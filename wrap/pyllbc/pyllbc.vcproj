@@ -95,8 +95,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy llbc python lib[$(TargetPath)] to python DLLs directory"
-				CommandLine="copy /b &quot;$(TargetPath)&quot; &quot;C:\Python27\DLLs&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -175,8 +175,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy llbc python lib[$(TargetPath)] to python DLLs directory"
-				CommandLine="copy /b &quot;$(TargetPath)&quot; &quot;C:\Python27\DLLs&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -208,7 +208,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)llbc/include&quot;;&quot;$(ProjectDir)Python2.7.8/Include&quot;;&quot;$(SolutionDir)wrap/pyllbc/include&quot;;&quot;$(ProjectDir)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYLLBC_EXPORTS"
@@ -259,8 +259,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy llbc python lib[$(TargetPath)] to python DLLs directory"
-				CommandLine="copy /b &quot;$(TargetPath)&quot; &quot;C:\Python27\DLLs&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration

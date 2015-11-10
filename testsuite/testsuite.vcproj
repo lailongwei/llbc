@@ -204,7 +204,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)testsuite&quot;;&quot;$(SolutionDir)llbc/include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
