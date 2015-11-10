@@ -1,7 +1,6 @@
 # llbc
 Low Level Base Compoment
 
-#####主要由于个人时间问题,llbc库当前基本没有任何文档(库相对庞大,写doc是一个比写代码更累的事),此Readme.txt也是非常简单的一个说明,实际编译安装及使用中,你可能会遇到一些问题,可以及时email给我:lailongwei@126.com,后期会逐步完善文档及支持,望见谅.
 
 llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的所有基础支持(包括字符串处理,日志,线程,配置,Timer,ObjRef,网络及其它所有基础支持),在最顶层,llbc使用Service的概念将这些所有支持以compoments的方式集成,也就意味着,在开发你的应用的时候,只需要一个Service就拥有所有你需要的功能.
 
@@ -49,43 +48,3 @@ llbc库没有任何依赖可以直接安装,json代码文件使用jsoncpp,已经
   
 ###Android:
   没时间处理Android平台,暂时没有安装说明
-  
-  
-##Demo:
-###// llbc基础Demo(c++):
-
-\#include "llbc.h"<br/>
-using namespace llbc;<br/>
-
-int main(int argc, char *argv[])<br/>
-{<br/>
-  std::cout <<"MajorVersion: " <<LLBC_majorVersion <<std::endl;<br/>
-  std::cout <<"MinorVersion: " <<LLBC_minorVersion <<std::endl;<br/>
-  std::cout <<"UpdateNumber: " <<LLBC_updateNumber <<std::endl;<br/>
-  std::cout <<"IsDebugVersion: " <<LLBC_isDebugVer <<std::endl;<br/>
-  <br/>
-  std::cout <<"VersionInfo: " <<std::endl;<br/>
-  std::cout <<LLBC_GetVersionInfo(true) <<std::endl;<br/>
-  <br/>
-  return 0;<br/>
-}<br/>
-
-###// llbc Service Demo(c++): 参考testsuite/comm/TestCase_Comm_Svc.h/.cpp
-
-### pyllbc基础Demo(python):
-import llbc<br/>
-<br/>
-print 'llbc information:'<br/>
-<br/>
-print 'info(non verbose):', llbc.GetVersionInfo(False)<br/>
-print 'info(verbose):'<br/>
-print llbc.GetVersionInfo(True)<br/>
-<br/>
-print 'major version:', llbc.MajorVersion<br/>
-print 'minor version:', llbc.MinorVersion<br/>
-print 'update num:', llbc.UpdateNo<br/>
-print 'is debug version:', llbc.Debug<br/>
-<br/>
-print 'machine endian:', llbc.Endian.MachineEndian<br/>
-<br/>
-### pyllbc Service Demo(python): 参考wrap/pyllbc/testsuite/communication/testcase_svcbase.py
