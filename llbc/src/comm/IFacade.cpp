@@ -1,0 +1,340 @@
+/**
+ * @file    IFacade.cpp
+ * @author  Longwei Lai<lailongwei@126.com>
+ * @date    2014/11/19
+ * @version 1.0
+ *
+ * @brief
+ */
+
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#include "llbc/comm/IFacade.h"
+#include "llbc/comm/protocol/ProtocolLayer.h"
+#include "llbc/comm/protocol/ProtoReportLevel.h"
+
+__LLBC_NS_BEGIN
+
+LLBC_SessionInfo::LLBC_SessionInfo()
+: _sessionId(0)
+, _isListen(false)
+, _localAddr()
+, _peerAddr()
+, _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
+{
+}
+
+LLBC_SessionInfo::~LLBC_SessionInfo()
+{
+}
+
+int LLBC_SessionInfo::GetSessionId() const
+{
+    return _sessionId;
+}
+
+void LLBC_SessionInfo::SetSessionId(int sessionId)
+{
+    _sessionId = sessionId;
+}
+
+bool LLBC_SessionInfo::IsListenSession() const
+{
+    return _isListen;
+}
+
+void LLBC_SessionInfo::SetIsListenSession(bool flag)
+{
+    _isListen = flag;
+}
+
+const LLBC_SockAddr_IN &LLBC_SessionInfo::GetLocalAddr() const
+{
+    return _localAddr;
+}
+
+void LLBC_SessionInfo::SetLocalAddr(const LLBC_SockAddr_IN &addr)
+{
+    _localAddr = addr;
+}
+
+const LLBC_SockAddr_IN &LLBC_SessionInfo::GetPeerAddr() const
+{
+    return _peerAddr;
+}
+
+void LLBC_SessionInfo::SetPeerAddr(const LLBC_SockAddr_IN &addr)
+{
+    _peerAddr = addr;
+}
+
+LLBC_SocketHandle LLBC_SessionInfo::GetSocket() const
+{
+    return _sockHandle;
+}
+
+void LLBC_SessionInfo::SetSocket(LLBC_SocketHandle handle)
+{
+    _sockHandle = handle;
+}
+
+LLBC_String LLBC_SessionInfo::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("sessionId:%d, ", _sessionId)
+        .append_format("isListen:%s, ", _isListen?"true":"false")
+        .append_format("local:{%s}, ", _localAddr.ToString().c_str())
+        .append_format("peer:{%s}, ", _peerAddr.ToString().c_str())
+        .append_format("handle:%d", _sockHandle);
+
+    return repr;
+}
+
+LLBC_SessionDestroy::LLBC_SessionDestroy()
+: _sessionId(0)
+, _initiative(false)
+, _reason()
+{
+}
+
+LLBC_SessionDestroy::~LLBC_SessionDestroy()
+{
+}
+
+int LLBC_SessionDestroy::GetSessionId() const
+{
+    return _sessionId;
+}
+
+void LLBC_SessionDestroy::SetSessionId(int id)
+{
+    _sessionId = id;
+}
+
+bool LLBC_SessionDestroy::IsInitiative() const
+{
+    return _initiative;
+}
+
+void LLBC_SessionDestroy::SetInitiative(bool flag)
+{
+    _initiative = flag;
+}
+
+const LLBC_String &LLBC_SessionDestroy::GetReason() const
+{
+    return _reason;
+}
+
+void LLBC_SessionDestroy::SetReason(const LLBC_String &reason)
+{
+    _reason.clear();
+    _reason.append(reason);
+}
+
+LLBC_String LLBC_SessionDestroy::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("sessionId:%d, ", _sessionId)
+        .append_format("initiative:%s, ", _initiative?"true":"false")
+        .append_format("reason:%s", _reason.c_str());
+
+    return repr;
+}
+
+LLBC_AsyncConnResult::LLBC_AsyncConnResult()
+: _connected(false)
+, _reason()
+, _peerAddr()
+{
+}
+
+LLBC_AsyncConnResult::~LLBC_AsyncConnResult()
+{
+}
+
+bool LLBC_AsyncConnResult::IsConnected() const
+{
+    return _connected;
+}
+
+void LLBC_AsyncConnResult::SetIsConnected(bool connected)
+{
+    _connected = connected;
+}
+
+const LLBC_String &LLBC_AsyncConnResult::GetReason() const
+{
+    return _reason;
+}
+
+void LLBC_AsyncConnResult::SetReason(const LLBC_String &reason)
+{
+    _reason.clear();
+    _reason.append(reason);
+}
+
+const LLBC_SockAddr_IN &LLBC_AsyncConnResult::GetPeerAddr() const
+{
+    return _peerAddr;
+}
+
+void LLBC_AsyncConnResult::SetPeerAddr(const LLBC_SockAddr_IN &addr)
+{
+    _peerAddr = addr;
+}
+
+LLBC_String LLBC_AsyncConnResult::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("connected:%s, ", _connected?"true":"false")
+        .append_format("reason:%s, ", _reason.c_str())
+        .append_format("peer_addr:{%s}", _peerAddr.ToString().c_str());
+
+    return repr;
+}
+
+LLBC_ProtoReport::LLBC_ProtoReport()
+: _sessionId(0)
+
+, _layer(0)
+, _level(0)
+, _report()
+{
+}
+
+LLBC_ProtoReport::~LLBC_ProtoReport()
+{
+}
+
+int LLBC_ProtoReport::GetSessionId() const
+{
+    return _sessionId;
+}
+
+void LLBC_ProtoReport::SetSessionId(int sessionId)
+{
+    _sessionId = sessionId;
+}
+
+int LLBC_ProtoReport::GetLayer() const
+{
+    return _layer;
+}
+
+void LLBC_ProtoReport::SetLayer(int layer)
+{
+    _layer = layer;
+}
+
+int LLBC_ProtoReport::GetLevel() const
+{
+    return _level;
+}
+
+void LLBC_ProtoReport::SetLevel(int level)
+{
+    _level = level;
+}
+
+const LLBC_String &LLBC_ProtoReport::GetReport() const
+{
+    return _report;
+}
+
+void LLBC_ProtoReport::SetReport(const LLBC_String &report)
+{
+    _report.clear();
+    _report.append(report);
+}
+
+LLBC_String LLBC_ProtoReport::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("sessionId:%d, ", _sessionId)
+        .append_format("layer:%s, ", LLBC_ProtocolLayer::Layer2Str(_layer).c_str())
+        .append_format("level:%s, ", LLBC_ProtoReportLevel::Level2Str(_level).c_str())
+        .append_format("report:%s", _report.c_str());
+
+    return repr;
+}
+
+LLBC_IFacade::LLBC_IFacade()
+: _svc(NULL)
+{
+}
+
+LLBC_IFacade::~LLBC_IFacade()
+{
+}
+
+LLBC_IService *LLBC_IFacade::GetService() const
+{
+    return _svc;
+}
+
+void LLBC_IFacade::OnInitialize()
+{
+}
+
+void LLBC_IFacade::OnDestroy()
+{
+}
+
+void LLBC_IFacade::OnUpdate()
+{
+}
+
+void LLBC_IFacade::OnIdle(int idleTime)
+{
+}
+
+void LLBC_IFacade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+{
+}
+
+void LLBC_IFacade::OnSessionDestroy(int sessionId)
+{
+}
+
+void LLBC_IFacade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+{
+}
+
+void LLBC_IFacade::OnProtoReport(const LLBC_ProtoReport &report)
+{
+}
+
+void LLBC_IFacade::OnUnHandledPacket(int opcode)
+{
+}
+
+void LLBC_IFacade::SetService(LLBC_IService *svc)
+{
+    _svc = svc;
+}
+
+__LLBC_NS_END
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
+{
+    return o <<si.ToString();
+}
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroy &destroy)
+{
+    return o <<destroy.ToString();
+}
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
+{
+    return o <<result.ToString();
+}
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
+{
+    return o <<report.ToString();
+}
+
+#include "llbc/common/AfterIncl.h"

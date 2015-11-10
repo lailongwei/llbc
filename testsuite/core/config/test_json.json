@@ -1,0 +1,17 @@
+{
+	"int_value" : {"int_value" : 3},
+	"string_value" : "I'am string value",
+	"json_value" : {"test" : "ttttteeeeesssssttttt"},
+	"json_array" : [ {"a" : 1}, {"b" : 2}, {"c" : 3} ],
+	"int_json_map" : {"1" : "a", "2" : "b", "3" : "c"},
+	"string_json_map" : {"aa" : 11, "bb" : 22, "cc" : 33},
+	"variant_array" : [1, "a", 2, "b", 3.0, "c", true, "d"],
+	"int_variant_map" : {"111" : "hello", "222" : 3.0, "333" : true},
+	"string_variant_map" : {
+		"string_variant_map" : {
+			"hello" : "hello",
+			"world" : 1.0,
+			"surprise" : true
+		}
+	}
+}

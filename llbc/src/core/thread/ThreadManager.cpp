@@ -1,0 +1,1287 @@
+/**
+ * @file    ThreadManager.cpp
+ * @author  Longwei Lai<lailongwei@126.com>
+ * @date    2013/05/18
+ * @version 1.0
+ *
+ * @brief
+ */
+
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#include "llbc/core/os/OS_Thread.h"
+#include "llbc/core/os/OS_Console.h"
+
+#include "llbc/core/utils/Util_Debug.h"
+
+#include "llbc/core/thread/Guard.h"
+#include "llbc/core/thread/ThreadDescriptor.h"
+#include "llbc/core/thread/ThreadGroupDescriptor.h"
+#include "llbc/core/thread/ThreadManager.h"
+
+__LLBC_INTERNAL_NS_BEGIN
+
+extern "C" {
+struct __LLBC_ThreadMgr_Thread_Arg
+{
+    LLBC_NS LLBC_ThreadArg realArg;
+    LLBC_NS LLBC_ThreadProc realProc;
+    LLBC_NS LLBC_Handle threadHandle;
+    LLBC_NS LLBC_ThreadManager *threadMgr;
+};
+}
+
+static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadArg arg)
+{
+    // Get thread arguments.
+    __LLBC_ThreadMgr_Thread_Arg *threadArg = 
+        reinterpret_cast<__LLBC_ThreadMgr_Thread_Arg *>(arg);
+    ASSERT(threadArg && "llbc library internal error, threadArg NULL!");
+
+    LLBC_NS LLBC_ThreadArg realArg = threadArg->realArg;
+    LLBC_NS LLBC_ThreadProc realProc = threadArg->realProc;
+    LLBC_NS LLBC_Handle threadHandle = threadArg->threadHandle;
+    LLBC_NS LLBC_ThreadManager *threadMgr = threadArg->threadMgr;
+
+    // Set TLS.
+    LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
+    tls->coreTls.llbcThread = true;
+    tls->coreTls.threadHandle = threadArg->threadHandle;
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    tls->coreTls.nativeThreadHandle = LLBC_NS LLBC_GetCurrentThread();
+#else // LLBC_TARGET_PLATFORM_WIN32
+    HANDLE pseudoHandle = ::GetCurrentThread();
+    ::DuplicateHandle(::GetCurrentProcess(),
+                      pseudoHandle,
+                      ::GetCurrentProcess(),
+                      &tls->coreTls.nativeThreadHandle,
+                      0,
+                      FALSE,
+                      DUPLICATE_SAME_ACCESS);
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
+    // Delete arg.
+    delete threadArg;
+
+    // Notify thread manager thread startup.
+    threadMgr->OnThreadStartup(threadHandle);
+
+    // Call thread proc.
+    LLBC_NS LLBC_ThreadRtn rtn = (*realProc)(realArg);
+
+    // Notify thread manager thread terminated.
+    threadMgr->OnThreadTerminate(threadHandle);
+
+    // Cleanup tls.
+#if LLBC_TARGET_PLATFORM_WIN32
+    ::CloseHandle(tls->coreTls.nativeThreadHandle);
+#endif // LLBC_TARGET_PLATFORM_WIN32
+    LLBC_NS __LLBC_ResetLibTls();
+
+    return rtn;
+}
+
+__LLBC_INTERNAL_NS_END
+
+__LLBC_NS_BEGIN
+
+LLBC_ThreadManager::LLBC_ThreadManager()
+    : _maxThreadHandle(LLBC_INVALID_HANDLE)
+    , _maxGroupHandle(LLBC_INVALID_HANDLE)
+{
+    ::memset(_groups, 0, sizeof(_groups));
+    ::memset(_threads, 0, sizeof(_threads));
+}
+
+LLBC_ThreadManager::~LLBC_ThreadManager()
+{
+    this->WaitAll();
+}
+
+LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
+                                              LLBC_ThreadProc proc,
+                                              LLBC_ThreadArg arg,
+                                              int flags,
+                                              int priority,
+                                              const int stackSize[],
+                                              LLBC_BaseTask *task,
+                                              LLBC_Handle groupHandle,
+                                              LLBC_NativeThreadHandle nativeHandles[],
+                                              LLBC_Handle handles[])
+{
+    if (threadNum <= 0 || !proc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_INVALID_HANDLE;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    if (groupHandle == LLBC_INVALID_HANDLE)
+    {
+        groupHandle =++ _maxGroupHandle;
+    }
+    
+    for (int i = 0; i < threadNum; i++)
+    {
+        if (this->CreateThread_NonLock(proc,
+                                       arg,
+                                       flags,
+                                       priority,
+                                       stackSize ? stackSize[i] : LLBC_CFG_THREAD_DFT_STACK_SIZE,
+                                       task,
+                                       groupHandle,
+                                       nativeHandles ? &nativeHandles[i] : NULL,
+                                       handles ? &handles[i] : NULL) == LLBC_INVALID_HANDLE)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return groupHandle;
+}
+
+LLBC_Handle LLBC_ThreadManager::CreateThread(LLBC_ThreadProc proc,
+                                             LLBC_ThreadArg arg,
+                                             int flags,
+                                             int priority,
+                                             int stackSize,
+                                             LLBC_BaseTask *task,
+                                             LLBC_Handle groupHandle,
+                                             LLBC_NativeThreadHandle *nativeHandle,
+                                             LLBC_Handle *handle)
+{
+    if (!proc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_INVALID_HANDLE;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    return this->CreateThread_NonLock(proc,
+                                      arg,
+                                      flags,
+                                      priority,
+                                      stackSize,
+                                      task,
+                                      groupHandle,
+                                      nativeHandle,
+                                      handle);
+}
+
+void LLBC_ThreadManager::Sleep(int milliSecs)
+{
+    LLBC_Sleep(milliSecs);
+}
+
+void LLBC_ThreadManager::CPURelax()
+{
+    LLBC_CPURelax();
+}
+
+LLBC_NativeThreadHandle LLBC_ThreadManager::GetCurrentThread()
+{
+    return LLBC_GetCurrentThread();
+}
+
+LLBC_NativeThreadHandle LLBC_ThreadManager::GetNativeThreadHandle(LLBC_Handle handle) const
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_INVALID_NATIVE_THREAD_HANDLE;
+    }
+
+    LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_INVALID_NATIVE_THREAD_HANDLE;
+    }
+
+    return threadDesc->GetNativeHandle();
+}
+
+LLBC_Handle LLBC_ThreadManager::GetGroupHandle(LLBC_Handle handle) const
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_INVALID_HANDLE;
+    }
+
+    LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_INVALID_HANDLE;
+    }
+
+    return threadDesc->GetGroupHandle();
+}
+
+LLBC_BaseTask *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return NULL;
+    }
+
+    LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return NULL;
+    }
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return threadDesc->GetTask();
+}
+
+int LLBC_ThreadManager::GetStackSize(LLBC_Handle handle) const
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return -1;
+    }
+
+    LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return -1;
+    }
+
+    return threadDesc->GetStackSize();
+}
+
+int LLBC_ThreadManager::GetPriority(LLBC_Handle handle) const
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return -1;
+    }
+
+    LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return -1;
+    }
+
+    return threadDesc->GetPriority();
+}
+
+int LLBC_ThreadManager::SetPriority(LLBC_Handle handle, int priority)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetPriority() == priority)
+    {
+        return LLBC_RTN_OK;
+    }
+
+    int rtn = LLBC_SetThreadPriority(threadDesc->GetNativeHandle(), priority);
+    if (rtn == LLBC_RTN_OK)
+    {
+        threadDesc->SetPriority(priority);
+    }
+
+    return rtn;
+}
+
+int LLBC_ThreadManager::Wait(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    _lock.Lock();
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        _lock.Unlock();
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetState() != LLBC_ThreadState::Running &&
+        threadDesc->GetState() != LLBC_ThreadState::Suspended)
+    {
+        _lock.Unlock();
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_NativeThreadHandle nativeHandle = threadDesc->GetNativeHandle();
+
+    _lock.Unlock();
+
+    int rtn = LLBC_JoinThread(nativeHandle);
+    if (rtn == LLBC_RTN_OK)
+    {
+        LLBC_Guard guard(_lock);
+        if ((threadDesc = this->FindThreadDescriptor(handle)))
+        {
+
+#if LLBC_TARGET_PLATFORM_WIN32
+            if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
+            {
+                ::CloseHandle(threadDesc->GetNativeHandle());
+            }
+#endif
+            this->RemoveThreadDescriptor(handle);
+        }
+    }
+
+    return rtn;
+}
+
+int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
+{
+    if (UNLIKELY(!task))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    _lock.Lock();
+
+    std::vector<LLBC_Handle> willWaitThreads;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        if (!_threads[i])
+            continue;
+
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            if (threadDesc->GetTask() == task)
+                willWaitThreads.push_back(threadDesc->GetHandle());
+
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    _lock.Unlock();
+
+    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    {
+        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
+            return LLBC_RTN_FAILED;
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    _lock.Lock();
+
+    LLBC_ThreadGroupDescriptor *groupDesc = 
+        this->FindThreadGroupDescriptor(handle);
+    if (!groupDesc)
+    {
+        _lock.Unlock();
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    std::vector<LLBC_Handle> willWaitThreads;
+    LLBC_ThreadDescriptor *threadDesc = 
+        groupDesc->FindFirstThreadDescriptor();
+    while (threadDesc)
+    {
+        willWaitThreads.push_back(threadDesc->GetHandle());
+        threadDesc = threadDesc->GetGroupThreadNext();
+    }
+
+    _lock.Unlock();
+
+    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    {
+        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::WaitAll()
+{
+    _lock.Lock();
+
+    std::vector<LLBC_Handle> willWaitThreads;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            willWaitThreads.push_back(threadDesc->GetHandle());
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    _lock.Unlock();
+
+    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    {
+        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetState() == LLBC_ThreadState::Suspended)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_RTN_FAILED;
+    }
+    else if (threadDesc->GetState() != LLBC_ThreadState::Running)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_RTN_FAILED;
+    }
+
+    int rtn = LLBC_SuspendThread(threadDesc->GetNativeHandle());
+    if (rtn == LLBC_RTN_OK)
+    {
+        threadDesc->SetState(LLBC_ThreadState::Suspended);
+    }
+
+    return rtn;
+}
+
+int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
+{
+    if (UNLIKELY(!task))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    std::vector<LLBC_Handle> willSuspendThreads;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        if (!_threads[i])
+        {
+            continue;
+        }
+
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            if (threadDesc->GetTask() == task)
+            {
+                willSuspendThreads.push_back(threadDesc->GetHandle());
+            }
+
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    for (size_t i = 0; i < willSuspendThreads.size(); i++)
+    {
+        if (this->Suspend(willSuspendThreads[i]) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadGroupDescriptor *groupDesc = 
+        this->FindThreadGroupDescriptor(handle);
+    if (!groupDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_ThreadDescriptor *threadDesc = 
+        groupDesc->FindFirstThreadDescriptor();
+    while (threadDesc)
+    {
+        LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+        threadDesc = threadDesc->GetGroupThreadNext();
+
+        if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::SuspendAll()
+{
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+            threadDesc = threadDesc->GetThreadNext();
+
+            if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            {
+                return LLBC_RTN_FAILED;
+            }
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::Resume(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetState() == LLBC_ThreadState::Running)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_RTN_FAILED;
+    }
+    else if (threadDesc->GetState() != LLBC_ThreadState::Suspended)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_RTN_FAILED;
+    }
+
+    int rtn = LLBC_ResumeThread(threadDesc->GetNativeHandle());
+    if (rtn == LLBC_RTN_OK)
+    {
+        threadDesc->SetState(LLBC_ThreadState::Running);
+    }
+
+    return rtn;
+}
+
+int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
+{
+    if (UNLIKELY(!task))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    std::vector<LLBC_Handle> willResumeThreads;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        if (!_threads[i])
+        {
+            continue;
+        }
+
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            if (threadDesc->GetTask() == task)
+            {
+                willResumeThreads.push_back(threadDesc->GetHandle());
+            }
+
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    for (size_t i = 0; i < willResumeThreads.size(); i++)
+    {
+        if (this->Resume(willResumeThreads[i]) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadGroupDescriptor *groupDesc = 
+        this->FindThreadGroupDescriptor(handle);
+    if (!groupDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_ThreadDescriptor *threadDesc = 
+        groupDesc->FindFirstThreadDescriptor();
+    while (threadDesc)
+    {
+        LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+        threadDesc = threadDesc->GetGroupThreadNext();
+
+        if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::ResumeAll()
+{
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+            threadDesc = threadDesc->GetThreadNext();
+
+            if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            {
+                return LLBC_RTN_FAILED;
+            }
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetState() != LLBC_ThreadState::Running &&
+        threadDesc->GetState() != LLBC_ThreadState::Suspended)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_RTN_FAILED;
+    }
+
+    int rtn = LLBC_CancelThread(threadDesc->GetNativeHandle());
+    if (rtn == LLBC_RTN_OK)
+    {
+        LLBC_JoinThread(threadDesc->GetNativeHandle());
+#if LLBC_TARGET_PLATFORM_WIN32
+        if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
+        {
+            ::CloseHandle(threadDesc->GetNativeHandle());
+        }
+#endif
+        this->RemoveThreadDescriptor(handle);
+    }
+
+    return rtn;
+}
+
+int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
+{
+    if (UNLIKELY(!task))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    std::vector<LLBC_Handle> willCancelTasks;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        if (!_threads[i])
+        {
+            continue;
+        }
+
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            if (threadDesc->GetTask() == task)
+            {
+                willCancelTasks.push_back(threadDesc->GetHandle());
+            }
+
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    for (size_t i = 0; i < willCancelTasks.size(); i++)
+    {
+        if (this->Cancel(willCancelTasks[i]) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadGroupDescriptor *groupDesc = 
+        this->FindThreadGroupDescriptor(handle);
+    if (!groupDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_ThreadDescriptor *threadDesc = 
+        groupDesc->FindFirstThreadDescriptor();
+    while (threadDesc)
+    {
+        LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+        threadDesc = threadDesc->GetGroupThreadNext();
+
+        if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::CancelAll()
+{
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+            threadDesc = threadDesc->GetThreadNext();
+
+            if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            {
+                return LLBC_RTN_FAILED;
+            }
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (!threadDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    if (threadDesc->GetState() != LLBC_ThreadState::Running &&
+        threadDesc->GetState() != LLBC_ThreadState::Suspended)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_RTN_FAILED;
+    }
+
+    return LLBC_KillThread(threadDesc->GetNativeHandle(), signum);
+}
+
+int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
+{
+    if (UNLIKELY(!task))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    std::vector<LLBC_Handle> willCancelTasks;
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        if (!_threads[i])
+        {
+            continue;
+        }
+
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            if (threadDesc->GetTask() == task)
+            {
+                willCancelTasks.push_back(threadDesc->GetHandle());
+            }
+
+            threadDesc = threadDesc->GetThreadNext();
+        }
+    }
+
+    for (size_t i = 0; i < willCancelTasks.size(); i++)
+    {
+        if (this->Kill(willCancelTasks[i], signum) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
+{
+    if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadGroupDescriptor *groupDesc = 
+        this->FindThreadGroupDescriptor(handle);
+    if (!groupDesc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_RTN_FAILED;
+    }
+
+    LLBC_ThreadDescriptor *threadDesc = 
+        groupDesc->FindFirstThreadDescriptor();
+    while (threadDesc)
+    {
+        LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+        threadDesc = threadDesc->GetGroupThreadNext();
+
+        if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_RTN_OK)
+        {
+            return LLBC_RTN_FAILED;
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+int LLBC_ThreadManager::KillAll(int signum)
+{
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    {
+        LLBC_ThreadDescriptor *threadDesc = _threads[i];
+        while (threadDesc)
+        {
+            LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
+            threadDesc = threadDesc->GetThreadNext();
+
+            if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_RTN_OK)
+            {
+                return LLBC_RTN_FAILED;
+            }
+        }
+    }
+
+    return LLBC_RTN_OK;
+}
+
+void LLBC_ThreadManager::OnThreadStartup(LLBC_Handle handle)
+{
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    threadDesc->SetState(LLBC_ThreadState::Running);
+}
+
+void LLBC_ThreadManager::OnThreadTerminate(LLBC_Handle handle)
+{
+    LLBC_Guard guard(_lock);
+
+    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    if (threadDesc)
+    {
+#if LLBC_TARGET_PLATFORM_WIN32
+        if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
+        {
+            ::CloseHandle(threadDesc->GetNativeHandle());
+        }
+#endif
+
+        this->RemoveThreadDescriptor(threadDesc->GetHandle());
+    }
+}
+
+LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
+                                                     LLBC_ThreadArg arg,
+                                                     int flags,
+                                                     int priority,
+                                                     int stackSize,
+                                                     LLBC_BaseTask *task,
+                                                     LLBC_Handle groupHandle,
+                                                     LLBC_NativeThreadHandle *nativeHandle,
+                                                     LLBC_Handle *handle)
+{
+    if (!proc)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_INVALID_HANDLE;
+    }
+    if (stackSize <= LLBC_CFG_THREAD_MINIMUM_STACK_SIZE)
+    {
+        stackSize = LLBC_CFG_THREAD_MINIMUM_STACK_SIZE;
+    }
+
+    if (groupHandle == LLBC_INVALID_HANDLE)
+    {
+        groupHandle =++ _maxGroupHandle;
+    }
+
+    LLBC_NativeThreadHandle tmpNativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
+    if (!nativeHandle)
+    {
+        nativeHandle = &tmpNativeThreadHandle;
+    }
+
+    LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg *threadArg =
+        new LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg;
+    threadArg->realArg = arg;
+    threadArg->realProc = proc;
+    threadArg->threadHandle =++ _maxThreadHandle;
+    threadArg->threadMgr = this;
+
+    if (LLBC_CreateThread(nativeHandle,
+                          &LLBC_INTERNAL_NS __LLBC_ThreadMgr_ThreadEntry,
+                          threadArg,
+                          flags,
+                          priority,
+                          stackSize) != LLBC_RTN_OK)
+    {
+        delete threadArg;
+        return LLBC_INVALID_HANDLE;
+    }
+
+    LLBC_ThreadDescriptor *desc = new LLBC_ThreadDescriptor;
+    desc->SetHandle(_maxThreadHandle);
+    desc->SetNativeHandle(*nativeHandle);
+    desc->SetGroupHandle(groupHandle);
+    desc->SetStackSize(stackSize);
+    desc->SetPriority(priority);
+    desc->SetState(LLBC_ThreadState::Stoped);
+    desc->SetFlags(flags);
+    desc->SetTask(task);
+
+    this->AddThreadDescriptor(desc);
+
+    return LLBC_RTN_OK;
+}
+
+void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
+{
+    // Check thread descriptor in threads hash bucket or not.
+    if (this->FindThreadDescriptor(threadDesc->GetHandle()))
+    {
+        return;
+    }
+
+    // Force set thread next to NULL.
+    threadDesc->SetThreadNext(NULL);
+
+    // Get thread group descriptor, if not exist, add new group descriptor
+    // and add to thread group hash bucket.
+    LLBC_ThreadGroupDescriptor *groupDesc = this->FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
+    if (!groupDesc)
+    {
+        groupDesc = new LLBC_ThreadGroupDescriptor;
+        groupDesc->SetGroupHandle(threadDesc->GetGroupHandle());
+        this->AddThreadGroupDescriptor(groupDesc);
+    }
+
+    // Add to thread hash bucket.
+    int threadBucketIdx = threadDesc->GetHandle() % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_threads[threadBucketIdx])
+    {
+        _threads[threadBucketIdx] = threadDesc;
+    }
+    else
+    {
+        LLBC_ThreadDescriptor *tmpDesc = _threads[threadBucketIdx];
+        while (tmpDesc->GetThreadNext())
+        {
+            tmpDesc = tmpDesc->GetThreadNext();
+        }
+
+        tmpDesc->SetThreadNext(threadDesc);
+    }
+
+    // Add to thread group.
+    groupDesc->AddToGroup(threadDesc);
+}
+
+LLBC_ThreadDescriptor *LLBC_ThreadManager::FindThreadDescriptor(LLBC_Handle handle) const
+{
+    int threadBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_threads[threadBucketIdx])
+    {
+        return NULL;
+    }
+
+    LLBC_ThreadDescriptor *desc = _threads[threadBucketIdx];
+    while (desc)
+    {
+        if (desc->GetHandle() == handle)
+        {
+            return desc;
+        }
+    }
+
+    return NULL;
+}
+
+void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
+{
+    int threadBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_threads[threadBucketIdx])
+    {
+        return;
+    }
+
+    LLBC_ThreadDescriptor *desc = _threads[threadBucketIdx];
+    if (desc->GetHandle() == handle)
+    {
+        _threads[threadBucketIdx] = desc->GetThreadNext();
+        LLBC_ThreadGroupDescriptor *groupDesc = 
+            this->FindThreadGroupDescriptor(desc->GetGroupHandle());
+        groupDesc->RemoveFromGroup(desc->GetHandle());
+        if (groupDesc->GetThreadCount() == 0)
+        {
+            this->RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
+        }
+
+        delete desc;
+
+        return;
+    }
+
+    while (desc->GetThreadNext())
+    {
+        LLBC_ThreadDescriptor *tmpDesc = desc->GetThreadNext();
+        if (tmpDesc->GetHandle() == handle)
+        {
+            LLBC_ThreadGroupDescriptor *groupDesc =
+                this->FindThreadGroupDescriptor(tmpDesc->GetGroupHandle());
+            groupDesc->RemoveFromGroup(tmpDesc->GetHandle());
+            if (groupDesc->GetThreadCount() == 0)
+            {
+                this->RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
+            }
+
+            desc->SetThreadNext(desc->GetThreadNext()->GetThreadNext());
+
+            delete tmpDesc;
+
+            return;
+        }
+
+        desc = tmpDesc;
+    }
+}
+
+void LLBC_ThreadManager::AddThreadGroupDescriptor(LLBC_ThreadGroupDescriptor *groupDesc)
+{
+    if (this->FindThreadGroupDescriptor(groupDesc->GetGroupHandle()))
+    {
+        return;
+    }
+
+    groupDesc->SetGroupNext(NULL);
+
+    int groupBucketIdx = groupDesc->GetGroupHandle() % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_groups[groupBucketIdx])
+    {
+        _groups[groupBucketIdx] = groupDesc;
+        return;
+    }
+
+    LLBC_ThreadGroupDescriptor *tmpGroupDesc = _groups[groupBucketIdx];
+    while (tmpGroupDesc->GetGroupNext())
+    {
+        tmpGroupDesc = tmpGroupDesc->GetGroupNext();
+    }
+
+    tmpGroupDesc->SetGroupNext(groupDesc);
+}
+
+LLBC_ThreadGroupDescriptor *LLBC_ThreadManager::FindThreadGroupDescriptor(LLBC_Handle handle) const
+{
+    int groupBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_groups[groupBucketIdx])
+    {
+        return NULL;
+    }
+
+    LLBC_ThreadGroupDescriptor *desc = _groups[groupBucketIdx];
+    while (desc)
+    {
+        if (desc->GetGroupHandle() == handle)
+        {
+            return desc;
+        }
+    }
+
+    return NULL;
+}
+
+void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
+{
+    int groupBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
+    if (!_groups[groupBucketIdx])
+    {
+        return;
+    }
+
+    LLBC_ThreadGroupDescriptor *groupDesc = _groups[groupBucketIdx];
+    if (groupDesc->GetGroupHandle() == handle)
+    {
+        _groups[groupBucketIdx] = groupDesc->GetGroupNext();
+
+        delete groupDesc;
+
+        return;
+    }
+
+    while (groupDesc->GetGroupNext())
+    {
+        if (groupDesc->GetGroupNext()->GetGroupHandle() == handle)
+        {
+            LLBC_ThreadGroupDescriptor *tmpGroupDesc = groupDesc->GetGroupNext();
+            groupDesc->SetGroupNext(groupDesc->GetGroupNext()->GetGroupNext());
+
+            delete tmpGroupDesc;
+
+            return;
+        }
+
+        groupDesc = groupDesc->GetGroupNext();
+    }
+}
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"

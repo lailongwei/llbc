@@ -1,0 +1,253 @@
+# llbc library update log file.
+# Longwei Lai<lailongwei@126.com>
+######################################################################################
+#
+# Version: 1.0.1
+# 2015/11/10
+# 1) 修复BasicString在LINUX编译WARN;
+# 2) 修复Logger在配置读取时level配置项读取错误的BUG;
+# 3) Makefile中加入install commands;
+#
+# 2015/10/18
+# 1) 整体重构框架编译makefile代码,以去除旧的相对落后的编译识别方式及优化编译识别速度,主要更新:
+#    a. 新的编译流程将依赖分析细化到所有.cpp/.h文件,任何.h文件改动都将触发相关依赖于此文件的.cpp文件重新编译;
+#    b. 重构整个文件搜索算法,支持无限层次扩展,同时优化整个搜索速度,不管项目目录层次有多深及代码有多少,编译分析过程都将变得非常快速;
+#    c. 去除之前%.o: %.c/.cpp隐式依赖编译实现,直接对所有文件执行显式编译,以去除make的任何不必要的文件推导过程;
+#    d. 重构过程直接修复旧的make编译相关实现中的debug/release交叉使用的时候出现的.o文件共用的BUG(由模式变量DEBUG引起);
+#    e. 删除了所有不必要的XXXX.linux, XXXX.mac编译支持文件(包括rules.mk及Makefile),只保留一个rules.mk及一个Makefile;
+#    f. 整个项目顶层Makefile也执行重构,以执行更精细化的编译.当前不支持直接make编译,需要输入具体的编译goal, 如需编译项目,请运行make或者make help查看;
+#
+# 2015/10/03
+# 1) 修复Property中的value部分解析时未unescape的BUG;
+# 2) 整理Macro.h/MacroInl.h文件;
+# 3) 修复LLBC_Packet中有关header part get/set接口的BUG及整体重写此部分代码(使用不方便及类型不兼容时产生的BUG);
+#    主要修复在get/set的类型长度跟part定义中的长度不符时候的处理BUG问题，如part为4,但在使用时想取得short数据,老代码将出现严重BUG;
+#    统一区分non-float type及float-type的get/set接口,在part的传输过程中可能涉及字节序列的转换以及模板匹配，需要对float/double单独实现get/set;
+#    去除有关之前自定义包头的相关代码实现中的冗余代码;
+#    优化LLBC_Packet中有关header part的操作接口便利性,在part为4字节长度的时候,你可以get/set 1/2/8字节长度的数据,在内部将完成part中的4字节定义的转换;
+# 4) 重写LLBC_PacketHeaderDesc类中的数据组织方式代码,以取得更高的效率(此类的相关接口使用频繁);
+# 5) 增加LLBC_PacketHeaderParts实现,以完整实现包头自定义功能,对于单播,组播及广播,都将在最后附带此数据,指示Packet还需要设置哪些包头数据;
+#    使用者在自定义包头后,在发送时,应该将所有自己额外的包头数据设置在此类对象中，再将由框架统一完成LLBC_Packet的包头设置;
+# 6) 调整LLBC_IService接口，加入Send2/Multicast2/Broadcast2方法,以区分有LLBC_PacketHeaderParts *参数及无LLBC_PacketHeaderParts *参数时的方法定义;
+# 7) 细化在BeforeIncl.h/AfterIncl.h中的相关宏限制;
+#
+# 2015/09/14
+# 1) 修复LLBC_BasicString中的escape/unescape错误.
+# 2) 去除LLBC_Property的DISABLE_ASSIGNMENT的限制，加入copy constructor及operator =()实现.
+#
+# 2015/09/14
+# 1) 重写.cfg文件读写类LLBC_Properties,更名为LLBC_Property,废除初始只为实现功能而编码的旧类,新类直接支持所有特性,包括路径访问及智能路径扩充.
+# 2) 考虑很多使用场景都需要字符串数组,加入LLBC_StringsA/LLBC_StringsW定义.
+# 3) LLBC_BasicString<>加入replace的const方法,返回replaced后的字符串.
+# 4) 修复LLBC_BasicString<>.rstrip()的BUG.
+# 5) LLBC_BasicString<>加入escape/unescape支持,直接转义/反转义字符串.
+# 6) 删除所有旧式的SAFE_FREE,SAFE_DELETE,SAFE_DELETES,统一使用LLBC_XFree,LLBC_XDelete,LLBC_XDeletes代替.
+# 7) OS_Directory部分加入LLBC_JoinDirectory封装,并将原来LLBC_Directory中的目录相关函数调整到此.
+# 8) log模块配置定义修改,不需要前缀:llbc.log,cfg配置文件中的property name第一个就是logger的名字.
+#
+# 2015/09/14
+# 1) 整体框架调整(3月到8月间的修改部分未作记录,未作记录,只描述2015/09月份的修改)
+#    a. 加入包头自定义支持，允许使用者直接自定义适合自己项目情况的包头结构.
+#    b. 修复LLBC_BasicString, LLBC_Stream的从多内部细节错误,基本都为致命错误.
+#    c. 在WIN32平台中,去除MFC依赖(afx.h),以加快编译速度及整体简洁度.
+#    d. 整体显式实例化LLBC_BasicString<char>, LLBC_BasicString<wchar>,执行统一的模块错误修复.
+#
+# 2015/03/16
+# 1) Service加入延迟执行delegate支持.
+#
+# 2015/02/07
+# 1) 统一所有llbc内部用到的参数格式化相关的代码,使用LLBC_FormatArg直接完成参数的格式化.
+# 2) 修复Logger中在参数在2048临界状态的时候导致的coredump的BUG.
+# 3) 修复SelectPoller在service频繁发包的时候,响应迟钝的BUG.
+#
+# 2015/01/10
+# 1) 去除FilterProtocol层的设计, 加入ProtocolFilter设计,所有ProtocolLayer都可以设置ProtocolFilter.
+#
+# 2014/12/29
+# 1)Service加入UnifyPreSubscribe支持,允许统一对packet设置pre-handler(适用于RAW及NORMAL类型的Service).
+#
+# 2014/12/27
+# 1)Service加入SubscribeStatus支持,允许订阅指定opcode的指定status的包,以便对此包作特殊处理,如果订阅,将不会再调默认包处理函数(由Subscribe注册)(需要将LLBC_CFG_COMM_ENABLE_STATUS_HANDLER宏开启).
+# 2)Service加入RegisterStatusDesc支持,允许在Service中注册指定status code的字符串描述信息,如果注册,在Packet中,将可以通过GetStatusDesc()得到此描述(需要将LLBC_CFG_COMM_ENABLE_STATUS_DESC宏开启).
+#
+# 2014/12/20
+# 1)去除testsuite中的旧代码风格(13年以前的测试代码).
+#
+# 2014/12/19
+# 1)core/utils模块加入Util_Network相关代码,用于支持IPv4地址判断.
+# 2)ExportHeader.h导出限定头文件统一改名为Export.h.
+#
+# 2014/12/17
+# 1)Facade中加入OnUnhandledPacket()事件调用接口,如果一个包未在service中订阅,将会使用此方法进行处理.
+#
+# 2014/12/9
+# 1)Stream默认的endian设置依据Config.h中的配置来确认,不使用机器字节序.
+# 2)service的Listen/Connect/AsyncConn接口将允许在service未开启的时候调用,操作操作将会延迟到service的Start函数中完成.
+#
+# 2014/12/02
+# 完成communication库的整体重构，测试，简化架构，性能及接口.
+#
+# 2014/11/09
+# 更新Dispatcher相关代码细节,修复在极端情况下的内存泄露BUG.
+# !!!!!!!! 此版本将到此为止, 后面将统一重构网络部分代码实现,以更好的支持并发及后期的重连实现.
+#
+# 2014/11/07
+# 加入LLBC_InvokeGuard, 以支持在复杂的函数逻辑中多返回点的资源自动释放.
+# 
+# 2014/10/14
+# 更新LLBC_String,增加split接口,类似python中的str.split.
+#
+# 2014/10/07
+# 1)更新BasicString,在DeSerialize的过程中,如果Stream可读字节数为0,返回false.
+# 2)更新Stream的DeSerialize std::string的特化,如果Stream可读字节数为0,返回false.
+# 3)更新STLHelper,以支持std::stack,std::queue的操作.
+# 4)在Macro.h中,加入LLBC_Deletes/LLBC_XDeletes的实现.
+#
+# 2014/09/06
+# 1)调整LibTls中的TimerScheduler实现,不由service创建,每个由task创建的线程,都将带有TimerScheduler.
+# 2)将BaseTimer::GetTimer()由private属性调整到public属性,以方便上层打印timer属性.
+# 3)修复BinaryHeap在只有一个堆元素的时候,重复删除BUG.
+#
+# 2014/08/15
+# 1)增加LLBC_Free, LLBC_XFree, LLBC_Delete, LLBC_XDelete, LLBC_New等相关内存分配及释放相关宏,以简化并统一管理内存,也用于以后废除SAFE_XXX()这一套宏.
+# 2)优化Log模块性能,减少malloc调用频繁度.
+# 3)为适应相关上层脚本封装,对原来的filename存储策略从const char *更改为char *,不对此字段作任何是字符串常量的假设,直接从堆中分配内存进行存储.
+#
+# 2014/08/14
+# 1)更新LLBC_Properties接口及实现,加入Delete方法,以支持对指定key的property进行移除,所有方法中的原始const char *类型统一更新为const LLBC_String &类型.
+# 2)更新WIN平台中的OS API 及 WSA 两类错误描述的输出,不使用SYSTEM_DEFAULT的语言,统一使用英文输出,以让所有的错误输出兼容任意的多字节字符集.
+#
+# 2014/08/11
+# 1)加入允许自定义错误id及描述支持,错误ID范围:[0,65535], 需要使用LLBC_BuildCustomErrno()生成真正的错误ID.
+#   llbc自带了一些脚本语言的封装,如python的封装:pyllbc, 在此类封装中,会使用自定义的id部分,详细需要看各自封装实现中的说明,但基本都是从高往低占用,
+#   建议使用者选择[0, 60000]范围的id用于自己的代码中.
+#
+# 2014/07/26
+# 1)去除LLBC_Int2Str,LLBC_UInt2Str, ...这类number -> string的转换函数,统一使用模板函数LLBC_Num2Str<>代替.
+#
+# 2014/07/24
+# 1)重写EventManager，对每次的AddListener返回一个存根，以可以只针对存根取消此listener.
+# 2)优化communication模块，整体上优化IocpDispatcher及EpollDispatcher性能，使得收发速度达到最高.
+# 3)修复error消息格式化模块中在找不到error code找不到定义时，有可能出现的崩溃的错误（WIN32平台.
+# 4)调整整体代码风格，去除成员变量m_xxx命名方式，使用_xxx的命名，对于if(,while(,for(更新成if (,while (,for (，此次更新不包括testsuite模块.
+# 5)条件限制原因，只此次更新只在linux/win32平台编译，测试通过.
+#
+# 2014/05/05
+# 1)增加objbase支援,支援全套的对象引用/释放机制(类似obj-c),同时提供完整的Object Array,Object Dictionary支援及完整的对象迭代器支援.
+# 2)修改core/config中的LLBC_Config类实现,在解析json出错的时候,GetError()同时返回出错文件及行号(前面的版本中,只返回行号,文件未知).
+# 3)修复communication中的同个socket/session的MessageBlock处理有可能被乱序处理的致命BUG.
+# 4)调整Dispatcher/Service全套接口,完善细节代码.
+# 5)Variant加入dictionary支援，完整实现variant所有接口，加入JVHelper,直接完成json到variant的转换.
+#
+# 2014/01/12
+# 1)调整Communication整体实现，允许不启动NetEventHandler线程，而使用Dispatcher线程来直接完成网络事件的处理，以减少线程间交互的开销.
+# 2)Service::Start()方法中的handlerCount参数默认值，客户端类型由1调整为0.
+# 3)考虑LLBC_File::WriteString()的使用实际情况，往往都不需要写入字符串结束符'\0'，加入一个参数，以标记是否写入字符串结束符，为了兼容库中已经有的调用及测试代码，默认值为true.
+#
+# 2014/01/11
+# 1)修复LLBC_BasicString模板类的format/append_format/vformat/append_vformat四个函数在非win32可能崩溃的bug.
+# 2)完善库内部本身使用的LibTls结构，以让库中不同模块能够结合的更紧密.
+# 3)BaseTimer去除 SetScheduler() 接口,不需要使用者调用，将会默认从TLS中取得当前线程对应的Scheduler来Schedule.
+#
+# 2013/12/20
+# 1)Stream增加GetBufStartWithPos()接口.
+# 2)调整sampler实现,加入sampler group,以整体管理samplers,并为service加入完成的运行时Dump功能实现及测试代码.
+#
+# 2013/12/14
+# 1)将Core/utils/Util_Coder相关实现调整到common中,使得字节序支持能够在common的LLBC_Stream中使用.
+# 2)LLBC_Stream接口调整，修改，简化LLBC_Stream之前的Attach及Assign,增加SetEndianType接口,以提供对不同字节序的byte buffer的支持.
+#
+# 2013/12/12
+# 1)优化 non-WIN32 平台编译选项，以减少不必要的符号导出，减小最终库文件大小.
+#
+# 2013/12/09
+# 1)允许LLBC_Stream进行直接copy.
+#
+# 2013/12/06
+# 1)优化TimerScheduler中Timer的调度策略,使得Timer调度速度快一倍.
+# 2)修复Directory相关代码在WIN32中编译Unicode版本库的时候,不能编译的BUG.
+# 3)开始为vcproj中加入Release的项目设置,框架已相对稳定,所以将默认编译方式调整成Release方式(WIN32).
+#
+# 2013/12/04
+# 1)加入Timer测试代码.
+# 2)调整Facade::OnInitialize()调用实现,原来调用实现是由调用Service::Start的线程调用,现在统一修改为由Service内部线程完成调用,以去除多线程问题.
+#   对于Service的RunningMode为External_Drive方式的,保留由调用Service::Start的线程调用Facade::OnInitialize()的实现方式.
+#
+# 2013/12/01
+# 1)重新设计Timer, 使得Timer在使用的时候,更简单,方便,并且更好的支持实际应用的中模块化编码(未测试).
+# 2)重新设计Sampler, 对于之前设计实现的采样器,在使用中存在的问题进行修复(未测试).
+#
+# 2013/11/25
+# 1)加入采样器实现,支持计数开型,间隔型(允许得出速率),及上下限型采样器,并运用于Service中,在支持Service自己dump自己的运行状态.
+#   对Service采样会降低效率,但该功能默认为开启,如果不需要采样Service,需要在common/Config.h中找到LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT,设置为0即可.
+#
+# 2013/11/17
+# 1)修复PacketProtocol中收包可能存在丢包的BUG.
+# 2)增加LogProtocol,用于临时调试,如果要使用此Protocol,请使用LLBC_CustomClient/LLBC_CustomServer来自定义自己的协议链.
+# 3)修复所有库内自带singleton类未export或者hidden,从而导致多个singleton类实例存在的BUG.
+# 4)调整logger实现,支持面向流的log模型,以防止打印非原始类型的时候,导致的core dump问题,同时保留原来的format方式实现,增加一个config宏进行切换,
+#   功能宏定义在llbc/common/Config.h中,LLBC_CFG_LOG_USING_WITH_STREAM,默认为1,即以流的方式使用logger.如果需要使用format方式,请配置成0
+#   并重新编译库.
+#
+# 2013/11/13
+# 1)调整communication中的protocol设计，整合协议层，加入customclient/customserver两种service以及protocols analyzer,以支持自定义协议.
+# 2)调整core/eventmanager,支持事件内的事件增加、删除及递归触发.
+# 3)调整service,将event整合到service中，以支持跨线程，异步事件.
+#
+# 2013/10/30
+# 1)为LLBC_String加入utf8操作支持(长度计算,字符串切割及打散).
+#
+# 2013/10/29
+# 1)考虑到std::string使用的普遍性（有时不使用LLBC_String）,在LLBC_Stream中加入std::string的serialize/deserialize偏特化.
+# 2)为LLBC_Stream增加序列化所有STL容器的默认支持(WIN32: vec, list, deque, Non-WIN32: vec, list, deque, set, map).
+#
+# 2013/10/27
+# 1)修复WIN32下如果使用IOCP dispatcher model,LLBC_IService::AsyncConnect()ip为非127.0.0.1的时候,返回失败的BUG.
+# 2)修改core/thread/MessageBlock.h 中的MessageBlock实现,优化代码结构,非WIN32平台使用condition varibale实现.WIN32下保留semaphore实现.
+# 3)移动llbc.h中LLBC_Startup, LLBC_Cleanup函数实现,放入llbcImpl.h头文件中,以使llbc.h最简洁.
+# 4)communication模块增加SessionEvBuilder,将Session中的event构造逻辑单独出来.
+#
+# 2013/10/14
+# 1)重新实现LLBC_ConditionVariable,参考pthread win32的实现,以消除旧版本中存在的多次Notify的BUG.
+# 2)提供LLBC_Bundle在非Iphone平台的伪实现.
+# 3)更新LLBC_File,LLBC_Directory, 在core/os中加入跟 目录/文件 操作相关的平台无关函数实现.
+# 4)增加LLBC_ReverseGuard反向守护.
+#
+# 2013/10/10
+# 1)在mac,iphone编译,测试通过.
+#
+# 2013/10/6
+# 1)加入Iocp实现(WIN32平台有效),完善Communication中Asynchronous connect实现.
+# 2)修复Communication中的NetEventHandler线程代码中存在的内存泄露.
+# 3)加入RawServer/RawClient支持,并加入测试代码.这两个Service允许开发者接收无格式的网络流数据.
+# 4)修复LLBC_GetCurrentDirectory()函数在WIN32平台内存泄露问题.
+# 5)对库本身的Error报告机制进行完善,对WIN32中WinSock错误记录及报告进行完善.
+#
+# 2013/10/01
+# 1)加入Library封装,支援跨平台库符号访问.
+#
+# 2013/09/25
+# 1)加入TransCoder,以支援字符集转换.
+# 2)抽象communication中的Dispatcher实现,在特定平台,可以在common/Config.h中选择事件模型(Select,Iocp, Epoll)来进行库的编译.
+# 3)修复Select模式下库CPU占用过高的BUG.
+# 
+# 2013/09/16
+# 1)为Service增加FPS概念,使得整个Service的服务周期变得可更改.
+# 2)为Service增加OnIdle(当前帧还有空闲时间的时候回调), OnDestroy(Service销毁的时候调用)通知机制,完善面向服务框架.
+# 3)增加Asynchronous-Connect异步connect机制,使得connect操作异步化.
+# 4)重写core/helper/STLHelper, 统一所有container操作接口.
+# 5)修复在WIN32平台下如果出现NETAPI错误的时候,取得的SubErrorNo为0的问题.
+#
+# 2013/08/26
+# 1)初步完成完整版本，跨跃WIN32/LINUX/MAC/Iphone四个平台.
+# 2)提供平台无关基础库，方法封装.
+# 3)库本身提供完整的Error报告机制.
+# 4)提供MD5, Time, Serialize, Json, Properties, Timer ...相关基础功能.
+# 5)提供多线程支持,使用Task简化线程使用.支持完整的平台无关线程操作支持.
+# 6)提供完的log特性支持,类似log4cxx,支持多个日志记录器,支持同/异步设置,支持按天分日志,按大小切割日志.
+# 7)提供network支援,封装socket,使用session概念,简化通信.使用服务模型.包使用包链方式完成自动路由.
+# 8)提供Bundle支持(特定行移动平台操作系统Iphone).
+# 
+# long long ago
+# 1)设计框架,设计common, core基础核心部分代码.
+

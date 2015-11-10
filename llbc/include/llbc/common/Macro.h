@@ -1,0 +1,381 @@
+/**
+ * @file	Macro.h
+ * @author	Longwei Lai<lailongwei@126.com>
+ * @date	2013/01/28
+ * @version	1.0
+ *
+ * @brief LLBC library all basic macros define.
+ */
+#ifndef __LLBC_COM_MACRO_H__
+#define __LLBC_COM_MACRO_H__
+
+#include "llbc/common/PFConfig.h"
+
+// The llbc namespace define.
+#define LLBC_NAMESPACE ::llbc::
+#define LLBC_NS        LLBC_NAMESPACE
+
+// The llbc internal namespace  define.
+#define LLBC_INTERNAL_NAMESPACE ::__llbc::
+#define LLBC_INTERNAL_NS        LLBC_INTERNAL_NAMESPACE
+#define LLBC_INL_NS             LLBC_INTERNAL_NAMESPACE
+
+// llbc library namespace macros(begin/end) define.
+#define __LLBC_NS_BEGIN \
+    namespace llbc {    \
+
+#define __LLBC_NS_END   \
+    }                   \
+
+// llbc library internal namespace macros(begin/end) define.
+#define __LLBC_INTERNAL_NS_BEGIN \
+    namespace __llbc {           \
+
+#define __LLBC_INTERNAL_NS_END   \
+    }                            \
+
+// llbc library error describe buffer size.
+#define __LLBC_ERROR_DESC_SIZE    2048
+
+// Debug macro define.
+#ifdef DEBUG
+ #ifndef LLBC_DEBUG
+  #define LLBC_DEBUG
+ #endif
+#else
+ #ifdef LLBC_DEBUG
+  #error "Defined LLBC_DEBUG macro, but DEBUG macro undefined!"
+ #endif
+#endif
+
+// Exception throw macro define.
+#define LLBC_THROW(e, s) throw e(s)
+
+// The likely & unlikely builtin expect macro.
+#ifdef __GNUC__
+ #ifndef LIKELY
+  #define LIKELY(x) __builtin_expect(!!(x), 1)
+ #endif
+ #ifndef UNLIKELY
+  #define UNLIKELY(x) __builtin_expect(!!(x), 0)
+ #endif
+#else
+ #ifndef LIKELY
+  #define LIKELY(x) (x)
+ #endif
+ #ifndef UNLIKELY
+  #define UNLIKELY(x) (x)
+ #endif
+#endif // __GNUC__
+
+// Min / Max macro define.
+#ifndef MIN
+#define MIN(x, y)           \
+    ((x) < (y) ? (x) : (y)) \
+
+#endif
+
+#ifndef MAX
+#define MAX(x, y)           \
+    ((x) > (y) ? (x) : (y)) \
+
+#endif
+
+// ISUNSIGNED macro define.
+#define LLBC_ISUNSIGNED_TYPE(type)     ((type)(0 - 1) > 0)
+#define LLBC_ISUNSIGNED_VAL(type, val) ((type)val >= 0 && (type)~a >= (type)0)
+
+// Extern macro define.
+#ifdef __cplusplus
+ #define LLBC_EXTERN     extern
+ #define LLBC_EXTERN_C   extern "C"
+#else
+ #define LLBC_EXTERN     extern
+ #define LLBC_EXTERN_C   
+#endif
+
+// Extern "C" macro define.
+#ifdef __cplusplus
+ #define LLBC_BEGIN_C_DECL extern "C" {
+ #define LLBC_END_C_DECL }
+#else
+ #define LLBC_BEGIN_C_DECL
+ #define LLBC_END_C_DECL
+#endif
+
+// The hidden macro define.
+#if LLBC_TARGET_PLATFORM_LINUX
+ #ifndef LLBC_HIDDEN
+  #define LLBC_HIDDEN
+ #endif
+#elif LLBC_TARGET_PLATFORM_WIN32
+ #ifndef LLBC_HIDDEN
+  #define LLBC_HIDDEN
+ #endif
+#elif LLBC_TARGET_PLATFORM_IPHONE
+ #ifndef LLBC_HIDDEN
+  #define LLBC_HIDDEN
+ #endif
+#elif LLBC_TARGET_PLATFORM_MAC
+ #ifndef LLBC_HIDDEN
+  #define LLBC_HIDDEN
+ #endif
+#elif LLBC_TARGET_PLATFORM_ANDROID
+ #ifndef LLBC_HIDDEN
+  #define LLBC_HIDDEN
+ #endif
+#endif
+
+// The dllexport macro define.
+#if LLBC_TARGET_PLATFORM_LINUX
+ #ifndef LLBC_EXPORT
+  #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
+ #endif
+#elif LLBC_TARGET_PLATFORM_WIN32
+ #ifndef LLBC_EXPORT
+  #define LLBC_EXPORT __declspec(dllimport)
+ #endif
+#elif LLBC_TARGET_PLATFORM_IPHONE
+ #ifndef LLBC_EXPORT
+  #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
+ #endif
+#elif LLBC_TARGET_PLATFORM_MAC
+ #ifndef LLBC_EXPORT
+  #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
+ #endif
+#elif LLBC_TARGET_PLATFORM_ANDROID
+ #ifndef LLBC_EXPORT
+  #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
+ #endif
+#endif
+
+// ASSERT macro define.
+#ifndef ASSERT
+#define ASSERT(x) assert(x)
+#endif
+
+// Check we have a fully featured C++11 compiler or not?
+#if !defined(_MSC_VER)
+#if (__cplusplus > 197711L) || (defined(__STDCXX_VERSION__) && (__STDCXX_VERSION__ >= 201001L))
+#define LLBC_CPP11
+#endif
+#endif
+// ...at least partial C++11?
+#if defined(LLBC_CPP11) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(__GXX_EXPERIMENTAL_CPP0X__))
+#define LLBC_CPP11_PARTICAL
+#endif
+
+// Disable assignments of objects.
+#ifdef LLBC_CPP11_PARTICAL
+#define LLBC_DISABLE_ASSIGNMENT(name)               \
+private:                                            \
+    name(const name &) = delete;                    \
+    name &operator =(const name &) = delete         \
+
+#else
+#define LLBC_DISABLE_ASSIGNMENT(name)               \
+private:                                            \
+    name(const name &);                             \
+    name &operator =(const name &)                  \
+
+#endif // LLBC_CPP0X_PARTIAL
+
+// Thread local macro define.
+#if LLBC_TARGET_PLATFORM_LINUX
+#define LLBC_THREAD_LOCAL __thread
+#elif LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_THREAD_LOCAL __declspec(thread)
+#elif LLBC_TARGET_PLATFORM_IPHONE
+#define LLBC_THREAD_LOCAL __thread
+#elif LLBC_TARGET_PLATFORM_MAC
+#define LLBC_THREAD_LOCAL __thread
+#elif LLBC_TARGET_PLATFORM_ANDROID
+#define LLBC_THREAD_LOCAL __thread
+#endif
+
+// Deprecated attribute macro define.
+#if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
+#define LLBC_DEPRECATED __attribute__((deprecated))
+#elif _MSC_VER >= 1400 // VS 2005 or higher.
+#define LLBC_DEPRECATED __declspec(deprecated)
+#else
+#define LLBC_DEPRECATED
+#endif
+
+// Unused param macro.
+#define LLBC_UNUSED_PARAM(param)  (void)param
+
+// No except macro.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #ifdef __clang__
+  #if (__has_feature(cxx_noexcept))
+   #define LLBC_NO_EXCEPT            noexcept
+  #else // Has feature: cxx_noexcept
+   #define LLBC_NO_EXCEPT            throw()
+  #endif // Not exist feature: cxx_noexcept
+ #else // defined __clang__
+  #define LLBC_NO_EXCEPT            throw()
+ #endif // undefined __clang__
+#else // LLBC_TARGET_PLATFORM_NON_WIN32
+ #define LLBC_NO_EXCEPT
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
+/* Memory operations macros. */
+// allocate/reallocate/free.
+#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
+#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
+#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
+#define LLBC_Free(memblock)                 (free(memblock))
+#define LLBC_XFree(memblock)        \
+    do {                            \
+        if (LIKELY(memblock)) {     \
+            LLBC_Free(memblock);    \
+            (memblock) = NULL;      \
+        }                           \
+    } while(0)                      \
+
+// new/delete.
+#define LLBC_New(cls)                       LLBC_New0(cls)
+#define LLBC_New0(cls)                      (new cls)
+#define LLBC_New1(cls, arg1)                (new cls(arg1))
+#define LLBC_New2(cls, arg1, arg2)          (new cls((arg1), (arg2)))
+#define LLBC_New3(cls, arg1, arg2, arg3)    (new cls((arg1), (arg2), (arg3)))
+#define LLBC_New4(cls, arg1, arg2, arg3, arg4) (new cls((arg1), (arg2), (arg3), (arg4)))
+#define LLBC_New5(cls, arg1, arg2, arg3, arg4, arg5) (new cls((arg1), (arg2), (arg3), (arg4), (arg5)))
+#define LLBC_New6(cls, arg1, arg2, arg3, arg4, arg5, arg6) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6)))
+#define LLBC_Delete(objptr)                 (delete (objptr))
+#define LLBC_XDelete(objptr)        \
+    do {                            \
+        if (LIKELY(objptr)) {       \
+            LLBC_Delete(objptr);    \
+            (objptr) = NULL;        \
+        }                           \
+    } while (0)                     \
+
+#define LLBC_Deletes(objsptr)               (delete [](objsptr))
+#define LLBC_XDeletes(objsptr)      \
+    do {                            \
+        if (LIKELY(objsptr)) {      \
+            LLBC_Deletes(objsptr);  \
+            objsptr = NULL;         \
+        }                           \
+    } while(0)                      \
+
+// memory set.
+#define LLBC_MemSet(dst, c, count)          (::memset(dst, c, count))
+// memory copy.
+#define LLBC_MemCpy(dst, src, s)                                    \
+    do {                                                            \
+        size_t ___s = static_cast<size_t>(s);                       \
+        char *___dst = reinterpret_cast<char *>(dst);               \
+        const char *___src = reinterpret_cast<const char *>(src);   \
+        if (UNLIKELY(!___dst || !___src || ___s <= 0))              \
+        {                                                           \
+            break;                                                  \
+        }                                                           \
+                                                                    \
+        if (___dst + ___s <= ___src || ___dst >= ___src + ___s)     \
+        {                                                           \
+            memcpy(___dst, ___src, ___s);                           \
+        }                                                           \
+        else                                                        \
+        {                                                           \
+            char *buf = reinterpret_cast<                           \
+                char *>(malloc(___s));                              \
+            memcpy(buf, ___src, ___s);                              \
+            memcpy(___dst, buf, ___s);                              \
+            free(buf);                                              \
+        }                                                           \
+    } while (0)                                                     \
+
+/**
+ * Format argument.
+ * @param[in] fmt  - the format string.
+ * @param[out] buf - the formatted string, must call LLBC_Free to free memory.
+ *                   if failed, this macro set retStr value to NULL and set last error.
+ * @param[out] len - the formatted string length, in bytes, not including tailing character.
+ *                   this macro always filled the tailing character.
+ */
+#if LLBC_TARGET_PLATFORM_WIN32
+ #define LLBC_FormatArg __LLBC_FormatArg_WIN32
+#else // LLBC_TARGET_PLATFORM_NON_WIN32
+ #define LLBC_FormatArg __LLBC_FormatArg_NonWIN32
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
+/**
+ * WIN32 specified internal macro, use to format string.
+ */
+#if LLBC_TARGET_PLATFORM_WIN32
+#define __LLBC_FormatArg_WIN32(fmt, buf, len)                                    \
+    do {                                                                         \
+        int &___len = (len);                                                     \
+        char *&___buf = (buf);                                                   \
+                                                                                 \
+        if (UNLIKELY(!(fmt))) {                                                  \
+            ___len = 0; ___buf = NULL;                                           \
+            LLBC_SetLastError(LLBC_ERROR_INVALID);                               \
+            break;                                                               \
+        }                                                                        \
+                                                                                 \
+        va_list ___ap;                                                           \
+                                                                                 \
+        int ___bufSize = 1024; ___len = 0;                                       \
+        ___buf = LLBC_Malloc(char, ___bufSize + 1);                              \
+        while (true) {                                                           \
+            va_start(___ap, (fmt));                                              \
+            ___len = ::vsnprintf_s(___buf, ___bufSize, _TRUNCATE, (fmt), ___ap); \
+            va_end(___ap);                                                       \
+                                                                                 \
+            if (___len >= 0)                                                     \
+                break;                                                           \
+                                                                                 \
+            ___bufSize <<= 1;                                                    \
+            ___buf = LLBC_Realloc(char, ___buf, ___bufSize + 1);                 \
+        }                                                                        \
+        ___buf[___len] = '\0';                                                   \
+    } while (0)                                                                  \
+
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
+/**
+ * Non-WIN32 platform specified internal macro, use to format string.
+ */
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+#define __LLBC_FormatArg_NonWIN32(fmt, buf, len)                    \
+    do {                                                            \
+        int &___len = (len);                                        \
+        char *&___buf = (buf);                                      \
+                                                                    \
+        if (UNLIKELY(!(fmt))) {                                     \
+            ___len = 0; ___buf = NULL;                              \
+            LLBC_SetLastError(LLBC_ERROR_INVALID);                  \
+            break;                                                  \
+        }                                                           \
+                                                                    \
+        va_list ___ap;                                              \
+                                                                    \
+        int ___bufSize = 1024; ___len = 0;                          \
+        ___buf = LLBC_Malloc(char, ___bufSize);                     \
+        while (true) {                                              \
+            va_start(___ap, (fmt));                                 \
+            ___len = ::vsnprintf(___buf, ___bufSize, (fmt), ___ap); \
+            va_end(___ap);                                          \
+                                                                    \
+            /* Workded, break */                                    \
+            if (___len > -1 && ___len < ___bufSize)                 \
+                break;                                              \
+                                                                    \
+            /* Try again with more space */                         \
+            if (LIKELY(___len > -1)) /* glibc 2.1 and later */      \
+                ___bufSize = ___len + 1;                            \
+            else /* glibc 2.0 */                                    \
+                ___bufSize <<= 1;                                   \
+                                                                    \
+            ___buf = LLBC_Realloc(char, ___buf, ___bufSize);        \
+        }                                                           \
+        ___buf[___len] = '\0';                                      \
+    } while(0)                                                      \
+
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
+#endif // !__LLBC_COM_MACRO_H__

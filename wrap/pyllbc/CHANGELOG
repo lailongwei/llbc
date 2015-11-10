@@ -1,0 +1,170 @@
+# llbc库python封装: pyllbc
+# author: Longwei Lai<lailongwei@126.com>
+######################################################################################
+#
+# *** 2015/11/10 ***
+# 1) 修复logger在log unicode字符串时,encode错误的BUG,默认使用utf-8编码;
+# 
+# *** 2015/10/18 ***
+# 1) 配合llbc核心库,完整重构编译makefile代码及机制;
+# 2) 修复property中因重构产生的BUG;
+#
+# *** 2015/10/03 ***
+# 1) 完成pyllbc中的自定义包头的完整支持;
+# 2) 修复所有的decorators在Service为RAW无效的BUG;
+# 3) 重新实现pyllbcObjUtil中的GetObjStr方法,以支持__str__ repr中返回的字符串中含有\0字符的情况; 
+# 4) 重写property(配合llbc核心库的property调整);
+# 5) 简单整理testsuite中的测试代码，加入自定义包头相关测试代码;
+# 6) 优化Service中的schedule间隔计算方法，去除无意义的调度循环;
+#
+# *** 2015/09/28 ***
+# 1) 配合llbc底层核心库，重构Property.
+# 2) 调整pyllbcObjAttrOptr类接口，修复内部BUG.
+# 
+# *** 2015/09/01 ***
+# 1) 积累更新:
+#    a) 整体框架完善,加入框架运行异常捕获支持,见@frame_exc_handler及@exc_handler装饰.
+#    b) 修复在session断开后,有可能还存在此session id的packet被派遣处理的bug.
+#    c) packet重构,完整支持包头自定义,从而解决不能平台,应用下的包格式不匹配导致的额外工作量(指使用RAW type service手工对接协议).
+#    d) 其它杂项重构,代码调整
+# 
+# *** 2015/03/16 ***
+# 1) service加入callable延迟执行支持,方法为Service.push(cble), 会在service本帧末尾或者下一帧执行push的callable对象.
+#
+# *** 2015/01/17 ***
+# 1) 加入InvokeGuard,以支持方法回调守护.
+#
+# *** 2015/01/16 ***
+# 1) 库自带安全输出函数print改名为output,以避免跟python本身的print命名冲突.
+# 2) 修复Stream在unpackone()中出现类似C<ClassName>格式化字符串的时候无法正常unpack的BUG.
+# 
+# *** 2015/01/15 ***
+# 1) 修复pyllbc_ObjUtil::GetObjStr()不返回字符串的BUG.
+# 2) Stream加入unpackone()接口.
+# 3) 修复Stream记法编译器中的空[]或者()的时候的异常崩溃问题以及ClassLemma在进行ClassName反向索引到Class对象时候,遇到嵌套类无法搜索的问题.
+#
+# *** 2015/01/10 ***
+# 1) 细化c++库报错的提示信息(倾印C++问题代码文件及行数(针对pyllbc调用))
+#
+# *** 2014/12/29 ***
+# 1)Service加入unify_presubscribe支持,允许统一对packet设置pre-handler(适用于RAW及NORMAL类型的Service).
+#
+# *** 2014/12/19 ***
+# 1) 加入service.presubscribe支持,以允许对包做预处理,如果在handler中返回False,将remove session.
+#
+# *** 2014/12/19 ***
+# 1) 修复service对象不能重用的BUG(stop后再start会引起c++层面core dump).
+# 2) 去除自动生成代码中的date标记(会引起不是由于修改代码而触发的文件修改(时间变更)).
+# 3) service构造参数顺序调整,从Service(Service.NORMAL, 'the name')调整成Service('the name'), 大部分情况下,都是使用NORMAL类型的service,所以将其放到第二个参数列,并指定默认值为NORMAL.
+#
+# *** 2014/12/17 ***
+# 新功能:
+#	1)facade中加入onprotoreport()接口,用于在python层面接收llbc底层库的protocol report事件, 同时加入Protocol子模块,用于存储protocol layer, protocol level相关枚举值.
+#	2)facade中加入onunhandledpacket()接口,用于处理未订阅的packet(仅传回opcode).
+# Bug Fix:
+#	1)修复service中的一处multicast代码错误,有可能在send的时候出现异常而不汇报到逻辑层.
+#
+# *** 2014/12/13 ***
+# 1)Stream pack-lemma编译器代码增加对S#的支持,以pack/unpack含有\0的字符串.
+#
+# *** 2014/12/12 ***
+# 1)Timer中timeout callable跟cancel callable使用weakref实现,以简化timer代码的使用(在将timer作为对象数据成员,且timeout或者cancel callable都是对象方法时候,使用者不必关心循环引用导致的内存泄露问题).
+# 2)Service.registerfacade接口增加了参数较验,不允许为type及其子类(元类), 类, 函数及方法对象传入, 只允许继承自object(包括)类的实例传入.
+# 3)加入新方法: ischild(), 用于检测类是否是指定类的基类或其自身.
+#
+# *** 2014/12/11 ***
+# 1)加入foreach函数用于逐个迭代可迭代对象,执行指定的lambda函数或者def函数运算,且不返回任何值,类似于map,但因为不会对每个元素的调用结果返回,所以更轻量级.
+# 2)库设计会发生python->c++->python的调用过程,在c++->python调用中如果有错误发生,其中的traceback信息将不会保留到python->c++调用完成回退到python的时候,导致出现问题非常难寻找,
+#   新的设计中,将c++->python过程中出现错误的时候的traceback hold住,在python->c++(往往发生在service.schedule()结束的时候)完成的时候,将hold住的traceback PyObject直接链到已经存在的traceback链表中,
+#   以支持python->c++->python调用过程中的完整的traceback查看(特别是在集成开发平台中).
+#
+# *** 2014/12/10 ***
+# 1)service的codec默认由JSON修改为BINARY.
+# 2)forsend/forrecv/handler三个装饰器自动识别有OP,OPCODE的对象,并允许将这些对象作为opcode使用.
+# 3)所有sessionid属性字段更新为session_id.
+# 4)Service.send方法支持使用Packet对象代替session_id参数,以方便在req_handler中直接发返回包,减少编码.
+#
+# *** 2014/12/02 ***
+# 配合llbc底层库作相应调整，以简化communication部分的接口.
+#
+# *** 2014/11/09 ***
+# 1)更新decorators的设计,实现:
+#   a)对原来的@coder拆分成@forsend/@forrecv两个decorator,单独对class进行装饰.
+#   b)修复del Service.name 可能引起的 service 线程不立刻停止的BUG.
+# !!!!!!!!! 此版本的更新将到此为止, python相关封装由于llbc C++库的整体重构而一并重构.
+#
+# *** 2014/11/07 ***
+# 1)调整facade接口定义, 参数从字典变成对象,方便代码编写,如之前在oninitialize(self, d)中取得svc,需要以下代码:d['svc'],在更新过的结构中,直接ev.svc即可.
+# 2)加入多service支持,这使得一个python进程中存在任意可Service成为可能(实际受到llbc c++库本身的编译配置限制,可通过Service.isgonetolimit()确认).
+#   简单用例:
+#     Service(Service.CLIENT, 'client') # 创建client service
+#	  Service(Service.SERVER, 'server') # 创建server service
+#     Service.client.startasclient() # 启动client service, 相同语法: Service['client'].startasclient()
+#     Service.server.startasserver(ip, port) # 启动server service, 相同语法: Service['server'].startasserver(ip, port)
+#     Service.schedule() # 执行调度,python主线程将陷入此函数中,执行中断或者在service代码中调用Service.deschedule()可以退出,所有service将还在
+#	  del Service.client # 删除service(未stop的将会自动先stop service,然后在从service列表中移除),如果在服务函数中调用此函数,service将会延迟删除
+# 3)加入一个调试相关函数,确认一个对象当前的引用计数,函数:refcnt(obj).
+# 4)其它相关模块的细节更新,优化
+#
+# *** 2014/10/14 ***
+# 1)修复facade在oninitialize/ondestroy/onupdate/onidle调用中如果出现python异常不提示的BUG.
+# 2)修复Stream中字符串编译器在解释class类型的字符串名的过程中,如果带有模块名,不能正确unpack的BUG.
+#
+# *** 2014/10/07 ***
+# 更新PyStream实现,参考struct跟re,进行整体重构,实现格式化字符串编译器,所有进行pack/unpack的格式化字符串,都将会进行编译,以提高性能,
+# 对于复杂的数据格式化,也直接进行了支持.
+#
+# *** 2014/09/29 ***
+# 1)加入varity_param装饰器,以从切面上支持函数/类调用过程中的参数调用,如:
+#	def foo(int_val, str_val):
+#		pass
+#  如果需要对第一个参数进行int类型确认,并且范围是[10, 100], 第二个参数进行str类型确认,并且符合正则: ^A.*A$,只需要对函数进行如下装饰:
+#	@llbc.varify_param(int_val=(int, '10<=x<=100'), str_val=(str, '/^A.*A$/)
+#		def foo(int_val, str_val):
+#			pass
+# 2)加入枚举创建函数: Enum, 用法: MyEnum = llbc.Enum('Type1', 'Type2', 'Type3', Type4=13, Type5=17)
+# 3)Communication模块整体改进:
+#	a)修改Service接口,对coder的注册分成两个函数: setencoder/setdecoder, 都只会在codec为BINARY的时候会使用到,其中setencoder不是必须,
+#	如果指定,在发包的时候,将不需要再指定opcode.
+#	b)修改Service.send()函数,将opcode的顺序放到data后面,并且默认不需要指定.大部分情况下,发包将不需要指定任何操作码.
+#	c)加入@facade装饰器,使得facade不再需要手动去注册,如果想让一个类成为一个facade,使用@facade装饰器即可,如下:
+#		@llbc.facade
+#		class MyFacade(object):pass
+#	d)加入@handler装饰器,使得对消息订阅处理不需要再手动去调用,如果想让一个类成为指定opcode的包处理类,使用@handler装饰器即可,如下:
+#		@llbc.handler((1, 2, 3, 4, 5)) # 装饰器参数可以是单一的整数或者为一个整数list或tuple.
+#		class MyHandler(object):
+#			def __init__(self):pass
+#			def __call__(self, packet): pass
+#	e)加入@coder装饰器,使使用者不需要手动调用setencoder/setdecoder,装饰器会自动完成这一调用(只在codec为BINARY模式下有效):
+#		@llbc.coder(send_opcode=1, recv_opcode=(1, 2, 3, 4)) # recv的opcode可以指定多个,而send的opcode只能指定一个,不允许list或者tuple.
+#		class MyPacket(object):
+#			def __init__(self):pass
+#			def encode(self, stream):pass
+#			def decode(self, stream):pass
+# 4)修复Service在SERVICE/CLIENT类型模式下,并且codec为BINARY的时候的内存泄露问题,问题发生在handler的调用上.
+#
+# *** 2014/09/06 ***
+# 1)加入初始版本,实现,主要提供llbc库中的主要组件:
+#    a) common部分:
+#		1.提供llbc库本身版本信息的输入,诊断函数,变量.
+#		2.提供字节序列相关操作函数及常量.
+#		3.提供类似llbc C++库中的Stream类实现,以支援python中的数据自动序列化及反序列化
+#		4.库统一使用一个异常类llbc.error.
+#	 b) core部分:
+# 		1.实现python版本Bundle
+#		2.实现python版本GUID工具类
+#		3.实现python版本Random,借助python语法,Random模块将更易用
+#		4.实现python版本Log
+#		5.对cfg文件解析类进行映射
+# 		6.针对python语言,使用纯python重写原llbc库中的事件机制,提供Observer/Observable机制.
+#	 c) communication部分:
+#		为最重要的一部分,对service进行完整的Python wrap,完整支持llbc库中所有service功能,线程部分使用c++扩充,以保证跟c++同等效率,timer调度也完整实现封装.
+#		对于python中的SERVER类型的service,将内部整合client跟server的c++ service,在使用过程中,一个service将直接支持connect及listen.
+#		在使用过程中llbc.Service将会接管python的主循环,使用者需要通过自己注册的facade来进行后续逻辑编写,处理.
+#		库默认实现两个codec strategy: JSON_CODEC, BINARY_CODEC,描述如下:
+#			JSON_CODEC: 此codec不需要注射使用coder,自动实现所有对象的序列化及反序列化,但有两个缺点: 
+#					 	1)不能反序列化回原来序列化的类类型,对于非内建类型,只能返回dict对象.
+#						2)性能上会有影响(使用代码已经使用C++实现).
+#			BINARY_CODEC: 此code需要注册coder, 主要用于decode,在进行反序列化时,将会用到注册的coder.
+# 						  优点是速度快,缺点是需要增加编码量,内部数据传递使用llbc.Stream.
+#		

@@ -1,0 +1,182 @@
+/**
+ * @file    Semaphore.cpp
+ * @author  Longwei Lai<lailongwei@126.com>
+ * @date    2013/04/30
+ * @version 1.0
+ *
+ * @brief
+ */
+
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+ #include "llbc/core/os/OS_Time.h"
+ #include "llbc/core/os/OS_Thread.h"
+ #include "llbc/core/helper/GUIDHelper.h"
+#endif // iPhone or Mac platform
+
+#include "llbc/core/thread/Semaphore.h"
+
+__LLBC_NS_BEGIN
+
+LLBC_Semaphore::LLBC_Semaphore(int initVal)
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    sem_init(&_sem, 0, initVal);
+ #else
+    LLBC_GUID guid = LLBC_GUIDHelper::Gen();
+    LLBC_String str = LLBC_GUIDHelper::Format(guid);
+    str = str.substr(0, 20);
+
+    _sem = sem_open(str.c_str(), O_CREAT | O_EXCL, 0644, 0);
+ #endif
+#else
+    _sem = ::CreateSemaphore(NULL,
+                              initVal,
+                              LONG_MAX,
+                              NULL);
+#endif
+}
+
+LLBC_Semaphore::~LLBC_Semaphore()
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    sem_destroy(&_sem);
+ #else
+    sem_destroy(_sem);
+ #endif
+#else
+    ::CloseHandle(_sem);
+    _sem = INVALID_HANDLE_VALUE;
+#endif
+}
+
+void LLBC_Semaphore::Wait()
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    pthread_testcancel();
+ #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    while(sem_wait(&_sem) != 0 && errno ==  EINTR);
+ #else
+    while(sem_wait(_sem) != 0 && errno ==  EINTR);
+ #endif
+#else
+    ::WaitForSingleObject(_sem, INFINITE);
+#endif
+}
+
+bool LLBC_Semaphore::TryWait()
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    pthread_testcancel();
+
+    int waitRet = 0;
+ #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    while((waitRet = sem_trywait(&_sem)) != 0 && errno == EINTR);
+ #else
+    while((waitRet = sem_trywait(_sem)) != 0 && errno == EINTR);
+ #endif
+    return waitRet == 0;
+#else
+    if(::WaitForSingleObject(_sem, 0) == WAIT_OBJECT_0)
+    {
+        return true;
+    }
+
+    return false;
+#endif
+}
+
+bool LLBC_Semaphore::TimedWait(int milliSeconds)
+{
+#if LLBC_TARGET_PLATFORM_LINUX || LLB_TARGET_PLATFORM_ANDROID
+    struct timeval tvStart, tvEnd;
+    struct timespec ts;
+
+    ::gettimeofday(&tvStart, NULL);
+    tvEnd = tvStart;
+    tvEnd.tv_sec += milliSeconds / 1000;
+    tvEnd.tv_usec += (milliSeconds % 1000) * 1000;
+    tvEnd.tv_sec += tvEnd.tv_usec / (1000 * 1000);
+    tvEnd.tv_usec = tvEnd.tv_usec % (1000 * 1000);
+
+    TIMEVAL_TO_TIMESPEC(&tvEnd, &ts);
+    int waitRet = 0;
+    while((waitRet = sem_timedwait(&_sem, &ts)) != 0 && errno == EINTR);
+    if(waitRet == 0)
+    {
+        return true;
+    }
+
+    LLBC_SetLastError(LLBC_ERROR_CLIB);
+    return false;
+#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+    if(milliSeconds <= 0)
+    {
+        return this->TryWait();
+    }
+
+    uint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
+    do
+    {
+        if(this->TryWait())
+        {
+            return true;
+        }
+
+        LLBC_Sleep(10);
+
+        if(this->TryWait())
+        {
+            return true;
+        }
+    } while(LLBC_GetMilliSeconds() < expireTime);
+
+    LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+    return false;
+#else
+    DWORD waitRet = 0;
+    if((waitRet = ::WaitForSingleObject(_sem, milliSeconds)) == WAIT_OBJECT_0)
+    {
+        return true;
+    }
+    else if(waitRet == WAIT_TIMEOUT)
+    {
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        return false;
+    }
+
+    LLBC_SetLastError(LLBC_ERROR_OSAPI);
+    return false;
+#endif
+}
+
+void LLBC_Semaphore::Post(int count)
+{
+    if(count <= 0)
+    {
+        count = 1;
+    }
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    for(int i = 0; i < count; i ++)
+    {
+ #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+        sem_post(&_sem);
+ #else
+        sem_post(_sem);
+ #endif
+    }
+
+    pthread_testcancel();
+#else
+    ::ReleaseSemaphore(_sem, count, NULL);
+#endif
+}
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"
