@@ -52,6 +52,12 @@ public:
      */
     bool IsAsyncMode() const;
 
+    /**
+     * Get file refresh interval.
+     * @return int - the file refresh interval.
+     */
+    int GetFlushInterval() const;
+
 public:
     /**
      * Get log to console switch.
@@ -109,6 +115,12 @@ public:
     int GetMaxBackupIndex() const;
 
     /**
+     * Get file buffer size.
+     * @return int - the file buffer size.
+     */
+    int GetFileBufferSize() const;
+
+    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
@@ -116,6 +128,7 @@ public:
 private:
     int _logLevel;
     bool _asyncMode;
+    int _flushInterval;
 
     bool _logToConsole;
     LLBC_String _consolePattern;
@@ -127,6 +140,7 @@ private:
     bool _dailyMode;
     long _maxFileSize;
     int _maxBackupIndex;
+    int _fileBufferSize;
 };
 
 __LLBC_NS_END

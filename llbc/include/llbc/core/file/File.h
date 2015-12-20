@@ -126,6 +126,12 @@ public:
     size_t Tell() const;
 
     /**
+     * Get file path.
+     * @return LLBC_String - the file path, if failed, return empty string.
+     */
+    LLBC_String GetFilePath() const;
+
+    /**
      * Get file size.
      * @return size_t - file size, if return npos, it means error occurred.
      */

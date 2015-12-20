@@ -40,12 +40,18 @@
 // Debug macro define.
 #ifdef DEBUG
  #ifndef LLBC_DEBUG
-  #define LLBC_DEBUG
+  #define LLBC_DEBUG 1
  #endif
 #else
  #ifdef LLBC_DEBUG
   #error "Defined LLBC_DEBUG macro, but DEBUG macro undefined!"
  #endif
+#endif
+
+// NDebug/Release macro define.
+#ifndef LLBC_DEBUG
+ #define LLBC_NDEBUG 1
+ #define LLBC_RELEASE 1
 #endif
 
 // Exception throw macro define.

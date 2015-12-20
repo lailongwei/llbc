@@ -187,6 +187,17 @@ size_t LLBC_File::Tell() const
     return pos;
 }
 
+LLBC_String LLBC_File::GetFilePath() const
+{
+    if (!this->IsOpened())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_String();
+    }
+
+    return _path;
+}
+
 size_t LLBC_File::GetSize() const
 {
     if (!this->IsOpened())
@@ -749,8 +760,7 @@ int LLBC_File::Move(const LLBC_String &path0,
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_RTN_FAILED;
     }
-
-    if (!This::Exist(path0))
+    else if (!This::Exist(path0))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_RTN_FAILED;

@@ -10,6 +10,7 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/thread/MessageBlock.h"
 
 #include "llbc/core/log/LogData.h"
@@ -22,6 +23,9 @@ __LLBC_NS_BEGIN
 LLBC_LogRunnable::LLBC_LogRunnable()
 : _stoped(false)
 , _head(NULL)
+
+, _lastFlushTime(0)
+, _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 {
 }
 
@@ -31,6 +35,20 @@ LLBC_LogRunnable::~LLBC_LogRunnable()
 
 void LLBC_LogRunnable::Cleanup()
 {
+    // Flush all not process's message blocks.
+    LLBC_LogData *logData = NULL;
+    LLBC_MessageBlock *block = NULL;
+
+    while (this->TryPop(block) == LLBC_RTN_OK)
+    {
+        block->Read(&logData, sizeof(LLBC_LogData *));
+
+        this->Output(logData);
+        this->FreeLogData(logData);
+
+        delete block;
+    }
+
     // Delete all appender.
     while (_head)
     {
@@ -38,17 +56,6 @@ void LLBC_LogRunnable::Cleanup()
         _head = _head->GetAppenderNext();
 
         delete appender;
-    }
-
-    // Delete all not process's message blocks.
-    LLBC_LogData *logData = NULL;
-    LLBC_MessageBlock *block = NULL;
-
-    while (this->TryPop(block) == LLBC_RTN_OK)
-    {
-        block->Read(&logData, sizeof(LLBC_LogData *));
-        this->FreeLogData(logData);
-        delete block;
     }
 }
 
@@ -58,18 +65,35 @@ void LLBC_LogRunnable::Svc()
     LLBC_MessageBlock *block = NULL;
     while (LIKELY(!_stoped))
     {
-        if (this->TimedPop(block, 20) != LLBC_RTN_OK)
-        {
+        if (this->TimedPop(block, 50) != LLBC_RTN_OK)
             continue;
-        }
 
         block->Read(&logData, sizeof(LLBC_LogData *));
 
         this->Output(logData);
-
         this->FreeLogData(logData);
+
         delete block;
+
+        sint64 now = LLBC_GetMilliSeconds();
+        sint64 diff = now - _lastFlushTime;
+        if (diff < 0 || diff >= _flushInterval)
+        {
+            LLBC_ILogAppender *appender = _head;
+            while (appender)
+            {
+                appender->Flush();
+                appender = appender->GetAppenderNext();
+            }
+
+            _lastFlushTime = now;
+        }
     }
+}
+
+void LLBC_LogRunnable::SetFlushInterval(sint64 flushInterval)
+{
+    _flushInterval = flushInterval;
 }
 
 void LLBC_LogRunnable::AddAppender(LLBC_ILogAppender *appender)

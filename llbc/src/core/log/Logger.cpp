@@ -60,8 +60,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_RTN_FAILED;
     }
-
-    if (this->IsInit())
+    else if (this->IsInit())
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_RTN_FAILED;
@@ -74,6 +73,8 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     _logLevel = config->GetLogLevel();
 
     _logRunnable = new LLBC_LogRunnable;
+    _logRunnable->SetFlushInterval(_config->GetFlushInterval());
+
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
@@ -99,6 +100,11 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         appenderInitInfo.dailyRolling = _config->IsDailyRollingMode();
         appenderInitInfo.maxFileSize = _config->GetMaxFileSize();
         appenderInitInfo.maxBackupIndex = _config->GetMaxBackupIndex();
+
+        if (!_config->IsAsyncMode())
+            appenderInitInfo.fileBufferSize = 0;
+        else
+            appenderInitInfo.fileBufferSize = _config->GetFileBufferSize();
 
         LLBC_ILogAppender *appender =
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::File);
@@ -296,7 +302,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
             memcpy(data->others + data->fileBeg, file, data->fileLen);
     }
 
-    data->logTime = LLBC_Time::GetCurrentTime().GetLocalTime();
+    data->logTime = time(NULL);
 
     data->line = line;
 

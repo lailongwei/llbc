@@ -37,7 +37,6 @@ public:
      */
     virtual void Finalize();
 
-
 protected:
     /**
      * Get current appender's token chain.
@@ -58,9 +57,14 @@ protected:
      */
     virtual void SetAppenderNext(LLBC_ILogAppender *appender);
 
+protected:
+    /**
+     * Flush method.
+     */
+    virtual void Flush();
+
 private:
     LLBC_LogTokenChain *_chain;
-
     LLBC_ILogAppender *_next;
 };
 

@@ -55,8 +55,9 @@ struct LLBC_LogAppenderInitInfo
 
     LLBC_String file;               // file name, used File type appender.
     bool dailyRolling;              // daily rolling mode flag, used in File type appender.
-    int maxFileSize;                // max log file size, int bytes, used in File type appender.
+    long maxFileSize;               // max log file size, int bytes, used in File type appender.
     int maxBackupIndex;             // max backup index, used in File type appender.
+    int fileBufferSize;             // file buffer size, used in File type appender.
 
     LLBC_String ip;                 // Ip address, used in Network type appender.
     uint16 port;                    // port, used in Network type appender.
@@ -118,6 +119,12 @@ protected:
      * @param[in] appender - next log appender.
      */
     virtual void SetAppenderNext(LLBC_ILogAppender *appender) = 0;
+
+protected:
+    /**
+     * Flush method.
+     */
+    virtual void Flush() = 0;
 };
 
 __LLBC_NS_END

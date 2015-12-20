@@ -47,6 +47,12 @@ public:
 
 public:
     /**
+     * Set runnable flush interval.
+     */
+    void SetFlushInterval(sint64 flushInterval);
+
+public:
+    /**
      * Add log appender.
      * @param[in] appender - log appender.
      */
@@ -73,6 +79,9 @@ public:
 private:
     volatile bool _stoped;
     LLBC_ILogAppender *_head;
+
+    sint64 _lastFlushTime;
+    sint64 _flushInterval;
 };
 
 __LLBC_NS_END

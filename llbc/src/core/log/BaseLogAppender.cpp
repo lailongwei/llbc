@@ -64,6 +64,10 @@ void LLBC_BaseLogAppender::SetAppenderNext(LLBC_ILogAppender *next)
     _next = next;
 }
 
+void LLBC_BaseLogAppender::Flush()
+{
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"

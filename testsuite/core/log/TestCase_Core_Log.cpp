@@ -25,6 +25,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
     if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_RTN_OK)
 #else
+
     if(LLBC_LoggerManagerSingleton->Initialize("core/log/Logger_Cfg.cfg") != LLBC_RTN_OK)
 #endif
     {
@@ -90,16 +91,17 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Peform performance test.
     LLBC_PrintLine("Perform preformance test:");
     LLBC_CPUTime begin = LLBC_CPUTime::Current();
-    const int loopLmt = 300000;
+    const int loopLmt = 500000;
     for (int i = 0; i < loopLmt; i++)
-        LLBC_DEBUG_LOG2("perf test", "performance test msg");
+        LLBC_DEBUG_LOG_SPEC("perftest", "performance test msg");
+    LLBC_LoggerManagerSingleton->Finalize();
+
     LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
-    LLBC_PrintLine("Performance test completed, elapsed time: %s", elapsed.ToString().c_str());
+    LLBC_PrintLine("Performance test completed, "
+        "log size:%d, elapsed time: %s", loopLmt, elapsed.ToString().c_str());
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
-
-    LLBC_LoggerManagerSingleton->Finalize();
 
     return 0;
 }

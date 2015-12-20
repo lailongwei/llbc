@@ -62,22 +62,71 @@ public:
      */
     virtual int Output(const LLBC_LogData &data);
 
-private:
+protected:
     /**
-     * Get log file.
-     * @return LLBC_String - log file name.
+     * Flush method.
      */
-    int OpenLogFile(LLBC_File &file) const;
+    virtual void Flush();
 
 private:
+    /**
+     * Check and update log file.
+     * @param[in] now 
+     */
+    void CheckAndUpdateLogFile(time_t now);
+
+    /**
+     * Build log file name.
+     * @now                - now time.
+     * @return LLBC_String - the log file name.
+     */
+    LLBC_String BuildLogFileName(time_t now) const;
+
+    /**
+     * Check is need reopen file or not.
+     * @param[in] now     - now time.
+     * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
+     * @param[out] backup - the backup flag, if true, means must backup log files.
+     *                      about backup, see BackupFiles() method.
+     * @return bool - need reopen if true, otherwise return false.
+     */
+    bool IsNeedReOpenFile(time_t now, const LLBC_String &newFileName, bool &clear, bool &backup) const;
+
+    /**
+     * ReOpen the log file.
+      * @param[in] newFileName - the new log file name.
+      * @param[in] clear       - clear flag.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReOpenFile(const LLBC_String &newFileName, bool clear);
+
+    /**
+     * Backup all log files.
+     */
+    void BackupFiles() const;
+
+    /**
+     * Update log file buffer info(included buffer mode and buffer size).
+     */
+    void UpdateFileBufferInfo();
+
+private:
+    LLBC_String _baseName;
+
+    int _fileBufferSize;
     bool _isDailyRolling;
 
     size_t _maxFileSize;
     int _maxBackupIndex;
 
+private:
     LLBC_String _fileName;
 
     LLBC_File *_file;
+    size_t _fileSize;
+
+    sint64 _nonFlushLogCount;
+    time_t _logfileLastCheckTime;
 };
 
 __LLBC_NS_END

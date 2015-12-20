@@ -117,7 +117,7 @@ void LLBC_TimerScheduler::Update()
             if (!(reSchedule = data->timer->OnTimeout()))
                 break;
 
-            if (data->timer->IsScheduling() == true)
+            if (data->timer->IsScheduling())
             {
                 reSchedule = false;
                 break;
