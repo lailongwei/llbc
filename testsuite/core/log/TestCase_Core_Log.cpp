@@ -88,6 +88,13 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_FATAL_LOG_SPEC("test", "This is a fatal log message.");
     LLBC_FATAL_LOG_SPEC2("test", "test_tag", "This is a fatal log message.");
 
+    // Log file delete test.
+    for (int i = 0; i < 20; i++)
+    {
+        LLBC_DEBUG_LOG_SPEC("deltest", "This is a deltest logger message.");
+        LLBC_ThreadManager::Sleep(1000);
+    }
+
     // Peform performance test.
     LLBC_PrintLine("Perform preformance test:");
     LLBC_CPUTime begin = LLBC_CPUTime::Current();
