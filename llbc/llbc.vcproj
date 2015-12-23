@@ -96,7 +96,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -178,7 +177,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -262,7 +260,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -347,7 +344,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -838,6 +834,10 @@
 					</File>
 					<File
 						RelativePath=".\include\llbc\core\os\OS_Time.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\llbc\core\os\OS_TimeImpl.h"
 						>
 					</File>
 				</Filter>

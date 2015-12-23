@@ -47,11 +47,11 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_GMTime(time_t time, struct LLBC_TimeStruct &tm
 LLBC_EXTERN LLBC_EXPORT time_t LLBC_MkTime(const struct LLBC_TimeStruct &tm);
 
 /**
- * Get the current time, 
+ * Get the current time.
  * @return sint64 - current time, in seconds since midnight(0:0:0), 
  *                  January 1, 1970, coordinated universal time(UTC).
  */
-LLBC_EXTERN LLBC_EXPORT sint64 LLBC_GetMilliSeconds();
+LLBC_EXTERN sint64 LLBC_GetMilliSeconds();
 
 /**
  * Retrieves the number of milliseconds that have elapsed since the system was started, up to 49.7 days.
@@ -84,5 +84,7 @@ __LLBC_NS_END
   LLBC_EXTERN LLBC_EXPORT int gettimeofday(struct timeval *tv, void *tz);
  #endif // LLBC_CFG_OS_IMPL_GETTIMEOFDAY
 #endif // LLBC_TARGET_PLATFORM_WIN32
+
+#include "llbc/core/os/OS_TimeImpl.h"
 
 #endif // !__LLBC_CORE_OS_OS_TIME_H__

@@ -54,6 +54,9 @@ void TestCase_Core_Time_Time::OSTimeTest()
 
     tmp = LLBC_MkTime(ts);
     std::cout <<"Convert to UTC time: " <<tmp <<std::endl;
+
+    sint64 nowTimeInMs = LLBC_GetMilliSeconds();
+    std::cout <<"now time in milli seconds: "<<nowTimeInMs <<std::endl;
 }
 
 void TestCase_Core_Time_Time::TimeClassTest()

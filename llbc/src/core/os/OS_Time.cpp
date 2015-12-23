@@ -22,20 +22,6 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-/*
- * Number of micro-seconds between the beginning of the Windows epoch
- * (Jan. 1, 1601) and the Unix epoch (Jan. 1, 1970).
- *
- * This assumes all Win32 compilers have 64-bit support.
- */
-#if LLBC_TARGET_PLATFORM_WIN32
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
-  #define DELTA_EPOCH_IN_USEC  11644473600000000Ui64
-#else
-  #define DELTA_EPOCH_IN_USEC  11644473600000000ULL
-#endif
-#endif // LLBC_PLATFORM_WIN32
-
 void LLBC_TZSet()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -282,19 +268,6 @@ time_t LLBC_MkTime(const struct LLBC_TimeStruct &tm)
     return retTime;
 }
 
-sint64 LLBC_GetMilliSeconds()
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct timeb tb;
-    ftime(&tb);
-#else
-    struct ::_timeb tb;
-    _ftime(&tb);
-#endif
-
-    return (static_cast<sint64>(tb.time)) * 1000 + tb.millitm;
-}
-
 uint64 LLBC_GetTickCount()
 {
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
@@ -346,20 +319,19 @@ int LLBC_GetTimeOfDay(struct timeval *tv, void *tz)
         return LLBC_RTN_FAILED;
     }
 
-    // get time
+    // Get time
     ::GetSystemTimeAsFileTime(&ft);
 
-    // convert to unix time
-    time = (LLBC_NS uint64)(ft.dwHighDateTime) << 32;
+    // Convert to unix time
+    time = ((LLBC_NS uint64)ft.dwHighDateTime) << 32;
     time |= ft.dwLowDateTime;
     time /= 10;
-    time -= DELTA_EPOCH_IN_USEC;
+    time -= LLBC_DELTA_EPOCH_IN_USEC;
 
-    // convert to timeval struct
+    // Convert to timeval struct
     tv->tv_sec = (long)(time / 1000000L);
     tv->tv_usec = (long)(time % 1000000L);
 
-    // success
     return LLBC_RTN_OK;
 #endif
 }
