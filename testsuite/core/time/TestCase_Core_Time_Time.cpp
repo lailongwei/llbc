@@ -78,7 +78,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"now2 - now: " <<diff.GetTotalSeconds() <<std::endl;
 }
 
-void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_NS LLBC_TimeStruct &ts)
+void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
 {
     std::cout <<"\t tm_year: " <<ts.tm_year <<std::endl;
     std::cout <<"\t tm_mon : " <<ts.tm_mon  <<std::endl;
