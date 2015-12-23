@@ -3,6 +3,11 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2015/12/23
+# 1) Log测试代码加入deltest代码;
+# 2) OS_Time中LLBC_GetMilliSeconds实现调整为LINUX平台使用gettimeofday(),Windows平台使用GetSystemTimeAsFileTime()完成,
+#    并将函数定义修改为inline;
+#
 # 2015/12/20
 # 1) 修复Log模块中的dailyRolling在跨天的时候有可能不分文件的BUG;
 # 2) 修复Log模块中的时间打印错误的BUG;
