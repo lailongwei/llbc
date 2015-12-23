@@ -246,8 +246,8 @@ MAKETARGET = $(MAKE) --no-print-directory \
                      INTDIR=$(INTDIR) \
                      MAKEDIR=$(MAKEDIR) \
                      MAKING_STATUS=DO_MAKE_TARGET \
-					 -j4 \
-					 $(TARGET)
+                     -j4 \
+                     $(TARGET)
 
 # Configrations
 $(RELEASETARGET) : all
