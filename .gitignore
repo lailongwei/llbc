@@ -1,0 +1,9 @@
+*.pyc
+*.user
+*.ncb
+*.suo
+Debug/
+Release/
+llbc/Debug/
+llbc/Release/
+wrap/pyllbc/lib/
