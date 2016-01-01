@@ -17,7 +17,8 @@ llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的
 长期测试维护平台为win/linux平台,Mac,iOS,Android主要因为个人时间问题,难以长期维护(Android基本未编译测试,虽然代码中有此平台的兼容代码,Mac及iOS平台之前有过简单的编译测试)
 llbc库没有任何依赖可以直接安装,json代码文件使用jsoncpp,已经作调整,以支持64位int,并整合到库代码中.
 ###Windows:
-  当前只在vs2008上编译测试过,其它版本vs编译应该没有什么问题,你如果使用的是其它版本的vs,遇到问题欢迎email.
+  vs2008: 打开llbc_vs2008.sln,编译即可,默认为32位release版本,如果需要编译debug版本或者64位的debug/release版本,请在项目配置中修改.
+  other version vs: 打开离你的vs版本最近的一个sln,打开,转换后,进行编译即可.
 ###Linux:
   请确认是否已经安装libuuid(sudo yum install libuuid-devel)
   make all & make install
@@ -31,7 +32,7 @@ llbc库没有任何依赖可以直接安装,json代码文件使用jsoncpp,已经
 ###Windows:
   llbc: 编译出的dll所在目录llbc/Release目录,copy使用即可
   testsuite: 编译出的测试套件在llbc/Release目录,直接使用即可
-  wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只有一个.pyd,目录在wrap/pyllbc/lib
+  wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只有一个.pyd,目录在llbc/Release/wrap/python看
   注:
     如果你需要编译64位版本的llbc或者pyllbc,请在项目中调整你的编译配置即可,对于64位版本的pyllbc,请确认你机器使用的python为64位版本的python.
     如果你需要编译debug版本的llbc或者pyllbc,同样也在编译配置中调整即可.

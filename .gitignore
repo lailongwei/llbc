@@ -2,13 +2,18 @@
 *.user
 *.ncb
 *.suo
+
 Debug/
 Release/
-llbc/Debug/
-llbc/Release/
-wrap/pyllbc/
+vcprojs/vs2008/Debug/
+vcprojs/vs2008/Release/
+
+llbc/lib/
 llbc/linux/
+
 testsuite/bin/
 testsuite/linux/
-wrap/pyllbc/linux//
+
+wrap/pyllbc/lib/
+wrap/pyllbc/linux/
 

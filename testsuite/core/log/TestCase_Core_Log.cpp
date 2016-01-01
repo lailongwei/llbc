@@ -26,10 +26,11 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_RTN_OK)
 #else
 
-    if(LLBC_LoggerManagerSingleton->Initialize("core/log/Logger_Cfg.cfg") != LLBC_RTN_OK)
+    if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_RTN_OK)
 #endif
     {
-        LLBC_PrintLine("Initialize logger manager failed, err: %s", LLBC_FormatLastError());
+        LLBC_FilePrintLine(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
+        LLBC_FilePrintLine(stderr, "Forgot copy Logger_Cfg.cfg test config file to CWD?");
         return -1;
     }
 
