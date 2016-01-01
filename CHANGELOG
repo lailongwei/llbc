@@ -3,6 +3,12 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2016/01/02
+# 1) 调整windows平台的sln文件及vcproj文件路径及名字,并调整所有projects的中间文件生成路径及目标文件路径:
+#    a. sln文件名从llbc.sln调整成llbc_vs2008.sln,以方便后期加入其它版本vs的支持;
+#    b. 所有项目的vcproj文件统一放入到vcprojs/vs2008/目录中,所有中间文件的生成目录也统一配置到了vcprojs/vs2008/Debug(或者Release)目录中;
+#    c. 所有项目生成文件放到顶层的Debug(或者Release)目录中;
+#
 # 2016/01/01
 # 1) 重新实现OS_Time模块,删除老的自有实现LLBC_MkTime,LLBC_GMTime,LLBC_LocalTime,改用系统自带线程安全实现,调整LLBC_GetMilliSeconds实现,
 #    不使用ftime实现,使用gettimeofday(Non-WIN32),GetSystemTimeAsFileTime(WIN32)实现,并加入LLBC_GetMicroSeconds实现,同时加入了闰年判定
