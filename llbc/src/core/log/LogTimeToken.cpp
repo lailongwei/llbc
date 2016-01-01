@@ -44,7 +44,11 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
 
     struct tm timeStruct;
+#if LLBC_TARGET_PLATFORM_WIN32
     localtime_s(&timeStruct, &timeInSecond);
+#else
+    localtime_r(&timeInSecond, &timeStruct);
+#endif
 
     char fmttedBuf[19];
     strftime(fmttedBuf, sizeof(fmttedBuf), "%y-%m-%d %H:%M:%S.", &timeStruct);

@@ -26,12 +26,17 @@ void LLBC_TZSet()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     tzset();
+ #if defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE)
+    LLBC_INTERNAL_NS __g_timezone = static_cast<int>(timezone);
+ #else
     time_t now = time(NULL);
-    LLBC_INTERNAL_NS __g_timezone = - static_cast<int>(localtime(&now)->tm_gmtoff);
-#else
+    LLBC_INTERNAL_NS __g_timezone = 
+        static_cast<int>(localtime(&now)->tm_gmtoff);
+ #endif // defined _SVID_SOURCE || _XOPEN_SOURCE
+#else // WIN32
     _tzset();
     LLBC_INTERNAL_NS __g_timezone = _timezone;
-#endif
+#endif // Non-WIN32
 }
 
 int LLBC_GetTimezone()

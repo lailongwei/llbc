@@ -195,7 +195,11 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
     {
         struct tm timeStruct;
         time_t nowInSecond = static_cast<time_t>(now / 1000);
+#if LLBC_TARGET_PLATFORM_WIN32
         localtime_s(&timeStruct, &nowInSecond);
+#else
+        localtime_r(&nowInSecond, &timeStruct);
+#endif
 
         char timeFmtBuf[9];
         timeFmtBuf[sizeof(timeFmtBuf) - 1] = '\0';

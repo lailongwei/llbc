@@ -38,7 +38,6 @@ void TestCase_Core_Time_Time::OSTimeTest()
     std::cout <<"OS_Time part test: " <<std::endl;
 
     std::cout <<"Now timeoffset: " <<LLBC_GetTimezone() <<std::endl;
-
     sint64 nowTimeInMs = LLBC_GetMilliSeconds();
     std::cout <<"LLBC_GetMilliSeconds(): "<<nowTimeInMs <<std::endl;
     sint64 nowTimeInUs = LLBC_GetMicroSeconds();

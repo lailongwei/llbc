@@ -37,7 +37,7 @@ const int LLBC_Time::NumOfMilliSecondsPerDay = 86400000;
 #if LLBC_TARGET_PLATFORM_WIN32
 const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000I64;
 #else
-const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000L64;
+const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000LL;
 #endif
 
 const int LLBC_Time::NumOfSecondsPerHour = 3600;
@@ -542,8 +542,13 @@ bool LLBC_Time::DeSerializeEx(LLBC_Stream &stream)
 void LLBC_Time::UpdateTimeStructs()
 {
     time_t calendarTime = (time_t)_time;
+#if LLBC_TARGET_PLATFORM_WIN32
     ::localtime_s(&_localTimeStruct, &calendarTime);
     ::gmtime_s(&_gmtTimeStruct, &calendarTime);
+#else
+    ::localtime_r(&calendarTime, &_localTimeStruct);
+    ::gmtime_r(&calendarTime, &_gmtTimeStruct);
+#endif
 }
 
 __LLBC_NS_END
