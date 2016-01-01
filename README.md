@@ -17,8 +17,8 @@ llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的
 长期测试维护平台为win/linux平台,Mac,iOS,Android主要因为个人时间问题,难以长期维护(Android基本未编译测试,虽然代码中有此平台的兼容代码,Mac及iOS平台之前有过简单的编译测试)
 llbc库没有任何依赖可以直接安装,json代码文件使用jsoncpp,已经作调整,以支持64位int,并整合到库代码中.
 ###Windows:
-  ####vs2008: 打开llbc_vs2008.sln,编译即可,默认为32位release版本,如果需要编译debug版本或者64位的debug/release版本,请在项目配置中修改.
-  ####other version vs: 打开离你的vs版本最近的一个sln,打开,转换后,进行编译即可.
+  打开llbc_vsxxxx.sln,编译即可,默认为32位release版本,如果需要编译debug版本或者64位的debug/release版本,请在项目配置中修改.
+  如果没有找到你机器上的vs版本的sln文件,请打开离你的vs版本最近的一个sln,打开,转换后,进行编译即可.
 ###Linux:
   请确认是否已经安装libuuid(sudo yum install libuuid-devel)
   make all & make install
