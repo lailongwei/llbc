@@ -93,9 +93,11 @@
 
 // Extern macro define.
 #ifdef __cplusplus
+ #define LLBC_INLINE     inline
  #define LLBC_EXTERN     extern
  #define LLBC_EXTERN_C   extern "C"
 #else
+ #define LLBC_INLINE     inline
  #define LLBC_EXTERN     extern
  #define LLBC_EXTERN_C   
 #endif
