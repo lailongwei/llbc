@@ -13,7 +13,6 @@
 # 1) 重新实现OS_Time模块,删除老的自有实现LLBC_MkTime,LLBC_GMTime,LLBC_LocalTime,改用系统自带线程安全实现,调整LLBC_GetMilliSeconds实现,
 #    不使用ftime实现,使用gettimeofday(Non-WIN32),GetSystemTimeAsFileTime(WIN32)实现,并加入LLBC_GetMicroSeconds实现,同时加入了闰年判定
 #    函数LLBC_IsLeapYear()及取得指定年月的此月的最大天数.
-#
 # 2) 重写LLBC_Time类,所有API重构,精度提升到MicroSecond,所有API参考C#的.Net DateTime实现;
 # 3) 重写LLBC_TimeSpan类,同样参考.Net TimeSpan类,精度提升到MicroSecond;
 #
