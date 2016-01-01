@@ -58,9 +58,9 @@ inline sint64 LLBC_GetMilliSeconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct timeval timeVal;
-    gettimeofday(&timeval, NULL);
+    gettimeofday(&timeVal, NULL);
 
-    return (LLBC_NS sint64)timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
+    return (LLBC_NS sint64)timeVal.tv_sec * 1000 + timeVal.tv_usec / 1000;
 #else
     // Get time.
     FILETIME ft;
@@ -98,9 +98,10 @@ inline sint64 LLBC_GetMicroSeconds()
 
 __LLBC_NS_END
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+#if LLBC_TARGET_PLATFORM_WIN32
  #undef LLBC_DELTA_EPOCH_IN_MSEC
  #undef LLBC_DELTA_EPOCH_IN_USEC
 #endif
 
 #endif // __LLBC_CORE_OS_OS_TIME_H__
+

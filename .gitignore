@@ -6,4 +6,9 @@ Debug/
 Release/
 llbc/Debug/
 llbc/Release/
-wrap/pyllbc/lib/
+wrap/pyllbc/
+llbc/linux/
+testsuite/bin/
+testsuite/linux/
+wrap/pyllbc/linux//
+
