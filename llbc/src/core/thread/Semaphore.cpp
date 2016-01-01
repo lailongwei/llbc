@@ -119,7 +119,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         return this->TryWait();
     }
 
-    uint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
+    sint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
     do
     {
         if(this->TryWait())
