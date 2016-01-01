@@ -852,6 +852,14 @@
 						RelativePath=".\include\llbc\core\time\Time.h"
 						>
 					</File>
+					<File
+						RelativePath=".\include\llbc\core\time\TimeSpan.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\llbc\core\time\TimeSpanImpl.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="singleton"
