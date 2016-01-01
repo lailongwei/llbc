@@ -73,14 +73,14 @@ private:
      * Check and update log file.
      * @param[in] now 
      */
-    void CheckAndUpdateLogFile(time_t now);
+    void CheckAndUpdateLogFile(sint64 now);
 
     /**
      * Build log file name.
      * @now                - now time.
      * @return LLBC_String - the log file name.
      */
-    LLBC_String BuildLogFileName(time_t now) const;
+    LLBC_String BuildLogFileName(sint64 now) const;
 
     /**
      * Check is need reopen file or not.
@@ -90,7 +90,7 @@ private:
      *                      about backup, see BackupFiles() method.
      * @return bool - need reopen if true, otherwise return false.
      */
-    bool IsNeedReOpenFile(time_t now, const LLBC_String &newFileName, bool &clear, bool &backup) const;
+    bool IsNeedReOpenFile(sint64 now, const LLBC_String &newFileName, bool &clear, bool &backup) const;
 
     /**
      * ReOpen the log file.
@@ -126,7 +126,7 @@ private:
     size_t _fileSize;
 
     sint64 _nonFlushLogCount;
-    time_t _logfileLastCheckTime;
+    sint64 _logfileLastCheckTime;
 };
 
 __LLBC_NS_END

@@ -39,9 +39,20 @@ int LLBC_LogTimeToken::GetType() const
 
 void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    LLBC_Time logTime(data.logTime);
+    // Format non millisecond part.
     int index = static_cast<int>(formattedData.size());
-    formattedData.append(logTime.Format());
+    time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
+
+    struct tm timeStruct;
+    localtime_s(&timeStruct, &timeInSecond);
+
+    char fmttedBuf[19];
+    strftime(fmttedBuf, sizeof(fmttedBuf), "%y-%m-%d %H:%M:%S.", &timeStruct);
+
+    formattedData.append(fmttedBuf, 18);
+
+    // Format millisecond part.
+    formattedData.append_format("%03llu", data.logTime % 1000);
 
     LLBC_LogFormattingInfo *formatter = this->GetFormatter();
     formatter->Format(formattedData, index);

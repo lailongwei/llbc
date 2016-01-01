@@ -12,9 +12,7 @@
 
 #include "llbc/core/utils/Util_Text.h"
 
-#include "llbc/core/os/OS_Thread.h"
-
-#include "llbc/core/time/Time.h"
+#include "llbc/core/os/OS_Time.h"
 
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/MessageBlock.h"
@@ -302,7 +300,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
             memcpy(data->others + data->fileBeg, file, data->fileLen);
     }
 
-    data->logTime = time(NULL);
+    data->logTime = LLBC_GetMilliSeconds();
 
     data->line = line;
 

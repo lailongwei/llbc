@@ -10,9 +10,9 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Console.h"
 
-#include "llbc/core/time/Time.h"
 #include "llbc/core/file/File.h"
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/utils/Util_Math.h"
@@ -26,6 +26,8 @@
 __LLBC_INTERNAL_NS_BEGIN
 const static LLBC_NS LLBC_String __ClearOpenFlag = "wb";
 const static LLBC_NS LLBC_String __AppendOpenFlag = "ab";
+
+const static int __LogFileCheckInterval = 500;
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -78,7 +80,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxFileSize = initInfo.maxFileSize > 0 ? initInfo.maxFileSize : LONG_MAX;
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
-    const time_t now = time(NULL);
+    const sint64 now = LLBC_GetMilliSeconds();
     const LLBC_String fileName = this->BuildLogFileName(now);
     if (this->ReOpenFile(fileName, false) != LLBC_RTN_OK)
         return LLBC_RTN_FAILED;
@@ -168,10 +170,10 @@ void LLBC_LogFileAppender::Flush()
     }
 }
 
-void LLBC_LogFileAppender::CheckAndUpdateLogFile(time_t now)
+void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 {
     if (_fileSize < _maxFileSize && 
-        LLBC_Abs(_logfileLastCheckTime - now) == 0)
+        LLBC_Abs(_logfileLastCheckTime - now) < LLBC_INL_NS __LogFileCheckInterval)
         return;
 
     bool clear = false, backup = false;
@@ -186,18 +188,26 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(time_t now)
     _logfileLastCheckTime = now;
 }
 
-LLBC_String LLBC_LogFileAppender::BuildLogFileName(time_t now) const
+LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 {
-    const LLBC_Time llbcNow(now);
-
     LLBC_String logFile(_baseName);
     if (_isDailyRolling)
-        logFile.append_format(".%s", llbcNow.Format("%Y-%m-%d").c_str());
+    {
+        struct tm timeStruct;
+        time_t nowInSecond = static_cast<time_t>(now / 1000);
+        localtime_s(&timeStruct, &nowInSecond);
+
+        char timeFmtBuf[9];
+        timeFmtBuf[sizeof(timeFmtBuf) - 1] = '\0';
+        strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
+
+        logFile.append_format(".%s", timeFmtBuf);
+    }
 
     return logFile;
 }
 
-bool LLBC_LogFileAppender::IsNeedReOpenFile(time_t now,
+bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
                                             const LLBC_String &newFileName,
                                             bool &clear,
                                             bool &backup) const

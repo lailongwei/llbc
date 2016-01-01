@@ -28,7 +28,7 @@ struct LLBC_EXPORT LLBC_LogData
     uint32 tagBeg;                        // Tag begin.
     uint32 tagLen;                        // Tag length.
 
-    time_t logTime;                       // Log time.
+    sint64 logTime;                       // Log time.
 
     uint32 fileBeg;                       // Log source file name begin.
     uint32 fileLen;                       // Log source file name length.
