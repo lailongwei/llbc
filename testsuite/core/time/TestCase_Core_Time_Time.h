@@ -27,6 +27,7 @@ private:
     void TimeClassTest();
 
     void PrintTimeStruct(const LLBC_TimeStruct &ts);
+    void PrintCLibTimeStruct(const struct tm &ts);
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_TIME_TIME_H__

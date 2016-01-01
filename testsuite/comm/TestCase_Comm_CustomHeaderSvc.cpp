@@ -36,7 +36,7 @@ namespace
             if (_asClient)
                 return;
 
-            time_t now = LLBC_Time::GetCurrentTime().GetLocalTime();
+            time_t now = time(NULL);
             if (now - _lastUpdateTime < 1)
                 return;
 
