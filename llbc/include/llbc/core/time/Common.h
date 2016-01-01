@@ -9,6 +9,7 @@
 #ifndef __LLBC_CORE_TIME_COMMON_H__
 #define __LLBC_CORE_TIME_COMMON_H__
 
+#include "llbc/core/time/TimeSpan.h"
 #include "llbc/core/time/Time.h"
 
 #endif // !__LLBC_CORE_TIME_COMMON_H__

@@ -12,79 +12,18 @@
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
+
 class LLBC_Time;
 class LLBC_TimeSpan;
+
 __LLBC_NS_END
 
 /**
- * Time, TimeSpan class stream output operators previous declare.
+ * Time class stream output operators previous declare.
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream & operator <<(std::ostream &o, const LLBC_NS LLBC_Time &s);
-LLBC_EXTERN LLBC_EXPORT std::ostream & operator <<(std::ostream &o, const LLBC_NS LLBC_TimeSpan &s);
+LLBC_EXTERN LLBC_EXPORT std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &span);
 
 __LLBC_NS_BEGIN
-
-/**
- * \brief Time span class encapsulation.
- */
-class LLBC_EXPORT LLBC_TimeSpan
-{
-public:
-    LLBC_TimeSpan();
-
-    LLBC_TimeSpan(const LLBC_TimeSpan &span);
-
-    explicit LLBC_TimeSpan(sint64 span);
-
-    LLBC_TimeSpan(int days, int hours, int mins, int secs);
-
-    ~LLBC_TimeSpan();
-
-public:
-    int GetDays() const;
-    int GetTotalHours() const;
-    int GetHours() const;
-    int GetTotalMinutes() const;
-    int GetMinutes() const;
-    int GetTotalSeconds() const;
-    int GetSeconds() const;
-
-    sint64 GetTimeSpan() const;
-    void SetTimeSpan(sint64 span);
-
-    LLBC_String Format(const char *format) const;
-
-    LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan& operator +=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan& operator -=(const LLBC_TimeSpan &span);
-
-    bool operator ==(const LLBC_TimeSpan &span) const;
-    bool operator !=(const LLBC_TimeSpan &span) const;
-    bool operator <(const LLBC_TimeSpan &span)const;
-    bool operator >(const LLBC_TimeSpan &span) const;
-    bool operator <=(const LLBC_TimeSpan &span) const;
-    bool operator >=(const LLBC_TimeSpan &span) const;
-
-    LLBC_TimeSpan &operator =(sint64 span);
-    LLBC_TimeSpan &operator =(const LLBC_TimeSpan &span);
-
-public:
-    /**
-     * Stream output operator support.
-     */
-    friend std::ostream & ::operator <<(std::ostream &o, const LLBC_TimeSpan &s);
-
-public:
-    void Serialize(LLBC_Stream &stream) const;
-    bool DeSerialize(LLBC_Stream &stream);
-
-    void SerializeEx(LLBC_Stream &stream) const;
-    bool DeSerializeEx(LLBC_Stream &stream);
-
-private:
-    sint64 m_span;
-};
 
 /**
  * \brief LLBC library Time class encapsulation.
@@ -93,120 +32,177 @@ class LLBC_EXPORT LLBC_Time
 {
 public:
     /**
+     * Some constants variables define.
+     */
+    static const int NumOfSecondsPerDay; // Number of seconds per-day.
+    static const int NumOfMilliSecondsPerDay; // Number of milli-seconds per-day.
+    static const sint64 NumOfMicroSecondsPerDay; // Number of micro-seconds per-day.
+
+    static const int NumOfSecondsPerHour; // Number of seconds per-hour.
+    static const int NumOfMilliSecondsPerHour; // Number of milli-seconds per-hour.
+    static const sint64 NumOfMicroSecondsPerHour; // Number of micro-seconds per-hour.
+
+    static const int NumOfSecondsPerMinute; // Number of seconds per-minute.
+    static const int NumOfMilliSecondsPerMinute; // Number of milli-seconds per-minute.
+    static const sint64 NumOfMicroSecondsPerMinute; // Number of micro-seconds per-minute.
+
+    static const int NumOfMilliSecondsPerSecond; // Number of milli-seconds per-second.
+    static const sint64 NumOfMicroSecondsPerSecond; // Number of micro-seconds per-second.
+
+    static const sint64 NumOfMicroSecondsPerMilliSecond; // Number of micro-seconds per-millisecond.
+
+public:
+    /**
      * Constructors.
      */
     LLBC_Time();
-
     LLBC_Time(const LLBC_Time &time);
-
-    explicit LLBC_Time(time_t time);
-
-    LLBC_Time(int year,
-              int month,
-              int day,
-              int hour,
-              int min,
-              int sec,
-              int tz = 8);
-
-    LLBC_Time(const char *timestr, 
-              char dateTimeSpliter = ' ', 
-              char dateSpliter = '-',
-              char timeSpliter = ':',
-              int tz = 8);
+    explicit LLBC_Time(double clanderTime);
 
     /**
      * Destructor.
      */
     ~LLBC_Time();
 
+public:
     /**
      * Get current time.
      */
-    static LLBC_Time GetCurrentTime();
-
-    /**
-     * Get number of seconds in day.
-     * @param[in] days - days, default is 1.
-     * @return uint32 - number of seconds in given days.
-     */
-    static uint32 GetNumOfSecondsInDay(uint32 days = 1);
-
-    /**
-     * Get number of milli-seconds in day.
-     * @param[in] days - days, default is 1.
-     * @return uint32 - number of milli-seconds in given days.
-     */
-    static uint32 GetNumOfMilliSecondsInDay(uint32 days = 1);
-
-    /**
-     * Get number of milli-seconds in second.
-     * @param[in] seconds - seconds, default is 1.
-     * @return uint32 - number of milli-seconds in given seconds.
-     */
-    static uint32 GetNumOfMilliSecondsInSecond(uint32 seconds = 1);
-
-    /**
-     * Get interval to specify hour,minute,second every day.
-     * @param[in] fromTime - from time.
-     * @param[in] hour - hour.
-     * @param[in] min  - minute.
-     * @param[in] sec  - second.
-     * @param[in] secondsInDay - seconds in day.
-     * @return LLBC_TimeSpan - timespan value.
-     */
-    static LLBC_TimeSpan GetIntervalTo(int secondsInDay);
-    static LLBC_TimeSpan GetIntervalTo(int hour, int min, int sec);
-    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &fromTime, int secondsInDay);
-    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &fromTime, int hour, int min, int sec);
-
-    /**
-     * Get time_t format time(Calendar time).
-     * @return time_t - UTC time, in seconds.
-     */
-    time_t GetGmtTime() const;
-    /**
-     * Get local time.
-     * @return time_t - local time, in seconds.
-     */
-    time_t GetLocalTime() const;
-
-    /**
-     * Get GMT time struct.
-     * @param[out] tm - time struct pointer, if not null, will fill value.
-     * @return struct LLBC_TimeStruct * - time struct pointer[thread unsafe].
-     */
-    struct LLBC_TimeStruct *GetGmtTm(struct LLBC_TimeStruct *tm) const;
-
-    /**
-     * Get local time struct.
-     * @param[out] tm - time struct pointer, if not null, will fill value.
-     * @return struct LLBC_TimeStruct * - time struct pointer[thread unsafe].
-     */
-    struct LLBC_TimeStruct *GetLocalTm(struct LLBC_TimeStruct *tm) const;
+    static LLBC_Time Now();
+    static LLBC_Time Current();
 
     /**
      * Get local time parts(year, month, day, hour, minute, second, dayofweek).
-     * @return int - time part.
+     * Notes: GetMonth() start by 1, GetDayOfWeek() start by 0(sunday), GetDayOfYear() start by 1.
+     * @return int - the specified time parts.
      */
     int GetYear() const;
     int GetMonth() const;
     int GetDay() const;
+    int GetDayOfWeek() const;
+    int GetDayOfYear() const;
     int GetHour() const;
     int GetMinute() const;
     int GetSecond() const;
-    int GetDayOfWeek() const;
+    int GetMilliSecond() const;
+    int GetMicroSecond() const;
 
+    /**
+     * Get date part time.
+     * @return LLBC_Time - the date part time.
+     */
+    LLBC_Time GetDate() const;
+    /**
+     * Get current time of day.
+     * @return LLBC_TimeSpan - the current time of day.
+     */
+    LLBC_TimeSpan GetTimeOfDay() const;
+
+    /**
+     * Get time ticks, in micro seconds.
+     * @return sint64 - the time ticks, in micro seconds.
+     */
+    sint64 GetTimeTicks() const;
+
+public:
+    /**
+     * Get GMT time struct.
+     * @param[out] time struct - time struct object reference.
+     * @return const struct tm & - time struct object.
+     */
+    const struct tm &GetGmtTime() const;
+    void GetGmtTime(struct tm &timeStruct) const;
+
+    /**
+     * Get local time struct.
+     * @param[out] timeStruct - time struct reference.
+     * @return const struct tm & - time struct object.
+     */
+    const struct tm &GetLocalTime() const;
+    void GetLocalTime(struct tm &timeStruct) const;
+
+public:
     /**
      * Format local time, see strftime() api.
      */
     LLBC_String Format(const char *format = NULL) const;
+    static LLBC_String Format(double time, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
-    LLBC_String FormatGmt(const char *format = NULL) const;
+    LLBC_String FormatAsGmt(const char *format = NULL) const;
+    static LLBC_String FormatAsGmt(double time, const char *format);
 
+public:
+    /**
+     * Create time object from some ways.
+     * @param[in] time         - calendar time, in seconds/milli-seconds/micro-seconds.
+     * @param[in] time         - calendar time, in milli seconds.
+     * @param[in] time         - calendar time, in micro seconds.
+     * @param[in] timeVal      - calendar time in milliseconds representation by timeval struct.
+     * @param[in] timeRepr     - time string representation, for example: "2015-12-25 00:00:00.000000".
+     * @param[in] <time parts> - the all time parts(year, month, day, ...). 
+     * @return LLBC_Time - Time object.
+     */
+    static LLBC_Time FromSeconds(double time);
+    static LLBC_Time FromMilliSeconds(sint64 time);
+    static LLBC_Time FromMicroSeconds(sint64 time);
+    static LLBC_Time FromTimeVal(const struct timeval &timeVal);
+    static LLBC_Time FromTimeRepr(LLBC_String timeRepr);
+    static LLBC_Time FromTimeStruct(const struct tm &timeStruct, int milliSecond = 0, int microSecond = 0);
+    static LLBC_Time FromTimeParts(int year, int month, int day, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
+
+public:
+    /**
+     * Add specified time parts values.
+     * Notes: These operations are thread-safe, all add parts added to new LLBC_Time object.
+     * @param[in] <time parts> - the all time parts(year, month, day, ...).
+     * @return LLBC_Time - the new time object.
+     */
+    LLBC_Time AddYears(int years) const;
+    LLBC_Time AddMonths(int months) const;
+    LLBC_Time AddDays(int days) const;
+    LLBC_Time AddHours(int hours) const;
+    LLBC_Time AddMinutes(int minutes) const;
+    LLBC_Time AddSeconds(int seconds) const;
+    LLBC_Time AddMilliSeconds(int milliSeconds) const;
+    LLBC_Time AddMicroSeconds(int microSeconds) const;
+
+public:
+    /**
+     * Makesure given year is leap year or not.
+     * @param[in] year - the given year.
+      *@return bool - return true it means given year is leap year, otherwise not.
+     */
+    static bool IsLeapYear(int year);
+
+    /**
+     * Get specific month max days.
+     * @param[in] year  - the year.
+     * @param[in] month - the month.
+     * @return int - the specific month max days, if failed, return 0.
+     */
+    static int GetMonthMaxDays(int year, int month);
+
+public:
+    /**
+     * Get interval to specify hour,minute,second every day.
+     * @param[in] fromTime     - the interval from time.
+     * @param[in] secondsInDay - seconds seconds in day.
+     * @param[in] hour         - hour.
+     * @param[in] minute       - minute.
+     * @param[in] second       - second.
+     * @param[in] milliSecond  - milli-second.
+     * @param[in] microSecond  - micro-second.
+     * @return LLBC_TimeSpan - timespan value.
+     */
+    static LLBC_TimeSpan GetIntervalTo(double secondsInDay);
+    static LLBC_TimeSpan GetIntervalTo(int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
+    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &fromTime, double secondsInDay);
+    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &fromTime, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
+
+public:
     /**
      * Time span operations.
      */
@@ -215,8 +211,6 @@ public:
 
     LLBC_Time operator +(const LLBC_TimeSpan &span) const;
     LLBC_Time operator -(const LLBC_TimeSpan &span) const;
-    LLBC_Time &operator +=(const LLBC_TimeSpan &span);
-    LLBC_Time &operator -=(const LLBC_TimeSpan &span);
 
     bool operator ==(const LLBC_Time &time) const;
     bool operator !=(const LLBC_Time &time) const;
@@ -225,7 +219,6 @@ public:
     bool operator <=(const LLBC_Time &time) const;
     bool operator >=(const LLBC_Time &time) const;
 
-    LLBC_Time &operator =(time_t time);
     LLBC_Time &operator =(const LLBC_Time &time);
 
 public:
@@ -245,14 +238,12 @@ public:
     bool DeSerializeEx(LLBC_Stream &stream);
 
 private:
-    void SetByPart(int year, int month, 
-        int day, int hour, int min, int sec, int tz);
+    void UpdateTimeStructs();
 
 private:
-    sint64 _time;
-    static const uint32 _numOfSecondsPerDay;
-    static const uint32 _numOfMilliSecondsPerDay;
-    static const uint32 _numOfMilliSecondsPerSecond;
+    double _time;
+    struct tm _gmtTimeStruct;
+    struct tm _localTimeStruct;
 };
 
 __LLBC_NS_END

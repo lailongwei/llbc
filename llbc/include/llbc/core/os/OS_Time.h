@@ -26,32 +26,33 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_TZSet();
 LLBC_EXTERN LLBC_EXPORT int LLBC_GetTimezone();
 
 /**
- * Get local time by calendar time value, thread safety.
- * @param[in] time - calendar time.
- * @param[out] tm  - time structure reference.
+ * Makesure given year is leap year or not.
+ * @param[in] year - the given year.
+ * @return bool - reutrn true if is leap year, otherwise return false.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_LocalTime(time_t time, struct LLBC_TimeStruct &tm);
+LLBC_EXTERN bool LLBC_IsLeapYear(int year);
 
 /**
- * Get UTC time by calendar time value, thread safety.
- * @param[in] time - calendar time.
- * @param[out] tm  - time structure reference.
+ * Get specific month max days.
+ * @param[in] year  - the year.
+ * @param[in] month - the month - [1, 12].
+ * @return int - the specific month max days, if failed, return 0.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_GMTime(time_t time, struct LLBC_TimeStruct &tm);
-
-/**
- * Convert tm structure value to calendar time.
- * @param[in] tm - time structure.
- * @return time_t - calendar time.
- */
-LLBC_EXTERN LLBC_EXPORT time_t LLBC_MkTime(const struct LLBC_TimeStruct &tm);
+LLBC_EXTERN int LLBC_GetMonthMaxDays(int year, int month);
 
 /**
  * Get the current time.
- * @return sint64 - current time, in seconds since midnight(0:0:0), 
+ * @return sint64 - current time, in milli-seconds since midnight(0:0:0), 
  *                  January 1, 1970, coordinated universal time(UTC).
  */
 LLBC_EXTERN sint64 LLBC_GetMilliSeconds();
+
+/**
+ * Get the current time as micro-seconds.
+ * @return sint64 - current time, in micro-seconds since midnight(0:0:0),
+ *                  January 1, 1970, corrdinated universal time(UTC).
+ */
+LLBC_EXTERN sint64 LLBC_GetMicroSeconds();
 
 /**
  * Retrieves the number of milliseconds that have elapsed since the system was started, up to 49.7 days.
