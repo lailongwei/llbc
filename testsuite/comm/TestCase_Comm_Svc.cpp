@@ -63,7 +63,7 @@ public:
             LLBC_PrintLine("[%lld]Received %lld packets!", LLBC_GetMilliSeconds(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
-        const LLBC_NS ulong nowMb = (_recvBytes / (1024 * 1024));
+        const size_t nowMb = (_recvBytes / (1024 * 1024));
         if (nowMb != _prevMb)
         {
             LLBC_PrintLine("[%lld]Received %lld MB data!", LLBC_GetMilliSeconds(), nowMb);
@@ -78,10 +78,10 @@ public:
     }
 
 private:
-    LLBC_NS ulong _prevMb;
-    LLBC_NS ulong _recvBytes;
+    size_t _prevMb;
+    size_t _recvBytes;
 
-    LLBC_NS ulong _packets;
+    size_t _packets;
 };
 
 }

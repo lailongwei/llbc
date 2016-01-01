@@ -113,7 +113,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     for (size_t i = 0; i < contents.size(); i++)
     {
         const LLBC_String &line = contents[i];
-        if (this->ParseLine(line, i + 1) != LLBC_RTN_OK)
+        if (this->ParseLine(line, static_cast<int>(i) + 1) != LLBC_RTN_OK)
         {
             done = false;
             break;
