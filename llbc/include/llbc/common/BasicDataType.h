@@ -193,6 +193,7 @@ typedef FILE * LLBC_FileHandle;
 #else
  typedef HANDLE LLBC_DirHandle;
 #endif
+#define LLBC_INVALID_FILE_HANDLE NULL
 
 // library data type define.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -207,6 +208,18 @@ typedef FILE * LLBC_FileHandle;
 // timer data type define.
 typedef uint64 LLBC_TimerId;
 #define LLBC_INVALID_TIMER_ID    (0)
+#if LLBC_TARGET_PLATFORM_WIN32
+extern "C"
+{
+    // For compatible with Linux like system, 
+    // we define timespec structure in WIN32 platform.
+    typedef struct _timespec 
+    {
+        time_t tv_sec; /* seconds */
+        long tv_nsec;  /* nanoseconds */
+    } timespec;
+}
+#endif
 
 // guid data type define.
 #if LLBC_TARGET_PLATFORM_NON_WIN32

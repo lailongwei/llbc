@@ -22,6 +22,9 @@ int TestCase_Com_DataType::Run(int argc, char *argv[])
     // utf8 test.
     this->StringUTF8Test();
 
+    // findreplace t est.
+    this->StringFindReplaceTest();
+
     // split test.
     this->StringSplitTest("com.packet.battle.");
     this->StringSplitTest("sys.io.stdout");
@@ -82,6 +85,35 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLine("'%s' to lower: '%s'", testStr.c_str(), testStr.tolower().c_str());
     LLBC_PrintLine("'%s' to upper: '%s'", testStr.c_str(), testStr.toupper().c_str());
 
+    // isalpha/isupper/islower.
+    LLBC_String str("HELLO");
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "hello";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "HeLlO";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "hello123";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "HELLO123";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "Hello123";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "H";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "h";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+    str = "3";
+    LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
+        str.c_str(), str.islower(), str.isupper(), str.isalpha());
+
     LLBC_PrintLine("\n");
 }
 
@@ -119,6 +151,18 @@ void TestCase_Com_DataType::StringUTF8Test()
     utf8Str.scatter_utf8_string(utf8Vec, 2);
     utf8Str.scatter_utf8_string(utf8Vec, 3);
     LLBC_PrintLine("After scatter utf8 string, vector size: %ld", utf8Vec.size());
+
+    LLBC_PrintLine("\n");
+}
+
+void TestCase_Com_DataType::StringFindReplaceTest()
+{
+    LLBC_PrintLine("FindReplace test:");
+
+    LLBC_String str("Hello World, Hello World");
+    LLBC_PrintLine("Before findreplace(), str: %s", str.c_str());
+    str.findreplace("Hel", "HEL");
+    LLBC_PrintLine("After findreplace(), str: %s", str.c_str());
 
     LLBC_PrintLine("\n");
 }

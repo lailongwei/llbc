@@ -27,7 +27,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The packet header assembler encapsulation.
  */
-class LLBC_HIDDEN LLBC_PacketHeaderAssembler
+class LLBC_EXPORT LLBC_PacketHeaderAssembler
 {
 public:
     /**

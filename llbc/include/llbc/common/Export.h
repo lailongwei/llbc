@@ -16,6 +16,7 @@
 // LINUX
 #if LLBC_TARGET_PLATFORM_LINUX
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
  #ifndef LLBC_HIDDEN
@@ -26,6 +27,7 @@
 // WIN32
 #if LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __declspec(dllexport)
  #endif
  #ifndef LLBC_HIDDEN
@@ -36,6 +38,7 @@
 // IPHONE
 #if LLBC_TARGET_PLATFORM_IPHONE
  #ifndef LLBC_EXPORT		
+  #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
  #ifndef LLBC_HIDDEN
@@ -46,6 +49,7 @@
 // MAC
 #if LLBC_TARGET_PLATFORM_MAC
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
  #ifndef LLBC_HIDDEN
@@ -56,6 +60,7 @@
 // ANDROID
 #if LLBC_TARGET_PLATFORM_ANDROID
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
  #ifndef LLBC_HIDDEN

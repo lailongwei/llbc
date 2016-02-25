@@ -44,7 +44,15 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
 #elif LLBC_TARGET_PLATFORM_ANDROID
     desc.append_format("(%s", "ANDROID");
 #endif
+
+#if LLBC_CUR_COMP == LLBC_COMP_MSVC
+    desc.append_format(", compiled with: %s, version: %d)", LLBC_CUR_COMP_DESC, LLBC_COMP_VER);
+#elif LLBC_CUR_COMP == LLBC_COMP_GCC
+    desc.append_format(", compiled with: %s, version %d.%d.%d)", 
+        LLBC_CUR_COMP_DESC, LLBC_COMP_MAJOR_VER, LLBC_COMP_MINOR_VER, LLBC_COMP_PATCH_LEVEL);
+#else
     desc.append_format(", compiled with: %s)", LLBC_CUR_COMP_DESC);
+#endif
 
     if (!verbose)
         return desc;
@@ -68,6 +76,9 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default daily mode enabled(available in file log): %s\n", (LLBC_CFG_LOG_DEFAULT_DAILY_MODE) ? "true" : "false");
     desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);
     desc.append_format("    default max backup index: %d\n", LLBC_CFG_LOG_MAX_BACKUP_INDEX);
+    desc.append_format("    default flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
+    desc.append_format("    max flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
+    desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
 
     // Append communication info.
     desc.append_format("communication info: \n");

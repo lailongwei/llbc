@@ -35,23 +35,23 @@ __LLBC_NS_BEGIN
 const int LLBC_Time::NumOfSecondsPerDay = 86400;
 const int LLBC_Time::NumOfMilliSecondsPerDay = 86400000;
 #if LLBC_TARGET_PLATFORM_WIN32
-const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000I64;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000I64;
 #else
-const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000LL;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000LL;
 #endif
 
-const int LLBC_Time::NumOfSecondsPerHour = 3600;
-const int LLBC_Time::NumOfMilliSecondsPerHour = 3600000;
-const sint64 LLBC_Time::NumOfMicroSecondsPerHour = 3600000000;
+LLBC_EXPORT const int LLBC_Time::NumOfSecondsPerHour = 3600;
+LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerHour = 3600000;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerHour = 3600000000;
 
-const int LLBC_Time::NumOfSecondsPerMinute = 60;
-const int LLBC_Time::NumOfMilliSecondsPerMinute = 60000;
-const sint64 LLBC_Time::NumOfMicroSecondsPerMinute = 60000000;
+LLBC_EXPORT const int LLBC_Time::NumOfSecondsPerMinute = 60;
+LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerMinute = 60000;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerMinute = 60000000;
 
-const int LLBC_Time::NumOfMilliSecondsPerSecond = 1000;
-const sint64 LLBC_Time::NumOfMicroSecondsPerSecond = 1000000;
+LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerSecond = 1000;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerSecond = 1000000;
 
-const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = 1000;
+LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = 1000;
 
 LLBC_Time::LLBC_Time()
 : _time()
@@ -64,6 +64,18 @@ LLBC_Time::LLBC_Time(const LLBC_Time &time)
 {
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(struct tm));
     memcpy(&_gmtTimeStruct, &time._gmtTimeStruct, sizeof(struct tm));
+}
+
+LLBC_Time::LLBC_Time(const timeval &tv)
+: _time(static_cast<double>(tv.tv_sec) + static_cast<double>(tv.tv_usec) / LLBC_Time::NumOfMicroSecondsPerSecond)
+{
+    UpdateTimeStructs();
+}
+
+LLBC_Time::LLBC_Time(const timespec &ts)
+: _time(static_cast<double>(ts.tv_sec) + ts.tv_nsec / (LLBC_Time::NumOfMicroSecondsPerSecond * 1000.0))
+{
+    UpdateTimeStructs();
 }
 
 LLBC_Time::LLBC_Time(double clanderTime)

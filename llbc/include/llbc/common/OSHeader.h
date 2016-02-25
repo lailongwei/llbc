@@ -94,6 +94,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <functional>
 #include <limits.h>
 
 // UUID lib header file.

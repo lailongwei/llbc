@@ -1,7 +1,7 @@
 /**
  * @file    TestCase_Core_File_File.h
  * @author  Longwei Lai<lailongwei@126.com>
- * @date    2013/04/07
+ * @date    2016/01/23
  * @version 1.0
  *
  * @brief
@@ -15,26 +15,26 @@ using namespace llbc;
 class TestCase_Core_File_File : public LLBC_BaseTestCase
 {
 public:
+    TestCase_Core_File_File();
+    virtual ~TestCase_Core_File_File();
+
+public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    void OpenCloseTest(const LLBC_NAMESPACE LLBC_String &file);
-
-    void SetBufferModeTest(const LLBC_NAMESPACE LLBC_String &file);
-
-    void RWTest(const LLBC_NAMESPACE LLBC_String &file);
-
-    void DeleteTest(const LLBC_NAMESPACE LLBC_String &file);
-
-    void MoveTest(const LLBC_NAMESPACE LLBC_String &file1,
-                  const LLBC_NAMESPACE LLBC_String &file2);
-
-    void CopyTest(const LLBC_NAMESPACE LLBC_String &file1,
-                  const LLBC_NAMESPACE LLBC_String &file2);
+    bool FileModeDescTest();
+    bool OpenCloseTest();
+    bool GetXXXMethodsTest();
+    bool ReadWriteTest();
+    bool FileAttributeTest();
+    bool CopyFileTest();
+    bool MoveFileTest();
 
 private:
-    LLBC_NAMESPACE LLBC_File m_file1;
-    LLBC_NAMESPACE LLBC_File m_file2;
+    void PrintFileAttributes(const LLBC_FileAttributes &fileAttrs);
+
+private:
+    LLBC_String _testFileName;
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_FILE_FILE_H__

@@ -1,7 +1,7 @@
 /**
  * @file    Directory.h
  * @author  Longwei Lai<lailongwei@126.com>
- * @date    2011/12/14
+ * @date    2016/02/17
  * @version 1.0
  *
  * @brief
@@ -12,154 +12,169 @@
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
-class LLBC_File;
-__LLBC_NS_END
-
-#if LLBC_TARGET_PLATFORM_WIN32
-#pragma warning(disable:4290)
-#endif
-
-__LLBC_NS_BEGIN
 
 /**
- * \brief Directory class encapsulation.
+ * \brief The directory operations encapsulation.
  */
 class LLBC_EXPORT LLBC_Directory
 {
 public:
-	LLBC_Directory();
-	virtual ~LLBC_Directory();
+    /**
+     * Check given path's directory exists or not.
+     * @param[in] path - the given path.
+     * @return bool - return true if given path exists and is directory.
+     */
+    static bool Exists(const LLBC_String &path);
+
+    /**
+     * Recursive create directory.
+     * @param[in] path - the will create directory path.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int Create(const LLBC_String &path);
+
+    /**
+     * Recursive remove directory.
+     * @param[in] path - the will remove path.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int Remove(const LLBC_String &path);
 
 public:
     /**
-     * Get directory handle, unsafe method.
+     * Convert path to normalized absolutize path.
+     * @return LLBC_String - the normalized absolutize path.
      */
-	LLBC_DirHandle Handle() const;
+    static LLBC_String AbsPath(const LLBC_String &path);
+
+    /**
+     * Join one or more path components intelligently.
+     * @param[in] path1~7 - the path components.
+     * @param[in] paths   - the paths list.
+     * @return LLBC_String - the joined path.
+     */
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2,
+                            const LLBC_String &path3);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2,
+                            const LLBC_String &path3,
+                            const LLBC_String &path4);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2,
+                            const LLBC_String &path3,
+                            const LLBC_String &path4,
+                            const LLBC_String &path5);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2,
+                            const LLBC_String &path3,
+                            const LLBC_String &path4,
+                            const LLBC_String &path5,
+                            const LLBC_String &path6);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2,
+                            const LLBC_String &path3,
+                            const LLBC_String &path4,
+                            const LLBC_String &path5,
+                            const LLBC_String &path6,
+                            const LLBC_String &path7);
+    static LLBC_String Join(const LLBC_Strings &paths);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_Strings &paths);
+
+    /**
+     * Split file extension, always success.
+     * @param[in] path - the file path.
+     * @return LLBC_Strings - the splited parts, patrts[0] is not has extension path, parts[1] is the file extension.
+     */
+    static LLBC_Strings SplitExt(const LLBC_String &path);
+
+    /**
+     * Get specific path's files, not include directory type files.
+     * @param[in]  path      - the path.
+     * @param[out] files     - all given path's files.
+     * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int GetFiles(const LLBC_String &path, std::vector<LLBC_String> &files, bool recursive = false);
+
+    /**
+     * Recursive specific path's directories.
+     * @param[in] path         - the path.
+     * @param[out] directories - the given path's directories.
+     * @param[in] recursive    - recursive flag, default is false.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int GetDirectories(const LLBC_String &path, LLBC_Strings &directories, bool recursive = false);
 
 public:
     /**
-     * Set directory.
-     * @param[in] dir - directory name.
+     * Get current executable module file name.
+     * @return LLBC_String - the module file name.
      */
-	int SetDir(const LLBC_String &dir);
+    static LLBC_String ModuleFileName();
 
     /**
-     * Check directory exist or not.
-     * @return bool - return true if successed, otherwise return false.
+     * Get current executable module file directory.
+     * @return LLBC_String - the module file directory.
      */
-	bool Exist() const;
+    static LLBC_String ModuleFileDir();
 
     /**
-     * Get directory name.
-     * @return LLBC_String - directory name.
+     * Get given path directory name.
+     * @param[in] path - the path.
+     * @return LLBC_String - the directory name for the path.
      */
-	LLBC_String GetDir() const;
-	LLBC_String GetFullDir() const;
+    static LLBC_String DirName(const LLBC_String &path);
 
     /**
-     * Get current directory's file list, not include directory types file.
-     * @param[out] files    - files.
-     * @param[in] filterStr - filter string, regular expression format, now not support.
-     * @param[in] recur     - recursion flag, if set to true, this function will recur to scan directory,
-     *                        default is false.
-     * @return std::deque<LLBC_String> - file name list.
+     * Get given path base name.
+     * @param[in] path - the path.
+     * @return LLBC_String - the base name for the path.
      */
-    int GetFiles(std::vector<LLBC_String> &files,
-                 const LLBC_String &filterStr, 
-                 bool recur = false) const;
+    static LLBC_String BaseName(const LLBC_String &path);
 
-    /**
-     * Get files, like another GetFiles() method, return must use LLBC_XDeletes(ptr) to delete.
-     */
-	LLBC_File *GetFiles(size_t &fileCount,
-                        const LLBC_String &filterStr,
-                        const LLBC_String &mode = "r",
-                        bool recur = false) const;
-
-    /**
-     * Get current directory's sub directory list.
-     * @param[out] directories - directories array.
-     * @param[in] filterStr    - filter string, reqular expression format, now not support.
-     * @param[in] recur        - recursion flag.
-     * @return int - return 0 if successed, otherwise return -1.
-     */
-    int GetDirectories(std::vector<LLBC_String> &directories,
-                       const LLBC_String &filterStr, 
-                       bool recur = false) const;
-
-    /**
-     * Get specified directory's sub directory list.
-     */
-	LLBC_Directory *GetDirectories(size_t &directoryCount,
-                                   const LLBC_String &filterStr,
-                                   bool recur = false) const;
-
-    /**
-     * Create directory.
-     */
-	int CreateSelfDir();
-	static int CreateDir(const LLBC_String &dirName);
-
-    /**
-     * Create sub directory.
-     */
-	int CreateSubDir(const LLBC_String &subDirName);
-
-    /**
-     * Delete directory.
-     */
-	int DeleteSelfDir();
-	static int DeleteDir(const LLBC_String &dirName);
-
-    /**
-     * Get/Set current directory.
-     */
-	static LLBC_String GetCurrentDirectory();
-    static int SetCurrentDirectory(const LLBC_String &curDir);
-
-    /* Exception throw APIs. */
 public:
-    void SetDirT(const LLBC_String &dir) throw (LLBC_IOException);
+    /**
+     * Get current directory.
+     * @return LLBC_String - current directory.
+     */
+    static LLBC_String CurDir();
 
-	LLBC_String GetDirT() const throw (LLBC_IOException);
-	LLBC_String GetFullDirT() const throw (LLBC_IOException);
+    /**
+     * Set current directory.
+     * @param[in] path - the new current directory.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int SetCurDir(const LLBC_String &path);
 
-    void GetFilesT(std::vector<LLBC_String> &files,
-                   const LLBC_String &filterStr, 
-                   bool recur = false) const throw (LLBC_IOException);
+    /**
+     * Get document directory.
+     * @return LLBC_String - document directory.
+     */
+    static LLBC_String DocDir();
 
-	LLBC_File *GetFilesT(size_t &fileCount,
-                         const LLBC_String &filterStr,
-                         const LLBC_String &mode = "r",
-                         bool recur = false) const throw (LLBC_IOException);
+    /**
+     * Get home directory.
+     * @return LLBC_String - the home directory.
+     */
+    static LLBC_String HomeDir();
 
-    void GetDirectoriesT(std::vector<LLBC_String> &directories,
-                         const LLBC_String &filterStr, 
-                         bool recur = false) const throw (LLBC_IOException);
+    /**
+     * Get temporary directory.
+     * @return LLBC_String - the temporary directory.
+     */
+    static LLBC_String TempDir();
 
-	LLBC_Directory *GetDirectoriesT(size_t &directoryCount,
-                                    const LLBC_String &filterStr,
-                                    bool recur = false) const throw (LLBC_IOException);
-
-	void CreateSelfDirT() throw (LLBC_IOException);
-	static void CreateDirT(const LLBC_String &dirName) throw (LLBC_IOException);
-
-	void CreateSubDirT(const LLBC_String &subDirName) throw (LLBC_IOException);
-
-	void DeleteSelfDirT() throw (LLBC_IOException);
-	static void DeleteDirT(const LLBC_String &dirName) throw (LLBC_IOException);
-
-	static LLBC_String GetCurrentDirectoryT() throw (LLBC_IOException);
-    static void SetCurrentDirectoryT(const LLBC_String &curDir) throw (LLBC_IOException);
-
-private:
-	LLBC_String _directoryName;
+    /**
+     * Get cache directory.
+     * @return LLBC_String - the cache directory.
+     */
+    static LLBC_String CacheDir();
 };
 
 __LLBC_NS_END
-
-#if LLBC_TARGET_PLATFORM_WIN32
-#pragma warning(default:4290)
-#endif
 
 #endif // !__LLBC_CORE_FILE_DIRECTORY_H__

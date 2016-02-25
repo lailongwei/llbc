@@ -27,16 +27,19 @@ class LLBC_BasicString : public
     typedef LLBC_BasicString<_Elem, _Traits, _Ax> _This;
     typedef std::basic_string<_Elem, _Traits, _Ax> _Base;
 
-	typedef std::vector<LLBC_BasicString<_Elem, _Traits, _Ax> > _These;
+    typedef std::vector<LLBC_BasicString<_Elem, _Traits, _Ax> > _These;
 
 public:
     typedef typename _Base::size_type size_type;
+    typedef typename _Base::value_type value_type;
 
     typedef typename _Base::iterator iterator;
     typedef typename _Base::const_iterator const_iterator;
 
     typedef typename _Base::pointer pointer;
     typedef typename _Base::const_pointer const_pointer;
+
+    typedef _These These;
 
 public:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -70,7 +73,7 @@ public:
         return *this;
     }
 
-    _This &operator =(_Elem c)
+    _This &operator =(const _Elem &c)
     {
         _Base::operator =(c);
         return *this;
@@ -119,7 +122,7 @@ public:
         return *this;
     }
 
-    _This &operator +=(_Elem c)
+    _This &operator +=(const _Elem &c)
     {
         _Base::operator +=(c);
         return *this;
@@ -136,7 +139,7 @@ public:
         return _This::compare(s) == 0;
     }
 
-    bool operator ==(_Elem c) const
+    bool operator ==(const _Elem &c) const
     {
         return _This::compare(c) == 0;
     }
@@ -152,7 +155,7 @@ public:
         return !this->operator ==(s);
     }
 
-    bool operator !=(_Elem c) const
+    bool operator !=(const _Elem &c) const
     {
         return !this->operator ==(c);
     }
@@ -361,24 +364,12 @@ public:
         return *this;
     }
 
-	_This replace(size_type p0, size_type n0,
-		const _This &str) const
-	{
-		return _This(*this).replace(p0, n0, str);
-	}
-
     _This &replace(size_type p0, size_type n0,
         const _This &str, size_type pos, size_type n)
     {
         _Base::replace(p0, n0, str, pos, n);
         return *this;
     }
-
-	_This replace(size_type p0, size_type n0,
-		const _This &str, size_type pos, size_type n) const
-	{
-		return _This(*this).replace(p0, n0, str, pos, n);
-	}
 
     _This &replace(size_type p0, size_type n0,
         const _Elem *s)
@@ -387,24 +378,12 @@ public:
         return *this;
     }
 
-	_This replace(size_type p0, size_type n0,
-		const _Elem *s) const
-	{
-		return _This(*this).replace(p0, n0, s);
-	}
-
     _This &replace(size_type p0, size_type n0,
         const _Elem *s, size_type n)
     {
         _Base::replace(p0, n0, s, n);
         return *this;
     }
-
-	_This replace(size_type p0, size_type n0,
-		const _Elem *s, size_type n) const
-	{
-		return _This(*this).replace(p0, n0, s, n);
-	}
 
     _This &replace(size_type p0, size_type n0,
         size_type n, _Elem c)
@@ -413,24 +392,12 @@ public:
         return *this;
     }
 
-	_This replace(size_type p0, size_type n0,
-		size_type n, _Elem c) const
-	{
-		return _This(*this).replace(p0, n0, n, c);
-	}
-
     _This &replace(iterator first0, iterator last0,
         const _This &str)
     {
         _Base::replace(first0, last0, str);
         return *this;
     }
-
-	_This replace(const_iterator first0, const_iterator last0,
-		const _This &str) const
-	{
-		_This(*this).replace(first0 - this->begin(), last0 - this->begin(), str);
-	}
 
     _This &replace(iterator first0, iterator last0,
         const _Elem *s)
@@ -439,24 +406,12 @@ public:
         return *this;
     }
 
-	_This replace(const_iterator first0, const_iterator last0,
-		const _Elem *s) const
-	{
-		_This(*this).replace(first0 - this->begin(), last0 - this->begin(), s);
-	}
-
     _This &replace(iterator first0, iterator last0,
         const _Elem *s, size_type n)
     {
         _Base::replace(first0, last0, s, n);
         return *this;
     }
-
-	_This replace(const_iterator first0, const_iterator last0,
-		const _Elem *s, size_type n) const
-	{
-		return _This(*this).replace(first0 - this->begin(), last0 - this->begin(), s, n);
-	}
 
     _This &replace(iterator first0, iterator last0,
         size_type n, _Elem c)
@@ -465,12 +420,6 @@ public:
         return *this;
     }
 
-	_This replace(const_iterator first0, const_iterator last0,
-		size_type n, _Elem c) const
-	{
-		return _This(*this).replace(first0 - this->begin(), last0 - this->begin(), n, c);
-	}
-
     _This &replace(iterator first0, iterator last0,
         const_iterator first, const_iterator last)
     {
@@ -478,19 +427,43 @@ public:
         return *this;
     }
 
-	_This replace(const_iterator first0, const_iterator last0,
-		const_iterator first, const_iterator last) const
-	{
-		_This sub = this->substr(first - this->begin(), last - first);
-		return this->replace(first0, last0, sub);
-	}
+    _These split(const _Elem &sep, size_type max_split = -1) const
+    {
+        return this->split(_This(1, sep), max_split);
+    }
 
-	_These split(const _Elem &sep, size_type max_split = -1) const
-	{
-		return this->split(_This(1, sep), max_split);
-	}
+    // findreplace operation
+    _This &findreplace(const _Elem &c1, const _Elem &c2, int count = -1)
+    {
+        if (c1 == c2)
+            return *this;
 
-    _These split(const _This &sep, size_type max_split = -1) const
+        for (size_type i = 0; i < this->size(); i++)
+        {
+            if ((*this)[i] == c1)
+                replace(i, 1, 1, c2);
+        }
+
+        return *this;
+    }
+
+    _This &findreplace(const _This &s1, const _This &s2, int count = -1)
+    {
+        if (s1 == s2)
+            return *this;
+
+        size_type found = 0;
+        while ((found = find(s1, found)) != npos)
+        {
+            replace(found, s1.size(), s2);
+            found += s2.size();
+        }
+
+        return *this;
+    }
+
+    // split operation
+    _These split(const _This &sep, size_type max_split = -1, bool with_elem = false) const
     {
         _These substrs;
         if (sep.empty() || max_split == 0 || this->empty())
@@ -503,7 +476,59 @@ public:
         uint32 splitTimes = 0;
         for (; splitTimes < static_cast<uint32>(max_split); splitTimes++)
         {
-            size_type findIdx = this->find(sep, idx);
+            size_type findIdx = npos;
+            if (with_elem)
+            {
+                for (size_t i = 0; i < sep.size(); i++)
+                {
+                    findIdx = this->find(sep[i], idx);
+                    if (findIdx != npos)
+                        break;
+                }
+            }
+            else
+            {
+                findIdx = this->find(sep, idx);
+            }
+
+            if (findIdx == npos)
+                break;
+
+            substrs.push_back(this->substr(idx, findIdx - idx));
+            if ((idx = findIdx + 1) == this->size())
+            {
+                substrs.push_back(_This());
+                break;
+            }
+        }
+
+        if (idx != this->size())
+            substrs.push_back(this->substr(idx));
+
+        return substrs;
+    }
+
+    _These split(const _These &seps, size_type max_split = -1) const
+    {
+        _These substrs;
+        if (seps.empty() || max_split == 0 || this->empty())
+        {
+            substrs.push_back(*this);
+            return substrs;
+        }
+
+        size_type idx = 0;
+        uint32 splitTimes = 0;
+        for (; splitTimes < static_cast<uint32>(max_split); splitTimes++)
+        {
+            size_type findIdx = npos;
+            for (int i = 0; i < seps.size(); i++)
+            {
+                findIdx = this->find(seps[i], idx);
+                if (findIdx != npos)
+                    break;
+            }
+
             if (findIdx == npos)
                 break;
 
@@ -739,7 +764,7 @@ public:
         return _Base::compare(p0, n0, s, pos);
     }
 
-    int compare(_Elem c) const
+    int compare(const _Elem &c) const
     {
         size_type size = this->size();
         if (size == 0)
@@ -749,6 +774,195 @@ public:
         return (thisC > c ? 1 : 
                     (thisC < c ? -1 :  
                         (size == 1 ? 0 : 1)));
+    }
+
+    // isalpha/isupper/islower
+    static bool isalpha(const _Elem &c)
+    {
+        if (sizeof(_Elem) == 1)
+        {
+            return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+        }
+        else if (sizeof(_Elem) == 2)
+        {
+            char ch = static_cast<char>(c);
+            return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z');
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static bool isalpha(const _This &s)
+    {
+        if (s.empty())
+            return false;
+
+        for (size_t i = 0; i < s.size(); i++)
+        {
+            if (!isalpha(s[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool isalpha() const
+    {
+        return isalpha(*this);
+    }
+
+    static bool islower(const _Elem &c)
+    {
+        if (sizeof(_Elem) == 1)
+        {
+            return 'a' <= c && c <= 'z';
+        }
+        else if (sizeof(_Elem) == 2)
+        {
+            char ch = static_cast<char>(c);
+            return 'a' <= ch && ch <= 'z';
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static bool islower(const _This &s)
+    {
+        if (s.empty())
+            return false;
+
+        bool foundLower = false;
+        for (size_type i = 0; i < s.size(); i++)
+        {
+            if (isupper(s[i]))
+                return false;
+            else if (islower(s[i]))
+                foundLower = true;
+        }
+
+        return foundLower;
+    }
+
+    bool islower() const
+    {
+        return islower(*this);
+    }
+
+    static bool isupper(const _Elem &c)
+    {
+        if (sizeof(_Elem) == 1)
+        {
+            return 'A' <= c && c <= 'Z';
+        }
+        else if (sizeof(_Elem) == 2)
+        {
+            char ch = static_cast<char>(c);
+            return 'A' <= ch && ch <= 'Z';
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static bool isupper(const _This &s)
+    {
+        if (s.empty())
+            return false;
+
+        bool foundUpper = false;
+        for (size_type i = 0; i < s.size(); i++)
+        {
+            if (islower(s[i]))
+                return false;
+            else if (isupper(s[i]))
+                foundUpper = true;
+        }
+
+        return foundUpper;
+    }
+
+    bool isupper() const
+    {
+        return isupper(*this);
+    }
+
+    // isdigit
+    static bool isdigit(const _Elem &c)
+    {
+        if (sizeof(_Elem) == 1)
+        {
+            return '0' <=c && c <= '9';
+        }
+        else if (sizeof(_Elem) == 2)
+        {
+            char ch = reinterpret_cast<char>(c);
+            return '0' <= ch && ch <= '9';
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static bool isdigit(const _This &s)
+    {
+        if (s.empty())
+            return false;
+
+        for (size_type i = 0; i < s.size(); i++)
+        {
+            if (!isdigit(s[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool isdigit() const
+    {
+        return isdigit(*this);
+    }
+
+    // isspace: space[' '], carriage return['\r'], line feed['\n'], form feed['\f'], horizontal tab['\t'], vertical tab['\v']
+    static bool isspace(const _Elem &c)
+    {
+        if (sizeof(_Elem) == 1)
+        {
+            return  c == ' ' || c == '\t' || c == '\v' || c == '\r' || c == '\n' || c == '\f';
+        }
+        else if (sizeof(_Elem) == 2)
+        {
+            char ch = reinterpret_cast<char>(c);
+            return  ch == ' ' || ch == '\t' || ch == '\v' || ch == '\r' || ch == '\n' || ch == '\f';
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static bool isspace(const _This &s)
+    {
+        if (s.empty())
+            return false;
+
+        for (size_type i = 0; i < s.size(); i++)
+        {
+            if (!isspace((*s)[i]))
+                return false;
+        }
+
+        return false;
+    }
+
+    bool isspace() const
+    {
+        return isspace(*this);
     }
 
 public:

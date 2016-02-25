@@ -3,6 +3,16 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2016/02/25
+# 1) 重写LLBC_File,LLBC_Directory类,提供更易用,更完整,更精简的File & Directory相关操作实现;
+# 2) 删除core/os/OS_File及core/os/OS_Directory实现,统一整合到LLBC_File,LLBC_Directory中;
+# 3) Log模块中的logFile配置支持目录配置,log启动过程中会自动检测并创建log文件目录;
+# 4) LLBC_BasicString加入findreplace实现,以支持"查找->替换"合并操作需求,优化&合并相关已有接口实现;
+# 5) 调整windows平台中vsproj整体配置,增加vs2012编译支持;
+# 6) 整合编译脚本,加入tools目录,将自身的python.exe依赖直接打包到tool目录,从而解除对编译机器的python要求;
+# 7) wrap中初步加入c#支持csllbc(未完成);
+# 8) GetVersionInfo()接口加入compiler版本相关输出;
+#
 # 2016/01/02
 # 1) 调整windows平台的sln文件及vcproj文件路径及名字,并调整所有projects的中间文件生成路径及目标文件路径:
 #    a. sln文件名从llbc.sln调整成llbc_vs2008.sln,以方便后期加入其它版本vs的支持;

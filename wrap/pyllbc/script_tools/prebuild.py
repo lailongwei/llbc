@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-预编译脚本,用于组织C++代码及python代码.
+Pre-Compile script, use to intergrate c++ code and python code.
 """
 
 

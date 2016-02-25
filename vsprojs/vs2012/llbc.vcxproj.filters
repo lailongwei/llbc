@@ -1,0 +1,1378 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{9294996c-4631-4b85-9291-1332fa770567}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\common">
+      <UniqueIdentifier>{d61ad71e-cd53-410a-ac8e-0dbdb2db5aee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core">
+      <UniqueIdentifier>{8fd38fd0-cb6b-4221-8ad1-106b4d04993f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\utils">
+      <UniqueIdentifier>{f3b22666-f38a-4558-b937-787a445aa94e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\utils\impl">
+      <UniqueIdentifier>{0204d698-1fd7-4e2b-ada5-9589f162935a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\helper">
+      <UniqueIdentifier>{a80f374f-7e20-48ed-94d1-35f8e25eb9ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\file">
+      <UniqueIdentifier>{977b5d18-a336-4529-83d9-a4282d16766a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\variant">
+      <UniqueIdentifier>{725c42a0-c430-42bc-830c-2d8eac10f320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\comstring">
+      <UniqueIdentifier>{c6bc8acb-4df0-4497-8792-1dcde43384db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\config">
+      <UniqueIdentifier>{726a245e-e2ff-4894-8912-e298f68866ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\json">
+      <UniqueIdentifier>{e1d8aafc-46d2-465e-ac2b-882fca6059db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\thread">
+      <UniqueIdentifier>{378af598-b440-4f2c-bacd-05859ed342bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\os">
+      <UniqueIdentifier>{15c3fd27-49b0-4466-aaf9-c2ec55bc3af2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\time">
+      <UniqueIdentifier>{03d9cf6e-a3aa-4be7-bf52-27874198fa86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\singleton">
+      <UniqueIdentifier>{02eb28ef-017b-49ac-9bd1-d3c47bf28a08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\log">
+      <UniqueIdentifier>{27a4264a-3891-447d-8b4f-ef3e46866d78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\log\token">
+      <UniqueIdentifier>{10bbd52c-f33b-4740-96e3-f7376287a0a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\log\appender">
+      <UniqueIdentifier>{cd86af24-0f9e-4fd9-8765-ea1dc373f7b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\random">
+      <UniqueIdentifier>{ebd673f4-cc43-4692-ba38-1e6616b76c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\entity">
+      <UniqueIdentifier>{c230ffd1-3eb7-4c45-aad3-221e1df9fb9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\timer">
+      <UniqueIdentifier>{33821994-1610-450d-a510-f5234c27cf0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\event">
+      <UniqueIdentifier>{88a3b5c3-92ac-41ed-96b9-2542ee02ac3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\bundle">
+      <UniqueIdentifier>{37e321d7-c83c-4af3-a865-c2554ad3934b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\transcoder">
+      <UniqueIdentifier>{2cd0bfaa-b392-4775-a9da-90359164d3d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\iconv">
+      <UniqueIdentifier>{beadf6a7-23e2-4341-96a2-875c9efcff39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\library">
+      <UniqueIdentifier>{2e02c223-ea24-4f49-9187-bdc1a6c12e74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\sampler">
+      <UniqueIdentifier>{738bf53d-e762-4b19-9495-7aacdf66acb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\testcase">
+      <UniqueIdentifier>{ac1dbdd1-2b26-4dd2-86d3-3aed1fff2ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\application">
+      <UniqueIdentifier>{92d1d8fe-9a6e-42dc-a20e-abf53a8e3f60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\objbase">
+      <UniqueIdentifier>{821fc86d-a6f9-4931-9578-abc3f7ad86f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm">
+      <UniqueIdentifier>{df53a386-a3dd-41d6-a886-13f64e7b4b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm\protocol">
+      <UniqueIdentifier>{367f7dd1-b269-42ca-ad5d-05acac6dd5cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm\impl">
+      <UniqueIdentifier>{9def340d-fd2e-4402-a361-82462bbe52d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm\headerdesc">
+      <UniqueIdentifier>{054ba261-0d1b-4cb0-9c97-f3a5b642b8e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{246bd23d-bf2f-4133-84ad-60a64e90c653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{c613b1bf-615a-43b7-9eb0-596c32031bd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\utils">
+      <UniqueIdentifier>{8225dbc9-93e2-4f29-91be-17775dec964b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\file">
+      <UniqueIdentifier>{f01c49cb-40cd-4054-bf76-78a011ff1bdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\variant">
+      <UniqueIdentifier>{dc8e8c33-2bfa-4f21-b5be-6440ca1ba314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\config">
+      <UniqueIdentifier>{6a6e46ca-3f88-473d-a575-480407d283d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\json">
+      <UniqueIdentifier>{d4f10cff-b16c-47c8-9497-0dc067e49dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\thread">
+      <UniqueIdentifier>{94bd1255-01e0-4a5b-8ce5-9c9cebd5443a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\os">
+      <UniqueIdentifier>{c478e3eb-3edb-4aff-813d-93a1f7e261fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\time">
+      <UniqueIdentifier>{cb2ec659-b97c-41b6-8ae9-f77a71bc7e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\log">
+      <UniqueIdentifier>{d6e1113a-83d9-4163-ac35-ecf86150fd34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\random">
+      <UniqueIdentifier>{08744280-0e1f-46f8-9e7f-9846899d0feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\entity">
+      <UniqueIdentifier>{3beb3c52-3132-4881-9f33-9b1e12a1ca35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\timer">
+      <UniqueIdentifier>{9a923712-8b22-401d-9970-88ae1369bc57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\event">
+      <UniqueIdentifier>{ce2ef9d0-befd-4032-bb54-42e2aab6a0e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\helper">
+      <UniqueIdentifier>{a9495c38-073a-4bdf-a23e-69c77272f93d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\bundle">
+      <UniqueIdentifier>{d30b260b-1aec-4ee4-99ca-c94b49afdc4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\transcoder">
+      <UniqueIdentifier>{ed528497-c7e3-43ee-b83b-9f12e32ae28d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\iconv">
+      <UniqueIdentifier>{a9dfd375-1fb9-409d-a369-cb8165be8b45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\library">
+      <UniqueIdentifier>{05e7cac3-f81d-4c7e-ab45-ad7f0f5d2ffb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\sampler">
+      <UniqueIdentifier>{982253ec-7cef-4bd0-b3b0-dc3a420fe309}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\testcase">
+      <UniqueIdentifier>{91932475-398e-482c-a482-029fbfefa0bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{2840513a-6250-4771-beaf-da036761162c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\application">
+      <UniqueIdentifier>{6d5a72ae-8659-4fe2-8087-c13454504d0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\objbase">
+      <UniqueIdentifier>{5e20dda3-8e37-40fb-945d-c11aa9ed8d63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\comm">
+      <UniqueIdentifier>{280ab9b8-61a1-4eaf-84e0-730d570a8f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\comm\protocol">
+      <UniqueIdentifier>{c8aa35f3-bff2-45de-8816-2d727b43dccc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\comm\headerdesc">
+      <UniqueIdentifier>{f9931d1e-2a29-4f52-98e7-d41fcf50f355}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\llbc\include\llbc\common\AfterIncl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\BasicDataType.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\BasicString.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\BeforeIncl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Common.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Compiler.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Config.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Define.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Endian.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\EndianImpl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Errno.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Errors.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\EventDataType.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Exceptions.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Export.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Functional.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\LibTlsInl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Macro.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\MacroInl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\OSHeader.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\PFConfig.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\SocketDataType.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Stream.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\StreamImpl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\StreamSpecImpl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\StringDataType.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Template.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\ThirdHeader.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\common\Version.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\Core.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Common.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Algorithm.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Debug.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Delegate.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_DelegateEx.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Math.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_MD5.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Misc.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Network.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Text.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_AlgorithmImpl.h">
+      <Filter>include\core\utils\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_DelegateImpl.h">
+      <Filter>include\core\utils\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_MathImpl.h">
+      <Filter>include\core\utils\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_MiscImpl.h">
+      <Filter>include\core\utils\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_TextImpl.h">
+      <Filter>include\core\utils\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\helper\Common.h">
+      <Filter>include\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\helper\GUIDHelper.h">
+      <Filter>include\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\helper\JVHelper.h">
+      <Filter>include\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\helper\STLHelper.h">
+      <Filter>include\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\helper\StlHelperImpl.h">
+      <Filter>include\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\file\Common.h">
+      <Filter>include\core\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\variant\Common.h">
+      <Filter>include\core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\variant\Variant.h">
+      <Filter>include\core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\variant\VariantArithmetic.h">
+      <Filter>include\core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\variant\VariantImpl.h">
+      <Filter>include\core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\variant\VariantTraits.h">
+      <Filter>include\core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\comstring\Common.h">
+      <Filter>include\core\comstring</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\comstring\ComString.h">
+      <Filter>include\core\comstring</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\comstring\ComStringImpl.h">
+      <Filter>include\core\comstring</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\Common.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\Config.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\Property.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\PropertyImpl.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\autolink.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\config.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\features.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\forwards.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\json.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\reader.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\value.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\json\writer.h">
+      <Filter>include\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\Common.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ConditionVariable.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\DummyLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\FastLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\Guard.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ILock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\MessageBlock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\MessageBuffer.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\MessageQueue.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\MessageQueueImpl.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\RecursiveLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ReverseGuard.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\RWLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\Semaphore.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\SimpleLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\SpinLock.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\Task.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ThreadDescriptor.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ThreadGroupDescriptor.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\ThreadManager.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\Tls.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\thread\TlsImpl.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\Common.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Atomic.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Bundle.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Console.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Epoll.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Iocp.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Library.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Network.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Select.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Socket.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Thread.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Time.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_TimeImpl.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\time\Common.h">
+      <Filter>include\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\time\Time.h">
+      <Filter>include\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\time\TimeSpan.h">
+      <Filter>include\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\time\TimeSpanImpl.h">
+      <Filter>include\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\singleton\Common.h">
+      <Filter>include\core\singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\singleton\Singleton.h">
+      <Filter>include\core\singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\singleton\SingletonImpl.h">
+      <Filter>include\core\singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\Common.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\ILogAppender.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\ILogToken.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogData.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogFormattingInfo.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\Logger.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LoggerConfigInfo.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LoggerConfigurator.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LoggerManager.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogLevel.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogMessageBuffer.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogMessageBufferImpl.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogRunnable.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogTokenChain.h">
+      <Filter>include\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\BaseLogToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogEscapeToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogFileToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogLevelToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogLineToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogMsgToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogNameToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogNewLineToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogNullToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogStrToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogTagToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogThreadIdToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogTimeToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogTokenBuilder.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\BaseLogAppender.h">
+      <Filter>include\core\log\appender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogAppenderBuilder.h">
+      <Filter>include\core\log\appender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogConsoleAppender.h">
+      <Filter>include\core\log\appender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogFileAppender.h">
+      <Filter>include\core\log\appender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogNetworkAppender.h">
+      <Filter>include\core\log\appender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\random\Common.h">
+      <Filter>include\core\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\random\mtrand.h">
+      <Filter>include\core\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\random\Random.h">
+      <Filter>include\core\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\Common.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\Entity.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\EntityImpl.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\Holder.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\HolderImpl.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\entity\IHolder.h">
+      <Filter>include\core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\BaseTimer.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\BinaryHeap.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\BinaryHeapImpl.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\Common.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\TimerData.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\timer\TimerScheduler.h">
+      <Filter>include\core\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\event\Common.h">
+      <Filter>include\core\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\event\Event.h">
+      <Filter>include\core\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\event\EventManager.h">
+      <Filter>include\core\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\event\EventManagerImpl.h">
+      <Filter>include\core\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\bundle\Bundle.h">
+      <Filter>include\core\bundle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\bundle\Common.h">
+      <Filter>include\core\bundle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\transcoder\Common.h">
+      <Filter>include\core\transcoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\transcoder\Transcoder.h">
+      <Filter>include\core\transcoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\iconv\iconv.h">
+      <Filter>include\core\iconv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\library\Common.h">
+      <Filter>include\core\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\library\Library.h">
+      <Filter>include\core\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\BaseSampler.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\Common.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\CountSampler.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\IntervalSampler.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\ISampler.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\LimitSampler.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\SamplerGroup.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\sampler\SamplerType.h">
+      <Filter>include\core\sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\testcase\BaseTestCase.h">
+      <Filter>include\testcase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\testcase\ITestCase.h">
+      <Filter>include\testcase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\application\Application.h">
+      <Filter>include\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\Array.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\ArrayImpl.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\AutoReleasePool.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\AutoReleasePoolStack.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\Dictionary.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\DictionaryElem.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\DictionaryImpl.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\KeyHashAlgorithm.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\ObjBase.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\Object.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\ObjectFactory.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\objbase\ObjectMacro.h">
+      <Filter>include\objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\AsyncConnInfo.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\BasePoller.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\Comm.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\EpollPoller.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\ICoder.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\IFacade.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\IocpPoller.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\IPacketHeaderDescFactory.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\IService.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\LibPacketHeaderDescFactory.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\Packet.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderAssembler.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescAccessor.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescImpl.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartDescImpl.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderParts.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartsImpl.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PollerEvent.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PollerMgr.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PollerMonitor.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PollerType.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\SelectPoller.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\Service.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceEvent.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceImpl.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceMgr.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\Session.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\Socket.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\CodecProtocol.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\CompressProtocol.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\IProtocol.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\IProtocolFilter.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\IProtocolImpl.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\PacketProtocol.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\ProtocolLayer.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\ProtocolStack.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\ProtoReportLevel.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\protocol\RawProtocol.h">
+      <Filter>include\comm\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\IServiceImpl.h">
+      <Filter>include\comm\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketImpl.h">
+      <Filter>include\comm\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\headerdesc\IPacketHeaderDescFactory.h">
+      <Filter>include\comm\headerdesc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\headerdesc\PacketHeaderDesc.h">
+      <Filter>include\comm\headerdesc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\headerdesc\PacketHeaderDescImpl.h">
+      <Filter>include\comm\headerdesc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\headerdesc\PacketHeaderPartDesc.h">
+      <Filter>include\comm\headerdesc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\headerdesc\PacketHeaderPartDescImpl.h">
+      <Filter>include\comm\headerdesc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\src\core\json\json_batchallocator.h">
+      <Filter>src\core\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc.h" />
+    <ClInclude Include="..\..\llbc\include\llbc\core\file\File.h">
+      <Filter>include\core\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\file\FileImpl.h">
+      <Filter>include\core\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\file\Directory.h">
+      <Filter>include\core\file</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\llbc\include\llbc\core\log\Logger_Cfg.cfg">
+      <Filter>include\core\log</Filter>
+    </None>
+    <None Include="..\..\llbc\src\core\json\json_internalarray.inl">
+      <Filter>src\core\json</Filter>
+    </None>
+    <None Include="..\..\llbc\src\core\json\json_internalmap.inl">
+      <Filter>src\core\json</Filter>
+    </None>
+    <None Include="..\..\llbc\src\core\json\json_valueiterator.inl">
+      <Filter>src\core\json</Filter>
+    </None>
+    <None Include="..\..\llbc\src\core\os\OS_Bundle_Iphone.mm">
+      <Filter>src\core\os</Filter>
+    </None>
+    <None Include="..\..\CHANGELOG" />
+    <None Include="..\..\llbc\src\core\file\Directory_Iphone.mm">
+      <Filter>src\core\file</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\llbc\src\llbc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\Core.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_Algorithm.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_Debug.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_Math.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_MD5.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_Network.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\utils\Util_Text.cpp">
+      <Filter>src\core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\variant\Variant.cpp">
+      <Filter>src\core\variant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\variant\VariantArithmetic.cpp">
+      <Filter>src\core\variant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\variant\VariantTraits.cpp">
+      <Filter>src\core\variant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\config\Config.cpp">
+      <Filter>src\core\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\config\Property.cpp">
+      <Filter>src\core\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\json\json_reader.cpp">
+      <Filter>src\core\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\json\json_value.cpp">
+      <Filter>src\core\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\json\json_writer.cpp">
+      <Filter>src\core\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\ConditionVariable.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\DummyLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\FastLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\Guard.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\MessageBlock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\MessageBuffer.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\MessageQueue.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\RecursiveLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\ReverseGuard.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\RWLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\Semaphore.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\SimpleLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\SpinLock.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\Task.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\ThreadDescriptor.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\ThreadGroupDescriptor.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\thread\ThreadManager.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Bundle_NonIphone.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Console.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Epoll.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Iocp.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Library.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Network.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Select.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Socket.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Thread.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Time.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\time\Time.cpp">
+      <Filter>src\core\time</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\BaseLogAppender.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\BaseLogToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogAppenderBuilder.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogConsoleAppender.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogEscapeToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogFileAppender.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogFileToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogFormattingInfo.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\Logger.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LoggerConfigInfo.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LoggerConfigurator.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LoggerManager.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogLevel.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogLevelToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogLineToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogMessageBuffer.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogMsgToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogNameToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogNetworkAppender.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogNewLineToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogNullToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogRunnable.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogStrToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogTagToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogThreadIdToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogTimeToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogTokenBuilder.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogTokenChain.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\random\mtrand.cpp">
+      <Filter>src\core\random</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\random\Random.cpp">
+      <Filter>src\core\random</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\entity\Entity.cpp">
+      <Filter>src\core\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\entity\Holder.cpp">
+      <Filter>src\core\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\timer\BaseTimer.cpp">
+      <Filter>src\core\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\timer\TimerScheduler.cpp">
+      <Filter>src\core\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\event\Event.cpp">
+      <Filter>src\core\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\event\EventManager.cpp">
+      <Filter>src\core\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\helper\GUIDHelper.cpp">
+      <Filter>src\core\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\helper\JVHelper.cpp">
+      <Filter>src\core\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\bundle\Bundle.cpp">
+      <Filter>src\core\bundle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\transcoder\Transcoder.cpp">
+      <Filter>src\core\transcoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\iconv\iconv.cpp">
+      <Filter>src\core\iconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\library\Library.cpp">
+      <Filter>src\core\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\BaseSampler.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\CountSampler.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\IntervalSampler.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\LimitSampler.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\SamplerGroup.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\sampler\SamplerType.cpp">
+      <Filter>src\core\sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\testcase\BaseTestCase.cpp">
+      <Filter>src\testcase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\Common.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\Endian.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\Errno.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\Errors.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\LibTlsInl.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\SocketDataType.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\common\Version.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\application\Application.cpp">
+      <Filter>src\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\Array.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\AutoReleasePool.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\AutoReleasePoolStack.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\Dictionary.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\DictionaryElem.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\KeyHashAlgorithm.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\Object.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\objbase\ObjectFactory.cpp">
+      <Filter>src\objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\BasePoller.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\Comm.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\EpollPoller.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\IFacade.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\IocpPoller.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\IService.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\LibPacketHeaderDescFactory.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\Packet.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PacketHeaderAssembler.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PacketHeaderDescAccessor.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PacketHeaderParts.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PollerEvent.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PollerMgr.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PollerMonitor.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\PollerType.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\SelectPoller.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\Service.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\ServiceEvent.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\ServiceMgr.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\Session.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\Socket.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\CodecProtocol.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\CompressProtocol.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\IProtocol.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\PacketProtocol.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\ProtocolLayer.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\ProtocolStack.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\ProtoReportLevel.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\protocol\RawProtocol.cpp">
+      <Filter>src\comm\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\headerdesc\PacketHeaderDesc.cpp">
+      <Filter>src\comm\headerdesc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\comm\headerdesc\PacketHeaderPartDesc.cpp">
+      <Filter>src\comm\headerdesc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\file\File.cpp">
+      <Filter>src\core\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\file\Directory_Com.cpp">
+      <Filter>src\core\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\file\Directory_NonIphone.cpp">
+      <Filter>src\core\file</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

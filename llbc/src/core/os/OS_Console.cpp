@@ -9,10 +9,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/file/File.h"
 #if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/FastLock.h"
 #endif // LLBC_TARGET_PLATFORM_WIN32
-#include "llbc/core/os/OS_File.h"
 #include "llbc/core/os/OS_Console.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -29,7 +29,7 @@ int LLBC_GetConsoleColor(FILE *file)
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_RTN_FAILED;
 #else
-    const int fileNo = LLBC_GetFileNo(file);
+    const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
         return LLBC_RTN_FAILED;
@@ -56,7 +56,7 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_RTN_FAILED;
 #else
-    const int fileNo = LLBC_GetFileNo(file);
+    const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
         return LLBC_RTN_FAILED;
@@ -82,7 +82,7 @@ int LLBC_SetConsoleColor(FILE *file, int color)
 
 int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 {
-    const int fileNo = LLBC_GetFileNo(file);
+    const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
         return LLBC_RTN_FAILED;

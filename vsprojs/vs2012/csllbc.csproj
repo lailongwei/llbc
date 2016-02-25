@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C8EFB088-481E-4B21-8F5F-FFA76CE47739}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>csllbc</RootNamespace>
+    <AssemblyName>csllbc</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>csllbc_debug</AssemblyName>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <BaseIntermediateOutputPath>..\..\output\vs2012\Debug\Win32\wrap\csharp\Objs\csllbc\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\output\vs2012\Debug\Win32\wrap\csharp\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSLLBC_TARGET_PLATFORM_WIN32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <BaseIntermediateOutputPath>..\..\output\vs2012\Release\Win32\wrap\csharp\Objs\csllbc\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\output\vs2012\Release\Win32\wrap\csharp\</OutputPath>
+    <DefineConstants>TRACE;CSLLBC_TARGET_PLATFORM_WIN32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\LLBCNative.cs">
+      <Link>native\LLBCNative.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\common\ErrorsNative.cs">
+      <Link>native\common\ErrorsNative.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\comm\ServiceNative.cs">
+      <Link>native\comm\ServiceNative.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\common\Exception.cs">
+      <Link>common\Exception.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\common\Errors.cs">
+      <Link>common\Errors.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\common\LibIniter.cs">
+      <Link>common\LibIniter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\comm\Service.cs">
+      <Link>comm\Service.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)..\..\tools\py.exe" "$(SolutionDir)..\..\wrap\csllbc\csharp\script_tools\gen_native_code.py"</PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

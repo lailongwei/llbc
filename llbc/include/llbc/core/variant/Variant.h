@@ -107,7 +107,7 @@ public:
     typedef Dict::iterator DictIter;
     typedef Dict::const_iterator DictConstIter;
 
-    struct Holder
+    struct LLBC_EXPORT Holder
     {
         LLBC_VariantType::ENUM type;
 

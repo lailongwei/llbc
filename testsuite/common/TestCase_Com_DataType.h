@@ -21,6 +21,7 @@ private:
     void RawTest();
     void StringBaseTest();
     void StringUTF8Test();
+    void StringFindReplaceTest();
     void StringStripTest();
     void StringSplitTest(const LLBC_String &str, size_t maxSplit = -1, const LLBC_String &sep = ".");
 };

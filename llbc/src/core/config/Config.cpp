@@ -63,19 +63,15 @@ int LLBC_Config::Initialize()
     for (; iter != _values.end(); iter ++)
     {
         const LLBC_String &fileName = iter->first;
-        LLBC_File file;
-        if (file.Open(fileName, "rb") != LLBC_RTN_OK)
+
+        LLBC_File file(fileName, LLBC_FileMode::BinaryRead);
+        if (!file.IsOpened())
         {
             this->BuildErrMsg(fileName, LLBC_FormatLastError());
             return LLBC_RTN_FAILED;
         }
 
-        LLBC_String content;
-        if (file.ReadString(content) != LLBC_RTN_OK)
-        {
-            this->BuildErrMsg(fileName, LLBC_FormatLastError());
-            return LLBC_RTN_FAILED;
-        }
+        LLBC_String content = file.ReadToEnd();
 
         Json::Reader reader;
         LLBC_JsonValue *value = new LLBC_JsonValue;

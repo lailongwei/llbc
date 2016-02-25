@@ -25,7 +25,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The message buffer class encapsulation.
  */
-class LLBC_MessageBuffer
+class LLBC_EXPORT LLBC_MessageBuffer
 {
 public:
     LLBC_MessageBuffer();

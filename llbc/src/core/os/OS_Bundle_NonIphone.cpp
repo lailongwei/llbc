@@ -10,8 +10,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/os/OS_File.h"
-#include "llbc/core/os/OS_Directory.h"
+#include "llbc/core/file/File.h"
+#include "llbc/core/file/Directory.h"
 
 #include "llbc/core/os/OS_Bundle.h"
 
@@ -22,7 +22,7 @@ __LLBC_NS_BEGIN
 LLBC_String LLBC_GetMainBundlePath()
 {
     // We use current directory to return.
-    return LLBC_GetCurrentDirectory(false);
+    return LLBC_Directory::CurDir();
 }
 
 LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
@@ -49,7 +49,7 @@ LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
     }
 
     // Check path.
-    if (!LLBC_DirectoryExist(realPath))
+    if (!LLBC_Directory::Exists(realPath))
         return LLBC_INVALID_BUNDLE_HANDLE;
 
     return new LLBC_String(realPath);
@@ -153,7 +153,7 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &n
         path.append(ext);
     }
 
-    if (!LLBC_FileExist(path))
+    if (!LLBC_File::Exists(path))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return "";

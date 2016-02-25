@@ -1,527 +1,436 @@
 /**
  * @file    File.h
  * @author  Longwei Lai<lailongwei@126.com>
- * @date    2013/04/06
+ * @date    2016/01/04
  * @version 1.0
  *
  * @brief
  */
-#ifndef __LLBC_CORE_FILE_FILE_H__
-#define __LLBC_CORE_FILE_FILE_H__
+#ifndef __LLBC_CORE_FILE_File_H__
+#define __LLBC_CORE_FILE_File_H__
 
 #include "llbc/common/Common.h"
-
-#if LLBC_TARGET_PLATFORM_WIN32
-#pragma warning(disable:4290)
-#endif
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The file position seek star flag enumeration.
+ * \brief The file mode enumerations
  */
-class LLBC_FilePos
+class LLBC_EXPORT LLBC_FileMode
 {
 public:
     enum
     {
-        Begin   = 0,
-        Cur     = 1,
-        End     = 2,
-        
-        Unknown
+        Read = 0x01,                            // Read file, the file must exist.
+        Write = 0x02,                           // Write file, if file not exist, will create, if exist, will truncate file.
+        ReadWrite = Read | Write,               // Read and write file, if file not exist, will create, if exist, will truncate file.
+        AppendWrite = 0x04,                     // Append write file, if file not exist, will create file, otherwise will truncate file.
+        AppendReadWrite = AppendWrite | Read,   // Append read and write file, if file not exist, will create file, otherwise will truncate file.
+
+        Text = 0x08,                            // Open file as text format.
+        Binary = 0x00,                          // Open file as binary format.
+
+        TextRead = Read | Text,                 // Read file as text format.
+        BinaryRead = Read | Binary,             // Read file as binary format.
+        TextWrite = Write | Text,               // Write file as text format.
+        BinaryWrite = Write | Binary,           // Write file as binary format.
+        TextReadWrite = ReadWrite | Text,       // Read and write file as text format.
+        BinaryReadWrite = ReadWrite | Binary,   // Read and write file as binary format.
+        TextAppendWrite = AppendWrite | Text,   // Append write file as text format.
+        BinaryAppendWrite = AppendWrite |Binary,// Append write file as binary format.
+        TextAppendReadWrite = AppendReadWrite | Text, // Append read and write file as text format.
+        BinaryAppendReadWrite = AppendReadWrite | Binary, // Append read and write file as binary format.
+
+        LastestMode = 0xe0000000,               // Lastest open mode, use ReOpen method.
     };
+
+public:
+    /**
+     * Get the file mode string representation.
+     * @param[in] fileMode - the file mode.
+     * @return LLBC_String - The file mode string representation.
+     */
+    static LLBC_String GetFileModeDesc(int fileMode);
 };
 
 /**
  * \brief The file buffer mode enumeration.
  */
-class LLBC_FileBufferMode
+class LLBC_EXPORT LLBC_FileBufferMode
 {
 public:
     enum
     {
-        FullBuf        = _IOFBF,
-        LineBuf        = _IOLBF,
-        NoBuf          = _IONBF
+        NoBuf = _IONBF,   // No buffer is used, all file read/write operation will direct synchronous to store device.
+        LineBuf = _IOLBF, // For some systems, this provides line buffering. However, for Win32, the behavior is the same as NoBuf - Full Buffering.
+        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and size is used as the size of the buffer. If buffer is NULL, an automatically allocated buffer size bytes long is used.
     };
 };
 
 /**
- * \brief file class encapsulation.
+ * \brief The file seek origin enumeration.
+ */
+class LLBC_FileSeekOrigin
+{
+public:
+    enum
+    {
+        Begin = SEEK_SET,
+        Current = SEEK_CUR,
+        End = SEEK_END
+    };
+};
+
+/**
+ * \brief The file new line format type enumeration.
+ */
+class LLBC_FileNewLineFormat
+{
+public:
+    enum
+    {
+        LineFeed,                 // LF, character is: \n, Linux/Unix OS used.
+        CarriageReturn,           // CR, character is: \r, Mac OS used.
+        CarriageReturn_LineFeed,  // CRLF, characters are: \r\n, Windows OS used.
+
+        UnixStyle = LineFeed,     // Alias for LineFeed enumeration.
+        MacStyle = CarriageReturn,// Alias for CarriageReturn.
+        WindowsStyle = CarriageReturn_LineFeed, // Alias for CarriageReturn-LineFeed.
+
+        AutoMatch, // Auto match, it means if you use llbc library in Windows, will use CRLF, and so on...
+    };
+};
+
+/**
+ * \brief The file attributes structure encapsulation.
+ */
+LLBC_BEGIN_C_DECL
+struct LLBC_FileAttributes
+{
+    bool readable; /* file readable or not */
+    bool writable; /* file writable or not */
+    bool execable; /* file execable or not */
+    bool hidden; /* file is hidden or not  */
+
+    bool isDirectory; /* file is directory or not */
+    
+#if LLBC_TARGET_PLATFORM_WIN32
+    timespec createTime; /* file create time(WIN32 specific) */
+#else
+    timespec lastChangeStatusTime; /* file last change status time(Non-WIN32 specific) */
+#endif
+
+    timespec lastModifyTime; /* file last modify time */
+    timespec lastAccessTime; /* file last access time */
+
+    sint64 fileSize; /* file size, in bytes */
+};
+LLBC_END_C_DECL
+
+/**
+ * \brief The File class encapsulation.
+ *        This file class provides static methods for the creation, copying, deleting, moving, 
+ *        and opening of single file, and access FileSystem object.
  */
 class LLBC_EXPORT LLBC_File
 {
-public:
-    static const size_t npos = -1;
-
 public:
     /**
      * Default constructor.
      */
     LLBC_File();
     /**
-     * Parameters constructor.
-     * @param[in] path - file path.
-     * @param[in] mode - type of access permitted, see fopen(), like: 'r', 'w', 'rb', 'wb', 'a', ...
-     */
-    explicit LLBC_File(const LLBC_String &path, 
-                       const LLBC_String &mode = "rb")
-                       throw (LLBC_IOException);
+     * Construct file object with path and file mode.
+     * Note: If file open success when constructor called, LLBC_GetLastError() return 0, 
+     *       otherwise return error code, or you can call IsOpened() method to check file open success or not.
+     * @param[in] path - the file path.
+     * @param[in] mode - the file access mode.
+     */;
+    explicit LLBC_File(const LLBC_String &path, int mode = LLBC_FileMode::BinaryRead);
 
-    ~LLBC_File();
+    /**
+     * Destructor.
+     */
+    virtual ~LLBC_File();
 
 public:
     /**
      * Open file.
-     * @param[in] path - file path.
-     * @param[in] mode - type of access permitted, see fopen(), like: 'r', 'w', 'rb', 'wb', 'a', ...
-     * @return int - if success return 0, otherwise return -1.
+     * @param[in] path - the file path.
+     * @param[in] mode - the file access mode.
+     * @return int - return 0 if open operation success, otherwise return -1.
      */
-    int Open(const LLBC_String &path, 
-             const LLBC_String &mode = "rb");
+    int Open(const LLBC_String &path, int mode = LLBC_FileMode::BinaryRead);
 
     /**
-     * Get file handle, unsefe method.
-     * @return LLBC_FileHandle - the file handle.
+     * ReOpen file.
+     * @param[in] mode - the reopen mode, default reopen mode is LLBC_FileMode::LastestMode.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_FileHandle Handle() const;
+    int ReOpen(int mode = LLBC_FileMode::LastestMode);
 
     /**
-     * Check file opened or not.
-     * @return bool - return true if opened, otherwise return false.
+     * Check whether the file object opened file.
+     * @return bool - return true if opened file, otherwise return false.
      */
     bool IsOpened() const;
 
     /**
-     * bool operation.
-     */
-    operator bool() const;
-
-    /**
-     * ! operation.
-     */
-    bool operator !() const;
-
-    /**
      * Close file.
-     * @return int - return success return 0, otherwise return -1.
      */
-    int Close();
+    void Close();
+
+    /**
+     * Get file no.
+     * @param[in] handle - the file handle(FILE *).
+     * @return int - the file no, if failed, return -1.
+     */
+    int GetFileNo() const;
+    static int GetFileNo(LLBC_FileHandle handle);
+
+    /**
+     * Get file object wrapped file system level file handle, unsafe.
+     * @return LLBC_FileHandle - the file system level file  handle.
+     */
+    LLBC_FileHandle GetFileHandle() const;
+
+    /**
+     * Get the file open mode.
+     * @return int - the file open mode.
+     */
+    int GetFileMode() const;
+
+    /**
+     * Set file buffer mode.
+     * @param[in] bufferMode - the file buffer mode, see LLBC_FileBufferMode class.
+     * @param[in] size       - Buffer size in bytes. Allowable range: 2 <= size <= INT_MAX (2147483647). Internally, the value supplied for size is rounded down to the nearest multiple of 2.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetBufferMode(int bufferMode, size_t size);
 
 public:
-    /**
-     * Set file buffer mode, must call when file open and not undergone any I/O operations.
-     * @param[in] mode - file buffer mode.
-     * @param[in] size - buffer size, allowable range 2 <= size <= INT_MAX, size will adjust to size/2*2.
-     * @return int - return 0 if successed, otherwise return -1.
-     */
-    int SetBufferMode(int mode, size_t size);
-
-public:
-    /**
-     * Get current position of the file.
-     * @return size_t - file position, if return npos, it means error occurred.
-     */
-    size_t Tell() const;
-
-    /**
-     * Get file path.
-     * @return LLBC_String - the file path, if failed, return empty string.
-     */
-    LLBC_String GetFilePath() const;
-
     /**
      * Get file size.
-     * @return size_t - file size, if return npos, it means error occurred.
+     * @return long - the file size, if failed, return -1.
      */
-    size_t GetSize() const;
+    long GetFileSize() const;
 
     /**
-     * Moves the file pointers to a specified location.
-     * @param origin - start move flag, see This class's enumeration.
-     * @param offset - number of bytes from origin.
-     * @return size_t - new position, if return npos, it means error occurred.
+     * Move the file pointer to a specified location.
+     * @param[in] seekOrigin - initial position.
+     * @param[in] offset     - number of bytes from origin.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    size_t Seek(int origin, long offset);
+    int Seek(int seekOrigin, long offset);
+
+    /**
+     * Get file position.
+     * @return long - the file position, if failed, return -1.
+     */
+    long GetFilePosition() const;
+
+    /**
+     * Set file position.
+     * @param[in] position - the new file position.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetFilePosition(long position);
+
+    /**
+     * Offset file position.
+     * @param[in] offset - the file offset.
+     * @return long - the new file position.
+     */
+    long OffsetFilePosition(long offset);
+
+    /**
+     * Get file readable size.
+     * @return long - the file readable size.
+     */
+    long GetReadableSize() const;
 
 public:
     /**
-     * Read data from the file.
-     * @param[out] buf  - storage location for data.
-     * @param[in]  size - require read size, in bytes.
-     * @return size_t - successfully to read bytes size, if return npos, it means error occurred.
+     * RAW data read helper methods.
      */
-    size_t Read(void *buf, size_t size);
+    int Read(bool &boolVal);
+    int Read(sint8 &sint8Val);
+    int Read(uint8 &uint8Val);
+    int Read(sint16 &sint16Val);
+    int Read(uint16 &uint16Val);
+    int Read(sint32 &sint32Val);
+    int Read(uint32 &uint32Val);
+    int Read(long &longVal);
+    int Read(LLBC_NS ulong &ulongVal);
+    int Read(sint64 &sint64Val);
+    int Read(uint64 &uint64Val);
+    int Read(float &floatVal);
+    int Read(double &doubleVal);
+    int Read(ldouble &ldoubleVal);
+    
+    /**
+     * Read oneline data to LLBC_String object.
+     * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non-zero.
+     */
+    LLBC_String ReadLine();
 
     /**
-     * Read string data from the file.
-     * @param[out] str - storage location for string.
-     * @return int - if success return 0, otherwise return -1.
+     * Read data to end.
+     * @param[in] filePath - the file path.
+     * @return LLBC_String - the all non-read data, if success, LLBC_GetLastError() return LLBC_ERROR_SUCCESS, 
+     *                       otherwise return error a special error code.
      */
-    int ReadString(LLBC_String &str);
+    LLBC_String ReadToEnd();
+    static LLBC_String ReadToEnd(const LLBC_String &filePath);
 
     /**
-     * Read stream data from the file.
-     * @param[out] stream - storage location for stream.
-     * @return int - if success return 0, otherwise return -1.
+     * File bytes read method.
+     * @param[in] buf  - storage location for data.
+     * @param[in] size - buffer size in bytes.
+     * @return long - actually read size, if -1, read failed, else if 0 < actuallyRead < size, 
+     *                it means truncated(LLBC_GetLastError() will return LLBC_ERROR_TRUNCATED),
+     *                otherwise success.
      */
-    int ReadStream(LLBC_Stream &stream);
-
-    /**
-     * Read one line data from file.
-     * @param[out] line - store location for line data.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int ReadLine(LLBC_String &line);
-
-    /**
-     * Read data from the file to object.
-     * @param[out] obj - object reference.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename _Ty>
-    int ReadObj(_Ty &obj)
-    {
-        size_t readRet = this->Read(&obj, sizeof(_Ty));
-        if (readRet != sizeof(_Ty))
-        {
-            if (readRet != npos)
-                LLBC_SetLastError(LLBC_ERROR_END);
-
-            return LLBC_RTN_FAILED;
-        }
-
-        return LLBC_RTN_OK;
-    }
-
-    /**
-     * Stream input operations.
-     */
-    LLBC_File &operator >>(sint8 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(uint8 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(sint16 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(uint16 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(sint32 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(uint32 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(sint64 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(uint64 &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(float &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(double &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(LLBC_String &value) throw (LLBC_IOException);
-    LLBC_File &operator >>(LLBC_Stream &value) throw (LLBC_IOException);
+    long Read(void *buf, size_t size);
 
 public:
     /**
-     * Write data to the file.
+     * Raw data write helper methods.
+     * Note: All write operation maybe truncated.
+     * @param[in] val - the will write simple object.
+     * @return int - if success return 0, otherwise return -1.
+     */
+    int Write(const bool &boolVal);
+    int Write(const sint8 &sint8Val);
+    int Write(const uint8 &uint8Val);
+    int Write(const sint16 &sint16Val);
+    int Write(const uint16 &uint16Val);
+    int Write(const sint32 &sint32Val);
+    int Write(const uint32 &uint32Val);
+    int Write(const sint64 &sint64Val);
+    int Write(const uint64 &uint64Val);
+    int Write(const long &longVal);
+    int Write(const LLBC_NS ulong &ulongVal);
+    int Write(const float &floatVal);
+    int Write(const double &doubleVal);
+    int Write(const ldouble &ldoubleVal);
+    int Write(const LLBC_String &str);
+    int Write(const LLBC_WString &wstr);
+    int Write(const std::string &str);
+    int Write(const std::wstring &wstr);
+
+    /**
+     * Write line data.
+     * @param[in] line          - the line content.
+     * @param[in] newLineFormat - the new line format, default is AutoMatch. 
+     * @return int - actually written size, in bytes, if write failed, return -1,
+     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     */
+    long WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+
+    /**
+     * File bytes write method.
      * @param[in] buf  - pointer to data to be written.
-     * @param[in] size - bytes to be written.
-     * @return size_t - real written size, if return npos, it means error occurred.
+     * @param[in] size - buffer size in bytes.
+     * @return int - actually written size, in bytes, if write failed, return -1,
+     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
      */
-    size_t Write(const void *buf, size_t size);
+    long Write(const void *buf, size_t size);
 
     /**
-     * Write string value, will auto append the '\0' character.
-     * @param[in] str       - string value.
-     * @param[in] writeNull - write NULL flag, default is true.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int WriteString(const LLBC_String &str, bool writeNull = true);
-
-    /**
-     * Write stream value to file.
-     * @param[in] stream - stream value.
-     * @return int - return 0 if successed, otherwise return -1.
-     */
-    int WriteStream(const LLBC_Stream &stream);
-
-    /**
-     * Write line data, will auto append the CRLF or LF character(s).
-     * @param[in] line - line data.
-     * @return int - return 0 if successed, otherwise return -1.
-     */
-    int WriteLine(const LLBC_String &line);
-
-    /**
-     * Write data to the file from object.
-     * @param[in] obj - will write object.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename _Ty>
-    int WriteObj(const _Ty &obj)
-    {
-        size_t writeRet = this->Write(&obj, sizeof(_Ty));
-        if (writeRet != sizeof(_Ty))
-        {
-            if (writeRet != npos)
-                LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-
-            return LLBC_RTN_FAILED;
-        }
-
-        return LLBC_RTN_OK;
-    }
-
-    /**
-     * Stream output operation.
-     */
-    LLBC_File &operator <<(const sint8 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const uint8 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const sint16 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const uint16 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const sint32 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const uint32 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const sint64 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const uint64 &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const float &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const double &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const LLBC_String &value) throw (LLBC_IOException);
-    LLBC_File &operator <<(const LLBC_Stream &value) throw (LLBC_IOException);
-
-    /**
-     * Flush file data to device.
+     * Flush file.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Flush();
 
 public:
     /**
-     * Delete current file.
-     * @return int - return 0 if success, otherwise return -1.
+     * Determine whether the specified file exists.
+     * @param[in] path - the file path.
+     * @return bool - return true if the file exist, otherwise return false.
      */
-    int DeleteSelf();
+    static bool Exists(const LLBC_String &path);
 
     /**
-     * Delete specified path file.
-     * @param[in] path - file path.
+     * Get file attributes.
+     * @param[in] path   - the file path.
+     * @param[out] attrs - the file attributes.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int Delete(const LLBC_String &path);
+    int GetFileAttributes(LLBC_FileAttributes &attrs);
+    static int GetFileAttributes(const LLBC_String &path, LLBC_FileAttributes &attrs);
+
+    /**
+     * Touch file.
+     * @param[in] filePath - the file path.
+     * @param[in] updateLastAccessTime - need update last access time?
+     * @param[in] lastAccessTime       - the last access time, if NULL, will update to now.
+     * @param[in] updateLastModifyTime - need update last modify time?
+     * @param[in] lastModifyTime       - the last modify time, if NULL, will update to now.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int TouchFile(const LLBC_String &filePath, 
+                         bool updateLastAccessTime = true, 
+                         const timespec *lastAccessTime = NULL,
+                         bool updateLastModifyTime = true,
+                         const timespec *lastModifyTime = NULL);
 
 public:
     /**
-     * Move current file.
-     * @param[in] path1   - new file path.
-     * @param[in] overlap - overlapped flag.
-     * @param[in] reopen  - when move completed, reopen the file or not.
-     * @param[in] mode1   - type of access permitted.
+     * Copy file.
+     * @param[in] srcFilePath  - the source file path.
+     * @param[in] destFilePath - the destination file path.
+     * @param[in] overlapped   - if the new file already exists, the function overrides the existing file and succeeds, otherwise failed.
+     *                           default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int MoveSelf(const LLBC_String &path1, 
-                 bool overlap = false,
-                 bool reopen = false, 
-                 const LLBC_String &mode1 = "rb");
+    int CopyFile(const LLBC_String &destFilePath, bool overlapped = false);
+    static int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
 
     /**
      * Move file.
-     * @param[in] path0   - current file path.
-     * @param[in] path1   - new file path.
-     * @param[in] overlap - overlapped flag.
+     * @param[in] fromFilePath - the from file path.
+     * @param[in] toFilePath   - the to file path.
+     * @param[in] overlapped   - if the new file already exists, the function overrides the existing fail and succeeds, otherwise failed.
+     *                           default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int Move(const LLBC_String &path0, 
-                    const LLBC_String &path1,
-                    bool overlap = false);
+    int MoveFile(const LLBC_String &toFilePath, bool overlapped = false);
+    static int MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFilePath, bool overlapped = false);
 
-public:
     /**
-     * Copy current file.
-     * @param[in] path1      - new file path.
-     * @param[in] overlap    - overlapped flag.
-     * @param[in] copyBuf    - copy buffer, if NULL, will allocate in internal.
-     * @param[in] copyBufLen - copy buffer length.
+     * Delete file.
+     * @param[in] filePath - the will delete file path.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CopySelf(const LLBC_String &path1,
-                 bool overlap = false,
-                 void *copyBuf = NULL,
-                 size_t copyBufLen = 0);
-
-    /**
-     * Copy file.
-     * @param[in] path0      - current file path.
-     * @param[in] path1      - new file path.
-     * @param[in] overlap    - overlapped flag.
-     * @param[in] copyBuf    - copy buffer, if NULL, will allocate in internal.
-     * @param[in] copyBufLen - copy buffer length.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int Copy(const LLBC_String &path0,
-                    const LLBC_String &path1,
-                    bool overlap = false,
-                    void *copyBuf = NULL,
-                    size_t copyBufLen = 0);
-
-public:
-    /**
-     * Get current file directory name.
-     * @return LLBC_String - directory name.
-     */
-    LLBC_String GetSelfDirectoryName() const;
-
-    /**
-     * Get specified file path's directory name.
-     * @param[in] path - file path.
-     * @return LLBC_String - directory name.
-     */
-    static LLBC_String  GetDirectoryName(const LLBC_String &path);
-
-    /**
-     * Get current file base name.
-     * @param[in] incExtension - sure include extension, default is true.
-     * @return LLBC_String - file base name.
-     */
-    LLBC_String GetSelfBaseName(bool incExtension = true) const;
-
-    /**
-     * Get specified file path's base name.
-     * @param[in] path         - file path.
-     * @param[in] incExtension - sure include extension, default is true.
-     * @return LLBC_String - file base name.
-     */
-    static LLBC_String GetBaseName(const LLBC_String &path, bool incExtension = true);
-
-    /**
-     * Get current file extension name.
-     * @return LLBC_String - file extension name.
-     */
-    LLBC_String GetSelfExtension() const;
-
-    /**
-     * Get specified file path's extension name.
-     * @param[in] path - file path.
-     * @return LLBC_String - file extension name.
-     */
-    static LLBC_String GetExtension(const LLBC_String &path);
-
-public:
-    /**
-     * Check given path is exist or not.
-     * @param[in] path - file path.
-     * @return bool - return true if exist, otherwise return false.
-     */
-    static bool Exist(const LLBC_String &path);
-
-    /**
-     * Create empty file.
-     * @param[in] path - file path.
-     * @return int - return 0 if successed, otherwise return -1.
-     */
-    static int Touch(const LLBC_String &path);
-
-public:
-    /**
-     * Convert given path to full path.
-     * @param[in] path - file path.
-     * @return LLBC_String - full path.
-     */
-    static LLBC_String ToFullPath(const LLBC_String &path);
-
-
-    /* Exception throw version APIs define. */
-public:
-    void OpenT(const LLBC_String &path, 
-               const LLBC_String &mode = "rb") throw (LLBC_IOException);
-
-    void CloseT() throw (LLBC_IOException);
-
-public:
-    void SetBufferModeT(int mode, size_t size) throw (LLBC_IOException);
-
-public:
-    size_t TellT() const throw (LLBC_IOException);
-
-    size_t GetSizeT() const throw (LLBC_IOException);
-
-    size_t SeekT(int origin, long offset) throw (LLBC_IOException);
-
-public:
-    size_t ReadT(void *buf, size_t size) throw (LLBC_IOException);
-
-    void ReadStringT(LLBC_String &str) throw (LLBC_IOException);
-
-    void ReadStreamT(LLBC_Stream &stream) throw (LLBC_IOException);
-
-    void ReadLineT(LLBC_String &line) throw (LLBC_IOException);
-
-    template <typename _Ty>
-    void ReadObjT(_Ty &obj) throw (LLBC_IOException)
-    {
-        size_t readRet = this->Read(&obj, sizeof(_Ty));
-        if (readRet != sizeof(_Ty))
-        {
-            if (readRet != npos)
-                LLBC_SetLastError(LLBC_ERROR_END);
-
-            throw LLBC_IOException(LLBC_FormatLastError());
-        }
-    }
-
-public:
-    size_t WriteT(const void *buf, size_t size) throw (LLBC_IOException);
-
-    void WriteStringT(const LLBC_String &str, bool writeNull = true) throw (LLBC_IOException);
-
-    void WriteStreamT(const LLBC_Stream &stream) throw (LLBC_IOException);
-
-    void WriteLineT(const LLBC_String &line) throw (LLBC_IOException);
-
-    template <typename _Ty>
-    void WriteObjT(const _Ty &obj) throw (LLBC_IOException)
-    {
-        size_t writeRet = this->Write(&obj, sizeof(_Ty));
-        if (writeRet != sizeof(_Ty))
-        {
-            if (writeRet != npos)
-                LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-
-            throw LLBC_IOException(LLBC_FormatLastError());
-        }
-    }
-
-    void FlushT() throw (LLBC_IOException);
-
-public:
-    void DeleteSelfT() throw (LLBC_IOException);
-
-    static void DeleteT(const LLBC_String &path) throw (LLBC_IOException);
-
-public:
-    void MoveSelfT(const LLBC_String &path1, 
-                   bool overlap = false,
-                   bool reopen = false, 
-                   const LLBC_String &mode1 = "rb") throw (LLBC_IOException);
-
-    static void MoveT(const LLBC_String &path0, 
-                      const LLBC_String &path1,
-                      bool overlap = false) throw (LLBC_IOException);
-
-public:
-    void CopySelfT(const LLBC_String &path1,
-                   bool overlap = false,
-                   void *copyBuf = NULL,
-                   size_t copyBufLen = 0) throw (LLBC_IOException);
-
-    static void CopyT(const LLBC_String &path0,
-                      const LLBC_String &path1,
-                      bool overlap = false,
-                      void *copyBuf = NULL,
-                      size_t copyBufLen = 0) throw (LLBC_IOException);
-
-public:
-    static void TouchT(const LLBC_String &path);
+    int DeleteFile();
+    static int DeleteFile(const LLBC_String &filePath);
 
 private:
+    /**
+     * Parse file mode to system file access mode.
+     * @return const char * - the system file string access mode.
+     */
+    static const char *ParseFileMode(int mode);
+
+    template <typename T>
+    int ReadRawObj(T &obj);
+
+    template <typename T>
+    int WriteRawObj(const T&obj);
+
+private:
+    LLBC_DISABLE_ASSIGNMENT(LLBC_File);
+
+private:
+    int _mode;
     LLBC_String _path;
-    LLBC_String _mode;
 
     LLBC_FileHandle _handle;
 };
 
 __LLBC_NS_END
 
-#if LLBC_TARGET_PLATFORM_WIN32
-#pragma warning(default:4290)
-#endif
+#include "llbc/core/file/FileImpl.h"
 
-#endif // __LLBC_CORE_FILE_FILE_H__
+#endif // !__LLBC_CORE_FILE_File_H__

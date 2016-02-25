@@ -96,6 +96,6 @@ install_$(WRAPS_TARGET): install_$(CORELIB_TARGET) $(addprefix install_,$(ALL_WR
 install_$(PYWRAP_TARGET):
 	@(cd wrap/pyllbc/lib && \cp -rfv llbc.so /usr/local/lib/python2.7/site-packages/)
 	
-tar: clean
-	@(cd .. && tar -p --exclude "*.svn" -jcvf llbc_$(shell date +%Y%m%d_%H%M%S).tar.bz2 $(notdir $(shell pwd)))
+tar:
+	@(cd tools && python tar.py)
 

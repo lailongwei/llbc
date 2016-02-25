@@ -9,7 +9,7 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetModuleFileName(PyObject *self, PyObject *args)
 {
-    const LLBC_String mfn = LLBC_GetModuleFileName();
+    const LLBC_String mfn = LLBC_Directory::ModuleFileName();
     if (mfn.empty())
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When get the module file name");

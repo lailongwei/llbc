@@ -16,7 +16,6 @@
 #include "common/TestCase_Com_Version.h"
 #include "common/TestCase_Com_Compiler.h"
 
-#include "core/os/TestCase_Core_OS_Directory.h"
 #include "core/os/TestCase_Core_OS_Thread.h"
 #include "core/os/TestCase_Core_OS_Console.h"
 #include "core/bundle/TestCase_Core_Bundle.h"

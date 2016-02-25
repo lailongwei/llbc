@@ -57,6 +57,8 @@ public:
      */
     LLBC_Time();
     LLBC_Time(const LLBC_Time &time);
+    explicit LLBC_Time(const timeval &tv);
+    explicit LLBC_Time(const timespec &ts);
     explicit LLBC_Time(double clanderTime);
 
     /**

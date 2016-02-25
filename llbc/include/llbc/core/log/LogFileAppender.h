@@ -116,14 +116,14 @@ private:
     int _fileBufferSize;
     bool _isDailyRolling;
 
-    size_t _maxFileSize;
+    long _maxFileSize;
     int _maxBackupIndex;
 
 private:
     LLBC_String _fileName;
 
     LLBC_File *_file;
-    size_t _fileSize;
+    long _fileSize;
 
     sint64 _nonFlushLogCount;
     sint64 _logfileLastCheckTime;

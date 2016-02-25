@@ -28,6 +28,13 @@
 #endif
 
 /**
+ * \brief Core/File about config options define.
+ */
+// Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
+// Only used in Non-WIN32 systems.
+#define LLBC_CFG_CORE_FILE_COPY_BUF_SIZE                    16384000
+
+/**
  * \brief Core/Utils about config options define.
  */
 // Determine library impl _itoa() API or not, Non-WIN32 Platform specific.

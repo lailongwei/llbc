@@ -12,7 +12,6 @@
 
 #include "llbc/core/file/Directory.h"
 
-#include "llbc/core/os/OS_Directory.h"
 #include "llbc/core/os/OS_Library.h"
 
 __LLBC_INTERNAL_NS_BEGIN
@@ -82,27 +81,18 @@ LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
     }
 
     return handle;
-#else // LLBC_TARGET_PLATFORM_NON_WIN32
+#else // LLBC_TARGET_PLATFORM_WIN32
     // Note, WIN32 API ::GetProcAddress not support slashes(/), so replace it.
     LLBC_String libName(fileName);
-    LLBC_String::size_type pos = libName.find(LLBC_SLASH_A);
-    for(; pos != LLBC_String::npos; pos = libName.find(LLBC_SLASH_A))
-    {
-        libName.replace(pos, 1, 1, LLBC_BACKLASH_A);
-    }
-
+    libName.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
     if (libName.empty())
-    {
-        libName = LLBC_GetModuleFileName();
-    }
+        libName = LLBC_Directory::ModuleFileName();
 
     if ((handle = ::LoadLibraryExA(libName.c_str(), NULL, 0)) == LLBC_INVALID_LIBRARY_HANDLE)
-    {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-    }
 
     return handle;
-#endif // LLBC_TARGET_PLATFORM_WIN32
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
 LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const char *procName)

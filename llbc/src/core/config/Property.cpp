@@ -78,17 +78,11 @@ LLBC_Property::~LLBC_Property()
 
 int LLBC_Property::LoadFromFile(const LLBC_String &file)
 {
-    LLBC_File f;
-    if (f.Open(file, "rb") != LLBC_RTN_OK)
+    LLBC_File f(file, LLBC_FileMode::BinaryRead);
+    if (!f.IsOpened())
         return LLBC_RTN_FAILED;
 
-    LLBC_String content;
-    if (f.ReadString(content) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
-
-    f.Close();
-
-    return this->LoadFromContent(content);
+    return this->LoadFromContent(f.ReadToEnd());
 }
 
 int LLBC_Property::LoadFromContent(const LLBC_String &content)
@@ -168,14 +162,14 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
 int LLBC_Property::SaveToFile(const LLBC_String &file) const
 {
     LLBC_File f;
-    if (f.Open(file, "wb") != LLBC_RTN_OK)
+    if (f.Open(file, LLBC_FileMode::BinaryWrite) != LLBC_RTN_OK)
         return LLBC_RTN_FAILED;
 
     LLBC_String content;
     if (this->SaveToContent(content) != LLBC_RTN_OK)
         return LLBC_RTN_FAILED;
 
-    if (f.WriteString(content, false) != LLBC_RTN_OK)
+    if (f.Write(content) != LLBC_RTN_OK)
         return LLBC_RTN_FAILED;
 
     f.Close();

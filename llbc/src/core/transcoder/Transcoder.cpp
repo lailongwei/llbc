@@ -241,41 +241,22 @@ int LLBC_Transcoder::MultiByteFileToMultiByteFile(const LLBC_String &fromCode, c
 
 int LLBC_Transcoder::ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content)
 {
-    LLBC_File file;
-    if (file.Open(fileName, "rb") != LLBC_RTN_OK)
-    {
+    content = LLBC_File::ReadToEnd(fileName);
+    if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+        return LLBC_RTN_OK;
+    else
         return LLBC_RTN_FAILED;
-    }
-
-    const size_t contentSize = file.GetSize();
-    if (UNLIKELY(contentSize < 0))
-    {
-        return LLBC_RTN_FAILED;
-    }
-
-    content.resize(contentSize);
-    if (file.Read(const_cast<char *>(content.c_str()), contentSize) != contentSize)
-    {
-        content.clear();
-        return LLBC_RTN_FAILED;
-    }
-
-    return file.Close();
 }
 
 int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString &content)
 {
-    LLBC_File file;
-    if (file.Open(fileName, "rb") != LLBC_RTN_OK)
-    {
+    LLBC_File file(fileName, LLBC_FileMode::BinaryRead);
+    if (!file.IsOpened())
         return LLBC_RTN_FAILED;
-    }
 
-    const size_t contentSize = file.GetSize();
+    const long contentSize = file.GetFileSize();
     if (UNLIKELY(contentSize < 0))
-    {
         return LLBC_RTN_FAILED;
-    }
 
     if (contentSize % 2 != 0)
     {
@@ -284,57 +265,39 @@ int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString 
     }
 
     content.resize(contentSize / 2);
-    if (file.Read(const_cast<wchar *>(content.c_str()), contentSize) != contentSize)
+    const long actuallyRead = file.Read(const_cast<wchar *>(content.c_str()), contentSize);
+    if (actuallyRead == -1)
     {
-        content.clear();
+        content.resize(0);
+        return LLBC_RTN_FAILED;
+    }
+    else if (actuallyRead != contentSize)
+    {
+        content.resize(0);
+
+        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
         return LLBC_RTN_FAILED;
     }
 
-    return file.Close();
+    return LLBC_RTN_OK;
 }
 
 int LLBC_Transcoder::WriteMultiByteToFile(const LLBC_String &content, const LLBC_String &fileName)
 {
-    LLBC_File file;
-    if (file.Open(fileName, "wb") != LLBC_RTN_OK)
-    {
+    LLBC_File file(fileName, LLBC_FileMode::BinaryWrite);
+    if (!file.IsOpened())
         return LLBC_RTN_FAILED;
-    }
 
-    if (content.empty())
-    {
-        return LLBC_RTN_OK;
-    }
-
-    const size_t cntLen = content.size();
-    if (file.Write(content.c_str(), cntLen) != cntLen)
-    {
-        return LLBC_RTN_FAILED;
-    }
-
-    return file.Close();
+    return file.Write(content);
 }
 
 int LLBC_Transcoder::WriteWideCharToFile(const LLBC_WString &content, const LLBC_String &fileName)
 {
-    LLBC_File file;
-    if (file.Open(fileName, "wb") != LLBC_RTN_OK)
-    {
+    LLBC_File file(fileName, LLBC_FileMode::BinaryWrite);
+    if (!file.IsOpened())
         return LLBC_RTN_FAILED;
-    }
 
-    const size_t contentSize = content.size() * sizeof(wchar);
-    if (contentSize == 0)
-    {
-        return LLBC_RTN_OK;
-    }
-
-    if (file.Write(content.c_str(), contentSize) != contentSize)
-    {
-        return LLBC_RTN_FAILED;
-    }
-
-    return file.Close();
+    return file.Write(content);
 }
 
 __LLBC_NS_END

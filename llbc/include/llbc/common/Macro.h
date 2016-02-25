@@ -137,10 +137,12 @@
 // The dllexport macro define.
 #if LLBC_TARGET_PLATFORM_LINUX
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 0
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
 #elif LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 0
   #define LLBC_EXPORT __declspec(dllimport)
  #endif
 #elif LLBC_TARGET_PLATFORM_IPHONE
@@ -149,10 +151,12 @@
  #endif
 #elif LLBC_TARGET_PLATFORM_MAC
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 0
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
 #elif LLBC_TARGET_PLATFORM_ANDROID
  #ifndef LLBC_EXPORT
+  #define LLBC_EXPORTING 0
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
 #endif

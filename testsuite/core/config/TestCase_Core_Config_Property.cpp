@@ -12,15 +12,15 @@
 TestCase_Core_Config_Property::TestCase_Core_Config_Property()
 {
 #if LLBC_TARGET_PLATFORM_IPHONE
-    _file = LLBC_JoinDirectory(LLBC_GetTemporaryDirectory(), "test_prop.cfg");
+    _file = LLBC_JoinDirectory(LLBC_Directory::TempDir(), "test_prop.cfg");
 #else
-    _file = LLBC_JoinDirectory(LLBC_GetModuleFileDirectory(), "test_prop.cfg");
+    _file = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "test_prop.cfg");
 #endif
 }
 
 TestCase_Core_Config_Property::~TestCase_Core_Config_Property()
 {
-    LLBC_File::Delete(_file);
+    LLBC_File::DeleteFile(_file);
 }
 
 int TestCase_Core_Config_Property::Run(int argc, char *argv[])

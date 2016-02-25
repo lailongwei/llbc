@@ -1,7 +1,7 @@
 /**
- * @file    TestCase_Core_File_File.cpp
+ * @file    TestCase_Core_File_File2.cpp
  * @author  Longwei Lai<lailongwei@126.com>
- * @date    2013/04/07
+ * @date    2016/01/23
  * @version 1.0
  *
  * @brief
@@ -9,297 +9,448 @@
 
 #include "core/file/TestCase_Core_File_File.h"
 
+TestCase_Core_File_File::TestCase_Core_File_File()
+: _testFileName("core_file_file__TestFile.test")
+{
+}
+
+TestCase_Core_File_File::~TestCase_Core_File_File()
+{
+    LLBC_File::DeleteFile(_testFileName);
+}
+
 int TestCase_Core_File_File::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/file test:");
-    
-    LLBC_PrintLine("Current working directory: %s", LLBC_Directory::GetCurrentDirectory().c_str());
-    
-    LLBC_String tempPath = LLBC_GetTemporaryDirectory(true);
-    this->OpenCloseTest(tempPath + "a.txt"), LLBC_PrintLine("");
-    this->OpenCloseTest(tempPath + "."), LLBC_PrintLine("");
+    LLBC_PrintLine("Core/File test:");
 
-    this->SetBufferModeTest(tempPath + "a.txt"), LLBC_PrintLine("");
-    try
+    int retCode = LLBC_RTN_FAILED;
+    do
     {
-        this->SetBufferModeTest(tempPath + ".");
-    }
-    catch (const LLBC_IOException &e)
-    {
-        LLBC_PrintLine("ioexception generation: %s", e.what() );
-    }
-    LLBC_PrintLine("");
+        if (!FileModeDescTest())
+            break;
 
-    this->RWTest(tempPath + "a.txt");
-    LLBC_PrintLine("");
+        if (!OpenCloseTest())
+            break;
 
-    this->DeleteTest(tempPath + "a.txt");
-    LLBC_PrintLine("");
+        if (!GetXXXMethodsTest())
+            break;
 
-    this->MoveTest(tempPath + "a.txt", tempPath + "b.txt");
-    LLBC_PrintLine("");
+        if (!ReadWriteTest())
+            break;
 
-    this->CopyTest(tempPath + "a.txt", tempPath + "b.txt");
-    LLBC_PrintLine("");
+        if (!FileAttributeTest())
+            break;
 
-    LLBC_PrintLine("Press any key to continue ...");
+        if (!CopyFileTest())
+            break;
+
+        if (!MoveFileTest())
+            break;
+
+        retCode = LLBC_RTN_OK;
+    } while (0);
+
+    LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    return 0;
+    return LLBC_RTN_OK;
 }
 
-void TestCase_Core_File_File::OpenCloseTest(const LLBC_String &file)
+bool TestCase_Core_File_File::FileModeDescTest()
 {
-    LLBC_PrintLine("Open()/Close() APIs test:");
+    LLBC_PrintLine("LLBC_FileMode describe test:");
+    LLBC_PrintLine("LLBC_FileMode::TextRead(%08x): %s", LLBC_FileMode::TextRead, LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextRead).c_str());
+    LLBC_PrintLine("LLBC_FileMode::TextWrite(%08x): %s", LLBC_FileMode::TextWrite, LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::TextReadWrite(%08x): %s", LLBC_FileMode::TextReadWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextReadWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::TextAppendWrite(%08x): %s", LLBC_FileMode::TextAppendWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextAppendWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::TextAppendReadWrite(%08x): %s", LLBC_FileMode::TextAppendReadWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextAppendReadWrite).c_str());
 
-    // open file.
-    LLBC_PrintLine("open file: %s", file.c_str() );
-    if(m_file1.Open(file, "wb") != LLBC_RTN_OK)
-    {
-        LLBC_PrintLine("open file[%s] failed: %s", 
-            file.c_str(), LLBC_FormatLastError() );
-        return;
-    }
+    LLBC_PrintLine("LLBC_FileMode::BinaryRead(%08x): %s", LLBC_FileMode::BinaryRead, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryRead).c_str());
+    LLBC_PrintLine("LLBC_FileMode::BinaryWrite(%08x): %s", LLBC_FileMode::BinaryWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::BinaryReadWrite(%08x): %s", LLBC_FileMode::BinaryReadWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryReadWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::BinaryAppendWrite(%08x): %s", LLBC_FileMode::BinaryAppendWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryAppendWrite).c_str());
+    LLBC_PrintLine("LLBC_FileMode::BinaryAppendReadWrite(%08x): %s", LLBC_FileMode::BinaryAppendReadWrite, 
+        LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryAppendReadWrite).c_str());
 
-    // check opened or not.
-    LLBC_PrintLine("file[%s] is opened? %s", file.c_str(), m_file1.IsOpened() ? "true" : "false");
-    LLBC_PrintLine("file[%s] exist? %s", file.c_str(), LLBC_File::Exist(file) ? "true" : "false");
+    LLBC_PrintLine("");
 
-    // close it.
-    LLBC_PrintLine("close file: %s", file.c_str() );
-    if(m_file1.Close() != LLBC_RTN_OK)
-    {
-        LLBC_PrintLine("close file[%s] failed: %s", 
-            file.c_str(), LLBC_FormatLastError() );
-        return;
-    }
-
-    // reopen it.
-    LLBC_PrintLine("reopen file: %s", file.c_str() );
-    if(m_file1.Open(file) != LLBC_RTN_OK)
-    {
-        LLBC_PrintLine("reopen file[%s] failed, reason: %s",
-            file.c_str(), LLBC_FormatLastError() );
-        return;
-    }
-
-    LLBC_PrintLine("close file %s", file.c_str() );
-    if(m_file1.Close() != LLBC_RTN_OK)
-    {
-        LLBC_PrintLine("close file[%s] failed, reason: %s",
-            file.c_str(), LLBC_FormatLastError() );
-        return;
-    }
+    return true;
 }
 
-void TestCase_Core_File_File::SetBufferModeTest(const LLBC_NAMESPACE LLBC_String &file)
+bool TestCase_Core_File_File::OpenCloseTest()
 {
-    LLBC_PrintLine("SetBufferMode() test:");
-    LLBC_PrintLine("open file(use exception throw version API) %s:", file.c_str());
+    LLBC_PrintLine("Open/Close file test:");
 
-    m_file1.OpenT(file);
-
-    LLBC_PrintLine("set buffer mode: FULL, size: 128");
-    if(m_file1.SetBufferMode(LLBC_FileBufferMode::FullBuf, 128) != LLBC_RTN_OK)
+    // Open/Close use BinaryRead mode.
+    LLBC_String fileName = _testFileName;
+    LLBC_PrintLine("Open file use constructor method(BinaryRead): %s", fileName.c_str());
+    LLBC_File file(fileName, LLBC_FileMode::BinaryRead);
+    if (file.IsOpened())
     {
-        LLBC_PrintLine("set buffer mode[FULL] failed, reason: %s", LLBC_FormatLastError());
-        return;
+        LLBC_PrintLine("File opened, test failed!!!");
+        return false;
     }
 
-    LLBC_PrintLine("set buffer mode: LINE, size:128");
-    if(m_file1.SetBufferMode(LLBC_FileBufferMode::LineBuf, 128) != LLBC_RTN_OK)
+    LLBC_PrintLine("File open failed, error: %s", LLBC_FormatLastError());
+
+    // Open/Close use BinaryWrite mode.
+    LLBC_PrintLine("Open file use constructor method(BinaryWrite): %s", fileName.c_str());
+    LLBC_File file2(fileName, LLBC_FileMode::BinaryWrite);
+    if (!file2.IsOpened())
     {
-        LLBC_PrintLine("set buffer mode[LINE] failed, reason: %s", LLBC_FormatLastError());
-        return;
+        LLBC_PrintLine("File not open, error: %s, test failed!!!", LLBC_FormatLastError());
+        return false;
     }
 
-    LLBC_PrintLine("set buffer mode: NO_BUF, size: 0");
-    if(m_file1.SetBufferMode(LLBC_FileBufferMode::NoBuf, 0) != LLBC_RTN_OK)
+    LLBC_PrintLine("File open success, close it");
+    file2.Close();
+
+    // Open/Close file use Open method.
+    LLBC_PrintLine("Open file use Open() method(BinaryRead): %s", fileName.c_str());
+    LLBC_File file3;
+    if (file3.Open(fileName, LLBC_FileMode::BinaryRead) != 0)
     {
-        LLBC_PrintLine("set buffer mode[NO_BUF] failed, reason: %s", LLBC_FormatLastError());
-        return;
+        LLBC_PrintLine("File open failed, error: %s, test failed", LLBC_FormatLastError());
+        return false;
     }
 
-    LLBC_PrintLine("close file.");
-    m_file1.Close();
-
-    LLBC_PrintLine("try to set closed file's buffer mode:");
-    if(m_file1.SetBufferMode(LLBC_FileBufferMode::FullBuf, 128) != LLBC_RTN_OK)
-        LLBC_PrintLine("set buffer mode failed, right!!!!, reason: %s", LLBC_FormatLastError());
+    LLBC_PrintLine("Open successful, reopen it(LastestMode):");
+    if (file3.ReOpen(LLBC_FileMode::LastestMode) != 0)
+    {
+        LLBC_PrintLine("Reopen file failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
     else
-        LLBC_PrintLine("set buffer mode successed, bad!!!");
+    {
+        LLBC_PrintLine("Reopen success, mode: %s", LLBC_FileMode::GetFileModeDesc(file3.GetFileMode()).c_str());
+    }
 
-    return;
+    LLBC_PrintLine("Reopen successful, reopen again(BinaryWrite):");
+    if (file3.ReOpen(LLBC_FileMode::BinaryWrite) != 0)
+    {
+        LLBC_PrintLine("Reopen file failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
+
+    file3.Close();
+
+    // Final, delete test file.
+    LLBC_PrintLine("Delete test file");
+    if (LLBC_File::DeleteFile(fileName) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Delete file failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
+
+    LLBC_PrintLine("");
+
+    return true;
 }
 
-void TestCase_Core_File_File::RWTest(const LLBC_NAMESPACE LLBC_String &file)
+bool TestCase_Core_File_File::GetXXXMethodsTest()
 {
-    LLBC_PrintLine("Read/Write APIs test:");
+    LLBC_PrintLine("GetXXXMethods test:");
 
-    // open file.
-    LLBC_PrintLine("Open file: %s", file.c_str());
-    m_file1.OpenT(file, "wb+");
+    // Open file as BinaryWrite mode for test.
+    LLBC_File file(_testFileName, LLBC_FileMode::BinaryWrite);
+    if (!file.IsOpened())
+    {
+        LLBC_PrintLine("Open file to test failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    // serialize.
-    LLBC_PrintLine("write basic datas(Use writeObjT() to write)");
-    m_file1.WriteObjT((sint8)-8 ), m_file1.WriteObjT( (uint8)8);
-    m_file1.WriteObjT((sint16)-16 ), m_file1.WriteObjT( (uint16)16);
-    m_file1.WriteObjT((sint32)-32 ), m_file1.WriteObjT( (uint32)32);
-    m_file1.WriteObjT((sint64)-64 ), m_file1.WriteObjT( (uint64)64);
-    m_file1.WriteObjT((float)0.1 ), m_file1.WriteObjT( (double)0.2);
+    LLBC_PrintLine("File %s opened", _testFileName.c_str());
 
-    LLBC_PrintLine("write basic datas(Use operator << to write)");
-    m_file1 <<(sint8)-8 <<(uint8)8;
-    m_file1 <<(sint16)-16 <<(uint16)16;
-    m_file1 <<(sint32)-32 <<(uint32)32;
-    m_file1 <<(sint64)-64 <<(uint64)64;
-    m_file1 <<(float)0.1 <<(double)0.2;
+    // GetFileNo():
+    LLBC_PrintLine("LLBC_File::GetFileNo(): %d", file.GetFileNo());
+    // GetFileHandle():
+    LLBC_PrintLine("LLBC_File::GetFileHandle()(FILE *): %p", file.GetFileHandle());
+    // GetFileMode():
+    LLBC_PrintLine("LLBC_File::GetFileMode(): %s", LLBC_FileMode::GetFileModeDesc(file.GetFileMode()).c_str());
 
-    LLBC_String strData = "String Data(Use WriteStringT() write)!";
-    LLBC_PrintLine("Write string data: %s", strData.c_str());
-    m_file1.WriteStringT(strData);
+    LLBC_PrintLine("");
 
-    strData = "String Data(Use operator << write)!";
-    LLBC_PrintLine("Write string data: %s", strData.c_str());
-    m_file1 <<strData;
+    return true;
+}
 
-    strData = "line data!!!!";
-    LLBC_PrintLine("Write line data: %s", strData.c_str());
-    m_file1.WriteLineT(strData);
+bool TestCase_Core_File_File::ReadWriteTest()
+{
+    LLBC_PrintLine("Read/Write test:");
+    // Open file as BinaryWrite mode for test.
+    LLBC_File file(_testFileName, LLBC_FileMode::BinaryReadWrite);
+    if (!file.IsOpened())
+    {
+        LLBC_PrintLine("Open file to test failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    LLBC_Stream stream;
-    stream.WriteBuffer("Stream data", 12);
-    LLBC_PrintLine("write stream data: %s", 
-        reinterpret_cast<const char *>( stream.GetBuf() ));
-    m_file1 <<stream;
+    LLBC_PrintLine("File %s opened", _testFileName.c_str());
 
-    // flush it.
-    LLBC_PrintLine("flush data");
-    m_file1.FlushT();
+    // Write raw data:
+    LLBC_PrintLine("Write (bool)true, (bool)false, (sint8)-8, (uint8)8, (sint16)-16, (uint16)16, "
+        "(sint32)-32, (uint32)32, (sint64)-64, (uint64)64, (float)3.14, (double)1.618");
+    file.Write(true), file.Write(false);
+    file.Write(static_cast<sint8>(-8)); file.Write(static_cast<uint8>(8));
+    file.Write(static_cast<sint16>(-16)); file.Write(static_cast<uint16>(16));
+    file.Write(static_cast<sint32>(-32)); file.Write(static_cast<uint32>(32));
+    file.Write(static_cast<sint64>(-64)); file.Write(static_cast<uint64>(64));
+    file.Write(static_cast<float>(3.14)); file.Write(static_cast<double>(1.618));
 
-    // seek to begin.
-    LLBC_PrintLine("seek to begin");
-    m_file1.SeekT(LLBC_FilePos::Begin, 0);
+    // Seek file pointer to file begin.
+    LLBC_PrintLine("Seek file pointer to begin.");
+    file.Seek(LLBC_FileSeekOrigin::Begin, 0);
 
-    // deserialize.
+    // Read it
+    bool trueVal, falseVal;
+    file.Read(trueVal); file.Read(falseVal);
     sint8 sint8Val; uint8 uint8Val;
+    file.Read(sint8Val); file.Read(uint8Val);
     sint16 sint16Val; uint16 uint16Val;
+    file.Read(sint16Val); file.Read(uint16Val);
     sint32 sint32Val; uint32 uint32Val;
+    file.Read(sint32Val); file.Read(uint32Val);
     sint64 sint64Val; uint64 uint64Val;
+    file.Read(sint64Val); file.Read(uint64Val);
     float floatVal; double doubleVal;
+    file.Read(floatVal); file.Read(doubleVal);
+    LLBC_PrintLine("Read it: %s, %s, %d, %u, %d, %u, %d, %u, %lld, %llu, %f, %f",
+        trueVal ? "true" : "false", falseVal ? "true" : "false",
+        sint8Val, uint8Val, sint16Val, uint16Val, sint32Val, uint32Val,
+        sint64Val, uint64Val, floatVal, doubleVal);
 
-    LLBC_PrintLine("get basic data(use ReadObjT() to read):");
-    m_file1.ReadObjT(sint8Val); m_file1.ReadObjT(uint8Val);
-    m_file1.ReadObjT(sint16Val); m_file1.ReadObjT(uint16Val);
-    m_file1.ReadObjT(sint32Val); m_file1.ReadObjT(uint32Val);
-    m_file1.ReadObjT(sint64Val); m_file1.ReadObjT(uint64Val);
-    m_file1.ReadObjT(floatVal); m_file1.ReadObjT(doubleVal);
-    std::cout <<"sint8Val: " <<sint8Val <<", uint8Val: " <<uint8Val <<"\n";
-    std::cout <<"sint16Val: " <<sint16Val <<", uint16Val: " <<uint16Val <<"\n";
-    std::cout <<"sint32Val: " <<sint32Val <<", uint32Val: " <<uint32Val <<"\n";
-    std::cout <<"sint64Val: " <<sint64Val <<", uint64Val: " <<uint64Val <<"\n";
-    std::cout <<"floatVal: " <<floatVal <<", doubleVal: " <<doubleVal <<"\n";
+    LLBC_PrintLine("Seek(Current, -sizeof(double)), and read again the double value:");
+    file.Seek(LLBC_FileSeekOrigin::Current, -8);
+    doubleVal = 0.0; file.Read(doubleVal);
+    LLBC_PrintLine("The doubleVal: %f", doubleVal);
 
-    LLBC_PrintLine("get basic data(use operator >>() to read):");
-    m_file1 >>sint8Val >>uint8Val;
-    m_file1 >>sint16Val >>uint16Val;
-    m_file1 >>sint32Val >>uint32Val;
-    m_file1 >>sint64Val >>uint64Val;
-    m_file1 >>floatVal >>doubleVal;
-    std::cout <<"sint8Val: " <<sint8Val <<", uint8Val: " <<uint8Val <<"\n";
-    std::cout <<"sint16Val: " <<sint16Val <<", uint16Val: " <<uint16Val <<"\n";
-    std::cout <<"sint32Val: " <<sint32Val <<", uint32Val: " <<uint32Val <<"\n";
-    std::cout <<"sint64Val: " <<sint64Val <<", uint64Val: " <<uint64Val <<"\n";
-    std::cout <<"floatVal: " <<floatVal <<", doubleVal: " <<doubleVal <<"\n";
+    LLBC_PrintLine("Seek(End, -sizeof(double)), and read again the double value:");
+    file.Seek(LLBC_FileSeekOrigin::End, -8);
+    doubleVal = 0.0; file.Read(doubleVal);
+    LLBC_PrintLine("The doubleVal: %f", doubleVal);
 
-    LLBC_PrintLine("read string data(use ReadStringT() to read):");
-    strData.clear();
-    m_file1.ReadStringT(strData);
-    std::cout <<"string data: " <<strData.c_str() <<std::endl;
+    LLBC_PrintLine("Now file size: %ld, file pos: %ld", file.GetFileSize(), file.GetFilePosition());
+    file.Seek(LLBC_FileSeekOrigin::Current, -16);
+    LLBC_PrintLine("After Seek(Current, -16), file size: %ld, file pos: %ld", file.GetFileSize(), file.GetFilePosition());
 
-    LLBC_PrintLine("read string data(use operator >>() to read):");
-    strData.clear();
-    m_file1 >>strData;
-    std::cout <<"string data: " <<strData.c_str() <<std::endl;
+    // Test ReadLine/WriteLine/ReadToEnd methods:
+    LLBC_PrintLine("ReOpen file for test ReadLine/WriteLine/ReadToEnd methods:");
+    file.ReOpen(LLBC_FileMode::BinaryReadWrite);
 
-    LLBC_PrintLine("read line data:");
-    strData.clear();
-    m_file1.ReadLineT(strData);
-    std::cout <<"line data: " <<strData.c_str() <<std::endl;
+    LLBC_PrintLine("WriteLine(\"Hello World!\"):");
+    file.WriteLine("Hello World!");
+    LLBC_PrintLine("WriteLine(\"Hey, Judy!\"):");
+    file.WriteLine("Hey, Judy!");
 
-    LLBC_PrintLine("read stream data:");
-    stream.SetPos(0);
-    m_file1 >>stream;
-    std::cout <<"stream data: " <<(const char *)stream.GetBuf() <<std::endl;
+    file.SetFilePosition(0);
+    LLBC_PrintLine("Read lines:");
+    LLBC_PrintLine("First line: %s", file.ReadLine().c_str());
+    LLBC_PrintLine("Second line: %s", file.ReadLine().c_str());
+    const LLBC_String notExistLine = file.ReadLine();
+    LLBC_PrintLine("Not exist line: %s, error: %s", notExistLine.c_str(), LLBC_FormatLastError());
 
-    LLBC_PrintLine("now file pos: %ld, size: %ld",
-        m_file1.TellT(), m_file1.GetSizeT() );
+    LLBC_PrintLine("");
 
-    LLBC_PrintLine("close file");
-    m_file1.CloseT();
+    return true;
 }
 
-void TestCase_Core_File_File::DeleteTest(const LLBC_NAMESPACE LLBC_String &file)
+bool TestCase_Core_File_File::FileAttributeTest()
 {
-    LLBC_PrintLine("Delete file test:");
+    LLBC_PrintLine("file attribute about test:");
+    LLBC_File file(_testFileName, LLBC_FileMode::BinaryRead);
+    if (!file.IsOpened())
+    {
+        LLBC_PrintLine("Open file to test failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    LLBC_PrintLine("open file: %s", file.c_str());
-    m_file1.OpenT(file, "wb+");
+    LLBC_FileAttributes fileAttrs;
+    if (file.GetFileAttributes(fileAttrs) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Failed to get file attributes, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    LLBC_PrintLine("delete it");
-    m_file1 <<"asfasflkas;lfas";
-    m_file1.DeleteSelfT();
+    LLBC_PrintLine("File %s attributes got, print it: ", _testFileName.c_str());
+    PrintFileAttributes(fileAttrs);
 
-    LLBC_PrintLine("now exist? %s", LLBC_File::Exist(file) ? "true" : "false");
+    // Test directory attributes:
+    if (LLBC_File::GetFileAttributes(".", fileAttrs) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Failed to get file attributes, error: %s", LLBC_FormatLastError());
+        return false;
+    }
+
+    LLBC_PrintLine("File %s attributes got, print it: ", ".");
+    PrintFileAttributes(fileAttrs);
+
+    file.Close();
+
+    LLBC_PrintLine("Touch file test, file: %s", _testFileName.c_str());
+    LLBC_PrintLine("Touch all times to now:");
+    if (LLBC_File::TouchFile(_testFileName, true, NULL, true, NULL) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Failed to touch file: %s, error: %s", _testFileName.c_str(), LLBC_FormatLastError());
+        return false;
+    }
+
+    LLBC_PrintLine("Touched, attributes:");
+    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    PrintFileAttributes(fileAttrs);
+
+    LLBC_PrintLine("Sleep 2 seconds...");
+    LLBC_Sleep(2000);
+    LLBC_PrintLine("Touch last access time to now");
+    LLBC_File::TouchFile(_testFileName, true, NULL, false, NULL);
+    LLBC_PrintLine("Touched, attributes:");
+    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    PrintFileAttributes(fileAttrs);
+
+    LLBC_PrintLine("Sleep 2 seconds...");
+    LLBC_Sleep(2000);
+    LLBC_PrintLine("Touch last modify time to now");
+    LLBC_File::TouchFile(_testFileName, false, NULL, true, NULL);
+    LLBC_PrintLine("Touched, attributes:");
+    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    PrintFileAttributes(fileAttrs);
+
+    LLBC_PrintLine("");
+
+    return true;
 }
 
-void TestCase_Core_File_File::MoveTest(const LLBC_String &file1,
-                                       const LLBC_String &file2)
+bool TestCase_Core_File_File::CopyFileTest()
 {
-    std::cout <<"Move file test:" <<std::endl;
+    LLBC_PrintLine("Copy file test:");
 
-    std::cout <<"Open file " <<file1 <<":" <<std::endl;
-    m_file1.OpenT(file1, "wb");
+    const LLBC_String copyFileName = _testFileName + ".copy";
+    LLBC_File file(_testFileName, LLBC_FileMode::BinaryReadWrite);
+    if (!file.IsOpened())
+    {
+        LLBC_PrintLine("Open test file[%s] failed, error: %s", _testFileName.c_str(), LLBC_FormatLastError());
+        return false;
+    }
 
-    LLBC_String strData = "This is a string data!";
-    std::cout <<"Write string: " <<strData <<std::endl;
-    m_file1 <<strData;
+    LLBC_PrintLine("test file[name: %s, will copy] opened, write line string: Hello World!", _testFileName.c_str());
+    file.WriteLine("Hello World");
 
-    std::cout <<"Move file [" <<file1 <<"] -> [" <<file2 <<"]:" <<std::endl;
-    m_file1.MoveSelfT(file2, true, true, "rb");
+    LLBC_PrintLine("Begin copy(overlapped): %s ---> %s", _testFileName.c_str(), copyFileName.c_str());
+    if (file.CopyFile(copyFileName, true) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Copy file failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    std::cout <<"Read data from the moved file" <<std::endl;
-    strData.clear();
-    m_file1 >>strData;
+    LLBC_PrintLine("Open the copy file:");
+    LLBC_File copyFile(copyFileName, LLBC_FileMode::BinaryRead);
+    if (!copyFile.IsOpened())
+    {
+        LLBC_PrintLine("Failed to open copy file, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    std::cout <<"Data is: " <<strData <<std::endl;
+    LLBC_PrintLine("Copy file opened, content: %s", copyFile.ReadToEnd().c_str());
+    copyFile.Close();
 
-    m_file1.CloseT();
-    LLBC_File::DeleteT(file2);
+    LLBC_PrintLine("Copy again(don't overlapped): %s ---> %s", _testFileName.c_str(), copyFileName.c_str());
+    if (file.CopyFile(copyFileName, false) == LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Copy success, failed. check your code!");
+        LLBC_File::DeleteFile(copyFileName);
+
+        return false;
+    }
+    else
+    {
+        LLBC_PrintLine("Copy failed, error: %s, right!", LLBC_FormatLastError());
+    }
+
+    LLBC_PrintLine("Delete copy file");
+    LLBC_File::DeleteFile(copyFileName);
+
+    LLBC_PrintLine("");
+
+    return true;
 }
 
-void TestCase_Core_File_File::CopyTest(const LLBC_String &file1,
-                                       const LLBC_String &file2)
+bool TestCase_Core_File_File::MoveFileTest()
 {
-    std::cout <<"Copy file test:" <<std::endl;
-    
-    std::cout <<"Open file [" <<file1 <<"]:" <<std::endl;
-    m_file1.OpenT(file1, "wb");
+    LLBC_PrintLine("Move file test:");
 
-    LLBC_String strData = "String Data!";
-    std::cout <<"Write data: " <<strData <<std::endl;
-    m_file1 <<strData;
+    const LLBC_String moveFileName = _testFileName + ".move";
+    LLBC_File file(_testFileName, LLBC_FileMode::BinaryReadWrite);
+    if (!file.IsOpened())
+    {
+        LLBC_PrintLine("Open test file[%s] failed, error: %s", _testFileName.c_str(), LLBC_FormatLastError());
+        return false;
+    }
 
-    std::cout <<"Copy to [" <<file2 <<"]" <<std::endl;
-    m_file1.CopySelfT(file2, true, NULL, 1024);
+    LLBC_PrintLine("test file[name: %s, will move] opened, write line string: Hello World!", _testFileName.c_str());
+    file.WriteLine("Hello World");
 
-    std::cout <<"Open copy file." <<std::endl;
-    m_file2.OpenT(file2);
+    LLBC_PrintLine("Begin move(overlapped): %s ---> %s", _testFileName.c_str(), moveFileName.c_str());
+    if (file.MoveFile(moveFileName, true) != LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Move file failed, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    strData.clear();
-    m_file2 >>strData;
-    std::cout <<"Read data from copy file: " <<strData <<std::endl;
+    LLBC_PrintLine("Open the move file:");
+    LLBC_File moveFile(moveFileName, LLBC_FileMode::BinaryRead);
+    if (!moveFile.IsOpened())
+    {
+        LLBC_PrintLine("Failed to open move file, error: %s", LLBC_FormatLastError());
+        return false;
+    }
 
-    m_file1.DeleteSelfT();
-    m_file2.DeleteSelfT();
+    LLBC_PrintLine("Move file opened, content: %s", moveFile.ReadToEnd().c_str());
+    moveFile.Close();
+
+    const LLBC_String copyFileName = _testFileName + ".copy";
+    LLBC_File::CopyFile(moveFileName, copyFileName, true);
+    LLBC_PrintLine("Copy move file and move again(don't overlapped): %s ---> %s", copyFileName.c_str(), copyFileName.c_str());
+    if (LLBC_File::MoveFile(copyFileName, moveFileName, false) == LLBC_RTN_OK)
+    {
+        LLBC_PrintLine("Move success, failed. check your code!");
+        LLBC_File::DeleteFile(copyFileName);
+        LLBC_File::DeleteFile(moveFileName);
+
+        return false;
+    }
+    else
+    {
+        LLBC_PrintLine("Move failed, error: %s, right!", LLBC_FormatLastError());
+    }
+
+    LLBC_PrintLine("Delete copy file and move file");
+    LLBC_File::DeleteFile(copyFileName);
+    LLBC_File::DeleteFile(moveFileName);
+
+    LLBC_PrintLine("");
+
+    return true;
+}
+
+void TestCase_Core_File_File::PrintFileAttributes(const LLBC_FileAttributes &fileAttrs)
+{
+    LLBC_PrintLine("    Readable: %s", fileAttrs.readable ? "true" : "false");
+    LLBC_PrintLine("    Writable: %s", fileAttrs.writable ? "true" : "false");
+    LLBC_PrintLine("    Execable: %s", fileAttrs.execable ? "true" : "false");
+
+    LLBC_PrintLine("    Is directory: %s", fileAttrs.isDirectory ? "true" : "false");
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    const LLBC_Time createTime(fileAttrs.createTime);
+    LLBC_PrintLine("    create time: %s", createTime.Format().c_str());
+#else
+    LLBC_PrintLine("    last change status time: %s",  LLBC_Time(fileAttrs.lastChangeStatusTime).Format().c_str());
+#endif
+    LLBC_PrintLine("    last modify time: %s", LLBC_Time(fileAttrs.lastModifyTime).Format().c_str());
+    LLBC_PrintLine("    last access time: %s", LLBC_Time(fileAttrs.lastAccessTime).Format().c_str());
 }

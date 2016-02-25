@@ -14,6 +14,7 @@
 #include "llbc/core/os/OS_Console.h"
 
 #include "llbc/core/file/File.h"
+#include "llbc/core/file/Directory.h"
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/utils/Util_Math.h"
 #include "llbc/core/utils/Util_Debug.h"
@@ -73,6 +74,12 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     }
 
     _baseName = initInfo.file;
+    const LLBC_String logDir = LLBC_Directory::DirName(_baseName);
+    if (!logDir.empty() && !LLBC_Directory::Exists(logDir))
+    {
+        if (LLBC_Directory::Create(logDir) != LLBC_RTN_OK)
+            return LLBC_RTN_FAILED;
+    }
 
     _fileBufferSize = MAX(0, initInfo.fileBufferSize);
     _isDailyRolling = initInfo.dailyRolling;
@@ -133,20 +140,19 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
     LLBC_String formattedData;
     chain->Format(data, formattedData);
 
-    const size_t actuallyWrite = 
+    const long actuallyWrote = 
         _file->Write(formattedData.data(), formattedData.size());
-    if (actuallyWrite != LLBC_File::npos)
+    if (actuallyWrote != -1)
     {
-        _fileSize += actuallyWrite;
+        _fileSize += actuallyWrote;
         if (_fileBufferSize > 0) // If file buffered, process flush logic
         {
             _nonFlushLogCount += 1;
-            if (data.level >= LLBC_LogLevel::Warn && 
-                _fileBufferSize > 0)
+            if (data.level >= LLBC_LogLevel::Warn)
                 this->Flush();
         }
 
-        if (actuallyWrite != formattedData.size())
+        if (actuallyWrote != static_cast<long>(formattedData.size()))
         {
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
             return LLBC_RTN_FAILED;
@@ -231,7 +237,7 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
 
         return true;
     }
-    else if (!LLBC_File::Exist(newFileName))
+    else if (!LLBC_File::Exists(newFileName))
     {
         clear = true;
         backup = false;
@@ -244,9 +250,6 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
 
 int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
 {
-    const LLBC_String openMode = 
-        clear ? LLBC_INL_NS __ClearOpenFlag : LLBC_INL_NS __AppendOpenFlag;
-
     // Close old file.
     if (_file)
         _file->Close();
@@ -256,18 +259,19 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
     // Reset non-reflush log count variables.
     _nonFlushLogCount = 0;
     // Do reopen file.
-    if (UNLIKELY(_file->Open(newFileName, openMode) != LLBC_RTN_OK))
+    if (UNLIKELY(_file->Open(newFileName, clear ? 
+        LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite) != LLBC_RTN_OK))
     {
 #ifdef LLBC_DEBUG
-        traceline("LLBC_LogFileAppender::ReOpenFile(): Open file failed, name:%s, openMode:%s, reason:%s",
-            __FILE__, __LINE__, newFileName.c_str(), openMode.c_str(), LLBC_FormatLastError());
+        traceline("LLBC_LogFileAppender::ReOpenFile(): Open file failed, name:%s, clear:%s, reason:%s",
+            __FILE__, __LINE__, newFileName.c_str(), clear, LLBC_FormatLastError());
 #endif
         return LLBC_RTN_FAILED;
     }
 
     // Update file name/size, buffer info.
     _fileName = newFileName;
-    _fileSize = _file->GetSize();
+    _fileSize = _file->GetFileSize();
     this->UpdateFileBufferInfo();
 
     return LLBC_RTN_OK;
@@ -277,7 +281,7 @@ void LLBC_LogFileAppender::BackupFiles() const
 {
     if (_maxBackupIndex == 0)
         return;
-    else if (!LLBC_File::Exist(_fileName))
+    else if (!LLBC_File::Exists(_fileName))
         return;
 
     if (_file->IsOpened())
@@ -289,7 +293,7 @@ void LLBC_LogFileAppender::BackupFiles() const
         availableIndex += 1;
         LLBC_String backupFileName;
         backupFileName.format("%s.%d", _fileName.c_str(), availableIndex);
-        if (!LLBC_File::Exist(backupFileName))
+        if (!LLBC_File::Exists(backupFileName))
             break;
     }
 
@@ -305,9 +309,9 @@ void LLBC_LogFileAppender::BackupFiles() const
         moveTo.format("%s.%d", _fileName.c_str(), willMoveIndex + 1);
 
 #ifdef LLBC_RELEASE
-        LLBC_File::Move(willMove, moveTo, true);
+        LLBC_File::MoveFile(willMove, moveTo, true);
 #else
-        if (LLBC_File::Move(willMove, moveTo, true) != LLBC_RTN_OK)
+        if (LLBC_File::MoveFile(willMove, moveTo, true) != LLBC_RTN_OK)
         {
             traceline("LLBC_LogFileAppender::BackupFiles(): Backup failed, reason: %s", LLBC_FormatLastError());
         }

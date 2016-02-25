@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{160e6ab2-b01c-446c-8df1-e6ecc8424cc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{cfbb8df3-3384-4420-96b6-139d8637bc97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\utils">
+      <UniqueIdentifier>{b7800b38-45d6-4131-9390-85b863a08dae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\helper">
+      <UniqueIdentifier>{798d60f8-55b5-4f12-a5ef-76774c287087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\file">
+      <UniqueIdentifier>{c7294514-1259-4714-84c2-4a1fb13ba8cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\variant">
+      <UniqueIdentifier>{722fb589-1588-4675-bae6-0bb3e345e649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\config">
+      <UniqueIdentifier>{e65ee6db-1cf6-4e85-961e-6a386cfc542f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\os">
+      <UniqueIdentifier>{f6463cdc-b537-429c-a57e-28c47b497ae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\thread">
+      <UniqueIdentifier>{1cd63a31-5727-4f26-9fcc-db064bc9bd35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\time">
+      <UniqueIdentifier>{b9b5cb32-66a1-43ca-b408-2186d2ad1766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\random">
+      <UniqueIdentifier>{0229bde6-e71a-4de1-90ae-989f929bed33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\log">
+      <UniqueIdentifier>{c2f6a7c7-ec32-4916-a45b-836062ee3038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\entity">
+      <UniqueIdentifier>{338bd138-0de1-4db2-b87c-dc8c7ae324ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\bundle">
+      <UniqueIdentifier>{b1f43b82-135d-4c2a-b9f3-2c8114036e29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\transcoder">
+      <UniqueIdentifier>{d8ec3185-316e-4d4a-9349-75810ced5196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\library">
+      <UniqueIdentifier>{75247b4a-0a9c-4faf-9546-1ae5bbd5b151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="comm">
+      <UniqueIdentifier>{ee4425b8-c685-4daf-aefb-fd310d2c4715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="objbase">
+      <UniqueIdentifier>{16c5bac1-0d8d-40ee-bc3e-f31abc437e13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_Compiler.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_DataType.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_Endian.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_Error.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_Stream.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\common\TestCase_Com_Version.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Algorithm.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Coder.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Debug.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Delegate.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_MD5.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Misc.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Network.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Text.cpp">
+      <Filter>core\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\helper\TestCase_Core_Helper_JVHelper.cpp">
+      <Filter>core\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\helper\TestCase_Core_Helper_StlHelper.cpp">
+      <Filter>core\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\file\TestCase_Core_File_Directory.cpp">
+      <Filter>core\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\variant\TestCase_Core_VariantTest.cpp">
+      <Filter>core\variant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\config\TestCase_Core_Config_Config.cpp">
+      <Filter>core\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\config\TestCase_Core_Config_Property.cpp">
+      <Filter>core\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\os\TestCase_Core_OS_Console.cpp">
+      <Filter>core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\os\TestCase_Core_OS_Thread.cpp">
+      <Filter>core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_CV.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Lock.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_RWLock.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Semaphore.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Task.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_ThreadMgr.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Tls.cpp">
+      <Filter>core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\time\TestCase_Core_Time_Time.cpp">
+      <Filter>core\time</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\random\TestCase_Core_Random.cpp">
+      <Filter>core\random</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\log\TestCase_Core_Log.cpp">
+      <Filter>core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\entity\TestCase_Core_Entity.cpp">
+      <Filter>core\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\bundle\TestCase_Core_Bundle.cpp">
+      <Filter>core\bundle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\transcoder\TestCase_Core_Transcoder.cpp">
+      <Filter>core\transcoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\library\TestCase_Core_Library.cpp">
+      <Filter>core\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_CustomHeaderSvc.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Event.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_ExternalDriveSvc.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_HeaderDesc.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_LazyTask.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Multicast.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_PacketHeaderParts.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_PacketOp.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_ReleasePool.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_SendBytes.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Svc.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_SvcBase.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Timer.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\objbase\TestCase_ObjBase_Array.cpp">
+      <Filter>objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\objbase\TestCase_ObjBase_Dictionary.cpp">
+      <Filter>objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\objbase\TestCase_ObjBase_Object.cpp">
+      <Filter>objbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\testsuite\Main_NonIOS.cpp" />
+    <ClCompile Include="..\..\testsuite\TestSuite.cpp" />
+    <ClCompile Include="..\..\testsuite\core\file\TestCase_Core_File_File.cpp">
+      <Filter>core\file</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_Compiler.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_DataType.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_Endian.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_Error.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_Stream.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\common\TestCase_Com_Version.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Algorithm.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Coder.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Debug.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Delegate.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_MD5.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Misc.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Network.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Text.h">
+      <Filter>core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\helper\TestCase_Core_Helper_JVHelper.h">
+      <Filter>core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\helper\TestCase_Core_Helper_StlHelper.h">
+      <Filter>core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\file\TestCase_Core_File_Directory.h">
+      <Filter>core\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\variant\TestCase_Core_VariantTest.h">
+      <Filter>core\variant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\config\TestCase_Core_Config_Config.h">
+      <Filter>core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\config\TestCase_Core_Config_Property.h">
+      <Filter>core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\os\TestCase_Core_OS_Console.h">
+      <Filter>core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\os\TestCase_Core_OS_Thread.h">
+      <Filter>core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_CV.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Lock.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_RWLock.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Semaphore.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Task.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_ThreadMgr.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\thread\TestCase_Core_Thread_Tls.h">
+      <Filter>core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\time\TestCase_Core_Time_Time.h">
+      <Filter>core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\random\TestCase_Core_Random.h">
+      <Filter>core\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\log\TestCase_Core_Log.h">
+      <Filter>core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\entity\TestCase_Core_Entity.h">
+      <Filter>core\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\bundle\TestCase_Core_Bundle.h">
+      <Filter>core\bundle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\transcoder\TestCase_Core_Transcoder.h">
+      <Filter>core\transcoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\library\TestCase_Core_Library.h">
+      <Filter>core\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_CustomHeaderSvc.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Event.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_ExternalDriveSvc.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_HeaderDesc.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_LazyTask.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Multicast.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_PacketHeaderParts.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_PacketOp.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_ReleasePool.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_SendBytes.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Svc.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_SvcBase.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Timer.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\objbase\TestCase_ObjBase_Array.h">
+      <Filter>objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\objbase\TestCase_ObjBase_Dictionary.h">
+      <Filter>objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\objbase\TestCase_ObjBase_Object.h">
+      <Filter>objbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\TestSuite.h" />
+    <ClInclude Include="..\..\testsuite\core\file\TestCase_Core_File_File.h">
+      <Filter>core\file</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\testsuite\core\config\test_json.json">
+      <Filter>core\config</Filter>
+    </None>
+    <None Include="..\..\testsuite\core\log\Logger_Cfg.cfg">
+      <Filter>core\log</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\testsuite\core\transcoder\Transcoder_Test_GBK.txt">
+      <Filter>core\transcoder</Filter>
+    </Text>
+    <Text Include="..\..\testsuite\core\transcoder\Transcoder_Test_UTF16.txt">
+      <Filter>core\transcoder</Filter>
+    </Text>
+    <Text Include="..\..\testsuite\core\transcoder\Transcoder_Test_UTF8.txt">
+      <Filter>core\transcoder</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Common.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\LibHeader.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Errors.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Export.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Macro.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\Comm.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{2d0a08bd-03d7-40db-8e52-91b4dd7b1a2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{3118a1d6-7a38-425e-acfa-b0b7288f2c34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\common">
+      <UniqueIdentifier>{6d4f8a81-1700-4526-ad0d-19eb6a5fa849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core">
+      <UniqueIdentifier>{f9430623-3ddf-482d-8c17-5b556c226739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm">
+      <UniqueIdentifier>{2923c2f6-5e39-43dd-a50e-cf11887c16d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{37a3804e-8611-4930-bca4-376537b70a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{4883600c-7eaf-4477-b207-b36d4913bfd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\comm">
+      <UniqueIdentifier>{41201e8c-b584-4256-bdb4-e950c1b0665f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\csllbc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\Errors.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csService.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\Comm.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

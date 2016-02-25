@@ -83,12 +83,12 @@ finally:
     return type;
 }
 
-int LLBC_MachineEndian = LLBC_Endian::UnknownEndian;
+LLBC_EXPORT int LLBC_MachineEndian = LLBC_Endian::UnknownEndian;
 
 # if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-int LLBC_DefaultEndian = LLBC_Endian::NetEndian;
+LLBC_EXPORT int LLBC_DefaultEndian = LLBC_Endian::NetEndian;
 # else
-int LLBC_DefaultEndian = LLBC_Endian::LittleEndian;
+LLBC_EXPORT int LLBC_DefaultEndian = LLBC_Endian::LittleEndian;
 #endif
 
 int LLBC_GetMachineEndianType()

@@ -1,0 +1,554 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{74246110-dba3-4164-a2c3-f01059cd7cd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\pack_lex_analysers">
+      <UniqueIdentifier>{85b3b7c7-a045-47d6-9bb2-8ff07ec12a18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{d7db48cc-dc92-4d66-ad34-6bad0f3b56db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\log">
+      <UniqueIdentifier>{0d994902-e175-4341-bab9-a102148b4100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\thread">
+      <UniqueIdentifier>{6a2e2637-da5c-496d-9b98-297f9e13dbc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\helper">
+      <UniqueIdentifier>{98359151-ab40-48d4-9c07-d123b90b509d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\bundle">
+      <UniqueIdentifier>{1b907f4e-2020-4f00-9497-d452d17b3fb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\random">
+      <UniqueIdentifier>{0a10634f-044e-43b3-b9e9-7bcbaa6bb579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\config">
+      <UniqueIdentifier>{80980903-e695-4f3b-b001-b927041b3c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\utils">
+      <UniqueIdentifier>{83b0e985-2372-4efb-b82b-910412a6b39f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\file">
+      <UniqueIdentifier>{551fa601-c67e-43e2-b702-6849cfc88dde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\comm">
+      <UniqueIdentifier>{9560251d-398a-4527-b3fd-cdb9287b3d2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\application">
+      <UniqueIdentifier>{16db7d33-a990-4b48-aa10-e366c9ca04a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\testcase">
+      <UniqueIdentifier>{3641452c-7fa1-4575-adb5-d1738dd1035a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="include\common">
+      <UniqueIdentifier>{19265b48-9bf0-4ba9-a270-918f7cfc9759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\common\pack_lex_analysers">
+      <UniqueIdentifier>{e3c2068a-b79c-4855-ad93-0980f75bbd93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\comm">
+      <UniqueIdentifier>{98780eb0-23f0-40f5-9fe8-ee15db9e43fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core">
+      <UniqueIdentifier>{b5186c4e-8b79-4560-afe8-ea422c450e4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\log">
+      <UniqueIdentifier>{2b9fce37-b3e4-48d8-b5de-1042aa8add9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\thread">
+      <UniqueIdentifier>{4d469271-d232-4739-8fb1-6a16cc704dc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\helper">
+      <UniqueIdentifier>{96c1b49d-70e9-4a44-a734-c4cc2cda4800}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\bundle">
+      <UniqueIdentifier>{12768bec-6157-46d1-bb65-82bfd1c7a7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\config">
+      <UniqueIdentifier>{ca291ba9-b547-4ba9-9a91-a8525d257e3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\application">
+      <UniqueIdentifier>{a68a2c93-ebec-4829-94ab-c5d89b94ecf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\testcase">
+      <UniqueIdentifier>{3b08a113-d6b5-4e3c-8ec8-2a8e6093fae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script">
+      <UniqueIdentifier>{8d734b5f-afe2-4846-8527-d436c2915008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\common">
+      <UniqueIdentifier>{b4fb5da5-5d38-4c47-b9da-56ccdd1cc9b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core">
+      <UniqueIdentifier>{a5e66172-243f-479f-a394-523ccaf95ad6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\helper">
+      <UniqueIdentifier>{76909d8d-8cc9-4bad-aeef-d664ab9ff5c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\bundle">
+      <UniqueIdentifier>{a8bd6cee-4334-485c-be6c-276d8c880224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\config">
+      <UniqueIdentifier>{b9239d65-a4ba-4ede-be3f-cd5ad9c1f822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\log">
+      <UniqueIdentifier>{d33c2f0b-4112-4c88-81f5-e689e5a3fd75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\event">
+      <UniqueIdentifier>{16d8730f-7d9b-4fd3-84ef-db205f258219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\decorators">
+      <UniqueIdentifier>{af7583e1-2df8-4be2-a936-ba21ae880dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\singleton">
+      <UniqueIdentifier>{f27e4cd7-49e5-4fef-ab80-c42d3a012d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\func">
+      <UniqueIdentifier>{c5cd2b63-ba54-44db-a03f-840a0b955af5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\core\utils">
+      <UniqueIdentifier>{b0bc0984-61e1-4d6d-92d5-b37b56ea0993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\comm">
+      <UniqueIdentifier>{a0ad2851-ca09-4dc0-8327-54f929c1d6ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\application">
+      <UniqueIdentifier>{7c25fb29-9946-4182-9c03-d3792f6fb626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\testcase">
+      <UniqueIdentifier>{41c45f9d-5cc9-4e7c-b6f8-9c0a8397d57f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script_tools">
+      <UniqueIdentifier>{f405d37b-3af0-416d-b437-e68785b04626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script_tools\cpputils">
+      <UniqueIdentifier>{a173982c-c0dc-4139-8871-f45f75fde19b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\wrap\pyllbc\src\pyllbc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\Common.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\Errors.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\InlModule.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\MethodTable.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\ObjAttrOptr.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\ObjUtil.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PyModule.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PyStream.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PyTypeDetector.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\ScriptIntegrator.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\TopModule.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma_Class.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma_Dict.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma_Raw.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma_Sequence.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemma_Top.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemmaBuilder.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\common\PackLemmaCompiler.cpp">
+      <Filter>src\common\pack_lex_analysers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\core\Core.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\core\thread\PyTask.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\core\thread\PyTaskMgr.cpp">
+      <Filter>src\core\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\Comm.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\ErrorHooker.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyEvent.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyFacade.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyFacadeEvBuilder.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyFrameCallable.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyObjCoder.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyPacketHandler.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyService.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyTimer.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\comm\PyTimerScheduler.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\application\Application.cpp">
+      <Filter>src\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\pyllbc\src\testcase\TestCase.cpp">
+      <Filter>src\testcase</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\wrap\pyllbc\src\pyllbc_scripts.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\common\_CommonMethods.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\common\_PyStream.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\common\_SecurePrint.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\common\_VerInfo.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\_CoreMethods.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\log\_Log.h">
+      <Filter>src\core\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\thread\_SimpleLock.h">
+      <Filter>src\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\thread\_Task.h">
+      <Filter>src\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\helper\_GUIDHelper.h">
+      <Filter>src\core\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\bundle\_Bundle.h">
+      <Filter>src\core\bundle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\random\_Random.h">
+      <Filter>src\core\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\config\_Property.h">
+      <Filter>src\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\utils\_Util_Misc.h">
+      <Filter>src\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\file\_Directory.h">
+      <Filter>src\core\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_Codec.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_CommMethods.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_ObjCoder.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_Packet.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_PacketHeaderDesc.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_PacketHeaderPartDesc.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_Protocol.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_Service.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\comm\_Timer.h">
+      <Filter>src\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\application\_ApplicationMethods.h">
+      <Filter>src\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\testcase\_TestCase.h">
+      <Filter>src\testcase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\testcase\_TestcaseMethods.h">
+      <Filter>src\testcase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\Common.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\Config.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\Errors.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\Export.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\InlModule.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\LibHeader.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\Macro.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\MethodTable.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\ObjAttrOptr.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\ObjAttrOptrImpl.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\ObjUtil.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PyModule.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PyStream.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PyTypeDetector.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\ScriptIntegrator.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\TopModule.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma_Class.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma_Dict.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma_Raw.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma_Sequence.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemma_Top.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemmaBuilder.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLemmaCompiler.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\common\PackLexAnalyser.h">
+      <Filter>include\common\pack_lex_analysers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\Comm.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\ErrorHooker.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyEvent.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyFacade.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyFacadeEvBuilder.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyFrameCallable.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyObjCoder.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyPacketHandler.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyService.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyTimer.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\comm\PyTimerScheduler.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\core\Core.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\core\thread\PyTask.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\core\thread\PyTaskMgr.h">
+      <Filter>include\core\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\application\Application.h">
+      <Filter>include\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc\testcase\TestCase.h">
+      <Filter>include\testcase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\wrap\pyllbc\script\common\Enum.py">
+      <Filter>script\common</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\common\Stream.py">
+      <Filter>script\common</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\helper\GUID.py">
+      <Filter>script\core\helper</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\bundle\Bundle.py">
+      <Filter>script\core\bundle</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\config\Property.py">
+      <Filter>script\core\config</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\log\Log.py">
+      <Filter>script\core\log</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\event\Observable.py">
+      <Filter>script\core\event</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\decorators\ParamVerify.py">
+      <Filter>script\core\decorators</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\singleton\Singleton.py">
+      <Filter>script\core\singleton</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\func\Func.py">
+      <Filter>script\core\func</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\utils\BitSet.py">
+      <Filter>script\core\utils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\utils\ClsUtil.py">
+      <Filter>script\core\utils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\core\utils\InvokeGuard.py">
+      <Filter>script\core\utils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\Packet.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\PacketHeaderDesc.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\PacketHeaderPartDesc.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\RegHolder.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\Service.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\ServiceEvent.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\comm\Timer.py">
+      <Filter>script\comm</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script\testcase\TestCase.py">
+      <Filter>script\testcase</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cfg.py">
+      <Filter>script_tools</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\integrator_builder.py">
+      <Filter>script_tools</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\methods_builder.py">
+      <Filter>script_tools</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\prebuild.py">
+      <Filter>script_tools</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\__init__.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\cppclass.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\cppdata.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\cppfile.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\cppfun.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\script_tools\cpputils\cppvisitattr.py">
+      <Filter>script_tools\cpputils</Filter>
+    </None>
+    <None Include="..\..\wrap\pyllbc\CHANGELOG" />
+  </ItemGroup>
+</Project>

@@ -286,16 +286,16 @@ const uint32 LLBC_MD5::_chainingValD = 0x10325476;
 
 LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
 {
-    size_t fileSize = 0;
+    long fileSize = 0;
     char *fileContent = NULL;
 
     LLBC_File fileObj;
-    if (fileObj.Open(file, "rb") != LLBC_RTN_OK)
+    if (fileObj.Open(file, LLBC_FileMode::BinaryRead) != LLBC_RTN_OK)
     {
         return "";
     }
 
-    fileSize = fileObj.GetSize();
+    fileSize = fileObj.GetFileSize();
     if (fileSize > 0)
     {
         fileContent = LLBC_Malloc(char, fileSize);
@@ -307,7 +307,6 @@ LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
     }
 
     fileObj.Close();
-
     LLBC_String result = MD5_Buffer(fileContent, fileSize);
 
     LLBC_XFree(fileContent);

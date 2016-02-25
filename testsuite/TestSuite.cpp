@@ -24,7 +24,6 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Com_Compiler;
 
     /* Core module testcases. */
-    // test = new TestCase_Core_OS_Directory;
     // test = new TestCase_Core_OS_Thread;
     // test = new TestCase_Core_OS_Console;
     // test = new TestCase_Core_Bundle;

@@ -11,8 +11,6 @@
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Atomic.h"
-#include "llbc/core/os/OS_File.h"
-#include "llbc/core/os/OS_Directory.h"
 #include "llbc/core/os/OS_Library.h"
 #include "llbc/core/os/OS_Thread.h"
 #include "llbc/core/os/OS_Console.h"
