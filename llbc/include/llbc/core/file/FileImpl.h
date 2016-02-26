@@ -5,7 +5,7 @@
  *
  * @brief
  */
-#ifdef __LLBC_CORE_FILE_File_H__
+#ifdef __LLBC_CORE_FILE_FILE_H__
 
 __LLBC_NS_BEGIN
 
@@ -318,4 +318,4 @@ inline int LLBC_File::WriteRawObj(const T &obj)
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_FILE_File_H__
+#endif // __LLBC_CORE_FILE_FILE_H__

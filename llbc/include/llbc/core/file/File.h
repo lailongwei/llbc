@@ -6,8 +6,8 @@
  *
  * @brief
  */
-#ifndef __LLBC_CORE_FILE_File_H__
-#define __LLBC_CORE_FILE_File_H__
+#ifndef __LLBC_CORE_FILE_FILE_H__
+#define __LLBC_CORE_FILE_FILE_H__
 
 #include "llbc/common/Common.h"
 
@@ -433,4 +433,4 @@ __LLBC_NS_END
 
 #include "llbc/core/file/FileImpl.h"
 
-#endif // !__LLBC_CORE_FILE_File_H__
+#endif // !__LLBC_CORE_FILE_FILE_H__
