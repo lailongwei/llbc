@@ -19,7 +19,7 @@ NOW = datetime.fromtimestamp(time())
 TARBALL = op.join(op.dirname(PROJ_DIR), 'llbc_{}{}{}_{:02d}{:02d}{:02d}.tar.bz2'.format(
     NOW.year, NOW.month, NOW.day, NOW.hour, NOW.minute, NOW.second))
 TAR_GIT = True if (len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].lower() == 'true')) else False
-FILTEROUT_SUFFIXES = ('.obj', '.pyc', '.sdf', '.suo', '.user', '.ncb', '.cache', '.o', '.d')
+FILTEROUT_SUFFIXES = ('.obj', '.pyc', '.sdf', '.opensdf', '.suo', '.user', '.ncb', '.cache', '.o', '.d')
 OS_NAME = platform.uname()[0].lower()
 
 
