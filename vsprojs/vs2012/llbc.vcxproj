@@ -188,15 +188,10 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(TargetDir)wrap\python" &gt;nul 2&gt;&amp;1
-cp "$(TargetPath)" "$(TargetDir)wrap\python"
-cp "$(TargetDir)$(TargetName).lib" "$(TargetDir)wrap\python"
-cp "$(TargetDir)$(TargetName).pdb" "$(TargetDir)wrap\python"
-md "$(TargetDir)wrap\csharp" &gt;nul 2&gt;&amp;1
-cp "$(TargetPath)" "$(TargetDir)wrap\csharp"
-cp "$(TargetDir)$(TargetName).lib" "$(TargetDir)wrap\csharp"
-cp "$(TargetDir)$(TargetName).pdb" "$(TargetDir)wrapcsharp"</Command>
-      <Message>copy llbc core library to wraps directory</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <BuildLog>
       <Path>$(IntDir)$(MSBuildProjectName).log</Path>
