@@ -3,6 +3,7 @@
 *.ncb
 *.suo
 *.sdf
+*.opensdf
 
 Debug/
 Release/
