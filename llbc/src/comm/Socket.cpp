@@ -108,13 +108,13 @@ int LLBC_Socket::Close()
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
-    else if (LLBC_CloseSocket(_handle) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    else if (LLBC_CloseSocket(_handle) != LLBC_OK)
+        return LLBC_FAILED;
 
     _handle = LLBC_INVALID_SOCKET_HANDLE;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Socket::IsClosed() const
@@ -159,15 +159,15 @@ int LLBC_Socket::SetNonBlocking()
     if (_nonBlocking)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
-    else if (LLBC_SetNonBlocking(_handle) != LLBC_RTN_OK)
+    else if (LLBC_SetNonBlocking(_handle) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _nonBlocking = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -198,20 +198,20 @@ int LLBC_Socket::BindTo(const char *ip, uint16 port)
 
 int LLBC_Socket::BindTo(const LLBC_SockAddr_IN &addr)
 {
-    if (LLBC_BindToAddress(_handle, addr) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (LLBC_BindToAddress(_handle, addr) != LLBC_OK)
+        return LLBC_FAILED;
 
     _localAddr = addr;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Socket::Listen(int backlog)
 {
-    if (LLBC_ListenForConnection(_handle, backlog) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (LLBC_ListenForConnection(_handle, backlog) != LLBC_OK)
+        return LLBC_FAILED;
 
     _listenSocket = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Socket::IsListen() const
@@ -250,14 +250,14 @@ int LLBC_Socket::AcceptEx(LLBC_SocketHandle listenSock,
 
 int LLBC_Socket::Connect(const LLBC_SockAddr_IN &addr)
 {
-    if (LLBC_ConnectToPeer(_handle, addr) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (LLBC_ConnectToPeer(_handle, addr) != LLBC_OK)
+        return LLBC_FAILED;
 
-    if (this->UpdateLocalAddress() != LLBC_RTN_OK ||
-            this->UpdatePeerAddress() != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->UpdateLocalAddress() != LLBC_OK ||
+            this->UpdatePeerAddress() != LLBC_OK)
+        return LLBC_FAILED;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -294,12 +294,12 @@ int LLBC_Socket::AsyncSend(const char *buf, int len)
 
 int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
 {
-    if (_willSend.Append(block) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (_willSend.Append(block) != LLBC_OK)
+        return LLBC_FAILED;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType != _PollerType::IocpPoller)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     LLBC_MessageBlock *mergedBlock = _willSend.MergeBuffersAndDetach();
 
@@ -315,7 +315,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     int ret = 0;
     ulong flags = 0;
     ulong bytesSent = 0;
-    if ((ret = LLBC_SendEx(_handle, &buf, 1, &bytesSent, flags, ol)) != LLBC_RTN_OK)
+    if ((ret = LLBC_SendEx(_handle, &buf, 1, &bytesSent, flags, ol)) != LLBC_OK)
     {
         if (LLBC_GetLastError() == LLBC_ERROR_NETAPI && LLBC_GetSubErrorNo() == WSAENOBUFS)
         {
@@ -330,16 +330,16 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     }
 
     _olGroup.InsertOverlapped(ol);
-    if (ret != LLBC_RTN_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
+    if (ret != LLBC_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
     {
         // If SendEx failed, do not need to delete to ol.buf, AsyncSend()'s caller will delete.
         LLBC_Delete(ol);
         _olGroup.RemoveOverlapped(ol);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Socket::IsExistNoSendData() const
@@ -467,7 +467,7 @@ void LLBC_Socket::OnSend()
     ulong flags = 0;
     ulong bytesSent = 0;
     int ret = LLBC_SendEx(_handle, &buf, 1, &bytesSent, flags, ol);
-    if (ret != LLBC_RTN_OK)
+    if (ret != LLBC_OK)
     {
         // Would block, post Zero-WSASend overlapped.
         if (LLBC_GetLastError() == LLBC_ERROR_NETAPI &&
@@ -483,7 +483,7 @@ void LLBC_Socket::OnSend()
         }
     }
 
-    if (ret != LLBC_RTN_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
+    if (ret != LLBC_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
     {
         trace("LLBC_Socket::OnSend() call LLBC_SendEx() failed, reason: %s\n", LLBC_FormatLastError());
         LLBC_Delete(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
@@ -556,7 +556,7 @@ void LLBC_Socket::OnRecv()
     // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == _PollerType::IocpPoller)
-        if (this->PostZeroWSARecv() != LLBC_RTN_OK)
+        if (this->PostZeroWSARecv() != LLBC_OK)
             _session->OnClose();
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
@@ -620,18 +620,18 @@ int LLBC_Socket::PostZeroWSARecv()
                                 &bytesRecv,
                                 &flags,
                                 ol);
-    if (ret != LLBC_RTN_OK && 
+    if (ret != LLBC_OK && 
         LLBC_GetLastError() != LLBC_ERROR_PENDING)
     {
         trace("LLBC_Socket::PostWSARecv() call LLBC_RecvEx() failed, "
             "reason: %s\n", LLBC_FormatLastError());
 
         LLBC_Delete(ol);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _olGroup.InsertOverlapped(ol);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Socket::PostAsyncAccept()
@@ -645,7 +645,7 @@ int LLBC_Socket::PostAsyncAccept()
                     LLBC_INVALID_SOCKET_HANDLE))
     {
         LLBC_Delete(ol);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const int ret = LLBC_AcceptClientEx(ol->sock,
@@ -655,17 +655,17 @@ int LLBC_Socket::PostAsyncAccept()
                                         sizeof(LLBC_SockAddr_IN) + 16,
                                         sizeof(LLBC_SockAddr_IN) + 16,
                                         ol);
-    if (UNLIKELY(ret != LLBC_RTN_OK &&
+    if (UNLIKELY(ret != LLBC_OK &&
         LLBC_GetLastError() != LLBC_ERROR_PENDING))
     {
         LLBC_CloseSocket(ol->acceptSock);
         LLBC_Delete(ol);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     this->InsertOverlapped(ol);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #endif // LLBC_TARGET_PLATFORM_WIN32

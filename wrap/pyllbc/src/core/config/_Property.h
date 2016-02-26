@@ -19,7 +19,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_New(PyObject *self, PyObject *args)
     if (LLBC_StrLenA(file) == 0)
         return Py_BuildValue("l", prop);
 
-    if (prop->LoadFromFile(file) != LLBC_RTN_OK)
+    if (prop->LoadFromFile(file) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, prop->GetLoadErrorDesc());
         LLBC_Delete(prop);
@@ -48,7 +48,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_FromContent(PyObject *self, PyObject *a
     if (!PyArg_ParseTuple(args, "ls", &prop, &content))
         return NULL;
 
-    if (prop->LoadFromContent(content) != LLBC_RTN_OK)
+    if (prop->LoadFromContent(content) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, prop->GetLoadErrorDesc());
         return NULL;
@@ -64,7 +64,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_FromFile(PyObject *self, PyObject *args
     if (!PyArg_ParseTuple(args, "ls", &prop, &file))
         return NULL;
 
-    if (prop->LoadFromFile(file) != LLBC_RTN_OK)
+    if (prop->LoadFromFile(file) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, prop->GetLoadErrorDesc());
         return NULL;
@@ -80,7 +80,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_ToContent(PyObject *self, PyObject *arg
         return NULL;
 
     LLBC_String content;
-    if (prop->SaveToContent(content) != LLBC_RTN_OK)
+    if (prop->SaveToContent(content) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;
@@ -96,7 +96,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_ToFile(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ls", &prop, &file))
         return NULL;
 
-    if (prop->SaveToFile(file) != LLBC_RTN_OK)
+    if (prop->SaveToFile(file) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;
@@ -137,7 +137,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
     pyllbc_ObjAttrOptr attrOptr(pySubProp);
 
     long oldSubProp = 0;
-    if (attrOptr.GetAttr("_c_obj", oldSubProp) != LLBC_RTN_OK)
+    if (attrOptr.GetAttr("_c_obj", oldSubProp) != LLBC_OK)
     {
         Py_DECREF(pySubProp);
         return NULL;
@@ -145,7 +145,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
 
     // Set new sub property.
     LLBC_Property *copySubProp = LLBC_New1(LLBC_Property, *subProp);
-    if (attrOptr.SetAttr("_c_obj", reinterpret_cast<long>(copySubProp)) != LLBC_RTN_OK)
+    if (attrOptr.SetAttr("_c_obj", reinterpret_cast<long>(copySubProp)) != LLBC_OK)
     {
         Py_DECREF(pySubProp);
         LLBC_Delete(copySubProp);
@@ -215,7 +215,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetValue(PyObject *self, PyObject *args
     const LLBC_Variant value = prop->GetValue(name);
 
 	const int lastErrNo = LLBC_GetLastError();
-    if (lastErrNo != LLBC_RTN_OK)
+    if (lastErrNo != LLBC_OK)
     {
 		if (lastErrNo != LLBC_ERROR_NOT_FOUND)
 		{
@@ -261,7 +261,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_SetValue(PyObject *self, PyObject *args
             return NULL;
     }
 
-    if (prop->SetValue(name, valueStr, commentsStr) != LLBC_RTN_OK)
+    if (prop->SetValue(name, valueStr, commentsStr) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When set property value");
         return NULL;
@@ -290,7 +290,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_SetComments(PyObject *self, PyObject *a
     if (!PyArg_ParseTuple(args, "lss", &prop, &name, &comments))
         return NULL;
 
-    if (prop->SetComments(name, comments) != LLBC_RTN_OK)
+    if (prop->SetComments(name, comments) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;
@@ -334,7 +334,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_RemoveProperty(PyObject *self, PyObject
         cRemoveAll = !!checkRet;
     }
 
-    if (prop->RemoveProperty(name, cRemoveAll) != LLBC_RTN_OK)
+    if (prop->RemoveProperty(name, cRemoveAll) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When remove property");
         return NULL;

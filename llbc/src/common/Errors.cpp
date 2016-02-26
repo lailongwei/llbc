@@ -293,12 +293,12 @@ int LLBC_AddCustomErrno(int no, const char *desc)
     if (LLBC_GetErrnoCustomPart(no) != LLBC_ERROR_CUSTOM)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!desc)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     __LLBC_LockCustomErr();
@@ -307,7 +307,7 @@ int LLBC_AddCustomErrno(int no, const char *desc)
         __LLBC_UnlockCustomErr();
         LLBC_SetLastError(LLBC_ERROR_EXIST);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Append custom error describe to dict.
@@ -315,7 +315,7 @@ int LLBC_AddCustomErrno(int no, const char *desc)
 
     __LLBC_UnlockCustomErr();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_RemoveCustomErrno(int no)
@@ -323,7 +323,7 @@ int LLBC_RemoveCustomErrno(int no)
     if (LLBC_GetErrnoCustomPart(no) != LLBC_ERROR_CUSTOM)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     __LLBC_LockCustomErr();
@@ -340,10 +340,10 @@ int LLBC_RemoveCustomErrno(int no)
     if (!found)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_RemoveAllCustomErrnos()
@@ -352,7 +352,7 @@ int LLBC_RemoveAllCustomErrnos()
     __g_customErrDesc.clear();
     __LLBC_UnlockCustomErr();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void __LLBC_InitErrors()

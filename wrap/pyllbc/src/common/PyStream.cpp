@@ -54,12 +54,12 @@ int pyllbc_Stream::SetEndian(int endian)
     if (!LLBC_Endian::IsValid(endian))
     {
         pyllbc_SetError("Invalid endian value", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.SetEndian(endian);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 size_t pyllbc_Stream::GetPos() const
@@ -72,12 +72,12 @@ int pyllbc_Stream::SetPos(size_t pos)
     if (pos > _stream.GetSize())
     {
         pyllbc_SetError("pos too large", LLBC_ERROR_LIMIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.SetPos(pos);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 size_t pyllbc_Stream::GetSize() const
@@ -90,12 +90,12 @@ int pyllbc_Stream::SetSize(size_t size)
     if (size <= _stream.GetSize())
     {
          pyllbc_SetError("stream new size must greater than old size", LLBC_ERROR_LIMIT);
-         return LLBC_RTN_FAILED;
+         return LLBC_FAILED;
     }
 
     _stream.Resize(size);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_Stream &pyllbc_Stream::GetLLBCStream()
@@ -132,7 +132,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
         if (PyString_AsStringAndSize(raw, &buf, &len) != 0)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
     else if (type == PYLLBC_BYTEARRAY_OBJ)
@@ -146,7 +146,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
         if (PyObject_AsReadBuffer(raw, &cbuf, &len) != 0)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         buf = reinterpret_cast<char *>(const_cast<void *>(cbuf));
@@ -154,13 +154,13 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
     else
     {
         pyllbc_SetError("raw type must str/bytearray/buffer type", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.SetPos(0);
     _stream.WriteBuffer(buf, len);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 PyObject *pyllbc_Stream::Read(PyObject *cls)
@@ -519,7 +519,7 @@ int pyllbc_Stream::Write(PyObject *obj)
 
 int pyllbc_Stream::WriteNone(PyObject *val)
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteByte(PyObject *val)
@@ -531,18 +531,18 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         if (PyString_AsStringAndSize(val, &str, &strLen) == -1)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         
         if (strLen < 1)
         {
             pyllbc_SetError("could not write byte, len(str) < 1", LLBC_ERROR_LIMIT);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _stream.WriteBuffer(str, 1);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (pyllbc_TypeDetector::IsByteArray(val))
     {
@@ -551,18 +551,18 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         if (PyObject_AsReadBuffer(val, &buf, &bufLen) != 0)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         if (bufLen < 1)
         {
             pyllbc_SetError("could not write byte, len(bytearray) < 1", LLBC_ERROR_LIMIT);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _stream.WriteBuffer(buf, 1);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (pyllbc_TypeDetector::IsBuffer(val))
     {
@@ -570,7 +570,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         if (PyObject_GetBuffer(val, &buffer, PyBUF_SIMPLE) != 0)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         if (buffer.len < 1)
@@ -578,20 +578,20 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             pyllbc_SetError("cound not write byte, len(buffer) < 1", LLBC_ERROR_LIMIT);
             PyBuffer_Release(&buffer);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _stream.WriteBuffer(buffer.buf, 1);
         PyBuffer_Release(&buffer);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (pyllbc_TypeDetector::IsBool(val))
     {
         const bool boolVal = !!PyObject_IsTrue(val);
         _stream.WriteBool(boolVal);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (pyllbc_TypeDetector::IsInt(val) ||
         pyllbc_TypeDetector::IsLong(val))
@@ -599,11 +599,11 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         const long longVal = PyLong_AsLong(val);
         _stream.WriteBuffer(&longVal, 1);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     pyllbc_SetError("not support write byte type object(must str/bytearray/buffer/bool/int/long)", LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 int pyllbc_Stream::WriteBool(PyObject *val)
@@ -611,7 +611,7 @@ int pyllbc_Stream::WriteBool(PyObject *val)
     bool bVal = !!PyObject_IsTrue(val);
     _stream.Write(bVal);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteInt16(PyObject *val)
@@ -620,12 +620,12 @@ int pyllbc_Stream::WriteInt16(PyObject *val)
     if (lVal == -1 && PyErr_Occurred())
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(static_cast<sint16>(lVal));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteInt32(PyObject *val)
@@ -634,12 +634,12 @@ int pyllbc_Stream::WriteInt32(PyObject *val)
     if (lVal == -1 && PyErr_Occurred())
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(static_cast<sint32>(lVal));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteInt64(PyObject *val)
@@ -648,12 +648,12 @@ int pyllbc_Stream::WriteInt64(PyObject *val)
     if (!PyArg_Parse(val, "L", &s64Val))
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(s64Val);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteFloat(PyObject *val)
@@ -662,12 +662,12 @@ int pyllbc_Stream::WriteFloat(PyObject *val)
     if (!PyArg_Parse(val, "d", &dbVal))
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(static_cast<float>(dbVal));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteDouble(PyObject *val)
@@ -676,12 +676,12 @@ int pyllbc_Stream::WriteDouble(PyObject *val)
     if (!PyArg_Parse(val, "d", &dbVal))
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(dbVal);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WritePyInt(PyObject *val)
@@ -701,12 +701,12 @@ int pyllbc_Stream::WriteStr(PyObject *val)
     if (PyString_AsStringAndSize(val, &str, &len) == -1)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(LLBC_String(str, len));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteStr2(PyObject *val)
@@ -716,13 +716,13 @@ int pyllbc_Stream::WriteStr2(PyObject *val)
     if (PyString_AsStringAndSize(val, &str, &len) == -1)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(static_cast<int>(len));
     _stream.WriteBuffer(str, len);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteUnicode(PyObject *val)
@@ -731,7 +731,7 @@ int pyllbc_Stream::WriteUnicode(PyObject *val)
     if (!str)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const int rtn = this->WriteStr(str);
@@ -749,7 +749,7 @@ int pyllbc_Stream::WriteByteArray(PyObject *val)
     if (len > 0)
         _stream.WriteBuffer(buf, len);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteBuffer(PyObject *val)
@@ -759,14 +759,14 @@ int pyllbc_Stream::WriteBuffer(PyObject *val)
     if (PyObject_AsReadBuffer(val, &buf, &len) != 0)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _stream.Write(static_cast<sint32>(len));
     if (len > 0)
         _stream.WriteBuffer(buf, len);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteTuple(PyObject *val)
@@ -788,16 +788,16 @@ int pyllbc_Stream::WriteSequence(PyObject *val)
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *elem = PySequence_ITEM(val, i);
-        if (this->Write(elem) != LLBC_RTN_OK)
+        if (this->Write(elem) != LLBC_OK)
         {
             Py_DECREF(elem);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         Py_DECREF(elem);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteDict(PyObject *val)
@@ -810,14 +810,14 @@ int pyllbc_Stream::WriteDict(PyObject *val)
     PyObject *key, *dictVal;
     while (PyDict_Next(val, &pos, &key, &dictVal))
     {
-        if (this->WriteStr(key) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (this->WriteStr(key) != LLBC_OK)
+            return LLBC_FAILED;
 
-        if (this->Write(dictVal) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (this->Write(dictVal) != LLBC_OK)
+            return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Stream::WriteInst(PyObject *val)
@@ -829,12 +829,12 @@ int pyllbc_Stream::WriteInst(PyObject *val)
         if (!rtn)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         Py_DECREF(rtn);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     // 2) Use __dict__.
@@ -852,7 +852,7 @@ int pyllbc_Stream::WriteInst(PyObject *val)
     if (!slots)
     {
         pyllbc_SetError("could not write object", PYLLBC_ERROR_COMMON);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::vector<std::pair<PyObject *, PyObject *> > kws;
@@ -868,13 +868,13 @@ int pyllbc_Stream::WriteInst(PyObject *val)
             Py_DECREF(slotItem);
     }
 
-    int rtn = LLBC_RTN_OK;
+    int rtn = LLBC_OK;
     _stream.Write(static_cast<sint32>(kws.size()));
     for (size_t i = 0; i < kws.size(); i++)
     {
-        if ((rtn = this->Write(kws[i].first)) != LLBC_RTN_OK)
+        if ((rtn = this->Write(kws[i].first)) != LLBC_OK)
             break;
-        if ((rtn = this->Write(kws[i].second)) != LLBC_RTN_OK)
+        if ((rtn = this->Write(kws[i].second)) != LLBC_OK)
             break;
     }
 
@@ -894,7 +894,7 @@ int pyllbc_Stream::FmtWrite(const LLBC_String &fmt, PyObject *values, PyObject *
     pyllbc_PackLemma *lemma =
         pyllbc_s_PackLemmaCompiler->Compile(fmt, false, callerEnv);
     if (!lemma)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     return lemma->Write(this, values);
 }

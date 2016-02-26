@@ -276,7 +276,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
     if (!handle || !proc)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((flags & LLBC_ThreadFlag::Joinable) != LLBC_ThreadFlag::Joinable &&
@@ -315,7 +315,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
 
         errno = ret;
         pthread_attr_destroy(&attr);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pthread_attr_destroy(&attr);
@@ -331,13 +331,13 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
         delete threadArg;
 
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #endif
 
-    if (LLBC_SetThreadPriority(*handle, priority) != LLBC_RTN_OK)
+    if (LLBC_SetThreadPriority(*handle, priority) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((flags | LLBC_ThreadFlag::Detached) == LLBC_ThreadFlag::Detached)
@@ -349,7 +349,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
         *handle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_NativeThreadHandle LLBC_GetCurrentThread()
@@ -366,7 +366,7 @@ int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -379,7 +379,7 @@ int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     priorityMin = sched_get_priority_min(policy);
@@ -398,7 +398,7 @@ int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle)
     if (nativeRtn == THREAD_PRIORITY_ERROR_RETURN)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return LLBC_INTERNAL_NS __WinPriority2LLBCPriority(nativeRtn);
@@ -411,7 +411,7 @@ int LLBC_SetThreadPriority(LLBC_NativeThreadHandle handle, int priority)
         (priority < LLBC_ThreadPriority::Begin || priority >= LLBC_ThreadPriority::End))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -424,7 +424,7 @@ int LLBC_SetThreadPriority(LLBC_NativeThreadHandle handle, int priority)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     priorityMin = sched_get_priority_min(policy);
@@ -448,19 +448,19 @@ int LLBC_SetThreadPriority(LLBC_NativeThreadHandle handle, int priority)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     BOOL ret = ::SetThreadPriority(handle, LLBC_INTERNAL_NS __LLBCPriority2WinPriority(priority));
     if (ret == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -469,20 +469,20 @@ int LLBC_SuspendThread(LLBC_NativeThreadHandle handle)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else
     if (::SuspendThread(handle) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -491,20 +491,20 @@ int LLBC_ResumeThread(LLBC_NativeThreadHandle handle)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else
     if (::ResumeThread(handle) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -513,7 +513,7 @@ int LLBC_JoinThread(LLBC_NativeThreadHandle handle)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -522,18 +522,18 @@ int LLBC_JoinThread(LLBC_NativeThreadHandle handle)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if (::WaitForSingleObject(handle, INFINITE) != WAIT_OBJECT_0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -542,7 +542,7 @@ int LLBC_CancelThread(LLBC_NativeThreadHandle handle)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -551,18 +551,18 @@ int LLBC_CancelThread(LLBC_NativeThreadHandle handle)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if (::TerminateThread(handle, 0) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -571,7 +571,7 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo)
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -580,18 +580,18 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if (raise(signo) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -638,7 +638,7 @@ int LLBC_TlsAlloc(LLBC_TlsHandle *handle)
     if (!handle)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -647,18 +647,18 @@ int LLBC_TlsAlloc(LLBC_TlsHandle *handle)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if ((*handle = ::TlsAlloc()) == TLS_OUT_OF_INDEXES)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -667,7 +667,7 @@ int LLBC_TlsFree(LLBC_TlsHandle handle)
     if (handle == LLBC_INVALID_TLS_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -676,18 +676,18 @@ int LLBC_TlsFree(LLBC_TlsHandle handle)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if (::TlsFree(handle) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -720,7 +720,7 @@ int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value)
     if (handle == LLBC_INVALID_TLS_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32 
@@ -729,18 +729,18 @@ int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     if (::TlsSetValue(handle, value) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 

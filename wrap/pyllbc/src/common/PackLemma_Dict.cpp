@@ -53,7 +53,7 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
     if (_state == Base::Done && _state == Base::Error)
     {
         pyllbc_SetError("dict-lemma state is done or error, could not continuing to parse format string");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_state == Base::Begin)
@@ -63,13 +63,13 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
             _state = Base::Error;
             pyllbc_SetError("dict-lemma expect dict begin character'{', got %c", ch);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _state = Base::Accepting;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     // Key-Word separator & dict close character('}') logic.
@@ -80,20 +80,20 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
             _state = Base::Error;
             pyllbc_SetError("dict-lemma expect key lemma, got key-word separator");
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         else if (_valueLemma)
         {
             _state = Base::Error;
             pyllbc_SetError("dict-lemma expect dict close character '}', got key-word separator");
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _gotKwSep = true;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (ch == Base::DictEnd)
     {
@@ -102,13 +102,13 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
             _state = Base::Error;
             pyllbc_SetError("dict-lemma not done, but got dict close character '}'");
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _state = Base::Done;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     const SymbolGroup &raw = GroupedSymbol::Raw();
@@ -117,25 +117,25 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
         _state = Base::Error;
         pyllbc_SetError("dict-lemma could direct process non-raw type format character: %c", ch);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
-    if (lemma->Process(ch) != LLBC_RTN_OK)
+    if (lemma->Process(ch) != LLBC_OK)
     {
         delete lemma;
         _state = Base::Error;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (this->Process(lemma) != LLBC_RTN_OK)
+    if (this->Process(lemma) != LLBC_OK)
     {
         delete lemma;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemma_Dict::Process(Base *lemma)
@@ -146,21 +146,21 @@ int pyllbc_PackLemma_Dict::Process(Base *lemma)
         _state = Base::Error;
         pyllbc_SetError("dict-lemma could not accept UnSerializable lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // State check.
     if (_state == Base::Done || _state == Base::Error)
     {
         pyllbc_SetError("dict-lemma state is done or error, could not continuing to parse format string");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_state == Base::Begin)
     {
         _state = Base::Error;
         pyllbc_SetError("dict-lemma expect dict begin character: '{', got lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Key, Value logic check.
@@ -169,20 +169,20 @@ int pyllbc_PackLemma_Dict::Process(Base *lemma)
         _state = Base::Error;
         pyllbc_SetError("dict-lemma expect dict close character'}', but got lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_keyLemma && !_gotKwSep)
     {
         _state = Base::Error;
         pyllbc_SetError("dict-lemma expect dict key-word separator':', but got lemma");
         
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     (!_keyLemma ? _keyLemma : _valueLemma) = lemma;
     _str.append(lemma->ToString());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
@@ -249,13 +249,13 @@ int pyllbc_PackLemma_Dict::Write(pyllbc_Stream *stream, PyObject *values)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("could not pack not done dict-lemma");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!PyDict_Check(values))
     {
         pyllbc_SetError("dict-lemma could not pack non-dict type object");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const Py_ssize_t len = PyDict_Size(values);
@@ -271,11 +271,11 @@ int pyllbc_PackLemma_Dict::Write(pyllbc_Stream *stream, PyObject *values)
     PyObject *key, *value;
     while (PyDict_Next(values, &pos, &key, &value))
     {
-        if (_keyLemma->Write(stream, key) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
-        if (_valueLemma->Write(stream, value) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (_keyLemma->Write(stream, key) != LLBC_OK)
+            return LLBC_FAILED;
+        if (_valueLemma->Write(stream, value) != LLBC_OK)
+            return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

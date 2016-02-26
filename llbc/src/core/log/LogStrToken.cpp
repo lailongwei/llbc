@@ -29,7 +29,7 @@ int LLBC_LogStrToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_S
     LLBC_XDelete(formatter);
     _str = str;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogStrToken::GetType() const

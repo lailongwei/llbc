@@ -16,27 +16,27 @@ int TestCase_Core_File_Directory::Run(int argc, char *argv[])
     bool allTested = false;
     do
     {
-        if (CurDirTest() != LLBC_RTN_OK)
+        if (CurDirTest() != LLBC_OK)
             break;
-        if (ExistsTest() != LLBC_RTN_OK)
+        if (ExistsTest() != LLBC_OK)
             break;
-        if (CreateRemoveTest() != LLBC_RTN_OK)
+        if (CreateRemoveTest() != LLBC_OK)
             break;
-        if (AbsPathTest() != LLBC_RTN_OK)
+        if (AbsPathTest() != LLBC_OK)
             break;
-        if (JoinTest() != LLBC_RTN_OK)
+        if (JoinTest() != LLBC_OK)
             break;
-        if (SplitExtTest() != LLBC_RTN_OK)
+        if (SplitExtTest() != LLBC_OK)
             break;
-        if (GetFilesTest() != LLBC_RTN_OK)
+        if (GetFilesTest() != LLBC_OK)
             break;
-        if (GetDirectoriesTest() != LLBC_RTN_OK)
+        if (GetDirectoriesTest() != LLBC_OK)
             break;
-        if (ModuleFileTest() != LLBC_RTN_OK)
+        if (ModuleFileTest() != LLBC_OK)
             break;
-        if (DirNameBaseNameTest() != LLBC_RTN_OK)
+        if (DirNameBaseNameTest() != LLBC_OK)
             break;
-        if (MiscTest() != LLBC_RTN_OK)
+        if (MiscTest() != LLBC_OK)
             break;
 
         allTested = true;
@@ -45,7 +45,7 @@ int TestCase_Core_File_Directory::Run(int argc, char *argv[])
     std::cout <<"All test done, press any key to exit..." <<std::endl;
     getchar();
 
-    return allTested ? LLBC_RTN_OK : LLBC_RTN_FAILED;
+    return allTested ? LLBC_OK : LLBC_FAILED;
 }
 
 int TestCase_Core_File_Directory::CurDirTest()
@@ -62,10 +62,10 @@ int TestCase_Core_File_Directory::CurDirTest()
     LLBC_PrintLine("Current directory: %s", curDir.c_str());
     LLBC_PrintLine("Set current directory To <%s>: ", toPath.c_str());
 
-    if (LLBC_Directory::SetCurDir(toPath) != LLBC_RTN_OK)
+    if (LLBC_Directory::SetCurDir(toPath) != LLBC_OK)
     {
         LLBC_PrintLine("Set current directory to <%s> failed, error: %s", toPath.c_str(), LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("After set, current directory: %s", LLBC_Directory::CurDir().c_str());
@@ -73,7 +73,7 @@ int TestCase_Core_File_Directory::CurDirTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::ExistsTest()
@@ -91,56 +91,56 @@ int TestCase_Core_File_Directory::ExistsTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::CreateRemoveTest()
 {
     LLBC_PrintLine("Create/Remove test:");
     LLBC_PrintLine("Create directory: a");
-    if (LLBC_Directory::Create("a") != LLBC_RTN_OK)
+    if (LLBC_Directory::Create("a") != LLBC_OK)
     {
         LLBC_PrintLine("Create directory a failed, error: %s", LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (int i = 0; i < 10; i++)
     {
         const LLBC_String path = LLBC_String().format("a/b_%d", i);
     LLBC_PrintLine("Create directory: %s", path.c_str());
-        if (LLBC_Directory::Create(path) != LLBC_RTN_OK)
+        if (LLBC_Directory::Create(path) != LLBC_OK)
         {
             LLBC_PrintLine("Create directory %s failed, error: %s", path.c_str(), LLBC_FormatLastError());
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
     LLBC_PrintLine("Remove directory: a");
-    if (LLBC_Directory::Remove("a") != LLBC_RTN_OK)
+    if (LLBC_Directory::Remove("a") != LLBC_OK)
     {
         LLBC_PrintLine("Remove directory a failed, error: %s", LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Complex path create/remove test.
     const LLBC_String complexPath = "a/b/c__d/d/add";
     LLBC_PrintLine("Create directory: %s", complexPath.c_str());
-    if (LLBC_Directory::Create(complexPath) != LLBC_RTN_OK)
+    if (LLBC_Directory::Create(complexPath) != LLBC_OK)
     {
         LLBC_PrintLine("Create directory %s faiiled, error: %s", complexPath.c_str(), LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("Remove directory: %s", complexPath.c_str());
-    if (LLBC_Directory::Remove(complexPath) != LLBC_RTN_OK)
+    if (LLBC_Directory::Remove(complexPath) != LLBC_OK)
     {
         LLBC_PrintLine("Remove directory %s failed, error: %s", complexPath.c_str(), LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::AbsPathTest()
@@ -168,7 +168,7 @@ int TestCase_Core_File_Directory::AbsPathTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::JoinTest()
@@ -184,7 +184,7 @@ int TestCase_Core_File_Directory::JoinTest()
     parts.clear(), parts.push_back("c:\\"), parts.push_back("/b"), JoinTest(parts);
 #endif
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::SplitExtTest()
@@ -209,7 +209,7 @@ int TestCase_Core_File_Directory::SplitExtTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::GetFilesTest()
@@ -228,23 +228,23 @@ int TestCase_Core_File_Directory::GetFilesTest()
     LLBC_Directory::Create("a/b/zz");
 
     LLBC_PrintLine("Get files from directory a(recursive = false)");
-    if (GetFilesTest("a", false) != LLBC_RTN_OK)
+    if (GetFilesTest("a", false) != LLBC_OK)
     {
         LLBC_Directory::Remove("a");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("Get files from directory a(recursive = true)");
-    if (GetFilesTest("a", true) != LLBC_RTN_OK)
+    if (GetFilesTest("a", true) != LLBC_OK)
     {
         LLBC_Directory::Remove("a");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Directory::Remove("a");
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::GetDirectoriesTest()
@@ -263,24 +263,24 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
     LLBC_Directory::Create("a/b/zz");
 
     LLBC_PrintLine("Get directories from directory a(recursive = false)");
-    if (GetDirectoriesTest("a", false) != LLBC_RTN_OK)
+    if (GetDirectoriesTest("a", false) != LLBC_OK)
     {
         LLBC_Directory::Remove("a");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("Get directories from directory a(recursive = true)");
-    if (GetDirectoriesTest("a", true) != LLBC_RTN_OK)
+    if (GetDirectoriesTest("a", true) != LLBC_OK)
     {
         LLBC_Directory::Remove("a");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Directory::Remove("a");
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::ModuleFileTest()
@@ -291,7 +291,7 @@ int TestCase_Core_File_Directory::ModuleFileTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::DirNameBaseNameTest()
@@ -312,7 +312,7 @@ int TestCase_Core_File_Directory::DirNameBaseNameTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::MiscTest()
@@ -326,7 +326,7 @@ int TestCase_Core_File_Directory::MiscTest()
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
@@ -343,7 +343,7 @@ int TestCase_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
     const LLBC_String &joined = LLBC_Directory::Join(pathParts);
     LLBC_PrintLine("Done, Result: %s", joined.c_str());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool recursive)
@@ -351,10 +351,10 @@ int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool rec
     LLBC_PrintLine("Get files from directory: %s, recursive: %d", path.c_str(), recursive);
     
     LLBC_Strings files;
-    if (LLBC_Directory::GetFiles(path, files, recursive) != LLBC_RTN_OK)
+    if (LLBC_Directory::GetFiles(path, files, recursive) != LLBC_OK)
     {
         LLBC_PrintLine("Failed, error: %s", LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Print("Directory %s files(count: %ld): ", path.c_str(), files.size());
@@ -367,7 +367,7 @@ int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool rec
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bool recursive)
@@ -375,10 +375,10 @@ int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bo
     LLBC_PrintLine("Get directories from directory: %s, recursive: %d", path.c_str(), recursive);
     
     LLBC_Strings directories;
-    if (LLBC_Directory::GetDirectories(path, directories, recursive) != LLBC_RTN_OK)
+    if (LLBC_Directory::GetDirectories(path, directories, recursive) != LLBC_OK)
     {
         LLBC_PrintLine("Failed, error: %s", LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Print("Directory %s subdirectories(count: %ld): ", path.c_str(), directories.size());
@@ -391,5 +391,5 @@ int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bo
 
     LLBC_PrintLine("");
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

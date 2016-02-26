@@ -27,7 +27,7 @@ int LLBC_LogNullToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_
 {
     LLBC_XDelete(formatter);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogNullToken::GetType() const

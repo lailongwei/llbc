@@ -16,7 +16,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
         return NULL;
 
     LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
-    if (loggerMgr->Initialize(cfgFile) != LLBC_RTN_OK)
+    if (loggerMgr->Initialize(cfgFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;
@@ -81,7 +81,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    if (UNLIKELY(rtn != LLBC_RTN_OK))
+    if (UNLIKELY(rtn != LLBC_OK))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;

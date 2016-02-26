@@ -50,7 +50,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     if (_head)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     char ch = '\0';
@@ -169,7 +169,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             this->Cleanup();
 
             LLBC_SetLastError(LLBC_ERROR_FORMAT);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
 
             break;
         }
@@ -182,7 +182,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
         this->AppendToken(token);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_LogTokenChain::Format(const LLBC_LogData &data, LLBC_String &formattedData) const

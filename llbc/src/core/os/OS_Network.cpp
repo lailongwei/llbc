@@ -25,10 +25,10 @@ int LLBC_GetAddrInfo(const char *nodename,
         LLBC_SetLastError(LLBC_ERROR_GAI);
         LLBC_SetSubErrorNo(ret);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_FreeAddrInfo(struct addrinfo *ai)

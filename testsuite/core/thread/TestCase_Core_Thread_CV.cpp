@@ -40,7 +40,7 @@ static int WaiterThreadProc(void *arg)
         }
         else
         {
-            if(__g_testData.cv.TimedWait(__g_testData.lock, 510) != LLBC_RTN_OK)
+            if(__g_testData.cv.TimedWait(__g_testData.lock, 510) != LLBC_OK)
             {
                 if(LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
                 {

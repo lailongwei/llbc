@@ -115,5 +115,5 @@ int TestCase_Comm_Event::Run(int argc, char *argv[])
 
     delete svc;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

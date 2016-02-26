@@ -25,41 +25,41 @@ int LLBC_Startup()
     if(LLBC_INTERNAL_NS __llbc_inited)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if(__LLBC_CommonStartup() != LLBC_RTN_OK)
+    if(__LLBC_CommonStartup() != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if(__LLBC_CoreStartup() != LLBC_RTN_OK)
+    if(__LLBC_CoreStartup() != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if(__LLBC_CommStartup() != LLBC_RTN_OK)
+    if(__LLBC_CommStartup() != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_INTERNAL_NS __llbc_inited = true;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Cleanup()
 {
     if(!LLBC_INTERNAL_NS __llbc_inited)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if(!tls->coreTls.entryThread)
     {
         LLBC_SetLastError(LLBC_ERROR_ACCESS_DENY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     __LLBC_CommCleanup();
@@ -70,7 +70,7 @@ int LLBC_Cleanup()
 
     LLBC_INTERNAL_NS __llbc_inited = false;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

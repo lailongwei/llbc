@@ -41,7 +41,7 @@ int TestCase_Core_Thread_ThreadMgr::Run(int argc, char *argv[])
     {
         LLBC_ThreadManager::Sleep(1000);
         LLBC_PrintLine("Create successed, group handle: %d, join it.", groupHandle);
-        if(LLBC_ThreadManagerSingleton->WaitGroup(groupHandle) != LLBC_RTN_OK)
+        if(LLBC_ThreadManagerSingleton->WaitGroup(groupHandle) != LLBC_OK)
         {
             LLBC_PrintLine("Wait group failed, reason: %s", LLBC_FormatLastError());
         }

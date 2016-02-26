@@ -18,8 +18,8 @@ __LLBC_NS_BEGIN
 /**
  * Common return values define.
  */
-#define LLBC_RTN_OK     (0)
-#define LLBC_RTN_FAILED (-1)
+#define LLBC_OK     (0)
+#define LLBC_FAILED (-1)
 
 /**
  * carriage return / line feed.

@@ -50,16 +50,16 @@ int LLBC_ServiceMgr::RemoveService(int id)
     LLBC_IService *svc = this->GetService(id);
     if (!svc)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (This::InTls(svc))
     {
         LLBC_SetLastError(LLBC_ERROR_PERM);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Delete(svc);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ServiceMgr::Wait()
@@ -68,7 +68,7 @@ int LLBC_ServiceMgr::Wait()
     if (This::InTls(_services))
     {
         LLBC_SetLastError(LLBC_ERROR_PERM);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Services svcs = _services;
@@ -90,7 +90,7 @@ int LLBC_ServiceMgr::Wait()
         it->second->Wait();
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ServiceMgr::Stop()
@@ -99,7 +99,7 @@ int LLBC_ServiceMgr::Stop()
     if (This::InTls(_services))
     {
         LLBC_SetLastError(LLBC_ERROR_PERM);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Services svcs = _services;
@@ -120,7 +120,7 @@ int LLBC_ServiceMgr::Stop()
         it->second->Stop();
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_ServiceMgr::InTls(const LLBC_IService *svc)

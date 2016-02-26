@@ -60,13 +60,13 @@ int LLBC_BaseTimer::Schedule(uint64 dueTime, uint64 period)
     if (_scheduling)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (UNLIKELY(!_scheduler || _scheduler->IsDstroyed()))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _dueTime = dueTime;
@@ -80,13 +80,13 @@ int LLBC_BaseTimer::Cancel()
     if (!_scheduling)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (UNLIKELY(!_scheduler || _scheduler->IsDstroyed()))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return _scheduler->Cancel(this);

@@ -34,7 +34,7 @@ int LLBC_Config::AddFile(const LLBC_String &file)
     if (file.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::map<LLBC_String, LLBC_JsonValue *>::iterator iter = _values.find(file);
@@ -48,7 +48,7 @@ int LLBC_Config::AddFile(const LLBC_String &file)
         _values[file] = NULL;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Config::Initialize()
@@ -68,7 +68,7 @@ int LLBC_Config::Initialize()
         if (!file.IsOpened())
         {
             this->BuildErrMsg(fileName, LLBC_FormatLastError());
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_String content = file.ReadToEnd();
@@ -82,7 +82,7 @@ int LLBC_Config::Initialize()
             this->BuildErrMsg(fileName, reader.getFormatedErrorMessages().c_str());
             LLBC_SetLastError(LLBC_ERROR_INVALID);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         iter->second = value;
@@ -90,7 +90,7 @@ int LLBC_Config::Initialize()
 
     _errMsg = "OK";
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 const LLBC_String &LLBC_Config::GetError() const

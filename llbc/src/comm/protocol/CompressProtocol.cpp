@@ -30,25 +30,25 @@ int LLBC_CompressProtocol::GetLayer() const
 
 int LLBC_CompressProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CompressProtocol::Send(void *in, void *&out)
 {
     out = in;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CompressProtocol::Recv(void *in, void *&out)
 {
     out = in;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CompressProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 __LLBC_NS_END

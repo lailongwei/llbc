@@ -62,7 +62,7 @@ int pyllbc_PackLemma_Top::Process(Symbol ch, Symbol nextCh)
     _state = Base::Error;
     pyllbc_SetError("top level pack-lemma could not accept any character symbols");
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 int pyllbc_PackLemma_Top::Process(Base *lemma)
@@ -72,7 +72,7 @@ int pyllbc_PackLemma_Top::Process(Base *lemma)
         _state = Base::Error;
         pyllbc_SetError("top level lemma could not accept not done lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _state = Base::Accepting;
@@ -80,7 +80,7 @@ int pyllbc_PackLemma_Top::Process(Base *lemma)
 
     _str.append(lemma->ToString());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
@@ -117,7 +117,7 @@ int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
     if (UNLIKELY(!this->IsDone()))
     {
         pyllbc_SetError("top-lemma not done, could not pack data");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const bool valuesIsNone = pyllbc_TypeDetector::IsNone(values);
@@ -126,15 +126,15 @@ int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
         if (!_lemmas.empty())
         {
             pyllbc_SetError("not found any values to pack, but has been specified format character symbol");
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (!pyllbc_TypeDetector::IsSequence(values))
     {
         pyllbc_SetError("will pack data not iterable");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
     const Py_ssize_t seqSize = PySequence_Size(values);
@@ -145,21 +145,21 @@ int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
             "will pack data sequence size[%ld] not equal format character size[%d]", 
             seqSize, _lemmas.size()));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (Py_ssize_t i = 0; i < seqSize; i++)
     {
         Base *lemma = _lemmas.at(i);
         PyObject *obj = PySequence_GetItem(values, i);
-        if (lemma->Write(stream, obj) != LLBC_RTN_OK)
+        if (lemma->Write(stream, obj) != LLBC_OK)
         {
             Py_DECREF(obj);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         Py_DECREF(obj);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

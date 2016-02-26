@@ -54,12 +54,12 @@ int LLBC_MessageBlock::Allocate(size_t size)
     if (_attach)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     this->Resize(_size + size);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_MessageBlock::Read(void *buf, size_t len)
@@ -67,7 +67,7 @@ int LLBC_MessageBlock::Read(void *buf, size_t len)
     if (!buf || len > this->GetReadableSize())
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     ASSERT((char *)buf + len < _buf || _buf + _size < buf);
@@ -75,7 +75,7 @@ int LLBC_MessageBlock::Read(void *buf, size_t len)
     memcpy(buf, _buf + _readPos, len);
     _readPos += len;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_MessageBlock::Write(const void *buf, size_t len)
@@ -83,12 +83,12 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
     if (UNLIKELY(!buf))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (UNLIKELY(len == 0))
     {
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (_writePos + len > _size)
@@ -101,7 +101,7 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
     memcpy(_buf + _writePos, buf, len);
     _writePos += len;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_MessageBlock::Release()
@@ -165,12 +165,12 @@ int LLBC_MessageBlock::SetReadPos(size_t pos)
     if (pos == This::npos || pos > _size)
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _readPos = pos;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_MessageBlock::ShiftReadPos(long off)
@@ -179,12 +179,12 @@ int LLBC_MessageBlock::ShiftReadPos(long off)
     if (pos < 0 || pos > static_cast<long>(_size))
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _readPos = static_cast<size_t>(pos);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 size_t LLBC_MessageBlock::GetWritePos() const
@@ -197,12 +197,12 @@ int LLBC_MessageBlock::SetWritePos(size_t pos)
     if (pos == This::npos || pos > _size)
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _writePos = pos;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_MessageBlock::ShiftWritePos(long off)
@@ -211,12 +211,12 @@ int LLBC_MessageBlock::ShiftWritePos(long off)
     if (UNLIKELY(pos < 0 || pos > static_cast<long>(_size)))
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _writePos = static_cast<size_t>(pos);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_MessageBlock::Swap(LLBC_MessageBlock *another)

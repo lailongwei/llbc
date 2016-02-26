@@ -80,7 +80,7 @@ int LLBC_Property::LoadFromFile(const LLBC_String &file)
 {
     LLBC_File f(file, LLBC_FileMode::BinaryRead);
     if (!f.IsOpened())
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     return this->LoadFromContent(f.ReadToEnd());
 }
@@ -107,7 +107,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     for (size_t i = 0; i < contents.size(); i++)
     {
         const LLBC_String &line = contents[i];
-        if (this->ParseLine(line, static_cast<int>(i) + 1) != LLBC_RTN_OK)
+        if (this->ParseLine(line, static_cast<int>(i) + 1) != LLBC_OK)
         {
             done = false;
             break;
@@ -124,7 +124,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
         _properties = backProperties;
         _comments = backComments;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     // Done, Delete all backet old data members.
     LLBC_XDelete(backValue);
@@ -134,7 +134,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
         LLBC_Delete(backProperties);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Property::SaveToContent(LLBC_String &content) const
@@ -142,7 +142,7 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
     if (!_properties)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 	content.clear();
@@ -156,25 +156,25 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
                 This::NameValueSeparator, prop->SerializeValue().c_str());
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Property::SaveToFile(const LLBC_String &file) const
 {
     LLBC_File f;
-    if (f.Open(file, LLBC_FileMode::BinaryWrite) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (f.Open(file, LLBC_FileMode::BinaryWrite) != LLBC_OK)
+        return LLBC_FAILED;
 
     LLBC_String content;
-    if (this->SaveToContent(content) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->SaveToContent(content) != LLBC_OK)
+        return LLBC_FAILED;
 
-    if (f.Write(content) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (f.Write(content) != LLBC_OK)
+        return LLBC_FAILED;
 
     f.Close();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 const LLBC_String &LLBC_Property::GetLoadErrorDesc() const
@@ -323,12 +323,12 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
     if (!this->CheckName(name))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!_properties)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const LLBC_Strings names = name.split(This::NameSeparator, 1);
@@ -338,7 +338,7 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
     if (it == _properties->end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     This *prop = it->second;
@@ -350,7 +350,7 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
 		if (_properties->size() == 0)
 			LLBC_XDelete(_properties);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else
     {
@@ -390,12 +390,12 @@ int LLBC_Property::SetComments(const LLBC_String &name, const LLBC_String &comme
     if (name.empty())
     {
         _comments = comments;
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     This *prop = const_cast<This *>(this->GetProperty(name));
     if (!prop)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     return prop->SetComments("", comments);
 }
@@ -532,9 +532,9 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
 int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
 {
     if (line.empty()) // Empty line.
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     else if (line[0] == This::CommentBeg) // Comments line.
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     typedef LLBC_Strings _Pair;
     _Pair pair = line.split(This::NameValueSeparator, 1);
@@ -543,7 +543,7 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
         _errMsg.format("line %d: could not find name-value separator '%c'", lineNo, This::NameValueSeparator);
         LLBC_SetLastError(LLBC_ERROR_FORMAT);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const LLBC_String name = pair[0].strip();
@@ -552,7 +552,7 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
         _errMsg.format("line %d: property name format error", lineNo);
         LLBC_SetLastError(LLBC_ERROR_FORMAT);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const LLBC_String valueComments = pair[1].strip();
@@ -580,13 +580,13 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
         value = valueComments.strip();
     }
 
-    if (this->SetValue(name, value) == LLBC_RTN_OK)
+    if (this->SetValue(name, value) == LLBC_OK)
     {
         This *prop = const_cast<This *>(this->GetProperty(name));
         prop->SetComments("", comments);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_String LLBC_Property::SerializeValue() const

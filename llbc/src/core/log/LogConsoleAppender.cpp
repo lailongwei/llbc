@@ -40,12 +40,12 @@ int LLBC_LogConsoleAppender::GetType() const
 
 int LLBC_LogConsoleAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 {
-    if (_Base::Initialize(initInfo) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (_Base::Initialize(initInfo) != LLBC_OK)
+        return LLBC_FAILED;
 
     _colourfulOutput = initInfo.colourfulOutput;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_LogConsoleAppender::Finalize()
@@ -59,7 +59,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     if (!(chain = this->GetTokenChain()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const int logLevel = data.level;
@@ -87,7 +87,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     if (_colourfulOutput)
         LLBC_SetConsoleColor(out, oldOutputColor);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogConsoleAppender::DetermineLogTextColor(int logLv)

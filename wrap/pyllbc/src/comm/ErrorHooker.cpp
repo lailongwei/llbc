@@ -39,14 +39,14 @@ int pyllbc_ErrorHooker::Install()
     if (_installed)
     {
         pyllbc_SetError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_SetErrSetHock(new _SetDeleg(this, &This::Hook_ErrSet));
     pyllbc_SetErrClearHook(new _ClearDeleg(this, &This::Hook_ErrClear));
 
     _installed = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void pyllbc_ErrorHooker::Uninstall()

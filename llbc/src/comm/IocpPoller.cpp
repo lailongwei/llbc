@@ -50,32 +50,32 @@ int LLBC_IocpPoller::Start()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((_iocp = LLBC_CreateIocp()) == LLBC_INVALID_IOCP_HANDLE)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
-    if (this->StartupMonitor() != LLBC_RTN_OK)
+    if (this->StartupMonitor() != LLBC_OK)
     {
         LLBC_CloseIocp(_iocp);
         _iocp = LLBC_INVALID_IOCP_HANDLE;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (this->Activate() != LLBC_RTN_OK)
+    if (this->Activate() != LLBC_OK)
     {
         this->StopMonitor();
 
         LLBC_CloseIocp(_iocp);
         _iocp = LLBC_INVALID_IOCP_HANDLE;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _started = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_IocpPoller::Svc()
@@ -119,7 +119,7 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
         socket->SetNonBlocking();
         socket->SetPollerType(LLBC_PollerType::IocpPoller);
-        if (socket->AttachToIocp(_iocp) != LLBC_RTN_OK)
+        if (socket->AttachToIocp(_iocp) != LLBC_OK)
         {
             LLBC_Delete(socket);
 
@@ -131,7 +131,7 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
         ol->opcode = LLBC_OverlappedOpcode::Connect;
         ol->sock = handle;
-        if (socket->ConnectEx(ev.peerAddr, ol) != LLBC_RTN_OK &&
+        if (socket->ConnectEx(ev.peerAddr, ol) != LLBC_OK &&
                 LLBC_GetLastError() != LLBC_ERROR_PENDING)
         {
             LLBC_Delete(ol);
@@ -174,7 +174,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     // Overlapped pointer.
     int off = sizeof(int);
     LLBC_POverlapped ol = *reinterpret_cast<LLBC_POverlapped *>(ev.un.monitorEv + off);
-    if (waitRet != LLBC_RTN_OK)
+    if (waitRet != LLBC_OK)
     {
         // Error No.
         off += sizeof(LLBC_POverlapped);
@@ -202,7 +202,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     }
 
     LLBC_Session *session = it->second;
-    if (waitRet == LLBC_RTN_FAILED)
+    if (waitRet == LLBC_FAILED)
     {
         session->OnClose(ol);
     }
@@ -247,13 +247,13 @@ int LLBC_IocpPoller::StartupMonitor()
         LLBC_IocpPoller>(this, &LLBC_IocpPoller::MonitorSvc);
 
     _monitor = new LLBC_PollerMonitor(deleg);
-    if (_monitor->Start() != LLBC_RTN_OK)
+    if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_IocpPoller::StopMonitor()
@@ -274,9 +274,9 @@ void LLBC_IocpPoller::MonitorSvc()
                                              20);
 
     int errNo = LLBC_ERROR_SUCCESS, subErrNo = 0;
-    if (ret != LLBC_RTN_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
+    if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
     {
-        if (ret != LLBC_RTN_OK)
+        if (ret != LLBC_OK)
         {
             errNo = LLBC_GetLastError();
             subErrNo = LLBC_GetSubErrorNo();
@@ -297,7 +297,7 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol)
     LLBC_Socket *sock = asyncInfo.socket;
     sock->DeleteOverlapped(ol);
 
-    if (waitRet == LLBC_RTN_OK)
+    if (waitRet == LLBC_OK)
     {
         sock->SetOption(SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
         this->SetConnectedSocketDftOpts(sock);

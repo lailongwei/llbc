@@ -38,7 +38,7 @@ int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
             !method.ml_meth)
     {
         pyllbc_SetError("method def structure invalid", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_capacity - _size <= 1)
@@ -49,7 +49,7 @@ int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
 
     _size += 1;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_MethodTable::RemoveMethod(const LLBC_String &name)
@@ -64,12 +64,12 @@ int pyllbc_MethodTable::RemoveMethod(const LLBC_String &name)
 
             _size -= 1;
 
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
     }
 
     pyllbc_SetError(LLBC_ERROR_NOT_FOUND);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 PyMethodDef *pyllbc_MethodTable::GetMethods()

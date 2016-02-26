@@ -79,12 +79,12 @@ int LLBC_PollerMgr::Start(int count)
     if (count <= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_pollers)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _pollerCount = count;
@@ -121,7 +121,7 @@ int LLBC_PollerMgr::Start(int count)
                 LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
     _pendingAsyncConns.clear();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PollerMgr::Stop()
@@ -145,7 +145,7 @@ void LLBC_PollerMgr::Stop()
 int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
 {
     LLBC_SockAddr_IN local;
-    if (This::GetAddr(ip, port, local) != LLBC_RTN_OK)
+    if (This::GetAddr(ip, port, local) != LLBC_OK)
         return 0;
 
     LLBC_Socket *sock;
@@ -153,10 +153,10 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
     {
         return 0;
     }
-    else if (sock->SetNonBlocking() != LLBC_RTN_OK ||
-            sock->EnableAddressReusable() != LLBC_RTN_OK ||
-            sock->BindTo(local) != LLBC_RTN_OK ||
-            sock->Listen() != LLBC_RTN_OK)
+    else if (sock->SetNonBlocking() != LLBC_OK ||
+            sock->EnableAddressReusable() != LLBC_OK ||
+            sock->BindTo(local) != LLBC_OK ||
+            sock->Listen() != LLBC_OK)
     {
         LLBC_Delete(sock);
         return 0;
@@ -175,7 +175,7 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
 int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
 {
     LLBC_SockAddr_IN peer;
-    if (This::GetAddr(ip, port, peer) != LLBC_RTN_OK)
+    if (This::GetAddr(ip, port, peer) != LLBC_OK)
         return 0;
 
     LLBC_Socket *sock;
@@ -183,7 +183,7 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
     {
         return 0;
     }
-    else if (sock->Connect(peer) != LLBC_RTN_OK)
+    else if (sock->Connect(peer) != LLBC_OK)
     {
         LLBC_Delete(sock);
         return 0;
@@ -205,7 +205,7 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
 int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
 {
     LLBC_SockAddr_IN peer;
-    if (This::GetAddr(ip, port, peer) != LLBC_RTN_OK)
+    if (This::GetAddr(ip, port, peer) != LLBC_OK)
         return 0;
 
     const int sessionId = this->AllocSessionId();
@@ -215,14 +215,14 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
     else
         _pendingAsyncConns.insert(std::make_pair(sessionId, peer));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_PollerMgr::Send(LLBC_Packet *packet)
 {
     _pollers[packet->GetSessionId() % 
         _pollerCount]->Push(LLBC_PollerEvUtil::BuildSendEv(packet));
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PollerMgr::Close(int sessionId)
@@ -242,10 +242,10 @@ int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
     if (LIKELY(poller))
     {
         poller->Push(block);
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 void LLBC_PollerMgr::OnPollerStop(int id)
@@ -263,7 +263,7 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
         addr.SetIp(ip);
         addr.SetPort(port);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     // Use LLBC_GetAddrInfo to fetch sockaddr.
@@ -281,14 +281,14 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     if (LLBC_GetAddrInfo(ip,                        // servname
                          LLBC_Num2Str(port).c_str(),// nodename
                          &hints,                    // hints
-                         &ai) != LLBC_RTN_OK)       // result
-        return LLBC_RTN_FAILED;
+                         &ai) != LLBC_OK)       // result
+        return LLBC_FAILED;
 
     addr.FromOSDataType(reinterpret_cast<
             struct sockaddr_in *>(ai->ai_addr));
     LLBC_FreeAddrInfo(ai);
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

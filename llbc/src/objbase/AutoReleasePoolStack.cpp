@@ -49,21 +49,21 @@ int LLBC_AutoReleasePoolStack::RemoveObject(LLBC_Object *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Pool *pool = _head;
     for (; pool != NULL; pool = pool->GetPoolNext())
     {
-        if (pool->RemoveObject(o) == LLBC_RTN_OK)
+        if (pool->RemoveObject(o) == LLBC_OK)
         {
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 int LLBC_AutoReleasePoolStack::PushPool(LLBC_AutoReleasePool *pool)
@@ -71,13 +71,13 @@ int LLBC_AutoReleasePoolStack::PushPool(LLBC_AutoReleasePool *pool)
     if (UNLIKELY(!pool))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pool->SetPoolNext(_head);
     _head = pool;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_AutoReleasePoolStack::PopPool(LLBC_AutoReleasePool *pool)
@@ -87,19 +87,19 @@ int LLBC_AutoReleasePoolStack::PopPool(LLBC_AutoReleasePool *pool)
     if (UNLIKELY(!pool))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_head)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_head == pool)
     {
         _head = _head->GetPoolNext();
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     _Pool *curPool = _head;
@@ -109,14 +109,14 @@ int LLBC_AutoReleasePoolStack::PopPool(LLBC_AutoReleasePool *pool)
         if (temp == pool)
         {
             curPool->SetPoolNext(curPool->GetPoolNext()->GetPoolNext());
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
 
         curPool = temp;
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 LLBC_AutoReleasePool *LLBC_AutoReleasePoolStack::GetCurrentReleasePool()

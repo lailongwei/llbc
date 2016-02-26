@@ -17,7 +17,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_o2j(PyObject *self, PyObject *args)
 
 
     std::string j;
-    if (pyllbc_ObjCoder::Encode(obj, j) != LLBC_RTN_OK)
+    if (pyllbc_ObjCoder::Encode(obj, j) != LLBC_OK)
         return NULL;
 
     return PyString_FromStringAndSize(j.c_str(), j.length());
@@ -37,7 +37,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_j2o(PyObject *self, PyObject *args)
     }
 
     PyObject *o;
-    if (pyllbc_ObjCoder::Decode(std::string(jStr, strLen), o) != LLBC_RTN_OK)
+    if (pyllbc_ObjCoder::Decode(std::string(jStr, strLen), o) != LLBC_OK)
         return NULL;
 
     return o;

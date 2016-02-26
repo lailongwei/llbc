@@ -45,10 +45,10 @@ int LLBC_AddSocketToIocp(LLBC_IocpHandle handle,
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         trace("LLBC_AddSocketToIocp() failed, reason: %s\n", LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CloseIocp(LLBC_IocpHandle handle)
@@ -56,10 +56,10 @@ int LLBC_CloseIocp(LLBC_IocpHandle handle)
     if (::CloseHandle(handle) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
@@ -84,10 +84,10 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
         }
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

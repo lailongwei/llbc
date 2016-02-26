@@ -72,7 +72,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
     if (UNLIKELY(bucketSize == 0))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Cancel hash.
@@ -95,7 +95,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
         it.Elem()->Hash(_bucket, _bucketSize);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
@@ -103,13 +103,13 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (this->Find(key) != this->End())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Check bucket size and auto expand it.
@@ -137,7 +137,7 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
 
     _size += 1;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
@@ -145,13 +145,13 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (this->Find(key) != this->End())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Check bucket size and auto expand it.
@@ -169,7 +169,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
 
     _size += 1;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Dictionary::Replace(int key, LLBC_Dictionary::Obj *o)
@@ -177,7 +177,7 @@ int LLBC_Dictionary::Replace(int key, LLBC_Dictionary::Obj *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Iter it = this->Find(key);
@@ -186,7 +186,7 @@ int LLBC_Dictionary::Replace(int key, LLBC_Dictionary::Obj *o)
         (*it)->Release();
         ((*it) = o)->Retain();
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     return this->Insert(key, o);
@@ -197,7 +197,7 @@ int LLBC_Dictionary::Replace(const LLBC_String &key, LLBC_Dictionary::Obj *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Iter it = this->Find(key);
@@ -206,7 +206,7 @@ int LLBC_Dictionary::Replace(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         (*it)->Release();
         ((*it) = o)->Retain();
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     return this->Insert(key, o);
@@ -217,13 +217,13 @@ int LLBC_Dictionary::Replace(Iter it, Obj *o)
     if (UNLIKELY(!o || it == this->End()))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     (*it)->Release();
     ((*it) = o)->Retain();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Dictionary::Erase(int key)
@@ -241,7 +241,7 @@ int LLBC_Dictionary::Erase(Iter it)
     if (it == this->End())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_DictionaryElem * elem = it.Elem();
@@ -255,7 +255,7 @@ int LLBC_Dictionary::Erase(Iter it)
 
     _size -= 1;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)

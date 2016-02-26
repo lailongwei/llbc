@@ -46,14 +46,14 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
 {
     if (UNLIKELY(this->IsErrorOccurred()))
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (UNLIKELY(this->IsDone()))
     {
         _state = Base::Error;
         pyllbc_SetError("raw-lemma is done, could not continue to accept any other lemmas");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_state == Base::Accepting)
     {
@@ -64,13 +64,13 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
             LLBC_String errStr;
             pyllbc_SetError(errStr.format("str type raw-lemma except '#' lemma to done, but got: %c", ch));
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _str2Flag = true;
         _state = Done;
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     const SymbolGroup &raw = GroupedSymbol::Raw();
     if (raw.find(ch) == raw.end())
@@ -80,14 +80,14 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
         LLBC_String errStr;
         pyllbc_SetError(errStr.format("invalid raw-lemma character: %c", ch));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (ch == Base::StringLen) // Special raw-lemma character, process it.
     {
         _state = Base::Error;
 
         pyllbc_SetError("str len lemma '#' must place on str lemma 'S' later");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _symbol = ch;
@@ -96,7 +96,7 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
     _state = (_symbol == Base::String && 
         nextCh == Base::StringLen) ? Base::Accepting : Base::Done;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemma_Raw::Process(Base *lemma)
@@ -104,7 +104,7 @@ int pyllbc_PackLemma_Raw::Process(Base *lemma)
     _state = Base::Error;
     pyllbc_SetError("raw-lemma not accept any non-raw lamma");
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 PyObject *pyllbc_PackLemma_Raw::Read(pyllbc_Stream *stream)
@@ -185,7 +185,7 @@ int pyllbc_PackLemma_Raw::Write(pyllbc_Stream *stream, PyObject *values)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("raw-lemma not done to pack data");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     int rtn;
@@ -241,7 +241,7 @@ int pyllbc_PackLemma_Raw::Write(pyllbc_Stream *stream, PyObject *values)
         break;
 
     default:
-        rtn = LLBC_RTN_FAILED;
+        rtn = LLBC_FAILED;
         {
             LLBC_String errStr;
             pyllbc_SetError(errStr.format(

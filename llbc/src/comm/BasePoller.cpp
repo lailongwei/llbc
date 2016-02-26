@@ -114,7 +114,7 @@ int LLBC_BasePoller::Start()
 {
     ASSERT(false && "Please implement LLBC_BasePoller::Start() method!");
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 void LLBC_BasePoller::Stop()
@@ -137,7 +137,7 @@ void LLBC_BasePoller::Cleanup()
     // Cleanup all queued events.
     LLBC_PollerEvent ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_RTN_OK)
+    while (this->TryPop(block) == LLBC_OK)
     {
         block->Read(&ev, sizeof(LLBC_PollerEvent));
         LLBC_PollerEvUtil::DestroyEv(ev);
@@ -168,7 +168,7 @@ void LLBC_BasePoller::Cleanup()
 void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
 {
     LLBC_MessageBlock *block;
-    while (this->TimedPop(block, waitTime) == LLBC_RTN_OK)
+    while (this->TimedPop(block, waitTime) == LLBC_OK)
     {
         LLBC_PollerEvent &ev = 
             *reinterpret_cast< LLBC_PollerEvent *>(block->GetData());
@@ -202,7 +202,7 @@ void LLBC_BasePoller::HandleEv_Send(LLBC_PollerEvent &ev)
     LLBC_Session *session = it->second;
     if (UNLIKELY(session->IsListen()))
         LLBC_Delete(ev.un.packet);
-    else if (UNLIKELY(session->Send(ev.un.packet) != LLBC_RTN_OK))
+    else if (UNLIKELY(session->Send(ev.un.packet) != LLBC_OK))
         session->OnClose();
 }
 
@@ -255,7 +255,7 @@ void LLBC_BasePoller::AddToPoller(LLBC_Session *session)
     {
         LLBC_MessageBlock *ev = 
             LLBC_PollerEvUtil::BuildTakeOverSessionEv(session);
-        if (_pollerMgr->PushMsgToPoller(hash, ev) != LLBC_RTN_OK)
+        if (_pollerMgr->PushMsgToPoller(hash, ev) != LLBC_OK)
         {
             trace("LLBC_BasePoller::AddToPoller() could not found poller, hash val: %d\n", hash);
             LLBC_PollerEvUtil::DestroyEv(ev);

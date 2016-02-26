@@ -22,7 +22,7 @@ void initllbc_debug()
 #endif // not define LLBC_DEBUG
 {
     /* Init llbc library. */
-    if (LLBC_Startup() == LLBC_RTN_FAILED)
+    if (LLBC_Startup() == LLBC_FAILED)
     {
         if (LLBC_GetLastError() != LLBC_ERROR_REENTRY)
         {
@@ -59,6 +59,6 @@ void initllbc_debug()
     pyllbc_TopModule->Build();
 
     /* Integrate script. */
-    if (pyllbc_s_Scripts->Integrate() != LLBC_RTN_OK)
+    if (pyllbc_s_Scripts->Integrate() != LLBC_OK)
         return;
 }

@@ -58,14 +58,14 @@ void LLBC_IntervalSampler::Update(time_t time)
 
 int LLBC_IntervalSampler::Sampling(sint64 value, void *appData)
 {
-    if(_Base::Sampling(value, appData) != LLBC_RTN_OK)
+    if(_Base::Sampling(value, appData) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _collector += value;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 sint64 LLBC_IntervalSampler::GetSpeedInSecs(int secs) const

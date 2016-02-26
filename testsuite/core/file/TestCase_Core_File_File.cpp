@@ -23,7 +23,7 @@ int TestCase_Core_File_File::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Core/File test:");
 
-    int retCode = LLBC_RTN_FAILED;
+    int retCode = LLBC_FAILED;
     do
     {
         if (!FileModeDescTest())
@@ -47,13 +47,13 @@ int TestCase_Core_File_File::Run(int argc, char *argv[])
         if (!MoveFileTest())
             break;
 
-        retCode = LLBC_RTN_OK;
+        retCode = LLBC_OK;
     } while (0);
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool TestCase_Core_File_File::FileModeDescTest()
@@ -143,7 +143,7 @@ bool TestCase_Core_File_File::OpenCloseTest()
 
     // Final, delete test file.
     LLBC_PrintLine("Delete test file");
-    if (LLBC_File::DeleteFile(fileName) != LLBC_RTN_OK)
+    if (LLBC_File::DeleteFile(fileName) != LLBC_OK)
     {
         LLBC_PrintLine("Delete file failed, error: %s", LLBC_FormatLastError());
         return false;
@@ -271,7 +271,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     }
 
     LLBC_FileAttributes fileAttrs;
-    if (file.GetFileAttributes(fileAttrs) != LLBC_RTN_OK)
+    if (file.GetFileAttributes(fileAttrs) != LLBC_OK)
     {
         LLBC_PrintLine("Failed to get file attributes, error: %s", LLBC_FormatLastError());
         return false;
@@ -281,7 +281,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     PrintFileAttributes(fileAttrs);
 
     // Test directory attributes:
-    if (LLBC_File::GetFileAttributes(".", fileAttrs) != LLBC_RTN_OK)
+    if (LLBC_File::GetFileAttributes(".", fileAttrs) != LLBC_OK)
     {
         LLBC_PrintLine("Failed to get file attributes, error: %s", LLBC_FormatLastError());
         return false;
@@ -294,7 +294,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
 
     LLBC_PrintLine("Touch file test, file: %s", _testFileName.c_str());
     LLBC_PrintLine("Touch all times to now:");
-    if (LLBC_File::TouchFile(_testFileName, true, NULL, true, NULL) != LLBC_RTN_OK)
+    if (LLBC_File::TouchFile(_testFileName, true, NULL, true, NULL) != LLBC_OK)
     {
         LLBC_PrintLine("Failed to touch file: %s, error: %s", _testFileName.c_str(), LLBC_FormatLastError());
         return false;
@@ -341,7 +341,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     file.WriteLine("Hello World");
 
     LLBC_PrintLine("Begin copy(overlapped): %s ---> %s", _testFileName.c_str(), copyFileName.c_str());
-    if (file.CopyFile(copyFileName, true) != LLBC_RTN_OK)
+    if (file.CopyFile(copyFileName, true) != LLBC_OK)
     {
         LLBC_PrintLine("Copy file failed, error: %s", LLBC_FormatLastError());
         return false;
@@ -359,7 +359,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     copyFile.Close();
 
     LLBC_PrintLine("Copy again(don't overlapped): %s ---> %s", _testFileName.c_str(), copyFileName.c_str());
-    if (file.CopyFile(copyFileName, false) == LLBC_RTN_OK)
+    if (file.CopyFile(copyFileName, false) == LLBC_OK)
     {
         LLBC_PrintLine("Copy success, failed. check your code!");
         LLBC_File::DeleteFile(copyFileName);
@@ -395,7 +395,7 @@ bool TestCase_Core_File_File::MoveFileTest()
     file.WriteLine("Hello World");
 
     LLBC_PrintLine("Begin move(overlapped): %s ---> %s", _testFileName.c_str(), moveFileName.c_str());
-    if (file.MoveFile(moveFileName, true) != LLBC_RTN_OK)
+    if (file.MoveFile(moveFileName, true) != LLBC_OK)
     {
         LLBC_PrintLine("Move file failed, error: %s", LLBC_FormatLastError());
         return false;
@@ -415,7 +415,7 @@ bool TestCase_Core_File_File::MoveFileTest()
     const LLBC_String copyFileName = _testFileName + ".copy";
     LLBC_File::CopyFile(moveFileName, copyFileName, true);
     LLBC_PrintLine("Copy move file and move again(don't overlapped): %s ---> %s", copyFileName.c_str(), copyFileName.c_str());
-    if (LLBC_File::MoveFile(copyFileName, moveFileName, false) == LLBC_RTN_OK)
+    if (LLBC_File::MoveFile(copyFileName, moveFileName, false) == LLBC_OK)
     {
         LLBC_PrintLine("Move success, failed. check your code!");
         LLBC_File::DeleteFile(copyFileName);

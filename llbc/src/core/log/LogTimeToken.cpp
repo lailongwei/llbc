@@ -29,7 +29,7 @@ LLBC_LogTimeToken::~LLBC_LogTimeToken()
 int LLBC_LogTimeToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
     this->SetFormatter(formatter);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogTimeToken::GetType() const

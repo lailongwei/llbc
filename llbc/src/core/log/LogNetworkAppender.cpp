@@ -36,7 +36,7 @@ int LLBC_LogNetworkAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo
     _port = 0;
 
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 void LLBC_LogNetworkAppender::Finalize()
@@ -47,7 +47,7 @@ void LLBC_LogNetworkAppender::Finalize()
 int LLBC_LogNetworkAppender::Output(const LLBC_LogData &data)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 __LLBC_NS_END

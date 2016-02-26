@@ -90,14 +90,14 @@ int LLBC_GetTimeOfDay(struct timeval *tv, void *tz)
     if (UNLIKELY(!tv))
     {
         errno = EINVAL;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     sint64 timeVal = LLBC_GetMicroSeconds();
     tv->tv_sec = (long)(timeVal / 1000000L);
     tv->tv_usec = (long)(timeVal % 1000000L);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 

@@ -56,20 +56,20 @@ int LLBC_AutoReleasePool::AddObject(LLBC_Object *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (UNLIKELY(o->_autoRef >= o->_ref))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _arr->PushBack(o);
     ++o->_autoRef;
     o->Release();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
@@ -77,18 +77,18 @@ int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     if (o->_autoRef == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _arr->Erase(o, false);
     o->_autoRef = 0;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_AutoReleasePool::Purge()
@@ -106,7 +106,7 @@ void LLBC_AutoReleasePool::Purge()
 int LLBC_AutoReleasePool::AutoRelease()
 {
     LLBC_SetLastError(LLBC_ERROR_PERM);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 LLBC_Object *LLBC_AutoReleasePool::Clone() const

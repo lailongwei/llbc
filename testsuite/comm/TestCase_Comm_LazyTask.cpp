@@ -53,5 +53,5 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     LLBC_Delete(svc);
     LLBC_Delete(taskObj);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

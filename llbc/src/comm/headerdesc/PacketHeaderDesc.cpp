@@ -62,16 +62,16 @@ int LLBC_PacketHeaderDesc::AddPartDesc(const LLBC_PacketHeaderPartDesc &partDesc
     if (!partDesc.IsValid())
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
-    else if (this->IsCanAdd(partDesc) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    else if (this->IsCanAdd(partDesc) != LLBC_OK)
+        return LLBC_FAILED;
 
     _parts.insert(std::make_pair(partDesc.GetSerialNo(), partDesc));
 
     this->UpdateExtraBookKeeping();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_PacketHeaderDesc::RemovePartDesc(int serialNo)
@@ -80,13 +80,13 @@ int LLBC_PacketHeaderDesc::RemovePartDesc(int serialNo)
     if (it == _parts.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _parts.erase(it);
     this->UpdateExtraBookKeeping();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 const _PartDesc *LLBC_PacketHeaderDesc::GetPart(int serialNo) const
@@ -183,7 +183,7 @@ int LLBC_PacketHeaderDesc::IsCanAdd(const LLBC_PacketHeaderPartDesc &partDesc) c
         if (conflicted)
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -192,10 +192,10 @@ int LLBC_PacketHeaderDesc::IsCanAdd(const LLBC_PacketHeaderPartDesc &partDesc) c
     if (newHeaderLen >= This::MaxHeaderLen)
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PacketHeaderDesc::UpdateExtraBookKeeping()

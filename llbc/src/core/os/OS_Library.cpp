@@ -132,18 +132,18 @@ int LLBC_CloseLibrary(LLBC_LibraryHandle handle)
     if (dlclose(handle) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::FreeLibrary(handle) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 

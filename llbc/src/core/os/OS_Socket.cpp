@@ -27,14 +27,14 @@ __LLBC_NS_BEGIN
 int LLBC_StartupNetLibrary()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     WSADATA wsaData;
     WORD version = MAKEWORD(2, 2);
     if (::WSAStartup(version, &wsaData) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     DWORD bytesReturn = 0;
@@ -56,7 +56,7 @@ int LLBC_StartupNetLibrary()
         LLBC_CloseSocket(sock);
         LLBC_CleanupNetLibrary();
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     GUID connectExGuid = WSAID_CONNECTEX;
@@ -76,7 +76,7 @@ int LLBC_StartupNetLibrary()
         LLBC_CloseSocket(sock);
         LLBC_CleanupNetLibrary();
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     GUID getAcceptExSockAddrsGuid = WSAID_GETACCEPTEXSOCKADDRS;
@@ -96,19 +96,19 @@ int LLBC_StartupNetLibrary()
         LLBC_CloseSocket(sock);
         LLBC_CleanupNetLibrary();
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_CloseSocket(sock);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
 int LLBC_CleanupNetLibrary()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else
     LLBC_INTERNAL_NS __g_AcceptExProc = NULL;
     LLBC_INTERNAL_NS __g_ConnectExProc = NULL;
@@ -117,10 +117,10 @@ int LLBC_CleanupNetLibrary()
     if (::WSACleanup() == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -165,25 +165,25 @@ int LLBC_ShutdownSocketInput(LLBC_SocketHandle handle)
     if (UNLIKELY(handle == LLBC_INVALID_SOCKET_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (::shutdown(handle, SHUT_RD) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::shutdown(handle, SD_RECEIVE) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -192,25 +192,25 @@ int LLBC_ShutdownSocketOutput(LLBC_SocketHandle handle)
     if (UNLIKELY(handle == LLBC_INVALID_SOCKET_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (::shutdown(handle, SHUT_WR) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::shutdown(handle, SD_SEND) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -219,25 +219,25 @@ int LLBC_ShutdownSocketInputOutput(LLBC_SocketHandle handle)
     if (UNLIKELY(handle == LLBC_INVALID_SOCKET_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (::shutdown(handle, SHUT_RDWR) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::shutdown(handle, SD_BOTH) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -254,16 +254,16 @@ int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags)
         if (errno == EWOULDBLOCK)
         {
             LLBC_SetLastError(LLBC_ERROR_WBLOCK);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         else if (errno == EAGAIN)
         {
             LLBC_SetLastError(LLBC_ERROR_AGAIN);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return ret;
@@ -273,11 +273,11 @@ int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags)
         if (::WSAGetLastError() == WSAEWOULDBLOCK)
         {
             LLBC_SetLastError(LLBC_ERROR_WBLOCK);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return ret;
@@ -293,7 +293,7 @@ int LLBC_SendEx(LLBC_SocketHandle handle,
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
     int ret = ::WSASend(handle, buffers, bufferCount, numOfBytesSent, flags, ol, NULL);
     if (ret == SOCKET_ERROR)
@@ -312,10 +312,10 @@ int LLBC_SendEx(LLBC_SocketHandle handle,
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
         }
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -332,16 +332,16 @@ int LLBC_Recv(LLBC_SocketHandle handle, void *buf, int len, int flags)
         if (errno == EWOULDBLOCK)
         {
             LLBC_SetLastError(LLBC_ERROR_WBLOCK);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         else if (errno == EAGAIN)
         {
             LLBC_SetLastError(LLBC_ERROR_AGAIN);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return ret;
@@ -351,11 +351,11 @@ int LLBC_Recv(LLBC_SocketHandle handle, void *buf, int len, int flags)
         if (::WSAGetLastError() == WSAEWOULDBLOCK)
         {
             LLBC_SetLastError(LLBC_ERROR_WBLOCK);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return ret;
@@ -371,7 +371,7 @@ int LLBC_RecvEx(LLBC_SocketHandle handle,
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
     int ret = ::WSARecv(handle, buffers, bufferCount, numOfBytesRecvd, flags, ol, NULL);
     if (ret == SOCKET_ERROR)
@@ -384,10 +384,10 @@ int LLBC_RecvEx(LLBC_SocketHandle handle,
         else
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -396,25 +396,25 @@ int LLBC_CloseSocket(LLBC_SocketHandle handle)
     if (UNLIKELY(handle == LLBC_INVALID_SOCKET_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (::close(handle) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::closesocket(handle) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -443,26 +443,26 @@ int LLBC_SetNonBlocking(LLBC_SocketHandle handle)
     if ((opts = ::fcntl(handle, F_GETFL)) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     opts |= O_NONBLOCK;
     if (::fcntl(handle, F_SETFL, opts) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     unsigned long arg = 1;
     if (::ioctlsocket(handle, FIONBIO, &arg) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -474,19 +474,19 @@ int LLBC_EnableAddressReusable(LLBC_SocketHandle handle)
         SO_REUSEADDR, reinterpret_cast<const char *>(&reuse), sizeof(int))!= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::setsockopt(handle, SOL_SOCKET, 
         SO_REUSEADDR, reinterpret_cast<const char *>(&reuse), sizeof(int)) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -498,19 +498,19 @@ int LLBC_DisableAddressReusable(LLBC_SocketHandle handle)
         SO_REUSEADDR, reinterpret_cast<const char *>(&reuse), sizeof(int))!= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::setsockopt(handle, SOL_SOCKET, 
         SO_REUSEADDR, reinterpret_cast<const char *>(&reuse), sizeof(int)) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -519,7 +519,7 @@ int LLBC_SetSendBufSize(LLBC_SocketHandle handle, size_t size)
     if (size <= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -527,19 +527,19 @@ int LLBC_SetSendBufSize(LLBC_SocketHandle handle, size_t size)
         reinterpret_cast<const char *>(&size), sizeof(int)) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::setsockopt(handle, SOL_SOCKET, SO_SNDBUF, 
         reinterpret_cast<const char *>(&size), sizeof(int)) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -548,7 +548,7 @@ int LLBC_SetRecvBufSize(LLBC_SocketHandle handle, size_t size)
     if (size <= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -556,19 +556,19 @@ int LLBC_SetRecvBufSize(LLBC_SocketHandle handle, size_t size)
         SO_RCVBUF, reinterpret_cast<char *>(&size), sizeof(int)) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::setsockopt(handle, SOL_SOCKET, 
         SO_RCVBUF, reinterpret_cast<char *>(&size), sizeof(int)) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif //LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -581,13 +581,13 @@ int LLBC_GetSocketName(LLBC_SocketHandle handle, LLBC_SockAddr_IN &addr)
     if (::getsockname(handle, reinterpret_cast<struct sockaddr *>(&inAddr), &len) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::getsockname(handle, reinterpret_cast<struct sockaddr *>(&inAddr), &len) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
@@ -603,13 +603,13 @@ int LLBC_GetPeerSocketName(LLBC_SocketHandle handle, LLBC_SockAddr_IN &addr)
     if (::getpeername(handle, reinterpret_cast<struct sockaddr *>(&inAddr), &len) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::getpeername(handle, reinterpret_cast<struct sockaddr *>(&inAddr), &len) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
@@ -641,10 +641,10 @@ int LLBC_BindToAddress(LLBC_SocketHandle handle, const char *ip, uint16 port)
     if (::bind(handle, reinterpret_cast<struct sockaddr *>(&addr), sizeof(struct sockaddr_in)) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (ip)
     {
@@ -658,10 +658,10 @@ int LLBC_BindToAddress(LLBC_SocketHandle handle, const char *ip, uint16 port)
     if (::bind(handle, reinterpret_cast<struct sockaddr *>(&addr), sizeof(struct sockaddr_in)) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -675,18 +675,18 @@ int LLBC_ListenForConnection(LLBC_SocketHandle handle, int backlog)
     if (::listen(handle, backlog) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::listen(handle, backlog) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -726,7 +726,7 @@ int LLBC_AcceptClientEx(LLBC_SocketHandle listenSock,
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
     DWORD bytesRecv = 0;
     BOOL ret = (*LLBC_INTERNAL_NS __g_AcceptExProc)(listenSock,
@@ -748,10 +748,10 @@ int LLBC_AcceptClientEx(LLBC_SocketHandle listenSock,
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
         }
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -762,12 +762,12 @@ int LLBC_GetAcceptExSocketAddrs(const void *outBuf,
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (!outBuf || outBufLen < sizeof(struct sockaddr_in) * 2)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     struct sockaddr *sysLocalAddr = NULL;
@@ -787,7 +787,7 @@ int LLBC_GetAcceptExSocketAddrs(const void *outBuf,
     localAddr.FromOSDataType(sysLocalAddr, localSockAddrLen);
     remoteAddr.FromOSDataType(sysRemoteAddr, remoteSockAddrLen);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -804,10 +804,10 @@ int LLBC_ConnectToPeer(LLBC_SocketHandle handle, const LLBC_SockAddr_IN &addr)
         else
             LLBC_SetLastError(LLBC_ERROR_CLIB);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::connect(handle, reinterpret_cast<const struct sockaddr *>(&inAddr), len) == SOCKET_ERROR)
     {
@@ -816,10 +816,10 @@ int LLBC_ConnectToPeer(LLBC_SocketHandle handle, const LLBC_SockAddr_IN &addr)
         else
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -833,8 +833,8 @@ int LLBC_ConnectToPeerEx(LLBC_SocketHandle handle,
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_ConnectToPeer(handle, addr);
 #else // LLBC_TARGET_PLATFORM_WIN32
-    if (LLBC_BindToAddress(handle, "0.0.0.0", 0) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (LLBC_BindToAddress(handle, "0.0.0.0", 0) != LLBC_OK)
+        return LLBC_FAILED;
 
     struct sockaddr_in sa = addr.ToOSDataType();
     BOOL ret = (*(LLBC_INTERNAL_NS __g_ConnectExProc))(handle,
@@ -851,10 +851,10 @@ int LLBC_ConnectToPeerEx(LLBC_SocketHandle handle,
         else
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -865,19 +865,19 @@ int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int optname, void 
         reinterpret_cast<char *>(optval), len) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::getsockopt(handle, level, optname, 
         reinterpret_cast<char *>(optval), len) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -888,19 +888,19 @@ int LLBC_SetSocketOption(LLBC_SocketHandle handle, int level, int optname, const
         reinterpret_cast<const char *>(optval), len) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (::setsockopt(handle, level, optname, 
         reinterpret_cast<const char *>(optval), len) == SOCKET_ERROR)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 

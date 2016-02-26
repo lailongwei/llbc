@@ -31,7 +31,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PacketHeaderDesc_AddPart(PyObject *self, PyObjec
     if (!PyArg_ParseTuple(args, "ll", &headerDesc, &partDesc))
         return NULL;
 
-    if (headerDesc->AddPartDesc(*partDesc) != LLBC_RTN_OK)
+    if (headerDesc->AddPartDesc(*partDesc) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When add part desc to header desc");
         return NULL;
@@ -47,7 +47,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PacketHeaderDesc_RemovePart(PyObject *self, PyOb
     if (!PyArg_ParseTuple(args, "li", &desc, &serialNo))
         return NULL;
 
-    if (desc->RemovePartDesc(serialNo) != LLBC_RTN_OK)
+    if (desc->RemovePartDesc(serialNo) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When remove part desc from header desc");
         return NULL;

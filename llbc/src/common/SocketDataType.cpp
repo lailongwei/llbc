@@ -81,7 +81,7 @@ int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr_in *sockaddr)
     if (!sockaddr)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _addrFamily= sockaddr->sin_family;
@@ -96,7 +96,7 @@ int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr_in *sockaddr)
     ::memset(_zero, 0, sizeof(_zero));
     ::memcpy(_zero, sockaddr->sin_zero, sizeof(sockaddr->sin_zero));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr *sockaddr, LLBC_SocketLen len)
@@ -104,7 +104,7 @@ int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr *sockaddr, LLBC_Socke
     if (!sockaddr || len < sizeof(sockaddr_in))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return this->FromOSDataType(
@@ -121,11 +121,11 @@ int LLBC_SockAddr_IN::SetAddressFamily(uint16 family)
     if (family != AF_INET)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _addrFamily = family;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_String LLBC_SockAddr_IN::GetIpAsString() const
@@ -211,13 +211,13 @@ int LLBC_SockAddr_IN::GetPaddingBuf(void *buf, size_t &len)
     if (!buf || len < sizeof(_zero))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     len = sizeof(_zero);
     ::memcpy(buf, _zero, len);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_SockAddr_IN::SetPaddingBuf(const char *buf, size_t len)
@@ -225,12 +225,12 @@ int LLBC_SockAddr_IN::SetPaddingBuf(const char *buf, size_t len)
     if (!buf || len < sizeof(_zero))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     ::memcpy(_zero, buf, sizeof(_zero));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_SockAddr_IN::ZeroPaddingBuf()

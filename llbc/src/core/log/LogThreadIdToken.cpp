@@ -29,7 +29,7 @@ LLBC_LogThreadIdToken::~LLBC_LogThreadIdToken()
 int LLBC_LogThreadIdToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
     this->SetFormatter(formatter);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogThreadIdToken::GetType() const

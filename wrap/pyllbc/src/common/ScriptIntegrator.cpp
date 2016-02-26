@@ -27,15 +27,15 @@ pyllbc_ScriptIntegrator::~pyllbc_ScriptIntegrator()
 int pyllbc_ScriptIntegrator::Integrate()
 {
     if (_builded)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     if (PyRun_SimpleString(_script.c_str()) != 0)
     {
         pyllbc_SetError(PYLLBC_ERROR_COMMON);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _builded = true;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

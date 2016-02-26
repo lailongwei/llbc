@@ -31,7 +31,7 @@ int LLBC_CodecProtocol::GetLayer() const
 
 int LLBC_CodecProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CodecProtocol::Send(void *in, void *&out)
@@ -39,7 +39,7 @@ int LLBC_CodecProtocol::Send(void *in, void *&out)
     out = in;
     reinterpret_cast<LLBC_Packet *>(in)->Encode();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CodecProtocol::Recv(void *in, void *&out)
@@ -55,7 +55,7 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out)
         packet->SetDecoder(coder);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_CodecProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
@@ -63,10 +63,10 @@ int LLBC_CodecProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
     if (!_coders.insert(std::make_pair(opcode, coder)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

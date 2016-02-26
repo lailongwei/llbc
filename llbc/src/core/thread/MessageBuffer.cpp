@@ -80,22 +80,22 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
     if (!buf)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (len == 0)
     {
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
     block->Write(buf, len);
-    if (this->Append(block) != LLBC_RTN_OK)
+    if (this->Append(block) != LLBC_OK)
     {
         delete block;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_MessageBlock *LLBC_MessageBuffer::FirstBlock() const
@@ -131,13 +131,13 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
     if (UNLIKELY(!block))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (block->GetReadPos() >= block->GetWritePos())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     block->SetNext(NULL);
@@ -145,7 +145,7 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
     if (!_head)
     {
         _head = block;
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_MessageBlock *curBlock = _head;
@@ -154,7 +154,7 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
 
     curBlock->SetNext(block);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 size_t LLBC_MessageBuffer::Remove(size_t length)

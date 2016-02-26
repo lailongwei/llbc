@@ -28,7 +28,7 @@ int TestCase_Comm_HeaderDesc::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to exit...");
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void TestCase_Comm_HeaderDesc::HeaderPartDescTest()

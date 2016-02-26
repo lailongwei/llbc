@@ -30,14 +30,14 @@ int TestCase_Core_Config_Config::Run(int argc, char *argv[])
 #endif
 
     LLBC_Config config;
-    if(config.AddFile(file) != LLBC_RTN_OK)
+    if(config.AddFile(file) != LLBC_OK)
     {
         std::cerr <<"Add file to config failed, file: " <<file;
         std::cerr <<", error desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
     }
 
-    if(config.Initialize() != LLBC_RTN_OK)
+    if(config.Initialize() != LLBC_OK)
     {
         std::cerr <<"Initialize config failed, error desc: ";
         std::cerr <<LLBC_FormatLastError() <<std::endl;

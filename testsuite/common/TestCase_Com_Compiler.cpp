@@ -33,6 +33,6 @@ int TestCase_Com_Compiler::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 

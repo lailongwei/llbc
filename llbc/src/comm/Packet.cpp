@@ -341,7 +341,7 @@ int LLBC_Packet::SetHeaderPartVal(int serialNo, const void *data, size_t len)
     if (!serialNo)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     char *partBeg = const_cast<char *>(reinterpret_cast<
@@ -358,7 +358,7 @@ int LLBC_Packet::SetHeaderPartVal(int serialNo, const void *data, size_t len)
         ::memcpy(partBeg, data, partLen);
     }
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
@@ -548,12 +548,12 @@ int LLBC_Packet::WriteHeader(const void *buf)
     if (!buf)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     memcpy(_block->GetData(), buf, _headerDesc->GetHeaderLen());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void *LLBC_Packet::GetPayload() const

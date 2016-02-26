@@ -90,7 +90,7 @@ void LLBC_TimerScheduler::Update()
     LLBC_TimerData *data;
     uint64 now = LLBC_GetMilliSeconds();
 
-    while (_heap.FindTop(data) == LLBC_RTN_OK)
+    while (_heap.FindTop(data) == LLBC_OK)
     {
         if (now < data->handle)
         {
@@ -182,7 +182,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_BaseTimer *timer)
     _heap.Insert(data);
     _idxMap.insert(std::make_pair(_maxTimerId, data));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
@@ -191,7 +191,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
     if (iter == _idxMap.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_TimerData *&data = iter->second;
@@ -204,7 +204,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
     data->timer->SetScheduling(false);
     data->timer->OnCancel();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

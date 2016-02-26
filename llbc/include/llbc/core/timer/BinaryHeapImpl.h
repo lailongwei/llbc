@@ -50,11 +50,11 @@ int LLBC_BinaryHeap<T, Comp>::FindTop(T &elem) const
     if (this->IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     elem = _elems[1];
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename T, typename Comp>
@@ -82,7 +82,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop()
     if (this->IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_size != 1)
@@ -94,7 +94,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop()
 
     this->PercolateDown(1);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename T, typename Comp>
@@ -103,7 +103,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop(T &elem)
     if (this->IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     elem = _elems[1];
@@ -117,7 +117,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop(T &elem)
 
     this->PercolateDown(1);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename T, typename Comp>
@@ -126,13 +126,13 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index)
     if (this->IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (index <= 0 || index > static_cast<int>(_size))
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (size_t i = index; i < _size; i++)
@@ -144,7 +144,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index)
 
     this->BuildHeap();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template<typename T, typename Comp>
@@ -159,7 +159,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(const T &elem)
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 template <typename T, typename Comp>
@@ -168,13 +168,13 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index, T &elem)
     if (this->IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (index <= 0 || index > _size)
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     elem = _elems[index];
@@ -187,7 +187,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index, T &elem)
 
     this->BuildHeap();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename T, typename Comp>

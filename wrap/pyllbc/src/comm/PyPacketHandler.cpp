@@ -29,19 +29,19 @@ int pyllbc_PacketHandler::SetHandler(PyObject *handler)
         _handler = handler;
         Py_INCREF(_handler);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else if (PyObject_HasAttrString(handler, "handle"))
     {
         _handler = PyObject_GetAttrString(handler, "handle");
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_String errDesc;
     pyllbc_SetError(errDesc.format("invalid packet handler"
         "(not callable or not exist handle() method): %s", pyllbc_ObjUtil::GetObjStr(handler).c_str()));
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)

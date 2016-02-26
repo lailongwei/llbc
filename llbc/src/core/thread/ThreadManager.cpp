@@ -135,7 +135,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
                                        nativeHandles ? &nativeHandles[i] : NULL,
                                        handles ? &handles[i] : NULL) == LLBC_INVALID_HANDLE)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -297,7 +297,7 @@ int LLBC_ThreadManager::SetPriority(LLBC_Handle handle, int priority)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -306,16 +306,16 @@ int LLBC_ThreadManager::SetPriority(LLBC_Handle handle, int priority)
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetPriority() == priority)
     {
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     int rtn = LLBC_SetThreadPriority(threadDesc->GetNativeHandle(), priority);
-    if (rtn == LLBC_RTN_OK)
+    if (rtn == LLBC_OK)
     {
         threadDesc->SetPriority(priority);
     }
@@ -328,7 +328,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _lock.Lock();
@@ -338,7 +338,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
         _lock.Unlock();
 
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetState() != LLBC_ThreadState::Running &&
@@ -347,7 +347,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
         _lock.Unlock();
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_NativeThreadHandle nativeHandle = threadDesc->GetNativeHandle();
@@ -355,7 +355,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
     _lock.Unlock();
 
     int rtn = LLBC_JoinThread(nativeHandle);
-    if (rtn == LLBC_RTN_OK)
+    if (rtn == LLBC_OK)
     {
         LLBC_Guard guard(_lock);
         if ((threadDesc = this->FindThreadDescriptor(handle)))
@@ -379,7 +379,7 @@ int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
     if (UNLIKELY(!task))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _lock.Lock();
@@ -404,11 +404,11 @@ int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
+            return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
@@ -416,7 +416,7 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _lock.Lock();
@@ -428,7 +428,7 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
         _lock.Unlock();
 
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::vector<LLBC_Handle> willWaitThreads;
@@ -444,13 +444,13 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
+        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::WaitAll()
@@ -472,12 +472,12 @@ int LLBC_ThreadManager::WaitAll()
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_RTN_OK)
+        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
@@ -485,7 +485,7 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -495,22 +495,22 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetState() == LLBC_ThreadState::Suspended)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (threadDesc->GetState() != LLBC_ThreadState::Running)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     int rtn = LLBC_SuspendThread(threadDesc->GetNativeHandle());
-    if (rtn == LLBC_RTN_OK)
+    if (rtn == LLBC_OK)
     {
         threadDesc->SetState(LLBC_ThreadState::Suspended);
     }
@@ -523,7 +523,7 @@ int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
     if (UNLIKELY(!task))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -550,13 +550,13 @@ int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willSuspendThreads.size(); i++)
     {
-        if (this->Suspend(willSuspendThreads[i]) != LLBC_RTN_OK)
+        if (this->Suspend(willSuspendThreads[i]) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
@@ -564,7 +564,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -574,7 +574,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ThreadDescriptor *threadDesc = 
@@ -584,13 +584,13 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::SuspendAll()
@@ -603,14 +603,14 @@ int LLBC_ThreadManager::SuspendAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::Resume(LLBC_Handle handle)
@@ -618,7 +618,7 @@ int LLBC_ThreadManager::Resume(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -627,22 +627,22 @@ int LLBC_ThreadManager::Resume(LLBC_Handle handle)
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetState() == LLBC_ThreadState::Running)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (threadDesc->GetState() != LLBC_ThreadState::Suspended)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     int rtn = LLBC_ResumeThread(threadDesc->GetNativeHandle());
-    if (rtn == LLBC_RTN_OK)
+    if (rtn == LLBC_OK)
     {
         threadDesc->SetState(LLBC_ThreadState::Running);
     }
@@ -655,7 +655,7 @@ int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
     if (UNLIKELY(!task))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -682,13 +682,13 @@ int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willResumeThreads.size(); i++)
     {
-        if (this->Resume(willResumeThreads[i]) != LLBC_RTN_OK)
+        if (this->Resume(willResumeThreads[i]) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
@@ -696,7 +696,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -706,7 +706,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ThreadDescriptor *threadDesc = 
@@ -716,13 +716,13 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::ResumeAll()
@@ -735,14 +735,14 @@ int LLBC_ThreadManager::ResumeAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
@@ -750,7 +750,7 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -759,18 +759,18 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetState() != LLBC_ThreadState::Running &&
         threadDesc->GetState() != LLBC_ThreadState::Suspended)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     int rtn = LLBC_CancelThread(threadDesc->GetNativeHandle());
-    if (rtn == LLBC_RTN_OK)
+    if (rtn == LLBC_OK)
     {
         LLBC_JoinThread(threadDesc->GetNativeHandle());
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -790,7 +790,7 @@ int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
     if (UNLIKELY(!task))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -817,13 +817,13 @@ int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willCancelTasks.size(); i++)
     {
-        if (this->Cancel(willCancelTasks[i]) != LLBC_RTN_OK)
+        if (this->Cancel(willCancelTasks[i]) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
@@ -831,7 +831,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -841,7 +841,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ThreadDescriptor *threadDesc = 
@@ -851,13 +851,13 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+        if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::CancelAll()
@@ -870,14 +870,14 @@ int LLBC_ThreadManager::CancelAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_RTN_OK)
+            if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
@@ -885,7 +885,7 @@ int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -894,14 +894,14 @@ int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (threadDesc->GetState() != LLBC_ThreadState::Running &&
         threadDesc->GetState() != LLBC_ThreadState::Suspended)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return LLBC_KillThread(threadDesc->GetNativeHandle(), signum);
@@ -912,7 +912,7 @@ int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
     if (UNLIKELY(!task))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -939,13 +939,13 @@ int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
 
     for (size_t i = 0; i < willCancelTasks.size(); i++)
     {
-        if (this->Kill(willCancelTasks[i], signum) != LLBC_RTN_OK)
+        if (this->Kill(willCancelTasks[i], signum) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
@@ -953,7 +953,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -963,7 +963,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ThreadDescriptor *threadDesc = 
@@ -973,13 +973,13 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_RTN_OK)
+        if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_ThreadManager::KillAll(int signum)
@@ -992,14 +992,14 @@ int LLBC_ThreadManager::KillAll(int signum)
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_RTN_OK)
+            if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
             {
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_ThreadManager::OnThreadStartup(LLBC_Handle handle)
@@ -1071,7 +1071,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
                           threadArg,
                           flags,
                           priority,
-                          stackSize) != LLBC_RTN_OK)
+                          stackSize) != LLBC_OK)
     {
         delete threadArg;
         return LLBC_INVALID_HANDLE;
@@ -1089,7 +1089,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
 
     this->AddThreadDescriptor(desc);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)

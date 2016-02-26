@@ -43,32 +43,32 @@ int LLBC_EpollPoller::Start()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((_epoll = LLBC_EpollCreate(
             LLBC_CFG_EPOLL_MAX_LISTEN_FD_SIZE)) == LLBC_INVALID_HANDLE)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
-    if (this->StartupMonitor() != LLBC_RTN_OK)
+    if (this->StartupMonitor() != LLBC_OK)
     {
         LLBC_EpollClose(_epoll);
         _epoll = LLBC_INVALID_HANDLE;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (this->Activate(1) != LLBC_RTN_OK)
+    if (this->Activate(1) != LLBC_OK)
     {
         this->StopMonitor();
         LLBC_EpollClose(_epoll);
         _epoll = LLBC_INVALID_HANDLE;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _started = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_EpollPoller::Svc()
@@ -104,7 +104,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
     sock->SetNonBlocking();
     sock->SetPollerType(LLBC_PollerType::EpollPoller);
-    if (sock->Connect(ev.peerAddr) == LLBC_RTN_OK)
+    if (sock->Connect(ev.peerAddr) == LLBC_OK)
     {
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
@@ -233,13 +233,13 @@ int LLBC_EpollPoller::StartupMonitor()
         LLBC_EpollPoller>(this, &LLBC_EpollPoller::MonitorSvc);
 
     _monitor = new LLBC_PollerMonitor(deleg);
-    if (_monitor->Start() != LLBC_RTN_OK)
+    if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_EpollPoller::StopMonitor()
@@ -276,7 +276,7 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
         if (sock->GetOption(SOL_SOCKET, 
                             SO_ERROR, 
                             &optval, 
-                            &optlen) == LLBC_RTN_OK && optval == 0)
+                            &optlen) == LLBC_OK && optval == 0)
             connected = true;
     }
     

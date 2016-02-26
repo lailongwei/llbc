@@ -76,7 +76,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_LazyTask;
     // test = new TestCase_Comm_CustomHeaderSvc;
 
-    int ret = LLBC_RTN_FAILED;
+    int ret = LLBC_FAILED;
     if (test)
     {
         ret = test->Run(argc, argv);

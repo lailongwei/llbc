@@ -91,7 +91,7 @@ int TestCase_Core_Config_Property::Run(int argc, char *argv[])
     // Test LoadFromFile
     // Load invalid file path.
     const LLBC_String invalidFilePath = "asldkjfaslf2l323lkjl;aj;afaj;lfkjslfk.a";
-    if (cfg.LoadFromFile(invalidFilePath) != LLBC_RTN_OK)
+    if (cfg.LoadFromFile(invalidFilePath) != LLBC_OK)
     {
         std::cerr <<"Load from file failed, right!" <<std::endl;
         std::cerr <<"Last error: " <<LLBC_FormatLastError() <<std::endl;
@@ -102,7 +102,7 @@ int TestCase_Core_Config_Property::Run(int argc, char *argv[])
     }
 
     // Load right path.
-    if (cfg.LoadFromFile(_file) != LLBC_RTN_OK)
+    if (cfg.LoadFromFile(_file) != LLBC_OK)
     {
         std::cerr <<"Load from file failed, error: " <<LLBC_FormatLastError() <<std::endl;
         std::cerr <<"Verbose error: " <<cfg.GetLoadErrorDesc() <<std::endl;
@@ -115,7 +115,7 @@ int TestCase_Core_Config_Property::Run(int argc, char *argv[])
     // Try write error format line to test file.
     std::cout <<"Try write error format line to property content" <<std::endl;
     cfg.SaveToContent(content);
-    if (cfg.LoadFromContent(content + "llbc.test.$errorProp 3434 # hey") != LLBC_RTN_OK)
+    if (cfg.LoadFromContent(content + "llbc.test.$errorProp 3434 # hey") != LLBC_OK)
     {
         std::cout <<"Load failed, error: " <<LLBC_FormatLastError() <<std::endl;
         std::cout <<"Verbose error: " <<cfg.GetLoadErrorDesc() <<std::endl;

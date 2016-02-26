@@ -18,14 +18,14 @@ int LLBC_Entity::AddBehavior(int id, BehaviorType *value, const LLBC_String &nam
     if (!value)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (this->IsExistBehavior(id) || 
         (!name.empty() && this->IsExistBehavior(name)))
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_BehaviorValue behaviorValue;
@@ -37,7 +37,7 @@ int LLBC_Entity::AddBehavior(int id, BehaviorType *value, const LLBC_String &nam
     if (!name.empty())
         _behaviors2.insert(std::make_pair(name, behaviorValue));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename BehaviorType>

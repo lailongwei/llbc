@@ -107,11 +107,11 @@ int TestCase_Comm_CustomHeaderSvc::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("comm/CustomHeaderSvc test:");
     if (!this->ParseArgs(argc, argv))
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     this->DesignHeader();
     if (!this->StartUpService())
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     LLBC_PrintLine("Service start up succeed, %s endPoint: %s:%d", 
         _asClient ? "client" : "server", _ip.c_str(), _port);
@@ -119,7 +119,7 @@ int TestCase_Comm_CustomHeaderSvc::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to exit...");
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool TestCase_Comm_CustomHeaderSvc::ParseArgs(int argc, char *argv[])

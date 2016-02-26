@@ -27,7 +27,7 @@ LLBC_LogFileToken::~LLBC_LogFileToken()
 int LLBC_LogFileToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
     this->SetFormatter(formatter);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogFileToken::GetType() const

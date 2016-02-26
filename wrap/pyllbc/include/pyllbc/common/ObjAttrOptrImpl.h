@@ -17,47 +17,47 @@ inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, PyObject *&val)
     if (!(val = PyObject_GetAttrString(_obj, name.c_str())))
     {
         pyllbc_SetError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, double &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_ParseTuple(oVal, "d", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, float &val)
 {
     double dbVal;
-    if (this->GetAttr(name, dbVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, dbVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     val = static_cast<float>(dbVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, LLBC_String &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     char *str;
     if (!PyArg_Parse(oVal, "s", &str))
@@ -65,178 +65,178 @@ inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, LLBC_String &val
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     val = str;
     Py_DECREF(oVal);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, sint64 &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "L", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, uint64 &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "K", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, long &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "l", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, LLBC_NS ulong &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "k", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, sint32 &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
     
     if (!PyArg_Parse(oVal, "i", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, uint32 &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "I", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, sint16 &val)
 {
     sint32 i32Val;
-    if (this->GetAttr(name, i32Val) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, i32Val) != LLBC_OK)
+        return LLBC_FAILED;
 
     val = static_cast<sint16>(i32Val);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, uint16 &val)
 {
     uint32 u32Val;
-    if (this->GetAttr(name, u32Val) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, u32Val) != LLBC_OK)
+        return LLBC_FAILED;
 
     val = static_cast<uint16>(u32Val);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, sint8 &val)
 {
     PyObject *oVal;
-    if (this->GetAttr(name, oVal) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, oVal) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (!PyArg_Parse(oVal, "b", &val))
     {
         Py_DECREF(oVal);
 
         pyllbc_SetError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_DECREF(oVal);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
 inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, uint8 &val)
 {
     uint32 u32Val;
-    if (this->GetAttr(name, u32Val) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->GetAttr(name, u32Val) != LLBC_OK)
+        return LLBC_FAILED;
 
     val = static_cast<uint8>(u32Val);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Val>
@@ -249,7 +249,7 @@ inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, _Val &val)
     
     pyllbc_SetError(err.c_str(), LLBC_ERROR_UNKNOWN);
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 template <>
@@ -258,10 +258,10 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, PyObject * const
     if (PyObject_SetAttrString(_obj, name.c_str(), val) == -1)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -389,7 +389,7 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const _Val &val)
 
     pyllbc_SetError(err.c_str(), LLBC_ERROR_UNKNOWN);
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 #endif // __PYLLBC_COM_OBJ_ATTR_OPTR_H__

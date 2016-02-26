@@ -47,7 +47,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetPacketHeaderDesc(PyObject *self, PyObject *ar
         return NULL;
 
     LLBC_PacketHeaderDesc *copyDesc = LLBC_New1(LLBC_PacketHeaderDesc, *desc);
-    if (LLBC_IService::SetPacketHeaderDesc(copyDesc) != LLBC_RTN_OK)
+    if (LLBC_IService::SetPacketHeaderDesc(copyDesc) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "when set packet header desc to service");
         LLBC_Delete(copyDesc);
@@ -101,7 +101,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetServiceFPS(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l|i", &svc, &fps))
         return NULL;
 
-    if (svc->SetFPS(fps) != LLBC_RTN_OK)
+    if (svc->SetFPS(fps) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -124,7 +124,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l|i", &svc, &pollerCount))
         return NULL;
 
-    if (svc->Start(pollerCount) != LLBC_RTN_OK)
+    if (svc->Start(pollerCount) != LLBC_OK)
         return NULL;
 
     if (PyErr_Occurred())
@@ -160,7 +160,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RegisterFacade(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "lO", &svc, &facade))
         return NULL;
 
-    if (svc->RegisterFacade(facade) != LLBC_RTN_OK)
+    if (svc->RegisterFacade(facade) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -174,7 +174,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RegisterCodec(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &codec))
         return NULL;
 
-    if (svc->RegisterCodec(opcode, codec) != LLBC_RTN_OK)
+    if (svc->RegisterCodec(opcode, codec) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -218,7 +218,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_AsyncConn(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "lsi", &svc, &ip, &port))
         return NULL;
 
-    if (svc->AsyncConn(ip, port) != LLBC_RTN_OK)
+    if (svc->AsyncConn(ip, port) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -245,7 +245,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SendData(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "liiO|iO", &svc, &sessionId, &opcode, &data, &status, &parts))
         return NULL;
 
-    if (svc->Send(sessionId, opcode, data, status, parts) != LLBC_RTN_OK)
+    if (svc->Send(sessionId, opcode, data, status, parts) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -307,7 +307,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Multicast(PyObject *self, PyObject *args)
 
     Py_DECREF(fastPySessionIds);
 
-    if (svc->Multicast(sessionIds, opcode, data, status, parts) != LLBC_RTN_OK)
+    if (svc->Multicast(sessionIds, opcode, data, status, parts) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -323,7 +323,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Broadcast(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "liO|iO", &svc, &opcode, &data, &status, &parts))
         return NULL;
 
-    if (svc->Broadcast(opcode, data, status, parts) != LLBC_RTN_OK)
+    if (svc->Broadcast(opcode, data, status, parts) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -337,7 +337,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Subscribe(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &handler))
         return NULL;
 
-    if (svc->Subscribe(opcode, handler) != LLBC_RTN_OK)
+    if (svc->Subscribe(opcode, handler) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -351,7 +351,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PreSubscribe(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &handler))
         return NULL;
 
-    if (svc->PreSubscribe(opcode, handler) != LLBC_RTN_OK)
+    if (svc->PreSubscribe(opcode, handler) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -365,7 +365,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnifyPreSubscribe(PyObject *self, PyObject *args
     if (!PyArg_ParseTuple(args, "lO", &svc, &handler))
         return NULL;
 
-    if (svc->UnifyPreSubscribe(handler) != LLBC_RTN_OK)
+    if (svc->UnifyPreSubscribe(handler) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -391,7 +391,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetServiceCodec(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "li", &svc, &codec))
         return NULL;
 
-    if (svc->SetCodec(codec) != LLBC_RTN_OK)
+    if (svc->SetCodec(codec) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -416,7 +416,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "lO", &svc, &callable))
         return NULL;
 
-    if (svc->Post(callable) != LLBC_RTN_OK)
+    if (svc->Post(callable) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;

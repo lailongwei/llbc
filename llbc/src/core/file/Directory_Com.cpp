@@ -38,7 +38,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
     if (path.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     size_t prePos = LLBC_String::npos;
@@ -52,7 +52,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
         if ((prePos != LLBC_String::npos) && (prePos + 1 == pos))
         {
             LLBC_SetLastError(LLBC_ERROR_INVALID);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         prePos = pos;
@@ -73,18 +73,18 @@ int LLBC_Directory::Create(const LLBC_String &path)
         if (!::CreateDirectory(toPath.c_str(), NULL))
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 #else
         if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) // permission: rwxr-xr-x
         {
             LLBC_SetLastError(LLBC_ERROR_CLIB);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 #endif
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Directory::Remove(const LLBC_String &path)
@@ -92,23 +92,23 @@ int LLBC_Directory::Remove(const LLBC_String &path)
     if (!Exists(path))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::vector<LLBC_String> delFileList;
     std::vector<LLBC_String> delSubDirList;
 
     // Get all files and sub-directories.
-    if (GetFiles(path, delFileList, true) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
-    if (GetDirectories(path, delSubDirList, true) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (GetFiles(path, delFileList, true) != LLBC_OK)
+        return LLBC_FAILED;
+    if (GetDirectories(path, delSubDirList, true) != LLBC_OK)
+        return LLBC_FAILED;
 
     // Delete files.
     for (size_t i = 0; i < delFileList.size(); i++)
     {
-        if (LLBC_File::DeleteFile(delFileList[i]) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (LLBC_File::DeleteFile(delFileList[i]) != LLBC_OK)
+            return LLBC_FAILED;
     }
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     // Delete empty directories.
@@ -117,7 +117,7 @@ int LLBC_Directory::Remove(const LLBC_String &path)
         if (rmdir(delSubDirList[i].c_str()) != 0)
         {
             LLBC_SetLastError(LLBC_ERROR_CLIB);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -125,10 +125,10 @@ int LLBC_Directory::Remove(const LLBC_String &path)
     if (rmdir(path.c_str()) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     // Delete empty directories.
     for(int i = static_cast<int>(delSubDirList.size()) - 1; i >= 0; i--)
@@ -136,7 +136,7 @@ int LLBC_Directory::Remove(const LLBC_String &path)
         if (!::RemoveDirectoryA(delSubDirList[i].c_str()))
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -144,10 +144,10 @@ int LLBC_Directory::Remove(const LLBC_String &path)
     if (!::RemoveDirectoryA(path.c_str()))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -384,7 +384,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     if (fileCount < 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     bool allProcessed = true;
@@ -408,7 +408,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
                 strcmp("..", direntList[procIdx]->d_name) == 0))
                 continue;
 
-            if (GetFiles(fileName, files, recursive) != LLBC_RTN_OK)
+            if (GetFiles(fileName, files, recursive) != LLBC_OK)
             {
                 allProcessed = false;
                 free(direntList[procIdx]);
@@ -434,10 +434,10 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     if (!allProcessed)
     {
         files.clear();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // Win32
     LLBC_String findPath = Join(path, "*.*");
 
@@ -446,7 +446,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     bool allProcessed = true;
@@ -458,7 +458,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
                 ::strcmp(findData.cFileName, "..") == 0)
                 continue;
 
-            if (GetFiles(Join(path, findData.cFileName), files, recursive) != LLBC_RTN_OK)
+            if (GetFiles(Join(path, findData.cFileName), files, recursive) != LLBC_OK)
             {
                 allProcessed = false;
                 break;
@@ -474,10 +474,10 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     if (!allProcessed)
     {
         files.clear();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // Non-Win32
 }
 
@@ -492,7 +492,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     if (fileCount < 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     bool allProcessed = true;
@@ -520,7 +520,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
                 continue;
             }
 
-            if (GetDirectories(fileName, directories, recursive) != LLBC_RTN_OK)
+            if (GetDirectories(fileName, directories, recursive) != LLBC_OK)
             {
                 allProcessed = false;
                 free(direntList[procIdx]);
@@ -540,10 +540,10 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     if (!allProcessed)
     {
         directories.clear();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     LLBC_String dirName = Join(path, "*.*");
 
@@ -552,7 +552,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     bool allProcessed = true;
@@ -568,7 +568,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
             if (!recursive)
                 continue;
 
-            if (GetDirectories(dirPath, directories, recursive) != LLBC_RTN_OK)
+            if (GetDirectories(dirPath, directories, recursive) != LLBC_OK)
             {
                 allProcessed = false;
                 break;
@@ -580,10 +580,10 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     if (!allProcessed)
     {
         directories.clear();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
@@ -724,25 +724,25 @@ int LLBC_Directory::SetCurDir(const LLBC_String &path)
     if (path.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 	if (chdir(path.c_str()) != 0)
 	{
 		LLBC_SetLastError(LLBC_ERROR_CLIB);
-		return LLBC_RTN_FAILED;
+		return LLBC_FAILED;
 	}
 
-	return LLBC_RTN_OK;
+	return LLBC_OK;
 #else // Win32
 	if (!::SetCurrentDirectoryA(path.c_str()))
 	{
 		LLBC_SetLastError(LLBC_ERROR_OSAPI);
-		return LLBC_RTN_FAILED;
+		return LLBC_FAILED;
 	}
 
-	return LLBC_RTN_OK;
+	return LLBC_OK;
 #endif // Non-Win32
 }
 

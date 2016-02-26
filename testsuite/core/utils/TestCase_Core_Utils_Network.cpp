@@ -31,7 +31,7 @@ int TestCase_Core_Utils_Network::Run(int argc, char *argv[])
     LLBC_Print("Press any key to continue...");
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void TestCase_Core_Utils_Network::VerifyIPv4Addr(const LLBC_String &addr)

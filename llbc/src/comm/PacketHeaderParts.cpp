@@ -65,15 +65,15 @@ int LLBC_PacketHeaderParts::SetPart(int serialNo, const void *val, size_t valSiz
     This::_Part part;
     part.type = _PartTypes::BytesType;
     part.value.bytesVal = LLBC_New1(LLBC_MessageBlock, valSize);
-    if (part.value.bytesVal->Write(val, valSize) != LLBC_RTN_OK)
+    if (part.value.bytesVal->Write(val, valSize) != LLBC_OK)
     {
         This::CleanupPart(part);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PacketHeaderParts::RemovePart(int serialNo)

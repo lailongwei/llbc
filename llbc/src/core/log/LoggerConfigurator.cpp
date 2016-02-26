@@ -34,8 +34,8 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
 int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 {
 	LLBC_Property cfg;
-	if (cfg.LoadFromFile(cfgFile) != LLBC_RTN_OK)
-		return LLBC_RTN_FAILED;
+	if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
+		return LLBC_FAILED;
 
 	// Get all logger names
 	const LLBC_Strings loggerNames = cfg.GetPropertyNames(false);
@@ -45,17 +45,17 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 	{
 		const LLBC_String &loggerName = *it;
         LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
-        if (info->Initialize(*cfg.GetProperty(loggerName)) != LLBC_RTN_OK)
+        if (info->Initialize(*cfg.GetProperty(loggerName)) != LLBC_OK)
         {
             delete info;
             LLBC_STLHelper::DeleteContainer(_configs, true);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _configs.insert(std::make_pair(loggerName, info));
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger) const
@@ -63,13 +63,13 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
     if (name.empty() || !logger)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (logger->IsInit())
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = _configs.find(name);
@@ -77,10 +77,10 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
     {
         LLBC_Property cfg;
         LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
-        if (info->Initialize(cfg) != LLBC_RTN_OK)
+        if (info->Initialize(cfg) != LLBC_OK)
         {
             delete info;
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_LoggerConfigurator *nonConstThis = const_cast<LLBC_LoggerConfigurator *>(this);

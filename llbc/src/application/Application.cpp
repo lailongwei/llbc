@@ -40,13 +40,13 @@ const LLBC_Config &LLBC_BaseApplication::GetConfig() const
 
 int LLBC_BaseApplication::Initialize(const LLBC_String &name, void *arg)
 {
-    if(LLBC_Startup() != LLBC_RTN_OK)
+    if(LLBC_Startup() != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _name = name;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_BaseApplication::Start()
@@ -82,7 +82,7 @@ int LLBC_BaseApplication::Send(LLBC_Packet *packet)
     if(!service)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return service->Send(packet);

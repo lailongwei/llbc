@@ -121,7 +121,7 @@ int LLBC_PacketHeaderPartDesc::Done()
     if (!_headerDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return _headerDesc->AddPartDesc(*this);

@@ -31,17 +31,17 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     if (_chain)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _chain = new LLBC_LogTokenChain;
-    if (_chain->Build(initInfo.pattern) != LLBC_RTN_OK)
+    if (_chain->Build(initInfo.pattern) != LLBC_OK)
     {
         LLBC_XDelete(_chain);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_BaseLogAppender::Finalize()

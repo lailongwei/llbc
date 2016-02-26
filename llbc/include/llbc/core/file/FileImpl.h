@@ -84,7 +84,7 @@ inline LLBC_String LLBC_File::ReadLine()
     LLBC_String line;
 
     char ch;
-    while (Read(ch) != LLBC_RTN_FAILED)
+    while (Read(ch) != LLBC_FAILED)
     {
         if (ch != LLBC_CR && ch != LLBC_LF)
         {
@@ -95,7 +95,7 @@ inline LLBC_String LLBC_File::ReadLine()
         if (ch == LLBC_CR)
         {
             // Read linefeed.
-            if (ReadRawObj<char>(ch) == LLBC_RTN_OK)
+            if (ReadRawObj<char>(ch) == LLBC_OK)
             {
                 if (ch != LLBC_LF)
                     OffsetFilePosition(-1);
@@ -114,15 +114,15 @@ inline int LLBC_File::ReadRawObj(T &obj)
     long actuallyRead = Read((&obj), sizeof(T));
     if (actuallyRead == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyRead != sizeof(T))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 inline int LLBC_File::Write(const bool &boolVal)
@@ -200,15 +200,15 @@ inline int LLBC_File::Write(const LLBC_String &str)
     const long actuallyWrote = Write(str.data(), str.size());
     if (actuallyWrote == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyWrote != static_cast<long>(str.size()))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 inline int LLBC_File::Write(const LLBC_WString &wstr)
@@ -217,16 +217,16 @@ inline int LLBC_File::Write(const LLBC_WString &wstr)
         wstr.data(), wstr.size() * sizeof(LLBC_WString::value_type));
     if (actuallyWrote == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyWrote != static_cast<long>(
             wstr.size() * sizeof(LLBC_WString::value_type)))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 inline int LLBC_File::Write(const std::string &str)
@@ -234,15 +234,15 @@ inline int LLBC_File::Write(const std::string &str)
     const long actuallyWrote = Write(str.data(), str.size());
     if (actuallyWrote == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyWrote != static_cast<long>(str.size()))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 inline int LLBC_File::Write(const std::wstring &wstr)
@@ -251,16 +251,16 @@ inline int LLBC_File::Write(const std::wstring &wstr)
         wstr.data(), wstr.size() * sizeof(std::string::value_type));
     if (actuallyWrote == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyWrote != static_cast<long>(
             wstr.size() * sizeof(std::string::value_type)))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
@@ -305,15 +305,15 @@ inline int LLBC_File::WriteRawObj(const T &obj)
     long actuallyWrote = Write(&obj, sizeof(T));
     if (actuallyWrote == -1)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (actuallyWrote != sizeof(T))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

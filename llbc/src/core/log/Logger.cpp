@@ -56,12 +56,12 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     if (name.empty() || !config)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (this->IsInit())
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_mutex);
@@ -81,10 +81,10 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 
         LLBC_ILogAppender *appender = 
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::Console);
-        if (appender->Initialize(appenderInitInfo) != LLBC_RTN_OK)
+        if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _logRunnable->AddAppender(appender);
@@ -106,10 +106,10 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 
         LLBC_ILogAppender *appender =
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::File);
-        if (appender->Initialize(appenderInitInfo) != LLBC_RTN_OK)
+        if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _logRunnable->AddAppender(appender);
@@ -118,7 +118,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     if (_config->IsAsyncMode())
         _logRunnable->Activate(1);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Logger::IsInit() const
@@ -186,7 +186,7 @@ void LLBC_Logger::SetLogLevel(int level)
 int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Debug < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -197,7 +197,7 @@ int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *
 int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Info < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -208,7 +208,7 @@ int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *m
 int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Warn < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -219,7 +219,7 @@ int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *m
 int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Error < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -230,7 +230,7 @@ int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *
 int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Fatal < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -241,7 +241,7 @@ int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *
 int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *message, ...) 
 {
     if (level < _logLevel)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
@@ -265,7 +265,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     _logRunnable->Push(block);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_LogData *LLBC_Logger::BuildLogData(int level,

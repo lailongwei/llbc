@@ -108,25 +108,25 @@ int LLBC_Session::Send(LLBC_Packet *packet)
 {
     LLBC_MessageBlock *block;
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Send(packet, block) != LLBC_RTN_OK)
+    if (_protoStack->Send(packet, block) != LLBC_OK)
 #else
-    if (_protoStack->SendRaw(packet, block) != LLBC_RTN_OK)
+    if (_protoStack->SendRaw(packet, block) != LLBC_OK)
 #endif
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
-    if (this->Send(block) != LLBC_RTN_OK)
+    if (this->Send(block) != LLBC_OK)
     {
         LLBC_Delete(block);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Session::Send(LLBC_MessageBlock *block)
 {
-    if (_socket->AsyncSend(block) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (_socket->AsyncSend(block) != LLBC_OK)
+        return LLBC_FAILED;
 
     // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
@@ -134,7 +134,7 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
         this->OnSend();
 #endif
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -191,9 +191,9 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 {
     std::vector<LLBC_Packet *> packets;
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Recv(block, packets) != LLBC_RTN_OK)
+    if (_protoStack->Recv(block, packets) != LLBC_OK)
 #else
-    if (_protoStack->RecvRaw(block, packets) != LLBC_RTN_OK)
+    if (_protoStack->RecvRaw(block, packets) != LLBC_OK)
 #endif
     {
         this->OnClose();

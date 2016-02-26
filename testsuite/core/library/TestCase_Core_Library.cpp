@@ -31,7 +31,7 @@ int TestCase_Core_Library::Run(int argc, char *argv[])
 
     // Open specific library.
     LLBC_Library lib;
-    if(lib.Open(libName) != LLBC_RTN_OK)
+    if(lib.Open(libName) != LLBC_OK)
     {
         LLBC_PrintLine("Open library %s failed, reason: %s", libName, LLBC_FormatLastError());
         return -1;
@@ -57,7 +57,7 @@ int TestCase_Core_Library::Run(int argc, char *argv[])
 
     // Open self library.
     LLBC_Library selfLib;
-	if(selfLib.Open(NULL) != LLBC_RTN_OK)
+	if(selfLib.Open(NULL) != LLBC_OK)
     {
         LLBC_PrintLine("Open self library failed, reason: %s", LLBC_FormatLastError());
         return -1;

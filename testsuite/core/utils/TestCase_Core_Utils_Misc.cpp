@@ -37,7 +37,7 @@ int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
     std::cout <<"Press any key to continue...";
     getchar();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void TestCase_Core_Utils_Misc::TestGuardFunc()

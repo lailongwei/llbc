@@ -48,7 +48,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const sint8 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -60,7 +60,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const uint8 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -72,7 +72,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const sint16 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -84,7 +84,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const uint16 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -96,7 +96,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const sint32 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -108,7 +108,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const uint32 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -120,7 +120,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const long &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -132,7 +132,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const LLBC_NS ulong &va
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -144,7 +144,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const sint64 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -156,7 +156,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const uint64 &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 
@@ -170,7 +170,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const float &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -182,7 +182,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const double &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -194,7 +194,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, char * const &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -206,7 +206,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const char * const &val
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -218,7 +218,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const std::string &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <>
@@ -230,7 +230,7 @@ inline int LLBC_PacketHeaderParts::SetPart(int serialNo, const LLBC_String &val)
 
     this->SetConstructedPart(serialNo, part);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

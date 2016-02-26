@@ -17,9 +17,9 @@ __LLBC_NS_BEGIN
 int __LLBC_CoreStartup()
 {
     // Create main bundle.
-    if(LLBC_Bundle::CreateMainBundle() != LLBC_RTN_OK)
+    if(LLBC_Bundle::CreateMainBundle() != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Set timezone.
@@ -42,7 +42,7 @@ int __LLBC_CoreStartup()
     // Initialize network library.
     LLBC_StartupNetLibrary();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void __LLBC_CoreCleanup()

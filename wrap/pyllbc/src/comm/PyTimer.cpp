@@ -29,7 +29,7 @@ namespace
             }
 
             method = boundedObj = NULL;
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         else if (PyMethod_Check(obj))
         {
@@ -44,7 +44,7 @@ namespace
                 }
 
                 method = NULL;
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
 
             method = PyMethod_Function(obj); // Borrowed reference.
@@ -65,7 +65,7 @@ namespace
             pyllbc_TransferPyError(couldNotCreateRefStr);
             method = boundedObj = NULL;
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         method = refMethod;
@@ -79,13 +79,13 @@ namespace
                 Py_DECREF(method);
                 method = boundedObj = NULL;
 
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
 
             boundedObj = refBoundedObj;
         }
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     static int __CallObj(PyObject *boundedObj,
@@ -113,7 +113,7 @@ namespace
                 pyllbc_SetError(errStr);
             }
 
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
         }
 
         PyObject *rawBoundedObj = NULL;
@@ -127,7 +127,7 @@ namespace
                     if (ignoredDeadRef)
                     {
                         needReschedule = false;
-                        return LLBC_RTN_OK;
+                        return LLBC_OK;
                     }
                     else
                     {
@@ -142,7 +142,7 @@ namespace
                     }
                 }
 
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
         }
 
@@ -157,13 +157,13 @@ namespace
         if (!pyRtn)
         {
             pyllbc_TransferPyError();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         needReschedule = !!PyObject_IsTrue(pyRtn);
         Py_DECREF(pyRtn);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 }
 
@@ -177,7 +177,7 @@ pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObjec
                        _timeoutCallable,
                        _timeoutCallableDesc,
                        _boundedTimeOutObj,
-                       _boundedTimeOutObjDesc) != LLBC_RTN_OK)
+                       _boundedTimeOutObjDesc) != LLBC_OK)
         return;
 
     if (cancelCallable)
@@ -186,7 +186,7 @@ pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObjec
                            _cancelCallable,
                            _cancelCallableDesc,
                            _boundedCancelObj,
-                           _boundedCancelObjDesc) != LLBC_RTN_OK)
+                           _boundedCancelObjDesc) != LLBC_OK)
             return;
     }
     else
@@ -220,16 +220,16 @@ void pyllbc_Timer::SetIgnoredDeadRef(bool flag)
 
 int pyllbc_Timer::Schedule(uint64 dueTime, uint64 period)
 {
-    if (Base::Schedule(dueTime, period) != LLBC_RTN_OK)
+    if (Base::Schedule(dueTime, period) != LLBC_OK)
     {
         const LLBC_String desc = this->ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, desc);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_INCREF(_pyTimer);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_String pyllbc_Timer::ToString() const
@@ -256,7 +256,7 @@ bool pyllbc_Timer::OnTimeout()
                   this->GetTimerId(),
                   true,
                   _ignoredDeadRef,
-                  reschedule) != LLBC_RTN_OK)
+                  reschedule) != LLBC_OK)
     {
         Py_DECREF(_pyTimer);
         return false;

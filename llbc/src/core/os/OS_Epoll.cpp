@@ -33,10 +33,10 @@ int LLBC_EpollCtl(LLBC_Handle epfd, int op, int fd, LLBC_EpollEvent *event)
     if (::epoll_ctl(epfd, op, fd, event) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_EpollWait(LLBC_Handle epfd, LLBC_EpollEvent *events, int maxEvents, int timeout)
@@ -55,10 +55,10 @@ int LLBC_EpollClose(LLBC_Handle epfd)
     if (::close(epfd) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID

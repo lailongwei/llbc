@@ -16,7 +16,7 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
     if (!name.empty() && !this->CheckName(name))
     {
         LLBC_SetLastError(LLBC_ERROR_FORMAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (name.empty())
@@ -29,7 +29,7 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
 
 		_comments = comments;
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else
     {
@@ -38,7 +38,7 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
         This *prop = const_cast<This *>(this->GetProperty(name));
         prop->SetValue("", value, comments);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 }
 

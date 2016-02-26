@@ -74,7 +74,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     if (UNLIKELY(milliSeconds < 0 && milliSeconds != static_cast<int>(LLBC_INFINITE)))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -84,7 +84,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     if (milliSeconds == static_cast<int>(LLBC_INFINITE))
     {
         pthread_cond_wait(&m_handle, mtx);
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     struct timeval tvStart, tvEnd;
@@ -112,10 +112,10 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
             LLBC_SetLastError(LLBC_ERROR_CLIB);
         }
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     ::WaitForSingleObject(_cond.blockLock, INFINITE);
     ++ _cond.waitersBlocked;
@@ -142,7 +142,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
   #pragma inline_depth()
  #endif
 
-    return successed ? LLBC_RTN_OK : LLBC_RTN_FAILED;
+    return successed ? LLBC_OK : LLBC_FAILED;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 

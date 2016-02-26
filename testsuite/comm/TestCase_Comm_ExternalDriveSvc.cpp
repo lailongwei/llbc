@@ -126,7 +126,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
 
     // Set drive mode and start it.
     _svc->SetDriveMode(LLBC_IService::ExternalDrive);
-    if (_svc->Start() != LLBC_RTN_OK)
+    if (_svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Service startup failed, reason: %s", LLBC_FormatLastError());
         return -1;

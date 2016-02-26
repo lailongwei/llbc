@@ -27,7 +27,7 @@
     if (!PyArg_ParseTuple(args, parseFmt, &packet, &serialNo, &val)) \
         return NULL;                                        \
                                                             \
-    if (packet->SetHeaderPartVal(serialNo, val) != LLBC_RTN_OK) \
+    if (packet->SetHeaderPartVal(serialNo, val) != LLBC_OK) \
     {                                                       \
         LLBC_String fmtStr;                                 \
         pyllbc_TransferLLBCError(                           \
@@ -190,7 +190,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_SetHeaderPartAsBytes(PyObject *self, PyOb
     if (!PyArg_ParseTuple(args, "lis#", &packet, &serialNo, &val, &valLen))
         return NULL;
 
-    if (packet->SetHeaderPartVal(serialNo, val, valLen) != LLBC_RTN_OK)
+    if (packet->SetHeaderPartVal(serialNo, val, valLen) != LLBC_OK)
     {
         LLBC_String addiErrMsg;
         addiErrMsg.format("When set packet header part, "

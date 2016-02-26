@@ -35,12 +35,12 @@ int LLBC_PacketHeaderDescAccessor::SetPacketDesc(LLBC_PacketHeaderDesc *headerDe
     if (_headerDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _headerDesc = headerDesc;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PacketHeaderDescAccessor::CleanupHeaderDesc()

@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 
 int __LLBC_CommStartup()
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void __LLBC_CommCleanup()

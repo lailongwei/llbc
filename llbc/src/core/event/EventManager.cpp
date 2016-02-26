@@ -95,7 +95,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
         return op.listener.stub.c_str();
     }
 
-    if (this->ProcessEventOperation(op) != LLBC_RTN_OK)
+    if (this->ProcessEventOperation(op) != LLBC_OK)
         return LLBC_INVALID_LISTENER_STUB;
 
     return op.listener.stub.c_str();
@@ -143,7 +143,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    if (this->ProcessEventOperation(op) != LLBC_RTN_OK)
+    if (this->ProcessEventOperation(op) != LLBC_OK)
     {
         LLBC_XDelete(listener);
         return LLBC_INVALID_LISTENER_STUB;
@@ -157,7 +157,7 @@ int LLBC_EventManager::RemoveListener(int id)
     if (id <= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Op op;
@@ -169,7 +169,7 @@ int LLBC_EventManager::RemoveListener(int id)
         _delayedOps.push_back(op);
 
         LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return this->ProcessEventOperation(op);
@@ -186,7 +186,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
         _delayedOps.push_back(op);
 
         LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return ProcessEventOperation(op);
@@ -248,7 +248,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
             if (mIt == _listeners.end())
             {
                 LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
 
             _Listeners &listeners = mIt->second;
@@ -270,7 +270,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
             if (stubIt == _stubListeners.end())
             {
                 LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
             
             const int evId = stubIt->second.evId;
@@ -299,7 +299,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_EventManager::BeforeFireEvent()

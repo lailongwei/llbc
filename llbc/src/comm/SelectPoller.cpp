@@ -43,14 +43,14 @@ int LLBC_SelectPoller::Start()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (this->Activate() != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (this->Activate() != LLBC_OK)
+        return LLBC_FAILED;
 
     _started = true;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_SelectPoller::Svc()
@@ -164,7 +164,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     socket->SetPollerType(LLBC_PollerType::SelectPoller);
 
     const LLBC_SocketHandle handle = socket->Handle();
-    if (socket->Connect(ev.peerAddr) == LLBC_RTN_OK)
+    if (socket->Connect(ev.peerAddr) == LLBC_OK)
     {
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
@@ -289,7 +289,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
             if (socket->GetOption(SOL_SOCKET,
                                   SO_ERROR,
                                   &optval,
-                                  &optlen) != LLBC_RTN_OK || optval != 0)
+                                  &optlen) != LLBC_OK || optval != 0)
                 connected = false;
         }
         else if (LLBC_FdIsSet(it->first, &excepts))

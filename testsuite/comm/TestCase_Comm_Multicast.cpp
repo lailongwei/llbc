@@ -104,7 +104,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     if (argc < 5)
     {
         LLBC_FilePrintLine(stderr, "Argument error, eg: ./a [client/server], [normal/raw] ip port [useBst=False]");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Fetch arguments.
@@ -128,7 +128,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 
     LLBC_Delete(svc);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
@@ -152,14 +152,14 @@ int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_IService *svc)
         {
             LLBC_PrintLine("Connect to %s:%d failed, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_PrintLine("Connect to %s:%d succeed, sid: %d",
             _runIp.c_str(), _runPort, sessionId);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_IService *svc)
@@ -169,10 +169,10 @@ int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_IService *svc)
     {
         LLBC_FilePrintLine(stderr, "Listen on %s:%d failed, err: %s",
             _runIp.c_str(), _runPort, LLBC_FormatLastError());
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_PrintLine("Server listening on %s:%d...", _runIp.c_str(), _runPort);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

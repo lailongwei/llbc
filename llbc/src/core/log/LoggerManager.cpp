@@ -40,24 +40,24 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     if (_root)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _configurator = new LLBC_LoggerConfigurator;
-    if (_configurator->Initialize(cfgFile) != LLBC_RTN_OK)
+    if (_configurator->Initialize(cfgFile) != LLBC_OK)
     {
         LLBC_XDelete(_configurator);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // First, config root logger.
     _root = new LLBC_Logger;
-    if (_configurator->Config("root", _root) != LLBC_RTN_OK)
+    if (_configurator->Config("root", _root) != LLBC_OK)
     {
         LLBC_XDelete(_root);
         LLBC_XDelete(_configurator);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Config other loggers.
@@ -71,17 +71,17 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         }
 
         LLBC_Logger *logger = new LLBC_Logger;
-        if (_configurator->Config(iter->first, logger) != LLBC_RTN_OK)
+        if (_configurator->Config(iter->first, logger) != LLBC_OK)
         {
             delete logger;
             this->Finalize();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _loggers.insert(std::make_pair(iter->first, logger));
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_LoggerManager::Finalize()

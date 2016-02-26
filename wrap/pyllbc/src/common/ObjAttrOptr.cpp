@@ -30,9 +30,9 @@ int pyllbc_ObjAttrOptr::DelAttr(const LLBC_String &name)
     if (PyObject_DelAttrString(_obj, name.c_str()) == -1)
     {
         pyllbc_TransferPyError();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 

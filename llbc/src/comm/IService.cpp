@@ -33,12 +33,12 @@ int LLBC_IService::SetPacketHeaderDesc(LLBC_PacketHeaderDesc *headerDesc)
     if (_Accessor::GetHeaderDesc(false))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Accessor::SetPacketDesc(headerDesc);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_IService::SetPacketHeaderDescFactory(LLBC_IPacketHeaderDescFactory *factory)
@@ -48,18 +48,18 @@ int LLBC_IService::SetPacketHeaderDescFactory(LLBC_IPacketHeaderDescFactory *fac
     if (!factory)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_Accessor::GetHeaderDesc(false))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _Accessor::SetPacketDesc(factory->Create());
     LLBC_Delete(factory);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

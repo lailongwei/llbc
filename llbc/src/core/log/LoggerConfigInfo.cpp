@@ -81,7 +81,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
         _logFile = LLBC_GetTemporaryDirectory(true) + _logFile;
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LoggerConfigInfo::GetLogLevel() const

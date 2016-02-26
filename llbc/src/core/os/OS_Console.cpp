@@ -27,17 +27,17 @@ int LLBC_GetConsoleColor(FILE *file)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else
     const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (UNLIKELY(fileNo != 1 && fileNo != 2))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     HANDLE handle = (fileNo == 1 ? 
@@ -54,17 +54,17 @@ int LLBC_SetConsoleColor(FILE *file, int color)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 #else
     const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (UNLIKELY(fileNo != 1 && fileNo != 2))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     HANDLE handle = (fileNo == 1 ? 
@@ -73,10 +73,10 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     if (::SetConsoleTextAttribute(handle, color) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -85,7 +85,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     char *buf; int len;
@@ -105,7 +105,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 
     LLBC_Free(buf);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

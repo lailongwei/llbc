@@ -502,7 +502,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(LLBC_Packet &packet)
     {
         const std::string j(reinterpret_cast<
             const char *>(packet.GetPayload()), packet.GetPayloadLength());
-        if ((pyllbc_ObjCoder::Decode(j, pyData)) != LLBC_RTN_OK)
+        if ((pyllbc_ObjCoder::Decode(j, pyData)) != LLBC_OK)
             return NULL;
     }
 

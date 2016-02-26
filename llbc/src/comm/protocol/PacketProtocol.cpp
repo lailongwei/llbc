@@ -41,7 +41,7 @@ void inline __DelPacketList(void *&data)
         reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data);
 
     LLBC_NS LLBC_Packet *packet;
-    while (block->Read(&packet, sizeof(LLBC_NS LLBC_Packet *)) == LLBC_RTN_OK)
+    while (block->Read(&packet, sizeof(LLBC_NS LLBC_Packet *)) == LLBC_OK)
         LLBC_Delete(packet);
 
     LLBC_Delete(block);
@@ -76,7 +76,7 @@ int LLBC_PacketProtocol::GetLayer() const
 
 int LLBC_PacketProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_PacketProtocol::Send(void *in, void *&out)
@@ -86,7 +86,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out)
     out = packet->GiveUp();
     LLBC_Delete(packet);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_PacketProtocol::Recv(void *in, void *&out)
@@ -106,7 +106,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
         {
             size_t headerUsed;
             if (!_headerAssembler.Assemble(readableBuf, readableSize, headerUsed)) // If header recv not done, return.
-                return LLBC_RTN_OK;
+                return LLBC_OK;
 
             // Create new packet.
             _packet = LLBC_New(LLBC_Packet);
@@ -125,13 +125,13 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
 
                 LLBC_INL_NS __DelPacketList(out);
 
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
 
             // Reset the header assembler.
             _headerAssembler.Reset();
             if (headerUsed == readableSize) // If readable size equal headerUsed, just return.
-                return LLBC_RTN_OK;
+                return LLBC_OK;
 
             // Offset the readable buffer pointer and modify readable size value.
             readableBuf += headerUsed;
@@ -156,7 +156,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
             _payloadRecved += readableSize;
 #endif // target platform is WIN32 and defined _WIN64 macro.
 
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
 
         // Readable data size >= content need receive size.
@@ -178,13 +178,13 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
 #endif // target platform is WIN32 and defined _WIN64 macro.
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_PacketProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 __LLBC_NS_END

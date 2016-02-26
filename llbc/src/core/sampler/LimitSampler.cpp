@@ -43,9 +43,9 @@ void LLBC_LimitSampler::Reset()
 
 int LLBC_LimitSampler::Sampling(sint64 value, void *appData)
 {
-    if (_Base::Sampling(value, appData) != LLBC_RTN_OK)
+    if (_Base::Sampling(value, appData) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (value < _minVal)
@@ -59,7 +59,7 @@ int LLBC_LimitSampler::Sampling(sint64 value, void *appData)
         _maxValSamplingTime = time(NULL);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 sint64 LLBC_LimitSampler::GetMinValue() const

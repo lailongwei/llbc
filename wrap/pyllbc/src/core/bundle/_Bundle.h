@@ -57,7 +57,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitBundle(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ls", &bundle, &path))
         return NULL;
 
-    if (bundle->Initialize(path) != LLBC_RTN_OK)
+    if (bundle->Initialize(path) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return NULL;

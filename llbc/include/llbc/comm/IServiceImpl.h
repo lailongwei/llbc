@@ -112,13 +112,13 @@ inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*me
 {
     LLBC_IDelegate1<LLBC_Packet &> *deleg = 
         new LLBC_Delegate1<ObjType, LLBC_Packet &>(obj, method);
-    if (this->Subscribe(opcode, deleg) != LLBC_RTN_OK)
+    if (this->Subscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename ObjType>
@@ -126,13 +126,13 @@ inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, void *(ObjType:
 {
     LLBC_IDelegateEx<LLBC_Packet &> *deleg =
         new LLBC_DelegateEx<ObjType, LLBC_Packet &>(obj, method);
-    if (this->PreSubscribe(opcode, deleg) != LLBC_RTN_OK)
+    if (this->PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -141,13 +141,13 @@ inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, void *(ObjType::*metho
 {
     LLBC_IDelegateEx<LLBC_Packet &> *deleg =
         new LLBC_DelegateEx<ObjType, LLBC_Packet &>(obj, method);
-    if (this->UnifyPreSubscribe(deleg) != LLBC_RTN_OK)
+    if (this->UnifyPreSubscribe(deleg) != LLBC_OK)
     {
         delete deleg;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
@@ -157,13 +157,13 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, 
 {
     LLBC_IDelegate1<LLBC_Packet &> *deleg =
         new LLBC_Delegate1<ObjType, LLBC_Packet &>(obj, method);
-    if (this->SubscribeStatus(opcode, status, deleg) != LLBC_RTN_OK)
+    if (this->SubscribeStatus(opcode, status, deleg) != LLBC_OK)
     {
         delete deleg;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
@@ -183,13 +183,13 @@ template <typename ObjType>
 inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(LLBC_IService::This *svc))
 {
     LLBC_IDelegate1<LLBC_IService::This *> *deleg = new LLBC_Delegate1<ObjType, LLBC_IService::This *>(obj, method);
-    if (this->Post(deleg) != LLBC_RTN_OK)
+    if (this->Post(deleg) != LLBC_OK)
     {
         delete deleg;
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

@@ -56,19 +56,19 @@ int LLBC_Entity::AddProperty(const LLBC_String &name, const LLBC_Variant &value)
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::map<LLBC_String, LLBC_Variant>::const_iterator iter = _properties.find(name);
     if (iter != _properties.end())
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _properties.insert(std::make_pair(name, value));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Entity::IsExistProperty(const LLBC_String &name) const
@@ -134,19 +134,19 @@ int LLBC_Entity::RemmoveProperty(const LLBC_String &name)
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::map<LLBC_String, LLBC_Variant>::iterator iter = _properties.find(name);
     if (iter == _properties.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _properties.erase(iter);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Entity::RemoveAllProperties()
@@ -200,7 +200,7 @@ int LLBC_Entity::RemoveBehavior(int id)
     if (iter == _behaviors.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 
@@ -210,7 +210,7 @@ int LLBC_Entity::RemoveBehavior(int id)
     delete iter->second.holder;
     _behaviors.erase(iter);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Entity::RemoveBehavior(const LLBC_String &name)
@@ -218,21 +218,21 @@ int LLBC_Entity::RemoveBehavior(const LLBC_String &name)
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     std::map<LLBC_String, LLBC_BehaviorValue>::iterator iter = _behaviors2.find(name);
     if (iter == _behaviors2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _behaviors.erase(iter->second.id);
     delete iter->second.holder;
     _behaviors2.erase(iter);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Entity::RemoveAllBehaviors()

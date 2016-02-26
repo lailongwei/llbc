@@ -2861,10 +2861,10 @@ public:
         for (::std::map<LLBC_String, ::pyllbc_ScriptIntegrator *>::iterator it = _scripts.begin();
              it != _scripts.end();
              it++)
-            if (it->second->Integrate() != LLBC_RTN_OK)
-                return LLBC_RTN_FAILED;
+            if (it->second->Integrate() != LLBC_OK)
+                return LLBC_FAILED;
         
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
 private:

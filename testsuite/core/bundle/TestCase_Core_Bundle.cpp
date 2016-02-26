@@ -36,7 +36,7 @@ int TestCase_Core_Bundle::Run(int argc, char *argv[])
     // Test create bundle.
     LLBC_Bundle myBundle;
     LLBC_String myBundlePath = "adfasdkfasfas";
-    if(myBundle.Initialize(myBundlePath) != LLBC_RTN_OK)
+    if(myBundle.Initialize(myBundlePath) != LLBC_OK)
     {
         LLBC_PrintLine("Create bundle with path [%s] failed, reason: %s, right!!!!", myBundlePath.c_str(), LLBC_FormatLastError());
     }
@@ -45,7 +45,7 @@ int TestCase_Core_Bundle::Run(int argc, char *argv[])
         LLBC_PrintLine("Try to create not exist's bundle[%s], but return successed, please check it!!!", myBundlePath.c_str());
     }
     
-    if(myBundle.Initialize("") != LLBC_RTN_OK)
+    if(myBundle.Initialize("") != LLBC_OK)
     {
         LLBC_PrintLine("Create main bundle failed, reason: %s, please check it!!!", LLBC_FormatLastError());
     }

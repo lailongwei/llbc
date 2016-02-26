@@ -52,7 +52,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
     if (UNLIKELY(!desc))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_firstThreadDesc)
@@ -62,7 +62,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
 
         _firstThreadDesc = desc;
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_ThreadDescriptor *threadDesc = _firstThreadDesc;
@@ -73,7 +73,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
         if (tempDesc->GetHandle() == desc->GetHandle())
         {
             LLBC_SetLastError(LLBC_ERROR_EXIST);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -82,7 +82,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
 
     threadDesc->SetGroupThreadNext(desc);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_ThreadGroupDescriptor::IsInGroup(LLBC_Handle threadHandle) const
@@ -120,25 +120,25 @@ int LLBC_ThreadGroupDescriptor::RemoveFromGroup(LLBC_Handle threadHandle)
     if (UNLIKELY(threadHandle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_firstThreadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_firstThreadDesc->GetHandle() == threadHandle)
     {
         _firstThreadDesc = _firstThreadDesc->GetGroupThreadNext();
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (!_firstThreadDesc->GetGroupThreadNext())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ThreadDescriptor *prevThreadDesc = _firstThreadDesc;
@@ -150,7 +150,7 @@ int LLBC_ThreadGroupDescriptor::RemoveFromGroup(LLBC_Handle threadHandle)
             prevThreadDesc->SetGroupThreadNext(
                 threadDesc->GetGroupThreadNext());
 
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
 
         prevThreadDesc = threadDesc;
@@ -158,7 +158,7 @@ int LLBC_ThreadGroupDescriptor::RemoveFromGroup(LLBC_Handle threadHandle)
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 uint32 LLBC_ThreadGroupDescriptor::GetThreadCount() const

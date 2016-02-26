@@ -47,7 +47,7 @@ int LLBC_RawProtocol::GetLayer() const
 
 int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 {
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_RawProtocol::Send(void *in, void *&out)
@@ -60,7 +60,7 @@ int LLBC_RawProtocol::Send(void *in, void *&out)
 
     LLBC_Delete(packet);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_RawProtocol::Recv(void *in, void *&out)
@@ -82,13 +82,13 @@ int LLBC_RawProtocol::Recv(void *in, void *&out)
     out = LLBC_New1(LLBC_MessageBlock, sizeof(LLBC_Packet *));
     (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&packet, sizeof(LLBC_Packet *));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_RawProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 __LLBC_NS_END

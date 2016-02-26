@@ -39,7 +39,7 @@ void LLBC_LogRunnable::Cleanup()
     LLBC_LogData *logData = NULL;
     LLBC_MessageBlock *block = NULL;
 
-    while (this->TryPop(block) == LLBC_RTN_OK)
+    while (this->TryPop(block) == LLBC_OK)
     {
         block->Read(&logData, sizeof(LLBC_LogData *));
 
@@ -65,7 +65,7 @@ void LLBC_LogRunnable::Svc()
     LLBC_MessageBlock *block = NULL;
     while (LIKELY(!_stoped))
     {
-        if (this->TimedPop(block, 50) != LLBC_RTN_OK)
+        if (this->TimedPop(block, 50) != LLBC_OK)
             continue;
 
         block->Read(&logData, sizeof(LLBC_LogData *));
@@ -119,20 +119,20 @@ int LLBC_LogRunnable::Output(LLBC_LogData *data)
     LLBC_ILogAppender *appender = _head;
     if (!appender)
     {
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     
     while (appender)
     {
-        if (appender->Output(*data) != LLBC_RTN_OK)
+        if (appender->Output(*data) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         appender = appender->GetAppenderNext();
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_LogRunnable::Stop()

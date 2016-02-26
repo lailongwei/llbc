@@ -181,7 +181,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     for(int i = 2; i <= 20; i += 2)
     {
         int status = dict.Erase(i);
-        ASSERT(status == LLBC_RTN_OK && "Dictionary internal error, check it!");
+        ASSERT(status == LLBC_OK && "Dictionary internal error, check it!");
     }
 
     std::cout <<"Done, output: " <<std::endl;

@@ -290,7 +290,7 @@ LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
     char *fileContent = NULL;
 
     LLBC_File fileObj;
-    if (fileObj.Open(file, LLBC_FileMode::BinaryRead) != LLBC_RTN_OK)
+    if (fileObj.Open(file, LLBC_FileMode::BinaryRead) != LLBC_OK)
     {
         return "";
     }
@@ -386,7 +386,7 @@ int LLBC_MD5::GenerateBufferDigest(const void *buf, size_t len, LLBC_MD5::MD5Gro
     if (len == 0 || len % MD5Group::GROUP_SIZE != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (size_t i = 0; i < len; i += MD5Group::GROUP_SIZE)
@@ -395,7 +395,7 @@ int LLBC_MD5::GenerateBufferDigest(const void *buf, size_t len, LLBC_MD5::MD5Gro
         group.GenerateDigest(digest);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

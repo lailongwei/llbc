@@ -44,7 +44,7 @@ int __LLBC_CommonStartup()
     // Set endian type constant.
     LLBC_MachineEndian = LLBC_GetMachineEndianType();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void __LLBC_CommonCleanup()

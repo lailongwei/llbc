@@ -51,10 +51,10 @@ class IntegratorBuilder(object):
                                "::pyllbc_ScriptIntegrator *>::iterator it = _scripts.begin();")
         integrate_meth.addstmt('     it != _scripts.end();')
         integrate_meth.addstmt('     it++)')
-        integrate_meth.addstmt('    if (it->second->Integrate() != LLBC_RTN_OK)')
-        integrate_meth.addstmt('        return LLBC_RTN_FAILED;')
+        integrate_meth.addstmt('    if (it->second->Integrate() != LLBC_OK)')
+        integrate_meth.addstmt('        return LLBC_FAILED;')
         integrate_meth.addstmt('')
-        integrate_meth.addstmt('return LLBC_RTN_OK;')
+        integrate_meth.addstmt('return LLBC_OK;')
         clazz.addmethod(integrate_meth)
 
         # Generate data member.

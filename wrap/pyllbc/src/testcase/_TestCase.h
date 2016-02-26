@@ -25,15 +25,15 @@ public:
 
         PyObject *callable = NULL;
         pyllbc_ObjAttrOptr optr(pyObj);
-        if (optr.GetAttr("run", callable) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (optr.GetAttr("run", callable) != LLBC_OK)
+            return LLBC_FAILED;
 
         if (!PyCallable_Check(callable))
         {
             Py_DECREF(callable);
 
             pyllbc_SetError("object not callable");
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     
         Py_DECREF(callable);
@@ -41,11 +41,11 @@ public:
         PyObject *arg = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[1]));
         PyObject *rtn = PyObject_CallMethod(pyObj, const_cast<char *>("run"), const_cast<char *>("N"), arg);
         if (!rtn)
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
 
         int cRtn = 0;
         if (!PyArg_Parse(rtn, "i", &cRtn))
-            cRtn = LLBC_RTN_FAILED;
+            cRtn = LLBC_FAILED;
 
         Py_DECREF(rtn);
         return cRtn;

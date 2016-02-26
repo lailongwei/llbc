@@ -40,15 +40,15 @@ void LLBC_CountSampler::Reset()
 
 int LLBC_CountSampler::Sampling(sint64 value, void *appData)
 {
-    if (_Base::Sampling(value, appData) != LLBC_RTN_OK)
+    if (_Base::Sampling(value, appData) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _totalSamplingTimes += 1;
     _totalSamplingValue += value;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 uint64 LLBC_CountSampler::GetTotalSamplingTimes() const

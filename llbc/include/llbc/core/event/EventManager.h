@@ -73,8 +73,8 @@ public:
     /**
      * Remove event listener.
      * @param[in] id - event Id.
-     * @return int - success if return LLBC_RTN_OK, otherwise return LLBC_RTN_FAILED.
-     *               specially, if return LLBC_RTN_FAILED,  and fetch the last error is pending,
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     *               specially, if return LLBC_FAILED,  and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
     int RemoveListener(int id);
@@ -82,8 +82,8 @@ public:
     /**
      * Remove event listener using listener stub.
      * @param[in] stub - event listener stub.
-     * @return int - success if return LLBC_RTN_OK, otherwise return LLBC_RTN_FAILED,
-     *               specially, if return LLBC_RTN_FAILED, and fetch the last error is pending,
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
+     *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
     int RemoveListener(const LLBC_ListenerStub &stub);

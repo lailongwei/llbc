@@ -72,7 +72,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
 
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
     svc->RegisterFacade(LLBC_New(TestFacade));
-    if(svc->Start() != LLBC_RTN_OK)
+    if(svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());
         delete svc;

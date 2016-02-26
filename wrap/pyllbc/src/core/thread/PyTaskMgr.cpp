@@ -38,7 +38,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
     if (script.empty())
     {
         pyllbc_SetError("task entry script empty", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
@@ -46,20 +46,20 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
     if (this->GetTaskCount() >= PYLLBC_CFG_TASK_LMT)
     {
         pyllbc_SetError("task count gone to limit, create failed", LLBC_ERROR_LIMIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_Task *task = new pyllbc_Task(++_maxTaskId, script);
     _tasks.insert(std::make_pair(_maxTaskId, task));
 
-    if (task->Activate() != LLBC_RTN_OK)
+    if (task->Activate() != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
 
         _tasks.erase(_maxTaskId--);
         delete task;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return _maxTaskId;
@@ -82,12 +82,12 @@ int pyllbc_TaskMgr::GetCurrentTaskId() const
 //        return (static_cast<pyllbc_Task *>(tls->coreTls.task))->GetId();
 //
 //    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-//    return LLBC_RTN_FAILED;
+//    return LLBC_FAILED;
 
     // TODO: Do stuff here.
 
     pyllbc_SetError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 bool pyllbc_TaskMgr::IsTaskExist(int taskId) const
@@ -115,13 +115,13 @@ int pyllbc_TaskMgr::PushMsg(int taskId, LLBC_MessageBlock *msg)
     if (UNLIKELY(!msg))
     {
         pyllbc_SetError("msg null", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (taskId == 0)
     {
         _mainThreadQueue.PushBack(msg);
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_Guard guard(_lock);
@@ -129,11 +129,11 @@ int pyllbc_TaskMgr::PushMsg(int taskId, LLBC_MessageBlock *msg)
     if (it == _tasks.end())
     {
         pyllbc_SetError("task not exist", LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     it->second->Push(msg);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_TaskMgr::PopMsg(int taskId, LLBC_MessageBlock *&msg, int interval)
@@ -147,7 +147,7 @@ int pyllbc_TaskMgr::PopMsg(int taskId, LLBC_MessageBlock *&msg, int interval)
         else if (interval == LLBC_INFINITE)
         {
             _mainThreadQueue.PopFront(msg);
-            return LLBC_RTN_OK;
+            return LLBC_OK;
         }
 
         return _mainThreadQueue.TimedPopFront(msg, interval);
@@ -158,7 +158,7 @@ int pyllbc_TaskMgr::PopMsg(int taskId, LLBC_MessageBlock *&msg, int interval)
     if (it == _tasks.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_Task *task = it->second;

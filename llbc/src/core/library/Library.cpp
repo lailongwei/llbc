@@ -30,13 +30,13 @@ int LLBC_Library::Open(const char *fileName)
     if (_handle != LLBC_INVALID_LIBRARY_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((_handle = LLBC_LoadLibrary(fileName)) == LLBC_INVALID_LIBRARY_HANDLE)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_LibraryFun LLBC_Library::GetProcAddress(const char *procName)
@@ -49,15 +49,15 @@ int LLBC_Library::Close()
     if (_handle == LLBC_INVALID_LIBRARY_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (LLBC_CloseLibrary(_handle) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (LLBC_CloseLibrary(_handle) != LLBC_OK)
+        return LLBC_FAILED;
 
     _handle = LLBC_INVALID_LIBRARY_HANDLE;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

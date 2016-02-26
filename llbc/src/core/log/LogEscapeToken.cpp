@@ -27,7 +27,7 @@ LLBC_LogEscapeToken::~LLBC_LogEscapeToken()
 int LLBC_LogEscapeToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
     this->SetFormatter(formatter);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogEscapeToken::GetType() const

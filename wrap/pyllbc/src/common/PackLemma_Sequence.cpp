@@ -48,7 +48,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
     {
         pyllbc_SetError(
             "sequence-lemma is done or error, could not continuing to process format symbol");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_state == Base::Begin)
     {
@@ -61,7 +61,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
             pyllbc_SetError(errStr.format(
                 "sequence-lemma expect sequence begin character, got %c", ch));
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _seqType = ch;
@@ -69,7 +69,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
 
         _str.append(1, static_cast<char>(_seqType));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     const SymbolGroup &raw = GroupedSymbol::Raw();
@@ -89,13 +89,13 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
             pyllbc_SetError(errMsg.format(
                 "sequence-lemma not exist sub lemma to describe sequence element type"));
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _state = Base::Done;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (raw.find(ch) == raw.end())
@@ -106,22 +106,22 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
         pyllbc_SetError(errMsg.format(
             "bad format character in sequence-lemma, format character: %c", ch));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
-    if (lemma->Process(ch) != LLBC_RTN_OK)
+    if (lemma->Process(ch) != LLBC_OK)
     {
         delete lemma;
         _state = Base::Error;
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _lemmas.push_back(lemma);
     _str.append(1, static_cast<char>(ch));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemma_Sequence::Process(Base *lemma)
@@ -131,21 +131,21 @@ int pyllbc_PackLemma_Sequence::Process(Base *lemma)
         _state = Base::Error;
         pyllbc_SetError("will accept lemma state not done, sequence-lemma could not accept it");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if(lemma->GetType() == Base::TopType)
     {
         _state = Base::Error;
         pyllbc_SetError("sequence-lemma cound not accept Top type lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if(!lemma->IsSerializable())
     {
         _state = Base::Error;
         pyllbc_SetError("sequence-lemma could not accept UnSerializable type lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_state != Base::Accepting)
@@ -153,13 +153,13 @@ int pyllbc_PackLemma_Sequence::Process(Base *lemma)
         _state = Base::Error;
         pyllbc_SetError("sequence-lemma not in accepting state, could not accept lemma");
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _lemmas.push_back(lemma);
     _str.append (lemma->ToString());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
@@ -222,12 +222,12 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("sequence-lemma state not done, could not packing data");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!PySequence_Check(values))
     {
         pyllbc_SetError("will pack data not iteratble");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const Py_ssize_t len = PySequence_Size(values);
@@ -236,7 +236,7 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
     {
         pyllbc_SetError("when packing sequence data, format string size > 1, "
             "but sequence len not equal the format string size");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
@@ -252,14 +252,14 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
         Base *lemma = _lemmas.at(lemmaCount > 1 ? i : 0);
         PyObject *elem = PySequence_ITEM(values, i);
 
-        if (lemma->Write(stream, elem) != LLBC_RTN_OK)
+        if (lemma->Write(stream, elem) != LLBC_OK)
         {
             Py_DECREF(elem);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         Py_DECREF(elem);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

@@ -177,23 +177,23 @@ int LLBC_Service::SetId(int id)
     if (_svcMgr.GetService(id))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _id = id;
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 This::Type LLBC_Service::GetType() const
@@ -206,25 +206,25 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
     if (mode != This::SelfDrive && mode != This::ExternalDrive)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((_driveMode = mode) == This::ExternalDrive)
         this->GetTimerScheduler();
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 int LLBC_Service::Start(int pollerCount)
@@ -232,28 +232,28 @@ int LLBC_Service::Start(int pollerCount)
     if (pollerCount <= 0)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_svcMgr.GetService(_id))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (_pollerMgr.Start(pollerCount) != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (_pollerMgr.Start(pollerCount) != LLBC_OK)
+        return LLBC_FAILED;
 
     if (_driveMode == This::ExternalDrive)
     {
@@ -262,17 +262,17 @@ int LLBC_Service::Start(int pollerCount)
             LLBC_SetLastError(LLBC_ERROR_LIMIT);
             _pollerMgr.Stop();
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         this->AddServiceToTls();
     }
     else
     {
-        if (this->Activate(1) != LLBC_RTN_OK)
+        if (this->Activate(1) != LLBC_OK)
         {
             _pollerMgr.Stop();
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
@@ -281,7 +281,7 @@ int LLBC_Service::Start(int pollerCount)
     if (_driveMode == This::ExternalDrive)
         this->InitFacades();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_Service::IsStarted() const
@@ -332,11 +332,11 @@ int LLBC_Service::SetFPS(int fps)
 
         _fps = fps;
         _frameInterval = 1000 / _fps;
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     LLBC_SetLastError(LLBC_ERROR_LIMIT);
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 int LLBC_Service::GetFrameInterval() const
@@ -466,7 +466,7 @@ int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, in
     if (parts)
         LLBC_Delete(parts);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::Broadcast2(int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
@@ -518,7 +518,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t le
     if (parts)
         LLBC_Delete(parts);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::RemoveSession(int sessionId)
@@ -527,7 +527,7 @@ int LLBC_Service::RemoveSession(int sessionId)
     if (!_started)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard connSIdsGuard(_connectedSessionIdsLock);
@@ -536,13 +536,13 @@ int LLBC_Service::RemoveSession(int sessionId)
     if (sessionIdIt == _connectedSessionIds.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _pollerMgr.Close(sessionId);
     _connectedSessionIds.erase(sessionIdIt);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
@@ -550,26 +550,26 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
     if (UNLIKELY(!facade))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (std::find(_facades.begin(), 
             _facades.end(), facade) != _facades.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     facade->SetService(this);
     _facades.push_back(facade);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
@@ -577,26 +577,26 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
     if (UNLIKELY(!coder))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!_coders.insert(std::make_pair(opcode, coder)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     _stack.AddCoder(opcode, coder);
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
@@ -605,24 +605,24 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
     if (status == 0 || desc.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_statusDescs.insert(std::make_pair(
         status, LLBC_String(desc.data(), desc.size()))).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
@@ -631,27 +631,27 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg)
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_type == This::Raw && opcode != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!_handlers.insert(std::make_pair(opcode, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg)
@@ -659,27 +659,27 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *dele
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_type == This::Raw && opcode != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!_preHandlers.insert(std::make_pair(opcode, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -688,24 +688,24 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg)
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_unifyPreHandler)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _unifyPreHandler = deleg;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
@@ -715,24 +715,24 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<LLBC_P
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_type == This::Raw)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (status == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _OpStatusHandlers::iterator it = _statusHandlers.find(opcode);
@@ -743,10 +743,10 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<LLBC_P
     if (!stHandlers.insert(std::make_pair(status, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
@@ -755,19 +755,19 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
     if (UNLIKELY(!filter) || !LLBC_ProtocolLayer::IsValid(toLayer))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_filters[toLayer])
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _filters[toLayer] = filter;
@@ -775,7 +775,7 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
     _stack.SetFilter(filter, toLayer);
 #endif
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::EnableTimerScheduler()
@@ -784,11 +784,11 @@ int LLBC_Service::EnableTimerScheduler()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _timerScheduler->SetEnabled(true);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_Service::DisableTimerScheduler()
@@ -797,11 +797,11 @@ int LLBC_Service::DisableTimerScheduler()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _timerScheduler->SetEnabled(false);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<LLBC_Event *> *deleg)
@@ -840,21 +840,21 @@ int LLBC_Service::Post(LLBC_IDelegate1<LLBC_Service::Base *> *deleg)
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_Guard guard(_lock);
     if (UNLIKELY(_handlingBeforeFrameTasks && _handlingAfterFrameTasks))
     {
         LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_beforeFrameTasks.find(deleg) != _beforeFrameTasks.end() ||
         _afterFrameTasks.find(deleg) != _afterFrameTasks.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_handlingBeforeFrameTasks)
@@ -876,7 +876,7 @@ int LLBC_Service::Post(LLBC_IDelegate1<LLBC_Service::Base *> *deleg)
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Service::OnSvc(bool fullFrame)
@@ -995,7 +995,7 @@ void LLBC_Service::Cleanup()
 
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_RTN_OK)
+    while (this->TryPop(block) == LLBC_OK)
     {
         // Skip event type.
         block->ShiftReadPos(sizeof(int));
@@ -1082,7 +1082,7 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_RTN_OK)
+    while (this->TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
         block->Read(&ev, sizeof(LLBC_ServiceEvent *));
@@ -1170,7 +1170,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     ev.packet = NULL;
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
-    if (UNLIKELY(_stack.RecvCodec(packet, packet) != LLBC_RTN_OK))
+    if (UNLIKELY(_stack.RecvCodec(packet, packet) != LLBC_OK))
     {
         this->RemoveSession(sessionId);
         return;
@@ -1389,7 +1389,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         LLBC_Delete(packet);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const int sessionId = packet->GetSessionId();
@@ -1404,18 +1404,18 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             LLBC_Delete(packet);
 
             LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     LLBC_Packet *encoded;
-    if (_stack.SendCodec(packet, encoded) != LLBC_RTN_OK)
+    if (_stack.SendCodec(packet, encoded) != LLBC_OK)
     {
         if (lock)
             _lock.Unlock();
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const int ret = _pollerMgr.Send(encoded);
@@ -1448,7 +1448,7 @@ int LLBC_Service::LockableSend(int svcId,
         parts->SetToPacket(*packet);
 
     int ret = packet->Write(bytes, len);
-    if (UNLIKELY(ret != LLBC_RTN_OK))
+    if (UNLIKELY(ret != LLBC_OK))
     {
         LLBC_Delete(packet);
         return ret;
@@ -1473,7 +1473,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             LLBC_Delete(coder);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (sessionIds.empty())
@@ -1481,7 +1481,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if(LIKELY(coder))
             LLBC_Delete(coder);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
@@ -1575,7 +1575,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     LLBC_Free(otherPackets);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

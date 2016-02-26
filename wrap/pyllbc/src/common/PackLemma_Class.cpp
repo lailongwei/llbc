@@ -64,7 +64,7 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
     if (_state == Base::Done || _state == Base::Error)
     {
         pyllbc_SetError("class-lemma could continuing accept format character, lemma done or error occurred");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_state == Base::Begin)
@@ -74,13 +74,13 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
             _state = Base::Error;
             pyllbc_SetError("class-lemma expect class format character to start, got: %c", ch);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _state = Base::Accepting;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (!_gotLeftAngle)
@@ -90,13 +90,13 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
             _state = Base::Error;
             pyllbc_SetError("class-lemma expect class name begin format character, got: %c", ch);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _gotLeftAngle = true;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (ch == Base::ClassNameEnd)
@@ -116,7 +116,7 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
                     _state = Base::Error;
                     pyllbc_SetError("not set compile environment to compile class pack-lemma");
 
-                    return LLBC_RTN_FAILED;
+                    return LLBC_FAILED;
                 }
                 else if (!(_class = this->GetClassFromEnvAndName()))
                 {
@@ -125,7 +125,7 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
                     LLBC_String errStr;
                     pyllbc_SetError(errStr.format("class name '%s' is not defined", _clsName.c_str()));
 
-                    return LLBC_RTN_FAILED;
+                    return LLBC_FAILED;
                 }
             }
         }
@@ -133,7 +133,7 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
         _state = Base::Done;
         _str.append(1, static_cast<char>(ch));
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     static const LLBC_String legalNames(
@@ -143,11 +143,11 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
         _state = Base::Error;
         pyllbc_SetError("invalid class name character: %c", ch);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _clsName.append(1, static_cast<char>(ch));
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemma_Class::Process(Base *lemma)
@@ -155,7 +155,7 @@ int pyllbc_PackLemma_Class::Process(Base *lemma)
     _state = Base::Error;
     pyllbc_SetError("class-lemma could not accept a lemma");
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 PyObject *pyllbc_PackLemma_Class::Read(pyllbc_Stream *stream)
@@ -179,7 +179,7 @@ int pyllbc_PackLemma_Class::Write(pyllbc_Stream *stream, PyObject *values)
     if (_state != Base::Done)
     {
         pyllbc_SetError("class-lemma not done for pack data");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_class)
@@ -193,7 +193,7 @@ int pyllbc_PackLemma_Class::Write(pyllbc_Stream *stream, PyObject *values)
             pyllbc_SetError(errStr.format(
                 "will pack values type not specific class: %s", _clsName.c_str()));
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         Py_DECREF(valuesClass);

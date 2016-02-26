@@ -131,121 +131,121 @@ template <typename _Ty>
 inline int LLBC_Packet::Read(std::vector<_Ty> &val)
 {
     uint32 len = 0;
-    if (this->Read(len) != LLBC_RTN_OK)
+    if (this->Read(len) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (register uint32 i = 0; i < len; i++)
     {
         _Ty elem;
-        if (this->Read(elem) != LLBC_RTN_OK)
+        if (this->Read(elem) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         val.push_back(elem);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
 inline int LLBC_Packet::Read(std::list<_Ty> &val)
 {
     uint32 len = 0; 
-    if (this->Read(len) != LLBC_RTN_OK)
+    if (this->Read(len) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (register uint32 i = 0; i < len; i++)
     {
         _Ty elem;
-        if (this->Read(elem) != LLBC_RTN_OK)
+        if (this->Read(elem) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         val.push_back(elem);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
 inline int LLBC_Packet::Read(std::deque<_Ty> &val)
 {
     uint32 len = 0;
-    if (this->Read(len) != LLBC_RTN_OK)
+    if (this->Read(len) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (register uint32 i = 0; i < len; i++)
     {
         _Ty elem;
-        if (this->Read(elem) != LLBC_RTN_OK)
+        if (this->Read(elem) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         val.push_back(elem);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Kty>
 inline int LLBC_Packet::Read(std::set<_Kty> &val)
 {
     uint32 len = 0;
-    if (this->Read(len) != LLBC_RTN_OK)
+    if (this->Read(len) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (register uint32 i = 0; i < len; i++)
     {
         _Kty key;
-        if (this->Read(key) != LLBC_RTN_OK)
+        if (this->Read(key) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         val.insert(key);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Kty, typename _Ty>
 inline int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 {
     uint32 len = 0;
-    if (this->Read(len) != LLBC_RTN_OK)
+    if (this->Read(len) != LLBC_OK)
     {
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     for (register uint32 i = 0; i < len; i++)
     {
         _Kty key;
-        if (this->Read(key) != LLBC_RTN_OK)
+        if (this->Read(key) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         _Ty elem;
-        if (this->Read(elem) != LLBC_RTN_OK)
+        if (this->Read(elem) != LLBC_OK)
         {
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         val.insert(std::make_pair(key, elem));
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
@@ -257,12 +257,12 @@ inline int LLBC_Packet::Read(_Ty &val)
     if (!s.Read(val))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _block->ShiftReadPos(static_cast<long>(s.GetPos()));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
@@ -276,7 +276,7 @@ inline int LLBC_Packet::Write(const std::vector<_Ty> &val)
         this->Write(val[i]);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
@@ -292,7 +292,7 @@ inline int LLBC_Packet::Write(const std::list<_Ty> &val)
         this->Write(*it);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
@@ -306,7 +306,7 @@ inline int LLBC_Packet::Write(const std::deque<_Ty> &val)
         this->Write(val[i]);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Kty>
@@ -322,7 +322,7 @@ inline int LLBC_Packet::Write(const std::set<_Kty> &val)
         this->Write(*it);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Kty, typename _Ty>
@@ -339,7 +339,7 @@ inline int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
         this->Write(it->second);
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _Ty>
@@ -510,7 +510,7 @@ inline int LLBC_Packet::RawSetFloatTypeHeaderPartVal(int serialNo, const _RawTy 
     if (!partDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Get part length and part begin buffer.
@@ -521,7 +521,7 @@ inline int LLBC_Packet::RawSetFloatTypeHeaderPartVal(int serialNo, const _RawTy 
     // Set it.
     this->RawSetFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
  
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _RawTy>
@@ -533,7 +533,7 @@ inline int LLBC_Packet::RawSetNonFloatTypeHeaderPartVal(int serialNo, const _Raw
     if (!partDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Get part length and part begin buffer.
@@ -544,7 +544,7 @@ inline int LLBC_Packet::RawSetNonFloatTypeHeaderPartVal(int serialNo, const _Raw
     // Set it.
     this->RawSetNonFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
  
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _RawTy>
@@ -632,10 +632,10 @@ inline void LLBC_Packet::RawSetNonFloatTypeHeaderPartVal(char *buf, size_t bufLe
 template <typename _RawTy>
 inline int LLBC_Packet::ReadRawType(_RawTy &val)
 {
-    if (this->Read(&val, sizeof(val)) != LLBC_RTN_OK)
+    if (this->Read(&val, sizeof(val)) != LLBC_OK)
     {
         val = _RawTy();
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
     else
@@ -644,7 +644,7 @@ inline int LLBC_Packet::ReadRawType(_RawTy &val)
     }
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 template <typename _RawTy>

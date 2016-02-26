@@ -149,12 +149,12 @@ int pyllbc_Module::AddSubModule(pyllbc_Module *module)
     if (module->GetParentModule())
     {
         pyllbc_SetError("will add sub module already exist parent module", LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (this->GetSubModule(module->GetModuleName()))
     {
         pyllbc_SetError("sub module name repeat", LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_ClearError();
@@ -163,7 +163,7 @@ int pyllbc_Module::AddSubModule(pyllbc_Module *module)
     const LLBC_String &moduleName = module->GetModuleName();
     _subModules.insert(std::make_pair(moduleName, module));
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddMethod(const PyMethodDef &method)
@@ -172,7 +172,7 @@ int pyllbc_Module::AddMethod(const PyMethodDef &method)
     {
         pyllbc_SetError(
             "module already build, not permit to add new method", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return _methods.AddMethod(method);
@@ -209,123 +209,123 @@ int pyllbc_Module::AddObject(const LLBC_String &name, PyObject *obj)
     if (name.empty())
     {
         pyllbc_SetError("object name must be not empty", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_lazyAddObjs.find(name) != _lazyAddObjs.end())
     {
         pyllbc_SetError("object name repeat", LLBC_ERROR_REPEAT);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_module)
     {
         _lazyAddObjs.insert(std::make_pair(name, obj));
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 
     if (PyModule_AddObject(_module, name.c_str(), obj) != 0)
     {
         pyllbc_SetError(PYLLBC_ERROR_COMMON);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, bool obj)
 {
     PyObject *o = PyBool_FromLong(obj ? 1 : 0);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, sint8 obj)
 {
     PyObject *o = Py_BuildValue("c", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, sint32 obj)
 {
     PyObject *o = Py_BuildValue("i", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, uint32 obj)
 {
     PyObject *o = Py_BuildValue("I", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, sint64 obj)
 {
     PyObject *o = Py_BuildValue("L", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, uint64 obj)
 {
     PyObject *o = Py_BuildValue("K", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, double obj)
 {
     PyObject *o = Py_BuildValue("d", obj);
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, const LLBC_String &obj)
 {
     PyObject *o = Py_BuildValue("s", obj.c_str());
-    if (this->AddObject(name, o) != LLBC_RTN_OK)
+    if (this->AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Module::Build()
@@ -335,7 +335,7 @@ int pyllbc_Module::Build()
         if (!(_module = Py_InitModule(_name.c_str(), _methods.GetMethods())))
         {
             pyllbc_SetError(PYLLBC_ERROR_COMMON);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         for (_Objs::iterator it = _lazyAddObjs.begin();
@@ -347,7 +347,7 @@ int pyllbc_Module::Build()
             if (PyModule_AddObject(_module, objName, obj) != 0)
             {
                 pyllbc_SetError(PYLLBC_ERROR_COMMON);
-                return LLBC_RTN_FAILED;
+                return LLBC_FAILED;
             }
 
             _lazyAddObjs.erase(it++);
@@ -359,8 +359,8 @@ int pyllbc_Module::Build()
          it++)
     {
         This *subModule = it->second;
-        if (subModule->Build() != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (subModule->Build() != LLBC_OK)
+            return LLBC_FAILED;
 
         const LLBC_String &subModuleName = it->first;
 
@@ -371,14 +371,14 @@ int pyllbc_Module::Build()
         PyObject *pySubModule = subModule->GetPyModule();
 
         Py_INCREF(pySubModule);
-        if (this->AddObject(subModuleName, pySubModule) != LLBC_RTN_OK)
+        if (this->AddObject(subModuleName, pySubModule) != LLBC_OK)
         {
             Py_DECREF(pySubModule);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
     _dict = PyModule_GetDict(_module);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }

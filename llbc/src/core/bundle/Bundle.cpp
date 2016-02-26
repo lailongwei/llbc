@@ -41,7 +41,7 @@ int LLBC_Bundle::CreateMainBundle()
     if (LLBC_INTERNAL_NS __g_mainBundle)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
     LLBC_INTERNAL_NS __g_mainBundle = new LLBC_Bundle;
@@ -63,16 +63,16 @@ int LLBC_Bundle::Initialize(const LLBC_String &path)
     if (_bundle != LLBC_INVALID_BUNDLE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if ((_bundle = LLBC_CreateBundle(path)) == LLBC_INVALID_BUNDLE_HANDLE)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     _bundlePath = LLBC_GetBundlePath(_bundle);
     _bundleName = LLBC_BaseName(_bundlePath, true);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Bundle::Finalize()

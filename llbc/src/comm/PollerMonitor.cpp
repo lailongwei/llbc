@@ -38,13 +38,13 @@ int LLBC_PollerMonitor::Start()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     this->Activate();
     _started = true;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_PollerMonitor::Stop()

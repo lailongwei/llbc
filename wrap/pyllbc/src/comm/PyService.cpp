@@ -95,13 +95,13 @@ int pyllbc_Service::GetFPS() const
 
 int pyllbc_Service::SetFPS(int fps)
 {
-    if (_llbcSvc->SetFPS(fps) != LLBC_RTN_OK)
+    if (_llbcSvc->SetFPS(fps) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::GetFrameInterval() const
@@ -120,18 +120,18 @@ int pyllbc_Service::SetCodec(Codec codec)
         codec != This::BinaryCodec)
     {
         pyllbc_SetError("invalid codec type", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_started)
     {
         pyllbc_SetError("service already start, could not change codec strategy");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (codec != _codec)
         _codec = codec;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::Start(int pollerCount)
@@ -139,20 +139,20 @@ int pyllbc_Service::Start(int pollerCount)
     if (_started)
     {
         pyllbc_SetError("service already started", LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _started = true;
 
-    if (_llbcSvc->Start(pollerCount) != LLBC_RTN_OK)
+    if (_llbcSvc->Start(pollerCount) != LLBC_OK)
     {
         _started = false;
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool pyllbc_Service::IsStarted() const
@@ -187,12 +187,12 @@ int pyllbc_Service::RegisterFacade(PyObject *facade)
         LLBC_String errStr;
         pyllbc_SetError(errStr.format("repeat to register facade: %s", facadeStr.c_str()), LLBC_ERROR_REPEAT);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_INCREF(facade);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::RegisterCodec(int opcode, PyObject *codec)
@@ -200,17 +200,17 @@ int pyllbc_Service::RegisterCodec(int opcode, PyObject *codec)
     if (_codec != This::BinaryCodec)
     {
         pyllbc_SetError("current codec strategy not BINARY, don't need register codec");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_llbcSvcType == LLBC_IService::Raw)
     {
         pyllbc_SetError("RAW type service don't need register codec");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (!PyCallable_Check(codec))
     {
         pyllbc_SetError("codec not callable");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_codecs.insert(std::make_pair(opcode, codec)).second)
@@ -219,12 +219,12 @@ int pyllbc_Service::RegisterCodec(int opcode, PyObject *codec)
         pyllbc_SetError(err.append_format(
             "repeat to register specify opcode's codec, opcode: %d", opcode));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_INCREF(codec);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::Listen(const char *ip, uint16 port)
@@ -253,13 +253,13 @@ int pyllbc_Service::Connect(const char *ip, uint16 port)
 
 int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
 {
-    if (_llbcSvc->AsyncConn(ip, port) != LLBC_RTN_OK)
+    if (_llbcSvc->AsyncConn(ip, port) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void pyllbc_Service::RemoveSession(int sessionId)
@@ -273,7 +273,7 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     if (UNLIKELY(!this->IsStarted()))
     {
         pyllbc_SetError("service not start");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Build parts, if exists.
@@ -281,16 +281,16 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
         if (!(cLayerParts = this->BuildCLayerParts(parts)))
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
     const int ret = this->SerializePyObj2Stream(data, stream);
-    if (UNLIKELY(ret != LLBC_RTN_OK))
+    if (UNLIKELY(ret != LLBC_OK))
     {
         LLBC_XDelete(cLayerParts);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Build packet & send.
@@ -310,13 +310,13 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
         }
     }
 
-    if (UNLIKELY(_llbcSvc->Send(packet) == LLBC_RTN_FAILED))
+    if (UNLIKELY(_llbcSvc->Send(packet) == LLBC_FAILED))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status, PyObject *parts)
@@ -325,27 +325,27 @@ int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, 
     if (UNLIKELY(!this->IsStarted()))
     {
         pyllbc_SetError("service not start");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Session Ids array is empty, done.
     if (sessionIds.empty())
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     // Build parts, if exists.
     LLBC_PacketHeaderParts *cLayerParts = NULL;
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
         if (!(cLayerParts = this->BuildCLayerParts(parts)))
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
-    if (this->SerializePyObj2Stream(data, stream) != LLBC_RTN_OK)
+    if (this->SerializePyObj2Stream(data, stream) != LLBC_OK)
     {
         LLBC_XDelete(cLayerParts);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Send it.
@@ -360,7 +360,7 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *
     if (UNLIKELY(!this->IsStarted()))
     {
         pyllbc_SetError("service not start");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Build parts, if exists.
@@ -368,15 +368,15 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
         if (!(cLayerParts = this->BuildCLayerParts(parts)))
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
-    if (this->SerializePyObj2Stream(data, stream) != LLBC_RTN_OK)
+    if (this->SerializePyObj2Stream(data, stream) != LLBC_OK)
     {
         LLBC_XDelete(cLayerParts);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Send it.
@@ -390,13 +390,13 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
     if (_started)
     {
         pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
     {
         pyllbc_SetError(LLBC_String().format(
             "RAW type service could not subscribe opcode[%d] != 0's packet", opcode), LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _PacketHandlers::const_iterator it = _handlers.find(opcode);
@@ -411,20 +411,20 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
 
         pyllbc_SetError(err, LLBC_ERROR_REPEAT);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, opcode);
-    if (wrapHandler->SetHandler(handler) != LLBC_RTN_OK)
+    if (wrapHandler->SetHandler(handler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _handlers.insert(std::make_pair(opcode, wrapHandler));
     _llbcSvc->Subscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataReceived);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
@@ -432,19 +432,19 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
     if (_started)
     {
         pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
     {
         pyllbc_SetError("RAW type service could not pre-subscribe opcode != 0's packet", LLBC_ERROR_INVALID);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, opcode);
-    if (wrapHandler->SetHandler(preHandler) != LLBC_RTN_OK)
+    if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (!_preHandlers.insert(std::make_pair(opcode, wrapHandler)).second)
@@ -455,12 +455,12 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
         pyllbc_SetError(err.format(
             "repeat to pre-subscribe opcode: %d, the opcode already pre-subscribed", opcode), LLBC_ERROR_REPEAT);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _llbcSvc->PreSubscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataPreReceived);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -469,26 +469,26 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
     if (_started)
     {
         pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, 0);
-    if (wrapHandler->SetHandler(preHandler) != LLBC_RTN_OK)
+    if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_unifyPreHandler)
     {
         pyllbc_SetError("repeat to unify pre-subscribe packet");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _unifyPreHandler = wrapHandler;
     _llbcSvc->UnifyPreSubscribe(_cppFacade, &pyllbc_Facade::OnDataUnifyPreReceived);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
@@ -499,14 +499,14 @@ int pyllbc_Service::Post(PyObject *callable)
         const LLBC_String objDesc = pyllbc_ObjUtil::GetObjStr(callable);
         pyllbc_SetError(LLBC_String().format("frame callable object not callable: %s", objDesc.c_str()));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_handlingBeforeFrameCallables &&
         _handlingAfterFrameCallables)
     {
         pyllbc_SetError("could not push callable object to service, internal error!");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_beforeFrameCallables.find(callable) != _beforeFrameCallables.end() ||
@@ -516,7 +516,7 @@ int pyllbc_Service::Post(PyObject *callable)
         pyllbc_SetError(LLBC_String().format(
             "repeat to add callable to service, callable: %s", objDesc.c_str()));
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Py_INCREF(callable);
@@ -539,7 +539,7 @@ int pyllbc_Service::Post(PyObject *callable)
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool pyllbc_Service::MainLoop()
@@ -780,12 +780,12 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
     if (_codec == This::JsonCodec)
     {
         std::string out;
-        if (UNLIKELY(pyllbc_ObjCoder::Encode(pyObj, out) != LLBC_RTN_OK))
-            return LLBC_RTN_FAILED;
+        if (UNLIKELY(pyllbc_ObjCoder::Encode(pyObj, out) != LLBC_OK))
+            return LLBC_FAILED;
 
         stream.WriteBuffer(out.data(), out.size());
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
     else
     {
@@ -802,7 +802,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
             Py_DECREF(arg);
             pyllbc_TransferPyError();
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         // Get cobj property.
@@ -814,7 +814,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
 
             pyllbc_SetError("could not get llbc.Stream property 'cobj'");
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         // Convert to pyllbc_Stream *.
@@ -832,6 +832,6 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
         Py_DECREF(pyStreamObj);
         Py_DECREF(arg);
 
-        return LLBC_RTN_OK;
+        return LLBC_OK;
     }
 }

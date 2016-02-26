@@ -23,10 +23,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
-    if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_RTN_OK)
+    if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_OK)
 #else
 
-    if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_RTN_OK)
+    if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLine(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());

@@ -74,7 +74,7 @@ LLBC_File::LLBC_File(const LLBC_String &path, int mode)
 
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
-    if (Open(path, mode) == LLBC_RTN_OK)
+    if (Open(path, mode) == LLBC_OK)
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 }
 
@@ -88,26 +88,26 @@ int LLBC_File::Open(const LLBC_String &path, int mode)
     if (IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_OPENED);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const char *modeRepr = ParseFileMode(mode);
     if (modeRepr == NULL)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     else if ((_handle = fopen(
         path.c_str(), modeRepr)) == LLBC_INVALID_FILE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _mode = mode;
     _path.append(path.c_str(), path.length());
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_File::ReOpen(int mode)
@@ -115,7 +115,7 @@ int LLBC_File::ReOpen(int mode)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_String path = _path;
@@ -193,7 +193,7 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     char *buffer = NULL;
@@ -204,7 +204,7 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
     else if (size < 2 || size > INT_MAX)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (size > 0)
@@ -214,10 +214,10 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         LLBC_Free(buffer);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 long LLBC_File::GetFileSize() const
@@ -237,19 +237,19 @@ long LLBC_File::GetFileSize() const
         return -1;
     }
 
-    int ret = LLBC_RTN_OK;
+    int ret = LLBC_OK;
     long fileSize = ftell(handle);
     if (fileSize == -1L)
     {
-        ret = LLBC_RTN_FAILED;
+        ret = LLBC_FAILED;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
     }
 
     if (fseek(handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
     {
-        if (ret == LLBC_RTN_OK)
+        if (ret == LLBC_OK)
         {
-            ret = LLBC_RTN_FAILED;
+            ret = LLBC_FAILED;
             LLBC_SetLastError(LLBC_ERROR_CLIB);
         }
     }
@@ -262,16 +262,16 @@ int LLBC_File::Seek(int seekOrigin, long offset)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (fseek(_handle, offset, seekOrigin) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 long LLBC_File::GetFilePosition() const
@@ -301,17 +301,17 @@ int LLBC_File::SetFilePosition(long position)
     if (fseek(_handle, position, LLBC_FileSeekOrigin::Begin) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 long LLBC_File::OffsetFilePosition(long offset)
 {
     long curPos = GetFilePosition();
     if (curPos == -1)
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     return SetFilePosition(curPos + offset);
 }
@@ -416,10 +416,10 @@ int LLBC_File::Flush()
     if (fflush(_handle) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_File::Exists(const LLBC_String &path)
@@ -449,7 +449,7 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
     if (!::GetFileAttributesExA(filePath.c_str(), GetFileExInfoStandard, &sysFileAttrData))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     static const LLBC_String exeSuffix(".exe");
@@ -476,7 +476,7 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
     if (stat(filePath.c_str(), &cStat) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     attrs.readable = (cStat.st_mode & S_IRUSR) == S_IRUSR;
@@ -501,7 +501,7 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
         attrs.fileSize = cStat.st_size;
 #endif
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_File::TouchFile(const LLBC_String &filePath,
@@ -514,17 +514,17 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     {
         LLBC_File newFile(filePath, LLBC_FileMode::BinaryWrite);
         if (!newFile.IsOpened())
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
 
         newFile.Close();
 
         if ((!updateLastAccessTime || lastAccessTime == NULL) &&
             (!updateLastModifyTime || lastModifyTime == NULL))
-            return LLBC_RTN_OK;
+            return LLBC_OK;
     }
 
     if (!updateLastAccessTime && !updateLastModifyTime)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     timespec tsNowTime;
     bool gotNowTime = false;
@@ -576,7 +576,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     FILETIME fileTimes[2];
@@ -593,17 +593,17 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         ::CloseHandle(handle);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     ::CloseHandle(handle);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // Non-WIN32
     int fd = open(filePath.c_str(), O_NOATIME, O_RDONLY);
     if (fd == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     timespec times[2];
@@ -622,11 +622,11 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         close(fd);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     close(fd);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif // Win32
 }
 
@@ -635,11 +635,11 @@ int LLBC_File::CopyFile(const LLBC_String &destFilePath, bool overlapped)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if (Flush() != LLBC_RTN_OK)
-        return LLBC_RTN_FAILED;
+    if (Flush() != LLBC_OK)
+        return LLBC_FAILED;
 
     return CopyFile(_path, destFilePath, overlapped);
 }
@@ -650,37 +650,37 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
     if (!::CopyFileA(srcFilePath.c_str(), destFilePath.c_str(), !overlapped))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // Non_WIN32
     if (!Exists(srcFilePath))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Open source file with BinayRead mode.
     LLBC_File srcFile(srcFilePath, LLBC_FileMode::BinaryRead);
     if (!srcFile.IsOpened())
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     // Check dest file exist or not.
     if (!overlapped && Exists(destFilePath))
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     // Open dest file with BinaryWrite mode.
     LLBC_File destFile(destFilePath, LLBC_FileMode::BinaryWrite);
     if (!destFile.IsOpened())
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
 
     long srcFileSize = srcFile.GetFileSize();
     if (srcFileSize == 0)
-        return LLBC_RTN_OK;
+        return LLBC_OK;
 
     long copyBufSize = MIN(LLBC_CFG_CORE_FILE_COPY_BUF_SIZE, srcFileSize);
     sint8 *copyBuf = LLBC_Malloc(sint8, copyBufSize);
@@ -693,21 +693,21 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
         if (UNLIKELY(actuallyCopy == -1))
         {
             LLBC_Free(copyBuf);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
         else if (UNLIKELY(actuallyCopy != copiableSize))
         {
             LLBC_Free(copyBuf);
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         copiedSize += actuallyCopy;
     }
 
     LLBC_Free(copyBuf);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -716,7 +716,7 @@ int LLBC_File::MoveFile(const LLBC_String &toFilePath, bool overlapped)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     const LLBC_String filePath(_path);
@@ -734,24 +734,24 @@ int LLBC_File::MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFi
     if (::MoveFileExA(fromFilePath.c_str(), toFilePath.c_str(), moveFlags) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // Non-WIN32
     if (!overlapped && Exists(toFilePath))
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (rename(fromFilePath.c_str(), toFilePath.c_str()) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 
@@ -760,7 +760,7 @@ int LLBC_File::DeleteFile()
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     Close();
@@ -773,18 +773,18 @@ int LLBC_File::DeleteFile(const LLBC_String &filePath)
     if (!::DeleteFileA(filePath.c_str()))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #else // Non-WIN32
     if (remove(filePath.c_str()) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 #endif
 }
 

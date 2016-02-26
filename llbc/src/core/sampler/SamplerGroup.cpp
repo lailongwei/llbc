@@ -37,13 +37,13 @@ int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
     if (!LLBC_SamplerType::IsValid(type) || name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (_samplers->find(name) != _samplers->end())
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     LLBC_ISampler *sampler = NULL;
@@ -107,7 +107,7 @@ const LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name) cons
 int LLBC_SamplerGroup::Sampling(const LLBC_String &name, sint64 value, void *appData)
 {
     LLBC_ISampler *sam = this->GetSampler(name);
-    return sam ? sam->Sampling(value, appData) : LLBC_RTN_FAILED;
+    return sam ? sam->Sampling(value, appData) : LLBC_FAILED;
 }
 
 __LLBC_NS_END

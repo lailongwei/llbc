@@ -65,7 +65,7 @@ int LLBC_BaseSampler::Sampling(sint64 value, void *appData)
     _lastSamplingValue = value;
     _lastSamplingAppData = appData;
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 bool LLBC_BaseSampler::IsBeginSampling() const

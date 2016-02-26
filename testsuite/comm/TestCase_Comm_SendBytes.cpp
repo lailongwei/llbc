@@ -67,7 +67,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     if (argc < 5)
     {
         LLBC_PrintLine("argument error, eg: ./a [client/server] [normal/raw] ip port");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     this->FetchArgs(argc, argv);
@@ -88,7 +88,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
             LLBC_Delete(svc);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_PrintLine("server connect to %s:%d success", _runIp.c_str(), _runPort);
@@ -102,7 +102,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
             LLBC_Delete(svc);
 
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
 
         LLBC_PrintLine("server listen on %s:%d", _runIp.c_str(), _runPort);
@@ -125,7 +125,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 
     LLBC_Delete(svc);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void TestCase_Comm_SendBytes::FetchArgs(int argc, char *argv[])

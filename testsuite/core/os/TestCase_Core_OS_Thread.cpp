@@ -58,7 +58,7 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
     LLBC_NativeThreadHandle handle1 = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     LLBC_NativeThreadHandle handle2 = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     std::cout <<"Create thread1" <<std::endl;
-    if(LLBC_CreateThread(&handle1, ThreadProc, (void *)"thread 1") != LLBC_RTN_OK)
+    if(LLBC_CreateThread(&handle1, ThreadProc, (void *)"thread 1") != LLBC_OK)
     {
         std::cerr <<"Create thread1 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
@@ -67,7 +67,7 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
     std::cout <<"thread1 priority: " <<LLBC_GetThreadPriority(handle1) <<std::endl;
 
     std::cout <<"Set thread1 priority to critical" <<std::endl;
-    if(LLBC_SetThreadPriority(handle1, LLBC_ThreadPriority::Critical) != LLBC_RTN_OK)
+    if(LLBC_SetThreadPriority(handle1, LLBC_ThreadPriority::Critical) != LLBC_OK)
     {
         std::cout <<"Set thread1 priority failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
@@ -76,7 +76,7 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
     std::cout <<"thread1 new priority: " <<LLBC_GetThreadPriority(handle1) <<std::endl;
 
     std::cout <<"Create thread2" <<std::endl;
-    if(LLBC_CreateThread(&handle2, ThreadProc, (void *)"thread 2") != LLBC_RTN_OK)
+    if(LLBC_CreateThread(&handle2, ThreadProc, (void *)"thread 2") != LLBC_OK)
     {
         std::cerr <<"Create thread2 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
@@ -87,12 +87,12 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
 
     // Join it.
     std::cout <<"Join child threads terminated." <<std::endl;
-    if(LLBC_JoinThread(handle1) != LLBC_RTN_OK)
+    if(LLBC_JoinThread(handle1) != LLBC_OK)
     {
         std::cerr <<"Join thread1 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
     }
-    if(LLBC_JoinThread(handle2) != LLBC_RTN_OK)
+    if(LLBC_JoinThread(handle2) != LLBC_OK)
     {
         std::cerr <<"Join thread2 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;

@@ -28,7 +28,7 @@ int LLBC_LogMsgToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_S
 {
     this->SetFormatter(formatter);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int LLBC_LogMsgToken::GetType() const

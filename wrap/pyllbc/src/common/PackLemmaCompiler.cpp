@@ -86,14 +86,14 @@ int pyllbc_PackLemmaCompiler::SetCacheLimit(size_t newSize)
     if (newSize == 0)
     {
         pyllbc_SetError("could not set pack-lemma compiler cache limit to 0");
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _cacheLimit = newSize;
     while (this->GetCachedSize() > _cacheLimit)
         this->RemoveOldestExpr();
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 size_t pyllbc_PackLemmaCompiler::GetCachedSize() const
@@ -135,13 +135,13 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
         char ch = str[i];
         char nextCh = i + 1 < len ? str[i + 1] : '\0';
 
-        if (this->CompileChar(ch, nextCh, compileEnv) != LLBC_RTN_OK)
+        if (this->CompileChar(ch, nextCh, compileEnv) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
             return NULL;
         }
 
-        if (this->ReduceStack() != LLBC_RTN_OK)
+        if (this->ReduceStack() != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
             return NULL;
@@ -177,14 +177,14 @@ int pyllbc_PackLemmaCompiler::ReduceStack()
             break;
 
         _compilingStack.pop();
-        if (_compilingStack.top()->Process(lemma) != LLBC_RTN_OK)
+        if (_compilingStack.top()->Process(lemma) != LLBC_OK)
         {
             LLBC_Delete(lemma);
-            return LLBC_RTN_FAILED;
+            return LLBC_FAILED;
         }
     }
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemmaCompiler::CompileChar(char ch, char nextCh, PyObject *compileEnv)
@@ -197,14 +197,14 @@ int pyllbc_PackLemmaCompiler::Compile_SeqBegin(char ch, char nextCh, PyObject *c
 {
     pyllbc_PackLemma *lemma = 
         pyllbc_PackLemmaBuilder::Build(Type::SequenceType, compileEnv);
-    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_RTN_OK)
+    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
         LLBC_Delete(lemma);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _compilingStack.push(lemma);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemmaCompiler::Compile_SeqEnd(char ch, char nextCh, PyObject *compileEnv)
@@ -220,7 +220,7 @@ int pyllbc_PackLemmaCompiler::Compile_SeqEnd(char ch, char nextCh, PyObject *com
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -230,14 +230,14 @@ int pyllbc_PackLemmaCompiler::Compile_DictBegin(char ch, char nextCh, PyObject *
 {
     pyllbc_PackLemma *lemma =
         pyllbc_PackLemmaBuilder::Build(Type::DictType, compileEnv);
-    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_RTN_OK)
+    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
         LLBC_Delete(lemma);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _compilingStack.push(lemma);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemmaCompiler::Compile_DictEnd(char ch, char nextCh, PyObject *compileEnv)
@@ -251,7 +251,7 @@ int pyllbc_PackLemmaCompiler::Compile_DictEnd(char ch, char nextCh, PyObject *co
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -268,7 +268,7 @@ int pyllbc_PackLemmaCompiler::Compile_DictKWSep(char ch, char nextCh, PyObject *
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -278,21 +278,21 @@ int pyllbc_PackLemmaCompiler::Compile_Class(char ch, char nextCh, PyObject *comp
 {
     pyllbc_PackLemma *lemma = 
         pyllbc_PackLemmaBuilder::Build(Type::ClassType, compileEnv);
-    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_RTN_OK)
+    if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
         LLBC_Delete(lemma);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     if (nextCh != static_cast<char>(pyllbc_PackLemma::ClassNameBegin))
     {
-        if (lemma->Process(pyllbc_PackLemma::ClassNameBegin) != LLBC_RTN_OK ||
-            lemma->Process(pyllbc_PackLemma::ClassNameEnd) != LLBC_RTN_OK)
-            return LLBC_RTN_FAILED;
+        if (lemma->Process(pyllbc_PackLemma::ClassNameBegin) != LLBC_OK ||
+            lemma->Process(pyllbc_PackLemma::ClassNameEnd) != LLBC_OK)
+            return LLBC_FAILED;
     }
 
     _compilingStack.push(lemma);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemmaCompiler::Compile_ClassNameBeg(char ch, char nextCh, PyObject *compileEnv)
@@ -306,7 +306,7 @@ int pyllbc_PackLemmaCompiler::Compile_ClassNameBeg(char ch, char nextCh, PyObjec
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -323,7 +323,7 @@ int pyllbc_PackLemmaCompiler::Compile_ClassNameEnd(char ch, char nextCh, PyObjec
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -340,7 +340,7 @@ int pyllbc_PackLemmaCompiler::Compile_ClassName(char ch, char nextCh, PyObject *
 
         pyllbc_SetError(errStr);
 
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     return topLemma->Process(static_cast<Symbol>(ch));
@@ -355,14 +355,14 @@ int pyllbc_PackLemmaCompiler::Compile_Raw(char ch, char nextCh, PyObject *compil
         return topLemma->Process(smbl, static_cast<Symbol>(nextCh));
 
     pyllbc_PackLemma *lemma = pyllbc_PackLemmaBuilder::Build(Type::RawType, compileEnv);
-    if (lemma->Process(smbl, static_cast<Symbol>(nextCh)) != LLBC_RTN_OK)
+    if (lemma->Process(smbl, static_cast<Symbol>(nextCh)) != LLBC_OK)
     {
         LLBC_Delete(lemma);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
     _compilingStack.push(lemma);
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 int pyllbc_PackLemmaCompiler::Compile_Invalid(char ch, char nextCh, PyObject *compileEnv)
@@ -370,7 +370,7 @@ int pyllbc_PackLemmaCompiler::Compile_Invalid(char ch, char nextCh, PyObject *co
     LLBC_String errStr;
     pyllbc_SetError(errStr.format("invalid pack format character: %c", ch));
 
-    return LLBC_RTN_FAILED;
+    return LLBC_FAILED;
 }
 
 Semantic pyllbc_PackLemmaCompiler::ResolveSemantic(char ch)
