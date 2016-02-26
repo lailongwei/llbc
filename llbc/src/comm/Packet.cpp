@@ -54,7 +54,7 @@ LLBC_Packet::LLBC_Packet()
 
 LLBC_Packet::~LLBC_Packet()
 {
-    this->CleanupPreHandleResult();
+    CleanupPreHandleResult();
 
     LLBC_XDelete(_encoder);
     LLBC_XDelete(_decoder);
@@ -71,7 +71,7 @@ int LLBC_Packet::GetLength() const
         reinterpret_cast<const char *>(_block->GetData()) + _lenOffset;
 
     int len;
-    this->RawGetNonFloatTypeHeaderPartVal(lenBeg, _lenSize, len);
+    RawGetNonFloatTypeHeaderPartVal(lenBeg, _lenSize, len);
 
     return len;
 }
@@ -88,7 +88,7 @@ int LLBC_Packet::GetOpcode() const
         reinterpret_cast<const char *>(_block->GetData()) + opcodeOffset;
 
     int opcode;
-    this->RawGetNonFloatTypeHeaderPartVal(opcodeBeg, opcodeLen, opcode);
+    RawGetNonFloatTypeHeaderPartVal(opcodeBeg, opcodeLen, opcode);
 
     return opcode;
 }
@@ -104,7 +104,7 @@ void LLBC_Packet::SetOpcode(int opcode)
     char *opcodeBeg = reinterpret_cast<
         char *>(_block->GetData()) + opcodeOffset;
 
-    this->RawSetNonFloatTypeHeaderPartVal(opcodeBeg, opcodeLen, opcode);
+    RawSetNonFloatTypeHeaderPartVal(opcodeBeg, opcodeLen, opcode);
 }
 
 int LLBC_Packet::GetStatus() const
@@ -119,7 +119,7 @@ int LLBC_Packet::GetStatus() const
         reinterpret_cast<const char *>(_block->GetData()) + statusOffset;
 
     int status;
-    this->RawGetNonFloatTypeHeaderPartVal(statusBeg, statusLen, status);
+    RawGetNonFloatTypeHeaderPartVal(statusBeg, statusLen, status);
 
     return status;
 }
@@ -135,7 +135,7 @@ void LLBC_Packet::SetStatus(int status)
     char *statusBeg = reinterpret_cast<
         char *>(_block->GetData()) + statusOffset;
 
-    this->RawSetNonFloatTypeHeaderPartVal(statusBeg, statusLen, status);
+    RawSetNonFloatTypeHeaderPartVal(statusBeg, statusLen, status);
 }
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
@@ -165,7 +165,7 @@ int LLBC_Packet::GetServiceId() const
         reinterpret_cast<const char *>(_block->GetData()) + svcIdOffset;
 
     int svcId;
-    this->RawGetNonFloatTypeHeaderPartVal(svcIdBeg, svcIdLen, svcId);
+    RawGetNonFloatTypeHeaderPartVal(svcIdBeg, svcIdLen, svcId);
 
     return svcId;
 }
@@ -181,7 +181,7 @@ void LLBC_Packet::SetServiceId(int serviceId)
     char *svcBeg = reinterpret_cast<
         char *>(_block->GetData()) + svcIdOffset;
 
-    this->RawSetNonFloatTypeHeaderPartVal(svcBeg, svcIdLen, serviceId);
+    RawSetNonFloatTypeHeaderPartVal(svcBeg, svcIdLen, serviceId);
 }
 
 int LLBC_Packet::GetFlags() const
@@ -196,7 +196,7 @@ int LLBC_Packet::GetFlags() const
         reinterpret_cast<const char *>(_block->GetData()) + flagsOffset;
 
     int flags;
-    this->RawGetNonFloatTypeHeaderPartVal(flagsBeg, flagsLen, flags);
+    RawGetNonFloatTypeHeaderPartVal(flagsBeg, flagsLen, flags);
 
     return flags;
 }
@@ -212,83 +212,83 @@ void LLBC_Packet::SetFlags(int flags)
     char *flagsBeg = reinterpret_cast<
         char *>(_block->GetData()) + flagsOffset;
 
-    this->RawSetNonFloatTypeHeaderPartVal(flagsBeg, flagsLen, flags);
+    RawSetNonFloatTypeHeaderPartVal(flagsBeg, flagsLen, flags);
 }
 
 bool LLBC_Packet::HasFlags(int flags) const
 {
-    const int packetFlags = this->GetFlags();
+    const int packetFlags = GetFlags();
     return (packetFlags & flags) == flags;
 }
 
 void LLBC_Packet::AddFlags(int flags)
 {
-    const int oldFlags = this->GetFlags();
-    this->SetFlags(oldFlags | flags);
+    const int oldFlags = GetFlags();
+    SetFlags(oldFlags | flags);
 }
 
 void LLBC_Packet::RemoveFlags(int flags)
 {
-    const int oldFlags = this->GetFlags();
-    this->SetFlags(oldFlags & (~flags));
+    const int oldFlags = GetFlags();
+    SetFlags(oldFlags & (~flags));
 }
 
 sint8 LLBC_Packet::GetHeaderPartAsSInt8(int serialNo) const
 {
     sint8 val;
-    this->RawGetNonFloatTypeHeaderPartVal<sint8>(serialNo, val);
+    RawGetNonFloatTypeHeaderPartVal<sint8>(serialNo, val);
 
     return val;
 }
 
 uint8 LLBC_Packet::GetHeaderPartAsUInt8(int serialNo) const
 {
-    return static_cast<uint8>(this->GetHeaderPartAsSInt8(serialNo));
+    return static_cast<uint8>(GetHeaderPartAsSInt8(serialNo));
 }
 
 sint16 LLBC_Packet::GetHeaderPartAsSInt16(int serialNo) const
 {
     sint16 val;
-    this->RawGetNonFloatTypeHeaderPartVal<sint16>(serialNo, val);
+    RawGetNonFloatTypeHeaderPartVal<sint16>(serialNo, val);
 
     return val;
 }
 
 uint16 LLBC_Packet::GetHeaderPartAsUInt16(int serialNo) const
 {
-    return static_cast<uint16>(this->GetHeaderPartAsSInt16(serialNo));
+    return static_cast<uint16>(GetHeaderPartAsSInt16(serialNo));
 }
 
 sint32 LLBC_Packet::GetHeaderPartAsSInt32(int serialNo) const
 {
     sint32 val;
-    this->RawGetNonFloatTypeHeaderPartVal<sint32>(serialNo, val);
+    RawGetNonFloatTypeHeaderPartVal<sint32>(serialNo, val);
 
     return val;
 }
 
 uint32 LLBC_Packet::GetHeaderPartAsUInt32(int serialNo) const
 {
-    return static_cast<uint32>(this->GetHeaderPartAsSInt32(serialNo));
+    return static_cast<uint32>(GetHeaderPartAsSInt32(serialNo));
 }
 
 sint64 LLBC_Packet::GetHeaderPartAsSInt64(int serialNo) const
 {
     sint64 val;
-    this->RawGetNonFloatTypeHeaderPartVal<sint64>(serialNo, val);
+    RawGetNonFloatTypeHeaderPartVal<sint64>(serialNo, val);
 
     return val;
 }
 
 uint64 LLBC_Packet::GetHeaderPartAsUInt64(int serialNo) const
 {
-    return static_cast<uint64>(this->GetHeaderPartAsSInt64(serialNo));
+    return static_cast<uint64>(GetHeaderPartAsSInt64(serialNo));
 }
 
 float LLBC_Packet::GetHeaderPartAsFloat(int serialNo) const
 {
     float val;
-    this->RawGetFloatTypeHeaderPartVal(serialNo, val);
+    RawGetFloatTypeHeaderPartVal(serialNo, val);
 
     return val;
 }
@@ -296,7 +296,7 @@ float LLBC_Packet::GetHeaderPartAsFloat(int serialNo) const
 double LLBC_Packet::GetHeaderPartAsDouble(int serialNo) const
 {
     double val;
-    this->RawGetFloatTypeHeaderPartVal(serialNo, val);
+    RawGetFloatTypeHeaderPartVal(serialNo, val);
 
     return val;
 }
@@ -363,25 +363,25 @@ int LLBC_Packet::SetHeaderPartVal(int serialNo, const void *data, size_t len)
 
 void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
 {
-    this->SetHeader(0, sessionId, opcode, status);
+    SetHeader(0, sessionId, opcode, status);
 }
 
 void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int status)
 {
-    this->SetOpcode(opcode);
-    this->SetStatus(status);
+    SetOpcode(opcode);
+    SetStatus(status);
 
-    this->SetServiceId(svcId);
-    this->SetSessionId(sessionId);
+    SetServiceId(svcId);
+    SetSessionId(sessionId);
 }
 
 void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int status)
 {
-    this->SetOpcode(opcode);
-    this->SetStatus(status);
+    SetOpcode(opcode);
+    SetStatus(status);
 
-    this->SetServiceId(packet.GetServiceId());
-    this->SetSessionId(packet.GetSessionId());
+    SetServiceId(packet.GetServiceId());
+    SetSessionId(packet.GetSessionId());
 }
 
 int LLBC_Packet::Read(bool &val)
@@ -401,52 +401,52 @@ int LLBC_Packet::Read(uint8 &val)
 
 int LLBC_Packet::Read(sint16 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(uint16 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(sint32 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(uint32 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(long &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(ulong &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(sint64 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(uint64 &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(float &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(double &val)
 {
-    return this->ReadRawType<>(val);
+    return ReadRawType<>(val);
 }
 
 int LLBC_Packet::Read(void *buf, size_t len)
@@ -471,52 +471,52 @@ int LLBC_Packet::Write(uint8 val)
 
 int LLBC_Packet::Write(sint16 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(uint16 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(sint32 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(uint32 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(long val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(ulong val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(sint64 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(uint64 val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(float val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(double val)
 {
-    return this->WriteRawType<>(val);
+    return WriteRawType<>(val);
 }
 
 int LLBC_Packet::Write(const char *val)
@@ -525,12 +525,12 @@ int LLBC_Packet::Write(const char *val)
     {
         while (*val != '\0')
         {
-            this->Write(val, 1);
+            Write(val, 1);
             val += 1;
         }
     }
 
-    return this->Write("\0", 1);
+    return Write("\0", 1);
 }
 
 int LLBC_Packet::Write(const void *buf, size_t len)
@@ -591,7 +591,7 @@ void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
 
 LLBC_MessageBlock *LLBC_Packet::GiveUp()
 {
-    this->Encode();
+    Encode();
 
     LLBC_MessageBlock *block = _block;
     block->SetReadPos(0);
@@ -604,7 +604,7 @@ LLBC_MessageBlock *LLBC_Packet::GiveUp()
     char *lenBeg = reinterpret_cast<
         char *>(block->GetData()) + _lenOffset;
 
-    this->RawSetNonFloatTypeHeaderPartVal(lenBeg, _lenSize, length);
+    RawSetNonFloatTypeHeaderPartVal(lenBeg, _lenSize, length);
 
     return block;
 }

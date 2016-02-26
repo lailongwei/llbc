@@ -96,7 +96,7 @@ LLBC_ThreadManager::LLBC_ThreadManager()
 
 LLBC_ThreadManager::~LLBC_ThreadManager()
 {
-    this->WaitAll();
+    WaitAll();
 }
 
 LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
@@ -125,7 +125,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
     
     for (int i = 0; i < threadNum; i++)
     {
-        if (this->CreateThread_NonLock(proc,
+        if (CreateThread_NonLock(proc,
                                        arg,
                                        flags,
                                        priority,
@@ -160,15 +160,15 @@ LLBC_Handle LLBC_ThreadManager::CreateThread(LLBC_ThreadProc proc,
 
     LLBC_Guard guard(_lock);
 
-    return this->CreateThread_NonLock(proc,
-                                      arg,
-                                      flags,
-                                      priority,
-                                      stackSize,
-                                      task,
-                                      groupHandle,
-                                      nativeHandle,
-                                      handle);
+    return CreateThread_NonLock(proc,
+                                arg,
+                                flags,
+                                priority,
+                                stackSize,
+                                task,
+                                groupHandle,
+                                nativeHandle,
+                                handle);
 }
 
 void LLBC_ThreadManager::Sleep(int milliSecs)
@@ -197,7 +197,7 @@ LLBC_NativeThreadHandle LLBC_ThreadManager::GetNativeThreadHandle(LLBC_Handle ha
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
     LLBC_Guard guard(nonConstThis->_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -218,7 +218,7 @@ LLBC_Handle LLBC_ThreadManager::GetGroupHandle(LLBC_Handle handle) const
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
     LLBC_Guard guard(nonConstThis->_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -239,7 +239,7 @@ LLBC_BaseTask *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
     LLBC_Guard guard(nonConstThis->_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -261,7 +261,7 @@ int LLBC_ThreadManager::GetStackSize(LLBC_Handle handle) const
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
     LLBC_Guard guard(nonConstThis->_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -282,7 +282,7 @@ int LLBC_ThreadManager::GetPriority(LLBC_Handle handle) const
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
     LLBC_Guard guard(nonConstThis->_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -302,7 +302,7 @@ int LLBC_ThreadManager::SetPriority(LLBC_Handle handle, int priority)
 
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -332,7 +332,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
     }
 
     _lock.Lock();
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         _lock.Unlock();
@@ -358,7 +358,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
     if (rtn == LLBC_OK)
     {
         LLBC_Guard guard(_lock);
-        if ((threadDesc = this->FindThreadDescriptor(handle)))
+        if ((threadDesc = FindThreadDescriptor(handle)))
         {
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -367,7 +367,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
                 ::CloseHandle(threadDesc->GetNativeHandle());
             }
 #endif
-            this->RemoveThreadDescriptor(handle);
+            RemoveThreadDescriptor(handle);
         }
     }
 
@@ -404,7 +404,7 @@ int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
+        if (Wait(willWaitThreads[i]) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -422,7 +422,7 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
     _lock.Lock();
 
     LLBC_ThreadGroupDescriptor *groupDesc = 
-        this->FindThreadGroupDescriptor(handle);
+        FindThreadGroupDescriptor(handle);
     if (!groupDesc)
     {
         _lock.Unlock();
@@ -444,7 +444,7 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
+        if (Wait(willWaitThreads[i]) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -472,7 +472,7 @@ int LLBC_ThreadManager::WaitAll()
 
     for (size_t i = 0; i < willWaitThreads.size(); i++)
     {
-        if (this->Wait(willWaitThreads[i]) != LLBC_OK)
+        if (Wait(willWaitThreads[i]) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -490,7 +490,7 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
 
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -550,7 +550,7 @@ int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willSuspendThreads.size(); i++)
     {
-        if (this->Suspend(willSuspendThreads[i]) != LLBC_OK)
+        if (Suspend(willSuspendThreads[i]) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -570,7 +570,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
     LLBC_Guard guard(_lock);
 
     LLBC_ThreadGroupDescriptor *groupDesc = 
-        this->FindThreadGroupDescriptor(handle);
+        FindThreadGroupDescriptor(handle);
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -584,7 +584,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
+        if (Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -603,7 +603,7 @@ int LLBC_ThreadManager::SuspendAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
+            if (Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
                 return LLBC_FAILED;
             }
@@ -623,7 +623,7 @@ int LLBC_ThreadManager::Resume(LLBC_Handle handle)
 
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -682,7 +682,7 @@ int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willResumeThreads.size(); i++)
     {
-        if (this->Resume(willResumeThreads[i]) != LLBC_OK)
+        if (Resume(willResumeThreads[i]) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -702,7 +702,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
     LLBC_Guard guard(_lock);
 
     LLBC_ThreadGroupDescriptor *groupDesc = 
-        this->FindThreadGroupDescriptor(handle);
+        FindThreadGroupDescriptor(handle);
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -716,7 +716,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
+        if (Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -735,7 +735,7 @@ int LLBC_ThreadManager::ResumeAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
+            if (Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
                 return LLBC_FAILED;
             }
@@ -755,7 +755,7 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
 
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -779,7 +779,7 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
             ::CloseHandle(threadDesc->GetNativeHandle());
         }
 #endif
-        this->RemoveThreadDescriptor(handle);
+        RemoveThreadDescriptor(handle);
     }
 
     return rtn;
@@ -817,7 +817,7 @@ int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
 
     for (size_t i = 0; i < willCancelTasks.size(); i++)
     {
-        if (this->Cancel(willCancelTasks[i]) != LLBC_OK)
+        if (Cancel(willCancelTasks[i]) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -837,7 +837,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
     LLBC_Guard guard(_lock);
 
     LLBC_ThreadGroupDescriptor *groupDesc = 
-        this->FindThreadGroupDescriptor(handle);
+        FindThreadGroupDescriptor(handle);
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -851,7 +851,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
+        if (Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -870,7 +870,7 @@ int LLBC_ThreadManager::CancelAll()
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
+            if (Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
             {
                 return LLBC_FAILED;
             }
@@ -890,7 +890,7 @@ int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
 
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -939,7 +939,7 @@ int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
 
     for (size_t i = 0; i < willCancelTasks.size(); i++)
     {
-        if (this->Kill(willCancelTasks[i], signum) != LLBC_OK)
+        if (Kill(willCancelTasks[i], signum) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -959,7 +959,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
     LLBC_Guard guard(_lock);
 
     LLBC_ThreadGroupDescriptor *groupDesc = 
-        this->FindThreadGroupDescriptor(handle);
+        FindThreadGroupDescriptor(handle);
     if (!groupDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -973,7 +973,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
         LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
         threadDesc = threadDesc->GetGroupThreadNext();
 
-        if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
+        if (Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -992,7 +992,7 @@ int LLBC_ThreadManager::KillAll(int signum)
             LLBC_ThreadDescriptor *tmpThreadDesc = threadDesc;
             threadDesc = threadDesc->GetThreadNext();
 
-            if (this->Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
+            if (Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
             {
                 return LLBC_FAILED;
             }
@@ -1006,7 +1006,7 @@ void LLBC_ThreadManager::OnThreadStartup(LLBC_Handle handle)
 {
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     threadDesc->SetState(LLBC_ThreadState::Running);
 }
 
@@ -1014,7 +1014,7 @@ void LLBC_ThreadManager::OnThreadTerminate(LLBC_Handle handle)
 {
     LLBC_Guard guard(_lock);
 
-    LLBC_ThreadDescriptor *threadDesc = this->FindThreadDescriptor(handle);
+    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
     if (threadDesc)
     {
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -1024,7 +1024,7 @@ void LLBC_ThreadManager::OnThreadTerminate(LLBC_Handle handle)
         }
 #endif
 
-        this->RemoveThreadDescriptor(threadDesc->GetHandle());
+        RemoveThreadDescriptor(threadDesc->GetHandle());
     }
 }
 
@@ -1087,7 +1087,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
     desc->SetFlags(flags);
     desc->SetTask(task);
 
-    this->AddThreadDescriptor(desc);
+    AddThreadDescriptor(desc);
 
     return LLBC_OK;
 }
@@ -1095,7 +1095,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
 void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
 {
     // Check thread descriptor in threads hash bucket or not.
-    if (this->FindThreadDescriptor(threadDesc->GetHandle()))
+    if (FindThreadDescriptor(threadDesc->GetHandle()))
     {
         return;
     }
@@ -1105,12 +1105,12 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
 
     // Get thread group descriptor, if not exist, add new group descriptor
     // and add to thread group hash bucket.
-    LLBC_ThreadGroupDescriptor *groupDesc = this->FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
+    LLBC_ThreadGroupDescriptor *groupDesc = FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
     if (!groupDesc)
     {
         groupDesc = new LLBC_ThreadGroupDescriptor;
         groupDesc->SetGroupHandle(threadDesc->GetGroupHandle());
-        this->AddThreadGroupDescriptor(groupDesc);
+        AddThreadGroupDescriptor(groupDesc);
     }
 
     // Add to thread hash bucket.
@@ -1167,11 +1167,11 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
     {
         _threads[threadBucketIdx] = desc->GetThreadNext();
         LLBC_ThreadGroupDescriptor *groupDesc = 
-            this->FindThreadGroupDescriptor(desc->GetGroupHandle());
+            FindThreadGroupDescriptor(desc->GetGroupHandle());
         groupDesc->RemoveFromGroup(desc->GetHandle());
         if (groupDesc->GetThreadCount() == 0)
         {
-            this->RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
+            RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
         }
 
         delete desc;
@@ -1185,11 +1185,11 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
         if (tmpDesc->GetHandle() == handle)
         {
             LLBC_ThreadGroupDescriptor *groupDesc =
-                this->FindThreadGroupDescriptor(tmpDesc->GetGroupHandle());
+                FindThreadGroupDescriptor(tmpDesc->GetGroupHandle());
             groupDesc->RemoveFromGroup(tmpDesc->GetHandle());
             if (groupDesc->GetThreadCount() == 0)
             {
-                this->RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
+                RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
             }
 
             desc->SetThreadNext(desc->GetThreadNext()->GetThreadNext());
@@ -1205,7 +1205,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
 
 void LLBC_ThreadManager::AddThreadGroupDescriptor(LLBC_ThreadGroupDescriptor *groupDesc)
 {
-    if (this->FindThreadGroupDescriptor(groupDesc->GetGroupHandle()))
+    if (FindThreadGroupDescriptor(groupDesc->GetGroupHandle()))
     {
         return;
     }

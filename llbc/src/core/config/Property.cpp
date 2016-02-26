@@ -73,7 +73,7 @@ LLBC_Property::LLBC_Property(LLBC_Property *parent)
 
 LLBC_Property::~LLBC_Property()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 int LLBC_Property::LoadFromFile(const LLBC_String &file)
@@ -82,7 +82,7 @@ int LLBC_Property::LoadFromFile(const LLBC_String &file)
     if (!f.IsOpened())
         return LLBC_FAILED;
 
-    return this->LoadFromContent(f.ReadToEnd());
+    return LoadFromContent(f.ReadToEnd());
 }
 
 int LLBC_Property::LoadFromContent(const LLBC_String &content)
@@ -103,11 +103,11 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
 
     // Begin parse.
     bool done = true;
-    LLBC_Strings contents = this->NormalizeContent(content);
+    LLBC_Strings contents = NormalizeContent(content);
     for (size_t i = 0; i < contents.size(); i++)
     {
         const LLBC_String &line = contents[i];
-        if (this->ParseLine(line, static_cast<int>(i) + 1) != LLBC_OK)
+        if (ParseLine(line, static_cast<int>(i) + 1) != LLBC_OK)
         {
             done = false;
             break;
@@ -117,7 +117,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     // If not done, restore above backet data members.
     if (!done)
     {
-        this->Cleanup();
+        Cleanup();
 
         _parent = backParent;
         _value = backValue;
@@ -148,7 +148,7 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
 	content.clear();
 
     std::vector<const This *> properties;
-    this->CollectValueProperties(properties);
+    CollectValueProperties(properties);
     for (size_t i = 0; i < properties.size(); i++)
     {
         const This *& prop = properties[i];
@@ -166,7 +166,7 @@ int LLBC_Property::SaveToFile(const LLBC_String &file) const
         return LLBC_FAILED;
 
     LLBC_String content;
-    if (this->SaveToContent(content) != LLBC_OK)
+    if (SaveToContent(content) != LLBC_OK)
         return LLBC_FAILED;
 
     if (f.Write(content) != LLBC_OK)
@@ -233,7 +233,7 @@ LLBC_Strings LLBC_Property::GetPropertyNames(bool nest) const
 	else
 	{
 		std::vector<const This *> valueProps;
-		this->CollectValueProperties(valueProps);
+		CollectValueProperties(valueProps);
 		for (size_t i = 0; i < valueProps.size(); i++)
 			names.push_back(valueProps[i]->GetName());
 	}
@@ -259,7 +259,7 @@ LLBC_Variant LLBC_Property::GetValue(const LLBC_String &name,
     }
     else
     {
-        const LLBC_Property *prop = this->GetProperty(name);
+        const LLBC_Property *prop = GetProperty(name);
         if (!prop)
         {
             LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -275,7 +275,7 @@ LLBC_Variant LLBC_Property::GetValue(const LLBC_String &name,
 
 bool LLBC_Property::HasProperty(const LLBC_String &name) const
 {
-    return !!this->GetProperty(name);
+    return !!GetProperty(name);
 }
 
 const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
@@ -285,7 +285,7 @@ const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }
-    else if (!this->CheckName(name))
+    else if (!CheckName(name))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return NULL;
@@ -320,7 +320,7 @@ const LLBC_Property::Properties &LLBC_Property::GetAllProperties() const
 
 int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
 {
-    if (!this->CheckName(name))
+    if (!CheckName(name))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -375,7 +375,7 @@ LLBC_String LLBC_Property::GetComments(const LLBC_String &name) const
         return _comments;
     }
 
-    const This *prop = this->GetProperty(name);
+    const This *prop = GetProperty(name);
     if (!prop)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -393,7 +393,7 @@ int LLBC_Property::SetComments(const LLBC_String &name, const LLBC_String &comme
         return LLBC_OK;
     }
 
-    This *prop = const_cast<This *>(this->GetProperty(name));
+    This *prop = const_cast<This *>(GetProperty(name));
     if (!prop)
         return LLBC_FAILED;
 
@@ -404,7 +404,7 @@ This &LLBC_Property::operator =(const This &another)
 {
     _parent = NULL;
 
-    this->Cleanup();
+    Cleanup();
     if (another._value)
         _value = LLBC_New1(LLBC_Variant, *another._value);
 
@@ -425,10 +425,10 @@ This &LLBC_Property::operator =(const This &another)
 
 void LLBC_Property::Cleanup()
 {
-    this->CleanupValue();
-    this->RemoveAllProperties();
+    CleanupValue();
+    RemoveAllProperties();
 
-    this->CleanupComments();
+    CleanupComments();
 
 	_comments.clear();
 }
@@ -547,7 +547,7 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
     }
 
     const LLBC_String name = pair[0].strip();
-    if (!this->CheckName(name))
+    if (!CheckName(name))
     {
         _errMsg.format("line %d: property name format error", lineNo);
         LLBC_SetLastError(LLBC_ERROR_FORMAT);
@@ -580,9 +580,9 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
         value = valueComments.strip();
     }
 
-    if (this->SetValue(name, value) == LLBC_OK)
+    if (SetValue(name, value) == LLBC_OK)
     {
-        This *prop = const_cast<This *>(this->GetProperty(name));
+        This *prop = const_cast<This *>(GetProperty(name));
         prop->SetComments("", comments);
     }
 

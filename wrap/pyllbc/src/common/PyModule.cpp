@@ -73,7 +73,7 @@ PyObject *pyllbc_Module::GetModuleDict() const
 
 PyObject *pyllbc_Module::GetObject(PyObject *name)
 {
-    PyObject *dict = this->GetModuleDict();
+    PyObject *dict = GetModuleDict();
     if (!dict)
         return NULL;
 
@@ -92,7 +92,7 @@ PyObject *pyllbc_Module::GetObject(const LLBC_String &name)
     PyObject *pyName = 
         PyString_FromStringAndSize(name.data(), name.size());
 
-    PyObject *obj = this->GetObject(pyName);
+    PyObject *obj = GetObject(pyName);
 
     Py_DECREF(pyName);
 
@@ -151,7 +151,7 @@ int pyllbc_Module::AddSubModule(pyllbc_Module *module)
         pyllbc_SetError("will add sub module already exist parent module", LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
-    else if (this->GetSubModule(module->GetModuleName()))
+    else if (GetSubModule(module->GetModuleName()))
     {
         pyllbc_SetError("sub module name repeat", LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -201,7 +201,7 @@ int pyllbc_Module::AddMethod(const LLBC_String &name,
     md.ml_flags = flags;
     md.ml_doc = hDoc;
 
-    return this->AddMethod(md);
+    return AddMethod(md);
 }
 
 int pyllbc_Module::AddObject(const LLBC_String &name, PyObject *obj)
@@ -235,7 +235,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, PyObject *obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, bool obj)
 {
     PyObject *o = PyBool_FromLong(obj ? 1 : 0);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -247,7 +247,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, bool obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, sint8 obj)
 {
     PyObject *o = Py_BuildValue("c", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -259,7 +259,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, sint8 obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, sint32 obj)
 {
     PyObject *o = Py_BuildValue("i", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -271,7 +271,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, sint32 obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, uint32 obj)
 {
     PyObject *o = Py_BuildValue("I", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -283,7 +283,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, uint32 obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, sint64 obj)
 {
     PyObject *o = Py_BuildValue("L", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -295,7 +295,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, sint64 obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, uint64 obj)
 {
     PyObject *o = Py_BuildValue("K", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -307,7 +307,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, uint64 obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, double obj)
 {
     PyObject *o = Py_BuildValue("d", obj);
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -319,7 +319,7 @@ int pyllbc_Module::AddObject(const LLBC_String &name, double obj)
 int pyllbc_Module::AddObject(const LLBC_String &name, const LLBC_String &obj)
 {
     PyObject *o = Py_BuildValue("s", obj.c_str());
-    if (this->AddObject(name, o) != LLBC_OK)
+    if (AddObject(name, o) != LLBC_OK)
     {
         Py_DECREF(o);
         return LLBC_FAILED;
@@ -371,7 +371,7 @@ int pyllbc_Module::Build()
         PyObject *pySubModule = subModule->GetPyModule();
 
         Py_INCREF(pySubModule);
-        if (this->AddObject(subModuleName, pySubModule) != LLBC_OK)
+        if (AddObject(subModuleName, pySubModule) != LLBC_OK)
         {
             Py_DECREF(pySubModule);
             return LLBC_FAILED;

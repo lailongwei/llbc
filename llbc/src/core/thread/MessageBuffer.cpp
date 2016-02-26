@@ -22,7 +22,7 @@ LLBC_MessageBuffer::LLBC_MessageBuffer()
 
 LLBC_MessageBuffer::~LLBC_MessageBuffer()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
@@ -89,7 +89,7 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
 
     LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
     block->Write(buf, len);
-    if (this->Append(block) != LLBC_OK)
+    if (Append(block) != LLBC_OK)
     {
         delete block;
         return LLBC_FAILED;

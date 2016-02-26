@@ -199,7 +199,7 @@ pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObjec
 
 pyllbc_Timer::~pyllbc_Timer()
 {
-    this->Cancel();
+    Cancel();
 
     Py_XDECREF(_timeoutCallable);
     Py_XDECREF(_boundedTimeOutObj);
@@ -222,7 +222,7 @@ int pyllbc_Timer::Schedule(uint64 dueTime, uint64 period)
 {
     if (Base::Schedule(dueTime, period) != LLBC_OK)
     {
-        const LLBC_String desc = this->ToString();
+        const LLBC_String desc = ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, desc);
         return LLBC_FAILED;
     }
@@ -253,7 +253,7 @@ bool pyllbc_Timer::OnTimeout()
                   _timeoutCallable,
                   _timeoutCallableDesc,
                   _pyTimer,
-                  this->GetTimerId(),
+                  GetTimerId(),
                   true,
                   _ignoredDeadRef,
                   reschedule) != LLBC_OK)
@@ -282,7 +282,7 @@ void pyllbc_Timer::OnCancel()
               _cancelCallable,
               _cancelCallableDesc,
               _pyTimer,
-              this->GetTimerId(),
+              GetTimerId(),
               false,
               _ignoredDeadRef,
               reschedule);

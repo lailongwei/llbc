@@ -14,28 +14,28 @@ int TestCase_Com_DataType::Run(int argc, char *argv[])
     LLBC_PrintLine("llbc library test case(datatype test):");
 
     // raw types test.
-    this->RawTest();
+    RawTest();
 
     // string base test.
-    this->StringBaseTest();
+    StringBaseTest();
 
     // utf8 test.
-    this->StringUTF8Test();
+    StringUTF8Test();
 
     // findreplace t est.
-    this->StringFindReplaceTest();
+    StringFindReplaceTest();
 
     // split test.
-    this->StringSplitTest("com.packet.battle.");
-    this->StringSplitTest("sys.io.stdout");
-    this->StringSplitTest(".os.path");
-    this->StringSplitTest(".");
-    this->StringSplitTest("a.b.c.d.");
-    this->StringSplitTest("a.b.c.d.", 3);
-    this->StringSplitTest("X.Y.Z", -1, "/");
+    StringSplitTest("com.packet.battle.");
+    StringSplitTest("sys.io.stdout");
+    StringSplitTest(".os.path");
+    StringSplitTest(".");
+    StringSplitTest("a.b.c.d.");
+    StringSplitTest("a.b.c.d.", 3);
+    StringSplitTest("X.Y.Z", -1, "/");
 
     // strip test.
-    this->StringStripTest();
+    StringStripTest();
 
     getchar();
 

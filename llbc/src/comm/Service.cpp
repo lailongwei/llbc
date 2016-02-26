@@ -126,7 +126,7 @@ LLBC_Service::LLBC_Service(This::Type type)
 
     // Create protocol stack.
 #if !LLBC_CFG_COMM_USE_FULL_STACK
-    this->CreateCodecStack(&_stack);
+    CreateCodecStack(&_stack);
 #endif
 }
 
@@ -137,7 +137,7 @@ LLBC_Service::LLBC_Service(This::Type type)
 
 LLBC_Service::~LLBC_Service()
 {
-    this->Stop();
+    Stop();
 
     LLBC_STLHelper::DeleteContainer(_facades);
     LLBC_STLHelper::DeleteContainer(_coders);
@@ -163,8 +163,8 @@ LLBC_Service::~LLBC_Service()
         LLBC_XDelete(_filters[layer]);
 
     _handledBeforeFrameTasks = false;
-    this->DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
-    this->DestroyFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
+    DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
+    DestroyFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
 }
 
 int LLBC_Service::GetId() const
@@ -222,7 +222,7 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
     }
 
     if ((_driveMode = mode) == This::ExternalDrive)
-        this->GetTimerScheduler();
+        GetTimerScheduler();
 
     return LLBC_FAILED;
 }
@@ -257,7 +257,7 @@ int LLBC_Service::Start(int pollerCount)
 
     if (_driveMode == This::ExternalDrive)
     {
-        if (!this->IsCanContinueDriveService())
+        if (!IsCanContinueDriveService())
         {
             LLBC_SetLastError(LLBC_ERROR_LIMIT);
             _pollerMgr.Stop();
@@ -265,11 +265,11 @@ int LLBC_Service::Start(int pollerCount)
             return LLBC_FAILED;
         }
 
-        this->AddServiceToTls();
+        AddServiceToTls();
     }
     else
     {
-        if (this->Activate(1) != LLBC_OK)
+        if (Activate(1) != LLBC_OK)
         {
             _pollerMgr.Stop();
             return LLBC_FAILED;
@@ -279,7 +279,7 @@ int LLBC_Service::Start(int pollerCount)
     _started = true;
 
     if (_driveMode == This::ExternalDrive)
-        this->InitFacades();
+        InitFacades();
 
     return LLBC_OK;
 }
@@ -309,7 +309,7 @@ void LLBC_Service::Stop()
         }
         else
         {
-            this->Cleanup();
+            Cleanup();
         }
     }
 
@@ -378,12 +378,12 @@ int LLBC_Service::Send(LLBC_Packet *packet)
     // Call internal Lockable() to complete.
     // lock = true
     // validCheck = true
-    return this->LockableSend(packet);
+    return LockableSend(packet);
 }
 
 int LLBC_Service::Send2(int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
 {
-    return this->Send2(0, sessionId, opcode, coder, status, parts);
+    return Send2(0, sessionId, opcode, coder, status, parts);
 }
 
 int LLBC_Service::Send2(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
@@ -403,7 +403,7 @@ int LLBC_Service::Send2(int svcId, int sessionId, int opcode, LLBC_ICoder *coder
     // Call internal LockableSend() to complete.
     // lock = true
     // validCheck = true
-    return this->LockableSend(packet);
+    return LockableSend(packet);
 }
 
 int LLBC_Service::Send2(int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
@@ -411,7 +411,7 @@ int LLBC_Service::Send2(int sessionId, int opcode, const void *bytes, size_t len
     // Call internal LockableSend() to complete.
     // lock = true
     // validCheck = true
-    const int ret = this->LockableSend(0, sessionId, opcode, bytes, len, status, parts);
+    const int ret = LockableSend(0, sessionId, opcode, bytes, len, status, parts);
     if (parts)
         LLBC_Delete(parts);
 
@@ -423,7 +423,7 @@ int LLBC_Service::Send2(int svcId, int sessionId, int opcode, const void *bytes,
     // Call internal LockableSend() to complete.
     // lock = true
     // validCheck = true
-    const int ret = this->LockableSend(svcId, sessionId, opcode, bytes, len, status, parts);
+    const int ret = LockableSend(svcId, sessionId, opcode, bytes, len, status, parts);
     if (parts)
         LLBC_Delete(parts);
 
@@ -432,14 +432,14 @@ int LLBC_Service::Send2(int svcId, int sessionId, int opcode, const void *bytes,
 
 int LLBC_Service::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
 {
-    return this->Multicast2(0, sessionIds, opcode, coder, status, parts);
+    return Multicast2(0, sessionIds, opcode, coder, status, parts);
 }
 
 int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
 {
     // Call internal MulticastSendCoder<> template method to complete.
     // validCheck = true
-    const int ret = this->MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status, parts);
+    const int ret = MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status, parts);
     if (parts)
         LLBC_Delete(parts);
 
@@ -448,7 +448,7 @@ int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, in
 
 int LLBC_Service::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
 {
-    return this->Multicast2(0, sessionIds, opcode, bytes, len, status, parts);
+    return Multicast2(0, sessionIds, opcode, bytes, len, status, parts);
 }
 
 int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
@@ -461,7 +461,7 @@ int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, in
     for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
          sessionIt != sessionIds.end();
          sessionIt++)
-        this->LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false);
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false);
 
     if (parts)
         LLBC_Delete(parts);
@@ -471,7 +471,7 @@ int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, in
 
 int LLBC_Service::Broadcast2(int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
 {
-    return this->Broadcast2(0, opcode, coder, status, parts);
+    return Broadcast2(0, opcode, coder, status, parts);
 }
 
 int LLBC_Service::Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
@@ -490,7 +490,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int stat
 
     // Call internal template method MulticastSendCoder<>() to complete.
     // validCheck = false
-    const int ret = this->MulticastSendCoder<LLBC_SessionIdList>(svcId, connectedSessionIds, opcode, coder, status, parts, false);
+    const int ret = MulticastSendCoder<LLBC_SessionIdList>(svcId, connectedSessionIds, opcode, coder, status, parts, false);
     if (parts)
         LLBC_Delete(parts);
 
@@ -499,7 +499,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int stat
 
 int LLBC_Service::Broadcast2(int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
 {
-    return this->Broadcast2(0, opcode, bytes, len ,status, parts);
+    return Broadcast2(0, opcode, bytes, len ,status, parts);
 }
 
 int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t len , int status, LLBC_PacketHeaderParts *parts)
@@ -513,7 +513,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t le
     for (LLBC_SessionIdSetCIter sessionIt = _connectedSessionIds.begin();
          sessionIt != _connectedSessionIds.end();
          sessionIt++)
-        this->LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false, false);
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false, false);
 
     if (parts)
         LLBC_Delete(parts);
@@ -813,26 +813,26 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<LLBC_E
     }
 
     const LLBC_ListenerStub stub = LLBC_GUIDHelper::GenStr();
-    this->Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, stub, deleg));
+    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, stub, deleg));
 
     return stub;
 }
 
 void LLBC_Service::UnsubscribeEvent(int event)
 {
-    this->Push(LLBC_SvcEvUtil::
+    Push(LLBC_SvcEvUtil::
         BuildUnsubscribeEvEv(event, LLBC_INVALID_LISTENER_STUB));
 }
 
 void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
 {
-    this->Push(LLBC_SvcEvUtil::
+    Push(LLBC_SvcEvUtil::
         BuildUnsubscribeEvEv(0, stub));
 }
 
 void LLBC_Service::FireEvent(LLBC_Event *ev)
 {
-    this->Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
+    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
 }
 
 int LLBC_Service::Post(LLBC_IDelegate1<LLBC_Service::Base *> *deleg)
@@ -887,23 +887,23 @@ void LLBC_Service::OnSvc(bool fullFrame)
     _begHeartbeatTime = LLBC_GetMilliSeconds();
 
     // Handle before frame-tasks.
-    this->HandleFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
+    HandleFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
     _handledBeforeFrameTasks = true;
 
     // Process queued events.
-    this->HandleQueuedEvents();
+    HandleQueuedEvents();
 
     // Update all compoments.
-    this->UpdateFacades();
-    this->UpdateTimers();
-    this->UpdateAutoReleasePool();
+    UpdateFacades();
+    UpdateTimers();
+    UpdateAutoReleasePool();
 
     // Handle after frame-tasks.
-    this->HandleFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
+    HandleFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
     _handledBeforeFrameTasks = false;
 
     // Process Idle.
-    this->ProcessIdle();
+    ProcessIdle();
 
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
@@ -916,7 +916,7 @@ void LLBC_Service::OnSvc(bool fullFrame)
     _sinkIntoLoop = false;
     if (_afterStop)
     {
-        this->Cleanup();
+        Cleanup();
         _stopping = false;
     }
 }
@@ -967,8 +967,8 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack()
     _Stack *stack = LLBC_New1(_Stack, _Stack::FullStack);
     stack->SetService(this);
 
-    return this->CreateRawStack(
-            this->CreateCodecStack(stack));
+    return CreateRawStack(
+            CreateCodecStack(stack));
 }
 
 void LLBC_Service::Svc()
@@ -977,16 +977,16 @@ void LLBC_Service::Svc()
         LLBC_Sleep(20);
 
     _lock.Lock();
-    this->AddServiceToTls();
-    this->GetTimerScheduler();
-    this->CreateAutoReleasePool();
-    this->InitFacades();
+    AddServiceToTls();
+    GetTimerScheduler();
+    CreateAutoReleasePool();
+    InitFacades();
     _lock.Unlock();
 
     _svcMgr.OnServiceStart(this);
 
     while (!_stopping)
-        this->OnSvc();
+        OnSvc();
 }
 
 void LLBC_Service::Cleanup()
@@ -995,7 +995,7 @@ void LLBC_Service::Cleanup()
 
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_OK)
+    while (TryPop(block) == LLBC_OK)
     {
         // Skip event type.
         block->ShiftReadPos(sizeof(int));
@@ -1009,9 +1009,9 @@ void LLBC_Service::Cleanup()
     _connectedSessionIds.clear();
     _connectedSessionIdsLock.Unlock();
 
-    this->DestroyFacades();
-    this->DestroyAutoReleasePool();
-    this->RemoveServiceFromTls();
+    DestroyFacades();
+    DestroyAutoReleasePool();
+    RemoveServiceFromTls();
 
     if (_driveMode == This::SelfDrive)
         _svcMgr.OnServiceStop(this);
@@ -1068,7 +1068,7 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
          it++)
         (*it)->Invoke(this);
 
-    this->DestroyFrameTasks(tasks, usingFlag);
+    DestroyFrameTasks(tasks, usingFlag);
 }
 
 void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
@@ -1082,7 +1082,7 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_OK)
+    while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
         block->Read(&ev, sizeof(LLBC_ServiceEvent *));
@@ -1172,7 +1172,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     if (UNLIKELY(_stack.RecvCodec(packet, packet) != LLBC_OK))
     {
-        this->RemoveSession(sessionId);
+        RemoveSession(sessionId);
         return;
     }
 #endif
@@ -1216,7 +1216,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             if (!preIt->second->Invoke(*packet))
             {
-                this->RemoveSession(sessionId);
+                RemoveSession(sessionId);
                 return;
             }
 
@@ -1229,7 +1229,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     {
         if (!_unifyPreHandler->Invoke(*packet))
         {
-            this->RemoveSession(sessionId);
+            RemoveSession(sessionId);
             return;
         }
     }
@@ -1454,7 +1454,7 @@ int LLBC_Service::LockableSend(int svcId,
         return ret;
     }
 
-    return this->LockableSend(packet, lock, validCheck);
+    return LockableSend(packet, lock, validCheck);
 }
 
 template <typename SessionIds>
@@ -1504,7 +1504,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     typename SessionIds::size_type sessionCnt = sessionIds.size();
     if (sessionCnt == 1)
-        return this->LockableSend(firstPacket, false, validCheck);
+        return LockableSend(firstPacket, false, validCheck);
 
     LLBC_Packet **otherPackets =
         LLBC_Calloc(LLBC_Packet *, (sizeof(LLBC_Packet *) * (sessionCnt - 1)));
@@ -1561,7 +1561,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             _connectedSessionIdsLock.Unlock();
     }
 
-    this->LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
+    LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
     const size_t otherPacketCnt = sessionCnt - 1;
     for (register size_t i = 0; i < otherPacketCnt; i++)
@@ -1570,7 +1570,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (!otherPacket)
             continue;
 
-        this->LockableSend(otherPacket, false, false); // Don't need vaildate check.
+        LockableSend(otherPacket, false, false); // Don't need vaildate check.
     }
 
     LLBC_Free(otherPackets);

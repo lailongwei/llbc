@@ -56,7 +56,7 @@ void LLBC_LogConsoleAppender::Finalize()
 int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
 {
     LLBC_LogTokenChain *chain = NULL;
-    if (!(chain = this->GetTokenChain()))
+    if (!(chain = GetTokenChain()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
@@ -70,7 +70,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     {
         oldOutputColor = LLBC_GetConsoleColor(out);
 
-        const int outputColor = this->DetermineLogTextColor(logLevel);
+        const int outputColor = DetermineLogTextColor(logLevel);
         LLBC_SetConsoleColor(out, outputColor);
     }
 

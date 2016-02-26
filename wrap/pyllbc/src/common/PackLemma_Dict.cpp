@@ -129,7 +129,7 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
         return LLBC_FAILED;
     }
 
-    if (this->Process(lemma) != LLBC_OK)
+    if (Process(lemma) != LLBC_OK)
     {
         delete lemma;
         return LLBC_FAILED;

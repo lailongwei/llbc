@@ -114,7 +114,7 @@ int LLBC_Session::Send(LLBC_Packet *packet)
 #endif
         return LLBC_FAILED;
 
-    if (this->Send(block) != LLBC_OK)
+    if (Send(block) != LLBC_OK)
     {
         LLBC_Delete(block);
         return LLBC_FAILED;
@@ -131,7 +131,7 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
     // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     if (_pollerType == LLBC_PollerType::EpollPoller)
-        this->OnSend();
+        OnSend();
 #endif
 
     return LLBC_OK;
@@ -196,7 +196,7 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
     if (_protoStack->RecvRaw(block, packets) != LLBC_OK)
 #endif
     {
-        this->OnClose();
+        OnClose();
         return false;
     }
 

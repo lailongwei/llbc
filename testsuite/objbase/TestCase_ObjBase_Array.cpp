@@ -100,9 +100,9 @@ int TestCase_ObjBase_Array::Run(int argc, char *argv[])
 {
     std::cout <<"objbase/array test: " <<std::endl;
 
-    this->BasicTest();
-    this->IterTest();
-    this->SortTest();
+    BasicTest();
+    IterTest();
+    SortTest();
 
     std::cout <<"press any key to continue ..." <<std::endl;
     getchar();

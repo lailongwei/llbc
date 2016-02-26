@@ -90,8 +90,8 @@ int pyllbc_PackLemmaCompiler::SetCacheLimit(size_t newSize)
     }
 
     _cacheLimit = newSize;
-    while (this->GetCachedSize() > _cacheLimit)
-        this->RemoveOldestExpr();
+    while (GetCachedSize() > _cacheLimit)
+        RemoveOldestExpr();
 
     return LLBC_OK;
 }
@@ -122,7 +122,7 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
     }
     else
     {
-        this->DiscardCache(expr);
+        DiscardCache(expr);
     }
 
     _compilingStack.push(
@@ -135,13 +135,13 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
         char ch = str[i];
         char nextCh = i + 1 < len ? str[i + 1] : '\0';
 
-        if (this->CompileChar(ch, nextCh, compileEnv) != LLBC_OK)
+        if (CompileChar(ch, nextCh, compileEnv) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
             return NULL;
         }
 
-        if (this->ReduceStack() != LLBC_OK)
+        if (ReduceStack() != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
             return NULL;
@@ -160,7 +160,7 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
     _compilingStack.pop();
 
     if (_exprs.size() == _cacheLimit)
-        this->RemoveOldestExpr();
+        RemoveOldestExpr();
 
     _exprsIdxQueue.push_back(expr);
     _exprs.insert(std::make_pair(expr, lemma));
@@ -189,7 +189,7 @@ int pyllbc_PackLemmaCompiler::ReduceStack()
 
 int pyllbc_PackLemmaCompiler::CompileChar(char ch, char nextCh, PyObject *compileEnv)
 {
-    Semantic sematic = this->ResolveSemantic(ch);
+    Semantic sematic = ResolveSemantic(ch);
     return (this->*_compMeths[sematic])(ch, nextCh, compileEnv);
 }
 

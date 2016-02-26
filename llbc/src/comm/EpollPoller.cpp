@@ -35,7 +35,7 @@ LLBC_EpollPoller::LLBC_EpollPoller()
 
 LLBC_EpollPoller::~LLBC_EpollPoller()
 {
-    this->Stop();
+    Stop();
 }
 
 int LLBC_EpollPoller::Start()
@@ -50,7 +50,7 @@ int LLBC_EpollPoller::Start()
             LLBC_CFG_EPOLL_MAX_LISTEN_FD_SIZE)) == LLBC_INVALID_HANDLE)
         return LLBC_FAILED;
 
-    if (this->StartupMonitor() != LLBC_OK)
+    if (StartupMonitor() != LLBC_OK)
     {
         LLBC_EpollClose(_epoll);
         _epoll = LLBC_INVALID_HANDLE;
@@ -58,9 +58,9 @@ int LLBC_EpollPoller::Start()
         return LLBC_FAILED;
     }
 
-    if (this->Activate(1) != LLBC_OK)
+    if (Activate(1) != LLBC_OK)
     {
-        this->StopMonitor();
+        StopMonitor();
         LLBC_EpollClose(_epoll);
         _epoll = LLBC_INVALID_HANDLE;
 
@@ -78,13 +78,13 @@ void LLBC_EpollPoller::Svc()
 
     while (!_stopping)
     {
-        this->HandleQueuedEvents(20);
+        HandleQueuedEvents(20);
     }
 }
 
 void LLBC_EpollPoller::Cleanup()
 {
-    this->StopMonitor();
+    StopMonitor();
 
     LLBC_EpollClose(_epoll);
     _epoll = LLBC_INVALID_HANDLE;
@@ -109,8 +109,8 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
         
-        this->SetConnectedSocketDftOpts(sock);
-        this->AddSession(this->CreateSession(sock, ev.sessionId));
+        SetConnectedSocketDftOpts(sock);
+        AddSession(CreateSession(sock, ev.sessionId));
     }
     else if (LLBC_GetLastError() == LLBC_ERROR_WBLOCK)
     {
@@ -153,7 +153,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     for (int i = 0; i < count; i++)
     {
         const LLBC_EpollEvent &ev = evs[i];
-        if (this->HandleConnecting(ev.data.fd, ev.events))
+        if (HandleConnecting(ev.data.fd, ev.events))
             continue;
 
         _Sockets::iterator it = _sockets.find(ev.data.fd);
@@ -171,7 +171,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             {
                 if (session->IsListen())
                 {
-                    this->Accept(session);
+                    Accept(session);
                     continue;
                 }
                 else
@@ -256,7 +256,7 @@ void LLBC_EpollPoller::MonitorSvc()
     if (ret <= 0)
         return;
 
-    this->Push(LLBC_PollerEvUtil::BuildEpollMonitorEv(_events, ret));
+    Push(LLBC_PollerEvUtil::BuildEpollMonitorEv(_events, ret));
 }
 
 bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
@@ -288,8 +288,8 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
         epev.events = EPOLLOUT | EPOLLET;
         LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
 
-        this->SetConnectedSocketDftOpts(sock);
-        this->AddSession(this->CreateSession(sock, asyncInfo.sessionId));
+        SetConnectedSocketDftOpts(sock);
+        AddSession(CreateSession(sock, asyncInfo.sessionId));
     }
     else
     {
@@ -311,8 +311,8 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
 
         newSock->SetNonBlocking();
 
-        this->SetConnectedSocketDftOpts(newSock);
-        this->AddToPoller(this->CreateSession(newSock));
+        SetConnectedSocketDftOpts(newSock);
+        AddToPoller(CreateSession(newSock));
     }
 }
 

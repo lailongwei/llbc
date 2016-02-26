@@ -24,12 +24,12 @@ LLBC_Array::LLBC_Array()
 
 , _objFactory(NULL)
 {
-    this->Recapacity(1);
+    Recapacity(1);
 }
 
 LLBC_Array::~LLBC_Array()
 {
-    this->Erase(this->Begin(), this->End());
+    Erase(Begin(), End());
     LLBC_XFree(_objs);
 
     LLBC_SAFE_RELEASE(_objFactory);
@@ -37,7 +37,7 @@ LLBC_Array::~LLBC_Array()
 
 void LLBC_Array::Clear()
 {
-    this->Erase(this->Begin(), this->End());
+    Erase(Begin(), End());
 }
 
 LLBC_Array::size_type LLBC_Array::GetSize() const
@@ -57,7 +57,7 @@ bool LLBC_Array::IsEmpty() const
 
 LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::difference_type n0, LLBC_Array::Obj *o)
 {
-    return this->Insert(this->Begin() + n0, o);
+    return Insert(Begin() + n0, o);
 }
 
 LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
@@ -65,17 +65,17 @@ LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
-    if (!(n0 >= this->Begin() && n0 <= this->End()))
+    if (!(n0 >= Begin() && n0 <= End()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
 
     if (_size == _capacity)
     {
-        this->Recapacity(MAX(1, _size * 2));
+        Recapacity(MAX(1, _size * 2));
     }
 
     LLBC_MemCpy(_objs + n0._idx + 1, 
@@ -91,17 +91,17 @@ LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
 
 LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::difference_type n0, const LLBC_Array &other)
 {
-    return this->Replace(n0, n0, other);
+    return Replace(n0, n0, other);
 }
 
 LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, const LLBC_Array &other)
 {
-    return this->Replace(n0, n0, other);
+    return Replace(n0, n0, other);
 }
 
 LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::difference_type n0, Obj *o)
 {
-    return this->Replace(this->Begin() + n0, o);
+    return Replace(Begin() + n0, o);
 }
 
 LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
@@ -109,12 +109,12 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
     if (UNLIKELY(o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
-    if (!(n0 >= this->Begin() && n0 < this->End()))
+    if (!(n0 >= Begin() && n0 < End()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
 
     _objs[n0._idx]->Release();
@@ -127,7 +127,7 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
 
 LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::difference_type n0, LLBC_Array::difference_type n1, const LLBC_Array &other)
 {
-    return this->Replace(this->Begin() + n0, this->Begin() + n1, other);
+    return Replace(Begin() + n0, Begin() + n1, other);
 }
 
 LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, const LLBC_Array &other)
@@ -135,18 +135,18 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     if (this == &other)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
-    if (!(n0 >= this->Begin() && n0 <= this->End()) ||
-        !(n1 >= this->Begin() && n1 <= this->End()))
+    if (!(n0 >= Begin() && n0 <= End()) ||
+        !(n1 >= Begin() && n1 <= End()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
 
     if (_capacity < n0._idx + other._size)
     {
-        this->Recapacity(n0._idx + other._size);
+        Recapacity(n0._idx + other._size);
     }
 
     for (difference_type i = n0._idx; i < n1._idx; i++)
@@ -196,18 +196,18 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
 
 LLBC_Array::Iter LLBC_Array::Erase(Iter n0)
 {
-    if (!(n0 >= this->Begin() && n0 < this->End()))
+    if (!(n0 >= Begin() && n0 < End()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
 
-    return this->Erase(n0, n0 + 1);
+    return Erase(n0, n0 + 1);
 }
 
 LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::difference_type n0)
 {
-    return this->Erase(this->Begin() + n0);
+    return Erase(Begin() + n0);
 }
 
 LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
@@ -215,13 +215,13 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
     if (UNLIKELY(n0 >= n1))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
-    if (!(n0 >= this->Begin() && n0 < this->End()) ||
-        !(n1 >= this->Begin() && n1 <= this->End()))
+    if (!(n0 >= Begin() && n0 < End()) ||
+        !(n1 >= Begin() && n1 <= End()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return this->End();
+        return End();
     }
 
     for (difference_type i = n0._idx; i < n1._idx; i++)
@@ -240,39 +240,39 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
 
 LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::difference_type n0, LLBC_Array::difference_type n1)
 {
-    return this->Erase(this->Begin() + n0, this->Begin() + n1);
+    return Erase(Begin() + n0, Begin() + n1);
 }
 
 void LLBC_Array::PushFront(LLBC_Array::Obj *o)
 {
-    this->Insert(this->Begin(), o);
+    Insert(Begin(), o);
 }
 
 void LLBC_Array::PushFront(LLBC_Array::Iter it)
 {
-    this->PushFront(*it);
+    PushFront(*it);
 }
 
 void LLBC_Array::PushBack(Obj *o)
 {
-    this->Insert(this->End(), o);
+    Insert(End(), o);
 }
 
 void LLBC_Array::PushBack(LLBC_Array::Iter it)
 {
-    this->PushBack(*it);
+    PushBack(*it);
 }
 
 void LLBC_Array::PopFront()
 {
-    this->Erase(this->Begin());
+    Erase(Begin());
 }
 
 void LLBC_Array::PopBack()
 {
-    if (!this->IsEmpty())
+    if (!IsEmpty())
     {
-        this->Erase(this->End() - 1);
+        Erase(End() - 1);
     }
 }
 
@@ -318,52 +318,52 @@ LLBC_Array::ConstReverseIter LLBC_Array::ReverseEnd() const
 
 LLBC_Array::Obj *LLBC_Array::FirstObject()
 {
-    if (this->IsEmpty())
+    if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }
 
-    return *this->Begin();
+    return *Begin();
 }
 
 LLBC_Array::ConstObj *LLBC_Array::FirstObject() const
 {
-    if (this->IsEmpty())
+    if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }
 
-    return *this->Begin();
+    return *Begin();
 }
 
 LLBC_Array::Obj *LLBC_Array::LastObject()
 {
-    if (this->IsEmpty())
+    if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }
 
-    return *(-- this->End());
+    return *(-- End());
 }
 
 LLBC_Array::ConstObj *LLBC_Array::LastObject() const
 {
-    if (this->IsEmpty())
+    if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }
 
-    return *(-- this->End());
+    return *(-- End());
 }
 
 LLBC_Array::Obj *LLBC_Array::ObjectAtIndex(difference_type off)
 {
-    Iter iter = this->Begin() + off;
-    if (iter >= this->Begin() && iter < this->End())
+    Iter iter = Begin() + off;
+    if (iter >= Begin() && iter < End())
     {
         return *iter;
     }
@@ -374,8 +374,8 @@ LLBC_Array::Obj *LLBC_Array::ObjectAtIndex(difference_type off)
 
 LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
 {
-    ConstIter iter = this->Begin() + off;
-    if (iter >= this->Begin() && iter < this->End())
+    ConstIter iter = Begin() + off;
+    if (iter >= Begin() && iter < End())
     {
         return *iter;
     }
@@ -395,7 +395,7 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); iter++)
     {
-        if ((o = this->ObjectAtIndex(*iter)))
+        if ((o = ObjectAtIndex(*iter)))
         {
             arr->PushBack(o);
         }
@@ -430,10 +430,10 @@ LLBC_Array &LLBC_Array::operator =(const LLBC_Array &rhs)
         return *this;
     }
 
-    this->Clear();
+    Clear();
     if (_capacity < rhs._size)
     {
-        this->Recapacity(rhs._size);
+        Recapacity(rhs._size);
     }
 
     LLBC_MemCpy(_objs, rhs._objs, rhs._size * sizeof(Obj *));
@@ -444,7 +444,7 @@ LLBC_Array &LLBC_Array::operator =(const LLBC_Array &rhs)
 
     _size = rhs._size;
 
-    this->SetObjectFactory(rhs._objFactory);
+    SetObjectFactory(rhs._objFactory);
 
     return *this;
 }
@@ -474,7 +474,7 @@ LLBC_Object *LLBC_Array::Clone() const
     }
 
     // Clone all array elements.
-    ConstIter it = this->Begin(), endIt = this->End();
+    ConstIter it = Begin(), endIt = End();
     for (; it != endIt; it++)
     {
         LLBC_Object *cloneObj = (*it)->Clone();
@@ -488,22 +488,22 @@ LLBC_Object *LLBC_Array::Clone() const
 
 void LLBC_Array::Serialize(LLBC_Stream &s) const
 {
-    this->SerializeInl(s, false);
+    SerializeInl(s, false);
 }
 
 bool LLBC_Array::DeSerialize(LLBC_Stream &s)
 {
-    return this->DeSerializeInl(s, false);
+    return DeSerializeInl(s, false);
 }
 
 void LLBC_Array::SerializeEx(LLBC_Stream &s) const
 {
-    this->SerializeInl(s, true);
+    SerializeInl(s, true);
 }
 
 bool LLBC_Array::DeSerializeEx(LLBC_Stream &s)
 {
-    return this->DeSerializeInl(s, true);
+    return DeSerializeInl(s, true);
 }
 
 void LLBC_Array::Recapacity(size_type cap)
@@ -525,7 +525,7 @@ void LLBC_Array::SerializeInl(LLBC_Stream &s, bool extended) const
 
     LLBC_STREAM_WRITE(static_cast<uint64>(_size));
 
-    ConstIter it = this->Begin(), endIt = this->End();
+    ConstIter it = Begin(), endIt = End();
     for (; it != endIt; it++)
     {
         if (!extended)
@@ -548,7 +548,7 @@ bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
         return false;
     }
 
-    this->Clear();
+    Clear();
 
     LLBC_STREAM_BEGIN_READ(s, bool, false);
 
@@ -561,12 +561,12 @@ bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
         if (!(!extended ? s.Read(*o) : s.ReadEx(*o)))
         {
             o->Release();
-            this->Clear();
+            Clear();
 
             return false;
         }
 
-        this->PushBack(o);
+        PushBack(o);
         o->Release();
     }
 

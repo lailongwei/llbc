@@ -27,7 +27,7 @@ LLBC_LogLevelToken::~LLBC_LogLevelToken()
 
 int LLBC_LogLevelToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    this->SetFormatter(formatter);
+    SetFormatter(formatter);
     return LLBC_OK;
 }
 
@@ -41,7 +41,7 @@ void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formatted
     int index = static_cast<int>(formattedData.size());
     formattedData.append(LLBC_LogLevel::GetLevelDesc(data.level));
 
-    LLBC_LogFormattingInfo *formatter = this->GetFormatter();
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
 }
 

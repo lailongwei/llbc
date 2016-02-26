@@ -169,31 +169,31 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
     switch(_Detector::DetectCls(cls))
     {
     case PYLLBC_NONE_OBJ:
-        return this->ReadNone();
+        return ReadNone();
 
     case PYLLBC_BOOL_OBJ:
-        return this->ReadBool();
+        return ReadBool();
 
     case PYLLBC_INT_OBJ:
-        return this->ReadInt32();
+        return ReadInt32();
 
     case PYLLBC_LONG_OBJ:
-        return this->ReadInt64();
+        return ReadInt64();
 
     case PYLLBC_FLOAT_OBJ:
-        return this->ReadDouble();
+        return ReadDouble();
 
     case PYLLBC_STR_OBJ:
-        return this->ReadStr();
+        return ReadStr();
 
     case PYLLBC_UNICODE_OBJ:
-        return this->ReadUnicode();
+        return ReadUnicode();
 
     case PYLLBC_BYTEARRAY_OBJ:
-        return this->ReadByteArray();
+        return ReadByteArray();
 
     case PYLLBC_BUFFER_OBJ:
-        return this->ReadBuffer();
+        return ReadBuffer();
 
     case PYLLBC_TUPLE_OBJ:
     case PYLLBC_LIST_OBJ:
@@ -336,12 +336,12 @@ PyObject *pyllbc_Stream::ReadDouble()
 
 PyObject *pyllbc_Stream::ReadPyInt()
 {
-    return this->ReadInt64();
+    return ReadInt64();
 }
 
 PyObject *pyllbc_Stream::ReadPyLong()
 {
-    return this->ReadInt64();
+    return ReadInt64();
 }
 
 PyObject *pyllbc_Stream::ReadStr()
@@ -472,49 +472,49 @@ int pyllbc_Stream::Write(PyObject *obj)
     switch (_Detector::Detect(obj))
     {
     case PYLLBC_NONE_OBJ:
-        return this->WriteNone(obj);
+        return WriteNone(obj);
 
     case PYLLBC_BOOL_OBJ:
-        return this->WriteBool(obj);
+        return WriteBool(obj);
 
     case PYLLBC_INT_OBJ:
-        return this->WriteInt32(obj);
+        return WriteInt32(obj);
 
     case PYLLBC_LONG_OBJ:
-        return this->WriteInt64(obj);
+        return WriteInt64(obj);
 
     case PYLLBC_FLOAT_OBJ:
-        return this->WriteDouble(obj);
+        return WriteDouble(obj);
 
     case PYLLBC_STR_OBJ:
-        return this->WriteStr(obj);
+        return WriteStr(obj);
 
     case PYLLBC_UNICODE_OBJ:
-        return this->WriteUnicode(obj);
+        return WriteUnicode(obj);
 
     case PYLLBC_BYTEARRAY_OBJ:
-        return this->WriteByteArray(obj);
+        return WriteByteArray(obj);
 
     case PYLLBC_BUFFER_OBJ:
-        return this->WriteBuffer(obj);
+        return WriteBuffer(obj);
 
     case PYLLBC_TUPLE_OBJ:
-        return this->WriteTuple(obj);
+        return WriteTuple(obj);
 
     case PYLLBC_LIST_OBJ:
-        return this->WriteList(obj);
+        return WriteList(obj);
 
     case PYLLBC_SEQ_OBJ:
-        return this->WriteSequence(obj);
+        return WriteSequence(obj);
 
     case PYLLBC_DICT_OBJ:
-        return this->WriteDict(obj);
+        return WriteDict(obj);
 
     default:
         break;
     }
 
-    return this->WriteInst(obj);
+    return WriteInst(obj);
 }
 
 int pyllbc_Stream::WriteNone(PyObject *val)
@@ -686,12 +686,12 @@ int pyllbc_Stream::WriteDouble(PyObject *val)
 
 int pyllbc_Stream::WritePyInt(PyObject *val)
 {
-    return this->WriteInt64(val);
+    return WriteInt64(val);
 }
 
 int pyllbc_Stream::WritePyLong(PyObject *val)
 {
-    return this->WriteInt64(val);
+    return WriteInt64(val);
 }
 
 int pyllbc_Stream::WriteStr(PyObject *val)
@@ -734,7 +734,7 @@ int pyllbc_Stream::WriteUnicode(PyObject *val)
         return LLBC_FAILED;
     }
 
-    const int rtn = this->WriteStr(str);
+    const int rtn = WriteStr(str);
     Py_DECREF(str);
 
     return rtn;
@@ -771,12 +771,12 @@ int pyllbc_Stream::WriteBuffer(PyObject *val)
 
 int pyllbc_Stream::WriteTuple(PyObject *val)
 {
-    return this->WriteSequence(val);
+    return WriteSequence(val);
 }
 
 int pyllbc_Stream::WriteList(PyObject *val)
 {
-    return this->WriteSequence(val);
+    return WriteSequence(val);
 };
 
 int pyllbc_Stream::WriteSequence(PyObject *val)
@@ -788,7 +788,7 @@ int pyllbc_Stream::WriteSequence(PyObject *val)
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *elem = PySequence_ITEM(val, i);
-        if (this->Write(elem) != LLBC_OK)
+        if (Write(elem) != LLBC_OK)
         {
             Py_DECREF(elem);
             return LLBC_FAILED;
@@ -810,10 +810,10 @@ int pyllbc_Stream::WriteDict(PyObject *val)
     PyObject *key, *dictVal;
     while (PyDict_Next(val, &pos, &key, &dictVal))
     {
-        if (this->WriteStr(key) != LLBC_OK)
+        if (WriteStr(key) != LLBC_OK)
             return LLBC_FAILED;
 
-        if (this->Write(dictVal) != LLBC_OK)
+        if (Write(dictVal) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -872,9 +872,9 @@ int pyllbc_Stream::WriteInst(PyObject *val)
     _stream.Write(static_cast<sint32>(kws.size()));
     for (size_t i = 0; i < kws.size(); i++)
     {
-        if ((rtn = this->Write(kws[i].first)) != LLBC_OK)
+        if ((rtn = Write(kws[i].first)) != LLBC_OK)
             break;
-        if ((rtn = this->Write(kws[i].second)) != LLBC_OK)
+        if ((rtn = Write(kws[i].second)) != LLBC_OK)
             break;
     }
 

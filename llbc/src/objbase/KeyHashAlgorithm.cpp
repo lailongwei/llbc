@@ -101,7 +101,7 @@ const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(int t
 
 const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(const LLBC_String &algoDesc) const
 {
-    return this->GetAlgorithm(LLBC_KeyHashAlgorithmType::Str2Type(algoDesc));
+    return GetAlgorithm(LLBC_KeyHashAlgorithmType::Str2Type(algoDesc));
 }
 
 LLBC_KeyHashAlgorithm::SDBMHash::Result_Type 

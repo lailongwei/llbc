@@ -28,7 +28,7 @@ LLBC_LogTimeToken::~LLBC_LogTimeToken()
 
 int LLBC_LogTimeToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    this->SetFormatter(formatter);
+    SetFormatter(formatter);
     return LLBC_OK;
 }
 
@@ -58,7 +58,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     // Format millisecond part.
     formattedData.append_format("%03llu", data.logTime % 1000);
 
-    LLBC_LogFormattingInfo *formatter = this->GetFormatter();
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
 }
 

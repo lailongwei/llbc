@@ -43,7 +43,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
 
     LLBC_Guard guard(_lock);
 
-    if (this->GetTaskCount() >= PYLLBC_CFG_TASK_LMT)
+    if (GetTaskCount() >= PYLLBC_CFG_TASK_LMT)
     {
         pyllbc_SetError("task count gone to limit, create failed", LLBC_ERROR_LIMIT);
         return LLBC_FAILED;

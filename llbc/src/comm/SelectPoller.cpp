@@ -35,7 +35,7 @@ LLBC_SelectPoller::LLBC_SelectPoller()
 
 LLBC_SelectPoller::~LLBC_SelectPoller()
 {
-    this->Stop();
+    Stop();
 }
 
 int LLBC_SelectPoller::Start()
@@ -46,7 +46,7 @@ int LLBC_SelectPoller::Start()
         return LLBC_FAILED;
     }
 
-    if (this->Activate() != LLBC_OK)
+    if (Activate() != LLBC_OK)
         return LLBC_FAILED;
 
     _started = true;
@@ -63,7 +63,7 @@ void LLBC_SelectPoller::Svc()
 
     while (!_stopping)
     {
-        this->HandleQueuedEvents(0);
+        HandleQueuedEvents(0);
         if (_maxFd == 0)
         {
             LLBC_ThreadManager::Sleep(interval);
@@ -77,7 +77,7 @@ void LLBC_SelectPoller::Svc()
             static_cast<int>(_maxFd + 1),&reads, &writes, &excepts, interval);
 
         const sint64 begin = LLBC_GetMilliSeconds();
-        const int processed = this->HandleConnecting(writes, excepts);
+        const int processed = HandleConnecting(writes, excepts);
 
         if (processed < evCount)
         {
@@ -91,7 +91,7 @@ void LLBC_SelectPoller::Svc()
                 LLBC_Session *session = 
                     _sockets.find(reads.fd_array[i])->second;
                 if (session->GetSocket()->IsListen())
-                    this->Accept(session);
+                    Accept(session);
                 else
                     session->OnRecv();
             }
@@ -119,7 +119,7 @@ void LLBC_SelectPoller::Svc()
                 {
                     LLBC_Session *session = _sockets.find(handle)->second;
                     if (session->GetSocket()->IsListen())
-                        this->Accept(session);
+                        Accept(session);
                     else
                         session->OnRecv();
                 }
@@ -168,7 +168,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     {
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
-        this->AddSession(this->CreateSession(socket, ev.sessionId));
+        AddSession(CreateSession(socket, ev.sessionId));
     }
     else if (LLBC_GetLastError() == LLBC_ERROR_WBLOCK)
     {
@@ -182,7 +182,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         LLBC_SetFd(handle, &_writes);
         LLBC_SetFd(handle, &_excepts);
 
-        this->UpdateMaxFd();
+        UpdateMaxFd();
     }
     else
     {
@@ -229,7 +229,7 @@ void LLBC_SelectPoller::AddSession(LLBC_Session *session, bool needAddToIocp)
     LLBC_SetFd(handle, &_writes);
     LLBC_SetFd(handle, &_excepts);
 
-    this->UpdateMaxFd();
+    UpdateMaxFd();
 }
 
 void LLBC_SelectPoller::RemoveSession(LLBC_Session *session)
@@ -241,7 +241,7 @@ void LLBC_SelectPoller::RemoveSession(LLBC_Session *session)
 
     Base::RemoveSession(session);
     
-    this->UpdateMaxFd();
+    UpdateMaxFd();
 }
 
 void LLBC_SelectPoller::UpdateMaxFd()
@@ -260,8 +260,8 @@ void LLBC_SelectPoller::Accept(LLBC_Session *session)
     {
         newSocket->SetNonBlocking();
 
-        this->SetConnectedSocketDftOpts(newSocket);
-        this->AddToPoller(this->CreateSession(newSocket));
+        SetConnectedSocketDftOpts(newSocket);
+        AddToPoller(CreateSession(newSocket));
     }
 }
 
@@ -313,8 +313,8 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
 
         if (connected)
         {
-            this->SetConnectedSocketDftOpts(socket);
-            this->AddSession(this->CreateSession(socket, asyncInfo.sessionId));
+            SetConnectedSocketDftOpts(socket);
+            AddSession(CreateSession(socket, asyncInfo.sessionId));
         }
         else
         {
@@ -325,7 +325,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         _connecting.erase(it++);
         // Update max Fd.
         if (!connected)
-            this->UpdateMaxFd();
+            UpdateMaxFd();
     }
 
     return processed;

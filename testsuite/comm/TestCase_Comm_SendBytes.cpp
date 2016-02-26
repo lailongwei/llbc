@@ -19,19 +19,19 @@ class TestFacade : public LLBC_IFacade
 public:
     virtual void OnInitialize()
     {
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         LLBC_PrintLine("Service create: %p", svc);
     }
 
     virtual void OnDestroy()
     {
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         LLBC_PrintLine("Service destroy: %p", svc);
     }
 
     virtual void OnUpdate()
     {
-        // LLBC_IService *svc = this->GetService();
+        // LLBC_IService *svc = GetService();
         // LLBC_PrintLine("Service update: %p", svc);
     }
 
@@ -41,7 +41,7 @@ public:
         const char *data = reinterpret_cast<char *>(packet.GetPayload());
         LLBC_PrintLine("Recved packet, data: %s", data);
 
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         svc->Send(packet.GetSessionId(), packet.GetOpcode(), "Hello, World!", 14, 0);
     }
 };
@@ -70,7 +70,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
 
-    this->FetchArgs(argc, argv);
+    FetchArgs(argc, argv);
     LLBC_IService *svc = LLBC_IService::Create(_svcType);
 
     TestFacade *facade = LLBC_New(TestFacade);

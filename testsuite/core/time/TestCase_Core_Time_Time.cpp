@@ -21,10 +21,10 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
 {
     std::cout <<"core/time/time test: " <<std::endl;
 
-    this->OSTimeTest();
+    OSTimeTest();
     std::cout <<std::endl;
 
-    this->TimeClassTest();
+    TimeClassTest();
     std::cout <<std::endl;
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;

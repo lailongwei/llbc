@@ -25,7 +25,7 @@ LLBC_BaseApplication::LLBC_BaseApplication()
 
 LLBC_BaseApplication::~LLBC_BaseApplication()
 {
-    this->Wait();
+    Wait();
 }
 
 const LLBC_String &LLBC_BaseApplication::GetName() const
@@ -57,7 +57,7 @@ void LLBC_BaseApplication::Wait()
 {
     _services.Wait();
 
-    this->Stop();
+    Stop();
 }
 
 void LLBC_BaseApplication::Stop()

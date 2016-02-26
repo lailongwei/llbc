@@ -105,7 +105,7 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
     _bucketSize = bucketSize;
 
     // Generate hash key.
-    if(this->IsIntKey())
+    if(IsIntKey())
     {
         _hash = _intKey % _bucketSize;
     }
@@ -116,17 +116,17 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
     }
 
     // Link to hash bucket.
-    this->SetBucketElemPrev(NULL);
+    SetBucketElemPrev(NULL);
     LLBC_DictionaryElem *&hashed = _bucket[_hash];
     if(!hashed)
     {
-        this->SetBucketElemNext(NULL);
+        SetBucketElemNext(NULL);
         hashed = this;
     }
     else
     {
         hashed->SetBucketElemPrev(this);
-        this->SetBucketElemNext(hashed);
+        SetBucketElemNext(hashed);
         hashed = this;
 
 #ifdef LLBC_DEBUG
@@ -146,18 +146,18 @@ void LLBC_DictionaryElem::CancelHash()
 {
     if(_bucket[_hash] == this)
     {
-        _bucket[_hash] = this->GetBucketElemNext();
+        _bucket[_hash] = GetBucketElemNext();
     }
 
-    if(this->GetBucketElemPrev())
+    if(GetBucketElemPrev())
     {
-        this->GetBucketElemPrev()->
-            SetBucketElemNext(this->GetBucketElemNext());
+        GetBucketElemPrev()->
+            SetBucketElemNext(GetBucketElemNext());
     }
-    if(this->GetBucketElemNext())
+    if(GetBucketElemNext())
     {
-        this->GetBucketElemNext()->
-            SetBucketElemPrev(this->GetBucketElemPrev());
+        GetBucketElemNext()->
+            SetBucketElemPrev(GetBucketElemPrev());
     }
 }
 

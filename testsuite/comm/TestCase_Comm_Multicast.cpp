@@ -56,7 +56,7 @@ public:
         if (_asClient)
             return;
 
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         if (_useBst)
             svc->Broadcast(OPCODE, "Hello world!", 14, 0);
         else
@@ -108,7 +108,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     }
 
     // Fetch arguments.
-    this->FetchArgs(argc, argv);
+    FetchArgs(argc, argv);
 
     LLBC_IService *svc = LLBC_IService::Create(_svcType);
 
@@ -117,9 +117,9 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     svc->Subscribe(OPCODE, facade, &TestFacade::OnRecv);
 
     if (_asClient)
-        this->PrepareClientLogic(svc);
+        PrepareClientLogic(svc);
     else
-        this->PrepareServerLogic(svc);
+        PrepareServerLogic(svc);
 
     svc->Start();
 

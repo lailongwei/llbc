@@ -19,7 +19,7 @@ __LLBC_NS_BEGIN
 
 LLBC_IntervalSampler::LLBC_IntervalSampler()
 {
-    this->Reset();
+    Reset();
 }
 
 LLBC_IntervalSampler::~LLBC_IntervalSampler()
@@ -41,7 +41,7 @@ void LLBC_IntervalSampler::Reset()
 
 void LLBC_IntervalSampler::Update(time_t time)
 {
-    int diff = static_cast<int>(time - this->GetLastUpdateTime());
+    int diff = static_cast<int>(time - GetLastUpdateTime());
     _Base::Update(time);
 
     if(diff == 0)
@@ -49,8 +49,7 @@ void LLBC_IntervalSampler::Update(time_t time)
         return;
     }
 
-    this->ShiftSpeedArray(_speeds, 
-        sizeof(_speeds) / sizeof(_speeds[0]), diff);
+    ShiftSpeedArray(_speeds, sizeof(_speeds) / sizeof(_speeds[0]), diff);
 
     _speeds[0] = _collector;
     _collector = 0;
@@ -77,13 +76,13 @@ sint64 LLBC_IntervalSampler::GetSpeedInSecs(int secs) const
         return 0;
     }
 
-    if(!this->IsBeginSampling())
+    if(!IsBeginSampling())
     {
         return 0;
     }
 
     int nowTime = static_cast<int>(time(NULL));
-    int firstSamplingTime = static_cast<int>(this->GetFirstSamplingTime());
+    int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {
         return 0;
@@ -114,13 +113,13 @@ sint64 LLBC_IntervalSampler::GetSpeedInMins(int mins) const
         return 0;
     }
 
-    if(!this->IsBeginSampling())
+    if(!IsBeginSampling())
     {
         return 0;
     }
 
     int nowTime = static_cast<int>(time(NULL));
-    int firstSamplingTime = static_cast<int>(this->GetFirstSamplingTime());
+    int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {
         return 0;
@@ -132,8 +131,8 @@ sint64 LLBC_IntervalSampler::GetSpeedInMins(int mins) const
     {
         if((mins = (nowTime - firstSamplingTime) / 60) == 0)
         {
-            return this->GetSpeedInSecs(
-                nowTime - firstSamplingTime) * (nowTime - firstSamplingTime);
+            return GetSpeedInSecs(
+                       nowTime - firstSamplingTime) * (nowTime - firstSamplingTime);
         }
     }
 
@@ -158,13 +157,13 @@ sint64 LLBC_IntervalSampler::GetSpeedInHours(int hours) const
         return 0;
     }
 
-    if(!this->IsBeginSampling())
+    if(!IsBeginSampling())
     {
         return 0;
     }
 
     int nowTime = static_cast<int>(time(NULL));
-    int firstSamplingTime = static_cast<int>(this->GetFirstSamplingTime());
+    int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {
         return 0;
@@ -176,7 +175,7 @@ sint64 LLBC_IntervalSampler::GetSpeedInHours(int hours) const
         if((hours = (nowTime - firstSamplingTime) / 3600) == 0)
         {
             int secs = nowTime - firstSamplingTime;
-            return this->GetSpeedInSecs(secs) * secs;
+            return GetSpeedInSecs(secs) * secs;
         }
     }
 

@@ -89,14 +89,14 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::sm_freq = 0;
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_freq = 0;
 #endif
 
-LLBC_CPUTime::LLBC_CPUTime():m_count(0)
+LLBC_CPUTime::LLBC_CPUTime():_count(0)
 {
 }
 
-LLBC_CPUTime::LLBC_CPUTime(CPUTimeCount count):m_count(count)
+LLBC_CPUTime::LLBC_CPUTime(CPUTimeCount count):_count(count)
 {
 }
 
@@ -120,68 +120,68 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToSeconds() const
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(m_count / 1000000.0);
+    return static_cast<CPUTimeCount>(_count / 1000000.0);
 #else
-    return static_cast<CPUTimeCount>(m_count / sm_freq);
+    return static_cast<CPUTimeCount>(_count / _freq);
 #endif
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMilliSeconds() const
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(m_count / 1000.0);
+    return static_cast<CPUTimeCount>(_count / 1000.0);
 #else
-    return static_cast<CPUTimeCount>(m_count * 1000.0 / sm_freq);
+    return static_cast<CPUTimeCount>(_count * 1000.0 / _freq);
 #endif
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return m_count;
+    return _count;
 #else
-    return static_cast<CPUTimeCount>(m_count * 1000000.0 / sm_freq);
+    return static_cast<CPUTimeCount>(_count * 1000000.0 / _freq);
 #endif
 }
 
 std::string LLBC_CPUTime::ToString() const
 {
     char buf[32];
-    sprintf(buf, "%f", this->ToMicroSeconds() / 1000.0);
+    sprintf(buf, "%f", ToMicroSeconds() / 1000.0);
 
     return buf;
 }
 
 LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const
 {
-    return LLBC_CPUTime(this->m_count + right.m_count);
+    return LLBC_CPUTime(_count + right._count);
 }
 
 LLBC_CPUTime LLBC_CPUTime::operator -(const LLBC_CPUTime &right) const
 {
-    if (this->m_count < right.m_count)
+    if (_count < right._count)
     {
         return LLBC_CPUTime(0);
     }
 
-    return LLBC_CPUTime(this->m_count - right.m_count);
+    return LLBC_CPUTime(_count - right._count);
 }
 
 LLBC_CPUTime &LLBC_CPUTime::operator +=(const LLBC_CPUTime &right)
 {
-    this->m_count += right.m_count;
+    _count += right._count;
     return *this;
 }
 
 LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
 {
-    if (this->m_count < right.m_count)
+    if (_count < right._count)
     {
-        this->m_count = 0;
+        _count = 0;
     }
     else
     {
-        this->m_count -= right.m_count;
+        _count -= right._count;
     }
 
     return *this;
@@ -189,32 +189,32 @@ LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
 
 bool LLBC_CPUTime::operator <(const LLBC_CPUTime &right) const
 {
-    return this->m_count < right.m_count;
+    return _count < right._count;
 }
 
 bool LLBC_CPUTime::operator >(const LLBC_CPUTime &right) const
 {
-    return this->m_count > right.m_count;
+    return _count > right._count;
 }
 
 bool LLBC_CPUTime::operator <=(const LLBC_CPUTime &right) const
 {
-    return this->m_count <= right.m_count;
+    return _count <= right._count;
 }
 
 bool LLBC_CPUTime::operator >=(const LLBC_CPUTime &right) const
 {
-    return this->m_count >= right.m_count;
+    return _count >= right._count;
 }
 
 bool LLBC_CPUTime::operator ==(const LLBC_CPUTime &right) const
 {
-    return this->m_count == right.m_count;
+    return _count == right._count;
 }
 
 bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
 {
-    return this->m_count != right.m_count;
+    return _count != right._count;
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -222,7 +222,7 @@ void LLBC_CPUTime::InitFrequency()
 {
     LARGE_INTEGER freq;
     ::QueryPerformanceFrequency(&freq);
-    sm_freq = freq.QuadPart;
+    _freq = freq.QuadPart;
 }
 #endif
 

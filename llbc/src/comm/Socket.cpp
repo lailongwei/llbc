@@ -65,7 +65,7 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 
 LLBC_Socket::~LLBC_Socket()
 {
-    this->Close();
+    Close();
 }
 
 void LLBC_Socket::SetSession(LLBC_Session *session)
@@ -124,12 +124,12 @@ bool LLBC_Socket::IsClosed() const
 
 LLBC_Socket::operator bool () const
 {
-    return !this->IsClosed();
+    return !IsClosed();
 }
 
 bool LLBC_Socket::operator ! () const
 {
-    return this->IsClosed();
+    return IsClosed();
 }
 
 int LLBC_Socket::EnableAddressReusable()
@@ -193,7 +193,7 @@ int LLBC_Socket::SetOption(int level, int optname, const void *optval, LLBC_Sock
 
 int LLBC_Socket::BindTo(const char *ip, uint16 port)
 {
-    return this->BindTo(LLBC_SockAddr_IN(ip, port));
+    return BindTo(LLBC_SockAddr_IN(ip, port));
 }
 
 int LLBC_Socket::BindTo(const LLBC_SockAddr_IN &addr)
@@ -253,8 +253,8 @@ int LLBC_Socket::Connect(const LLBC_SockAddr_IN &addr)
     if (LLBC_ConnectToPeer(_handle, addr) != LLBC_OK)
         return LLBC_FAILED;
 
-    if (this->UpdateLocalAddress() != LLBC_OK ||
-            this->UpdatePeerAddress() != LLBC_OK)
+    if (UpdateLocalAddress() != LLBC_OK ||
+            UpdatePeerAddress() != LLBC_OK)
         return LLBC_FAILED;
 
     return LLBC_OK;
@@ -289,7 +289,7 @@ int LLBC_Socket::AsyncSend(const char *buf, int len)
     LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
     block->Write(buf, len);
 
-    return this->AsyncSend(block);
+    return AsyncSend(block);
 }
 
 int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
@@ -439,7 +439,7 @@ void LLBC_Socket::OnSend()
 #endif
          )
     {
-         this->OnClose();
+         OnClose();
          return;
     }
 
@@ -556,7 +556,7 @@ void LLBC_Socket::OnRecv()
     // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == _PollerType::IocpPoller)
-        if (this->PostZeroWSARecv() != LLBC_OK)
+        if (PostZeroWSARecv() != LLBC_OK)
             _session->OnClose();
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
@@ -567,7 +567,7 @@ void LLBC_Socket::OnClose(LLBC_POverlapped ol)
 void LLBC_Socket::OnClose()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
-    this->Close();
+    Close();
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -664,7 +664,7 @@ int LLBC_Socket::PostAsyncAccept()
         return LLBC_FAILED;
     }
 
-    this->InsertOverlapped(ol);
+    InsertOverlapped(ol);
     return LLBC_OK;
 }
 

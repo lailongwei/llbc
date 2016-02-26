@@ -73,34 +73,34 @@ int LLBC_Transcoder::MultiByteToWideChar(const LLBC_String &fromCode, const LLBC
 int LLBC_Transcoder::MultiByteFileToWideChar(const LLBC_String &fromCode, const LLBC_String &srcFile, LLBC_WString &dest)
 {
     LLBC_String srcContent;
-    if (this->ReadMultiByteFile(srcFile, srcContent) != LLBC_OK)
+    if (ReadMultiByteFile(srcFile, srcContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->MultiByteToWideChar(fromCode, srcContent, dest);
+    return MultiByteToWideChar(fromCode, srcContent, dest);
 }
 
 int LLBC_Transcoder::MultiByteToWideCharFile(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &destFile)
 {
     LLBC_WString destContent;
-    if (this->MultiByteToWideChar(fromCode, src, destContent) != LLBC_OK)
+    if (MultiByteToWideChar(fromCode, src, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteWideCharToFile(destContent, destFile);
+    return WriteWideCharToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::MultiByteFileToWideCharFile(const LLBC_String &fromCode, const LLBC_String &srcFile, const LLBC_String &destFile)
 {
     LLBC_WString destContent;
-    if (this->MultiByteFileToWideChar(fromCode, srcFile, destContent) != LLBC_OK)
+    if (MultiByteFileToWideChar(fromCode, srcFile, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteWideCharToFile(destContent, destFile);
+    return WriteWideCharToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src, LLBC_String &dest)
@@ -148,34 +148,34 @@ int LLBC_Transcoder::WideCharToMultiByte(const LLBC_String &toCode, const LLBC_W
 int LLBC_Transcoder::WideCharFileToMultiByte(const LLBC_String &toCode, const LLBC_String &srcFile, LLBC_String &dest)
 {
     LLBC_WString srcContent;
-    if (this->ReadWideCharFile(srcFile, srcContent) != LLBC_OK)
+    if (ReadWideCharFile(srcFile, srcContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WideCharToMultiByte(toCode, srcContent, dest);
+    return WideCharToMultiByte(toCode, srcContent, dest);
 }
 
 int LLBC_Transcoder::WideCharToMultiByteFile(const LLBC_String &toCode, const LLBC_WString &src, const LLBC_String &destFile)
 {
     LLBC_String destContent;
-    if (this->WideCharToMultiByte(toCode, src, destContent) != LLBC_OK)
+    if (WideCharToMultiByte(toCode, src, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteMultiByteToFile(destContent, destFile);
+    return WriteMultiByteToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::WideCharFileToMultiByteFile(const LLBC_String &toCode, const LLBC_String &srcFile, const LLBC_String &destFile)
 {
     LLBC_String destContent;
-    if (this->WideCharFileToMultiByte(toCode, srcFile, destContent) != LLBC_OK)
+    if (WideCharFileToMultiByte(toCode, srcFile, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteMultiByteToFile(destContent, destFile);
+    return WriteMultiByteToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::MultiByteToMultiByte(const LLBC_String &fromCode,
@@ -192,12 +192,12 @@ int LLBC_Transcoder::MultiByteToMultiByte(const LLBC_String &fromCode,
     }
 
     LLBC_WString wStr;
-    if (this->MultiByteToWideChar(fromCode, src, wStr) != LLBC_OK)
+    if (MultiByteToWideChar(fromCode, src, wStr) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WideCharToMultiByte(toCode, wStr, dest);
+    return WideCharToMultiByte(toCode, wStr, dest);
 }
 
 int LLBC_Transcoder::MultiByteFileToMultiByte(const LLBC_String &fromCode,
@@ -206,12 +206,12 @@ int LLBC_Transcoder::MultiByteFileToMultiByte(const LLBC_String &fromCode,
                                               LLBC_String &dest)
 {
     LLBC_String srcContent;
-    if (this->ReadMultiByteFile(srcFile, srcContent) != LLBC_OK)
+    if (ReadMultiByteFile(srcFile, srcContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->MultiByteToMultiByte(fromCode, srcContent, toCode, dest);
+    return MultiByteToMultiByte(fromCode, srcContent, toCode, dest);
 }
 
 int LLBC_Transcoder::MultiByteToMultiByteFile(const LLBC_String &fromCode,
@@ -220,23 +220,23 @@ int LLBC_Transcoder::MultiByteToMultiByteFile(const LLBC_String &fromCode,
                                               const LLBC_String &destFile)
 {
     LLBC_String destContent;
-    if (this->MultiByteToMultiByte(fromCode, src, toCode, destContent) != LLBC_OK)
+    if (MultiByteToMultiByte(fromCode, src, toCode, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteMultiByteToFile(destContent, destFile);
+    return WriteMultiByteToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::MultiByteFileToMultiByteFile(const LLBC_String &fromCode, const LLBC_String &srcFile, const LLBC_String &toCode, const LLBC_String &destFile)
 {
     LLBC_String destContent;
-    if (this->MultiByteFileToMultiByte(fromCode, srcFile, toCode, destContent) != LLBC_OK)
+    if (MultiByteFileToMultiByte(fromCode, srcFile, toCode, destContent) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
 
-    return this->WriteMultiByteToFile(destContent, destFile);
+    return WriteMultiByteToFile(destContent, destFile);
 }
 
 int LLBC_Transcoder::ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content)

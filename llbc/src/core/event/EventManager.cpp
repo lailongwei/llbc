@@ -70,7 +70,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
     LLBC_String stub;
     if (bindedStub != LLBC_INVALID_LISTENER_STUB)
     {
-        if (this->SearchStub(bindedStub))
+        if (SearchStub(bindedStub))
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_INVALID_LISTENER_STUB;
@@ -87,7 +87,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
     op.listener.listener1 = listener;
     op.listener.stub = stub;
 
-    if (this->IsFiring())
+    if (IsFiring())
     {
         _delayedOps.push_back(op);
 
@@ -95,7 +95,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
         return op.listener.stub.c_str();
     }
 
-    if (this->ProcessEventOperation(op) != LLBC_OK)
+    if (ProcessEventOperation(op) != LLBC_OK)
         return LLBC_INVALID_LISTENER_STUB;
 
     return op.listener.stub.c_str();
@@ -116,7 +116,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     LLBC_String stub;
     if (bindedStub != LLBC_INVALID_LISTENER_STUB)
     {
-        if (this->SearchStub(bindedStub))
+        if (SearchStub(bindedStub))
         {
             delete listener;
 
@@ -135,7 +135,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     op.listener.listener2 = listener;
     op.listener.stub = stub;
 
-    if (this->IsFiring())
+    if (IsFiring())
     {
         _delayedOps.push_back(op);
 
@@ -143,7 +143,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    if (this->ProcessEventOperation(op) != LLBC_OK)
+    if (ProcessEventOperation(op) != LLBC_OK)
     {
         LLBC_XDelete(listener);
         return LLBC_INVALID_LISTENER_STUB;
@@ -164,7 +164,7 @@ int LLBC_EventManager::RemoveListener(int id)
     op.addOp = false;
     op.listener.evId = id;
 
-    if (this->IsFiring())
+    if (IsFiring())
     {
         _delayedOps.push_back(op);
 
@@ -172,7 +172,7 @@ int LLBC_EventManager::RemoveListener(int id)
         return LLBC_FAILED;
     }
 
-    return this->ProcessEventOperation(op);
+    return ProcessEventOperation(op);
 }
 
 int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
@@ -181,7 +181,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
     op.addOp = false;
     op.listener.stub.append(stub);
 
-    if (this->IsFiring())
+    if (IsFiring())
     {
         _delayedOps.push_back(op);
 
@@ -194,7 +194,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
 
 void LLBC_EventManager::FireEvent(LLBC_Event *event)
 {
-    this->BeforeFireEvent();
+    BeforeFireEvent();
 
     _ListenersMap::iterator mIt = _listeners.find(event->GetId());
     if (mIt != _listeners.end())
@@ -213,7 +213,7 @@ void LLBC_EventManager::FireEvent(LLBC_Event *event)
     }
 
     delete event;
-    this->AfterFireEvent();
+    AfterFireEvent();
 }
 
 bool LLBC_EventManager::IsFiring() const
@@ -312,7 +312,7 @@ void LLBC_EventManager::AfterFireEvent()
     if (--_firing == 0)
     {
         for (size_t i = 0; i < _delayedOps.size(); i++)
-            this->ProcessEventOperation(_delayedOps[i]);
+            ProcessEventOperation(_delayedOps[i]);
 
         _delayedOps.clear();
     }

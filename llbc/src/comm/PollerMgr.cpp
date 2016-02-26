@@ -61,7 +61,7 @@ LLBC_PollerMgr::LLBC_PollerMgr()
 
 LLBC_PollerMgr::~LLBC_PollerMgr()
 {
-    this->Stop();
+    Stop();
 }
 
 void LLBC_PollerMgr::SetPollerType(int type)
@@ -162,7 +162,7 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
         return 0;
     }
 
-    const int sessionId = this->AllocSessionId();
+    const int sessionId = AllocSessionId();
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAddSockEv(sessionId, sock));
@@ -191,7 +191,7 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
 
     sock->SetNonBlocking();
 
-    const int sessionId = this->AllocSessionId();
+    const int sessionId = AllocSessionId();
 
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
@@ -208,7 +208,7 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
         return 0;
 
-    const int sessionId = this->AllocSessionId();
+    const int sessionId = AllocSessionId();
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAsyncConnEv(sessionId, peer));

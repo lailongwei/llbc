@@ -82,10 +82,10 @@ public:
 
 private:
 #if LLBC_TARGET_PLATFORM_WIN32
-    static CPUTimeCount sm_freq;
+    static CPUTimeCount _freq;
 #endif
 
-    CPUTimeCount m_count;
+    CPUTimeCount _count;
 };
 
 __LLBC_NS_END

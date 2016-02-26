@@ -22,7 +22,7 @@ public:
 public:
     bool OnTimeout()
     {
-        this->Schedule(LLBC_Random::RandInt32cmcn(1000, 5000), 0);
+        Schedule(LLBC_Random::RandInt32cmcn(1000, 5000), 0);
         return false;
     }
 

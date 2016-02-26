@@ -50,7 +50,7 @@ LLBC_PacketHeaderDesc::LLBC_PacketHeaderDesc(const This &another)
          it++)
         _parts.insert(std::make_pair(it->first, it->second));
 
-    this->UpdateExtraBookKeeping();
+    UpdateExtraBookKeeping();
 }
 
 LLBC_PacketHeaderDesc::~LLBC_PacketHeaderDesc()
@@ -64,12 +64,12 @@ int LLBC_PacketHeaderDesc::AddPartDesc(const LLBC_PacketHeaderPartDesc &partDesc
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
-    else if (this->IsCanAdd(partDesc) != LLBC_OK)
+    else if (IsCanAdd(partDesc) != LLBC_OK)
         return LLBC_FAILED;
 
     _parts.insert(std::make_pair(partDesc.GetSerialNo(), partDesc));
 
-    this->UpdateExtraBookKeeping();
+    UpdateExtraBookKeeping();
 
     return LLBC_OK;
 }
@@ -84,7 +84,7 @@ int LLBC_PacketHeaderDesc::RemovePartDesc(int serialNo)
     }
 
     _parts.erase(it);
-    this->UpdateExtraBookKeeping();
+    UpdateExtraBookKeeping();
 
     return LLBC_OK;
 }
@@ -152,7 +152,7 @@ This &LLBC_PacketHeaderDesc::operator =(const This &another)
          it++)
          _parts.insert(std::make_pair(it->first, it->second));
 
-    this->UpdateExtraBookKeeping();
+    UpdateExtraBookKeeping();
 
     return *this;
 }

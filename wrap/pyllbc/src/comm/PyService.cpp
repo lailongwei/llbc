@@ -61,7 +61,7 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc)
 , _stoping(false)
 {
     // Create llbc library Service object and set some service attributes.
-    this->CreateLLBCService(type);
+    CreateLLBCService(type);
 
     // Create cobj python attribute key.
     _keyCObj = Py_BuildValue("s", "cobj");
@@ -72,8 +72,8 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc)
 
 pyllbc_Service::~pyllbc_Service()
 {
-    this->Stop();
-    this->AfterStop();
+    Stop();
+    AfterStop();
 
     Py_DECREF(_keyCObj);
 }
@@ -162,7 +162,7 @@ bool pyllbc_Service::IsStarted() const
 
 void pyllbc_Service::Stop()
 {
-    if (!this->IsStarted())
+    if (!IsStarted())
         return;
 
     if (_inMainloop)
@@ -171,7 +171,7 @@ void pyllbc_Service::Stop()
     }
     else
     {
-        this->AfterStop();
+        AfterStop();
         _started = false;
     }
 }
@@ -270,7 +270,7 @@ void pyllbc_Service::RemoveSession(int sessionId)
 int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, PyObject *parts)
 {
     // Started check.
-    if (UNLIKELY(!this->IsStarted()))
+    if (UNLIKELY(!IsStarted()))
     {
         pyllbc_SetError("service not start");
         return LLBC_FAILED;
@@ -280,13 +280,13 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     LLBC_PacketHeaderParts *cLayerParts = NULL;
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
-        if (!(cLayerParts = this->BuildCLayerParts(parts)))
+        if (!(cLayerParts = BuildCLayerParts(parts)))
             return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
-    const int ret = this->SerializePyObj2Stream(data, stream);
+    const int ret = SerializePyObj2Stream(data, stream);
     if (UNLIKELY(ret != LLBC_OK))
     {
         LLBC_XDelete(cLayerParts);
@@ -322,7 +322,7 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
 int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status, PyObject *parts)
 {
     // Started check.
-    if (UNLIKELY(!this->IsStarted()))
+    if (UNLIKELY(!IsStarted()))
     {
         pyllbc_SetError("service not start");
         return LLBC_FAILED;
@@ -336,13 +336,13 @@ int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, 
     LLBC_PacketHeaderParts *cLayerParts = NULL;
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
-        if (!(cLayerParts = this->BuildCLayerParts(parts)))
+        if (!(cLayerParts = BuildCLayerParts(parts)))
             return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
-    if (this->SerializePyObj2Stream(data, stream) != LLBC_OK)
+    if (SerializePyObj2Stream(data, stream) != LLBC_OK)
     {
         LLBC_XDelete(cLayerParts);
         return LLBC_FAILED;
@@ -357,7 +357,7 @@ int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, 
 int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *parts)
 {
     // Started check.
-    if (UNLIKELY(!this->IsStarted()))
+    if (UNLIKELY(!IsStarted()))
     {
         pyllbc_SetError("service not start");
         return LLBC_FAILED;
@@ -367,13 +367,13 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *
     LLBC_PacketHeaderParts *cLayerParts = NULL;
     if (parts && _llbcSvcType != LLBC_IService::Raw)
     {
-        if (!(cLayerParts = this->BuildCLayerParts(parts)))
+        if (!(cLayerParts = BuildCLayerParts(parts)))
             return LLBC_FAILED;
     }
 
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
-    if (this->SerializePyObj2Stream(data, stream) != LLBC_OK)
+    if (SerializePyObj2Stream(data, stream) != LLBC_OK)
     {
         LLBC_XDelete(cLayerParts);
         return LLBC_FAILED;
@@ -552,7 +552,7 @@ bool pyllbc_Service::MainLoop()
 
     if (!_stoping)
     {
-        this->HandleFrameCallables(_beforeFrameCallables, _handlingBeforeFrameCallables);
+        HandleFrameCallables(_beforeFrameCallables, _handlingBeforeFrameCallables);
         _handledBeforeFrameCallables = true;
     }
 
@@ -561,14 +561,14 @@ bool pyllbc_Service::MainLoop()
 
     if (!_stoping)
     {
-        this->HandleFrameCallables(_afterFrameCallables, _handlingAfterFrameCallables);
+        HandleFrameCallables(_afterFrameCallables, _handlingAfterFrameCallables);
     }
 
     _handledBeforeFrameCallables = false;
 
     if (_stoping)
     {
-        this->AfterStop();
+        AfterStop();
 
         _stoping = false;
         _started = false;
@@ -606,7 +606,7 @@ void pyllbc_Service::AfterStop()
 
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
-    this->CreateLLBCService(_llbcSvcType);
+    CreateLLBCService(_llbcSvcType);
 
     // Cleanup all python layer facades.
     for (_Facades::iterator it = _facades.begin();
@@ -631,8 +631,8 @@ void pyllbc_Service::AfterStop()
 
     // Destroy all frame callables.
     _handledBeforeFrameCallables = false;
-    this->DestroyFrameCallables(_beforeFrameCallables, _handlingBeforeFrameCallables);
-    this->DestroyFrameCallables(_afterFrameCallables, _handlingAfterFrameCallables);
+    DestroyFrameCallables(_beforeFrameCallables, _handlingBeforeFrameCallables);
+    DestroyFrameCallables(_afterFrameCallables, _handlingAfterFrameCallables);
 
 }
 
@@ -657,7 +657,7 @@ void pyllbc_Service::HandleFrameCallables(pyllbc_Service::_FrameCallables &calla
         }
     }
 
-    this->DestroyFrameCallables(callables, usingFlag);
+    DestroyFrameCallables(callables, usingFlag);
 }
 
 void pyllbc_Service::DestroyFrameCallables(_FrameCallables &callables, bool &usingFlag)

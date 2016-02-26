@@ -123,7 +123,7 @@ bool pyllbc_PackLemma::IsErrorOccurred() const
 
 const LLBC_String &pyllbc_PackLemma::ToString() const
 {
-    if (!this->IsDone())
+    if (!IsDone())
         return _emptyStr;
 
     return _str;

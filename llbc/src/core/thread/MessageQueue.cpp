@@ -25,7 +25,7 @@ LLBC_MessageQueue::LLBC_MessageQueue()
 
 LLBC_MessageQueue::~LLBC_MessageQueue()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 ulong LLBC_MessageQueue::GetSize() const
@@ -73,7 +73,7 @@ void LLBC_MessageQueue::Cleanup()
 void LLBC_MessageQueue::Push(LLBC_MessageBlock *block, bool front)
 {
     _lock.Lock();
-    this->PushNonLock(block, front);
+    PushNonLock(block, front);
     _lock.Unlock();
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -130,7 +130,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
             _lock.Lock();
             if (_size > 0)
             {
-                this->PopNonLock(block, front);
+                PopNonLock(block, front);
                 _lock.Unlock();
 
                 return true;
@@ -139,7 +139,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
             _cond.TimedWait(_lock, interval);
             if (_size > 0)
             {
-                this->PopNonLock(block, front);
+                PopNonLock(block, front);
                 _lock.Unlock();
 
                 return true;
@@ -155,7 +155,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         _lock.Lock();
         if (_size > 0)
         {
-            this->PopNonLock(block, front);
+            PopNonLock(block, front);
             _lock.Unlock();
 
             return true;
@@ -169,7 +169,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         _sem.Wait();
 
         _lock.Lock();
-        this->PopNonLock(block, front);
+        PopNonLock(block, front);
         _lock.Unlock();
 
         return true;
@@ -179,7 +179,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         if (_sem.TryWait())
         {
             _lock.Lock();
-            this->PopNonLock(block, front);
+            PopNonLock(block, front);
             _lock.Unlock();
 
             return true;
@@ -190,7 +190,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         if (_sem.TimedWait(interval))
         {
             _lock.Lock();
-            this->PopNonLock(block, front);
+            PopNonLock(block, front);
             _lock.Unlock();
 
             return true;

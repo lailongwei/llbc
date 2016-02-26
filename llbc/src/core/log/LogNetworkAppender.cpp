@@ -22,7 +22,7 @@ LLBC_LogNetworkAppender::LLBC_LogNetworkAppender()
 
 LLBC_LogNetworkAppender::~LLBC_LogNetworkAppender()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_LogNetworkAppender::GetType() const

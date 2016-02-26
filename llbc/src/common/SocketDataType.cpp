@@ -107,8 +107,7 @@ int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr *sockaddr, LLBC_Socke
         return LLBC_FAILED;
     }
 
-    return this->FromOSDataType(
-        reinterpret_cast<const struct sockaddr_in *>(sockaddr));
+    return FromOSDataType(reinterpret_cast<const struct sockaddr_in *>(sockaddr));
 }
 
 uint16 LLBC_SockAddr_IN::GetAddressFamily() const
@@ -130,7 +129,7 @@ int LLBC_SockAddr_IN::SetAddressFamily(uint16 family)
 
 LLBC_String LLBC_SockAddr_IN::GetIpAsString() const
 {
-    struct in_addr addr = this->GetIpAsINAddr();
+    struct in_addr addr = GetIpAsINAddr();
     return ::inet_ntoa(addr);
 }
 
@@ -160,7 +159,7 @@ void LLBC_SockAddr_IN::SetIp(const LLBC_String &ip)
 {
     if (ip.empty())
     {
-        this->SetIp("127.0.0.1");
+        SetIp("127.0.0.1");
         return;
     }
 
@@ -241,7 +240,7 @@ void LLBC_SockAddr_IN::ZeroPaddingBuf()
 LLBC_String LLBC_SockAddr_IN::ToString() const
 {
     LLBC_String desc;
-    desc.format("%s:%d", this->GetIpAsString().c_str(), this->GetPort());
+    desc.format("%s:%d", GetIpAsString().c_str(), GetPort());
 
     return desc;
 }
@@ -312,7 +311,7 @@ void LLBC_OverlappedGroup::DeleteOverlapped(LLBC_POverlapped ol)
     _OLContainerIter iter = _ols.find(ol);
     ASSERT(iter != _ols.end() && "LLBC_OverlappedGroup::DeleteOverlapped(): not found overlapped!");
 
-    this->ClearOverlappedMembers(ol);
+    ClearOverlappedMembers(ol);
     delete ol;
 
     _ols.erase(iter);
@@ -324,7 +323,7 @@ void LLBC_OverlappedGroup::DeleteAllOverlappeds()
     for (; iter != _ols.end(); iter++)
     {
         LLBC_POverlapped ol = *iter;
-        this->ClearOverlappedMembers(ol);
+        ClearOverlappedMembers(ol);
         delete ol;
     }
 

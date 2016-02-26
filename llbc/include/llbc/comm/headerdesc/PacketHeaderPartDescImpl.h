@@ -137,7 +137,7 @@ inline LLBC_PacketHeaderPartDesc &LLBC_PacketHeaderPartDesc::SetFixedValue(const
         return *this;
     }
 
-    this->ClearFixedValue();
+    ClearFixedValue();
 
     _fixedValue = LLBC_Malloc(void, _partLen);
     LLBC_MemCpy(_fixedValue, value, _partLen);

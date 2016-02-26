@@ -31,8 +31,8 @@ namespace
 int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
 {
     std::cout <<"core/utils/Util_Misc test:" <<std::endl;
-    this->TestGuardFunc();
-    this->TestGuardMeth();
+    TestGuardFunc();
+    TestGuardMeth();
 
     std::cout <<"Press any key to continue...";
     getchar();

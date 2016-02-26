@@ -37,7 +37,7 @@ LLBC_BaseTimer::LLBC_BaseTimer(LLBC_BaseTimer::Scheduler *scheduler)
 
 LLBC_BaseTimer::~LLBC_BaseTimer()
 {
-    this->Cancel();
+    Cancel();
 }
 
 uint64 LLBC_BaseTimer::GetDueTime() const

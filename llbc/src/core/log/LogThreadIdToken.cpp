@@ -28,7 +28,7 @@ LLBC_LogThreadIdToken::~LLBC_LogThreadIdToken()
 
 int LLBC_LogThreadIdToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    this->SetFormatter(formatter);
+    SetFormatter(formatter);
     return LLBC_OK;
 }
 
@@ -53,7 +53,7 @@ void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &format
     formattedData.append(LLBC_Ptr2Str(data.threadHandle));
 #endif
 
-    LLBC_LogFormattingInfo *formatter = this->GetFormatter();
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
 }
 

@@ -26,7 +26,7 @@ LLBC_LogFileToken::~LLBC_LogFileToken()
 
 int LLBC_LogFileToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    this->SetFormatter(formatter);
+    SetFormatter(formatter);
     return LLBC_OK;
 }
 
@@ -41,7 +41,7 @@ void LLBC_LogFileToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     if (data.fileLen)
         formattedData.append(data.others + data.fileBeg, data.fileLen);
 
-    LLBC_LogFormattingInfo *formatter = this->GetFormatter();
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
 }
 

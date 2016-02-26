@@ -69,10 +69,10 @@ void LLBC_MD5::MD5GroupDigest::SetD(uint32 d)
 
 void LLBC_MD5::MD5GroupDigest::SetInfo(uint32 a, uint32 b, uint32 c, uint32 d)
 {
-    this->SetA(a);
-    this->SetB(b);
-    this->SetC(c);
-    this->SetD(d);
+    SetA(a);
+    SetB(b);
+    SetC(c);
+    SetD(d);
 }
 
 LLBC_String LLBC_MD5::MD5GroupDigest::ToString() const
@@ -89,10 +89,10 @@ LLBC_String LLBC_MD5::MD5GroupDigest::ToString() const
 
 LLBC_MD5::MD5GroupDigest &LLBC_MD5::MD5GroupDigest::operator +=(const LLBC_MD5::MD5GroupDigest &right)
 {
-    this->SetA(this->GetA() + right.GetA());
-    this->SetB(this->GetB() + right.GetB());
-    this->SetC(this->GetC() + right.GetC());
-    this->SetD(this->GetD() + right.GetD());
+    SetA(GetA() + right.GetA());
+    SetB(GetB() + right.GetB());
+    SetC(GetC() + right.GetC());
+    SetD(GetD() + right.GetD());
 
     return *this;
 }

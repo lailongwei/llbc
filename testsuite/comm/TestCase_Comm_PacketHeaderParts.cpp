@@ -22,21 +22,21 @@ int TestCase_Comm_PacketHeaderParts::Run(int argc, char *argv[])
     LLBC_PrintLine("comm/PacketeHeaderParts test:");
 
     int serialNo = 0;
-    this->TestOne<sint8>(serialNo++, 'a', "sint8");
-    this->TestOne<uint8>(serialNo++, 8, "uint8");
-    this->TestOne<sint16>(serialNo++, -16, "sint16");
-    this->TestOne<uint16>(serialNo++, 16, "uint16");
-    this->TestOne<sint32>(serialNo++, -32, "sint32");
-    this->TestOne<uint32>(serialNo++, 32, "uint32");
-    this->TestOne<sint64>(serialNo++, -64, "sint64");
-    this->TestOne<uint64>(serialNo++, 64, "uint64");
-    this->TestOne<float>(serialNo++, 1.618f, "float");
-    this->TestOne<double>(serialNo++, 8.161, "double");
-    this->TestOne<const char *>(serialNo++, "Hello World!", "char *");
-    this->TestOne<std::string>(serialNo++, "Hello std::string!", "std::string");
-    this->TestOne<LLBC_String>(serialNo++, "Hello LLBC_String!", "LLBC_String");
+    TestOne<sint8>(serialNo++, 'a', "sint8");
+    TestOne<uint8>(serialNo++, 8, "uint8");
+    TestOne<sint16>(serialNo++, -16, "sint16");
+    TestOne<uint16>(serialNo++, 16, "uint16");
+    TestOne<sint32>(serialNo++, -32, "sint32");
+    TestOne<uint32>(serialNo++, 32, "uint32");
+    TestOne<sint64>(serialNo++, -64, "sint64");
+    TestOne<uint64>(serialNo++, 64, "uint64");
+    TestOne<float>(serialNo++, 1.618f, "float");
+    TestOne<double>(serialNo++, 8.161, "double");
+    TestOne<const char *>(serialNo++, "Hello World!", "char *");
+    TestOne<std::string>(serialNo++, "Hello std::string!", "std::string");
+    TestOne<LLBC_String>(serialNo++, "Hello LLBC_String!", "LLBC_String");
 
-    this->TestSetToPacket();
+    TestSetToPacket();
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();

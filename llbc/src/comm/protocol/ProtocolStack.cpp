@@ -172,9 +172,9 @@ int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block)
 
 int LLBC_ProtocolStack::Send(LLBC_Packet *packet, LLBC_MessageBlock *&block)
 {
-    if (this->SendCodec(packet, packet) != LLBC_OK)
+    if (SendCodec(packet, packet) != LLBC_OK)
         return LLBC_FAILED;
-    return this->SendRaw(packet, block);
+    return SendRaw(packet, block);
 }
 
 int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets)
@@ -238,13 +238,13 @@ int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded
 int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets)
 {
     std::vector<LLBC_Packet *> rawPackets;
-    if (this->RecvRaw(block, rawPackets) != LLBC_OK)
+    if (RecvRaw(block, rawPackets) != LLBC_OK)
         return LLBC_FAILED;
 
     for (size_t i = 0;  i < rawPackets.size(); i++)
     {
         LLBC_Packet *packet;
-        if (this->RecvCodec(rawPackets[i], packet) != LLBC_OK)
+        if (RecvCodec(rawPackets[i], packet) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(packets);
             for (++i; i < rawPackets.size(); i++)
@@ -261,7 +261,7 @@ int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *
 
 void LLBC_ProtocolStack::Report(LLBC_IProtocol *proto, int level, const LLBC_String &err)
 {
-    this->Report(_session->GetId(), proto, level, err);
+    Report(_session->GetId(), proto, level, err);
 }
 
 void LLBC_ProtocolStack::Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &err)

@@ -137,7 +137,7 @@ void LLBC_BasePoller::Cleanup()
     // Cleanup all queued events.
     LLBC_PollerEvent ev;
     LLBC_MessageBlock *block;
-    while (this->TryPop(block) == LLBC_OK)
+    while (TryPop(block) == LLBC_OK)
     {
         block->Read(&ev, sizeof(LLBC_PollerEvent));
         LLBC_PollerEvUtil::DestroyEv(ev);
@@ -168,7 +168,7 @@ void LLBC_BasePoller::Cleanup()
 void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
 {
     LLBC_MessageBlock *block;
-    while (this->TimedPop(block, waitTime) == LLBC_OK)
+    while (TimedPop(block, waitTime) == LLBC_OK)
     {
         LLBC_PollerEvent &ev = 
             *reinterpret_cast< LLBC_PollerEvent *>(block->GetData());
@@ -181,7 +181,7 @@ void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
 
 void LLBC_BasePoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
 {
-    this->AddSession(this->CreateSession(ev.un.socket, ev.sessionId));
+    AddSession(CreateSession(ev.un.socket, ev.sessionId));
 }
 
 void LLBC_BasePoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
@@ -223,7 +223,7 @@ void LLBC_BasePoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
 {
-    this->AddSession(ev.un.session);
+    AddSession(ev.un.session);
 }
 
 LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId)
@@ -249,7 +249,7 @@ void LLBC_BasePoller::AddToPoller(LLBC_Session *session)
 
     if (hash == _id)
     {
-        this->AddSession(session);
+        AddSession(session);
     }
     else
     {

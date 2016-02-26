@@ -42,7 +42,7 @@ LLBC_LogTokenChain::LLBC_LogTokenChain()
 
 LLBC_LogTokenChain::~LLBC_LogTokenChain()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
@@ -98,7 +98,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                     {
                         token = LLBC_LogTokenBuilderSingleton->BuildLogToken(LLBC_LogTokenType::StrToken);
                         token->Initialize(formatter, buf);
-                        this->AppendToken(token);
+                        AppendToken(token);
 
                         buf.clear();
                         formatter = NULL;
@@ -133,7 +133,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             }
 
             token->Initialize(formatter, "");
-            this->AppendToken(token);
+            AppendToken(token);
 
             formatter = NULL;
             state = LLBC_INTERNAL_NS __g_literal_state;
@@ -166,7 +166,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
         default:
             LLBC_XDelete(formatter);
-            this->Cleanup();
+            Cleanup();
 
             LLBC_SetLastError(LLBC_ERROR_FORMAT);
             return LLBC_FAILED;
@@ -179,7 +179,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     {
         token = LLBC_LogTokenBuilderSingleton->BuildLogToken(LLBC_LogTokenType::StrToken);
         token->Initialize(NULL, buf);
-        this->AppendToken(token);
+        AppendToken(token);
     }
 
     return LLBC_OK;

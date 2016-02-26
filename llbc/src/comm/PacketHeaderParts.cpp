@@ -71,7 +71,7 @@ int LLBC_PacketHeaderParts::SetPart(int serialNo, const void *val, size_t valSiz
         return LLBC_FAILED;
     }
 
-    this->SetConstructedPart(serialNo, part);
+    SetConstructedPart(serialNo, part);
 
     return LLBC_OK;
 }
@@ -151,7 +151,7 @@ void LLBC_PacketHeaderParts::SetPartToPacket(int serialNo, const _Part &part, LL
 
 void LLBC_PacketHeaderParts::SetConstructedPart(int serialNo, const This::_Part &part)
 {
-    this->RemovePart(serialNo);
+    RemovePart(serialNo);
     _parts.insert(std::make_pair(serialNo, part));
 }
 

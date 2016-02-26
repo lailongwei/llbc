@@ -231,14 +231,14 @@ bool LLBC_Variant::IsRaw() const
 
 bool LLBC_Variant::IsSignedRaw() const
 {
-    return (this->IsRaw() && 
+    return (IsRaw() && 
         ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) == 
             LLBC_VariantType::VT_MASK_RAW_SIGNED));
 }
 
 bool LLBC_Variant::IsUnsignedRaw() const
 {
-    return (this->IsRaw() &&
+    return (IsRaw() &&
         ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) !=
             LLBC_VariantType::VT_MASK_RAW_SIGNED));
 }
@@ -335,12 +335,12 @@ bool LLBC_Variant::IsDict() const
 
 LLBC_Variant &LLBC_Variant::BecomeNil()
 {
-    if (this->IsNil())
+    if (IsNil())
     {
         return *this;
     }
 
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
     _holder.type = LLBC_VariantType::VT_NIL;
 
     return *this;
@@ -348,9 +348,9 @@ LLBC_Variant &LLBC_Variant::BecomeNil()
 
 LLBC_Variant &LLBC_Variant::BecomeBool()
 {
-    if (!this->IsBool())
+    if (!IsBool())
     {
-        *this = LLBC_Variant(this->AsBool());
+        *this = LLBC_Variant(AsBool());
     }
 
     return *this;
@@ -358,9 +358,9 @@ LLBC_Variant &LLBC_Variant::BecomeBool()
 
 LLBC_Variant &LLBC_Variant::BecomeInt8()
 {
-    if (!this->IsInt8())
+    if (!IsInt8())
     {
-        *this = this->AsInt8();
+        *this = AsInt8();
     }
 
     return *this;
@@ -368,9 +368,9 @@ LLBC_Variant &LLBC_Variant::BecomeInt8()
 
 LLBC_Variant &LLBC_Variant::BecomeUInt8()
 {
-    if (!this->IsUInt8())
+    if (!IsUInt8())
     {
-        *this = this->AsUInt8();
+        *this = AsUInt8();
     }
 
     return *this;
@@ -378,9 +378,9 @@ LLBC_Variant &LLBC_Variant::BecomeUInt8()
 
 LLBC_Variant &LLBC_Variant::BecomeInt16()
 {
-    if (!this->IsInt16())
+    if (!IsInt16())
     {
-        *this = this->AsInt16();
+        *this = AsInt16();
     }
 
     return *this;
@@ -388,9 +388,9 @@ LLBC_Variant &LLBC_Variant::BecomeInt16()
 
 LLBC_Variant &LLBC_Variant::BecomeUInt16()
 {
-    if (!this->IsUInt16())
+    if (!IsUInt16())
     {
-        *this = this->AsUInt16();
+        *this = AsUInt16();
     }
 
     return *this;
@@ -398,9 +398,9 @@ LLBC_Variant &LLBC_Variant::BecomeUInt16()
 
 LLBC_Variant &LLBC_Variant::BecomeInt32()
 {
-    if (!this->IsInt32())
+    if (!IsInt32())
     {
-        *this = this->AsInt32();
+        *this = AsInt32();
     }
 
     return *this;
@@ -408,9 +408,9 @@ LLBC_Variant &LLBC_Variant::BecomeInt32()
 
 LLBC_Variant &LLBC_Variant::BecomeUInt32()
 {
-    if (!this->IsUInt32())
+    if (!IsUInt32())
     {
-        *this = this->AsUInt32();
+        *this = AsUInt32();
     }
 
     return *this;
@@ -418,9 +418,9 @@ LLBC_Variant &LLBC_Variant::BecomeUInt32()
 
 LLBC_Variant &LLBC_Variant::BecomeLong()
 {
-    if (!this->IsLong())
+    if (!IsLong())
     {
-        *this = this->AsLong();
+        *this = AsLong();
     }
 
     return *this;
@@ -428,9 +428,9 @@ LLBC_Variant &LLBC_Variant::BecomeLong()
 
 LLBC_Variant &LLBC_Variant::BecomeULong()
 {
-    if (!this->IsULong())
+    if (!IsULong())
     {
-        *this = this->AsULong();
+        *this = AsULong();
     }
 
     return *this;
@@ -438,9 +438,9 @@ LLBC_Variant &LLBC_Variant::BecomeULong()
 
 LLBC_Variant &LLBC_Variant::BecomeInt64()
 {
-    if (!this->IsInt64())
+    if (!IsInt64())
     {
-        *this = this->AsInt64();
+        *this = AsInt64();
     }
 
     return *this;
@@ -448,9 +448,9 @@ LLBC_Variant &LLBC_Variant::BecomeInt64()
 
 LLBC_Variant &LLBC_Variant::BecomeUInt64()
 {
-    if (!this->IsUInt64())
+    if (!IsUInt64())
     {
-        *this = this->AsUInt64();
+        *this = AsUInt64();
     }
 
     return *this;
@@ -458,9 +458,9 @@ LLBC_Variant &LLBC_Variant::BecomeUInt64()
 
 LLBC_Variant &LLBC_Variant::BecomeFloat()
 {
-    if (!this->IsFloat())
+    if (!IsFloat())
     {
-        *this = this->AsFloat();
+        *this = AsFloat();
     }
 
     return *this;
@@ -468,9 +468,9 @@ LLBC_Variant &LLBC_Variant::BecomeFloat()
 
 LLBC_Variant &LLBC_Variant::BecomeDouble()
 {
-    if (!this->IsDouble())
+    if (!IsDouble())
     {
-        *this = this->AsDouble();
+        *this = AsDouble();
     }
 
     return *this;
@@ -478,9 +478,9 @@ LLBC_Variant &LLBC_Variant::BecomeDouble()
 
 LLBC_Variant &LLBC_Variant::BecomeStr()
 {
-    if (!this->IsStr())
+    if (!IsStr())
     {
-        *this = this->AsStr();
+        *this = AsStr();
     }
 
     return *this;
@@ -488,9 +488,9 @@ LLBC_Variant &LLBC_Variant::BecomeStr()
 
 LLBC_Variant &LLBC_Variant::BecomeDict()
 {
-    if (!this->IsDict())
+    if (!IsDict())
     {
-        *this = this->AsDict();
+        *this = AsDict();
     }
 
     return *this;
@@ -498,20 +498,20 @@ LLBC_Variant &LLBC_Variant::BecomeDict()
 
 bool LLBC_Variant::AsBool() const
 {
-    if (this->IsNil())
+    if (IsNil())
     {
         return false;
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         return false;
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         LLBC_String trimedData(LLBC_Trim(_holder.str));
         if (trimedData.length() != 4 && trimedData.length() != 5)
         {
-            return (this->AsInt64() != 0 ? true : false);
+            return (AsInt64() != 0 ? true : false);
         }
 
         LLBC_String lowerData(LLBC_ToLower(trimedData.c_str()));
@@ -523,60 +523,60 @@ bool LLBC_Variant::AsBool() const
 
 sint8 LLBC_Variant::AsInt8() const
 {
-    return static_cast<sint8>(this->AsInt64());
+    return static_cast<sint8>(AsInt64());
 }
 
 uint8 LLBC_Variant::AsUInt8() const
 {
-    return static_cast<uint8>(this->AsUInt64());
+    return static_cast<uint8>(AsUInt64());
 }
 
 sint16 LLBC_Variant::AsInt16() const
 {
-    return static_cast<sint16>(this->AsInt64());
+    return static_cast<sint16>(AsInt64());
 }
 
 uint16 LLBC_Variant::AsUInt16() const
 {
-    return static_cast<uint16>(this->AsUInt64());
+    return static_cast<uint16>(AsUInt64());
 }
 
 sint32 LLBC_Variant::AsInt32() const
 {
-    return static_cast<sint32>(this->AsInt64());
+    return static_cast<sint32>(AsInt64());
 }
 
 uint32 LLBC_Variant::AsUInt32() const
 {
-    return static_cast<uint32>(this->AsUInt64());
+    return static_cast<uint32>(AsUInt64());
 }
 
 long LLBC_Variant::AsLong() const
 {
-    return static_cast<long>(this->AsInt64());
+    return static_cast<long>(AsInt64());
 }
 
 unsigned long LLBC_Variant::AsULong() const
 {
-    return static_cast<unsigned long>(this->AsUInt64());
+    return static_cast<unsigned long>(AsUInt64());
 }
 
 sint64 LLBC_Variant::AsInt64() const
 {
-    if (this->IsNil())
+    if (IsNil())
     {
         return 0;
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         return 0;
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         return LLBC_Str2Int64(_holder.str.c_str());
     }
 
-    if (this->IsDouble() || this->IsFloat())
+    if (IsDouble() || IsFloat())
     {
         return static_cast<sint64>(_holder.raw.doubleVal);
     }
@@ -586,20 +586,20 @@ sint64 LLBC_Variant::AsInt64() const
 
 uint64 LLBC_Variant::AsUInt64() const
 {
-    if (this->IsNil())
+    if (IsNil())
     {
         return 0;
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         return 0;
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         return LLBC_Str2UInt64(_holder.str.c_str());
     }
 
-    if (this->IsDouble() || this->IsFloat())
+    if (IsDouble() || IsFloat())
     {
         return static_cast<uint64>(_holder.raw.doubleVal);
     }
@@ -609,30 +609,30 @@ uint64 LLBC_Variant::AsUInt64() const
 
 float LLBC_Variant::AsFloat() const
 {
-    return static_cast<float>(this->AsDouble());
+    return static_cast<float>(AsDouble());
 }
 
 double LLBC_Variant::AsDouble() const
 {
-    if (this->IsNil())
+    if (IsNil())
     {
         return 0.0;
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         return 0.0;
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         return LLBC_Str2Double(_holder.str.c_str());
     }
 
-    if (this->IsDouble() || this->IsFloat())
+    if (IsDouble() || IsFloat())
     {
         return _holder.raw.doubleVal;
     }
 
-    if (this->IsSignedRaw())
+    if (IsSignedRaw())
     {
         return static_cast<double>(_holder.raw.int64Val);
     }
@@ -642,25 +642,25 @@ double LLBC_Variant::AsDouble() const
 
 const char *LLBC_Variant::AsCStr() const
 {
-    return this->AsStr().c_str();
+    return AsStr().c_str();
 }
 
 const LLBC_String &LLBC_Variant::AsStr() const
 {
-    if (this->IsRaw())
+    if (IsRaw())
     {
         LLBC_Variant *nonConstThis = const_cast<LLBC_Variant *>(this);
-        if (this->IsBool())
+        if (IsBool())
         {
             nonConstThis->_holder.str = 
                 (_holder.raw.uint64Val ? "true" : "false");
         }
-        else if (this->IsFloat() || this->IsDouble())
+        else if (IsFloat() || IsDouble())
         {
             return nonConstThis->_holder.str =
                 LLBC_Num2Str(_holder.raw.doubleVal);
         }
-        else if (this->IsSignedRaw())
+        else if (IsSignedRaw())
         {
             nonConstThis->_holder.str = LLBC_Num2Str(_holder.raw.int64Val);
         }
@@ -669,7 +669,7 @@ const LLBC_String &LLBC_Variant::AsStr() const
             nonConstThis->_holder.str = LLBC_Num2Str(_holder.raw.uint64Val);
         }
     }
-    else if (!this->IsStr())
+    else if (!IsStr())
     {
         LLBC_Variant *nonConstThis = const_cast<LLBC_Variant *>(this);
         nonConstThis->CleanStrData();
@@ -686,7 +686,7 @@ Dict &LLBC_Variant::AsDict()
 
 const Dict &LLBC_Variant::AsDict() const
 {
-    if (!this->IsDict())
+    if (!IsDict())
     {
         return LLBC_INL_NS __g_nullDict;
     }
@@ -696,93 +696,93 @@ const Dict &LLBC_Variant::AsDict() const
 
 LLBC_Variant::operator bool() const
 {
-    return this->AsBool();
+    return AsBool();
 }
 
 LLBC_Variant::operator sint8() const
 {
-    return this->AsInt8();
+    return AsInt8();
 }
 
 LLBC_Variant::operator uint8() const
 {
-    return this->AsUInt8();
+    return AsUInt8();
 }
 
 LLBC_Variant::operator sint16() const
 {
-    return this->AsInt16();
+    return AsInt16();
 }
 
 LLBC_Variant::operator uint16() const
 {
-    return this->AsUInt16();
+    return AsUInt16();
 }
 
 LLBC_Variant::operator sint32() const
 {
-    return this->AsInt32();
+    return AsInt32();
 }
 
 LLBC_Variant::operator uint32() const
 {
-    return this->AsUInt32();
+    return AsUInt32();
 }
 
 LLBC_Variant::operator long() const
 {
-    return this->AsLong();
+    return AsLong();
 }
 
 LLBC_Variant::operator ulong() const
 {
-    return this->AsULong();
+    return AsULong();
 }
 
 LLBC_Variant::operator sint64() const
 {
-    return this->AsInt64();
+    return AsInt64();
 }
 
 LLBC_Variant::operator uint64() const
 {
-    return this->AsUInt64();
+    return AsUInt64();
 }
 
 LLBC_Variant::operator float() const
 {
-    return this->AsFloat();
+    return AsFloat();
 }
 
 LLBC_Variant::operator double() const
 {
-    return this->AsDouble();
+    return AsDouble();
 }
 
 LLBC_Variant::operator const char *() const
 {
-    return this->AsCStr();
+    return AsCStr();
 }
 
 LLBC_Variant::operator const LLBC_String &() const
 {
-    return this->AsStr();
+    return AsStr();
 }
 
 LLBC_Variant::operator Dict &()
 {
-    return this->AsDict();
+    return AsDict();
 }
 
 LLBC_Variant::operator const Dict &() const
 {
-    return this->AsDict();
+    return AsDict();
 }
 
 DictIter LLBC_Variant::Begin()
 {
     LLBC_INL_NS BecomeAndAllocDict(*this, _holder);
-    return this->AsDict().begin();
+    return AsDict().begin();
 }
 
 DictConstIter LLBC_Variant::Begin() const
@@ -790,13 +790,13 @@ DictConstIter LLBC_Variant::Begin() const
     LLBC_Variant *ncThis = const_cast<LLBC_Variant *>(this);
     LLBC_INL_NS BecomeAndAllocDict(*ncThis, ncThis->_holder);
 
-    return this->AsDict().begin();
+    return AsDict().begin();
 }
 
 DictIter LLBC_Variant::End()
 {
     LLBC_INL_NS BecomeAndAllocDict(*this, _holder);
-    return this->AsDict().end();
+    return AsDict().end();
 }
 
 DictConstIter LLBC_Variant::End() const
@@ -804,12 +804,12 @@ DictConstIter LLBC_Variant::End() const
     LLBC_Variant *ncThis = const_cast<LLBC_Variant *>(this);
     LLBC_INL_NS BecomeAndAllocDict(*ncThis, ncThis->_holder);
 
-    return this->AsDict().end();
+    return AsDict().end();
 }
 
 std::pair<DictIter, bool> LLBC_Variant::Insert(const Dict::key_type &key, const Dict::mapped_type &val)
 {
-    return this->Insert(Dict::value_type(key, val));
+    return Insert(Dict::value_type(key, val));
 }
 
 std::pair<DictIter, bool> LLBC_Variant::Insert(const Dict::value_type &val)
@@ -866,7 +866,7 @@ const Dict::mapped_type &LLBC_Variant::operator [](const LLBC_Variant &key) cons
 
 LLBC_Variant &LLBC_Variant::operator =(sint8 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_SINT8;
     _holder.raw.int64Val = val;
@@ -876,7 +876,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint8 val)
 
 LLBC_Variant &LLBC_Variant::operator =(uint8 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_UINT8;
     _holder.raw.uint64Val = val;
@@ -886,7 +886,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint8 val)
 
 LLBC_Variant &LLBC_Variant::operator =(sint16 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_SINT16;
     _holder.raw.int64Val = val;
@@ -896,7 +896,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint16 val)
 
 LLBC_Variant &LLBC_Variant::operator =(uint16 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_UINT16;
     _holder.raw.uint64Val = val;
@@ -906,7 +906,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint16 val)
 
 LLBC_Variant &LLBC_Variant::operator =(sint32 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_SINT32;
     _holder.raw.int64Val = val;
@@ -916,7 +916,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint32 val)
 
 LLBC_Variant &LLBC_Variant::operator =(uint32 val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_UINT32;
     _holder.raw.uint64Val = val;
@@ -926,7 +926,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint32 val)
 
 LLBC_Variant &LLBC_Variant::operator =(long val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_LONG;
     _holder.raw.int64Val = val;
@@ -936,7 +936,7 @@ LLBC_Variant &LLBC_Variant::operator =(long val)
 
 LLBC_Variant &LLBC_Variant::operator =(ulong val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_ULONG;
     _holder.raw.uint64Val = val;
@@ -946,7 +946,7 @@ LLBC_Variant &LLBC_Variant::operator =(ulong val)
 
 LLBC_Variant &LLBC_Variant::operator =(const sint64 &val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_SINT64;
     _holder.raw.int64Val = val;
@@ -956,7 +956,7 @@ LLBC_Variant &LLBC_Variant::operator =(const sint64 &val)
 
 LLBC_Variant &LLBC_Variant::operator =(const uint64 &val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_UINT64;
     _holder.raw.uint64Val = val;
@@ -966,7 +966,7 @@ LLBC_Variant &LLBC_Variant::operator =(const uint64 &val)
 
 LLBC_Variant &LLBC_Variant::operator =(float val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_FLOAT;
     _holder.raw.doubleVal = val;
@@ -976,7 +976,7 @@ LLBC_Variant &LLBC_Variant::operator =(float val)
 
 LLBC_Variant &LLBC_Variant::operator =(const double &val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_RAW_DOUBLE;
     _holder.raw.doubleVal = val;
@@ -986,7 +986,7 @@ LLBC_Variant &LLBC_Variant::operator =(const double &val)
 
 LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_STR_LLBC_STR;
     _holder.str = val;
@@ -996,7 +996,7 @@ LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &val)
 
 LLBC_Variant &LLBC_Variant::operator =(const Dict &val)
 {
-    this->CleanTypeData(_holder.type);
+    CleanTypeData(_holder.type);
 
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
     if (!val.empty())
@@ -1100,11 +1100,11 @@ const LLBC_String &LLBC_Variant::TypeToString() const
 
 LLBC_String LLBC_Variant::ValueToString() const
 {
-    if (this->IsStr())
+    if (IsStr())
     {
         return _holder.str;
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
 
         LLBC_String content;
@@ -1130,7 +1130,7 @@ LLBC_String LLBC_Variant::ValueToString() const
         content.append("}");
         return content;
     }
-    else if (this->IsNil())
+    else if (IsNil())
     {
         return "nil";
     }
@@ -1169,9 +1169,9 @@ LLBC_String LLBC_Variant::ValueToString() const
 LLBC_String LLBC_Variant::ToString() const
 {
     LLBC_String desc = "type:";
-    desc += this->TypeToString();
+    desc += TypeToString();
     desc += ", value:";
-    desc += this->ValueToString();
+    desc += ValueToString();
     return desc;
 }
 
@@ -1179,15 +1179,15 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
 {
     stream.Write(_holder.type);
 
-    if (this->IsRaw())
+    if (IsRaw())
     {
         stream.Write(_holder.raw.uint64Val);
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         stream.Write(_holder.str);
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         if (!_holder.dict)
         {
@@ -1209,18 +1209,18 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
 
 bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
 {
-    this->BecomeNil();
+    BecomeNil();
 
     if (!stream.Read(_holder.type))
     {
         return false;
     }
 
-    if (this->IsNil())
+    if (IsNil())
     {
         return true;
     }
-    if (this->IsRaw())
+    if (IsRaw())
     {
         if (!stream.Read(_holder.raw.uint64Val))
         {
@@ -1228,7 +1228,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return false;
         }
     }
-    else if (this->IsStr())
+    else if (IsStr())
     {
         if (!stream.Read(_holder.str))
         {
@@ -1236,7 +1236,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return false;
         }
     }
-    else if (this->IsDict())
+    else if (IsDict())
     {
         uint32 count = 0;
         if (!stream.Read(count))
@@ -1273,12 +1273,12 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
 
 void LLBC_Variant::SerializeEx(LLBC_Stream &stream) const
 {
-    this->Serialize(stream);
+    Serialize(stream);
 }
 
 bool LLBC_Variant::DeSerializeEx(LLBC_Stream &stream)
 {
-    return this->DeSerialize(stream);
+    return DeSerialize(stream);
 }
 
 void LLBC_Variant::SetType(int type)
@@ -1314,15 +1314,15 @@ void LLBC_Variant::CleanTypeData(int type)
     switch(topType)
     {
     case _Type::VT_RAW:
-        this->CleanRawData();
+        CleanRawData();
         break;
 
     case _Type::VT_STR:
-        this->CleanStrData();
+        CleanStrData();
         break;
 
     case _Type::VT_DICT:
-        this->CleanDictData();
+        CleanDictData();
         break;
 
     default:
@@ -1332,7 +1332,7 @@ void LLBC_Variant::CleanTypeData(int type)
 
 void LLBC_Variant::OptimizePerformance()
 {
-    if (this->IsDict())
+    if (IsDict())
     {
         if (_holder.dict && _holder.dict->empty())
         {

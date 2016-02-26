@@ -39,12 +39,12 @@ void LLBC_LogRunnable::Cleanup()
     LLBC_LogData *logData = NULL;
     LLBC_MessageBlock *block = NULL;
 
-    while (this->TryPop(block) == LLBC_OK)
+    while (TryPop(block) == LLBC_OK)
     {
         block->Read(&logData, sizeof(LLBC_LogData *));
 
-        this->Output(logData);
-        this->FreeLogData(logData);
+        Output(logData);
+        FreeLogData(logData);
 
         delete block;
     }
@@ -65,13 +65,13 @@ void LLBC_LogRunnable::Svc()
     LLBC_MessageBlock *block = NULL;
     while (LIKELY(!_stoped))
     {
-        if (this->TimedPop(block, 50) != LLBC_OK)
+        if (TimedPop(block, 50) != LLBC_OK)
             continue;
 
         block->Read(&logData, sizeof(LLBC_LogData *));
 
-        this->Output(logData);
-        this->FreeLogData(logData);
+        Output(logData);
+        FreeLogData(logData);
 
         delete block;
 

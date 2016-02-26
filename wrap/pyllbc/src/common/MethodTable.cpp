@@ -23,7 +23,7 @@ pyllbc_MethodTable::pyllbc_MethodTable()
 , _size(0)
 , _capacity(0)
 {
-    this->ReCapacity(128);
+    ReCapacity(128);
 }
 
 pyllbc_MethodTable::~pyllbc_MethodTable()
@@ -42,7 +42,7 @@ int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
     }
 
     if (_capacity - _size <= 1)
-        this->ReCapacity(_capacity * 2);
+        ReCapacity(_capacity * 2);
 
     LLBC_MemCpy(_methods + 1, _methods, sizeof(PyMethodDef) * _size);
     LLBC_MemCpy(_methods, &method, sizeof(PyMethodDef));

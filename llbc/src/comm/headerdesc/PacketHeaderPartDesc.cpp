@@ -72,7 +72,7 @@ LLBC_PacketHeaderPartDesc::LLBC_PacketHeaderPartDesc(const This &another)
 
 LLBC_PacketHeaderPartDesc::~LLBC_PacketHeaderPartDesc()
 {
-    this->ClearFixedValue();
+    ClearFixedValue();
 }
 
 bool LLBC_PacketHeaderPartDesc::IsValid() const
@@ -86,7 +86,7 @@ bool LLBC_PacketHeaderPartDesc::IsValid() const
     {
         if (_partLen > sizeof(LLBC_NS sint32))
             return false;
-        else if (this->IsHasFixedValue())
+        else if (IsHasFixedValue())
             return false;
     }
     else if (_opcodePart && _partLen > sizeof(LLBC_NS sint32))
@@ -167,7 +167,7 @@ This &LLBC_PacketHeaderPartDesc::operator =(const This &another)
 
     _partLen = another._partLen;
 
-    this->ClearFixedValue();
+    ClearFixedValue();
     if (another._fixedValue)
     {
         _fixedValue = LLBC_Malloc(void, _partLen);

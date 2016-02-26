@@ -41,7 +41,7 @@ inline void TestTask::Svc()
     LLBC_MessageBlock *block = NULL;
     while(-- m_repeatCount > 0)
     {
-        this->Pop(block);
+        Pop(block);
         LLBC_String content;
         LLBC_Stream stream(block->GetData(), block->GetReadableSize());
         stream.Read(content);

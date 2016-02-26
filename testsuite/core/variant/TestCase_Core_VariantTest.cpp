@@ -13,13 +13,13 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
 {
     std::cout <<"LLBC_Variant test:" <<std::endl;
 
-    this->BasicTest();
+    BasicTest();
     std::cout <<std::endl;
 
-    this->ArithmeticTest();
+    ArithmeticTest();
     std::cout <<std::endl;
 
-    this->DictTtest();
+    DictTtest();
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();

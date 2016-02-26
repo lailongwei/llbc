@@ -48,7 +48,7 @@ LLBC_Logger::LLBC_Logger()
 
 LLBC_Logger::~LLBC_Logger()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config)
@@ -58,7 +58,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
-    else if (this->IsInit())
+    else if (IsInit())
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -191,7 +191,7 @@ int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(LLBC_LogLevel::Debug, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(LLBC_LogLevel::Debug, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *message, ...)
@@ -202,7 +202,7 @@ int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *m
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(LLBC_LogLevel::Info, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(LLBC_LogLevel::Info, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *message, ...)
@@ -213,7 +213,7 @@ int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *m
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(LLBC_LogLevel::Warn, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(LLBC_LogLevel::Warn, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *message, ...)
@@ -224,7 +224,7 @@ int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(LLBC_LogLevel::Error, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(LLBC_LogLevel::Error, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *message, ...)
@@ -235,7 +235,7 @@ int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(LLBC_LogLevel::Fatal, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(LLBC_LogLevel::Fatal, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *message, ...) 
@@ -246,12 +246,12 @@ int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, 
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(message, fmttedMsg, msgLen);
 
-    return this->DirectOutput(level, tag, file, line, fmttedMsg, msgLen);
+    return DirectOutput(level, tag, file, line, fmttedMsg, msgLen);
 }
 
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
-    LLBC_LogData *data = this->BuildLogData(level, tag, file, line, message, len);
+    LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
     if (!_config->IsAsyncMode())
     {
         const int ret = _logRunnable->Output(data);

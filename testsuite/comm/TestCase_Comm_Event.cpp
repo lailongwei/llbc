@@ -48,7 +48,7 @@ public:
     {
         LLBC_ThreadManager::Sleep(1000);
 
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         _stub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestFacade::HandleEvent);
     }
 
@@ -59,7 +59,7 @@ public:
 
     virtual void OnUpdate()
     {
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
 
         TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
@@ -77,7 +77,7 @@ public:
         std::cout <<"handle event, data: " <<ev->data <<std::endl;
 
         ++_handleTimes;
-        LLBC_IService *svc = this->GetService();
+        LLBC_IService *svc = GetService();
         if (_handleTimes == 5)
             svc->SubscribeEvent(TestEvent::TEST_EV_ID2, this, &EventTestFacade::HandleEvent);
         else if (_handleTimes == 10)

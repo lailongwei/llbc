@@ -106,7 +106,7 @@ const LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name) cons
 
 int LLBC_SamplerGroup::Sampling(const LLBC_String &name, sint64 value, void *appData)
 {
-    LLBC_ISampler *sam = this->GetSampler(name);
+    LLBC_ISampler *sam = GetSampler(name);
     return sam ? sam->Sampling(value, appData) : LLBC_FAILED;
 }
 

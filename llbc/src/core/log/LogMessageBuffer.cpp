@@ -50,7 +50,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const std::basic_strin
 
 LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(char *msg)
 {
-    return this->operator <<((const char *)msg);
+    return operator <<((const char *)msg);
 }
 
 LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const char *msg)

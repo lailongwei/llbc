@@ -74,7 +74,7 @@ public:
         resPacket->SetHeader(packet, OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
-        this->GetService()->Send(resPacket);
+        GetService()->Send(resPacket);
     }
 
 private:

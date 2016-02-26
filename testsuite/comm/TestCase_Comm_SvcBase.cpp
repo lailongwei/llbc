@@ -55,7 +55,7 @@ public:
         int fps = LLBC_Random::RandInt32cmon(20, 60);
         // LLBC_PrintLine("Service update, set fps to %d", fps);
 
-        this->GetService()->SetFPS(fps);
+        GetService()->SetFPS(fps);
     }
 
     virtual void OnIdle(int idleTime)
@@ -100,7 +100,7 @@ public:
         resPacket->SetHeader(packet, packet.GetOpcode(), 0);
         resPacket->SetEncoder(resData);
 
-        this->GetService()->Send(resPacket);
+        GetService()->Send(resPacket);
     }
 
     void *OnPreRecvData(LLBC_Packet &packet)
@@ -184,18 +184,18 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     _svc->Start();
 
     // Connect test.
-    this->ConnectTest("www.baidu.com", 80);
-    this->ConnectTest("127.0.0.1", 7788);
+    ConnectTest("www.baidu.com", 80);
+    ConnectTest("127.0.0.1", 7788);
   
     // Listen test.
-    this->ListenTest("127.0.0.1", 7788);
+    ListenTest("127.0.0.1", 7788);
   
   
     // Async connect test.
-    this->AsyncConnTest("www.baidu.com", 80);
+    AsyncConnTest("www.baidu.com", 80);
 
     // Send/Recv test.
-    this->SendRecvTest("127.0.0.1", 7789);
+    SendRecvTest("127.0.0.1", 7789);
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();

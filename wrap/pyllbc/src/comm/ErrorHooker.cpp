@@ -31,7 +31,7 @@ pyllbc_ErrorHooker::pyllbc_ErrorHooker()
 
 pyllbc_ErrorHooker::~pyllbc_ErrorHooker()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 int pyllbc_ErrorHooker::Install()
@@ -113,13 +113,13 @@ void pyllbc_ErrorHooker::TransferHookedErrorToPython()
 
         _transfering = false;
 
-        this->Cleanup();
+        Cleanup();
     }
 }
 
 void pyllbc_ErrorHooker::Hook_ErrClear()
 {
-    this->Cleanup();
+    Cleanup();
 }
 
 void pyllbc_ErrorHooker::Hook_ErrSet(const LLBC_String &errDesc, int llbcErr, PyObject *errCls, PyObject *tbObj)

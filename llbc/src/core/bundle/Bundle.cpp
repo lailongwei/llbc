@@ -33,7 +33,7 @@ LLBC_Bundle::LLBC_Bundle()
 
 LLBC_Bundle::~LLBC_Bundle()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_Bundle::CreateMainBundle()

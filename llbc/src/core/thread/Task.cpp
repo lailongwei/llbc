@@ -57,7 +57,7 @@ LLBC_BaseTask::LLBC_BaseTask(LLBC_ThreadManager *threadMgr)
 
 LLBC_BaseTask::~LLBC_BaseTask()
 {
-    this->Wait();
+    Wait();
 }
 
 int LLBC_BaseTask::Activate(int threadNum,
@@ -100,7 +100,7 @@ int LLBC_BaseTask::GetThreadCount() const
     LLBC_BaseTask *nonConstTask = const_cast<LLBC_BaseTask *>(this);
     LLBC_Guard guard(nonConstTask->_lock);
 
-    return this->_threadNum;
+    return _threadNum;
 }
 
 int LLBC_BaseTask::Wait()
@@ -174,7 +174,7 @@ void LLBC_BaseTask::OnTaskThreadStop()
     if (--_curThreadNum == 0)
     {
         _lock.Unlock();
-        this->Cleanup();
+        Cleanup();
 
         return;
     }

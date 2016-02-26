@@ -47,7 +47,7 @@ LLBC_IService *LLBC_ServiceMgr::GetService(int id)
 int LLBC_ServiceMgr::RemoveService(int id)
 {
     LLBC_Guard guard(_lock);
-    LLBC_IService *svc = this->GetService(id);
+    LLBC_IService *svc = GetService(id);
     if (!svc)
     {
         return LLBC_FAILED;

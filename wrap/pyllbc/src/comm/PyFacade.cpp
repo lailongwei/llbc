@@ -367,7 +367,7 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
     pyllbc_PacketHandler *handler = handlerIt->second;
     PyObject *pyPacket = reinterpret_cast<PyObject *>(packet.GetPreHandleResult());
     if (!pyPacket)
-        if (UNLIKELY(!(pyPacket = this->BuildPyPacket(packet))))
+        if (UNLIKELY(!(pyPacket = BuildPyPacket(packet))))
             return;
 
     PyObject *ret = handler->Handle(pyPacket);
@@ -394,7 +394,7 @@ void *pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
         return succeedRtn;
 
     pyllbc_PacketHandler *handler = handlerIt->second;
-    PyObject *pyPacket = this->BuildPyPacket(packet);
+    PyObject *pyPacket = BuildPyPacket(packet);
     if (UNLIKELY(!pyPacket))
         return failedRtn;
 
@@ -421,7 +421,7 @@ void *pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
     if (UNLIKELY(_svc->_stoping))
         return succeedRtn;
 
-    PyObject *pyPacket = this->BuildPyPacket(packet);
+    PyObject *pyPacket = BuildPyPacket(packet);
     if (UNLIKELY(!pyPacket))
         return failedRtn;
 

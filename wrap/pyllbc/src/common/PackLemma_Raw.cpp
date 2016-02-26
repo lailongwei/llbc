@@ -44,11 +44,11 @@ bool pyllbc_PackLemma_Raw::IsSerializable() const
 
 int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
 {
-    if (UNLIKELY(this->IsErrorOccurred()))
+    if (UNLIKELY(IsErrorOccurred()))
     {
         return LLBC_FAILED;
     }
-    else if (UNLIKELY(this->IsDone()))
+    else if (UNLIKELY(IsDone()))
     {
         _state = Base::Error;
         pyllbc_SetError("raw-lemma is done, could not continue to accept any other lemmas");

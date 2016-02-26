@@ -67,7 +67,7 @@ int LLBC_Config::Initialize()
         LLBC_File file(fileName, LLBC_FileMode::BinaryRead);
         if (!file.IsOpened())
         {
-            this->BuildErrMsg(fileName, LLBC_FormatLastError());
+            BuildErrMsg(fileName, LLBC_FormatLastError());
             return LLBC_FAILED;
         }
 
@@ -79,7 +79,7 @@ int LLBC_Config::Initialize()
         {
             delete value;
 
-            this->BuildErrMsg(fileName, reader.getFormatedErrorMessages().c_str());
+            BuildErrMsg(fileName, reader.getFormatedErrorMessages().c_str());
             LLBC_SetLastError(LLBC_ERROR_INVALID);
 
             return LLBC_FAILED;
@@ -120,7 +120,7 @@ LLBC_JsonValue LLBC_Config::GetJsonValue(const LLBC_String &file, const char *fi
 
 std::vector<LLBC_JsonValue> LLBC_Config::GetJsonValueArray(const LLBC_String &file, const char *field) const
 {
-    LLBC_JsonValue value = this->GetJsonValue(file, field);
+    LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::vector<LLBC_JsonValue>();
@@ -139,7 +139,7 @@ std::vector<LLBC_JsonValue> LLBC_Config::GetJsonValueArray(const LLBC_String &fi
 
 std::map<int, LLBC_JsonValue> LLBC_Config::GetIntJsonMap(const LLBC_String &file, const char *field) const
 {
-    LLBC_JsonValue value = this->GetJsonValue(file, field);
+    LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::map<int, LLBC_JsonValue>();
@@ -159,7 +159,7 @@ std::map<int, LLBC_JsonValue> LLBC_Config::GetIntJsonMap(const LLBC_String &file
 
 std::map<LLBC_String, LLBC_JsonValue> LLBC_Config::GetStringJsonMap(const LLBC_String &file, const char *field) const
 {
-    LLBC_JsonValue value = this->GetJsonValue(file, field);
+    LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::map<LLBC_String, LLBC_JsonValue>();
@@ -179,7 +179,7 @@ std::map<LLBC_String, LLBC_JsonValue> LLBC_Config::GetStringJsonMap(const LLBC_S
 
 LLBC_Variant LLBC_Config::GetVariantValue(const LLBC_String &file, const char *field) const
 {
-    LLBC_JsonValue json = this->GetJsonValue(file, field);
+    LLBC_JsonValue json = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return LLBC_Variant();
@@ -190,7 +190,7 @@ LLBC_Variant LLBC_Config::GetVariantValue(const LLBC_String &file, const char *f
 
 std::vector<LLBC_Variant> LLBC_Config::GetVariantValueArray(const LLBC_String &file, const char *field) const
 {
-    std::vector<LLBC_JsonValue> jsons = this->GetJsonValueArray(file, field);
+    std::vector<LLBC_JsonValue> jsons = GetJsonValueArray(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::vector<LLBC_Variant>();
@@ -207,7 +207,7 @@ std::vector<LLBC_Variant> LLBC_Config::GetVariantValueArray(const LLBC_String &f
 
 std::map<int, LLBC_Variant> LLBC_Config::GetIntVariantMap(const LLBC_String &file, const char *field) const
 {
-    std::map<int, LLBC_JsonValue> jsons = this->GetIntJsonMap(file, field);
+    std::map<int, LLBC_JsonValue> jsons = GetIntJsonMap(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::map<int, LLBC_Variant>();
@@ -226,7 +226,7 @@ std::map<int, LLBC_Variant> LLBC_Config::GetIntVariantMap(const LLBC_String &fil
 
 std::map<LLBC_String, LLBC_Variant> LLBC_Config::GetStringVariantMap(const LLBC_String &file, const char *field) const
 {
-    std::map<LLBC_String, LLBC_JsonValue> jsons = this->GetStringJsonMap(file, field);
+    std::map<LLBC_String, LLBC_JsonValue> jsons = GetStringJsonMap(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
     {
         return std::map<LLBC_String, LLBC_Variant>();

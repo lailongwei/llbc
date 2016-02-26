@@ -116,20 +116,20 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
 #elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
     if(milliSeconds <= 0)
     {
-        return this->TryWait();
+        return TryWait();
     }
 
     sint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
     do
     {
-        if(this->TryWait())
+        if(TryWait())
         {
             return true;
         }
 
         LLBC_Sleep(10);
 
-        if(this->TryWait())
+        if(TryWait())
         {
             return true;
         }

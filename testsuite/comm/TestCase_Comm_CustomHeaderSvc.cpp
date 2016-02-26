@@ -54,7 +54,7 @@ namespace
             parts->SetPart(5, 3.14159);
             parts->SetPart(6, 3.14159f);
 
-            this->GetService()->Broadcast2(OPCODE, msg, 0, parts);
+            GetService()->Broadcast2(OPCODE, msg, 0, parts);
 
             _lastUpdateTime = now;
         }
@@ -106,11 +106,11 @@ TestCase_Comm_CustomHeaderSvc::~TestCase_Comm_CustomHeaderSvc()
 int TestCase_Comm_CustomHeaderSvc::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("comm/CustomHeaderSvc test:");
-    if (!this->ParseArgs(argc, argv))
+    if (!ParseArgs(argc, argv))
         return LLBC_FAILED;
 
-    this->DesignHeader();
-    if (!this->StartUpService())
+    DesignHeader();
+    if (!StartUpService())
         return LLBC_FAILED;
 
     LLBC_PrintLine("Service start up succeed, %s endPoint: %s:%d", 

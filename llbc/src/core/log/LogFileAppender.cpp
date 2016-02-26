@@ -54,7 +54,7 @@ LLBC_LogFileAppender::LLBC_LogFileAppender()
 
 LLBC_LogFileAppender::~LLBC_LogFileAppender()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_LogFileAppender::GetType() const
@@ -88,14 +88,14 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
     const sint64 now = LLBC_GetMilliSeconds();
-    const LLBC_String fileName = this->BuildLogFileName(now);
-    if (this->ReOpenFile(fileName, false) != LLBC_OK)
+    const LLBC_String fileName = BuildLogFileName(now);
+    if (ReOpenFile(fileName, false) != LLBC_OK)
         return LLBC_FAILED;
 
     if (_fileSize >= _maxFileSize)
     {
-        this->BackupFiles();
-        if (this->ReOpenFile(fileName, true) != LLBC_OK)
+        BackupFiles();
+        if (ReOpenFile(fileName, true) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -129,13 +129,13 @@ void LLBC_LogFileAppender::Finalize()
 int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 {
     LLBC_LogTokenChain *chain = NULL;
-    if (!(chain = this->GetTokenChain()))
+    if (!(chain = GetTokenChain()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
 
-    this->CheckAndUpdateLogFile(data.logTime);
+    CheckAndUpdateLogFile(data.logTime);
 
     LLBC_String formattedData;
     chain->Format(data, formattedData);
@@ -149,7 +149,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
         {
             _nonFlushLogCount += 1;
             if (data.level >= LLBC_LogLevel::Warn)
-                this->Flush();
+                Flush();
         }
 
         if (actuallyWrote != static_cast<long>(formattedData.size()))
@@ -183,14 +183,14 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
         return;
 
     bool clear = false, backup = false;
-    const LLBC_String newFileName = this->BuildLogFileName(now);
-    if (!this->IsNeedReOpenFile(now, newFileName, clear, backup))
+    const LLBC_String newFileName = BuildLogFileName(now);
+    if (!IsNeedReOpenFile(now, newFileName, clear, backup))
         return;
 
     if (backup)
-        this->BackupFiles();
+        BackupFiles();
 
-    this->ReOpenFile(newFileName, clear);
+    ReOpenFile(newFileName, clear);
     _logfileLastCheckTime = now;
 }
 
@@ -272,7 +272,7 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
     // Update file name/size, buffer info.
     _fileName = newFileName;
     _fileSize = _file->GetFileSize();
-    this->UpdateFileBufferInfo();
+    UpdateFileBufferInfo();
 
     return LLBC_OK;
 }

@@ -27,7 +27,7 @@ LLBC_Entity::LLBC_Entity()
 
 LLBC_Entity::~LLBC_Entity()
 {
-    this->RemoveAllBehaviors();
+    RemoveAllBehaviors();
 }
 
 int LLBC_Entity::GetId() const

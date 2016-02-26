@@ -29,7 +29,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 #endif
 
     // Simple convert test.
-    if(this->SimpleConvertTest() != 0)
+    if(SimpleConvertTest() != 0)
     {
         getchar();
         return -1;
@@ -37,7 +37,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 
     // UTF8 format string convert test.
     const LLBC_String utf8FileName = "core/transcoder/Transcoder_Test_UTF8.txt";
-    if(this->UTF8ConvertTest(utf8FileName) != 0)
+    if(UTF8ConvertTest(utf8FileName) != 0)
     {
         getchar();
         return -1;
@@ -45,7 +45,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 
     // GBK format string convert test.
     const LLBC_String gbkFileName = "core/transcoder/Transcoder_Test_GBK.txt";
-    if(this->GBKConvertTest(gbkFileName) != 0)
+    if(GBKConvertTest(gbkFileName) != 0)
     {
         getchar();
         return -1;
@@ -53,7 +53,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 
     // UTF16 format string convert test.
     const LLBC_String utf16FileName = "core/transcoder/Transcoder_Test_UTF16.txt";
-    if(this->UTF16ConvertTest(utf16FileName) != 0)
+    if(UTF16ConvertTest(utf16FileName) != 0)
     {
         getchar();
         return -1;
@@ -181,7 +181,7 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
     std::vector<LLBC_String> willDeleteFiles;
     willDeleteFiles.push_back(utf16FileName);
     willDeleteFiles.push_back(gbkFileName);
-    this->DeleteOutputFiles(willDeleteFiles);
+    DeleteOutputFiles(willDeleteFiles);
 
     return 0;
 }
@@ -241,7 +241,7 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
     std::vector<LLBC_String> willDeleteFiles;
     willDeleteFiles.push_back(utf16FileName);
     willDeleteFiles.push_back(utf8FileName);
-    this->DeleteOutputFiles(willDeleteFiles);
+    DeleteOutputFiles(willDeleteFiles);
 
     return 0;
 }
@@ -271,7 +271,7 @@ int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
     std::vector<LLBC_String> willDeleteFiles;
     willDeleteFiles.push_back(utf8FileName);
     willDeleteFiles.push_back(gbkFileName);
-    this->DeleteOutputFiles(willDeleteFiles);
+    DeleteOutputFiles(willDeleteFiles);
 
     return 0;
 }

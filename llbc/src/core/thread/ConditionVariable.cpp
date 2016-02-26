@@ -51,7 +51,7 @@ void LLBC_ConditionVariable::Notify()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     pthread_cond_signal(&m_handle);
 #else
-    this->Notify(false);
+    Notify(false);
 #endif
 }
 
@@ -60,13 +60,13 @@ void LLBC_ConditionVariable::Broadcast()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     pthread_cond_broadcast(&m_handle);
 #else
-    this->Notify(true);
+    Notify(true);
 #endif
 }
 
 void LLBC_ConditionVariable::Wait(LLBC_ILock &lock)
 {
-    this->TimedWait(lock, LLBC_INFINITE);
+    TimedWait(lock, LLBC_INFINITE);
 }
 
 int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
@@ -136,7 +136,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
         LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
     }
 
-    this->AfterWait(lock);
+    AfterWait(lock);
 
  #ifdef _MSC_VER
   #pragma inline_depth()

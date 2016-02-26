@@ -30,7 +30,7 @@ LLBC_LoggerManager::LLBC_LoggerManager()
 
 LLBC_LoggerManager::~LLBC_LoggerManager()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
@@ -74,7 +74,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         if (_configurator->Config(iter->first, logger) != LLBC_OK)
         {
             delete logger;
-            this->Finalize();
+            Finalize();
             return LLBC_FAILED;
         }
 

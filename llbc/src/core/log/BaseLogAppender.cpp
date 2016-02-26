@@ -23,7 +23,7 @@ LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 
 LLBC_BaseLogAppender::~LLBC_BaseLogAppender()
 {
-    this->Finalize();
+    Finalize();
 }
 
 int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)

@@ -118,7 +118,7 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
 
                     return LLBC_FAILED;
                 }
-                else if (!(_class = this->GetClassFromEnvAndName()))
+                else if (!(_class = GetClassFromEnvAndName()))
                 {
                     _state = Base::Error;
 

@@ -25,16 +25,16 @@ __LLBC_NS_BEGIN
 
 __LLBC_LibTls::__LLBC_LibTls()
 {
-    this->commonTls.errNo = LLBC_ERROR_SUCCESS;
-    this->commonTls.subErrNo = LLBC_ERROR_SUCCESS;
-    ::memset(&this->commonTls.errDesc, 0, __LLBC_ERROR_DESC_SIZE);
+    commonTls.errNo = LLBC_ERROR_SUCCESS;
+    commonTls.subErrNo = LLBC_ERROR_SUCCESS;
+    ::memset(&commonTls.errDesc, 0, __LLBC_ERROR_DESC_SIZE);
 
-    this->coreTls.llbcThread = false;
-    this->coreTls.entryThread = false;
-    this->coreTls.threadHandle = LLBC_INVALID_HANDLE;
-    this->coreTls.nativeThreadHandle =LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    this->coreTls.task = NULL;
-    this->coreTls.timerScheduler = NULL;
+    coreTls.llbcThread = false;
+    coreTls.entryThread = false;
+    coreTls.threadHandle = LLBC_INVALID_HANDLE;
+    coreTls.nativeThreadHandle =LLBC_INVALID_NATIVE_THREAD_HANDLE;
+    coreTls.task = NULL;
+    coreTls.timerScheduler = NULL;
 
     objbaseTls.poolStack = NULL;
 

@@ -54,7 +54,7 @@ bool pyllbc_PackLemma_Top::IsSerializable() const
 
 bool pyllbc_PackLemma_Top::IsDone() const
 {
-    return this->GetState() == Base::Done;
+    return GetState() == Base::Done;
 }
 
 int pyllbc_PackLemma_Top::Process(Symbol ch, Symbol nextCh)
@@ -85,7 +85,7 @@ int pyllbc_PackLemma_Top::Process(Base *lemma)
 
 PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
 {
-    if (UNLIKELY(!this->IsDone()))
+    if (UNLIKELY(!IsDone()))
     {
         pyllbc_SetError("top-lemma not done, could not unpack data");
         return NULL;
@@ -114,7 +114,7 @@ PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
 
 int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
 {
-    if (UNLIKELY(!this->IsDone()))
+    if (UNLIKELY(!IsDone()))
     {
         pyllbc_SetError("top-lemma not done, could not pack data");
         return LLBC_FAILED;

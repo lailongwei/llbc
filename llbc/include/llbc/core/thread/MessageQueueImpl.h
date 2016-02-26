@@ -13,58 +13,58 @@ __LLBC_NS_BEGIN
 
 inline void LLBC_MessageQueue::PushFront(LLBC_MessageBlock *block)
 {
-    this->Push(block, true);
+    Push(block, true);
 }
 
 inline void LLBC_MessageQueue::PushBack(LLBC_MessageBlock *block)
 {
-    this->Push(block, false);
+    Push(block, false);
 }
 
 inline void LLBC_MessageQueue::PopFront(LLBC_MessageBlock *&block)
 {
-    this->Pop(block, LLBC_INFINITE, true);
+    Pop(block, LLBC_INFINITE, true);
 }
 
 inline void LLBC_MessageQueue::PopBack(LLBC_MessageBlock *&block)
 {
-    this->Pop(block, LLBC_INFINITE, false);
+    Pop(block, LLBC_INFINITE, false);
 }
 
 inline bool LLBC_MessageQueue::TryPopFront(LLBC_MessageBlock *&block)
 {
-    return this->Pop(block, 0, true);
+    return Pop(block, 0, true);
 }
 
 inline bool LLBC_MessageQueue::TryPopBack(LLBC_MessageBlock *&block)
 {
-    return this->Pop(block, 0, false);
+    return Pop(block, 0, false);
 }
 
 inline bool LLBC_MessageQueue::TimedPopFront(LLBC_MessageBlock *&block, int interval)
 {
-    return this->Pop(block, interval, true);
+    return Pop(block, interval, true);
 }
 
 inline bool LLBC_MessageQueue::TimedPopBack(LLBC_MessageBlock *&block, int interval)
 {
-    return this->Pop(block, interval, false);
+    return Pop(block, interval, false);
 }
 
 inline void LLBC_MessageQueue::PushNonLock(LLBC_MessageBlock *block, bool front)
 {
     if (front)
-        this->PushFrontNonLock(block);
+        PushFrontNonLock(block);
     else
-        this->PushBackNonLock(block);
+        PushBackNonLock(block);
 }
 
 inline void LLBC_MessageQueue::PopNonLock(LLBC_MessageBlock *&block, bool front)
 {
     if (front)
-        this->PopFrontNonLock(block);
+        PopFrontNonLock(block);
     else
-        this->PopBackNonLock(block);
+        PopBackNonLock(block);
 }
 
 __LLBC_NS_END

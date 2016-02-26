@@ -26,7 +26,7 @@ LLBC_LogMsgToken::~LLBC_LogMsgToken()
 
 int LLBC_LogMsgToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    this->SetFormatter(formatter);
+    SetFormatter(formatter);
 
     return LLBC_OK;
 }
@@ -41,7 +41,7 @@ void LLBC_LogMsgToken::Format(const LLBC_LogData &data, LLBC_String &formattedDa
     int index = static_cast<int>(formattedData.size());
     formattedData.append(data.msg, data.msgLen);
 
-    LLBC_LogFormattingInfo *formatter = this->GetFormatter();
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
 }
 

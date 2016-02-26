@@ -29,7 +29,7 @@ LLBC_PollerMonitor::LLBC_PollerMonitor(_Deleg *deleg)
 
 LLBC_PollerMonitor::~LLBC_PollerMonitor()
 {
-    this->Stop();
+    Stop();
     LLBC_Delete(_deleg);
 }
 
@@ -41,7 +41,7 @@ int LLBC_PollerMonitor::Start()
         return LLBC_FAILED;
     }
 
-    this->Activate();
+    Activate();
     _started = true;
 
     return LLBC_OK;

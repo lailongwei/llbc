@@ -22,7 +22,7 @@ LLBC_Library::LLBC_Library()
 
 LLBC_Library::~LLBC_Library()
 {
-    (void)this->Close();
+    (void)Close();
 }
 
 int LLBC_Library::Open(const char *fileName)

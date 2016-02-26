@@ -20,10 +20,10 @@ TestCase_Comm_HeaderDesc::~TestCase_Comm_HeaderDesc()
 int TestCase_Comm_HeaderDesc::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("comm/PacketHeaderDesc test:");
-    this->HeaderPartDescTest();
+    HeaderPartDescTest();
     
     LLBC_PrintLine("=========================================================================");
-    this->HeaderDescTest();
+    HeaderDescTest();
 
     LLBC_PrintLine("Press any key to exit...");
     getchar();

@@ -34,7 +34,7 @@ LLBC_Dictionary::LLBC_Dictionary(LLBC_Dictionary::size_type bucketSize)
 
 LLBC_Dictionary::~LLBC_Dictionary()
 {
-    this->Clear();
+    Clear();
     free(_bucket);
 
     LLBC_SAFE_RELEASE(_objFactory);
@@ -76,7 +76,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
     }
 
     // Cancel hash.
-    Iter it = this->Begin(), endIt = this->End();
+    Iter it = Begin(), endIt = End();
     for (; it != endIt; it++)
     {
         it.Elem()->CancelHash();
@@ -89,7 +89,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
     LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 
     // ReHash.
-    it = this->Begin();
+    it = Begin();
     for (; it != endIt; it++)
     {
         it.Elem()->Hash(_bucket, _bucketSize);
@@ -106,7 +106,7 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
         return LLBC_FAILED;
     }
 
-    if (this->Find(key) != this->End())
+    if (Find(key) != End())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -115,7 +115,7 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
     // Check bucket size and auto expand it.
     if (_size >= _bucketSize * 100)
     {
-        this->SetHashBucketSize(_bucketSize * 2);
+        SetHashBucketSize(_bucketSize * 2);
     }
 
     LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
@@ -148,7 +148,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         return LLBC_FAILED;
     }
 
-    if (this->Find(key) != this->End())
+    if (Find(key) != End())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -157,7 +157,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
     // Check bucket size and auto expand it.
     if (_size >= _bucketSize * 100)
     {
-        this->SetHashBucketSize(_bucketSize * 2);
+        SetHashBucketSize(_bucketSize * 2);
     }
 
     LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
@@ -165,7 +165,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
     // Hash to bucket.
     elem->Hash(_bucket, _bucketSize);
     // Link to doubly-linked list.
-    this->AddToDoublyLinkedList(elem);
+    AddToDoublyLinkedList(elem);
 
     _size += 1;
 
@@ -180,8 +180,8 @@ int LLBC_Dictionary::Replace(int key, LLBC_Dictionary::Obj *o)
         return LLBC_FAILED;
     }
 
-    Iter it = this->Find(key);
-    if (it != this->End())
+    Iter it = Find(key);
+    if (it != End())
     {
         (*it)->Release();
         ((*it) = o)->Retain();
@@ -189,7 +189,7 @@ int LLBC_Dictionary::Replace(int key, LLBC_Dictionary::Obj *o)
         return LLBC_OK;
     }
 
-    return this->Insert(key, o);
+    return Insert(key, o);
 }
 
 int LLBC_Dictionary::Replace(const LLBC_String &key, LLBC_Dictionary::Obj *o)
@@ -200,8 +200,8 @@ int LLBC_Dictionary::Replace(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         return LLBC_FAILED;
     }
 
-    Iter it = this->Find(key);
-    if (it != this->End())
+    Iter it = Find(key);
+    if (it != End())
     {
         (*it)->Release();
         ((*it) = o)->Retain();
@@ -209,12 +209,12 @@ int LLBC_Dictionary::Replace(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         return LLBC_OK;
     }
 
-    return this->Insert(key, o);
+    return Insert(key, o);
 }
 
 int LLBC_Dictionary::Replace(Iter it, Obj *o)
 {
-    if (UNLIKELY(!o || it == this->End()))
+    if (UNLIKELY(!o || it == End()))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -228,17 +228,17 @@ int LLBC_Dictionary::Replace(Iter it, Obj *o)
 
 int LLBC_Dictionary::Erase(int key)
 {
-    return this->Erase(this->Find(key));
+    return Erase(Find(key));
 }
 
 int LLBC_Dictionary::Erase(const LLBC_String &key)
 {
-    return this->Erase(this->Find(key));
+    return Erase(Find(key));
 }
 
 int LLBC_Dictionary::Erase(Iter it)
 {
-    if (it == this->End())
+    if (it == End())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
@@ -249,7 +249,7 @@ int LLBC_Dictionary::Erase(Iter it)
     // Remove from hash bucket.
     elem->CancelHash();
     // Remove from doubly-linked list.
-    this->RemoveFromDoublyLinkedList(elem);
+    RemoveFromDoublyLinkedList(elem);
 
     delete elem;
 
@@ -271,7 +271,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return this->End();
+    return End();
 }
 
 LLBC_Dictionary::Iter LLBC_Dictionary::Find(const LLBC_String &key)
@@ -291,7 +291,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(const LLBC_String &key)
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return this->End();
+    return End();
 }
 
 LLBC_Dictionary::ConstIter LLBC_Dictionary::Find(int key) const
@@ -302,7 +302,7 @@ LLBC_Dictionary::ConstIter LLBC_Dictionary::Find(int key) const
     LLBC_Dictionary::Iter it = nonConstThis->Find(key);
     if (it == nonConstThis->End())
     {
-        return this->End();
+        return End();
     }
 
     return ConstIter(it.Elem());
@@ -316,7 +316,7 @@ LLBC_Dictionary::ConstIter LLBC_Dictionary::Find(const LLBC_String &key) const
     LLBC_Dictionary::Iter it = nonConstThis->Find(key);
     if (it == nonConstThis->End())
     {
-        return this->End();
+        return End();
     }
 
     return ConstIter(it.Elem());
@@ -364,14 +364,14 @@ LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseEnd() const
 
 LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](int key) const
 {
-    ConstIter it = this->Find(key);
-    return it != this->End() ? it.Obj() : NULL;
+    ConstIter it = Find(key);
+    return it != End() ? it.Obj() : NULL;
 }
 
 LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](const LLBC_String &key) const
 {
-    ConstIter it = this->Find(key);
-    return it != this->End() ? it.Obj() : NULL;
+    ConstIter it = Find(key);
+    return it != End() ? it.Obj() : NULL;
 }
 
 void LLBC_Dictionary::SetObjectFactory(LLBC_ObjectFactory *factory)
@@ -399,7 +399,7 @@ LLBC_Object *LLBC_Dictionary::Clone() const
     }
 
     // Clone all elements.
-    ConstIter it = this->Begin(), endIt = this->End();
+    ConstIter it = Begin(), endIt = End();
     for (; it != endIt; it++)
     {
         LLBC_Object *cloneObj = ((Obj *)*it)->Clone();
@@ -420,22 +420,22 @@ LLBC_Object *LLBC_Dictionary::Clone() const
 
 void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
 {
-    this->SerializeInl(s, false);
+    SerializeInl(s, false);
 }
 
 bool LLBC_Dictionary::DeSerialize(LLBC_Stream &s)
 {
-    return this->DeSerializeInl(s, false);
+    return DeSerializeInl(s, false);
 }
 
 void LLBC_Dictionary::SerializeEx(LLBC_Stream &s) const
 {
-    this->SerializeInl(s, true);
+    SerializeInl(s, true);
 }
 
 bool LLBC_Dictionary::DeSerializeEx(LLBC_Stream &s)
 {
-    return this->DeSerializeInl(s, true);
+    return DeSerializeInl(s, true);
 }
 
 void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
@@ -446,7 +446,7 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
 
     LLBC_STREAM_WRITE(static_cast<uint64>(_size));
 
-    ConstIter it = this->Begin(), endIt = this->End();
+    ConstIter it = Begin(), endIt = End();
     for (; it != endIt; it++)
     {
         const LLBC_DictionaryElem *elem = it.Elem();
@@ -477,13 +477,13 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
         return false;
     }
 
-    this->Clear();
+    Clear();
 
     LLBC_STREAM_BEGIN_READ(s, bool, false);
 
     uint64 bucketSize = 0;
     LLBC_STREAM_READ(bucketSize);
-    this->SetHashBucketSize(static_cast<size_type>(bucketSize));
+    SetHashBucketSize(static_cast<size_type>(bucketSize));
 
     uint64 size = 0;
     LLBC_STREAM_READ(size);
@@ -504,7 +504,7 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
                 return false;
             }
 
-            this->Insert(intKey, o);
+            Insert(intKey, o);
             o->Release();
         }
         else
@@ -519,7 +519,7 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
                 return false;
             }
 
-            this->Insert(strKey, o);
+            Insert(strKey, o);
             o->Release();
         }
     }

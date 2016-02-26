@@ -57,14 +57,14 @@ int LLBC_MessageBlock::Allocate(size_t size)
         return LLBC_FAILED;
     }
 
-    this->Resize(_size + size);
+    Resize(_size + size);
 
     return LLBC_OK;
 }
 
 int LLBC_MessageBlock::Read(void *buf, size_t len)
 {
-    if (!buf || len > this->GetReadableSize())
+    if (!buf || len > GetReadableSize())
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
@@ -93,7 +93,7 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
 
     if (_writePos + len > _size)
     {
-        this->Resize(MAX(_writePos + len, _size * 2));
+        Resize(MAX(_writePos + len, _size * 2));
     }
 
     ASSERT((char *)(buf) + len < _buf || _buf + _size < buf);
@@ -236,7 +236,7 @@ void LLBC_MessageBlock::Swap(LLBC_MessageBlock *another)
 LLBC_MessageBlock *LLBC_MessageBlock::Clone() const
 {
     LLBC_MessageBlock *clone;
-    if (this->IsAttach())
+    if (IsAttach())
     {
         clone = new LLBC_MessageBlock(_buf, _size);
     }
