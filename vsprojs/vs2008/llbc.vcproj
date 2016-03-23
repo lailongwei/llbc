@@ -813,6 +813,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\llbc\include\llbc\core\os\OS_Process.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\llbc\include\llbc\core\os\OS_Select.h"
 						>
 					</File>
@@ -969,6 +973,10 @@
 						</File>
 						<File
 							RelativePath="..\..\llbc\include\llbc\core\log\LogNullToken.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\llbc\include\llbc\core\log\LogProcessIdToken.h"
 							>
 						</File>
 						<File
@@ -1685,6 +1693,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\llbc\src\core\os\OS_Process.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\llbc\src\core\os\OS_Select.cpp"
 						>
 					</File>
@@ -1794,6 +1806,10 @@
 					</File>
 					<File
 						RelativePath="..\..\llbc\src\core\log\LogNullToken.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\llbc\src\core\log\LogProcessIdToken.cpp"
 						>
 					</File>
 					<File
