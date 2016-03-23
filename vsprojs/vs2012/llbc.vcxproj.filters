@@ -922,6 +922,12 @@
     <ClInclude Include="..\..\llbc\include\llbc\core\file\Directory.h">
       <Filter>include\core\file</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogProcessIdToken.h">
+      <Filter>include\core\log\token</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Process.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\llbc\include\llbc\core\log\Logger_Cfg.cfg">
@@ -1373,6 +1379,12 @@
     </ClCompile>
     <ClCompile Include="..\..\llbc\src\core\file\Directory_NonIphone.cpp">
       <Filter>src\core\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\log\LogProcessIdToken.cpp">
+      <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Process.cpp">
+      <Filter>src\core\os</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

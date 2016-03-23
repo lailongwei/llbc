@@ -269,6 +269,8 @@
     <ClInclude Include="..\..\llbc\include\llbc\core\file\Directory.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\file\File.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\file\FileImpl.h" />
+    <ClInclude Include="..\..\llbc\include\llbc\core\log\LogProcessIdToken.h" />
+    <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Process.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\utils\Common.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Algorithm.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\utils\Util_Debug.h" />
@@ -495,6 +497,8 @@
     <ClCompile Include="..\..\llbc\src\core\file\Directory_Com.cpp" />
     <ClCompile Include="..\..\llbc\src\core\file\Directory_NonIphone.cpp" />
     <ClCompile Include="..\..\llbc\src\core\file\File.cpp" />
+    <ClCompile Include="..\..\llbc\src\core\log\LogProcessIdToken.cpp" />
+    <ClCompile Include="..\..\llbc\src\core\os\OS_Process.cpp" />
     <ClCompile Include="..\..\llbc\src\llbc.cpp" />
     <ClCompile Include="..\..\llbc\src\core\Core.cpp" />
     <ClCompile Include="..\..\llbc\src\core\utils\Util_Algorithm.cpp" />
