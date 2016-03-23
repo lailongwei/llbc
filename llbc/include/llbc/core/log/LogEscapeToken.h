@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The escape log token class encapsulation.
  */
-class LLBC_LogEscapeToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogEscapeToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogEscapeToken();

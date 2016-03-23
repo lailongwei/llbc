@@ -16,7 +16,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The time log token class encapsulation.
  */
-class LLBC_LogTimeToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogTimeToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogTimeToken();

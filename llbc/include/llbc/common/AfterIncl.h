@@ -9,6 +9,10 @@
 #ifndef __LLBC_COM_AFTER_INCL_H__
 #define __LLBC_COM_AFTER_INCL_H__
 
+#ifndef __LLBC_COM_BEFORE_INCL_H__
+#error "Please first include llbc/common/BeforeIncl.h header in source file head!"
+#endif // !__LLBC_COM_BEFORE_INCL_H__
+
 #include "llbc/common/PFConfig.h"
 #include "llbc/common/Compiler.h"
 

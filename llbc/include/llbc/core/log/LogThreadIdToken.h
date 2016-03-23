@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The thread Id log token class encapsulation.
  */
-class LLBC_LogThreadIdToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogThreadIdToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogThreadIdToken();

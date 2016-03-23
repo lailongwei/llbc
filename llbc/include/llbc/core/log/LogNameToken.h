@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The name log token class encapsulation.
  */
-class LLBC_LogNameToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogNameToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogNameToken();

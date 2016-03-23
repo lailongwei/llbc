@@ -15,7 +15,7 @@
 
 __LLBC_NS_BEGIN
 
-class LLBC_LogMsgToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogMsgToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogMsgToken();

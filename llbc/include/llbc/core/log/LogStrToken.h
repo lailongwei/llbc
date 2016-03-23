@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief String type log token calss encapsulation.
  */
-class LLBC_LogStrToken : public LLBC_BaseLogToken
+class LLBC_HIDDEN LLBC_LogStrToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogStrToken();

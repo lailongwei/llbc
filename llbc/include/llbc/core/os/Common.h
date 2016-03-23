@@ -13,6 +13,7 @@
 #include "llbc/core/os/OS_Atomic.h"
 #include "llbc/core/os/OS_Library.h"
 #include "llbc/core/os/OS_Thread.h"
+#include "llbc/core/os/OS_Process.h"
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/os/OS_Socket.h"
 #include "llbc/core/os/OS_Select.h"
