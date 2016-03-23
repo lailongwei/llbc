@@ -96,6 +96,10 @@ public:
         PacketHeaderPartDesc_New.ml_meth = (PyCFunction)_pyllbc_PacketHeaderPartDesc_New;
         PacketHeaderPartDesc_New.ml_flags = METH_VARARGS;
         PacketHeaderPartDesc_New.ml_doc = "pyllbc library method/function";
+        ClearHookedErrors.ml_name = "ClearHookedErrors";
+        ClearHookedErrors.ml_meth = (PyCFunction)_pyllbc_ClearHookedErrors;
+        ClearHookedErrors.ml_flags = METH_VARARGS;
+        ClearHookedErrors.ml_doc = "pyllbc library method/function";
         Packet_SetHeaderPartAsUInt32.ml_name = "Packet_SetHeaderPartAsUInt32";
         Packet_SetHeaderPartAsUInt32.ml_meth = (PyCFunction)_pyllbc_Packet_SetHeaderPartAsUInt32;
         Packet_SetHeaderPartAsUInt32.ml_flags = METH_VARARGS;
@@ -485,6 +489,7 @@ public:
     ::PyMethodDef Packet_SetHeaderPartAsStr;
     ::PyMethodDef PacketHeaderPartDesc_GetSerialNo;
     ::PyMethodDef PacketHeaderPartDesc_New;
+    ::PyMethodDef ClearHookedErrors;
     ::PyMethodDef Packet_SetHeaderPartAsUInt32;
     ::PyMethodDef PacketHeaderPartDesc_IsFlagsPart;
     ::PyMethodDef InstallErrHooker;

@@ -150,6 +150,7 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.SetServiceCodec);
     inlMod->AddMethod(methods.InstallErrHooker);
     inlMod->AddMethod(methods.UninstallErrHooker);
+    inlMod->AddMethod(methods.ClearHookedErrors);
     inlMod->AddMethod(methods.Post);
     inlMod->AddMethod(methods.ServiceMainLoop);
 

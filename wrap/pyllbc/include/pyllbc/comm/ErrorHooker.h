@@ -48,7 +48,6 @@ public:
      */
     void Cleanup();
 
-
     /**
      * Transfer hooked error to python.
      */

@@ -409,6 +409,12 @@ LLBC_EXTERN_C PyObject *_pyllbc_UninstallErrHooker(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_ClearHookedErrors(PyObject *self, PyObject *args)
+{
+    pyllbc_ClearError();
+    Py_RETURN_NONE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;

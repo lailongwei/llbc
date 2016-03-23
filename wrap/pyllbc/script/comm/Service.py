@@ -348,11 +348,13 @@ class pyllbcService(object):
         update_timers = llbc.inl.PyTimerUpdateAllTimers
         inst_errhooker = llbc.inl.InstallErrHooker
         uninst_errhooker = llbc.inl.UninstallErrHooker
+        clear_hookederrors = llbc.inl.ClearHookedErrors
 
         try:
             inst_errhooker()
             cls._procwilldelsvcs()
             while True:
+                clear_hookederrors()
                 schedule_beg = _pyllbc_time()
                 try:
                     for svc in svcs:
