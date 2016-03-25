@@ -3,6 +3,12 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2016/03/25
+# 1) logger添加对%p支持,以打印进程Id;
+# 2) logFileName添加模式支持,当前支持模式:
+#     %p: 当前进程Id
+#     %m: 当前可执行程序模块文件名(不包含路径)
+#
 # 2016/02/25
 # 1) 重写LLBC_File,LLBC_Directory类,提供更易用,更完整,更精简的File & Directory相关操作实现;
 # 2) 删除core/os/OS_File及core/os/OS_Directory实现,统一整合到LLBC_File,LLBC_Directory中;

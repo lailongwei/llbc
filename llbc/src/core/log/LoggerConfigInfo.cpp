@@ -10,6 +10,9 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Process.h"
+#include "llbc/core/utils/Util_Text.h"
+#include  "llbc/core/file/Directory.h"
 #include "llbc/core/config/Property.h"
 
 #include "llbc/core/log/LogLevel.h"
@@ -42,17 +45,17 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
 {
-	// Common log configs.
-	_logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Levevl(cfg.GetValue("level").AsCStr()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
+    // Common log configs.
+    _logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Levevl(cfg.GetValue("level").AsCStr()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
     _asyncMode = (cfg.HasProperty("asynchronous") ? cfg.GetValue("asynchronous").AsBool() : LLBC_CFG_LOG_DEFAULT_ASYNC_MODE);
     _flushInterval= (cfg.HasProperty("flushInterval") ? cfg.GetValue("flushInterval").AsInt32() : LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
 
-	// Console log configs.
+    // Console log configs.
     _logToConsole = (cfg.HasProperty("logToConsole") ? cfg.GetValue("logToConsole").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE);
     _consolePattern = (cfg.HasProperty("consolePattern") ? cfg.GetValue("consolePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     _colourfulOutput = (cfg.HasProperty("colourfulOutput") ? cfg.GetValue("colourfulOutput").AsBool() : LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT);
 
-	// File log configs.
+    // File log configs.
     _logToFile = (cfg.HasProperty("logToFile") ? cfg.GetValue("logToFile").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
     _logFile = (cfg.HasProperty("logFile") ? cfg.GetValue("logFile").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
     _filePattern = (cfg.HasProperty("filePattern") ? cfg.GetValue("filePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
@@ -66,20 +69,16 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     else
         _fileBufferSize = 0;
 
-	// Check configs.
-	if (!(_logLevel >= LLBC_LogLevel::Begin && _logLevel < LLBC_LogLevel::End))
-		_logLevel = LLBC_CFG_LOG_DEFAULT_LEVEL;
+    // Check configs.
+    if (!(_logLevel >= LLBC_LogLevel::Begin && _logLevel < LLBC_LogLevel::End))
+        _logLevel = LLBC_CFG_LOG_DEFAULT_LEVEL;
 
     _maxFileSize = MAX(1, _maxFileSize);
     _maxBackupIndex = MAX(0, _maxBackupIndex);
     _flushInterval = MIN(MAX(0, _flushInterval), LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
-    
-#if LLBC_TARGET_PLATFORM_IPHONE
-    if (_logToFile &&
-        !_logFile.empty() &&
-        _logFile[0] != LLBC_SLASH_A)
-        _logFile = LLBC_GetTemporaryDirectory(true) + _logFile;
-#endif // LLBC_TARGET_PLATFORM_IPHONE
+
+    // Normallize log file name.
+    NormalizeLogFileName();
 
     return LLBC_OK;
 }
@@ -147,6 +146,24 @@ int LLBC_LoggerConfigInfo::GetMaxBackupIndex() const
 int LLBC_LoggerConfigInfo::GetFileBufferSize() const
 {
     return _fileBufferSize;
+}
+
+void LLBC_LoggerConfigInfo::NormalizeLogFileName()
+{
+    const LLBC_String curProcId = 
+        LLBC_Num2Str(LLBC_GetCurrentProcessId());
+    _logFile.findreplace("%p", curProcId); 
+
+    const LLBC_String modFileName = 
+        LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName());
+    _logFile.findreplace("%m", modFileName);
+
+#if LLBC_TARGET_PLATFORM_IPHONE
+    if (_logToFile &&
+        !_logFile.empty() &&
+        _logFile[0] != LLBC_SLASH_A)
+        _logFile = LLBC_GetTemporaryDirectory(true) + _logFile;
+#endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 
 __LLBC_NS_END

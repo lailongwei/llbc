@@ -120,6 +120,12 @@ public:
      */
     int GetFileBufferSize() const;
 
+private:
+    /**
+     * Normalize the log file name.
+     */
+    void NormalizeLogFileName();
+
     /**
      * Disable assignment.
      */
