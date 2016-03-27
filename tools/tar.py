@@ -16,8 +16,7 @@ import platform
 CUR_DIR = op.dirname(op.abspath(__file__))
 PROJ_DIR = op.dirname(CUR_DIR)
 NOW = datetime.fromtimestamp(time())
-TARBALL = op.join(op.dirname(PROJ_DIR), 'llbc_{}{}{}_{:02d}{:02d}{:02d}.tar.bz2'.format(
-    NOW.year, NOW.month, NOW.day, NOW.hour, NOW.minute, NOW.second))
+TARBALL = op.join(op.dirname(PROJ_DIR), 'llbc_{}.tar.bz2'.format(NOW.strftime('%Y%m%d_%H%M%S')))
 TAR_GIT = True if (len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].lower() == 'true')) else False
 FILTEROUT_SUFFIXES = ('.obj', '.pyc', '.sdf', '.opensdf', '.suo', '.user', '.ncb', '.cache', '.o', '.d')
 OS_NAME = platform.uname()[0].lower()
