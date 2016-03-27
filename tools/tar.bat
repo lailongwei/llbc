@@ -1,2 +1,2 @@
 @echo off
-py.exe tar.py
+py.exe tar.py %1
