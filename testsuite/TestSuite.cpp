@@ -68,7 +68,6 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_PacketHeaderParts;
     // test = new TestCase_Comm_ReleasePool;
     // test = new TestCase_Comm_SvcBase;
-    // test = new TestCase_Comm_RawSvc;
     // test = new TestCase_Comm_Svc;
     // test = new TestCase_Comm_SendBytes;
     // test = new TestCase_Comm_Multicast;
