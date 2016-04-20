@@ -185,8 +185,10 @@ public:
      *      to indicate operation success or not, In python layer, we ignore
      *      llbc core library method's return value.
      * @param[in] sessionId - the session Id.
+     * @param[in] reason    - the remove reason.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void RemoveSession(int sessionId);
+    int RemoveSession(int sessionId, const char *reason = NULL);
 
 public:
     /**

@@ -201,14 +201,14 @@ void pyllbc_Facade::OnIdle(int idleTime)
     }
 }
 
-void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &si)
+void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
     typedef pyllbc_Service::_Facades _Facades;
 
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionCreateEv(_pySvc, si);
+    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo);
     LLBC_InvokeGuard guard(&DecRefPyObj, ev);
 
     _Facades &facades = _svc->_facades;
@@ -232,12 +232,12 @@ void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &si)
     }
 }
 
-void pyllbc_Facade::OnSessionDestroy(int sessionId)
+void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(_pySvc, sessionId);
+    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo);
     LLBC_InvokeGuard guard(&DecRefPyObj, ev);
 
     typedef pyllbc_Service::_Facades _Facades;

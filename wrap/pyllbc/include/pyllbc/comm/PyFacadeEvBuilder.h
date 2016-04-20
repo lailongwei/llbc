@@ -54,11 +54,11 @@ public:
 
     /**
      * Build SessionDestroy event object.
-     * @param[in] svc       - service object, not steals reference, normal.
-     * @param[in] sessionId - session Id.
+     * @param[in] svc         - service object, not steals reference, normal.
+     * @param[in] destroyInfo - the session destroy info.
      * @return PyObject * - ServiceEvent object, new reference.
      */
-    static PyObject *BuildSessionDestroyEv(PyObject *svc, int sessionId);
+    static PyObject *BuildSessionDestroyEv(PyObject *svc, const LLBC_SessionDestroyInfo &destroyInfo);
 
     /**
      * Build AsyncConnResult event object.
@@ -114,6 +114,9 @@ private:
     static PyObject *_attrReportLevel;
     static PyObject *_attrReportMsg;
     static PyObject *_attrOpcode;
+    static PyObject *_attrDestroyedFromSvc;
+    static PyObject *_attrErrNo;
+    static PyObject *_attrSubErrNo;
 };
 
 #endif // !__PYLLBC_COMM_PY_FACADE_EV_BUILDER_H__

@@ -262,9 +262,16 @@ int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
     return LLBC_OK;
 }
 
-void pyllbc_Service::RemoveSession(int sessionId)
+int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
 {
-    _llbcSvc->RemoveSession(sessionId);
+    if (_llbcSvc->RemoveSession(sessionId, reason) != LLBC_OK)
+    {
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, 
+            LLBC_String().format("when remove session: %d", sessionId));
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
 }
 
 int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, PyObject *parts)

@@ -228,10 +228,17 @@ LLBC_EXTERN_C PyObject *_pyllbc_RemoveSession(PyObject *self, PyObject *args)
 {
     int sid;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "li", &svc, &sid))
+    char *reason = NULL;
+    PyObject *strict = NULL;
+    if (!PyArg_ParseTuple(args, "li|sO", &svc, &sid, &reason, &strict))
         return NULL;
 
-    svc->RemoveSession(sid);
+    if (svc->RemoveSession(sid, reason) != LLBC_OK)
+    {
+        if (strict &&
+                PyObject_IsTrue(strict))
+            return NULL;
+    }
 
     Py_RETURN_NONE;
 }

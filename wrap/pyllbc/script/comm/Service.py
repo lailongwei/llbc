@@ -440,6 +440,15 @@ class pyllbcService(object):
                 onsessiondestroy(self, ev): session destroy handler.
                     ev.svc: service object.
                     ev.session_id: session Id.
+                    ev.reason: destroy reason.
+                    ev.destroyed_from_service: destroyed from service flag.
+                    ev.local_ip: local ip address.
+                    ev.local_port: local port number.
+                    ev.peer_ip: peer ip address.
+                    ev.peer_port: peer port number.
+                    ev.socket: socket file descripter.
+                    ev.errno: error number(only available when ev.destroyed_from_service is True).
+                    ev.sub_errno: sub error number(only available when ev.destroyed_from_service is True).
                 onasyncconnresult(self, ev): async-connect result handler.
                     ev.svc: service object.
                     ev.peer_ip: peer ip address.
@@ -514,11 +523,14 @@ class pyllbcService(object):
         """
         llbc.inl.AsyncConn(self._c_obj, ip, port)
 
-    def removesession(self, session_id):
+    def removesession(self, session_id, reason='', strict=False):
         """
         Remove session
+        :param session_id: the will remove session Id.
+        :param reason: remove reason, default is empty string.
+        :param strict: strict mode flag, default is false, if set to true and the session not exist or already removed, will raise an exception.
         """
-        llbc.inl.RemoveSession(self._c_obj, session_id)
+        llbc.inl.RemoveSession(self._c_obj, session_id, reason, strict)
 
     def send(self, session_id, data, opcode=None, status=0, parts=None):
         """

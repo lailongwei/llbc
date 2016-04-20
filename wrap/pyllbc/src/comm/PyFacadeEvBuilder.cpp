@@ -33,6 +33,9 @@ PyObject *This::_attrReportLayer = PyString_FromString("_report_layer");
 PyObject *This::_attrReportLevel = PyString_FromString("_report_level");
 PyObject *This::_attrReportMsg = PyString_FromString("_report_msg");
 PyObject *This::_attrOpcode = PyString_FromString("_opcode");
+PyObject *This::_attrDestroyedFromSvc = PyString_FromString("_destroyed_from_service");
+PyObject *This::_attrErrNo = PyString_FromString("_errno");
+PyObject *This::_attrSubErrNo = PyString_FromString("_sub_errno");
 
 PyObject *pyllbc_FacadeEvBuilder::BuildInitializeEv(PyObject *svc)
 {
@@ -73,10 +76,23 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionCreateEv(PyObject *svc, const LLBC
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, int sessionId)
+PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLBC_SessionDestroyInfo &destroyInfo)
 {
     PyObject *ev = This::CreateEv(svc);
-    This::SetAttr(ev, This::_attrSessionId, sessionId);
+    This::SetAttr(ev, This::_attrReason, destroyInfo.GetReason());
+    This::SetAttr(ev, This::_attrSessionId, destroyInfo.GetSessionId());
+    This::SetAttr(ev, This::_attrDestroyedFromSvc, destroyInfo.IsDestroyedFromService());
+
+    This::SetAttr(ev, This::_attrLocalIp, destroyInfo.GetLocalAddr().GetIpAsString());
+    This::SetAttr(ev, This::_attrLocalPort, destroyInfo.GetLocalAddr().GetPort());
+
+    This::SetAttr(ev, This::_attrPeerIp, destroyInfo.GetPeerAddr().GetIpAsString());
+    This::SetAttr(ev, This::_attrPeerPort, destroyInfo.GetPeerAddr().GetPort());
+
+    This::SetAttr(ev, This::_attrSocket, static_cast<int>(destroyInfo.GetSocket()));
+
+    This::SetAttr(ev, This::_attrErrNo, destroyInfo.GetErrno());
+    This::SetAttr(ev, This::_attrSubErrNo, destroyInfo.GetSubErrno());
 
     return ev;
 }

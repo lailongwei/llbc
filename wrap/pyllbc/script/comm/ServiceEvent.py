@@ -22,66 +22,135 @@ class pyllbcServiceEvent(object):
         self._report_level = None
         self._report_msg = None
         self._opcode = None
+        self._destroyed_from_service = None
+        self._errno = None
+        self._sub_errno = None
 
     @property
     def svc(self):
+        """
+        Service - service object.
+        """
         return self._svc
 
     @property
     def idletime(self):
+        """sessionId
+        float - idle time, in seconds.
+        """
         return self._idletime
 
     @property
     def session_id(self):
+        """
+        int - session Id.
+        """
         return self._session_id
 
     @property
     def connected(self):
+        """
+        bool - connected flag.
+        """
         return self._connected
 
     @property
     def reason(self):
+        """
+        str - reason.
+        """
         return self._reason
 
     @property
     def localip(self):
+        """
+        str - local ip address.
+        """
         return self._local_ip
 
     @property
     def localport(self):
+        """
+        int - local port number.
+        """
         return self._local_port
 
     @property
     def peerip(self):
+        """
+        str - peer ip address.
+        """
         return self._peer_ip
 
     @property
     def peerport(self):
+        """
+        int - peer port number.
+        """
         return self._peer_port
 
     @property
     def islisten(self):
+        """
+        bool - listen socket flag.
+        """
         return self._islisten
 
     @property
     def socket(self):
+        """
+        int - socket file descripter.
+        """
         return self._socket
 
     @property
     def report_layer(self):
+        """
+        int - report layer.
+        """
         return self._report_layer
 
     @property
     def report_level(self):
+        """
+        int - report level
+        """
         return self._report_level
 
     @property
     def report_msg(self):
+        """
+        str - report message.
+        """
         return self._report_msg
 
     @property
     def opcode(self):
+        """
+        int - packet opcode.
+        """
         return self._opcode
+
+    @property
+    def destroyed_from_service(self):
+        """
+        bool - destroyed from service flag.
+        """
+        return self._destroyed_from_service
+
+    @property
+    def errno(self):
+        """
+        int - error number, 0 if success.
+        """
+        return self._errno
+
+    @property
+    def sub_errno(self):
+        """
+        int - sub error number, 0 if success.
+        """
+        return self._sub_errno
 
     def __str__(self):
         s = 'svc: {}'.format(self._svc)
@@ -109,6 +178,13 @@ class pyllbcServiceEvent(object):
             s += ', report_msg: {}'.format(self._report_msg)
         if self._opcode is not None:
             s += ', opcode: {}'.format(self._opcode)
+        if self._destroyed_from_service is not None:
+            s += ', from_service?: {}'.format(self._destroyed_from_service)
+        if self._errno is not None:
+            s += ', errno: {}'.format(self._errno)
+        if self._sub_errno is not None:
+            s += ', sub_errno: {}'.format(self._sub_errno)
+
         return s
 
 llbc.ServiceEvent = pyllbcServiceEvent

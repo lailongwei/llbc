@@ -115,5 +115,5 @@ class SvcBaseTest(TestCase):
 
         # If deschedule, will gone to here.
         # Delete my_svc service.
-        del Service.my_svc
+        del Service.svcbase_test_svc
         del Service.another

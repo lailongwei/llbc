@@ -56,15 +56,15 @@ public:
 public:
     /**
      * When new session create, will call this event handler.
-     * @param[in] si - the session info.
+     * @param[in] sessionInfo - the session info.
      */
-    virtual void OnSessionCreate(const LLBC_SessionInfo &si);
+    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
 
     /**
      * When session destroy, will call this event handler.
-     * @param[in] sessionId - session Id.
+     * @param[in] destroyInfo - the session destroy information.
      */
-    virtual void OnSessionDestroy(int sessionId);
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
 
     /**
      * When asynchronous connect result, will call this event handler.
