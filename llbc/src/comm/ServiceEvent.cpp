@@ -11,6 +11,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
+#include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 #include "llbc/comm/ServiceEvent.h"
@@ -59,6 +60,7 @@ LLBC_SvcEv_SessionDestroy::LLBC_SvcEv_SessionDestroy()
 
 LLBC_SvcEv_SessionDestroy::~LLBC_SvcEv_SessionDestroy()
 {
+    LLBC_XDelete(closeInfo);
 }
 
 LLBC_SvcEv_AsyncConn::LLBC_SvcEv_AsyncConn()
@@ -148,12 +150,23 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionCreateEv(const LLBC_SockAddr_IN &
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(int sessionId)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(const LLBC_SockAddr_IN &local,
+                                                         const LLBC_SockAddr_IN &peer,
+                                                         bool isListen,
+                                                         int sessionId,
+                                                         LLBC_SocketHandle handle,
+                                                         LLBC_SessionCloseInfo *closeInfo)
 {
     typedef LLBC_SvcEv_SessionDestroy _Ev;
 
     _Ev *ev = LLBC_New(_Ev);
+    ev->local = local;
+    ev->peer = peer;
     ev->sessionId = sessionId;
+    ev->isListen = isListen;
+    ev->handle = handle;
+
+    ev->closeInfo = closeInfo;
 
     return __CreateEvBlock(ev);
 }
@@ -227,10 +240,22 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEvEv(LLBC_Event *ev)
 {
     typedef LLBC_SvcEv_FireEv _Ev;
 
-    _Ev *e = LLBC_New(_Ev);
-    e->ev = ev;
+    _Ev *wrapEv = LLBC_New(_Ev);
+    wrapEv->ev = ev;
 
-    return __CreateEvBlock(e);
+    return __CreateEvBlock(wrapEv);
+}
+
+void LLBC_SvcEvUtil::DestroyEvBlock(LLBC_MessageBlock *block)
+{
+    // Skip event type.
+    block->ShiftReadPos(sizeof(int));
+
+    LLBC_ServiceEvent *svcEv;
+    block->Read(&svcEv, sizeof(LLBC_ServiceEvent *));
+
+    LLBC_Delete(svcEv);
+    LLBC_Delete(block);
 }
 
 __LLBC_NS_END

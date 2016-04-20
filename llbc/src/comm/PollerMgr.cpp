@@ -225,9 +225,9 @@ int LLBC_PollerMgr::Send(LLBC_Packet *packet)
     return LLBC_OK;
 }
 
-void LLBC_PollerMgr::Close(int sessionId)
+void LLBC_PollerMgr::Close(int sessionId, const char *reason)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId));
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
 int LLBC_PollerMgr::AllocSessionId()

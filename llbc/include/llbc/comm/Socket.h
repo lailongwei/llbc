@@ -251,6 +251,8 @@ public:
 
     /**
      * Asynchronous send data, data will append the socket's send queue.
+     * Note: 
+     *       No matter method call success or not, method will steal <block> the parameter.
      * @param[in] block - data block.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -318,6 +320,15 @@ public:
      * @return uint16 - port number.
      */
     uint16 GetPeerPort() const;
+
+public:
+    /**
+     * Get socket pending error.
+     * @param[out] pendingError - the pending error value.
+     * @return int - return 0 if success, otherwise return -1.
+     *               
+     */
+    int GetPendingError(int &pendingError);
 
 public:
     /**

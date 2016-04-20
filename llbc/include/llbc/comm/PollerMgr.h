@@ -101,8 +101,9 @@ public:
     /**
      * Close session.
      * @param[in] sessionId - the session Id.
+	 * @param[in] reason    - the session close reason, default is NULL.
      */
-    void Close(int sessionId);
+    void Close(int sessionId, const char *reason = NULL);
 
 private:
     /**

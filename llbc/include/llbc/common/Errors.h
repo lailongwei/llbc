@@ -32,6 +32,21 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_SetLastError(int no);
  */
 LLBC_EXTERN LLBC_EXPORT const char *LLBC_StrError(int no);
 
+
+/**
+ * Format error message(extend version).
+ * @param[in] no        - error number.
+ * @param[in] subErrrno - the sub error number.
+ */
+LLBC_EXTERN LLBC_EXPORT const char *LLBC_StrErrorEx(int no, int subErrno);
+
+/**
+ * Check given error no has sub error no or not.
+ * @param[in] no = error number.
+ * @return bool - return true if has sub error number, otherwise return false.
+ */
+LLBC_EXTERN LLBC_EXPORT bool LLBC_HasSubErrorNo(int no);
+
 /**
  * Format last error.
  * @return const char *last error describe.

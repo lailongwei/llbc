@@ -84,7 +84,20 @@ void LLBC_SelectPoller::Svc()
 #if LLBC_TARGET_PLATFORM_WIN32
             // In WIN32 platform, the fd_set use {int fd_array[]; int count} way to implement.
             for (uint32 i = 0; i < excepts.fd_count; i++)
-                _sockets.find(excepts.fd_array[i])->second->OnClose();
+            {
+                LLBC_Session *session = 
+                    _sockets.find(excepts.fd_array[i])->second;
+                LLBC_Socket *sock = session->GetSocket();
+
+                int sockErr;
+                LLBC_SessionCloseInfo *closeInfo;
+                if (sock->GetPendingError(sockErr) != LLBC_OK)
+                    closeInfo = new LLBC_SessionCloseInfo;
+                else
+                    closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, sockErr);
+
+                session->OnClose(NULL, closeInfo);
+            }
 
             for (uint32 i = 0; i < reads.fd_count; i++)
             {
@@ -113,7 +126,18 @@ void LLBC_SelectPoller::Svc()
                 const LLBC_SocketHandle handle = it->first;
                 if (LLBC_FdIsSet(handle, &excepts))
                 {
-                    _sockets.find(handle)->second->OnClose();
+                    LLBC_Session *session = 
+                        _sockets.find(handle)->second;
+                    LLBC_Socket *sock = session->GetSocket();
+
+                    int sockErr;
+                    LLBC_SessionCloseInfo *closeInfo;
+                    if (UNLIKELY(sock->GetPendingError(sockErr) != LLBC_OK))
+                        closeInfo = new LLBC_SessionCloseInfo();
+                    else
+                        closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
+
+                    session->OnClose(closeInfo);
                 }
                 else if (LLBC_FdIsSet(handle, &reads))
                 {
@@ -272,44 +296,69 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
          it != _connecting.end();
          )
     {
+        // Check event triggered in writeable-set or excepts-set
         const LLBC_SocketHandle handle = it->first;
-        LLBC_AsyncConnInfo &asyncInfo = it->second;
-        LLBC_Socket *socket = asyncInfo.socket;
+        bool inExceptSet = false;
+        const bool inWriteSet = !!LLBC_FdIsSet(handle, &writes);
+        if (!inWriteSet)
+            inExceptSet = !!LLBC_FdIsSet(handle, &excepts);
 
-        bool connected = true;
-        if (LLBC_FdIsSet(handle, &writes))
+        // Not triggered, continue.
+        if (!inWriteSet && !inExceptSet)
         {
-            processed += 1;
-            LLBC_ClrFd(handle, &writes);
-            LLBC_ClrFd(handle, &_writes);
-            LLBC_ClrFd(handle, &_excepts);
-
-            int optval = 0;
-            LLBC_SocketLen optlen = sizeof(int);
-            if (socket->GetOption(SOL_SOCKET,
-                                  SO_ERROR,
-                                  &optval,
-                                  &optlen) != LLBC_OK || optval != 0)
-                connected = false;
-        }
-        else if (LLBC_FdIsSet(it->first, &excepts))
-        {
-            processed += 1;
-            LLBC_ClrFd(handle, &excepts);
-            LLBC_ClrFd(handle, &_writes);
-            LLBC_ClrFd(handle, &_excepts);
-
-            connected = false;
-        }
-        else
-        {
-            it++;
+            ++it;
             continue;
         }
 
+        // Clear _writes & _excepts data members.
+        LLBC_ClrFd(handle, &_writes);
+        LLBC_ClrFd(handle, &_excepts);
+        // Clear local sets.
+        if (inWriteSet)
+            LLBC_ClrFd(handle, &writes);
+        else
+            LLBC_ClrFd(handle, &excepts);
+
+        // Process event result.
+        LLBC_AsyncConnInfo &asyncInfo = it->second;
+        LLBC_Socket *socket = asyncInfo.socket;
+
+        processed += 1;
+
+        int sockErr;
+        const char *reason = NULL;
+        bool connected = inWriteSet;
+        if (UNLIKELY(socket->GetPendingError(sockErr) != LLBC_OK))
+        {
+            connected = false;
+            reason = LLBC_FormatLastError();
+        }
+        else
+        {
+#if LLBC_DEBUG
+            if (inExceptSet)
+            {
+                ASSERT(sockErr != 0 && "llbc library internal error, in SelectPoller::HandleConnecting()!");
+            }
+#endif // LLBC_DEBUG
+
+            if (sockErr != 0)
+            {
+                connected = false;
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+                reason = LLBC_StrErrorEx(LLBC_ERROR_CLIB, sockErr);
+#else // Win32
+                reason = LLBC_StrErrorEx(LLBC_ERROR_NETAPI, sockErr);
+#endif
+            }
+            else
+            {
+                reason = LLBC_StrError(LLBC_ERROR_SUCCESS);
+            }
+        }
+
         // Build async connect event and push it to service.
-        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(connected, 
-                connected ? "Success" : LLBC_FormatLastError(), asyncInfo.peerAddr));
+        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(connected, reason, asyncInfo.peerAddr));
 
         if (connected)
         {

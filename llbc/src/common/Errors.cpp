@@ -142,6 +142,11 @@ void LLBC_SetLastError(int no)
 
 const char *LLBC_StrError(int no)
 {
+    return LLBC_StrErrorEx(no, LLBC_SubErrno);
+}
+
+const char *LLBC_StrErrorEx(int no, int subErrno)
+{
     //! First, process custom type error.
     if (UNLIKELY(LLBC_GetErrnoCustomPart(no) == LLBC_ERROR_CUSTOM))
     {
@@ -168,12 +173,12 @@ const char *LLBC_StrError(int no)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         ::sprintf(libTls->commonTls.errDesc, 
-                __g_errDesc[noPart], LLBC_SubErrno, strerror(LLBC_SubErrno));
+                __g_errDesc[noPart], subErrno, strerror(subErrno));
 #else // LLBC_TARGET_PLATFORM_WIN32
         char libcErrDesc[__LLBC_ERROR_DESC_SIZE] = {0};
-        ::strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, LLBC_SubErrno);
+        ::strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
         ::sprintf_s(libTls->commonTls.errDesc, 
-                __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], LLBC_SubErrno, libcErrDesc);
+                __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     }
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -186,7 +191,7 @@ const char *LLBC_StrError(int no)
                              FORMAT_MESSAGE_ALLOCATE_BUFFER |
                              FORMAT_MESSAGE_IGNORE_INSERTS,
                          NULL,
-                         LLBC_SubErrno,
+                         subErrno,
                          sysLocale,
                          (PSTR)&hLocal,
                          0,
@@ -200,7 +205,7 @@ const char *LLBC_StrError(int no)
                                     FORMAT_MESSAGE_ALLOCATE_BUFFER |
                                     FORMAT_MESSAGE_IGNORE_INSERTS,
                                  netDll,
-                                 LLBC_SubErrno,
+                                 subErrno,
                                  sysLocale,
                                  (PSTR)&hLocal,
                                  0,
@@ -227,7 +232,7 @@ const char *LLBC_StrError(int no)
             ::LocalUnlock(hLocal);
 
             ::sprintf_s(libTls->commonTls.errDesc, 
-                    __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], LLBC_SubErrno, sysErr);
+                    __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, sysErr);
 
             ::LocalFree(hLocal);
         }
@@ -235,7 +240,7 @@ const char *LLBC_StrError(int no)
         {
             char unknownErrDesc[64] = {0};
             ::sprintf_s(unknownErrDesc, 
-                sizeof(unknownErrDesc), "Unknown error, error code: %d", LLBC_SubErrno);
+                sizeof(unknownErrDesc), "Unknown error, error code: %d", subErrno);
             ::sprintf_s(libTls->commonTls.errDesc, 
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], unknownErrDesc);
         }
@@ -245,10 +250,10 @@ const char *LLBC_StrError(int no)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         ::sprintf(libTls->commonTls.errDesc, 
-                __g_errDesc[noPart], LLBC_SubErrno, gai_strerror(LLBC_SubErrno));
+                __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
 #else // LLBC_TARGET_PLATFORM_WIN32
         ::sprintf_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, 
-                __g_errDesc[noPart], LLBC_SubErrno, gai_strerror(LLBC_SubErrno));
+                __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
         return libTls->commonTls.errDesc;
     }
@@ -271,6 +276,11 @@ const char *LLBC_StrError(int no)
     }
 
     return libTls->commonTls.errDesc;
+}
+
+bool LLBC_HasSubErrorNo(int no)
+{
+    return !LLBC_ERROR_TYPE_IS_LIBRARY(no);
 }
 
 const char *LLBC_FormatLastError()

@@ -521,7 +521,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t le
     return LLBC_OK;
 }
 
-int LLBC_Service::RemoveSession(int sessionId)
+int LLBC_Service::RemoveSession(int sessionId, const char *reason)
 {
     LLBC_Guard guard(_lock);
     if (!_started)
@@ -539,7 +539,7 @@ int LLBC_Service::RemoveSession(int sessionId)
         return LLBC_FAILED;
     }
 
-    _pollerMgr.Close(sessionId);
+    _pollerMgr.Close(sessionId, reason);
     _connectedSessionIds.erase(sessionIdIt);
 
     return LLBC_OK;
@@ -993,17 +993,9 @@ void LLBC_Service::Cleanup()
 {
     _pollerMgr.Stop();
 
-    LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
     while (TryPop(block) == LLBC_OK)
-    {
-        // Skip event type.
-        block->ShiftReadPos(sizeof(int));
-        block->Read(&ev, sizeof(ev));
-
-        LLBC_Delete(ev);
-        LLBC_Delete(block);
-    }
+        LLBC_SvcEvUtil::DestroyEvBlock(block);
 
     _connectedSessionIdsLock.Lock();
     _connectedSessionIds.clear();
@@ -1123,14 +1115,28 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_SessionDestroy _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
+    // Erase session from connected sessionIds set.
     _connectedSessionIdsLock.Lock();
     _connectedSessionIds.erase(ev.sessionId);
     _connectedSessionIdsLock.Unlock();
 
+    // Build session info.
+    LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
+    sessionInfo->SetSessionId(ev.sessionId);
+    sessionInfo->SetIsListenSession(ev.isListen);
+    sessionInfo->SetLocalAddr(ev.local);
+    sessionInfo->SetPeerAddr(ev.peer);
+    sessionInfo->SetSocket(ev.handle);
+
+    // Build session destroy info.
+    LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
+    ev.closeInfo = NULL;
+
+    // Dispatch destroy event to all facades.
     for (_Facades::iterator it = _facades.begin();
          it != _facades.end();
          it++)
-        (*it)->OnSessionDestroy(ev.sessionId);
+        (*it)->OnSessionDestroy(destroyInfo);
 }
 
 void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)

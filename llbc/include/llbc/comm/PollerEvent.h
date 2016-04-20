@@ -60,6 +60,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         LLBC_Packet *packet;
         LLBC_Session *session;
         char *monitorEv;
+        char *closeReason;
     } un;
 };
 
@@ -89,7 +90,7 @@ public:
     /**
      * Build close event.
      */
-    static LLBC_MessageBlock *BuildCloseEv(int sessionId);
+    static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
 
     /**
      * Build Iocp monitor event.

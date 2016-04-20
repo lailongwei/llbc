@@ -146,7 +146,7 @@
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
 
 // The poller model config(Platform specific).
-//  Alloc set to fllow datas(string format, case insensitive).
+//  Alloc set one of the follow configs(string format, case insensitive).
 //   "SelectPoller" : Use select poller(All platform available).
 //   "EpollPoller"  : Epoll poller(Avaliable in LINUX/Android platform).
 //   "IocpPoller"   : Iocp poller(Available in WIN32 platform).

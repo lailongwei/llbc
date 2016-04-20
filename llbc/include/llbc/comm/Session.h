@@ -29,6 +29,62 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
+ * \brief The session close params class encapsulation.
+ */
+class LLBC_EXPORT LLBC_SessionCloseInfo
+{
+public:
+    /**
+     * Construct a fromSvc=False, errInfo auto create LLBC_SessionCloseParams object.
+     */
+    LLBC_SessionCloseInfo();
+
+    /**
+     * Construct a fromSvc=True LLBC_SessionCloseParams object.
+     */
+    LLBC_SessionCloseInfo(char *reason);
+
+    /**
+     * Construct a fromSvc=False, errInfo specified LLBC_SessionCloseParams object.
+     */
+    LLBC_SessionCloseInfo(int errNo, int subErrNo);
+
+    ~LLBC_SessionCloseInfo();
+
+public:
+    /**
+     * Get from service flag.
+     * @return bool - the from service flag.
+     */
+    bool IsFromService() const;
+
+    /**
+     * Get close reason.
+     * @return const LLBC_String & - the close reason.
+     */
+    const LLBC_String &GetReason() const;
+
+    /**
+     * Get error no.
+     * @return int - the errno.
+     */
+    int GetErrno() const;
+
+    /**
+     * Get sub errno.
+     * @return int - the sub errno.
+     */
+    int GetSubErrno() const;
+
+private:
+    bool _fromSvc;
+    LLBC_String _reason;
+
+    int _errNo;
+    int _subErrNo;
+};
+
+/**
  * \brief The session class encapsulation.
  */
 class LLBC_HIDDEN LLBC_Session
@@ -113,6 +169,8 @@ public:
 
     /**
      * Send message block.
+     * Note: 
+     *       No matter method call success or not, method will steal <block> the parameter.
      * @param[in] block - the message block.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -141,12 +199,13 @@ public:
 
     /**
      * Close event handler method, call by poller or socket.
-     * @param[in] ol - overlapped structure(WIN32 specified).
+     * @param[in] ol        - overlapped structure(WIN32 specified).
+     * @param[in] closeInfo - session close info, default is NULL, method will auto create close info.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    void OnClose(LLBC_POverlapped ol = NULL);
+    void OnClose(LLBC_POverlapped ol = NULL, LLBC_SessionCloseInfo *closeInfo = NULL);
 #else
-    void OnClose();
+    void OnClose(LLBC_SessionCloseInfo *info = NULL);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 public:

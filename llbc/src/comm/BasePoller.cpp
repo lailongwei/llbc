@@ -212,8 +212,16 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
     if (it == _sessions.end())
         return;
 
+    LLBC_SessionCloseInfo *closeInfo = 
+        new LLBC_SessionCloseInfo(ev.un.closeReason);
+    LLBC_XFree(ev.un.closeReason);
+
     LLBC_Session *session = it->second;
-    session->OnClose();
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    session->OnClose(closeInfo);
+#else
+    session->OnClose(NULL, closeInfo);
+#endif
 }
 
 void LLBC_BasePoller::HandleEv_Monitor(LLBC_PollerEvent &ev)

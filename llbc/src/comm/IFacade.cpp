@@ -11,6 +11,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/IFacade.h"
+#include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 
@@ -91,54 +92,75 @@ LLBC_String LLBC_SessionInfo::ToString() const
     return repr;
 }
 
-LLBC_SessionDestroy::LLBC_SessionDestroy()
-: _sessionId(0)
-, _initiative(false)
-, _reason()
+LLBC_SessionDestroyInfo::LLBC_SessionDestroyInfo(LLBC_SessionInfo *sessionInfo,
+                                                 LLBC_SessionCloseInfo *closeInfo)
+: _sessionInfo(sessionInfo)
+, _closeInfo(closeInfo)
 {
 }
 
-LLBC_SessionDestroy::~LLBC_SessionDestroy()
+LLBC_SessionDestroyInfo::~LLBC_SessionDestroyInfo()
 {
+    LLBC_XDelete(_sessionInfo);
+    LLBC_XDelete(_closeInfo);
 }
 
-int LLBC_SessionDestroy::GetSessionId() const
+const LLBC_SessionInfo &LLBC_SessionDestroyInfo::GetSessionInfo() const
 {
-    return _sessionId;
+    return *_sessionInfo;
 }
 
-void LLBC_SessionDestroy::SetSessionId(int id)
+int LLBC_SessionDestroyInfo::GetSessionId() const
 {
-    _sessionId = id;
+    return _sessionInfo->GetSessionId();
 }
 
-bool LLBC_SessionDestroy::IsInitiative() const
+bool LLBC_SessionDestroyInfo::IsListenSession() const
 {
-    return _initiative;
+    return _sessionInfo->IsListenSession();
 }
 
-void LLBC_SessionDestroy::SetInitiative(bool flag)
+LLBC_SocketHandle LLBC_SessionDestroyInfo::GetSocket() const
 {
-    _initiative = flag;
+    return _sessionInfo->GetSocket();
 }
 
-const LLBC_String &LLBC_SessionDestroy::GetReason() const
+const LLBC_SockAddr_IN &LLBC_SessionDestroyInfo::GetLocalAddr() const
 {
-    return _reason;
+    return _sessionInfo->GetLocalAddr();
 }
 
-void LLBC_SessionDestroy::SetReason(const LLBC_String &reason)
+const LLBC_SockAddr_IN &LLBC_SessionDestroyInfo::GetPeerAddr() const
 {
-    _reason.clear();
-    _reason.append(reason);
+    return _sessionInfo->GetPeerAddr();
 }
 
-LLBC_String LLBC_SessionDestroy::ToString() const
+bool LLBC_SessionDestroyInfo::IsDestroyedFromService() const
+{
+    return _closeInfo->IsFromService();
+}
+
+int LLBC_SessionDestroyInfo::GetErrno() const
+{
+    return _closeInfo->GetErrno();
+}
+
+int LLBC_SessionDestroyInfo::GetSubErrno() const
+{
+    return _closeInfo->GetSubErrno();
+}
+
+const LLBC_String &LLBC_SessionDestroyInfo::GetReason() const
+{
+    return _closeInfo->GetReason();
+}
+
+LLBC_String LLBC_SessionDestroyInfo::ToString() const
 {
     LLBC_String repr;
-    repr.append_format("sessionId:%d, ", _sessionId)
-        .append_format("initiative:%s, ", _initiative?"true":"false")
-        .append_format("reason:%s", _reason.c_str());
+    repr.append_format("sessionInfo:{%s}, ", _sessionInfo->ToString().c_str())
+        .append_format("fromService:%s, ", _closeInfo->IsFromService()?"true":"false")
+        .append_format("reason:%s", _closeInfo->GetReason().c_str());
 
     return repr;
 }
@@ -294,7 +316,7 @@ void LLBC_IFacade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
 }
 
-void LLBC_IFacade::OnSessionDestroy(int sessionId)
+void LLBC_IFacade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
 }
 
@@ -322,7 +344,7 @@ std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
     return o <<si.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroy &destroy)
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
 {
     return o <<destroy.ToString();
 }

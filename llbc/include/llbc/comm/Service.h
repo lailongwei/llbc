@@ -266,9 +266,10 @@ public:
     /**
      * Remove session, always success.
      * @param[in] sessionId - the will close session Id.
+	 * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int RemoveSession(int sessionId);
+    virtual int RemoveSession(int sessionId, const char *reason = NULL);
 
 public:
     /**

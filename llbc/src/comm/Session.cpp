@@ -20,8 +20,72 @@
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/IService.h"
 
-
 __LLBC_NS_BEGIN
+
+LLBC_SessionCloseInfo::LLBC_SessionCloseInfo()
+: _fromSvc(false)
+{
+    // Get reason.
+    _reason = LLBC_FormatLastError();
+
+    // Fill errNo & subErrNo.
+    _errNo = LLBC_Errno;
+    if (LLBC_HasSubErrorNo(_errNo))
+        _subErrNo = LLBC_GetSubErrorNo();
+    else
+        _subErrNo = LLBC_ERROR_SUCCESS;
+}
+
+LLBC_SessionCloseInfo::LLBC_SessionCloseInfo(char *reason)
+: _fromSvc(true)
+, _reason(reason)
+
+, _errNo(LLBC_ERROR_SUCCESS)
+, _subErrNo(LLBC_ERROR_SUCCESS)
+{
+}
+
+LLBC_SessionCloseInfo::LLBC_SessionCloseInfo(int errNo, int subErrNo)
+: _fromSvc(false)
+{
+    // Format error.
+    if (!LLBC_ERROR_TYPE_IS_LIBRARY(errNo))
+    {
+        _errNo = errNo;
+        _subErrNo = subErrNo;
+        _reason = LLBC_StrErrorEx(errNo, subErrNo);
+    }
+    else
+    {
+        _errNo = errNo;
+        _subErrNo = LLBC_ERROR_SUCCESS;
+        _reason = LLBC_StrError(errNo);
+    }
+}
+
+LLBC_SessionCloseInfo::~LLBC_SessionCloseInfo()
+{
+}
+
+bool LLBC_SessionCloseInfo::IsFromService() const
+{
+    return _fromSvc;
+}
+
+const LLBC_String &LLBC_SessionCloseInfo::GetReason() const
+{
+    return _reason;
+}
+
+int LLBC_SessionCloseInfo::GetErrno() const
+{
+    return _errNo;
+}
+
+int LLBC_SessionCloseInfo::GetSubErrno() const
+{
+    return _subErrNo;
+}
 
 LLBC_Session::LLBC_Session()
 : _id(0)
@@ -114,13 +178,7 @@ int LLBC_Session::Send(LLBC_Packet *packet)
 #endif
         return LLBC_FAILED;
 
-    if (Send(block) != LLBC_OK)
-    {
-        LLBC_Delete(block);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
+    return Send(block);
 }
 
 int LLBC_Session::Send(LLBC_MessageBlock *block)
@@ -162,12 +220,16 @@ void LLBC_Session::OnRecv()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #if LLBC_TARGET_PLATFORM_WIN32
-void LLBC_Session::OnClose(LLBC_POverlapped ol)
+void LLBC_Session::OnClose(LLBC_POverlapped ol, LLBC_SessionCloseInfo *closeInfo)
 #else
-void LLBC_Session::OnClose()
+void LLBC_Session::OnClose(LLBC_SessionCloseInfo *closeInfo)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
+    if (closeInfo == NULL)
+        closeInfo = new LLBC_SessionCloseInfo();
+
     // Notify socket session closed.
+    const LLBC_SocketHandle sockHandle = _socket->Handle();
 #if LLBC_TARGET_PLATFORM_WIN32
     _socket->OnClose(ol);
 #else
@@ -175,7 +237,12 @@ void LLBC_Session::OnClose()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
     // Build session-destroy event and push to service.
-    _svc->Push(LLBC_SvcEvUtil::BuildSessionDestroyEv(_id));
+    _svc->Push(LLBC_SvcEvUtil::BuildSessionDestroyEv(_socket->GetLocalAddress(),
+                                                     _socket->GetPeerAddress(),
+                                                     _socket->IsListen(),
+                                                     _id,
+                                                     sockHandle,
+                                                     closeInfo));
 
     // Let poller remove self.
     _poller->RemoveSession(this);

@@ -295,7 +295,10 @@ int LLBC_Socket::AsyncSend(const char *buf, int len)
 int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
 {
     if (_willSend.Append(block) != LLBC_OK)
+    {
+        LLBC_XDelete(block);
         return LLBC_FAILED;
+    }
 
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType != _PollerType::IocpPoller)
@@ -324,6 +327,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
             buf.buf = NULL;
             buf.len = 0;
 
+            // Failed and error is WSAENOBUFS, rebuff the mergedBlock, wait next time to send.
             _willSend.Append(mergedBlock);
             ret = LLBC_SendEx(_handle, &buf, 1, &bytesSent, 0, ol);
         }
@@ -332,10 +336,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     _olGroup.InsertOverlapped(ol);
     if (ret != LLBC_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
     {
-        // If SendEx failed, do not need to delete to ol.buf, AsyncSend()'s caller will delete.
-        LLBC_Delete(ol);
-        _olGroup.RemoveOverlapped(ol);
-
+        _olGroup.DeleteOverlapped(ol);
         return LLBC_FAILED;
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -390,6 +391,12 @@ LLBC_String LLBC_Socket::GetPeerHostname() const
 uint16 LLBC_Socket::GetPeerPort() const
 {
     return _peerAddr.GetPort();
+}
+
+int LLBC_Socket::GetPendingError(int &pendingError)
+{
+    LLBC_SocketLen soLen = sizeof(int);
+    return GetOption(SOL_SOCKET, SO_ERROR, &pendingError, &soLen);
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -526,9 +533,18 @@ void LLBC_Socket::OnRecv()
         recvFlag = true;
     }
 
-    int errNo = LLBC_GetLastError();
-    int subErrNo = LLBC_GetSubErrorNo();
+    // If recv failed, firstly get last error.
+    int errNo, subErrNo;
+    if (len < 0)
+    {
+        errNo = LLBC_Errno;
+        if (LLBC_ERROR_TYPE_IS_LIBRARY(errNo))
+            subErrNo = 0;
+        else
+            subErrNo = LLBC_SubErrno;
+    }
 
+    // Try process already received data, whether the errors occurred or not.
     if (recvFlag)
     {
         if (!_session->OnRecved(block))
@@ -539,17 +555,37 @@ void LLBC_Socket::OnRecv()
         LLBC_Delete(block);
     }
 
-    LLBC_SetLastError(errNo);
-    LLBC_SetSubErrorNo(subErrNo);
-
-    if (len == 0 || (errNo != LLBC_ERROR_WBLOCK
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-        // In Non-WIN32 platform, recv() API return errnor maybe EAGAIN or EWOULDBLOCK.
-        && errNo != LLBC_ERROR_AGAIN
-#endif
-        ))
+    // Process errors.
+    if (len < 0)
     {
-        _session->OnClose();
+        if (errNo != LLBC_ERROR_WBLOCK
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+            // In Non-WIN32 platform, recv() API return errnor maybe EAGAIN or EWOULDBLOCK.
+            && errNo != LLBC_ERROR_AGAIN
+#endif
+           )
+        {
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+            _session->OnClose(new LLBC_SessionCloseInfo(errNo, subErrNo));
+#else
+            _session->OnClose(NULL, new LLBC_SessionCloseInfo(errNo, subErrNo));
+#endif
+            return;
+        }
+    }
+    else if (len == 0) // Connection gracefully close by peer, explicit set a OS dependent's error number.
+                       // In Non-Win32 platform: Set to ECONNRESET(104)
+                       // In Win32 platform    : set to WSAECONNRESET(10054)
+    {
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+        LLBC_SessionCloseInfo *closeInfo = 
+            new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, ECONNRESET);
+        _session->OnClose(closeInfo);
+#else
+        LLBC_SessionCloseInfo *closeInfo =
+            new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, WSAECONNRESET);
+        _session->OnClose(NULL, closeInfo);
+#endif
         return;
     }
 
@@ -567,6 +603,11 @@ void LLBC_Socket::OnClose(LLBC_POverlapped ol)
 void LLBC_Socket::OnClose()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (ol != NULL)
+        DeleteOverlapped(ol);
+#endif
+
     Close();
 }
 

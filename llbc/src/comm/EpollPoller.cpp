@@ -163,7 +163,16 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         LLBC_Session *session = it->second;
         if (ev.events & (EPOLLHUP|EPOLLERR))
         {
-            session->OnClose();
+            LLBC_Socket *sock = session->GetSocket();
+
+            int sockErr;
+            LLBC_SessionCloseInfo *closeInfo;
+            if (sock->GetPendingError(sockErr) != LLBC_OK)
+                closeInfo = new LLBC_SessionCloseInfo();
+            else
+                closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
+
+            session->OnClose(closeInfo);
         }
         else
         {

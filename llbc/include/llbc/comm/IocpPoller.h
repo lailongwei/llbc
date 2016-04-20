@@ -94,7 +94,7 @@ private:
     /**
      * The connecting sockets handler.
      */
-    bool HandleConnecting(int waitRet, LLBC_POverlapped ol);
+    bool HandleConnecting(int waitRet, LLBC_POverlapped ol, int errNo, int subErrNo);
 
     /**
      * Accept new session.

@@ -60,12 +60,22 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildSendEv(LLBC_Packet *packet)
     return block;
 }
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildCloseEv(int sessionId)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildCloseEv(int sessionId, const char *reason)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::Close;
     ev.sessionId = sessionId;
+
+    if (reason != NULL)
+    {
+        ev.un.closeReason = LLBC_Malloc(char, LLBC_StrLenA(reason) + 1);
+        LLBC_StrCpyA(ev.un.closeReason, reason);
+    }
+    else
+    {
+        ev.un.closeReason = NULL;
+    }
 
     block->SetWritePos(sizeof(_Ev));
     return block;
@@ -137,6 +147,10 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
     case _Ev::Send:
         LLBC_Delete(ev.un.packet);
         break;
+
+	case _Ev::Close:
+		LLBC_XFree(ev.un.closeReason);
+		break;
 
     case _Ev::Monitor:
         LLBC_XFree(ev.un.monitorEv);

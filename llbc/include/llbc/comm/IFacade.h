@@ -16,9 +16,10 @@
 __LLBC_NS_BEGIN
 
 /**
- * Previous declare Service class.
+ * Previous declare Service/Session class.
  */
 class LLBC_IService;
+class LLBC_SessionCloseInfo;
 
 __LLBC_NS_END
 
@@ -111,30 +112,50 @@ private:
 /**
  * \brief The session destroy information class encapsulation.
  */
-class LLBC_EXPORT LLBC_SessionDestroy
+class LLBC_EXPORT LLBC_SessionDestroyInfo
 {
 public:
-    LLBC_SessionDestroy();
-    ~LLBC_SessionDestroy();
+    LLBC_SessionDestroyInfo(LLBC_SessionInfo *sessionInfo, 
+                            LLBC_SessionCloseInfo *closeInfo);
+    ~LLBC_SessionDestroyInfo();
 
 public:
     /**
-     * Session Id getter & setter.
+     * Get destroyed session information.
+     */
+    const LLBC_SessionInfo &GetSessionInfo() const;
+
+    /**
+     * Help methods about get session infos.
      */
     int GetSessionId() const;
-    void SetSessionId(int id);
+    bool IsListenSession() const;
+    LLBC_SocketHandle GetSocket() const;
+    const LLBC_SockAddr_IN &GetLocalAddr() const;
+    const LLBC_SockAddr_IN &GetPeerAddr() const;
+
+public:
+    /**
+     * Is destroy from service layer flag getter.
+     */
+    bool IsDestroyedFromService() const;
 
     /**
-     * Initiative flag getter & setter.
-     */
-    bool IsInitiative() const;
-    void SetInitiative(bool flag);
+    * Error No getter, available while IsDestroyedFromService() == false.
+    */
+    int GetErrno() const;
 
     /**
-     * Reason getter & setter.
-     */
+    * SubError No getter, available while IsDestroyedFromService() == false.
+    */
+    int GetSubErrno() const;
+
+    /**
+    * Reason getter.
+    * Note: If is destroyed from service, it return Service destroy reason, otherwise return 
+    *       network network layer error reason(Call LLBC_StrError() to get).
+    */
     const LLBC_String &GetReason() const;
-    void SetReason(const LLBC_String &reason);
 
 public:
     /**
@@ -144,9 +165,8 @@ public:
     LLBC_String ToString() const;
 
 private:
-    int _sessionId;
-    bool _initiative;
-    LLBC_String _reason;
+    LLBC_SessionInfo *_sessionInfo;
+    LLBC_SessionCloseInfo *_closeInfo;
 };
 
 /**
@@ -308,9 +328,9 @@ public:
 
     /**
      * When session destroy, will call this event handler.
-     * @param[in] sessionId - the session Id.
+     * @param[in] destroyInfo - the session destroy info.
      */
-    virtual void OnSessionDestroy(int sessionId);
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
 
     /**
      * When asynchronous connect result, will call this event handler.
@@ -356,7 +376,7 @@ __LLBC_NS_END
  * Some stream output operator functions(in global ns).
  */
 LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si);
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroy &destroy);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy);
 LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
 LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 

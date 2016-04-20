@@ -171,22 +171,20 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 {
     // Wait return value.
     const int waitRet = *reinterpret_cast<int *>(ev.un.monitorEv);
+
     // Overlapped pointer.
     int off = sizeof(int);
     LLBC_POverlapped ol = *reinterpret_cast<LLBC_POverlapped *>(ev.un.monitorEv + off);
-    if (waitRet != LLBC_OK)
-    {
-        // Error No.
-        off += sizeof(LLBC_POverlapped);
-        LLBC_SetLastError(*reinterpret_cast<int *>(ev.un.monitorEv + off));
-        // Sub-Error No.
-        off += sizeof(int);
-        LLBC_SetSubErrorNo(*reinterpret_cast<int *>(ev.un.monitorEv + off));
-    }
+    // Error No.
+    off += sizeof(LLBC_POverlapped);
+    int errNo = *reinterpret_cast<int *>(ev.un.monitorEv + off);
+    // Sub-Error No.
+    off += sizeof(int);
+    int subErrNo = *reinterpret_cast<int *>(ev.un.monitorEv + off);
 
     LLBC_Free(ev.un.monitorEv);
 
-    if (HandleConnecting(waitRet, ol))
+    if (HandleConnecting(waitRet, ol, errNo, subErrNo))
         return;
 
     _Sockets::iterator it  = _sockets.find(ol->sock);
@@ -204,7 +202,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     LLBC_Session *session = it->second;
     if (waitRet == LLBC_FAILED)
     {
-        session->OnClose(ol);
+        session->OnClose(ol, LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
     }
     else
     {
@@ -286,7 +284,7 @@ void LLBC_IocpPoller::MonitorSvc()
     }
 }
 
-bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol)
+bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int errNo, int subErrNo)
 {
     if (ol->opcode != LLBC_OverlappedOpcode::Connect)
         return false;
@@ -302,15 +300,15 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol)
         sock->SetOption(SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
         SetConnectedSocketDftOpts(sock);
 
-        _svc->Push(LLBC_SvcEvUtil::
-                BuildAsyncConnResultEv(true, "Success", asyncInfo.peerAddr));
+        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
+            true, LLBC_StrError(LLBC_ERROR_SUCCESS), asyncInfo.peerAddr));
 
         AddSession(CreateSession(sock, asyncInfo.sessionId), false);
     }
     else
     {
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
-                false, LLBC_FormatLastError(), asyncInfo.peerAddr));
+                false, LLBC_StrErrorEx(errNo, subErrNo), asyncInfo.peerAddr));
         LLBC_Delete(asyncInfo.socket);
     }
 

@@ -21,6 +21,7 @@ __LLBC_NS_BEGIN
  * Previous declare some classes.
  */
 class LLBC_Packet;
+class LLBC_SessionCloseInfo;
 
 __LLBC_NS_END
 
@@ -80,9 +81,13 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
 {
+    bool isListen;
     int sessionId;
-    bool isInitiative;
-    LLBC_String reason;
+    LLBC_SockAddr_IN local;
+    LLBC_SockAddr_IN peer;
+    LLBC_SocketHandle handle;
+
+    LLBC_SessionCloseInfo *closeInfo;
 
     LLBC_SvcEv_SessionDestroy();
     virtual ~LLBC_SvcEv_SessionDestroy();
@@ -182,7 +187,12 @@ public:
     /**
      * Build session destroy event.
      */
-    static LLBC_MessageBlock *BuildSessionDestroyEv(int sessionId);
+    static LLBC_MessageBlock *BuildSessionDestroyEv(const LLBC_SockAddr_IN &local,
+                                                    const LLBC_SockAddr_IN &peer,
+                                                    bool isListen,
+                                                    int sessionId,
+                                                    LLBC_SocketHandle handle,
+                                                    LLBC_SessionCloseInfo *closeInfo);
 
     /**
      * Build async-connect result event.
@@ -220,9 +230,14 @@ public:
      * Build fire-event event.
      */
     static LLBC_MessageBlock *BuildFireEvEv(LLBC_Event *ev);
+
+public:
+    /**
+     * Destroy service event block.
+     */
+    static void DestroyEvBlock(LLBC_MessageBlock *block);
 };
 
 __LLBC_NS_END
 
 #endif // __LLBC_COMM_SERVICE_EVENT_H__
-
