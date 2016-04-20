@@ -39,8 +39,9 @@ public:
         _sessionIds.push_back(sessionInfo.GetSessionId());
     }
 
-    virtual void OnSessionDestroy(int sessionId)
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
+        int sessionId = destroyInfo.GetSessionId();
         for (LLBC_SessionIdListIter it = _sessionIds.begin();
              it != _sessionIds.end();
              it++)

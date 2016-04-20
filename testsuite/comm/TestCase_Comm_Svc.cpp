@@ -41,9 +41,9 @@ public:
         LLBC_PrintLine("Session Create: %s", sessionInfo.ToString().c_str());
     }
 
-    virtual void OnSessionDestroy(int sessionId)
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session Destroy: %d", sessionId);
+        LLBC_PrintLine("Session Destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
@@ -60,13 +60,13 @@ public:
     void OnDataArrival(LLBC_Packet &packet)
     {
         if ((_packets += 1) % 1000 == 0)
-            LLBC_PrintLine("[%lld]Received %lld packets!", LLBC_GetMilliSeconds(), _packets);
+            LLBC_PrintLine("[%lld]Received %ld packets!", LLBC_GetMilliSeconds(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
         const size_t nowMb = (_recvBytes / (1024 * 1024));
         if (nowMb != _prevMb)
         {
-            LLBC_PrintLine("[%lld]Received %lld MB data!", LLBC_GetMilliSeconds(), nowMb);
+            LLBC_PrintLine("[%lld]Received %ld MB data!", LLBC_GetMilliSeconds(), nowMb);
             _prevMb = nowMb;
         }
 

@@ -63,15 +63,15 @@ public:
         // LLBC_PrintLine("Service idle, idle time: %d", idleTime);
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &si)
+    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
-        LLBC_PrintLine("SessionCreate: %s", si.ToString().c_str());
+        LLBC_PrintLine("SessionCreate: %s", sessionInfo.ToString().c_str());
         // std::cout <<"Session Create: " <<si <<std::endl;
     }
 
-    virtual void OnSessionDestroy(int sessionId)
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session destroy, id: %d", sessionId);
+        LLBC_PrintLine("Session destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
@@ -190,7 +190,6 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     // Listen test.
     ListenTest("127.0.0.1", 7788);
   
-  
     // Async connect test.
     AsyncConnTest("www.baidu.com", 80);
 
@@ -230,7 +229,7 @@ void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
     {
         LLBC_PrintLine("Connet to %s:%d success, sid: %d", ip, port, sid);
         LLBC_PrintLine("Disconnet it");
-        _svc->RemoveSession(sid);
+        _svc->RemoveSession(sid, "For test!!!!!");
     }
     else
     {

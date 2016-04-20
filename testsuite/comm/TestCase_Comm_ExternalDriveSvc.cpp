@@ -44,9 +44,9 @@ public:
         LLBC_PrintLine("Session create: %s", sessionInfo.ToString().c_str());
     }
 
-    virtual void OnSessionDestroy(int sessionId)
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session destroy: %d", sessionId);
+        LLBC_PrintLine("Session destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
