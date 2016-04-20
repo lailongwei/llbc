@@ -113,30 +113,51 @@ public:
     /**
      * Register facade.
      * @param[in] facade - the facade instance(normal, not steal reference).
-     *                     methods:
-     *                      oninitialize(ev): service initialize handler.
-     *                        ev.svc: service object.
-     *                      ondestroy(ev): service destroy handler.
-     *                        ev.svc: service object.
-     *                      onupdate(ev): service update handler.
-     *                        ev.svc: service object.
-     *                      onidle(ev): service idle handler.
-     *                        ev.svc: service object.
-     *                        ev.idletime: idletime, float type, in seconds.
-     *                      onsessioncreate(ev): session create handler.
-     *                        ev.svc: service object.
-     *                        ev.sessionid: session Id.
-     *                        ev.ip: peer Ip address.
-     *                        ev.port: peer port number.
-     *                      onsessiondestroy(sessionId): session destroy handler.
-     *                        ev.svc: service object.
-     *                        ev.sessionid: session Id.
-     *                      onasyncconnresult(dict): async-connect result handler.
-     *                        ev.svc: service object.
-     *                        ev.ip:  peer Ip address.
-     *                        ev.port: peer port number.
-     *                        ev.connected: connected flag.
-     *                        ev.reason: reason describe.
+     *      facade methods(all methods are optional):
+     *          oninitialize(self, ev): service initialize handler.
+     *              ev.svc: service object.
+     *          ondestroy(self, ev): service destroy handler.
+     *              ev.svc: service object.
+     *          onupdate(self, ev): service per-frame update handler.
+     *              ev.svc: service object.
+     *          onidle(self, ev): service per-frame idle handler.
+     *              ev.svc: service object.
+     *              ev.idletime: idle time, float type, in seconds.
+     *          onsessioncreate(self, ev): session create handler.
+     *              ev.svc: service object.
+     *              ev.islisten: is listen session or not.
+     *              ev.session_id: session Id.
+     *              ev.local_ip: local ip address.
+     *              ev.local_port: local port number.
+     *              ev.peer_ip: peer ip address.
+     *              ev.peer_port: peer port number.
+     *          onsessiondestroy(self, ev): session destroy handler.
+     *              ev.svc: service object.
+     *              ev.session_id: session Id.
+     *              ev.reason: destroy reason.
+     *              ev.destroyed_from_service: destroyed from service flag.
+     *              ev.local_ip: local ip address.
+     *              ev.local_port: local port number.
+     *              ev.peer_ip: peer ip address.
+     *              ev.peer_port: peer port number.
+     *              ev.socket: socket file descripter.
+     *              ev.errno: error number(only available when ev.destroyed_from_service is True).
+     *              ev.sub_errno: sub error number(only available when ev.destroyed_from_service is True).
+     *          onasyncconnresult(self, ev): async-connect result handler.
+     *              ev.svc: service object.
+     *              ev.peer_ip: peer ip address.
+     *              ev.peer_port: peer port number.
+     *              ev.connected: connected flag.
+     *              ev.reason: reason describe.
+     *          onprotoreport(self, ev): protocol report.
+     *              ev.svc: service object.
+     *              ev.report_layer: which layer protocol reported.
+     *              ev.report_level: report event level(DEBUG, INFO, WARN, ERROR).
+     *              ev.report_msg: report message.
+     *              ev.session_id: report session_id(optional, maybe is 0).
+     *          onunhandledpacket(self, ev): unhandled packet.
+     *              ev.svc: service object.
+     *              ev.opcode: packet opcode.
      * @return int - return 0 if success, otherwise return -1.
      */
     int RegisterFacade(PyObject *facade);
