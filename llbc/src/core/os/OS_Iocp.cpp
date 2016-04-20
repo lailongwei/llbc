@@ -81,7 +81,20 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
         }
         else
         {
-            LLBC_SetLastError(LLBC_ERROR_OSAPI);
+            DWORD flags = 0;
+            DWORD bytesTransfer = 0;
+#if LLBC_DEBUG
+            BOOL grRet =
+#endif
+            ::WSAGetOverlappedResult((*ol)->sock,
+                                     *ol,
+                                     &bytesTransfer,
+                                     TRUE,
+                                     &flags);
+#if LLBC_DEBUG
+            ASSERT(grRet == FALSE && "llbc library internal error, in LLBC_GetQueuedCompletionStatus()!");
+#endif
+            LLBC_SetLastError(LLBC_ERROR_NETAPI);
         }
 
         return LLBC_FAILED;
