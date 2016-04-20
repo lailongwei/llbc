@@ -53,7 +53,7 @@ int TestCase_Core_File_File::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    return LLBC_OK;
+    return retCode;
 }
 
 bool TestCase_Core_File_File::FileModeDescTest()
