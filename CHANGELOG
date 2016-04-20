@@ -3,6 +3,18 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2016/04/20
+# BUG修复:
+#  1) 修复在LLBC_Session::OnClose过程中存在的OVERLAPPED结构泄露的BUG(win32特有);
+#  2) 修复在LLBC_Socket::Send过程中, 可能出现的core dump的BUG;
+#  3) 修复在LLBC_Socket::OnRecv在对端关闭情况下,获取不到的error相关数据的BUG;
+#  4) 修复Select Poller在处理connecting会话过程中,有可能出现的fail reason无效的问题;
+#  5) 修复在Iocp Poller中当LLBC_GetQueuedCompletionStatus失败后, 取得的error不准确的BUG;
+#  6) 修复testsuite的Makefile BUG: make debug的时候, 不会自动link带_debug后缀的llbc库;
+# 新增功能:
+#  1) 更新IFacade::OnSessionDestroy(int sessionId)定义为: IFacade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+# 	  可以让使用者完整了解被关闭的session的所有信息(包括:socket描述符, 本机/对端 ip及端口信息, 关闭原因(是否由Service层面主动关闭还是其它原因), 错误码相关信息);
+#
 # 2016/03/25
 # 1) logger添加对%p支持,以打印进程Id;
 # 2) logFileName添加模式支持,当前支持模式:
