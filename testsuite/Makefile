@@ -109,10 +109,10 @@ NOTSRCFILES=
 # Library files for link
 #****************************************************************************
 # LIBS += -Lyour/libs/path -lyour/libs/name
-RTLIB   := -lrt
-DLLIB	:= -ldl
-UUIDLIB := -luuid
-LLBCLIB := -L$(PROJECTDIR)/../llbc/lib -lllbc
+RTLIB   = -lrt
+DLLIB   = -ldl
+UUIDLIB = -luuid
+LLBCLIB = -L$(PROJECTDIR)/../llbc/lib -l$(if $(DEBUG),llbc_$(DEBUGTARGET),llbc)
 
 LIBS += $(RTLIB)
 LIBS += $(DLLIB)
