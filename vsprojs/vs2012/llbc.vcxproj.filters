@@ -813,16 +813,7 @@
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescAccessor.h">
       <Filter>include\comm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescImpl.h">
-      <Filter>include\comm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartDescImpl.h">
-      <Filter>include\comm</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderParts.h">
-      <Filter>include\comm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartsImpl.h">
       <Filter>include\comm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\llbc\include\llbc\comm\PollerEvent.h">
@@ -844,9 +835,6 @@
       <Filter>include\comm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceEvent.h">
-      <Filter>include\comm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceImpl.h">
       <Filter>include\comm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceMgr.h">
@@ -927,6 +915,12 @@
     </ClInclude>
     <ClInclude Include="..\..\llbc\include\llbc\core\os\OS_Process.h">
       <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartsImpl.h">
+      <Filter>include\comm\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceImpl.h">
+      <Filter>include\comm\impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

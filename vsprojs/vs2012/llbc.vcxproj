@@ -449,8 +449,6 @@
     <ClInclude Include="..\..\llbc\include\llbc\comm\Packet.h" />
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderAssembler.h" />
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescAccessor.h" />
-    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderDescImpl.h" />
-    <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartDescImpl.h" />
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderParts.h" />
     <ClInclude Include="..\..\llbc\include\llbc\comm\PacketHeaderPartsImpl.h" />
     <ClInclude Include="..\..\llbc\include\llbc\comm\PollerEvent.h" />
