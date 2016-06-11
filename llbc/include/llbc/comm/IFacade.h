@@ -16,8 +16,9 @@
 __LLBC_NS_BEGIN
 
 /**
- * Previous declare Service/Session class.
+ * Previous declare Packet/Session/Service class.
  */
+class LLBC_Packet;
 class LLBC_IService;
 class LLBC_SessionCloseInfo;
 
@@ -248,6 +249,12 @@ public:
     void SetSessionId(int sessionId);
 
     /**
+     * Opcode getter & setter.
+     */
+    int GetOpcode() const;
+    void SetOpcode(int opcode);
+
+    /**
      * Layer getter & setter.
      */
     int GetLayer() const;
@@ -275,6 +282,7 @@ public:
 
 private:
     int _sessionId;
+    int _opcode;
 
     int _layer;
     int _level;
@@ -299,15 +307,26 @@ public:
 
 public:
     /**
-     * When service initialized, will call then event handler function.
+     * When service start and not not init facade before, will call then event handler function.
      */
     virtual void OnInitialize();
 
     /**
-     * When service will destroy, will call this event handler function.
+     * When service destroy, will call this event handler function.
      */
     virtual void OnDestroy();
 
+    /**
+     * When service start, will call this event handler function.
+     */
+    virtual void OnStart();
+
+    /**
+     * When service stop, will call this event handler function.
+     */
+    virtual void OnStop();
+
+public:
     /**
      * Heartbeat function.
      */
@@ -348,15 +367,17 @@ public:
 
     /**
      * When service receive a unhandled packet, will call this event handler.
-     * @param[in] opcode - the opcode.
+     * @param[in] packet - the unhandled packet.
      */
-    virtual void OnUnHandledPacket(int opcode);
+    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     /**
      * Friend class: LLBC_Service.
      *  Access methods:
      *      void SetService()
+     * Access data members:
+     *      _inited;
      */
     friend class LLBC_Service;
 
@@ -367,6 +388,7 @@ private:
     virtual void SetService(LLBC_IService *service);
 
 private:
+    bool _inited;
     LLBC_IService *_svc;
 };
 

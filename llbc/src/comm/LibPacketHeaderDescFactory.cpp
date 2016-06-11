@@ -15,9 +15,9 @@
 namespace
 {
     static const int LengthPartNo = 0, LengthPartLen = 4;
-    static const int OpcodePartNo = 1, OpcodePartLen = 2;
+    static const int OpcodePartNo = 1, OpcodePartLen = 4;
     static const int StatusPartNo = 2, StatusPartLen = 2;
-    static const int ServiceIdPartNo = 3, ServiceIdPartLen = 4;
+    static const int ServiceIdPartNo = 3, ServiceIdPartLen = 2;
     static const int FlagsPartNo = 4, FlagsPartLen = 2;
 }
 

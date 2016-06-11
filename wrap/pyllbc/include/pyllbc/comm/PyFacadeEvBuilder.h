@@ -30,6 +30,20 @@ public:
     static PyObject *BuildDestroyEv(PyObject *svc);
 
     /**
+     * Build Start event object.
+     * @param[in] svc - service object, not steals reference, normal.
+     * @return PyObject * - ServiceEvent object, new reference.
+     */
+    static PyObject *BuildStartEv(PyObject *svc);
+
+    /**
+     * Build Stop event object.
+     * @param[in] svc - service object, not steals reference, normal.
+     * @return PyObject * - ServiceEvent object, new reference.
+     */
+    static PyObject *BuildStopEv(PyObject *svc);
+
+    /**
      * Build Update event object.
      * @param[in] svc - service object, not steals reference, normal.
      * @return PyObject * - ServiceEvent object, new reference.
@@ -78,11 +92,12 @@ public:
 
     /**
      * Build unhandled packet event object.
-     * @param[in] svc    - the service object, not steals reference, normal.
-     * @param[in] opcode - the opcode.
-     * @return PyObject * - the ServiceEvent object, new reference.
+     * @param[in] svc        - the service object, not steals reference, normal.
+     * @param[in] llbcPacket - the llbc core library packet object.
+     * @param[in] packet     - the packet object, not steals reference, normal.
+     * @return PyObject *    - the ServiceEvent object, new reference.
      */
-    static PyObject *BuildUnHandledPacketEv(PyObject *svc, int opcode);
+    static PyObject *BuildUnHandledPacketEv(PyObject *svc, const LLBC_Packet &llbcPacket, PyObject *packet);
 
 private:
     static PyObject *CreateEv(PyObject *svc);
@@ -110,6 +125,7 @@ private:
     static PyObject *_attrPeerPort;
     static PyObject *_attrIsListen;
     static PyObject *_attrSocket;
+    static PyObject *_attrPacket;
     static PyObject *_attrReportLayer;
     static PyObject *_attrReportLevel;
     static PyObject *_attrReportMsg;

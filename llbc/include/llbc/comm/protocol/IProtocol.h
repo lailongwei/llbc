@@ -65,19 +65,21 @@ public:
 
     /**
      * When data send, will call this method.
-     * @param[in] in   - the in data.
-     * @param[out] out - the out data.
+     * @param[in] in             - the in data.
+     * @param[out] out           - the out data.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(void *in, void *&out) = 0;
+    virtual int Send(void *in, void *&out, bool &removeSession) = 0;
 
     /**
      * When data received, will call this method.
-     * @param[in] in   - the in data.
-     * @param[out] out - the out data.
+     * @param[in] in             - the in data.
+     * @param[out] out           - the out data.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Recv(void *in, void *&out) = 0;
+    virtual int Recv(void *in, void *&out, bool &removeSession) = 0;
 
     /**
      * Add coder factory to protocol, only available in Codec-Layer.

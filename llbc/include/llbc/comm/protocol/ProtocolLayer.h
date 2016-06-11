@@ -25,7 +25,7 @@ public:
     {
         Begin,
 
-        // Pack/Unpack layer, be resonsible for raw bytestream and packet conversion.
+        // Pack/Unpack layer, be responsible for raw bytestream and packet conversion.
         PackLayer = Begin,
         // Compress/DeCompress layer, be responsible for comp/decomp packet.
         CompressLayer,

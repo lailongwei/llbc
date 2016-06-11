@@ -12,4 +12,8 @@
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
 
+#include "csllbc/comm/csCoder.h"
+#include "csllbc/comm/csFacade.h"
+#include "csllbc/comm/csService.h"
+
 #endif // !__CSLLBC_COMM_COMM_H__

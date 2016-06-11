@@ -42,7 +42,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="llbc">
-      <HintPath>..\..\output\vs2012\Debug\win32\wrap\csharp\csllbc_debug.dll</HintPath>
+      <HintPath>..\..\output\vs2012\Release\win32\wrap\csharp\csllbc.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +54,12 @@
     </Compile>
     <Compile Include="..\..\wrap\csllbc\testsuite\ITestCase.cs">
       <Link>ITestCase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\testsuite\common\TestCase_Com_LibConfig.cs">
+      <Link>common\TestCase_Com_LibConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\testsuite\common\TestCase_Com_SafeConsole.cs">
+      <Link>common\TestCase_Com_SafeConsole.cs</Link>
     </Compile>
     <Compile Include="..\..\wrap\csllbc\testsuite\comm\TestCase_Comm_Service.cs">
       <Link>comm\TestCase_Comm_Service.cs</Link>

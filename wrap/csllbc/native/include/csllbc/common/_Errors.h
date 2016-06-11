@@ -6,8 +6,8 @@
  *
  * @brief
  */
-#ifndef __CSLLBC_COM_ERRORS_H__
-#define __CSLLBC_COM_ERRORS_H__
+#ifndef __CSLLBC_COM__ERRORS_H__
+#define __CSLLBC_COM__ERRORS_H__
 
 #include "csllbc/common/Macro.h"
 #include "csllbc/common/LibHeader.h"
@@ -19,4 +19,4 @@
  */
 LLBC_EXTERN_C CSLLBC_EXPORT const char *csllbc_FormatLastError(int *lastErrorLen);
 
-#endif // !__CSLLBC_COM_ERRORS_H__
+#endif // !__CSLLBC_COM__ERRORS_H__

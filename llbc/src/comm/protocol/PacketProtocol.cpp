@@ -17,6 +17,9 @@
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
+#include "llbc/comm/Session.h"
+#include "llbc/comm/IService.h"
+
 namespace
 {
     typedef LLBC_NS LLBC_IProtocol Base;
@@ -79,7 +82,7 @@ int LLBC_PacketProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer
     return LLBC_OK;
 }
 
-int LLBC_PacketProtocol::Send(void *in, void *&out)
+int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
 
@@ -89,8 +92,9 @@ int LLBC_PacketProtocol::Send(void *in, void *&out)
     return LLBC_OK;
 }
 
-int LLBC_PacketProtocol::Recv(void *in, void *&out)
+int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
+
     out = NULL;
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
 
@@ -111,6 +115,8 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
             // Create new packet.
             _packet = LLBC_New(LLBC_Packet);
             _packet->WriteHeader(_headerAssembler.GetHeader());
+            _packet->SetServiceId(_stack->_svc->GetId());
+            _packet->SetSessionId(_stack->_session->GetId());
             _payloadNeedRecv = _packet->GetLength() - _headerIncludedLen;
             if (_payloadNeedRecv < 0)
             {
@@ -125,6 +131,8 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out)
 
                 LLBC_INL_NS __DelPacketList(out);
 
+                removeSession = true;
+                LLBC_SetLastError(LLBC_ERROR_PACK);
                 return LLBC_FAILED;
             }
 

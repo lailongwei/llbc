@@ -268,10 +268,20 @@ class pyllbcService(object):
 
     @staticmethod
     def set_header_desc(header_desc):
+        """
+        Set packet header describe.
+        """
         if not isinstance(header_desc, llbc.PacketHeaderDesc):
             raise llbc.error('set header desc failed, type error, given type: {}'.format(type(header_desc)))
 
         llbc.inl.SetPacketHeaderDesc(header_desc._cobj)
+
+    def suppress_codernotfound_warning(self):
+        """
+        Suppress all coder not found warning.
+        If suppressed, packet handler received packet.data type is llbc.Stream type.
+        """
+        llbc.inl.SuppressServiceCoderNotFoundWarning(self._c_obj)
 
     def start(self, pollercount=1):
         """
@@ -424,6 +434,10 @@ class pyllbcService(object):
                     ev.svc: service object.
                 ondestroy(self, ev): service destroy handler.
                     ev.svc: service object.
+                onstart(self, ev): service start handler.
+                    ev.svc: service object.
+                onstop(self, ev): service stop handler.
+                    ev.svc: service object.
                 onupdate(self, ev): service per-frame update handler.
                     ev.svc: service object.
                 onidle(self, ev): service per-frame idle handler.
@@ -463,7 +477,9 @@ class pyllbcService(object):
                     ev.session_id: report session_id(optional, maybe is 0).
                 onunhandledpacket(self, ev): unhandled packet.
                     ev.svc: service object.
+					ev.session_id: packet session Id.
                     ev.opcode: packet opcode.
+					ev.packet: packet object.
         """
         if hasattr(facade, '__bases__') and llbc.ischild(facade, type):
             raise llbc.error('facade could not be type(or derived from type) instance, facade:{}'.format(facade))

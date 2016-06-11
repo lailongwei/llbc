@@ -225,20 +225,36 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
   <ItemGroup>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Common.h" />
-    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Errors.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\csDelegates.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_LibConfig.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_Errors.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Export.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\LibHeader.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Macro.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\Comm.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csCoder.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csFacade.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csPacketHandler.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Service.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\wrap\csllbc\native\src\common\Errors.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\_LibConfig.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\_Errors.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\Comm.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csCoder.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csFacade.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csPacketHandler.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csService.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Service.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\csllbc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\wrap\csllbc\csharp\native\llbcnative.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

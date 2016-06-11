@@ -50,6 +50,7 @@ LLBC_ProtocolStack::LLBC_ProtocolStack(This::StackType type)
 
 , _svc(NULL)
 , _session(NULL)
+, _suppressCoderNotFoundError(false)
 {
     ::memset(_protos, 0, sizeof(_protos));
 }
@@ -68,6 +69,11 @@ void LLBC_ProtocolStack::SetService(LLBC_IService *svc)
 void LLBC_ProtocolStack::SetSession(LLBC_Session *session)
 {
     _session = session;
+}
+
+void LLBC_ProtocolStack::SetIsSuppressedCoderNotFoundWarning(bool suppressed)
+{
+    _suppressCoderNotFoundError = suppressed;
 }
 
 int LLBC_ProtocolStack::AddProtocol(LLBC_IProtocol *proto)
@@ -136,7 +142,7 @@ int LLBC_ProtocolStack::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded)
+int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded, bool &removeSession)
 {
     void *in, *out = willEncode;
     for (int i = _Layer::End - 1; i >= _Layer::CodecLayer; i--)
@@ -145,7 +151,7 @@ int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded
             continue;
 
         in = out, out = NULL;
-        if (_protos[i]->Send(in, out) != LLBC_OK)
+        if (_protos[i]->Send(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -153,7 +159,7 @@ int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block)
+int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block, bool &removeSession)
 {
     void *in, *out = packet;
     for (int i = _Layer::CompressLayer; i >= _Layer::Begin; i--)
@@ -162,7 +168,7 @@ int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block)
             continue;
 
         in = out, out = NULL;
-        if (_protos[i]->Send(in, out) != LLBC_OK)
+        if (_protos[i]->Send(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -170,17 +176,17 @@ int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block)
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::Send(LLBC_Packet *packet, LLBC_MessageBlock *&block)
+int LLBC_ProtocolStack::Send(LLBC_Packet *packet, LLBC_MessageBlock *&block, bool &removeSession)
 {
-    if (SendCodec(packet, packet) != LLBC_OK)
+    if (SendCodec(packet, packet, removeSession) != LLBC_OK)
         return LLBC_FAILED;
-    return SendRaw(packet, block);
+    return SendRaw(packet, block, removeSession);
 }
 
-int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets)
+int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession)
 {
     void *in, *out = NULL;
-    if (UNLIKELY(_protos[_Layer::PackLayer]->Recv(block, out) != LLBC_OK))
+    if (UNLIKELY(_protos[_Layer::PackLayer]->Recv(block, out, removeSession) != LLBC_OK))
         return LLBC_FAILED;
     else if (!out)
         return LLBC_OK;
@@ -198,7 +204,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
                 continue;
 
             in = out, out = NULL;
-            if (_protos[layer]->Recv(in, out) != LLBC_OK)
+            if (_protos[layer]->Recv(in, out, removeSession) != LLBC_OK)
             {
                 //! Current in-data already deleted in specific protocol, we don't need care it.
                 //  Just need delete decoded packets, and non-decode packets.
@@ -218,7 +224,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded)
+int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded, bool &removeSession)
 {
     void *in, *out = willDecode;
     for (int i = _Layer::CodecLayer; i < _Layer::End; i++)
@@ -227,7 +233,7 @@ int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded
             continue;
 
         in = out, out = NULL;
-        if (_protos[i]->Recv(in, out) != LLBC_OK)
+        if (_protos[i]->Recv(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -235,16 +241,16 @@ int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets)
+int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession)
 {
     std::vector<LLBC_Packet *> rawPackets;
-    if (RecvRaw(block, rawPackets) != LLBC_OK)
+    if (RecvRaw(block, rawPackets, removeSession) != LLBC_OK)
         return LLBC_FAILED;
 
     for (size_t i = 0;  i < rawPackets.size(); i++)
     {
         LLBC_Packet *packet;
-        if (RecvCodec(rawPackets[i], packet) != LLBC_OK)
+        if (RecvCodec(rawPackets[i], packet, removeSession) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(packets);
             for (++i; i < rawPackets.size(); i++)
@@ -259,18 +265,26 @@ int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *
     return LLBC_OK;
 }
 
-void LLBC_ProtocolStack::Report(LLBC_IProtocol *proto, int level, const LLBC_String &err)
+void LLBC_ProtocolStack::Report(LLBC_IProtocol *proto, int level, const LLBC_String &msg)
 {
-    Report(_session->GetId(), proto, level, err);
+    Report(_session->GetId(), proto, level, msg);
 }
 
-void LLBC_ProtocolStack::Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &err)
+void LLBC_ProtocolStack::Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &msg)
+{
+    Report(sessionId, 0, proto, level, msg);
+}
+
+void LLBC_ProtocolStack::Report(int sessionId, int opcode, LLBC_IProtocol *proto, int level, const LLBC_String &msg)
 {
     if (sessionId == 0)
         sessionId = _session->GetId();
 
-    _svc->Push(LLBC_SvcEvUtil::BuildProtoReportEv(
-            sessionId, proto->GetLayer(), level, err));
+    _svc->Push(LLBC_SvcEvUtil::BuildProtoReportEv(sessionId,
+                                                  opcode,
+                                                  proto->GetLayer(),
+                                                  level,
+                                                  msg));
 }
 
 __LLBC_NS_END

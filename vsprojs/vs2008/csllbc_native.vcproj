@@ -346,11 +346,19 @@
 				Name="commom"
 				>
 				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\common\_Errors.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\common\_LibConfig.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\wrap\csllbc\native\include\csllbc\common\Common.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\wrap\csllbc\native\include\csllbc\common\Errors.h"
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\common\csDelegates.h"
 					>
 				</File>
 				<File
@@ -373,12 +381,36 @@
 					RelativePath="..\..\wrap\csllbc\native\include\csllbc\core\Core.h"
 					>
 				</File>
+				<Filter
+					Name="os"
+					>
+					<File
+						RelativePath="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="comm"
 				>
 				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\_Service.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\Comm.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\csCoder.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\csFacade.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\csPacketHandler.h"
 					>
 				</File>
 				<File
@@ -398,7 +430,11 @@
 				Name="common"
 				>
 				<File
-					RelativePath="..\..\wrap\csllbc\native\src\common\Errors.cpp"
+					RelativePath="..\..\wrap\csllbc\native\src\common\_Errors.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\src\common\_LibConfig.cpp"
 					>
 				</File>
 			</Filter>
@@ -409,12 +445,36 @@
 					RelativePath="..\..\wrap\csllbc\native\src\core\Core.cpp"
 					>
 				</File>
+				<Filter
+					Name="os"
+					>
+					<File
+						RelativePath="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="comm"
 				>
 				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\_Service.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\wrap\csllbc\native\src\comm\Comm.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\csCoder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\csFacade.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\csPacketHandler.cpp"
 					>
 				</File>
 				<File

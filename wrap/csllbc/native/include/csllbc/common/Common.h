@@ -11,6 +11,6 @@
 
 #include "csllbc/common/LibHeader.h"
 #include "csllbc/common/Macro.h"
-#include "csllbc/common/Errors.h"
+#include "csllbc/common/csDelegates.h"
 
 #endif // !__CSLLBC_COM_COMMON_H__

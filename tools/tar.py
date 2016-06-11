@@ -21,7 +21,6 @@ TAR_GIT = True if (len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].lowe
 FILTEROUT_SUFFIXES = ('.obj', '.pyc', '.sdf', '.opensdf', '.suo', '.user', '.ncb', '.cache', '.o', '.d')
 OS_NAME = platform.uname()[0].lower()
 
-
 def common_filter(tarinfo):
     """
     Common tarinfo filter, use to all files/directories.

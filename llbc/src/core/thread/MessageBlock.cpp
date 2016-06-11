@@ -80,21 +80,18 @@ int LLBC_MessageBlock::Read(void *buf, size_t len)
 
 int LLBC_MessageBlock::Write(const void *buf, size_t len)
 {
-    if (UNLIKELY(!buf))
+    if (len == 0)
+    {
+        return LLBC_OK;
+    }
+    else if (UNLIKELY(!buf))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    if (UNLIKELY(len == 0))
-    {
-        return LLBC_OK;
-    }
-
     if (_writePos + len > _size)
-    {
         Resize(MAX(_writePos + len, _size * 2));
-    }
 
     ASSERT((char *)(buf) + len < _buf || _buf + _size < buf);
 

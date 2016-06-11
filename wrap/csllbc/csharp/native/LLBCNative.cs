@@ -15,6 +15,7 @@ namespace llbc
     /// </summary>
     internal partial class LLBCNative
     {
+        #region Startup/Cleanup llbc library
         /// <summary>
         /// Startup the llbc library.
         /// </summary>
@@ -28,6 +29,19 @@ namespace llbc
         /// <returns></returns>
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Cleanup();
+        #endregion
+
+        # region Library some constants
+        /// <summary>
+        /// All llbc native library functions execute success return code.
+        /// </summary>
+        public const int LLBC_OK = 0;
+
+        /// <summary>
+        /// All llbc native library functions execute failed return code.
+        /// </summary>
+        public const int LLBC_FAILED = -1;
+        #endregion
 
         #region llbc core library name & native library name define
 #if !DEBUG

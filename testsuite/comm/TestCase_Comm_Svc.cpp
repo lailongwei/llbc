@@ -36,6 +36,7 @@ public:
         LLBC_PrintLine("Service destroy!");
     }
 
+public:
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
         LLBC_PrintLine("Session Create: %s", sessionInfo.ToString().c_str());
@@ -51,9 +52,15 @@ public:
         LLBC_PrintLine("Async-Conn result: %s", result.ToString().c_str());
     }
 
-    virtual void OnUnHandledPacket(int opcode)
+    virtual void OnUnHandledPacket(const LLBC_Packet &packet)
     {
-        LLBC_PrintLine("Unhandled packet, opcode: %d", opcode);
+        LLBC_PrintLine("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
+            packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
+    }
+
+    virtual void OnProtoReport(const LLBC_ProtoReport &report)
+    {
+        LLBC_PrintLine("Proto report: %s", report.ToString().c_str());
     }
 
 public:
@@ -110,7 +117,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     LLBC_IService::Type svcType = 
         LLBC_String(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
 
-    LLBC_PrintLine("Will start %s type service, service type: %s", 
+    LLBC_PrintLine("Will start %s type service, service type: %s",
         asClient ? "CLIENT" : "SERVER",
         svcType == LLBC_IService::Normal ? "Normal" : "Raw");
 
@@ -119,6 +126,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     TestFacade *facade = LLBC_New(TestFacade);
     svc->RegisterFacade(facade);
     svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);
+    svc->SuppressCoderNotFoundWarning();
     svc->Start(2);
 
     // Connect to server / Create listen session to wait client connect.

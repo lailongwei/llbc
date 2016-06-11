@@ -7,9 +7,11 @@ VERSION 1.0
 BRIEF   Auto generate all C# native code.
 """
 
-from os import path as op
 import os
+from os import path as op
+import shutil
 import re
+import md5
 
 # This script file path
 SCRIPT_PATH = op.abspath(op.dirname(__file__))
@@ -43,6 +45,7 @@ TYPE_MAP = {
     'double': 'double',
 
     'void *': 'IntPtr',
+    'char *': 'byte*',
 }
 
 
@@ -54,6 +57,8 @@ class NativeFunctionInfo(object):
 
     # C++ pointer type match regular expression
     _ptr_type_re = re.compile(r'[^\*]+\s*\*')
+    _deleg_type_re = re.compile(r'csllbc_Delegates::(.*)')
+    _char_ptr_type_re = re.compile(r'(const)?\s*char\s*\*')
 
     def __init__(self):
         self.lib_name = 'NativeLibName'
@@ -61,39 +66,56 @@ class NativeFunctionInfo(object):
         self.method_name = 'Unknown'
         self.args = []
 
+        # Format control data members
+        self.args_multiline = False
+
     @property
     def cs_ret_type(self):
         """C# return type representation"""
-        if self._ptr_type_re.match(self.ret_type):
-            return TYPE_MAP['void *']
-        else:
-            return TYPE_MAP[self.ret_type]
+        return self._convert_type(self.ret_type)
 
     @property
     def cs_args(self):
         """C# arguments type representation"""
         cs_args = []
         for arg in self.args:
-            if self._ptr_type_re.match(arg[0]):
-                cs_args.append((TYPE_MAP['void *'], arg[1]))
-            else:
-                cs_args.append(arg)
+            cs_args.append((self._convert_type(arg[0]), arg[1]))
 
         return cs_args
 
     def to_csharp_import_stmt(self):
         """Convert to C# DllImport statement"""
-        stmt = '        [DllImport({}, CallingConvention = CallingConvention.Cdecl)]\n'.format(self.lib_name)
-        stmt += '        public extern static {} {}('.format(self.cs_ret_type, self.method_name)
+        method_attrs = '        [DllImport({}, CallingConvention = CallingConvention.Cdecl)]'.format(self.lib_name)
+        method_begin = '        public extern static {} {}('.format(self.cs_ret_type, self.method_name)
+
+        stmt = method_attrs
+        stmt += '\n' + method_begin
+
+        if self.args_multiline:
+            arg_begin_pos = len(method_begin)
 
         cs_args = self.cs_args
         for i in xrange(len(cs_args)):
             if i != 0:
-                stmt += ', '
+                if self.args_multiline:
+                    stmt += ',\n' + ' ' * arg_begin_pos
+                else:
+                    stmt += ', '
             stmt += '{} {}'.format(cs_args[i][0], cs_args[i][1])
+
         return stmt + ');'
 
-
+    @classmethod
+    def _convert_type(cls, ty):
+        if cls._ptr_type_re.match(ty):
+            return TYPE_MAP['void *']
+        else:
+            deleg_m = cls._deleg_type_re.match(ty)
+            if deleg_m:
+                return deleg_m.group(1)
+            else:
+                return TYPE_MAP[ty]
+ 
 # endregion
 
 
@@ -102,14 +124,18 @@ class NativeCodeFile(object):
     """
     Native code file information, representation every C++ native code file.
     """
+    _Status_Done = 0
+    _Status_WaitMethodEnd = 1
 
-    # The C# importable C++ function match regular expression.
-    _match_re = re.compile(r'\s*LLBC_EXTERN_C\s+CSLLBC_EXPORT\s+(.+)(csllbc_[^\(]+)\s*\((.*)\)')
+    # The C# importable C++ function match regular expressions.
+    _match_method = re.compile(r'\s*LLBC_EXTERN_C\s+CSLLBC_EXPORT\s+(.+)(csllbc_[^\(]+)\s*\(([^\)\\]*)(\)?)')
+    _match_method_end = re.compile(r'\s*([^\)\\]*)\)')
 
     def __init__(self):
         self._native_header_file = ''
         self._function_infos = []
         self._csharp_code = ''
+        self._parse_status = self._Status_Done
 
     @property
     def csharp_code_file(self):
@@ -118,8 +144,10 @@ class NativeCodeFile(object):
         rel_name = op.basename(rel_path)
 
         cs_code_file = op.splitext(rel_name)[0] + u'Native.cs'
-        if cs_code_file[0:2] == u'cs':
-            cs_code_file = cs_code_file[2:]
+        if cs_code_file[0:3] == u'_cs':
+            cs_code_file = cs_code_file[3:]
+        elif cs_code_file[0] == u'_':
+            cs_code_file = cs_code_file[1:]
 
         return cs_code_file
 
@@ -150,12 +178,40 @@ class NativeCodeFile(object):
         self._end_class()
         self._end_file()
 
-        with open(self.csharp_code_path, 'wb') as f:
+        # check c# code file directory exist or not, if not exist, create it.
+        code_dir = op.dirname(self.csharp_code_path)
+        code_file = op.basename(self.csharp_code_path)
+        if not op.exists(code_dir):
+            os.makedirs(code_dir)
+
+        # write c# code to tempory file.
+        temp_code_path = op.join(code_dir, '_____' + code_file + '.temp')
+        with open(temp_code_path, 'wb') as f:
             f.write(self._csharp_code)
+
+        if not op.exists(self.csharp_code_path):
+            print 'Generated native method import c# code file: {}'.format(self.csharp_code_path)
+            shutil.move(temp_code_path, self.csharp_code_path)
+        else:
+            with open(self.csharp_code_path, 'rb') as f:
+                old_digest = md5.new(f.read()).digest()
+            new_digest = md5.new(self._csharp_code).digest()
+            if new_digest != old_digest:
+                print 'Update native method import c# code file: {}'.format(self.csharp_code_path)
+                shutil.move(temp_code_path, self.csharp_code_path)
+            else:
+                os.remove(temp_code_path)
 
     # region Internal methods
     def _parse_line(self, line):
-        m = self._match_re.match(line)
+        line = line.strip()
+        if self._parse_status == self._Status_Done:
+            self._parse_line_new(line)
+        else:
+            self._parse_line_wait_methodend(line)
+
+    def _parse_line_new(self, line):
+        m = self._match_method.match(line)
         if m is None:
             return
 
@@ -164,7 +220,26 @@ class NativeCodeFile(object):
         function_info.method_name = m.group(2)
 
         args = m.group(3).strip()
-        for arg in args.split(','):
+        self._split_args_to_store(args, function_info)
+        self._function_infos.append(function_info)
+
+        if m.group(4) == '':
+            function_info.args_multiline = True
+            self._parse_status = self._Status_WaitMethodEnd
+        else:
+            self._parse_status = self._Status_Done
+
+    def _parse_line_wait_methodend(self, line):
+        function_info = self._function_infos[-1]
+        m = self._match_method_end.match(line)
+        if m is None:
+            self._split_args_to_store(line, function_info)
+        else:
+            self._split_args_to_store(m.group(1), function_info)
+            self._parse_status = self._Status_Done
+
+    def _split_args_to_store(self, line, function_info):
+        for arg in line.split(','):
             striped_arg = arg.strip()
             if not striped_arg:
                 continue
@@ -183,7 +258,6 @@ class NativeCodeFile(object):
                 continue
 
             function_info.args.append((arg_type, arg_name))
-        self._function_infos.append(function_info)
 
     def _begin_file(self):
         a = self._append_line

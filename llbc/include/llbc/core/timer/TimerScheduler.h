@@ -83,6 +83,12 @@ public:
      */
     void SetEnabled(bool enabled);
 
+public:
+    /**
+     * Cancel all timers.
+     */
+    virtual void CancelAll();
+
 private:
     /**
      * Set friend class: LLBC_BaseTimer.
@@ -108,7 +114,6 @@ private:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Cancel(LLBC_BaseTimer *timer);
-
 
 private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_TimerScheduler);

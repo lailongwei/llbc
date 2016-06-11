@@ -50,7 +50,7 @@ int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
     return LLBC_OK;
 }
 
-int LLBC_RawProtocol::Send(void *in, void *&out)
+int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
     LLBC_MessageBlock *block = packet->GiveUp();
@@ -63,7 +63,7 @@ int LLBC_RawProtocol::Send(void *in, void *&out)
     return LLBC_OK;
 }
 
-int LLBC_RawProtocol::Recv(void *in, void *&out)
+int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
 

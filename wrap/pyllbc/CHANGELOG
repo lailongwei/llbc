@@ -2,6 +2,9 @@
 # author: Longwei Lai<lailongwei@126.com>
 ######################################################################################
 #
+# *** 2016/06/11 ***
+# 1) 配合llbc核心库作调整(详见核心库中的CHANGELOG说明):
+#
 # *** 2016/04/20 ***
 # 1) Service.removesession接口增加reason参数, 以让调用者给一个简要的字符串描述关闭此session的原因;
 # 2) Service.removesession接口增加一个strict参数, 默认为False, 用于严格关闭session, 当为true的时候, 如果session不存在, 将raise exception;

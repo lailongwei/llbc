@@ -36,12 +36,12 @@ public:
     /**
      * Encode pure virtual function, implement it to use encode packet data.
      */
-    virtual void Encode(LLBC_Packet &packet) = 0;
+    virtual bool Encode(LLBC_Packet &packet) = 0;
 
     /**
      * Decode pure virtual function, implement it to use decode packet data.
      */
-    virtual void Decode(LLBC_Packet &packet) = 0;
+    virtual bool Decode(LLBC_Packet &packet) = 0;
 };
 
 /**

@@ -398,12 +398,24 @@ public:
     /**
      * Encode packet data.
      */
-    void Encode();
+    bool Encode();
 
     /**
      * Decode packet data.
      */
-    void Decode();
+    bool Decode();
+
+    /**
+     * Get packet codec error.
+     * @return const LLBC_String & - the packet codec error.
+     */
+    const LLBC_String &GetCodecError() const;
+
+    /**
+     * Set packet codec error.
+     * @param[in] codecErr - the codec error.
+     */
+    void SetCodecError(const LLBC_String &codecErr);
 
 private:
     /**
@@ -419,7 +431,7 @@ private:
      * Raw get header part value from packet.
      * @param[in] buf    - part begin buffer.
      * @param[in] bufLen - part buffer length.
-     * @param[out] val     - the output value.
+     * @param[out] val   - the output value.
      */
     template <typename _RawTy>
     void RawGetFloatTypeHeaderPartVal(const char *buf, size_t bufLen, _RawTy &val) const;
@@ -489,6 +501,7 @@ private:
     LLBC_IDelegate1<void *> *_resultClearDeleg;
 
     LLBC_MessageBlock *_block;
+    LLBC_String *_codecError;
 };
 
 __LLBC_NS_END

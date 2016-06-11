@@ -13,114 +13,194 @@
 #include "csllbc/core/Core.h"
 
 /**
- * Create new service.
- * @param[in] svcType - the service type, see LLBC_IService::Type enumeration.
- * @return LLBC_IService * - the created service, if failed, return NULL.
+ * Predeclare some classes.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT LLBC_IService *csllbc_Service_Create(int svcType);
+class csllbc_Coder;
+class csllbc_Facade;
+class csllbc_PacketHandler;
+ 
+/**
+ * \brief The csharp wrapped service class encapsulation.
+ */
+class CSLLBC_HIDDEN csllbc_Service
+{
+    typedef csllbc_Delegates _D;
 
-/**
- * Delete service.
- * @param[in] svc - will delete service.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_Delete(LLBC_IService *svc);
+public:
+    typedef LLBC_IService::Type Type;
+    typedef LLBC_IService::DriveMode DriveMode;
 
-/**
- * Get service Id.
- * @param[in] svc - the service.
- * @return int - the service Id.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetId(LLBC_IService *svc);
-/**
- * Set service Id.
- * @param[in] svc   - the service.
- * @param[in] svcId - the service Id.
- * @return int - return 0 if success, otherwise return -1.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_SetId(LLBC_IService *svc, int svcId);
+public:
+    /**
+     * Constructor & Destructor.
+     */
+    csllbc_Service(Type type, 
+                   _D::Deleg_Service_EncodePacket encodeDeleg,
+                   _D::Deleg_Service_DecodePacket decodeDeleg,
+                   _D::Deleg_Service_PacketHandler handlerDeleg,
+                   _D::Deleg_Service_PacketPreHandler preHandlerDeleg,
+                   _D::Deleg_Service_PacketUnifyPreHandler unifyPreHandlerDeleg,
+                   _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg);
+    ~csllbc_Service();
 
-/**
- * Get service type.
- * @param[in] svc - the service.
- * @return int - the service type, see LLBC_IService::Type enumerations.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetType(LLBC_IService *svc);
+public:
+    /**
+     * Start service.
+     */
+    int Start(int pollerCount = 1);
+    /**
+     * Stop service.
+     */
+    void Stop();
+    /**
+     * Check service started or not.
+     */
+    bool IsStarted() const;
 
-/**
- * Set service drive mode.
- * @param[in] svc       - the service.
- * @param[in] deiveMode - the service drive mode, see LLBC_IService::DriveMode enumerations.
- * @return int - return 0 if success, otherwise return -1.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int SetDriveMode(int driveMode);
+public:
+    /**
+     * Get service type.
+     */
+    Type GetType() const;
 
-/**
- * Startup service.
- * @param[in] svc         - the service.
- * @param[in] pollerCount - the worker poller thread count.
- * @param[in] int - return 0 if success, otherwise return -1.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Start(LLBC_IService *svc, int pollerCount);
+    /**
+     * Get service Id.
+     */
+    int GetId() const;
 
-/**
- * Stop service.
- * @param[in] svc - the service.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_Stop(LLBC_IService *svc);
+    /**
+     * Get service FPS.
+     */
+    int GetFPS() const;
+    /**
+     * Set service FPS.
+     */
+    int SetFPS(int fps);
+    /**
+     * Get service frame interval.
+     */
+    int GetFrameInterval() const;
 
-/**
- * Check service is started or not.
- * @param[in] svc - the service.
- * @return bool - return ture if service started, otherwise return false.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT bool csllbc_Service_IsStarted(LLBC_IService *svc);
+public:
+    /**
+     * Get service drive mode.
+     */
+    DriveMode GetDriveMode() const;
+    /**
+     * Set service drive mode.
+     */
+    int SetDriveMode(DriveMode mode);
 
-/**
- * Get service FPS.
- * @param[in] svc - the service.
- * @return int - the service FPS.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetFPS(LLBC_IService *svc);
+public:
+    /**
+     * Get the csharp layer packet encode delegage.
+     */
+    _D::Deleg_Service_EncodePacket GetEncodePacketDeleg() const;
 
-/**
- * Set service FPS.
- * @param[in] svc - the service.
- * @param[in] fps - the new FPS.
- * @return int - return 0 if success, otherwise return -1.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_SetFPS(LLBC_IService *svc, int fps);
+public:
+    /**
+     * Create a new listen session in ip:port.
+     */
+    int Listen(const char *ip, uint16 port);
+    /**
+     * Create new session to connect to specified remote endpoint.
+     */
+    int Connect(const char *ip, uint16 port);
+    /**
+     * Create new session to asynchronous connect to specified remote endpoint.
+     */
+    int AsyncConn(const char *ip, uint16 port);
 
-/**
- * Get service frame interval, in milliseconds.
- * @param[in] svc - the service.
- * @return int - the service frame interval.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetFrameInterval(LLBC_IService *svc);
+    /**
+     * Check given session Id is validate or not.
+     */
+    bool IsSessionValidate(int sessionId);
 
-/**
- * Create a session and listening.
- * @param[in] ip   - the ip address.
- * @param[in] port - the port number.
- * @return int - the new session Id, if return 0, means failed.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Listen(LLBC_IService *svc, const char *ip, int port);
+    /**
+     * Remove specific session.
+     */
+    int RemoveSession(int sessionId, const char *reason = NULL);
 
-/**
- * Establishes a connection to a specified address.
- * @param[in] svc  - the service.
- * @param[in] ip   - the ip address.
- * @param[in] port - the port number.
- * @return int - the session Id, if failed, return 0.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Connect(LLBC_IService *svc, const char *ip, int port);
+public:
+    /**
+     * Send data.
+     */
+    int Send(int sessionId, int opcode, csllbc_Coder *coder, int status = 0);
+    int Send(int sessionId, int opcode, const void *bytes, size_t len, int status = 0);
+    /**
+     * Multicast data.
+     */
+    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status = 0);
+    /**
+     * Broadcast data.
+     */
+    int Broadcast(int opcode, const void *bytes, size_t len, int status = 0);
 
-/**
- * Asynchronous establishes a connection to a specified address.
- * @param[in] svc  - the service.
- * @param[in] ip   - the ip address.
- * @param[in] port - the port number.
- * @return int - return 0 if post success, otherwise return -1.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_AsyncConn(LLBC_IService *svc, const char *ip, int port);
+public:
+    /**
+     * Register csharp layer facades.
+     */
+    int RegisterFacade(csllbc_Facade *facade);
+
+    /**
+     * Register csharp layer coder.
+     */
+    int RegisterCoder(int opcode);
+
+    /**
+     * Subscribe/PreSubscribe/Unify-PreSubscribe specific opcode's packet.
+     */
+    int Subscribe(int opcode);
+    int PreSubscribe(int opcode);
+    int UnifyPreSubscribe();
+
+public:
+    /**
+     * per-frame service method, call when drivemove == ExternalDrive.
+     */
+    void OnSvc(bool fullFrame);
+
+public:
+    /**
+     * \brief The packet decode embedded class encapsulation.
+     */
+    struct PacketDecodeDelegates
+    {
+        _D::Deleg_Service_DecodePacket decodeDeleg;
+        _D::Deleg_Service_PacketHandler handlerDeleg;
+        _D::Deleg_Service_PacketPreHandler preHandlerDeleg;
+        _D::Deleg_Service_PacketUnifyPreHandler unifyPreHandlerDeleg;
+    };
+
+    /**
+     * Add csharp layer all packet decode delegates.
+     * @param[in] svcId     - the service Id.
+     * @param[in] delegates - the csharp layer all packet decode delegates.
+     */
+    static void AddPacketDecodeDelegates(int svcId, PacketDecodeDelegates *delegates);
+
+    /**
+     * Get all csharp layer packet decode delegates.
+     * @param[in] svcId - the service Id.
+     * @return PacketDecodeDelegates - the all csharp layer packet decode delegates.
+     */
+    static PacketDecodeDelegates *GetPacketDecodeDelegates(int svcId);
+
+    /**
+     * Remove all csharp layer packet decode delegates.
+     * @param[in] svcId - the service Id.
+     */
+    static void RemovePacketDecodeDelegates(int svcId);
+
+private:
+    LLBC_IService *_llbcSvc;
+    static int _maxSvcId;
+    csllbc_PacketHandler *_packetHandler;
+
+    static LLBC_SpinLock _packetDelegatesLock;
+    _D::Deleg_Service_EncodePacket _packetEncodeDeleg;
+    typedef std::map<int, PacketDecodeDelegates *> _PacketDecodeDelegs;
+    static _PacketDecodeDelegs _packetDecodeDelegs;
+};
 
 #endif // !__CSLLBC_COMM_CSSERVICE_H__

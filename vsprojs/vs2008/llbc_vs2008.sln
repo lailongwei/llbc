@@ -14,6 +14,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyllbc", "pyllbc.vcproj", "
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csllbc", "csllbc", "{2558B31F-C1E7-4FB4-8868-DBCCED3F71FE}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\wrap\csllbc\CHANGELOG = ..\..\wrap\csllbc\CHANGELOG
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csllbc_native", "csllbc_native.vcproj", "{F2B48447-339D-497F-8E80-D3EF9B79D858}"
 	ProjectSection(ProjectDependencies) = postProject

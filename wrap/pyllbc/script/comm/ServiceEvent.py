@@ -18,6 +18,7 @@ class pyllbcServiceEvent(object):
         self._peer_port = None
         self._islisten = None
         self._socket = None
+        self._packet = None
         self._report_layer = None
         self._report_level = None
         self._report_msg = None
@@ -104,6 +105,13 @@ class pyllbcServiceEvent(object):
         return self._socket
 
     @property
+    def packet(self):
+        """
+        Packet - packet object.
+        """
+        return self._packet
+
+    @property
     def report_layer(self):
         """
         int - report layer.
@@ -170,6 +178,8 @@ class pyllbcServiceEvent(object):
             s += ', islisten: {}'.format(self._islisten)
         if self._socket is not None:
             s += ', socket: {}'.format(self._socket)
+        if self._packet is not None:
+            s += ', packet: [{}]'.format(self._packet)
         if self._report_layer is not None:
             s += ', report_layer: {}'.format(llbc.Protocol.layer2str(self._report_layer))
         if self._report_level is not None:

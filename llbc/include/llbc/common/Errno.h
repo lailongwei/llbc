@@ -29,7 +29,7 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 //  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 // +---+-+-----------------+-------+-------------------------------+
-// |Sev|C|    Reserved     |  Type  |         Errno no              |
+// |Sev|C|    Reserved       Type  |         Errno no              |
 // +---+-+-----------------+-------+-------------------------------+
 // 
 // Where
@@ -424,6 +424,76 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 #define __LLBC_ERROR_REPEAT      ((int)(0x0000001d))
 #define LLBC_ERROR_REPEAT        ((int)(0xc000001d))
+
+//
+// Message Id: LLBC_ERROR_ENCODE
+//
+// MessageText:
+//
+// encode error.
+//
+#define __LLBC_ERROR_ENCODE      ((int)(0x0000001e))
+#define LLBC_ERROR_ENCODE        ((int)(0xc000001e))
+
+//
+// Message Id: LLBC_ERROR_DECODE
+//
+// MessageText:
+//
+// decode error.
+//
+#define __LLBC_ERROR_DECODE      ((int)(0x0000001f))
+#define LLBC_ERROR_DECODE        ((int)(0xc000001f))
+
+//
+// Message Id: LLBC_ERROR_COMPRESS
+//
+// MessageText:
+//
+// compress error.
+//
+#define __LLBC_ERROR_COMPRESS    ((int)(0x00000020))
+#define LLBC_ERROR_COMPRESS      ((int)(0xc0000020))
+
+//
+// Message Id: LLBC_ERROR_DECOMPRESS
+//
+// MessageText:
+//
+// decompress error.
+//
+#define __LLBC_ERROR_DECOMPRESS  ((int)(0x00000021))
+#define LLBC_ERROR_DECOMPRESS    ((int)(0xc0000021))
+
+//
+// Message Id: LLBC_ERROR_PACK
+//
+// MessageText:
+//
+// pack error.
+//
+#define __LLBC_ERROR_PACK        ((int)(0x00000022))
+#define LLBC_ERROR_PACK          ((int)(0xc0000022))
+
+//
+// Message Id: LLBC_ERROR_UNPACK
+//
+// MessageText:
+//
+// unpack error.
+//
+#define __LLBC_ERROR_UNPACK      ((int)(0x00000023))
+#define LLBC_ERROR_UNPACK        ((int)(0xc0000023))
+
+//
+// Message Id: LLBC_ERROR_NOT_ALLOW
+//
+// MessageText:
+//
+// not allow.
+//
+#define __LLBC_ERROR_NOT_ALLOW   ((int)(0x00000024))
+#define LLBC_ERROR_NOT_ALLOW     ((int)(0xc0000024))
 
 //
 //!! Sentinel error no.

@@ -14,6 +14,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csllbc", "csllbc.csproj", "
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csllbc", "csllbc", "{4502F6F5-B100-4896-BB5A-C46629621358}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\wrap\csllbc\CHANGELOG = ..\..\wrap\csllbc\CHANGELOG
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csllbc_native", "csllbc_native.vcxproj", "{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -84,6 +87,7 @@ Global
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|Mixed Platforms.Build.0 = Release|Any CPU
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Debug|x64.Build.0 = Debug|Any CPU
@@ -95,6 +99,7 @@ Global
 		{C8EFB088-481E-4B21-8F5F-FFA76CE47739}.Release|x64.ActiveCfg = Release|Any CPU
 		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|Mixed Platforms.ActiveCfg = Release|Win32
+		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|Mixed Platforms.Build.0 = Release|Win32
 		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|Win32.Build.0 = Debug|Win32
 		{C8563AC4-19A4-4D9C-B24E-6249126A8EA9}.Debug|x64.ActiveCfg = Debug|Win32
@@ -109,6 +114,7 @@ Global
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|Mixed Platforms.Build.0 = Release|Any CPU
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{9FEC27E9-1BEB-45D1-BCB4-2A4BAB475EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU

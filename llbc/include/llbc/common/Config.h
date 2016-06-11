@@ -11,10 +11,6 @@
 
 #include "llbc/common/PFConfig.h"
 
-// The library debug macro define, if enabled this option, library will working in 
-// LIB_DEBUG mode(it means the performance will be affected and has a lot of debug output.
-#define LLBC_LIB_DEBUG                                      1
-
 /**
  * \brief OS about config options define.
  */
@@ -73,21 +69,21 @@
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
 // Default log asynchronous mode is set to false.
-#define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     false
+#define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     0
 // Default is log to console.
-#define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 true
+#define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN            "%T [%N][%L] - %m%n"
 // Default console colourful output enabled flag.
-# define LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT      true
+# define LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT      1
 // Default is not log to file.
-#define LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE                    false
+#define LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE                    0
 // Default log file name.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME                  "llbc.log"
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default is daily rolling mode.
-#define LLBC_CFG_LOG_DEFAULT_DAILY_MODE                     true
+#define LLBC_CFG_LOG_DEFAULT_DAILY_MODE                     1
 // Default max log file size.
 #define LLBC_CFG_LOG_MAX_FILE_SIZE                          (LONG_MAX)
 // Default max backup file index.
@@ -100,6 +96,12 @@
 #define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 1000
 // Default log using mode.
 #define LLBC_CFG_LOG_USING_WITH_STREAM                      1
+
+/**
+ * \brief core/timer about configs.
+ */
+// strict timer schedule mode.
+#define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
 
 /**
  * \brief ObjBase about configs.

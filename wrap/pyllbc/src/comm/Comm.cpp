@@ -132,6 +132,7 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.GetServiceFPS);
     inlMod->AddMethod(methods.SetServiceFPS);
     inlMod->AddMethod(methods.GetServiceFrameInterval);
+    inlMod->AddMethod(methods.SuppressServiceCoderNotFoundWarning);
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);
     inlMod->AddMethod(methods.RegisterFacade);

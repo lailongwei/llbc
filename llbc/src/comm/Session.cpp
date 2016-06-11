@@ -170,13 +170,14 @@ void LLBC_Session::SetPoller(LLBC_BasePoller *poller)
 
 int LLBC_Session::Send(LLBC_Packet *packet)
 {
+    bool removeSession;
     LLBC_MessageBlock *block;
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Send(packet, block) != LLBC_OK)
+    if (_protoStack->Send(packet, block, removeSession) != LLBC_OK)
 #else
-    if (_protoStack->SendRaw(packet, block) != LLBC_OK)
+    if (_protoStack->SendRaw(packet, block, removeSession) != LLBC_OK)
 #endif
-        return LLBC_FAILED;
+        return removeSession ? LLBC_FAILED : LLBC_OK;
 
     return Send(block);
 }
@@ -256,14 +257,17 @@ void LLBC_Session::OnSent(size_t len)
 
 bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 {
+    bool removeSession;
     std::vector<LLBC_Packet *> packets;
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Recv(block, packets) != LLBC_OK)
+    if (_protoStack->Recv(block, packets, removeSession) != LLBC_OK)
 #else
-    if (_protoStack->RecvRaw(block, packets) != LLBC_OK)
+    if (_protoStack->RecvRaw(block, packets, removeSession) != LLBC_OK)
 #endif
     {
-        OnClose();
+        if (removeSession)
+            OnClose();
+
         return false;
     }
 

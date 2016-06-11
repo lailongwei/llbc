@@ -17,14 +17,16 @@ struct TestData : public LLBC_ICoder
     int iVal;
     LLBC_String strVal;
 
-    virtual void Encode(LLBC_Packet &packet)
+    virtual bool Encode(LLBC_Packet &packet)
     {
         packet <<iVal <<strVal;
+        return true;
     }
 
-    virtual void Decode(LLBC_Packet &packet)
+    virtual bool Decode(LLBC_Packet &packet)
     {
         packet >>iVal >>strVal;
+        return true;
     }
 };
 
@@ -50,6 +52,17 @@ public:
         LLBC_PrintLine("Service Destroy");
     }
 
+    virtual void OnStart()
+    {
+        LLBC_PrintLine("Service start");
+    }
+
+    virtual void OnStop()
+    {
+        LLBC_PrintLine("Service stop");
+    }
+
+public:
     virtual void OnUpdate()
     {
         int fps = LLBC_Random::RandInt32cmon(20, 60);

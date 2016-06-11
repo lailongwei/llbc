@@ -59,6 +59,7 @@ LLBC_Service::LLBC_Service(This::Type type)
 : _type(type)
 , _id(0)
 , _driveMode(This::SelfDrive)
+, _suppressedCoderNotFoundWarning(false)
 
 , _started(false)
 , _stopping(false)
@@ -126,6 +127,7 @@ LLBC_Service::LLBC_Service(This::Type type)
 
     // Create protocol stack.
 #if !LLBC_CFG_COMM_USE_FULL_STACK
+    _stack.SetService(this);
     CreateCodecStack(&_stack);
 #endif
 }
@@ -139,7 +141,7 @@ LLBC_Service::~LLBC_Service()
 {
     Stop();
 
-    LLBC_STLHelper::DeleteContainer(_facades);
+    DestroyFacades();
     LLBC_STLHelper::DeleteContainer(_coders);
     LLBC_STLHelper::DeleteContainer(_handlers);
     LLBC_STLHelper::DeleteContainer(_preHandlers);
@@ -201,6 +203,11 @@ This::Type LLBC_Service::GetType() const
     return _type;
 }
 
+This::DriveMode LLBC_Service::GetDriveMode() const
+{
+    return _driveMode;
+}
+
 int LLBC_Service::SetDriveMode(This::DriveMode mode)
 {
     if (mode != This::SelfDrive && mode != This::ExternalDrive)
@@ -225,6 +232,22 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
         GetTimerScheduler();
 
     return LLBC_FAILED;
+}
+
+int LLBC_Service::SuppressCoderNotFoundWarning()
+{
+    LLBC_Guard guard(_lock);
+    if (_started)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INITED);
+        return LLBC_FAILED;
+    }
+
+    _suppressedCoderNotFoundWarning = true;
+#if !LLBC_CFG_COMM_USE_FULL_STACK
+    _stack.SetIsSuppressedCoderNotFoundWarning(true);
+#endif
+    return LLBC_OK;
 }
 
 int LLBC_Service::Start(int pollerCount)
@@ -279,7 +302,10 @@ int LLBC_Service::Start(int pollerCount)
     _started = true;
 
     if (_driveMode == This::ExternalDrive)
+    {
         InitFacades();
+        StartFacades();
+    }
 
     return LLBC_OK;
 }
@@ -297,23 +323,26 @@ void LLBC_Service::Stop()
         return;
 
     _stopping = true;
-    if (_driveMode == This::SelfDrive)
-        while (_started)
-            LLBC_ThreadManager::Sleep(20);
-    else
+    if (_driveMode == This::SelfDrive) // Stop self-drive service.
     {
-        if (_sinkIntoLoop)
+        // TODO: How to stop sink into loop service???
+        // if (_sinkIntoLoop) // Service sink into loop, direct return.
+        //     return;
+
+        while (_started) // Service not sink into loop, wait service stop(LLBC_Task mechanism will ensure Cleanup method called).
+            LLBC_ThreadManager::Sleep(20);
+    }
+    else // Stop external-drive service.
+    {
+        if (_sinkIntoLoop) // Service sink into loop, set afterStop flag to true, and return.
         {
-            _afterStop = true;
+            _afterStop = true; //! After stop datamember only use external-drive service.
             return;
         }
-        else
-        {
-            Cleanup();
-        }
-    }
 
-    _stopping = false;
+        // Service not sink into loop, direct cleanup.
+        Cleanup();
+    }
 }
 
 int LLBC_Service::GetFPS() const
@@ -350,7 +379,15 @@ int LLBC_Service::GetFrameInterval() const
 int LLBC_Service::Listen(const char *ip, uint16 port)
 {
     LLBC_Guard guard(_lock);
-    return _pollerMgr.Listen(ip, port);
+    const int sessionId = _pollerMgr.Listen(ip, port);
+    if (sessionId != 0)
+    {
+        _connectedSessionIdsLock.Lock();
+        _connectedSessionIds.insert(sessionId);
+        _connectedSessionIdsLock.Unlock();
+    }
+
+    return sessionId;
 }
 
 int LLBC_Service::Connect(const char *ip, uint16 port)
@@ -371,6 +408,19 @@ int LLBC_Service::AsyncConn(const char *ip, uint16 port)
 {
     LLBC_Guard guard(_lock);
     return _pollerMgr.AsyncConn(ip, port);
+}
+
+bool LLBC_Service::IsSessionValidate(int sessionId)
+{
+    if (UNLIKELY(sessionId == 0))
+        return false;
+
+    _connectedSessionIdsLock.Lock();
+    const bool valid = 
+        _connectedSessionIds.find(sessionId) != _connectedSessionIds.end();
+    _connectedSessionIdsLock.Unlock();
+
+    return valid;
 }
 
 int LLBC_Service::Send(LLBC_Packet *packet)
@@ -786,6 +836,11 @@ int LLBC_Service::EnableTimerScheduler()
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
+    else if (_driveMode != ExternalDrive)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
 
     _timerScheduler->SetEnabled(true);
     return LLBC_OK;
@@ -797,6 +852,11 @@ int LLBC_Service::DisableTimerScheduler()
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+    else if (_driveMode != ExternalDrive)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
 
@@ -881,6 +941,14 @@ int LLBC_Service::Post(LLBC_IDelegate1<LLBC_Service::Base *> *deleg)
 
 void LLBC_Service::OnSvc(bool fullFrame)
 {
+    if (UNLIKELY(!_started))
+    {
+        if (fullFrame)
+            LLBC_Sleep(_frameInterval);
+
+        return;
+    }
+
     _sinkIntoLoop = true;
 
     // Record begin heartbeat time.
@@ -893,7 +961,7 @@ void LLBC_Service::OnSvc(bool fullFrame)
     // Process queued events.
     HandleQueuedEvents();
 
-    // Update all compoments.
+    // Update all components.
     UpdateFacades();
     UpdateTimers();
     UpdateAutoReleasePool();
@@ -914,11 +982,8 @@ void LLBC_Service::OnSvc(bool fullFrame)
     }
 
     _sinkIntoLoop = false;
-    if (_afterStop)
-    {
+    if (UNLIKELY(_afterStop))
         Cleanup();
-        _stopping = false;
-    }
 }
 
 LLBC_ProtocolStack *LLBC_Service::CreateRawStack(LLBC_ProtocolStack *stack)
@@ -948,6 +1013,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(LLBC_ProtocolStack *stack)
     {
         stack = LLBC_New1(_Stack, _Stack::CodecStack);
         stack->SetService(this);
+        stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
     }
 
     if (_type != This::Raw)
@@ -966,6 +1032,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack()
 {
     _Stack *stack = LLBC_New1(_Stack, _Stack::FullStack);
     stack->SetService(this);
+    stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
 
     return CreateRawStack(
             CreateCodecStack(stack));
@@ -981,6 +1048,7 @@ void LLBC_Service::Svc()
     GetTimerScheduler();
     CreateAutoReleasePool();
     InitFacades();
+    StartFacades();
     _lock.Unlock();
 
     _svcMgr.OnServiceStart(this);
@@ -991,24 +1059,38 @@ void LLBC_Service::Svc()
 
 void LLBC_Service::Cleanup()
 {
+    // Stop poller manager.
     _pollerMgr.Stop();
 
-    LLBC_MessageBlock *block;
-    while (TryPop(block) == LLBC_OK)
-        LLBC_SvcEvUtil::DestroyEvBlock(block);
+    // If drivemode is external-drive, cancel all timers first.
+    if (_driveMode == This::ExternalDrive)
+        _timerScheduler->CancelAll();
 
+    // Cleanup connected-sessionIds set.
     _connectedSessionIdsLock.Lock();
     _connectedSessionIds.clear();
     _connectedSessionIdsLock.Unlock();
 
-    DestroyFacades();
+    // Stop facades, destroy release-pool, and remove service from TLS.
+    StopFacades();
     DestroyAutoReleasePool();
     RemoveServiceFromTls();
 
-    if (_driveMode == This::SelfDrive)
-        _svcMgr.OnServiceStop(this);
+    // Popup & Destroy all not-process events.
+    LLBC_MessageBlock *block;
+    while (TryPop(block) == LLBC_OK)
+        LLBC_SvcEvUtil::DestroyEvBlock(block);
 
+    // If is self-drive servie, notify service manager self stopped.
+    if (_driveMode == This::SelfDrive)
+    {
+        _timerScheduler = NULL;
+        _svcMgr.OnServiceStop(this);
+    }
+
+    // Reset some variables.
     _started = false;
+    _stopping = false;
 }
 
 void LLBC_Service::AddServiceToTls()
@@ -1176,9 +1258,12 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     ev.packet = NULL;
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
-    if (UNLIKELY(_stack.RecvCodec(packet, packet) != LLBC_OK))
+    bool removeSession;
+    if (UNLIKELY(_stack.RecvCodec(packet, packet, removeSession) != LLBC_OK))
     {
-        RemoveSession(sessionId);
+        if (removeSession)
+            RemoveSession(sessionId);
+
         return;
     }
 #endif
@@ -1187,7 +1272,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     LLBC_InvokeGuard delPacketGuard(&LLBC_INL_NS __DeletePacket, packet);
 
     const int opcode = packet->GetOpcode();
-	
+
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
     const int status = packet->GetStatus();
     if (status != 0)
@@ -1221,10 +1306,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         if (preIt != _preHandlers.end())
         {
             if (!preIt->second->Invoke(*packet))
-            {
-                RemoveSession(sessionId);
                 return;
-            }
 
             preHandled = true;
         }
@@ -1234,10 +1316,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     if (!preHandled && _unifyPreHandler)
     {
         if (!_unifyPreHandler->Invoke(*packet))
-        {
-            RemoveSession(sessionId);
             return;
-        }
     }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
@@ -1251,7 +1330,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         for (_Facades::iterator facadeIt = _facades.begin();
              facadeIt != _facades.end();
              facadeIt++)
-            (*facadeIt)->OnUnHandledPacket(packet->GetOpcode());
+            (*facadeIt)->OnUnHandledPacket(*packet);
     }
 }
 
@@ -1262,6 +1341,7 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
 
     LLBC_ProtoReport report;
     report.SetSessionId(ev.sessionId);
+    report.SetOpcode(ev.opcode);
     report.SetLayer(ev.layer);
     report.SetLevel(ev.level);
     report.SetReport(ev.report);
@@ -1306,7 +1386,30 @@ void LLBC_Service::InitFacades()
     for (_Facades::iterator it = _facades.begin();
          it != _facades.end();
          it++)
-        (*it)->OnInitialize();
+    {
+        LLBC_IFacade *facade = (*it);
+        if (facade->_inited)
+            continue;
+
+        facade->OnInitialize();
+        facade->_inited = true;
+    }
+}
+
+void LLBC_Service::StartFacades()
+{
+    for (_Facades::iterator it = _facades.begin();
+         it != _facades.end();
+         it++)
+        (*it)->OnStart();
+}
+
+void LLBC_Service::StopFacades()
+{
+    for (_Facades::reverse_iterator it = _facades.rbegin();
+         it != _facades.rend();
+         it++)
+        (*it)->OnStop();
 }
 
 void LLBC_Service::UpdateFacades()
@@ -1322,7 +1425,13 @@ void LLBC_Service::DestroyFacades()
     for (_Facades::reverse_iterator it = _facades.rbegin();
          it != _facades.rend();
          it++)
-        (*it)->OnDestroy();
+    {
+        LLBC_IFacade *facade = *it;
+        if (facade->_inited)
+            facade->OnDestroy();
+    }
+
+    LLBC_STLHelper::DeleteContainer(_facades, true, true);
 }
 
 void LLBC_Service::CreateAutoReleasePool()
@@ -1415,9 +1524,13 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     }
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
+    bool removeSession;
     LLBC_Packet *encoded;
-    if (_stack.SendCodec(packet, encoded) != LLBC_OK)
+    if (_stack.SendCodec(packet, encoded, removeSession) != LLBC_OK)
     {
+        if (removeSession)
+            RemoveSession(sessionId, LLBC_FormatLastError());
+
         if (lock)
             _lock.Unlock();
 
@@ -1472,6 +1585,14 @@ int LLBC_Service::MulticastSendCoder(int svcId,
                                      const LLBC_PacketHeaderParts *parts,
                                      bool validCheck)
 {
+    if (sessionIds.empty())
+    {
+        if(LIKELY(coder))
+            LLBC_Delete(coder);
+
+        return LLBC_OK;
+    }
+
     LLBC_Guard guard(_lock);
     if (UNLIKELY(!_started))
     {
@@ -1480,14 +1601,6 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
-    }
-
-    if (sessionIds.empty())
-    {
-        if(LIKELY(coder))
-            LLBC_Delete(coder);
-
-        return LLBC_OK;
     }
 
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
@@ -1500,7 +1613,12 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     bool hasCoder = true;
     if (LIKELY(coder))
     {
-        coder->Encode(*firstPacket);
+        if (!coder->Encode(*firstPacket))
+        {
+            LLBC_SetLastError(LLBC_ERROR_ENCODE);
+            return LLBC_FAILED;
+        }
+
         LLBC_Delete(coder);
     }
     else

@@ -15,7 +15,7 @@ namespace llbc
 {
 
     /// <summary>
-    /// Wrap common/Errors.h file defined c functions
+    /// Wrap common/_Errors.h file defined c functions
     /// </summary>
     internal partial class LLBCNative
     {

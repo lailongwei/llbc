@@ -86,6 +86,7 @@ LLBC_SvcEv_DataArrival::~LLBC_SvcEv_DataArrival()
 LLBC_SvcEv_ProtoReport::LLBC_SvcEv_ProtoReport()
 : Base(_EvType::ProtoReport)
 , sessionId(0)
+, opcode(0)
 
 , layer(LLBC_ProtocolLayer::End)
 , level(LLBC_ProtoReportLevel::Error)
@@ -196,6 +197,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildDataArrivalEv(LLBC_Packet *packet)
 }
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
+                                                      int opcode,
                                                       int layer,
                                                       int level,
                                                       const LLBC_String &report)
@@ -204,6 +206,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
 
     _Ev *ev = LLBC_New(_Ev);
     ev->sessionId = sessionId;
+    ev->opcode = opcode;
     ev->layer = layer;
     ev->level = level;
     ev->report.append(report);

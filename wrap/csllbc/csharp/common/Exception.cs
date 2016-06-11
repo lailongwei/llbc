@@ -24,5 +24,10 @@ namespace llbc
         : base(message)
         {
         }
+
+        public LLBCException(string messageFmt, params object[] args)
+        : base(string.Format(messageFmt, args))
+        {
+        }
     }
 }

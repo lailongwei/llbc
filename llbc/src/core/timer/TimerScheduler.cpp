@@ -93,9 +93,7 @@ void LLBC_TimerScheduler::Update()
     while (_heap.FindTop(data) == LLBC_OK)
     {
         if (now < data->handle)
-        {
             break;
-        }
 
         _heap.DeleteTop();
 
@@ -110,8 +108,10 @@ void LLBC_TimerScheduler::Update()
         data->timer->SetScheduling(false);
 
         bool reSchedule = false;
+#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         uint64 pseudoNow = now;
         while (pseudoNow >= data->handle)
+#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         {
             ++ data->repeatTimes;
             if (!(reSchedule = data->timer->OnTimeout()))
@@ -126,10 +126,12 @@ void LLBC_TimerScheduler::Update()
             if (data->period == 0)
                 break;
 
+#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
             if (UNLIKELY(pseudoNow < data->period))
                 break;
 
             pseudoNow -= data->period;
+#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         }
 
         if (reSchedule)
@@ -194,7 +196,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
         return LLBC_FAILED;
     }
 
-    LLBC_TimerData *&data = iter->second;
+    LLBC_TimerData *data = iter->second;
     ASSERT(data->timer == timer && 
         "Timer manager internal error, LLBC_TimerData::timer != argument: timer!");
 
@@ -205,6 +207,35 @@ int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
     data->timer->OnCancel();
 
     return LLBC_OK;
+}
+
+void LLBC_TimerScheduler::CancelAll()
+{
+    if (_destroyed)
+        return;
+
+    std::vector<LLBC_TimerId> timerIds;
+    for (_IdxMap::iterator iter = _idxMap.begin();
+         iter != _idxMap.end();
+         iter++)
+    {
+        LLBC_TimerData *data = iter->second;
+        if (data->validate)
+            timerIds.push_back(data->timerId);
+    }
+
+    for (size_t i = 0; i < timerIds.size(); i++)
+    {
+        _IdxMap::iterator iter = _idxMap.find(timerIds[i]);
+        if (iter != _idxMap.end())
+        {
+            LLBC_TimerData *data = iter->second;
+            if (UNLIKELY(!data->validate))
+                return;
+
+            data->timer->Cancel();
+        }
+    }
 }
 
 __LLBC_NS_END

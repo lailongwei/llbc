@@ -219,6 +219,7 @@ LLBC_String LLBC_AsyncConnResult::ToString() const
 
 LLBC_ProtoReport::LLBC_ProtoReport()
 : _sessionId(0)
+, _opcode(0)
 
 , _layer(0)
 , _level(0)
@@ -238,6 +239,16 @@ int LLBC_ProtoReport::GetSessionId() const
 void LLBC_ProtoReport::SetSessionId(int sessionId)
 {
     _sessionId = sessionId;
+}
+
+int LLBC_ProtoReport::GetOpcode() const
+{
+    return _opcode;
+}
+
+void LLBC_ProtoReport::SetOpcode(int opcode)
+{
+    _opcode = opcode;
 }
 
 int LLBC_ProtoReport::GetLayer() const
@@ -275,6 +286,7 @@ LLBC_String LLBC_ProtoReport::ToString() const
 {
     LLBC_String repr;
     repr.append_format("sessionId:%d, ", _sessionId)
+        .append_format("opcode:%d, ", _opcode)
         .append_format("layer:%s, ", LLBC_ProtocolLayer::Layer2Str(_layer).c_str())
         .append_format("level:%s, ", LLBC_ProtoReportLevel::Level2Str(_level).c_str())
         .append_format("report:%s", _report.c_str());
@@ -283,7 +295,8 @@ LLBC_String LLBC_ProtoReport::ToString() const
 }
 
 LLBC_IFacade::LLBC_IFacade()
-: _svc(NULL)
+: _inited(false)
+, _svc(NULL)
 {
 }
 
@@ -301,6 +314,14 @@ void LLBC_IFacade::OnInitialize()
 }
 
 void LLBC_IFacade::OnDestroy()
+{
+}
+
+void LLBC_IFacade::OnStart()
+{
+}
+
+void LLBC_IFacade::OnStop()
 {
 }
 
@@ -328,7 +349,7 @@ void LLBC_IFacade::OnProtoReport(const LLBC_ProtoReport &report)
 {
 }
 
-void LLBC_IFacade::OnUnHandledPacket(int opcode)
+void LLBC_IFacade::OnUnHandledPacket(const LLBC_Packet &packet)
 {
 }
 

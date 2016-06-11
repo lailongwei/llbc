@@ -104,6 +104,10 @@ public:
         Packet_SetHeaderPartAsUInt32.ml_meth = (PyCFunction)_pyllbc_Packet_SetHeaderPartAsUInt32;
         Packet_SetHeaderPartAsUInt32.ml_flags = METH_VARARGS;
         Packet_SetHeaderPartAsUInt32.ml_doc = "pyllbc library method/function";
+        SetPacketHeaderDesc.ml_name = "SetPacketHeaderDesc";
+        SetPacketHeaderDesc.ml_meth = (PyCFunction)_pyllbc_SetPacketHeaderDesc;
+        SetPacketHeaderDesc.ml_flags = METH_VARARGS;
+        SetPacketHeaderDesc.ml_doc = "pyllbc library method/function";
         PacketHeaderPartDesc_IsFlagsPart.ml_name = "PacketHeaderPartDesc_IsFlagsPart";
         PacketHeaderPartDesc_IsFlagsPart.ml_meth = (PyCFunction)_pyllbc_PacketHeaderPartDesc_IsFlagsPart;
         PacketHeaderPartDesc_IsFlagsPart.ml_flags = METH_VARARGS;
@@ -216,10 +220,10 @@ public:
         PacketHeaderPartDesc_IsValid.ml_meth = (PyCFunction)_pyllbc_PacketHeaderPartDesc_IsValid;
         PacketHeaderPartDesc_IsValid.ml_flags = METH_VARARGS;
         PacketHeaderPartDesc_IsValid.ml_doc = "pyllbc library method/function";
-        SetPacketHeaderDesc.ml_name = "SetPacketHeaderDesc";
-        SetPacketHeaderDesc.ml_meth = (PyCFunction)_pyllbc_SetPacketHeaderDesc;
-        SetPacketHeaderDesc.ml_flags = METH_VARARGS;
-        SetPacketHeaderDesc.ml_doc = "pyllbc library method/function";
+        SuppressServiceCoderNotFoundWarning.ml_name = "SuppressServiceCoderNotFoundWarning";
+        SuppressServiceCoderNotFoundWarning.ml_meth = (PyCFunction)_pyllbc_SuppressServiceCoderNotFoundWarning;
+        SuppressServiceCoderNotFoundWarning.ml_flags = METH_VARARGS;
+        SuppressServiceCoderNotFoundWarning.ml_doc = "pyllbc library method/function";
         PyTimerUpdateAllTimers.ml_name = "PyTimerUpdateAllTimers";
         PyTimerUpdateAllTimers.ml_meth = (PyCFunction)_pyllbc_PyTimerUpdateAllTimers;
         PyTimerUpdateAllTimers.ml_flags = METH_VARARGS;
@@ -491,6 +495,7 @@ public:
     ::PyMethodDef PacketHeaderPartDesc_New;
     ::PyMethodDef ClearHookedErrors;
     ::PyMethodDef Packet_SetHeaderPartAsUInt32;
+    ::PyMethodDef SetPacketHeaderDesc;
     ::PyMethodDef PacketHeaderPartDesc_IsFlagsPart;
     ::PyMethodDef InstallErrHooker;
     ::PyMethodDef level2str;
@@ -519,7 +524,7 @@ public:
     ::PyMethodDef Packet_GetHeaderPartAsUInt32;
     ::PyMethodDef PyTimerGetPeriod;
     ::PyMethodDef PacketHeaderPartDesc_IsValid;
-    ::PyMethodDef SetPacketHeaderDesc;
+    ::PyMethodDef SuppressServiceCoderNotFoundWarning;
     ::PyMethodDef PyTimerUpdateAllTimers;
     ::PyMethodDef NewService;
     ::PyMethodDef RegisterCodec;

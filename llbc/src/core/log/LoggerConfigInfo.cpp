@@ -162,7 +162,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
     if (_logToFile &&
         !_logFile.empty() &&
         _logFile[0] != LLBC_SLASH_A)
-        _logFile = LLBC_GetTemporaryDirectory(true) + _logFile;
+        _logFile = LLBC_Directory::Join(LLBC_Directory::TempDir(), _logFile);
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 

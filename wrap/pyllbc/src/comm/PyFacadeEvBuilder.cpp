@@ -29,6 +29,7 @@ PyObject *This::_attrPeerIp = PyString_FromString("_peer_ip");
 PyObject *This::_attrPeerPort = PyString_FromString("_peer_port");
 PyObject *This::_attrIsListen = PyString_FromString("_islisten");
 PyObject *This::_attrSocket = PyString_FromString("_socket");
+PyObject *This::_attrPacket = PyString_FromString("_packet");
 PyObject *This::_attrReportLayer = PyString_FromString("_report_layer");
 PyObject *This::_attrReportLevel = PyString_FromString("_report_level");
 PyObject *This::_attrReportMsg = PyString_FromString("_report_msg");
@@ -43,6 +44,16 @@ PyObject *pyllbc_FacadeEvBuilder::BuildInitializeEv(PyObject *svc)
 }
 
 PyObject *pyllbc_FacadeEvBuilder::BuildDestroyEv(PyObject *svc)
+{
+    return This::CreateEv(svc);
+}
+
+PyObject *pyllbc_FacadeEvBuilder::BuildStartEv(PyObject *svc)
+{
+    return This::CreateEv(svc);
+}
+
+PyObject *pyllbc_FacadeEvBuilder::BuildStopEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
@@ -119,10 +130,12 @@ PyObject *pyllbc_FacadeEvBuilder::BuildProtoReportEv(PyObject *svc, const LLBC_P
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(PyObject *svc, int opcode)
+PyObject *pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(PyObject *svc, const LLBC_Packet &llbcPacket, PyObject *packet)
 {
     PyObject *ev = This::CreateEv(svc);
-    This::SetAttr(ev, This::_attrOpcode, opcode);
+    This::SetAttr(ev, This::_attrSessionId, llbcPacket.GetSessionId());
+    This::SetAttr(ev, This::_attrOpcode, llbcPacket.GetOpcode());
+    This::SetAttr(ev, This::_attrPacket, packet);
 
     return ev;
 }

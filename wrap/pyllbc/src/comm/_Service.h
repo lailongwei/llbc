@@ -116,6 +116,15 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFrameInterval(PyObject *self, PyObject
     return PyFloat_FromDouble(svc->GetFrameInterval() / 1000.0);
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_SuppressServiceCoderNotFoundWarning(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    if (!PyArg_ParseTuple(args, "l", &svc))
+        return NULL;
+
+    Py_RETURN_NONE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;

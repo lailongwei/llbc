@@ -12,7 +12,9 @@
 
 #include "llbc/comm/ICoder.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
+#include "llbc/comm/protocol/ProtoReportLevel.h"
 #include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/ProtocolStack.h"
 
 __LLBC_NS_BEGIN
 
@@ -34,27 +36,88 @@ int LLBC_CodecProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
     return LLBC_OK;
 }
 
-int LLBC_CodecProtocol::Send(void *in, void *&out)
+int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
 {
-    out = in;
-    reinterpret_cast<LLBC_Packet *>(in)->Encode();
+    LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
+    if (UNLIKELY(!packet->Encode()))
+    {
+        LLBC_String reportMsg = LLBC_String().format(
+                "Encode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
 
+        const LLBC_String &codecErr = packet->GetCodecError();
+        if (!codecErr.empty())
+            reportMsg.append_format("\ndetail error:%s", codecErr.c_str());
+
+        _stack->Report(packet->GetSessionId(),
+                       packet->GetOpcode(),
+                       this,
+                       LLBC_ProtoReportLevel::Warn,
+                       reportMsg);
+
+        removeSession = false;
+
+        LLBC_Delete(packet);
+        LLBC_SetLastError(LLBC_ERROR_ENCODE);
+
+        return LLBC_FAILED;
+    }
+
+    out = in;
     return LLBC_OK;
 }
 
-int LLBC_CodecProtocol::Recv(void *in, void *&out)
+int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
-    out = in;
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
     _Coders::iterator it = _coders.find(packet->GetOpcode());
     if (it != _coders.end())
     {
         LLBC_ICoder *coder = it->second->Create();
-        coder->Decode(*packet);
+        if (UNLIKELY(!coder->Decode(*packet)))
+        {
+            LLBC_String reportMsg = LLBC_String().format(
+                    "Decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+
+            const LLBC_String &codecErr = packet->GetCodecError();
+            if (!codecErr.empty())
+                reportMsg.append_format("\ndetail error:%s", codecErr.c_str());
+
+            _stack->Report(packet->GetSessionId(),
+                           packet->GetOpcode(),
+                           this,
+                           LLBC_ProtoReportLevel::Error,
+                           reportMsg);
+
+            removeSession = true;
+
+            LLBC_Delete(coder);
+            LLBC_Delete(packet);
+            LLBC_SetLastError(LLBC_ERROR_DECODE);
+
+            return LLBC_FAILED;
+        }
 
         packet->SetDecoder(coder);
     }
+    else if (!_stack->_suppressCoderNotFoundError)
+    {
+        const LLBC_String reportMsg = LLBC_String().format(
+            "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+        _stack->Report(packet->GetSessionId(),
+                       packet->GetOpcode(),
+                       this,
+                       LLBC_ProtoReportLevel::Warn,
+                       reportMsg);
 
+        removeSession = false;
+
+        LLBC_Delete(packet);
+        LLBC_SetLastError(LLBC_ERROR_ENCODE);
+
+        return LLBC_FAILED;
+    }
+
+    out = in;
     return LLBC_OK;
 }
 

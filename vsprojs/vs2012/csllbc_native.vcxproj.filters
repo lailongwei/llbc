@@ -8,23 +8,44 @@
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\LibHeader.h">
       <Filter>include\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Errors.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Export.h">
       <Filter>include\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Macro.h">
       <Filter>include\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h">
-      <Filter>include\comm</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\Comm.h">
       <Filter>include\comm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h">
       <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_LibConfig.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_Errors.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Service.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csFacade.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\csDelegates.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h">
+      <Filter>include\core\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csCoder.h">
+      <Filter>include\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csPacketHandler.h">
+      <Filter>include\comm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -52,16 +73,16 @@
     <Filter Include="src\comm">
       <UniqueIdentifier>{41201e8c-b584-4256-bdb4-e950c1b0665f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\core\os">
+      <UniqueIdentifier>{57ff5cc6-f38d-45af-aa51-ef349d48242a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\os">
+      <UniqueIdentifier>{d972c3c3-77c5-4959-8380-abb0ea37c500}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\wrap\csllbc\native\src\csllbc.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\wrap\csllbc\native\src\common\Errors.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csService.cpp">
-      <Filter>src\comm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\Comm.cpp">
       <Filter>src\comm</Filter>
@@ -69,5 +90,32 @@
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\_LibConfig.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\_Errors.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Service.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csService.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csFacade.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csCoder.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csPacketHandler.cpp">
+      <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp">
+      <Filter>src\core\os</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\wrap\csllbc\csharp\native\llbcnative.cs" />
   </ItemGroup>
 </Project>

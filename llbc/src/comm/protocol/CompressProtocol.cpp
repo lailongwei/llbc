@@ -33,13 +33,13 @@ int LLBC_CompressProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &pe
     return LLBC_OK;
 }
 
-int LLBC_CompressProtocol::Send(void *in, void *&out)
+int LLBC_CompressProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     out = in;
     return LLBC_OK;
 }
 
-int LLBC_CompressProtocol::Recv(void *in, void *&out)
+int LLBC_CompressProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
     out = in;
     return LLBC_OK;

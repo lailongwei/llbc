@@ -91,6 +91,20 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "access deny",              // 0x001c
     // repeat.
     "repeat",                   // 0x001d
+    // encode error.
+    "encode error",             // 0x001e
+    // decode error.
+    "decode error",             // 0x001f
+    // compress error.
+    "compress error",           // 0x0020
+    // decompress error.
+    "decompress error",         // 0x0021
+    // pack error.
+    "pack error",               // 0x0022
+    // unpack error.
+    "unpack error",             // 0x0023
+    // not allow.
+    "not allow",                // 0x0024
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;
@@ -182,7 +196,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     }
 #if LLBC_TARGET_PLATFORM_WIN32
-    else if (LLBC_ERROR_TYPE_IS_OSAPI(no) || LLBC_ERROR_TYPE_IS_NETAPI(no))
+    else if (LLBC_ERROR_TYPE_IS_OSAPI(no) || LLBC_ERROR_TYPE_IS_NETAPI(no) || LLBC_ERROR_TYPE_IS_GAI(no))
     {
         HLOCAL hLocal = NULL;
         const DWORD sysLocale = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
@@ -246,17 +260,14 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         }
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
+#if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (LLBC_ERROR_TYPE_IS_GAI(no))
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
         ::sprintf(libTls->commonTls.errDesc, 
                 __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
-#else // LLBC_TARGET_PLATFORM_WIN32
-        ::sprintf_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, 
-                __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
         return libTls->commonTls.errDesc;
     }
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
     else if (noPart == __LLBC_ERROR_UNKNOWN)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32

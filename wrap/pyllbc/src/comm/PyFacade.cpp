@@ -18,6 +18,7 @@
 namespace
 {
     typedef pyllbc_Facade This;
+    typedef pyllbc_FacadeEvBuilder _EvBuilder;
 }
 
 namespace
@@ -38,6 +39,8 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 , _methOnInitialize(Py_BuildValue("s", "oninitialize"))
 , _methOnDestroy(Py_BuildValue("s", "ondestroy"))
 , _methOnUpdate(Py_BuildValue("s", "onupdate"))
+, _methOnStart(Py_BuildValue("s", "onstart"))
+, _methOnStop(Py_BuildValue("s", "onstop"))
 , _methOnIdle(Py_BuildValue("s", "onidle"))
 , _methOnSessionCreate(Py_BuildValue("s", "onsessioncreate"))
 , _methOnSessionDestroy(Py_BuildValue("s", "onsessiondestroy"))
@@ -65,6 +68,8 @@ pyllbc_Facade::~pyllbc_Facade()
 {
     Py_DECREF(_methOnInitialize);
     Py_DECREF(_methOnDestroy);
+    Py_DECREF(_methOnStart);
+    Py_DECREF(_methOnStop);
     Py_DECREF(_methOnUpdate);
     Py_DECREF(_methOnIdle);
     Py_DECREF(_methOnSessionCreate);
@@ -88,148 +93,46 @@ pyllbc_Facade::~pyllbc_Facade()
 
 void pyllbc_Facade::OnInitialize()
 {
-    typedef pyllbc_Service::_Facades _Facades;
-
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildInitializeEv(_pySvc);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnInitialize))
-        {
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, _methOnInitialize, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc));
 }
 
 void pyllbc_Facade::OnDestroy()
 {
-    typedef pyllbc_Service::_Facades _Facades;
+    CallFacadeMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc));
+}
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildDestroyEv(_pySvc);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
+void pyllbc_Facade::OnStart()
+{
+    CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc));
+}
 
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnDestroy))
-        {
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, _methOnDestroy, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+void pyllbc_Facade::OnStop()
+{
+    CallFacadeMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc));
 }
 
 void pyllbc_Facade::OnUpdate()
 {
-    typedef pyllbc_Service::_Facades _Facades;
-
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildUpdateEv(_pySvc);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnUpdate))
-        {
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, _methOnUpdate, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnUpdate, _EvBuilder::BuildUpdateEv(_pySvc));
 }
 
 void pyllbc_Facade::OnIdle(int idleTime)
 {
-    typedef pyllbc_Service::_Facades _Facades;
-
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildIdleEv(_pySvc, idleTime);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnIdle))
-        {
-
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, _methOnIdle, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnIdle, _EvBuilder::BuildIdleEv(_pySvc, idleTime));
 }
 
 void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
-    typedef pyllbc_Service::_Facades _Facades;
-
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnSessionCreate))
-        {
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(
-                facade, _methOnSessionCreate, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo));
 }
 
 void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
@@ -237,29 +140,7 @@ void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    typedef pyllbc_Service::_Facades _Facades;
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnSessionDestroy))
-        {
-            PyObject *pyRtn = 
-                PyObject_CallMethodObjArgs(facade, _methOnSessionDestroy, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo));
 }
 
 void pyllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
@@ -267,29 +148,7 @@ void pyllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildAsyncConnResultEv(_pySvc, result);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    typedef pyllbc_Service::_Facades _Facades;
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnAsyncConnResult))
-        {
-            PyObject *pyRtn = 
-                PyObject_CallMethodObjArgs(facade, _methOnAsyncConnResult, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result));
 }
 
 void pyllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
@@ -297,59 +156,23 @@ void pyllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildProtoReportEv(_pySvc, report);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
-
-    typedef pyllbc_Service::_Facades _Facades;
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnProtoReport))
-        {
-            PyObject *pyRtn =
-                PyObject_CallMethodObjArgs(facade, _methOnProtoReport, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
-
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report));
 }
 
-void pyllbc_Facade::OnUnHandledPacket(int opcode)
+void pyllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *ev = pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(_pySvc, opcode);
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
+    PyObject *pyPacket = BuildPyPacket(packet);
+    if (UNLIKELY(pyPacket == NULL))
+        return;
 
-    typedef pyllbc_Service::_Facades _Facades;
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
-         it++)
-    {
-        PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, _methOnUnHandledPacket))
-        {
-            PyObject *pyRtn =
-                PyObject_CallMethodObjArgs(facade, _methOnUnHandledPacket, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return;
-            }
+    PyObject *ev = 
+        pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
+    Py_DecRef(pyPacket); pyPacket = NULL;
 
-            Py_DECREF(pyRtn);
-        }
-    }
+    CallFacadeMeth(_methOnUnHandledPacket, ev);
 }
 
 void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
@@ -406,7 +229,12 @@ void *pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
 
     const int detectResult = PyObject_IsTrue(ret);
     if (UNLIKELY(detectResult == -1))
+    {
         pyllbc_TransferPyError();
+
+        Py_DECREF(ret);
+        return failedRtn;
+    }
 
     Py_DECREF(ret);
     return (detectResult == 0 ? failedRtn : succeedRtn);
@@ -433,14 +261,19 @@ void *pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
 
     const int detectResult = PyObject_IsTrue(ret);
     if (UNLIKELY(detectResult == -1))
+    {
         pyllbc_TransferPyError();
+
+        Py_DECREF(ret);
+        return failedRtn;
+    }
 
     Py_DECREF(ret);
     return (detectResult == 0 ? failedRtn : succeedRtn);
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-PyObject *pyllbc_Facade::BuildPyPacket(LLBC_Packet &packet)
+PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
 {
     if (UNLIKELY(!_pyPacketCls))
     {
@@ -567,4 +400,29 @@ void pyllbc_Facade::DeletePyPacket(void *_)
 {
     PyObject *pyPacket = reinterpret_cast<PyObject *>(_);
     Py_DECREF(pyPacket);
+}
+
+void pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
+{
+    typedef pyllbc_Service::_Facades _Facades;
+    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
+
+    _Facades &facades = _svc->_facades;
+    for (_Facades::iterator it = facades.begin();
+         it != facades.end();
+         it++)
+    {
+        PyObject *facade = *it;
+        if (PyObject_HasAttr(facade, meth))
+        {
+            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, meth, ev, NULL);
+            if (!pyRtn)
+            {
+                pyllbc_TransferPyError();
+                return;
+            }
+
+            Py_DECREF(pyRtn);
+        }
+    }
 }

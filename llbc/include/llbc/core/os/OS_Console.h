@@ -104,6 +104,13 @@ LLBC_EXTERN LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const cha
 #define LLBC_FilePrintLine(file, fmt, ...) \
     LLBC_NS __LLBC_FilePrint(true, file, fmt, ##__VA_ARGS__)
 
+/**
+ * Flush specific file buffer.
+ * @param[in] file - file pointer.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXTERN LLBC_EXPORT int LLBC_FlushFile(FILE *file);
+
 __LLBC_NS_END
 
 #endif // !__LLBC_CORE_OS_OS_CONSOLE_H__

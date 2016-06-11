@@ -69,11 +69,24 @@ public:
     virtual Type GetType() const;
 
     /**
+     * Get the service drive mode.
+     * @return DriveMode - the service drive mode.
+     */
+    virtual DriveMode GetDriveMode() const;
+
+    /**
      * Set the service drive mode.
      * @param[in] mode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetDriveMode(DriveMode mode);
+
+public:
+    /**
+     * Suppress coder not found warning in protocol-stack.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int SuppressCoderNotFoundWarning();
 
 public:
     /**
@@ -143,11 +156,18 @@ public:
      *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip   - the ip address.
      * @param[in] port - the port number.
-     * @return int - return  if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
     virtual int AsyncConn(const char *ip, uint16 port);
+
+    /**
+     * Check given sessionId is lgeal or not.
+     * @param[in] sessionId - the given session Id.
+     * @return bool - return true is given session Id validate, otherwise return false.
+     */
+    virtual bool IsSessionValidate(int sessionId);
 
     /**
      * Send packet.
@@ -295,13 +315,13 @@ public:
     virtual int Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg);
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will direct close specified session.
+     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg);
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will direct close specified session.
+     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -323,7 +343,8 @@ public:
 
 public:
     /**
-     * Enable/Disable timer scheduler.
+     * Enable/Disable timer scheduler, only use external-drive type service.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int EnableTimerScheduler();
     virtual int DisableTimerScheduler();
@@ -418,7 +439,9 @@ private:
      * Facade operation methods.
      */
     void InitFacades();
+    void StartFacades();
     void UpdateFacades();
+    void StopFacades();
     void DestroyFacades();
 
     /**
@@ -469,6 +492,7 @@ private:
     Type _type;
     volatile int _id;
     DriveMode _driveMode;
+    bool _suppressedCoderNotFoundWarning;
 
     volatile bool _started;
     volatile bool _stopping;

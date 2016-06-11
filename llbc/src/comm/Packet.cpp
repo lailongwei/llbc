@@ -50,6 +50,8 @@ LLBC_Packet::LLBC_Packet()
 
     _block->SetReadPos(headerLen);
     _block->SetWritePos(headerLen);
+
+    _codecError = NULL;
 }
 
 LLBC_Packet::~LLBC_Packet()
@@ -63,6 +65,7 @@ LLBC_Packet::~LLBC_Packet()
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
     LLBC_XDelete(_block);
+    LLBC_XDelete(_codecError);
 }
 
 int LLBC_Packet::GetLength() const
@@ -609,23 +612,42 @@ LLBC_MessageBlock *LLBC_Packet::GiveUp()
     return block;
 }
 
-void LLBC_Packet::Encode()
+bool LLBC_Packet::Encode()
 {
     if (_encoder)
     {
-        _encoder->Encode(*this);
+        if (!_encoder->Encode(*this))
+            return false;
 
         delete _encoder;
         _encoder = NULL;
     }
+
+    return true;
 }
 
-void LLBC_Packet::Decode()
+bool LLBC_Packet::Decode()
 {
     if (_decoder)
     {
-        _decoder->Decode(*this);
+        return _decoder->Decode(*this);
     }
+
+    return true;
+}
+
+const LLBC_String &LLBC_Packet::GetCodecError() const
+{
+    static const LLBC_String noError;
+    return _codecError ? *_codecError : noError;
+}
+
+void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
+{
+    if (_codecError)
+        LLBC_Delete(_codecError);
+
+    _codecError = new LLBC_String(codecErr.c_str(), codecErr.length());
 }
 
 void LLBC_Packet::CleanupPreHandleResult()

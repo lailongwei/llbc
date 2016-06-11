@@ -206,7 +206,7 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
-        return 0;
+        return LLBC_FAILED;
 
     const int sessionId = AllocSessionId();
     if (LIKELY(_pollers))

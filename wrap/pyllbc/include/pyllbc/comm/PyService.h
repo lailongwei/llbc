@@ -78,6 +78,13 @@ public:
 
 public:
     /**
+     * Suppress coder not found warning in protocol-stack.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SuppressCoderNotFoundWarning();
+
+public:
+    /**
      * Get service codec strategy(default is Json).
      * @return  Codec - the codec.
      */
@@ -366,6 +373,8 @@ private:
     Codec _codec;
     typedef std::map<int, PyObject *> _Codecs;
     _Codecs _codecs;
+
+    bool _suppressedCoderNotFoundWarning;
 
     _FrameCallables _beforeFrameCallables;
     _FrameCallables _afterFrameCallables;

@@ -40,11 +40,19 @@ int LLBC_GetConsoleColor(FILE *file)
         return LLBC_FAILED;
     }
 
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-
     CONSOLE_SCREEN_BUFFER_INFO info;
-    ::GetConsoleScreenBufferInfo(handle, &info);
+    if (::GetConsoleScreenBufferInfo(handle, &info) == 0)
+    {
+        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return LLBC_FAILED;
+    }
+
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
 
     return info.wAttributes;
 #endif
@@ -67,15 +75,18 @@ int LLBC_SetConsoleColor(FILE *file, int color)
         return LLBC_FAILED;
     }
 
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-
     if (::SetConsoleTextAttribute(handle, color) == 0)
     {
+        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
     }
     
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
     return LLBC_OK;
 #endif
 }
@@ -106,6 +117,40 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     LLBC_Free(buf);
 
     return LLBC_OK;
+}
+
+int LLBC_FlushFile(FILE *file)
+{
+    if (UNLIKELY(!file))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    flockfile(file);
+    if (UNLIKELY(::fflush(file) != 0))
+    {
+        funlockfile(file);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+
+    funlockfile(file);
+    return LLBC_OK;
+#else // Win32
+    const int fileNo = LLBC_File::GetFileNo(file);
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+    if (UNLIKELY(::fflush(file) != 0))
+    {
+        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    return LLBC_OK;
+#endif
 }
 
 __LLBC_NS_END

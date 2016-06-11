@@ -3,6 +3,37 @@
 ######################################################################################
 #
 # Version: 1.0.1
+#
+# 2016/06/11
+# 新增功能:
+#  1) 调整LLBC_ICoder::Encode/LLBC_ICoder::Decode定义, 统一返回bool值指示是否encode/decode成功.
+      在失败的情况下，允许通过Packet.SetCodecError()设置错误描述，Service会将此调整统一以IFacade::OnProtoReport形式报告给Facade层面.
+   2) 调整IFacade相关接口定义, 原有OnInitialize/OnDestroy不再作为Service Start/Stop过程中的回调, 只作为Facade第一次调用OnStart前的回调及delete Service前的回调.
+      OnInitialize: 在Facade添加到Service, 并且Service的随后Start调用中会被调用一次, 整个Service生命周期只会调用一次.
+      OnDestroy: 在Facade添加到Service并且已经调用过OnInitialize, 如果Service被Delete, 将会触发此函数调用.
+      OnStart: Service的每次Start都会触发此调用(如果对应的Facade为第一次调用, 将会先触发OnInitialize调用).
+      OnStop: Service的每次Stop都会触发此调用.
+   3) 完善所有Session断开, 连接相关的错误描述, 以让应用层在收到SessionDestroy/Connect相关回调的时候, 知道是因何原因导致的断开或者连接错误.
+      对于断开支持: 
+        > 修改Service.RemoveSession接口, 增加一个reason参数, 用于指示因何关闭此session, 在随后的所有Facade.OnSessionDestroy中, 都将可收到此错误描述.
+        > 对于网络事件导致的断开, 也将有统一的描述报告到上层.
+      对于Connect相关支持:
+        > 一个连接如果失败, 也将会有相关的完整描述信息报告到上层.
+   4) Service添加GetDriveMode()方法, 以让使用者任何时候都知道Service当前运行(或已设置到)在外部驱动模式还是自驱动模式.
+   5) Service添加IsSessionValidate()方法, 以让使用者任何时候都可以较验会话是否有效.
+   6) Service添加SuppressCoderNotFoundWarning()方法, 用于抑制在包解码的时候, Coder不能找到的报错.
+   7) 调整Packet PreHandler, UnifyPreHandler定义, 在返回false的情况下, 将不断开session, 而仅仅是不继续调用后续的Handler接口.
+   8) 增加一个库配置宏(Config.h): LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE, 允许编译的时候是否开启严格调度选项, 默认关闭.
+      如果开启严格调度, 则如果在timeout被检测到, 并且已经过了N个timeout周期, 框架将会被调这错过的几次timeout周期, 大部分情况下不需要如此严格, 所以将其关闭.
+   9) 其它细节代码调整, 优化.
+# BUG修复:
+#  1) 修复Timer在Cancel过程中可能导致的coredump的BUG.
+#  2) 修复Service在SelfDrive模式下, 重复Start/Stop会因为timerScheduler无效导致coredump的BUG.
+#  3) 修复core/os/console中SetConsoleColor()方法未lock的BUG.
+#  4) 修复MessageBlock在Write的时候, 不能写入len为0且buf == NULL的BUG.
+#  5) 修复Service在ExternalDrive模式下Stop后, 无法cancel所有timer的BUG.
+#  6) 修复Service的EnableTimerScheduler()及DisableTimerScheduler()有可能导致coredump的BUG.
+#
 # 2016/04/20
 # BUG修复:
 #  1) 修复在LLBC_Session::OnClose过程中存在的OVERLAPPED结构泄露的BUG(win32特有);

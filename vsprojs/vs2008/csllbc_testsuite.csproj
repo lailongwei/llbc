@@ -47,6 +47,12 @@
     <Compile Include="..\..\wrap\csllbc\testsuite\ITestCase.cs">
       <Link>ITestCase.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\testsuite\common\TestCase_Com_LibConfig.cs">
+      <Link>common\TestCase_Com_LibConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\testsuite\common\TestCase_Com_SafeConsole.cs">
+      <Link>common\TestCase_Com_SafeConsole.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\testsuite\comm\TestCase_Comm_Service.cs">
       <Link>comm\TestCase_Comm_Service.cs</Link>
     </Compile>
@@ -57,7 +63,7 @@
       <HintPath>C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll</HintPath>
     </Reference>
     <Reference Include="llbc">
-      <HintPath>..\..\output\vs2008\Debug\Win32\wrap\csharp\csllbc_debug.dll</HintPath>
+      <HintPath>..\..\output\vs2008\Release\Win32\wrap\csharp\llbc.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

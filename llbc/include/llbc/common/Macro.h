@@ -255,6 +255,8 @@ private:                                            \
 #define LLBC_New4(cls, arg1, arg2, arg3, arg4) (new cls((arg1), (arg2), (arg3), (arg4)))
 #define LLBC_New5(cls, arg1, arg2, arg3, arg4, arg5) (new cls((arg1), (arg2), (arg3), (arg4), (arg5)))
 #define LLBC_New6(cls, arg1, arg2, arg3, arg4, arg5, arg6) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6)))
+#define LLBC_New7(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7)))
+#define LLBC_New8(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8)))
 #define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
     do {                            \

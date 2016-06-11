@@ -123,6 +123,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
 struct LLBC_HIDDEN LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
 {
     int sessionId;
+    int opcode;
 
     int layer;
     int level;
@@ -217,6 +218,7 @@ public:
      * Build proto-report event.
      */
     static LLBC_MessageBlock *BuildProtoReportEv(int sessionId,
+                                                 int opcode,
                                                  int layer,
                                                  int level,
                                                  const LLBC_String &report);

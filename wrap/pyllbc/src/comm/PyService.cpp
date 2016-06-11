@@ -50,6 +50,8 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc)
 , _codec((This::Codec)(PYLLBC_CFG_DFT_SVC_CODEC))
 , _codecs()
 
+, _suppressedCoderNotFoundWarning(false)
+
 , _beforeFrameCallables()
 , _afterFrameCallables()
 
@@ -107,6 +109,18 @@ int pyllbc_Service::SetFPS(int fps)
 int pyllbc_Service::GetFrameInterval() const
 {
     return _llbcSvc->GetFrameInterval();
+}
+
+int pyllbc_Service::SuppressCoderNotFoundWarning()
+{
+    if (_llbcSvc->SuppressCoderNotFoundWarning() != LLBC_OK)
+    {
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "when suppress service warning");
+        return LLBC_FAILED;
+    }
+
+    _suppressedCoderNotFoundWarning = true;
+    return LLBC_OK;
 }
 
 This::Codec pyllbc_Service::GetCodec() const
@@ -602,6 +616,7 @@ void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType)
     _llbcSvc->SetId(++This::_maxLLBCSvcId); // llbc library ServiceId we not use, so, let's simple set it.
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
+    _llbcSvc->SuppressCoderNotFoundWarning();
 
     _cppFacade = LLBC_New1(pyllbc_Facade, this);
     _llbcSvc->RegisterFacade(_cppFacade);

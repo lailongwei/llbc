@@ -108,11 +108,24 @@ public:
     virtual Type GetType() const = 0;
 
     /**
+     * Get the service drive mode.
+     * @return DriveMode - the service drive mode.
+     */
+    virtual DriveMode GetDriveMode() const = 0;
+
+    /**
      * Set the service drive mode.
      * @param[in] mode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetDriveMode(DriveMode mode) = 0;
+
+public:
+    /**
+     * Suppress coder not found warning in protocol-stack.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int SuppressCoderNotFoundWarning() = 0;
 
 public:
     /**
@@ -173,11 +186,18 @@ public:
      * Asynchronous establishes a connection to a specified address.
      * @param[in] ip   - the ip address.
      * @param[in] port - the port number.
-     * @return int - return  if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
     virtual int AsyncConn(const char *ip, uint16 port) = 0;
+
+    /**
+     * Check given sessionId is validate or not.
+     * @param[in] sessionId - the given session Id.
+     * @return bool - return true is given session Id validate, otherwise return false.
+     */
+    virtual bool IsSessionValidate(int sessionId) = 0;
 
     /**
      * Send packet.
@@ -384,24 +404,24 @@ public:
     int Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will direct close specified session.
+     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg) = 0;
 
     /**
-     * Previous subscribe message to specified handler method, if method return NULL, will direct close specified session.
+     * Previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
      */
     template <typename ObjType>
     int PreSubscribe(int opcode, ObjType *obj, void *(ObjType::*method)(LLBC_Packet &));
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will direct close specified session.
+     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg) = 0;
 
     /**
-     * Unify previous subscribe message to specified handler method, if method return NULL, will direct close specified session.
+     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
      */
     template <typename ObjType>
     int UnifyPreSubscribe(ObjType *obj, void *(ObjType::*method)(LLBC_Packet &));

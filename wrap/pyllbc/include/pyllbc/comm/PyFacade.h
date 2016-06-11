@@ -33,15 +33,26 @@ public:
 
 public:
     /**
-     * When service initialized, will call this event handle function.
+     * When service start and not not init facade before, will call then event handler function.
      */
     virtual void OnInitialize();
 
     /**
-     * When service will destroy, will call this event handle function.
+     * When service destroy, will call this event handler function.
      */
     virtual void OnDestroy();
 
+    /**
+     * When service start, will call this event handler function.
+     */
+    virtual void OnStart();
+
+    /**
+     * When service stop, will call this event handler function.
+     */
+    virtual void OnStop();
+
+public:
     /**
      * Heartbeat function.
      */
@@ -82,7 +93,7 @@ public:
      * When service receive a unhandled packet, will call this event handler.
      * @param[in] opcode - the opcode.
      */
-    virtual void OnUnHandledPacket(int opcode);
+    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
 
 public:
     /**
@@ -109,14 +120,23 @@ public:
 
     /**
      * Build python layer packet object according to LLBC_Packet object reference.
+     * @param[in] packet - the core library packet object reference.
      * @return PyObject * - the python layer packet object, if error occurred, return NULL.
      */
-    PyObject *BuildPyPacket(LLBC_Packet &packet);
+    PyObject *BuildPyPacket(const LLBC_Packet &packet);
 
     /**
      * Delete the python layer packet.
      */
     void DeletePyPacket(void *pyPacket);
+
+private:
+    /**
+     * Call python layer facade method.
+     * @param[in] meth - method name, not steal reference, normal.
+     * @param[in] ev   - call event object, steal reference.
+     */
+    void CallFacadeMeth(PyObject *meth, PyObject *ev);
 
 private:
     pyllbc_Service *_svc;
@@ -126,6 +146,8 @@ private:
 
     PyObject *_methOnInitialize;
     PyObject *_methOnDestroy;
+    PyObject *_methOnStart;
+    PyObject *_methOnStop;
     PyObject *_methOnUpdate;
     PyObject *_methOnIdle;
     PyObject *_methOnSessionCreate;

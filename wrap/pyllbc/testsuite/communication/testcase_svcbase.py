@@ -14,6 +14,12 @@ class TestFacade(object):
     def oninitialize(self, ev):
         print 'service init: {}'.format(ev)
 
+    def onstart(self, ev):
+        print 'service start: {}'.format(ev)
+
+    def onstop(self, ev):
+        print 'service stop: {}'.format(ev)
+
     def ondestroy(self, ev):
         print 'service destroy: {}'.format(ev)
 

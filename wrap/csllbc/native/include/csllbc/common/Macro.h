@@ -9,6 +9,8 @@
 #ifndef __CSLLBC_COM_MACRO_H__
 #define __CSLLBC_COM_MACRO_H__
 
+#include "llbc/common/Macro.h"
+
 // the hidden/export/exporting macro define, same with llbc core library.
 #ifndef CSLLBC_HIDDEN
  #define CSLLBC_HIDDEN LLBC_HIDDEN

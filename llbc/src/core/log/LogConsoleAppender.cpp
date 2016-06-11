@@ -81,7 +81,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
 
 #if LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE
     if (logLevel < _LogLevel::Warn) 
-        ::fflush(stdout);
+        LLBC_FlushFile(stdout);
 #endif
 
     if (_colourfulOutput)

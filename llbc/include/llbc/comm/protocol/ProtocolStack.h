@@ -72,6 +72,12 @@ public:
      */
     void SetSession(LLBC_Session *session);
 
+    /**
+     * Set suppressed coder not found warning option to protocol-stack.
+     * @param[in] suppressed - the suppressed flag.
+     */
+    void SetIsSuppressedCoderNotFoundWarning(bool suppressed);
+
 public:
     /**
      * Set protocol to protocol stack.
@@ -103,50 +109,57 @@ public:
 
     /**
      * When packet send, will use this protocol stack method to filter and encode packet.
-     * @param[in] willEncode - the will send packet.
-     * @param[in] encoded    - the filtered and encoded packet. 
+     * @param[in] willEncode     - the will send packet.
+     * @param[in] encoded        - the filtered and encoded packet. 
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded);
+    int SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded, bool &removeSession);
     
     /**
      * When packet send, will use this protocol stack method to compress packet and convert to message-block to send.
-     * @param[in] packet - the will compress and convert packet.
-     * @param[in] block  - the message block.
+     * @param[in] packet         - the will compress and convert packet.
+     * @param[in] block          - the message block.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block);
+    int SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block, bool &removeSession);
 
     /**
      * When packet send, will use this protocol stack method to convert packet to message-block type to send.
-     * @param[in] packet - the packet.
-     * @param[in] block  - the message block.
+     * @param[in] packet         - the packet.
+     * @param[in] block          - the message block.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Send(LLBC_Packet *packet, LLBC_MessageBlock *&block);
+    int Send(LLBC_Packet *packet, LLBC_MessageBlock *&block, bool &removeSession);
 
     /**
      * When message receive, will use this protocol stack method to convert message-block to undecoded.
-     * @param[in] block   - the message block.
-     * @param[in] packets - the packets.
+     * @param[in] block          - the message block.
+     * @param[in] packets        - the packets.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets);
+    int RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession);
 
     /**
      * When packet receive, will use this protocol stack method to decode and filter.
-     * @param[in] willDecode  - the will decode and filter packet.
-     * @param[in] decoded     - the decoded and filtered packet.
+     * @param[in] willDecode     - the will decode and filter packet.
+     * @param[in] decoded        - the decoded and filtered packet.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded);
+    int RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded, bool &removeSession);
 
     /**
      * When packet recv, will use this protocol stack method to convert message-block type to packets.
-     * @param[in] block   - the message block.
-     * @param[in] packets - the converted packet list.
+     * @param[in] block          - the message block.
+     * @param[in] packets        - the converted packet list.
+     * @param[out] removeSession - when error occurred, this out param determine remove session or not.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    int Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets);
+    int Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession);
 
 private:
     /**
@@ -163,12 +176,14 @@ private:
     /**
      * Report error, call by protocol.
      * @param[in] sessionId - the session Id.
+     * @param[in] opcode    - the opcode.
      * @param[in] proto     - the reporter.
      * @param[in] level     - the report level.
-     * @param[in] err       - the error describe.
+     * @param[in] msg       - the report message.
      */
-    void Report(LLBC_IProtocol *proto, int level, const LLBC_String &err);
-    void Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &err);
+    void Report(LLBC_IProtocol *proto, int level, const LLBC_String &msg);
+    void Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &msg);
+    void Report(int sessionId, int opcode, LLBC_IProtocol *proto, int level, const LLBC_String &msg);
 
 private:
     StackType _type;
@@ -176,6 +191,7 @@ private:
 
     LLBC_IService *_svc;
     LLBC_Session *_session;
+    bool _suppressCoderNotFoundError;
 
     LLBC_IProtocol *_protos[LLBC_ProtocolLayer::End];
 };
