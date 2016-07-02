@@ -55,6 +55,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\native\core\os\OS_ConsoleNative.cs">
       <Link>native\core\os\OS_ConsoleNative.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\comm\TimerNative.cs">
+      <Link>native\comm\TimerNative.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\native\comm\ServiceNative.cs">
       <Link>native\comm\ServiceNative.cs</Link>
     </Compile>
@@ -87,6 +90,9 @@
     </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\core\util\StringUtil.cs">
       <Link>core\util\StringUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\comm\Timer.cs">
+      <Link>comm\Timer.cs</Link>
     </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\comm\Codec.cs">
       <Link>comm\Codec.cs</Link>

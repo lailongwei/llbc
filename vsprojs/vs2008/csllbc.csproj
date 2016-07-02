@@ -92,6 +92,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\core\util\StringUtil.cs">
       <Link>core\util\StringUtil.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\comm\Timer.cs">
+      <Link>comm\Timer.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\comm\Codec.cs">
       <Link>comm\Codec.cs</Link>
     </Compile>

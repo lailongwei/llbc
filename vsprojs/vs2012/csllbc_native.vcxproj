@@ -236,7 +236,9 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csFacade.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csPacketHandler.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csTimer.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Service.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Timer.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h" />
   </ItemGroup>
@@ -248,7 +250,9 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csFacade.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csPacketHandler.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csService.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csTimer.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Service.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Timer.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\csllbc.cpp" />

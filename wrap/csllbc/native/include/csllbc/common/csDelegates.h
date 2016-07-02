@@ -79,6 +79,15 @@ public:
     typedef int (__stdcall *Deleg_Service_PacketUnifyPreHandler)(int sessionId, int opcode, const void *data);
     typedef void (__stdcall *Deleg_Service_NativeCouldNotFoundDecoderReport)(int sessionId, int opcode, const void *data, int dataLen, int status);
     ///////////////////////////////////////////////////////////////////////////////////
+
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    // Timer about delegates.
+    //
+    typedef int (__stdcall *Deleg_Timer_OnTimeout)();
+    typedef void (__stdcall *Deleg_Timer_OnCancel)();
+    ///////////////////////////////////////////////////////////////////////////////////
 };
 
 #endif // __CSLLBC_COM_CSDeleg_FacadeATES_H__

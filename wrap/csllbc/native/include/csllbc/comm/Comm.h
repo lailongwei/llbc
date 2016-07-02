@@ -12,6 +12,7 @@
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
 
+#include "csllbc/comm/csTimer.h"
 #include "csllbc/comm/csCoder.h"
 #include "csllbc/comm/csFacade.h"
 #include "csllbc/comm/csService.h"

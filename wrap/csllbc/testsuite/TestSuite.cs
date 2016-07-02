@@ -28,6 +28,7 @@ namespace csllbc_testsuite
             // testCase = new TestCase_Com_SafeConsole();
 
             // Communication ttestcases:
+            // testCase = new TestCase_Comm_Timer.TestCase_Comm_Timer();
             // testCase = new TestCase_Comm_Service.TestCase_Comm_Service();
 
             testCase.Run(args);

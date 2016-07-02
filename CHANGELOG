@@ -4,6 +4,9 @@
 #
 # Version: 1.0.1
 #
+# 2016/07/02
+# 1) 修复TimerScheduler在关闭Strict模式的时候调度异常BUG.
+#
 # 2016/06/11
 # 新增功能:
 #  1) 调整LLBC_ICoder::Encode/LLBC_ICoder::Decode定义, 统一返回bool值指示是否encode/decode成功.

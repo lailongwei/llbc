@@ -398,6 +398,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\_Timer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\Comm.h"
 					>
 				</File>
@@ -415,6 +419,10 @@
 				</File>
 				<File
 					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\csService.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\include\csllbc\comm\csTimer.h"
 					>
 				</File>
 			</Filter>
@@ -462,6 +470,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\_Timer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\wrap\csllbc\native\src\comm\Comm.cpp"
 					>
 				</File>
@@ -479,6 +491,10 @@
 				</File>
 				<File
 					RelativePath="..\..\wrap\csllbc\native\src\comm\csService.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\wrap\csllbc\native\src\comm\csTimer.cpp"
 					>
 				</File>
 			</Filter>

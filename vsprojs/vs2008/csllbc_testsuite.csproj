@@ -53,6 +53,9 @@
     <Compile Include="..\..\wrap\csllbc\testsuite\common\TestCase_Com_SafeConsole.cs">
       <Link>common\TestCase_Com_SafeConsole.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\testsuite\comm\TestCase_Comm_Timer.cs">
+      <Link>comm\TestCase_Comm_Timer.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\testsuite\comm\TestCase_Comm_Service.cs">
       <Link>comm\TestCase_Comm_Service.cs</Link>
     </Compile>

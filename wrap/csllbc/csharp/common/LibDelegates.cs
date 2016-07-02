@@ -77,5 +77,13 @@ namespace llbc
         public delegate int Deleg_Service_PacketUnifyPreHandler(int sessionId, int opcode, IntPtr data);
         public delegate void Deleg_Service_NativeCouldNotFoundDecoderReport(int sessionId, int opcode, IntPtr data, int dataLen, int status);
         /////////////////////////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////////
+        //
+        // Timer about delegates.
+        //
+        public delegate int Deleg_Timer_OnTimeout();
+        public delegate void Deleg_Timer_OnCancel();
+        /////////////////////////////////////////////////////////////////////////////////////
     }
 }
