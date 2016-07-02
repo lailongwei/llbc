@@ -241,6 +241,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Timer.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\utils\_Util_String.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\wrap\csllbc\native\src\common\_LibConfig.cpp" />
@@ -255,6 +256,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Timer.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\utils\_Util_String.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\csllbc.cpp" />
   </ItemGroup>
   <ItemGroup>

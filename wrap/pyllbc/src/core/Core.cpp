@@ -79,6 +79,7 @@ void pyllbc_AddCoreMethods()
 
     // core/utils
     top->AddMethod(methods.refcnt);
+    inl->AddMethod(methods.HashString);
 }
 
 void pyllbc_AddCoreObjs()

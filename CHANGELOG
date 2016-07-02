@@ -4,6 +4,9 @@
 #
 # Version: 1.0.1
 #
+# 2016/07/03
+# 1) 增加utils中增加LLBC_HashString方法, 用于计算一个字符串的hash code(不保证完全唯一)
+#
 # 2016/07/02
 # 1) 修复TimerScheduler在关闭Strict模式的时候调度异常BUG.
 #

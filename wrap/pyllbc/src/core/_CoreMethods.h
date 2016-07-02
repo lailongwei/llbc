@@ -19,6 +19,7 @@
 #include "src/core/random/_Random.h"
 #include "src/core/thread/_Task.h"
 #include "src/core/utils/_Util_Misc.h"
+#include "src/core/utils/_Util_String.h"
 
 class pyllbc_CoreMethods{
 public:
@@ -52,6 +53,10 @@ public:
         Property_RemoveAllPropertyes.ml_meth = (PyCFunction)_pyllbc_Property_RemoveAllPropertyes;
         Property_RemoveAllPropertyes.ml_flags = METH_VARARGS;
         Property_RemoveAllPropertyes.ml_doc = "pyllbc library method/function";
+        HashString.ml_name = "HashString";
+        HashString.ml_meth = (PyCFunction)_pyllbc_HashString;
+        HashString.ml_flags = METH_VARARGS;
+        HashString.ml_doc = "pyllbc library method/function";
         istaskexist.ml_name = "istaskexist";
         istaskexist.ml_meth = (PyCFunction)_pyllbc_istaskexist;
         istaskexist.ml_flags = METH_VARARGS;
@@ -198,6 +203,7 @@ public:
     ::PyMethodDef GetMainBundle;
     ::PyMethodDef createtask;
     ::PyMethodDef Property_RemoveAllPropertyes;
+    ::PyMethodDef HashString;
     ::PyMethodDef istaskexist;
     ::PyMethodDef Property_ToFile;
     ::PyMethodDef Property_GetProperty;

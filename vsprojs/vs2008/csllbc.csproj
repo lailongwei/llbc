@@ -59,6 +59,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\native\core\os\OS_ConsoleNative.cs">
       <Link>native\core\os\OS_ConsoleNative.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\core\utils\Util_StringNative.cs">
+      <Link>native\core\utils\Util_StringNative.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\native\comm\ServiceNative.cs">
       <Link>native\comm\ServiceNative.cs</Link>
     </Compile>

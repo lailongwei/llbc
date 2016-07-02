@@ -53,6 +53,9 @@
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csTimer.h">
       <Filter>include\comm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\utils\_Util_String.h">
+      <Filter>include\core\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -84,6 +87,12 @@
     </Filter>
     <Filter Include="src\core\os">
       <UniqueIdentifier>{d972c3c3-77c5-4959-8380-abb0ea37c500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\utils">
+      <UniqueIdentifier>{d588cbc0-8942-4732-ab93-b5e827f99d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\utils">
+      <UniqueIdentifier>{c60dc8ff-6237-4f7f-a1e8-8a937e92b726}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +134,9 @@
     </ClCompile>
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Timer.cpp">
       <Filter>src\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\utils\_Util_String.cpp">
+      <Filter>src\core\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

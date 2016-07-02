@@ -454,6 +454,9 @@
     <ClInclude Include="..\..\wrap\pyllbc\include\pyllbc.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\utils\_Util_String.h">
+      <Filter>src\core\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\wrap\pyllbc\script\common\Enum.py">
@@ -550,5 +553,8 @@
       <Filter>script_tools\cpputils</Filter>
     </None>
     <None Include="..\..\wrap\pyllbc\CHANGELOG" />
+    <None Include="..\..\wrap\pyllbc\script\core\utils\StrUtil.py">
+      <Filter>script\core\utils</Filter>
+    </None>
   </ItemGroup>
 </Project>

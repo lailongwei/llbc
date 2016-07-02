@@ -541,6 +541,10 @@
 						RelativePath="..\..\wrap\pyllbc\src\core\utils\_Util_Misc.h"
 						>
 					</File>
+					<File
+						RelativePath="..\..\wrap\pyllbc\src\core\utils\_Util_String.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="file"
@@ -973,6 +977,10 @@
 					</File>
 					<File
 						RelativePath="..\..\wrap\pyllbc\script\core\utils\InvokeGuard.py"
+						>
+					</File>
+					<File
+						RelativePath="..\..\wrap\pyllbc\script\core\utils\StrUtil.py"
 						>
 					</File>
 				</Filter>

@@ -7,6 +7,9 @@
  * @brief
  */
 
+using System;
+using System.Text;
+
 namespace llbc
 {
     /// <summary>
@@ -24,15 +27,14 @@ namespace llbc
             if (string.IsNullOrEmpty(str))
                 return 0;
 
-            int uniqueueId = 0;
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
-            for (int i = 0; i < bytes.Length; i++)
-                uniqueueId += i * 0x31 * bytes[i];
-
-            uniqueueId += bytes.Length * bytes[0];
-            uniqueueId *= bytes[bytes.Length - 1];
-
-            return uniqueueId;
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+            unsafe
+            {
+                fixed (byte* ptr = &bytes[0])
+                {
+                    return LLBCNative.csllbc_Utils_String_HashString(new IntPtr(ptr), bytes.Length);
+                }
+            }
         }
     }
 }

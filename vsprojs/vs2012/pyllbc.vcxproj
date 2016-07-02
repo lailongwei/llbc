@@ -289,6 +289,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllbc.pdb"</Command>
     <ClCompile Include="..\..\wrap\pyllbc\src\testcase\TestCase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\wrap\pyllbc\src\core\utils\_Util_String.h" />
     <ClInclude Include="..\..\wrap\pyllbc\src\pyllbc_scripts.h" />
     <ClInclude Include="..\..\wrap\pyllbc\src\common\_CommonMethods.h" />
     <ClInclude Include="..\..\wrap\pyllbc\src\common\_PyStream.h" />
@@ -380,6 +381,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllbc.pdb"</Command>
     <None Include="..\..\wrap\pyllbc\script\comm\Service.py" />
     <None Include="..\..\wrap\pyllbc\script\comm\ServiceEvent.py" />
     <None Include="..\..\wrap\pyllbc\script\comm\Timer.py" />
+    <None Include="..\..\wrap\pyllbc\script\core\utils\StrUtil.py" />
     <None Include="..\..\wrap\pyllbc\script\testcase\TestCase.py" />
     <None Include="..\..\wrap\pyllbc\script_tools\cfg.py" />
     <None Include="..\..\wrap\pyllbc\script_tools\integrator_builder.py" />
