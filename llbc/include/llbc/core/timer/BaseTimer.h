@@ -62,7 +62,7 @@ public:
 public:
     /**
      * Timeout event handler.
-     * @return bool - return true means readd, otherwise means stop this timer.
+     * @return bool - return true means continuing schedule, otherwise means stop this timer.
      */
      virtual bool OnTimeout() = 0;
 
@@ -75,10 +75,10 @@ public:
     /**
      * Schedule timer.
      * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period value, in milli-seconds.
+     * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(uint64 dueTime, uint64 period);
+    virtual int Schedule(uint64 dueTime, uint64 period = 0);
 
     /**
      * Cancel this timer.

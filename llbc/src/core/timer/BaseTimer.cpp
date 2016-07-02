@@ -70,8 +70,7 @@ int LLBC_BaseTimer::Schedule(uint64 dueTime, uint64 period)
     }
 
     _dueTime = dueTime;
-    _period = period;
-
+    _period = period <= 0 ? dueTime : period;
     return _scheduler->Schedule(this);
 }
 
