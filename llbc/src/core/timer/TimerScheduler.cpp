@@ -114,19 +114,24 @@ void LLBC_TimerScheduler::Update()
 #endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         {
             ++ data->repeatTimes;
-            if (!(reSchedule = data->timer->OnTimeout()))
+            reSchedule = data->timer->OnTimeout();
+#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
+            if (!reSchedule)
                 break;
+#endif // !LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
 
             if (data->timer->IsScheduling())
             {
                 reSchedule = false;
+#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
                 break;
+#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
             }
 
+#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
             if (data->period == 0)
                 break;
 
-#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
             if (UNLIKELY(pseudoNow < data->period))
                 break;
 
