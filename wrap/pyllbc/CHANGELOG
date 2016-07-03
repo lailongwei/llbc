@@ -4,6 +4,12 @@
 #
 # *** 2017/07/03 ***
 # 1) 增加StrUtil工具类, 实现一个hash_string()方法, 用于取得指定字符串的hash code(不保证唯一);
+# 2) 优化所有communication相关装饰器
+#    > 增加@packet装饰器, 在@packet使用的时候, 将自动计算被装饰的coder的opcode,在使用@packet(168)的时候,将使用168作为被装饰的coder的opcode;
+#    > 简化@forsend/@forrecv装饰器,支持不填写opcode,在不填写opcode的情况下,将自动计算forsend/forrecv的opcode;
+#    > 简化@handler/@prehandler装饰器使用,支持直接填写被@forrecv或者@packet装饰过的coder作为参数,不需要再写一遍opcode;
+#    > 简化@exc_handler/@exc_prehandler装饰器使用,同@handler/@prehandler一样,支持支持填写被@forrecv或者@packet装饰过的coder作为参数,不需要再写一遍opcode;
+#    !!! 所有自动计算opcode的算法由StrUtil.hash_string()方法提供,最终实现由c++核心库的LLBC_HashString定义;
 #
 # *** 2016/06/11 ***
 # 1) 配合llbc核心库作调整(详见核心库中的CHANGELOG说明):

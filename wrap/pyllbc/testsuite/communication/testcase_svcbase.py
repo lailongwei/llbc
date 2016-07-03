@@ -2,8 +2,7 @@
 """
 Service basic 测试
 """
-from llbc import TestCase, facade, forrecv, forsend, bindto, Service, Stream, handler
-
+from llbc import TestCase, facade, packet, bindto, Service, Stream, handler, exc_handler
 
 @facade
 @bindto('svcbase_test_svc')
@@ -50,8 +49,7 @@ class TestFacade(object):
         print 'protocol report: {}'.format(ev)
 
 
-@forsend(0)
-@forrecv(0)
+@packet
 @bindto('svcbase_test_svc')
 class TestData(object):
     def __init__(self):
@@ -69,18 +67,24 @@ class TestData(object):
         self.iVal, self.strVal, self.listVal, self.dictVal = s.unpack('iS[i]{i:S}')
 
 
-@handler(0)
+@handler(TestData)
 @bindto('svcbase_test_svc')
 class TestHandler(object):
     def __call__(self, packet):
         svc = packet.svc
         data = packet.data
         session_id = packet.session_id
-        print 'session[{}] recv data: {}'.format(session_id, data)
+        print 'session[{}] recv data, opcode:{}, data:{}'.format(session_id, packet.opcode, data)
 
         print 'send response...'
         svc.send(session_id, data)
+        # raise Exception('Test exception, raise from TestData packet handler')
 
+@exc_handler(TestData)
+@bindto('svcbase_test_svc')
+class ExcHandler(object):
+    def __call__(self, svc, tb, e):
+        print 'Exc handler, tb: {}, e: {}'.format(tb, e)
 
 class SvcBaseTest(TestCase):
     def misc_test(self):

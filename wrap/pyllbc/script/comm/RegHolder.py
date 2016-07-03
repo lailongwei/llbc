@@ -265,6 +265,27 @@ def pyllbc_frame_exc_handler(handler):
 
 llbc.frame_exc_handler = pyllbc_frame_exc_handler
 
+def __pyllbc_normalize_opcodes(opcodes):
+    libkey = '__pyllbcreg__'
+    RegCls = llbc.inl.SvcRegInfo
+    
+    normalized = []
+    for opcode in opcodes:
+        if hasattr(opcode, 'OP'):
+            normalized.append(opcode.OP)
+        elif hasattr(opcode, 'OPCODE'):
+            normalized.append(opcode.OPCODE)
+        elif hasattr(opcode, libkey):
+            opcode_reg = getattr(opcode, libkey)
+            if opcode_reg.regtype == RegCls.Coder:
+                for opcode_deopcode in opcode_reg.deopcodes:
+                    if opcode_deopcode not in normalized:
+                        normalized.append(opcode_deopcode)
+        else:
+            normalized.append(opcode)
+
+    return normalized 
+
 def pyllbc_handler(*opcodes):
     """
     Decorate packet-handler class, once decorate, library will use the class to handle packet.
@@ -273,9 +294,10 @@ def pyllbc_handler(*opcodes):
     def generator(handler):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
-        converted = [(opcode.OP if hasattr(opcode, 'OP') else \
-                (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)) for opcode in opcodes]
+
         reg = pyllbc_extractreg(handler, RegCls.Handler)
+
+        converted = __pyllbc_normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_hldropcodes(*converted))
         return handler 
 
@@ -291,9 +313,10 @@ def pyllbc_prehandler(*opcodes):
     def generator(handler):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
-        converted = [(opcode.OP if hasattr(opcode, 'OP') else \
-                (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)) for opcode in opcodes]
+
         reg = pyllbc_extractreg(handler, RegCls.PreHandler)
+
+        converted = __pyllbc_normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_prehldropcodes(*converted))
         return handler
 
@@ -319,15 +342,16 @@ def pyllbc_exc_handler(*opcodes):
     Decorate packet handler exception handler class, once decorate, library will use the class to pre-handle packet.
     Handler must has __call__() method.
     """
+    # not callable, try parse opcodes
     def generator(handler):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
-        converted = [(opcode.OP if hasattr(opcode, 'OP') else \
-                (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)) for opcode in opcodes]
+
         reg = pyllbc_extractreg(handler, RegCls.ExcHandler)
+
+        converted = __pyllbc_normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_exc_hldropcodes(*converted))
         return handler
-
     return generator
 
 llbc.exc_handler = pyllbc_exc_handler
@@ -368,12 +392,11 @@ def pyllbc_exc_prehandler(*opcodes):
     def generator(handler):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
-        converted = [(opcode.OP if hasattr(opcode, 'OP') else \
-                (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)) for opcode in opcodes]
         reg = pyllbc_extractreg(handler, RegCls.ExcPreHandler)
+
+        converted = __pyllbc_normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_exc_prehldropcodes(*converted))
         return handler
-
     return generator
 
 llbc.exc_prehandler = pyllbc_exc_prehandler
@@ -409,13 +432,19 @@ def pyllbc_forsend(opcode):
     """
     Decorate coder clas, once decorate, library will use the class to encode packet.
     """
+    # callable opcode, it means opcode is coder
+    if callable(opcode):
+        hashed_opcode = llbc.inl.HashString(opcode.__name__)
+        return pyllbc_forsend(hashed_opcode)(opcode)
+
+    # not callable, it means opcode is real opcode, parse it
     def generator(coder):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
 
         reg = pyllbc_extractreg(coder, RegCls.Coder)
         reg.enopcode = opcode.OP if hasattr(opcode, 'OP') else \
-                (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)
+            (opcode.OPCODE if hasattr(opcode, 'OPCODE') else opcode)
         RegsHolder.update(reg)
         return coder
 
@@ -427,6 +456,12 @@ def pyllbc_forrecv(*opcodes):
     """
     Decorate coder class, once decorate, library will use the class to decode packet.
     """
+    # opcodes[0] callable, it means opcodes[0] is coder
+    if len(opcodes) == 1 and callable(opcodes[0]):
+        hashed_opcode = llbc.inl.HashString(opcodes[0].__name__)
+        return pyllbc_forrecv(hashed_opcode)(opcodes[0])
+
+    # not callable, parse opcode
     def generator(coder):
         RegCls = llbc.inl.SvcRegInfo
         RegsHolder = llbc.inl.SvcRegsHolder
@@ -436,10 +471,28 @@ def pyllbc_forrecv(*opcodes):
         reg = pyllbc_extractreg(coder, RegCls.Coder)
         RegsHolder.update(reg.add_deocodes(*converted))
         return coder
-
     return generator
 
 llbc.forrecv = pyllbc_forrecv
+
+def pyllbc_packet(opcode):
+    """
+    Decorate coder class, once decorate, library will use the class to encode & decode packet.
+    """
+    # callable opcode, means this opcode is coder
+    if callable(opcode):
+        hashed_opcode = llbc.inl.HashString(opcode.__name__)
+        return pyllbc_packet(hashed_opcode)(opcode)
+
+    # opcode not callable, parse opcode
+    def generator(coder):
+        pyllbc_forsend(opcode)(coder)
+        recv_opcodes = (opcode, ) if opcode is not None else tuple()
+        pyllbc_forrecv(*recv_opcodes)(coder)
+        return coder
+    return generator
+
+llbc.packet = pyllbc_packet
 
 def pyllbc_bindto(*svcs):
     """
