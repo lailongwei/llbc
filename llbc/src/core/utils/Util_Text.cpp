@@ -547,7 +547,7 @@ int LLBC_HashString(const char *str, size_t strLen)
     if (UNLIKELY(str == NULL || strLen == 0))
         return 0;
 
-    if (strLen == -1)
+    if (strLen == static_cast<size_t>(-1))
         strLen = LLBC_StrLenA(str);
 
     int hashVal = 0;
