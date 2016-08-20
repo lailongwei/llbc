@@ -53,6 +53,12 @@ public:
     void Finalize();
 
     /**
+     * Check logger manager inited or not.
+     * @return bool - the inited flag.
+     */
+    bool IsInited() const;
+
+    /**
      * Get root logger.
      * @return LLBC_Logger * - root logger.
      */

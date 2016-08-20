@@ -60,15 +60,15 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
+    _loggers.insert(std::make_pair("root", _root));
+
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
     std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = configs.begin();
     for (; iter != configs.end(); iter++)
     {
         if (iter->first == "root")
-        {
             continue;
-        }
 
         LLBC_Logger *logger = new LLBC_Logger;
         if (_configurator->Config(iter->first, logger) != LLBC_OK)
@@ -81,14 +81,22 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         _loggers.insert(std::make_pair(iter->first, logger));
     }
 
+
     return LLBC_OK;
+}
+
+bool LLBC_LoggerManager::IsInited() const
+{
+    LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
+    LLBC_Guard guard(nonConstThis->_lock);
+    return _root != NULL;
 }
 
 void LLBC_LoggerManager::Finalize()
 {
     LLBC_Guard guard(_lock);
 
-    LLBC_XDelete(_root);
+    _root = NULL;
     LLBC_STLHelper::DeleteContainer(_loggers);
 
     LLBC_XDelete(_configurator);

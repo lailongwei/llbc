@@ -44,7 +44,6 @@ public:
      */
     int Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config);
 
-
     /**
      * Check logger initialized or not.
      * @return bool - return 0 if success, otherwise return -1.

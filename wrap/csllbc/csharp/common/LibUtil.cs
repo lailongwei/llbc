@@ -31,8 +31,9 @@ namespace llbc
         /// </summary>
         /// <param name="str">the managed string object</param>
         /// <param name="nativeLen">native string length</param>
+        /// <param name="appendNull">auto append \0 character option, default is true</param>
         /// <returns>The native string pointer(alloc from unmanaged memory area)</returns>
-        public static IntPtr CreateNativeStr(string str, IntPtr nativeLen)
+        public static IntPtr CreateNativeStr(string str, IntPtr nativeLen, bool appendNull = true)
         {
             if (string.IsNullOrEmpty(str))
             {
@@ -43,13 +44,16 @@ namespace llbc
                 return IntPtr.Zero;
             }
 
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
+
+            int strBytesLen = Encoding.UTF8.GetByteCount(str);
+            byte[] bytes = new byte[strBytesLen + (appendNull ? 1 : 0)];
+            Encoding.UTF8.GetBytes(str, 0, str.Length, bytes, 0);
+
             IntPtr unmanaged = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, unmanaged, bytes.Length);
-
             unsafe
             {
-                *(int*)nativeLen.ToPointer() = bytes.Length;
+                *(int*)nativeLen.ToPointer() = strBytesLen;
             }
 
             return unmanaged;
@@ -60,16 +64,29 @@ namespace llbc
         /// </summary>
         /// <param name="str">the managed string object</param>
         /// <param name="nativeLen">native string length</param>
+        /// <param name="appendNull">auto append \0 character option, default is true</param>
         /// <returns>the native string pointer(alloc from unmanaged memory area)</returns>
-        public static IntPtr CreateNativeStr(string str, out int nativeLen)
+        public static IntPtr CreateNativeStr(string str, out int nativeLen, bool appendNull = true)
         {
             unsafe
             {
                 fixed (int* ptr = &nativeLen)
                 {
-                    return CreateNativeStr(str, new IntPtr(ptr));
+                    return CreateNativeStr(str, new IntPtr(ptr), appendNull);
                 }
             }
+        }
+
+        /// <summary>
+        /// Create native string.
+        /// </summary>
+        /// <param name="str">the managed string object</param>
+        /// <param name="appendNull">auto append \0 character option, default is true</param>
+        /// <returns></returns>
+        public static IntPtr CreateNativeStr(string str, bool appendNull = true)
+        {
+            int len;
+            return CreateNativeStr(str, out len, appendNull);
         }
     }
 }
