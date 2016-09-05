@@ -522,7 +522,7 @@ public:
         for (; splitTimes < static_cast<uint32>(max_split); splitTimes++)
         {
             size_type findIdx = npos;
-            for (int i = 0; i < seps.size(); i++)
+            for (size_t i = 0; i < seps.size(); i++)
             {
                 findIdx = this->find(seps[i], idx);
                 if (findIdx != npos)
@@ -1015,9 +1015,9 @@ public:
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
-                willStripChars.append(reinterpret_cast<const _Elem *>(" \t"));
+                willStripChars.append(reinterpret_cast<const _Elem *>(" \t\v\r\n\f"));
             else if (sizeof(_Elem) == 2)
-                willStripChars.append(reinterpret_cast<const _Elem *>(L" \t"));
+                willStripChars.append(reinterpret_cast<const _Elem *>(L" \t\v\r\n\f"));
             else
                 return *this;
         }
@@ -1062,9 +1062,9 @@ public:
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
-                willStripChars.append(reinterpret_cast<const _Elem *>(" \t"));
+                willStripChars.append(reinterpret_cast<const _Elem *>(" \t\v\r\n\f"));
             else if (sizeof(_Elem) == 2)
-                willStripChars.append(reinterpret_cast<const _Elem *>(L" \t"));
+                willStripChars.append(reinterpret_cast<const _Elem *>(L" \t\v\r\n\f"));
             else
                 return *this;
         }
@@ -1118,7 +1118,7 @@ public:
 
 public:
 	// escape support: escape string
-	_This &escape(const _This &willEscapeChars, const _Elem &escapeChar)
+	_This &escape(const _This &willbeEscapeChars, const _Elem &escapeChar)
 	{
 		if (this->empty())
 			return *this;
@@ -1128,19 +1128,19 @@ public:
 		{
 			const _Elem &ch = (*this)[i];
 			if (ch == escapeChar || 
-				willEscapeChars.find(ch) != _This::npos)
+				willbeEscapeChars.find(ch) != _This::npos)
 				this->insert(i, 1, escapeChar);
 		}
 
 		return *this;
 	}
 
-	_This escape(const _This &willEscapeChars, const _Elem &escapeChar) const
+	_This escape(const _This &willbeEscapeChars, const _Elem &escapeChar) const
 	{
 		if (this->empty())
 			return *this;
 
-		return _This(*this).escape(willEscapeChars, escapeChar);
+		return _This(*this).escape(willbeEscapeChars, escapeChar);
 	}
 
 	// escape support: unescape string
