@@ -922,6 +922,12 @@
     <ClInclude Include="..\..\llbc\include\llbc\comm\ServiceImpl.h">
       <Filter>include\comm\impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\Ini.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\IniImpl.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\llbc\include\llbc\core\log\Logger_Cfg.cfg">
@@ -1379,6 +1385,9 @@
     </ClCompile>
     <ClCompile Include="..\..\llbc\src\core\os\OS_Process.cpp">
       <Filter>src\core\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\llbc\src\core\config\Ini.cpp">
+      <Filter>src\core\config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

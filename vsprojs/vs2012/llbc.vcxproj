@@ -265,6 +265,8 @@
     <ClInclude Include="..\..\llbc\include\llbc\common\Template.h" />
     <ClInclude Include="..\..\llbc\include\llbc\common\ThirdHeader.h" />
     <ClInclude Include="..\..\llbc\include\llbc\common\Version.h" />
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\Ini.h" />
+    <ClInclude Include="..\..\llbc\include\llbc\core\config\IniImpl.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\Core.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\file\Directory.h" />
     <ClInclude Include="..\..\llbc\include\llbc\core\file\File.h" />
@@ -492,6 +494,7 @@
     <None Include="..\..\CHANGELOG" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\llbc\src\core\config\Ini.cpp" />
     <ClCompile Include="..\..\llbc\src\core\file\Directory_Com.cpp" />
     <ClCompile Include="..\..\llbc\src\core\file\Directory_NonIphone.cpp" />
     <ClCompile Include="..\..\llbc\src\core\file\File.cpp" />

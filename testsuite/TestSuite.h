@@ -31,6 +31,7 @@
 #include "core/file/TestCase_Core_File_File.h"
 #include "core/file/TestCase_Core_File_Directory.h"
 #include "core/variant/TestCase_Core_VariantTest.h"
+#include "core/config/TestCase_Core_Config_Ini.h"
 #include "core/config/TestCase_Core_Config_Config.h"
 #include "core/config/TestCase_Core_Config_Property.h"
 #include "core/time/TestCase_Core_Time_Time.h"

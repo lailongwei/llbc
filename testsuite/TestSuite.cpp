@@ -39,6 +39,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_File_File;
     // test = new TestCase_Core_File_Directory;
     // test = new TestCase_Core_VariantTest;
+    // test = new TestCase_Core_Config_Ini;
     // test = new TestCase_Core_Config_Config;
     // test = new TestCase_Core_Time_Time;
     // test = new TestCase_Core_Config_Property;

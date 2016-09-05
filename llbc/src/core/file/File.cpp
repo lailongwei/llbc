@@ -791,7 +791,8 @@ int LLBC_File::DeleteFile(const LLBC_String &filePath)
 const char *LLBC_File::ParseFileMode(int mode)
 {
     bool openAsText = (mode & LLBC_FileMode::Text) == LLBC_FileMode::Text;
-    int nonFormatMode = mode &= (~LLBC_FileMode::Text | ~LLBC_FileMode::Binary);
+    int nonFormatMode = mode & ~LLBC_FileMode::Text;
+    nonFormatMode = nonFormatMode & ~LLBC_FileMode::Binary;
     switch (nonFormatMode)
     {
     case LLBC_FileMode::Read:

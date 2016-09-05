@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\testsuite\common\TestCase_Com_Stream.cpp" />
     <ClCompile Include="..\..\testsuite\common\TestCase_Com_Version.cpp" />
     <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Facade.cpp" />
+    <ClCompile Include="..\..\testsuite\core\config\TestCase_Core_Config_Ini.cpp" />
     <ClCompile Include="..\..\testsuite\core\file\TestCase_Core_File_File.cpp" />
     <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Algorithm.cpp" />
     <ClCompile Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Coder.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="..\..\testsuite\common\TestCase_Com_Stream.h" />
     <ClInclude Include="..\..\testsuite\common\TestCase_Com_Version.h" />
     <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Facade.h" />
+    <ClInclude Include="..\..\testsuite\core\config\TestCase_Core_Config_Ini.h" />
     <ClInclude Include="..\..\testsuite\core\file\TestCase_Core_File_File.h" />
     <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Algorithm.h" />
     <ClInclude Include="..\..\testsuite\core\utils\TestCase_Core_Utils_Coder.h" />

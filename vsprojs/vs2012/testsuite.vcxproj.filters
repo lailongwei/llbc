@@ -221,6 +221,9 @@
     <ClCompile Include="..\..\testsuite\comm\TestCase_Comm_Facade.cpp">
       <Filter>comm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\testsuite\core\config\TestCase_Core_Config_Ini.cpp">
+      <Filter>core\config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\testsuite\common\TestCase_Com_Compiler.h">
@@ -385,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="..\..\testsuite\comm\TestCase_Comm_Facade.h">
       <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\testsuite\core\config\TestCase_Core_Config_Ini.h">
+      <Filter>core\config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
