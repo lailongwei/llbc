@@ -4,11 +4,19 @@
 #
 # Version: 1.0.1
 #
+# 2016/09/05
+# 新增功能:
+# 1) 增加ini文件解析引擎, 完整支持ini解析, 并支持在错误发生的时候精确定位原因及完整的错误描述, 同时支持分段定义高级功能.
+# 2) 完善LLBC_String.strip()相关功能,以完整支持所有不可显字符的strip.
+# BUG修复:
+# 1) 修复LLBC_File对象在以TextRead打开文本时候内部open_mode转化BUG.
+#
 # 2016/07/03
 # 1) 增加utils中增加LLBC_HashString方法, 用于计算一个字符串的hash code(不保证完全唯一)
 #
 # 2016/07/02
 # 1) 修复TimerScheduler在关闭Strict模式的时候调度异常BUG.
+# 2) 修复linux平台相关编译WARN.
 #
 # 2016/06/11
 # 新增功能:
