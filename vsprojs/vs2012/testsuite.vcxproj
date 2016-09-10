@@ -319,6 +319,7 @@
     <ClInclude Include="..\..\testsuite\TestSuite.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\testsuite\core\config\test_ini.ini" />
     <None Include="..\..\testsuite\core\config\test_json.json" />
     <None Include="..\..\testsuite\core\log\Logger_Cfg.cfg" />
   </ItemGroup>

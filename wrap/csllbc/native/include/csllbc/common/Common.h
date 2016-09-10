@@ -12,5 +12,6 @@
 #include "csllbc/common/LibHeader.h"
 #include "csllbc/common/Macro.h"
 #include "csllbc/common/csDelegates.h"
+#include "csllbc/common/PInvokeUtil.h"
 
 #endif // !__CSLLBC_COM_COMMON_H__

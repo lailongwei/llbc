@@ -226,6 +226,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Common.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\csDelegates.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\PInvokeUtil.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_LibConfig.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\_Errors.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\Export.h" />
@@ -239,12 +240,14 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\csTimer.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Service.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\comm\_Timer.h" />
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\config\_Ini.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\Core.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\log\_Log.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\os\_OS_Console.h" />
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\utils\_Util_String.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\PInvokeUtil.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\common\_LibConfig.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\common\_Errors.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\Comm.cpp" />
@@ -255,6 +258,7 @@ copy "$(TargetDir)..\..\libllbc.pdb" "$(TargetDir)libllb.pdb"</Command>
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\csTimer.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Service.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\comm\_Timer.cpp" />
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\config\_Ini.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\Core.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\log\_Log.cpp" />
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\os\_OS_Console.cpp" />

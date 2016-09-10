@@ -55,6 +55,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\native\core\os\OS_ConsoleNative.cs">
       <Link>native\core\os\OS_ConsoleNative.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\native\core\config\IniNative.cs">
+      <Link>native\core\config\IniNative.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\native\core\log\LogNative.cs">
       <Link>native\core\log\LogNative.cs</Link>
     </Compile>
@@ -88,6 +91,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\common\LibDelegates.cs">
       <Link>common\LibDelegates.cs</Link>
     </Compile>
+    <Compile Include="..\..\wrap\csllbc\csharp\core\config\Ini.cs">
+      <Link>core\config\Ini.cs</Link>
+    </Compile>
     <Compile Include="..\..\wrap\csllbc\csharp\core\log\Logger.cs">
       <Link>core\log\Logger.cs</Link>
     </Compile>
@@ -118,6 +124,9 @@
     <Compile Include="..\..\wrap\csllbc\csharp\comm\RegHolder.cs">
       <Link>comm\RegHolder.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="core\config\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

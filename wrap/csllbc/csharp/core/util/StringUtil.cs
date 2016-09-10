@@ -36,5 +36,35 @@ namespace llbc
                 }
             }
         }
+
+        /// <summary>
+        /// Convert string value to specific type value.
+        /// </summary>
+        /// <typeparam name="T">will convert to type</typeparam>
+        /// <param name="str">string value</param>
+        /// <param name="dftValue">if convert failed, will return the default value</param>
+        /// <returns>converted value</returns>
+        public static T ToType<T>(string str, T dftValue = default(T))
+        {
+            if (string.IsNullOrEmpty(str) && typeof(T) != typeof(string))
+                return dftValue;
+            try
+            {
+                if (typeof(T) == typeof(bool))
+                {
+                    string lowercasedStr = str.ToLower();
+                    if (lowercasedStr == "true")
+                        return (T)((object)true);
+                    else if (lowercasedStr == "false")
+                        return (T)((object)false);
+                }
+
+                return (T)Convert.ChangeType(str, typeof(T));
+            }
+            catch (Exception)
+            {
+                return dftValue;
+            }
+        }
     }
 }

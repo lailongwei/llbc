@@ -400,6 +400,9 @@
     <None Include="..\..\testsuite\core\log\Logger_Cfg.cfg">
       <Filter>core\log</Filter>
     </None>
+    <None Include="..\..\testsuite\core\config\test_ini.ini">
+      <Filter>core\config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\testsuite\core\transcoder\Transcoder_Test_GBK.txt">

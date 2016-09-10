@@ -29,6 +29,7 @@ namespace csllbc_testsuite
 
             // Core testcases.
             // testCase = new TestCase_Core_Log_Logger();
+            // testCase = new TestCase_Core_Config_Ini();
 
             // Communication ttestcases:
             // testCase = new TestCase_Comm_Timer.TestCase_Comm_Timer();

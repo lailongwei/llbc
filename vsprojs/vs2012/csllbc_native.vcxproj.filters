@@ -59,6 +59,12 @@
     <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\log\_Log.h">
       <Filter>include\core\log</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\core\config\_Ini.h">
+      <Filter>include\core\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wrap\csllbc\native\include\csllbc\common\PInvokeUtil.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -102,6 +108,12 @@
     </Filter>
     <Filter Include="src\core\log">
       <UniqueIdentifier>{e65b7b96-0d0a-4f1e-a16b-c2a87ccec2f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core\config">
+      <UniqueIdentifier>{32a671e2-ad10-4775-a6c2-9b054fa30b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\config">
+      <UniqueIdentifier>{907966c6-93db-430d-a74c-1888dbbd8bdf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +161,12 @@
     </ClCompile>
     <ClCompile Include="..\..\wrap\csllbc\native\src\core\log\_Log.cpp">
       <Filter>src\core\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\core\config\_Ini.cpp">
+      <Filter>src\core\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wrap\csllbc\native\src\common\PInvokeUtil.cpp">
+      <Filter>src\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
