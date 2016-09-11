@@ -31,9 +31,9 @@ namespace csllbc_testsuite
             // testCase = new TestCase_Core_Log_Logger();
             // testCase = new TestCase_Core_Config_Ini();
 
-            // Communication ttestcases:
-            // testCase = new TestCase_Comm_Timer.TestCase_Comm_Timer();
-            // testCase = new TestCase_Comm_Service.TestCase_Comm_Service();
+            // Communication testcases:
+            // testCase = new TestCase_Comm_Timer();
+            // testCase = new TestCase_Comm_Service();
 
             testCase.Run(args);
 
