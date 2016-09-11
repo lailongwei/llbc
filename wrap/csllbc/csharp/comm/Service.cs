@@ -1051,7 +1051,6 @@ namespace llbc
                     }
                 }
 
-                // TODO: Process encode return and exceptions.
                 // full-stack option disabled, encode packet and send.
                 MemoryStream stream = new MemoryStream();
                 if (!iCoder.Encode(stream))
@@ -1295,7 +1294,7 @@ namespace llbc
         {
             lock (_lock)
             {
-                LLBCNative.csllbc_Service_OnSvc(_llbcSvc, fullFrame);
+                LLBCNative.csllbc_Service_OnSvc(_llbcSvc, fullFrame ? 1 : 0);
             }
         }
         #endregion
