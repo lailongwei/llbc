@@ -231,7 +231,7 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
     if ((_driveMode = mode) == This::ExternalDrive)
         GetTimerScheduler();
 
-    return LLBC_FAILED;
+    return LLBC_OK;
 }
 
 int LLBC_Service::SuppressCoderNotFoundWarning()
