@@ -1011,7 +1011,7 @@ namespace llbc
                 lock (_lock)
                 {
                     // Check global coder.
-                    if (iCoder == null && _globalCoder == null)
+                    if (_globalCoder == null)
                         throw new LLBCException(
                             "GlobalCoder not found, send packet[{0}] failed, sessionId:{1}", typeof(T), sessionId);
                     // Get opcode.
@@ -1021,7 +1021,7 @@ namespace llbc
                     // Enabled full-stack option, push and waiting native coder to encode it.
                     if (_usedFullStack)
                     {
-                        _FullStackSendNonLock(sessionId, coderInfo.opcode, obj, true, status);
+                        _FullStackSendNonLock(sessionId, obj, coderInfo, status);
                         return;
                     }
 
@@ -1046,7 +1046,7 @@ namespace llbc
                     // Enabled full-stack option, push and waiting native coder to encode it.
                     if (_usedFullStack)
                     {
-                        _FullStackSendNonLock(sessionId, coderInfo.opcode, obj, true, status);
+                        _FullStackSendNonLock(sessionId, obj, coderInfo, status);
                         return;
                     }
                 }
@@ -1382,25 +1382,20 @@ namespace llbc
         #endregion
 
         #region Send helper methods
-        private void _FullStackSendNonLock(int sessionId, int opcode, object obj, bool isCoder, int status)
+        private void _FullStackSendNonLock(int sessionId, object obj, _CoderInfo coderInfo, int status)
         {
             // Check sessionId.
             if (LLBCNative.csllbc_Service_IsSessionValidate(_llbcSvc, sessionId) != 0)
                 throw new LLBCException("Session Id[{0}] invalidate, send failed", sessionId);
 
-            // Get opcode.
-            _CoderInfo coderInfo;
-            if (!_coders.TryGetValue(obj.GetType(), out coderInfo))
-                throw new LLBCException("Could not find packet[{0}] opcode, please RegisterCoder first!", obj.GetType());
-
             // Get packetId.
             long packetId = Interlocked.Increment(ref _maxPacketId);
             // Let native Service object create csllbc_Coder object to send.
-            if (LLBCNative.csllbc_Service_SendPacket(_llbcSvc, sessionId, opcode, packetId, status) != LLBCNative.LLBC_OK)
+            if (LLBCNative.csllbc_Service_SendPacket(_llbcSvc, sessionId, coderInfo.opcode, packetId, status) != LLBCNative.LLBC_OK)
                 throw ExceptionUtil.CreateExceptionFromCoreLib();
 
             // Push
-            _nativeFacade.PushWillEncodeObj(sessionId, coderInfo.opcode, obj, isCoder, packetId, status);
+            _nativeFacade.PushWillEncodeObj(sessionId, coderInfo.opcode, obj, coderInfo.isICoder, packetId, status);
         }
         #endregion
 
