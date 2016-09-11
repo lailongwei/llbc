@@ -33,7 +33,7 @@ namespace csllbc_testsuite
 
             // Communication testcases:
             // testCase = new TestCase_Comm_Timer();
-            // testCase = new TestCase_Comm_Service();
+            testCase = new TestCase_Comm_Service();
 
             testCase.Run(args);
 

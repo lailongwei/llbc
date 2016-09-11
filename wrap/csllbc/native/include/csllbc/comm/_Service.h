@@ -274,6 +274,6 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_UnifyPreSubscribe(csllbc_Service 
  * @param[in] svc       - the service.
  * @param[in] fullStack - full stack flag.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_OnSvc(csllbc_Service *svc, bool fullStack);
+LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_OnSvc(csllbc_Service *svc, int fullStack);
 
 #endif // !__CSLLBC_COMM__SERVICE_H__

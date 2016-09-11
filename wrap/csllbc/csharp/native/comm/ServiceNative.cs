@@ -134,6 +134,6 @@ namespace llbc
         public extern static int csllbc_Service_UnifyPreSubscribe(IntPtr svc);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static void csllbc_Service_OnSvc(IntPtr svc, bool fullStack);
+        public extern static void csllbc_Service_OnSvc(IntPtr svc, int fullStack);
     }
 }

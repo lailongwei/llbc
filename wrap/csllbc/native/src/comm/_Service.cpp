@@ -239,9 +239,9 @@ int csllbc_Service_UnifyPreSubscribe(csllbc_Service *svc)
     return svc->UnifyPreSubscribe();
 }
 
-void csllbc_Service_OnSvc(csllbc_Service *svc, bool fullStack)
+void csllbc_Service_OnSvc(csllbc_Service *svc, int fullStack)
 {
-    svc->OnSvc(fullStack);
+    svc->OnSvc(fullStack != 0);
 }
 
 LLBC_END_C_DECL
