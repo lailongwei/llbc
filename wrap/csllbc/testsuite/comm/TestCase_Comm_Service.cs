@@ -31,6 +31,7 @@ class TestCase_Comm_Service : ITestCase
         // _PreHandleTest();
         // _PacketExcTest();
         // _FrameExcTest();
+        // _SelfDriveTest();
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
@@ -286,7 +287,7 @@ class TestCase_Comm_Service : ITestCase
         }
     }
 
-    [BindTo("SendRecvTest", "PreHandleTest", "PacketExcTest")]
+    [BindTo("SendRecvTest", "PreHandleTest", "PacketExcTest", "SelfDriveTest")]
     class TestPacket : ICoder
     {
         public int intVal;
@@ -566,6 +567,64 @@ class TestCase_Comm_Service : ITestCase
         {
             Console.WriteLine("Service {0} destroy(By Facade2)", svc.svcName);
         }
+    }
+    #endregion
+
+    #region Self-Drive test
+    private void _SelfDriveTest()
+    {
+        Console.WriteLine("Self-Drive test:");
+        using (var svc = new Service("SelfDriveTest"))
+        {
+            svc.driveMode = ServiceDriveMode.SelfDrive;
+            svc.Start();
+            svc.fps = 10;
+
+            Console.WriteLine("Service[{0}] startup, and set fps to: {1}", svc, svc.fps);
+
+            // Self drive 30 seconds
+            Console.WriteLine("Loop 300 times...");
+            for (int i = 0; i < 300; i++)
+                svc.OnSvc(true);
+        }
+    }
+
+    [BindTo("SelfDriveTest")]
+    class _SelfDriveTestFacade : IFacade
+    {
+        public override void OnInit()
+        {
+            Console.Write("Service[{0}] init", svc);
+        }
+
+        public override void OnDestroy()
+        {
+            Console.WriteLine("Service[{0}] destroy", svc);
+        }
+
+        public override void OnStart()
+        {
+            var ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7788);
+            _listenSessionId = svc.Listen(ep);
+            _connSessionId = svc.Connect(ep);
+        }
+
+        public override void OnUpdate()
+        {
+            var packet = new TestPacket();
+            packet.intVal = 1;
+            packet.strVal = "Hello, World";
+            svc.Send(_connSessionId, packet);
+        }
+
+        [Handler(typeof(TestPacket))]
+        private void OnPacket(Packet packet)
+        {
+            Console.WriteLine("Recv packet: {0}", packet);
+        }
+
+        private int _listenSessionId;
+        private int _connSessionId;
     }
     #endregion
 }
