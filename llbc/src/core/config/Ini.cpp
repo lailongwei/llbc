@@ -192,7 +192,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
 
         const LLBC_IniSection &section = *_sections.find(sectionName)->second;
         if (!section._sectionComment.empty())
-            content.append_format(" ; %s", section._sectionComment.c_str());
+            content.append_format(" %c %s", CommentBegin, section._sectionComment.c_str());
         EndLine(content);
 
         LLBC_Strings sectionKeys;
@@ -216,7 +216,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
 
             LLBC_IniSection::_Comments::const_iterator commentIt = section._comments.find(key);
             if (commentIt != section._comments.end())
-                content.append_format(" # %s", commentIt->second.c_str());
+                content.append_format(" %c %s", CommentBegin, commentIt->second.c_str());
             EndLine(content);
         }
 

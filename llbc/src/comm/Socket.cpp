@@ -534,7 +534,8 @@ void LLBC_Socket::OnRecv()
     }
 
     // If recv failed, firstly get last error.
-    int errNo, subErrNo;
+    int errNo = LLBC_ERROR_SUCCESS;
+    int subErrNo = LLBC_ERROR_SUCCESS;
     if (len < 0)
     {
         errNo = LLBC_Errno;
