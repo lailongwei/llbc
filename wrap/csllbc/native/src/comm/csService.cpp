@@ -204,9 +204,9 @@ int csllbc_Service::UnifyPreSubscribe()
 #endif
 }
 
-void csllbc_Service::OnSvc(bool fullStack)
+void csllbc_Service::OnSvc(bool fullFrame)
 {
-    _llbcSvc->OnSvc(fullStack);
+    _llbcSvc->OnSvc(fullFrame);
 }
 
 void csllbc_Service::AddPacketDecodeDelegates(int svcId, PacketDecodeDelegates *delegates)

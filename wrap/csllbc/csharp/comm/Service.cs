@@ -1295,7 +1295,7 @@ namespace llbc
         {
             lock (_lock)
             {
-                LLBCNative.csllbc_Service_OnSvc(_llbcSvc, fullFrame ? 1 : 0);
+                LLBCNative.csllbc_Service_OnSvc(_llbcSvc, fullFrame);
             }
         }
         #endregion
