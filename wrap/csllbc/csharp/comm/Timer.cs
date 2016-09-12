@@ -32,7 +32,10 @@ namespace llbc
         {
             _timeoutHandler = timeoutHandler;
             _cancelHandler = cancelHandler;
-            _nativeTimer = LLBCNative.csllbc_Timer_Create(_OnTimeout, _OnCancel);
+
+            _nativeTimeoutDeleg = _OnTimeout;
+            _nativeCancelDeleg = _OnCancel;
+            _nativeTimer = LLBCNative.csllbc_Timer_Create(_nativeTimeoutDeleg, _nativeCancelDeleg);
         }
 
         /// <summary>
@@ -180,8 +183,11 @@ namespace llbc
         }
         #endregion // Internal implements
 
-        IntPtr _nativeTimer;
         TimeoutHandler _timeoutHandler;
         TimerCancelHandler _cancelHandler;
+
+        IntPtr _nativeTimer;
+        LLBCNative.Deleg_Timer_OnTimeout _nativeTimeoutDeleg;
+        LLBCNative.Deleg_Timer_OnCancel _nativeCancelDeleg;
     }
 }

@@ -426,29 +426,30 @@ namespace llbc
 
                 // Create native service.
                 _nativeFacade = new NativeFacade(this);
+                _nativeFacadeDelegates = new NativeFacadeDelegates(_nativeFacade);
                 _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
-                                                            _nativeFacade.EncodeManagedObj,
-                                                            _nativeFacade.DecodeNative,
-                                                            _nativeFacade.HandlePacket,
-                                                            _nativeFacade.PreHandlePacket,
-                                                            _nativeFacade.UnifyPreHandlePacket,
-                                                            _nativeFacade.HandleCoderNotFound);
+                                                            _nativeFacadeDelegates.svcEncodePacket,
+                                                            _nativeFacadeDelegates.svcDecodePacket,
+                                                            _nativeFacadeDelegates.svcPacketHandler,
+                                                            _nativeFacadeDelegates.svcPacketPreHandler,
+                                                            _nativeFacadeDelegates.svcPacketUnifyPreHandler,
+                                                            _nativeFacadeDelegates.svcNativeCouldNotFoundDecoderReport);
                 if (_llbcSvc.ToInt64() == 0)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
                 // Register native facade.
                 if (LLBCNative.csllbc_Service_RegisterFacade(_llbcSvc,
-                                                             _nativeFacade.OnInit,
-                                                             _nativeFacade.OnDestroy,
-                                                             _nativeFacade.OnStart,
-                                                             _nativeFacade.OnStop,
-                                                             _nativeFacade.OnUpdate,
-                                                             _nativeFacade.OnIdle,
-                                                             _nativeFacade.OnSessionCreate,
-                                                             _nativeFacade.OnSessionDestroy,
-                                                             _nativeFacade.OnAsyncConnResult,
-                                                             _nativeFacade.OnProtoReport,
-                                                             _nativeFacade.OnUnHandledPacket) != LLBCNative.LLBC_OK)
+                                                             _nativeFacadeDelegates.onInit,
+                                                             _nativeFacadeDelegates.onDestroy,
+                                                             _nativeFacadeDelegates.onStart,
+                                                             _nativeFacadeDelegates.onStop,
+                                                             _nativeFacadeDelegates.onUpdate,
+                                                             _nativeFacadeDelegates.onIdle,
+                                                             _nativeFacadeDelegates.onSessionCreate,
+                                                             _nativeFacadeDelegates.onSessionDestroy,
+                                                             _nativeFacadeDelegates.onAsyncConnResult,
+                                                             _nativeFacadeDelegates.onProtoReport,
+                                                             _nativeFacadeDelegates.onUnHandledPacket) != LLBCNative.LLBC_OK)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
                 // Add new service to global svc dictionaries.
@@ -1357,6 +1358,7 @@ namespace llbc
         private void _CleanupFacades()
         {
             _nativeFacade = null;
+            _nativeFacadeDelegates = null;
         }
 
         private void _CleanupCoders()
@@ -2209,6 +2211,58 @@ namespace llbc
         }
         #endregion
 
+        #region NativeFacade delegates
+        private class NativeFacadeDelegates
+        {
+            public NativeFacadeDelegates(NativeFacade facade)
+            {
+                svcEncodePacket = facade.EncodeManagedObj;
+                svcDecodePacket = facade.DecodeNative;
+                svcPacketHandler = facade.HandlePacket;
+                svcPacketPreHandler = facade.PreHandlePacket;
+                svcPacketUnifyPreHandler = facade.UnifyPreHandlePacket;
+                svcNativeCouldNotFoundDecoderReport = facade.HandleCoderNotFound;
+
+                onInit = facade.OnInit;
+                onDestroy = facade.OnDestroy;
+                onStart = facade.OnStart;
+                onStop = facade.OnStop;
+
+                onUpdate = facade.OnUpdate;
+                onIdle = facade.OnIdle;
+
+                onSessionCreate = facade.OnSessionCreate;
+                onSessionDestroy = facade.OnSessionDestroy;
+                onAsyncConnResult = facade.OnAsyncConnResult;
+
+                onProtoReport = facade.OnProtoReport;
+                onUnHandledPacket = facade.OnUnHandledPacket;
+            }
+
+            public LLBCNative.Deleg_Service_EncodePacket svcEncodePacket;
+            public LLBCNative.Deleg_Service_DecodePacket svcDecodePacket;
+            public LLBCNative.Deleg_Service_PacketHandler svcPacketHandler;
+            public LLBCNative.Deleg_Service_PacketPreHandler svcPacketPreHandler;
+            public LLBCNative.Deleg_Service_PacketUnifyPreHandler svcPacketUnifyPreHandler;
+            public LLBCNative.Deleg_Service_NativeCouldNotFoundDecoderReport svcNativeCouldNotFoundDecoderReport;
+
+            public LLBCNative.Deleg_Facade_OnInit onInit;
+            public LLBCNative.Deleg_Facade_OnDestroy onDestroy;
+            public LLBCNative.Deleg_Facade_OnStart onStart;
+            public LLBCNative.Deleg_Facade_OnStop onStop;
+
+            public LLBCNative.Deleg_Facade_OnUpdate onUpdate;
+            public LLBCNative.Deleg_Facade_OnIdle onIdle;
+
+            public LLBCNative.Deleg_Facade_OnSessionCreate onSessionCreate;
+            public LLBCNative.Deleg_Facade_OnSessionDestroy onSessionDestroy;
+            public LLBCNative.Deleg_Facade_OnAsyncConnResult onAsyncConnResult;
+
+            public LLBCNative.Deleg_Facade_OnProtoReport onProtoReport;
+            public LLBCNative.Deleg_Facade_OnUnHandledPacket onUnHandledPacket;
+        }
+        #endregion
+
         private object _lock = new object();
 
         // Main data members.
@@ -2218,6 +2272,7 @@ namespace llbc
 
         // Facades about data members.
         private NativeFacade _nativeFacade;
+        private NativeFacadeDelegates _nativeFacadeDelegates;
 
         // Coder about data members.
         IGlobalCoder _globalCoder;
