@@ -24,7 +24,7 @@ class TestCase_Comm_Service : ITestCase
         Console.WriteLine("Comm/Service test:");
 
         // _BaseMethodsTest();
-        // _StartStopTest();
+        _StartStopTest();
         // _ListenTest();
         // _ConnectTest();
         // _SendRecvTest();
