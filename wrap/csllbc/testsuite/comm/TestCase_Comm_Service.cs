@@ -24,14 +24,14 @@ class TestCase_Comm_Service : ITestCase
         Console.WriteLine("Comm/Service test:");
 
         // _BaseMethodsTest();
-        _StartStopTest();
+        // _StartStopTest();
         // _ListenTest();
         // _ConnectTest();
         // _SendRecvTest();
         // _PreHandleTest();
         // _PacketExcTest();
         // _FrameExcTest();
-        // _SelfDriveTest();
+        // _ExternalDriveTest();
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
@@ -287,7 +287,7 @@ class TestCase_Comm_Service : ITestCase
         }
     }
 
-    [BindTo("SendRecvTest", "PreHandleTest", "PacketExcTest", "SelfDriveTest")]
+    [BindTo("SendRecvTest", "PreHandleTest", "PacketExcTest", "ExternalDriveTest")]
     class TestPacket : ICoder
     {
         public int intVal;
@@ -570,13 +570,13 @@ class TestCase_Comm_Service : ITestCase
     }
     #endregion
 
-    #region Self-Drive test
-    private void _SelfDriveTest()
+    #region External-Drive test
+    private void _ExternalDriveTest()
     {
-        Console.WriteLine("Self-Drive test:");
-        using (var svc = new Service("SelfDriveTest"))
+        Console.WriteLine("External-Drive test:");
+        using (var svc = new Service("ExternalDriveTest"))
         {
-            svc.driveMode = ServiceDriveMode.SelfDrive;
+            svc.driveMode = ServiceDriveMode.ExternalDrive;
             svc.Start();
             svc.fps = 10;
 
@@ -586,10 +586,13 @@ class TestCase_Comm_Service : ITestCase
             Console.WriteLine("Loop 300 times...");
             for (int i = 0; i < 300; i++)
                 svc.OnSvc(true);
+
+            Console.WriteLine("Press any key to exit External-Drive test...");
+            Console.ReadKey();
         }
     }
 
-    [BindTo("SelfDriveTest")]
+    [BindTo("ExternalDriveTest")]
     class _SelfDriveTestFacade : IFacade
     {
         public override void OnInit()
