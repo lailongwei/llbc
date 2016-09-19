@@ -11,6 +11,9 @@ Release/
 vcprojs/vs2008/Debug/
 vcprojs/vs2008/Release/
 
+output/
+build/
+
 llbc/lib/
 llbc/linux/
 
