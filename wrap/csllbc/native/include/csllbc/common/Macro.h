@@ -24,4 +24,9 @@
  #define CSLLBC_EXPORTING LLBC_EXPORTING
 #endif
 
+// the __stdcall macro define(only available in non-windows platform.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+#define __stdcall __attribute__((__stdcall__))
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
 #endif // !__CSLLBC_COM_MACRO_H__

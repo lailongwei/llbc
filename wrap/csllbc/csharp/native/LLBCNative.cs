@@ -54,7 +54,7 @@ namespace llbc
         /// The llbc c# native library name define.
         /// </summary>
         public const string NativeLibName = "libcsllbc_native.dll";
-#else
+#else // Debug
         /// <summary>
         /// The llbc core library name define.
         /// </summary>

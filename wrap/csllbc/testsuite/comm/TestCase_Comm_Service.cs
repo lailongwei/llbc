@@ -385,11 +385,9 @@ class TestCase_Comm_Service : ITestCase
         Console.WriteLine("PreHandle test:");
         using (Service svc = new Service("PreHandleTest"))
         {
-            var facade = new TestFacade_PreHandleTest();
             svc.Start();
 
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7788);
-            int sessionId = svc.Listen(ep);
             Console.WriteLine("Listened on {0}", ep);
 
             int connSessionId = svc.Connect(ep);
@@ -446,11 +444,9 @@ class TestCase_Comm_Service : ITestCase
         Console.WriteLine("PacketExc test:");
         using (Service svc = new Service("PacketExcTest"))
         {
-            var facade = new TestFacade_PacketExcTest();
             svc.Start();
 
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7788);
-            int listenSessionId = svc.Listen(ep);
             Console.WriteLine("Listened on {0}", ep);
 
             int connSessionId = svc.Connect(ep);
@@ -525,8 +521,6 @@ class TestCase_Comm_Service : ITestCase
         Console.WriteLine("FrameExc test:");
         using (Service svc = new Service("FrameExcTest"))
         {
-            var facade = new TestFacade_FrameExcTest();
-            var facade2 = new TestFacade_FrameExcTest2();
             svc.Start();
 
             Console.WriteLine("Press any key to exit FrameExc test...");
@@ -608,7 +602,6 @@ class TestCase_Comm_Service : ITestCase
         public override void OnStart()
         {
             var ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7788);
-            _listenSessionId = svc.Listen(ep);
             _connSessionId = svc.Connect(ep);
         }
 
@@ -626,7 +619,6 @@ class TestCase_Comm_Service : ITestCase
             Console.WriteLine("Recv packet: {0}", packet);
         }
 
-        private int _listenSessionId;
         private int _connSessionId;
     }
     #endregion

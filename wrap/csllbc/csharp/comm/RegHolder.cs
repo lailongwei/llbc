@@ -385,7 +385,7 @@ namespace llbc
         }
 
         /// <summary>
-        /// Register all alyread hold register informations to service.
+        /// Register all already hold register informations to service.
         /// </summary>
         /// <param name="svc"></param>
         /// <param name="assembly"></param>
@@ -394,14 +394,7 @@ namespace llbc
             if (assembly == null)
                 assembly = LibIniter.loaderAssembly;
 
-            bool notCollect = true;
             string assemblyName = assembly.FullName;
-            lock (_lock)
-            {
-                notCollect =
-                    !IsCollected(assemblyName) && !IsCollecting(assemblyName);
-            }
-
             if (IsNotCollect(assemblyName))
             {
                 Collect(assembly, false);
