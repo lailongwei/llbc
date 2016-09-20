@@ -6,19 +6,19 @@
 -- Global compile settings
 
 -- All libraries output directory
-local LLBC_OUTPUT_DIR = "../../../output/" .. _ACTION
+local LLBC_OUTPUT_DIR = "../../output/" .. _ACTION
 
 -- Some third party libraries paths define
 -- Python library: format [2]: include path, [2]: lib path [3]: lib name
 local PYTHON_LIB = { "/usr/local/include/python2.7", "/usr/local/lib", "python2.7" }
 
 -- zlib library:
-local ZLIB_LIB = "../../../llbc/3rd_party/zlib"
+local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
 
 workspace ("llbc_" .. _ACTION)
     -- location define
-    location ("../../../build/" .. _ACTION)
+    location ("../../build/" .. _ACTION)
     -- target directory define
     targetdir (LLBC_OUTPUT_DIR)
 
@@ -64,15 +64,15 @@ project "llbc"
 
     -- files
     files {
-        "../../../llbc/**.h",
-        "../../../llbc/**.c",
-        "../../../llbc/**.cpp",
+        "../../llbc/**.h",
+        "../../llbc/**.c",
+        "../../llbc/**.cpp",
     }
 
     -- includedirs
     includedirs {
         ZLIB_LIB .. "/include",
-        "../../../llbc/include",
+        "../../llbc/include",
     }
 
     -- target prefix
@@ -132,14 +132,14 @@ project "testsuite"
 
     -- files
     files {
-        "../../../testsuite/**.h",
-        "../../../testsuite/**.cpp",
+        "../../testsuite/**.h",
+        "../../testsuite/**.cpp",
     }
 
     -- includedirs
     includedirs {
-        "../../../llbc/include",
-        "../../../testsuite",
+        "../../llbc/include",
+        "../../testsuite",
     }
 
     -- links
@@ -187,20 +187,20 @@ project "pyllbc"
 
     -- files
     files {
-        "../../../wrap/pyllbc/**.h",
-        "../../../wrap/pyllbc/**.cpp",
+        "../../wrap/pyllbc/**.h",
+        "../../wrap/pyllbc/**.cpp",
     }
 
     -- includedirs
     includedirs {
         PYTHON_LIB[1],
 
-        "../../../wrap/pyllbc/Python2.7.8/Include",
+        "../../wrap/pyllbc/Python2.7.8/Include",
 
-        "../../../llbc/include",
+        "../../llbc/include",
 
-        "../../../wrap/pyllbc/include",
-        "../../../wrap/pyllbc",
+        "../../wrap/pyllbc/include",
+        "../../wrap/pyllbc",
     }
 
     -- prebuild commands
@@ -235,11 +235,11 @@ project "pyllbc"
 
     filter { "system:windows", "architecture:x86" }
         libdirs {
-            "../../../wrap/pyllbc/Python2.7.8/Libs/Win/32",
+            "../../wrap/pyllbc/Python2.7.8/Libs/Win/32",
         }
     filter { "system:windows", "architecture:x64" }
         libdirs {
-            "../../../wrap/pyllbc/Python2.7.8/Libs/Win/64",
+            "../../wrap/pyllbc/Python2.7.8/Libs/Win/64",
         }
 
     filter { "system:windows", "configurations:debug*" }
@@ -274,14 +274,14 @@ project "csllbc_native"
 
     -- files
     files {
-        "../../../wrap/csllbc/native/**.h",
-        "../../../wrap/csllbc/native/**.cpp",
+        "../../wrap/csllbc/native/**.h",
+        "../../wrap/csllbc/native/**.cpp",
     }
 
     -- includedirs
     includedirs {
-        "../../../llbc/include",
-        "../../../wrap/csllbc/native/include",
+        "../../llbc/include",
+        "../../wrap/csllbc/native/include",
     }
 
     -- links
@@ -324,7 +324,7 @@ project "csllbc"
 
     -- files
     files {
-        "../../../wrap/csllbc/csharp/**.cs",
+        "../../wrap/csllbc/csharp/**.cs",
     }
 
     -- dependents
@@ -375,7 +375,7 @@ project "csllbc_testsuite"
 
     -- files
     files {
-        "../../../wrap/csllbc/testsuite/**.cs",
+        "../../wrap/csllbc/testsuite/**.cs",
     }
 
     -- links
