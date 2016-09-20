@@ -9,27 +9,30 @@
 local LLBC_OUTPUT_DIR = "../../../output/" .. _ACTION
 
 -- Some third party libraries paths define
--- Format [2]: include path, [2]: lib path [3]: lib name
+-- Python library: format [2]: include path, [2]: lib path [3]: lib name
 local PYTHON_LIB = { "/usr/local/include/python2.7", "/usr/local/lib", "python2.7" }
+
+-- zlib library:
+local ZLIB_LIB = "../../../llbc/3rd_party/zlib"
 -- #########################################################################
 
-workspace "llbc"
-    configurations { "release", "debug" }
+workspace ("llbc_" .. _ACTION)
+    -- location define
     location ("../../../build/" .. _ACTION)
-
     -- target directory define
     targetdir (LLBC_OUTPUT_DIR)
 
-    -- remove independent platforms
-    filter "system:linux"
-        platforms { "linux" }
-    filter "system:win*"
-        removeplatforms { "win32", "win64" }
+    -- configurations
+    configurations { "release", "debug" }
 
     -- defines
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         defines {
             "DEBUG"
+        }
+    filter { "system:windows", "language:c++" }
+        defines {
+            "WIN32",
         }
     filter { "system:linux", "language:c++" }
         defines {
@@ -37,17 +40,20 @@ workspace "llbc"
         }
 
     -- optimize
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         optimize "Debug"
-    filter { "configurations:release" }
+    filter { "configurations:release*" }
         optimize "On"
 
     -- architecture
-    filter "platforms:win32"
-        architecture "x32"
-    filter "platforms:win64 or linux"
+    filter { "system:not windows" }
         architecture "x64"
+    filter { "system:windows" }
+        architecture "x86"
 
+    -- characterset
+    filter { "language:c++" }
+        characterset "MBCS"
 
 -- ****************************************************************************
 -- llbc core library compile setting
@@ -63,15 +69,52 @@ project "llbc"
         "../../../llbc/**.cpp",
     }
 
+    -- includedirs
+    includedirs {
+        ZLIB_LIB .. "/include",
+        "../../../llbc/include",
+    }
+
+    -- target prefix
+    targetprefix "lib"
+
     -- links
-    filter "system:linux"
+    filter { "system:linux" }
+        libdirs {
+            ZLIB_LIB .. "/lib/linux"
+        }
         links {
             "rt",
             "uuid",
         }
 
+    filter { "system:windows" }
+        libdirs {
+            ZLIB_LIB .. "/lib/win"
+        }
+        links {
+            "ws2_32",
+            "Mswsock",
+        }
+    filter { "system:windows", "configurations:debug*", "architecture:x86" }
+        links {
+            "zlibwapi_debug",
+        }
+    filter { "system:windows", "configurations:release*", "architecture:x86" }
+        links {
+            "zlibwapi",
+        }
+    filter { "system:windows", "configurations:debug*", "architecture:x64" }
+        links {
+            "zlibwapi_debug_64",
+        }
+    filter { "system:windows", "configurations:release*", "architecture:x64" }
+        links {
+            "zlibwapi_64",
+        }
+
     -- debug target suffix define
-    filter "configurations:debug"
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
 
 
@@ -81,6 +124,11 @@ project "testsuite"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
+
+    -- dependents
+    dependson {
+        "llbc",
+    }
 
     -- files
     files {
@@ -96,19 +144,33 @@ project "testsuite"
 
     -- links
     libdirs { LLBC_OUTPUT_DIR }
-    filter "configurations:debug"
+    filter { "system:linux" }
         links {
             "dl",
+        }
+    filter { "system:windows" }
+        links {
+            "ws2_32",
+        }
+    filter { "system:linux", "configurations:debug*" }
+        links {
             "llbc_debug",
         }
-    filter "configurations:release"
+    filter { "system:linux", "configurations:release*" }
         links {
-            "dl",
             "llbc",
+        }
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "libllbc_debug",
+        }
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "libllbc",
         }
 
     -- debug target suffix define
-    filter "configurations:debug"
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
 
 -- ****************************************************************************
@@ -117,6 +179,11 @@ project "pyllbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- dependents
+    dependson {
+        "llbc",
+    }
 
     -- files
     files {
@@ -128,12 +195,16 @@ project "pyllbc"
     includedirs {
         PYTHON_LIB[1],
 
+        "../../../wrap/pyllbc/Python2.7.8/Include",
+
         "../../../llbc/include",
+
         "../../../wrap/pyllbc/include",
         "../../../wrap/pyllbc",
     }
 
     -- prebuild commands
+    filter {}
     prebuildcommands {
         "python ../../wrap/pyllbc/script_tools/prebuild.py",
     }
@@ -145,29 +216,61 @@ project "pyllbc"
     -- links 
     libdirs { 
         LLBC_OUTPUT_DIR,
-        PYTHON_LIB[2],
     }
-    filter "configurations:debug"
+    filter { "system:linux" }
+        libdirs {
+            PYTHON_LIB[2],
+        }
         links {
             PYTHON_LIB[3],
+        }
+    filter { "system:linux", "configurations:debug*" }
+        links {
             "llbc_debug",
         }
-    filter "configurations:release"
+    filter { "system:linux", "configurations:release*" }
         links {
-            PYTHON_LIB[3],
             "llbc",
         }
 
+    filter { "system:windows", "architecture:x86" }
+        libdirs {
+            "../../../wrap/pyllbc/Python2.7.8/Libs/Win/32",
+        }
+    filter { "system:windows", "architecture:x64" }
+        libdirs {
+            "../../../wrap/pyllbc/Python2.7.8/Libs/Win/64",
+        }
+
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "python27_d",
+            "libllbc_debug",
+        }
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "python27",
+            "libllbc",
+        }
+
     -- debug target suffix define
-    filter "configurations:debug"
+    filter { "configurations:debug" }
         targetsuffix "_debug"
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) native library compile setting
 project "csllbc_native"
     -- language, kind
-    kind "SharedLib"
     language "c++"
+    kind "SharedLib"
+
+    -- dependents
+    dependson {
+        "llbc",
+    }
+
+    -- library suffix
+    targetprefix "lib"
 
     -- files
     files {
@@ -185,21 +288,29 @@ project "csllbc_native"
     libdirs {
         LLBC_OUTPUT_DIR,
     }
-    filter "configurations:debug"
+    filter { "system:linux", "configurations:debug*" }
         links {
             "llbc_debug",
         }
-    filter "configurations:release"
+    filter { "system:linux", "configurations:release*" }
         links {
             "llbc",
         }
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "libllbc_debug",
+        }
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "libllbc",
+        }
 
     -- debug target suffix define
-    filter "configurations:debug"
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
 
     -- disable warnings
-    filter "system:not windows"
+    filter { "system:not windows" }
         disablewarnings {
             "attributes"
         }
@@ -216,6 +327,11 @@ project "csllbc"
         "../../../wrap/csllbc/csharp/**.cs",
     }
 
+    -- dependents
+    dependson {
+        "llbc",
+        "csllbc_native",
+    }
 
     -- set unsafe flag
     clr "Unsafe"
@@ -226,33 +342,21 @@ project "csllbc"
     }
 
     -- defines
-    filter "system:linux"
+    filter { "system:linux" }
         defines {
             "CSLLBC_TARGET_PLATFORM_LINUX",
         }
-    filter "system:windows"
+    filter { "system:windows" }
         defines {
             "CSLLBC_TARGET_PLATFORM_WIN32",
         }
 
-
     -- links
-    filter "configurations:debug"
-        links {
-            "System",
-            "System.Core",
-            "System.Net",
-        }
-    filter "configurations:release"
-        links {
-            "System",
-            "System.Core",
-            "System.Net",
-        }
-
-    -- debug target suffix define
-    filter "configurations:debug"
-        targetsuffix "_debug"
+    links {
+        "System",
+        "System.Core",
+        "System.Net",
+    }
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) testsuite compile setting
@@ -261,22 +365,23 @@ project "csllbc_testsuite"
     kind "ConsoleApp"
     language "c#"
 
+    -- dependents
+    dependson {
+        "llbc",
+        "csllbc_native",
+        "csllbc",
+    }
+
     -- files
     files {
         "../../../wrap/csllbc/testsuite/**.cs",
     }
 
     -- links
-    filter "configurations:release"
-        links {
-            "csllbc",
-    
-            "System",
-            "System.Core",
-            "System.Net",
-        }
-    
-    -- debug target suffix define
-    filter "configurations:debug"
-        targetsuffix "_debug"
+    links {
+        "System",
+        "System.Core",
+        "System.Net",
+        "csllbc",
+    }
 
