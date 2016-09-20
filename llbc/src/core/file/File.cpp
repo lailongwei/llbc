@@ -491,9 +491,15 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
 
     attrs.isDirectory = (cStat.st_mode & S_IFDIR) == S_IFDIR;
 
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+    memcpy(&attrs.lastAccessTime, &cStat.st_atimespec, sizeof(timespec));
+    memcpy(&attrs.lastModifyTime, &cStat.st_mtimespec, sizeof(timespec));
+    memcpy(&attrs.lastChangeStatusTime, &cStat.st_ctimespec, sizeof(timespec));
+#else // Linux or Android
     memcpy(&attrs.lastAccessTime, &cStat.st_atim, sizeof(timespec));
     memcpy(&attrs.lastModifyTime, &cStat.st_mtim, sizeof(timespec));
     memcpy(&attrs.lastChangeStatusTime, &cStat.st_ctim, sizeof(timespec));
+#endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
 
     if (attrs.isDirectory)
         attrs.fileSize = 0;
@@ -599,7 +605,12 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     ::CloseHandle(handle);
     return LLBC_OK;
 #else // Non-WIN32
-    int fd = open(filePath.c_str(), O_NOATIME, O_RDONLY);
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+    const int openFlags = O_RDONLY;
+#else // Linux & Android
+    const int openFlags = O_RDONLY | O_NOATIME;
+#endif
+    int fd = open(filePath.c_str(), openFlags);
     if (fd == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
