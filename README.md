@@ -19,7 +19,7 @@ llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的
 长期测试维护平台为win/linux平台,Mac,iOS,Android主要因为个人时间问题,难以长期维护(Android基本未编译测试,虽然代码中有此平台的兼容代码,Mac及iOS平台之前有过简单的编译测试)  
 llbc库没有任何依赖可以直接安装,json代码文件使用jsoncpp,已经作调整,以支持64位int,并整合到库代码中.
 ###Windows:
-运行WinPreBuild.bat,根据自己机器环境选择选择对应vs版本的sln文件及project文件,完成后进行打开sln文件进行编译即可.  
+运行WinPreBuild.bat,根据自己机器环境选择选择生成对应vs版本的sln文件及project文件,完成后进行打开sln文件进行编译即可.  
 sln文件目标目录: build/vsxxxx, PreBuild脚本在生成后,会自动帮你打开此目录,只需要双击llbc_vsxxxx.sln编译即可.  
 当前支持的vs版本: **vs2005**, **vs2008**, **vs2010**, **vs2012**, **vs2013**, **vs2015**
 ###Linux:
