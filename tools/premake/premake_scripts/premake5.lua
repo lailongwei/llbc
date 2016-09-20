@@ -352,10 +352,11 @@ project "csllbc"
         }
 
     -- links
+    filter {}
     links {
         "System",
-        "System.Core",
         "System.Net",
+        "System.Core",
     }
 
 -- ****************************************************************************
@@ -380,8 +381,8 @@ project "csllbc_testsuite"
     -- links
     links {
         "System",
-        "System.Core",
         "System.Net",
+        "System.Core",
         "csllbc",
     }
 
