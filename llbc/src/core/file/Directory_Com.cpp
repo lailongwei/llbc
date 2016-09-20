@@ -70,7 +70,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
             continue;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (!::CreateDirectory(toPath.c_str(), NULL))
+        if (!::CreateDirectoryA(toPath.c_str(), NULL))
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
             return LLBC_FAILED;
