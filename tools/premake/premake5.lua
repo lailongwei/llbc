@@ -38,6 +38,10 @@ workspace ("llbc_" .. _ACTION)
         defines {
             "LINUX"
         }
+    filter { "system:macosx", "language:c++" }
+        defines {
+            "TARGET_OS_MAC",
+        }
 
     -- optimize
     filter { "configurations:debug*" }
