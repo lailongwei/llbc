@@ -26,7 +26,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The log token chain class encapsulation.
  */
-class LLBC_LogTokenChain
+class LLBC_EXPORT LLBC_LogTokenChain
 {
 public:
     LLBC_LogTokenChain();
