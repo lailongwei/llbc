@@ -274,6 +274,12 @@ project "pyllbc"
             "libllbc",
         }
 
+    -- flags
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
+
     -- debug target suffix define
     filter { "configurations:debug" }
         targetsuffix "_debug"
@@ -324,6 +330,12 @@ project "csllbc_native"
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
+        }
+
+    -- flags
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
         }
 
     -- debug target suffix define
