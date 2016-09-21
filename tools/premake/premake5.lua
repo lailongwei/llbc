@@ -194,6 +194,12 @@ project "testsuite"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
 
+    -- warnings
+    filter { "system:not windows" }
+        disablewarnings {
+            "invalid-source-encoding",
+        }
+
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting
 project "pyllbc"
