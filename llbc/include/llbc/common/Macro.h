@@ -177,6 +177,11 @@
 #define LLBC_CPP11_PARTICAL
 #endif
 
+// Define register keyword to empty n c++11(in c++11 standard, register is deprecated)
+#ifdef LLBC_CPP11
+#define register
+#endif
+
 // Disable assignments of objects.
 #ifdef LLBC_CPP11_PARTICAL
 #define LLBC_DISABLE_ASSIGNMENT(name)               \
