@@ -5,14 +5,15 @@
 #****************************************************************************
 # Determine platform name
 #****************************************************************************
-OS = $(shell uname)
-PLATFORMNAME=linux
+SUPPORTED_PLATFORMS	:= linux darwin
+PLATFORMNAME		?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
+$(if $(findstring $(PLATFORMNAME),$(SUPPORTED_PLATFORMS)),,$(error "Unsupported os, must be one of '$(SUPPORTED_PLATFORMS)'"))
 
 #****************************************************************************
 # some useful variables
 #****************************************************************************
 # All targets define
-PREMAKE_TARGET	:= ________premake________
+PREMAKE_TARGET	:= build_makefiles
 
 CORELIB_TARGET  := core_lib
 TEST_TARGET     := test
