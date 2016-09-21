@@ -529,6 +529,12 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
             return LLBC_OK;
     }
 
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+    // In MAC or iPhone platform, always upate access & modify time.
+    updateLastAccessTime = true;
+    updateLastModifyTime = true;
+#endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+
     if (!updateLastAccessTime && !updateLastModifyTime)
         return LLBC_OK;
 
@@ -617,6 +623,20 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         return LLBC_FAILED;
     }
 
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+    timeval times[2];
+    times[0].tv_sec = lastAccessTime->tv_sec;
+    times[0].tv_usec = lastAccessTime->tv_nsec / 1000;
+    times[1].tv_sec = lastModifyTime->tv_sec;
+    times[1].tv_usec = lastModifyTime->tv_nsec / 1000;
+    if (futimes(fd, times) == -1)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        close(fd);
+
+        return LLBC_FAILED;
+    }
+#else // Linux & Android
     timespec times[2];
     if (lastAccessTime)
         memcpy(&times[0], lastAccessTime, sizeof(timespec));
@@ -635,6 +655,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
 
         return LLBC_FAILED;
     }
+#endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
 
     close(fd);
     return LLBC_OK;

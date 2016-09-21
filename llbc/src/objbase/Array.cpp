@@ -423,32 +423,6 @@ LLBC_Array::ConstObj *LLBC_Array::operator [](LLBC_Array::difference_type off) c
     return _objs[off];
 }
 
-LLBC_Array &LLBC_Array::operator =(const LLBC_Array &rhs)
-{
-    if (this == &rhs)
-    {
-        return *this;
-    }
-
-    Clear();
-    if (_capacity < rhs._size)
-    {
-        Recapacity(rhs._size);
-    }
-
-    LLBC_MemCpy(_objs, rhs._objs, rhs._size * sizeof(Obj *));
-    for (size_type i = 0; i < rhs._size; i++)
-    {
-        _objs[i]->Retain();
-    }
-
-    _size = rhs._size;
-
-    SetObjectFactory(rhs._objFactory);
-
-    return *this;
-}
-
 void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
 {
     LLBC_SAFE_RELEASE(_objFactory);

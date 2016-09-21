@@ -41,7 +41,7 @@ public:
         TextAppendReadWrite = AppendReadWrite | Text, // Append read and write file as text format.
         BinaryAppendReadWrite = AppendReadWrite | Binary, // Append read and write file as binary format.
 
-        LastestMode = 0xe0000000,               // Lastest open mode, use ReOpen method.
+        LastestMode = 0x70000000,               // Lastest open mode, use ReOpen method.
     };
 
 public:
@@ -362,6 +362,9 @@ public:
 
     /**
      * Touch file.
+     * Note:
+     *      In iOS & Mac platform, updateLastAccessTime and updateLastModifyTime will always set to true.
+     *      In this two platforms, if lastAccessTime and lastModifyTime not set, will update to now.
      * @param[in] filePath - the file path.
      * @param[in] updateLastAccessTime - need update last access time?
      * @param[in] lastAccessTime       - the last access time, if NULL, will update to now.

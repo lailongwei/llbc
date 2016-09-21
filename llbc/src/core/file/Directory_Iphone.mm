@@ -7,7 +7,7 @@
  * @brief
  */
 
- #include "llbc/common/ExportHeader.h"
+ #include "llbc/common/Export.h"
  #include "llbc/common/BeforeIncl.h"
 
  #include "llbc/core/file/Directory.h"
@@ -46,4 +46,4 @@ LLBC_String LLBC_Directory::CacheDir()
 
  #endif // iPhone
 
- #include "llbc/common/AfeterIncl.h"
+ #include "llbc/common/AfterIncl.h"

@@ -72,8 +72,13 @@ project "llbc"
         "../../llbc/**.c",
         "../../llbc/**.cpp",
     }
+    filter { "system:macosx" }
+    files {
+        "../../llbc/**.mm",
+    }
 
     -- includedirs
+    filter {}
     includedirs {
         ZLIB_LIB .. "/include",
         "../../llbc/include",
@@ -117,6 +122,17 @@ project "llbc"
             "zlibwapi_64",
         }
 
+    filter { "system:macosx" }
+        links {
+            "iconv",
+        }
+
+    -- flags
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
@@ -152,17 +168,18 @@ project "testsuite"
         links {
             "dl",
         }
-    filter { "system:windows" }
-        links {
-            "ws2_32",
-        }
-    filter { "system:linux", "configurations:debug*" }
+    filter { "system:not windows", "configurations:debug*" }
         links {
             "llbc_debug",
         }
-    filter { "system:linux", "configurations:release*" }
+    filter { "system:not windows", "configurations:release*" }
         links {
             "llbc",
+        }
+
+    filter { "system:windows" }
+        links {
+            "ws2_32",
         }
     filter { "system:windows", "configurations:debug*" }
         links {

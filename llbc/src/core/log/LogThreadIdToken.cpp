@@ -42,15 +42,15 @@ void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &format
     int index = static_cast<int>(formattedData.size());
 
 #if LLBC_TARGET_PLATFORM_LINUX
-    formattedData.append(LLBC_Num2Str((uint32)(data.threadHandle)));
+    formattedData.append(LLBC_Num2Str(data.threadHandle));
 #elif LLBC_TARGET_PLATFORM_WIN32
     formattedData.append(LLBC_Num2Str((uint32)(data.threadHandle)));
 #elif LLBC_TARGET_PLATFORM_IPHONE
-    formattedData.append(LLBC_Ptr2Str(data.threadHandle));
+    formattedData.append(LLBC_Num2Str(data.threadHandle));
 #elif LLBC_TARGET_PLATFORM_MAC
-    formattedData.append(LLBC_Ptr2Str(data.threadHandle));
+    formattedData.append(LLBC_Num2Str(data.threadHandle));
 #elif LLBC_TARGET_PLATFORM_ANDROID
-    formattedData.append(LLBC_Ptr2Str(data.threadHandle));
+    formattedData.append(LLBC_Num2Str(data.threadHandle));
 #endif
 
     LLBC_LogFormattingInfo *formatter = GetFormatter();
