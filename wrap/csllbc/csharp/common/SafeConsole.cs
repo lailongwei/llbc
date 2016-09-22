@@ -27,15 +27,14 @@ namespace llbc
             { 
                 int color = LLBCNative.csllbc_Console_GetForegroundColor();
                 if (color == LLBCNative.LLBC_FAILED)
-                    throw ExceptionUtil.CreateExceptionFromCoreLib();
+                    return ConsoleColor.White;
 
                 return (ConsoleColor)color;
             }
 
             set
             {
-                if (LLBCNative.csllbc_Console_SetForegroundColor((int)value) != LLBCNative.LLBC_OK)
-                    throw ExceptionUtil.CreateExceptionFromCoreLib();
+                LLBCNative.csllbc_Console_SetForegroundColor((int)value);
             }
         }
 
@@ -48,15 +47,14 @@ namespace llbc
             {
                 int color = LLBCNative.csllbc_Console_GetBackgroundColor();
                 if (color == LLBCNative.LLBC_FAILED)
-                    throw ExceptionUtil.CreateExceptionFromCoreLib();
+                    return ConsoleColor.Black;
 
                 return (ConsoleColor)color;
             }
 
             set
             {
-                if (LLBCNative.csllbc_Console_SetBackgroundColor((int)value) != LLBCNative.LLBC_OK)
-                    throw ExceptionUtil.CreateExceptionFromCoreLib();
+                LLBCNative.csllbc_Console_SetBackgroundColor((int)value);
             }
         }
 
@@ -65,8 +63,7 @@ namespace llbc
         /// </summary>
         public static void ResetColor()
         {
-            if (LLBCNative.csllbc_Console_ResetColor() != LLBCNative.LLBC_OK)
-                throw ExceptionUtil.CreateExceptionFromCoreLib();
+            LLBCNative.csllbc_Console_ResetColor();
         }
         #endregion
 
