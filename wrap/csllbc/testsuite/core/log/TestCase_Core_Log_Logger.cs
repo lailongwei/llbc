@@ -37,10 +37,10 @@ class TestCase_Core_Log_Logger : ITestCase
         // Get test logger to test.
         var testLogger = LoggerMgr.Get("test");
         testLogger.Dbg("A debug message from testLogger.Dbg()...");
-        testLogger.Info("A debug message from testLogger.Dbg()...");
-        testLogger.Warn("A debug message from testLogger.Dbg()...");
-        testLogger.Err("A debug message from testLogger.Dbg()...");
-        testLogger.Fatal("A debug message from testLogger.Dbg()...");
+        testLogger.Info("A info message from testLogger.Info()...");
+        testLogger.Warn("A warn message from testLogger.Warn()...");
+        testLogger.Err("A error message from testLogger.Err()...");
+        testLogger.Fatal("A fatal message from testLogger.Fatal()...");
 
         Console.WriteLine("Press any key to exit test...");
         Console.ReadKey();
