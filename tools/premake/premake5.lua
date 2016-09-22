@@ -48,7 +48,15 @@ workspace ("llbc_" .. _ACTION)
         symbols("On")
 
     -- optimize
-    filter { "configurations:debug*" }
+    filter { "configurations:debug*", "language:c++", "system:not windows" }
+        buildoptions {
+            "-ggdb -g",
+        }
+    filter { "configurations:debug*", "language:c++", "system:macosx" } 
+        buildoptions {
+            "-glldb",
+        }
+    filter { "configurations:debug*", "language:not c++" }
         optimize "Debug"
     filter { "configurations:release*" }
         optimize "On"
