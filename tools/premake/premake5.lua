@@ -43,6 +43,10 @@ workspace ("llbc_" .. _ACTION)
             "TARGET_OS_MAC",
         }
 
+    -- control symbols
+    filter { "system:macosx", "language:c++" }
+        symbols("On")
+
     -- optimize
     filter { "configurations:debug*" }
         optimize "Debug"
