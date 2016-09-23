@@ -24,10 +24,10 @@ sln文件目标目录: build/vsxxxx, PreBuild脚本在生成后,会自动帮你�
 当前支持的vs版本: **vs2005**, **vs2008**, **vs2010**, **vs2012**, **vs2013**, **vs2015**
 ###Linux:
 请确认是否已经安装libuuid(sudo yum install libuuid-devel)  
-make all & make install
+make all
 ###Mac:
 请确认是否已经安装xCode command line tools  
-make all & make install(untested)
+make all
 ###iOS:
 使用xCode编译即可(untested)
   
@@ -35,17 +35,14 @@ make all & make install(untested)
 ###Windows:
 llbc: 编译出的dll所在目录output/vsxxxx中,copy使用即可.  
 testsuite: 编译出的测试套件在output/vsxxxx中,直接使用即可.  
-wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只有一个.pyd,编译输出目录为output/vsxxxx/wrap/python.  
-*注*:  
-> 如果你需要编译64位版本的llbc或者pyllbc,请在项目中调整你的编译配置即可,对于64位版本的pyllbc,请确认你机器使用的python为64位版本的python.  
-> 如果你需要编译debug版本的llbc或者pyllbc,同样也在编译配置中调整即可.
+wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只有一个.pyd,编译输出目录为output/vsxxxx.  
     
-###Linux & mac:
-llbc: 编译出的so所在目录: llbc/lib,可以直接copy使用  
-testsuite 编译出的可执行程序目录: testsuite/bin,直接使用  
-pyllbc: 编译出的so所在目录为: wrap/pyllbc/lib,可以直接copy到你的python版本的site-package目录使用  
-*注*:
-> linux版本的makefile集成了install指令,建议使用make install安装
+###Linux/Mac
+请根据你的需要执行安装指令:  
+**llbc**: make install_core_lib  
+**wrap/pyllbc**: make install_py_wrap  
+**wrap/csllbc**: make install_cs_wrap为空实现, 如果需要使用csllbc, 请直接copy到您的目标目录即可  
+如果需要完全安装, 请执行make install即可  
     
 ###iOS:
 xCode编译出来dylib,直接在你的项目中引用即可
