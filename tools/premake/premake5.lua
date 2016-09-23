@@ -329,14 +329,6 @@ project "csllbc_native"
     libdirs {
         LLBC_OUTPUT_DIR,
     }
-    filter { "system:linux", "configurations:debug*" }
-        links {
-            "llbc_debug",
-        }
-    filter { "system:linux", "configurations:release*" }
-        links {
-            "llbc",
-        }
     filter { "system:windows", "configurations:debug*" }
         links {
             "libllbc_debug",
@@ -344,6 +336,14 @@ project "csllbc_native"
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
+        }
+    filter { "system:not windows", "configurations:debug*" }
+        links {
+            "llbc_debug",
+        }
+    filter { "system:not windows", "configurations:release*" }
+        links {
+            "llbc",
         }
 
     -- flags
