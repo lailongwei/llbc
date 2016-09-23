@@ -52,10 +52,6 @@ workspace ("llbc_" .. _ACTION)
         buildoptions {
             "-ggdb -g",
         }
-    filter { "configurations:debug*", "language:c++", "system:macosx" } 
-        buildoptions {
-            "-glldb",
-        }
     filter { "configurations:debug*", "language:not c++" }
         optimize "Debug"
     filter { "configurations:release*" }
