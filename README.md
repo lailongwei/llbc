@@ -33,8 +33,8 @@ make all
   
 ##安装:
 ###Windows:
-llbc: 编译出的dll所在目录output/vsxxxx中,copy使用即可.  
-testsuite: 编译出的测试套件在output/vsxxxx中,直接使用即可.  
+llbc: 编译出的dll所在目录output/vsxxxx中,直接复制使用即可.  
+testsuite: 编译出的测试套件在output/vsxxxx中,直接复制使用即可.  
 wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只有一个.pyd,编译输出目录为output/vsxxxx.  
     
 ###Linux/Mac
@@ -42,7 +42,7 @@ wrap/pyllbc: python封装使用了自动化脚本,编译出来的python库将只
 **llbc**: make install_core_lib  
 **wrap/pyllbc**: make install_py_wrap  
 **wrap/csllbc**: make install_cs_wrap为空实现, 如果需要使用csllbc, 请直接copy到您的目标目录即可  
-如果需要完全安装, 请执行make install即可  
+如果需要完全安装, 请执行make install命令  
     
 ###iOS:
 xCode编译出来dylib,直接在你的项目中引用即可
