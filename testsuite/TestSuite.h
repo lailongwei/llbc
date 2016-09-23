@@ -60,6 +60,7 @@
 #include "comm/TestCase_Comm_ReleasePool.h"
 #include "comm/TestCase_Comm_Facade.h"
 #include "comm/TestCase_Comm_SvcBase.h"
+#include "comm/TestCase_Comm_SvcStartStop.h"
 #include "comm/TestCase_Comm_Svc.h"
 #include "comm/TestCase_Comm_SendBytes.h"
 #include "comm/TestCase_Comm_Multicast.h"

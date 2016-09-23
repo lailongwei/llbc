@@ -112,7 +112,7 @@ LLBC_Service::LLBC_Service(This::Type type)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 {
-    // Get the poller type from Config.h
+    // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);
     ASSERT (LLBC_PollerType::IsValid(pollerType) && "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
@@ -120,10 +120,8 @@ LLBC_Service::LLBC_Service(This::Type type)
     _pollerMgr.SetService(this);
     _pollerMgr.SetPollerType(pollerType);
 
-    // MSVC earlier compiler may not support initialize array in construct list.
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC && LLBC_COMP_VER < 1400
+    // Force cleanup _filters array again.
     LLBC_MemSet(_filters, 0, sizeof(_filters));
-#endif
 
     // Create protocol stack.
 #if !LLBC_CFG_COMM_USE_FULL_STACK
