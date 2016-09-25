@@ -58,9 +58,11 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
 
     -- architecture
-    filter { "system:not windows" }
+    filter { "system:linux" }
         architecture "x64"
     filter { "system:windows" }
+        architecture "x86"
+    filter { "system:macosx" }
         architecture "x86"
 
     -- characterset
@@ -387,6 +389,12 @@ project "csllbc"
     prebuildcommands {
         "python ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
     }
+
+    -- postbuild commands
+    filter { 'system:not windows' }
+        postbuildcommands {
+            "python ../../wrap/csllbc/csharp/script_tools/gen_dll_cfg.py ../../output/" .. _ACTION,
+        }
 
     -- defines
     filter { "system:linux" }
