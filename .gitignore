@@ -6,6 +6,8 @@
 *.opensdf
 *.idc
 
+.DS_Store
+
 Debug/
 Release/
 vcprojs/vs2008/Debug/
@@ -23,3 +25,4 @@ testsuite/linux/
 wrap/pyllbc/lib/
 wrap/pyllbc/linux/
 
+!.gitignore
