@@ -5,6 +5,9 @@
 -- #########################################################################
 -- Global compile settings
 
+-- python tool define
+local PY = string.find(_ACTION, "vs") and "$(ProjectDir)../../tools/py.exe" or "python"
+
 -- All libraries output directory
 local LLBC_OUTPUT_DIR = "../../output/" .. _ACTION
 
@@ -243,7 +246,7 @@ project "pyllbc"
     -- prebuild commands
     filter {}
     prebuildcommands {
-        "python ../../wrap/pyllbc/script_tools/prebuild.py",
+        PY .. " ../../wrap/pyllbc/script_tools/prebuild.py",
     }
 
     -- target name, target prefix
@@ -387,13 +390,13 @@ project "csllbc"
 
     -- prebuild commands
     prebuildcommands {
-        "python ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+        PY .. " ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
     }
 
     -- postbuild commands
     filter { 'system:not windows' }
         postbuildcommands {
-            "python ../../wrap/csllbc/csharp/script_tools/gen_dll_cfg.py ../../output/" .. _ACTION,
+            PY .. " ../../wrap/csllbc/csharp/script_tools/gen_dll_cfg.py ../../output/" .. _ACTION,
         }
 
     -- defines
