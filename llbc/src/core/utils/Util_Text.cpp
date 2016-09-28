@@ -22,7 +22,11 @@
 
 int lstrlenA(LPCSTR lpString)
 {
+#if LLBC_TARGET_PLATFORM_NON_IPHONE
     return ::strlen(lpString);
+#else // iPhone
+    return static_cast<int>(::strlen(lpString));
+#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
 }
 
 int lstrlenW(LPCWSTR lpString)

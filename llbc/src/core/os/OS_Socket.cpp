@@ -243,8 +243,12 @@ int LLBC_ShutdownSocketInputOutput(LLBC_SocketHandle handle)
 
 int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags)
 {
+#if LLBC_TARGET_PLATFORM_NON_IPHONE
     int ret = 0;
-    while ((ret = ::send(handle, 
+#else // iPhone
+    ssize_t ret = 0;
+#endif
+    while ((ret = ::send(handle,
                          reinterpret_cast<const char *>(buf), 
                          len, 
                          flags)) < 0 && errno == EINTR);
@@ -266,7 +270,11 @@ int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags)
         return LLBC_FAILED;
     }
 
+#if LLBC_TARGET_PLATFORM_NON_IPHONE
     return ret;
+#else // iPhone
+    return static_cast<int>(ret);
+#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (ret == SOCKET_ERROR)
     {
@@ -321,8 +329,12 @@ int LLBC_SendEx(LLBC_SocketHandle handle,
 
 int LLBC_Recv(LLBC_SocketHandle handle, void *buf, int len, int flags)
 {
+#if LLBC_TARGET_PLATFORM_NON_IPHONE
     int ret = 0;
-    while ((ret = ::recv(handle, 
+#else // iPHone
+    ssize_t ret = 0;
+#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
+    while ((ret = ::recv(handle,
                          reinterpret_cast<char *>(buf), 
                          len, 
                          flags)) < 0 && errno == EINTR);
@@ -344,7 +356,11 @@ int LLBC_Recv(LLBC_SocketHandle handle, void *buf, int len, int flags)
         return LLBC_FAILED;
     }
 
+#if LLBC_TARGET_PLATFORM_NON_IPHONE
     return ret;
+#else // iPHone
+    return static_cast<int>(ret);
+#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
 #else // LLBC_TARGET_PLATFORM_WIN32
     if (ret == SOCKET_ERROR)
     {

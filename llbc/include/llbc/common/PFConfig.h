@@ -4,12 +4,36 @@
  * @date    2013/08/16
  * @version 1.0
  *
- * @brief   llbc library target platform determine header file.
+ * @brief   llbc library target platform recognize header file.
  */
 #ifndef __LLBC_COM_PF_CONFIG_H__
 #define __LLBC_COM_PF_CONFIG_H__
 
+// ==================================================================================
+// Platform specific macros pre-define.
+//
+// If in macos/ios platform, include macos/ios platform recognize implement file.
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
+// If in windows platform, define WIN32 macro
+#ifndef WIN32
+ #if defined(_WIN32)
+  #define WIN32
+ #endif // _WIN32
+#endif // !WIN32
+
+// If in linux platform, define LINUX macro
+#ifndef LINUX
+ #if defined(__linux__)
+  #define LINUX
+ #endif // __linux__
+#endif // !LINUX
+
+// ==================================================================================
 // Platform type enumeration.
+//
 #define LLBC_PLATFORM_UNKNOWN       0
 #define LLBC_PLATFORM_LINUX         1
 #define LLBC_PLATFORM_WIN32         2
@@ -17,34 +41,36 @@
 #define LLBC_PLATFORM_MAC           4
 #define LLBC_PLATFORM_ANDROID       5
 
-// Determine target platform by compile enviornment macro.
 #define LLBC_TARGET_PLATFORM        LLBC_PLATFORM_UNKNOWN
 
-// LINUX Platform determine.
+// ==================================================================================
+// Recognize platforms
+//
+// Linux platform recognize.
 #if !LLBC_TARGET_PLATFORM && defined(LINUX)
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_LINUX
 #endif
 
-// WIN32 Platform determine.
+// Windows platform recognize.
 #if !LLBC_TARGET_PLATFORM && defined(WIN32)
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_WIN32
 #endif
 
-// IPHONE(and IPHONE Simulator)
-#if !LLBC_TARGET_PLATFORM && (defined(TARGET_OS_IPHONE) || defined(TARGET_OS_SIMULATOR))
+// iPhone(included Simulator) platform recognize.
+#if !LLBC_TARGET_PLATFORM && TARGET_OS_IPHONE
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_IPHONE
 #endif
-	
-// MAC
-#if !LLBC_TARGET_PLATFORM && defined(TARGET_OS_MAC)
- #undef LLBC_TARGET_PLATFORM
- #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_MAC
+
+// Mac platform recognize.
+#if !LLBC_TARGET_PLATFORM && TARGET_OS_MAC
+#undef LLBC_TARGET_PLATFORM
+#define LLBC_TARGET_PLATFORM LLBC_PLATFORM_MAC
 #endif
 
-// ANDROID
+// Android platform recognize.
 #if !LLBC_TARGET_PLATFORM && defined(ANDROID)
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_ANDROID
@@ -77,8 +103,14 @@
 #if LLBC_TARGET_PLATFORM == LLBC_PLATFORM_IPHONE
  #define LLBC_TARGET_PLATFORM_IPHONE                        1
  #define LLBC_TARGET_PLATFORM_NON_IPHONE                    0
+ #if TARGET_IPHONE_SIMULATOR
+  #define LLBC_TARGET_PLATFORM_IPHONE_SIMULATOR             1
+ #else
+  #define LLBC_TARGET_PLATFORM_IPHONE_SIMULATOR             0
+ #endif
 #else
  #define LLBC_TARGET_PLATFORM_IPHONE                        0
+ #define LLBC_TARGET_PLATFORM_IPHONE_SIMULATOR              0
  #define LLBC_TARGET_PLATFORM_NON_IPHONE                    1
 #endif
 

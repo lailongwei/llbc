@@ -33,18 +33,6 @@ workspace ("llbc_" .. _ACTION)
         defines {
             "DEBUG"
         }
-    filter { "system:windows", "language:c++" }
-        defines {
-            "WIN32",
-        }
-    filter { "system:linux", "language:c++" }
-        defines {
-            "LINUX"
-        }
-    filter { "system:macosx", "language:c++" }
-        defines {
-            "TARGET_OS_MAC",
-        }
 
     -- control symbols
     filter { "system:macosx", "language:c++" }

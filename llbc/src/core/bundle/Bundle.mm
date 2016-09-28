@@ -16,6 +16,7 @@
 #include "llbc/core/bundle/Bundle.h"
 
 #if LLBC_TARGET_PLATFORM_IPHONE
+#import <Foundation/Foundation.h>
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -26,10 +27,10 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_Bundle::LLBC_Bundle()
-: m_bundle(LLBC_INVALID_BUNDLE_HANDLE)
+: _bundle(LLBC_INVALID_BUNDLE_HANDLE)
 
-, m_bundleName()
-, m_bundlePath()
+, _bundleName()
+, _bundlePath()
 {
 }
 
@@ -40,10 +41,10 @@ LLBC_Bundle::~LLBC_Bundle()
 
 int LLBC_Bundle::CreateMainBundle()
 {
-    if(LLBC_INTERNAL_NS __g_mainBundle)
+    if (LLBC_INTERNAL_NS __g_mainBundle)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
     
     LLBC_INTERNAL_NS __g_mainBundle = new LLBC_Bundle;
@@ -52,7 +53,7 @@ int LLBC_Bundle::CreateMainBundle()
 
 void LLBC_Bundle::DestroyMainBundle()
 {
-    SAFE_DELETE(LLBC_INTERNAL_NS __g_mainBundle);
+    LLBC_XDelete(LLBC_INTERNAL_NS __g_mainBundle);
 }
 
 const LLBC_Bundle *LLBC_Bundle::GetMainBundle()
@@ -63,81 +64,79 @@ const LLBC_Bundle *LLBC_Bundle::GetMainBundle()
 int LLBC_Bundle::Initialize(const LLBC_String &path)
 {
     
-    if(m_bundle != LLBC_INVALID_BUNDLE_HANDLE)
+    if (_bundle != LLBC_INVALID_BUNDLE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_RTN_FAILED;
+        return LLBC_FAILED;
     }
 
-    if( ( m_bundle = LLBC_CreateBundle(path) ) == LLBC_INVALID_BUNDLE_HANDLE )
-    {
-        return LLBC_RTN_FAILED;
-    }
+    if((_bundle = LLBC_CreateBundle(path)) == LLBC_INVALID_BUNDLE_HANDLE)
+        return LLBC_FAILED;
 
-    m_bundlePath = LLBC_GetBundlePath(m_bundle);
-    m_bundleName = LLBC_BaseName(m_bundlePath, true);
+    _bundlePath = LLBC_GetBundlePath(_bundle);
+    _bundleName = LLBC_BaseName(_bundlePath, true);
 
-    return LLBC_RTN_OK;
+    return LLBC_OK;
 }
 
 void LLBC_Bundle::Finalize()
 {
-    if(m_bundle != LLBC_INVALID_BUNDLE_HANDLE)
+    if(_bundle != LLBC_INVALID_BUNDLE_HANDLE)
     {
-        LLBC_ReleaseBundle(m_bundle);
-        m_bundle = LLBC_INVALID_BUNDLE_HANDLE;
+        LLBC_ReleaseBundle(_bundle);
+        _bundle = LLBC_INVALID_BUNDLE_HANDLE;
 
-        m_bundleName.clear();
-        m_bundlePath.clear();
+        _bundleName.clear();
+        _bundlePath.clear();
     }
 }
 
 LLBC_BundleHandle LLBC_Bundle::GetHandle() const
 {
-    return m_bundle;
+    return _bundle;
 }
 
 const LLBC_String &LLBC_Bundle::GetBundleName() const
 {
-    return m_bundleName;
+    return _bundleName;
 }
 
 const LLBC_String &LLBC_Bundle::GetBundlePath() const
 {
-    return m_bundlePath;
+    return _bundlePath;
 }
 
 LLBC_String LLBC_Bundle::GetResPath(const LLBC_String &name) const
 {
-    if(m_bundle == LLBC_INVALID_BUNDLE_HANDLE)
+    if(_bundle == LLBC_INVALID_BUNDLE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return "";
     }
 
-    return LLBC_GetBundleResPath(m_bundle, name);
+    return LLBC_GetBundleResPath(_bundle, name);
 }
 
 LLBC_String LLBC_Bundle::GetResPath(const LLBC_String &name, const LLBC_String &ext) const
 {
-    if(m_bundle == LLBC_INVALID_BUNDLE_HANDLE)
+    if(_bundle == LLBC_INVALID_BUNDLE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return "";
     }
 
-    return LLBC_GetBundleResPath(m_bundle, name, ext);
+    return LLBC_GetBundleResPath(_bundle, name, ext);
 }
 
 LLBC_String LLBC_Bundle::GetResPath(const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir) const
 {
-    if(m_bundle == LLBC_INVALID_BUNDLE_HANDLE)
+    if(_bundle == LLBC_INVALID_BUNDLE_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return "";
     }
     
-    return LLBC_GetBundleResPath(m_bundle, name, ext, inDir);
+    return LLBC_GetBundleResPath(_bundle, name, ext, inDir);
 }
 
 __LLBC_NS_END

@@ -119,15 +119,14 @@ void LLBC_SelectPoller::Svc()
             // In Non-WIN32 platform, the fd_set use bit-set way to implement.
             // So, we must use the looks like stupid method to lookup.
             _Sockets sockets = _sockets;
-            for (_Sockets::iterator it = _sockets.begin();
-                    it != _sockets.end();
+            for (_Sockets::iterator it = sockets.begin();
+                    it != sockets.end();
                     it++)
             {
+                LLBC_Session *session = it->second;
                 const LLBC_SocketHandle handle = it->first;
                 if (LLBC_FdIsSet(handle, &excepts))
                 {
-                    LLBC_Session *session = 
-                        _sockets.find(handle)->second;
                     LLBC_Socket *sock = session->GetSocket();
 
                     int sockErr;
@@ -141,7 +140,6 @@ void LLBC_SelectPoller::Svc()
                 }
                 else if (LLBC_FdIsSet(handle, &reads))
                 {
-                    LLBC_Session *session = _sockets.find(handle)->second;
                     if (session->GetSocket()->IsListen())
                         Accept(session);
                     else
@@ -149,9 +147,7 @@ void LLBC_SelectPoller::Svc()
                 }
                 else if (LLBC_FdIsSet(handle, &writes))
                 {
-                    _Sessions::iterator sit = _sockets.find(handle);
-                    if (it != _sockets.end())
-                        it->second->OnSend();
+                    session->OnSend();
                 }
             }
 #endif // LLBC_TARGET_PLATFORM_WIN32

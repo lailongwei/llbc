@@ -13,6 +13,7 @@
 #include "llbc/core/os/OS_Bundle.h"
 
 #if LLBC_TARGET_PLATFORM_IPHONE
+#import <Foundation/Foundation.h>
 
 __LLBC_NS_BEGIN
 

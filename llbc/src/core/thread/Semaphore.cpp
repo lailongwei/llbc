@@ -46,7 +46,7 @@ LLBC_Semaphore::~LLBC_Semaphore()
  #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     sem_destroy(&_sem);
  #else
-    sem_destroy(_sem);
+    sem_close(_sem);
  #endif
 #else
     ::CloseHandle(_sem);

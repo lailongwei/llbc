@@ -626,9 +626,9 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
 #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
     timeval times[2];
     times[0].tv_sec = lastAccessTime->tv_sec;
-    times[0].tv_usec = lastAccessTime->tv_nsec / 1000;
+    times[0].tv_usec = static_cast<__darwin_suseconds_t>(lastAccessTime->tv_nsec / 1000);
     times[1].tv_sec = lastModifyTime->tv_sec;
-    times[1].tv_usec = lastModifyTime->tv_nsec / 1000;
+    times[1].tv_usec = static_cast<__darwin_suseconds_t>(lastModifyTime->tv_nsec / 1000);
     if (futimes(fd, times) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
