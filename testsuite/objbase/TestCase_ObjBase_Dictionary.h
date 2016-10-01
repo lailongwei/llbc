@@ -12,6 +12,8 @@
 #include "llbc.h"
 using namespace llbc;
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 class TestCase_ObjBase_Dictionary : public LLBC_BaseTestCase
 {
 public:
@@ -21,5 +23,7 @@ public:
 public:
     virtual int Run(int argc, char *argv[]);
 };
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #endif // !__LLBC_TEST_CASE_OBJBASE_DICTIONARY_H__

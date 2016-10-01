@@ -9,6 +9,8 @@
 
 #include "objbase/TestCase_ObjBase_Array.h"
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 namespace
 {
 
@@ -265,3 +267,5 @@ void TestCase_ObjBase_Array::SortTest()
     std::cout <<"Done, output it: " <<std::endl;
     arr.Foreach(foreachFun);
 }
+
+#endif // LLBC_CFG_OBJBASE_ENABLED

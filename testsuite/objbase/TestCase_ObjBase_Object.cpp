@@ -9,6 +9,8 @@
 
 #include "objbase/TestCase_ObjBase_Object.h"
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 namespace
 {
 
@@ -57,3 +59,5 @@ int TestCase_ObjBase_Object::Run(int arg, char *argv[])
 
     return 0;
 }
+
+#endif // LLBC_CFG_OBJBASE_ENABLED

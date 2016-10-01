@@ -57,9 +57,11 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_Library;
 
     /* ObjBase module testcases. */
+#if LLBC_CFG_OBJBASE_ENABLED
     // test = new TestCase_ObjBase_Object;
     // test = new TestCase_ObjBase_Array;
     // test = new TestCase_ObjBase_Dictionary;
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
     /* Communication module testcases. */
     // test = new TestCase_Comm_Event;
@@ -67,7 +69,9 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_PacketOp;
     // test = new TestCase_Comm_HeaderDesc;
     // test = new TestCase_Comm_PacketHeaderParts;
+#if LLBC_CFG_OBJBASE_ENABLED
     // test = new TestCase_Comm_ReleasePool;
+#endif // LLBC_CFG_OBJBASE_ENABLED
     // test = new TestCase_Comm_Facade;
     // test = new TestCase_Comm_SvcBase;
     // test = new TestCase_Comm_SvcStartStop;

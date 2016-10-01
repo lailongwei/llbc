@@ -12,6 +12,8 @@
 #include "llbc.h"
 using namespace llbc;
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 class TestCase_ObjBase_Array : public LLBC_BaseTestCase
 {
 public:
@@ -28,5 +30,7 @@ private:
 
     void SortTest();
 };
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #endif // !__LLBC_TEST_CASE_OBJBASE_ARRAY_H__

@@ -104,7 +104,9 @@ LLBC_Service::LLBC_Service(This::Type type)
 , _handledBeforeFrameTasks(false)
 , _handlingAfterFrameTasks(false)
 
+#if LLBC_CFG_OBJBASE_ENABLED
 , _releasePoolStack(NULL)
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 , _timerScheduler(NULL)
 
@@ -334,7 +336,7 @@ void LLBC_Service::Stop()
     {
         if (_sinkIntoLoop) // Service sink into loop, set afterStop flag to true, and return.
         {
-            _afterStop = true; //! After stop datamember only use external-drive service.
+            _afterStop = true; //! After stop data member only use external-drive service.
             return;
         }
 
@@ -962,7 +964,9 @@ void LLBC_Service::OnSvc(bool fullFrame)
     // Update all components.
     UpdateFacades();
     UpdateTimers();
+#if LLBC_CFG_OBJBASE_ENABLED
     UpdateAutoReleasePool();
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
     // Handle after frame-tasks.
     HandleFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
@@ -1044,7 +1048,9 @@ void LLBC_Service::Svc()
     _lock.Lock();
     AddServiceToTls();
     GetTimerScheduler();
+#if LLBC_CFG_OBJBASE_ENABLED
     CreateAutoReleasePool();
+#endif // LLBC_CFG_OBJBASE_ENABLED
     InitFacades();
     StartFacades();
     _lock.Unlock();
@@ -1071,7 +1077,9 @@ void LLBC_Service::Cleanup()
 
     // Stop facades, destroy release-pool, and remove service from TLS.
     StopFacades();
+#if LLBC_CFG_OBJBASE_ENABLED
     DestroyAutoReleasePool();
+#endif // LLBC_CFG_OBJBASE_ENABLED
     RemoveServiceFromTls();
 
     // Popup & Destroy all not-process events.
@@ -1432,6 +1440,7 @@ void LLBC_Service::DestroyFacades()
     LLBC_STLHelper::DeleteContainer(_facades, true, true);
 }
 
+#if LLBC_CFG_OBJBASE_ENABLED
 void LLBC_Service::CreateAutoReleasePool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
@@ -1455,6 +1464,7 @@ void LLBC_Service::DestroyAutoReleasePool()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->objbaseTls.poolStack = NULL;
 }
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 void LLBC_Service::GetTimerScheduler()
 {

@@ -12,6 +12,8 @@
 #include "llbc.h"
 using namespace llbc;
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 class TestCase_Comm_ReleasePool : public LLBC_BaseTestCase
 {
 public:
@@ -21,5 +23,7 @@ public:
 public:
     virtual int Run(int argc, char *argv[]);
 };
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #endif // !__LLBC_TEST_CASE_COMM_RELEASE_POOL_H__

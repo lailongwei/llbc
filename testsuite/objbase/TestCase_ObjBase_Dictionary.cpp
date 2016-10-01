@@ -9,6 +9,8 @@
 
 #include "objbase/TestCase_ObjBase_Dictionary.h"
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 namespace
 {
 
@@ -201,3 +203,5 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
 
     return 0;
 }
+
+#endif // LLBC_CFG_OBJBASE_ENABLED

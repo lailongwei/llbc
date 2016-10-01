@@ -9,6 +9,8 @@
 
 #include "comm/TestCase_Comm_ReleasePool.h"
 
+#if LLBC_CFG_OBJBASE_ENABLED
+
 namespace
 {
 
@@ -90,3 +92,5 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
 
     return 0;
 }
+
+#endif // LLBC_CFG_OBJBASE_ENABLED

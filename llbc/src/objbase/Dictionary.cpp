@@ -10,6 +10,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/common/Config.h"
+
+#if LLBC_CFG_OBJBASE_ENABLED
+
 #include "llbc/objbase/Object.h"
 #include "llbc/objbase/ObjectFactory.h"
 #include "llbc/objbase/ObjectMacro.h"
@@ -563,5 +567,7 @@ void LLBC_Dictionary::RemoveFromDoublyLinkedList(LLBC_DictionaryElem *elem)
 }
 
 __LLBC_NS_END
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

@@ -10,6 +10,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/common/Config.h"
+
+#if LLBC_CFG_OBJBASE_ENABLED
+
 #include "llbc/objbase/Object.h"
 #include "llbc/objbase/KeyHashAlgorithm.h"
 #include "llbc/objbase/DictionaryElem.h"
@@ -242,5 +246,7 @@ const LLBC_Object *LLBC_DictionaryElem::operator *() const
 }
 
 __LLBC_NS_END
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

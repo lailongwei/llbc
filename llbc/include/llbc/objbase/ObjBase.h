@@ -9,6 +9,10 @@
 #ifndef __LLBC_OBJBASE_OBJBASE_H__
 #define __LLBC_OBJBASE_OBJBASE_H__
 
+#include "llbc/common/Config.h"
+
+#if LLBC_CFG_OBJBASE_ENABLED 
+
 #include "llbc/objbase/Object.h"
 #include "llbc/objbase/ObjectMacro.h"
 #include "llbc/objbase/ObjectFactory.h"
@@ -20,5 +24,7 @@
 
 #include "llbc/objbase/AutoReleasePool.h"
 #include "llbc/objbase/AutoReleasePoolStack.h"
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #endif // !__LLBC_OBJBASE_OBJBASE_H__

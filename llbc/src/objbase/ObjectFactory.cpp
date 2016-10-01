@@ -10,6 +10,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/common/Config.h"
+
+#if LLBC_CFG_OBJBASE_ENABLED
+
 #include "llbc/objbase/ObjectFactory.h"
 
 __LLBC_NS_BEGIN
@@ -33,5 +37,7 @@ LLBC_Object *LLBC_ObjectFactory::Clone() const
 }
 
 __LLBC_NS_END
+
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

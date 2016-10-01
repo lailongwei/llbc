@@ -444,12 +444,14 @@ private:
     void StopFacades();
     void DestroyFacades();
 
+#if LLBC_CFG_OBJBASE_ENABLED
     /**
      * Auto-Release pool operation methods.
      */
     void CreateAutoReleasePool();
     void UpdateAutoReleasePool();
     void DestroyAutoReleasePool();
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
     /**
      * Timer-Scheduler operation methods.
@@ -548,7 +550,9 @@ private:
     bool _handlingAfterFrameTasks;
 
 private:
+#if LLBC_CFG_OBJBASE_ENABLED
     LLBC_AutoReleasePoolStack *_releasePoolStack;
+#endif // LLBC_CFG_OBJBASE_ENABLED
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
