@@ -568,7 +568,7 @@
 		D88A7F881D9ACA3D008C9A1F /* BaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseTestCase.h; sourceTree = "<group>"; };
 		D88A7F891D9ACA3D008C9A1F /* ITestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITestCase.h; sourceTree = "<group>"; };
 		D88A7F8A1D9ACA48008C9A1F /* llbc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = llbc.h; path = ../llbc/include/llbc.h; sourceTree = "<group>"; };
-		D8B593161D98399200D3D22E /* libllbc_debug.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libllbc_debug.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8B593161D98399200D3D22E /* libllbc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libllbc.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1482,7 +1482,7 @@
 		D8B593171D98399200D3D22E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D8B593161D98399200D3D22E /* libllbc_debug.a */,
+				D8B593161D98399200D3D22E /* libllbc.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1504,7 +1504,7 @@
 			);
 			name = llbc;
 			productName = llbc;
-			productReference = D8B593161D98399200D3D22E /* libllbc_debug.a */;
+			productReference = D8B593161D98399200D3D22E /* libllbc.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -1783,10 +1783,13 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../llbc/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = "-fvisibility=hidden";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)_debug";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7s armv7";
 			};
 			name = Debug;
 		};
@@ -1794,12 +1797,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../llbc/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = "-fvisibility=hidden";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7s armv7";
 			};
 			name = Release;
 		};
