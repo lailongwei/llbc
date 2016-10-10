@@ -50,7 +50,6 @@ int TestCase_Core_Config_Ini::Run(int argc, char *argv[])
         ini.GetValue<LLBC_String>("Hello", "Cfg1").c_str(), ini.GetComment("Hello", "Cfg1").c_str());
     LLBC_PrintLine("Config [Hello] Cfg3 = %s", ini.GetValue<LLBC_String>("Hello", "Cfg3").c_str());
 
-    const char *val = ini.GetValue<const char *>("World", "Cfg1");
     LLBC_PrintLine("Config [World] Cfg1 = %s", ini.GetValue<LLBC_String>("World", "Cfg1").c_str());
     LLBC_PrintLine("Config [World] Cfg3 = %s", ini.GetValue<LLBC_String>("World", "Cfg3").c_str());
 

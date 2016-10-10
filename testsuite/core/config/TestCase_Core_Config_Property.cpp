@@ -12,7 +12,7 @@
 TestCase_Core_Config_Property::TestCase_Core_Config_Property()
 {
 #if LLBC_TARGET_PLATFORM_IPHONE
-    _file = LLBC_JoinDirectory(LLBC_Directory::TempDir(), "test_prop.cfg");
+    _file = LLBC_Directory::Join(LLBC_Directory::TempDir(), "test_prop.cfg");
 #else
     _file = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "test_prop.cfg");
 #endif

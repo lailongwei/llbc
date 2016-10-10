@@ -1,0 +1,814 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D87A14261DA3541D00DB1F62 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = D87A14231DA3541D00DB1F62 /* AppDelegate.mm */; };
+		D87A14271DA3541D00DB1F62 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = D87A14251DA3541D00DB1F62 /* ViewController.mm */; };
+		D87A142F1DA3544B00DB1F62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D87A14281DA3544B00DB1F62 /* Assets.xcassets */; };
+		D87A14321DA3544B00DB1F62 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D87A142E1DA3544B00DB1F62 /* Info.plist */; };
+		D87A14341DA3556F00DB1F62 /* Main_iOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = D87A14331DA3556F00DB1F62 /* Main_iOS.mm */; };
+		D87A14BF1DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14361DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.cpp */; };
+		D87A14C01DA3559100DB1F62 /* TestCase_Comm_Event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14381DA3559100DB1F62 /* TestCase_Comm_Event.cpp */; };
+		D87A14C11DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A143A1DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.cpp */; };
+		D87A14C21DA3559100DB1F62 /* TestCase_Comm_Facade.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A143C1DA3559100DB1F62 /* TestCase_Comm_Facade.cpp */; };
+		D87A14C31DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A143E1DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.cpp */; };
+		D87A14C41DA3559100DB1F62 /* TestCase_Comm_LazyTask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14401DA3559100DB1F62 /* TestCase_Comm_LazyTask.cpp */; };
+		D87A14C51DA3559100DB1F62 /* TestCase_Comm_Multicast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14421DA3559100DB1F62 /* TestCase_Comm_Multicast.cpp */; };
+		D87A14C61DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14441DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.cpp */; };
+		D87A14C71DA3559100DB1F62 /* TestCase_Comm_PacketOp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14461DA3559100DB1F62 /* TestCase_Comm_PacketOp.cpp */; };
+		D87A14C81DA3559100DB1F62 /* TestCase_Comm_ReleasePool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14481DA3559100DB1F62 /* TestCase_Comm_ReleasePool.cpp */; };
+		D87A14C91DA3559100DB1F62 /* TestCase_Comm_SendBytes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A144A1DA3559100DB1F62 /* TestCase_Comm_SendBytes.cpp */; };
+		D87A14CA1DA3559100DB1F62 /* TestCase_Comm_Svc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A144C1DA3559100DB1F62 /* TestCase_Comm_Svc.cpp */; };
+		D87A14CB1DA3559100DB1F62 /* TestCase_Comm_SvcBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A144E1DA3559100DB1F62 /* TestCase_Comm_SvcBase.cpp */; };
+		D87A14CC1DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14501DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.cpp */; };
+		D87A14CD1DA3559100DB1F62 /* TestCase_Comm_Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14521DA3559100DB1F62 /* TestCase_Comm_Timer.cpp */; };
+		D87A14CE1DA3559100DB1F62 /* TestCase_Com_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14551DA3559100DB1F62 /* TestCase_Com_Compiler.cpp */; };
+		D87A14CF1DA3559100DB1F62 /* TestCase_Com_DataType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14571DA3559100DB1F62 /* TestCase_Com_DataType.cpp */; };
+		D87A14D01DA3559100DB1F62 /* TestCase_Com_Endian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14591DA3559100DB1F62 /* TestCase_Com_Endian.cpp */; };
+		D87A14D11DA3559100DB1F62 /* TestCase_Com_Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A145B1DA3559100DB1F62 /* TestCase_Com_Error.cpp */; };
+		D87A14D21DA3559100DB1F62 /* TestCase_Com_Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A145D1DA3559100DB1F62 /* TestCase_Com_Stream.cpp */; };
+		D87A14D31DA3559100DB1F62 /* TestCase_Com_Version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A145F1DA3559100DB1F62 /* TestCase_Com_Version.cpp */; };
+		D87A14D41DA3559100DB1F62 /* TestCase_Core_Bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14631DA3559100DB1F62 /* TestCase_Core_Bundle.cpp */; };
+		D87A14D51DA3559100DB1F62 /* test_ini.ini in Resources */ = {isa = PBXBuildFile; fileRef = D87A14661DA3559100DB1F62 /* test_ini.ini */; };
+		D87A14D61DA3559100DB1F62 /* test_json.json in Resources */ = {isa = PBXBuildFile; fileRef = D87A14671DA3559100DB1F62 /* test_json.json */; };
+		D87A14D71DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14681DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp */; };
+		D87A14D81DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146A1DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp */; };
+		D87A14D91DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146C1DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp */; };
+		D87A14DA1DA3559100DB1F62 /* TestCase_Core_Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */; };
+		D87A14DB1DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14721DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp */; };
+		D87A14DC1DA3559100DB1F62 /* TestCase_Core_File_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14741DA3559100DB1F62 /* TestCase_Core_File_File.cpp */; };
+		D87A14DD1DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14771DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp */; };
+		D87A14DE1DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14791DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp */; };
+		D87A14DF1DA3559100DB1F62 /* TestCase_Core_Library.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A147C1DA3559100DB1F62 /* TestCase_Core_Library.cpp */; };
+		D87A14E01DA3559100DB1F62 /* Logger_Cfg.cfg in Resources */ = {isa = PBXBuildFile; fileRef = D87A147F1DA3559100DB1F62 /* Logger_Cfg.cfg */; };
+		D87A14E11DA3559100DB1F62 /* TestCase_Core_Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14801DA3559100DB1F62 /* TestCase_Core_Log.cpp */; };
+		D87A14E21DA3559100DB1F62 /* TestCase_Core_OS_Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14831DA3559100DB1F62 /* TestCase_Core_OS_Console.cpp */; };
+		D87A14E31DA3559100DB1F62 /* TestCase_Core_OS_Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14851DA3559100DB1F62 /* TestCase_Core_OS_Thread.cpp */; };
+		D87A14E41DA3559100DB1F62 /* TestCase_Core_Random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14881DA3559100DB1F62 /* TestCase_Core_Random.cpp */; };
+		D87A14E51DA3559100DB1F62 /* TestCase_Core_Thread_CV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A148B1DA3559100DB1F62 /* TestCase_Core_Thread_CV.cpp */; };
+		D87A14E61DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A148D1DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp */; };
+		D87A14E71DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A148F1DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.cpp */; };
+		D87A14E81DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14911DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.cpp */; };
+		D87A14E91DA3559100DB1F62 /* TestCase_Core_Thread_Task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14931DA3559100DB1F62 /* TestCase_Core_Thread_Task.cpp */; };
+		D87A14EA1DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14951DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.cpp */; };
+		D87A14EB1DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14971DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp */; };
+		D87A14EC1DA3559100DB1F62 /* TestCase_Core_Time_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A149A1DA3559100DB1F62 /* TestCase_Core_Time_Time.cpp */; };
+		D87A14ED1DA3559100DB1F62 /* TestCase_Core_Transcoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A149D1DA3559100DB1F62 /* TestCase_Core_Transcoder.cpp */; };
+		D87A14EE1DA3559100DB1F62 /* Transcoder_Test_GBK.txt in Resources */ = {isa = PBXBuildFile; fileRef = D87A149F1DA3559100DB1F62 /* Transcoder_Test_GBK.txt */; };
+		D87A14EF1DA3559100DB1F62 /* Transcoder_Test_UTF16.txt in Resources */ = {isa = PBXBuildFile; fileRef = D87A14A01DA3559100DB1F62 /* Transcoder_Test_UTF16.txt */; };
+		D87A14F01DA3559100DB1F62 /* Transcoder_Test_UTF8.txt in Resources */ = {isa = PBXBuildFile; fileRef = D87A14A11DA3559100DB1F62 /* Transcoder_Test_UTF8.txt */; };
+		D87A14F11DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14A31DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.cpp */; };
+		D87A14F21DA3559100DB1F62 /* TestCase_Core_Utils_Coder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14A51DA3559100DB1F62 /* TestCase_Core_Utils_Coder.cpp */; };
+		D87A14F31DA3559100DB1F62 /* TestCase_Core_Utils_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14A71DA3559100DB1F62 /* TestCase_Core_Utils_Debug.cpp */; };
+		D87A14F41DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14A91DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.cpp */; };
+		D87A14F51DA3559100DB1F62 /* TestCase_Core_Utils_MD5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14AB1DA3559100DB1F62 /* TestCase_Core_Utils_MD5.cpp */; };
+		D87A14F61DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14AD1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp */; };
+		D87A14F71DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14AF1DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp */; };
+		D87A14F81DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B11DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp */; };
+		D87A14F91DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */; };
+		D87A14FA1DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B71DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp */; };
+		D87A14FB1DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B91DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp */; };
+		D87A14FC1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14BB1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp */; };
+		D87A14FD1DA3559100DB1F62 /* TestSuite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14BD1DA3559100DB1F62 /* TestSuite.cpp */; };
+		D8AEB5B71DAA8C40009F915D /* libllbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D8AEB5B41DA38596009F915D /* libllbc.a */; };
+		D8AEB5C11DAB5987009F915D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D8AEB5C01DAB5987009F915D /* libiconv.tbd */; };
+		D8AEB5C91DAB7EFD009F915D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8AEB5C81DAB7EFD009F915D /* UIKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D82310901DA1FE3D00228EEF /* testsuite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = testsuite.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D87A14221DA3541D00DB1F62 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../testsuite/iOSSpecific/AppDelegate.h; sourceTree = "<group>"; };
+		D87A14231DA3541D00DB1F62 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ../testsuite/iOSSpecific/AppDelegate.mm; sourceTree = "<group>"; };
+		D87A14241DA3541D00DB1F62 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = ../testsuite/iOSSpecific/ViewController.h; sourceTree = "<group>"; };
+		D87A14251DA3541D00DB1F62 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ViewController.mm; path = ../testsuite/iOSSpecific/ViewController.mm; sourceTree = "<group>"; };
+		D87A14281DA3544B00DB1F62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../testsuite/iOSSpecific/Assets.xcassets; sourceTree = "<group>"; };
+		D87A142E1DA3544B00DB1F62 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../testsuite/iOSSpecific/Info.plist; sourceTree = "<group>"; };
+		D87A14331DA3556F00DB1F62 /* Main_iOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Main_iOS.mm; path = ../testsuite/Main_iOS.mm; sourceTree = "<group>"; };
+		D87A14361DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_CustomHeaderSvc.cpp; sourceTree = "<group>"; };
+		D87A14371DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_CustomHeaderSvc.h; sourceTree = "<group>"; };
+		D87A14381DA3559100DB1F62 /* TestCase_Comm_Event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_Event.cpp; sourceTree = "<group>"; };
+		D87A14391DA3559100DB1F62 /* TestCase_Comm_Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_Event.h; sourceTree = "<group>"; };
+		D87A143A1DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_ExternalDriveSvc.cpp; sourceTree = "<group>"; };
+		D87A143B1DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_ExternalDriveSvc.h; sourceTree = "<group>"; };
+		D87A143C1DA3559100DB1F62 /* TestCase_Comm_Facade.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_Facade.cpp; sourceTree = "<group>"; };
+		D87A143D1DA3559100DB1F62 /* TestCase_Comm_Facade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_Facade.h; sourceTree = "<group>"; };
+		D87A143E1DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_HeaderDesc.cpp; sourceTree = "<group>"; };
+		D87A143F1DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_HeaderDesc.h; sourceTree = "<group>"; };
+		D87A14401DA3559100DB1F62 /* TestCase_Comm_LazyTask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_LazyTask.cpp; sourceTree = "<group>"; };
+		D87A14411DA3559100DB1F62 /* TestCase_Comm_LazyTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_LazyTask.h; sourceTree = "<group>"; };
+		D87A14421DA3559100DB1F62 /* TestCase_Comm_Multicast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_Multicast.cpp; sourceTree = "<group>"; };
+		D87A14431DA3559100DB1F62 /* TestCase_Comm_Multicast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_Multicast.h; sourceTree = "<group>"; };
+		D87A14441DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_PacketHeaderParts.cpp; sourceTree = "<group>"; };
+		D87A14451DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_PacketHeaderParts.h; sourceTree = "<group>"; };
+		D87A14461DA3559100DB1F62 /* TestCase_Comm_PacketOp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_PacketOp.cpp; sourceTree = "<group>"; };
+		D87A14471DA3559100DB1F62 /* TestCase_Comm_PacketOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_PacketOp.h; sourceTree = "<group>"; };
+		D87A14481DA3559100DB1F62 /* TestCase_Comm_ReleasePool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_ReleasePool.cpp; sourceTree = "<group>"; };
+		D87A14491DA3559100DB1F62 /* TestCase_Comm_ReleasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_ReleasePool.h; sourceTree = "<group>"; };
+		D87A144A1DA3559100DB1F62 /* TestCase_Comm_SendBytes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_SendBytes.cpp; sourceTree = "<group>"; };
+		D87A144B1DA3559100DB1F62 /* TestCase_Comm_SendBytes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_SendBytes.h; sourceTree = "<group>"; };
+		D87A144C1DA3559100DB1F62 /* TestCase_Comm_Svc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_Svc.cpp; sourceTree = "<group>"; };
+		D87A144D1DA3559100DB1F62 /* TestCase_Comm_Svc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_Svc.h; sourceTree = "<group>"; };
+		D87A144E1DA3559100DB1F62 /* TestCase_Comm_SvcBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_SvcBase.cpp; sourceTree = "<group>"; };
+		D87A144F1DA3559100DB1F62 /* TestCase_Comm_SvcBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_SvcBase.h; sourceTree = "<group>"; };
+		D87A14501DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_SvcStartStop.cpp; sourceTree = "<group>"; };
+		D87A14511DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_SvcStartStop.h; sourceTree = "<group>"; };
+		D87A14521DA3559100DB1F62 /* TestCase_Comm_Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Comm_Timer.cpp; sourceTree = "<group>"; };
+		D87A14531DA3559100DB1F62 /* TestCase_Comm_Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Comm_Timer.h; sourceTree = "<group>"; };
+		D87A14551DA3559100DB1F62 /* TestCase_Com_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_Compiler.cpp; sourceTree = "<group>"; };
+		D87A14561DA3559100DB1F62 /* TestCase_Com_Compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_Compiler.h; sourceTree = "<group>"; };
+		D87A14571DA3559100DB1F62 /* TestCase_Com_DataType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_DataType.cpp; sourceTree = "<group>"; };
+		D87A14581DA3559100DB1F62 /* TestCase_Com_DataType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_DataType.h; sourceTree = "<group>"; };
+		D87A14591DA3559100DB1F62 /* TestCase_Com_Endian.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_Endian.cpp; sourceTree = "<group>"; };
+		D87A145A1DA3559100DB1F62 /* TestCase_Com_Endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_Endian.h; sourceTree = "<group>"; };
+		D87A145B1DA3559100DB1F62 /* TestCase_Com_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_Error.cpp; sourceTree = "<group>"; };
+		D87A145C1DA3559100DB1F62 /* TestCase_Com_Error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_Error.h; sourceTree = "<group>"; };
+		D87A145D1DA3559100DB1F62 /* TestCase_Com_Stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_Stream.cpp; sourceTree = "<group>"; };
+		D87A145E1DA3559100DB1F62 /* TestCase_Com_Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_Stream.h; sourceTree = "<group>"; };
+		D87A145F1DA3559100DB1F62 /* TestCase_Com_Version.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Com_Version.cpp; sourceTree = "<group>"; };
+		D87A14601DA3559100DB1F62 /* TestCase_Com_Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Com_Version.h; sourceTree = "<group>"; };
+		D87A14631DA3559100DB1F62 /* TestCase_Core_Bundle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Bundle.cpp; sourceTree = "<group>"; };
+		D87A14641DA3559100DB1F62 /* TestCase_Core_Bundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Bundle.h; sourceTree = "<group>"; };
+		D87A14661DA3559100DB1F62 /* test_ini.ini */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_ini.ini; sourceTree = "<group>"; };
+		D87A14671DA3559100DB1F62 /* test_json.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = test_json.json; sourceTree = "<group>"; };
+		D87A14681DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Config_Config.cpp; sourceTree = "<group>"; };
+		D87A14691DA3559100DB1F62 /* TestCase_Core_Config_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Config_Config.h; sourceTree = "<group>"; };
+		D87A146A1DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Config_Ini.cpp; sourceTree = "<group>"; };
+		D87A146B1DA3559100DB1F62 /* TestCase_Core_Config_Ini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Config_Ini.h; sourceTree = "<group>"; };
+		D87A146C1DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Config_Property.cpp; sourceTree = "<group>"; };
+		D87A146D1DA3559100DB1F62 /* TestCase_Core_Config_Property.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Config_Property.h; sourceTree = "<group>"; };
+		D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Entity.cpp; sourceTree = "<group>"; };
+		D87A14701DA3559100DB1F62 /* TestCase_Core_Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Entity.h; sourceTree = "<group>"; };
+		D87A14721DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_File_Directory.cpp; sourceTree = "<group>"; };
+		D87A14731DA3559100DB1F62 /* TestCase_Core_File_Directory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_File_Directory.h; sourceTree = "<group>"; };
+		D87A14741DA3559100DB1F62 /* TestCase_Core_File_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_File_File.cpp; sourceTree = "<group>"; };
+		D87A14751DA3559100DB1F62 /* TestCase_Core_File_File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_File_File.h; sourceTree = "<group>"; };
+		D87A14771DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Helper_JVHelper.cpp; sourceTree = "<group>"; };
+		D87A14781DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Helper_JVHelper.h; sourceTree = "<group>"; };
+		D87A14791DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Helper_StlHelper.cpp; sourceTree = "<group>"; };
+		D87A147A1DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Helper_StlHelper.h; sourceTree = "<group>"; };
+		D87A147C1DA3559100DB1F62 /* TestCase_Core_Library.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Library.cpp; sourceTree = "<group>"; };
+		D87A147D1DA3559100DB1F62 /* TestCase_Core_Library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Library.h; sourceTree = "<group>"; };
+		D87A147F1DA3559100DB1F62 /* Logger_Cfg.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Logger_Cfg.cfg; sourceTree = "<group>"; };
+		D87A14801DA3559100DB1F62 /* TestCase_Core_Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Log.cpp; sourceTree = "<group>"; };
+		D87A14811DA3559100DB1F62 /* TestCase_Core_Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Log.h; sourceTree = "<group>"; };
+		D87A14831DA3559100DB1F62 /* TestCase_Core_OS_Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_OS_Console.cpp; sourceTree = "<group>"; };
+		D87A14841DA3559100DB1F62 /* TestCase_Core_OS_Console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_OS_Console.h; sourceTree = "<group>"; };
+		D87A14851DA3559100DB1F62 /* TestCase_Core_OS_Thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_OS_Thread.cpp; sourceTree = "<group>"; };
+		D87A14861DA3559100DB1F62 /* TestCase_Core_OS_Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_OS_Thread.h; sourceTree = "<group>"; };
+		D87A14881DA3559100DB1F62 /* TestCase_Core_Random.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Random.cpp; sourceTree = "<group>"; };
+		D87A14891DA3559100DB1F62 /* TestCase_Core_Random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Random.h; sourceTree = "<group>"; };
+		D87A148B1DA3559100DB1F62 /* TestCase_Core_Thread_CV.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_CV.cpp; sourceTree = "<group>"; };
+		D87A148C1DA3559100DB1F62 /* TestCase_Core_Thread_CV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_CV.h; sourceTree = "<group>"; };
+		D87A148D1DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_Lock.cpp; sourceTree = "<group>"; };
+		D87A148E1DA3559100DB1F62 /* TestCase_Core_Thread_Lock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_Lock.h; sourceTree = "<group>"; };
+		D87A148F1DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_RWLock.cpp; sourceTree = "<group>"; };
+		D87A14901DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_RWLock.h; sourceTree = "<group>"; };
+		D87A14911DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_Semaphore.cpp; sourceTree = "<group>"; };
+		D87A14921DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_Semaphore.h; sourceTree = "<group>"; };
+		D87A14931DA3559100DB1F62 /* TestCase_Core_Thread_Task.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_Task.cpp; sourceTree = "<group>"; };
+		D87A14941DA3559100DB1F62 /* TestCase_Core_Thread_Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_Task.h; sourceTree = "<group>"; };
+		D87A14951DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_ThreadMgr.cpp; sourceTree = "<group>"; };
+		D87A14961DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_ThreadMgr.h; sourceTree = "<group>"; };
+		D87A14971DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Thread_Tls.cpp; sourceTree = "<group>"; };
+		D87A14981DA3559100DB1F62 /* TestCase_Core_Thread_Tls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Thread_Tls.h; sourceTree = "<group>"; };
+		D87A149A1DA3559100DB1F62 /* TestCase_Core_Time_Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Time_Time.cpp; sourceTree = "<group>"; };
+		D87A149B1DA3559100DB1F62 /* TestCase_Core_Time_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Time_Time.h; sourceTree = "<group>"; };
+		D87A149D1DA3559100DB1F62 /* TestCase_Core_Transcoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Transcoder.cpp; sourceTree = "<group>"; };
+		D87A149E1DA3559100DB1F62 /* TestCase_Core_Transcoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Transcoder.h; sourceTree = "<group>"; };
+		D87A149F1DA3559100DB1F62 /* Transcoder_Test_GBK.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Transcoder_Test_GBK.txt; sourceTree = "<group>"; };
+		D87A14A01DA3559100DB1F62 /* Transcoder_Test_UTF16.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Transcoder_Test_UTF16.txt; sourceTree = "<group>"; };
+		D87A14A11DA3559100DB1F62 /* Transcoder_Test_UTF8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Transcoder_Test_UTF8.txt; sourceTree = "<group>"; };
+		D87A14A31DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Algorithm.cpp; sourceTree = "<group>"; };
+		D87A14A41DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Algorithm.h; sourceTree = "<group>"; };
+		D87A14A51DA3559100DB1F62 /* TestCase_Core_Utils_Coder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Coder.cpp; sourceTree = "<group>"; };
+		D87A14A61DA3559100DB1F62 /* TestCase_Core_Utils_Coder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Coder.h; sourceTree = "<group>"; };
+		D87A14A71DA3559100DB1F62 /* TestCase_Core_Utils_Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Debug.cpp; sourceTree = "<group>"; };
+		D87A14A81DA3559100DB1F62 /* TestCase_Core_Utils_Debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Debug.h; sourceTree = "<group>"; };
+		D87A14A91DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Delegate.cpp; sourceTree = "<group>"; };
+		D87A14AA1DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Delegate.h; sourceTree = "<group>"; };
+		D87A14AB1DA3559100DB1F62 /* TestCase_Core_Utils_MD5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_MD5.cpp; sourceTree = "<group>"; };
+		D87A14AC1DA3559100DB1F62 /* TestCase_Core_Utils_MD5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_MD5.h; sourceTree = "<group>"; };
+		D87A14AD1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Misc.cpp; sourceTree = "<group>"; };
+		D87A14AE1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Misc.h; sourceTree = "<group>"; };
+		D87A14AF1DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Network.cpp; sourceTree = "<group>"; };
+		D87A14B01DA3559100DB1F62 /* TestCase_Core_Utils_Network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Network.h; sourceTree = "<group>"; };
+		D87A14B11DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Text.cpp; sourceTree = "<group>"; };
+		D87A14B21DA3559100DB1F62 /* TestCase_Core_Utils_Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Text.h; sourceTree = "<group>"; };
+		D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_VariantTest.cpp; sourceTree = "<group>"; };
+		D87A14B51DA3559100DB1F62 /* TestCase_Core_VariantTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_VariantTest.h; sourceTree = "<group>"; };
+		D87A14B71DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_ObjBase_Array.cpp; sourceTree = "<group>"; };
+		D87A14B81DA3559100DB1F62 /* TestCase_ObjBase_Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_ObjBase_Array.h; sourceTree = "<group>"; };
+		D87A14B91DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_ObjBase_Dictionary.cpp; sourceTree = "<group>"; };
+		D87A14BA1DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_ObjBase_Dictionary.h; sourceTree = "<group>"; };
+		D87A14BB1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_ObjBase_Object.cpp; sourceTree = "<group>"; };
+		D87A14BC1DA3559100DB1F62 /* TestCase_ObjBase_Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_ObjBase_Object.h; sourceTree = "<group>"; };
+		D87A14BD1DA3559100DB1F62 /* TestSuite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestSuite.cpp; path = ../testsuite/TestSuite.cpp; sourceTree = "<group>"; };
+		D87A14BE1DA3559100DB1F62 /* TestSuite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestSuite.h; path = ../testsuite/TestSuite.h; sourceTree = "<group>"; };
+		D8AEB5B41DA38596009F915D /* libllbc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libllbc.a; path = ../output/iOS/libllbc.a; sourceTree = "<group>"; };
+		D8AEB5C01DAB5987009F915D /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		D8AEB5C81DAB7EFD009F915D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D8AEB5B61DAA8C07009F915D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D8AEB5C91DAB7EFD009F915D /* UIKit.framework in Frameworks */,
+				D8AEB5C11DAB5987009F915D /* libiconv.tbd in Frameworks */,
+				D8AEB5B71DAA8C40009F915D /* libllbc.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D82310871DA1FE3D00228EEF = {
+			isa = PBXGroup;
+			children = (
+				D8AEB5C81DAB7EFD009F915D /* UIKit.framework */,
+				D8AEB5C01DAB5987009F915D /* libiconv.tbd */,
+				D8AEB5B41DA38596009F915D /* libllbc.a */,
+				D87A14351DA3559100DB1F62 /* comm */,
+				D87A14541DA3559100DB1F62 /* common */,
+				D87A14611DA3559100DB1F62 /* core */,
+				D87A14B61DA3559100DB1F62 /* objbase */,
+				D87A14BD1DA3559100DB1F62 /* TestSuite.cpp */,
+				D87A14BE1DA3559100DB1F62 /* TestSuite.h */,
+				D87A14331DA3556F00DB1F62 /* Main_iOS.mm */,
+				D87A14211DA353F900DB1F62 /* iOSSpecific */,
+				D82310911DA1FE3D00228EEF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D82310911DA1FE3D00228EEF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D82310901DA1FE3D00228EEF /* testsuite.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D87A14211DA353F900DB1F62 /* iOSSpecific */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14281DA3544B00DB1F62 /* Assets.xcassets */,
+				D87A142E1DA3544B00DB1F62 /* Info.plist */,
+				D87A14221DA3541D00DB1F62 /* AppDelegate.h */,
+				D87A14231DA3541D00DB1F62 /* AppDelegate.mm */,
+				D87A14241DA3541D00DB1F62 /* ViewController.h */,
+				D87A14251DA3541D00DB1F62 /* ViewController.mm */,
+			);
+			name = iOSSpecific;
+			sourceTree = "<group>";
+		};
+		D87A14351DA3559100DB1F62 /* comm */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14361DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.cpp */,
+				D87A14371DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.h */,
+				D87A14381DA3559100DB1F62 /* TestCase_Comm_Event.cpp */,
+				D87A14391DA3559100DB1F62 /* TestCase_Comm_Event.h */,
+				D87A143A1DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.cpp */,
+				D87A143B1DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.h */,
+				D87A143C1DA3559100DB1F62 /* TestCase_Comm_Facade.cpp */,
+				D87A143D1DA3559100DB1F62 /* TestCase_Comm_Facade.h */,
+				D87A143E1DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.cpp */,
+				D87A143F1DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.h */,
+				D87A14401DA3559100DB1F62 /* TestCase_Comm_LazyTask.cpp */,
+				D87A14411DA3559100DB1F62 /* TestCase_Comm_LazyTask.h */,
+				D87A14421DA3559100DB1F62 /* TestCase_Comm_Multicast.cpp */,
+				D87A14431DA3559100DB1F62 /* TestCase_Comm_Multicast.h */,
+				D87A14441DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.cpp */,
+				D87A14451DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.h */,
+				D87A14461DA3559100DB1F62 /* TestCase_Comm_PacketOp.cpp */,
+				D87A14471DA3559100DB1F62 /* TestCase_Comm_PacketOp.h */,
+				D87A14481DA3559100DB1F62 /* TestCase_Comm_ReleasePool.cpp */,
+				D87A14491DA3559100DB1F62 /* TestCase_Comm_ReleasePool.h */,
+				D87A144A1DA3559100DB1F62 /* TestCase_Comm_SendBytes.cpp */,
+				D87A144B1DA3559100DB1F62 /* TestCase_Comm_SendBytes.h */,
+				D87A144C1DA3559100DB1F62 /* TestCase_Comm_Svc.cpp */,
+				D87A144D1DA3559100DB1F62 /* TestCase_Comm_Svc.h */,
+				D87A144E1DA3559100DB1F62 /* TestCase_Comm_SvcBase.cpp */,
+				D87A144F1DA3559100DB1F62 /* TestCase_Comm_SvcBase.h */,
+				D87A14501DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.cpp */,
+				D87A14511DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.h */,
+				D87A14521DA3559100DB1F62 /* TestCase_Comm_Timer.cpp */,
+				D87A14531DA3559100DB1F62 /* TestCase_Comm_Timer.h */,
+			);
+			name = comm;
+			path = ../testsuite/comm;
+			sourceTree = "<group>";
+		};
+		D87A14541DA3559100DB1F62 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14551DA3559100DB1F62 /* TestCase_Com_Compiler.cpp */,
+				D87A14561DA3559100DB1F62 /* TestCase_Com_Compiler.h */,
+				D87A14571DA3559100DB1F62 /* TestCase_Com_DataType.cpp */,
+				D87A14581DA3559100DB1F62 /* TestCase_Com_DataType.h */,
+				D87A14591DA3559100DB1F62 /* TestCase_Com_Endian.cpp */,
+				D87A145A1DA3559100DB1F62 /* TestCase_Com_Endian.h */,
+				D87A145B1DA3559100DB1F62 /* TestCase_Com_Error.cpp */,
+				D87A145C1DA3559100DB1F62 /* TestCase_Com_Error.h */,
+				D87A145D1DA3559100DB1F62 /* TestCase_Com_Stream.cpp */,
+				D87A145E1DA3559100DB1F62 /* TestCase_Com_Stream.h */,
+				D87A145F1DA3559100DB1F62 /* TestCase_Com_Version.cpp */,
+				D87A14601DA3559100DB1F62 /* TestCase_Com_Version.h */,
+			);
+			name = common;
+			path = ../testsuite/common;
+			sourceTree = "<group>";
+		};
+		D87A14611DA3559100DB1F62 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14621DA3559100DB1F62 /* bundle */,
+				D87A14651DA3559100DB1F62 /* config */,
+				D87A146E1DA3559100DB1F62 /* entity */,
+				D87A14711DA3559100DB1F62 /* file */,
+				D87A14761DA3559100DB1F62 /* helper */,
+				D87A147B1DA3559100DB1F62 /* library */,
+				D87A147E1DA3559100DB1F62 /* log */,
+				D87A14821DA3559100DB1F62 /* os */,
+				D87A14871DA3559100DB1F62 /* random */,
+				D87A148A1DA3559100DB1F62 /* thread */,
+				D87A14991DA3559100DB1F62 /* time */,
+				D87A149C1DA3559100DB1F62 /* transcoder */,
+				D87A14A21DA3559100DB1F62 /* utils */,
+				D87A14B31DA3559100DB1F62 /* variant */,
+			);
+			name = core;
+			path = ../testsuite/core;
+			sourceTree = "<group>";
+		};
+		D87A14621DA3559100DB1F62 /* bundle */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14631DA3559100DB1F62 /* TestCase_Core_Bundle.cpp */,
+				D87A14641DA3559100DB1F62 /* TestCase_Core_Bundle.h */,
+			);
+			path = bundle;
+			sourceTree = "<group>";
+		};
+		D87A14651DA3559100DB1F62 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14661DA3559100DB1F62 /* test_ini.ini */,
+				D87A14671DA3559100DB1F62 /* test_json.json */,
+				D87A14681DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp */,
+				D87A14691DA3559100DB1F62 /* TestCase_Core_Config_Config.h */,
+				D87A146A1DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp */,
+				D87A146B1DA3559100DB1F62 /* TestCase_Core_Config_Ini.h */,
+				D87A146C1DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp */,
+				D87A146D1DA3559100DB1F62 /* TestCase_Core_Config_Property.h */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		D87A146E1DA3559100DB1F62 /* entity */ = {
+			isa = PBXGroup;
+			children = (
+				D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */,
+				D87A14701DA3559100DB1F62 /* TestCase_Core_Entity.h */,
+			);
+			path = entity;
+			sourceTree = "<group>";
+		};
+		D87A14711DA3559100DB1F62 /* file */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14721DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp */,
+				D87A14731DA3559100DB1F62 /* TestCase_Core_File_Directory.h */,
+				D87A14741DA3559100DB1F62 /* TestCase_Core_File_File.cpp */,
+				D87A14751DA3559100DB1F62 /* TestCase_Core_File_File.h */,
+			);
+			path = file;
+			sourceTree = "<group>";
+		};
+		D87A14761DA3559100DB1F62 /* helper */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14771DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp */,
+				D87A14781DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.h */,
+				D87A14791DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp */,
+				D87A147A1DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.h */,
+			);
+			path = helper;
+			sourceTree = "<group>";
+		};
+		D87A147B1DA3559100DB1F62 /* library */ = {
+			isa = PBXGroup;
+			children = (
+				D87A147C1DA3559100DB1F62 /* TestCase_Core_Library.cpp */,
+				D87A147D1DA3559100DB1F62 /* TestCase_Core_Library.h */,
+			);
+			path = library;
+			sourceTree = "<group>";
+		};
+		D87A147E1DA3559100DB1F62 /* log */ = {
+			isa = PBXGroup;
+			children = (
+				D87A147F1DA3559100DB1F62 /* Logger_Cfg.cfg */,
+				D87A14801DA3559100DB1F62 /* TestCase_Core_Log.cpp */,
+				D87A14811DA3559100DB1F62 /* TestCase_Core_Log.h */,
+			);
+			path = log;
+			sourceTree = "<group>";
+		};
+		D87A14821DA3559100DB1F62 /* os */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14831DA3559100DB1F62 /* TestCase_Core_OS_Console.cpp */,
+				D87A14841DA3559100DB1F62 /* TestCase_Core_OS_Console.h */,
+				D87A14851DA3559100DB1F62 /* TestCase_Core_OS_Thread.cpp */,
+				D87A14861DA3559100DB1F62 /* TestCase_Core_OS_Thread.h */,
+			);
+			path = os;
+			sourceTree = "<group>";
+		};
+		D87A14871DA3559100DB1F62 /* random */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14881DA3559100DB1F62 /* TestCase_Core_Random.cpp */,
+				D87A14891DA3559100DB1F62 /* TestCase_Core_Random.h */,
+			);
+			path = random;
+			sourceTree = "<group>";
+		};
+		D87A148A1DA3559100DB1F62 /* thread */ = {
+			isa = PBXGroup;
+			children = (
+				D87A148B1DA3559100DB1F62 /* TestCase_Core_Thread_CV.cpp */,
+				D87A148C1DA3559100DB1F62 /* TestCase_Core_Thread_CV.h */,
+				D87A148D1DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp */,
+				D87A148E1DA3559100DB1F62 /* TestCase_Core_Thread_Lock.h */,
+				D87A148F1DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.cpp */,
+				D87A14901DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.h */,
+				D87A14911DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.cpp */,
+				D87A14921DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.h */,
+				D87A14931DA3559100DB1F62 /* TestCase_Core_Thread_Task.cpp */,
+				D87A14941DA3559100DB1F62 /* TestCase_Core_Thread_Task.h */,
+				D87A14951DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.cpp */,
+				D87A14961DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.h */,
+				D87A14971DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp */,
+				D87A14981DA3559100DB1F62 /* TestCase_Core_Thread_Tls.h */,
+			);
+			path = thread;
+			sourceTree = "<group>";
+		};
+		D87A14991DA3559100DB1F62 /* time */ = {
+			isa = PBXGroup;
+			children = (
+				D87A149A1DA3559100DB1F62 /* TestCase_Core_Time_Time.cpp */,
+				D87A149B1DA3559100DB1F62 /* TestCase_Core_Time_Time.h */,
+			);
+			path = time;
+			sourceTree = "<group>";
+		};
+		D87A149C1DA3559100DB1F62 /* transcoder */ = {
+			isa = PBXGroup;
+			children = (
+				D87A149D1DA3559100DB1F62 /* TestCase_Core_Transcoder.cpp */,
+				D87A149E1DA3559100DB1F62 /* TestCase_Core_Transcoder.h */,
+				D87A149F1DA3559100DB1F62 /* Transcoder_Test_GBK.txt */,
+				D87A14A01DA3559100DB1F62 /* Transcoder_Test_UTF16.txt */,
+				D87A14A11DA3559100DB1F62 /* Transcoder_Test_UTF8.txt */,
+			);
+			path = transcoder;
+			sourceTree = "<group>";
+		};
+		D87A14A21DA3559100DB1F62 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14A31DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.cpp */,
+				D87A14A41DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.h */,
+				D87A14A51DA3559100DB1F62 /* TestCase_Core_Utils_Coder.cpp */,
+				D87A14A61DA3559100DB1F62 /* TestCase_Core_Utils_Coder.h */,
+				D87A14A71DA3559100DB1F62 /* TestCase_Core_Utils_Debug.cpp */,
+				D87A14A81DA3559100DB1F62 /* TestCase_Core_Utils_Debug.h */,
+				D87A14A91DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.cpp */,
+				D87A14AA1DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.h */,
+				D87A14AB1DA3559100DB1F62 /* TestCase_Core_Utils_MD5.cpp */,
+				D87A14AC1DA3559100DB1F62 /* TestCase_Core_Utils_MD5.h */,
+				D87A14AD1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp */,
+				D87A14AE1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.h */,
+				D87A14AF1DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp */,
+				D87A14B01DA3559100DB1F62 /* TestCase_Core_Utils_Network.h */,
+				D87A14B11DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp */,
+				D87A14B21DA3559100DB1F62 /* TestCase_Core_Utils_Text.h */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		D87A14B31DA3559100DB1F62 /* variant */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */,
+				D87A14B51DA3559100DB1F62 /* TestCase_Core_VariantTest.h */,
+			);
+			path = variant;
+			sourceTree = "<group>";
+		};
+		D87A14B61DA3559100DB1F62 /* objbase */ = {
+			isa = PBXGroup;
+			children = (
+				D87A14B71DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp */,
+				D87A14B81DA3559100DB1F62 /* TestCase_ObjBase_Array.h */,
+				D87A14B91DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp */,
+				D87A14BA1DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.h */,
+				D87A14BB1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp */,
+				D87A14BC1DA3559100DB1F62 /* TestCase_ObjBase_Object.h */,
+			);
+			name = objbase;
+			path = ../testsuite/objbase;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D823108F1DA1FE3D00228EEF /* testsuite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D82310A71DA1FE3D00228EEF /* Build configuration list for PBXNativeTarget "testsuite" */;
+			buildPhases = (
+				D823108C1DA1FE3D00228EEF /* Sources */,
+				D823108E1DA1FE3D00228EEF /* Resources */,
+				D8AEB5B61DAA8C07009F915D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = testsuite;
+			productName = testsuite;
+			productReference = D82310901DA1FE3D00228EEF /* testsuite.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D82310881DA1FE3D00228EEF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = lailongwei;
+				TargetAttributes = {
+					D823108F1DA1FE3D00228EEF = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
+				};
+			};
+			buildConfigurationList = D823108B1DA1FE3D00228EEF /* Build configuration list for PBXProject "testsuite" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D82310871DA1FE3D00228EEF;
+			productRefGroup = D82310911DA1FE3D00228EEF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D823108F1DA1FE3D00228EEF /* testsuite */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D823108E1DA1FE3D00228EEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D87A14F01DA3559100DB1F62 /* Transcoder_Test_UTF8.txt in Resources */,
+				D87A14EE1DA3559100DB1F62 /* Transcoder_Test_GBK.txt in Resources */,
+				D87A142F1DA3544B00DB1F62 /* Assets.xcassets in Resources */,
+				D87A14E01DA3559100DB1F62 /* Logger_Cfg.cfg in Resources */,
+				D87A14321DA3544B00DB1F62 /* Info.plist in Resources */,
+				D87A14D51DA3559100DB1F62 /* test_ini.ini in Resources */,
+				D87A14D61DA3559100DB1F62 /* test_json.json in Resources */,
+				D87A14EF1DA3559100DB1F62 /* Transcoder_Test_UTF16.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D823108C1DA1FE3D00228EEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D87A14D31DA3559100DB1F62 /* TestCase_Com_Version.cpp in Sources */,
+				D87A14BF1DA3559100DB1F62 /* TestCase_Comm_CustomHeaderSvc.cpp in Sources */,
+				D87A14DF1DA3559100DB1F62 /* TestCase_Core_Library.cpp in Sources */,
+				D87A14F41DA3559100DB1F62 /* TestCase_Core_Utils_Delegate.cpp in Sources */,
+				D87A14C41DA3559100DB1F62 /* TestCase_Comm_LazyTask.cpp in Sources */,
+				D87A14F21DA3559100DB1F62 /* TestCase_Core_Utils_Coder.cpp in Sources */,
+				D87A14D01DA3559100DB1F62 /* TestCase_Com_Endian.cpp in Sources */,
+				D87A14D71DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp in Sources */,
+				D87A14FA1DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp in Sources */,
+				D87A14C81DA3559100DB1F62 /* TestCase_Comm_ReleasePool.cpp in Sources */,
+				D87A14FC1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp in Sources */,
+				D87A14C61DA3559100DB1F62 /* TestCase_Comm_PacketHeaderParts.cpp in Sources */,
+				D87A14DE1DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp in Sources */,
+				D87A14E61DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp in Sources */,
+				D87A14F61DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp in Sources */,
+				D87A14DA1DA3559100DB1F62 /* TestCase_Core_Entity.cpp in Sources */,
+				D87A14271DA3541D00DB1F62 /* ViewController.mm in Sources */,
+				D87A14F71DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp in Sources */,
+				D87A14EB1DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp in Sources */,
+				D87A14E51DA3559100DB1F62 /* TestCase_Core_Thread_CV.cpp in Sources */,
+				D87A14C91DA3559100DB1F62 /* TestCase_Comm_SendBytes.cpp in Sources */,
+				D87A14D81DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp in Sources */,
+				D87A14E41DA3559100DB1F62 /* TestCase_Core_Random.cpp in Sources */,
+				D87A14FB1DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp in Sources */,
+				D87A14C01DA3559100DB1F62 /* TestCase_Comm_Event.cpp in Sources */,
+				D87A14CD1DA3559100DB1F62 /* TestCase_Comm_Timer.cpp in Sources */,
+				D87A14CB1DA3559100DB1F62 /* TestCase_Comm_SvcBase.cpp in Sources */,
+				D87A14E81DA3559100DB1F62 /* TestCase_Core_Thread_Semaphore.cpp in Sources */,
+				D87A14E31DA3559100DB1F62 /* TestCase_Core_OS_Thread.cpp in Sources */,
+				D87A14C31DA3559100DB1F62 /* TestCase_Comm_HeaderDesc.cpp in Sources */,
+				D87A14DC1DA3559100DB1F62 /* TestCase_Core_File_File.cpp in Sources */,
+				D87A14CE1DA3559100DB1F62 /* TestCase_Com_Compiler.cpp in Sources */,
+				D87A14F81DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp in Sources */,
+				D87A14CF1DA3559100DB1F62 /* TestCase_Com_DataType.cpp in Sources */,
+				D87A14EC1DA3559100DB1F62 /* TestCase_Core_Time_Time.cpp in Sources */,
+				D87A14F51DA3559100DB1F62 /* TestCase_Core_Utils_MD5.cpp in Sources */,
+				D87A14E21DA3559100DB1F62 /* TestCase_Core_OS_Console.cpp in Sources */,
+				D87A14ED1DA3559100DB1F62 /* TestCase_Core_Transcoder.cpp in Sources */,
+				D87A14E91DA3559100DB1F62 /* TestCase_Core_Thread_Task.cpp in Sources */,
+				D87A14CC1DA3559100DB1F62 /* TestCase_Comm_SvcStartStop.cpp in Sources */,
+				D87A14341DA3556F00DB1F62 /* Main_iOS.mm in Sources */,
+				D87A14D41DA3559100DB1F62 /* TestCase_Core_Bundle.cpp in Sources */,
+				D87A14D21DA3559100DB1F62 /* TestCase_Com_Stream.cpp in Sources */,
+				D87A14EA1DA3559100DB1F62 /* TestCase_Core_Thread_ThreadMgr.cpp in Sources */,
+				D87A14C51DA3559100DB1F62 /* TestCase_Comm_Multicast.cpp in Sources */,
+				D87A14F11DA3559100DB1F62 /* TestCase_Core_Utils_Algorithm.cpp in Sources */,
+				D87A14CA1DA3559100DB1F62 /* TestCase_Comm_Svc.cpp in Sources */,
+				D87A14E11DA3559100DB1F62 /* TestCase_Core_Log.cpp in Sources */,
+				D87A14FD1DA3559100DB1F62 /* TestSuite.cpp in Sources */,
+				D87A14C71DA3559100DB1F62 /* TestCase_Comm_PacketOp.cpp in Sources */,
+				D87A14D11DA3559100DB1F62 /* TestCase_Com_Error.cpp in Sources */,
+				D87A14C11DA3559100DB1F62 /* TestCase_Comm_ExternalDriveSvc.cpp in Sources */,
+				D87A14DB1DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp in Sources */,
+				D87A14F31DA3559100DB1F62 /* TestCase_Core_Utils_Debug.cpp in Sources */,
+				D87A14E71DA3559100DB1F62 /* TestCase_Core_Thread_RWLock.cpp in Sources */,
+				D87A14DD1DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp in Sources */,
+				D87A14D91DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp in Sources */,
+				D87A14261DA3541D00DB1F62 /* AppDelegate.mm in Sources */,
+				D87A14F91DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp in Sources */,
+				D87A14C21DA3559100DB1F62 /* TestCase_Comm_Facade.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D82310A51DA1FE3D00228EEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D82310A61DA1FE3D00228EEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D82310A81DA1FE3D00228EEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../testsuite",
+					"$(SRCROOT)/../llbc/include",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/../testsuite/iOSSpecific/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../output/iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lailongwei.testsuite;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = "-Wno-invalid-source-encoding";
+			};
+			name = Debug;
+		};
+		D82310A91DA1FE3D00228EEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../testsuite",
+					"$(SRCROOT)/../llbc/include",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/../testsuite/iOSSpecific/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../output/iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lailongwei.testsuite;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = "-Wno-invalid-source-encoding";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D823108B1DA1FE3D00228EEF /* Build configuration list for PBXProject "testsuite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D82310A51DA1FE3D00228EEF /* Debug */,
+				D82310A61DA1FE3D00228EEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D82310A71DA1FE3D00228EEF /* Build configuration list for PBXNativeTarget "testsuite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D82310A81DA1FE3D00228EEF /* Debug */,
+				D82310A91DA1FE3D00228EEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D82310881DA1FE3D00228EEF /* Project object */;
+}

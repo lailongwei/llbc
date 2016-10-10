@@ -209,8 +209,13 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     // Send/Recv test.
     SendRecvTest("127.0.0.1", 7789);
 
+#if LLBC_TARGET_PLATFORM_IPHONE
+    LLBC_PrintLine("Sleep 300 seconds to exit...");
+    LLBC_ThreadManager::Sleep(300 * 1000);
+#else // Non-iPhone
     LLBC_PrintLine("Press any key to continue...");
     getchar();
+#endif // iPhone
 
     return 0;
 }

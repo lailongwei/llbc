@@ -155,6 +155,7 @@
 		D88A7E711D9AC8AA008C9A1F /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7E521D9AC8AA008C9A1F /* Socket.cpp */; };
 		D88A7E731D9AC8D4008C9A1F /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7E721D9AC8D4008C9A1F /* Application.cpp */; };
 		D88A7E761D9AC8E1008C9A1F /* BaseTestCase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7E751D9AC8E1008C9A1F /* BaseTestCase.cpp */; };
+		D8AEB5B91DAA8CBB009F915D /* llbc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8AEB5B81DAA8CBB009F915D /* llbc.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -170,6 +171,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D838B7801DA3741100450274 /* en */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = en; path = en.lproj/libllbc.a; sourceTree = "<group>"; };
 		D88A7D321D9AC83C008C9A1F /* Common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Common.cpp; path = ../llbc/src/common/Common.cpp; sourceTree = "<group>"; };
 		D88A7D331D9AC83C008C9A1F /* Endian.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Endian.cpp; path = ../llbc/src/common/Endian.cpp; sourceTree = "<group>"; };
 		D88A7D341D9AC83C008C9A1F /* Errno.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Errno.cpp; path = ../llbc/src/common/Errno.cpp; sourceTree = "<group>"; };
@@ -568,7 +570,8 @@
 		D88A7F881D9ACA3D008C9A1F /* BaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseTestCase.h; sourceTree = "<group>"; };
 		D88A7F891D9ACA3D008C9A1F /* ITestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITestCase.h; sourceTree = "<group>"; };
 		D88A7F8A1D9ACA48008C9A1F /* llbc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = llbc.h; path = ../llbc/include/llbc.h; sourceTree = "<group>"; };
-		D8B593161D98399200D3D22E /* libllbc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libllbc.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8AEB5AD1DA37F89009F915D /* libllbc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libllbc.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8AEB5B81DAA8CBB009F915D /* llbc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = llbc.cpp; path = ../llbc/src/llbc.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -585,6 +588,7 @@
 		D88A7C131D9ABF71008C9A1F /* src */ = {
 			isa = PBXGroup;
 			children = (
+				D8AEB5B81DAA8CBB009F915D /* llbc.cpp */,
 				D88A7E741D9AC8E1008C9A1F /* testcase */,
 				D88A7D311D9AC580008C9A1F /* common */,
 				D88A7D411D9AC85E008C9A1F /* core */,
@@ -1482,7 +1486,8 @@
 		D8B593171D98399200D3D22E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D8B593161D98399200D3D22E /* libllbc.a */,
+				D838B7811DA3741100450274 /* libllbc.a */,
+				D8AEB5AD1DA37F89009F915D /* libllbc.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1497,6 +1502,7 @@
 				D8B593121D98399100D3D22E /* Sources */,
 				D8B593131D98399100D3D22E /* Frameworks */,
 				D8B593141D98399100D3D22E /* CopyFiles */,
+				D838B77F1DA359BF00450274 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1504,7 +1510,7 @@
 			);
 			name = llbc;
 			productName = llbc;
-			productReference = D8B593161D98399200D3D22E /* libllbc.a */;
+			productReference = D8AEB5AD1DA37F89009F915D /* libllbc.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -1537,6 +1543,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D838B77F1DA359BF00450274 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh ${SRCROOT}/build_scripts/post_build.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D8B593121D98399100D3D22E /* Sources */ = {
@@ -1588,6 +1610,7 @@
 				D88A7DD61D9AC877008C9A1F /* LogConsoleAppender.cpp in Sources */,
 				D88A7E711D9AC8AA008C9A1F /* Socket.cpp in Sources */,
 				D88A7E621D9AC8AA008C9A1F /* PollerMonitor.cpp in Sources */,
+				D8AEB5B91DAA8CBB009F915D /* llbc.cpp in Sources */,
 				D88A7E5B1D9AC8AA008C9A1F /* LibPacketHeaderDescFactory.cpp in Sources */,
 				D88A7E5C1D9AC8AA008C9A1F /* Packet.cpp in Sources */,
 				D88A7E2F1D9AC899008C9A1F /* KeyHashAlgorithm.cpp in Sources */,
@@ -1695,6 +1718,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D838B7811DA3741100450274 /* libllbc.a */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D838B7801DA3741100450274 /* en */,
+			);
+			name = libllbc.a;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D8B5931D1D98399200D3D22E /* Debug */ = {

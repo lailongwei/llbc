@@ -79,8 +79,13 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
         return -1;
     }
 
+#if LLBC_TARGET_PLATFORM_IPHONE
+    LLBC_PrintLine("Wait 100 seconds to exit...");
+    LLBC_ThreadManager::Sleep(100 * 1000);
+#else // Non-iPhone
     LLBC_PrintLine("Press any key to continue...");
     getchar();
+#endif // iPhone
 
     delete svc;
 

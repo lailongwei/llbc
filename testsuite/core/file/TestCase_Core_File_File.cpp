@@ -12,6 +12,9 @@
 TestCase_Core_File_File::TestCase_Core_File_File()
 : _testFileName("core_file_file__TestFile.test")
 {
+#if LLBC_TARGET_PLATFORM_IPHONE
+    _testFileName = LLBC_Directory::Join(LLBC_Directory::TempDir(), _testFileName);
+#endif // iPhone
 }
 
 TestCase_Core_File_File::~TestCase_Core_File_File()

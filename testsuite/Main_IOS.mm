@@ -8,10 +8,11 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import "iOSSpecific/AppDelegate.h"
 
 int main(int argc, char *argv[])
 {
+    NSLog(@"Hello, For test!");
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }

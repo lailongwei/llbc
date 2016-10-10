@@ -26,8 +26,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 #if LLBC_TARGET_PLATFORM_IPHONE
     LLBC_PrintLine("In Iphone platform, not support this test case!");
     return -1;
-#endif
-
+#else // non-iPhone
     // Simple convert test.
     if(SimpleConvertTest() != 0)
     {
@@ -63,6 +62,7 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
     getchar();
 
     return 0;
+#endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 
 int TestCase_Core_Transcoder::SimpleConvertTest()
