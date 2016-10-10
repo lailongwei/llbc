@@ -19,7 +19,7 @@ __OUTPUT_DIR=${SRCROOT}/../output/iOS
 [ -d "${__OUTPUT_DIR}" ] || \mkdir -p "${__OUTPUT_DIR}"
 
 # Build log file
-__POST_BUILD_LOG_FILE="${__OUTPUT_DIR}/post_build_log.txt"
+__POST_BUILD_LOG_FILE="${__OUTPUT_DIR}/${TARGET_NAME}.post_build_log"
 
 
 # ---------------------------------------------------------------------

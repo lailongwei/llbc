@@ -24,9 +24,13 @@
  #define CSLLBC_EXPORTING LLBC_EXPORTING
 #endif
 
-// the __stdcall macro define(only available in non-windows platform.
+// the __stdcall macro define only available in non-windows platform.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-#define __stdcall __attribute__((__stdcall__))
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+ #if LLBC_TARGET_PLATFORM_IPHONE
+  #define __stdcall
+ #else // Non-Win32 & Non-iPhone
+  #define __stdcall __attribute__((__stdcall__))
+ #endif // iPhone
+#endif // Non-Win32
 
 #endif // !__CSLLBC_COM_MACRO_H__

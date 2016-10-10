@@ -11,17 +11,6 @@
 
 #include "csllbc/core/log/_Log.h"
 
-namespace
-{
-    static LLBC_Logger *_GetLogger(const char *logger)
-    {
-        if (logger == NULL)
-            return LLBC_LoggerManagerSingleton->GetRootLogger();
-        else
-            return LLBC_LoggerManagerSingleton->GetLogger(logger);
-    }
-}
-
 LLBC_BEGIN_C_DECL
 
 int csllbc_Log_Init(const char *cfgFile)

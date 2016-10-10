@@ -88,7 +88,7 @@ int csllbc_Console_SetForegroundColor(int color)
         return LLBC_FAILED;
 
     int oldFgColor = oldColor & 0xf;
-    if (color == oldColor)
+    if (color == oldFgColor)
         return LLBC_OK;
 
     int newColor = (oldColor & ~0xf) | (color & 0xf);
