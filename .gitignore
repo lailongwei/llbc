@@ -13,6 +13,8 @@ Release/
 vcprojs/vs2008/Debug/
 vcprojs/vs2008/Release/
 
+iOSBuild/*.xcodeproj/xcuserdata/
+
 output/
 build/
 
