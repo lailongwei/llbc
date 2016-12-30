@@ -237,9 +237,12 @@ project "pyllbc"
         PY .. " ../../wrap/pyllbc/script_tools/prebuild.py",
     }
 
-    -- target name, target prefix
+    -- target name, target prefix, extension
     targetname "llbc"
     targetprefix ""
+    filter { "system:windows" }
+        targetextension ".pyd"
+    filter {}
 
     -- links 
     libdirs { 
