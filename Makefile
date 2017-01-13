@@ -12,7 +12,15 @@ $(if $(findstring $(PLATFORMNAME),$(SUPPORTED_PLATFORMS)),,$(error "Unsupported 
 #****************************************************************************
 # some useful variables
 #****************************************************************************
-# All targets define
+# Parse debug option
+CONFIG_OPT		?= $(shell echo $(config) | tr "[:upper:]" "[:lower:]")
+ifeq ($(CONFIG_OPT),debug)
+  DEBUG_OPT=TRUE
+else
+  DEBUG_OPT=FALSE
+endif
+
+# All make targets define
 PREMAKE_TARGET	:= build_makefiles
 
 CORELIB_TARGET  := core_lib
@@ -23,6 +31,32 @@ PYWRAP_TARGET   := py_wrap
 CSWRAP_TARGET	:= cs_wrap
 
 ALL_WRAP_TARGETS:= $(PYWRAP_TARGET) $(CSWRAP_TARGET)
+
+# All targets output directory
+ALL_TARGETS_OUTPUT := output/gmake
+# Some prefixs/suffixes define
+ifeq ($(PLATFORMNAME),darwin)
+  DYNLIB_SUFFIX := .dylib
+else
+  DYNLIB_SUFFIX := .so
+endif
+DEBUG_SUFFIX    := _debug
+EXE_SUFFIX      :=
+
+# Target names/paths define
+ifeq ($(DEBUG_OPT),FALSE)
+  CORELIB_TARGET_NAME   := libllbc$(DYNLIB_SUFFIX)
+  TESTSUITE_TARGET_NAME := testsuite$(EXE_SUFFIX)
+  PYWRAP_TARGET_NAME    := llbc$(DYNLIB_SUFFIX)
+else
+  CORELIB_TARGET_NAME   := libllbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
+  TESTSUITE_TARGET_NAME := testsuite$(DEBUG_SUFFIX)$(EXE_SUFFIX)
+  PYWRAP_TARGET_NAME    := llbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
+endif
+
+CORELIB_TARGET_PATH   := $(ALL_TARGETS_OUTPUT)/$(CORELIB_TARGET_NAME)
+TESTSUITE_TARGET_PATH := $(ALL_TARGETS_OUTPUT)/$(TESTSUITE_TARGET_NAME)
+PYWRAP_TARGET_PATH    := $(ALL_TARGETS_OUTPUT)/$(PYWRAP_TARGET_NAME)
 
 # Some variables define
 PREMAKE_PATH	:= "tools/premake"
@@ -104,16 +138,18 @@ clean_$(CSWRAP_TARGET):
 install: install_$(CORELIB_TARGET) install_$(WRAPS_TARGET)
 
 install_$(CORELIB_TARGET):
+	@(if [ ! -e $(CORELIB_TARGET_PATH) ]; then echo "not found '$(CORELIB_TARGET)' targets, install failed!"; exit -1; fi)
 	@rm -rf /usr/include/llbc
-	@(cd llbc/lib && \cp -rfv libllbc* /usr/lib)
+	@(cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(CORELIB_TARGET_NAME) /usr/lib)
 	@(cd llbc/include && \cp -rfv llbc.h /usr/include)
 	@(cd llbc/include && \rsync -av --exclude='*.svn' llbc /usr/include/)
 
 install_$(WRAPS_TARGET): install_$(CORELIB_TARGET) $(addprefix install_,$(ALL_WRAP_TARGETS))
 install_$(PYWRAP_TARGET):
-	@(cd wrap/pyllbc/lib && \cp -rfv llbc.so /usr/local/lib/python2.7/site-packages/)
+	@(if [ ! -e $(PYWRAP_TARGET_PATH) ]; then echo "not found '$(PYWRAP_TARGET)' targets, install failed!"; exit -1; fi)
+	@(cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(PYWRAP_TARGET_NAME) /usr/local/lib/python2.7/site-packages/)
 install_$(CSWRAP_TARGET):
-	@echo "!!!csrarp library could not be install, please copy the library file to your project directory"
+	@echo "!!!csrarp library could not be install, please copy the libraries file to your project directory"
 	
 tar:
 	@(cd tools && python tar.py)
