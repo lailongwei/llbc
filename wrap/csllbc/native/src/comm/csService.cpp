@@ -14,12 +14,11 @@
 #include "csllbc/comm/csService.h"
 #include "csllbc/comm/csPacketHandler.h"
 
-int csllbc_Service::_maxSvcId = 1;
-
 LLBC_SpinLock csllbc_Service::_packetDelegatesLock;
 csllbc_Service::_PacketDecodeDelegs csllbc_Service::_packetDecodeDelegs;
 
 csllbc_Service::csllbc_Service(Type type,
+                               const LLBC_String &name,
                                _D::Deleg_Service_EncodePacket encodeDeleg,
                                _D::Deleg_Service_DecodePacket decodeDeleg, 
                                _D::Deleg_Service_PacketHandler handlerDeleg,
@@ -28,11 +27,7 @@ csllbc_Service::csllbc_Service(Type type,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
-    _llbcSvc = LLBC_IService::Create(type);
-
-    // Set service Id, csllbc wrapped service don't need serviceId, so simply to set.
-    int svcId = LLBC_AtomicFetchAndAdd(&_maxSvcId, 1);
-    _llbcSvc->SetId(svcId);
+    _llbcSvc = LLBC_IService::Create(type, name);
 
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
@@ -42,7 +37,7 @@ csllbc_Service::csllbc_Service(Type type,
     delegs->handlerDeleg = handlerDeleg;
     delegs->preHandlerDeleg = preHandlerDeleg;
     delegs->unifyPreHandlerDeleg = unifyPreHandlerDeleg;
-    AddPacketDecodeDelegates(svcId, delegs);
+    AddPacketDecodeDelegates(_llbcSvc->GetId(), delegs);
 
     // Create packet handler object.
     _packetHandler = LLBC_New1(csllbc_PacketHandler, notFoundDecoderDeleg);

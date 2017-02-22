@@ -20,9 +20,12 @@ class csllbc_Service;
 /**
  * Create new service.
  * @param[in] svcType - the service type, see csllbc_Service::Type enumeration.
+ * @param[in] svcName - the service name.
+ * @param[in] ...     - the delegates, internal used.
  * @return csllbc_Service * - the created service, if failed, return NULL.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
+                                                                  const char *svcName,
                                                                   csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_PacketHandler handlerDeleg,

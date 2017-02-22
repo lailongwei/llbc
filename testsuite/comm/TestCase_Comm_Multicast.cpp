@@ -111,7 +111,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     // Fetch arguments.
     FetchArgs(argc, argv);
 
-    LLBC_IService *svc = LLBC_IService::Create(_svcType);
+    LLBC_IService *svc = LLBC_IService::Create(_svcType, "MulticastTest");
 
     TestFacade *facade = LLBC_New2(TestFacade, _asClient, _useBst);
     svc->RegisterFacade(facade);

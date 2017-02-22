@@ -36,9 +36,10 @@ public:
     /**
      * Parameter constructor.
      * @param[in] type  - the service type, see enumeration: SvcType.
+     * @param[in] name  - the service name.
      * @param[in] pySvc - the python layer service instance(borrow instance).
      */
-    pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc);
+    pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc);
     /**
      * Destructor.
      */
@@ -312,8 +313,9 @@ private:
     /**
      * Create llbc layer service object.
      * @param[in] svcType - the service type.
+     * @param[in] svcName - the service name.
      */
-    void CreateLLBCService(LLBC_IService::Type svcType);
+    void CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName);
 
     /**
      * After stop method, use to purge all python type data.
@@ -354,6 +356,7 @@ private:
 private:
     LLBC_IService *_llbcSvc;
     LLBC_IService::Type _llbcSvcType;
+    LLBC_String _llbcSvcName;
 
     PyObject *_pySvc;
 
@@ -389,7 +392,6 @@ private:
 private:
     PyObject *_keyCObj;
 
-    static int _maxLLBCSvcId;
     static PyObject *_streamCls;
     static pyllbc_ErrorHooker *_errHooker;
 };

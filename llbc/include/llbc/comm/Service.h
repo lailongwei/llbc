@@ -39,9 +39,10 @@ class LLBC_HIDDEN LLBC_Service : public LLBC_IService
 public:
     /**
      * Create specified type service.
-     * @param[in] type - the service type, see LLBC_ServiceType enumeration.
+     * @param[in] type - the service type, see LLBC_IService::Type enumeration.
+     * @param[in] name - type service name.
      */
-    LLBC_Service(Type type);
+    LLBC_Service(Type type, const LLBC_String &name);
 
     /**
      * Service destructor.
@@ -56,17 +57,16 @@ public:
     virtual int GetId() const;
 
     /**
-     * Set the service Id.
-     * @param[in] id - the service Id.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetId(int id);
-
-    /**
      * Get the service type.
      * @return Type - the service type.
      */
     virtual Type GetType() const;
+
+    /**
+     * Get the service name.
+     * @return const LLBC_String & - the service name.
+     */
+    virtual const LLBC_String &GetName() const;
 
     /**
      * Get the service drive mode.
@@ -491,8 +491,11 @@ private:
                            bool validCheck = true);
 
 private:
+    int _id;
+    static int _maxId;
+
     Type _type;
-    volatile int _id;
+    LLBC_String _name;
     DriveMode _driveMode;
     bool _suppressedCoderNotFoundWarning;
 

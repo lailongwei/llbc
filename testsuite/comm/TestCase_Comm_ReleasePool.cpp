@@ -81,7 +81,7 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
     LLBC_PrintLine("ReleasePool test:");
 
     // Create service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "ReleasePoolTest");
     svc->RegisterFacade(LLBC_New(MyFacade));
     svc->Start();
 

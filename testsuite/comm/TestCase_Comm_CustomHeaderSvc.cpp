@@ -94,7 +94,7 @@ TestCase_Comm_CustomHeaderSvc::TestCase_Comm_CustomHeaderSvc()
 , _ip("0.0.0.0")
 , _port(8888)
 
-, _svc(LLBC_IService::Create(LLBC_IService::Normal))
+, _svc(LLBC_IService::Create(LLBC_IService::Normal, "CustomHeaderSvcTest"))
 {
 }
 

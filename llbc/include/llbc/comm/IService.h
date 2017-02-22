@@ -70,8 +70,10 @@ public:
 public:
     /**
      * Factory method, create service type service type.
+     * @param[in] type - the service type.
+     * @param[in] name - the service name.
      */
-    static This *Create(Type type);
+    static This *Create(Type type, const LLBC_String &name);
 
     /**
      * Set the packet header describe.
@@ -81,7 +83,7 @@ public:
     static int SetPacketHeaderDesc(LLBC_PacketHeaderDesc *headerDesc);
 
     /**
-     * Set the packet header desc factory, this method is thread unsafty, call in progress start.
+     * Set the packet header desc factory, this method is thread unsafety, call in progress start.
      * @param[in] factory - the factory.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -95,17 +97,16 @@ public:
     virtual int GetId() const = 0;
 
     /**
-     * Set the service Id.
-     * @param[in] id - the service Id.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetId(int id) = 0;
-
-    /**
      * Get the service type.
      * @return Type - the service type.
      */
     virtual Type GetType() const = 0;
+
+    /**
+     * Get the service name.
+     * @return const LLBC_String & - the service name.
+     */
+    virtual const LLBC_String &GetName() const = 0;
 
     /**
      * Get the service drive mode.

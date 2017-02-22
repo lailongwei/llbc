@@ -122,7 +122,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         svcType == LLBC_IService::Normal ? "Normal" : "Raw");
 
     // Create service
-    LLBC_IService *svc = LLBC_IService::Create(svcType);
+    LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
     TestFacade *facade = LLBC_New(TestFacade);
     svc->RegisterFacade(facade);
     svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);

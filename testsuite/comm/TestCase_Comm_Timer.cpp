@@ -70,7 +70,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Timer testcase:");
 
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "TimerTest");
     svc->RegisterFacade(LLBC_New(TestFacade));
     if(svc->Start() != LLBC_OK)
     {

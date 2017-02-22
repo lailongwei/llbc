@@ -101,8 +101,7 @@ int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, in
     LLBC_PrintLine("Facade test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
-    svc->SetId(1);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
     svc->SetFPS(1);
     svc->RegisterFacade(LLBC_New(TestFacade));
 
@@ -130,8 +129,7 @@ int TestCase_Comm_Facade::TestInExternalDriveService(const LLBC_String &host, in
     LLBC_PrintLine("Facade test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
-    svc->SetId(1);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
     svc->SetFPS(1);
     svc->RegisterFacade(LLBC_New(TestFacade));
     svc->SetDriveMode(LLBC_IService::ExternalDrive);

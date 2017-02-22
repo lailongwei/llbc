@@ -96,7 +96,7 @@ private:
 }
 
 TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "ExternalDriveSvc"))
 {
 }
 

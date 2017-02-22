@@ -35,6 +35,7 @@ public:
      * Constructor & Destructor.
      */
     csllbc_Service(Type type, 
+                   const LLBC_String &name,
                    _D::Deleg_Service_EncodePacket encodeDeleg,
                    _D::Deleg_Service_DecodePacket decodeDeleg,
                    _D::Deleg_Service_PacketHandler handlerDeleg,
@@ -194,7 +195,6 @@ public:
 
 private:
     LLBC_IService *_llbcSvc;
-    static int _maxSvcId;
     csllbc_PacketHandler *_packetHandler;
 
     static LLBC_SpinLock _packetDelegatesLock;

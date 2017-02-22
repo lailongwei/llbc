@@ -69,7 +69,7 @@ TestCase_Comm_SvcStartStop::~TestCase_Comm_SvcStartStop()
 int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Service start/stop test:");
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "SvcStartStopTest");
     svc->RegisterFacade(LLBC_New(SvcStartStopTestFacade));
     svc->Start();
 

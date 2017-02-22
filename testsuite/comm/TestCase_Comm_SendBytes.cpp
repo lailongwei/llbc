@@ -71,7 +71,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     }
 
     FetchArgs(argc, argv);
-    LLBC_IService *svc = LLBC_IService::Create(_svcType);
+    LLBC_IService *svc = LLBC_IService::Create(_svcType, "SendBytesTest");
 
     TestFacade *facade = LLBC_New(TestFacade);
     svc->RegisterFacade(facade);

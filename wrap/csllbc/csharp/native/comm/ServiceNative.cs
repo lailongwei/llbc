@@ -21,6 +21,7 @@ namespace llbc
     {
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static IntPtr csllbc_Service_Create(int svcType,
+                                                          IntPtr svcName,
                                                           Deleg_Service_EncodePacket encodeDeleg,
                                                           Deleg_Service_DecodePacket decodeDeleg,
                                                           Deleg_Service_PacketHandler handlerDeleg,

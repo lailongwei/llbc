@@ -40,7 +40,7 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("service/lazy task test:");
 
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "LazyTaskTest");
 
     LazyClass *taskObj = LLBC_New(LazyClass);
     svc->Post(taskObj, &LazyClass::BeforeRun);

@@ -36,6 +36,8 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
+int LLBC_Service::_maxId = 1;
+
 LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] = 
 {
     &LLBC_Service::HandleEv_SessionCreate,
@@ -55,9 +57,10 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] =
 # pragma warning(disable:4351)
 #endif
 
-LLBC_Service::LLBC_Service(This::Type type)
-: _type(type)
-, _id(0)
+LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
+: _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
+, _type(type)
+, _name(name.c_str(), name.length())
 , _driveMode(This::SelfDrive)
 , _suppressedCoderNotFoundWarning(false)
 
@@ -174,33 +177,14 @@ int LLBC_Service::GetId() const
     return _id;
 }
 
-int LLBC_Service::SetId(int id)
-{
-    if (_svcMgr.GetService(id))
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-    else if (_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
-    LLBC_Guard guard(_lock);
-    if (_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
-    _id = id;
-    return LLBC_OK;
-}
-
 This::Type LLBC_Service::GetType() const
 {
     return _type;
+}
+
+const LLBC_String &LLBC_Service::GetName() const
+{
+    return _name;
 }
 
 This::DriveMode LLBC_Service::GetDriveMode() const
@@ -257,7 +241,8 @@ int LLBC_Service::Start(int pollerCount)
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
-    else if (_svcMgr.GetService(_id))
+    else if (_svcMgr.GetService(_id) ||
+        _svcMgr.GetService(_name))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;

@@ -18,6 +18,7 @@
 LLBC_BEGIN_C_DECL
 
 csllbc_Service *csllbc_Service_Create(int svcType,
+                                      const char *svcName,
                                       csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                       csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
                                       csllbc_Delegates::Deleg_Service_PacketHandler handlerDeleg,
@@ -32,8 +33,9 @@ csllbc_Service *csllbc_Service_Create(int svcType,
         return NULL;
     }
 
-    return LLBC_New7(csllbc_Service,
+    return LLBC_New8(csllbc_Service,
                      static_cast<csllbc_Service::Type>(svcType),
+                     svcName,
                      encodeDeleg,
                      decodeDeleg,
                      handlerDeleg,

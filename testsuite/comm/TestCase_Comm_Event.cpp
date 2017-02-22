@@ -106,7 +106,7 @@ int TestCase_Comm_Event::Run(int argc, char *argv[])
     std::cout <<"Core/Event component testcase..." <<std::endl;
 
     // We create a service to test.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal);
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "EventTest");
     svc->RegisterFacade(LLBC_New(EventTestFacade));
     svc->Start();
 

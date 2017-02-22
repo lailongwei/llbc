@@ -26,13 +26,13 @@ namespace
     }
 }
 
-int pyllbc_Service::_maxLLBCSvcId = 0;
 PyObject *pyllbc_Service::_streamCls = NULL;
 pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
 
-pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc)
+pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc)
 : _llbcSvc(NULL)
 , _llbcSvcType(type)
+, _llbcSvcName(name.c_str(), name.length())
 
 , _pySvc(pySvc)
 
@@ -63,7 +63,7 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, PyObject *pySvc)
 , _stoping(false)
 {
     // Create llbc library Service object and set some service attributes.
-    CreateLLBCService(type);
+    CreateLLBCService(type, name);
 
     // Create cobj python attribute key.
     _keyCObj = Py_BuildValue("s", "cobj");
@@ -608,12 +608,11 @@ pyllbc_ErrorHooker *pyllbc_Service::GetErrHooker()
     return This::_errHooker;
 }
 
-void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType)
+void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName)
 {
     ASSERT(!_llbcSvc && "llbc service pointer not NULL");
 
-    _llbcSvc = LLBC_IService::Create(svcType);
-    _llbcSvc->SetId(++This::_maxLLBCSvcId); // llbc library ServiceId we not use, so, let's simple set it.
+    _llbcSvc = LLBC_IService::Create(svcType, svcName);
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
@@ -628,7 +627,7 @@ void pyllbc_Service::AfterStop()
 
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
-    CreateLLBCService(_llbcSvcType);
+    CreateLLBCService(_llbcSvcType, _llbcSvcName);
 
     // Cleanup all python layer facades.
     for (_Facades::iterator it = _facades.begin();

@@ -427,13 +427,17 @@ namespace llbc
                 // Create native service.
                 _nativeFacade = new NativeFacade(this);
                 _nativeFacadeDelegates = new NativeFacadeDelegates(_nativeFacade);
+
+                IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName, true);
                 _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
+                                                            nativeSvcName,
                                                             _nativeFacadeDelegates.svcEncodePacket,
                                                             _nativeFacadeDelegates.svcDecodePacket,
                                                             _nativeFacadeDelegates.svcPacketHandler,
                                                             _nativeFacadeDelegates.svcPacketPreHandler,
                                                             _nativeFacadeDelegates.svcPacketUnifyPreHandler,
                                                             _nativeFacadeDelegates.svcNativeCouldNotFoundDecoderReport);
+                LibUtil.FreeNativePtr(ref nativeSvcName);
                 if (_llbcSvc.ToInt64() == 0)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 

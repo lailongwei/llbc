@@ -156,7 +156,7 @@ private:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest"))
 {
 }
 
@@ -169,9 +169,6 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Communication Service Basic test:");
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
-
-    // Set service Id.
-    _svc->SetId(8);
 
     // Register facade.
     TestFacade *facade = LLBC_New(TestFacade);

@@ -14,7 +14,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
 {
     PyObject *pySvc;
     LLBC_IService::Type svcType;
-    if (!PyArg_ParseTuple(args, "Oi", &pySvc, &svcType))
+    char *svcName = NULL;
+    if (!PyArg_ParseTuple(args, "Ois", &pySvc, &svcType, &svcName))
         return NULL;
 
     if (svcType != LLBC_IService::Normal &&
@@ -24,7 +25,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    pyllbc_Service *svc = LLBC_New2(pyllbc_Service, svcType, pySvc);
+    pyllbc_Service *svc = LLBC_New3(pyllbc_Service, svcType, svcName, pySvc);
 
     return Py_BuildValue("l", svc);
 }

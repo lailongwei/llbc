@@ -47,6 +47,13 @@ public:
     LLBC_IService *GetService(int id);
 
     /**
+     * Get service by service name.
+     * @param[in] name - the service name.
+     * @return LLBC_IService * - the service, if not found, return NULL.
+     */
+    LLBC_IService *GetService(const LLBC_String &name);
+
+    /**
      * Remove specified id service.
      * Note:
      *  1. Not allow to remove self thread drive's service, if try to call, 
@@ -55,6 +62,13 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int RemoveService(int id);
+
+    /**
+     * Remove specified name service, like Remove(int id) method.
+     * @param[in] id - the service Id.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveService(const LLBC_String &name);
 
     /**
      * Wait all services.
@@ -95,9 +109,14 @@ private:
     typedef std::map<int, LLBC_IService *> _Services;
     static bool InTls(const _Services &svcs);
 
+    typedef std::map<LLBC_String, LLBC_IService *> _Services2;
+    static bool InTls(const _Services2 &svcs);
+
 private:
     LLBC_RecursiveLock _lock;
-    _Services _services;
+
+    _Services _id2Services;
+    _Services2 _name2Services;
 };
 
 /**
