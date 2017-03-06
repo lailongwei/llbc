@@ -125,7 +125,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
 {
     char *buf = NULL;
     Py_ssize_t len = 0;
- 
+
     const pyllbc_ObjType type = pyllbc_TypeDetector::Detect(raw);
     if (type == PYLLBC_STR_OBJ)
     {
@@ -159,7 +159,6 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
 
     _stream.SetPos(0);
     _stream.WriteBuffer(buf, len);
-    _stream.SetPos(0);
 
     return LLBC_OK;
 }

@@ -8,8 +8,8 @@ class pyllbcStream(object):
     """
     Stream class encapsulation, use to pack/unpack data sequence.
     """
-    def __init__(self, size=0, init_obj=None):
-        self.__c_obj = llbc.inl.NewPyStream(self, size)
+    def __init__(self, size=0, init_obj=None, endian=llbc.Endian.MachineEndian):
+        self.__c_obj = llbc.inl.NewPyStream(self, size, endian)
         self.packobj(init_obj)
 
     def __del__(self):
@@ -68,7 +68,6 @@ class pyllbcStream(object):
     def raw(self, r):
         """
         Set stream raw memory from str/buffer/bytearray.
-        After set raw memory, the self.pos will always reset to 0.
         """
         llbc.inl.PyStreamSetRaw(self.__c_obj, r)
 

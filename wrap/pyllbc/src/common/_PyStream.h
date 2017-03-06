@@ -15,10 +15,16 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewPyStream(PyObject *self, PyObject *args)
 {
     int initSize = 0;
     PyObject *pyStream;
-    if (!PyArg_ParseTuple(args, "O|i", &pyStream, &initSize))
+    int endian = LLBC_MachineEndian;
+    if (!PyArg_ParseTuple(args, "O|ii", &pyStream, &initSize, &endian))
         return NULL;
 
     pyllbc_Stream *stream = new pyllbc_Stream(pyStream, initSize);
+    if (UNLIKELY(stream->SetEndian(endian) != LLBC_OK))
+    {
+        LLBC_Delete(stream);
+        return NULL;
+    }
 
     return Py_BuildValue("l", stream);
 }
