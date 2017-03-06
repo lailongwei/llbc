@@ -68,6 +68,7 @@ class pyllbcStream(object):
     def raw(self, r):
         """
         Set stream raw memory from str/buffer/bytearray.
+        After set raw memory, the self.pos will always reset to 0.
         """
         llbc.inl.PyStreamSetRaw(self.__c_obj, r)
 

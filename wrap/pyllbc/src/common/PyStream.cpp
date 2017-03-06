@@ -159,6 +159,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
 
     _stream.SetPos(0);
     _stream.WriteBuffer(buf, len);
+    _stream.SetPos(0);
 
     return LLBC_OK;
 }
