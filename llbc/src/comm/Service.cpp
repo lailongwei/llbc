@@ -57,7 +57,7 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] =
 # pragma warning(disable:4351)
 #endif
 
-LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
+LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name/* = ""*/)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
 , _type(type)
 , _name(name.c_str(), name.length())
@@ -117,6 +117,9 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 {
+    if (_name.empty())
+        _name.format("S%d-%s", _id, LLBC_GUIDHelper::GenStr().c_str());
+
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);

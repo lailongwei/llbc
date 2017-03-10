@@ -73,7 +73,7 @@ public:
      * @param[in] type - the service type.
      * @param[in] name - the service name.
      */
-    static This *Create(Type type, const LLBC_String &name);
+    static This *Create(Type type, const LLBC_String &name = "");
 
     /**
      * Set the packet header describe.

@@ -21,7 +21,7 @@ namespace
 
 __LLBC_NS_BEGIN
 
-This *LLBC_IService::Create(Type type, const LLBC_String &name)
+This *LLBC_IService::Create(Type type, const LLBC_String &name/* = ""*/)
 {
     return LLBC_New2(LLBC_Service, type, name);
 }

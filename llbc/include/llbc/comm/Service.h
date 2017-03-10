@@ -42,7 +42,7 @@ public:
      * @param[in] type - the service type, see LLBC_IService::Type enumeration.
      * @param[in] name - type service name.
      */
-    LLBC_Service(Type type, const LLBC_String &name);
+    LLBC_Service(Type type, const LLBC_String &name = "");
 
     /**
      * Service destructor.
