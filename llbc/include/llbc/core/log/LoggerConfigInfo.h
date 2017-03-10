@@ -97,6 +97,12 @@ public:
     const LLBC_String &GetLogFile() const;
 
     /**
+     * Get force application log path flag
+     * @return const bool - log path flag
+     */
+    const bool GetForceAppLogPath() const;
+
+    /**
      * Get daily rolling mode switch(available in file appender).
      * @return bool - daily rolling mode switch.
      */
@@ -142,6 +148,7 @@ private:
 
     bool _logToFile;
     LLBC_String _logFile;
+    bool _forceAppLogPath;
     LLBC_String _filePattern;
     bool _dailyMode;
     long _maxFileSize;

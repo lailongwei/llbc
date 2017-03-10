@@ -31,6 +31,7 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 
 , _logToFile(false)
 , _logFile()
+, _forceAppLogPath(false)
 , _filePattern()
 , _dailyMode(true)
 , _maxFileSize(INT_MAX)
@@ -58,6 +59,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     // File log configs.
     _logToFile = (cfg.HasProperty("logToFile") ? cfg.GetValue("logToFile").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
     _logFile = (cfg.HasProperty("logFile") ? cfg.GetValue("logFile").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
+    _forceAppLogPath = (cfg.HasProperty("forceAppLogPath") ? cfg.GetValue("forceAppLogPath").AsBool() : LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH);
     _filePattern = (cfg.HasProperty("filePattern") ? cfg.GetValue("filePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     _dailyMode = (cfg.HasProperty("dailyRollingMode") ? cfg.GetValue("dailyRollingMode").AsBool() : LLBC_CFG_LOG_DEFAULT_DAILY_MODE);
     _maxFileSize = (cfg.HasProperty("maxFileSize") ? cfg.GetValue("maxFileSize").AsLong() : LLBC_CFG_LOG_MAX_FILE_SIZE);
@@ -126,6 +128,11 @@ const LLBC_String &LLBC_LoggerConfigInfo::GetFilePattern() const
 const LLBC_String &LLBC_LoggerConfigInfo::GetLogFile() const
 {
     return _logFile;
+}
+
+const bool LLBC_LoggerConfigInfo::GetForceAppLogPath() const
+{
+    return _forceAppLogPath;
 }
 
 bool LLBC_LoggerConfigInfo::IsDailyRollingMode() const

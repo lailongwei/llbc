@@ -112,6 +112,7 @@ private:
 
 private:
     LLBC_String _baseName;
+    LLBC_String _basePath;
 
     int _fileBufferSize;
     bool _isDailyRolling;

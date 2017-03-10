@@ -74,7 +74,14 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     }
 
     _baseName = initInfo.file;
-    const LLBC_String logDir = LLBC_Directory::DirName(_baseName);
+    LLBC_String logDir = LLBC_Directory::DirName(_baseName);
+
+    if (initInfo.forceAppLogPath)
+    {
+        _basePath = LLBC_Directory::ModuleFileDir();
+        logDir = LLBC_Directory::Join(_basePath, logDir);
+    }
+
     if (!logDir.empty() && !LLBC_Directory::Exists(logDir))
     {
         if (LLBC_Directory::Create(logDir) != LLBC_OK)
@@ -196,7 +203,7 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 
 LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 {
-    LLBC_String logFile(_baseName);
+    LLBC_String logFile(_basePath.empty() ? _baseName : LLBC_Directory::Join(_basePath, _baseName));
     if (_isDailyRolling)
     {
         struct tm timeStruct;
