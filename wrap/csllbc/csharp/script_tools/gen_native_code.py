@@ -39,6 +39,7 @@ TYPE_MAP = {
     'uint16': 'unsigned short',
 
     'int': 'int',
+    'unsigned int' : 'uint',
     'sint64': 'long',
     'uint64': 'ulong',
 

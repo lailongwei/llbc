@@ -382,6 +382,7 @@ project "csllbc"
     -- prebuild commands
     prebuildcommands {
         PY .. " ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+        PY .. " ../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
     }
 
     -- postbuild commands

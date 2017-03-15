@@ -22,23 +22,22 @@ namespace llbc
         /// Create exception from llbc core library.
         /// </summary>
         /// <returns></returns>
-        public static LLBCException CreateExceptionFromCoreLib()
+        public static LLBCException CreateExceptionFromCoreLib(uint errNo = 0)
         {
             unsafe
             {
                 int errStrLen = 0;
-                IntPtr errStr = LLBCNative.csllbc_FormatLastError(new IntPtr(&errStrLen));
+                IntPtr errStr;
+
+                if (errNo == 0)
+                    errStr = LLBCNative.csllbc_FormatLastError(new IntPtr(&errStrLen));
+                else
+                    errStr = LLBCNative.csllbc_StrError(errNo, new IntPtr(&errStrLen));
 
                 if (errStrLen > 0)
-                {
-                    byte[] bytes = new byte[errStrLen];
-                    Marshal.Copy(errStr, bytes, 0, errStrLen);
-                    return new LLBCException(Encoding.UTF8.GetString(bytes));
-                }
-                else
-                {
-                    return new LLBCException("unknown error");
-                }
+                    return new LLBCException(LibUtil.Ptr2Str(errStr, errStrLen));
+                
+                return new LLBCException("unknown error");
             }
         }
     }

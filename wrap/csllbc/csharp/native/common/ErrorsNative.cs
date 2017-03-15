@@ -21,5 +21,8 @@ namespace llbc
     {
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static IntPtr csllbc_FormatLastError(IntPtr lastErrorLen);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static IntPtr csllbc_StrError(uint errNo, IntPtr errLen);
     }
 }

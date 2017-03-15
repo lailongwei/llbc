@@ -182,7 +182,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
     if (UNLIKELY(!libTls))
         return LLBC_INTERNAL_NS __g_invalidErrDesc;
 
-    int noPart = LLBC_GetErrnoNoPart(no);
+    uint32 noPart = LLBC_GetErrnoNoPart(no);
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -268,7 +268,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         return libTls->commonTls.errDesc;
     }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
-    else if (noPart == __LLBC_ERROR_UNKNOWN)
+    else if (noPart == __LLBC_ERROR_UNKNOWN ||
+        noPart >= __LLBC_ERROR_SENTINEL)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         ::strcpy(libTls->commonTls.errDesc, "unknown error");

@@ -21,4 +21,12 @@ const char *csllbc_FormatLastError(int *lastErrorLen)
     return lastError;
 }
 
+const char *csllbc_StrError(unsigned int errNo, int *errLen)
+{
+    const char *error = LLBC_StrError((int)errNo);
+    *errLen = LLBC_StrLenA(error);
+
+    return error;
+}
+
 LLBC_END_C_DECL

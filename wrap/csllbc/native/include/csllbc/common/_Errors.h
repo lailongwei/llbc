@@ -19,4 +19,6 @@
  */
 LLBC_EXTERN_C CSLLBC_EXPORT const char *csllbc_FormatLastError(int *lastErrorLen);
 
+LLBC_EXTERN_C CSLLBC_EXPORT const char *csllbc_StrError(unsigned int errNo, int *errLen);
+
 #endif // !__CSLLBC_COM__ERRORS_H__
