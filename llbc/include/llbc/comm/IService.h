@@ -177,21 +177,23 @@ public:
 
     /**
      * Establisthes a connection to a specified address.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip      - the ip address.
+     * @param[in] port    - the port number.
+     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port) = 0;
+    virtual int Connect(const char *ip, uint16 port, double timeout = -1) = 0;
 
     /**
      * Asynchronous establishes a connection to a specified address.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip      - the ip address.
+     * @param[in] port    - the port number.
+     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port) = 0;
+    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1) = 0;
 
     /**
      * Check given sessionId is validate or not.

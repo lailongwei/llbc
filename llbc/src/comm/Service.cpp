@@ -378,7 +378,7 @@ int LLBC_Service::Listen(const char *ip, uint16 port)
     return sessionId;
 }
 
-int LLBC_Service::Connect(const char *ip, uint16 port)
+int LLBC_Service::Connect(const char *ip, uint16 port, double timeout)
 {
     LLBC_Guard guard(_lock);
     const int sessionId = _pollerMgr.Connect(ip, port);
@@ -392,7 +392,7 @@ int LLBC_Service::Connect(const char *ip, uint16 port)
     return sessionId;
 }
 
-int LLBC_Service::AsyncConn(const char *ip, uint16 port)
+int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout)
 {
     LLBC_Guard guard(_lock);
     return _pollerMgr.AsyncConn(ip, port);

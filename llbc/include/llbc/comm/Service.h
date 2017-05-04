@@ -143,24 +143,26 @@ public:
      * Note:
      *      If service not start when call this method, connection operation will 
      *      create a pending-operation and recorded in service, your maybe could not get error.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip      - the ip address.
+     * @param[in] port    - the port number.
+     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port);
+    virtual int Connect(const char *ip, uint16 port, double timeout = -1);
 
     /**
      * Asynchronous establishes a connection to a specified address.
      * Note:
      *      If service not start when call this method, connection operation will 
      *      create a pending-operation and recorded in service, your maybe could not get error.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip      - the ip address.
+     * @param[in] port    - the port number.
+     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port);
+    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1);
 
     /**
      * Check given sessionId is lgeal or not.
