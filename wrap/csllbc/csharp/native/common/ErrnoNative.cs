@@ -107,5 +107,13 @@ namespace llbc
 
         static public uint LLBC_ERROR_NOT_ALLOW              = 0xc0000024;
 
+        static public uint LLBC_ERROR_WSA_SYSNOTREADY        = 0xc0000025;
+
+        static public uint LLBC_ERROR_WSA_VERNOTSUPPORTED    = 0xc0000026;
+
+        static public uint LLBC_ERROR_WSA_EINPROGRESS        = 0xc0000027;
+
+        static public uint LLBC_ERROR_WSA_EPROCLIM           = 0xc0000028;
+
     }
 }
