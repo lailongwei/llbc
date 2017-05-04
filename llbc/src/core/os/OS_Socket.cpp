@@ -31,9 +31,31 @@ int LLBC_StartupNetLibrary()
 #else // LLBC_TARGET_PLATFORM_WIN32
     WSADATA wsaData;
     WORD version = MAKEWORD(2, 2);
-    if (::WSAStartup(version, &wsaData) == SOCKET_ERROR)
+    int wsaInitRet = ::WSAStartup(version, &wsaData);
+    if (wsaInitRet != 0)
     {
-        LLBC_SetLastError(LLBC_ERROR_NETAPI);
+        switch (wsaInitRet)
+        {
+        case WSASYSNOTREADY:
+            LLBC_SetLastError(LLBC_ERROR_WSA_SYSNOTREADY);
+            break;
+
+        case WSAVERNOTSUPPORTED:
+            LLBC_SetLastError(LLBC_ERROR_WSA_VERNOTSUPPORTED);
+            break;
+
+        case WSAEINPROGRESS:
+            LLBC_SetLastError(LLBC_ERROR_WSA_EINPROGRESS);
+            break;
+
+        case WSAEPROCLIM:
+            LLBC_SetLastError(LLBC_ERROR_WSA_EPROCLIM);
+            break;
+
+        default:
+            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+            break;
+        }
         return LLBC_FAILED;
     }
 

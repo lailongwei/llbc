@@ -123,7 +123,7 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Successfully.
 //
-#define LLBC_ERROR_SUCCESS      0
+#define LLBC_ERROR_SUCCESS              0
 
 //
 // Message Id: LLBC_ERROR_UNKNOWN
@@ -132,8 +132,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Unknown error.
 //
-#define __LLBC_ERROR_UNKNOWN     ((int)(0x0000ffff))
-#define LLBC_ERROR_UNKNOWN       ((int)(0xc000ffff))
+#define __LLBC_ERROR_UNKNOWN             ((int)(0x0000ffff))
+#define LLBC_ERROR_UNKNOWN               ((int)(0xc000ffff))
 
 //
 // Message Id: LLBC_ERROR_CLIB
@@ -142,8 +142,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // C Lib error: %s.
 //
-#define __LLBC_ERROR_CLIB        ((int)(0x00000001))
-#define LLBC_ERROR_CLIB          ((int)(0xc0010001))
+#define __LLBC_ERROR_CLIB                ((int)(0x00000001))
+#define LLBC_ERROR_CLIB                  ((int)(0xc0010001))
 
 //
 // Message Id: LLBC_ERROR_OSAPI 
@@ -152,8 +152,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // OS Api call error: %s.
 //
-#define __LLBC_ERROR_OSAPI       ((int)(0x00000002))
-#define LLBC_ERROR_OSAPI         ((int)(0xc0020002))
+#define __LLBC_ERROR_OSAPI               ((int)(0x00000002))
+#define LLBC_ERROR_OSAPI                 ((int)(0xc0020002))
 
 //
 // Message Id: LLBC_ERROR_NETAPI
@@ -162,8 +162,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Net API call error: %d.
 //
-#define __LLBC_ERROR_NETAPI      ((int)(0x00000003))
-#define LLBC_ERROR_NETAPI        ((int)(0xc0030003))
+#define __LLBC_ERROR_NETAPI              ((int)(0x00000003))
+#define LLBC_ERROR_NETAPI                ((int)(0xc0030003))
 
 //
 // Message Id: LLBC_ERROR_GAI
@@ -172,8 +172,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // getaddrinfo() call error: %d:%s
 //
-#define __LLBC_ERROR_GAI         ((int)(0x00000004))
-#define LLBC_ERROR_GAI           ((int)(0xc0040004))
+#define __LLBC_ERROR_GAI                 ((int)(0x00000004))
+#define LLBC_ERROR_GAI                   ((int)(0xc0040004))
 
 //
 // Message Id: LLBC_ERROR_ARG
@@ -182,8 +182,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Argument error.
 //
-#define __LLBC_ERROR_ARG         ((int)(0x00000005))
-#define LLBC_ERROR_ARG           ((int)(0xc0000005))
+#define __LLBC_ERROR_ARG                 ((int)(0x00000005))
+#define LLBC_ERROR_ARG                   ((int)(0xc0000005))
 
 //
 // Message Id: LLBC_ERROR_NOT_IMPL
@@ -192,8 +192,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Not implement.
 //
-#define __LLBC_ERROR_NOT_IMPL    ((int)(0x00000006))
-#define LLBC_ERROR_NOT_IMPL      ((int)(0xc0000006))
+#define __LLBC_ERROR_NOT_IMPL            ((int)(0x00000006))
+#define LLBC_ERROR_NOT_IMPL              ((int)(0xc0000006))
 
 //
 // Message Id: LLBC_ERROR_RANGE
@@ -202,8 +202,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // Range error.
 //
-#define __LLBC_ERROR_RANGE       ((int)(0x00000007))
-#define LLBC_ERROR_RANGE         ((int)(0xc0000007))
+#define __LLBC_ERROR_RANGE               ((int)(0x00000007))
+#define LLBC_ERROR_RANGE                 ((int)(0xc0000007))
 
 //
 // Message Id: LLBC_ERROR_EXIST
@@ -212,8 +212,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // exist.
 //
-#define __LLBC_ERROR_EXIST       ((int)(0x00000008))
-#define LLBC_ERROR_EXIST         ((int)(0xc0000008))
+#define __LLBC_ERROR_EXIST               ((int)(0x00000008))
+#define LLBC_ERROR_EXIST                 ((int)(0xc0000008))
 
 //
 // Message Id: LLBC_ERROR_NOT_FOUND
@@ -222,8 +222,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // not found.
 //
-#define __LLBC_ERROR_NOT_FOUND   ((int)(0x00000009))
-#define LLBC_ERROR_NOT_FOUND     ((int)(0xc0000009))
+#define __LLBC_ERROR_NOT_FOUND           ((int)(0x00000009))
+#define LLBC_ERROR_NOT_FOUND             ((int)(0xc0000009))
 
 //
 // Message Id: LLBC_ERROR_END
@@ -232,8 +232,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // end.
 //
-#define __LLBC_ERROR_END         ((int)(0x0000000a))
-#define LLBC_ERROR_END           ((int)(0xc000000a))
+#define __LLBC_ERROR_END                 ((int)(0x0000000a))
+#define LLBC_ERROR_END                   ((int)(0xc000000a))
 
 //
 // Message Id: LLBC_ERROR_END
@@ -242,8 +242,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // limit.
 //
-#define __LLBC_ERROR_LIMIT       ((int)(0x0000000b))
-#define LLBC_ERROR_LIMIT         ((int)(0xc000000b))
+#define __LLBC_ERROR_LIMIT               ((int)(0x0000000b))
+#define LLBC_ERROR_LIMIT                 ((int)(0xc000000b))
 
 //
 // Message Id: LLBC_ERROR_NOT_INIT
@@ -252,8 +252,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // not init.
 //
-#define __LLBC_ERROR_NOT_INIT    ((int)(0x0000000c))
-#define LLBC_ERROR_NOT_INIT      ((int)(0xc000000c))
+#define __LLBC_ERROR_NOT_INIT            ((int)(0x0000000c))
+#define LLBC_ERROR_NOT_INIT              ((int)(0xc000000c))
 
 //
 // Message Id: LLBC_ERROR_NOT_OPEN
@@ -262,8 +262,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // not open.
 //
-#define __LLBC_ERROR_NOT_OPEN    ((int)(0x0000000d))
-#define LLBC_ERROR_NOT_OPEN      ((int)(0xc000000d))
+#define __LLBC_ERROR_NOT_OPEN            ((int)(0x0000000d))
+#define LLBC_ERROR_NOT_OPEN              ((int)(0xc000000d))
 
 //
 // Message Id: LLBC_ERROR_INITED
@@ -272,8 +272,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // initialized.
 //
-#define __LLBC_ERROR_INITED      ((int)(0x0000000e))
-#define LLBC_ERROR_INITED        ((int)(0xc000000e))
+#define __LLBC_ERROR_INITED              ((int)(0x0000000e))
+#define LLBC_ERROR_INITED                ((int)(0xc000000e))
 
 //
 // Message Id: LLBC_ERROR_OPENED
@@ -282,8 +282,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // opened.
 //
-#define __LLBC_ERROR_OPENED      ((int)(0x0000000f))
-#define LLBC_ERROR_OPENED        ((int)(0xc000000f))
+#define __LLBC_ERROR_OPENED              ((int)(0x0000000f))
+#define LLBC_ERROR_OPENED                ((int)(0xc000000f))
 
 //
 // Message Id: LLBC_ERROR_PERM
@@ -292,8 +292,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // permission denied.
 //
-#define __LLBC_ERROR_PERM        ((int)(0x00000010))
-#define LLBC_ERROR_PERM          ((int)(0xc0000010))
+#define __LLBC_ERROR_PERM                ((int)(0x00000010))
+#define LLBC_ERROR_PERM                  ((int)(0xc0000010))
 
 //
 // Message Id: LLBC_ERROR_TRUNCATED
@@ -302,8 +302,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // truncated.
 //
-#define __LLBC_ERROR_TRUNCATED   ((int)(0x00000011))
-#define LLBC_ERROR_TRUNCATED     ((int)(0xc0000011))
+#define __LLBC_ERROR_TRUNCATED           ((int)(0x00000011))
+#define LLBC_ERROR_TRUNCATED             ((int)(0xc0000011))
 
 //
 // Message Id: LLBC_ERROR_INVALID
@@ -312,8 +312,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // invalidate.
 //
-#define __LLBC_ERROR_INVALID     ((int)(0x00000012))
-#define LLBC_ERROR_INVALID       ((int)(0xc0000012))
+#define __LLBC_ERROR_INVALID             ((int)(0x00000012))
+#define LLBC_ERROR_INVALID               ((int)(0xc0000012))
 
 //
 // Message Id: LLBC_ERROR_FORMAT
@@ -322,8 +322,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // format error.
 //
-#define __LLBC_ERROR_FORMAT      ((int)(0x00000013))
-#define LLBC_ERROR_FORMAT        ((int)(0xc0000013))
+#define __LLBC_ERROR_FORMAT              ((int)(0x00000013))
+#define LLBC_ERROR_FORMAT                ((int)(0xc0000013))
 
 //
 // Message Id: LLBC_ERROR_TIMEOUT
@@ -332,8 +332,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // timeout.
 //
-#define __LLBC_ERROR_TIMEOUT     ((int)(0x00000014))
-#define LLBC_ERROR_TIMEOUT       ((int)(0xc0000014))
+#define __LLBC_ERROR_TIMEOUT             ((int)(0x00000014))
+#define LLBC_ERROR_TIMEOUT               ((int)(0xc0000014))
 
 //
 // Message Id: LLBC_ERROR_BUSY
@@ -342,8 +342,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // busy.
 //
-#define __LLBC_ERROR_BUSY        ((int)(0x00000015))
-#define LLBC_ERROR_BUSY          ((int)(0xc0000015))
+#define __LLBC_ERROR_BUSY                ((int)(0x00000015))
+#define LLBC_ERROR_BUSY                  ((int)(0xc0000015))
 
 //
 // Message Id: LLBC_ERROR_REENTRY
@@ -352,8 +352,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // reentry.
 //
-#define __LLBC_ERROR_REENTRY     ((int)(0x00000016))
-#define LLBC_ERROR_REENTRY       ((int)(0xc0000016))
+#define __LLBC_ERROR_REENTRY             ((int)(0x00000016))
+#define LLBC_ERROR_REENTRY               ((int)(0xc0000016))
 
 //
 // Message Id: LLBC_ERROR_NO_SUCH
@@ -362,8 +362,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // no such memory/data/resource.
 //
-#define __LLBC_ERROR_NO_SUCH     ((int)(0x00000017))
-#define LLBC_ERROR_NO_SUCH       ((int)(0xc0000017))
+#define __LLBC_ERROR_NO_SUCH             ((int)(0x00000017))
+#define LLBC_ERROR_NO_SUCH               ((int)(0xc0000017))
 
 //
 // Message Id: LLBC_ERROR_WOULD_BLOCK
@@ -372,8 +372,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // would block.
 //
-#define __LLBC_ERROR_WBLOCK      ((int)(0x00000018))
-#define LLBC_ERROR_WBLOCK        ((int)(0xc0000018))
+#define __LLBC_ERROR_WBLOCK              ((int)(0x00000018))
+#define LLBC_ERROR_WBLOCK                ((int)(0xc0000018))
 
 //
 // Message Id: LLBC_ERROR_AGAIN
@@ -382,8 +382,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // again.
 //
-#define __LLBC_ERROR_AGAIN       ((int)(0x00000019))
-#define LLBC_ERROR_AGAIN         ((int)(0xc0000019))
+#define __LLBC_ERROR_AGAIN               ((int)(0x00000019))
+#define LLBC_ERROR_AGAIN                 ((int)(0xc0000019))
 
 //
 // Message Id: LLBC_ERROR_PENDING
@@ -392,8 +392,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // pending.
 //
-#define __LLBC_ERROR_PENDING     ((int)(0x0000001a))
-#define LLBC_ERROR_PENDING       ((int)(0xc000001a))
+#define __LLBC_ERROR_PENDING             ((int)(0x0000001a))
+#define LLBC_ERROR_PENDING               ((int)(0xc000001a))
 
 //
 // Message Id: LLBC_ERROR_ILLEGAL
@@ -402,8 +402,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // illegal.
 //
-#define __LLBC_ERROR_ILLEGAL     ((int)(0x0000001b))
-#define LLBC_ERROR_ILLEGAL       ((int)(0xc000001b))
+#define __LLBC_ERROR_ILLEGAL             ((int)(0x0000001b))
+#define LLBC_ERROR_ILLEGAL               ((int)(0xc000001b))
 
 //
 // Message Id: LLBC_ERROR_ACCESS_DENY
@@ -412,8 +412,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // access deny.
 //
-#define __LLBC_ERROR_ACCESS_DENY ((int)(0x0000001c))
-#define LLBC_ERROR_ACCESS_DENY   ((int)(0xc000001c))
+#define __LLBC_ERROR_ACCESS_DENY         ((int)(0x0000001c))
+#define LLBC_ERROR_ACCESS_DENY           ((int)(0xc000001c))
 
 //
 // Message Id: LLBC_ERROR_REPEAT
@@ -422,8 +422,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // repeat
 //
-#define __LLBC_ERROR_REPEAT      ((int)(0x0000001d))
-#define LLBC_ERROR_REPEAT        ((int)(0xc000001d))
+#define __LLBC_ERROR_REPEAT              ((int)(0x0000001d))
+#define LLBC_ERROR_REPEAT                ((int)(0xc000001d))
 
 //
 // Message Id: LLBC_ERROR_ENCODE
@@ -432,8 +432,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // encode error.
 //
-#define __LLBC_ERROR_ENCODE      ((int)(0x0000001e))
-#define LLBC_ERROR_ENCODE        ((int)(0xc000001e))
+#define __LLBC_ERROR_ENCODE              ((int)(0x0000001e))
+#define LLBC_ERROR_ENCODE                ((int)(0xc000001e))
 
 //
 // Message Id: LLBC_ERROR_DECODE
@@ -442,8 +442,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // decode error.
 //
-#define __LLBC_ERROR_DECODE      ((int)(0x0000001f))
-#define LLBC_ERROR_DECODE        ((int)(0xc000001f))
+#define __LLBC_ERROR_DECODE              ((int)(0x0000001f))
+#define LLBC_ERROR_DECODE                ((int)(0xc000001f))
 
 //
 // Message Id: LLBC_ERROR_COMPRESS
@@ -452,8 +452,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // compress error.
 //
-#define __LLBC_ERROR_COMPRESS    ((int)(0x00000020))
-#define LLBC_ERROR_COMPRESS      ((int)(0xc0000020))
+#define __LLBC_ERROR_COMPRESS            ((int)(0x00000020))
+#define LLBC_ERROR_COMPRESS              ((int)(0xc0000020))
 
 //
 // Message Id: LLBC_ERROR_DECOMPRESS
@@ -462,8 +462,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // decompress error.
 //
-#define __LLBC_ERROR_DECOMPRESS  ((int)(0x00000021))
-#define LLBC_ERROR_DECOMPRESS    ((int)(0xc0000021))
+#define __LLBC_ERROR_DECOMPRESS          ((int)(0x00000021))
+#define LLBC_ERROR_DECOMPRESS            ((int)(0xc0000021))
 
 //
 // Message Id: LLBC_ERROR_PACK
@@ -472,8 +472,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // pack error.
 //
-#define __LLBC_ERROR_PACK        ((int)(0x00000022))
-#define LLBC_ERROR_PACK          ((int)(0xc0000022))
+#define __LLBC_ERROR_PACK                ((int)(0x00000022))
+#define LLBC_ERROR_PACK                  ((int)(0xc0000022))
 
 //
 // Message Id: LLBC_ERROR_UNPACK
@@ -482,8 +482,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // unpack error.
 //
-#define __LLBC_ERROR_UNPACK      ((int)(0x00000023))
-#define LLBC_ERROR_UNPACK        ((int)(0xc0000023))
+#define __LLBC_ERROR_UNPACK              ((int)(0x00000023))
+#define LLBC_ERROR_UNPACK                ((int)(0xc0000023))
 
 //
 // Message Id: LLBC_ERROR_NOT_ALLOW
@@ -492,13 +492,53 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // not allow.
 //
-#define __LLBC_ERROR_NOT_ALLOW   ((int)(0x00000024))
-#define LLBC_ERROR_NOT_ALLOW     ((int)(0xc0000024))
+#define __LLBC_ERROR_NOT_ALLOW           ((int)(0x00000024))
+#define LLBC_ERROR_NOT_ALLOW             ((int)(0xc0000024))
+
+//
+// Message Id: LLBC_ERROR_WSA_SYSNOTREADY
+//
+// MessageText:
+//
+// underlying network subsystem is not ready for network communication(only provide for windows sockets api).
+//
+#define __LLBC_ERROR_WSA_SYSNOTREADY     ((int)(0x00000025))
+#define LLBC_ERROR_WSA_SYSNOTREADY       ((int)(0xc0000025))
+
+//
+// Message Id: LLBC_ERROR_WSA_VERNOTSUPPORTED
+//
+// MessageText:
+//
+// the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation(only provide for windows sockets api).
+//
+#define __LLBC_ERROR_WSA_VERNOTSUPPORTED ((int)(0x00000026))
+#define LLBC_ERROR_WSA_VERNOTSUPPORTED   ((int)(0xc0000026))
+
+//
+// Message Id: LLBC_ERROR_WSA_EINPROGRESS
+//
+// MessageText:
+//
+// a blocking windows Sockets 1.1 operations in progress(only provide for windows sockets api).
+//
+#define __LLBC_ERROR_WSA_EINPROGRESS     ((int)(0x00000027))
+#define LLBC_ERROR_WSA_EINPROGRESS       ((int)(0xc0000027))
+
+//
+// Message Id: LLBC_ERROR_WSA_EPROCLIM
+//
+// MessageText:
+//
+// limit on the number of tasks supported by the Windows Sockets implementation has been reached(only provide for windows sockets api).
+//
+#define __LLBC_ERROR_WSA_EPROCLIM        ((int)(0x00000028))
+#define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc0000028))
 
 //
 //!! Sentinel error no.
 //
-#define __LLBC_ERROR_SENTINEL    ((int)(0x000000ff))
+#define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))
 
 __LLBC_NS_END
 
