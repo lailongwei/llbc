@@ -347,9 +347,11 @@ class pyllbcService(object):
         return True if len(cls._svcs_list) >= cls.MAX_COUNT else False
 
     @classmethod
-    def schedule(cls):
+    def schedule(cls, schedule_time=0, idle_sleep=True):
         """
         Service mainloop
+        :param schedule_time: specific schedule time, in seconds, if less than or equal to 0, schedule or return immediately.
+        :param idle_sleep: at one schedule operation, if service check has idle time, will sleep if idle_sleep set to True, otherwise not sleep.
         """
         if cls._scheduling:
             raise llbc.error('Service in scheduling, not allow to reschedule')
@@ -366,9 +368,15 @@ class pyllbcService(object):
         try:
             inst_errhooker()
             cls._procwilldelsvcs()
-            while True:
-                clear_hookederrors()
+
+            if schedule_time > 0:
                 schedule_beg = _pyllbc_time()
+
+            while True:
+                if idle_sleep:
+                    scheduleonce_beg = _pyllbc_time()
+
+                clear_hookederrors()
                 try:
                     for svc in svcs:
                         if not svc._started:
@@ -404,12 +412,18 @@ class pyllbcService(object):
                         raise
                 finally:
                     cls._procwilldelsvcs()
+
+                now = _pyllbc_time()
+                if schedule_time > 0:
+                    if now - schedule_beg >= schedule_time:
+                        break
     
-                elapsed = _pyllbc_time() - schedule_beg
-                if elapsed < 0:
-                    continue
-                elif elapsed < schedule_interval:
-                    _pyllbc_sleep(schedule_interval - elapsed)
+                if idle_sleep:
+                    elapsed = now - scheduleonce_beg
+                    if elapsed < 0:
+                        continue
+                    elif elapsed < schedule_interval:
+                        _pyllbc_sleep(schedule_interval - elapsed)
         except BaseException, e:
             raise
         finally:
