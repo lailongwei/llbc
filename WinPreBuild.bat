@@ -21,8 +21,5 @@ if errorlevel 1 (
 ) else (
     echo Succcess to generate Visual Studio solution and project files
     echo Solution file path: build/%choose%/llbc_%choose%.sln
-    echo Press any key to open target directory...
-    pause >nul
-    
     explorer ..\..\build\%choose%
 )
