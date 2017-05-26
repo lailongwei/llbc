@@ -183,6 +183,9 @@ class pyllbcService(object):
         :param svctype: the service type, see service type enumeration.
         :param svcname: the service name, must be not empty.
         """
+        if isinstance(svcname, unicode):
+            svcname = svcname.encode('utf-8')
+
         if not isinstance(svcname, str):
             raise llbc.error('service name must str type')
         elif not svcname:
@@ -195,7 +198,7 @@ class pyllbcService(object):
         self._svctype = svctype
 
         self._addsvc(self)
-        self._c_obj = llbc.inl.NewService(self, svctype)
+        self._c_obj = llbc.inl.NewService(self, svctype, svcname)
 
         self._encoders = {}
         self._facades = {}
