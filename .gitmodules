@@ -1,0 +1,3 @@
+[submodule "wrap/lullbc/lua"]
+	path = wrap/lullbc/lua
+	url = https://github.com/lua/lua.git
