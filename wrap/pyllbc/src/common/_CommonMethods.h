@@ -5,17 +5,20 @@
  *@version	1.0
  *
  *@brief	Auto generate by script tools, do not modify this file!!
+ *@doc	
  */
 
-#ifndef __PYLLBC_AUTOGEN__COMMONMETHODS_H__
-#define __PYLLBC_AUTOGEN__COMMONMETHODS_H__
+#ifndef __PYLLBC_AUTOGEN_COMMON__COMMONMETHODS_H__
+#define __PYLLBC_AUTOGEN_COMMON__COMMONMETHODS_H__
 
 #include "pyllbc/common/LibHeader.h"
+#include "pyllbc/common/Macro.h"
 #include "src/common/_PyStream.h"
 #include "src/common/_SecurePrint.h"
 #include "src/common/_VerInfo.h"
 
-class pyllbc_CommonMethods{
+class pyllbc_CommonMethods
+{
 public:
     pyllbc_CommonMethods()
     {
@@ -321,5 +324,5 @@ public:
 
 #define pyllbc_s_CommonMethods LLBC_Singleton< ::pyllbc_CommonMethods, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_AUTOGEN__COMMONMETHODS_H__
+#endif // !__PYLLBC_AUTOGEN_COMMON__COMMONMETHODS_H__
 

@@ -5,15 +5,17 @@
  *@version	1.0
  *
  *@brief	Auto generate by script tools, do not modify this file!!
+ *@doc	
  */
 
-#ifndef __PYLLBC_AUTOGEN_PYLLBC_SCRIPTS_H__
-#define __PYLLBC_AUTOGEN_PYLLBC_SCRIPTS_H__
+#ifndef __PYLLBC_AUTOGEN_SRC_PYLLBC_SCRIPTS_H__
+#define __PYLLBC_AUTOGEN_SRC_PYLLBC_SCRIPTS_H__
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/ScriptIntegrator.h"
 
-class pyllbc_Scripts{
+class pyllbc_Scripts
+{
 public:
     pyllbc_Scripts()
     {
@@ -3078,5 +3080,5 @@ private:
 
 #define pyllbc_s_Scripts LLBC_Singleton<pyllbc_Scripts, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_AUTOGEN_PYLLBC_SCRIPTS_H__
+#endif // !__PYLLBC_AUTOGEN_SRC_PYLLBC_SCRIPTS_H__
 

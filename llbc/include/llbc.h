@@ -30,10 +30,11 @@ __LLBC_NS_BEGIN
 /**
  * LLBC library startup function, before use any LLBC library functions
  * or classes, must call this function to initialize the LLBC library.
+ * @param[in] initWinSock - init windows socket library, only available on Windows platform, default true.
  * @return int - return 0 if success, otherwise return -1, to get extended
  *               error information, call LLBC_GetLastError().
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_Startup();
+LLBC_EXTERN LLBC_EXPORT int LLBC_Startup(bool initWinSock = true);
 
 /**
  * LLBC library cleanup function, when your program will terminate,

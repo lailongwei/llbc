@@ -12,7 +12,7 @@
 
 #include "pyllbc/common/LibHeader.h"
 
-// pyllbc library all errno define.
+// pyllbc library all errnos define.
 
 // Error No: PYLLBC_ERROR_COMMON
 //
@@ -37,7 +37,7 @@ LLBC_EXTERN LLBC_HIDDEN PyObject *pyllbc_Exception;
 LLBC_EXTERN LLBC_HIDDEN void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback);
 
 /**
- * Transfer llbc library to python.
+ * Transfer llbc library error to python.
  */
 LLBC_EXTERN LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = NULL, int lineNo = 0, const LLBC_String &additionalMsg = "");
 

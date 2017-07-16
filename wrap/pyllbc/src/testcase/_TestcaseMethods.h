@@ -5,15 +5,18 @@
  *@version	1.0
  *
  *@brief	Auto generate by script tools, do not modify this file!!
+ *@doc	
  */
 
-#ifndef __PYLLBC_AUTOGEN__TESTCASEMETHODS_H__
-#define __PYLLBC_AUTOGEN__TESTCASEMETHODS_H__
+#ifndef __PYLLBC_AUTOGEN_TESTCASE__TESTCASEMETHODS_H__
+#define __PYLLBC_AUTOGEN_TESTCASE__TESTCASEMETHODS_H__
 
 #include "pyllbc/common/LibHeader.h"
+#include "pyllbc/common/Macro.h"
 #include "src/testcase/_TestCase.h"
 
-class pyllbc_TestcaseMethods{
+class pyllbc_TestcaseMethods
+{
 public:
     pyllbc_TestcaseMethods()
     {
@@ -49,5 +52,5 @@ public:
 
 #define pyllbc_s_TestcaseMethods LLBC_Singleton< ::pyllbc_TestcaseMethods, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_AUTOGEN__TESTCASEMETHODS_H__
+#endif // !__PYLLBC_AUTOGEN_TESTCASE__TESTCASEMETHODS_H__
 

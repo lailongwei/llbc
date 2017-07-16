@@ -12,7 +12,7 @@ local PY = string.find(_ACTION, "vs") and "$(ProjectDir)../../tools/py.exe" or "
 local LLBC_OUTPUT_DIR = "../../output/" .. _ACTION
 
 -- Some third party libraries paths define
--- Python library: format [2]: include path, [2]: lib path [3]: lib name
+-- Python library: format [1]: include path, [2]: lib path [3]: lib name
 local PYTHON_LIB = { "/usr/local/include/python2.7", "/usr/local/lib", "python2.7" }
 
 -- zlib library:
@@ -26,7 +26,7 @@ workspace ("llbc_" .. _ACTION)
     targetdir (LLBC_OUTPUT_DIR)
 
     -- configurations
-    configurations { "release", "debug" }
+    configurations { "release32", "debug32" }
 
     -- defines
     filter { "configurations:debug*" }
@@ -231,10 +231,14 @@ project "pyllbc"
         "../../wrap/pyllbc",
     }
 
+    -- some defines
+    filter { "action:vs2013 or vs2015 or vs2017" }
+    defines { "HAVE_ROUND" }
+
     -- prebuild commands
     filter {}
     prebuildcommands {
-        PY .. " ../../wrap/pyllbc/script_tools/prebuild.py",
+        PY .. " ../../tools/building_script/py_prebuild.py pyllbc",
     }
 
     -- target name, target prefix, extension
@@ -435,4 +439,197 @@ project "csllbc_testsuite"
         "System.Core",
         "csllbc",
     }
+
+
+-- ****************************************************************************
+-- luasrc library(liblua) compile setting
+local LUA_SRC_PATH = "../../wrap/lullbc/lua"
+project "lullbc_lualib"
+    -- language, kind
+    language "c++"
+    kind "SharedLib"
+
+    -- files
+    files {
+        LUA_SRC_PATH .. "/*.h",
+        LUA_SRC_PATH .. "/*.c",
+    }
+    removefiles {
+        LUA_SRC_PATH .. "/lua.c",
+        LUA_SRC_PATH .. "/luac.c",
+    }
+
+    -- defines
+    defines {
+        "LUA_COMPAT_5_1",
+        "LUA_COMPAT_5_2",
+    }
+    filter { "system:windows" }
+        defines { "LUA_BUILD_AS_DLL" }
+    filter {}
+
+    -- target name, target prefix
+    targetname "lua"
+    targetprefix "lib"
+
+    -- debug target suffix define
+    filter { "configurations:debug" }
+        targetsuffix "_debug"
+
+-- lua executable compile setting
+local LUA_SRC_PATH = "../../wrap/lullbc/lua"
+project "lullbc_luaexec"
+    -- language, kind
+    language "c++"
+    kind "ConsoleApp"
+
+    -- files
+    files {
+        LUA_SRC_PATH .. "/*.h",
+        LUA_SRC_PATH .. "/lua.c",
+    }
+
+    -- defines
+    defines {
+        "LUA_COMPAT_5_1",
+        "LUA_COMPAT_5_2",
+    }
+
+    -- dependents
+    dependson {
+        "lullbc_lualib"
+    }
+
+    -- links 
+    libdirs { 
+        LLBC_OUTPUT_DIR,
+    }
+    filter { "configurations:debug*", "system:windows" }
+        links { "liblua_debug" }
+    filter {}
+    filter { "configurations:release*", "system:windows" }
+        links { "liblua" }
+    filter {}
+    filter { "configurations:debug*", "system:not windows" }
+        links { "lua_debug" }
+    filter {}
+    filter { "configurations:release*", "system:not windows" }
+        links { "lua" }
+    filter {}
+ 
+    -- target name, target prefix
+    targetname "lua"
+
+    -- debug target suffix define
+    filter { "configurations:debug" }
+        targetsuffix "_debug"
+
+-- lua wrap library(lullbc) compile setting
+-- import lualib_setting
+package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
+local LUALIB_SETTING = require "lualib_setting"
+local LUALIB_INCL_PATH = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
+local LUALIB_LIB_DIR = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
+project "lullbc"
+    -- language, kind
+    language "c++"
+    kind "SharedLib"
+
+    -- dependents
+    dependson {
+        "llbc",
+        "lullbc_lualib",
+        "lullbc_luaexec",
+    }
+
+    -- files
+    files {
+        "../../wrap/lullbc/lua/*.h",
+
+        "../../wrap/lullbc/include/**.h",
+        "../../wrap/lullbc/src/**.h",
+        "../../wrap/lullbc/src/**.c",
+        "../../wrap/lullbc/src/**.cpp",
+
+        "../../wrap/lullbc/script/**.lua",
+    }
+
+    -- includedirs
+    includedirs {
+        LUALIB_INCL_PATH,
+        "../../llbc/include",
+        "../../wrap/lullbc/include",
+        "../../wrap/lullbc",
+    }
+
+    -- defines
+    filter { "system:windows", "action:vs2013 and vs2015 and vs2017" }
+    defines {
+        "HAVE_ROUND",
+    }
+    filter {}
+
+    -- prebuild commands
+    filter { "configurations:debug*" }
+        prebuildcommands {
+            PY .. " ../../tools/building_script/lu_prebuild.py lullbc debug",
+        }
+        postbuildcommands {
+            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
+        }
+    filter {}
+    filter { "configurations:release*" }
+        prebuildcommands {
+            PY .. " ../../tools/building_script/lu_prebuild.py lullbc release",
+        }
+        postbuildcommands {
+            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "release", LLBC_OUTPUT_DIR),
+        }
+    filter {}
+
+    -- target name, target prefix, extension
+    targetname "_lullbc"
+    targetprefix ""
+
+    -- links 
+    libdirs { 
+        LLBC_OUTPUT_DIR,
+        LUALIB_LIB_DIR,
+    }
+    filter { "configurations:debug*", "system:windows" }
+        links {
+            "libllbc_debug",
+            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua_debug",
+        }
+    filter {}
+    filter { "configurations:debug*", "system:not windows" }
+        links {
+            "llbc_debug",
+            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua_debug",
+        }
+    filter {}
+    filter { "configurations:release*", "system:windows" }
+        links {
+            "libllbc",
+            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua",
+        }
+    filter {}
+    filter { "configurations:release*", "system:not windows" }
+        links {
+            "llbc",
+            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua",
+        }
+    filter {}
+
+    -- flags
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
+    filter {}
+
+    -- debug target suffix define
+    filter { "configurations:debug" }
+        targetsuffix "_debug"
+    filter {}
 

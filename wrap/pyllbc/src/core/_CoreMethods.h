@@ -5,12 +5,14 @@
  *@version	1.0
  *
  *@brief	Auto generate by script tools, do not modify this file!!
+ *@doc	
  */
 
-#ifndef __PYLLBC_AUTOGEN__COREMETHODS_H__
-#define __PYLLBC_AUTOGEN__COREMETHODS_H__
+#ifndef __PYLLBC_AUTOGEN_CORE__COREMETHODS_H__
+#define __PYLLBC_AUTOGEN_CORE__COREMETHODS_H__
 
 #include "pyllbc/common/LibHeader.h"
+#include "pyllbc/common/Macro.h"
 #include "src/core/bundle/_Bundle.h"
 #include "src/core/config/_Property.h"
 #include "src/core/file/_Directory.h"
@@ -21,7 +23,8 @@
 #include "src/core/utils/_Util_Misc.h"
 #include "src/core/utils/_Util_String.h"
 
-class pyllbc_CoreMethods{
+class pyllbc_CoreMethods
+{
 public:
     pyllbc_CoreMethods()
     {
@@ -242,5 +245,5 @@ public:
 
 #define pyllbc_s_CoreMethods LLBC_Singleton< ::pyllbc_CoreMethods, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_AUTOGEN__COREMETHODS_H__
+#endif // !__PYLLBC_AUTOGEN_CORE__COREMETHODS_H__
 

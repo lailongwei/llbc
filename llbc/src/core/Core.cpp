@@ -40,7 +40,8 @@ int __LLBC_CoreStartup()
     LLBC_Random::Seed(static_cast<uint32>(::time(NULL)));
 
     // Initialize network library.
-    LLBC_StartupNetLibrary();
+    if (tls->coreTls.needInitWinSock)
+        LLBC_StartupNetLibrary();
 
     return LLBC_OK;
 }
@@ -48,10 +49,11 @@ int __LLBC_CoreStartup()
 void __LLBC_CoreCleanup()
 {
     // Cleanup network library.
-    LLBC_CleanupNetLibrary();
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (tls->coreTls.needInitWinSock)
+        LLBC_CleanupNetLibrary();
 
     // Destroy entry thread timer scheduler.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.timerScheduler = NULL;
 
     LLBC_TimerScheduler::DestroyEntryThreadScheduler();

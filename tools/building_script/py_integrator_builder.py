@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-脚本代码整合生成器
+python代码整合器(c++类)代码构建器, 自动生成整合器代码, 以使得python代码统一整合到c++中, 以确保最终库文件只有一个动态库
 """
-
 
 import os
 import re
 from os import path as op
 
-
-from cfg import Cfg
 from cpputils import *
 
+from c import Cfg
 
-class IntegratorBuilder(object):
+
+class PyIntegratorBuilder(object):
     @staticmethod
     def build():
         """生成"""
         # Generate file head.
+        imp = Cfg.getprojname().upper()
         cpp_file_path = op.join(Cfg.getcodepath(), 'pyllbc_scripts.h')
-        cpp_file = CppFile(cpp_file_path, Cfg.getauthor(), Cfg.getver())
+        cpp_file = CppFile(cpp_file_path, author=Cfg.getauthor(), ver=Cfg.getver(), include_macro_prefix=imp)
         cpp_file.addincl('pyllbc/common/LibHeader.h')
         cpp_file.addincl('pyllbc/common/ScriptIntegrator.h')
 
@@ -34,7 +34,7 @@ class IntegratorBuilder(object):
                 elif op.splitext(fpath)[1].lower() != '.py':
                     continue
 
-                script_cnt = IntegratorBuilder.__transfer_to_cpp_str(fpath)
+                script_cnt = PyIntegratorBuilder.__transfer_to_cpp_str(fpath)
                 ctor.addstmt('_scripts.insert(::std::make_pair("{}", new ::pyllbc_ScriptIntegrator({})));'
                              .format(op.basename(fpath), script_cnt))
 
@@ -60,8 +60,7 @@ class IntegratorBuilder(object):
         # Generate data member.
         data_mem = CppData('::std::map<LLBC_String, ::pyllbc_ScriptIntegrator *>',
                            '_scripts',
-                           False,
-                           CppVisit(CppVisit.PRIVATE))
+                           visit=CppVisit(CppVisit.PRIVATE))
         clazz.adddata(data_mem)
 
         cpp_file.addcls(clazz)

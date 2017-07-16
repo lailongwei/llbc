@@ -5,12 +5,14 @@
  *@version	1.0
  *
  *@brief	Auto generate by script tools, do not modify this file!!
+ *@doc	
  */
 
-#ifndef __PYLLBC_AUTOGEN__COMMMETHODS_H__
-#define __PYLLBC_AUTOGEN__COMMMETHODS_H__
+#ifndef __PYLLBC_AUTOGEN_COMM__COMMMETHODS_H__
+#define __PYLLBC_AUTOGEN_COMM__COMMMETHODS_H__
 
 #include "pyllbc/common/LibHeader.h"
+#include "pyllbc/common/Macro.h"
 #include "src/comm/_Codec.h"
 #include "src/comm/_ObjCoder.h"
 #include "src/comm/_Packet.h"
@@ -20,7 +22,8 @@
 #include "src/comm/_Service.h"
 #include "src/comm/_Timer.h"
 
-class pyllbc_CommMethods{
+class pyllbc_CommMethods
+{
 public:
     pyllbc_CommMethods()
     {
@@ -591,5 +594,5 @@ public:
 
 #define pyllbc_s_CommMethods LLBC_Singleton< ::pyllbc_CommMethods, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_AUTOGEN__COMMMETHODS_H__
+#endif // !__PYLLBC_AUTOGEN_COMM__COMMMETHODS_H__
 

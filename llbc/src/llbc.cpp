@@ -20,28 +20,29 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_Startup()
+int LLBC_Startup(bool initWinSock)
 {
+    // ReEntry judge.
     if(LLBC_INTERNAL_NS __llbc_inited)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
+    // Init common module.
     if(__LLBC_CommonStartup() != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
+    // Set some init parameters.
+    __LLBC_GetLibTls()->coreTls.needInitWinSock = initWinSock;
+
+    // Init core module.
     if(__LLBC_CoreStartup() != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
+    // Init communication module
     if(__LLBC_CommStartup() != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     LLBC_INTERNAL_NS __llbc_inited = true;
 

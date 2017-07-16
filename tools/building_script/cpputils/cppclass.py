@@ -5,8 +5,9 @@ CPP类封装
 
 
 class CppClass(object):
-    def __init__(self, name, indent=0):
+    def __init__(self, name, constraint='', indent=0):
         self.__name = name
+        self.__constraint = constraint
         self.__indent = indent
 
         self.__datas = []
@@ -25,7 +26,11 @@ class CppClass(object):
         indent = self.__indent
         beg_indent = ' ' * indent
 
-        c = beg_indent + 'class {}'.format(self.__name)
+        if not self.__constraint:
+            c = beg_indent + 'class {}\n'.format(self.__name)
+        else:
+            c = beg_indent + 'class {} {}\n'.format(self.__constraint, self.__name)
+
         c += beg_indent + '{\n'
         for method in self.__methods:
             c += method.build(indent + 4)

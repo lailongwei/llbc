@@ -51,7 +51,7 @@
  */
 // Enable/Disable Suspend/Resume thread support macro(Non-WIN32 platform available only).
 // If enable it, LLBC library will use SIGUSR1, SIGUSR2 signal to implement.
-#define LLBC_CFG_THREAD_ENABLE_SUSPEND_RESUMT_SUPPORT       1
+#define LLBC_CFG_THREAD_ENABLE_SUSPEND_RESUME_SUPPORT       1
 // Maximum thread number.
 #define LLBC_CFG_THREAD_MAX_THREAD_NUM                      128
 // Default stack size.
