@@ -259,21 +259,17 @@ project "pyllbc"
         "../../wrap/pyllbc",
     }
 
-    if string.len(PYLIB_INCL_PATH) then
-        includedirs {
-            PYLIB_INCL_PATH,
-        }
+    if string.len(PYLIB_INCL_PATH) > 0 then
+        includedirs { PYLIB_INCL_PATH }
     else -- if not specific python include path, windows platform will use specific version python, other platforms will auto detect.
         filter { "system:windows" }
-        includedirs {
-            "../../wrap/pyllbc/Python2.7.8/Include",
-        }
+            includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
         filter {}
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
     filter { "action:vs2013 or vs2015 or vs2017" }
-    defines { "HAVE_ROUND" }
+        defines { "HAVE_ROUND" }
 
     -- prebuild commands
     filter {}
@@ -307,7 +303,7 @@ project "pyllbc"
     filter {}
 
     -- link python library
-    if string.len(PYLIB_LIB_DIR) then
+    if string.len(PYLIB_LIB_DIR) > 0 then
         libdirs { PYLIB_LIB_DIR }
     else
         filter { "system:windows", "architecture:x86" }
@@ -568,7 +564,11 @@ project "lullbc_luaexec"
     libdirs { 
         LLBC_OUTPUT_DIR,
     }
-    links { "dl" }
+
+    filter { "system:not windows" }
+        links { "dl" }
+    filter {}
+
     filter { "configurations:debug*", "system:windows" }
         links { "liblua_debug" }
     filter {}
