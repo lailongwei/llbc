@@ -17,10 +17,6 @@ else
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
 end
 
--- Some third party libraries paths define
--- Python library: format [1]: include path, [2]: lib path [3]: lib name
-local PYTHON_LIB = { "/usr/local/include/python2.7", "/usr/local/lib", "python2.7" }
-
 -- zlib library:
 local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
@@ -233,6 +229,12 @@ project "testsuite"
 
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting
+-- import pylib_setting
+package.path = package.path .. ";" .. "../../wrap/pyllbc/?.lua"
+local PYLIB_SETTING = require "pylib_setting"
+local PYLIB_INCL_PATH = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[1] or ''
+local PYLIB_LIB_DIR = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[2] or ''
+local PYLIB_LIB_NAME = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[3] or 'python27'
 project "pyllbc"
     -- language, kind
     language "c++"
@@ -251,17 +253,25 @@ project "pyllbc"
 
     -- includedirs
     includedirs {
-        PYTHON_LIB[1],
-
-        "../../wrap/pyllbc/Python2.7.8/Include",
-
         "../../llbc/include",
 
         "../../wrap/pyllbc/include",
         "../../wrap/pyllbc",
     }
 
-    -- some defines
+    if string.len(PYLIB_INCL_PATH) then
+        includedirs {
+            PYLIB_INCL_PATH,
+        }
+    else -- if not specific python include path, windows platform will use specific version python, other platforms will auto detect.
+        filter { "system:windows" }
+        includedirs {
+            "../../wrap/pyllbc/Python2.7.8/Include",
+        }
+        filter {}
+    end
+
+    -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
     filter { "action:vs2013 or vs2015 or vs2017" }
     defines { "HAVE_ROUND" }
 
@@ -279,52 +289,51 @@ project "pyllbc"
     filter {}
 
     -- links 
-    libdirs { 
-        LLBC_OUTPUT_DIR,
-    }
-    filter { "system:linux" }
-        libdirs {
-            PYTHON_LIB[2],
-        }
-        links {
-            PYTHON_LIB[3],
-        }
-    filter {}
-
-    filter { "system:linux", "configurations:debug*" }
-        links {
-            "llbc_debug",
-        }
-    filter {}
-    filter { "system:linux", "configurations:release*" }
-        links {
-            "llbc",
-        }
-    filter {}
-
-    filter { "system:windows", "architecture:x86" }
-        libdirs {
-            "../../wrap/pyllbc/Python2.7.8/Libs/Win/32",
-        }
-    filter {}
-    filter { "system:windows", "architecture:x64" }
-        libdirs {
-            "../../wrap/pyllbc/Python2.7.8/Libs/Win/64",
-        }
-    filter {}
+    -- link llbc library
+    libdirs { LLBC_OUTPUT_DIR }
 
     filter { "system:windows", "configurations:debug*" }
-        links {
-            "python27_d",
-            "libllbc_debug",
-        }
+        links { "libllbc_debug" }
     filter {}
     filter { "system:windows", "configurations:release*" }
-        links {
-            "python27",
-            "libllbc",
-        }
+        links { "libllbc" }
     filter {}
+
+    filter { "system:not windows", "configurations:debug*" }
+        links { "llbc_debug" }
+    filter {}
+    filter { "system:not windows", "configurations:release*" }
+        links { "llbc" }
+    filter {}
+
+    -- link python library
+    if string.len(PYLIB_LIB_DIR) then
+        libdirs { PYLIB_LIB_DIR }
+    else
+        filter { "system:windows", "architecture:x86" }
+            libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/32" }
+        filter {}
+        filter { "system:windows", "architecture:x64" }
+            libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/64" }
+        filter {}
+    end
+
+    if string.len(PYLIB_LIB_NAME) then
+        links { PYLIB_LIB_NAME }
+    else
+        -- in windows platform, python library use the python library file in the repo
+        filter { "system:windows", "configurations:debug*" }
+            links { "python27_d" }
+        filter {}
+        filter { "system:windows", "configurations:release*" }
+            links { "python27" }
+        filter {}
+
+        -- in non-windows platform, python library default named: python2.7
+        filter { "system:not windows" }
+            links { "python2.7" }
+        filter {}
+    end
 
     -- flags
     filter { "system:not windows" }
@@ -518,6 +527,9 @@ project "lullbc_lualib"
     filter { "system:windows" }
         defines { "LUA_BUILD_AS_DLL" }
     filter {}
+    filter { "system:not windows" }
+        defines { "LUA_USE_DLOPEN" }
+    filter {}
 
     -- target name, target prefix
     targetname "lua"
@@ -556,6 +568,7 @@ project "lullbc_luaexec"
     libdirs { 
         LLBC_OUTPUT_DIR,
     }
+    links { "dl" }
     filter { "configurations:debug*", "system:windows" }
         links { "liblua_debug" }
     filter {}
@@ -627,28 +640,18 @@ project "lullbc"
         prebuildcommands {
             PY .. " ../../tools/building_script/lu_prebuild.py lullbc debug",
         }
-        filter { "action:vs*" }
-            postbuildcommands {
-                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
-            }
-        filter { "action:not vs*" }
-            postbuildcommands {
-                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
-            }
+        postbuildcommands {
+            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
+        }
     filter {}
 
     filter { "configurations:release*" }
         prebuildcommands {
             PY .. " ../../tools/building_script/lu_prebuild.py lullbc release",
         }
-        filter { "action:vs*" }
-            postbuildcommands {
-                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s" $(ConfigurationName)', "lullbc", "release", LLBC_OUTPUT_DIR),
-            }
-        filter { "action:not vs*" }
-            postbuildcommands {
-                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s" $(config)', "lullbc", "release", LLBC_OUTPUT_DIR),
-            }
+        postbuildcommands {
+            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "release", LLBC_OUTPUT_DIR),
+        }
     filter {}
 
     -- target name, target prefix, extension
