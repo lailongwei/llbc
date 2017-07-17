@@ -15,3 +15,8 @@ end
 function llbc.Cleanup()
     _llbc.Cleanup()
 end
+
+-- Final, implement __newindex method to prevent llbc library table set operation.
+function llbc_mt.__newindex(t, k, v)
+    error('Could not change llbc library!')
+end
