@@ -12,7 +12,9 @@
 #include "lullbc/common/LibHeader.h"
 
 // Define debug macro, same as LLBC_DEBUG
-#define LULLBC_DEBUG LLBC_DEBUG
+#ifdef LLBC_DEBUG
+ #define LULLBC_DEBUG
+#endif
 
 // Define LULLBC_EXTERN, LULLBC_EXTERN_C macros to constraint methods/classes.
 #define LULLBC_EXTERN LLBC_EXTERN
