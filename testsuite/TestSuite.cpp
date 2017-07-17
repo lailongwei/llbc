@@ -51,7 +51,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_Thread_ThreadMgr;
     // test = new TestCase_Core_Thread_Task;
     // test = new TestCase_Core_Random;
-    test = new TestCase_Core_Log;
+    // test = new TestCase_Core_Log;
     // test = new TestCase_Core_Entity;
     // test = new TestCase_Core_Transcoder;
     // test = new TestCase_Core_Library;
