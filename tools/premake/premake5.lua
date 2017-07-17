@@ -6,10 +6,16 @@
 -- Global compile settings
 
 -- python tool define
-local PY = string.find(_ACTION, "vs") and "$(ProjectDir)../../tools/py.exe" or "python"
+IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
+local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
 
 -- All libraries output directory
-local LLBC_OUTPUT_DIR = "../../output/" .. _ACTION
+LLBC_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
+if IS_WINDOWS then
+    LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(Configuration)"
+else
+    LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
+end
 
 -- Some third party libraries paths define
 -- Python library: format [1]: include path, [2]: lib path [3]: lib name
@@ -26,39 +32,45 @@ workspace ("llbc_" .. _ACTION)
     targetdir (LLBC_OUTPUT_DIR)
 
     -- configurations
-    configurations { "release32", "debug32" }
+    configurations { "release32", "debug32", "release64", "debug64" }
+
+    -- architecture
+    filter { "configurations:*32" }
+        architecture "x86"
+    filter {}
+    filter { "configurations:*64" }
+        architecture "x86_64"
+    filter {}
 
     -- defines
     filter { "configurations:debug*" }
         defines {
             "DEBUG"
         }
+    filter {}
 
     -- control symbols
     filter { "system:macosx", "language:c++" }
         symbols("On")
+    filter {}
 
     -- optimize
     filter { "configurations:debug*", "language:c++", "system:not windows" }
         buildoptions {
             "-ggdb -g",
         }
+    filter {}
     filter { "configurations:debug*", "language:not c++" }
         optimize "Debug"
+    filter {}
     filter { "configurations:release*" }
         optimize "On"
+    filter {}
 
-    -- architecture
-    filter { "system:linux" }
-        architecture "x64"
-    filter { "system:windows" }
-        architecture "x86"
-    filter { "system:macosx" }
-        architecture "x86"
-
-    -- characterset
+    -- charactersetarchitecture
     filter { "language:c++" }
         characterset "MBCS"
+    filter {}
 
 -- ****************************************************************************
 -- llbc core library compile setting
@@ -110,34 +122,40 @@ project "llbc"
         links {
             "zlibwapi_debug",
         }
+    filter {}
     filter { "system:windows", "configurations:release*", "architecture:x86" }
         links {
             "zlibwapi",
         }
+    filter {}
     filter { "system:windows", "configurations:debug*", "architecture:x64" }
         links {
             "zlibwapi_debug_64",
         }
+    filter {}
     filter { "system:windows", "configurations:release*", "architecture:x64" }
         links {
             "zlibwapi_64",
         }
+    filter {}
 
     filter { "system:macosx" }
         links {
             "iconv",
         }
+    filter {}
 
     -- flags
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
         }
+    filter {}
 
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
-
+    filter {}
 
 -- ****************************************************************************
 -- core library testsuite compile setting
@@ -157,7 +175,7 @@ project "testsuite"
         "../../testsuite/**.cpp",
     }
 
-    -- includedirs
+    -- includedirswrap\csllbc\csharp\script_tools
     includedirs {
         "../../llbc/include",
         "../../testsuite",
@@ -169,37 +187,49 @@ project "testsuite"
         links {
             "dl",
         }
+    filter {}
+
     filter { "system:not windows", "configurations:debug*" }
         links {
             "llbc_debug",
         }
+    filter {}
+
     filter { "system:not windows", "configurations:release*" }
         links {
             "llbc",
         }
+    filter {}
 
     filter { "system:windows" }
         links {
             "ws2_32",
         }
+    filter {}
+
     filter { "system:windows", "configurations:debug*" }
         links {
             "libllbc_debug",
         }
+    filter {}
+
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
         }
+    filter {}
 
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
+    filter {}
 
     -- warnings
     filter { "system:not windows" }
         disablewarnings {
             "invalid-source-encoding",
         }
+    filter {}
 
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting
@@ -259,44 +289,54 @@ project "pyllbc"
         links {
             PYTHON_LIB[3],
         }
+    filter {}
+
     filter { "system:linux", "configurations:debug*" }
         links {
             "llbc_debug",
         }
+    filter {}
     filter { "system:linux", "configurations:release*" }
         links {
             "llbc",
         }
+    filter {}
 
     filter { "system:windows", "architecture:x86" }
         libdirs {
             "../../wrap/pyllbc/Python2.7.8/Libs/Win/32",
         }
+    filter {}
     filter { "system:windows", "architecture:x64" }
         libdirs {
             "../../wrap/pyllbc/Python2.7.8/Libs/Win/64",
         }
+    filter {}
 
     filter { "system:windows", "configurations:debug*" }
         links {
             "python27_d",
             "libllbc_debug",
         }
+    filter {}
     filter { "system:windows", "configurations:release*" }
         links {
             "python27",
             "libllbc",
         }
+    filter {}
 
     -- flags
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
         }
+    filter {}
 
     -- debug target suffix define
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
+    filter {}
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) native library compile setting
@@ -333,34 +373,41 @@ project "csllbc_native"
         links {
             "libllbc_debug",
         }
+    filter {}
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
         }
+    filter {}
     filter { "system:not windows", "configurations:debug*" }
         links {
             "llbc_debug",
         }
+    filter {}
     filter { "system:not windows", "configurations:release*" }
         links {
             "llbc",
         }
+    filter {}
 
     -- flags
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
         }
+    filter {}
 
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
+    filter {}
 
     -- disable warnings
     filter { "system:not windows" }
         disablewarnings {
             "attributes"
         }
+    filter {}
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) compile setting
@@ -385,25 +432,29 @@ project "csllbc"
 
     -- prebuild commands
     prebuildcommands {
-        PY .. " ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
-        PY .. " ../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
+        PY .. ' -c "import os;print(os.getcwd())"',
+        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
     }
 
     -- postbuild commands
-    filter { 'system:not windows' }
+    filter { "system:not windows" }
         postbuildcommands {
             PY .. " ../../wrap/csllbc/csharp/script_tools/gen_dll_cfg.py ../../output/" .. _ACTION,
         }
+    filter {}
 
     -- defines
     filter { "system:linux" }
         defines {
             "CSLLBC_TARGET_PLATFORM_LINUX",
         }
+    filter {}
     filter { "system:windows" }
         defines {
             "CSLLBC_TARGET_PLATFORM_WIN32",
         }
+    filter {}
 
     -- links
     filter {}
@@ -473,8 +524,9 @@ project "lullbc_lualib"
     targetprefix "lib"
 
     -- debug target suffix define
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
+    filter {}
 
 -- lua executable compile setting
 local LUA_SRC_PATH = "../../wrap/lullbc/lua"
@@ -521,8 +573,9 @@ project "lullbc_luaexec"
     targetname "lua"
 
     -- debug target suffix define
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
+    filter {}
 
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
@@ -574,17 +627,28 @@ project "lullbc"
         prebuildcommands {
             PY .. " ../../tools/building_script/lu_prebuild.py lullbc debug",
         }
-        postbuildcommands {
-            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
-        }
+        filter { "action:vs*" }
+            postbuildcommands {
+                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
+            }
+        filter { "action:not vs*" }
+            postbuildcommands {
+                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", LLBC_OUTPUT_DIR),
+            }
     filter {}
+
     filter { "configurations:release*" }
         prebuildcommands {
             PY .. " ../../tools/building_script/lu_prebuild.py lullbc release",
         }
-        postbuildcommands {
-            PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "release", LLBC_OUTPUT_DIR),
-        }
+        filter { "action:vs*" }
+            postbuildcommands {
+                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s" $(ConfigurationName)', "lullbc", "release", LLBC_OUTPUT_DIR),
+            }
+        filter { "action:not vs*" }
+            postbuildcommands {
+                PY .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s" $(config)', "lullbc", "release", LLBC_OUTPUT_DIR),
+            }
     filter {}
 
     -- target name, target prefix, extension
@@ -629,7 +693,7 @@ project "lullbc"
     filter {}
 
     -- debug target suffix define
-    filter { "configurations:debug" }
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
 
