@@ -9,3 +9,8 @@
 function llbc.GetVersionInfo(verbose)
     return _llbc.GetVersionInfo(verbose)
 end
+
+-- Implement __tostring
+function llbc_mt.__tostring(t)
+    return 'llbc lua wrapped library(lullbc): ' .. t.GetVersionInfo(false)
+end
