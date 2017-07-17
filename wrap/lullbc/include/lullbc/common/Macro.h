@@ -21,7 +21,7 @@
 #define LULLBC_EXTERN_C LLBC_EXTERN_C
 
 // Define Lua wrap methods constraint macro.
-#define LULLBC_LUA_METH LULLBC_EXTERN_C static
+#define LULLBC_LUA_METH static
 
 #ifdef LULLBC_DEBUG
  #define lullbc_entry luaopen__lullbc_debug
