@@ -1,7 +1,7 @@
 ## llbc
 Low Level Base Compoment
 
-llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的所有基础支持(包括字符串处理,日志,线程,配置,Timer,ObjRef,网络及其它所有基础支持),在最顶层,llbc使用Service的概念将这些所有支持以compoments的方式集成,也就意味着,在开发你的应用的时候,只需要一个Service就拥有所有你需要的功能.
+llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的所有基础支持(包括字符串处理,日志,线程,配置,Timer,ObjRef,网络及其它所有基础支持),在最顶层,llbc使用Service的概念将这些所有支持以compoments的方式集成,也就意味着,在开发你的应用的时候,只需要一个Service就拥有所有你需要的功能.  
 llbc是一个低调的库, 但~~~你开心就好.  
 
 ## 支持语言：
@@ -32,65 +32,65 @@ llbc是一个低调的库, 但~~~你开心就好.
 
 ## 各项目说明:
 llbc项目为一个整体性项目，里面按语言不同分成各个子项目，各个语言项目各自独立, 大家各取所需即可
-> **c/c++**:
->> **llbc**: llbc核心库, 编译它可以在c++语言中直接使用
->> **testsuite**: llbc核心库测试套件, 可不编译, 如果需要测试及学习llbc, 建议编译
->
-> **python**:
->> **pyllbc**: llbc python wrap库, 最终只生成一个llbc python库文件, 保证简洁, 如果需要将llbc用于您的python项目中, 请编译此项目
->
-> **csharp**:
->> **csllbc_native**: llbc csharp wrap库实现中的native包装包, 用于包装符合c# PInvoke标准的接口实现
->> **csllbc**: llbc csharp wrap, 如果需要将llbc用于您的c#项目中, 请编译此项目(llbc_native项目会连同编译)
->> **csllbc_testsuite**: llbc csharp wrap库测试套件, 可不编译, testsuite项目一样, 如果需要测试及学习csllbc, 建议编译
+> **c/c++**:  
+>> **llbc**: llbc核心库, 编译它可以在c++语言中直接使用  
+>> **testsuite**: llbc核心库测试套件, 可不编译, 如果需要测试及学习llbc, 建议编译  
+>  
+> **python**:  
+>> **pyllbc**: llbc python wrap库, 最终只生成一个llbc python库文件, 保证简洁, 如果需要将llbc用于您的python项目中, 请编译此项目  
+>  
+> **csharp**:  
+>> **csllbc_native**: llbc csharp wrap库实现中的native包装包, 用于包装符合c# PInvoke标准的接口实现  
+>> **csllbc**: llbc csharp wrap, 如果需要将llbc用于您的c#项目中, 请编译此项目(llbc_native项目会连同编译)  
+>> **csllbc_testsuite**: llbc csharp wrap库测试套件, 可不编译, testsuite项目一样, 如果需要测试及学习csllbc, 建议编译  
 > 
 > **lua**:
->> **lullbc_lualib**: llbc lua wrap中的lua语言库项目, 最终生成指定版本的lualib
->> **lullbc_luaexec**: llbc lua wrap中的lua解释器, 最终生成lua.exe(windows)/lua(not windows)
->> **lullbc**: llbc lua wrap库, 最终只生成一个lullbc库及一个llbc.lua文件, 保证简洁, 如果需要将llbc用于您的lua项目中, 请编译此项目
+>> **lullbc_lualib**: llbc lua wrap中的lua语言库项目, 最终生成指定版本的lualib  
+>> **lullbc_luaexec**: llbc lua wrap中的lua解释器, 最终生成lua.exe(windows)/lua(not windows)  
+>> **lullbc**: llbc lua wrap库, 最终只生成一个lullbc库及一个llbc.lua文件, 保证简洁, 如果需要将llbc用于您的lua项目中, 请编译此项目  
 
-## 编译:
+## 编译:  
 得益于premake编译系统, 编译llbc库是一件非常简单的事情, 编译脚本会生成四个编译配置：
-> debug32: 32位debug环境
-> debug64: 64位debug环境
-> release32: 32位release环境
-> release64: 64位release环境
+> debug32: 32位debug环境  
+> debug64: 64位debug环境  
+> release32: 32位release环境  
+> release64: 64位release环境  
 > 
-请根据需求选择不同环境编译(windows请在项目属性中选择, linux及mac请在编译时使用config=xxxx来指定编译环境).
-#### Windows:
-运行WinPreBuild.bat, 生成指定vs版本sln文件, 打开并选择你要的语言项目编译.
-当前支持的vs版本: **vs2005**, **vs2008**, **vs2010**, **vs2012**, **vs2013**, **vs2015**
+请根据需求选择不同环境编译(windows请在项目属性中选择, linux及mac请在编译时使用config=xxxx来指定编译环境).  
+#### Windows:  
+运行WinPreBuild.bat, 生成指定vs版本sln文件, 打开并选择你要的语言项目编译.  
+当前支持的vs版本: **vs2005**, **vs2008**, **vs2010**, **vs2012**, **vs2013**, **vs2015**  
 
-#### Linux/Mac:
+#### Linux/Mac:  
 在linux环境下, 请确认是否已经安装libuuid(sudo yum install libuuid-devel)  
 在Mac环境下, 请确认是否已经安装xCode command line tools  
-> 编译llbc c++核心库: `make core_lib`
-> 编译核心库测试套件: `make test`
-> 编译pyllbc: `make py_wrap`
-> 编译lullbc: `make lu_wrap`
-> 编译csllbc: `make cs_wrap`
-> 
-ps: 直接`make`可以查看具体编译命令说明.
+> 编译llbc c++核心库: `make core_lib`  
+> 编译核心库测试套件: `make test`  
+> 编译pyllbc: `make py_wrap`  
+> 编译lullbc: `make lu_wrap`  
+> 编译csllbc: `make cs_wrap`  
+>   
+ps: 直接`make`可以查看具体编译命令说明.  
 
-#### iOS:
-使用xCode编译即可(untested)
+#### iOS:  
+使用xCode编译即可(untested)  
 
-#### Android:
-未提供编译工具支持
+#### Android:  
+未提供编译工具支持  
   
-## 安装:
-### Windows:
-所有目标文件在output/vsxxxx/<config>目录中, 在编译完成后, 在此目录提取即可.
+## 安装:  
+### Windows:  
+所有目标文件在output/vsxxxx/<config>目录中, 在编译完成后, 在此目录提取即可.  
     
-### Linux/Mac
+### Linux/Mac  
 请根据你的需要执行安装指令:  
 **llbc**: `make install_core_lib`  
 **wrap/pyllbc**: `make install_py_wrap`  
 **wrap/csllbc**: `make install_cs_wrap`, 为空实现, 如果需要使用csllbc, 请直接copy到您的目标目录即可   
-**wrap/lullbc**: `make install_lu_wrap`, 为空实现, 如果需要使用lullbc, 请直接copy到你的目标目录即可
+**wrap/lullbc**: `make install_lu_wrap`, 为空实现, 如果需要使用lullbc, 请直接copy到你的目标目录即可  
     
 ### iOS:
-xCode编译出来dylib,直接在你的项目中引用即可
+xCode编译出来dylib,直接在你的项目中引用即可  
   
-### Android:
-没时间处理Android平台,暂时没有安装说明
+### Android:  
+没时间处理Android平台,暂时没有安装说明  
