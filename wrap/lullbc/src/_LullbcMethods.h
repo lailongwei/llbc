@@ -14,8 +14,8 @@
 #include "lullbc/common/LibHeader.h"
 #include "lullbc/common/Macro.h"
 #include "src/_Lullbc.h"
-#include "src/common/_Config.h"
 #include "src/common/_VerInfo.h"
+#include "src/common/_Config.h"
 #include "src/core/log/_Log.h"
 
 static luaL_Reg lullbc_NativeMethods[] = {
