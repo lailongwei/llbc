@@ -6,5 +6,9 @@ local llbc = {}
 llbc.DEBUG = false
 llbc.RELEASE = true
 
+-- Define lullbc lib metatable.
+local llbc_mt = {}
+setmetatable(llbc, llbc_mt)
+
 -- Set lib config.
 _llbc.SetLibConfigToLua(llbc)
