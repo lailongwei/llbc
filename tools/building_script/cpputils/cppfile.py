@@ -98,29 +98,29 @@ class CppFile(object):
         now_date = strftime('%Y-%m-%d', localtime(time()))
 
         cnt = '/**\n'
-        cnt += ' *@file\t\t{}\n'.format(op.basename(self.__fpath))
-        cnt += ' *@author\t{}\n'.format(self.__author)
-        cnt += ' *@date\t\t{}\n'.format('<auto generate code, not tag date>')
-        cnt += ' *@version\t{}\n'.format(self.__ver)
+        cnt += ' *@file\t\t{0}\n'.format(op.basename(self.__fpath))
+        cnt += ' *@author\t{0}\n'.format(self.__author)
+        cnt += ' *@date\t\t{0}\n'.format('<auto generate code, not tag date>')
+        cnt += ' *@version\t{0}\n'.format(self.__ver)
         cnt += ' *\n'
         cnt += ' *@brief\tAuto generate by script tools, do not modify this file!!\n'
-        cnt += ' *@doc\t{}\n'.format(self.__doc)
+        cnt += ' *@doc\t{0}\n'.format(self.__doc)
         cnt += ' */\n\n'
 
         basename = op.splitext(op.basename(self.__fpath))[0]
         parent_dirname = op.basename(op.dirname(self.__fpath)).upper()
         extension = op.splitext(op.basename(self.__fpath))[1][1:]
         if extension in ('h', 'hpp'):
-            macro = '__{}_AUTOGEN_{}_{}_{}__'.format(self.include_macro_prefix or 'NOPREFIX',
-                                                     parent_dirname, basename.upper(), extension.upper())
-            cnt += '#ifndef {}\n'.format(macro)
-            cnt += '#define {}\n\n'.format(macro)
+            macro = '__{0}_AUTOGEN_{1}_{2}_{3}__'.format(self.include_macro_prefix or 'NOPREFIX',
+                                                         parent_dirname, basename.upper(), extension.upper())
+            cnt += '#ifndef {0}\n'.format(macro)
+            cnt += '#define {0}\n\n'.format(macro)
         else:
             macro = ''
 
         # Generate include stmts
         for incl in self.__incls:
-            cnt += '#include "{}"\n'.format(incl)
+            cnt += '#include "{0}"\n'.format(incl)
         if self.__incls:
             cnt += '\n'
 
@@ -138,13 +138,13 @@ class CppFile(object):
 
         # Generate defines.
         for d in self.__defs:
-            cnt += '#define {}\n'.format(d)
+            cnt += '#define {0}\n'.format(d)
         if self.__defs:
             cnt += '\n'
 
         # End of file.
         if macro:
-            cnt += '#endif // !{}\n\n'.format(macro)
+            cnt += '#endif // !{0}\n\n'.format(macro)
 
         with open(self.__fpath, 'w+') as f:
             f.write(cnt)

@@ -82,8 +82,8 @@ class LuScriptIntegrator(object):
         f = open(llbc_file_path, 'w')
         f.write('--[[\n')
         f.write('@file    llbc.lua\n')
-        f.write('@author  {}\n'.format(Cfg.getauthor()))
-        f.write('@version {}\n'.format(Cfg.getver()))
+        f.write('@author  {0}\n'.format(Cfg.getauthor()))
+        f.write('@version {0}\n'.format(Cfg.getver()))
         f.write('@date    ----/--/--\n')
         f.write('\n')
         f.write('@brief   llbc lua wrap library(lullbc)\n')
@@ -92,7 +92,7 @@ class LuScriptIntegrator(object):
         # 整合所有脚本
         for luafile in luafiles:
             with open(luafile, 'r') as lf:
-                f.write('-- ******** SCRIPT: {} ********\n'.format(luafile[len(self._script_path) + 1:]).replace('\\', '/'))
+                f.write('-- ******** SCRIPT: {0} ********\n'.format(luafile[len(self._script_path) + 1:]).replace('\\', '/'))
                 f.write(lf.read())
                 f.write('\n\n')
 

@@ -58,7 +58,7 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
             if not meth:
                 return '\n    {NULL, NULL}'
             else:
-                return '\n    {{"{}", {}}},'.format(meth['lua_name'], meth['name'])
+                return '\n    {{"{0}", {1}}},'.format(meth['lua_name'], meth['name'])
 
         luareg = 'static luaL_Reg lullbc_NativeMethods[] = {'
         for meth in methods.itervalues():

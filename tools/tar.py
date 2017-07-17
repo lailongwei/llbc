@@ -16,7 +16,7 @@ import platform
 CUR_DIR = op.dirname(op.abspath(__file__))
 PROJ_DIR = op.dirname(CUR_DIR)
 NOW = datetime.fromtimestamp(time())
-TARBALL = op.join(op.dirname(PROJ_DIR), 'llbc_{}.tar.bz2'.format(NOW.strftime('%Y%m%d_%H%M%S')))
+TARBALL = op.join(op.dirname(PROJ_DIR), 'llbc_{0}.tar.bz2'.format(NOW.strftime('%Y%m%d_%H%M%S')))
 TAR_GIT = True if (len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].lower() == 'true')) else False
 FILTEROUT_SUFFIXES = ('.obj', '.pyc', '.sdf', '.opensdf', '.suo', '.user', '.ncb', '.cache', '.o', '.d')
 OS_NAME = platform.uname()[0].lower()
@@ -34,10 +34,10 @@ def common_filter(tarinfo):
     if OS_NAME != 'windows' and \
             tarinfo.type == tarfile.DIRTYPE:
         # filter-out llbc/<platform_name>, testsuite/<platform_name>, wrap/xxx/<platform_name>
-        if tarinfo.name == 'llbc/{}'.format(OS_NAME) or \
-                tarinfo.name.startswith('testsuite/{}'.format(OS_NAME)) or \
-                tarinfo.name.startswith('wrap/pyllbc/{}'.format(OS_NAME)) or \
-                tarinfo.name.startswith('wrap/csllbc/native/{}'.format(OS_NAME)):
+        if tarinfo.name == 'llbc/{0}'.format(OS_NAME) or \
+                tarinfo.name.startswith('testsuite/{0}'.format(OS_NAME)) or \
+                tarinfo.name.startswith('wrap/pyllbc/{0}'.format(OS_NAME)) or \
+                tarinfo.name.startswith('wrap/csllbc/native/{0}'.format(OS_NAME)):
             return None
 
         # filter-out llbc/lib, testsuite/lib, wrap/xxx/lib
@@ -98,11 +98,11 @@ def main():
 
         # tar vsprojs
         for dir in os.listdir('vsprojs'):
-            tardir = 'vsprojs/{}'.format(dir)
+            tardir = 'vsprojs/{0}'.format(dir)
             if not op.isdir(tardir):
                 continue
 
-            print 'tar {}...'.format(tardir)
+            print 'tar {0}...'.format(tardir)
             tar.add(tardir, filter=vsprojs_filter)
 
         # tar others
@@ -114,7 +114,7 @@ def main():
         tar.add('rules.mk')
 
         tar.close()
-        print 'Done, tar file: {}'.format(TARBALL)
+        print 'Done, tar file: {0}'.format(TARBALL)
     finally:
         os.chdir(old_cwd)
 

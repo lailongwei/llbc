@@ -61,10 +61,10 @@ class PyNativeMethodCollector(BaseNativeMethodCollector):
         first_data = True
         ctor = CppFun(cls_name, rtn='', visit=CppVisit(CppVisit.PUBLIC))
         for meth_name, meth in methods.iteritems():
-            ctor.addstmt('{}.ml_name = {};'.format(meth_name, meth['name']))
-            ctor.addstmt('{}.ml_meth = {};'.format(meth_name, meth['meth']))
-            ctor.addstmt('{}.ml_flags = {};'.format(meth_name, meth['flags']))
-            ctor.addstmt('{}.ml_doc = {};'.format(meth_name, meth['doc']))
+            ctor.addstmt('{0}.ml_name = {1};'.format(meth_name, meth['name']))
+            ctor.addstmt('{0}.ml_meth = {1};'.format(meth_name, meth['meth']))
+            ctor.addstmt('{0}.ml_flags = {1};'.format(meth_name, meth['flags']))
+            ctor.addstmt('{0}.ml_doc = {1};'.format(meth_name, meth['doc']))
 
             visit = CppVisit(CppVisit.PUBLIC) if first_data else CppVisit(CppVisit.NONE)
             cls.adddata(CppData('::PyMethodDef', meth_name, visit=visit))
@@ -95,7 +95,7 @@ class PyNativeMethodCollector(BaseNativeMethodCollector):
 
                 meth = match.group(1)
                 md = {'name': '"' + meth + '"',
-                      'meth': '(PyCFunction)_pyllbc_{}'.format(meth),
+                      'meth': '(PyCFunction)_pyllbc_{0}'.format(meth),
                       'flags': func_flags,
                       'doc': '"pyllbc library method/function"'}
                 rtn[meth] = md

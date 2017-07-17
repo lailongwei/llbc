@@ -20,7 +20,7 @@ def main():
 
     # 读取当前编译是否处于debug模式
     debug = not (len(sys.argv) < 3 or sys.argv[2].upper() != 'DEBUG')
-    print 'Build in {} mode...'.format(debug and 'Debug' or 'Release')
+    print 'Build in {0} mode...'.format(debug and 'Debug' or 'Release')
 
     # 整合所有lua脚本
     print 'Integrate lua scripts...'

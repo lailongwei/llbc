@@ -33,7 +33,7 @@ class BaseNativeMethodCollector(object):
 
     def _buildable(self):
         if not op.exists(self.search_path):
-            print 'Path [{}] not found, skip build methods...'.format(self.search_path)
+            print 'Path [{0}] not found, skip build methods...'.format(self.search_path)
             return False
 
         return True
@@ -42,12 +42,12 @@ class BaseNativeMethodCollector(object):
         return re.compile(r'(_[a-zA-Z]+)+\.h')
 
     def _build_cpp_cls_name(self):
-        return '{}_{}Methods'.format(self.proj_name, self.classname_base)
+        return '{0}_{1}Methods'.format(self.proj_name, self.classname_base)
 
     def _build_cpp_file(self):
-        cpp_file_path = op.join(self.search_path, '_{}Methods.h'.format(self.filename_base))
+        cpp_file_path = op.join(self.search_path, '_{0}Methods.h'.format(self.filename_base))
         cpp_file = CppFile(
             cpp_file_path, author=Cfg.getauthor(), ver=Cfg.getver(), include_macro_prefix=self.proj_name.upper())
-        cpp_file.addincl('{}/common/LibHeader.h'.format(self.proj_name))
-        cpp_file.addincl('{}/common/Macro.h'.format(self.proj_name))
+        cpp_file.addincl('{0}/common/LibHeader.h'.format(self.proj_name))
+        cpp_file.addincl('{0}/common/Macro.h'.format(self.proj_name))
         return cpp_file

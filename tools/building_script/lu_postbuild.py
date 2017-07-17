@@ -20,7 +20,7 @@ def main():
     else:
         target = op.join(target_path, 'llbc_debug.lua')
 
-    print 'Copy [{}] to [{}]...'.format(src, target)
+    print 'Copy [{0}] to [{1}]...'.format(src, target)
     shutil.copyfile(src, target)
 
     print 'Done!'

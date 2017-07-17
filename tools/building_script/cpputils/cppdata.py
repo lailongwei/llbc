@@ -29,7 +29,7 @@ class CppData(object):
 
         s += ' ' + self.__name
         if self.__init:
-            s += ' = {}'.format(self.__init)
+            s += ' = {0}'.format(self.__init)
         s += ';\n'
 
         return s

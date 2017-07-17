@@ -27,9 +27,9 @@ class CppClass(object):
         beg_indent = ' ' * indent
 
         if not self.__constraint:
-            c = beg_indent + 'class {}\n'.format(self.__name)
+            c = beg_indent + 'class {0}\n'.format(self.__name)
         else:
-            c = beg_indent + 'class {} {}\n'.format(self.__constraint, self.__name)
+            c = beg_indent + 'class {0} {1}\n'.format(self.__constraint, self.__name)
 
         c += beg_indent + '{\n'
         for method in self.__methods:

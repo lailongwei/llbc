@@ -47,9 +47,9 @@ class CppFun(object):
 
         function += ')\n'
         if self.__initStmts:
-            function += beg_indent + ': {}\n'.format(self.__initStmts[0])
+            function += beg_indent + ': {0}\n'.format(self.__initStmts[0])
             for i in range(1, len(self.__initStmts)):
-                function += beg_indent + ', {}\n'.format(self.__initStmts[i])
+                function += beg_indent + ', {0}\n'.format(self.__initStmts[i])
 
         function += beg_indent + '{\n'
         for stmt in self.__stmts:

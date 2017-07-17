@@ -35,10 +35,10 @@ class PyIntegratorBuilder(object):
                     continue
 
                 script_cnt = PyIntegratorBuilder.__transfer_to_cpp_str(fpath)
-                ctor.addstmt('_scripts.insert(::std::make_pair("{}", new ::pyllbc_ScriptIntegrator({})));'
+                ctor.addstmt('_scripts.insert(::std::make_pair("{0}", new ::pyllbc_ScriptIntegrator({1})));'
                              .format(op.basename(fpath), script_cnt))
 
-        dtor = CppFun('~{}'.format(class_name), rtn='', visit=CppVisit(CppVisit.PUBLIC))
+        dtor = CppFun('~{0}'.format(class_name), rtn='', visit=CppVisit(CppVisit.PUBLIC))
         dtor.addstmt('LLBC_STLHelper::DeleteContainer(_scripts);')
 
         clazz = CppClass(class_name)
@@ -64,7 +64,7 @@ class PyIntegratorBuilder(object):
         clazz.adddata(data_mem)
 
         cpp_file.addcls(clazz)
-        cpp_file.adddef('pyllbc_s_Scripts LLBC_Singleton<{}, LLBC_DummyLock>::Instance()'.format(class_name))
+        cpp_file.adddef('pyllbc_s_Scripts LLBC_Singleton<{0}, LLBC_DummyLock>::Instance()'.format(class_name))
 
         cpp_file.build()
 
