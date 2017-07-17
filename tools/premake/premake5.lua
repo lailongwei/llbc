@@ -620,6 +620,11 @@ project "lullbc"
         "../../wrap/lullbc/script/**.lua",
     }
 
+    -- define targetextension
+    filter { "system:macosx" }
+        targetextension ".so"
+    filter {}
+
     -- includedirs
     includedirs {
         LUALIB_INCL_PATH,
