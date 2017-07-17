@@ -48,18 +48,20 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
-    // Cleanup network library.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (tls->coreTls.needInitWinSock)
-        LLBC_CleanupNetLibrary();
-
     // Destroy entry thread timer scheduler.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.timerScheduler = NULL;
-
     LLBC_TimerScheduler::DestroyEntryThreadScheduler();
 
     // Destroy main bundle.
     LLBC_Bundle::DestroyMainBundle();
+
+    // Finalize logger manager.
+    LLBC_LoggerManagerSingleton->Finalize();
+
+    // Cleanup network library.
+    if (tls->coreTls.needInitWinSock)
+        LLBC_CleanupNetLibrary();
 }
 
 __LLBC_NS_END
