@@ -556,7 +556,13 @@ int LLBC_HashString(const char *str, size_t strLen)
 
     int hashVal = 0;
     for (size_t i = 0; i < strLen; i++)
+    {
+#ifdef _M_X64
+        hashVal += static_cast<int>(i * 0x31 * str[i]);
+#else
         hashVal += i * 0x31 * str[i];
+#endif
+    }
 
     hashVal += static_cast<int>(strLen) * str[0];
     hashVal *= str[strLen - 1];
