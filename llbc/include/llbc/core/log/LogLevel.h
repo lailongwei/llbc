@@ -79,7 +79,7 @@ public:
      * @param[in] str - log level describe.
      * @return int - log level.
      */
-    static int Str2Levevl(const char *str);
+    static int Str2Level(const char *str);
 };
 
 __LLBC_NS_END

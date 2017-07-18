@@ -136,11 +136,14 @@ void LLBC_LogFileAppender::Finalize()
 int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 {
     LLBC_LogTokenChain *chain = NULL;
-    if (!(chain = GetTokenChain()))
+    if (UNLIKELY(!(chain = GetTokenChain())))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
+
+    if (data.level < GetLogLevel())
+        return LLBC_OK;
 
     CheckAndUpdateLogFile(data.logTime);
 

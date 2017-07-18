@@ -26,10 +26,12 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _flushInterval(0)
 
 , _logToConsole(true)
+, _consoleLogLevel(LLBC_LogLevel::End)
 , _consolePattern()
 , _colourfulOutput(true)
 
 , _logToFile(false)
+, _fileLogLevel(LLBC_LogLevel::End)
 , _logFile()
 , _forceAppLogPath(false)
 , _filePattern()
@@ -49,17 +51,19 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
 {
     // Common log configs.
-    _logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Levevl(cfg.GetValue("level").AsCStr()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
+    _logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsCStr()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
     _asyncMode = (cfg.HasProperty("asynchronous") ? cfg.GetValue("asynchronous").AsBool() : LLBC_CFG_LOG_DEFAULT_ASYNC_MODE);
     _flushInterval= (cfg.HasProperty("flushInterval") ? cfg.GetValue("flushInterval").AsInt32() : LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
 
     // Console log configs.
     _logToConsole = (cfg.HasProperty("logToConsole") ? cfg.GetValue("logToConsole").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE);
+    _consoleLogLevel = (cfg.HasProperty("consoleLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsCStr()) : _logLevel);
     _consolePattern = (cfg.HasProperty("consolePattern") ? cfg.GetValue("consolePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     _colourfulOutput = (cfg.HasProperty("colourfulOutput") ? cfg.GetValue("colourfulOutput").AsBool() : LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT);
 
     // File log configs.
     _logToFile = (cfg.HasProperty("logToFile") ? cfg.GetValue("logToFile").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
+    _fileLogLevel = (cfg.HasProperty("fileLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsCStr()) : _logLevel);
     _logFile = (cfg.HasProperty("logFile") ? cfg.GetValue("logFile").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
     _forceAppLogPath = (cfg.HasProperty("forceAppLogPath") ? cfg.GetValue("forceAppLogPath").AsBool() : LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH);
     _filePattern = (cfg.HasProperty("filePattern") ? cfg.GetValue("filePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
@@ -110,6 +114,11 @@ bool LLBC_LoggerConfigInfo::IsLogToConsole() const
     return _logToConsole;
 }
 
+int LLBC_LoggerConfigInfo::GetConsoleLogLevel() const
+{
+    return _consoleLogLevel;
+}
+
 const LLBC_String &LLBC_LoggerConfigInfo::GetConsolePattern() const
 {
     return _consolePattern;
@@ -123,6 +132,11 @@ bool LLBC_LoggerConfigInfo::IsColourfulOutput() const
 bool LLBC_LoggerConfigInfo::IsLogToFile() const
 {
     return _logToFile;
+}
+
+int LLBC_LoggerConfigInfo::GetFileLogLevel() const
+{
+    return _fileLogLevel;
 }
 
 const LLBC_String &LLBC_LoggerConfigInfo::GetFilePattern() const

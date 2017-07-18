@@ -50,6 +50,7 @@ public:
  */
 struct LLBC_LogAppenderInitInfo
 {
+    int level;                      // log level.
     LLBC_String pattern;            // output pattern.
     bool colourfulOutput;           // colourful output flag.
 
@@ -98,6 +99,13 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Output(const LLBC_LogData &data) = 0;
+
+protected:
+    /**
+     * Get log level.
+     * @return int - the log level.
+     */
+    virtual int GetLogLevel() const = 0;
 
 protected:
     /**

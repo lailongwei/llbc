@@ -56,13 +56,16 @@ void LLBC_LogConsoleAppender::Finalize()
 int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
 {
     LLBC_LogTokenChain *chain = NULL;
-    if (!(chain = GetTokenChain()))
+    if (UNLIKELY(!(chain = GetTokenChain())))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
 
     const int logLevel = data.level;
+    if (logLevel < GetLogLevel())
+        return LLBC_OK;
+
     FILE * const out = logLevel >= _LogLevel::Warn ? stderr : stdout;
 
     int oldOutputColor = 0;

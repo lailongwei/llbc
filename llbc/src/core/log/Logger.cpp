@@ -68,7 +68,8 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     _name.append(name);
 
     _config = config;
-    _logLevel = config->GetLogLevel();
+
+    _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
 
     _logRunnable = new LLBC_LogRunnable;
     _logRunnable->SetFlushInterval(_config->GetFlushInterval());
@@ -76,6 +77,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
+        appenderInitInfo.level = _config->GetConsoleLogLevel();
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
 
@@ -93,6 +95,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     if (_config->IsLogToFile())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
+        appenderInitInfo.level = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
         appenderInitInfo.file = _config->GetLogFile();
         appenderInitInfo.forceAppLogPath = _config->GetForceAppLogPath();

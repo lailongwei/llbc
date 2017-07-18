@@ -39,6 +39,14 @@ public:
 
 protected:
     /**
+     * Get log level.
+     * @return int - the log level.
+     */
+    virtual int GetLogLevel() const;
+
+protected:
+
+    /**
      * Get current appender's token chain.
      * @return LLBC_LogTokenChain * - the log token chain.
      */
@@ -64,10 +72,14 @@ protected:
     virtual void Flush();
 
 private:
+    int _level;
+
     LLBC_LogTokenChain *_chain;
     LLBC_ILogAppender *_next;
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/log/BaseLogAppenderImpl.h"
 
 #endif // !__LLBC_CORE_LOG_BASE_LOG_APPENDER_H__

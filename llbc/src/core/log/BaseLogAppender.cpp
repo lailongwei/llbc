@@ -10,13 +10,16 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTokenChain.h"
 #include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
-: _chain(NULL)
+: _level(LLBC_LogLevel::End)
+
+, _chain(NULL)
 , _next(NULL)
 {
 }
@@ -34,6 +37,8 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         return LLBC_FAILED;
     }
 
+    _level = initInfo.level;
+
     _chain = new LLBC_LogTokenChain;
     if (_chain->Build(initInfo.pattern) != LLBC_OK)
     {
@@ -47,21 +52,7 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 void LLBC_BaseLogAppender::Finalize()
 {
     LLBC_XDelete(_chain);
-}
-
-LLBC_LogTokenChain *LLBC_BaseLogAppender::GetTokenChain() const
-{
-    return _chain;
-}
-
-LLBC_ILogAppender *LLBC_BaseLogAppender::GetAppenderNext() const
-{
-    return _next;
-}
-
-void LLBC_BaseLogAppender::SetAppenderNext(LLBC_ILogAppender *next)
-{
-    _next = next;
+    _level = LLBC_LogLevel::End;
 }
 
 void LLBC_BaseLogAppender::Flush()

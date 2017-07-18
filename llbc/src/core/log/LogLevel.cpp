@@ -61,7 +61,7 @@ const LLBC_String &LLBC_LogLevel::GetLevelDesc(int level)
         LLBC_INTERNAL_NS __level2StrDesc[level] : LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::End]);
 }
 
-int LLBC_LogLevel::Str2Levevl(const char *level)
+int LLBC_LogLevel::Str2Level(const char *level)
 {
     if (UNLIKELY(!level))
     {

@@ -66,6 +66,12 @@ public:
     bool IsLogToConsole() const;
 
     /**
+     * Get console log level.
+     * @return int - console log level
+     */
+    int GetConsoleLogLevel() const;
+
+    /**
      * Get console log pattern.
      * @return const LLBC_String & - console log pattern.
      */
@@ -83,6 +89,12 @@ public:
      * @return bool - log to file switch.
      */
     bool IsLogToFile() const;
+
+    /**
+     * Get file log level.
+     * @return int - file log level.
+     */
+    int GetFileLogLevel() const;
 
     /**
      * Get file log pattern.
@@ -150,10 +162,12 @@ private:
     int _flushInterval;
 
     bool _logToConsole;
+    int _consoleLogLevel;
     LLBC_String _consolePattern;
     bool _colourfulOutput;
 
     bool _logToFile;
+    int _fileLogLevel;
     LLBC_String _logFile;
     bool _forceAppLogPath;
     LLBC_String _filePattern;
