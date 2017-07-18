@@ -18,8 +18,14 @@ cd tools\premake && premake5_windows.exe %choose%
 if errorlevel 1 (
     echo Failed to generate Visual Studio solution and project files, error: %errorlevel%
     pause
+    exit 1
 ) else (
     echo Succcess to generate Visual Studio solution and project files
     echo Solution file path: build/%choose%/llbc_%choose%.sln
-    explorer ..\..\build\%choose%
+   if "%1"=="" (
+        explorer ..\..\build\%choose%
+    )
+    if "%1"=="1" (
+        explorer ..\..\build\%choose%
+    )
 )
