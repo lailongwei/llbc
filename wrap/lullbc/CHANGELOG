@@ -1,0 +1,8 @@
+# llbc lua wrap library update log file.
+# Longwei Lai<lailongwei@126.com>
+######################################################################################
+#
+# Version: 1.0.1
+#
+# 2017/07/18
+# 1) 新增lullbc初始化支持,当前支持GetVersionInfo及Log组件的完整支持
