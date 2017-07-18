@@ -135,6 +135,9 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     std::map<LLBC_String, LLBC_Logger *>::const_iterator iter = _loggers.find(name);
     if (iter == _loggers.end())
     {
+        if (_root->IsTakeOver())
+            return _root;
+
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return NULL;
     }

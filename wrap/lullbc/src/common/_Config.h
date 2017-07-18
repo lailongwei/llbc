@@ -81,6 +81,8 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_MAX_LOG_FLUSH_INTERVAL");
     lua_pushboolean(l, LLBC_CFG_LOG_USING_WITH_STREAM);
     lua_setfield(l, 1, "CFG_LOG_USING_WITH_STREAM");
+    lua_pushboolean(l, LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED);
+    lua_setfield(l, 1, "CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED");
 
     // Timer
     lua_pushboolean(l, LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE);

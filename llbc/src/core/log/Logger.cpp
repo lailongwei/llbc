@@ -184,6 +184,11 @@ void LLBC_Logger::SetLogLevel(int level)
     _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
 }
 
+bool LLBC_Logger::IsTakeOver() const
+{
+    return _config->IsTakeOver();
+}
+
 int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *message, ...)
 {
     if (LLBC_LogLevel::Debug < _logLevel)

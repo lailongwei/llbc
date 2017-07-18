@@ -37,6 +37,8 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)
 , _fileBufferSize(0)
+
+, _takeOver(false)
 {
 }
 
@@ -64,6 +66,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     _dailyMode = (cfg.HasProperty("dailyRollingMode") ? cfg.GetValue("dailyRollingMode").AsBool() : LLBC_CFG_LOG_DEFAULT_DAILY_MODE);
     _maxFileSize = (cfg.HasProperty("maxFileSize") ? cfg.GetValue("maxFileSize").AsLong() : LLBC_CFG_LOG_MAX_FILE_SIZE);
     _maxBackupIndex = (cfg.HasProperty("maxBackupIndex") ? cfg.GetValue("maxBackupIndex").AsInt32() : LLBC_CFG_LOG_MAX_BACKUP_INDEX);
+
+    // Misc configs.
+    _takeOver = (cfg.HasProperty("takeOver") ? cfg.GetValue("takeOver").AsBool() : LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED);
 
     if (_asyncMode)
         _fileBufferSize = (cfg.HasProperty("fileBufferSize") ? 
@@ -153,6 +158,11 @@ int LLBC_LoggerConfigInfo::GetMaxBackupIndex() const
 int LLBC_LoggerConfigInfo::GetFileBufferSize() const
 {
     return _fileBufferSize;
+}
+
+bool LLBC_LoggerConfigInfo::IsTakeOver() const
+{
+    return _takeOver;
 }
 
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()

@@ -98,6 +98,9 @@
 #define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 1000
 // Default log using mode.
 #define LLBC_CFG_LOG_USING_WITH_STREAM                      1
+// Default take over config, only using in root logger, when a message log to 
+// unconfiged logger, root logger will take over, if configed takeover to true.
+#define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
 
 /**
  * \brief core/timer about configs.

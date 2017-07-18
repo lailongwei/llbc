@@ -126,6 +126,13 @@ public:
      */
     int GetFileBufferSize() const;
 
+public:
+    /**
+     * Get take over option.
+     * @return bool - take over option.
+     */
+    bool IsTakeOver() const;
+
 private:
     /**
      * Normalize the log file name.
@@ -154,6 +161,8 @@ private:
     long _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
+
+    bool _takeOver;
 };
 
 __LLBC_NS_END

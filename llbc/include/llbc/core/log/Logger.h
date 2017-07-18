@@ -74,6 +74,12 @@ public:
      */
     void SetLogLevel(int level);
 
+    /**
+     * Get logger take over option, only available on root logger.
+     * @return bool - take over option.
+     */
+    bool IsTakeOver() const;
+
 public:
     /**
      * Output specific level message.
