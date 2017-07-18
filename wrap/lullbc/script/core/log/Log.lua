@@ -34,11 +34,20 @@ function Log.d(...)
 end
 
 -- Log DEBUG level message to specific logger.
--- :param ...:              log message.
 -- :param[optional] logger: logger name, default is root logger.
+-- :param ...:              log message.
 -- :returns: no return.
 function Log.d2(logger, ...)
     Log.Output(0, logger, nil, ...)
+end
+
+-- Log DEBUG level message to specific logger, and append tag.
+-- :param[optional] logger: logger name, default is root logger.
+-- :param[optional] tag:    log tag, default is nil.
+-- :param ...:              log message.
+-- :returns: no return.
+function Log.d3(logger, tag, ...)
+    Log.Output(0, logger, tag, ...)
 end
 
 -- Log INFO level message to root logger.
@@ -49,11 +58,20 @@ function Log.i(...)
 end
 
 -- Log INFO level message to specific logger.
--- :param ...:              log message.
 -- :param[optional] logger: logger name, default is root logger.
+-- :param ...:              log message.
 -- :returns: no return.
 function Log.i2(logger, ...)
     Log.Output(1, logger, nil, ...)
+end
+
+-- Log INFO level message to specific logger, and append tag.
+-- :param[optional] logger: logger name, default is root logger.
+-- :param[optional] tag:    log tag, default is nil.
+-- :param ...:              log message.
+-- :returns: no return.
+function Log.i3(logger, tag, ...)
+    Log.Output(1, logger, tag, ...)
 end
 
 -- Log WARN level message to root logger.
@@ -64,11 +82,20 @@ function Log.w(...)
 end
 
 -- Log WARN level message to specific logger.
--- :param ...:              log message.
 -- :param[optional] logger: logger name, default is root logger.
+-- :param ...:              log message.
 -- :returns: no return.
 function Log.w2(logger, ...)
     Log.Output(2, logger, nil, ...)
+end
+
+-- Log WARN level message to specific logger.
+-- :param[optional] logger: logger name, default is root logger.
+-- :param[optional] tag:    log tag, default is nil.
+-- :param ...:              log message.
+-- :returns: no return.
+function Log.w3(logger, tag, ...)
+    Log.Output(2, logger, tag, ...)
 end
 
 -- Log ERROR level message to root logger.
@@ -79,11 +106,20 @@ function Log.e(...)
 end
 
 -- Log ERROR level message to specific logger.
--- :param ...:              log message.
 -- :param[optional] logger: logger name, default is root logger.
+-- :param ...:              log message.
 -- :returns: no return.
 function Log.e2(logger, ...)
     Log.Output(3, logger, nil, ...)
+end
+
+-- Log ERROR level message to specific logger, and append tag.
+-- :param[optional] logger: logger name, default is root logger.
+-- :param[optional] tag:    log tag, default is nil.
+-- :param ...:              log message.
+-- :returns: no return.
+function Log.e3(logger, tag, ...)
+    Log.Output(3, logger, tag, ...)
 end
 
 -- Log FATAL level message to root logger.
@@ -94,11 +130,20 @@ function Log.f(...)
 end
 
 -- Log FATAL level message to specific logger.
--- :param ...:              log message.
 -- :param[optional] logger: logger name, default is root logger.
+-- :param ...:              log message.
 -- :returns: no return.
 function Log.f2(logger, ...)
     Log.Output(4, logger, nil, ...)
+end
+
+-- Log FATAL level message to specific logger, and append tag.
+-- :param[optional] logger: logger name, default is root logger.
+-- :param[optional] tag:    log tag, default is nil.
+-- :param ...:              log message.
+-- :returns: no return.
+function Log.f3(logger, tag, ...)
+    Log.Output(4, logger, tag, ...)
 end
 
 -- Output message to logger.

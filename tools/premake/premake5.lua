@@ -618,6 +618,9 @@ project "lullbc"
         "../../wrap/lullbc/src/**.cpp",
 
         "../../wrap/lullbc/script/**.lua",
+
+        "../../wrap/lullbc/testsuite/**.lua",
+        "../../wrap/lullbc/testsuite/**.cfg",
     }
 
     -- define targetextension
