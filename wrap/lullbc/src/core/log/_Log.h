@@ -54,9 +54,8 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 
     const char *tag = paramsCount >= 4 ? lua_tostring(l, 4) : NULL;
 
-    const char *file = paramsCount >= 4 ? lua_tostring(l, 5) : NULL;
-    int line = paramsCount >= 5 ? lua_toint32(l, 6) : 0;
-
+    const char *file = paramsCount >= 5 ? lua_tostring(l, 5) : NULL;
+    int line = paramsCount >= 6 ? lua_toint32(l, 6) : 0;
     if (UNLIKELY(logger->Output(level, tag, file, line, "%s", msg) != LLBC_OK))
         lullbc_TransferLLBCError(l, "failed to log message, Output call failed");
 

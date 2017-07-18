@@ -109,9 +109,10 @@ end
 -- :returns: no return.
 function Log.Output(level, logger, tag, ...)
     msg = table.concat({...}, '\t')
-    if Log.logFileinfo then
-        local di = debug.getinfo(2, 'Sl')
-        local file, line = di.source, di.currentline
+    local file, line
+    if Log.logFileInfo then
+        local di = debug.getinfo(3, 'Sl')
+        file, line = di.source, di.currentline
     end
 
     _llbc.LogMsg(level, msg, logger, tag, file, line)
