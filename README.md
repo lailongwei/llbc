@@ -2,10 +2,10 @@
 Low Level Base Compoment
 
 llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的所有基础支持(包括字符串处理,日志,线程,配置,Timer,ObjRef,网络及其它所有基础支持),在最顶层,llbc使用Service的概念将这些所有支持以compoments的方式集成,也就意味着,在开发你的应用的时候,只需要一个Service就拥有所有你需要的功能.  
-llbc是一个低调的库, 但~~~你开心就好.  
+llbc是一个低调的库, 但...你开心就好.  
 
 ## 支持语言：
-**c/c++**：完整支持, 并经过反复测试及线上使用
+**c/c++**：完整支持, 并经过反复测试及线上使用  
 **python**: 完整支持, 并经过反复测试及线上使用, 在易用性上得益于python语法, 更容易学习及使用  
 **csharp**: 基本支持, 并经过反复测试, 在易用性上同样得益于c#语法, 更容易学习及使用  
 **lua**: 最小化支持, 包装库开发工作处于开始状态, 当前支持Log组件, 其它暂时未提供  
@@ -79,18 +79,18 @@ ps: 直接`make`可以查看具体编译命令说明.
 未提供编译工具支持  
   
 ## 安装:  
-### Windows:  
+#### Windows:  
 所有目标文件在output/vsxxxx/<config>目录中, 在编译完成后, 在此目录提取即可.  
     
-### Linux/Mac  
+#### Linux/Mac  
 请根据你的需要执行安装指令:  
 **llbc**: `make install_core_lib`  
 **wrap/pyllbc**: `make install_py_wrap`  
 **wrap/csllbc**: `make install_cs_wrap`, 为空实现, 如果需要使用csllbc, 请直接copy到您的目标目录即可   
 **wrap/lullbc**: `make install_lu_wrap`, 为空实现, 如果需要使用lullbc, 请直接copy到你的目标目录即可  
     
-### iOS:
+#### iOS:
 xCode编译出来dylib,直接在你的项目中引用即可  
   
-### Android:  
+#### Android:  
 没时间处理Android平台,暂时没有安装说明  
