@@ -81,8 +81,12 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
         _fileBufferSize = 0;
 
     // Check configs.
-    if (!(_logLevel >= LLBC_LogLevel::Begin && _logLevel < LLBC_LogLevel::End))
+    if (!LLBC_LogLevel::IsLegal(_logLevel))
         _logLevel = LLBC_CFG_LOG_DEFAULT_LEVEL;
+    if (!LLBC_LogLevel::IsLegal(_consoleLogLevel))
+        _consoleLogLevel = _logLevel;
+    if (!LLBC_LogLevel::IsLegal(_fileLogLevel))
+        _fileLogLevel = _logLevel;
 
     _maxFileSize = MAX(1, _maxFileSize);
     _maxBackupIndex = MAX(0, _maxBackupIndex);

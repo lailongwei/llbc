@@ -80,6 +80,13 @@ public:
      * @return int - log level.
      */
     static int Str2Level(const char *str);
+
+    /**
+     * Check giving log level is legal or not.
+     * @param[in] level - the given log level.
+     * @return bool - return if log level is legal, otherwise return false.
+     */
+    static bool IsLegal(int level);
 };
 
 __LLBC_NS_END

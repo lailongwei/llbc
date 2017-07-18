@@ -93,6 +93,11 @@ int LLBC_LogLevel::Str2Level(const char *level)
     return LLBC_LogLevel::End;
 }
 
+bool LLBC_LogLevel::IsLegal(int level)
+{
+    return (LLBC_LogLevel::Begin <= level && level < LLBC_LogLevel::End);
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"
