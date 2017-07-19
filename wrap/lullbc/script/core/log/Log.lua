@@ -153,7 +153,7 @@ end
 -- :param ...:    log message.
 -- :returns: no return.
 function Log.Output(level, logger, tag, ...)
-    msg = table.concat({...}, '\t')
+    msg = table.concat({...}, ' ')
     local file, line
     if Log.logFileInfo then
         local di = debug.getinfo(3, 'Sl')
