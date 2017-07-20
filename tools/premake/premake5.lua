@@ -703,6 +703,13 @@ project "lullbc"
         }
     filter {}
 
+    -- linkoptions
+    filter { "system:macosx" }
+    	linkoptions {
+            "-undefined dynamic_lookup",
+        }
+    filter {}
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
