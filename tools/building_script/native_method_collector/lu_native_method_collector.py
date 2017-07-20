@@ -17,7 +17,8 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
         super(LuNativeMethodCollector, self).__init__(search_path, classname_base, filename_base)
         self._meth_re = re.compile(
             r'\s*LULLBC_LUA_METH\s+int\s+(_lullbc_([a-zA-Z0-9_]+))\s*\(\s*lua_State\s*\*\s*[a-zA-Z0-9_]*\s*\)\s*')
-        self._doc_re = re.compile(r'\s*//\s*API\s*:\s*([a-zA-Z0-9_]+)')
+        self._anno_re = re.compile(r'\s*//.*')
+        self._doc_re = re.compile(r'\s*//\s*[Aa][Pp][Ii]\s*:\s*([a-zA-Z0-9_]+)')
 
     def build(self):
         """构建方法文件"""
@@ -83,9 +84,16 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
 
                 meth = m.group(1)
                 lua_meth = m.group(2)
-                if idx > 0:
+                anno_idx = idx - 1
+                while anno_idx >= 0:
+                    if not self._anno_re.match(lines[anno_idx]):
+                        anno_idx -= 1
+                        continue
+
                     m2 = self._doc_re.match(lines[idx - 1])
                     if m2 is not None:
                         lua_meth = m2.group(1)
+                    anno_idx -= 1
+
                 meths[meth] = {'name': meth, 'lua_name': lua_meth}
         return meths
