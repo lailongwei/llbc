@@ -192,6 +192,14 @@ namespace llbc
         {
             get { return LLBCNative.csllbc_LibConfig_Log_MaxLogFlushInterval(); }
         }
+
+        /// <summary>
+        /// Take over unknown logger message.
+        /// </summary>
+        public static bool takeOverUnknownLoggerMsg
+        {
+            get { return LLBCNative.csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg() != 0; }
+        }
         #endregion // logger about configs
 
         #region timer about configs

@@ -68,6 +68,9 @@ namespace llbc
         public extern static int csllbc_LibConfig_Log_MaxLogFlushInterval();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg();
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Timer_StrictSchedule();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]

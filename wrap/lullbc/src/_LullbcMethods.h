@@ -15,6 +15,7 @@
 #include "lullbc/common/Macro.h"
 #include "src/_Lullbc.h"
 #include "src/common/_Config.h"
+#include "src/common/_MonkeyPatch.h"
 #include "src/common/_VerInfo.h"
 #include "src/core/log/_Log.h"
 
@@ -23,6 +24,7 @@ static luaL_Reg lullbc_NativeMethods[] = {
     {"Startup", _lullbc_Startup},
     {"SetLibConfigToLua", _lullbc_SetLibConfigToLua},
     {"GetVersionInfo", _lullbc_GetVersionInfo},
+    {"MonkeyPatch", _lullbc_MonkeyPatch},
     {"InitLog", _lullbc_InitLog},
     {"LogMsg", _lullbc_LogMsg},
     {NULL, NULL}

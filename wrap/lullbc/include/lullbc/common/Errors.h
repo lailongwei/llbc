@@ -28,15 +28,16 @@
  * @param[in] file        - error occurred code file name.
  * @param[in] lineNo      - error occurred code file line.
  * @param[in] additionMsg - addition message to transfer.
+ * @param[in] ...         - addition message format arguments.
  */
-LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const LLBC_String &additionMsg = "");
-LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const LLBC_String &additionMsg = "");
+LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *additionMsg = NULL, ...);
+LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const char *additionMsg = NULL, ...);
 
 /**
  * Set error by errno/errDesc.
  * @param[in] errNo/errDesc - the errno/error describe.
  */
 LULLBC_HIDDEN void lullbc_SetError(lua_State *l, int errNo);
-LULLBC_HIDDEN void lullbc_SetError(lua_State *l, const LLBC_String &errDesc);
+LULLBC_HIDDEN void lullbc_SetError(lua_State *l, const char *errDesc, ...);
 
 #endif // !__LULLBC_COM_ERRORS_H__

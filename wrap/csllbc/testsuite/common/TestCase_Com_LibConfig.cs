@@ -35,6 +35,7 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("Log default log file buffer size(in bytes): {0}", LibConfig.logDefaultLogFileBufferSize);
         Console.WriteLine("Log default log flush interval(milli-seconds): {0}", LibConfig.logDefaultLogFlushInterval);
         Console.WriteLine("Log max log flush interval(milli-seconds): {0}", LibConfig.logMaxLogFlushInterval);
+        Console.WriteLine("Log take over unknown logger message: {0}", LibConfig.takeOverUnknownLoggerMsg);
         Console.WriteLine();
 
         Console.WriteLine("Timer about configs:");

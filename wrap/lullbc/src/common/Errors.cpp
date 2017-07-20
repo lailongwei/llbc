@@ -11,21 +11,56 @@
 
 #include "lullbc/common/Errors.h"
 
-void lullbc_TransferLLBCError(lua_State *l, const LLBC_String &additionMsg)
+void lullbc_TransferLLBCError(lua_State *l, const char *additionMsg, ...)
 {
-    lullbc_TransferLLBCError(l, NULL, 0, additionMsg);
+    {
+        // Format llbc error.
+        LLBC_String errMsg;
+        errMsg.format("%s", LLBC_FormatLastError());
+
+        // Format addition message.
+        if (additionMsg != NULL)
+        {
+            char *fmttedAdditionMsg = NULL; int fmttedAdditionMsgLen = 0;
+            LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
+
+            errMsg.format("%s, addition error info: %s", LLBC_FormatLastError(), fmttedAdditionMsg);
+            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+        }
+
+        // Push to stack top.
+        lua_pushlstring(l, errMsg.data(), errMsg.size());
+    }
+
+    // Raise lua error.
+    lua_error(l);
 }
 
-void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const LLBC_String &additionMsg)
+void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const char *additionMsg, ...)
 {
-    LLBC_String errDesc;
-    errDesc.format("%s", LLBC_FormatLastError());
-    if (file)
-        errDesc.append_format(", raised from c/c++ source %s:%d", file, lineNo);
-    if (!additionMsg.empty())
-        errDesc.append_format(", addition info: %s", additionMsg.c_str());
+    {
+        // Format llbc error, fileline info.
+        LLBC_String errMsg;
+        errMsg.format("%s", LLBC_FormatLastError());
+        if (file)
+            errMsg.append_format(", raised from c/c++ source %s:%d", file, lineNo);
 
-    luaL_error(l, "%s", errDesc.c_str());
+        // Format addition message, if specific.
+        if (additionMsg != NULL)
+        {
+            char *fmttedAdditionMsg = NULL; int fmttedAdditionMsgLen = 0;
+            LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
+
+            errMsg.append_format(", addition error info: %s", fmttedAdditionMsg);
+            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+        }
+        
+        // Push to stack top.
+        lua_pushlstring(l, errMsg.data(), errMsg.size());
+    }
+
+    // Raise lua error.
+    lua_error(l);
 }
 
 void lullbc_SetError(lua_State *l, int errNo)
@@ -34,8 +69,35 @@ void lullbc_SetError(lua_State *l, int errNo)
     lullbc_TransferLLBCError(l);
 }
 
-void lullbc_SetError(lua_State *l, const LLBC_String &errDesc)
+void lullbc_SetError(lua_State *l, const char *additionMsg, ...)
 {
     LLBC_SetLastError(LULLBC_ERROR_COMMON);
-    lullbc_TransferLLBCError(l, errDesc);
+
+    if (additionMsg == NULL)
+    {
+        lullbc_TransferLLBCError(l, NULL);
+        return;
+    }
+ 
+   {
+        // Format llbc error.
+        LLBC_String errMsg;
+        errMsg.format("%s", LLBC_FormatLastError());
+
+        // Format addition message.
+        if (additionMsg != NULL)
+        {
+            char *fmttedAdditionMsg = NULL; int fmttedAdditionMsgLen = 0;
+            LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
+
+            errMsg.format("%s, addition error info: %s", LLBC_FormatLastError(), fmttedAdditionMsg);
+            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+        }
+
+        // Push to stack top.
+        lua_pushlstring(l, errMsg.data(), errMsg.size());
+    }
+
+    // Raise lua error.
+    lua_error(l);
 }

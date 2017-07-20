@@ -102,6 +102,11 @@ int csllbc_LibConfig_Log_MaxLogFlushInterval()
     return LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL;
 }
 
+int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg()
+{
+    return LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED;
+}
+
 int csllbc_LibConfig_Timer_StrictSchedule()
 {
     return LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE;

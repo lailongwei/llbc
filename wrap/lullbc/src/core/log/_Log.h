@@ -40,15 +40,9 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     {
         const char *loggerName = lua_tostring(l, 2);
         if (UNLIKELY(loggerName == NULL))
-        {
             logger = __rootLogger;
-        }
         else if (UNLIKELY((logger = LLBC_LoggerManagerSingleton->GetLogger(loggerName)) == NULL))
-        {
-            LLBC_String errMsg;
-            errMsg.format("failed to log message, logger[%s] not found", loggerName);
-            lullbc_SetError(l, errMsg);
-        }
+            lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
     }
 
     // Parse tag, file, line
@@ -69,6 +63,8 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         msg.append(partMsg, msgSize);
         if (i < paramsCount)
             msg.append(1, ' ');
+
+        lua_pop(l, 1);
     }
 
     if (UNLIKELY(logger->OutputNonFormat(level, tag, file, line, msg.data(), msg.size()) != LLBC_OK))

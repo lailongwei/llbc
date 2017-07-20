@@ -19,4 +19,9 @@
 #define lua_toint64(l, i)   lua_tointeger(l, i)
 #define lua_touint64(l, i)  static_cast<uint64>(lua_tointeger(l, i))
 
+// lua_objlen check, before 5.2, lua_objlen is supported, but after 5.2, this method changed to lua_rawlen.
+#if LUA_VERSION_NUM > 501 && !defined(lua_objlen)
+ #define lua_objlen(l, i)    lua_rawlen(l, (i))
+#endif
+
 #endif // !__LULLBC_COM_LUAEXT_H__
