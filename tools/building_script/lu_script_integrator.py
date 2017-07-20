@@ -79,7 +79,7 @@ class LuScriptIntegrator(object):
     def _build_file(self, luafiles):
         # 添加文件头
         llbc_file_path = op.join(Cfg.getscriptpath(), 'llbc.lua')
-        f = open(llbc_file_path, 'w')
+        f = open(llbc_file_path, 'wb')
         f.write('--[[\n')
         f.write('@file    llbc.lua\n')
         f.write('@author  {0}\n'.format(Cfg.getauthor()))

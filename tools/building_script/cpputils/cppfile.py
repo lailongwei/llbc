@@ -146,7 +146,7 @@ class CppFile(object):
         if macro:
             cnt += '#endif // !{0}\n\n'.format(macro)
 
-        with open(self.__fpath, 'w+') as f:
+        with open(self.__fpath, 'wb+') as f:
             f.write(cnt)
     # endregion
 
