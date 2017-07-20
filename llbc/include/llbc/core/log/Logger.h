@@ -108,6 +108,17 @@ public:
      */
     int Output(int level, const char *tag, const char *file, int line, const char *message, ...);
 
+    /**
+     * Like Output() method, but message is non-format message, use to improve performance.
+     * @param[in] level      - log level.
+     * @param[in] tag        - log tag, can set to NULL.
+     * @param[in] file       - log file name.
+     * @param[in] line       - log file line.
+     * @param[in] message    - message string, non-format.
+     * @param[in] messageLen - message string length, if -1, will auto calculate.
+     */
+    int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
+
 private:
     /**
      * Direct output message using given level.

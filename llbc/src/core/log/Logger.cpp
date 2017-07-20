@@ -258,6 +258,24 @@ int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, 
     return DirectOutput(level, tag, file, line, fmttedMsg, msgLen);
 }
 
+int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen)
+{
+    if (level < _logLevel)
+        return LLBC_OK;
+
+    if (UNLIKELY(message == NULL))
+        return DirectOutput(level, tag, file, line, NULL, 0);
+
+    if (messageLen < 0)
+        messageLen = LLBC_StrLenA(message);
+
+    char *copyMessage = LLBC_Malloc(char, messageLen + 1);
+    LLBC_MemCpy(copyMessage, message, messageLen);
+    copyMessage[messageLen] = '\0';
+
+    return DirectOutput(level, tag, file, line, copyMessage, messageLen);
+}
+
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
