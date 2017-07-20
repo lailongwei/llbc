@@ -124,7 +124,7 @@ class CppFile(object):
             incls = sorted(incls)
         for incl in incls:
             cnt += '#include "{0}"\n'.format(incl)
-        if self.__incls:
+        if incls:
             cnt += '\n'
 
         # Generate classes, functions and datas.
