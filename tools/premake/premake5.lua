@@ -674,25 +674,25 @@ project "lullbc"
     filter { "configurations:debug*", "system:windows" }
         links {
             "libllbc_debug",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua_debug",
+            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua_debug",
         }
     filter {}
     filter { "configurations:debug*", "system:not windows" }
         links {
             "llbc_debug",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua_debug",
+            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua_debug",
         }
     filter {}
     filter { "configurations:release*", "system:windows" }
         links {
             "libllbc",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua",
+            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua",
         }
     filter {}
     filter { "configurations:release*", "system:not windows" }
         links {
             "llbc",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua",
+            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua",
         }
     filter {}
 
