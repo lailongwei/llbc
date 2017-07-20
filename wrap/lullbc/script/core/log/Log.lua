@@ -153,14 +153,13 @@ end
 -- :param ...:    log message.
 -- :returns: no return.
 function Log.Output(level, logger, tag, ...)
-    msg = table.concat({...}, ' ')
     local file, line
     if Log.logFileInfo then
         local di = debug.getinfo(3, 'Sl')
         file, line = di.source, di.currentline
     end
 
-    _llbc.LogMsg(level, msg, logger, tag, file, line)
+    _llbc.LogMsg(level, logger, tag, file, line, ...)
 end
 
 -- Set Log table to llbc
