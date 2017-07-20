@@ -92,7 +92,7 @@ class CppFile(object):
     # endregion
 
     # region 构建
-    def build(self):
+    def build(self, sort_incl=True):
         """生成文件"""
         # Generate file head.
         now_date = strftime('%Y-%m-%d', localtime(time()))
@@ -119,7 +119,10 @@ class CppFile(object):
             macro = ''
 
         # Generate include stmts
-        for incl in self.__incls:
+        incls = self.__incls
+        if sort_incl:
+            incls = sorted(incls)
+        for incl in incls:
             cnt += '#include "{0}"\n'.format(incl)
         if self.__incls:
             cnt += '\n'
