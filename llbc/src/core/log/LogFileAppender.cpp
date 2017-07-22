@@ -25,9 +25,6 @@
 #include "llbc/core/log/LogFileAppender.h"
 
 __LLBC_INTERNAL_NS_BEGIN
-const static LLBC_NS LLBC_String __ClearOpenFlag = "wb";
-const static LLBC_NS LLBC_String __AppendOpenFlag = "ab";
-
 const static int __LogFileCheckInterval = 500;
 __LLBC_INTERNAL_NS_END
 
@@ -94,17 +91,32 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxFileSize = initInfo.maxFileSize > 0 ? initInfo.maxFileSize : LONG_MAX;
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
-    const sint64 now = LLBC_GetMilliSeconds();
-    const LLBC_String fileName = BuildLogFileName(now);
-    if (ReOpenFile(fileName, false) != LLBC_OK)
-        return LLBC_FAILED;
+    sint64 now = LLBC_GetMilliSeconds();
 
-    if (_fileSize >= _maxFileSize)
+    _file = LLBC_New(LLBC_File);
+    _fileName = BuildLogFileName(now);
+
+    LLBC_FileAttributes fileAttrs;
+    fileAttrs.fileSize = 0;
+    bool fileExists = LLBC_File::Exists(_fileName);
+    if (fileExists)
     {
-        BackupFiles();
-        if (ReOpenFile(fileName, true) != LLBC_OK)
+        if (LLBC_File::GetFileAttributes(_fileName, fileAttrs) != LLBC_OK)
             return LLBC_FAILED;
     }
+
+    bool reOpenClear = false;
+    int backupFilesCount = GetBackupFilesCount(_fileName);
+    if (fileExists &&
+        (fileAttrs.fileSize >= _maxFileSize ||
+            backupFilesCount < _maxBackupIndex))
+    {
+        BackupFiles();
+        reOpenClear = true;
+    }
+
+    if (ReOpenFile(_fileName, reOpenClear) != LLBC_OK)
+        return LLBC_FAILED;
 
     _nonFlushLogCount = 0;
     _logfileLastCheckTime = now;
@@ -232,7 +244,6 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
                                             bool &clear,
                                             bool &backup) const
 {
-
     if (_fileSize >= _maxFileSize)
     {
         clear = true;
@@ -240,7 +251,8 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
 
         return true;
     }
-    else if (::memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
+    else if (newFileName.size() != _fileName.size() ||
+            ::memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
     {
         clear = false;
         backup = false;
@@ -335,6 +347,21 @@ void LLBC_LogFileAppender::UpdateFileBufferInfo()
         _file->SetBufferMode(LLBC_FileBufferMode::NoBuf, 0);
     else
         _file->SetBufferMode(LLBC_FileBufferMode::FullBuf, _fileBufferSize);
+}
+
+int LLBC_LogFileAppender::GetBackupFilesCount(const LLBC_String &logFileName) const
+{
+    int backupFilesCount = 0;
+    for (int i = 1; i <= _maxBackupIndex; i++)
+    {
+        const LLBC_String bkLogFileName = LLBC_String().format("%s.%d", logFileName.c_str(), i);
+        if (!LLBC_File::Exists(bkLogFileName))
+            break;
+
+        backupFilesCount += 1;
+    }
+
+    return backupFilesCount;
 }
 
 __LLBC_NS_END

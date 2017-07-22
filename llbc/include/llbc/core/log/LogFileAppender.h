@@ -110,6 +110,11 @@ private:
      */
     void UpdateFileBufferInfo();
 
+    /**
+     * Get backup files count, if failed, return -1.
+     */
+    int GetBackupFilesCount(const LLBC_String &logFileName) const;
+
 private:
     LLBC_String _baseName;
     LLBC_String _basePath;
