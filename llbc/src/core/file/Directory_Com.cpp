@@ -65,7 +65,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
 
     for (size_t i = 0; i < sepPoses.size(); i++)
     {
-        const LLBC_String toPath = path.substr(0, sepPoses[i]);
+        const LLBC_String toPath = path.substr(0, sepPoses[i] + 1);
         if (Exists(toPath))
             continue;
 
