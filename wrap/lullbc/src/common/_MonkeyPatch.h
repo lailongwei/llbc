@@ -42,7 +42,15 @@ LULLBC_LUA_METH int _lullbc_MonkeyPatchImpl_Table_Concat(lua_State *l)
     return 1;
 }
 
+// Api: MonkeyPatchImpl_ToPointer
+LULLBC_LUA_METH int _lullbc_MonkeyPatchImpl_ToPointer(lua_State *l)
+{
+    lua_pushinteger(l, reinterpret_cast<lua_Integer>(lua_topointer(l, 1)));
+    return 1;
+}
+
 static int _lullbc_MonkeyPatch_Table(lua_State *l);
+static int _lullbc_MonkeyPatch_ToPointer(lua_State *l);
 
 // Api: MonkeyPatch
 // Brief: Perform monkey patch.
@@ -55,11 +63,14 @@ LULLBC_LUA_METH int _lullbc_MonkeyPatch(lua_State *l)
     if (patchType == -1)
     {
         _lullbc_MonkeyPatch_Table(l);
+        _lullbc_MonkeyPatch_ToPointer(l);
     }
     else
     {
         if (patchType == lullbc_MonkeyPatchType::Table)
             _lullbc_MonkeyPatch_Table(l);
+        else if (patchType == lullbc_MonkeyPatchType::ToPointer)
+            _lullbc_MonkeyPatch_ToPointer(l);
         else
             lullbc_SetError(l, "Unknown monkey patch type %d", patchType);
     }
@@ -77,6 +88,19 @@ static int _lullbc_MonkeyPatch_Table(lua_State *l)
     // Patch table.concat.
     lua_pushcfunction(l, _lullbc_MonkeyPatchImpl_Table_Concat);
     lua_setfield(l, -2, "concat");
+
+    lua_pop(l, 1);
+
+    return 0;
+}
+
+// Api(Internal): Patch _G, add topointer function.
+static int _lullbc_MonkeyPatch_ToPointer(lua_State *l)
+{
+    lua_getglobal(l, "_G");
+
+    lua_pushcfunction(l, _lullbc_MonkeyPatchImpl_ToPointer);
+    lua_setfield(l, -2, "topointer");
 
     lua_pop(l, 1);
 

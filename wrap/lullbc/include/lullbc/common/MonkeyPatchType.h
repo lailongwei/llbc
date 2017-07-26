@@ -24,6 +24,9 @@ public:
         // 1. patch table.concat, after patch, table.concat can concat any implemented __tostring methods object.
         Table = Begin,
 
+        // Patch _G, add topointer method.
+        ToPointer,
+
         End
     };
 };

@@ -22,9 +22,10 @@
 
 static luaL_Reg lullbc_NativeMethods[] = {
     {"Dir_Create", _lullbc_Dir_Create},
-    {"Dir_Remove", _lullbc_Dir_Remove},
+    {"MonkeyPatchImpl_ToPointer", _lullbc_MonkeyPatchImpl_ToPointer},
     {"SetLibConfigToLua", _lullbc_SetLibConfigToLua},
     {"GetVersionInfo", _lullbc_GetVersionInfo},
+    {"Dir_Remove", _lullbc_Dir_Remove},
     {"MonkeyPatchImpl_Table_Concat", _lullbc_MonkeyPatchImpl_Table_Concat},
     {"LogMsg", _lullbc_LogMsg},
     {"Cleanup", _lullbc_Cleanup},

@@ -10,6 +10,7 @@ llbc = require 'llbc'
 
 -- Import all common module testcases.
 local TestCase_Com_VerInfo = require 'common.TestCase_Com_VerInfo'
+local TestCase_Com_ObjectOriented = require 'common.TestCase_Com_ObjectOriented'
 -- Import all core module testcases.
 local TestCase_Core_Log = require 'core.log.TestCase_Core_Log'
 local TestCase_Core_Utils_Util_Table = require 'core.utils.TestCase_Core_Utils_Util_Table'
@@ -22,6 +23,7 @@ local function Main(...)
 
     -- All common module testcases.
     TestCase_Com_VerInfo.Run(...)
+    -- TestCase_Com_ObjectOriented.Run(...)
 
     -- All core module testcases...
     -- TestCase_Core_Log.Run(...)
