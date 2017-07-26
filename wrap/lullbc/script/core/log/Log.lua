@@ -12,8 +12,10 @@ Log.WARN = 2
 Log.ERROR = 3
 Log.FATAL = 4
 
--- Define logFileInfo to control output message included file&line information or not, default is false.
+-- logFileInfo: to control output message included file&line information or not, default is false.
 Log.logFileInfo = false
+-- defaultLogTag: use to fill <tag> param on output message, can set to string or function, default is nil.
+Log.defaultLogTag = nil
 
 -- Initialize Log component.
 -- :param[required] cfgFile:     log init config file.
@@ -158,6 +160,18 @@ function Log.Output(level, logger, tag, ...)
         local di = debug.getinfo(3, 'Sl')
         file, line = di.source, di.currentline
     end
+
+    if tag == nil then
+        local defaultLogTag = Log.defaultLogTag
+        if defaultLogTag ~= nil then
+            if type(defaultLogTag) == 'function' then
+                tag = defaultLogTag()
+            else
+                tag = defaultLogTag
+            end
+        end
+    end
+
 
     if level >= 3 then -- For improve Log performance, explicit use Log Level value to perform if condition judge.
         local logMsg = _llbc.MonkeyPatchImpl_Table_Concat({...}, ' ')
