@@ -5,4 +5,8 @@
 # Version: 1.0.1
 #
 # 2017/07/18
-# 1) 新增lullbc初始化支持,当前支持GetVersionInfo及Log组件的完整支持
+# 1) 新增lullbc初始化支持,当前支持GetVersionInfo及Log组件的完整支持;
+#
+# 2017/07/26
+# 1) 增加面向对象支持, 使用llbc.newclass(classname, super)完成class创建, 使用llbc.iskindof(obj, class)完成对象所属确认;
+# 2) 增加GUID支持, 如果需要生成GUID, 使用llbc.GUID.generate()完成;
