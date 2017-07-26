@@ -18,6 +18,7 @@
 #include "src/common/_MonkeyPatch.h"
 #include "src/common/_VerInfo.h"
 #include "src/core/file/_Dir.h"
+#include "src/core/helper/_GUIDHelper.h"
 #include "src/core/log/_Log.h"
 
 static luaL_Reg lullbc_NativeMethods[] = {
@@ -30,6 +31,7 @@ static luaL_Reg lullbc_NativeMethods[] = {
     {"LogMsg", _lullbc_LogMsg},
     {"Cleanup", _lullbc_Cleanup},
     {"Startup", _lullbc_Startup},
+    {"GUID_Generate", _lullbc_GUID_Generate},
     {"InitLog", _lullbc_InitLog},
     {"MonkeyPatch", _lullbc_MonkeyPatch},
     {"Dir_AbsPath", _lullbc_Dir_AbsPath},

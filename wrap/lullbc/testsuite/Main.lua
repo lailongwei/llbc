@@ -13,6 +13,7 @@ local TestCase_Com_VerInfo = require 'common.TestCase_Com_VerInfo'
 local TestCase_Com_ObjectOriented = require 'common.TestCase_Com_ObjectOriented'
 -- Import all core module testcases.
 local TestCase_Core_Log = require 'core.log.TestCase_Core_Log'
+local TestCase_Core_Helper_GUID= require 'core.helper.TestCase_Core_Helper_GUID'
 local TestCase_Core_Utils_Util_Table = require 'core.utils.TestCase_Core_Utils_Util_Table'
 -- Import all communication module testcases.
 -- ... ...
@@ -27,6 +28,7 @@ local function Main(...)
 
     -- All core module testcases...
     -- TestCase_Core_Log.Run(...)
+    -- TestCase_Core_Helper_GUID.Run(...)
     -- TestCase_Core_Utils_Util_Table.Run(...)
 
     -- All communication module testcases...
