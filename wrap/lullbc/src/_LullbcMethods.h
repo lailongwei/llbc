@@ -17,16 +17,23 @@
 #include "src/common/_Config.h"
 #include "src/common/_MonkeyPatch.h"
 #include "src/common/_VerInfo.h"
+#include "src/core/file/_Dir.h"
 #include "src/core/log/_Log.h"
 
 static luaL_Reg lullbc_NativeMethods[] = {
-    {"Cleanup", _lullbc_Cleanup},
-    {"Startup", _lullbc_Startup},
+    {"Dir_Create", _lullbc_Dir_Create},
+    {"Dir_Remove", _lullbc_Dir_Remove},
     {"SetLibConfigToLua", _lullbc_SetLibConfigToLua},
     {"GetVersionInfo", _lullbc_GetVersionInfo},
-    {"MonkeyPatch", _lullbc_MonkeyPatch},
-    {"InitLog", _lullbc_InitLog},
+    {"MonkeyPatchImpl_Table_Concat", _lullbc_MonkeyPatchImpl_Table_Concat},
     {"LogMsg", _lullbc_LogMsg},
+    {"Cleanup", _lullbc_Cleanup},
+    {"Startup", _lullbc_Startup},
+    {"InitLog", _lullbc_InitLog},
+    {"MonkeyPatch", _lullbc_MonkeyPatch},
+    {"Dir_AbsPath", _lullbc_Dir_AbsPath},
+    {"Dir_Join", _lullbc_Dir_Join},
+    {"Dir_IsDir", _lullbc_Dir_IsDir},
     {NULL, NULL}
 };
 #endif // !__LULLBC_AUTOGEN_SRC__LULLBCMETHODS_H__

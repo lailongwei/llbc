@@ -270,10 +270,10 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
         messageLen = LLBC_StrLenA(message);
 
     char *copyMessage = LLBC_Malloc(char, messageLen + 1);
-    LLBC_MemCpy(copyMessage, message, static_cast<int>(messageLen));
+    LLBC_MemCpy(copyMessage, message, messageLen);
     copyMessage[messageLen] = '\0';
 
-    return DirectOutput(level, tag, file, line, copyMessage, messageLen);
+    return DirectOutput(level, tag, file, line, copyMessage, static_cast<int>(messageLen));
 }
 
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 

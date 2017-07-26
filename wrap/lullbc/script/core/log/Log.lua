@@ -159,7 +159,13 @@ function Log.Output(level, logger, tag, ...)
         file, line = di.source, di.currentline
     end
 
-    _llbc.LogMsg(level, logger, tag, file, line, ...)
+    if level >= 3 then -- For improve Log performance, explicit use Log Level value to perform if condition judge.
+        local logMsg = _llbc.MonkeyPatchImpl_Table_Concat({...}, ' ')
+        local logMsgAppendedTb = debug.traceback(logMsg, 3)
+        _llbc.LogMsg(level, logger, tag, file, line, logMsgAppendedTb)
+    else
+        _llbc.LogMsg(level, logger, tag, file, line, ...)
+    end
 end
 
 -- Set Log table to llbc

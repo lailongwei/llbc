@@ -13,8 +13,36 @@
 #include "lullbc/common/Errors.h"
 #include "lullbc/common/MonkeyPatchType.h"
 
+// Api: MonkeyPatchImpl_Table_Concat
+LULLBC_LUA_METH int _lullbc_MonkeyPatchImpl_Table_Concat(lua_State *l)
+{
+    luaL_checktype(l, 1, LUA_TTABLE);
+    luaL_checktype(l, 2, LUA_TSTRING);
+
+    size_t fmtStrLen;
+    const char *fmtStr = lua_tolstring(l, 2, &fmtStrLen);
+
+    LLBC_String concatResult;
+    size_t tableLen = lua_objlen(l, 1);
+    for (size_t i = 1; i <= tableLen; i++)
+    {
+        lua_geti(l, 1, i);
+
+        size_t len;
+        const char *str = luaL_tolstring(l, -1, &len);
+        if (i > 0)
+            concatResult.append(fmtStr, fmtStrLen);
+        concatResult.append(str, len);
+
+        lua_pop(l, 2);
+    }
+
+    lua_pushlstring(l, concatResult.data(), concatResult.size());
+
+    return 1;
+}
+
 static int _lullbc_MonkeyPatch_Table(lua_State *l);
-static int _lullbc_MonkeyPatchImpl_Table_Concat(lua_State *l);
 
 // Api: MonkeyPatch
 // Brief: Perform monkey patch.
@@ -55,31 +83,3 @@ static int _lullbc_MonkeyPatch_Table(lua_State *l)
     return 0;
 }
 
-// Api(Internal): Patch table.concat implement.
-static int _lullbc_MonkeyPatchImpl_Table_Concat(lua_State *l)
-{
-    luaL_checktype(l, 1, LUA_TTABLE);
-    luaL_checktype(l, 2, LUA_TSTRING);
-
-    size_t fmtStrLen;
-    const char *fmtStr = lua_tolstring(l, 2, &fmtStrLen);
-
-    LLBC_String concatResult;
-    size_t tableLen = lua_objlen(l, 1);
-    for (size_t i = 1; i <= tableLen; i++)
-    {
-        lua_geti(l, 1, i);
-
-        size_t len;
-        const char *str = luaL_tolstring(l, -1, &len);
-        if (i > 0)
-            concatResult.append(fmtStr, fmtStrLen);
-        concatResult.append(str, len);
-
-        lua_pop(l, 2);
-    }
-
-    lua_pushlstring(l, concatResult.data(), concatResult.size());
-
-    return 1;
-}
