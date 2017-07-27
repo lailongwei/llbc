@@ -11,3 +11,7 @@
 function llbc.MonkeyPatch()
     _llbc.MonkeyPatch(-1)
 end
+
+-- Set topointer method to llbc.topointer.
+llbc.topointer = _llbc.MonkeyPatchImpl_ToPointer
+
