@@ -65,16 +65,7 @@ void LLBC_LogRunnable::Svc()
     LLBC_MessageBlock *block = NULL;
     while (LIKELY(!_stoped))
     {
-        if (TimedPop(block, 50) != LLBC_OK)
-            continue;
-
-        block->Read(&logData, sizeof(LLBC_LogData *));
-
-        Output(logData);
-        FreeLogData(logData);
-
-        delete block;
-
+        // Flush all appenders(cycle config: flushInterval)
         sint64 now = LLBC_GetMilliSeconds();
         sint64 diff = now - _lastFlushTime;
         if (diff < 0 || diff >= _flushInterval)
@@ -88,6 +79,18 @@ void LLBC_LogRunnable::Svc()
 
             _lastFlushTime = now;
         }
+
+        // Try pop log message to output.
+        if (TimedPop(block, 50) != LLBC_OK)
+            continue;
+
+        block->Read(&logData, sizeof(LLBC_LogData *));
+
+        Output(logData);
+        FreeLogData(logData);
+
+        delete block;
+
     }
 }
 
