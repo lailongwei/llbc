@@ -56,17 +56,26 @@ workspace ("llbc_" .. _ACTION)
             "-ggdb -g",
         }
     filter {}
+    filter { "configurations:debug*", "language:c++", "system:windows" }
+        runtime "Debug"
+        optimize "Debug"
+    filter {}
     filter { "configurations:debug*", "language:not c++" }
         optimize "Debug"
     filter {}
     filter { "configurations:release*" }
-        optimize "On"
+        optimize "Speed"
     filter {}
 
     -- charactersetarchitecture
     filter { "language:c++" }
         characterset "MBCS"
     filter {}
+
+    -- special buildoptions
+    -- filter { "system:windows", "language:c++" }
+    --     flags "StaticRuntime"
+    -- filter {}
 
 -- ****************************************************************************
 -- llbc core library compile setting
@@ -89,7 +98,6 @@ project "llbc"
     -- includedirs
     filter {}
     includedirs {
-        ZLIB_LIB .. "/include",
         "../../llbc/include",
     }
 
@@ -98,42 +106,16 @@ project "llbc"
 
     -- links
     filter { "system:linux" }
-        libdirs {
-            ZLIB_LIB .. "/lib/linux"
-        }
         links {
             "rt",
             "uuid",
         }
 
     filter { "system:windows" }
-        libdirs {
-            ZLIB_LIB .. "/lib/win"
-        }
         links {
             "ws2_32",
             "Mswsock",
         }
-    filter { "system:windows", "configurations:debug*", "architecture:x86" }
-        links {
-            "zlibwapi_debug",
-        }
-    filter {}
-    filter { "system:windows", "configurations:release*", "architecture:x86" }
-        links {
-            "zlibwapi",
-        }
-    filter {}
-    filter { "system:windows", "configurations:debug*", "architecture:x64" }
-        links {
-            "zlibwapi_debug_64",
-        }
-    filter {}
-    filter { "system:windows", "configurations:release*", "architecture:x64" }
-        links {
-            "zlibwapi_64",
-        }
-    filter {}
 
     filter { "system:macosx" }
         links {

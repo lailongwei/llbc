@@ -95,8 +95,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("  sampler support: %s\n", LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT ? "true" : "false");
 
     // Append third-party info.
-    desc.append_format("3rd party info: \n");
-    desc.append_format("  zlib version: %s(ver-num:%d)\n", ZLIB_VERSION, ZLIB_VERNUM);
+    // desc.append_format("3rd party info: \n");
+    // desc.append_format("  zlib version: %s(ver-num:%d)\n", ZLIB_VERSION, ZLIB_VERNUM);
 
     return desc;
 }
