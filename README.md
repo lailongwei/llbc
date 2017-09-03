@@ -1,8 +1,9 @@
 ## llbc
 Low Level Base Compoment
 
-llbc为一套轻量级的跨平台基础开发库,提供了跨平台开发中的所有基础支持(包括字符串处理,日志,线程,配置,Timer,ObjRef,网络及其它所有基础支持),在最顶层,llbc使用Service的概念将这些所有支持以compoments的方式集成,也就意味着,在开发你的应用的时候,只需要一个Service就拥有所有你需要的功能.  
-llbc是一个低调的库, 但...你开心就好, QQ交流群: 662590231.  
+llbc为一个精简、功能完整、多语言支持的服务端开发框架，面向Service及Facade，底层c++实现。  
+QQ交流群：662590231  
+手册：[简书--llbc 手册](http://www.jianshu.com/p/ab225bd56779)   
 
 ## 支持语言：
 **c/c++**：完整支持, 并经过反复测试及线上使用  
