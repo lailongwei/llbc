@@ -62,12 +62,12 @@ private:
      */
     int DetermineLogTextColor(int logLv);
 #else
-	/**
+    /**
      * Determine the log text output color, only available in Unix-like platform.
      * @param[in] logLv - the log level.
      * @return const char* - the output color.
      */
-	const char *DetermineAnsiTextColor(int logLv);
+    const char *DetermineAnsiTextColor(int logLv);
 #endif
 
 private:
