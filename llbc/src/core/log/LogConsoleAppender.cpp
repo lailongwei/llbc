@@ -23,7 +23,7 @@ namespace
 }
 
 //https://en.wikipedia.org/wiki/ANSI_escape_code
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
 namespace __AnsiColor
 {
     const char* Fg_Hightlight_Yellow = "\x1B[93m";
@@ -81,7 +81,13 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     LLBC_String formattedData;
     chain->Format(data, formattedData);
 
-#if LLBC_TARGET_PLATFORM_WIN32
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    const char *outputColor = NULL;
+    if (_colourfulOutput && (outputColor = DetermineAnsiTextColor(logLevel)) != NULL)
+        LLBC_FilePrint(out, "%s%s%s", outputColor, formattedData.c_str(), __AnsiColor::Reset);
+    else
+        LLBC_FilePrint(out, "%s", formattedData.c_str());
+#else
     int oldOutputColor = 0;
     if (_colourfulOutput)
     {
@@ -92,12 +98,6 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     }
 
     LLBC_FilePrint(out, "%s", formattedData.c_str());
-#else
-    const char *outputColor = NULL;
-    if (_colourfulOutput && (outputColor = DetermineAnsiTextColor(logLevel)) != NULL)
-        LLBC_FilePrint(out, "%s%s%s", outputColor, formattedData.c_str(), __AnsiColor::Reset);
-    else
-        LLBC_FilePrint(out, "%s", formattedData.c_str());
 #endif
 
 #if LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE
@@ -105,7 +105,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
         LLBC_FlushFile(stdout);
 #endif
 
-#if LLBC_TARGET_PLATFORM_WIN32
+#if !(LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC)
     if (_colourfulOutput)
         LLBC_SetConsoleColor(out, oldOutputColor);
 #endif
@@ -113,20 +113,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     return LLBC_OK;
 }
 
-#if LLBC_TARGET_PLATFORM_WIN32
-int LLBC_LogConsoleAppender::DetermineLogTextColor(int logLv)
-{
-    typedef LLBC_ConsoleColor _CC;
-
-    if (logLv == _LogLevel::Warn)
-        return _CC::Bg_Black | _CC::Fg_Yellow | _CC::Highlight_Fg;
-    else if (logLv == _LogLevel::Error ||
-        logLv == _LogLevel::Fatal)
-        return _CC::Bg_Black | _CC::Fg_Red | _CC::Highlight_Fg;
-    else
-        return _CC::Bg_Black | _CC::Fg_White;
-}
-#else
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
 const char *LLBC_LogConsoleAppender::DetermineAnsiTextColor(int logLv)
 {
     switch (logLv)
@@ -139,6 +126,19 @@ const char *LLBC_LogConsoleAppender::DetermineAnsiTextColor(int logLv)
     default:
         return NULL;
     }
+}
+#else
+int LLBC_LogConsoleAppender::DetermineLogTextColor(int logLv)
+{
+    typedef LLBC_ConsoleColor _CC;
+
+    if (logLv == _LogLevel::Warn)
+        return _CC::Bg_Black | _CC::Fg_Yellow | _CC::Highlight_Fg;
+    else if (logLv == _LogLevel::Error ||
+        logLv == _LogLevel::Fatal)
+        return _CC::Bg_Black | _CC::Fg_Red | _CC::Highlight_Fg;
+    else
+        return _CC::Bg_Black | _CC::Fg_White;
 }
 #endif
 

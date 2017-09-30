@@ -54,20 +54,20 @@ public:
     virtual int Output(const LLBC_LogData &data);
 
 private:
-#if LLBC_TARGET_PLATFORM_WIN32
-    /**
-     * Determine the log text output color, only available in WIN platform.
-     * @param[in] logLv - the log level.
-     * @return int - the output color.
-     */
-    int DetermineLogTextColor(int logLv);
-#else
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     /**
      * Determine the log text output color, only available in Unix-like platform.
      * @param[in] logLv - the log level.
      * @return const char* - the output color.
      */
     const char *DetermineAnsiTextColor(int logLv);
+#else
+    /**
+     * Determine the log text output color, only available in WIN platform.
+     * @param[in] logLv - the log level.
+     * @return int - the output color.
+     */
+    int DetermineLogTextColor(int logLv);
 #endif
 
 private:
