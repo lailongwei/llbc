@@ -3,10 +3,18 @@
 @brief  monkey patch functions implementation.
 --]]
 
+-- Store all classes(class name -> class definition)
+local _classes = {}
+
 -- Create new class
 -- :param[required] className: the class name.
 -- :param[optional] super:     super class, can set to function or table.
+-- :returns: the new class object.
 function llbc.newclass(className, super)
+    if _classes[className] then
+        error(string.format("Cloud not repeat to create class '%s'", className))
+    end
+
     local cls, clsmt
     if super then
         clsmt = {__index = super}
@@ -31,17 +39,26 @@ function llbc.newclass(className, super)
     end
 
     if not rawget(cls, '__tostring') then
-        cls.__tostring = function (instance)
+        rawset(cls, '__tostring', function (instance)
             return string.format('<%s object at %x>', className, _llbc.MonkeyPatchImpl_ToPointer(instance))
-        end
+        end)
     end
 
+    rawset(_classes, className, cls)
     return cls
 end
 
+-- Get class by class name.
+-- :param[required] className: the class name.
+-- :returns: the class object or nil.
+function llbc.getclass(className)
+    return _classes[className]
+end
+
 -- Check given object is kind of class.
--- :param[required] obj: given object.
--- :param[
+-- :param[required] obj:              given object.
+-- :param[required] classOrClassName: the class object or class name.
+-- :returns: true if obj is kind of specified class or class name, otherwise return false.
 function llbc.iskindof(obj, classOrClassName)
     if type(obj) ~= 'table' then
         return false

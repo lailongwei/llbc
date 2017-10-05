@@ -3,6 +3,13 @@
 ######################################################################################
 #
 # Version: 1.0.1
+#
+# 2017/10/05
+# 新增功能：
+# 1) 【lullbc】完善lullbc中的ObjectOriented实现，增加getclass(className)接口，以支持按类名索引类.
+# 2) 【lullbc】llbc.newclass(className, super)接口增加创建相同类名检测，当创建相同类名时，直接error().
+# 3) 【llbc all】llbc Log组件整体增加linux&mac平台的console colourful output支持.
+#
 # 2017/07/22
 # 1) Log增加每次Init时，尽量backup log file的操作，以确保每次启动应用时日志输出到一个全新的文件中.
 #

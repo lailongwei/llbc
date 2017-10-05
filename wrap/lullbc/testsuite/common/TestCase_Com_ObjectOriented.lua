@@ -1,6 +1,7 @@
 local TestCase = {}
 
 -- Create class: Foo
+print('Try to create class \'Foo\'')
 local Foo = llbc.newclass('Foo')
 
 function Foo:ctor(...)
@@ -16,6 +17,7 @@ function Foo:Sleep()
 end
 
 -- Create class: Goo, inherited from 'Foo'
+print('Try to create class \'Goo\', inherit from \'Foo\'')
 local Goo = llbc.newclass('Goo', Foo)
 
 function Goo:ctor(...)
@@ -27,10 +29,25 @@ function Goo:Say()
     print('Goo:Say():', self)
 end
 
+-- Try repeat create class: GooToo, inherited from 'Foo'
+print('Try create GooToo class, name is \'Goo\'')
+local succ, GooToo = pcall(llbc.newclass, 'Goo', Foo)
+if succ then
+    error('Test failed, please check object oriented about code')
+else
+    print('Yep, llbc library not allow user to create same name classes in the same lua vm')
+    print(string.format('Create \'GooToo\' return message: %s', GooToo))
+end
+
 function TestCase.Run()
     print('ObjectOriented test:')
     print('Foo class string repr:', Foo)
     print('Goo class(inherited from Foo) string repr: ', Goo)
+
+    local FooToo = llbc.getclass('Foo')
+    print('Call llbc.getclass(\'Foo\') return: ', FooToo)
+    local GooToo = llbc.getclass('Goo')
+    print('Call llbc.getclass(\'Goo\') return: ', GooToo)
 
     print('Create Foo objects: foo1, foo2:')
     local foo1 = Foo.new()

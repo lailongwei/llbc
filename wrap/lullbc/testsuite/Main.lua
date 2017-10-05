@@ -4,8 +4,9 @@
             if you want to run the testsuite, please lua executable/library files and lullbc library files to this file directory.
 --]]
 
--- Import lullbc library(set to _G), default test use release version library, if you
--- want to use debug version library to run testsuite, please changed to `llbc = require 'llbc_debug'`
+-- Import lullbc library(set to _G), default test use release version
+-- library, if you want to use debug version library to run testsuite, 
+-- !!!!!!!!please changed to `llbc = require 'llbc_debug'`!!!!!!!!
 llbc = require 'llbc'
 
 -- Import all common module testcases.

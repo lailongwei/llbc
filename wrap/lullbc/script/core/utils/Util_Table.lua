@@ -19,7 +19,7 @@ function llbc.SetTableReadOnly(t, promptMsg)
                 string.len(promptMsg) > 0 then
             error(promptMsg)
         else
-            error("Could not change readonly table!")
+            error("Could not change readonly table")
         end
     end
 end
