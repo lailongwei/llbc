@@ -231,6 +231,8 @@ project "pyllbc"
     files {
         "../../wrap/pyllbc/**.h",
         "../../wrap/pyllbc/**.cpp",
+
+        "../../wrap/pyllbc/script/**.py",
     }
 
     -- includedirs
