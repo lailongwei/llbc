@@ -21,7 +21,7 @@ def main():
         target = op.join(target_path, 'llbc_debug.lua')
 
     print 'Copy [{0}] to [{1}]...'.format(src, target)
-    shutil.copyfile(src, target)
+    shutil.move(src, target)
 
     print 'Done!'
 
