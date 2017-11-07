@@ -31,7 +31,9 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_LogFileAppender::LLBC_LogFileAppender()
-: _baseName()
+: _basePath()
+, _baseName()
+, _fileSuffix()
 
 , _fileBufferSize(0)
 , _isDailyRolling(true)
@@ -71,6 +73,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     }
 
     _baseName = initInfo.file;
+    _fileSuffix = initInfo.fileSuffix;
     LLBC_String logDir = LLBC_Directory::DirName(_baseName);
 
     if (initInfo.forceAppLogPath)
@@ -126,7 +129,9 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
 void LLBC_LogFileAppender::Finalize()
 {
+    _basePath.clear();
     _baseName.clear();
+    _fileSuffix.clear();
 
     _fileBufferSize = 0;
     _isDailyRolling = false;
@@ -235,6 +240,9 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 
         logFile.append_format(".%s", timeFmtBuf);
     }
+
+    if (!_fileSuffix.empty())
+        logFile.append(_fileSuffix);
 
     return logFile;
 }

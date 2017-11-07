@@ -1,13 +1,13 @@
 /**
- * @file    LogConfigInfo.h
+ * @file    LoggerConfigInfo.h
  * @author  Longwei Lai<lailongwei@126.com>
  * @date    2013/06/11
  * @version 1.0
  *
  * @brief
  */
-#ifndef __LLBC_CORE_LOG_LOG_CONFIG_INFO_H__
-#define __LLBC_CORE_LOG_LOG_CONFIG_INFO_H__
+#ifndef __LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
+#define __LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
 
 #include "llbc/common/Common.h"
 
@@ -109,10 +109,22 @@ public:
     const LLBC_String &GetLogFile() const;
 
     /**
+     * Get log file suffix.
+     * @return const LLBC_String & - log file suffix.
+     */
+    const LLBC_String &GetLogFileSuffix() const;
+
+    /**
+     * Get log file path or not, when log code file name(%f).
+     * @return bool - log file path flag, if true, log file path, otherwise only log file name.
+     */
+    bool IsLogCodeFilePath() const;
+
+    /**
      * Get force application log path flag
      * @return const bool - log path flag
      */
-    const bool GetForceAppLogPath() const;
+    bool IsForceAppLogPath() const;
 
     /**
      * Get daily rolling mode switch(available in file appender).
@@ -169,6 +181,8 @@ private:
     bool _logToFile;
     int _fileLogLevel;
     LLBC_String _logFile;
+    LLBC_String _logFileSuffix;
+    bool _logCodeFilePath;
     bool _forceAppLogPath;
     LLBC_String _filePattern;
     bool _dailyMode;
@@ -181,4 +195,6 @@ private:
 
 __LLBC_NS_END
 
-#endif // !__LLBC_CORE_LOG_LOG_CONFIG_INFO_H__
+#include "llbc/core/log/LoggerConfigInfoImpl.h"
+
+#endif // !__LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__

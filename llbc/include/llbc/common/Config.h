@@ -80,8 +80,12 @@
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE                    0
 // Default log file name.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME                  "llbc.log"
+// Default log file suffix.
+#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX                ""
 // Default force application log path
 #define LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH             false
+// Default log code file path control config
+#define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             true
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default is daily rolling mode.

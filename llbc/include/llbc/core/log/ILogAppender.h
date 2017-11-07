@@ -55,6 +55,7 @@ struct LLBC_LogAppenderInitInfo
     bool colourfulOutput;           // colourful output flag.
 
     LLBC_String file;               // file name, used File type appender.
+    LLBC_String fileSuffix;         // file suffix name, used File t ype appender.
     bool forceAppLogPath;           // force use application path to be coming for log file base path.
     bool dailyRolling;              // daily rolling mode flag, used in File type appender.
     long maxFileSize;               // max log file size, int bytes, used in File type appender.

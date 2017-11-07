@@ -98,7 +98,8 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         appenderInitInfo.level = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
         appenderInitInfo.file = _config->GetLogFile();
-        appenderInitInfo.forceAppLogPath = _config->GetForceAppLogPath();
+        appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
+        appenderInitInfo.forceAppLogPath = _config->IsForceAppLogPath();
         appenderInitInfo.dailyRolling = _config->IsDailyRollingMode();
         appenderInitInfo.maxFileSize = _config->GetMaxFileSize();
         appenderInitInfo.maxBackupIndex = _config->GetMaxBackupIndex();
@@ -308,7 +309,38 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->loggerName = _name.c_str();
 
     data->tagLen = tag ? LLBC_StrLenA(tag) : 0;
-    data->fileLen = file ? LLBC_StrLenA(file) : 0;
+
+    if (file)
+    {
+        data->fileLen = LLBC_StrLenA(file);
+        if (!_config->IsLogCodeFilePath())
+        {
+#if LLBC_TARGET_PLATFORM_WIN32
+            const char *ps = strrchr(file, '\\');
+#else // Non-Win32
+            const char *ps = strrchr(file, '/');
+#endif // Win32
+            if (ps != NULL)
+            {
+                data->fileLen -= (static_cast<uint32>(ps - file) + 1);
+                file = ps + 1;
+            }
+#if LLBC_TARGET_PLATFORM_WIN32 // In Win32 platform, search '/' again
+            else
+            {
+                if ((ps = strrchr(file, '/')) != NULL)
+                {
+                    data->fileLen -= (static_cast<uint32>(ps - file) + 1);
+                    file = ps + 1;
+                }
+            }
+#endif // Win32
+        }
+    }
+    else
+    {
+        data->fileLen = 0;
+    }
 
     data->tagBeg = 0;
     data->fileBeg = data->tagLen;

@@ -33,6 +33,8 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _logToFile(false)
 , _fileLogLevel(LLBC_LogLevel::End)
 , _logFile()
+, _logFileSuffix()
+, _logCodeFilePath(true)
 , _forceAppLogPath(false)
 , _filePattern()
 , _dailyMode(true)
@@ -65,7 +67,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     _logToFile = (cfg.HasProperty("logToFile") ? cfg.GetValue("logToFile").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
     _fileLogLevel = (cfg.HasProperty("fileLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsCStr()) : _logLevel);
     _logFile = (cfg.HasProperty("logFile") ? cfg.GetValue("logFile").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
+    _logFileSuffix = (cfg.HasProperty("logFileSuffix") ? cfg.GetValue("logFileSuffix").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX);
     _forceAppLogPath = (cfg.HasProperty("forceAppLogPath") ? cfg.GetValue("forceAppLogPath").AsBool() : LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH);
+    _logCodeFilePath = (cfg.HasProperty("logCodeFilePath") ? cfg.GetValue("logCodeFilePath").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH);
     _filePattern = (cfg.HasProperty("filePattern") ? cfg.GetValue("filePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     _dailyMode = (cfg.HasProperty("dailyRollingMode") ? cfg.GetValue("dailyRollingMode").AsBool() : LLBC_CFG_LOG_DEFAULT_DAILY_MODE);
     _maxFileSize = (cfg.HasProperty("maxFileSize") ? cfg.GetValue("maxFileSize").AsLong() : LLBC_CFG_LOG_MAX_FILE_SIZE);
@@ -96,91 +100,6 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     NormalizeLogFileName();
 
     return LLBC_OK;
-}
-
-int LLBC_LoggerConfigInfo::GetLogLevel() const
-{
-    return _logLevel;
-}
-
-bool LLBC_LoggerConfigInfo::IsAsyncMode() const
-{
-    return _asyncMode;
-}
-
-int LLBC_LoggerConfigInfo::GetFlushInterval() const
-{
-    return _flushInterval;
-}
-
-bool LLBC_LoggerConfigInfo::IsLogToConsole() const
-{
-    return _logToConsole;
-}
-
-int LLBC_LoggerConfigInfo::GetConsoleLogLevel() const
-{
-    return _consoleLogLevel;
-}
-
-const LLBC_String &LLBC_LoggerConfigInfo::GetConsolePattern() const
-{
-    return _consolePattern;
-}
-
-bool LLBC_LoggerConfigInfo::IsColourfulOutput() const
-{
-    return _colourfulOutput;
-}
-
-bool LLBC_LoggerConfigInfo::IsLogToFile() const
-{
-    return _logToFile;
-}
-
-int LLBC_LoggerConfigInfo::GetFileLogLevel() const
-{
-    return _fileLogLevel;
-}
-
-const LLBC_String &LLBC_LoggerConfigInfo::GetFilePattern() const
-{
-    return _filePattern;
-}
-
-const LLBC_String &LLBC_LoggerConfigInfo::GetLogFile() const
-{
-    return _logFile;
-}
-
-const bool LLBC_LoggerConfigInfo::GetForceAppLogPath() const
-{
-    return _forceAppLogPath;
-}
-
-bool LLBC_LoggerConfigInfo::IsDailyRollingMode() const
-{
-    return _dailyMode;
-}
-
-long LLBC_LoggerConfigInfo::GetMaxFileSize() const
-{
-    return _maxFileSize;
-}
-
-int LLBC_LoggerConfigInfo::GetMaxBackupIndex() const
-{
-    return _maxBackupIndex;
-}
-
-int LLBC_LoggerConfigInfo::GetFileBufferSize() const
-{
-    return _fileBufferSize;
-}
-
-bool LLBC_LoggerConfigInfo::IsTakeOver() const
-{
-    return _takeOver;
 }
 
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
