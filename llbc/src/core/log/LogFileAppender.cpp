@@ -317,12 +317,15 @@ void LLBC_LogFileAppender::BackupFiles() const
     if (_file->IsOpened())
         _file->Close();
 
+    const LLBC_String fileNameNonSuffix = 
+        _fileName.substr(0, _fileName.size() - _fileSuffix.size());
+
     int availableIndex = 0;
     while (availableIndex < _maxBackupIndex)
     {
         availableIndex += 1;
         LLBC_String backupFileName;
-        backupFileName.format("%s.%d", _fileName.c_str(), availableIndex);
+        backupFileName.format("%s.%d%s", fileNameNonSuffix.c_str(), availableIndex, _fileSuffix.c_str());
         if (!LLBC_File::Exists(backupFileName))
             break;
     }
@@ -331,12 +334,12 @@ void LLBC_LogFileAppender::BackupFiles() const
     {
         LLBC_String willMove;
         if (willMoveIndex > 0)
-            willMove.format("%s.%d", _fileName.c_str(), willMoveIndex);
+            willMove.format("%s.%d%s", fileNameNonSuffix.c_str(), willMoveIndex, _fileSuffix.c_str());
         else
             willMove = _fileName;
 
         LLBC_String moveTo;
-        moveTo.format("%s.%d", _fileName.c_str(), willMoveIndex + 1);
+        moveTo.format("%s.%d%s", fileNameNonSuffix.c_str(), willMoveIndex + 1, _fileSuffix.c_str());
 
 #ifdef LLBC_RELEASE
         LLBC_File::MoveFile(willMove, moveTo, true);
