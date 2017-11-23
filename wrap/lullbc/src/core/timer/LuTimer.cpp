@@ -15,27 +15,24 @@
 static const int __TimerKey_LuaTimer = 1;
 static const int __TimerKey_Timeout= 2;
 
-namespace
+static int __Timer_PCallErrorHandler(lua_State *l)
 {
-    static int __Timer_PCallErrorHandler(lua_State *l)
-    {
-        size_t errMsgLen;
-        const char *errMsg = luaL_tolstring(l, 1, &errMsgLen);
+    size_t errMsgLen;
+    const char *errMsg = luaL_tolstring(l, 1, &errMsgLen);
 
-        luaL_traceback(l, l, NULL, 2);
-        size_t tbInfoLen;
-        const char *tbInfo = luaL_tolstring(l, -1, &tbInfoLen);
+    luaL_traceback(l, l, NULL, 2);
+    size_t tbInfoLen;
+    const char *tbInfo = luaL_tolstring(l, -1, &tbInfoLen);
 
-        LLBC_String tbAppendedErrMsg;
-        tbAppendedErrMsg.append(errMsg, errMsgLen);
-        tbAppendedErrMsg.append("\n");
-        tbAppendedErrMsg.append(tbInfo, tbInfoLen);
+    LLBC_String tbAppendedErrMsg;
+    tbAppendedErrMsg.append(errMsg, errMsgLen);
+    tbAppendedErrMsg.append("\n");
+    tbAppendedErrMsg.append(tbInfo, tbInfoLen);
 
-        lua_remove(l, -1);
-        lua_pushlstring(l, tbAppendedErrMsg.data(), tbAppendedErrMsg.size());
+    lua_remove(l, -1);
+    lua_pushlstring(l, tbAppendedErrMsg.data(), tbAppendedErrMsg.size());
 
-        return 1;
-    }
+    return 1;
 }
 
 lullbc_Timer::lullbc_Timer(lua_State *l)

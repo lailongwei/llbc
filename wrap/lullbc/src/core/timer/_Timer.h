@@ -9,7 +9,7 @@
 
 #include "lullbc/core/timer/LuTimer.h"
 
-LULLBC_EXTERN_C static int __Del_LuTimer(lua_State *l)
+static int __Del_LuTimer(lua_State *l)
 {
     lullbc_Timer *timer = 
         reinterpret_cast<lullbc_Timer *>(lua_touserdata(l, 1));
