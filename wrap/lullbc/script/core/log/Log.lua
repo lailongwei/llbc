@@ -3,7 +3,7 @@
 @brief  The log logic implementation.
 --]]
 
-local Log = {}
+local Log = llbc.newclass('llbc.Log')
 
 -- Log levels enumeration.
 Log.DEBUG = 0
@@ -16,6 +16,11 @@ Log.FATAL = 4
 Log.logFileInfo = false
 -- defaultLogTag: use to fill <tag> param on output message, can set to string or function, default is nil.
 Log.defaultLogTag = nil
+
+-- constructor, do not call.
+function Log.ctor()
+    error('now allow to instantiate Log instance')
+end
 
 -- Initialize Log component.
 -- @param[required] cfgFile     - log init config file.

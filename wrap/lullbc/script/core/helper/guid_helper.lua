@@ -3,10 +3,17 @@
 @brief  The GUID about logic implementation.
 --]]
 
-local GUID = {}
+local GUID = llbc.newclass('llbc.GUID')
+
+-- constructor, do not call.
+function GUID.ctor()
+    error('now allow to instantiate GUID instance')
+end
 
 -- Generate GUID string
--- :returns: the GUID string
-GUID.generate = _llbc.GUID_Generate
+-- @returns - the GUID string
+function GUID.generate()
+    return _llbc.GUID_Generate()
+end
 
 llbc.GUID = GUID

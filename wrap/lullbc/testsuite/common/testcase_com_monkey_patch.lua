@@ -30,11 +30,20 @@ end
 function TestCase.print_patchinfo()
     print(string.format('  table.concat: %s', table.concat))
     print(string.format('  table.readonly: %s', table.readonly))
+
+    print(string.format('  hash: %s', hash))
     print(string.format('  topointer: %s', topointer))
     print(string.format('  printf: %s', printf))
+    print(string.format('  GUID: %s', GUID))
+
     print(string.format('  newclass: %s', newclass))
     print(string.format('  getclass: %s', getclass))
     print(string.format('  isinstance: %s', isinstance))
+
+    print(string.format('  Log: %s', Log))
+
+    print(string.format('  Timer: %s', Timer))
+    print(string.format('  TimerScheduler: %s', TimerScheduler))
 end
 
 return TestCase
