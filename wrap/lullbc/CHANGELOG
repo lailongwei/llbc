@@ -4,6 +4,17 @@
 #
 # Version: 1.0.1
 #
+# 2017/11/23
+# 1) 增加Timer、TimerScheduler实现, 使用core lib中的LLBC_BaseTimer/LLBC_TimerScheduler实现.
+# 2) 增加相应的utils支持，包括topointer, hash, printf, FuncTool的支持.
+# 3) object oriented增加isinstance()实现，完整实现类似python中的instance()功能.
+# 4) 重构monkey patch打补丁机制，全部llbc功能方法/类都将统一ptach到vm中.
+# 5) 重新调整lullbc中的lua代码及文件命名
+#    	a. class/table: 大驼峰.
+#		b. function/public methods: linux命名, 如果method是private的, 前面增加_前缀.
+#		c. data member/local variable: linux命名, 如果是private的, 前面增加_前缀.
+#		d. 文件名统一使用小写并以_分隔方式组成.
+
 # 2017/07/18
 # 1) 新增lullbc初始化支持,当前支持GetVersionInfo及Log组件的完整支持;
 #
