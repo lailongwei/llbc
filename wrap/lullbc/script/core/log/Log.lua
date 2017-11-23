@@ -1,5 +1,5 @@
 --[[
-@file   Log.lua
+@file   log.lua
 @brief  The log logic implementation.
 --]]
 
@@ -18,9 +18,9 @@ Log.logFileInfo = false
 Log.defaultLogTag = nil
 
 -- Initialize Log component.
--- :param[required] cfgFile:     log init config file.
--- :param[optional] logFileinfo: log file info or not, default is false.
--- :returns: no return.
+-- @param[required] cfgFile     - log init config file.
+-- @param[optional] logFileinfo - log file info or not, default is false.
+-- @returns - no return.
 function Log.Init(cfgFile, logFileInfo)
     _llbc.InitLog(cfgFile)
     if logFileInfo then
@@ -29,132 +29,132 @@ function Log.Init(cfgFile, logFileInfo)
 end
 
 -- Log DEBUG level message to root logger.
--- :param ...: log message.
--- :returns: no return.
+-- @param ... - log message.
+-- @returns - no return.
 function Log.d(...)
-    Log.Output(0, nil, nil, ...)
+    Log.output(0, nil, nil, ...)
 end
 
 -- Log DEBUG level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.d2(logger, ...)
-    Log.Output(0, logger, nil, ...)
+    Log.output(0, logger, nil, ...)
 end
 
 -- Log DEBUG level message to specific logger, and append tag.
--- :param[optional] logger: logger name, default is root logger.
--- :param[optional] tag:    log tag, default is nil.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.d3(logger, tag, ...)
-    Log.Output(0, logger, tag, ...)
+    Log.output(0, logger, tag, ...)
 end
 
 -- Log INFO level message to root logger.
--- :param ...: log message.
--- :returns: no return.
+-- @param ... - log message.
+-- @returns - no return.
 function Log.i(...)
-    Log.Output(1, nil, nil, ...)
+    Log.output(1, nil, nil, ...)
 end
 
 -- Log INFO level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.i2(logger, ...)
-    Log.Output(1, logger, nil, ...)
+    Log.output(1, logger, nil, ...)
 end
 
 -- Log INFO level message to specific logger, and append tag.
--- :param[optional] logger: logger name, default is root logger.
--- :param[optional] tag:    log tag, default is nil.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.i3(logger, tag, ...)
-    Log.Output(1, logger, tag, ...)
+    Log.output(1, logger, tag, ...)
 end
 
 -- Log WARN level message to root logger.
--- :param ...: log message.
--- :returns: no return.
+-- @param ... - log message.
+-- @returns - no return.
 function Log.w(...)
-    Log.Output(2, nil, nil, ...)
+    Log.output(2, nil, nil, ...)
 end
 
 -- Log WARN level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.w2(logger, ...)
-    Log.Output(2, logger, nil, ...)
+    Log.output(2, logger, nil, ...)
 end
 
 -- Log WARN level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param[optional] tag:    log tag, default is nil.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ... -              log message.
+-- @returns - no return.
 function Log.w3(logger, tag, ...)
-    Log.Output(2, logger, tag, ...)
+    Log.output(2, logger, tag, ...)
 end
 
 -- Log ERROR level message to root logger.
--- :param ...: log message.
--- :returns: no return.
+-- @param ... - log message.
+-- @returns - no return.
 function Log.e(...)
-    Log.Output(3, nil, nil, ...)
+    Log.output(3, nil, nil, ...)
 end
 
 -- Log ERROR level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.e2(logger, ...)
-    Log.Output(3, logger, nil, ...)
+    Log.output(3, logger, nil, ...)
 end
 
 -- Log ERROR level message to specific logger, and append tag.
--- :param[optional] logger: logger name, default is root logger.
--- :param[optional] tag:    log tag, default is nil.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.e3(logger, tag, ...)
-    Log.Output(3, logger, tag, ...)
+    Log.output(3, logger, tag, ...)
 end
 
 -- Log FATAL level message to root logger.
--- :param ...: log message.
--- :returns: no return.
+-- @param ... - log message.
+-- @returns - no return.
 function Log.f(...)
-    Log.Output(4, nil, nil, ...)
+    Log.output(4, nil, nil, ...)
 end
 
 -- Log FATAL level message to specific logger.
--- :param[optional] logger: logger name, default is root logger.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.f2(logger, ...)
-    Log.Output(4, logger, nil, ...)
+    Log.output(4, logger, nil, ...)
 end
 
 -- Log FATAL level message to specific logger, and append tag.
--- :param[optional] logger: logger name, default is root logger.
--- :param[optional] tag:    log tag, default is nil.
--- :param ...:              log message.
--- :returns: no return.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
 function Log.f3(logger, tag, ...)
-    Log.Output(4, logger, tag, ...)
+    Log.output(4, logger, tag, ...)
 end
 
 -- Output message to logger.
--- :param level:  logger level.
--- :param logger: logger name, default is root logger.
--- :param tag:    log tag, default is nil.
--- :param ...:    log message.
--- :returns: no return.
-function Log.Output(level, logger, tag, ...)
+-- @param level  - logger level.
+-- @param logger - logger name, default is root logger.
+-- @param tag    - log tag, default is nil.
+-- @param ...    - log message.
+-- @returns - no return.
+function Log.output(level, logger, tag, ...)
     local file, line
     if Log.logFileInfo then
         local di = debug.getinfo(3, 'Sl')
@@ -173,7 +173,7 @@ function Log.Output(level, logger, tag, ...)
     end
 
     if level >= 3 then -- For improve Log performance, explicit use Log Level value to perform if condition judge.
-        local logMsg = _llbc.MonkeyPatchImpl_Table_Concat({...}, ' ')
+        local logMsg = _llbc.Util_Table_Concat({...}, ' ')
         local logMsgAppendedTb = debug.traceback(logMsg, 3)
         _llbc.LogMsg(level, logger, tag, file, line, logMsgAppendedTb)
     else

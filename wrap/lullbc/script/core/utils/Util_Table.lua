@@ -1,13 +1,13 @@
 --[[
-@file   Util_Table.lua
+@file   util_table.lua
 @brief  The some table util functions define.
 --]]
 
 -- Set specific table to readonly.
--- :param[required] t:         specific table.
--- :param[optional] promptMsg: when outer logic try to write table, will raise this prompt message,
--- :returns: no return.
-function llbc.SetTableReadOnly(t, promptMsg)
+-- @param[required] t         - specific table.
+-- @param[optional] promptMsg - when outer logic try to write table, will raise this prompt message,
+-- @returns - no return.
+function llbc.set_table_readonly(t, promptMsg)
     local mt = getmetatable(t)
     if mt == nil then
         mt = {}

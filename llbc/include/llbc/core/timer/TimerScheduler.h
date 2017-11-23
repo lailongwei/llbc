@@ -83,6 +83,12 @@ public:
      */
     void SetEnabled(bool enabled);
 
+    /**
+     * Get timer count in this scheduler.
+     * @return size_t - the timer count.
+     */
+    size_t GetTimerCount() const;
+
 public:
     /**
      * Cancel all timers.

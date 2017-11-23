@@ -10,6 +10,7 @@
 #define __LULLBC_LULLBC_H__
 
 #include "lullbc/common/Common.h"
+#include "lullbc/core/Core.h"
 
 /**
  * lullbc entry function, call by lua program.

@@ -1,6 +1,6 @@
 local TestCase = {}
 
-function TestCase.Run(...)
+function TestCase.run(...)
     print 'Log test:'
     -- Initialize Log component
     print 'Initialize log component...'

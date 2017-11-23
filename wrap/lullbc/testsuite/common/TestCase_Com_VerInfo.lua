@@ -1,17 +1,17 @@
 local TestCase = {}
 
-function TestCase.Run(...)
+function TestCase.run(...)
     print 'VersionInfo test:'
-    print 'Test GetVersionInfo(verbose=false):'
-    briefVerInfo = llbc.GetVersionInfo()
-    print(briefVerInfo)
+    print 'Test get_versioninfo(verbose=false):'
+    local brief_verinfo = llbc.get_versioninfo()
+    print(brief_verinfo)
 
-    print 'Test GetVersionInfo(verbose=true):'
-    verboseVerInfo = llbc.GetVersionInfo(true)
-    print(verboseVerInfo)
+    print 'Test get_versioninfo(verbose=true):'
+    verbose_verinfo = llbc.get_versioninfo(true)
+    print(verbose_verinfo)
 
-    if string.len(briefVerInfo) == 0 or 
-            string.len(verboseVerInfo) <= string.len(briefVerInfo) then
+    if string.len(brief_verinfo) == 0 or 
+            string.len(verbose_verinfo) <= string.len(brief_verinfo) then
         error('VersionInfo test failed!')
     end
 

@@ -1,5 +1,5 @@
 --[[
-@file   GUIDHelper.lua
+@file   guid_helper.lua
 @brief  The GUID about logic implementation.
 --]]
 

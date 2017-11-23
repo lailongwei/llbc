@@ -89,7 +89,6 @@ void LLBC_TimerScheduler::Update()
 
     LLBC_TimerData *data;
     uint64 now = LLBC_GetMilliSeconds();
-
     while (_heap.FindTop(data) == LLBC_OK)
     {
         if (now < data->handle)
@@ -165,6 +164,11 @@ bool LLBC_TimerScheduler::IsEnabled() const
 void LLBC_TimerScheduler::SetEnabled(bool enabled)
 {
     _enabled = enabled;
+}
+
+size_t LLBC_TimerScheduler::GetTimerCount() const
+{
+    return _heap.GetSize();
 }
 
 bool LLBC_TimerScheduler::IsDstroyed() const

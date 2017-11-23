@@ -40,4 +40,9 @@ LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *file, int 
 LULLBC_HIDDEN void lullbc_SetError(lua_State *l, int errNo);
 LULLBC_HIDDEN void lullbc_SetError(lua_State *l, const char *errDesc, ...);
 
+/**
+ * Check argument, like luaL_argcheck() method.
+ */
+LULLBC_HIDDEN void lullbc_ArgCheck(lua_State *l, int cond, int arg, const char *extraMsg, ...);
+
 #endif // !__LULLBC_COM_ERRORS_H__

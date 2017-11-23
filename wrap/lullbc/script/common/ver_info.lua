@@ -1,12 +1,12 @@
 --[[
-@file   VerInfo.lua
+@file   ver_info.lua
 @brief  Implementation some version about APIs.
 --]]
 
 -- Get llbc version information.
--- :param[optional] verbose: indicate return verbose library version information or not, default is false.
--- :returns: version information string.
-function llbc.GetVersionInfo(verbose)
+-- @param[optional] verbose - indicate return verbose library version information or not, default is false.
+-- @returns - version information string.
+function llbc.get_versioninfo(verbose)
     return _llbc.GetVersionInfo(verbose)
 end
 

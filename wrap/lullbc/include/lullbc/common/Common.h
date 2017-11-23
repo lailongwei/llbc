@@ -13,8 +13,7 @@
 #include "lullbc/common/Macro.h"
 #include "lullbc/common/Export.h"
 #include "lullbc/common/Errors.h"
-#include "lullbc/common/MonkeyPatchType.h"
-
+#include "lullbc/common/LuaHolder.h"
 
 /**
  * Init common module

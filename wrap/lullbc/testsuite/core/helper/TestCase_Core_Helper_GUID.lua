@@ -1,11 +1,11 @@
 local TestCase = {}
 
-function TestCase.Run(...)
+function TestCase.run(...)
     print('Core/Helper/GUIDHelper test:')
 
-    local genCount = 100
+    local gen_count = 100
     print('Generate 100 GUIDs...')
-    for i = 1,genCount do
+    for i = 1,gen_count do
         print(tostring(i) .. ': ' .. llbc.GUID.generate())
     end
 

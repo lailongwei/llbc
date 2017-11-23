@@ -7,11 +7,6 @@
  * @brief
  */
 
-#include "lullbc/common/LibHeader.h"
-#include "lullbc/common/Export.h"
-#include "lullbc/common/Macro.h"
-#include "lullbc/common/Errors.h"
-
 // API: GetVersionInfo
 LULLBC_LUA_METH int _lullbc_GetVersionInfo(lua_State *l)
 {

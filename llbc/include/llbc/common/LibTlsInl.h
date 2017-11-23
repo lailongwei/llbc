@@ -85,7 +85,7 @@ LLBC_EXTERN void __LLBC_DestroyLibTls();
  * Get lib TLS value.
  * @return __LLBC_LibTls * - lib TLS value pointer.
  */
-LLBC_EXTERN __LLBC_LibTls *__LLBC_GetLibTls();
+LLBC_EXTERN LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
 
 /**
  * Reset lib TLS value.

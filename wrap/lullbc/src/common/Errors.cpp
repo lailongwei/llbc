@@ -101,3 +101,28 @@ void lullbc_SetError(lua_State *l, const char *additionMsg, ...)
     // Raise lua error.
     lua_error(l);
 }
+
+void lullbc_ArgCheck(lua_State *l, int cond, int arg, const char *extraMsg, ...)
+{
+    if (cond)
+        return;
+
+    LLBC_SetLastError(LULLBC_ERROR_COMMON);
+    if (extraMsg != NULL)
+    {
+
+        char *fmttedExtraMsg = NULL; int fmttedExtraMsgLen = 0;
+        LLBC_FormatArg(extraMsg, fmttedExtraMsg, fmttedExtraMsgLen);
+
+        LLBC_String msg;
+        msg.append(fmttedExtraMsg, fmttedExtraMsgLen);
+
+        LLBC_Free(fmttedExtraMsg);
+
+        luaL_argcheck(l, cond, arg, msg.c_str());
+    }
+    else
+    {
+        luaL_argcheck(l, cond, arg, extraMsg);
+    }
+}

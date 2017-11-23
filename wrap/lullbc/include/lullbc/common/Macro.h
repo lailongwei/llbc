@@ -23,10 +23,22 @@
 // Define Lua wrap methods constraint macro.
 #define LULLBC_LUA_METH static
 
+// Define lullbc library entry method name.
 #ifdef LULLBC_DEBUG
  #define lullbc_entry luaopen__lullbc_debug
 #else
  #define lullbc_entry luaopen__lullbc
 #endif
+
+// Define lullbc library table.
+#ifdef LULLBC_DEBUG
+ #define LULLBC_HOLD_TABLE_KEY "____llbc.holdtable.debug____"
+#else
+ #define LULLBC_HOLD_TABLE_KEY "____llbc.holdtable____"
+#endif
+
+// All lua hold keys define.
+#define LULLBC_HOLD_KEY__TIMER_SCHEDULER        "timer_scheduler"
+#define LULLBC_HOLD_KEY__TIMER_ERROR_HANDLER    "timer_error_handler"
 
 #endif // !__LULLBC_COM_MACRO_H__

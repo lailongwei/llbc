@@ -24,8 +24,8 @@ class LuScriptIntegrator(object):
         # 收集comm
         luafiles.extend(self._collect_dir('comm'))
 
-        # 添加顶层LullbcTop.lua
-        top_luafile = op.join(self._script_path, 'LullbcTop.lua')
+        # 添加顶层lullbc_top.lua
+        top_luafile = op.join(self._script_path, 'lullbc_top.lua')
         if op.isfile(top_luafile):
             luafiles.append(top_luafile)
 
@@ -65,11 +65,11 @@ class LuScriptIntegrator(object):
         return luafiles
 
     def _file_includable(self, filename):
-        endswith_debug = filename.endswith('_Debug')
+        endswith_debug = filename.endswith('_debug')
         if endswith_debug:
             endswith_release = False
         else:
-            endswith_release = filename.endswith('_Release')
+            endswith_release = filename.endswith('_release')
 
         if not endswith_debug and not endswith_release:
             return True

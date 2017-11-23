@@ -32,7 +32,7 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.llbcThread = false;
     coreTls.entryThread = false;
     coreTls.threadHandle = LLBC_INVALID_HANDLE;
-    coreTls.nativeThreadHandle =LLBC_INVALID_NATIVE_THREAD_HANDLE;
+    coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     coreTls.task = NULL;
     coreTls.timerScheduler = NULL;
 
