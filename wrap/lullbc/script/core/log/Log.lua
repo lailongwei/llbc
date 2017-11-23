@@ -21,7 +21,7 @@ Log.defaultLogTag = nil
 -- @param[required] cfgFile     - log init config file.
 -- @param[optional] logFileinfo - log file info or not, default is false.
 -- @returns - no return.
-function Log.Init(cfgFile, logFileInfo)
+function Log.init(cfgFile, logFileInfo)
     _llbc.InitLog(cfgFile)
     if logFileInfo then
         Log.logFileInfo = true

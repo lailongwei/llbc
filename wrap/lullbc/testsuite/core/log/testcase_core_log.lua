@@ -6,7 +6,7 @@ function TestCase.run(...)
     print 'Initialize log component...'
 
     local Log = llbc.Log
-    Log.Init('core/log/Logger_Cfg.cfg')
+    Log.init('core/log/Logger_Cfg.cfg')
 
     -- Test base log methods(all messages log to root logger).
     print 'Test base log methods, all messages log to root logger...'
