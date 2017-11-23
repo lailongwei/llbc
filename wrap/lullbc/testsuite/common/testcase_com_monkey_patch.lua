@@ -35,6 +35,7 @@ function TestCase.print_patchinfo()
     print(string.format('  topointer: %s', topointer))
     print(string.format('  printf: %s', printf))
     print(string.format('  GUID: %s', GUID))
+    print(string.format('  FuncTool: %s', FuncTool))
 
     print(string.format('  newclass: %s', newclass))
     print(string.format('  getclass: %s', getclass))

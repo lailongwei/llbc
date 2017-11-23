@@ -13,6 +13,7 @@
 --   2.2 add printf method.
 --   2.3 add topointer method.
 --   2.4 add GUID support methods.
+--   2.5 add FuncTool support methods.
 --
 -- 3. Patch _G, add some object oriented about methods.
 --   3.1. patch newclass() method to _G, use to create class.
@@ -34,6 +35,7 @@ function llbc.monkey_patch()
     printf = llbc.printf
     topointer = _llbc.Util_Misc_ToPointer
     GUID = llbc.GUID
+    FuncTool = llbc.FuncTool
 
     -- patch obiect oriented functions to _G.
     newclass = llbc.newclass
