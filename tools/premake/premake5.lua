@@ -511,6 +511,11 @@ project "lullbc_lualib"
         defines { "LUA_USE_DLOPEN" }
     filter {}
 
+    -- links
+    filter { "system:not windows" }
+        links { "dl" }
+    filter {}
+
     -- target name, target prefix
     targetname "lua"
     targetprefix "lib"
