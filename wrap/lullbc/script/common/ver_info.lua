@@ -12,5 +12,5 @@ end
 
 -- Implement __tostring
 function llbc_mt.__tostring(t)
-    return 'llbc lua wrapped library(lullbc): ' .. t.GetVersionInfo(false)
+    return 'llbc lua wrapped library(lullbc): ' .. t.get_versioninfo(false)
 end
