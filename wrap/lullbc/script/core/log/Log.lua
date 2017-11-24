@@ -33,6 +33,12 @@ function Log.init(cfgFile, logFileInfo)
     end
 end
 
+-- Check Log init or log.
+-- @returns boolean - init flag.
+function Log.isinit()
+    return _llbc.IsLogInit()
+end
+
 -- Log DEBUG level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.

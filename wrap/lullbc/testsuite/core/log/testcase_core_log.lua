@@ -2,11 +2,19 @@ local TestCase = {}
 
 function TestCase.run(...)
     print 'Log test:'
-    -- Initialize Log component
-    print 'Initialize log component...'
 
     local Log = llbc.Log
+    print('Call Log.isinit():', Log.isinit())
+
+    print('Before log init, output some message...')
+    Log.d('Not init debug message')
+    Log.d2('test', 'Not init debug message')
+    Log.d3('test', 'TestTag', 'Not init debug message')
+
+    -- Initialize Log component
+    print 'Initialize log component...'
     Log.init('core/log/Logger_Cfg.cfg')
+    print('Call Log.isinit():', Log.isinit())
 
     -- Test base log methods(all messages log to root logger).
     print 'Test base log methods, all messages log to root logger...'

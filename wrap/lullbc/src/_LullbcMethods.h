@@ -54,6 +54,7 @@ static luaL_Reg lullbc_NativeMethods[] = {
     {"Timer_New", _lullbc_Timer_New},
     {"GUID_Generate", _lullbc_GUID_Generate},
     {"Dir_Join", _lullbc_Dir_Join},
+    {"IsLogInit", _lullbc_IsLogInit},
     {"Thread_Sleep", _lullbc_Thread_Sleep},
     {"Timer_Schedule", _lullbc_Timer_Schedule},
     {NULL, NULL}
