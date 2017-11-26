@@ -15,7 +15,7 @@
 /**
  * \brief The python c++ wrap timer class encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Timer : public LLBC_BaseTimer
+class LLBC_HIDDEN pyllbc_Timer : public LLBC_Timer
 {
 public:
     /**
@@ -65,7 +65,7 @@ public:
      * Timeout event handler.
      * @return bool - return true means readd, otherwise means stop this timer.
      */
-    virtual bool OnTimeout();
+    virtual void OnTimeout();
 
     /**
      * Cancel event handler.

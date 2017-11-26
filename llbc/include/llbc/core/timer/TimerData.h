@@ -13,7 +13,7 @@
 
 __LLBC_NS_BEGIN
 
-class LLBC_BaseTimer;
+class LLBC_Timer;
 
 __LLBC_NS_END
 
@@ -22,7 +22,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The timer data structure encapsulation.
  */
-struct LLBC_TimerData
+struct LLBC_HIDDEN LLBC_TimerData
 {
     // Timer handle, use to build timer heap.
     uint64 handle;
@@ -39,10 +39,17 @@ struct LLBC_TimerData
     uint64 repeatTimes;
 
     // timer object.
-    LLBC_BaseTimer *timer;
+    LLBC_Timer *timer;
 
     // Validate flag.
     bool validate;
+    // Cancelling flag.
+    bool cancelling;
+    // Timeouting flag.
+    bool timeouting;
+
+    // ref count.
+    uint8 refCount;
 };
 
 __LLBC_NS_END

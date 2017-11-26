@@ -15,7 +15,7 @@
 /**
  * \brief The csharp timer class encapsulation.
  */
-class CSLLBC_EXPORT csllbc_Timer : public LLBC_BaseTimer
+class CSLLBC_EXPORT csllbc_Timer : public LLBC_Timer
 {
     /**
      * typedef some timer about delegate types.
@@ -33,7 +33,7 @@ public:
      * Timeout event handler.
      * @return bool - return true means continuing schedule, otherwise means stop this timer.
      */
-    virtual bool OnTimeout();
+    virtual void OnTimeout();
 
     /**
      * Timer cancel event handler.

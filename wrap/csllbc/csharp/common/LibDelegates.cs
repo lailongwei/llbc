@@ -82,7 +82,7 @@ namespace llbc
         //
         // Timer about delegates.
         //
-        public delegate int Deleg_Timer_OnTimeout();
+        public delegate void Deleg_Timer_OnTimeout();
         public delegate void Deleg_Timer_OnCancel();
         /////////////////////////////////////////////////////////////////////////////////////
     }

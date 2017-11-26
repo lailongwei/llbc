@@ -12,7 +12,7 @@ using System;
 namespace llbc
 {
     #region Timer Timeout/Cancel handlers
-    public delegate bool TimeoutHandler(Timer timer);
+    public delegate void TimeoutHandler(Timer timer);
     public delegate void TimerCancelHandler(Timer timer);
     #endregion
 
@@ -172,9 +172,9 @@ namespace llbc
         #endregion
 
         #region Internal implements
-        private int _OnTimeout()
+        private void _OnTimeout()
         {
-            return _timeoutHandler(this) ? 1 : 0;
+            _timeoutHandler(this);
         }
 
         private void _OnCancel()

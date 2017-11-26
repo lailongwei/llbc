@@ -65,8 +65,16 @@ class pyllbcTimer(object):
         return llbc.inl.PyTimerGetPeriod(self.__c_obj)
 
     @property
-    def scheduling(self):
+    def isscheduling(self):
         return llbc.inl.PyTimerIsScheduling(self.__c_obj)
+
+    @property
+    def istimeouting(self):
+        return llbc.inl.PyTimerIsTimeouting(self.__c_obj)
+
+    @property
+    def iscancelling(self):
+        return llbc.inl.PyTimerIsCancelling(self.__c_obj)
 
     @property
     def ignored_dead_ref(self):

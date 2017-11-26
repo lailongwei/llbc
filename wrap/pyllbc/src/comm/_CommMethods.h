@@ -55,6 +55,10 @@ public:
         Packet_SetHeaderPartAsSInt8.ml_meth = (PyCFunction)_pyllbc_Packet_SetHeaderPartAsSInt8;
         Packet_SetHeaderPartAsSInt8.ml_flags = METH_VARARGS;
         Packet_SetHeaderPartAsSInt8.ml_doc = "pyllbc library method/function";
+        PyTimerIsCancelling.ml_name = "PyTimerIsCancelling";
+        PyTimerIsCancelling.ml_meth = (PyCFunction)_pyllbc_PyTimerIsCancelling;
+        PyTimerIsCancelling.ml_flags = METH_VARARGS;
+        PyTimerIsCancelling.ml_doc = "pyllbc library method/function";
         Packet_SetHeaderPartAsUInt64.ml_name = "Packet_SetHeaderPartAsUInt64";
         Packet_SetHeaderPartAsUInt64.ml_meth = (PyCFunction)_pyllbc_Packet_SetHeaderPartAsUInt64;
         Packet_SetHeaderPartAsUInt64.ml_flags = METH_VARARGS;
@@ -283,6 +287,10 @@ public:
         Packet_GetHeaderPartAsSInt32.ml_meth = (PyCFunction)_pyllbc_Packet_GetHeaderPartAsSInt32;
         Packet_GetHeaderPartAsSInt32.ml_flags = METH_VARARGS;
         Packet_GetHeaderPartAsSInt32.ml_doc = "pyllbc library method/function";
+        PyTimerIsTimeouting.ml_name = "PyTimerIsTimeouting";
+        PyTimerIsTimeouting.ml_meth = (PyCFunction)_pyllbc_PyTimerIsTimeouting;
+        PyTimerIsTimeouting.ml_flags = METH_VARARGS;
+        PyTimerIsTimeouting.ml_doc = "pyllbc library method/function";
         StopService.ml_name = "StopService";
         StopService.ml_meth = (PyCFunction)_pyllbc_StopService;
         StopService.ml_flags = METH_VARARGS;
@@ -485,6 +493,7 @@ public:
     ::PyMethodDef Packet_GetHeaderPartAsSInt16;
     ::PyMethodDef GetServiceTypeStr;
     ::PyMethodDef Packet_SetHeaderPartAsSInt8;
+    ::PyMethodDef PyTimerIsCancelling;
     ::PyMethodDef Packet_SetHeaderPartAsUInt64;
     ::PyMethodDef SetServiceCodec;
     ::PyMethodDef StartService;
@@ -542,6 +551,7 @@ public:
     ::PyMethodDef RegisterFacade;
     ::PyMethodDef DelService;
     ::PyMethodDef Packet_GetHeaderPartAsSInt32;
+    ::PyMethodDef PyTimerIsTimeouting;
     ::PyMethodDef StopService;
     ::PyMethodDef RemoveSession;
     ::PyMethodDef o2j;

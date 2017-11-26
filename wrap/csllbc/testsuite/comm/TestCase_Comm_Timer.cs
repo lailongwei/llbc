@@ -44,10 +44,9 @@ class TimerTestFacade : IFacade
         _timer.Cancel();
     }
 
-    private bool _OnTimeout(Timer timer)
+    private void _OnTimeout(Timer timer)
     {
         Console.WriteLine("Timeout handler called!");
-        return true;
     }
 
     private void _OnCancel(Timer timer)

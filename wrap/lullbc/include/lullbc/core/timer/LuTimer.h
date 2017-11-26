@@ -14,7 +14,7 @@
 /**
  * \breif The lullbc timer encapsulation.
  */
-class LULLBC_HIDDEN lullbc_Timer : public LLBC_BaseTimer
+class LULLBC_HIDDEN lullbc_Timer : public LLBC_Timer
 {
 public:
     /**
@@ -32,7 +32,7 @@ public:
     /**
      * Overrided method, when timer timeout, will call this method.
      */
-    virtual bool OnTimeout();
+    virtual void OnTimeout();
 
     /**
      * Overrided method, when timer cancel, will call this method.

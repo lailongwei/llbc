@@ -132,6 +132,30 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsScheduling(PyObject *self, PyObject *ar
     return rtn;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsTimeouting(PyObject *self, PyObject *args)
+{
+    pyllbc_Timer *timer;
+    if (!PyArg_ParseTuple(args, "l", &timer))
+        return NULL;
+
+    PyObject *rtn = timer->IsTimeouting() ? Py_True : Py_False;
+    Py_INCREF(rtn);
+
+    return rtn;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsCancelling(PyObject *self, PyObject *args)
+{
+    pyllbc_Timer *timer;
+    if (!PyArg_ParseTuple(args, "l", &timer))
+        return NULL;
+
+    PyObject *rtn = timer->IsCancelling() ? Py_True : Py_False;
+    Py_INCREF(rtn);
+
+    return rtn;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_PyTimerUpdateAllTimers(PyObject *self, PyObject *args)
 {
     pyllbc_s_TimerScheduler->Schedule();

@@ -1,8 +1,8 @@
 local TestCase = {}
 
 function TestCase.run(...)
-    TestCase.standard_test()
-    -- TestCase.performance_test()
+    -- TestCase.standard_test()
+    TestCase.performance_test()
 end
 
 function TestCase.standard_test()

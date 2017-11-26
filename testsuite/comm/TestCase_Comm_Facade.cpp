@@ -11,13 +11,12 @@
 
 namespace
 {
-    class TestTimer : public LLBC_BaseTimer
+    class TestTimer : public LLBC_Timer
     {
     public:
-        virtual bool OnTimeout()
+        virtual void OnTimeout()
         {
             LLBC_PrintLine("Timer timeout!");
-            return true;
         }
 
         virtual void OnCancel()

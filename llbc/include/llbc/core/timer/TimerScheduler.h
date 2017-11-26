@@ -15,7 +15,7 @@
 
 __LLBC_NS_BEGIN
 
-class LLBC_BaseTimer;
+class LLBC_Timer;
 struct LLBC_TimerData;
 
 __LLBC_NS_END
@@ -30,7 +30,6 @@ class LLBC_EXPORT LLBC_TimerScheduler
     typedef LLBC_TimerScheduler _This;
 
     typedef LLBC_BinaryHeap<LLBC_TimerData *> _Heap;
-    typedef std::map<LLBC_TimerId, LLBC_TimerData *> _IdxMap;
 
 public:
     LLBC_TimerScheduler();
@@ -97,9 +96,9 @@ public:
 
 private:
     /**
-     * Set friend class: LLBC_BaseTimer.
+     * Set friend class: LLBC_Timer.
      */
-    friend class LLBC_BaseTimer;
+    friend class LLBC_Timer;
 
     /**
      * Get scheduler destroyed flag.
@@ -109,17 +108,19 @@ private:
 
     /**
      * Schedule timer.
-     * @param[in] timer - timer object.
+     * @param[in] timer   - timer object.
+     * @param[in] dueTime - due time, in milli-seconds.
+     * @param[in] period  - period time, in milli-seconds.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(LLBC_BaseTimer *timer);
+    virtual int Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 period);
 
     /**
      * Cancel timer.
      * @param[in] - timer object.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Cancel(LLBC_BaseTimer *timer);
+    virtual int Cancel(LLBC_Timer *timer);
 
 private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_TimerScheduler);
@@ -130,7 +131,6 @@ private:
     bool _destroyed;
 
     _Heap _heap;
-    _IdxMap _idxMap;
 };
 
 __LLBC_NS_END

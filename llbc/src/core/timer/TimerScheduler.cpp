@@ -12,7 +12,7 @@
 
 #include "llbc/core/os/OS_Time.h"
 
-#include "llbc/core/timer/BaseTimer.h"
+#include "llbc/core/timer/Timer.h"
 #include "llbc/core/timer/TimerData.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
@@ -36,7 +36,7 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 {
     _destroyed = true;
 
-    size_t size = _heap.GetSize();
+    const size_t size = _heap.GetSize();
     const _Heap::Container &elems = _heap.GetData();
     for (size_t i = 1; i <= size; i++)
     {
@@ -44,15 +44,12 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
         if (data->validate)
         {
             data->validate = false;
-            data->timer->SetScheduling(false);
-
+            data->cancelling = true;
             data->timer->OnCancel();
-        }
-    }
 
-    for (size_t i = 1; i < size; i++)
-    {
-        delete const_cast<LLBC_TimerData *>(elems[i]);
+            if (--data->refCount == 0)
+                LLBC_Delete(data);
+        }
     }
 }
 
@@ -84,7 +81,7 @@ LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
 
 void LLBC_TimerScheduler::Update()
 {
-    if (!_enabled)
+    if (UNLIKELY(!_enabled))
         return;
 
     LLBC_TimerData *data;
@@ -95,31 +92,28 @@ void LLBC_TimerScheduler::Update()
             break;
 
         _heap.DeleteTop();
-
         if (!data->validate)
         {
-            _idxMap.erase(data->timerId);
-            delete data;
+            if (--data->refCount == 0)
+                LLBC_Delete(data);
+
             continue;
         }
 
-        data->validate = false;
-        data->timer->SetScheduling(false);
+        data->timeouting = true;
 
-        bool reSchedule = false;
+        bool reSchedule = true;
+        LLBC_Timer *timer = data->timer;
 #if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         uint64 pseudoNow = now;
         while (pseudoNow >= data->handle)
 #endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         {
-            ++ data->repeatTimes;
-            reSchedule = data->timer->OnTimeout();
-#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-            if (!reSchedule)
-                break;
-#endif // !LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
+            ++data->repeatTimes;
+            timer->OnTimeout();
 
-            if (data->timer->IsScheduling())
+            // Cancel() or Schedule() called.
+            if (!data->validate)
             {
                 reSchedule = false;
 #if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
@@ -140,18 +134,17 @@ void LLBC_TimerScheduler::Update()
 
         if (reSchedule)
         {
-            uint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
+            data->timeouting = false;
 
-            data->validate = true;
-            data->timer->SetScheduling(true);
+            uint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
             _heap.Insert(data);
         }
         else
         {
-            _idxMap.erase(data->timerId);
-            delete data;
+            if (--data->refCount == 0)
+                LLBC_Delete(data);
         }
     }
 }
@@ -176,74 +169,80 @@ bool LLBC_TimerScheduler::IsDstroyed() const
     return _destroyed;
 }
 
-int LLBC_TimerScheduler::Schedule(LLBC_BaseTimer *timer)
+int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 period)
 {
+    if (UNLIKELY(_destroyed))
+        return LLBC_ERROR_INVALID;
+
     LLBC_TimerData *data = new LLBC_TimerData;
-    data->handle = LLBC_GetMilliSeconds() + timer->GetDueTime();
+    ::memset(data, 0, sizeof(LLBC_TimerData));
+    data->handle = LLBC_GetMilliSeconds() + dueTime;
     data->timerId = ++ _maxTimerId;
-    data->dueTime = timer->GetDueTime();
-    data->period = timer->GetPeriod();
-    data->repeatTimes = 0;
+    data->dueTime = dueTime;
+    data->period = period;
+    // data->repeatTimes = 0;
     data->timer = timer;
     data->validate = true;
+    // data->timeouting = false;
+    // data->cancelling = false;
+    data->refCount = 2;
 
-    timer->SetTimerId(_maxTimerId);
-    timer->SetScheduling(true);
+    if (timer->_timerData)
+    {
+        if (--timer->_timerData->refCount == 0)
+            LLBC_Delete(timer->_timerData);
+    }
 
+    timer->_timerData = data;
     _heap.Insert(data);
-    _idxMap.insert(std::make_pair(_maxTimerId, data));
 
     return LLBC_OK;
 }
 
-int LLBC_TimerScheduler::Cancel(LLBC_BaseTimer *timer)
+int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 {
-    _IdxMap::iterator iter = _idxMap.find(timer->GetTimerId());
-    if (iter == _idxMap.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
+    if (UNLIKELY(_destroyed))
+        return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = iter->second;
+    LLBC_TimerData *data = timer->_timerData;
     ASSERT(data->timer == timer && 
         "Timer manager internal error, LLBC_TimerData::timer != argument: timer!");
 
-    _idxMap.erase(data->timerId);
-
     data->validate = false;
-    data->timer->SetScheduling(false);
-    data->timer->OnCancel();
+    data->cancelling = true;
+    timer->OnCancel();
+    data->cancelling = false;
+
+    if (data->timeouting)
+        return LLBC_OK;
+
+    if (static_cast<sint64>(data->handle) - 
+            LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
+    {
+        int delElemRet = _heap.DeleteElem(data);
+        ASSERT(delElemRet == LLBC_OK &&
+            "Timer manager internal error, Could not found timer data when Cancel long timeout timer!");
+        if (--data->refCount == 0)
+            LLBC_Delete(data);
+    }
 
     return LLBC_OK;
 }
 
 void LLBC_TimerScheduler::CancelAll()
 {
-    if (_destroyed)
+    if (UNLIKELY(_destroyed))
         return;
 
-    std::vector<LLBC_TimerId> timerIds;
-    for (_IdxMap::iterator iter = _idxMap.begin();
-         iter != _idxMap.end();
-         iter++)
+    const size_t size = _heap.GetSize();
+    _Heap::Container copyElems(_heap.GetData());
+    for (size_t i = 1; i <= size; i++)
     {
-        LLBC_TimerData *data = iter->second;
-        if (data->validate)
-            timerIds.push_back(data->timerId);
-    }
+        LLBC_TimerData *data = copyElems[i];
+        if (UNLIKELY(!data->validate))
+            return;
 
-    for (size_t i = 0; i < timerIds.size(); i++)
-    {
-        _IdxMap::iterator iter = _idxMap.find(timerIds[i]);
-        if (iter != _idxMap.end())
-        {
-            LLBC_TimerData *data = iter->second;
-            if (UNLIKELY(!data->validate))
-                return;
-
-            data->timer->Cancel();
-        }
+        data->timer->Cancel();
     }
 }
 

@@ -11,29 +11,39 @@
 
 namespace
 {
-class TestTimer : public LLBC_BaseTimer
+class TestTimer : public LLBC_Timer
 {
 public:
     TestTimer()
     {
-        _times = 0;
+    }
+
+    virtual ~TestTimer()
+    {
+        Cancel();
     }
 
 public:
-    bool OnTimeout()
+    void OnTimeout()
     {
-        Schedule(LLBC_Random::RandInt32cmcn(1000, 5000), 0);
-        return false;
+        if (++_timeoutTimes % 10000 == 0)
+            LLBC_PrintLine("Timer <%s> trigger %d times timeout", this->ToString().c_str(), _timeoutTimes);
+        Schedule(LLBC_Random::RandInt32cmcn(5000, 15000));
     }
 
     void OnCancel()
     {
-        delete this;
+        if (++_cancelTimes % 10000 == 0)
+            LLBC_PrintLine("Timer <%s> trigger %d times cancel", this->ToString().c_str(), _cancelTimes);
     }
 
 private:
-    int _times;
+    static int _timeoutTimes;
+    static int _cancelTimes;
 };
+
+int TestTimer::_timeoutTimes = 0;
+int TestTimer::_cancelTimes = 0;
 
 class TestFacade : public LLBC_IFacade
 {
@@ -41,11 +51,17 @@ public:
     void OnInitialize()
     {
         LLBC_PrintLine("Service startup, startup timers...");
-        for(int i = 1; i <= 500000; i ++)
+
+        // Create long time timer and try to cancel
+        TestTimer *longTimeTimer = new TestTimer();
+        longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
+        delete longTimeTimer;
+
+        for(int i = 1; i <=2000000; i++) 
         {
             TestTimer *timer = new TestTimer();
-            timer->Schedule(LLBC_Random::RandInt32cmcn(10000, 100000), 
-                LLBC_Random::RandInt32cmcn(10000, 50000));
+            timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000), 
+                LLBC_Random::RandInt32cmcn(5000, 15000));
         }
 
         LLBC_PrintLine("Done!");
@@ -78,6 +94,8 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
         delete svc;
         return -1;
     }
+
+    svc->SetFPS(1000);
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     LLBC_PrintLine("Wait 100 seconds to exit...");

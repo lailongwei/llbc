@@ -36,7 +36,7 @@ static int __Timer_PCallErrorHandler(lua_State *l)
 }
 
 lullbc_Timer::lullbc_Timer(lua_State *l)
-: LLBC_BaseTimer(lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
+: LLBC_Timer(lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
 , _luaState(l)
 , _callableInfo(0)
 {
@@ -82,34 +82,33 @@ lullbc_Timer::~lullbc_Timer()
     _callableInfo = 0;
 }
 
-bool lullbc_Timer::OnTimeout()
+void lullbc_Timer::OnTimeout()
 {
     // Push pcall error handler.
     int errHandlerPos = PushPCallErrorHandler();
 
     // Push timer object and timeout callable.
     if (UNLIKELY(!PushCallable()))
-        return false;
+    {
+        Cancel();
+        return;
+    }
 
     // Call.
-    int callRet = lua_pcall(_luaState, 1, 1, errHandlerPos);
+    int callRet = lua_pcall(_luaState, 1, 0, errHandlerPos);
     if (UNLIKELY(callRet != LUA_OK))
     {
         HandleTimerError("timeout");
         if (errHandlerPos != 0) // If has pcall error handler, remove it.
             lua_remove(_luaState, errHandlerPos);
 
-        return false;
+        Cancel();
+        return;
     }
 
-    int reSchedule = lua_toboolean(_luaState, -1);
-
     // Reset lua_stack
-    lua_remove(_luaState, -1);
     if (errHandlerPos != 0)
         lua_remove(_luaState, errHandlerPos);
-
-    return reSchedule != 0;
 }
 
 void lullbc_Timer::OnCancel()

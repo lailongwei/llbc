@@ -13,7 +13,7 @@
 
 namespace
 {
-    typedef LLBC_BaseTimer Base;
+    typedef LLBC_Timer Base;
 
     static int __NormalizeObj(PyObject *obj, PyObject *&method, LLBC_String &methodDesc, PyObject *&boundedObj, LLBC_String &boundedObjDesc)
     {
@@ -160,7 +160,8 @@ namespace
             return LLBC_FAILED;
         }
 
-        needReschedule = !!PyObject_IsTrue(pyRtn);
+        // needReschedule = !!PyObject_IsTrue(pyRtn);
+        needReschedule = true;
         Py_DECREF(pyRtn);
 
         return LLBC_OK;
@@ -245,7 +246,7 @@ LLBC_String pyllbc_Timer::ToString() const
     return desc;
 }
 
-bool pyllbc_Timer::OnTimeout()
+void pyllbc_Timer::OnTimeout()
 {
     bool reschedule = false;
     if (__CallObj(_boundedTimeOutObj,
@@ -259,13 +260,15 @@ bool pyllbc_Timer::OnTimeout()
                   reschedule) != LLBC_OK)
     {
         Py_DECREF(_pyTimer);
-        return false;
+        Cancel();
+        return;
     }
 
     if (!reschedule)
+    {
+        Cancel();
         Py_DECREF(_pyTimer);
-
-    return reschedule;
+    }
 }
 
 void pyllbc_Timer::OnCancel()

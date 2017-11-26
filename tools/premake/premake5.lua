@@ -233,6 +233,8 @@ project "pyllbc"
         "../../wrap/pyllbc/**.cpp",
 
         "../../wrap/pyllbc/script/**.py",
+
+        "../../wrap/pyllbc/testsuite/**.py",
     }
 
     -- includedirs

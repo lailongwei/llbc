@@ -21,13 +21,12 @@ class TimerTest(llbc.TestCase):
         if self.times % 10000 == 0:
             print '{}(period:{}): hello..., schedule times: {}'.format(timer.timerid, timer.period, self.times)
 
-        return True
-
     def oncancel(self, timer):
-        print 'timer[{}] cancelled!'.format(timer.timerid)
+        pass
+        # print 'timer[{}] cancelled!'.format(timer.timerid)
 
     def _createtimers(self):
         for i in range(0, 500000):
             timer = llbc.Timer(self.ontimeout, self.oncancel)
-            timer.schedule(llbc.Random.rand(1000, 8000), llbc.Random.rand(500, 5000))
+            timer.schedule(llbc.Random.rand(5000, 15000), llbc.Random.rand(5000, 15000))
 

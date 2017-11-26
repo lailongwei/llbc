@@ -19,13 +19,15 @@ csllbc_Timer::csllbc_Timer(_TimeoutDeleg timeoutDeleg, _CancelDeleg cancelDeleg)
 
 csllbc_Timer::~csllbc_Timer()
 {
+    Cancel();
+
     _timeoutDeleg = NULL;
     _cancelDeleg = NULL;
 }
 
-bool csllbc_Timer::OnTimeout()
+void csllbc_Timer::OnTimeout()
 {
-    return (*_timeoutDeleg)() != 0;
+    (*_timeoutDeleg)();
 }
 
 void csllbc_Timer::OnCancel()

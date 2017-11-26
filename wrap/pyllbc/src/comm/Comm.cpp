@@ -62,6 +62,8 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.PyTimerSchedule);
     inlMod->AddMethod(methods.PyTimerCancel);
     inlMod->AddMethod(methods.PyTimerIsScheduling);
+    inlMod->AddMethod(methods.PyTimerIsTimeouting);
+    inlMod->AddMethod(methods.PyTimerIsCancelling);
     inlMod->AddMethod(methods.PyTimerUpdateAllTimers);
 
     // Add packet header part describe about methods/variables to inl module.
