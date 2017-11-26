@@ -160,7 +160,6 @@ namespace
             return LLBC_FAILED;
         }
 
-        // needReschedule = !!PyObject_IsTrue(pyRtn);
         needReschedule = true;
         Py_DECREF(pyRtn);
 
