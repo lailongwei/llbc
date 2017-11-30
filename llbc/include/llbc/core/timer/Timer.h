@@ -11,6 +11,8 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/utils/Util_DelegateImpl.h"
+
 __LLBC_NS_BEGIN
 
 struct LLBC_TimerData;
@@ -28,17 +30,24 @@ class LLBC_EXPORT LLBC_Timer
     typedef LLBC_TimerScheduler Scheduler;
 
 public:
+    typedef void (*TimeoutFunc)(LLBC_Timer *);
+    typedef void (*CancelFunc)(LLBC_Timer *);
+
+public:
     /**
      * Constructor.
-     * @param[in] scheduler - timer scheduler, if set to NULL, it means use default scheduler, 
-     *                        otherwise use you specific timer scheduler.
+     * @param[in] timeoutFunc/timeoutDeleg - the timeout handler function/delegate.
+     * @param[in] cancelFunc/cancelDeleg   - the cancel handler function/delegate(optional).
+     * @param[in] scheduler                - timer scheduler, if set to NULL, it means use default scheduler, 
+     *                                       otherwise use you specific timer scheduler.
      * Note:
      *          The default scheduler is means:
      *              In entry thread, use LLBC library Startup() API create's timer scheduler.
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is NULL.
      */
-    explicit LLBC_Timer(Scheduler *scheduler = NULL);
+    explicit LLBC_Timer(TimeoutFunc timeoutFunc, CancelFunc cancelFunc, Scheduler *scheduler = NULL);
+    explicit LLBC_Timer(LLBC_IDelegate1<LLBC_Timer *> *timeoutDeleg, LLBC_IDelegate1<LLBC_Timer *> *cancelDeleg, Scheduler *scheduler = NULL);
     virtual ~LLBC_Timer();
 
 public:
@@ -64,7 +73,7 @@ public:
     /**
      * Timeout event handler.
      */
-     virtual void OnTimeout() = 0;
+     virtual void OnTimeout();
 
     /**
      * Timer cancel event handler.
@@ -123,6 +132,12 @@ private:
 private:
     Scheduler *_scheduler;
     LLBC_TimerData *_timerData;
+
+    TimeoutFunc _timeoutFunc;
+    LLBC_IDelegate1<LLBC_Timer *> *_timeoutDeleg;
+
+    CancelFunc _cancelFunc;
+    LLBC_IDelegate1<LLBC_Timer *> *_cancelDeleg;
 };
 
 __LLBC_NS_END

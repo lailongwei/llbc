@@ -4,6 +4,10 @@
 #
 # Version: 1.0.1
 #
+# 2017/11/30
+# 1) 【llbc core】调整LLBC_Timer::OnTimeout/LLBC_Timer::OnCancel实现，不需要子类化LLBC_Timer，只需要在new LLBC_Timer的时候给定Timeout handler或者Timeout delegate即可.
+#                 对于上层的wraps库，同步进行兼容(wraps库没有影响).
+#
 # 2017/11/23
 # 新增功能:
 # 1) 【lullbc】增加Timer、TimerScheduler实现, 使用core lib中的LLBC_BaseTimer/LLBC_TimerScheduler实现.

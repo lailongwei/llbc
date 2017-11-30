@@ -11,20 +11,6 @@
 
 namespace
 {
-    class TestTimer : public LLBC_Timer
-    {
-    public:
-        virtual void OnTimeout()
-        {
-            LLBC_PrintLine("Timer timeout!");
-        }
-
-        virtual void OnCancel()
-        {
-            LLBC_PrintLine("Time cancelled!");
-        }
-    };
-
     class TestFacade : public LLBC_IFacade
     {
     public:
@@ -41,7 +27,8 @@ namespace
         virtual void OnStart()
         {
             LLBC_PrintLine("Service start");
-            _timer = LLBC_New(TestTimer);
+            _timer = new LLBC_Timer(new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
+                                    new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
             _timer->Schedule(2000, 2000);
         }
 
@@ -63,8 +50,19 @@ namespace
             LLBC_PrintLine("Idle, times: %d...", idleTime);
         }
 
+    public:
+        virtual void OnTimerTimeout(LLBC_Timer *timer)
+        {
+            LLBC_PrintLine("Timer timeout!");
+        }
+
+        virtual void OnTimerCancel(LLBC_Timer *timer)
+        {
+            LLBC_PrintLine("Time cancelled!");
+        }
+
     private:
-        TestTimer *_timer;
+        LLBC_Timer *_timer;
     };
 }
 

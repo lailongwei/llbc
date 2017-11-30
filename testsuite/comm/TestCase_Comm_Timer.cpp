@@ -11,40 +11,6 @@
 
 namespace
 {
-class TestTimer : public LLBC_Timer
-{
-public:
-    TestTimer()
-    {
-    }
-
-    virtual ~TestTimer()
-    {
-        Cancel();
-    }
-
-public:
-    void OnTimeout()
-    {
-        if (++_timeoutTimes % 10000 == 0)
-            LLBC_PrintLine("Timer <%s> trigger %d times timeout", this->ToString().c_str(), _timeoutTimes);
-        Schedule(LLBC_Random::RandInt32cmcn(5000, 15000));
-    }
-
-    void OnCancel()
-    {
-        if (++_cancelTimes % 10000 == 0)
-            LLBC_PrintLine("Timer <%s> trigger %d times cancel", this->ToString().c_str(), _cancelTimes);
-    }
-
-private:
-    static int _timeoutTimes;
-    static int _cancelTimes;
-};
-
-int TestTimer::_timeoutTimes = 0;
-int TestTimer::_cancelTimes = 0;
-
 class TestFacade : public LLBC_IFacade
 {
 public:
@@ -52,14 +18,19 @@ public:
     {
         LLBC_PrintLine("Service startup, startup timers...");
 
+        _timeoutTimes = 0;
+        _cancelTimes = 0;
+
         // Create long time timer and try to cancel
-        TestTimer *longTimeTimer = new TestTimer();
+        LLBC_Timer *longTimeTimer = new LLBC_Timer(new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
+                                                   new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
         longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
         delete longTimeTimer;
 
         for(int i = 1; i <=2000000; i++) 
         {
-            TestTimer *timer = new TestTimer();
+            LLBC_Timer *timer = new LLBC_Timer(new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
+                                               new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
             timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000), 
                 LLBC_Random::RandInt32cmcn(5000, 15000));
         }
@@ -71,7 +42,28 @@ public:
     {
         LLBC_PrintLine("Service destroy!");
     }
+
+public:
+    void OnTimerTimeout(LLBC_Timer *timer)
+    {
+        if (++_timeoutTimes % 10000 == 0)
+            LLBC_PrintLine("Timer <%s> trigger %d times timeout", timer->ToString().c_str(), _timeoutTimes);
+        timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000));
+    }
+
+    void OnTimerCancel(LLBC_Timer *timer)
+    {
+        if (++_cancelTimes % 10000 == 0)
+            LLBC_PrintLine("Timer <%s> trigger %d times cancel", timer->ToString().c_str(), _cancelTimes);
+    }
+
+private:
+    static int _timeoutTimes;
+    static int _cancelTimes;
 };
+
+int TestFacade::_timeoutTimes = 0;
+int TestFacade::_cancelTimes = 0;
 }
 
 TestCase_Comm_Timer::TestCase_Comm_Timer()

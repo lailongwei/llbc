@@ -36,7 +36,7 @@ static int __Timer_PCallErrorHandler(lua_State *l)
 }
 
 lullbc_Timer::lullbc_Timer(lua_State *l)
-: LLBC_Timer(lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
+: LLBC_Timer((TimeoutFunc)NULL, NULL, lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
 , _luaState(l)
 , _callableInfo(0)
 {

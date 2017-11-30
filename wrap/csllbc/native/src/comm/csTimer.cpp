@@ -12,7 +12,8 @@
 #include "csllbc/comm/csTimer.h"
 
 csllbc_Timer::csllbc_Timer(_TimeoutDeleg timeoutDeleg, _CancelDeleg cancelDeleg)
-: _timeoutDeleg(timeoutDeleg)
+: LLBC_Timer((TimeoutFunc)NULL, NULL, NULL)
+, _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
 }
