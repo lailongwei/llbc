@@ -25,18 +25,35 @@ public:
 template <typename ObjectType, typename Arg>
 class LLBC_DelegateEx : public LLBC_IDelegateEx<Arg>
 {
-    typedef void *(ObjectType::*Function)(Arg arg);
+    typedef void *(ObjectType::*Method)(Arg arg);
 
 public:
-    LLBC_DelegateEx(ObjectType *object, Function function):_object(object), _function(function) {  }
+    LLBC_DelegateEx(ObjectType *object, Method method):_object(object), _method(method) {  }
 
     virtual ~LLBC_DelegateEx() {  }
 
 public:
-    virtual void *Invoke(Arg arg) { return (_object->*_function)(arg); }
+    virtual void *Invoke(Arg arg) { return (_object->*_method)(arg); }
 
 public:
     ObjectType *_object;
+    Method _method;
+};
+
+template <typename Arg>
+class LLBC_FuncDelegateEx : public LLBC_IDelegateEx<Arg>
+{
+    typedef void *(*Function)(Arg arg);
+
+public:
+    LLBC_FuncDelegateEx(Function function):_function(function) {  }
+
+    virtual ~LLBC_FuncDelegateEx() {  }
+
+public:
+    virtual void *Invoke(Arg arg) { return (*_function)(arg); }
+
+public:
     Function _function;
 };
 
