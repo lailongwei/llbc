@@ -4,6 +4,14 @@
 #
 # Version: 1.0.1
 #
+# 2017/12/10
+# 1) 【llbc core】增加LLBC_FuncDelegate实现, 以实现对function, class static function的保存, 做到使用LLBC_IDelegate hold住所有的callable的目的.
+#                 eg: std::vector<LLBC_IDelegate1<int> *> delegs;
+#					  delegs.push_back(new LLBC_Delegate1<Obj, int>(obj, &Obj::Foo)); // hold住Obj类的Foo函数
+#					  delegs.push_back(new LLBC_FuncDelegate1<int>(FuncFoo)); // hold住FuncFoo函数
+#					  for (size_t i = 0; i <delegs.size(); i++)
+#						  delegs[i]->Invoke((int)i);
+#
 # 2017/11/30
 # 1) 【llbc core】调整LLBC_Timer::OnTimeout/LLBC_Timer::OnCancel实现，不需要子类化LLBC_Timer，只需要在new LLBC_Timer的时候给定Timeout handler或者Timeout delegate即可.
 #                 对于上层的wraps库，同步进行兼容(wraps库没有影响).
