@@ -168,7 +168,7 @@ namespace
 }
 
 pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObject *cancelCallable)
-: Base((TimeoutFunc)NULL, NULL, NULL)
+: Base(NULL, NULL, NULL)
 , _pyTimer(pyTimer)
 , _ignoredDeadRef(false)
 {
