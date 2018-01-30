@@ -305,12 +305,16 @@ bool LLBC_Service::IsStarted() const
 
 void LLBC_Service::Stop()
 {
-    LLBC_Guard guard(_lock);
-
-    if (!_started || _stopping)
-        return;
+	_lock.Lock();
+	if (!_started || _stopping)
+	{
+		_lock.Unlock();
+		return;
+	}
 
     _stopping = true;
+	_lock.Unlock();
+
     if (_driveMode == This::SelfDrive) // Stop self-drive service.
     {
         // TODO: How to stop sink into loop service???
@@ -1030,8 +1034,8 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack()
 
 void LLBC_Service::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
+	while (!_started)
+		LLBC_Sleep(20);
 
     _lock.Lock();
     AddServiceToTls();
