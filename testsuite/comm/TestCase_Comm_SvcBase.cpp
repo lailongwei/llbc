@@ -116,7 +116,7 @@ public:
         GetService()->Send(resPacket);
     }
 
-    void *OnPreRecvData(LLBC_Packet &packet)
+    bool OnPreRecvData(LLBC_Packet &packet)
     {
         TestData *data = (TestData *)packet.GetDecoder();
         LLBC_PrintLine("Pre-Receive data[%d], iVal: %d, strVal: %s",
@@ -124,16 +124,16 @@ public:
 
         packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
 
-        return reinterpret_cast<void *>(0x01);
+        return true;
     }
 
-    void *OnUnifyPreRecvData(LLBC_Packet &packet)
+    bool OnUnifyPreRecvData(LLBC_Packet &packet)
     {
         LLBC_PrintLine("Unify Pre-Receive data[%d]", packet.GetSessionId());
 
         packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
 
-        return reinterpret_cast<void *>(0x01);
+        return true;
     }
 
 public:

@@ -24,7 +24,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return this->AddListener(id, new LLBC_Delegate1<ObjectType, LLBC_Event *>(obj, listener), bindedStub);
+    return this->AddListener(id, new LLBC_Delegate1<void, ObjectType, LLBC_Event *>(obj, listener), bindedStub);
 }
 
 __LLBC_NS_END

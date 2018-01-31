@@ -110,8 +110,8 @@ inline int LLBC_IService::Broadcast2(int svcId, int opcode, const T &data, int s
 template <typename ObjType>
 inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
-    LLBC_IDelegate1<LLBC_Packet &> *deleg = 
-        new LLBC_Delegate1<ObjType, LLBC_Packet &>(obj, method);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = 
+        new LLBC_Delegate1<void, ObjType, LLBC_Packet &>(obj, method);
     if (this->Subscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
@@ -122,10 +122,10 @@ inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*me
 }
 
 template <typename ObjType>
-inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, void *(ObjType::*method)(LLBC_Packet &))
+inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
-    LLBC_IDelegateEx<LLBC_Packet &> *deleg =
-        new LLBC_DelegateEx<ObjType, LLBC_Packet &>(obj, method);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
+        new LLBC_Delegate1<bool, ObjType, LLBC_Packet &>(obj, method);
     if (this->PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
@@ -137,10 +137,10 @@ inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, void *(ObjType:
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 template <typename ObjType>
-inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, void *(ObjType::*method)(LLBC_Packet &))
+inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
-    LLBC_IDelegateEx<LLBC_Packet &> *deleg =
-        new LLBC_DelegateEx<ObjType, LLBC_Packet &>(obj, method);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
+        new LLBC_Delegate1<bool, ObjType, LLBC_Packet &>(obj, method);
     if (this->UnifyPreSubscribe(deleg) != LLBC_OK)
     {
         delete deleg;
@@ -155,8 +155,8 @@ inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, void *(ObjType::*metho
 template <typename ObjType>
 inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
-    LLBC_IDelegate1<LLBC_Packet &> *deleg =
-        new LLBC_Delegate1<ObjType, LLBC_Packet &>(obj, method);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg =
+        new LLBC_Delegate1<void, ObjType, LLBC_Packet &>(obj, method);
     if (this->SubscribeStatus(opcode, status, deleg) != LLBC_OK)
     {
         delete deleg;
@@ -170,8 +170,8 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, 
 template <typename ObjType>
 inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event *))
 {
-    LLBC_IDelegate1<LLBC_Event *> *deleg = 
-        new LLBC_Delegate1<ObjType, LLBC_Event *>(obj, method);
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg = 
+        new LLBC_Delegate1<void, ObjType, LLBC_Event *>(obj, method);
     LLBC_ListenerStub stub = this->SubscribeEvent(event, deleg);
     if (stub.empty())
         delete deleg;
@@ -182,7 +182,7 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
 template <typename ObjType>
 inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(LLBC_IService::This *svc))
 {
-    LLBC_IDelegate1<LLBC_IService::This *> *deleg = new LLBC_Delegate1<ObjType, LLBC_IService::This *>(obj, method);
+    LLBC_IDelegate1<void, LLBC_IService::This *> *deleg = new LLBC_Delegate1<void, ObjType, LLBC_IService::This *>(obj, method);
     if (this->Post(deleg) != LLBC_OK)
     {
         delete deleg;

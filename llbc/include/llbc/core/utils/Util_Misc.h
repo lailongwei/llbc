@@ -42,7 +42,7 @@ private:
 
 private:
     LLBC_GuardFunc _func;
-    LLBC_IDelegate1<void *> *_meth;
+    LLBC_IDelegate1<void, void *> *_meth;
 
     void *_data;
 };

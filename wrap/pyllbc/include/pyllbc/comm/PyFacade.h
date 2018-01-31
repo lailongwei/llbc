@@ -105,17 +105,17 @@ public:
     /**
      * The data pre-receive handler.
      * @param[in] packet - packet.
-     * @return void * - the return value, if return NULL, will remove this session.
+     * @return bool - the return value, if return false, will remove this session.
      */
-    virtual void *OnDataPreReceived(LLBC_Packet &packet);
+    virtual bool OnDataPreReceived(LLBC_Packet &packet);
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * The data unify pre-receive handler.
      * @param[in] packet - packet.
-     * @return void * - the return value, if return NULL, will remove this session.
+     * @return bool - the return value, if return zero, will remove this session.
      */
-    virtual void *OnDataUnifyPreReceived(LLBC_Packet &packet);
+    virtual bool OnDataUnifyPreReceived(LLBC_Packet &packet);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
     /**

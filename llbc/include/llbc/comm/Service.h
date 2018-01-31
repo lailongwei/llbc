@@ -314,25 +314,25 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg);
+    virtual int Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
 
     /**
      * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg);
+    virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg);
+    virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<LLBC_Packet &> *deleg);
+    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     /**
@@ -355,7 +355,7 @@ public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<LLBC_Event *> *deleg);
+    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg);
 
     /**
      * Unsubscribe event.
@@ -381,7 +381,7 @@ public:
      * @param[in] delegate - the task delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<Base *> *deleg);
+    virtual int Post(LLBC_IDelegate1<void, Base *> *deleg);
 
 public:
     /**
@@ -420,7 +420,7 @@ private:
     /**
      * Frame tasks operation methods.
      */
-    typedef std::set<LLBC_IDelegate1<Base *> *> _FrameTasks;
+    typedef std::set<LLBC_IDelegate1<void, Base *> *> _FrameTasks;
     void HandleFrameTasks(_FrameTasks &tasks, bool &usingFlag);
     void DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag);
 
@@ -527,15 +527,15 @@ private:
     _Facades _facades;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
-    typedef std::map<int, LLBC_IDelegate1<LLBC_Packet &> *> _Handlers;
+    typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;
     _Handlers _handlers;
-    typedef std::map<int, LLBC_IDelegateEx<LLBC_Packet &> *> _PreHandlers;
+    typedef std::map<int, LLBC_IDelegate1<bool, LLBC_Packet &> *> _PreHandlers;
     _PreHandlers _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_IDelegateEx<LLBC_Packet &> *_unifyPreHandler;
+    LLBC_IDelegate1<bool, LLBC_Packet &> *_unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    typedef std::map<int, LLBC_IDelegate1<LLBC_Packet &> *> _StatusHandlers;
+    typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _StatusHandlers;
     typedef std::map<int, _StatusHandlers *> _OpStatusHandlers;
     _OpStatusHandlers _statusHandlers;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER

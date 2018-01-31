@@ -201,31 +201,28 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
         Py_DECREF(pyPacket);
 }
 
-void *pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
+bool pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
 {
-    static void * const succeedRtn = reinterpret_cast<void *>(0x01);
-    static void * const failedRtn = reinterpret_cast<void *>(0x00);
-
     typedef pyllbc_Service::_PacketHandlers _Handlers;
 
     if (UNLIKELY(_svc->_stoping))
-        return succeedRtn;
+        return true;
 
     _Handlers &handlers = _svc->_preHandlers;
     _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
     if (handlerIt == handlers.end())
-        return succeedRtn;
+        return true;
 
     pyllbc_PacketHandler *handler = handlerIt->second;
     PyObject *pyPacket = BuildPyPacket(packet);
     if (UNLIKELY(!pyPacket))
-        return failedRtn;
+        return false;
 
     packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
 
     PyObject *ret = handler->Handle(pyPacket);
     if (UNLIKELY(!ret))
-        return failedRtn;
+        return false;
 
     const int detectResult = PyObject_IsTrue(ret);
     if (UNLIKELY(detectResult == -1))
@@ -233,31 +230,28 @@ void *pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
         pyllbc_TransferPyError();
 
         Py_DECREF(ret);
-        return failedRtn;
+        return false;
     }
 
     Py_DECREF(ret);
-    return (detectResult == 0 ? failedRtn : succeedRtn);
+    return detectResult != 0;
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-void *pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
+bool pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
 {
-    static void * const succeedRtn = reinterpret_cast<void *>(0x01);
-    static void * const failedRtn = reinterpret_cast<void *>(0x00);
-
     if (UNLIKELY(_svc->_stoping))
-        return succeedRtn;
+        return true;
 
     PyObject *pyPacket = BuildPyPacket(packet);
     if (UNLIKELY(!pyPacket))
-        return failedRtn;
+        return false;
 
     packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
 
     PyObject *ret = _svc->_unifyPreHandler->Handle(pyPacket);
     if (UNLIKELY(!ret))
-        return failedRtn;
+        return false;
 
     const int detectResult = PyObject_IsTrue(ret);
     if (UNLIKELY(detectResult == -1))
@@ -265,11 +259,11 @@ void *pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
         pyllbc_TransferPyError();
 
         Py_DECREF(ret);
-        return failedRtn;
+        return false;
     }
 
     Py_DECREF(ret);
-    return (detectResult == 0 ? failedRtn : succeedRtn);
+    return detectResult != 0;
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 

@@ -22,15 +22,15 @@ public:
         _cancelTimes = 0;
 
         // Create long time timer and try to cancel
-        LLBC_Timer *longTimeTimer = new LLBC_Timer(new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
-                                                   new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
+        LLBC_Timer *longTimeTimer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
+                                                   new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
         longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
         delete longTimeTimer;
 
         for(int i = 1; i <=2000000; i++) 
         {
-            LLBC_Timer *timer = new LLBC_Timer(new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
-                                               new LLBC_Delegate1<TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
+            LLBC_Timer *timer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
+                                               new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
             timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000), 
                 LLBC_Random::RandInt32cmcn(5000, 15000));
         }

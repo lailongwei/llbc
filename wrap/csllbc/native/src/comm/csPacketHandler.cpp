@@ -35,7 +35,7 @@ void csllbc_PacketHandler::Handle(LLBC_Packet &packet)
                             packet.GetPayload());
 }
 
-void *csllbc_PacketHandler::PreHandle(LLBC_Packet &packet)
+bool csllbc_PacketHandler::PreHandle(LLBC_Packet &packet)
 {
     csllbc_Coder *coder = (csllbc_Coder *)packet.GetDecoder();
     if (coder == NULL &&
@@ -45,10 +45,10 @@ void *csllbc_PacketHandler::PreHandle(LLBC_Packet &packet)
     _DecodeDelegs *delegs = coder->GetDecodeDelegates();
     return (*delegs->preHandlerDeleg)(packet.GetSessionId(),
                                       packet.GetOpcode(),
-                                      packet.GetPayload()) ? (void *)1 : NULL;
+                                      packet.GetPayload()) != 0;
 }
 
-void *csllbc_PacketHandler::UnifyPreHandle(LLBC_Packet &packet)
+bool csllbc_PacketHandler::UnifyPreHandle(LLBC_Packet &packet)
 {
     csllbc_Coder *coder = (csllbc_Coder *)packet.GetDecoder();
     if (coder == NULL &&
@@ -58,7 +58,7 @@ void *csllbc_PacketHandler::UnifyPreHandle(LLBC_Packet &packet)
     _DecodeDelegs *delegs = coder->GetDecodeDelegates();
     return (*delegs->unifyPreHandlerDeleg)(packet.GetSessionId(),
                                            packet.GetOpcode(),
-                                           packet.GetPayload()) ? (void *)1 : NULL;
+                                           packet.GetPayload()) != 0;
 }
 
 void csllbc_PacketHandler::ReportNotFoundDecoder(int phase, LLBC_Packet &packet)

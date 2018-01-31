@@ -216,7 +216,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSubscribeEvEv(int id,
                                                       const LLBC_String &stub,
-                                                      LLBC_IDelegate1<LLBC_Event *> *deleg)
+                                                      LLBC_IDelegate1<void, LLBC_Event *> *deleg)
 {
     typedef LLBC_SvcEv_SubscribeEv _Ev;
 

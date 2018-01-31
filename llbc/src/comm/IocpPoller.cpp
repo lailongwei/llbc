@@ -241,7 +241,7 @@ void LLBC_IocpPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_IocpPoller::StartupMonitor()
 {
-    LLBC_IDelegate0 *deleg = new LLBC_Delegate0<
+    LLBC_IDelegate0<void> *deleg = new LLBC_Delegate0<void,
         LLBC_IocpPoller>(this, &LLBC_IocpPoller::MonitorSvc);
 
     _monitor = new LLBC_PollerMonitor(deleg);

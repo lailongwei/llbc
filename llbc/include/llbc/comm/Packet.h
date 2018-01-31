@@ -498,7 +498,7 @@ private:
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
     void *_preHandleResult;
-    LLBC_IDelegate1<void *> *_resultClearDeleg;
+    LLBC_IDelegate1<void, void *> *_resultClearDeleg;
 
     LLBC_MessageBlock *_block;
     LLBC_String *_codecError;

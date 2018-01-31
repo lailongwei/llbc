@@ -362,7 +362,7 @@ inline void LLBC_Packet::SetPreHandleResult(void *result, Obj *obj, void (Obj::*
     this->CleanupPreHandleResult();
     if ((_preHandleResult = result))
         if (obj && clearMethod)
-            _resultClearDeleg = new LLBC_Delegate1<Obj, void *>(obj, clearMethod);
+            _resultClearDeleg = new LLBC_Delegate1<void, Obj, void *>(obj, clearMethod);
 }
 
 template <typename _Ty>

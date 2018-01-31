@@ -16,7 +16,9 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_Timer::LLBC_Timer(LLBC_IDelegate1<LLBC_Timer *> *timeoutDeleg, LLBC_IDelegate1<LLBC_Timer *> *cancelDeleg, LLBC_Timer::Scheduler *scheduler)
+LLBC_Timer::LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg,
+                       LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg,
+                       LLBC_Timer::Scheduler *scheduler)
 : _scheduler(NULL)
 , _timerData(NULL)
 

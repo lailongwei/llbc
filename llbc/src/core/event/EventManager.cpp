@@ -102,7 +102,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
 }
 
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                 LLBC_IDelegate1<LLBC_Event *> *listener,
+                                                 LLBC_IDelegate1<void, LLBC_Event *> *listener,
                                                  const LLBC_ListenerStub &bindedStub)
 {
     if (id <= 0 || listener == NULL)

@@ -42,12 +42,12 @@ public:
     /**
     * The csharp packet pre-handler.
     */
-    void *PreHandle(LLBC_Packet &packet);
+    bool PreHandle(LLBC_Packet &packet);
 
     /**
     * The csharp packet unify-prehandler.
     */
-    void *UnifyPreHandle(LLBC_Packet &packet);
+    bool UnifyPreHandle(LLBC_Packet &packet);
 
 private:
     /**

@@ -140,7 +140,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 {
     int id;
     LLBC_String stub;
-    LLBC_IDelegate1<LLBC_Event *> *deleg;
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg;
 
     LLBC_SvcEv_SubscribeEv();
     virtual ~LLBC_SvcEv_SubscribeEv();
@@ -212,7 +212,7 @@ public:
      */
     static LLBC_MessageBlock *BuildSubscribeEvEv(int id,
                                                  const LLBC_String &stub,
-                                                 LLBC_IDelegate1<LLBC_Event *> *deleg);
+                                                 LLBC_IDelegate1<void, LLBC_Event *> *deleg);
 
     /**
      * Build proto-report event.

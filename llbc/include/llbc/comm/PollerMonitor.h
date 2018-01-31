@@ -20,7 +20,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_BaseTask
 {
-    typedef LLBC_IDelegate0 _Deleg;
+    typedef LLBC_IDelegate0<void> _Deleg;
 
 public:
     /**

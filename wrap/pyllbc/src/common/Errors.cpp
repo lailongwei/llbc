@@ -14,8 +14,8 @@
 
 PyObject *pyllbc_Exception = NULL;
 
-LLBC_IDelegate0 *pyllbc_ErrClearHook = NULL;
-LLBC_IDelegate4<const LLBC_String &, int, PyObject *, PyObject *> *pyllbc_ErrSetHook = NULL;
+LLBC_IDelegate0<void> *pyllbc_ErrClearHook = NULL;
+LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *pyllbc_ErrSetHook = NULL;
 
 void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback)
 {
@@ -131,13 +131,13 @@ void pyllbc_ClearError()
         pyllbc_ErrClearHook->Invoke();
 }
 
-void pyllbc_SetErrSetHock(LLBC_IDelegate4<const LLBC_String &, int, PyObject *, PyObject *> *hook)
+void pyllbc_SetErrSetHock(LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *hook)
 {
     LLBC_XDelete(pyllbc_ErrSetHook);
     pyllbc_ErrSetHook = hook;
 }
 
-void pyllbc_SetErrClearHook(LLBC_IDelegate0 *hook)
+void pyllbc_SetErrClearHook(LLBC_IDelegate0<void> *hook)
 {
     LLBC_XDelete(pyllbc_ErrClearHook);
     pyllbc_ErrClearHook = hook;

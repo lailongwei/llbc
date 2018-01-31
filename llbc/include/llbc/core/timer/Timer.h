@@ -42,7 +42,7 @@ public:
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is NULL.
      */
-    explicit LLBC_Timer(LLBC_IDelegate1<LLBC_Timer *> *timeoutDeleg, LLBC_IDelegate1<LLBC_Timer *> *cancelDeleg, Scheduler *scheduler = NULL);
+    explicit LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg, LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg, Scheduler *scheduler = NULL);
     virtual ~LLBC_Timer();
 
 public:
@@ -128,8 +128,8 @@ private:
     Scheduler *_scheduler;
     LLBC_TimerData *_timerData;
 
-    LLBC_IDelegate1<LLBC_Timer *> *_timeoutDeleg;
-    LLBC_IDelegate1<LLBC_Timer *> *_cancelDeleg;
+    LLBC_IDelegate1<void, LLBC_Timer *> *_timeoutDeleg;
+    LLBC_IDelegate1<void, LLBC_Timer *> *_cancelDeleg;
 };
 
 __LLBC_NS_END

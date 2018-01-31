@@ -668,7 +668,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg)
+int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -696,7 +696,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg)
     return LLBC_OK;
 }
 
-int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg)
+int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -725,7 +725,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *dele
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg)
+int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -752,7 +752,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<LLBC_Packet &> *deleg)
+int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -856,7 +856,7 @@ int LLBC_Service::DisableTimerScheduler()
     return LLBC_OK;
 }
 
-LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<LLBC_Event *> *deleg)
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -887,7 +887,7 @@ void LLBC_Service::FireEvent(LLBC_Event *ev)
     Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
 }
 
-int LLBC_Service::Post(LLBC_IDelegate1<LLBC_Service::Base *> *deleg)
+int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
 {
     if (UNLIKELY(!deleg))
     {

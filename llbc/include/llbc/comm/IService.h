@@ -398,7 +398,7 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, LLBC_IDelegate1<LLBC_Packet &> *deleg) = 0;
+    virtual int Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
 
     /**
      * Subscribe message to specified handler method.
@@ -409,32 +409,32 @@ public:
     /**
      * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, LLBC_IDelegateEx<LLBC_Packet &> *deleg) = 0;
+    virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
     /**
      * Previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
      */
     template <typename ObjType>
-    int PreSubscribe(int opcode, ObjType *obj, void *(ObjType::*method)(LLBC_Packet &));
+    int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(LLBC_IDelegateEx<LLBC_Packet &> *deleg) = 0;
+    virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
     /**
      * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
      */
     template <typename ObjType>
-    int UnifyPreSubscribe(ObjType *obj, void *(ObjType::*method)(LLBC_Packet &));
+    int UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<LLBC_Packet &> *deleg) = 0;
+    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
 
     /**
      * Subscribe message status to specified method, if subscribed, service will not call default opcode handler.
@@ -468,7 +468,7 @@ public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<LLBC_Event *> *deleg) = 0;
+    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg) = 0;
 
     /**
      * Unsubscribe event.
@@ -494,7 +494,7 @@ public:
      * @param[in] delegate - the task delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<This *> *deleg) = 0;
+    virtual int Post(LLBC_IDelegate1<void, This *> *deleg) = 0;
 
     /**
      * Post lazy task to service.

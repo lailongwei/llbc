@@ -24,7 +24,7 @@ inline LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
 template <typename Object>
 inline LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data)
 : _func(NULL)
-, _meth(new LLBC_Delegate1<Object, void *>(obj, meth))
+, _meth(new LLBC_Delegate1<void, Object, void *>(obj, meth))
 
 , _data(data)
 {

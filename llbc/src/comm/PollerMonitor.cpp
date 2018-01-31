@@ -14,7 +14,7 @@
 
 namespace
 {
-    typedef LLBC_NS LLBC_IDelegate0 _Deleg;
+    typedef LLBC_NS LLBC_IDelegate0<void> _Deleg;
 }
 
 __LLBC_NS_BEGIN

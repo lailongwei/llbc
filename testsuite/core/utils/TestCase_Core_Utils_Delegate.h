@@ -23,6 +23,7 @@ public:
 
 private:
     void Foo_0();
+    int Foo_0_Rtn_Int();
 
     void Foo_1(int arg1);
 

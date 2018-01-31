@@ -77,12 +77,12 @@ LLBC_EXTERN LLBC_HIDDEN void pyllbc_ClearError();
  *                     PyObject *          - exception class.
  *                     PyObject *          - traceback object.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrSetHock(LLBC_IDelegate4<const LLBC_String &, int, PyObject *, PyObject *> *hook);
+LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrSetHock(LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *hook);
 
 /**
  * Error clear hook setter.
  * @param[in] hook - the error clear hook.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrClearHook(LLBC_IDelegate0 *hook);
+LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrClearHook(LLBC_IDelegate0<void> *hook);
 
 #endif // !__PYLLBC_COM_ERROR_H__

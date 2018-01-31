@@ -14,8 +14,8 @@ namespace
 {
     typedef pyllbc_ErrorHooker This;
 
-    typedef LLBC_Delegate0<This> _ClearDeleg;
-    typedef LLBC_Delegate4<This, const LLBC_String &, int, PyObject *, PyObject *> _SetDeleg;
+    typedef LLBC_Delegate0<void, This> _ClearDeleg;
+    typedef LLBC_Delegate4<void, This, const LLBC_String &, int, PyObject *, PyObject *> _SetDeleg;
 }
 
 pyllbc_ErrorHooker::pyllbc_ErrorHooker()
