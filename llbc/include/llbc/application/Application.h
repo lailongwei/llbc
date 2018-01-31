@@ -56,7 +56,7 @@ public:
      * @param[in] arg  - user data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(const LLBC_String &name, void *arg);
+    virtual int Initialize(const LLBC_String &name, void *arg = NULL);
 
     /**
      * Start application.
