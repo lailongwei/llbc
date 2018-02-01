@@ -3,6 +3,15 @@
 ######################################################################################
 #
 # Version: 1.0.1
+# 2018/01/31
+# 功能新增/改进/优化:
+# 1) 【llbc core】对Delegate, Func增加Rtn typename, 以支持hold任意的class methods及functions, 同时对void Rtn进行偏特化，最终LLBC_Delegate机制可以完整hold任意class methods及functions.
+# 2) 【llbc core】对LLBC_Delegate增加destroyObjectWhenDestruct参数，以指示delegate在destruct的时候，是否要destroy cached的object.
+# 3) 【llbc core】针对CPURelax，增加windows x64支持(之前版本的支持是直接粗暴使用Sleep完成).
+# 4) 【llbc core】增加ALWAYS_INLINE macro，以更好的指示编译器进行内联.
+# Bug Fix:
+# 1) 【llbc core】fix LLBC_FormatArg在vs2015及以后的版本中的编译报错, 为va_start要求fmt不能有()引起.
+# 2) 【llbc core】修复LLBC_Service在start后, 立刻删除, 有可能引起dead lock的BUG.
 #
 # 2017/12/10
 # 1) 【llbc core】增加LLBC_FuncDelegate实现, 以实现对function, class static function的保存, 做到使用LLBC_IDelegate hold住所有的callable的目的.
