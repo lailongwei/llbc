@@ -624,6 +624,7 @@ void LLBC_CPURelax()
  #endif
 #else // WIN32 platform
  #ifdef _M_X64
+    // TODO: inline assembly is not support for now, just use Sleep(0) to replace.
     ::Sleep(0);
  #else // not define _M_X64
     __asm {
