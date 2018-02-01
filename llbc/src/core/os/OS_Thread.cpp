@@ -623,13 +623,7 @@ void LLBC_CPURelax()
     asm volatile ("nop");
  #endif
 #else // WIN32 platform
- #ifdef _M_X64
-    _mm_pause();
- #else // not define _M_X64
-    __asm {
-        rep nop
-    }
- #endif // defined _M_X64
+    YieldProcessor();
 #endif // Non-WIN32 platform
 }
 

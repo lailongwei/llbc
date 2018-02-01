@@ -89,7 +89,7 @@ public:
     /**
      * Relax the CPU.
      */
-    static void CPURelax();
+    static LLBC_FORCE_INLINE void CPURelax();
 
     /**
      * Get current thread native thread handle.
