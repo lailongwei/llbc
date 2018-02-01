@@ -341,7 +341,7 @@ private:                                            \
         int ___bufSize = 1024; ___len = 0;                                       \
         ___buf = LLBC_Malloc(char, ___bufSize + 1);                              \
         while (true) {                                                           \
-            va_start(___ap, (fmt));                                              \
+            va_start(___ap, fmt);                                                \
             ___len = ::vsnprintf_s(___buf, ___bufSize, _TRUNCATE, (fmt), ___ap); \
             va_end(___ap);                                                       \
                                                                                  \
