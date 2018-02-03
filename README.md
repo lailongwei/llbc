@@ -1,6 +1,4 @@
 ## llbc
-Low Level Base Compoment
-
 llbc为一个精简、功能完整、多语言支持的服务端开发框架，面向Service及Facade，底层c++实现。  
 QQ交流群：662590231  
 手册：[简书--llbc 手册](http://www.jianshu.com/p/ab225bd56779)   
