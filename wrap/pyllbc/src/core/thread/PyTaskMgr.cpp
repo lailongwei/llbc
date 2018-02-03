@@ -27,7 +27,7 @@ pyllbc_TaskMgr::pyllbc_TaskMgr()
 
 pyllbc_TaskMgr::~pyllbc_TaskMgr()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     
     while(!_tasks.empty())
         LLBC_ThreadManager::Sleep(20);
@@ -41,7 +41,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
 
     if (GetTaskCount() >= PYLLBC_CFG_TASK_LMT)
     {
@@ -67,7 +67,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
 
 pyllbc_Task *pyllbc_TaskMgr::GetTask(int taskId)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _Tasks::iterator it = _tasks.find(taskId);
 
     return it != _tasks.end() ? it->second : NULL;
@@ -106,7 +106,7 @@ uint32 pyllbc_TaskMgr::GetTaskCount() const
 {
     This *ncThis = const_cast<This *>(this);
 
-    LLBC_Guard(ncThis->_lock);
+    LLBC_LockGuard(ncThis->_lock);
     return static_cast<uint32>(ncThis->_tasks.size());
 }
 
@@ -124,7 +124,7 @@ int pyllbc_TaskMgr::PushMsg(int taskId, LLBC_MessageBlock *msg)
         return LLBC_OK;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _Tasks::iterator it = _tasks.find(taskId);
     if (it == _tasks.end())
     {
@@ -153,7 +153,7 @@ int pyllbc_TaskMgr::PopMsg(int taskId, LLBC_MessageBlock *&msg, int interval)
         return _mainThreadQueue.TimedPopFront(msg, interval);
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _Tasks::iterator it = _tasks.find(taskId);
     if (it == _tasks.end())
     {
@@ -176,7 +176,7 @@ void pyllbc_TaskMgr::OnTaskCreated(pyllbc_Task *task)
 
 void pyllbc_TaskMgr::OnTaskDestroy(pyllbc_Task *task)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _tasks.erase(task->GetId());
 
     delete task;

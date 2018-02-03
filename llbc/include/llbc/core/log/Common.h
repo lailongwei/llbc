@@ -13,5 +13,6 @@
 
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/Log.h"
 
 #endif // !__LLBC_CORE_LOG_COMMON_H__

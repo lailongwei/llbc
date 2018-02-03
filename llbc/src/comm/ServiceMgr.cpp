@@ -35,7 +35,7 @@ LLBC_ServiceMgr::~LLBC_ServiceMgr()
 
 LLBC_IService *LLBC_ServiceMgr::GetService(int id)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _Services::iterator it = _id2Services.find(id);
     if (it == _id2Services.end())
     {
@@ -48,7 +48,7 @@ LLBC_IService *LLBC_ServiceMgr::GetService(int id)
 
 LLBC_IService *LLBC_ServiceMgr::GetService(const LLBC_String &name)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _Services2::iterator it = _name2Services.find(name);
     if (it == _name2Services.end())
     {
@@ -61,7 +61,7 @@ LLBC_IService *LLBC_ServiceMgr::GetService(const LLBC_String &name)
 
 int LLBC_ServiceMgr::RemoveService(int id)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     LLBC_IService *svc = GetService(id);
     if (!svc)
     {
@@ -79,7 +79,7 @@ int LLBC_ServiceMgr::RemoveService(int id)
 
 int LLBC_ServiceMgr::RemoveService(const LLBC_String &name)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     LLBC_IService *svc = GetService(name);
     if (!svc)
     {
@@ -91,7 +91,7 @@ int LLBC_ServiceMgr::RemoveService(const LLBC_String &name)
 
 int LLBC_ServiceMgr::Wait()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (This::InTls(_id2Services))
     {
         LLBC_SetLastError(LLBC_ERROR_PERM);
@@ -116,7 +116,7 @@ int LLBC_ServiceMgr::Wait()
 
 int LLBC_ServiceMgr::Stop()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (This::InTls(_id2Services))
     {
         LLBC_SetLastError(LLBC_ERROR_PERM);
@@ -175,14 +175,14 @@ bool LLBC_ServiceMgr::InTls(const This::_Services2 &svcs)
 
 void LLBC_ServiceMgr::OnServiceStart(LLBC_IService *svc)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _id2Services.insert(std::make_pair(svc->GetId(), svc));
     _name2Services.insert(std::make_pair(svc->GetName(), svc));
 }
 
 void LLBC_ServiceMgr::OnServiceStop(LLBC_IService *svc)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     _id2Services.erase(svc->GetId());
     _name2Services.erase(svc->GetName());
 }

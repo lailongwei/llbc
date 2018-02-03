@@ -78,6 +78,8 @@ private:
     std::map<LLBC_String, LLBC_Logger *> _loggers;
 
     LLBC_LoggerConfigurator *_configurator;
+
+    static LLBC_String _rootLoggerName;
 };
 
 /**
@@ -163,45 +165,45 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 
 #else // !LLBC_CFG_LOG_USING_WITH_STREAM
 
-#define LLBC_DEBUG_LOG(message, ...)                            \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Debug(NULL, __FILE__, __LINE__, message, ##__VA_ARGS__) \
+#define LLBC_DEBUG_LOG(fmt, ...)                            \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Debug(NULL, __FILE__, __LINE__, fmt, ##__VA_ARGS__) \
 
-#define LLBC_INFO_LOG(message, ...)                             \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Info(NULL, __FILE__, __LINE__, message, ##__VA_ARGS__)  \
+#define LLBC_INFO_LOG(fmt, ...)                             \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Info(NULL, __FILE__, __LINE__, fmt, ##__VA_ARGS__)  \
 
-#define LLBC_WARN_LOG(message, ...)                             \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Warn(NULL, __FILE__, __LINE__, message, ##__VA_ARGS__)  \
+#define LLBC_WARN_LOG(fmt, ...)                             \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Warn(NULL, __FILE__, __LINE__, fmt, ##__VA_ARGS__)  \
 
-#define LLBC_ERROR_LOG(message, ...)                            \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Error(NULL, __FILE__, __LINE__, message, ##__VA_ARGS__) \
+#define LLBC_ERROR_LOG(fmt, ...)                            \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Error(NULL, __FILE__, __LINE__, fmt, ##__VA_ARGS__) \
 
-#define LLBC_FATAL_LOG(message, ...)                            \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Fatal(NULL, __FILE__, __LINE__, message, ##__VA_ARGS__) \
+#define LLBC_FATAL_LOG(fmt, ...)                            \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Fatal(NULL, __FILE__, __LINE__, fmt, ##__VA_ARGS__) \
 
-#define LLBC_DEBUG_LOG2(tag, message, ...)                      \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Debug(tag, __FILE__, __LINE__, message, ##__VA_ARGS__)  \
+#define LLBC_DEBUG_LOG2(tag, fmt, ...)                      \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Debug(tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)  \
 
-#define LLBC_INFO_LOG2(tag, message, ...)                       \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Info(tag, __FILE__, __LINE__, message, ##__VA_ARGS__)   \
+#define LLBC_INFO_LOG2(tag, fmt, ...)                       \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Info(tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)   \
 
-#define LLBC_WARN_LOG2(tag, message, ...)                       \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Warn(tag, __FILE__, __LINE__, message, ##__VA_ARGS__)   \
+#define LLBC_WARN_LOG2(tag, fmt, ...)                       \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Warn(tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)   \
 
-#define LLBC_ERROR_LOG2(tag, message, ...)                      \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Error(tag, __FILE__, __LINE__, message, ##__VA_ARGS__)  \
+#define LLBC_ERROR_LOG2(tag, fmt, ...)                      \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Error(tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)  \
 
-#define LLBC_FATAL_LOG2(tag, message, ...)                      \
-    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->      \
-        Fatal(tag, __FILE__, __LINE__, message, ##__VA_ARGS__)  \
+#define LLBC_FATAL_LOG2(tag, fmt, ...)                      \
+    LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger()->  \
+        Fatal(tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)  \
 
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 

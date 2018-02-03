@@ -208,7 +208,7 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -223,7 +223,7 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
 
 int LLBC_Service::SuppressCoderNotFoundWarning()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -256,7 +256,7 @@ int LLBC_Service::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
@@ -340,7 +340,7 @@ void LLBC_Service::Stop()
 int LLBC_Service::GetFPS() const
 {
     This *ncThis = const_cast<This *>(this);
-    LLBC_Guard guard(ncThis->_lock);
+    LLBC_LockGuard guard(ncThis->_lock);
     return _fps;
 }
 
@@ -349,7 +349,7 @@ int LLBC_Service::SetFPS(int fps)
     if (LLBC_CFG_COMM_MIN_SERVICE_FPS <= fps &&
             fps <= LLBC_CFG_COMM_MAX_SERVICE_FPS)
     {
-        LLBC_Guard guard(_lock);
+        LLBC_LockGuard guard(_lock);
 
         _fps = fps;
         _frameInterval = 1000 / _fps;
@@ -364,13 +364,13 @@ int LLBC_Service::GetFrameInterval() const
 {
     This *ncThis = const_cast<This *>(this);
 
-    LLBC_Guard guard(ncThis->_lock);
+    LLBC_LockGuard guard(ncThis->_lock);
     return _frameInterval;
 }
 
 int LLBC_Service::Listen(const char *ip, uint16 port)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Listen(ip, port);
     if (sessionId != 0)
     {
@@ -384,7 +384,7 @@ int LLBC_Service::Listen(const char *ip, uint16 port)
 
 int LLBC_Service::Connect(const char *ip, uint16 port, double timeout)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Connect(ip, port);
     if (sessionId != 0)
     {
@@ -398,7 +398,7 @@ int LLBC_Service::Connect(const char *ip, uint16 port, double timeout)
 
 int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     return _pollerMgr.AsyncConn(ip, port);
 }
 
@@ -495,7 +495,7 @@ int LLBC_Service::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, c
 
 int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
 
     // Foreach to call internal method LockableSend() method to complete.
     // lock = false
@@ -546,12 +546,12 @@ int LLBC_Service::Broadcast2(int opcode, const void *bytes, size_t len, int stat
 
 int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t len , int status, LLBC_PacketHeaderParts *parts)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
 
     // Foreach to call internal method LockableSend() method to complete.
     // lock = false
     // validCheck = false
-    LLBC_Guard connSIdsGuard(_connectedSessionIdsLock);
+    LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
     for (LLBC_SessionIdSetCIter sessionIt = _connectedSessionIds.begin();
          sessionIt != _connectedSessionIds.end();
          sessionIt++)
@@ -565,14 +565,14 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t le
 
 int LLBC_Service::RemoveSession(int sessionId, const char *reason)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (!_started)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
 
-    LLBC_Guard connSIdsGuard(_connectedSessionIdsLock);
+    LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
 
     LLBC_SessionIdSetIter sessionIdIt = _connectedSessionIds.find(sessionId);
     if (sessionIdIt == _connectedSessionIds.end())
@@ -595,7 +595,7 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -622,7 +622,7 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -650,7 +650,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -676,7 +676,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *de
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -704,7 +704,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> 
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -733,7 +733,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -760,7 +760,7 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, 
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -800,7 +800,7 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -822,7 +822,7 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
 
 int LLBC_Service::EnableTimerScheduler()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
@@ -840,7 +840,7 @@ int LLBC_Service::EnableTimerScheduler()
 
 int LLBC_Service::DisableTimerScheduler()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
@@ -895,7 +895,7 @@ int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_handlingBeforeFrameTasks && _handlingAfterFrameTasks))
     {
         LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
@@ -1510,7 +1510,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     const int sessionId = packet->GetSessionId();
     if (validCheck)
     {
-        LLBC_Guard connSIdsGuard(_connectedSessionIdsLock);
+        LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
         if (_connectedSessionIds.find(sessionId) == _connectedSessionIds.end())
         {
             if (lock)
@@ -1593,7 +1593,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         return LLBC_OK;
     }
 
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (UNLIKELY(!_started))
     {
         if (LIKELY(coder))

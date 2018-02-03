@@ -28,7 +28,7 @@ LLBC_SpinLock LLBC_Random::_lock;
 
 uint32 LLBC_Random::RandInt32()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     return static_cast<uint32>(LLBC_INTERNAL_NS __g_mt_generator());
 }
 
@@ -131,13 +131,13 @@ double LLBC_Random::Rand53Real()
 
 void LLBC_Random::Seed(unsigned long seed)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     LLBC_INTERNAL_NS __g_mt_generator.seed(seed);
 }
 
 void LLBC_Random::Seed(const unsigned long *array, int size)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     LLBC_INTERNAL_NS __g_mt_generator.seed(array, size);
 }
 

@@ -98,7 +98,7 @@ int LLBC_BaseTask::Activate(int threadNum,
 int LLBC_BaseTask::GetThreadCount() const
 {
     LLBC_BaseTask *nonConstTask = const_cast<LLBC_BaseTask *>(this);
-    LLBC_Guard guard(nonConstTask->_lock);
+    LLBC_LockGuard guard(nonConstTask->_lock);
 
     return _threadNum;
 }
@@ -158,7 +158,7 @@ int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
 
 void LLBC_BaseTask::OnTaskThreadStart()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
     if (++_curThreadNum == _threadNum)
         _startCompleted = true;
 }

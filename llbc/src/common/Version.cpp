@@ -65,6 +65,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default thread stack size: %d\n", LLBC_CFG_THREAD_DFT_STACK_SIZE);
     desc.append_format("    miximum thread stack size: %d\n", LLBC_CFG_THREAD_MINIMUM_STACK_SIZE);
     desc.append_format("    message block size: %d\n", LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE);
+    desc.append_format("    enabled guard debug: %s\n", LLBC_CFG_THREAD_GUARD_DEBUG ? "true" : "false");
     desc.append_format("  logger info: \n");
     desc.append_format("    default level: %d\n", LLBC_CFG_LOG_DEFAULT_LEVEL);
     desc.append_format("    default asynchronous mode: %s\n", (LLBC_CFG_LOG_DEFAULT_ASYNC_MODE) ? "true" : "false");

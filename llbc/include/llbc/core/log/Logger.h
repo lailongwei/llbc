@@ -86,27 +86,27 @@ public:
      * @param[in] tag      - log tag, can set to NULL.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
-     * @param[in] message  - format control string.
+     * @param[in] fmt      - format control string.
      * @param[in] argument - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Debug(const char *tag, const char *file, int line, const char *message, ...);
-    int Info(const char *tag, const char *file, int line, const char *message, ...);
-    int Warn(const char *tag, const char *file, int line, const char *message, ...);
-    int Error(const char *tag, const char *file, int line, const char *message, ...);
-    int Fatal(const char *tag, const char *file, int line, const char *message, ...);
+    int Debug(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Info(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Warn(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Error(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...);
 
     /**
-     * Output message using given level.
+     * Output fmt using given level.
      * @param[in] level    - log level.
      * @param[in] tag      - log tag, can set to NULL.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
-     * @param[in] message  - format control string.
+     * @param[in] fmt      - format control string.
      * @param[in] argument - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *message, ...);
+    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...);
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.

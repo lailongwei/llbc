@@ -60,6 +60,8 @@
 #define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (1 * 1024 * 1024)
 // Message block default size.
 #define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (1024)
+// If you want debug guardians, enable this config option.
+#define LLBC_CFG_THREAD_GUARD_DEBUG                         0
 
 /**
  * \brief Core/Log about config options define.
@@ -101,7 +103,7 @@
 // Default max log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 1000
 // Default log using mode.
-#define LLBC_CFG_LOG_USING_WITH_STREAM                      1
+#define LLBC_CFG_LOG_USING_WITH_STREAM                      0
 // Default take over config, only using in root logger, when a message log to 
 // unconfiged logger, root logger will take over, if configed takeover to true.
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1

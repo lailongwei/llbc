@@ -64,7 +64,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         return LLBC_FAILED;
     }
 
-    LLBC_Guard guard(_mutex);
+    LLBC_LockGuard guard(_mutex);
     _name.append(name);
 
     _config = config;
@@ -129,14 +129,14 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 bool LLBC_Logger::IsInit() const
 {
     LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_Guard guard(nonConstThis->_mutex);
+    LLBC_LockGuard guard(nonConstThis->_mutex);
 
     return (_logRunnable ? true : false);
 }
 
 void LLBC_Logger::Finalize()
 {
-    LLBC_Guard guard(_mutex);
+    LLBC_LockGuard guard(_mutex);
     if (!_logRunnable)
         return;
 
@@ -157,7 +157,7 @@ void LLBC_Logger::Finalize()
 const LLBC_String &LLBC_Logger::GetLoggerName() const
 {
     LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_Guard guard(nonConstThis->_mutex);
+    LLBC_LockGuard guard(nonConstThis->_mutex);
     if (!_logRunnable)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
@@ -171,7 +171,7 @@ const LLBC_String &LLBC_Logger::GetLoggerName() const
 int LLBC_Logger::GetLogLevel() const
 {
     LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_Guard guard(nonConstThis->_mutex);
+    LLBC_LockGuard guard(nonConstThis->_mutex);
     if (!_logRunnable)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
@@ -183,7 +183,7 @@ int LLBC_Logger::GetLogLevel() const
 
 void LLBC_Logger::SetLogLevel(int level)
 {
-    LLBC_Guard guard(_mutex);
+    LLBC_LockGuard guard(_mutex);
 
     _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
 }
@@ -193,68 +193,68 @@ bool LLBC_Logger::IsTakeOver() const
     return _config->IsTakeOver();
 }
 
-int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *message, ...)
+int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Debug < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(LLBC_LogLevel::Debug, tag, file, line, fmttedMsg, msgLen);
 }
 
-int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *message, ...)
+int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Info < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(LLBC_LogLevel::Info, tag, file, line, fmttedMsg, msgLen);
 }
 
-int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *message, ...)
+int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Warn < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(LLBC_LogLevel::Warn, tag, file, line, fmttedMsg, msgLen);
 }
 
-int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *message, ...)
+int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Error < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(LLBC_LogLevel::Error, tag, file, line, fmttedMsg, msgLen);
 }
 
-int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *message, ...)
+int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Fatal < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(LLBC_LogLevel::Fatal, tag, file, line, fmttedMsg, msgLen);
 }
 
-int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *message, ...) 
+int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) 
 {
     if (level < _logLevel)
         return LLBC_OK;
 
     char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(message, fmttedMsg, msgLen);
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     return DirectOutput(level, tag, file, line, fmttedMsg, msgLen);
 }

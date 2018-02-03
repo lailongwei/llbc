@@ -237,7 +237,7 @@ int LLBC_PollerMgr::AllocSessionId()
 
 int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
 {
-    LLBC_Guard guard(_pollerLock);
+    LLBC_LockGuard guard(_pollerLock);
     LLBC_BasePoller *poller = _pollers[id];
     if (LIKELY(poller))
     {

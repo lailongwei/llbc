@@ -16,7 +16,6 @@
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/RWLock.h"
 #include "llbc/core/thread/Guard.h"
-#include "llbc/core/thread/ReverseGuard.h"
 #include "llbc/core/thread/ConditionVariable.h"
 #include "llbc/core/thread/Semaphore.h"
 #include "llbc/core/thread/Tls.h"

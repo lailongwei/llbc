@@ -17,8 +17,11 @@
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerConfigurator.h"
 #include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/Log.h"
 
 __LLBC_NS_BEGIN
+
+LLBC_String LLBC_LoggerManager::_rootLoggerName = "root";
 
 LLBC_LoggerManager::LLBC_LoggerManager()
 : _lock()
@@ -35,7 +38,7 @@ LLBC_LoggerManager::~LLBC_LoggerManager()
 
 int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
 
     if (_root)
     {
@@ -52,7 +55,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 
     // First, config root logger.
     _root = new LLBC_Logger;
-    if (_configurator->Config("root", _root) != LLBC_OK)
+    if (_configurator->Config(_rootLoggerName, _root) != LLBC_OK)
     {
         LLBC_XDelete(_root);
         LLBC_XDelete(_configurator);
@@ -60,14 +63,14 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    _loggers.insert(std::make_pair("root", _root));
+    _loggers.insert(std::make_pair(_rootLoggerName, _root));
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
     std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = configs.begin();
     for (; iter != configs.end(); iter++)
     {
-        if (iter->first == "root")
+        if (iter->first == _rootLoggerName)
             continue;
 
         LLBC_Logger *logger = new LLBC_Logger;
@@ -81,6 +84,8 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         _loggers.insert(std::make_pair(iter->first, logger));
     }
 
+    // Init Log helper class.
+    LLBC_LogHelper::Initialize(this);
 
     return LLBC_OK;
 }
@@ -88,24 +93,29 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 bool LLBC_LoggerManager::IsInited() const
 {
     LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_Guard guard(nonConstThis->_lock);
+    LLBC_LockGuard guard(nonConstThis->_lock);
     return _root != NULL;
 }
 
 void LLBC_LoggerManager::Finalize()
 {
-    LLBC_Guard guard(_lock);
+    LLBC_LockGuard guard(_lock);
 
+    // Finalize Log helper class.
+    LLBC_LogHelper::Finalize();
+
+    // Delete all loggers and set _root logger to NULL.
     _root = NULL;
     LLBC_STLHelper::DeleteContainer(_loggers);
 
+    // Delete logger configurator.
     LLBC_XDelete(_configurator);
 }
 
 LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
 {
     LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_Guard guard(nonConstThis->_lock);
+    LLBC_LockGuard guard(nonConstThis->_lock);
     if (UNLIKELY(!_root))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
@@ -125,7 +135,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     }
 
     LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_Guard guard(nonConstThis->_lock);
+    LLBC_LockGuard guard(nonConstThis->_lock);
     if (UNLIKELY(!_root))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
