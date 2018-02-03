@@ -3,6 +3,8 @@
 @brief  The function util functions encapsulation.
 --]]
 
+local table_unpack = table.unpack or unpack
+
 local FuncTool = llbc.newclass('llbc.FuncTool')
 
 -- constructor, do not call.
@@ -21,11 +23,12 @@ function FuncTool.partial(func, ...)
     end
 
     return function (...)
-        for _, v in pairs({...}) do
-            table.insert(call_args, #call_args + 1, v)
+        local args = {table_unpack(call_args)}
+        for k, v in ipairs({...}) do
+            table.insert(args, #args + 1, v)
         end
 
-        return func(table.unpack(call_args))
+        return func(table_unpack(args))
     end
 end
 
