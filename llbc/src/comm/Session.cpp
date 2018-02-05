@@ -89,6 +89,7 @@ int LLBC_SessionCloseInfo::GetSubErrno() const
 
 LLBC_Session::LLBC_Session()
 : _id(0)
+, _acceptId(0)
 , _socket(NULL)
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 
@@ -113,6 +114,16 @@ int LLBC_Session::GetId() const
 void LLBC_Session::SetId(int id)
 {
     _id = id;
+}
+
+int LLBC_Session::GetAcceptId() const
+{
+    return _acceptId;
+}
+
+void LLBC_Session::SetAcceptId(int acceptId)
+{
+    _acceptId = acceptId;
 }
 
 LLBC_SocketHandle LLBC_Session::GetSocketHandle() const
@@ -151,11 +162,22 @@ void LLBC_Session::SetService(LLBC_IService *svc)
 {
     _svc = svc;
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    _protoStack = _svc->CreateFullStack();
+    _protoStack = _svc->CreateFullStack(_id, _acceptId);
 #else
-    _protoStack = _svc->CreateRawStack();
+    _protoStack = _svc->CreatePackStack(_id, _acceptId);
 #endif
     _protoStack->SetSession(this);
+}
+
+LLBC_ProtocolStack *LLBC_Session::GetProtocolStack()
+{
+    return this->_protoStack;
+}
+
+void LLBC_Session::SetProtocolStack(LLBC_ProtocolStack *protoStack)
+{
+    LLBC_XDelete(_protoStack);
+    _protoStack = protoStack;
 }
 
 LLBC_BasePoller *LLBC_Session::GetPoller()
@@ -242,6 +264,7 @@ void LLBC_Session::OnClose(LLBC_SessionCloseInfo *closeInfo)
                                                      _socket->GetPeerAddress(),
                                                      _socket->IsListen(),
                                                      _id,
+                                                     _acceptId,
                                                      sockHandle,
                                                      closeInfo));
 

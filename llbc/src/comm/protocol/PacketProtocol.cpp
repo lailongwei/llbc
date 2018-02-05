@@ -10,14 +10,14 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/comm/Session.h"
 #include "llbc/comm/PacketHeaderDescAccessor.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
-#include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/PacketProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
-#include "llbc/comm/Session.h"
 #include "llbc/comm/IService.h"
 
 namespace

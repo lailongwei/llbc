@@ -14,7 +14,7 @@
 #include "llbc/comm/headerdesc/PacketHeaderDesc.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
-#include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/RawProtocol.h"
 
 __LLBC_NS_BEGIN
 

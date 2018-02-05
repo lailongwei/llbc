@@ -107,7 +107,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     if (sock->Connect(ev.peerAddr) == LLBC_OK)
     {
         _svc->Push(LLBC_SvcEvUtil::
-                BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
+                BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
         
         SetConnectedSocketDftOpts(sock);
         AddSession(CreateSession(sock, ev.sessionId));
@@ -128,7 +128,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     else
     {
         const LLBC_String &reason = LLBC_FormatLastError();
-        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(false, reason, ev.peerAddr));
+        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(ev.sessionId, false, reason, ev.peerAddr));
 
         LLBC_Delete(sock);
     }
@@ -289,8 +289,10 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
             connected = true;
     }
     
-    _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(connected, 
-                connected ? "Success" : LLBC_FormatLastError(), asyncInfo.peerAddr));
+    _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(asyncInfo.sessionId,
+                                                      connected,
+                                                      connected ? "Success" : LLBC_FormatLastError(),
+                                                      asyncInfo.peerAddr));
     if (connected)
     {
         LLBC_EpollEvent epev;
@@ -321,7 +323,7 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
         newSock->SetNonBlocking();
 
         SetConnectedSocketDftOpts(newSock);
-        AddToPoller(CreateSession(newSock));
+        AddToPoller(CreateSession(newSock, 0, session));
     }
 }
 

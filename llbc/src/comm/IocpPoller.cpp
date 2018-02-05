@@ -154,7 +154,7 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
     if (!succeed)
         _svc->Push(LLBC_SvcEvUtil::
-                BuildAsyncConnResultEv(succeed, reason, ev.peerAddr));
+                BuildAsyncConnResultEv(ev.sessionId, succeed, reason, ev.peerAddr));
 }
 
 void LLBC_IocpPoller::HandleEv_Send(LLBC_PollerEvent &ev)
@@ -301,14 +301,14 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int err
         SetConnectedSocketDftOpts(sock);
 
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
-            true, LLBC_StrError(LLBC_ERROR_SUCCESS), asyncInfo.peerAddr));
+            asyncInfo.sessionId, true, LLBC_StrError(LLBC_ERROR_SUCCESS), asyncInfo.peerAddr));
 
         AddSession(CreateSession(sock, asyncInfo.sessionId), false);
     }
     else
     {
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
-                false, LLBC_StrErrorEx(errNo, subErrNo), asyncInfo.peerAddr));
+                asyncInfo.sessionId, false, LLBC_StrErrorEx(errNo, subErrNo), asyncInfo.peerAddr));
         LLBC_Delete(asyncInfo.socket);
     }
 
@@ -337,7 +337,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
     sock->PostAsyncAccept();
 
     // Create session and add to poller.
-    AddToPoller(CreateSession(newSock));
+    AddToPoller(CreateSession(newSock, 0, session));
 }
 
 __LLBC_NS_END

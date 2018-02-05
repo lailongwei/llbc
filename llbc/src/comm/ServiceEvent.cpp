@@ -155,6 +155,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(const LLBC_SockAddr_IN 
                                                          const LLBC_SockAddr_IN &peer,
                                                          bool isListen,
                                                          int sessionId,
+                                                         int acceptSessionId,
                                                          LLBC_SocketHandle handle,
                                                          LLBC_SessionCloseInfo *closeInfo)
 {
@@ -164,6 +165,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(const LLBC_SockAddr_IN 
     ev->local = local;
     ev->peer = peer;
     ev->sessionId = sessionId;
+    ev->acceptSessionId = acceptSessionId;
     ev->isListen = isListen;
     ev->handle = handle;
 
@@ -172,13 +174,15 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(const LLBC_SockAddr_IN 
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAsyncConnResultEv(bool connected,
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAsyncConnResultEv(int sessionId,
+                                                          bool connected,
                                                           const LLBC_String &reason,
                                                           const LLBC_SockAddr_IN &peer)
 {
     typedef LLBC_SvcEv_AsyncConn _Ev;
 
     _Ev *ev = LLBC_New(_Ev);
+    ev->sessionId = sessionId;
     ev->connected = connected;
     ev->reason.append(reason);
     ev->peer = peer;

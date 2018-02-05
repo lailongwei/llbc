@@ -39,10 +39,11 @@ class LLBC_HIDDEN LLBC_Service : public LLBC_IService
 public:
     /**
      * Create specified type service.
-     * @param[in] type - the service type, see LLBC_IService::Type enumeration.
-     * @param[in] name - type service name.
+     * @param[in] type         - the service type, see LLBC_IService::Type enumeration.
+     * @param[in] name         - type service name.
+     * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
      */
-    LLBC_Service(Type type, const LLBC_String &name = "");
+    LLBC_Service(Type type, const LLBC_String &name = "", LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
      * Service destructor.
@@ -132,37 +133,40 @@ public:
      * Note:
      *      If service not start when call this method, connection operation will 
      *      create a pending-operation and recorded in service, your maybe could not get error.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port);
+    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
      * Establishes a connection to a specified address.
      * Note:
      *      If service not start when call this method, connection operation will 
      *      create a pending-operation and recorded in service, your maybe could not get error.
-     * @param[in] ip      - the ip address.
-     * @param[in] port    - the port number.
-     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1);
+    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
      * Asynchronous establishes a connection to a specified address.
      * Note:
      *      If service not start when call this method, connection operation will 
      *      create a pending-operation and recorded in service, your maybe could not get error.
-     * @param[in] ip      - the ip address.
-     * @param[in] port    - the port number.
-     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1);
+    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
      * Check given sessionId is lgeal or not.
@@ -394,9 +398,9 @@ protected:
     /**
      * Stack create helper method(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreateRawStack(LLBC_ProtocolStack *stack = NULL);
-    virtual LLBC_ProtocolStack *CreateCodecStack(LLBC_ProtocolStack *stack = NULL);
-    virtual LLBC_ProtocolStack *CreateFullStack();
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
+    virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
 
 protected:
     /**
@@ -445,6 +449,13 @@ private:
     void UpdateFacades();
     void StopFacades();
     void DestroyFacades();
+
+    /**
+     * Session protocol factory operation methods.
+     */
+    void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
+    LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
+    void RemoveSessionProtocolFactory(int sessionId);
 
 #if LLBC_CFG_OBJBASE_ENABLED
     /**
@@ -498,6 +509,8 @@ private:
 
     Type _type;
     LLBC_String _name;
+    LLBC_IProtocolFactory *_protoFactory;
+    std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory;
     DriveMode _driveMode;
     bool _suppressedCoderNotFoundWarning;
 
@@ -505,6 +518,7 @@ private:
     volatile bool _stopping;
 
     LLBC_RecursiveLock _lock;
+    LLBC_SpinLock _protoLock;
 
     int _fps;
     int _frameInterval;

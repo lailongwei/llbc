@@ -42,6 +42,7 @@ void pyllbc_AddCommObjs()
     // Add service types to inl module.
     inlMod->AddObject("SVC_TYPE_NORMAL", LLBC_IService::Normal);
     inlMod->AddObject("SVC_TYPE_RAW", LLBC_IService::Raw);
+    inlMod->AddObject("SVC_TYPE_CUSTOM", LLBC_IService::Custom);
     // Add codec strategies to inl module.
     inlMod->AddObject("SVC_CODEC_JSON", pyllbc_Service::JsonCodec);
     inlMod->AddObject("SVC_CODEC_BINARY", pyllbc_Service::BinaryCodec);

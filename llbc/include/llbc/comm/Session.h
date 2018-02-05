@@ -110,6 +110,18 @@ public:
     void SetId(int id);
 
     /**
+     * Get accept session Id.
+     * @return int - the accept session Id.
+     */
+    int GetAcceptId() const;
+
+    /**
+     * Set accept session Id.
+     * @param[in] acceptId - the accept session Id.
+     */
+    void SetAcceptId(int acceptId);
+
+    /**
      * Get the socket handle.
      * @return LLBC_SocketHanle - the socket handle.
      */
@@ -146,6 +158,18 @@ public:
      * @param[in] svc - service.
      */
     void SetService(LLBC_IService *svc);
+
+    /**
+     * Get protocol stack.
+     * @return LLBC_ProtocolStack * - protocol stack.
+     */
+    LLBC_ProtocolStack *GetProtocolStack();
+
+    /**
+     * Set protocol stack.
+     * @param[in] protoStack - the protocol stack.
+     */
+    void SetProtocolStack(LLBC_ProtocolStack *protoStack);
 
     /**
      * Get the poller.
@@ -224,6 +248,8 @@ public:
 
 private:
     int _id;
+    int _acceptId;
+
     LLBC_Socket *_socket;
     LLBC_SocketHandle _sockHandle;
 

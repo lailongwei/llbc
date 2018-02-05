@@ -101,6 +101,9 @@ void LLBC_LoggerManager::Finalize()
 {
     LLBC_LockGuard guard(_lock);
 
+    if (_root == NULL)
+        return;
+
     // Finalize Log helper class.
     LLBC_LogHelper::Finalize();
 

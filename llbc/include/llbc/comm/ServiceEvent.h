@@ -83,6 +83,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
 {
     bool isListen;
     int sessionId;
+    int acceptSessionId;
     LLBC_SockAddr_IN local;
     LLBC_SockAddr_IN peer;
     LLBC_SocketHandle handle;
@@ -98,6 +99,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
 {
+    int sessionId;
     bool connected;
     LLBC_String reason;
     LLBC_SockAddr_IN peer;
@@ -192,13 +194,15 @@ public:
                                                     const LLBC_SockAddr_IN &peer,
                                                     bool isListen,
                                                     int sessionId,
+                                                    int acceptSessionId,
                                                     LLBC_SocketHandle handle,
                                                     LLBC_SessionCloseInfo *closeInfo);
 
     /**
      * Build async-connect result event.
      */
-    static LLBC_MessageBlock *BuildAsyncConnResultEv(bool conneted, 
+    static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
+                                                     bool conneted, 
                                                      const LLBC_String &reason, 
                                                      const LLBC_SockAddr_IN &peer);
 

@@ -57,10 +57,12 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] =
 # pragma warning(disable:4351)
 #endif
 
-LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
+LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProtocolFactory *protoFactory)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
 , _type(type)
 , _name(name.c_str(), name.length())
+, _protoFactory(protoFactory)
+, _sessionProtoFactory()
 , _driveMode(This::SelfDrive)
 , _suppressedCoderNotFoundWarning(false)
 
@@ -68,6 +70,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
 , _stopping(false)
 
 , _lock()
+, _protoLock()
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
@@ -117,13 +120,28 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 {
+    // Create service name, if is empty.
     if (_name.empty())
         _name.format("S%d-%s", _id, LLBC_GUIDHelper::GenStr().c_str());
+
+    // Create protocol stack, if type is not Custom.
+    if (_type != This::Custom)
+    {
+        LLBC_XDelete(_protoFactory);
+        if (_type == This::Raw)
+            _protoFactory = LLBC_New(LLBC_RawProtocolFactory);
+        else
+            _protoFactory = LLBC_New(LLBC_NormalProtocolFactory);
+    }
+    else
+    {
+        ASSERT(_protoFactory != NULL && "Service type is Custom, but not pass Protocol Factory to Service!");
+    }
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);
-    ASSERT (LLBC_PollerType::IsValid(pollerType) && "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
+    ASSERT(LLBC_PollerType::IsValid(pollerType) && "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
 
     _pollerMgr.SetService(this);
     _pollerMgr.SetPollerType(pollerType);
@@ -134,7 +152,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name)
     // Create protocol stack.
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     _stack.SetService(this);
-    CreateCodecStack(&_stack);
+    CreateCodecStack(0, 0, &_stack);
 #endif
 }
 
@@ -173,6 +191,9 @@ LLBC_Service::~LLBC_Service()
     _handledBeforeFrameTasks = false;
     DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
     DestroyFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
+
+    LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
+    LLBC_XDelete(_protoFactory);
 }
 
 int LLBC_Service::GetId() const
@@ -368,7 +389,7 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-int LLBC_Service::Listen(const char *ip, uint16 port)
+int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Listen(ip, port);
@@ -377,12 +398,15 @@ int LLBC_Service::Listen(const char *ip, uint16 port)
         _connectedSessionIdsLock.Lock();
         _connectedSessionIds.insert(sessionId);
         _connectedSessionIdsLock.Unlock();
+
+        if (protoFactory)
+            AddSessionProtocolFactory(sessionId, protoFactory);
     }
 
     return sessionId;
 }
 
-int LLBC_Service::Connect(const char *ip, uint16 port, double timeout)
+int LLBC_Service::Connect(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Connect(ip, port);
@@ -391,15 +415,27 @@ int LLBC_Service::Connect(const char *ip, uint16 port, double timeout)
         _connectedSessionIdsLock.Lock();
         _connectedSessionIds.insert(sessionId);
         _connectedSessionIdsLock.Unlock();
+
+        if (protoFactory)
+            AddSessionProtocolFactory(sessionId, protoFactory);
     }
 
     return sessionId;
 }
 
-int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout)
+int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_LockGuard guard(_lock);
-    return _pollerMgr.AsyncConn(ip, port);
+
+    int pendingSessionId;
+    const int ret = _pollerMgr.AsyncConn(ip, port, pendingSessionId);
+    if (ret != LLBC_OK)
+        return ret;
+
+    if (protoFactory)
+        AddSessionProtocolFactory(pendingSessionId, protoFactory);
+
+    return ret;
 }
 
 bool LLBC_Service::IsSessionValidate(int sessionId)
@@ -633,10 +669,6 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
-
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    _stack.AddCoder(opcode, coder);
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
     return LLBC_OK;
 }
@@ -980,28 +1012,36 @@ void LLBC_Service::OnSvc(bool fullFrame)
         Cleanup();
 }
 
-LLBC_ProtocolStack *LLBC_Service::CreateRawStack(LLBC_ProtocolStack *stack)
+LLBC_ProtocolStack *LLBC_Service::CreatePackStack(int sessionId, int acceptSessionId, LLBC_ProtocolStack *stack)
 {
     if (!stack)
     {
-        stack = LLBC_New1(_Stack, _Stack::RawStack);
+        stack = LLBC_New1(_Stack, _Stack::PackStack);
         stack->SetService(this);
     }
 
-    if (_type == This::Raw)
+    // Find protocol factory.
+    LLBC_IProtocolFactory *protoFactory = 
+        FindSessionProtocolFactory(acceptSessionId != 0 ? acceptSessionId : sessionId);
+
+    // Create PackLayer protocol.
+    LLBC_IProtocol *packProtocol = protoFactory->Create(LLBC_ProtocolLayer::PackLayer);
+    ASSERT(packProtocol && "Protocol stack require PackLayer protocol exist!");
+    ASSERT(packProtocol->GetLayer() == LLBC_ProtocolLayer::PackLayer && "Invalid protocol layer!");
+    stack->AddProtocol(packProtocol);
+
+    // Create CompressLayer protocol.
+    LLBC_IProtocol *compressProtocol = protoFactory->Create(LLBC_ProtocolLayer::CompressLayer);
+    if (compressProtocol)
     {
-        stack->AddProtocol(LLBC_IProtocol::Create<LLBC_RawProtocol>(_filters[LLBC_ProtocolLayer::PackLayer]));
-    }
-    else
-    {
-        stack->AddProtocol(LLBC_IProtocol::Create<LLBC_PacketProtocol>(_filters[LLBC_ProtocolLayer::PackLayer]));
-        stack->AddProtocol(LLBC_IProtocol::Create<LLBC_CompressProtocol>(_filters[LLBC_ProtocolLayer::CompressLayer]));
+        ASSERT(compressProtocol->GetLayer() == LLBC_ProtocolLayer::CompressLayer && "Invalid protocol layer!");
+        stack->AddProtocol(compressProtocol);
     }
 
     return stack;
 }
 
-LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(LLBC_ProtocolStack *stack)
+LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(int sessionId, int acceptSessionId, LLBC_ProtocolStack *stack)
 {
     if (!stack)
     {
@@ -1010,26 +1050,32 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(LLBC_ProtocolStack *stack)
         stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
     }
 
-    if (_type != This::Raw)
+    // Find protocol factory.
+    LLBC_IProtocolFactory *protoFactory = 
+        FindSessionProtocolFactory(acceptSessionId != 0 ? acceptSessionId : sessionId);
+
+    // Create CodecLayer protocol.
+    LLBC_IProtocol *codecLayer = protoFactory->Create(LLBC_ProtocolLayer::CodecLayer);
+    if (codecLayer)
     {
-        stack->AddProtocol(LLBC_IProtocol::Create<LLBC_CodecProtocol>(_filters[LLBC_ProtocolLayer::CodecLayer]));
-        for (_Coders::iterator it = _coders.begin();
-             it != _coders.end();
-             it++)
-            stack->AddCoder(it->first, it->second);
+        ASSERT(codecLayer->GetLayer() == 
+            LLBC_ProtocolLayer::CodecLayer && "Invalid protocol layer!");
+
+        stack->AddProtocol(codecLayer);
+        stack->SetCoders(&_coders);
     }
 
     return stack;
 }
 
-LLBC_ProtocolStack *LLBC_Service::CreateFullStack()
+LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessionId)
 {
     _Stack *stack = LLBC_New1(_Stack, _Stack::FullStack);
     stack->SetService(this);
     stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
 
-    return CreateRawStack(
-            CreateCodecStack(stack));
+    return CreatePackStack(sessionId, acceptSessionId,
+            CreateCodecStack(sessionId, acceptSessionId, stack));
 }
 
 void LLBC_Service::Svc()
@@ -1217,6 +1263,10 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
          it != _facades.end();
          it++)
         (*it)->OnSessionDestroy(destroyInfo);
+
+    // Remove session protocol factory.
+    if (ev.acceptSessionId == 0)
+        RemoveSessionProtocolFactory(ev.sessionId);
 }
 
 void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
@@ -1233,6 +1283,9 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
          it != _facades.end();
          it++)
         (*it)->OnAsyncConnResult(result);
+
+    if (!ev.connected)
+        RemoveSessionProtocolFactory(ev.sessionId);
 }
 
 void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
@@ -1430,6 +1483,46 @@ void LLBC_Service::DestroyFacades()
     }
 
     LLBC_STLHelper::DeleteContainer(_facades, true, true);
+}
+
+void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
+{
+    _protoLock.Lock();
+
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+    {
+        LLBC_Delete(it->second);
+        _sessionProtoFactory.erase(it);
+    }
+
+    _sessionProtoFactory.insert(std::make_pair(sessionId, protoFactory));
+
+    _protoLock.Unlock();
+}
+
+LLBC_IProtocolFactory *LLBC_Service::FindSessionProtocolFactory(int sessionId)
+{
+    if (sessionId == 0)
+        return _protoFactory;
+
+    LLBC_LockGuard guard(_protoLock);
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+        return it->second;
+
+    return _protoFactory;
+}
+
+void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
+{
+    LLBC_LockGuard guard(_protoLock);
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+    {
+        LLBC_Delete(it->second);
+        _sessionProtoFactory.erase(it);
+    }
 }
 
 #if LLBC_CFG_OBJBASE_ENABLED

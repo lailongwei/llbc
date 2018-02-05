@@ -11,9 +11,11 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/ICoder.h"
+#include "llbc/comm/Packet.h"
+
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
-#include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/CodecProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
 __LLBC_NS_BEGIN
@@ -69,8 +71,8 @@ int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
 int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
-    _Coders::iterator it = _coders.find(packet->GetOpcode());
-    if (it != _coders.end())
+    Coders::const_iterator it = _coders->find(packet->GetOpcode());
+    if (it != _coders->end())
     {
         LLBC_ICoder *coder = it->second->Create();
         if (UNLIKELY(!coder->Decode(*packet)))
@@ -118,17 +120,6 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
     }
 
     out = in;
-    return LLBC_OK;
-}
-
-int LLBC_CodecProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
-{
-    if (!_coders.insert(std::make_pair(opcode, coder)).second)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
     return LLBC_OK;
 }
 

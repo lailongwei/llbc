@@ -113,7 +113,7 @@ protected:
     /**
      * Create new session from socket.
      */
-    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId = 0);
+    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId = 0, LLBC_Session *acceptSession = NULL);
 
 protected:
     /**

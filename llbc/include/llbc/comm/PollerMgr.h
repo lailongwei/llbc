@@ -83,13 +83,14 @@ public:
 
     /**
      * Asynchronous connect to peer address(call by service).
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number. 
+     * @param[in] ip   -              the ip address.
+     * @param[in] port -              the port number. 
+     * @param[out] pendingSessionId - pending sessionId, when return 0, this output parameter will assign the session Id, otherwise set to 0.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established, 
      *                     it only means post async-conn request to poller success.
      */
-    int AsyncConn(const char *ip, uint16 port);
+    int AsyncConn(const char *ip, uint16 port, int &pendingSessionId);
 
     /**
      * Send packet.

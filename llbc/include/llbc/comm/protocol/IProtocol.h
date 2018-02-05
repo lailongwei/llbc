@@ -13,8 +13,6 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
-#include "llbc/comm/protocol/ProtocolLayer.h"
-
 __LLBC_NS_BEGIN
 
 /**
@@ -36,18 +34,13 @@ class LLBC_EXPORT LLBC_IProtocol
     typedef LLBC_IProtocol This;
 
 public:
+    typedef std::map<int, LLBC_ICoderFactory *> Coders;
+
+public:
     LLBC_IProtocol();
     virtual ~LLBC_IProtocol();
 
 public:
-    /**
-     * Protocol create method.
-     * @param[in] layer - the protocol layer.
-     * @return This * - protocol.
-     */
-    template <typename Proto>
-    static This *Create(LLBC_IProtocolFilter *filter = NULL);
-
     /**
      * Get the protocol layer.
      * @return int - the protocol layer.
@@ -81,28 +74,12 @@ public:
      */
     virtual int Recv(void *in, void *&out, bool &removeSession) = 0;
 
-    /**
-     * Add coder factory to protocol, only available in Codec-Layer.
-     * @param[in] opcode - the opcode.
-     * @param[in] coder  - the coder factory
-     *  Note: When protocol deleted, it will not delete coder pointer,
-     *        It means that you must self manage your coder memory.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder) = 0;
-
-public:
-    /**
-     * Set protocol filter to protocol.
-     * @param[in] filter - the protocol filter.
-     */
-    void SetFilter(LLBC_IProtocolFilter *filter);
-
 private:
     /**
      * Friend class: LLBC_ProtocolStack.
      *  Access methods:
      *      void SetStack()
+     *      void SetFilter()
      */
     friend class LLBC_ProtocolStack;
 
@@ -110,11 +87,67 @@ private:
      * Set protocol stack to protocol.
      * @param[in] stack - the protocol stack.
      */
-    void SetStack(LLBC_ProtocolStack *stack);
+    LLBC_INLINE void SetStack(LLBC_ProtocolStack *stack);
+
+    /**
+     * Set protocol filter to protocol.
+     * @param[in] filter - the protocol filter.
+     */
+    LLBC_INLINE void SetFilter(LLBC_IProtocolFilter *filter);
+
+    /**
+     * Set coder factories, only available in Codec-Layer.
+     * @param[in] coders - the coder factories pointer.
+     * @return int - reutrn 0 if success, otherwise return -1.
+     */
+    LLBC_INLINE int SetCoders(const Coders *coders);
 
 protected:
     LLBC_ProtocolStack* _stack;
     LLBC_IProtocolFilter *_filter;
+    const Coders *_coders;
+};
+
+/**
+ * \brief The protocol factory interface encapsulation.
+ */
+class LLBC_EXPORT LLBC_IProtocolFactory
+{
+public:
+    virtual ~LLBC_IProtocolFactory() {  }
+
+public:
+    /**
+     * Create specific layer protocol.
+     * @return LLBC_IProtocol * - the protocol pointer.
+     */
+    virtual LLBC_IProtocol *Create(int layer) const = 0;
+};
+
+/**
+ * \brief The llbc library normal protocol factory encapsulation.
+ */
+class LLBC_HIDDEN LLBC_NormalProtocolFactory : public LLBC_IProtocolFactory
+{
+public:
+    /**
+     * Create specific layer protocol.
+     * @return LLBC_IProtocol * - the protocol pointer.
+     */
+    virtual LLBC_IProtocol *Create(int layer) const;
+};
+
+/**
+ * \brief The llbc library raw protocol factory encapsulation.
+ */
+class LLBC_HIDDEN LLBC_RawProtocolFactory : public LLBC_IProtocolFactory
+{
+public:
+    /**
+     * Create specific layer protocol.
+     * @return LLBC_IProtocol * - the protocol pointer.
+     */
+    virtual LLBC_IProtocol *Create(int layer) const;
 };
 
 __LLBC_NS_END

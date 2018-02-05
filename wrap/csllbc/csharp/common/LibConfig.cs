@@ -202,6 +202,13 @@ namespace llbc
         }
         #endregion // logger about configs
 
+        #region thread about configs
+        public static bool debugGuard
+        {
+            get { return LLBCNative.csllbc_LibConfig_Thread_GuardDebug() != 0; }
+        }
+        #endregion
+
         #region timer about configs
         /// <summary>
         /// Timer used strict schedule or not.

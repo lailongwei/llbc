@@ -234,17 +234,17 @@ void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
     AddSession(ev.un.session);
 }
 
-LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId)
+LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, LLBC_Session *acceptSession)
 {
     if (sessionId == 0)
-    {
         sessionId = _pollerMgr->AllocSessionId();
-    }
 
     LLBC_Session *session = new LLBC_Session();
     session->SetId(sessionId);
     session->SetSocket(socket);
     session->SetService(_svc);
+    if (acceptSession)
+        session->SetAcceptId(acceptSession->GetId());
 
     socket->SetSession(session);
 

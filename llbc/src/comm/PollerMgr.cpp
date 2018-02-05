@@ -202,11 +202,14 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
     return sessionId;
 }
 
-int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
+int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
+    {
+        pendingSessionId = 0;
         return LLBC_FAILED;
+    }
 
     const int sessionId = AllocSessionId();
     if (LIKELY(_pollers))
@@ -214,6 +217,8 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port)
                 LLBC_PollerEvUtil::BuildAsyncConnEv(sessionId, peer));
     else
         _pendingAsyncConns.insert(std::make_pair(sessionId, peer));
+
+    pendingSessionId = sessionId;
 
     return LLBC_OK;
 }

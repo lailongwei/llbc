@@ -59,20 +59,6 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Recv(void *in, void *&out, bool &removeSession);
-
-    /**
-     * Add coder factory to protocol, only available in Codec-Layer.
-     * @param[in] opcode - the opcode.
-     * @param[in] coder  - the coder factory
-     *  Note: When protocol deleted, it will not delete coder pointer,
-     *        It means that you must self manage your coder memory.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder);
-
-private:
-    typedef std::map<int, LLBC_ICoderFactory *> _Coders;
-    _Coders _coders;
 };
 
 __LLBC_NS_END

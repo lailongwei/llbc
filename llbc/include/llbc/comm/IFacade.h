@@ -224,6 +224,7 @@ public:
     LLBC_String ToString() const;
 
 private:
+    int _sessionId;
     bool _connected;
     LLBC_String _reason;
     LLBC_SockAddr_IN _peerAddr;

@@ -79,7 +79,7 @@ void LLBC_ProtocolStack::SetIsSuppressedCoderNotFoundWarning(bool suppressed)
 int LLBC_ProtocolStack::AddProtocol(LLBC_IProtocol *proto)
 {
     const int layer = proto->GetLayer();
-    if (_type == This::RawStack &&
+    if (_type == This::PackStack &&
             layer == _Layer::CodecLayer)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
@@ -101,7 +101,7 @@ int LLBC_ProtocolStack::AddProtocol(LLBC_IProtocol *proto)
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::AddCoder(int opcode, LLBC_ICoderFactory *coder)
+int LLBC_ProtocolStack::SetCoders(const LLBC_IProtocol::Coders *coders)
 {
     if (!_protos[_Layer::CodecLayer])
     {
@@ -109,7 +109,7 @@ int LLBC_ProtocolStack::AddCoder(int opcode, LLBC_ICoderFactory *coder)
         return LLBC_FAILED;
     }
 
-    return _protos[_Layer::CodecLayer]->AddCoder(opcode, coder);
+    return _protos[_Layer::CodecLayer]->SetCoders(coders);
 }
 
 int LLBC_ProtocolStack::SetFilter(LLBC_IProtocolFilter *filter, int toProto)

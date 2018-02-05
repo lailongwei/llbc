@@ -11,7 +11,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
-#include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/CompressProtocol.h"
 
 __LLBC_NS_BEGIN
 

@@ -56,6 +56,11 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_MaxLogFlushInterval();
 // LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg();
 
+// Thread about configs.
+//
+// LLBC_CFG_THREAD_GUARD_DEBUG
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Thread_GuardDebug();
+
 //
 // Timer about configs.
 //

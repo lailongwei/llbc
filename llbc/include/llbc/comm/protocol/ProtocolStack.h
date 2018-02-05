@@ -13,6 +13,7 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
+#include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 
 __LLBC_NS_BEGIN
@@ -21,7 +22,6 @@ __LLBC_NS_BEGIN
  * Previous declare some classes.
  */
 class LLBC_Packet;
-class LLBC_IProtocol;
 class LLBC_IProtocolFilter;
 class LLBC_ICoderFactory;
 class LLBC_Session;
@@ -42,7 +42,7 @@ public:
      */
     enum StackType
     {
-        RawStack,
+        PackStack,
         CodecStack,
 
         FullStack
@@ -87,14 +87,13 @@ public:
     int AddProtocol(LLBC_IProtocol *proto);
 
     /**
-     * Add coder to protocol stack.
-     * @param[in] opcode - the opcode.
-     * @param[in] coder  - the coder factory.
-     *                    Warn: The protocol factory will not delete coder object,
+     * Set coder factories to protocol stack.
+     * @param[in] coders - the coder factories.
+     *                    Warn: The protocol stack will not delete coder object,
      *                          Just simple hold it pointer.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddCoder(int opcode, LLBC_ICoderFactory *coder);
+    int SetCoders(const LLBC_IProtocol::Coders *coders);
 
     /**
      * Set protocol filter to specified layer protocol.

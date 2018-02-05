@@ -34,6 +34,11 @@ namespace llbc
         /// Normal type service, with this type service, will use codec layer to encode/decode your message data.
         /// </summary>
         Normal,
+
+        /// <summary>
+        /// Custom type service, with this type service, you must specific your protocol factory to service.
+        /// </summary>
+        Custom,
     }
     #endregion
 

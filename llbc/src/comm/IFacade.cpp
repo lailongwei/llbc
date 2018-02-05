@@ -166,7 +166,8 @@ LLBC_String LLBC_SessionDestroyInfo::ToString() const
 }
 
 LLBC_AsyncConnResult::LLBC_AsyncConnResult()
-: _connected(false)
+: _sessionId(0)
+, _connected(false)
 , _reason()
 , _peerAddr()
 {

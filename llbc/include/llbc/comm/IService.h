@@ -23,6 +23,7 @@ class LLBC_Packet;
 class LLBC_IFacade;
 class LLBC_Session;
 class LLBC_ICoderFactory;
+class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
 class LLBC_PacketHeaderDesc;
@@ -48,6 +49,7 @@ public:
     {
         Raw,
         Normal,
+        Custom,
     };
 
     /**
@@ -169,31 +171,34 @@ public:
 public:
     /**
      * Create a session and listening.
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port) = 0;
+    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
 
     /**
      * Establisthes a connection to a specified address.
-     * @param[in] ip      - the ip address.
-     * @param[in] port    - the port number.
-     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1) = 0;
+    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
 
     /**
      * Asynchronous establishes a connection to a specified address.
-     * @param[in] ip      - the ip address.
-     * @param[in] port    - the port number.
-     * @param[in] timeout - the timeout value on connect operation, default use OS setting.
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number.
+     * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1) = 0;
+    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
 
     /**
      * Check given sessionId is validate or not.
@@ -517,16 +522,16 @@ protected:
      * Declare friend class: LLBC_Session.
      *  Access method list:
      *      CreateFullStack()
-     *      CreateRawStack()
+     *      CreatePackStack()
      */
     friend class LLBC_Session;
 
     /**
      * Stack create helper method(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreateRawStack(LLBC_ProtocolStack *stack = NULL) = 0;
-    virtual LLBC_ProtocolStack *CreateCodecStack(LLBC_ProtocolStack *stack = NULL) = 0;
-    virtual LLBC_ProtocolStack *CreateFullStack() = 0;
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
+    virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
 };
 
 __LLBC_NS_END

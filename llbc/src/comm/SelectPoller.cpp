@@ -187,7 +187,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     if (socket->Connect(ev.peerAddr) == LLBC_OK)
     {
         _svc->Push(LLBC_SvcEvUtil::
-                BuildAsyncConnResultEv(true, "Success", ev.peerAddr));
+                BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
         AddSession(CreateSession(socket, ev.sessionId));
     }
     else if (LLBC_GetLastError() == LLBC_ERROR_WBLOCK)
@@ -208,7 +208,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     {
         LLBC_Delete(socket);
         _svc->Push(LLBC_SvcEvUtil::
-                BuildAsyncConnResultEv(false, LLBC_FormatLastError(), ev.peerAddr));
+                BuildAsyncConnResultEv(ev.sessionId, false, LLBC_FormatLastError(), ev.peerAddr));
     }
 }
 
@@ -281,7 +281,7 @@ void LLBC_SelectPoller::Accept(LLBC_Session *session)
         newSocket->SetNonBlocking();
 
         SetConnectedSocketDftOpts(newSocket);
-        AddToPoller(CreateSession(newSocket));
+        AddToPoller(CreateSession(newSocket, 0, session));
     }
 }
 
@@ -354,7 +354,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         }
 
         // Build async connect event and push it to service.
-        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(connected, reason, asyncInfo.peerAddr));
+        _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(asyncInfo.sessionId, connected, reason, asyncInfo.peerAddr));
 
         if (connected)
         {
