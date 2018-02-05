@@ -93,15 +93,23 @@
 
 // Extern macro define.
 #ifdef __cplusplus
- #define LLBC_INLINE       inline
- #define LLBC_FORCE_INLINE __forceinline
- #define LLBC_EXTERN       extern
- #define LLBC_EXTERN_C     extern "C"
+ #define LLBC_INLINE        inline
+ #if LLBC_TARGET_PLATFORM_WIN32
+  #define LLBC_FORCE_INLINE __forceinline
+ #else // Non-Win32
+  #define LLBC_FORCE_INLINE __attribute__((always_inline))
+ #endif // Win32
+ #define LLBC_EXTERN        extern
+ #define LLBC_EXTERN_C      extern "C"
 #else
- #define LLBC_INLINE       inline
-#define LLBC_FORCE_INLINE __attribute__((always_inline))
- #define LLBC_EXTERN       extern
- #define LLBC_EXTERN_C     
+ #define LLBC_INLINE        inline
+ #if LLBC_TARGET_PLATFORM_WIN32
+  #define LLBC_FORCE_INLINE __forceinline
+ #else // Non-Win32
+  #define LLBC_FORCE_INLINE __attribute__((always_inline))
+ #endif // Win32
+ #define LLBC_EXTERN        extern
+ #define LLBC_EXTERN_C      
 #endif
 
 // Extern "C" macro define.
