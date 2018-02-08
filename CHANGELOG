@@ -12,6 +12,7 @@
 6）【llbc core】Packet Protocol协议层的创建优化，去除创建时的coders copy，直接reference，以让session create操作变得更快.
 7）【llbc core】从易用性及优雅性考虑，优化Service Send/Multicast/Broadcast接口.
 8) 【llbc core】Service各订阅接口统一支持function delegate，为开发者提供另外一种选择.
+9) 【llbc core】增加FPS为LLBC_INFINTE时的支持，即不限制帧率.
 9) 【pyllbc】修复Service.send相关BUG.
 10)【csllbc】修复Log相关BUG.
 
