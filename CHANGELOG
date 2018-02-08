@@ -3,6 +3,18 @@
 ######################################################################################
 #
 # Version: 1.0.1
+功能新增/改进/优化:
+1) 【llbc core】归整所有Guard实现，统一抽取到Guard.h/Guard.cpp中.
+2) 【llbc core】增加自定义协议栈支持，允许开发者根据会话自定义自己的网络传输协议栈，最大限度提供灵活性，并保留Raw/Normal两种库内部默认实现.
+3）【llbc core】去除原有的Packet Header Designer框架，原有的框架相对灵活，但也有局限，统一使用自定议协议栈方式替换旧机制.
+4）【llbc core】重构Packet类，去除在操作headers时直接操作bytes实现.
+5）【llbc core】增加sender service id/receiver service id的概念，为后面的集群支持作准备，当前已经支持service转发.
+6）【llbc core】Packet Protocol协议层的创建优化，去除创建时的coders copy，直接reference，以让session create操作变得更快.
+7）【llbc core】从易用性及优雅性考虑，优化Service Send/Multicast/Broadcast接口.
+8) 【llbc core】Service各订阅接口统一支持function delegate，为开发者提供另外一种选择.
+9) 【pyllbc】修复Service.send相关BUG.
+10)【csllbc】修复Log相关BUG.
+
 # 2018/01/31
 # 功能新增/改进/优化:
 # 1) 【llbc core】对Delegate, Func增加Rtn typename, 以支持hold任意的class methods及functions, 同时对void Rtn进行偏特化，最终LLBC_Delegate机制可以完整hold任意class methods及functions.
