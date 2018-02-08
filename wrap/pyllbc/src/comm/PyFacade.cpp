@@ -333,6 +333,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
             return NULL;
     }
 
+    PyObject *pySenderSvcId = PyInt_FromLong(packet.GetSenderServiceId());
     PyObject *pySessionId = PyInt_FromLong(packet.GetSessionId());
 
     const LLBC_SockAddr_IN &localAddr = packet.GetLocalAddr();
@@ -359,6 +360,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
 
     PyObject *pyPacket = PyObject_CallFunctionObjArgs(_pyPacketCls,
                                                       _pySvc,
+                                                      pySenderSvcId,
                                                       pySessionId,
                                                       pyLocalIp,
                                                       pyLocalPort,
@@ -370,6 +372,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
                                                       pyData,
                                                       pyPacketCObj,
                                                       NULL);
+    Py_DECREF(pySenderSvcId);
     Py_DECREF(pySessionId);
     Py_DECREF(pyLocalIp);
     Py_DECREF(pyLocalPort);

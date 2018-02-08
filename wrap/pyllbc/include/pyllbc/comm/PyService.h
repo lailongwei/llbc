@@ -47,6 +47,12 @@ public:
 
 public:
     /**
+     * Get the service Id.
+     * @return int - the service Id.
+     */
+    int GetId() const;
+
+    /**
      * Get the python service type.
      * @return SvcType - the service type enumeration.
      */
@@ -227,10 +233,9 @@ public:
      * @param[in] data - send data(normal, not steal reference).
      *                   Note, the object's class must has encode() method and return bytearray.
      * @param[in] status - the status code, default is 0.
-     * @param[in] parts  - the packet header parts object, method will not hold this object instance.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Send(int sessionId, int opcode, PyObject *data, int status = 0, PyObject *parts = NULL);
+    int Send(int sessionId, int opcode, PyObject *data, int status = 0);
 
     /**
      * Multicast data.
@@ -239,10 +244,9 @@ public:
      * @param[in] data       - the data(normal, not steal reference).
      *                         Note, the object's class must has encode() method and return bytearray.
      * @param[in] status     - the status code, default is 0.
-     * @param[in] parts  - the packet header parts object, method will not hold this object instance.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status=0, PyObject *parts = NULL);
+    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status=0);
 
     /**
      * Broadcast data.
@@ -251,10 +255,9 @@ public:
      * @param[in] data       - the data(normal, not steal reference).
      *                         Note, the object's class must has encode() method and return bytearray.
      * @param[in] status     - the status code, default is 0.
-     * @param[in] parts  - the packet header parts object, method will not hold this object instance.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Broadcast(int opcode, PyObject *data, int status=0, PyObject *parts = NULL);
+    int Broadcast(int opcode, PyObject *data, int status=0);
 
     /**
      * Set specific opcode's packet Subscribe handler, if is RAW type service, the opcode parameter must be 0.
@@ -328,14 +331,6 @@ private:
     typedef std::set<PyObject *> _FrameCallables;
     void HandleFrameCallables(_FrameCallables &callables, bool &usingFlag);
     void DestroyFrameCallables(_FrameCallables &callables, bool &usingFlag);
-
-private:
-    /**
-     * Build c++ layer parts object, from python layer parts.
-     * @param[in] pyLayerParts - the python layer parts.
-     * @return LLBC_Pa cketHeaderParts * - the c++ layer parts.
-     */
-    LLBC_PacketHeaderParts *BuildCLayerParts(PyObject *pyLayerParts);
 
 private:
     /**

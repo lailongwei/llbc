@@ -8,95 +8,242 @@
  */
 #ifdef __LLBC_COMM_ISERVICE_H__
 
+#include "llbc/comm/ICoder.h"
 #include "llbc/comm/Packet.h"
-#include "llbc/comm/PacketHeaderParts.h"
 
 __LLBC_NS_BEGIN
+
+inline int LLBC_IService::Send(int sessionId)
+{
+    return Send(0, sessionId, 0, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, int opcode)
+{
+    return Send(0, sessionId, opcode, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, LLBC_ICoder *coder)
+{
+    return Send(0, sessionId, 0, coder, 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_ICoder *coder)
+{
+    return Send(0, sessionId, opcode, coder, 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_ICoder *coder, int status)
+{
+    return Send(0, sessionId, opcode, coder, status);
+}
+
+inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status)
+{
+    const int svcType = GetType();
+    if (svcType == Raw && coder == NULL)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    packet->SetEncoder(coder);
+
+    if (svcType == Raw)
+        packet->SetSessionId(sessionId);
+    else
+        packet->SetHeader(svcId, sessionId, opcode, status);
+
+    return Send(packet);
+}
+
+inline int LLBC_IService::Send(int sessionId, const void *bytes, size_t len)
+{
+    return Send(0, sessionId, 0, bytes, len, 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, int opcode, const void *bytes, size_t len)
+{
+    return Send(0, sessionId, opcode, bytes, len, 0);
+}
+
+inline int LLBC_IService::Send(int sessionId, int opcode, const void *bytes, size_t len, int status)
+{
+    return Send(0, sessionId, opcode, bytes, len, status);
+}
+
+inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status)
+{
+    const int svcType = GetType();
+    if (svcType == Raw && (bytes == NULL || len == 0))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    if (svcType == Raw)
+        packet->SetSessionId(sessionId);
+    else
+        packet->SetHeader(svcId, sessionId, opcode, status);
+
+    if (UNLIKELY(packet->Write(bytes, len) != LLBC_OK))
+    {
+        LLBC_Delete(packet);
+        return LLBC_FAILED;
+    }
+
+    return Send(packet);
+}
+
+template <typename T>
+inline int LLBC_IService::Send(int sessionId, const T &data)
+{
+    return Send<T>(0, sessionId, 0, data, 0);
+}
+
+template <typename T>
+inline int LLBC_IService::Send(int sessionId, int opcode, const T &data)
+{
+    return Send<T>(0, sessionId, opcode, data, 0);
+}
 
 template <typename T>
 inline int LLBC_IService::Send(int sessionId, int opcode, const T &data, int status)
 {
-    return this->Send2<T>(sessionId, opcode, data, status, NULL);
+    return Send<T>(0, sessionId, opcode, data, status);
 }
 
 template <typename T>
 inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const T &data, int status)
 {
-    return this->Send2<T>(svcId, sessionId, opcode, data, status, NULL);
-}
-
-template <typename T>
-inline int LLBC_IService::Send2(int sessionId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
-{
-    return this->Send2<T>(0, sessionId, opcode, data, status, parts);
-}
-
-template <typename T>
-inline int LLBC_IService::Send2(int svcId, int sessionId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
-{
     LLBC_Packet *packet = LLBC_New(LLBC_Packet);
-    packet->SetHeader(svcId, sessionId, opcode, status);
-    if (parts)
-    {
-        parts->SetToPacket(*packet);
-        LLBC_Delete(parts);
-    }
+    if (GetType() == Raw)
+        packet->SetSessionId(sessionId);
+    else
+        packet->SetHeader(svcId, sessionId, opcode, status);
 
     *packet <<data;
 
-    return this->Send(packet);
+    return Send(packet);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds)
+{
+    return Multicast(0, sessionIds, 0, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode)
+{
+    return Multicast(0, sessionIds, opcode, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, LLBC_ICoder *coder)
+{
+    return Multicast(0, sessionIds, 0, coder, 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder)
+{
+    return Multicast(0, sessionIds, opcode, coder, 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+{
+    return Multicast(0, sessionIds, opcode, coder, status);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, const void *bytes, size_t len)
+{
+    return Multicast(0, sessionIds, 0, bytes, len, 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len)
+{
+    return Multicast(0, sessionIds, opcode, bytes, len, 0);
+}
+
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
+{
+    return Multicast(0, sessionIds, opcode, bytes, len, status);
+}
+
+template <typename T>
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, const T &data)
+{
+    Multicast<T>(0, sessionIds, 0, data, 0);
+}
+
+template <typename T>
+inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data)
+{
+    Multicast<T>(0, sessionIds, opcode, data, 0);
 }
 
 template <typename T>
 inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status)
 {
-    return this->Multicast2<T>(sessionIds, opcode, data, status, NULL);
+    return Multicast(0, sessionIds, opcode, data, status);
 }
 
 template <typename T>
 inline int LLBC_IService::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status)
 {
-    return this->Multicast2<T>(svcId, sessionIds, opcode, data, status, NULL);
-}
-
-template <typename T>
-inline int LLBC_IService::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
-{
-    return this->Multicast2(0, sessionIds, opcode, data, status, parts);
-}
-
-template <typename T>
-inline int LLBC_IService::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
-{
     LLBC_Stream stream;
     stream.Write(data);
 
     const void *bytes = stream.GetBuf();
     const size_t len = stream.GetPos();
 
-    return this->Multicast2(svcId, sessionIds, opcode, bytes, len, status, parts);
+    return Multicast(svcId, sessionIds, opcode, bytes, len, status);
+}
+
+inline int LLBC_IService::Broadcast()
+{
+    return Broadcast(0, 0, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Broadcast(int opcode)
+{
+    return Broadcast(0, opcode, static_cast<LLBC_ICoder *>(NULL), 0);
+}
+
+inline int LLBC_IService::Broadcast(int opcode, LLBC_ICoder *coder, int status)
+{
+    return Broadcast(0, opcode, coder, status);
+}
+
+inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len)
+{
+    return Broadcast(0, opcode, bytes, len, 0);
+}
+
+inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, int status)
+{
+    return Broadcast(0, opcode, bytes, len, status);
+}
+
+template <typename T>
+inline int LLBC_IService::Broadcast(const T &data)
+{
+    return Broadcast<T>(0, 0, data, 0);
+}
+
+template <typename T>
+inline int LLBC_IService::Broadcast(int opcode, const T &data)
+{
+    return Broadcast<T>(0, opcode, data, 0);
 }
 
 template <typename T>
 inline int LLBC_IService::Broadcast(int opcode, const T &data, int status)
 {
-    return this->Broadcast2<T>(opcode, data ,status, NULL);
+    return Broadcast<T>(0, opcode, data, status);
 }
 
 template <typename T>
 inline int LLBC_IService::Broadcast(int svcId, int opcode, const T &data, int status)
-{
-    return this->Broadcast2<T>(svcId, opcode, data, status, NULL);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast2(int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
-{
-    return this->Broadcast2<T>(0, opcode, data, status, parts);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast2(int svcId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts)
 {
     LLBC_Stream stream;
     stream.Write(data);
@@ -104,7 +251,20 @@ inline int LLBC_IService::Broadcast2(int svcId, int opcode, const T &data, int s
     const void *bytes = stream.GetBuf();
     const size_t len = stream.GetPos();
 
-    return this->Broadcast2(svcId, opcode, bytes, len, status, parts);
+    return Broadcast(svcId, opcode, bytes, len, status);
+}
+
+inline int LLBC_IService::Subscribe(int opcode, void(*func)(LLBC_Packet &))
+{
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg =
+        new LLBC_Func1<void, LLBC_Packet &>(func);
+    if (Subscribe(opcode, deleg) != LLBC_OK)
+    {
+        delete deleg;
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
 }
 
 template <typename ObjType>
@@ -112,7 +272,20 @@ inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*me
 {
     LLBC_IDelegate1<void, LLBC_Packet &> *deleg = 
         new LLBC_Delegate1<void, ObjType, LLBC_Packet &>(obj, method);
-    if (this->Subscribe(opcode, deleg) != LLBC_OK)
+    if (Subscribe(opcode, deleg) != LLBC_OK)
+    {
+        delete deleg;
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+inline int LLBC_IService::PreSubscribe(int opcode, bool (*func)(LLBC_Packet &))
+{
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
+        new LLBC_Func1<bool, LLBC_Packet &>(func);
+    if (PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;
@@ -126,7 +299,7 @@ inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::
 {
     LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
         new LLBC_Delegate1<bool, ObjType, LLBC_Packet &>(obj, method);
-    if (this->PreSubscribe(opcode, deleg) != LLBC_OK)
+    if (PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;
@@ -136,12 +309,25 @@ inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+inline int LLBC_IService::UnifyPreSubscribe(bool(*func)(LLBC_Packet &))
+{
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
+        new LLBC_Func1<bool, LLBC_Packet &>(func);
+    if (!UnifyPreSubscribe(deleg) != LLBC_OK)
+    {
+        delete deleg;
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 template <typename ObjType>
 inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
     LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
         new LLBC_Delegate1<bool, ObjType, LLBC_Packet &>(obj, method);
-    if (this->UnifyPreSubscribe(deleg) != LLBC_OK)
+    if (UnifyPreSubscribe(deleg) != LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;
@@ -152,12 +338,25 @@ inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+inline int LLBC_IService::SubscribeStatus(int opcode, int status, void(*func)(LLBC_Packet &))
+{
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg =
+        new LLBC_Func1<void, LLBC_Packet &>(func);
+    if (SubscribeStatus(opcode, status, deleg) != LLBC_OK)
+    {
+        delete deleg;
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 template <typename ObjType>
 inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
     LLBC_IDelegate1<void, LLBC_Packet &> *deleg =
         new LLBC_Delegate1<void, ObjType, LLBC_Packet &>(obj, method);
-    if (this->SubscribeStatus(opcode, status, deleg) != LLBC_OK)
+    if (SubscribeStatus(opcode, status, deleg) != LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;
@@ -167,12 +366,11 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, 
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-template <typename ObjType>
-inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event *))
+inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, void(*func)(LLBC_Event *))
 {
-    LLBC_IDelegate1<void, LLBC_Event *> *deleg = 
-        new LLBC_Delegate1<void, ObjType, LLBC_Event *>(obj, method);
-    LLBC_ListenerStub stub = this->SubscribeEvent(event, deleg);
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg =
+        new LLBC_Func1<void, LLBC_Event *>(func);
+    LLBC_ListenerStub stub = SubscribeEvent(event, deleg);
     if (stub.empty())
         delete deleg;
 
@@ -180,10 +378,36 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
 }
 
 template <typename ObjType>
-inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(LLBC_IService::This *svc))
+inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event *))
 {
-    LLBC_IDelegate1<void, LLBC_IService::This *> *deleg = new LLBC_Delegate1<void, ObjType, LLBC_IService::This *>(obj, method);
-    if (this->Post(deleg) != LLBC_OK)
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg = 
+        new LLBC_Delegate1<void, ObjType, LLBC_Event *>(obj, method);
+    LLBC_ListenerStub stub = SubscribeEvent(event, deleg);
+    if (stub.empty())
+        delete deleg;
+
+    return stub;
+}
+
+inline int LLBC_IService::Post(void(*func)(This *))
+{
+    LLBC_IDelegate1<void, This *> *deleg =
+        new LLBC_Func1<void, This *>(func);
+    if (Post(deleg) != LLBC_OK)
+    {
+        delete deleg;
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+template <typename ObjType>
+inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(This *svc))
+{
+    LLBC_IDelegate1<void, This *> *deleg = 
+        new LLBC_Delegate1<void, ObjType, This *>(obj, method);
+    if (Post(deleg) != LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;

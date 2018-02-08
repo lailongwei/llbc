@@ -9,6 +9,15 @@
 
 #include "comm/TestCase_Comm_PacketOp.h"
 
+namespace
+{
+    void __DeletePreHandleResult(void *result)
+    {
+        delete reinterpret_cast<char *>(result);
+        std::cout <<"Prehandle result data deleted!" <<std::endl;
+    }
+}
+
 TestCase_Comm_PacketOp::TestCase_Comm_PacketOp()
 {
 }
@@ -94,19 +103,28 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     LLBC_Packet packet2;
     packet2.SetOpcode(10086);
     packet2.SetStatus(-1);
-    packet2.SetServiceId(110);
+    packet2.SetSenderServiceId(110);
+    packet2.SetRecverServiceId(220);
     packet2.SetFlags(1111);
     std::cout <<"After set opcode/status/serviceId/flags, these values are:" <<std::endl;
     std::cout <<"  opcode: " <<packet2.GetOpcode() <<std::endl;
     std::cout <<"  status: " <<packet2.GetStatus() <<std::endl;
-    std::cout <<"  serviceId: " <<packet2.GetServiceId() <<std::endl;
+    std::cout <<"  sender service Id: " <<packet2.GetSenderServiceId() <<std::endl;
+    std::cout <<"  receiver service Id: " <<packet2.GetRecverServiceId() <<std::endl;
+
     std::cout <<"  flags: " <<packet2.GetFlags() <<std::endl;
     std::cout <<"  packet length: " <<packet2.GetLength() <<std::endl;
     std::cout <<"  payload length: " <<packet2.GetPayloadLength() <<std::endl;
 
-    std::cout <<"Test packet header part set methods:" <<std::endl;
-    packet2.SetHeaderPartVal(1, 119);
-    std::cout <<"After set, opcode: " <<packet2.GetHeaderPartAsSInt16(1) <<std::endl;
+    // PreHandleResult about test.
+    std::cout <<"\nPreHandle result about test:" <<std::endl;
+
+    std::cout <<"Create new packet to test prehandle result clear callback method" <<std::endl;
+    LLBC_Packet *preHandleTestPacket = LLBC_New(LLBC_Packet);
+    preHandleTestPacket->SetPreHandleResult(new char(), __DeletePreHandleResult);
+
+    std::cout <<"Delete prehandle test packet" <<std::endl;
+    LLBC_XDelete(preHandleTestPacket);
 
     std::cout <<"Press any key to continue ...";
     getchar();

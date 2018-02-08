@@ -13,7 +13,6 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
-#include "llbc/comm/Packet.h"
 #include "llbc/comm/protocol/IProtocol.h"
 
 __LLBC_NS_BEGIN
@@ -71,13 +70,6 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder);
-
-private:
-    size_t _headerLen;
-    int _lenPartId;
-
-    size_t _lenOffset;
-    size_t _lenSize;
 };
 
 __LLBC_NS_END

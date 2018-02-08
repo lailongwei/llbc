@@ -47,7 +47,7 @@ namespace
 
         virtual void OnIdle(int idleTime)
         {
-            LLBC_PrintLine("Idle, times: %d...", idleTime);
+            LLBC_PrintLine("Idle, idle time: %d...", idleTime);
         }
 
     public:

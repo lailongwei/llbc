@@ -68,7 +68,7 @@ public:
     virtual void OnRecv(LLBC_Packet &packet)
     {
         const int sessionId = packet.GetSessionId();
-        const char *data = reinterpret_cast<char *>(packet.GetPayload());
+        const char *data = reinterpret_cast<const char *>(packet.GetPayload());
 
         LLBC_PrintLine("Session[%4d] received data: %s", sessionId, data);
     }

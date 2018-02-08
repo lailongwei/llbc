@@ -9,92 +9,36 @@
  */
 #ifdef __LLBC_COMM_PACKET_H__
 
-#include "llbc/comm/headerdesc/PacketHeaderDesc.h"
-
 __LLBC_NS_BEGIN
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const sint8 &val)
+inline size_t LLBC_Packet::GetLength() const
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<sint8>(serialNo, val);
+    return _length;
 }
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const uint8 &val)
+inline void LLBC_Packet::SetLength(size_t length)
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<uint8>(serialNo, val);
+    _length = length;
 }
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const sint16 &val)
+inline int LLBC_Packet::GetSenderServiceId() const
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<sint16>(serialNo, val);
+    return _senderSvcId;
 }
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const uint16 &val)
+inline void LLBC_Packet::SetSenderServiceId(int senderServiceId)
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<uint16>(serialNo, val);
+    _senderSvcId = senderServiceId;
 }
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const sint32 &val)
+inline int LLBC_Packet::GetRecverServiceId() const
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<sint32>(serialNo, val);
+    return _recverSvcId;
 }
 
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const uint32 &val)
+inline void LLBC_Packet::SetRecverServiceId(int recverServiceId)
 {
-    return this->RawSetNonFloatTypeHeaderPartVal<uint32>(serialNo, val);
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const sint64 &val)
-{
-    return this->RawSetNonFloatTypeHeaderPartVal<sint64>(serialNo, val);
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const uint64 &val)
-{
-    return this->RawSetNonFloatTypeHeaderPartVal<uint64>(serialNo, val);
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const float &val)
-{
-    return this->RawSetFloatTypeHeaderPartVal<float>(serialNo, val);
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const double &val)
-{
-    return this->RawSetFloatTypeHeaderPartVal<double>(serialNo, val);
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const char * const &val)
-{
-    return this->SetHeaderPartVal(serialNo, val, LLBC_StrLenA(val));
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, char * const &val)
-{
-    return this->SetHeaderPartVal(serialNo, val, LLBC_StrLenA(val));
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const std::string &val)
-{
-    return this->SetHeaderPartVal(serialNo, val.data(), val.size());
-}
-
-template <>
-inline int LLBC_Packet::SetHeaderPartVal(int serialNo, const LLBC_String &val)
-{
-    return this->SetHeaderPartVal(serialNo, val.data(), val.size());
+    _recverSvcId = recverServiceId;
 }
 
 inline int LLBC_Packet::GetSessionId() const
@@ -125,6 +69,75 @@ inline const LLBC_SockAddr_IN &LLBC_Packet::GetPeerAddr() const
 inline void LLBC_Packet::SetPeerAddr(const LLBC_SockAddr_IN &addr)
 {
     _peerAddr = addr;
+}
+
+inline int LLBC_Packet::GetOpcode() const
+{
+    return _opcode;
+}
+
+inline void LLBC_Packet::SetOpcode(int opcode)
+{
+    _opcode = opcode;
+}
+
+inline int LLBC_Packet::GetStatus() const
+{
+    return _status;
+}
+
+inline void LLBC_Packet::SetStatus(int status)
+{
+    _status = status;
+}
+
+inline int LLBC_Packet::GetFlags() const
+{
+    return _flags;
+}
+
+inline void LLBC_Packet::SetFlags(int flags)
+{
+    _flags = flags;
+}
+
+inline bool LLBC_Packet::HasFlags(int flags) const
+{
+    return (_flags & flags) == flags;
+}
+
+inline void LLBC_Packet::AddFlags(int flags)
+{
+    SetFlags(_flags | flags);
+}
+
+inline void LLBC_Packet::RemoveFlags(int flags)
+{
+    SetFlags(_flags & (~flags));
+}
+
+inline void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
+{
+    SetSessionId(sessionId);
+    SetOpcode(opcode);
+    SetStatus(status);
+}
+
+inline void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int status)
+{
+    SetRecverServiceId(svcId);
+
+    SetSessionId(sessionId);
+    SetOpcode(opcode);
+    SetStatus(status);
+}
+
+inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int status)
+{
+    SetSessionId(packet._sessionId);
+
+    SetOpcode(opcode);
+    SetStatus(status);
 }
 
 template <typename _Ty>
@@ -251,16 +264,22 @@ inline int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 template <typename _Ty>
 inline int LLBC_Packet::Read(_Ty &val)
 {
+    if (_payload == NULL)
+    {
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
     LLBC_Stream s;
-    s.Attach(_block->
-        GetDataStartWithReadPos(), _block->GetReadableSize());
+    s.Attach(_payload->
+        GetDataStartWithReadPos(), _payload->GetReadableSize());
     if (!s.Read(val))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
     }
 
-    _block->ShiftReadPos(static_cast<long>(s.GetPos()));
+    _payload->ShiftReadPos(static_cast<long>(s.GetPos()));
 
     return LLBC_OK;
 }
@@ -351,20 +370,6 @@ inline int LLBC_Packet::Write(const _Ty &obj)
     return this->Write(s.GetBuf(), s.GetPos());
 }
 
-inline void *LLBC_Packet::GetPreHandleResult() const
-{
-    return _preHandleResult;
-}
-
-template <typename Obj>
-inline void LLBC_Packet::SetPreHandleResult(void *result, Obj *obj, void (Obj::*clearMethod)(void *))
-{
-    this->CleanupPreHandleResult();
-    if ((_preHandleResult = result))
-        if (obj && clearMethod)
-            _resultClearDeleg = new LLBC_Delegate1<void, Obj, void *>(obj, clearMethod);
-}
-
 template <typename _Ty>
 LLBC_Packet &LLBC_Packet::operator <<(const _Ty &val)
 {
@@ -379,254 +384,19 @@ LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
     return *this;
 }
 
-template <typename _RawTy>
-inline void LLBC_Packet::RawGetFloatTypeHeaderPartVal(int serialNo, _RawTy &val) const
+inline void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
-    // Get part describe.
-    const LLBC_PacketHeaderPartDesc *
-        partDesc = _headerDesc->GetPart(serialNo);
-    if (!partDesc)
-    {
-        val = _RawTy();
-        return;
-    }
-
-    // Get part begin buffer, buffer length.
-    const char *partBeg = reinterpret_cast<const char *>(
-        _block->GetData()) + _headerDesc->GetPartOffset(serialNo);
-    const size_t partLen = partDesc->GetPartLen();
-
-    // Real get part value.
-    this->RawGetFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
+    LLBC_IDelegate1<void, void *> *clearDeleg =
+        new LLBC_Func1<void, void *>(clearFunc);
+    SetPreHandleResult(result, clearDeleg);
 }
 
-template <typename _RawTy>
-inline void LLBC_Packet::RawGetNonFloatTypeHeaderPartVal(int serialNo, _RawTy &val) const
+template <typename ObjType>
+inline void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
-    // Get part describe.
-    const LLBC_PacketHeaderPartDesc *
-        partDesc = _headerDesc->GetPart(serialNo);
-    if (!partDesc)
-    {
-        val = _RawTy();
-        return;
-    }
-
-    // Get part begin buffer, buffer length.
-    const char *partBeg = reinterpret_cast<const char *>(
-        _block->GetData()) + _headerDesc->GetPartOffset(serialNo);
-    const size_t partLen = partDesc->GetPartLen();
-
-    // Real get part value.
-    this->RawGetNonFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
-}
-
-template <typename _RawTy>
-inline void LLBC_Packet::RawGetFloatTypeHeaderPartVal(const char *buf, size_t bufLen, _RawTy &val) const
-{
-    // Try test 'bufLen' variable order: 8->4->others(1,2,3,5,6,7)
-    if (bufLen == 8)
-    {
-        double dblVal =
-            *reinterpret_cast<const double *>(buf);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Net2Host(dblVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-
-        val = static_cast<_RawTy>(dblVal);
-    }
-    else if (bufLen == 4)
-    {
-        float floatVal =
-            *reinterpret_cast<const float *>(buf);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Net2Host(floatVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-
-        val = static_cast<_RawTy>(floatVal);
-    }
-    else
-    {
-        val = _RawTy();
-        const size_t copyLen =
-            sizeof(_RawTy) > bufLen ? bufLen : sizeof(_RawTy);
-        ::memcpy(&val, buf, copyLen);
-    }
-}
-
-template <typename _RawTy>
-inline void LLBC_Packet::RawGetNonFloatTypeHeaderPartVal(const char *buf, size_t bufLen, _RawTy &val) const
-{
-    // Try test 'bufLen' variable order: 2->4->8->1->others(3,5,6,7)
-    if (bufLen == 2)
-    {
-        sint16 sint16Val =
-            *reinterpret_cast<const sint16 *>(buf);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Net2Host(sint16Val);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-
-        val = static_cast<_RawTy>(sint16Val);
-    }
-    else if (bufLen == 4)
-    {
-        sint32 sint32Val =
-            *reinterpret_cast<const sint32 *>(buf);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Net2Host(sint32Val);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-
-        val = static_cast<_RawTy>(sint32Val);
-    }
-    else if (bufLen == 8)
-    {
-        sint64 sint64Val =
-            *reinterpret_cast<const sint64 *>(buf);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Net2Host(sint64Val);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-
-        val = static_cast<_RawTy>(sint64Val);
-    }
-    else if (bufLen == 1)
-    {
-        val = static_cast<_RawTy>(*buf);
-    }
-    else
-    {
-        val = _RawTy();
-        const size_t copyLen =
-            sizeof(_RawTy) > bufLen ? bufLen : sizeof(_RawTy);
-        ::memcpy(&val, buf, copyLen);
-    }
-}
-
-template <typename _RawTy>
-inline int LLBC_Packet::RawSetFloatTypeHeaderPartVal(int serialNo, const _RawTy &val)
-{
-    // Get part describe.
-    const LLBC_PacketHeaderPartDesc *
-        partDesc = _headerDesc->GetPart(serialNo);
-    if (!partDesc)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    // Get part length and part begin buffer.
-    const size_t partLen = partDesc->GetPartLen();
-    char *partBeg = const_cast<char *>(reinterpret_cast<
-        const char *>(_block->GetData())) + _headerDesc->GetPartOffset(serialNo);
-
-    // Set it.
-    this->RawSetFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
- 
-    return LLBC_OK;
-}
-
-template <typename _RawTy>
-inline int LLBC_Packet::RawSetNonFloatTypeHeaderPartVal(int serialNo, const _RawTy &val)
-{
-    // Get part describe.
-    const LLBC_PacketHeaderPartDesc *
-        partDesc = _headerDesc->GetPart(serialNo);
-    if (!partDesc)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    // Get part length and part begin buffer.
-    const size_t partLen = partDesc->GetPartLen();
-    char *partBeg = const_cast<char *>(reinterpret_cast<
-        const char *>(_block->GetData())) + _headerDesc->GetPartOffset(serialNo);
-
-    // Set it.
-    this->RawSetNonFloatTypeHeaderPartVal<_RawTy>(partBeg, partLen, val);
- 
-    return LLBC_OK;
-}
-
-template <typename _RawTy>
-inline void LLBC_Packet::RawSetFloatTypeHeaderPartVal(char *buf, size_t bufLen, const _RawTy &val)
-{
-    // Begin assign.
-    // Try test 'bufLen' variable order: 8->4->others(1,2,3,5,6,7)
-    if (bufLen == 8)
-    {
-        double convertedVal = static_cast<double>(val);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Host2Net(convertedVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        *reinterpret_cast<double *>(buf) = convertedVal;
-    }
-    else if (bufLen == 4)
-    {
-        float convertedVal = static_cast<float>(val);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Host2Net(convertedVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        *reinterpret_cast<float *>(buf) = convertedVal;
-    }
-    else
-    {
-        if (bufLen > sizeof(_RawTy))
-        {
-            ::memset(buf + bufLen, 0, bufLen - sizeof(_RawTy));
-            ::memcpy(buf, &val, sizeof(_RawTy));
-        }
-        else
-        {
-            ::memcpy(buf, &val, bufLen);
-        }
-    }
-}
-
-template <typename _RawTy>
-inline void LLBC_Packet::RawSetNonFloatTypeHeaderPartVal(char *buf, size_t bufLen, const _RawTy &val)
-{
-    // Begin assign.
-    // Try test 'bufLen' variable order: 2->4->8->1->others(3,5,6,7)
-    if (bufLen == 2)
-    {
-        sint16 convertedVal = static_cast<sint16>(val);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Host2Net(convertedVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        *reinterpret_cast<sint16 *>(buf) = convertedVal;
-    }
-    else if (bufLen == 4)
-    {
-        sint32 convertedVal = static_cast<sint32>(val);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Host2Net(convertedVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        *reinterpret_cast<sint32 *>(buf) = convertedVal;
-    }
-    else if (bufLen == 8)
-    {
-        sint64 convertedVal = static_cast<sint64>(val);
-#if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        LLBC_Host2Net(convertedVal);
-#endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-        *reinterpret_cast<sint64 *>(buf) = convertedVal;
-    }
-    else if (bufLen == 1)
-    {
-        *buf = static_cast<sint8>(val);
-    }
-    else
-    {
-        if (bufLen > sizeof(_RawTy))
-        {
-            ::memset(buf + bufLen, 0, bufLen - sizeof(_RawTy));
-            ::memcpy(buf, &val, sizeof(_RawTy));
-        }
-        else
-        {
-            ::memcpy(buf, &val, bufLen);
-        }
-    }
+    LLBC_IDelegate1<void, void *> *clearDeleg =
+        new LLBC_Delegate1<void, ObjType, void *>(obj, clearMethod);
+    SetPreHandleResult(result, clearDeleg);
 }
 
 template <typename _RawTy>
@@ -654,7 +424,10 @@ inline int LLBC_Packet::WriteRawType(_RawTy val)
     LLBC_Host2Net(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
-    return _block->Write(&val, sizeof(val));
+    if (!_payload)
+        _payload = new LLBC_MessageBlock(sizeof(val));
+
+    return _payload->Write(&val, sizeof(val));
 }
 
 __LLBC_NS_END

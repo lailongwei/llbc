@@ -36,33 +36,19 @@ LLBC_ServiceMgr::~LLBC_ServiceMgr()
 LLBC_IService *LLBC_ServiceMgr::GetService(int id)
 {
     LLBC_LockGuard guard(_lock);
-    _Services::iterator it = _id2Services.find(id);
-    if (it == _id2Services.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
-    }
-
-    return it->second;
+    return GetServiceNonLock(id);
 }
 
 LLBC_IService *LLBC_ServiceMgr::GetService(const LLBC_String &name)
 {
     LLBC_LockGuard guard(_lock);
-    _Services2::iterator it = _name2Services.find(name);
-    if (it == _name2Services.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
-    }
-
-    return it->second;
+    return GetServiceNonLock(name);
 }
 
 int LLBC_ServiceMgr::RemoveService(int id)
 {
     LLBC_LockGuard guard(_lock);
-    LLBC_IService *svc = GetService(id);
+    LLBC_IService *svc = GetServiceNonLock(id);
     if (!svc)
     {
         return LLBC_FAILED;
@@ -79,12 +65,14 @@ int LLBC_ServiceMgr::RemoveService(int id)
 
 int LLBC_ServiceMgr::RemoveService(const LLBC_String &name)
 {
-    LLBC_LockGuard guard(_lock);
-    LLBC_IService *svc = GetService(name);
+    _lock.Lock();
+    LLBC_IService *svc = GetServiceNonLock(name);
     if (!svc)
     {
+        _lock.Unlock();
         return LLBC_FAILED;
     }
+    _lock.Unlock();
 
     return RemoveService(svc->GetId());
 }

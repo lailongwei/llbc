@@ -95,6 +95,7 @@ class SvcBaseTest(TestCase):
 
     def run(self, arg):
         print 'Service base test:'
+
         # Create service: my_svc
         svc = Service('svcbase_test_svc')
         svc.codec = Service.CODEC_BINARY

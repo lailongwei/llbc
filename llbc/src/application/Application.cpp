@@ -78,7 +78,7 @@ int LLBC_BaseApplication::RemoveService(int id)
 
 int LLBC_BaseApplication::Send(LLBC_Packet *packet)
 {
-    LLBC_IService *service = _services.GetService(packet->GetServiceId());
+    LLBC_IService *service = _services.GetService(packet->GetSenderServiceId());
     if(!service)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);

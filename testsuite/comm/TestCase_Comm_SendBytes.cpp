@@ -38,7 +38,7 @@ public:
 public:
     void OnRecv(LLBC_Packet &packet)
     {
-        const char *data = reinterpret_cast<char *>(packet.GetPayload());
+        const char *data = reinterpret_cast<const char *>(packet.GetPayload());
         LLBC_PrintLine("Recved packet, data: %s", data);
 
         LLBC_IService *svc = GetService();

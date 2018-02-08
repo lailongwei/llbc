@@ -64,7 +64,7 @@ int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
         return LLBC_FAILED;
     }
 
-    out = in;
+    out = packet;
     return LLBC_OK;
 }
 
@@ -101,7 +101,7 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 
         packet->SetDecoder(coder);
     }
-    else if (!_stack->_suppressCoderNotFoundError)
+    else if (!_stack->GetIsSuppressedCoderNotFoundWarning())
     {
         const LLBC_String reportMsg = LLBC_String().format(
             "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
@@ -119,7 +119,7 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
         return LLBC_FAILED;
     }
 
-    out = in;
+    out = packet;
     return LLBC_OK;
 }
 

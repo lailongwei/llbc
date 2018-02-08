@@ -144,7 +144,7 @@ void csllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
 {
     (*_unHandledPacketDeleg)(packet.GetSessionId(),
                              packet.GetOpcode(),
-                             packet.GetPayload(),
+                             const_cast<void *>(packet.GetPayload()),
                              static_cast<int>(packet.GetPayloadLength()),
                              packet.GetStatus());
 }

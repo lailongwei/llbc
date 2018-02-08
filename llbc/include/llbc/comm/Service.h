@@ -186,40 +186,6 @@ public:
      */
     virtual int Send(LLBC_Packet *packet);
 
-    /**
-     * Send data(these methods will automatics create packet to send).
-     * Note: 
-     *      no matter this method success or not, coder will be managed by this call,
-     *      it means no matter this call success or not, delete coder operation will
-     *      execute by llbc framework.
-     * @param[in] svcId     - the service Id.
-     * @param[in] sessionId - the session Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Send2(int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Send2(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
-
-    /**
-     * Send bytes(these methods will automatics create packet to send).
-     * @param[in] svcId     - the service Id.
-     * @param[in] sessionId - the session Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] bytes     - the bytes data.
-     * @param[in] len       - data length.
-     * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status);
-    virtual int Send2(int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Send2(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
-
     /** 
      * Multicast data(these methods will automatics create packet to send).
      * Note: 
@@ -231,14 +197,9 @@ public:
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
-
     /**
      * Multicast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -247,13 +208,9 @@ public:
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
-    virtual int Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
 
     /** 
      * Broadcast data(these methods will automatics create packet to send).
@@ -266,13 +223,9 @@ public:
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, LLBC_ICoder *coder, int status);
     virtual int Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Broadcast2(int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts);
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -281,13 +234,9 @@ public:
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, const void *bytes, size_t len, int status);
     virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status);
-    virtual int Broadcast2(int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
-    virtual int Broadcast2(int svcId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts);
 
     /**
      * Remove session, always success.
@@ -490,7 +439,6 @@ private:
                      const void *bytes,
                      size_t len,
                      int status,
-                     const LLBC_PacketHeaderParts *parts = NULL,
                      bool lock = true,
                      bool validCheck = true);
 
@@ -500,7 +448,6 @@ private:
                            int opcode,
                            LLBC_ICoder *coder,
                            int status,
-                           const LLBC_PacketHeaderParts *parts = NULL,
                            bool validCheck = true);
 
 private:

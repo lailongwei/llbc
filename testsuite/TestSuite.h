@@ -55,8 +55,6 @@
 #include "comm/TestCase_Comm_Event.h"
 #include "comm/TestCase_Comm_Timer.h"
 #include "comm/TestCase_Comm_PacketOp.h"
-#include "comm/TestCase_Comm_HeaderDesc.h"
-#include "comm/TestCase_Comm_PacketHeaderParts.h"
 #include "comm/TestCase_Comm_ReleasePool.h"
 #include "comm/TestCase_Comm_Facade.h"
 #include "comm/TestCase_Comm_SvcBase.h"
@@ -66,7 +64,6 @@
 #include "comm/TestCase_Comm_Multicast.h"
 #include "comm/TestCase_Comm_ExternalDriveSvc.h"
 #include "comm/TestCase_Comm_LazyTask.h"
-#include "comm/TestCase_Comm_CustomHeaderSvc.h"
 
 extern int TestSuite_Main(int argc, char *argv[]);
 

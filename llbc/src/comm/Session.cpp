@@ -201,6 +201,9 @@ int LLBC_Session::Send(LLBC_Packet *packet)
 #endif
         return removeSession ? LLBC_FAILED : LLBC_OK;
 
+    if (block == NULL)
+        return LLBC_OK;
+
     return Send(block);
 }
 

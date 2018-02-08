@@ -26,9 +26,6 @@ class LLBC_ICoderFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
-class LLBC_PacketHeaderDesc;
-class LLBC_IPacketHeaderDescFactory;
-class LLBC_PacketHeaderParts;
 
 __LLBC_NS_END
 
@@ -72,24 +69,12 @@ public:
 public:
     /**
      * Factory method, create service type service type.
-     * @param[in] type - the service type.
-     * @param[in] name - the service name.
+     * @param[in] type         - the service type.
+     * @param[in] name         - the service name.
+     * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
+     * @param[in] This * - new service.
      */
-    static This *Create(Type type, const LLBC_String &name = "");
-
-    /**
-     * Set the packet header describe.
-     * @param[in] headerDesc - the packet header describe.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int SetPacketHeaderDesc(LLBC_PacketHeaderDesc *headerDesc);
-
-    /**
-     * Set the packet header desc factory, this method is thread unsafety, call in progress start.
-     * @param[in] factory - the factory.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int SetPacketHeaderDescFactory(LLBC_IPacketHeaderDescFactory *factory);
+    static This *Create(Type type, const LLBC_String &name = "", LLBC_IProtocolFactory *protoFactory = NULL);
 
 public:
     /**
@@ -207,6 +192,7 @@ public:
      */
     virtual bool IsSessionValidate(int sessionId) = 0;
 
+public:
     /**
      * Send packet.
      * Note: 
@@ -229,13 +215,14 @@ public:
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder, int status) = 0;
-    virtual int Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status) = 0;
-    virtual int Send2(int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Send2(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
+    virtual int Send(int sessionId);
+    virtual int Send(int sessionId, int opcode);
+    virtual int Send(int sessionId, LLBC_ICoder *coder);
+    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder);
+    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status);
 
     /**
      * Send bytes(these methods will automatics create packet to send).
@@ -245,13 +232,12 @@ public:
      * @param[in] bytes     - the bytes data.
      * @param[in] len       - data length.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Send2(int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Send2(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
+    virtual int Send(int sessionId, const void *bytes, size_t len);
+    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len);
+    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status);
+    virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status);
 
     /**
      * Send data(the template methods will automatics create packet to send).
@@ -262,14 +248,15 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename T>
+    int Send(int sessionId, const T &data);
+    template <typename T>
+    int Send(int sessionId, int opcode, const T &data);
+    template <typename T>
     int Send(int sessionId, int opcode, const T &data, int status);
     template <typename T>
     int Send(int svcId, int sessionId, int opcode, const T &data, int status);
-    template <typename T>
-    int Send2(int sessionId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
-    template <typename T>
-    int Send2(int svcId, int sessionId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
 
+public:
     /** 
      * Multicast data(these methods will automatics create packet to send).
      * Note: 
@@ -281,13 +268,14 @@ public:
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, LLBC_ICoder *coder);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
-    virtual int Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
 
     /**
      * Multicast bytes(these methods will automatics create packet to send).
@@ -297,30 +285,30 @@ public:
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, const void *bytes, size_t len);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len);
+    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
+
     /**
      * Multicast data(these template methods will automatics create packet to send).
      * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
      * @param[in] data       - the data.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
+    template <typename T>
+    int Multicast(const LLBC_SessionIdList &sessionIds, const T &data);
+    template <typename T>
+    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data);
     template <typename T>
     int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status);
     template <typename T>
     int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status);
-    template <typename T>
-    int Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
-    template <typename T>
-    int Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
+
     /** 
      * Broadcast data(these methods will automatics create packet to send).
      * Note: 
@@ -332,13 +320,12 @@ public:
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, LLBC_ICoder *coder, int status) = 0;
+    virtual int Broadcast();
+    virtual int Broadcast(int opcode);
+    virtual int Broadcast(int opcode, LLBC_ICoder *coder, int status);
     virtual int Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status) = 0;
-    virtual int Broadcast2(int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts) = 0;
 
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
@@ -348,13 +335,11 @@ public:
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, const void *bytes, size_t len, int status) = 0;
+    virtual int Broadcast(int opcode, const void *bytes, size_t len);
+    virtual int Broadcast(int opcode, const void *bytes, size_t len, int status);
     virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Broadcast2(int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
-    virtual int Broadcast2(int svcId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts) = 0;
 
     /**
      * Broadcast data(these template methods will automatics create packet to send).
@@ -362,17 +347,16 @@ public:
      * @param[in] opcode     - the opcode.
      * @param[in] data       - the data.
      * @param[in] status     - the status, default is 0.
-     * @param[in] parts     - the packet header parts values, default is NULL.
      * @return int - return 0 if success, otherwise return -1.
      */
+    template <typename T>
+    int Broadcast(const T &data);
+    template <typename T>
+    int Broadcast(int opcode, const T &data);
     template <typename T>
     int Broadcast(int opcode, const T &data, int status);
     template <typename T>
     int Broadcast(int svcId, int opcode, const T &data, int status);
-    template <typename T>
-    int Broadcast2(int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
-    template <typename T>
-    int Broadcast2(int svcId, int opcode, const T &data, int status, LLBC_PacketHeaderParts *parts);
 
     /**
      * Remove session, always success.
@@ -401,51 +385,55 @@ public:
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
     /**
+     * Subscribe message to specified handler method.
+     */
+    int Subscribe(int opcode, void(*func)(LLBC_Packet &));
+    template <typename ObjType>
+    int Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
+
+    /**
      * Subscribe message to specified delegate.
      */
     virtual int Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
 
     /**
-     * Subscribe message to specified handler method.
+     * Previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
      */
+    int PreSubscribe(int opcode, bool (*func)(LLBC_Packet &));
     template <typename ObjType>
-    int Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
+    int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
     /**
      * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
-    /**
-     * Previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
-     */
-    template <typename ObjType>
-    int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
-
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    /**
+     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
+     */
+    int UnifyPreSubscribe(bool(*func)(LLBC_Packet &));
+    template <typename ObjType>
+    int UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
+
     /**
      * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
-
-    /**
-     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
-     */
-    template <typename ObjType>
-    int UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
+     * Subscribe message status to specified method, if subscribed, service will not call default opcode handler.
+     */
+    int SubscribeStatus(int opcode, int status, void(*func)(LLBC_Packet &));
+    template <typename ObjType>
+    int SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
+
+    /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
     virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
-
-    /**
-     * Subscribe message status to specified method, if subscribed, service will not call default opcode handler.
-     */
-    template <typename ObjType>
-    int SubscribeStatus(int opcode ,int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     /**
@@ -467,6 +455,7 @@ public:
     /**
      * Subscribe event to specified handler method.
      */
+    LLBC_ListenerStub SubscribeEvent(int event, void(*func)(LLBC_Event *));
     template <typename ObjType>
     LLBC_ListenerStub SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event *));
 
@@ -496,11 +485,10 @@ public:
 public:
     /**
      * Post lazy task to service.
-     * @param[in] delegate - the task delegate.
+     * @param[in] func - the task function.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<void, This *> *deleg) = 0;
-
+    int Post(void(*func)(This *));
     /**
      * Post lazy task to service.
      * @param[in] obj    - the task object.
@@ -509,6 +497,13 @@ public:
      */
     template <typename ObjType>
     int Post(ObjType *obj, void (ObjType::*method)(This *));
+
+    /**
+     * Post lazy task to service.
+     * @param[in] delegate - the task delegate.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Post(LLBC_IDelegate1<void, This *> *deleg) = 0;
 
 public:
     /**

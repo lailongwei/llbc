@@ -12,13 +12,15 @@
 namespace
 {
 
+class EventTestFacade;
+
 class TestEvent : public LLBC_Event
 {
 public:
     enum
     {
         TEST_EV_ID1 = 1,
-        TEST_EV_ID2 = 2
+        TEST_EV_ID2 = 2,
     };
 
 public:
@@ -31,6 +33,7 @@ public:
     {
     }
 
+    EventTestFacade *facade;
     LLBC_String data;
 };
 
@@ -39,7 +42,9 @@ class EventTestFacade : public LLBC_IFacade
 public:
     EventTestFacade()
     : _handleTimes(0)
-    , _stub()
+    , _staticHandleTimes(0)
+    , _ev1HandlerStub()
+    , _ev1StaticHandlerStub()
     {
     }
 
@@ -49,7 +54,8 @@ public:
         LLBC_ThreadManager::Sleep(1000);
 
         LLBC_IService *svc = GetService();
-        _stub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestFacade::HandleEvent);
+        _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestFacade::HandleEvent);
+        _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestFacade::HandleEvent_Static);
     }
 
     virtual void OnDestroy()
@@ -62,7 +68,9 @@ public:
         LLBC_IService *svc = GetService();
 
         TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
+        ev->facade = this;
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
+
         svc->FireEvent(ev);
 
         ev = new TestEvent(TestEvent::TEST_EV_ID2);
@@ -74,21 +82,36 @@ public:
     void HandleEvent(LLBC_Event *_)
     {
         TestEvent *ev = static_cast<TestEvent *>(_);
-        std::cout <<"handle event, data: " <<ev->data <<std::endl;
+        std::cout <<"handle event(class member method), data: " <<ev->data <<std::endl;
 
         ++_handleTimes;
         LLBC_IService *svc = GetService();
         if (_handleTimes == 5)
             svc->SubscribeEvent(TestEvent::TEST_EV_ID2, this, &EventTestFacade::HandleEvent);
         else if (_handleTimes == 10)
-            svc->UnsubscribeEvent(_stub);
+            svc->UnsubscribeEvent(_ev1HandlerStub);
         else if (_handleTimes == 1000)
             svc->UnsubscribeEvent(TestEvent::TEST_EV_ID2);
     }
 
+    static void HandleEvent_Static(LLBC_Event *_)
+    {
+        TestEvent *ev = static_cast<TestEvent *>(_);
+        std::cout << "handle event(class static method(like function), data: " <<ev->data <<std::endl;
+
+        EventTestFacade *facade = ev->facade;
+        ++facade->_staticHandleTimes;
+        LLBC_IService *svc = facade->GetService();
+        if (facade->_staticHandleTimes == 1000)
+            svc->UnsubscribeEvent(facade->_ev1StaticHandlerStub);
+    }
+
 private:
     int _handleTimes;
-    LLBC_ListenerStub _stub;
+    int _staticHandleTimes;
+
+    LLBC_ListenerStub _ev1HandlerStub;
+    LLBC_ListenerStub _ev1StaticHandlerStub;
 };
 
 }

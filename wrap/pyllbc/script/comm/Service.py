@@ -199,6 +199,7 @@ class pyllbcService(object):
 
         self._addsvc(self)
         self._c_obj = llbc.inl.NewService(self, svctype, svcname)
+        self._svcid = llbc.inl.GetServiceId(self._c_obj)
 
         self._encoders = {}
         self._facades = {}
@@ -239,6 +240,10 @@ class pyllbcService(object):
         return llbc.inl.GetServiceTypeStr(self._svctype)
 
     @property
+    def id(self):
+        return self._svcid
+
+    @property
     def name(self):
         return self._svcname
 
@@ -268,16 +273,6 @@ class pyllbcService(object):
     @codec.setter
     def codec(self, c):
         llbc.inl.SetServiceCodec(self._c_obj, c)
-
-    @staticmethod
-    def set_header_desc(header_desc):
-        """
-        Set packet header describe.
-        """
-        if not isinstance(header_desc, llbc.PacketHeaderDesc):
-            raise llbc.error('set header desc failed, type error, given type: {}'.format(type(header_desc)))
-
-        llbc.inl.SetPacketHeaderDesc(header_desc._cobj)
 
     def suppress_codernotfound_warning(self):
         """
@@ -534,6 +529,7 @@ class pyllbcService(object):
         Note: must raw types(eg:int, long, float, str, bytearray, unicode...) or exist follow methods' class:
               decode(self, stream): decode data from stream.
         """
+
         llbc.inl.RegisterCodec(self._c_obj, opcode, coder)
 
     def listen(self, ip, port):
@@ -565,7 +561,7 @@ class pyllbcService(object):
         """
         llbc.inl.RemoveSession(self._c_obj, session_id, reason, strict)
 
-    def send(self, session_id, data, opcode=None, status=0, parts=None):
+    def send(self, session_id, data, opcode=None, status=0):
         """
         Send data to specific session
         """
@@ -584,28 +580,19 @@ class pyllbcService(object):
         if isinstance(session_id, Packet):
             session_id = session_id.session_id
 
-        if parts is None:
-            llbc.inl.SendData(self._c_obj, session_id, opcode, data, status)
-        else:
-            llbc.inl.SendData(self._c_obj, session_id, opcode, data, status, parts)
+        llbc.inl.SendData(self._c_obj, session_id, opcode, data, status)
 
-    def multicast(self, session_ids, data, opcode=None, status=0, parts=None):
+    def multicast(self, session_ids, data, opcode=None, status=0):
         """
         Multicast message
         """
-        if parts is None:
-            llbc.inl.Multicast(self._c_obj, session_ids, opcode, data, status)
-        else:
-            llbc.inl.Multicast(self._c_obj, session_ids, opcode, data, status, parts)
+        llbc.inl.Multicast(self._c_obj, session_ids, opcode, data, status)
 
-    def broadcast(self, data, opcode=None, status=0, parts=None):
+    def broadcast(self, data, opcode=None, status=0):
         """
         Broadcast message
         """
-        if parts is None:
-            llbc.inl.Broadcast(self._c_obj, opcode, data, status)
-        else:
-            llbc.inl.Broadcast(self._c_obj, opcode, data, status, parts)
+        llbc.inl.Broadcast(self._c_obj, opcode, data, status)
 
     def subscribe(self, opcode, handler, exc_handler=None):
         """

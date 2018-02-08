@@ -41,22 +41,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelService(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_SetPacketHeaderDesc(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_GetServiceId(PyObject *self, PyObject *args)
 {
-    LLBC_PacketHeaderDesc *desc;
-    if (!PyArg_ParseTuple(args, "l", &desc))
+    pyllbc_Service *svc;
+    if (!PyArg_ParseTuple(args, "l", &svc))
         return NULL;
 
-    LLBC_PacketHeaderDesc *copyDesc = LLBC_New1(LLBC_PacketHeaderDesc, *desc);
-    if (LLBC_IService::SetPacketHeaderDesc(copyDesc) != LLBC_OK)
-    {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, "when set packet header desc to service");
-        LLBC_Delete(copyDesc);
-
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
+    return PyInt_FromLong(svc->GetId());
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceType(PyObject *self, PyObject *args)
@@ -258,11 +249,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_SendData(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     PyObject *data;
     int sessionId, opcode, status = 0;
-    PyObject *parts = NULL;
-    if (!PyArg_ParseTuple(args, "liiO|iO", &svc, &sessionId, &opcode, &data, &status, &parts))
+    if (!PyArg_ParseTuple(args, "liiO|i", &svc, &sessionId, &opcode, &data, &status))
         return NULL;
 
-    if (svc->Send(sessionId, opcode, data, status, parts) != LLBC_OK)
+    if (svc->Send(sessionId, opcode, data, status) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -277,9 +267,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Multicast(PyObject *self, PyObject *args)
 
     int opcode, status = 0;
 
-    PyObject *parts = NULL;
-
-    if (!PyArg_ParseTuple(args, "lOiO|iO", &svc, &pySessionIds, &opcode, &data, &status, &parts))
+    if (!PyArg_ParseTuple(args, "lOiO|i", &svc, &pySessionIds, &opcode, &data, &status))
         return NULL;
 
     if (!PySequence_Check(pySessionIds))
@@ -324,7 +312,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Multicast(PyObject *self, PyObject *args)
 
     Py_DECREF(fastPySessionIds);
 
-    if (svc->Multicast(sessionIds, opcode, data, status, parts) != LLBC_OK)
+    if (svc->Multicast(sessionIds, opcode, data, status) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
@@ -336,11 +324,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_Broadcast(PyObject *self, PyObject *args)
 
     PyObject *data;
     int opcode, status = 0;
-    PyObject *parts = NULL;
-    if (!PyArg_ParseTuple(args, "liO|iO", &svc, &opcode, &data, &status, &parts))
+    if (!PyArg_ParseTuple(args, "liO|i", &svc, &opcode, &data, &status))
         return NULL;
 
-    if (svc->Broadcast(opcode, data, status, parts) != LLBC_OK)
+    if (svc->Broadcast(opcode, data, status) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;

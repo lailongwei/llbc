@@ -402,8 +402,11 @@ namespace llbc
                 var st = new System.Diagnostics.StackTrace(true);
                 var frame = st.GetFrame(skipFrames);
 
-                lineNo = frame.GetFileLineNumber();
-                fileName = LibUtil.CreateNativeStr(frame.GetFileName());
+                if (frame != null)
+                {
+                    lineNo = frame.GetFileLineNumber();
+                    fileName = LibUtil.CreateNativeStr(frame.GetFileName());
+                }
             }
 
             IntPtr nativeTag = IntPtr.Zero;

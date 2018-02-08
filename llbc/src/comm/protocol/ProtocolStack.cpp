@@ -61,14 +61,37 @@ LLBC_ProtocolStack::~LLBC_ProtocolStack()
         LLBC_XDelete(_protos[i]);
 }
 
+LLBC_IService *LLBC_ProtocolStack::GetService()
+{
+    return _svc;
+}
+
 void LLBC_ProtocolStack::SetService(LLBC_IService *svc)
 {
     _svc = svc;
 }
 
+LLBC_Session *LLBC_ProtocolStack::GetSession()
+{
+    return _session;
+}
+
 void LLBC_ProtocolStack::SetSession(LLBC_Session *session)
 {
     _session = session;
+    for (int i = _Layer::Begin; i < _Layer::End; i++)
+    {
+        LLBC_IProtocol *proto = _protos[i];
+        if (!proto)
+            continue;
+
+        proto->SetSession(session);
+    }
+}
+
+bool LLBC_ProtocolStack::GetIsSuppressedCoderNotFoundWarning() const
+{
+    return _suppressCoderNotFoundError;
 }
 
 void LLBC_ProtocolStack::SetIsSuppressedCoderNotFoundWarning(bool suppressed)

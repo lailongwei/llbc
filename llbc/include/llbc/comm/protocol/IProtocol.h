@@ -18,6 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
+class LLBC_Session;
 class LLBC_ICoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
@@ -87,71 +88,35 @@ private:
      * Set protocol stack to protocol.
      * @param[in] stack - the protocol stack.
      */
-    LLBC_INLINE void SetStack(LLBC_ProtocolStack *stack);
+    void SetStack(LLBC_ProtocolStack *stack);
+
+    /**
+     * Set session.
+     * @param[in] session - the session.
+     */
+    void SetSession(LLBC_Session *session);
 
     /**
      * Set protocol filter to protocol.
      * @param[in] filter - the protocol filter.
      */
-    LLBC_INLINE void SetFilter(LLBC_IProtocolFilter *filter);
+    void SetFilter(LLBC_IProtocolFilter *filter);
 
     /**
      * Set coder factories, only available in Codec-Layer.
      * @param[in] coders - the coder factories pointer.
      * @return int - reutrn 0 if success, otherwise return -1.
      */
-    LLBC_INLINE int SetCoders(const Coders *coders);
+    int SetCoders(const Coders *coders);
 
 protected:
+    int _sessionId;
+    LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
 };
 
-/**
- * \brief The protocol factory interface encapsulation.
- */
-class LLBC_EXPORT LLBC_IProtocolFactory
-{
-public:
-    virtual ~LLBC_IProtocolFactory() {  }
-
-public:
-    /**
-     * Create specific layer protocol.
-     * @return LLBC_IProtocol * - the protocol pointer.
-     */
-    virtual LLBC_IProtocol *Create(int layer) const = 0;
-};
-
-/**
- * \brief The llbc library normal protocol factory encapsulation.
- */
-class LLBC_HIDDEN LLBC_NormalProtocolFactory : public LLBC_IProtocolFactory
-{
-public:
-    /**
-     * Create specific layer protocol.
-     * @return LLBC_IProtocol * - the protocol pointer.
-     */
-    virtual LLBC_IProtocol *Create(int layer) const;
-};
-
-/**
- * \brief The llbc library raw protocol factory encapsulation.
- */
-class LLBC_HIDDEN LLBC_RawProtocolFactory : public LLBC_IProtocolFactory
-{
-public:
-    /**
-     * Create specific layer protocol.
-     * @return LLBC_IProtocol * - the protocol pointer.
-     */
-    virtual LLBC_IProtocol *Create(int layer) const;
-};
-
 __LLBC_NS_END
-
-#include "llbc/comm/protocol/IProtocolImpl.h"
 
 #endif // !__LLBC_COMM_IPROTOCOL_H__

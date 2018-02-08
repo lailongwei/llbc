@@ -10,17 +10,15 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/IProtocol.h"
-#include "llbc/comm/protocol/RawProtocol.h"
-#include "llbc/comm/protocol/PacketProtocol.h"
-#include "llbc/comm/protocol/CompressProtocol.h"
-#include "llbc/comm/protocol/CodecProtocol.h"
-
+#include "llbc/comm/protocol/ProtocolStack.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_IProtocol::LLBC_IProtocol()
-: _stack(NULL)
+: _sessionId(0)
+, _stack(NULL)
 , _filter(NULL)
 , _coders(NULL)
 {
@@ -30,36 +28,33 @@ LLBC_IProtocol::~LLBC_IProtocol()
 {
 }
 
-LLBC_IProtocol *LLBC_NormalProtocolFactory::Create(int layer) const
+void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
 {
-    switch (layer)
-    {
-    case LLBC_ProtocolLayer::CodecLayer:
-        return LLBC_New(LLBC_CodecProtocol);
-
-    case LLBC_ProtocolLayer::CompressLayer:
-        return LLBC_New(LLBC_CompressProtocol);
-
-    case LLBC_ProtocolLayer::PackLayer:
-        return LLBC_New(LLBC_PacketProtocol);
-
-    default:
-        return NULL;
-    }
+    _stack = stack;
 }
 
-LLBC_IProtocol *LLBC_RawProtocolFactory::Create(int layer) const
+void LLBC_IProtocol::SetSession(LLBC_Session *session)
 {
-    switch (layer)
-    {
-    case LLBC_ProtocolLayer::PackLayer:
-        return LLBC_New(LLBC_RawProtocol);
-
-    default:
-        return NULL;
-    }
+    _session = session;
+    _sessionId = session->GetId();
 }
 
+void LLBC_IProtocol::SetFilter(LLBC_IProtocolFilter *filter)
+{
+    _filter = filter;
+}
+
+int LLBC_IProtocol::SetCoders(const Coders *coders)
+{
+    if (GetLayer() != LLBC_ProtocolLayer::CodecLayer)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    _coders = coders;
+    return LLBC_OK;
+}
 
 __LLBC_NS_END
 

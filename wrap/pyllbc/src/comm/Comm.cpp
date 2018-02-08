@@ -67,69 +67,10 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.PyTimerIsCancelling);
     inlMod->AddMethod(methods.PyTimerUpdateAllTimers);
 
-    // Add packet header part describe about methods/variables to inl module.
-    inlMod->AddObject("PacketHeaderPartDesc_MaxPartLen",
-            static_cast<sint32>(LLBC_PacketHeaderPartDesc::MaxPartLen));
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_New);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_Del);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_GetSerialNo);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetSerialNo);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsLenPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsLenPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsLenIncludedSelf);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsLenIncludedSelf);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_GetPartLen);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetPartLen);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsOpcodePart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsOpcodePart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsStatusPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsStatusPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsServiceIdPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsServiceIdPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsFlagsPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_SetIsFlagsPart);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_IsValid);
-    inlMod->AddMethod(methods.PacketHeaderPartDesc_ToString);
-
-    // Add packet header desc about methods & variables to inl module.
-    inlMod->AddObject("PacketHeaderDesc_MaxHeaderLen",
-            static_cast<sint32>(LLBC_PacketHeaderDesc::MaxHeaderLen));
-    inlMod->AddMethod(methods.PacketHeaderDesc_New);
-    inlMod->AddMethod(methods.PacketHeaderDesc_Del);
-    inlMod->AddMethod(methods.PacketHeaderDesc_AddPart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_RemovePart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetHeaderLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetLenPartIncludedLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetLenPartNotIncludedLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetLenPartLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetLenPartOffset);
-    inlMod->AddMethod(methods.PacketHeaderDesc_IsHasOpcodePart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetOpcodePartLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetOpcodePartOffset);
-    inlMod->AddMethod(methods.PacketHeaderDesc_IsHasStatusPart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetStatusPartLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetStatusPartOffset);
-    inlMod->AddMethod(methods.PacketHeaderDesc_IsHasServiceIdPart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetServiceIdPartLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetServiceIdPartOffset);
-    inlMod->AddMethod(methods.PacketHeaderDesc_IsHasFlagsPart);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetFlagsPartLen);
-    inlMod->AddMethod(methods.PacketHeaderDesc_GetFlagsPartOffset);
-    inlMod->AddMethod(methods.PacketHeaderDesc_ToString);
-
-    // Add packet about methods to inl module.
-    inlMod->AddMethod(methods.Packet_GetHeaderPartAsSInt64);
-    inlMod->AddMethod(methods.Packet_GetHeaderPartAsDouble);
-    inlMod->AddMethod(methods.Packet_GetHeaderPartAsStr);
-
-    inlMod->AddMethod(methods.Packet_SetHeaderPartAsSInt64);
-    inlMod->AddMethod(methods.Packet_SetHeaderPartAsDouble);
-    inlMod->AddMethod(methods.Packet_SetHeaderPartAsStr);
-
     // Add all service about methods to inl module.
     inlMod->AddMethod(methods.NewService);
     inlMod->AddMethod(methods.DelService);
-    inlMod->AddMethod(methods.SetPacketHeaderDesc);
+    inlMod->AddMethod(methods.GetServiceId);
     inlMod->AddMethod(methods.GetServiceType);
     inlMod->AddMethod(methods.GetServiceTypeStr);
     inlMod->AddMethod(methods.GetServiceFPS);

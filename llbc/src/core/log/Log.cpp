@@ -198,6 +198,7 @@ LLBC_FORCE_INLINE void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
     LLBC_FilePrintLine(to, "[Log] %s\n", msg);
 }
 
+//! At latest, undef code define macros.
 #undef __LLBC_LOG_TO_ROOT
 #undef __LLBC_LOG_TO_SPEC
 

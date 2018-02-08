@@ -134,10 +134,10 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
         return LLBC_FAILED;
     }
 
-    if (block->GetReadPos() >= block->GetWritePos())
+    if (UNLIKELY(block->GetReadableSize() == 0))
     {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
+        LLBC_Delete(block);
+        return LLBC_OK;
     }
 
     block->SetNext(NULL);

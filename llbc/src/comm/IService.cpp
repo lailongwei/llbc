@@ -10,8 +10,6 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/headerdesc/PacketHeaderDesc.h"
-#include "llbc/comm/PacketHeaderDescAccessor.h"
 #include "llbc/comm/Service.h"
 
 namespace
@@ -21,45 +19,9 @@ namespace
 
 __LLBC_NS_BEGIN
 
-This *LLBC_IService::Create(Type type, const LLBC_String &name)
+This *LLBC_IService::Create(Type type, const LLBC_String &name, LLBC_IProtocolFactory *protoFactory)
 {
-    return LLBC_New2(LLBC_Service, type, name);
-}
-
-int LLBC_IService::SetPacketHeaderDesc(LLBC_PacketHeaderDesc *headerDesc)
-{
-    typedef LLBC_PacketHeaderDescAccessor _Accessor;
-
-    if (_Accessor::GetHeaderDesc(false))
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _Accessor::SetPacketDesc(headerDesc);
-
-    return LLBC_OK;
-}
-
-int LLBC_IService::SetPacketHeaderDescFactory(LLBC_IPacketHeaderDescFactory *factory)
-{
-    typedef LLBC_PacketHeaderDescAccessor _Accessor;
-
-    if (!factory)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-    else if (_Accessor::GetHeaderDesc(false))
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _Accessor::SetPacketDesc(factory->Create());
-    LLBC_Delete(factory);
-
-    return LLBC_OK;
+    return LLBC_New3(LLBC_Service, type, name, protoFactory);
 }
 
 __LLBC_NS_END

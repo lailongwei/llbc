@@ -10,12 +10,13 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/ICoder.h"
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/IProtocolFilter.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
+#include "llbc/comm/protocol/RawProtocolFactory.h"
+#include "llbc/comm/protocol/NormalProtocolFactory.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
@@ -459,77 +460,14 @@ int LLBC_Service::Send(LLBC_Packet *packet)
     return LockableSend(packet);
 }
 
-int LLBC_Service::Send2(int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
-{
-    return Send2(0, sessionId, opcode, coder, status, parts);
-}
-
-int LLBC_Service::Send2(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
-{
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
-    packet->SetHeader(svcId, sessionId, opcode, status);
-    if (parts)
-    {
-        if (_type != This::Raw)
-            parts->SetToPacket(*packet);
-
-        LLBC_Delete(parts);
-    }
-
-    packet->SetEncoder(coder);
-
-    // Call internal LockableSend() to complete.
-    // lock = true
-    // validCheck = true
-    return LockableSend(packet);
-}
-
-int LLBC_Service::Send2(int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
-{
-    // Call internal LockableSend() to complete.
-    // lock = true
-    // validCheck = true
-    const int ret = LockableSend(0, sessionId, opcode, bytes, len, status, parts);
-    if (parts)
-        LLBC_Delete(parts);
-
-    return ret;
-}
-
-int LLBC_Service::Send2(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
-{
-    // Call internal LockableSend() to complete.
-    // lock = true
-    // validCheck = true
-    const int ret = LockableSend(svcId, sessionId, opcode, bytes, len, status, parts);
-    if (parts)
-        LLBC_Delete(parts);
-
-    return ret;
-}
-
-int LLBC_Service::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
-{
-    return Multicast2(0, sessionIds, opcode, coder, status, parts);
-}
-
-int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
+int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
 {
     // Call internal MulticastSendCoder<> template method to complete.
     // validCheck = true
-    const int ret = MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status, parts);
-    if (parts)
-        LLBC_Delete(parts);
-
-    return ret;
+    return MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status);
 }
 
-int LLBC_Service::Multicast2(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
-{
-    return Multicast2(0, sessionIds, opcode, bytes, len, status, parts);
-}
-
-int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
+int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -539,20 +477,12 @@ int LLBC_Service::Multicast2(int svcId, const LLBC_SessionIdList &sessionIds, in
     for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
          sessionIt != sessionIds.end();
          sessionIt++)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false);
-
-    if (parts)
-        LLBC_Delete(parts);
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
 
     return LLBC_OK;
 }
 
-int LLBC_Service::Broadcast2(int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
-{
-    return Broadcast2(0, opcode, coder, status, parts);
-}
-
-int LLBC_Service::Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int status, LLBC_PacketHeaderParts *parts)
+int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status)
 {
     // Copy all connected session Ids.
     int idx = 0;
@@ -568,19 +498,10 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, LLBC_ICoder *coder, int stat
 
     // Call internal template method MulticastSendCoder<>() to complete.
     // validCheck = false
-    const int ret = MulticastSendCoder<LLBC_SessionIdList>(svcId, connectedSessionIds, opcode, coder, status, parts, false);
-    if (parts)
-        LLBC_Delete(parts);
-
-    return ret;
+    return MulticastSendCoder<LLBC_SessionIdList>(svcId, connectedSessionIds, opcode, coder, status, false);
 }
 
-int LLBC_Service::Broadcast2(int opcode, const void *bytes, size_t len, int status, LLBC_PacketHeaderParts *parts)
-{
-    return Broadcast2(0, opcode, bytes, len ,status, parts);
-}
-
-int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t len , int status, LLBC_PacketHeaderParts *parts)
+int LLBC_Service::Broadcast(int svcId, int opcode, const void *bytes, size_t len , int status)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -591,10 +512,7 @@ int LLBC_Service::Broadcast2(int svcId, int opcode, const void *bytes, size_t le
     for (LLBC_SessionIdSetCIter sessionIt = _connectedSessionIds.begin();
          sessionIt != _connectedSessionIds.end();
          sessionIt++)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, parts, false, false);
-
-    if (parts)
-        LLBC_Delete(parts);
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false, false);
 
     return LLBC_OK;
 }
@@ -1296,7 +1214,6 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
 
     // Makesure session in connected sessionId set.
     const int sessionId = packet->GetSessionId();
-
     _connectedSessionIdsLock.Lock();
     if (_connectedSessionIds.find(sessionId) == 
         _connectedSessionIds.end())
@@ -1318,6 +1235,25 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         return;
     }
 #endif
+
+    // Packet receiver service Id set or dispatch to another service.
+    const int recverSvcId = packet->GetRecverServiceId();
+    if (recverSvcId == 0) // Set receiver service Id, if the packet's receiver service Id is 0.
+    {
+        packet->SetRecverServiceId(_id);
+    }
+    else if (recverSvcId != _id)
+    {
+        LLBC_IService *recverSvc = _svcMgr.GetService(recverSvcId);
+        if (recverSvc == NULL || !recverSvc->IsStarted())
+        {
+            LLBC_Delete(packet);
+            return;
+        }
+
+        recverSvc->Push(LLBC_SvcEvUtil::BuildDataArrivalEv(packet));
+        return;
+    }
 
     // Create invoke-guard to delete packet.
     LLBC_InvokeGuard delPacketGuard(&LLBC_INL_NS __DeletePacket, packet);
@@ -1616,6 +1552,8 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         }
     }
 
+    packet->SetSenderServiceId(_id);
+
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     bool removeSession;
     LLBC_Packet *encoded;
@@ -1650,14 +1588,12 @@ int LLBC_Service::LockableSend(int svcId,
                                const void *bytes,
                                size_t len,
                                int status,
-                               const LLBC_PacketHeaderParts *parts,
                                bool lock,
                                bool validCheck)
 {
     LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
     packet->SetHeader(svcId, sessionId, opcode, status);
-    if (parts && _type != This::Raw)
-        parts->SetToPacket(*packet);
 
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))
@@ -1675,7 +1611,6 @@ int LLBC_Service::MulticastSendCoder(int svcId,
                                      int opcode,
                                      LLBC_ICoder *coder,
                                      int status,
-                                     const LLBC_PacketHeaderParts *parts,
                                      bool validCheck)
 {
     if (sessionIds.empty())
@@ -1699,9 +1634,8 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
 
     LLBC_Packet *firstPacket = LLBC_New(LLBC_Packet);
+    // firstPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
     firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
-    if (parts && _type != This::Raw)
-        parts->SetToPacket(*firstPacket);
 
     bool hasCoder = true;
     if (LIKELY(coder))
@@ -1743,6 +1677,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
                     continue;
 
             LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
             otherPacket->Write(payload, payloadLen);
 
@@ -1767,9 +1702,8 @@ int LLBC_Service::MulticastSendCoder(int svcId,
                 continue;
 
             LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
-            if (parts && _type != This::Raw)
-                parts->SetToPacket(*otherPacket);
 
             otherPackets[i - 1] = otherPacket;
         }

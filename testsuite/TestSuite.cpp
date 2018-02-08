@@ -67,8 +67,6 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_Event;
     // test = new TestCase_Comm_Timer;
     // test = new TestCase_Comm_PacketOp;
-    // test = new TestCase_Comm_HeaderDesc;
-    // test = new TestCase_Comm_PacketHeaderParts;
 #if LLBC_CFG_OBJBASE_ENABLED
     // test = new TestCase_Comm_ReleasePool;
 #endif // LLBC_CFG_OBJBASE_ENABLED
@@ -80,7 +78,6 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_Multicast;
     // test = new TestCase_Comm_ExternalDriveSvc;
     // test = new TestCase_Comm_LazyTask;
-    // test = new TestCase_Comm_CustomHeaderSvc;
 
     int ret = LLBC_FAILED;
     if (test)

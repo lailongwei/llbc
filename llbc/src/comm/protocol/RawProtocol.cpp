@@ -10,30 +10,17 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/PacketHeaderDescAccessor.h"
-#include "llbc/comm/headerdesc/PacketHeaderDesc.h"
+#include "llbc/comm/Packet.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 
+#include "llbc/comm/IService.h"
+
 __LLBC_NS_BEGIN
 
 LLBC_RawProtocol::LLBC_RawProtocol()
-: _headerLen(0)
-, _lenPartId(0)
-
-, _lenOffset(0)
-, _lenSize(0)
 {
-    typedef LLBC_PacketHeaderDescAccessor _HDAccessor;
-
-    const LLBC_PacketHeaderDesc *headerDesc = _HDAccessor::GetHeaderDesc();
-
-    _headerLen = headerDesc->GetHeaderLen();
-    _lenPartId = headerDesc->GetLenPart()->GetSerialNo();
-
-    _lenOffset = headerDesc->GetLenPartOffset();
-    _lenSize = headerDesc->GetLenPartLen();
 }
 
 LLBC_RawProtocol::~LLBC_RawProtocol()
@@ -53,13 +40,14 @@ int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
+
     LLBC_MessageBlock *block = packet->GiveUp();
-
-    block->SetReadPos(_headerLen);
-    out = block;
-
     LLBC_Delete(packet);
 
+    if (!block)
+        return LLBC_OK;
+
+    out = block;
     return LLBC_OK;
 }
 
@@ -70,10 +58,10 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     // Create packet and write data.
     LLBC_Packet *packet = LLBC_New(LLBC_Packet);
     const size_t readableSize = block->GetReadableSize();
-    packet->Write(block->GetDataStartWithReadPos(), readableSize);
 
-    // Write length part.
-    packet->SetHeaderPartVal(_lenPartId, static_cast<sint32>(readableSize));
+    packet->SetLength(readableSize);
+    packet->SetSessionId(_sessionId);
+    packet->Write(block->GetDataStartWithReadPos(), readableSize);
 
     // Delete this block.
     LLBC_Delete(block);

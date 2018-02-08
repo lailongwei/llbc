@@ -18,7 +18,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare LLBC_PacketHeaderDesc class.
  */
-class LLBC_PacketHeaderDesc;
+class LLBC_Packet;
 
 __LLBC_NS_END
 
@@ -53,21 +53,15 @@ public:
 
 public:
     /**
-     * Get the packet header buffer.
-     * @return const void * - the header buffer.
+     * Set header content to packet.
+     * @param[in] packet - the packet.
      */
-    const void *GetHeader() const;
-
-    /**
-     * Get the packet header buffer length.
-     * @return size_t - the packet header length.
-     */
-    size_t GetHeaderLen() const;
+    void SetToPacket(LLBC_Packet &packet) const;
 
 private:
-    char *_header;
     size_t _headerLen;
 
+    char *_header;
     size_t _curRecved;
 };
 

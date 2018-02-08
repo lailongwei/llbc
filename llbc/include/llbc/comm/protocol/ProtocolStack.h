@@ -61,16 +61,34 @@ public:
 
 public:
     /**
+     * Get service.
+     * @return LLBC_IService * - the service.
+     */
+    LLBC_IService *GetService();
+
+    /**
      * Set service to protocol stack, use to report something to service.
      * @param[in] svc - the service.
      */
     void SetService(LLBC_IService *svc);
 
     /**
+     * Get session.
+     * @return LLBC_Session * - the session.
+     */
+    LLBC_Session *GetSession();
+
+    /**
      * Set session to protocol stack, use to report something to service.
      * @param[in] session - the session.
      */
     void SetSession(LLBC_Session *session);
+
+    /**
+     * Check is suppressed coder not found warning or not.
+     * @return bool - the suppressed coder not found warning flag.
+     */
+    bool GetIsSuppressedCoderNotFoundWarning() const;
 
     /**
      * Set suppressed coder not found warning option to protocol-stack.
@@ -160,18 +178,7 @@ public:
      */
     int Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession);
 
-private:
-    /**
-     * Declare friend class: LLBC_IProtocol.
-     * Access method list:
-     *      Report(LLBC_IProtocol *, const LLBC_String &).
-     */
-    friend class LLBC_RawProtocol;
-    friend class LLBC_PacketProtocol;
-    friend class LLBC_CodecProtocol;
-    friend class LLBC_CompressProtocol;
-    friend class LLBC_FilterProtocol;
-
+public:
     /**
      * Report error, call by protocol.
      * @param[in] sessionId - the session Id.

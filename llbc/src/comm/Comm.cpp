@@ -12,8 +12,6 @@
 
 #include "llbc/comm/Comm.h"
 
-#include "llbc/comm/PacketHeaderDescAccessor.h"
-
 __LLBC_NS_BEGIN
 
 int __LLBC_CommStartup()
@@ -23,7 +21,6 @@ int __LLBC_CommStartup()
 
 void __LLBC_CommCleanup()
 {
-    LLBC_PacketHeaderDescAccessor::CleanupHeaderDesc();
 }
 
 __LLBC_NS_END

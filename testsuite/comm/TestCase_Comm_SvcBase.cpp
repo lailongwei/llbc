@@ -242,8 +242,7 @@ void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
     int sid = _svc->Connect(ip, port);
     if (sid != 0)
     {
-        LLBC_PrintLine("Connet to %s:%d success, sid: %d", ip, port, sid);
-        LLBC_PrintLine("Disconnet it");
+        LLBC_PrintLine("Connet to %s:%d success, sid: %d, disconnect it", ip, port, sid);
         _svc->RemoveSession(sid, "For test!!!!!");
     }
     else

@@ -26,7 +26,6 @@ def main():
     # SvcBaseTest()()
     # MultiSvcTest()()
     # MulticastTest()()
-    # CustomHeaderPartsTest()()
 
 
 if __name__ == '__main__':

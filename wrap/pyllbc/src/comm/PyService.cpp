@@ -80,6 +80,11 @@ pyllbc_Service::~pyllbc_Service()
     Py_DECREF(_keyCObj);
 }
 
+int pyllbc_Service::GetId() const
+{
+    return _llbcSvc->GetId();
+}
+
 LLBC_IService::Type pyllbc_Service::GetType() const
 {
     return _llbcSvcType;
@@ -288,7 +293,7 @@ int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, PyObject *parts)
+int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status)
 {
     // Started check.
     if (UNLIKELY(!IsStarted()))
@@ -297,22 +302,11 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
         return LLBC_FAILED;
     }
 
-    // Build parts, if exists.
-    LLBC_PacketHeaderParts *cLayerParts = NULL;
-    if (parts && _llbcSvcType != LLBC_IService::Raw)
-    {
-        if (!(cLayerParts = BuildCLayerParts(parts)))
-            return LLBC_FAILED;
-    }
-
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
     const int ret = SerializePyObj2Stream(data, stream);
     if (UNLIKELY(ret != LLBC_OK))
-    {
-        LLBC_XDelete(cLayerParts);
         return LLBC_FAILED;
-    }
 
     // Build packet & send.
     LLBC_Packet *packet = LLBC_New(LLBC_Packet);
@@ -323,24 +317,18 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     {
         packet->SetOpcode(opcode);
         packet->SetStatus(status);
-
-        if (cLayerParts)
-        {
-            cLayerParts->SetToPacket(*packet);
-            LLBC_Delete(cLayerParts);
-        }
     }
 
     if (UNLIKELY(_llbcSvc->Send(packet) == LLBC_FAILED))
     {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When sending packet");
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
 }
 
-int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status, PyObject *parts)
+int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status)
 {
     // Started check.
     if (UNLIKELY(!IsStarted()))
@@ -353,29 +341,18 @@ int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, 
     if (sessionIds.empty())
         return LLBC_OK;
 
-    // Build parts, if exists.
-    LLBC_PacketHeaderParts *cLayerParts = NULL;
-    if (parts && _llbcSvcType != LLBC_IService::Raw)
-    {
-        if (!(cLayerParts = BuildCLayerParts(parts)))
-            return LLBC_FAILED;
-    }
-
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
     if (SerializePyObj2Stream(data, stream) != LLBC_OK)
-    {
-        LLBC_XDelete(cLayerParts);
         return LLBC_FAILED;
-    }
 
     // Send it.
     const void *bytes = stream.GetBuf();
     const size_t len = stream.GetPos();
-    return _llbcSvc->Multicast2(sessionIds, opcode, bytes, len, status, cLayerParts);
+    return _llbcSvc->Multicast(sessionIds, opcode, bytes, len, status);
 }
 
-int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *parts)
+int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status)
 {
     // Started check.
     if (UNLIKELY(!IsStarted()))
@@ -384,26 +361,15 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status, PyObject *
         return LLBC_FAILED;
     }
 
-    // Build parts, if exists.
-    LLBC_PacketHeaderParts *cLayerParts = NULL;
-    if (parts && _llbcSvcType != LLBC_IService::Raw)
-    {
-        if (!(cLayerParts = BuildCLayerParts(parts)))
-            return LLBC_FAILED;
-    }
-
     // Serialize python layer 'data' object to stream.
     LLBC_Stream stream;
     if (SerializePyObj2Stream(data, stream) != LLBC_OK)
-    {
-        LLBC_XDelete(cLayerParts);
         return LLBC_FAILED;
-    }
 
     // Send it.
     const void *bytes = stream.GetBuf();
     const size_t len = stream.GetPos();
-    return _llbcSvc->Broadcast2(opcode, bytes, len, status, cLayerParts);
+    return _llbcSvc->Broadcast(opcode, bytes, len, status);
 }
 
 int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
@@ -690,110 +656,6 @@ void pyllbc_Service::DestroyFrameCallables(_FrameCallables &callables, bool &usi
 
     callables.clear();
     usingFlag = false;
-}
-
-LLBC_PacketHeaderParts *pyllbc_Service::BuildCLayerParts(PyObject *pyLayerParts)
-{
-    // Python layer parts(dict type) convert rules describe:
-    //   python type       c++ type
-    // --------------------------
-    //   int/long/bool -->   sint64
-    //     float4/8    -->  float/double
-    //   str/bytearray -->  LLBC_String
-
-    if (!PyDict_Check(pyLayerParts))
-    {
-        pyllbc_SetError("parts instance not dict type");
-        return NULL;
-    }
-
-    LLBC_PacketHeaderParts *cLayerParts = LLBC_New(LLBC_PacketHeaderParts);
-
-    Py_ssize_t pos = 0;
-    PyObject *key, *value;
-    while (PyDict_Next(pyLayerParts, &pos, &key, &value)) // key & value are borrowed.
-    {
-        const int serialNo = static_cast<int>(PyInt_AsLong(key));
-        if (UNLIKELY(serialNo == -1 && PyErr_Occurred()))
-        {
-            pyllbc_TransferPyError("When fetch header part serial no");
-            LLBC_Delete(cLayerParts);
-
-            return NULL;
-        }
-
-        // Value type check order:
-        //   int->
-        //     str->
-        //       float->
-        //         long->
-        //           bool->
-        //             bytearray->
-        //               other objects
-        if (PyInt_CheckExact(value))
-        {
-            const sint64 cValue = PyInt_AS_LONG(value);
-            cLayerParts->SetPart<sint64>(serialNo, cValue);
-        }
-        else if (PyString_CheckExact(value))
-        {
-            char *strBeg;
-            Py_ssize_t strLen;
-            if (UNLIKELY(PyString_AsStringAndSize(value, &strBeg, &strLen) == -1))
-            {
-                pyllbc_TransferPyError("When fetch header part value");
-                LLBC_Delete(cLayerParts);
-
-                return NULL;
-            }
-
-            cLayerParts->SetPart(serialNo, strBeg, strLen);
-
-        }
-        else if (PyFloat_CheckExact(value))
-        {
-            const double cValue = PyFloat_AS_DOUBLE(value);
-            cLayerParts->SetPart<double>(serialNo, cValue);
-        }
-        else if (PyLong_CheckExact(value))
-        {
-            const sint64 cValue = PyLong_AsLongLong(value);
-            cLayerParts->SetPart<sint64>(serialNo, cValue);
-        }
-        else if (PyBool_Check(value))
-        {
-            const int pyBoolCheck = PyObject_IsTrue(value);
-            if (UNLIKELY(pyBoolCheck == -1))
-            {
-                pyllbc_TransferPyError("when fetch header part value");
-                LLBC_Delete(cLayerParts);
-
-                return NULL;
-            }
-
-            cLayerParts->SetPart<uint8>(serialNo, pyBoolCheck);
-        }
-        else if (PyByteArray_CheckExact(value))
-        {
-            char *bytesBeg = PyByteArray_AS_STRING(value);
-            Py_ssize_t bytesLen = PyByteArray_GET_SIZE(value);
-
-            cLayerParts->SetPart(serialNo, bytesBeg, bytesLen);
-        }
-        else // Other types, we simple get the object string representations.
-        {
-            LLBC_String strRepr = pyllbc_ObjUtil::GetObjStr(value);
-            if (UNLIKELY(strRepr.empty() && PyErr_Occurred()))
-            {
-                LLBC_Delete(cLayerParts);
-                return NULL;
-            }
-
-            cLayerParts->SetPart(serialNo, strRepr.data(), strRepr.size());
-        }
-    }
-
-    return cLayerParts;
 }
 
 int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)

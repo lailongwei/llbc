@@ -22,13 +22,11 @@
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceMgr.h"
-#include "llbc/comm/PacketHeaderParts.h"
-#include "llbc/comm/LibPacketHeaderDescFactory.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 #include "llbc/comm/protocol/IProtocol.h"
+#include "llbc/comm/protocol/IProtocolFactory.h"
 #include "llbc/comm/protocol/IProtocolFilter.h"
-#include "llbc/comm/headerdesc/PacketHeaderDesc.h"
 
 __LLBC_NS_BEGIN
 

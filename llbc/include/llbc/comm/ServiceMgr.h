@@ -104,6 +104,10 @@ private:
     void OnServiceStop(LLBC_IService *svc);
 
 private:
+    LLBC_IService *GetServiceNonLock(int id);
+    LLBC_IService *GetServiceNonLock(const LLBC_String &name);
+
+private:
     static bool InTls(const LLBC_IService *svc);
 
     typedef std::map<int, LLBC_IService *> _Services;
@@ -113,7 +117,7 @@ private:
     static bool InTls(const _Services2 &svcs);
 
 private:
-    LLBC_RecursiveLock _lock;
+    LLBC_SpinLock _lock;
 
     _Services _id2Services;
     _Services2 _name2Services;
@@ -126,6 +130,8 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ServiceMgr>;
 #define LLBC_ServiceMgrSingleton LLBC_Singleton<LLBC_ServiceMgr>::Instance()
 
 __LLBC_NS_END
+
+#include "llbc/comm/ServiceMgrImpl.h"
 
 #endif // !__LLBC_COMM_SERVICE_MGR_H__
 

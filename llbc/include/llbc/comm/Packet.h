@@ -19,7 +19,6 @@
 __LLBC_NS_BEGIN
 class LLBC_ICoder;
 class LLBC_Session;
-class LLBC_PacketHeaderDesc;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -36,16 +35,76 @@ public:
 public:
     /**
      * Get packet length.
-     * @return int - packet length.
+     * @return size_t - the packet length(included header).
      */
-    int GetLength() const;
+    size_t GetLength() const;
+    /**
+     * Set packet length.
+     * @param[in] length - the packet length.
+     */
+    void SetLength(size_t length);
 
+    /**
+     * Get sender service Id.
+     * @return int - sender service Id.
+     */
+    int GetSenderServiceId() const;
+    /**
+     * Set sender service Id.
+     * @param[in] serviceId - receiver service Id.
+     */
+    void SetSenderServiceId(int senderServiceId);
+
+    /**
+     * Get receiver service Id.
+     * @return int - receiver service Id.
+     */
+    int GetRecverServiceId() const;
+    /**
+     * Set receiver service Id.
+     * @param[in] recverServiceId - receiver service Id.
+     */
+    void SetRecverServiceId(int recverServiceId);
+
+    /**
+     * Get session Id.
+     * @return int - the session Id.
+     */
+    int GetSessionId() const;
+    /**
+     * Set session Id.
+     * @param[in] sessionId - the session Id.
+     */
+    void SetSessionId(int sessionId);
+
+    /**
+     * Get local address.
+     * @return const LLBC_SockAddr_IN & - the local address.
+     */
+    const LLBC_SockAddr_IN &GetLocalAddr() const;
+    /**
+     * Set local address.
+     * @param[in] addr - the local address.
+     */
+    void SetLocalAddr(const LLBC_SockAddr_IN &addr);
+
+    /**
+     * Get peer address.
+     * @return const LLBC_SockAddr_IN & - the peer address.
+     */
+    const LLBC_SockAddr_IN &GetPeerAddr() const;
+    /**
+     * Set peer address.
+     * @param[in] addr - the peer address.
+     */
+    void SetPeerAddr(const LLBC_SockAddr_IN &addr);
+
+public:
     /**
      * Get opcode.
      * @return int - opcode.
      */
     int GetOpcode() const;
-
     /**
      * Set opcode.
      * @param[in] opcode - opcode.
@@ -77,17 +136,7 @@ public:
     void SetStatusDesc(const LLBC_String &desc);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-    /**
-     * Get service Id.
-     * @return int - service Id.
-     */
-    int GetServiceId() const;
-    /**
-     * Set service Id.
-     * @param[in] serviceId - service Id.
-     */
-    void SetServiceId(int serviceId);
-
+public:
     /**
      * Get packet flags.
      * @return int - the packet flags.
@@ -120,75 +169,7 @@ public:
 
 public:
     /**
-     * Get special header part value APIs.
-     * @param[in] serialNo - the serialNo.
-     * @return T - the value.
-     */
-    sint8 GetHeaderPartAsSInt8(int serialNo) const;
-    uint8 GetHeaderPartAsUInt8(int serialNo) const;
-    sint16 GetHeaderPartAsSInt16(int serialNo) const;
-    uint16 GetHeaderPartAsUInt16(int serialNo) const;
-    sint32 GetHeaderPartAsSInt32(int serialNo) const;
-    uint32 GetHeaderPartAsUInt32(int serialNo) const;
-    sint64 GetHeaderPartAsSInt64(int serialNo) const;
-    uint64 GetHeaderPartAsUInt64(int serialNo) const;
-    float GetHeaderPartAsFloat(int serialNo) const;
-    double GetHeaderPartAsDouble(int serialNo) const;
-    LLBC_String GetHeaderPartAsStr(int serialNo) const;
-    
-    const void *GetHeaderPartVal(int serialNo) const;
-    size_t GetHeaderPartLen(int serialNo) const;
-
-public:
-    /**
-     * Set special header part value APIs.
-     * @param[in] serialNo - the serialNo.
-     * @param[in] val      - the will set part value.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename _Ty>
-    int SetHeaderPartVal(int serialNo, const _Ty &val);
-    int SetHeaderPartVal(int serialNo, const void *data, size_t len);
-
-public:
-    /**
-     * Get session Id.
-     * @return int - the session Id.
-     */
-    int GetSessionId() const;
-
-    /**
-     * Set session Id.
-     * @param[in] sessionId - the session Id.
-     */
-    void SetSessionId(int sessionId);
-
-    /**
-     * Get local address.
-     * @return const LLBC_SockAddr_IN & - the local address.
-     */
-    const LLBC_SockAddr_IN &GetLocalAddr() const;
-    /**
-     * Set local address.
-     * @param[in] addr - the local address.
-     */
-    void SetLocalAddr(const LLBC_SockAddr_IN &addr);
-
-    /**
-     * Get peer address.
-     * @return const LLBC_SockAddr_IN & - the peer address.
-     */
-    const LLBC_SockAddr_IN &GetPeerAddr() const;
-    
-    /**
-     * Set peer address.
-     * @param[in] addr - the peer address.
-     */
-    void SetPeerAddr(const LLBC_SockAddr_IN &addr);
-
-    /**
      * Set packet header.
-     * @param[in] svcId     - service Id.
      * @param[in] sessionId - session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] status    - the status code.
@@ -203,6 +184,19 @@ public:
      * @param[in] status - the status code.
      */
     void SetHeader(const LLBC_Packet &packet, int opcode, int status);
+
+public:
+    /**
+     * Get payload data.
+     * @return const void * - payload data pointer.
+     */
+    const void *GetPayload() const;
+
+    /**
+     * Get payload length.
+     * @return size_t - payload length.
+     */
+    size_t GetPayloadLength() const;
 
 public:
     /**
@@ -315,24 +309,18 @@ public:
     template <typename _Ty>
     int Write(const _Ty &obj);
 
+public:
     /**
-     * Write header(unsafe method).
-     * @param[in] buf - buffer.
-     * @return int - return 0 if success, otherwise return -1.
+     * stream output operations.
      */
-     int WriteHeader(const void *buf);
+    template <typename _Ty>
+    LLBC_Packet &operator <<(const _Ty &val);
 
     /**
-     * Get payload data.
-     * @return void * - payload data pointer.
+     * Stream input operations.
      */
-    void *GetPayload() const;
-
-    /**
-     * Get payload length.
-     * @return size_t - payload length.
-     */
-    size_t GetPayloadLength() const;
+    template <typename _Ty>
+    LLBC_Packet &operator >>(_Ty &val);
 
 public:
     /**
@@ -360,6 +348,23 @@ public:
     void SetDecoder(LLBC_ICoder *decoder);
 
     /**
+     * Encode packet data.
+     */
+    bool Encode();
+
+    /**
+     * Decode packet data.
+     */
+    bool Decode();
+
+    /**
+     * Giveup the message block.
+     * @return LLBC_MessageBlock * - message block.
+     */
+    LLBC_MessageBlock *GiveUp();
+
+public:
+    /**
      * Get the pre-handle result in the packet.
      * @return void * - the packet pre-handle result.
      */
@@ -371,40 +376,12 @@ public:
      * @param[in] obj         - the clear method target, default is NULL.
      * @param[in] clearMethod - the clear method, default is NULL.
      */
-    template <typename Obj>
-    void SetPreHandleResult(void *result, Obj *obj = NULL, void (Obj::*clearMethod)(void *) = NULL);
+    void SetPreHandleResult(void *result, void(*clearFunc)(void *));
+    template <typename ObjType>
+    void SetPreHandleResult(void *result, ObjType *obj, void (ObjType::*clearMethod)(void *));
+    void SetPreHandleResult(void *result, LLBC_IDelegate1<void, void *> *clearDeleg = NULL);
 
 public:
-    /**
-     * Giveup the message block.
-     * @return LLBC_MessageBlock * - message block.
-     */
-    LLBC_MessageBlock *GiveUp();
-
-public:
-    /**
-     * stream output operations.
-     */
-    template <typename _Ty>
-    LLBC_Packet &operator <<(const _Ty &val);
-
-    /**
-     * Stream input operations.
-     */
-    template <typename _Ty>
-    LLBC_Packet &operator >>(_Ty &val);
-
-public:
-    /**
-     * Encode packet data.
-     */
-    bool Encode();
-
-    /**
-     * Decode packet data.
-     */
-    bool Decode();
-
     /**
      * Get packet codec error.
      * @return const LLBC_String & - the packet codec error.
@@ -418,48 +395,6 @@ public:
     void SetCodecError(const LLBC_String &codecErr);
 
 private:
-    /**
-     * Raw get header part value from packet.
-     * @param[in] serialNo - the serial number.
-     * @param[out] val     - the output value.
-     */
-    template <typename _RawTy>
-    void RawGetFloatTypeHeaderPartVal(int serialNo, _RawTy &val) const;
-    template <typename _RawTy>
-    void RawGetNonFloatTypeHeaderPartVal(int serialNo, _RawTy &val) const;
-    /**
-     * Raw get header part value from packet.
-     * @param[in] buf    - part begin buffer.
-     * @param[in] bufLen - part buffer length.
-     * @param[out] val   - the output value.
-     */
-    template <typename _RawTy>
-    void RawGetFloatTypeHeaderPartVal(const char *buf, size_t bufLen, _RawTy &val) const;
-    template <typename _RawTy>
-    void RawGetNonFloatTypeHeaderPartVal(const char *buf, size_t bufLen, _RawTy &val) const;
-
-    /**
-     * Raw set header part value to packet.
-     * @param[in] serialNo - the serial number.
-     * @param[in] val      - will set raw value.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename _RawTy>
-    int RawSetFloatTypeHeaderPartVal(int serialNo, const _RawTy &val);
-    template <typename _RawTy>
-    int RawSetNonFloatTypeHeaderPartVal(int serialNo, const _RawTy &val);
-
-    /**
-     * Raw set header part value to packet.
-     * @param[in] buf    - part buffer begin.
-     * @param[in] bufLen - part buffer length.
-     * @param[in] val    - will set raw value.
-     */
-    template <typename _RawTy>
-    void RawSetFloatTypeHeaderPartVal(char *buf, size_t bufLen, const _RawTy &val);
-    template <typename _RawTy>
-    void RawSetNonFloatTypeHeaderPartVal(char *buf, size_t bufLen, const _RawTy &val);
-
     /**
      * Read raw type data from packet.
      * @param[out] val - the value reference.
@@ -476,32 +411,36 @@ private:
     template <typename _RawTy>
     int WriteRawType(_RawTy val);
 
+private:
     /**
      * Cleanup the pre-handle result data.
      */
     void CleanupPreHandleResult();
 
 private:
-    const LLBC_PacketHeaderDesc *_headerDesc;
-    const size_t _lenSize;
-    const size_t _lenOffset;
+    size_t _length;
 
-private:
     int _sessionId;
+    int _senderSvcId;
+    int _recverSvcId;
     LLBC_SockAddr_IN _localAddr;
     LLBC_SockAddr_IN _peerAddr;
 
-    LLBC_ICoder *_encoder;
-    LLBC_ICoder *_decoder;
+    int _opcode;
+    int _status;
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     LLBC_String *_statusDesc;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    int _flags;
+
+    LLBC_ICoder *_encoder;
+    LLBC_ICoder *_decoder;
+    LLBC_String *_codecError;
 
     void *_preHandleResult;
     LLBC_IDelegate1<void, void *> *_resultClearDeleg;
 
-    LLBC_MessageBlock *_block;
-    LLBC_String *_codecError;
+    LLBC_MessageBlock *_payload;
 };
 
 __LLBC_NS_END

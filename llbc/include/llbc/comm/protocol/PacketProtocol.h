@@ -22,6 +22,17 @@ __LLBC_NS_BEGIN
 /**
  * \brief The Pack-Layer protocol implement.
  *        It will construct/destruct LLBC_Packet to/from byte stream.
+ * 
+ * Library default header format.
+ *   |       Type       | Offset |  Len |
+ * --|------------------|--------|------|--
+ *   |      Length      |    0   |   4  |
+ *   |      Opcode      |    4   |   4  |
+ *   |      Status      |    8   |   2  |
+ *   | Sender ServiceId |   10   |   4  |
+ *   | Recver ServiceId |   14   |   4  |
+ *   |      Flags       |   18   |   2  |
+ *Header total length: 20 bytes.
  */
 class LLBC_EXPORT LLBC_PacketProtocol : public LLBC_IProtocol
 {
@@ -71,24 +82,12 @@ public:
      */
     virtual int Recv(void *in, void *&out, bool &removeSession);
 
-    /**
-     * Add coder factory to protocol, only available in Codec-Layer.
-     * @param[in] opcode - the opcode.
-     * @param[in] coder  - the coder factory
-     *  Note: When protocol deleted, it will not delete coder pointer,
-     *        It means that you must self manage your coder memory.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder);
-
 private:
     LLBC_PacketHeaderAssembler _headerAssembler;
 
     LLBC_Packet *_packet;
-    int _payloadNeedRecv;
-    int _payloadRecved;
-
-    const int _headerIncludedLen;
+    size_t _payloadNeedRecv;
+    size_t _payloadRecved;
 };
 
 __LLBC_NS_END
