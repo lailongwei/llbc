@@ -72,6 +72,7 @@ int TestSuite_Main(int argc, char *argv[])
 #endif // LLBC_CFG_OBJBASE_ENABLED
     // test = new TestCase_Comm_Facade;
     // test = new TestCase_Comm_SvcBase;
+    // test = new TestCase_Comm_SvcFps;
     // test = new TestCase_Comm_SvcStartStop;
     // test = new TestCase_Comm_Svc;
     // test = new TestCase_Comm_SendBytes;
