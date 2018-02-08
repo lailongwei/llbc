@@ -424,7 +424,7 @@ private:
     /**
      * Idle process method.
      */
-    void ProcessIdle();
+    void ProcessIdle(bool fullFrame);
 
 private:
     /**
@@ -469,6 +469,7 @@ private:
 
     int _fps;
     int _frameInterval;
+    uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
 
     volatile bool _sinkIntoLoop;

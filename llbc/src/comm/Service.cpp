@@ -75,6 +75,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
+, _relaxTimes(0)
 , _begHeartbeatTime(0)
 , _sinkIntoLoop(false)
 , _afterStop(false)
@@ -368,18 +369,27 @@ int LLBC_Service::GetFPS() const
 
 int LLBC_Service::SetFPS(int fps)
 {
-    if (LLBC_CFG_COMM_MIN_SERVICE_FPS <= fps &&
-            fps <= LLBC_CFG_COMM_MAX_SERVICE_FPS)
+    if (fps != LLBC_INFINITE &&
+            (fps < LLBC_CFG_COMM_MIN_SERVICE_FPS || fps > LLBC_CFG_COMM_MAX_SERVICE_FPS))
     {
-        LLBC_LockGuard guard(_lock);
-
-        _fps = fps;
-        _frameInterval = 1000 / _fps;
-        return LLBC_OK;
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
     }
 
-    LLBC_SetLastError(LLBC_ERROR_LIMIT);
-    return LLBC_FAILED;
+    LLBC_LockGuard guard(_lock);
+
+    _fps = fps;
+    if (_fps != LLBC_INFINITE)
+    {
+        _frameInterval = 1000 / _fps;
+    }
+    else
+    {
+        _relaxTimes = 0;
+        _frameInterval = 0;
+    }
+
+    return LLBC_OK;
 }
 
 int LLBC_Service::GetFrameInterval() const
@@ -883,6 +893,9 @@ int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
 
 void LLBC_Service::OnSvc(bool fullFrame)
 {
+    if (fullFrame && _frameInterval == 0)
+        fullFrame = false;
+
     if (UNLIKELY(!_started))
     {
         if (fullFrame)
@@ -894,7 +907,8 @@ void LLBC_Service::OnSvc(bool fullFrame)
     _sinkIntoLoop = true;
 
     // Record begin heartbeat time.
-    _begHeartbeatTime = LLBC_GetMilliSeconds();
+    if (fullFrame)
+        _begHeartbeatTime = LLBC_GetMilliSeconds();
 
     // Handle before frame-tasks.
     HandleFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
@@ -915,7 +929,7 @@ void LLBC_Service::OnSvc(bool fullFrame)
     _handledBeforeFrameTasks = false;
 
     // Process Idle.
-    ProcessIdle();
+    ProcessIdle(fullFrame);
 
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
@@ -923,6 +937,12 @@ void LLBC_Service::OnSvc(bool fullFrame)
         const sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
         if (elapsed >= 0 && elapsed < _frameInterval)
             LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
+    }
+    else
+    {
+        LLBC_CPURelax();
+        if ((++_relaxTimes) % 10000 == 0)
+            LLBC_Sleep(0);
     }
 
     _sinkIntoLoop = false;
@@ -998,8 +1018,8 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
 
 void LLBC_Service::Svc()
 {
-	while (!_started)
-		LLBC_Sleep(20);
+    while (!_started)
+        LLBC_Sleep(20);
 
     _lock.Lock();
     AddServiceToTls();
@@ -1051,6 +1071,8 @@ void LLBC_Service::Cleanup()
     }
 
     // Reset some variables.
+    _relaxTimes = 0;
+
     _started = false;
     _stopping = false;
 }
@@ -1098,6 +1120,9 @@ bool LLBC_Service::IsCanContinueDriveService()
 
 void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usingFlag)
 {
+    if (tasks.size() == 0)
+        return;
+
     usingFlag = true;
     for (_FrameTasks::iterator it = tasks.begin();
          it != tasks.end();
@@ -1501,19 +1526,26 @@ void LLBC_Service::UpdateTimers()
     _timerScheduler->Update();
 }
 
-void LLBC_Service::ProcessIdle()
+void LLBC_Service::ProcessIdle(bool fullFrame)
 {
     for (_Facades::iterator it = _facades.begin();
          it != _facades.end();
          it++)
     {
-        sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
-        if (LIKELY(elapsed >= 0))
+        if (fullFrame)
         {
-            if (elapsed >= _frameInterval)
-                break;
+            sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
+            if (LIKELY(elapsed >= 0))
+            {
+                if (elapsed >= _frameInterval)
+                    break;
 
-            (*it)->OnIdle(static_cast<int>(_frameInterval - elapsed));
+                (*it)->OnIdle(static_cast<int>(_frameInterval - elapsed));
+            }
+        }
+        else
+        {
+            (*it)->OnIdle(0);
         }
     }
 }
