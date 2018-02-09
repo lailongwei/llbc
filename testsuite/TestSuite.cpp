@@ -22,6 +22,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Com_Stream;
     // test = new TestCase_Com_Error;
     // test = new TestCase_Com_Compiler;
+    // test = new TestCase_Com_RTTI;
 
     /* Core module testcases. */
     // test = new TestCase_Core_OS_Thread;

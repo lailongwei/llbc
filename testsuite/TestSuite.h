@@ -15,6 +15,7 @@
 #include "common/TestCase_Com_Error.h"
 #include "common/TestCase_Com_Version.h"
 #include "common/TestCase_Com_Compiler.h"
+#include "common/TestCase_Com_RTTI.h"
 
 #include "core/os/TestCase_Core_OS_Thread.h"
 #include "core/os/TestCase_Core_OS_Console.h"

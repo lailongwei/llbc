@@ -29,6 +29,9 @@ struct __LLBC_LibTls
         int errNo;
         int subErrNo;
         char errDesc[__LLBC_ERROR_DESC_SIZE];
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+        char rtti[__LLBC_RTTI_BUF_SIZE];
+#endif
     } commonTls;
 
     /* Core-Module TLS value. */

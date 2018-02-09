@@ -253,6 +253,12 @@ public:
     virtual int RegisterFacade(LLBC_IFacade *facade);
 
     /**
+     * Get facade/facades.
+     */
+    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName);
+    virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName);
+
+    /**
      * Register coder.
      */
     virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coder);
@@ -487,6 +493,8 @@ private:
 
     typedef std::vector<LLBC_IFacade *> _Facades;
     _Facades _facades;
+    typedef std::map<LLBC_String, _Facades> _Facades2;
+    _Facades2 _facades2;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;

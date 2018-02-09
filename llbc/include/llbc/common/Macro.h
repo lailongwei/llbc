@@ -407,4 +407,13 @@ private:                                            \
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
+/**
+ * RTTI support.
+ */
+// Define rtti buffer size.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #define __LLBC_RTTI_BUF_SIZE    512
+#endif // Non-Win32
+
+
 #endif // !__LLBC_COM_MACRO_H__

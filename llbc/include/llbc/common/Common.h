@@ -31,6 +31,8 @@
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"
 
+#include "llbc/common/RTTI.h"
+
 #include "llbc/common/Version.h"
 
 #include "llbc/common/LibTlsInl.h"

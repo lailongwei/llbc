@@ -88,6 +88,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 #endif
 
 , _facades()
+, _facades2()
 , _coders()
 , _handlers()
 , _preHandlers()
@@ -575,7 +576,44 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
     facade->SetService(this);
     _facades.push_back(facade);
 
+    const LLBC_String facadeName = LLBC_GetTypeName(*facade);
+    _Facades2::iterator it = _facades2.find(facadeName);
+    if (it == _facades2.end())
+        it = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+    it->second.push_back(facade);
+
     return LLBC_OK;
+}
+
+LLBC_IFacade *LLBC_Service::GetFacade(const LLBC_String &facadeName)
+{
+    LLBC_LockGuard guard(_lock);
+
+    _Facades2::iterator it = _facades2.find(facadeName);
+    if (it == _facades2.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return NULL;
+    }
+
+    _Facades &facades = it->second;
+    return facades[0];
+}
+
+std::vector<LLBC_IFacade *> LLBC_Service::GetFacades(const LLBC_String &facadeName)
+{
+    static const std::vector<LLBC_IFacade *> emptyFacades;
+
+    LLBC_LockGuard guard(_lock);
+
+    _Facades2::iterator it = _facades2.find(facadeName);
+    if (it == _facades2.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return emptyFacades;
+    }
+
+    return it->second;
 }
 
 int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
@@ -1444,6 +1482,7 @@ void LLBC_Service::DestroyFacades()
     }
 
     LLBC_STLHelper::DeleteContainer(_facades, true, true);
+    _facades2.clear();
 }
 
 void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)

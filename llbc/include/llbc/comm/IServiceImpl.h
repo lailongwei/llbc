@@ -13,6 +13,34 @@
 
 __LLBC_NS_BEGIN
 
+template <typename FacadeCls>
+inline FacadeCls *LLBC_IService::RegisterFacade()
+{
+    FacadeCls *facade = LLBC_New(FacadeCls);
+    int ret = RegisterFacade(facade);
+    if (ret != LLBC_OK)
+    {
+        LLBC_Delete(facade);
+        return NULL;
+    }
+
+    return facade;
+}
+
+template <typename FacadeCls>
+inline FacadeCls *LLBC_IService::GetFacade()
+{
+    const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
+    return static_cast<FacadeCls *>(GetFacade(facadeName));
+}
+
+template <typename FacadeCls>
+inline std::vector<LLBC_IFacade *> LLBC_IService::GetFacades()
+{
+    const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
+    return GetFacades(facadeName);
+}
+
 inline int LLBC_IService::Send(int sessionId)
 {
     return Send(0, sessionId, 0, static_cast<LLBC_ICoder *>(NULL), 0);

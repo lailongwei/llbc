@@ -97,6 +97,9 @@
 #include <functional>
 #include <limits.h>
 
+// RTTI support header files.
+#include <typeinfo>
+
 // UUID lib header file.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 #include <uuid/uuid.h>
