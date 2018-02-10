@@ -29,6 +29,8 @@
 //  MSVC++10.0  -> 1600(Visual Studio 2010)
 //  MSVC++11.0  -> 1700(Visual Studio 2012)
 //  MSVC++12.0  -> 1800(Visual Studio 2013)
+//  MSVC++14.0  -> 1900(Visual Studio 2015)
+//  MSVC++15.0  -> 1910(Visual Studio 2017)
 //  ... ...
 #if LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
  #define LLBC_CUR_COMP          LLBC_COMP_MSVC
@@ -51,9 +53,20 @@
  #define LLBC_COMP_PATCH_LEVEL  __GNUC_PATCHLEVEL__
 #endif
 
+// CLang compiler.
+// The compile version is converted, like GUN C compiler
+#ifdef __clang__
+ #define LLBC_CUR_COMP          LLBC_COMP_CLANG
+ #define LLBC_CUR_COMP_DESC     "clang"
+ #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minar__ *100 + __clang_patchlevel__)
+ #define LLBC_COMP_MAJOR_VER    __clang_major__
+ #define LLBC_COMP_MINOR_VER    __clang_minar__
+ #define LLBC_COMP_PATCH_LEVEL  __clang_patchlevel__
+#endif
+
 // Other compiles.
 #ifndef LLBC_CUR_COMP
- #warning "Cannot recognize the target compiler! please makesure you're using MSVC compiler or GNU c compiler to compiling llbc library!"
+ #warning "Cannot recognize the target compiler! please makesure you're using MSVC compiler or GNU c compiler or CLANG compiler to compiling llbc library!"
  #define LLBC_CUR_COMP          LLBC_COMP_OTHER
  #define LLBC_CUR_COMP_DESC     "other"
  #define LLBC_COMP_VER          0
