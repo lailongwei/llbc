@@ -91,21 +91,20 @@
 #define LLBC_ISUNSIGNED_TYPE(type)     ((type)(0 - 1) > 0)
 #define LLBC_ISUNSIGNED_VAL(type, val) ((type)val >= 0 && (type)~a >= (type)0)
 
+// Force inline macro define.
+#if defined(_MSC_VER)
+ #define LLBC_FORCE_INLINE __forceinline
+#elif defined(__GUNC__) || defined(__clang__)
+ #define LLBC_FORCE_INLINE __inline__ __attribute__((always_inline))
+#else
+ #define LLBC_FORCE_INLINE inline
+#endif
+
 // Extern macro define.
 #ifdef __cplusplus
- #if LLBC_TARGET_PLATFORM_WIN32
-  #define LLBC_FORCE_INLINE __forceinline
- #else // Non-Win32
-  #define LLBC_FORCE_INLINE __attribute__((always_inline))
- #endif // Win32
  #define LLBC_EXTERN        extern
  #define LLBC_EXTERN_C      extern "C"
 #else
- #if LLBC_TARGET_PLATFORM_WIN32
-  #define LLBC_FORCE_INLINE __forceinline
- #else // Non-Win32
-  #define LLBC_FORCE_INLINE __attribute__((always_inline))
- #endif // Win32
  #define LLBC_EXTERN        extern
  #define LLBC_EXTERN_C      
 #endif
