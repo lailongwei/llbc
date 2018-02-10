@@ -99,6 +99,9 @@
 
 // RTTI support header files.
 #include <typeinfo>
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+#include <cxxabi.h>
+#endif
 
 // UUID lib header file.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
