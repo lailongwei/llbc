@@ -18,14 +18,14 @@
 __LLBC_NS_BEGIN
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_DeleteGuard<T>::LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete)
+inline LLBC_DeleteGuard<T>::LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete)
 : _ptr(ptr)
 , _setNullAfterDelete(setNullAfterDelete)
 {
 }
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
+inline LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeleteGuard: ptr[%p] will delete", _ptr);
@@ -42,14 +42,14 @@ LLBC_FORCE_INLINE LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
 }
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_DeletesGuard<T>::LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes)
+inline LLBC_DeletesGuard<T>::LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes)
 : _ptr(ptr)
 , _setNullAfterDeletes(setNullAfterDeletes)
 {
 }
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
+inline LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeletesGuard: ptr array[%p] will delete", _ptr);
@@ -66,14 +66,14 @@ LLBC_FORCE_INLINE LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
 }
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_FreeGuard<T>::LLBC_FreeGuard(T *&ptr, bool setNullAfterFree)
+inline LLBC_FreeGuard<T>::LLBC_FreeGuard(T *&ptr, bool setNullAfterFree)
 : _ptr(ptr)
 , _setNullAfterFree(setNullAfterFree)
 {
 }
 
 template <typename T>
-LLBC_FORCE_INLINE LLBC_FreeGuard<T>::~LLBC_FreeGuard()
+inline LLBC_FreeGuard<T>::~LLBC_FreeGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_FreeGuard: ptr[%p] will free", _ptr);
@@ -89,7 +89,7 @@ LLBC_FORCE_INLINE LLBC_FreeGuard<T>::~LLBC_FreeGuard()
 #endif // Guard debug
 }
 
-LLBC_FORCE_INLINE LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
+inline LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
 : _func(func)
 , _meth(NULL)
 
@@ -98,7 +98,7 @@ LLBC_FORCE_INLINE LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *
 }
 
 template <typename Object>
-LLBC_FORCE_INLINE LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data)
+inline LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data)
 : _func(NULL)
 , _meth(new LLBC_Delegate1<void, Object, void *>(obj, meth))
 
@@ -106,7 +106,7 @@ LLBC_FORCE_INLINE LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::
 {
 }
 
-LLBC_FORCE_INLINE LLBC_InvokeGuard::~LLBC_InvokeGuard()
+inline LLBC_InvokeGuard::~LLBC_InvokeGuard()
 {
     if (_func)
     {

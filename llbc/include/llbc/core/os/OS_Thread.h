@@ -153,7 +153,7 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_Sleep(int milliSeconds);
 /**
  * Relax CPU.
  */
-LLBC_EXTERN LLBC_FORCE_INLINE void LLBC_CPURelax();
+LLBC_EXTERN LLBC_EXPORT void LLBC_CPURelax();
 
 /**
  * Alloc thread local storage handle.

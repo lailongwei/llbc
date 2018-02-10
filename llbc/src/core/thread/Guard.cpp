@@ -16,7 +16,7 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_FORCE_INLINE LLBC_LockGuard::LLBC_LockGuard(LLBC_ILock &lock, bool reverse)
+LLBC_LockGuard::LLBC_LockGuard(LLBC_ILock &lock, bool reverse)
 : _lock(lock)
 , _reverse(reverse)
 {
@@ -34,7 +34,7 @@ LLBC_FORCE_INLINE LLBC_LockGuard::LLBC_LockGuard(LLBC_ILock &lock, bool reverse)
 #endif // Guard debug
 }
 
-LLBC_FORCE_INLINE LLBC_LockGuard::~LLBC_LockGuard()
+LLBC_LockGuard::~LLBC_LockGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_LockGuard: locker[%p] will %s", &_lock, (_reverse ? "lock" : "unlock"));

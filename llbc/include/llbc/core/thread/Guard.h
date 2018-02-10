@@ -32,9 +32,9 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_LockGuard
 {
 public:
-    explicit LLBC_FORCE_INLINE LLBC_LockGuard(LLBC_ILock &lock, bool reverse = false);
+    explicit LLBC_LockGuard(LLBC_ILock &lock, bool reverse = false);
 
-    LLBC_FORCE_INLINE ~LLBC_LockGuard();
+    ~LLBC_LockGuard();
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_LockGuard);
 

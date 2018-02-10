@@ -26,7 +26,7 @@ LLBC_String __LLBC_CxxDemangle(const char *name)
     int status = 0;
     size_t length = sizeof(libTls->commonTls.rtti);
 
-    ::abi::__cxa_demangle(name, libTls->commonTls.rtti, &length, &status);
+    abi::__cxa_demangle(name, libTls->commonTls.rtti, &length, &status);
     if (status != 0)
         return LLBC_String();
 

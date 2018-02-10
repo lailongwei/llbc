@@ -64,6 +64,10 @@ public:
         SetServiceCodec.ml_meth = (PyCFunction)_pyllbc_SetServiceCodec;
         SetServiceCodec.ml_flags = METH_VARARGS;
         SetServiceCodec.ml_doc = "pyllbc library method/function";
+        Connect.ml_name = "Connect";
+        Connect.ml_meth = (PyCFunction)_pyllbc_Connect;
+        Connect.ml_flags = METH_VARARGS;
+        Connect.ml_doc = "pyllbc library method/function";
         GetServiceId.ml_name = "GetServiceId";
         GetServiceId.ml_meth = (PyCFunction)_pyllbc_GetServiceId;
         GetServiceId.ml_flags = METH_VARARGS;
@@ -72,10 +76,10 @@ public:
         Listen.ml_meth = (PyCFunction)_pyllbc_Listen;
         Listen.ml_flags = METH_VARARGS;
         Listen.ml_doc = "pyllbc library method/function";
-        level2str.ml_name = "level2str";
-        level2str.ml_meth = (PyCFunction)_pyllbc_level2str;
-        level2str.ml_flags = METH_VARARGS;
-        level2str.ml_doc = "pyllbc library method/function";
+        Broadcast.ml_name = "Broadcast";
+        Broadcast.ml_meth = (PyCFunction)_pyllbc_Broadcast;
+        Broadcast.ml_flags = METH_VARARGS;
+        Broadcast.ml_doc = "pyllbc library method/function";
         SetServiceFPS.ml_name = "SetServiceFPS";
         SetServiceFPS.ml_meth = (PyCFunction)_pyllbc_SetServiceFPS;
         SetServiceFPS.ml_flags = METH_VARARGS;
@@ -120,10 +124,10 @@ public:
         UninstallErrHooker.ml_meth = (PyCFunction)_pyllbc_UninstallErrHooker;
         UninstallErrHooker.ml_flags = METH_VARARGS;
         UninstallErrHooker.ml_doc = "pyllbc library method/function";
-        Connect.ml_name = "Connect";
-        Connect.ml_meth = (PyCFunction)_pyllbc_Connect;
-        Connect.ml_flags = METH_VARARGS;
-        Connect.ml_doc = "pyllbc library method/function";
+        ServiceMainLoop.ml_name = "ServiceMainLoop";
+        ServiceMainLoop.ml_meth = (PyCFunction)_pyllbc_ServiceMainLoop;
+        ServiceMainLoop.ml_flags = METH_VARARGS;
+        ServiceMainLoop.ml_doc = "pyllbc library method/function";
         PyTimerSchedule.ml_name = "PyTimerSchedule";
         PyTimerSchedule.ml_meth = (PyCFunction)_pyllbc_PyTimerSchedule;
         PyTimerSchedule.ml_flags = METH_VARARGS;
@@ -168,10 +172,10 @@ public:
         GetServiceFPS.ml_meth = (PyCFunction)_pyllbc_GetServiceFPS;
         GetServiceFPS.ml_flags = METH_VARARGS;
         GetServiceFPS.ml_doc = "pyllbc library method/function";
-        Broadcast.ml_name = "Broadcast";
-        Broadcast.ml_meth = (PyCFunction)_pyllbc_Broadcast;
-        Broadcast.ml_flags = METH_VARARGS;
-        Broadcast.ml_doc = "pyllbc library method/function";
+        SuppressServiceCoderNotFoundWarning.ml_name = "SuppressServiceCoderNotFoundWarning";
+        SuppressServiceCoderNotFoundWarning.ml_meth = (PyCFunction)_pyllbc_SuppressServiceCoderNotFoundWarning;
+        SuppressServiceCoderNotFoundWarning.ml_flags = METH_VARARGS;
+        SuppressServiceCoderNotFoundWarning.ml_doc = "pyllbc library method/function";
         PyTimerIsIgnoredDeadRef.ml_name = "PyTimerIsIgnoredDeadRef";
         PyTimerIsIgnoredDeadRef.ml_meth = (PyCFunction)_pyllbc_PyTimerIsIgnoredDeadRef;
         PyTimerIsIgnoredDeadRef.ml_flags = METH_VARARGS;
@@ -180,10 +184,6 @@ public:
         PyTimerIsScheduling.ml_meth = (PyCFunction)_pyllbc_PyTimerIsScheduling;
         PyTimerIsScheduling.ml_flags = METH_VARARGS;
         PyTimerIsScheduling.ml_doc = "pyllbc library method/function";
-        SuppressServiceCoderNotFoundWarning.ml_name = "SuppressServiceCoderNotFoundWarning";
-        SuppressServiceCoderNotFoundWarning.ml_meth = (PyCFunction)_pyllbc_SuppressServiceCoderNotFoundWarning;
-        SuppressServiceCoderNotFoundWarning.ml_flags = METH_VARARGS;
-        SuppressServiceCoderNotFoundWarning.ml_doc = "pyllbc library method/function";
         PyTimerUpdateAllTimers.ml_name = "PyTimerUpdateAllTimers";
         PyTimerUpdateAllTimers.ml_meth = (PyCFunction)_pyllbc_PyTimerUpdateAllTimers;
         PyTimerUpdateAllTimers.ml_flags = METH_VARARGS;
@@ -216,10 +216,10 @@ public:
         UnifyPreSubscribe.ml_meth = (PyCFunction)_pyllbc_UnifyPreSubscribe;
         UnifyPreSubscribe.ml_flags = METH_VARARGS;
         UnifyPreSubscribe.ml_doc = "pyllbc library method/function";
-        ServiceMainLoop.ml_name = "ServiceMainLoop";
-        ServiceMainLoop.ml_meth = (PyCFunction)_pyllbc_ServiceMainLoop;
-        ServiceMainLoop.ml_flags = METH_VARARGS;
-        ServiceMainLoop.ml_doc = "pyllbc library method/function";
+        level2str.ml_name = "level2str";
+        level2str.ml_meth = (PyCFunction)_pyllbc_level2str;
+        level2str.ml_flags = METH_VARARGS;
+        level2str.ml_doc = "pyllbc library method/function";
     }
 
 public:
@@ -233,9 +233,10 @@ public:
     ::PyMethodDef PyTimerCancel;
     ::PyMethodDef o2j;
     ::PyMethodDef SetServiceCodec;
+    ::PyMethodDef Connect;
     ::PyMethodDef GetServiceId;
     ::PyMethodDef Listen;
-    ::PyMethodDef level2str;
+    ::PyMethodDef Broadcast;
     ::PyMethodDef SetServiceFPS;
     ::PyMethodDef PyTimerGetPeriod;
     ::PyMethodDef ClearHookedErrors;
@@ -247,7 +248,7 @@ public:
     ::PyMethodDef Post;
     ::PyMethodDef PyTimerSetIgnoredDeadRef;
     ::PyMethodDef UninstallErrHooker;
-    ::PyMethodDef Connect;
+    ::PyMethodDef ServiceMainLoop;
     ::PyMethodDef PyTimerSchedule;
     ::PyMethodDef SendData;
     ::PyMethodDef PyTimerGetDueTime;
@@ -259,10 +260,9 @@ public:
     ::PyMethodDef AsyncConn;
     ::PyMethodDef StartService;
     ::PyMethodDef GetServiceFPS;
-    ::PyMethodDef Broadcast;
+    ::PyMethodDef SuppressServiceCoderNotFoundWarning;
     ::PyMethodDef PyTimerIsIgnoredDeadRef;
     ::PyMethodDef PyTimerIsScheduling;
-    ::PyMethodDef SuppressServiceCoderNotFoundWarning;
     ::PyMethodDef PyTimerUpdateAllTimers;
     ::PyMethodDef NewService;
     ::PyMethodDef RegisterCodec;
@@ -271,7 +271,7 @@ public:
     ::PyMethodDef GetServiceCodec;
     ::PyMethodDef Multicast;
     ::PyMethodDef UnifyPreSubscribe;
-    ::PyMethodDef ServiceMainLoop;
+    ::PyMethodDef level2str;
 };
 
 #define pyllbc_s_CommMethods LLBC_Singleton< ::pyllbc_CommMethods, LLBC_DummyLock>::Instance()

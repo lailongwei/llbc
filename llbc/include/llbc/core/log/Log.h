@@ -29,7 +29,7 @@ __LLBC_NS_BEGIN
  * Get log helper object.
  * @return LLBC_LogHelper & - the log helper reference.
  */
-LLBC_EXTERN LLBC_FORCE_INLINE LLBC_EXPORT LLBC_LogHelper &__LLBC_GetLogHelper();
+LLBC_EXTERN LLBC_EXPORT LLBC_LogHelper &__LLBC_GetLogHelper();
 
 // Log macro define.
 #ifdef Log

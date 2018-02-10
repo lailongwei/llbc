@@ -33,7 +33,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_FORCE_INLINE LLBC_LogHelper &__LLBC_GetLogHelper()
+LLBC_LogHelper &__LLBC_GetLogHelper()
 {
     return LLBC_INTERNAL_NS __llbc_logHelper;
 }
@@ -193,7 +193,7 @@ void LLBC_LogHelper::f4(const char *logger, const char *tag, const char *fmt, ..
     __LLBC_LOG_TO_SPEC(logger, _LV::Fatal, tag, fmt);
 }
 
-LLBC_FORCE_INLINE void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
+void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
 {
     LLBC_FilePrintLine(to, "[Log] %s\n", msg);
 }
