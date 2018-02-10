@@ -10,7 +10,7 @@
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_ThreadManager::CPURelax()
+LLBC_FORCE_INLINE void LLBC_ThreadManager::CPURelax()
 {
     LLBC_CPURelax();
 }
