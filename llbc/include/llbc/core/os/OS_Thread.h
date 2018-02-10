@@ -153,7 +153,7 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_Sleep(int milliSeconds);
 /**
  * Relax CPU.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_CPURelax();
+LLBC_EXTERN void LLBC_CPURelax();
 
 /**
  * Alloc thread local storage handle.
@@ -186,5 +186,7 @@ LLBC_EXTERN LLBC_EXPORT void *LLBC_TlsGetValue(LLBC_TlsHandle handle);
 LLBC_EXTERN LLBC_EXPORT int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value);
 
 __LLBC_NS_END
+
+#include "llbc/core/os/OS_ThreadImpl.h"
 
 #endif // __LLBC_CORE_OS_OS_THREAD_H__

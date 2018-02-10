@@ -176,11 +176,6 @@ void LLBC_ThreadManager::Sleep(int milliSecs)
     LLBC_Sleep(milliSecs);
 }
 
-LLBC_FORCE_INLINE void LLBC_ThreadManager::CPURelax()
-{
-    LLBC_CPURelax();
-}
-
 LLBC_NativeThreadHandle LLBC_ThreadManager::GetCurrentThread()
 {
     return LLBC_GetCurrentThread();

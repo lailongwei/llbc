@@ -89,7 +89,7 @@ public:
     /**
      * Relax the CPU.
      */
-    static LLBC_FORCE_INLINE void CPURelax();
+    static void CPURelax();
 
     /**
      * Get current thread native thread handle.
@@ -377,5 +377,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ThreadManager>;
 #define LLBC_ThreadManagerSingleton LLBC_Singleton<LLBC_NS LLBC_ThreadManager>::Instance()
 
 __LLBC_NS_END
+
+#include "llbc/core/thread/ThreadManagerImpl.h"
 
 #endif // !__LLBC_CORE_THREAD_THREAD_MANAGER_H__

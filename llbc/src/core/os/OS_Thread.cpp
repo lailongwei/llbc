@@ -614,19 +614,6 @@ void LLBC_Sleep(int milliSeconds)
 #endif
 }
 
-void LLBC_CPURelax()
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
- #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID || LLBC_TARGET_PLATFORM_MAC
-    asm volatile ("rep;nop" : : : "memory");
- #else
-    asm volatile ("nop");
- #endif
-#else // WIN32 platform
-    YieldProcessor();
-#endif // Non-WIN32 platform
-}
-
 int LLBC_TlsAlloc(LLBC_TlsHandle *handle)
 {
     if (!handle)

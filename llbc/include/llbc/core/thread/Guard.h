@@ -51,9 +51,9 @@ template <typename T>
 class LLBC_DeleteGuard
 {
 public:
-    explicit LLBC_FORCE_INLINE LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete = true);
+    explicit LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete = true);
 
-    LLBC_FORCE_INLINE ~LLBC_DeleteGuard();
+    ~LLBC_DeleteGuard();
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DeleteGuard);
 
@@ -70,9 +70,9 @@ template <typename T>
 class LLBC_DeletesGuard
 {
 public:
-    explicit LLBC_FORCE_INLINE LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes = true);
+    explicit LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes = true);
 
-    LLBC_FORCE_INLINE ~LLBC_DeletesGuard();
+    ~LLBC_DeletesGuard();
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DeletesGuard);
 
@@ -89,9 +89,9 @@ template <typename T>
 class LLBC_FreeGuard
 {
 public:
-    explicit LLBC_FORCE_INLINE LLBC_FreeGuard(T *&ptr, bool setNullAfterFree = true);
+    explicit LLBC_FreeGuard(T *&ptr, bool setNullAfterFree = true);
 
-    LLBC_FORCE_INLINE ~LLBC_FreeGuard();
+    ~LLBC_FreeGuard();
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_FreeGuard);
 
@@ -111,7 +111,7 @@ public:
      * @param[in] func - the guard invoke function pointer.
      * @param[in] data - the call data, default is NULL.
      */
-    explicit LLBC_FORCE_INLINE LLBC_InvokeGuard(LLBC_GuardFunc func, void *data = NULL);
+    explicit LLBC_InvokeGuard(LLBC_GuardFunc func, void *data = NULL);
     
     /**
      * Create method type invoke guard.
@@ -120,9 +120,9 @@ public:
      * @param[in] data - the call data, default is NULL.
      */
     template <typename Object>
-    LLBC_FORCE_INLINE LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data = NULL);
+    LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data = NULL);
 
-    LLBC_FORCE_INLINE ~LLBC_InvokeGuard();
+    ~LLBC_InvokeGuard();
 
 private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_InvokeGuard);
