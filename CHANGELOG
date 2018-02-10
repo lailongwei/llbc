@@ -3,7 +3,13 @@
 ######################################################################################
 #
 # Version: 1.0.1
-功能新增/改进/优化:
+# 2018/02/10
+# 功能新增/改进/优化:
+# 1) 【llbc all】所有文件头增加MIT LICENSE.
+# 2) 【llbc core】引入RTTI支援, 同时对Service.RegisterXXX接口增加泛型支持，增加Service.GetFacade/GetFacades支持.
+# 
+# 2018/02/08
+# 功能新增/改进/优化:
 1) 【llbc core】归整所有Guard实现，统一抽取到Guard.h/Guard.cpp中.
 2) 【llbc core】增加自定义协议栈支持，允许开发者根据会话自定义自己的网络传输协议栈，最大限度提供灵活性，并保留Raw/Normal两种库内部默认实现.
 3）【llbc core】去除原有的Packet Header Designer框架，原有的框架相对灵活，但也有局限，统一使用自定议协议栈方式替换旧机制.
