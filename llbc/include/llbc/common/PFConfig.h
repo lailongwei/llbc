@@ -47,7 +47,7 @@
 // Recognize platforms
 //
 // Linux platform recognize.
-#if !LLBC_TARGET_PLATFORM && defined(LINUX)
+#if !LLBC_TARGET_PLATFORM && defined(LINUX) && !defined(__ANDROID__)
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_LINUX
 #endif
@@ -71,7 +71,7 @@
 #endif
 
 // Android platform recognize.
-#if !LLBC_TARGET_PLATFORM && defined(ANDROID)
+#if !LLBC_TARGET_PLATFORM && defined(__ANDROID__)
  #undef LLBC_TARGET_PLATFORM
  #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_ANDROID
 #endif
