@@ -384,18 +384,23 @@ public:
     virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
     virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName) = 0;
 
+public:
     /**
      * Register coder.
      */
+    template <typename CoderFactoryCls>
+    int RegisterCoder(int opcode);
     virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coder) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+public:
     /**
      * Register status code describe.
      */
     virtual int RegisterStatusDesc(int status, const LLBC_String &desc) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
+public:
     /**
      * Subscribe message to specified handler method.
      */
@@ -448,6 +453,7 @@ public:
     virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
+public:
     /**
      * Set protocol filter to service's specified protocol layer.
      * @param[in] filter  - the protocol filter.

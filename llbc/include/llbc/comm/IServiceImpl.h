@@ -27,6 +27,20 @@ inline FacadeCls *LLBC_IService::RegisterFacade()
     return facade;
 }
 
+template <typename CoderFactoryCls>
+inline int LLBC_IService::RegisterCoder(int opcode)
+{
+    CoderFactoryCls *coderFactory = LLBC_New(CoderFactoryCls);
+    int ret = RegisterCoder(opcode, coderFactory);
+    if (ret != LLBC_OK)
+    {
+        LLBC_Delete(coderFactory);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 template <typename FacadeCls>
 inline FacadeCls *LLBC_IService::GetFacade()
 {
