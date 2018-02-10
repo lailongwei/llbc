@@ -11,6 +11,7 @@
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/OSHeader.h"
+#include "llbc/common/StringDataType.h"
 
 __LLBC_NS_BEGIN
 
@@ -32,7 +33,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String __LLBC_CxxDemangle(const char *name);
 /**
  * Get type name(demangled).
  */
-#define LLBC_GetTypeName(ty) __LLBC_CxxDemangle(typeid(ty).name)
+#define LLBC_GetTypeName(ty) __LLBC_CxxDemangle(typeid(ty).name())
 
 #endif // Win32
 
