@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_majorVersion       = 1;
 int LLBC_minorVersion       = 0;
-int LLBC_updateNo           = 2;
+int LLBC_updateNo           = 3;
 
 #ifdef LLBC_DEBUG
 bool LLBC_isDebugVer        = true;
