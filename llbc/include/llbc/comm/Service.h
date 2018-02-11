@@ -29,6 +29,7 @@
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
+#include "llbc/comm/protocol/ProtocolLayer.h"
 #if !LLBC_CFG_COMM_USE_FULL_STACK
 #include "llbc/comm/protocol/ProtocolStack.h"
 #endif
