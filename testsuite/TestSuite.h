@@ -80,6 +80,8 @@
 #include "comm/TestCase_Comm_ExternalDriveSvc.h"
 #include "comm/TestCase_Comm_LazyTask.h"
 
+#include "application/TestCase_App_AppTest.h"
+
 extern int TestSuite_Main(int argc, char *argv[]);
 
 #endif // !__LLBC_TEST_SUITE_H__

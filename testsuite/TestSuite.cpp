@@ -94,6 +94,8 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Comm_ExternalDriveSvc;
     // test = new TestCase_Comm_LazyTask;
 
+    // test = new TestCase_App_AppTest;
+
     int ret = LLBC_FAILED;
     if (test)
     {
