@@ -62,7 +62,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     if (LIKELY(_rootLogger))                                                  \
         _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
     else                                                                      \
-        UnInitOutput(stdout, fmttedMsg);                                      \
+        UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
 
 #define __LLBC_LOG_TO_SPEC(logger, level, tag, fmt)                           \
     char *fmttedMsg; int msgLen;                                              \
@@ -79,7 +79,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     if (LIKELY(l))                                                            \
         l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen);\
     else                                                                      \
-        UnInitOutput(stdout, fmttedMsg);                                      \
+        UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
 
 void LLBC_LogHelper::Initialize(LLBC_LoggerManager *loggerManager)
 {
@@ -207,7 +207,9 @@ void LLBC_LogHelper::f4(const char *logger, const char *tag, const char *fmt, ..
 
 void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
 {
-    LLBC_FilePrintLine(to, "[Log] %s\n", msg);
+    LLBC_FilePrint(to, "[Log] %s\n", msg);
+    if (to != stderr)
+        LLBC_FlushFile(to);
 }
 
 //! At latest, undef code define macros.
