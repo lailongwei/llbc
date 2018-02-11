@@ -249,9 +249,9 @@ inline bool LLBC_BinaryHeap<T, Comp>::operator !() const
 template <typename T, typename Comp>
 void LLBC_BinaryHeap<T, Comp>::BuildHeap()
 {
-    for (int i = _size / 2; i > 0; i --)
+    for (size_t i = _size / 2; i > 0; i --)
     {
-        this->PercolateDown(i);
+        this->PercolateDown(static_cast<int>(i));
     }
 }
 
