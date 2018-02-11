@@ -61,12 +61,14 @@ class Cfg(object):
             return LangType.unknown
 
     @classmethod
-    def getlicensehead(cls):
-        lang_type = cls.getlangtype()
+    def getlicensehead(cls, lang_type=None):
+        lang_type = lang_type or cls.getlangtype()
         if lang_type == LangType.python:
             line_prefix = '# '
         elif lang_type == LangType.lua:
             line_prefix = '-- '
+        elif lang_type == LangType.cplusplus:
+            line_prefix = '// '
         else:
             line_prefix = ''
 

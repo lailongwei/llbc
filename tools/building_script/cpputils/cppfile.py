@@ -14,6 +14,7 @@ class CppFile(object):
         self.__ver = ver
         self.__doc = doc
         self.__include_macro_prefix = include_macro_prefix
+        self.__custom_filehead = None
 
         self.__incls = []
         self.__clses = []
@@ -54,6 +55,15 @@ class CppFile(object):
     def doc(self, doc):
         """设置文件描述文档"""
         self.__doc = doc
+
+    @property
+    def custom_filehead(self):
+        """取得自定义文件头"""
+        return self.__custom_filehead
+    @custom_filehead.setter
+    def custom_filehead(self, custom_filehead):
+        """设置自定义文件头"""
+        self.__custom_filehead = custom_filehead
 
     @property
     def include_macro_prefix(self):
@@ -97,15 +107,19 @@ class CppFile(object):
         # Generate file head.
         now_date = strftime('%Y-%m-%d', localtime(time()))
 
-        cnt = '/**\n'
-        cnt += ' *@file\t\t{0}\n'.format(op.basename(self.__fpath))
-        cnt += ' *@author\t{0}\n'.format(self.__author)
-        cnt += ' *@date\t\t{0}\n'.format('<auto generate code, not tag date>')
-        cnt += ' *@version\t{0}\n'.format(self.__ver)
-        cnt += ' *\n'
-        cnt += ' *@brief\tAuto generate by script tools, do not modify this file!!\n'
-        cnt += ' *@doc\t{0}\n'.format(self.__doc)
-        cnt += ' */\n\n'
+        if not self.__custom_filehead:
+            cnt = '/**\n'
+            cnt += ' *@file\t\t{0}\n'.format(op.basename(self.__fpath))
+            cnt += ' *@author\t{0}\n'.format(self.__author)
+            cnt += ' *@date\t\t{0}\n'.format('<auto generate code, not tag date>')
+            cnt += ' *@version\t{0}\n'.format(self.__ver)
+            cnt += ' *\n'
+            cnt += ' *@brief\tAuto generate by script tools, do not modify this file!!\n'
+            cnt += ' *@doc\t{0}\n'.format(self.__doc)
+            cnt += ' */\n\n'
+        else:
+            cnt = self.__custom_filehead
+            cnt += '\n'
 
         basename = op.splitext(op.basename(self.__fpath))[0]
         parent_dirname = op.basename(op.dirname(self.__fpath)).upper()

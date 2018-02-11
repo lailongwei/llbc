@@ -7,6 +7,7 @@
 class LangType(object):
     python = 'python'
     lua = 'lua'
+    cplusplus = 'cplusplus'
     unknown = 'unknown'
 
 
