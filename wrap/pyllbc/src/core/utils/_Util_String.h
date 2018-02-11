@@ -19,7 +19,6 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 #include "pyllbc/common/Common.h"
 
 LLBC_EXTERN_C PyObject *_pyllbc_HashString(PyObject *self, PyObject *args)
