@@ -42,6 +42,7 @@ __LLBC_NS_BEGIN
 
 /**
  * \brief The application class encapsulation.
+ *        Note: Please call Start/Wait/Stop method at main thread.
  */
 class LLBC_EXPORT LLBC_BaseApplication
 {
@@ -51,40 +52,59 @@ public:
 
 public:
     /**
+     * Application start event method, please override this method at your project.
+     * @param[in] name - the application name.
+     * @param[in] argv - the application startup arguments.
+     * @return int - return 0 if start success, otherwise return -1.
+     */
+    virtual int OnStart(int argc, char *argv[]);
+
+    /**
+     * Application wait event method, please override this method at your project.
+     */
+    virtual void OnWait();
+
+    /**
+     * Application stop event method, please override this method at your project.
+     */
+    virtual void OnStop();
+
+public:
+    /**
+     * Start application.
+     * @param[in] name - the application name.
+     * @param[in] argv - the application startup arguments.
+     * @return int - return 0 if start success, otherwise return -1.
+     */
+    int Start(const char *name, int argc, char *argv[]);
+
+    /**
+     * Check application started or not.
+     */
+    bool IsStarted() const;
+
+    /**
+     * Wait application.
+     */
+    void Wait();
+
+    /**
+     * Stop application.
+     */
+    void Stop();
+
+public:
+    /**
      * Get application name.
      * @return const LLBC_String & - application name.
      */
-    virtual const LLBC_String &GetName() const;
+    const LLBC_String &GetName() const;
 
     /**
      * Get application config.
      * return const LLBC_Config & - application config.
      */
-    virtual const LLBC_Config &GetConfig() const;
-
-public:
-    /**
-     * Initialize application.
-     * @param[in] name - application name.
-     * @param[in] arg  - user data.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Initialize(const LLBC_String &name, void *arg = NULL);
-
-    /**
-     * Start application.
-     */
-    virtual void Start();
-
-    /**
-     * Wait application.
-     */
-    virtual void Wait();
-
-    /**
-     * Stop application.
-     */
-    virtual void Stop();
+    const LLBC_Config &GetConfig() const;
 
 public:
     /**
@@ -112,8 +132,11 @@ public:
 protected:
     LLBC_String _name;
     LLBC_Config _config;
-
     LLBC_ServiceMgr &_services;
+
+private:
+    volatile bool _started;
+    bool _waited;
 };
 
 __LLBC_NS_END

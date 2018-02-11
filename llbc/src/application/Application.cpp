@@ -32,12 +32,94 @@ LLBC_BaseApplication::LLBC_BaseApplication()
 , _config()
 
 , _services(*LLBC_ServiceMgrSingleton)
+
+, _started(false)
+, _waited(false)
 {
 }
 
 LLBC_BaseApplication::~LLBC_BaseApplication()
 {
     Wait();
+    Stop();
+}
+
+int LLBC_BaseApplication::OnStart(int argc, char *argv[])
+{
+    return LLBC_OK;
+}
+
+void LLBC_BaseApplication::OnWait()
+{
+}
+
+void LLBC_BaseApplication::OnStop()
+{
+}
+
+int LLBC_BaseApplication::Start(const char *name, int argc, char *argv[])
+{
+    if (_started)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_OK;
+    }
+
+    // Startup llbc library.
+    if (LLBC_Startup() != LLBC_OK)
+    {
+        if (LLBC_Errno != LLBC_ERROR_REENTRY)
+            return LLBC_FAILED;
+
+        LLBC_SetLastError(LLBC_OK);
+    }
+
+    // Set application name.
+    _name = name;
+
+    // Call OnStart event method.
+    if (OnStart(argc, argv) != LLBC_OK)
+    {
+        LLBC_Cleanup();
+        return LLBC_FAILED;
+    }
+
+    // Mark started.
+    _started = true;
+
+    return LLBC_OK;
+}
+
+bool LLBC_BaseApplication::IsStarted() const
+{
+    return _started;
+}
+
+void LLBC_BaseApplication::Wait()
+{
+    if (!_started || _waited)
+        return;
+
+    OnWait();
+    _services.Wait();
+
+    _waited = true;
+}
+
+void LLBC_BaseApplication::Stop()
+{
+    if (!_started)
+        return;
+
+    if (!_waited)
+        Wait();
+
+    OnStop();
+    _services.Stop();
+
+    LLBC_Cleanup();
+
+    _started = false;
 }
 
 const LLBC_String &LLBC_BaseApplication::GetName() const
@@ -48,34 +130,6 @@ const LLBC_String &LLBC_BaseApplication::GetName() const
 const LLBC_Config &LLBC_BaseApplication::GetConfig() const
 {
     return _config;
-}
-
-int LLBC_BaseApplication::Initialize(const LLBC_String &name, void *arg)
-{
-    if(LLBC_Startup() != LLBC_OK)
-    {
-        return LLBC_FAILED;
-    }
-
-    _name = name;
-    return LLBC_OK;
-}
-
-void LLBC_BaseApplication::Start()
-{
-}
-
-void LLBC_BaseApplication::Wait()
-{
-    _services.Wait();
-
-    Stop();
-}
-
-void LLBC_BaseApplication::Stop()
-{
-    _services.Stop();
-    LLBC_Cleanup();
 }
 
 LLBC_IService *LLBC_BaseApplication::GetService(int id) const
