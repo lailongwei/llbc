@@ -71,12 +71,19 @@ public:
 
 public:
     /**
+     * Get this application.
+     * @return LLBC_BaseApplication * - this application.
+     */
+    static LLBC_BaseApplication *ThisApp();
+
+public:
+    /**
      * Start application.
      * @param[in] name - the application name.
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    int Start(const char *name, int argc, char *argv[]);
+    int Start(const LLBC_String &name, int argc, char *argv[]);
 
     /**
      * Check application started or not.
@@ -100,11 +107,24 @@ public:
      */
     const LLBC_String &GetName() const;
 
+public:
     /**
-     * Get application config.
-     * return const LLBC_Config & - application config.
+     * Get application ini format config.
+     * @return const LLBC_Ini & - ini config.
      */
-    const LLBC_Config &GetConfig() const;
+    const LLBC_Ini &GetIniConfig() const;
+
+    /**
+     * Get application json format config.
+     * return const LLBC_Config & - json config.
+     */
+    const LLBC_Config &GetJsonConfig() const;
+
+    /**
+     * Get application property format config.
+     * @return const LLBC_Property & - property config.
+     */
+    const LLBC_Property &GetPropertyConfig() const;
 
 public:
     /**
@@ -129,14 +149,24 @@ public:
      */
     int Send(LLBC_Packet *packet);
 
+private:
+    int TryLoadConfig();
+    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded);
+
 protected:
     LLBC_String _name;
-    LLBC_Config _config;
+
+    LLBC_Ini _iniConfig;
+    LLBC_Config _jsonConfig;
+    LLBC_Property _propertyConfig;
+
     LLBC_ServiceMgr &_services;
 
 private:
     volatile bool _started;
     bool _waited;
+
+    static LLBC_BaseApplication *_thisApp;
 };
 
 __LLBC_NS_END

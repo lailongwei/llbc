@@ -27,15 +27,22 @@
 
 __LLBC_NS_BEGIN
 
+LLBC_BaseApplication *LLBC_BaseApplication::_thisApp = NULL;
+
 LLBC_BaseApplication::LLBC_BaseApplication()
 : _name()
-, _config()
+
+, _iniConfig()
+, _jsonConfig()
+, _propertyConfig()
 
 , _services(*LLBC_ServiceMgrSingleton)
 
 , _started(false)
 , _waited(false)
 {
+    if (_thisApp == NULL)
+        _thisApp = this;
 }
 
 LLBC_BaseApplication::~LLBC_BaseApplication()
@@ -57,12 +64,32 @@ void LLBC_BaseApplication::OnStop()
 {
 }
 
-int LLBC_BaseApplication::Start(const char *name, int argc, char *argv[])
+LLBC_BaseApplication *LLBC_BaseApplication::ThisApp()
 {
-    if (_started)
+    return _thisApp;
+}
+
+int LLBC_BaseApplication::Start(const LLBC_String &name, int argc, char *argv[])
+{
+    // Multi application check.
+    if (_thisApp != this)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_OK;
+        return LLBC_FAILED;
+    }
+
+    // Application name check.
+    if (name.empty())
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    // Reentry check.
+    if (_started)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
     }
 
     // Startup llbc library.
@@ -76,6 +103,13 @@ int LLBC_BaseApplication::Start(const char *name, int argc, char *argv[])
 
     // Set application name.
     _name = name;
+
+    // Try load config.
+    if (TryLoadConfig() != LLBC_OK)
+    {
+        _name.clear();
+        return LLBC_FAILED;
+    }
 
     // Call OnStart event method.
     if (OnStart(argc, argv) != LLBC_OK)
@@ -127,9 +161,19 @@ const LLBC_String &LLBC_BaseApplication::GetName() const
     return _name;
 }
 
-const LLBC_Config &LLBC_BaseApplication::GetConfig() const
+const LLBC_Ini &LLBC_BaseApplication::GetIniConfig() const
 {
-    return _config;
+    return _iniConfig;
+}
+
+const LLBC_Config &LLBC_BaseApplication::GetJsonConfig() const
+{
+    return _jsonConfig;
+}
+
+const LLBC_Property &LLBC_BaseApplication::GetPropertyConfig() const
+{
+    return _propertyConfig;
 }
 
 LLBC_IService *LLBC_BaseApplication::GetService(int id) const
@@ -152,6 +196,80 @@ int LLBC_BaseApplication::Send(LLBC_Packet *packet)
     }
 
     return service->Send(packet);
+}
+
+int LLBC_BaseApplication::TryLoadConfig()
+{
+    // Build all try paths.
+    LLBC_Strings tryPaths;
+    tryPaths.push_back("Config/" + _name);
+    tryPaths.push_back("config/" + _name);
+    tryPaths.push_back("Conf/" + _name);
+    tryPaths.push_back("conf/" + _name);
+    tryPaths.push_back("cfg/" + _name);
+    tryPaths.push_back("cfg/" + _name);
+    tryPaths.push_back(_name);
+
+    const size_t tryPathsCount = tryPaths.size();
+    for (size_t i = 0; i < tryPathsCount; i++)
+        tryPaths.push_back("../" + tryPaths[i]);
+
+    // Try load.
+    bool loaded = false;
+    for (LLBC_Strings::const_iterator iter = tryPaths.begin();
+        iter != tryPaths.end();
+        iter++)
+    {
+        if (TryLoadConfig(*iter, loaded) != LLBC_OK)
+            return LLBC_FAILED;
+
+        if (loaded)
+            break;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::TryLoadConfig(const LLBC_String &path, bool &loaded)
+{
+    loaded = false;
+
+    // Try load ini config file.
+    const LLBC_String iniPath = path + ".ini";
+    if (LLBC_File::Exists(iniPath))
+    {
+        if (_iniConfig.LoadFromFile(iniPath) != LLBC_OK)
+            return LLBC_FAILED;
+
+        loaded = true;
+        return LLBC_OK;
+    }
+
+    // Try load json config file.
+    const LLBC_String jsonPath = path + ".json";
+    if (LLBC_File::Exists(jsonPath))
+    {
+        _jsonConfig.AddFile(jsonPath);
+        if (_jsonConfig.Initialize() != LLBC_OK)
+            return LLBC_FAILED;
+
+        loaded = true;
+        return LLBC_OK;
+    }
+
+    // Try load property config file.
+    const LLBC_String propPath = path + ".cfg";
+    if (LLBC_File::Exists(propPath))
+    {
+        if (_propertyConfig.LoadFromFile(propPath) != LLBC_OK)
+            return LLBC_FAILED;
+
+        loaded = true;
+        return LLBC_OK;
+    }
+
+    // Finally, not found any llbc library supported config format file, return OK.
+    return LLBC_OK;
 }
 
 __LLBC_NS_END
