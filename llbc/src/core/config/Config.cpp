@@ -66,13 +66,11 @@ int LLBC_Config::AddFile(const LLBC_String &file)
 int LLBC_Config::Initialize()
 {
     std::map<LLBC_String, LLBC_JsonValue *>::iterator iter = _values.begin();
-    for (; iter != _values.end(); iter ++)
-    {
+    for (; iter != _values.end(); iter++)
         LLBC_XDelete(iter->second);
-    }
 
     iter = _values.begin();
-    for (; iter != _values.end(); iter ++)
+    for (; iter != _values.end(); iter++)
     {
         const LLBC_String &fileName = iter->first;
 
@@ -113,9 +111,7 @@ const LLBC_String &LLBC_Config::GetError() const
 LLBC_JsonValue LLBC_Config::GetJsonValue(const LLBC_String &file, const char *field) const
 {
     if (!field)
-    {
         field = ".";
-    }
 
     std::map<LLBC_String, LLBC_JsonValue *>::const_iterator iter = _values.find(file);
     if (iter == _values.end() || !iter->second)
@@ -134,17 +130,13 @@ std::vector<LLBC_JsonValue> LLBC_Config::GetJsonValueArray(const LLBC_String &fi
 {
     LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::vector<LLBC_JsonValue>();
-    }
 
     std::vector<LLBC_JsonValue> values;
 
     LLBC_JsonValueIter jsonIter = value.begin();
-    for (; jsonIter != value.end(); jsonIter ++)
-    {
+    for (; jsonIter != value.end(); jsonIter++)
         values.push_back(*jsonIter);
-    }
 
     return values;
 }
@@ -153,14 +145,12 @@ std::map<int, LLBC_JsonValue> LLBC_Config::GetIntJsonMap(const LLBC_String &file
 {
     LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::map<int, LLBC_JsonValue>();
-    }
 
     std::map<int, LLBC_JsonValue> values;
 
     LLBC_JsonValueIter jsonIter = value.begin();
-    for (; jsonIter != value.end(); jsonIter ++)
+    for (; jsonIter != value.end(); jsonIter++)
     {
         const LLBC_JsonValue &key = jsonIter.key();
         values[LLBC_Str2Int32(key.asCString())] = *jsonIter;
@@ -173,14 +163,12 @@ std::map<LLBC_String, LLBC_JsonValue> LLBC_Config::GetStringJsonMap(const LLBC_S
 {
     LLBC_JsonValue value = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::map<LLBC_String, LLBC_JsonValue>();
-    }
 
     std::map<LLBC_String, LLBC_JsonValue> values;
 
     LLBC_JsonValueIter jsonIter = value.begin();
-    for (; jsonIter != value.end(); jsonIter ++)
+    for (; jsonIter != value.end(); jsonIter++)
     {
         const LLBC_JsonValue &key = jsonIter.key();
         values[key.asCString()] = *jsonIter;
@@ -193,9 +181,7 @@ LLBC_Variant LLBC_Config::GetVariantValue(const LLBC_String &file, const char *f
 {
     LLBC_JsonValue json = GetJsonValue(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return LLBC_Variant();
-    }
 
     return LLBC_JVHelper::J2V(json);
 }
@@ -204,15 +190,11 @@ std::vector<LLBC_Variant> LLBC_Config::GetVariantValueArray(const LLBC_String &f
 {
     std::vector<LLBC_JsonValue> jsons = GetJsonValueArray(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::vector<LLBC_Variant>();
-    }
 
     std::vector<LLBC_Variant> variants;
-    for (size_t i = 0; i < jsons.size(); i ++)
-    {
+    for (size_t i = 0; i < jsons.size(); i++)
         variants.push_back(LLBC_JVHelper::J2V(jsons[i]));
-    }
 
     return variants;
 }
@@ -221,17 +203,13 @@ std::map<int, LLBC_Variant> LLBC_Config::GetIntVariantMap(const LLBC_String &fil
 {
     std::map<int, LLBC_JsonValue> jsons = GetIntJsonMap(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::map<int, LLBC_Variant>();
-    }
 
     std::map<int, LLBC_Variant> variants;
     std::map<int, LLBC_JsonValue>::const_iterator iter = jsons.begin();
-    for (; iter != jsons.end(); iter ++)
-    {
+    for (; iter != jsons.end(); iter++)
         variants.insert(std::make_pair(
             iter->first, LLBC_JVHelper::J2V(iter->second)));
-    }
 
     return variants;
 }
@@ -240,17 +218,13 @@ std::map<LLBC_String, LLBC_Variant> LLBC_Config::GetStringVariantMap(const LLBC_
 {
     std::map<LLBC_String, LLBC_JsonValue> jsons = GetStringJsonMap(file, field);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-    {
         return std::map<LLBC_String, LLBC_Variant>();
-    }
 
     std::map<LLBC_String, LLBC_Variant> variants;
     std::map<LLBC_String, LLBC_JsonValue>::const_iterator iter = jsons.begin();
-    for (; iter != jsons.end(); iter ++)
-    {
+    for (; iter != jsons.end(); iter++)
         variants.insert(std::make_pair(
             iter->first, LLBC_JVHelper::J2V(iter->second)));
-    }
 
     return variants;
 }
