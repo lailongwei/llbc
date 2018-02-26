@@ -166,6 +166,15 @@ private:
     }
 };
 
+class TestFacadeFactory : public LLBC_IFacadeFactory
+{
+public:
+    LLBC_IFacade *Create() const
+    {
+        return LLBC_New(TestFacade);
+    }
+};
+
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
@@ -184,7 +193,7 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register facade.
-    TestFacade *facade = _svc->RegisterFacade<TestFacade>();
+    TestFacade *facade = static_cast<TestFacade *>(_svc->RegisterFacade<TestFacadeFactory>());
     // Register coder.
     _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
     // Register status desc(if enabled).

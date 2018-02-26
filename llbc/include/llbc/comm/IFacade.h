@@ -406,6 +406,18 @@ private:
     LLBC_IService *_svc;
 };
 
+/**
+ * \brief The facade factory class encapsulation.
+ */
+class LLBC_EXPORT LLBC_IFacadeFactory
+{
+public:
+    virtual ~LLBC_IFacadeFactory() {  }
+
+public:
+    virtual LLBC_IFacade *Create() const = 0;
+};
+
 __LLBC_NS_END
 
 /**

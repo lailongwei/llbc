@@ -36,6 +36,7 @@ class LLBC_Packet;
 class LLBC_IFacade;
 class LLBC_Session;
 class LLBC_ICoderFactory;
+class LLBC_IFacadeFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
@@ -383,8 +384,9 @@ public:
     /**
      * Register facade.
      */
-    template <typename FacadeCls>
-    FacadeCls *RegisterFacade();
+    template <typename FacadeFactoryCls>
+    LLBC_IFacade *RegisterFacade();
+    virtual LLBC_IFacade *RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
     virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
 
     /**

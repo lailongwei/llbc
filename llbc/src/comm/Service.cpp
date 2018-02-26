@@ -82,6 +82,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 
 , _started(false)
 , _stopping(false)
+, _initingFacade(false)
 
 , _lock()
 , _protoLock()
@@ -565,6 +566,27 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
+LLBC_IFacade *LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
+{
+    if (UNLIKELY(!facadeFactory))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return NULL;
+    }
+
+    LLBC_IFacade *facade = facadeFactory->Create();
+    LLBC_Delete(facadeFactory);
+
+    int ret = RegisterFacade(facade);
+    if (UNLIKELY(ret != LLBC_OK))
+    {
+        LLBC_Delete(facade);
+        return NULL;
+    }
+
+    return facade;
+}
+
 int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
 {
     if (UNLIKELY(!facade))
@@ -629,21 +651,21 @@ std::vector<LLBC_IFacade *> LLBC_Service::GetFacades(const LLBC_String &facadeNa
     return it->second;
 }
 
-int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coder)
+int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory)
 {
-    if (UNLIKELY(!coder))
+    if (UNLIKELY(!coderFactory))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
-    else if (!_coders.insert(std::make_pair(opcode, coder)).second)
+    else if (!_coders.insert(std::make_pair(opcode, coderFactory)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -1446,6 +1468,8 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
 
 void LLBC_Service::InitFacades()
 {
+    _initingFacade = true;
+
     for (_Facades::iterator it = _facades.begin();
          it != _facades.end();
          it++)
@@ -1457,6 +1481,8 @@ void LLBC_Service::InitFacades()
         facade->OnInitialize();
         facade->_inited = true;
     }
+
+    _initingFacade = false;
 }
 
 void LLBC_Service::StartFacades()

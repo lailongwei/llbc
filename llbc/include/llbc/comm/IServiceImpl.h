@@ -26,14 +26,14 @@
 
 __LLBC_NS_BEGIN
 
-template <typename FacadeCls>
-inline FacadeCls *LLBC_IService::RegisterFacade()
+template <typename FacadeFactoryCls>
+inline LLBC_IFacade *LLBC_IService::RegisterFacade()
 {
-    FacadeCls *facade = LLBC_New(FacadeCls);
-    int ret = RegisterFacade(facade);
-    if (ret != LLBC_OK)
+    FacadeFactoryCls *facadeFactory = LLBC_New(FacadeFactoryCls);
+    LLBC_IFacade *facade = RegisterFacade(facadeFactory);
+    if (!facade)
     {
-        LLBC_Delete(facade);
+        LLBC_Delete(facadeFactory);
         return NULL;
     }
 

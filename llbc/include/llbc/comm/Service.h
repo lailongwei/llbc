@@ -264,6 +264,7 @@ public:
     /**
      * Register facade.
      */
+    virtual LLBC_IFacade *RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
 
     /**
@@ -275,7 +276,7 @@ public:
     /**
      * Register coder.
      */
-    virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coder);
+    virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory);
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     /**
@@ -483,6 +484,7 @@ private:
 
     volatile bool _started;
     volatile bool _stopping;
+    bool _initingFacade;
 
     LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;

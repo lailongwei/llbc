@@ -77,6 +77,15 @@ namespace
     private:
         LLBC_Timer *_timer;
     };
+
+    class TestFacadeFactory : public LLBC_IFacadeFactory
+    {
+    public:
+        virtual LLBC_IFacade *Create() const
+        {
+            return LLBC_New(TestFacade);
+        }
+    };
 }
 
 TestCase_Comm_Facade::TestCase_Comm_Facade()
@@ -113,7 +122,7 @@ int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, in
     // Create and init service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
     svc->SetFPS(1);
-    svc->RegisterFacade(LLBC_New(TestFacade));
+    svc->RegisterFacade<TestFacadeFactory>();
 
     LLBC_PrintLine("Start service...");
     svc->Start(10);
@@ -141,7 +150,7 @@ int TestCase_Comm_Facade::TestInExternalDriveService(const LLBC_String &host, in
     // Create and init service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
     svc->SetFPS(1);
-    svc->RegisterFacade(LLBC_New(TestFacade));
+    svc->RegisterFacade<TestFacadeFactory>();
     svc->SetDriveMode(LLBC_IService::ExternalDrive);
 
     LLBC_PrintLine("Start service...");
