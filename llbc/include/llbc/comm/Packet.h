@@ -349,6 +349,12 @@ public:
     void SetEncoder(LLBC_ICoder *encoder);
 
     /**
+     * Give up encoder.
+     * @param[in] LLBC_ICoder * - the already give up encoder object pointer.
+     */
+    LLBC_ICoder *GiveUpEncoder();
+
+    /**
      * Get decoder.
      * @return LLBC_ICoder * - decoder.
      */
@@ -359,6 +365,12 @@ public:
      * @param[in] decoder - decoder.
      */
     void SetDecoder(LLBC_ICoder *decoder);
+
+    /**
+     * Give up decoder.
+     * @return[in] LLBC_ICoder * - the already give up decoder object pointer.
+     */
+    LLBC_ICoder *GiveUpDecoder();
 
     /**
      * Encode packet data.

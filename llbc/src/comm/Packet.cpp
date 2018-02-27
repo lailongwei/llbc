@@ -288,6 +288,14 @@ void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
     _encoder = encoder;
 }
 
+LLBC_ICoder *LLBC_Packet::GiveUpEncoder()
+{
+    LLBC_ICoder *encoder = _encoder;
+    _encoder = NULL;
+
+    return encoder;
+}
+
 LLBC_ICoder *LLBC_Packet::GetDecoder() const
 {
     return _decoder;
@@ -297,6 +305,14 @@ void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
 {
     LLBC_XDelete(_decoder);
     _decoder = decoder;
+}
+
+LLBC_ICoder *LLBC_Packet::GiveUpDecoder()
+{
+    LLBC_ICoder *decoder = _decoder;
+    _decoder = NULL;
+
+    return decoder;
 }
 
 bool LLBC_Packet::Encode()
