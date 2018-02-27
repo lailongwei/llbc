@@ -102,7 +102,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     // Backup all data members & set to NULL.
     This *backParent = _parent;
     LLBC_Variant *backValue = _value;
-	This::Properties *backProperties = _properties;
+    This::Properties *backProperties = _properties;
     LLBC_String backComments = _comments;
 
     _parent = NULL;
@@ -157,7 +157,7 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
         return LLBC_FAILED;
     }
 
-	content.clear();
+    content.clear();
 
     std::vector<const This *> properties;
     CollectValueProperties(properties);
@@ -233,24 +233,24 @@ size_t LLBC_Property::GetPropertyCount() const
 
 LLBC_Strings LLBC_Property::GetPropertyNames(bool nest) const
 {
-	LLBC_Strings names;
-	if (!_properties)
-		return names;
+    LLBC_Strings names;
+    if (!_properties)
+        return names;
 
-	if (!nest)
-	{
-		for (_CIt it = _properties->begin(); it != _properties->end(); it++)
-			names.push_back(it->first);
-	}
-	else
-	{
-		std::vector<const This *> valueProps;
-		CollectValueProperties(valueProps);
-		for (size_t i = 0; i < valueProps.size(); i++)
-			names.push_back(valueProps[i]->GetName());
-	}
+    if (!nest)
+    {
+        for (_CIt it = _properties->begin(); it != _properties->end(); it++)
+            names.push_back(it->first);
+    }
+    else
+    {
+        std::vector<const This *> valueProps;
+        CollectValueProperties(valueProps);
+        for (size_t i = 0; i < valueProps.size(); i++)
+            names.push_back(valueProps[i]->GetName());
+    }
 
-	return names;
+    return names;
 }
 
 LLBC_Variant LLBC_Property::GetValue(const LLBC_String &name,
@@ -359,8 +359,8 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
         LLBC_Delete(prop);
         _properties->erase(it);
 
-		if (_properties->size() == 0)
-			LLBC_XDelete(_properties);
+        if (_properties->size() == 0)
+            LLBC_XDelete(_properties);
 
         return LLBC_OK;
     }
@@ -442,7 +442,7 @@ void LLBC_Property::Cleanup()
 
     CleanupComments();
 
-	_comments.clear();
+    _comments.clear();
 }
 
 void LLBC_Property::CleanupValue()
@@ -469,11 +469,11 @@ void LLBC_Property::ExpandProperties(const LLBC_String &name)
         LLBC_Property *prop = LLBC_New1(LLBC_Property, this);
         it = _properties->insert(std::make_pair(topName, prop)).first;
     }
-	else
-	{
+    else
+    {
         it->second->CleanupValue();
         it->second->CleanupComments();
-	}
+    }
 
     if (names.size() == 2)
         it->second->ExpandProperties(names[1]);
@@ -490,26 +490,26 @@ bool LLBC_Property::CheckName(const LLBC_String &name, bool allowSeparator) cons
     {
         const char &ch = *it;
         if (ch == This::NameSeparator)
-		{
-			if (!allowSeparator)
-				return false;
-			else
-				continue;
-		}
+        {
+            if (!allowSeparator)
+                return false;
+            else
+                continue;
+        }
 
         if (!((ch >= 'a' && ch <= 'z') ||
-			(ch >= 'A' && ch <= 'Z') ||
-			(ch >= '0' && ch <= '9') ||
-			ch == '_'))
+            (ch >= 'A' && ch <= 'Z') ||
+            (ch >= '0' && ch <= '9') ||
+            ch == '_'))
             return false;
     }
 
     const LLBC_Strings names = name.split(This::NameSeparator);
     for (size_t i = 0; i < names.size(); i++)
-	{
+    {
         if (names[i].empty())
             return false;
-	}
+    }
 
     return true;
 }
@@ -609,7 +609,7 @@ LLBC_String LLBC_Property::SerializeValue() const
     static const LLBC_Variant nilValue;
     const LLBC_Variant &value = (_value ? *_value : nilValue);
 
-	LLBC_String valueStr;
+    LLBC_String valueStr;
     if (!value.IsNil())
         valueStr.append_format("%s", value.ValueToString()
                 .escape(This::EscapeChars, This::EscapeChar).c_str());
@@ -628,10 +628,10 @@ LLBC_String LLBC_Property::SerializeValue() const
 void LLBC_Property::CollectValueProperties(std::vector<const This *> &properties) const
 {
     if (!_properties)
-	{
+    {
         properties.push_back(this);
-		return;
-	}
+        return;
+    }
 
     for (_CIt it = _properties->begin();
          it != _properties->end();
