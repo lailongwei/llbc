@@ -684,7 +684,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -710,7 +710,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *de
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -738,7 +738,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> 
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -767,7 +767,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -794,7 +794,7 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, 
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -834,7 +834,7 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (_started)
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -856,7 +856,7 @@ int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
 int LLBC_Service::EnableTimerScheduler()
 {
     LLBC_LockGuard guard(_lock);
-    if (_started)
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -874,7 +874,7 @@ int LLBC_Service::EnableTimerScheduler()
 int LLBC_Service::DisableTimerScheduler()
 {
     LLBC_LockGuard guard(_lock);
-    if (_started)
+    if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
