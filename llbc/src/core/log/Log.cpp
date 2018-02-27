@@ -81,6 +81,16 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
 
+int LLBC_LogHelper::init(const LLBC_String &cfgFile)
+{
+    return LLBC_LoggerManagerSingleton->Initialize(cfgFile);
+}
+
+void LLBC_LogHelper::destroy()
+{
+    LLBC_LoggerManagerSingleton->Finalize();
+}
+
 void LLBC_LogHelper::Initialize(LLBC_LoggerManager *loggerManager)
 {
     if (UNLIKELY(_rootLogger))

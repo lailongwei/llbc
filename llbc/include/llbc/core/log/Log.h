@@ -59,6 +59,13 @@ class LLBC_EXPORT LLBC_LogHelper
 {
 public:
     /**
+     * Logger initialize/finalize support.
+     */
+    static int init(const LLBC_String &cfgFile);
+    static void destroy();
+
+public:
+    /**
      * Output debug level message.
      */
     static void d(const char *fmt, ...);
