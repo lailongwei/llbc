@@ -227,13 +227,13 @@ inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int op
 template <typename T>
 inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, const T &data)
 {
-    Multicast<T>(0, sessionIds, 0, data, 0);
+    return Multicast<T>(0, sessionIds, 0, data, 0);
 }
 
 template <typename T>
 inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data)
 {
-    Multicast<T>(0, sessionIds, opcode, data, 0);
+    return Multicast<T>(0, sessionIds, opcode, data, 0);
 }
 
 template <typename T>
