@@ -180,8 +180,6 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 
             // Reset the header assembler.
             _headerAssembler.Reset();
-            if (headerUsed == readableSize) // If readable size equal headerUsed, just return.
-                return LLBC_OK;
 
             // Offset the readable buffer pointer and modify readable size value.
             readableBuf += headerUsed;
