@@ -152,38 +152,6 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void 
     return Send(packet);
 }
 
-template <typename T>
-inline int LLBC_IService::Send(int sessionId, const T &data)
-{
-    return Send<T>(0, sessionId, 0, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Send(int sessionId, int opcode, const T &data)
-{
-    return Send<T>(0, sessionId, opcode, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Send(int sessionId, int opcode, const T &data, int status)
-{
-    return Send<T>(0, sessionId, opcode, data, status);
-}
-
-template <typename T>
-inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const T &data, int status)
-{
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
-    if (GetType() == Raw)
-        packet->SetSessionId(sessionId);
-    else
-        packet->SetHeader(svcId, sessionId, opcode, status);
-
-    *packet <<data;
-
-    return Send(packet);
-}
-
 inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds)
 {
     return Multicast(0, sessionIds, 0, static_cast<LLBC_ICoder *>(NULL), 0);
@@ -224,36 +192,6 @@ inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int op
     return Multicast(0, sessionIds, opcode, bytes, len, status);
 }
 
-template <typename T>
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, const T &data)
-{
-    return Multicast<T>(0, sessionIds, 0, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data)
-{
-    return Multicast<T>(0, sessionIds, opcode, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status)
-{
-    return Multicast(0, sessionIds, opcode, data, status);
-}
-
-template <typename T>
-inline int LLBC_IService::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status)
-{
-    LLBC_Stream stream;
-    stream.Write(data);
-
-    const void *bytes = stream.GetBuf();
-    const size_t len = stream.GetPos();
-
-    return Multicast(svcId, sessionIds, opcode, bytes, len, status);
-}
-
 inline int LLBC_IService::Broadcast()
 {
     return Broadcast(0, 0, static_cast<LLBC_ICoder *>(NULL), 0);
@@ -277,36 +215,6 @@ inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len)
 inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, int status)
 {
     return Broadcast(0, opcode, bytes, len, status);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast(const T &data)
-{
-    return Broadcast<T>(0, 0, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast(int opcode, const T &data)
-{
-    return Broadcast<T>(0, opcode, data, 0);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast(int opcode, const T &data, int status)
-{
-    return Broadcast<T>(0, opcode, data, status);
-}
-
-template <typename T>
-inline int LLBC_IService::Broadcast(int svcId, int opcode, const T &data, int status)
-{
-    LLBC_Stream stream;
-    stream.Write(data);
-
-    const void *bytes = stream.GetBuf();
-    const size_t len = stream.GetPos();
-
-    return Broadcast(svcId, opcode, bytes, len, status);
 }
 
 inline int LLBC_IService::Subscribe(int opcode, void(*func)(LLBC_Packet &))

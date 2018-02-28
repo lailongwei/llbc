@@ -253,23 +253,6 @@ public:
     virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status);
     virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status);
 
-    /**
-     * Send data(the template methods will automatics create packet to send).
-     * @param[in] sessionId - the session Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] data      - the data.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename T>
-    int Send(int sessionId, const T &data);
-    template <typename T>
-    int Send(int sessionId, int opcode, const T &data);
-    template <typename T>
-    int Send(int sessionId, int opcode, const T &data, int status);
-    template <typename T>
-    int Send(int svcId, int sessionId, int opcode, const T &data, int status);
-
 public:
     /** 
      * Multicast data(these methods will automatics create packet to send).
@@ -306,23 +289,6 @@ public:
     virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
 
-    /**
-     * Multicast data(these template methods will automatics create packet to send).
-     * @param[in] sessionIds - the session Ids.
-     * @param[in] opcode     - the opcode.
-     * @param[in] data       - the data.
-     * @param[in] status     - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename T>
-    int Multicast(const LLBC_SessionIdList &sessionIds, const T &data);
-    template <typename T>
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data);
-    template <typename T>
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status);
-    template <typename T>
-    int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const T &data, int status);
-
     /** 
      * Broadcast data(these methods will automatics create packet to send).
      * Note: 
@@ -354,23 +320,6 @@ public:
     virtual int Broadcast(int opcode, const void *bytes, size_t len);
     virtual int Broadcast(int opcode, const void *bytes, size_t len, int status);
     virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status) = 0;
-
-    /**
-     * Broadcast data(these template methods will automatics create packet to send).
-     * @param[in] sessionIds - the session Ids.
-     * @param[in] opcode     - the opcode.
-     * @param[in] data       - the data.
-     * @param[in] status     - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename T>
-    int Broadcast(const T &data);
-    template <typename T>
-    int Broadcast(int opcode, const T &data);
-    template <typename T>
-    int Broadcast(int opcode, const T &data, int status);
-    template <typename T>
-    int Broadcast(int svcId, int opcode, const T &data, int status);
 
     /**
      * Remove session, always success.
