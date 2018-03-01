@@ -132,6 +132,30 @@ public:
      */
     const LLBC_Property &GetPropertyConfig() const;
 
+    /**
+     * Reload application ini format config.
+     * @param[in] configPath - the config file path.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReloadIniConfig();
+    int ReloadIniConfig(const LLBC_String &configPath);
+
+    /**
+     * Reload application json format config.
+     * @param[in] configPath - the config file path.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReloadJsonConfig();
+    int ReloadJsonConfig(const LLBC_String &configPath);
+
+    /**
+     * Reload application property format config.
+     * @param[in] configPath - the config file path.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReloadPropertyConfig();
+    int ReloadPropertyConfig(const LLBC_String &configPath);
+
 public:
     /**
      * Get service.
@@ -156,8 +180,9 @@ public:
     int Send(LLBC_Packet *packet);
 
 private:
-    int TryLoadConfig();
-    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded);
+    int TryLoadConfig(bool tryIni = true, bool tryJson = true, bool tryCfg = true);
+    int TryLoadConfig(bool &loaded, bool tryIni = true, bool tryJson = true, bool tryCfg = true);
+    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded, bool tryIni = true, bool tryJson = true, bool tryCfg = true);
 
 protected:
     LLBC_String _name;

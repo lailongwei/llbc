@@ -185,6 +185,99 @@ const LLBC_Property &LLBC_BaseApplication::GetPropertyConfig() const
     return _propertyConfig;
 }
 
+int LLBC_BaseApplication::ReloadIniConfig()
+{
+    bool loaded = false;
+    if (TryLoadConfig(loaded, true, false, false) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::ReloadIniConfig(const LLBC_String &configPath)
+{
+    bool loaded = false;
+    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
+    if (TryLoadConfig(splited[0], loaded, true, false, false) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::ReloadJsonConfig()
+{
+    bool loaded = false;
+    if (TryLoadConfig(loaded, false, true, false) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::ReloadJsonConfig(const LLBC_String &configPath)
+{
+    bool loaded = false;
+    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
+    if (TryLoadConfig(splited[0], loaded, false, true, false) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::ReloadPropertyConfig()
+{
+    bool loaded = false;
+    if (TryLoadConfig(loaded, false, false, true) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_BaseApplication::ReloadPropertyConfig(const LLBC_String &configPath)
+{
+    bool loaded = false;
+    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
+    if (TryLoadConfig(splited[0], loaded, false, false, true) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (!loaded)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 LLBC_IService *LLBC_BaseApplication::GetService(int id) const
 {
     return _services.GetService(id);
@@ -207,8 +300,16 @@ int LLBC_BaseApplication::Send(LLBC_Packet *packet)
     return service->Send(packet);
 }
 
-int LLBC_BaseApplication::TryLoadConfig()
+int LLBC_BaseApplication::TryLoadConfig(bool tryIni, bool tryJson, bool tryCfg)
 {
+    bool loaded = false;
+    return TryLoadConfig(loaded, tryIni, tryJson, tryCfg);
+}
+
+int LLBC_BaseApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
+{
+    loaded = false;
+
     // Build all try paths.
     LLBC_Strings tryPaths;
     tryPaths.push_back("Config/" + _name);
@@ -224,12 +325,11 @@ int LLBC_BaseApplication::TryLoadConfig()
         tryPaths.push_back("../" + tryPaths[i]);
 
     // Try load.
-    bool loaded = false;
     for (LLBC_Strings::const_iterator iter = tryPaths.begin();
         iter != tryPaths.end();
         iter++)
     {
-        if (TryLoadConfig(*iter, loaded) != LLBC_OK)
+        if (TryLoadConfig(*iter, loaded, tryIni, tryJson, tryCfg) != LLBC_OK)
             return LLBC_FAILED;
 
         if (loaded)
@@ -239,42 +339,48 @@ int LLBC_BaseApplication::TryLoadConfig()
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::TryLoadConfig(const LLBC_String &path, bool &loaded)
+int LLBC_BaseApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
 {
     loaded = false;
 
     // Try load ini config file.
-    const LLBC_String iniPath = path + ".ini";
-    if (LLBC_File::Exists(iniPath))
+    if (tryIni)
     {
-        if (_iniConfig.LoadFromFile(iniPath) != LLBC_OK)
-            return LLBC_FAILED;
+        const LLBC_String iniPath = path + ".ini";
+        if (LLBC_File::Exists(iniPath))
+        {
+            if (_iniConfig.LoadFromFile(iniPath) != LLBC_OK)
+                return LLBC_FAILED;
 
-        loaded = true;
-        return LLBC_OK;
+            loaded = true;
+        }
     }
 
     // Try load json config file.
-    const LLBC_String jsonPath = path + ".json";
-    if (LLBC_File::Exists(jsonPath))
+    if (tryJson)
     {
-        _jsonConfig.AddFile(jsonPath);
-        if (_jsonConfig.Initialize() != LLBC_OK)
-            return LLBC_FAILED;
+        const LLBC_String jsonPath = path + ".json";
+        if (LLBC_File::Exists(jsonPath))
+        {
+            _jsonConfig.AddFile(jsonPath);
+            if (_jsonConfig.Initialize() != LLBC_OK)
+                return LLBC_FAILED;
 
-        loaded = true;
-        return LLBC_OK;
+            loaded = true;
+        }
     }
 
     // Try load property config file.
-    const LLBC_String propPath = path + ".cfg";
-    if (LLBC_File::Exists(propPath))
+    if (tryCfg)
     {
-        if (_propertyConfig.LoadFromFile(propPath) != LLBC_OK)
-            return LLBC_FAILED;
+        const LLBC_String propPath = path + ".cfg";
+        if (LLBC_File::Exists(propPath))
+        {
+            if (_propertyConfig.LoadFromFile(propPath) != LLBC_OK)
+                return LLBC_FAILED;
 
-        loaded = true;
-        return LLBC_OK;
+            loaded = true;
+        }
     }
 
     // Finally, not found any llbc library supported config format file, return OK.
