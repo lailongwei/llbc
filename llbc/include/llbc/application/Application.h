@@ -107,6 +107,12 @@ public:
      */
     const LLBC_String &GetName() const;
 
+    /**
+     * Get startup arguments.
+     * @return const LLBC_StartArgs & - the startup arguments(llbc library wrapped object const reference).
+     */
+    const LLBC_StartArgs &GetStartArgs() const;
+
 public:
     /**
      * Get application ini format config.
@@ -165,6 +171,7 @@ protected:
 private:
     volatile bool _started;
     bool _waited;
+    LLBC_StartArgs _startArgs;
 
     static LLBC_BaseApplication *_thisApp;
 };

@@ -92,6 +92,10 @@ int LLBC_BaseApplication::Start(const LLBC_String &name, int argc, char *argv[])
         return LLBC_FAILED;
     }
 
+    // Parse startup arguments.
+    if (_startArgs.Parse(argc, argv) != LLBC_OK)
+        return LLBC_FAILED;
+
     // Startup llbc library.
     if (LLBC_Startup() != LLBC_OK)
     {
@@ -159,6 +163,11 @@ void LLBC_BaseApplication::Stop()
 const LLBC_String &LLBC_BaseApplication::GetName() const
 {
     return _name;
+}
+
+const LLBC_StartArgs &LLBC_BaseApplication::GetStartArgs() const
+{
+    return _startArgs;
 }
 
 const LLBC_Ini &LLBC_BaseApplication::GetIniConfig() const
