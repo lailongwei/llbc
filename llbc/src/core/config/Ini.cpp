@@ -143,6 +143,9 @@ int LLBC_Ini::LoadFromFile(const LLBC_String &file)
 
 int LLBC_Ini::LoadFromContent(const LLBC_String &content)
 {
+    LLBC_STLHelper::DeleteContainer(_sections, true);
+    _sectionNames.clear();
+
     LLBC_String sectionName;
     const LLBC_Strings lines = content.split("\n");
     for (size_t i = 0; i < lines.size(); i++)
