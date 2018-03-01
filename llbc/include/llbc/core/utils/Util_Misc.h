@@ -24,10 +24,81 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/variant/Variant.h"
+
 __LLBC_NS_BEGIN
 
-__LLBC_NS_END
+/**
+ * \brief The startup arguments class encapsulation.
+ */
+class LLBC_EXPORT LLBC_StartArgs
+{
+public:
+    LLBC_StartArgs();
+    virtual ~LLBC_StartArgs();
 
-#include "llbc/core/utils/Util_MiscImpl.h"
+public:
+    /**
+     * Parse startup arguments.
+     * @param[in] argc - the startup argument count.
+     * @param[in] argv - the startup arguments detail.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Parse(int argc, char *argv[]);
+
+    /**
+     * Check arguments already parsed or not.
+     */
+    virtual bool IsParsed() const;
+
+public:
+    /**
+     * Get module file path.
+     * @return const LLBC_String & - the module file path.
+     */
+    const LLBC_String &GetModuleFilePath()const;
+
+    /**
+     * Get startup arguments count.
+     * @return size_t - the startup arguments count.
+     */
+    size_t GetArgumentsCount() const;
+    /**
+     * Get all startup arguments.
+     * @return std::vector<LLBC_Variant> & - the all startup arguments.
+     */
+    const std::vector<LLBC_Variant> &GetAllArguments() const;
+
+    /**
+     * Get startup naming arguments count.
+     * @return size_t - the naming startup arguments count.
+     */
+    size_t GetNamingArgumentsCount() const;
+    /**
+     * Get all naming startup arguments.
+     * @return std::map<LLBC_String, LLBC_Variant> & - the all naming startup arguments.
+     */
+    const std::map<LLBC_String, LLBC_Variant> &GetAllNamingArguments() const;
+
+public:
+    /**
+     * Subscript operations support.
+     */
+    const LLBC_Variant &operator [](size_t index) const;
+    const LLBC_Variant &operator [](const LLBC_String &key) const;
+
+    LLBC_DISABLE_ASSIGNMENT(LLBC_StartArgs);
+
+private:
+    bool _parsed;
+
+    LLBC_String _moduleFilePath;
+    typedef std::vector<LLBC_Variant> _SeqArgs;
+    _SeqArgs _seqArgs;
+    typedef std::map<LLBC_String, LLBC_Variant> _NamingArgs;
+    _NamingArgs _namingArgs;
+};
+
+__LLBC_NS_END
 
 #endif // !__LLBC_CORE_UTILS_UTIL_MISC_H__
