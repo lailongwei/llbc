@@ -214,12 +214,12 @@ private:
     void CollectValueProperties(std::vector<const This *> &properties) const;
 
 private:
-	LLBC_Property *_parent;
+    LLBC_Property *_parent;
 
-	LLBC_Variant *_value;
-	Properties *_properties;
+    LLBC_Variant *_value;
+    Properties *_properties;
 
-	LLBC_String _comments;
+    LLBC_String _comments;
 
 private:
     LLBC_String _errMsg;
