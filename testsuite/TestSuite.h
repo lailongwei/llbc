@@ -52,6 +52,7 @@
 #include "core/event/TestCase_Core_Event.h"
 #include "core/thread/TestCase_Core_Thread_Lock.h"
 #include "core/thread/TestCase_Core_Thread_RWLock.h"
+#include "core/thread/TestCase_Core_Thread_Guard.h"
 #include "core/thread/TestCase_Core_Thread_CV.h"
 #include "core/thread/TestCase_Core_Thread_Semaphore.h"
 #include "core/thread/TestCase_Core_Thread_Tls.h"

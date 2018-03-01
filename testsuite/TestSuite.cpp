@@ -59,8 +59,9 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_Event;
     // test = new TestCase_Core_Config_Property;
     // test = new TestCase_Core_Thread_Lock;
-    // test = new TestCase_Core_Thread_CV;
     // test = new TestCase_Core_Thread_RWLock;
+    // test = new TestCase_Core_Thread_Guard;
+    // test = new TestCase_Core_Thread_CV;
     // test = new TestCase_Core_Thread_Semaphore;
     // test = new TestCase_Core_Thread_Tls;
     // test = new TestCase_Core_Thread_ThreadMgr;

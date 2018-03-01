@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/utils/TestCase_Core_Utils_Misc.h"
+#include "core/thread/TestCase_Core_Thread_Guard.h"
 
 namespace
 {
@@ -40,38 +40,37 @@ namespace
     };
 }
 
-int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
+TestCase_Core_Thread_Guard::TestCase_Core_Thread_Guard()
 {
-    std::cout <<"core/utils/Util_Misc test:" <<std::endl;
-    TestStartArgs(argc, argv);
+}
+
+TestCase_Core_Thread_Guard::~TestCase_Core_Thread_Guard()
+{
+}
+
+int TestCase_Core_Thread_Guard::Run(int argc, char *argv[])
+{
+    std::cout <<"core/thread/guard test:" <<std::endl;
+    TestGuardFunc();
+    TestGuardMeth();
 
     std::cout <<"Press any key to continue...";
     getchar();
 
-    return LLBC_OK;
+    return 0;
 }
 
-int TestCase_Core_Utils_Misc::TestStartArgs(int argc, char *argv[])
+void TestCase_Core_Thread_Guard::TestGuardFunc()
 {
-    std::cout <<"test startargs:" <<std::endl;
-    LLBC_StartArgs startArgs;
-    int ret = startArgs.Parse(argc, argv);
-    if (ret != LLBC_OK)
+    std::cout <<"Guard Function test:" <<std::endl;
+    LLBC_InvokeGuard guard(&GuardFunc, (void *)0x01);
+}
+
+void TestCase_Core_Thread_Guard::TestGuardMeth()
+{
+    std::cout <<"Guard Method test:" <<std::endl;
+    GuardCls obj;
     {
-        std::cerr << "Failed to parse startup arguments, error: " << LLBC_FormatLastError() << std::endl;
-        return -1;
+        LLBC_InvokeGuard guard(&obj, &GuardCls::GuardMeth, (void *)0x02);
     }
-
-    std::cout <<"Module file path: " <<startArgs.GetModuleFilePath() <<std::endl;
-    std::cout <<"Arguments(total:" <<startArgs.GetArgumentsCount() <<"):" <<std::endl;
-    for (size_t i = 0; i < startArgs.GetArgumentsCount(); i++)
-        std::cout <<"  " <<i <<startArgs[i] <<std::endl;
-
-    std::cout <<"Naming startup arguments(total:" <<startArgs.GetNamingArgumentsCount() <<"):" <<std::endl;
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator it = startArgs.GetAllNamingArguments().begin();
-         it != startArgs.GetAllNamingArguments().end();
-         it++)
-        std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
-
-    return 0;
 }
