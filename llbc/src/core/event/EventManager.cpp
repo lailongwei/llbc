@@ -52,7 +52,7 @@ LLBC_EventManager::~LLBC_EventManager()
     {
         _Op &op = *it;
         if (op.listener.listener2)
-            delete op.listener.listener2;
+            LLBC_Delete(op.listener.listener2);
     }
 
     for (_ListenersMap::iterator mIt = _listeners.begin();
@@ -66,7 +66,7 @@ LLBC_EventManager::~LLBC_EventManager()
         {
             _Listener &listener = *lIt;
             if (listener.listener2)
-                delete listener.listener2;
+                LLBC_Delete(listener.listener2);
         }
     }
 }
@@ -130,7 +130,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     {
         if (SearchStub(bindedStub))
         {
-            delete listener;
+            LLBC_Delete(listener);
 
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_INVALID_LISTENER_STUB;
@@ -224,7 +224,7 @@ void LLBC_EventManager::FireEvent(LLBC_Event *event)
         }
     }
 
-    delete event;
+    LLBC_Delete(event);
     AfterFireEvent();
 }
 

@@ -19,20 +19,24 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_COMM_EVENT_H__
-#define __LLBC_TEST_CASE_COMM_EVENT_H__ 
+#ifdef __LLBC_CORE_EVENT_EVENT_H__
 
-#include "llbc.h"
-using namespace llbc;
+__LLBC_NS_BEGIN
 
-class TestCase_Comm_Event : public LLBC_BaseTestCase
+template <typename ParamType>
+inline LLBC_Event &LLBC_Event::AddParam(const ParamType &param)
 {
-public:
-    TestCase_Comm_Event();
-    virtual ~TestCase_Comm_Event();
+    const LLBC_Variant varParam(param);
+    return AddParam(varParam);
+}
 
-public:
-    virtual int Run(int argc, char *argv[]);
-};
+template <typename ParamType>
+inline LLBC_Event &LLBC_Event::AddParam(const LLBC_String &key, const ParamType &param)
+{
+    const LLBC_Variant varParam(param);
+    return AddParam(key, varParam);
+}
 
-#endif // !__LLBC_TEST_CASE_COMM_EVENT_H__
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_EVENT_EVENT_H__

@@ -56,6 +56,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_Config_Ini;
     // test = new TestCase_Core_Config_Config;
     // test = new TestCase_Core_Time_Time;
+    // test = new TestCase_Core_Event;
     // test = new TestCase_Core_Config_Property;
     // test = new TestCase_Core_Thread_Lock;
     // test = new TestCase_Core_Thread_CV;
@@ -78,7 +79,7 @@ int TestSuite_Main(int argc, char *argv[])
 #endif // LLBC_CFG_OBJBASE_ENABLED
 
     /* Communication module testcases. */
-    // test = new TestCase_Comm_Event;
+    // test = new TestCase_Comm_EventInSvc;
     // test = new TestCase_Comm_Timer;
     // test = new TestCase_Comm_PacketOp;
 #if LLBC_CFG_OBJBASE_ENABLED

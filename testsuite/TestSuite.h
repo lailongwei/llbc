@@ -49,6 +49,7 @@
 #include "core/config/TestCase_Core_Config_Config.h"
 #include "core/config/TestCase_Core_Config_Property.h"
 #include "core/time/TestCase_Core_Time_Time.h"
+#include "core/event/TestCase_Core_Event.h"
 #include "core/thread/TestCase_Core_Thread_Lock.h"
 #include "core/thread/TestCase_Core_Thread_RWLock.h"
 #include "core/thread/TestCase_Core_Thread_CV.h"
@@ -66,7 +67,7 @@
 #include "objbase/TestCase_ObjBase_Array.h"
 #include "objbase/TestCase_ObjBase_Dictionary.h"
 
-#include "comm/TestCase_Comm_Event.h"
+#include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"
 #include "comm/TestCase_Comm_PacketOp.h"
 #include "comm/TestCase_Comm_ReleasePool.h"
