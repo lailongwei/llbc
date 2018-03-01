@@ -84,6 +84,9 @@ project "llbc"
     language "c++"
     kind "SharedLib"
 
+    -- symbols
+    symbols "On"
+
     -- files
     files {
         "../../llbc/**.h",
@@ -141,6 +144,9 @@ project "testsuite"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
+
+    -- symbols
+    symbols "On"
 
     -- dependents
     dependson {
@@ -221,6 +227,9 @@ project "pyllbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- symbols
+    symbols "On"
 
     -- dependents
     dependson {
@@ -335,6 +344,9 @@ project "csllbc_native"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- symbols
+    symbols "On"
 
     -- dependents
     dependson {
@@ -491,6 +503,9 @@ project "lullbc_lualib"
     language "c++"
     kind "SharedLib"
 
+    -- symbols
+    symbols "On"
+
     -- files
     files {
         LUA_SRC_PATH .. "/*.h",
@@ -533,6 +548,9 @@ project "lullbc_luaexec"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
+
+    -- symbols
+    symbols "On"
 
     -- files
     files {
@@ -591,6 +609,9 @@ project "lullbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- symbols
+    symbols "On"
 
     -- dependents
     dependson {
