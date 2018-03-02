@@ -88,6 +88,19 @@ public:
      */
     virtual int Recv(void *in, void *&out, bool &removeSession) = 0;
 
+protected:
+    /**
+     * Get protocol stack.
+     * @return LLBC_ProtocolStack * - the protocol stack.
+     */
+    LLBC_ProtocolStack *GetStack();
+
+    /**
+     * Get session Id.
+     * @return int - the session Id.
+     */
+    int GetSessionId() const;
+
 private:
     /**
      * Friend class: LLBC_ProtocolStack.

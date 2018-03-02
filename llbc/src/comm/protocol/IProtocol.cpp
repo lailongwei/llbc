@@ -41,6 +41,16 @@ LLBC_IProtocol::~LLBC_IProtocol()
 {
 }
 
+LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
+{
+    return _stack;
+}
+
+int LLBC_IProtocol::GetSessionId() const
+{
+    return _sessionId;
+}
+
 void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
 {
     _stack = stack;
