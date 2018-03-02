@@ -35,10 +35,15 @@
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceMgr.h"
+
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
-#include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/IProtocolFactory.h"
+#include "llbc/comm/protocol/RawProtocol.h"
+#include "llbc/comm/protocol/PacketProtocol.h"
+#include "llbc/comm/protocol/CompressProtocol.h"
+#include "llbc/comm/protocol/CodecProtocol.h"
+#include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/IProtocolFilter.h"
 
 __LLBC_NS_BEGIN
