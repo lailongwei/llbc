@@ -51,12 +51,14 @@ int TestCase_Core_Utils_Coder::Run(int argc, char *argv[])
 
     // Test host <-> net.
     int data = 0x01020304;
-    LLBC_PrintLine("host to net test, host: 0x%08x, net: 0x%08x",
-        data, LLBC_Host2Net2(data));
+    LLBC_PrintLine("host to net test, host: 0x%08x, net: 0x%08x", data, LLBC_Host2Net2(data));
     LLBC_Host2Net(data);
-    LLBC_PrintLine("net to host test, net: 0x%08x, host: 0x%08x",
-        data, LLBC_Net2Host2(data));
+    LLBC_PrintLine("net to host test, net: 0x%08x, host: 0x%08x", data, LLBC_Net2Host2(data));
     LLBC_PrintLine("");
+    sint64 longData = 0x0506070801020304L;
+    LLBC_PrintLine("host to net test(long data), host: 0x%16llx, net: 0x%16llx", longData, LLBC_Host2Net2(longData));
+    LLBC_Host2Net(longData);
+    LLBC_PrintLine("net to host test, net: 0x%16llx, host: 0x%16llx", longData, LLBC_Net2Host2(longData));
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

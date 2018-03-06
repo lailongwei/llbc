@@ -40,6 +40,7 @@
 #include "core/utils/TestCase_Core_Utils_MD5.h"
 #include "core/utils/TestCase_Core_Utils_Misc.h"
 #include "core/utils/TestCase_Core_Utils_Network.h"
+#include "core/utils/TestCase_Core_Utils_Coder.h"
 #include "core/helper/TestCase_Core_Helper_JVHelper.h"
 #include "core/helper/TestCase_Core_Helper_StlHelper.h"
 #include "core/file/TestCase_Core_File_File.h"

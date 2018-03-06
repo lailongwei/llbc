@@ -45,11 +45,67 @@ inline T LLBC_ReverseBytes2(const T &val)
     return reversedVal;
 }
 
+template <>
+inline void LLBC_Net2Host<sint64>(sint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    val = static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
+}
+
+template <>
+inline void LLBC_Net2Host<uint64>(uint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    val = (static_cast<uint64>(part2) << 32) | part1;
+}
+
 template <typename T>
 inline void LLBC_Net2Host(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
+}
+
+template <>
+inline sint64 LLBC_Net2Host2<sint64>(const sint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return val;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    return static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
+}
+
+template <>
+inline uint64 LLBC_Net2Host2<uint64>(const uint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return val;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    return (static_cast<uint64>(part2) << 32) | part1;
 }
 
 template <typename T>
@@ -61,11 +117,67 @@ inline T LLBC_Net2Host2(const T &val)
     return val;
 }
 
+template <>
+inline void LLBC_Host2Net<sint64>(sint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    val = static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
+}
+
+template <>
+inline void LLBC_Host2Net<uint64>(uint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    val = (static_cast<uint64>(part2) << 32) | part1;
+}
+
 template <typename T>
 inline void LLBC_Host2Net(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
+}
+
+template <>
+inline sint64 LLBC_Host2Net2<sint64>(const sint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return val;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    return static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
+}
+
+template <>
+inline uint64 LLBC_Host2Net2<uint64>(const uint64 &val)
+{
+    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
+        return val;
+
+    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
+    uint32 part2 = static_cast<uint32>(val >> 32);
+
+    LLBC_Net2Host<uint32>(part1);
+    LLBC_Net2Host<uint32>(part2);
+    return (static_cast<uint64>(part2) << 32) | part1;
 }
 
 template <typename T>

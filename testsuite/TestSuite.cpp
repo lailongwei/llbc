@@ -48,6 +48,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = new TestCase_Core_Utils_MD5;
     // test = new TestCase_Core_Utils_Misc;
     // test = new TestCase_Core_Utils_Network;
+    // test = new TestCase_Core_Utils_Coder;
     // test = new TestCase_Core_Helper_JVHelper;
     // test = new TestCase_Core_Helper_StlHelper;
     // test = new TestCase_Core_File_File;
