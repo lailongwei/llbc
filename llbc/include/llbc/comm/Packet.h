@@ -43,7 +43,7 @@ class LLBC_EXPORT LLBC_Packet
 {
 public:
     LLBC_Packet();
-    ~LLBC_Packet();
+    virtual ~LLBC_Packet();
 
 public:
     /**
