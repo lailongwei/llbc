@@ -39,7 +39,7 @@ namespace
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const size_t __llbc_headerLen = 20;
+static const size_t __llbc_headerLen = 28;
 
 void inline __DelBlock(void *data)
 {
@@ -106,6 +106,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
     int senderServiceId = packet->GetSenderServiceId();
     int recverServiceId = packet->GetRecverServiceId();
     uint16 flags = static_cast<uint16>(packet->GetFlags());
+    sint64 extData1 = packet->GetExtData1();
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
     LLBC_Host2Net(length);
@@ -114,6 +115,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
     LLBC_Host2Net(senderServiceId);
     LLBC_Host2Net(recverServiceId);
     LLBC_Host2Net(flags);
+    LLBC_Host2Net(extData1);
 #endif // Net order.
 
     block->Write(&length, sizeof(length));
@@ -122,6 +124,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
     block->Write(&senderServiceId, sizeof(senderServiceId));
     block->Write(&recverServiceId, sizeof(recverServiceId));
     block->Write(&flags, sizeof(flags));
+    block->Write(&extData1, sizeof(extData1));
 
     // Write packet data and delete packet.
     block->Write(packet->GetPayload(), packet->GetPayloadLength());

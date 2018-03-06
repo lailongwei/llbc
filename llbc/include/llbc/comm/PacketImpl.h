@@ -128,6 +128,36 @@ inline void LLBC_Packet::RemoveFlags(int flags)
     SetFlags(_flags & (~flags));
 }
 
+inline const sint64 &LLBC_Packet::GetExtData1() const
+{
+    return _extData1;
+}
+
+inline void LLBC_Packet::SetExtData1(const sint64 &extData1)
+{
+    _extData1 = extData1;
+}
+
+inline const sint64 &LLBC_Packet::GetExtData2() const
+{
+    return _extData2;
+}
+
+inline void LLBC_Packet::SetExtData2(const sint64 &extData2)
+{
+    _extData2 = extData2;
+}
+
+inline const sint64 &LLBC_Packet::GetExtData3() const
+{
+    return _extData3;
+}
+
+inline void LLBC_Packet::SetExtData3(const sint64 &extData3)
+{
+    _extData3 = extData3;
+}
+
 inline void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
 {
     SetSessionId(sessionId);

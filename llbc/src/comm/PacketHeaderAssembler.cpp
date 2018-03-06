@@ -81,6 +81,7 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
     int senderServiceId = *reinterpret_cast<int *>(_header + 10);
     int recverServiceId = *reinterpret_cast<int *>(_header + 14);
     uint16 flags = *reinterpret_cast<uint16 *>(_header + 18);
+    sint64 extData1 = *reinterpret_cast<sint64 *>(_header + 20);
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
     LLBC_Net2Host(len);
@@ -89,6 +90,7 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
     LLBC_Net2Host(senderServiceId);
     LLBC_Net2Host(recverServiceId);
     LLBC_Net2Host(flags);
+    LLBC_Net2Host(extData1);
 #endif
 
     packet.SetLength(len);
@@ -97,6 +99,7 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
     packet.SetSenderServiceId(senderServiceId);
     packet.SetRecverServiceId(recverServiceId);
     packet.SetFlags(flags);
+    packet.SetExtData1(extData1);
 }
 
 __LLBC_NS_END

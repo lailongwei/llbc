@@ -45,6 +45,7 @@ __LLBC_NS_BEGIN
  *   | Sender ServiceId |   10   |   4  |
  *   | Recver ServiceId |   14   |   4  |
  *   |      Flags       |   18   |   2  |
+ *   |     ExtData1     |   20   |   8  |
  *Header total length: 20 bytes.
  */
 class LLBC_EXPORT LLBC_PacketProtocol : public LLBC_IProtocol
