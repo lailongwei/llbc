@@ -31,8 +31,9 @@
 __LLBC_NS_BEGIN
 
 LLBC_SessionInfo::LLBC_SessionInfo()
-: _sessionId(0)
-, _isListen(false)
+: _isListen(false)
+, _sessionId(0)
+, _acceptSessionId(0)
 , _localAddr()
 , _peerAddr()
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
@@ -41,6 +42,16 @@ LLBC_SessionInfo::LLBC_SessionInfo()
 
 LLBC_SessionInfo::~LLBC_SessionInfo()
 {
+}
+
+bool LLBC_SessionInfo::IsListenSession() const
+{
+    return _isListen;
+}
+
+void LLBC_SessionInfo::SetIsListenSession(bool flag)
+{
+    _isListen = flag;
 }
 
 int LLBC_SessionInfo::GetSessionId() const
@@ -53,14 +64,14 @@ void LLBC_SessionInfo::SetSessionId(int sessionId)
     _sessionId = sessionId;
 }
 
-bool LLBC_SessionInfo::IsListenSession() const
+int LLBC_SessionInfo::GetAcceptSessionId() const
 {
-    return _isListen;
+    return _acceptSessionId;
 }
 
-void LLBC_SessionInfo::SetIsListenSession(bool flag)
+void LLBC_SessionInfo::SetAcceptSessionId(int acceptSessionId)
 {
-    _isListen = flag;
+    _acceptSessionId = acceptSessionId;
 }
 
 const LLBC_SockAddr_IN &LLBC_SessionInfo::GetLocalAddr() const
@@ -96,8 +107,9 @@ void LLBC_SessionInfo::SetSocket(LLBC_SocketHandle handle)
 LLBC_String LLBC_SessionInfo::ToString() const
 {
     LLBC_String repr;
-    repr.append_format("sessionId:%d, ", _sessionId)
-        .append_format("isListen:%s, ", _isListen?"true":"false")
+    repr.append_format("isListen:%s, ", _isListen?"true":"false")
+        .append_format("sessionId:%d, ", _sessionId)
+        .append_format("acceptSessionId:%d, ", _acceptSessionId)
         .append_format("local:{%s}, ", _localAddr.ToString().c_str())
         .append_format("peer:{%s}, ", _peerAddr.ToString().c_str())
         .append_format("handle:%d", _sockHandle);
@@ -123,14 +135,19 @@ const LLBC_SessionInfo &LLBC_SessionDestroyInfo::GetSessionInfo() const
     return *_sessionInfo;
 }
 
+bool LLBC_SessionDestroyInfo::IsListenSession() const
+{
+    return _sessionInfo->IsListenSession();
+}
+
 int LLBC_SessionDestroyInfo::GetSessionId() const
 {
     return _sessionInfo->GetSessionId();
 }
 
-bool LLBC_SessionDestroyInfo::IsListenSession() const
+int LLBC_SessionDestroyInfo::GetAcceptSessionId() const
 {
-    return _sessionInfo->IsListenSession();
+    return _sessionInfo->GetAcceptSessionId();
 }
 
 LLBC_SocketHandle LLBC_SessionDestroyInfo::GetSocket() const

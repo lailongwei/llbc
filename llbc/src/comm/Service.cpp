@@ -1240,8 +1240,9 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     }
 
     LLBC_SessionInfo info;
-    info.SetSessionId(ev.sessionId);
     info.SetIsListenSession(ev.isListen);
+    info.SetSessionId(ev.sessionId);
+    info.SetAcceptSessionId(ev.acceptSessionId);
     info.SetLocalAddr(ev.local);
     info.SetPeerAddr(ev.peer);
     info.SetSocket(ev.handle);
@@ -1264,8 +1265,9 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
 
     // Build session info.
     LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
-    sessionInfo->SetSessionId(ev.sessionId);
     sessionInfo->SetIsListenSession(ev.isListen);
+    sessionInfo->SetSessionId(ev.sessionId);
+    sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
     sessionInfo->SetLocalAddr(ev.local);
     sessionInfo->SetPeerAddr(ev.peer);
     sessionInfo->SetSocket(ev.handle);

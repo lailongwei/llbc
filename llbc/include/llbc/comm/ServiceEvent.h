@@ -81,6 +81,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
 {
     bool isListen;
     int sessionId;
+    int acceptSessionId;
     LLBC_SockAddr_IN local;
     LLBC_SockAddr_IN peer;
     LLBC_SocketHandle handle;
@@ -198,6 +199,7 @@ public:
                                                    const LLBC_SockAddr_IN &peer,
                                                    bool isListen,
                                                    int sessionId,
+                                                   int acceptSessionId,
                                                    LLBC_SocketHandle handle);
 
     /**

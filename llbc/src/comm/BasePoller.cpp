@@ -303,6 +303,7 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
                                              sock->GetPeerAddress(),
                                              sock->IsListen(),
                                              session->GetId(),
+                                             session->GetAcceptId(),
                                              sock->Handle());
 
     _svc->Push(block);

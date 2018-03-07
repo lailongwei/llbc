@@ -53,6 +53,17 @@ public:
 
 public:
     /**
+     * Confirm this create session is listen session.
+     * @return bool - return true is this session is listen session, otherwise return false.
+     */
+    bool IsListenSession() const;
+    /**
+     * Set session listen flag.
+     * @param[in] flag - the session listen flag.
+     */
+    void SetIsListenSession(bool flag);
+
+    /**
      * Get the session Id.
      * @return int - the session Id.
      */
@@ -64,15 +75,15 @@ public:
     void SetSessionId(int sessionId);
 
     /**
-     * Confirm this create session is listen session.
-     * @return bool - return true is this session is listen session, otherwise return false.
+     * Get accept session Id.
+     * @return int - the accept session Id.
      */
-    bool IsListenSession() const;
+    int GetAcceptSessionId() const;
     /**
-     * Set session listen flag.
-     * @param[in] flag - the session listen flag.
+     * Set accept sessionId.
+     * @param[in] acceptSessionId - the accept session Id.
      */
-    void SetIsListenSession(bool flag);
+    void SetAcceptSessionId(int acceptSessionId);
 
     /**
      * Get local address.
@@ -116,8 +127,9 @@ public:
     LLBC_String ToString() const;
 
 private:
-    int _sessionId;
     bool _isListen;
+    int _sessionId;
+    int _acceptSessionId;
     LLBC_SockAddr_IN _localAddr;
     LLBC_SockAddr_IN _peerAddr;
     LLBC_SocketHandle _sockHandle;
@@ -142,8 +154,9 @@ public:
     /**
      * Help methods about get session infos.
      */
-    int GetSessionId() const;
     bool IsListenSession() const;
+    int GetSessionId() const;
+    int GetAcceptSessionId() const;
     LLBC_SocketHandle GetSocket() const;
     const LLBC_SockAddr_IN &GetLocalAddr() const;
     const LLBC_SockAddr_IN &GetPeerAddr() const;

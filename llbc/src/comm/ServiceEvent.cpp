@@ -150,6 +150,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionCreateEv(const LLBC_SockAddr_IN &
                                                         const LLBC_SockAddr_IN &peer,
                                                         bool isListen,
                                                         int sessionId,
+                                                        int acceptSessionId,
                                                         LLBC_SocketHandle handle)
 {
     typedef LLBC_SvcEv_SessionCreate _Ev;
@@ -157,6 +158,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionCreateEv(const LLBC_SockAddr_IN &
     _Ev *ev = LLBC_New(_Ev);
     ev->isListen = isListen;
     ev->sessionId = sessionId;
+    ev->acceptSessionId = acceptSessionId;
     ev->local = local;
     ev->peer = peer;
     ev->handle = handle;
