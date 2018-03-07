@@ -94,9 +94,10 @@ void csllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     const LLBC_SockAddr_IN &remoteAddr = sessionInfo.GetPeerAddr();
     const LLBC_String remoteHost = remoteAddr.GetIpAsString();
 
-    (*_sessionCreateDeleg)(sessionInfo.GetSessionId(),
+    (*_sessionCreateDeleg)(sessionInfo.IsListenSession(),
+                           sessionInfo.GetSessionId(),
+                           sessionInfo.GetAcceptSessionId(),
                            static_cast<int>(sessionInfo.GetSocket()),
-                           sessionInfo.IsListenSession(),
                            localHost.c_str(),
                            static_cast<int>(localHost.length()),
                            localAddr.GetPort(),
@@ -114,9 +115,10 @@ void csllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     const LLBC_SockAddr_IN &remoteAddr = sessionInfo.GetPeerAddr();
     const LLBC_String remoteHost = remoteAddr.GetIpAsString();
 
-    (*_sessionDestroyDeleg)(sessionInfo.GetSessionId(),
+    (*_sessionDestroyDeleg)(sessionInfo.IsListenSession(),
+                            sessionInfo.GetSessionId(),
+                            sessionInfo.GetAcceptSessionId(),
                             static_cast<int>(sessionInfo.GetSocket()),
-                            sessionInfo.IsListenSession(),
                             localHost.c_str(),
                             static_cast<int>(localHost.length()),
                             localAddr.GetPort(),

@@ -43,18 +43,20 @@ public:
     typedef void (__stdcall *Deleg_Facade_OnUpdate)();
     typedef void (__stdcall *Deleg_Facade_OnIdle)(int idleTime);
 
-    typedef void (__stdcall *Deleg_Facade_OnSessionCreate)(int sessionId,
+    typedef void (__stdcall *Deleg_Facade_OnSessionCreate)(bool isListen,
+                                                           int sessionId,
+                                                           int acceptSessionId,
                                                            int socketHandle,
-                                                           bool isListen,
                                                            const char *localHost,
                                                            int localHostLen,
                                                            int localHostPort,
                                                            const char *remoteHost,
                                                            int remoteHostLen,
                                                            int remoteHostPort);
-    typedef void (__stdcall *Deleg_Facade_OnSessionDestroy)(int sessionId,
+    typedef void (__stdcall *Deleg_Facade_OnSessionDestroy)(bool isListen,
+                                                            int sessionId,
+                                                            int acceptSessionId,
                                                             int socketHandle,
-                                                            bool isListen,
                                                             const char *localHost,
                                                             int localHostLen,
                                                             int localPort,

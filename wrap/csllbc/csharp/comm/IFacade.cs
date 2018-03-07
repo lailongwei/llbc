@@ -34,16 +34,18 @@ namespace llbc
     /// </summary>
     public class SessionInfo
     {
-        public SessionInfo(int sessionId,
+        public SessionInfo(bool isListen,
+                           int sessionId,
+                           int acceptSessionId,
                            int socketHandle,
-                           bool isListen,
                            IPEndPoint localEndPoint,
                            IPEndPoint remoteEndPoint)
         {
-            _sessionId = sessionId;
-            _socketHandle = socketHandle;
-
             _isListen = isListen;
+
+            _sessionId = sessionId;
+            _acceptSessionId = acceptSessionId;
+            _socketHandle = socketHandle;
 
             _localEndPoint = localEndPoint;
             _remoteEndPoint = remoteEndPoint;
@@ -51,19 +53,22 @@ namespace llbc
             _BuildStringRepr();
         }
 
+        public bool isListenSession
+        {
+            get { return _isListen; }
+        }
         public int sessionId
         {
             get { return _sessionId; }
         }
 
+        public int acceptSessionId
+        {
+            get { return _acceptSessionId; }
+        }
         public int socketHandle
         {
             get { return _socketHandle; }
-        }
-
-        public bool isListenSession
-        {
-            get { return _isListen; }
         }
 
         public IPEndPoint localEndPoint
@@ -105,15 +110,16 @@ namespace llbc
         private void _BuildStringRepr()
         {
             _repr = string.Format(
-                "SessionInfo: [sessionId: {0}, socketHandle: {1}, isListen: {2}, localEP: {3}, remoteEP: {4}]",
-                _sessionId, _socketHandle, _isListen, _localEndPoint, _remoteEndPoint);
+                "SessionInfo: [sessionId: {0}, acceptSessionId: {1}, socketHandle: {2}, isListen: {3}, localEP: {4}, remoteEP: {5}]",
+                _sessionId, _acceptSessionId, _socketHandle, _isListen, _localEndPoint, _remoteEndPoint);
         }
         #endregion
 
-        int _sessionId;
-        int _socketHandle;
-
         bool _isListen;
+
+        int _sessionId;
+        int _acceptSessionId;
+        int _socketHandle;
 
         IPEndPoint _localEndPoint;
         IPEndPoint _remoteEndPoint;

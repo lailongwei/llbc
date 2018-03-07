@@ -41,18 +41,20 @@ namespace llbc
         public delegate void Deleg_Facade_OnUpdate();
         public delegate void Deleg_Facade_OnIdle(int idleTime);
 
-        public delegate void Deleg_Facade_OnSessionCreate(int sessionId,
+        public delegate void Deleg_Facade_OnSessionCreate(bool isListen,
+                                                          int sessionId,
+                                                          int acceptSessionId,
                                                           int socketHandle,
-                                                          bool isListen,
                                                           IntPtr localHost,
                                                           int localHostLen,
                                                           int localPort,
                                                           IntPtr remoteHost,
                                                           int remoteHostLen,
                                                           int remotePort);
-        public delegate void Deleg_Facade_OnSessionDestroy(int sessionId,
+        public delegate void Deleg_Facade_OnSessionDestroy(bool isListen,
+                                                           int sessionId,
+                                                           int acceptSessionId,
                                                            int socketHandle,
-                                                           bool isListen,
                                                            IntPtr localHost,
                                                            int localHostLen,
                                                            int localPort,

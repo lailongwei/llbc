@@ -1578,9 +1578,10 @@ namespace llbc
                 }
             }
 
-            public void OnSessionCreate(int sessionId,
+            public void OnSessionCreate(bool isListen,
+                                        int sessionId,
+                                        int acceptSessionId,
                                         int socketHandle,
-                                        bool isListen,
                                         IntPtr localHost,
                                         int localHostLen,
                                         int localPort,
@@ -1594,7 +1595,7 @@ namespace llbc
                     IPAddress.Parse(LibUtil.Ptr2Str(remoteHost, remoteHostLen)), remotePort);
 
                 SessionInfo sessionInfo =
-                    new SessionInfo(sessionId, socketHandle, isListen, localEndPoint, remoteEndPoint);
+                    new SessionInfo(isListen, sessionId, acceptSessionId, socketHandle, localEndPoint, remoteEndPoint);
                 for (int i = 0; i < _facades.Count; i++)
                 {
                     try
@@ -1608,9 +1609,10 @@ namespace llbc
                 }
             }
 
-            public void OnSessionDestroy(int sessionId,
+            public void OnSessionDestroy(bool isListen,
+                                         int sessionId,
+                                         int acceptSessionId,
                                          int socketHandle,
-                                         bool isListen,
                                          IntPtr localHost,
                                          int localHostLen,
                                          int localPort,
@@ -1634,7 +1636,7 @@ namespace llbc
                     IPAddress.Parse(LibUtil.Ptr2Str(remoteHost, remoteHostLen)), remotePort);
 
                 SessionInfo sessionInfo = new SessionInfo(
-                    sessionId, socketHandle, isListen, localEndPoint, remoteEndPoint);
+                    isListen, sessionId, acceptSessionId, socketHandle, localEndPoint, remoteEndPoint);
 
                 string managedReason = LibUtil.Ptr2Str(reason, reasonLen);
 
