@@ -127,6 +127,7 @@ private:
 
     static PyObject *_attrSvc;
     static PyObject *_attrSessionId;
+    static PyObject *_attrAcceptSessionId;
     static PyObject *_attrIp;
     static PyObject *_attrPort;
     static PyObject *_attrIdleTime;

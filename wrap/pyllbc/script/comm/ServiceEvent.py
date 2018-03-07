@@ -10,6 +10,7 @@ class pyllbcServiceEvent(object):
         self._svc = svc
         self._idletime = None
         self._session_id = None
+        self._accept_session_id = None
         self._connected = None
         self._reason = None
         self._local_ip = None
@@ -47,6 +48,13 @@ class pyllbcServiceEvent(object):
         int - session Id.
         """
         return self._session_id
+
+    @property
+    def accept_session_id(self):
+        """
+        int - accept session Id.
+        """
+        return self._accept_session_id
 
     @property
     def connected(self):

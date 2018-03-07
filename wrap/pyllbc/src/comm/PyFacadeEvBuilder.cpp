@@ -32,6 +32,7 @@ PyObject *This::_evCls = NULL;
 
 PyObject *This::_attrSvc = PyString_FromString("_svc");
 PyObject *This::_attrSessionId = PyString_FromString("_session_id");
+PyObject *This::_attrAcceptSessionId = PyString_FromString("_accept_session_id");
 PyObject *This::_attrIdleTime = PyString_FromString("_idletime");
 PyObject *This::_attrConnected = PyString_FromString("_connected");
 PyObject *This::_attrReason = PyString_FromString("_reason");
@@ -87,8 +88,9 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionCreateEv(PyObject *svc, const LLBC
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrSocket, static_cast<int>(si.GetSocket()));
-    This::SetAttr(ev, This::_attrSessionId, si.GetSessionId());
     This::SetAttr(ev, This::_attrIsListen, si.IsListenSession());
+    This::SetAttr(ev, This::_attrSessionId, si.GetSessionId());
+    This::SetAttr(ev, This::_attrAcceptSessionId, si.GetAcceptSessionId());
 
     This::SetAttr(ev, This::_attrLocalIp, si.GetLocalAddr().GetIpAsString());
     This::SetAttr(ev, This::_attrLocalPort, si.GetLocalAddr().GetPort());
@@ -103,7 +105,9 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLB
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrReason, destroyInfo.GetReason());
+    This::SetAttr(ev, This::_attrIsListen, destroyInfo.IsListenSession());
     This::SetAttr(ev, This::_attrSessionId, destroyInfo.GetSessionId());
+    This::SetAttr(ev, This::_attrAcceptSessionId, destroyInfo.GetAcceptSessionId());
     This::SetAttr(ev, This::_attrDestroyedFromSvc, destroyInfo.IsDestroyedFromService());
 
     This::SetAttr(ev, This::_attrLocalIp, destroyInfo.GetLocalAddr().GetIpAsString());
