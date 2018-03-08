@@ -81,21 +81,25 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_INFO_LOG2("test_tag", "This is a info log message.");
     Log.i("This is a info log message(from Log.i()).");
     Log.i2("test_tag", "This is a info log message(from Log.i2()).");
+    Log.i2<TestCase_Core_Log>("This is a info log message(from Log.i2()).");
 
     LLBC_WARN_LOG("This is a warn log message.");
     LLBC_WARN_LOG2("test_tag", "This is a warn log message.");
     Log.w("This is a warn log message(from Log.w()).");
     Log.w2("test_tag", "This is a warn log message(from Log.w2()).");
+    Log.w2<TestCase_Core_Log>("This is a warn log message(from Log.w2()).");
 
     LLBC_ERROR_LOG("This is a error log message.");
     LLBC_ERROR_LOG2("test_tag", "This is a error log message.");
     Log.e("This is a error log message(from Log.e()).");
     Log.e2("test_tag", "This is a error log message(from Log.e2()).");
+    Log.e2<TestCase_Core_Log>("This is a error log message(from Log.e2()).");
 
     LLBC_FATAL_LOG("This is a fatal log message.");
     LLBC_FATAL_LOG2("test_tag", "This is a fatal log message.");
     Log.f("This is a fatal log message(from Log.f()).");
     Log.f2("test_tag", "This is a fatal log message(from Log.f2()).");
+    Log.f2<TestCase_Core_Log>("This is a fatal log message(from Log.f2()).");
 
     // Use test logger to test.
     LLBC_DEBUG_LOG_SPEC("test", "This is a debug log message.");

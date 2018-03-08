@@ -70,6 +70,8 @@ public:
      */
     static void d(const char *fmt, ...);
     static void d2(const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void d2(const char *fmt, ...);
     static void d3(const char *logger, const char *fmt, ...);
     static void d4(const char *logger, const char *tag, const char *fmt, ...);
 
@@ -78,6 +80,8 @@ public:
      */
     static void i(const char *fmt, ...);
     static void i2(const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void i2(const char *fmt, ...);
     static void i3(const char *logger, const char *fmt, ...);
     static void i4(const char *logger, const char *tag, const char *fmt, ...);
 
@@ -86,6 +90,8 @@ public:
      */
     static void w(const char *fmt, ...);
     static void w2(const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void w2(const char *fmt, ...);
     static void w3(const char *logger, const char *fmt, ...);
     static void w4(const char *logger, const char *tag, const char *fmt, ...);
 
@@ -94,6 +100,8 @@ public:
      */
     static void e(const char *fmt, ...);
     static void e2(const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void e2(const char *fmt, ...);
     static void e3(const char *logger, const char *fmt, ...);
     static void e4(const char *logger, const char *tag, const char *fmt, ...);
 
@@ -102,6 +110,8 @@ public:
      */
     static void f(const char *fmt, ...);
     static void f2(const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void f2(const char *fmt, ...);
     static void f3(const char *logger, const char *fmt, ...);
     static void f4(const char *logger, const char *tag, const char *fmt, ...);
 
@@ -136,5 +146,7 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/log/LogImpl.h"
 
 #endif // !__LLBC_CORE_LOG_LOG_H__
