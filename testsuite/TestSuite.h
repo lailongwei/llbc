@@ -38,6 +38,7 @@
 #include "core/utils/TestCase_Core_Utils_Algorithm.h"
 #include "core/utils/TestCase_Core_Utils_Delegate.h"
 #include "core/utils/TestCase_Core_Utils_MD5.h"
+#include "core/utils/TestCase_Core_Utils_Base64.h"
 #include "core/utils/TestCase_Core_Utils_Misc.h"
 #include "core/utils/TestCase_Core_Utils_Network.h"
 #include "core/utils/TestCase_Core_Utils_Coder.h"

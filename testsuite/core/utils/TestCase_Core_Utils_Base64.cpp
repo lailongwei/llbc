@@ -19,17 +19,35 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_COMMON_H__
-#define __LLBC_CORE_UTILS_COMMON_H__
+#include "core/utils/TestCase_Core_Utils_Base64.h"
 
-#include "llbc/core/utils/Util_Math.h"
-#include "llbc/core/utils/Util_Algorithm.h"
-#include "llbc/core/utils/Util_Debug.h"
-#include "llbc/core/utils/Util_Text.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
-#include "llbc/core/utils/Util_MD5.h"
-#include "llbc/core/utils/Util_Base64.h"
-#include "llbc/core/utils/Util_Misc.h"
-#include "llbc/core/utils/Util_Network.h"
+TestCase_Core_Utils_Base64::TestCase_Core_Utils_Base64()
+{
+}
 
-#endif // !__LLBC_CORE_UTILS_COMMON_H__
+TestCase_Core_Utils_Base64::~TestCase_Core_Utils_Base64()
+{
+}
+
+int TestCase_Core_Utils_Base64::Run(int argc, char *argv[])
+{
+    LLBC_PrintLine("core/utils/base64 test: ");
+
+    std::string encodedText;
+    std::string decodedText;
+    std::string plainText = "hello, world!@#$%^&*()_+`";
+
+    // Test encode.
+    LLBC_Base64::Encode(plainText, encodedText);
+    LLBC_PrintLine("Text: [%s]", plainText.c_str());
+    LLBC_PrintLine("Encoded: [%s]", encodedText.c_str());
+
+    // Test decode.
+    LLBC_Base64::Decode(encodedText, decodedText);
+    LLBC_PrintLine("Decoded: [%s]", decodedText.c_str());
+
+    LLBC_PrintLine("Press any key to continue...");
+    getchar();
+
+    return 0;
+}

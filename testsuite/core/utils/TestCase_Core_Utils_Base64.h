@@ -19,17 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_COMMON_H__
-#define __LLBC_CORE_UTILS_COMMON_H__
+#ifndef __LLBC_TEST_CASE_CORE_UTILS_BASE64_H__
+#define __LLBC_TEST_CASE_CORE_UTILS_BASE64_H__
 
-#include "llbc/core/utils/Util_Math.h"
-#include "llbc/core/utils/Util_Algorithm.h"
-#include "llbc/core/utils/Util_Debug.h"
-#include "llbc/core/utils/Util_Text.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
-#include "llbc/core/utils/Util_MD5.h"
-#include "llbc/core/utils/Util_Base64.h"
-#include "llbc/core/utils/Util_Misc.h"
-#include "llbc/core/utils/Util_Network.h"
+#include "llbc.h"
+using namespace llbc;
 
-#endif // !__LLBC_CORE_UTILS_COMMON_H__
+class TestCase_Core_Utils_Base64 : public LLBC_BaseTestCase
+{
+public:
+    TestCase_Core_Utils_Base64();
+    virtual ~TestCase_Core_Utils_Base64();
+
+public:
+    virtual int Run(int argc, char *argv[]);
+};
+
+#endif // !__LLBC_TEST_CASE_CORE_UTILS_BASE64_H__
