@@ -346,6 +346,8 @@ public:
     template <typename FacadeCls>
     std::vector<LLBC_IFacade *> GetFacades();
     virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
+    template <typename FacadeCls>
+    FacadeCls *GetFacade(const LLBC_String &facadeName);
     virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName) = 0;
 
 public:

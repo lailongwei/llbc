@@ -62,6 +62,12 @@ inline FacadeCls *LLBC_IService::GetFacade()
 }
 
 template <typename FacadeCls>
+inline FacadeCls *LLBC_IService::GetFacade(const LLBC_String &facadeName)
+{
+    return static_cast<FacadeCls *>(GetFacade(facadeName));
+}
+
+template <typename FacadeCls>
 inline std::vector<LLBC_IFacade *> LLBC_IService::GetFacades()
 {
     const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
