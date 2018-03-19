@@ -255,11 +255,11 @@ LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId,
     LLBC_Session *session = new LLBC_Session();
     session->SetId(sessionId);
     session->SetSocket(socket);
-    session->SetService(_svc);
+    socket->SetSession(session);
     if (acceptSession)
         session->SetAcceptId(acceptSession->GetId());
 
-    socket->SetSession(session);
+    session->SetService(_svc);
 
     return session;
 }
