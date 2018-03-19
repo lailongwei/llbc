@@ -55,7 +55,9 @@ public:
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is NULL.
      */
-    explicit LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg, LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg, Scheduler *scheduler = NULL);
+    explicit LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg = NULL,
+                        LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg = NULL,
+                        Scheduler *scheduler = NULL);
     virtual ~LLBC_Timer();
 
 public:
@@ -76,6 +78,24 @@ public:
      * @return LLBC_TimerId - timer Id.
      */
     LLBC_TimerId GetTimerId() const;
+
+    /**
+     * Set timeout handler.
+     * @param[in] timeoutFunc/timeoutMeth/timeoutDeleg - the timeout function/method/delegate.
+     */
+    void SetTimeoutHandler(void(*timeoutFunc)(LLBC_Timer *));
+    template <typename ObjectType>
+    void SetTimeoutHandler(ObjectType *object, void (ObjectType::*timeoutMeth)(LLBC_Timer *));
+    void SetTimeoutHandler(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg);
+
+    /**
+     * Set cancel handler.
+     * @param[in] cancelFunc/cancelMeth/cancelDeleg - the cancel function/method/delegate.
+     */
+    void SetCancelHandler(void(*cancelFunc)(LLBC_Timer *));
+    template <typename ObjectType>
+    void SetCancelHandler(ObjectType *object, void (ObjectType::*cancelMeth)(LLBC_Timer *));
+    void SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg);
 
 public:
     /**
@@ -146,5 +166,7 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/timer/TimerImpl.h"
 
 #endif // !__LLBC_CORE_TIMER_TIMER_H__

@@ -75,9 +75,42 @@ LLBC_TimerId LLBC_Timer::GetTimerId() const
     return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
 }
 
+void LLBC_Timer::SetTimeoutHandler(void (*timeoutFunc)(LLBC_Timer *))
+{
+    LLBC_XDelete(_timeoutDeleg);
+    if (timeoutFunc != NULL)
+        _timeoutDeleg = new LLBC_Func1<void, LLBC_Timer *>(timeoutFunc);
+}
+
+void LLBC_Timer::SetTimeoutHandler(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg)
+{
+    if (UNLIKELY(timeoutDeleg == _timeoutDeleg))
+        return;
+
+    LLBC_XDelete(_timeoutDeleg);
+    _timeoutDeleg = timeoutDeleg;
+}
+
+void LLBC_Timer::SetCancelHandler(void (*cancelFunc)(LLBC_Timer *))
+{
+    LLBC_XDelete(_cancelDeleg);
+    if (cancelFunc != NULL)
+        _cancelDeleg = new LLBC_Func1<void, LLBC_Timer *>(cancelFunc);
+}
+
+void LLBC_Timer::SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg)
+{
+    if (UNLIKELY(cancelDeleg == _cancelDeleg))
+        return;
+
+    LLBC_XDelete(_cancelDeleg);
+    _cancelDeleg = cancelDeleg;
+}
+
 void LLBC_Timer::OnTimeout()
 {
-    _timeoutDeleg->Invoke(this);
+    if (LIKELY(_timeoutDeleg))
+        _timeoutDeleg->Invoke(this);
 }
 
 void LLBC_Timer::OnCancel()
