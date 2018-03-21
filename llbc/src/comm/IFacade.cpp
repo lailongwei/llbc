@@ -335,11 +335,6 @@ LLBC_IFacade::~LLBC_IFacade()
 {
 }
 
-LLBC_IService *LLBC_IFacade::GetService() const
-{
-    return _svc;
-}
-
 void LLBC_IFacade::OnInitialize()
 {
 }
@@ -353,14 +348,6 @@ void LLBC_IFacade::OnStart()
 }
 
 void LLBC_IFacade::OnStop()
-{
-}
-
-void LLBC_IFacade::OnUpdate()
-{
-}
-
-void LLBC_IFacade::OnIdle(int idleTime)
 {
 }
 
