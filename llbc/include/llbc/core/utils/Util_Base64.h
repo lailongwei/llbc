@@ -27,7 +27,7 @@
 __LLBC_NS_BEGIN
 
 /**
- * \brief The base coder encapsulation.
+ * \brief The base64 coder encapsulation.
  */
 class LLBC_EXPORT LLBC_Base64
 {
