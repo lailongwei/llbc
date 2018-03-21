@@ -37,14 +37,22 @@ int TestCase_Core_Utils_Base64::Run(int argc, char *argv[])
     std::string decodedText;
     std::string plainText = "hello, world!@#$%^&*()_+`";
 
+    std::string emptyPlainText;
+    std::string encodedEmptyText;
+    std::string decodedEmptyText;
+
     // Test encode.
     LLBC_Base64::Encode(plainText, encodedText);
     LLBC_PrintLine("Text: [%s]", plainText.c_str());
     LLBC_PrintLine("Encoded: [%s]", encodedText.c_str());
+    LLBC_Base64::Encode(emptyPlainText, encodedEmptyText);
+    LLBC_PrintLine("Empty Text Encoded: [%s]", encodedEmptyText.c_str());
 
     // Test decode.
     LLBC_Base64::Decode(encodedText, decodedText);
     LLBC_PrintLine("Decoded: [%s]", decodedText.c_str());
+    LLBC_Base64::Decode(encodedEmptyText, decodedEmptyText);
+    LLBC_PrintLine("Decoded Empty Text: [%s]", decodedEmptyText.c_str());
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();

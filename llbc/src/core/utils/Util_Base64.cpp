@@ -59,42 +59,6 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_Base64::Encode(const std::string &input, std::string &output)
-{
-    return Encode(input.data(), input.size(), output);
-}
-
-int LLBC_Base64::Encode(const LLBC_String &input, LLBC_String &output)
-{
-    return Encode(input.data(), input.size(), output);
-}
-
-int LLBC_Base64::Encode(const char *input, size_t inputLen, std::string &output)
-{
-    size_t outputLen = CalcEncodeLen(inputLen);
-    if (UNLIKELY(outputLen == 0))
-    {
-        output.clear();
-        return LLBC_OK;
-    }
-
-    output.resize(outputLen);
-    return Encode(input, inputLen, const_cast<char *>(output.data()), outputLen);
-}
-
-int LLBC_Base64::Encode(const char *input, size_t inputLen, LLBC_String &output)
-{
-    size_t outputLen = CalcEncodeLen(inputLen);
-    if (UNLIKELY(outputLen == 0))
-    {
-        output.clear();
-        return LLBC_OK;
-    }
-
-    output.resize(outputLen);
-    return Encode(input, inputLen, const_cast<char *>(output.data()), outputLen);
-}
-
 int LLBC_Base64::Encode(const char *input, size_t inputLen, char *output, size_t &outputLen)
 {
     if (UNLIKELY(outputLen < CalcEncodeLen(inputLen)))
@@ -135,42 +99,6 @@ int LLBC_Base64::Encode(const char *input, size_t inputLen, char *output, size_t
 
     output[outputLen] = '\0';
     return LLBC_OK;
-}
-
-int LLBC_Base64::Decode(const std::string &input, std::string &output)
-{
-    return Decode(input.data(), input.size(), output);
-}
-
-int LLBC_Base64::Decode(const LLBC_String &input, LLBC_String &output)
-{
-    return Decode(input.data(), input.size(), output);
-}
-
-int LLBC_Base64::Decode(const char *input, size_t inputLen, std::string &output)
-{
-    size_t outputLen = CalcDecodedLen(input, inputLen);
-    if (UNLIKELY(outputLen == 0))
-    {
-        output.clear();
-        return LLBC_OK;
-    }
-
-    output.resize(outputLen);
-    return Decode(input, inputLen, const_cast<char *>(output.data()), outputLen);
-}
-
-int LLBC_Base64::Decode(const char *input, size_t inputLen, LLBC_String &output)
-{
-    size_t outputLen = CalcDecodedLen(input, inputLen);
-    if (UNLIKELY(outputLen == 0))
-    {
-        output.clear();
-        return LLBC_OK;
-    }
-
-    output.resize(outputLen);
-    return Decode(input, inputLen, const_cast<char *>(output.data()), outputLen);
 }
 
 int LLBC_Base64::Decode(const char *input, size_t inputLen, char *output, size_t &outputLen)
