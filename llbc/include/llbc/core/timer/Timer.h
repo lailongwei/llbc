@@ -36,7 +36,7 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
- * \brief The base timer object encapsulation.
+ * \brief The timer encapsulation.
  */
 class LLBC_EXPORT LLBC_Timer
 {
