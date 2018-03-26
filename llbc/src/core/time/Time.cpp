@@ -429,12 +429,12 @@ int LLBC_Time::GetMonthMaxDays(int year, int month)
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(double secondsInDay)
 {
-    return LLBC_Time::GetIntervalTo(LLBC_Time::Current(), secondsInDay);
+    return LLBC_Time::GetIntervalTo(LLBC_Time::Now(), secondsInDay);
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond)
 {
-    return LLBC_Time::GetIntervalTo(LLBC_Time::Current(), hour, minute, second, milliSecond, microSecond);
+    return LLBC_Time::GetIntervalTo(LLBC_Time::Now(), hour, minute, second, milliSecond, microSecond);
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &fromTime, double secondsInDay)
