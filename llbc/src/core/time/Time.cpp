@@ -105,9 +105,9 @@ LLBC_Time LLBC_Time::Now()
     return LLBC_Time(static_cast<double>(LLBC_GetMicroSeconds()) / NumOfMicroSecondsPerSecond);
 }
 
-LLBC_Time LLBC_Time::Current()
+uint32 LLBC_Time::TimeStamp()
 {
-    return LLBC_Time(static_cast<double>(LLBC_GetMicroSeconds()) / NumOfMicroSecondsPerSecond);
+    return (uint32)time(NULL);
 }
 
 int LLBC_Time::GetYear() const

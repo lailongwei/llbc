@@ -84,7 +84,7 @@ public:
      * Get current time.
      */
     static LLBC_Time Now();
-    static LLBC_Time Current();
+    static uint32 TimeStamp();
 
     /**
      * Get local time parts(year, month, day, hour, minute, second, dayofweek).
