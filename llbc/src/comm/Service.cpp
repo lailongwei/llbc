@@ -1500,7 +1500,7 @@ void LLBC_Service::InitFacades()
         }
 
         _facades.push_back(facade);
-        const LLBC_String facadeName = LLBC_GetTypeName(facade);
+        const LLBC_String facadeName = LLBC_GetTypeName(*facade);
         _Facades2::iterator facadesIt = _facades2.find(facadeName);
         if (facadesIt == _facades2.end())
             facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
