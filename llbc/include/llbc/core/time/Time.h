@@ -85,6 +85,9 @@ public:
      */
     static LLBC_Time Now();
 
+    /**
+     * Get current timestamp.
+     */
     static uint32 TimeStamp();
 
     /**
