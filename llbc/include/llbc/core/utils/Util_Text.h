@@ -215,6 +215,13 @@ LLBC_String LLBC_Num2Str(T val, int radix = 10);
  */
 LLBC_EXTERN LLBC_EXPORT int LLBC_HashString(const char *str, size_t strLen = -1);
 
+/**
+* Hash specific string.
+* @param[in] str    - the string.
+* @return int - the string hash code.
+*/
+LLBC_EXTERN LLBC_EXPORT int LLBC_HashString(const LLBC_String &str);
+
 __LLBC_NS_END
 
 #include "llbc/core/utils/Util_TextImpl.h"
