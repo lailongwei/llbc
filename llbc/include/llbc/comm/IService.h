@@ -334,8 +334,8 @@ public:
      * Register facade.
      */
     template <typename FacadeFactoryCls>
-    LLBC_IFacade *RegisterFacade();
-    virtual LLBC_IFacade *RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
+    int RegisterFacade();
+    virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
     virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
 
     /**

@@ -183,6 +183,7 @@ LLBC_Service::~LLBC_Service()
     Stop();
 
     DestroyFacades();
+    DestroyWillRegFacades();
     LLBC_STLHelper::DeleteContainer(_coders);
     LLBC_STLHelper::DeleteContainer(_handlers);
     LLBC_STLHelper::DeleteContainer(_preHandlers);
@@ -566,25 +567,35 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-LLBC_IFacade *LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
+int LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
 {
     if (UNLIKELY(!facadeFactory))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return NULL;
+        return LLBC_FAILED;
     }
 
-    LLBC_IFacade *facade = facadeFactory->Create();
-    LLBC_Delete(facadeFactory);
-
-    int ret = RegisterFacade(facade);
-    if (UNLIKELY(ret != LLBC_OK))
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_started))
     {
-        LLBC_Delete(facade);
-        return NULL;
+        LLBC_SetLastError(LLBC_ERROR_INITED);
+        return LLBC_FAILED;
     }
 
-    return facade;
+    for (_WillRegFacades::iterator it = _willRegFacades.begin();
+         it != _willRegFacades.end();
+         it++)
+    {
+        if (it->facadeFactory != NULL && it->facadeFactory == facadeFactory)
+        {
+            LLBC_SetLastError(LLBC_ERROR_REPEAT);
+            return LLBC_FAILED;
+        }
+    }
+
+    _willRegFacades.push_back(_WillRegFacade(facadeFactory));
+
+    return LLBC_OK;
 }
 
 int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
@@ -608,14 +619,18 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
         return LLBC_FAILED;
     }
 
-    facade->SetService(this);
-    _facades.push_back(facade);
+    for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
+         regIt != _willRegFacades.end();
+         regIt++)
+    {
+        if (regIt->facade != NULL && regIt->facade == facade)
+        {
+            LLBC_SetLastError(LLBC_ERROR_REPEAT);
+            return LLBC_FAILED;
+        }
+    }
 
-    const LLBC_String facadeName = LLBC_GetTypeName(*facade);
-    _Facades2::iterator it = _facades2.find(facadeName);
-    if (it == _facades2.end())
-        it = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
-    it->second.push_back(facade);
+    _willRegFacades.push_back(_WillRegFacade(facade));
 
     return LLBC_OK;
 }
@@ -1472,17 +1487,31 @@ void LLBC_Service::InitFacades()
 {
     _initingFacade = true;
 
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
+    for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
+         regIt != _willRegFacades.end();
+         regIt++)
     {
-        LLBC_IFacade *facade = (*it);
-        if (facade->_inited)
-            continue;
+        _WillRegFacade &willRegFacade = *regIt;
+        LLBC_IFacade *facade = willRegFacade.facade;
+        if (willRegFacade.facadeFactory != NULL)
+        {
+            facade = willRegFacade.facadeFactory->Create();
+            LLBC_Delete(willRegFacade.facadeFactory);
+        }
 
+        _facades.push_back(facade);
+        const LLBC_String facadeName = LLBC_GetTypeName(facade);
+        _Facades2::iterator facadesIt = _facades2.find(facadeName);
+        if (facadesIt == _facades2.end())
+            facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+        facadesIt->second.push_back(facade);  // TODO: Add to facades dictionaries before facade init?
+
+        facade->SetService(this);
         facade->OnInitialize();
         facade->_inited = true;
     }
+
+    _willRegFacades.clear();
 
     _initingFacade = false;
 }
@@ -1524,6 +1553,19 @@ void LLBC_Service::DestroyFacades()
 
     LLBC_STLHelper::DeleteContainer(_facades, true, true);
     _facades2.clear();
+}
+
+void LLBC_Service::DestroyWillRegFacades()
+{
+    for (_WillRegFacades::iterator it = _willRegFacades.begin();
+         it != _willRegFacades.end();
+         it++)
+    {
+        LLBC_XDelete((*it).facade);
+        LLBC_XDelete((*it).facadeFactory);
+    }
+
+    _willRegFacades.clear();
 }
 
 void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
@@ -1839,6 +1881,18 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     LLBC_Free(otherPackets);
 
     return LLBC_OK;
+}
+
+LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacade *facade)
+{
+    this->facade = facade;
+    facadeFactory = NULL;
+}
+
+LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacadeFactory *facadeFactory)
+{
+    facade = NULL;
+    this->facadeFactory = facadeFactory;
 }
 
 __LLBC_NS_END

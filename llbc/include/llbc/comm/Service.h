@@ -264,7 +264,7 @@ public:
     /**
      * Register facade.
      */
-    virtual LLBC_IFacade *RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
+    virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
 
     /**
@@ -419,6 +419,7 @@ private:
     void UpdateFacades();
     void StopFacades();
     void DestroyFacades();
+    void DestroyWillRegFacades();
 
     /**
      * Session protocol factory operation methods.
@@ -506,6 +507,18 @@ private:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     LLBC_ProtocolStack _stack;
 #endif
+
+    class _WillRegFacade
+    {
+    public:
+        LLBC_IFacade *facade;
+        LLBC_IFacadeFactory *facadeFactory;
+
+        _WillRegFacade(LLBC_IFacade *facade);
+        _WillRegFacade(LLBC_IFacadeFactory *facadeFactory);
+    };
+    typedef std::vector<_WillRegFacade> _WillRegFacades;
+    _WillRegFacades _willRegFacades;
 
     typedef std::vector<LLBC_IFacade *> _Facades;
     _Facades _facades;

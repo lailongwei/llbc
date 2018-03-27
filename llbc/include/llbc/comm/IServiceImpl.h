@@ -27,17 +27,17 @@
 __LLBC_NS_BEGIN
 
 template <typename FacadeFactoryCls>
-inline LLBC_IFacade *LLBC_IService::RegisterFacade()
+inline int LLBC_IService::RegisterFacade()
 {
     FacadeFactoryCls *facadeFactory = LLBC_New(FacadeFactoryCls);
-    LLBC_IFacade *facade = RegisterFacade(facadeFactory);
-    if (!facade)
+    int ret = RegisterFacade(facadeFactory);
+    if (ret != LLBC_OK)
     {
         LLBC_Delete(facadeFactory);
-        return NULL;
+        return LLBC_FAILED;
     }
 
-    return facade;
+    return LLBC_OK;
 }
 
 template <typename CoderFactoryCls>
