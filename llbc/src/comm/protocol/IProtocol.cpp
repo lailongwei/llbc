@@ -31,7 +31,9 @@ __LLBC_NS_BEGIN
 
 LLBC_IProtocol::LLBC_IProtocol()
 : _sessionId(0)
+, _session(NULL)
 , _stack(NULL)
+, _svc(NULL)
 , _filter(NULL)
 , _coders(NULL)
 {
@@ -41,25 +43,36 @@ LLBC_IProtocol::~LLBC_IProtocol()
 {
 }
 
-LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
-{
-    return _stack;
-}
-
 int LLBC_IProtocol::GetSessionId() const
 {
     return _sessionId;
 }
 
-void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
+LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
 {
-    _stack = stack;
+    return _stack;
+}
+
+LLBC_IService *LLBC_IProtocol::GetService()
+{
+    return _svc;
+}
+
+const LLBC_IProtocol::Coders *LLBC_IProtocol::GetCoders() const
+{
+    return _coders;
 }
 
 void LLBC_IProtocol::SetSession(LLBC_Session *session)
 {
     _session = session;
     _sessionId = session->GetId();
+}
+
+void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
+{
+    _stack = stack;
+    _svc = _stack->GetService();
 }
 
 void LLBC_IProtocol::SetFilter(LLBC_IProtocolFilter *filter)

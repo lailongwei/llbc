@@ -35,6 +35,7 @@ class LLBC_Session;
 class LLBC_ICoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
+class LLBC_IService;
 
 __LLBC_NS_END
 
@@ -90,16 +91,28 @@ public:
 
 protected:
     /**
+     * Get session Id.
+     * @return int - the session Id.
+     */
+    int GetSessionId() const;
+
+    /**
      * Get protocol stack.
      * @return LLBC_ProtocolStack * - the protocol stack.
      */
     LLBC_ProtocolStack *GetStack();
 
     /**
-     * Get session Id.
-     * @return int - the session Id.
+     * Get service.
+     * @return LLBC_IService * - the service.
      */
-    int GetSessionId() const;
+    LLBC_IService *GetService();
+
+    /**
+     * Get coders.
+     * @return const Coders * - the coders.
+     */
+    const Coders *GetCoders() const;
 
 private:
     /**
@@ -111,16 +124,16 @@ private:
     friend class LLBC_ProtocolStack;
 
     /**
-     * Set protocol stack to protocol.
-     * @param[in] stack - the protocol stack.
-     */
-    void SetStack(LLBC_ProtocolStack *stack);
-
-    /**
      * Set session.
      * @param[in] session - the session.
      */
     void SetSession(LLBC_Session *session);
+
+    /**
+     * Set protocol stack to protocol.
+     * @param[in] stack - the protocol stack.
+     */
+    void SetStack(LLBC_ProtocolStack *stack);
 
     /**
      * Set protocol filter to protocol.
@@ -139,6 +152,7 @@ protected:
     int _sessionId;
     LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
+    LLBC_IService *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
 };
