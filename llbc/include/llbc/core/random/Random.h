@@ -116,7 +116,7 @@ public:
 
 public:
     /**
-     * Re-seeding with 32 bitt integer the random class.
+     * Re-seeding with 32 bit integer the random class.
      * @param[in] seed - seed value.
      */
     static void Seed(unsigned long seed);
