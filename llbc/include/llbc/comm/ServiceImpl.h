@@ -23,6 +23,60 @@
 
 __LLBC_NS_BEGIN
 
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+{
+    // Call internal MulticastSendCoder<> template method to complete.
+    // validCheck = true
+    return MulticastSendCoder<LLBC_SessionIdSet>(svcId, sessionIds, opcode, coder, status);
+}
+
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+{
+    // Call internal MulticastSendCoder<> template method to complete.
+    // validCheck = true
+    return MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status);
+}
+
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status)
+{
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(!_started))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Foreach to call internal method LockableSend() method to complete.
+    // lock = false
+    // validCheck = true
+    for (LLBC_SessionIdSetCIter sessionIt = sessionIds.begin();
+         sessionIt != sessionIds.end();
+         sessionIt++)
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
+
+    return LLBC_OK;
+}
+
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
+{
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(!_started))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Foreach to call internal method LockableSend() method to complete.
+    // lock = false
+    // validCheck = true
+    for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
+         sessionIt != sessionIds.end();
+         sessionIt++)
+        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
+
+    return LLBC_OK;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_COMM_SERVICE_H__

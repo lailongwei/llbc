@@ -486,28 +486,6 @@ int LLBC_Service::Send(LLBC_Packet *packet)
     return LockableSend(packet);
 }
 
-int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
-{
-    // Call internal MulticastSendCoder<> template method to complete.
-    // validCheck = true
-    return MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status);
-}
-
-int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
-{
-    LLBC_LockGuard guard(_lock);
-
-    // Foreach to call internal method LockableSend() method to complete.
-    // lock = false
-    // validCheck = true
-    for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
-         sessionIt != sessionIds.end();
-         sessionIt++)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
-
-    return LLBC_OK;
-}
-
 int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status)
 {
     // Copy all connected session Ids.

@@ -213,6 +213,7 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
     /**
      * Multicast bytes(these methods will automatics create packet to send).
@@ -224,6 +225,7 @@ public:
      * @param[in] status     - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status);
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
 
     /** 

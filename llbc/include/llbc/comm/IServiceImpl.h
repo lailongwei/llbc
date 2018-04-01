@@ -158,42 +158,50 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void 
     return Send(packet);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds)
 {
     return Multicast(0, sessionIds, 0, static_cast<LLBC_ICoder *>(NULL), 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode)
 {
     return Multicast(0, sessionIds, opcode, static_cast<LLBC_ICoder *>(NULL), 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, LLBC_ICoder *coder)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, LLBC_ICoder *coder)
 {
     return Multicast(0, sessionIds, 0, coder, 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder)
 {
     return Multicast(0, sessionIds, opcode, coder, 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder, int status)
 {
     return Multicast(0, sessionIds, opcode, coder, status);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, const void *bytes, size_t len)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, const void *bytes, size_t len)
 {
     return Multicast(0, sessionIds, 0, bytes, len, 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len)
 {
     return Multicast(0, sessionIds, opcode, bytes, len, 0);
 }
 
-inline int LLBC_IService::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
+template <typename SessionIds>
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     return Multicast(0, sessionIds, opcode, bytes, len, status);
 }

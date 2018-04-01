@@ -267,11 +267,17 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, LLBC_ICoder *coder);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, int opcode);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, LLBC_ICoder *coder);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
 
     /**
@@ -284,9 +290,13 @@ public:
      * @param[in] status     - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, const void *bytes, size_t len);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len);
-    virtual int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, const void *bytes, size_t len);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len);
+    template <typename SessionIds>
+    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
     virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
 
     /** 
