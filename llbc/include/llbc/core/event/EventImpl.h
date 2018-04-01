@@ -23,6 +23,11 @@
 
 __LLBC_NS_BEGIN
 
+inline int LLBC_Event::GetId() const
+{
+    return _id;
+}
+
 template <typename ParamType>
 inline LLBC_Event &LLBC_Event::AddParam(const ParamType &param)
 {
@@ -35,6 +40,21 @@ inline LLBC_Event &LLBC_Event::AddParam(const LLBC_String &key, const ParamType 
 {
     const LLBC_Variant varParam(param);
     return AddParam(key, varParam);
+}
+
+inline size_t LLBC_Event::GetSequentialParamsCount() const
+{
+    return _seqParams != NULL ? _seqParams->size() : 0;
+}
+
+inline size_t LLBC_Event::GetNamingParamsCount() const
+{
+    return _namingParams != NULL ? _namingParams->size() : 0;
+}
+
+inline bool LLBC_Event::IsDontDelAfterFire() const
+{
+    return _dontDelAfterFire;
 }
 
 __LLBC_NS_END

@@ -224,8 +224,15 @@ void LLBC_EventManager::FireEvent(LLBC_Event *event)
         }
     }
 
-    LLBC_Delete(event);
-    AfterFireEvent();
+    if (event->IsDontDelAfterFire())
+    {
+        AfterFireEvent();
+    }
+    else
+    {
+        LLBC_Delete(event);
+        AfterFireEvent();
+    }
 }
 
 bool LLBC_EventManager::IsFiring() const

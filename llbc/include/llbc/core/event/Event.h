@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Event
 {
 public:
-    LLBC_Event(int id = 0);
+    LLBC_Event(int id = 0, bool dontDelAfterFire = false);
     virtual ~LLBC_Event();
 
 public:
@@ -99,6 +99,12 @@ public:
      */
     size_t GetNamingParamsCount() const;
 
+    /**
+     * Check dont delete after fire option.
+     * @return bool - the option.
+     */
+    bool IsDontDelAfterFire() const;
+
 public:
     /**
      * Subscript supports.
@@ -113,6 +119,7 @@ public:
 
 protected:
     int _id;
+    bool _dontDelAfterFire;
 
     typedef std::vector<LLBC_Variant> _SeqParams;
     _SeqParams *_seqParams;

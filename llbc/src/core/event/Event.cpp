@@ -36,8 +36,9 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_Event::LLBC_Event(int id)
+LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
+, _dontDelAfterFire(dontDelAfterFire)
 , _seqParams(NULL)
 , _namingParams(NULL)
 {
@@ -47,11 +48,6 @@ LLBC_Event::~LLBC_Event()
 {
     LLBC_XDelete(_seqParams);
     LLBC_XDelete(_namingParams);
-}
-
-int LLBC_Event::GetId() const
-{
-    return _id;
 }
 
 LLBC_Event &LLBC_Event::AddParam(const LLBC_Variant &param)
@@ -77,19 +73,9 @@ const std::vector<LLBC_Variant> &LLBC_Event::GetSequentialParams() const
     return _seqParams != NULL ? *_seqParams : LLBC_INL_NS __emptySeqParams;
 }
 
-size_t LLBC_Event::GetSequentialParamsCount() const
-{
-    return _seqParams != NULL ? _seqParams->size() : 0;
-}
-
 const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetNamingParams() const
 {
     return _namingParams != NULL ? *_namingParams : LLBC_INL_NS __emptyNamingParams;
-}
-
-size_t LLBC_Event::GetNamingParamsCount() const
-{
-    return _namingParams != NULL ? _namingParams->size() : 0;
 }
 
 const LLBC_Variant &LLBC_Event::operator [](size_t index) const
