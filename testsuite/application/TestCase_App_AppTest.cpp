@@ -23,7 +23,7 @@
 
 namespace
 {
-    class TestApp : public LLBC_BaseApplication
+    class TestApp : public LLBC_IApplication
     {
     public:
         TestApp()

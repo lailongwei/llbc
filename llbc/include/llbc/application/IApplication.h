@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_APPLICATION_H__
-#define __LLBC_COMM_APPLICATION_H__
+#ifndef __LLBC_APP_IAPPLICATION_H__
+#define __LLBC_APP_IAPPLICATION_H__
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -41,14 +41,14 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
- * \brief The application class encapsulation.
+ * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
-class LLBC_EXPORT LLBC_BaseApplication
+class LLBC_EXPORT LLBC_IApplication
 {
 public:
-    LLBC_BaseApplication();
-    virtual ~LLBC_BaseApplication();
+    LLBC_IApplication();
+    virtual ~LLBC_IApplication();
 
 public:
     /**
@@ -57,24 +57,26 @@ public:
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    virtual int OnStart(int argc, char *argv[]);
+    virtual int OnStart(int argc, char *argv[]) = 0;
 
     /**
      * Application wait event method, please override this method at your project.
      */
-    virtual void OnWait();
+    virtual void OnWait() = 0;
 
     /**
      * Application stop event method, please override this method at your project.
      */
-    virtual void OnStop();
+    virtual void OnStop() = 0;
 
 public:
     /**
      * Get this application.
-     * @return LLBC_BaseApplication * - this application.
+     * @return App * - this application.
      */
-    static LLBC_BaseApplication *ThisApp();
+    template <typename App>
+    static App *ThisApp();
+    static LLBC_IApplication *ThisIApp();
 
 public:
     /**
@@ -198,9 +200,11 @@ private:
     bool _waited;
     LLBC_StartArgs _startArgs;
 
-    static LLBC_BaseApplication *_thisApp;
+    static LLBC_IApplication *_thisApp;
 };
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COMM_APPLICATION_H__
+#include "llbc/application/IApplicationImpl.h"
+
+#endif // !__LLBC_APP_IAPPLICATION_H__

@@ -23,13 +23,13 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
-#include "llbc/application/Application.h"
+#include "llbc/application/IApplication.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_BaseApplication *LLBC_BaseApplication::_thisApp = NULL;
+LLBC_IApplication *LLBC_IApplication::_thisApp = NULL;
 
-LLBC_BaseApplication::LLBC_BaseApplication()
+LLBC_IApplication::LLBC_IApplication()
 : _name()
 
 , _iniConfig()
@@ -45,31 +45,13 @@ LLBC_BaseApplication::LLBC_BaseApplication()
         _thisApp = this;
 }
 
-LLBC_BaseApplication::~LLBC_BaseApplication()
+LLBC_IApplication::~LLBC_IApplication()
 {
     Wait();
     Stop();
 }
 
-int LLBC_BaseApplication::OnStart(int argc, char *argv[])
-{
-    return LLBC_OK;
-}
-
-void LLBC_BaseApplication::OnWait()
-{
-}
-
-void LLBC_BaseApplication::OnStop()
-{
-}
-
-LLBC_BaseApplication *LLBC_BaseApplication::ThisApp()
-{
-    return _thisApp;
-}
-
-int LLBC_BaseApplication::Start(const LLBC_String &name, int argc, char *argv[])
+int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
 {
     // Multi application check.
     if (_thisApp != this)
@@ -128,12 +110,12 @@ int LLBC_BaseApplication::Start(const LLBC_String &name, int argc, char *argv[])
     return LLBC_OK;
 }
 
-bool LLBC_BaseApplication::IsStarted() const
+bool LLBC_IApplication::IsStarted() const
 {
     return _started;
 }
 
-void LLBC_BaseApplication::Wait()
+void LLBC_IApplication::Wait()
 {
     if (!_started || _waited)
         return;
@@ -144,7 +126,7 @@ void LLBC_BaseApplication::Wait()
     _waited = true;
 }
 
-void LLBC_BaseApplication::Stop()
+void LLBC_IApplication::Stop()
 {
     if (!_started)
         return;
@@ -160,32 +142,32 @@ void LLBC_BaseApplication::Stop()
     _started = false;
 }
 
-const LLBC_String &LLBC_BaseApplication::GetName() const
+const LLBC_String &LLBC_IApplication::GetName() const
 {
     return _name;
 }
 
-const LLBC_StartArgs &LLBC_BaseApplication::GetStartArgs() const
+const LLBC_StartArgs &LLBC_IApplication::GetStartArgs() const
 {
     return _startArgs;
 }
 
-const LLBC_Ini &LLBC_BaseApplication::GetIniConfig() const
+const LLBC_Ini &LLBC_IApplication::GetIniConfig() const
 {
     return _iniConfig;
 }
 
-const LLBC_Config &LLBC_BaseApplication::GetJsonConfig() const
+const LLBC_Config &LLBC_IApplication::GetJsonConfig() const
 {
     return _jsonConfig;
 }
 
-const LLBC_Property &LLBC_BaseApplication::GetPropertyConfig() const
+const LLBC_Property &LLBC_IApplication::GetPropertyConfig() const
 {
     return _propertyConfig;
 }
 
-int LLBC_BaseApplication::ReloadIniConfig()
+int LLBC_IApplication::ReloadIniConfig()
 {
     bool loaded = false;
     if (TryLoadConfig(loaded, true, false, false) != LLBC_OK)
@@ -200,7 +182,7 @@ int LLBC_BaseApplication::ReloadIniConfig()
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::ReloadIniConfig(const LLBC_String &configPath)
+int LLBC_IApplication::ReloadIniConfig(const LLBC_String &configPath)
 {
     bool loaded = false;
     LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
@@ -216,7 +198,7 @@ int LLBC_BaseApplication::ReloadIniConfig(const LLBC_String &configPath)
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::ReloadJsonConfig()
+int LLBC_IApplication::ReloadJsonConfig()
 {
     bool loaded = false;
     if (TryLoadConfig(loaded, false, true, false) != LLBC_OK)
@@ -231,7 +213,7 @@ int LLBC_BaseApplication::ReloadJsonConfig()
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::ReloadJsonConfig(const LLBC_String &configPath)
+int LLBC_IApplication::ReloadJsonConfig(const LLBC_String &configPath)
 {
     bool loaded = false;
     LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
@@ -247,7 +229,7 @@ int LLBC_BaseApplication::ReloadJsonConfig(const LLBC_String &configPath)
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::ReloadPropertyConfig()
+int LLBC_IApplication::ReloadPropertyConfig()
 {
     bool loaded = false;
     if (TryLoadConfig(loaded, false, false, true) != LLBC_OK)
@@ -262,7 +244,7 @@ int LLBC_BaseApplication::ReloadPropertyConfig()
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::ReloadPropertyConfig(const LLBC_String &configPath)
+int LLBC_IApplication::ReloadPropertyConfig(const LLBC_String &configPath)
 {
     bool loaded = false;
     LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
@@ -278,17 +260,17 @@ int LLBC_BaseApplication::ReloadPropertyConfig(const LLBC_String &configPath)
     return LLBC_OK;
 }
 
-LLBC_IService *LLBC_BaseApplication::GetService(int id) const
+LLBC_IService *LLBC_IApplication::GetService(int id) const
 {
     return _services.GetService(id);
 }
 
-int LLBC_BaseApplication::RemoveService(int id)
+int LLBC_IApplication::RemoveService(int id)
 {
     return _services.RemoveService(id);
 }
 
-int LLBC_BaseApplication::Send(LLBC_Packet *packet)
+int LLBC_IApplication::Send(LLBC_Packet *packet)
 {
     LLBC_IService *service = _services.GetService(packet->GetSenderServiceId());
     if(!service)
@@ -300,13 +282,13 @@ int LLBC_BaseApplication::Send(LLBC_Packet *packet)
     return service->Send(packet);
 }
 
-int LLBC_BaseApplication::TryLoadConfig(bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(bool tryIni, bool tryJson, bool tryCfg)
 {
     bool loaded = false;
     return TryLoadConfig(loaded, tryIni, tryJson, tryCfg);
 }
 
-int LLBC_BaseApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
 {
     loaded = false;
 
@@ -339,7 +321,7 @@ int LLBC_BaseApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson,
     return LLBC_OK;
 }
 
-int LLBC_BaseApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
 {
     loaded = false;
 
