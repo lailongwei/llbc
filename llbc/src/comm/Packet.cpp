@@ -110,6 +110,15 @@ size_t LLBC_Packet::GetPayloadLength() const
     return _payload->GetWritePos();
 }
 
+void LLBC_Packet::ResetPayload()
+{
+    if (_payload)
+    {
+        _payload->SetReadPos(0);
+        _payload->SetWritePos(0);
+    }
+}
+
 int LLBC_Packet::Read(bool &val)
 {
     return ReadRawType<>(val);

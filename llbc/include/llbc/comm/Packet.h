@@ -244,6 +244,11 @@ public:
      */
     size_t GetPayloadLength() const;
 
+    /**
+     * Reset packet payload.
+     */
+    void ResetPayload();
+
 public:
     /**
      * Raw data type read methods.
