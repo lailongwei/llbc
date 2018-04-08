@@ -62,6 +62,12 @@ public:
      */
     virtual int GetLayer() const = 0;
 
+    /**
+    * Get coders.
+    * @return const Coders * - the coders.
+    */
+    const Coders *GetCoders() const;
+
 public:
     /**
      * When one connection established, will call this method.
@@ -107,12 +113,6 @@ protected:
      * @return LLBC_IService * - the service.
      */
     LLBC_IService *GetService();
-
-    /**
-     * Get coders.
-     * @return const Coders * - the coders.
-     */
-    const Coders *GetCoders() const;
 
 private:
     /**

@@ -148,6 +148,11 @@ int LLBC_ProtocolStack::SetCoders(const LLBC_IProtocol::Coders *coders)
     return _protos[_Layer::CodecLayer]->SetCoders(coders);
 }
 
+const LLBC_IProtocol *LLBC_ProtocolStack::GetCoderProtocol() const
+{
+    return _protos[_Layer::CodecLayer];
+}
+
 int LLBC_ProtocolStack::SetFilter(LLBC_IProtocolFilter *filter, int toProto)
 {
     if (UNLIKELY(!filter || !LLBC_ProtocolLayer::IsValid(toProto)))

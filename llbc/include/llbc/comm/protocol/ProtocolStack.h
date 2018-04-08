@@ -127,6 +127,12 @@ public:
     int SetCoders(const LLBC_IProtocol::Coders *coders);
 
     /**
+    * Get CodecLayer protocol instance.
+    * @return LLBC_IProtocol * - return CodecLayer instance ptr.
+    */
+    const LLBC_IProtocol *GetCoderProtocol() const;
+
+    /**
      * Set protocol filter to specified layer protocol.
      * @param[in] filter  - the protocol filter.
      * @param[in] toProto - protocol layer.
