@@ -102,6 +102,14 @@ const void *LLBC_Packet::GetPayload() const
     return _payload->GetData();
 }
 
+void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
+{
+    if (_payload)
+        LLBC_Delete(_payload);
+
+    _payload = block;
+}
+
 size_t LLBC_Packet::GetPayloadLength() const
 {
     if (!_payload)

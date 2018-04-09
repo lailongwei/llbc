@@ -239,6 +239,11 @@ public:
     const void *GetPayload() const;
 
     /**
+    * Set payload data.
+    */
+    void SetPayload(LLBC_MessageBlock *block);
+
+    /**
      * Get payload length.
      * @return size_t - payload length.
      */
