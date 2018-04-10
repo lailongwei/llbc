@@ -46,9 +46,9 @@ LLBC_Semaphore::LLBC_Semaphore(int initVal)
  #endif
 #else
     _sem = ::CreateSemaphore(NULL,
-                              initVal,
-                              LONG_MAX,
-                              NULL);
+                             initVal,
+                             LONG_MAX,
+                             NULL);
 #endif
 }
 

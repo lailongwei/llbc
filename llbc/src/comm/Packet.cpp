@@ -104,9 +104,10 @@ const void *LLBC_Packet::GetPayload() const
 
 void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
 {
-    if (_payload)
-        LLBC_Delete(_payload);
+    if (UNLIKELY(block == _payload))
+        return;
 
+    LLBC_XDelete(_payload);
     _payload = block;
 }
 

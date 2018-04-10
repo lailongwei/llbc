@@ -240,6 +240,7 @@ public:
 
     /**
     * Set payload data.
+    * @param[in] block - the new payload block.
     */
     void SetPayload(LLBC_MessageBlock *block);
 
