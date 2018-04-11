@@ -182,6 +182,21 @@ inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int st
     SetStatus(status);
 }
 
+inline void LLBC_Packet::SetReuse()
+{
+    _isReuse = true;
+}
+
+inline void LLBC_Packet::UnSetReuse()
+{
+    _isReuse = false;
+}
+
+inline bool LLBC_Packet::IsReuse()
+{
+    return _isReuse;
+}
+
 template <typename _Ty>
 inline int LLBC_Packet::Read(std::vector<_Ty> &val)
 {

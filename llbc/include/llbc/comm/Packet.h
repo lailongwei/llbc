@@ -463,6 +463,23 @@ public:
      */
     void SetCodecError(const LLBC_String &codecErr);
 
+public:
+    /*
+    * Set reuse flag for packet
+    */
+    void SetReuse();
+
+    /*
+    * UnSet reuse flag for packet
+    */
+    void UnSetReuse();
+
+    /*
+    * Check reuse flag
+    * @return bool
+    */
+    bool IsReuse();
+
 private:
     /**
      * Read raw type data from packet.
@@ -513,6 +530,8 @@ private:
     LLBC_IDelegate1<void, void *> *_resultClearDeleg;
 
     LLBC_MessageBlock *_payload;
+
+    bool _isReuse;
 };
 
 __LLBC_NS_END

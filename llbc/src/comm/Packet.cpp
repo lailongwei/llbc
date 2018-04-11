@@ -61,6 +61,8 @@ LLBC_Packet::LLBC_Packet()
 , _resultClearDeleg(NULL)
 
 , _payload(NULL)
+
+, _isReuse(false)
 {
 }
 
