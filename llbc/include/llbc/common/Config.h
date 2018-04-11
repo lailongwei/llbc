@@ -183,7 +183,7 @@
 #if LLBC_TARGET_PLATFORM_LINUX
  #define LLBC_CFG_COMM_POLLER_MODEL                 "EpollPoller"
 #elif LLBC_TARGET_PLATFORM_WIN32
- #define LLBC_CFG_COMM_POLLER_MODEL                 "IocpPoller"
+ #define LLBC_CFG_COMM_POLLER_MODEL                 "SelectPoller"
 #elif LLBC_TARGET_PLATFORM_IPHONE
  #define LLBC_CFG_COMM_POLLER_MODEL                 "SelectPoller"
 #elif LLBC_TARGET_PLATFORM_MAC
