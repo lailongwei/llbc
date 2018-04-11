@@ -465,20 +465,14 @@ public:
 
 public:
     /*
-    * Set reuse flag for packet
+    * Set NeedFreeAfterHandler flag for packet
     */
-    void SetReuse();
+    void SetNeedFreeAfterHandler(bool isFree);
 
     /*
-    * UnSet reuse flag for packet
+    * Get NeedFreeAfterHandler flag
     */
-    void UnSetReuse();
-
-    /*
-    * Check reuse flag
-    * @return bool
-    */
-    bool IsReuse();
+    bool GetNeedFreeAfterHandler();
 
 private:
     /**
@@ -531,7 +525,7 @@ private:
 
     LLBC_MessageBlock *_payload;
 
-    bool _isReuse;
+    bool _isNeedFreeAfterHandler;
 };
 
 __LLBC_NS_END
