@@ -169,6 +169,13 @@ public:
      * @return bool - take over option.
      */
     bool IsTakeOver() const;
+    
+public:
+    /**
+     * Is init file on initialize time
+     * @return bool - init option.
+     */
+    bool IsLazyCreateLogFile() const;
 
 private:
     /**
@@ -202,6 +209,7 @@ private:
     long _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
+    bool _lazyCreateLogFile;
 
     bool _takeOver;
 };

@@ -60,7 +60,7 @@ LLBC_Logger::LLBC_Logger()
 
 LLBC_Logger::~LLBC_Logger()
 {
-    Finalize();
+Finalize();
 }
 
 int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config)
@@ -104,7 +104,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         _logRunnable->AddAppender(appender);
     }
 
-    if (_config->IsLogToFile())
+    if (_config->IsLogToFile() )
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
         appenderInitInfo.level = _config->GetFileLogLevel();
@@ -115,12 +115,12 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         appenderInitInfo.dailyRolling = _config->IsDailyRollingMode();
         appenderInitInfo.maxFileSize = _config->GetMaxFileSize();
         appenderInitInfo.maxBackupIndex = _config->GetMaxBackupIndex();
+        appenderInitInfo.lazyCreateLogFile = _config->IsLazyCreateLogFile();
 
         if (!_config->IsAsyncMode())
             appenderInitInfo.fileBufferSize = 0;
         else
             appenderInitInfo.fileBufferSize = _config->GetFileBufferSize();
-
         LLBC_ILogAppender *appender =
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::File);
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
@@ -383,7 +383,6 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     return data;
 }
-
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32

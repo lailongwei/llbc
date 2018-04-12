@@ -1,24 +1,11 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+/**
+ * @file    _LibConfig.h
+ * @author  Longwei Lai<lailongwei@126.com>
+ * @date    2016/04/20
+ * @version 1.0
+ *
+ * @brief   All csllbc_native, llbc core library configs will export in this file(VIA functions).
+ */
 #ifndef __CSLLBC_COM__LIB_CONFIG_H__
 #define __CSLLBC_COM__LIB_CONFIG_H__
 
@@ -68,12 +55,8 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultLogFlushInterval();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_MaxLogFlushInterval();
 // LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg();
-
-// Thread about configs.
-//
-// LLBC_CFG_THREAD_GUARD_DEBUG
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Thread_GuardDebug();
-
+// LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_LazyCreateLogFile();
 //
 // Timer about configs.
 //
