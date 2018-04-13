@@ -108,6 +108,11 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
     sint64 now = LLBC_GetMilliSeconds();
 
+    if (initInfo.lazyCreateLogFile)
+    {
+        return LLBC_OK;
+    }
+
     _file = LLBC_New(LLBC_File);
     _fileName = BuildLogFileName(now);
 

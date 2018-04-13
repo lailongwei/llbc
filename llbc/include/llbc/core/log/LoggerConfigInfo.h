@@ -170,6 +170,13 @@ public:
      */
     bool IsTakeOver() const;
 
+public:
+    /**
+     * Get logfile create option.
+     * @return bool - logfile create option.
+     */
+    bool IsLazyCreateLogFile() const;
+
 private:
     /**
      * Normalize the log file name.
@@ -202,6 +209,7 @@ private:
     long _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
+    bool _lazyCreateLogFile;
 
     bool _takeOver;
 };

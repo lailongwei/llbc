@@ -120,6 +120,8 @@
 // Default take over config, only using in root logger, when a message log to 
 // unconfiged logger, root logger will take over, if configed takeover to true.
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
+// Default logfile create option
+#define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
 
 /**
  * \brief core/timer about configs.
