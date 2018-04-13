@@ -94,7 +94,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         logDir = LLBC_Directory::Join(_basePath, logDir);
     }
 
-    if (!logDir.empty() && !LLBC_Directory::Exists(logDir))
+    if (!logDir.empty() && !LLBC_Directory::Exists(logDir)) // .empty()校验字符串是否为空，当返回false时字符串非空
     {
         if (LLBC_Directory::Create(logDir) != LLBC_OK)
             return LLBC_FAILED;
@@ -107,35 +107,35 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
     sint64 now = LLBC_GetMilliSeconds();
+    if (!initInfo.lazyCreateLogFile){
+        _file = LLBC_New(LLBC_File);
+        _fileName = BuildLogFileName(now);
 
-    _file = LLBC_New(LLBC_File);
-    _fileName = BuildLogFileName(now);
+        LLBC_FileAttributes fileAttrs;
+        fileAttrs.fileSize = 0;
+        bool fileExists = LLBC_File::Exists(_fileName);// false 表示文件不存在
+        if (fileExists)
+        {
+            if (LLBC_File::GetFileAttributes(_fileName, fileAttrs) != LLBC_OK)
+                return LLBC_FAILED;
+        }
 
-    LLBC_FileAttributes fileAttrs;
-    fileAttrs.fileSize = 0;
-    bool fileExists = LLBC_File::Exists(_fileName);
-    if (fileExists)
-    {
-        if (LLBC_File::GetFileAttributes(_fileName, fileAttrs) != LLBC_OK)
+        bool reOpenClear = false;
+        int backupFilesCount = GetBackupFilesCount(_fileName);
+        if (fileExists &&
+            (fileAttrs.fileSize >= _maxFileSize ||
+                backupFilesCount < _maxBackupIndex))
+        {
+            BackupFiles();
+            reOpenClear = true;
+        }
+
+        if (ReOpenFile(_fileName, reOpenClear) != LLBC_OK)
             return LLBC_FAILED;
+
+        _nonFlushLogCount = 0;
+        _logfileLastCheckTime = now;
     }
-
-    bool reOpenClear = false;
-    int backupFilesCount = GetBackupFilesCount(_fileName);
-    if (fileExists &&
-        (fileAttrs.fileSize >= _maxFileSize ||
-            backupFilesCount < _maxBackupIndex))
-    {
-        BackupFiles();
-        reOpenClear = true;
-    }
-
-    if (ReOpenFile(_fileName, reOpenClear) != LLBC_OK)
-        return LLBC_FAILED;
-
-    _nonFlushLogCount = 0;
-    _logfileLastCheckTime = now;
-
     return LLBC_OK;
 }
 
