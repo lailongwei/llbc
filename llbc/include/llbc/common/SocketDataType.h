@@ -267,10 +267,10 @@ private:
     // Address family, like struct sockaddr_in.sim_family.
     uint16 _addrFamily;
 
-    // ip value, network byte order.
-    int _ip;
     // Port number, network byte order.
     uint16 _port;
+    // ip value, network byte order.
+    int _ip;
 
     // Padding to make structure the same size as sockaddr.
     char _zero[8];
