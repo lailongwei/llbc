@@ -56,15 +56,17 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     // Build event.
     LLBC_Event *ev = new LLBC_Event(EventIds::Event1);
-    // Attach sequential params.
-    ev->AddParam(1);
-    ev->AddParam(true);
-    ev->AddParam("Hello world");
-    ev->AddParam(1.5);
-    ev->AddParam(-1.5f);
-    // Attach naming params.
-    ev->AddParam("Key1", "Hello world");
-    ev->AddParam("Key2", "Hello world too");
+    // Attach int key indexed params.
+    ev->SetParam(0, 1);
+    ev->SetParam(1, true);
+    ev->SetParam(2, "Hello world");
+    ev->SetParam(2, "Hello world(overrided)");
+    (*ev)[3] = 1.5;
+    (*ev)[4] = -1.5f;
+    (*ev)[4] = -3.0f;
+    // Attach string key indexed params.
+    ev->SetParam("Key1", "Hello world");
+    (*ev)["Key2"] =  "Hey, Judy";
     // Fire Event1(Event2 listener already add in Event1 handler).
     evMgr.FireEvent(ev);
 
@@ -82,20 +84,19 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
 void TestCase_Core_Event::OnEvent1(LLBC_Event *ev)
 {
-    std::cout <<"OnEvent1() called! event sequential params:" <<std::endl;
-    for (size_t i = 0; i < ev->GetSequentialParamsCount(); i++)
-    {
-        const LLBC_Variant &param = (*ev)[i];
-        std::cout <<"  " <<i <<": " <<param <<std::endl;
-    }
-
-    std::cout <<"Naming params: " <<std::endl;
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator it = ev->GetNamingParams().begin();
-         it != ev->GetNamingParams().end();
+    std::cout <<"OnEvent1() called! event int key indexed params:" <<std::endl;
+    const std::map<int, LLBC_Variant> &intKeyParams = ev->GetIntKeyParams();
+    for (std::map<int, LLBC_Variant>::const_iterator it = intKeyParams.begin();
+         it != intKeyParams.end();
          it++)
-    {
         std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
-    }
+
+    std::cout <<"string key indexed params: " <<std::endl;
+    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev->GetStrKeyParams();
+    for (std::map<LLBC_String, LLBC_Variant>::const_iterator it = strKeyParams.begin();
+         it != strKeyParams.end();
+         it++)
+        std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
 }
 
 void TestCase_Core_Event::OnEvent1Too(LLBC_Event *ev)
