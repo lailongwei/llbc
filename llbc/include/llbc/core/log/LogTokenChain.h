@@ -56,7 +56,7 @@ public:
     /**
      * Format specific log data.
      * @param[in] data - log data.
-     * @param[out] storage location for formatted log message.
+     * @param[out] formattedData - location for formatted log message.
      */
     void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
