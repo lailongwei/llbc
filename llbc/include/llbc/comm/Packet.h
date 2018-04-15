@@ -465,18 +465,18 @@ public:
 
 public:
     /*
-    * Set reuse flag for packet
+    * Set reuse flag for packet.
     */
     void SetReuse();
 
     /*
-    * UnSet reuse flag for packet
+    * UnSet reuse flag for packet.
     */
     void UnSetReuse();
 
     /*
     * Check reuse flag
-    * @return bool
+    * @return bool - the packet reuse flag.
     */
     bool IsReuse();
 
