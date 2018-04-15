@@ -465,20 +465,15 @@ public:
 
 public:
     /*
-    * Set reuse flag for packet.
+    * Get don't delete after packet handle flag.
+    * @return bool - the dont delete after handle flag.
     */
-    void SetReuse();
+    bool IsDontDeleteAfterHandle() const;
 
     /*
-    * UnSet reuse flag for packet.
+    * Set don't delete after packet handle flag.
     */
-    void UnSetReuse();
-
-    /*
-    * Check reuse flag
-    * @return bool - the packet reuse flag.
-    */
-    bool IsReuse();
+    void SetDontDeleteAfterHandle();
 
 private:
     /**
@@ -531,7 +526,7 @@ private:
 
     LLBC_MessageBlock *_payload;
 
-    bool _isReuse;
+    bool _dontDelAfterHandle;
 };
 
 __LLBC_NS_END

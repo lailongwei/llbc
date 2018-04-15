@@ -37,6 +37,12 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
+
+    inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
+    {
+        if (LIKELY(!packet->IsDontDeleteAfterHandle()))
+            LLBC_Delete(packet);
+    }
 }
 
 __LLBC_INTERNAL_NS_BEGIN
@@ -1348,9 +1354,6 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         return;
     }
 
-    // Create invoke-guard to delete packet.
-    LLBC_InvokeGuard delPacketGuard(&LLBC_INL_NS __DeletePacket, packet);
-
     const int opcode = packet->GetOpcode();
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
@@ -1371,6 +1374,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             if (stHandlerIt != stHandlers.end())
             {
                 stHandlerIt->second->Invoke(*packet);
+                __LLBC_DelPacketAfterHandle(packet);
                 return;
             }
         }
@@ -1386,7 +1390,10 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         if (preIt != _preHandlers.end())
         {
             if (!preIt->second->Invoke(*packet))
+            {
+                __LLBC_DelPacketAfterHandle(packet);
                 return;
+            }
 
             preHandled = true;
         }
@@ -1396,7 +1403,10 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     if (!preHandled && _unifyPreHandler)
     {
         if (!_unifyPreHandler->Invoke(*packet))
+        {
+            __LLBC_DelPacketAfterHandle(packet);
             return;
+        }
     }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
@@ -1412,6 +1422,8 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
              facadeIt++)
             (*facadeIt)->OnUnHandledPacket(*packet);
     }
+
+    __LLBC_DelPacketAfterHandle(packet);
 }
 
 void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)

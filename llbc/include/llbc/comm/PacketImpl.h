@@ -182,19 +182,14 @@ inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int st
     SetStatus(status);
 }
 
-inline void LLBC_Packet::SetReuse()
+inline bool LLBC_Packet::IsDontDeleteAfterHandle() const
 {
-    _isReuse = true;
+    return _dontDelAfterHandle;
 }
 
-inline void LLBC_Packet::UnSetReuse()
+inline void LLBC_Packet::SetDontDeleteAfterHandle()
 {
-    _isReuse = false;
-}
-
-inline bool LLBC_Packet::IsReuse()
-{
-    return _isReuse;
+    _dontDelAfterHandle = true;
 }
 
 template <typename _Ty>
