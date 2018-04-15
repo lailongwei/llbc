@@ -55,6 +55,7 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _fileBufferSize(0)
 
 , _takeOver(false)
+, _isLazyCreateLogFile(false)
 {
 }
 
@@ -86,6 +87,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
     _dailyMode = (cfg.HasProperty("dailyRollingMode") ? cfg.GetValue("dailyRollingMode").AsBool() : LLBC_CFG_LOG_DEFAULT_DAILY_MODE);
     _maxFileSize = (cfg.HasProperty("maxFileSize") ? cfg.GetValue("maxFileSize").AsLong() : LLBC_CFG_LOG_MAX_FILE_SIZE);
     _maxBackupIndex = (cfg.HasProperty("maxBackupIndex") ? cfg.GetValue("maxBackupIndex").AsInt32() : LLBC_CFG_LOG_MAX_BACKUP_INDEX);
+    _lazyCreateLogFile = (cfg.HasProperty("lazyCreateLogFile") ? cfg.GetValue("lazyCreateLogFile").AsBool() : LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE)
 
     // Misc configs.
     _takeOver = (cfg.HasProperty("takeOver") ? cfg.GetValue("takeOver").AsBool() : LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED);
