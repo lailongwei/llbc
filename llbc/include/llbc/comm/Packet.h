@@ -465,14 +465,15 @@ public:
 
 public:
     /*
-    * Set NeedFreeAfterHandler flag for packet
+    * Get don't delete after packet handle flag.
+    * @return bool - the dont delete after handle flag.
     */
-    void SetNeedFreeAfterHandler(bool isFree);
+    bool IsDontDeleteAfterHandle() const;
 
     /*
-    * Get NeedFreeAfterHandler flag
+    * Set don't delete after packet handle flag.
     */
-    bool GetNeedFreeAfterHandler();
+    void SetDontDeleteAfterHandle();
 
 private:
     /**
@@ -525,7 +526,7 @@ private:
 
     LLBC_MessageBlock *_payload;
 
-    bool _isNeedFreeAfterHandler;
+    bool _dontDelAfterHandle;
 };
 
 __LLBC_NS_END

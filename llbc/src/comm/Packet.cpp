@@ -62,7 +62,7 @@ LLBC_Packet::LLBC_Packet()
 
 , _payload(NULL)
 
-, _isNeedFreeAfterHandler(true)
+, _dontDelAfterHandle(false)
 {
 }
 
@@ -109,7 +109,9 @@ void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
     if (UNLIKELY(block == _payload))
         return;
 
-    LLBC_XDelete(_payload);
+    if (_payload)
+        LLBC_Delete(_payload);
+
     _payload = block;
 }
 
