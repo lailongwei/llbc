@@ -438,6 +438,8 @@ public:
      * @return void * - the packet pre-handle result.
      */
     void *GetPreHandleResult() const;
+    template<typename RetType>
+    RetType *GetPreHandleResult() const;
 
     /**
      * Set the pre-handle result into the packet.
