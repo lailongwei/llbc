@@ -43,62 +43,6 @@ public:
      */
     int GetId() const;
 
-public:
-    /**
-     * Add sequential event param.
-     * @param[in] param - the event param.
-     * @return LLBC_Event & - this reference.
-     */
-    LLBC_Event &AddParam(const LLBC_Variant &param);
-    /**
-     * Add sequential event param(template version).
-     * @param[in] param - the event param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    LLBC_Event &AddParam(const ParamType &param);
-
-    /**
-     * Add naming event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    LLBC_Event &AddParam(const LLBC_String &key, const LLBC_Variant &param);
-    /**
-     * Add naming event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    LLBC_Event &AddParam(const LLBC_String &key, const ParamType &param);
-
-public:
-    /**
-     * Get all sequential params.
-     * @return const std::vector<LLBC_Variant> & - the sequential params const reference.
-     */
-    const std::vector<LLBC_Variant> &GetSequentialParams() const;
-
-    /**
-     * Get sequential params count.
-     * @return size_t - the sequential params count.
-     */
-    size_t GetSequentialParamsCount() const;
-
-    /**
-     * Get all naming params.
-     * @return const std::map<LLBC_String, LLBC_Variant> & - the naming params const reference.
-     */
-    const std::map<LLBC_String, LLBC_Variant> &GetNamingParams() const;
-
-    /**
-     * Get naming params count.
-     * @return size_t - the naming params count.
-     */
-    size_t GetNamingParamsCount() const;
-
     /**
      * Check dont delete after fire option.
      * @return bool - the option.
@@ -107,9 +51,83 @@ public:
 
 public:
     /**
+     * Get integer key indexed event param.
+     * @param[in] key - the integer key.
+     * @return const LLBC_Variant & - the event param.
+     */
+    const LLBC_Variant &GetParam(int key) const;
+
+    /**
+     * Get string key indexed event param.
+     * @param[in] key - the string key.
+     * @return const LLBC_Variant & - the event param.
+     */
+    const LLBC_Variant &GetParam(const LLBC_String &key) const;
+
+    /**
+     * Set integer key indexed event param.
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    LLBC_Event &SetParam(int key, const LLBC_Variant &param);
+    /**
+     * Set integer key indexed event param(template version).
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    template <typename ParamType>
+    LLBC_Event &SetParam(int key, const ParamType &param);
+
+    /**
+     * Set string key indexed event param.
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    LLBC_Event &SetParam(const LLBC_String &key, const LLBC_Variant &param);
+    /**
+     * Set string key indexed event param(template version).
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    template <typename ParamType>
+    LLBC_Event &SetParam(const LLBC_String &key, const ParamType &param);
+
+public:
+    /**
+     * Get all int key indexed params.
+     * @return const std::map<int, LLBC_Variant> & - the int key indexed params const reference.
+     */
+    const std::map<int, LLBC_Variant> &GetIntKeyParams() const;
+
+    /**
+     * Get all string key indexed params count.
+     * @return size_t - the integer key indexed params count.
+     */
+    size_t GetIntKeyParamsCount() const;
+
+    /**
+     * Get all string key indexed params.
+     * @return const std::map<LLBC_String, LLBC_Variant> & - the string key indexed params const reference.
+     */
+    const std::map<LLBC_String, LLBC_Variant> &GetStrKeyParams() const;
+
+    /**
+     * Get all string key indexed params count.
+     * @return size_t - the string key indexed params count.
+     */
+    size_t GetStrKeyParamsCount() const;
+
+public:
+    /**
      * Subscript supports.
      */
-    const LLBC_Variant &operator [](size_t index) const;
+    LLBC_Variant &operator [](int key);
+    LLBC_Variant &operator [](const LLBC_String &key);
+    const LLBC_Variant &operator [](int key) const;
     const LLBC_Variant &operator [](const LLBC_String &key) const;
 
     /**
@@ -121,11 +139,11 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    typedef std::vector<LLBC_Variant> _SeqParams;
-    _SeqParams *_seqParams;
+    typedef std::map<int, LLBC_Variant> _IntKeyParams;
+    _IntKeyParams *_intKeyParams;
 
-    typedef std::map<LLBC_String, LLBC_Variant> _NamingParams;
-    _NamingParams *_namingParams;
+    typedef std::map<LLBC_String, LLBC_Variant> _StrKeyParams;
+    _StrKeyParams *_strKeyParams;
 };
 
 __LLBC_NS_END

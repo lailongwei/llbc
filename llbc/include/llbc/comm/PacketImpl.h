@@ -182,19 +182,14 @@ inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int st
     SetStatus(status);
 }
 
-inline void LLBC_Packet::SetReuse()
+inline void LLBC_Packet::SetNeedFreeAfterHandler(bool isFree)
 {
-    _isReuse = true;
+    _isNeedFreeAfterHandler = isFree;
 }
 
-inline void LLBC_Packet::UnSetReuse()
+inline bool LLBC_Packet::GetNeedFreeAfterHandler()
 {
-    _isReuse = false;
-}
-
-inline bool LLBC_Packet::IsReuse()
-{
-    return _isReuse;
+    return _isNeedFreeAfterHandler;
 }
 
 template <typename _Ty>

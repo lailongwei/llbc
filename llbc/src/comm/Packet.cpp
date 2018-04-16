@@ -62,7 +62,7 @@ LLBC_Packet::LLBC_Packet()
 
 , _payload(NULL)
 
-, _isReuse(false)
+, _isNeedFreeAfterHandler(true)
 {
 }
 

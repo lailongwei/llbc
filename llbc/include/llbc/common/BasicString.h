@@ -1265,10 +1265,6 @@ public:
 
         strs.push_back(_This::substr(0, bytePos));
         strs.push_back(_This::substr(bytePos));
-
-        return;
-
-        strs.push_back(*this);
     }
 
     // utf8 support: scatter utf8 string.
