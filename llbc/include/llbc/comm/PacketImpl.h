@@ -182,14 +182,14 @@ inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int st
     SetStatus(status);
 }
 
-inline void LLBC_Packet::SetNeedFreeAfterHandler(bool isFree)
+inline bool LLBC_Packet::IsDontDeleteAfterHandle() const
 {
-    _isNeedFreeAfterHandler = isFree;
+    return _dontDelAfterHandle;
 }
 
-inline bool LLBC_Packet::GetNeedFreeAfterHandler()
+inline void LLBC_Packet::SetDontDeleteAfterHandle()
 {
-    return _isNeedFreeAfterHandler;
+    _dontDelAfterHandle = true;
 }
 
 template <typename _Ty>

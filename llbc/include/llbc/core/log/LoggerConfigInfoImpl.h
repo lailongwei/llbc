@@ -120,7 +120,7 @@ inline bool LLBC_LoggerConfigInfo::IsTakeOver() const
 
 inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
 {
-    return _lazyCreateLogFilel
+    return _lazyCreateLogFile;
 }
 
 __LLBC_NS_END

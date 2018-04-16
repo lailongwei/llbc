@@ -49,9 +49,7 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static void __DeletePacket(void *data)
 {
-    LLBC_NS LLBC_Packet *pkt = reinterpret_cast<LLBC_NS LLBC_Packet *>(data);
-    if (pkt && pkt->GetNeedFreeAfterHandler())
-        LLBC_Delete(pkt);
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_Packet *>(data));
 }
 
 __LLBC_INTERNAL_NS_END
