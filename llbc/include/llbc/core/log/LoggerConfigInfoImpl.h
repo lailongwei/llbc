@@ -118,6 +118,11 @@ inline bool LLBC_LoggerConfigInfo::IsTakeOver() const
     return _takeOver;
 }
 
+inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
+{
+    return _lazyCreateLogFilel
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
