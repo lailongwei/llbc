@@ -38,7 +38,7 @@ void LLBC_Timer::SetCancelHandler(ObjectType *object, void ( ObjectType::*cancel
     if (UNLIKELY(object == NULL || cancelMeth == NULL))
         SetCancelHandler(static_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL));
     else
-        SetCancelHandler(new LLBC_Delegate1<void, ObjectType, LLBC_Timer *>(object, timeoutMeth));
+        SetCancelHandler(new LLBC_Delegate1<void, ObjectType, LLBC_Timer *>(object, cancelMeth));
 }
 
 __LLBC_NS_END
