@@ -28,7 +28,6 @@ __LLBC_NS_BEGIN
 
 /**
  * Get main bundle path.
- * @param[in] appendSlash - append slash flag, default is false.
  * @return LLBC_String - main bundle path.
  */
 LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetMainBundlePath();

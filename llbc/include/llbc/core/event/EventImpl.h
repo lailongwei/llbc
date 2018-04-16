@@ -28,33 +28,33 @@ inline int LLBC_Event::GetId() const
     return _id;
 }
 
-template <typename ParamType>
-inline LLBC_Event &LLBC_Event::AddParam(const ParamType &param)
-{
-    const LLBC_Variant varParam(param);
-    return AddParam(varParam);
-}
-
-template <typename ParamType>
-inline LLBC_Event &LLBC_Event::AddParam(const LLBC_String &key, const ParamType &param)
-{
-    const LLBC_Variant varParam(param);
-    return AddParam(key, varParam);
-}
-
-inline size_t LLBC_Event::GetSequentialParamsCount() const
-{
-    return _seqParams != NULL ? _seqParams->size() : 0;
-}
-
-inline size_t LLBC_Event::GetNamingParamsCount() const
-{
-    return _namingParams != NULL ? _namingParams->size() : 0;
-}
-
 inline bool LLBC_Event::IsDontDelAfterFire() const
 {
     return _dontDelAfterFire;
+}
+
+template <typename ParamType>
+inline LLBC_Event &LLBC_Event::SetParam(int key, const ParamType &param)
+{
+    const LLBC_Variant varParam(param);
+    return SetParam(key, varParam);
+}
+
+template <typename ParamType>
+inline LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const ParamType &param)
+{
+    const LLBC_Variant varParam(param);
+    return SetParam(key, varParam);
+}
+
+inline size_t LLBC_Event::GetIntKeyParamsCount() const
+{
+    return _intKeyParams != NULL ? _intKeyParams->size() : 0;
+}
+
+inline size_t LLBC_Event::GetStrKeyParamsCount() const
+{
+    return _strKeyParams != NULL ? _strKeyParams->size() : 0;
 }
 
 __LLBC_NS_END
