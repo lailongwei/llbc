@@ -90,7 +90,7 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_USING_WITH_STREAM");
     lua_pushboolean(l, LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED);
     lua_setfield(l, 1, "CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED");
-    lua_pushboolean(l, LLBC_CFG_LOG_LAZY_CREATE_LOG_FLIE);
+    lua_pushboolean(l, LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE);
     lua_setfield(l, 1, "CFG_LOG_LAZY_CREATE_LOG_FILE");
 
     // Timer
