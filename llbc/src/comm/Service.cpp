@@ -38,21 +38,12 @@ namespace
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
 
-    inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
+    void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
     {
         if (LIKELY(!packet->IsDontDeleteAfterHandle()))
             LLBC_Delete(packet);
     }
 }
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static void __DeletePacket(void *data)
-{
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_Packet *>(data));
-}
-
-__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
