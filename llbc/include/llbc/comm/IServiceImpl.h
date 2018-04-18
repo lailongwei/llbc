@@ -290,7 +290,7 @@ inline int LLBC_IService::UnifyPreSubscribe(bool(*func)(LLBC_Packet &))
 {
     LLBC_IDelegate1<bool, LLBC_Packet &> *deleg =
         new LLBC_Func1<bool, LLBC_Packet &>(func);
-    if (!UnifyPreSubscribe(deleg) != LLBC_OK)
+    if (UnifyPreSubscribe(deleg) == LLBC_OK)
     {
         delete deleg;
         return LLBC_FAILED;
