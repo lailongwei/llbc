@@ -68,7 +68,7 @@
 
 // CLang compiler.
 // The compile version is converted, like GUN C compiler
-#ifdef __clang__
+#if defined(__clang__) && !defined(LLBC_CUR_COMP)
  #define LLBC_CUR_COMP          LLBC_COMP_CLANG
  #define LLBC_CUR_COMP_DESC     "clang"
  #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minar__ *100 + __clang_patchlevel__)
@@ -86,6 +86,6 @@
  #define LLBC_COMP_MAJOR_VER    0
  #define LLBC_COMP_MINOR_VER    0
  #define LLBC_COMP_PATCH_LEVEL  0
-#endif
+ #endif
 
 #endif // !__LLBC_COM_COMPILE_H__
