@@ -68,6 +68,8 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultLogFlushInterval();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_MaxLogFlushInterval();
 // LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg();
+// LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_LazyCreateLogFile();
 
 // Thread about configs.
 //

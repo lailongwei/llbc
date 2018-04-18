@@ -213,6 +213,14 @@ namespace llbc
         {
             get { return LLBCNative.csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg() != 0; }
         }
+
+        /// <summary>
+        /// Lazy create log file.
+        /// </summary>
+        public static bool lazyCreateLogFile
+        {
+            get { return LLBCNative.csllbc_LibConfig_Log_LazyCreateLogFile() != 0; }
+        }
         #endregion // logger about configs
 
         #region thread about configs
