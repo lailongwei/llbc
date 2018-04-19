@@ -38,7 +38,7 @@ namespace
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
 
-    void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
+    inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
     {
         if (LIKELY(!packet->IsDontDeleteAfterHandle()))
             LLBC_Delete(packet);
