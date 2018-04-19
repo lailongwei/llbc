@@ -119,6 +119,11 @@ int csllbc_LibConfig_Log_TakeOverUnknownLoggerMsg()
     return LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED;
 }
 
+int csllbc_LibConfig_Log_LazyCreateLogFile()
+{
+    return LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE;
+}
+
 int csllbc_LibConfig_Thread_GuardDebug()
 {
     return LLBC_CFG_THREAD_GUARD_DEBUG;
