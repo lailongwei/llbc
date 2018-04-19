@@ -93,7 +93,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    max flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
     desc.append_format("    take over unknown logger message?: %s\n", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED ? "true" : "false");
-    desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false")
+    desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
     desc.append_format("  timer info: \n");
     desc.append_format("    strict timer schedule: %s\n", LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE ? "true" : "false");
 
