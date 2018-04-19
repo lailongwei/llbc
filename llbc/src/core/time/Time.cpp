@@ -105,7 +105,7 @@ LLBC_Time LLBC_Time::Now()
     return LLBC_Time(static_cast<double>(LLBC_GetMicroSeconds()) / NumOfMicroSecondsPerSecond);
 }
 
-uint32 LLBC_Time::TimeStamp()
+uint32 LLBC_Time::NowTimeStamp()
 {
     return (uint32)time(NULL);
 }
@@ -185,9 +185,14 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
     return LLBC_TimeSpan(static_cast<double>(timePart) / NumOfMicroSecondsPerSecond);
 }
 
-sint64 LLBC_Time::GetTimeTicks() const
+uint64 LLBC_Time::GetTimeTick() const
 {
-    return static_cast<sint64>(_time * NumOfMicroSecondsPerSecond);
+    return static_cast<uint64>(_time * NumOfMicroSecondsPerSecond);
+}
+
+uint32 LLBC_Time::GetTimeStamp() const
+{
+    return static_cast<uint32>(_time);
 }
 
 const struct tm &LLBC_Time::GetGmtTime() const

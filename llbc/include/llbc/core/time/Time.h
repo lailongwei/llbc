@@ -88,7 +88,7 @@ public:
     /**
      * Get current timestamp.
      */
-    static uint32 TimeStamp();
+    static uint32 NowTimeStamp();
 
     /**
      * Get local time parts(year, month, day, hour, minute, second, dayofweek).
@@ -118,10 +118,15 @@ public:
     LLBC_TimeSpan GetTimeOfDay() const;
 
     /**
-     * Get time ticks, in micro seconds.
-     * @return sint64 - the time ticks, in micro seconds.
+     * Get time tick, in micro seconds.
+     * @return uint64 - the time tick, in micro seconds.
      */
-    sint64 GetTimeTicks() const;
+    uint64 GetTimeTick() const;
+    /**
+     * Get timestamp, in seconds.
+     * @return uint32 - the timestamp, in seconds.
+     */
+    uint32 GetTimeStamp() const;
 
 public:
     /**
