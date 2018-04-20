@@ -192,6 +192,12 @@ inline void LLBC_Packet::SetDontDeleteAfterHandle()
     _dontDelAfterHandle = true;
 }
 
+template<typename RetType>
+inline RetType *LLBC_Packet::GetPreHandleResult() const
+{
+    return reinterpret_cast<RetType *>(_preHandleResult);
+}
+
 template <typename _Ty>
 inline int LLBC_Packet::Read(std::vector<_Ty> &val)
 {
