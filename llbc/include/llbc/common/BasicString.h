@@ -978,6 +978,17 @@ public:
         return isspace(*this);
     }
 
+    // startswith/endswith
+    bool startswith(const _This &s) const
+    {
+        return (this->size() >= s.size() && substr(0, s.size()) == s);
+    }
+
+    bool endswith(const _This &s) const
+    {
+        return (this->size() >= s.size() && substr(size() - s.size(), s.size()) == s);
+    }
+
 public:
     friend std::basic_ostream<_Elem> &operator <<(std::basic_ostream<_Elem> &o, const _This &str)
     {
