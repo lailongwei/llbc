@@ -106,26 +106,31 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_DEBUG_LOG_SPEC2("test", "test_tag", "This is a debug log message.");
     Log.d3("test", "This is a debug log message(from Log.d3()).");
     Log.d4("test", "test_tag", "This is a debug log message(from Log.d4()).");
+    Log.d4<TestCase_Core_Log>("test", "This is a debug log message(from Log.d4()).");
 
     LLBC_INFO_LOG_SPEC("test", "This is a info log message.");
     LLBC_INFO_LOG_SPEC2("test", "test_tag", "This is a info log message.");
     Log.i3("test", "This is a info log message(from Log.i3()).");
     Log.i4("test", "test_tag", "This is a info log message(from Log.i4()).");
+    Log.i4<TestCase_Core_Log>("test", "This is a info log message(from Log.i4()).");
 
     LLBC_WARN_LOG_SPEC("test", "This is a warn log message.");
     LLBC_WARN_LOG_SPEC2("test", "test_tag", "This is a warn log message.");
     Log.w3("test", "This is a warn log message(from Log.w3()).");
     Log.w4("test", "test_tag", "This is a warn log message(from Log.w4()).");
+    Log.w4<TestCase_Core_Log>("test", "This is a warn log message(from Log.w4()).");
 
     LLBC_ERROR_LOG_SPEC("test", "This is a error log message.");
     LLBC_ERROR_LOG_SPEC2("test", "test_tag", "This is a error log message.");
     Log.e3("test", "This is a error log message(from Log.e3()).");
     Log.e4("test", "test_tag", "This is a error log message(from Log.e4()).");
+    Log.e4<TestCase_Core_Log>("test", "This is a error log message(from Log.e4()).");
 
     LLBC_FATAL_LOG_SPEC("test", "This is a fatal log message.");
     LLBC_FATAL_LOG_SPEC2("test", "test_tag", "This is a fatal log message.");
     Log.f3("test", "This is a fatal log message(from Log.f3()).");
     Log.f4("test", "test_tag", "This is a fatal log message(from Log.f4()).");
+    Log.f4<TestCase_Core_Log>("test", "This is a fatal log message(from Log.f4()).");
 
     // Log file delete test.
     for (int i = 0; i < 20; i++)

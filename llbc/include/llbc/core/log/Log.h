@@ -74,6 +74,8 @@ public:
     static void d2(const char *fmt, ...);
     static void d3(const char *logger, const char *fmt, ...);
     static void d4(const char *logger, const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void d4(const char *logger, const char *fmt, ...);
 
     /**
      * Output info level message.
@@ -84,6 +86,8 @@ public:
     static void i2(const char *fmt, ...);
     static void i3(const char *logger, const char *fmt, ...);
     static void i4(const char *logger, const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void i4(const char *logger, const char *fmt, ...);
 
     /**
      * Output warning level message.
@@ -94,6 +98,8 @@ public:
     static void w2(const char *fmt, ...);
     static void w3(const char *logger, const char *fmt, ...);
     static void w4(const char *logger, const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void w4(const char *logger, const char *fmt, ...);
 
     /**
      * Output error level message.
@@ -104,6 +110,8 @@ public:
     static void e2(const char *fmt, ...);
     static void e3(const char *logger, const char *fmt, ...);
     static void e4(const char *logger, const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void e4(const char *logger, const char *fmt, ...);
 
     /**
      * Output fatal level message.
@@ -114,6 +122,8 @@ public:
     static void f2(const char *fmt, ...);
     static void f3(const char *logger, const char *fmt, ...);
     static void f4(const char *logger, const char *tag, const char *fmt, ...);
+    template <typename Tag>
+    static void f4(const char *logger, const char *fmt, ...);
 
 private:
     /**
