@@ -986,7 +986,7 @@ public:
 
     bool endswith(const _This &s) const
     {
-        return (this->size() >= s.size() && substr(size() - s.size(), s.size()) == s);
+        return (this->size() >= s.size() && substr(this->size() - s.size(), s.size()) == s);
     }
 
 public:
