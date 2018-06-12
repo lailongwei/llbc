@@ -27,6 +27,25 @@
 __LLBC_NS_BEGIN
 
 /**
+ * \brief Thread local storage value clear method enumeration, use in SetValue()/ClearValue() method.
+ */
+class LLBC_TlsValueClearMeth
+{
+public:
+    enum
+    {
+        Begin,
+
+        Delete = Begin,
+        Free,
+
+        Default = Delete,
+
+        End,
+    };
+};
+
+/**
  * \brief Thread local storage class encapsulation, it allow each thread
  *        allocate locations in which to store thread-specific data.
  */
@@ -76,9 +95,16 @@ public:
 
     /**
      * Set value associated with the tls.
-     * @param[in] value - value pointer.
+     * @param[in] value          - value pointer.
+     * @param[in] valueClearMeth - the value clear method.
      */
-    void SetValue(ValueType *value);
+    void SetValue(ValueType *value, int valueClearMeth = LLBC_TlsValueClearMeth::Default);
+
+    /**
+     * Clear value associated with the tls.
+     * @param[in] valueClearMeth - the value clear method.
+     */
+    void ClearValue(int valueClearMeth = LLBC_TlsValueClearMeth::Default);
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_Tls);
 

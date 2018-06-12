@@ -127,6 +127,13 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLine("%s islower?%d, isupper?%d, isalpha?%d", 
         str.c_str(), str.islower(), str.isupper(), str.isalpha());
 
+    // startswith/endswith
+    str = "Hello world!";
+    LLBC_PrintLine("%s starts with 'Hello'?: %s", str.c_str(), str.startswith("Hello") ? "true" : "false");
+    LLBC_PrintLine("%s starts with 'hello'?: %s", str.c_str(), str.startswith("hello") ? "true" : "false");
+    LLBC_PrintLine("%s ends with 'world!'?: %s", str.c_str(), str.endswith("world!") ? "true" : "false");
+    LLBC_PrintLine("%s starts with 'world!!'?: %s", str.c_str(), str.endswith("world!!") ? "true" : "false");
+
     LLBC_PrintLine("\n");
 }
 

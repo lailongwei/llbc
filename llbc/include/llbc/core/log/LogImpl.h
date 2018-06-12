@@ -35,12 +35,34 @@ inline void LLBC_LogHelper::d2(const char *fmt, ...)
 }
 
 template <typename Tag>
+inline void LLBC_LogHelper::d4(const char *logger, const char *fmt, ...)
+{
+    char *fmttedMsg; int msgLen;
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+
+    d4(logger, LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
+
+    LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::i2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     i2(LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
+
+    LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
+inline void LLBC_LogHelper::i4(const char *logger, const char *fmt, ...)
+{
+    char *fmttedMsg; int msgLen;
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+
+    i4(logger, LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
 
     LLBC_Free(fmttedMsg);
 }
@@ -57,6 +79,17 @@ inline void LLBC_LogHelper::w2(const char *fmt, ...)
 }
 
 template <typename Tag>
+inline void LLBC_LogHelper::w4(const char *logger, const char *fmt, ...)
+{
+    char *fmttedMsg; int msgLen;
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+
+    w4(logger, LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
+
+    LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::e2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
@@ -68,12 +101,34 @@ inline void LLBC_LogHelper::e2(const char *fmt, ...)
 }
 
 template <typename Tag>
+inline void LLBC_LogHelper::e4(const char *logger, const char *fmt, ...)
+{
+    char *fmttedMsg; int msgLen;
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+
+    e4(logger, LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
+
+    LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::f2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
     f2(LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
+
+    LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
+inline void LLBC_LogHelper::f4(const char *logger, const char *fmt, ...)
+{
+    char *fmttedMsg; int msgLen;
+    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+
+    f4(logger, LLBC_GetTypeName(Tag).c_str(), "%s", fmttedMsg);
 
     LLBC_Free(fmttedMsg);
 }

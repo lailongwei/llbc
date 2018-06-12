@@ -17,6 +17,14 @@ else
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
 end
 
+-- Common functional functions define
+-- Enable multithread compile
+function enable_multithread_comp()
+    filter { "system:windows" }
+        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
+    filter {}
+end
+
 -- zlib library:
 local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
@@ -67,15 +75,10 @@ workspace ("llbc_" .. _ACTION)
         optimize "Speed"
     filter {}
 
-    -- charactersetarchitecture
+    -- characterset architecture
     filter { "language:c++" }
         characterset "MBCS"
     filter {}
-
-    -- special buildoptions
-    -- filter { "system:windows", "language:c++" }
-    --     flags "StaticRuntime"
-    -- filter {}
 
 -- ****************************************************************************
 -- llbc core library compile setting
@@ -137,6 +140,9 @@ project "llbc"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp()
 
 -- ****************************************************************************
 -- core library testsuite compile setting
@@ -207,6 +213,9 @@ project "testsuite"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp()
 
     -- warnings
     filter { "system:not windows" }
@@ -338,6 +347,9 @@ project "pyllbc"
         targetsuffix "_debug"
     filter {}
 
+    -- enable multithread compile
+    enable_multithread_comp()
+
 -- ****************************************************************************
 -- csharp wrap library(csllbc) native library compile setting
 project "csllbc_native"
@@ -404,6 +416,9 @@ project "csllbc_native"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp()
 
     -- disable warnings
     filter { "system:not windows" }
@@ -542,6 +557,9 @@ project "lullbc_lualib"
         targetsuffix "_debug"
     filter {}
 
+    -- enable multithread compile
+    enable_multithread_comp()
+
 -- lua executable compile setting
 local LUA_SRC_PATH = "../../wrap/lullbc/lua"
 project "lullbc_luaexec"
@@ -598,6 +616,9 @@ project "lullbc_luaexec"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp()
 
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
@@ -726,4 +747,7 @@ project "lullbc"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp()
 

@@ -73,9 +73,9 @@ void TestCase_Core_Time_Time::TimeClassTest()
     LLBC_Time defaultTime;
     std::cout <<"Default time: " <<defaultTime <<std::endl;
 
-    // Now(), GetTimeTicks(), Format(), FormatAsGmt() test.
+    // Now(), GetTimeTick(), Format(), FormatAsGmt() test.
     LLBC_Time now = LLBC_Time::Now();
-    std::cout <<"now time: " <<now <<", Time Ticks: " <<now.GetTimeTicks() <<std::endl;
+    std::cout <<"now time: " <<now <<", Time Ticks: " <<now.GetTimeTick() <<std::endl;
     std::cout <<"Default format, LOCAL: " <<now.Format() <<", UTC: " <<now.FormatAsGmt() <<std::endl;
     std::cout <<"Special format(%y-%m) LOCAL: " <<now.Format("%y-%m") <<", UTC: " <<now.FormatAsGmt("%y-%m") <<std::endl;
 
@@ -130,14 +130,14 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     std::cout <<"AddMilliSeconds() test:" <<std::endl;
     for (int i = 1; i <= 3; i++)
-        std::cout <<i <<": " <<now.AddMilliSeconds(i * 500).GetTimeTicks() <<", -" 
-        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTicks() <<"\n";
+        std::cout <<i <<": " <<now.AddMilliSeconds(i * 500).GetTimeTick() <<", -" 
+        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTick() <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddMicroSeconds() test:" <<std::endl;
     for (int i = 1; i <= 3; i++)
-        std::cout <<i <<": " <<now.AddMicroSeconds(i * 500).GetTimeTicks() <<", -" 
-        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTicks() <<"\n";
+        std::cout <<i <<": " <<now.AddMicroSeconds(i * 500).GetTimeTick() <<", -" 
+        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTick() <<"\n";
     std::cout <<std::endl;
 
     // IsLeapYear() test.
