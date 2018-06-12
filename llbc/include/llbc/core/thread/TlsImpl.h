@@ -75,10 +75,33 @@ const ValueType *LLBC_Tls<ValueType>::GetValue() const
 }
 
 template <typename ValueType>
-void LLBC_Tls<ValueType>::SetValue(ValueType *value)
+void LLBC_Tls<ValueType>::SetValue(ValueType *value, int valueClearMeth)
 {
-    delete reinterpret_cast<ValueType *>(LLBC_TlsGetValue(_handle));
+    void *oldValue = LLBC_TlsGetValue(_handle);
+    if (UNLIKELY(oldValue == value))
+        return;
+
+    if (UNLIKELY(oldValue))
+    {
+        switch (valueClearMeth)
+        {
+        case LLBC_TlsValueClearMeth::Free:
+            LLBC_Free(oldValue);
+            break;
+
+        default: // Default using delete to clear value.
+            LLBC_Delete(reinterpret_cast<ValueType *>(oldValue));
+            break;
+        }
+    }
+
     LLBC_TlsSetValue(_handle, value);
+}
+
+template <typename ValueType>
+void LLBC_Tls<ValueType>::ClearValue(int valueClearMeth)
+{
+    this->SetValue(NULL, valueClearMeth);
 }
 
 __LLBC_NS_END
