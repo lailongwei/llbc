@@ -456,8 +456,6 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &fromTime, double seconds
     double spanVal = secondsInDay - pastTimeLocal;
     if (spanVal < 0)
         spanVal = NumOfSecondsPerDay + spanVal;
-    else
-        spanVal = NumOfSecondsPerDay - spanVal;
 
     return LLBC_TimeSpan(spanVal);
 }
