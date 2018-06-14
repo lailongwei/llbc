@@ -97,6 +97,7 @@
 // C++ standard header files.
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <iomanip>
 #include <memory>
 #include <vector>
