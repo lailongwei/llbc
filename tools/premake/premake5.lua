@@ -25,6 +25,28 @@ function enable_multithread_comp()
     filter {}
 end
 
+-- Set optimize options.
+function set_optimize_opts()
+    filter { "configurations:debug*", "language:c++", "system:not windows" }
+        buildoptions {
+            "-ggdb -g",
+        }
+    filter {}
+
+    filter { "configurations:debug*", "language:c++", "system:windows" }
+        runtime "Debug"
+        optimize "Debug"
+    filter {}
+
+    filter { "configurations:debug*", "language:not c++" }
+        optimize "Debug"
+    filter {}
+
+    filter { "configurations:release*" }
+        optimize "Speed"
+    filter {}
+end
+
 -- zlib library:
 local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
@@ -56,23 +78,6 @@ workspace ("llbc_" .. _ACTION)
     -- control symbols
     filter { "system:macosx", "language:c++" }
         symbols("On")
-    filter {}
-
-    -- optimize
-    filter { "configurations:debug*", "language:c++", "system:not windows" }
-        buildoptions {
-            "-ggdb -g",
-        }
-    filter {}
-    filter { "configurations:debug*", "language:c++", "system:windows" }
-        runtime "Debug"
-        optimize "Debug"
-    filter {}
-    filter { "configurations:debug*", "language:not c++" }
-        optimize "Debug"
-    filter {}
-    filter { "configurations:release*" }
-        optimize "Speed"
     filter {}
 
     -- characterset architecture
@@ -135,6 +140,9 @@ project "llbc"
             "-fvisibility=hidden",
         }
     filter {}
+
+    -- optimize
+    set_optimize_opts()
 
     -- debug target suffix define
     filter { "configurations:debug*" }
@@ -223,6 +231,9 @@ project "testsuite"
             "invalid-source-encoding",
         }
     filter {}
+
+    -- optimize
+    set_optimize_opts()
 
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting
@@ -342,6 +353,9 @@ project "pyllbc"
         }
     filter {}
 
+    -- optimize
+    set_optimize_opts()
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
@@ -412,6 +426,9 @@ project "csllbc_native"
         }
     filter {}
 
+    -- optimize
+    set_optimize_opts()
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
@@ -474,6 +491,9 @@ project "csllbc"
         }
     filter {}
 
+    -- optimize
+    set_optimize_opts()
+
     -- links
     filter {}
     links {
@@ -501,6 +521,9 @@ project "csllbc_testsuite"
         "../../wrap/csllbc/testsuite/**.cs",
     }
 
+    -- optimize
+    set_optimize_opts()
+
     -- links
     links {
         "System",
@@ -508,7 +531,6 @@ project "csllbc_testsuite"
         "System.Core",
         "csllbc",
     }
-
 
 -- ****************************************************************************
 -- luasrc library(liblua) compile setting
@@ -542,6 +564,9 @@ project "lullbc_lualib"
     filter { "system:not windows" }
         defines { "LUA_USE_DLOPEN" }
     filter {}
+
+    -- optimize
+    set_optimize_opts()
 
     -- links
     filter { "system:not windows" }
@@ -586,6 +611,9 @@ project "lullbc_luaexec"
     dependson {
         "lullbc_lualib"
     }
+
+    -- optimize
+    set_optimize_opts()
 
     -- links 
     libdirs { 
@@ -698,6 +726,9 @@ project "lullbc"
     -- target name, target prefix, extension
     targetname "_lullbc"
     targetprefix ""
+
+    -- optimize
+    set_optimize_opts()
 
     -- links 
     libdirs { 
