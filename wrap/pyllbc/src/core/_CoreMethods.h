@@ -41,10 +41,10 @@ class pyllbc_CoreMethods
 public:
     pyllbc_CoreMethods()
     {
-        rand.ml_name = "rand";
-        rand.ml_meth = (PyCFunction)_pyllbc_rand;
-        rand.ml_flags = METH_VARARGS;
-        rand.ml_doc = "pyllbc library method/function";
+        createtask.ml_name = "createtask";
+        createtask.ml_meth = (PyCFunction)_pyllbc_createtask;
+        createtask.ml_flags = METH_VARARGS;
+        createtask.ml_doc = "pyllbc library method/function";
         Property_ToContent.ml_name = "Property_ToContent";
         Property_ToContent.ml_meth = (PyCFunction)_pyllbc_Property_ToContent;
         Property_ToContent.ml_flags = METH_VARARGS;
@@ -53,18 +53,18 @@ public:
         GetBundleResPath.ml_meth = (PyCFunction)_pyllbc_GetBundleResPath;
         GetBundleResPath.ml_flags = METH_VARARGS;
         GetBundleResPath.ml_doc = "pyllbc library method/function";
-        shuffle.ml_name = "shuffle";
-        shuffle.ml_meth = (PyCFunction)_pyllbc_shuffle;
-        shuffle.ml_flags = METH_VARARGS;
-        shuffle.ml_doc = "pyllbc library method/function";
+        BoolJudge.ml_name = "BoolJudge";
+        BoolJudge.ml_meth = (PyCFunction)_pyllbc_BoolJudge;
+        BoolJudge.ml_flags = METH_VARARGS;
+        BoolJudge.ml_doc = "pyllbc library method/function";
         GetMainBundle.ml_name = "GetMainBundle";
         GetMainBundle.ml_meth = (PyCFunction)_pyllbc_GetMainBundle;
         GetMainBundle.ml_flags = METH_VARARGS;
         GetMainBundle.ml_doc = "pyllbc library method/function";
-        createtask.ml_name = "createtask";
-        createtask.ml_meth = (PyCFunction)_pyllbc_createtask;
-        createtask.ml_flags = METH_VARARGS;
-        createtask.ml_doc = "pyllbc library method/function";
+        RandReal.ml_name = "RandReal";
+        RandReal.ml_meth = (PyCFunction)_pyllbc_RandReal;
+        RandReal.ml_flags = METH_VARARGS;
+        RandReal.ml_doc = "pyllbc library method/function";
         Property_RemoveAllPropertyes.ml_name = "Property_RemoveAllPropertyes";
         Property_RemoveAllPropertyes.ml_meth = (PyCFunction)_pyllbc_Property_RemoveAllPropertyes;
         Property_RemoveAllPropertyes.ml_flags = METH_VARARGS;
@@ -73,6 +73,10 @@ public:
         HashString.ml_meth = (PyCFunction)_pyllbc_HashString;
         HashString.ml_flags = METH_VARARGS;
         HashString.ml_doc = "pyllbc library method/function";
+        SeedRand.ml_name = "SeedRand";
+        SeedRand.ml_meth = (PyCFunction)_pyllbc_SeedRand;
+        SeedRand.ml_flags = METH_VARARGS;
+        SeedRand.ml_doc = "pyllbc library method/function";
         istaskexist.ml_name = "istaskexist";
         istaskexist.ml_meth = (PyCFunction)_pyllbc_istaskexist;
         istaskexist.ml_flags = METH_VARARGS;
@@ -89,26 +93,22 @@ public:
         GenGUID.ml_meth = (PyCFunction)_pyllbc_GenGUID;
         GenGUID.ml_flags = METH_VARARGS;
         GenGUID.ml_doc = "pyllbc library method/function";
-        choice.ml_name = "choice";
-        choice.ml_meth = (PyCFunction)_pyllbc_choice;
-        choice.ml_flags = METH_VARARGS;
-        choice.ml_doc = "pyllbc library method/function";
-        booljudge.ml_name = "booljudge";
-        booljudge.ml_meth = (PyCFunction)_pyllbc_booljudge;
-        booljudge.ml_flags = METH_VARARGS;
-        booljudge.ml_doc = "pyllbc library method/function";
         GetModuleFileName.ml_name = "GetModuleFileName";
         GetModuleFileName.ml_meth = (PyCFunction)_pyllbc_GetModuleFileName;
         GetModuleFileName.ml_flags = METH_VARARGS;
         GetModuleFileName.ml_doc = "pyllbc library method/function";
-        seed.ml_name = "seed";
-        seed.ml_meth = (PyCFunction)_pyllbc_seed;
-        seed.ml_flags = METH_VARARGS;
-        seed.ml_doc = "pyllbc library method/function";
+        istaskactivated.ml_name = "istaskactivated";
+        istaskactivated.ml_meth = (PyCFunction)_pyllbc_istaskactivated;
+        istaskactivated.ml_flags = METH_VARARGS;
+        istaskactivated.ml_doc = "pyllbc library method/function";
         Property_GetComments.ml_name = "Property_GetComments";
         Property_GetComments.ml_meth = (PyCFunction)_pyllbc_Property_GetComments;
         Property_GetComments.ml_flags = METH_VARARGS;
         Property_GetComments.ml_doc = "pyllbc library method/function";
+        RandInt.ml_name = "RandInt";
+        RandInt.ml_meth = (PyCFunction)_pyllbc_RandInt;
+        RandInt.ml_flags = METH_VARARGS;
+        RandInt.ml_doc = "pyllbc library method/function";
         Property_FromContent.ml_name = "Property_FromContent";
         Property_FromContent.ml_meth = (PyCFunction)_pyllbc_Property_FromContent;
         Property_FromContent.ml_flags = METH_VARARGS;
@@ -117,14 +117,6 @@ public:
         Property_GetPropertyNames.ml_meth = (PyCFunction)_pyllbc_Property_GetPropertyNames;
         Property_GetPropertyNames.ml_flags = METH_VARARGS;
         Property_GetPropertyNames.ml_doc = "pyllbc library method/function";
-        rand53real.ml_name = "rand53real";
-        rand53real.ml_meth = (PyCFunction)_pyllbc_rand53real;
-        rand53real.ml_flags = METH_VARARGS;
-        rand53real.ml_doc = "pyllbc library method/function";
-        istaskactivated.ml_name = "istaskactivated";
-        istaskactivated.ml_meth = (PyCFunction)_pyllbc_istaskactivated;
-        istaskactivated.ml_flags = METH_VARARGS;
-        istaskactivated.ml_doc = "pyllbc library method/function";
         pushmsg.ml_name = "pushmsg";
         pushmsg.ml_meth = (PyCFunction)_pyllbc_pushmsg;
         pushmsg.ml_flags = METH_VARARGS;
@@ -201,6 +193,10 @@ public:
         GetBundlePath.ml_meth = (PyCFunction)_pyllbc_GetBundlePath;
         GetBundlePath.ml_flags = METH_VARARGS;
         GetBundlePath.ml_doc = "pyllbc library method/function";
+        NewRandom.ml_name = "NewRandom";
+        NewRandom.ml_meth = (PyCFunction)_pyllbc_NewRandom;
+        NewRandom.ml_flags = METH_VARARGS;
+        NewRandom.ml_doc = "pyllbc library method/function";
         gettaskcount.ml_name = "gettaskcount";
         gettaskcount.ml_meth = (PyCFunction)_pyllbc_gettaskcount;
         gettaskcount.ml_flags = METH_VARARGS;
@@ -209,30 +205,32 @@ public:
         DelBundle.ml_meth = (PyCFunction)_pyllbc_DelBundle;
         DelBundle.ml_flags = METH_VARARGS;
         DelBundle.ml_doc = "pyllbc library method/function";
+        DelRandom.ml_name = "DelRandom";
+        DelRandom.ml_meth = (PyCFunction)_pyllbc_DelRandom;
+        DelRandom.ml_flags = METH_VARARGS;
+        DelRandom.ml_doc = "pyllbc library method/function";
     }
 
 public:
-    ::PyMethodDef rand;
+    ::PyMethodDef createtask;
     ::PyMethodDef Property_ToContent;
     ::PyMethodDef GetBundleResPath;
-    ::PyMethodDef shuffle;
+    ::PyMethodDef BoolJudge;
     ::PyMethodDef GetMainBundle;
-    ::PyMethodDef createtask;
+    ::PyMethodDef RandReal;
     ::PyMethodDef Property_RemoveAllPropertyes;
     ::PyMethodDef HashString;
+    ::PyMethodDef SeedRand;
     ::PyMethodDef istaskexist;
     ::PyMethodDef Property_ToFile;
     ::PyMethodDef Property_GetProperty;
     ::PyMethodDef GenGUID;
-    ::PyMethodDef choice;
-    ::PyMethodDef booljudge;
     ::PyMethodDef GetModuleFileName;
-    ::PyMethodDef seed;
+    ::PyMethodDef istaskactivated;
     ::PyMethodDef Property_GetComments;
+    ::PyMethodDef RandInt;
     ::PyMethodDef Property_FromContent;
     ::PyMethodDef Property_GetPropertyNames;
-    ::PyMethodDef rand53real;
-    ::PyMethodDef istaskactivated;
     ::PyMethodDef pushmsg;
     ::PyMethodDef Property_HasProperty;
     ::PyMethodDef Property_GetValue;
@@ -252,8 +250,10 @@ public:
     ::PyMethodDef Property_GetPropertyCount;
     ::PyMethodDef Property_SetComments;
     ::PyMethodDef GetBundlePath;
+    ::PyMethodDef NewRandom;
     ::PyMethodDef gettaskcount;
     ::PyMethodDef DelBundle;
+    ::PyMethodDef DelRandom;
 };
 
 #define pyllbc_s_CoreMethods LLBC_Singleton< ::pyllbc_CoreMethods, LLBC_DummyLock>::Instance()
