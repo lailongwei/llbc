@@ -25,7 +25,9 @@
 #include "llbc/core/os/OS_Time.h"
 
 #include "llbc/core/file/File.h"
-#include "llbc/core/file/Directory.h"
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include "llbc/core/file/Directory.h"
+#endif // Non-WIN32
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
