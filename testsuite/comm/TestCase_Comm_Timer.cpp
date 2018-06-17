@@ -44,8 +44,7 @@ public:
         {
             LLBC_Timer *timer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
                                                new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
-            timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000), 
-                LLBC_Random::RandInt32cmcn(5000, 15000));
+            timer->Schedule(LLBC_RandInt(5000, 15001), LLBC_RandInt(5000, 15001));
         }
 
         LLBC_PrintLine("Done!");
@@ -61,7 +60,7 @@ public:
     {
         if (++_timeoutTimes % 10000 == 0)
             LLBC_PrintLine("Timer <%s> trigger %d times timeout", timer->ToString().c_str(), _timeoutTimes);
-        timer->Schedule(LLBC_Random::RandInt32cmcn(5000, 15000));
+        timer->Schedule(LLBC_RandInt(5000, 15001));
     }
 
     void OnTimerCancel(LLBC_Timer *timer)
