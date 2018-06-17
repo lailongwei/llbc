@@ -19,53 +19,60 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
-
-#include "llbc/core/thread/Guard.h"
-#include "llbc/core/thread/SpinLock.h"
-
-#include "llbc/core/random/Random.h"
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static LLBC_NS LLBC_Random __g_random;
-static LLBC_NS LLBC_SpinLock __g_randomLock;
-
-__LLBC_INTERNAL_NS_END
+#include "mtrand.h"
+#ifdef __LLBC_CORE_RANDOM_RANDOM_H__
 
 __LLBC_NS_BEGIN
 
-void LLBC_SeedRand(int seed)
+inline LLBC_Random::LLBC_Random(int seed)
 {
-    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
-    LLBC_INL_NS __g_random.Seed(seed);
+    if (seed == 0)
+        seed = static_cast<int>(::time(NULL));
+
+    _mtRand.seed(seed);
 }
 
-int LLBC_RandInt()
+inline void LLBC_Random::Seed(int seed)
 {
-    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
-    return LLBC_INL_NS __g_random.Rand();
+    _mtRand.seed(seed);
 }
 
-int LLBC_RandInt(int end)
+inline int LLBC_Random::Rand()
 {
-    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
-    return LLBC_INL_NS __g_random.Rand(end);
+    return static_cast<int>(_mtRand());
 }
 
-int LLBC_RandInt(int begin, int end)
+inline int LLBC_Random::Rand(int end)
 {
-    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
-    return LLBC_INL_NS __g_random.Rand(begin, end);
+    if (end >= 0)
+        return static_cast<int>(_mtRand()) % end;
+    else
+        return static_cast<int>(_mtRand()) % (-end) + end;
 }
 
-double LLBC_RandReal()
+inline int LLBC_Random::Rand(int begin, int end)
 {
-    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
-    return LLBC_INL_NS __g_random.RandReal();
+    if (LIKELY(begin <= end))
+        return _mtRand() % (end - begin) + begin;
+    else
+        return _mtRand() % (begin - end) + end;
+
+}
+
+inline double LLBC_Random::RandReal()
+{
+    return static_cast<double>(_mtRand()) * (1. / 4294967296.); // divided by 2^32
+}
+
+template <typename _RandomAccessIter>
+inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
+{
+    auto diff = end - begin;
+    if (UNLIKELY(diff <= 0))
+        return end;
+    return begin + Rand(0, diff);
 }
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_CORE_RANDOM_RANDOM_H__
