@@ -68,6 +68,12 @@ public:
     double RandReal();
 
     /**
+     * Execute one time bool judge.
+     * @return bool - the judge result.
+     */
+    bool BoolJudge();
+
+    /**
      * Random choose one element at given range.
      * @return _RandomAccessIter - the choose element iterator.
      */
@@ -86,6 +92,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt();
 LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt(int end);
 LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt(int begin, int end);
 LLBC_EXTERN LLBC_EXPORT double LLBC_RandReal();
+LLBC_EXTERN LLBC_EXPORT bool LLBC_BoolJudge();
 
 __LLBC_NS_END
 

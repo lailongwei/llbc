@@ -64,6 +64,11 @@ inline double LLBC_Random::RandReal()
     return static_cast<double>(_mtRand()) * (1. / 4294967296.); // divided by 2^32
 }
 
+inline bool LLBC_Random::BoolJudge()
+{
+    return _mtRand() % 2 == 1;
+}
+
 template <typename _RandomAccessIter>
 inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
 {

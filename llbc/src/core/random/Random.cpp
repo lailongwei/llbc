@@ -66,6 +66,12 @@ double LLBC_RandReal()
     return LLBC_INL_NS __g_random.RandReal();
 }
 
+bool LLBC_BoolJudge()
+{
+    LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
+    return LLBC_INL_NS __g_random.BoolJudge();
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"
