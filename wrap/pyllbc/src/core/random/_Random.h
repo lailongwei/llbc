@@ -126,7 +126,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_BoolJudge(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &random))
         return NULL;
 
-    PyObject *judgeResult = random->Rand(0, 2) ? Py_True : Py_False;
+    PyObject *judgeResult = random->BoolJudge() ? Py_True : Py_False;
     Py_INCREF(judgeResult);
 
     return judgeResult;
