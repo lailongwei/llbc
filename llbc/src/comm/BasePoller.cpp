@@ -30,8 +30,12 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/SelectPoller.h"
-#include "llbc/comm/IocpPoller.h"
-#include "llbc/comm/EpollPoller.h"
+#if LLBC_TARGET_PLATFORM_WIN32
+ #include "llbc/comm/IocpPoller.h"
+#endif // Win32
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+ #include "llbc/comm/EpollPoller.h"
+#endif // Linux or Android
 #include "llbc/comm/PollerMgr.h"
 #include "llbc/comm/IService.h"
 
