@@ -141,6 +141,11 @@ project "llbc"
         }
     filter {}
 
+    -- buildopts
+    filter { "system:not windows" }
+        buildoptions { "-std=c++0x" }
+    filter {}
+
     -- optimize
     set_optimize_opts()
 

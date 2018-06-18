@@ -72,7 +72,7 @@ inline bool LLBC_Random::BoolJudge()
 template <typename _RandomAccessIter>
 inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
 {
-    auto diff = end - begin;
+    long diff = static_cast<long>(end - begin);
     if (UNLIKELY(diff <= 0))
         return end;
     return begin + Rand(0, diff);

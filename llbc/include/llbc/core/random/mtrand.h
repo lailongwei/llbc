@@ -42,13 +42,17 @@
 // Feedback about the C++ port should be sent to Jasper Bedaux,
 // see http://www.bedaux.net/mtrand/ for e-mail address and info.
 
-#ifndef MTRAND_H
-#define MTRAND_H
+#ifndef __LLBC_CORE_RANDOM_MTRAND_H__
+#define __LLBC_CORE_RANDOM_MTRAND_H__
 
-class MTRand_int32 { // Mersenne Twister random number generator
+#include "llbc/common/Common.h"
+
+__LLBC_NS_BEGIN
+
+class LLBC_EXPORT MTRand_int32 { // Mersenne Twister random number generator
 public:
 // default constructor: uses default seed only if this is the first instance
-    MTRand_int32() { state[n] = { 0x0UL }; p = 0; };
+    MTRand_int32();
 
 // constructor with 32 bit int as seed
   MTRand_int32(unsigned long s) { seed(s); }
@@ -150,4 +154,7 @@ private:
   void operator=(const MTRand53&); // assignment operator not defined
 };
 
-#endif // MTRAND_H
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_RANDOM_MTRAND_H__
+
