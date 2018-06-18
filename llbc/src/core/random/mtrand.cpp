@@ -11,7 +11,8 @@
 __LLBC_NS_BEGIN
 
 MTRand_int32::MTRand_int32() {
-    state[n] = { 0x0UL }; p = 0;
+    memset(state, 0, n * sizeof(state[0]));
+    p = 0;
 };
 
 void MTRand_int32::gen_state() { // generate new state vector

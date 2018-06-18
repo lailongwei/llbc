@@ -112,7 +112,7 @@ const std::map<LLBC_String, LLBC_Variant> &LLBC_StartArgs::GetAllNamingArguments
 
 const LLBC_Variant &LLBC_StartArgs::operator [](size_t index) const
 {
-    return (index >= 0 && index < _seqArgs.size()) ? 
+    return index < _seqArgs.size() ? 
         _seqArgs.at(index) : (LLBC_INL_NS __nilVariant);
 }
 
