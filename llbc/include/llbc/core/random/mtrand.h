@@ -68,7 +68,8 @@ public:
 protected: // used by derived classes, otherwise not accessible; use the ()-operator
   unsigned long rand_int32(); // generate 32 bit random integer
 private:
-  static const int n = 624, m = 397; // compile time constants
+  static const int n = 624; // compile time constants
+  static const int m = 397; // compile time constants
 // the variables below are static (no duplicates can exist)
   unsigned long state[n]; // state vector array
   int p; // position in state array
