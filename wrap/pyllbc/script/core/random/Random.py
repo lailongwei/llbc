@@ -23,7 +23,7 @@ class pyllbcRandom(object):
         """
         if isinstance(seed, (str, unicode)):
             seed = int(float(seed))
-        self.__c_obj = llbc.inl.SeedRand(self.__c_obj, seed)
+        llbc.inl.SeedRand(self.__c_obj, seed)
 
     def rand(self, begin=None, end=None):
         """
