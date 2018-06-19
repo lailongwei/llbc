@@ -78,7 +78,7 @@ public:
 public:
     virtual void OnUpdate()
     {
-        int fps = LLBC_Random::RandInt32cmon(20, 60);
+        int fps = LLBC_RandInt(20, 61);
         // LLBC_PrintLine("Service update, set fps to %d", fps);
 
         GetService()->SetFPS(fps);

@@ -60,13 +60,12 @@ void pyllbc_AddCoreMethods()
     inl->AddMethod(methods.GetBundleResPath);
 
     // core/random
-    pyllbc_Module *randMod = LLBC_New2(pyllbc_Module, "Random", top);
-    randMod->AddMethod(methods.seed);
-    randMod->AddMethod(methods.rand);
-    randMod->AddMethod(methods.rand53real);
-    randMod->AddMethod(methods.choice);
-    randMod->AddMethod(methods.shuffle);
-    randMod->AddMethod(methods.booljudge);
+    inl->AddMethod(methods.NewRandom);
+    inl->AddMethod(methods.DelRandom);
+    inl->AddMethod(methods.SeedRand);
+    inl->AddMethod(methods.RandInt);
+    inl->AddMethod(methods.RandReal);
+    inl->AddMethod(methods.BoolJudge);
 
     // core/config
     inl->AddMethod(methods.Property_New);

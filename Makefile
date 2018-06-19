@@ -89,7 +89,7 @@ help:
 	@echo "  make $(CORELIB_TARGET) - make c++ core library"
 	@echo "  make $(TEST_TARGET)     - make c++ core library testsuite"
 	@echo "  make $(WRAPS_TARGET)    - make all language specificed warpped libraries"
-	@echo "                  now supported languages: python"
+	@echo "                  now supported languages: python, csharp, lua"
 	@echo "  make $(PYWRAP_TARGET)  - make python wrapped library"
 	@echo "  make $(CSWRAP_TARGET)  - make csharp wrapped library"
 	@echo "  make $(LUWRAP_TARGET)  - make lua wrapped library"

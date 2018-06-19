@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-"""
-
 
 import llbc
 from llbc import TestCase
-
 
 class LLBCInfoTest(TestCase):
     def run(self, arg):

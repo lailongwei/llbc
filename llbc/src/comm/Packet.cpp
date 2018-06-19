@@ -118,7 +118,7 @@ void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
 size_t LLBC_Packet::GetPayloadLength() const
 {
     if (!_payload)
-        return NULL;
+        return 0;
 
     return _payload->GetWritePos();
 }

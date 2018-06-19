@@ -1,13 +1,19 @@
 // mtrand.cpp, see include file mtrand.h for information
 
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
 #include "llbc/core/random/mtrand.h"
+
 // non-inline function definitions and static member definitions cannot
 // reside in header file because of the risk of multiple declarations
 
-// initialization of static private members
-unsigned long MTRand_int32::state[n] = {0x0UL};
-int MTRand_int32::p = 0;
-bool MTRand_int32::init = false;
+__LLBC_NS_BEGIN
+
+MTRand_int32::MTRand_int32() {
+    memset(state, 0, n * sizeof(state[0]));
+    p = 0;
+};
 
 void MTRand_int32::gen_state() { // generate new state vector
   for (int i = 0; i < (n - m); ++i)
@@ -48,3 +54,8 @@ void MTRand_int32::seed(const unsigned long* array, int size) { // init by array
   state[0] = 0x80000000UL; // MSB is 1; assuring non-zero initial array
   p = n; // force gen_state() to be called for next random number
 }
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"
+

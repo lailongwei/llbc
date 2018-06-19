@@ -137,12 +137,6 @@ int LLBC_Timer::Schedule(uint64 dueTime, uint64 period)
         return LLBC_FAILED;
     }
 
-    if (UNLIKELY(dueTime < 0 || period < 0))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
     period = period == 0 ? dueTime : period;
     return _scheduler->Schedule(this, dueTime, period);
 }

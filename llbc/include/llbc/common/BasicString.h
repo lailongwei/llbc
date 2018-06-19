@@ -1031,6 +1031,23 @@ public:
         return *this;
     }
 
+    _This append_format(const _Elem *fmt, ...) const
+    {
+        
+        if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
+            return *this;
+
+        char *buf; int len;
+        LLBC_FormatArg(fmt, buf, len);
+
+        _This s(*this);
+        s.append(reinterpret_cast<const _Elem *>(buf), len);
+
+        LLBC_Free(buf);
+
+        return s;
+    }
+
 public:
     // strip operation: strip left. 
     _This &lstrip(const _This &chars = _This())

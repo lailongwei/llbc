@@ -24,117 +24,78 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/random/mtrand.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The Mersenne Twister algorithm encapsulation.
+ * \brief The Random class encapsulation(using Mersenne Twister algorithm).
  */
 class LLBC_EXPORT LLBC_Random
 {
 public:
-    /**
-     * Integer in [0, 2^32 - 1].
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32();
-
-    /**
-     * Integer in [0, n].
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32(uint32 n);
-
-    /**
-     * Integer in [m, n].
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32cmcn(uint32 m, uint32 n);
-
-    /**
-     * Integer in [m, n).
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32cmon(uint32 m, uint32 n);
-
-    /**
-     * Integer in (m, n].
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32omcn(uint32 m, uint32 n);
-
-    /**
-     * Integer in (m, n).
-     * @return uint32 - random value.
-     */
-    static uint32 RandInt32omon(uint32 m, uint32 n);
+    explicit LLBC_Random(int seed = 0);
 
 public:
     /**
-     * Real number in [0, 1].
-     * @return double - random value.
+     * Initialize internal state of the random number generator.
+     * @param[in] seed - seed for random-number generator.
      */
-    static double RandRealc0c1();
+    void Seed(int seed);
 
     /**
-     * Real number in [0, n].
-     * @return double - random value.
+     * Generate a random integer N such that: -2,147,483,648 <= N < 2,147,483,647.
+     * @return int - the random integer N.
      */
-    static double RandRealc0cn(double n);
+    int Rand();
 
     /**
-     * Real number in [0, 1).
-     * @return double - random value.
+     * Generate a random integer N such that: 0 <= N < end for end >= 0 and end <= N < 0 for end < 0.
+     * @return int - the random integer N.
      */
-    static double RandRealc0o1();
+    int Rand(int end);
 
     /**
-     * Real number in [0, n).
-     * @return double - random value.
+     * Generate a random integer N such that: begin <= N < end for begin <= end and end <= N < begin for begin > end.
+     * @return int - the random integer N.
      */
-    static double RandRealc0on(double n);
+    int Rand(int begin, int end);
 
     /**
-     * Real number in (0, 1).
-     * @return double - random value.
+     * Generate a floating point number N such that: 0 <= N < 1.
+     * @return int - the random floating point number N.
      */
-    static double RandRealo0o1();
+    double RandReal();
 
     /**
-     * Real number in (0, n).
-     * @return double - random value.
+     * Execute one time bool judge.
+     * @return bool - the judge result.
      */
-    static double RandRealo0on(double n);
-
-public:
-    /**
-     * Access to 53-bit random numbers (capacity of IEEE double precision).
-     * @return double - double value.
-     */
-    static double Rand53Real();
-
-public:
-    /**
-     * Re-seeding with 32 bit integer the random class.
-     * @param[in] seed - seed value.
-     */
-    static void Seed(unsigned long seed);
+    bool BoolJudge();
 
     /**
-     * Re-seeding with array the random class.
-     * @param[in] array - seed array.
-     * @param[in] size  - array size.
+     * Random choose one element at given range.
+     * @return _RandomAccessIter - the choose element iterator.
      */
-    static void Seed(const unsigned long *array, int size);
-
-    // Disable assignment.
-    LLBC_DISABLE_ASSIGNMENT(LLBC_Random);
+    template <typename _RandomAccessIter>
+    _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
 
 private:
-    static LLBC_SpinLock _lock;
+    MTRand_int32 _mtRand;
 };
 
+/**
+ * Some global random support functions definition.
+ */
+LLBC_EXTERN LLBC_EXPORT void LLBC_SeedRand(int seed);
+LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt();
+LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt(int end);
+LLBC_EXTERN LLBC_EXPORT int LLBC_RandInt(int begin, int end);
+LLBC_EXTERN LLBC_EXPORT double LLBC_RandReal();
+LLBC_EXTERN LLBC_EXPORT bool LLBC_BoolJudge();
+
 __LLBC_NS_END
+
+#include "llbc/core/random/RandomImpl.h"
 
 #endif // !__LLBC_CORE_RANDOM_RANDOM_H__

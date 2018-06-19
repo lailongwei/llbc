@@ -111,7 +111,7 @@ public:
      * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetFiles(const LLBC_String &path, std::vector<LLBC_String> &files, bool recursive = false);
+    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, bool recursive = false);
 
     /**
      * Recursive specific path's directories.
