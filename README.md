@@ -1,7 +1,7 @@
 ## llbc
 llbc为一个精简、功能完整、多语言支持的服务端开发框架，面向Service及Facade，底层c++实现。  
 QQ交流群：662590231  
-手册：[简书--llbc 手册](http://www.jianshu.com/p/ab225bd56779)   
+手册：[llbc wiki](https://github.com/lailongwei/llbc/wiki)   
 
 ## 支持语言：
 **c/c++**：完整支持, 并经过反复测试及线上使用  
