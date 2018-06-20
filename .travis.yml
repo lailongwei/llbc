@@ -2,6 +2,7 @@ language: c++
 sudo: yes
 install: 
     - sudo apt-get install uuid-dev
+    - sudo apt-get install python2.7-dev
 
 script:
     - make core_lib -j4 # make c++ core library
