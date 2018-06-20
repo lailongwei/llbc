@@ -1,13 +1,17 @@
 language: c++
 sudo: yes
 install: 
-    - sudo apt-get install uuid-dev
-    - sudo apt-get install python2.7-dev
+    - sudo apt-get install -y uuid-dev
+    - sudo apt-get install -y python2.7-dev
+    - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    - echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
+    - sudo apt-get update
+    - sudo apt-get install -y mono-complete
 
 script:
     - make core_lib -j4 # make c++ core library
     - make test -j4     # make c++ core library testsuite
-    - make py_wrap -j4  # make python wrap library
+    - make cs_wrap -j4  # make csharp wrap library
     - make lu_wrap -j4  # make lua wrap library
 
 notifications:
