@@ -4,14 +4,17 @@ install:
     - sudo apt-get install uuid-dev
 
 script:
-    - make core_lib
-    - make test
+    - make core_lib -j4 # make c++ core library
+    - make test -j4     # make c++ core library testsuite
+    - make py_wrap -j4  # make python wrap library
+    - make lu_wrap -j4  # make lua wrap library
 
 notifications:
     email:
         recipients:
-            - lailongwei@126.com
-            - 964855959@qq.com
+            - lailongwei@126.com # Longwei Lai
+            - 964855959@qq.com   # Longwei Lai
+            - 852917130@qq.com   # Huasheng Liu
         on_success: change
         on_failure: always
 
