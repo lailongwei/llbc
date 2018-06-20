@@ -17,7 +17,7 @@ install:
     - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get update; fi
     - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y mono-complete; fi
     # osx platform install instructions
-    - if [[ "${TARVIS_OS_NAME}" == "osx" ]]; then brew install mono; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then brew install mono; fi
 
 script:
     # core library about make instructions
