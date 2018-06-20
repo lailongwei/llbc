@@ -298,7 +298,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
     tryPaths.push_back("config/" + _name);
     tryPaths.push_back("Conf/" + _name);
     tryPaths.push_back("conf/" + _name);
-    tryPaths.push_back("cfg/" + _name);
+    tryPaths.push_back("Cfg/" + _name);
     tryPaths.push_back("cfg/" + _name);
     tryPaths.push_back(_name);
 
