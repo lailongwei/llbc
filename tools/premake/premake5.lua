@@ -658,9 +658,6 @@ project "lullbc_luaexec"
         targetsuffix "_debug"
     filter {}
 
-    -- enable multithread compile
-    enable_multithread_comp()
-
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
@@ -791,7 +788,4 @@ project "lullbc"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
