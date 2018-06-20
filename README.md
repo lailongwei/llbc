@@ -4,7 +4,7 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 
 ## 构建状态
 
-*将添加*
+[![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc)
 
 ## 文档
 
