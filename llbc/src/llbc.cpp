@@ -61,30 +61,30 @@ int LLBC_Startup(bool initWinSock)
     return LLBC_OK;
 }
 
-int LLBC_Cleanup()
-{
-    if(!LLBC_INTERNAL_NS __llbc_inited)
-    {
-        return LLBC_FAILED;
-    }
-
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if(!tls->coreTls.entryThread)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ACCESS_DENY);
-        return LLBC_FAILED;
-    }
-
-    __LLBC_CommCleanup();
-
-    __LLBC_CoreCleanup();
-
-    __LLBC_CommonCleanup();
-
-    LLBC_INTERNAL_NS __llbc_inited = false;
-
-    return LLBC_OK;
-}
+//int LLBC_Cleanup()
+//{
+//    if(!LLBC_INTERNAL_NS __llbc_inited)
+//    {
+//        return LLBC_FAILED;
+//    }
+//
+//    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+//    if(!tls->coreTls.entryThread)
+//    {
+//        LLBC_SetLastError(LLBC_ERROR_ACCESS_DENY);
+//        return LLBC_FAILED;
+//    }
+//
+//    __LLBC_CommCleanup();
+//
+//    __LLBC_CoreCleanup();
+//
+//    __LLBC_CommonCleanup();
+//
+//    LLBC_INTERNAL_NS __llbc_inited = false;
+//
+//    return LLBC_OK;
+//}
 
 __LLBC_NS_END
 
