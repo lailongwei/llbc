@@ -1,0 +1,17 @@
+language: c++
+sudo: yes
+install: 
+    - sudo apt-get install uuid-dev
+
+script:
+    - make core_lib
+    - make test
+
+notifications:
+    email:
+        recipients:
+            - lailongwei@126.com
+            - 964855959@qq.com
+        on_success: change
+        on_failure: always
+
