@@ -280,6 +280,10 @@ project "pyllbc"
         filter { "system:windows" }
             includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
         filter {}
+
+        filter { "system:not windows" }
+            includedirs { "/usr/include/python2.7" }
+        filter {}
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
