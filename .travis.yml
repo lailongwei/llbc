@@ -12,7 +12,7 @@ script:
     - make core_lib -j4 # make c++ core library
     - make test -j4     # make c++ core library testsuite
     - make cs_wrap -j4  # make csharp wrap library
-    - make lu_wrap -j4  # make lua wrap library
+    - make lu_wrap      # make lua wrap library
 
 notifications:
     email:
