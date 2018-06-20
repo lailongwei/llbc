@@ -20,9 +20,9 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 
 ## 支持：
 
-llbc欢迎大家使用、提出问题及贡献代码。
-作者QQ：964855959
-QQ交流群：662590231  
-手册：[llbc wiki](https://github.com/lailongwei/llbc/wiki) 
+llbc欢迎大家使用、提出问题及贡献代码。  
+作者QQ：964855959  
+QQ交流群：662590231    
+手册：[llbc wiki](https://github.com/lailongwei/llbc/wiki)   
 
 
