@@ -9,12 +9,15 @@ os:
 
 sudo: yes
 install: 
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y uuid-dev; else echo "For now not support osx!"; fi
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y python2.7-dev; else echo "For now not support osx!"; fi
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; else echo "For now not support osx!"; fi
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list; else echo "For now not support osx!"; fi
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get update; else echo "For now not support osx!"; fi
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y mono-complete; else echo "For now not support osx!"; fi
+    # linux platform install instructions
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y uuid-dev; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y python2.7-dev; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get update; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y mono-complete; fi
+    # osx platform install instructions
+    - if [[ "${TARVIS_OS_NAME}" == "osx" ]]; then brew install mono; fi
 
 script:
     # core library about make instructions
