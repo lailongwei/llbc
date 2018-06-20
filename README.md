@@ -5,11 +5,11 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 ## 构建状态
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-| 平台 | 类型 | 状态 |
-|---   |---   |---   |
-| **Windows** | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | None |
-| **Linux** | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
-| **OSX** | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | None |
+| 平台 | 编译器 | 类型 | 状态 |
+|---   |---   |---   |---   |
+| **Windows** | Visual Studio | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | None |
+| **Linux** | g++, clang++ | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
+| **OSX** | g++, clang++ | Build, ~~Test(暂不支持)~~, ~~Deploy(暂不支持)~~ | None |
 
 ## 文档
 
