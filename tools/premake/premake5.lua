@@ -470,11 +470,20 @@ project "csllbc"
     clr "Unsafe"
 
     -- prebuild commands
-    prebuildcommands {
-        PY .. ' -c "import os;print(os.getcwd())"',
-        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
-        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
-    }
+    filter { "system:windows" }
+        prebuildcommands {
+            PY .. ' -c "import os;print(os.getcwd())"',
+            PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+            PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
+        }
+    filter {}
+    filter { "system:not windows" }
+        prebuildcommands {
+            PY .. ' -c "import os;print(os.getcwd())"',
+            PY .. " ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+            PY .. " ../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
+        }
+    filter {}
 
     -- postbuild commands
     filter { "system:not windows" }
