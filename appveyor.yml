@@ -23,11 +23,15 @@ platform:
     - x86
     - x64
 
+for:
+-
 matrix:
-    - exclude:
+    exclude:
         - configuration: release32
           platform: x64
-    - exclude:
+-
+matrix:
+    exclude:
         - configuration: release64
           platform: x86
 
