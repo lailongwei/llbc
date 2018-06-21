@@ -33,52 +33,40 @@ for:
 -
     matrix:
         fast_finish: true
-for:
 -
     matrix:
         exclude:
             - configuration: release32
             - platform: x64
-for:
 -
     matrix:
         exclude:
             - configuration: release64
             - platform: x86
-
-for:
 -
     matrix:
         only:
             - image: Visual Studio 2008
     build:
         project: build\vs2008\llbc_vs2008.sln
-
-for:
 -
     matrix:
         only:
             - image: Visual Studio 2010
     build:
         project: build\vs2008\llbc_vs2010.sln
-
-for:
 -
     matrix:
         only:
             - image: Visual Studio 2012
     build:
         project: build\vs2008\llbc_vs2012.sln
-
-for:
 -
     matrix:
         only:
             - image: Visual Studio 2013
     build:
         project: build\vs2008\llbc_vs2013.sln
-
-for:
 -
     matrix:
         only:
