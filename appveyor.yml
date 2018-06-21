@@ -29,16 +29,22 @@ platform:
     - x86
     - x64
 
-matrix:
-    fast_finish: true
-matrix:
-    exclude:
-        - configuration: release32
-        - platform: x64
-matrix:
-    exclude:
-        - configuration: release64
-        - platform: x86
+for
+-
+    matrix:
+        fast_finish: true
+for
+-
+    matrix:
+        exclude:
+            - configuration: release32
+            - platform: x64
+for
+-
+    matrix:
+        exclude:
+            - configuration: release64
+            - platform: x86
 
 for:
 -
