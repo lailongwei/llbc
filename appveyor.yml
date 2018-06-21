@@ -23,29 +23,14 @@ platform:
     - x86
     - x64
 
-for:
--
-    matrix:
-        exclude:
-            - configuration: release32
-            - platform: x64
--
-    matrix:
-        exclude:
-            - configuration: release64
-            - platform: x86
--
-    matrix:
-        only:
-            - image: Visual Studio 2013
-        build:
-            project: build\vs2008\llbc_vs2013.sln
--
-    matrix:
-        only:
-            - image: Visual Studio 2015
-        build:
-            project: build\vs2008\llbc_vs2015.sln
+matrix:
+    - exclude:
+        - configuration: release32
+          platform: x64
+    - exclude:
+        - configuration: release64
+          platform: x86
 
 build:
+    project build\vs2013\llbc_vs2013.sln
     verbosity: normal
