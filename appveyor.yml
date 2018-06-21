@@ -1,0 +1,81 @@
+version: 1.0.6.{build}
+max_jobs: 8
+branches:
+    only:
+        - master
+
+clone_depth: 50
+clone_folder: c:\projects\llbc
+install:
+    - cmd: >-
+        git submodule update --init --recursive
+        echo vs2008 | call WinPreBuild.bat 0
+        echo vs2010 | call WinPreBuild.bat 0
+        echo vs2012 | call WinPreBuild.bat 0
+        echo vs2013 | call WinPreBuild.bat 0
+        echo vs2015 | call WinPreBuild.bat 0
+image: 
+    - Visual Studio 2008
+    - Visual Studio 2010
+    - Visual Studio 2012
+    - Visual Studio 2013
+    - Visual Studio 2015
+
+configuration: 
+    - release32
+    - release64
+
+platform: 
+    - x86
+    - x64
+
+matrix:
+    fast_finish: true
+    exclude:
+        - configuration: release32
+            platform: x64
+        - configuration: release64
+            platform: x86
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2008
+    build:
+        project: build\vs2008\llbc_vs2008.sln
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2010
+    build:
+        project: build\vs2008\llbc_vs2010.sln
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2012
+    build:
+        project: build\vs2008\llbc_vs2012.sln
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2013
+    build:
+        project: build\vs2008\llbc_vs2013.sln
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2015
+    build:
+        project: build\vs2008\llbc_vs2015.sln
+
+build:
+    verbosity: normal
