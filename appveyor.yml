@@ -32,5 +32,5 @@ matrix:
           platform: x86
 
 build:
-    project build\vs2013\llbc_vs2013.sln
+    project: build\vs2013\llbc_vs2013.sln
     verbosity: normal
