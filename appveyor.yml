@@ -26,9 +26,6 @@ platform:
 for:
 -
     matrix:
-        fast_finish: true
--
-    matrix:
         exclude:
             - configuration: release32
             - platform: x64
@@ -41,14 +38,14 @@ for:
     matrix:
         only:
             - image: Visual Studio 2013
-    build:
-        project: build\vs2008\llbc_vs2013.sln
+        build:
+            project: build\vs2008\llbc_vs2013.sln
 -
     matrix:
         only:
             - image: Visual Studio 2015
-    build:
-        project: build\vs2008\llbc_vs2015.sln
+        build:
+            project: build\vs2008\llbc_vs2015.sln
 
 build:
     verbosity: normal
