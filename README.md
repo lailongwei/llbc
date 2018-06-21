@@ -7,9 +7,9 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 
 | 平台 | 编译器 | 类型 | 状态 |
 |---   |---   |---   |---   |
-| **Windows** | Visual Studio | Build, Test(暂不支持), Deploy(暂不支持) | [![Build status](https://ci.appveyor.com/api/projects/status/1bjwlbciimde29al?svg=true)](https://ci.appveyor.com/project/lailongwei/llbc) |  
-| **Linux** | g++, clang++ | Build, Test(暂不支持), Deploy(暂不支持) | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
-| **OSX** | g++, clang++ | Build, Test(暂不支持), Deploy(暂不支持) | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
+| **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://ci.appveyor.com/api/projects/status/1bjwlbciimde29al?svg=true)](https://ci.appveyor.com/project/lailongwei/llbc) |  
+| **Linux** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
+| **OSX** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
 
 
 ## 文档
