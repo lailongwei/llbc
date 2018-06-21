@@ -34,6 +34,19 @@ for:
 
             - configuration: release64
               platform: x86
+-
+    matrix:
+        except:
+            - image: Visual Studio 2013
+        build:
+            project: build\vs2013\llbc_vs2013.sln
+-
+    matrix:
+        except:
+            - image: Visual Studio 2015
+        build:
+            project: build\vs2013\llbc_vs2015.sln
+            
 
 build:
     verbosity: normal
