@@ -31,7 +31,7 @@ for:
         exclude:
             - configuration: release32
               platform: x64
-        exclude:
+
             - configuration: release64
               platform: x86
 
