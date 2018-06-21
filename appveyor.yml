@@ -9,7 +9,9 @@ clone_folder: c:\projects\llbc
 install:
     - cmd: >-
         git submodule update --init --recursive
+        
         echo vs2013 | call WinPreBuild.bat 0
+        
         echo vs2015 | call WinPreBuild.bat 0
 image: 
     - Visual Studio 2013
