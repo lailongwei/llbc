@@ -280,6 +280,10 @@ project "pyllbc"
         filter { "system:windows" }
             includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
         filter {}
+
+        filter { "system:not windows" }
+            includedirs { "/usr/include/python2.7" }
+        filter {}
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
@@ -466,11 +470,20 @@ project "csllbc"
     clr "Unsafe"
 
     -- prebuild commands
-    prebuildcommands {
-        PY .. ' -c "import os;print(os.getcwd())"',
-        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
-        PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
-    }
+    filter { "system:windows" }
+        prebuildcommands {
+            PY .. ' -c "import os;print(os.getcwd())"',
+            PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+            PY .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
+        }
+    filter {}
+    filter { "system:not windows" }
+        prebuildcommands {
+            PY .. ' -c "import os;print(os.getcwd())"',
+            PY .. " ../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
+            PY .. " ../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
+        }
+    filter {}
 
     -- postbuild commands
     filter { "system:not windows" }
@@ -645,9 +658,6 @@ project "lullbc_luaexec"
         targetsuffix "_debug"
     filter {}
 
-    -- enable multithread compile
-    enable_multithread_comp()
-
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
@@ -778,7 +788,4 @@ project "lullbc"
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 

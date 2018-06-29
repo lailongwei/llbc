@@ -1,0 +1,38 @@
+language: cpp
+compiler:
+    - g++
+    - clang++
+   
+os:
+    - linux
+    - osx
+
+sudo: yes
+install: 
+    # linux platform install instructions
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y uuid-dev; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y python2.7-dev; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get update; fi
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo apt-get install -y mono-complete; fi
+    # osx platform install instructions
+    - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then brew install mono; fi
+
+script:
+    # core library about make instructions
+    - make core_lib -j4 # make c++ core library
+    - make test -j4     # make c++ core library testsuite
+    # wrap library about make instructions
+    - make cs_wrap -j4  # make csharp wrap library
+    - make lu_wrap      # make lua wrap library
+
+notifications:
+    email:
+        recipients:
+            - lailongwei@126.com # Longwei Lai
+            - 964855959@qq.com   # Longwei Lai
+            - 852917130@qq.com   # Huasheng Liu
+        on_success: change
+        on_failure: always
+

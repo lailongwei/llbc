@@ -169,7 +169,7 @@
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine full stack attribute.
-#define LLBC_CFG_COMM_USE_FULL_STACK                        1
+#define LLBC_CFG_COMM_USE_FULL_STACK                        0
 // Determine enable the service has status handler support or not.
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
 // Determine enable the service has status desc support or not.
