@@ -609,17 +609,17 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
 LLBC_String LLBC_Directory::ModuleFileName()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-	ssize_t ret = -1;
+    ssize_t ret = -1;
     char buf[PATH_MAX + 1];
-	if ((ret = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
-	{
-		LLBC_SetLastError(LLBC_ERROR_CLIB);
-		return LLBC_String();
-	}
+    if ((ret = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_String();
+    }
 
-	buf[ret] = '\0';
+    buf[ret] = '\0';
 
-	return buf;
+    return buf;
 #else // LLBC_TARGET_PLATFORM_WIN32
     DWORD ret = 0;
     int bufLen = MAX_PATH + 1;
@@ -630,18 +630,18 @@ LLBC_String LLBC_Directory::ModuleFileName()
     }
 
     if (ret == 0)
-	{
+    {
         LLBC_Free(buf);
-		LLBC_SetLastError(LLBC_ERROR_OSAPI);
-		return LLBC_String();
-	}
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return LLBC_String();
+    }
 
     buf[ret] = '\0';
 
     const LLBC_String modFileName(buf);
     LLBC_Free(buf);
 
-	return modFileName;
+    return modFileName;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -747,25 +747,24 @@ int LLBC_Directory::SetCurDir(const LLBC_String &path)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-	if (chdir(path.c_str()) != 0)
-	{
-		LLBC_SetLastError(LLBC_ERROR_CLIB);
-		return LLBC_FAILED;
-	}
+    if (chdir(path.c_str()) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
 
-	return LLBC_OK;
+    return LLBC_OK;
 #else // Win32
-	if (!::SetCurrentDirectoryA(path.c_str()))
-	{
-		LLBC_SetLastError(LLBC_ERROR_OSAPI);
-		return LLBC_FAILED;
-	}
+    if (!::SetCurrentDirectoryA(path.c_str()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return LLBC_FAILED;
+    }
 
-	return LLBC_OK;
+    return LLBC_OK;
 #endif // Non-Win32
 }
 
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"
-
