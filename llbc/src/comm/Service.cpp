@@ -954,6 +954,13 @@ int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
     return LLBC_OK;
 }
 
+#if !LLBC_CFG_COMM_USE_FULL_STACK
+const LLBC_ProtocolStack *LLBC_Service::GetProtocolStack() const
+{
+    return &_stack;
+}
+#endif // !LLBC_CFG_COMM_USE_FULL_STACK
+
 void LLBC_Service::OnSvc(bool fullFrame)
 {
     if (fullFrame && _frameInterval == 0)
