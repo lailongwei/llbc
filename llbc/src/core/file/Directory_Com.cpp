@@ -32,15 +32,22 @@ bool LLBC_Directory::Exists(const LLBC_String &path)
 #if LLBC_TARGET_PLATFORM_WIN32
     DWORD attrs = ::GetFileAttributesA(path.c_str());
     if (attrs == INVALID_FILE_ATTRIBUTES)
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return false;
+    }
 
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return (attrs & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 #else // Non-WIN32
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
     {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
         return false;
     }
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return (st.st_mode & S_IFDIR) == S_IFDIR;
 #endif // WIN32
 }
