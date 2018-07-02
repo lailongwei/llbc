@@ -91,14 +91,6 @@ namespace
         std::cout <<"\targ6: " <<arg6 <<std::endl;
         std::cout <<"\targ7: " <<arg7 <<std::endl;
     }
-
-    void *Func_FooEx(const LLBC_String &arg)
-    {
-        std::cout <<"Func_FooEx() called" <<std::endl;
-        std::cout <<"\t arg: " <<arg <<std::endl;
-
-        return NULL;
-    }
 }
 
 TestCase_Core_Utils_Delegate::TestCase_Core_Utils_Delegate()
@@ -117,96 +109,112 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     int arg4 = 4, arg5 = 5, arg6 = 6, arg7 = 7;
 
     // Call delegate0, funcDelegate0.
-    LLBC_IDelegate0<void> *deleg0 = 
-        new LLBC_Delegate0<void, DelegObj>(this, &DelegObj::Foo_0);
+    typedef LLBC_Delegate0<void, DelegObj> __Deleg0_RtnVoid;
+    LLBC_IDelegate0<void> *deleg0 = LLBC_New2(__Deleg0_RtnVoid, this, &DelegObj::Foo_0);
     deleg0->Invoke();
-    delete deleg0;
+    LLBC_Delete(deleg0);
 
+    typedef LLBC_Delegate0<int, DelegObj> __Deleg0_RtnInt;
     LLBC_IDelegate0<int> *deleg0_rtn_int =
-        new LLBC_Delegate0<int, DelegObj>(this, &DelegObj::Foo_0_Rtn_Int);
+            LLBC_New2(__Deleg0_RtnInt, this, &DelegObj::Foo_0_Rtn_Int);
     std::cout << "Call Foo_0_Rtn_Int() return: " << deleg0_rtn_int->Invoke() << std::endl;
 
-    LLBC_IDelegate0<void> *funcDeleg0 =
-        new LLBC_Func0<void>(&Func_Foo_0);
+    typedef LLBC_Func0<void> __Func0_RtnVoid;
+    LLBC_IDelegate0<void> *funcDeleg0 = 
+            LLBC_New1(__Func0_RtnVoid, &Func_Foo_0);
     funcDeleg0->Invoke();
-    delete funcDeleg0;
+    LLBC_Delete(funcDeleg0);
 
     // Call delegate1.
-    LLBC_IDelegate1<void, int> *deleg1 =
-        new LLBC_Delegate1<void, DelegObj, int>(this, &DelegObj::Foo_1);
+    typedef LLBC_Delegate1<void, DelegObj, int> __Deleg1_Int_RtnVoid;
+    LLBC_IDelegate1<void, int> *deleg1 = 
+            LLBC_New2(__Deleg1_Int_RtnVoid, this, &DelegObj::Foo_1);
     deleg1->Invoke(arg1);
-    delete deleg1;
+    LLBC_Delete(deleg1);
 
-    LLBC_IDelegate1<void, int> *funcDeleg1 =
-        new LLBC_Func1<void, int>(&Func_Foo_1);
+    typedef LLBC_Func1<void, int> __Func1_Int_RtnVoid;
+    LLBC_IDelegate1<void, int> *funcDeleg1 = 
+            LLBC_New1(__Func1_Int_RtnVoid, &Func_Foo_1);
     funcDeleg1->Invoke(arg1);
-    delete funcDeleg1;
+    LLBC_Delete(funcDeleg1);
 
     // Call delegate2.
-    LLBC_IDelegate2<void, int, int> *deleg2 =
-        new LLBC_Delegate2<void, DelegObj, int, int>(this, &DelegObj::Foo_2);
+    typedef LLBC_Delegate2<void, DelegObj, int, int> __Deleg2_Int_RtnVoid;
+    LLBC_IDelegate2<void, int, int> *deleg2 =  
+            LLBC_New2(__Deleg2_Int_RtnVoid, this, &DelegObj::Foo_2);
     deleg2->Invoke(arg1, arg2);
-    delete deleg2;
+    LLBC_Delete(deleg2);
 
-    LLBC_IDelegate2<void, int, int> *funcDeleg2 =
-        new LLBC_Func2<void, int, int>(&Func_Foo_2);
+    typedef LLBC_Func2<void, int, int> __Func2_Int_RtnVoid;
+    LLBC_IDelegate2<void, int, int> *funcDeleg2 = 
+            LLBC_New1(__Func2_Int_RtnVoid, &Func_Foo_2);
     funcDeleg2->Invoke(arg1, arg2);
-    delete funcDeleg2;
+    LLBC_Delete(funcDeleg2);
 
     // Call delegate3.
-    LLBC_IDelegate3<void, int, int, int> *deleg3 =
-        new LLBC_Delegate3<void, DelegObj, int, int, int>(this, &DelegObj::Foo_3);
+    typedef LLBC_Delegate3<void, DelegObj, int, int, int> __Deleg3_Int_RtnVoid;
+    LLBC_IDelegate3<void, int, int, int> *deleg3 = 
+            LLBC_New2(__Deleg3_Int_RtnVoid, this, &DelegObj::Foo_3);
     deleg3->Invoke(arg1, arg2, arg3);
-    delete deleg3;
+    LLBC_Delete(deleg3);
 
-    LLBC_IDelegate3<void, int, int, int> *funcDeleg3 =
-        new LLBC_Func3<void, int, int, int>(&Func_Foo_3);
+    typedef LLBC_Func3<void, int, int, int> __Func3_Int_RtnVoid;
+    LLBC_IDelegate3<void, int, int, int> *funcDeleg3 = 
+            LLBC_New1(__Func3_Int_RtnVoid, &Func_Foo_3);
     funcDeleg3->Invoke(arg1, arg2, arg3);
-    delete funcDeleg3;
+    LLBC_Delete(funcDeleg3);
 
     // Call delegate4.
-    LLBC_IDelegate4<void, int, int, int, int> *deleg4 =
-        new LLBC_Delegate4<void, DelegObj, int, int, int, int>(this, &DelegObj::Foo_4);
+    typedef LLBC_Delegate4<void, DelegObj, int, int, int, int> __Deleg4_Int_RtnVoid;
+    LLBC_IDelegate4<void, int, int, int, int> *deleg4 =  
+            LLBC_New2(__Deleg4_Int_RtnVoid, this, &DelegObj::Foo_4);
     deleg4->Invoke(arg1, arg2, arg3, arg4);
-    delete deleg4;
+    LLBC_Delete(deleg4);
 
+    typedef LLBC_Func4<void, int, int, int, int> __Func4_Int_RtnVoid;
     LLBC_IDelegate4<void, int, int, int, int> *funcDeleg4 =
-        new LLBC_Func4<void, int, int, int, int>(&Func_Foo_4);
+            LLBC_New1(__Func4_Int_RtnVoid, &Func_Foo_4);
     funcDeleg4->Invoke(arg1, arg2, arg3, arg4);
-    delete funcDeleg4;
+    LLBC_Delete(funcDeleg4);
 
     // Call delegate5.
-    LLBC_IDelegate5<void, int, int, int, int, int> *deleg5 =
-        new LLBC_Delegate5<void, DelegObj, int, int, int, int, int>(this, &DelegObj::Foo_5);
+    typedef LLBC_Delegate5<void, DelegObj, int, int, int, int, int> __Deleg5_Int_RtnVoid;
+    LLBC_IDelegate5<void, int, int, int, int, int> *deleg5 = 
+            LLBC_New2(__Deleg5_Int_RtnVoid, this, &DelegObj::Foo_5);
     deleg5->Invoke(arg1, arg2, arg3, arg4, arg5);
-    delete deleg5;
+    LLBC_Delete(deleg5);
 
-    LLBC_IDelegate5<void, int, int, int, int, int> *funcDeleg5 =
-        new LLBC_Func5<void, int, int, int, int, int>(&Func_Foo_5);
+    typedef LLBC_Func5<void, int, int, int, int, int> __Func5_Int_RtnVoid;
+    LLBC_IDelegate5<void, int, int, int, int, int> *funcDeleg5 = 
+            LLBC_New1(__Func5_Int_RtnVoid, &Func_Foo_5);
     funcDeleg5->Invoke(arg1, arg2, arg3, arg4, arg5);
-    delete funcDeleg5;
+    LLBC_Delete(funcDeleg5);
 
     // Call delegate6.
+    typedef LLBC_Delegate6<void, DelegObj, int, int, int, int, int, int> __Deleg6_Int_RtnVoid;
     LLBC_IDelegate6<void, int, int, int, int, int, int> *deleg6 =
-        new LLBC_Delegate6<void, DelegObj, int, int, int, int, int, int>(this, &DelegObj::Foo_6);
+            LLBC_New2(__Deleg6_Int_RtnVoid, this, &DelegObj::Foo_6);
     deleg6->Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
-    delete deleg6;
+    LLBC_Delete(deleg6);
 
+    typedef LLBC_Func6<void, int, int, int, int, int, int> __Func6_Int_RtnVoid;
     LLBC_IDelegate6<void, int, int, int, int, int, int> *funcDeleg6 =
-        new LLBC_Func6<void, int, int, int, int, int, int>(&Func_Foo_6);
+            LLBC_New1(__Func6_Int_RtnVoid, &Func_Foo_6);
     funcDeleg6->Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
-    delete funcDeleg6;
+    LLBC_Delete(funcDeleg6);
 
     // Call delegate7.
+    typedef LLBC_Delegate7<void, DelegObj, int, int, int, int, int, int, int> __Deleg7_Int_RtnVoid;
     LLBC_IDelegate7<void, int, int, int, int, int, int, int> *deleg7 =
-        new LLBC_Delegate7<void, DelegObj, int, int, int, int, int, int, int>(this, &DelegObj::Foo_7);
+            LLBC_New2(__Deleg7_Int_RtnVoid, this, &DelegObj::Foo_7);
     deleg7->Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-    delete deleg7;
+    LLBC_Delete(deleg7);
 
+    typedef LLBC_Func7<void, int, int, int, int, int, int, int> __Func7_Int_RtnVoid;
     LLBC_IDelegate7<void, int, int, int, int, int, int, int> *funcDeleg7 =
-        new LLBC_Func7<void, int, int, int, int, int, int, int>(&Func_Foo_7);
+            LLBC_New1(__Func7_Int_RtnVoid, &Func_Foo_7);
     funcDeleg7->Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-    delete funcDeleg7;
+    LLBC_Delete(funcDeleg7);
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();

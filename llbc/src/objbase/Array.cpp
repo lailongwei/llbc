@@ -407,7 +407,7 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
     int errNo = LLBC_GetLastError();
     int subErrNo = LLBC_GetSubErrorNo();
 
-    LLBC_Array *arr = new LLBC_Array;
+    LLBC_Array *arr = LLBC_New0(LLBC_Array);
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); iter++)
     {
@@ -451,7 +451,7 @@ void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
 
 LLBC_Object *LLBC_Array::Clone() const
 {
-    LLBC_Array *clone = new LLBC_Array;
+    LLBC_Array *clone = LLBC_New0(LLBC_Array);
 
     // Clone object factory.
     if (_objFactory)

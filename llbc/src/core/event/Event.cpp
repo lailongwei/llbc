@@ -74,7 +74,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 {
     if (_intKeyParams == NULL)
-        _intKeyParams = new _IntKeyParams();
+        _intKeyParams = LLBC_New0(_IntKeyParams);
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -88,7 +88,7 @@ LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &param)
 {
     if (_strKeyParams == NULL)
-        _strKeyParams = new _StrKeyParams();
+        _strKeyParams = LLBC_New0(_StrKeyParams);
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())
@@ -112,7 +112,7 @@ const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetStrKeyParams() const
 LLBC_Variant &LLBC_Event::operator [](int key)
 {
     if (!_intKeyParams)
-        _intKeyParams = new _IntKeyParams();
+        _intKeyParams = LLBC_New0(_IntKeyParams);
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -124,7 +124,7 @@ LLBC_Variant &LLBC_Event::operator [](int key)
 LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key)
 {
     if (!_strKeyParams)
-        _strKeyParams = new _StrKeyParams();
+        _strKeyParams = LLBC_New0(_StrKeyParams);
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())

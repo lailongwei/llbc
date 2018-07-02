@@ -254,10 +254,11 @@ void LLBC_IocpPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_IocpPoller::StartupMonitor()
 {
-    LLBC_IDelegate0<void> *deleg = new LLBC_Delegate0<void,
-        LLBC_IocpPoller>(this, &LLBC_IocpPoller::MonitorSvc);
+    typedef LLBC_Delegate0<void, LLBC_IocpPoller> __MonitorDeleg;
 
-    _monitor = new LLBC_PollerMonitor(deleg);
+    LLBC_IDelegate0<void> *deleg = 
+        LLBC_New2(__MonitorDeleg, this, &LLBC_IocpPoller::MonitorSvc);
+    _monitor = LLBC_New1(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
@@ -333,7 +334,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
 {
     // Create accepted socket and set some options.
     LLBC_Socket *sock = session->GetSocket();
-    LLBC_Socket *newSock = new LLBC_Socket(ol->acceptSock);
+    LLBC_Socket *newSock = LLBC_New1(LLBC_Socket, ol->acceptSock);
     newSock->SetNonBlocking();
     newSock->SetOption(SOL_SOCKET,
                        SO_UPDATE_ACCEPT_CONTEXT,

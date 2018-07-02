@@ -33,7 +33,7 @@ static int ThreadProc(void *arg)
     int threadIdx = static_cast<int>(reinterpret_cast<long>(arg));
     LLBC_PrintLine("thread %d startup", threadIdx);
 
-    __g_tls.SetValue(new int);
+    __g_tls.SetValue(LLBC_New0(int));
     (*__g_tls) = threadIdx;
     for(int i = 0; i < 5000000; i ++)
         (*__g_tls) += 1;

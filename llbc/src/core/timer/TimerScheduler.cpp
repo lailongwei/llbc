@@ -71,7 +71,7 @@ void LLBC_TimerScheduler::CreateEntryThreadScheduler()
         LLBC_INTERNAL_NS __g_entryThreadTimerScheduler;
     if (!scheduler)
     {
-        scheduler = new LLBC_TimerScheduler;
+        scheduler = LLBC_New0(LLBC_TimerScheduler);
     }
 }
 
@@ -186,7 +186,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 peri
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = new LLBC_TimerData;
+    LLBC_TimerData *data = LLBC_New0(LLBC_TimerData);
     ::memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliSeconds() + dueTime;
     data->timerId = ++ _maxTimerId;

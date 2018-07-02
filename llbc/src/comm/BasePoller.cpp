@@ -159,7 +159,7 @@ void LLBC_BasePoller::Cleanup()
         block->Read(&ev, sizeof(LLBC_PollerEvent));
         LLBC_PollerEvUtil::DestroyEv(ev);
 
-        delete block;
+        LLBC_Delete(block);
     }
 
     // Delete all sessions.
@@ -230,7 +230,7 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
         return;
 
     LLBC_SessionCloseInfo *closeInfo = 
-        new LLBC_SessionCloseInfo(ev.un.closeReason);
+        LLBC_New1(LLBC_SessionCloseInfo, ev.un.closeReason);
     LLBC_XFree(ev.un.closeReason);
 
     LLBC_Session *session = it->second;
@@ -256,7 +256,7 @@ LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId,
     if (sessionId == 0)
         sessionId = _pollerMgr->AllocSessionId();
 
-    LLBC_Session *session = new LLBC_Session();
+    LLBC_Session *session = LLBC_New0(LLBC_Session);
     session->SetId(sessionId);
     session->SetSocket(socket);
     socket->SetSession(session);

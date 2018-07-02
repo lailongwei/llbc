@@ -40,7 +40,7 @@ int static __LLBC_BaseTaskEntry(void *arg)
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
 
     tls->coreTls.task = task;
-    tls->coreTls.timerScheduler = new LLBC_NS LLBC_TimerScheduler;
+    tls->coreTls.timerScheduler = LLBC_New0(LLBC_NS LLBC_TimerScheduler);
 
     task->OnTaskThreadStart();
 

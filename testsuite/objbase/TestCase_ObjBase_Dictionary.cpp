@@ -125,7 +125,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     std::cout <<"Inset 10 integer type objects." <<std::endl;
     for(int i = 1; i <= 10; i ++)
     {
-        LLBC_Object *obj = new TestObj;
+        LLBC_Object *obj = LLBC_New0(TestObj);
         dict.Insert(i, obj);
 
         obj->Release();
@@ -144,15 +144,15 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
 
     // Insert string key type object.
     std::cout <<"Insert string type key to dictionary" <<std::endl;
-    LLBC_Object *obj = new TestObj;
+    LLBC_Object *obj = LLBC_New0(TestObj);
     dict.Insert("Hello, World!!!", obj);
     obj->Release();
     
-    obj = new TestObj;
+    obj = LLBC_New0(TestObj);
     dict.Insert("sunday", obj);
     obj->Release();
 
-    obj = new TestObj;
+    obj = LLBC_New0(TestObj);
     dict.Insert("saturday", obj);
     obj->Release();
 
@@ -163,7 +163,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     std::cout <<"Insert integer type key again, 10 elements." <<std::endl;
     for(int i = 11; i <= 20; i ++)
     {
-        LLBC_Object *obj = new TestObj;
+        LLBC_Object *obj = LLBC_New0(TestObj);
         dict.Insert(i, obj);
 
         obj->Release();

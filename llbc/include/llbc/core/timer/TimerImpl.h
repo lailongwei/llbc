@@ -26,19 +26,23 @@ __LLBC_NS_BEGIN
 template <typename ObjectType>
 inline void LLBC_Timer::SetTimeoutHandler(ObjectType *object, void ( ObjectType::*timeoutMeth)(LLBC_Timer *))
 {
+    typedef LLBC_Delegate1<void, ObjectType, LLBC_Timer *> __TimeoutMethDeleg;
+
     if (UNLIKELY(object == NULL || timeoutMeth == NULL))
         SetTimeoutHandler(static_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL));
     else
-        SetTimeoutHandler(new LLBC_Delegate1<void, ObjectType, LLBC_Timer *>(object, timeoutMeth));
+        SetTimeoutHandler(LLBC_New2(__TimeoutMethDeleg, object, timeoutMeth));
 }
 
 template <typename ObjectType>
 void LLBC_Timer::SetCancelHandler(ObjectType *object, void ( ObjectType::*cancelMeth)(LLBC_Timer *))
 {
+    typedef LLBC_Delegate1<void, ObjectType, LLBC_Timer *> __CancelMethDeleg;
+
     if (UNLIKELY(object == NULL || cancelMeth == NULL))
         SetCancelHandler(static_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL));
     else
-        SetCancelHandler(new LLBC_Delegate1<void, ObjectType, LLBC_Timer *>(object, cancelMeth));
+        SetCancelHandler(LLBC_New2(__CancelMethDeleg, object, cancelMeth));
 }
 
 __LLBC_NS_END

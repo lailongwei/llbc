@@ -45,21 +45,21 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
 
 int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 {
-	LLBC_Property cfg;
-	if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
-		return LLBC_FAILED;
+    LLBC_Property cfg;
+    if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
+        LLBC_FAILED;
 
-	// Get all logger names
-	const LLBC_Strings loggerNames = cfg.GetPropertyNames(false);
-	for (LLBC_Strings::const_iterator it = loggerNames.begin();
-		 it != loggerNames.end();
-		 it++)
-	{
-		const LLBC_String &loggerName = *it;
-        LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
+    // Get all logger names
+    const LLBC_Strings loggerNames = cfg.GetPropertyNames(false);
+    for (LLBC_Strings::const_iterator it = loggerNames.begin();
+         it != loggerNames.end();
+         it++)
+    {
+        const LLBC_String &loggerName = *it;
+        LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
         if (info->Initialize(*cfg.GetProperty(loggerName)) != LLBC_OK)
         {
-            delete info;
+            LLBC_Delete(info);
             LLBC_STLHelper::DeleteContainer(_configs, true);
             return LLBC_FAILED;
         }
@@ -88,10 +88,10 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
     if (iter == _configs.end())
     {
         LLBC_Property cfg;
-        LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
+        LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
         if (info->Initialize(cfg) != LLBC_OK)
         {
-            delete info;
+            LLBC_Delete(info);
             return LLBC_FAILED;
         }
 

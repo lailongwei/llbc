@@ -58,7 +58,7 @@ void LLBC_LogRunnable::Cleanup()
         Output(logData);
         FreeLogData(logData);
 
-        delete block;
+        LLBC_Delete(block);
     }
 
     // Delete all appender.
@@ -67,7 +67,7 @@ void LLBC_LogRunnable::Cleanup()
         LLBC_ILogAppender *appender = _head;
         _head = _head->GetAppenderNext();
 
-        delete appender;
+        LLBC_Delete(appender);
     }
 }
 
@@ -101,7 +101,7 @@ void LLBC_LogRunnable::Svc()
         Output(logData);
         FreeLogData(logData);
 
-        delete block;
+        LLBC_Delete(block);
 
     }
 }
@@ -160,7 +160,7 @@ void LLBC_LogRunnable::FreeLogData(LLBC_LogData *data)
     LLBC_XFree(data->msg);
     LLBC_XFree(data->others);
 
-    delete data;
+    LLBC_Delete(data);
 }
 
 __LLBC_NS_END

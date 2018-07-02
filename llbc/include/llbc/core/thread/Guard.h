@@ -141,9 +141,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_InvokeGuard);
 
 private:
-    LLBC_GuardFunc _func;
-    LLBC_IDelegate1<void, void *> *_meth;
-
+    LLBC_IDelegate1<void, void *> *_deleg;
     void *_data;
 };
 

@@ -55,7 +55,7 @@ LLBC_DictionaryElem::LLBC_DictionaryElem(int key, LLBC_Object *o)
 
 LLBC_DictionaryElem::LLBC_DictionaryElem(const LLBC_String &key, LLBC_Object *o)
 : _intKey(0)
-, _strKey(new LLBC_String(key))
+, _strKey(LLBC_New1(LLBC_String, key))
 , _hash(0)
 
 , _obj(o)

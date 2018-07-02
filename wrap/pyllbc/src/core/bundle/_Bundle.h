@@ -23,7 +23,7 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_NewBundle(PyObject *self, PyObject *args)
 {
-    LLBC_Bundle *b = new LLBC_Bundle();
+    LLBC_Bundle *b = LLBC_New0(LLBC_Bundle);
     return Py_BuildValue("l", b);
 }
 
@@ -33,7 +33,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelBundle(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &bundlePtr))
         return NULL;
 
-    delete bundlePtr;
+    LLBC_Delete(bundlePtr);
 
     Py_RETURN_NONE;
 }

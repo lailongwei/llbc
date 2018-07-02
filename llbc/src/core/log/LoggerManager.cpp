@@ -58,7 +58,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    _configurator = new LLBC_LoggerConfigurator;
+    _configurator = LLBC_New0(LLBC_LoggerConfigurator);
     if (_configurator->Initialize(cfgFile) != LLBC_OK)
     {
         LLBC_XDelete(_configurator);
@@ -66,7 +66,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     }
 
     // First, config root logger.
-    _root = new LLBC_Logger;
+    _root = LLBC_New0(LLBC_Logger);
     if (_configurator->Config(_rootLoggerName, _root) != LLBC_OK)
     {
         LLBC_XDelete(_root);
@@ -85,10 +85,10 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         if (iter->first == _rootLoggerName)
             continue;
 
-        LLBC_Logger *logger = new LLBC_Logger;
+        LLBC_Logger *logger = LLBC_New0(LLBC_Logger);
         if (_configurator->Config(iter->first, logger) != LLBC_OK)
         {
-            delete logger;
+            LLBC_Delete(logger);
             Finalize();
             return LLBC_FAILED;
         }

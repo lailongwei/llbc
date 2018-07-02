@@ -49,7 +49,7 @@ LLBC_AutoReleasePoolStack::~LLBC_AutoReleasePoolStack()
 
     for (size_t i = 0; i < pools.size(); i++)
     {
-        delete pools[i];
+        LLBC_Delete(pools[i]);
     }
 }
 

@@ -103,33 +103,28 @@ inline LLBC_FreeGuard<T>::~LLBC_FreeGuard()
 }
 
 inline LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
-: _func(func)
-, _meth(NULL)
-
+: _deleg(NULL)
 , _data(data)
 {
+    typedef LLBC_Func1<void, void *> __InvokeFuncDeleg;
+
+    _deleg = LLBC_New1(__InvokeFuncDeleg, func);
 }
 
 template <typename Object>
 inline LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data)
-: _func(NULL)
-, _meth(new LLBC_Delegate1<void, Object, void *>(obj, meth))
-
+: _deleg(NULL)
 , _data(data)
 {
+    typedef LLBC_Delegate1<void, Object, void *> __InvokeMethDeleg;
+
+    _deleg = LLBC_New2(__InvokeMethDeleg, obj, meth);
 }
 
 inline LLBC_InvokeGuard::~LLBC_InvokeGuard()
 {
-    if (_func)
-    {
-        (*_func)(_data);
-    }
-    else
-    {
-        _meth->Invoke(_data);
-        LLBC_Delete(_meth);
-    }
+    _deleg->Invoke(_data);
+    LLBC_Delete(_deleg);
 }
 __LLBC_NS_END
 

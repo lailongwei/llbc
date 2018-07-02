@@ -46,7 +46,7 @@ static void BecomeAndAllocDict(LLBC_NS LLBC_Variant &var, LLBC_NS LLBC_Variant::
     if (!var.IsDict())
         var.BecomeDict();
     if (!holder.dict)
-        holder.dict = new Dict;
+        holder.dict = LLBC_New0(Dict);
 }
 
 __LLBC_INTERNAL_NS_END
@@ -210,7 +210,7 @@ LLBC_Variant::LLBC_Variant(const Dict &dictVal)
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
     if (!dictVal.empty())
     {
-        _holder.dict= new Dict();
+        _holder.dict= LLBC_New0(Dict);
         _holder.dict->insert(dictVal.begin(), dictVal.end());
     }
 }
@@ -1013,7 +1013,7 @@ LLBC_Variant &LLBC_Variant::operator =(const Dict &val)
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
     if (!val.empty())
     {
-        _holder.dict = new Dict;
+        _holder.dict = LLBC_New0(Dict);
         for (DictConstIter it = val.begin();
             it != val.end();
             it ++)
@@ -1262,7 +1262,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return true;
         }
 
-        _holder.dict = new Dict;
+        _holder.dict = LLBC_New0(Dict);
         for (uint32 i = 0; i < count; i ++)
         {
             LLBC_Variant key;

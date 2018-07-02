@@ -193,10 +193,10 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register facade.
-    TestFacade *facade = new TestFacade();
+    TestFacade *facade = LLBC_New0(TestFacade);
     _svc->RegisterFacade(facade);
     // Register coder.
-    _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
+    _svc->RegisterCoder(1, LLBC_New0(TestDataFactory));
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _svc->RegisterStatusDesc(1, "The test status describe");

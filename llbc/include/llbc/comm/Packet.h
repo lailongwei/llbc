@@ -466,15 +466,15 @@ public:
     void SetCodecError(const LLBC_String &codecErr);
 
 public:
-    /*
-    * Get don't delete after packet handle flag.
-    * @return bool - the dont delete after handle flag.
-    */
+    /**
+     * Get don't delete after packet handle flag.
+     * @return bool - the dont delete after handle flag.
+     */
     bool IsDontDeleteAfterHandle() const;
 
-    /*
-    * Set don't delete after packet handle flag.
-    */
+    /**
+     * Set don't delete after packet handle flag.
+     */
     void SetDontDeleteAfterHandle();
 
 private:

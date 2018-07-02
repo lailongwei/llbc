@@ -61,7 +61,7 @@ inline void TestTask::Svc()
 
         LLBC_PrintLine("task fetch data: %s", content.c_str());
 
-        delete block;
+        LLBC_Delete(block);
     }
 
     return;
@@ -85,7 +85,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     LLBC_PrintLine("core/thread/task test:");
 
     // Activate task.
-    TestTask *task = new TestTask;
+    TestTask *task = LLBC_New0(TestTask);
     task->Activate(2);
 
     // Send message to task.
@@ -94,7 +94,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
         LLBC_Stream stream;
         LLBC_String content = "Hello Tasks!";
         stream.Write(content);
-        LLBC_MessageBlock *block = new LLBC_MessageBlock;
+        LLBC_MessageBlock *block = LLBC_New0(LLBC_MessageBlock);
         block->Write(stream.GetBuf(), stream.GetPos());
 
         task->Push(block);
@@ -103,7 +103,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     // Wait task.
     task->Wait();
     // Delete task.
-    delete task;
+    LLBC_Delete(task);
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

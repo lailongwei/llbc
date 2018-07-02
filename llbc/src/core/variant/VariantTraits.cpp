@@ -53,7 +53,7 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         const LLBC_Variant::Holder &rHolder = right.GetHolder();
         if (rHolder.dict)
         {
-            lHolder.dict = new LLBC_Variant::Dict(*rHolder.dict);
+            lHolder.dict = LLBC_New1(LLBC_Variant::Dict, *rHolder.dict);
         }
     }
 }
@@ -249,7 +249,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
             }
 
-            lDict = new LLBC_Variant::Dict;
+            lDict = LLBC_New0(LLBC_Variant::Dict);
         }
 
         if (rDict)
@@ -292,7 +292,7 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
             }
 
-            lDict = new LLBC_Variant::Dict;
+            lDict = LLBC_New0(LLBC_Variant::Dict);
         }
 
         if (rDict)
