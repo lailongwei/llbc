@@ -1239,6 +1239,8 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             _holder.type = LLBC_VariantType::VT_NIL;
             return false;
         }
+
+        return true;
     }
     else if (IsStr())
     {
@@ -1247,6 +1249,8 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             _holder.type = LLBC_VariantType::VT_NIL;
             return false;
         }
+
+        return true;
     }
     else if (IsDict())
     {
