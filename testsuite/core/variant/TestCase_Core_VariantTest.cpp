@@ -33,6 +33,9 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     std::cout <<std::endl;
 
     DictTtest();
+    std::cout <<std::endl;
+
+    SerializeTest();
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
@@ -42,7 +45,7 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
 
 void TestCase_Core_VariantTest::BasicTest()
 {
-    std::cout <<"basic test:" <<std::endl;
+    std::cout <<"Basic test:" <<std::endl;
 
     LLBC_Variant nilVal;
     LLBC_Variant boolVal(true);
@@ -130,6 +133,8 @@ void TestCase_Core_VariantTest::BasicTest()
 
 void TestCase_Core_VariantTest::ArithmeticTest()
 {
+    std::cout <<"Arithmetic test:" <<std::endl;
+
     LLBC_Variant left( (sint32)3 );
     LLBC_Variant right( (sint64)-5 );
     LLBC_Variant result = left + right;
@@ -178,6 +183,8 @@ void TestCase_Core_VariantTest::ArithmeticTest()
 
 void TestCase_Core_VariantTest::DictTtest()
 {
+    std::cout <<"Dict test" <<std::endl;
+
     // Raw key type dictionary test.
     LLBC_Variant rawDict1;
     rawDict1.Insert(1, "Hello");
@@ -219,4 +226,44 @@ void TestCase_Core_VariantTest::DictTtest()
     lowPerfDict[rawDict1] = "Hello";
     lowPerfDict[rawDict2] = "World";
     std::cout <<"lowPerfDict: " <<lowPerfDict <<std::endl;
+}
+
+void TestCase_Core_VariantTest::SerializeTest()
+{
+    std::cout <<"Serialize test" <<std::endl;
+
+    // Serialize & Deserialize raw type.
+    LLBC_Stream stream;
+    LLBC_Variant raw(-64);
+    stream <<raw;
+    std::cout <<"Raw obj[" <<raw <<"] serialized size: " <<stream.GetPos() <<std::endl;
+
+    LLBC_Variant deserRaw;
+    stream.SetPos(0);
+    stream>> deserRaw;
+    std::cout <<"Deserialized from stream: [" <<deserRaw <<"]" <<std::endl;
+
+    // Serialize & Deserialize string type.
+    LLBC_Variant str("Hello World!");
+    stream.SetPos(0);
+    stream <<str;
+    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetPos() <<std::endl;
+
+    LLBC_Variant deserStr;
+    stream.SetPos(0);
+    stream>> deserStr;
+    std::cout <<"Deserialized from stream: [" <<deserStr <<"]" <<std::endl;
+
+    // Serialize & Deserialize dict type.
+    LLBC_Variant dict;
+    dict[1] = "Hello World!";
+    dict[2] = "Hey Judy!";
+    stream.SetPos(0);
+    stream <<dict;
+    std::cout <<"Dict obj[" <<dict <<"] serialized size: " <<stream.GetPos() <<std::endl;
+
+    LLBC_Variant deserDict;
+    stream.SetPos(0);
+    stream>> deserDict;
+    std::cout <<"Deserialized from stream: [" <<deserDict <<"]" <<std::endl;
 }
