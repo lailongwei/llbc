@@ -28,6 +28,9 @@ __LLBC_NS_BEGIN
 
 int __LLBC_CoreStartup()
 {
+    // Initialize Variant Type->StrDesc dictionary.
+    LLBC_VariantType::InitType2StrDict();
+
     // Create main bundle.
     if(LLBC_Bundle::CreateMainBundle() != LLBC_OK)
     {

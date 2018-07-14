@@ -94,10 +94,7 @@ void LLBC_VariantArithmetic::Performs_bool_any(
     switch (right.GetType())
     {
     case LLBC_VariantType::VT_RAW_BOOL:
-        if (left.AsBool() || right.AsBool())
-        {
-            left = true;
-        }
+        left = Performs_raw_operation(left.AsBool(), right.AsBool(), type);
         break;
 
     case LLBC_VariantType::VT_RAW_SINT8:
@@ -578,13 +575,13 @@ void LLBC_VariantArithmetic::Performs_uint64_any(
 void LLBC_VariantArithmetic::Performs_float_any(
     LLBC_Variant &left, const LLBC_Variant &right, int type)
 {
-    Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
+    left = static_cast<float>(Performs_raw_operation(left.AsDouble(), right.AsDouble(), type));
 }
 
 void LLBC_VariantArithmetic::Performs_double_any(
     LLBC_Variant &left, const LLBC_Variant &right, int type)
 {
-    Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
+    left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
 }
 
 __LLBC_NS_END

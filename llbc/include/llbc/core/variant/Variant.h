@@ -72,7 +72,7 @@ public:
         // Bit view(first type always equal VT_STR):
         //          [first type] [string type]
         //             8 bits       24 bits
-        VT_STR_LLBC_STR         = 0x02000001,
+        VT_STR_DFT              = 0x02000001,
 
         // Dictionary type enumeration.
         // Bit view(first type always equal VT_DICT):
@@ -88,7 +88,20 @@ public:
         VT_MASK_RAW_SIGNED      = 0x00000001
     };
 
+    /**
+     * Get type string representation.
+     * @param[in] type - the variant type enumeration.
+     * @return const LLBC_String & - the type string representation.
+     */
     static const LLBC_String &Type2Str(int type);
+
+    /**
+     * Init type to string representation dictionary, call by llbc library.
+     */
+    static void InitType2StrDict();
+
+private:
+    static std::map<int, LLBC_String> _typeDescs;
 };
 
 __LLBC_NS_END
@@ -115,10 +128,13 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Variant
 {
 public:
-    typedef std::map<LLBC_Variant, LLBC_Variant> Dict;
+    typedef LLBC_String Str;
 
+    typedef std::map<LLBC_Variant, LLBC_Variant> Dict;
     typedef Dict::iterator DictIter;
     typedef Dict::const_iterator DictConstIter;
+    typedef Dict::reverse_iterator DictReverseIter;
+    typedef Dict::const_reverse_iterator DictConstReverseIter;
 
     struct LLBC_EXPORT Holder
     {
@@ -131,7 +147,9 @@ public:
 
             double doubleVal;
         } raw;
-        LLBC_String str;
+
+        Str *str;
+
         Dict *dict;
 
         Holder();
@@ -159,7 +177,7 @@ public:
         FLOAT = LLBC_VariantType::VT_RAW_FLOAT,
         DOUBLE = LLBC_VariantType::VT_RAW_DOUBLE,
 
-        STR = LLBC_VariantType::VT_STR_LLBC_STR,
+        STR = LLBC_VariantType::VT_STR_DFT,
         DICT = LLBC_VariantType::VT_DICT_DFT
     };
 
@@ -190,6 +208,7 @@ public:
     explicit LLBC_Variant(const float &floatVal);
     explicit LLBC_Variant(const double &doubleVal);
     explicit LLBC_Variant(const char *cstrVal);
+    explicit LLBC_Variant(const std::string &strVal);
     explicit LLBC_Variant(const LLBC_String &strVal);
     explicit LLBC_Variant(const Dict &dictVal);
     LLBC_Variant(const LLBC_Variant &varVal);
@@ -252,8 +271,7 @@ public:
     float AsFloat() const;
     double AsDouble() const;
     const char *AsCStr() const;
-    const LLBC_String &AsStr() const;
-    Dict &AsDict();
+    LLBC_String AsStr() const;
     const Dict &AsDict() const;
 
     operator bool () const;
@@ -270,8 +288,7 @@ public:
     operator float () const;
     operator double () const;
     operator const char *() const;
-    operator const LLBC_String &() const;
-    operator Dict &();
+    operator LLBC_String () const;
     operator const Dict &() const;
 
     // Dictionary type variant object specify operate methods.
@@ -279,6 +296,10 @@ public:
     DictIter End();
     DictConstIter Begin() const;
     DictConstIter End() const;
+    DictReverseIter ReverseBegin();
+    DictReverseIter ReverseEnd();
+    DictConstReverseIter ReverseBegin() const;
+    DictConstReverseIter ReverseEnd() const;
 
     std::pair<DictIter, bool> Insert(const Dict::key_type &key, const Dict::mapped_type &val);
     std::pair<DictIter, bool> Insert(const Dict::value_type &val);

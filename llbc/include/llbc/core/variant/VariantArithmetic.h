@@ -80,31 +80,12 @@ private:
      * Implementation function.
      */
     template <typename RawType>
-    static RawType Performs_raw_operation(RawType left, RawType right, int type)
-    {
-        switch(type)
-        {
-        case VT_ARITHMETIC_ADD:
-            return left + right;
-
-        case VT_ARITHMETIC_SUB:
-            return left - right;
-
-        case VT_ARITHMETIC_MUL:
-            return left * right;
-
-        case VT_ARITHMETIC_DIV:
-            return left / right;
-
-        default:
-            break;
-        }
-
-        return RawType();
-    }
+    static RawType Performs_raw_operation(RawType left, RawType right, int type);
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/variant/VariantArithmeticImpl.h"
 
 #endif // !__LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
 
