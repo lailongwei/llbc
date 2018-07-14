@@ -148,9 +148,11 @@ public:
             double doubleVal;
         } raw;
 
-        Str *str;
-
-        Dict *dict;
+        union ObjType
+        {
+            Str *str;
+            Dict *dict;
+        } obj;
 
         Holder();
         ~Holder();

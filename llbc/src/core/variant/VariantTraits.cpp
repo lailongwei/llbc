@@ -64,17 +64,17 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         left.SetType(right.GetType());
         LLBC_Variant::Holder &lHolder = left.GetHolder();
         const LLBC_Variant::Holder &rHolder = right.GetHolder();
-        if (rHolder.str == NULL || rHolder.str->empty())
+        if (rHolder.obj.str == NULL || rHolder.obj.str->empty())
         {
-            if (lHolder.str)
-                lHolder.str->clear();
+            if (lHolder.obj.str)
+                lHolder.obj.str->clear();
         }
         else
         {
-            if (lHolder.str == NULL)
-                lHolder.str = LLBC_New1(LLBC_String, *rHolder.str);
-            else if (lHolder.str != rHolder.str)
-                *lHolder.str = *rHolder.str;
+            if (lHolder.obj.str == NULL)
+                lHolder.obj.str = LLBC_New1(LLBC_String, *rHolder.obj.str);
+            else if (lHolder.obj.str != rHolder.obj.str)
+                *lHolder.obj.str = *rHolder.obj.str;
         }
     }
     else if (right.IsDict()) // Do DICT type data assignment.
@@ -88,17 +88,17 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         left.SetType(right.GetType());
         LLBC_Variant::Holder &lHolder = left.GetHolder();
         const LLBC_Variant::Holder &rHolder = right.GetHolder();
-        if (rHolder.dict == NULL || rHolder.dict->empty())
+        if (rHolder.obj.dict == NULL || rHolder.obj.dict->empty())
         {
-            if (lHolder.dict)
-                lHolder.dict->clear();
+            if (lHolder.obj.dict)
+                lHolder.obj.dict->clear();
         }
         else
         {
-            if (lHolder.dict == NULL)
-                lHolder.dict = LLBC_New1(LLBC_Variant::Dict, *rHolder.dict);
-            else if (lHolder.dict != rHolder.dict)
-                *lHolder.dict = *rHolder.dict;
+            if (lHolder.obj.dict == NULL)
+                lHolder.obj.dict = LLBC_New1(LLBC_Variant::Dict, *rHolder.obj.dict);
+            else if (lHolder.obj.dict != rHolder.obj.dict)
+                *lHolder.obj.dict = *rHolder.obj.dict;
         }
     }
 }
@@ -112,17 +112,17 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
         if (!right.IsStr())
             return false;
 
-        if (lHolder.str)
+        if (lHolder.obj.str)
         {
-            if (rHolder.str)
-                return *lHolder.str == *rHolder.str;
+            if (rHolder.obj.str)
+                return *lHolder.obj.str == *rHolder.obj.str;
             else
-                return lHolder.str->empty();
+                return lHolder.obj.str->empty();
         }
         else
         {
-            if (rHolder.str)
-                return rHolder.str->empty();
+            if (rHolder.obj.str)
+                return rHolder.obj.str->empty();
             else
                 return true;
         }
@@ -132,8 +132,8 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
         if (!right.IsDict())
             return false;
 
-        const LLBC_Variant::Dict *lDict = lHolder.dict;
-        const LLBC_Variant::Dict *rDict = rHolder.dict;
+        const LLBC_Variant::Dict *lDict = lHolder.obj.dict;
+        const LLBC_Variant::Dict *rDict = rHolder.obj.dict;
         if (lDict)
         {
             if (rDict)
@@ -176,15 +176,15 @@ bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
 {
     if (left.IsDict() && right.IsDict())
     {
-        const LLBC_Variant::Dict *lDict = left.GetHolder().dict;
-        const LLBC_Variant::Dict *rDict = right.GetHolder().dict;
+        const LLBC_Variant::Dict *lDict = left.GetHolder().obj.dict;
+        const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
 
         if (lDict == rDict)
             return false;
 
-        if (lDict == NULL)
+        if (lDict == NULL || lDict->empty())
             return rDict && !rDict->empty();
-        if (rDict == NULL)
+        if (rDict == NULL || rDict->empty())
             return false;
 
         return *lDict < *rDict;
@@ -267,11 +267,11 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             return;
         }
 
-        LLBC_Variant::Dict *&lDict = left.GetHolder().dict;
-        const LLBC_Variant:: Dict *rDict = right.GetHolder().dict;
-        if (!lDict)
+        LLBC_Variant::Dict *&lDict = left.GetHolder().obj.dict;
+        const LLBC_Variant:: Dict *rDict = right.GetHolder().obj.dict;
+        if (lDict == NULL)
         {
-            if (!rDict || rDict->empty())
+            if (rDict == NULL || rDict->empty())
                 return;
 
             lDict = LLBC_New0(LLBC_Variant::Dict);
@@ -306,11 +306,11 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
             return;
         }
 
-        LLBC_Variant::Dict *&lDict = left.GetHolder().dict;
-        const LLBC_Variant::Dict *rDict = right.GetHolder().dict;
-        if (!lDict)
+        LLBC_Variant::Dict *&lDict = left.GetHolder().obj.dict;
+        const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
+        if (lDict == NULL)
         {
-            if (!rDict || rDict->empty())
+            if (rDict == NULL || rDict->empty())
                 return;
 
             lDict = LLBC_New0(LLBC_Variant::Dict);
@@ -320,8 +320,8 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
         {
             typedef LLBC_Variant::Dict::const_iterator _It;
             for (_It rIt = rDict->begin(); 
-                rIt != rDict->end() && !lDict->empty(); 
-                rIt ++)
+                 rIt != rDict->end() && !lDict->empty(); 
+                 rIt++)
             {
                 lDict->erase(rIt->first);
             }
@@ -353,10 +353,10 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
             return;
         }
 
-        LLBC_Variant::Dict *&lDict = left.GetHolder().dict;
-        const LLBC_Variant::Dict *rDict = right.GetHolder().dict;
-        if ((!lDict || lDict->empty()) ||
-            (!rDict || rDict->empty()))
+        LLBC_Variant::Dict *&lDict = left.GetHolder().obj.dict;
+        const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
+        if ((lDict == NULL || lDict->empty()) ||
+            (rDict == NULL || rDict->empty()))
         {
             if (lDict)
                 lDict->clear();
@@ -364,7 +364,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
         }
 
         LLBC_Variant cLeft(left);
-        LLBC_Variant::Dict *clDict = cLeft.GetHolder().dict;
+        LLBC_Variant::Dict *clDict = cLeft.GetHolder().obj.dict;
         for (LLBC_Variant::Dict::const_iterator clIt = clDict->begin();
              clIt != clDict->end(); clIt++)
         {
@@ -379,7 +379,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
         if (left.IsStr() && right.IsRaw())
         {
             size_t rawRight = static_cast<size_t>(right.AsUInt32());
-            LLBC_Variant::Str *&lStr = left.GetHolder().str;
+            LLBC_Variant::Str *&lStr = left.GetHolder().obj.str;
             if (lStr && !lStr->empty())
                 *lStr *= rawRight;
         }
@@ -408,8 +408,8 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
             return;
         }
 
-        LLBC_Variant::Dict *&lDict = left.GetHolder().dict;
-        const LLBC_Variant::Dict *rDict = right.GetHolder().dict;
+        LLBC_Variant::Dict *&lDict = left.GetHolder().obj.dict;
+        const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
         if ((!lDict || lDict->empty()) ||
             (!rDict || rDict->empty()))
         {
@@ -419,16 +419,18 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
         }
 
         LLBC_Variant cLeft(left);
-        LLBC_Variant::Dict *clDict = cLeft.GetHolder().dict;
+        LLBC_Variant::Dict *clDict = cLeft.GetHolder().obj.dict;
         for (LLBC_Variant::Dict::const_iterator clIt = clDict->begin();
-             clIt != clDict->end(); clIt++)
+             clIt != clDict->end();
+             clIt++)
         {
             if (rDict->find(clIt->first) != rDict->end())
                 lDict->erase(clIt->first);
         }
 
         for (LLBC_Variant::Dict::const_iterator rIt = rDict->begin();
-             rIt != rDict->end(); rIt++)
+             rIt != rDict->end();
+             rIt++)
         {
             if (clDict->find(rIt->first) == clDict->end())
                 lDict->insert(std::make_pair(rIt->first, rIt->second));
