@@ -1197,7 +1197,7 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsStr())
     {
-        stream.Write(_holder.str);
+        stream.WriteEx(_holder.str);
     }
     else if (IsDict())
     {
@@ -1244,7 +1244,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
     }
     else if (IsStr())
     {
-        if (!stream.Read(_holder.str))
+        if (!stream.ReadEx(_holder.str))
         {
             _holder.type = LLBC_VariantType::VT_NIL;
             return false;
