@@ -141,6 +141,42 @@ public:
         return *this;
     }
 
+    // operator *
+    _This operator *(size_t right) const
+    {
+        if (this->empty() || right == 1)
+            return *this;
+        else if (right == 0)
+            return _This();
+
+        _This copy(*this);
+        copy *= right;
+        return copy;
+    }
+
+    _This &operator *=(size_t right)
+    {
+        if (this->empty() || right == 1)
+            return *this;
+        
+        if (right == 0)
+        {
+            this->clear();
+            return *this;
+        }
+
+        _This unitStr(*this);
+        const _Elem *unitStrBuf = unitStr.data();
+        typename _This::size_type unitStrSize = unitStr.size();
+
+        this->resize(unitStrSize * right);
+        _Elem *buf = const_cast<_Elem *>(this->data());
+        for (size_t i = 1; i < right; i++)
+            LLBC_MemCpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
+
+        return *this;
+    }
+
     // operator ==
     bool operator ==(const _This &rhs) const
     {
@@ -981,12 +1017,19 @@ public:
     // startswith/endswith
     bool startswith(const _This &s) const
     {
-        return (this->size() >= s.size() && substr(0, s.size()) == s);
+        if (s.empty())
+            return true;
+
+        return (this->size() >= s.size() && memcmp(s.data(), this->data(), s.size() * sizeof(_Elem)) == 0);
     }
 
     bool endswith(const _This &s) const
     {
-        return (this->size() >= s.size() && substr(this->size() - s.size(), s.size()) == s);
+        if (s.empty())
+            return true;
+
+        return (this->size() >= s.size() && 
+            memcmp(s.data(), this->data() + (this->size() - s.size()) * sizeof(_Elem), s.size() * sizeof(_Elem)) == 0);
     }
 
 public:
@@ -1064,12 +1107,12 @@ public:
         }
 
         _This &thisRef = *this;
-        _This::size_type stripTo = 0;
-        for (_This::size_type i = 0; i != thisRef.size(); i++)
+        typename _This::size_type stripTo = 0;
+        for (typename _This::size_type i = 0; i != thisRef.size(); i++)
         {
             bool found = false;
             const _Elem &now = thisRef[i];
-            for (_This::size_type j = 0; j != willStripChars.size(); j++)
+            for (typename _This::size_type j = 0; j != willStripChars.size(); j++)
             {
                 if (now == willStripChars[j])
                 {
