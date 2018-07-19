@@ -61,7 +61,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
         return LLBC_FAILED;
     }
 
-    pyllbc_Task *task = new pyllbc_Task(++_maxTaskId, script);
+    pyllbc_Task *task = LLBC_New2(pyllbc_Task, ++_maxTaskId, script);
     _tasks.insert(std::make_pair(_maxTaskId, task));
 
     if (task->Activate() != LLBC_OK)
@@ -69,7 +69,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
 
         _tasks.erase(_maxTaskId--);
-        delete task;
+        LLBC_Delete(task);
 
         return LLBC_FAILED;
     }
@@ -191,5 +191,5 @@ void pyllbc_TaskMgr::OnTaskDestroy(pyllbc_Task *task)
     LLBC_LockGuard guard(_lock);
     _tasks.erase(task->GetId());
 
-    delete task;
+    LLBC_Delete(task);
 }

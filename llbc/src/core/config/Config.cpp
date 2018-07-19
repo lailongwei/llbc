@@ -52,7 +52,7 @@ int LLBC_Config::AddFile(const LLBC_String &file)
     std::map<LLBC_String, LLBC_JsonValue *>::iterator iter = _values.find(file);
     if (iter != _values.end())
     {
-        delete iter->second;
+        LLBC_Delete(iter->second);
         iter->second = NULL;
     }
     else
@@ -84,10 +84,10 @@ int LLBC_Config::Initialize()
         LLBC_String content = file.ReadToEnd();
 
         Json::Reader reader;
-        LLBC_JsonValue *value = new LLBC_JsonValue;
+        LLBC_JsonValue *value = LLBC_New0(LLBC_JsonValue);
         if (!reader.parse(content, *value))
         {
-            delete value;
+            LLBC_Delete(value);
 
             BuildErrMsg(fileName, reader.getFormatedErrorMessages().c_str());
             LLBC_SetLastError(LLBC_ERROR_INVALID);

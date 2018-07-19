@@ -500,6 +500,16 @@ public:
     virtual int Post(LLBC_IDelegate1<void, This *> *deleg) = 0;
 
 public:
+#if !LLBC_CFG_COMM_USE_FULL_STACK
+    /**
+     * Get service protocol stack, only full-stack option disabled available.
+     * Warning: This is a danger method, only use in user-defined protocol.
+     * @return const LLBC_ProtocolStack * - the protocol stack.
+     */
+    virtual const LLBC_ProtocolStack *GetProtocolStack() const = 0;
+#endif // !LLBC_CFG_COMM_USE_FULL_STACK
+
+public:
     /**
      * One time service call routine, if service drive mode is ExternalDrive, you must manual call this method.
      * @param[in] fullFrame - the full frame flag.

@@ -290,14 +290,14 @@ int LLBC_Packet::Write(const char *val)
 int LLBC_Packet::Write(const void *buf, size_t len)
 {
     if (!_payload)
-        _payload = new LLBC_MessageBlock(len);
+        _payload = LLBC_New1(LLBC_MessageBlock, len);
     return _payload->Write(buf, len);
 }
 
 int LLBC_Packet::Write(const LLBC_Stream &stream)
 {
     if (!_payload)
-        _payload = new LLBC_MessageBlock(stream.GetPos());
+        _payload = LLBC_New1(LLBC_MessageBlock, stream.GetPos());
 
     return _payload->Write(stream.GetBuf(), stream.GetPos());
 }
@@ -347,7 +347,7 @@ bool LLBC_Packet::Encode()
         if (!_encoder->Encode(*this))
             return false;
 
-        delete _encoder;
+        LLBC_Delete(_encoder);
         _encoder = NULL;
     }
 
@@ -400,7 +400,7 @@ void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
     if (_codecError)
         LLBC_Delete(_codecError);
 
-    _codecError = new LLBC_String(codecErr.c_str(), codecErr.length());
+    _codecError = LLBC_New2(LLBC_String, codecErr.c_str(), codecErr.length());
 }
 
 void LLBC_Packet::CleanupPreHandleResult()

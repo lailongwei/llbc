@@ -33,8 +33,8 @@ public:
 private:
     void BasicTest();
     void ArithmeticTest();
-
     void DictTtest();
+    void SerializeTest();
 };
 
 #endif // !__LLBC_TEST_CORE_VARIANT_TEST_H__

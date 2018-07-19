@@ -105,9 +105,9 @@ void LLBC_SelectPoller::Svc()
                 int sockErr;
                 LLBC_SessionCloseInfo *closeInfo;
                 if (sock->GetPendingError(sockErr) != LLBC_OK)
-                    closeInfo = new LLBC_SessionCloseInfo;
+                    closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
                 else
-                    closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, sockErr);
+                    closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, sockErr);
 
                 session->OnClose(NULL, closeInfo);
             }
@@ -145,9 +145,9 @@ void LLBC_SelectPoller::Svc()
                     int sockErr;
                     LLBC_SessionCloseInfo *closeInfo;
                     if (UNLIKELY(sock->GetPendingError(sockErr) != LLBC_OK))
-                        closeInfo = new LLBC_SessionCloseInfo();
+                        closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
                     else
-                        closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
+                        closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
 
                     session->OnClose(closeInfo);
                 }

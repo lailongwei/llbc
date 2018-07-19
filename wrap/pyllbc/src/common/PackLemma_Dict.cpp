@@ -135,7 +135,7 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
     Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
     if (lemma->Process(ch) != LLBC_OK)
     {
-        delete lemma;
+        LLBC_Delete(lemma);
         _state = Base::Error;
 
         return LLBC_FAILED;
@@ -143,7 +143,7 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
 
     if (Process(lemma) != LLBC_OK)
     {
-        delete lemma;
+        LLBC_Delete(lemma);
         return LLBC_FAILED;
     }
 

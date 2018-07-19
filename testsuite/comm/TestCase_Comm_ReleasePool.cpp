@@ -52,7 +52,7 @@ public:
     {
         LLBC_PrintLine("MyFacade initialize ...");
 
-        TestObj *obj = new TestObj;
+        TestObj *obj = LLBC_New0(TestObj);
         obj->AutoRelease();
 
         obj->Retain();
@@ -70,12 +70,12 @@ public:
     virtual void OnUpdate()
     {
         // Create new release pool.
-        LLBC_AutoReleasePool *pool = new LLBC_AutoReleasePool;
+        LLBC_AutoReleasePool *pool = LLBC_New0(LLBC_AutoReleasePool);
 
-        LLBC_Object *obj = new TestObj;
+        LLBC_Object *obj = LLBC_New0(TestObj);
         obj->AutoRelease();
 
-        delete pool;
+        LLBC_Delete(pool);
     }
 };
 
@@ -101,7 +101,7 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
     std::cout <<"press any key to continue ..." <<std::endl;
     getchar();
 
-    delete svc;
+    LLBC_Delete(svc);
 
     return 0;
 }

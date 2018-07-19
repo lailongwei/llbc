@@ -39,9 +39,11 @@ namespace
 
         virtual void OnStart()
         {
+            typedef LLBC_Delegate1<void, TestFacade, LLBC_Timer *> __Deleg;
             LLBC_PrintLine("Service start");
-            _timer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
-                                    new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
+            _timer = LLBC_New2(LLBC_Timer,
+                               LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
+                               LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
             _timer->Schedule(2000, 2000);
         }
 

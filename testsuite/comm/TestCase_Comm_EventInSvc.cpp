@@ -80,13 +80,13 @@ public:
     {
         LLBC_IService *svc = GetService();
 
-        TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
+        TestEvent *ev = LLBC_New1(TestEvent, TestEvent::TEST_EV_ID1);
         ev->facade = this;
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
 
         svc->FireEvent(ev);
 
-        ev = new TestEvent(TestEvent::TEST_EV_ID2);
+        ev = LLBC_New1(TestEvent, TestEvent::TEST_EV_ID2);
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
         svc->FireEvent(ev);
     }
@@ -149,7 +149,7 @@ int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
     std::cout <<"Press any key to continue..." <<std::endl;
     getchar();
 
-    delete svc;
+    LLBC_Delete(svc);
 
     return LLBC_OK;
 }

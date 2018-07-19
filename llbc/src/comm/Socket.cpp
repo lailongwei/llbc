@@ -299,7 +299,7 @@ int LLBC_Socket::Send(const char *buf, int len)
 
 int LLBC_Socket::AsyncSend(const char *buf, int len)
 {
-    LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
+    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, len);
     block->Write(buf, len);
 
     return AsyncSend(block);
@@ -580,9 +580,9 @@ void LLBC_Socket::OnRecv()
            )
         {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-            _session->OnClose(new LLBC_SessionCloseInfo(errNo, subErrNo));
+            _session->OnClose(LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
 #else
-            _session->OnClose(NULL, new LLBC_SessionCloseInfo(errNo, subErrNo));
+            _session->OnClose(NULL, LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
 #endif
             return;
         }
@@ -593,11 +593,11 @@ void LLBC_Socket::OnRecv()
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         LLBC_SessionCloseInfo *closeInfo = 
-            new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, ECONNRESET);
+            LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, ECONNRESET);
         _session->OnClose(closeInfo);
 #else
         LLBC_SessionCloseInfo *closeInfo =
-            new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, WSAECONNRESET);
+            LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, WSAECONNRESET);
         _session->OnClose(NULL, closeInfo);
 #endif
         return;

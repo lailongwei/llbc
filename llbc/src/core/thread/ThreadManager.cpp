@@ -74,7 +74,7 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     // Delete arg.
-    delete threadArg;
+    LLBC_Delete(threadArg);
 
     // Notify thread manager thread startup.
     threadMgr->OnThreadStartup(threadHandle);
@@ -1067,7 +1067,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
     }
 
     LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg *threadArg =
-        new LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg;
+        LLBC_New0(LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg);
     threadArg->realArg = arg;
     threadArg->realProc = proc;
     threadArg->threadHandle =++ _maxThreadHandle;
@@ -1080,11 +1080,11 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
                           priority,
                           stackSize) != LLBC_OK)
     {
-        delete threadArg;
+        LLBC_Delete(threadArg);
         return LLBC_INVALID_HANDLE;
     }
 
-    LLBC_ThreadDescriptor *desc = new LLBC_ThreadDescriptor;
+    LLBC_ThreadDescriptor *desc = LLBC_New0(LLBC_ThreadDescriptor);
     desc->SetHandle(_maxThreadHandle);
     desc->SetNativeHandle(*nativeHandle);
     desc->SetGroupHandle(groupHandle);
@@ -1115,7 +1115,7 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
     LLBC_ThreadGroupDescriptor *groupDesc = FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
     if (!groupDesc)
     {
-        groupDesc = new LLBC_ThreadGroupDescriptor;
+        groupDesc = LLBC_New0(LLBC_ThreadGroupDescriptor);
         groupDesc->SetGroupHandle(threadDesc->GetGroupHandle());
         AddThreadGroupDescriptor(groupDesc);
     }
@@ -1181,7 +1181,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
             RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
         }
 
-        delete desc;
+        LLBC_Delete(desc);
 
         return;
     }
@@ -1201,7 +1201,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
 
             desc->SetThreadNext(desc->GetThreadNext()->GetThreadNext());
 
-            delete tmpDesc;
+            LLBC_Delete(tmpDesc);
 
             return;
         }
@@ -1268,7 +1268,7 @@ void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
     {
         _groups[groupBucketIdx] = groupDesc->GetGroupNext();
 
-        delete groupDesc;
+        LLBC_Delete(groupDesc);
 
         return;
     }
@@ -1280,7 +1280,7 @@ void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
             LLBC_ThreadGroupDescriptor *tmpGroupDesc = groupDesc->GetGroupNext();
             groupDesc->SetGroupNext(groupDesc->GetGroupNext()->GetGroupNext());
 
-            delete tmpGroupDesc;
+            LLBC_Delete(tmpGroupDesc);
 
             return;
         }

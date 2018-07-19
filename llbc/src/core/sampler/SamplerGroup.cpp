@@ -62,15 +62,15 @@ int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
     switch (type)
     {
     case LLBC_SamplerType::CountSampler:
-        sampler = new LLBC_CountSampler;
+        sampler = LLBC_New0(LLBC_CountSampler);
         break;
 
     case LLBC_SamplerType::LimitSampler:
-        sampler = new LLBC_LimitSampler;
+        sampler = LLBC_New0(LLBC_LimitSampler);
         break;
 
     case LLBC_SamplerType::IntervalSampler:
-        sampler = new LLBC_IntervalSampler;
+        sampler = LLBC_New0(LLBC_IntervalSampler);
         break;
 
     default:

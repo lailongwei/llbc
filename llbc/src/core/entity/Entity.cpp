@@ -219,7 +219,7 @@ int LLBC_Entity::RemoveBehavior(int id)
     if (!iter->second.name.empty())
         _behaviors2.erase(iter->second.name);
 
-    delete iter->second.holder;
+    LLBC_Delete(iter->second.holder);
     _behaviors.erase(iter);
 
     return LLBC_OK;
@@ -241,7 +241,7 @@ int LLBC_Entity::RemoveBehavior(const LLBC_String &name)
     }
 
     _behaviors.erase(iter->second.id);
-    delete iter->second.holder;
+    LLBC_Delete(iter->second.holder);
     _behaviors2.erase(iter);
 
     return LLBC_OK;
@@ -251,9 +251,7 @@ void LLBC_Entity::RemoveAllBehaviors()
 {
     std::map<int, LLBC_BehaviorValue>::iterator iter = _behaviors.begin();
     for (; iter != _behaviors.end(); iter++)
-    {
-        delete iter->second.holder;
-    }
+        LLBC_Delete(iter->second.holder);
 
     _behaviors.erase(_behaviors.begin(), _behaviors.end());
     _behaviors2.erase(_behaviors2.begin(), _behaviors2.end());

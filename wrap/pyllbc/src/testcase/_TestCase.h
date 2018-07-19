@@ -71,7 +71,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewTestCase(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &tcName))
         return NULL;
 
-    pyllbc_TestCase *tc = new pyllbc_TestCase;
+    pyllbc_TestCase *tc = LLBC_New0(pyllbc_TestCase);
     tc->SetName(tcName);
 
     return Py_BuildValue("l", tc);
@@ -83,7 +83,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelTestCase(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &tc))
         return NULL;
 
-    delete tc;
+    LLBC_Delete(tc);
 
     Py_RETURN_NONE;
 }

@@ -273,7 +273,7 @@ private:                                            \
 
 // new/delete.
 #define LLBC_New(cls)                       LLBC_New0(cls)
-#define LLBC_New0(cls)                      (new cls)
+#define LLBC_New0(cls)                      (new cls())
 #define LLBC_New1(cls, arg1)                (new cls(arg1))
 #define LLBC_New2(cls, arg1, arg2)          (new cls((arg1), (arg2)))
 #define LLBC_New3(cls, arg1, arg2, arg3)    (new cls((arg1), (arg2), (arg3)))
@@ -282,6 +282,7 @@ private:                                            \
 #define LLBC_New6(cls, arg1, arg2, arg3, arg4, arg5, arg6) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6)))
 #define LLBC_New7(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7)))
 #define LLBC_New8(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8)))
+#define LLBC_News(cls, size)                (new cls[size])
 #define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
     do {                            \

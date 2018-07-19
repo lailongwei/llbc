@@ -51,7 +51,7 @@ void LLBC_Object::Release()
 {
     if (-- _ref == 0)
     {
-        delete this;
+        LLBC_Delete(this);
     }
 }
 
@@ -74,7 +74,7 @@ int LLBC_Object::AutoRelease()
 
 LLBC_Object *LLBC_Object::Clone() const
 {
-    return new LLBC_Object;
+    return LLBC_New0(LLBC_Object);
 }
 
 LLBC_String LLBC_Object::ToString() const

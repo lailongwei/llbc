@@ -67,7 +67,7 @@ void LLBC_MessageQueue::Cleanup()
         LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
 
-        delete block;
+        LLBC_Delete(block);
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32

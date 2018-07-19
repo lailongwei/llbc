@@ -46,7 +46,7 @@ void pyllbc_AddCommObjs()
     pyllbc_Module *topMod = pyllbc_s_TopModule;
 
     // Create llbc.codec module.
-    pyllbc_Module *codecMod = new pyllbc_Module("codec", topMod);
+    pyllbc_Module *codecMod = LLBC_New2(pyllbc_Module, "codec", topMod);
     codecMod->AddMethod(methods.encode);
     codecMod->AddMethod(methods.decode);
 

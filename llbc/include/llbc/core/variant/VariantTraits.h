@@ -25,7 +25,9 @@
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
+
 class LLBC_Variant;
+
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN

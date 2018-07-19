@@ -83,7 +83,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 
     _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
 
-    _logRunnable = new LLBC_LogRunnable;
+    _logRunnable = LLBC_New0(LLBC_LogRunnable);
     _logRunnable->SetFlushInterval(_config->GetFlushInterval());
 
     if (_config->IsLogToConsole())
@@ -298,8 +298,8 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
         return ret;
     }
 
-    LLBC_MessageBlock *block = new LLBC_MessageBlock;
-    block->Write(&data, sizeof(LLBC_LogData));
+    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, sizeof(LLBC_LogData *));
+    block->Write(&data, sizeof(LLBC_LogData *));
 
     _logRunnable->Push(block);
 
@@ -313,7 +313,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                         char *message,
                                         int len)
 {
-    LLBC_LogData *data = new LLBC_LogData;
+    LLBC_LogData *data = LLBC_New(LLBC_LogData);
     
     data->level = level;
     data->loggerName = _name.c_str();

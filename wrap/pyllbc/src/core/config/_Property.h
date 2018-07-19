@@ -27,7 +27,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_New(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &file))
         return NULL;
 
-    LLBC_Property *prop = new LLBC_Property;
+    LLBC_Property *prop = LLBC_New0(LLBC_Property);
     if (LLBC_StrLenA(file) == 0)
         return Py_BuildValue("l", prop);
 

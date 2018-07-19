@@ -56,6 +56,10 @@ int TestCase_Com_Endian::Run(int argc, char *argv[])
     LLBC_PrintLine("net to host test, net: 0x%08x, host: 0x%08x",
         data, LLBC_Net2Host2(data) );
     LLBC_PrintLine("");
+    sint64 longData = 0x0506070801020304L;
+    LLBC_PrintLine("host to net test(long data), host: 0x%16llx, net: 0x%16llx", longData, LLBC_Host2Net2(longData));
+    LLBC_Host2Net(longData);
+    LLBC_PrintLine("net to host test, net: 0x%16llx, host: 0x%16llx", longData, LLBC_Net2Host2(longData));
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

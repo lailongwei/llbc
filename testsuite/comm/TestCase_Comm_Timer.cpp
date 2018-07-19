@@ -34,16 +34,20 @@ public:
         _timeoutTimes = 0;
         _cancelTimes = 0;
 
+        typedef LLBC_Delegate1<void, TestFacade, LLBC_Timer *> __Deleg;
+
         // Create long time timer and try to cancel
-        LLBC_Timer *longTimeTimer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
-                                                   new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
+        LLBC_Timer *longTimeTimer = LLBC_New2(LLBC_Timer,
+                                              LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
+                                              LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
         longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
-        delete longTimeTimer;
+        LLBC_Delete(longTimeTimer);
 
         for(int i = 1; i <=2000000; i++) 
         {
-            LLBC_Timer *timer = new LLBC_Timer(new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerTimeout),
-                                               new LLBC_Delegate1<void, TestFacade, LLBC_Timer *>(this, &TestFacade::OnTimerCancel));
+            LLBC_Timer *timer = LLBC_New2(LLBC_Timer,
+                                          LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
+                                          LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
             timer->Schedule(LLBC_RandInt(5000, 15001), LLBC_RandInt(5000, 15001));
         }
 
@@ -95,7 +99,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     if(svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());
-        delete svc;
+        LLBC_Delete(svc);
         return -1;
     }
 
@@ -109,7 +113,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     getchar();
 #endif // iPhone
 
-    delete svc;
+    LLBC_Delete(svc);
 
     return 0;
 }

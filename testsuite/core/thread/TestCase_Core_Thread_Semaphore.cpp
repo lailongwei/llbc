@@ -115,7 +115,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     std::cout <<"core/thread/semaphore test: " <<std::endl;
 
     // Create test value structure.
-    __g_testVal = new __LLBC_SemTestType;
+    __g_testVal = LLBC_New0(__LLBC_SemTestType);
     __g_testVal->value = 0;
 
     // Create waiters.
@@ -142,7 +142,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     getchar();
 
     // Delete test value structure.
-    delete __g_testVal;
+    LLBC_Delete(__g_testVal);
 
     return 0;
 }

@@ -444,16 +444,18 @@ LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
 
 inline void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
-    LLBC_IDelegate1<void, void *> *clearDeleg =
-        new LLBC_Func1<void, void *>(clearFunc);
+    typedef LLBC_Func1<void, void *> __PreHandleResultFuncDeleg;
+
+    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New1(__PreHandleResultFuncDeleg, clearFunc);
     SetPreHandleResult(result, clearDeleg);
 }
 
 template <typename ObjType>
 inline void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
-    LLBC_IDelegate1<void, void *> *clearDeleg =
-        new LLBC_Delegate1<void, ObjType, void *>(obj, clearMethod);
+    typedef LLBC_Delegate1<void, ObjType, void *> __PreHandleResultMethDeleg;
+
+    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New2(__PreHandleResultMethDeleg, obj, clearMethod);
     SetPreHandleResult(result, clearDeleg);
 }
 
@@ -483,7 +485,7 @@ inline int LLBC_Packet::WriteRawType(_RawTy val)
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
     if (!_payload)
-        _payload = new LLBC_MessageBlock(sizeof(val));
+        _payload = LLBC_New1(LLBC_MessageBlock, sizeof(val));
 
     return _payload->Write(&val, sizeof(val));
 }

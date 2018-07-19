@@ -49,64 +49,48 @@ LLBC_LogTokenBuilder::~LLBC_LogTokenBuilder()
 
 LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 {
-    LLBC_ILogToken *token = NULL;
-
     switch(type)
     {
     case LLBC_LogTokenType::StrToken:
-        token = new LLBC_LogStrToken;
-        break;
+        return LLBC_New0(LLBC_LogStrToken);
 
     case LLBC_LogTokenType::NameToken:
-        token = new LLBC_LogNameToken;
-        break;
+        return LLBC_New0(LLBC_LogNameToken);
 
     case LLBC_LogTokenType::TagToken:
-        token = new LLBC_LogTagToken;
-        break;
+        return LLBC_New0(LLBC_LogTagToken);
 
     case LLBC_LogTokenType::FileToken:
-        token = new LLBC_LogFileToken;
-        break;
+        return LLBC_New0(LLBC_LogFileToken);
 
     case LLBC_LogTokenType::LineToken:
-        token = new LLBC_LogLineToken;
-        break;
+        return LLBC_New0(LLBC_LogLineToken);
 
     case LLBC_LogTokenType::ThreadIdToken:
-        token = new LLBC_LogThreadIdToken;
+        return LLBC_New0(LLBC_LogThreadIdToken);
         break;
 
     case LLBC_LogTokenType::ProcessIdToken:
-        token = new LLBC_LogProcessIdToken;
-        break;
+        return LLBC_New0(LLBC_LogProcessIdToken);
 
     case LLBC_LogTokenType::LevelToken:
-        token = new LLBC_LogLevelToken;
-        break;
+        return LLBC_New0(LLBC_LogLevelToken);
 
     case LLBC_LogTokenType::NewLineToken:
-        token = new LLBC_LogNewLineToken;
-        break;
+        return LLBC_New0(LLBC_LogNewLineToken);
 
     case LLBC_LogTokenType::MsgToken:
-        token = new LLBC_LogMsgToken;
-        break;
+        return LLBC_New0(LLBC_LogMsgToken);
 
     case LLBC_LogTokenType::TimeToken:
-        token = new LLBC_LogTimeToken;
-        break;
+        return LLBC_New0(LLBC_LogTimeToken);
 
     case LLBC_LogTokenType::EscapeToken:
-        token = new LLBC_LogEscapeToken;
-        break;
+        return LLBC_New0(LLBC_LogEscapeToken);
 
     default:
-        token = new LLBC_LogNullToken;
-        break;
+        return LLBC_New0(LLBC_LogNullToken);
     }
-
-    return token;
 }
 
 __LLBC_NS_END

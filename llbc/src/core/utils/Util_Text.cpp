@@ -192,9 +192,9 @@ LLBC_String LLBC_ToUpper(const char *str)
 {
     LLBC_String convertedStr(str);
 
-    char ch = '\0';
+    char ch;
     const LLBC_String::size_type length = convertedStr.size();
-    for (register LLBC_String::size_type i = 0; i < length; i ++)
+    for (LLBC_String::size_type i = 0; i < length; i ++)
     {
         ch = convertedStr[i];
         if (ch >= 'a' && ch <= 'z')
@@ -210,9 +210,9 @@ LLBC_String LLBC_ToLower(const char *str)
 {
     LLBC_String convertedStr(str);
 
-    char ch = '\0';
+    char ch;
     const LLBC_String::size_type length = convertedStr.size();
-    for (register LLBC_String::size_type i = 0; i < length; i ++)
+    for (LLBC_String::size_type i = 0; i < length; i ++)
     {
         ch = convertedStr[i];
         if (ch >= 'A' && ch <= 'Z')
@@ -266,8 +266,8 @@ LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target)
         return LLBC_String();
     }
 
+    LLBC_String::size_type leftPos = 0;
     const LLBC_String::size_type length = str.size();
-    register LLBC_String::size_type leftPos = 0;
     for (; str[leftPos] == target && leftPos < length; leftPos ++);
 
     if (leftPos >= length)
@@ -287,7 +287,7 @@ LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets)
 
     LLBC_String retStr = str;
     const uint32 len = LLBC_StrLenA(targets);
-    for (register uint32 i = 0; i < len; i ++)
+    for (uint32 i = 0; i < len; i ++)
     {
         retStr = LLBC_TrimLeft(retStr, targets[i]);
     }
@@ -308,7 +308,7 @@ LLBC_String LLBC_TrimRight(const LLBC_String &str, char target)
     }
 
     const LLBC_String::size_type length = str.size();
-    register LLBC_String::size_type rightPos = length - 1;
+    LLBC_String::size_type rightPos = length - 1;
     for (; str[rightPos] == target && rightPos != 0; rightPos --);
 
     return str.substr(0, rightPos + 1);
@@ -323,7 +323,7 @@ LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets)
 
     LLBC_String retStr = str;
     const uint32 len = LLBC_StrLenA(targets);
-    for (register uint32 i = 0; i < len; i ++)
+    for (uint32 i = 0; i < len; i ++)
     {
         retStr = LLBC_TrimRight(retStr, targets[i]);               
     }

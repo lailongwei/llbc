@@ -37,8 +37,9 @@ LLBC_AutoReleasePool::LLBC_AutoReleasePool()
 : _arr(NULL)
 , _next(NULL)
 {
-    _arr = new LLBC_Array;
     typedef LLBC_AutoReleasePoolStack _Stack;
+
+    _arr = LLBC_New0(LLBC_Array);
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     _Stack *stack = reinterpret_cast<_Stack *>(tls->objbaseTls.poolStack);

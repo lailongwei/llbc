@@ -19,58 +19,59 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifdef __LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
 
-#include "objbase/TestCase_ObjBase_Object.h"
+__LLBC_NS_BEGIN
 
-#if LLBC_CFG_OBJBASE_ENABLED
-
-namespace
+template <>
+inline bool LLBC_VariantArithmetic::Performs_raw_operation(bool left, bool right, int type)
 {
-
-class MyObj : public LLBC_Object
-{
-public:
-    MyObj()
+    switch (type)
     {
-        std::cout <<"MyObj construct" <<std::endl;
-        m_data = malloc(10);
+    case VT_ARITHMETIC_ADD:
+        return left || right;
+
+    case VT_ARITHMETIC_SUB:
+        if (left) // true - true = false, true - false = true.
+            return !right;
+        else // false - true = false, false - false = false.
+            return false;
+
+    case VT_ARITHMETIC_MUL:
+    case VT_ARITHMETIC_DIV:
+        return left && right; // left == true and right == true return true, otherwise return false.
+
+    default:
+        break;
     }
 
-    virtual ~MyObj()
+    return bool();
+}
+
+template <typename RawType>
+inline RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
+{
+    switch (type)
     {
-        std::cout <<"MyObj destruct" <<std::endl;
-        free(m_data);
+    case VT_ARITHMETIC_ADD:
+        return left + right;
+
+    case VT_ARITHMETIC_SUB:
+        return left - right;
+
+    case VT_ARITHMETIC_MUL:
+        return left * right;
+
+    case VT_ARITHMETIC_DIV:
+        return left / right;
+
+    default:
+        break;
     }
 
-private:
-    void *m_data;
-};
-
+    return RawType();
 }
 
-TestCase_ObjBase_Object::TestCase_ObjBase_Object()
-{
-}
+__LLBC_NS_END
 
-TestCase_ObjBase_Object::~TestCase_ObjBase_Object()
-{
-}
-
-int TestCase_ObjBase_Object::Run(int arg, char *argv[])
-{
-    std::cout <<"objbase/object test: " <<std::endl;
-    
-    MyObj *obj = LLBC_New0(MyObj);
-    obj->Retain();
-    obj->Release();
-    obj->Release();
-
-    MyObj anotherObj;
-
-    std::cout <<"press any key to continue ..." <<std::endl;
-    getchar();
-
-    return 0;
-}
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
+#endif // __LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__

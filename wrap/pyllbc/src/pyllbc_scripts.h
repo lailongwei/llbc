@@ -2725,7 +2725,7 @@ public:
 "        \"\"\"\n"
 "        if isinstance(seed, (str, unicode)):\n"
 "            seed = int(float(seed))\n"
-"        self.__c_obj = llbc.inl.SeedRand(self.__c_obj, seed)\n"
+"        llbc.inl.SeedRand(self.__c_obj, seed)\n"
 "\n"
 "    def rand(self, begin=None, end=None):\n"
 "        \"\"\"\n"
