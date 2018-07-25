@@ -116,6 +116,18 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_PrintLine("\tLLBC_ERROR_ILLEGAL: %s", LLBC_StrError(LLBC_ERROR_ILLEGAL));
     LLBC_PrintLine("\tLLBC_ERROR_ACCESS_DENY: %s", LLBC_StrError(LLBC_ERROR_ACCESS_DENY));
     LLBC_PrintLine("\tLLBC_ERROR_REPEAT: %s", LLBC_StrError(LLBC_ERROR_REPEAT));
+    LLBC_PrintLine("\tLLBC_ERROR_ENCODE: %s", LLBC_StrError(LLBC_ERROR_ENCODE));
+    LLBC_PrintLine("\tLLBC_ERROR_DECODE: %s", LLBC_StrError(LLBC_ERROR_DECODE));
+    LLBC_PrintLine("\tLLBC_ERROR_COMPRESS: %s", LLBC_StrError(LLBC_ERROR_COMPRESS));
+    LLBC_PrintLine("\tLLBC_ERROR_DECOMPRESS: %s", LLBC_StrError(LLBC_ERROR_DECOMPRESS));
+    LLBC_PrintLine("\tLLBC_ERROR_PACK: %s", LLBC_StrError(LLBC_ERROR_PACK));
+    LLBC_PrintLine("\tLLBC_ERROR_UNPACK: %s", LLBC_StrError(LLBC_ERROR_UNPACK));
+    LLBC_PrintLine("\tLLBC_ERROR_NOT_ALLOW: %s", LLBC_StrError(LLBC_ERROR_NOT_ALLOW));
+    LLBC_PrintLine("\tLLBC_ERROR_FACADE_INIT: %s", LLBC_StrError(LLBC_ERROR_FACADE_INIT));
+    LLBC_PrintLine("\tLLBC_ERROR_FACADE_START: %s", LLBC_StrError(LLBC_ERROR_FACADE_START));
+    LLBC_PrintLine("\tLLBC_ERROR_WSA_SYSNOTREADY: %s", LLBC_StrError(LLBC_ERROR_WSA_SYSNOTREADY));
+    LLBC_PrintLine("\tLLBC_ERROR_WSA_VERNOTSUPPORTED: %s", LLBC_StrError(LLBC_ERROR_WSA_VERNOTSUPPORTED));
+    LLBC_PrintLine("\tLLBC_ERROR_WSA_EPROCLIM: %s", LLBC_StrError(LLBC_ERROR_WSA_EPROCLIM));
 
     // Custom erorr test.
     LLBC_PrintLine("LLBC library custom error test:");

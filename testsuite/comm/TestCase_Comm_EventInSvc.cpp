@@ -62,13 +62,15 @@ public:
     }
 
 public:
-    virtual void OnInitialize()
+    virtual bool OnInitialize()
     {
         LLBC_ThreadManager::Sleep(1000);
 
         LLBC_IService *svc = GetService();
         _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestFacade::HandleEvent);
         _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestFacade::HandleEvent_Static);
+
+        return true;
     }
 
     virtual void OnDestroy()

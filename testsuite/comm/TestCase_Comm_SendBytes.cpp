@@ -30,10 +30,12 @@ const int OPCODE = 1;
 class TestFacade : public LLBC_IFacade
 {
 public:
-    virtual void OnInitialize()
+    virtual bool OnInitialize()
     {
         LLBC_IService *svc = GetService();
         LLBC_PrintLine("Service create: %p", svc);
+
+        return true;
     }
 
     virtual void OnDestroy()

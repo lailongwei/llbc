@@ -55,9 +55,10 @@ public:
 class TestFacade : public LLBC_IFacade
 {
 public:
-    virtual void OnInitialize()
+    virtual bool OnInitialize()
     {
         LLBC_PrintLine("Service initialize");
+        return true;
     }
 
     virtual void OnDestroy()
@@ -65,9 +66,10 @@ public:
         LLBC_PrintLine("Service Destroy");
     }
 
-    virtual void OnStart()
+    virtual bool OnStart()
     {
         LLBC_PrintLine("Service start");
+        return true;
     }
 
     virtual void OnStop()

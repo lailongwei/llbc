@@ -48,7 +48,7 @@ public:
     virtual ~MyFacade() {  }
 
 public:
-    virtual void OnInitialize()
+    virtual bool OnInitialize()
     {
         LLBC_PrintLine("MyFacade initialize ...");
 
@@ -60,6 +60,8 @@ public:
         
         obj->Retain();
         obj->AutoRelease();
+
+        return true;
     }
 
     virtual void OnDestroy()

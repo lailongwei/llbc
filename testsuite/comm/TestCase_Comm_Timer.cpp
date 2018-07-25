@@ -27,7 +27,7 @@ namespace
 class TestFacade : public LLBC_IFacade
 {
 public:
-    void OnInitialize()
+    bool OnInitialize()
     {
         LLBC_PrintLine("Service startup, startup timers...");
 
@@ -52,6 +52,8 @@ public:
         }
 
         LLBC_PrintLine("Done!");
+
+        return true;
     }
 
     void OnDestroy()

@@ -27,9 +27,20 @@ namespace
     class TestFacade : public LLBC_IFacade
     {
     public:
-        virtual void OnInitialize()
+        TestFacade()
+        {
+            _timer = NULL;
+        }
+
+        virtual ~TestFacade()
+        {
+        }
+
+    public:
+        virtual bool OnInitialize()
         {
             LLBC_PrintLine("Service initialize");
+            return true;
         }
 
         virtual void OnDestroy()
@@ -37,7 +48,7 @@ namespace
             LLBC_PrintLine("Service destroy");
         }
 
-        virtual void OnStart()
+        virtual bool OnStart()
         {
             typedef LLBC_Delegate1<void, TestFacade, LLBC_Timer *> __Deleg;
             LLBC_PrintLine("Service start");
@@ -45,6 +56,8 @@ namespace
                                LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
                                LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
             _timer->Schedule(2000, 2000);
+
+            return true;
         }
 
         virtual void OnStop()
@@ -127,12 +140,28 @@ int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, in
     svc->RegisterFacade<TestFacadeFactory>();
 
     LLBC_PrintLine("Start service...");
-    svc->Start(10);
+    if (svc->Start(10) != LLBC_OK)
+    {
+        LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    LLBC_PrintLine("Call Service::Start() finished!");
 
     LLBC_PrintLine("Press any key to restart service(stop->start)...");
     getchar();
     svc->Stop();
-    svc->Start(5);
+    if (svc->Start(5) != LLBC_OK)
+    {
+        LLBC_PrintLine("Failed to restart service, error: %s", LLBC_FormatLastError());
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    LLBC_PrintLine("Call Service::Start() finished!");
 
     LLBC_PrintLine("Press any key to stop service...");
     getchar();
@@ -156,7 +185,15 @@ int TestCase_Comm_Facade::TestInExternalDriveService(const LLBC_String &host, in
     svc->SetDriveMode(LLBC_IService::ExternalDrive);
 
     LLBC_PrintLine("Start service...");
-    svc->Start(2);
+    if (svc->Start(2) != LLBC_OK)
+    {
+        LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    LLBC_PrintLine("Call Service::Start() finished!");
 
     int waitSecs = 10, nowWaited = 0;
     LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
@@ -168,7 +205,15 @@ int TestCase_Comm_Facade::TestInExternalDriveService(const LLBC_String &host, in
 
     LLBC_PrintLine("Restart service...");
     svc->Stop();
-    svc->Start(2);
+    if (svc->Start(2) != LLBC_OK)
+    {
+        LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    LLBC_PrintLine("Call Service::Start() finished!");
 
     LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will stop service...", waitSecs);
     nowWaited = 0;
