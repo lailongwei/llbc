@@ -50,6 +50,7 @@
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <fcntl.h>
  #include <netinet/in.h>
+ #include <netinet/tcp.h>
  #include <pthread.h>
  #include <libgen.h>
  #include <sys/time.h>
