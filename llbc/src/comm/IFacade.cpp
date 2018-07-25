@@ -327,6 +327,7 @@ LLBC_String LLBC_ProtoReport::ToString() const
 
 LLBC_IFacade::LLBC_IFacade()
 : _inited(false)
+, _started(false)
 , _svc(NULL)
 {
 }
@@ -335,16 +336,18 @@ LLBC_IFacade::~LLBC_IFacade()
 {
 }
 
-void LLBC_IFacade::OnInitialize()
+bool LLBC_IFacade::OnInitialize()
 {
+    return true;
 }
 
 void LLBC_IFacade::OnDestroy()
 {
 }
 
-void LLBC_IFacade::OnStart()
+bool LLBC_IFacade::OnStart()
 {
+    return true;
 }
 
 void LLBC_IFacade::OnStop()

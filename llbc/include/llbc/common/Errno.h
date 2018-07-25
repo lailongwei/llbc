@@ -509,14 +509,34 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_NOT_ALLOW             ((int)(0xc0000024))
 
 //
+// Message Id: LLBC_ERROR_FACADE_INIT
+//
+// MessageText:
+//
+// initialize facade failed.
+//
+#define __LLBC_ERROR_FACADE_INIT         ((int)(0x00000025))
+#define LLBC_ERROR_FACADE_INIT           ((int)(0xc0000025))
+
+//
+// Message Id: LLBC_ERROR_FACADE_START
+//
+// MessageText:
+//
+// start facade failed.
+//
+#define __LLBC_ERROR_FACADE_START        ((int)(0x00000026))
+#define LLBC_ERROR_FACADE_START          ((int)(0xc0000026))
+
+//
 // Message Id: LLBC_ERROR_WSA_SYSNOTREADY
 //
 // MessageText:
 //
 // underlying network subsystem is not ready for network communication(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_SYSNOTREADY     ((int)(0x00000025))
-#define LLBC_ERROR_WSA_SYSNOTREADY       ((int)(0xc0000025))
+#define __LLBC_ERROR_WSA_SYSNOTREADY     ((int)(0x00000027))
+#define LLBC_ERROR_WSA_SYSNOTREADY       ((int)(0xc0000027))
 
 //
 // Message Id: LLBC_ERROR_WSA_VERNOTSUPPORTED
@@ -525,8 +545,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_VERNOTSUPPORTED ((int)(0x00000026))
-#define LLBC_ERROR_WSA_VERNOTSUPPORTED   ((int)(0xc0000026))
+#define __LLBC_ERROR_WSA_VERNOTSUPPORTED ((int)(0x00000028))
+#define LLBC_ERROR_WSA_VERNOTSUPPORTED   ((int)(0xc0000028))
 
 //
 // Message Id: LLBC_ERROR_WSA_EINPROGRESS
@@ -535,8 +555,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // a blocking windows Sockets 1.1 operations in progress(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_EINPROGRESS     ((int)(0x00000027))
-#define LLBC_ERROR_WSA_EINPROGRESS       ((int)(0xc0000027))
+#define __LLBC_ERROR_WSA_EINPROGRESS     ((int)(0x00000029))
+#define LLBC_ERROR_WSA_EINPROGRESS       ((int)(0xc0000029))
 
 //
 // Message Id: LLBC_ERROR_WSA_EPROCLIM
@@ -545,8 +565,8 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // limit on the number of tasks supported by the Windows Sockets implementation has been reached(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_EPROCLIM        ((int)(0x00000028))
-#define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc0000028))
+#define __LLBC_ERROR_WSA_EPROCLIM        ((int)(0x0000002a))
+#define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc000002a))
 
 //
 //!! Sentinel error no.
