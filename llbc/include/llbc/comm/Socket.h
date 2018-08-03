@@ -171,7 +171,7 @@ public:
 
     /**
      * Set socket option.
-     * @param[in] level   - socket level, eg: SOL_TCP, SOL_SOCKET.
+     * @param[in] level   - socket level, eg: SOL_TCP, IPPROTO_TCP, IPPROTO_IP, ....
      * @param[in] optname - the socket option name, eg: SO_KEEPALIVE.
      * @param[in] optval  - the option value buffer.
      * @param[in] optlen  - the option value length.

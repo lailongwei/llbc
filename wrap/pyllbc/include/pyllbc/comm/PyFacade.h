@@ -48,7 +48,7 @@ public:
     /**
      * When service start and not not init facade before, will call then event handler function.
      */
-    virtual void OnInitialize();
+    virtual bool OnInitialize();
 
     /**
      * When service destroy, will call this event handler function.
@@ -58,7 +58,7 @@ public:
     /**
      * When service start, will call this event handler function.
      */
-    virtual void OnStart();
+    virtual bool OnStart();
 
     /**
      * When service stop, will call this event handler function.

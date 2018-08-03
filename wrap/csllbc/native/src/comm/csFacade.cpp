@@ -56,9 +56,10 @@ csllbc_Facade::csllbc_Facade(_D::Deleg_Facade_OnInit initDeleg,
     _unHandledPacketDeleg = unHandledPacketDeleg;
 }
 
-void csllbc_Facade::OnInitialize()
+bool csllbc_Facade::OnInitialize()
 {
     (*_initDeleg)();
+    return true;
 }
 
 void csllbc_Facade::OnDestroy()
@@ -66,9 +67,10 @@ void csllbc_Facade::OnDestroy()
     (*_destroyDeleg)();
 }
 
-void csllbc_Facade::OnStart()
+bool csllbc_Facade::OnStart()
 {
     (*_startDeleg)();
+    return true;
 }
 
 void csllbc_Facade::OnStop()

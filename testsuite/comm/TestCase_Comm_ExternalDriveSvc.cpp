@@ -42,9 +42,10 @@ public:
     }
 
 public:
-    virtual void OnInitialize()
+    virtual bool OnInitialize()
     {
         LLBC_PrintLine("Service initialize");
+        return true;
     }
 
     virtual void OnDestroy()

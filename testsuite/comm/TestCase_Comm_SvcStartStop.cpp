@@ -27,9 +27,10 @@ namespace
     class SvcStartStopTestFacade : public LLBC_IFacade
     {
     public:
-        virtual void OnInitialize()
+        virtual bool OnInitialize()
         {
             LLBC_PrintLine("Service initialize");
+            return true;
         }
 
         virtual void OnDestroy()
@@ -37,11 +38,13 @@ namespace
             LLBC_PrintLine("Service destroy");
         }
 
-        virtual void OnStart()
+        virtual bool OnStart()
         {
             _updateOutputTimes = 0;
             _idleOutputTimes = 0;
             LLBC_PrintLine("Service start");
+
+            return true;
         }
 
         virtual void OnStop()

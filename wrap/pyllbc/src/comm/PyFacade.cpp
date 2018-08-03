@@ -103,9 +103,10 @@ pyllbc_Facade::~pyllbc_Facade()
     Py_XDECREF(_pyPacketCls);
 }
 
-void pyllbc_Facade::OnInitialize()
+bool pyllbc_Facade::OnInitialize()
 {
     CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc));
+    return true;
 }
 
 void pyllbc_Facade::OnDestroy()
@@ -113,9 +114,10 @@ void pyllbc_Facade::OnDestroy()
     CallFacadeMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc));
 }
 
-void pyllbc_Facade::OnStart()
+bool pyllbc_Facade::OnStart()
 {
     CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc));
+    return true;
 }
 
 void pyllbc_Facade::OnStop()

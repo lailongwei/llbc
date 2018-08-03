@@ -426,8 +426,8 @@ private:
     /**
      * Facade operation methods.
      */
-    void InitFacades();
-    void StartFacades();
+    int InitFacades();
+    int StartFacades();
     void UpdateFacades();
     void StopFacades();
     void DestroyFacades();
@@ -531,6 +531,11 @@ private:
     };
     typedef std::vector<_WillRegFacade> _WillRegFacades;
     _WillRegFacades _willRegFacades;
+
+    volatile int _facadesInitFinished;
+    volatile int _facadesInitRet;
+    volatile int _facadesStartFinished;
+    volatile int _facadesStartRet;
 
     typedef std::vector<LLBC_IFacade *> _Facades;
     _Facades _facades;

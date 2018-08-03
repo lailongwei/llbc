@@ -330,6 +330,13 @@ void LLBC_BasePoller::SetConnectedSocketDftOpts(LLBC_Socket *sock)
         sock->SetSendBufSize(LLBC_CFG_COMM_DFT_SEND_BUF_SIZE);
     if (LLBC_CFG_COMM_DFT_RECV_BUF_SIZE > 0)
         sock->SetRecvBufSize(LLBC_CFG_COMM_DFT_RECV_BUF_SIZE);
+
+    if (!sock->IsListen())
+    {
+        const bool noDelay = true;
+        const LLBC_SocketLen noDelayOptLen = sizeof(noDelay);
+        sock->SetOption(IPPROTO_TCP, TCP_NODELAY, &noDelay, noDelayOptLen);
+    }
 }
 
 __LLBC_NS_END

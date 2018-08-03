@@ -52,10 +52,10 @@ public:
     /**
      * All facade event handlers.
      */
-    virtual void OnInitialize();
+    virtual bool OnInitialize();
     virtual void OnDestroy();
 
-    virtual void OnStart();
+    virtual bool OnStart();
     virtual void OnStop();
 
     virtual void OnUpdate();

@@ -98,6 +98,13 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 , _stack(LLBC_ProtocolStack::CodecStack)
 #endif
 
+, _willRegFacades()
+
+, _facadesInitFinished(0)
+, _facadesInitRet(LLBC_OK)
+, _facadesStartFinished(0)
+, _facadesStartRet(LLBC_OK)
+
 , _facades()
 , _facades2()
 , _coders()
@@ -292,22 +299,29 @@ int LLBC_Service::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
+    _lock.Lock();
     if (_started)
     {
+        _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
+
         return LLBC_FAILED;
     }
 
     if (_pollerMgr.Start(pollerCount) != LLBC_OK)
+    {
+        _lock.Unlock();
         return LLBC_FAILED;
+    }
 
     if (_driveMode == This::ExternalDrive)
     {
         if (!IsCanContinueDriveService())
         {
-            LLBC_SetLastError(LLBC_ERROR_LIMIT);
             _pollerMgr.Stop();
+            LLBC_SetLastError(LLBC_ERROR_LIMIT);
+
+            _lock.Unlock();
 
             return LLBC_FAILED;
         }
@@ -319,6 +333,8 @@ int LLBC_Service::Start(int pollerCount)
         if (Activate(1) != LLBC_OK)
         {
             _pollerMgr.Stop();
+            _lock.Unlock();
+
             return LLBC_FAILED;
         }
     }
@@ -327,8 +343,48 @@ int LLBC_Service::Start(int pollerCount)
 
     if (_driveMode == This::ExternalDrive)
     {
-        InitFacades();
-        StartFacades();
+        // Waiting for all facade init & start finished.
+        if (InitFacades() != LLBC_OK || 
+            StartFacades() != LLBC_OK)
+        {
+            int errNo = LLBC_GetLastError();
+
+            Stop();
+            LLBC_SetLastError(errNo);
+
+            _lock.Unlock();
+
+            return LLBC_FAILED;
+        }
+
+        _lock.Unlock();
+    }
+    else
+    {
+        // Unlock first.
+        _lock.Unlock();
+
+        // Waiting for all facades init finished.
+        while (!_facadesInitFinished)
+            LLBC_Sleep(2);
+        if (_facadesInitRet != LLBC_OK)
+        {
+            Stop();
+            LLBC_SetLastError(LLBC_ERROR_FACADE_INIT);
+
+            return LLBC_FAILED;
+        }
+
+        // Waiting for all facades start finished.
+        while (!_facadesStartFinished)
+            LLBC_Sleep(2);
+        if (_facadesStartRet != LLBC_OK)
+        {
+            Stop();
+            LLBC_SetLastError(LLBC_ERROR_FACADE_START);
+
+            return LLBC_FAILED;
+        }
     }
 
     return LLBC_OK;
@@ -341,15 +397,15 @@ bool LLBC_Service::IsStarted() const
 
 void LLBC_Service::Stop()
 {
-	_lock.Lock();
-	if (!_started || _stopping)
-	{
-		_lock.Unlock();
-		return;
-	}
+    _lock.Lock();
+    if (!_started || _stopping)
+    {
+        _lock.Unlock();
+        return;
+    }
 
     _stopping = true;
-	_lock.Unlock();
+    _lock.Unlock();
 
     if (_driveMode == This::SelfDrive) // Stop self-drive service.
     {
@@ -1092,13 +1148,28 @@ void LLBC_Service::Svc()
         LLBC_Sleep(20);
 
     _lock.Lock();
+
     AddServiceToTls();
     GetTimerScheduler();
 #if LLBC_CFG_OBJBASE_ENABLED
     CreateAutoReleasePool();
 #endif // LLBC_CFG_OBJBASE_ENABLED
-    InitFacades();
-    StartFacades();
+    _facadesInitRet = InitFacades();
+    _facadesInitFinished = 1;
+    if (UNLIKELY(_facadesInitRet != LLBC_OK))
+    {
+        _lock.Unlock();
+        return;
+    }
+
+    _facadesStartRet = StartFacades();
+    _facadesStartFinished = 1;
+    if (UNLIKELY(_facadesStartRet != LLBC_OK))
+    {
+        _lock.Unlock();
+        return;
+    }
+
     _lock.Unlock();
 
     _svcMgr.OnServiceStart(this);
@@ -1142,6 +1213,11 @@ void LLBC_Service::Cleanup()
 
     // Reset some variables.
     _relaxTimes = 0;
+
+    _facadesInitFinished = 0;
+    _facadesInitRet = LLBC_OK;
+    _facadesStartFinished = 0;
+    _facadesStartRet = LLBC_OK;
 
     _started = false;
     _stopping = false;
@@ -1471,20 +1547,26 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     ev.ev = NULL;
 }
 
-void LLBC_Service::InitFacades()
+int LLBC_Service::InitFacades()
 {
     _initingFacade = true;
 
+    bool initSuccess = true;
     for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
          regIt != _willRegFacades.end();
          regIt++)
     {
+        LLBC_IFacade *facade = NULL;
         _WillRegFacade &willRegFacade = *regIt;
-        LLBC_IFacade *facade = willRegFacade.facade;
         if (willRegFacade.facadeFactory != NULL)
         {
             facade = willRegFacade.facadeFactory->Create();
-            LLBC_Delete(willRegFacade.facadeFactory);
+            LLBC_XDelete(willRegFacade.facadeFactory);
+        }
+        else
+        {
+            facade = willRegFacade.facade;
+            willRegFacade.facade = NULL;
         }
 
         _facades.push_back(facade);
@@ -1492,24 +1574,56 @@ void LLBC_Service::InitFacades()
         _Facades2::iterator facadesIt = _facades2.find(facadeName);
         if (facadesIt == _facades2.end())
             facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
-        facadesIt->second.push_back(facade);  // TODO: Add to facades dictionaries before facade init?
+        _Facades2::mapped_type &typeFacades = facadesIt->second;
+        typeFacades.push_back(facade);  // TODO: Add to facades dictionaries before facade init?
 
         facade->SetService(this);
-        facade->OnInitialize();
+        if (UNLIKELY(!facade->OnInitialize()))
+        {
+            StopFacades();
+            DestroyFacades();
+            DestroyWillRegFacades();
+
+            initSuccess = false;
+            LLBC_SetLastError(LLBC_ERROR_FACADE_INIT);
+
+            break;
+        }
+
         facade->_inited = true;
     }
 
-    _willRegFacades.clear();
+    if (initSuccess)
+        _willRegFacades.clear();
 
     _initingFacade = false;
+
+    return initSuccess ? LLBC_OK : LLBC_FAILED;
 }
 
-void LLBC_Service::StartFacades()
+int LLBC_Service::StartFacades()
 {
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnStart();
+    int startIndex = 0;
+    int facadesSize = static_cast<int>(_facades.size());
+    for (; startIndex < facadesSize; startIndex++)
+    {
+        LLBC_IFacade *facade = _facades[startIndex];
+        if (facade->_started)
+            continue;
+
+        if (!facade->OnStart())
+            break;
+
+        facade->_started = true;
+    }
+
+    if (startIndex == facadesSize)
+        return LLBC_OK;
+
+    StopFacades();
+    LLBC_SetLastError(LLBC_ERROR_FACADE_START);
+
+    return LLBC_FAILED;
 }
 
 void LLBC_Service::StopFacades()
@@ -1517,7 +1631,14 @@ void LLBC_Service::StopFacades()
     for (_Facades::reverse_iterator it = _facades.rbegin();
          it != _facades.rend();
          it++)
-        (*it)->OnStop();
+    {
+        LLBC_IFacade *facade = *it;
+        if (!facade->_started)
+            continue;
+
+        facade->OnStop();
+        facade->_started = false;
+    }
 }
 
 void LLBC_Service::UpdateFacades()
@@ -1834,7 +1955,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (validCheck)
             _connectedSessionIdsLock.Lock();
 
-        for (register typename SessionIds::size_type i = 1;
+        for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
              i++)
         {

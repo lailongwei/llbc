@@ -26,11 +26,13 @@ namespace
 {
     class TestFacade : public LLBC_IFacade
     {
-        virtual void OnStart()
+        virtual bool OnStart()
         {
             _updateTimes = 0;
             _beginUpdateTime = 0;
             LLBC_PrintLine("Service %s start", GetService()->GetName().c_str());
+
+            return true;
         }
 
         virtual void OnStop()

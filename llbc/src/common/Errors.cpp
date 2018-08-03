@@ -117,14 +117,18 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "unpack error",             // 0x0023
     // not allow.
     "not allow",                // 0x0024
+    // initialize facade failed.
+    "initialize facade failed", // 0x0025
+    // start facade failed.
+    "start facade failed",      // 0x0026
     // WSA specific: WSASYSNOTREADY
-    "underlying network subsystem is not ready for network communication", // 0x0025
+    "underlying network subsystem is not ready for network communication", // 0x0027
     // WSA specific: WSAVERNOTSUPPORTED
-    "the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation", // 0x0026
+    "the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation", // 0x0028
     // WSA specific: WSAEINPROGRESS
-    "a blocking windows Sockets 1.1 operations in progress", // 0x0027
+    "a blocking windows Sockets 1.1 operations in progress", // 0x0029
     // WSA specific: WSAEPROCLIM
-    "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x0028
+    "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x002a
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

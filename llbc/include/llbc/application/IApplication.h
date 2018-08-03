@@ -53,7 +53,7 @@ public:
 public:
     /**
      * Application start event method, please override this method at your project.
-     * @param[in] name - the application name.
+     * @param[in] argc - the application startup arguments count.
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
      */
