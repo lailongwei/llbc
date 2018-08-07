@@ -53,7 +53,7 @@ LLBC_Dictionary::~LLBC_Dictionary()
     Clear();
     free(_bucket);
 
-    LLBC_SAFE_RELEASE(_objFactory);
+    LLBC_XRelease(_objFactory);
 }
 
 void LLBC_Dictionary::Clear()
@@ -392,7 +392,7 @@ LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](const LLBC_String &key) 
 
 void LLBC_Dictionary::SetObjectFactory(LLBC_ObjectFactory *factory)
 {
-    LLBC_SAFE_RELEASE(_objFactory);
+    LLBC_XRelease(_objFactory);
 
     if ((_objFactory = factory))
     {
@@ -411,7 +411,7 @@ LLBC_Object *LLBC_Dictionary::Clone() const
             static_cast<LLBC_ObjectFactory *>(_objFactory->Clone());
         clone->SetObjectFactory(cloneObjFactory);
 
-        LLBC_SAFE_RELEASE(cloneObjFactory);
+        LLBC_XRelease(cloneObjFactory);
     }
 
     // Clone all elements.
@@ -428,7 +428,7 @@ LLBC_Object *LLBC_Dictionary::Clone() const
             clone->Insert(it.StrKey(), cloneObj);
         }
 
-        LLBC_SAFE_RELEASE(cloneObj);
+        LLBC_XRelease(cloneObj);
     }
 
     return clone;

@@ -27,22 +27,31 @@
 
 __LLBC_NS_BEGIN
 
-// Safe release macro define.
-#define LLBC_SAFE_RELEASE(o) \
-    do {                     \
-        if (LIKELY(o)) {     \
-            o->Release();    \
-        }                    \
-    } while(0)               \
+// Object release macro, use for release object(not reset to NULL after released).
+#define LLBC_Release(o)       \
+        o->Release()          \
 
-// Safe release and set object pointer to null macro define.
-#define LLBC_SAFE_RELEASE_NULL(o) \
-    do {                          \
-        if (LIKELY(o)) {          \
-            o->Release();         \
-            o = NULL;             \
-        }                         \
-    } while(0)                    \
+// Object release macro, it check object and reset to NULL after released.
+#define LLBC_XRelease(o)      \
+    do {                      \
+        if (LIKELY(o)) {      \
+            o->Release();     \
+            o = NULL;         \
+        }                     \
+    } while(0)                \
+
+// Object auto-release macro, use for auto release object(not reset to NULL after auto-released).
+#define LLBC_AutoRelease(o)   \
+    o->AutoRelease()          \
+
+// Object auto-release macro, it check object and reset to NULL after auto-released.
+#define LLBC_XAutoRelease(o)  \
+    do {                      \
+        if (LIKELY(o)) {      \
+            o->AutoRelease(); \
+            o = NULL;         \
+        }                     \
+    } while (0)               \
 
 __LLBC_NS_END
 
