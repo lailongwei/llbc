@@ -279,8 +279,13 @@ LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
 
     // Split date, time
     LLBC_Strings dateTimes = timeRepr.split(' ', 1);
-    if (dateTimes.size() == 1) // Only has date part.
-        dateTimes.push_back("0:0:0.000");
+    if (dateTimes.size() == 1) // Only has date part or time part(try guess).
+    {
+        if (dateTimes[0].find('-') != LLBC_String::npos) // Is date part, append default time part.
+            dateTimes.push_back("0:0:0.000");
+        else // Is time part, insert default date part.
+            dateTimes.insert(dateTimes.begin(), "1970-1-1");
+    }
 
     const LLBC_String &datePart = dateTimes[0];
     const LLBC_String &timePart = dateTimes[1];
