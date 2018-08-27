@@ -357,9 +357,23 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_mon = month - 1;
     timeStruct.tm_mday = day;
 
+    if (year == 1970 && month == 1 && day == 1)
+    {
+        int tz = LLBC_GetTimezone();
+        int totalSeconds = hour * NumOfSecondsPerHour +
+            minute * NumOfSecondsPerMinute + second;
+        if (tz < 0 && totalSeconds < -tz)
+        {
+            hour = -tz / NumOfSecondsPerHour;
+            minute = (-tz % NumOfSecondsPerHour) / NumOfSecondsPerMinute;
+            second = -tz % NumOfSecondsPerMinute;
+        }
+    }
+
     timeStruct.tm_hour = hour;
     timeStruct.tm_min = minute;
     timeStruct.tm_sec = second;
+
 
     return FromTimeStruct(timeStruct, milliSecond, microSecond);
 }

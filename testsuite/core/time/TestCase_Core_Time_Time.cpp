@@ -179,7 +179,12 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "1977-1-1 0:0:0";
+    timeRepr = "1970-1-1 0:0:0";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
+    timeRepr = "07:21:35";
     fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
     std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
