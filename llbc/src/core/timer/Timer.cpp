@@ -22,6 +22,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/time/Common.h"
+
 #include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"
 #include "llbc/core/timer/TimerScheduler.h"
@@ -143,6 +145,27 @@ int LLBC_Timer::Schedule(uint64 dueTime, uint64 period)
 
     period = period == 0 ? dueTime : period;
     return _scheduler->Schedule(this, dueTime, period);
+}
+
+int LLBC_Timer::Schedule(const LLBC_Time &dueTime, uint64 period)
+{
+    const LLBC_TimeSpan span = dueTime - LLBC_Time::Now();
+    return Schedule(LIKELY(span.GetTotalMilliSeconds() >= 0) ? 
+        static_cast<uint64>(span.GetTotalMilliSeconds()) : 0, period);
+}
+
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime)
+{
+    return Schedule(LIKELY(dueTime.GetTotalMilliSeconds() >= 0) ?
+        static_cast<uint64>(dueTime.GetTotalMilliSeconds()) : 0, 0);
+}
+
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
+{
+    return Schedule(LIKELY(dueTime.GetTotalMilliSeconds() >= 0) ?
+            static_cast<uint64>(dueTime.GetTotalMilliSeconds()) : 0, 
+                    LIKELY(period.GetTotalMilliSeconds() >= 0) ? 
+            static_cast<uint64>(period.GetTotalMilliSeconds()) : 0);
 }
 
 int LLBC_Timer::Cancel()

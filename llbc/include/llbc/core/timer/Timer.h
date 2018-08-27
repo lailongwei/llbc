@@ -28,6 +28,9 @@
 
 __LLBC_NS_BEGIN
 
+class LLBC_Time;
+class LLBC_TimeSpan;
+
 struct LLBC_TimerData;
 class LLBC_TimerScheduler;
 
@@ -116,6 +119,29 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Schedule(uint64 dueTime, uint64 period = 0);
+
+    /**
+     * Schedule timer.
+     * @param[in] dueTime - the absolute due time.
+     * @param[in] period  -period value, in milli-seconds, if is zero, will use dueTime to schedule. 
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Schedule(const LLBC_Time &dueTime, uint64 period = 0);
+
+    /**
+     * Schedule timer.
+     * @param[in] dueTime - due time, in milli-seconds.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Schedule(const LLBC_TimeSpan &dueTime);
+
+    /**
+     * Schedule timer.
+     * @param[in] dueTime - due time, in milli-seconds.
+     * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period);
 
     /**
      * Cancel this timer.
