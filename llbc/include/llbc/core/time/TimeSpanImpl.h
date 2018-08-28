@@ -131,6 +131,18 @@ inline LLBC_TimeSpan LLBC_TimeSpan::operator -(const LLBC_TimeSpan &span) const
     return LLBC_TimeSpan(_span - span._span);
 }
 
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator +=(const LLBC_TimeSpan &span)
+{
+    _span += span._span;
+    return *this;
+}
+
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator -=(const LLBC_TimeSpan &span)
+{
+    _span -= span._span;
+    return *this;
+}
+
 inline bool LLBC_TimeSpan::operator ==(const LLBC_TimeSpan &span) const
 {
     return _span == span._span;
@@ -166,6 +178,13 @@ inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(double span)
     _span = span;
     return *this;
 }
+
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(const LLBC_TimeSpan &span)
+{
+    _span = span._span;
+    return *this;
+}
+
 
 inline LLBC_String LLBC_TimeSpan::ToString() const
 {

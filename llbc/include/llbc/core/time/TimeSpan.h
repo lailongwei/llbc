@@ -112,6 +112,9 @@ public:
     LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
 
+    LLBC_TimeSpan &operator +=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator -=(const LLBC_TimeSpan &span);
+
     bool operator ==(const LLBC_TimeSpan &span) const;
     bool operator !=(const LLBC_TimeSpan &span) const;
     bool operator <(const LLBC_TimeSpan &span)const;
