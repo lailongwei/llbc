@@ -135,7 +135,7 @@
  * \brief ObjBase about configs.
  */
 // Enable objbase module or not
-#define LLBC_CFG_OBJBASE_ENABLED                            0
+#define LLBC_CFG_OBJBASE_ENABLED                            1
 // Dictionary default bucket size.
 #define LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE               100
 // Dictionary string key hash algorithm(case insensitive).

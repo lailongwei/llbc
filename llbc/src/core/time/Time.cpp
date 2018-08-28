@@ -278,29 +278,45 @@ LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
         return LLBC_Time();
 
     // Split date, time
-    std::vector<LLBC_String> dateTimes;
-    LLBC_SplitString(timeRepr, " ", dateTimes, true);
-    if (dateTimes.size() != 2)
-        dateTimes.push_back("0:0:0.000");
+    LLBC_Strings dateTimes = timeRepr.split(' ', 1);
+    if (dateTimes.size() == 1) // Only has date part or time part(try guess).
+    {
+        if (dateTimes[0].find('-') != LLBC_String::npos) // Is date part, append default time part.
+            dateTimes.push_back("0:0:0.000");
+        else // Is time part, insert default date part.
+            dateTimes.insert(dateTimes.begin(), "1970-1-1");
+    }
 
-    const std::string &datePart = dateTimes[0];
-    const std::string &timePart = dateTimes[1];
+    const LLBC_String &datePart = dateTimes[0];
+    const LLBC_String &timePart = dateTimes[1];
 
-    // Split year,month,day hour,minute,second
-    std::vector<LLBC_String> dateParts;
-    LLBC_SplitString(datePart.c_str(), "-", dateParts);
-    for (size_t i = dateParts.size(); i < 3; i++)
-        dateParts.push_back("0");
+    // Split year,month,day
+    LLBC_Strings dateParts = datePart.split('-', 2);
+    if (dateParts.size() == 1) // Only has day part.
+    {
+        dateParts.insert(dateParts.begin(), "1");
+        dateParts.insert(dateParts.begin(), "1970");
+    }
+    else if (dateParts.size() == 2) // Only has day and month parts.
+    {
+        dateParts.insert(dateParts.begin(), "1970");
+    }
 
-    std::vector<LLBC_String> timeParts;
-    LLBC_SplitString(timePart.c_str(), ":", timeParts);
-    for (size_t i = timeParts.size(); i < 3; i++)
-        timeParts.push_back("0");
+    // Split hour,minute,second
+    LLBC_Strings timeParts = timePart.split(':', 2);
+    if (timeParts.size() == 1) // Only has second part.
+    {
+        timeParts.insert(timeParts.begin(), "0");
+        timeParts.insert(timeParts.begin(), "0");
+    }
+    else if (timeParts.size() == 2) // Only has second and minute parts.
+    {
+        timeParts.insert(timeParts.begin(), "0");
+    }
 
     // Split time, microseconds 
-    std::vector<LLBC_String> secondParts;
-    LLBC_SplitString(timeParts[2], ".", secondParts, true);
-    if (secondParts.size() == 1)
+    LLBC_Strings secondParts = timeParts[2].split('.', 1);
+    if (secondParts.size() == 1) // Only has second part.
         secondParts.push_back("0");
 
     // Convert it
@@ -341,9 +357,23 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_mon = month - 1;
     timeStruct.tm_mday = day;
 
+    if (year == 1970 && month == 1 && day == 1)
+    {
+        int tz = LLBC_GetTimezone();
+        int totalSeconds = hour * NumOfSecondsPerHour +
+            minute * NumOfSecondsPerMinute + second;
+        if (tz < 0 && totalSeconds < -tz)
+        {
+            hour = -tz / NumOfSecondsPerHour;
+            minute = (-tz % NumOfSecondsPerHour) / NumOfSecondsPerMinute;
+            second = -tz % NumOfSecondsPerMinute;
+        }
+    }
+
     timeStruct.tm_hour = hour;
     timeStruct.tm_min = minute;
     timeStruct.tm_sec = second;
+
 
     return FromTimeStruct(timeStruct, milliSecond, microSecond);
 }

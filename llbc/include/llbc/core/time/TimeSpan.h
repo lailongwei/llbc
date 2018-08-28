@@ -58,6 +58,12 @@ public:
     LLBC_TimeSpan(double span);
 
     /**
+     * Construct by span string representation(fmt: 00:00:00.xxxxxx).
+     * @param[in] span - the span value string representation, fmt: 00:00:00.xxxxx, the milli seconds is optional.
+     */
+    LLBC_TimeSpan(const LLBC_String &span);
+
+    /**
      * Copy constructor.
      */
     LLBC_TimeSpan(const LLBC_TimeSpan &span);

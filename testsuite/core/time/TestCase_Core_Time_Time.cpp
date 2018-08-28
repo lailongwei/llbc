@@ -169,6 +169,31 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
+    timeRepr = "12-13 21:35";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
+    timeRepr = "12-13";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
+    timeRepr = "1970-1-1 0:0:0";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
+    timeRepr = "07:21:35";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
+    timeRepr = "13 35";
+    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
+    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
+
     int yearPart = 1971, monthPart = 12, dayPart = 21;
     int hourPart = 13, minutePart = 23, secondPart = 32;
     int milliPart = 322, microPart = 321;

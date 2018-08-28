@@ -733,7 +733,7 @@ public:
     bool Peek(T &obj)
     {
         size_t oldPos = _pos;
-        bool ret = read_data<T>(obj, 0);
+        bool ret = Read<T>(obj);
         this->SetPos(oldPos);
 
         return ret;
@@ -748,7 +748,7 @@ public:
     bool PeekEx(T &obj)
     {
         size_t oldPos = _pos;
-        bool ret = read_data_ex<T>(obj, 0);
+        bool ret = ReadEx<T>(obj);
         this->SetPos(oldPos);
 
         return ret;

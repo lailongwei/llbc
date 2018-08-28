@@ -48,7 +48,7 @@ LLBC_Array::~LLBC_Array()
     Erase(Begin(), End());
     LLBC_XFree(_objs);
 
-    LLBC_SAFE_RELEASE(_objFactory);
+    LLBC_XRelease(_objFactory);
 }
 
 void LLBC_Array::Clear()
@@ -441,7 +441,7 @@ LLBC_Array::ConstObj *LLBC_Array::operator [](LLBC_Array::difference_type off) c
 
 void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
 {
-    LLBC_SAFE_RELEASE(_objFactory);
+    LLBC_XRelease(_objFactory);
 
     if ((_objFactory = factory))
     {
@@ -460,7 +460,7 @@ LLBC_Object *LLBC_Array::Clone() const
             static_cast<LLBC_ObjectFactory *>(_objFactory->Clone());
         clone->SetObjectFactory(cloneObjFactory);
 
-        LLBC_SAFE_RELEASE(cloneObjFactory);
+        LLBC_XRelease(cloneObjFactory);
     }
 
     // Clone all array elements.
@@ -470,7 +470,7 @@ LLBC_Object *LLBC_Array::Clone() const
         LLBC_Object *cloneObj = (*it)->Clone();
         clone->PushBack(cloneObj);
 
-        LLBC_SAFE_RELEASE(cloneObj);
+        LLBC_XRelease(cloneObj);
     }
 
     return clone;
