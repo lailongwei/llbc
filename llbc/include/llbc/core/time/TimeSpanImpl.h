@@ -57,6 +57,11 @@ inline LLBC_TimeSpan::~LLBC_TimeSpan()
 {
 }
 
+inline double LLBC_TimeSpan::GetSpan() const
+{
+    return _span;
+}
+
 inline int LLBC_TimeSpan::GetDays() const
 {
     return (int)(_span / LLBC_Time::NumOfSecondsPerDay);
@@ -131,6 +136,18 @@ inline LLBC_TimeSpan LLBC_TimeSpan::operator -(const LLBC_TimeSpan &span) const
     return LLBC_TimeSpan(_span - span._span);
 }
 
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator +=(const LLBC_TimeSpan &span)
+{
+    _span += span._span;
+    return *this;
+}
+
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator -=(const LLBC_TimeSpan &span)
+{
+    _span -= span._span;
+    return *this;
+}
+
 inline bool LLBC_TimeSpan::operator ==(const LLBC_TimeSpan &span) const
 {
     return _span == span._span;
@@ -166,6 +183,13 @@ inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(double span)
     _span = span;
     return *this;
 }
+
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(const LLBC_TimeSpan &span)
+{
+    _span = span._span;
+    return *this;
+}
+
 
 inline LLBC_String LLBC_TimeSpan::ToString() const
 {
