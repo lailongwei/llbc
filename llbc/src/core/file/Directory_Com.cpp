@@ -506,8 +506,8 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
 
     for (size_t i = files.size() - 1; i >= 0; i--)
     {
-        auto &f = files[i];
-        auto splited = SplitExt(f);
+        const LLBC_String &file = files[i];
+        const LLBC_Strings splited = SplitExt(file);
         if (splited.size() == 1 || splited[1] != fileExt)
             files.erase(files.begin() + i);
     }
