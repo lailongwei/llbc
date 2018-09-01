@@ -501,10 +501,11 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
     }
 #endif // Non-Win32
 
-    if (files.empty() || fileExt.empty())
+    if (files.empty() || 
+            fileExt.empty())
         return LLBC_OK;
 
-    for (size_t i = files.size() - 1; i >= 0; i--)
+    for (int i = static_cast<int>(files.size() - 1); i >= 0; i--)
     {
         const LLBC_String &file = files[i];
         const LLBC_Strings splited = SplitExt(file);
