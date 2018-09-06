@@ -395,6 +395,12 @@ LLBC_Strings LLBC_Directory::SplitExt(const LLBC_String &path)
 
 int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool recursive)
 {
+    static LLBC_String __emptyFileExt;
+    return GetFiles(path, files, __emptyFileExt, recursive);
+}
+
+int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &fileExt, bool recursive)
+{
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct stat fileStat;
     struct dirent **direntList = NULL;
@@ -455,8 +461,6 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
         files.clear();
         return LLBC_FAILED;
     }
-
-    return LLBC_OK;
 #else // Win32
     LLBC_String findPath = Join(path, "*.*");
 
@@ -495,9 +499,21 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
         files.clear();
         return LLBC_FAILED;
     }
+#endif // Non-Win32
+
+    if (files.empty() || 
+            fileExt.empty())
+        return LLBC_OK;
+
+    for (int i = static_cast<int>(files.size() - 1); i >= 0; i--)
+    {
+        const LLBC_String &file = files[i];
+        const LLBC_Strings splited = SplitExt(file);
+        if (splited.size() == 1 || splited[1] != fileExt)
+            files.erase(files.begin() + i);
+    }
 
     return LLBC_OK;
-#endif // Non-Win32
 }
 
 int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &directories, bool recursive)
