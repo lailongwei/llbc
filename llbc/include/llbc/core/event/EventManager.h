@@ -101,6 +101,15 @@ public:
      */
     int RemoveListener(const LLBC_ListenerStub &stub);
 
+    /**
+     * Remove event listener using listener stub and clear lisener stub.
+     * @param[in] stub - event listener stub.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
+     *               specially, if return LLBC_FAILED, and fetch the last error is pending,
+     *               it means operation will success on later, but pending at now.
+     */
+    int RemoveListenerX(LLBC_ListenerStub &stub);
+
 public:
     /**
      * Fire the event.

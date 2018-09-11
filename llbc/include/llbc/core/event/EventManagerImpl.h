@@ -40,6 +40,16 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     return this->AddListener(id, new LLBC_Delegate1<void, ObjectType, LLBC_Event *>(obj, listener), bindedStub);
 }
 
+inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
+{
+    if (RemoveListener(stub) != LLBC_OK)
+        return LLBC_FAILED;
+
+    stub.clear();
+
+    return LLBC_OK;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_EVENT_EVENT_MANAGER_H__
