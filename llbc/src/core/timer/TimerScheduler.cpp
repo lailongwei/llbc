@@ -144,10 +144,9 @@ void LLBC_TimerScheduler::Update()
 #endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         }
 
+        data->timeouting = false;
         if (reSchedule)
         {
-            data->timeouting = false;
-
             uint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
