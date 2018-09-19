@@ -361,7 +361,8 @@ void LLBC_LogFileAppender::BackupFiles() const
 #else
         if (LLBC_File::MoveFile(willMove, moveTo, true) != LLBC_OK)
         {
-            traceline("LLBC_LogFileAppender::BackupFiles(): Backup failed, reason: %s", LLBC_FormatLastError());
+            traceline("LLBC_LogFileAppender::BackupFiles(): Backup failed, %s -> %s, reason: %s", 
+                willMove.c_str(), moveTo.c_str(), LLBC_FormatLastError());
         }
 #endif
     }
