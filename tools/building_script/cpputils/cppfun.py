@@ -41,9 +41,11 @@ class CppFun(object):
         function += self.__name
         function += '('
         if isinstance(self.__args, (list, tuple)):
-            for arg in self.__args:
-                function += arg
-                function += ', '
+            argslen = len(self.__args)
+            for argidx in xrange(0, argslen):
+                if argidx != 0:
+                    function += ', '
+                function += args[argidx]
 
         function += ')\n'
         if self.__initStmts:
