@@ -45,7 +45,7 @@ class CppFun(object):
             for argidx in xrange(0, argslen):
                 if argidx != 0:
                     function += ', '
-                function += args[argidx]
+                function += self.__args[argidx]
 
         function += ')\n'
         if self.__initStmts:
