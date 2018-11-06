@@ -310,16 +310,36 @@ public:
         this->write_data<T>(obj, 0);
     }
 
-    template <typename T, void (T::*)(LLBC_Stream &) const>
-    struct write_fun;
-
     /**
      * T::Serialize method impl.
      */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct serializable_type;
     template <typename T>
-    void write_data(const T &obj, write_fun<T, &T::Serialize> *)
+    void write_data(const T &obj, serializable_type<T, &T::Serialize> *)
     {
         obj.Serialize(*this);
+    }
+
+    /**
+     * T::SerializeToString method impl.
+     */
+    template <typename T, bool (T::*)(void *, int) const>
+    class protobuf_ser_type;
+    template <typename T>
+    void write_data(const T &obj, protobuf_ser_type<T, &T::SerializeToArray> *)
+    {
+        // Check initialized first.
+        obj.CheckInitialized();
+
+        // Resize Stream.
+        size_t needSize = static_cast<size_t>(obj.ByteSize());
+        if ((_size - _pos) < needSize + sizeof(uint32))
+            Resize(_size + (needSize + sizeof(uint32)) - (_size - _pos));
+
+        Write(static_cast<uint32>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos + sizeof(uint32), static_cast<int>(needSize));
+        _pos += needSize;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -422,9 +442,29 @@ public:
      * T::SerializeEx method impl.
      */
     template <typename T>
-    void write_data_ex(const T &obj, write_fun<T, &T::SerializeEx> *)
+    void write_data_ex(const T &obj, serializable_type<T, &T::SerializeEx> *)
     {
         obj.SerializeEx(*this);
+    }
+
+    /**
+     * T::SerializeToString method impl.
+     */
+    template <typename T>
+    void write_data_ex(const T &obj, serializable_type<T, &T::SerializeToArray> *)
+    {
+        // Check initialized first.
+        obj.CheckInitialized();
+
+        // Resize Stream.
+        size_t needSize = static_cast<size_t>(obj.ByteSize());
+        if ((_size - _pos) < needSize + sizeof(uint32))
+            Resize(_size + (needSize + sizeof(uint32)) - (_size - _pos));
+
+        Write(static_cast<uint32>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos + sizeof(uint32), static_cast<int>(needSize));
+        _pos += needSize;
+ 
     }
 
     /**
@@ -502,16 +542,30 @@ public:
         return this->read_data<T>(obj, 0);
     }
 
-    template <typename T, bool (T::*)(LLBC_Stream &)>
-    struct read_fun;
-
     /**
      * T::DeSerialize method impl.
      */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct deserializable_type;
     template <typename T>
-    bool read_data(T &obj, read_fun<T, &T::DeSerialize> *)
+    bool read_data(T &obj, deserializable_type<T, &T::DeSerialize> *)
     {
         return obj.DeSerialize(*this);
+    }
+
+    /**
+     * T::ParseFromString method impl.
+     */
+    template <typename T, bool (T::*)(const void *, int)>
+    class protobuf_parse_type;
+    template <typename T>
+    bool read_data(T &obj, protobuf_parse_type<T, &T::ParseFromArray> *)
+    {
+        uint32 pbDataSize;
+        if (UNLIKELY(Read(pbDataSize) == false))
+            return false;
+
+        return obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -561,7 +615,7 @@ public:
 
         typedef typename T::key_type KeyType;
         typedef typename T::referent_type ValType;
-        for (register uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; i++)
         {
             KeyType key;
             if (!this->Read<KeyType>(key))
@@ -594,7 +648,7 @@ public:
         if (!this->Read<uint32>(count))
             return false;
 
-        for (register uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; i++)
         {
             typedef typename T::value_type ElemType;
 
@@ -636,9 +690,19 @@ public:
      * T::DeSerializeEx method impl.
      */
     template <typename T>
-    bool read_data_ex(T &obj, read_fun<T, &T::DeSerializeEx> *)
+    bool read_data_ex(T &obj, deserializable_type<T, &T::DeSerializeEx> *)
     {
         return obj.DeSerializeEx(*this);
+    }
+
+    template <typename T>
+    bool read_data_ex(T &obj, protobuf_parse_type<T, &T::ParseFromArray> *)
+    {
+        uint32 pbDataSize;
+        if (UNLIKELY(Read(pbDataSize) == false))
+            return false;
+
+        return obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
     }
 
     /**
@@ -665,7 +729,7 @@ public:
 
         typedef typename T::key_type KeyType;
         typedef typename T::referent_type ValType;
-        for (register uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; i++)
         {
             KeyType key;
             if (!this->ReadEx<KeyType>(key))
@@ -698,7 +762,7 @@ public:
         if (!this->ReadEx<uint32>(count))
             return false;
 
-        for (register uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; i++)
         {
             typedef typename T::value_type ElemType;
 
