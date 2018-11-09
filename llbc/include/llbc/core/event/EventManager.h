@@ -54,7 +54,7 @@ public:
      * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
      */
-    LLBC_ListenerStub AddListener(int id, 
+    virtual LLBC_ListenerStub AddListener(int id,
                                   Listener listener,
                                   const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
 
@@ -79,7 +79,7 @@ public:
      * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
-    LLBC_ListenerStub AddListener(int id, 
+    virtual LLBC_ListenerStub AddListener(int id,
                                   LLBC_IDelegate1<void, LLBC_Event *> *listener,
                                   const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
 
@@ -90,7 +90,7 @@ public:
      *               specially, if return LLBC_FAILED,  and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    int RemoveListener(int id);
+    virtual int RemoveListener(int id);
 
     /**
      * Remove event listener using listener stub.
@@ -99,7 +99,7 @@ public:
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    int RemoveListener(const LLBC_ListenerStub &stub);
+    virtual int RemoveListener(const LLBC_ListenerStub &stub);
 
     /**
      * Remove event listener using listener stub and clear the listener stub.
@@ -108,7 +108,7 @@ public:
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    int RemoveListenerX(LLBC_ListenerStub &stub);
+    virtual int RemoveListenerX(LLBC_ListenerStub &stub);
 
 public:
     /**
@@ -123,11 +123,11 @@ public:
      */
     virtual bool IsFiring() const;
 
-private:
+protected:
     /**
      * \brief Wrap the event listener.
      */
-    struct _Listener 
+    struct _Listener
     {
         LLBC_ListenerStub stub;
 
@@ -147,7 +147,7 @@ private:
         _Listener listener;
     };
 
-private:
+protected:
     /**
      * Search given listen stub in the event manager.
      */
@@ -168,7 +168,7 @@ private:
      */
     void AfterFireEvent();
 
-private:
+protected:
     int _firing;
 
     typedef std::vector<_Op> _DelayedOps;
