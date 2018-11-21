@@ -24,7 +24,7 @@
 __LLBC_NS_BEGIN
 
 template <>
-inline LLBC_Variant LLBC_IniSection::GetValue(const LLBC_String &key, LLBC_Variant defaultValue) const
+inline LLBC_Variant LLBC_IniSection::GetValue(const LLBC_String &key, const LLBC_Variant &defaultValue) const
 {
     _Values::const_iterator it = _values.find(key);
     if (it == _values.end())
@@ -38,85 +38,85 @@ inline LLBC_Variant LLBC_IniSection::GetValue(const LLBC_String &key, LLBC_Varia
 }
 
 template <>
-inline bool LLBC_IniSection::GetValue(const LLBC_String &key, bool defaultValue) const
+inline bool LLBC_IniSection::GetValue(const LLBC_String &key, const bool &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline sint8 LLBC_IniSection::GetValue(const LLBC_String &key, sint8 defaultValue) const
+inline sint8 LLBC_IniSection::GetValue(const LLBC_String &key, const sint8 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline uint8 LLBC_IniSection::GetValue(const LLBC_String &key, uint8 defaultValue) const
+inline uint8 LLBC_IniSection::GetValue(const LLBC_String &key, const uint8 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline sint16 LLBC_IniSection::GetValue(const LLBC_String &key, sint16 defaultValue) const
+inline sint16 LLBC_IniSection::GetValue(const LLBC_String &key, const sint16 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline uint16 LLBC_IniSection::GetValue(const LLBC_String &key, uint16 defaultValue) const
+inline uint16 LLBC_IniSection::GetValue(const LLBC_String &key, const uint16 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline sint32 LLBC_IniSection::GetValue(const LLBC_String &key, sint32 defaultValue) const
+inline sint32 LLBC_IniSection::GetValue(const LLBC_String &key, const sint32 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline uint32 LLBC_IniSection::GetValue(const LLBC_String &key, uint32 defaultValue) const
+inline uint32 LLBC_IniSection::GetValue(const LLBC_String &key, const uint32 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline sint64 LLBC_IniSection::GetValue(const LLBC_String &key, sint64 defaultValue) const
+inline sint64 LLBC_IniSection::GetValue(const LLBC_String &key, const sint64 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline uint64 LLBC_IniSection::GetValue(const LLBC_String &key, uint64 defaultValue) const
+inline uint64 LLBC_IniSection::GetValue(const LLBC_String &key, const uint64 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline float LLBC_IniSection::GetValue(const LLBC_String &key, float defaultValue) const
+inline float LLBC_IniSection::GetValue(const LLBC_String &key, const float &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline double LLBC_IniSection::GetValue(const LLBC_String &key, double defaultValue) const
+inline double LLBC_IniSection::GetValue(const LLBC_String &key, const double &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline LLBC_String LLBC_IniSection::GetValue(const LLBC_String &key, LLBC_String defaultValue) const
+inline LLBC_String LLBC_IniSection::GetValue(const LLBC_String &key, const LLBC_String &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <>
-inline std::string LLBC_IniSection::GetValue(const LLBC_String &key, std::string defaultValue) const
+inline std::string LLBC_IniSection::GetValue(const LLBC_String &key, const std::string &defaultValue) const
 {
-    return this->GetValue(key, LLBC_Variant(LLBC_String(defaultValue))).AsCStr();
+    return this->GetValue(key, LLBC_Variant(LLBC_String(defaultValue))).AsStr();
 }
 
 template <typename _ValueType>
-inline _ValueType LLBC_IniSection::GetValue(const LLBC_String &key, _ValueType defaultValue) const
+inline _ValueType LLBC_IniSection::GetValue(const LLBC_String &key, const _ValueType &defaultValue) const
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return defaultValue;
@@ -165,7 +165,7 @@ inline void LLBC_Ini::EndLine(LLBC_String &str)
 template <typename _ValueType>
 inline _ValueType LLBC_Ini::GetValue(const LLBC_String &sectionName,
                             const LLBC_String &key,
-                            _ValueType defaultValue) const
+                            const _ValueType &defaultValue) const
 {
     const LLBC_IniSection *section = GetSection(sectionName);
     if (section == NULL)

@@ -62,7 +62,7 @@ public:
      * @return _ValueType - the given key's value, if return defaultValue, use LLBC_GetLastError() to get error reason.
      */
     template <typename _ValueType>
-    _ValueType GetValue(const LLBC_String &key, _ValueType defaultValue = _ValueType()) const;
+    _ValueType GetValue(const LLBC_String &key, const _ValueType &defaultValue = _ValueType()) const;
 
     /**
     * Set value.
@@ -256,7 +256,7 @@ public:
     template <typename _ValueType>
     _ValueType GetValue(const LLBC_String &sectionName,
                         const LLBC_String &key,
-                        _ValueType defaultValue = _ValueType()) const;
+                        const _ValueType &defaultValue = _ValueType()) const;
 
     /**
      * Set specific key value in given section.

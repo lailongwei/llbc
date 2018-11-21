@@ -66,19 +66,19 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_Property &cfg)
 {
     // Common log configs.
-    _logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsCStr()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
+    _logLevel = (cfg.HasProperty("level") ? LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str()) : LLBC_CFG_LOG_DEFAULT_LEVEL);
     _asyncMode = (cfg.HasProperty("asynchronous") ? cfg.GetValue("asynchronous").AsBool() : LLBC_CFG_LOG_DEFAULT_ASYNC_MODE);
     _flushInterval= (cfg.HasProperty("flushInterval") ? cfg.GetValue("flushInterval").AsInt32() : LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
 
     // Console log configs.
     _logToConsole = (cfg.HasProperty("logToConsole") ? cfg.GetValue("logToConsole").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE);
-    _consoleLogLevel = (cfg.HasProperty("consoleLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsCStr()) : _logLevel);
+    _consoleLogLevel = (cfg.HasProperty("consoleLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsStr().c_str()) : _logLevel);
     _consolePattern = (cfg.HasProperty("consolePattern") ? cfg.GetValue("consolePattern").AsStr() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     _colourfulOutput = (cfg.HasProperty("colourfulOutput") ? cfg.GetValue("colourfulOutput").AsBool() : LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT);
 
     // File log configs.
     _logToFile = (cfg.HasProperty("logToFile") ? cfg.GetValue("logToFile").AsBool() : LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
-    _fileLogLevel = (cfg.HasProperty("fileLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsCStr()) : _logLevel);
+    _fileLogLevel = (cfg.HasProperty("fileLogLevel") ? LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str()) : _logLevel);
     _logFile = (cfg.HasProperty("logFile") ? cfg.GetValue("logFile").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
     _logFileSuffix = (cfg.HasProperty("logFileSuffix") ? cfg.GetValue("logFileSuffix").AsStr() : LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX);
     _forceAppLogPath = (cfg.HasProperty("forceAppLogPath") ? cfg.GetValue("forceAppLogPath").AsBool() : LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH);

@@ -272,7 +272,6 @@ public:
     uint64 AsUInt64() const;
     float AsFloat() const;
     double AsDouble() const;
-    const char *AsCStr() const;
     LLBC_String AsStr() const;
     const Dict &AsDict() const;
 
@@ -289,7 +288,6 @@ public:
     operator uint64 () const;
     operator float () const;
     operator double () const;
-    operator const char *() const;
     operator LLBC_String () const;
     operator const Dict &() const;
 

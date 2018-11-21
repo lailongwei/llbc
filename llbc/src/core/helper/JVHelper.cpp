@@ -109,20 +109,18 @@ LLBC_JsonValue LLBC_JVHelper::V2J(const LLBC_Variant &v)
         return LLBC_JsonValue(v.AsDouble());
 
     case LLBC_Variant::STR:
-        return LLBC_JsonValue(v.AsCStr());
+        return LLBC_JsonValue(v.AsStr().c_str());
 
     case LLBC_Variant::DICT:
         {
             const LLBC_Variant::Dict &dict = v.AsDict();
             if (dict.empty())
-            {
                 return LLBC_JsonValue(Json::objectValue);
-            }
 
             LLBC_Variant::Dict::const_iterator dictIt = dict.begin();
             LLBC_JsonValue json(Json::objectValue);
             for (; dictIt != dict.end(); dictIt++)
-                json[dictIt->first.AsCStr()] = V2J(dictIt->second);
+                json[dictIt->first.AsStr().c_str()] = V2J(dictIt->second);
 
             return json;
         }
