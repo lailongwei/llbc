@@ -33,9 +33,9 @@ inline bool LLBC_Event::IsDontDelAfterFire() const
     return _dontDelAfterFire;
 }
 
-inline void LLBC_Event::SetDontDelAfterFire(bool isDontDelAfterFire)
+inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
 {
-    _dontDelAfterFire = isDontDelAfterFire;
+    _dontDelAfterFire = dontDelAfterFire;
 }
 
 template <typename ParamType>

@@ -55,8 +55,8 @@ public:
      * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
-                                  Listener listener,
-                                  const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
+                                          Listener listener,
+                                          const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
 
     /**
      * Add event listener.
@@ -80,8 +80,8 @@ public:
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
-                                  LLBC_IDelegate1<void, LLBC_Event *> *listener,
-                                  const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
+                                          LLBC_IDelegate1<void, LLBC_Event *> *listener,
+                                          const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
 
     /**
      * Remove event listener.

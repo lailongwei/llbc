@@ -50,10 +50,10 @@ public:
     bool IsDontDelAfterFire() const;
 
     /**
-     * Set dont delete after fire option
-     * @return void
+     * Set don't delete after fire option.
+     * @param[in] dontDelAfterFire - the don't delete after fire option.
      */
-    void SetDontDelAfterFire(bool isDontDelAfterFire);
+    void SetDontDelAfterFire(bool dontDelAfterFire);
 
 public:
     /**
