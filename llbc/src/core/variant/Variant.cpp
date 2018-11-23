@@ -613,11 +613,6 @@ double LLBC_Variant::AsDouble() const
     return static_cast<double>(_holder.raw.uint64Val);
 }
 
-const char *LLBC_Variant::AsCStr() const
-{
-    return AsStr().c_str();
-}
-
 LLBC_String LLBC_Variant::AsStr() const
 {
     if (IsNil())
@@ -716,11 +711,6 @@ LLBC_Variant::operator float() const
 LLBC_Variant::operator double() const
 {
     return AsDouble();
-}
-
-LLBC_Variant::operator const char *() const
-{
-    return AsCStr();
 }
 
 LLBC_Variant::operator LLBC_String () const

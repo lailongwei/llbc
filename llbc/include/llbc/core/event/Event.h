@@ -49,6 +49,12 @@ public:
      */
     bool IsDontDelAfterFire() const;
 
+    /**
+     * Set don't delete after fire option.
+     * @param[in] dontDelAfterFire - the don't delete after fire option.
+     */
+    void SetDontDelAfterFire(bool dontDelAfterFire);
+
 public:
     /**
      * Get integer key indexed event param.
