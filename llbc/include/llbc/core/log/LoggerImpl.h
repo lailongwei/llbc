@@ -19,23 +19,35 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_LOG_H__
-#define __LLBC_TEST_CASE_CORE_LOG_H__
+#ifdef __LLBC_CORE_LOG_LOGGER_H__
 
-#include "llbc.h"
-using namespace llbc;
+__LLBC_NS_BEGIN
 
-class TestCase_Core_Log : public LLBC_BaseTestCase
+inline int LLBC_Logger::InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData))
 {
-public:
-    TestCase_Core_Log();
-    virtual ~TestCase_Core_Log();
+    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg = 
+        new LLBC_Func1<void, const LLBC_LogData *>(hookFunc);
 
-public:
-    int Run(int argc, char *argv[]);
+    int installRet = InstallHook(level, hookDeleg);
+    if (installRet != LLBC_OK)
+        LLBC_Delete(hookDeleg);
 
-private:
-    void _OnLogHook(const LLBC_LogData *logData);
-};
+    return installRet;
+}
 
-#endif // !__LLBC_TEST_CASE_CORE_LOG_H__
+template <typename ObjType>
+inline int LLBC_Logger::InstallHook(int level, ObjType *obj, void ( ObjType::*hookMeth)(const LLBC_LogData *logData))
+{
+    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg =
+        new LLBC_Delegate1<void, ObjType, const LLBC_LogData *>(obj, hookMeth);
+
+    int installRet = InstallHook(level, hookDeleg);
+    if (installRet != LLBC_OK)
+        LLBC_Delete(hookDeleg);
+
+    return installRet;
+}
+
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_LOG_LOGGER_H__

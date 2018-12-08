@@ -56,6 +56,7 @@ LLBC_Logger::LLBC_Logger()
 , _config(NULL)
 , _logRunnable(NULL)
 {
+    LLBC_MemSet(_hookDelegs, 0, sizeof(_hookDelegs));
 }
 
 LLBC_Logger::~LLBC_Logger()
@@ -141,8 +142,8 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 
 bool LLBC_Logger::IsInit() const
 {
-    LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(nonConstThis->_mutex);
+    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
+    LLBC_LockGuard guard(ncThis->_mutex);
 
     return (_logRunnable ? true : false);
 }
@@ -152,6 +153,9 @@ void LLBC_Logger::Finalize()
     LLBC_LockGuard guard(_mutex);
     if (!_logRunnable)
         return;
+
+    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; level++)
+        UninstallHook(level);
 
     if (_config->IsAsyncMode())
     {
@@ -203,7 +207,35 @@ void LLBC_Logger::SetLogLevel(int level)
 
 bool LLBC_Logger::IsTakeOver() const
 {
+    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
+    LLBC_LockGuard guard(ncThis->_mutex);
+
     return _config->IsTakeOver();
+}
+
+int LLBC_Logger::InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg)
+{
+    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
+        !hookDeleg))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    LLBC_LockGuard guard(_mutex);
+
+    UninstallHook(level);
+    _hookDelegs[level] = hookDeleg;
+
+    return LLBC_OK;
+}
+
+void LLBC_Logger::UninstallHook(int level)
+{
+    LLBC_LockGuard guard(_mutex);
+
+    if (LIKELY(LLBC_LogLevel::IsLegal(level)))
+        LLBC_XDelete(_hookDelegs[level]);
 }
 
 int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *fmt, ...)
@@ -290,6 +322,9 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
+    if (_hookDelegs[level])
+        _hookDelegs[level]->Invoke(data);
+
     if (!_config->IsAsyncMode())
     {
         const int ret = _logRunnable->Output(data);

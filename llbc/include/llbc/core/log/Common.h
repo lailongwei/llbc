@@ -22,6 +22,7 @@
 #ifndef __LLBC_CORE_LOG_COMMON_H__
 #define __LLBC_CORE_LOG_COMMON_H__
 
+#include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
 
 #include "llbc/core/log/Logger.h"
