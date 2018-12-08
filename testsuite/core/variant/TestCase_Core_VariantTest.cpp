@@ -57,6 +57,7 @@ void TestCase_Core_VariantTest::BasicTest()
     LLBC_Variant uint32Val( (uint32)32 );
     LLBC_Variant longVal( (long)-10086 );
     LLBC_Variant ulongVal( (LLBC_NS ulong)10086 );
+    LLBC_Variant ptrVal( (void *)0x80000000 );
     LLBC_Variant int64Val( (sint64)-64 );
     LLBC_Variant uint64Val( (uint64)64 );
     LLBC_Variant floatVal( (float)88.0 );
@@ -83,6 +84,8 @@ void TestCase_Core_VariantTest::BasicTest()
         <<(longVal.IsLong() ? "true" : "false") <<", ToString: " <<longVal <<std::endl;
     std::cout <<"ulongVal, isULong: " 
         <<(ulongVal.IsULong() ? "true" : "false") <<", ToString: " <<ulongVal <<std::endl;
+    std::cout <<"ptrVal, isPtr: " 
+        <<(ptrVal.IsPtr() ? "true" : "false") <<", ToString: " <<ptrVal <<std::endl;
     std::cout <<"int64Val, isInt64: " 
         <<(int64Val.IsInt64() ? "true" : "false") <<", ToString: " <<int64Val <<std::endl;
     std::cout <<"uint64Val, isUInt64: " 
@@ -117,6 +120,8 @@ void TestCase_Core_VariantTest::BasicTest()
     std::cout <<"become long: " <<become <<std::endl;
     become.BecomeULong();
     std::cout <<"become ulong: " <<become <<std::endl;
+    become.BecomePtr();
+    std::cout <<"become ptr: " <<become <<std::endl;
     become.BecomeInt64();
     std::cout <<"become int64: " <<become <<std::endl;
     become.BecomeUInt64();
@@ -129,6 +134,15 @@ void TestCase_Core_VariantTest::BasicTest()
     std::cout <<"become Nil: " <<become <<std::endl;
     become.BecomeBool();
     std::cout <<"become bool: " <<become <<std::endl;
+
+    int intData = 300;
+    ptrVal = &intData;
+    std::cout <<"Pointer type(special) test:" <<std::endl;
+    std::cout <<"intData: " <<intData <<", save ptr(0x" <<&intData << ") to variant: " <<ptrVal <<std::endl;
+
+    ptrVal = ptrVal + LLBC_Variant(4);
+    ptrVal = ptrVal - LLBC_Variant(4);
+    std::cout <<"After ptrVal += 4, ptrVal -= 4, value: " <<*ptrVal.AsPtr<int>() <<std::endl;
 }
 
 void TestCase_Core_VariantTest::ArithmeticTest()
