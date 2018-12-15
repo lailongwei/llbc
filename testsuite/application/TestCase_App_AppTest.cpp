@@ -40,6 +40,18 @@ namespace
             // _testSvc = LLBC_IService::Create(LLBC_IService::Normal);
             // _testSvc->Start();
 
+            // You can uncomment below codes for test SetDumpFile()
+            // #if LLBC_TARGET_PLATFORM_WIN32
+            // const LLBC_String &dumpFileName = GetName();
+            // LLBC_PrintLine("Set dump file: %s", dumpFileName.c_str());
+            // SetDumpFile(dumpFileName);
+
+            // LLBC_PrintLine("Raise division by 0 error!");
+            // int val1 = 3;
+            // int val2 = 0;
+            // val1 /= val2;
+            // #endif // Win32
+
             return 0;
         }
 

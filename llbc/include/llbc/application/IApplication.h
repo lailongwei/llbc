@@ -102,6 +102,13 @@ public:
      */
     void Stop();
 
+    /**
+     * Set dump file when application dump.
+     * @param[in] dumpFileName - the dump file name.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetDumpFile(const LLBC_String &dumpFileName);
+
 public:
     /**
      * Get application name.
@@ -199,6 +206,10 @@ private:
     volatile bool _started;
     bool _waited;
     LLBC_StartArgs _startArgs;
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_String _dumpFileName;
+#endif // Win32
 
     static LLBC_IApplication *_thisApp;
 };

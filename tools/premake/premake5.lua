@@ -126,6 +126,7 @@ project "llbc"
         links {
             "ws2_32",
             "Mswsock",
+            "DbgHelp",
         }
 
     filter { "system:macosx" }

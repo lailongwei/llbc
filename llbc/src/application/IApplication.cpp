@@ -25,6 +25,52 @@
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/IApplication.h"
 
+
+#if LLBC_TARGET_PLATFORM_WIN32
+
+__LLBC_INTERNAL_NS_BEGIN
+
+static const char *__dumpFileName = NULL;
+
+static LONG WINAPI __AppCrashHandler(EXCEPTION_POINTERS *exception)
+{
+    HANDLE dmpFile = ::CreateFileA(__dumpFileName,
+                                   GENERIC_WRITE,
+                                   FILE_SHARE_READ,
+                                   NULL,
+                                   CREATE_ALWAYS,
+                                   FILE_ATTRIBUTE_NORMAL,
+                                   NULL);
+    if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
+    dmpInfo.ExceptionPointers = exception;
+    dmpInfo.ThreadId = GetCurrentThreadId();
+    dmpInfo.ClientPointers = TRUE;
+
+    ::MiniDumpWriteDump(::GetCurrentProcess(),
+                        ::GetCurrentProcessId(),
+                        dmpFile,
+                        MiniDumpNormal,
+                        &dmpInfo,
+                        NULL,
+                        NULL);
+
+    ::CloseHandle(dmpFile);
+
+    LLBC_NS LLBC_String errMsg;
+    errMsg.append("Unhandled exception!");
+    errMsg.append_format("The mini dump file path: %s.", __dumpFileName);
+    ::FatalAppExitA(0, errMsg.c_str());
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+__LLBC_INTERNAL_NS_END
+
+#endif // Win32
+
 __LLBC_NS_BEGIN
 
 LLBC_IApplication *LLBC_IApplication::_thisApp = NULL;
@@ -140,6 +186,36 @@ void LLBC_IApplication::Stop()
     LLBC_Cleanup();
 
     _started = false;
+}
+
+int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+#else // Win32
+    if (UNLIKELY(dumpFileName.empty()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+    else if (UNLIKELY(!_dumpFileName.empty()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    _dumpFileName = dumpFileName;
+    if (LLBC_Directory::SplitExt(_dumpFileName)[1] != ".dmp")
+        _dumpFileName += ".dmp";
+    _dumpFileName = LLBC_Directory::AbsPath(_dumpFileName);
+
+    LLBC_INL_NS __dumpFileName = _dumpFileName.c_str();
+
+    ::SetUnhandledExceptionFilter(LLBC_INL_NS __AppCrashHandler);
+
+    return LLBC_OK;
+#endif // Non Win32
 }
 
 const LLBC_String &LLBC_IApplication::GetName() const

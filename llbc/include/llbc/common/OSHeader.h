@@ -41,6 +41,7 @@
  #include <process.h>
  #include <ObjBase.h>
  #include <ShlObj.h>
+ #include <DbgHelp.h>
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #include <sys/stat.h>
