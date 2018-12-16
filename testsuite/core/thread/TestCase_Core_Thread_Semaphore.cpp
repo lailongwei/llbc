@@ -35,7 +35,9 @@ static LLBC_SimpleLock __g_outLock;
 
 static int WaiterThreadProc(void *arg)
 {
-    int threadIndex = (int)((long)(arg));
+    int threadIndex = 0;
+    ::memcpy(&threadIndex, &arg, sizeof(int));
+
     __g_testVal->sem.Wait();
     __g_outLock.Lock();
     std::cout <<"waiter: " <<threadIndex <<" weakup[Wait], get value: " <<__g_testVal->value <<std::endl;
@@ -120,9 +122,11 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
 
     // Create waiters.
     LLBC_NativeThreadHandle waiters[__g_waitersCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(int i = 0; i < __g_waitersCount; i ++)
+    for(long i = 0; i < __g_waitersCount; i ++)
     {
-        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, reinterpret_cast<void *>(i));
+        void *threadArg = NULL;
+        ::memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
     }
 
     // Create signaler.
@@ -133,7 +137,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     LLBC_JoinThread(signaler);
 
     // Join waiters.
-    for(int i = 0; i < __g_waitersCount; i ++)
+    for(long i = 0; i < __g_waitersCount; i ++)
     {
         LLBC_JoinThread(waiters[i]);
     }

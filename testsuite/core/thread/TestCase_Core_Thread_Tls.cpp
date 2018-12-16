@@ -24,21 +24,22 @@
 
 namespace
 {
-    static LLBC_Tls<int> __g_tls;
-    static const uint32 __g_threadNum = 5;
+    static LLBC_Tls<long> __g_tls;
+    static const long __g_threadNum = 5;
 }
 
 static int ThreadProc(void *arg)
 {
-    int threadIdx = static_cast<int>(reinterpret_cast<long>(arg));
-    LLBC_PrintLine("thread %d startup", threadIdx);
+    long threadIndex;
+    ::memcpy(&threadIndex, &arg, sizeof(long));
+    LLBC_PrintLine("thread %d startup", threadIndex);
 
-    __g_tls.SetValue(LLBC_New0(int));
-    (*__g_tls) = threadIdx;
+    __g_tls.SetValue(LLBC_New0(long));
+    (*__g_tls) = threadIndex;
     for(int i = 0; i < 5000000; i ++)
         (*__g_tls) += 1;
 
-    LLBC_PrintLine("thread [%d] tls value: %d", threadIdx, *__g_tls);
+    LLBC_PrintLine("thread [%ld] tls value: %ld", threadIndex, *__g_tls);
 
     return 0;
 }
@@ -57,13 +58,15 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
 
     // Create threads.
     LLBC_NativeThreadHandle threads[__g_threadNum] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(uint32 i = 0; i < __g_threadNum; i ++)
+    for(long i = 0; i < __g_threadNum; i ++)
     {
-        LLBC_CreateThread(&threads[i], &ThreadProc, reinterpret_cast<void *>(i));
+        void *threadArg = NULL;
+        ::memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&threads[i], &ThreadProc, threadArg);
     }
 
     // Join threads.
-    for(uint32 i = 0; i < __g_threadNum; i ++)
+    for(long i = 0; i < __g_threadNum; i ++)
     {
         LLBC_JoinThread(threads[i]);
     }

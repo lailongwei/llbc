@@ -48,6 +48,42 @@ inline bool LLBC_VariantArithmetic::Performs_raw_operation(bool left, bool right
     return bool();
 }
 
+template <>
+inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *right, int type)
+{
+    sint64 leftVal = 0, rightVal = 0;
+    ::memcpy(&leftVal, &left, sizeof(void *));
+    ::memcpy(&rightVal, &right, sizeof(void *));
+
+    switch (type)
+    {
+    case VT_ARITHMETIC_ADD:
+        leftVal += rightVal;
+        break;
+
+    case VT_ARITHMETIC_SUB:
+        leftVal -= rightVal;
+        break;
+
+    case VT_ARITHMETIC_MUL:
+        leftVal *= rightVal;
+        break;
+
+    case VT_ARITHMETIC_DIV:
+        leftVal /= rightVal;
+        break;
+
+    default:
+        leftVal = 0;
+        break;
+    }
+
+    void *finalPtr = NULL;
+    ::memcpy(&finalPtr, &leftVal, sizeof(void *));
+
+    return finalPtr;
+}
+
 template <typename RawType>
 inline RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
 {

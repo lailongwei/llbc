@@ -47,7 +47,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 {
     LLBC_Property cfg;
     if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
-        LLBC_FAILED;
+        return LLBC_FAILED;
 
     // Get all logger names
     const LLBC_Strings loggerNames = cfg.GetPropertyNames(false);

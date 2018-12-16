@@ -32,7 +32,7 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
 
-static LONG WINAPI __AppCrashHandler(EXCEPTION_POINTERS *exception)
+static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 {
     HANDLE dmpFile = ::CreateFileA(__dumpFileName,
                                    GENERIC_WRITE,
@@ -44,7 +44,7 @@ static LONG WINAPI __AppCrashHandler(EXCEPTION_POINTERS *exception)
     if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
         return EXCEPTION_CONTINUE_SEARCH;
 
-    MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
+    ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
     dmpInfo.ExceptionPointers = exception;
     dmpInfo.ThreadId = GetCurrentThreadId();
     dmpInfo.ClientPointers = TRUE;
@@ -65,6 +65,38 @@ static LONG WINAPI __AppCrashHandler(EXCEPTION_POINTERS *exception)
     ::FatalAppExitA(0, errMsg.c_str());
 
     return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static BOOL __PreventSetUnhandledExceptionFilter()
+{
+    HMODULE kernel32 = ::LoadLibraryA("kernel32.dll");
+    if (kernel32 == NULL)
+        return FALSE;
+
+    void *orgEntry = (void *)::GetProcAddress(kernel32, "SetUnhandledExceptionFilter");
+    if (orgEntry == NULL)
+        return FALSE;
+
+#ifdef _M_IX86
+    // Code for x86:
+    // 33 C0    xor eax, eax
+    // C2 04 00 ret 4
+    unsigned char execute[] = { 0x33, 0xc0, 0xc2, 0x04, 0x00 };
+#elif _M_X64
+    // Code for x64
+    // 33 c0    xor eax, eax
+    // c3       ret
+    unsigned char execute[] = { 0x33, 0xc0, 0xc3 };
+#else
+ #error "Unsupported architecture(on windows platform)!"
+#endif
+
+    SIZE_T bytesWritten = 0;
+    return ::WriteProcessMemory(GetCurrentProcess(),
+                                orgEntry,
+                                execute,
+                                sizeof(execute),
+                                &bytesWritten);
 }
 
 __LLBC_INTERNAL_NS_END
@@ -206,13 +238,25 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
     }
 
     _dumpFileName = dumpFileName;
-    if (LLBC_Directory::SplitExt(_dumpFileName)[1] != ".dmp")
+    LLBC_Strings dumpFileNameParts = LLBC_Directory::SplitExt(_dumpFileName);
+
+    LLBC_Time now = LLBC_Time::Now();
+    _dumpFileName = dumpFileNameParts[0];
+    _dumpFileName.append_format("_%d%02d%02d_%02d%02d%02d_%06d%s",
+        now.GetYear(), now.GetMonth(), now.GetDay(), now.GetHour(), now.GetMinute(),
+        now.GetSecond(), now.GetMilliSecond() * 1000 + now.GetMicroSecond(), dumpFileNameParts[1].c_str());
+    if (dumpFileNameParts[1] != ".dmp")
         _dumpFileName += ".dmp";
+
     _dumpFileName = LLBC_Directory::AbsPath(_dumpFileName);
 
     LLBC_INL_NS __dumpFileName = _dumpFileName.c_str();
 
     ::SetUnhandledExceptionFilter(LLBC_INL_NS __AppCrashHandler);
+
+#ifdef LLBC_RELEASE
+    LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
+#endif // Release
 
     return LLBC_OK;
 #endif // Non Win32

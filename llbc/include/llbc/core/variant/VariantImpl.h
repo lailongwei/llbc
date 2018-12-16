@@ -504,7 +504,7 @@ inline LLBC_Variant::operator ulong() const
 template <typename _T>
 inline LLBC_Variant::operator _T *() const
 {
-    AsPtr<_T>();
+    return AsPtr<_T>();
 }
 
 inline LLBC_Variant::operator sint64() const
