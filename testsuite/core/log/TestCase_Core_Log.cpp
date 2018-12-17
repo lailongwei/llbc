@@ -40,7 +40,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_OK)
 #else
 
-    auto a = LLBC_Directory::AbsPath("Logger_Cfg.cfg");
+    LLBC_String a = LLBC_Directory::AbsPath("Logger_Cfg.cfg");
     if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_OK)
 #endif
     {
