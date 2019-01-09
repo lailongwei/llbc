@@ -66,11 +66,11 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
         if (::SymGetLineFromAddr64(curProc, symbol->Address, &displacement, &imgHelpLine64) == TRUE)
         {
             backTrace.append_format("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
-                symbol->Name, imgHelpLine64.FileName, imgHelpLine64.LineNumber);
+                                    symbol->Name, imgHelpLine64.FileName, imgHelpLine64.LineNumber);
         }
         else
         {
-            backTrace.append_format("#%d 0x%x in %s at %s:%d", frames - frame - 1, 
+            backTrace.append_format("#%d 0x%x in %s at %s:%d", frames - frame - 1,
                 (void *)symbol->Address, symbol->Name, "", 0);
         }
 
@@ -80,14 +80,17 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
 #else // Non-Win32
     const int frames = ::backtrace(stack, captureFrames);
     char **strs = ::backtrace_symbols(stack, frames);
-    for (int i = 0; i < frames; i++)
+    if (LIKELY(strs))
     {
-        backTrace.append("%s", strs[i]);
-        if (i != frames - 1)
-            backTrace.append(1, '\n');
-    }
+        for (int i = 0; i < frames; i++)
+        {
+            backTrace.append_format("%s", strs[i]);
+            if (i != frames - 1)
+                backTrace.append(1, '\n');
+        }
 
-    free(strs);
+        free(strs);
+    }
 #endif
 
     return backTrace;
