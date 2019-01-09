@@ -84,7 +84,37 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     {
         for (int i = 0; i < frames; i++)
         {
-            backTrace.append_format("%s", strs[i]);
+            char *parenthesisEnd = NULL;
+            char *parenthesisBeg = strchr(strs[i], '(');
+            if (parenthesisBeg)
+            {
+                parenthesisBeg += 1;
+                parenthesisEnd = strchr(parenthesisBeg, ')');
+            }
+
+            if (parenthesisEnd)
+            {
+                int status = 0;
+                size_t length = sizeof(libTls->commonTls.rtti);
+                *parenthesisEnd = '\0';
+                abi::__cxa_demangle(parthesisBeg, libTls->commonTls.rtti, &length, &status);
+                if (status == 0)
+                {
+                    backTrace.append(strs[i], parthesisBeg - strs[i]);
+                    backTrace.append(libTls->commonTls.rtti);
+                    *parenthesisEnd = ')';
+                    backTrace.append(parenthesisEnd);
+                }
+                else
+                {
+                    backTrace.append_format("%s", strs[i]);
+                }
+            }
+            else
+            {
+                backTrace.append_format("%s", strs[i]);
+            }
+
             if (i != frames - 1)
                 backTrace.append(1, '\n');
         }
