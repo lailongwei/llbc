@@ -68,6 +68,22 @@ struct __LLBC_LibTls
 
         /* Timer scheduler. */
         void *timerScheduler;
+
+        /* symbol about data. */
+        #if LLBC_CFG_OS_IMPL_SYMBOL
+        struct
+        {
+            #if LLBC_TARGET_PLATFORM_WIN32
+            /* Win32 spec: the win32 symbol structure. */
+            SYMBOL_INFO *win32Symbol;
+            /* Win32 spec: the image helper structure, use for store symbol file name and line number. */
+            IMAGEHLP_LINE64 win32ImgHelpLine64;
+            #endif // LLBC_TARGET_PLATFORM_WIN32
+
+            /* The call stack. */
+            void *stack[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES];
+        } symbol;
+        #endif // LLBC_CFG_OS_IMPL_SYMBOL
     } coreTls;
 
     /* ObjBase-Module TLS valus. */
@@ -85,6 +101,7 @@ struct __LLBC_LibTls
     } commTls;
 
     __LLBC_LibTls();
+    ~__LLBC_LibTls();
 };
 
 /**

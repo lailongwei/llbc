@@ -186,36 +186,16 @@
 #define ASSERT(x) assert(x)
 #endif
 
-// Check we have a fully featured C++11 compiler or not?
-#if !defined(_MSC_VER)
-#if (__cplusplus > 197711L) || (defined(__STDCXX_VERSION__) && (__STDCXX_VERSION__ >= 201001L))
-#define LLBC_CPP11
-#endif
-#endif
-// ...at least partial C++11?
-#if defined(LLBC_CPP11) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(__GXX_EXPERIMENTAL_CPP0X__))
-#define LLBC_CPP11_PARTICAL
-#endif
-
 // Define register keyword to empty n c++11(in c++11 standard, register is deprecated)
 #ifdef LLBC_CPP11
 #define register
 #endif
 
 // Disable assignments of objects.
-#ifdef LLBC_CPP11_PARTICAL
-#define LLBC_DISABLE_ASSIGNMENT(name)               \
-private:                                            \
-    name(const name &) = delete;                    \
-    name &operator =(const name &) = delete         \
-
-#else
 #define LLBC_DISABLE_ASSIGNMENT(name)               \
 private:                                            \
     name(const name &);                             \
     name &operator =(const name &)                  \
-
-#endif // LLBC_CPP0X_PARTIAL
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX

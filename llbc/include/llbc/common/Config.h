@@ -35,6 +35,12 @@
 #else
  #define LLBC_CFG_OS_DFT_BACKLOG_SIZE                       (SOMAXCONN)
 #endif
+// Determine implement symbol about functions or not.
+#define LLBC_CFG_OS_IMPL_SYMBOL                             1
+// Determine max symbol name when enabled OS/Symbol functions.
+#define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  63
+// Determine max cpature frames count when enabled OS/Symbol functions.
+#define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
  * \brief Core/File about config options define.
@@ -169,7 +175,7 @@
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine full stack attribute.
-#define LLBC_CFG_COMM_USE_FULL_STACK                        0
+#define LLBC_CFG_COMM_USE_FULL_STACK                        1
 // Determine enable the service has status handler support or not.
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
 // Determine enable the service has status desc support or not.

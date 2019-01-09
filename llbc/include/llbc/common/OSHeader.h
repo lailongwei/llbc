@@ -61,6 +61,7 @@
  #include <semaphore.h>
  #include <arpa/inet.h>
  #include <dlfcn.h>
+ #include <execinfo.h>
 
  #if LLBC_TARGET_PLATFORM_LINUX
   #include <sys/epoll.h>
