@@ -100,7 +100,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
                 abi::__cxa_demangle(parenthesisBeg, libTls->commonTls.rtti, &length, &status);
                 if (status == 0)
                 {
-                    backTrace.append(strs[i], parthesisBeg - strs[i]);
+                    backTrace.append(strs[i], parenthesisBeg - strs[i]);
                     backTrace.append(libTls->commonTls.rtti);
                     *parenthesisEnd = ')';
                     backTrace.append(parenthesisEnd);
