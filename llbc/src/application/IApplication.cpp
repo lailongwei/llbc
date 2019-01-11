@@ -25,12 +25,77 @@
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/IApplication.h"
 
-
 #if LLBC_TARGET_PLATFORM_WIN32
 
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
+
+static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
+{
+#if defined(_M_IX86)
+    DWORD machineType = IMAGE_FILE_MACHINE_I386;
+#elif defined(_M_IA64)
+    DWORD machineType = IMAGE_FILE_MACHINE_IA64;
+#elif defined(_M_X64)
+    DWORD machineType = IMAGE_FILE_MACHINE_AMD64
+#else
+    return;
+#endif
+
+    STACKFRAME64 stackFrame64;
+    ::memset(&stackFrame64, 0, sizeof(STACKFRAME64));
+    stackFrame64.AddrPC.Offset = ctx->Eip;
+    stackFrame64.AddrPC.Mode = AddrModeFlat;
+    stackFrame64.AddrStack.Offset = ctx->Esp;
+    stackFrame64.AddrStack.Mode = AddrModeFlat;
+    stackFrame64.AddrFrame.Offset = ctx->Ebp;
+    stackFrame64.AddrFrame.Mode = AddrModeFlat;
+
+    HANDLE curProc = ::GetCurrentProcess();
+    HANDLE curThread = ::GetCurrentThread();
+    LLBC_NS LLBC_Strings backTraces;
+    while (true)
+    {
+        if (!::StackWalk64(machineType,
+                           curProc,
+                           curThread,
+                           &stackFrame64,
+                           ctx,
+                           NULL,
+                           ::SymFunctionTableAccess64,
+                           ::SymGetModuleBase64,
+                           NULL))
+            break;
+
+        if (stackFrame64.AddrFrame.Offset == 0)
+            break;
+
+        BYTE symbolBuffer[sizeof(SYMBOL_INFO) + 512];
+        PSYMBOL_INFO symbol = (PSYMBOL_INFO)(symbolBuffer);
+        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+        symbol->MaxNameLen = 511;
+
+        if (!::SymFromAddr(curProc, stackFrame64.AddrPC.Offset, NULL, symbol))
+            break;
+
+        DWORD symDisplacement = 0;
+        IMAGEHLP_LINE64 lineInfo = { sizeof(IMAGEHLP_LINE64) };
+        if (::SymGetLineFromAddr64(curProc, stackFrame64.AddrPC.Offset, &symDisplacement, &lineInfo))
+        {
+            backTraces.push_back(LLBC_NS LLBC_String().format("0x%x in %s at %s:%d",
+                (void *)symbol->Address, symbol->Name, lineInfo.FileName, lineInfo.LineNumber));
+        }
+        else
+        {
+            backTraces.push_back(LLBC_NS LLBC_String().format("0x%x in %s at %s:%d",
+                (void *)symbol->Address, symbol->Name, "", 0));
+        }
+    }
+
+    for (size_t i = 0; i < backTraces.size(); i++)
+        backTrace.append_format("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
+}
 
 static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 {
@@ -60,9 +125,16 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     ::CloseHandle(dmpFile);
 
     LLBC_NS LLBC_String errMsg;
-    errMsg.append("Unhandled exception!");
-    errMsg.append_format("The mini dump file path: %s.", __dumpFileName);
-    ::FatalAppExitA(0, errMsg.c_str());
+    errMsg.append("Unhandled exception!\n");
+    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
+
+    LLBC_NS LLBC_String backTrace;
+    __GetExceptionBackTrace(exception->ContextRecord, backTrace);
+    errMsg.append_format("Stack BackTrace:\n%s\n", backTrace.c_str());
+
+    LLBC_NS LLBC_String mbTitle;
+    mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::BaseName(LLBC_NS LLBC_Directory::ModuleFileName()).c_str());
+    ::MessageBoxA(NULL, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
     return EXCEPTION_EXECUTE_HANDLER;
 }

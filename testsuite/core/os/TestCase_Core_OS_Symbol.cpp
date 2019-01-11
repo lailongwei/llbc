@@ -21,7 +21,6 @@
 
 
 #include "core/os/TestCase_Core_OS_Symbol.h"
-#include "llbc/core/os/OS_Symbol.h"
 
 TestCase_Core_OS_Symbol::TestCase_Core_OS_Symbol()
 {
