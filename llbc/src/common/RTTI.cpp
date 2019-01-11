@@ -89,7 +89,7 @@ const char *__LLBC_GetTypeName(const char *rawTyName)
 
     return rtti;
 #else // Non-Win32
-    return __LLBC_CXXDemangle(typeid(Ty).name());
+    return __LLBC_CXXDemangle(rawTyName);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
@@ -99,14 +99,14 @@ const char *__LLBC_CxxDemangle(const char *name)
 {
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     if (UNLIKELY(!libTls))
-        return LLBC_String();
+        return "";
 
     int status = 0;
     size_t length = sizeof(libTls->commonTls.rtti);
 
     abi::__cxa_demangle(name, libTls->commonTls.rtti, &length, &status);
     if (status != 0)
-        return LLBC_String();
+        return "";
 
     return libTls->commonTls.rtti;
 }
