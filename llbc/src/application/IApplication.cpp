@@ -38,7 +38,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
 #elif defined(_M_IA64)
     DWORD machineType = IMAGE_FILE_MACHINE_IA64;
 #elif defined(_M_X64)
-    DWORD machineType = IMAGE_FILE_MACHINE_AMD64
+    DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
 #else
     return;
 #endif
