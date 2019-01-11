@@ -130,7 +130,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
 
         free(strs);
     }
-#endif
+#endif // LLBC_TARGET_PLATFORM_WIN32
 
     return backTrace;
 }
