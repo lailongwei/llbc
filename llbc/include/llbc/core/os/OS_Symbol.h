@@ -19,34 +19,32 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_RTTI_H__
-#define __LLBC_COM_RTTI_H__
+#ifndef __LLBC_CORE_OS_OS_SYMBOL_H__
+#define __LLBC_CORE_OS_OS_SYMBOL_H__
 
-#include "llbc/common/Macro.h"
-#include "llbc/common/OSHeader.h"
-#include "llbc/common/StringDataType.h"
+#include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
 
-/**
- * Get type name(demangled).
- */
-#define LLBC_GetTypeName(ty)  LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
+#if LLBC_CFG_OS_IMPL_SYMBOL
 
 /**
- * Get type name(demangled).
+ * Initialize symbol.
+ * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+LLBC_EXTERN LLBC_EXPORT int LLBC_InitSymbol();
 
 /**
- * Demangle cxx type name(only available in non-windows platform).
+ * Capture stack back trace.
+ * @param[in]  skipFrames    - skip frames count, default 0.
+ * @param[out] captureFrames - the final back traces, default is infinite.
+ *                              the infinite value limitd by LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES config option.
+ * @return LLBC_String - The stack back trace string representation.
  */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
+LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = LLBC_INFINITE);
 
-#endif // Non-Win32
+#endif // LLBC_CFG_OS_IMPL_SYMBOL
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_RTTI_H__
+#endif // !__LLBC_CORE_OS_OS_SYMBOL_H__

@@ -27,20 +27,86 @@
 
 __LLBC_NS_BEGIN
 
+const char *__LLBC_GetTypeName(const char *rawTyName)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    char *rtti = tls->commonTls.rtti;
+    int rawTyNameLen = strlen(rawTyName);
+    memcpy(rtti, rawTyName, rawTyNameLen);
+    rtti[rawTyNameLen] = '\0';
+
+    int skipCopy = 0;
+    int totalSkipCopy = 0;
+    char *it = rtti;
+    char *itEnd = rtti + rawTyNameLen;
+    while ((it= strstr(it, "class ")))
+    {
+        int copyLen = itEnd - it - 6;
+        memmove(it, it + 6, copyLen);
+        itEnd -= 6;
+        skipCopy += 6;
+    }
+    totalSkipCopy += skipCopy;
+    rtti[rawTyNameLen - totalSkipCopy] = '\0';
+
+    it = rtti;
+    skipCopy = 0;
+    itEnd = rtti + rawTyNameLen - totalSkipCopy;
+    while ((it= strstr(it, "struct ")))
+    {
+        int copyLen = itEnd - it - 7;
+        memmove(it, it + 7, copyLen);
+        itEnd -= 7;
+        skipCopy += 7;
+    }
+    totalSkipCopy += skipCopy;
+    rtti[rawTyNameLen - totalSkipCopy] = '\0';
+
+    it = rtti;
+    skipCopy = 0;
+    itEnd = rtti + rawTyNameLen - totalSkipCopy;
+    while ((it= strstr(it, " *")))
+    {
+        int copyLen = itEnd - it - 2;
+        memmove(it, it + 2, copyLen);
+        itEnd -= 2;
+        skipCopy += 2;
+
+        if (copyLen == 0)
+            break;
+    }
+    totalSkipCopy += skipCopy;
+    rtti[rawTyNameLen - totalSkipCopy] = '\0';
+
+    char *anonBeg = rtti;
+    while ((anonBeg = strchr(anonBeg, '`')))
+    {
+        *anonBeg = '(';
+        char *anonEnd = strchr(anonBeg + 1, '\'');
+        *anonEnd = ')';
+    }
+
+    return rtti;
+#else // Non-Win32
+    return __LLBC_CXXDemangle(rawTyName);
+#endif // LLBC_TARGET_PLATFORM_WIN32
+}
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
-LLBC_String __LLBC_CxxDemangle(const char *name)
+const char *__LLBC_CxxDemangle(const char *name)
 {
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     if (UNLIKELY(!libTls))
-        return LLBC_String();
+        return "";
 
     int status = 0;
     size_t length = sizeof(libTls->commonTls.rtti);
 
     abi::__cxa_demangle(name, libTls->commonTls.rtti, &length, &status);
     if (status != 0)
-        return LLBC_String();
+        return "";
 
     return libTls->commonTls.rtti;
 }

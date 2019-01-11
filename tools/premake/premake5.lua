@@ -85,6 +85,11 @@ workspace ("llbc_" .. _ACTION)
         characterset "MBCS"
     filter {}
 
+    -- disable some warnings
+    filter { "language:c++" }
+        disablewarnings { "4091" }
+    filter {}
+
 -- ****************************************************************************
 -- llbc core library compile setting
 project "llbc"
@@ -126,6 +131,7 @@ project "llbc"
         links {
             "ws2_32",
             "Mswsock",
+            "DbgHelp",
         }
 
     filter { "system:macosx" }

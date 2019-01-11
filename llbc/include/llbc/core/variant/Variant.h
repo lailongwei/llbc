@@ -62,10 +62,11 @@ public:
         VT_RAW_UINT32           = 0x01000080,
         VT_RAW_LONG             = 0x01000101,
         VT_RAW_ULONG            = 0x01000200,
-        VT_RAW_SINT64           = 0x01000401,
-        VT_RAW_UINT64           = 0x01000800,
-        VT_RAW_FLOAT            = 0x01001001,
-        VT_RAW_DOUBLE           = 0x01002001,
+        VT_RAW_PTR              = 0x01000400,
+        VT_RAW_SINT64           = 0x01000801,
+        VT_RAW_UINT64           = 0x01001000,
+        VT_RAW_FLOAT            = 0x01002001,
+        VT_RAW_DOUBLE           = 0x01004001,
 
         // Str type enumeartion.
         // ! Now, string type's second type only support LLBC_String type.
@@ -172,10 +173,11 @@ public:
         UINT16 = LLBC_VariantType::VT_RAW_UINT16,
         SINT32 = LLBC_VariantType::VT_RAW_SINT32,
         UINT32 = LLBC_VariantType::VT_RAW_UINT32,
-        SINT64 = LLBC_VariantType::VT_RAW_SINT64,
-        UINT64 = LLBC_VariantType::VT_RAW_UINT64,
         LONG = LLBC_VariantType::VT_RAW_LONG,
         ULONG = LLBC_VariantType::VT_RAW_ULONG,
+        PTR = LLBC_VariantType::VT_RAW_PTR,
+        SINT64 = LLBC_VariantType::VT_RAW_SINT64,
+        UINT64 = LLBC_VariantType::VT_RAW_UINT64,
         FLOAT = LLBC_VariantType::VT_RAW_FLOAT,
         DOUBLE = LLBC_VariantType::VT_RAW_DOUBLE,
 
@@ -205,6 +207,8 @@ public:
     explicit LLBC_Variant(const uint32 &uint32Val);
     explicit LLBC_Variant(const long &longVal);
     explicit LLBC_Variant(const ulong &ulongVal);
+    template <typename _T>
+    explicit LLBC_Variant(const _T * const &ptrVal);
     explicit LLBC_Variant(const sint64 &int64Val);
     explicit LLBC_Variant(const uint64 &uint64Val); 
     explicit LLBC_Variant(const float &floatVal);
@@ -233,6 +237,7 @@ public:
     bool IsUInt32() const;
     bool IsLong() const;
     bool IsULong() const;
+    bool IsPtr() const;
     bool IsInt64() const;
     bool IsUInt64() const;
     bool IsFloat() const;
@@ -251,6 +256,7 @@ public:
     LLBC_Variant &BecomeUInt32();
     LLBC_Variant &BecomeLong();
     LLBC_Variant &BecomeULong();
+    LLBC_Variant &BecomePtr();
     LLBC_Variant &BecomeInt64();
     LLBC_Variant &BecomeUInt64();
     LLBC_Variant &BecomeFloat();
@@ -268,6 +274,8 @@ public:
     uint32 AsUInt32() const;
     long AsLong() const;
     unsigned long AsULong() const;
+    template <typename _T>
+    _T *AsPtr() const;
     sint64 AsInt64() const;
     uint64 AsUInt64() const;
     float AsFloat() const;
@@ -284,6 +292,8 @@ public:
     operator uint32 () const;
     operator long () const;
     operator ulong () const;
+    template <typename _T>
+    operator _T * () const;
     operator sint64 () const;
     operator uint64 () const;
     operator float () const;
@@ -339,6 +349,8 @@ public:
     LLBC_Variant &operator =(uint32 val);
     LLBC_Variant &operator =(long val);
     LLBC_Variant &operator =(unsigned long val);
+    template <typename _T>
+    LLBC_Variant &operator =(const _T * const &val);
     LLBC_Variant &operator =(const sint64 &val);
     LLBC_Variant &operator =(const uint64 &val);
     LLBC_Variant &operator =(float val);

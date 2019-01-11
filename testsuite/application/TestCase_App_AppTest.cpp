@@ -40,6 +40,9 @@ namespace
             // _testSvc = LLBC_IService::Create(LLBC_IService::Normal);
             // _testSvc->Start();
 
+            // Test unhandled exception proc
+            TestUnhandledExceptionProc();
+
             return 0;
         }
 
@@ -54,6 +57,58 @@ namespace
             LLBC_XDelete(_testSvc);
         }
 
+    private:
+        void TestUnhandledExceptionProc()
+        {
+            #if LLBC_TARGET_PLATFORM_WIN32
+            LLBC_PrintLine("Test unhandled exception proc:");
+
+            const LLBC_String &dumpFileName = GetName();
+            LLBC_PrintLine("Set dump file: %s", dumpFileName.c_str());
+            SetDumpFile(dumpFileName);
+
+            // Test division by 0 error
+            // TestUnhandledExceptionProc_DivisionByZero();
+
+            // Test invalid pointer read
+            // TestUnhandledExceptionProc_InvalidPtrRead();
+
+            // Test invalid pointer write
+            // TestUnhandledExceptionProc_InvalidPtrWrite();
+            #endif // Win32
+        }
+
+        void TestUnhandledExceptionProc_DivisionByZero()
+        {
+            #if LLBC_TARGET_PLATFORM_WIN32
+            LLBC_PrintLine("Raise division by 0 error, please input 0!");
+            int val1 = 3;
+            int val2 = 0;
+
+            std::cin >> val2;
+            val1 = val1 / val2;
+
+            LLBC_PrintLine("%d", val1);
+            #endif // Win32
+        }
+
+        void TestUnhandledExceptionProc_InvalidPtrWrite()
+        {
+            LLBC_PrintLine("Test invalid pointer write");
+
+            int *invalidPtr4Write = NULL;
+            *invalidPtr4Write = 3;
+
+            LLBC_PrintLine("%d", *invalidPtr4Write);
+        }
+
+        void TestUnhandledExceptionProc_InvalidPtrRead()
+        {
+            LLBC_PrintLine("Test invalid pointer read");
+
+            int *invalidPtr4Write = NULL;
+            LLBC_PrintLine("%d", *invalidPtr4Write);
+        }
     private:
         LLBC_IService *_testSvc;
     };
@@ -80,5 +135,3 @@ int TestCase_App_AppTest::Run(int argc, char *argv[])
 
     return LLBC_OK;
 }
-
-

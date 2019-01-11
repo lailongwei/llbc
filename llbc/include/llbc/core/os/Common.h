@@ -31,6 +31,7 @@
 #include "llbc/core/os/OS_Socket.h"
 #include "llbc/core/os/OS_Select.h"
 #include "llbc/core/os/OS_Network.h"
+#include "llbc/core/os/OS_Symbol.h"
 
 #if LLBC_TARGET_PLATFORM_LINUX
 #include "llbc/core/os/OS_Epoll.h"

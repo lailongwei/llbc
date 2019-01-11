@@ -31,6 +31,12 @@
 
 #include "llbc/common/SocketDataType.h"
 
+// Disable some warnings(on windows platform)
+#if LLBC_TARGET_PLATFORM_WIN32
+ #pragma warning(push)
+ #pragma warning(disable: 4996)
+#endif // Win32
+
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a)
 {
     LLBC_NS LLBC_String str;
@@ -367,5 +373,10 @@ void LLBC_OverlappedGroup::ClearOverlappedMembers(LLBC_POverlapped ol)
 }
 
 __LLBC_NS_END
+
+// Recover warnings setting(on windows platform)
+#if LLBC_TARGET_PLATFORM_WIN32
+ #pragma warning(pop)
+#endif // Win32
 
 #include "llbc/common/AfterIncl.h"

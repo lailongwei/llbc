@@ -24,7 +24,10 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/thread/RecursiveLock.h"
+
+#include "llbc/core/log/LogLevel.h"
 
 __LLBC_NS_BEGIN
 
@@ -95,12 +98,44 @@ public:
 
 public:
     /**
+     * Install logger hook.
+     * @param[in] level    - the log level.
+     * @param[in] hookFunc - the hook function.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData));
+
+    /**
+     * Install logger hook.
+     * @param[in] level    - the log level.
+     * @param[in] obj      - the hook method bound obj.
+     * @param[in] hookMeth - the hook method.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename ObjType>
+    int InstallHook(int level, ObjType *obj, void (ObjType::*hookMeth)(const LLBC_LogData *logData));
+
+    /**
+     * Install logger hook.
+     * @param[in] level     - the log level.
+     * @param[in] hookDeleg - the hook delegate.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg);
+
+    /**
+     * Uninstall error hook.
+     */
+    void UninstallHook(int level);
+
+public:
+    /**
      * Output specific level message.
      * @param[in] tag      - log tag, can set to NULL.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
-     * @param[in] argument - optional arguments.
+     * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Debug(const char *tag, const char *file, int line, const char *fmt, ...);
@@ -163,8 +198,12 @@ private:
     const LLBC_LoggerConfigInfo *_config;
 
     LLBC_LogRunnable *_logRunnable;
+
+    LLBC_IDelegate1<void, const LLBC_LogData *> *_hookDelegs[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/log/LoggerImpl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_H__

@@ -19,34 +19,35 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_RTTI_H__
-#define __LLBC_COM_RTTI_H__
-
-#include "llbc/common/Macro.h"
-#include "llbc/common/OSHeader.h"
-#include "llbc/common/StringDataType.h"
+#ifdef __LLBC_CORE_LOG_LOGGER_H__
 
 __LLBC_NS_BEGIN
 
-/**
- * Get type name(demangled).
- */
-#define LLBC_GetTypeName(ty)  LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
+inline int LLBC_Logger::InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData))
+{
+    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg = 
+        new LLBC_Func1<void, const LLBC_LogData *>(hookFunc);
 
-/**
- * Get type name(demangled).
- */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
+    int installRet = InstallHook(level, hookDeleg);
+    if (installRet != LLBC_OK)
+        LLBC_Delete(hookDeleg);
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+    return installRet;
+}
 
-/**
- * Demangle cxx type name(only available in non-windows platform).
- */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
+template <typename ObjType>
+inline int LLBC_Logger::InstallHook(int level, ObjType *obj, void ( ObjType::*hookMeth)(const LLBC_LogData *logData))
+{
+    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg =
+        new LLBC_Delegate1<void, ObjType, const LLBC_LogData *>(obj, hookMeth);
 
-#endif // Non-Win32
+    int installRet = InstallHook(level, hookDeleg);
+    if (installRet != LLBC_OK)
+        LLBC_Delete(hookDeleg);
+
+    return installRet;
+}
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_RTTI_H__
+#endif // __LLBC_CORE_LOG_LOGGER_H__

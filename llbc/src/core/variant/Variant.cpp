@@ -80,6 +80,7 @@ void LLBC_VariantType::InitType2StrDict()
         _typeDescs.insert(std::make_pair(VT_RAW_UINT32, "uint32"));
         _typeDescs.insert(std::make_pair(VT_RAW_LONG, "long"));
         _typeDescs.insert(std::make_pair(VT_RAW_ULONG, "ulong"));
+        _typeDescs.insert(std::make_pair(VT_RAW_PTR, "ptr"));
         _typeDescs.insert(std::make_pair(VT_RAW_SINT64, "int64"));
         _typeDescs.insert(std::make_pair(VT_RAW_UINT64, "uint64"));
         _typeDescs.insert(std::make_pair(VT_RAW_FLOAT, "float"));
@@ -119,88 +120,6 @@ LLBC_Variant::Holder::~Holder()
         LLBC_XDelete(obj.dict);
 }
 
-LLBC_Variant::LLBC_Variant()
-{
-}
-
-LLBC_Variant::LLBC_Variant(const bool &boolVal)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_BOOL;
-    _holder.raw.int64Val = boolVal ? 1 : 0;
-}
-
-LLBC_Variant::LLBC_Variant(const sint8 &sint8Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_SINT8;
-    _holder.raw.int64Val = sint8Val;
-}
-
-LLBC_Variant::LLBC_Variant(const uint8 &uint8Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_UINT8;
-    _holder.raw.uint64Val = uint8Val;
-}
-
-LLBC_Variant::LLBC_Variant(const sint16 &sint16Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_SINT16;
-    _holder.raw.int64Val = sint16Val;
-}
-
-LLBC_Variant::LLBC_Variant(const uint16 &uint16Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_UINT16;
-    _holder.raw.uint64Val = uint16Val;
-}
-
-LLBC_Variant::LLBC_Variant(const sint32 &sint32Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_SINT32;
-    _holder.raw.int64Val = sint32Val;
-}
-
-LLBC_Variant::LLBC_Variant(const uint32 &uint32Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_UINT32;
-    _holder.raw.uint64Val = uint32Val;
-}
-
-LLBC_Variant::LLBC_Variant(const long &longVal)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_LONG;
-    _holder.raw.int64Val = longVal;
-}
-
-LLBC_Variant::LLBC_Variant(const ulong &ulongVal)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_ULONG;
-    _holder.raw.uint64Val = ulongVal;
-}
-
-LLBC_Variant::LLBC_Variant(const sint64 &int64Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_SINT64;
-    _holder.raw.int64Val = int64Val;
-}
-
-LLBC_Variant::LLBC_Variant(const uint64 &uint64Val)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_UINT64;
-    _holder.raw.uint64Val = uint64Val;
-}
-
-LLBC_Variant::LLBC_Variant(const float &floatVal)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_FLOAT;
-    _holder.raw.doubleVal = floatVal;
-}
-
-LLBC_Variant::LLBC_Variant(const double &doubleVal)
-{
-    _holder.type = LLBC_VariantType::VT_RAW_DOUBLE;
-    _holder.raw.doubleVal = doubleVal;
-}
-
 LLBC_Variant::LLBC_Variant(const char *cstrVal)
 {
     _holder.type = LLBC_VariantType::VT_STR_DFT;
@@ -212,286 +131,9 @@ LLBC_Variant::LLBC_Variant(const char *cstrVal)
     }
 }
 
-LLBC_Variant::LLBC_Variant(const std::string &strVal)
-{
-    _holder.type = LLBC_VariantType::VT_STR_DFT;
-    if (!strVal.empty())
-        _holder.obj.str = LLBC_New2(LLBC_String, strVal.data(), strVal.size());
-}
-
-LLBC_Variant::LLBC_Variant(const LLBC_String &strVal)
-{
-    _holder.type = LLBC_VariantType::VT_STR_DFT;
-    if (!strVal.empty())
-        _holder.obj.str = LLBC_New1(LLBC_String, strVal);
-}
-
-LLBC_Variant::LLBC_Variant(const Dict &dictVal)
-{
-    _holder.type = LLBC_VariantType::VT_DICT_DFT;
-    if (!dictVal.empty())
-        _holder.obj.dict = LLBC_New1(Dict, dictVal);
-}
-
 LLBC_Variant::LLBC_Variant(const LLBC_Variant &varVal)
 {
     LLBC_VariantTraits::assign(*this, varVal);
-}
-
-int LLBC_Variant::GetType() const
-{
-    return _holder.type;
-}
-
-const LLBC_Variant::Holder &LLBC_Variant::GetHolder() const
-{
-    return _holder;
-}
-
-bool LLBC_Variant::IsNil() const
-{
-    return (_holder.type  == LLBC_VariantType::VT_NIL);
-}
-
-bool LLBC_Variant::IsRaw() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW) == 
-        LLBC_VariantType::VT_RAW);
-}
-
-bool LLBC_Variant::IsSignedRaw() const
-{
-    return (IsRaw() && 
-        ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) == 
-            LLBC_VariantType::VT_MASK_RAW_SIGNED));
-}
-
-bool LLBC_Variant::IsUnsignedRaw() const
-{
-    return (IsRaw() &&
-        ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) !=
-            LLBC_VariantType::VT_MASK_RAW_SIGNED));
-}
-
-bool LLBC_Variant::IsBool() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_BOOL) == 
-        LLBC_VariantType::VT_RAW_BOOL);
-}
-
-bool LLBC_Variant::IsInt8() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT8) ==
-        LLBC_VariantType::VT_RAW_SINT8);
-}
-
-bool LLBC_Variant::IsUInt8() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT8) ==
-        LLBC_VariantType::VT_RAW_UINT8);
-}
-
-bool LLBC_Variant::IsInt16() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT16) ==
-        LLBC_VariantType::VT_RAW_SINT16);
-}
-
-bool LLBC_Variant::IsUInt16() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT16) ==
-        LLBC_VariantType::VT_RAW_UINT16);
-}
-
-bool LLBC_Variant::IsInt32() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT32) ==
-        LLBC_VariantType::VT_RAW_SINT32);
-}
-
-bool LLBC_Variant::IsUInt32() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT32) ==
-        LLBC_VariantType::VT_RAW_UINT32);
-}
-
-bool LLBC_Variant::IsLong() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_LONG) ==
-        LLBC_VariantType::VT_RAW_LONG);
-}
-
-bool LLBC_Variant::IsULong() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_ULONG) ==
-        LLBC_VariantType::VT_RAW_ULONG);
-}
-
-bool LLBC_Variant::IsInt64() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT64) ==
-        LLBC_VariantType::VT_RAW_SINT64);
-}
-
-bool LLBC_Variant::IsUInt64() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT64) ==
-        LLBC_VariantType::VT_RAW_UINT64);
-}
-
-bool LLBC_Variant::IsFloat() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_FLOAT) ==
-        LLBC_VariantType::VT_RAW_FLOAT);
-}
-
-bool LLBC_Variant::IsDouble() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_RAW_DOUBLE) ==
-        LLBC_VariantType::VT_RAW_DOUBLE);
-}
-
-bool LLBC_Variant::IsStr() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_STR_DFT) ==
-        LLBC_VariantType::VT_STR_DFT);
-}
-
-bool LLBC_Variant::IsDict() const
-{
-    return ((_holder.type & LLBC_VariantType::VT_DICT_DFT) ==
-        LLBC_VariantType::VT_DICT_DFT);
-}
-
-LLBC_Variant &LLBC_Variant::BecomeNil()
-{
-    if (IsNil())
-        return *this;
-
-    CleanTypeData(_holder.type);
-    _holder.type = LLBC_VariantType::VT_NIL;
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeBool()
-{
-    if (!IsBool())
-        *this = LLBC_Variant(AsBool());
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeInt8()
-{
-    if (!IsInt8())
-        *this = AsInt8();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeUInt8()
-{
-    if (!IsUInt8())
-        *this = AsUInt8();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeInt16()
-{
-    if (!IsInt16())
-        *this = AsInt16();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeUInt16()
-{
-    if (!IsUInt16())
-        *this = AsUInt16();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeInt32()
-{
-    if (!IsInt32())
-        *this = AsInt32();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeUInt32()
-{
-    if (!IsUInt32())
-        *this = AsUInt32();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeLong()
-{
-    if (!IsLong())
-        *this = AsLong();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeULong()
-{
-    if (!IsULong())
-        *this = AsULong();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeInt64()
-{
-    if (!IsInt64())
-        *this = AsInt64();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeUInt64()
-{
-    if (!IsUInt64())
-        *this = AsUInt64();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeFloat()
-{
-    if (!IsFloat())
-        *this = AsFloat();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeDouble()
-{
-    if (!IsDouble())
-        *this = AsDouble();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeStr()
-{
-    if (!IsStr())
-        *this = AsStr();
-
-    return *this;
-}
-
-LLBC_Variant &LLBC_Variant::BecomeDict()
-{
-    if (!IsDict())
-        *this = AsDict();
-
-    return *this;
 }
 
 bool LLBC_Variant::AsBool() const
@@ -518,46 +160,6 @@ bool LLBC_Variant::AsBool() const
     }
 
     return _holder.raw.uint64Val != 0;
-}
-
-sint8 LLBC_Variant::AsInt8() const
-{
-    return static_cast<sint8>(AsInt64());
-}
-
-uint8 LLBC_Variant::AsUInt8() const
-{
-    return static_cast<uint8>(AsUInt64());
-}
-
-sint16 LLBC_Variant::AsInt16() const
-{
-    return static_cast<sint16>(AsInt64());
-}
-
-uint16 LLBC_Variant::AsUInt16() const
-{
-    return static_cast<uint16>(AsUInt64());
-}
-
-sint32 LLBC_Variant::AsInt32() const
-{
-    return static_cast<sint32>(AsInt64());
-}
-
-uint32 LLBC_Variant::AsUInt32() const
-{
-    return static_cast<uint32>(AsUInt64());
-}
-
-long LLBC_Variant::AsLong() const
-{
-    return static_cast<long>(AsInt64());
-}
-
-unsigned long LLBC_Variant::AsULong() const
-{
-    return static_cast<unsigned long>(AsUInt64());
 }
 
 sint64 LLBC_Variant::AsInt64() const
@@ -588,11 +190,6 @@ uint64 LLBC_Variant::AsUInt64() const
         return static_cast<uint64>(_holder.raw.doubleVal);
 
     return _holder.raw.uint64Val;
-}
-
-float LLBC_Variant::AsFloat() const
-{
-    return static_cast<float>(AsDouble());
 }
 
 double LLBC_Variant::AsDouble() const
@@ -646,81 +243,6 @@ const Dict &LLBC_Variant::AsDict() const
         return *_holder.obj.dict;
 
     return LLBC_INL_NS __g_nullDict;
-}
-
-LLBC_Variant::operator bool() const
-{
-    return AsBool();
-}
-
-LLBC_Variant::operator sint8() const
-{
-    return AsInt8();
-}
-
-LLBC_Variant::operator uint8() const
-{
-    return AsUInt8();
-}
-
-LLBC_Variant::operator sint16() const
-{
-    return AsInt16();
-}
-
-LLBC_Variant::operator uint16() const
-{
-    return AsUInt16();
-}
-
-LLBC_Variant::operator sint32() const
-{
-    return AsInt32();
-}
-
-LLBC_Variant::operator uint32() const
-{
-    return AsUInt32();
-}
-
-LLBC_Variant::operator long() const
-{
-    return AsLong();
-}
-
-LLBC_Variant::operator ulong() const
-{
-    return AsULong();
-}
-
-LLBC_Variant::operator sint64() const
-{
-    return AsInt64();
-}
-
-LLBC_Variant::operator uint64() const
-{
-    return AsUInt64();
-}
-
-LLBC_Variant::operator float() const
-{
-    return AsFloat();
-}
-
-LLBC_Variant::operator double() const
-{
-    return AsDouble();
-}
-
-LLBC_Variant::operator LLBC_String () const
-{
-    return AsStr();
-}
-
-LLBC_Variant::operator const Dict &() const
-{
-    return AsDict();
 }
 
 DictIter LLBC_Variant::Begin()
@@ -1155,6 +677,9 @@ LLBC_String LLBC_Variant::ValueToString() const
     case LLBC_VariantType::VT_RAW_ULONG:
     case LLBC_VariantType::VT_RAW_UINT64:
         return LLBC_Num2Str(_holder.raw.uint64Val);
+
+    case LLBC_VariantType::VT_RAW_PTR:
+        return LLBC_String().format("0x%p", _holder.raw.uint64Val);
 
     case LLBC_VariantType::VT_RAW_FLOAT:
     case LLBC_VariantType::VT_RAW_DOUBLE:

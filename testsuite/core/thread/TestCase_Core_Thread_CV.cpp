@@ -30,11 +30,12 @@ static struct
 } __g_testData;
 
 static LLBC_SimpleLock __g_outLock;
-static const int __g_waiterThreadCount = 5;
+static const long __g_waiterThreadCount = 5;
 
 static int WaiterThreadProc(void *arg)
 {
-    const int threadIndex = static_cast<int>(reinterpret_cast<long>(arg));
+    long threadIndex;
+    ::memcpy(&threadIndex, &arg, sizeof(long));
 
     __g_outLock.Lock();
     std::cout <<"I'm waiter thread " <<threadIndex <<std::endl;
@@ -157,9 +158,11 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
 
     // Create waiters.
     LLBC_NativeThreadHandle waiters[__g_waiterThreadCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(int i = 0; i < __g_waiterThreadCount; i ++)
+    for(long i = 0; i < __g_waiterThreadCount; i ++)
     {
-        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, reinterpret_cast<void *>(i));
+        void *threadArg = NULL;
+        ::memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
     }
 
     // Create signaler.
@@ -170,7 +173,7 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
     LLBC_JoinThread(signaler);
 
     // Cancel and join signaler.
-    for(int i = 0; i < __g_waiterThreadCount; i ++)
+    for(long i = 0; i < __g_waiterThreadCount; i ++)
     {
         LLBC_CancelThread(waiters[i]);
         LLBC_JoinThread(waiters[i]);

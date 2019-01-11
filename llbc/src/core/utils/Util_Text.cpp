@@ -525,8 +525,8 @@ void *LLBC_Str2Ptr(const char *str)
         }
     }
 
-    ulong ptrVal = 0;
-    ulong baseVal = hexFormat ? 16 : 10;
+    uint64 ptrVal = 0;
+    uint64 baseVal = hexFormat ? 16 : 10;
     for (LLBC_String::size_type i = 0; i < lowerStr.size(); i ++)
     {
         ptrVal *= baseVal;
@@ -540,7 +540,10 @@ void *LLBC_Str2Ptr(const char *str)
         }
     }
 
-    return reinterpret_cast<void *>(ptrVal);
+    void *ptr;
+    ::memcpy(&ptr, &ptrVal, sizeof(void *));
+
+    return ptr;
 }
 
 double LLBC_Str2Double(const char *str)

@@ -19,34 +19,32 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_RTTI_H__
-#define __LLBC_COM_RTTI_H__
+#ifndef __LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
+#define __LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
 
-#include "llbc/common/Macro.h"
-#include "llbc/common/OSHeader.h"
-#include "llbc/common/StringDataType.h"
+#include "llbc.h"
+using namespace llbc;
 
-__LLBC_NS_BEGIN
+class TestCase_Core_OS_Symbol : public LLBC_BaseTestCase
+{
+public:
+    TestCase_Core_OS_Symbol();
+    virtual ~TestCase_Core_OS_Symbol();
 
-/**
- * Get type name(demangled).
- */
-#define LLBC_GetTypeName(ty)  LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
+public:
+    virtual int Run(int argc, char *argv[]);
 
-/**
- * Get type name(demangled).
- */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
+private:
+    void Foo1();
+    void Foo2();
+    void Foo3();
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+    void Goo1();
+    void Goo2();
+    void Goo3();
 
-/**
- * Demangle cxx type name(only available in non-windows platform).
- */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
+    void PrintBackTrace();
+};
 
-#endif // Non-Win32
+#endif // !__LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
 
-__LLBC_NS_END
-
-#endif // !__LLBC_COM_RTTI_H__

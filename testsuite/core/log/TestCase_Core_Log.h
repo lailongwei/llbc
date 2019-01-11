@@ -33,6 +33,9 @@ public:
 
 public:
     int Run(int argc, char *argv[]);
+
+private:
+    void _OnLogHook(const LLBC_LogData *logData);
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_LOG_H__

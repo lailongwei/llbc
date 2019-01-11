@@ -22,7 +22,7 @@
 
 #include "core/thread/TestCase_Core_Thread_RWLock.h"
 
-static const int __g_readerCount = 5;
+static const long __g_readerCount = 5;
 static const int __g_updateTimes = 50000;
 static LLBC_SimpleLock __g_outLock;
 
@@ -34,7 +34,9 @@ static struct
 
 static int Reader_ThreadProc(void *arg)
 {
-    int threadIndex = static_cast<int>(reinterpret_cast<long>(arg));
+    long threadIndex;
+    ::memcpy(&threadIndex, &arg, sizeof(long));
+
     __g_outLock.Lock();
     std::cout <<"I'm reader: " <<threadIndex <<std::endl;
     __g_outLock.Unlock();
@@ -93,9 +95,11 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
 
     // Create readers.
     LLBC_NativeThreadHandle readers[__g_readerCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(int i = 0; i < __g_readerCount; i ++)
+    for(long i = 0; i < __g_readerCount; i ++)
     {
-        LLBC_CreateThread(&readers[i], &Reader_ThreadProc, reinterpret_cast<void *>(i));
+        void *threadArg = NULL;
+        ::memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&readers[i], &Reader_ThreadProc, threadArg);
     }
 
     // Create writer.
@@ -106,7 +110,7 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
     LLBC_JoinThread(writer);
 
     // Cancel readers and join it.
-    for(int i = 0; i < __g_readerCount; i ++)
+    for(long i = 0; i < __g_readerCount; i ++)
     {
         LLBC_CancelThread(readers[i]);
         LLBC_JoinThread(readers[i]);

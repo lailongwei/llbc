@@ -38,6 +38,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Com_RTTI);
 
     /* Core module testcases. */
+    // test = LLBC_New0(TestCase_Core_OS_Symbol);
     // test = LLBC_New0(TestCase_Core_OS_Thread);
     // test = LLBC_New0(TestCase_Core_OS_Console);
     // test = LLBC_New0(TestCase_Core_Bundle);

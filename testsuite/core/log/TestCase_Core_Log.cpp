@@ -34,11 +34,13 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/log test:");
 
+    // Initialize logger manager.
 #if LLBC_TARGET_PLATFORM_IPHONE
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
     if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_OK)
 #else
 
+    LLBC_String a = LLBC_Directory::AbsPath("Logger_Cfg.cfg");
     if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_OK)
 #endif
     {
@@ -47,12 +49,19 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         return -1;
     }
 
+    // Install logger hook(to root logger).
+    LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
+    rootLogger->InstallHook(LLBC_LogLevel::Debug, this, &TestCase_Core_Log::_OnLogHook);
+
     // Use root logger to test.
     LLBC_DEBUG_LOG("This is a debug log message.");
     LLBC_DEBUG_LOG2("test_tag", "This is a debug log message.");
 
     Log.d("This is a debug log message(from Log.d())");
     Log.d2("test_tag", "This is a debug log message(from Log.d2())");
+
+    // Uninstall logger hook(from root logger).
+    rootLogger->UninstallHook(LLBC_LogLevel::Debug);
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LLBC_DEBUG_LOG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
@@ -156,3 +165,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     return 0;
 }
+
+void TestCase_Core_Log::_OnLogHook(const LLBC_LogData *logData)
+{
+    LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
+                   logData->loggerName, LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
+}
+
