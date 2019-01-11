@@ -35,8 +35,6 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
 {
 #if defined(_M_IX86)
     DWORD machineType = IMAGE_FILE_MACHINE_I386;
-#elif defined(_M_IA64)
-    DWORD machineType = IMAGE_FILE_MACHINE_IA64;
 #elif defined(_M_X64)
     DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
 #else
@@ -45,12 +43,21 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
 
     STACKFRAME64 stackFrame64;
     ::memset(&stackFrame64, 0, sizeof(STACKFRAME64));
+#if defined(_M_IX86)
     stackFrame64.AddrPC.Offset = ctx->Eip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
     stackFrame64.AddrStack.Offset = ctx->Esp;
     stackFrame64.AddrStack.Mode = AddrModeFlat;
     stackFrame64.AddrFrame.Offset = ctx->Ebp;
     stackFrame64.AddrFrame.Mode = AddrModeFlat;
+#elif (_M_X64)
+    stackFrame64.AddrPC.Offset = ctx->Rip;
+    stackFrame64.AddrPC.Mode = AddrModeFlat;
+    stackFrame64.AddrStack.Offset = ctx->Rsp;
+    stackFrame64.AddrStack.Mode = AddrModeFlat;
+    stackFrame64.AddrFrame.Offset = ctx->Rbp;
+    stackFrame64.AddrFrame.Mode = AddrModeFlat;
+#endif // _M_IX86
 
     HANDLE curProc = ::GetCurrentProcess();
     HANDLE curThread = ::GetCurrentThread();
