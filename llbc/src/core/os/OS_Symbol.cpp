@@ -57,7 +57,10 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     DWORD displacement;
     HANDLE curProc = ::GetCurrentProcess();
     SYMBOL_INFO *symbol = libTls->coreTls.symbol.win32Symbol;
-    const WORD frames = ::CaptureStackBackTrace(skipFrames + 1, captureFrames, stack, NULL);
+    const WORD frames = ::CaptureStackBackTrace(static_cast<DWORD>(skipFrames) + 1,
+                                                static_cast<DWORD>(captureFrames),
+                                                stack,
+                                                NULL);
 
     for (WORD frame = 0; frame != frames; frame++)
     {
