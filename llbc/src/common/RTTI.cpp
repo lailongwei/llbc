@@ -27,6 +27,22 @@
 
 __LLBC_NS_BEGIN
 
+#define __LLBC_GET_TYPE_NAME_Trim(str, len)      \
+    it = rtti;                                   \
+    skipCopy = 0;                                \
+    itEnd = rtti + rawTyNameLen - totalSkipCopy; \
+    while ((it= strstr(it, str)))                \
+    {                                            \
+        int copyLen = itEnd - it - len;          \
+        memmove(it, it + len, copyLen);          \
+        itEnd -= len;                            \
+        skipCopy += len;                         \
+        if (copyLen == 0)                        \
+            break;                               \
+    }                                            \
+    totalSkipCopy += skipCopy;                   \
+    rtti[rawTyNameLen - totalSkipCopy] = '\0'    \
+
 const char *__LLBC_GetTypeName(const char *rawTyName)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -36,48 +52,14 @@ const char *__LLBC_GetTypeName(const char *rawTyName)
     memcpy(rtti, rawTyName, rawTyNameLen);
     rtti[rawTyNameLen] = '\0';
 
-    int skipCopy = 0;
     int totalSkipCopy = 0;
-    char *it = rtti;
-    char *itEnd = rtti + rawTyNameLen;
-    while ((it= strstr(it, "class ")))
-    {
-        int copyLen = itEnd - it - 6;
-        memmove(it, it + 6, copyLen);
-        itEnd -= 6;
-        skipCopy += 6;
-    }
-    totalSkipCopy += skipCopy;
-    rtti[rawTyNameLen - totalSkipCopy] = '\0';
 
-    it = rtti;
-    skipCopy = 0;
-    itEnd = rtti + rawTyNameLen - totalSkipCopy;
-    while ((it= strstr(it, "struct ")))
-    {
-        int copyLen = itEnd - it - 7;
-        memmove(it, it + 7, copyLen);
-        itEnd -= 7;
-        skipCopy += 7;
-    }
-    totalSkipCopy += skipCopy;
-    rtti[rawTyNameLen - totalSkipCopy] = '\0';
-
-    it = rtti;
-    skipCopy = 0;
-    itEnd = rtti + rawTyNameLen - totalSkipCopy;
-    while ((it= strstr(it, " *")))
-    {
-        int copyLen = itEnd - it - 2;
-        memmove(it, it + 2, copyLen);
-        itEnd -= 2;
-        skipCopy += 2;
-
-        if (copyLen == 0)
-            break;
-    }
-    totalSkipCopy += skipCopy;
-    rtti[rawTyNameLen - totalSkipCopy] = '\0';
+    int skipCopy;
+    char *it;
+    char *itEnd;
+    __LLBC_GET_TYPE_NAME_Trim("class ", 6);
+    __LLBC_GET_TYPE_NAME_Trim("struct ", 7);
+    __LLBC_GET_TYPE_NAME_Trim(" *", 2);
 
     char *anonBeg = rtti;
     while ((anonBeg = strchr(anonBeg, '`')))
@@ -89,9 +71,11 @@ const char *__LLBC_GetTypeName(const char *rawTyName)
 
     return rtti;
 #else // Non-Win32
-    return __LLBC_CXXDemangle(rawTyName);
+    return __LLBC_CxxDemangle(rawTyName);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
+
+#undef __LLBC_GET_TYPE_NAME_Trim
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
