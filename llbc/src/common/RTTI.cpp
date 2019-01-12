@@ -89,7 +89,7 @@ const char *__LLBC_GetTypeName(const char *rawTyName)
 
     return rtti;
 #else // Non-Win32
-    return __LLBC_CXXDemangle(rawTyName);
+    return __LLBC_CxxDemangle(rawTyName);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
