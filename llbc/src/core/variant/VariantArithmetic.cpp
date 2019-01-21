@@ -31,6 +31,10 @@ void LLBC_VariantArithmetic::Performs(LLBC_Variant &left, const LLBC_Variant &ri
 {
     switch (left.GetType())
     {
+    case LLBC_VariantType::VT_NIL:
+        left = right;
+        break;
+
     case LLBC_VariantType::VT_RAW_BOOL:
         LLBC_VariantArithmetic::Performs_bool_any(left, right, type);
         break;
