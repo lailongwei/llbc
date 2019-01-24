@@ -72,6 +72,7 @@ int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
+        return LLBC_FAILED;
     }
 
     // Parse startup arguments.
