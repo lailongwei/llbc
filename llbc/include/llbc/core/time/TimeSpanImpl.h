@@ -57,11 +57,6 @@ inline LLBC_TimeSpan::~LLBC_TimeSpan()
 {
 }
 
-inline const sint64 &LLBC_TimeSpan::GetSpan() const
-{
-    return _span;
-}
-
 inline int LLBC_TimeSpan::GetDays() const
 {
     return static_cast<int>(_span / LLBC_Time::NumOfMicroSecondsPerDay);

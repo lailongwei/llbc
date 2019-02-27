@@ -89,12 +89,6 @@ public:
 
 public:
     /**
-     * Get span value, in micro-seconds.
-     * @return const sint64 & - the time span value, in seconds.
-     */
-    const sint64 &GetSpan() const;
-
-    /**
      * Get days/hours/minutes/seconds/milli-seconds/micro-seconds.
      * @return int - the time span parts value.
      */
