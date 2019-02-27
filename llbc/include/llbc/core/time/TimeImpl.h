@@ -120,6 +120,82 @@ inline LLBC_String LLBC_Time::Format(const time_t &clanderTimeInSeconds, const c
     return FromSeconds(clanderTimeInSeconds).Format(format);
 }
 
+inline LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format)
+{
+    return FromSeconds(clanderTimeInSeconds).FormatAsGmt(format);
+}
+
+inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
+{
+    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
+}
+
+inline LLBC_Time LLBC_Time::FromMilliSeconds(sint64 clanderTimeInMilliSeconds)
+{
+    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
+}
+
+inline LLBC_Time LLBC_Time::FromMicroSeconds(sint64 clanderTimeInMicroSeconds)
+{
+    return LLBC_Time(clanderTimeInMicroSeconds);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
+{
+    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
+{
+    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
+}
+
+inline bool LLBC_Time::operator ==(const LLBC_Time &time) const
+{
+    return _time == time._time;
+}
+
+inline bool LLBC_Time::operator !=(const LLBC_Time &time) const
+{
+    return _time != time._time;
+}
+
+inline bool LLBC_Time::operator <(const LLBC_Time &time) const
+{
+    return _time < time._time;
+}
+
+inline bool LLBC_Time::operator >(const LLBC_Time &time) const
+{
+    return _time > time._time;
+}
+
+inline bool LLBC_Time::operator >=(const LLBC_Time &time) const
+{
+    return _time >= time._time;
+}
+
+inline bool LLBC_Time::operator <=(const LLBC_Time &time) const
+{
+    return _time <= time._time;
+}
+
+inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
+{
+    stream.Write(_time);
+}
+
+inline void LLBC_Time::SerializeEx(LLBC_Stream &stream) const
+{
+    stream.WriteEx(_time);
+}
+
+inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroSeconds)
+: _time(clanderTimeInMicroSeconds)
+{
+    UpdateTimeStructs();
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_TIME_TIME_H__

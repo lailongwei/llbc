@@ -141,36 +141,6 @@ LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
     return buf;
 }
 
-LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format)
-{
-    return FromSeconds(clanderTimeInSeconds).FormatAsGmt(format);
-}
-
-LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
-{
-    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
-}
-
-LLBC_Time LLBC_Time::FromMilliSeconds(sint64 clanderTimeInMilliSeconds)
-{
-    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
-}
-
-LLBC_Time LLBC_Time::FromMicroSeconds(sint64 clanderTimeInMicroSeconds)
-{
-    return LLBC_Time(clanderTimeInMicroSeconds);
-}
-
-LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
-{
-    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
-}
-
-class LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
-{
-    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
-}
-
 LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
 {
     if (UNLIKELY(timeRepr.empty()))
@@ -391,8 +361,7 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond) const
 {
-    LLBC_TimeSpan span(0, hour, minute, second, milliSecond, microSecond);
-    return GetIntervalTo(span);
+    return GetIntervalTo(LLBC_TimeSpan(0, hour, minute, second, milliSecond, microSecond));
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span)
@@ -407,14 +376,12 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, int hour, int minu
 
 LLBC_TimeSpan LLBC_Time::operator -(const LLBC_Time &time) const
 {
-    LLBC_TimeSpan ts(_time - time._time);
-    return ts;
+    return LLBC_TimeSpan(_time - time._time);
 }
 
 LLBC_TimeSpan LLBC_Time::operator +(const LLBC_Time &time) const
 {
-    LLBC_TimeSpan ts(_time - time._time);
-    return ts;
+    return LLBC_TimeSpan(_time - time._time);
 }
 
 LLBC_Time LLBC_Time::operator +(const LLBC_TimeSpan &span) const
@@ -425,36 +392,6 @@ LLBC_Time LLBC_Time::operator +(const LLBC_TimeSpan &span) const
 LLBC_Time LLBC_Time::operator -(const LLBC_TimeSpan &span) const
 {
     return LLBC_Time(_time - span.GetTotalMicroSeconds());
-}
-
-bool LLBC_Time::operator ==(const LLBC_Time &time) const
-{
-    return _time == time._time;
-}
-
-bool LLBC_Time::operator !=(const LLBC_Time &time) const
-{
-    return _time != time._time;
-}
-
-bool LLBC_Time::operator <(const LLBC_Time &time) const
-{
-    return _time < time._time;
-}
-
-bool LLBC_Time::operator >(const LLBC_Time &time) const
-{
-    return _time > time._time;
-}
-
-bool LLBC_Time::operator >=(const LLBC_Time &time) const
-{
-    return _time >= time._time;
-}
-
-bool LLBC_Time::operator <=(const LLBC_Time &time) const
-{
-    return _time <= time._time;
 }
 
 LLBC_Time &LLBC_Time::operator =(const LLBC_Time &time)
@@ -477,11 +414,6 @@ LLBC_String LLBC_Time::ToString() const
     return repr.format("%s.%06d", Format().c_str(), GetMilliSecond() * NumOfMicroSecondsPerMilliSecond + GetMicroSecond());
 }
 
-    void LLBC_Time::Serialize(LLBC_Stream &stream) const
-{
-    stream.Write(_time);
-}
-
 bool LLBC_Time::DeSerialize(LLBC_Stream &stream)
 {
     sint64 timeVal = 0;
@@ -492,11 +424,6 @@ bool LLBC_Time::DeSerialize(LLBC_Stream &stream)
     UpdateTimeStructs();
 
     return true;
-}
-
-void LLBC_Time::SerializeEx(LLBC_Stream &stream) const
-{
-    stream.WriteEx(_time);
 }
 
 bool LLBC_Time::DeSerializeEx(LLBC_Stream &stream)
@@ -511,13 +438,7 @@ bool LLBC_Time::DeSerializeEx(LLBC_Stream &stream)
     return true;
 }
 
-LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroSeconds)
-: _time(clanderTimeInMicroSeconds)
-{
-    UpdateTimeStructs();
-}
-
-    void LLBC_Time::UpdateTimeStructs()
+void LLBC_Time::UpdateTimeStructs()
 {
     time_t calendarTime = static_cast<time_t>(_time / NumOfMicroSecondsPerSecond);
     #if LLBC_TARGET_PLATFORM_WIN32
