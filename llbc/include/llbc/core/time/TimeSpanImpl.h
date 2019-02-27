@@ -184,7 +184,6 @@ inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(const LLBC_TimeSpan &span)
     return *this;
 }
 
-
 inline LLBC_String LLBC_TimeSpan::ToString() const
 {
     int days = GetDays();
