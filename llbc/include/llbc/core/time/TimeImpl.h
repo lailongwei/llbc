@@ -92,7 +92,7 @@ inline const sint64 &LLBC_Time::GetTimeTick() const
 
 inline time_t LLBC_Time::GetTimeStamp() const
 {
-    return static_cast<uint32>(_time / NumOfMicroSecondsPerSecond);
+    return static_cast<time_t>(_time / NumOfMicroSecondsPerSecond);
 }
 
 inline const tm &LLBC_Time::GetGmtTime() const
