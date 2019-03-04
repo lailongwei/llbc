@@ -23,7 +23,6 @@
 #define __LLBC_COM_RTTI_H__
 
 #include "llbc/common/Macro.h"
-#include "llbc/common/OSHeader.h"
 #include "llbc/common/StringDataType.h"
 
 __LLBC_NS_BEGIN

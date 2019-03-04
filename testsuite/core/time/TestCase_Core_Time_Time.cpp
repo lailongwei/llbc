@@ -104,18 +104,18 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<std::endl;
 
     std::cout <<"AddMonths() test:" <<std::endl;
-    for (int i = 1; i <= 13; i++)
+    for (int i = 1; i <= 15; i++)
         std::cout <<i <<": " <<now.AddMonths(i) <<", -" <<i <<": " <<now.AddMonths(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddDays() test:" <<std::endl;
-    for (int i = 1; i <= 32; i++)
+    for (int i = 1; i <= 70; i++)
         std::cout <<i <<": " <<now.AddDays(i) <<", -" <<i <<": " <<now.AddDays(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddHours() test:" <<std::endl;
     for (int i = 1; i <= 62; i++)
-        std::cout <<i <<": " <<now.AddHours(i) <<", -" <<i <<": " <<now.AddMinutes(-i) <<"\n";
+        std::cout <<i <<": " <<now.AddHours(i) <<", -" <<i <<": " <<now.AddHours(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddMinutes() test:" <<std::endl;
@@ -128,16 +128,24 @@ void TestCase_Core_Time_Time::TimeClassTest()
         std::cout <<i <<": " <<now.AddSeconds(i) <<", -" <<i <<": " <<now.AddSeconds(-i) <<"\n";
     std::cout <<std::endl;
 
-    std::cout <<"AddMilliSeconds() test:" <<std::endl;
+    int addMilliSecsStep = 500;
+    std::cout <<"AddMilliSeconds() test(step:+/- " <<addMilliSecsStep <<" milli-seconds):" <<std::endl;
     for (int i = 1; i <= 3; i++)
-        std::cout <<i <<": " <<now.AddMilliSeconds(i * 500).GetTimeTick() <<", -" 
-        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTick() <<"\n";
+    {
+        int addMilliSecs = addMilliSecsStep * i;
+        std::cout << i <<"(" <<addMilliSecs <<"): " <<now.AddMilliSeconds(addMilliSecs).GetTimeTick() <<", -"
+            <<i <<"(" <<-addMilliSecs <<"): " <<now.AddMilliSeconds(-addMilliSecs).GetTimeTick() <<"\n";
+    }
     std::cout <<std::endl;
 
-    std::cout <<"AddMicroSeconds() test:" <<std::endl;
+    int addMicroSecsStep = 500;
+    std::cout <<"AddMicroSeconds() test(step:+/- " <<addMicroSecsStep <<" micro-seconds):" <<std::endl;
     for (int i = 1; i <= 3; i++)
-        std::cout <<i <<": " <<now.AddMicroSeconds(i * 500).GetTimeTick() <<", -" 
-        <<i <<": " <<now.AddMilliSeconds(-i * 500).GetTimeTick() <<"\n";
+    {
+        int addMicroSecs = addMicroSecsStep * i;
+        std::cout <<i <<"(" <<addMicroSecs <<"): " <<now.AddMicroSeconds(addMicroSecs).GetTimeTick() <<", -"
+            <<i <<"(" <<-addMicroSecs <<"): " <<now.AddMicroSeconds(-addMicroSecs).GetTimeTick() <<"\n";
+    }
     std::cout <<std::endl;
 
     // IsLeapYear() test.
@@ -157,12 +165,19 @@ void TestCase_Core_Time_Time::TimeClassTest()
         std::cout <<"2015-" <<i <<": max days: " <<LLBC_Time::GetMonthMaxDays(2015, i) <<std::endl;
 
     // FromXXX() test.
-    std::cout <<"FromSeconds(1.0): " <<LLBC_Time::FromSeconds(1.0) <<std::endl;
+    std::cout <<"FromSeconds(1.0): " <<LLBC_Time::FromSeconds(1) <<std::endl;
     std::cout <<"FromMilliSeconds(10001): " <<LLBC_Time::FromMilliSeconds(10001) <<std::endl;
     std::cout <<"FromMicroSeconds(10000000): " <<LLBC_Time::FromMicroSeconds(10000000) <<std::endl;
-    struct timeval tv;
-    tv.tv_sec = 10, tv.tv_usec = 10;
+    timeval tv;
+    tv.tv_sec = 10; tv.tv_usec = 10;
     std::cout <<"FromTimeVal(tv.sec=10, tv.usec=10): " <<LLBC_Time::FromTimeVal(tv) <<std::endl;
+#if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_NS timespec ts;
+#else
+    timespec ts;
+#endif
+    ts.tv_sec = 10000000; ts.tv_nsec = 123456;
+    std::cout <<"FromTimeSpec(ts.sec=10000000, ts.tv_nsec=123456): " <<LLBC_Time::FromTimeSpec(ts) <<std::endl;
 
     std::string timeRepr = "2000-12-13 19:21:35.333435";
     LLBC_Time fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
@@ -206,7 +221,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"    millisec: " <<fromParts.GetMilliSecond() <<", microsec: " <<fromParts.GetMicroSecond() <<std::endl;
 
     // GetIntervalTo test:
-    std::cout <<"GetInterval To 3600 seconds: " <<now.GetIntervalTo(3600) <<std::endl;
+    std::cout <<"now: " <<now <<", GetInterval To 3600 seconds: " <<now.GetIntervalTo(LLBC_TimeSpan(3600)) <<std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

@@ -34,6 +34,8 @@ class LLBC_TimeSpan;
 struct LLBC_TimerData;
 class LLBC_TimerScheduler;
 
+class LLBC_Variant;
+
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -99,6 +101,14 @@ public:
     template <typename ObjectType>
     void SetCancelHandler(ObjectType *object, void (ObjectType::*cancelMeth)(LLBC_Timer *));
     void SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg);
+
+public:
+    /**
+     * Get timer data.
+     * @return [const] LLBC_Variant & - the timer data.
+     */
+    LLBC_Variant &GetTimerData();
+    const LLBC_Variant &GetTimerData() const;
 
 public:
     /**
@@ -187,6 +197,7 @@ private:
     Scheduler *_scheduler;
     LLBC_TimerData *_timerData;
 
+    LLBC_Variant *_data;
     LLBC_IDelegate1<void, LLBC_Timer *> *_timeoutDeleg;
     LLBC_IDelegate1<void, LLBC_Timer *> *_cancelDeleg;
 };

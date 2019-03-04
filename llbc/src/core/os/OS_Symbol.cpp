@@ -38,7 +38,9 @@ int LLBC_InitSymbol()
     }
 
     return LLBC_OK;
-#endif // Win32
+#else // Non-Win32
+    return LLBC_OK;
+#endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
 LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
