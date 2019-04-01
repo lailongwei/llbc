@@ -44,7 +44,7 @@ LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
         return;
     }
 
-    // Split by ':', fetch hour,minute,second, millosecond parts.
+    // Split by ':', fetch hour,minute,second, microsecond parts.
     LLBC_Strings spanParts = span.split(':');
     if (spanParts.size() == 1) // Only has second part.
     {
@@ -56,13 +56,13 @@ LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
         spanParts.insert(spanParts.begin(), "0");
     }
 
-    _span = LLBC_Str2Int32(spanParts[0].c_str()) * LLBC_Time::NumOfSecondsPerHour +
-        LLBC_Str2Int32(spanParts[1].c_str()) * LLBC_Time::NumOfSecondsPerMinute;
+    _span = LLBC_Str2Int32(spanParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerHour +
+        LLBC_Str2Int32(spanParts[1].c_str()) * LLBC_Time::NumOfMicroSecondsPerMinute;
 
     LLBC_Strings secParts = spanParts[2].split('.', 1);
-    _span += LLBC_Str2Int32(secParts[0].c_str());
+    _span += LLBC_Str2Int32(secParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerSecond;
     if (secParts.size() == 2)
-        _span += LLBC_Str2Int32(secParts[1].c_str()) / static_cast<double>(LLBC_Time::NumOfMicroSecondsPerSecond);
+        _span += LLBC_Str2Int32(secParts[1].c_str());
 }
 
 __LLBC_NS_END

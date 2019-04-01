@@ -29,6 +29,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare Time & TimeSpan class.
  */
+class LLBC_Time;
 class LLBC_TimeSpan;
 
 __LLBC_NS_END
@@ -52,14 +53,16 @@ public:
     LLBC_TimeSpan();
 
     /**
-     * Construct by span, in micro-seconds.
-     * @param[in] span - the span value, in seconds.
+     * Construct by span, in seconds.
+     * @param[in] seconds      - the span seconds part.
+     * @param[in] milliSeconds - the span milli-seconds part.
+     * @param[in] microSeconds - the span micro-seconds part.
      */
-    LLBC_TimeSpan(double span);
+    explicit LLBC_TimeSpan(int seconds, int milliSeconds = 0, int microSeconds = 0);
 
     /**
      * Construct by span string representation(fmt: 00:00:00.xxxxxx).
-     * @param[in] span - the span value string representation, fmt: 00:00:00.xxxxx, the milli seconds is optional.
+     * @param[in] span - the span value string representation, fmt: 00:00:00.xxxxx, the micro-seconds is optional.
      */
     LLBC_TimeSpan(const LLBC_String &span);
 
@@ -86,12 +89,6 @@ public:
 
 public:
     /**
-     * Get span value, in micro-seconds.
-     * @return double - the time span value, in seconds.
-     */
-    double GetSpan() const;
-
-    /**
      * Get days/hours/minutes/seconds/milli-seconds/micro-seconds.
      * @return int - the time span parts value.
      */
@@ -102,12 +99,12 @@ public:
     int GetMilliSeconds() const;
     int GetMicroSeconds() const;
 
-    double GetTotalDays() const;
-    double GetTotalHours() const;
-    double GetTotalMinutes() const;
-    double GetTotalSeconds() const;
-    double GetTotalMilliSeconds() const;
-    double GetTotalMicroSeconds() const;
+    int GetTotalDays() const;
+    int GetTotalHours() const;
+    int GetTotalMinutes() const;
+    int GetTotalSeconds() const;
+    sint64 GetTotalMilliSeconds() const;
+    const sint64 &GetTotalMicroSeconds() const;
 
     LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
@@ -122,10 +119,13 @@ public:
     bool operator <=(const LLBC_TimeSpan &span) const;
     bool operator >=(const LLBC_TimeSpan &span) const;
 
-    LLBC_TimeSpan &operator =(double span);
     LLBC_TimeSpan &operator =(const LLBC_TimeSpan &span);
 
 public:
+    /**
+     * Get the timespan object string representation.
+     * @return LLBC_String - the object string representation.
+     */
     LLBC_String ToString() const;
 
 public:
@@ -135,6 +135,9 @@ public:
     friend std::ostream & ::operator <<(std::ostream &o, const LLBC_TimeSpan &s);
 
 public:
+    /**
+     * Serialize&DeSerialize support.
+     */
     void Serialize(LLBC_Stream &stream) const;
     bool DeSerialize(LLBC_Stream &stream);
 
@@ -142,7 +145,16 @@ public:
     bool DeSerializeEx(LLBC_Stream &stream);
 
 private:
-    double _span;
+    // Declare friend class:LLBC_Time.
+    // Access members:
+    // - LLBC_TimeSpan::LLBC_TimeSpan(const sint64 &span)
+    friend class LLBC_Time;
+
+private:
+    LLBC_TimeSpan(const sint64 &span);
+
+private:
+    sint64 _span;
 };
 
 __LLBC_NS_END

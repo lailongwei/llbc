@@ -462,11 +462,11 @@ void TestCase_Core_File_File::PrintFileAttributes(const LLBC_FileAttributes &fil
     LLBC_PrintLine("    Is directory: %s", fileAttrs.isDirectory ? "true" : "false");
 
 #if LLBC_TARGET_PLATFORM_WIN32
-    const LLBC_Time createTime(fileAttrs.createTime);
+    const LLBC_Time createTime = LLBC_Time::FromTimeSpec(fileAttrs.createTime);
     LLBC_PrintLine("    create time: %s", createTime.Format().c_str());
 #else
-    LLBC_PrintLine("    last change status time: %s",  LLBC_Time(fileAttrs.lastChangeStatusTime).Format().c_str());
+    LLBC_PrintLine("    last change status time: %s",  LLBC_Time::FromTimeSpec(fileAttrs.lastChangeStatusTime).Format().c_str());
 #endif
-    LLBC_PrintLine("    last modify time: %s", LLBC_Time(fileAttrs.lastModifyTime).Format().c_str());
-    LLBC_PrintLine("    last access time: %s", LLBC_Time(fileAttrs.lastAccessTime).Format().c_str());
+    LLBC_PrintLine("    last modify time: %s", LLBC_Time::FromTimeSpec(fileAttrs.lastModifyTime).Format().c_str());
+    LLBC_PrintLine("    last access time: %s", LLBC_Time::FromTimeSpec(fileAttrs.lastAccessTime).Format().c_str());
 }
