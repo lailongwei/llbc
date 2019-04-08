@@ -46,6 +46,13 @@ inline LLBC_Event &LLBC_Event::SetParam(int key, const ParamType &param)
 }
 
 template <typename ParamType>
+inline LLBC_Event &LLBC_Event::SetParam(const char *key, const ParamType &param)
+{
+    const LLBC_Variant varParam(param);
+    return SetParam(key, varParam);
+}
+
+template <typename ParamType>
 inline LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const ParamType &param)
 {
     const LLBC_Variant varParam(param);
@@ -55,6 +62,11 @@ inline LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const ParamType 
 inline size_t LLBC_Event::GetIntKeyParamsCount() const
 {
     return _intKeyParams != NULL ? _intKeyParams->size() : 0;
+}
+
+inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
+{
+    return _constantStrKeyParams != NULL ? _constantStrKeyParams->size() : 0;
 }
 
 inline size_t LLBC_Event::GetStrKeyParamsCount() const

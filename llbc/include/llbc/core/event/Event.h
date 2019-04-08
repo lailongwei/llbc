@@ -64,6 +64,13 @@ public:
     const LLBC_Variant &GetParam(int key) const;
 
     /**
+    * Get constant string key indexed event param.
+    * @param[in] key - the constant string key.
+    * @return const LLBC_Variant & - the event param.
+    */
+    const LLBC_Variant &GetParam(const char* key) const;
+
+    /**
      * Get string key indexed event param.
      * @param[in] key - the string key.
      * @return const LLBC_Variant & - the event param.
@@ -85,6 +92,22 @@ public:
      */
     template <typename ParamType>
     LLBC_Event &SetParam(int key, const ParamType &param);
+
+    /**
+    * Set constant string key indexed event param.
+    * @param[in] key   - the param key.
+    * @param[in] param - the param.
+    * @return LLBC_Event & - this reference.
+    */
+    LLBC_Event &SetParam(const char* key, const LLBC_Variant &param);
+    /**
+    * Set constant string key indexed event param(template version).
+    * @param[in] key   - the param key.
+    * @param[in] param - the param.
+    * @return LLBC_Event & - this reference.
+    */
+    template <typename ParamType>
+    LLBC_Event &SetParam(const char* key, const ParamType &param);
 
     /**
      * Set string key indexed event param.
@@ -116,6 +139,18 @@ public:
     size_t GetIntKeyParamsCount() const;
 
     /**
+    * Get all constant string key indexed params.
+    * @return const std::map<const char*, LLBC_Variant> & - the constant string key indexed params const reference.
+    */
+    const std::map<const char*, LLBC_Variant> &GetConstantStrKeyParams() const;
+
+    /**
+    * Get all constant string key indexed params count.
+    * @return size_t - the constant string key indexed params count.
+    */
+    size_t GetConstantStrKeyParamsCount() const;
+
+    /**
      * Get all string key indexed params.
      * @return const std::map<LLBC_String, LLBC_Variant> & - the string key indexed params const reference.
      */
@@ -132,8 +167,10 @@ public:
      * Subscript supports.
      */
     LLBC_Variant &operator [](int key);
+    LLBC_Variant &operator [](const char* key);
     LLBC_Variant &operator [](const LLBC_String &key);
     const LLBC_Variant &operator [](int key) const;
+    const LLBC_Variant &operator [](const char* key) const;
     const LLBC_Variant &operator [](const LLBC_String &key) const;
 
     /**
@@ -147,6 +184,9 @@ protected:
 
     typedef std::map<int, LLBC_Variant> _IntKeyParams;
     _IntKeyParams *_intKeyParams;
+
+    typedef std::map<const char*, LLBC_Variant> _ConstantStrKeyParams;
+    _ConstantStrKeyParams *_constantStrKeyParams;
 
     typedef std::map<LLBC_String, LLBC_Variant> _StrKeyParams;
     _StrKeyParams *_strKeyParams;
