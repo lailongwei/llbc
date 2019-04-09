@@ -27,20 +27,70 @@
 
 __LLBC_NS_BEGIN
 
+#define __LLBC_GET_TYPE_NAME_Trim(str, len)      \
+    it = rtti;                                   \
+    skipCopy = 0;                                \
+    itEnd = rtti + rawTyNameLen - totalSkipCopy; \
+    while ((it= strstr(it, str)))                \
+    {                                            \
+        int copyLen = itEnd - it - len;          \
+        memmove(it, it + len, copyLen);          \
+        itEnd -= len;                            \
+        skipCopy += len;                         \
+        if (copyLen == 0)                        \
+            break;                               \
+    }                                            \
+    totalSkipCopy += skipCopy;                   \
+    rtti[rawTyNameLen - totalSkipCopy] = '\0'    \
+
+const char *__LLBC_GetTypeName(const char *rawTyName)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    char *rtti = tls->commonTls.rtti;
+    int rawTyNameLen = strlen(rawTyName);
+    memcpy(rtti, rawTyName, rawTyNameLen);
+    rtti[rawTyNameLen] = '\0';
+
+    int totalSkipCopy = 0;
+
+    int skipCopy;
+    char *it;
+    char *itEnd;
+    __LLBC_GET_TYPE_NAME_Trim("class ", 6);
+    __LLBC_GET_TYPE_NAME_Trim("struct ", 7);
+    __LLBC_GET_TYPE_NAME_Trim(" *", 2);
+
+    char *anonBeg = rtti;
+    while ((anonBeg = strchr(anonBeg, '`')))
+    {
+        *anonBeg = '(';
+        char *anonEnd = strchr(anonBeg + 1, '\'');
+        *anonEnd = ')';
+    }
+
+    return rtti;
+#else // Non-Win32
+    return __LLBC_CxxDemangle(rawTyName);
+#endif // LLBC_TARGET_PLATFORM_WIN32
+}
+
+#undef __LLBC_GET_TYPE_NAME_Trim
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
-LLBC_String __LLBC_CxxDemangle(const char *name)
+const char *__LLBC_CxxDemangle(const char *name)
 {
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     if (UNLIKELY(!libTls))
-        return LLBC_String();
+        return "";
 
     int status = 0;
     size_t length = sizeof(libTls->commonTls.rtti);
 
     abi::__cxa_demangle(name, libTls->commonTls.rtti, &length, &status);
     if (status != 0)
-        return LLBC_String();
+        return "";
 
     return libTls->commonTls.rtti;
 }

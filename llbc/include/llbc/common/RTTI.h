@@ -23,32 +23,28 @@
 #define __LLBC_COM_RTTI_H__
 
 #include "llbc/common/Macro.h"
-#include "llbc/common/OSHeader.h"
 #include "llbc/common/StringDataType.h"
 
 __LLBC_NS_BEGIN
 
-#if LLBC_TARGET_PLATFORM_WIN32
 /**
  * Get type name(demangled).
  */
-#define LLBC_GetTypeName(ty)                                                                \
-     (LLBC_String(typeid(ty).name()).findreplace("class ", "").findreplace("struct ", "")   \
-      .findreplace(" *", "").findreplace("`anonymous namespace'", "(anonymous namespace)")) \
+#define LLBC_GetTypeName(ty)  LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
 
-#else // Non-Win32
+/**
+ * Get type name(demangled).
+ */
+LLBC_EXTERN LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
 
 /**
  * Demangle cxx type name(only available in non-windows platform).
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String __LLBC_CxxDemangle(const char *name);
+LLBC_EXTERN LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
 
-/**
- * Get type name(demangled).
- */
-#define LLBC_GetTypeName(ty) __LLBC_CxxDemangle(typeid(ty).name())
-
-#endif // Win32
+#endif // Non-Win32
 
 __LLBC_NS_END
 

@@ -41,6 +41,9 @@
  #include <process.h>
  #include <ObjBase.h>
  #include <ShlObj.h>
+#pragma warning(disable:4091)
+ #include <DbgHelp.h>
+#pragma warning(default:4091)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #include <sys/stat.h>
@@ -60,6 +63,7 @@
  #include <semaphore.h>
  #include <arpa/inet.h>
  #include <dlfcn.h>
+ #include <execinfo.h>
 
  #if LLBC_TARGET_PLATFORM_LINUX
   #include <sys/epoll.h>

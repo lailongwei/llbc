@@ -19,25 +19,32 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_COMMON_H__
-#define __LLBC_CORE_OS_COMMON_H__
+#ifndef __LLBC_CORE_OS_OS_SYMBOL_H__
+#define __LLBC_CORE_OS_OS_SYMBOL_H__
 
-#include "llbc/core/os/OS_Time.h"
-#include "llbc/core/os/OS_Atomic.h"
-#include "llbc/core/os/OS_Library.h"
-#include "llbc/core/os/OS_Thread.h"
-#include "llbc/core/os/OS_Process.h"
-#include "llbc/core/os/OS_Console.h"
-#include "llbc/core/os/OS_Socket.h"
-#include "llbc/core/os/OS_Select.h"
-#include "llbc/core/os/OS_Network.h"
-#include "llbc/core/os/OS_Symbol.h"
+#include "llbc/common/Common.h"
 
-#if LLBC_TARGET_PLATFORM_LINUX
-#include "llbc/core/os/OS_Epoll.h"
-#endif
-#if LLBC_TARGET_PLATFORM_WIN32
-#include "llbc/core/os/OS_Iocp.h"
-#endif
+__LLBC_NS_BEGIN
 
-#endif // __LLBC_CORE_OS_COMMON_H__
+#if LLBC_CFG_OS_IMPL_SYMBOL
+
+/**
+ * Initialize symbol.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXTERN LLBC_EXPORT int LLBC_InitSymbol();
+
+/**
+ * Capture stack back trace.
+ * @param[in]  skipFrames    - skip frames count, default 0.
+ * @param[out] captureFrames - the final back traces, default is infinite.
+ *                              the infinite value limitd by LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES config option.
+ * @return LLBC_String - The stack back trace string representation.
+ */
+LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = LLBC_INFINITE);
+
+#endif // LLBC_CFG_OS_IMPL_SYMBOL
+
+__LLBC_NS_END
+
+#endif // !__LLBC_CORE_OS_OS_SYMBOL_H__

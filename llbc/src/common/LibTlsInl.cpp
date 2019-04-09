@@ -48,9 +48,30 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.task = NULL;
     coreTls.timerScheduler = NULL;
 
+    #if LLBC_CFG_OS_IMPL_SYMBOL
+     #if LLBC_TARGET_PLATFORM_WIN32
+    coreTls.symbol.win32Symbol = LLBC_Calloc(
+        ::SYMBOL_INFO, sizeof(::SYMBOL_INFO) + (LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME + 1) * sizeof(char));
+    coreTls.symbol.win32Symbol->SizeOfStruct = sizeof(::SYMBOL_INFO);
+    coreTls.symbol.win32Symbol->MaxNameLen = LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME;
+
+    ::memset(&coreTls.symbol.win32ImgHelpLine64, 0, sizeof(coreTls.symbol.win32ImgHelpLine64));
+    coreTls.symbol.win32ImgHelpLine64.SizeOfStruct = sizeof(coreTls.symbol.win32ImgHelpLine64);
+     #endif // LLBC_TARGET_PLATFORM_WIN32
+    #endif // LLBC_CFG_OS_IMPL_SYMBOL
+
     objbaseTls.poolStack = NULL;
 
     ::memset(commTls.services, 0, sizeof(commTls.services));
+}
+
+__LLBC_LibTls::~__LLBC_LibTls()
+{
+    #if LLBC_CFG_OS_IMPL_SYMBOL
+     #if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_XFree(coreTls.symbol.win32Symbol);
+     #endif // LLBC_TARGET_PLATFORM_WIN32
+    #endif // LLBC_CFG_OS_IMPL_SYMBOL
 }
 
 void __LLBC_CreateLibTls()

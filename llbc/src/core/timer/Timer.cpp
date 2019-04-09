@@ -23,6 +23,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/time/Common.h"
+#include "llbc/core/variant/Common.h"
 
 #include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"
@@ -36,6 +37,7 @@ LLBC_Timer::LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg,
 : _scheduler(NULL)
 , _timerData(NULL)
 
+, _data(NULL)
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
@@ -56,6 +58,7 @@ LLBC_Timer::~LLBC_Timer()
         _timerData = NULL;
     }
 
+    LLBC_XDelete(_data);
     LLBC_XDelete(_timeoutDeleg);
     LLBC_XDelete(_cancelDeleg);
 
@@ -113,7 +116,19 @@ void LLBC_Timer::SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDel
     _cancelDeleg = cancelDeleg;
 }
 
-void LLBC_Timer::OnTimeout()
+LLBC_Variant &LLBC_Timer::GetTimerData()
+{
+    if (!_data)
+        _data = new LLBC_Variant();
+    return *_data;
+}
+
+const LLBC_Variant & LLBC_Timer::GetTimerData() const
+{
+    return const_cast<LLBC_Timer *>(this)->GetTimerData();
+}
+
+    void LLBC_Timer::OnTimeout()
 {
     if (LIKELY(_timeoutDeleg))
         _timeoutDeleg->Invoke(this);

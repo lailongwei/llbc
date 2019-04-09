@@ -28,14 +28,18 @@ __LLBC_NS_BEGIN
 
 int __LLBC_CoreStartup()
 {
+    // Initialize Symbol(if enabled).
+    #if LLBC_CFG_OS_IMPL_SYMBOL
+    if (LLBC_InitSymbol() != LLBC_OK)
+        return LLBC_FAILED;
+    #endif // LLBC_CFG_OS_IMPL_SYMBOL
+
     // Initialize Variant Type->StrDesc dictionary.
     LLBC_VariantType::InitType2StrDict();
 
     // Create main bundle.
     if(LLBC_Bundle::CreateMainBundle() != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     // Set timezone.
     LLBC_TZSet();

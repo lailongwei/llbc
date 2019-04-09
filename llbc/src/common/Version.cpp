@@ -72,6 +72,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     // Append core info.
     desc.append_format("\n");
     desc.append_format("core info: \n");
+    desc.append_format("  os info: \n");
+    desc.append_format("    enabled symbol support?: %s\n", LLBC_CFG_OS_IMPL_SYMBOL ? "true" : "false");
     desc.append_format("  thread info: \n");
     desc.append_format("    max thread num: %d\n", LLBC_CFG_THREAD_MAX_THREAD_NUM);
     desc.append_format("    default thread stack size: %d\n", LLBC_CFG_THREAD_DFT_STACK_SIZE);

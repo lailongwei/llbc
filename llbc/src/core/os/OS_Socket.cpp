@@ -24,6 +24,12 @@
 
 #include "llbc/core/os/OS_Socket.h"
 
+// Disable some warnings(on windows platform)
+#if LLBC_TARGET_PLATFORM_WIN32
+ #pragma warning(push)
+ #pragma warning(disable: 4996)
+#endif // Win32
+
 __LLBC_INTERNAL_NS_BEGIN
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -955,5 +961,10 @@ int LLBC_SetSocketOption(LLBC_SocketHandle handle, int level, int optname, const
 }
 
 __LLBC_NS_END
+
+// Recover warnings setting(on windows platform)
+#if LLBC_TARGET_PLATFORM_WIN32
+ #pragma warning(pop)
+#endif // Win32
 
 #include "llbc/common/AfterIncl.h"

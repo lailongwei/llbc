@@ -42,9 +42,10 @@ namespace
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static Str __g_nullStr;
-static Str __g_trueStr = "true";
-static Dict __g_nullDict;
+static const Str __g_nullStr;
+static const Str __g_trueStr = "true";
+static const Dict __g_nullDict;
+static const LLBC_NS LLBC_Variant __g_nilVariant;
 
 static void BecomeAndAllocDict(LLBC_NS LLBC_Variant &var, LLBC_NS LLBC_Variant::Holder &holder)
 {
@@ -250,7 +251,7 @@ DictIter LLBC_Variant::Begin()
     if (IsDict() && _holder.obj.dict)
         return _holder.obj.dict->begin();
     else
-        return LLBC_INL_NS __g_nullDict.begin();
+        return const_cast<Dict &>(LLBC_INL_NS __g_nullDict).begin();
 }
 
 DictConstIter LLBC_Variant::Begin() const
@@ -266,7 +267,7 @@ DictIter LLBC_Variant::End()
     if (IsDict() && _holder.obj.dict)
         return _holder.obj.dict->end();
     else
-        return LLBC_INL_NS __g_nullDict.end();
+        return const_cast<Dict &>(LLBC_INL_NS __g_nullDict).end();
 }
 
 DictConstIter LLBC_Variant::End() const
@@ -282,7 +283,7 @@ DictReverseIter LLBC_Variant::ReverseBegin()
     if (IsDict() && _holder.obj.dict)
         return _holder.obj.dict->rbegin();
     else
-        return LLBC_INL_NS __g_nullDict.rbegin();
+        return const_cast<Dict &>(LLBC_INL_NS __g_nullDict).rbegin();
 }
 
 DictConstReverseIter LLBC_Variant::ReverseBegin() const
@@ -298,7 +299,7 @@ DictReverseIter LLBC_Variant::ReverseEnd()
     if (IsDict() && _holder.obj.dict)
         return _holder.obj.dict->rend();
     else
-        return LLBC_INL_NS __g_nullDict.rend();
+        return const_cast<Dict &>(LLBC_INL_NS __g_nullDict).rend();
 }
 
 DictConstReverseIter LLBC_Variant::ReverseEnd() const
@@ -325,7 +326,7 @@ DictIter LLBC_Variant::Find(const Dict::key_type &key)
     if (IsDict() && _holder.obj.dict)
         return _holder.obj.dict->find(key);
     else
-        return LLBC_INL_NS __g_nullDict.end();
+        return const_cast<Dict &>(LLBC_INL_NS __g_nullDict).end();
 }
 
 DictConstIter LLBC_Variant::Find(const Dict::key_type &key) const
@@ -365,9 +366,15 @@ Dict::mapped_type &LLBC_Variant::operator [](const LLBC_Variant &key)
 const Dict::mapped_type &LLBC_Variant::operator [](const LLBC_Variant &key) const
 {
     if (IsDict() && _holder.obj.dict)
-        return (*_holder.obj.dict)[key];
-    else
-        return LLBC_INL_NS __g_nullDict[key];
+    {
+        Dict::const_iterator it = _holder.obj.dict->find(key);
+        if (it == _holder.obj.dict->end())
+            return LLBC_INL_NS __g_nilVariant;
+        else
+            return it->second;
+    }
+
+    return LLBC_INL_NS __g_nilVariant;
 }
 
 LLBC_Variant &LLBC_Variant::operator =(sint8 val)

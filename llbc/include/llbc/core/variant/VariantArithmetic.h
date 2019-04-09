@@ -71,6 +71,7 @@ private:
     static void Performs_uint32_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
     static void Performs_long_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
     static void Performs_ulong_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
+    static void Performs_ptr_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
     static void Performs_int64_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
     static void Performs_uint64_any(LLBC_Variant &left, const LLBC_Variant &right, int type);
     static void Performs_float_any(LLBC_Variant &left, const LLBC_Variant &right, int type);

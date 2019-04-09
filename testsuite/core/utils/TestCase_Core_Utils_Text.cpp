@@ -126,12 +126,15 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         LLBC_PrintLine("LLBC_Num2Str<double>()[%f] -> string: %s",
             doubleVal, LLBC_Num2Str(doubleVal).c_str());
 
-        int *intPtr = reinterpret_cast<int *>(0xcdcdcdcd);
+        sint64 intPtrAddr = 0xcdcdcdcd;
+        int *intPtr; ::memcpy(&intPtr, &intPtrAddr, sizeof(int *));
         LLBC_PrintLine("LLBC_Num2Str<int *>()[%p] -> string: %s",
-            intPtr, LLBC_Num2Str(intPtr).c_str());
-        const void *voidPtr = reinterpret_cast<const void *>(0xfffffffe);
+            intPtr, LLBC_Num2Str(intPtr, 16).c_str());
+
+        sint64 voidPtrAddr = 0xfffffffe;
+        void *voidPtr; ::memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
         LLBC_PrintLine("LLBC_Num2Str<void *>()[%p] -> string: %s",
-            voidPtr, LLBC_Num2Str(voidPtr).c_str());
+            voidPtr, LLBC_Num2Str(voidPtr, 16).c_str());
     }
 
     LLBC_PrintLine("");

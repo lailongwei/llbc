@@ -114,8 +114,9 @@ inline LLBC_String LLBC_Num2Str(T val, int radix)
     if (radix == 16)
         str += "0x";
 
-    const ulong ptrVal = reinterpret_cast<ulong>(val);
-    return (str + LLBC_Num2Str<ulong>(ptrVal, radix));
+    uint64 ptrVal = 0;
+    ::memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
+    return (str + LLBC_Num2Str<uint64>(ptrVal, radix));
 }
 
 __LLBC_NS_END

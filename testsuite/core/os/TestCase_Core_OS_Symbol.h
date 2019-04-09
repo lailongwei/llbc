@@ -19,25 +19,32 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_COMMON_H__
-#define __LLBC_CORE_OS_COMMON_H__
+#ifndef __LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
+#define __LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
 
-#include "llbc/core/os/OS_Time.h"
-#include "llbc/core/os/OS_Atomic.h"
-#include "llbc/core/os/OS_Library.h"
-#include "llbc/core/os/OS_Thread.h"
-#include "llbc/core/os/OS_Process.h"
-#include "llbc/core/os/OS_Console.h"
-#include "llbc/core/os/OS_Socket.h"
-#include "llbc/core/os/OS_Select.h"
-#include "llbc/core/os/OS_Network.h"
-#include "llbc/core/os/OS_Symbol.h"
+#include "llbc.h"
+using namespace llbc;
 
-#if LLBC_TARGET_PLATFORM_LINUX
-#include "llbc/core/os/OS_Epoll.h"
-#endif
-#if LLBC_TARGET_PLATFORM_WIN32
-#include "llbc/core/os/OS_Iocp.h"
-#endif
+class TestCase_Core_OS_Symbol : public LLBC_BaseTestCase
+{
+public:
+    TestCase_Core_OS_Symbol();
+    virtual ~TestCase_Core_OS_Symbol();
 
-#endif // __LLBC_CORE_OS_COMMON_H__
+public:
+    virtual int Run(int argc, char *argv[]);
+
+private:
+    void Foo1();
+    void Foo2();
+    void Foo3();
+
+    void Goo1();
+    void Goo2();
+    void Goo3();
+
+    void PrintBackTrace();
+};
+
+#endif // !__LLBC_TEST_CASE_CORE_OS_SYMBOL_H__
+
