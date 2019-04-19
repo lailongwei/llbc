@@ -47,7 +47,7 @@ LLBC_Object::~LLBC_Object()
     }
 }
 
-int LLBC_Object::GetRef()
+int LLBC_Object::GetRefCount()
 {
     return _ref;
 }

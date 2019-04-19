@@ -50,7 +50,7 @@ public:
     /**
      * Get ref
      */
-    virtual int GetRef();
+    virtual int GetRefCount();
 
     /**
      * Retain object.
