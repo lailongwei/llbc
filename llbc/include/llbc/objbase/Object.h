@@ -48,6 +48,11 @@ public:
 
 public:
     /**
+     * Get ref
+     */
+    virtual int GetRef();
+
+    /**
      * Retain object.
      */
     virtual void Retain();

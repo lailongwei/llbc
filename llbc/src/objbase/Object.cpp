@@ -47,6 +47,11 @@ LLBC_Object::~LLBC_Object()
     }
 }
 
+int LLBC_Object::GetRef()
+{
+    return _ref;
+}
+
 void LLBC_Object::Release()
 {
     if (-- _ref == 0)
