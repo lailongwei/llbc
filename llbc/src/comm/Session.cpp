@@ -110,6 +110,8 @@ LLBC_Session::LLBC_Session()
 , _poller(NULL)
 
 , _protoStack(NULL)
+
+, _pollerType(LLBC_PollerType::End)
 {
 }
 
@@ -297,9 +299,9 @@ void LLBC_Session::OnSent(size_t len)
 bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 {
     bool removeSession;
-    std::vector<LLBC_Packet *> packets;
+    _recvedPackets.clear();
 #if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Recv(block, packets, removeSession) != LLBC_OK)
+    if (_protoStack->Recv(block, _recvedPackets, removeSession) != LLBC_OK)
 #else
     if (_protoStack->RecvRaw(block, packets, removeSession) != LLBC_OK)
 #endif
@@ -311,9 +313,9 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
     }
 
     LLBC_Packet *packet;
-    for (size_t i = 0; i < packets.size(); i++)
+    for (size_t i = 0; i < _recvedPackets.size(); i++)
     {
-        packet = packets[i];
+        packet = _recvedPackets[i];
         packet->SetSessionId(_id);
         packet->SetLocalAddr(_socket->GetLocalAddress());
         packet->SetPeerAddr(_socket->GetPeerAddress());
