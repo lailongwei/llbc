@@ -270,6 +270,7 @@ private:
     LLBC_BasePoller *_poller;
 
     LLBC_ProtocolStack *_protoStack;
+    std::vector<LLBC_Packet *> _recvedPackets;
 
     int _pollerType;
 };
