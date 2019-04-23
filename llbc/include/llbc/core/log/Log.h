@@ -32,6 +32,8 @@ __LLBC_NS_BEGIN
 class LLBC_Logger;
 class LLBC_LoggerManager;
 
+class LLBC_LogJsonMsg;
+
 class LLBC_LogHelper;
 
 __LLBC_NS_END
@@ -66,9 +68,17 @@ public:
 
 public:
     /**
+     * When logger component not initialize, will use this function to output message.
+     */
+    static void UnInitOutput(FILE *to, const char *msg);
+
+public:
+    /**
      * Output debug level message.
      */
     static void d(const char *fmt, ...);
+    template <typename Tag>
+    static LLBC_LogJsonMsg jd();
     static void d2(const char *tag, const char *fmt, ...);
     template <typename Tag>
     static void d2(const char *fmt, ...);
@@ -143,12 +153,6 @@ private:
      *         Finalize() - When logger manager finalize, this method will be called!
      */
     friend class LLBC_LoggerManager;
-
-private:
-    /**
-     * When logger component not initialize, will use this function to output message.
-     */
-    static void UnInitOutput(FILE *to, const char *msg);
 
 private:
     static LLBC_Logger *_rootLogger;

@@ -30,12 +30,9 @@
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerManager.h"
 
-#include "llbc/core/log/Log.h"
+#include "llbc/core/json/json.h"
 
-namespace
-{
-    typedef LLBC_NS LLBC_LogLevel _LV;
-}
+#include "llbc/core/log/Log.h"
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -80,6 +77,29 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
         l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen);\
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+
+#define __LLBC_JLOG_TO_SPEC(logger, level, tag, jMsg)                               \
+                                                                                    \
+    if (LIKELY(logger))                                                             \
+        logger->OutputNonFormat(level, tag, __FILE__, __LINE__, jMsg, strlen(jMsg));\
+    else                                                                            \
+        LLBC_LogHelper::UnInitOutput(level >= _LV::Warn ? stderr : stdout, jMsg);   \
+
+LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger* logger, const char* tag, int lv):
+    _logger(logger),
+    _tag(LLBC_GetTypeName(tag)),
+    _lv(lv)
+{
+}
+
+LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
+{
+}
+
+void LLBC_LogJsonMsg::Finish(LLBC_Logger* logger, int lv, const char* tag, const char *message)
+{
+    __LLBC_JLOG_TO_SPEC(logger, _lv, _tag, _json.asString().c_str());
+}
 
 int LLBC_LogHelper::init(const LLBC_String &cfgFile)
 {
