@@ -61,7 +61,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 
     _json["msg"] = fmttedMsg;
 
-    const std::string &jStr = _json.toStyledString();
+    const LLBC_String &jStr = _json.toStyledString();
 
     if (LIKELY(_logger))
         _logger->OutputNonFormat(_lv, _tag, __FILE__, __LINE__, jStr.c_str(), jStr.length());
