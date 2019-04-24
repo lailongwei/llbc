@@ -87,7 +87,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
 
 LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger* logger, const char* tag, int lv):
     _logger(logger),
-    _tag(LLBC_GetTypeName(tag)),
+    _tag(tag),
     _lv(lv)
 {
 }
@@ -98,7 +98,7 @@ LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 
 void LLBC_LogJsonMsg::Finish(LLBC_Logger* logger, int lv, const char* tag, const char *message)
 {
-    __LLBC_JLOG_TO_SPEC(logger, _lv, _tag, _json.asString().c_str());
+    __LLBC_JLOG_TO_SPEC(logger, lv, tag, message);
 }
 
 int LLBC_LogHelper::init(const LLBC_String &cfgFile)
