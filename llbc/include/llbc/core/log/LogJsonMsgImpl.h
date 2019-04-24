@@ -21,19 +21,19 @@
 
 #include "llbc/core/variant/Variant.h"
 
-#ifdef __LLBC_CORE_LOG_LOG_H__
+#ifdef __LLBC_CORE_LOG_LOG_JSONMSG_H__
 
 __LLBC_NS_BEGIN
 
 template <>
-LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const LLBC_Variant &value)
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const LLBC_Variant &value)
 {
     _json[key] = value.ValueToString();
     return *this;
 }
 
 template <typename T>
-LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
 {
     _json[key] = value;
     return *this;
@@ -41,4 +41,4 @@ LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
 
 __LLBC_NS_END
 
-#endif
+#endif // __LLBC_CORE_LOG_LOG_JSONMSG_H__

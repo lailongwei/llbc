@@ -56,18 +56,16 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     char *fmttedMsg; int msgLen;                                              \
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
                                                                               \
-    LLBC_FreeGuard<char> guard(fmttedMsg);                                    \
-                                                                              \
     if (LIKELY(_rootLogger))                                                  \
         _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+                                                                              \
+    LLBC_Free(fmttedMsg);                                                     \
 
 #define __LLBC_LOG_TO_SPEC(logger, level, tag, fmt)                           \
     char *fmttedMsg; int msgLen;                                              \
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
-                                                                              \
-    LLBC_FreeGuard<char> guard(fmttedMsg);                                    \
                                                                               \
     LLBC_Logger *l = NULL;                                                    \
     if (logger == NULL)                                                       \
@@ -79,6 +77,8 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
         l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen);\
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+                                                                              \
+    LLBC_Free(fmttedMsg);                                                     \
 
 #define __LLBC_JLOG_TO_SPEC(logger, tag, lv)                                  \
     LLBC_Logger *l = NULL;                                                    \

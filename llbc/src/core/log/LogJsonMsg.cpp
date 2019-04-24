@@ -23,7 +23,6 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
-#include "llbc/core/thread/Guard.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
@@ -41,10 +40,10 @@ namespace
     typedef LLBC_NS LLBC_LogLevel _LV;
 }
 
-LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger* logger, const char* tag, int lv) :
-    _logger(logger),
-    _tag(tag),
-    _lv(lv)
+LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger, const char *tag, int lv)
+: _logger(logger)
+, _tag(tag)
+, _lv(lv)
 {
 }
 
@@ -57,10 +56,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     char *fmttedMsg; int msgLen;
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
-    LLBC_FreeGuard<char> guard(fmttedMsg);
-
     _json["msg"] = fmttedMsg;
-
     const LLBC_String &jStr = _json.toStyledString();
 
     if (LIKELY(_logger))
@@ -68,7 +64,9 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     else
         UnInitOutput(_lv >= _LV::Warn ? stderr : stdout, jStr.c_str());
 
-    delete this;
+    LLBC_Free(fmttedMsg);
+
+    LLBC_Delete(this);
 }
 
 void LLBC_LogJsonMsg::UnInitOutput(FILE *to, const char *msg)

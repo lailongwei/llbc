@@ -153,13 +153,13 @@ inline void LLBC_LogHelper::e4(const char *logger, const char *fmt, ...)
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::je2()
 {
-    return jw2(LLBC_GetTypeName(Tag));
+    return je2(LLBC_GetTypeName(Tag));
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger)
 {
-    return jw4(logger, LLBC_GetTypeName(Tag));
+    return je4(logger, LLBC_GetTypeName(Tag));
 }
 
 template <typename Tag>

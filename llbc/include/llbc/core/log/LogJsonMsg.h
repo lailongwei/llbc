@@ -44,14 +44,13 @@ public:
 
 public:
     /**
-     * Add json style message
-     */
+    * Add json styled message
+    */
     template <typename T>
     LLBC_LogJsonMsg &Add(const char *key, const T &value);
-
-    template <>
-    LLBC_LogJsonMsg &Add(const char *key, const LLBC_Variant &value);
-
+    /**
+    * Output json styled message
+    */
     void Finish(const char *fmt, ...);
 
 private:
