@@ -26,7 +26,6 @@
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/utils/Util_Debug.h"
 
-#include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerManager.h"
 
@@ -57,18 +56,16 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     char *fmttedMsg; int msgLen;                                              \
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
                                                                               \
-    LLBC_FreeGuard<char> guard(fmttedMsg);                                    \
-                                                                              \
     if (LIKELY(_rootLogger))                                                  \
         _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+                                                                              \
+    LLBC_Free(fmttedMsg);                                                     \
 
 #define __LLBC_LOG_TO_SPEC(logger, level, tag, fmt)                           \
     char *fmttedMsg; int msgLen;                                              \
     LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
-                                                                              \
-    LLBC_FreeGuard<char> guard(fmttedMsg);                                    \
                                                                               \
     LLBC_Logger *l = NULL;                                                    \
     if (logger == NULL)                                                       \
@@ -80,6 +77,18 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
         l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen);\
     else                                                                      \
         UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+                                                                              \
+    LLBC_Free(fmttedMsg);                                                     \
+
+#define __LLBC_JLOG_TO_SPEC(logger, tag, lv)                                  \
+    LLBC_Logger *l = NULL;                                                    \
+    if (logger == NULL)                                                       \
+        l = _rootLogger;                                                      \
+    else if (LIKELY(_loggerManager))                                          \
+        l = _loggerManager->GetLogger(logger);                                \
+                                                                              \
+    return *LLBC_New3(LLBC_LogJsonMsg, l, tag, lv);                           \
+
 
 int LLBC_LogHelper::init(const LLBC_String &cfgFile)
 {
@@ -135,6 +144,26 @@ void LLBC_LogHelper::d4(const char *logger, const char *tag, const char *fmt, ..
     __LLBC_LOG_TO_SPEC(logger, _LV::Debug, tag, fmt);
 }
 
+LLBC_LogJsonMsg &LLBC_LogHelper::jd()
+{
+    __LLBC_JLOG_TO_SPEC(NULL, NULL, _LV::Debug);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jd2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(NULL, tag, _LV::Debug);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jd3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, NULL, _LV::Debug);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jd4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Debug);
+}
+
 void LLBC_LogHelper::i(const char *fmt, ...)
 {
     __LLBC_LOG_TO_ROOT(_LV::Info, fmt);
@@ -153,6 +182,26 @@ void LLBC_LogHelper::i3(const char *logger, const char *fmt, ...)
 void LLBC_LogHelper::i4(const char *logger, const char *tag, const char *fmt, ...)
 {
     __LLBC_LOG_TO_SPEC(logger, _LV::Info, tag, fmt);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::ji()
+{
+    __LLBC_JLOG_TO_SPEC(NULL, NULL, _LV::Info);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::ji2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(NULL, tag, _LV::Info);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::ji3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, NULL, _LV::Info);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::ji4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Info);
 }
 
 void LLBC_LogHelper::w(const char *fmt, ...)
@@ -175,6 +224,26 @@ void LLBC_LogHelper::w4(const char *logger, const char *tag, const char *fmt, ..
     __LLBC_LOG_TO_SPEC(logger, _LV::Warn, tag, fmt);
 }
 
+LLBC_LogJsonMsg &LLBC_LogHelper::jw()
+{
+    __LLBC_JLOG_TO_SPEC(NULL, NULL, _LV::Warn);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jw2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(NULL, tag, _LV::Warn);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jw3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, NULL, _LV::Warn);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jw4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Warn);
+}
+
 void LLBC_LogHelper::e(const char *fmt, ...)
 {
     __LLBC_LOG_TO_ROOT(_LV::Error, fmt);
@@ -195,6 +264,26 @@ void LLBC_LogHelper::e4(const char *logger, const char *tag, const char *fmt, ..
     __LLBC_LOG_TO_SPEC(logger, _LV::Error, tag, fmt);
 }
 
+LLBC_LogJsonMsg &LLBC_LogHelper::je()
+{
+    __LLBC_JLOG_TO_SPEC(NULL, NULL, _LV::Error);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::je2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(NULL, tag, _LV::Error);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::je3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, NULL, _LV::Error);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Error);
+}
+
 void LLBC_LogHelper::f(const char *fmt, ...)
 {
     __LLBC_LOG_TO_ROOT(_LV::Fatal, fmt);
@@ -213,6 +302,26 @@ void LLBC_LogHelper::f3(const char *logger, const char *fmt, ...)
 void LLBC_LogHelper::f4(const char *logger, const char *tag, const char *fmt, ...)
 {
     __LLBC_LOG_TO_SPEC(logger, _LV::Fatal, tag, fmt);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jf()
+{
+    __LLBC_JLOG_TO_SPEC(NULL, NULL, _LV::Fatal);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jf2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(NULL, tag, _LV::Fatal);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jf3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, NULL, _LV::Fatal);
+}
+
+LLBC_LogJsonMsg &LLBC_LogHelper::jf4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Fatal);
 }
 
 void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)

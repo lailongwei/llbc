@@ -51,7 +51,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Install logger hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug, this, &TestCase_Core_Log::_OnLogHook);
+    rootLogger->InstallHook(LLBC_LogLevel::Debug, this, &TestCase_Core_Log::OnLogHook);
 
     // Use root logger to test.
     LLBC_DEBUG_LOG("This is a debug log message.");
@@ -160,13 +160,140 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_PrintLine("Performance test completed, "
         "log size:%d, elapsed time: %s", loopLmt, elapsed.ToString().c_str());
 
+    // test json styled log
+    OnJsonLogTest();
+
+    int testTime = 10000;
+    for (int i=0; i<testTime; ++i)
+        OnJsonLogTest();
+
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
 
     return 0;
 }
 
-void TestCase_Core_Log::_OnLogHook(const LLBC_LogData *logData)
+void TestCase_Core_Log::OnJsonLogTest()
+{
+    LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
+    Log.jd().Add("testKey", "testValue->jd.1").Finish("");
+    Log.jd().Add("testKey", "testValue->jd.2").Finish("%s", "Finish Test");
+    Log.jd().Add("testKey", "testValue->jd.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jd2("testTag").Add("testKey", "testValue->jd2.1").Finish("");
+    Log.jd2("testTag").Add("testKey", "testValue->jd2.2").Finish("%s", "Finish Test");
+    Log.jd2("testTag").Add("testKey", "testValue->jd2.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jd2<TestCase_Core_Log>().Add("testKey", LLBC_Variant()).Finish("");
+    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.1").Finish("");
+    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.2").Finish("%s", "Finish Test");
+    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jd3(NULL).Add("testKey", "testValue->Log.jd3(1).").Finish("");
+    Log.jd3("").Add("testKey", "testValue->jd3(2).").Finish("");
+    Log.jd3("test").Add("testKey", "testValue->jd3(3).").Finish("");
+    Log.jd3("test").Add("testKey", "testValue->jd3(4).").Finish("%s", "Finish Test");
+    Log.jd3("test").Add("testKey", "testValue->jd3(5).").Finish("%s%d", "Finish Test", 2);
+
+    Log.jd4<TestCase_Core_Log>(NULL).Add("testKey", "testValue->jd4<>.1").Finish("");
+    Log.jd4<TestCase_Core_Log>("").Add("testKey", "testValue->jd4<>.2").Finish("");
+    Log.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.3").Finish("%s", "Finish Test");
+    Log.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.4").Finish("%s%d", "Finish Test", 2);
+
+    Log.ji().Add("testKey", "testValue->ji.1").Finish("");
+    Log.ji().Add("testKey", "testValue->ji.2").Finish("%s", "Finish Test");
+    Log.ji().Add("testKey", "testValue->ji.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.ji2("testTag").Add("testKey", "testValue->ji2.1").Finish("");
+    Log.ji2("testTag").Add("testKey", "testValue->ji2.2").Finish("%s", "Finish Test");
+    Log.ji2("testTag").Add("testKey", "testValue->ji2.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.1").Finish("");
+    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.2").Finish("%s", "Finish Test");
+    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.ji3(NULL).Add("testKey", "testValue->Log.ji3().1").Finish("");
+    Log.ji3("").Add("testKey", "testValue->ji3().2").Finish("");
+    Log.ji3("test").Add("testKey", "testValue->ji3().3").Finish("");
+    Log.ji3("test").Add("testKey", "testValue->ji3().4").Finish("%s", "Finish Test");
+    Log.ji3("test").Add("testKey", "testValue->ji3().5").Finish("%s%d", "Finish Test", 2);
+
+    Log.ji4<TestCase_Core_Log>(NULL).Add("testKey", "testValue->ji4<>1").Finish("");
+    Log.ji4<TestCase_Core_Log>("").Add("testKey", "testValue->ji4<>2").Finish("");
+    Log.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>3").Finish("%s", "Finish Test");
+    Log.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>4").Finish("%s%d", "Finish Test", 2);
+
+    Log.jw().Add("testKey", "testValue->jw.1").Finish("");
+    Log.jw().Add("testKey", "testValue->jw.2").Finish("%s", "Finish Test");
+    Log.jw().Add("testKey", "testValue->jw.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jw2("testTag").Add("testKey", "testValue->jw2.1").Finish("");
+    Log.jw2("testTag").Add("testKey", "testValue->jw2.2").Finish("%s", "Finish Test");
+    Log.jw2("testTag").Add("testKey", "testValue->jw2.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.1").Finish("");
+    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.2").Finish("%s", "Finish Test");
+    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jw3(NULL).Add("testKey", "testValue->Log.jw3().1").Finish("");
+    Log.jw3("").Add("testKey", "testValue->jw3().2").Finish("");
+    Log.jw3("test").Add("testKey", "testValue->jw3().3").Finish("");
+    Log.jw3("test").Add("testKey", "testValue->jw3().4").Finish("%s", "Finish Test");
+    Log.jw3("test").Add("testKey", "testValue->jw3().5").Finish("%s%d", "Finish Test", 2);
+
+    Log.jw4<TestCase_Core_Log>(NULL).Add("testKey", "testValue->jw4<>1").Finish("");
+    Log.jw4<TestCase_Core_Log>("").Add("testKey", "testValue->jw4<>2").Finish("");
+    Log.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>3").Finish("%s", "Finish Test");
+    Log.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>4").Finish("%s%d", "Finish Test", 2);
+
+    Log.je().Add("testKey", "testValue->je.1").Finish("");
+    Log.je().Add("testKey", "testValue->je.2").Finish("%s", "Finish Test");
+    Log.je().Add("testKey", "testValue->je.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.je2("testTag").Add("testKey", "testValue->je2.1").Finish("");
+    Log.je2("testTag").Add("testKey", "testValue->je2.2").Finish("%s", "Finish Test");
+    Log.je2("testTag").Add("testKey", "testValue->je2.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.1").Finish("");
+    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.2").Finish("%s", "Finish Test");
+    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.je3(NULL).Add("testKey", "testValue->Log.je3().1").Finish("");
+    Log.je3("").Add("testKey", "testValue->je3().2").Finish("");
+    Log.je3("test").Add("testKey", "testValue->je3().3").Finish("");
+    Log.je3("test").Add("testKey", "testValue->je3().4").Finish("%s", "Finish Test");
+    Log.je3("test").Add("testKey", "testValue->je3().5").Finish("%s%d", "Finish Test", 2);
+
+    Log.je4<TestCase_Core_Log>(NULL).Add("testKey", "testValue->je4<>1").Finish("");
+    Log.je4<TestCase_Core_Log>("").Add("testKey", "testValue->je4<>2").Finish("");
+    Log.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>3").Finish("%s", "Finish Test");
+    Log.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>4").Finish("%s%d", "Finish Test", 2);
+
+    Log.jf().Add("testKey", "testValue->jf.1").Finish("");
+    Log.jf().Add("testKey", "testValue->jf.2").Finish("%s", "Finish Test");
+    Log.jf().Add("testKey", "testValue->jf.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jf2("testTag").Add("testKey", "testValue->jf2.1").Finish("");
+    Log.jf2("testTag").Add("testKey", "testValue->jf2.2").Finish("%s", "Finish Test");
+    Log.jf2("testTag").Add("testKey", "testValue->jf2.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.1").Finish("");
+    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.2").Finish("%s", "Finish Test");
+    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.3").Finish("%s%d", "Finish Test", 2);
+
+    Log.jf3(NULL).Add("testKey", "testValue->Log.jf3().1").Finish("");
+    Log.jf3("").Add("testKey", "testValue->jf3().2").Finish("");
+    Log.jf3("test").Add("testKey", "testValue->jf3().3").Finish("");
+    Log.jf3("test").Add("testKey", "testValue->jf3().4").Finish("%s", "Finish Test");
+    Log.jf3("test").Add("testKey", "testValue->jf3().5").Finish("%s%d", "Finish Test", 2);
+
+    Log.jf4<TestCase_Core_Log>(NULL).Add("testKey", "testValue->jf4<>1").Finish("");
+    Log.jf4<TestCase_Core_Log>("").Add("testKey", "testValue->jf4<>2").Finish("");
+    Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>3").Finish("%s", "Finish Test");
+    Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>4").Finish("%s%d", "Finish Test", 2);
+}
+
+void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
                    logData->loggerName, LLBC_LogLevel::GetLevelDesc(logData->level).c_str());

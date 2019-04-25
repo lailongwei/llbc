@@ -19,24 +19,55 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_LOG_H__
-#define __LLBC_TEST_CASE_CORE_LOG_H__
+#ifndef __LLBC_CORE_LOG_LOG_JSONMSG_H__
+#define __LLBC_CORE_LOG_LOG_JSONMSG_H__
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/common/Common.h"
+#include "llbc/core/json/json.h"
 
-class TestCase_Core_Log : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+/**
+ * Pre-declare some classes.
+ */
+class LLBC_Logger;
+
+/**
+ * \brief The json log msg class encapsulation.
+ */
+class LLBC_EXPORT LLBC_LogJsonMsg
 {
 public:
-    TestCase_Core_Log();
-    virtual ~TestCase_Core_Log();
+    explicit LLBC_LogJsonMsg(LLBC_Logger *logger, const char* tag, int lv);
+    ~LLBC_LogJsonMsg();
 
 public:
-    int Run(int argc, char *argv[]);
+    /**
+    * Add json styled message
+    */
+    template <typename T>
+    LLBC_LogJsonMsg &Add(const char *key, const T &value);
+    /**
+    * Output json styled message
+    */
+    void Finish(const char *fmt, ...);
 
 private:
-    void OnLogHook(const LLBC_LogData *logData);
-    void OnJsonLogTest();
+    /**
+    * When logger component not initialize, will use this function to output message.
+    */
+    void UnInitOutput(FILE *to, const char *msg);
+
+private:
+    LLBC_Logger *_logger;
+    const char *_tag;
+    int _lv;
+
+    Json::Value _json;
 };
 
-#endif // !__LLBC_TEST_CASE_CORE_LOG_H__
+__LLBC_NS_END
+
+#include "llbc/core/log/LogJsonMsgImpl.h"
+
+#endif // !__LLBC_CORE_LOG_LOG_JSONMSG_H__

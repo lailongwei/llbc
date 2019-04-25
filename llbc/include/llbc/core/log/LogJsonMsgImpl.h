@@ -19,24 +19,26 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_LOG_H__
-#define __LLBC_TEST_CASE_CORE_LOG_H__
+#include "llbc/core/variant/Variant.h"
 
-#include "llbc.h"
-using namespace llbc;
+#ifdef __LLBC_CORE_LOG_LOG_JSONMSG_H__
 
-class TestCase_Core_Log : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+template <>
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const LLBC_Variant &value)
 {
-public:
-    TestCase_Core_Log();
-    virtual ~TestCase_Core_Log();
+    _json[key] = value.ValueToString();
+    return *this;
+}
 
-public:
-    int Run(int argc, char *argv[]);
+template <typename T>
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
+{
+    _json[key] = value;
+    return *this;
+}
 
-private:
-    void OnLogHook(const LLBC_LogData *logData);
-    void OnJsonLogTest();
-};
+__LLBC_NS_END
 
-#endif // !__LLBC_TEST_CASE_CORE_LOG_H__
+#endif // __LLBC_CORE_LOG_LOG_JSONMSG_H__

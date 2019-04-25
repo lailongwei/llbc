@@ -19,6 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogJsonMsg.h"
+
 #ifdef __LLBC_CORE_LOG_LOG_H__
 
 __LLBC_NS_BEGIN
@@ -46,6 +49,18 @@ inline void LLBC_LogHelper::d4(const char *logger, const char *fmt, ...)
 }
 
 template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jd2()
+{
+    return jd2(LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jd4(const char *logger)
+{
+    return jd4(logger, LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::i2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
@@ -65,6 +80,18 @@ inline void LLBC_LogHelper::i4(const char *logger, const char *fmt, ...)
     i4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
 
     LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::ji2()
+{
+    return ji2(LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::ji4(const char *logger)
+{
+    return ji4(logger, LLBC_GetTypeName(Tag));
 }
 
 template <typename Tag>
@@ -90,6 +117,18 @@ inline void LLBC_LogHelper::w4(const char *logger, const char *fmt, ...)
 }
 
 template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jw2()
+{
+    return jw2(LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jw4(const char *logger)
+{
+    return jw4(logger, LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::e2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
@@ -112,6 +151,18 @@ inline void LLBC_LogHelper::e4(const char *logger, const char *fmt, ...)
 }
 
 template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::je2()
+{
+    return je2(LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger)
+{
+    return je4(logger, LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
 inline void LLBC_LogHelper::f2(const char *fmt, ...)
 {
     char *fmttedMsg; int msgLen;
@@ -131,6 +182,18 @@ inline void LLBC_LogHelper::f4(const char *logger, const char *fmt, ...)
     f4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
 
     LLBC_Free(fmttedMsg);
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jf2()
+{
+    return jf2(LLBC_GetTypeName(Tag));
+}
+
+template <typename Tag>
+LLBC_LogJsonMsg &LLBC_LogHelper::jf4(const char *logger)
+{
+    return jf4(logger, LLBC_GetTypeName(Tag));
 }
 
 __LLBC_NS_END
