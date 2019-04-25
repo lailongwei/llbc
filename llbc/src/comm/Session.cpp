@@ -303,7 +303,7 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 #if LLBC_CFG_COMM_USE_FULL_STACK
     if (_protoStack->Recv(block, _recvedPackets, removeSession) != LLBC_OK)
 #else
-    if (_protoStack->RecvRaw(block, packets, removeSession) != LLBC_OK)
+    if (_protoStack->RecvRaw(block, _recvedPackets, removeSession) != LLBC_OK)
 #endif
     {
         if (removeSession)
