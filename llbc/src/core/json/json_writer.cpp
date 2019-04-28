@@ -33,7 +33,7 @@ static bool containsControlCharacter( const char* str )
    }
    return false;
 }
-static void ulongToString( unsigned long long value, 
+static void ulonglongToString( unsigned long long value, 
                           char *&current )
 {
    *--current = 0;
@@ -52,7 +52,7 @@ std::string valueToString( Int value )
    bool isNegative = value < 0;
    if ( isNegative )
       value = -value;
-   ulongToString( UInt(value), current );
+   ulonglongToString( UInt(value), current );
    if ( isNegative )
       *--current = '-';
    assert( current >= buffer );
@@ -64,19 +64,42 @@ std::string valueToString( UInt value )
 {
    char buffer[32];
    char *current = buffer + sizeof(buffer);
-   ulongToString( value, current );
+   ulonglongToString( value, current );
    assert( current >= buffer );
    return current;
 }
 
-std::string valueToString( LongLong value )
+std::string valueToString(Long value)
 {
     char buffer[64];
+    char *current = buffer + sizeof(buffer);
+    bool isNegative = value < 0;
+    if (isNegative)
+        value = -value;
+    ulonglongToString(ULongLong(value), current);
+    if (isNegative)
+        *--current = '-';
+    assert(current >= buffer);
+    return current;
+}
+
+std::string valueToString(ULong value)
+{
+    char buffer[64];
+    char *current = buffer + sizeof(buffer);
+    ulonglongToString(value, current);
+    assert(current >= buffer);
+    return current;
+}
+
+std::string valueToString( LongLong value )
+{
+   char buffer[64];
    char *current = buffer + sizeof(buffer);
    bool isNegative = value < 0;
    if ( isNegative )
       value = -value;
-   ulongToString( ULongLong(value), current );
+   ulonglongToString( ULongLong(value), current );
    if ( isNegative )
       *--current = '-';
    assert( current >= buffer );
@@ -87,7 +110,7 @@ std::string valueToString( ULongLong value )
 {
    char buffer[64];
    char *current = buffer + sizeof(buffer);
-   ulongToString( value, current );
+   ulonglongToString( value, current );
    assert( current >= buffer );
    return current;
 }
@@ -341,6 +364,12 @@ StyledWriter::writeValue( const Value &value )
        break;
    case ulongValue:
        pushValue( valueToString( value.asULong() ) );
+       break;
+   case longlongValue:
+       pushValue(valueToString(value.asLongLong()));
+       break;
+   case ulonglongValue:
+       pushValue(valueToString(value.asULongLong()));
        break;
    case realValue:
       pushValue( valueToString( value.asDouble() ) );

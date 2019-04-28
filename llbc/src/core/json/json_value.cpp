@@ -36,9 +36,12 @@ const Value Value::null;
 const Int Value::minInt = Int( ~(UInt(-1)/2) );
 const Int Value::maxInt = Int( UInt(-1)/2 );
 const UInt Value::maxUInt = UInt(-1);
-const LongLong Value::minLong = LongLong( ~(ULongLong(-1)/2) );
-const LongLong Value::maxLong = LongLong( ULongLong(-1)/2 );
-const ULongLong Value::maxULong = ULongLong(-1);
+const Long Value::minLong = Long( ~(ULong(-1) / 2) );
+const Long Value::maxLong = Long( (ULong(-1) / 2) );
+const ULong Value::maxULong = ULong(-1);
+const LongLong Value::minLongLong = LongLong( ~(ULongLong(-1)/2) );
+const LongLong Value::maxLongLong = LongLong( ULongLong(-1)/2 );
+const ULongLong Value::maxULongLong = ULongLong(-1);
 
 // A "safe" implementation of strdup. Allow null pointer to be passed. 
 // Also avoid warning on msvc80.
@@ -350,25 +353,50 @@ Value::Value( UInt value )
    value_.uint_ = value;
 }
 
-Value::Value( LongLong value )
-    : type_( longValue )
-    , comments_( 0 )
+
+Value::Value(Long value)
+    : type_(longValue)
+    , comments_(0)
 #ifdef JSON_VALUE_USE_INTERNAL_MAP
-    , itemIsUsed_( 0 )
+    , itemIsUsed_(0)
 #endif
 {
     value_.long_ = value;
 }
 
-Value::Value( ULongLong value ) 
-    : type_( ulongValue )
+
+Value::Value(ULong value)
+    : type_(ulongValue)
+    , comments_(0)
+#ifdef JSON_VALUE_USE_INTERNAL_MAP
+    , itemIsUsed_(0)
+#endif
+{
+    value_.ulong_ = value;
+}
+
+
+Value::Value( LongLong value )
+    : type_( longlongValue )
     , comments_( 0 )
 #ifdef JSON_VALUE_USE_INTERNAL_MAP
     , itemIsUsed_( 0 )
 #endif
 {
-    value_.ulong_ = value;    value_.ulong_ = value;
+    value_.longlong_ = value;
 }
+
+
+Value::Value( ULongLong value ) 
+    : type_( ulonglongValue )
+    , comments_( 0 )
+#ifdef JSON_VALUE_USE_INTERNAL_MAP
+    , itemIsUsed_( 0 )
+#endif
+{
+    value_.ulonglong_ = value;
+}
+
 
 Value::Value( double value )
    : type_( realValue )
@@ -379,6 +407,7 @@ Value::Value( double value )
 {
    value_.real_ = value;
 }
+
 
 Value::Value( const char *value )
    : type_( stringValue )
@@ -469,6 +498,8 @@ Value::Value( const Value &other )
    case uintValue:
    case longValue:
    case ulongValue:
+   case longlongValue:
+   case ulonglongValue:
    case realValue:
    case booleanValue:
       value_ = other.value_;
@@ -520,6 +551,8 @@ Value::~Value()
    case uintValue:
    case longValue:
    case ulongValue:
+   case longlongValue:
+   case ulonglongValue:
    case realValue:
    case booleanValue:
       break;
@@ -832,7 +865,7 @@ Value::asUInt() const
    return 0; // unreachable;
 }
 
-Value::LongLong
+Value::Long
 Value::asLong() const
 {
    switch ( type_ )
@@ -844,26 +877,32 @@ Value::asLong() const
    case uintValue:
       return value_.uint_;
    case longValue:
-       return value_.long_;
+      return value_.long_;
    case ulongValue:
-       JSON_ASSERT_MESSAGE( value_.ulong_ <= (ULongLong)maxLong, "ULong out of long range" );
-       return value_.ulong_;
+      JSON_ASSERT_MESSAGE(value_.ulong_ <= (Long)maxLong, "ULong out of long range");
+      return value_.ulong_;
+   case longlongValue:
+      JSON_ASSERT_MESSAGE(value_.longlong_ <= (Long)maxLong, "LongLong out of long range");
+      return Long(value_.longlong_);
+   case ulonglongValue:
+      JSON_ASSERT_MESSAGE(value_.ulonglong_ <= (Long)maxLong, "ULongLong out of long range");
+      return Long(value_.ulonglong_);
    case realValue:
       JSON_ASSERT_MESSAGE( value_.real_ >= minLong &&  value_.real_ <= maxLong, "Real out of long range" );
-      return LongLong( value_.real_ );
+      return Long( value_.real_ );
    case booleanValue:
       return value_.bool_ ? 1 : 0;
    case stringValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to int" );
+      JSON_ASSERT_MESSAGE( false, "Type is not convertible to long" );
    default:
       JSON_ASSERT_UNREACHABLE;
    }
    return 0; // unreachable;
 }
 
-ULongLong
+ULong
 Value::asULong() const
 {
    switch ( type_ )
@@ -871,28 +910,107 @@ Value::asULong() const
    case nullValue:
       return 0;
    case intValue:
-      JSON_ASSERT_MESSAGE( value_.int_ >= 0, "Negative integer can not be converted to unsigned integer" );
+      JSON_ASSERT_MESSAGE( value_.int_ >= 0, "Negative integer can not be converted to unsigned long" );
       return value_.int_;
    case uintValue:
       return value_.uint_;
    case longValue:
-      JSON_ASSERT_MESSAGE( value_.long_ >= 0,  "long out of unsigned long range" );
-       return value_.long_;
+      JSON_ASSERT_MESSAGE( value_.long_ >= 0,  "Negative long can not be converted to unsigned long" );
+      return value_.long_;
    case ulongValue:
-       return value_.ulong_;
+      return value_.ulong_;
+   case longlongValue:
+       JSON_ASSERT_MESSAGE(value_.longlong_ >= 0, "Negative long can not be converted to unsigned long");
+       JSON_ASSERT_MESSAGE(value_.longlong_ <= (ULong)maxLong, "LongLong out of unsigned long range");
+       return ULong(value_.longlong_);
+   case ulonglongValue:
+       JSON_ASSERT_MESSAGE(value_.ulonglong_ <= (ULong)maxLong, "ULongLong out of unsigned long range");
+       return ULong(value_.ulonglong_);
    case realValue:
       JSON_ASSERT_MESSAGE( value_.real_ >= 0  &&  value_.real_ <= maxULong,  "Real out of unsigned long range" );
-      return ULongLong( value_.real_ );
+      return ULong( value_.real_ );
    case booleanValue:
       return value_.bool_ ? 1 : 0;
    case stringValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to uint" );
+      JSON_ASSERT_MESSAGE( false, "Type is not convertible to unsigned long" );
    default:
       JSON_ASSERT_UNREACHABLE;
    }
    return 0; // unreachable;
+}
+
+Value::LongLong
+Value::asLongLong() const
+{
+    switch (type_)
+    {
+    case nullValue:
+        return 0;
+    case intValue:
+        return value_.int_;
+    case uintValue:
+        return value_.uint_;
+    case longValue:
+        return value_.long_;
+    case ulongValue:
+        return value_.ulong_;
+    case longlongValue:
+        return value_.longlong_;
+    case ulonglongValue:
+        JSON_ASSERT_MESSAGE(value_.ulonglong_ <= (LongLong)maxLongLong, "ULongLong out of long long range");
+        return value_.ulonglong_;
+    case realValue:
+        JSON_ASSERT_MESSAGE(value_.real_ >= minLongLong && value_.real_ <= maxLongLong, "Real out of long long range");
+        return LongLong(value_.real_);
+    case booleanValue:
+        return value_.bool_ ? 1 : 0;
+    case stringValue:
+    case arrayValue:
+    case objectValue:
+        JSON_ASSERT_MESSAGE(false, "Type is not convertible to long long");
+    default:
+        JSON_ASSERT_UNREACHABLE;
+    }
+    return 0; // unreachable;
+}
+
+Value::ULongLong
+Value::asULongLong() const
+{
+    switch (type_)
+    {
+    case nullValue:
+        return 0;
+    case intValue:
+        JSON_ASSERT_MESSAGE(value_.int_ >= 0, "Negative integer can not be converted to unsigned long long");
+        return value_.int_;
+    case uintValue:
+        return value_.uint_;
+    case longValue:
+        JSON_ASSERT_MESSAGE(value_.long_ >= 0, "Negative long can not be converted to unsigned long long");
+        return value_.long_;
+    case ulongValue:
+        return value_.ulong_;
+    case longlongValue:
+        JSON_ASSERT_MESSAGE(value_.longlong_ >= 0, "Negative long long can not be converted to unsigned long long");
+        return value_.longlong_;
+    case ulonglongValue:
+        return value_.ulonglong_;
+    case realValue:
+        JSON_ASSERT_MESSAGE(value_.real_ >= 0 && value_.real_ <= maxULongLong, "Real out of unsigned long long range");
+        return ULongLong(value_.real_);
+    case booleanValue:
+        return value_.bool_ ? 1 : 0;
+    case stringValue:
+    case arrayValue:
+    case objectValue:
+        JSON_ASSERT_MESSAGE(false, "Type is not convertible to unsigned long long");
+    default:
+        JSON_ASSERT_UNREACHABLE;
+    }
+    return 0; // unreachable;
 }
 
 double 
@@ -1426,6 +1544,20 @@ bool
 Value::isULong() const
 {
     return type_ == ulongValue;
+}
+
+
+bool
+Value::isLongLong() const
+{
+    return type_ == longlongValue;
+}
+
+
+bool
+Value::isULongLong() const
+{
+    return type_ == ulonglongValue;
 }
 
 

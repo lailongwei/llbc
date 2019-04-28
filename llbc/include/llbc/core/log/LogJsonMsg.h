@@ -31,7 +31,6 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
-class LLBC_Variant;
 
 /**
  * \brief The json log msg class encapsulation.
