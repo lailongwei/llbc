@@ -920,12 +920,12 @@ Value::asULong() const
    case ulongValue:
       return value_.ulong_;
    case longlongValue:
-       JSON_ASSERT_MESSAGE(value_.longlong_ >= 0, "Negative long can not be converted to unsigned long");
-       JSON_ASSERT_MESSAGE(value_.longlong_ <= (ULong)maxLong, "LongLong out of unsigned long range");
-       return ULong(value_.longlong_);
+      JSON_ASSERT_MESSAGE(value_.longlong_ >= 0, "Negative long can not be converted to unsigned long");
+      JSON_ASSERT_MESSAGE(value_.longlong_ <= (ULong)maxLong, "LongLong out of unsigned long range");
+      return ULong(value_.longlong_);
    case ulonglongValue:
-       JSON_ASSERT_MESSAGE(value_.ulonglong_ <= (ULong)maxLong, "ULongLong out of unsigned long range");
-       return ULong(value_.ulonglong_);
+      JSON_ASSERT_MESSAGE(value_.ulonglong_ <= (ULong)maxLong, "ULongLong out of unsigned long range");
+      return ULong(value_.ulonglong_);
    case realValue:
       JSON_ASSERT_MESSAGE( value_.real_ >= 0  &&  value_.real_ <= maxULong,  "Real out of unsigned long range" );
       return ULong( value_.real_ );
