@@ -28,8 +28,10 @@ namespace Json {
       nullValue = 0, ///< 'null' value
       intValue,      ///< signed integer value
       uintValue,     ///< unsigned integer value
-      longValue,     ///< long long integer value
-      ulongValue,    ///< unsigned long long integer value.
+      longValue,     ///< long integer value
+      ulongValue,    ///< unsigned long integer value
+      longlongValue, ///< long long integer value
+      ulonglongValue,///< unsigned long long integer value.
       realValue,     ///< double value
       stringValue,   ///< UTF-8 string value
       booleanValue,  ///< bool value
@@ -126,6 +128,8 @@ namespace Json {
       typedef ValueConstIterator const_iterator;
       typedef Json::UInt UInt;
       typedef Json::Int Int;
+      typedef Json::Long Long;
+      typedef Json::ULong Ulong;
       typedef Json::LongLong LongLong;
       typedef Json::ULongLong ULongLong;
       typedef UInt ArrayIndex;
@@ -134,9 +138,12 @@ namespace Json {
       static const Int minInt;
       static const Int maxInt;
       static const UInt maxUInt;
-      static const LongLong minLong;
-      static const LongLong maxLong;
-      static const ULongLong maxULong;
+      static const Long minLong;
+      static const Long maxLong;
+      static const ULong maxULong;
+      static const LongLong minLongLong;
+      static const LongLong maxLongLong;
+      static const ULongLong maxULongLong;
 
    private:
 #ifndef JSONCPP_DOC_EXCLUDE_IMPLEMENTATION
@@ -194,6 +201,8 @@ namespace Json {
       Value( ValueType type = nullValue );
       Value( Int value );
       Value( UInt value );
+      Value( Long value );
+      Value( ULong value );
       Value( LongLong value );
       Value( ULongLong value );
       Value( double value );
@@ -243,8 +252,10 @@ namespace Json {
 # endif
       Int asInt() const;
       UInt asUInt() const;
-      LongLong asLong() const;
-      ULongLong asULong() const;
+      Long asLong() const;
+      ULong asULong() const;
+      LongLong asLongLong() const;
+      ULongLong asULongLong() const;
       double asDouble() const;
       bool asBool() const;
 
@@ -254,6 +265,8 @@ namespace Json {
       bool isUInt() const;
       bool isLong() const;
       bool isULong() const;
+      bool isLongLong() const;
+      bool isULongLong() const;
       bool isIntegral() const;
       bool isDouble() const;
       bool isNumeric() const;
@@ -442,8 +455,10 @@ namespace Json {
       {
          Int int_;
          UInt uint_;
-         LongLong long_;
-         ULongLong ulong_;
+         Long long_;
+         ULong ulong_;
+         LongLong longlong_;
+         ULongLong ulonglong_;
          double real_;
          bool bool_;
          char *string_;

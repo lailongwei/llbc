@@ -161,6 +161,8 @@ namespace Json {
 
    std::string JSON_API valueToString( Int value );
    std::string JSON_API valueToString( UInt value );
+   std::string JSON_API valueToString( Long value);
+   std::string JSON_API valueToString( ULong value);
    std::string JSON_API valueToString( LongLong value );
    std::string JSON_API valueToString( ULongLong value );
    std::string JSON_API valueToString( double value );
