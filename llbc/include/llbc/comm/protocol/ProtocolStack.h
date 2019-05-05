@@ -219,6 +219,8 @@ private:
     bool _suppressCoderNotFoundError;
 
     LLBC_IProtocol *_protos[LLBC_ProtocolLayer::End];
+
+    std::vector<LLBC_Packet *> _rawPackets;
 };
 
 __LLBC_NS_END
