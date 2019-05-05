@@ -354,10 +354,11 @@ public:
 public:
     /**
      * Post lazy task to service.
-     * @param[in] delegate - the task delegate.
+     * @param[in] deleg - the task delegate.
+     * @param[in] data  - the task data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<void, Base *> *deleg);
+    virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
 
 public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
@@ -406,7 +407,7 @@ private:
     /**
      * Frame tasks operation methods.
      */
-    typedef std::set<LLBC_IDelegate1<void, Base *> *> _FrameTasks;
+    typedef std::map<LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *, LLBC_Variant *> _FrameTasks;
     void HandleFrameTasks(_FrameTasks &tasks, bool &usingFlag);
     void DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag);
 
