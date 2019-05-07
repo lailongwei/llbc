@@ -34,6 +34,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/log test:");
 
+    // Do uninited log message test
+    DoUninitLogTest();
+
     // Initialize logger manager.
 #if LLBC_TARGET_PLATFORM_IPHONE
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
@@ -154,26 +157,28 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     const int loopLmt = 500000;
     for (int i = 0; i < loopLmt; i++)
         LLBC_DEBUG_LOG_SPEC("perftest", "performance test msg");
-    LLBC_LoggerManagerSingleton->Finalize();
 
     LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
     LLBC_PrintLine("Performance test completed, "
         "log size:%d, elapsed time: %s", loopLmt, elapsed.ToString().c_str());
 
     // test json styled log
-    OnJsonLogTest();
+    DoJsonLogTest();
 
-    int testTime = 10000;
-    for (int i=0; i<testTime; ++i)
-        OnJsonLogTest();
+    int jsonLogTestTimes = 10000;
+    for (int i = 0; i < jsonLogTestTimes; ++i)
+        DoJsonLogTest();
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
 
+    // Finalize logger manager.
+    LLBC_LoggerManagerSingleton->Finalize();
+
     return 0;
 }
 
-void TestCase_Core_Log::OnJsonLogTest()
+void TestCase_Core_Log::DoJsonLogTest()
 {
     LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
     Log.jd().Add("testKey", "testValue->jd.1").Finish("");
@@ -291,6 +296,12 @@ void TestCase_Core_Log::OnJsonLogTest()
     Log.jf4<TestCase_Core_Log>("").Add("testKey", "testValue->jf4<>2").Finish("");
     Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>3").Finish("%s", "Finish Test");
     Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>4").Finish("%s%d", "Finish Test", 2);
+}
+
+void TestCase_Core_Log::DoUninitLogTest()
+{
+    Log.d("This is a uninited log message");
+    Log.jd().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)

@@ -187,14 +187,6 @@ const LLBC_String &LLBC_Logger::GetLoggerName() const
 
 int LLBC_Logger::GetLogLevel() const
 {
-    LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(nonConstThis->_mutex);
-    if (!_logRunnable)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_LogLevel::End;
-    }
-
     return _logLevel;
 }
 

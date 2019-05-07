@@ -284,18 +284,18 @@ int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded
 
 int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession)
 {
-    std::vector<LLBC_Packet *> rawPackets;
-    if (RecvRaw(block, rawPackets, removeSession) != LLBC_OK)
+    _rawPackets.clear();
+    if (RecvRaw(block, _rawPackets, removeSession) != LLBC_OK)
         return LLBC_FAILED;
-
-    for (size_t i = 0;  i < rawPackets.size(); i++)
+        
+    for (size_t i = 0;  i < _rawPackets.size(); i++)
     {
         LLBC_Packet *packet;
-        if (RecvCodec(rawPackets[i], packet, removeSession) != LLBC_OK)
+        if (RecvCodec(_rawPackets[i], packet, removeSession) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(packets);
-            for (++i; i < rawPackets.size(); i++)
-                LLBC_Delete(rawPackets[i]);
+            for (++i; i < _rawPackets.size(); i++)
+                LLBC_Delete(_rawPackets[i]);
 
             return LLBC_FAILED;
         }

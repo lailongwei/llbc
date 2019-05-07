@@ -438,7 +438,7 @@ int LLBC_Service::GetFPS() const
 
 int LLBC_Service::SetFPS(int fps)
 {
-    if (fps != LLBC_INFINITE &&
+    if (fps != static_cast<int>(LLBC_INFINITE) &&
             (fps < LLBC_CFG_COMM_MIN_SERVICE_FPS || fps > LLBC_CFG_COMM_MAX_SERVICE_FPS))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
@@ -448,7 +448,7 @@ int LLBC_Service::SetFPS(int fps)
     LLBC_LockGuard guard(_lock);
 
     _fps = fps;
-    if (_fps != LLBC_INFINITE)
+    if (_fps != static_cast<int>(LLBC_INFINITE))
     {
         _frameInterval = 1000 / _fps;
     }
@@ -966,7 +966,7 @@ void LLBC_Service::FireEvent(LLBC_Event *ev)
     Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
 }
 
-int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
+int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
 {
     if (UNLIKELY(!deleg))
     {
@@ -990,20 +990,20 @@ int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
 
     if (_handlingBeforeFrameTasks)
     {
-        _afterFrameTasks.insert(deleg);
+        _afterFrameTasks.insert(std::make_pair(deleg, data));
     }
     else
     {
         if (!_handledBeforeFrameTasks)
         {
-            _beforeFrameTasks.insert(deleg);
+            _beforeFrameTasks.insert(std::make_pair(deleg, data));
         }
         else
         {
             if (!_handlingAfterFrameTasks)
-                _afterFrameTasks.insert(deleg);
+                _afterFrameTasks.insert(std::make_pair(deleg, data));
             else
-                _beforeFrameTasks.insert(deleg);
+                _beforeFrameTasks.insert(std::make_pair(deleg, data));
         }
     }
 
@@ -1273,7 +1273,7 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
     for (_FrameTasks::iterator it = tasks.begin();
          it != tasks.end();
          it++)
-        (*it)->Invoke(this);
+        (it->first)->Invoke(this, it->second);
 
     DestroyFrameTasks(tasks, usingFlag);
 }
@@ -1281,7 +1281,16 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
 void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
 {
     usingFlag = false;
-    LLBC_STLHelper::DeleteContainer(tasks, true);
+    for (_FrameTasks::iterator it = tasks.begin();
+         it != tasks.end();
+         it++)
+    {
+        LLBC_Delete(it->first);
+        if (it->second)
+            LLBC_Delete(it->second);
+    }
+
+    tasks.clear();
 }
 
 void LLBC_Service::HandleQueuedEvents()
@@ -1930,7 +1939,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (validCheck)
             _connectedSessionIdsLock.Lock();
 
-        for (register typename SessionIds::size_type i = 1;
+        for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
              i++)
         {
@@ -1978,7 +1987,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
     const size_t otherPacketCnt = sessionCnt - 1;
-    for (register size_t i = 0; i < otherPacketCnt; i++)
+    for (size_t i = 0; i < otherPacketCnt; i++)
     {
         LLBC_Packet *otherPacket = otherPackets[i];
         if (!otherPacket)

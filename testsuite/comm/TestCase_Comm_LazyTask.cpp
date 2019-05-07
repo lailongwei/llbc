@@ -27,16 +27,20 @@ namespace
     class LazyClass
     {
     public:
-        void BeforeRun(LLBC_IService *svc)
+        void BeforeRun(LLBC_IService *svc, const LLBC_Variant *data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s", "BeforeRun()");
-            svc->Post(this, &LazyClass::AfterRun);
+            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data ? data->ToString().c_str() : "Null");
+
+            LLBC_Variant *afterRunData = new LLBC_Variant(data ? *data : LLBC_Variant());
+            svc->Post(this, &LazyClass::AfterRun, afterRunData);
         }
 
-        void AfterRun(LLBC_IService *svc)
+        void AfterRun(LLBC_IService *svc, const LLBC_Variant *data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s", "AfterRun()");
-            svc->Post(this, &LazyClass::BeforeRun);
+            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data ? data->ToString().c_str() : "Null");
+
+            LLBC_Variant *beforeRunTask = new LLBC_Variant(data ? *data : LLBC_Variant());
+            svc->Post(this, &LazyClass::BeforeRun, beforeRunTask);
         }
     };
 }
@@ -56,7 +60,12 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "LazyTaskTest");
 
     LazyClass *taskObj = LLBC_New(LazyClass);
-    svc->Post(taskObj, &LazyClass::BeforeRun);
+    LLBC_Variant *taskData = new LLBC_Variant();
+    (*taskData)["IntVal"] = 51215;
+    (*taskData)["StrVal"] = "Hello World";
+    (*taskData)["DictData"] = LLBC_Variant();
+    (*taskData)["DictData"]["EmbeddedVal"] = 3.1415926;
+    svc->Post(taskObj, &LazyClass::BeforeRun, taskData);
 
     svc->Start();
 
