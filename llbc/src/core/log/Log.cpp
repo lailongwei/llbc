@@ -53,32 +53,60 @@ LLBC_Logger *LLBC_LogHelper::_rootLogger = NULL;
 LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
 
 #define __LLBC_LOG_TO_ROOT(level, fmt)                                        \
-    char *fmttedMsg; int msgLen;                                              \
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
+    do                                                                        \
+    {                                                                         \
+        if (LIKELY(_rootLogger))                                              \
+        {                                                                     \
+            if (level < _rootLogger->GetLogLevel())                           \
+                break;                                                        \
                                                                               \
-    if (LIKELY(_rootLogger))                                                  \
-        _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
-    else                                                                      \
-        UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+            char *fmttedMsg; int msgLen;                                      \
+            LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
+            _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
                                                                               \
-    LLBC_Free(fmttedMsg);                                                     \
+            LLBC_Free(fmttedMsg);                                             \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            char *fmttedMsg; int msgLen;                                      \
+            LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
+            UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);    \
+                                                                              \
+            LLBC_Free(fmttedMsg);                                             \
+        }                                                                     \
+    } while (0)                                                               \
 
 #define __LLBC_LOG_TO_SPEC(logger, level, tag, fmt)                           \
-    char *fmttedMsg; int msgLen;                                              \
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);                                   \
+    do                                                                        \
+    {                                                                         \
+        if (UNLIKELY(!_rootLogger))                                           \
+        {                                                                     \
+            char *fmttedMsg; int msgLen;                                      \
+            LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
+            UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);    \
                                                                               \
-    LLBC_Logger *l = NULL;                                                    \
-    if (logger == NULL)                                                       \
-        l = _rootLogger;                                                      \
-    else if (LIKELY(_loggerManager))                                          \
-        l = _loggerManager->GetLogger(logger);                                \
+            LLBC_Free(fmttedMsg);                                             \
+            break;                                                            \
+        }                                                                     \
                                                                               \
-    if (LIKELY(l))                                                            \
-        l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen);\
-    else                                                                      \
-        UnInitOutput(level >= _LV::Warn ? stderr : stdout, fmttedMsg);        \
+        LLBC_Logger *l = NULL;                                                \
+        if (logger == NULL)                                                   \
+            l = _rootLogger;                                                  \
+        else                                                                  \
+            l = _loggerManager->GetLogger(logger);                            \
                                                                               \
-    LLBC_Free(fmttedMsg);                                                     \
+        if (LIKELY(l))                                                        \
+        {                                                                     \
+            if (level < l->GetLogLevel())                                     \
+                break;                                                        \
+                                                                              \
+            char *fmttedMsg; int msgLen;                                      \
+            LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
+            l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen); \
+                                                                              \
+            LLBC_Free(fmttedMsg);                                             \
+        }                                                                     \
+    } while (0)                                                               \
 
 #define __LLBC_JLOG_TO_SPEC(logger, tag, lv)                                  \
     LLBC_Logger *l = NULL;                                                    \
@@ -87,7 +115,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     else if (LIKELY(_loggerManager))                                          \
         l = _loggerManager->GetLogger(logger);                                \
                                                                               \
-    return *LLBC_New3(LLBC_LogJsonMsg, l, tag, lv);                           \
+    return *LLBC_New4(LLBC_LogJsonMsg, _rootLogger != NULL, l, tag, lv);      \
 
 
 int LLBC_LogHelper::init(const LLBC_String &cfgFile)
@@ -334,6 +362,7 @@ void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
 //! At latest, undef code define macros.
 #undef __LLBC_LOG_TO_ROOT
 #undef __LLBC_LOG_TO_SPEC
+#undef __LLBC_JLOG_TO_SPEC
 
 __LLBC_NS_END
 

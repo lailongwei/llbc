@@ -35,8 +35,10 @@ public:
     int Run(int argc, char *argv[]);
 
 private:
+    void DoJsonLogTest();
+    void DoUninitLogTest();
+
     void OnLogHook(const LLBC_LogData *logData);
-    void OnJsonLogTest();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_LOG_H__

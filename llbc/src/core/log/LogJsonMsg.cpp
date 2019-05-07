@@ -28,6 +28,7 @@
 #include "llbc/core/log/Logger.h"
 
 #include "llbc/core/log/LogJsonMsg.h"
+#include "llbc/core/log/LoggerManager.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
@@ -40,8 +41,9 @@ namespace
     typedef LLBC_NS LLBC_LogLevel _LV;
 }
 
-LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger, const char *tag, int lv)
-: _logger(logger)
+LLBC_LogJsonMsg::LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const char *tag, int lv)
+: _loggerInited(loggerInited)
+, _logger(logger)
 , _tag(tag)
 , _lv(lv)
 {
@@ -53,18 +55,28 @@ LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    if (UNLIKELY(!_loggerInited))
+    {
+        char *fmttedMsg; int msgLen;
+        LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
-    _json["msg"] = fmttedMsg;
-    const LLBC_String &jStr = _json.toStyledString();
+        _json["msg"] = fmttedMsg;
+        LLBC_Free(fmttedMsg);
+        const LLBC_String &jStr = _json.toStyledString();
 
-    if (LIKELY(_logger))
-        _logger->OutputNonFormat(_lv, _tag, __FILE__, __LINE__, jStr.c_str(), jStr.length());
-    else
         UnInitOutput(_lv >= _LV::Warn ? stderr : stdout, jStr.c_str());
+    }
+    else if (_logger && _lv >= _logger->GetLogLevel())
+    {
+        char *fmttedMsg; int msgLen;
+        LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
-    LLBC_Free(fmttedMsg);
+        _json["msg"] = fmttedMsg;
+        LLBC_Free(fmttedMsg);
+        const LLBC_String &jStr = _json.toStyledString();
+
+        _logger->OutputNonFormat(_lv, _tag, __FILE__, __LINE__, jStr.c_str(), jStr.length());
+    }
 
     LLBC_Delete(this);
 }
