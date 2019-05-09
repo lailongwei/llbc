@@ -14,12 +14,19 @@
 
 __LLBC_NS_BEGIN
 
+// replace rapidjson with LLBC_Json
 namespace LLBC_Json = ::rapidjson;
+// rapidjson's value
 typedef LLBC_Json::Value LLBC_JsonValue;
+// rapidjson's document
 typedef LLBC_Json::Document LLBC_JsonDocument;
+// iterator of rapidjson's value
 typedef LLBC_Json::Value::ValueIterator LLBC_JsonValueIter;
+// const iterator of rapidjson's value
 typedef LLBC_Json::Value::ConstValueIterator LLBC_JsonValueCIter;
+// iterator of rapidjson's member
 typedef LLBC_Json::Value::MemberIterator LLBC_JsonMemberIter;
+// const iterator of rapidjson's member
 typedef LLBC_Json::Value::ConstMemberIterator LLBC_JsonMemberCIter;
 
 /**
