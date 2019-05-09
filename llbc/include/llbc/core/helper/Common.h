@@ -24,6 +24,5 @@
 
 #include "llbc/core/helper/STLHelper.h"
 #include "llbc/core/helper/GUIDHelper.h"
-#include "llbc/core/helper/JVHelper.h"
 
 #endif // __LLBC_CORE_HELPER_COMMON_H__

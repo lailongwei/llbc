@@ -19,20 +19,43 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_HELPER_JV_HELPER_H__
-#define __LLBC_TEST_CASE_CORE_HELPER_JV_HELPER_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/core/rapidjson/json.h"
 
-class TestCase_Core_Helper_JVHelper : public LLBC_BaseTestCase
+#if LLBC_TARGET_PLATFORM_WIN32
+#pragma warning(disable:4996)
+#endif
+
+__LLBC_NS_BEGIN
+
+void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool isPretty)
 {
-public:
-    TestCase_Core_Helper_JVHelper();
-    virtual ~TestCase_Core_Helper_JVHelper();
+    LLBC_Json::StringBuffer buffer;
+    if (isPretty)
+    {
+        LLBC_Json::PrettyWriter<LLBC_Json::StringBuffer> writer(buffer);
+        value.Accept(writer);
+    }
+    else
+    {
+        LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
+        value.Accept(writer);
+    }
 
-public:
-    virtual int Run(int argc, char *argv[]);
-};
+    outStr = buffer.GetString();
+}
 
-#endif // !__LLBC_TEST_CASE_CORE_HELPER_JV_HELPER_H__
+std::ostream &operator <<(std::ostream &o, const LLBC_Json::Value &value)
+{
+    LLBC_Json::StringBuffer buffer;
+    LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
+    value.Accept(writer);
+
+    return o << buffer.GetString();
+}
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"

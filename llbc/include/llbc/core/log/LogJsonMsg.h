@@ -23,7 +23,7 @@
 #define __LLBC_CORE_LOG_LOG_JSONMSG_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/json/json.h"
+#include "llbc/core/rapidjson/json.h"
 
 __LLBC_NS_BEGIN
 
@@ -45,8 +45,10 @@ public:
     /**
     * Add json styled message
     */
+    LLBC_LogJsonMsg &Add(const char *key, const char *value);
     template <typename T>
     LLBC_LogJsonMsg &Add(const char *key, const T &value);
+
     /**
     * Output json styled message
     */
@@ -64,7 +66,7 @@ private:
     const char *_tag;
     int _lv;
 
-    Json::Value _json;
+    LLBC_Json::Document _doc;
 };
 
 __LLBC_NS_END
