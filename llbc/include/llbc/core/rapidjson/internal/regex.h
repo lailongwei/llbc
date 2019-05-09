@@ -15,9 +15,9 @@
 #ifndef RAPIDJSON_INTERNAL_REGEX_H_
 #define RAPIDJSON_INTERNAL_REGEX_H_
 
-#include "../allocators.h"
-#include "../stream.h"
-#include "stack.h"
+#include "llbc/core/rapidjson/allocators.h"
+#include "llbc/core/rapidjson/stream.h"
+#include "llbc/core/rapidjson/internal/stack.h"
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH

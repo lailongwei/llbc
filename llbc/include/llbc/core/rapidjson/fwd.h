@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_FWD_H_
 #define RAPIDJSON_FWD_H_
 
-#include "rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 

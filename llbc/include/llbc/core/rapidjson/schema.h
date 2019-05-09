@@ -15,9 +15,9 @@
 #ifndef RAPIDJSON_SCHEMA_H_
 #define RAPIDJSON_SCHEMA_H_
 
-#include "document.h"
-#include "pointer.h"
-#include "stringbuffer.h"
+#include "llbc/core/rapidjson/document.h"
+#include "llbc/core/rapidjson/pointer.h"
+#include "llbc/core/rapidjson/stringbuffer.h"
 #include <cmath> // abs, floor
 
 #if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)
@@ -33,7 +33,7 @@
 #endif
 
 #if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
-#include "internal/regex.h"
+#include "llbc/core/rapidjson/internal/regex.h"
 #elif RAPIDJSON_SCHEMA_USE_STDREGEX
 #include <regex>
 #endif
@@ -49,7 +49,7 @@
 #endif
 
 #if RAPIDJSON_SCHEMA_VERBOSE
-#include "stringbuffer.h"
+#include "llbc/core/rapidjson/stringbuffer.h"
 #endif
 
 RAPIDJSON_DIAG_PUSH

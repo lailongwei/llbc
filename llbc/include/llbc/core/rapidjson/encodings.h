@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_ENCODINGS_H_
 #define RAPIDJSON_ENCODINGS_H_
 
-#include "rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_PUSH

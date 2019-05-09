@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_ALLOCATORS_H_
 #define RAPIDJSON_ALLOCATORS_H_
 
-#include "rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 

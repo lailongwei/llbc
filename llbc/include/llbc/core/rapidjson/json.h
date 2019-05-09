@@ -1,16 +1,16 @@
 #ifndef JSON_RAPIDJSON_H_INCLUDED
-# define JSON_RAPIDJSON_H_INCLUDED
+#define JSON_RAPIDJSON_H_INCLUDED
 
 #include "llbc/common/Common.h"
 
-# include "reader.h"
-# include "writer.h"
-# include "prettywriter.h"
-# include "pointer.h"
-# include "stream.h"
-# include "document.h"
-# include "stringbuffer.h"
-#include "error/en.h"
+#include "llbc/core/rapidjson/reader.h"
+#include "llbc/core/rapidjson/writer.h"
+#include "llbc/core/rapidjson/prettywriter.h"
+#include "llbc/core/rapidjson/pointer.h"
+#include "llbc/core/rapidjson/stream.h"
+#include "llbc/core/rapidjson/document.h"
+#include "llbc/core/rapidjson/stringbuffer.h"
+#include "llbc/core/rapidjson/error/en.h"
 
 __LLBC_NS_BEGIN
 

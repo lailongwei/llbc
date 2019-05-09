@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_MEMORYSTREAM_H_
 #define RAPIDJSON_MEMORYSTREAM_H_
 
-#include "stream.h"
+#include "llbc/core/rapidjson/stream.h"
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH

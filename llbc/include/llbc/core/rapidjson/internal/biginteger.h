@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_BIGINTEGER_H_
 #define RAPIDJSON_BIGINTEGER_H_
 
-#include "../rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 #if defined(_MSC_VER) && !__INTEL_COMPILER && defined(_M_AMD64)
 #include <intrin.h> // for _umul128

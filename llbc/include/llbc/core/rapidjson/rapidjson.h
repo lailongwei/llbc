@@ -99,7 +99,7 @@
     #define RAPIDJSON_NAMESPACE my::rapidjson
     #define RAPIDJSON_NAMESPACE_BEGIN namespace my { namespace rapidjson {
     #define RAPIDJSON_NAMESPACE_END   } }
-    #include "rapidjson/..."
+    #include "llbc/core/rapidjson/rapidjson/..."
     \endcode
 
     \see rapidjson
@@ -165,8 +165,8 @@
 #ifndef RAPIDJSON_NO_INT64DEFINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #if defined(_MSC_VER) && (_MSC_VER < 1800)	// Visual Studio 2013
-#include "msinttypes/stdint.h"
-#include "msinttypes/inttypes.h"
+#include "llbc/core/rapidjson/msinttypes/stdint.h"
+#include "llbc/core/rapidjson/msinttypes/inttypes.h"
 #else
 // Other compilers should have this.
 #include <stdint.h>
@@ -367,7 +367,7 @@
     \code
     #define RAPIDJSON_NO_SIZETYPEDEFINE
     namespace rapidjson { typedef ::std::size_t SizeType; }
-    #include "rapidjson/..."
+    #include "llbc/core/rapidjson/rapidjson/..."
     \endcode
 
     \see rapidjson::SizeType

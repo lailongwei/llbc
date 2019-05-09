@@ -45,7 +45,7 @@
 #pragma once
 #endif
 
-#include "stdint.h"
+#include "llbc/core/rapidjson/stdint.h"
 
 // miloyip: VC supports inttypes.h since VC2013
 #if _MSC_VER >= 1800

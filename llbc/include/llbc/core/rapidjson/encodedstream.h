@@ -15,8 +15,8 @@
 #ifndef RAPIDJSON_ENCODEDSTREAM_H_
 #define RAPIDJSON_ENCODEDSTREAM_H_
 
-#include "stream.h"
-#include "memorystream.h"
+#include "llbc/core/rapidjson/stream.h"
+#include "llbc/core/rapidjson/memorystream.h"
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH

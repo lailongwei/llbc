@@ -17,12 +17,12 @@
 
 /*! \file reader.h */
 
-#include "allocators.h"
-#include "stream.h"
-#include "encodedstream.h"
-#include "internal/meta.h"
-#include "internal/stack.h"
-#include "internal/strtod.h"
+#include "llbc/core/rapidjson/allocators.h"
+#include "llbc/core/rapidjson/stream.h"
+#include "llbc/core/rapidjson/encodedstream.h"
+#include "llbc/core/rapidjson/internal/meta.h"
+#include "llbc/core/rapidjson/internal/stack.h"
+#include "llbc/core/rapidjson/internal/strtod.h"
 #include <limits>
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
@@ -83,14 +83,14 @@ RAPIDJSON_DIAG_OFF(effc++)
        throw ParseException(parseErrorCode, #parseErrorCode, offset)
 
     #include <stdexcept>               // std::runtime_error
-    #include "rapidjson/error/error.h" // rapidjson::ParseResult
+    #include "llbc/core/rapidjson/rapidjson/error/error.h" // rapidjson::ParseResult
 
     struct ParseException : std::runtime_error, rapidjson::ParseResult {
       ParseException(rapidjson::ParseErrorCode code, const char* msg, size_t offset)
         : std::runtime_error(msg), ParseResult(code, offset) {}
     };
 
-    #include "rapidjson/reader.h"
+    #include "llbc/core/rapidjson/rapidjson/reader.h"
     \endcode
 
     \see RAPIDJSON_PARSE_ERROR, rapidjson::GenericReader::Parse
@@ -122,7 +122,7 @@ RAPIDJSON_DIAG_OFF(effc++)
     RAPIDJSON_MULTILINEMACRO_END
 #endif
 
-#include "error/error.h" // ParseErrorCode, ParseResult
+#include "llbc/core/rapidjson/error/error.h" // ParseErrorCode, ParseResult
 
 RAPIDJSON_NAMESPACE_BEGIN
 

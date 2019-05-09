@@ -18,11 +18,11 @@
 
 /*! \file document.h */
 
-#include "reader.h"
-#include "internal/meta.h"
-#include "internal/strfunc.h"
-#include "memorystream.h"
-#include "encodedstream.h"
+#include "llbc/core/rapidjson/reader.h"
+#include "llbc/core/rapidjson/internal/meta.h"
+#include "llbc/core/rapidjson/internal/strfunc.h"
+#include "llbc/core/rapidjson/memorystream.h"
+#include "llbc/core/rapidjson/encodedstream.h"
 #include <new>      // placement new
 #include <limits>
 

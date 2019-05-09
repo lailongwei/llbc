@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_INTERNAL_SWAP_H_
 #define RAPIDJSON_INTERNAL_SWAP_H_
 
-#include "../rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 #if defined(__clang__)
 RAPIDJSON_DIAG_PUSH
