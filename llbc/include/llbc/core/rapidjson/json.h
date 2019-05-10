@@ -18,16 +18,14 @@ __LLBC_NS_BEGIN
 namespace LLBC_Json = ::rapidjson;
 // rapidjson's value
 typedef LLBC_Json::Value LLBC_JsonValue;
-// rapidjson's document
-typedef LLBC_Json::Document LLBC_JsonDocument;
 // iterator of rapidjson's value
-typedef LLBC_Json::Value::ValueIterator LLBC_JsonValueIter;
+typedef LLBC_JsonValue::ValueIterator LLBC_JsonValueIter;
 // const iterator of rapidjson's value
-typedef LLBC_Json::Value::ConstValueIterator LLBC_JsonValueCIter;
+typedef LLBC_JsonValue::ConstValueIterator LLBC_JsonValueCIter;
 // iterator of rapidjson's member
-typedef LLBC_Json::Value::MemberIterator LLBC_JsonMemberIter;
+typedef LLBC_JsonValue::MemberIterator LLBC_JsonMemberIter;
 // const iterator of rapidjson's member
-typedef LLBC_Json::Value::ConstMemberIterator LLBC_JsonMemberCIter;
+typedef LLBC_JsonValue::ConstMemberIterator LLBC_JsonMemberCIter;
 
 /**
  * LLBC_JsonValue convert to LLBC_String
@@ -40,7 +38,7 @@ LLBC_EXTERN LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC
 /**
  * LLBC_JsonValue output to stream operator function(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &json);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
 
 __LLBC_NS_END
 

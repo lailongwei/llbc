@@ -27,7 +27,7 @@ __LLBC_NS_BEGIN
 
 inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const char* value)
 {
-    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_Json::Value(value, strlen(value)).Move(), _doc.GetAllocator());
+    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_JsonValue(value, strlen(value)).Move(), _doc.GetAllocator());
     return *this;
 }
 
@@ -35,14 +35,14 @@ template <>
 inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const LLBC_Variant &value)
 {
     LLBC_String str = value.ValueToString();
-    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_Json::Value(str.c_str(), str.length(), _doc.GetAllocator()).Move(), _doc.GetAllocator());
+    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_JsonValue(str.c_str(), str.length(), _doc.GetAllocator()).Move(), _doc.GetAllocator());
     return *this;
 }
 
 template <typename T>
 inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
 {
-    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_Json::Value(value).Move(), _doc.GetAllocator());
+    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_JsonValue(value).Move(), _doc.GetAllocator());
     return *this;
 }
 

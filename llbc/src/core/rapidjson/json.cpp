@@ -47,7 +47,7 @@ void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool is
     outStr = buffer.GetString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_Json::Value &value)
+std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value)
 {
     LLBC_Json::StringBuffer buffer;
     LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
