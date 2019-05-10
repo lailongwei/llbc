@@ -55,6 +55,11 @@ public:
 class TestFacade : public LLBC_IFacade
 {
 public:
+    TestFacade()
+    : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents)
+    {}
+
+public:
     virtual bool OnInitialize()
     {
         LLBC_PrintLine("Service initialize");

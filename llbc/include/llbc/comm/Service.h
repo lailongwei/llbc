@@ -26,6 +26,7 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
+#include "llbc/comm/FacadeEvents.h"
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
@@ -433,6 +434,8 @@ private:
     void StopFacades();
     void DestroyFacades();
     void DestroyWillRegFacades();
+    void AddFacade(LLBC_IFacade *facade);
+    void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
 
     /**
      * Session protocol factory operation methods.
@@ -542,6 +545,7 @@ private:
     _Facades _facades;
     typedef std::map<LLBC_String, _Facades> _Facades2;
     _Facades2 _facades2;
+    _Facades *_caredEventFacades[LLBC_FacadeEventsOffset::End];
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;

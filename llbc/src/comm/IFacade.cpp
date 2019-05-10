@@ -325,9 +325,11 @@ LLBC_String LLBC_ProtoReport::ToString() const
     return repr;
 }
 
-LLBC_IFacade::LLBC_IFacade()
+LLBC_IFacade::LLBC_IFacade(uint64 caredEvents)
 : _inited(false)
 , _started(false)
+, _caredEvents(caredEvents)
+
 , _svc(NULL)
 {
 }

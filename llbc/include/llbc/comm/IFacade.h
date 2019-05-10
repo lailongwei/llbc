@@ -26,6 +26,8 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
+#include "llbc/comm/FacadeEvents.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -322,7 +324,7 @@ private:
 class LLBC_EXPORT LLBC_IFacade
 {
 public:
-    LLBC_IFacade();
+    LLBC_IFacade(uint64 caredEvents = LLBC_FacadeEvents::DefaultEvents);
     virtual ~LLBC_IFacade();
 
 public:
@@ -331,6 +333,27 @@ public:
      * @return LLBC_IService * - service object.
      */
     virtual LLBC_IService *GetService() const;
+
+public:
+    /**
+     * Get cared events.
+     * @return uint64 - the cared events.
+     */
+    uint64 GetCaredEvents() const;
+
+    /**
+     * Get cared specified facade events or not.
+     * @param[in] facadeEvs - the facade events(bit collection).
+     * @return bool - return true it means cared specified events, otherwise return false.
+     */
+    bool IsCaredEvents(uint64 facadeEvs) const;
+
+    /**
+     * Get cared specified facade events offset or not.
+     * @param[in] facadeEvOffset - the facade event offset.
+     * @return bool - return true it means cared specified event offset, otherwise return false.
+     */
+    bool IsCaredEventOffset(int facadeEvOffset) const;
 
 public:
     /**
@@ -417,6 +440,8 @@ private:
 private:
     bool _inited;
     bool _started;
+    uint64 _caredEvents;
+
     LLBC_IService *_svc;
 };
 
