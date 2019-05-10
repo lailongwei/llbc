@@ -62,7 +62,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
         // doc add string with not copy
-        _doc.AddMember("msg", LLBC_Json::Value(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
+        _doc.AddMember("msg", LLBC_JsonValue(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
         
         // _doc stringify
         LLBC_Json::StringBuffer buffer;
@@ -80,7 +80,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
         // _doc add string with not copy
-        _doc.AddMember("msg", LLBC_Json::Value(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
+        _doc.AddMember("msg", LLBC_JsonValue(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
 
         // _doc convert to string
         LLBC_Json::StringBuffer buffer;
