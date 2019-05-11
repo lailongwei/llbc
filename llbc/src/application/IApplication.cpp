@@ -190,7 +190,6 @@ LLBC_IApplication::LLBC_IApplication()
 : _name()
 
 , _iniConfig()
-, _jsonConfig()
 , _propertyConfig()
 
 , _services(*LLBC_ServiceMgrSingleton)
@@ -354,11 +353,6 @@ const LLBC_StartArgs &LLBC_IApplication::GetStartArgs() const
 const LLBC_Ini &LLBC_IApplication::GetIniConfig() const
 {
     return _iniConfig;
-}
-
-const LLBC_Config &LLBC_IApplication::GetJsonConfig() const
-{
-    return _jsonConfig;
 }
 
 const LLBC_Property &LLBC_IApplication::GetPropertyConfig() const
@@ -531,20 +525,6 @@ int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool
         if (LLBC_File::Exists(iniPath))
         {
             if (_iniConfig.LoadFromFile(iniPath) != LLBC_OK)
-                return LLBC_FAILED;
-
-            loaded = true;
-        }
-    }
-
-    // Try load json config file.
-    if (tryJson)
-    {
-        const LLBC_String jsonPath = path + ".json";
-        if (LLBC_File::Exists(jsonPath))
-        {
-            _jsonConfig.AddFile(jsonPath);
-            if (_jsonConfig.Initialize() != LLBC_OK)
                 return LLBC_FAILED;
 
             loaded = true;

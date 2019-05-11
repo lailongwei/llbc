@@ -27,45 +27,53 @@ namespace
 {
     typedef pyllbc_ObjCoder This;
 
-    static Json::FastWriter __g_jsonFmter;
+    static LLBC_Json::StringBuffer buffer;
+    static LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
 }
 
 int pyllbc_ObjCoder::Encode(PyObject *in, std::string &out)
 {
-    LLBC_JsonValue *jsonVal = NULL;
+    LLBC_Json::Document wrapJson(LLBC_Json::kArrayType);
+    LLBC_Json::Document *jsonVal = new LLBC_Json::Document(&wrapJson.GetAllocator());
     if (This::Encode(in, jsonVal) != LLBC_OK)
+    {
+        LLBC_Delete(jsonVal);
         return LLBC_FAILED;
+    }
 
-    LLBC_JsonValue wrapJson(Json::arrayValue);
-
-    wrapJson.append(*jsonVal);
+    wrapJson.PushBack((*jsonVal), wrapJson.GetAllocator());
     LLBC_Delete(jsonVal);
 
-    out = __g_jsonFmter.write(wrapJson);
+    // json stringify
+    wrapJson.Accept(writer);
+    out = buffer.GetString();
+
+    // clear that be used for reuse buffer and writer
+    buffer.Clear();
+    writer.Reset(buffer);
 
     return LLBC_OK;
 }
 
 int pyllbc_ObjCoder::Decode(const std::string &in, PyObject *&out)
 {
-    LLBC_JsonValue j;
-    Json::Reader reader;
-    if (!reader.parse(in, j))
+    LLBC_Json::Document j;
+    if (j.Parse(in.c_str()).HasParseError())
     {
         LLBC_String err;
         err.format("could not decode json string, err:%s", 
-            reader.getFormatedErrorMessages().c_str(), LLBC_ERROR_FORMAT);
+            LLBC_Json::GetParseError_En(j.GetParseError()), LLBC_ERROR_FORMAT);
         pyllbc_SetError(err);
 
         return LLBC_FAILED;
     }
 
-    if (j.type() != Json::arrayValue)
+    if (j.GetType() != LLBC_Json::kArrayType)
     {
         pyllbc_SetError("top json type not array", LLBC_ERROR_FORMAT);
         return LLBC_FAILED;
     }
-    else if (j.size() < 1)
+    else if (j.Size() < 1)
     {
         pyllbc_SetError("top json size lt 1", LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -74,14 +82,16 @@ int pyllbc_ObjCoder::Decode(const std::string &in, PyObject *&out)
     return This::_Decode(j[0u], out);
 }
 
-int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
+int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_Json::Document *&out)
 {
     int rtn = LLBC_FAILED;
     switch (pyllbc_TypeDetector::Detect(in))
     {
     case PYLLBC_NONE_OBJ:
-        rtn = LLBC_OK;
-        out = LLBC_New1(LLBC_JsonValue, Json::nullValue);
+        {
+            rtn = LLBC_OK;
+            out->SetNull();
+        }
         break;
 
     case PYLLBC_BOOL_OBJ:
@@ -90,7 +100,7 @@ int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
             if ((rtn = This::EncodeBool(in, val)) != LLBC_OK)
                 break;
 
-            out = LLBC_New1(LLBC_JsonValue, val);
+            out->SetBool(val);
         }
         break;
 
@@ -102,9 +112,9 @@ int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
                 break;
 
             if (INT_MIN <= val && val <= INT_MAX)
-                out = LLBC_New1(LLBC_JsonValue, static_cast<sint32>(val));
+                out->SetInt(static_cast<sint32>(val));
             else
-                out = LLBC_New1(LLBC_JsonValue, val);
+                out->SetInt64(val);
         }
         break;
 
@@ -114,7 +124,7 @@ int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
             if ((rtn = This::EncodeFloat(in, val)) != LLBC_OK)
                 break;
 
-            out = LLBC_New1(LLBC_JsonValue, val);
+            out->SetDouble(val);
         }
         break;
 
@@ -124,7 +134,7 @@ int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
             if ((rtn = This::EncodeStr(in, val)) != LLBC_OK)
                 break;
 
-            out = LLBC_New1(LLBC_JsonValue, val);
+            out->SetString(val.c_str(), out->GetAllocator());
         }
         break;
 
@@ -140,15 +150,24 @@ int pyllbc_ObjCoder::Encode(PyObject *in, LLBC_JsonValue *&out)
     case PYLLBC_TUPLE_OBJ:
     case PYLLBC_LIST_OBJ:
     case PYLLBC_SEQ_OBJ:
-        rtn = This::EncodeSeq(in, *(out = LLBC_New1(LLBC_JsonValue, Json::arrayValue)));
+        {
+            out->SetArray();
+            rtn = This::EncodeSeq(in, *out);
+        }
         break;
 
     case PYLLBC_DICT_OBJ:
-        rtn = This::EncodeDict(in, *(out = LLBC_New1(LLBC_JsonValue, Json::objectValue)));
+        {
+            out->SetObject();
+            rtn = This::EncodeDict(in, *out);
+        }
         break;
 
     case PYLLBC_UNKNOWN_OBJ:
-        rtn = This::EncodeInst(in, *(out = LLBC_New1(LLBC_JsonValue, Json::objectValue)));
+        {
+            out->SetObject();
+            rtn = This::EncodeInst(in, *out);
+        }
         break;
 
     default:
@@ -213,7 +232,7 @@ int pyllbc_ObjCoder::EncodeStr(PyObject *in, std::string &out)
     return LLBC_OK;
 }
 
-int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_JsonValue &out)
+int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_Json::Document &out)
 {
     PyObject *fastSeq = PySequence_Fast(in, "could not convert seq to FAST seq");
     if (UNLIKELY(!fastSeq))
@@ -236,14 +255,15 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_JsonValue &out)
             return LLBC_FAILED;
         }
 
-        LLBC_JsonValue *elemJson = NULL;
+        LLBC_Json::Document *elemJson = new LLBC_Json::Document(&out.GetAllocator());
         if (This::Encode(elemObj, elemJson) != LLBC_OK)
         {
             Py_DECREF(fastSeq);
+            LLBC_Delete(elemJson);
             return LLBC_FAILED;
         }
 
-        out.append(*elemJson);
+        out.PushBack(*elemJson, out.GetAllocator());
 
         LLBC_Delete(elemJson);
     }
@@ -253,7 +273,7 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_JsonValue &out)
     return LLBC_OK;
 }
 
-int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_JsonValue &out)
+int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_Json::Document &out)
 {
     Py_ssize_t pos = 0;
     PyObject *key, *val;
@@ -266,11 +286,14 @@ int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_JsonValue &out)
             return LLBC_FAILED;
         }
 
-        LLBC_JsonValue *valJson = NULL;
+        LLBC_Json::Document *valJson = new LLBC_Json::Document(&out.GetAllocator());
         if (This::Encode(val, valJson) != LLBC_OK)
+        {
+            LLBC_Delete(valJson);
             return LLBC_FAILED;
+        }
 
-        out[strKey] = *valJson;
+        out.AddMember(LLBC_JsonValue(strKey, out.GetAllocator()), *valJson, out.GetAllocator());
 
         LLBC_Delete(valJson);
     }
@@ -278,7 +301,7 @@ int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_JsonValue &out)
     return LLBC_OK;
 }
 
-int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_JsonValue &out)
+int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json::Document &out)
 {
     PyObject *dict = PyObject_GetAttrString(in, "__dict__");
     if (dict)
@@ -303,9 +326,10 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_JsonValue &out)
         PyObject *slotVal = PyObject_GetAttr(in, slotItem);
         if (slotVal)
         {
-            LLBC_JsonValue *slotValJson;
+            LLBC_Json::Document *slotValJson = new LLBC_Json::Document(&out.GetAllocator());
             if (This::Encode(slotVal, slotValJson) != LLBC_OK)
             {
+                LLBC_Delete(slotValJson);
                 Py_DECREF(slotVal);
                 Py_DECREF(slotItem);
 
@@ -329,7 +353,7 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_JsonValue &out)
                 return LLBC_FAILED;
             }
 
-            out[itemStr] = *slotValJson;
+            out.AddMember(LLBC_JsonValue(itemStr, out.GetAllocator()), *slotValJson, out.GetAllocator());
 
             LLBC_Delete(slotValJson);
 
@@ -347,45 +371,37 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_JsonValue &out)
 int pyllbc_ObjCoder::_Decode(const LLBC_JsonValue &in, PyObject *&out)
 {
     int rtn = LLBC_OK;
-    switch(in.type())
+    switch(in.GetType())
     {
-    case Json::nullValue:
+    case LLBC_Json::kNullType:
         rtn = This::DecodeNull(in, out);
         break;
 
-    case  Json::booleanValue:
+    case  LLBC_Json::kFalseType:
         rtn = This::DecodeBool(in, out);
         break;
 
-    case Json::intValue:
-        rtn = This::DecodeInt(in, out);
+    case  LLBC_Json::kTrueType:
+        rtn = This::DecodeBool(in, out);
         break;
 
-    case Json::uintValue:
-        rtn = This::DecodeUInt(in, out);
+    case LLBC_Json::kNumberType:
+        if (in.IsDouble())         rtn = This::DecodeReal(in, out);
+        else if (in.IsInt())       rtn = This::DecodeInt(in, out);
+        else if (in.IsUint())      rtn = This::DecodeUInt(in, out);
+        else if (in.IsInt64())     rtn = This::DecodeLong(in, out);
+        else                       rtn = This::DecodeULong(in, out);
         break;
 
-    case Json::longValue:
-        rtn = This::DecodeLong(in, out);
-        break;
-
-    case Json::ulongValue:
-        rtn = This::DecodeULong(in, out);
-        break;
-
-    case Json::realValue:
-        rtn = This::DecodeReal(in, out);
-        break;
-
-    case Json::stringValue:
+    case LLBC_Json::kStringType:
         rtn = This::DecodeStr(in, out);
         break;
 
-    case Json::arrayValue:
+    case LLBC_Json::kArrayType:
         rtn = This::DecodeArray(in, out);
         break;
 
-    case Json::objectValue:
+    case LLBC_Json::kObjectType:
         rtn = This::DecodeObj(in, out);
         break;
 
@@ -408,7 +424,7 @@ int pyllbc_ObjCoder::DecodeNull(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeBool(const LLBC_JsonValue &in, PyObject *&out)
 {
-    const bool boolVal = in.asBool();
+    const bool boolVal = in.GetBool();
 
     out = boolVal ? Py_True : Py_False;
     Py_INCREF(out);
@@ -418,7 +434,7 @@ int pyllbc_ObjCoder::DecodeBool(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeInt(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if(!(out = Py_BuildValue("i", in.asInt())))
+    if(!(out = Py_BuildValue("i", in.GetInt())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -429,7 +445,7 @@ int pyllbc_ObjCoder::DecodeInt(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeUInt(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if (!(out = Py_BuildValue("I", in.asUInt())))
+    if (!(out = Py_BuildValue("I", in.GetUint())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -440,7 +456,7 @@ int pyllbc_ObjCoder::DecodeUInt(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeLong(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if (!(out = Py_BuildValue("L", in.asLong())))
+    if (!(out = Py_BuildValue("L", in.GetInt64())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -451,7 +467,7 @@ int pyllbc_ObjCoder::DecodeLong(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeULong(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if (!(out = Py_BuildValue("K", in.asULong())))
+    if (!(out = Py_BuildValue("K", in.GetUint64())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -462,7 +478,7 @@ int pyllbc_ObjCoder::DecodeULong(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeReal(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if (!(out = Py_BuildValue("d", in.asDouble())))
+    if (!(out = Py_BuildValue("d", in.GetDouble())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -473,7 +489,7 @@ int pyllbc_ObjCoder::DecodeReal(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeStr(const LLBC_JsonValue &in, PyObject *&out)
 {
-    if (!(out = Py_BuildValue("s", in.asCString())))
+    if (!(out = Py_BuildValue("s", in.GetString())))
     {
         pyllbc_TransferPyError();
         return LLBC_FAILED;
@@ -484,7 +500,7 @@ int pyllbc_ObjCoder::DecodeStr(const LLBC_JsonValue &in, PyObject *&out)
 
 int pyllbc_ObjCoder::DecodeArray(const LLBC_JsonValue &in, PyObject *&out)
 {
-    out = PyTuple_New(in.size());
+    out = PyTuple_New(in.Size());
     if (UNLIKELY(!out))
     {
         pyllbc_TransferPyError();
@@ -492,8 +508,8 @@ int pyllbc_ObjCoder::DecodeArray(const LLBC_JsonValue &in, PyObject *&out)
     }
 
     Py_ssize_t tupleIdx = 0;
-    for (LLBC_JsonValueCIter it = in.begin();
-         it != in.end();
+    for (LLBC_JsonValueCIter it = in.Begin();
+         it != in.End();
          it++)
     {
         const LLBC_JsonValue &elemJson = *it;
@@ -531,12 +547,12 @@ int pyllbc_ObjCoder::DecodeObj(const LLBC_JsonValue &in, PyObject *&out)
         return LLBC_FAILED;
     }
 
-    for (LLBC_JsonValueCIter it = in.begin();
-         it != in.end();
+    for (LLBC_JsonMemberCIter it = in.MemberBegin();
+         it != in.MemberEnd();
          it++)
     {
-        const LLBC_JsonValue &key = it.key();
-        if (UNLIKELY(key.type() != Json::stringValue))
+        const LLBC_JsonValue &key = it->name;
+        if (UNLIKELY(key.GetType() != LLBC_Json::kStringType))
         {
             pyllbc_SetError("dict key not string type", LLBC_ERROR_INVALID);
 
@@ -547,7 +563,7 @@ int pyllbc_ObjCoder::DecodeObj(const LLBC_JsonValue &in, PyObject *&out)
         }
 
         PyObject *elemObj = NULL;
-        const LLBC_JsonValue &elemJson = *it;
+        const LLBC_JsonValue &elemJson = it->value;
         if (This::_Decode(elemJson, elemObj) != LLBC_OK)
         {
             Py_DECREF(out);
@@ -556,7 +572,7 @@ int pyllbc_ObjCoder::DecodeObj(const LLBC_JsonValue &in, PyObject *&out)
             return LLBC_FAILED;
         }
 
-        if (UNLIKELY(PyDict_SetItemString(out, key.asCString(), elemObj) != 0))
+        if (UNLIKELY(PyDict_SetItemString(out, it->name.GetString(), elemObj) != 0))
         {
             pyllbc_TransferPyError();
             
