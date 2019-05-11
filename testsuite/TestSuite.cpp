@@ -50,13 +50,11 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_Utils_Base64);
     // test = LLBC_New0(TestCase_Core_Utils_Misc);
     // test = LLBC_New0(TestCase_Core_Utils_Network);
-    // test = LLBC_New0(TestCase_Core_Helper_JVHelper);
     // test = LLBC_New0(TestCase_Core_Helper_StlHelper);
     // test = LLBC_New0(TestCase_Core_File_File);
     // test = LLBC_New0(TestCase_Core_File_Directory);
     // test = LLBC_New0(TestCase_Core_VariantTest);
     // test = LLBC_New0(TestCase_Core_Config_Ini);
-    // test = LLBC_New0(TestCase_Core_Config_Config);
     // test = LLBC_New0(TestCase_Core_Time_Time);
     // test = LLBC_New0(TestCase_Core_Event);
     // test = LLBC_New0(TestCase_Core_Config_Property);

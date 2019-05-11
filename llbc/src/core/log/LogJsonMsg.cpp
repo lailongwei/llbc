@@ -46,6 +46,7 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const c
 , _logger(logger)
 , _tag(tag)
 , _lv(lv)
+, _doc(LLBC_Json::Type::kObjectType)
 {
 }
 
@@ -60,22 +61,36 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         char *fmttedMsg; int msgLen;
         LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
-        _json["msg"] = fmttedMsg;
-        LLBC_Free(fmttedMsg);
-        const LLBC_String &jStr = _json.toStyledString();
+        // doc add string with not copy
+        _doc.AddMember("msg", LLBC_JsonValue(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
+        
+        // _doc stringify
+        LLBC_Json::StringBuffer buffer;
+        LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
+        _doc.Accept(writer);
 
-        UnInitOutput(_lv >= _LV::Warn ? stderr : stdout, jStr.c_str());
+        // free fmttedMsg should after _doc stringify
+        LLBC_Free(fmttedMsg);
+
+        UnInitOutput(_lv >= _LV::Warn ? stderr : stdout, buffer.GetString());
     }
     else if (_logger && _lv >= _logger->GetLogLevel())
     {
         char *fmttedMsg; int msgLen;
         LLBC_FormatArg(fmt, fmttedMsg, msgLen);
 
-        _json["msg"] = fmttedMsg;
-        LLBC_Free(fmttedMsg);
-        const LLBC_String &jStr = _json.toStyledString();
+        // _doc add string with not copy
+        _doc.AddMember("msg", LLBC_JsonValue(fmttedMsg, msgLen).Move(), _doc.GetAllocator());
 
-        _logger->OutputNonFormat(_lv, _tag, __FILE__, __LINE__, jStr.c_str(), jStr.length());
+        // _doc convert to string
+        LLBC_Json::StringBuffer buffer;
+        LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
+        _doc.Accept(writer);
+
+        // free fmttedMsg should after _doc call Accept function
+        LLBC_Free(fmttedMsg);
+
+        _logger->OutputNonFormat(_lv, _tag, __FILE__, __LINE__, buffer.GetString(), buffer.GetLength());
     }
 
     LLBC_Delete(this);

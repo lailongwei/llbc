@@ -130,12 +130,6 @@ public:
     const LLBC_Ini &GetIniConfig() const;
 
     /**
-     * Get application json format config.
-     * return const LLBC_Config & - json config.
-     */
-    const LLBC_Config &GetJsonConfig() const;
-
-    /**
      * Get application property format config.
      * @return const LLBC_Property & - property config.
      */
@@ -197,7 +191,6 @@ protected:
     LLBC_String _name;
 
     LLBC_Ini _iniConfig;
-    LLBC_Config _jsonConfig;
     LLBC_Property _propertyConfig;
 
     LLBC_ServiceMgr &_services;
