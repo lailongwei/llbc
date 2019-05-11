@@ -46,7 +46,7 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const c
 , _logger(logger)
 , _tag(tag)
 , _lv(lv)
-, _doc(LLBC_Json::Type::kObjectType)
+, _doc(LLBC_Json::kObjectType)
 {
 }
 
