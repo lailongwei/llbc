@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
+class LLBC_LogJsonMsg;
 class LLBC_LoggerManager;
 
 class LLBC_LogHelper;
@@ -78,6 +79,18 @@ public:
     static void d4(const char *logger, const char *fmt, ...);
 
     /**
+     * Output debug level json message.
+     */
+    static LLBC_LogJsonMsg &jd();
+    static LLBC_LogJsonMsg &jd2(const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jd2();
+    static LLBC_LogJsonMsg &jd3(const char *logger);
+    static LLBC_LogJsonMsg &jd4(const char *logger, const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jd4(const char *logger);
+
+    /**
      * Output info level message.
      */
     static void i(const char *fmt, ...);
@@ -88,6 +101,18 @@ public:
     static void i4(const char *logger, const char *tag, const char *fmt, ...);
     template <typename Tag>
     static void i4(const char *logger, const char *fmt, ...);
+
+    /**
+     * Output info level json message.
+     */
+    static LLBC_LogJsonMsg &ji();
+    static LLBC_LogJsonMsg &ji2(const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &ji2();
+    static LLBC_LogJsonMsg &ji3(const char *logger);
+    static LLBC_LogJsonMsg &ji4(const char *logger, const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &ji4(const char *logger);
 
     /**
      * Output warning level message.
@@ -102,6 +127,18 @@ public:
     static void w4(const char *logger, const char *fmt, ...);
 
     /**
+     * Output warning level json message.
+     */
+    static LLBC_LogJsonMsg &jw();
+    static LLBC_LogJsonMsg &jw2(const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jw2();
+    static LLBC_LogJsonMsg &jw3(const char *logger);
+    static LLBC_LogJsonMsg &jw4(const char *logger, const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jw4(const char *logger);
+
+    /**
      * Output error level message.
      */
     static void e(const char *fmt, ...);
@@ -114,6 +151,18 @@ public:
     static void e4(const char *logger, const char *fmt, ...);
 
     /**
+     * Output error level json message.
+     */
+    static LLBC_LogJsonMsg &je();
+    static LLBC_LogJsonMsg &je2(const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &je2();
+    static LLBC_LogJsonMsg &je3(const char *logger);
+    static LLBC_LogJsonMsg &je4(const char *logger, const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &je4(const char *logger);
+
+    /**
      * Output fatal level message.
      */
     static void f(const char *fmt, ...);
@@ -124,7 +173,18 @@ public:
     static void f4(const char *logger, const char *tag, const char *fmt, ...);
     template <typename Tag>
     static void f4(const char *logger, const char *fmt, ...);
-
+    
+    /**
+     * Output fatal level json message.
+     */
+    static LLBC_LogJsonMsg &jf();
+    static LLBC_LogJsonMsg &jf2(const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jf2();
+    static LLBC_LogJsonMsg &jf3(const char *logger);
+    static LLBC_LogJsonMsg &jf4(const char *logger, const char *tag);
+    template <typename Tag>
+    static LLBC_LogJsonMsg &jf4(const char *logger);
 private:
     /**
      * Initialize Log help class.
@@ -146,8 +206,8 @@ private:
 
 private:
     /**
-     * When logger component not initialize, will use this function to output message.
-     */
+    * When logger component not initialize, will use this function to output message.
+    */
     static void UnInitOutput(FILE *to, const char *msg);
 
 private:

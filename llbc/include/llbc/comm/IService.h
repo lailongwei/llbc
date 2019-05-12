@@ -480,24 +480,27 @@ public:
     /**
      * Post lazy task to service.
      * @param[in] func - the task function.
+     * @param[in] data - the task data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Post(void(*func)(This *));
+    int Post(void(*func)(This *, const LLBC_Variant *data), LLBC_Variant *data = NULL);
     /**
      * Post lazy task to service.
      * @param[in] obj    - the task object.
      * @param[in] method - the task method.
+     * @param[in] data   - the task data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int Post(ObjType *obj, void (ObjType::*method)(This *));
+    int Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant *data), LLBC_Variant *data = NULL);
 
     /**
      * Post lazy task to service.
-     * @param[in] delegate - the task delegate.
+     * @param[in] deleg - the task delegate.
+     * @param[in] data  - the task data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<void, This *> *deleg) = 0;
+    virtual int Post(LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL) = 0;
 
 public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK

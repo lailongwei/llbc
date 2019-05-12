@@ -322,12 +322,12 @@ public:
     }
 
     /**
-     * T::SerializeToString method impl.
+     * T::SerializeToArray method impl.
      */
-    template <typename T, bool (T::*)(void *, int) const>
-    class protobuf_ser_type;
+    template <typename T, bool (T::*)() const, int (T::*)() const>
+    class protobuf_type;
     template <typename T>
-    void write_data(const T &obj, protobuf_ser_type<T, &T::SerializeToArray> *)
+    void write_data(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
     {
         // Check initialized first.
         obj.CheckInitialized();
@@ -335,10 +335,10 @@ public:
         // Resize Stream.
         size_t needSize = static_cast<size_t>(obj.ByteSize());
         if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)) - (_size - _pos));
+            Resize(_size + (needSize + sizeof(uint32)));
 
         Write(static_cast<uint32>(needSize));
-        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos + sizeof(uint32), static_cast<int>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
         _pos += needSize;
     }
 
@@ -451,7 +451,7 @@ public:
      * T::SerializeToString method impl.
      */
     template <typename T>
-    void write_data_ex(const T &obj, serializable_type<T, &T::SerializeToArray> *)
+    void write_data_ex(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
     {
         // Check initialized first.
         obj.CheckInitialized();
@@ -459,12 +459,11 @@ public:
         // Resize Stream.
         size_t needSize = static_cast<size_t>(obj.ByteSize());
         if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)) - (_size - _pos));
+            Resize(_size + (needSize + sizeof(uint32)));
 
         Write(static_cast<uint32>(needSize));
-        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos + sizeof(uint32), static_cast<int>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
         _pos += needSize;
- 
     }
 
     /**
@@ -554,18 +553,21 @@ public:
     }
 
     /**
-     * T::ParseFromString method impl.
+     * T::ParseFrommArray ethod impl.
      */
-    template <typename T, bool (T::*)(const void *, int)>
-    class protobuf_parse_type;
     template <typename T>
-    bool read_data(T &obj, protobuf_parse_type<T, &T::ParseFromArray> *)
+    bool read_data(T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
     {
         uint32 pbDataSize;
         if (UNLIKELY(Read(pbDataSize) == false))
             return false;
 
-        return obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
+        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
+        if (!ret)
+            return false;
+
+        _pos += pbDataSize;
+        return true;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -696,13 +698,18 @@ public:
     }
 
     template <typename T>
-    bool read_data_ex(T &obj, protobuf_parse_type<T, &T::ParseFromArray> *)
+    bool read_data_ex(T &obj,  protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
     {
         uint32 pbDataSize;
         if (UNLIKELY(Read(pbDataSize) == false))
             return false;
 
-        return obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
+        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
+        if (!ret)
+            return false;
+
+        _pos += pbDataSize;
+        return true;
     }
 
     /**

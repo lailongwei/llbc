@@ -26,6 +26,7 @@
 #include "llbc/core/Core.h"
 #include "llbc/objbase/ObjBase.h"
 
+#include "llbc/comm/FacadeEvents.h"
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
@@ -354,10 +355,11 @@ public:
 public:
     /**
      * Post lazy task to service.
-     * @param[in] delegate - the task delegate.
+     * @param[in] deleg - the task delegate.
+     * @param[in] data  - the task data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate1<void, Base *> *deleg);
+    virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
 
 public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
@@ -406,7 +408,7 @@ private:
     /**
      * Frame tasks operation methods.
      */
-    typedef std::set<LLBC_IDelegate1<void, Base *> *> _FrameTasks;
+    typedef std::map<LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *, LLBC_Variant *> _FrameTasks;
     void HandleFrameTasks(_FrameTasks &tasks, bool &usingFlag);
     void DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag);
 
@@ -432,6 +434,8 @@ private:
     void StopFacades();
     void DestroyFacades();
     void DestroyWillRegFacades();
+    void AddFacade(LLBC_IFacade *facade);
+    void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
 
     /**
      * Session protocol factory operation methods.
@@ -541,6 +545,7 @@ private:
     _Facades _facades;
     typedef std::map<LLBC_String, _Facades> _Facades2;
     _Facades2 _facades2;
+    _Facades *_caredEventFacades[LLBC_FacadeEventsOffset::End];
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;
