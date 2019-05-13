@@ -32,6 +32,20 @@ inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const char* value)
 }
 
 template <>
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const sint64 &value)
+{
+    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_JsonValue(static_cast<int64_t>(value)).Move(), _doc.GetAllocator());
+    return *this;
+}
+
+template <>
+inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const uint64 &value)
+{
+    _doc.AddMember(LLBC_Json::StringRef(key), LLBC_JsonValue(static_cast<uint64_t>(value)).Move(), _doc.GetAllocator());
+    return *this;
+}
+
+template <>
 inline LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const LLBC_Variant &value)
 {
     LLBC_String str = value.ValueToString();
