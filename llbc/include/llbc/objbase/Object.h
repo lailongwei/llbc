@@ -63,6 +63,16 @@ public:
     virtual void Release();
 
     /**
+     * Thread safety retain object.
+     */
+    virtual void SafeRetain();
+
+    /**
+     * Thread safety release object.
+     */
+    virtual void SafeRelease();
+
+    /**
      * Auto release object.
      * @return int - return 0 if success, otherwise return -1.
      */
