@@ -189,7 +189,7 @@ LLBC_LogJsonMsg &LLBC_LogHelper::jd3(const char *logger)
 
 LLBC_LogJsonMsg &LLBC_LogHelper::jd4(const char *logger, const char *tag)
 {
-    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Debug);
+    __LLBC_JLOG_TO_SPEC(logger, tag, _LV::Debug);
 }
 
 void LLBC_LogHelper::i(const char *fmt, ...)
@@ -229,7 +229,7 @@ LLBC_LogJsonMsg &LLBC_LogHelper::ji3(const char *logger)
 
 LLBC_LogJsonMsg &LLBC_LogHelper::ji4(const char *logger, const char *tag)
 {
-    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Info);
+    __LLBC_JLOG_TO_SPEC(logger, tag, _LV::Info);
 }
 
 void LLBC_LogHelper::w(const char *fmt, ...)
@@ -269,7 +269,7 @@ LLBC_LogJsonMsg &LLBC_LogHelper::jw3(const char *logger)
 
 LLBC_LogJsonMsg &LLBC_LogHelper::jw4(const char *logger, const char *tag)
 {
-    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Warn);
+    __LLBC_JLOG_TO_SPEC(logger, tag, _LV::Warn);
 }
 
 void LLBC_LogHelper::e(const char *fmt, ...)
@@ -309,7 +309,7 @@ LLBC_LogJsonMsg &LLBC_LogHelper::je3(const char *logger)
 
 LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger, const char *tag)
 {
-    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Error);
+    __LLBC_JLOG_TO_SPEC(logger, tag, _LV::Error);
 }
 
 void LLBC_LogHelper::f(const char *fmt, ...)
@@ -349,7 +349,7 @@ LLBC_LogJsonMsg &LLBC_LogHelper::jf3(const char *logger)
 
 LLBC_LogJsonMsg &LLBC_LogHelper::jf4(const char *logger, const char *tag)
 {
-    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(tag), _LV::Fatal);
+    __LLBC_JLOG_TO_SPEC(logger, tag, _LV::Fatal);
 }
 
 void LLBC_LogHelper::UnInitOutput(FILE *to, const char *msg)
