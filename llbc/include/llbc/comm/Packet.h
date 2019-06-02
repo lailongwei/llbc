@@ -245,6 +245,13 @@ public:
     void SetPayload(LLBC_MessageBlock *block);
 
     /**
+     * Set payload delete delegate.
+     * @param[in] deleg                   - the delete delegate.
+     * @param[in] deleteWhenPacketDestroy - when packet destroy, specific delegate need delete or not, default is true.
+     */
+    void SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy = true);
+
+    /**
      * Get payload length.
      * @return size_t - payload length.
      */
@@ -500,6 +507,16 @@ private:
      */
     void CleanupPreHandleResult();
 
+    /**
+     * Cleanup payload.
+     */
+    void CleanupPayload();
+
+    /**
+     * Cleanup payload delete delegate.
+     */
+    void CleanupPayloadDeleteDeleg();
+
 private:
     size_t _length;
 
@@ -527,6 +544,8 @@ private:
     LLBC_IDelegate1<void, void *> *_resultClearDeleg;
 
     LLBC_MessageBlock *_payload;
+    LLBC_IDelegate1<void, LLBC_MessageBlock *> *_payloadDeleteDeleg;
+    bool _deletePayloadDeleteDelegWhenDestroy;
 
     bool _dontDelAfterHandle;
 };
