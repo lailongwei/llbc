@@ -32,7 +32,7 @@
 #include "llbc/core/file/Common.h"
 #include "llbc/core/comstring/Common.h"
 #include "llbc/core/variant/Common.h"
-#include "llbc/core/json/json.h"
+#include "llbc/core/rapidjson/json.h"
 #include "llbc/core/config/Common.h"
 #include "llbc/core/time/Common.h"
 #include "llbc/core/event/Common.h"

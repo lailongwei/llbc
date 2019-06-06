@@ -28,6 +28,25 @@ inline LLBC_IService *LLBC_IFacade::GetService() const
     return _svc;
 }
 
+inline uint64 LLBC_IFacade::GetCaredEvents() const
+{
+    return _caredEvents;
+}
+
+inline bool LLBC_IFacade::IsCaredEvents(uint64 facadeEvs) const
+{
+    return (_caredEvents & facadeEvs) == facadeEvs;
+}
+
+inline bool LLBC_IFacade::IsCaredEventOffset(int facadeEvOffset) const
+{
+ #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
+    return IsCaredEvents(1Ui64 << facadeEvOffset);
+#else
+    return IsCaredEvents(1ULL << facadeEvOffset);
+#endif
+}
+
 inline void LLBC_IFacade::OnUpdate()
 {
 }

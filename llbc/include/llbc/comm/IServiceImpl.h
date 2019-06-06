@@ -376,11 +376,11 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
     return stub;
 }
 
-inline int LLBC_IService::Post(void(*func)(This *))
+inline int LLBC_IService::Post(void(*func)(This *, const LLBC_Variant *), LLBC_Variant *data)
 {
-    typedef LLBC_Func1<void, This *> __PostFuncDeleg;
+    typedef LLBC_Func2<void, This *, const LLBC_Variant *> __PostFuncDeleg;
 
-    LLBC_IDelegate1<void, This *> *deleg = LLBC_New1(__PostFuncDeleg, func);
+    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New1(__PostFuncDeleg, func);
     if (Post(deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -391,12 +391,12 @@ inline int LLBC_IService::Post(void(*func)(This *))
 }
 
 template <typename ObjType>
-inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(This *svc))
+inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant *), LLBC_Variant *data)
 {
-    typedef LLBC_Delegate1<void, ObjType, This *> __PostMethDeleg;
+    typedef LLBC_Delegate2<void, ObjType, This *, const LLBC_Variant *> __PostMethDeleg;
 
-    LLBC_IDelegate1<void, This *> *deleg = LLBC_New2(__PostMethDeleg, obj, method);
-    if (Post(deleg) != LLBC_OK)
+    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New2(__PostMethDeleg, obj, method);
+    if (Post(deleg, data) != LLBC_OK)
     {
         LLBC_Delete(deleg);
         return LLBC_FAILED;

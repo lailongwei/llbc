@@ -61,6 +61,8 @@ LLBC_Packet::LLBC_Packet()
 , _resultClearDeleg(NULL)
 
 , _payload(NULL)
+, _payloadDeleteDeleg(NULL)
+, _deletePayloadDeleteDelegWhenDestroy(false)
 
 , _dontDelAfterHandle(false)
 {
@@ -68,9 +70,10 @@ LLBC_Packet::LLBC_Packet()
 
 LLBC_Packet::~LLBC_Packet()
 {
-    CleanupPreHandleResult();
+    CleanupPayload();
+    CleanupPayloadDeleteDeleg();
 
-    LLBC_XDelete(_payload);
+    CleanupPreHandleResult();
 
     LLBC_XDelete(_encoder);
     LLBC_XDelete(_decoder);
@@ -109,10 +112,27 @@ void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
     if (UNLIKELY(block == _payload))
         return;
 
-    if (_payload)
-        LLBC_Delete(_payload);
+    CleanupPayload();
 
     _payload = block;
+}
+
+void LLBC_Packet::SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy)
+{
+    if (_payloadDeleteDeleg == deleg)
+    {
+        _deletePayloadDeleteDelegWhenDestroy = deleteWhenPacketDestroy;
+        return;
+    }
+
+    if (_payloadDeleteDeleg && _deletePayloadDeleteDelegWhenDestroy)
+    {
+        LLBC_Delete(_payloadDeleteDeleg);
+        _deletePayloadDeleteDelegWhenDestroy = false;
+    }
+
+    if ((_payloadDeleteDeleg = deleg))
+        _deletePayloadDeleteDelegWhenDestroy = deleteWhenPacketDestroy;
 }
 
 size_t LLBC_Packet::GetPayloadLength() const
@@ -291,6 +311,7 @@ int LLBC_Packet::Write(const void *buf, size_t len)
 {
     if (!_payload)
         _payload = LLBC_New1(LLBC_MessageBlock, len);
+
     return _payload->Write(buf, len);
 }
 
@@ -416,6 +437,32 @@ void LLBC_Packet::CleanupPreHandleResult()
 
         _preHandleResult = NULL;
     }
+}
+
+void LLBC_Packet::CleanupPayload()
+{
+    if (!_payload)
+        return;
+
+    if (_payloadDeleteDeleg)
+        _payloadDeleteDeleg->Invoke(_payload);
+
+    LLBC_Delete(_payload);
+    _payload = NULL;
+}
+
+void LLBC_Packet::CleanupPayloadDeleteDeleg()
+{
+    if (!_payloadDeleteDeleg)
+        return;
+
+    if (_deletePayloadDeleteDelegWhenDestroy)
+    {
+        LLBC_Delete(_payloadDeleteDeleg);
+        _deletePayloadDeleteDelegWhenDestroy = false;
+    }
+
+    _payloadDeleteDeleg = NULL;
 }
 
 __LLBC_NS_END

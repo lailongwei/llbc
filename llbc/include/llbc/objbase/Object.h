@@ -48,6 +48,11 @@ public:
 
 public:
     /**
+     * Get ref
+     */
+    virtual int GetRefCount();
+
+    /**
      * Retain object.
      */
     virtual void Retain();
@@ -56,6 +61,16 @@ public:
      * Release object.
      */
     virtual void Release();
+
+    /**
+     * Thread safety retain object.
+     */
+    virtual void SafeRetain();
+
+    /**
+     * Thread safety release object.
+     */
+    virtual void SafeRelease();
 
     /**
      * Auto release object.

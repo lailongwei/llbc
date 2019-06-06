@@ -159,6 +159,9 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
         ASSERT(_protoFactory != NULL && "Service type is Custom, but not pass Protocol Factory to Service!");
     }
 
+    // Initialize cared event facades array.
+    LLBC_MemSet(_caredEventFacades, 0, sizeof(_caredEventFacades));
+
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);
@@ -438,7 +441,7 @@ int LLBC_Service::GetFPS() const
 
 int LLBC_Service::SetFPS(int fps)
 {
-    if (fps != LLBC_INFINITE &&
+    if (fps != static_cast<int>(LLBC_INFINITE) &&
             (fps < LLBC_CFG_COMM_MIN_SERVICE_FPS || fps > LLBC_CFG_COMM_MAX_SERVICE_FPS))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
@@ -448,7 +451,7 @@ int LLBC_Service::SetFPS(int fps)
     LLBC_LockGuard guard(_lock);
 
     _fps = fps;
-    if (_fps != LLBC_INFINITE)
+    if (_fps != static_cast<int>(LLBC_INFINITE))
     {
         _frameInterval = 1000 / _fps;
     }
@@ -966,7 +969,7 @@ void LLBC_Service::FireEvent(LLBC_Event *ev)
     Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
 }
 
-int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
+int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
 {
     if (UNLIKELY(!deleg))
     {
@@ -990,20 +993,20 @@ int LLBC_Service::Post(LLBC_IDelegate1<void, LLBC_Service::Base *> *deleg)
 
     if (_handlingBeforeFrameTasks)
     {
-        _afterFrameTasks.insert(deleg);
+        _afterFrameTasks.insert(std::make_pair(deleg, data));
     }
     else
     {
         if (!_handledBeforeFrameTasks)
         {
-            _beforeFrameTasks.insert(deleg);
+            _beforeFrameTasks.insert(std::make_pair(deleg, data));
         }
         else
         {
             if (!_handlingAfterFrameTasks)
-                _afterFrameTasks.insert(deleg);
+                _afterFrameTasks.insert(std::make_pair(deleg, data));
             else
-                _beforeFrameTasks.insert(deleg);
+                _beforeFrameTasks.insert(std::make_pair(deleg, data));
         }
     }
 
@@ -1273,7 +1276,7 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
     for (_FrameTasks::iterator it = tasks.begin();
          it != tasks.end();
          it++)
-        (*it)->Invoke(this);
+        (it->first)->Invoke(this, it->second);
 
     DestroyFrameTasks(tasks, usingFlag);
 }
@@ -1281,7 +1284,16 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
 void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
 {
     usingFlag = false;
-    LLBC_STLHelper::DeleteContainer(tasks, true);
+    for (_FrameTasks::iterator it = tasks.begin();
+         it != tasks.end();
+         it++)
+    {
+        LLBC_Delete(it->first);
+        if (it->second)
+            LLBC_Delete(it->second);
+    }
+
+    tasks.clear();
 }
 
 void LLBC_Service::HandleQueuedEvents()
@@ -1306,24 +1318,31 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_SessionCreate _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
+    // Add session to connected sessionIds set.
     {
         _connectedSessionIdsLock.Lock();
         _connectedSessionIds.insert(ev.sessionId);
         _connectedSessionIdsLock.Unlock();
     }
 
-    LLBC_SessionInfo info;
-    info.SetIsListenSession(ev.isListen);
-    info.SetSessionId(ev.sessionId);
-    info.SetAcceptSessionId(ev.acceptSessionId);
-    info.SetLocalAddr(ev.local);
-    info.SetPeerAddr(ev.peer);
-    info.SetSocket(ev.handle);
+    // Check has care session-create ev facades or not, if has cared event facades, dispatch event.
+    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate])
+    {
+        // Build session info.
+        LLBC_SessionInfo info;
+        info.SetIsListenSession(ev.isListen);
+        info.SetSessionId(ev.sessionId);
+        info.SetAcceptSessionId(ev.acceptSessionId);
+        info.SetLocalAddr(ev.local);
+        info.SetPeerAddr(ev.peer);
+        info.SetSocket(ev.handle);
 
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnSessionCreate(info);
+        // Dispatch session-create event to all facades.
+        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate];
+        const size_t facadesSize = caredEvFacades.size();
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+            caredEvFacades[facadeIdx]->OnSessionCreate(info);
+    }
 }
 
 void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
@@ -1332,28 +1351,34 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     // Erase session from connected sessionIds set.
-    _connectedSessionIdsLock.Lock();
-    _connectedSessionIds.erase(ev.sessionId);
-    _connectedSessionIdsLock.Unlock();
+    {
+        _connectedSessionIdsLock.Lock();
+        _connectedSessionIds.erase(ev.sessionId);
+        _connectedSessionIdsLock.Unlock();
+    }
 
-    // Build session info.
-    LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
-    sessionInfo->SetIsListenSession(ev.isListen);
-    sessionInfo->SetSessionId(ev.sessionId);
-    sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
-    sessionInfo->SetLocalAddr(ev.local);
-    sessionInfo->SetPeerAddr(ev.peer);
-    sessionInfo->SetSocket(ev.handle);
+    // Check has care session-destroy ev facades or not, if has cared event facades, dispatch event.
+    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy])
+    {
+        // Build session info.
+        LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
+        sessionInfo->SetIsListenSession(ev.isListen);
+        sessionInfo->SetSessionId(ev.sessionId);
+        sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
+        sessionInfo->SetLocalAddr(ev.local);
+        sessionInfo->SetPeerAddr(ev.peer);
+        sessionInfo->SetSocket(ev.handle);
 
-    // Build session destroy info.
-    LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
-    ev.closeInfo = NULL;
+        // Build session destroy info.
+        LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
+        ev.closeInfo = NULL;
 
-    // Dispatch destroy event to all facades.
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnSessionDestroy(destroyInfo);
+        // Dispatch session-destroy event to all facades.
+        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy];
+        const size_t facadesSize = caredEvFacades.size();
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+             caredEvFacades[facadeIdx]->OnSessionDestroy(destroyInfo);
+    }
 
     // Remove session protocol factory.
     if (ev.acceptSessionId == 0)
@@ -1365,16 +1390,22 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_AsyncConn _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    LLBC_AsyncConnResult result;
-    result.SetIsConnected(ev.connected);
-    result.SetReason(ev.reason);
-    result.SetPeerAddr(ev.peer);
 
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnAsyncConnResult(result);
+    // Check has care asyncconn-result ev facades or not, if has cared event facades, dispatch event.
+    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult])
+    {
+        LLBC_AsyncConnResult result;
+        result.SetIsConnected(ev.connected);
+        result.SetReason(ev.reason);
+        result.SetPeerAddr(ev.peer);
 
+        _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult];
+        const size_t facadesSize = caredFacades.size();
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+             caredFacades[facadeIdx]->OnAsyncConnResult(result);
+    }
+
+    // Remove session protocol factory, if connect failed.
     if (!ev.connected)
         RemoveSessionProtocolFactory(ev.sessionId);
 }
@@ -1484,6 +1515,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
+    // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all facades.
     _Handlers::iterator it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
@@ -1491,10 +1523,13 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     else
     {
-        for (_Facades::iterator facadeIt = _facades.begin();
-             facadeIt != _facades.end();
-             facadeIt++)
-            (*facadeIt)->OnUnHandledPacket(*packet);
+        if (_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket])
+        {
+            _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket];
+            const size_t facadesSize = caredFacades.size();
+            for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+                 caredFacades[facadeIdx]->OnUnHandledPacket(*packet);
+        }
     }
 
     __LLBC_DelPacketAfterHandle(packet);
@@ -1505,17 +1540,21 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_ProtoReport _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    LLBC_ProtoReport report;
-    report.SetSessionId(ev.sessionId);
-    report.SetOpcode(ev.opcode);
-    report.SetLayer(ev.layer);
-    report.SetLevel(ev.level);
-    report.SetReport(ev.report);
+    // Check has care proto-report ev facades or not, if has cared event facades, dispatch event.
+    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport])
+    {
+        LLBC_ProtoReport report;
+        report.SetSessionId(ev.sessionId);
+        report.SetOpcode(ev.opcode);
+        report.SetLayer(ev.layer);
+        report.SetLevel(ev.level);
+        report.SetReport(ev.report);
 
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnProtoReport(report);
+        _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport];
+        const size_t facadesSize = caredFacades.size();
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+             caredFacades[facadeIdx]->OnProtoReport(report);
+    }
 }
 
 void LLBC_Service::HandleEv_SubscribeEv(LLBC_ServiceEvent &_)
@@ -1569,16 +1608,11 @@ int LLBC_Service::InitFacades()
             willRegFacade.facade = NULL;
         }
 
-        _facades.push_back(facade);
-        const LLBC_String facadeName = LLBC_GetTypeName(*facade);
-        _Facades2::iterator facadesIt = _facades2.find(facadeName);
-        if (facadesIt == _facades2.end())
-            facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
-        _Facades2::mapped_type &typeFacades = facadesIt->second;
-        typeFacades.push_back(facade);  // TODO: Add to facades dictionaries before facade init?
-
         facade->SetService(this);
-        if (UNLIKELY(!facade->OnInitialize()))
+        AddFacade(facade);
+
+        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnInitialize) &&
+            UNLIKELY(!facade->OnInitialize()))
         {
             StopFacades();
             DestroyFacades();
@@ -1603,15 +1637,16 @@ int LLBC_Service::InitFacades()
 
 int LLBC_Service::StartFacades()
 {
-    int startIndex = 0;
-    int facadesSize = static_cast<int>(_facades.size());
+    size_t startIndex = 0;
+    const size_t facadesSize = _facades.size();
     for (; startIndex < facadesSize; startIndex++)
     {
         LLBC_IFacade *facade = _facades[startIndex];
         if (facade->_started)
             continue;
 
-        if (!facade->OnStart())
+        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnStart) && 
+            !facade->OnStart())
             break;
 
         facade->_started = true;
@@ -1636,17 +1671,23 @@ void LLBC_Service::StopFacades()
         if (!facade->_started)
             continue;
 
-        facade->OnStop();
+        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnStop))
+            facade->OnStop();
+
         facade->_started = false;
     }
 }
 
 void LLBC_Service::UpdateFacades()
 {
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
-        (*it)->OnUpdate();
+    _Facades *&caredFacadesPtr = _caredEventFacades[LLBC_FacadeEventsOffset::OnUpdate];
+    if (!caredFacadesPtr)
+        return;
+
+    _Facades &caredFacades = *caredFacadesPtr;
+    const size_t facadesSize = caredFacades.size();
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        caredFacades[facadeIdx]->OnUpdate();
 }
 
 void LLBC_Service::DestroyFacades()
@@ -1656,12 +1697,23 @@ void LLBC_Service::DestroyFacades()
          it++)
     {
         LLBC_IFacade *facade = *it;
-        if (facade->_inited)
+        if (!facade->_inited)
+            continue;
+
+        if (facade->IsCaredEvents(LLBC_FacadeEventsOffset::OnDestroy))
             facade->OnDestroy();
     }
 
     LLBC_STLHelper::DeleteContainer(_facades, true, true);
     _facades2.clear();
+
+    for (int evOffset = LLBC_FacadeEventsOffset::Begin;
+         evOffset != LLBC_FacadeEventsOffset::End;
+         evOffset++)
+    {
+        _Facades *&evFacades = _caredEventFacades[evOffset];
+        LLBC_XDelete(evFacades);
+    }
 }
 
 void LLBC_Service::DestroyWillRegFacades()
@@ -1675,6 +1727,40 @@ void LLBC_Service::DestroyWillRegFacades()
     }
 
     _willRegFacades.clear();
+}
+
+void LLBC_Service::AddFacade(LLBC_IFacade *facade)
+{
+    // Add facade to _facades(vector)
+    _facades.push_back(facade);
+
+    // Add facade to _facades2(map<type, vector>)
+    const LLBC_String facadeName = LLBC_GetTypeName(*facade);
+    _Facades2::iterator facadesIt = _facades2.find(facadeName);
+    if (facadesIt == _facades2.end())
+        facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+    _Facades2::mapped_type &typeFacades = facadesIt->second;
+    typeFacades.push_back(facade);
+
+    // Add facade to cared events array
+    AddFacadeToCaredEventsArray(facade);
+}
+
+void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
+{
+    uint64 caredEvents = facade->GetCaredEvents();
+    for (int evOffset = LLBC_FacadeEventsOffset::Begin;
+         evOffset != LLBC_FacadeEventsOffset::End;
+         evOffset++)
+    {
+        if (!facade->IsCaredEventOffset(evOffset))
+            continue;
+
+        _Facades *&evFacades = _caredEventFacades[evOffset];
+        if (evFacades == NULL)
+            evFacades = new _Facades();
+        evFacades->push_back(facade);
+    }
 }
 
 void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
@@ -1759,9 +1845,13 @@ void LLBC_Service::UpdateTimers()
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
 {
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
-         it++)
+    _Facades *&caredEvsPtr = _caredEventFacades[LLBC_FacadeEventsOffset::OnIdle];
+    if (!caredEvsPtr)
+        return;
+
+    _Facades &caredEvs = *caredEvsPtr;
+    const size_t facadesSize = caredEvs.size();
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
     {
         if (fullFrame)
         {
@@ -1771,12 +1861,12 @@ void LLBC_Service::ProcessIdle(bool fullFrame)
                 if (elapsed >= _frameInterval)
                     break;
 
-                (*it)->OnIdle(static_cast<int>(_frameInterval - elapsed));
+                caredEvs[facadeIdx]->OnIdle(static_cast<int>(_frameInterval - elapsed));
             }
         }
         else
         {
-            (*it)->OnIdle(0);
+            caredEvs[facadeIdx]->OnIdle(0);
         }
     }
 }
@@ -1930,7 +2020,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (validCheck)
             _connectedSessionIdsLock.Lock();
 
-        for (register typename SessionIds::size_type i = 1;
+        for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
              i++)
         {
@@ -1978,7 +2068,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
     const size_t otherPacketCnt = sessionCnt - 1;
-    for (register size_t i = 0; i < otherPacketCnt; i++)
+    for (size_t i = 0; i < otherPacketCnt; i++)
     {
         LLBC_Packet *otherPacket = otherPackets[i];
         if (!otherPacket)

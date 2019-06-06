@@ -47,17 +47,31 @@ LLBC_Object::~LLBC_Object()
     }
 }
 
+int LLBC_Object::GetRefCount()
+{
+    return _ref;
+}
+
 void LLBC_Object::Release()
 {
-    if (-- _ref == 0)
-    {
+    if (--_ref == 0)
         LLBC_Delete(this);
-    }
+}
+
+void LLBC_Object::SafeRetain()
+{
+    (void)LLBC_AtomicFetchAndAdd(&_ref, 1);
+}
+
+void LLBC_Object::SafeRelease()
+{
+    if (LLBC_AtomicFetchAndSub(&_ref, 1) == 1)
+        LLBC_Delete(this);
 }
 
 void LLBC_Object::Retain()
 {
-    ++ _ref;
+    ++_ref;
 }
 
 int LLBC_Object::AutoRelease()

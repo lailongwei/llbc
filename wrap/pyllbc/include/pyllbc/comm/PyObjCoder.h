@@ -48,15 +48,15 @@ public:
     static int Decode(const std::string &in, PyObject *&out);
 
 private:
-    static int Encode(PyObject *in, LLBC_JsonValue *&out);
+    static int Encode(PyObject *in, LLBC_Json::Document *&out);
     static int EncodeBool(PyObject *in, bool &out);
     static int EncodeInt(PyObject *in, sint64 &out);
     static int EncodeLong(PyObject *in, sint64 &out);
     static int EncodeFloat(PyObject *in, double &out);
     static int EncodeStr(PyObject *in, std::string &out);
-    static int EncodeSeq(PyObject *in, LLBC_JsonValue &out);
-    static int EncodeDict(PyObject *in, LLBC_JsonValue &out);
-    static int EncodeInst(PyObject *in, LLBC_JsonValue &out);
+    static int EncodeSeq(PyObject *in, LLBC_Json::Document &out);
+    static int EncodeDict(PyObject *in, LLBC_Json::Document &out);
+    static int EncodeInst(PyObject *in, LLBC_Json::Document &out);
 
     static int _Decode(const LLBC_JsonValue &in, PyObject *&out);
     static int DecodeNull(const LLBC_JsonValue &in, PyObject *&out);
