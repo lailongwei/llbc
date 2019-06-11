@@ -137,6 +137,8 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 
 , _timerScheduler(NULL)
 
+, _objectPool(NULL)
+
 , _evManager()
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
@@ -262,7 +264,10 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
     }
 
     if ((_driveMode = mode) == This::ExternalDrive)
-        GetTimerScheduler();
+    {
+        InitTimerScheduler();
+        InitObjectPool();
+    }
 
     return LLBC_OK;
 }
@@ -1153,7 +1158,8 @@ void LLBC_Service::Svc()
     _lock.Lock();
 
     AddServiceToTls();
-    GetTimerScheduler();
+    InitTimerScheduler();
+    InitObjectPool();
 #if LLBC_CFG_OBJBASE_ENABLED
     CreateAutoReleasePool();
 #endif // LLBC_CFG_OBJBASE_ENABLED
@@ -1829,7 +1835,7 @@ void LLBC_Service::DestroyAutoReleasePool()
 }
 #endif // LLBC_CFG_OBJBASE_ENABLED
 
-void LLBC_Service::GetTimerScheduler()
+void LLBC_Service::InitTimerScheduler()
 {
     if (!_timerScheduler)
     {
@@ -1841,6 +1847,19 @@ void LLBC_Service::GetTimerScheduler()
 void LLBC_Service::UpdateTimers()
 {
     _timerScheduler->Update();
+}
+
+void LLBC_Service::InitObjectPool()
+{
+    if (!_objectPool)
+    {
+        __LLBC_LibTls *tls = __LLBC_GetLibTls();
+        _objectPool = reinterpret_cast<LLBC_ThreadObjectPool *>(tls->coreTls.objectPool);
+    }
+}
+
+void LLBC_Service::UpdateObjectPool()
+{
 }
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
