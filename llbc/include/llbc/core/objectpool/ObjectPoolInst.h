@@ -38,6 +38,7 @@ __LLBC_INTERNAL_NS_BEGIN
 #if LLBC_TARGET_PLATFORM_WIN32
     const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
 #else
+    const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
 #endif
 
 // Define 64bit 0&1.
