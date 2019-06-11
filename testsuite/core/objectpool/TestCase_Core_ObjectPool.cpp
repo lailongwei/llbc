@@ -35,11 +35,11 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     LLBC_PrintLine("core/objectpool test:");
 
     LLBC_ObjectPool<> pool;
-    std::vector<int*>* vec = pool.Get<std::vector<int*>>();
+    std::vector<int*>* vec = pool.Get<std::vector<int*> >();
     
     for (int i = 0; i < 70; ++i)
     {
-        auto* data = pool.Get<int>();
+        int* data = pool.Get<int>();
         *data = i;
         vec->push_back(data);
     }

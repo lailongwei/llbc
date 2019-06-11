@@ -35,11 +35,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 // Define bitview element size, in bytes.
-#if LLBC_TARGET_PLATFORM_WIN32
-    const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
-#else
-    const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
-#endif
+const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
 
 // Define 64bit 0&1.
 #if LLBC_TARGET_PLATFORM_WIN32
