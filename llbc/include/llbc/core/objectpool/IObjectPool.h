@@ -29,7 +29,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The object pool interface encapsulation.
  */
-class LLBC_EXPORT LLBC_IObjectPool
+class LLBC_IObjectPool
 {
 public:
     virtual ~LLBC_IObjectPool() {  }

@@ -70,7 +70,7 @@ __LLBC_NS_BEGIN
 * \brief The object pool instance encapsulation.
 */
 template <typename ObjectType, typename LockType = LLBC_DummyLock>
-class LLBC_EXPORT LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
+class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
 private:
     

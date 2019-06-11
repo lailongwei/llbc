@@ -34,7 +34,7 @@ class LLBC_IObjectPool;
 * \brief The pool object guard class encapsulation.
 */
 template <typename ObjectType>
-class LLBC_EXPORT LLBC_ObjectGuard
+class LLBC_ObjectGuard
 {
 public:
     LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPool *pool);

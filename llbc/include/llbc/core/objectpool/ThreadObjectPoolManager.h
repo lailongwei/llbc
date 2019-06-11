@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The thread object pool manager class encapsulation.
  */
-class LLBC_ThreadObjectPoolManager
+class LLBC_EXPORT LLBC_ThreadObjectPoolManager
 {
 public:
     /**

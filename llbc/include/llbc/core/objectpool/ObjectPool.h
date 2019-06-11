@@ -40,7 +40,7 @@ class LLBC_ObjectGuard;
  * \brief The object pool class encapsulation.
  */
 template <typename PoolLockType = LLBC_DummyLock, typename PoolInstLockType = PoolLockType>
-class LLBC_EXPORT LLBC_ObjectPool : public LLBC_IObjectPool
+class LLBC_ObjectPool : public LLBC_IObjectPool
 {
 public:
     LLBC_ObjectPool();
@@ -97,7 +97,6 @@ __LLBC_NS_BEGIN
 /**
  * Export & typedef some usually used thread pool classes.
  */
-template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
 typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_ThreadObjectPool;
 
 __LLBC_NS_END
