@@ -132,8 +132,6 @@ protected:
      */
     void *FindFreeObj(MemoryBlock *memBlock);
 
-    sint32 BitCount(const uint32& u);
-
     /**
     * Detect idle memory unit for 64bits bit view flag.
     * @param[in] bitView - bit view flag.
