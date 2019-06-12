@@ -25,6 +25,22 @@
 #include "llbc.h"
 using namespace llbc;
 
+class EmptyLock : public LLBC_ILock
+{
+public:
+    EmptyLock() {  }
+    ~EmptyLock() {  }
+
+    virtual void Lock() {  }
+    virtual bool TryLock() { return false; }
+    virtual void Unlock() {  }
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+private:
+    virtual void *Handle() { return NULL; };
+#endif
+};
+
 class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
 {
 public:

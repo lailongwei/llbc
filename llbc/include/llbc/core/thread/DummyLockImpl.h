@@ -19,44 +19,41 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
-
-#include "llbc/core/thread/DummyLock.h"
+#ifdef __LLBC_CORE_THREAD_DUMMY_LOCK_H__
 
 __LLBC_NS_BEGIN
 
-LLBC_DummyLock::LLBC_DummyLock()
+inline LLBC_DummyLock::LLBC_DummyLock()
 {
 }
 
-LLBC_DummyLock::~LLBC_DummyLock()
+inline LLBC_DummyLock::~LLBC_DummyLock()
 {
 }
 
-void LLBC_DummyLock::Lock()
+inline void LLBC_DummyLock::Lock()
 {
     // ... ...
 }
 
-bool LLBC_DummyLock::TryLock()
+inline bool LLBC_DummyLock::TryLock()
 {
     // ... ...
     return true;
 }
 
-void LLBC_DummyLock::Unlock()
+inline void LLBC_DummyLock::Unlock()
 {
     // ... ...
 }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-void *LLBC_DummyLock::Handle()
+inline void *LLBC_DummyLock::Handle()
 {
     return NULL;
 }
-#endif
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_CORE_THREAD_DUMMY_LOCK_H__

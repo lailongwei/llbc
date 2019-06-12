@@ -34,24 +34,45 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/objectpool test:");
 
-    LLBC_ObjectPool<> pool;
-    std::vector<int*>* vec = pool.Get<std::vector<int*> >();
+    LLBC_ObjectPool<EmptyLock, EmptyLock> pool;
+    const int LstCnt = 100000;
+    std::vector<int*>* lst[LstCnt];
+    std::vector<int*>* lst1[LstCnt];
+
+    const sint64 beginT = LLBC_Time::Now().GetTimeTick();
+    for (int i = 0; i < LstCnt; i++)
+        lst[i] = pool.Get<std::vector<int*> >();
+
+    const sint64 endT = LLBC_Time::Now().GetTimeTick();
+    LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT-beginT);
+
+    const sint64 beginT1 = LLBC_Time::Now().GetTimeTick();
+    for (int i = 0; i < LstCnt; i++)
+        lst1[i] = new std::vector<int*>();
     
-    for (int i = 0; i < 70; ++i)
-    {
-        int* data = pool.Get<int>();
-        *data = i;
-        vec->push_back(data);
-    }
+    const sint64 endT1 = LLBC_Time::Now().GetTimeTick();
+    LLBC_PrintLine("New %d objects cost time [%llu].", LstCnt, endT1 - beginT1);
 
-    std::vector<int*>::const_iterator it;
-    for (it = vec->begin(); it != vec->end(); ++it)
-        pool.Release(*it);
+    const sint64 beginT4 = LLBC_Time::Now().GetTimeTick();
+    for (int i = 0; i < LstCnt; i++)
+        delete lst1[i];
 
-    pool.Release(vec);
+    const sint64 endT4 = LLBC_Time::Now().GetTimeTick();
+    LLBC_PrintLine("Delete %d objects cost time [%llu].", LstCnt, endT4 - beginT4);
 
+    const sint64 beginT2 = LLBC_Time::Now().GetTimeTick();
+    for (int i = 0; i < LstCnt; i++)
+        pool.Release(lst[i]);
+    const sint64 endT2 = LLBC_Time::Now().GetTimeTick();
+    LLBC_PrintLine("Release %d object-pool objects cost time [%llu].", LstCnt, endT2 - beginT2);
 
-    pool.GetGuarded<double>();
+    const sint64 beginT3 = LLBC_Time::Now().GetTimeTick();
+    for (int i = 0; i < LstCnt; i++)
+        lst[i] = pool.Get<std::vector<int*> >();
+
+    const sint64 endT3 = LLBC_Time::Now().GetTimeTick();
+    LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT3 - beginT3);
+
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
