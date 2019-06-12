@@ -132,13 +132,7 @@ protected:
      */
     void *FindFreeObj(MemoryBlock *memBlock);
 
-    /**
-     * Mask the bit state of bit view .
-     * @param[in] bitView - bit view.
-     * @param[in] index - bit index.
-     * @param[in] used - true means the memory unit is used, otherwise the memory unit is free.
-     */
-    void MaskBitState(MemoryBitView *bitView, sint32 index, bool used);
+    sint32 BitCount(const uint32& u);
 
     /**
     * Detect idle memory unit for 64bits bit view flag.

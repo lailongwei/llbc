@@ -34,44 +34,96 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/objectpool test:");
 
-    LLBC_ObjectPool<EmptyLock, EmptyLock> pool;
-    const int LstCnt = 100000;
-    std::vector<int*>* lst[LstCnt];
-    std::vector<int*>* lst1[LstCnt];
+    LLBC_ThreadObjectPool pool;
+    const int listSize = 100;
+    std::vector<double> *poolObjs[listSize];
+    std::vector<double> *mallocObjs[listSize];
 
-    const sint64 beginT = LLBC_Time::Now().GetTimeTick();
-    for (int i = 0; i < LstCnt; i++)
-        lst[i] = pool.Get<std::vector<int*> >();
+    LLBC_Random rand;
+    rand.Seed(LLBC_Time::Now().GetTimeTick());
 
-    const sint64 endT = LLBC_Time::Now().GetTimeTick();
-    LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT-beginT);
+    const int testTimes = 100000;
+    int randTimes[testTimes];
+    int pushElems[testTimes];
+    for (int i = 0; i < testTimes; ++i)
+    {
+        randTimes[i] = LLBC_Abs(rand.Rand(listSize));
+        pushElems[i] = LLBC_Abs(rand.Rand(listSize));
+    }
 
-    const sint64 beginT1 = LLBC_Time::Now().GetTimeTick();
-    for (int i = 0; i < LstCnt; i++)
-        lst1[i] = new std::vector<int*>();
-    
-    const sint64 endT1 = LLBC_Time::Now().GetTimeTick();
-    LLBC_PrintLine("New %d objects cost time [%llu].", LstCnt, endT1 - beginT1);
+    LLBC_PrintLine("Test new/delete ...");
+    LLBC_Time begTime = LLBC_Time::Now();
+    for (int i = 0; i < testTimes; ++i)
+    {
+        const int &newDelTimes = randTimes[i];
+        for (int j = 0; j < newDelTimes; ++j)
+        {
+            mallocObjs[j] = new std::vector<double>();
+            for (int k = 0; k < pushElems[i]; ++k)
+                mallocObjs[j]->push_back(k);
+        }
+        for (int j = 0; j < newDelTimes; ++j)
+            delete mallocObjs[j];
+    }
 
-    const sint64 beginT4 = LLBC_Time::Now().GetTimeTick();
-    for (int i = 0; i < LstCnt; i++)
-        delete lst1[i];
+    LLBC_TimeSpan usedTime = LLBC_Time::Now() - begTime;
+    LLBC_PrintLine("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
-    const sint64 endT4 = LLBC_Time::Now().GetTimeTick();
-    LLBC_PrintLine("Delete %d objects cost time [%llu].", LstCnt, endT4 - beginT4);
+    LLBC_PrintLine("Test pool Get/Release ...");
+    begTime = LLBC_Time::Now();
+    for (int i = 0; i < testTimes; ++i)
+    {
+        const int &newDelTimes = randTimes[i];
+        for (int j = 0; j < newDelTimes; ++j)
+        {
+            poolObjs[j] = pool.Get<std::vector<double> >();
+            for (int k = 0; k < pushElems[i]; ++k)
+                poolObjs[j]->push_back(k);
+        }
+        for (int j = 0; j < newDelTimes; ++j)
+            pool.Release(poolObjs[j]);
+    }
+    usedTime = LLBC_Time::Now() - begTime;
+    LLBC_PrintLine("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
-    const sint64 beginT2 = LLBC_Time::Now().GetTimeTick();
-    for (int i = 0; i < LstCnt; i++)
-        pool.Release(lst[i]);
-    const sint64 endT2 = LLBC_Time::Now().GetTimeTick();
-    LLBC_PrintLine("Release %d object-pool objects cost time [%llu].", LstCnt, endT2 - beginT2);
+    //LLBC_ObjectPool<EmptyLock, EmptyLock> pool;
+    //const int LstCnt = 100000;
+    //std::vector<int*>* lst[LstCnt];
+    //std::vector<int*>* lst1[LstCnt];
 
-    const sint64 beginT3 = LLBC_Time::Now().GetTimeTick();
-    for (int i = 0; i < LstCnt; i++)
-        lst[i] = pool.Get<std::vector<int*> >();
+    //const sint64 beginT = LLBC_Time::Now().GetTimeTick();
+    //for (int i = 0; i < LstCnt; i++)
+    //    lst[i] = pool.Get<std::vector<int*> >();
 
-    const sint64 endT3 = LLBC_Time::Now().GetTimeTick();
-    LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT3 - beginT3);
+    //const sint64 endT = LLBC_Time::Now().GetTimeTick();
+    //LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT-beginT);
+
+    //const sint64 beginT1 = LLBC_Time::Now().GetTimeTick();
+    //for (int i = 0; i < LstCnt; i++)
+    //    lst1[i] = new std::vector<int*>();
+    //
+    //const sint64 endT1 = LLBC_Time::Now().GetTimeTick();
+    //LLBC_PrintLine("New %d objects cost time [%llu].", LstCnt, endT1 - beginT1);
+
+    //const sint64 beginT4 = LLBC_Time::Now().GetTimeTick();
+    //for (int i = 0; i < LstCnt; i++)
+    //    delete lst1[i];
+
+    //const sint64 endT4 = LLBC_Time::Now().GetTimeTick();
+    //LLBC_PrintLine("Delete %d objects cost time [%llu].", LstCnt, endT4 - beginT4);
+
+    //const sint64 beginT2 = LLBC_Time::Now().GetTimeTick();
+    //for (int i = 0; i < LstCnt; i++)
+    //    pool.Release(lst[i]);
+    //const sint64 endT2 = LLBC_Time::Now().GetTimeTick();
+    //LLBC_PrintLine("Release %d object-pool objects cost time [%llu].", LstCnt, endT2 - beginT2);
+
+    //const sint64 beginT3 = LLBC_Time::Now().GetTimeTick();
+    //for (int i = 0; i < LstCnt; i++)
+    //    lst[i] = pool.Get<std::vector<int*> >();
+
+    //const sint64 endT3 = LLBC_Time::Now().GetTimeTick();
+    //LLBC_PrintLine("Get %d objects from object pool cost time [%llu].", LstCnt, endT3 - beginT3);
 
 
     LLBC_PrintLine("Press any key to continue ...");

@@ -92,7 +92,9 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void* obj)
         memUnit->inited = false;
 
     MemoryBlock *memBlock = reinterpret_cast<MemoryBlock *>(reinterpret_cast<uint8 *>(memUnit) - memUnit->seq * _elemSize - sizeof(MemoryBlock));
-    MaskBitState(_blockBitView[memBlock->seq], memUnit->seq, false);
+    MemoryBitView *& bitView = _blockBitView[memBlock->seq];
+    ++bitView->freeCnt;
+    *(reinterpret_cast<sint64 *>(bitView->bits) + (memUnit->seq >> 6)) &= ~(LLBC_INL_NS One << (memUnit->seq & 0x3f));
 
     _lock.Unlock();
 }
@@ -152,10 +154,10 @@ void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlo
         return NULL;
 
     sint32 unusedUnitSeq = 0;
-    uint8 *viewBits = reinterpret_cast<uint8*>(bitView->bits);
+    uint8 *viewBits = bitView->bits;
     for (size_t bitViewIdx = 0; bitViewIdx != _bitViewSize; bitViewIdx += LLBC_INL_NS BitViewElemSize)
     {
-        const uint64 &bitViewVal = *(reinterpret_cast<uint64 *>(viewBits + bitViewIdx));
+        uint64 &bitViewVal = *(reinterpret_cast<uint64 *>(viewBits + bitViewIdx));
         sint32 curUnusedUnitSeq = DetectIdleMemoryUnit(bitViewVal);
         if (curUnusedUnitSeq == -1)
             continue;
@@ -164,7 +166,10 @@ void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlo
         if (unusedUnitSeq >= _elemCnt)
             continue;
 
-        MaskBitState(bitView, unusedUnitSeq, true);
+        // Mask bitview bits.
+        --bitView->freeCnt;
+        bitViewVal |= (LLBC_INL_NS One << curUnusedUnitSeq);
+
         MemoryUnit* memUnit = reinterpret_cast<MemoryUnit *>(memBlock->buff + unusedUnitSeq * _elemSize);
 
 #if LLBC_DEBUG 
@@ -187,27 +192,12 @@ void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlo
 }
 
 template <typename ObjectType, typename LockType>
-void LLBC_ObjectPoolInst<ObjectType, LockType>::MaskBitState(MemoryBitView* bitView, sint32 index, bool used)
-{
-    if (used)
-    {
-        --bitView->freeCnt;
-        *(reinterpret_cast<sint64 *>(bitView->bits) + (index >> 6)) |= LLBC_INL_NS One << (index & 0x3f);
-    }
-    else
-    {
-        ++bitView->freeCnt;
-        *(reinterpret_cast<sint64 *>(bitView->bits) + (index >> 6)) &= ~(LLBC_INL_NS One << (index & 0x3f));
-    }
-}
-
-template <typename ObjectType, typename LockType>
 sint32 LLBC_ObjectPoolInst<ObjectType, LockType>::DetectIdleMemoryUnit(const uint64 &bitView)
 {
     if (bitView == static_cast<uint64>(-1))
         return -1;
 
-    sint32 left = DetectIdleMemoryUnit(static_cast<uint32>(bitView & 0xffffffff));
+    sint32 left = DetectIdleMemoryUnit(static_cast<uint32>(bitView));
     if (left >= 0)
         return left;
 
@@ -220,7 +210,7 @@ sint32 LLBC_ObjectPoolInst<ObjectType, LockType>::DetectIdleMemoryUnit(const uin
     if (bitView == static_cast<uint32>(-1))
         return -1;
 
-    sint32 left = DetectIdleMemoryUnit(static_cast<uint16>(bitView & 0xffff));
+    sint32 left = DetectIdleMemoryUnit(static_cast<uint16>(bitView));
     if (left >= 0)
         return left;
 
