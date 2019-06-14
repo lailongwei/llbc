@@ -53,6 +53,13 @@ public:
      */
     template <typename ObjectType>
     ObjectType *Get();
+    
+    /**
+    * Get pool instance.
+    * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
+    */
+    template <typename ObjectType>
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
 
     /**
      * Get guarded object.

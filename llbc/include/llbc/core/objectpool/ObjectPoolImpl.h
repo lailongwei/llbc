@@ -40,6 +40,26 @@ LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
+LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
+{
+    const char *objectType = typeid(ObjectType).name();
+
+    LLBC_IObjectPoolInst *poolInst;
+    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+
+    _lock.Lock();
+    if ((it = _poolDict.find(objectType)) == _poolDict.end())
+        poolInst = _poolDict.insert(std::make_pair(objectType, new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>())).first->second;
+    else
+        poolInst = it->second;
+
+    _lock.Unlock();
+
+    return reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>* >(poolInst);
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename ObjectType>
 ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 {
     const char *objectType = typeid(ObjectType).name();

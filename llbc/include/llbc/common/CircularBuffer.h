@@ -19,20 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
-#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+#ifndef __LLBC_COMMON_CIRCULAR_BUFFER_H__
+#define __LLBC_COMMON_CIRCULAR_BUFFER_H__
 
-#include "llbc.h"
-using namespace llbc;
-
-class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
+template <typename ObjectType>
+class CircularBuffer
 {
 public:
-    TestCase_Core_ObjectPool();
-    virtual ~TestCase_Core_ObjectPool();
+    CircularBuffer(const size_t capacity);
+    ~CircularBuffer();
 
 public:
-    int Run(int argc, char *argv[]);
+    /**
+    * Determines whether the buffer is full.
+    * @return bool - return true if full, otherwise return false.
+    */
+    bool IsFull();
+
+    /**
+    * Determines whether the buffer is empty.
+    * @return bool - return true if empty, otherwise return false.
+    */
+    bool IsEmpty();
+
+    /**
+    * Insert object to the tail.
+    * @param[in] elem - The object.
+    */
+    void Push(const ObjectType &obj);
+
+    /**
+    * Get object from front.
+    * @return ObjectType - The object.
+    */
+    ObjectType Pop();
+
+private:
+    const size_t _capacity;
+
+    int _front;
+    int _tail;
+    bool _isFull;
+    
+    ObjectType *_buffers;
 };
 
-#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+#include "llbc/common/CircularBufferImpl.h"
+
+#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__

@@ -19,20 +19,43 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
-#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
+#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
+
+#include <atomic>
 
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
+namespace {
+    const int TestTimes = 100000;
+    const int ListSize = 100;
+}
+
+/**
+* \brief Object pool test task encapsulation.
+*/
+class ObjectPoolTestTask : public LLBC_BaseTask
 {
 public:
-    TestCase_Core_ObjectPool();
-    virtual ~TestCase_Core_ObjectPool();
+    ObjectPoolTestTask();
+    virtual ~ObjectPoolTestTask();
 
 public:
-    int Run(int argc, char *argv[]);
+    virtual void Svc();
+
+    virtual void Cleanup();
+
+private:
+    int _randTimes[TestTimes];
+    int _pushElems[TestTimes];
+
+    int m_repeatCount;
+
+    LLBC_SpinLock _lock;
+    LLBC_ObjectPool<LLBC_SpinLock> *_pool;
+    LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
 };
 
-#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+
+#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__

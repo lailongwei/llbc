@@ -94,31 +94,34 @@ private:
         uint8 buff[0];         // The begin address of buffer.
     };
 
-    /**
-     * The structure of memory bit view.
-     */
-    struct MemoryBitView
-    {
-        sint32 freeCnt;        // count of free memory unit.
-        uint8 bits[0];         // The begin address of buffer.
-    };
-
 public:
     LLBC_ObjectPoolInst();
     virtual ~LLBC_ObjectPoolInst();
 
 public:
     /**
-     * Get object.
-     * @return void * - the object pointer.
-     */
+    * Get object.
+    * @return void * - the object pointer.
+    */
     virtual void *Get();
+
+    /**
+     * Get object.
+     * @return ObjectType * - the object pointer.
+     */
+    ObjectType *GetObject();
 
     /**
      * Release object.
      * @param[in] obj - the object pointer.
      */
     virtual void Release(void *obj);
+
+    /**
+    * Release object.
+    * @param[in] obj - the object pointer.
+    */
+    virtual void ReleaseObject(ObjectType *obj);
 
 protected:
     /**
@@ -132,33 +135,14 @@ protected:
      */
     void *FindFreeObj(MemoryBlock *memBlock);
 
-    /**
-    * Detect idle memory unit for 64bits bit view flag.
-    * @param[in] bitView - bit view flag.
-    */
-    sint32 DetectIdleMemoryUnit(const uint64 &bitView);
-
-    /**
-    * Detect idle memory unit for 32bits bit view flag.
-    * @param[in] bitView - bit view flag.
-    */
-    sint32 DetectIdleMemoryUnit(const uint32 &bitView);
-
-    /**
-    * Detect idle memory unit for 16bits bit view flag.
-    * @param[in] bitView - bit view flag.
-    */
-    sint32 DetectIdleMemoryUnit(const uint16 &bitView);
-
 private:
     const sint32 _elemSize;
     const sint32 _elemCnt;
     const sint32 _blockSize;
-    const size_t _bitViewSize;
 
     sint32 _blockCnt;
     MemoryBlock **_block;
-    MemoryBitView **_blockBitView;
+    CircularBuffer<MemoryUnit *> ** _memUnitUsageView;
 
     LockType _lock;
 };

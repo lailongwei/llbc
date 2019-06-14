@@ -19,20 +19,61 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
-#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+#ifdef __LLBC_COMMON_CIRCULAR_BUFFER_H__
 
-#include "llbc.h"
-using namespace llbc;
+template <typename ObjectType>
+inline CircularBuffer<ObjectType>::CircularBuffer(const size_t capacity)
+: _capacity(capacity)
 
-class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
+, _front(0)
+, _tail(0)
+, _isFull(false)
+
+, _buffers(new ObjectType[capacity])
 {
-public:
-    TestCase_Core_ObjectPool();
-    virtual ~TestCase_Core_ObjectPool();
+}
 
-public:
-    int Run(int argc, char *argv[]);
-};
+template <typename ObjectType>
+inline CircularBuffer<ObjectType>::~CircularBuffer()
+{
+    LLBC_Deletes(_buffers);
+}
 
-#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+template <typename ObjectType>
+inline bool CircularBuffer<ObjectType>::IsFull()
+{
+    return _isFull;
+}
+
+template <typename ObjectType>
+inline bool CircularBuffer<ObjectType>::IsEmpty()
+{
+    return !_isFull && _tail == _front;
+}
+
+template <typename ObjectType>
+inline void CircularBuffer<ObjectType>::Push(const ObjectType &obj)
+{
+    _buffers[_tail] = obj;
+    if (++_tail == _capacity)
+        _tail = 0;
+
+    if (_tail == _front)
+        _isFull = true;
+}
+
+template <typename ObjectType>
+inline ObjectType CircularBuffer<ObjectType>::Pop()
+{
+    ObjectType &obj = _buffers[_front];
+
+    if (++_front == _capacity)
+        _front = 0;
+
+    if (_isFull)
+        _isFull = false;
+
+    return obj;
+}
+
+#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__
