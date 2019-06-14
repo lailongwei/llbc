@@ -22,8 +22,6 @@
 #ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
 #define __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
 
-#include <atomic>
-
 #include "llbc.h"
 using namespace llbc;
 
