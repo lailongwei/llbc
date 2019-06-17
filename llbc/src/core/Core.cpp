@@ -55,6 +55,10 @@ int __LLBC_CoreStartup()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.timerScheduler = LLBC_TimerScheduler::GetEntryThreadScheduler();
 
+    // Set entry thread object pool.
+    LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPool();
+    tls->coreTls.objectPool = LLBC_ThreadObjectPoolManager::GetEntryThreadObjectPool();
+
     // Set random seed.
     LLBC_SeedRand(static_cast<int>(::time(NULL)));
 
@@ -71,6 +75,10 @@ void __LLBC_CoreCleanup()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.timerScheduler = NULL;
     LLBC_TimerScheduler::DestroyEntryThreadScheduler();
+
+    // Destroy entry thread object pool.
+    tls->coreTls.objectPool = NULL;
+    LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPool();
 
     // Destroy main bundle.
     LLBC_Bundle::DestroyMainBundle();

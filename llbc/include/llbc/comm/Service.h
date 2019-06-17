@@ -132,7 +132,7 @@ public:
 
     /**
      * Set service FPS.
-     * @return int - return 0 if success, ohterwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetFPS(int fps);
 
@@ -184,7 +184,7 @@ public:
     virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
-     * Check given sessionId is lgeal or not.
+     * Check given sessionId is legal or not.
      * @param[in] sessionId - the given session Id.
      * @return bool - return true is given session Id validate, otherwise return false.
      */
@@ -354,6 +354,13 @@ public:
 
 public:
     /**
+    * Get object pool.
+    * @return LLBC_ThreadObjectPool * - the object pool.
+    */
+    LLBC_ThreadObjectPool *GetObjectPool();
+
+public:
+    /**
      * Post lazy task to service.
      * @param[in] deleg - the task delegate.
      * @param[in] data  - the task data, can be null.
@@ -456,8 +463,14 @@ private:
     /**
      * Timer-Scheduler operation methods.
      */
-    void GetTimerScheduler();
+    void InitTimerScheduler();
     void UpdateTimers();
+
+    /**
+    * Object pool operation methods.
+    */
+    void InitObjectPool();
+    void UpdateObjectPool();
 
     /**
      * Idle process method.
@@ -582,6 +595,9 @@ private:
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
+
+private:
+    LLBC_ThreadObjectPool *_objectPool;
 
 private:
     LLBC_EventManager _evManager;

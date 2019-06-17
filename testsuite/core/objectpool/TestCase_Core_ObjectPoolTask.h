@@ -19,51 +19,41 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_DUMMY_LOCK_H__
-#define __LLBC_CORE_THREAD_DUMMY_LOCK_H__
+#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
+#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__
 
-#include "llbc/common/Common.h"
+#include "llbc.h"
+using namespace llbc;
 
-#include "llbc/core/thread/ILock.h"
-
-__LLBC_NS_BEGIN
+namespace {
+    const int TestTimes = 100000;
+    const int ListSize = 100;
+}
 
 /**
- * \brief dummy lock encapsulation.
- */
-class LLBC_EXPORT LLBC_DummyLock : public LLBC_ILock
+* \brief Object pool test task encapsulation.
+*/
+class ObjectPoolTestTask : public LLBC_BaseTask
 {
 public:
-    LLBC_DummyLock();
-    virtual ~LLBC_DummyLock();
+    ObjectPoolTestTask();
+    virtual ~ObjectPoolTestTask();
 
 public:
-    /**
-     * Acquire lock.
-     */
-    virtual void Lock();
+    virtual void Svc();
 
-    /**
-     * Try acquire lock.
-     */
-    virtual bool TryLock();
-
-    /**
-     * Release lock.
-     */
-    virtual void Unlock();
+    virtual void Cleanup();
 
 private:
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    friend class LLBC_ConditionVariable;
-    void *Handle();
-#endif
+    int _randTimes[TestTimes];
+    int _pushElems[TestTimes];
 
-    LLBC_DISABLE_ASSIGNMENT(LLBC_DummyLock);
+    int m_repeatCount;
+
+    LLBC_SpinLock _lock;
+    LLBC_ObjectPool<LLBC_SpinLock> *_pool;
+    LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
 };
 
-__LLBC_NS_END
 
-#include "llbc/core/thread/DummyLockImpl.h"
-
-#endif // !__LLBC_CORE_THREAD_DUMMY_LOCK_H__
+#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_TASK_H__

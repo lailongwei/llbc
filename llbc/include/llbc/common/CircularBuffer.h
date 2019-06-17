@@ -19,44 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+#ifndef __LLBC_COMMON_CIRCULAR_BUFFER_H__
+#define __LLBC_COMMON_CIRCULAR_BUFFER_H__
 
-#include "llbc/core/thread/DummyLock.h"
-
-__LLBC_NS_BEGIN
-
-LLBC_DummyLock::LLBC_DummyLock()
+template <typename ObjectType>
+class CircularBuffer
 {
-}
+public:
+    CircularBuffer(const size_t capacity);
+    ~CircularBuffer();
 
-LLBC_DummyLock::~LLBC_DummyLock()
-{
-}
+public:
+    /**
+    * Determines whether the buffer is full.
+    * @return bool - return true if full, otherwise return false.
+    */
+    bool IsFull();
 
-void LLBC_DummyLock::Lock()
-{
-    // ... ...
-}
+    /**
+    * Determines whether the buffer is empty.
+    * @return bool - return true if empty, otherwise return false.
+    */
+    bool IsEmpty();
 
-bool LLBC_DummyLock::TryLock()
-{
-    // ... ...
-    return true;
-}
+    /**
+    * Insert object to the tail.
+    * @param[in] elem - The object.
+    */
+    void Push(const ObjectType &obj);
 
-void LLBC_DummyLock::Unlock()
-{
-    // ... ...
-}
+    /**
+    * Get object from front.
+    * @return ObjectType - The object.
+    */
+    ObjectType Pop();
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-void *LLBC_DummyLock::Handle()
-{
-    return NULL;
-}
-#endif
+private:
+    const size_t _capacity;
 
-__LLBC_NS_END
+    int _front;
+    int _tail;
+    bool _isFull;
+    
+    ObjectType *_buffers;
+};
 
-#include "llbc/common/AfterIncl.h"
+#include "llbc/common/CircularBufferImpl.h"
+
+#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__

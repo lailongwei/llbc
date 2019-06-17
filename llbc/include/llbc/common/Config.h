@@ -138,6 +138,12 @@
 #define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
 
 /**
+* \brief core/objectpool about configs.
+*/
+// object pool memory block size
+#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE                    40960
+
+/**
  * \brief ObjBase about configs.
  */
 // Enable objbase module or not

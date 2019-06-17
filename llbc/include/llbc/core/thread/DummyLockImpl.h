@@ -19,51 +19,41 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_DUMMY_LOCK_H__
-#define __LLBC_CORE_THREAD_DUMMY_LOCK_H__
-
-#include "llbc/common/Common.h"
-
-#include "llbc/core/thread/ILock.h"
+#ifdef __LLBC_CORE_THREAD_DUMMY_LOCK_H__
 
 __LLBC_NS_BEGIN
 
-/**
- * \brief dummy lock encapsulation.
- */
-class LLBC_EXPORT LLBC_DummyLock : public LLBC_ILock
+inline LLBC_DummyLock::LLBC_DummyLock()
 {
-public:
-    LLBC_DummyLock();
-    virtual ~LLBC_DummyLock();
+}
 
-public:
-    /**
-     * Acquire lock.
-     */
-    virtual void Lock();
+inline LLBC_DummyLock::~LLBC_DummyLock()
+{
+}
 
-    /**
-     * Try acquire lock.
-     */
-    virtual bool TryLock();
+inline void LLBC_DummyLock::Lock()
+{
+    // ... ...
+}
 
-    /**
-     * Release lock.
-     */
-    virtual void Unlock();
+inline bool LLBC_DummyLock::TryLock()
+{
+    // ... ...
+    return true;
+}
 
-private:
+inline void LLBC_DummyLock::Unlock()
+{
+    // ... ...
+}
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    friend class LLBC_ConditionVariable;
-    void *Handle();
-#endif
-
-    LLBC_DISABLE_ASSIGNMENT(LLBC_DummyLock);
-};
+inline void *LLBC_DummyLock::Handle()
+{
+    return NULL;
+}
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/DummyLockImpl.h"
-
-#endif // !__LLBC_CORE_THREAD_DUMMY_LOCK_H__
+#endif // __LLBC_CORE_THREAD_DUMMY_LOCK_H__
