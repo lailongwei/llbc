@@ -55,9 +55,9 @@ private:
      * Reset object, this method is called when object has clear function.
      */
     template <typename ObjectType, void (ObjectType::*)()>
-    struct serializable_type;
+    struct clearable_type;
     template <typename ObjectType>
-    static bool ResetObj(void *obj, serializable_type<ObjectType, &ObjectType::clear> *);
+    static bool ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *);
 
     /**
      * Reset object, default method.

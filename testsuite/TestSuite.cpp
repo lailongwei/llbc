@@ -29,7 +29,7 @@ int TestSuite_Main(int argc, char *argv[])
     ::llbc::LLBC_ITestCase *test = NULL;
 
     /* Common module testcases. */
-    //test = LLBC_New0(TestCase_Com_Version);
+    test = LLBC_New0(TestCase_Com_Version);
     // test = LLBC_New0(TestCase_Com_DataType);
     // test = LLBC_New0(TestCase_Com_Endian);
     // test = LLBC_New0(TestCase_Com_Stream);
@@ -71,7 +71,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_Entity);
     // test = LLBC_New0(TestCase_Core_Transcoder);
     // test = LLBC_New0(TestCase_Core_Library);
-    test = LLBC_New0(TestCase_Core_ObjectPool);
+    // test = LLBC_New0(TestCase_Core_ObjectPool);
 
     /* ObjBase module testcases. */
 #if LLBC_CFG_OBJBASE_ENABLED

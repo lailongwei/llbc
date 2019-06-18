@@ -45,7 +45,7 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
 
     if (_blockCnt != 0)
     {
-        for (sint32 blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
+        for (int blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
         {
             delete _block[blockIdx];
             delete _memUnitUsageView[blockIdx];
@@ -63,7 +63,7 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get()
 
     void *obj;
     int oldBlockCnt = _blockCnt;
-    for (sint32 blockIdx = 0; blockIdx < _blockCnt; ++blockIdx)
+    for (int blockIdx = 0; blockIdx < oldBlockCnt; ++blockIdx)
     {
         if ((obj = FindFreeObj(_block[blockIdx])))
         {
@@ -87,7 +87,7 @@ inline ObjectType *LLBC_ObjectPoolInst<ObjectType, LockType>::GetObject()
 }
 
 template <typename ObjectType, typename LockType>
-inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void* obj)
+inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void *obj)
 {
     bool destoryed = LLBC_ObjectManipulator::Reset<ObjectType>(obj);
 
@@ -136,7 +136,7 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
 #endif
 
     memBlock->seq = _blockCnt;
-    for (sint32 idx = 0; idx < _elemCnt; ++idx)
+    for (int idx = 0; idx < _elemCnt; ++idx)
     {
         MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * idx);
         memUnit->inited = false;
@@ -159,7 +159,7 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
 template <typename ObjectType, typename LockType>
 inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlock)
 {
-    CircularBuffer<MemoryUnit* > *& memUnitView = _memUnitUsageView[memBlock->seq];
+    CircularBuffer<MemoryUnit *> *& memUnitView = _memUnitUsageView[memBlock->seq];
     if (memUnitView->IsEmpty())
         return NULL;
 
@@ -170,7 +170,8 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock 
     ASSERT(*(reinterpret_cast<sint64 *>(
         reinterpret_cast<uint8 *>(memUnit) + _elemSize - LLBC_INL_NS CheckSymbolSize)) == LLBC_INL_NS EndingSymbol &&
         "LLBC_ObjectPoolInst::Get() memory unit is dirty");
-#endif
+#endif // LLBC_DEBUG
+
     void *obj = memUnit->buff + LLBC_INL_NS CheckSymbolSize;
     if (!memUnit->inited)
     {
@@ -183,4 +184,4 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock 
 
 __LLBC_NS_END
 
-#endif //__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__
+#endif // __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__

@@ -80,7 +80,7 @@ private:
     struct MemoryUnit
     {
         bool inited;            // Object has initialized or not.
-        sint32 seq;             // The location seq of memory unit.  
+        sint32 seq;             // The location seq of memory unit.
 
         uint8 buff[0];          // The begin address of buffer.
     };
@@ -121,7 +121,7 @@ public:
     * Release object.
     * @param[in] obj - the object pointer.
     */
-    virtual void ReleaseObject(ObjectType *obj);
+    void ReleaseObject(ObjectType *obj);
 
 protected:
     /**
@@ -136,13 +136,13 @@ protected:
     void *FindFreeObj(MemoryBlock *memBlock);
 
 private:
-    const sint32 _elemSize;
-    const sint32 _elemCnt;
-    const sint32 _blockSize;
+    const int _elemSize;
+    const int _elemCnt;
+    const int _blockSize;
 
-    sint32 _blockCnt;
+    int _blockCnt;
     MemoryBlock **_block;
-    CircularBuffer<MemoryUnit *> ** _memUnitUsageView;
+    CircularBuffer<MemoryUnit *> **_memUnitUsageView;
 
     LockType _lock;
 };

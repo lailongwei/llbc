@@ -141,7 +141,7 @@
 * \brief core/objectpool about configs.
 */
 // object pool memory block size
-#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE                    40960
+#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         40960
 
 /**
  * \brief ObjBase about configs.

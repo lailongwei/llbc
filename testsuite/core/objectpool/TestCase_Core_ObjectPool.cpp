@@ -21,7 +21,85 @@
 
 
 #include "core/objectpool/TestCase_Core_ObjectPool.h"
-#include "core/objectpool/TestCase_Core_ObjectPoolTask.h"
+
+namespace
+{
+    // Define some test configs.
+    const int TestTimes = 100000;
+    const int ListSize = 100;
+
+    /**
+    * \brief Object pool test task encapsulation.
+    */
+    class ObjectPoolTestTask : public LLBC_BaseTask
+    {
+    public:
+        ObjectPoolTestTask()
+        : m_repeatCount(TestTimes)
+        , _pool(new LLBC_ObjectPool<LLBC_SpinLock>())
+        , _poolInst(_pool->GetPoolInst<std::vector<double> >())
+        {
+            LLBC_Random rand;
+            rand.Seed(static_cast<int>(LLBC_Time::NowTimeStamp()));
+
+            for (int i = 0; i < TestTimes; ++i)
+            {
+                _randTimes[i] = LLBC_Abs(rand.Rand(ListSize));
+                _pushElems[i] = LLBC_Abs(rand.Rand(ListSize));
+            }
+        }
+
+        virtual ~ObjectPoolTestTask() {  }
+
+    public:
+        virtual void Svc()
+        {
+            std::vector<double> *poolObjs[ListSize];
+
+            int runTimes;
+            while (true)
+            {
+                _lock.Lock();
+                if (m_repeatCount == 0)
+                {
+                    _lock.Unlock();
+                    break;
+                }
+
+                runTimes = --m_repeatCount;
+                _lock.Unlock();
+
+                const int &newDelTimes = _randTimes[runTimes];
+                for (int j = 0; j < newDelTimes; ++j)
+                {
+                    poolObjs[j] = _poolInst->GetObject();
+                    //poolObjs[j] = _pool->Get<std::vector<double> >();
+                    for (int k = 0; k < _pushElems[runTimes]; ++k)
+                        poolObjs[j]->push_back(k);
+                }
+
+                for (int j = 0; j < newDelTimes; ++j)
+                    //_pool->Release(poolObjs[j]);
+                    _poolInst->ReleaseObject(poolObjs[j]);
+            }
+        }
+
+        virtual void Cleanup()
+        {
+            LLBC_XDelete(_pool);
+        }
+
+    private:
+        int _randTimes[TestTimes];
+        int _pushElems[TestTimes];
+
+        int m_repeatCount;
+
+        LLBC_SpinLock _lock;
+        LLBC_ObjectPool<LLBC_SpinLock> *_pool;
+        LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
+    };
+}
 
 TestCase_Core_ObjectPool::TestCase_Core_ObjectPool()
 {
@@ -36,25 +114,23 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     LLBC_PrintLine("core/objectpool test:");
 
     LLBC_ThreadObjectPool pool;
-    const int listSize = 100;
-    std::vector<double> *poolObjs[listSize];
-    std::vector<double> *mallocObjs[listSize];
+    std::vector<double> *poolObjs[ListSize];
+    std::vector<double> *mallocObjs[ListSize];
 
     LLBC_Random rand;
-    rand.Seed(LLBC_Time::Now().GetTimeTick());
+    rand.Seed(static_cast<int>(LLBC_Time::Now().GetTimeStamp()));
 
-    const int testTimes = 100000;
-    int randTimes[testTimes];
-    int pushElems[testTimes];
-    for (int i = 0; i < testTimes; ++i)
+    int randTimes[TestTimes];
+    int pushElems[TestTimes];
+    for (int i = 0; i < TestTimes; ++i)
     {
-        randTimes[i] = LLBC_Abs(rand.Rand(listSize));
-        pushElems[i] = LLBC_Abs(rand.Rand(listSize));
+        randTimes[i] = LLBC_Abs(rand.Rand(ListSize));
+        pushElems[i] = LLBC_Abs(rand.Rand(ListSize));
     }
 
     LLBC_PrintLine("Test new/delete ...");
     LLBC_Time begTime = LLBC_Time::Now();
-    for (int i = 0; i < testTimes; ++i)
+    for (int i = 0; i < TestTimes; ++i)
     {
         const int &newDelTimes = randTimes[i];
         for (int j = 0; j < newDelTimes; ++j)
@@ -63,6 +139,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
             for (int k = 0; k < pushElems[i]; ++k)
                 mallocObjs[j]->push_back(k);
         }
+
         for (int j = 0; j < newDelTimes; ++j)
             delete mallocObjs[j];
     }
@@ -72,17 +149,18 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 
     LLBC_PrintLine("Test pool Get/Release ...");
     begTime = LLBC_Time::Now();
-    for (int i = 0; i < testTimes; ++i)
+    LLBC_ObjectPoolInst<std::vector<double> > *poolInst = pool.GetPoolInst<std::vector<double> >();
+    for (int i = 0; i < TestTimes; ++i)
     {
         const int &newDelTimes = randTimes[i];
         for (int j = 0; j < newDelTimes; ++j)
         {
-            poolObjs[j] = pool.Get<std::vector<double> >();
+            poolObjs[j] = poolInst->GetObject();
             for (int k = 0; k < pushElems[i]; ++k)
                 poolObjs[j]->push_back(k);
         }
         for (int j = 0; j < newDelTimes; ++j)
-            pool.Release(poolObjs[j]);
+            poolInst->ReleaseObject(poolObjs[j]);
     }
     usedTime = LLBC_Time::Now() - begTime;
     LLBC_PrintLine("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
