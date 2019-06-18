@@ -1,49 +1,85 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
+# Version: 1.0.7
+#
+# Version: 1.0.6
+# 1)【llbc core】增加ci支持（windows/linux/mac osx）.
+# 2)【llbc core】重构Variant，以优化性能、内存占用及支持Ptr.
+# 3)【llbc core】Time/TimeSpan接口重整，内部移除double实现，以规范化使用时间相关对象.
+# 4)【llbc core】增加dump file支持，增加实际获取stack backtrace支持.
+# 5)【llbc core】日志支持json log，内部移除旧json库，使用Tencent的rapidjson.
+# 6)【llbc core】增加object pool支持，以数量级提高性能及减少内存碎片.
+# 7)【llbc core】其它各对象接口/细节完善.
+#
+# Version: 1.0.5
+# 2018/03~2018/06
+# 1)【llbc core】LLBC_BasicString增加startswith/endswith支持.
+# 2)【llbc core】Random增加booljudge支持.
+# 3)【llbc core】移除c++0x依赖及编译选项.
+# 4)【llbc core】优化个别文件include.
+#
+# Version: 1.0.4
+# 2018/03~2018/03
+# 1)【llbc core】Facade增加Factory机制，所有Facade方法都在Service逻辑线程中调用.
+# 2)【llbc core】Application增加Ini&Property&Json配置读取方案实现，以在实际应用中更便捷取得Application配置.
+# 3)【llbc core】允许Facade::OnInitialize方法中调用Service的Subscribe/SubscribeEvent/SubscribeStatus/...相关注册订阅方法.
+# 4)【llbc core】Packet增加GiveupEncoder/GiveupDecoder支持，以直接从Packet中取得Coder而不是copy.
+# 5)【llbc core】Service移除所有模板Send方法支持.
+# 6)【llbc core】Event机制扩展，Event增加参数支持，支持string参数/int参数.
+# 7)【llbc core】增加LLBC_StartArgs支持，用于便利解析argc/argv启动参数, 同时Application增加GetStartArgs()支持, 直接可访问当前App启动参数.
+# 8)【llbc core】LLBC_Ini增加reload支持.
+# 9)【llbc core】Net<->Host bytes转换增加sint64/uint64转换支持.
+# 10)【llbc core】整体优化网络及Log相关性能.
+# 11) BugFix:
+#    -【llbc core】修复PacketProtocol空包接收错误.
+#    -【llbc core】修复Service中部分Multicast方法未返回的错误.
+#    -【llbc core】修复ServiceExternalDriveSvc test case编译错误.
 #
 # Version: 1.0.3
-# 2018/02/11
-# 1) 版本升级到1.0.3
+# 2018/02
+# 1)【llbc core】修复Log中UnInitOutput()中level错误bug.
+# 2)【llbc core】修复FULL_STACK选项编译错误.
+# 3)【llbc core】Application接口规整、简化，更易于项目使用.
 #
 # Version: 1.0.2
 # 2018/02/10
 # 功能新增/改进/优化:
-# 1) 【llbc all】所有文件头增加MIT LICENSE.
-# 2) 【llbc core】引入RTTI支援, 同时对Service.RegisterXXX接口增加泛型支持，增加Service.GetFacade/GetFacades支持.
+# 1)【llbc all】所有文件头增加MIT LICENSE.
+# 2)【llbc core】引入RTTI支援, 同时对Service.RegisterXXX接口增加泛型支持，增加Service.GetFacade/GetFacades支持.
 # 
 # 2018/02/08
 # 功能新增/改进/优化:
-1) 【llbc core】归整所有Guard实现，统一抽取到Guard.h/Guard.cpp中.
-2) 【llbc core】增加自定义协议栈支持，允许开发者根据会话自定义自己的网络传输协议栈，最大限度提供灵活性，并保留Raw/Normal两种库内部默认实现.
-3）【llbc core】去除原有的Packet Header Designer框架，原有的框架相对灵活，但也有局限，统一使用自定议协议栈方式替换旧机制.
-4）【llbc core】重构Packet类，去除在操作headers时直接操作bytes实现.
-5）【llbc core】增加sender service id/receiver service id的概念，为后面的集群支持作准备，当前已经支持service转发.
-6）【llbc core】Packet Protocol协议层的创建优化，去除创建时的coders copy，直接reference，以让session create操作变得更快.
-7）【llbc core】从易用性及优雅性考虑，优化Service Send/Multicast/Broadcast接口.
-8) 【llbc core】Service各订阅接口统一支持function delegate，为开发者提供另外一种选择.
-9) 【llbc core】增加FPS为LLBC_INFINTE时的支持，即不限制帧率.
-9) 【pyllbc】修复Service.send相关BUG.
+1)【llbc core】归整所有Guard实现，统一抽取到Guard.h/Guard.cpp中.
+2)【llbc core】增加自定义协议栈支持，允许开发者根据会话自定义自己的网络传输协议栈，最大限度提供灵活性，并保留Raw/Normal两种库内部默认实现.
+3)【llbc core】去除原有的Packet Header Designer框架，原有的框架相对灵活，但也有局限，统一使用自定议协议栈方式替换旧机制.
+4)【llbc core】重构Packet类，去除在操作headers时直接操作bytes实现.
+5)【llbc core】增加sender service id/receiver service id的概念，为后面的集群支持作准备，当前已经支持service转发.
+6)【llbc core】Packet Protocol协议层的创建优化，去除创建时的coders copy，直接reference，以让session create操作变得更快.
+7)【llbc core】从易用性及优雅性考虑，优化Service Send/Multicast/Broadcast接口.
+8)【llbc core】Service各订阅接口统一支持function delegate，为开发者提供另外一种选择.
+9)【llbc core】增加FPS为LLBC_INFINTE时的支持，即不限制帧率.
+9)【pyllbc】修复Service.send相关BUG.
 10)【csllbc】修复Log相关BUG.
 
 # 2018/01/31
 # 功能新增/改进/优化:
-# 1) 【llbc core】对Delegate, Func增加Rtn typename, 以支持hold任意的class methods及functions, 同时对void Rtn进行偏特化，最终LLBC_Delegate机制可以完整hold任意class methods及functions.
-# 2) 【llbc core】对LLBC_Delegate增加destroyObjectWhenDestruct参数，以指示delegate在destruct的时候，是否要destroy cached的object.
-# 3) 【llbc core】针对CPURelax，增加windows x64支持(之前版本的支持是直接粗暴使用Sleep完成).
-# 4) 【llbc core】增加ALWAYS_INLINE macro，以更好的指示编译器进行内联.
+# 1)【llbc core】对Delegate, Func增加Rtn typename, 以支持hold任意的class methods及functions, 同时对void Rtn进行偏特化，最终LLBC_Delegate机制可以完整hold任意class methods及functions.
+# 2)【llbc core】对LLBC_Delegate增加destroyObjectWhenDestruct参数，以指示delegate在destruct的时候，是否要destroy cached的object.
+# 3)【llbc core】针对CPURelax，增加windows x64支持(之前版本的支持是直接粗暴使用Sleep完成).
+# 4)【llbc core】增加ALWAYS_INLINE macro，以更好的指示编译器进行内联.
 # Bug Fix:
-# 1) 【llbc core】fix LLBC_FormatArg在vs2015及以后的版本中的编译报错, 为va_start要求fmt不能有()引起.
-# 2) 【llbc core】修复LLBC_Service在start后, 立刻删除, 有可能引起dead lock的BUG.
+# 1)【llbc core】fix LLBC_FormatArg在vs2015及以后的版本中的编译报错, 为va_start要求fmt不能有()引起.
+# 2)【llbc core】修复LLBC_Service在start后, 立刻删除, 有可能引起dead lock的BUG.
 #
 # 2017/12/10
-# 1) 【llbc core】增加LLBC_FuncDelegate实现, 以实现对function, class static function的保存, 做到使用LLBC_IDelegate hold住所有的callable的目的.
-#                 eg: std::vector<LLBC_IDelegate1<int> *> delegs;
-#					  delegs.push_back(new LLBC_Delegate1<Obj, int>(obj, &Obj::Foo)); // hold住Obj类的Foo函数
-#					  delegs.push_back(new LLBC_FuncDelegate1<int>(FuncFoo)); // hold住FuncFoo函数
-#					  for (size_t i = 0; i <delegs.size(); i++)
-#						  delegs[i]->Invoke((int)i);
-#
+# 1)【llbc core】增加LLBC_FuncDelegate实现, 以实现对function, class static function的保存, 做到使用LLBC_IDelegate hold住所有的callable的目的.
+#                eg: std::vector<LLBC_IDelegate1<int> *> delegs;
+#				 	 delegs.push_back(new LLBC_Delegate1<Obj, int>(obj, &Obj::Foo)); // hold住Obj类的Foo函数
+#				  	 delegs.push_back(new LLBC_FuncDelegate1<int>(FuncFoo)); // hold住FuncFoo函数
+#				  	 for (size_t i = 0; i <delegs.size(); i++)
+#				  	 	delegs[i]->Invoke((int)i);
+
 # 2017/11/30
 # 1) 【llbc core】调整LLBC_Timer::OnTimeout/LLBC_Timer::OnCancel实现，不需要子类化LLBC_Timer，只需要在new LLBC_Timer的时候给定Timeout handler或者Timeout delegate即可.
 #                 对于上层的wraps库，同步进行兼容(wraps库没有影响).
