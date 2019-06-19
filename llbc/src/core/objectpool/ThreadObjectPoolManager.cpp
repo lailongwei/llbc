@@ -47,12 +47,12 @@ void LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPool()
     LLBC_XDelete(LLBC_INTERNAL_NS __g_entryThreadObjectPool);
 }
 
-LLBC_ThreadObjectPool * LLBC_ThreadObjectPoolManager::GetEntryThreadObjectPool()
+LLBC_ThreadObjectPool *LLBC_ThreadObjectPoolManager::GetEntryThreadObjectPool()
 {
     return LLBC_INTERNAL_NS __g_entryThreadObjectPool;
 }
 
-LLBC_ThreadObjectPool * LLBC_ThreadObjectPoolManager::GetCurrentThreadObjectPool()
+LLBC_ThreadObjectPool *LLBC_ThreadObjectPoolManager::GetCurrentThreadObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     return reinterpret_cast<LLBC_ThreadObjectPool *>(tls->coreTls.objectPool);

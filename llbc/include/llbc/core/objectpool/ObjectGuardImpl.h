@@ -80,4 +80,4 @@ inline void LLBC_ObjectGuard<ObjectType>::MakeWeakRef()
 
 __LLBC_NS_END
 
-#endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__
+#endif // __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__

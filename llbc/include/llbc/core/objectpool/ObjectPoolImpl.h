@@ -118,4 +118,4 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
 
 __LLBC_NS_END
 
-#endif //!__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_H__
+#endif // __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_H__

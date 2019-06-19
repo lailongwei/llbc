@@ -42,7 +42,7 @@ inline bool LLBC_ObjectManipulator::Reset(void *obj)
 }
 
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, serializable_type<ObjectType, &ObjectType::clear> *)
+inline bool LLBC_ObjectManipulator::ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *)
 {
     reinterpret_cast<ObjectType *>(obj)->clear();
     return false;

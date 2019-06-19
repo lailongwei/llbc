@@ -87,7 +87,7 @@ public:
 
 private:
     PoolLockType _lock;
-    std::map<const char*, LLBC_IObjectPoolInst*> _poolDict;
+    std::map<const char *, LLBC_IObjectPoolInst *> _poolDict;
 };
 
 /**
