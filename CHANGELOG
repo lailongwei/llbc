@@ -2,6 +2,10 @@
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
 # Version: 1.0.7
+# 1)【llbc core】增加Protocol Stack控制支持，以安全异步的完成Service层跟ProtocolStack层的通信.
+# 2)BugFix:
+#   -【llbc all】解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
+factory.
 #
 # Version: 1.0.6
 # 1)【llbc core】增加ci支持（windows/linux/mac osx）.

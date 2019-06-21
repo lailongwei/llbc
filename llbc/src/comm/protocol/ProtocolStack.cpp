@@ -328,6 +328,36 @@ void LLBC_ProtocolStack::Report(int sessionId, int opcode, LLBC_IProtocol *proto
                                                   msg));
 }
 
+void LLBC_ProtocolStack::CtrlStack(int ctrlType, const LLBC_Variant &ctrlData)
+{
+    if (!CtrlStackCodec(ctrlType, ctrlData))
+        return;
+
+    CtrlStackRaw(ctrlType, ctrlData);
+}
+
+bool LLBC_ProtocolStack::CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData)
+{
+    for (int layer = _Layer::PackLayer; layer <= _Layer::CompressLayer; layer++)
+    {
+        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+            return false;
+    }
+
+    return true;
+}
+
+bool LLBC_ProtocolStack::CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData)
+{
+    for (int layer = _Layer::CodecLayer; layer != _Layer::End; layer++)
+    {
+        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+            return false;
+    }
+
+    return true;
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"

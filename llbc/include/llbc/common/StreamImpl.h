@@ -84,7 +84,7 @@ inline LLBC_Stream::LLBC_Stream(size_t size)
     _attach = false;
 }
 
-inline LLBC_Stream::LLBC_Stream(void *buf, size_t len)
+inline LLBC_Stream::LLBC_Stream(void *buf, size_t len, bool attach)
 : _buf(NULL)
 , _pos(0)
 , _size(0)
@@ -93,7 +93,14 @@ inline LLBC_Stream::LLBC_Stream(void *buf, size_t len)
 
 , _attach(false)
 {
-    this->Attach(buf, len);
+    if (attach)
+    {
+        Attach(buf, len);
+        return;
+    }
+
+    WriteBuffer(buf, len);
+    _pos = 0;
 }
 
 inline LLBC_Stream::~LLBC_Stream()

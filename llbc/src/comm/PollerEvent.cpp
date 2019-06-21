@@ -149,6 +149,25 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *sessi
     return block;
 }
 
+LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+{
+    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
+
+    LLBC_Stream ctrlDataStream;
+    ctrlDataStream.Write(ctrlData);
+
+    ev.type = _Ev::CtrlProtocolStack;
+    ev.sessionId = sessionId;
+    ev.un.protocolStackCtrlInfo.ctrlType = ctrlType;
+    ev.un.protocolStackCtrlInfo.ctrlDataLen = ctrlDataStream.GetSize();
+    ev.un.protocolStackCtrlInfo.ctrlData = LLBC_Malloc(void, ctrlDataStream.GetSize());
+    ::memcpy(ev.un.protocolStackCtrlInfo.ctrlData, ctrlDataStream.GetBuf(), ctrlDataStream.GetSize());
+
+    block->SetWritePos(sizeof(_Ev));
+    return block;
+}
+
 void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
 {
     switch (ev.type)
@@ -161,9 +180,9 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
         LLBC_Delete(ev.un.packet);
         break;
 
-	case _Ev::Close:
-		LLBC_XFree(ev.un.closeReason);
-		break;
+    case _Ev::Close:
+        LLBC_XFree(ev.un.closeReason);
+        break;
 
     case _Ev::Monitor:
         LLBC_XFree(ev.un.monitorEv);
@@ -171,6 +190,10 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
 
     case _Ev::TakeOverSession:
         LLBC_Delete(ev.un.session);
+        break;
+
+    case _Ev::CtrlProtocolStack:
+        LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
         break;
 
     default:

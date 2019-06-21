@@ -178,7 +178,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
     // Create protocol stack.
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     _stack.SetService(this);
-    CreateCodecStack(0, 0, &_stack);
+    LLBC_Service::CreateCodecStack(0, 0, &_stack);
 #endif
 }
 
@@ -480,15 +480,12 @@ int LLBC_Service::GetFrameInterval() const
 int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Listen(ip, port);
+    const int sessionId = _pollerMgr.Listen(ip, port, protoFactory);
     if (sessionId != 0)
     {
         _connectedSessionIdsLock.Lock();
         _connectedSessionIds.insert(sessionId);
         _connectedSessionIdsLock.Unlock();
-
-        if (protoFactory)
-            AddSessionProtocolFactory(sessionId, protoFactory);
     }
 
     return sessionId;
@@ -497,15 +494,12 @@ int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *pro
 int LLBC_Service::Connect(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Connect(ip, port);
+    const int sessionId = _pollerMgr.Connect(ip, port, protoFactory);
     if (sessionId != 0)
     {
         _connectedSessionIdsLock.Lock();
         _connectedSessionIds.insert(sessionId);
         _connectedSessionIdsLock.Unlock();
-
-        if (protoFactory)
-            AddSessionProtocolFactory(sessionId, protoFactory);
     }
 
     return sessionId;
@@ -516,14 +510,7 @@ int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout, LLBC_IP
     LLBC_LockGuard guard(_lock);
 
     int pendingSessionId;
-    const int ret = _pollerMgr.AsyncConn(ip, port, pendingSessionId);
-    if (ret != LLBC_OK)
-        return ret;
-
-    if (protoFactory)
-        AddSessionProtocolFactory(pendingSessionId, protoFactory);
-
-    return ret;
+    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory);
 }
 
 bool LLBC_Service::IsSessionValidate(int sessionId)
@@ -602,6 +589,36 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
 
     _pollerMgr.Close(sessionId, reason);
     _connectedSessionIds.erase(sessionIdIt);
+
+    return LLBC_OK;
+}
+
+int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+{
+    LLBC_LockGuard guard(_lock);
+    if (!_started)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    _connectedSessionIdsLock.Lock();
+    LLBC_SessionIdSetIter sessionIdIt = _connectedSessionIds.find(sessionId);
+    if (sessionIdIt == _connectedSessionIds.end())
+    {
+        _connectedSessionIdsLock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    _connectedSessionIdsLock.Unlock();
+
+#if !LLBC_CFG_COMM_USE_FULL_STACK
+    if (!_stack.CtrlStackCodec(ctrlType, ctrlData))
+        return LLBC_OK;
+#endif
+
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData);
 
     return LLBC_OK;
 }
@@ -1148,6 +1165,46 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
 
     return CreatePackStack(sessionId, acceptSessionId,
             CreateCodecStack(sessionId, acceptSessionId, stack));
+}
+
+void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
+{
+    _protoLock.Lock();
+
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+    {
+        LLBC_Delete(it->second);
+        _sessionProtoFactory.erase(it);
+    }
+
+    _sessionProtoFactory.insert(std::make_pair(sessionId, protoFactory));
+
+    _protoLock.Unlock();
+}
+
+LLBC_IProtocolFactory *LLBC_Service::FindSessionProtocolFactory(int sessionId)
+{
+    if (sessionId == 0)
+        return _protoFactory;
+
+    LLBC_LockGuard guard(_protoLock);
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+        return it->second;
+
+    return _protoFactory;
+}
+
+void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
+{
+    LLBC_LockGuard guard(_protoLock);
+    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
+    if (it != _sessionProtoFactory.end())
+    {
+        LLBC_Delete(it->second);
+        _sessionProtoFactory.erase(it);
+    }
 }
 
 void LLBC_Service::Svc()
@@ -1766,46 +1823,6 @@ void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
         if (evFacades == NULL)
             evFacades = new _Facades();
         evFacades->push_back(facade);
-    }
-}
-
-void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
-{
-    _protoLock.Lock();
-
-    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
-    if (it != _sessionProtoFactory.end())
-    {
-        LLBC_Delete(it->second);
-        _sessionProtoFactory.erase(it);
-    }
-
-    _sessionProtoFactory.insert(std::make_pair(sessionId, protoFactory));
-
-    _protoLock.Unlock();
-}
-
-LLBC_IProtocolFactory *LLBC_Service::FindSessionProtocolFactory(int sessionId)
-{
-    if (sessionId == 0)
-        return _protoFactory;
-
-    LLBC_LockGuard guard(_protoLock);
-    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
-    if (it != _sessionProtoFactory.end())
-        return it->second;
-
-    return _protoFactory;
-}
-
-void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
-{
-    LLBC_LockGuard guard(_protoLock);
-    std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
-    if (it != _sessionProtoFactory.end())
-    {
-        LLBC_Delete(it->second);
-        _sessionProtoFactory.erase(it);
     }
 }
 

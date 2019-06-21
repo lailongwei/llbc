@@ -263,6 +263,15 @@ public:
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL);
 
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlType  - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+
 public:
     /**
      * Register facade.
@@ -395,6 +404,21 @@ protected:
 
 protected:
     /**
+     * Declare friend class: LLBC_pollerMgr.
+     *  Access method list:
+     *      AddSessionProtocolFactory()
+     */
+    friend class LLBC_PollerMgr;
+
+    /**
+     * Session protocol factory operation methods.
+     */
+    virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
+    virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
+    virtual void RemoveSessionProtocolFactory(int sessionId);
+
+protected:
+    /**
      * Task entry method.
      */
     virtual void Svc();
@@ -443,13 +467,6 @@ private:
     void DestroyWillRegFacades();
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
-
-    /**
-     * Session protocol factory operation methods.
-     */
-    void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
-    LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
-    void RemoveSessionProtocolFactory(int sessionId);
 
 #if LLBC_CFG_OBJBASE_ENABLED
     /**

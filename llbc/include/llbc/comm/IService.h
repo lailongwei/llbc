@@ -35,6 +35,7 @@ class LLBC_ICoder;
 class LLBC_Packet;
 class LLBC_IFacade;
 class LLBC_Session;
+class LLBC_PollerMgr;
 class LLBC_ICoderFactory;
 class LLBC_IFacadeFactory;
 class LLBC_IProtocolFactory;
@@ -339,6 +340,15 @@ public:
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL) = 0;
 
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlType  - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData) = 0;
+
 public:
     /**
      * Register facade.
@@ -534,6 +544,21 @@ protected:
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
+
+protected:
+    /**
+     * Declare friend class: LLBC_pollerMgr.
+     *  Access method list:
+     *      AddSessionProtocolFactory()
+     */
+    friend class LLBC_PollerMgr;
+
+    /**
+     * Session protocol factory operation methods.
+     */
+    virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory) = 0;
+    virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId) = 0;
+    virtual void RemoveSessionProtocolFactory(int sessionId) = 0;
 };
 
 __LLBC_NS_END
