@@ -132,7 +132,7 @@ public:
 
     /**
      * Set service FPS.
-     * @return int - return 0 if success, ohterwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetFPS(int fps);
 
@@ -184,7 +184,7 @@ public:
     virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
-     * Check given sessionId is lgeal or not.
+     * Check given sessionId is legal or not.
      * @param[in] sessionId - the given session Id.
      * @return bool - return true is given session Id validate, otherwise return false.
      */
@@ -262,6 +262,15 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL);
+
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlType  - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
 
 public:
     /**
@@ -354,6 +363,13 @@ public:
 
 public:
     /**
+    * Get object pool.
+    * @return LLBC_ThreadObjectPool * - the object pool.
+    */
+    LLBC_ThreadObjectPool *GetObjectPool();
+
+public:
+    /**
      * Post lazy task to service.
      * @param[in] deleg - the task delegate.
      * @param[in] data  - the task data, can be null.
@@ -385,6 +401,21 @@ protected:
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
+
+protected:
+    /**
+     * Declare friend class: LLBC_pollerMgr.
+     *  Access method list:
+     *      AddSessionProtocolFactory()
+     */
+    friend class LLBC_PollerMgr;
+
+    /**
+     * Session protocol factory operation methods.
+     */
+    virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
+    virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
+    virtual void RemoveSessionProtocolFactory(int sessionId);
 
 protected:
     /**
@@ -437,13 +468,6 @@ private:
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
 
-    /**
-     * Session protocol factory operation methods.
-     */
-    void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
-    LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
-    void RemoveSessionProtocolFactory(int sessionId);
-
 #if LLBC_CFG_OBJBASE_ENABLED
     /**
      * Auto-Release pool operation methods.
@@ -456,8 +480,14 @@ private:
     /**
      * Timer-Scheduler operation methods.
      */
-    void GetTimerScheduler();
+    void InitTimerScheduler();
     void UpdateTimers();
+
+    /**
+    * Object pool operation methods.
+    */
+    void InitObjectPool();
+    void UpdateObjectPool();
 
     /**
      * Idle process method.
@@ -582,6 +612,9 @@ private:
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
+
+private:
+    LLBC_ThreadObjectPool *_objectPool;
 
 private:
     LLBC_EventManager _evManager;

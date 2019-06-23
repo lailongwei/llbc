@@ -25,11 +25,13 @@
 #include "llbc/core/os/OS_Atomic.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
+#include "llbc/core/objectpool/ObjectPool.h"
 
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/ThreadManager.h"
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/Task.h"
+
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -41,6 +43,7 @@ int static __LLBC_BaseTaskEntry(void *arg)
 
     tls->coreTls.task = task;
     tls->coreTls.timerScheduler = LLBC_New0(LLBC_NS LLBC_TimerScheduler);
+    tls->coreTls.objectPool = LLBC_New0(LLBC_NS LLBC_ThreadObjectPool);
 
     task->OnTaskThreadStart();
 
@@ -51,6 +54,8 @@ int static __LLBC_BaseTaskEntry(void *arg)
     tls->coreTls.task = NULL;
     LLBC_Delete(reinterpret_cast<
         LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler));
+    LLBC_Delete(reinterpret_cast<
+        LLBC_NS LLBC_IObjectPool*>(tls->coreTls.objectPool));
 
     return 0;
 }

@@ -77,6 +77,11 @@ inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionI
     return LLBC_OK;
 }
 
+inline LLBC_ThreadObjectPool * llbc::LLBC_Service::GetObjectPool()
+{
+    return _objectPool;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_COMM_SERVICE_H__

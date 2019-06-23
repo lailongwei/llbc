@@ -44,6 +44,7 @@
 #include "llbc/core/entity/Common.h"
 #include "llbc/core/transcoder/Common.h"
 #include "llbc/core/library/Common.h"
+#include "llbc/core/objectpool/Common.h"
 
 __LLBC_NS_BEGIN
 

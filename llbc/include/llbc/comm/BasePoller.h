@@ -122,6 +122,7 @@ protected:
     virtual void HandleEv_Close(LLBC_PollerEvent &ev);
     virtual void HandleEv_Monitor(LLBC_PollerEvent &ev);
     virtual void HandleEv_TakeOverSession(LLBC_PollerEvent &ev);
+    virtual void HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev);
 
     /**
      * Create new session from socket.

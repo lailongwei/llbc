@@ -19,51 +19,61 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_DUMMY_LOCK_H__
-#define __LLBC_CORE_THREAD_DUMMY_LOCK_H__
+#ifdef __LLBC_COMMON_CIRCULAR_BUFFER_H__
 
-#include "llbc/common/Common.h"
+template <typename ObjectType>
+inline CircularBuffer<ObjectType>::CircularBuffer(const size_t capacity)
+: _capacity(capacity)
 
-#include "llbc/core/thread/ILock.h"
+, _front(0)
+, _tail(0)
+, _isFull(false)
 
-__LLBC_NS_BEGIN
-
-/**
- * \brief dummy lock encapsulation.
- */
-class LLBC_EXPORT LLBC_DummyLock : public LLBC_ILock
+, _buffers(new ObjectType[capacity])
 {
-public:
-    LLBC_DummyLock();
-    virtual ~LLBC_DummyLock();
+}
 
-public:
-    /**
-     * Acquire lock.
-     */
-    virtual void Lock();
+template <typename ObjectType>
+inline CircularBuffer<ObjectType>::~CircularBuffer()
+{
+    LLBC_Deletes(_buffers);
+}
 
-    /**
-     * Try acquire lock.
-     */
-    virtual bool TryLock();
+template <typename ObjectType>
+inline bool CircularBuffer<ObjectType>::IsFull()
+{
+    return _isFull;
+}
 
-    /**
-     * Release lock.
-     */
-    virtual void Unlock();
+template <typename ObjectType>
+inline bool CircularBuffer<ObjectType>::IsEmpty()
+{
+    return !_isFull && _tail == _front;
+}
 
-private:
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    friend class LLBC_ConditionVariable;
-    void *Handle();
-#endif
+template <typename ObjectType>
+inline void CircularBuffer<ObjectType>::Push(const ObjectType &obj)
+{
+    _buffers[_tail] = obj;
+    if (++_tail == _capacity)
+        _tail = 0;
 
-    LLBC_DISABLE_ASSIGNMENT(LLBC_DummyLock);
-};
+    if (_tail == _front)
+        _isFull = true;
+}
 
-__LLBC_NS_END
+template <typename ObjectType>
+inline ObjectType CircularBuffer<ObjectType>::Pop()
+{
+    ObjectType &obj = _buffers[_front];
 
-#include "llbc/core/thread/DummyLockImpl.h"
+    if (++_front == _capacity)
+        _front = 0;
 
-#endif // !__LLBC_CORE_THREAD_DUMMY_LOCK_H__
+    if (_isFull)
+        _isFull = false;
+
+    return obj;
+}
+
+#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__

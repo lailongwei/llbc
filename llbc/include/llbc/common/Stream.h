@@ -146,11 +146,12 @@ public:
     explicit LLBC_Stream(size_t size);
 
     /**
-     * Parameter constructor, will attach external buffer.
-     * @param[in] buf - external buffer pointer, not null.
-     * @param[in] len - indicate buffer size, in bytes, must greater than 0.
+     * Parameter constructor, will copy or attach external buffer.
+     * @param[in] buf    - external buffer pointer, not null.
+     * @param[in] len    - indicate buffer size, in bytes, must greater than 0.
+     * @param[in] attach - attach flag, if true, stream object will attach external buffer, default is true.
      */
-    LLBC_Stream(void *buf, size_t len);
+    LLBC_Stream(void *buf, size_t len, bool attach = true);
 
     /**
      * Destructor, if stream buffer is allocate by itself, will delete.
