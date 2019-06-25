@@ -73,7 +73,7 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     ret.reserve(len * 3 + len / lineWidth * 2);
 #endif
 
-    for (register size_t i = 0; i < len - 1; i++)
+    for (size_t i = 0; i < len - 1; ++i)
     {
         if (i != 0 && i % lineWidth == 0)
         {

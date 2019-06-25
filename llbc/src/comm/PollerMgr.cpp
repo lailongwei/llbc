@@ -106,7 +106,7 @@ int LLBC_PollerMgr::Start(int count)
     ::memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
 
     // Create pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
         _pollers[i] = LLBC_BasePoller::Create(_type);
         _pollers[i]->SetPollerId(i);
@@ -116,7 +116,7 @@ int LLBC_PollerMgr::Start(int count)
     }
 
     // Startup all pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
         _pollers[i]->Start();
 
     // Process pending sockets.
@@ -147,7 +147,7 @@ void LLBC_PollerMgr::Stop()
 
     if (_pollers)
     {
-        for (int i = 0; i < _pollerCount; i++)
+        for (int i = 0; i < _pollerCount; ++i)
             LLBC_Delete(_pollers[i]);
         LLBC_XFree(_pollers);
         _pollerCount = 0;

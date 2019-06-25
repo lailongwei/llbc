@@ -330,7 +330,7 @@ void LLBC_EventManager::AfterFireEvent()
 {
     if (--_firing == 0)
     {
-        for (size_t i = 0; i < _delayedOps.size(); i++)
+        for (size_t i = 0; i < _delayedOps.size(); ++i)
             ProcessEventOperation(_delayedOps[i]);
 
         _delayedOps.clear();

@@ -3,8 +3,10 @@
 ######################################################################################
 # Version: 1.0.7
 # 1)【llbc core】增加Protocol Stack控制支持，以安全异步的完成Service层跟ProtocolStack层的通信.
-# 2)BugFix:
-#   -【llbc all】解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
+# 2)【llbc all】 规整所有for中的++/--使用，所有++/--统一调整为前置.
+# 3)【llbc core】增加Protocol Stack Control机制，以满足业务层安全的对协议栈实施控制.
+# 4)BugFix:
+#   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 factory.
 #
 # Version: 1.0.6

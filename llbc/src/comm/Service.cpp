@@ -1295,9 +1295,11 @@ void LLBC_Service::AddServiceToTls()
 
     int idx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; idx++)
+    for (; idx <= lmt; ++idx)
+    {
         if (!tls->commTls.services[idx])
             break;
+    }
 
     tls->commTls.services[idx] = this;
 }
@@ -1308,9 +1310,11 @@ void LLBC_Service::RemoveServiceFromTls()
 
     int idx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; idx++)
+    for (; idx <= lmt; ++idx)
+    {
         if (tls->commTls.services[idx] == this)
             break;
+    }
 
     LLBC_MemCpy(&tls->commTls.services[idx],
                 &tls->commTls.services[idx + 1],
@@ -1323,9 +1327,11 @@ bool LLBC_Service::IsCanContinueDriveService()
 
     int checkIdx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; checkIdx <= lmt; checkIdx++)
+    for (; checkIdx <= lmt; ++checkIdx)
+    {
         if (tls->commTls.services[checkIdx] == NULL)
             break;
+    }
 
     return checkIdx < lmt ? true : false;
 }
@@ -1403,7 +1409,7 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         // Dispatch session-create event to all facades.
         _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate];
         const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
             caredEvFacades[facadeIdx]->OnSessionCreate(info);
     }
 }
@@ -1439,7 +1445,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         // Dispatch session-destroy event to all facades.
         _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy];
         const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredEvFacades[facadeIdx]->OnSessionDestroy(destroyInfo);
     }
 
@@ -1464,7 +1470,7 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
 
         _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult];
         const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredFacades[facadeIdx]->OnAsyncConnResult(result);
     }
 
@@ -1590,7 +1596,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket];
             const size_t facadesSize = caredFacades.size();
-            for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+            for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
                  caredFacades[facadeIdx]->OnUnHandledPacket(*packet);
         }
     }
@@ -1615,7 +1621,7 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
 
         _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport];
         const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredFacades[facadeIdx]->OnProtoReport(report);
     }
 }
@@ -1658,7 +1664,7 @@ int LLBC_Service::InitFacades()
          regIt != _willRegFacades.end();
          regIt++)
     {
-        LLBC_IFacade *facade = NULL;
+        LLBC_IFacade *facade;
         _WillRegFacade &willRegFacade = *regIt;
         if (willRegFacade.facadeFactory != NULL)
         {
@@ -1702,7 +1708,7 @@ int LLBC_Service::StartFacades()
 {
     size_t startIndex = 0;
     const size_t facadesSize = _facades.size();
-    for (; startIndex < facadesSize; startIndex++)
+    for (; startIndex < facadesSize; ++startIndex)
     {
         LLBC_IFacade *facade = _facades[startIndex];
         if (facade->_started)
@@ -1749,7 +1755,7 @@ void LLBC_Service::UpdateFacades()
 
     _Facades &caredFacades = *caredFacadesPtr;
     const size_t facadesSize = caredFacades.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
         caredFacades[facadeIdx]->OnUpdate();
 }
 
@@ -1811,7 +1817,6 @@ void LLBC_Service::AddFacade(LLBC_IFacade *facade)
 
 void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
 {
-    uint64 caredEvents = facade->GetCaredEvents();
     for (int evOffset = LLBC_FacadeEventsOffset::Begin;
          evOffset != LLBC_FacadeEventsOffset::End;
          evOffset++)
@@ -1887,7 +1892,7 @@ void LLBC_Service::ProcessIdle(bool fullFrame)
 
     _Facades &caredEvs = *caredEvsPtr;
     const size_t facadesSize = caredEvs.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
     {
         if (fullFrame)
         {
@@ -2104,7 +2109,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
     const size_t otherPacketCnt = sessionCnt - 1;
-    for (size_t i = 0; i < otherPacketCnt; i++)
+    for (size_t i = 0; i < otherPacketCnt; ++i)
     {
         LLBC_Packet *otherPacket = otherPackets[i];
         if (!otherPacket)

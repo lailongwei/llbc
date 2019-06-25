@@ -797,7 +797,7 @@ int pyllbc_Stream::WriteSequence(PyObject *val)
 
     _stream.Write(static_cast<sint32>(len));
 
-    for (Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < len; ++i)
     {
         PyObject *elem = PySequence_ITEM(val, i);
         if (Write(elem) != LLBC_OK)
@@ -870,7 +870,7 @@ int pyllbc_Stream::WriteInst(PyObject *val)
     std::vector<std::pair<PyObject *, PyObject *> > kws;
 
     const Py_ssize_t len = PySequence_Size(slots);
-    for (Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < len; ++i)
     {
         PyObject *slotItem = PySequence_ITEM(slots, i);
         PyObject *slotVal = PyObject_GetAttr(val, slotItem);
@@ -882,7 +882,7 @@ int pyllbc_Stream::WriteInst(PyObject *val)
 
     int rtn = LLBC_OK;
     _stream.Write(static_cast<sint32>(kws.size()));
-    for (size_t i = 0; i < kws.size(); i++)
+    for (size_t i = 0; i < kws.size(); ++i)
     {
         if ((rtn = Write(kws[i].first)) != LLBC_OK)
             break;
@@ -890,7 +890,7 @@ int pyllbc_Stream::WriteInst(PyObject *val)
             break;
     }
 
-    for (size_t i = 0; i < kws.size(); i++)
+    for (size_t i = 0; i < kws.size(); ++i)
     {
         Py_DECREF(kws[i].first);
         Py_DECREF(kws[i].second);

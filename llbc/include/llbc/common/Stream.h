@@ -384,7 +384,7 @@ public:
     {
         this->Write<uint32>(static_cast<uint32>(obj.size()));
         typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); iter++)
+        for (; iter != obj.end(); ++iter)
         {
             typedef typename T::key_type KeyType;
             typedef typename T::referent_type ValType;
@@ -410,7 +410,7 @@ public:
     {
         this->Write<uint32>(static_cast<uint32>(obj.size()));
         typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); iter++)
+        for (; iter != obj.end(); ++iter)
         {
             typedef typename T::value_type ElemType;
 
@@ -485,7 +485,7 @@ public:
     {
         this->WriteEx<uint32>(static_cast<uint32>(obj.size()));
         typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); iter++)
+        for (; iter != obj.end(); ++iter)
         {
             typedef typename T::key_type KeyType;
             typedef typename T::referent_type ValType;
@@ -511,7 +511,7 @@ public:
     {
         this->WriteEx<uint32>(static_cast<uint32>(obj.size()));
         typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); iter++)
+        for (; iter != obj.end(); ++iter)
         {
             typedef typename T::value_type ElemType;
 
@@ -618,7 +618,7 @@ public:
 
         typedef typename T::key_type KeyType;
         typedef typename T::referent_type ValType;
-        for (uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; ++i)
         {
             KeyType key;
             if (!this->Read<KeyType>(key))
@@ -651,7 +651,7 @@ public:
         if (!this->Read<uint32>(count))
             return false;
 
-        for (uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; ++i)
         {
             typedef typename T::value_type ElemType;
 
@@ -737,7 +737,7 @@ public:
 
         typedef typename T::key_type KeyType;
         typedef typename T::referent_type ValType;
-        for (uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; ++i)
         {
             KeyType key;
             if (!this->ReadEx<KeyType>(key))
@@ -770,7 +770,7 @@ public:
         if (!this->ReadEx<uint32>(count))
             return false;
 
-        for (uint32 i = 0; i < count; i++)
+        for (uint32 i = 0; i < count; ++i)
         {
             typedef typename T::value_type ElemType;
 

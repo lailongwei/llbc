@@ -28,85 +28,85 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     // Vector test.
     std::vector<sint8 *> vec;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         vec.push_back(LLBC_Malloc(sint8, sizeof(sint8)));
     LLBC_STLHelper::FreeContainer(vec);
     LLBC_PrintLine("after free vector, size: %lu", vec.size());
 
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         vec.push_back(LLBC_New(sint8));
     LLBC_STLHelper::DeleteContainer(vec, true, true);
     LLBC_PrintLine("after free vector, size: %lu", vec.size() );
 
     // List test.
     std::list<sint32 *> list;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         list.push_back(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(list);
     LLBC_PrintLine("after free list, size: %lu", list.size());
 
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         list.push_back(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(list, true, true);
     LLBC_PrintLine("after delete list, size: %lu", list.size());
 
     // Deque test.
     std::deque<sint32 *> dq;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         dq.push_back(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(dq);
     LLBC_PrintLine("after free deque, size: %lu", list.size() );
 
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         dq.push_back(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(dq, true, true);
     LLBC_PrintLine("after delete deque, size: %lu", list.size() );
 
     // Stack test.
     std::stack<sint32 *> stk;
-    for (sint32 i = 0; i < 10; i++)
+    for (sint32 i = 0; i < 10; ++i)
         stk.push(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(stk);
     LLBC_PrintLine("after free stack, size: %lu", stk.size());
 
-    for (sint32 i = 0; i < 10; i++)
+    for (sint32 i = 0; i < 10; ++i)
         stk.push(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(stk);
     LLBC_PrintLine("after delete stack, size: %lu", stk.size());
 
     // Queue test.
     std::queue<sint32 *> q;
-    for (sint32 i = 0; i < 10; i++)
+    for (sint32 i = 0; i < 10; ++i)
         q.push(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(q);
     LLBC_PrintLine("after free queue, size: %lu", q.size());
 
-    for (sint32 i = 0; i < 10; i++)
+    for (sint32 i = 0; i < 10; ++i)
         q.push(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(q);
     LLBC_PrintLine("after delete queue, size: %lu", q.size());
 
     // Map test.
     std::map<sint32, sint32 *> map1;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         map1[i] = LLBC_Malloc(sint32, sizeof(sint32));
     LLBC_STLHelper::FreeContainer(map1);
     LLBC_PrintLine("after free map, size: %lu", map1.size());
 
     std::map<sint32, std::string *> map2;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         map2[i] = LLBC_New(std::string);
     LLBC_STLHelper::DeleteContainer(map2, true, true);
     LLBC_PrintLine("after delete map, size: %lu", map2.size());
 
     // Set test.
     std::set<sint32 *> s;
-    for(sint32 i = 0; i < 10; i++)
+    for(sint32 i = 0; i < 10; ++i)
         s.insert(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(s);
     LLBC_PrintLine("after free set, size: %lu", s.size());
 
-    for(sint32 i = 0;  i < 10; i++)
+    for(sint32 i = 0;  i < 10; ++i)
         s.insert(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(s, true, true);
     LLBC_PrintLine("after delete set, size: %lu", s.size());

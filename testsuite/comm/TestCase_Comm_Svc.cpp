@@ -168,7 +168,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
         LLBC_PrintLine("Create %d clients to test", clientCount);
 
-        for (int i = 0; i < clientCount; i++)
+        for (int i = 0; i < clientCount; ++i)
         {
             const int sessionId = svc->Connect(ip, port);
 

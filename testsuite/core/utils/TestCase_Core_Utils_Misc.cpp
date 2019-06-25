@@ -64,7 +64,7 @@ int TestCase_Core_Utils_Misc::TestStartArgs(int argc, char *argv[])
 
     std::cout <<"Module file path: " <<startArgs.GetModuleFilePath() <<std::endl;
     std::cout <<"Arguments(total:" <<startArgs.GetArgumentsCount() <<"):" <<std::endl;
-    for (size_t i = 0; i < startArgs.GetArgumentsCount(); i++)
+    for (size_t i = 0; i < startArgs.GetArgumentsCount(); ++i)
         std::cout <<"  " <<i <<startArgs[i] <<std::endl;
 
     std::cout <<"Naming startup arguments(total:" <<startArgs.GetNamingArgumentsCount() <<"):" <<std::endl;

@@ -70,7 +70,7 @@ LLBC_ProtocolStack::LLBC_ProtocolStack(This::StackType type)
 
 LLBC_ProtocolStack::~LLBC_ProtocolStack()
 {
-    for (int i = _Layer::Begin; i < _Layer::End; i++)
+    for (int i = _Layer::Begin; i < _Layer::End; ++i)
         LLBC_XDelete(_protos[i]);
 }
 
@@ -92,7 +92,7 @@ LLBC_Session *LLBC_ProtocolStack::GetSession()
 void LLBC_ProtocolStack::SetSession(LLBC_Session *session)
 {
     _session = session;
-    for (int i = _Layer::Begin; i < _Layer::End; i++)
+    for (int i = _Layer::Begin; i < _Layer::End; ++i)
     {
         LLBC_IProtocol *proto = _protos[i];
         if (!proto)
@@ -175,10 +175,14 @@ int LLBC_ProtocolStack::SetFilter(LLBC_IProtocolFilter *filter, int toProto)
 
 int LLBC_ProtocolStack::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 {
-    for (int i = _Layer::Begin; i < _Layer::End; i++)
-        if (_protos[i])
-            if (_protos[i]->Connect(local, peer) != LLBC_OK)
-                return LLBC_FAILED;
+    for (int i = _Layer::Begin; i != _Layer::End; ++i)
+    {
+        if (!_protos[i])
+            continue;
+
+        if (_protos[i]->Connect(local, peer) != LLBC_OK)
+            return LLBC_FAILED;
+    }
 
     return LLBC_OK;
 }
@@ -186,7 +190,7 @@ int LLBC_ProtocolStack::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded, bool &removeSession)
 {
     void *in, *out = willEncode;
-    for (int i = _Layer::End - 1; i >= _Layer::CodecLayer; i--)
+    for (int i = _Layer::End - 1; i >= _Layer::CodecLayer; --i)
     {
         if (!_protos[i])
             continue;
@@ -203,13 +207,13 @@ int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded
 int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block, bool &removeSession)
 {
     void *in, *out = packet;
-    for (int i = _Layer::CompressLayer; i >= _Layer::Begin; i--)
+    for (int layer = _Layer::CompressLayer; layer >= _Layer::Begin; --layer)
     {
-        if (!_protos[i])
+        if (!_protos[layer])
             continue;
 
         in = out, out = NULL;
-        if (_protos[i]->Send(in, out, removeSession) != LLBC_OK)
+        if (_protos[layer]->Send(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -221,6 +225,7 @@ int LLBC_ProtocolStack::Send(LLBC_Packet *packet, LLBC_MessageBlock *&block, boo
 {
     if (SendCodec(packet, packet, removeSession) != LLBC_OK)
         return LLBC_FAILED;
+
     return SendRaw(packet, block, removeSession);
 }
 
@@ -239,7 +244,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
     while (packetsBlock->Read(&packet, sizeof(LLBC_Packet *)) == LLBC_OK)
     {
         out = packet;
-        for (int layer = _Layer::PackLayer + 1; layer <= _Layer::CompressLayer; layer++)
+        for (int layer = _Layer::PackLayer + 1; layer <= _Layer::CompressLayer; ++layer)
         {
             if (!_protos[layer])
                 continue;
@@ -268,13 +273,13 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
 int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded, bool &removeSession)
 {
     void *in, *out = willDecode;
-    for (int i = _Layer::CodecLayer; i < _Layer::End; i++)
+    for (int layer = _Layer::CodecLayer; layer != _Layer::End; ++layer)
     {
-        if (!_protos[i])
+        if (!_protos[layer])
             continue;
 
         in = out, out = NULL;
-        if (_protos[i]->Recv(in, out, removeSession) != LLBC_OK)
+        if (_protos[layer]->Recv(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -288,13 +293,13 @@ int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *
     if (RecvRaw(block, _rawPackets, removeSession) != LLBC_OK)
         return LLBC_FAILED;
         
-    for (size_t i = 0;  i < _rawPackets.size(); i++)
+    for (size_t i = 0;  i < _rawPackets.size(); ++i)
     {
         LLBC_Packet *packet;
         if (RecvCodec(_rawPackets[i], packet, removeSession) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(packets);
-            for (++i; i < _rawPackets.size(); i++)
+            for (++i; i < _rawPackets.size(); ++i)
                 LLBC_Delete(_rawPackets[i]);
 
             return LLBC_FAILED;
@@ -338,7 +343,7 @@ void LLBC_ProtocolStack::CtrlStack(int ctrlType, const LLBC_Variant &ctrlData)
 
 bool LLBC_ProtocolStack::CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData)
 {
-    for (int layer = _Layer::PackLayer; layer <= _Layer::CompressLayer; layer++)
+    for (int layer = _Layer::PackLayer; layer <= _Layer::CompressLayer; ++layer)
     {
         if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
             return false;
@@ -349,7 +354,7 @@ bool LLBC_ProtocolStack::CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData
 
 bool LLBC_ProtocolStack::CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData)
 {
-    for (int layer = _Layer::CodecLayer; layer != _Layer::End; layer++)
+    for (int layer = _Layer::CodecLayer; layer != _Layer::End; ++layer)
     {
         if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
             return false;

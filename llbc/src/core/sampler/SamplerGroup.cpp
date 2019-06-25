@@ -86,7 +86,7 @@ int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
 void LLBC_SamplerGroup::Reset()
 {
     _SamplerMapIter iter = _samplers->begin();
-    for (; iter != _samplers->end(); iter++)
+    for (; iter != _samplers->end(); ++iter)
     {
         iter->second->Reset();
     }
@@ -95,7 +95,7 @@ void LLBC_SamplerGroup::Reset()
 void LLBC_SamplerGroup::Update(time_t time)
 {
     _SamplerMapIter iter = _samplers->begin();
-    for (; iter != _samplers->end(); iter++)
+    for (; iter != _samplers->end(); ++iter)
     {
         iter->second->Update(time);
     }

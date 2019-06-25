@@ -100,7 +100,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
         }
     }
 
-    for (size_t i = 0; i < backTraces.size(); i++)
+    for (size_t i = 0; i < backTraces.size(); ++i)
         backTrace.append_format("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
 }
 
@@ -496,7 +496,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
     tryPaths.push_back(_name);
 
     const size_t tryPathsCount = tryPaths.size();
-    for (size_t i = 0; i < tryPathsCount; i++)
+    for (size_t i = 0; i < tryPathsCount; ++i)
         tryPaths.push_back("../" + tryPaths[i]);
 
     // Try load.

@@ -65,7 +65,7 @@ int LLBC_Endian::Str2Type(const char *str)
     size_t len = ::strlen(str);
 
     char *lowerCaseStr = reinterpret_cast<char *>(malloc(len + 1));
-    for (register size_t i = 0; i < len; i++)
+    for (size_t i = 0; i < len; ++i)
         lowerCaseStr[i] = ::tolower(str[i]);
 
     lowerCaseStr[len] = '\0';

@@ -250,7 +250,7 @@ int LLBC_Entity::RemoveBehavior(const LLBC_String &name)
 void LLBC_Entity::RemoveAllBehaviors()
 {
     std::map<int, LLBC_BehaviorValue>::iterator iter = _behaviors.begin();
-    for (; iter != _behaviors.end(); iter++)
+    for (; iter != _behaviors.end(); ++iter)
         LLBC_Delete(iter->second.holder);
 
     _behaviors.erase(_behaviors.begin(), _behaviors.end());

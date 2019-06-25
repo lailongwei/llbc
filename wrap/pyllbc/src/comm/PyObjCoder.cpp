@@ -244,7 +244,7 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_Json::Document &out)
     const Py_ssize_t len = PySequence_Fast_GET_SIZE(fastSeq);
     ASSERT(len >= 0 && "python API internal error");
 
-    for (register Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < len; ++i)
     {
         PyObject *elemObj = PySequence_Fast_GET_ITEM(fastSeq, i);
         if (UNLIKELY(!elemObj))
@@ -320,7 +320,7 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json::Document &out)
     }
 
     const Py_ssize_t len = PySequence_Size(slots);
-    for (Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < len; ++i)
     {
         PyObject *slotItem = PySequence_ITEM(slots, i);
         PyObject *slotVal = PyObject_GetAttr(in, slotItem);

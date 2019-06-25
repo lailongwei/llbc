@@ -32,7 +32,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     std::vector<LLBC_String> strs;
     LLBC_SplitString(str, " ", strs);
     LLBC_PrintLine("result(sub string count: %lu):", strs.size());
-    for(size_t i = 0; i < strs.size(); i ++)
+    for(size_t i = 0; i < strs.size(); ++i)
     {
         LLBC_PrintLine("\t%s", strs[i].c_str());
     }

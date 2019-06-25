@@ -220,7 +220,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
     }
 
     PyObject *dict = PyDict_New();
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; ++i)
     {
         PyObject *key = _keyLemma->Read(stream);
         if (!key)

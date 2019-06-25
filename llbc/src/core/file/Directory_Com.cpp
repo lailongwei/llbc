@@ -62,7 +62,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
 
     size_t prePos = LLBC_String::npos;
     std::vector<size_t> sepPoses;
-    for (size_t pos = 0; pos < path.size(); pos++)
+    for (size_t pos = 0; pos < path.size(); ++pos)
     {
         if (path[pos] != LLBC_SLASH_A &&
                 path[pos] != LLBC_BACKLASH_A)
@@ -82,7 +82,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
         *sepPoses.rbegin() != path.size() - 1)
         sepPoses.push_back(path.size());
 
-    for (size_t i = 0; i < sepPoses.size(); i++)
+    for (size_t i = 0; i < sepPoses.size(); ++i)
     {
         const LLBC_String toPath = path.substr(0, sepPoses[i] + 1);
         if (Exists(toPath))
@@ -124,14 +124,14 @@ int LLBC_Directory::Remove(const LLBC_String &path)
         return LLBC_FAILED;
 
     // Delete files.
-    for (size_t i = 0; i < delFileList.size(); i++)
+    for (size_t i = 0; i < delFileList.size(); ++i)
     {
         if (LLBC_File::DeleteFile(delFileList[i]) != LLBC_OK)
             return LLBC_FAILED;
     }
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     // Delete empty directories.
-    for(int i = (int)(delSubDirList.size() - 1); i >= 0; i--)
+    for(int i = (int)(delSubDirList.size() - 1); i >= 0; --i)
     {
         if (rmdir(delSubDirList[i].c_str()) != 0)
         {
@@ -150,7 +150,7 @@ int LLBC_Directory::Remove(const LLBC_String &path)
     return LLBC_OK;
 #else // LLBC_TARGET_PLATFORM_WIN32
     // Delete empty directories.
-    for(int i = static_cast<int>(delSubDirList.size()) - 1; i >= 0; i--)
+    for(int i = static_cast<int>(delSubDirList.size()) - 1; i >= 0; --i)
     {
         if (!::RemoveDirectoryA(delSubDirList[i].c_str()))
         {
@@ -244,7 +244,7 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
 #endif
     // Merge path parts list(process "." and ".." parts).
     LLBC_Strings stack;
-    for (size_t i = 0; i < parts.size(); i++)
+    for (size_t i = 0; i < parts.size(); ++i)
     {
         if (parts[i] == ".")
         {
@@ -356,7 +356,7 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
 LLBC_String LLBC_Directory::Join(const LLBC_Strings &paths)
 {
     LLBC_String finalPath;
-    for (size_t i = 0; i < paths.size(); i++)
+    for (size_t i = 0; i < paths.size(); ++i)
         finalPath = Join(finalPath, paths[i]);
 
     return finalPath;
@@ -366,7 +366,7 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
                                  const LLBC_Strings &paths)
 {
     LLBC_String finalPath = path1;
-    for (size_t i = 0; i < paths.size(); i++)
+    for (size_t i = 0; i < paths.size(); ++i)
         finalPath = Join(finalPath, paths[i]);
 
     return finalPath;
@@ -415,7 +415,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
     bool allProcessed = true;
 
     int procIdx = 0;
-    for (; procIdx < fileCount; procIdx++)
+    for (; procIdx < fileCount; ++procIdx)
     {
         LLBC_String fileName = Join(path, direntList[procIdx]->d_name);
         if (stat(fileName.c_str(), &fileStat) != 0)
@@ -505,7 +505,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
             fileExt.empty())
         return LLBC_OK;
 
-    for (int i = static_cast<int>(files.size() - 1); i >= 0; i--)
+    for (int i = static_cast<int>(files.size() - 1); i >= 0; --i)
     {
         const LLBC_String &file = files[i];
         const LLBC_Strings splited = SplitExt(file);
@@ -533,7 +533,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     bool allProcessed = true;
 
     int procIdx = 0;
-    for(; procIdx < fileCount; procIdx++)
+    for(; procIdx < fileCount; ++procIdx)
     {
         LLBC_String fileName = Join(path, direntList[procIdx]->d_name);
         if (stat(fileName.c_str(), &fileStat) == -1)
@@ -567,7 +567,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
         free(direntList[procIdx]);
     }
 
-    for (procIdx = procIdx + 1; procIdx < fileCount; procIdx++)
+    for (procIdx = procIdx + 1; procIdx < fileCount; ++procIdx)
         free(direntList[procIdx]);
 
     free(direntList);

@@ -551,6 +551,7 @@ private:
     LLBC_SpinLock _connectedSessionIdsLock;
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
+    typedef std::map<int, LLBC_ProtocolStack *> _CodecStacks;
     LLBC_ProtocolStack _stack;
 #endif
 

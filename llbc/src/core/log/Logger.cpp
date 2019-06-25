@@ -154,7 +154,7 @@ void LLBC_Logger::Finalize()
     if (!_logRunnable)
         return;
 
-    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; level++)
+    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
         UninstallHook(level);
 
     if (_config->IsAsyncMode())
@@ -163,7 +163,9 @@ void LLBC_Logger::Finalize()
         _logRunnable->Wait();
     }
     else
+    {
         _logRunnable->Cleanup();
+    }
 
     LLBC_XDelete(_logRunnable);
 

@@ -132,7 +132,7 @@ void TestCase_ObjBase_Array::BasicTest()
     std::cout <<"Insert 10 objects." <<std::endl;
     LLBC_Array *arr = LLBC_New0(LLBC_Array);
     const LLBC_Array &constArr = *arr;
-    for(int i = 0; i < 10; i ++)
+    for(int i = 0; i < 10; ++i)
     {
         LLBC_Object *obj = LLBC_New0(TestObj);
         arr->Insert(arr->End(), obj);
@@ -147,14 +147,14 @@ void TestCase_ObjBase_Array::BasicTest()
     constArr.Foreach(constForeachFun);
 
     std::cout <<"Using subscript to access array element." <<std::endl;
-    for(int i = 0; i < 10; i ++)
+    for(int i = 0; i < 10; ++i)
     {
         std::cout <<(*arr)[i]->ToString() <<std::endl;
     }
     std::cout <<"Done" <<std::endl;
 
     std::cout <<"Using subscript to access array element(const array)." <<std::endl;
-    for(int i = 0; i < 10; i ++)
+    for(int i = 0; i < 10; ++i)
     {
         std::cout <<constArr[i]->ToString() <<std::endl;
     }
@@ -182,7 +182,7 @@ void TestCase_ObjBase_Array::IterTest()
     LLBC_Array arr;
     static const int insertCnt = 10;
     std::cout <<"PushBack/PushFront" <<insertCnt <<" objects into array." <<std::endl;
-    for(int i = 1; i <= insertCnt; i ++)
+    for(int i = 1; i <= insertCnt; ++i)
     {
         LLBC_Object *obj = LLBC_New0(TestObj);
         arr.PushBack(obj);
@@ -195,7 +195,7 @@ void TestCase_ObjBase_Array::IterTest()
     ForeachFun foreachFun;
     std::cout <<"Iteration, using LLBC_Array::Iter" <<std::endl;
     LLBC_Array::Iter it1 = arr.Begin();
-    for(; it1 != arr.End(); it1 ++)
+    for(; it1 != arr.End(); ++it1)
     {
         LLBC_Object *obj = *it1;
         std::cout <<obj->ToString() <<std::endl;
@@ -204,7 +204,7 @@ void TestCase_ObjBase_Array::IterTest()
 
     std::cout <<"Iteration, using LLBC_Array::ReverseIter" <<std::endl;
     LLBC_Array::ReverseIter it2 = arr.ReverseBegin();
-    for(; it2 != arr.ReverseEnd(); it2 ++)
+    for(; it2 != arr.ReverseEnd(); ++it2)
     {
         std::cout <<(*it2)->ToString() <<std::endl;
     }
@@ -249,7 +249,7 @@ void TestCase_ObjBase_Array::SortTest()
     LLBC_Array arr;
 
     std::cout <<"Insert 10 elements: " <<std::endl;
-    for(int i = 1; i <= 10; i ++)
+    for(int i = 1; i <= 10; ++i)
     {
         LLBC_Object *obj = LLBC_New0(TestObj);
         if(i % 2 == 0)

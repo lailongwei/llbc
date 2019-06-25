@@ -59,7 +59,7 @@ LLBC_AutoReleasePool::~LLBC_AutoReleasePool()
 
     // To make more efficient, set array all elements' _poolStack to null.
     LLBC_Array::Iter it = _arr->Begin();
-    for (; it != _arr->End(); it++)
+    for (; it != _arr->End(); ++it)
     {
         (*it)->_poolStack = NULL;
     }
@@ -111,7 +111,7 @@ int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
 void LLBC_AutoReleasePool::Purge()
 {
     LLBC_Array::Iter iter = _arr->Begin();
-    for (; iter != _arr->End(); iter++)
+    for (; iter != _arr->End(); ++iter)
     {
         LLBC_Object *obj = *iter;
         --obj->_autoRef;

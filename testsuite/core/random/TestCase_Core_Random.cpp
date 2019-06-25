@@ -37,7 +37,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     // Test RandInt.
     LLBC_Random rand;
     LLBC_PrintLine("LLBC_Random::Rand(0, 100) test:");
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 20 == 0)
             LLBC_PrintLine("");
@@ -47,7 +47,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
 
     LLBC_PrintLine("");
     LLBC_PrintLine("LLBC_RandInt(-100, 100) test:");
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 100; ++i)
     {
         if (i != 0 && i % 20 == 0)
             LLBC_PrintLine("");
@@ -58,7 +58,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     // Test RandReal.
     LLBC_PrintLine("");
     LLBC_PrintLine("LLBC_Random::RandReal() test:");
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
             LLBC_PrintLine("");
@@ -68,7 +68,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
 
     LLBC_PrintLine("");
     LLBC_PrintLine("LLBC_RandReal() test:");
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
             LLBC_PrintLine("");
@@ -80,10 +80,10 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     LLBC_PrintLine("");
     LLBC_PrintLine("LLBC_Random::Choice() test(vector range:[1, 100]):");
     std::vector<int> v;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 100; ++i)
         v.push_back(i + 1);
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; ++i)
         LLBC_PrintLine("  Choice result: %d", *rand.Choice(v.begin(), v.end()));
 
     LLBC_PrintLine("Press any key to continue ...");

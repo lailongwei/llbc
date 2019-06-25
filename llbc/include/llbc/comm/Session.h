@@ -100,7 +100,7 @@ private:
 /**
  * \brief The session class encapsulation.
  */
-class LLBC_HIDDEN LLBC_Session
+class LLBC_EXPORT LLBC_Session
 {
 public:
     /**

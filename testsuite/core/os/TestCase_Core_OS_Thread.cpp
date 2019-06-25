@@ -31,7 +31,7 @@ static int ThreadProc(void *arg)
     }
 
     int loopVal = 10;
-    for(int i = 0; i < loopVal; i ++)
+    for(int i = 0; i < loopVal; ++i)
     {
         LLBC_NativeThreadHandle handle = LLBC_GetCurrentThread();
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
