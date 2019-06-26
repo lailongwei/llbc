@@ -7,7 +7,7 @@
 # 3)【llbc core】增加Protocol Stack Control机制，以满足业务层安全的对协议栈实施控制.
 # 4)BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
-#   -【llbc core】修复对象池销毁时内存泄露问题
+#   -【llbc core】修复对象池销毁时内存泄露问题.
 factory.
 #
 # Version: 1.0.6
