@@ -47,7 +47,15 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
     {
         for (int blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
         {
-            delete _block[blockIdx];
+            MemoryBlock *&memBlock = _block[blockIdx];
+            for (int unitIdx = 0; unitIdx != _elemCnt; ++unitIdx)
+            {
+                MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * unitIdx);
+                if (memUnit->inited)
+                    LLBC_ObjectManipulator::Delete<ObjectType>(reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize));
+            }
+
+            ::free(memBlock);
             delete _memUnitUsageView[blockIdx];
         }
 
