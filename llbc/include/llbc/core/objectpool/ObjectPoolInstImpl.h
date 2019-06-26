@@ -55,7 +55,7 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
                     LLBC_ObjectManipulator::Delete(memUnit->buff);
             }
 
-            ::free _block[blockIdx];
+            ::free(_block[blockIdx]);
             delete _memUnitUsageView[blockIdx];
         }
 
