@@ -28,7 +28,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
 
     // Byte2Hex test.
     char str[256];
-    for(int i = 0; i < 256; i ++)
+    for(int i = 0; i < 256; ++i)
     {
         str[i] = static_cast<char>(i);
     }

@@ -123,7 +123,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
 
     // Insert 10 int type object.
     std::cout <<"Inset 10 integer type objects." <<std::endl;
-    for(int i = 1; i <= 10; i ++)
+    for(int i = 1; i <= 10; ++i)
     {
         LLBC_Object *obj = LLBC_New0(TestObj);
         dict.Insert(i, obj);
@@ -161,7 +161,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
 
     // Insert integer type key again.
     std::cout <<"Insert integer type key again, 10 elements." <<std::endl;
-    for(int i = 11; i <= 20; i ++)
+    for(int i = 11; i <= 20; ++i)
     {
         LLBC_Object *obj = LLBC_New0(TestObj);
         dict.Insert(i, obj);
@@ -205,7 +205,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     // Use reverse iter to dump data.
     std::cout <<"Using ReverseIter to dump data: " <<std::endl;
     LLBC_Dictionary::ConstReverseIter reverseIt = dict.ReverseBegin();
-    for(; reverseIt != dict.ReverseEnd(); reverseIt ++)
+    for(; reverseIt != dict.ReverseEnd(); ++reverseIt)
     {
         std::cout <<(*reverseIt)->ToString() <<std::endl;
     }

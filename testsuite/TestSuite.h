@@ -82,6 +82,7 @@
 #include "comm/TestCase_Comm_Multicast.h"
 #include "comm/TestCase_Comm_ExternalDriveSvc.h"
 #include "comm/TestCase_Comm_LazyTask.h"
+#include "comm/TestCase_Comm_ProtoStackCtrl.h"
 
 #include "application/TestCase_App_AppTest.h"
 

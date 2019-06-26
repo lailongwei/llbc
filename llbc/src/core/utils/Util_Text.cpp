@@ -43,12 +43,10 @@ int lstrlenA(LPCSTR lpString)
 int lstrlenW(LPCWSTR lpString)
 {
     if (UNLIKELY(!lpString))
-    {
         return 0;
-    }
 
     int i = 0;
-    for (; lpString[i] != LLBC_WTEXT('\0'); i ++);
+    for (; lpString[i] != LLBC_WTEXT('\0'); ++i);
     return i;
 }
 
@@ -60,9 +58,7 @@ LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2)
 LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2)
 {
     if (UNLIKELY(!lpString2))
-    {
         return lpString1;
-    }
 
     int str1Len = ::lstrlenW(lpString1);
     int str2Len = ::lstrlenW(lpString2);
@@ -81,16 +77,12 @@ int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
     int str1Len = ::lstrlenW(lpString1);
     int str2Len = ::lstrlenW(lpString2);
     int len = MIN(str1Len, str2Len);
-    for (register int i = 0; i < len; i ++)
+    for (register int i = 0; i < len; ++i)
     {
         if (lpString1[i] < lpString2[i])
-        {
             return -1;
-        }
         else if (lpString1[i] == lpString2[i])
-        {
             return 1;
-        }
     }
 
     return (str1Len < str2Len ? -1 : 
@@ -132,14 +124,10 @@ void LLBC_SplitString(const LLBC_String &str,
                       char escapeChar)
 {
     if (UNLIKELY(str.empty()))
-    {
         return;
-    }
 
     if (UNLIKELY(separator.empty()))
-    {
         destStrList.push_back(str);
-    }
 
     LLBC_String::size_type curPos = 0;
     LLBC_String::size_type prevPos = 0;
@@ -169,9 +157,7 @@ void LLBC_SplitString(const LLBC_String &str,
 
     LLBC_String temp = strInternal.substr(prevPos);
     if (!temp.empty())
-    {   
         destStrList.push_back(temp);
-    }
 }
 
 LLBC_String LLBC_FilterOutString(const LLBC_String &str, const LLBC_String &filterStr)
@@ -180,10 +166,8 @@ LLBC_String LLBC_FilterOutString(const LLBC_String &str, const LLBC_String &filt
     LLBC_SplitString(str, filterStr, strings);
 
     LLBC_String retStr;
-    for (size_t i = 0; i < strings.size(); i ++)
-    {
+    for (size_t i = 0; i < strings.size(); ++i)
         retStr += strings[i];
-    }
 
     return retStr;
 }
@@ -194,13 +178,11 @@ LLBC_String LLBC_ToUpper(const char *str)
 
     char ch;
     const LLBC_String::size_type length = convertedStr.size();
-    for (LLBC_String::size_type i = 0; i < length; i ++)
+    for (LLBC_String::size_type i = 0; i < length; ++i)
     {
         ch = convertedStr[i];
         if (ch >= 'a' && ch <= 'z')
-        {
             convertedStr[i] -= 32;
-        }
     }
 
     return convertedStr;
@@ -212,13 +194,11 @@ LLBC_String LLBC_ToLower(const char *str)
 
     char ch;
     const LLBC_String::size_type length = convertedStr.size();
-    for (LLBC_String::size_type i = 0; i < length; i ++)
+    for (LLBC_String::size_type i = 0; i < length; ++i)
     {
         ch = convertedStr[i];
         if (ch >= 'A' && ch <= 'Z')
-        {
             convertedStr[i] += 32;
-        }
     }
 
     return convertedStr;
@@ -262,18 +242,14 @@ LLBC_String LLBC_TrimLeft(const LLBC_String &str)
 LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target)
 {
     if (UNLIKELY(str.empty()))
-    {
         return LLBC_String();
-    }
 
     LLBC_String::size_type leftPos = 0;
     const LLBC_String::size_type length = str.size();
-    for (; str[leftPos] == target && leftPos < length; leftPos ++);
+    for (; str[leftPos] == target && leftPos < length; ++leftPos);
 
     if (leftPos >= length)
-    {
         return LLBC_String();
-    }
 
     return str.substr(leftPos, LLBC_String::npos);
 }
@@ -281,16 +257,12 @@ LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target)
 LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets)
 {
     if (UNLIKELY(!targets))
-    {
         return str;
-    }
 
     LLBC_String retStr = str;
     const uint32 len = LLBC_StrLenA(targets);
-    for (uint32 i = 0; i < len; i ++)
-    {
+    for (uint32 i = 0; i < len; ++i)
         retStr = LLBC_TrimLeft(retStr, targets[i]);
-    }
 
     return retStr;
 }
@@ -303,13 +275,11 @@ LLBC_String LLBC_TrimRight(const LLBC_String &str)
 LLBC_String LLBC_TrimRight(const LLBC_String &str, char target)
 {
     if (UNLIKELY(str.empty()))
-    {
         return LLBC_String();
-    }
 
     const LLBC_String::size_type length = str.size();
     LLBC_String::size_type rightPos = length - 1;
-    for (; str[rightPos] == target && rightPos != 0; rightPos --);
+    for (; str[rightPos] == target && rightPos != 0; --rightPos);
 
     return str.substr(0, rightPos + 1);
 }
@@ -317,16 +287,12 @@ LLBC_String LLBC_TrimRight(const LLBC_String &str, char target)
 LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets)
 {
     if (UNLIKELY(!targets))
-    {
         return str;
-    }
 
     LLBC_String retStr = str;
     const uint32 len = LLBC_StrLenA(targets);
-    for (uint32 i = 0; i < len; i ++)
-    {
-        retStr = LLBC_TrimRight(retStr, targets[i]);               
-    }
+    for (uint32 i = 0; i < len; ++i)
+        retStr = LLBC_TrimRight(retStr, targets[i]);
 
     return retStr;
 }
@@ -334,9 +300,7 @@ LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets)
 LLBC_String LLBC_DirName(const LLBC_String &path)
 {
     if (UNLIKELY(path.empty()))
-    {
         return LLBC_String();
-    }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     char *buf = reinterpret_cast<char *>(::malloc(path.size() + 1));
@@ -351,9 +315,7 @@ LLBC_String LLBC_DirName(const LLBC_String &path)
     return dirName;
 #else
     if (path[path.length() - 1] == ':')
-    {
         return path;
-    }
 
     LLBC_String::size_type slashPos = path.rfind(LLBC_SLASH_A);
     LLBC_String::size_type backlashPos = path.rfind(LLBC_BACKLASH_A);
@@ -361,18 +323,14 @@ LLBC_String LLBC_DirName(const LLBC_String &path)
     if (slashPos == LLBC_String::npos)
     {
         if (backlashPos == LLBC_String::npos)
-        {
             return LLBC_String();
-        }
 
         return path.substr(0, backlashPos);
     }
     else
     {
         if (backlashPos == LLBC_String::npos)
-        {
             return path.substr(0, slashPos);
-        }
     }
 
     return path.substr(0, MAX(slashPos, backlashPos));
@@ -396,24 +354,16 @@ LLBC_String LLBC_BaseName(const LLBC_String &path, bool incExtension)
     if (slashPos == LLBC_String::npos)
     {
         if (backlashPos == LLBC_String::npos)
-        {
             baseName = path;
-        }
         else
-        {
             baseName = path.substr(backlashPos + 1);
-        }
     }
     else
     {
         if (backlashPos == LLBC_String::npos)
-        {
             baseName = path.substr(slashPos + 1);
-        }
         else
-        {
             baseName = path.substr(MAX(slashPos, backlashPos) + 1);
-        }
     }
 #endif
 
@@ -421,9 +371,7 @@ LLBC_String LLBC_BaseName(const LLBC_String &path, bool incExtension)
     {
         LLBC_String::size_type dotPos = baseName.rfind('.');
         if (dotPos != LLBC_String::npos && dotPos != 0)
-        {
             baseName.erase(dotPos);
-        }
     }
 
     return baseName;
@@ -433,15 +381,11 @@ LLBC_String LLBC_ExtensionName(const LLBC_String &path)
 {
     LLBC_String basename = LLBC_BaseName(path);
     if (UNLIKELY(basename.empty()))
-    {
         return LLBC_String();
-    }
 
     LLBC_String::size_type pos = basename.rfind(".");
     if (pos == LLBC_String::npos)
-    {
         return LLBC_String();
-    }
 
     return basename.substr(pos + 1);
 }
@@ -500,11 +444,9 @@ void *LLBC_Str2Ptr(const char *str)
     }
 
     if (lowerStr.empty())
-    {
         return NULL;
-    }
 
-    for (LLBC_String::size_type i = 0; i < lowerStr.size(); i ++)
+    for (LLBC_String::size_type i = 0; i < lowerStr.size(); ++i)
     {
         if (hexFormat)
         {
@@ -527,17 +469,13 @@ void *LLBC_Str2Ptr(const char *str)
 
     uint64 ptrVal = 0;
     uint64 baseVal = hexFormat ? 16 : 10;
-    for (LLBC_String::size_type i = 0; i < lowerStr.size(); i ++)
+    for (LLBC_String::size_type i = 0; i < lowerStr.size(); ++i)
     {
         ptrVal *= baseVal;
         if (lowerStr[i] >= '0' && lowerStr[i] <= '9')
-        {
             ptrVal += (uint8)(lowerStr[i] - '0');
-        }
         else
-        {
             ptrVal += (uint8)(lowerStr[i] - 'a' + (char)10);
-        }
     }
 
     void *ptr;
@@ -569,7 +507,7 @@ int LLBC_HashString(const char *str, size_t strLen)
         strLen = LLBC_StrLenA(str);
 
     int hashVal = 0;
-    for (size_t i = 0; i < strLen; i++)
+    for (size_t i = 0; i < strLen; ++i)
     {
 #ifdef _M_X64
         hashVal += static_cast<int>(i * 0x31 * str[i]);

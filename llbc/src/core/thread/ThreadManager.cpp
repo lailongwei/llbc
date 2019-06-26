@@ -135,7 +135,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
         groupHandle =++ _maxGroupHandle;
     }
     
-    for (int i = 0; i < threadNum; i++)
+    for (int i = 0; i < threadNum; ++i)
     {
         if (CreateThread_NonLock(proc,
                                        arg,
@@ -323,9 +323,7 @@ int LLBC_ThreadManager::SetPriority(LLBC_Handle handle, int priority)
 
     int rtn = LLBC_SetThreadPriority(threadDesc->GetNativeHandle(), priority);
     if (rtn == LLBC_OK)
-    {
         threadDesc->SetPriority(priority);
-    }
 
     return rtn;
 }
@@ -370,9 +368,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
 
 #if LLBC_TARGET_PLATFORM_WIN32
             if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
-            {
                 ::CloseHandle(threadDesc->GetNativeHandle());
-            }
 #endif
             RemoveThreadDescriptor(handle);
         }
@@ -392,7 +388,7 @@ int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
     _lock.Lock();
 
     std::vector<LLBC_Handle> willWaitThreads;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         if (!_threads[i])
             continue;
@@ -409,7 +405,7 @@ int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
 
     _lock.Unlock();
 
-    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    for (size_t i = 0; i < willWaitThreads.size(); ++i)
     {
         if (Wait(willWaitThreads[i]) != LLBC_OK)
             return LLBC_FAILED;
@@ -449,12 +445,10 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
 
     _lock.Unlock();
 
-    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    for (size_t i = 0; i < willWaitThreads.size(); ++i)
     {
         if (Wait(willWaitThreads[i]) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -465,7 +459,7 @@ int LLBC_ThreadManager::WaitAll()
     _lock.Lock();
 
     std::vector<LLBC_Handle> willWaitThreads;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
@@ -477,12 +471,10 @@ int LLBC_ThreadManager::WaitAll()
 
     _lock.Unlock();
 
-    for (size_t i = 0; i < willWaitThreads.size(); i++)
+    for (size_t i = 0; i < willWaitThreads.size(); ++i)
     {
         if (Wait(willWaitThreads[i]) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
     return LLBC_OK;
 }
@@ -501,7 +493,6 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-
         return LLBC_FAILED;
     }
 
@@ -518,9 +509,7 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
 
     int rtn = LLBC_SuspendThread(threadDesc->GetNativeHandle());
     if (rtn == LLBC_OK)
-    {
         threadDesc->SetState(LLBC_ThreadState::Suspended);
-    }
 
     return rtn;
 }
@@ -536,31 +525,25 @@ int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
     LLBC_LockGuard guard(_lock);
 
     std::vector<LLBC_Handle> willSuspendThreads;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         if (!_threads[i])
-        {
             continue;
-        }
 
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
         {
             if (threadDesc->GetTask() == task)
-            {
                 willSuspendThreads.push_back(threadDesc->GetHandle());
-            }
 
             threadDesc = threadDesc->GetThreadNext();
         }
     }
 
-    for (size_t i = 0; i < willSuspendThreads.size(); i++)
+    for (size_t i = 0; i < willSuspendThreads.size(); ++i)
     {
         if (Suspend(willSuspendThreads[i]) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -592,9 +575,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
         threadDesc = threadDesc->GetGroupThreadNext();
 
         if (Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -602,7 +583,7 @@ int LLBC_ThreadManager::SuspendGroup(LLBC_Handle handle)
 
 int LLBC_ThreadManager::SuspendAll()
 {
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
@@ -611,9 +592,7 @@ int LLBC_ThreadManager::SuspendAll()
             threadDesc = threadDesc->GetThreadNext();
 
             if (Suspend(tmpThreadDesc->GetHandle()) != LLBC_OK)
-            {
                 return LLBC_FAILED;
-            }
         }
     }
 
@@ -650,9 +629,7 @@ int LLBC_ThreadManager::Resume(LLBC_Handle handle)
 
     int rtn = LLBC_ResumeThread(threadDesc->GetNativeHandle());
     if (rtn == LLBC_OK)
-    {
         threadDesc->SetState(LLBC_ThreadState::Running);
-    }
 
     return rtn;
 }
@@ -668,31 +645,25 @@ int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
     LLBC_LockGuard guard(_lock);
 
     std::vector<LLBC_Handle> willResumeThreads;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         if (!_threads[i])
-        {
             continue;
-        }
 
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
         {
             if (threadDesc->GetTask() == task)
-            {
                 willResumeThreads.push_back(threadDesc->GetHandle());
-            }
 
             threadDesc = threadDesc->GetThreadNext();
         }
     }
 
-    for (size_t i = 0; i < willResumeThreads.size(); i++)
+    for (size_t i = 0; i < willResumeThreads.size(); ++i)
     {
         if (Resume(willResumeThreads[i]) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -724,9 +695,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
         threadDesc = threadDesc->GetGroupThreadNext();
 
         if (Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -734,7 +703,7 @@ int LLBC_ThreadManager::ResumeGroup(LLBC_Handle handle)
 
 int LLBC_ThreadManager::ResumeAll()
 {
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
@@ -743,9 +712,7 @@ int LLBC_ThreadManager::ResumeAll()
             threadDesc = threadDesc->GetThreadNext();
 
             if (Resume(tmpThreadDesc->GetHandle()) != LLBC_OK)
-            {
                 return LLBC_FAILED;
-            }
         }
     }
 
@@ -782,9 +749,7 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
         LLBC_JoinThread(threadDesc->GetNativeHandle());
 #if LLBC_TARGET_PLATFORM_WIN32
         if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
-        {
             ::CloseHandle(threadDesc->GetNativeHandle());
-        }
 #endif
         RemoveThreadDescriptor(handle);
     }
@@ -803,31 +768,25 @@ int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
     LLBC_LockGuard guard(_lock);
 
     std::vector<LLBC_Handle> willCancelTasks;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         if (!_threads[i])
-        {
             continue;
-        }
 
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
         {
             if (threadDesc->GetTask() == task)
-            {
                 willCancelTasks.push_back(threadDesc->GetHandle());
-            }
 
             threadDesc = threadDesc->GetThreadNext();
         }
     }
 
-    for (size_t i = 0; i < willCancelTasks.size(); i++)
+    for (size_t i = 0; i < willCancelTasks.size(); ++i)
     {
         if (Cancel(willCancelTasks[i]) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -859,9 +818,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
         threadDesc = threadDesc->GetGroupThreadNext();
 
         if (Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -869,7 +826,7 @@ int LLBC_ThreadManager::CancelGroup(LLBC_Handle handle)
 
 int LLBC_ThreadManager::CancelAll()
 {
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
@@ -878,9 +835,7 @@ int LLBC_ThreadManager::CancelAll()
             threadDesc = threadDesc->GetThreadNext();
 
             if (Cancel(tmpThreadDesc->GetHandle()) != LLBC_OK)
-            {
                 return LLBC_FAILED;
-            }
         }
     }
 
@@ -925,31 +880,25 @@ int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
     LLBC_LockGuard guard(_lock);
 
     std::vector<LLBC_Handle> willCancelTasks;
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         if (!_threads[i])
-        {
             continue;
-        }
 
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
         {
             if (threadDesc->GetTask() == task)
-            {
                 willCancelTasks.push_back(threadDesc->GetHandle());
-            }
 
             threadDesc = threadDesc->GetThreadNext();
         }
     }
 
-    for (size_t i = 0; i < willCancelTasks.size(); i++)
+    for (size_t i = 0; i < willCancelTasks.size(); ++i)
     {
         if (Kill(willCancelTasks[i], signum) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -991,7 +940,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
 
 int LLBC_ThreadManager::KillAll(int signum)
 {
-    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; i++)
+    for (int i = 0; i < LLBC_CFG_THREAD_MAX_THREAD_NUM; ++i)
     {
         LLBC_ThreadDescriptor *threadDesc = _threads[i];
         while (threadDesc)
@@ -1000,9 +949,7 @@ int LLBC_ThreadManager::KillAll(int signum)
             threadDesc = threadDesc->GetThreadNext();
 
             if (Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
-            {
                 return LLBC_FAILED;
-            }
         }
     }
 
@@ -1026,9 +973,7 @@ void LLBC_ThreadManager::OnThreadTerminate(LLBC_Handle handle)
     {
 #if LLBC_TARGET_PLATFORM_WIN32
         if (threadDesc->GetFlags() | LLBC_ThreadFlag::Joinable)
-        {
             ::CloseHandle(threadDesc->GetNativeHandle());
-        }
 #endif
 
         RemoveThreadDescriptor(threadDesc->GetHandle());

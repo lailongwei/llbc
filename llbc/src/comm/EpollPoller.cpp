@@ -163,7 +163,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     LLBC_EpollEvent *evs = 
         reinterpret_cast<LLBC_EpollEvent *>(ev.un.monitorEv + sizeof(int));
 
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
         const LLBC_EpollEvent &ev = evs[i];
         if (HandleConnecting(ev.data.fd, ev.events))

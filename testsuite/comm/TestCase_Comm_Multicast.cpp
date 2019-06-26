@@ -160,7 +160,7 @@ void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
 
 int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_IService *svc)
 {
-    for (int i = 0; i < _clientCnt; i++)
+    for (int i = 0; i < _clientCnt; ++i)
     {
         const int sessionId = svc->Connect(_runIp.c_str(), _runPort);
         if (sessionId == 0)

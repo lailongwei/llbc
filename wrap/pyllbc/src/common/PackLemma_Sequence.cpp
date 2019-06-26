@@ -210,7 +210,7 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
     else
         seq = PyTuple_New(len);
 
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; ++i)
     {
         Base *lemma = _lemmas.at(lemmasCount > 1 ? i : 0);
         PyObject *elem = lemma->Read(stream);
@@ -259,7 +259,7 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
     llbcStream.WriteSInt32(len);
 #endif
 
-    for (Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < len; ++i)
     {
         Base *lemma = _lemmas.at(lemmaCount > 1 ? i : 0);
         PyObject *elem = PySequence_ITEM(values, i);

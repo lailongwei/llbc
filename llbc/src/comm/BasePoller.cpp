@@ -53,7 +53,8 @@ This::_Handler This::_handlers[LLBC_PollerEvent::End] =
     &This::HandleEv_Send,
     &This::HandleEv_Close,
     &This::HandleEv_Monitor,
-    &This::HandleEv_TakeOverSession
+    &This::HandleEv_TakeOverSession,
+    &This::HandleEv_CtrlProtocolStack
 };
 
 LLBC_BasePoller::LLBC_BasePoller()
@@ -227,7 +228,10 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
 {
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
+    {
+        LLBC_XFree(ev.un.closeReason);
         return;
+    }
 
     LLBC_SessionCloseInfo *closeInfo = 
         LLBC_New1(LLBC_SessionCloseInfo, ev.un.closeReason);
@@ -249,6 +253,25 @@ void LLBC_BasePoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
 {
     AddSession(ev.un.session);
+}
+
+void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
+{
+    _Sessions::iterator it = _sessions.find(ev.sessionId);
+    if (it == _sessions.end())
+    {
+        LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
+        return;
+    }
+
+    LLBC_Session *session = it->second;
+    LLBC_Variant ctrlData;
+    LLBC_Stream ctrlDataStream(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
+    ASSERT(ctrlDataStream.Read(ctrlData) && "llbc library internal error: deserialize protocol stack control data failed!");
+
+    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+
+    LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
 }
 
 LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, LLBC_Session *acceptSession)

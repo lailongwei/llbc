@@ -93,7 +93,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
 
     // Cancel hash.
     Iter it = Begin(), endIt = End();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         it.Elem()->CancelHash();
     }
@@ -106,7 +106,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
 
     // ReHash.
     it = Begin();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         it.Elem()->Hash(_bucket, _bucketSize);
     }
@@ -416,7 +416,7 @@ LLBC_Object *LLBC_Dictionary::Clone() const
 
     // Clone all elements.
     ConstIter it = Begin(), endIt = End();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         LLBC_Object *cloneObj = ((Obj *)*it)->Clone();
         if (it.IsIntKey())
@@ -463,7 +463,7 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
     LLBC_STREAM_WRITE(static_cast<uint64>(_size));
 
     ConstIter it = Begin(), endIt = End();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         const LLBC_DictionaryElem *elem = it.Elem();
 
@@ -503,7 +503,7 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
 
     uint64 size = 0;
     LLBC_STREAM_READ(size);
-    for (uint64 i = 0; i < size; i++)
+    for (uint64 i = 0; i < size; ++i)
     {
         uint8 intKeyFlag = 0;
         LLBC_STREAM_READ(intKeyFlag);

@@ -32,7 +32,7 @@ class TestCase_Com_SafeConsole : ITestCase
         SafeConsole.WriteLine("Default foreground color: {0}", SafeConsole.foregroundColor);
         SafeConsole.WriteLine("Default background color: {0}", SafeConsole.backgroundColor);
 
-        for (int i = 0x00; i < 0x10; i++)
+        for (int i = 0x00; i < 0x10; ++i)
         {
             SafeConsole.WriteLine("Set foreground color to: {0}", (ConsoleColor)i);
             SafeConsole.foregroundColor = (ConsoleColor)i;

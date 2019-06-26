@@ -63,6 +63,11 @@ const LLBC_IProtocol::Coders *LLBC_IProtocol::GetCoders() const
     return _coders;
 }
 
+bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
+{
+    return true;
+}
+
 void LLBC_IProtocol::SetSession(LLBC_Session *session)
 {
     _session = session;

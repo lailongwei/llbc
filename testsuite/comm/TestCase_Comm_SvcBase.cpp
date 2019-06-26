@@ -261,7 +261,7 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     // Try to connect.
     const int clientCount = 10;
     LLBC_PrintLine("Create %d clients to connet to this listen session", clientCount);
-    for (int i = 0; i < clientCount; i++)
+    for (int i = 0; i < clientCount; ++i)
         _svc->AsyncConn(ip, port);
 }
 
@@ -289,7 +289,7 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
         clientCount = 50;
 
     LLBC_PrintLine("Async connect to %s:%d", ip, port);
-    for (int i = 0; i < clientCount; i++)
+    for (int i = 0; i < clientCount; ++i)
         _svc->AsyncConn(ip, port);
 }
 

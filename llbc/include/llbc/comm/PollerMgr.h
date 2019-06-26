@@ -35,6 +35,7 @@ class LLBC_Packet;
 class LLBC_Socket;
 class LLBC_IService;
 class LLBC_BasePoller;
+class LLBC_IProtocolFactory;
 
 __LLBC_NS_END
 
@@ -78,32 +79,35 @@ public:
 public:
     /**
      * Listen in specified local address(call by service).
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number. 
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number. 
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Listen(const char *ip, uint16 port);
+    int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory);
 
     /**
      * Connect to peer address(call by service).
-     * @param[in] ip   - the ip address.
-     * @param[in] port - the port number. 
+     * @param[in] ip           - the ip address.
+     * @param[in] port         - the port number. 
+     * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Connect(const char *ip, uint16 port);
+    int Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory);
 
     /**
      * Asynchronous connect to peer address(call by service).
      * @param[in] ip   -              the ip address.
      * @param[in] port -              the port number. 
      * @param[out] pendingSessionId - pending sessionId, when return 0, this output parameter will assign the session Id, otherwise set to 0.
+     * @param[in] protoFactory      - the protocol factory, default use service protocol factory.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established, 
      *                     it only means post async-conn request to poller success.
      */
-    int AsyncConn(const char *ip, uint16 port, int &pendingSessionId);
+    int AsyncConn(const char *ip, uint16 port, int &pendingSessionId, LLBC_IProtocolFactory *protoFactory);
 
     /**
      * Send packet.
@@ -118,6 +122,15 @@ public:
 	 * @param[in] reason    - the session close reason, default is NULL.
      */
     void Close(int sessionId, const char *reason = NULL);
+
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlType  - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    void CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
 
 private:
     /**

@@ -174,7 +174,7 @@ void LLBC_Semaphore::Post(int count)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    for(int i = 0; i < count; i ++)
+    for(int i = 0; i < count; ++i)
     {
  #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
         sem_post(&_sem);

@@ -346,7 +346,7 @@ namespace llbc
             }
 
             _opcodes = new List<int>();
-            for (int i = 0; i < coders.Length; i++)
+            for (int i = 0; i < coders.Length; ++i)
             {
                 int opcode = RegHolderCollector.GetCoderOpcode(coders[i]);
                 if (_opcodes.Contains(opcode))
@@ -1183,7 +1183,7 @@ namespace llbc
             unsafe
             {
                 int* ptr = (int*)unmanagedSessionIds.ToPointer();
-                for (int i = 0; i < sessionIds.Count; i++)
+                for (int i = 0; i < sessionIds.Count; ++i)
                     *(ptr + i) = sessionIds[i];
             }
 
@@ -1490,7 +1490,7 @@ namespace llbc
             #region llbc native library facade interfaces
             public void OnInit()
             {
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -1505,7 +1505,7 @@ namespace llbc
 
             public void OnDestroy()
             {
-                for (int i = _facades.Count - 1; i >= 0; i--)
+                for (int i = _facades.Count - 1; i >= 0; --i)
                 {
                     try
                     {
@@ -1520,7 +1520,7 @@ namespace llbc
 
             public void OnStart()
             {
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -1535,7 +1535,7 @@ namespace llbc
 
             public void OnStop()
             {
-                for (int i = _facades.Count - 1; i >= 0; i--)
+                for (int i = _facades.Count - 1; i >= 0; --i)
                 {
                     try
                     {
@@ -1550,7 +1550,7 @@ namespace llbc
 
             public void OnUpdate()
             {
-                for (int i = 0; i < _overridedOnUpdateFacades.Count; i++)
+                for (int i = 0; i < _overridedOnUpdateFacades.Count; ++i)
                 {
                     try
                     {
@@ -1565,7 +1565,7 @@ namespace llbc
 
             public void OnIdle(int idleTime)
             {
-                for (int i = 0; i < _overridedOnIdleFacades.Count; i++)
+                for (int i = 0; i < _overridedOnIdleFacades.Count; ++i)
                 {
                     try
                     {
@@ -1596,7 +1596,7 @@ namespace llbc
 
                 SessionInfo sessionInfo =
                     new SessionInfo(isListen, sessionId, acceptSessionId, socketHandle, localEndPoint, remoteEndPoint);
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -1642,7 +1642,7 @@ namespace llbc
 
                 SessionDestroyInfo destroyInfo =
                     new SessionDestroyInfo(sessionInfo, fromSvc, managedReason, errNo, subErrNo);
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -1669,7 +1669,7 @@ namespace llbc
                 AsyncConnResult asyncConnResult =
                     new AsyncConnResult(connected, managedReason, remoteEndPoint);
 
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -1695,7 +1695,7 @@ namespace llbc
                                                          (ProtoReportLevel)level,
                                                          managedReport);
 
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                     _facades[i].OnProtoReport(reportInfo);
             }
 
@@ -1712,7 +1712,7 @@ namespace llbc
                 Packet packet = new Packet(
                     _svc, sessionId, opcode, dataStream, dataLen, status, data.ToInt64());
 
-                for (int i = 0; i < _facades.Count; i++)
+                for (int i = 0; i < _facades.Count; ++i)
                 {
                     try
                     {
@@ -2113,7 +2113,7 @@ namespace llbc
                     return null;
 
                 int packetCount = packets.Count;
-                for (int i = 0; i < packetCount; i++)
+                for (int i = 0; i < packetCount; ++i)
                 {
                     Packet packet = packets[i];
                     if (packet.nativeDataPtr == nativeDataPtr)
@@ -2150,7 +2150,7 @@ namespace llbc
                     return;
 
                 int packetCount = packets.Count;
-                for (int i = 0; i < packetCount; i++)
+                for (int i = 0; i < packetCount; ++i)
                 {
                     if (packets[i].nativeDataPtr == nativeDataPtr)
                     {

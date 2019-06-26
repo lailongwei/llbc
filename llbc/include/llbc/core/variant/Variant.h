@@ -129,6 +129,15 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Variant
 {
 public:
+/**
+ * \brief The unually used const variables define.
+ */
+    static const LLBC_Variant nil;
+
+public:
+    /**
+     * Variant embedded data types typedef.
+     */
     typedef LLBC_String Str;
 
     typedef std::map<LLBC_Variant, LLBC_Variant> Dict;

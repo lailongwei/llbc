@@ -96,7 +96,7 @@ void LLBC_SelectPoller::Svc()
         {
 #if LLBC_TARGET_PLATFORM_WIN32
             // In WIN32 platform, the fd_set use {int fd_array[]; int count} way to implement.
-            for (uint32 i = 0; i < excepts.fd_count; i++)
+            for (uint32 i = 0; i < excepts.fd_count; ++i)
             {
                 LLBC_Session *session = 
                     _sockets.find(excepts.fd_array[i])->second;
@@ -112,7 +112,7 @@ void LLBC_SelectPoller::Svc()
                 session->OnClose(NULL, closeInfo);
             }
 
-            for (uint32 i = 0; i < reads.fd_count; i++)
+            for (uint32 i = 0; i < reads.fd_count; ++i)
             {
                 LLBC_Session *session = 
                     _sockets.find(reads.fd_array[i])->second;
@@ -122,7 +122,7 @@ void LLBC_SelectPoller::Svc()
                     session->OnRecv();
             }
 
-            for (uint32 i = 0; i < writes.fd_count; i++)
+            for (uint32 i = 0; i < writes.fd_count; ++i)
             {
                 _Sockets::iterator it = _sockets.find(writes.fd_array[i]);
                 if (it != _sockets.end())

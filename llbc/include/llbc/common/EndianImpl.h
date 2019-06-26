@@ -32,7 +32,7 @@ inline void LLBC_ReverseBytes(T &val)
 
     uint8 *ptr = reinterpret_cast<uint8 *>(&val);
     const uint8 *copyPtr = reinterpret_cast<const uint8 *>(&copyVal);
-    for (register size_t i = 0; i < sizeof(T); i++)
+    for (size_t i = 0; i < sizeof(T); ++i)
         ptr[i] = copyPtr[sizeof(T) - i - 1];
 }
 

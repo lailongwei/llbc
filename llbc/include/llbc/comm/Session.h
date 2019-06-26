@@ -100,7 +100,7 @@ private:
 /**
  * \brief The session class encapsulation.
  */
-class LLBC_HIDDEN LLBC_Session
+class LLBC_EXPORT LLBC_Session
 {
 public:
     /**
@@ -258,6 +258,14 @@ public:
      * @return bool - return false if success, otherwise return false(if failed, this method will perform OnClose() op).
      */
     bool OnRecved(LLBC_MessageBlock *block);
+
+public:
+    /**
+     * Control session protocol stack.
+     * @param[in] ctrlType  - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
+     */
+    void CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData);
 
 private:
     int _id;

@@ -105,7 +105,7 @@ PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
 
     size_t idx = 0;
     PyObject *values = PyTuple_New(_lemmas.size());
-    for (; idx < _lemmas.size(); idx++)
+    for (; idx < _lemmas.size(); ++idx)
     {
         PyObject *value;
         Base *lemma = _lemmas[idx];
@@ -160,7 +160,7 @@ int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
         return LLBC_FAILED;
     }
 
-    for (Py_ssize_t i = 0; i < seqSize; i++)
+    for (Py_ssize_t i = 0; i < seqSize; ++i)
     {
         Base *lemma = _lemmas.at(i);
         PyObject *obj = PySequence_GetItem(values, i);

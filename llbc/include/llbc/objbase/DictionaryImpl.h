@@ -27,29 +27,23 @@ template <typename _Fn1>
 void LLBC_Dictionary::Foreach(_Fn1 &fn)
 {
     Iter it = this->Begin();
-    for (; it != this->End(); it++)
-    {
+    for (; it != this->End(); ++it)
         fn(it.Elem());
-    }
 }
 
 template <typename _Fn1>
 void LLBC_Dictionary::Foreach(_Fn1 &fn) const
 {
     ConstIter it = this->Begin();
-    for (; it != this->End(); it++)
-    {
+    for (; it != this->End(); ++it)
         fn(it.Elem());
-    }
 }
 
 template <typename _Fn2>
 void LLBC_Dictionary::Sort(_Fn2 &fn)
 {
     if (this->GetSize() < 2)
-    {
         return;
-    }
 
     for (LLBC_DictionaryElem *elem = _head->GetElemNext() ; elem != NULL;)
     {

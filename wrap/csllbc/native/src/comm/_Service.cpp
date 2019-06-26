@@ -188,7 +188,7 @@ int csllbc_Service_Multicast(csllbc_Service *svc,
                              int status)
 {
     LLBC_SessionIdList sessionIdList(sessionIdCount);
-    for (int idx = 0; idx < sessionIdCount; idx++)
+    for (int idx = 0; idx < sessionIdCount; ++idx)
         sessionIdList.push_back(sessionIds[idx]);
 
     LLBC_XFree(sessionIds);

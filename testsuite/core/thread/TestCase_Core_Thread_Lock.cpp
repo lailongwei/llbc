@@ -40,7 +40,7 @@ static int ThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"thread [" <<threadIndex <<"]" <<" begin call lock" <<std::endl;
     __g_outLock.Unlock();
-    for(int i = 0; i < 500000; i ++)
+    for(int i = 0; i < 500000; ++i)
     {
         threadArg->lock->Lock();
         threadArg->val ++;
@@ -76,7 +76,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"Test SimpleLock ..." <<std::endl;
     threadArg->lock = LLBC_New0(LLBC_SimpleLock);
     threadArg->val = 0;
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         char *buf = reinterpret_cast<char *>(malloc(sizeof(int) + sizeof(__LLBC_Thread_Test_Arg *)));
 
@@ -85,7 +85,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
         LLBC_CreateThread(&handles[i], &ThreadProc, buf);
     }
 
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         LLBC_JoinThread(handles[i]);
     }
@@ -96,7 +96,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"Test RecursiveLock ..." <<std::endl;
     threadArg->lock = LLBC_New0(LLBC_RecursiveLock);
     threadArg->val = 0;
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         char *buf = reinterpret_cast<char *>(malloc(sizeof(int) + sizeof(__LLBC_Thread_Test_Arg *)));
 
@@ -105,7 +105,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
         LLBC_CreateThread(&handles[i], &ThreadProc, buf);
     }
 
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         LLBC_JoinThread(handles[i]);
     }
@@ -116,7 +116,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"Test FastLock ..." <<std::endl;
     threadArg->lock = LLBC_New0(LLBC_FastLock);
     threadArg->val = 0;
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         char *buf = reinterpret_cast<char *>(malloc(sizeof(int) + sizeof(__LLBC_Thread_Test_Arg *)));
 
@@ -125,7 +125,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
         LLBC_CreateThread(&handles[i], &ThreadProc, buf);
     }
 
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         LLBC_JoinThread(handles[i]);
     }
@@ -136,7 +136,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"Test SpinLock ..." <<std::endl;
     threadArg->lock = new LLBC_SpinLock;
     threadArg->val = 0;
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         char *buf = reinterpret_cast<char *>(malloc(sizeof(int) + sizeof(__LLBC_Thread_Test_Arg *)));
 
@@ -145,7 +145,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
         LLBC_CreateThread(&handles[i], &ThreadProc, buf);
     }
 
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         LLBC_JoinThread(handles[i]);
     }
@@ -156,7 +156,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"Test DummyLock ..." <<std::endl;
     threadArg->lock = LLBC_New0(LLBC_DummyLock);
     threadArg->val = 0;
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         char *buf = reinterpret_cast<char *>(malloc(sizeof(int) + sizeof(__LLBC_Thread_Test_Arg *)));
 
@@ -165,7 +165,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
         LLBC_CreateThread(&handles[i], &ThreadProc, buf);
     }
 
-    for(int i = 0; i < __g_threads_num; i ++)
+    for(int i = 0; i < __g_threads_num; ++i)
     {
         LLBC_JoinThread(handles[i]);
     }

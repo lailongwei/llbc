@@ -148,7 +148,7 @@ int LLBC_Ini::LoadFromContent(const LLBC_String &content)
 
     LLBC_String sectionName;
     const LLBC_Strings lines = content.split("\n");
-    for (size_t i = 0; i < lines.size(); i++)
+    for (size_t i = 0; i < lines.size(); ++i)
     {
         if (ParseLine(lines[i], i + 1, sectionName) != LLBC_OK)
             return LLBC_FAILED;
@@ -489,7 +489,7 @@ int LLBC_Ini::Split(const LLBC_String &str,
 
     bool foundSep = false;
     const size_t len = str.length();
-    for (size_t pos = 0; pos < str.length(); pos++)
+    for (size_t pos = 0; pos < str.length(); ++pos)
     {
         const char ch = str[pos];
         if (ch == EscapeChar)
@@ -547,7 +547,7 @@ int LLBC_Ini::UnEscape(LLBC_String &str,
     if (str.empty())
         return LLBC_OK;
 
-    for (size_t i = 0; i < str.length(); i++)
+    for (size_t i = 0; i < str.length(); ++i)
     {
         if (str[i] != EscapeChar)
             continue;

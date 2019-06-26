@@ -142,7 +142,7 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
 
     const char *str = expr.c_str();
     const LLBC_String::size_type len = expr.length();
-    for (LLBC_String::size_type i = 0; i < len; i++)
+    for (LLBC_String::size_type i = 0; i < len; ++i)
     {
         char ch = str[i];
         char nextCh = i + 1 < len ? str[i + 1] : '\0';

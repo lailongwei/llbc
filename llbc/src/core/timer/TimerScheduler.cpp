@@ -50,7 +50,7 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 
     const size_t size = _heap.GetSize();
     const _Heap::Container &elems = _heap.GetData();
-    for (size_t i = 1; i <= size; i++)
+    for (size_t i = 1; i <= size; ++i)
     {
         LLBC_TimerData *data = const_cast<LLBC_TimerData *>(elems[i]);
         if (data->validate)
@@ -247,7 +247,7 @@ void LLBC_TimerScheduler::CancelAll()
 
     const size_t size = _heap.GetSize();
     _Heap::Container copyElems(_heap.GetData());
-    for (size_t i = 1; i <= size; i++)
+    for (size_t i = 1; i <= size; ++i)
     {
         LLBC_TimerData *data = copyElems[i];
         if (UNLIKELY(!data->validate))

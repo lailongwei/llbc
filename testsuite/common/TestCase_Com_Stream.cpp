@@ -145,9 +145,9 @@ static void STLContainersSerializeTest()
     nestingVec.push_back( std::vector<int>() );
     nestingVec.push_back( std::vector<int>() );
     nestingVec.push_back( std::vector<int>() );
-    for(size_t i = 0; i < nestingVec.size(); i ++)
+    for(size_t i = 0; i < nestingVec.size(); ++i)
     {
-        for(int j = 0; j < 3; j ++)
+        for(int j = 0; j < 3; ++j)
         {
             nestingVec[i].push_back(j + 1);
         }
@@ -243,7 +243,7 @@ static LLBC_String ToStringVec(const std::vector<int> &vec)
     }
     else
     {
-        for(size_t i = 0; i < vec.size(); i ++)
+        for(size_t i = 0; i < vec.size(); ++i)
         {
             out.append_format("%d", vec[i]);
             if(i != vec.size() - 1)
@@ -266,7 +266,7 @@ static LLBC_String ToStringNestingVec(const std::vector<std::vector<int> > &vec)
     else
     {
         out.append_format( "{%d|", vec.size() );
-        for(size_t i = 0; i < vec.size(); i ++)
+        for(size_t i = 0; i < vec.size(); ++i)
         {
             out.append_format( "{%s}", ToStringVec(vec[i]).c_str() );
             if(i != vec.size() - 1)

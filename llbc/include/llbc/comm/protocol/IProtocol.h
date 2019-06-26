@@ -95,6 +95,15 @@ public:
      */
     virtual int Recv(void *in, void *&out, bool &removeSession) = 0;
 
+public:
+    /**
+     * Control protocol layer.
+     * @param[in] ctrlType - the stack control type(user defined).
+     * @param[in] ctrlData - the stack control data(user defined).
+     * @return bool - return true if need continue control, otherwise stop ctrl other layers.
+     */
+    virtual bool Ctrl(int ctrlType, const LLBC_Variant &ctrlData);
+
 protected:
     /**
      * Get session Id.

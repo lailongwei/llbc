@@ -29,6 +29,7 @@
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/PollerMgr.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -105,7 +106,7 @@ int LLBC_PollerMgr::Start(int count)
     ::memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
 
     // Create pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
         _pollers[i] = LLBC_BasePoller::Create(_type);
         _pollers[i]->SetPollerId(i);
@@ -115,7 +116,7 @@ int LLBC_PollerMgr::Start(int count)
     }
 
     // Startup all pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
         _pollers[i]->Start();
 
     // Process pending sockets.
@@ -146,7 +147,7 @@ void LLBC_PollerMgr::Stop()
 
     if (_pollers)
     {
-        for (int i = 0; i < _pollerCount; i++)
+        for (int i = 0; i < _pollerCount; ++i)
             LLBC_Delete(_pollers[i]);
         LLBC_XFree(_pollers);
         _pollerCount = 0;
@@ -155,7 +156,7 @@ void LLBC_PollerMgr::Stop()
     _maxSessionId = 1;
 }
 
-int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
+int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_SockAddr_IN local;
     if (This::GetAddr(ip, port, local) != LLBC_OK)
@@ -176,6 +177,9 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
     }
 
     const int sessionId = AllocSessionId();
+    if (protoFactory)
+        _svc->AddSessionProtocolFactory(sessionId, protoFactory);
+
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAddSockEv(sessionId, sock));
@@ -185,7 +189,7 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port)
     return sessionId;
 }
 
-int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
+int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
@@ -205,6 +209,8 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
     sock->SetNonBlocking();
 
     const int sessionId = AllocSessionId();
+    if (protoFactory)
+        _svc->AddSessionProtocolFactory(sessionId, protoFactory);
 
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
@@ -215,7 +221,7 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port)
     return sessionId;
 }
 
-int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId)
+int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId, LLBC_IProtocolFactory *protoFactory)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
@@ -225,6 +231,9 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId
     }
 
     const int sessionId = AllocSessionId();
+    if (protoFactory)
+        _svc->AddSessionProtocolFactory(sessionId, protoFactory);
+
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAsyncConnEv(sessionId, peer));
@@ -246,6 +255,11 @@ int LLBC_PollerMgr::Send(LLBC_Packet *packet)
 void LLBC_PollerMgr::Close(int sessionId, const char *reason)
 {
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
+}
+
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+{
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData));
 }
 
 int LLBC_PollerMgr::AllocSessionId()

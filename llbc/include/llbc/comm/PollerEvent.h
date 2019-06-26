@@ -59,6 +59,8 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         // Take over session request, once poller found it can't process the new session,
         // poller will create this event and post to appropriate brother.
         TakeOverSession,
+        // Control protocol stack, generate by Service layer.
+        CtrlProtocolStack,
 
         // Sentinel.
         End
@@ -74,6 +76,12 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         LLBC_Session *session;
         char *monitorEv;
         char *closeReason;
+        struct
+        {
+            int ctrlType;
+            void *ctrlData;
+            size_t ctrlDataLen;
+        } protocolStackCtrlInfo;
     } un;
 };
 
@@ -129,6 +137,11 @@ public:
 #if LLBC_TARGET_PLATFORM_WIN32
     static LLBC_MessageBlock *BuildTakeOverSocketEv(int sessionId, LLBC_Socket *sock);
 #endif
+
+    /**
+     * Build control protocol stack event.
+     */
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
 
 public:
     /**

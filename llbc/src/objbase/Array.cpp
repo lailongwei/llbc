@@ -90,9 +90,7 @@ LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
     }
 
     if (_size == _capacity)
-    {
         Recapacity(MAX(1, _size * 2));
-    }
 
     LLBC_MemCpy(_objs + n0._idx + 1, 
         _objs + n0._idx, (_size - n0._idx) * sizeof(Obj *));
@@ -161,11 +159,9 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     }
 
     if (_capacity < n0._idx + other._size)
-    {
         Recapacity(n0._idx + other._size);
-    }
 
-    for (difference_type i = n0._idx; i < n1._idx; i++)
+    for (difference_type i = n0._idx; i < n1._idx; ++i)
     {
         _objs[i]->Release();
         _objs[i] = NULL;
@@ -174,10 +170,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     difference_type shift = other._size - (n1._idx - n0._idx);
     LLBC_MemCpy(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
     LLBC_MemCpy(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
-    for (difference_type i = n0._idx; i < n0._idx + other._size; i++)
-    {
+    for (difference_type i = n0._idx; i < n0._idx + other._size; ++i)
         _objs[i]->Retain();
-    }
 
     _size += shift;
 
@@ -188,11 +182,9 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
 {
     size_type erasedCount = 0;
     if (UNLIKELY(o == NULL))
-    {
         return erasedCount;
-    }
 
-    for (difference_type i = _size - 1; i >= 0; i --)
+    for (difference_type i = _size - 1; i >= 0; --i)
     {
         if (_objs[i] == o)
         {
@@ -203,7 +195,7 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
             }
 
             LLBC_MemCpy(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
-            _objs[-- _size] = NULL;
+            _objs[--_size] = NULL;
         }
     }
 
@@ -240,10 +232,8 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
         return End();
     }
 
-    for (difference_type i = n0._idx; i < n1._idx; i++)
-    {
+    for (difference_type i = n0._idx; i < n1._idx; ++i)
         _objs[i]->Release();
-    }
 
     LLBC_MemCpy(_objs + n0._idx, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
     LLBC_MemSet(_objs + _size - (n1._idx - n0._idx), 0, (n1._idx - n0._idx) * sizeof(Obj *));
@@ -362,7 +352,7 @@ LLBC_Array::Obj *LLBC_Array::LastObject()
         return NULL;
     }
 
-    return *(-- End());
+    return *(--End());
 }
 
 LLBC_Array::ConstObj *LLBC_Array::LastObject() const
@@ -373,16 +363,14 @@ LLBC_Array::ConstObj *LLBC_Array::LastObject() const
         return NULL;
     }
 
-    return *(-- End());
+    return *(--End());
 }
 
 LLBC_Array::Obj *LLBC_Array::ObjectAtIndex(difference_type off)
 {
     Iter iter = Begin() + off;
     if (iter >= Begin() && iter < End())
-    {
         return *iter;
-    }
 
     LLBC_SetLastError(LLBC_ERROR_ARG);
     return NULL;
@@ -392,9 +380,7 @@ LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
 {
     ConstIter iter = Begin() + off;
     if (iter >= Begin() && iter < End())
-    {
         return *iter;
-    }
 
     LLBC_SetLastError(LLBC_ERROR_ARG);
     return NULL;
@@ -409,12 +395,10 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
 
     LLBC_Array *arr = LLBC_New0(LLBC_Array);
     IndexSet::const_iterator iter = indexs.begin();
-    for (; iter != indexs.end(); iter++)
+    for (; iter != indexs.end(); ++iter)
     {
         if ((o = ObjectAtIndex(*iter)))
-        {
             arr->PushBack(o);
-        }
     }
 
     LLBC_SetLastError(errNo);
@@ -444,9 +428,7 @@ void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
     LLBC_XRelease(_objFactory);
 
     if ((_objFactory = factory))
-    {
         _objFactory->Retain();
-    }
 }
 
 LLBC_Object *LLBC_Array::Clone() const
@@ -465,7 +447,7 @@ LLBC_Object *LLBC_Array::Clone() const
 
     // Clone all array elements.
     ConstIter it = Begin(), endIt = End();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         LLBC_Object *cloneObj = (*it)->Clone();
         clone->PushBack(cloneObj);
@@ -499,9 +481,7 @@ bool LLBC_Array::DeSerializeEx(LLBC_Stream &s)
 void LLBC_Array::Recapacity(size_type cap)
 {
     if (cap <= _capacity)
-    {
         return;
-    }
 
     _objs = reinterpret_cast<Obj **>(realloc(_objs, cap * sizeof(Obj *)));
     LLBC_MemSet(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
@@ -516,16 +496,12 @@ void LLBC_Array::SerializeInl(LLBC_Stream &s, bool extended) const
     LLBC_STREAM_WRITE(static_cast<uint64>(_size));
 
     ConstIter it = Begin(), endIt = End();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         if (!extended)
-        {
             LLBC_STREAM_WRITE(*it);
-        }
         else
-        {
             LLBC_STREAM_WRITE_EX(*it);
-        }
     }
 
     LLBC_STREAM_END_WRITE();
@@ -534,9 +510,7 @@ void LLBC_Array::SerializeInl(LLBC_Stream &s, bool extended) const
 bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
 {
     if (UNLIKELY(!_objFactory))
-    {
         return false;
-    }
 
     Clear();
 
@@ -545,7 +519,7 @@ bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
     uint64 size = 0;
     LLBC_STREAM_READ(size);
 
-    for (uint64 i = 0; i < size; i++)
+    for (uint64 i = 0; i < size; ++i)
     {
         LLBC_Object *o = _objFactory->CreateObject();
         if (!(!extended ? s.Read(*o) : s.ReadEx(*o)))

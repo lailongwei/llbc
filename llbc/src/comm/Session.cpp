@@ -313,7 +313,7 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
     }
 
     LLBC_Packet *packet;
-    for (size_t i = 0; i < _recvedPackets.size(); i++)
+    for (size_t i = 0; i < _recvedPackets.size(); ++i)
     {
         packet = _recvedPackets[i];
         packet->SetSessionId(_id);
@@ -324,6 +324,15 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
     }
 
     return true;
+}
+
+void LLBC_Session::CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData)
+{
+#if LLBC_CFG_COMM_USE_FULL_STACK
+    (void)_protoStack->CtrlStack(ctrlType, ctrlData);
+#else
+    (void)_protoStack->CtrlStackRaw(ctrlType, ctrlData);
+#endif
 }
 
 __LLBC_NS_END

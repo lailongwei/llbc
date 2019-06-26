@@ -19,57 +19,26 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef __LLBC_TEST_CASE_COMM_PROTO_STACK_CTRL_H__
+#define __LLBC_TEST_CASE_COMM_PROTO_STACK_CTRL_H__
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+#include "llbc.h"
+using namespace llbc;
 
-#include "llbc/comm/PollerType.h"
-
-namespace
+class TestCase_Comm_ProtoStackCtrl : public LLBC_BaseTestCase
 {
-    typedef LLBC_NS LLBC_PollerType This;
-}
+public:
+    TestCase_Comm_ProtoStackCtrl();
+    virtual ~TestCase_Comm_ProtoStackCtrl();
 
-__LLBC_INTERNAL_NS_BEGIN
+public:
+    virtual int Run(int argc, char *argv[]);
 
-static const LLBC_NS LLBC_String __g_descs[] =
-{
-    "SelectPoller",
-#if LLBC_TARGET_PLATFORM_WIN32
-    "IocpPoller",
-#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    "EpollPoller",
-#endif // LLBC_TARGET_PLATFORM_WIN32
+private:
+    void TestCtrlScene(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
 
-    "Invalid"
+private:
+    LLBC_IService *_svc;
 };
 
-__LLBC_INTERNAL_NS_END
-
-__LLBC_NS_BEGIN
-
-bool LLBC_PollerType::IsValid(int type)
-{
-    return (This::Begin <= type && type < This::End);
-}
-
-const LLBC_String &LLBC_PollerType::Type2Str(int type)
-{
-    return LLBC_INL_NS __g_descs[This::IsValid(type) ? type : This::End];
-}
-
-int LLBC_PollerType::Str2Type(const LLBC_String &typeStr)
-{
-    const LLBC_String &lowercased = typeStr.tolower();
-    for (int ty = This::Begin; ty != This::End; ++ty)
-    {
-        if (lowercased == LLBC_INL_NS __g_descs[ty].tolower())
-            return ty;
-    }
-
-    return This::End;
-}
-
-__LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"
+#endif // !__LLBC_TEST_CASE_COMM_PROTO_STACK_CTRL_H__

@@ -44,12 +44,10 @@ void LLBC_Array::Foreach(LLBC_Array::difference_type n0, _Fn1 &fn)
 template <typename _Fn1>
 void LLBC_Array::Foreach(LLBC_Array::Iter n0, LLBC_Array::Iter n1, _Fn1 &fn)
 {
-    for (Iter it = n0; it != n1; it ++)
+    for (Iter it = n0; it != n1; ++it)
     {
         if (!fn(*it))
-        {
             break;
-        }
     }
 }
 
@@ -80,12 +78,10 @@ void LLBC_Array::Foreach(LLBC_Array::difference_type n0, _Fn1 &fn) const
 template <typename _Fn1>
 void LLBC_Array::Foreach(LLBC_Array::ConstIter n0, LLBC_Array::ConstIter n1, _Fn1 &fn) const
 {
-    for (ConstIter it = n0; it != n1; it ++)
+    for (ConstIter it = n0; it != n1; ++it)
     {
         if (!fn(*it))
-        {
             break;
-        }
     }
 }
 
@@ -119,11 +115,9 @@ void LLBC_Array::Sort(LLBC_Array::Iter n0, LLBC_Array::Iter n1, _Fn2 &fn)
     const difference_type begin = n0._idx;
     const difference_type end = n1._idx;
     if (begin == end)
-    {
         return;
-    }
 
-    for (difference_type i = begin + 1; i < end; i ++)
+    for (difference_type i = begin + 1; i < end; ++i)
     {
         Obj *obj = _objs[i];
         difference_type j = i - 1;

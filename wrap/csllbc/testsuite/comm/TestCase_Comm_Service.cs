@@ -591,7 +591,7 @@ class TestCase_Comm_Service : ITestCase
 
             // Self drive 30 seconds
             Console.WriteLine("Loop 300 times...");
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 300; ++i)
                 svc.OnSvc(true);
 
             Console.WriteLine("Press any key to exit External-Drive test...");

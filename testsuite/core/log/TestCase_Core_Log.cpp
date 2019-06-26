@@ -145,7 +145,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     Log.f4<TestCase_Core_Log>("test", "This is a fatal log message(from Log.f4()).");
 
     // Log file delete test.
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 20; ++i)
     {
         LLBC_DEBUG_LOG_SPEC("deltest", "This is a deltest logger message.");
         LLBC_ThreadManager::Sleep(1000);
@@ -155,7 +155,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_PrintLine("Perform preformance test:");
     LLBC_CPUTime begin = LLBC_CPUTime::Current();
     const int loopLmt = 500000;
-    for (int i = 0; i < loopLmt; i++)
+    for (int i = 0; i < loopLmt; ++i)
         LLBC_DEBUG_LOG_SPEC("perftest", "performance test msg");
 
     LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
