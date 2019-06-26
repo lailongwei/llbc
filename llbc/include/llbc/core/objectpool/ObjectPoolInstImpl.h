@@ -55,7 +55,7 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
                     LLBC_ObjectManipulator::Delete<ObjectType>(reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize));
             }
 
-            ::free(_block[blockIdx]);
+            ::free(memBlock);
             delete _memUnitUsageView[blockIdx];
         }
 
