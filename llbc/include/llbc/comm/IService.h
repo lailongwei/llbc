@@ -40,7 +40,6 @@ class LLBC_ICoderFactory;
 class LLBC_IFacadeFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
-class LLBC_IProtocolFilter;
 
 __LLBC_NS_END
 
@@ -441,15 +440,6 @@ public:
 
 public:
     /**
-     * Set protocol filter to service's specified protocol layer.
-     * @param[in] filter  - the protocol filter.
-     * @param[in] toLayer - which layer will add to.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer) = 0;
-
-public:
-    /**
      * Enable/Disable timer scheduler.
      */
     virtual int EnableTimerScheduler() = 0;
@@ -512,14 +502,14 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL) = 0;
 
-public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
-     * Get service protocol stack, only full-stack option disabled available.
+     * Get service codec protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
+     * @param[in] sessionId - the session Id.
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
-    virtual const LLBC_ProtocolStack *GetProtocolStack() const = 0;
+    virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const = 0;
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:
