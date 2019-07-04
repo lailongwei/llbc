@@ -300,7 +300,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Multicast(PyObject *self, PyObject *args)
     const Py_ssize_t sessionCnt = 
         PySequence_Fast_GET_SIZE(fastPySessionIds);
     LLBC_SessionIdList sessionIds(sessionCnt);
-    for (register Py_ssize_t index = 0; index < sessionCnt; index++)
+    for (Py_ssize_t index = 0; index < sessionCnt; ++index)
     {
         PyObject *pySessionId = PySequence_Fast_GET_ITEM(fastPySessionIds, index); // Borrowed reference.
         if (UNLIKELY(!pySessionId))

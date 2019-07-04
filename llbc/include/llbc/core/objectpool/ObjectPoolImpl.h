@@ -28,6 +28,7 @@ __LLBC_NS_BEGIN
 
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
+: LLBC_IObjectPool()
 {
 }
 
@@ -35,7 +36,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
 {
     LLBC_LockGuard guard(_lock);
-    LLBC_STLHelper::DeleteContainer(_poolDict, false, false);
+    LLBC_STLHelper::DeleteContainer(_poolDict, true, false);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -44,18 +45,18 @@ LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType,
 {
     const char *objectType = typeid(ObjectType).name();
 
-    LLBC_IObjectPoolInst *poolInst;
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
     if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        poolInst = _poolDict.insert(std::make_pair(objectType, new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>())).first->second;
+        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
     else
-        poolInst = it->second;
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
 
     _lock.Unlock();
 
-    return reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>* >(poolInst);
+    return poolInst;
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -64,14 +65,14 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 {
     const char *objectType = typeid(ObjectType).name();
 
-    LLBC_IObjectPoolInst *poolInst;
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
     if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        poolInst = _poolDict.insert(std::make_pair(objectType, new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>())).first->second;
+        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
     else
-        poolInst = it->second;
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
 
     _lock.Unlock();
 
@@ -82,7 +83,20 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetGuarded()
 {
-    return LLBC_ObjectGuard<ObjectType>(Get<ObjectType>(), this);
+    const char *objectType = typeid(ObjectType).name();
+
+    LLBC_IObjectPoolInst *poolInst;
+    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+
+    _lock.Lock();
+    if ((it = _poolDict.find(objectType)) == _poolDict.end())
+        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    else
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+
+    _lock.Unlock();
+
+    return LLBC_ObjectGuard<ObjectType>(reinterpret_cast<ObjectType *>(poolInst->Get()), poolInst);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -99,11 +113,11 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolDict.find(objectType)) == _poolDict.end())
+    if (UNLIKELY((it = _poolDict.find(objectType)) == _poolDict.end()))
     {
         _lock.Unlock();
 
-        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        LLBC_SetLastError(LLBC_ERROR_NOT_POOL_OBJECT);
         return LLBC_FAILED;
     }
 

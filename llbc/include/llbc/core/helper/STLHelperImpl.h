@@ -153,10 +153,10 @@ void LLBC_STLHelper::OperateContainer(std::vector<_Ty *> &vec, int opcode, bool 
 
     const SizeType vecSize = vec.size();
     if (!reverse)
-        for (register SizeType i = 0; i < vecSize; i++)
+        for (SizeType i = 0; i < vecSize; ++i)
             LLBC_STLHelper::OperateElem(vec[i], opcode);
     else
-        for (register SizeType i = vecSize - 1; i != SizeType(-1); i--)
+        for (SizeType i = vecSize - 1; i != SizeType(-1); --i)
             LLBC_STLHelper::OperateElem(vec[i], opcode);
 
     if (LIKELY(clear))
@@ -173,10 +173,10 @@ void LLBC_STLHelper::OperateContainer(std::list<_Ty *> &l, int opcode, bool clea
     typedef typename std::list<_Ty *>::reverse_iterator ListReverseIter;
 
     if (!reverse)
-        for (ListIter iter = l.begin(); iter != l.end(); iter++)
+        for (ListIter iter = l.begin(); iter != l.end(); ++iter)
             LLBC_STLHelper::OperateElem(*iter, opcode);
     else
-        for (ListReverseIter riter = l.rbegin(); riter != l.rend(); riter++)
+        for (ListReverseIter riter = l.rbegin(); riter != l.rend(); ++riter)
             LLBC_STLHelper::OperateElem(*riter, opcode);
 
     if (LIKELY(clear))
@@ -193,10 +193,10 @@ void LLBC_STLHelper::OperateContainer(std::deque<_Ty *> &dq, int opcode, bool cl
 
     const SizeType dqSize = dq.size();
     if (!reverse)
-        for (register SizeType i = 0; i < dqSize; i++)
+        for (SizeType i = 0; i < dqSize; ++i)
             LLBC_STLHelper::OperateElem(dq[i], opcode);
     else
-        for (register SizeType i = dqSize - 1; i != SizeType(-1); i--)
+        for (SizeType i = dqSize - 1; i != SizeType(-1); --i)
             LLBC_STLHelper::OperateElem(dq[i], opcode);
 
     if (LIKELY(clear))
@@ -233,13 +233,13 @@ void LLBC_STLHelper::OperateContainer(std::set<_Key *> &s, int opcode, bool clea
     typedef typename std::set<_Key *>::reverse_iterator SetReverseIter;
 
     if (!reverse)
-        for (SetIter iter = s.begin(); iter != s.end(); iter++)
+        for (SetIter iter = s.begin(); iter != s.end(); ++iter)
         {
             _Key * const &elem = *iter;
             LLBC_STLHelper::OperateElem(elem, opcode);
         }
     else
-        for (SetReverseIter riter = s.rbegin(); riter != s.rend(); riter++)
+        for (SetReverseIter riter = s.rbegin(); riter != s.rend(); ++riter)
         {
             _Key * const &elem = *riter;
             LLBC_STLHelper::OperateElem(elem, opcode);
@@ -259,10 +259,10 @@ void LLBC_STLHelper::OperateContainer(std::map<_Key, _Ty *> &m, int opcode, bool
     typedef typename std::map<_Key, _Ty *>::reverse_iterator MapReverseIter;
 
     if (!reverse)
-        for (MapIter iter = m.begin(); iter != m.end(); iter++)
+        for (MapIter iter = m.begin(); iter != m.end(); ++iter)
             LLBC_STLHelper::OperateElem(iter->second, opcode);
     else
-        for (MapReverseIter riter = m.rbegin(); riter != m.rend(); riter++)
+        for (MapReverseIter riter = m.rbegin(); riter != m.rend(); ++riter)
             LLBC_STLHelper::OperateElem(riter->second, opcode);
 
     if (LIKELY(clear))

@@ -148,7 +148,7 @@ int LLBC_Ini::LoadFromContent(const LLBC_String &content)
 
     LLBC_String sectionName;
     const LLBC_Strings lines = content.split("\n");
-    for (size_t i = 0; i < lines.size(); i++)
+    for (size_t i = 0; i < lines.size(); ++i)
     {
         if (ParseLine(lines[i], i + 1, sectionName) != LLBC_OK)
             return LLBC_FAILED;
@@ -175,7 +175,7 @@ int LLBC_Ini::SaveToFile(const LLBC_String &file, const LLBC_Strings &headerLine
 
     for (LLBC_Strings::const_iterator it = headerLines.begin();
          it != headerLines.end();
-         it++)
+         ++it)
     {
         if (f.WriteLine(LLBC_String().append_format("%c %s", CommentBegin, it->c_str())) != LLBC_OK)
             return LLBC_FAILED;
@@ -200,7 +200,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
         sortedSections != NULL ? *sortedSections : _sectionNames;
     for (LLBC_Strings::const_iterator sectionIt = finalSectionNames.begin();
          sectionIt != finalSectionNames.end();
-         sectionIt++)
+         ++sectionIt)
     {
         const LLBC_String &sectionName = *sectionIt;
         content.append_format("%c%s%c", SectionBegin, sectionName.c_str(), SectionEnd);
@@ -214,7 +214,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
         const LLBC_IniSection::_Values &sectionValues = section._values;
         for (LLBC_IniSection::_Values::const_iterator it = sectionValues.begin();
              it != section._values.end();
-             it++)
+             ++it)
             sectionKeys.push_back(it->first);
 
         if (sortKeys)
@@ -222,7 +222,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
 
         for (LLBC_Strings::const_iterator keyIt = sectionKeys.begin();
              keyIt != sectionKeys.end();
-             keyIt++)
+             ++keyIt)
         {
             const LLBC_String &key = *keyIt;
             const LLBC_String escapedKey = Escape(key);
@@ -289,7 +289,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
             LLBC_IniSection &existSection = *it->second;
             for (LLBC_IniSection::_Values::const_iterator sectionIt = section._values.begin();
                 sectionIt != section._values.end();
-                sectionIt++)
+                ++sectionIt)
             {
                 const LLBC_String &key = sectionIt->first;
                 LLBC_IniSection::_Comments::const_iterator commentIt = section._comments.find(key);
@@ -489,7 +489,7 @@ int LLBC_Ini::Split(const LLBC_String &str,
 
     bool foundSep = false;
     const size_t len = str.length();
-    for (size_t pos = 0; pos < str.length(); pos++)
+    for (size_t pos = 0; pos < str.length(); ++pos)
     {
         const char ch = str[pos];
         if (ch == EscapeChar)
@@ -547,7 +547,7 @@ int LLBC_Ini::UnEscape(LLBC_String &str,
     if (str.empty())
         return LLBC_OK;
 
-    for (size_t i = 0; i < str.length(); i++)
+    for (size_t i = 0; i < str.length(); ++i)
     {
         if (str[i] != EscapeChar)
             continue;
@@ -576,7 +576,7 @@ void LLBC_Ini::Copy(const This &another)
     LLBC_STLHelper::DeleteContainer(_sections, true);
     for (_Sections::const_iterator it = another._sections.begin();
          it != another._sections.end();
-         it++)
+         ++it)
         _sections.insert(std::make_pair(it->first, LLBC_New1(LLBC_IniSection, *it->second)));
 }
 

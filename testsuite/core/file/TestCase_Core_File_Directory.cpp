@@ -117,7 +117,7 @@ int TestCase_Core_File_Directory::CreateRemoveTest()
         return LLBC_FAILED;
     }
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; ++i)
     {
         const LLBC_String path = LLBC_String().format("a/b_%d", i);
     LLBC_PrintLine("Create directory: %s", path.c_str());
@@ -345,7 +345,7 @@ int TestCase_Core_File_Directory::MiscTest()
 int TestCase_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
 {
     LLBC_Print("Join [");
-    for (size_t i = 0; i < pathParts.size(); i++)
+    for (size_t i = 0; i < pathParts.size(); ++i)
     {
         LLBC_Print("%s", pathParts[i].c_str());
         if (i != pathParts.size() - 1)
@@ -371,7 +371,7 @@ int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool rec
     }
 
     LLBC_Print("Directory %s files(count: %ld): ", path.c_str(), files.size());
-    for (size_t i = 0; i < files.size(); i++)
+    for (size_t i = 0; i < files.size(); ++i)
     {
         LLBC_Print("%s", files[i].c_str());
         if (i != files.size() - 1)
@@ -395,7 +395,7 @@ int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bo
     }
 
     LLBC_Print("Directory %s subdirectories(count: %ld): ", path.c_str(), directories.size());
-    for (size_t i = 0; i < directories.size(); i++)
+    for (size_t i = 0; i < directories.size(); ++i)
     {
         LLBC_Print("%s", directories[i].c_str());
         if (i != directories.size() - 1)

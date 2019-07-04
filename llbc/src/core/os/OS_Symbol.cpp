@@ -64,7 +64,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
                                                 stack,
                                                 NULL);
 
-    for (WORD frame = 0; frame != frames; frame++)
+    for (WORD frame = 0; frame != frames; ++frame)
     {
         ::SymFromAddr(curProc, (DWORD64)stack[frame], 0, symbol);
         IMAGEHLP_LINE64 &imgHelpLine64 = libTls->coreTls.symbol.win32ImgHelpLine64;
@@ -87,7 +87,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     char **strs = ::backtrace_symbols(stack, frames);
     if (LIKELY(strs))
     {
-        for (int i = skipFrames; i < frames; i++)
+        for (int i = skipFrames; i < frames; ++i)
         {
             backTrace.append_format("#%d ", frames - i - 1);
 

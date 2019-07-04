@@ -113,17 +113,22 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
     return LLBC_OK;
 }
 
+void LLBC_MessageBlock::Clear()
+{
+    _readPos = _writePos = 0;
+}
+
 void LLBC_MessageBlock::Release()
 {
-    if (!_attach && _buf)
-    {
-        LLBC_Free(_buf);
-        _buf = NULL;
-        _size = 0;
+    if (!_buf)
+        return;
 
-        _readPos = 0;
-        _writePos = 0;
-    }
+    if (!_attach)
+        LLBC_Free(_buf);
+    _buf = NULL;
+
+    _size = NULL;
+    _readPos = _writePos = 0;
 }
 
 bool LLBC_MessageBlock::IsAttach() const

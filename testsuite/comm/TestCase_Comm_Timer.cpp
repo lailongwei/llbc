@@ -43,7 +43,7 @@ public:
         longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
         LLBC_Delete(longTimeTimer);
 
-        for(int i = 1; i <=2000000; i++) 
+        for(int i = 1; i <=2000000; ++i) 
         {
             LLBC_Timer *timer = LLBC_New2(LLBC_Timer,
                                           LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),

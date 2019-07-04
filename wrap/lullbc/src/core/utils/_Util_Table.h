@@ -30,7 +30,7 @@ LULLBC_LUA_METH int _lullbc_Util_Table_Concat(lua_State *l)
 
     LLBC_String concatResult;
     size_t tableLen = lua_objlen(l, 1);
-    for (size_t i = 1; i <= tableLen; i++)
+    for (size_t i = 1; i <= tableLen; ++i)
     {
         lua_geti(l, 1, i);
 

@@ -59,6 +59,8 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
+const LLBC_Variant LLBC_Variant::nil;
+
 std::map<int, LLBC_String> LLBC_VariantType::_typeDescs;
 
 const LLBC_String &LLBC_VariantType::Type2Str(int type)
@@ -788,7 +790,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return true;
 
         _holder.obj.dict = LLBC_New0(Dict);
-        for (uint32 i = 0; i < count; i ++)
+        for (uint32 i = 0; i < count; ++i)
         {
             LLBC_Variant key;
             LLBC_Variant val;

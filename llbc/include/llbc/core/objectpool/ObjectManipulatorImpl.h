@@ -41,12 +41,41 @@ inline bool LLBC_ObjectManipulator::Reset(void *obj)
     return ResetObj<ObjectType>(obj, 0);
 }
 
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
 template <typename ObjectType>
 inline bool LLBC_ObjectManipulator::ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *)
 {
     reinterpret_cast<ObjectType *>(obj)->clear();
     return false;
 }
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
+
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear
+template <typename ObjectType>
+inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Clearable_type<ObjectType, &ObjectType::Clear> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->Clear();
+    return false;
+}
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear
+
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
+template <typename ObjectType>
+inline bool LLBC_ObjectManipulator::ResetObj(void *obj, resetable_type<ObjectType, &ObjectType::reset> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->reset();
+    return false;
+}
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
+
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+template <typename ObjectType>
+inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_type<ObjectType, &ObjectType::Reset> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->Reset();
+    return false;
+}
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
 
 template <typename ObjectType>
 inline bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)

@@ -167,7 +167,7 @@ void LLBC_LogFileAppender::Finalize()
 
 int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 {
-    LLBC_LogTokenChain *chain = NULL;
+    LLBC_LogTokenChain *chain;
     if (UNLIKELY(!(chain = GetTokenChain())))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
@@ -345,7 +345,7 @@ void LLBC_LogFileAppender::BackupFiles() const
             break;
     }
 
-    for (int willMoveIndex = availableIndex - 1; willMoveIndex >= 0; willMoveIndex--)
+    for (int willMoveIndex = availableIndex - 1; willMoveIndex >= 0; --willMoveIndex)
     {
         LLBC_String willMove;
         if (willMoveIndex > 0)
@@ -379,7 +379,7 @@ void LLBC_LogFileAppender::UpdateFileBufferInfo()
 int LLBC_LogFileAppender::GetBackupFilesCount(const LLBC_String &logFileName) const
 {
     int backupFilesCount = 0;
-    for (int i = 1; i <= _maxBackupIndex; i++)
+    for (int i = 1; i <= _maxBackupIndex; ++i)
     {
         const LLBC_String bkLogFileName = LLBC_String().format("%s.%d", logFileName.c_str(), i);
         if (!LLBC_File::Exists(bkLogFileName))

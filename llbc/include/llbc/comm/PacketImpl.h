@@ -198,6 +198,82 @@ inline RetType *LLBC_Packet::GetPreHandleResult() const
     return reinterpret_cast<RetType *>(_preHandleResult);
 }
 
+inline int LLBC_Packet::Read(bool &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(sint8 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(uint8 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(sint16 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(uint16 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(sint32 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(uint32 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(long &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(ulong &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(sint64 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(uint64 &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(float &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(double &val)
+{
+    return ReadRawType<>(val);
+}
+
+inline int LLBC_Packet::Read(void *buf, size_t len)
+{
+    if (!_payload)
+    {
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
+    return _payload->Read(buf, len);
+}
+
 template <typename _Ty>
 inline int LLBC_Packet::Read(std::vector<_Ty> &val)
 {
@@ -207,7 +283,7 @@ inline int LLBC_Packet::Read(std::vector<_Ty> &val)
         return LLBC_FAILED;
     }
 
-    for (register uint32 i = 0; i < len; i++)
+    for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
@@ -230,7 +306,7 @@ inline int LLBC_Packet::Read(std::list<_Ty> &val)
         return LLBC_FAILED;
     }
 
-    for (register uint32 i = 0; i < len; i++)
+    for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
@@ -253,7 +329,7 @@ inline int LLBC_Packet::Read(std::deque<_Ty> &val)
         return LLBC_FAILED;
     }
 
-    for (register uint32 i = 0; i < len; i++)
+    for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
@@ -276,7 +352,7 @@ inline int LLBC_Packet::Read(std::set<_Kty> &val)
         return LLBC_FAILED;
     }
 
-    for (register uint32 i = 0; i < len; i++)
+    for (uint32 i = 0; i < len; ++i)
     {
         _Kty key;
         if (this->Read(key) != LLBC_OK)
@@ -299,7 +375,7 @@ inline int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
         return LLBC_FAILED;
     }
 
-    for (register uint32 i = 0; i < len; i++)
+    for (uint32 i = 0; i < len; ++i)
     {
         _Kty key;
         if (this->Read(key) != LLBC_OK)
@@ -342,13 +418,108 @@ inline int LLBC_Packet::Read(_Ty &val)
     return LLBC_OK;
 }
 
+inline int LLBC_Packet::Write(bool val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(sint8 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(uint8 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(sint16 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(uint16 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(sint32 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(uint32 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(long val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(ulong val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(sint64 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(uint64 val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(float val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(double val)
+{
+    return WriteRawType<>(val);
+}
+
+inline int LLBC_Packet::Write(const char *val)
+{
+    if (LIKELY(val))
+    {
+        while (*val != '\0')
+        {
+            Write(val, 1);
+            val += 1;
+        }
+    }
+
+    return Write("\0", 1);
+}
+
+inline int LLBC_Packet::Write(const void *buf, size_t len)
+{
+    if (!_payload)
+        _payload = LLBC_New1(LLBC_MessageBlock, len);
+
+    return _payload->Write(buf, len);
+}
+
+inline int LLBC_Packet::Write(const LLBC_Stream &stream)
+{
+    if (!_payload)
+        _payload = LLBC_New1(LLBC_MessageBlock, stream.GetPos());
+
+    return _payload->Write(stream.GetBuf(), stream.GetPos());
+}
+
 template <typename _Ty>
 inline int LLBC_Packet::Write(const std::vector<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
     const size_t size = val.size();
-    for (register size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < size; ++i)
     {
         this->Write(val[i]);
     }
@@ -364,7 +535,7 @@ inline int LLBC_Packet::Write(const std::list<_Ty> &val)
     typedef typename std::list<_Ty>::const_iterator _Iter;
 
     _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         this->Write(*it);
     }
@@ -378,7 +549,7 @@ inline int LLBC_Packet::Write(const std::deque<_Ty> &val)
     this->Write(static_cast<uint32>(val.size()));
 
     const size_t size = val.size();
-    for (register size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < size; ++i)
     {
         this->Write(val[i]);
     }
@@ -394,7 +565,7 @@ inline int LLBC_Packet::Write(const std::set<_Kty> &val)
     typedef typename std::set<_Kty>::const_iterator _Iter;
 
     _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         this->Write(*it);
     }
@@ -410,7 +581,7 @@ inline int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
     typedef typename std::map<_Kty, _Ty>::const_iterator _Iter;
 
     _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; it++)
+    for (; it != endIt; ++it)
     {
         this->Write(it->first);
         this->Write(it->second);
@@ -467,11 +638,9 @@ inline int LLBC_Packet::ReadRawType(_RawTy &val)
         val = _RawTy();
         return LLBC_FAILED;
     }
+
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    else
-    {
-        LLBC_Net2Host(val);
-    }
+    LLBC_Net2Host(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
     return LLBC_OK;

@@ -102,17 +102,20 @@ project "llbc"
 
     -- files
     files {
+        "../../CHANGELOG",
+        "../../README.md",
         "../../llbc/**.h",
         "../../llbc/**.c",
         "../../llbc/**.cpp",
     }
+
     filter { "system:macosx" }
     files {
         "../../llbc/**.mm",
     }
+    filter {}
 
     -- includedirs
-    filter {}
     includedirs {
         "../../llbc/include",
     }

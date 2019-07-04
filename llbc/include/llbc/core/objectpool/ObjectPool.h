@@ -26,7 +26,6 @@
 
 #include "llbc/core/thread/DummyLock.h"
 
-#include "llbc/core/objectpool/ObjectGuard.h"
 #include "llbc/core/objectpool/IObjectPool.h"
 #include "llbc/core/objectpool/ObjectPoolInst.h"
 
@@ -55,13 +54,6 @@ public:
     ObjectType *Get();
     
     /**
-    * Get pool instance.
-    * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
-    */
-    template <typename ObjectType>
-    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
-
-    /**
      * Get guarded object.
      * @return LLBC_ObjectGuard<Object> - the guarded object.
      */
@@ -76,7 +68,6 @@ public:
     template <typename ObjectType>
     int Release(ObjectType *obj);
 
-public:
     /**
      * Release object.
      * @param[in] objectType - the object type string representation.
@@ -84,6 +75,18 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Release(const char *objectType, void *obj);
+
+public:
+    /**
+    * Get pool instance.
+    * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
+    */
+    template <typename ObjectType>
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPool);
 
 private:
     PoolLockType _lock;

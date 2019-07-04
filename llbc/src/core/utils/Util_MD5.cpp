@@ -375,14 +375,14 @@ LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
     }
 
     MD5GroupDigest digest(_chainingValA, _chainingValB, _chainingValC, _chainingValD);
-    for (size_t i = 0; i < realGroupCnt; i ++)
+    for (size_t i = 0; i < realGroupCnt; ++i)
     {
         MD5Group group(buf, i * MD5Group::GROUP_SIZE);
         group.GenerateDigest(digest);
     }
 
     size_t secondaryGroupCnt = secondaryBufSize / MD5Group::GROUP_SIZE;
-    for (size_t i = 0; i < secondaryGroupCnt; i ++)
+    for (size_t i = 0; i < secondaryGroupCnt; ++i)
     {
         MD5Group group(secondaryBuf, i * MD5Group::GROUP_SIZE);
         group.GenerateDigest(digest);

@@ -106,7 +106,7 @@ int LLBC_PollerMgr::Start(int count)
     ::memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
 
     // Create pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
         _pollers[i] = LLBC_BasePoller::Create(_type);
         _pollers[i]->SetPollerId(i);
@@ -116,13 +116,13 @@ int LLBC_PollerMgr::Start(int count)
     }
 
     // Startup all pollers.
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
         _pollers[i]->Start();
 
     // Process pending sockets.
     for (_PendingAddSocks::iterator it = _pendingAddSocks.begin();
          it != _pendingAddSocks.end();
-         it++)
+         ++it)
          _pollers[it->first % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAddSockEv(it->first, it->second));
     _pendingAddSocks.clear();
@@ -130,7 +130,7 @@ int LLBC_PollerMgr::Start(int count)
     // Process Async-connections.
     for (_PendingAsyncConns::iterator it = _pendingAsyncConns.begin();
          it != _pendingAsyncConns.end();
-         it++)
+         ++it)
         _pollers[it->first % _pollerCount]->Push(
                 LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
     _pendingAsyncConns.clear();
@@ -147,7 +147,7 @@ void LLBC_PollerMgr::Stop()
 
     if (_pollers)
     {
-        for (int i = 0; i < _pollerCount; i++)
+        for (int i = 0; i < _pollerCount; ++i)
             LLBC_Delete(_pollers[i]);
         LLBC_XFree(_pollers);
         _pollerCount = 0;
@@ -257,9 +257,9 @@ void LLBC_PollerMgr::Close(int sessionId, const char *reason)
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
-void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData));
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg));
 }
 
 int LLBC_PollerMgr::AllocSessionId()

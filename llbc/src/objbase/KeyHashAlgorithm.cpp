@@ -104,7 +104,7 @@ LLBC_KeyHashAlgorithm::~LLBC_KeyHashAlgorithm()
     typedef LLBC_KeyHashAlgorithmType _AlgoType;
 
     int curType = _AlgoType::Begin;
-    for(; curType != _AlgoType::End; curType ++)
+    for(; curType != _AlgoType::End; ++curType)
     {
         LLBC_Delete(m_algos[curType]);
     }
@@ -128,7 +128,7 @@ LLBC_KeyHashAlgorithm::SDBMHash::Result_Type
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         // Equivalent to: hash = 65599 * hash + (*buf ++);
         hash = str[i] + (hash << 6) + (hash << 16) - hash;
@@ -147,7 +147,7 @@ LLBC_KeyHashAlgorithm::RSHash::Result_Type
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash = hash * a + (str[i]);
         a *= b;
@@ -164,7 +164,7 @@ LLBC_KeyHashAlgorithm::JSHash::Result_Type
     uint32 hash = 1315423911;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash ^= ((hash << 5) + str[i] + (hash >> 2));
     }
@@ -173,9 +173,9 @@ LLBC_KeyHashAlgorithm::JSHash::Result_Type
 }
 
 LLBC_KeyHashAlgorithm::PJHash::Result_Type
-	LLBC_KeyHashAlgorithm::PJHash::operator ()(
-		LLBC_KeyHashAlgorithm::PJHash::Argument1_Type buf,
-		LLBC_KeyHashAlgorithm::PJHash::Argument2_Type size) const
+    LLBC_KeyHashAlgorithm::PJHash::operator ()(
+        LLBC_KeyHashAlgorithm::PJHash::Argument1_Type buf,
+        LLBC_KeyHashAlgorithm::PJHash::Argument2_Type size) const
 {
     static const uint32 bitsInUInt32 = sizeof(uint32) * 8;
     static const uint32 threeQuarters = bitsInUInt32 * 3 / 4;
@@ -186,7 +186,7 @@ LLBC_KeyHashAlgorithm::PJHash::Result_Type
     uint32 test = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size;i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash = (hash << oneEighth) + str[i];
         if((test = hash & highBits) != 0)
@@ -199,15 +199,15 @@ LLBC_KeyHashAlgorithm::PJHash::Result_Type
 }
 
 LLBC_KeyHashAlgorithm::ELFHash::Result_Type 
-	LLBC_KeyHashAlgorithm::ELFHash::operator ()(
-		LLBC_KeyHashAlgorithm::ELFHash::Argument1_Type buf,
-		LLBC_KeyHashAlgorithm::ELFHash::Argument2_Type size) const
+    LLBC_KeyHashAlgorithm::ELFHash::operator ()(
+        LLBC_KeyHashAlgorithm::ELFHash::Argument1_Type buf,
+        LLBC_KeyHashAlgorithm::ELFHash::Argument2_Type size) const
 {
     uint32 x = 0;
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash = (hash << 4) + str[i];
         if((x = hash & 0xF0000000L) != 0)
@@ -221,15 +221,15 @@ LLBC_KeyHashAlgorithm::ELFHash::Result_Type
 }
 
 LLBC_KeyHashAlgorithm::BKDRHash::Result_Type
-	LLBC_KeyHashAlgorithm::BKDRHash::operator ()(
-		LLBC_KeyHashAlgorithm::BKDRHash::Argument1_Type buf,
-		LLBC_KeyHashAlgorithm::BKDRHash::Argument2_Type size) const
+    LLBC_KeyHashAlgorithm::BKDRHash::operator ()(
+        LLBC_KeyHashAlgorithm::BKDRHash::Argument1_Type buf,
+        LLBC_KeyHashAlgorithm::BKDRHash::Argument2_Type size) const
 {
-	uint32 seed = 131;
+    uint32 seed = 131;
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash = hash * seed + str[i];
     }
@@ -238,14 +238,14 @@ LLBC_KeyHashAlgorithm::BKDRHash::Result_Type
 }
 
 LLBC_KeyHashAlgorithm::DJBHash::Result_Type
-	LLBC_KeyHashAlgorithm::DJBHash::operator ()(
-		LLBC_KeyHashAlgorithm::DJBHash::Argument1_Type buf,
-		LLBC_KeyHashAlgorithm::DJBHash::Argument2_Type size) const
+    LLBC_KeyHashAlgorithm::DJBHash::operator ()(
+        LLBC_KeyHashAlgorithm::DJBHash::Argument1_Type buf,
+        LLBC_KeyHashAlgorithm::DJBHash::Argument2_Type size) const
 {
-	uint32 hash = 5381;
+    uint32 hash = 5381;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         hash += (hash << 5) + str[i];
     }
@@ -254,14 +254,14 @@ LLBC_KeyHashAlgorithm::DJBHash::Result_Type
 }
 
 LLBC_KeyHashAlgorithm::APHash::Result_Type
-	LLBC_KeyHashAlgorithm::APHash::operator ()(
-		LLBC_KeyHashAlgorithm::APHash::Argument1_Type buf,
-		LLBC_KeyHashAlgorithm::APHash::Argument2_Type size) const
+    LLBC_KeyHashAlgorithm::APHash::operator ()(
+        LLBC_KeyHashAlgorithm::APHash::Argument1_Type buf,
+        LLBC_KeyHashAlgorithm::APHash::Argument2_Type size) const
 {
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(register size_t i = 0; i < size; i ++)
+    for(size_t i = 0; i < size; ++i)
     {
         if((i & 1) == 0)
         {

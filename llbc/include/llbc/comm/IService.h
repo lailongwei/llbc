@@ -40,7 +40,6 @@ class LLBC_ICoderFactory;
 class LLBC_IFacadeFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
-class LLBC_IProtocolFilter;
 
 __LLBC_NS_END
 
@@ -342,12 +341,40 @@ public:
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId - the sessionId.
-     * @param[in] ctrlType  - the stack control type(user defined).
-     * @param[in] ctrlData  - the stack control data(user defined).
+     * @param[in] sessionId         - the sessionId.
+     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlData          - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData) = 0;
+    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId         - the sessionId.
+     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlData          - the stack control data(user defined).
+     * @param[in] ctrlDataClearFunc - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId         - the sessionId.
+     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlData          - the stack control data(user defined).
+     * @param[in] ctrlDataClearMeth - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename ObjType>
+    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId          - the sessionId.
+     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlData           - the stack control data(user defined).
+     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
 
 public:
     /**
@@ -441,15 +468,6 @@ public:
 
 public:
     /**
-     * Set protocol filter to service's specified protocol layer.
-     * @param[in] filter  - the protocol filter.
-     * @param[in] toLayer - which layer will add to.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer) = 0;
-
-public:
-    /**
      * Enable/Disable timer scheduler.
      */
     virtual int EnableTimerScheduler() = 0;
@@ -512,14 +530,14 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL) = 0;
 
-public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
-     * Get service protocol stack, only full-stack option disabled available.
+     * Get service codec protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
+     * @param[in] sessionId - the session Id.
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
-    virtual const LLBC_ProtocolStack *GetProtocolStack() const = 0;
+    virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const = 0;
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:

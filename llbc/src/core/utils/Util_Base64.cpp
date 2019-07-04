@@ -77,7 +77,7 @@ int LLBC_Base64::Encode(const char *input, size_t inputLen, char *output, size_t
         if (i == 3)
         {
             LLBC_INL_NS __A3ToA4(a3, a4);
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 4; ++i)
                 output[outputLen++] = LLBC_INL_NS __b64Alphabet[a4[i]];
 
             i = 0;
@@ -86,11 +86,11 @@ int LLBC_Base64::Encode(const char *input, size_t inputLen, char *output, size_t
 
     if (i)
     {
-        for (j = i; j < 3; j++)
+        for (j = i; j < 3; ++j)
             a3[j] = '\0';
 
         LLBC_INL_NS __A3ToA4(a3, a4);
-        for (j = 0; j < i + 1; j++)
+        for (j = 0; j < i + 1; ++j)
             output[outputLen++] = LLBC_INL_NS __b64Alphabet[a4[j]];
 
         while ((i++ < 3))
@@ -122,11 +122,11 @@ int LLBC_Base64::Decode(const char *input, size_t inputLen, char *output, size_t
         a4[i++] = *(input++);
         if (i == 4)
         {
-            for (i = 0; i <4; i++)
+            for (i = 0; i <4; ++i)
                 a4[i] = LLBC_INL_NS __B64Lookup(a4[i]);
 
             LLBC_INL_NS __A4ToA3(a4, a3);
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 3; ++i)
                 output[outputLen++] = a3[i];
 
             i = 0;
@@ -135,15 +135,15 @@ int LLBC_Base64::Decode(const char *input, size_t inputLen, char *output, size_t
 
     if (i)
     {
-        for (j = i; j < 4; j++)
+        for (j = i; j < 4; ++j)
             a4[j] = '\0';
 
-        for (j = 0; j <4; j++)
+        for (j = 0; j <4; ++j)
             a4[j] = LLBC_INL_NS __B64Lookup(a4[j]);
 
         LLBC_INL_NS __A4ToA3(a4, a3);
 
-        for (j = 0; j < i - 1; j++)
+        for (j = 0; j < i - 1; ++j)
             output[outputLen++] = a3[j];
     }
 
@@ -159,7 +159,7 @@ size_t LLBC_Base64::CalcEncodeLen(size_t bytesLen)
 size_t LLBC_Base64::CalcDecodedLen(const char *input, size_t inputLen)
 {
     size_t placeHolderCount = 0;
-    for (size_t i = inputLen - 1; input[i] == '='; i--)
+    for (size_t i = inputLen - 1; input[i] == '='; --i)
         ++placeHolderCount;
 
     return ((6 * inputLen) / 8) - placeHolderCount;

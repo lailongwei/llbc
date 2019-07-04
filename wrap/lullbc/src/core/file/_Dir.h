@@ -78,7 +78,7 @@ LULLBC_LUA_METH int _lullbc_Dir_Join(lua_State *l)
         lullbc_SetError(l, "Failed to join paths, expect more than 1 parameters to join");
 
     LLBC_String joined;
-    for (int i = 0; i < paramsCount; i++)
+    for (int i = 0; i < paramsCount; ++i)
     {
         luaL_checktype(l, 1, LUA_TSTRING);
 

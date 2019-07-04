@@ -26,7 +26,6 @@
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/protocol/IProtocol.h"
-#include "llbc/comm/protocol/IProtocolFilter.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
@@ -92,11 +91,8 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 , _afterStop(false)
 
 , _pollerMgr()
-, _connectedSessionIds()
-, _connectedSessionIdsLock()
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-, _stack(LLBC_ProtocolStack::CodecStack)
-#endif
+, _readySessionInfos()
+, _readySessionInfosLock()
 
 , _willRegFacades()
 
@@ -118,10 +114,6 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 #endif
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
 , _statusDescs()
-#endif
-
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC && LLBC_COMP_VER >= 1400
-, _filters()
 #endif
 
 , _beforeFrameTasks()
@@ -171,15 +163,6 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 
     _pollerMgr.SetService(this);
     _pollerMgr.SetPollerType(pollerType);
-
-    // Force cleanup _filters array again.
-    LLBC_MemSet(_filters, 0, sizeof(_filters));
-
-    // Create protocol stack.
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    _stack.SetService(this);
-    LLBC_Service::CreateCodecStack(0, 0, &_stack);
-#endif
 }
 
 // If using MSVC compiler and version >= 1400(VS2005), Reset C4351 warning to default.
@@ -193,6 +176,7 @@ LLBC_Service::~LLBC_Service()
 
     DestroyFacades();
     DestroyWillRegFacades();
+
     LLBC_STLHelper::DeleteContainer(_coders);
     LLBC_STLHelper::DeleteContainer(_handlers);
     LLBC_STLHelper::DeleteContainer(_preHandlers);
@@ -203,17 +187,14 @@ LLBC_Service::~LLBC_Service()
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     for (_OpStatusHandlers::iterator it = _statusHandlers.begin();
          it != _statusHandlers.end();
-         it++)
+         ++it)
     {
         LLBC_STLHelper::DeleteContainer(*it->second);
         LLBC_Delete(it->second);
     }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-    for (int layer = LLBC_ProtocolLayer::Begin;
-         layer != LLBC_ProtocolLayer::End;
-         layer++)
-        LLBC_XDelete(_filters[layer]);
+    RemoveAllReadySessions();
 
     _handledBeforeFrameTasks = false;
     DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
@@ -282,9 +263,7 @@ int LLBC_Service::SuppressCoderNotFoundWarning()
     }
 
     _suppressedCoderNotFoundWarning = true;
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    _stack.SetIsSuppressedCoderNotFoundWarning(true);
-#endif
+
     return LLBC_OK;
 }
 
@@ -482,11 +461,7 @@ int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *pro
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Listen(ip, port, protoFactory);
     if (sessionId != 0)
-    {
-        _connectedSessionIdsLock.Lock();
-        _connectedSessionIds.insert(sessionId);
-        _connectedSessionIdsLock.Unlock();
-    }
+        AddReadySession(sessionId, 0, true);
 
     return sessionId;
 }
@@ -496,11 +471,7 @@ int LLBC_Service::Connect(const char *ip, uint16 port, double timeout, LLBC_IPro
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Connect(ip, port, protoFactory);
     if (sessionId != 0)
-    {
-        _connectedSessionIdsLock.Lock();
-        _connectedSessionIds.insert(sessionId);
-        _connectedSessionIdsLock.Unlock();
-    }
+        AddReadySession(sessionId, 0, false);
 
     return sessionId;
 }
@@ -518,10 +489,9 @@ bool LLBC_Service::IsSessionValidate(int sessionId)
     if (UNLIKELY(sessionId == 0))
         return false;
 
-    _connectedSessionIdsLock.Lock();
-    const bool valid = 
-        _connectedSessionIds.find(sessionId) != _connectedSessionIds.end();
-    _connectedSessionIdsLock.Unlock();
+    _readySessionInfosLock.Lock();
+    const bool valid = _readySessionInfos.find(sessionId) != _readySessionInfos.end();
+    _readySessionInfosLock.Unlock();
 
     return valid;
 }
@@ -537,20 +507,23 @@ int LLBC_Service::Send(LLBC_Packet *packet)
 int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status)
 {
     // Copy all connected session Ids.
-    int idx = 0;
+    _readySessionInfosLock.Lock();
+    LLBC_SessionIdList connSIds;
+    for (_ReadySessionInfosCIter readySInfoIt = _readySessionInfos.begin();
+         readySInfoIt != _readySessionInfos.end();
+         ++readySInfoIt)
+    {
+        const _ReadySessionInfo * const &sessionInfo = readySInfoIt->second;
+        if (sessionInfo->isListenSession)
+            continue;
 
-    _connectedSessionIdsLock.Lock();
-    LLBC_SessionIdList connectedSessionIds(_connectedSessionIds.size());
-    for (LLBC_SessionIdSetCIter sessionIdIt = _connectedSessionIds.begin();
-         sessionIdIt != _connectedSessionIds.end();
-         idx++, sessionIdIt++)
-         connectedSessionIds[idx] = *sessionIdIt;
-
-    _connectedSessionIdsLock.Unlock();
+        connSIds.push_back(sessionInfo->sessionId);
+    }
+    _readySessionInfosLock.Unlock();
 
     // Call internal template method MulticastSendCoder<>() to complete.
     // validCheck = false
-    return MulticastSendCoder<LLBC_SessionIdList>(svcId, connectedSessionIds, opcode, coder, status, false);
+    return MulticastSendCoder<LLBC_SessionIdList>(svcId, connSIds, opcode, coder, status, false);
 }
 
 int LLBC_Service::Broadcast(int svcId, int opcode, const void *bytes, size_t len , int status)
@@ -560,11 +533,17 @@ int LLBC_Service::Broadcast(int svcId, int opcode, const void *bytes, size_t len
     // Foreach to call internal method LockableSend() method to complete.
     // lock = false
     // validCheck = false
-    LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
-    for (LLBC_SessionIdSetCIter sessionIt = _connectedSessionIds.begin();
-         sessionIt != _connectedSessionIds.end();
-         sessionIt++)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false, false);
+    LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
+    for (_ReadySessionInfosCIter readySInfoIt = _readySessionInfos.begin();
+         readySInfoIt != _readySessionInfos.end();
+         ++readySInfoIt)
+    {
+        const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+        if (readySInfo->isListenSession)
+            continue;
+
+        LockableSend(svcId, readySInfo->sessionId, opcode, bytes, len, status, false, false);
+    }
 
     return LLBC_OK;
 }
@@ -578,22 +557,23 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
-
-    LLBC_SessionIdSetIter sessionIdIt = _connectedSessionIds.find(sessionId);
-    if (sessionIdIt == _connectedSessionIds.end())
+    LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
+    _ReadySessionInfosIter readySInfoIt = _readySessionInfos.find(sessionId);
+    if (readySInfoIt == _readySessionInfos.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
     _pollerMgr.Close(sessionId, reason);
-    _connectedSessionIds.erase(sessionIdIt);
+
+    LLBC_Delete(readySInfoIt->second);
+    _readySessionInfos.erase(readySInfoIt);
 
     return LLBC_OK;
 }
 
-int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -602,23 +582,28 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Vari
         return LLBC_FAILED;
     }
 
-    _connectedSessionIdsLock.Lock();
-    LLBC_SessionIdSetIter sessionIdIt = _connectedSessionIds.find(sessionId);
-    if (sessionIdIt == _connectedSessionIds.end())
+    _readySessionInfosLock.Lock();
+    _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+    if (readySInfoIt == _readySessionInfos.end())
     {
-        _connectedSessionIdsLock.Unlock();
+        _readySessionInfosLock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return LLBC_FAILED;
     }
 
-    _connectedSessionIdsLock.Unlock();
-
 #if !LLBC_CFG_COMM_USE_FULL_STACK
-    if (!_stack.CtrlStackCodec(ctrlType, ctrlData))
+    const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+    if (!readySInfo->codecStack->CtrlStackCodec(ctrlType, ctrlData))
+    {
+        _readySessionInfosLock.Unlock();
         return LLBC_OK;
-#endif
+    }
+#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
-    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData);
+    _readySessionInfosLock.Unlock();
+
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
 
     return LLBC_OK;
 }
@@ -640,7 +625,7 @@ int LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
 
     for (_WillRegFacades::iterator it = _willRegFacades.begin();
          it != _willRegFacades.end();
-         it++)
+         ++it)
     {
         if (it->facadeFactory != NULL && it->facadeFactory == facadeFactory)
         {
@@ -677,7 +662,7 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
 
     for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
          regIt != _willRegFacades.end();
-         regIt++)
+         ++regIt)
     {
         if (regIt->facade != NULL && regIt->facade == facade)
         {
@@ -896,34 +881,6 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, 
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-int LLBC_Service::SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer)
-{
-    if (UNLIKELY(!filter) || !LLBC_ProtocolLayer::IsValid(toLayer))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_filters[toLayer])
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _filters[toLayer] = filter;
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    _stack.SetFilter(filter, toLayer);
-#endif
-
-    return LLBC_OK;
-}
-
 int LLBC_Service::EnableTimerScheduler()
 {
     LLBC_LockGuard guard(_lock);
@@ -1036,9 +993,15 @@ int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Va
 }
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
-const LLBC_ProtocolStack *LLBC_Service::GetProtocolStack() const
+const LLBC_ProtocolStack *LLBC_Service::GetCodecProtocolStack(int sessionId) const
 {
-    return &_stack;
+    LLBC_Service *ncThis = const_cast<LLBC_Service *>(this);
+    ncThis->_readySessionInfosLock.Lock();
+    _ReadySessionInfosCIter it = _readySessionInfos.find(sessionId);
+    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : NULL;
+    ncThis->_readySessionInfosLock.Unlock();
+
+    return codecStack;
 }
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
@@ -1207,6 +1170,74 @@ void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
     }
 }
 
+void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isListenSession, bool repeatCheck)
+{
+    if (repeatCheck)
+    {
+        _readySessionInfosLock.Lock();
+        const _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+        if (readySInfoIt != _readySessionInfos.end())
+        {
+            _readySessionInfosLock.Unlock();
+            return;
+        }
+
+        _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
+                                                              0,
+                                                              isListenSession
+                                                              #if !LLBC_CFG_COMM_USE_FULL_STACK
+                                                              , CreateCodecStack(sessionId, acceptSessionId, NULL)
+                                                              #endif
+                                                              );
+        _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
+        _readySessionInfosLock.Unlock();
+    }
+    else
+    {
+        _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
+                                                              0,
+                                                              isListenSession
+                                                              #if !LLBC_CFG_COMM_USE_FULL_STACK
+                                                              , CreateCodecStack(sessionId, acceptSessionId, NULL)
+                                                              #endif
+                                                              );
+        _readySessionInfosLock.Lock();
+        _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
+        _readySessionInfosLock.Unlock();
+    }
+}
+
+void LLBC_Service::RemoveReadySession(int sessionId)
+{
+    // Lock.
+    _readySessionInfosLock.Lock();
+
+    // Find ready session info, if not found, return.
+    _ReadySessionInfosIter readySInfoIt = _readySessionInfos.find(sessionId);
+    if (readySInfoIt == _readySessionInfos.end())
+    {
+        _readySessionInfosLock.Unlock();
+        return;
+    }
+
+    // Erase from dict.
+    _ReadySessionInfo *readySInfo = readySInfoIt->second;
+    _readySessionInfos.erase(readySInfoIt);
+
+    // Unlock.
+    _readySessionInfosLock.Unlock();
+
+    // At last, delete ready session info.
+    LLBC_Delete(readySInfo);
+}
+
+void LLBC_Service::RemoveAllReadySessions()
+{
+    _readySessionInfosLock.Lock();
+    LLBC_STLHelper::DeleteContainer(_readySessionInfos, true, false);
+    _readySessionInfosLock.Unlock();
+}
+
 void LLBC_Service::Svc()
 {
     while (!_started)
@@ -1253,10 +1284,8 @@ void LLBC_Service::Cleanup()
     if (_driveMode == This::ExternalDrive)
         _timerScheduler->CancelAll();
 
-    // Cleanup connected-sessionIds set.
-    _connectedSessionIdsLock.Lock();
-    _connectedSessionIds.clear();
-    _connectedSessionIdsLock.Unlock();
+    // Cleanup ready-sessionInfos map.
+    RemoveAllReadySessions();
 
     // Stop facades, destroy release-pool, and remove service from TLS.
     StopFacades();
@@ -1295,9 +1324,11 @@ void LLBC_Service::AddServiceToTls()
 
     int idx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; idx++)
+    for (; idx <= lmt; ++idx)
+    {
         if (!tls->commTls.services[idx])
             break;
+    }
 
     tls->commTls.services[idx] = this;
 }
@@ -1308,9 +1339,11 @@ void LLBC_Service::RemoveServiceFromTls()
 
     int idx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; idx++)
+    for (; idx <= lmt; ++idx)
+    {
         if (tls->commTls.services[idx] == this)
             break;
+    }
 
     LLBC_MemCpy(&tls->commTls.services[idx],
                 &tls->commTls.services[idx + 1],
@@ -1323,9 +1356,11 @@ bool LLBC_Service::IsCanContinueDriveService()
 
     int checkIdx = 0;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; checkIdx <= lmt; checkIdx++)
+    for (; checkIdx <= lmt; ++checkIdx)
+    {
         if (tls->commTls.services[checkIdx] == NULL)
             break;
+    }
 
     return checkIdx < lmt ? true : false;
 }
@@ -1338,7 +1373,7 @@ void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usin
     usingFlag = true;
     for (_FrameTasks::iterator it = tasks.begin();
          it != tasks.end();
-         it++)
+         ++it)
         (it->first)->Invoke(this, it->second);
 
     DestroyFrameTasks(tasks, usingFlag);
@@ -1349,7 +1384,7 @@ void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
     usingFlag = false;
     for (_FrameTasks::iterator it = tasks.begin();
          it != tasks.end();
-         it++)
+         ++it)
     {
         LLBC_Delete(it->first);
         if (it->second)
@@ -1383,9 +1418,7 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
 
     // Add session to connected sessionIds set.
     {
-        _connectedSessionIdsLock.Lock();
-        _connectedSessionIds.insert(ev.sessionId);
-        _connectedSessionIdsLock.Unlock();
+        AddReadySession(ev.sessionId, ev.acceptSessionId, ev.isListen, true);
     }
 
     // Check has care session-create ev facades or not, if has cared event facades, dispatch event.
@@ -1403,7 +1436,7 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         // Dispatch session-create event to all facades.
         _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate];
         const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
             caredEvFacades[facadeIdx]->OnSessionCreate(info);
     }
 }
@@ -1415,9 +1448,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
 
     // Erase session from connected sessionIds set.
     {
-        _connectedSessionIdsLock.Lock();
-        _connectedSessionIds.erase(ev.sessionId);
-        _connectedSessionIdsLock.Unlock();
+        RemoveReadySession(ev.sessionId);
     }
 
     // Check has care session-destroy ev facades or not, if has cared event facades, dispatch event.
@@ -1439,7 +1470,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         // Dispatch session-destroy event to all facades.
         _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy];
         const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredEvFacades[facadeIdx]->OnSessionDestroy(destroyInfo);
     }
 
@@ -1464,7 +1495,7 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
 
         _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult];
         const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredFacades[facadeIdx]->OnAsyncConnResult(result);
     }
 
@@ -1480,28 +1511,39 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     LLBC_Packet *packet = ev.packet;
 
     // Makesure session in connected sessionId set.
+#if !LLBC_CFG_COMM_USE_FULL_STACK
+    _ReadySessionInfosCIter readySInfoIt;
+#endif // !LLBC_CFG_COMM_USE_FULL_STACK
     const int sessionId = packet->GetSessionId();
-    _connectedSessionIdsLock.Lock();
-    if (_connectedSessionIds.find(sessionId) == 
-        _connectedSessionIds.end())
+
+    _readySessionInfosLock.Lock();
+#if LLBC_CFG_COMM_USE_FULL_STACK
+    if (_readySessionInfos.find(sessionId) == _readySessionInfos.end())
+#else // !LLBC_CFG_COMM_USE_FULL_STACK
+    if ((readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
     {
-        _connectedSessionIdsLock.Unlock();
+        _readySessionInfosLock.Unlock();
         return;
     }
-    _connectedSessionIdsLock.Unlock();
 
     ev.packet = NULL;
 
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     bool removeSession;
-    if (UNLIKELY(_stack.RecvCodec(packet, packet, removeSession) != LLBC_OK))
+    const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+    if (UNLIKELY(readySInfo->codecStack->RecvCodec(packet, packet, removeSession) != LLBC_OK))
     {
+        _readySessionInfosLock.Unlock();
+
         if (removeSession)
             RemoveSession(sessionId);
 
         return;
     }
-#endif
+#endif // !LLBC_CFG_COMM_USE_FULL_STACK
+
+    _readySessionInfosLock.Unlock();
 
     // Packet receiver service Id set or dispatch to another service.
     const int recverSvcId = packet->GetRecverServiceId();
@@ -1523,7 +1565,6 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
 
     const int opcode = packet->GetOpcode();
-
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
     const int status = packet->GetStatus();
     if (status != 0)
@@ -1590,7 +1631,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket];
             const size_t facadesSize = caredFacades.size();
-            for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+            for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
                  caredFacades[facadeIdx]->OnUnHandledPacket(*packet);
         }
     }
@@ -1615,7 +1656,7 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
 
         _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport];
         const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
              caredFacades[facadeIdx]->OnProtoReport(report);
     }
 }
@@ -1656,9 +1697,9 @@ int LLBC_Service::InitFacades()
     bool initSuccess = true;
     for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
          regIt != _willRegFacades.end();
-         regIt++)
+         ++regIt)
     {
-        LLBC_IFacade *facade = NULL;
+        LLBC_IFacade *facade;
         _WillRegFacade &willRegFacade = *regIt;
         if (willRegFacade.facadeFactory != NULL)
         {
@@ -1702,7 +1743,7 @@ int LLBC_Service::StartFacades()
 {
     size_t startIndex = 0;
     const size_t facadesSize = _facades.size();
-    for (; startIndex < facadesSize; startIndex++)
+    for (; startIndex < facadesSize; ++startIndex)
     {
         LLBC_IFacade *facade = _facades[startIndex];
         if (facade->_started)
@@ -1728,7 +1769,7 @@ void LLBC_Service::StopFacades()
 {
     for (_Facades::reverse_iterator it = _facades.rbegin();
          it != _facades.rend();
-         it++)
+         ++it)
     {
         LLBC_IFacade *facade = *it;
         if (!facade->_started)
@@ -1749,7 +1790,7 @@ void LLBC_Service::UpdateFacades()
 
     _Facades &caredFacades = *caredFacadesPtr;
     const size_t facadesSize = caredFacades.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
         caredFacades[facadeIdx]->OnUpdate();
 }
 
@@ -1757,7 +1798,7 @@ void LLBC_Service::DestroyFacades()
 {
     for (_Facades::reverse_iterator it = _facades.rbegin();
          it != _facades.rend();
-         it++)
+         ++it)
     {
         LLBC_IFacade *facade = *it;
         if (!facade->_inited)
@@ -1772,7 +1813,7 @@ void LLBC_Service::DestroyFacades()
 
     for (int evOffset = LLBC_FacadeEventsOffset::Begin;
          evOffset != LLBC_FacadeEventsOffset::End;
-         evOffset++)
+         ++evOffset)
     {
         _Facades *&evFacades = _caredEventFacades[evOffset];
         LLBC_XDelete(evFacades);
@@ -1783,7 +1824,7 @@ void LLBC_Service::DestroyWillRegFacades()
 {
     for (_WillRegFacades::iterator it = _willRegFacades.begin();
          it != _willRegFacades.end();
-         it++)
+         ++it)
     {
         LLBC_XDelete((*it).facade);
         LLBC_XDelete((*it).facadeFactory);
@@ -1811,10 +1852,9 @@ void LLBC_Service::AddFacade(LLBC_IFacade *facade)
 
 void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
 {
-    uint64 caredEvents = facade->GetCaredEvents();
     for (int evOffset = LLBC_FacadeEventsOffset::Begin;
          evOffset != LLBC_FacadeEventsOffset::End;
-         evOffset++)
+         ++evOffset)
     {
         if (!facade->IsCaredEventOffset(evOffset))
             continue;
@@ -1887,7 +1927,7 @@ void LLBC_Service::ProcessIdle(bool fullFrame)
 
     _Facades &caredEvs = *caredEvsPtr;
     const size_t facadesSize = caredEvs.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; facadeIdx++)
+    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
     {
         if (fullFrame)
         {
@@ -1911,9 +1951,11 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
                                bool lock,
                                bool validCheck)
 {
+    // Lock if need.
     if (lock)
         _lock.Lock();
 
+    // Started or not check.
     if (UNLIKELY(!_started))
     {
         if (lock)
@@ -1925,29 +1967,68 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         return LLBC_FAILED;
     }
 
+    // Validate check, if need.
     const int sessionId = packet->GetSessionId();
+#if LLBC_CFG_COMM_USE_FULL_STACK
     if (validCheck)
     {
-        LLBC_LockGuard connSIdsGuard(_connectedSessionIdsLock);
-        if (_connectedSessionIds.find(sessionId) == _connectedSessionIds.end())
+#else // !LLBC_CFG_COMM_USE_FULL_STACK
+    const _ReadySessionInfo *readySInfo;
+    {
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfosCIter readySInfoIt;
+
+        _readySessionInfosLock.Lock();
+        if ((readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
         {
+            _readySessionInfosLock.Unlock();
+
             if (lock)
                 _lock.Unlock();
 
             LLBC_Delete(packet);
-
             LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
             return LLBC_FAILED;
         }
+
+#if LLBC_CFG_COMM_USE_FULL_STACK
+        if (readySInfoIt->second->isListenSession)
+#else // !LLBC_CFG_COMM_USE_FULL_STACK
+        readySInfo = readySInfoIt->second;
+        if (UNLIKELY(readySInfo->isListenSession))
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
+        {
+            _readySessionInfosLock.Unlock();
+
+            if (lock)
+                _lock.Unlock();
+
+            LLBC_Delete(packet);
+            LLBC_SetLastError(LLBC_ERROR_IS_LISTEN_SOCKET);
+
+            return LLBC_FAILED;
+        }
+
+#if LLBC_CFG_COMM_USE_FULL_STACK
+        _readySessionInfosLock.Unlock();
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
     }
 
     packet->SetSenderServiceId(_id);
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
+#if LLBC_CFG_COMM_USE_FULL_STACK
+    const int ret = _pollerMgr.Send(packet);
+    if (lock)
+        _lock.Unlock();
+
+    return ret;
+#else // !LLBC_CFG_COMM_USE_FULL_STACK
     bool removeSession;
     LLBC_Packet *encoded;
-    if (_stack.SendCodec(packet, encoded, removeSession) != LLBC_OK)
+    if (readySInfo->codecStack->SendCodec(packet, encoded, removeSession) != LLBC_OK)
     {
+        _readySessionInfosLock.Unlock();
         if (removeSession)
             RemoveSession(sessionId, LLBC_FormatLastError());
 
@@ -1957,18 +2038,14 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         return LLBC_FAILED;
     }
 
+    _readySessionInfosLock.Unlock();
+
     const int ret = _pollerMgr.Send(encoded);
     if (lock)
         _lock.Unlock();
 
     return ret;
-#else
-    const int ret = _pollerMgr.Send(packet);
-    if (lock)
-        _lock.Unlock();
-
-    return ret;
-#endif
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
 }
 
 int LLBC_Service::LockableSend(int svcId,
@@ -2054,16 +2131,21 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         const size_t payloadLen = firstPacket->GetPayloadLength();
 
         if (validCheck)
-            _connectedSessionIdsLock.Lock();
+            _readySessionInfosLock.Lock();
 
+        _ReadySessionInfosCIter readySInfoIt;
         for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
-             i++)
+             ++i)
         {
             const int sessionId = *sessionIt++;
             if (validCheck &&
-                _connectedSessionIds.find(sessionId) == _connectedSessionIds.end())
+                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
                     continue;
+
+            const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+            if (readySInfo->isListenSession)
+                continue;
 
             LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
@@ -2074,20 +2156,25 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         }
 
         if (validCheck)
-            _connectedSessionIdsLock.Unlock();
+            _readySessionInfosLock.Unlock();
     }
     else
     {
         if (validCheck)
-            _connectedSessionIdsLock.Lock();
+            _readySessionInfosLock.Lock();
 
+        _ReadySessionInfosCIter readySInfoIt;
         for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
-             i++)
+             ++i)
         {
             const int sessionId = *sessionIt++;
             if (validCheck &&
-                _connectedSessionIds.find(sessionId) == _connectedSessionIds.end())
+                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
+                continue;
+
+            const _ReadySessionInfo *const &readySInfo = readySInfoIt->second;
+            if (readySInfo->isListenSession)
                 continue;
 
             LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
@@ -2098,15 +2185,15 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         }
 
         if (validCheck)
-            _connectedSessionIdsLock.Unlock();
+            _readySessionInfosLock.Unlock();
     }
 
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
     const size_t otherPacketCnt = sessionCnt - 1;
-    for (size_t i = 0; i < otherPacketCnt; i++)
+    for (size_t i = 0; i < otherPacketCnt; ++i)
     {
-        LLBC_Packet *otherPacket = otherPackets[i];
+        LLBC_Packet *&otherPacket = otherPackets[i];
         if (!otherPacket)
             continue;
 
@@ -2116,6 +2203,28 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     LLBC_Free(otherPackets);
 
     return LLBC_OK;
+}
+
+#if LLBC_CFG_COMM_USE_FULL_STACK
+LLBC_Service::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession)
+#else // !LLBC_CFG_COMM_USE_FULL_STACK
+LLBC_Service::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack)
+#endif // LLBC_CFG_COMM_USE_FULL_STACK
+{
+    this->sessionId = sessionId;
+    this->acceptSessionId = acceptSessionId;
+    this->isListenSession = isListenSession;
+    #if !LLBC_CFG_COMM_USE_FULL_STACK
+    this->codecStack = codecStack;
+    #endif // !LLBC_CFG_COMM_USE_FULL_STACK
+}
+
+LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
+{
+    #if !LLBC_CFG_COMM_USE_FULL_STACK
+    if (codecStack)
+        LLBC_Delete(codecStack);
+    #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 }
 
 LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacade *facade)

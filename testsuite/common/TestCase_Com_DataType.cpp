@@ -85,7 +85,7 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLine("LLBC_String::format/append_format test: %s", testStr.c_str());
 
     LLBC_String testStr2;
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < 1000; ++i)
     {
         testStr.append("hello world!");
     }
@@ -202,6 +202,6 @@ void TestCase_Com_DataType::StringSplitTest(const LLBC_String &str, size_t maxSp
     LLBC_PrintLine("Will split string(maxSplit: %ld, sep: %s): %s", maxSplit, sep.c_str(), str.c_str());
     std::vector<LLBC_String> splitted = str.split(sep, maxSplit);
     LLBC_PrintLine("Split use separator:., size: %ld", splitted.size());
-    for (size_t i = 0; i < splitted.size(); i++)
+    for (size_t i = 0; i < splitted.size(); ++i)
         LLBC_PrintLine("    \"%s\"", splitted[i].c_str());
 }

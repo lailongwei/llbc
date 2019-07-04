@@ -98,7 +98,7 @@ static int SignalerThreadProc(void *arg)
     std::cout <<"I'm signaler thread." <<std::endl;
     __g_outLock.Unlock();
 
-    for(int i = 1; i <= 100; i ++)
+    for(int i = 1; i <= 100; ++i)
     {
         LLBC_Sleep(500);
 
@@ -158,7 +158,7 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
 
     // Create waiters.
     LLBC_NativeThreadHandle waiters[__g_waiterThreadCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(long i = 0; i < __g_waiterThreadCount; i ++)
+    for(long i = 0; i < __g_waiterThreadCount; ++i)
     {
         void *threadArg = NULL;
         ::memcpy(&threadArg, &i, sizeof(long));
@@ -173,7 +173,7 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
     LLBC_JoinThread(signaler);
 
     // Cancel and join signaler.
-    for(long i = 0; i < __g_waiterThreadCount; i ++)
+    for(long i = 0; i < __g_waiterThreadCount; ++i)
     {
         LLBC_CancelThread(waiters[i]);
         LLBC_JoinThread(waiters[i]);

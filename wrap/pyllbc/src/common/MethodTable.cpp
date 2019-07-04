@@ -66,7 +66,7 @@ int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
 
 int pyllbc_MethodTable::RemoveMethod(const LLBC_String &name)
 {
-    for (sint32 i = 0; i < _size; i++)
+    for (sint32 i = 0; i < _size; ++i)
     {
         const PyMethodDef &method = _methods[i];
         if (name == method.ml_name)

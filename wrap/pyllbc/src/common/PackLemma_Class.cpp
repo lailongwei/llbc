@@ -222,7 +222,7 @@ PyObject *pyllbc_PackLemma_Class::GetClassFromEnvAndName()
 
     Py_INCREF(nowObj);
     const int subNameSize = static_cast<int>(subNames.size());
-    for (int i = 0; i < subNameSize; i++)
+    for (int i = 0; i < subNameSize; ++i)
     {
         // First, we check now will parse object is Module type or not.
         // If is module type, get this module's dictionary.

@@ -122,7 +122,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
 
     // Create waiters.
     LLBC_NativeThreadHandle waiters[__g_waitersCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(long i = 0; i < __g_waitersCount; i ++)
+    for(long i = 0; i < __g_waitersCount; ++i)
     {
         void *threadArg = NULL;
         ::memcpy(&threadArg, &i, sizeof(long));
@@ -137,7 +137,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     LLBC_JoinThread(signaler);
 
     // Join waiters.
-    for(long i = 0; i < __g_waitersCount; i ++)
+    for(long i = 0; i < __g_waitersCount; ++i)
     {
         LLBC_JoinThread(waiters[i]);
     }

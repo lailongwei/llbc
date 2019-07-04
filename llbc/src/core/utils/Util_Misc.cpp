@@ -64,7 +64,7 @@ int LLBC_StartArgs::Parse(int argc, char *argv[])
     }
 
     _moduleFilePath = argv[0];
-    for (int i = 1; i < argc; i++)
+    for (int i = 1; i < argc; ++i)
     {
         LLBC_String arg = argv[i];
         _seqArgs.push_back(LLBC_Variant(arg));

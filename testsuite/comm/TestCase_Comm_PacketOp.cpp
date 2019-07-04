@@ -101,11 +101,11 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     stlCont.clear();
     packet >>stlCont;
     std::cout <<"Packet::Read(): std::vector<std::list<LLBC_String> >, size = " <<stlCont.size() <<std::endl;
-    for(size_t i = 0; i < stlCont.size(); i ++)
+    for(size_t i = 0; i < stlCont.size(); ++i)
     {
         std::cout <<"  elem[ " <<i <<"] value: " <<std::endl;
         std::list<LLBC_String>::const_iterator it = stlCont[i].begin();
-        for(int j = 0; it != stlCont[i].end(); it ++, j ++)
+        for(int j = 0; it != stlCont[i].end(); ++it, ++j)
         {
             std::cout <<"    elem[" <<i <<"][" <<j <<"] value: " <<*it <<std::endl;
         }

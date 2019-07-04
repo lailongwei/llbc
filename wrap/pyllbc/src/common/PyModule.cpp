@@ -140,7 +140,7 @@ This *pyllbc_Module::GetSubModule(const LLBC_String &name) const
     }
 
     This *module = it->second;
-    for (size_t i = 1; i < names.size(); i++)
+    for (size_t i = 1; i < names.size(); ++i)
     {
         const LLBC_String &splittedName = names[i];
         if (splittedName.empty())

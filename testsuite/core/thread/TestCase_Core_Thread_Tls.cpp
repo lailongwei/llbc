@@ -36,7 +36,7 @@ static int ThreadProc(void *arg)
 
     __g_tls.SetValue(LLBC_New0(long));
     (*__g_tls) = threadIndex;
-    for(int i = 0; i < 5000000; i ++)
+    for(int i = 0; i < 5000000; ++i)
         (*__g_tls) += 1;
 
     LLBC_PrintLine("thread [%ld] tls value: %ld", threadIndex, *__g_tls);
@@ -58,7 +58,7 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
 
     // Create threads.
     LLBC_NativeThreadHandle threads[__g_threadNum] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(long i = 0; i < __g_threadNum; i ++)
+    for(long i = 0; i < __g_threadNum; ++i)
     {
         void *threadArg = NULL;
         ::memcpy(&threadArg, &i, sizeof(long));
@@ -66,7 +66,7 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
     }
 
     // Join threads.
-    for(long i = 0; i < __g_threadNum; i ++)
+    for(long i = 0; i < __g_threadNum; ++i)
     {
         LLBC_JoinThread(threads[i]);
     }

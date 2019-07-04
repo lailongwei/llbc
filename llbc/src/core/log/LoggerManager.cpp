@@ -80,7 +80,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
     std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = configs.begin();
-    for (; iter != configs.end(); iter++)
+    for (; iter != configs.end(); ++iter)
     {
         if (iter->first == _rootLoggerName)
             continue;

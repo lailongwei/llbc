@@ -51,7 +51,7 @@ inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdSet &sessionId
     // validCheck = true
     for (LLBC_SessionIdSetCIter sessionIt = sessionIds.begin();
          sessionIt != sessionIds.end();
-         sessionIt++)
+         ++sessionIt)
         LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
 
     return LLBC_OK;
@@ -71,7 +71,7 @@ inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionI
     // validCheck = true
     for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
          sessionIt != sessionIds.end();
-         sessionIt++)
+         ++sessionIt)
         LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
 
     return LLBC_OK;
