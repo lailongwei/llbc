@@ -59,7 +59,6 @@ __LLBC_NS_BEGIN
 
 LLBC_ProtocolStack::LLBC_ProtocolStack(This::StackType type)
 : _type(type)
-, _builded(false)
 
 , _svc(NULL)
 , _session(NULL)

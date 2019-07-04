@@ -23,6 +23,5 @@
 #define __LLBC_CORE_OBJECT_POOL_COMMON_H__
 
 #include "llbc/core/objectpool/ThreadObjectPoolManager.h"
-#include "llbc/core/objectpool/ObjectGuard.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_COMMON_H__

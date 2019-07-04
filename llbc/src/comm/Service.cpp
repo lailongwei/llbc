@@ -26,7 +26,6 @@
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/protocol/IProtocol.h"
-#include "llbc/comm/protocol/IProtocolFilter.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
@@ -574,7 +573,7 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -604,7 +603,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Vari
 
     _readySessionInfosLock.Unlock();
 
-    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData);
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
 
     return LLBC_OK;
 }

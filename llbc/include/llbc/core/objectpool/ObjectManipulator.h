@@ -50,15 +50,50 @@ public:
     template <typename ObjectType>
     static bool Reset(void *obj);
 
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
 private:
     /**
-     * Reset object, this method is called when object has clear function.
+     * Reset object, this method is called when object has clear():void function.
      */
     template <typename ObjectType, void (ObjectType::*)()>
     struct clearable_type;
     template <typename ObjectType>
     static bool ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
 
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear
+private:
+    /**
+     * Reset object, this method is called when object has Clear():void function.
+     */
+    template <typename ObjectType, void (ObjectType::*)()>
+    struct Clearable_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, Clearable_type<ObjectType, &ObjectType::Clear> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear
+
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
+private:
+    /**
+     * Reset object, this method is called when object has reset():void function.
+     */
+    template <typename ObjectType, void (ObjectType::*)()>
+    struct resetable_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, resetable_type<ObjectType, &ObjectType::reset> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
+
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+    /**
+     * Reset object, this method is called when object has Reset():void function.
+     */
+    template <typename ObjectType, void (ObjectType::*)()>
+    struct Resetable_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, Resetable_type<ObjectType, &ObjectType::Reset> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+
+private:
     /**
      * Reset object, default method.
      */

@@ -131,6 +131,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x002a
     // the specific socket is listen socket
     "the specific socket is listen socket", // 0x002b
+    // object is not pool object
+    "object is not pool object", // 0x002c
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

@@ -96,11 +96,11 @@ public:
         _Checkit();
         if(_Forward)
         {
-            ++ _idx;
+            ++_idx;
         }
         else
         {
-            -- _idx;
+            --_idx;
         }
 
         return *this;
@@ -109,7 +109,7 @@ public:
     const iterator operator ++(int)
     {   // postincrement.
         iterator temp(*this);
-        ++ *this;
+        ++*this;
         return temp;
     }
 
@@ -118,11 +118,11 @@ public:
         _Checkit();
         if(_Forward)
         {
-            -- _idx;
+            --_idx;
         }
         else
         {
-            ++ _idx;
+            ++_idx;
         }
 
         return *this;
@@ -131,7 +131,7 @@ public:
     const iterator operator --(int)
     {   // postdecrement.
         iterator temp(*this);
-        -- *this;
+        --*this;
         return temp;
     }
 
@@ -334,7 +334,7 @@ public:
     const iterator operator ++(int)
     {   // postincrement.
         iterator temp(*this);
-        ++ *this;
+        ++*this;
         return temp;
     }
 
@@ -347,7 +347,7 @@ public:
     const iterator operator --(int)
     {
         iterator temp(*this);
-        -- *this;
+        --*this;
         return temp;
     }
 

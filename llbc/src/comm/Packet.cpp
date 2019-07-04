@@ -152,6 +152,13 @@ void LLBC_Packet::ResetPayload()
     }
 }
 
+void LLBC_Packet::Clear()
+{
+    ResetPayload();
+    LLBC_XDelete(_encoder);
+    LLBC_XDelete(_decoder);
+}
+
 LLBC_ICoder *LLBC_Packet::GetEncoder() const
 {
     return _encoder;

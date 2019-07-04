@@ -23,12 +23,11 @@
 #define __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/objectpool/ObjectPool.h"
 
 __LLBC_NS_BEGIN
 
 // Pre-declare some classes.
-class LLBC_IObjectPool;
+class LLBC_IObjectPoolInst;
 
 /**
 * \brief The pool object guard class encapsulation.
@@ -37,29 +36,56 @@ template <typename ObjectType>
 class LLBC_ObjectGuard
 {
 public:
-    LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPool *pool);
+    LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst);
     LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another);
 
     ~LLBC_ObjectGuard();
 
 public:
     /**
-     * Get guarded object.
-     * @return ObjectType * - the guarded object.
+     * Get guarded object pointer.
+     * @return ObjectType *& - the guarded object pointer.
      */
-    ObjectType *operator ->();
+    ObjectType *&operator ->();
+    /**
+     * Get guarded object pointer.
+     * @return const ObjectType * const & - the guarded object pointer.
+     */
+    const ObjectType * const &operator ->() const;
 
+public:
+    /**
+     * Get guarded object.
+     * @return ObjectType & - the guarded object reference.
+     */
+    ObjectType &operator *();
+    /**
+     * Get guarded object.
+     * @return const const ObjectType & - the guarded object reference.
+     */
+    const ObjectType &operator *() const;
+
+public:
+    /**
+     * Implicit type convert to ObjectType *.
+     */
+    operator ObjectType *();
+    /**
+     * Implicit type convert to const ObjectType *.
+     */
+    operator const ObjectType *() const;
+
+public:
     /**
      * Get guarded object.
      * @return ObjectType * - the guarded object.
      */
-    ObjectType *GetObj() const;
-
+    ObjectType *GetObj();
     /**
-     * Get object pool.
-     * @return LLBC_IObjectPool * - the object pool.
+     * Get guarded object.
+     * @return ObjectType & - the guarded object.
      */
-    LLBC_IObjectPool *GetPool() const;
+    const ObjectType *GetObj() const;
 
 private:
     /**
@@ -75,7 +101,7 @@ private:
 
 private:
     ObjectType *_obj;
-    LLBC_IObjectPool *_pool;
+    LLBC_IObjectPoolInst *_poolInst;
 
     bool _weakRef;
 };

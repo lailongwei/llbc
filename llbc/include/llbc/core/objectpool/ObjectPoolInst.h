@@ -66,6 +66,10 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
+// Pre-declare some classes
+template <typename ObjectType>
+class LLBC_ObjectGuard;
+
 /**
 * \brief The object pool instance encapsulation.
 */
@@ -112,6 +116,12 @@ public:
     ObjectType *GetObject();
 
     /**
+     * Get guarded object.
+     * @return LLBC_ObjectGuard<ObjectType> - the guarded object.
+     */
+    LLBC_ObjectGuard<ObjectType> GetGuarded();
+
+    /**
      * Release object.
      * @param[in] obj - the object pointer.
      */
@@ -134,6 +144,10 @@ protected:
      * @param[in] memBlock - memory block.
      */
     void *FindFreeObj(MemoryBlock *memBlock);
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPoolInst);
 
 private:
     const int _elemSize;

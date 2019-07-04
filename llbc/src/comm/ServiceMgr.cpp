@@ -103,7 +103,7 @@ int LLBC_ServiceMgr::Wait()
 
     for (_Services::iterator it = svcs.begin();
          it != svcs.end();
-         it++)
+         ++it)
     {
         if (_id2Services.find(it->first) == _id2Services.end())
             continue;
@@ -128,7 +128,7 @@ int LLBC_ServiceMgr::Stop()
 
     for (_Services::iterator it = svcs.begin();
          it != svcs.end();
-         it++)
+         ++it)
     {
         if (_id2Services.find(it->first) == _id2Services.end())
             continue;
@@ -145,7 +145,7 @@ bool LLBC_ServiceMgr::InTls(const LLBC_IService *svc)
     void **svcs = tls->commTls.services;
     for (int i = 0;
          i <= LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-         i++)
+         ++i)
         if (reinterpret_cast<LLBC_IService *>(svcs[i]) == svc)
             return true;
 
@@ -156,7 +156,7 @@ bool LLBC_ServiceMgr::InTls(const This::_Services &svcs)
 {
     for (_Services::const_iterator it = svcs.begin();
          it != svcs.end();
-         it++)
+         ++it)
         if (This::InTls(it->second))
             return true;
 
@@ -167,7 +167,7 @@ bool LLBC_ServiceMgr::InTls(const This::_Services2 &svcs)
 {
     for (_Services2::const_iterator it = svcs.begin();
          it != svcs.end();
-         it++)
+         ++it)
         if (This::InTls(it->second))
             return true;
 

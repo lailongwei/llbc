@@ -32,6 +32,7 @@ __LLBC_NS_BEGIN
 class LLBC_IObjectPool
 {
 public:
+    LLBC_IObjectPool() {  }
     virtual ~LLBC_IObjectPool() {  }
 
 public:
@@ -42,6 +43,10 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Release(const char *objectType, void *obj) = 0;
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_IObjectPool);
 };
 
 __LLBC_NS_END

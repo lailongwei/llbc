@@ -134,7 +134,7 @@ void LLBC_SelectPoller::Svc()
             _Sockets sockets = _sockets;
             for (_Sockets::iterator it = sockets.begin();
                     it != sockets.end();
-                    it++)
+                    ++it)
             {
                 LLBC_Session *session = it->second;
                 const LLBC_SocketHandle handle = it->first;

@@ -129,6 +129,7 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_PrintLine("\tLLBC_ERROR_WSA_VERNOTSUPPORTED: %s", LLBC_StrError(LLBC_ERROR_WSA_VERNOTSUPPORTED));
     LLBC_PrintLine("\tLLBC_ERROR_WSA_EPROCLIM: %s", LLBC_StrError(LLBC_ERROR_WSA_EPROCLIM));
     LLBC_PrintLine("\tLLBC_ERROR_IS_LISTEN_SOCKET: %s", LLBC_StrError(LLBC_ERROR_IS_LISTEN_SOCKET));
+    LLBC_PrintLine("\tLLBC_ERROR_NOT_POOL_OBJECT: %s", LLBC_StrError(LLBC_ERROR_NOT_POOL_OBJECT));
 
     // Custom erorr test.
     LLBC_PrintLine("LLBC library custom error test:");

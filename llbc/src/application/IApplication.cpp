@@ -502,7 +502,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
     // Try load.
     for (LLBC_Strings::const_iterator iter = tryPaths.begin();
         iter != tryPaths.end();
-        iter++)
+        ++iter)
     {
         if (TryLoadConfig(*iter, loaded, tryIni, tryJson, tryCfg) != LLBC_OK)
             return LLBC_FAILED;
