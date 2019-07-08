@@ -44,7 +44,7 @@ public:
 
     /**
     * Insert object to the tail.
-    * @param[in] elem - The object.
+    * @param[in] obj - The object.
     */
     void Push(const ObjectType &obj);
 

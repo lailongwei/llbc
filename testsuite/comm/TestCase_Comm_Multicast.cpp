@@ -31,7 +31,8 @@ class TestFacade : public LLBC_IFacade
 {
 public:
     TestFacade(bool asClient, bool useBst)
-    : _asClient(asClient)
+    : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents | LLBC_FacadeEvents::OnUpdate)
+    , _asClient(asClient)
     , _useBst(useBst)
     {
     }
@@ -126,6 +127,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     FetchArgs(argc, argv);
 
     LLBC_IService *svc = LLBC_IService::Create(_svcType, "MulticastTest");
+    svc->SuppressCoderNotFoundWarning();
 
     TestFacade *facade = LLBC_New2(TestFacade, _asClient, _useBst);
     svc->RegisterFacade(facade);

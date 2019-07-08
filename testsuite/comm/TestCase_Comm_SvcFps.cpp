@@ -26,6 +26,12 @@ namespace
 {
     class TestFacade : public LLBC_IFacade
     {
+    public:
+        TestFacade()
+        : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents | LLBC_FacadeEvents::OnUpdate)
+        {
+        }
+
         virtual bool OnStart()
         {
             _updateTimes = 0;

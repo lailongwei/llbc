@@ -25,7 +25,7 @@
 namespace
 {
 
-const int OPCODE = 1;
+const int OPCODE = 0;
 
 class TestFacade : public LLBC_IFacade
 {
@@ -87,6 +87,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 
     FetchArgs(argc, argv);
     LLBC_IService *svc = LLBC_IService::Create(_svcType, "SendBytesTest");
+    svc->SuppressCoderNotFoundWarning();
 
     TestFacade *facade = LLBC_New(TestFacade);
     svc->RegisterFacade(facade);

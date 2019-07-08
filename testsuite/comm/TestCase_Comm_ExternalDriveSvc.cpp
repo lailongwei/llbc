@@ -112,6 +112,7 @@ private:
 TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
 : _svc(LLBC_IService::Create(LLBC_IService::Normal, "ExternalDriveSvc"))
 {
+    _svc->SuppressCoderNotFoundWarning();
 }
 
 TestCase_Comm_ExternalDriveSvc::~TestCase_Comm_ExternalDriveSvc()

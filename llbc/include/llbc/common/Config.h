@@ -78,7 +78,7 @@
 // Minimum stack size.
 #define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (1 * 1024 * 1024)
 // Message block default size.
-#define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (1024)
+#define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (64)
 // If you want debug guardians, enable this config option.
 #define LLBC_CFG_THREAD_GUARD_DEBUG                         0
 
@@ -142,6 +142,11 @@
 */
 // object pool memory block size
 #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         40960
+// object reset metch methods control.
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
 
 /**
  * \brief ObjBase about configs.

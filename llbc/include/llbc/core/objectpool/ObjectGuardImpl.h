@@ -21,14 +21,14 @@
 
 #ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__
 
-#include "llbc/core/objectpool/IObjectPool.h"
+#include "llbc/core/objectpool/IObjectPoolInst.h"
 
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPool *pool)
+inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst)
 : _obj(obj)
-, _pool(pool)
+, _poolInst(poolInst)
 
 , _weakRef(false)
 {
@@ -37,7 +37,7 @@ inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObj
 template <typename ObjectType>
 inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another)
 : _obj(another._obj)
-, _pool(another._pool)
+, _poolInst(another._poolInst)
 
 , _weakRef(false)
 {
@@ -50,26 +50,55 @@ inline LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
     if (_weakRef)
         return;
 
-    if (LIKELY(_pool))
-        _pool->Release(typeid(ObjectType).name(), _obj);
+    _poolInst->Release(_obj);
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_ObjectGuard<ObjectType>::operator ->()
+inline ObjectType *&LLBC_ObjectGuard<ObjectType>::operator ->()
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj() const
+inline const ObjectType * const &LLBC_ObjectGuard<ObjectType>::operator ->() const
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline LLBC_IObjectPool *LLBC_ObjectGuard<ObjectType>::GetPool() const
+ObjectType &LLBC_ObjectGuard<ObjectType>::operator *()
 {
-    return _pool;
+    return *_obj;
+}
+
+template <typename ObjectType>
+const ObjectType &LLBC_ObjectGuard<ObjectType>::operator *() const
+{
+    return *_obj;
+}
+
+template <typename ObjectType>
+inline LLBC_ObjectGuard<ObjectType>::operator ObjectType *()
+{
+    return _obj;
+}
+
+template <typename ObjectType>
+inline LLBC_ObjectGuard<ObjectType>::operator const ObjectType *() const
+{
+    return _obj;
+}
+
+template <typename ObjectType>
+inline ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj()
+{
+    return _obj;
+}
+
+template <typename ObjectType>
+inline const ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj() const
+{
+    return _obj;
 }
 
 template <typename ObjectType>
@@ -77,7 +106,6 @@ inline void LLBC_ObjectGuard<ObjectType>::MakeWeakRef()
 {
     _weakRef = true;
 }
-
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__

@@ -264,6 +264,13 @@ public:
 
 public:
     /**
+     * Clear packet object.
+     * Note: This operation will reset payload, delete encoder&decoder.
+     */
+    void Clear();
+
+public:
+    /**
      * Raw data type read methods.
      * @param[out] val - storage location for data.
      * @return int - return 0 if success, otherwise return -1.

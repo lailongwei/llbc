@@ -234,7 +234,6 @@ public:
 
 private:
     StackType _type;
-    bool _builded;
 
     LLBC_IService *_svc;
     LLBC_Session *_session;

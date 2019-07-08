@@ -265,12 +265,13 @@ public:
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId - the sessionId.
-     * @param[in] ctrlType  - the stack control type(user defined).
-     * @param[in] ctrlData  - the stack control data(user defined).
+     * @param[in] sessionId          - the sessionId.
+     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlData           - the stack control data(user defined).
+     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 public:
     /**
@@ -321,14 +322,6 @@ public:
     virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-    /**
-     * Set protocol filter to service's specified protocol layer.
-     * @param[in] filter  - the protocol filter.
-     * @param[in] toLayer - which layer will add to.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer);
-
 public:
     /**
      * Enable/Disable timer scheduler, only use external-drive type service.
@@ -377,14 +370,14 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
 
-public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
      * Get service protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
+     * @param[in] sessionId - the session Id.
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
-    virtual const LLBC_ProtocolStack *GetProtocolStack() const;
+    virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:
@@ -416,6 +409,14 @@ protected:
     virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
     virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
     virtual void RemoveSessionProtocolFactory(int sessionId);
+
+protected:
+    /**
+     * Ready session operation methods.
+     */
+    void AddReadySession(int sessionId, int acceptSessionId, bool isListenSession, bool repeatCheck = false);
+    void RemoveReadySession(int sessionId);
+    void RemoveAllReadySessions();
 
 protected:
     /**
@@ -546,14 +547,30 @@ private:
 
 private:
     LLBC_PollerMgr _pollerMgr;
-    
-    LLBC_SessionIdSet _connectedSessionIds;
-    LLBC_SpinLock _connectedSessionIdsLock;
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    typedef std::map<int, LLBC_ProtocolStack *> _CodecStacks;
-    LLBC_ProtocolStack _stack;
-#endif
+    class _ReadySessionInfo
+    {
+    public:
+        int sessionId;
+        int acceptSessionId;
+        bool isListenSession;
+        #if !LLBC_CFG_COMM_USE_FULL_STACK
+        LLBC_ProtocolStack *codecStack;
+        #endif // !LLBC_CFG_COMM_USE_FULL_STACK
+
+    public:
+        #if LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession);
+        #else // !LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack);
+        #endif // LLBC_CFG_COMM_USE_FULL_STACK
+        ~_ReadySessionInfo();
+    };
+    typedef std::map<int, _ReadySessionInfo *> _ReadySessionInfos;
+    typedef _ReadySessionInfos::iterator _ReadySessionInfosIter;
+    typedef _ReadySessionInfos::const_iterator _ReadySessionInfosCIter;
+    _ReadySessionInfos _readySessionInfos;
+    LLBC_SpinLock _readySessionInfosLock;
 
     class _WillRegFacade
     {
@@ -595,8 +612,6 @@ private:
     typedef std::map<int, LLBC_String> _StatusDescs;
     _StatusDescs _statusDescs;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-
-    LLBC_IProtocolFilter *_filters[LLBC_ProtocolLayer::End];
 
 private:
     _FrameTasks _beforeFrameTasks;

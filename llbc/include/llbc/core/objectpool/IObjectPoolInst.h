@@ -32,6 +32,7 @@ __LLBC_NS_BEGIN
 class LLBC_IObjectPoolInst
 {
 public:
+    LLBC_IObjectPoolInst() {  }
     virtual ~LLBC_IObjectPoolInst() {  }
 
 public:
@@ -46,6 +47,10 @@ public:
     * @param[in] obj - the object pointer.
     */
     virtual void Release(void *obj) = 0;
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_IObjectPoolInst);
 };
 
 __LLBC_NS_END
