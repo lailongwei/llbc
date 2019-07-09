@@ -206,7 +206,9 @@ LLBC_IApplication::LLBC_IApplication()
 , _started(false)
 , _waited(false)
 
+#if LLBC_TARGET_PLATFORM_WIN32
 , _crashDumpDelegate(NULL)
+#endif // Win32
 {
     if (_thisApp == NULL)
         _thisApp = this;
