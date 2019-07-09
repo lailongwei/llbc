@@ -36,6 +36,9 @@ class LLBC_Packet;
 class LLBC_IFacade;
 class LLBC_IService;
 
+template <typename Rtn, typename Arg1>
+class LLBC_IDelegate1;
+
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -108,6 +111,12 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetDumpFile(const LLBC_String &dumpFileName);
+
+    /**
+     * Set dump file delegate, invoke after write dump file.
+     * @param[in] dumpDelegate - the delegate.
+     */
+    void SetCrashDumpDelegate(LLBC_IDelegate1<void, const LLBC_Variant&> *dumpDelegate);
 
 public:
     /**
@@ -202,6 +211,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
+    LLBC_IDelegate1<void, const LLBC_Variant&> *_crashDumpDelegate;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;
