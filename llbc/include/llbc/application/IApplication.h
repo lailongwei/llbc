@@ -113,10 +113,11 @@ public:
     int SetDumpFile(const LLBC_String &dumpFileName);
 
     /**
-     * Set dump file delegate, invoke after write dump file.
-     * @param[in] dumpDelegate - the delegate.
+     * Set crash hook, invoke after crashed.
+     * @param[in] crashHook - the crash hook.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void SetCrashDumpDelegate(LLBC_IDelegate1<void, const LLBC_Variant&> *dumpDelegate);
+    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook);
 
 public:
     /**
@@ -211,7 +212,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
-    LLBC_IDelegate1<void, const LLBC_Variant&> *_crashDumpDelegate;
+    LLBC_IDelegate1<void, const LLBC_String&> *_crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;

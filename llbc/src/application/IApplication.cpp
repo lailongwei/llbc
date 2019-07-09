@@ -30,7 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
-static void *__crashDumpDelegate = NULL;
+static void *__crashHook = NULL;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -132,13 +132,8 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     ::CloseHandle(dmpFile);
 
-    if (__crashDumpDelegate)
-    {
-        LLBC_NS LLBC_Variant params;
-        params.BecomeDict();
-        params["DumpFileName"] = LLBC_NS LLBC_String(__dumpFileName);
-        reinterpret_cast<LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_Variant&> *>(__crashDumpDelegate)->Invoke(params);
-    }
+    if (__crashHook)
+        reinterpret_cast<LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String&> *>(__crashHook)->Invoke(__dumpFileName);
 
     LLBC_NS LLBC_String errMsg;
     errMsg.append("Unhandled exception!\n");
@@ -207,7 +202,7 @@ LLBC_IApplication::LLBC_IApplication()
 , _waited(false)
 
 #if LLBC_TARGET_PLATFORM_WIN32
-, _crashDumpDelegate(NULL)
+, _crashHook(NULL)
 #endif // Win32
 {
     if (_thisApp == NULL)
@@ -353,13 +348,15 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-void LLBC_IApplication::SetCrashDumpDelegate(LLBC_IDelegate1<void, const LLBC_Variant&> *dumpDelegate)
+int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
 #else // Win32
-    _crashDumpDelegate = dumpDelegate;
-    LLBC_INL_NS __crashDumpDelegate = dumpDelegate;
+    _crashHook = crashHook;
+    LLBC_INL_NS __crashHook = crashHook;
+    return LLBC_OK;
 #endif // Non Win32
 }
 
