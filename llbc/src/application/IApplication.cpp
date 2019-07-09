@@ -355,8 +355,12 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 
 void LLBC_IApplication::SetCrashDumpDelegate(LLBC_IDelegate1<void, const LLBC_Variant&> *dumpDelegate)
 {
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+#else // Win32
     _crashDumpDelegate = dumpDelegate;
     LLBC_INL_NS __crashDumpDelegate = dumpDelegate;
+#endif // Non Win32
 }
 
 const LLBC_String &LLBC_IApplication::GetName() const
