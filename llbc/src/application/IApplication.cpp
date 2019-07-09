@@ -24,7 +24,6 @@
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/IApplication.h"
-#include "llbc/core/utils/common.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 
