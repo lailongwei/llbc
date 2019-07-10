@@ -194,8 +194,6 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
         derefObj.clear();
         derefObj.push_back(5);
 
-        auto copyObj = obj;
-
         LLBC_ObjectGuard<std::vector<double> > obj2 = poolInst->GetGuarded();
         obj2->push_back(30.0);
         obj2->push_back(40.0);

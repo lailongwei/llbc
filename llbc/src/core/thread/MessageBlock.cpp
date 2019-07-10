@@ -127,7 +127,7 @@ void LLBC_MessageBlock::Release()
         LLBC_Free(_buf);
     _buf = NULL;
 
-    _size = NULL;
+    _size = 0;
     _readPos = _writePos = 0;
 }
 

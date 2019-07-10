@@ -27,6 +27,7 @@
 #include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/thread/Guard.h"
+#include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/Task.h"
 #include "llbc/core/thread/ThreadDescriptor.h"
 #include "llbc/core/thread/ThreadGroupDescriptor.h"
