@@ -23,15 +23,14 @@
 #define __LLBC_OBJBASE_DICTIONARY_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
-#include "llbc/objbase/DictionaryElem.h"
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/DictionaryElem.h"
 
 /**
  * Previous declare some classes.
  */
 __LLBC_NS_BEGIN
-class LLBC_Object;
 class LLBC_ObjectFactory;
 __LLBC_NS_END
 
@@ -44,10 +43,12 @@ template <bool _Forward>
 class LLBC_Dictionary_Const_Iterator_Base
 {
 public:
-    typedef const int int_key_type;
-    typedef const LLBC_String & str_key_type;
-    typedef const LLBC_Object * object_type;
-    typedef const LLBC_DictionaryElem * pointer;
+    typedef int int_key_type;
+    typedef LLBC_String str_key_type;
+    typedef LLBC_Object * object_type;
+    typedef const LLBC_Object * cobject_type;
+    typedef LLBC_DictionaryElem * pointer;
+    typedef const LLBC_DictionaryElem * cpointer;
     typedef LLBC_Dictionary_Const_Iterator_Base<_Forward> iterator;
 
 public:
@@ -66,6 +67,11 @@ public:
     {   // construct with dictionary element.
     }
 
+    explicit LLBC_Dictionary_Const_Iterator_Base(cpointer elem)
+    : _elem((pointer)elem)
+    {   // construct with dictionary element.
+    }
+
     ~LLBC_Dictionary_Const_Iterator_Base()
     {   // do noting.
     }
@@ -80,27 +86,27 @@ public:
         return _elem->IsStrKey();
     }
 
-    int_key_type IntKey() const
+    const int_key_type &IntKey() const
     {   // return integer type key.
         return _elem->GetIntKey();
     }
 
-    str_key_type StrKey() const
+    const str_key_type &StrKey() const
     {   // return string type key.
-        return *_elem->GetStrKey();
+        return _elem->GetStrKey();
     }
 
-    pointer Elem() const
+    const cpointer &Elem() const
     {   // return element.
         return _elem;
     }
 
-    object_type Obj() const
+    const cobject_type &Obj() const
     {   // return designated object.
         return _elem->GetObject();
     }
 
-    object_type operator *() const
+    const cobject_type &operator *() const
     {   // return designed object.
         _Checkit();
         return **_elem;
@@ -123,7 +129,7 @@ public:
         return *this;
     }
 
-    const iterator operator ++(int)
+    iterator operator ++(int)
     {   // postincrement.
         iterator temp(*this);
         ++ *this;
@@ -143,9 +149,11 @@ public:
                 _elem = _elem->GetElemNext();
             }
         }
+
+        return *this;
     }
 
-    const iterator operator --(int)
+    iterator operator --(int)
     {   // postdecrement.
         iterator temp(*this);
         -- *this;
@@ -201,9 +209,7 @@ class LLBC_Dictionary_Iterator_Base : public LLBC_Dictionary_Const_Iterator_Base
 
 public:
     typedef const int int_key_type;
-    typedef const LLBC_String & str_key_type;
-    typedef LLBC_Object *& object_type;
-    typedef LLBC_DictionaryElem * pointer;
+    typedef LLBC_String str_key_type;
     typedef LLBC_Dictionary_Iterator_Base<_Forward> iterator;
 
 public:
@@ -225,19 +231,19 @@ public:
     {   // do nothing.
     }
 
-    object_type Obj() const
+    object_type &Obj()
     {   // return designated object.
-        return (object_type)_MyBase::Obj();
+        return _elem->GetObject();
     }
 
-    pointer Elem()
+    pointer &Elem()
     {   // return element.
-        return (pointer)_elem;
+        return _elem;
     }
 
-    object_type operator *()
+    object_type &operator *()
     {   // return designated object.
-        return **(pointer)_elem;
+        return **_elem;
     }
 
     iterator &operator ++()
@@ -434,6 +440,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/objbase/DictionaryImpl.h"
+#include "llbc/core/objbase/DictionaryImpl.h"
 
 #endif // !__LLBC_OBJBASE_DICTIONARY_H__

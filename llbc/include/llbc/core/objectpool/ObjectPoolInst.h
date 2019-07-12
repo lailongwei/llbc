@@ -84,6 +84,7 @@ private:
     struct MemoryUnit
     {
         bool inited;            // Object has initialized or not.
+        bool referencableObj;   // Indicate object is referencable object or not.
         sint32 seq;             // The location seq of memory unit.
 
         uint8 buff[0];          // The begin address of buffer.
@@ -108,12 +109,23 @@ public:
     * @return void * - the object pointer.
     */
     virtual void *Get();
+    /**
+     * Get referencable object.
+     * @return void * - the object pointer.
+     */
+    virtual void *GetReferencable();
 
     /**
      * Get object.
      * @return ObjectType * - the object pointer.
      */
     ObjectType *GetObject();
+
+    /**
+     * Get object.
+     * @return ObjectType * - the object pointer.
+     */
+    ObjectType *GetReferencableObject();
 
     /**
      * Get guarded object.
@@ -135,15 +147,38 @@ public:
 
 protected:
     /**
+     * Release referencable object.
+    * @param[in] obj - the object pointer.
+     */
+    virtual void ReleaseReferencable(void *obj);
+
+private:
+    /**
      * Allocate a new memory block. 
      */
     void AllocateMemoryBlock();
 
     /**
      * Find a free object from memory block.
-     * @param[in] memBlock - memory block.
+     * @param[in] memBlock        - memory block.
+     * @param[in] referencableObj - is referencable object or not.
+     * @return void * - the object pointer.
      */
-    void *FindFreeObj(MemoryBlock *memBlock);
+    void *FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj);
+
+    /**
+     * Internal get object implement.
+     * @param[in] referencableObj - specific get referencable object or not.
+     * @return void * - the object pointer.
+     */
+    virtual void *Get(const bool &referencableObj);
+
+    /**
+     * Release object.
+     * @param[in] memUnit - the object memory unit.
+     * @param[in] obj     - the object pointer.
+     */
+    virtual void Release(MemoryUnit *memUnit, void *obj);
 
 private:
     // Disable assignment.

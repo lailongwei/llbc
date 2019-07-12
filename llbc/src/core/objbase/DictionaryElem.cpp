@@ -24,11 +24,18 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/os/OS_Console.h"
+#include "llbc/core/utils/Util_Debug.h"
 
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/KeyHashAlgorithm.h"
-#include "llbc/objbase/DictionaryElem.h"
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/KeyHashAlgorithm.h"
+#include "llbc/core/objbase/DictionaryElem.h"
+
+__LLBC_INTERNAL_NS_BEGIN
+
+static LLBC_NS LLBC_String __emptyStrKey;
+
+__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -90,14 +97,14 @@ bool LLBC_DictionaryElem::IsStrKey() const
     return !!_strKey;
 }
 
-int LLBC_DictionaryElem::GetIntKey() const
+const int &LLBC_DictionaryElem::GetIntKey() const
 {
     return _intKey;
 }
 
-const LLBC_String *LLBC_DictionaryElem::GetStrKey() const
+const LLBC_String &LLBC_DictionaryElem::GetStrKey() const
 {
-    return _strKey;
+    return _strKey ? *_strKey : LLBC_INL_NS __emptyStrKey;
 }
 
 uint32 LLBC_DictionaryElem::GetHashValue() const
@@ -110,7 +117,7 @@ LLBC_Object *&LLBC_DictionaryElem::GetObject()
     return _obj;
 }
 
-const LLBC_Object *LLBC_DictionaryElem::GetObject() const
+const LLBC_Object * const &LLBC_DictionaryElem::GetObject() const
 {
     return _obj;
 }
@@ -252,13 +259,11 @@ LLBC_Object *&LLBC_DictionaryElem::operator *()
     return _obj;
 }
 
-const LLBC_Object *LLBC_DictionaryElem::operator *() const
+const LLBC_Object * const &LLBC_DictionaryElem::operator *() const
 {
     return _obj;
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

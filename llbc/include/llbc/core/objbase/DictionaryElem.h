@@ -23,9 +23,8 @@
 #define __LLBC_OBJBASE_DICTIONARY_ELEM_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
-#include "llbc/objbase/KeyHashAlgorithm.h"
+#include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 /**
  * Previous declare some classes.
@@ -71,13 +70,13 @@ public:
     /**
      * Get integer key.
      */
-    int GetIntKey() const;
+    const int &GetIntKey() const;
 
     /**
      * Get string key.
      * @return const LLBC_String * - the string key.
      */
-    const LLBC_String *GetStrKey() const;
+    const LLBC_String &GetStrKey() const;
 
     /**
      * Get element key hash value.
@@ -94,7 +93,7 @@ public:
      * Get the element value(const).
      * @return const LLBC_Object * - the value.
      */
-    const LLBC_Object *GetObject() const;
+    const LLBC_Object * const &GetObject() const;
 
 public:
     /**
@@ -192,7 +191,7 @@ public:
      * Operator *.
      */
     LLBC_Object *&operator *();
-    const LLBC_Object *operator *() const;
+    const LLBC_Object * const &operator *() const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DictionaryElem);
 

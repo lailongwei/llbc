@@ -19,58 +19,21 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef __LLBC_OBJBASE_OBJBASE_H__
+#define __LLBC_OBJBASE_OBJBASE_H__
 
-#include "objbase/TestCase_ObjBase_Object.h"
+#include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/ObjectMacro.h"
+#include "llbc/core/objbase/ObjectFactory.h"
 
-namespace
-{
+#include "llbc/core/objbase/Array.h"
 
-class MyObj : public LLBC_Object
-{
-public:
-    MyObj()
-    {
-        std::cout <<"MyObj construct" <<std::endl;
-        m_data = malloc(10);
-    }
+#include "llbc/core/objbase/Dictionary.h"
+#include "llbc/core/objbase/DictionaryElem.h"
 
-    virtual ~MyObj()
-    {
-        std::cout <<"MyObj destruct" <<std::endl;
-        free(m_data);
-    }
+#include "llbc/core/objbase/AutoReleasePool.h"
+#include "llbc/core/objbase/AutoReleasePoolStack.h"
 
-private:
-    void *m_data;
-};
-
-}
-
-TestCase_ObjBase_Object::TestCase_ObjBase_Object()
-{
-}
-
-TestCase_ObjBase_Object::~TestCase_ObjBase_Object()
-{
-}
-
-int TestCase_ObjBase_Object::Run(int arg, char *argv[])
-{
-    std::cout <<"objbase/object test: " <<std::endl;
-    
-    MyObj *obj = LLBC_New0(MyObj);
-    obj->Retain();
-    obj->Release();
-    obj->Release();
-
-    MyObj anotherObj;
-
-    std::cout <<"press any key to continue ..." <<std::endl;
-    getchar();
-
-    return 0;
-}
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
+#endif // !__LLBC_OBJBASE_OBJBASE_H__

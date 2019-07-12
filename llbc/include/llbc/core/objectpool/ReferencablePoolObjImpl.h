@@ -19,24 +19,60 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
-#define __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/core/os/OS_Atomic.h"
+#include "llbc/core/objectpool/IObjectPoolInst.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+__LLBC_NS_BEGIN
 
-class TestCase_ObjBase_Object : public LLBC_BaseTestCase
+inline LLBC_ReferencablePoolObj::LLBC_ReferencablePoolObj()
+: _poolInst(NULL)
 {
-public:
-    TestCase_ObjBase_Object();
-    virtual ~TestCase_ObjBase_Object();
+}
 
-public:
-    virtual int Run(int argc, char *argv[]);
-};
+inline LLBC_ReferencablePoolObj::~LLBC_ReferencablePoolObj()
+{
+}
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
+inline void LLBC_ReferencablePoolObj::Release()
+{
+    if (--_ref == 0)
+    {
+        if (_poolInst)
+        {
+            _ref = 1;
+            _autoRef = 0;
+            _poolStack = NULL;
 
-#endif // !__LLBC_TEST_CASE_OBJBASE_OBJECT_H__
+            _poolInst->ReleaseReferencable(this);
+        }
+        else
+        {
+            LLBC_Delete(this);
+        }
+    }
+}
+
+inline void LLBC_ReferencablePoolObj::SafeRelease()
+{
+    if (LLBC_AtomicFetchAndSub(&_ref, 1) == 1)
+    {
+        if (_poolInst)
+        {
+            _ref = 1;
+            _autoRef = 0;
+            _poolStack = NULL;
+
+            _poolInst->ReleaseReferencable(this);
+        }
+        else
+        {
+            LLBC_Delete(this);
+        }
+    }
+}
+
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__

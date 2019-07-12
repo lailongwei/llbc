@@ -23,7 +23,8 @@
 #define __LLBC_OBJBASE_KEY_HASH_ALGORITHM_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+
+#include "llbc/core/singleton/Common.h"
 
 __LLBC_NS_BEGIN
 

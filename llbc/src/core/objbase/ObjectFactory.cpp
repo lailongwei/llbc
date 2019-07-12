@@ -19,64 +19,33 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_POLLER_MONITOR_H__
-#define __LLBC_COMM_POLLER_MONITOR_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#include "llbc/common/Config.h"
+
+#include "llbc/core/objbase/ObjectFactory.h"
 
 __LLBC_NS_BEGIN
 
-/**
- * \brief The poller monitor class encapsulation.
- */
-class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_BaseTask
+LLBC_ObjectFactory::LLBC_ObjectFactory()
 {
-    typedef LLBC_IDelegate0<void> _Deleg;
+}
 
-public:
-    /**
-     * Parameter constructor.
-     * @param[in] deleg - the monitor invoke delegate.
-     */
-    LLBC_PollerMonitor(_Deleg *deleg);
+LLBC_ObjectFactory::~LLBC_ObjectFactory()
+{
+}
 
-    /**
-     * Destructor.
-     */
-    virtual ~LLBC_PollerMonitor();
+LLBC_Object *LLBC_ObjectFactory::CreateObject() const
+{
+    return LLBC_New0(LLBC_Object);
+}
 
-public:
-    /**
-     * Startup poller monitor.
-     * @return int - return 0 if startup success, otherwise return -1.
-     */
-    int Start();
-
-    /**
-     * Stop poller monitor.
-     */
-    void Stop();
-
-public:
-    /**
-     * Task entry method.
-     */
-    virtual void Svc();
-
-    /**
-     * Task cleanup method.
-     */
-    virtual void Cleanup();
-
-private:
-    _Deleg *_deleg;
-
-    volatile bool _started;
-    volatile bool _stopping;
-};
+LLBC_Object *LLBC_ObjectFactory::Clone() const
+{
+    return LLBC_New0(LLBC_ObjectFactory);
+}
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COMM_POLLER_MONITOR_H__
-
+#include "llbc/common/AfterIncl.h"

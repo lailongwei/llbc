@@ -23,9 +23,8 @@
 #define __LLBC_OBJBASE_OBJECT_FACTORY_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
-#include "llbc/objbase/Object.h"
+#include "llbc/core/objbase/Object.h"
 
 __LLBC_NS_BEGIN
 

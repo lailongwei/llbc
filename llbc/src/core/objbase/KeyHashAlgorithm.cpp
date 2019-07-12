@@ -24,9 +24,9 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/utils/Util_Text.h"
 
-#include "llbc/objbase/KeyHashAlgorithm.h"
+#include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -277,7 +277,5 @@ LLBC_KeyHashAlgorithm::APHash::Result_Type
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

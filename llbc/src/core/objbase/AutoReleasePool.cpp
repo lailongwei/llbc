@@ -24,12 +24,9 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/Array.h"
-#include "llbc/objbase/AutoReleasePool.h"
-#include "llbc/objbase/AutoReleasePoolStack.h"
+#include "llbc/core/objbase/Array.h"
+#include "llbc/core/objbase/AutoReleasePool.h"
+#include "llbc/core/objbase/AutoReleasePoolStack.h"
 
 __LLBC_NS_BEGIN
 
@@ -143,7 +140,5 @@ void LLBC_AutoReleasePool::SetPoolNext(LLBC_AutoReleasePool *next)
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

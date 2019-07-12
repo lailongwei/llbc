@@ -19,37 +19,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+#ifdef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__
 
-#include "llbc/common/Config.h"
-
-#if LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/objbase/ObjectFactory.h"
+#include "llbc/core/objectpool/ReferencablePoolObj.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_ObjectFactory::LLBC_ObjectFactory()
+inline void LLBC_IObjectPoolInst::SetPoolInstToReferencablePoolObj(void *obj)
 {
+    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = this;
 }
 
-LLBC_ObjectFactory::~LLBC_ObjectFactory()
+inline void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolObj(void *obj)
 {
-}
-
-LLBC_Object *LLBC_ObjectFactory::CreateObject() const
-{
-    return LLBC_New0(LLBC_Object);
-}
-
-LLBC_Object *LLBC_ObjectFactory::Clone() const
-{
-    return LLBC_New0(LLBC_ObjectFactory);
+    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = NULL;
 }
 
 __LLBC_NS_END
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

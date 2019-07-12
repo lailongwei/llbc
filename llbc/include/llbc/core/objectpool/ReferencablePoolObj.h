@@ -19,24 +19,58 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_OBJBASE_DICTIONARY_H__
-#define __LLBC_TEST_CASE_OBJBASE_DICTIONARY_H__
+#ifndef __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__
+#define __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/common/Common.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/objbase/Object.h"
 
-class TestCase_ObjBase_Dictionary : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+/**
+ * Pre-declare some classes.
+ */
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
+ * \brief The referencable pool object encapsulation.
+ */
+class LLBC_EXPORT LLBC_ReferencablePoolObj : public LLBC_Object
 {
 public:
-    TestCase_ObjBase_Dictionary();
-    virtual ~TestCase_ObjBase_Dictionary();
+    explicit LLBC_ReferencablePoolObj();
+    virtual ~LLBC_ReferencablePoolObj();
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    /**
+     * Release object.
+     */
+    virtual void Release();
+
+    /**
+     * Safe release object.
+     */
+    virtual void SafeRelease();
+
+private:
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ReferencablePoolObj);
+
+private:
+    /**
+     * Declare friend classes.
+     */
+    friend class LLBC_IObjectPoolInst;
+
+    LLBC_IObjectPoolInst *_poolInst;
 };
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
+__LLBC_NS_END
 
-#endif // !__LLBC_TEST_CASE_OBJBASE_DICTIONARY_H__
+#include "llbc/core/objectpool/ReferencablePoolObjImpl.h"
+
+#endif // !__LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__

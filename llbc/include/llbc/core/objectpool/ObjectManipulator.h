@@ -27,6 +27,15 @@
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
  * \brief The pool object manipulator.
  */
 class LLBC_ObjectManipulator
