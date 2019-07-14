@@ -105,7 +105,8 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void *obj)
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
         reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
 #if LLBC_DEBUG
-    ASSERT(!memUnit->referencableObj && "LLBC_ObjectPoolInst::Release() could not release referencable object, "
+    ASSERT(!memUnit->referencableObj && 
+           "LLBC_ObjectPoolInst::Release() could not release referencable object, "
            "please using LLBC_ReferencableObj::Release/AutoRelease methods to complete object release");
 #endif // LLBC_DEBUG
     Release(memUnit, obj);
@@ -153,6 +154,7 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
     for (int idx = 0; idx < _elemCnt; ++idx)
     {
         MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * idx);
+        memUnit->block = memBlock;
 #if !LLBC_DEBUG
         memUnit->inited = false;
         memUnit->referencableObj = false;
@@ -189,14 +191,20 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock 
     if (memUnit->inited)
         ASSERT(memUnit->referencableObj == referencableObj && "LLBC_ObjectPoolInst::Get() memory unit referencable flag conflict");
 #endif // LLBC_DEBUG
-    memUnit->referencableObj = referencableObj;
 
+#if LLBC_DEBUG
     void *obj = memUnit->buff + LLBC_INL_NS CheckSymbolSize;
+#else // !LLBC_DEBUG
+    void *obj = memUnit->buff; //! Implic CheckSymbolSize is zero.
+#endif // LLBC_DEBUG
     if (!memUnit->inited)
     {
         LLBC_ObjectManipulator::New<ObjectType>(obj);
         if (referencableObj)
+        {
+            memUnit->referencableObj = true;
             SetPoolInstToReferencablePoolObj(obj);
+        }
 
         memUnit->inited = true;
     }
@@ -232,17 +240,11 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get(const boo
 template <typename ObjectType, typename LockType>
 inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(MemoryUnit *memUnit, void *obj)
 {
-    bool destoryed = LLBC_ObjectManipulator::Reset<ObjectType>(obj);
-    if (destoryed)
+    if (LLBC_ObjectManipulator::Reset<ObjectType>(obj))
         memUnit->inited = false;
 
-    MemoryBlock *memBlock = reinterpret_cast<MemoryBlock *>(reinterpret_cast<uint8 *>(memUnit) - memUnit->seq * _elemSize - sizeof(MemoryBlock));
-
     _lock.Lock();
-
-    CircularBuffer<MemoryUnit *> *&memUnitView = _memUnitUsageView[memBlock->seq];
-    memUnitView->Push(memUnit);
-
+    _memUnitUsageView[memUnit->block->seq]->Push(memUnit);
     _lock.Unlock();
 }
 

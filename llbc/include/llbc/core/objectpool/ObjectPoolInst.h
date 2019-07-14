@@ -32,19 +32,8 @@
  #pragma warning(disable:4200)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+
 __LLBC_INTERNAL_NS_BEGIN
-
-// Define bitview element size, in bytes.
-const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
-
-// Define 64bit 0&1.
-#if LLBC_TARGET_PLATFORM_WIN32
-    const LLBC_NS sint64 Zero = 0I64;
-    const LLBC_NS sint64 One = 1I64;
-#else
-    const LLBC_NS sint64 Zero = 0LL;
-    const LLBC_NS sint64 One = 1LL;
-#endif
 
 // Define BeginingSymbol/EndSymbol, CheckSymbolSize.
 #if LLBC_DEBUG
@@ -77,12 +66,14 @@ template <typename ObjectType, typename LockType = LLBC_DummyLock>
 class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
 private:
-    
     /**
      * The structure of memory unit.
      */
+    struct MemoryBlock;
     struct MemoryUnit
     {
+        MemoryBlock *block;     // ownered this memory unit's block.
+
         bool inited;            // Object has initialized or not.
         bool referencableObj;   // Indicate object is referencable object or not.
         sint32 seq;             // The location seq of memory unit.

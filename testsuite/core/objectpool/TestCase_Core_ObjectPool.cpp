@@ -72,14 +72,14 @@ namespace
                 const int newDelTimes = _randTimes[runTimes];
                 for (int j = 0; j < newDelTimes; ++j)
                 {
+                    // poolObjs[j] = _pool->Get<std::vector<double> >();
                     poolObjs[j] = _poolInst->GetObject();
-                    //poolObjs[j] = _pool->Get<std::vector<double> >();
                     for (int k = 0; k < _pushElems[runTimes]; ++k)
                         poolObjs[j]->push_back(k);
                 }
 
                 for (int j = 0; j < newDelTimes; ++j)
-                    //_pool->Release(poolObjs[j]);
+                    // _pool->Release(poolObjs[j]);
                     _poolInst->ReleaseObject(poolObjs[j]);
             }
         }
@@ -113,8 +113,8 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/objectpool test:");
 
-    DoBasicTest();
-    // DoPrefTest();
+    // DoBasicTest();
+    DoPrefTest();
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
