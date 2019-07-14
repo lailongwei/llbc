@@ -12,6 +12,7 @@
 # 7)【llbc core】调整objbase模块到core中, 去除编译控制.
 # 8)【llbc core】objectpool增加ReferencablePoolObj支持, 以从对象池取得可引用对象(Retain/Release/AutoRelease).
 # 9)【llbc core】优化LLBC_Dicrionary代码(主要为Iter相关).
+# 10)【llbc core】优化object pool代码，去除不必要的运算, 性能再提升10%.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
