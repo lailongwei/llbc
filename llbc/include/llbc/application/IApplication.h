@@ -36,9 +36,6 @@ class LLBC_Packet;
 class LLBC_IFacade;
 class LLBC_IService;
 
-template <typename Rtn, typename Arg1>
-class LLBC_IDelegate1;
-
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -212,7 +209,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
-    LLBC_IDelegate1<void, const LLBC_String&> *_crashHook;
+    LLBC_IDelegate1<void, const LLBC_String &> *_crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;

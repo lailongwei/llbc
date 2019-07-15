@@ -30,7 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
-static void *__crashHook = NULL;
+static LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String &> *__crashHook = NULL;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -133,7 +133,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     ::CloseHandle(dmpFile);
 
     if (__crashHook)
-        reinterpret_cast<LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String&> *>(__crashHook)->Invoke(__dumpFileName);
+        __crashHook->Invoke(__dumpFileName);
 
     LLBC_NS LLBC_String errMsg;
     errMsg.append("Unhandled exception!\n");
