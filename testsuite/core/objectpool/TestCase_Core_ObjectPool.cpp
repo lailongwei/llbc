@@ -28,6 +28,61 @@ namespace
     const int TestTimes = 100000;
     const int ListSize = 100;
 
+    // Define some test classes.
+    class TestObj
+    {
+    public:
+        TestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        ~TestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
+    class ClearableTestObj
+    {
+    public:
+        ClearableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        ~ClearableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+    public:
+        void Clear()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
+    class ReferencableTestObj : public LLBC_ReferencablePoolObj
+    {
+    public:
+        ReferencableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        virtual ~ReferencableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+    public:
+        void Clear()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
     /**
     * \brief Object pool test task encapsulation.
     */
@@ -125,61 +180,6 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 void TestCase_Core_ObjectPool::DoBasicTest()
 {
     LLBC_PrintLine("Begin object pool basic test:");
-
-    // Declare embedded test object classes.
-    class TestObj
-    {
-    public:
-        TestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-
-        ~TestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-    };
-
-    class ClearableTestObj
-    {
-    public:
-        ClearableTestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-
-        ~ClearableTestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-
-    public:
-        void Clear()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-    };
-
-    class ReferencableTestObj : public LLBC_ReferencablePoolObj
-    {
-    public:
-        ReferencableTestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-
-        virtual ~ReferencableTestObj()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-
-    public:
-        void Clear()
-        {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
-        }
-    };
 
     // Test Get/Release
     {
