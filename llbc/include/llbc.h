@@ -29,8 +29,6 @@
 #include "llbc/common/Common.h"
 /* llbc/core part */
 #include "llbc/core/Core.h"
-/* llbc/objbase part */
-#include "llbc/objbase/ObjBase.h"
 /* llbc/communication part */
 #include "llbc/comm/Comm.h"
 /* llbc/testcase part */

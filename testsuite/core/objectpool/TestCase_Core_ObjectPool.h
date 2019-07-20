@@ -33,6 +33,11 @@ public:
 
 public:
     int Run(int argc, char *argv[]);
+
+private:
+    void DoBasicTest();
+
+    void DoPrefTest();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__

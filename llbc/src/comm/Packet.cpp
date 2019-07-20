@@ -104,7 +104,7 @@ const void *LLBC_Packet::GetPayload() const
     if (!_payload)
         return NULL;
 
-    return _payload->GetData();
+    return _payload->GetDataStartWithReadPos();
 }
 
 void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
@@ -140,7 +140,7 @@ size_t LLBC_Packet::GetPayloadLength() const
     if (!_payload)
         return 0;
 
-    return _payload->GetWritePos();
+    return _payload->GetReadableSize();
 }
 
 void LLBC_Packet::ResetPayload()

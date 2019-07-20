@@ -52,7 +52,14 @@ public:
      */
     template <typename ObjectType>
     ObjectType *Get();
-    
+
+    /**
+     * Get referencable object.
+     * @return ObjectType * - the referencable object pointer, never null.
+     */
+    template <typename ObjectType>
+    ObjectType *GetReferencable();
+
     /**
      * Get guarded object.
      * @return LLBC_ObjectGuard<Object> - the guarded object.

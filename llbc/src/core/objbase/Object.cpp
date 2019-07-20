@@ -24,10 +24,10 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/os/OS_Atomic.h"
 
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/AutoReleasePoolStack.h"
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/AutoReleasePoolStack.h"
 
 __LLBC_NS_BEGIN
 
@@ -127,7 +127,5 @@ bool LLBC_Object::DeSerializeEx(LLBC_Stream &s)
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

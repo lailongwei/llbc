@@ -22,6 +22,7 @@
 #ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__
 
 #include "llbc/core/thread/Guard.h"
+
 #include "llbc/core/objectpool/ObjectGuard.h"
 #include "llbc/core/objectpool/ObjectManipulator.h"
 
@@ -52,8 +53,11 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
             for (int unitIdx = 0; unitIdx != _elemCnt; ++unitIdx)
             {
                 MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * unitIdx);
-                if (memUnit->inited)
-                    LLBC_ObjectManipulator::Delete<ObjectType>(reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize));
+                if (!memUnit->inited)
+                    continue;
+
+                void *obj = reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize);
+                LLBC_ObjectManipulator::Delete<ObjectType>(obj);
             }
 
             ::free(memBlock);
@@ -68,32 +72,25 @@ inline LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
 template <typename ObjectType, typename LockType>
 inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get()
 {
-    void *obj;
+    return Get(false);
+}
 
-    _lock.Lock();
-
-    int oldBlockCnt = _blockCnt;
-    for (int blockIdx = 0; blockIdx < oldBlockCnt; ++blockIdx)
-    {
-        if ((obj = FindFreeObj(_block[blockIdx])))
-        {
-            _lock.Unlock();
-            return obj;
-        }
-    }
-
-    AllocateMemoryBlock();
-    obj = FindFreeObj(_block[oldBlockCnt]);
-
-    _lock.Unlock();
-
-    return obj;
+template <typename ObjectType, typename LockType>
+inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::GetReferencable()
+{
+    return Get(true);
 }
 
 template <typename ObjectType, typename LockType>
 inline ObjectType *LLBC_ObjectPoolInst<ObjectType, LockType>::GetObject()
 {
-    return reinterpret_cast<ObjectType *>(Get());
+    return reinterpret_cast<ObjectType *>(Get(false));
+}
+
+template <typename ObjectType, typename LockType>
+inline ObjectType *LLBC_ObjectPoolInst<ObjectType, LockType>::GetReferencableObject()
+{
+    return reinterpret_cast<ObjectType *>(Get(true));
 }
 
 template <typename ObjectType, typename LockType>
@@ -105,20 +102,14 @@ LLBC_ObjectGuard<ObjectType> LLBC_ObjectPoolInst<ObjectType, LockType>::GetGuard
 template <typename ObjectType, typename LockType>
 inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void *obj)
 {
-    bool destoryed = LLBC_ObjectManipulator::Reset<ObjectType>(obj);
-
-    MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
-    if (destoryed)
-        memUnit->inited = false;
-
-    MemoryBlock *memBlock = reinterpret_cast<MemoryBlock *>(reinterpret_cast<uint8 *>(memUnit) - memUnit->seq * _elemSize - sizeof(MemoryBlock));
-
-    _lock.Lock();
-
-    CircularBuffer<MemoryUnit *> *&memUnitView = _memUnitUsageView[memBlock->seq];
-    memUnitView->Push(memUnit);
-
-    _lock.Unlock();
+    MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
+        reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
+#if LLBC_DEBUG
+    ASSERT(!memUnit->referencableObj && 
+           "LLBC_ObjectPoolInst::Release() could not release referencable object, "
+           "please using LLBC_ReferencableObj::Release/AutoRelease methods to complete object release");
+#endif // LLBC_DEBUG
+    Release(memUnit, obj);
 }
 
 template <typename ObjectType, typename LockType>
@@ -128,6 +119,14 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::ReleaseObject(ObjectType*
 }
 
 template <typename ObjectType, typename LockType>
+inline void LLBC_ObjectPoolInst<ObjectType, LockType>::ReleaseReferencable(void *obj)
+{
+    MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
+        reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
+    Release(memUnit, obj);
+}
+
+    template <typename ObjectType, typename LockType>
 inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
 {
     // Allocate new block and memory unit usage view.
@@ -155,7 +154,11 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
     for (int idx = 0; idx < _elemCnt; ++idx)
     {
         MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * idx);
+        memUnit->block = memBlock;
+#if !LLBC_DEBUG
         memUnit->inited = false;
+        memUnit->referencableObj = false;
+#endif // !LLBC_DEBUG
         memUnit->seq = idx;
 
 #if LLBC_DEBUG 
@@ -173,29 +176,76 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
 }
 
 template <typename ObjectType, typename LockType>
-inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlock)
+inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj)
 {
     CircularBuffer<MemoryUnit *> *&memUnitView = _memUnitUsageView[memBlock->seq];
     if (memUnitView->IsEmpty())
         return NULL;
 
     MemoryUnit *memUnit = memUnitView->Pop();
-
-#if LLBC_DEBUG 
+#if LLBC_DEBUG
     ASSERT(*(reinterpret_cast<sint64 *>(memUnit->buff)) == LLBC_INL_NS BeginingSymbol && "LLBC_ObjectPoolInst::Get() memory unit is dirty");
     ASSERT(*(reinterpret_cast<sint64 *>(
         reinterpret_cast<uint8 *>(memUnit) + _elemSize - LLBC_INL_NS CheckSymbolSize)) == LLBC_INL_NS EndingSymbol &&
         "LLBC_ObjectPoolInst::Get() memory unit is dirty");
+    if (memUnit->inited)
+        ASSERT(memUnit->referencableObj == referencableObj && "LLBC_ObjectPoolInst::Get() memory unit referencable flag conflict");
 #endif // LLBC_DEBUG
 
+#if LLBC_DEBUG
     void *obj = memUnit->buff + LLBC_INL_NS CheckSymbolSize;
+#else // !LLBC_DEBUG
+    void *obj = memUnit->buff; //! Implic CheckSymbolSize is zero.
+#endif // LLBC_DEBUG
     if (!memUnit->inited)
     {
         LLBC_ObjectManipulator::New<ObjectType>(obj);
+        if (referencableObj)
+        {
+            memUnit->referencableObj = true;
+            SetPoolInstToReferencablePoolObj(obj);
+        }
+
         memUnit->inited = true;
     }
 
     return obj;
+}
+
+template <typename ObjectType, typename LockType>
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get(const bool &referencableObj)
+{
+    void *obj;
+
+    _lock.Lock();
+
+    int oldBlockCnt = _blockCnt;
+    for (int blockIdx = 0; blockIdx < oldBlockCnt; ++blockIdx)
+    {
+        if ((obj = FindFreeObj(_block[blockIdx], referencableObj)))
+        {
+            _lock.Unlock();
+            return reinterpret_cast<ObjectType *>(obj);
+        }
+    }
+
+    AllocateMemoryBlock();
+    obj = FindFreeObj(_block[oldBlockCnt], referencableObj);
+
+    _lock.Unlock();
+
+    return obj;
+}
+
+template <typename ObjectType, typename LockType>
+inline void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(MemoryUnit *memUnit, void *obj)
+{
+    if (LLBC_ObjectManipulator::Reset<ObjectType>(obj))
+        memUnit->inited = false;
+
+    _lock.Lock();
+    _memUnitUsageView[memUnit->block->seq]->Push(memUnit);
+    _lock.Unlock();
 }
 
 __LLBC_NS_END

@@ -121,5 +121,7 @@ namespace llbc
 
         static public uint LLBC_ERROR_IS_LISTEN_SOCKET       = 0xc000002b;
 
+        static public uint LLBC_ERROR_NOT_POOL_OBJECT        = 0xc000002c;
+
     }
 }
