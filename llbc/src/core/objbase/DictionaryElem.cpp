@@ -117,7 +117,7 @@ LLBC_Object *&LLBC_DictionaryElem::GetObject()
     return _obj;
 }
 
-const LLBC_Object * const &LLBC_DictionaryElem::GetObject() const
+LLBC_Object * const &LLBC_DictionaryElem::GetObject() const
 {
     return _obj;
 }
@@ -259,7 +259,7 @@ LLBC_Object *&LLBC_DictionaryElem::operator *()
     return _obj;
 }
 
-const LLBC_Object * const &LLBC_DictionaryElem::operator *() const
+LLBC_Object * const &LLBC_DictionaryElem::operator *() const
 {
     return _obj;
 }

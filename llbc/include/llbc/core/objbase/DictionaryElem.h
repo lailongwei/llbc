@@ -93,7 +93,7 @@ public:
      * Get the element value(const).
      * @return const LLBC_Object * - the value.
      */
-    const LLBC_Object * const &GetObject() const;
+    LLBC_Object * const &GetObject() const;
 
 public:
     /**
@@ -191,7 +191,7 @@ public:
      * Operator *.
      */
     LLBC_Object *&operator *();
-    const LLBC_Object * const &operator *() const;
+    LLBC_Object * const &operator *() const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DictionaryElem);
 

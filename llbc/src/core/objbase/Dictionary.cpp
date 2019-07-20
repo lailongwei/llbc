@@ -477,7 +477,7 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
     ConstIter it = Begin(), endIt = End();
     for (; it != endIt; ++it)
     {
-        const LLBC_DictionaryElem *elem = it.Elem();
+        const LLBC_DictionaryElem * const elem = it.Elem();
 
         const uint8 intKeyFlag = elem->IsIntKey() ? 1 : 0;
         LLBC_STREAM_WRITE(intKeyFlag);

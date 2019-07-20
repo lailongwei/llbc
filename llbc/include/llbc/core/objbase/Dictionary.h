@@ -46,9 +46,9 @@ public:
     typedef int int_key_type;
     typedef LLBC_String str_key_type;
     typedef LLBC_Object * object_type;
-    typedef const LLBC_Object * cobject_type;
+    typedef const object_type cobject_type;
     typedef LLBC_DictionaryElem * pointer;
-    typedef const LLBC_DictionaryElem * cpointer;
+    typedef LLBC_DictionaryElem * const cpointer;
     typedef LLBC_Dictionary_Const_Iterator_Base<_Forward> iterator;
 
 public:
@@ -62,12 +62,12 @@ public:
     {   // construct with another iter.
     }
 
-    explicit LLBC_Dictionary_Const_Iterator_Base(pointer elem)
+    explicit LLBC_Dictionary_Const_Iterator_Base(pointer &elem)
     : _elem(elem)
     {   // construct with dictionary element.
     }
 
-    explicit LLBC_Dictionary_Const_Iterator_Base(cpointer elem)
+    explicit LLBC_Dictionary_Const_Iterator_Base(cpointer &elem)
     : _elem((pointer)elem)
     {   // construct with dictionary element.
     }
@@ -96,7 +96,7 @@ public:
         return _elem->GetStrKey();
     }
 
-    const cpointer &Elem() const
+    cpointer &Elem() const
     {   // return element.
         return _elem;
     }
@@ -208,9 +208,14 @@ class LLBC_Dictionary_Iterator_Base : public LLBC_Dictionary_Const_Iterator_Base
     using _MyBase::_elem;
 
 public:
-    typedef const int int_key_type;
-    typedef LLBC_String str_key_type;
+    typedef typename _MyBase::int_key_type int_key_type;
+    typedef typename _MyBase::str_key_type str_key_type;
+    typedef typename _MyBase::object_type object_type;
+    typedef typename _MyBase::cobject_type cobject_type;
+    typedef typename _MyBase::pointer pointer;
+    typedef typename _MyBase::cpointer cpointer;
     typedef LLBC_Dictionary_Iterator_Base<_Forward> iterator;
+
 
 public:
     LLBC_Dictionary_Iterator_Base()
