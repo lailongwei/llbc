@@ -125,9 +125,10 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 
 , _releasePoolStack(NULL)
 
-, _timerScheduler(NULL)
+, _safetyObjectPool(NULL)
+, _unsafetyObjectPool(NULL)
 
-, _objectPool(NULL)
+, _timerScheduler(NULL)
 
 , _evManager()
 
@@ -224,17 +225,19 @@ This::DriveMode LLBC_Service::GetDriveMode() const
 
 int LLBC_Service::SetDriveMode(This::DriveMode mode)
 {
+    // Drive mode vlidate check.
     if (mode != This::SelfDrive && mode != This::ExternalDrive)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
-    else if (_started)
+    else if (_started) // If service started, could not change drive mode.
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
 
+    // Service started recheck(after locked).
     LLBC_LockGuard guard(_lock);
     if (_started)
     {
@@ -242,10 +245,14 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
         return LLBC_FAILED;
     }
 
+    // If drive mode is external drive, Reinit object-pools, timer-scheduler, ...
     if ((_driveMode = mode) == This::ExternalDrive)
     {
+        ClearHoldedObjectPools();
+        ClearHoldedTimerScheduler();
+
+        InitObjectPools();
         InitTimerScheduler();
-        InitObjectPool();
     }
 
     return LLBC_OK;
@@ -1242,8 +1249,8 @@ void LLBC_Service::Svc()
     _lock.Lock();
 
     AddServiceToTls();
+    InitObjectPools();
     InitTimerScheduler();
-    InitObjectPool();
     CreateAutoReleasePool();
     _facadesInitRet = InitFacades();
     _facadesInitFinished = 1;
@@ -1281,9 +1288,15 @@ void LLBC_Service::Cleanup()
     // Cleanup ready-sessionInfos map.
     RemoveAllReadySessions();
 
-    // Stop facades, destroy release-pool, and remove service from TLS.
+    // Stop facades, destroy release-pool.
     StopFacades();
     DestroyAutoReleasePool();
+
+    // Clear holded timer-scheduler & object-pools.
+    ClearHoldedObjectPools();
+    ClearHoldedTimerScheduler();
+
+    // Remove service from TLS.
     RemoveServiceFromTls();
 
     // Popup & Destroy all not-process events.
@@ -1293,10 +1306,7 @@ void LLBC_Service::Cleanup()
 
     // If is self-drive servie, notify service manager self stopped.
     if (_driveMode == This::SelfDrive)
-    {
-        _timerScheduler = NULL;
         _svcMgr.OnServiceStop(this);
-    }
 
     // Reset some variables.
     _relaxTimes = 0;
@@ -1882,6 +1892,26 @@ void LLBC_Service::DestroyAutoReleasePool()
     tls->objbaseTls.poolStack = NULL;
 }
 
+void LLBC_Service::InitObjectPools()
+{
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (!_safetyObjectPool)
+        _safetyObjectPool = reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
+
+    if (!_unsafetyObjectPool)
+        _unsafetyObjectPool = reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
+}
+
+void LLBC_Service::UpdateObjectPools()
+{
+}
+
+void LLBC_Service::ClearHoldedObjectPools()
+{
+    _safetyObjectPool = NULL;
+    _unsafetyObjectPool = NULL;
+}
+
 void LLBC_Service::InitTimerScheduler()
 {
     if (!_timerScheduler)
@@ -1896,17 +1926,9 @@ void LLBC_Service::UpdateTimers()
     _timerScheduler->Update();
 }
 
-void LLBC_Service::InitObjectPool()
+void LLBC_Service::ClearHoldedTimerScheduler()
 {
-    if (!_objectPool)
-    {
-        __LLBC_LibTls *tls = __LLBC_GetLibTls();
-        _objectPool = reinterpret_cast<LLBC_ThreadObjectPool *>(tls->coreTls.objectPool);
-    }
-}
-
-void LLBC_Service::UpdateObjectPool()
-{
+    _timerScheduler = NULL;
 }
 
 void LLBC_Service::ProcessIdle(bool fullFrame)

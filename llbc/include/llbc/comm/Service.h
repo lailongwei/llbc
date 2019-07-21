@@ -355,10 +355,16 @@ public:
 
 public:
     /**
-    * Get object pool.
-    * @return LLBC_ThreadObjectPool * - the object pool.
+    * Get safety object pool.
+    * @return LLBC_SafetyObjectPool * - the safety object pool.
     */
-    LLBC_ThreadObjectPool *GetObjectPool();
+    LLBC_SafetyObjectPool *GetSafetyObjectPool();
+
+    /**
+    * Get unsafety object pool.
+    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
+    */
+    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
 
 public:
     /**
@@ -476,16 +482,18 @@ private:
     void DestroyAutoReleasePool();
 
     /**
+    * Object pool operation methods.
+    */
+    void InitObjectPools();
+    void UpdateObjectPools();
+    void ClearHoldedObjectPools();
+
+    /**
      * Timer-Scheduler operation methods.
      */
     void InitTimerScheduler();
     void UpdateTimers();
-
-    /**
-    * Object pool operation methods.
-    */
-    void InitObjectPool();
-    void UpdateObjectPool();
+    void ClearHoldedTimerScheduler();
 
     /**
      * Idle process method.
@@ -622,10 +630,11 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack;
 
 private:
-    LLBC_TimerScheduler *_timerScheduler;
+    LLBC_SafetyObjectPool *_safetyObjectPool;
+    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
 
 private:
-    LLBC_ThreadObjectPool *_objectPool;
+    LLBC_TimerScheduler *_timerScheduler;
 
 private:
     LLBC_EventManager _evManager;

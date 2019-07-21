@@ -49,20 +49,19 @@ int __LLBC_CoreStartup()
     LLBC_CPUTime::InitFrequency();
 #endif
 
-    // Set entry thread timer scheduler.
-    LLBC_TimerScheduler::CreateEntryThreadScheduler();
-
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    tls->coreTls.timerScheduler = LLBC_TimerScheduler::GetEntryThreadScheduler();
-
     // Set entry thread object pool.
-    LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPool();
-    tls->coreTls.objectPool = LLBC_ThreadObjectPoolManager::GetEntryThreadObjectPool();
+    if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
+        return LLBC_FAILED;
+
+    // Set entry thread timer scheduler.
+    if (LLBC_TimerScheduler::CreateEntryThreadScheduler() != LLBC_OK)
+        return LLBC_FAILED;
 
     // Set random seed.
     LLBC_SeedRand(static_cast<int>(::time(NULL)));
 
     // Initialize network library.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->coreTls.needInitWinSock)
         LLBC_StartupNetLibrary();
 
@@ -72,13 +71,10 @@ int __LLBC_CoreStartup()
 void __LLBC_CoreCleanup()
 {
     // Destroy entry thread timer scheduler.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    tls->coreTls.timerScheduler = NULL;
-    LLBC_TimerScheduler::DestroyEntryThreadScheduler();
+    (void)LLBC_TimerScheduler::DestroyEntryThreadScheduler();
 
     // Destroy entry thread object pool.
-    tls->coreTls.objectPool = NULL;
-    LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPool();
+    (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
 
     // Destroy main bundle.
     LLBC_Bundle::DestroyMainBundle();
@@ -87,6 +83,7 @@ void __LLBC_CoreCleanup()
     LLBC_LoggerManagerSingleton->Finalize();
 
     // Cleanup network library.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->coreTls.needInitWinSock)
         LLBC_CleanupNetLibrary();
 }

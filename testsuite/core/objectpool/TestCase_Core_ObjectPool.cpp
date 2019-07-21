@@ -91,7 +91,7 @@ namespace
     public:
         ObjectPoolTestTask()
         : _repeatCount(TestTimes)
-        , _pool(new LLBC_ObjectPool<LLBC_SpinLock>())
+        , _pool(new LLBC_SafetyObjectPool())
         , _poolInst(_pool->GetPoolInst<std::vector<double> >())
         {
             LLBC_Random rand;
@@ -151,7 +151,7 @@ namespace
         volatile int _repeatCount;
 
         LLBC_FastLock _lock;
-        LLBC_ObjectPool<LLBC_SpinLock> *_pool;
+        LLBC_SafetyObjectPool  *_pool;
         LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
     };
 }
@@ -234,7 +234,7 @@ void TestCase_Core_ObjectPool::DoPrefTest()
 {
     LLBC_PrintLine("Begin object pool performance test:");
 
-    LLBC_ThreadObjectPool pool;
+    LLBC_UnsafetyObjectPool pool;
     std::vector<double> *poolObjs[ListSize];
     std::vector<double> *mallocObjs[ListSize];
 

@@ -52,14 +52,16 @@ public:
     /**
      * Create the entry thread(Call LLBC_Startup()/LLBC_Cleanup() methods' thread) scheduler.
      * Call by LLBC framework, do not try to call it.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    static void CreateEntryThreadScheduler();
+    static int CreateEntryThreadScheduler();
 
     /**
      * Destroy entry thread(Call LLBC_Startup()/LLBC_Cleanup() methods' thread) scheduler.
      * Call by LLBC framework, do not try to call it.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    static void DestroyEntryThreadScheduler();
+    static int DestroyEntryThreadScheduler();
 
 public:
     /**
