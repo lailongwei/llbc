@@ -108,6 +108,13 @@ public:
      */
     int SetDumpFile(const LLBC_String &dumpFileName);
 
+    /**
+     * Set crash hook, invoke after crashed.
+     * @param[in] crashHook - the crash hook.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook);
+
 public:
     /**
      * Get application name.
@@ -201,6 +208,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
+    LLBC_IDelegate1<void, const LLBC_String &> *_crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;
