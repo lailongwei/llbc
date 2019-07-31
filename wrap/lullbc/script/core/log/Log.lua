@@ -3,7 +3,6 @@ local Log = llbc.newclass('llbc.Log')
 local type = type
 local getinfo = debug.getinfo
 local traceback = debug.traceback
-local Util_Table_Concat = _llbc.Util_Table_Concat
 local LogMsg = _llbc.LogMsg
 
 -- Log levels enumeration.
