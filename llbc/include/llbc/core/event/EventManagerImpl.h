@@ -42,10 +42,10 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
 
 inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
 {
+    stub.clear();
+
     if (RemoveListener(stub) != LLBC_OK)
         return LLBC_FAILED;
-
-    stub.clear();
 
     return LLBC_OK;
 }
