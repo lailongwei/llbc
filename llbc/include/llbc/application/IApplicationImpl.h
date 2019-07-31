@@ -29,7 +29,7 @@ inline App *LLBC_IApplication::ThisApp()
     return static_cast<App *>(_thisApp);
 }
 
-inline LLBC_IApplication *LLBC_IApplication::ThisIApp()
+inline LLBC_IApplication *LLBC_IApplication::ThisApp()
 {
     return _thisApp;
 }

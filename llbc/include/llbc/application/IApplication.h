@@ -75,7 +75,7 @@ public:
      */
     template <typename App>
     static App *ThisApp();
-    static LLBC_IApplication *ThisIApp();
+    static LLBC_IApplication *ThisApp();
 
 public:
     /**

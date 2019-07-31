@@ -194,6 +194,11 @@ public:
     void Close();
 
     /**
+     * Get file path.
+     */
+    const LLBC_String &GetFilePath() const;
+
+    /**
      * Get file no.
      * @param[in] handle - the file handle(FILE *).
      * @return int - the file no, if failed, return -1.
