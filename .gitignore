@@ -5,6 +5,8 @@
 *.sdf
 *.opensdf
 *.idc
+*.dylib
+*.so
 
 .DS_Store
 
@@ -29,3 +31,5 @@ wrap/pyllbc/lib/
 wrap/pyllbc/linux/
 
 !.gitignore
+
+llbc.lua
