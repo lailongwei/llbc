@@ -164,7 +164,7 @@ function Log.output(level, logger, tag, ...)
     local file, line
     if Log.logFileInfo then
         local di = debug.getinfo(3, 'Sl')
-        file, line = di.source, di.currentline
+        file, line = strung.sub(di.source, 2), di.currentline
     end
 
     if tag == nil then
