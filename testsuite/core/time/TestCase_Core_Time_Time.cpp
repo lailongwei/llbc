@@ -99,38 +99,38 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // AddYears/Months/... test
     std::cout <<"AddYears() test:" <<std::endl;
-    for (int i = 1; i <= 4; i++)
+    for (int i = 1; i <= 4; ++i)
         std::cout <<i <<": " <<now.AddYears(i) <<", -" <<i <<": " <<now.AddYears(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddMonths() test:" <<std::endl;
-    for (int i = 1; i <= 15; i++)
+    for (int i = 1; i <= 15; ++i)
         std::cout <<i <<": " <<now.AddMonths(i) <<", -" <<i <<": " <<now.AddMonths(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddDays() test:" <<std::endl;
-    for (int i = 1; i <= 70; i++)
+    for (int i = 1; i <= 70; ++i)
         std::cout <<i <<": " <<now.AddDays(i) <<", -" <<i <<": " <<now.AddDays(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddHours() test:" <<std::endl;
-    for (int i = 1; i <= 62; i++)
+    for (int i = 1; i <= 62; ++i)
         std::cout <<i <<": " <<now.AddHours(i) <<", -" <<i <<": " <<now.AddHours(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddMinutes() test:" <<std::endl;
-    for (int i = 1; i <= 62; i++)
+    for (int i = 1; i <= 62; ++i)
         std::cout <<i <<": " <<now.AddMinutes(i) <<", -" <<i <<": " <<now.AddMinutes(-i) <<"\n";
     std::cout <<std::endl;
 
     std::cout <<"AddSeconds() test:" <<std::endl;
-    for (int i = 1; i <= 62; i++)
+    for (int i = 1; i <= 62; ++i)
         std::cout <<i <<": " <<now.AddSeconds(i) <<", -" <<i <<": " <<now.AddSeconds(-i) <<"\n";
     std::cout <<std::endl;
 
     int addMilliSecsStep = 500;
     std::cout <<"AddMilliSeconds() test(step:+/- " <<addMilliSecsStep <<" milli-seconds):" <<std::endl;
-    for (int i = 1; i <= 3; i++)
+    for (int i = 1; i <= 3; ++i)
     {
         int addMilliSecs = addMilliSecsStep * i;
         std::cout << i <<"(" <<addMilliSecs <<"): " <<now.AddMilliSeconds(addMilliSecs).GetTimeTick() <<", -"
@@ -140,7 +140,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     int addMicroSecsStep = 500;
     std::cout <<"AddMicroSeconds() test(step:+/- " <<addMicroSecsStep <<" micro-seconds):" <<std::endl;
-    for (int i = 1; i <= 3; i++)
+    for (int i = 1; i <= 3; ++i)
     {
         int addMicroSecs = addMicroSecsStep * i;
         std::cout <<i <<"(" <<addMicroSecs <<"): " <<now.AddMicroSeconds(addMicroSecs).GetTimeTick() <<", -"
@@ -159,9 +159,9 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // GetMonthMaxDays() test.
     std::cout <<"GetMonthMaxDays() test:" <<std::endl;
-    for (int i = 0; i <= 13; i++)
+    for (int i = 0; i <= 13; ++i)
         std::cout <<"2012-" <<i <<": max days: " <<LLBC_Time::GetMonthMaxDays(2012, i) <<std::endl;
-    for (int i = 0; i <= 13; i++)
+    for (int i = 0; i <= 13; ++i)
         std::cout <<"2015-" <<i <<": max days: " <<LLBC_Time::GetMonthMaxDays(2015, i) <<std::endl;
 
     // FromXXX() test.

@@ -41,7 +41,7 @@ static int Reader_ThreadProc(void *arg)
     std::cout <<"I'm reader: " <<threadIndex <<std::endl;
     __g_outLock.Unlock();
 
-    for(int i = 1; ; i ++)
+    for(int i = 1; ; ++i)
     {
         __g_rwValue.lock.ReadLock();
         if(i % 50000 == 0)
@@ -66,7 +66,7 @@ static int Writer_ThreadProc(void *arg)
     std::cout <<"I'm writer" <<std::endl;
     __g_outLock.Unlock();
 
-    for(int i = 0; i < __g_updateTimes; i ++)
+    for(int i = 0; i < __g_updateTimes; ++i)
     {
         __g_rwValue.lock.WriteLock();
         __g_rwValue.value += 1;
@@ -95,7 +95,7 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
 
     // Create readers.
     LLBC_NativeThreadHandle readers[__g_readerCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(long i = 0; i < __g_readerCount; i ++)
+    for(long i = 0; i < __g_readerCount; ++i)
     {
         void *threadArg = NULL;
         ::memcpy(&threadArg, &i, sizeof(long));
@@ -110,7 +110,7 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
     LLBC_JoinThread(writer);
 
     // Cancel readers and join it.
-    for(long i = 0; i < __g_readerCount; i ++)
+    for(long i = 0; i < __g_readerCount; ++i)
     {
         LLBC_CancelThread(readers[i]);
         LLBC_JoinThread(readers[i]);

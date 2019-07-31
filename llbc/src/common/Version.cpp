@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_majorVersion       = 1;
 int LLBC_minorVersion       = 0;
-int LLBC_updateNo           = 6;
+int LLBC_updateNo           = 7;
 
 #ifdef LLBC_DEBUG
 bool LLBC_isDebugVer        = true;
@@ -98,6 +98,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
     desc.append_format("  timer info: \n");
     desc.append_format("    strict timer schedule: %s\n", LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE ? "true" : "false");
+    desc.append_format("  objectpool info: \n");
+    desc.append_format("    object pool memory block size(bytes): %d\n", LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE);
 
     // Append communication info.
     desc.append_format("communication info: \n");

@@ -55,15 +55,13 @@ public:
      * @param[in] priority    - thread priority.
      * @param[in] groupHandle - thread group handle.
      * @param[in] stack_size  - per thread stack size, in bytes.
-     * @param[in] task        - task pointer, default is this.
      * @return int - return 0 if success, otherwise return false.
      */
     virtual int Activate(int threadNum = 1,
                          int flags = LLBC_ThreadFlag::Joinable,
                          int priority = LLBC_ThreadPriority::Normal,
                          LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                         const int stack_size[] = NULL,
-                         LLBC_BaseTask *task = NULL);
+                         const int stack_size[] = NULL);
 
     /**
      * Get thread count.
@@ -160,10 +158,25 @@ public:
     LLBC_DISABLE_ASSIGNMENT(LLBC_BaseTask);
 
 private:
+    /**
+     * Declare friend class: LLBC_Session.
+     *  Access method list:
+     *      GetTaskThreads()
+     */
+    friend class LLBC_ThreadManager;
+
+    /**
+     * Get task threads, call by LLBC_TaskManager.
+     * @param[out] taskThreads - the task threads.
+     */
+    void GetTaskThreads(std::vector<LLBC_Handle> &taskThreads);
+
+private:
     int _threadNum;
     int _curThreadNum;
     volatile bool _startCompleted;
     LLBC_ThreadManager *_threadManager;
+    LLBC_Handle *_taskThreads;
 
     LLBC_SpinLock _lock;
 

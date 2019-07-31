@@ -38,12 +38,14 @@
 #include "llbc/core/event/Common.h"
 #include "llbc/core/timer/Common.h"
 #include "llbc/core/thread/Common.h"
-#include "llbc/core/singleton/Singleton.h"
+#include "llbc/core/singleton/Common.h"
 #include "llbc/core/log/Common.h"
 #include "llbc/core/random/Common.h"
 #include "llbc/core/entity/Common.h"
 #include "llbc/core/transcoder/Common.h"
 #include "llbc/core/library/Common.h"
+#include "llbc/core/objbase/ObjBase.h"
+#include "llbc/core/objectpool/Common.h"
 
 __LLBC_NS_BEGIN
 

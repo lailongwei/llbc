@@ -53,7 +53,8 @@ This::_Handler This::_handlers[LLBC_PollerEvent::End] =
     &This::HandleEv_Send,
     &This::HandleEv_Close,
     &This::HandleEv_Monitor,
-    &This::HandleEv_TakeOverSession
+    &This::HandleEv_TakeOverSession,
+    &This::HandleEv_CtrlProtocolStack
 };
 
 LLBC_BasePoller::LLBC_BasePoller()
@@ -166,7 +167,7 @@ void LLBC_BasePoller::Cleanup()
 #if LLBC_TARGET_PLATFORM_WIN32
     for (_Sessions::iterator it = _sessions.begin();
          it != _sessions.end();
-         it++)
+         ++it)
         it->second->GetSocket()->DeleteAllOverlappeds();
 #endif // LLBC_TARGET_PLATFORM_WIN32
     LLBC_STLHelper::DeleteContainer(_sessions);
@@ -175,7 +176,7 @@ void LLBC_BasePoller::Cleanup()
     // Delete all connecting sockets.
     for (_Connecting::iterator it = _connecting.begin();
          it != _connecting.end();
-         it++)
+         ++it)
         LLBC_Delete(it->second.socket);
     _connecting.clear();
 
@@ -227,7 +228,10 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
 {
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
+    {
+        LLBC_XFree(ev.un.closeReason);
         return;
+    }
 
     LLBC_SessionCloseInfo *closeInfo = 
         LLBC_New1(LLBC_SessionCloseInfo, ev.un.closeReason);
@@ -249,6 +253,28 @@ void LLBC_BasePoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
 {
     AddSession(ev.un.session);
+}
+
+void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
+{
+    _Sessions::iterator it = _sessions.find(ev.sessionId);
+    if (it == _sessions.end())
+    {
+        LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
+        return;
+    }
+
+    LLBC_Variant ctrlData;
+    LLBC_Stream ctrlDataStream(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
+    ASSERT(ctrlDataStream.Read(ctrlData) && "llbc library internal error: deserialize protocol stack control data failed!");
+
+    LLBC_Session *&session = it->second;
+    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+
+    if (ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg)
+        ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+
+    LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
 }
 
 LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, LLBC_Session *acceptSession)

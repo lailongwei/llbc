@@ -98,8 +98,6 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_CORE_TIMER_STRICT_SCHEDULE");
 
     // Push objbase module about config.
-    lua_pushboolean(l, LLBC_CFG_OBJBASE_ENABLED);
-    lua_setfield(l, 1, "CFG_OBJBASE_ENABLED");
     lua_pushinteger(l, LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE);
     lua_setfield(l, 1, "CFG_OBJBASE_DICT_DFT_BUCKET_SIZE");
     lua_pushstring(l, LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO);

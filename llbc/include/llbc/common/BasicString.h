@@ -171,7 +171,7 @@ public:
 
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
-        for (size_t i = 1; i < right; i++)
+        for (size_type i = 1; i < right; ++i)
             LLBC_MemCpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
 
         return *this;
@@ -476,9 +476,9 @@ public:
         return *this;
     }
 
-    _These split(const _Elem &sep, size_type max_split = -1) const
+    _These split(const _Elem &sep, size_type max_split = -1, bool strip_empty = false) const
     {
-        return this->split(_This(1, sep), max_split);
+        return this->split(_This(1, sep), max_split, false, strip_empty);
     }
 
     // findreplace operation
@@ -487,7 +487,7 @@ public:
         if (c1 == c2)
             return *this;
 
-        for (size_type i = 0; i < this->size(); i++)
+        for (size_type i = 0; i < this->size(); ++i)
         {
             if ((*this)[i] == c1)
                 replace(i, 1, 1, c2);
@@ -512,7 +512,7 @@ public:
     }
 
     // split operation
-    _These split(const _This &sep, size_type max_split = -1, bool with_elem = false) const
+    _These split(const _This &sep, size_type max_split = -1, bool with_elem = false, bool strip_empty = false) const
     {
         _These substrs;
         if (sep.empty() || max_split == 0 || this->empty())
@@ -522,13 +522,14 @@ public:
         }
 
         size_type idx = 0;
-        uint32 splitTimes = 0;
-        for (; splitTimes < static_cast<uint32>(max_split); splitTimes++)
+        size_type splitTimes = 0;
+        const size_type step = with_elem ? 1 : sep.size();
+        for (; splitTimes < max_split; ++splitTimes)
         {
             size_type findIdx = npos;
             if (with_elem)
             {
-                for (size_t i = 0; i < sep.size(); i++)
+                for (size_t i = 0; i < sep.size(); ++i)
                 {
                     findIdx = this->find(sep[i], idx);
                     if (findIdx != npos)
@@ -543,46 +544,16 @@ public:
             if (findIdx == npos)
                 break;
 
-            substrs.push_back(this->substr(idx, findIdx - idx));
-            if ((idx = findIdx + 1) == this->size())
+            if (strip_empty && findIdx == idx)
             {
-                substrs.push_back(_This());
-                break;
-            }
-        }
-
-        if (idx != this->size())
-            substrs.push_back(this->substr(idx));
-
-        return substrs;
-    }
-
-    _These split(const _These &seps, size_type max_split = -1) const
-    {
-        _These substrs;
-        if (seps.empty() || max_split == 0 || this->empty())
-        {
-            substrs.push_back(*this);
-            return substrs;
-        }
-
-        size_type idx = 0;
-        uint32 splitTimes = 0;
-        for (; splitTimes < static_cast<uint32>(max_split); splitTimes++)
-        {
-            size_type findIdx = npos;
-            for (size_t i = 0; i < seps.size(); i++)
-            {
-                findIdx = this->find(seps[i], idx);
-                if (findIdx != npos)
+                if ((idx = findIdx + step) == this->size())
                     break;
+
+                continue;
             }
 
-            if (findIdx == npos)
-                break;
-
             substrs.push_back(this->substr(idx, findIdx - idx));
-            if ((idx = findIdx + 1) == this->size())
+            if ((idx = findIdx + step) == this->size() && !strip_empty)
             {
                 substrs.push_back(_This());
                 break;
@@ -753,11 +724,13 @@ public:
 
         _This lower;
         lower.resize(size);
-        for (register size_type i = 0; i < size; i++)
+        for (size_type i = 0; i < size; ++i)
+        {
             if (buf[i] >= 0x41 && buf[i] <= 0x5A)
                 lower[i] = buf[i] + 0x20;
             else
                 lower[i] = buf[i];
+        }
 
         return lower;
     }
@@ -769,7 +742,7 @@ public:
 
         _This upper;
         upper.resize(size);
-        for (register size_type i = 0; i < size; i++)
+        for (size_type i = 0; i < size; ++i)
             if (buf[i] >= 0x61 && buf[i] <= 0x7a)
                 upper[i] = buf[i] - 0x20;
             else
@@ -848,7 +821,7 @@ public:
         if (s.empty())
             return false;
 
-        for (size_t i = 0; i < s.size(); i++)
+        for (size_type i = 0; i < s.size(); ++i)
         {
             if (!isalpha(s[i]))
                 return false;
@@ -885,7 +858,7 @@ public:
             return false;
 
         bool foundLower = false;
-        for (size_type i = 0; i < s.size(); i++)
+        for (size_type i = 0; i < s.size(); ++i)
         {
             if (isupper(s[i]))
                 return false;
@@ -924,7 +897,7 @@ public:
             return false;
 
         bool foundUpper = false;
-        for (size_type i = 0; i < s.size(); i++)
+        for (size_type i = 0; i < s.size(); ++i)
         {
             if (islower(s[i]))
                 return false;
@@ -963,7 +936,7 @@ public:
         if (s.empty())
             return false;
 
-        for (size_type i = 0; i < s.size(); i++)
+        for (size_type i = 0; i < s.size(); ++i)
         {
             if (!isdigit(s[i]))
                 return false;
@@ -1000,7 +973,7 @@ public:
         if (s.empty())
             return false;
 
-        for (size_type i = 0; i < s.size(); i++)
+        for (size_type i = 0; i < s.size(); ++i)
         {
             if (!isspace((*s)[i]))
                 return false;
@@ -1107,12 +1080,12 @@ public:
         }
 
         _This &thisRef = *this;
-        typename _This::size_type stripTo = 0;
-        for (typename _This::size_type i = 0; i != thisRef.size(); i++)
+        size_type stripTo = 0;
+        for (size_type i = 0; i != thisRef.size(); ++i)
         {
             bool found = false;
             const _Elem &now = thisRef[i];
-            for (typename _This::size_type j = 0; j != willStripChars.size(); j++)
+            for (size_type j = 0; j != willStripChars.size(); ++j)
             {
                 if (now == willStripChars[j])
                 {
@@ -1157,11 +1130,11 @@ public:
         const long thisSize = static_cast<long>(thisRef.size());
 
         long stripFrom = thisSize;
-        for (long i = thisSize - 1; i >= 0; i--)
+        for (long i = thisSize - 1; i >= 0; --i)
         {
             bool found = false;
             const _Elem &now = thisRef[i];
-            for (_This::size_type j = 0; j != willStripChars.size(); j++)
+            for (size_type j = 0; j != willStripChars.size(); ++j)
             {
                 if (now == willStripChars[j])
                 {
@@ -1201,40 +1174,40 @@ public:
     }
 
 public:
-	// escape support: escape string
-	_This &escape(const _This &willbeEscapeChars, const _Elem &escapeChar)
-	{
-		if (this->empty())
-			return *this;
-
-		const long len = static_cast<long>(this->size());
-		for (long i = len - 1; i >= 0; i--)
-		{
-			const _Elem &ch = (*this)[i];
-			if (ch == escapeChar || 
-				willbeEscapeChars.find(ch) != _This::npos)
-				this->insert(i, 1, escapeChar);
-		}
-
-		return *this;
-	}
-
-	_This escape(const _This &willbeEscapeChars, const _Elem &escapeChar) const
-	{
-		if (this->empty())
-			return *this;
-
-		return _This(*this).escape(willbeEscapeChars, escapeChar);
-	}
-
-	// escape support: unescape string
-	_This &unescape(const _Elem &escapeChar)
-	{
+    // escape support: escape string
+    _This &escape(const _This &willbeEscapeChars, const _Elem &escapeChar)
+    {
         if (this->empty())
             return *this;
 
-		const long len = static_cast<long>(this->size());
-        for (long i = len - 1; i >= 0; i--)
+        const long len = static_cast<long>(this->size());
+        for (long i = len - 1; i >= 0; --i)
+        {
+            const _Elem &ch = (*this)[i];
+            if (ch == escapeChar ||
+                willbeEscapeChars.find(ch) != _This::npos)
+                this->insert(i, 1, escapeChar);
+        }
+
+        return *this;
+    }
+
+    _This escape(const _This &willbeEscapeChars, const _Elem &escapeChar) const
+    {
+        if (this->empty())
+            return *this;
+
+        return _This(*this).escape(willbeEscapeChars, escapeChar);
+    }
+
+    // escape support: unescape string
+    _This &unescape(const _Elem &escapeChar)
+    {
+        if (this->empty())
+            return *this;
+
+        const long len = static_cast<long>(this->size());
+        for (long i = len - 1; i >= 0; --i)
         {
             const _Elem &ch = (*this)[i];
             if (ch == escapeChar)
@@ -1498,7 +1471,7 @@ private:
         if (endPos > _This::size())
             return npos;
 
-        for (; curPos != endPos; curPos++)
+        for (; curPos != endPos; ++curPos)
         {
             ch = static_cast<uint8>(_Base::at(curPos));
             if ((ch & 0xc0) != 0x80)

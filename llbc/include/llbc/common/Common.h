@@ -40,6 +40,7 @@
 #include "llbc/common/SocketDataType.h"
 #include "llbc/common/Exceptions.h"
 #include "llbc/common/Functional.h"
+#include "llbc/common/CircularBuffer.h"
 
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"

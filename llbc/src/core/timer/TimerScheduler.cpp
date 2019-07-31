@@ -50,7 +50,7 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 
     const size_t size = _heap.GetSize();
     const _Heap::Container &elems = _heap.GetData();
-    for (size_t i = 1; i <= size; i++)
+    for (size_t i = 1; i <= size; ++i)
     {
         LLBC_TimerData *data = const_cast<LLBC_TimerData *>(elems[i]);
         if (data->validate)
@@ -65,19 +65,46 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
     }
 }
 
-void LLBC_TimerScheduler::CreateEntryThreadScheduler()
+int LLBC_TimerScheduler::CreateEntryThreadScheduler()
 {
-    LLBC_TimerScheduler *&scheduler = 
-        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler;
-    if (!scheduler)
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (!tls->coreTls.entryThread)
     {
-        scheduler = LLBC_New0(LLBC_TimerScheduler);
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
     }
+    else if (tls->coreTls.timerScheduler)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    tls->coreTls.timerScheduler = 
+        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = LLBC_New0(LLBC_TimerScheduler);
+
+    return LLBC_OK;
 }
 
-void LLBC_TimerScheduler::DestroyEntryThreadScheduler()
+int LLBC_TimerScheduler::DestroyEntryThreadScheduler()
 {
-    LLBC_XDelete(LLBC_INTERNAL_NS __g_entryThreadTimerScheduler);
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (!tls->coreTls.entryThread)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+    else if (!tls->coreTls.timerScheduler)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    tls->coreTls.timerScheduler = NULL;
+
+    LLBC_Delete(LLBC_INTERNAL_NS __g_entryThreadTimerScheduler);
+    LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = NULL;
+
+    return LLBC_OK;
 }
 
 LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetEntryThreadScheduler()
@@ -247,7 +274,7 @@ void LLBC_TimerScheduler::CancelAll()
 
     const size_t size = _heap.GetSize();
     _Heap::Container copyElems(_heap.GetData());
-    for (size_t i = 1; i <= size; i++)
+    for (size_t i = 1; i <= size; ++i)
     {
         LLBC_TimerData *data = copyElems[i];
         if (UNLIKELY(!data->validate))

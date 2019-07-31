@@ -67,6 +67,10 @@ struct __LLBC_LibTls
         /* Timer scheduler. */
         void *timerScheduler;
 
+        /* ObjectPool pointers. */
+        void *safetyObjectPool;
+        void *unsafetyObjectPool;
+
         /* symbol about data. */
         #if LLBC_CFG_OS_IMPL_SYMBOL
         struct

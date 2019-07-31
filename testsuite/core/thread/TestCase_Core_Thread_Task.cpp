@@ -89,7 +89,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     task->Activate(2);
 
     // Send message to task.
-    for(int i = 0; i < 50000; i ++)
+    for(int i = 0; i < 50000; ++i)
     {
         LLBC_Stream stream;
         LLBC_String content = "Hello Tasks!";

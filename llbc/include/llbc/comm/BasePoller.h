@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/AsyncConnInfo.h"
@@ -122,6 +121,7 @@ protected:
     virtual void HandleEv_Close(LLBC_PollerEvent &ev);
     virtual void HandleEv_Monitor(LLBC_PollerEvent &ev);
     virtual void HandleEv_TakeOverSession(LLBC_PollerEvent &ev);
+    virtual void HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev);
 
     /**
      * Create new session from socket.

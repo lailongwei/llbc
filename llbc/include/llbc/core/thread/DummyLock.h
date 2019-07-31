@@ -64,4 +64,6 @@ private:
 
 __LLBC_NS_END
 
+#include "llbc/core/thread/DummyLockImpl.h"
+
 #endif // !__LLBC_CORE_THREAD_DUMMY_LOCK_H__

@@ -80,7 +80,7 @@ public:
      * @param[in] index - heap index.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int DeleteElem(int index);
+    int DeleteElem(size_t index);
 
     /**
      * Delete specific elem's heap element.
@@ -94,7 +94,7 @@ public:
      * @param[in] index - heap index.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int DeleteElem(int index, T &elem);
+    int DeleteElem(size_t index, T &elem);
 
     /**
      * Cleanup heap.

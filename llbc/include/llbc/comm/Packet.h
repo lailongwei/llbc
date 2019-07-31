@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 
 /**
  * Pre-declare some classes.
@@ -261,6 +260,13 @@ public:
      * Reset packet payload.
      */
     void ResetPayload();
+
+public:
+    /**
+     * Clear packet object.
+     * Note: This operation will reset payload, delete encoder&decoder.
+     */
+    void Clear();
 
 public:
     /**

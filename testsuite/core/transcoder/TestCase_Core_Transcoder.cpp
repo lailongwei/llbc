@@ -295,7 +295,7 @@ void TestCase_Core_Transcoder::DeleteOutputFiles(const std::vector<LLBC_String> 
     getchar();
 
     const size_t filesCnt = files.size();
-    for(size_t i = 0; i < filesCnt; i ++)
+    for(size_t i = 0; i < filesCnt; ++i)
     {
         LLBC_PrintLine("    Delete file: %s ......", files[i].c_str());
         if(LLBC_File::DeleteFile(files[i]) != LLBC_OK)

@@ -63,10 +63,10 @@
 #include "core/entity/TestCase_Core_Entity.h"
 #include "core/transcoder/TestCase_Core_Transcoder.h"
 #include "core/library/TestCase_Core_Library.h"
-
-#include "objbase/TestCase_ObjBase_Object.h"
-#include "objbase/TestCase_ObjBase_Array.h"
-#include "objbase/TestCase_ObjBase_Dictionary.h"
+#include "core/objbase/TestCase_ObjBase_Object.h"
+#include "core/objbase/TestCase_ObjBase_Array.h"
+#include "core/objbase/TestCase_ObjBase_Dictionary.h"
+#include "core/objectpool/TestCase_Core_ObjectPool.h"
 
 #include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"
@@ -81,6 +81,7 @@
 #include "comm/TestCase_Comm_Multicast.h"
 #include "comm/TestCase_Comm_ExternalDriveSvc.h"
 #include "comm/TestCase_Comm_LazyTask.h"
+#include "comm/TestCase_Comm_ProtoStackCtrl.h"
 
 #include "application/TestCase_App_AppTest.h"
 

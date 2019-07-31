@@ -331,13 +331,13 @@ namespace llbc
         #region Internal implementation
         private unsafe void _LoadAllSections(_NativeIniSection* nativeSections, int sectionCount)
         {
-            for (int sectionIdx = 0; sectionIdx < sectionCount; sectionIdx++)
+            for (int sectionIdx = 0; sectionIdx < sectionCount; ++sectionIdx)
             {
                 _NativeIniSection nativeSection = *(nativeSections + sectionIdx);
                 string sectionName = LibUtil.Ptr2Str(nativeSection.sectionName, nativeSection.sectionNameLen);
 
                 Dictionary<string, string> values = new Dictionary<string, string>(nativeSection.count);
-                for (int valueIdx = 0; valueIdx < nativeSection.count; valueIdx++)
+                for (int valueIdx = 0; valueIdx < nativeSection.count; ++valueIdx)
                 {
                     string key = LibUtil.Ptr2Str(nativeSection.keys[valueIdx], nativeSection.keysLen[valueIdx]);
                     string value = LibUtil.Ptr2Str(nativeSection.values[valueIdx], nativeSection.valuesLen[valueIdx]);

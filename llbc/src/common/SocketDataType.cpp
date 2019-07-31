@@ -338,7 +338,7 @@ void LLBC_OverlappedGroup::DeleteOverlapped(LLBC_POverlapped ol)
 void LLBC_OverlappedGroup::DeleteAllOverlappeds()
 {
     _OLContainerIter iter = _ols.begin();
-    for (; iter != _ols.end(); iter++)
+    for (; iter != _ols.end(); ++iter)
     {
         LLBC_POverlapped ol = *iter;
         ClearOverlappedMembers(ol);

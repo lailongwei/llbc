@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 
 #include "llbc/comm/FacadeEvents.h"
 #include "llbc/comm/IService.h"
@@ -132,7 +131,7 @@ public:
 
     /**
      * Set service FPS.
-     * @return int - return 0 if success, ohterwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetFPS(int fps);
 
@@ -184,7 +183,7 @@ public:
     virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
 
     /**
-     * Check given sessionId is lgeal or not.
+     * Check given sessionId is legal or not.
      * @param[in] sessionId - the given session Id.
      * @return bool - return true is given session Id validate, otherwise return false.
      */
@@ -263,6 +262,16 @@ public:
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL);
 
+    /**
+     * Control session protocol stack.
+     * @param[in] sessionId          - the sessionId.
+     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlData           - the stack control data(user defined).
+     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+
 public:
     /**
      * Register facade.
@@ -312,14 +321,6 @@ public:
     virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-    /**
-     * Set protocol filter to service's specified protocol layer.
-     * @param[in] filter  - the protocol filter.
-     * @param[in] toLayer - which layer will add to.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int SetProtocolFilter(LLBC_IProtocolFilter *filter, int toLayer);
-
 public:
     /**
      * Enable/Disable timer scheduler, only use external-drive type service.
@@ -354,6 +355,19 @@ public:
 
 public:
     /**
+    * Get safety object pool.
+    * @return LLBC_SafetyObjectPool * - the safety object pool.
+    */
+    LLBC_SafetyObjectPool *GetSafetyObjectPool();
+
+    /**
+    * Get unsafety object pool.
+    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
+    */
+    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
+
+public:
+    /**
      * Post lazy task to service.
      * @param[in] deleg - the task delegate.
      * @param[in] data  - the task data, can be null.
@@ -361,14 +375,14 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
 
-public:
 #if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
      * Get service protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
+     * @param[in] sessionId - the session Id.
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
-    virtual const LLBC_ProtocolStack *GetProtocolStack() const;
+    virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
 #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:
@@ -385,6 +399,29 @@ protected:
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
+
+protected:
+    /**
+     * Declare friend class: LLBC_pollerMgr.
+     *  Access method list:
+     *      AddSessionProtocolFactory()
+     */
+    friend class LLBC_PollerMgr;
+
+    /**
+     * Session protocol factory operation methods.
+     */
+    virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
+    virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
+    virtual void RemoveSessionProtocolFactory(int sessionId);
+
+protected:
+    /**
+     * Ready session operation methods.
+     */
+    void AddReadySession(int sessionId, int acceptSessionId, bool isListenSession, bool repeatCheck = false);
+    void RemoveReadySession(int sessionId);
+    void RemoveAllReadySessions();
 
 protected:
     /**
@@ -438,26 +475,25 @@ private:
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
 
     /**
-     * Session protocol factory operation methods.
-     */
-    void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
-    LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
-    void RemoveSessionProtocolFactory(int sessionId);
-
-#if LLBC_CFG_OBJBASE_ENABLED
-    /**
      * Auto-Release pool operation methods.
      */
     void CreateAutoReleasePool();
     void UpdateAutoReleasePool();
     void DestroyAutoReleasePool();
-#endif // LLBC_CFG_OBJBASE_ENABLED
+
+    /**
+    * Object pool operation methods.
+    */
+    void InitObjectPools();
+    void UpdateObjectPools();
+    void ClearHoldedObjectPools();
 
     /**
      * Timer-Scheduler operation methods.
      */
-    void GetTimerScheduler();
+    void InitTimerScheduler();
     void UpdateTimers();
+    void ClearHoldedTimerScheduler();
 
     /**
      * Idle process method.
@@ -516,13 +552,30 @@ private:
 
 private:
     LLBC_PollerMgr _pollerMgr;
-    
-    LLBC_SessionIdSet _connectedSessionIds;
-    LLBC_SpinLock _connectedSessionIdsLock;
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    LLBC_ProtocolStack _stack;
-#endif
+    class _ReadySessionInfo
+    {
+    public:
+        int sessionId;
+        int acceptSessionId;
+        bool isListenSession;
+        #if !LLBC_CFG_COMM_USE_FULL_STACK
+        LLBC_ProtocolStack *codecStack;
+        #endif // !LLBC_CFG_COMM_USE_FULL_STACK
+
+    public:
+        #if LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession);
+        #else // !LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack);
+        #endif // LLBC_CFG_COMM_USE_FULL_STACK
+        ~_ReadySessionInfo();
+    };
+    typedef std::map<int, _ReadySessionInfo *> _ReadySessionInfos;
+    typedef _ReadySessionInfos::iterator _ReadySessionInfosIter;
+    typedef _ReadySessionInfos::const_iterator _ReadySessionInfosCIter;
+    _ReadySessionInfos _readySessionInfos;
+    LLBC_SpinLock _readySessionInfosLock;
 
     class _WillRegFacade
     {
@@ -565,8 +618,6 @@ private:
     _StatusDescs _statusDescs;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-    LLBC_IProtocolFilter *_filters[LLBC_ProtocolLayer::End];
-
 private:
     _FrameTasks _beforeFrameTasks;
     _FrameTasks _afterFrameTasks;
@@ -576,9 +627,11 @@ private:
     bool _handlingAfterFrameTasks;
 
 private:
-#if LLBC_CFG_OBJBASE_ENABLED
     LLBC_AutoReleasePoolStack *_releasePoolStack;
-#endif // LLBC_CFG_OBJBASE_ENABLED
+
+private:
+    LLBC_SafetyObjectPool *_safetyObjectPool;
+    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;

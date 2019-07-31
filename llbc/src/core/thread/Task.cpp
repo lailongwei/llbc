@@ -24,8 +24,6 @@
 
 #include "llbc/core/os/OS_Atomic.h"
 
-#include "llbc/core/timer/TimerScheduler.h"
-
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/ThreadManager.h"
 #include "llbc/core/thread/Guard.h"
@@ -40,17 +38,12 @@ int static __LLBC_BaseTaskEntry(void *arg)
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
 
     tls->coreTls.task = task;
-    tls->coreTls.timerScheduler = LLBC_New0(LLBC_NS LLBC_TimerScheduler);
 
     task->OnTaskThreadStart();
-
     task->Svc();
-
     task->OnTaskThreadStop();
 
     tls->coreTls.task = NULL;
-    LLBC_Delete(reinterpret_cast<
-        LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler));
 
     return 0;
 }
@@ -60,38 +53,43 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_BaseTask::LLBC_BaseTask(LLBC_ThreadManager *threadMgr)
-    : _threadNum(0)
-    , _curThreadNum(0)
-    , _startCompleted(false)
-    , _threadManager(threadMgr ? threadMgr : LLBC_ThreadManagerSingleton)
+: _threadNum(0)
+, _curThreadNum(0)
+, _startCompleted(false)
+, _threadManager(threadMgr ? threadMgr : LLBC_ThreadManagerSingleton)
+, _taskThreads(NULL)
 {
 }
 
 LLBC_BaseTask::~LLBC_BaseTask()
 {
     Wait();
+    LLBC_XFree(_taskThreads);
 }
 
 int LLBC_BaseTask::Activate(int threadNum,
-                        int flags,
-                        int priority,
-                        LLBC_Handle groupHandle,
-                        const int stackSize[],
-                        LLBC_BaseTask *task)
+                            int flags,
+                            int priority,
+                            LLBC_Handle groupHandle,
+                            const int stackSize[])
 {
-    task = task ? task : this;
-
     _lock.Lock();
+
+    LLBC_XFree(_taskThreads);
+    _taskThreads = LLBC_Calloc(LLBC_Handle, threadNum * sizeof(LLBC_Handle));
 
     if (_threadManager->CreateThreads(threadNum,
                                       &LLBC_INTERNAL_NS __LLBC_BaseTaskEntry,
-                                      task,
+                                      this,
                                       flags,
-                                      priority,stackSize,
-                                      task,
-                                      groupHandle) == LLBC_INVALID_HANDLE)
+                                      priority,
+                                      stackSize,
+                                      this,
+                                      groupHandle,
+                                      NULL,
+                                      _taskThreads) == LLBC_INVALID_HANDLE)
     {
-		_lock.Unlock();
+        _lock.Unlock();
         return LLBC_FAILED;
     }
 
@@ -192,6 +190,16 @@ void LLBC_BaseTask::OnTaskThreadStop()
     }
 
     _lock.Unlock();
+}
+
+void LLBC_BaseTask::GetTaskThreads(std::vector<LLBC_Handle> &taskThreads)
+{
+    while (!_startCompleted)
+        LLBC_ThreadManager::Sleep(10);
+
+    LLBC_LockGuard guard(_lock);
+    for (int i = 0; i != _threadNum; ++i)
+        taskThreads.push_back(_taskThreads[i]);
 }
 
 __LLBC_NS_END

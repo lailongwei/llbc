@@ -61,9 +61,11 @@ const LLBC_String &LLBC_PollerType::Type2Str(int type)
 int LLBC_PollerType::Str2Type(const LLBC_String &typeStr)
 {
     const LLBC_String &lowercased = typeStr.tolower();
-    for (int ty = This::Begin; ty != This::End; ty++)
+    for (int ty = This::Begin; ty != This::End; ++ty)
+    {
         if (lowercased == LLBC_INL_NS __g_descs[ty].tolower())
             return ty;
+    }
 
     return This::End;
 }

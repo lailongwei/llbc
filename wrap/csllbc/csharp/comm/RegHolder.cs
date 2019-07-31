@@ -126,7 +126,7 @@ namespace llbc
                 if (!asDefault && asExcHandler)
                 {
                     _CreateObject(ref obj);
-                    for (int i = 0; i < excHandlerOpcodes.Count; i++)
+                    for (int i = 0; i < excHandlerOpcodes.Count; ++i)
                     {
                         svc.SetPacketExcHandler(PacketHandlePhase.Handle,
                             methodInfo.CreateDelegate(typeof(PacketExcHandler), obj) as PacketExcHandler, excHandlerOpcodes[i]);
@@ -144,7 +144,7 @@ namespace llbc
                 if (!asDefault && asExcPreHandler)
                 {
                     _CreateObject(ref obj);
-                    for (int i = 0; i < excPreHandlerOpcodes.Count; i++)
+                    for (int i = 0; i < excPreHandlerOpcodes.Count; ++i)
                     {
                         svc.SetPacketExcHandler(PacketHandlePhase.PreHandle,
                             methodInfo.CreateDelegate(typeof(PacketExcHandler), obj) as PacketExcHandler, excPreHandlerOpcodes[i]);
@@ -456,7 +456,7 @@ namespace llbc
             ServiceRegHolderClass holderCls;
 
             Type[] types = assembly.GetTypes();
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < types.Length; ++i)
             {
                 Type ty = types[i];
                 if (!ty.IsClass)
@@ -545,7 +545,7 @@ namespace llbc
         private static void _CollectMethods(Type cls, ServiceRegHolderClass holderCls, ref MethodInfo[] clsMethods)
         {
             _GetClassMethods(cls, ref clsMethods);
-            for (int i = 0; i < clsMethods.Length; i++)
+            for (int i = 0; i < clsMethods.Length; ++i)
             {
                 MethodInfo clsMethod = clsMethods[i];
                 _DetectMethod_Handler(cls, clsMethod, PacketHandlePhase.Handle, holderCls);
@@ -588,7 +588,7 @@ namespace llbc
         private static void _DetectMethod_PacketExcHandler(Type cls, MethodInfo mi, ServiceRegHolderClass holderCls)
         {
             object[] attrs = mi.GetCustomAttributes(typeof(PacketExcHandlerAttribute), false);
-            for (int i = 0; i < attrs.Length; i++)
+            for (int i = 0; i < attrs.Length; ++i)
             {
                 PacketExcHandlerAttribute attr = attrs[i] as PacketExcHandlerAttribute;
 
@@ -652,13 +652,13 @@ namespace llbc
         {
             object[] attrs = ty.GetCustomAttributes(typeof(BindToAttribute), false);
             List<string> bindTos = new List<string>(attrs.Length);
-            for (int i = 0; i < attrs.Length; i++)
+            for (int i = 0; i < attrs.Length; ++i)
             {
                 List<string> oneBindTos = (attrs[i] as BindToAttribute).svcNames;
                 if (oneBindTos == null)
                     continue;
 
-                for (int j = 0; j < oneBindTos.Count; j++)
+                for (int j = 0; j < oneBindTos.Count; ++j)
                 {
                     if (bindTos.Contains(oneBindTos[j]))
                         continue;
@@ -675,7 +675,7 @@ namespace llbc
             if (to == null)
                 to = new List<int>();
 
-            for (int i = 0; i < from.Count; i++)
+            for (int i = 0; i < from.Count; ++i)
             {
                 if (to.Contains(from[i]))
                     continue;
@@ -694,7 +694,7 @@ namespace llbc
                 if (!_holders.TryGetValue(assemblyName, out holderClasses))
                     return;
 
-                for (int i = 0; i < holderClasses.Count; i++)
+                for (int i = 0; i < holderClasses.Count; ++i)
                     holderClasses[i].RegisterToService(svc);
             }
         }

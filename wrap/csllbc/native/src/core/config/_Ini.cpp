@@ -113,13 +113,13 @@ void csllbc_Ini_FreeNativeSections(csllbc_Ini_IniSection *sections, int sectionC
     if (UNLIKELY(sections == NULL))
         return;
 
-    for (int sectionIdx = 0; sectionIdx < sectionCount; sectionIdx++)
+    for (int sectionIdx = 0; sectionIdx < sectionCount; ++sectionIdx)
     {
         csllbc_Ini_IniSection &section = sections[sectionIdx];
         LLBC_Free(section.sectionName);
 
         int valueCount = section.count;
-        for (int valueIdx = 0; valueIdx < valueCount; valueIdx++)
+        for (int valueIdx = 0; valueIdx < valueCount; ++valueIdx)
         {
             LLBC_Free(section.keys[valueIdx]);
             LLBC_XFree(section.values[valueIdx]);

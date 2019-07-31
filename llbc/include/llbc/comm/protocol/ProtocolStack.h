@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -210,9 +209,30 @@ public:
     void Report(int sessionId, LLBC_IProtocol *proto, int level, const LLBC_String &msg);
     void Report(int sessionId, int opcode, LLBC_IProtocol *proto, int level, const LLBC_String &msg);
 
+public:
+    /**
+     * Control protocol stack.
+     * @param[in] ctrlType - the stack control type(user defined).
+     * @param[in] ctrlData - the stack control data(user defined).
+     */
+    void CtrlStack(int ctrlType, const LLBC_Variant &ctrlData);
+    
+    /**
+     * Control raw-part protocol stack.
+     * @param[in] ctrlType - the stack control type(user defined).
+     * @param[in] ctrlData - the stack control data(user defined).
+     */
+    bool CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData);
+
+    /**
+     * Control codec-part protocol stack.
+     * @param[in] ctrlType - the stack control type(user defined).
+     * @param[in] ctrlData - the stack control data(user defined).
+     */
+    bool CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData);
+
 private:
     StackType _type;
-    bool _builded;
 
     LLBC_IService *_svc;
     LLBC_Session *_session;

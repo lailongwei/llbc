@@ -116,7 +116,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     // Begin parse.
     bool done = true;
     LLBC_Strings contents = NormalizeContent(content);
-    for (size_t i = 0; i < contents.size(); i++)
+    for (size_t i = 0; i < contents.size(); ++i)
     {
         const LLBC_String &line = contents[i];
         if (ParseLine(line, static_cast<int>(i) + 1) != LLBC_OK)
@@ -161,7 +161,7 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
 
     std::vector<const This *> properties;
     CollectValueProperties(properties);
-    for (size_t i = 0; i < properties.size(); i++)
+    for (size_t i = 0; i < properties.size(); ++i)
     {
         const This *& prop = properties[i];
         content.append_format("%s %c %s\n", prop->GetName().c_str(), 
@@ -239,14 +239,14 @@ LLBC_Strings LLBC_Property::GetPropertyNames(bool nest) const
 
     if (!nest)
     {
-        for (_CIt it = _properties->begin(); it != _properties->end(); it++)
+        for (_CIt it = _properties->begin(); it != _properties->end(); ++it)
             names.push_back(it->first);
     }
     else
     {
         std::vector<const This *> valueProps;
         CollectValueProperties(valueProps);
-        for (size_t i = 0; i < valueProps.size(); i++)
+        for (size_t i = 0; i < valueProps.size(); ++i)
             names.push_back(valueProps[i]->GetName());
     }
 
@@ -505,7 +505,7 @@ bool LLBC_Property::CheckName(const LLBC_String &name, bool allowSeparator) cons
     }
 
     const LLBC_Strings names = name.split(This::NameSeparator);
-    for (size_t i = 0; i < names.size(); i++)
+    for (size_t i = 0; i < names.size(); ++i)
     {
         if (names[i].empty())
             return false;
@@ -535,7 +535,7 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
 
     // Split lines and strip the lines.
     LLBC_Strings normalizedContents = normalizedContent.split(unixLineEnd);
-    for (size_t i = 0; i < normalizedContents.size(); i++)
+    for (size_t i = 0; i < normalizedContents.size(); ++i)
         normalizedContents[i].strip();
 
     return normalizedContents;

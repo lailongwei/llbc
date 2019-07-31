@@ -569,6 +569,26 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc000002a))
 
 //
+// Message Id: LLBC_ERROR_IS_LISTEN_SOCKET
+//
+// MessageText:
+//
+// the specific socket is listen socket.
+//
+#define __LLBC_ERROR_IS_LISTEN_SOCKET    ((int)(0x0000002b))
+#define LLBC_ERROR_IS_LISTEN_SOCKET      ((int)(0xc000002b))
+
+//
+// Message Id: LLBC_ERROR_NOT_POOL_OBJECT
+//
+// MessageText:
+//
+// object is not pool object.
+//
+#define __LLBC_ERROR_NOT_POOL_OBJECT     ((int)(0x0000002c))
+#define LLBC_ERROR_NOT_POOL_OBJECT       ((int)(0xc000002c))
+
+//
 //!! Sentinel error no.
 //
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))

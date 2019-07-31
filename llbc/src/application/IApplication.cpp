@@ -30,6 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
+static LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String &> *__crashHook = NULL;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -100,7 +101,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
         }
     }
 
-    for (size_t i = 0; i < backTraces.size(); i++)
+    for (size_t i = 0; i < backTraces.size(); ++i)
         backTrace.append_format("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
 }
 
@@ -130,6 +131,9 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
                         NULL);
 
     ::CloseHandle(dmpFile);
+
+    if (__crashHook)
+        __crashHook->Invoke(__dumpFileName);
 
     LLBC_NS LLBC_String errMsg;
     errMsg.append("Unhandled exception!\n");
@@ -196,6 +200,10 @@ LLBC_IApplication::LLBC_IApplication()
 
 , _started(false)
 , _waited(false)
+
+#if LLBC_TARGET_PLATFORM_WIN32
+, _crashHook(NULL)
+#endif // Win32
 {
     if (_thisApp == NULL)
         _thisApp = this;
@@ -336,6 +344,18 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
     LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
 #endif // Release
 
+    return LLBC_OK;
+#endif // Non Win32
+}
+
+int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook)
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+#else // Win32
+    _crashHook = crashHook;
+    LLBC_INL_NS __crashHook = crashHook;
     return LLBC_OK;
 #endif // Non Win32
 }
@@ -496,13 +516,13 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
     tryPaths.push_back(_name);
 
     const size_t tryPathsCount = tryPaths.size();
-    for (size_t i = 0; i < tryPathsCount; i++)
+    for (size_t i = 0; i < tryPathsCount; ++i)
         tryPaths.push_back("../" + tryPaths[i]);
 
     // Try load.
     for (LLBC_Strings::const_iterator iter = tryPaths.begin();
         iter != tryPaths.end();
-        iter++)
+        ++iter)
     {
         if (TryLoadConfig(*iter, loaded, tryIni, tryJson, tryCfg) != LLBC_OK)
             return LLBC_FAILED;

@@ -87,7 +87,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
     for (size_t i = 0; i < patternLength;)
     {
-        ch = curPattern[i ++];
+        ch = curPattern[i++];
         switch(state)
         {
         case LLBC_INTERNAL_NS __g_literal_state:
@@ -102,7 +102,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 if (curPattern[i] == LLBC_LogTokenType::EscapeToken)
                 {
                     buf.append(1, ch);
-                    i ++;
+                    i++;
                 }
                 else
                 {
@@ -167,7 +167,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                     formatter->SetMaxLen(INT_MAX);
                 }
 
-                i --;
+                i--;
                 state = LLBC_INTERNAL_NS __g_converter_state;
 
                 break;

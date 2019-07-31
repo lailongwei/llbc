@@ -36,7 +36,7 @@ LLBC_BinaryHeap<T, Comp>::LLBC_BinaryHeap(const typename LLBC_BinaryHeap<T, Comp
     _size = elems.size();
     _elems.resize(elems.size() + 1);
 
-    for (register size_t i = 0; i < _size; i++)
+    for (size_t i = 0; i < _size; ++i)
     {
         _elems[i + 1] = elems[i];
     }
@@ -122,9 +122,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop(T &elem)
     elem = _elems[1];
 
     if (_size != 1)
-    {
         _elems[1] = _elems[_size];
-    }
 
     _elems[_size--] = T();
 
@@ -134,7 +132,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop(T &elem)
 }
 
 template <typename T, typename Comp>
-int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index)
+int LLBC_BinaryHeap<T, Comp>::DeleteElem(size_t index)
 {
     if (this->IsEmpty())
     {
@@ -148,10 +146,8 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index)
         return LLBC_FAILED;
     }
 
-    for (size_t i = index; i < _size; i++)
-    {
+    for (size_t i = index; i < _size; ++i)
         _elems[i] = _elems[i + 1];
-    }
 
     _size -= 1;
 
@@ -163,12 +159,10 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index)
 template<typename T, typename Comp>
 int LLBC_BinaryHeap<T, Comp>::DeleteElem(const T &elem)
 {
-    for (size_t i = 1; i <= _size; i++)
+    for (size_t i = 1; i <= _size; ++i)
     {
         if (_elems[i] == elem)
-        {
-            return this->DeleteElem(static_cast<int>(i));
-        }
+            return this->DeleteElem(i);
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -176,7 +170,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(const T &elem)
 }
 
 template <typename T, typename Comp>
-int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index, T &elem)
+int LLBC_BinaryHeap<T, Comp>::DeleteElem(size_t index, T &elem)
 {
     if (this->IsEmpty())
     {
@@ -191,10 +185,8 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(int index, T &elem)
     }
 
     elem = _elems[index];
-    for (int i = index; i < _size; i++)
-    {
+    for (size_t i = index; i < _size; ++i)
         _elems[i] = _elems[i + 1];
-    }
 
     _size -= 1;
 
@@ -249,7 +241,7 @@ inline bool LLBC_BinaryHeap<T, Comp>::operator !() const
 template <typename T, typename Comp>
 void LLBC_BinaryHeap<T, Comp>::BuildHeap()
 {
-    for (size_t i = _size / 2; i > 0; i --)
+    for (size_t i = _size / 2; i > 0; --i)
     {
         this->PercolateDown(static_cast<int>(i));
     }

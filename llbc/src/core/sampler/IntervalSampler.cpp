@@ -108,10 +108,8 @@ sint64 LLBC_IntervalSampler::GetSpeedInSecs(int secs) const
     }
 
     sint64 value = 0;
-    for(int i = 0; i < secs; i ++)
-    {
+    for(int i = 0; i < secs; ++i)
         value += _speeds[i];
-    }
 
     return value / secs;
 }
@@ -149,12 +147,10 @@ sint64 LLBC_IntervalSampler::GetSpeedInMins(int mins) const
     }
 
     sint64 value = 0;
-    for(int i = 0; i < mins; i ++)
+    for(int i = 0; i < mins; ++i)
     {
-        for(int j = 0; j < 60; j ++)
-        {
+        for(int j = 0; j < 60; ++j)
             value += _speeds[i * 60 + j];
-        }
     }
 
     return value / mins;
@@ -192,12 +188,10 @@ sint64 LLBC_IntervalSampler::GetSpeedInHours(int hours) const
     }
 
     sint64 value = 0;
-    for(int i = 0; i < hours; i ++)
+    for(int i = 0; i < hours; ++i)
     {
-        for(int j = 0; j < 3600; j ++)
-        {
+        for(int j = 0; j < 3600; ++j)
             value += _speeds[i * 3600 + j];
-        }
     }
 
     return value;

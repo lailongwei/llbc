@@ -78,6 +78,12 @@ public:
      */
     int Write(const void *buf, size_t len);
 
+public:
+    /**
+     * Clear message block, this operation will clear read&write position information.
+     */
+    void Clear();
+
     /**
      * Release message block.
      */

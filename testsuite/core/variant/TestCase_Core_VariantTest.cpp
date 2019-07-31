@@ -29,6 +29,9 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     BasicTest();
     std::cout <<std::endl;
 
+    CompositeKeyTest();
+    std::cout <<std::endl;
+
     ArithmeticTest();
     std::cout <<std::endl;
 
@@ -145,6 +148,27 @@ void TestCase_Core_VariantTest::BasicTest()
     ptrVal = ptrVal + LLBC_Variant(4);
     ptrVal = ptrVal - LLBC_Variant(4);
     std::cout <<"After ptrVal += 4, ptrVal -= 4, value: " <<*ptrVal.AsPtr<int>() <<std::endl;
+}
+
+void TestCase_Core_VariantTest::CompositeKeyTest()
+{
+    std::cout <<"Composite key test:" <<std::endl;
+
+    LLBC_Variant v;
+    v["The str key 1"] = "The str value 1";
+    v[100] = 100;
+    v[-100] = -100;
+    v[true] = true;
+    v[false] = false;
+    v[LLBC_Variant::nil] = LLBC_Variant::nil;
+    v[LLBC_Variant::nil] = "The nil value";
+
+    LLBC_Variant dictKey;
+    dictKey["embedded key 1"] = "embedded value 1";
+    dictKey["embedded key 2"] = "embedded value 2";
+    v[dictKey] = "The dict value";
+
+    std::cout <<"The composite variant: " <<v <<std::endl;
 }
 
 void TestCase_Core_VariantTest::ArithmeticTest()

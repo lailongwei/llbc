@@ -158,6 +158,11 @@ void LLBC_File::Close()
     _mode = LLBC_FileMode::Read;
 }
 
+const LLBC_String &LLBC_File::GetFilePath() const
+{
+    return _path;
+}
+
 int LLBC_File::GetFileNo() const
 {
     if (!IsOpened())
