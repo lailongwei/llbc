@@ -104,8 +104,8 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 // API: GetLogLevel
 LULLBC_LUA_METH int _lullbc_GetLogLevel(lua_State *l)
 {
+    LLBC_Logger *logger;
     const char *loggerName = lua_tostring(l, 1);
-    LLBC_Logger *logger = NULL;
     if (UNLIKELY(loggerName == NULL))
         logger = __rootLogger;
     else
