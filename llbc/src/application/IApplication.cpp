@@ -117,27 +117,31 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
         return EXCEPTION_CONTINUE_SEARCH;
 
+    LLBC_NS LLBC_String errMsg;
+    errMsg.append("Unhandled exception!\n");
+    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
+
     ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
     dmpInfo.ExceptionPointers = exception;
     dmpInfo.ThreadId = GetCurrentThreadId();
     dmpInfo.ClientPointers = TRUE;
 
-    ::MiniDumpWriteDump(::GetCurrentProcess(),
-                        ::GetCurrentProcessId(),
-                        dmpFile,
-                        MiniDumpNormal,
-                        &dmpInfo,
-                        NULL,
-                        NULL);
+    const ::BOOL writeDumpSucc = MiniDumpWriteDump(::GetCurrentProcess(),
+                                                   ::GetCurrentProcessId(),
+                                                   dmpFile,
+                                                   (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
+                                                   &dmpInfo,
+                                                   NULL,
+                                                   NULL);
+    if (UNLIKELY(!writeDumpSucc))
+    {
+        LLBC_NS LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        errMsg.append_format("Write dump failed, error:%s\n", LLBC_NS LLBC_FormatLastError());
+    }
 
     ::CloseHandle(dmpFile);
-
     if (__crashHook)
         __crashHook->Invoke(__dumpFileName);
-
-    LLBC_NS LLBC_String errMsg;
-    errMsg.append("Unhandled exception!\n");
-    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
 
     LLBC_NS LLBC_String backTrace;
     __GetExceptionBackTrace(exception->ContextRecord, backTrace);

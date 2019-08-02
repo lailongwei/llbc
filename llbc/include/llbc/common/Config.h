@@ -209,4 +209,17 @@
  #define LLBC_CFG_COMM_POLLER_MODEL                 "SelectPoller"
 #endif
 
+/**
+ * \brief Application about configs.
+ */
+// Minidump types define, library default use full opts to write minidump file, you also can use <MiniDumpNormal> opt to replace it if you don' need write large & full minidump file.
+// About Minidump type, see: https://docs.microsoft.com/en-us/windows/win32/api/minidumpapiset/ne-minidumpapiset-minidump_type
+#if LLBC_TARGET_PLATFORM_WIN32
+ #define LLBC_CFG_APP_DUMPFILE_DUMPTYPES            (MiniDumpWithFullMemoryInfo | \
+                                                     MiniDumpIgnoreInaccessibleMemory | \
+                                                     MiniDumpWithFullAuxiliaryState | \
+                                                     MiniDumpWithHandleData | \
+                                                     MiniDumpWithIndirectlyReferencedMemory)
+#endif
+
 #endif // !__LLBC_COM_CONFIG_H__

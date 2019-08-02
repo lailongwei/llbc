@@ -53,7 +53,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     size_t msgSize;
     LLBC_String msg;
     const char *partMsg;
-    for (register int i = 6; i <= paramsCount; ++i)
+    for (int i = 6; i <= paramsCount; ++i)
     {
         partMsg = luaL_tolstring(l, i, &msgSize);
         if (UNLIKELY(partMsg == NULL))
