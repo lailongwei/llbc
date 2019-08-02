@@ -46,7 +46,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 {
     // Params: level, logger, tag, file, line, ...<msg>(optional)
     int paramsCount = lua_gettop(l);
-    if (lua_gettop(l) < 5)
+    if (paramsCount < 5)
         lullbc_SetError(l, "failed to log message, parameters count must be equal or greater than 5");
 
     // Concat messages to output.
@@ -99,4 +99,21 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
 
     return 0;
+}
+
+// API: GetLogLevel
+LULLBC_LUA_METH int _lullbc_GetLogLevel(lua_State *l)
+{
+    const char *loggerName = lua_tostring(l, 1);
+    LLBC_Logger *logger = NULL;
+    if (UNLIKELY(loggerName == NULL))
+        logger = __rootLogger;
+    else
+        logger = __loggerManager->GetLogger(loggerName);
+
+    if (UNLIKELY(logger == NULL))
+        lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
+
+    lua_pushinteger(l, logger->GetLogLevel());
+    return 1;
 }

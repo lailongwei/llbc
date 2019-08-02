@@ -41,6 +41,18 @@ function Log.isinit()
     return _llbc.IsLogInit()
 end
 
+local ROOT_LOGGER = "root"
+local _logsLevel = {}
+
+local function _canOutput(level, logger)
+    local logLevel = _logsLevel[logger or ROOT_LOGGER]
+    if not logLevel then
+        logLevel = _llbc.GetLogLevel(logger)
+        _logsLevel[logger or ROOT_LOGGER] = logLevel
+    end
+    return level >= logLevel
+end
+
 -- Output message to logger.
 -- @param level  - logger level.
 -- @param logger - logger name, default is root logger.
@@ -48,6 +60,10 @@ end
 -- @param ...    - log message.
 -- @returns - no return.
 function Log.output(level, logger, tag, ...)
+    if not _canOutput(level, logger) then
+        return
+    end
+
     local file, line
     if Log.logFileInfo then
         local defaultFileInfo = Log.defaultFileInfo
