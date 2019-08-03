@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 #include "llbc/comm/Comm.h"
 
 __LLBC_NS_BEGIN
@@ -76,7 +75,7 @@ public:
      */
     template <typename App>
     static App *ThisApp();
-    static LLBC_IApplication *ThisIApp();
+    static LLBC_IApplication *ThisApp();
 
 public:
     /**
@@ -108,6 +107,13 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetDumpFile(const LLBC_String &dumpFileName);
+
+    /**
+     * Set crash hook, invoke after crashed.
+     * @param[in] crashHook - the crash hook.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook);
 
 public:
     /**
@@ -202,6 +208,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
+    LLBC_IDelegate1<void, const LLBC_String &> *_crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;

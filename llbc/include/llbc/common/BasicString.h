@@ -476,9 +476,9 @@ public:
         return *this;
     }
 
-    _These split(const _Elem &sep, size_type max_split = -1) const
+    _These split(const _Elem &sep, size_type max_split = -1, bool strip_empty = false) const
     {
-        return this->split(_This(1, sep), max_split);
+        return this->split(_This(1, sep), max_split, false, strip_empty);
     }
 
     // findreplace operation
@@ -512,7 +512,7 @@ public:
     }
 
     // split operation
-    _These split(const _This &sep, size_type max_split = -1, bool with_elem = false) const
+    _These split(const _This &sep, size_type max_split = -1, bool with_elem = false, bool strip_empty = false) const
     {
         _These substrs;
         if (sep.empty() || max_split == 0 || this->empty())
@@ -522,8 +522,9 @@ public:
         }
 
         size_type idx = 0;
-        uint32 splitTimes = 0;
-        for (; splitTimes < static_cast<uint32>(max_split); ++splitTimes)
+        size_type splitTimes = 0;
+        const size_type step = with_elem ? 1 : sep.size();
+        for (; splitTimes < max_split; ++splitTimes)
         {
             size_type findIdx = npos;
             if (with_elem)
@@ -543,46 +544,16 @@ public:
             if (findIdx == npos)
                 break;
 
-            substrs.push_back(this->substr(idx, findIdx - idx));
-            if ((idx = findIdx + 1) == this->size())
+            if (strip_empty && findIdx == idx)
             {
-                substrs.push_back(_This());
-                break;
-            }
-        }
-
-        if (idx != this->size())
-            substrs.push_back(this->substr(idx));
-
-        return substrs;
-    }
-
-    _These split(const _These &seps, size_type max_split = -1) const
-    {
-        _These substrs;
-        if (seps.empty() || max_split == 0 || this->empty())
-        {
-            substrs.push_back(*this);
-            return substrs;
-        }
-
-        size_type idx = 0;
-        uint32 splitTimes = 0;
-        for (; splitTimes < static_cast<uint32>(max_split); ++splitTimes)
-        {
-            size_type findIdx = npos;
-            for (size_type i = 0; i < seps.size(); ++i)
-            {
-                findIdx = this->find(seps[i], idx);
-                if (findIdx != npos)
+                if ((idx = findIdx + step) == this->size())
                     break;
+
+                continue;
             }
 
-            if (findIdx == npos)
-                break;
-
             substrs.push_back(this->substr(idx, findIdx - idx));
-            if ((idx = findIdx + 1) == this->size())
+            if ((idx = findIdx + step) == this->size() && !strip_empty)
             {
                 substrs.push_back(_This());
                 break;

@@ -23,7 +23,6 @@
 #define __LLBC_OBJBASE_AUTO_RELEASE_POOL_STACK_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
 /**
  * Previous declare some classes.

@@ -19,37 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+#ifndef __LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__
+#define __LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__
 
-#include "llbc/common/Config.h"
-
-#if LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/objbase/ObjectFactory.h"
+#include "llbc/common/Common.h"
+#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/objectpool/ObjectPool.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_ObjectFactory::LLBC_ObjectFactory()
-{
-}
+/**
+ * Export thread-unsafety & thread-safety object pool template class instances.
+ */
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>;
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
 
-LLBC_ObjectFactory::~LLBC_ObjectFactory()
-{
-}
-
-LLBC_Object *LLBC_ObjectFactory::CreateObject() const
-{
-    return LLBC_New0(LLBC_Object);
-}
-
-LLBC_Object *LLBC_ObjectFactory::Clone() const
-{
-    return LLBC_New0(LLBC_ObjectFactory);
-}
+/**
+ * Typedef thread-unsafety & thread-safety object pool template class instances.
+ */
+typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafetyObjectPool;
+typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafetyObjectPool;
 
 __LLBC_NS_END
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/common/AfterIncl.h"
+#endif // !__LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__

@@ -24,7 +24,6 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-#include "llbc/objbase/ObjBase.h"
 
 #include "llbc/comm/FacadeEvents.h"
 #include "llbc/comm/IService.h"
@@ -356,10 +355,16 @@ public:
 
 public:
     /**
-    * Get object pool.
-    * @return LLBC_ThreadObjectPool * - the object pool.
+    * Get safety object pool.
+    * @return LLBC_SafetyObjectPool * - the safety object pool.
     */
-    LLBC_ThreadObjectPool *GetObjectPool();
+    LLBC_SafetyObjectPool *GetSafetyObjectPool();
+
+    /**
+    * Get unsafety object pool.
+    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
+    */
+    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
 
 public:
     /**
@@ -469,26 +474,26 @@ private:
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
 
-#if LLBC_CFG_OBJBASE_ENABLED
     /**
      * Auto-Release pool operation methods.
      */
     void CreateAutoReleasePool();
     void UpdateAutoReleasePool();
     void DestroyAutoReleasePool();
-#endif // LLBC_CFG_OBJBASE_ENABLED
+
+    /**
+    * Object pool operation methods.
+    */
+    void InitObjectPools();
+    void UpdateObjectPools();
+    void ClearHoldedObjectPools();
 
     /**
      * Timer-Scheduler operation methods.
      */
     void InitTimerScheduler();
     void UpdateTimers();
-
-    /**
-    * Object pool operation methods.
-    */
-    void InitObjectPool();
-    void UpdateObjectPool();
+    void ClearHoldedTimerScheduler();
 
     /**
      * Idle process method.
@@ -622,15 +627,14 @@ private:
     bool _handlingAfterFrameTasks;
 
 private:
-#if LLBC_CFG_OBJBASE_ENABLED
     LLBC_AutoReleasePoolStack *_releasePoolStack;
-#endif // LLBC_CFG_OBJBASE_ENABLED
+
+private:
+    LLBC_SafetyObjectPool *_safetyObjectPool;
+    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
-
-private:
-    LLBC_ThreadObjectPool *_objectPool;
 
 private:
     LLBC_EventManager _evManager;

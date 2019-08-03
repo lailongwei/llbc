@@ -19,21 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 __LLBC_NS_BEGIN
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
-{
-    return static_cast<App *>(_thisApp);
-}
-
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
-{
-    return _thisApp;
-}
-
 __LLBC_NS_END
 
-#endif // __LLBC_APP_IAPPLICATION_H__
+#include "llbc/common/AfterIncl.h"

@@ -32,19 +32,8 @@
  #pragma warning(disable:4200)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+
 __LLBC_INTERNAL_NS_BEGIN
-
-// Define bitview element size, in bytes.
-const size_t BitViewElemSize = sizeof(LLBC_NS uint64);
-
-// Define 64bit 0&1.
-#if LLBC_TARGET_PLATFORM_WIN32
-    const LLBC_NS sint64 Zero = 0I64;
-    const LLBC_NS sint64 One = 1I64;
-#else
-    const LLBC_NS sint64 Zero = 0LL;
-    const LLBC_NS sint64 One = 1LL;
-#endif
 
 // Define BeginingSymbol/EndSymbol, CheckSymbolSize.
 #if LLBC_DEBUG
@@ -77,13 +66,16 @@ template <typename ObjectType, typename LockType = LLBC_DummyLock>
 class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
 private:
-    
     /**
      * The structure of memory unit.
      */
+    struct MemoryBlock;
     struct MemoryUnit
     {
+        MemoryBlock *block;     // ownered this memory unit's block.
+
         bool inited;            // Object has initialized or not.
+        bool referencableObj;   // Indicate object is referencable object or not.
         sint32 seq;             // The location seq of memory unit.
 
         uint8 buff[0];          // The begin address of buffer.
@@ -108,12 +100,23 @@ public:
     * @return void * - the object pointer.
     */
     virtual void *Get();
+    /**
+     * Get referencable object.
+     * @return void * - the object pointer.
+     */
+    virtual void *GetReferencable();
 
     /**
      * Get object.
      * @return ObjectType * - the object pointer.
      */
     ObjectType *GetObject();
+
+    /**
+     * Get object.
+     * @return ObjectType * - the object pointer.
+     */
+    ObjectType *GetReferencableObject();
 
     /**
      * Get guarded object.
@@ -135,15 +138,38 @@ public:
 
 protected:
     /**
+     * Release referencable object.
+    * @param[in] obj - the object pointer.
+     */
+    virtual void ReleaseReferencable(void *obj);
+
+private:
+    /**
      * Allocate a new memory block. 
      */
     void AllocateMemoryBlock();
 
     /**
      * Find a free object from memory block.
-     * @param[in] memBlock - memory block.
+     * @param[in] memBlock        - memory block.
+     * @param[in] referencableObj - is referencable object or not.
+     * @return void * - the object pointer.
      */
-    void *FindFreeObj(MemoryBlock *memBlock);
+    void *FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj);
+
+    /**
+     * Internal get object implement.
+     * @param[in] referencableObj - specific get referencable object or not.
+     * @return void * - the object pointer.
+     */
+    virtual void *Get(const bool &referencableObj);
+
+    /**
+     * Release object.
+     * @param[in] memUnit - the object memory unit.
+     * @param[in] obj     - the object pointer.
+     */
+    virtual void Release(MemoryUnit *memUnit, void *obj);
 
 private:
     // Disable assignment.

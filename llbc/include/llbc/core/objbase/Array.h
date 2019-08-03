@@ -23,9 +23,8 @@
 #define __LLBC_OBJBASE_ARRAY_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
-#include "llbc/objbase/Object.h"
+#include "llbc/core/objbase/Object.h"
 
 /**
  * Previous declare some classes.
@@ -597,6 +596,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/objbase/ArrayImpl.h"
+#include "llbc/core/objbase/ArrayImpl.h"
 
 #endif // !__LLBC_OBJBASE_ARRAY_H__

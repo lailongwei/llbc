@@ -174,34 +174,71 @@ bool LLBC_VariantTraits::ne(const LLBC_Variant &left, const LLBC_Variant &right)
 
 bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
 {
-    if (left.IsDict() && right.IsDict())
+    if (left.IsDict())
     {
-        const LLBC_Variant::Dict *lDict = left.GetHolder().obj.dict;
-        const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
+        if (right.IsDict()) // Dict: compare
+        {
+            const LLBC_Variant::Dict *lDict = left.GetHolder().obj.dict;
+            const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
 
-        if (lDict == rDict)
+            if (lDict == rDict)
+                return false;
+
+            if (lDict == NULL || lDict->empty())
+                return rDict && !rDict->empty();
+            if (rDict == NULL || rDict->empty())
+                return false;
+
+            return *lDict < *rDict;
+        }
+        else // Str/Raw/Nil: true
+        {
+            return true;
+        }
+    }
+    else if (left.IsStr())
+    {
+        if (right.IsDict()) // Dict: true
+        {
             return false;
-
-        if (lDict == NULL || lDict->empty())
-            return rDict && !rDict->empty();
-        if (rDict == NULL || rDict->empty())
+        }
+        else if (right.IsStr()) // Str: exec compare
+        {
+            return left.AsStr() < right.AsStr();
+        }
+        else // Raw/Nil: true
+        {
+            return true;
+        }
+    }
+    else if (left.IsRaw())
+    {
+        if (right.IsDict()) // Dict: false
+        {
             return false;
+        }
+        else if (right.IsStr()) // Str: false
+        {
+            return false;
+        }
+        else if (right.IsRaw()) // Raw: exec compare
+        {
+            if ((left.IsDouble() || left.IsFloat()) ||
+                (right.IsDouble() || right.IsFloat()))
+                return left.AsDouble() < right.AsDouble();
 
-        return *lDict < *rDict;
-    }
-    else if (left.IsStr() && right.IsStr())
-    {
-        return left.AsStr() < right.AsStr();
-    }
-    else if (left.IsRaw() && right.IsRaw())
-    {
-        if ((left.IsDouble() || left.IsFloat()) ||
-            (right.IsDouble() || right.IsFloat()))
-            return left.AsDouble() < right.AsDouble();
-
-        return left.AsUInt64() < right.AsUInt64();
+            if (left.IsSignedRaw() || right.IsSignedRaw())
+                return left.AsInt64() < right.AsInt64();
+            else
+                return left.AsUInt64() < right.AsUInt64();
+        }
+        else // Nil: true
+        {
+            return true;
+        }
     }
 
+    // Nil < any type: false
     return false;
 }
 

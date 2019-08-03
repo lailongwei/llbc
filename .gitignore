@@ -5,6 +5,8 @@
 *.sdf
 *.opensdf
 *.idc
+*.dylib
+*.so
 
 .DS_Store
 
@@ -12,6 +14,8 @@ Debug/
 Release/
 vcprojs/vs2008/Debug/
 vcprojs/vs2008/Release/
+
+.vscode*
 
 iOSBuild/*.xcodeproj/xcuserdata/
 iOSBuild/*.xcodeproj/project.xcworkspace/xcuserdata/
@@ -29,3 +33,5 @@ wrap/pyllbc/lib/
 wrap/pyllbc/linux/
 
 !.gitignore
+
+llbc.lua

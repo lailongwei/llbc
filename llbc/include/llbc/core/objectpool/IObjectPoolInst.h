@@ -27,9 +27,18 @@
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+class LLBC_ReferencablePoolObj;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
 * \brief The object pool instance interface encapsulation.
 */
-class LLBC_IObjectPoolInst
+class LLBC_EXPORT LLBC_IObjectPoolInst
 {
 public:
     LLBC_IObjectPoolInst() {  }
@@ -41,6 +50,11 @@ public:
     * @return void * - the object pointer.
     */
     virtual void *Get() = 0;
+    /**
+     * Get referencable object.
+     * @return void * - the object pointer.
+     */
+    virtual void *GetReferencable() = 0;
 
     /**
     * Release object.
@@ -48,11 +62,36 @@ public:
     */
     virtual void Release(void *obj) = 0;
 
+protected:
+    // Friend class: Referencable pool object.
+    // Access methods:
+    //    ReleaseReferencable(): use to release referencable object.
+    friend class LLBC_ReferencablePoolObj;
+
+    /**
+     * Release referencable object.
+    * @param[in] obj - the object pointer.
+     */
+    virtual void ReleaseReferencable(void *obj) = 0;
+
+protected:
+    /**
+     * Set pool instance to referencable pool object.
+     */
+    void SetPoolInstToReferencablePoolObj(void *obj);
+
+    /**
+     * Clear pool instance from referencable pool object.
+     */
+    void ClearPoolInstFromReferencablePoolObj(void *obj);
+
 private:
     // Disable assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_IObjectPoolInst);
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/objectpool/IObjectPoolInstImpl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

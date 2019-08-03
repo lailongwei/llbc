@@ -19,25 +19,39 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_OBJBASE_H__
-#define __LLBC_OBJBASE_OBJBASE_H__
+#ifndef __LLBC_OBJBASE_OBJECT_MACRO_H__
+#define __LLBC_OBJBASE_OBJECT_MACRO_H__
 
-#include "llbc/common/Config.h"
+#include "llbc/common/Common.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED 
+__LLBC_NS_BEGIN
 
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/ObjectMacro.h"
-#include "llbc/objbase/ObjectFactory.h"
+// Object release macro, use for release object(not reset to NULL after released).
+#define LLBC_Release(o)       \
+        o->Release()          \
 
-#include "llbc/objbase/Array.h"
+// Object release macro, it check object and reset to NULL after released.
+#define LLBC_XRelease(o)      \
+    do {                      \
+        if (LIKELY(o)) {      \
+            o->Release();     \
+            o = NULL;         \
+        }                     \
+    } while(0)                \
 
-#include "llbc/objbase/Dictionary.h"
-#include "llbc/objbase/DictionaryElem.h"
+// Object auto-release macro, use for auto release object(not reset to NULL after auto-released).
+#define LLBC_AutoRelease(o)   \
+    o->AutoRelease()          \
 
-#include "llbc/objbase/AutoReleasePool.h"
-#include "llbc/objbase/AutoReleasePoolStack.h"
+// Object auto-release macro, it check object and reset to NULL after auto-released.
+#define LLBC_XAutoRelease(o)  \
+    do {                      \
+        if (LIKELY(o)) {      \
+            o->AutoRelease(); \
+            o = NULL;         \
+        }                     \
+    } while (0)               \
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
+__LLBC_NS_END
 
-#endif // !__LLBC_OBJBASE_OBJBASE_H__
+#endif // !__LLBC_OBJBASE_OBJECT_MACRO_H__

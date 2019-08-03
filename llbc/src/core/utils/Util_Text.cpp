@@ -77,7 +77,7 @@ int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
     int str1Len = ::lstrlenW(lpString1);
     int str2Len = ::lstrlenW(lpString2);
     int len = MIN(str1Len, str2Len);
-    for (register int i = 0; i < len; ++i)
+    for (int i = 0; i < len; ++i)
     {
         if (lpString1[i] < lpString2[i])
             return -1;

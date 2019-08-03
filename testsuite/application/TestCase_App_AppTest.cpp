@@ -68,7 +68,7 @@ namespace
             SetDumpFile(dumpFileName);
 
             // Test division by 0 error
-            // TestUnhandledExceptionProc_DivisionByZero();
+            TestUnhandledExceptionProc_DivisionByZero();
 
             // Test invalid pointer read
             // TestUnhandledExceptionProc_InvalidPtrRead();

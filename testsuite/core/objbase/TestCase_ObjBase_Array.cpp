@@ -20,9 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "objbase/TestCase_ObjBase_Array.h"
-
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "core/objbase/TestCase_ObjBase_Array.h"
 
 namespace
 {
@@ -280,5 +278,3 @@ void TestCase_ObjBase_Array::SortTest()
     std::cout <<"Done, output it: " <<std::endl;
     arr.Foreach(foreachFun);
 }
-
-#endif // LLBC_CFG_OBJBASE_ENABLED

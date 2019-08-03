@@ -19,24 +19,43 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
-#define __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
+#ifndef __LLBC_OBJBASE_OBJECT_FACTORY_H__
+#define __LLBC_OBJBASE_OBJECT_FACTORY_H__
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/common/Common.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "llbc/core/objbase/Object.h"
 
-class TestCase_ObjBase_Object : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+/**
+ * \brief The object factory class encapsulation.
+ *        In your project, can rewrite CreateObject() method to custom your object create way.
+ */
+class LLBC_EXPORT LLBC_ObjectFactory : public LLBC_Object
 {
 public:
-    TestCase_ObjBase_Object();
-    virtual ~TestCase_ObjBase_Object();
+    /**
+     * Constructor/Destructor.
+     */
+    LLBC_ObjectFactory();
+    virtual ~LLBC_ObjectFactory();
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    /**
+     * Create the object.
+     * @return LLBC_Object * - new object.
+     */
+    virtual LLBC_Object *CreateObject() const;
+
+public:
+    /**
+     * Re-write clone method.
+     * @return LLBC_Object * - the clone object.
+     */
+    virtual LLBC_Object *Clone() const;
 };
 
-#endif // LLBC_CFG_OBJBASE_ENABLED
+__LLBC_NS_END
 
-#endif // !__LLBC_TEST_CASE_OBJBASE_OBJECT_H__
+#endif // !__LLBC_OBJBASE_OBJECT_FACTORY_H__

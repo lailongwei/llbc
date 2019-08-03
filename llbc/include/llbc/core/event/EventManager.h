@@ -49,8 +49,8 @@ public:
 public:
     /**
      * Add event listener.
-     * @param[in] id       - event Id.
-     * @param[in] listener - event listener.
+     * @param[in] id         - event Id.
+     * @param[in] listener   - event listener.
      * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
      */

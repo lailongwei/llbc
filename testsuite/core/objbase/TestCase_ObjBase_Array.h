@@ -19,40 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_OBJECT_MACRO_H__
-#define __LLBC_OBJBASE_OBJECT_MACRO_H__
+#ifndef __LLBC_TEST_CASE_OBJBASE_ARRAY_H__
+#define __LLBC_TEST_CASE_OBJBASE_ARRAY_H__
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#include "llbc.h"
+using namespace llbc;
 
-__LLBC_NS_BEGIN
+class TestCase_ObjBase_Array : public LLBC_BaseTestCase
+{
+public:
+    TestCase_ObjBase_Array();
+    virtual ~TestCase_ObjBase_Array();
 
-// Object release macro, use for release object(not reset to NULL after released).
-#define LLBC_Release(o)       \
-        o->Release()          \
+public:
+    virtual int Run(int argc ,char *argv[]);
 
-// Object release macro, it check object and reset to NULL after released.
-#define LLBC_XRelease(o)      \
-    do {                      \
-        if (LIKELY(o)) {      \
-            o->Release();     \
-            o = NULL;         \
-        }                     \
-    } while(0)                \
+private:
+    void BasicTest();
 
-// Object auto-release macro, use for auto release object(not reset to NULL after auto-released).
-#define LLBC_AutoRelease(o)   \
-    o->AutoRelease()          \
+    void IterTest();
 
-// Object auto-release macro, it check object and reset to NULL after auto-released.
-#define LLBC_XAutoRelease(o)  \
-    do {                      \
-        if (LIKELY(o)) {      \
-            o->AutoRelease(); \
-            o = NULL;         \
-        }                     \
-    } while (0)               \
+    void SortTest();
+};
 
-__LLBC_NS_END
-
-#endif // !__LLBC_OBJBASE_OBJECT_MACRO_H__
+#endif // !__LLBC_TEST_CASE_OBJBASE_ARRAY_H__

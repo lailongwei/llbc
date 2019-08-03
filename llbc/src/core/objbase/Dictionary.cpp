@@ -24,12 +24,9 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/ObjectFactory.h"
-#include "llbc/objbase/ObjectMacro.h"
-#include "llbc/objbase/Dictionary.h"
+#include "llbc/core/objbase/ObjectFactory.h"
+#include "llbc/core/objbase/ObjectMacro.h"
+#include "llbc/core/objbase/Dictionary.h"
 
 __LLBC_NS_BEGIN
 
@@ -274,6 +271,21 @@ int LLBC_Dictionary::Erase(Iter it)
     return LLBC_OK;
 }
 
+void LLBC_Dictionary::Erase(Obj *o)
+{
+    if (IsEmpty())
+        return;
+
+    for (Iter it = Begin(); it != End(); ++it)
+    {
+        if (it.Obj() != o)
+            continue;
+
+        Erase(it);
+        return;
+    }
+}
+
 LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)
 {
     int hash = key % _bucketSize;
@@ -300,7 +312,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(const LLBC_String &key)
     LLBC_DictionaryElem *elem = _bucket[hash];
     for (; elem != NULL; elem = elem->GetBucketElemNext())
     {
-        if (elem->IsStrKey() && *elem->GetStrKey() == key)
+        if (elem->IsStrKey() && elem->GetStrKey() == key)
         {
             return Iter(elem);
         }
@@ -350,12 +362,12 @@ LLBC_Dictionary::ConstIter LLBC_Dictionary::Begin() const
 
 LLBC_Dictionary::Iter LLBC_Dictionary::End()
 {
-    return Iter(NULL);
+    return Iter(Iter::pointer(NULL));
 }
 
 LLBC_Dictionary::ConstIter LLBC_Dictionary::End() const
 {
-    return ConstIter(NULL);
+    return ConstIter(ConstIter::cpointer(NULL));
 }
 
 LLBC_Dictionary::ReverseIter LLBC_Dictionary::ReverseBegin()
@@ -370,12 +382,12 @@ LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseBegin() const
 
 LLBC_Dictionary::ReverseIter LLBC_Dictionary::ReverseEnd()
 {
-    return ReverseIter(NULL);
+    return ReverseIter(Iter::pointer(NULL));
 }
 
 LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseEnd() const
 {
-    return ConstReverseIter(NULL);
+    return ConstReverseIter(ConstIter::cpointer(NULL));
 }
 
 LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](int key) const
@@ -465,7 +477,7 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
     ConstIter it = Begin(), endIt = End();
     for (; it != endIt; ++it)
     {
-        const LLBC_DictionaryElem *elem = it.Elem();
+        const LLBC_DictionaryElem * const elem = it.Elem();
 
         const uint8 intKeyFlag = elem->IsIntKey() ? 1 : 0;
         LLBC_STREAM_WRITE(intKeyFlag);
@@ -477,7 +489,7 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
         else
         {
             !extended ? s.Write(
-                *elem->GetStrKey()) : s.WriteEx(*elem->GetStrKey());
+                elem->GetStrKey()) : s.WriteEx(elem->GetStrKey());
         }
 
         !extended ? s.Write(*it) : s.WriteEx(*it);
@@ -579,7 +591,5 @@ void LLBC_Dictionary::RemoveFromDoublyLinkedList(LLBC_DictionaryElem *elem)
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

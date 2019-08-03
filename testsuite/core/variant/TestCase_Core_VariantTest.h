@@ -32,6 +32,7 @@ public:
 
 private:
     void BasicTest();
+    void CompositeKeyTest();
     void ArithmeticTest();
     void DictTtest();
     void SerializeTest();

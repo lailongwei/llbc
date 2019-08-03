@@ -76,7 +76,27 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 
     _lock.Unlock();
 
-    return reinterpret_cast<ObjectType *>(poolInst->Get());
+    return poolInst->GetObject();
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename ObjectType>
+ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
+{
+    const char *objectType = typeid(ObjectType).name();
+
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
+    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+
+    _lock.Lock();
+    if ((it = _poolDict.find(objectType)) == _poolDict.end())
+        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    else
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+
+    _lock.Unlock();
+
+    return reinterpret_cast<ObjectType *>(poolInst->GetReferencable());
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -103,7 +123,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(ObjectType *obj)
 {
-    return this->Release(typeid(ObjectType).name(), obj);
+    return Release(typeid(ObjectType).name(), obj);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>

@@ -23,7 +23,6 @@
 #define __LLBC_OBJBASE_OBJECT_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
 
@@ -32,6 +31,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_AutoReleasePool;
 class LLBC_AutoReleasePoolStack;
+class LLBC_ReferencablePoolObj;
 
 __LLBC_NS_END
 
@@ -121,8 +121,9 @@ public:
 
 private:
     /**
-     * Declare friend class AutoReleasePool.
+     * Declare friend classes.
      */
+    friend class LLBC_ReferencablePoolObj;
     friend class LLBC_AutoReleasePool;
     friend class LLBC_AutoReleasePoolStack;
 

@@ -58,8 +58,7 @@ inline void CircularBuffer<ObjectType>::Push(const ObjectType &obj)
     if (++_tail == _capacity)
         _tail = 0;
 
-    if (_tail == _front)
-        _isFull = true;
+    _isFull = (_tail == _front);
 }
 
 template <typename ObjectType>

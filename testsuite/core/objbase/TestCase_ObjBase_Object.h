@@ -19,21 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
+#ifndef __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
+#define __LLBC_TEST_CASE_OBJBASE_OBJECT_H__
 
-__LLBC_NS_BEGIN
+#include "llbc.h"
+using namespace llbc;
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
+class TestCase_ObjBase_Object : public LLBC_BaseTestCase
 {
-    return static_cast<App *>(_thisApp);
-}
+public:
+    TestCase_ObjBase_Object();
+    virtual ~TestCase_ObjBase_Object();
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
-{
-    return _thisApp;
-}
+public:
+    virtual int Run(int argc, char *argv[]);
+};
 
-__LLBC_NS_END
-
-#endif // __LLBC_APP_IAPPLICATION_H__
+#endif // !__LLBC_TEST_CASE_OBJBASE_OBJECT_H__

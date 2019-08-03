@@ -19,21 +19,33 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#include "llbc/common/Config.h"
+
+#include "llbc/core/objbase/ObjectFactory.h"
 
 __LLBC_NS_BEGIN
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
+LLBC_ObjectFactory::LLBC_ObjectFactory()
 {
-    return static_cast<App *>(_thisApp);
 }
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
+LLBC_ObjectFactory::~LLBC_ObjectFactory()
 {
-    return _thisApp;
+}
+
+LLBC_Object *LLBC_ObjectFactory::CreateObject() const
+{
+    return LLBC_New0(LLBC_Object);
+}
+
+LLBC_Object *LLBC_ObjectFactory::Clone() const
+{
+    return LLBC_New0(LLBC_ObjectFactory);
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_APP_IAPPLICATION_H__
+#include "llbc/common/AfterIncl.h"

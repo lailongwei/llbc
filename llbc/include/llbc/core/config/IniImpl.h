@@ -153,13 +153,7 @@ inline int LLBC_IniSection::SetValue(const LLBC_String &key, const _ValueType &v
 
 inline void LLBC_Ini::EndLine(LLBC_String &str)
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-        str.append(LLBC_CRLF_A);
-#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-        str.append(1, LLBC_CR_A);
-#else
-        str.append(1, LLBC_LF_A);
-#endif
+    str.append(1, LLBC_LF_A);
 }
 
 template <typename _ValueType>

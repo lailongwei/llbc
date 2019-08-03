@@ -20,9 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "objbase/TestCase_ObjBase_Dictionary.h"
-
-#if LLBC_CFG_OBJBASE_ENABLED
+#include "core/objbase/TestCase_ObjBase_Dictionary.h"
 
 namespace
 {
@@ -74,7 +72,7 @@ struct ForeachFun
         }
         else
         {
-            str.append_format( "%s", elem->GetStrKey()->c_str() );
+            str.append_format( "%s", elem->GetStrKey().c_str() );
         }
 
         str.append_format( ", value: %s", elem->GetObject()->ToString().c_str() );
@@ -216,5 +214,3 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
 
     return 0;
 }
-
-#endif // LLBC_CFG_OBJBASE_ENABLED

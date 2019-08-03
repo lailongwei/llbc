@@ -19,21 +19,54 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
 
-__LLBC_NS_BEGIN
+#include "core/objbase/TestCase_ObjBase_Object.h"
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
+namespace
 {
-    return static_cast<App *>(_thisApp);
+
+class MyObj : public LLBC_Object
+{
+public:
+    MyObj()
+    {
+        std::cout <<"MyObj construct" <<std::endl;
+        m_data = malloc(10);
+    }
+
+    virtual ~MyObj()
+    {
+        std::cout <<"MyObj destruct" <<std::endl;
+        free(m_data);
+    }
+
+private:
+    void *m_data;
+};
+
 }
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
+TestCase_ObjBase_Object::TestCase_ObjBase_Object()
 {
-    return _thisApp;
 }
 
-__LLBC_NS_END
+TestCase_ObjBase_Object::~TestCase_ObjBase_Object()
+{
+}
 
-#endif // __LLBC_APP_IAPPLICATION_H__
+int TestCase_ObjBase_Object::Run(int arg, char *argv[])
+{
+    std::cout <<"objbase/object test: " <<std::endl;
+    
+    MyObj *obj = LLBC_New0(MyObj);
+    obj->Retain();
+    obj->Release();
+    obj->Release();
+
+    MyObj anotherObj;
+
+    std::cout <<"press any key to continue ..." <<std::endl;
+    getchar();
+
+    return 0;
+}

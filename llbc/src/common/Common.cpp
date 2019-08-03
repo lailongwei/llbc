@@ -65,6 +65,7 @@ void __LLBC_CommonCleanup()
 #if LLBC_TARGET_PLATFORM_WIN32
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
+    tls->coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
 #endif // LLBC_TARGET_PLATFORM_WIN32
     __LLBC_ResetLibTls();
 

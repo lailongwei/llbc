@@ -151,8 +151,6 @@
 /**
  * \brief ObjBase about configs.
  */
-// Enable objbase module or not
-#define LLBC_CFG_OBJBASE_ENABLED                            1
 // Dictionary default bucket size.
 #define LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE               100
 // Dictionary string key hash algorithm(case insensitive).
@@ -209,6 +207,20 @@
  #define LLBC_CFG_COMM_POLLER_MODEL                 "SelectPoller"
 #else
  #define LLBC_CFG_COMM_POLLER_MODEL                 "SelectPoller"
+#endif
+
+/**
+ * \brief Application about configs.
+ */
+// Minidump types define, library default use full opts to write minidump file, you also can use <MiniDumpNormal> opt to replace it if you don' need write large & full minidump file.
+// About Minidump type, see: https://docs.microsoft.com/en-us/windows/win32/api/minidumpapiset/ne-minidumpapiset-minidump_type
+#if LLBC_TARGET_PLATFORM_WIN32
+ #define LLBC_CFG_APP_DUMPFILE_DUMPTYPES            (MiniDumpWithFullMemory | \
+                                                     MiniDumpWithFullMemoryInfo | \
+                                                     MiniDumpIgnoreInaccessibleMemory | \
+                                                     MiniDumpWithFullAuxiliaryState | \
+                                                     MiniDumpWithHandleData | \
+                                                     MiniDumpWithThreadInfo)
 #endif
 
 #endif // !__LLBC_COM_CONFIG_H__

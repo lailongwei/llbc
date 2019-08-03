@@ -9,7 +9,15 @@
 # 4)【llbc core】在非全栈模式下, Codec Protocol Stack支持每session一个.
 # 5)【llbc core】优化ObjectPool代码, 包括Guard部分及核心部分, 使得ObjectPool更易使用.
 # 6)【llbc core】Protocol Stack Control增加ctrl data delete delegate支持, 以让框架以自定义的方式销毁ctrlData.
-# 7)BugFix:
+# 7)【llbc core】调整objbase模块到core中, 去除编译控制.
+# 8)【llbc core】objectpool增加ReferencablePoolObj支持, 以从对象池取得可引用对象(Retain/Release/AutoRelease).
+# 9)【llbc core】优化LLBC_Dicrionary代码(主要为Iter相关).
+# 10)【llbc core】优化object pool代码，去除不必要的运算, 性能再提升10%.
+# 11)【llbc core】修复BasicString::split() bug, 并增加是否strip empty的支持.
+# 12)【lullbc】Log中的file信息的前导符号去除(&,=), 以让其它交互工具更容易识别路径并进行交互操作.
+# 13)【llbc core】Application中的ThisIApp()接口调整为ThisApp(), 统一命名.
+# 14)【llbc core】修复Ini文件写入行结束符多出一个0x0d的问题.
+# BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
 #   -【llbc core】修复Task::Wait/Cancel/...方法在Task所有线程并未完全创建就快速调用时,时引发的ThreadManager无法完全等待的bug.

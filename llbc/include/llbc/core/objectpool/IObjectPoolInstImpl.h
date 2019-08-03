@@ -19,44 +19,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_OBJECT_FACTORY_H__
-#define __LLBC_OBJBASE_OBJECT_FACTORY_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
-#include "llbc/objbase/Object.h"
+#include "llbc/core/objectpool/ReferencablePoolObj.h"
 
 __LLBC_NS_BEGIN
 
-/**
- * \brief The object factory class encapsulation.
- *        In your project, can rewrite CreateObject() method to custom your object create way.
- */
-class LLBC_EXPORT LLBC_ObjectFactory : public LLBC_Object
+inline void LLBC_IObjectPoolInst::SetPoolInstToReferencablePoolObj(void *obj)
 {
-public:
-    /**
-     * Constructor/Destructor.
-     */
-    LLBC_ObjectFactory();
-    virtual ~LLBC_ObjectFactory();
+    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = this;
+}
 
-public:
-    /**
-     * Create the object.
-     * @return LLBC_Object * - new object.
-     */
-    virtual LLBC_Object *CreateObject() const;
-
-public:
-    /**
-     * Re-write clone method.
-     * @return LLBC_Object * - the clone object.
-     */
-    virtual LLBC_Object *Clone() const;
-};
+inline void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolObj(void *obj)
+{
+    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = NULL;
+}
 
 __LLBC_NS_END
 
-#endif // !__LLBC_OBJBASE_OBJECT_FACTORY_H__
+#endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

@@ -71,22 +71,16 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_Entity);
     // test = LLBC_New0(TestCase_Core_Transcoder);
     // test = LLBC_New0(TestCase_Core_Library);
-    // test = LLBC_New0(TestCase_Core_ObjectPool);
-
-    /* ObjBase module testcases. */
-#if LLBC_CFG_OBJBASE_ENABLED
     // test = LLBC_New0(TestCase_ObjBase_Object);
     // test = LLBC_New0(TestCase_ObjBase_Array);
     // test = LLBC_New0(TestCase_ObjBase_Dictionary);
-#endif // LLBC_CFG_OBJBASE_ENABLED
+    // test = LLBC_New0(TestCase_Core_ObjectPool);
 
     /* Communication module testcases. */
     // test = LLBC_New0(TestCase_Comm_EventInSvc);
     // test = LLBC_New0(TestCase_Comm_Timer);
     // test = LLBC_New0(TestCase_Comm_PacketOp);
-#if LLBC_CFG_OBJBASE_ENABLED
     // test = LLBC_New0(TestCase_Comm_ReleasePool);
-#endif // LLBC_CFG_OBJBASE_ENABLED
     // test = LLBC_New0(TestCase_Comm_Facade);
     // test = LLBC_New0(TestCase_Comm_SvcBase);
     // test = LLBC_New0(TestCase_Comm_SvcFps);

@@ -52,7 +52,14 @@ public:
      */
     template <typename ObjectType>
     ObjectType *Get();
-    
+
+    /**
+     * Get referencable object.
+     * @return ObjectType * - the referencable object pointer, never null.
+     */
+    template <typename ObjectType>
+    ObjectType *GetReferencable();
+
     /**
      * Get guarded object.
      * @return LLBC_ObjectGuard<Object> - the guarded object.
@@ -101,14 +108,5 @@ private:
 __LLBC_NS_END
 
 #include "llbc/core/objectpool/ObjectPoolImpl.h"
-
-__LLBC_NS_BEGIN
-
-/**
- * Export & typedef some usually used thread pool classes.
- */
-typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_ThreadObjectPool;
-
-__LLBC_NS_END
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_H__

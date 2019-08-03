@@ -24,12 +24,9 @@
 
 #include "llbc/common/Config.h"
 
-#if LLBC_CFG_OBJBASE_ENABLED
-
-#include "llbc/objbase/Object.h"
-#include "llbc/objbase/ObjectFactory.h"
-#include "llbc/objbase/ObjectMacro.h"
-#include "llbc/objbase/Array.h"
+#include "llbc/core/objbase/ObjectFactory.h"
+#include "llbc/core/objbase/ObjectMacro.h"
+#include "llbc/core/objbase/Array.h"
 
 __LLBC_NS_BEGIN
 
@@ -538,7 +535,5 @@ bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
 }
 
 __LLBC_NS_END
-
-#endif // LLBC_CFG_OBJBASE_ENABLED
 
 #include "llbc/common/AfterIncl.h"

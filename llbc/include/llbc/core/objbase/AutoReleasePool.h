@@ -23,9 +23,8 @@
 #define __LLBC_OBJBASE_AUTO_RELEASE_POOL_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
 
-#include "llbc/objbase/Object.h"
+#include "llbc/core/objbase/Object.h"
 
 /* Previous declare some classes. */
 __LLBC_NS_BEGIN
