@@ -41,7 +41,7 @@ private:
     static LLBC_THREAD_LOCAL int *_val;
 };
 
-int *TestTask::_val = NULL;
+LLBC_THREAD_LOCAL int *TestTask::_val = NULL;
 
 inline TestTask::TestTask()
     : _repeatCount(10000)
