@@ -24,25 +24,25 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-inline ObjectType *LLBC_GetObjectFromSafetyObjectPool()
+inline ObjectType *LLBC_GetObjectFromSafetyPool()
 {
     return LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
-inline void LLBC_ReleaseObjectToSafetyObjectPool(ObjectType *obj)
+inline void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj)
 {
     LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Release(obj);
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_GetObjectFromUnsafetyObjectPool()
+inline ObjectType *LLBC_GetObjectFromUnsafetyPool()
 {
     return LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
-inline void LLBC_ReleaseObjectToUnsafetyObjectPool(ObjectType *obj)
+inline void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
 {
     LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
 }

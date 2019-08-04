@@ -87,28 +87,28 @@ public:
  * @return OjectType * - the object pointer.
  */
 template <typename ObjectType>
-ObjectType *LLBC_GetObjectFromSafetyObjectPool();
+ObjectType *LLBC_GetObjectFromSafetyPool();
 
 /**
  * Object pool converience method, release object to safety object-pool.
  * @param[in] obj - the will release object pointer.
  */
 template <typename ObjectType>
-void LLBC_ReleaseObjectToSafetyObjectPool(ObjectType *obj);
+void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj);
 
 /**
  * Object pool converience method, get object from unsafety object-pool.
  * @return ObjectType * - the object pointer.
  */
 template <typename ObjectType>
-ObjectType *LLBC_GetObjectFromUnsafetyObjectPool();
+ObjectType *LLBC_GetObjectFromUnsafetyPool();
 
 /**
  * Object pool converience method, release object to unsafety object-pool.
  * @param[in] obj - the will release object pointer.
  */
 template <typename ObjectType>
-void LLBC_ReleaseObjectToUnsafetyObjectPool(ObjectType *obj);
+void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj);
 
 __LLBC_NS_END
 

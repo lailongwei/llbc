@@ -237,18 +237,18 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
 
     typedef std::map<int, std::string> _TestType;
 
-    _TestType *obj1 = LLBC_GetObjectFromSafetyObjectPool<_TestType>();
+    _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
     LLBC_PrintLine("Get object from safety object-pool: 0x%08x, do some operations...", obj1);
     obj1->insert(std::make_pair(1, "Hello world!"));
     obj1->insert(std::make_pair(2, "Hey, Judy!"));
-    LLBC_ReleaseObjectToSafetyObjectPool(obj1);
+    LLBC_ReleaseObjectToSafetyPool(obj1);
     LLBC_PrintLine("Release object to safety object-pool");
 
-    _TestType *obj2 = LLBC_GetObjectFromUnsafetyObjectPool<_TestType>();
+    _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
     LLBC_PrintLine("Get object from unsafety object-pool 0x%08x, do some operations...", obj2);
     obj2->insert(std::make_pair(3, "Hello world!"));
     obj2->insert(std::make_pair(4, "Hey, Judy!"));
-    LLBC_ReleaseObjectToUnsafetyObjectPool(obj2);
+    LLBC_ReleaseObjectToUnsafetyPool(obj2);
     LLBC_PrintLine("Release object to unafety object-pool");
 
     LLBC_SafetyObjectPool objPool1;
@@ -260,16 +260,16 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
     LLBC_Time begTestTime = LLBC_Time::Now();
     for (int i = 0; i < perfTestTimes; ++i)
     {
-        _TestType *obj1 = LLBC_GetObjectFromSafetyObjectPool<_TestType>();
-        _TestType *obj2 = LLBC_GetObjectFromUnsafetyObjectPool<_TestType>();
+        _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
+        _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
         for (int j = 0; j < perTestPerTimeLoopTimes; ++j)
         {
             obj1->insert(std::make_pair(j, "Hello, World"));
             obj2->insert(std::make_pair(j + perTestPerTimeLoopTimes, "Hello, World"));
         }
 
-        LLBC_ReleaseObjectToSafetyObjectPool(obj1);
-        LLBC_ReleaseObjectToUnsafetyObjectPool(obj2);
+        LLBC_ReleaseObjectToSafetyPool(obj1);
+        LLBC_ReleaseObjectToUnsafetyPool(obj2);
     }
     LLBC_PrintLine("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
