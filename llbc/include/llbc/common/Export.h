@@ -50,7 +50,7 @@
 
 // IPHONE
 #if LLBC_TARGET_PLATFORM_IPHONE
- #ifndef LLBC_EXPORT		
+ #ifndef LLBC_EXPORT
   #define LLBC_EXPORTING 1
   #define LLBC_EXPORT __attribute__ ((__visibility__("default")))
  #endif
