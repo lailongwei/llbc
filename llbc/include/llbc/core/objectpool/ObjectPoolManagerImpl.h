@@ -19,25 +19,34 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
-#define __LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__
 
-#include "llbc.h"
-using namespace llbc;
+__LLBC_NS_BEGIN
 
-class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
+template <typename ObjectType>
+inline ObjectType *LLBC_GetObjectFromSafetyObjectPool()
 {
-public:
-    TestCase_Core_ObjectPool();
-    virtual ~TestCase_Core_ObjectPool();
+    return LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
+}
 
-public:
-    int Run(int argc, char *argv[]);
+template <typename ObjectType>
+inline void LLBC_ReleaseObjectToSafetyObjectPool(ObjectType *obj)
+{
+    LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Release(obj);
+}
 
-private:
-    void DoBasicTest();
-    void DoConverienceMethodsTest();
-    void DoPrefTest();
-};
+template <typename ObjectType>
+inline ObjectType *LLBC_GetObjectFromUnsafetyObjectPool()
+{
+    return LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
+}
 
-#endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__
+template <typename ObjectType>
+inline void LLBC_ReleaseObjectToUnsafetyObjectPool(ObjectType *obj)
+{
+    LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
+}
+
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__

@@ -37,11 +37,14 @@ public:
     virtual void Cleanup();
 
 private:
-    int m_repeatCount;
+    volatile int _repeatCount;
+    static LLBC_THREAD_LOCAL int *_val;
 };
 
+int *TestTask::_val = NULL;
+
 inline TestTask::TestTask()
-    : m_repeatCount(10000)
+    : _repeatCount(10000)
 {
 }
 
@@ -51,8 +54,15 @@ inline TestTask::~TestTask()
 
 inline void TestTask::Svc()
 {
+    _val = new int();
+    LLBC_PrintLine("Thread allocated thread-local variable[int *], ptr:%p", _val);
+    for (int i = 0; i < 100000; ++i)
+        *_val += 1;
+    LLBC_PrintLine("Exec `*val += 1` finished, val:%d", *_val);
+    LLBC_XDelete(_val);
+
     LLBC_MessageBlock *block = NULL;
-    while(-- m_repeatCount > 0)
+    while(--_repeatCount > 0)
     {
         Pop(block);
         LLBC_String content;

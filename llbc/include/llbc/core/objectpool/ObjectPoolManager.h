@@ -82,6 +82,36 @@ public:
     static LLBC_UnsafetyObjectPool *GetCurThreadUnsafetyObjectPool();
 };
 
+/**
+ * Object pool converience method, get object from safety object-pool.
+ * @return OjectType * - the object pointer.
+ */
+template <typename ObjectType>
+ObjectType *LLBC_GetObjectFromSafetyObjectPool();
+
+/**
+ * Object pool converience method, release object to safety object-pool.
+ * @param[in] obj - the will release object pointer.
+ */
+template <typename ObjectType>
+void LLBC_ReleaseObjectToSafetyObjectPool(ObjectType *obj);
+
+/**
+ * Object pool converience method, get object from unsafety object-pool.
+ * @return ObjectType * - the object pointer.
+ */
+template <typename ObjectType>
+ObjectType *LLBC_GetObjectFromUnsafetyObjectPool();
+
+/**
+ * Object pool converience method, release object to unsafety object-pool.
+ * @param[in] obj - the will release object pointer.
+ */
+template <typename ObjectType>
+void LLBC_ReleaseObjectToUnsafetyObjectPool(ObjectType *obj);
+
 __LLBC_NS_END
+
+#include "llbc/core/objectpool/ObjectPoolManagerImpl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__
