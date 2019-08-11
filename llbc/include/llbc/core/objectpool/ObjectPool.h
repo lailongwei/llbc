@@ -100,11 +100,6 @@ private:
     std::map<const char *, LLBC_IObjectPoolInst *> _poolDict;
 };
 
-/**
- * Export some usually use classes.
- */
-//template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
-
 __LLBC_NS_END
 
 #include "llbc/core/objectpool/ObjectPoolImpl.h"

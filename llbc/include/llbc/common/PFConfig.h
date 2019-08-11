@@ -145,5 +145,112 @@
  #define LLBC_TARGET_PLATFORM_NON_ANDROID                   1
 #endif
 
+// ==================================================================================
+// Processer type enumeration.
+//
+#define LLBC_PROCESSOR_UNKNOWN                              0
+#define LLBC_PROCESSOR_X86                                  1
+#define LLBC_PROCESSOR_X86_64                               2
+#define LLBC_PROCESSOR_ARM                                  3
+#define LLBC_PROCESSOR_ARM_THUMB                            4
+#define LLBC_PROCESSOR_ARM_64                               5
+
+// ==================================================================================
+// Recognize processors
+// About processor predefined macros, see:
+// All mainstream compilers: https://sourceforge.net/p/predef/wiki/Architectures/
+// MSVC only:                https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros?view=vs-2019
+//
+#if LLBC_TARGET_PLATFORM_WIN32
+
+ #if defined(_M_IX86)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_X86
+  #define LLBC_16BIT_PROCESSOR                              0
+  #define LLBC_32BIT_PROCESSOR                              1
+  #define LLBC_64BIT_PROCESSOR                              0
+ #elif defined(_M_X64) || defined(_M_AMD64)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_X86_64
+  #define LLBC_16BIT_PROCESSOR                              0
+  #define LLBC_32BIT_PROCESSOR                              0
+  #define LLBC_64BIT_PROCESSOR                              1
+ #elif defined(_M_ARM)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM
+  #define LLBC_16BIT_PROCESSOR                              0
+  #define LLBC_32BIT_PROCESSOR                              1
+  #define LLBC_64BIT_PROCESSOR                              0
+ #elif defined(_M_ARMT)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM_THUMB
+  #define LLBC_16BIT_PROCESSOR                              1
+  #define LLBC_32BIT_PROCESSOR                              0
+  #define LLBC_64BIT_PROCESSOR                              0
+ #elif defined(_M_ARM64)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM_64
+  #define LLBC_16BIT_PROCESSOR                              0
+  #define LLBC_32BIT_PROCESSOR                              0
+  #define LLBC_64BIT_PROCESSOR                              1
+ #else // Unknown
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_UNKNOWN
+  #define LLBC_16BIT_PROCESSOR                              0
+  #define LLBC_32BIT_PROCESSOR                              0
+  #define LLBC_64BIT_PROCESSOR                              0
+ #endif // defined(_M_IX86)
+
+#else // LLBC_TARGET_PLATFORM_NON_WIN32
+
+ #if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_X86
+ #elif defined(__x86_64__) || defined(__amd64__)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_X86_64
+ #elif defined(__arm__)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM
+ #elif defined(__arm__) && defined(__thumb__)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM_THUMB
+ #elif defined(__aarch64__)
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_ARM_64
+ #else // Unknown
+  #define LLBC_TARGET_PROCESSOR LLBC_PROCESSOR_UNKNOWN
+ #endif // defined(__ix86__)
+
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
+#if LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86
+ #define LLBC_TARGET_PROCESSOR_X86                          1
+ #define LLBC_TARGET_PROCESSOR_X86_64                       0
+ #define LLBC_TARGET_PROCESSOR_ARM                          0
+ #define LLBC_TARGET_PROCESSOR_ARM_THUMB                    0
+ #define LLBC_TARGET_PROCESSOR_ARM_64                       0
+ #define LLBC_TARGET_PROCESSOR_DESC                         "x86"
+#elif LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86_64
+ #define LLBC_TARGET_PROCESSOR_X86                          0
+ #define LLBC_TARGET_PROCESSOR_X86_64                       1
+ #define LLBC_TARGET_PROCESSOR_ARM                          0
+ #define LLBC_TARGET_PROCESSOR_ARM_THUMB                    0
+ #define LLBC_TARGET_PROCESSOR_ARM_64                       0
+ #define LLBC_TARGET_PROCESSOR_DESC                         "x86_64"
+#elif LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_ARM
+ #define LLBC_TARGET_PROCESSOR_X86                          0
+ #define LLBC_TARGET_PROCESSOR_X86_64                       0
+ #define LLBC_TARGET_PROCESSOR_ARM                          1
+ #define LLBC_TARGET_PROCESSOR_ARM_THUMB                    0
+ #define LLBC_TARGET_PROCESSOR_ARM_64                       0
+ #define LLBC_TARGET_PROCESSOR_DESC                         "arm"
+#elif LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_ARM_THUMB
+ #define LLBC_TARGET_PROCESSOR_X86                          0
+ #define LLBC_TARGET_PROCESSOR_X86_64                       0
+ #define LLBC_TARGET_PROCESSOR_ARM                          0
+ #define LLBC_TARGET_PROCESSOR_ARM_THUMB                    1
+ #define LLBC_TARGET_PROCESSOR_ARM_64                       0
+ #define LLBC_TARGET_PROCESSOR_DESC                         "thumb"
+#elif LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_ARM_64
+ #define LLBC_TARGET_PROCESSOR_X86                          0
+ #define LLBC_TARGET_PROCESSOR_X86_64                       0
+ #define LLBC_TARGET_PROCESSOR_ARM                          0
+ #define LLBC_TARGET_PROCESSOR_ARM_THUMB                    0
+ #define LLBC_TARGET_PROCESSOR_ARM_64                       1
+ #define LLBC_TARGET_PROCESSOR_DESC                         "arm64"
+#else // Unknown processor
+ #error "Cannot recognize the target processor; are you targeting an unsuported processor?"
+#endif // LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86
+
 #endif // !__LLBC_COM_PF_CONFIG_H__
 
