@@ -30,9 +30,7 @@
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
-#if !LLBC_CFG_COMM_USE_FULL_STACK
 #include "llbc/comm/protocol/ProtocolStack.h"
-#endif
 
 __LLBC_NS_BEGIN
 
@@ -56,8 +54,12 @@ public:
      * @param[in] type         - the service type, see LLBC_IService::Type enumeration.
      * @param[in] name         - type service name.
      * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
+     * @param[in] fullStack    - the full stack option, default is true.
      */
-    LLBC_Service(Type type, const LLBC_String &name = "", LLBC_IProtocolFactory *protoFactory = NULL);
+    LLBC_Service(Type type,
+                 const LLBC_String &name = "",
+                 LLBC_IProtocolFactory *protoFactory = NULL,
+                 bool fullStack = true);
 
     /**
      * Service destructor.
@@ -82,6 +84,12 @@ public:
      * @return const LLBC_String & - the service name.
      */
     virtual const LLBC_String &GetName() const;
+
+    /**
+     * Get full stack option.
+     * @return bool - the full stack option.
+     */
+    virtual bool IsFullStack() const;
 
     /**
      * Get the service drive mode.
@@ -375,7 +383,6 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
      * Get service protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
@@ -383,7 +390,6 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:
     /**
@@ -529,6 +535,7 @@ private:
     static int _maxId;
 
     Type _type;
+    bool _fullStack;
     LLBC_String _name;
     LLBC_IProtocolFactory *_protoFactory;
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory;
@@ -559,16 +566,10 @@ private:
         int sessionId;
         int acceptSessionId;
         bool isListenSession;
-        #if !LLBC_CFG_COMM_USE_FULL_STACK
         LLBC_ProtocolStack *codecStack;
-        #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
     public:
-        #if LLBC_CFG_COMM_USE_FULL_STACK
-        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession);
-        #else // !LLBC_CFG_COMM_USE_FULL_STACK
-        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack);
-        #endif // LLBC_CFG_COMM_USE_FULL_STACK
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack = NULL);
         ~_ReadySessionInfo();
     };
     typedef std::map<int, _ReadySessionInfo *> _ReadySessionInfos;

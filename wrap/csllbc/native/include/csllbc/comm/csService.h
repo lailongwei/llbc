@@ -49,6 +49,7 @@ public:
      */
     csllbc_Service(Type type, 
                    const LLBC_String &name,
+                   bool fullStack,
                    _D::Deleg_Service_EncodePacket encodeDeleg,
                    _D::Deleg_Service_DecodePacket decodeDeleg,
                    _D::Deleg_Service_PacketHandler handlerDeleg,
@@ -81,6 +82,11 @@ public:
      * Get service Id.
      */
     int GetId() const;
+
+    /**
+     * Get full-stack option.
+     */
+    bool IsFullStack() const;
 
     /**
      * Get service FPS.
