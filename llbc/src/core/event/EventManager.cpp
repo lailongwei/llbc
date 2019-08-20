@@ -104,13 +104,14 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, cons
         _delayedOps.push_back(op);
 
         LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return op.listener.stub.c_str();
+        return op.listener.stub;
     }
 
     if (ProcessEventOperation(op) != LLBC_OK)
         return LLBC_INVALID_LISTENER_STUB;
 
-    return op.listener.stub.c_str();
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return op.listener.stub;
 }
 
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
@@ -152,7 +153,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         _delayedOps.push_back(op);
 
         LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return LLBC_INVALID_LISTENER_STUB;
+        return op.listener.stub;
     }
 
     if (ProcessEventOperation(op) != LLBC_OK)
@@ -161,7 +162,8 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return op.listener.stub.c_str();
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return op.listener.stub;
 }
 
 int LLBC_EventManager::RemoveListener(int id)
