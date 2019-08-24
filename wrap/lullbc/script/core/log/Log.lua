@@ -2,7 +2,6 @@ local Log = llbc.newclass('llbc.Log')
 
 local type = type
 local getinfo = debug.getinfo
-local traceback = debug.traceback
 local LogMsg = _llbc.LogMsg
 
 -- Log levels enumeration.
@@ -86,11 +85,7 @@ function Log.output(level, logger, tag, ...)
         end
     end
 
-    if level >= 3 then -- For improve Log performance, explicit use Log Level value to perform if condition judge.
-        LogMsg(level, logger, tag, file, line, ..., traceback(3))
-    else
-        LogMsg(level, logger, tag, file, line, ...)
-    end
+    LogMsg(level, logger, tag, file, line, ...)
 end
 
 local output = Log.output
