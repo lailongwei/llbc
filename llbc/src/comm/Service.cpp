@@ -135,6 +135,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _timerScheduler(NULL)
 
 , _evManager()
+, _evManagerMaxListenerStub(0)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 {
@@ -941,10 +942,16 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    const LLBC_ListenerStub stub = LLBC_GUIDHelper::GenStr();
-    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, stub, deleg));
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_started && !_initingFacade))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
 
-    return stub;
+    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
+
+    return _evManagerMaxListenerStub;
 }
 
 void LLBC_Service::UnsubscribeEvent(int event)
@@ -1685,7 +1692,7 @@ void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    if (ev.stub.empty())
+    if (ev.stub == LLBC_INVALID_LISTENER_STUB)
         _evManager.RemoveListener(ev.id);
     else
         _evManager.RemoveListener(ev.stub);

@@ -110,6 +110,14 @@ ObjectType *LLBC_GetObjectFromUnsafetyPool();
 template <typename ObjectType>
 void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj);
 
+/**
+ * Object pool converience method, get referencable object from object pool(unsafety object-pool).
+ * @param[in] autoRelease - the auto-release flag, default is false.
+ * @return ReferencableObjectType * - the referencable object pointer.
+ */
+template <typename ReferencableObjectType>
+ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease = false);
+
 __LLBC_NS_END
 
 #include "llbc/core/objectpool/ObjectPoolManagerImpl.h"

@@ -25,8 +25,13 @@
 namespace
 {
     // Define some test configs.
+    #if LLBC_DEBUG
+    const int TestTimes = 1000;
+    const int ListSize = 100;
+    #else
     const int TestTimes = 100000;
     const int ListSize = 100;
+    #endif
 
     // Define some test classes.
     class TestObj
@@ -38,6 +43,26 @@ namespace
         }
 
         ~TestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
+    class MarkableTestObj
+    {
+    public:
+        MarkableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        ~MarkableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+    public:
+        void MarkPoolObject()
         {
             LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
@@ -215,12 +240,25 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         }
     }
 
+    // Test Markable pool object.
+    {
+        LLBC_ObjectPool<> pool;
+
+        const int testTimes = 10;
+        LLBC_PrintLine("Markable object test(times:%d)", testTimes);
+        for (int i = 0; i < testTimes; ++i)
+        {
+            MarkableTestObj *obj = pool.Get<MarkableTestObj>();
+            pool.Release(obj);
+        }
+    }
+
     // Test Referencable object
     {
         LLBC_ObjectPool<> pool;
 
         const int testTimes = 10;
-        LLBC_PrintLine("Referencable object test(times: 10)");
+        LLBC_PrintLine("Referencable object test(times: %d)", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
             ReferencableTestObj *obj = pool.GetReferencable<ReferencableTestObj>();
@@ -251,10 +289,21 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
     LLBC_ReleaseObjectToUnsafetyPool(obj2);
     LLBC_PrintLine("Release object to unafety object-pool");
 
+    ReferencableTestObj *refObj = LLBC_GetReferencableObjectFromPool<ReferencableTestObj>();
+    LLBC_PrintLine("Get referencable-object from object-pool(unsafety) 0x%08x, do some operations...", refObj);
+    refObj->Retain();
+    refObj->Release();
+    refObj->Release();
+
     LLBC_SafetyObjectPool objPool1;
     LLBC_UnsafetyObjectPool objPool2;
+    #if LLBC_DEBUG
+    int perfTestTimes = 1000;
+    int perTestPerTimeLoopTimes = 100;
+    #else
     int perfTestTimes = 100000;
     int perTestPerTimeLoopTimes = 100;
+    #endif
     LLBC_PrintLine("Exec performance compare test(Converience methods performance <<>> local object pools), "
                    "test times:%d, per-time loop times:%d", perfTestTimes, perTestPerTimeLoopTimes);
     LLBC_Time begTestTime = LLBC_Time::Now();

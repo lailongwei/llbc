@@ -639,6 +639,7 @@ private:
 
 private:
     LLBC_EventManager _evManager;
+    LLBC_ListenerStub _evManagerMaxListenerStub;
 
 private:
     LLBC_ServiceMgr &_svcMgr;

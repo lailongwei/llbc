@@ -47,6 +47,16 @@ inline void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
     LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
 }
 
+template <typename ReferencableObjectType>
+ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease)
+{
+    ReferencableObjectType *refObj = LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->GetReferencable<ReferencableObjectType>();
+    if (autoRelease)
+        refObj->AutoRelease();
+
+    return refObj;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__

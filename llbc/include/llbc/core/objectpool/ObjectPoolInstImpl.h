@@ -24,6 +24,7 @@
 #include "llbc/core/thread/Guard.h"
 
 #include "llbc/core/objectpool/ObjectGuard.h"
+#include "llbc/core/objectpool/PoolObjectMarker.h"
 #include "llbc/core/objectpool/ObjectManipulator.h"
 
 __LLBC_NS_BEGIN
@@ -207,6 +208,7 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock 
     if (!memUnit->inited)
     {
         LLBC_ObjectManipulator::New<ObjectType>(obj);
+        LLBC_PoolObjectMarker::Mark<ObjectType>(reinterpret_cast<ObjectType *>(obj), 0);
         if (referencableObj)
         {
             memUnit->referencableObj = true;
