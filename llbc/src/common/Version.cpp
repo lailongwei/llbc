@@ -46,7 +46,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
         LLBC_minorVersion, LLBC_updateNo, LLBC_isDebugVer ? "debug" : "release");
 
 #if LLBC_TARGET_PLATFORM_WIN32
-    desc.append_format("(%s", "WIN32");
+    desc.append_format("(%s", "WINDOWS");
 #elif LLBC_TARGET_PLATFORM_LINUX
     desc.append_format("(%s", "LINUX");
 #elif LLBC_TARGET_PLATFORM_IPHONE
@@ -58,12 +58,14 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
 #endif
 
 #if LLBC_CUR_COMP == LLBC_COMP_MSVC
-    desc.append_format(", compiled with: %s, version: %d)", LLBC_CUR_COMP_DESC, LLBC_COMP_VER);
+    desc.append_format(", arch:%s, compiled with:%s(ver:%d))", 
+        LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC, LLBC_COMP_VER);
 #elif LLBC_CUR_COMP == LLBC_COMP_GCC
-    desc.append_format(", compiled with: %s, version %d.%d.%d)", 
-        LLBC_CUR_COMP_DESC, LLBC_COMP_MAJOR_VER, LLBC_COMP_MINOR_VER, LLBC_COMP_PATCH_LEVEL);
+    desc.append_format(", arch:%s, compiled with:%s(ver:%d.%d.%d))", 
+        LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC, LLBC_COMP_MAJOR_VER, LLBC_COMP_MINOR_VER, LLBC_COMP_PATCH_LEVEL);
 #else
-    desc.append_format(", compiled with: %s)", LLBC_CUR_COMP_DESC);
+    desc.append_format(", arch:%s, compiled with:%s)", 
+        LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC);
 #endif
 
     if (!verbose)
@@ -106,7 +108,6 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("  poller model: %s\n", LLBC_CFG_COMM_POLLER_MODEL);
     desc.append_format("  default service FPS: %d\n", LLBC_CFG_COMM_DFT_SERVICE_FPS);
     desc.append_format("  per thread max drive services count: %d\n", LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT);
-    desc.append_format("  full protocol-stack support(let your program more efficient): %s\n", LLBC_CFG_COMM_USE_FULL_STACK ? "true" : "false");
     desc.append_format("  enabled register status code handler support: %s\n", LLBC_CFG_COMM_ENABLE_STATUS_HANDLER ? "true" : "false");
     desc.append_format("  enabled register status code describe string support: %s\n", LLBC_CFG_COMM_ENABLE_STATUS_DESC ? "true" : "false");
     desc.append_format("  enabled unify pre-subscribe support: %s\n", LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE ? "true" : "false");

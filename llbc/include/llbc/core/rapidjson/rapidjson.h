@@ -356,6 +356,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_SIZETYPEDEFINE
 
+#define RAPIDJSON_NO_SIZETYPEDEFINE
 #ifndef RAPIDJSON_NO_SIZETYPEDEFINE
 /*! \def RAPIDJSON_NO_SIZETYPEDEFINE
     \ingroup RAPIDJSON_CONFIG
@@ -383,6 +384,8 @@ RAPIDJSON_NAMESPACE_BEGIN
 */
 typedef unsigned SizeType;
 RAPIDJSON_NAMESPACE_END
+#else
+typedef std::size_t SizeType;
 #endif
 
 // always import std::size_t to rapidjson namespace

@@ -38,24 +38,21 @@ class LLBC_EXPORT LLBC_EventManager
 {
 public:
     /**
-     * Event listener function  typedef.
+     * Ctor & Dtor.
      */
-    typedef void (*Listener)(LLBC_Event *event);
-
-public:
     LLBC_EventManager();
     virtual ~LLBC_EventManager();
 
 public:
     /**
      * Add event listener.
-     * @param[in] id       - event Id.
-     * @param[in] listener - event listener.
+     * @param[in] id         - event Id.
+     * @param[in] listener   - event listener.
      * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
-                                          Listener listener,
+                                          void (*listener)(LLBC_Event *),
                                           const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
 
     /**
@@ -132,8 +129,7 @@ protected:
         LLBC_ListenerStub stub;
 
         int evId;
-        Listener listener1;
-        LLBC_IDelegate1<void, LLBC_Event *> *listener2;
+        LLBC_IDelegate1<void, LLBC_Event *> *listener;
 
         _Listener();
     };
@@ -170,6 +166,7 @@ protected:
 
 protected:
     int _firing;
+    LLBC_ListenerStub _maxListenerStub;
 
     typedef std::vector<_Op> _DelayedOps;
     _DelayedOps _delayedOps;
@@ -178,7 +175,7 @@ protected:
     typedef std::map<int, _Listeners> _ListenersMap;
     _ListenersMap _listeners;
 
-    typedef std::map<LLBC_String, _Listener> _StubIndexedListeners;
+    typedef std::map<LLBC_ListenerStub, _Listener> _StubIndexedListeners;
     _StubIndexedListeners _stubListeners;
 };
 

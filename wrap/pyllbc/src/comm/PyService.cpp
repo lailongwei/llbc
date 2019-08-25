@@ -590,7 +590,7 @@ void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_S
 {
     ASSERT(!_llbcSvc && "llbc service pointer not NULL");
 
-    _llbcSvc = LLBC_IService::Create(svcType, svcName);
+    _llbcSvc = LLBC_IService::Create(svcType, svcName, NULL, false);
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();

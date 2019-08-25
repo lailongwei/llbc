@@ -149,9 +149,7 @@ namespace llbc
     /// <summary>
     /// The packet exception handler.
     /// </summary>
-    /// <param name="packet">the packet object</param>
-    /// <param name="handlePhase">packet handle phase</param>
-    /// <param name="e">exception</param>
+    /// <param name="exceptionInfo">the packet exception info</param>
     public delegate void PacketExcHandler(PacketExceptionInfo exceptionInfo);
     #endregion
 
@@ -429,8 +427,10 @@ namespace llbc
         /// <summary>
         ///  Construct service object with specific ServiceType.
         /// </summary>
+        /// <param name="name">service name</param>
         /// <param name="svcType">service type enumeration</param>
-        public Service(string name, ServiceType svcType = ServiceType.Normal)
+        /// <param name="fullStack">full-stack option</param>
+        public Service(string name, ServiceType svcType = ServiceType.Normal, bool fullStack = true)
         {
             lock (_gblLock)
             {
@@ -441,14 +441,16 @@ namespace llbc
 
                 _svcName = name;
                 _svcType = svcType;
+                _fullStack = fullStack;
 
                 // Create native service.
                 _nativeFacade = new NativeFacade(this);
                 _nativeFacadeDelegates = new NativeFacadeDelegates(_nativeFacade);
 
-                IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName, true);
+                IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName);
                 _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
                                                             nativeSvcName,
+                                                            fullStack,
                                                             _nativeFacadeDelegates.svcEncodePacket,
                                                             _nativeFacadeDelegates.svcDecodePacket,
                                                             _nativeFacadeDelegates.svcPacketHandler,
@@ -493,7 +495,7 @@ namespace llbc
         #endregion
 
         #region properties
-        #region svcType, svcName, isStarted
+        #region svcType, svcName, fullStack, isStarted
         /// <summary>
         /// Get the service type.
         /// </summary>
@@ -519,6 +521,14 @@ namespace llbc
         public string svcName
         {
             get { return _svcName; }
+        }
+
+        /// <summary>
+        /// Get the service full-stack option.
+        /// </summary>
+        public bool fullStack
+        {
+            get { return _fullStack; }
         }
 
         /// <summary>
@@ -623,7 +633,7 @@ namespace llbc
             lock (_lock)
             {
                 // Reset _maxPacketId.
-                if (_usedFullStack)
+                if (_fullStack)
                     Interlocked.Exchange(ref _maxPacketId, 0);
 
                 // Stop native llbc service.
@@ -893,6 +903,7 @@ namespace llbc
         /// </summary>
         /// <param name="opcode">opcode</param>
         /// <param name="preHandler">the packet prehandler</param>
+        /// <param name="excHandler">the exception handler</param>
         public void PreSubscribe(int opcode, PacketPreHandler preHandler, PacketExcHandler excHandler = null)
         {
             lock (_lock)
@@ -915,6 +926,7 @@ namespace llbc
         /// Unify presubscribe packet, need LibConfig.commIsEnabledUnifyPreSubscribe == true support, if not enabled this option will raise exception.
         /// </summary>
         /// <param name="unifyPreHandler">the packet unify prehandler</param>
+        /// <param name="excHandler">the exception handler</param>
         public void UnifyPreSubscribe(PacketUnifyPreHandler unifyPreHandler, PacketExcHandler excHandler = null)
         {
             lock (_lock)
@@ -1042,7 +1054,7 @@ namespace llbc
                         throw new LLBCException("Could not find packet[{0}] opcode, please RegisterCoder first!", typeof(T));
 
                     // Enabled full-stack option, push and waiting native coder to encode it.
-                    if (_usedFullStack)
+                    if (_fullStack)
                     {
                         _FullStackSendNonLock(sessionId, obj, coderInfo, status);
                         return;
@@ -1067,7 +1079,7 @@ namespace llbc
                         throw new LLBCException("Could not find packet[{0}] opcode, send failed, please RegisterCoder first!", obj.GetType());
 
                     // Enabled full-stack option, push and waiting native coder to encode it.
-                    if (_usedFullStack)
+                    if (_fullStack)
                     {
                         _FullStackSendNonLock(sessionId, obj, coderInfo, status);
                         return;
@@ -1450,6 +1462,7 @@ namespace llbc
             public NativeFacade(Service svc)
             {
                 _svc = svc;
+                _fullStack = svc.fullStack;
             }
 
             #region RegisterFacade/CleanupFacades
@@ -1856,7 +1869,7 @@ namespace llbc
 
                 // Get coder, for optimize performance, do minimize lock(just lock coder access code).
                 _CoderInfo coderInfo;
-                if (Service._usedFullStack)
+                if (_fullStack)
                 {
                     lock (_svc._lock)
                     {
@@ -1998,7 +2011,7 @@ namespace llbc
             /// </summary>
             public int UnifyPreHandlePacket(int sessionId, int opcode, IntPtr data)
             {
-                if (!Service._enabledUnifyPreSubscribe)
+                if (!_enabledUnifyPreSubscribe)
                     return 1;
 
                 if (_svc._unifyPreHandler == null)
@@ -2066,7 +2079,7 @@ namespace llbc
             #region Decoded packets operation support methods
             private void _PushDecodedPacket(int sessionId, Packet packet)
             {
-                if (Service._usedFullStack)
+                if (_fullStack)
                 {
                     lock (_decodedPackets)
                     {
@@ -2093,7 +2106,7 @@ namespace llbc
 
             private Packet _GetDecodedPacket(int sessionId, long nativeDataPtr, bool dequeue)
             {
-                if (Service._usedFullStack)
+                if (_fullStack)
                 {
                     lock (_decodedPackets)
                     {
@@ -2130,7 +2143,7 @@ namespace llbc
 
             private void _DeleteDecodedPacket(int sessionId, long nativeDataPtr)
             {
-                if (Service._usedFullStack)
+                if (_fullStack)
                 {
                     lock (_decodedPackets)
                     {
@@ -2202,13 +2215,12 @@ namespace llbc
                         _svc.RemoveSession(packet.sessionId, string.Format(
                             "Call packet exception handler failed, opcode: {0}, phase: {1}, exception: {2}", packet.opcode, phase, e2));
                         _svc._HandleFrameExc(e2);
-                        return;
                     }
                 }
                 else
                 {
                     _svc.RemoveSession(packet.sessionId,
-                        string.Format("Handle packet failed, opcode: {1}, phase: {1}, exception: {2}", packet.opcode, phase, e));
+                        string.Format("Handle packet failed, opcode: {0}, phase: {1}, exception: {2}", packet.opcode, phase, e));
                     _svc._HandleFrameExc(e);
                 }
             }
@@ -2216,10 +2228,12 @@ namespace llbc
             #endregion
 
             #region InlFacade data members
-            Service _svc;
-            List<IFacade> _facades = new List<IFacade>();
-            List<IFacade> _overridedOnIdleFacades = new List<IFacade>();
-            List<IFacade> _overridedOnUpdateFacades = new List<IFacade>();
+            private Service _svc;
+            private bool _fullStack;
+
+            private List<IFacade> _facades = new List<IFacade>();
+            private List<IFacade> _overridedOnIdleFacades = new List<IFacade>();
+            private List<IFacade> _overridedOnUpdateFacades = new List<IFacade>();
 
             private Dictionary<int, List<Packet>> _decodedPackets = new Dictionary<int, List<Packet>>();
 
@@ -2292,6 +2306,7 @@ namespace llbc
         // Main data members.
         private string _svcName;
         private ServiceType _svcType;
+        private bool _fullStack;
         private IntPtr _llbcSvc = IntPtr.Zero;
 
         // Facades about data members.
@@ -2324,8 +2339,6 @@ namespace llbc
 
         // Max packet Id, only available on enabled full-stack support.
         private long _maxPacketId = 1;
-        // Static data member, indicate llbc core library enabled full-stack support or not in phases of compiler.
-        private static bool _usedFullStack = LibConfig.commIsUseFullStack;
         // Static data member, indicate llbc core library enabled unify pre-subscribe support or not in phases of compiler.
         private static bool _enabledUnifyPreSubscribe = LibConfig.commIsEnabledUnifyPreSubscribe;
 

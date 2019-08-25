@@ -31,6 +31,7 @@ csllbc_Service::_PacketDecodeDelegs csllbc_Service::_packetDecodeDelegs;
 
 csllbc_Service::csllbc_Service(Type type,
                                const LLBC_String &name,
+                               bool fullStack,
                                _D::Deleg_Service_EncodePacket encodeDeleg,
                                _D::Deleg_Service_DecodePacket decodeDeleg, 
                                _D::Deleg_Service_PacketHandler handlerDeleg,
@@ -39,7 +40,7 @@ csllbc_Service::csllbc_Service(Type type,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
-    _llbcSvc = LLBC_IService::Create(type, name);
+    _llbcSvc = LLBC_IService::Create(type, name, NULL, fullStack);
 
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
@@ -97,6 +98,11 @@ csllbc_Service::Type csllbc_Service::GetType() const
 int csllbc_Service::GetId() const
 {
     return _llbcSvc->GetId();
+}
+
+bool csllbc_Service::IsFullStack() const
+{
+    return _llbcSvc->IsFullStack();
 }
 
 int csllbc_Service::GetFPS() const

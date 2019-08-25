@@ -306,15 +306,6 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service Full-Stack Used config.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static bool commIsUseFullStack
-        {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsUsedFullStack() != 0; }
-        }
-
-        /// <summary>
         /// Service Status-Handler enabled config.
         /// <para>config layer: llbc core library</para>
         /// </summary>

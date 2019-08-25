@@ -19,27 +19,44 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
-
-#include "llbc/comm/Service.h"
-
-namespace
-{
-    typedef LLBC_NS LLBC_IService This;
-}
+#ifdef __LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__
 
 __LLBC_NS_BEGIN
 
-This *LLBC_IService::Create(Type type,
-                            const LLBC_String &name,
-                            LLBC_IProtocolFactory *protoFactory,
-                            bool fullStack)
+template <typename ObjectType>
+inline ObjectType *LLBC_GetObjectFromSafetyPool()
 {
-    return LLBC_New4(LLBC_Service, type, name, protoFactory, fullStack);
+    return LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
+}
+
+template <typename ObjectType>
+inline void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj)
+{
+    LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Release(obj);
+}
+
+template <typename ObjectType>
+inline ObjectType *LLBC_GetObjectFromUnsafetyPool()
+{
+    return LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
+}
+
+template <typename ObjectType>
+inline void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
+{
+    LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
+}
+
+template <typename ReferencableObjectType>
+ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease)
+{
+    ReferencableObjectType *refObj = LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->GetReferencable<ReferencableObjectType>();
+    if (autoRelease)
+        refObj->AutoRelease();
+
+    return refObj;
 }
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__

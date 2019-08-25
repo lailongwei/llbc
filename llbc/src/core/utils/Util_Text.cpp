@@ -77,7 +77,7 @@ int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
     int str1Len = ::lstrlenW(lpString1);
     int str2Len = ::lstrlenW(lpString2);
     int len = MIN(str1Len, str2Len);
-    for (register int i = 0; i < len; ++i)
+    for (int i = 0; i < len; ++i)
     {
         if (lpString1[i] < lpString2[i])
             return -1;
@@ -509,7 +509,7 @@ int LLBC_HashString(const char *str, size_t strLen)
     int hashVal = 0;
     for (size_t i = 0; i < strLen; ++i)
     {
-#ifdef _M_X64
+#if LLBC_64BIT_PROCESSOR
         hashVal += static_cast<int>(i * 0x31 * str[i]);
 #else
         hashVal += i * 0x31 * str[i];

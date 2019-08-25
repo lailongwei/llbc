@@ -174,7 +174,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             continue;
 
         LLBC_Session *session = it->second;
-        if (ev.events & (EPOLLHUP|EPOLLERR))
+        if (ev.events & (EPOLLHUP | EPOLLERR))
         {
             LLBC_Socket *sock = session->GetSocket();
 

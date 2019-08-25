@@ -19,27 +19,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
-
-#include "llbc/comm/Service.h"
-
-namespace
-{
-    typedef LLBC_NS LLBC_IService This;
-}
+#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
 
 __LLBC_NS_BEGIN
 
-This *LLBC_IService::Create(Type type,
-                            const LLBC_String &name,
-                            LLBC_IProtocolFactory *protoFactory,
-                            bool fullStack)
+template <typename ObjectType>
+inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *)
 {
-    return LLBC_New4(LLBC_Service, type, name, protoFactory, fullStack);
+    obj->MarkPoolObject();
+}
+
+template <typename ObjectType>
+inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, ...)
+{
+    // Do nothing.
 }
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__

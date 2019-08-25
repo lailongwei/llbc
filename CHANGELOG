@@ -17,6 +17,11 @@
 # 12)【lullbc】Log中的file信息的前导符号去除(&,=), 以让其它交互工具更容易识别路径并进行交互操作.
 # 13)【llbc core】Application中的ThisIApp()接口调整为ThisApp(), 统一命名.
 # 14)【llbc core】修复Ini文件写入行结束符多出一个0x0d的问题.
+# 15)【llbc core】objectpool增加memory align支持.
+# 16)【llbc core】增加process识别, 当前支持x86/x86_64/arm/thumb/arm_64(详见PFConfig.h).
+# 17)【llbc core】Service Full-Stack 选项从Config中去除，变成Service属性，即不同Service中的Full-Stack选项可不同，在Create时指定.
+# 18)【llbc core】优化EventManager代码, LLBC_ListenerStub类型由String调整为uint64.
+# 19)【llbc core】objectpool增加对象MarkPoolObject():void方法识别, 以在生成对象时标记此对象为池子内部对象, 以供业务及框架未来拓展用.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
