@@ -561,8 +561,23 @@ void LLBC_Socket::OnRecv()
     // Try process already received data, whether the errors occurred or not.
     if (recvFlag)
     {
-        if (!_session->OnRecved(block))
+        bool sessionRemoved;
+        if (!_session->OnRecved(block, sessionRemoved))
+        {
+            #if LLBC_TARGET_PLATFORM_WIN32
+            if (sessionRemoved)
+                return;
+
+            // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
+            if (_pollerType == _PollerType::IocpPoller)
+            {
+                if (UNLIKELY(PostZeroWSARecv() != LLBC_OK))
+                    _session->OnClose();
+            }
+            #endif // LLBC_TARGET_PLATFORM_WIN32
+
             return;
+        }
     }
     else
     {
@@ -606,10 +621,8 @@ void LLBC_Socket::OnRecv()
     // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == _PollerType::IocpPoller)
-    {
         if (PostZeroWSARecv() != LLBC_OK)
             _session->OnClose();
-    }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
