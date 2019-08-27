@@ -253,10 +253,11 @@ public:
 
     /**
      * Received event handler method, call by socket, when data received, will call this metho.
-     * @param[in] block - the data block.
+     * @param[in] block           - the data block.
+     * @param[out] sessionRemoved - the session remove flag.
      * @return bool - return false if success, otherwise return false(if failed, this method will perform OnClose() op).
      */
-    bool OnRecved(LLBC_MessageBlock *block);
+    bool OnRecved(LLBC_MessageBlock *block, bool &sessionRemoved);
 
 public:
     /**

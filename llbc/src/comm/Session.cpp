@@ -299,10 +299,13 @@ void LLBC_Session::OnSent(size_t len)
     // ... ...
 }
 
-bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
+bool LLBC_Session::OnRecved(LLBC_MessageBlock *block, bool &sessionRemoved)
 {
     int recvRet;
-    bool removeSession;
+    bool &removeSession = sessionRemoved;
+
+    removeSession = false;
+
     _recvedPackets.clear();
     if (_fullStack)
         recvRet = _protoStack->Recv(block, _recvedPackets, removeSession);
