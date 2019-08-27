@@ -46,14 +46,14 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 {
     // Params: level, logger, tag, file, line, ...<msg>(optional)
     int paramsCount = lua_gettop(l);
-    if (lua_gettop(l) < 5)
+    if (paramsCount < 5)
         lullbc_SetError(l, "failed to log message, parameters count must be equal or greater than 5");
 
     // Concat messages to output.
     size_t msgSize;
     LLBC_String msg;
     const char *partMsg;
-    for (register int i = 6; i <= paramsCount; ++i)
+    for (int i = 6; i <= paramsCount; ++i)
     {
         partMsg = luaL_tolstring(l, i, &msgSize);
         if (UNLIKELY(partMsg == NULL))
@@ -66,6 +66,17 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         lua_pop(l, 1);
     }
 
+    // Append traceback.
+    int level = lua_toint32(l, 1);
+    if (level >= LLBC_LogLevel::Error)
+    {
+        luaL_traceback(l, l, NULL, 4);
+        partMsg = lua_tolstring(l, paramsCount+1, &msgSize);
+        msg.append(1, ' ');
+        msg.append(partMsg, msgSize);
+        lua_pop(l, 1);
+    }
+
     // If Log not init, direct output to console.
     if (UNLIKELY(!__loggerManager))
     {
@@ -74,29 +85,42 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         return 0;
     }
 
-    // Parse level, logger.
-    int level = lua_toint32(l, 1);
-    LLBC_Logger *logger = __rootLogger;
-    if (paramsCount >= 2)
-    {
-        const char *loggerName = lua_tostring(l, 2);
-        if (UNLIKELY(loggerName == NULL))
-            logger = __rootLogger;
-        else
-            logger = __loggerManager->GetLogger(loggerName);
-        
-        if (UNLIKELY(logger == NULL))
-            lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
-    }
+    // Parse logger.
+    LLBC_Logger *logger;
+    const char *loggerName = lua_tostring(l, 2);
+    if (UNLIKELY(loggerName == NULL))
+        logger = __rootLogger;
+    else
+        logger = __loggerManager->GetLogger(loggerName);
 
-    // Parse tag, file, line
-    const char *tag = paramsCount >= 3 ? lua_tostring(l, 3) : NULL;
-    const char *file = paramsCount >= 4 ? lua_tostring(l, 4) : NULL;
-    int line = paramsCount >= 5 ? lua_toint32(l, 5) : 0;
+    if (UNLIKELY(logger == NULL))
+        lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
+
+    // Parse tag, file, line, traceback
+    const char *tag = lua_tostring(l, 3);
+    const char *file = lua_tostring(l, 4);
+    int line = lua_toint32(l, 5);
 
     // Output message.
     if (UNLIKELY(logger->OutputNonFormat(level, tag, file, line, msg.data(), msg.size()) != LLBC_OK))
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
 
     return 0;
+}
+
+// API: GetLogLevel
+LULLBC_LUA_METH int _lullbc_GetLogLevel(lua_State *l)
+{
+    LLBC_Logger *logger;
+    const char *loggerName = lua_tostring(l, 1);
+    if (UNLIKELY(loggerName == NULL))
+        logger = __rootLogger;
+    else
+        logger = __loggerManager->GetLogger(loggerName);
+
+    if (UNLIKELY(logger == NULL))
+        lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
+
+    lua_pushinteger(l, logger->GetLogLevel());
+    return 1;
 }

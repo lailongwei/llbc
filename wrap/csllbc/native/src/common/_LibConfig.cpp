@@ -174,11 +174,6 @@ int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
     return LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
 }
 
-int csllbc_LibConfig_Comm_IsUsedFullStack()
-{
-    return LLBC_CFG_COMM_USE_FULL_STACK;
-}
-
 int csllbc_LibConfig_Comm_IsEnabledStatusHandler()
 {
     return LLBC_CFG_COMM_ENABLE_STATUS_HANDLER;

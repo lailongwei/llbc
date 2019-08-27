@@ -283,6 +283,11 @@ inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
     if (contentRet != static_cast<long>(line.size()))
         return contentRet;
 
+    if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch &&
+        (_mode & LLBC_FileMode::Text))
+        newLineFormat = LLBC_FileNewLineFormat::LineFeed;
+
+
     long lineEndingRet = -1;
     if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch)
     {

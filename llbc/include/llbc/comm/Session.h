@@ -273,6 +273,7 @@ private:
     LLBC_Socket *_socket;
     LLBC_SocketHandle _sockHandle;
 
+    bool _fullStack;
     LLBC_IService *_svc;
     LLBC_BasePoller *_poller;
 

@@ -273,7 +273,7 @@ int pyllbc_PackLemma_Dict::Write(pyllbc_Stream *stream, PyObject *values)
     const Py_ssize_t len = PyDict_Size(values);
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
 
-#if _M_X64
+#if LLBC_TARGET_PROCESSOR_X86_64
     llbcStream.WriteSInt32(static_cast<sint32>(len));
 #else
     llbcStream.WriteSInt32(len);

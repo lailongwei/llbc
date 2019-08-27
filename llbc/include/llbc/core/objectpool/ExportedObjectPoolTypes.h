@@ -19,21 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
+#ifndef __LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__
+#define __LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__
+
+#include "llbc/common/Common.h"
+#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/objectpool/ObjectPool.h"
 
 __LLBC_NS_BEGIN
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
-{
-    return static_cast<App *>(_thisApp);
-}
+/**
+ * Export thread-unsafety & thread-safety object pool template class instances.
+ */
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>;
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
-{
-    return _thisApp;
-}
+/**
+ * Typedef thread-unsafety & thread-safety object pool template class instances.
+ */
+typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafetyObjectPool;
+typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafetyObjectPool;
 
 __LLBC_NS_END
 
-#endif // __LLBC_APP_IAPPLICATION_H__
+#endif // !__LLBC_CORE_OBJECT_POOL_EXPORT_OBJECT_POOL_TYPES_H__

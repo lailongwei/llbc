@@ -19,21 +19,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_APP_IAPPLICATION_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
 
 __LLBC_NS_BEGIN
 
-template <typename App>
-inline App *LLBC_IApplication::ThisApp()
+template <typename ObjectType>
+inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *)
 {
-    return static_cast<App *>(_thisApp);
+    obj->MarkPoolObject();
 }
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
+template <typename ObjectType>
+inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, ...)
 {
-    return _thisApp;
+    // Do nothing.
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_APP_IAPPLICATION_H__
+#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__

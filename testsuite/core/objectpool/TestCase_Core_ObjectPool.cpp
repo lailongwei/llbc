@@ -25,8 +25,13 @@
 namespace
 {
     // Define some test configs.
+    #if LLBC_DEBUG
+    const int TestTimes = 1000;
+    const int ListSize = 100;
+    #else
     const int TestTimes = 100000;
     const int ListSize = 100;
+    #endif
 
     // Define some test classes.
     class TestObj
@@ -38,6 +43,26 @@ namespace
         }
 
         ~TestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
+    class MarkableTestObj
+    {
+    public:
+        MarkableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        ~MarkableTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+    public:
+        void MarkPoolObject()
         {
             LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
@@ -91,7 +116,7 @@ namespace
     public:
         ObjectPoolTestTask()
         : _repeatCount(TestTimes)
-        , _pool(new LLBC_ObjectPool<LLBC_SpinLock>())
+        , _pool(new LLBC_SafetyObjectPool())
         , _poolInst(_pool->GetPoolInst<std::vector<double> >())
         {
             LLBC_Random rand;
@@ -151,7 +176,7 @@ namespace
         volatile int _repeatCount;
 
         LLBC_FastLock _lock;
-        LLBC_ObjectPool<LLBC_SpinLock> *_pool;
+        LLBC_SafetyObjectPool  *_pool;
         LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
     };
 }
@@ -168,7 +193,8 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("core/objectpool test:");
 
-    // DoBasicTest();
+    DoBasicTest();
+    DoConverienceMethodsTest();
     DoPrefTest();
 
     LLBC_PrintLine("Press any key to continue ...");
@@ -214,12 +240,25 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         }
     }
 
+    // Test Markable pool object.
+    {
+        LLBC_ObjectPool<> pool;
+
+        const int testTimes = 10;
+        LLBC_PrintLine("Markable object test(times:%d)", testTimes);
+        for (int i = 0; i < testTimes; ++i)
+        {
+            MarkableTestObj *obj = pool.Get<MarkableTestObj>();
+            pool.Release(obj);
+        }
+    }
+
     // Test Referencable object
     {
         LLBC_ObjectPool<> pool;
 
         const int testTimes = 10;
-        LLBC_PrintLine("Referencable object test(times: 10)");
+        LLBC_PrintLine("Referencable object test(times: %d)", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
             ReferencableTestObj *obj = pool.GetReferencable<ReferencableTestObj>();
@@ -230,11 +269,85 @@ void TestCase_Core_ObjectPool::DoBasicTest()
     LLBC_PrintLine("Object pool basic test finished");
 }
 
+void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
+{
+    LLBC_PrintLine("Begin object pool converience methods test:");
+
+    typedef std::map<int, std::string> _TestType;
+
+    _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
+    LLBC_PrintLine("Get object from safety object-pool: 0x%08x, do some operations...", obj1);
+    obj1->insert(std::make_pair(1, "Hello world!"));
+    obj1->insert(std::make_pair(2, "Hey, Judy!"));
+    LLBC_ReleaseObjectToSafetyPool(obj1);
+    LLBC_PrintLine("Release object to safety object-pool");
+
+    _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
+    LLBC_PrintLine("Get object from unsafety object-pool 0x%08x, do some operations...", obj2);
+    obj2->insert(std::make_pair(3, "Hello world!"));
+    obj2->insert(std::make_pair(4, "Hey, Judy!"));
+    LLBC_ReleaseObjectToUnsafetyPool(obj2);
+    LLBC_PrintLine("Release object to unafety object-pool");
+
+    ReferencableTestObj *refObj = LLBC_GetReferencableObjectFromPool<ReferencableTestObj>();
+    LLBC_PrintLine("Get referencable-object from object-pool(unsafety) 0x%08x, do some operations...", refObj);
+    refObj->Retain();
+    refObj->Release();
+    refObj->Release();
+
+    LLBC_SafetyObjectPool objPool1;
+    LLBC_UnsafetyObjectPool objPool2;
+    #if LLBC_DEBUG
+    int perfTestTimes = 1000;
+    int perTestPerTimeLoopTimes = 100;
+    #else
+    int perfTestTimes = 100000;
+    int perTestPerTimeLoopTimes = 100;
+    #endif
+    LLBC_PrintLine("Exec performance compare test(Converience methods performance <<>> local object pools), "
+                   "test times:%d, per-time loop times:%d", perfTestTimes, perTestPerTimeLoopTimes);
+    LLBC_Time begTestTime = LLBC_Time::Now();
+    for (int i = 0; i < perfTestTimes; ++i)
+    {
+        _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
+        _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
+        for (int j = 0; j < perTestPerTimeLoopTimes; ++j)
+        {
+            obj1->insert(std::make_pair(j, "Hello, World"));
+            obj2->insert(std::make_pair(j + perTestPerTimeLoopTimes, "Hello, World"));
+        }
+
+        LLBC_ReleaseObjectToSafetyPool(obj1);
+        LLBC_ReleaseObjectToUnsafetyPool(obj2);
+    }
+    LLBC_PrintLine("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
+    begTestTime = LLBC_Time::Now();
+    objPool1.Release(objPool1.Get<_TestType>());
+    objPool2.Release(objPool2.Get<_TestType>());
+    for (int i = 0; i < perfTestTimes; ++i)
+    {
+        _TestType *obj1 = objPool1.Get<_TestType>();
+        _TestType *obj2 = objPool2.Get<_TestType>();
+        for (int j = 0; j < perTestPerTimeLoopTimes; ++j)
+        {
+            obj1->insert(std::make_pair(j, "Hello, World"));
+            obj2->insert(std::make_pair(j + perTestPerTimeLoopTimes, "Hello, World"));
+        }
+
+        objPool1.Release(obj1);
+        objPool2.Release(obj2);
+    }
+    LLBC_PrintLine("Local object pools test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
+    LLBC_PrintLine("Object pool converience methods test finished");
+}
+
 void TestCase_Core_ObjectPool::DoPrefTest()
 {
     LLBC_PrintLine("Begin object pool performance test:");
 
-    LLBC_ThreadObjectPool pool;
+    LLBC_UnsafetyObjectPool pool;
     std::vector<double> *poolObjs[ListSize];
     std::vector<double> *mallocObjs[ListSize];
 

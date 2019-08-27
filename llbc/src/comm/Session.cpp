@@ -106,6 +106,7 @@ LLBC_Session::LLBC_Session()
 , _socket(NULL)
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 
+, _fullStack(false)
 , _svc(NULL)
 , _poller(NULL)
 
@@ -176,11 +177,11 @@ LLBC_IService *LLBC_Session::GetService()
 void LLBC_Session::SetService(LLBC_IService *svc)
 {
     _svc = svc;
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    _protoStack = _svc->CreateFullStack(_id, _acceptId);
-#else
-    _protoStack = _svc->CreatePackStack(_id, _acceptId);
-#endif
+    if ((_fullStack = svc->IsFullStack()))
+        _protoStack = _svc->CreateFullStack(_id, _acceptId);
+    else
+        _protoStack = _svc->CreatePackStack(_id, _acceptId);
+
     _protoStack->SetSession(this);
 }
 
@@ -207,13 +208,15 @@ void LLBC_Session::SetPoller(LLBC_BasePoller *poller)
 
 int LLBC_Session::Send(LLBC_Packet *packet)
 {
+    int sendRet;
     bool removeSession;
     LLBC_MessageBlock *block;
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Send(packet, block, removeSession) != LLBC_OK)
-#else
-    if (_protoStack->SendRaw(packet, block, removeSession) != LLBC_OK)
-#endif
+    if (_fullStack)
+        sendRet = _protoStack->Send(packet, block, removeSession);
+    else
+        sendRet = _protoStack->SendRaw(packet, block, removeSession);
+
+    if (UNLIKELY(sendRet != LLBC_OK))
         return removeSession ? LLBC_FAILED : LLBC_OK;
 
     if (block == NULL)
@@ -298,13 +301,15 @@ void LLBC_Session::OnSent(size_t len)
 
 bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 {
+    int recvRet;
     bool removeSession;
     _recvedPackets.clear();
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_protoStack->Recv(block, _recvedPackets, removeSession) != LLBC_OK)
-#else
-    if (_protoStack->RecvRaw(block, _recvedPackets, removeSession) != LLBC_OK)
-#endif
+    if (_fullStack)
+        recvRet = _protoStack->Recv(block, _recvedPackets, removeSession);
+    else
+        recvRet = _protoStack->RecvRaw(block, _recvedPackets, removeSession);
+
+    if (UNLIKELY(recvRet != LLBC_OK))
     {
         if (removeSession)
             OnClose();
@@ -328,11 +333,10 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
 
 void LLBC_Session::CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData)
 {
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    (void)_protoStack->CtrlStack(ctrlType, ctrlData);
-#else
-    (void)_protoStack->CtrlStackRaw(ctrlType, ctrlData);
-#endif
+    if (_fullStack)
+        (void)_protoStack->CtrlStack(ctrlType, ctrlData);
+    else
+        (void)_protoStack->CtrlStackRaw(ctrlType, ctrlData);
 }
 
 __LLBC_NS_END

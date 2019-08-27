@@ -43,11 +43,13 @@ __LLBC_LibTls::__LLBC_LibTls()
 
     coreTls.llbcThread = false;
     coreTls.entryThread = false;
+    coreTls.needInitWinSock = true;
     coreTls.threadHandle = LLBC_INVALID_HANDLE;
     coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     coreTls.task = NULL;
     coreTls.timerScheduler = NULL;
-    coreTls.objectPool = NULL;
+    coreTls.safetyObjectPool = NULL;
+    coreTls.unsafetyObjectPool = NULL;
 
     #if LLBC_CFG_OS_IMPL_SYMBOL
      #if LLBC_TARGET_PLATFORM_WIN32

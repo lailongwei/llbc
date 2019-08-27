@@ -154,7 +154,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
 struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 {
     int id;
-    LLBC_String stub;
+    LLBC_ListenerStub stub;
     LLBC_IDelegate1<void, LLBC_Event *> *deleg;
 
     LLBC_SvcEv_SubscribeEv();
@@ -167,7 +167,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 struct LLBC_HIDDEN LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
 {
     int id;
-    LLBC_String stub;
+    LLBC_ListenerStub stub;
 
     LLBC_SvcEv_UnsubscribeEv();
     virtual ~LLBC_SvcEv_UnsubscribeEv();
@@ -229,7 +229,7 @@ public:
      * Build subscribe-event event.
      */
     static LLBC_MessageBlock *BuildSubscribeEvEv(int id,
-                                                 const LLBC_String &stub,
+                                                 const LLBC_ListenerStub &stub,
                                                  LLBC_IDelegate1<void, LLBC_Event *> *deleg);
 
     /**
@@ -244,7 +244,7 @@ public:
     /**
      * Build unsubscribe-event event.
      */
-    static LLBC_MessageBlock *BuildUnsubscribeEvEv(int id, const LLBC_String &stub);
+    static LLBC_MessageBlock *BuildUnsubscribeEvEv(int id, const LLBC_ListenerStub &stub);
 
     /**
      * Build fire-event event.

@@ -678,7 +678,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamEncodeSelf(PyObject *self, PyObject *arg
 LLBC_EXTERN_C PyObject *_pyllbc_PyStreamGetCachedSize(PyObject *self, PyObject *args)
 {
     const size_t size = pyllbc_s_PackLemmaCompiler->GetCachedSize();
-#ifdef _M_X64
+#if LLBC_TARGET_PROCESSOR_X86_64
     return PyInt_FromLong(static_cast<long>(size));
 #else
     return PyInt_FromLong(size);
@@ -700,7 +700,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamIsExprCompiled(PyObject *self, PyObject 
 LLBC_EXTERN_C PyObject *_pyllbc_PyStreamGetCacheLimit(PyObject *self, PyObject *args)
 {
     const size_t lmt = pyllbc_s_PackLemmaCompiler->GetCacheLimit();
-#ifdef _M_X64
+#if LLBC_TARGET_PROCESSOR_X86_64
     return PyInt_FromLong(static_cast<long>(lmt));
 #else
     return PyInt_FromLong(lmt);

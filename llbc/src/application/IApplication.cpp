@@ -34,31 +34,31 @@ static LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String &> *__crashHook =
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
-#if defined(_M_IX86)
+#if LLBC_TARGET_PROCESSOR_X86
     DWORD machineType = IMAGE_FILE_MACHINE_I386;
-#elif defined(_M_X64)
+#elif LLBC_TARGET_PROCESSOR_X86_64
     DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
-#else
+#else // Not supported dump processor types.
     return;
 #endif
 
     STACKFRAME64 stackFrame64;
     ::memset(&stackFrame64, 0, sizeof(STACKFRAME64));
-#if defined(_M_IX86)
+#if LLBC_TARGET_PROCESSOR_X86
     stackFrame64.AddrPC.Offset = ctx->Eip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
     stackFrame64.AddrStack.Offset = ctx->Esp;
     stackFrame64.AddrStack.Mode = AddrModeFlat;
     stackFrame64.AddrFrame.Offset = ctx->Ebp;
     stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#elif (_M_X64)
+#elif LLBC_TARGET_PROCESSOR_X86_64
     stackFrame64.AddrPC.Offset = ctx->Rip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
     stackFrame64.AddrStack.Offset = ctx->Rsp;
     stackFrame64.AddrStack.Mode = AddrModeFlat;
     stackFrame64.AddrFrame.Offset = ctx->Rbp;
     stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#endif // _M_IX86
+#endif
 
     HANDLE curProc = ::GetCurrentProcess();
     HANDLE curThread = ::GetCurrentThread();
@@ -117,27 +117,31 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
         return EXCEPTION_CONTINUE_SEARCH;
 
+    LLBC_NS LLBC_String errMsg;
+    errMsg.append("Unhandled exception!\n");
+    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
+
     ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
     dmpInfo.ExceptionPointers = exception;
     dmpInfo.ThreadId = GetCurrentThreadId();
     dmpInfo.ClientPointers = TRUE;
 
-    ::MiniDumpWriteDump(::GetCurrentProcess(),
-                        ::GetCurrentProcessId(),
-                        dmpFile,
-                        MiniDumpNormal,
-                        &dmpInfo,
-                        NULL,
-                        NULL);
+    const ::BOOL writeDumpSucc = MiniDumpWriteDump(::GetCurrentProcess(),
+                                                   ::GetCurrentProcessId(),
+                                                   dmpFile,
+                                                   (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
+                                                   &dmpInfo,
+                                                   NULL,
+                                                   NULL);
+    if (UNLIKELY(!writeDumpSucc))
+    {
+        LLBC_NS LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        errMsg.append_format("Write dump failed, error:%s\n", LLBC_NS LLBC_FormatLastError());
+    }
 
     ::CloseHandle(dmpFile);
-
     if (__crashHook)
         __crashHook->Invoke(__dumpFileName);
-
-    LLBC_NS LLBC_String errMsg;
-    errMsg.append("Unhandled exception!\n");
-    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
 
     LLBC_NS LLBC_String backTrace;
     __GetExceptionBackTrace(exception->ContextRecord, backTrace);

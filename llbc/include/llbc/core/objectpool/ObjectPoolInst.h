@@ -86,7 +86,10 @@ private:
     */
     struct MemoryBlock
     {
-        sint32 seq;            // the seq of memory block
+        sint32 seq;            // the seq of memory block.
+        #if LLBC_64BIT_PROCESSOR
+        sint32 unused;         // if in 64bit arch, use for memory align.
+        #endif
         uint8 buff[0];         // The begin address of buffer.
     };
 

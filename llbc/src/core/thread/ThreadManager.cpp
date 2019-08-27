@@ -26,6 +26,9 @@
 
 #include "llbc/core/utils/Util_Debug.h"
 
+#include "llbc/core/timer/TimerScheduler.h"
+#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
+
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/Task.h"
@@ -74,6 +77,10 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
                       DUPLICATE_SAME_ACCESS);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
+    tls->coreTls.safetyObjectPool = LLBC_New0(LLBC_NS LLBC_SafetyObjectPool);
+    tls->coreTls.unsafetyObjectPool = LLBC_New0(LLBC_NS LLBC_UnsafetyObjectPool);
+    tls->coreTls.timerScheduler = LLBC_New0(LLBC_NS LLBC_TimerScheduler);
+
     // Delete arg.
     LLBC_Delete(threadArg);
 
@@ -87,6 +94,10 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     threadMgr->OnThreadTerminate(threadHandle);
 
     // Cleanup tls.
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler));
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool));
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool));
+
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
 #endif // LLBC_TARGET_PLATFORM_WIN32

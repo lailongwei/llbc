@@ -38,7 +38,7 @@ __LLBC_NS_BEGIN
 /**
 * \brief The object pool instance interface encapsulation.
 */
-class LLBC_IObjectPoolInst
+class LLBC_EXPORT LLBC_IObjectPoolInst
 {
 public:
     LLBC_IObjectPoolInst() {  }

@@ -117,9 +117,6 @@ namespace llbc
         public extern static int csllbc_LibConfig_Comm_IsEnabledSamplerSupport();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Comm_IsUsedFullStack();
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]

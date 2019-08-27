@@ -606,8 +606,10 @@ void LLBC_Socket::OnRecv()
     // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
 #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == _PollerType::IocpPoller)
+    {
         if (PostZeroWSARecv() != LLBC_OK)
             _session->OnClose();
+    }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 

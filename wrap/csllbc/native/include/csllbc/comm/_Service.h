@@ -32,13 +32,15 @@ class csllbc_Service;
 
 /**
  * Create new service.
- * @param[in] svcType - the service type, see csllbc_Service::Type enumeration.
- * @param[in] svcName - the service name.
- * @param[in] ...     - the delegates, internal used.
+ * @param[in] svcType   - the service type, see csllbc_Service::Type enumeration.
+ * @param[in] svcName   - the service name.
+ * @param[in] fullStack - the full-stack option.
+ * @param[in] ...       - the delegates, internal used.
  * @return csllbc_Service * - the created service, if failed, return NULL.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
                                                                   const char *svcName,
+                                                                  bool fullStack,
                                                                   csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_PacketHandler handlerDeleg,
@@ -65,6 +67,13 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetType(csllbc_Service *svc);
  * @return int - the service Id, process uniqueue.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetId(csllbc_Service *svc);
+
+/**
+ * Get service full-stack option.
+ * @param[in] svc - the service.
+ * @return int - the full-stack option, 0 if disabled, 1 if enabled.
+ */
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_IsFullStack(csllbc_Service *svc);
 
 /**
  * Get service drive mode.

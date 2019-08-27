@@ -52,7 +52,7 @@
  #define LLBC_COMP_MAJOR_VER    _MSC_VER
  #define LLBC_COMP_MINOR_VER    0
  #define LLBC_COMP_PATCH_LEVEL  0
-#endif // LLLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
+#endif // LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
 
 // GNU C compiler.
 // The compiler version is converted, if gcc version is 3.2.0

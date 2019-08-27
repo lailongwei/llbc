@@ -75,7 +75,7 @@ public:
      */
     template <typename App>
     static App *ThisApp();
-    static LLBC_IApplication *ThisIApp();
+    static LLBC_IApplication *ThisApp();
 
 public:
     /**
@@ -113,7 +113,7 @@ public:
      * @param[in] crashHook - the crash hook.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook);
+    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook);
 
 public:
     /**

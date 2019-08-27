@@ -31,9 +31,9 @@ __LLBC_NS_BEGIN
     it = rtti;                                   \
     skipCopy = 0;                                \
     itEnd = rtti + rawTyNameLen - totalSkipCopy; \
-    while ((it= strstr(it, str)))                \
+    while ((it = strstr(it, str)))               \
     {                                            \
-        int copyLen = itEnd - it - len;          \
+        size_t copyLen = itEnd - it - len;       \
         memmove(it, it + len, copyLen);          \
         itEnd -= len;                            \
         skipCopy += len;                         \
@@ -48,15 +48,15 @@ const char *__LLBC_GetTypeName(const char *rawTyName)
 #if LLBC_TARGET_PLATFORM_WIN32
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     char *rtti = tls->commonTls.rtti;
-    int rawTyNameLen = strlen(rawTyName);
+    size_t rawTyNameLen = strlen(rawTyName);
     memcpy(rtti, rawTyName, rawTyNameLen);
     rtti[rawTyNameLen] = '\0';
 
-    int totalSkipCopy = 0;
+    size_t totalSkipCopy = 0;
 
-    int skipCopy;
     char *it;
     char *itEnd;
+    size_t skipCopy;
     __LLBC_GET_TYPE_NAME_Trim("class ", 6);
     __LLBC_GET_TYPE_NAME_Trim("struct ", 7);
     __LLBC_GET_TYPE_NAME_Trim(" *", 2);
