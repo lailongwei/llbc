@@ -43,14 +43,14 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
- * \brief Core/File about config options define.
+ * \brief core/file about config options define.
  */
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
 // Only used in Non-WIN32 systems.
 #define LLBC_CFG_CORE_FILE_COPY_BUF_SIZE                    16384000
 
 /**
- * \brief Core/Utils about config options define.
+ * \brief core/utils about config options define.
  */
 // Determine library impl _itoa() API or not, Non-WIN32 Platform specific.
 #define LLBC_CFG_CORE_UTILS_IMPL__ITOA                      0
@@ -60,13 +60,13 @@
 #define LLBC_CFG_CORE_UTILS_IMPL__UI64TOA                   0
 
 /**
- * \brief Core/Sampler about config options define.
+ * \brief core/sampler about config options define.
  */
 // The interval sampler sampling hours value, default is 1.
 #define LLBC_CFG_CORE_SAMPLER_INTERVAL_SAMPLING_HOURS       1
 
 /**
- * \brief Core/Thread about config options define.
+ * \brief core/thread about config options define.
  */
 // Enable/Disable Suspend/Resume thread support macro(Non-WIN32 platform available only).
 // If enable it, LLBC library will use SIGUSR1, SIGUSR2 signal to implement.
@@ -83,7 +83,7 @@
 #define LLBC_CFG_THREAD_GUARD_DEBUG                         0
 
 /**
- * \brief Core/Log about config options define.
+ * \brief core/log about config options define.
  */
 // Default log level is set to DEBUG.
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
@@ -142,6 +142,12 @@
 */
 // object pool memory block size
 #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         40960
+// object pool memory allign config.
+#if LLBC_64BIT_PROCESSOR
+ #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             8
+#else
+ #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
+#endif
 // object reset metch methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
@@ -183,8 +189,6 @@
 #define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
-// Determine full stack attribute.
-#define LLBC_CFG_COMM_USE_FULL_STACK                        0
 // Determine enable the service has status handler support or not.
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
 // Determine enable the service has status desc support or not.

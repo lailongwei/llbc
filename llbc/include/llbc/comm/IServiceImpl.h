@@ -394,11 +394,7 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, void(*func)(LL
     typedef LLBC_Func1<void, LLBC_Event *> __SubEvFuncDeleg;
 
     LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New1(__SubEvFuncDeleg, func);
-    LLBC_ListenerStub stub = SubscribeEvent(event, deleg);
-    if (stub.empty())
-        LLBC_Delete(deleg);
-
-    return stub;
+    return SubscribeEvent(event, deleg);
 }
 
 template <typename ObjType>
@@ -407,11 +403,7 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
     typedef LLBC_Delegate1<void, ObjType, LLBC_Event *> __SubEvMethDeleg;
 
     LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New2(__SubEvMethDeleg, obj, method);
-    LLBC_ListenerStub stub = SubscribeEvent(event, deleg);
-    if (stub.empty())
-        LLBC_Delete(deleg);
-
-    return stub;
+    return SubscribeEvent(event, deleg);
 }
 
 inline int LLBC_IService::Post(void(*func)(This *, const LLBC_Variant *), LLBC_Variant *data)

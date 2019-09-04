@@ -35,6 +35,7 @@ namespace llbc
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static IntPtr csllbc_Service_Create(int svcType,
                                                           IntPtr svcName,
+                                                          bool fullStack,
                                                           Deleg_Service_EncodePacket encodeDeleg,
                                                           Deleg_Service_DecodePacket decodeDeleg,
                                                           Deleg_Service_PacketHandler handlerDeleg,
@@ -50,6 +51,9 @@ namespace llbc
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Service_GetId(IntPtr svc);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static int csllbc_Service_IsFullStack(IntPtr svc);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Service_GetDriveMode(IntPtr svc);

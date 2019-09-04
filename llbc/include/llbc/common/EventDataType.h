@@ -32,8 +32,8 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event listener stub data type encapsulation.
  */
-typedef LLBC_String LLBC_ListenerStub;
-const LLBC_String LLBC_INVALID_LISTENER_STUB;
+typedef uint64 LLBC_ListenerStub;
+#define LLBC_INVALID_LISTENER_STUB  0
 
 __LLBC_NS_END
 

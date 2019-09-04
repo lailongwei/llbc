@@ -7,13 +7,10 @@
 *.idc
 *.dylib
 *.so
+*.tmp
+.*.swp
 
 .DS_Store
-
-Debug/
-Release/
-vcprojs/vs2008/Debug/
-vcprojs/vs2008/Release/
 
 .vscode*
 

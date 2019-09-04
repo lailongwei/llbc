@@ -85,9 +85,13 @@ public:
      * @param[in] type         - the service type.
      * @param[in] name         - the service name.
      * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
-     * @param[in] This * - new service.
+     * @param[in] fullStack    - the full stack option, default is true.
+     * @return This * - new service.
      */
-    static This *Create(Type type, const LLBC_String &name = "", LLBC_IProtocolFactory *protoFactory = NULL);
+    static This *Create(Type type,
+                        const LLBC_String &name = "",
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        bool fullStack = true);
 
 public:
     /**
@@ -107,6 +111,12 @@ public:
      * @return const LLBC_String & - the service name.
      */
     virtual const LLBC_String &GetName() const = 0;
+
+    /**
+     * Get full stack option.
+     * @return bool - the full stack option.
+     */
+    virtual bool IsFullStack() const = 0;
 
     /**
      * Get the service drive mode.
@@ -529,7 +539,6 @@ public:
      */
     virtual int Post(LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL) = 0;
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
     /**
      * Get service codec protocol stack, only full-stack option disabled available.
      * Warning: This is a danger method, only use in user-defined protocol.
@@ -537,7 +546,6 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const = 0;
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 public:
     /**

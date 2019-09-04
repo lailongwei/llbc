@@ -67,9 +67,13 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] =
 # pragma warning(disable:4351)
 #endif
 
-LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProtocolFactory *protoFactory)
+LLBC_Service::LLBC_Service(This::Type type,
+                           const LLBC_String &name,
+                           LLBC_IProtocolFactory *protoFactory,
+                           bool fullStack)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
 , _type(type)
+, _fullStack(fullStack)
 , _name(name.c_str(), name.length())
 , _protoFactory(protoFactory)
 , _sessionProtoFactory()
@@ -131,6 +135,7 @@ LLBC_Service::LLBC_Service(This::Type type, const LLBC_String &name, LLBC_IProto
 , _timerScheduler(NULL)
 
 , _evManager()
+, _evManagerMaxListenerStub(0)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 {
@@ -216,6 +221,11 @@ This::Type LLBC_Service::GetType() const
 const LLBC_String &LLBC_Service::GetName() const
 {
     return _name;
+}
+
+bool LLBC_Service::IsFullStack() const
+{
+    return _fullStack;
 }
 
 This::DriveMode LLBC_Service::GetDriveMode() const
@@ -424,6 +434,7 @@ void LLBC_Service::Stop()
 int LLBC_Service::GetFPS() const
 {
     This *ncThis = const_cast<This *>(this);
+
     LLBC_LockGuard guard(ncThis->_lock);
     return _fps;
 }
@@ -503,7 +514,7 @@ bool LLBC_Service::IsSessionValidate(int sessionId)
 
 int LLBC_Service::Send(LLBC_Packet *packet)
 {
-    // Call internal Lockable() to complete.
+    // Call internal LockableSend() method to send packet.
     // lock = true
     // validCheck = true
     return LockableSend(packet);
@@ -597,14 +608,15 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Vari
         return LLBC_FAILED;
     }
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-    if (!readySInfo->codecStack->CtrlStackCodec(ctrlType, ctrlData))
+    if (!_fullStack)
     {
-        _readySessionInfosLock.Unlock();
-        return LLBC_OK;
+        const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+        if (!readySInfo->codecStack->CtrlStackCodec(ctrlType, ctrlData))
+        {
+            _readySessionInfosLock.Unlock();
+            return LLBC_OK;
+        }
     }
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
     _readySessionInfosLock.Unlock();
 
@@ -930,10 +942,16 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    const LLBC_ListenerStub stub = LLBC_GUIDHelper::GenStr();
-    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, stub, deleg));
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_started && !_initingFacade))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
 
-    return stub;
+    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
+
+    return _evManagerMaxListenerStub;
 }
 
 void LLBC_Service::UnsubscribeEvent(int event)
@@ -997,18 +1015,27 @@ int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Va
     return LLBC_OK;
 }
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
 const LLBC_ProtocolStack *LLBC_Service::GetCodecProtocolStack(int sessionId) const
 {
+    // If enabled full-stack option, return NULL.
+    if (_fullStack)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return NULL;
+    }
+
+    // Not enabled full-stack option, return session codec protocol-stack.
     LLBC_Service *ncThis = const_cast<LLBC_Service *>(this);
     ncThis->_readySessionInfosLock.Lock();
     _ReadySessionInfosCIter it = _readySessionInfos.find(sessionId);
     const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : NULL;
     ncThis->_readySessionInfosLock.Unlock();
 
+    if (!codecStack)
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
     return codecStack;
 }
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
 void LLBC_Service::OnSvc(bool fullFrame)
 {
@@ -1187,11 +1214,8 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
 
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
-                                                              isListenSession
-                                                              #if !LLBC_CFG_COMM_USE_FULL_STACK
-                                                              , CreateCodecStack(sessionId, acceptSessionId, NULL)
-                                                              #endif
-                                                              );
+                                                              isListenSession,
+                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
     }
@@ -1199,11 +1223,8 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
     {
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
-                                                              isListenSession
-                                                              #if !LLBC_CFG_COMM_USE_FULL_STACK
-                                                              , CreateCodecStack(sessionId, acceptSessionId, NULL)
-                                                              #endif
-                                                              );
+                                                              isListenSession,
+                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
         _readySessionInfosLock.Lock();
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
@@ -1513,17 +1534,11 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     LLBC_Packet *packet = ev.packet;
 
     // Makesure session in connected sessionId set.
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    _ReadySessionInfosCIter readySInfoIt;
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
     const int sessionId = packet->GetSessionId();
 
     _readySessionInfosLock.Lock();
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    if (_readySessionInfos.find(sessionId) == _readySessionInfos.end())
-#else // !LLBC_CFG_COMM_USE_FULL_STACK
-    if ((readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
+    _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+    if (readySInfoIt == _readySessionInfos.end())
     {
         _readySessionInfosLock.Unlock();
         return;
@@ -1531,19 +1546,19 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
 
     ev.packet = NULL;
 
-#if !LLBC_CFG_COMM_USE_FULL_STACK
-    bool removeSession;
-    const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-    if (UNLIKELY(readySInfo->codecStack->RecvCodec(packet, packet, removeSession) != LLBC_OK))
+    if (!_fullStack)
     {
-        _readySessionInfosLock.Unlock();
+        bool removeSession;
+        const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
+        if (UNLIKELY(readySInfo->codecStack->RecvCodec(packet, packet, removeSession) != LLBC_OK))
+        {
+            _readySessionInfosLock.Unlock();
+            if (removeSession)
+                RemoveSession(sessionId);
 
-        if (removeSession)
-            RemoveSession(sessionId);
-
-        return;
+            return;
+        }
     }
-#endif // !LLBC_CFG_COMM_USE_FULL_STACK
 
     _readySessionInfosLock.Unlock();
 
@@ -1677,7 +1692,7 @@ void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    if (ev.stub.empty())
+    if (ev.stub == LLBC_INVALID_LISTENER_STUB)
         _evManager.RemoveListener(ev.id);
     else
         _evManager.RemoveListener(ev.stub);
@@ -1980,16 +1995,13 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     }
 
     // Validate check, if need.
-    const int sessionId = packet->GetSessionId();
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    if (validCheck)
-    {
-#else // !LLBC_CFG_COMM_USE_FULL_STACK
     const _ReadySessionInfo *readySInfo;
+    const int sessionId = packet->GetSessionId();
+    if (!_fullStack || validCheck)
     {
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
         _ReadySessionInfosCIter readySInfoIt;
 
+        // Check _ReadySessionInfo exist or not.
         _readySessionInfosLock.Lock();
         if ((readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
         {
@@ -2004,12 +2016,9 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             return LLBC_FAILED;
         }
 
-#if LLBC_CFG_COMM_USE_FULL_STACK
-        if (readySInfoIt->second->isListenSession)
-#else // !LLBC_CFG_COMM_USE_FULL_STACK
+        // Listen session check(not allow send packet to listen session).
         readySInfo = readySInfoIt->second;
         if (UNLIKELY(readySInfo->isListenSession))
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
         {
             _readySessionInfosLock.Unlock();
 
@@ -2022,20 +2031,25 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             return LLBC_FAILED;
         }
 
-#if LLBC_CFG_COMM_USE_FULL_STACK
-        _readySessionInfosLock.Unlock();
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
+        // If enabled full-stack option, unlock _readySessionInfosLock.
+        if (_fullStack)
+            _readySessionInfosLock.Unlock();
     }
 
+    // Set sender service Id.
     packet->SetSenderServiceId(_id);
 
-#if LLBC_CFG_COMM_USE_FULL_STACK
-    const int ret = _pollerMgr.Send(packet);
-    if (lock)
-        _lock.Unlock();
+    // If enabled full-stack option, send packet and return.
+    if (_fullStack)
+    {
+        const int ret = _pollerMgr.Send(packet);
+        if (lock)
+            _lock.Unlock();
 
-    return ret;
-#else // !LLBC_CFG_COMM_USE_FULL_STACK
+        return ret;
+    }
+
+    // Not enabled full-stack option, call codec protocol-stack to encode packet.
     bool removeSession;
     LLBC_Packet *encoded;
     if (readySInfo->codecStack->SendCodec(packet, encoded, removeSession) != LLBC_OK)
@@ -2050,14 +2064,15 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         return LLBC_FAILED;
     }
 
+    // Unlock _readySessionInfosLock.
     _readySessionInfosLock.Unlock();
 
+    // Send encoded packet.
     const int ret = _pollerMgr.Send(encoded);
     if (lock)
         _lock.Unlock();
 
     return ret;
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
 }
 
 int LLBC_Service::LockableSend(int svcId,
@@ -2217,26 +2232,18 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     return LLBC_OK;
 }
 
-#if LLBC_CFG_COMM_USE_FULL_STACK
-LLBC_Service::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession)
-#else // !LLBC_CFG_COMM_USE_FULL_STACK
 LLBC_Service::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack)
-#endif // LLBC_CFG_COMM_USE_FULL_STACK
 {
     this->sessionId = sessionId;
     this->acceptSessionId = acceptSessionId;
     this->isListenSession = isListenSession;
-    #if !LLBC_CFG_COMM_USE_FULL_STACK
     this->codecStack = codecStack;
-    #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 }
 
 LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
 {
-    #if !LLBC_CFG_COMM_USE_FULL_STACK
     if (codecStack)
         LLBC_Delete(codecStack);
-    #endif // !LLBC_CFG_COMM_USE_FULL_STACK
 }
 
 LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacade *facade)

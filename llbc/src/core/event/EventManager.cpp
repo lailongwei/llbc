@@ -31,16 +31,16 @@
 __LLBC_NS_BEGIN
 
 LLBC_EventManager::_Listener::_Listener()
-: stub()
+: stub(LLBC_INVALID_LISTENER_STUB)
 
 , evId(0)
-, listener1(NULL)
-, listener2(NULL)
+, listener(NULL)
 {
 }
 
 LLBC_EventManager::LLBC_EventManager()
 : _firing(0)
+, _maxListenerStub(0)
 {
 }
 
@@ -48,69 +48,25 @@ LLBC_EventManager::~LLBC_EventManager()
 {
     for (_DelayedOps::iterator it = _delayedOps.begin();
          it != _delayedOps.end();
-         it++)
+         ++it)
     {
         _Op &op = *it;
-        if (op.listener.listener2)
-            LLBC_Delete(op.listener.listener2);
+        LLBC_Delete(op.listener.listener);
     }
 
     for (_ListenersMap::iterator mIt = _listeners.begin();
          mIt != _listeners.end();
-         mIt++)
+         ++mIt)
     {
         _Listeners listeners = mIt->second;
         for (_Listeners::iterator lIt = listeners.begin();
              lIt != listeners.end();
-             lIt++)
+             ++lIt)
         {
             _Listener &listener = *lIt;
-            if (listener.listener2)
-                LLBC_Delete(listener.listener2);
+            LLBC_Delete(listener.listener);
         }
     }
-}
-
-LLBC_ListenerStub LLBC_EventManager::AddListener(int id, Listener listener, const LLBC_ListenerStub &bindedStub)
-{
-    if (id <= 0 || listener == NULL)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INVALID_LISTENER_STUB;
-    }
-
-    LLBC_String stub;
-    if (bindedStub != LLBC_INVALID_LISTENER_STUB)
-    {
-        if (SearchStub(bindedStub))
-        {
-            LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_INVALID_LISTENER_STUB;
-        }
-
-        stub = bindedStub;
-    }
-    else
-        stub = LLBC_GUIDHelper::GenStr();
-
-    _Op op;
-    op.addOp = true;
-    op.listener.evId = id;
-    op.listener.listener1 = listener;
-    op.listener.stub = stub;
-
-    if (IsFiring())
-    {
-        _delayedOps.push_back(op);
-
-        LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return op.listener.stub.c_str();
-    }
-
-    if (ProcessEventOperation(op) != LLBC_OK)
-        return LLBC_INVALID_LISTENER_STUB;
-
-    return op.listener.stub.c_str();
 }
 
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
@@ -125,7 +81,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    LLBC_String stub;
+    LLBC_ListenerStub stub;
     if (bindedStub != LLBC_INVALID_LISTENER_STUB)
     {
         if (SearchStub(bindedStub))
@@ -139,29 +95,29 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         stub = bindedStub;
     }
     else
-        stub = LLBC_GUIDHelper::GenStr();
+        stub = ++_maxListenerStub;
 
     _Op op;
     op.addOp = true;
     op.listener.evId = id;
-    op.listener.listener2 = listener;
     op.listener.stub = stub;
+    op.listener.listener = listener;
 
     if (IsFiring())
     {
         _delayedOps.push_back(op);
 
         LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return LLBC_INVALID_LISTENER_STUB;
+        return op.listener.stub;
     }
 
     if (ProcessEventOperation(op) != LLBC_OK)
     {
-        LLBC_XDelete(listener);
+        LLBC_Delete(listener);
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return op.listener.stub.c_str();
+    return op.listener.stub;
 }
 
 int LLBC_EventManager::RemoveListener(int id)
@@ -191,7 +147,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
 {
     _Op op;
     op.addOp = false;
-    op.listener.stub.append(stub);
+    op.listener.stub = stub;
 
     if (IsFiring())
     {
@@ -214,13 +170,10 @@ void LLBC_EventManager::FireEvent(LLBC_Event *event)
         _Listeners &listeners = mIt->second;
         for (_Listeners::iterator lIt = listeners.begin();
              lIt != listeners.end();
-             lIt++)
+             ++lIt)
         {
             _Listener &listener = *lIt;
-            if (listener.listener1)
-                (*listener.listener1)(event);
-            else
-                listener.listener2->Invoke(event);
+            listener.listener->Invoke(event);
         }
     }
 
@@ -235,14 +188,9 @@ void LLBC_EventManager::FireEvent(LLBC_Event *event)
     }
 }
 
-bool LLBC_EventManager::IsFiring() const
-{
-    return _firing > 0;
-}
-
 bool LLBC_EventManager::SearchStub(const LLBC_ListenerStub &stub) const
 {
-    return (_stubListeners.find(stub) != _stubListeners.end()) ? true : false;
+    return _stubListeners.find(stub) != _stubListeners.end();
 }
 
 int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
@@ -278,7 +226,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
                 _Listener &l = *lIt;
 
                 _stubListeners.erase(l.stub);
-                LLBC_XDelete(l.listener2);
+                LLBC_Delete(l.listener);
             }
 
             _listeners.erase(mIt);
@@ -303,9 +251,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
                 _Listener &l = *lIt;
                 if (l.stub == listener.stub)
                 {
-                    if (l.listener2)
-                        LLBC_XDelete(l.listener2);
-
+                    LLBC_Delete(l.listener);
                     listeners.erase(lIt);
                     break;
                 }

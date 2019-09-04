@@ -114,7 +114,7 @@ LLBC_SvcEv_ProtoReport::~LLBC_SvcEv_ProtoReport()
 LLBC_SvcEv_SubscribeEv::LLBC_SvcEv_SubscribeEv()
 : Base(_EvType::SubscribeEv)
 , id(0)
-, stub()
+, stub(LLBC_INVALID_LISTENER_STUB)
 , deleg(NULL)
 {
 }
@@ -127,7 +127,7 @@ LLBC_SvcEv_SubscribeEv::~LLBC_SvcEv_SubscribeEv()
 LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
 : Base(_EvType::UnsubscribeEv)
 , id(0)
-, stub()
+, stub(LLBC_INVALID_LISTENER_STUB)
 {
 }
 
@@ -234,26 +234,26 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
 }
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSubscribeEvEv(int id,
-                                                      const LLBC_String &stub,
+                                                      const LLBC_ListenerStub &stub,
                                                       LLBC_IDelegate1<void, LLBC_Event *> *deleg)
 {
     typedef LLBC_SvcEv_SubscribeEv _Ev;
 
     _Ev *ev = LLBC_New(_Ev);
     ev->id = id;
-    ev->stub.append(stub);
+    ev->stub = stub;
     ev->deleg = deleg;
 
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEvEv(int id, const LLBC_String &stub)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEvEv(int id, const LLBC_ListenerStub &stub)
 {
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
 
     _Ev *ev = LLBC_New(_Ev);
     ev->id = id;
-    ev->stub.append(stub);
+    ev->stub = stub;
 
     return __CreateEvBlock(ev);
 }

@@ -126,8 +126,6 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_COMM_ENABLE_SAMPLER_SUPPORT");
     lua_pushinteger(l, LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT);
     lua_setfield(l, 1, "CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT");
-    lua_pushboolean(l, LLBC_CFG_COMM_USE_FULL_STACK);
-    lua_setfield(l, 1, "CFG_COMM_USE_FULL_STACK");
     lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_STATUS_HANDLER);
     lua_setfield(l, 1, "CFG_COMM_ENABLE_STATUS_HANDLER");
     lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_STATUS_DESC);

@@ -24,13 +24,17 @@
 #include "llbc/core/thread/Guard.h"
 
 #include "llbc/core/objectpool/ObjectGuard.h"
+#include "llbc/core/objectpool/PoolObjectMarker.h"
 #include "llbc/core/objectpool/ObjectManipulator.h"
 
 __LLBC_NS_BEGIN
 
 template <typename ObjectType, typename LockType>
 inline LLBC_ObjectPoolInst<ObjectType, LockType>::LLBC_ObjectPoolInst()
-: _elemSize((sizeof(MemoryUnit) + sizeof(ObjectType) + (LLBC_INL_NS CheckSymbolSize << 1))) // CheckSymbolSize << 1 equivalent to CheckSymbolSize * 2
+: _elemSize((sizeof(MemoryUnit) + 
+            (sizeof(ObjectType) % LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN ? 
+                LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN * (sizeof(ObjectType) / LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN + 1) : 
+                sizeof(ObjectType)) + (LLBC_INL_NS CheckSymbolSize << 1))) // CheckSymbolSize << 1 equivalent to CheckSymbolSize * 2
 , _elemCnt(LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE / _elemSize + (LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE % _elemSize != 0 ? 1 : 0))
 , _blockSize(_elemSize * _elemCnt)
 
@@ -151,6 +155,10 @@ inline void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
 #endif
 
     memBlock->seq = _blockCnt;
+    #if LLBC_64BIT_PROCESSOR
+    memBlock->unused = 0;
+    #endif // 64bit-processor
+
     for (int idx = 0; idx < _elemCnt; ++idx)
     {
         MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * idx);
@@ -200,6 +208,7 @@ inline void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock 
     if (!memUnit->inited)
     {
         LLBC_ObjectManipulator::New<ObjectType>(obj);
+        LLBC_PoolObjectMarker::Mark<ObjectType>(reinterpret_cast<ObjectType *>(obj), 0);
         if (referencableObj)
         {
             memUnit->referencableObj = true;

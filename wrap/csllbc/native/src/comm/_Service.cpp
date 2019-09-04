@@ -31,6 +31,7 @@ LLBC_BEGIN_C_DECL
 
 csllbc_Service *csllbc_Service_Create(int svcType,
                                       const char *svcName,
+                                      bool fullStack,
                                       csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                       csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
                                       csllbc_Delegates::Deleg_Service_PacketHandler handlerDeleg,
@@ -45,9 +46,10 @@ csllbc_Service *csllbc_Service_Create(int svcType,
         return NULL;
     }
 
-    return LLBC_New8(csllbc_Service,
+    return LLBC_New9(csllbc_Service,
                      static_cast<csllbc_Service::Type>(svcType),
                      svcName,
+                     fullStack != 0,
                      encodeDeleg,
                      decodeDeleg,
                      handlerDeleg,
@@ -69,6 +71,11 @@ int csllbc_Service_GetType(csllbc_Service *svc)
 int csllbc_Service_GetId(csllbc_Service *svc)
 {
     return svc->GetId();
+}
+
+int csllbc_Service_IsFullStack(csllbc_Service *svc)
+{
+    return svc->IsFullStack() ? 1 : 0;
 }
 
 int csllbc_Service_GetDriveMode(csllbc_Service *svc)

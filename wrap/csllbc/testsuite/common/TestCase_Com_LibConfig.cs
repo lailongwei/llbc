@@ -67,7 +67,6 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("  Comm max service FPS: {0}", LibConfig.commMaxServiceFPS);
         Console.WriteLine("  Comm per-thread max drive service count: {0}", LibConfig.commPerThreadMaxDriveServiceCount);
         Console.WriteLine("  Comm enabled sampler support: {0}", LibConfig.commIsEnabledSamplerSupport);
-        Console.WriteLine("  Comm used full stack: {0}", LibConfig.commIsUseFullStack);
         Console.WriteLine("  Comm enabled status handler: {0}", LibConfig.commIsEnabledStatusHandler);
         Console.WriteLine("  Comm enabled status desc: {0}", LibConfig.commIsEnabledStatusDesc);
         Console.WriteLine("  Comm enabled unify pre-subscribe: {0}", LibConfig.commIsEnabledUnifyPreSubscribe);
