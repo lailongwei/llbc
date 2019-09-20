@@ -343,7 +343,7 @@ public:
     /**
      * Remove session, always success.
      * @param[in] sessionId - the will close session Id.
-	 * @param[in] reason    - the close reason string, use to describe session close reason.
+     * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL) = 0;
@@ -564,11 +564,25 @@ protected:
     friend class LLBC_Session;
 
     /**
-     * Stack create helper method(call by service and session class).
+     * Stack create helper methods(call by service and session class).
      */
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
+
+protected:
+    /**
+     * Declare friend class: LLBC_IApplication.
+     *  Access method list:
+     *      NtyApplicationIniConfigReload()
+     *      NtyApplicationPropertyConfigReload()
+     */
+    friend class LLBC_IApplication;
+
+    /**
+     * Application ini/property config reload event notifiy method.
+     */
+    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded) = 0;
 
 protected:
     /**

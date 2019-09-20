@@ -58,6 +58,8 @@ public:
         UnsubscribeEv,
         FireEv,
 
+        AppCfgReloaded,
+
         End
     };
 };
@@ -185,6 +187,18 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 };
 
 /**
+ * \brief The application config reloaded event structure encapsulation.
+ */
+struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
+{
+    bool iniReloaded;
+    bool propReloaded;
+
+    LLBC_SvcEv_AppCfgReloadedEv();
+    virtual ~LLBC_SvcEv_AppCfgReloadedEv();
+};
+
+/**
  * \brief The service event util class encapsulation.
  *        Use for Build/Destroy service events.
  */
@@ -250,6 +264,11 @@ public:
      * Build fire-event event.
      */
     static LLBC_MessageBlock *BuildFireEvEv(LLBC_Event *ev);
+
+    /**
+     * Build application config reloaded event.
+     */
+    static LLBC_MessageBlock *BuildAppCfgReloadedEv(bool iniReloaded, bool propReloaded);
 
 public:
     /**

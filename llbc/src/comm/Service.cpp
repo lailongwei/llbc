@@ -58,7 +58,9 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] =
 
     &LLBC_Service::HandleEv_SubscribeEv,
     &LLBC_Service::HandleEv_UnsubscribeEv,
-    &LLBC_Service::HandleEv_FireEv
+    &LLBC_Service::HandleEv_FireEv,
+
+    &LLBC_Service::HandleEv_AppCfgReloaded,
 };
 
 // VS2005 and later version compiler support initialize array in construct list.
@@ -1160,6 +1162,15 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
             CreateCodecStack(sessionId, acceptSessionId, stack));
 }
 
+void LLBC_Service::NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded)
+{
+    LLBC_LockGuard guard(_lock);
+    if (!IsStarted())
+        return;
+
+    Push(LLBC_SvcEvUtil::BuildAppCfgReloadedEv(iniReloaded, propReloaded));
+}
+
 void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
 {
     _protoLock.Lock();
@@ -1705,6 +1716,27 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
 
     _evManager.FireEvent(ev.ev);
     ev.ev = NULL;
+}
+
+void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
+{
+    typedef LLBC_SvcEv_AppCfgReloadedEv _Ev;
+    _Ev &ev = static_cast<_Ev &>(_);
+
+    // Check has care application config reloaded ev facades or not, if has cared event facades, dispatch event.
+    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnAppCfgReloaded])
+    {
+        // Dispatch application config reloaded event to all facades.
+        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAppCfgReloaded];
+        const size_t facadesSize = caredEvFacades.size();
+        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
+        {
+            if (ev.iniReloaded)
+                caredEvFacades[facadeIdx]->OnApplicationIniConfigReload();
+            if (ev.propReloaded)
+                caredEvFacades[facadeIdx]->OnApplicationPropertyConfigReload();
+        }
+    }
 }
 
 int LLBC_Service::InitFacades()

@@ -131,7 +131,18 @@ LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
 {
 }
 
-LLBC_SvcEv_UnsubscribeEv::~LLBC_SvcEv_UnsubscribeEv()
+LLBC_SvcEv_AppCfgReloadedEv::LLBC_SvcEv_AppCfgReloadedEv()
+: Base(_EvType::AppCfgReloaded)
+, iniReloaded(false)
+, propReloaded(false)
+{
+}
+
+LLBC_SvcEv_AppCfgReloadedEv::~LLBC_SvcEv_AppCfgReloadedEv()
+{
+}
+
+    LLBC_SvcEv_UnsubscribeEv::~LLBC_SvcEv_UnsubscribeEv()
 {
 }
 
@@ -268,7 +279,18 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEvEv(LLBC_Event *ev)
     return __CreateEvBlock(wrapEv);
 }
 
-void LLBC_SvcEvUtil::DestroyEvBlock(LLBC_MessageBlock *block)
+LLBC_MessageBlock * LLBC_SvcEvUtil::BuildAppCfgReloadedEv(bool iniReloaded, bool propReloaded)
+{
+    typedef LLBC_SvcEv_AppCfgReloadedEv _Ev;
+
+    _Ev *ev= LLBC_New(_Ev);
+    ev->iniReloaded = iniReloaded;
+    ev->propReloaded = propReloaded;
+
+    return __CreateEvBlock(ev);
+}
+
+    void LLBC_SvcEvUtil::DestroyEvBlock(LLBC_MessageBlock *block)
 {
     // Skip event type.
     block->ShiftReadPos(sizeof(int));

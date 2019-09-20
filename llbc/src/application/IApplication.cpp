@@ -199,6 +199,8 @@ LLBC_IApplication::LLBC_IApplication()
 
 , _iniConfig()
 , _propertyConfig()
+, _loadingIniCfg(false)
+, _loadingPropertyCfg(false)
 
 , _services(*LLBC_ServiceMgrSingleton)
 
@@ -219,7 +221,7 @@ LLBC_IApplication::~LLBC_IApplication()
     Stop();
 }
 
-int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
+    int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
 {
     // Multi application check.
     if (_thisApp != this)
@@ -352,7 +354,7 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String&> *crashHook)
+int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
@@ -384,95 +386,140 @@ const LLBC_Property &LLBC_IApplication::GetPropertyConfig() const
     return _propertyConfig;
 }
 
-int LLBC_IApplication::ReloadIniConfig()
+int LLBC_IApplication::ReloadIniConfig(bool callEvMeth)
 {
-    bool loaded = false;
-    if (TryLoadConfig(loaded, true, false, false) != LLBC_OK)
+    LLBC_LockGuard guard(_lock);
+
+    if (_loadingIniCfg)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
+    }
+
+    _loadingIniCfg = true;
+
+    bool loaded = false;
+    if (TryLoadConfig(loaded, true, false) != LLBC_OK)
+    {
+        _loadingIniCfg = false;
+        return LLBC_FAILED;
+    }
 
     if (!loaded)
     {
+        _loadingIniCfg = false;
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return LLBC_FAILED;
     }
+
+    _loadingIniCfg = false;
+
+    AfterReloadConfig(true, false, callEvMeth);
 
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadIniConfig(const LLBC_String &configPath)
+int LLBC_IApplication::ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth)
 {
+    LLBC_LockGuard guard(_lock);
+
+    if (_loadingIniCfg)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    _loadingIniCfg = true;
+
     bool loaded = false;
     LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
-    if (TryLoadConfig(splited[0], loaded, true, false, false) != LLBC_OK)
+    if (TryLoadConfig(splited[0], loaded, true, false) != LLBC_OK)
+    {
+        _loadingIniCfg = false;
         return LLBC_FAILED;
+    }
 
     if (!loaded)
     {
+        _loadingIniCfg = false;
+
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
+    _loadingIniCfg = false;
+
+    AfterReloadConfig(true, false, callEvMeth);
+
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadJsonConfig()
+int LLBC_IApplication::ReloadPropertyConfig(bool callEvMeth)
 {
+    LLBC_LockGuard guard(_lock);
+
+    if (_loadingPropertyCfg)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    _loadingPropertyCfg = true;
+
     bool loaded = false;
-    if (TryLoadConfig(loaded, false, true, false) != LLBC_OK)
+    if (TryLoadConfig(loaded, false, true) != LLBC_OK)
+    {
+        _loadingPropertyCfg = false;
         return LLBC_FAILED;
+    }
 
     if (!loaded)
     {
+        _loadingPropertyCfg = false;
+
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
+    _loadingPropertyCfg = false;
+
+    AfterReloadConfig(false, true, callEvMeth);
+
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadJsonConfig(const LLBC_String &configPath)
+int LLBC_IApplication::ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth)
 {
+    LLBC_LockGuard guard(_lock);
+
+    if (_loadingPropertyCfg)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    _loadingPropertyCfg = true;
+
     bool loaded = false;
     LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
-    if (TryLoadConfig(splited[0], loaded, false, true, false) != LLBC_OK)
+    if (TryLoadConfig(splited[0], loaded, false, true) != LLBC_OK)
+    {
+        _loadingPropertyCfg = false;
         return LLBC_FAILED;
+    }
 
     if (!loaded)
     {
+        _loadingPropertyCfg = false;
+
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
-    return LLBC_OK;
-}
+    _loadingPropertyCfg = false;
 
-int LLBC_IApplication::ReloadPropertyConfig()
-{
-    bool loaded = false;
-    if (TryLoadConfig(loaded, false, false, true) != LLBC_OK)
-        return LLBC_FAILED;
-
-    if (!loaded)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-
-int LLBC_IApplication::ReloadPropertyConfig(const LLBC_String &configPath)
-{
-    bool loaded = false;
-    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
-    if (TryLoadConfig(splited[0], loaded, false, false, true) != LLBC_OK)
-        return LLBC_FAILED;
-
-    if (!loaded)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
+    AfterReloadConfig(false, true, callEvMeth);
 
     return LLBC_OK;
 }
@@ -499,13 +546,13 @@ int LLBC_IApplication::Send(LLBC_Packet *packet)
     return service->Send(packet);
 }
 
-int LLBC_IApplication::TryLoadConfig(bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(bool tryIni, bool tryPropCfg)
 {
     bool loaded = false;
-    return TryLoadConfig(loaded, tryIni, tryJson, tryCfg);
+    return TryLoadConfig(loaded, tryIni, tryPropCfg);
 }
 
-int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryPropCfg)
 {
     loaded = false;
 
@@ -528,7 +575,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
         iter != tryPaths.end();
         ++iter)
     {
-        if (TryLoadConfig(*iter, loaded, tryIni, tryJson, tryCfg) != LLBC_OK)
+        if (TryLoadConfig(*iter, loaded, tryIni, tryPropCfg) != LLBC_OK)
             return LLBC_FAILED;
 
         if (loaded)
@@ -538,7 +585,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryJson, bo
     return LLBC_OK;
 }
 
-int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryJson, bool tryCfg)
+int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryPropCfg)
 {
     loaded = false;
 
@@ -556,7 +603,7 @@ int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool
     }
 
     // Try load property config file.
-    if (tryCfg)
+    if (tryPropCfg)
     {
         const LLBC_String propPath = path + ".cfg";
         if (LLBC_File::Exists(propPath))
@@ -570,6 +617,24 @@ int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool
 
     // Finally, not found any llbc library supported config format file, return OK.
     return LLBC_OK;
+}
+
+void LLBC_IApplication::AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth)
+{
+    if (!callEvMeth)
+        return;
+
+    if (iniReloaded)
+        OnIniConfigReloaded();
+    if (propReloaded)
+        OnPropertyConfigReloaded();
+
+    typedef LLBC_ServiceMgr::Id2Services _Services;
+    const _Services &services = _services.GetAllIndexedByIdServices();
+    for (_Services::const_iterator it = services.begin();
+         it != services.end();
+         ++it)
+        it->second->NtyApplicationConfigReloaded(iniReloaded, propReloaded);
 }
 
 __LLBC_NS_END
