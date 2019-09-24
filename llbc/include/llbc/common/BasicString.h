@@ -517,7 +517,9 @@ public:
         _These substrs;
         if (sep.empty() || max_split == 0 || this->empty())
         {
-            substrs.push_back(*this);
+            if (!strip_empty)
+                substrs.push_back(*this);
+
             return substrs;
         }
 
