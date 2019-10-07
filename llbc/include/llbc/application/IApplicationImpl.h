@@ -23,6 +23,14 @@
 
 __LLBC_NS_BEGIN
 
+inline void LLBC_IApplication::OnIniConfigReloaded()
+{
+}
+
+inline void LLBC_IApplication::OnPropertyConfigReloaded()
+{
+}
+
 template <typename App>
 inline App *LLBC_IApplication::ThisApp()
 {

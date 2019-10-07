@@ -517,7 +517,9 @@ public:
         _These substrs;
         if (sep.empty() || max_split == 0 || this->empty())
         {
-            substrs.push_back(*this);
+            if (!strip_empty)
+                substrs.push_back(*this);
+
             return substrs;
         }
 
@@ -712,8 +714,7 @@ public:
     // substr operations.
     _This substr(size_type pos = 0, size_type n = npos) const
     {
-        _Base ret = _Base::substr(pos, n);
-        return _This(ret.c_str());
+        return _Base::substr(pos, n);
     }
 
     // tolower/toupper operations.

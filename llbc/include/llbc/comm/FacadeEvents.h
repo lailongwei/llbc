@@ -52,6 +52,8 @@ public:
         OnProtoReport,
         OnUnHandledPacket,
 
+        OnAppCfgReloaded,
+
         End,
     };
 };
@@ -76,6 +78,7 @@ public:
     static const uint64 OnAsyncConnResult;
     static const uint64 OnProtoReport;
     static const uint64 OnUnHandledPacket;
+    static const uint64 OnAppCfgReloaded;
 
 public:
     static const uint64 AllEvents;

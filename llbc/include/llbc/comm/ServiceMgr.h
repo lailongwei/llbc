@@ -44,6 +44,10 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_ServiceMgr
 {
 public:
+    typedef std::map<int, LLBC_IService *> Id2Services;
+    typedef std::map<LLBC_String, LLBC_IService *> Name2Services;
+
+public:
     /**
      * Constructor & Destructor.
      */
@@ -77,7 +81,7 @@ public:
 
     /**
      * Remove specified name service, like Remove(int id) method.
-     * @param[in] id - the service Id.
+     * @param[in] name - the service name.
      * @return int - return 0 if success, otherwise return -1.
      */
     int RemoveService(const LLBC_String &name);
@@ -93,6 +97,19 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int Stop();
+
+public:
+    /**
+     * Get all services(included not-start/starting/stoping status services).
+     * @return const Id2Services & - the services collections(indexed by service id).
+     */
+    const Id2Services &GetAllIndexedByIdServices() const;
+
+    /**
+     * Get all services(included not-start/starting/stoping status services).
+     * @return const Name2Services & - the services collections(indexed by service name).
+     */
+    const Name2Services &GetAllIndexedByNameServices() const;
 
 private:
     /**
@@ -122,8 +139,7 @@ private:
 private:
     static bool InTls(const LLBC_IService *svc);
 
-    typedef std::map<int, LLBC_IService *> _Services;
-    static bool InTls(const _Services &svcs);
+    static bool InTls(const Id2Services &svcs);
 
     typedef std::map<LLBC_String, LLBC_IService *> _Services2;
     static bool InTls(const _Services2 &svcs);
@@ -131,7 +147,7 @@ private:
 private:
     LLBC_SpinLock _lock;
 
-    _Services _id2Services;
+    Id2Services _id2Services;
     _Services2 _name2Services;
 };
 

@@ -408,6 +408,12 @@ protected:
 
 protected:
     /**
+     * Application ini/property config reload event notifiy method.
+     */
+    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded);
+
+protected:
+    /**
      * Declare friend class: LLBC_pollerMgr.
      *  Access method list:
      *      AddSessionProtocolFactory()
@@ -467,6 +473,7 @@ private:
     void HandleEv_SubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
+    void HandleEv_AppCfgReloaded(LLBC_ServiceEvent &ev);
 
     /**
      * Facade operation methods.

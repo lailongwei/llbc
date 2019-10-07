@@ -22,6 +22,7 @@
 # 17)【llbc core】Service Full-Stack 选项从Config中去除，变成Service属性，即不同Service中的Full-Stack选项可不同，在Create时指定.
 # 18)【llbc core】优化EventManager代码, LLBC_ListenerStub类型由String调整为uint64.
 # 19)【llbc core】objectpool增加对象MarkPoolObject():void方法识别, 以在生成对象时标记此对象为池子内部对象, 以供业务及框架未来拓展用.
+# 20)【llbc core】完善配置加载支持，IApplication/IFacade增加配置加载事件方法定义(ServiceMgr部分方法暂时线程不安全, 因项目需要先行提交).
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.

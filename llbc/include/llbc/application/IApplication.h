@@ -51,7 +51,7 @@ public:
 
 public:
     /**
-     * Application start event method, please override this method at your project.
+     * Application start event method, please override this method in your project.
      * @param[in] argc - the application startup arguments count.
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
@@ -59,14 +59,24 @@ public:
     virtual int OnStart(int argc, char *argv[]) = 0;
 
     /**
-     * Application wait event method, please override this method at your project.
+     * Application wait event method, please override this method in your project.
      */
     virtual void OnWait() = 0;
 
     /**
-     * Application stop event method, please override this method at your project.
+     * Application stop event method, please override this method in your project.
      */
     virtual void OnStop() = 0;
+
+    /**
+     * Application ini config reloaded event method, please override this method in your project.
+     */
+    virtual void OnIniConfigReloaded();
+
+    /**
+     * Application property config reloaded event method, please override this method in your project.
+     */
+    virtual void OnPropertyConfigReloaded();
 
 public:
     /**
@@ -144,31 +154,25 @@ public:
     /**
      * Reload application ini format config.
      * @param[in] configPath - the config file path.
+     * @param[in] callEvMeth - specific call event method when reload success or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int ReloadIniConfig();
-    int ReloadIniConfig(const LLBC_String &configPath);
-
-    /**
-     * Reload application json format config.
-     * @param[in] configPath - the config file path.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int ReloadJsonConfig();
-    int ReloadJsonConfig(const LLBC_String &configPath);
+    int ReloadIniConfig(bool callEvMeth = true);
+    int ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth = true);
 
     /**
      * Reload application property format config.
      * @param[in] configPath - the config file path.
+     * @param[in] callEvMeth - specific call event method when reload success or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int ReloadPropertyConfig();
-    int ReloadPropertyConfig(const LLBC_String &configPath);
+    int ReloadPropertyConfig(bool callEvMeth = true);
+    int ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth = true);
 
 public:
     /**
      * Get service.
-     * @param[in] serviceId - service Id.
+     * @param[in] id - service Id.
      * @return LLBC_IService * - service.
      */
     LLBC_IService *GetService(int id) const;
@@ -189,15 +193,20 @@ public:
     int Send(LLBC_Packet *packet);
 
 private:
-    int TryLoadConfig(bool tryIni = true, bool tryJson = true, bool tryCfg = true);
-    int TryLoadConfig(bool &loaded, bool tryIni = true, bool tryJson = true, bool tryCfg = true);
-    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded, bool tryIni = true, bool tryJson = true, bool tryCfg = true);
+    int TryLoadConfig(bool tryIni = true, bool tryPropCfg = true);
+    int TryLoadConfig(bool &loaded, bool tryIni = true, bool tryPropCfg = true);
+    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded, bool tryIni = true, bool tryPropCfg = true);
+
+    void AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth);
 
 protected:
     LLBC_String _name;
+    LLBC_SpinLock _lock;
 
     LLBC_Ini _iniConfig;
     LLBC_Property _propertyConfig;
+    bool _loadingIniCfg;
+    bool _loadingPropertyCfg;
 
     LLBC_ServiceMgr &_services;
 
