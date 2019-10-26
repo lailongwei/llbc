@@ -66,7 +66,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_Thread_Tls);
     // test = LLBC_New0(TestCase_Core_Thread_ThreadMgr);
     // test = LLBC_New0(TestCase_Core_Thread_Task);
-    // test = LLBC_New0(TestCase_Core_Random);
+    test = LLBC_New0(TestCase_Core_Random);
     // test = LLBC_New0(TestCase_Core_Log);
     // test = LLBC_New0(TestCase_Core_Entity);
     // test = LLBC_New0(TestCase_Core_Transcoder);

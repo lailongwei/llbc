@@ -24,7 +24,7 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/random/mtrand.h"
+#include "llbc/core/random/mtrandom.h"
 
 __LLBC_NS_BEGIN
 
@@ -81,7 +81,7 @@ public:
     _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
 
 private:
-    MTRand_int32 _mtRand;
+    mtrandom _mtRand;
 };
 
 /**
