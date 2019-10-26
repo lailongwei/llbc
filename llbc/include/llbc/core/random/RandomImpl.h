@@ -24,10 +24,8 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_Random::LLBC_Random(int seed)
-: _mtRand(seed)
+: _mtRand(seed != 0 ? seed : static_cast<int>(::time(NULL)))
 {
-    if (seed == 0)
-        seed = static_cast<int>(::time(NULL));
 }
 
 inline void LLBC_Random::Seed(int seed)

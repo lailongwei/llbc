@@ -29,6 +29,7 @@
 #   -【llbc core】修复对象池销毁时内存泄露问题.
 #   -【llbc core】修复Task::Wait/Cancel/...方法在Task所有线程并未完全创建就快速调用时,时引发的ThreadManager无法完全等待的bug.
 #   -【llbc core】修复LLBC_BasicString::split()在对空串进行split且strip_empty为True时还会返回包含空串的bug.
+#   -【llbc core】修复LLBC_Random构造函数在seed为0时未自动应用当前时间戳做seed的bug.
 factory.
 #
 # Version: 1.0.6
