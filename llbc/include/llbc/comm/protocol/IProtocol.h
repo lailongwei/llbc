@@ -111,6 +111,12 @@ protected:
     int GetSessionId() const;
 
     /**
+     * Get accept session Id.
+     * @return int - the accept session Id.
+     */
+    int GetAcceptSessionId() const;
+
+    /**
      * Get protocol stack.
      * @return LLBC_ProtocolStack * - the protocol stack.
      */
@@ -158,6 +164,7 @@ private:
 
 protected:
     int _sessionId;
+    int _acceptSessionId;
     LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
     LLBC_IService *_svc;

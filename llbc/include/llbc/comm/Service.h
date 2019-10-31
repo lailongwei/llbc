@@ -317,7 +317,7 @@ public:
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -551,7 +551,7 @@ private:
 
     volatile bool _started;
     volatile bool _stopping;
-    bool _initingFacade;
+    volatile bool _initingFacade;
 
     LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;

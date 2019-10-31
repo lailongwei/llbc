@@ -58,6 +58,16 @@ inline int LLBC_Packet::GetSessionId() const
     return _sessionId;
 }
 
+inline int LLBC_Packet::GetAcceptSessionId() const
+{
+    return _acceptSessionId;
+}
+
+inline void LLBC_Packet::SetAcceptSessionId(int sessionId)
+{
+    _acceptSessionId = sessionId;
+}
+
 inline void LLBC_Packet::SetSessionId(int sessionId)
 {
     _sessionId = sessionId;

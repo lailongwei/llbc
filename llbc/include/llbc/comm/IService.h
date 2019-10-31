@@ -443,13 +443,13 @@ public:
     int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified handler method, if method return false, will stop packet process flow.
      */
     int UnifyPreSubscribe(bool(*func)(LLBC_Packet &));
     template <typename ObjType>

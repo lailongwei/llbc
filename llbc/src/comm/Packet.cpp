@@ -38,6 +38,7 @@ LLBC_Packet::LLBC_Packet()
 : _length(0)
 
 , _sessionId(0)
+, _acceptSessionId(0)
 , _senderSvcId(0)
 , _recverSvcId(0)
 , _localAddr()

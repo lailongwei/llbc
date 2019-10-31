@@ -90,6 +90,18 @@ public:
     void SetSessionId(int sessionId);
 
     /**
+     * Get accept session Id.
+     * @return int - the accept session Id.
+     */
+    int GetAcceptSessionId() const;
+
+    /**
+     * Set accept session Id.
+     * @param[in] sessionId - the accept session Id.
+     */
+    void SetAcceptSessionId(int sessionId);
+
+    /**
      * Get local address.
      * @return const LLBC_SockAddr_IN & - the local address.
      */
@@ -527,6 +539,7 @@ private:
     size_t _length;
 
     int _sessionId;
+    int _acceptSessionId;
     int _senderSvcId;
     int _recverSvcId;
     LLBC_SockAddr_IN _localAddr;
