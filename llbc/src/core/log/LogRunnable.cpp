@@ -47,10 +47,9 @@ LLBC_LogRunnable::~LLBC_LogRunnable()
 
 void LLBC_LogRunnable::Cleanup()
 {
-    // Flush all not process's message blocks.
+    // Output all queued log messages.
     LLBC_LogData *logData = NULL;
     LLBC_MessageBlock *block = NULL;
-
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&logData, sizeof(LLBC_LogData *));
@@ -60,6 +59,9 @@ void LLBC_LogRunnable::Cleanup()
 
         LLBC_Delete(block);
     }
+
+    // Flush all appenders(force).
+    FlushAppenders(true);
 
     // Delete all appender.
     while (_head)
@@ -77,20 +79,8 @@ void LLBC_LogRunnable::Svc()
     LLBC_MessageBlock *block = NULL;
     while (LIKELY(!_stoped))
     {
-        // Flush all appenders(cycle config: flushInterval)
-        sint64 now = LLBC_GetMilliSeconds();
-        sint64 diff = now - _lastFlushTime;
-        if (diff < 0 || diff >= _flushInterval)
-        {
-            LLBC_ILogAppender *appender = _head;
-            while (appender)
-            {
-                appender->Flush();
-                appender = appender->GetAppenderNext();
-            }
-
-            _lastFlushTime = now;
-        }
+        // Flush all appenders(not force).
+        FlushAppenders(false);
 
         // Try pop log message to output.
         if (TimedPop(block, 50) != LLBC_OK)
@@ -102,7 +92,6 @@ void LLBC_LogRunnable::Svc()
         FreeLogData(logData);
 
         LLBC_Delete(block);
-
     }
 }
 
@@ -161,6 +150,29 @@ void LLBC_LogRunnable::FreeLogData(LLBC_LogData *data)
     LLBC_XFree(data->others);
 
     LLBC_Delete(data);
+}
+
+void LLBC_LogRunnable::FlushAppenders(bool force)
+{
+    // If not force flush appenders and the flush time not reached, no flush.
+    if (!force)
+    {
+        sint64 now = LLBC_GetMilliSeconds();
+        sint64 diff = now - _lastFlushTime;
+        if (diff >= 0 && diff < _flushInterval)
+            return;
+    }
+
+    // Foreach appenders to flush.
+    LLBC_ILogAppender *appender = _head;
+    while (appender)
+    {
+        appender->Flush();
+        appender = appender->GetAppenderNext();
+    }
+
+    // Update last flush time(use flushed time to avoid logger performance problem).
+    _lastFlushTime = LLBC_GetMicroSeconds();
 }
 
 __LLBC_NS_END

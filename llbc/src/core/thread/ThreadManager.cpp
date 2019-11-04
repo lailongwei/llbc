@@ -141,26 +141,21 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
     }
 
     LLBC_LockGuard guard(_lock);
-
     if (groupHandle == LLBC_INVALID_HANDLE)
-    {
         groupHandle =++ _maxGroupHandle;
-    }
     
     for (int i = 0; i < threadNum; ++i)
     {
         if (CreateThread_NonLock(proc,
-                                       arg,
-                                       flags,
-                                       priority,
-                                       stackSize ? stackSize[i] : LLBC_CFG_THREAD_DFT_STACK_SIZE,
-                                       task,
-                                       groupHandle,
-                                       nativeHandles ? &nativeHandles[i] : NULL,
-                                       handles ? &handles[i] : NULL) == LLBC_INVALID_HANDLE)
-        {
+                                 arg,
+                                 flags,
+                                 priority,
+                                 stackSize ? stackSize[i] : LLBC_CFG_THREAD_DFT_STACK_SIZE,
+                                 task,
+                                 groupHandle,
+                                 nativeHandles ? &nativeHandles[i] : NULL,
+                                 handles ? &handles[i] : NULL) == LLBC_INVALID_HANDLE)
             return LLBC_FAILED;
-        }
     }
 
     return groupHandle;
@@ -1005,9 +1000,7 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
 {
     // Check thread descriptor in threads hash bucket or not.
     if (FindThreadDescriptor(threadDesc->GetHandle()))
-    {
         return;
-    }
 
     // Force set thread next to NULL.
     threadDesc->SetThreadNext(NULL);
@@ -1032,9 +1025,7 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
     {
         LLBC_ThreadDescriptor *tmpDesc = _threads[threadBucketIdx];
         while (tmpDesc->GetThreadNext())
-        {
             tmpDesc = tmpDesc->GetThreadNext();
-        }
 
         tmpDesc->SetThreadNext(threadDesc);
     }

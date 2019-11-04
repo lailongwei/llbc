@@ -90,6 +90,13 @@ public:
     static void FreeLogData(LLBC_LogData *data);
 
 private:
+    /**
+     * Flush appenders.
+     * @param[in] force - force flush or not, default is false.
+     */
+    void FlushAppenders(bool force = false);
+
+private:
     volatile bool _stoped;
     LLBC_ILogAppender *_head;
 
