@@ -236,6 +236,8 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
         epev.events |= EPOLLOUT;
 
     LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
+
+    session->OnRecv();
 }
 
 void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
