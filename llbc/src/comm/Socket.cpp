@@ -556,6 +556,10 @@ void LLBC_Socket::OnRecv()
             subErrNo = 0;
         else
             subErrNo = LLBC_SubErrno;
+
+        if (LLBC_ERROR_TYPE_IS_CLIB(errNo))
+            Log.e2<LLBC_Socket>("Socket[sessionId:%d, peer port:%d] recv error, errNo:%d, errorDesc:%s, bt:\n%s", 
+                               _session->GetId(), GetPeerPort(), errNo, LLBC_FormatLastError(), LLBC_CaptureStackBackTrace().c_str());
     }
 
     // Try process already received data, whether the errors occurred or not.

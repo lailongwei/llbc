@@ -36,6 +36,9 @@
 namespace
 {
     typedef LLBC_NS LLBC_BasePoller Base;
+
+    static const int __listenSockEpollEvents = EPOLLIN | EPOLLET | EPOLLHUP | EPOLLERR;
+    static const int __nonListenSockEpollEvents = EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLONESHOT;
 }
 
 __LLBC_NS_BEGIN
@@ -135,7 +138,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
         LLBC_EpollEvent epev;
         epev.data.fd = handle;
-        epev.events = EPOLLOUT | EPOLLET;
+        epev.events = EPOLLOUT | EPOLLONESHOT;
         LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
     }
     else
@@ -231,14 +234,12 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
 
     LLBC_EpollEvent epev;
     epev.data.fd = handle;
-    epev.events = EPOLLIN | EPOLLET | EPOLLHUP | EPOLLERR;
-    if (!sock->IsListen())
-        epev.events |= EPOLLOUT;
+    if (sock->IsListen())
+        epev.events = __listenSockEpollEvents;
+    else
+        epev.events = __nonListenSockEpollEvents;
 
     LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
-
-    if (!sock->IsListen())
-        session->OnRecv();
 }
 
 void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
@@ -246,7 +247,10 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
     // For compatible before 2.6.9 version kernel, we pass event point to LLBC_EpollCtl() API,
     // even through this argument is ignored.
     LLBC_EpollEvent epev;
-    epev.events = EPOLLIN | EPOLLOUT | EPOLLET | EPOLLHUP | EPOLLERR;
+    if (session->IsListen())
+        epev.events = __listenSockEpollEvents;
+    else
+        epev.events = __nonListenSockEpollEvents;
     LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, session->GetSocketHandle(), &epev);
 
     Base::RemoveSession(session);
@@ -310,12 +314,13 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
                                                       connected,
                                                       connected ? "Success" : LLBC_FormatLastError(),
                                                       asyncInfo.peerAddr));
+
+    LLBC_EpollEvent epev;
+    epev.events = EPOLLOUT | EPOLLONESHOT;
+    LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
+
     if (connected)
     {
-        LLBC_EpollEvent epev;
-        epev.events = EPOLLOUT | EPOLLET;
-        LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
-
         SetConnectedSocketDftOpts(sock);
         AddSession(CreateSession(sock, asyncInfo.sessionId));
     }
@@ -342,6 +347,19 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
         SetConnectedSocketDftOpts(newSock);
         AddToPoller(CreateSession(newSock, 0, session));
     }
+}
+
+void LLBC_EpollPoller::ReMonitorNonListenSocket(LLBC_SocketHandle handle)
+{
+    _Sockets::iterator it = _sockets.find(handle);
+    if (it == _sockets.end())
+        return;
+
+    LLBC_EpollEvent epev;
+    epev.data.fd = handle;
+    epev.events = __nonListenSockEpollEvents;
+
+    LLBC_EpollCtl(_epoll, EPOLL_CTL_MOD, handle, &epev);
 }
 
 __LLBC_NS_END
