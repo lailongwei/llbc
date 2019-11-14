@@ -237,7 +237,7 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
 
     LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
 
-    if (sock->IsListen())
+    if (!sock->IsListen())
         session->OnRecv();
 }
 
