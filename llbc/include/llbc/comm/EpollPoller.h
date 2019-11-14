@@ -116,6 +116,7 @@ private:
     /**
      * Remonitor non-listen socket(modify epoll ctrl events).
      */
+    void ReMonitorNonListenSocket(LLBC_Session *session);
     void ReMonitorNonListenSocket(LLBC_SocketHandle handle);
 
 private:

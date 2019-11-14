@@ -152,6 +152,11 @@ bool LLBC_Session::IsListen() const
     return _socket->IsListen();
 }
 
+bool LLBC_Session::HasWaitingForSendData() const
+{
+    return _socket->HasWaitingForSendData();
+}
+
 LLBC_Socket *LLBC_Session::GetSocket()
 {
     return _socket;

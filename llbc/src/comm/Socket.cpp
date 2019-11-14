@@ -412,6 +412,11 @@ int LLBC_Socket::GetPendingError(int &pendingError)
     return GetOption(SOL_SOCKET, SO_ERROR, &pendingError, &soLen);
 }
 
+bool LLBC_Socket::HasWaitingForSendData() const
+{
+    return _willSend.FirstBlock() != NULL;
+}
+
 #if LLBC_TARGET_PLATFORM_WIN32
 void LLBC_Socket::OnSend(LLBC_POverlapped ol)
 #else

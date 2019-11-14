@@ -38,7 +38,7 @@ namespace
     typedef LLBC_NS LLBC_BasePoller Base;
 
     static const int __listenSockEpollEvents = EPOLLIN | EPOLLET | EPOLLHUP | EPOLLERR;
-    static const int __nonListenSockEpollEvents = EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLONESHOT;
+    static const int __nonListenSockEpollEvents = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLONESHOT;
 }
 
 __LLBC_NS_BEGIN
@@ -152,7 +152,19 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
 void LLBC_EpollPoller::HandleEv_Send(LLBC_PollerEvent &ev)
 {
+    int sessionId = ev.un.packet->GetSessionId();
+
     Base::HandleEv_Send(ev);
+
+    _Sessions::iterator it = _sessions.find(sessionId);
+    if (UNLIKELY(it == _sessions.end()))
+        return;
+
+    LLBC_Session *&session = it->second;
+    if (UNLIKELY(session->IsListen()))
+        return;
+
+    ReMonitorNonListenSocket(session);
 }
 
 void LLBC_EpollPoller::HandleEv_Close(LLBC_PollerEvent &ev)
@@ -172,7 +184,8 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         if (HandleConnecting(ev.data.fd, ev.events))
             continue;
 
-        _Sockets::iterator it = _sockets.find(ev.data.fd);
+        const int &fd = ev.data.fd;
+        _Sockets::iterator it = _sockets.find(fd);
         if (UNLIKELY(it == _sockets.end()))
             continue;
 
@@ -202,6 +215,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
                 else
                 {
                     session->OnRecv();
+                    ReMonitorNonListenSocket(fd);
                 }
             }
             if (ev.events & EPOLLOUT)
@@ -213,6 +227,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
                     continue;
 
                 session->OnSend();
+                ReMonitorNonListenSocket(fd);
             }
        }
     }
@@ -250,7 +265,7 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
     if (session->IsListen())
         epev.events = __listenSockEpollEvents;
     else
-        epev.events = __nonListenSockEpollEvents;
+        epev.events = __nonListenSockEpollEvents | EPOLLOUT;
     LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, session->GetSocketHandle(), &epev);
 
     Base::RemoveSession(session);
@@ -349,19 +364,27 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
     }
 }
 
-void LLBC_EpollPoller::ReMonitorNonListenSocket(LLBC_SocketHandle handle)
+void LLBC_EpollPoller::ReMonitorNonListenSocket(LLBC_Session *session)
 {
-    _Sockets::iterator it = _sockets.find(handle);
-    if (it == _sockets.end())
-        return;
+    ASSERT(!session->IsListen() && "Session must be non-listen session");
+
+    const LLBC_SocketHandle handle = session->GetSocketHandle();
 
     LLBC_EpollEvent epev;
     epev.data.fd = handle;
     epev.events = __nonListenSockEpollEvents;
+    if (session->HasWaitingForSendData())
+        epev.events | EPOLLOUT;
 
     LLBC_EpollCtl(_epoll, EPOLL_CTL_MOD, handle, &epev);
 }
 
+void LLBC_EpollPoller::ReMonitorNonListenSocket(LLBC_SocketHandle handle)
+{
+    _Sockets::iterator it = _sockets.find(handle);
+    if (it != _sockets.end())
+        ReMonitorNonListenSocket(it->second);
+}
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID

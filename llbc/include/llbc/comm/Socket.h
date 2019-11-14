@@ -344,6 +344,13 @@ public:
 
 public:
     /**
+     * Check this socket has waiting for send data or not.
+     * @return bool - return true if has any waiting for send data, otherwise return false.
+     */
+    bool HasWaitingForSendData() const;
+
+public:
+    /**
      * Event handle function, if socket in event trigger mode, must call this function to send data.
      * @param[in] ol - overlapped, available in WIN32 platform and IOCP poller model.
      */
@@ -412,8 +419,6 @@ private:
      */
     int PostZeroWSARecv();
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-private:
 
 private:
     LLBC_SocketHandle _handle;
