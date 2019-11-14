@@ -113,12 +113,6 @@ private:
      */
     void Accept(LLBC_Session *session);
 
-    /**
-     * Remonitor non-listen socket(modify epoll ctrl events).
-     */
-    void ReMonitorNonListenSocket(LLBC_Session *session);
-    void ReMonitorNonListenSocket(LLBC_SocketHandle handle);
-
 private:
     LLBC_Handle _epoll;
     LLBC_PollerMonitor *_monitor;

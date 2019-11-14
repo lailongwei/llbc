@@ -153,12 +153,6 @@ public:
     bool IsListen() const;
 
     /**
-     * Check this socket has waiting for send data or not.
-     * @return bool - return true if has any waiting for send data, otherwise return false.
-     */
-    bool HasWaitingForSendData() const;
-
-    /**
      * Set socket.
      * Note: Once the socket setting into the session, the session will own the socket.
      * @param[in] socket - socket.
