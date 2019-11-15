@@ -343,7 +343,6 @@ void LLBC_BasePoller::RemoveSession(LLBC_Session *session)
 {
     _sessions.erase(session->GetId());
     _sockets.erase(session->GetSocketHandle());
-
     LLBC_Delete(session);
 }
 

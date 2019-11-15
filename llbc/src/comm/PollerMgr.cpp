@@ -70,6 +70,8 @@ LLBC_PollerMgr::LLBC_PollerMgr()
 
 , _pendingAddSocks()
 , _pendingAsyncConns()
+
+, _sock2SessionIds()
 {
 }
 
@@ -145,6 +147,7 @@ void LLBC_PollerMgr::Stop()
     // Always cleanup pending async-conn container.
     _pendingAsyncConns.clear();
 
+    // Delete all pollers.
     if (_pollers)
     {
         for (int i = 0; i < _pollerCount; ++i)
@@ -153,7 +156,11 @@ void LLBC_PollerMgr::Stop()
         _pollerCount = 0;
     }
 
+    // Reset max sessionId.
     _maxSessionId = 1;
+
+    // Clear _sock2Sessions dict.
+    _sock2Sessions.clear();
 }
 
 int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
@@ -265,6 +272,42 @@ void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_V
 int LLBC_PollerMgr::AllocSessionId()
 {
     return LLBC_AtomicFetchAndAdd(&_maxSessionId, 1);
+}
+
+bool LLBC_PollerMgr::TryBindSocketToSession(LLBC_SocketHandle handle, int sessionId, int &boundSessionId)
+{
+    _pollerLock.Lock();
+    _Sock2Sessions::iterator it = _sock2SessionIds.find(handle);
+    if (it != _sock2SessionIds.end())
+    {
+        boundSessionId = it->second;
+        _poolerLock.Unlock();
+
+        return false;
+    }
+
+    boundSessionId = 0;
+    _sock2SessionIds.insert(std::make_pair(handle, sessionId));
+
+    _pollerLock.Unlock();
+
+    return  true;
+}
+
+void LLBC_PollerMgr::UnbindSocketToSession(LLBC_SocketHandle handle, int sessionId)
+{
+    _pollerLock.Lock();
+    _Sock2Sessions::iterator it = _sock2SessionIds.find(handle);
+    if (it == _sock2SessionIds.end())
+    {
+        _pollerLock.Unlock();
+        return;
+    }
+
+    ASSERT(it->second == sessionId && "Poller internal error(bound sessionId dismatch)");
+    _sock2SessionIds.erase(it);
+
+    _pollerLock.Unlock();
 }
 
 int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
