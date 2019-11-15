@@ -50,7 +50,8 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(int sessionId, LLBC_Socket 
     return block;
 }
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId, const LLBC_SockAddr_IN &peerAddr)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
+                                                       const LLBC_SockAddr_IN &peerAddr)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());

@@ -140,23 +140,6 @@ private:
     int AllocSessionId();
 
     /**
-     * Try bind socket to session.
-     * @param[in]  handle         - the socket handle.
-     * @param[in]  sessionId      - the session Id.
-     * @param[out] boundSessionId - the bound old sessionId, if return false, this out parameter will fill.
-     * @return bool - return true if bound success, otherwise return false.
-     */
-    bool TryBindSocketToSession(LLBC_SocketHandle handle, int sessionId, int &boundSessionId);
-
-    /**
-     * Unbind socket to session mapping.
-     * @param[in] handle    - the socket handle.
-     * @param[in] sessionId - the session Id.
-     */
-    void UnbindSocketToSession(LLBC_SocketHandle handle, int sessionId);
-
-public:
-    /**
      * Push specific message to poller, call by Poller.
      * @param[in] id    - the poller Id.
      * @param[in] block - the message block.
@@ -196,9 +179,6 @@ private:
     _PendingAddSocks _pendingAddSocks;
     typedef std::map<int, LLBC_SockAddr_IN> _PendingAsyncConns;
     _PendingAsyncConns _pendingAsyncConns;
-
-    typedef std::map<int, int> _Sock2Sessions;
-    _Sock2SessionIds _sock2Sessions;
 };
 
 __LLBC_NS_END

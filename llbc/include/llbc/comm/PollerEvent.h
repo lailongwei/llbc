@@ -100,7 +100,7 @@ public:
     /**
      * Build Async-Conn event.
      */
-    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId, 
+    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
                                                const LLBC_SockAddr_IN &peerAddr);
 
     /**

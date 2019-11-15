@@ -328,13 +328,12 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
 
     // Build event and push to service.
     LLBC_Socket *sock = session->GetSocket();
-    LLBC_MessageBlock *block = 
-        LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
-                                             sock->GetPeerAddress(),
-                                             sock->IsListen(),
-                                             session->GetId(),
-                                             session->GetAcceptId(),
-                                             sock->Handle());
+    LLBC_MessageBlock *block = LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
+                                                                    sock->GetPeerAddress(),
+                                                                    sock->IsListen(),
+                                                                    session->GetId(),
+                                                                    session->GetAcceptId(),
+                                                                    sock->Handle());
 
     _svc->Push(block);
 }

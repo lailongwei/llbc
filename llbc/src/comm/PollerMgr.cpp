@@ -70,8 +70,6 @@ LLBC_PollerMgr::LLBC_PollerMgr()
 
 , _pendingAddSocks()
 , _pendingAsyncConns()
-
-, _sock2SessionIds()
 {
 }
 
@@ -133,8 +131,10 @@ int LLBC_PollerMgr::Start(int count)
     for (_PendingAsyncConns::iterator it = _pendingAsyncConns.begin();
          it != _pendingAsyncConns.end();
          ++it)
+    {
         _pollers[it->first % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
+            LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second);
+    }
     _pendingAsyncConns.clear();
 
     return LLBC_OK;
@@ -158,9 +158,6 @@ void LLBC_PollerMgr::Stop()
 
     // Reset max sessionId.
     _maxSessionId = 1;
-
-    // Clear _sock2Sessions dict.
-    _sock2Sessions.clear();
 }
 
 int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
@@ -214,7 +211,6 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *
     }
 
     sock->SetNonBlocking();
-
     const int sessionId = AllocSessionId();
     if (protoFactory)
         _svc->AddSessionProtocolFactory(sessionId, protoFactory);
@@ -274,42 +270,6 @@ int LLBC_PollerMgr::AllocSessionId()
     return LLBC_AtomicFetchAndAdd(&_maxSessionId, 1);
 }
 
-bool LLBC_PollerMgr::TryBindSocketToSession(LLBC_SocketHandle handle, int sessionId, int &boundSessionId)
-{
-    _pollerLock.Lock();
-    _Sock2Sessions::iterator it = _sock2SessionIds.find(handle);
-    if (it != _sock2SessionIds.end())
-    {
-        boundSessionId = it->second;
-        _poolerLock.Unlock();
-
-        return false;
-    }
-
-    boundSessionId = 0;
-    _sock2SessionIds.insert(std::make_pair(handle, sessionId));
-
-    _pollerLock.Unlock();
-
-    return  true;
-}
-
-void LLBC_PollerMgr::UnbindSocketToSession(LLBC_SocketHandle handle, int sessionId)
-{
-    _pollerLock.Lock();
-    _Sock2Sessions::iterator it = _sock2SessionIds.find(handle);
-    if (it == _sock2SessionIds.end())
-    {
-        _pollerLock.Unlock();
-        return;
-    }
-
-    ASSERT(it->second == sessionId && "Poller internal error(bound sessionId dismatch)");
-    _sock2SessionIds.erase(it);
-
-    _pollerLock.Unlock();
-}
-
 int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
 {
     LLBC_LockGuard guard(_pollerLock);
@@ -342,7 +302,7 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     }
 
     // Use LLBC_GetAddrInfo to fetch sockaddr.
-    struct addrinfo hints;
+    addrinfo hints;
     hints.ai_flags = 0;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
