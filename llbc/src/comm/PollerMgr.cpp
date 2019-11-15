@@ -133,7 +133,7 @@ int LLBC_PollerMgr::Start(int count)
          ++it)
     {
         _pollers[it->first % _pollerCount]->Push(
-            LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second);
+            LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
     }
     _pendingAsyncConns.clear();
 
