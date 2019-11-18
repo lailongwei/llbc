@@ -230,12 +230,6 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
     if (_socket->AsyncSend(block) != LLBC_OK)
         return LLBC_FAILED;
 
-    // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
-#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    if (_pollerType == LLBC_PollerType::EpollPoller)
-        OnSend();
-#endif
-
     return LLBC_OK;
 }
 

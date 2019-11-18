@@ -209,8 +209,7 @@ void LLBC_BasePoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_Send(LLBC_PollerEvent &ev)
 {
-    _Sessions::iterator it = 
-        _sessions.find(ev.un.packet->GetSessionId());
+    _Sessions::iterator it = _sessions.find(ev.un.packet->GetSessionId());
     if (it == _sessions.end())
     {
         LLBC_Delete(ev.un.packet);

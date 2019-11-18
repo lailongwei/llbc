@@ -150,7 +150,17 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
 void LLBC_EpollPoller::HandleEv_Send(LLBC_PollerEvent &ev)
 {
+    const int sessionId = ev.un.packet->GetSessionId();
+
     Base::HandleEv_Send(ev);
+
+    // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
+    _Sessions::iterator it = _sessions.find(sessionId);
+    if (it == _sessions.end())
+        return;
+
+    LLBC_Session *&session = it->second;
+    session->OnSend();
 }
 
 void LLBC_EpollPoller::HandleEv_Close(LLBC_PollerEvent &ev)
