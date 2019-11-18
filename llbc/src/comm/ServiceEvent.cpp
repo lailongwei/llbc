@@ -197,11 +197,6 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionDestroyEv(const LLBC_SockAddr_IN 
 
     ev->closeInfo = closeInfo;
 
-    // TODO: For debug
-    if (closeInfo->GetErrno() == LLBC_ERROR_CLIB && closeInfo->GetSubErrno() == 0)
-        Log.e2<LLBC_SvcEvUtil>("Session[%d] destroy, clib error, but sub errno is 0, bt:\n%s", 
-                sessionId, LLBC_CaptureStackBackTrace().c_str());
-
     return __CreateEvBlock(ev);
 }
 

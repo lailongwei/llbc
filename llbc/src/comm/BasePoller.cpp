@@ -339,9 +339,6 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
 
 void LLBC_BasePoller::RemoveSession(LLBC_Session *session)
 {
-    // TODO: For test
-    Log.e2<LLBC_BasePoller>("Remove session, sid:%d, handle:%d", session->GetId(), session->GetSocketHandle());
-
     _sessions.erase(session->GetId());
     _sockets.erase(session->GetSocketHandle());
     LLBC_Delete(session);

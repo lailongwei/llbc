@@ -183,11 +183,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         const int &sessionId = ev.data.u32;
         _Sessions::iterator it = _sessions.find(sessionId);
         if (UNLIKELY(it == _sessions.end()))
-        {
-            // TODO: For test
-            Log.e2<LLBC_EpollPoller>("Session ev triggered, session not found, sid:%d, handle:%d", sessionId, ev.data.fd);
             continue;
-        }
 
         LLBC_Session *session = it->second;
         if (ev.events & (EPOLLHUP | EPOLLERR))
@@ -198,31 +194,10 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             LLBC_SessionCloseInfo *closeInfo;
             if (sock->GetPendingError(sockErr) != LLBC_OK)
             {
-                // TODO: For test
-                Log.e2<LLBC_EpollPoller>("time(micro second):%llu, Session[%d] encountered EPOLLHUP(%s) or EPOLLERR(%s), try get pending error, but failed, error:%d, errno:%d",
-                        LLBC_GetMicroSeconds(), 
-                        session->GetId(), 
-                        ev.events & EPOLLHUP ? "True" : "False",  
-                        ev.events & EPOLLERR ? "True" : "False",  
-                        LLBC_Errno, 
-                        LLBC_GetSubErrorNo());
                 closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
             }
             else
             {
-                // TODO: For test
-                Log.e2<LLBC_EpollPoller>("time(micro second):%llu, Session[%d] encountered EPOLLHUP(%s) or EPOLLERR(%s), pending error ret:%d",
-                        LLBC_GetMicroSeconds(), 
-                        session->GetId(), 
-                        ev.events & EPOLLHUP ? "True" : "False",  
-                        ev.events & EPOLLERR ? "True" : "False",  
-                        sockErr);
-
-                //! Linux platform will encounter this situation, file descriptor will reuse(by poller thread Accept()) 
-                //  when epoller monitor thread received(by epoll_wait) old socket EPOLLHUP/EPOLLERR ev.
-                if (UNLIKELY(sockErr == 0))
-                    continue;
-
                 closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
             }
 
@@ -276,14 +251,7 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
     if (!sock->IsListen())
         epev.events |= EPOLLOUT;
 
-    // TODO: For debug
-    Log.d2<LLBC_EpollPoller>("Add new session[%d], time(micro seconds):%llu",
-            session->GetId(), LLBC_GetMicroSeconds());
     LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
-
-    // TODO: For debug
-    // if (!sock->IsListen())
-    //     session->OnRecv();
 }
 
 void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)

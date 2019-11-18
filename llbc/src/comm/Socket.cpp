@@ -118,9 +118,6 @@ int LLBC_Socket::ShutdownInputOutput()
 
 int LLBC_Socket::Close()
 {
-    // TODO: For test
-    Log.e2<LLBC_Socket>("Close socket, handle:%d, sessionId:%d,bt:\n%s", _handle, _session->GetId(), LLBC_CaptureStackBackTrace().c_str());
-
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
@@ -128,8 +125,6 @@ int LLBC_Socket::Close()
     }
     else if (LLBC_CloseSocket(_handle) != LLBC_OK)
     {
-        // TODO: For test
-        Log.e2<LLBC_Socket>("Close socket failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
@@ -563,10 +558,6 @@ void LLBC_Socket::OnRecv()
             subErrNo = 0;
         else
             subErrNo = LLBC_SubErrno;
-
-        if (LLBC_ERROR_TYPE_IS_CLIB(errNo))
-            Log.e2<LLBC_Socket>("Socket[sessionId:%d, peer port:%d] recv error, errNo:%d, errorDesc:%s, bt:\n%s", 
-                               _session->GetId(), GetPeerPort(), errNo, LLBC_FormatLastError(), LLBC_CaptureStackBackTrace().c_str());
     }
 
     // Try process already received data, whether the errors occurred or not.
