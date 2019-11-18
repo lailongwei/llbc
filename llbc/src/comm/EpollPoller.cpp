@@ -173,7 +173,11 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         const int &sessionId = ev.data.u32;
         _Sessions::iterator it = _sessions.find(sessionId);
         if (UNLIKELY(it == _sessions.end()))
+        {
+            // TODO: For test
+            Log.e2<LLBC_EpollPoller>("Session ev triggered, session not found, sid:%d, handle:%d", sessionId, ev.data.fd);
             continue;
+        }
 
         LLBC_Session *session = it->second;
         if (ev.events & (EPOLLHUP | EPOLLERR))
@@ -191,7 +195,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
                         ev.events & EPOLLHUP ? "True" : "False",  
                         ev.events & EPOLLERR ? "True" : "False",  
                         LLBC_Errno, 
-                        LLBC_GetSubErrorNo);
+                        LLBC_GetSubErrorNo());
                 closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
             }
             else

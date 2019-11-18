@@ -118,13 +118,20 @@ int LLBC_Socket::ShutdownInputOutput()
 
 int LLBC_Socket::Close()
 {
+    // TODO: For test
+    Log.e2<LLBC_Socket>("Close socket, handle:%d, sessionId:%d,bt:\n%s", _handle, _session->GetId(), LLBC_CaptureStackBackTrace().c_str());
+
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
         return LLBC_FAILED;
     }
     else if (LLBC_CloseSocket(_handle) != LLBC_OK)
+    {
+        // TODO: For test
+        Log.e2<LLBC_Socket>("Close socket failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
+    }
 
     _handle = LLBC_INVALID_SOCKET_HANDLE;
     return LLBC_OK;
@@ -459,7 +466,7 @@ void LLBC_Socket::OnSend()
 #endif
          )
     {
-         OnClose();
+         _session->OnClose();
          return;
     }
 
