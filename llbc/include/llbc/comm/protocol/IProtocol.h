@@ -97,11 +97,13 @@ public:
 public:
     /**
      * Control protocol layer.
-     * @param[in] ctrlType - the stack control type(user defined).
-     * @param[in] ctrlData - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      * @return bool - return true if need continue control, otherwise stop ctrl other layers.
      */
-    virtual bool Ctrl(int ctrlType, const LLBC_Variant &ctrlData);
+    virtual bool Ctrl(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
 
 protected:
     /**

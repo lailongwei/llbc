@@ -277,6 +277,12 @@ public:
     bool IsExistNoSendData() const;
 
     /**
+     * Get will send message buffer.
+     * @return const LLBC_MessageBuffer & - the will send message buffer.
+     */
+    const LLBC_MessageBuffer &GetWillSendBuffer() const;
+
+    /**
      * Receive data from a connected socket.
      * @param[in] buf - buffer for the incoming data.
      * @param[in] len - length of buf.

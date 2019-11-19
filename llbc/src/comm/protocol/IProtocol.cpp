@@ -69,7 +69,7 @@ const LLBC_IProtocol::Coders *LLBC_IProtocol::GetCoders() const
     return _coders;
 }
 
-bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_IProtocol::Ctrl(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     return true;
 }

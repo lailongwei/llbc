@@ -231,18 +231,18 @@ inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, i
     return Broadcast(0, opcode, bytes, len, status);
 }
 
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
 {
-    return CtrlProtocolStack(sessionId, ctrlType, ctrlData, reinterpret_cast<LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *>(NULL));
+    return CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, reinterpret_cast<LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *>(NULL));
 }
 
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &))
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &))
 {
     LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg = NULL;
     if (ctrlDataClearFunc)
         ctrlDataClearDeleg = new LLBC_Func3<void, int, int, const LLBC_Variant &>(ctrlDataClearFunc);
 
-    int ret = CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
+    int ret = CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
     if (ret != LLBC_OK)
     {
         LLBC_Delete(ctrlDataClearDeleg);
@@ -253,13 +253,13 @@ inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const L
 }
 
 template <typename ObjType>
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void ( ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &))
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void ( ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &))
 {
     LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg = NULL;
     if (obj && ctrlDataClearMeth)
         ctrlDataClearDeleg = new LLBC_Delegate3<void, ObjType, int, int, const LLBC_Variant &>(obj, ctrlDataClearMeth);
 
-    int ret = CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
+    int ret = CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
     if (ret != LLBC_OK)
     {
         LLBC_Delete(ctrlDataClearDeleg);

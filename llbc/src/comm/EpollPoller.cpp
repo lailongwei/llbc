@@ -237,6 +237,24 @@ void LLBC_EpollPoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
     Base::HandleEv_TakeOverSession(ev);
 }
 
+void LLBC_EpollPoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
+{
+    // Store sessionId first.
+    const int sessionId = ev.sessionId;
+
+    // Do protocol stack control.
+    Base::HandleEv_CtrlProtocolStack(ev);
+
+    // Find session and force trigger OnSend() operation on Epoll trigger mode.
+    // TODO: Can be optimized.
+    _Sessions::iterator it = _sessions.find(sessionId);
+    if (it == _sessions.end())
+        return;
+
+    LLBC_Session *&session = it->second;
+    session->OnSend();
+}
+
 void LLBC_EpollPoller::AddSession(LLBC_Session *session)
 {
     Base::AddSession(session);

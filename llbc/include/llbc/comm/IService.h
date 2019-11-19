@@ -350,40 +350,40 @@ public:
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
-     * @param[in] ctrlData          - the stack control data(user defined).
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlCmd   - the stack control command(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearFunc - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearMeth - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control command(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
+    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
 
 public:
     /**

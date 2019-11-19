@@ -591,7 +591,7 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -612,17 +612,21 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Vari
 
     if (!_fullStack)
     {
+        bool removeSession = false;
         const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-        if (!readySInfo->codecStack->CtrlStackCodec(ctrlType, ctrlData))
+        if (!readySInfo->codecStack->CtrlStackCodec(ctrlCmd, ctrlData, removeSession))
         {
             _readySessionInfosLock.Unlock();
+            if (removeSession)
+                RemoveSession(sessionId, "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
+
             return LLBC_OK;
         }
     }
 
     _readySessionInfosLock.Unlock();
 
-    _pollerMgr.CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
 
     return LLBC_OK;
 }

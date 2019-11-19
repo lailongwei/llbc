@@ -212,24 +212,30 @@ public:
 public:
     /**
      * Control protocol stack.
-     * @param[in] ctrlType - the stack control type(user defined).
-     * @param[in] ctrlData - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      */
-    void CtrlStack(int ctrlType, const LLBC_Variant &ctrlData);
+    void CtrlStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
     
     /**
      * Control raw-part protocol stack.
-     * @param[in] ctrlType - the stack control type(user defined).
-     * @param[in] ctrlData - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      */
-    bool CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData);
+    bool CtrlStackRaw(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
 
     /**
      * Control codec-part protocol stack.
-     * @param[in] ctrlType - the stack control type(user defined).
-     * @param[in] ctrlData - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      */
-    bool CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData);
+    bool CtrlStackCodec(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
 
 private:
     StackType _type;

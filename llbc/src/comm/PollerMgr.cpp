@@ -260,9 +260,9 @@ void LLBC_PollerMgr::Close(int sessionId, const char *reason)
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
-void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg));
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg));
 }
 
 int LLBC_PollerMgr::AllocSessionId()

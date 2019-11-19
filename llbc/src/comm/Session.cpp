@@ -328,12 +328,12 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block, bool &sessionRemoved)
     return true;
 }
 
-void LLBC_Session::CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData)
+void LLBC_Session::CtrlProtocolStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     if (_fullStack)
-        (void)_protoStack->CtrlStack(ctrlType, ctrlData);
+        (void)_protoStack->CtrlStack(cmd, ctrlData, removeSession);
     else
-        (void)_protoStack->CtrlStackRaw(ctrlType, ctrlData);
+        (void)_protoStack->CtrlStackRaw(cmd, ctrlData, removeSession);
 }
 
 __LLBC_NS_END

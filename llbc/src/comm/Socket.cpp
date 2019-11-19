@@ -363,6 +363,11 @@ bool LLBC_Socket::IsExistNoSendData() const
     return !!_willSend.FirstBlock();
 }
 
+const LLBC_MessageBuffer &LLBC_Socket::GetWillSendBuffer() const
+{
+    return _willSend;
+}
+
 int LLBC_Socket::Recv(char *buf, int len)
 {
     return LLBC_Recv(_handle, buf, len, 0);

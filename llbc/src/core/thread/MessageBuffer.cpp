@@ -52,7 +52,7 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
     }
 
     size_t needReadLen = len;
-    while (needReadLen > 0)
+    while (needReadLen > 0 && _head)
     {
         size_t availableSize = _head->GetWritePos() - _head->GetReadPos();
         if (availableSize >= needReadLen)
@@ -171,14 +171,14 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
 
 size_t LLBC_MessageBuffer::Remove(size_t length)
 {
-    if (UNLIKELY(length < 0))
+    if (UNLIKELY(length <= 0))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return 0;
     }
 
     size_t needRemoveLength = length;
-    while (needRemoveLength > 0)
+    while (needRemoveLength > 0 && _head)
     {
         size_t availableSize = _head->GetWritePos() - _head->GetReadPos();
         if (availableSize >= needRemoveLength)
