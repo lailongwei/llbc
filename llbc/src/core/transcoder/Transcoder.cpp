@@ -251,7 +251,34 @@ int LLBC_Transcoder::MultiByteFileToMultiByteFile(const LLBC_String &fromCode, c
     return WriteMultiByteToFile(destContent, destFile);
 }
 
-int LLBC_Transcoder::ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content)
+LLBC_WString LLBC_Transcoder::MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src)
+{
+    LLBC_WString dest;
+    if (MultiByteToWideChar(fromCode, src, dest) == LLBC_OK)
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    return dest;
+}
+
+LLBC_String LLBC_Transcoder::WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src)
+{
+    LLBC_String dest;
+    if (WideCharToMultiByte(toCode, src, dest) == LLBC_OK)
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    return dest;
+}
+
+LLBC_String LLBC_Transcoder::MultiByteToMultiByte(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &toCode)
+{
+    LLBC_String dest;
+    if (MultiByteToMultiByte(fromCode, src, toCode, dest) == LLBC_OK)
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    return dest;
+}
+
+    int LLBC_Transcoder::ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content)
 {
     content = LLBC_File::ReadToEnd(fileName);
     if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
