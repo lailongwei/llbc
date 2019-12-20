@@ -54,7 +54,11 @@ void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &format
     int index = static_cast<int>(formattedData.size());
 
     char buf[32];
+    #if LLBC_TARGET_PLATFORM_WIN32
     ::sprintf_s(buf, sizeof(buf), "%d", data.threadId);
+    #else
+    ::sprintf(buf, "%d", data.threadId);
+    #endif
     formattedData.append(buf);
 
     LLBC_LogFormattingInfo *formatter = GetFormatter();
