@@ -43,7 +43,7 @@ int __LLBC_CommonStartup()
 #if LLBC_TARGET_PLATFORM_WIN32
     tls->coreTls.threadId = ::GetCurrentThreadId();
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    tls->coreTls.threadId = ::gettid();
+    tls->coreTls.threadId = syscall(SYS_gettid);
 #else // LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC (FreeBSD kernel)
     tls->coreTls.threadId = pthread_getthreadid_np();
 #endif
