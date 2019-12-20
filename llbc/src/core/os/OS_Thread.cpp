@@ -373,6 +373,15 @@ LLBC_NativeThreadHandle LLBC_GetCurrentThread()
 #endif
 }
 
+LLBC_ThreadId LLBC_GetCurrentThreadId()
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    return pthread_getthreadid_np();
+#else
+    return ::GetCurrentThreadId();
+#endif
+}
+
 int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle)
 {
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)

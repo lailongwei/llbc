@@ -53,7 +53,10 @@ int LLBC_LogProcessIdToken::GetType() const
 void LLBC_LogProcessIdToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     int index = static_cast<int>(formattedData.size());
-    formattedData.append(LLBC_Num2Str(_processId));
+
+    char buf[32];
+    ::sprintf_s(buf, sizeof(buf), "%d", _processId);
+    formattedData.append(buf);
 
     LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);

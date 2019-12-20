@@ -41,8 +41,10 @@ int __LLBC_CommonStartup()
     tls->coreTls.threadHandle = LLBC_INVALID_HANDLE;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
+    tls->coreTls.threadId = pthread_getthreadid_np();
     tls->coreTls.nativeThreadHandle = pthread_self();
 #else // LLBC_TARGET_PLATFORM_WIN32
+    tls->coreTls.threadId = ::GetCurrentThreadId();
     HANDLE pseudoHandle = ::GetCurrentThread();
     ::DuplicateHandle(GetCurrentProcess(),
                       pseudoHandle,

@@ -100,10 +100,16 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
                                               int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE);
 
 /**
- * Get Current native thread handle.
+ * Get current native thread handle.
  * @return LLBC_NativeThreadHandle - native thread handle.
  */
 LLBC_EXTERN LLBC_EXPORT LLBC_NativeThreadHandle LLBC_GetCurrentThread();
+
+/**
+ * Get current native thread Id.
+ * @return LLBC_ThreadId - native thread Id.
+ */
+LLBC_EXTERN LLBC_EXPORT LLBC_ThreadId LLBC_GetCurrentThreadId();
 
 /**
  * Get thread priority.

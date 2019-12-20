@@ -64,6 +64,7 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
     tls->coreTls.llbcThread = true;
     tls->coreTls.threadHandle = threadArg->threadHandle;
+    tls->coreTls.threadId = LLBC_NS LLBC_GetCurrentThreadId();
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     tls->coreTls.nativeThreadHandle = LLBC_NS LLBC_GetCurrentThread();
 #else // LLBC_TARGET_PLATFORM_WIN32
@@ -111,8 +112,8 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_ThreadManager::LLBC_ThreadManager()
-    : _maxThreadHandle(LLBC_INVALID_HANDLE)
-    , _maxGroupHandle(LLBC_INVALID_HANDLE)
+: _maxThreadHandle(LLBC_INVALID_HANDLE)
+, _maxGroupHandle(LLBC_INVALID_HANDLE)
 {
     ::memset(_groups, 0, sizeof(_groups));
     ::memset(_threads, 0, sizeof(_threads));
