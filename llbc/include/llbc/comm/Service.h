@@ -490,9 +490,9 @@ private:
     /**
      * Auto-Release pool operation methods.
      */
-    void CreateAutoReleasePool();
+    void InitAutoReleasePool();
     void UpdateAutoReleasePool();
-    void DestroyAutoReleasePool();
+    void ClearAutoReleasePool();
 
     /**
     * Object pool operation methods.

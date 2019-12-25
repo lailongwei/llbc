@@ -60,6 +60,7 @@ struct Serialize_Test2
     }
 };
 
+static void ClearTest();
 static void RawSerializeTest();
 static void STLContainersSerializeTest();
 static void MethodSerializeTest();
@@ -73,6 +74,7 @@ static LLBC_String ToStringMap(const std::map<int, int> &m);
 
 int TestCase_Com_Stream::Run(int argc, char *argv[])
 {
+    ClearTest();
     RawSerializeTest();
     STLContainersSerializeTest();
     MethodSerializeTest();
@@ -81,6 +83,31 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     getchar();
 
     return LLBC_OK;
+}
+
+static void ClearTest()
+{
+    LLBC_PrintLine("Clear stream test:");
+    LLBC_Stream s;
+    s.Write(32);
+    s.Write(true);
+    s.Write(false);
+    LLBC_PrintLine("Before clear non-attach stream, s.pos:%lu, s.size:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetSize(), s.GetBuf(), s.IsAttach());
+
+    s.Clear();
+    LLBC_PrintLine("After clear non-attack stream, s.pos:%lu, s.size:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetSize(), s.GetBuf(), s.IsAttach());
+
+    LLBC_Stream s2;
+    char *buf = LLBC_Malloc(char, 1024);
+    s2.Attach(buf, 1024);
+    s2.Write(10086);
+    s2.Skip(1000);
+    LLBC_PrintLine("Before clear attach stream, s.pos:%lu, s.size:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetSize(), s2.GetBuf(), s2.IsAttach());
+
+    s2.Clear();
+    LLBC_PrintLine("After clear attach stream, s.pos:%lu, s.size:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetSize(), s2.GetBuf(), s2.IsAttach());
+
+    LLBC_Free(buf);
 }
 
 static void RawSerializeTest()

@@ -1287,7 +1287,7 @@ void LLBC_Service::Svc()
     AddServiceToTls();
     InitObjectPools();
     InitTimerScheduler();
-    CreateAutoReleasePool();
+    InitAutoReleasePool();
     _facadesInitRet = InitFacades();
     _facadesInitFinished = 1;
     if (UNLIKELY(_facadesInitRet != LLBC_OK))
@@ -1326,7 +1326,7 @@ void LLBC_Service::Cleanup()
 
     // Stop facades, destroy release-pool.
     StopFacades();
-    DestroyAutoReleasePool();
+    ClearAutoReleasePool();
 
     // Clear holded timer-scheduler & object-pools.
     ClearHoldedObjectPools();
@@ -1919,14 +1919,9 @@ void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
     }
 }
 
-void LLBC_Service::CreateAutoReleasePool()
+void LLBC_Service::InitAutoReleasePool()
 {
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-
-    _releasePoolStack = LLBC_New(LLBC_AutoReleasePoolStack);
-    tls->objbaseTls.poolStack = _releasePoolStack;
-
-    LLBC_New(LLBC_AutoReleasePool);
+    _releasePoolStack = LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack();
 }
 
 void LLBC_Service::UpdateAutoReleasePool()
@@ -1935,12 +1930,9 @@ void LLBC_Service::UpdateAutoReleasePool()
         _releasePoolStack->Purge();
 }
 
-void LLBC_Service::DestroyAutoReleasePool()
+void LLBC_Service::ClearAutoReleasePool()
 {
-    LLBC_XDelete(_releasePoolStack);
-
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    tls->objbaseTls.poolStack = NULL;
+    _releasePoolStack = NULL;
 }
 
 void LLBC_Service::InitObjectPools()

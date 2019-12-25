@@ -38,8 +38,10 @@ __LLBC_NS_BEGIN
  * \brief The auto release pool stack class encapsulation.
  *        Use to manage the auto release pool.
  */
-class LLBC_HIDDEN LLBC_AutoReleasePoolStack
+class LLBC_EXPORT LLBC_AutoReleasePoolStack
 {
+    typedef LLBC_AutoReleasePoolStack _This;
+
 public:
     LLBC_AutoReleasePoolStack();
     ~LLBC_AutoReleasePoolStack();
@@ -83,6 +85,13 @@ public:
      * Purge all pools.
      */
     void Purge();
+
+public:
+    /**
+     * Get current thread release pool stack.
+     * @return _This * - the current thread release pool stack.
+     */
+    static _This *GetCurrentThreadReleasePoolStack();
 
 private:
     LLBC_AutoReleasePool *_head;

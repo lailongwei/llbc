@@ -410,15 +410,19 @@ inline void LLBC_Stream::Resize(size_t newSize)
     }
 }
 
-inline void LLBC_Stream::Cleanup()
+inline void LLBC_Stream::Clear()
 {
-    if (_buf && !_attach)
-        free(_buf);
+    if (_attach)
+    {
+        _buf = NULL;
+        _pos = _size = 0;
 
-    _buf = NULL;
-    _size = _pos = 0;
-
-    _attach = false;
+        _attach = false;
+    }
+    else
+    {
+        _pos = 0;
+    }
 }
 
 inline bool LLBC_Stream::ReadBool(bool &value)

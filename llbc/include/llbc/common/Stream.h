@@ -856,9 +856,9 @@ public:
     void Resize(size_t newSize);
 
     /**
-     * Cleanup stream.
+     * Clear stream.
      */
-    void Cleanup();
+    void Clear();
 
 public:
     /**
