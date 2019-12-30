@@ -36,6 +36,7 @@ public:
 
 private:
     void DoBasicTest();
+    void DoOrderedDeleteTest();
     void DoConverienceMethodsTest();
     void DoPrefTest();
 };

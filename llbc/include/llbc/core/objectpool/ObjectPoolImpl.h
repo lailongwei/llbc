@@ -29,34 +29,32 @@ __LLBC_NS_BEGIN
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
 : LLBC_IObjectPool()
+, _orderedDeleteNodes(NULL)
+, _topOrderedDeleteNodes(NULL)
 {
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
 {
+    // Lock pool.
     LLBC_LockGuard guard(_lock);
-    LLBC_STLHelper::DeleteContainer(_poolDict, true, false);
-}
 
-template <typename PoolLockType, typename PoolInstLockType>
-template <typename ObjectType>
-LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
-{
-    const char *objectType = typeid(ObjectType).name();
+    // Delete acquire ordered delete pool instances.
+    if (_orderedDeleteNodes)
+    {
+        for (LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _topOrderedDeleteNodes->begin();
+             nodeIt != _topOrderedDeleteNodes->end();
+             ++nodeIt)
+            DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 
-    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+        LLBC_STLHelper::DeleteContainer(*_orderedDeleteNodes, false);
+        LLBC_Delete(_orderedDeleteNodes);
+        LLBC_Delete(_topOrderedDeleteNodes);
+    }
 
-    _lock.Lock();
-    if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
-    else
-        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
-
-    _lock.Unlock();
-
-    return poolInst;
+    // Delete unacquire ordered delete pool instances.
+    LLBC_STLHelper::DeleteContainer(_poolInsts, true, false);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -69,8 +67,8 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
     else
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
 
@@ -89,8 +87,8 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
     else
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
 
@@ -109,8 +107,8 @@ LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Ge
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolDict.find(objectType)) == _poolDict.end())
-        _poolDict.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
     else
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
 
@@ -133,7 +131,7 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
     std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if (UNLIKELY((it = _poolDict.find(objectType)) == _poolDict.end()))
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
     {
         _lock.Unlock();
 
@@ -148,6 +146,172 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
     poolInst->Release(obj);
 
     return LLBC_OK;
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename ObjectType>
+LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
+{
+    const char *objectType = typeid(ObjectType).name();
+
+    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
+    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+
+    _lock.Lock();
+    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    else
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+
+    _lock.Unlock();
+
+    return poolInst;
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename FrontObjectType, typename BackObjectType>
+int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
+{
+    // Same object type check.
+    const char *frontNodeName = typeid(FrontObjectType).name();
+    const char *backNodeName = typeid(BackObjectType).name();
+    if (UNLIKELY(frontNodeName == backNodeName))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    // Lock pool.
+    LLBC_LockGuard guard(_lock);
+
+    // Check and create nodes containers.
+    if (!_orderedDeleteNodes)
+    {
+        _orderedDeleteNodes = LLBC_New(LLBC_ObjectPoolOrderedDeleteNodes);
+        _topOrderedDeleteNodes = LLBC_New(LLBC_ObjectPoolOrderedDeleteNodes);
+    }
+
+    // Try fetch frontNode & backNode.
+    LLBC_ObjectPoolOrderedDeleteNode *frontNode = NULL;
+    LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _orderedDeleteNodes->find(frontNodeName);
+    if (nodeIt != _orderedDeleteNodes->end())
+        frontNode = nodeIt->second;
+
+    LLBC_ObjectPoolOrderedDeleteNode *backNode = NULL;
+    nodeIt = _orderedDeleteNodes->find(backNodeName);
+    if (nodeIt != _orderedDeleteNodes->end())
+        backNode = nodeIt->second;
+
+    // Case 1: frontNode & backNode never add to <_orderedDeleteNodes> container.
+    if (!frontNode && !backNode)
+    {
+        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+
+        _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
+        _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
+
+        frontNode->AddBackNode(backNode);
+        _topOrderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
+
+        return LLBC_OK;
+    }
+
+    // Case 2: frontNode found, backNode not found.
+    else if (frontNode && !backNode)
+    {
+        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+        _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
+
+        frontNode->AddBackNode(backNode);
+
+        return LLBC_OK;
+    }
+
+    // Case 3: frontNode not found, backNode found.
+    else if (!frontNode && backNode)
+    {
+        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
+
+        // backNode is top node.
+        if (!backNode->GetFrontNode())
+        {
+            _topOrderedDeleteNodes->erase(backNodeName);
+
+            frontNode->AddBackNode(backNode);
+            _topOrderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
+        }
+        else // backNode is not top node.
+        {
+            LLBC_ObjectPoolOrderedDeleteNode *grandFrontNode = backNode->GetFrontNode();
+            grandFrontNode->RemoveBackNode(backNodeName, false);
+
+            frontNode->AddBackNode(backNode);
+            grandFrontNode->AddBackNode(frontNode);
+        }
+
+        return LLBC_OK;
+    }
+
+    // Case 4: frontNode & backNode found.
+    else
+    {
+        // Node relationship between inversion check.
+        if (frontNode->IsFrontNode(backNode->GetNodeName()))
+        {
+            LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+            return LLBC_FAILED;
+        }
+
+        // Exec adjust.
+        // eg: 
+        //   before adjust nodes graph:
+        //      A --> X --> Y1 --> Z1
+        //             |--> Y2 --> Z2
+        //      B --> I --> J1 --> K1
+        //             |--> J2 --> K2
+        // If caller acquire X before I delete(X --> I), below graph is the adjusted nodes graph:
+        //      A --> X --> B -- >I --> Y1 --> Z1
+        //                         |--> Y2 --> Z2
+        //                         |--> J1 --> K1
+        //                         |--> J2 --> K2
+        LLBC_ObjectPoolOrderedDeleteNode *backNodeTopParentNode = backNode->GetTopFrontNode();
+        if (!backNodeTopParentNode)
+            _topOrderedDeleteNodes->erase(backNodeName);
+        else
+            _topOrderedDeleteNodes->erase(backNodeTopParentNode->GetNodeName());
+
+        frontNode->AdjustBackNodesFrontNode(backNode);
+        if (backNodeTopParentNode)
+            frontNode->AddBackNode(backNodeTopParentNode);
+        else
+            frontNode->AddBackNode(backNode);
+
+        return LLBC_OK;
+    }
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
+{
+    // Delete node pool instance.
+    _PoolInsts::iterator instIt = _poolInsts.find(node->GetNodeName());
+    if (instIt != _poolInsts.end())
+    {
+        LLBC_Delete(instIt->second);
+        _poolInsts.erase(instIt);
+    }
+
+    // Delete back nodes pool instances.
+    const LLBC_ObjectPoolOrderedDeleteNodes *backNodes = node->GetBackNodes();
+    if (!backNodes)
+        return;
+
+    for (LLBC_ObjectPoolOrderedDeleteNodes::const_iterator nodeIt = backNodes->begin();
+         nodeIt != backNodes->end();
+         ++nodeIt)
+        DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 }
 
 __LLBC_NS_END

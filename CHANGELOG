@@ -26,6 +26,7 @@
 # 21)【llbc core】更新mtrandom库.
 # 22)【llbc core】增加LLBC_GetCurrentThreadId()支持, 对应LLBC_ThreadId数据类型增加.
 # 23)【llbc core】优化Log ThreadId/ProcessId Token打印信息.
+# 24)【llbc core】ObjectPool删除ObjectPoolInsts时, 增加删除顺序依赖支持.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
