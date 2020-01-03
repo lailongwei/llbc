@@ -70,6 +70,11 @@ inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
+inline void LLBC_EventManager::FireEvent(int id)
+{
+    FireEvent(new LLBC_Event(id));
+}
+
 inline bool LLBC_EventManager::IsFiring() const
 {
     return _firing > 0;

@@ -332,30 +332,32 @@ void LLBC_ProtocolStack::Report(int sessionId, int opcode, LLBC_IProtocol *proto
                                                   msg));
 }
 
-void LLBC_ProtocolStack::CtrlStack(int ctrlType, const LLBC_Variant &ctrlData)
+void LLBC_ProtocolStack::CtrlStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
-    if (!CtrlStackCodec(ctrlType, ctrlData))
+    if (!CtrlStackCodec(cmd, ctrlData, removeSession))
         return;
 
-    CtrlStackRaw(ctrlType, ctrlData);
+    CtrlStackRaw(cmd, ctrlData, removeSession);
 }
 
-bool LLBC_ProtocolStack::CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_ProtocolStack::CtrlStackRaw(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     for (int layer = _Layer::PackLayer; layer <= _Layer::CompressLayer; ++layer)
     {
-        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+        removeSession = false;
+        if (!_protos[layer]->Ctrl(cmd, ctrlData, removeSession))
             return false;
     }
 
     return true;
 }
 
-bool LLBC_ProtocolStack::CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_ProtocolStack::CtrlStackCodec(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     for (int layer = _Layer::CodecLayer; layer != _Layer::End; ++layer)
     {
-        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+        removeSession = false;
+        if (!_protos[layer]->Ctrl(cmd, ctrlData, removeSession))
             return false;
     }
 

@@ -35,7 +35,7 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    void TestCtrlScene(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    void TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
 
 private:
     LLBC_IService *_svc;

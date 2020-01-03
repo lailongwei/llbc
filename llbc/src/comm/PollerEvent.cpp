@@ -50,7 +50,8 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(int sessionId, LLBC_Socket 
     return block;
 }
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId, const LLBC_SockAddr_IN &peerAddr)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
+                                                       const LLBC_SockAddr_IN &peerAddr)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
@@ -149,7 +150,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *sessi
     return block;
 }
 
-LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
@@ -159,7 +160,7 @@ LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, i
 
     ev.type = _Ev::CtrlProtocolStack;
     ev.sessionId = sessionId;
-    ev.un.protocolStackCtrlInfo.ctrlType = ctrlType;
+    ev.un.protocolStackCtrlInfo.ctrlCmd = ctrlCmd;
     ev.un.protocolStackCtrlInfo.ctrlDataLen = ctrlDataStream.GetSize();
     ev.un.protocolStackCtrlInfo.ctrlData = LLBC_Malloc(void, ctrlDataStream.GetSize());
     ::memcpy(ev.un.protocolStackCtrlInfo.ctrlData, ctrlDataStream.GetBuf(), ctrlDataStream.GetSize());
@@ -204,7 +205,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
                 LLBC_Variant ctrlData;
                 ctrlDataStream.Read(ctrlData);
 
-                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
             }
 
             LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);

@@ -41,13 +41,15 @@ const uint64 LLBC_FacadeEvents::OnSessionDestroy = 1 << LLBC_FacadeEventsOffset:
 const uint64 LLBC_FacadeEvents::OnAsyncConnResult = 1 << LLBC_FacadeEventsOffset::OnAsyncConnResult;
 const uint64 LLBC_FacadeEvents::OnProtoReport = 1 << LLBC_FacadeEventsOffset::OnProtoReport;
 const uint64 LLBC_FacadeEvents::OnUnHandledPacket = 1 << LLBC_FacadeEventsOffset::OnUnHandledPacket;
+const uint64 LLBC_FacadeEvents::OnAppCfgReloaded = 1 << LLBC_FacadeEventsOffset::OnAppCfgReloaded;
 
 const uint64 LLBC_FacadeEvents::AllEvents = LLBC_FacadeEvents::OnInitialize | LLBC_FacadeEvents::OnDestroy |
                                             LLBC_FacadeEvents::OnStart | LLBC_FacadeEvents::OnStop |
                                             LLBC_FacadeEvents::OnUpdate | LLBC_FacadeEvents::OnIdle |
                                             LLBC_FacadeEvents::OnSessionCreate | LLBC_FacadeEvents::OnSessionDestroy |
                                             LLBC_FacadeEvents::OnAsyncConnResult | LLBC_FacadeEvents::OnProtoReport |
-                                            LLBC_FacadeEvents::OnUnHandledPacket;
+                                            LLBC_FacadeEvents::OnUnHandledPacket |
+                                            LLBC_FacadeEvents::OnAppCfgReloaded;
 
 const uint64 LLBC_FacadeEvents::DefaultEvents = LLBC_FacadeEvents::AllEvents & ~(LLBC_FacadeEvents::OnUpdate | LLBC_FacadeEvents::OnIdle);
 

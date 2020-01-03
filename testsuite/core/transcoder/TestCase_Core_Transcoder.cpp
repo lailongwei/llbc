@@ -82,8 +82,6 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
 {
     LLBC_PrintLine("Simple convert test");
 
-    LLBC_Transcoder *transcoder = LLBC_TranscoderSingleton;
-
     // Test coding string(gbk coding): ÄãºÃ.
     // GBK binary view:      c4 e3 ba c3
     const LLBC_String gbkBinaryData = "c4 e3 ba c3";
@@ -99,7 +97,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
     // Test GBK->UTF8.
     LLBC_String utf8Str;
     LLBC_String gbkStr = "ÄãºÃ";
-    if(transcoder->MultiByteToMultiByte(
+    if(LLBC_Transcoder::MultiByteToMultiByte(
         "GBK", gbkStr, "UTF-8", utf8Str) != LLBC_OK)
     {
         LLBC_PrintLine("GBK->UTF8 convert failed, reason: %s", LLBC_FormatLastError());
@@ -109,7 +107,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         LLBC_Byte2Hex(utf8Str.c_str(), utf8Str.length()).c_str() );
     // Test GBK->UTF16.
     LLBC_WString utf16Str;
-    if(transcoder->MultiByteToWideChar("GBK", gbkStr, utf16Str) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToWideChar("GBK", gbkStr, utf16Str) != LLBC_OK)
     {
         LLBC_PrintLine("GBK->UTF16 convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -118,7 +116,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         LLBC_Byte2Hex(utf16Str.data(), utf16Str.size() * sizeof(wchar)).c_str() );
 
     // Test UTF8->GBK.
-    if(transcoder->MultiByteToMultiByte("UTF-8", utf8Str, "GBK", gbkStr) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToMultiByte("UTF-8", utf8Str, "GBK", gbkStr) != LLBC_OK)
     {
         LLBC_PrintLine("UTF8->GBK convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -126,7 +124,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
     LLBC_PrintLine("UTF8->GBK convert successed, gbk binary view: %s",
         LLBC_Byte2Hex(gbkStr.c_str(), gbkStr.length()).c_str() );
     // Test UTF8->UTF16.
-    if(transcoder->MultiByteToWideChar("UTF8", utf8Str, utf16Str) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToWideChar("UTF8", utf8Str, utf16Str) != LLBC_OK)
     {
         LLBC_PrintLine("UTF8->UTF16-LE convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -158,7 +156,7 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
     }
 
     LLBC_WString utf16Str;
-    if(LLBC_TranscoderSingleton->MultiByteToWideChar("UTF8", utf8Str, utf16Str) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToWideChar("UTF8", utf8Str, utf16Str) != LLBC_OK)
     {
         LLBC_PrintLine("UTF8->UTF16 convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -179,7 +177,7 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
     }
 
     LLBC_String gbkStr;
-    if(LLBC_TranscoderSingleton->MultiByteToMultiByte("UTF8", utf8Str, "GBK", gbkStr) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToMultiByte("UTF8", utf8Str, "GBK", gbkStr) != LLBC_OK)
     {
         LLBC_PrintLine("UTF8->GBK convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -220,7 +218,7 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
     }
 
     LLBC_WString utf16Str;
-    if(LLBC_TranscoderSingleton->MultiByteToWideChar("GBK", gbkStr, utf16Str) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToWideChar("GBK", gbkStr, utf16Str) != LLBC_OK)
     {
         LLBC_PrintLine("GBK->UTF16 convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -240,7 +238,7 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
     }
 
     LLBC_String utf8Str;
-    if(LLBC_TranscoderSingleton->MultiByteToMultiByte("GBK", gbkStr, "UTF8", utf8Str) != LLBC_OK)
+    if(LLBC_Transcoder::MultiByteToMultiByte("GBK", gbkStr, "UTF8", utf8Str) != LLBC_OK)
     {
         LLBC_PrintLine("GBK->UTF8 convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -263,7 +261,7 @@ int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
 {
     // Test UTF16->UTF8.
     const LLBC_String utf8FileName = LLBC_BaseName(inputFile) + "_out_utf16_to_utf8." + LLBC_ExtensionName(inputFile);
-    if(LLBC_TranscoderSingleton->WideCharFileToMultiByteFile("UTF8", inputFile, utf8FileName) != LLBC_OK)
+    if(LLBC_Transcoder::WideCharFileToMultiByteFile("UTF8", inputFile, utf8FileName) != LLBC_OK)
     {
         LLBC_PrintLine("UTF16->UTF8 convert failed, reason: %s", LLBC_FormatLastError());
         return -1;
@@ -273,7 +271,7 @@ int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
 
     // Test UTF16->GBK.
     const LLBC_String gbkFileName = LLBC_BaseName(inputFile) + "_out_utf16_to_gbk." + LLBC_ExtensionName(inputFile);
-    if(LLBC_TranscoderSingleton->WideCharFileToMultiByteFile("GBK", inputFile, gbkFileName) != LLBC_OK)
+    if(LLBC_Transcoder::WideCharFileToMultiByteFile("GBK", inputFile, gbkFileName) != LLBC_OK)
     {
         LLBC_PrintLine("UTF16->GBK convert failed, reason: %s", LLBC_FormatLastError());
         return -1;

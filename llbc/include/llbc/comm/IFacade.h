@@ -356,22 +356,22 @@ public:
 
 public:
     /**
-     * When service start and not not init facade before, will call then event handler function.
+     * When service start and not not init facade before, will call then event handler.
      */
     virtual bool OnInitialize();
 
     /**
-     * When service destroy, will call this event handler function.
+     * When service destroy, will call this event handler.
      */
     virtual void OnDestroy();
 
     /**
-     * When service start, will call this event handler function.
+     * When service start, will call this event handler.
      */
     virtual bool OnStart();
 
     /**
-     * When service stop, will call this event handler function.
+     * When service stop, will call this event handler.
      */
     virtual void OnStop();
 
@@ -386,6 +386,17 @@ public:
      * @param[in] idleTime - idle time, in milliseconds.
      */
     virtual void OnIdle(int idleTime);
+
+public:
+    /**
+     * When application ini config reload, will call this event handler.
+     */
+    virtual void OnApplicationIniConfigReload();
+
+    /**
+     * When application property config reload, will call this event handler.
+     */
+    virtual void OnApplicationPropertyConfigReload();
 
 public:
     /**

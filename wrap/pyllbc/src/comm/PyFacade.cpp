@@ -370,7 +370,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     Py_INCREF(pyStatusDesc);
 #endif
 
-    PyObject *pyPacketCObj = PyLong_FromLong(reinterpret_cast<long>(&packet));
+    PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
 
     PyObject *pyPacket = PyObject_CallFunctionObjArgs(_pyPacketCls,
                                                       _pySvc,

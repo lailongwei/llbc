@@ -160,6 +160,8 @@ typedef int LLBC_Handle;
 #if LLBC_TARGET_PLATFORM_LINUX
  typedef pthread_t LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ typedef int LLBC_ThreadId;
+ #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
  typedef pthread_spinlock_t LLBC_SpinLockHandle;
  typedef pthread_key_t LLBC_TlsHandle;
@@ -167,6 +169,8 @@ typedef int LLBC_Handle;
 #elif LLBC_TARGET_PLATFORM_WIN32
  typedef HANDLE LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE INVALID_HANDLE_VALUE
+ typedef int LLBC_ThreadId;
+ #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef CRITICAL_SECTION LLBC_MutexHandle;
  typedef CRITICAL_SECTION LLBC_SpinLockHandle;
  typedef DWORD LLBC_TlsHandle;
@@ -174,6 +178,8 @@ typedef int LLBC_Handle;
 #elif LLBC_TARGET_PLATFORM_IPHONE
  typedef pthread_t LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ typedef pthread_id_np_t LLBC_ThreadId;
+ #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
  typedef pthread_mutex_t LLBC_SpinLockHandle;
  typedef pthread_key_t LLBC_TlsHandle;
@@ -181,6 +187,8 @@ typedef int LLBC_Handle;
 #elif LLBC_TARGET_PLATFORM_MAC
  typedef pthread_t LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ typedef pthread_id_np_t LLBC_ThreadId;
+ #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
  typedef pthread_mutex_t LLBC_SpinLockHandle;
  typedef pthread_key_t LLBC_TlsHandle;
@@ -188,6 +196,8 @@ typedef int LLBC_Handle;
 #elif LLBC_TARGET_PLATFORM_ANDROID
  typedef pthread_t LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ typedef int LLBC_ThreadId;
+ #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
  typedef pthread_spinlock_t LLBC_SpinLockHandle;
  typedef pthread_key_t LLBC_TlsHandle;

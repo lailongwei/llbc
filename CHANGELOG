@@ -22,10 +22,17 @@
 # 17)【llbc core】Service Full-Stack 选项从Config中去除，变成Service属性，即不同Service中的Full-Stack选项可不同，在Create时指定.
 # 18)【llbc core】优化EventManager代码, LLBC_ListenerStub类型由String调整为uint64.
 # 19)【llbc core】objectpool增加对象MarkPoolObject():void方法识别, 以在生成对象时标记此对象为池子内部对象, 以供业务及框架未来拓展用.
+# 20)【llbc core】完善配置加载支持，IApplication/IFacade增加配置加载事件方法定义(ServiceMgr部分方法暂时线程不安全, 因项目需要先行提交).
+# 21)【llbc core】更新mtrandom库.
+# 22)【llbc core】增加LLBC_GetCurrentThreadId()支持, 对应LLBC_ThreadId数据类型增加.
+# 23)【llbc core】优化Log ThreadId/ProcessId Token打印信息.
+# 24)【llbc core】ObjectPool删除ObjectPoolInsts时, 增加删除顺序依赖支持.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
 #   -【llbc core】修复Task::Wait/Cancel/...方法在Task所有线程并未完全创建就快速调用时,时引发的ThreadManager无法完全等待的bug.
+#   -【llbc core】修复LLBC_BasicString::split()在对空串进行split且strip_empty为True时还会返回包含空串的bug.
+#   -【llbc core】修复LLBC_Random构造函数在seed为0时未自动应用当前时间戳做seed的bug.
 factory.
 #
 # Version: 1.0.6

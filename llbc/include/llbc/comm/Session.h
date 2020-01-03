@@ -253,18 +253,21 @@ public:
 
     /**
      * Received event handler method, call by socket, when data received, will call this metho.
-     * @param[in] block - the data block.
+     * @param[in] block           - the data block.
+     * @param[out] sessionRemoved - the session remove flag.
      * @return bool - return false if success, otherwise return false(if failed, this method will perform OnClose() op).
      */
-    bool OnRecved(LLBC_MessageBlock *block);
+    bool OnRecved(LLBC_MessageBlock *block, bool &sessionRemoved);
 
 public:
     /**
      * Control session protocol stack.
-     * @param[in] ctrlType  - the stack control type(user defined).
-     * @param[in] ctrlData  - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      */
-    void CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData);
+    void CtrlProtocolStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
 
 private:
     int _id;

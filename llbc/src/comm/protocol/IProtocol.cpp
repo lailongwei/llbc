@@ -31,6 +31,7 @@ __LLBC_NS_BEGIN
 
 LLBC_IProtocol::LLBC_IProtocol()
 : _sessionId(0)
+, _acceptSessionId(0)
 , _session(NULL)
 , _stack(NULL)
 , _svc(NULL)
@@ -48,6 +49,11 @@ int LLBC_IProtocol::GetSessionId() const
     return _sessionId;
 }
 
+int LLBC_IProtocol::GetAcceptSessionId() const
+{
+    return _acceptSessionId;
+}
+
 LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
 {
     return _stack;
@@ -63,7 +69,7 @@ const LLBC_IProtocol::Coders *LLBC_IProtocol::GetCoders() const
     return _coders;
 }
 
-bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_IProtocol::Ctrl(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     return true;
 }
@@ -71,7 +77,9 @@ bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
 void LLBC_IProtocol::SetSession(LLBC_Session *session)
 {
     _session = session;
+
     _sessionId = session->GetId();
+    _acceptSessionId = session->GetAcceptId();
 }
 
 void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)

@@ -209,8 +209,7 @@ void LLBC_BasePoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_Send(LLBC_PollerEvent &ev)
 {
-    _Sessions::iterator it = 
-        _sessions.find(ev.un.packet->GetSessionId());
+    _Sessions::iterator it = _sessions.find(ev.un.packet->GetSessionId());
     if (it == _sessions.end())
     {
         LLBC_Delete(ev.un.packet);
@@ -257,6 +256,7 @@ void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
 {
+    // Get session.
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
     {
@@ -264,17 +264,29 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
         return;
     }
 
+    // Control data deserialize.
     LLBC_Variant ctrlData;
     LLBC_Stream ctrlDataStream(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
     ASSERT(ctrlDataStream.Read(ctrlData) && "llbc library internal error: deserialize protocol stack control data failed!");
 
+    // Do protocol stack control.
+    bool removeSession = false;
     LLBC_Session *&session = it->second;
-    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData, removeSession);
 
+    // Clear control data.
     if (ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg)
-        ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+        ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
 
+    // Free ctrl data pointer.
     LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
+
+    // Remove session, if specified(Error number must be set when business logic determine remove this session).
+    if (removeSession)
+    {
+        session->OnClose();
+        return;
+    }
 }
 
 LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, LLBC_Session *acceptSession)
@@ -328,13 +340,12 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
 
     // Build event and push to service.
     LLBC_Socket *sock = session->GetSocket();
-    LLBC_MessageBlock *block = 
-        LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
-                                             sock->GetPeerAddress(),
-                                             sock->IsListen(),
-                                             session->GetId(),
-                                             session->GetAcceptId(),
-                                             sock->Handle());
+    LLBC_MessageBlock *block = LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
+                                                                    sock->GetPeerAddress(),
+                                                                    sock->IsListen(),
+                                                                    session->GetId(),
+                                                                    session->GetAcceptId(),
+                                                                    sock->Handle());
 
     _svc->Push(block);
 }
@@ -343,7 +354,6 @@ void LLBC_BasePoller::RemoveSession(LLBC_Session *session)
 {
     _sessions.erase(session->GetId());
     _sockets.erase(session->GetSocketHandle());
-
     LLBC_Delete(session);
 }
 

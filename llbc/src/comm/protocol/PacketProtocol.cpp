@@ -158,6 +158,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
             _packet = LLBC_New(LLBC_Packet);
             _headerAssembler.SetToPacket(*_packet);
             _packet->SetSessionId(_sessionId);
+            _packet->SetAcceptSessionId(_acceptSessionId);
             // Check length.
             const size_t packetLen = _packet->GetLength();
             if (packetLen < LLBC_INL_NS __llbc_headerLen)

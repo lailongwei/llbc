@@ -23,15 +23,25 @@
 
 __LLBC_NS_BEGIN
 
+inline const LLBC_ServiceMgr::Id2Services &LLBC_ServiceMgr::GetAllIndexedByIdServices() const
+{
+    return _id2Services;
+}
+
+inline const LLBC_ServiceMgr::Name2Services &LLBC_ServiceMgr::GetAllIndexedByNameServices() const
+{
+    return _name2Services;
+}
+
 inline LLBC_IService *LLBC_ServiceMgr::GetServiceNonLock(int id)
 {
-    _Services::iterator it = _id2Services.find(id);
+    Id2Services::iterator it = _id2Services.find(id);
     return it != _id2Services.end() ? it->second : NULL;
 }
 
 inline LLBC_IService *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_String &name)
 {
-    _Services2::iterator it = _name2Services.find(name);
+    Name2Services::iterator it = _name2Services.find(name);
     return it != _name2Services.end() ? it->second : NULL;
 }
 

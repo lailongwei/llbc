@@ -28,12 +28,14 @@
 
 #include "llbc/core/objectpool/IObjectPool.h"
 #include "llbc/core/objectpool/ObjectPoolInst.h"
+#include "llbc/core/objectpool/ObjectPoolOrderedDeleteNode.h"
 
 __LLBC_NS_BEGIN
 
 // Pre-declare some classes.
 template <typename ObjectType>
 class LLBC_ObjectGuard;
+class LLBC_ObjectPoolOrderedDeleteNode;
 
 /**
  * \brief The object pool class encapsulation.
@@ -91,13 +93,31 @@ public:
     template <typename ObjectType>
     LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
 
+    /**
+     * Acquire ordered delete pool instance.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename FrontObjectType, typename BackObjectType>
+    int AcquireOrderedDeletePoolInst();
+
+private:
+    /**
+     * Delete acquire ordered delete pool instance.
+     * @param[in] node - the ordered delete node.
+     */
+    void DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node);
+
 private:
     // Disable assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPool);
 
 private:
+    typedef std::map<const char *, LLBC_IObjectPoolInst *> _PoolInsts;
+
     PoolLockType _lock;
-    std::map<const char *, LLBC_IObjectPoolInst *> _poolDict;
+    _PoolInsts _poolInsts;
+     LLBC_ObjectPoolOrderedDeleteNodes *_orderedDeleteNodes;
+     LLBC_ObjectPoolOrderedDeleteNodes *_topOrderedDeleteNodes;
 };
 
 __LLBC_NS_END

@@ -33,6 +33,44 @@ namespace
     const int ListSize = 100;
     #endif
 
+    // Ordered delete test classes.
+    class OD_A {};
+    class OD_X
+    {
+    public:
+        OD_X()
+        : _a(NULL)
+        , _pool(NULL)
+        {
+        }
+
+        ~OD_X()
+        {
+            if (_pool && _a)
+                _pool->Release(_a);
+        }
+
+        void Init(LLBC_UnsafetyObjectPool *pool)
+        {
+            _pool = pool;
+            _a = pool->Get<OD_A>();
+        }
+
+    private:
+        OD_A *_a;
+        LLBC_UnsafetyObjectPool *_pool;
+    };
+    class OD_Y1 {};
+    class OD_Z1 {};
+    class OD_Y2 {};
+    class OD_Z2 {};
+    class OD_B {};
+    class OD_I {};
+    class OD_J1 {};
+    class OD_K1 {};
+    class OD_J2 {};
+    class OD_K2 {};
+
     // Define some test classes.
     class TestObj
     {
@@ -194,6 +232,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     LLBC_PrintLine("core/objectpool test:");
 
     DoBasicTest();
+    DoOrderedDeleteTest();
     DoConverienceMethodsTest();
     DoPrefTest();
 
@@ -267,6 +306,106 @@ void TestCase_Core_ObjectPool::DoBasicTest()
     }
 
     LLBC_PrintLine("Object pool basic test finished");
+}
+
+void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
+{
+    LLBC_PrintLine("Do ordered delete test(Please use debug tools too check test result):");
+
+    LLBC_PrintLine("Test case 1: <FrontNode == NULL && BackNode == NULL>:");
+    {
+        LLBC_UnsafetyObjectPool pool;
+        pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
+    }
+
+    LLBC_PrintLine("Test case 2: <FrontNode != NULL && BackNode == NULL>:");
+    {
+        {
+            // Before:
+            //     OD_A --> OD_B
+            // Let:
+            //     OD_B --> OD_I
+            // After:
+            //     OD_A --> OD_B --> OD_I
+            LLBC_UnsafetyObjectPool pool;
+            pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
+            pool.AcquireOrderedDeletePoolInst<OD_B, OD_I>();
+        }
+
+        {
+            // Before:
+            //    OD_A --> OD_B
+            // Let:
+            //    OD_A --> OD_I
+            // After:
+            //    OD_A --> OD_B
+            //        |--> OD_I
+            LLBC_UnsafetyObjectPool pool;
+            pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
+            pool.AcquireOrderedDeletePoolInst<OD_A, OD_I>();
+        }
+    }
+
+    LLBC_PrintLine("Test case 3: <FrontNode == NULL && BackNode != NULL>:");
+    {
+        {
+            // Before:
+            //    OD_B --> OD_X
+            // Let:
+            //    OD_A --> OD_B
+            // After:
+            //   OD_A --> OD_B -->OD_X
+            LLBC_UnsafetyObjectPool pool;
+            pool.AcquireOrderedDeletePoolInst<OD_B, OD_X>();
+            pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
+        }
+
+        {
+            // Before:
+            //    OD_B --> OD_X
+            // Let:
+            //    OD_A --> OD_X
+            // After:
+            //   OD_B --> OD_A -->OD_X
+            LLBC_UnsafetyObjectPool pool;
+            pool.AcquireOrderedDeletePoolInst<OD_B, OD_X>();
+            pool.AcquireOrderedDeletePoolInst<OD_A, OD_X>();
+        }
+    }
+
+    LLBC_PrintLine("Test 4: <FrontNode != NULL && BackNode != NULL>:");
+    {
+        // Before:
+        //    A --> X --> Y1 --> Z1
+        //    B --> I --> J1 --> K1
+        // Let:
+        //    X --> I
+        // After:
+        //    A --> X --> B -- >I --> Y1 --> Z1
+        //                       |--> J1 --> K1
+
+        LLBC_UnsafetyObjectPool pool;
+        // Build: A --> X --> Y1 --> Z1
+        pool.AcquireOrderedDeletePoolInst<OD_Y1, OD_Z1>();
+        pool.AcquireOrderedDeletePoolInst<OD_X, OD_Y1>();
+        pool.AcquireOrderedDeletePoolInst<OD_A, OD_X>();
+        // Build: B --> I --> J1 --> K1
+        pool.AcquireOrderedDeletePoolInst<OD_J1, OD_K1>();
+        pool.AcquireOrderedDeletePoolInst<OD_I, OD_J1>();
+        pool.AcquireOrderedDeletePoolInst<OD_B, OD_I>();
+        // Let: X --> I
+        pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
+    }
+
+    LLBC_PrintLine("Test 5: Real ordered delete test:");
+    {
+        // X --> A
+
+        LLBC_UnsafetyObjectPool pool;
+        pool.AcquireOrderedDeletePoolInst<OD_X, OD_A>();
+        OD_X *x = pool.Get<OD_X>();
+        x->Init(&pool);
+    }
 }
 
 void TestCase_Core_ObjectPool::DoConverienceMethodsTest()

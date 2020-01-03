@@ -77,7 +77,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         char *closeReason;
         struct
         {
-            int ctrlType;
+            int ctrlCmd;
             void *ctrlData;
             size_t ctrlDataLen;
             LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg;
@@ -100,7 +100,7 @@ public:
     /**
      * Build Async-Conn event.
      */
-    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId, 
+    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
                                                const LLBC_SockAddr_IN &peerAddr);
 
     /**
@@ -141,7 +141,7 @@ public:
     /**
      * Build control protocol stack event.
      */
-    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 public:
     /**

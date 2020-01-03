@@ -58,6 +58,7 @@
  #include <libgen.h>
  #include <sys/time.h>
  #include <sys/socket.h>
+ #include <sys/syscall.h>
  #include <netdb.h>
  #include <dirent.h>
  #include <semaphore.h>

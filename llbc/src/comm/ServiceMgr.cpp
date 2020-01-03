@@ -99,9 +99,8 @@ int LLBC_ServiceMgr::Wait()
         return LLBC_FAILED;
     }
 
-    _Services svcs = _id2Services;
-
-    for (_Services::iterator it = svcs.begin();
+    Id2Services svcs = _id2Services;
+    for (Id2Services::iterator it = svcs.begin();
          it != svcs.end();
          ++it)
     {
@@ -124,9 +123,8 @@ int LLBC_ServiceMgr::Stop()
         return LLBC_FAILED;
     }
 
-    _Services svcs = _id2Services;
-
-    for (_Services::iterator it = svcs.begin();
+    Id2Services svcs = _id2Services;
+    for (Id2Services::iterator it = svcs.begin();
          it != svcs.end();
          ++it)
     {
@@ -152,9 +150,9 @@ bool LLBC_ServiceMgr::InTls(const LLBC_IService *svc)
     return false;
 }
 
-bool LLBC_ServiceMgr::InTls(const This::_Services &svcs)
+bool LLBC_ServiceMgr::InTls(const This::Id2Services &svcs)
 {
-    for (_Services::const_iterator it = svcs.begin();
+    for (Id2Services::const_iterator it = svcs.begin();
          it != svcs.end();
          ++it)
         if (This::InTls(it->second))
@@ -163,9 +161,9 @@ bool LLBC_ServiceMgr::InTls(const This::_Services &svcs)
     return false;
 }
 
-bool LLBC_ServiceMgr::InTls(const This::_Services2 &svcs)
+bool LLBC_ServiceMgr::InTls(const This::Name2Services &svcs)
 {
-    for (_Services2::const_iterator it = svcs.begin();
+    for (Name2Services::const_iterator it = svcs.begin();
          it != svcs.end();
          ++it)
         if (This::InTls(it->second))

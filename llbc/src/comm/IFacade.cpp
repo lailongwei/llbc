@@ -356,6 +356,14 @@ void LLBC_IFacade::OnStop()
 {
 }
 
+void LLBC_IFacade::OnApplicationIniConfigReload()
+{
+}
+
+void LLBC_IFacade::OnApplicationPropertyConfigReload()
+{
+}
+
 void LLBC_IFacade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
 }

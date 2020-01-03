@@ -135,6 +135,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
         LLBC_EpollEvent epev;
         epev.data.fd = handle;
+        epev.data.u32 = ev.sessionId;
         epev.events = EPOLLOUT | EPOLLET;
         LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
     }
@@ -149,7 +150,17 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 
 void LLBC_EpollPoller::HandleEv_Send(LLBC_PollerEvent &ev)
 {
+    const int sessionId = ev.un.packet->GetSessionId();
+
     Base::HandleEv_Send(ev);
+
+    // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
+    _Sessions::iterator it = _sessions.find(sessionId);
+    if (it == _sessions.end())
+        return;
+
+    LLBC_Session *&session = it->second;
+    session->OnSend();
 }
 
 void LLBC_EpollPoller::HandleEv_Close(LLBC_PollerEvent &ev)
@@ -169,8 +180,9 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         if (HandleConnecting(ev.data.fd, ev.events))
             continue;
 
-        _Sockets::iterator it = _sockets.find(ev.data.fd);
-        if (UNLIKELY(it == _sockets.end()))
+        const int &sessionId = ev.data.u32;
+        _Sessions::iterator it = _sessions.find(sessionId);
+        if (UNLIKELY(it == _sessions.end()))
             continue;
 
         LLBC_Session *session = it->second;
@@ -181,9 +193,13 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             int sockErr;
             LLBC_SessionCloseInfo *closeInfo;
             if (sock->GetPendingError(sockErr) != LLBC_OK)
+            {
                 closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
+            }
             else
+            {
                 closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+            }
 
             session->OnClose(closeInfo);
         }
@@ -205,8 +221,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             {
                 // Maybe in session removed while calling OnRecv() method.
                 if ((ev.events & EPOLLIN) && 
-                        UNLIKELY(_sockets.find(
-                            ev.data.fd) == _sockets.end()))
+                        UNLIKELY(_sessions.find(sessionId) == _sessions.end()))
                     continue;
 
                 session->OnSend();
@@ -222,6 +237,24 @@ void LLBC_EpollPoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
     Base::HandleEv_TakeOverSession(ev);
 }
 
+void LLBC_EpollPoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
+{
+    // Store sessionId first.
+    const int sessionId = ev.sessionId;
+
+    // Do protocol stack control.
+    Base::HandleEv_CtrlProtocolStack(ev);
+
+    // Find session and force trigger OnSend() operation on Epoll trigger mode.
+    // TODO: Can be optimized.
+    _Sessions::iterator it = _sessions.find(sessionId);
+    if (it == _sessions.end())
+        return;
+
+    LLBC_Session *&session = it->second;
+    session->OnSend();
+}
+
 void LLBC_EpollPoller::AddSession(LLBC_Session *session)
 {
     Base::AddSession(session);
@@ -231,6 +264,7 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
 
     LLBC_EpollEvent epev;
     epev.data.fd = handle;
+    epev.data.u32 = session->GetId();
     epev.events = EPOLLIN | EPOLLET | EPOLLHUP | EPOLLERR;
     if (!sock->IsListen())
         epev.events |= EPOLLOUT;
@@ -307,12 +341,12 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
                                                       connected,
                                                       connected ? "Success" : LLBC_FormatLastError(),
                                                       asyncInfo.peerAddr));
+
+    LLBC_EpollEvent epev;
+    epev.events = EPOLLOUT | EPOLLET;
+    LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
     if (connected)
     {
-        LLBC_EpollEvent epev;
-        epev.events = EPOLLOUT | EPOLLET;
-        LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
-
         SetConnectedSocketDftOpts(sock);
         AddSession(CreateSession(sock, asyncInfo.sessionId));
     }

@@ -406,7 +406,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msgLen = len;
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    data->threadHandle = tls->coreTls.nativeThreadHandle;
+    data->threadId = tls->coreTls.threadId;
 
     return data;
 }

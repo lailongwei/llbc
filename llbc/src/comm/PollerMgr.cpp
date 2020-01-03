@@ -131,8 +131,10 @@ int LLBC_PollerMgr::Start(int count)
     for (_PendingAsyncConns::iterator it = _pendingAsyncConns.begin();
          it != _pendingAsyncConns.end();
          ++it)
+    {
         _pollers[it->first % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
+            LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
+    }
     _pendingAsyncConns.clear();
 
     return LLBC_OK;
@@ -145,6 +147,7 @@ void LLBC_PollerMgr::Stop()
     // Always cleanup pending async-conn container.
     _pendingAsyncConns.clear();
 
+    // Delete all pollers.
     if (_pollers)
     {
         for (int i = 0; i < _pollerCount; ++i)
@@ -153,6 +156,7 @@ void LLBC_PollerMgr::Stop()
         _pollerCount = 0;
     }
 
+    // Reset max sessionId.
     _maxSessionId = 1;
 }
 
@@ -207,7 +211,6 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *
     }
 
     sock->SetNonBlocking();
-
     const int sessionId = AllocSessionId();
     if (protoFactory)
         _svc->AddSessionProtocolFactory(sessionId, protoFactory);
@@ -257,9 +260,9 @@ void LLBC_PollerMgr::Close(int sessionId, const char *reason)
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
-void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg));
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg));
 }
 
 int LLBC_PollerMgr::AllocSessionId()
@@ -299,7 +302,7 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     }
 
     // Use LLBC_GetAddrInfo to fetch sockaddr.
-    struct addrinfo hints;
+    addrinfo hints;
     hints.ai_flags = 0;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;

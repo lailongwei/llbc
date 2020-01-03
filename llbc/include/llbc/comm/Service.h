@@ -273,12 +273,12 @@ public:
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control command(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 public:
     /**
@@ -317,7 +317,7 @@ public:
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -408,6 +408,12 @@ protected:
 
 protected:
     /**
+     * Application ini/property config reload event notifiy method.
+     */
+    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded);
+
+protected:
+    /**
      * Declare friend class: LLBC_pollerMgr.
      *  Access method list:
      *      AddSessionProtocolFactory()
@@ -467,6 +473,7 @@ private:
     void HandleEv_SubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
+    void HandleEv_AppCfgReloaded(LLBC_ServiceEvent &ev);
 
     /**
      * Facade operation methods.
@@ -483,9 +490,9 @@ private:
     /**
      * Auto-Release pool operation methods.
      */
-    void CreateAutoReleasePool();
+    void InitAutoReleasePool();
     void UpdateAutoReleasePool();
-    void DestroyAutoReleasePool();
+    void ClearAutoReleasePool();
 
     /**
     * Object pool operation methods.
@@ -544,7 +551,7 @@ private:
 
     volatile bool _started;
     volatile bool _stopping;
-    bool _initingFacade;
+    volatile bool _initingFacade;
 
     LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;

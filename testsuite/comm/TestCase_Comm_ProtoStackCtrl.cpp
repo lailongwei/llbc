@@ -27,10 +27,17 @@ namespace
     class TestPackProtocol : public LLBC_PacketProtocol
     {
     public:
-        virtual bool Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
+        virtual bool Ctrl(int ctrlCmd, const LLBC_Variant &ctrlData, bool &removeSession)
         {
-            LLBC_PrintLine(">>>Ctrl protocol, type:%d, data:%s", ctrlType, ctrlData.ToString().c_str());
-            return true;
+            LLBC_PrintLine(">>>Ctrl protocol, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
+            return false; // Return true if you want to pass control command to lower protocols.
+                          // Return false if you dont want to pass control command to lower protocols.
+
+            // For test remove session out parameter, if you want to remove session in control progress, set this parameter to true, and return false.
+            // removeSession = true;
+            // LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+            //
+            // return false;
         }
     };
 
@@ -55,6 +62,20 @@ namespace
             }
         }
     };
+
+    class TestFacade : public LLBC_IFacade
+    {
+    public:
+        virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+        {
+            LLBC_PrintLine("Session Create, sessionInfo:%s", sessionInfo.ToString().c_str());
+        }
+
+        virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+        {
+            LLBC_PrintLine("Session Destroy, destroyInfo:%s", destroyInfo.ToString().c_str());
+        }
+    };
 }
 
 TestCase_Comm_ProtoStackCtrl::TestCase_Comm_ProtoStackCtrl()
@@ -71,6 +92,9 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Communication Service protocol stack control test:");
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
+
+    // Register facade.
+    _svc->RegisterFacade(new TestFacade());
 
     // Start service.
     LLBC_PrintLine("Start service...");
@@ -91,19 +115,19 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     }
 
     // Ctrl service
-    int ctrlType;
+    int ctrlCmd;
     LLBC_Variant ctrlData;
-    ctrlType = 10086;
+    ctrlCmd = 10086;
     ctrlData["Hello"] = "World";
-    TestCtrlScene(sessionId, ctrlType, ctrlData);
+    TestCtrlScene(sessionId, ctrlCmd, ctrlData);
 
-    ctrlType = 10010;
+    ctrlCmd = 10010;
     ctrlData = 0x7fffffff;
-    TestCtrlScene(sessionId, ctrlType, ctrlData);
+    TestCtrlScene(sessionId, ctrlCmd, ctrlData);
 
-    ctrlType = 10010;
+    ctrlCmd= 10010;
     ctrlData = true;
-    TestCtrlScene(sessionId, ctrlType, ctrlData);
+    TestCtrlScene(sessionId, ctrlCmd, ctrlData);
 
     LLBC_FlushFile(stdout);
     LLBC_FlushFile(stderr);
@@ -119,8 +143,8 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Comm_ProtoStackCtrl::TestCtrlScene(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+void TestCase_Comm_ProtoStackCtrl::TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
 {
-    LLBC_PrintLine("Do control scene, type:%d, data:%s", ctrlType, ctrlData.ToString().c_str());
-    _svc->CtrlProtocolStack(sessionId, ctrlType, ctrlData);
+    LLBC_PrintLine("Do control scene, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
+    _svc->CtrlProtocolStack(sessionId, ctrlCmd, ctrlData);
 }

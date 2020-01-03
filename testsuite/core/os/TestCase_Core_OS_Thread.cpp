@@ -25,24 +25,22 @@
 static int ThreadProc(void *arg)
 {
     const char *threadDesc = reinterpret_cast<const char *>(arg);
-    if(::strcmp(threadDesc, "thread 1") == 0)
-    {
-//      LLBC_Sleep(1000);
-    }
 
     int loopVal = 10;
     for(int i = 0; i < loopVal; ++i)
     {
+        LLBC_ThreadId id = LLBC_GetCurrentThreadId();
         LLBC_NativeThreadHandle handle = LLBC_GetCurrentThread();
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-        LLBC_PrintLine("Hello, I'm thread[%p]: %s", handle, threadDesc);
+        LLBC_PrintLine("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
 #else
-        LLBC_PrintLine("Hello, I'm thread[%lu]: %s", handle, threadDesc);
+        LLBC_PrintLine("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
 #endif
-        LLBC_PrintLine("\tThread priority: %d", LLBC_GetThreadPriority(handle));
 
-        LLBC_Sleep(2000);
+        LLBC_Sleep(1000);
     }
+
+    LLBC_Sleep(60 * 1000);
 
     return 0;
 }
@@ -95,7 +93,8 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
         return -1;
     }
 
-    // Cancel thread1.
+    // Cancel thread1(after sleep sound times).
+    LLBC_Sleep(5000);
     LLBC_CancelThread(handle1);
 
     // Join it.

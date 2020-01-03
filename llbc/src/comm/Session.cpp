@@ -230,12 +230,6 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
     if (_socket->AsyncSend(block) != LLBC_OK)
         return LLBC_FAILED;
 
-    // In LINUX or ANDROID platform, if use EPOLL ET mode, we must force call OnSend() one time.
-#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    if (_pollerType == LLBC_PollerType::EpollPoller)
-        OnSend();
-#endif
-
     return LLBC_OK;
 }
 
@@ -299,10 +293,13 @@ void LLBC_Session::OnSent(size_t len)
     // ... ...
 }
 
-bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
+bool LLBC_Session::OnRecved(LLBC_MessageBlock *block, bool &sessionRemoved)
 {
     int recvRet;
-    bool removeSession;
+    bool &removeSession = sessionRemoved;
+
+    removeSession = false;
+
     _recvedPackets.clear();
     if (_fullStack)
         recvRet = _protoStack->Recv(block, _recvedPackets, removeSession);
@@ -331,12 +328,12 @@ bool LLBC_Session::OnRecved(LLBC_MessageBlock *block)
     return true;
 }
 
-void LLBC_Session::CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData)
+void LLBC_Session::CtrlProtocolStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     if (_fullStack)
-        (void)_protoStack->CtrlStack(ctrlType, ctrlData);
+        (void)_protoStack->CtrlStack(cmd, ctrlData, removeSession);
     else
-        (void)_protoStack->CtrlStackRaw(ctrlType, ctrlData);
+        (void)_protoStack->CtrlStackRaw(cmd, ctrlData, removeSession);
 }
 
 __LLBC_NS_END

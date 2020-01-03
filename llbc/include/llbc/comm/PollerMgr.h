@@ -125,12 +125,12 @@ public:
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control type(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    void CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    void CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 private:
     /**
@@ -177,7 +177,6 @@ private:
 
     typedef std::map<int, LLBC_Socket *> _PendingAddSocks;
     _PendingAddSocks _pendingAddSocks;
-
     typedef std::map<int, LLBC_SockAddr_IN> _PendingAsyncConns;
     _PendingAsyncConns _pendingAsyncConns;
 };

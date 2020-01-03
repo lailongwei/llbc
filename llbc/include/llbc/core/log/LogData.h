@@ -47,7 +47,7 @@ struct LLBC_EXPORT LLBC_LogData
     uint32 fileLen;                       // Log source file name length.
     long line;                            // Log source file line number.
 
-    LLBC_NativeThreadHandle threadHandle; // Log native thread handle.
+    LLBC_ThreadId threadId;               // Log native thread Id.
 };
 
 __LLBC_NS_END

@@ -343,47 +343,47 @@ public:
     /**
      * Remove session, always success.
      * @param[in] sessionId - the will close session Id.
-	 * @param[in] reason    - the close reason string, use to describe session close reason.
+     * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int RemoveSession(int sessionId, const char *reason = NULL) = 0;
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
-     * @param[in] ctrlData          - the stack control data(user defined).
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlCmd   - the stack control command(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearFunc - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearMeth - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control command(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
+    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
 
 public:
     /**
@@ -443,13 +443,13 @@ public:
     int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified handler method, if method return false, will stop packet process flow.
      */
     int UnifyPreSubscribe(bool(*func)(LLBC_Packet &));
     template <typename ObjType>
@@ -564,11 +564,25 @@ protected:
     friend class LLBC_Session;
 
     /**
-     * Stack create helper method(call by service and session class).
+     * Stack create helper methods(call by service and session class).
      */
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
+
+protected:
+    /**
+     * Declare friend class: LLBC_IApplication.
+     *  Access method list:
+     *      NtyApplicationIniConfigReload()
+     *      NtyApplicationPropertyConfigReload()
+     */
+    friend class LLBC_IApplication;
+
+    /**
+     * Application ini/property config reload event notifiy method.
+     */
+    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded) = 0;
 
 protected:
     /**
