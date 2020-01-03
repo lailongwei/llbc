@@ -66,7 +66,7 @@ private:
     const char *_tag;
     int _lv;
 
-    LLBC_Json::Document _doc;
+    LLBC_Json::Document &_doc;
 };
 
 __LLBC_NS_END
