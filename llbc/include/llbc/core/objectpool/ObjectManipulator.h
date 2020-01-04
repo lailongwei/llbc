@@ -59,6 +59,18 @@ public:
     template <typename ObjectType>
     static bool Reset(void *obj);
 
+    /**
+     * Pool instance create callback, this method is called when ObjectType object pool instance created.
+     */
+    template <typename ObjectType>
+    static void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Pool instance destroy callback, this method is called when ObjectType object pool instance will destroy.
+     */
+    template <typename ObjectType>
+    static void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst);
+
     #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
 private:
     /**
@@ -108,6 +120,37 @@ private:
      */
     template <typename ObjectType>
     static bool ResetObj(void *obj, ...);
+
+private:
+    /**
+     * Object pool instance create callback function caller, this method is called when object pool instance created.
+     */
+    template <typename ObjectType, void (ObjectType::*)(LLBC_IObjectPoolInst &)>
+    struct poolinstcreate_callable_type;
+    template <typename ObjectType>
+    static void OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *);
+
+    /**
+     * Default object pool instance create callback function caller.
+     */
+    template <typename ObjectType>
+    static void OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, ...);
+
+private:
+    /**
+     * Object pool instance destroy callback function caller, this method is called when object pool instance will destroy.
+     */
+    template <typename ObjectType, void (ObjectType::*)(LLBC_IObjectPoolInst &)>
+    struct poolinstdestroy_callable_type;
+    template <typename ObjectType>
+    static void OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *);
+
+    /**
+     * Default object pool instance destroy callback function caller.
+     */
+    template <typename ObjectType>
+    static void OnPoolInstDestroyInl(LLBC_IObjectPoolInst &pool, ...);
+
 };
 
 __LLBC_NS_END

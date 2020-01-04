@@ -212,13 +212,13 @@ void LLBC_BasePoller::HandleEv_Send(LLBC_PollerEvent &ev)
     _Sessions::iterator it = _sessions.find(ev.un.packet->GetSessionId());
     if (it == _sessions.end())
     {
-        LLBC_Delete(ev.un.packet);
+        LLBC_Recycle(ev.un.packet);
         return;
     }
 
     LLBC_Session *session = it->second;
     if (UNLIKELY(session->IsListen()))
-        LLBC_Delete(ev.un.packet);
+        LLBC_Recycle(ev.un.packet);
     else if (UNLIKELY(session->Send(ev.un.packet) != LLBC_OK))
         session->OnClose();
 }

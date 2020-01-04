@@ -40,7 +40,7 @@ namespace
     inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
     {
         if (LIKELY(!packet->IsDontDeleteAfterHandle()))
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
     }
 }
 
@@ -133,6 +133,8 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _safetyObjectPool(NULL)
 , _unsafetyObjectPool(NULL)
+, _packetObjectPool(NULL)
+, _msgBlockObjectPool(NULL)
 
 , _timerScheduler(NULL)
 
@@ -1588,7 +1590,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         LLBC_IService *recverSvc = _svcMgr.GetService(recverSvcId);
         if (recverSvc == NULL || !recverSvc->IsStarted())
         {
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             return;
         }
 
@@ -1939,10 +1941,13 @@ void LLBC_Service::InitObjectPools()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (!_safetyObjectPool)
+    {
         _safetyObjectPool = reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
-
-    if (!_unsafetyObjectPool)
         _unsafetyObjectPool = reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
+
+        _packetObjectPool = _safetyObjectPool->GetPoolInst<LLBC_Packet>();
+        _msgBlockObjectPool = _safetyObjectPool->GetPoolInst<LLBC_MessageBlock>();
+    }
 }
 
 void LLBC_Service::UpdateObjectPools()
@@ -1953,6 +1958,9 @@ void LLBC_Service::ClearHoldedObjectPools()
 {
     _safetyObjectPool = NULL;
     _unsafetyObjectPool = NULL;
+
+    _packetObjectPool = NULL;
+    _msgBlockObjectPool = NULL;
 }
 
 void LLBC_Service::InitTimerScheduler()
@@ -2016,7 +2024,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         if (lock)
             _lock.Unlock();
 
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
@@ -2038,7 +2046,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             if (lock)
                 _lock.Unlock();
 
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
 
             return LLBC_FAILED;
@@ -2053,7 +2061,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             if (lock)
                 _lock.Unlock();
 
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             LLBC_SetLastError(LLBC_ERROR_IS_LISTEN_SOCKET);
 
             return LLBC_FAILED;
@@ -2112,14 +2120,14 @@ int LLBC_Service::LockableSend(int svcId,
                                bool lock,
                                bool validCheck)
 {
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    // Create packet(from object pool) and send.
+    LLBC_Packet *packet = _packetObjectPool->GetObject();
     // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
     packet->SetHeader(svcId, sessionId, opcode, status);
-
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))
     {
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
         return ret;
     }
 
@@ -2137,7 +2145,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (sessionIds.empty())
     {
         if(LIKELY(coder))
-            LLBC_Delete(coder);
+            LLBC_Recycle(coder);
 
         return LLBC_OK;
     }
@@ -2146,7 +2154,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (UNLIKELY(!_started))
     {
         if (LIKELY(coder))
-            LLBC_Delete(coder);
+            LLBC_Recycle(coder);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
@@ -2154,20 +2162,21 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
 
-    LLBC_Packet *firstPacket = LLBC_New(LLBC_Packet);
+    LLBC_Packet *firstPacket = _packetObjectPool->GetObject();
     // firstPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
     firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
 
     bool hasCoder = true;
     if (LIKELY(coder))
     {
-        if (!coder->Encode(*firstPacket))
+        firstPacket->SetEncoder(coder);
+        if (!firstPacket->Encode())
         {
+            LLBC_Recycle(firstPacket);
             LLBC_SetLastError(LLBC_ERROR_ENCODE);
+
             return LLBC_FAILED;
         }
-
-        LLBC_Delete(coder);
     }
     else
     {
@@ -2202,7 +2211,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *otherPacket = _packetObjectPool->GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
             otherPacket->Write(payload, payloadLen);
@@ -2232,7 +2241,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *otherPacket = _packetObjectPool->GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
 
@@ -2249,7 +2258,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     for (size_t i = 0; i < otherPacketCnt; ++i)
     {
         LLBC_Packet *&otherPacket = otherPackets[i];
-        if (!otherPacket)
+        if (UNLIKELY(!otherPacket))
             continue;
 
         LockableSend(otherPacket, false, false); // Don't need vaildate check.

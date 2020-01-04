@@ -38,7 +38,9 @@ private:
     void DoBasicTest();
     void DoOrderedDeleteTest();
     void DoConverienceMethodsTest();
-    void DoPrefTest();
+    void DoPerfTest();
+    void DoComplexObjPerfTest();
+    void DoPoolDebugAssetTest();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__

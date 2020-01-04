@@ -63,7 +63,7 @@ public:
     int GetSenderServiceId() const;
     /**
      * Set sender service Id.
-     * @param[in] serviceId - receiver service Id.
+     * @param[in] senderServiceId - sender service Id.
      */
     void SetSenderServiceId(int senderServiceId);
 
@@ -250,10 +250,28 @@ public:
     const void *GetPayload() const;
 
     /**
+     * Get payload length.
+     * @return size_t - payload length.
+     */
+    size_t GetPayloadLength() const;
+
+    /**
+     * Get mutable payload(message block object pointer).
+     * @return LLBC_MessageBlock * - the mutable payload.
+     */
+    LLBC_MessageBlock *GetMutablePayload();
+
+    /**
+     * Detach payload.
+     * @return LLBC_MessageBlock * - the payload.
+     */
+    LLBC_MessageBlock *DetachPayload();
+
+    /**
     * Set payload data.
-    * @param[in] block - the new payload block.
+    * @param[in] payload - the new payload.
     */
-    void SetPayload(LLBC_MessageBlock *block);
+    void SetPayload(LLBC_MessageBlock *payload);
 
     /**
      * Set payload delete delegate.
@@ -263,20 +281,33 @@ public:
     void SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy = true);
 
     /**
-     * Get payload length.
-     * @return size_t - payload length.
-     */
-    size_t GetPayloadLength() const;
-
-    /**
      * Reset packet payload.
      */
     void ResetPayload();
 
 public:
     /**
-     * Clear packet object.
-     * Note: This operation will reset payload, delete encoder&decoder.
+     * Object-Pool reflection support: Mark pool object.
+     */
+    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: Is pool object.
+     */
+    bool IsPoolObject() const;
+
+    /**
+     * Object-Pool reflection support: Give back object to pool.
+     */
+    void GiveBackToPool();
+
+    /**
+     * Object-Pool reflection support: pool instance create event callback.
+     */
+    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: Clear message block, this operation will clear read&write position information.
      */
     void Clear();
 
@@ -419,7 +450,7 @@ public:
 
     /**
      * Give up encoder.
-     * @param[in] LLBC_ICoder * - the already give up encoder object pointer.
+     * @return LLBC_ICoder * - the already give up encoder object pointer.
      */
     LLBC_ICoder *GiveUpEncoder();
 
@@ -521,6 +552,14 @@ private:
 
 private:
     /**
+     * Check and create payload(if payload not exist).
+     * @param[in] initSize - the messageBlock init size(if need create, will use this parameter).
+     * @return LLBC_MessageBlock *& - the payload pointer reference.
+     */
+    LLBC_MessageBlock *&CheckAndCreatePayload(size_t initSize);
+
+private:
+    /**
      * Cleanup the pre-handle result data.
      */
     void CleanupPreHandleResult();
@@ -567,6 +606,9 @@ private:
     bool _deletePayloadDeleteDelegWhenDestroy;
 
     bool _dontDelAfterHandle;
+
+    LLBC_IObjectPoolInst *_selfPoolInst;
+    LLBC_IObjectPoolInst *_msgBlockPoolInst;
 };
 
 __LLBC_NS_END

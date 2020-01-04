@@ -65,6 +65,11 @@ int __LLBC_CoreStartup()
     if (tls->coreTls.needInitWinSock)
         LLBC_StartupNetLibrary();
 
+    // Supported object-pool reflection types assert.
+    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_MessageBlock>());
+    // Add all framework internal implemented object pool factories.
+    LLBC_IObjectPool::RegisterPoolInstFactory(new LLBC_MessageBlockObjectPoolInstFactory());
+
     return LLBC_OK;
 }
 
@@ -72,9 +77,6 @@ void __LLBC_CoreCleanup()
 {
     // Destroy entry thread timer scheduler.
     (void)LLBC_TimerScheduler::DestroyEntryThreadScheduler();
-
-    // Destroy entry thread object pool.
-    (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
 
     // Destroy main bundle.
     LLBC_Bundle::DestroyMainBundle();
@@ -86,6 +88,11 @@ void __LLBC_CoreCleanup()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->coreTls.needInitWinSock)
         LLBC_CleanupNetLibrary();
+
+    // Destroy entry thread object pool.
+    (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
+    // Destroy all object pool instance factories.
+    LLBC_IObjectPool::DestroyAllPoolInstFactories();
 }
 
 __LLBC_NS_END

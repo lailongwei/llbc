@@ -549,6 +549,31 @@ public:
 
 public:
     /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool() = 0;
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool() = 0;
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> &GetPacketObjectPool() = 0;
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> &GetMsgBlockObjectPool() = 0;
+
+public:
+    /**
      * One time service call routine, if service drive mode is ExternalDrive, you must manual call this method.
      * @param[in] fullFrame - the full frame flag.
      */

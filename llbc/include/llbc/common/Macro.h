@@ -282,6 +282,9 @@ private:                                            \
         }                           \
     } while(0)                      \
 
+#define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
+#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
+
 // memory set.
 #define LLBC_MemSet(dst, c, count)          (::memset(dst, c, count))
 // memory copy.

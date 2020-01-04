@@ -30,6 +30,17 @@ struct TestData : public LLBC_ICoder
     int iVal;
     LLBC_String strVal;
 
+    TestData()
+    : iVal(0)
+    , _poolInst(NULL)
+    {
+    }
+
+    virtual ~TestData()
+    {
+        std::cout <<"Test data destroyed!" <<std::endl;
+    }
+
     virtual bool Encode(LLBC_Packet &packet)
     {
         packet <<iVal <<strVal;
@@ -41,6 +52,30 @@ struct TestData : public LLBC_ICoder
         packet >>iVal >>strVal;
         return true;
     }
+
+    virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+    {
+        LLBC_ICoder::MarkPoolObject(poolInst);
+    }
+
+    virtual bool IsPoolObject() const
+    {
+        return LLBC_ICoder::IsPoolObject();
+    }
+
+    virtual void GiveBackToPool()
+    {
+        LLBC_ICoder::GiveBackToPool();
+    }
+
+    virtual void Clear()
+    {
+        iVal = 0;
+        strVal.clear();
+    }
+
+private:
+    LLBC_IObjectPoolInst *_poolInst;
 };
 
 class TestDataFactory : public LLBC_ICoderFactory
@@ -185,8 +220,8 @@ public:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, true))
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, false))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, true))
+// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, false))
 {
 }
 
@@ -321,7 +356,8 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library";
 
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    // LLBC_Packet *packet = LLBC_New(LLBC_Packet); // uncomment for test send non object-pool packet.
+     LLBC_Packet *packet = _svc->GetPacketObjectPool().GetObject();  // uncomment for test send object-pool packet.
     packet->SetHeader(connSession, 1, 0);
     packet->SetEncoder(encoder);
 
@@ -329,7 +365,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
 
     // Create status == 1 packet to send to peer(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    encoder = LLBC_New(TestData);
+    encoder = _svc->GetSafetyObjectPool().Get<TestData>();
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
 

@@ -27,7 +27,7 @@
 __LLBC_NS_BEGIN
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
+LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
 : LLBC_IObjectPool()
 , _orderedDeleteNodes(NULL)
 , _topOrderedDeleteNodes(NULL)
@@ -35,7 +35,7 @@ LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
+LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
 {
     // Lock pool.
     LLBC_LockGuard guard(_lock);
@@ -48,29 +48,40 @@ LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectPool()
              ++nodeIt)
             DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 
-        LLBC_STLHelper::DeleteContainer(*_orderedDeleteNodes, false);
+        for (LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _orderedDeleteNodes->begin();
+             nodeIt != _orderedDeleteNodes->end();
+             ++nodeIt)
+            LLBC_Delete(nodeIt->second);
         LLBC_Delete(_orderedDeleteNodes);
         LLBC_Delete(_topOrderedDeleteNodes);
     }
 
     // Delete unacquire ordered delete pool instances.
-    LLBC_STLHelper::DeleteContainer(_poolInsts, true, false);
+    for (_PoolInsts::iterator poolIt = _poolInsts.begin();
+         poolIt != _poolInsts.end();
+         ++poolIt)
+        LLBC_Delete(poolIt->second);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
+LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 {
     const char *objectType = typeid(ObjectType).name();
 
+    _PoolInsts::iterator it;
     LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
+    {
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>(this)));
+        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
+    }
     else
+    {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+    }
 
     _lock.Unlock();
 
@@ -79,18 +90,23 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
+LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
 {
     const char *objectType = typeid(ObjectType).name();
 
+    _PoolInsts::iterator it;
     LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
     if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    {
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>(this)));
+        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
+    }
     else
+    {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+    }
 
     _lock.Unlock();
 
@@ -99,18 +115,23 @@ ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetGuarded()
+LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetGuarded()
 {
     const char *objectType = typeid(ObjectType).name();
 
+    _PoolInsts::iterator it;
     LLBC_IObjectPoolInst *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
+    {
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>(this)));
+        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
+    }
     else
+    {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+    }
 
     _lock.Unlock();
 
@@ -119,7 +140,7 @@ LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Ge
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(ObjectType *obj)
+LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(ObjectType *obj)
 {
     return Release(typeid(ObjectType).name(), obj);
 }
@@ -128,7 +149,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectType, void *obj)
 {
     LLBC_IObjectPoolInst *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
+    std::map<LLBC_CString, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
     if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
@@ -150,18 +171,23 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
 {
     const char *objectType = typeid(ObjectType).name();
 
+    _PoolInsts::iterator it;
     LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *poolInst;
-    std::map<const char *, LLBC_IObjectPoolInst *>::iterator it;
 
     _lock.Lock();
-    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>()));
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
+    {
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType, PoolInstLockType>(this)));
+        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
+    }
     else
+    {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *>(it->second);
+    }
 
     _lock.Unlock();
 
@@ -169,12 +195,51 @@ LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *LLBC_ObjectPool<PoolLockType,
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-template <typename FrontObjectType, typename BackObjectType>
-int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetIPoolInst(const char *objectType)
 {
-    // Same object type check.
+    _PoolInsts::iterator it;
+    LLBC_IObjectPoolInst *poolInst;
+
+    // Try get pool instance.
+    _lock.Lock();
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
+    {
+        // Try create object pool instance by pool instance factory if not found pool instance.
+        if (!(poolInst = TryCreatePoolInstFromFactory(objectType)))
+        {
+            _lock.Unlock();
+            return NULL;
+        }
+
+        _poolInsts.insert(std::make_pair(poolInst->GetPoolInstName(), poolInst));
+        _lock.Unlock();
+
+        return poolInst;
+    }
+
+    poolInst = it->second;
+    _lock.Unlock();
+
+    return poolInst;
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename FrontObjectType, typename BackObjectType>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
+{
     const char *frontNodeName = typeid(FrontObjectType).name();
     const char *backNodeName = typeid(BackObjectType).name();
+    return AcquireOrderedDeletePoolInst(frontNodeName, backNodeName);
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
+{
+    // Make node name reference(const) to shorten the param name.
+    const LLBC_CString frontNodeName(frontObjectTypeName);
+    const LLBC_CString backNodeName(backObjectTypeName);
+
+    // Same object type check.
     if (UNLIKELY(frontNodeName == backNodeName))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
@@ -257,6 +322,12 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolIns
     // Case 4: frontNode & backNode found.
     else
     {
+        // Node relationship has been set to right order check.
+        if (frontNode->IsBackNode(backNode->GetNodeName()))
+        {
+            return LLBC_OK;
+        }
+
         // Node relationship between inversion check.
         if (frontNode->IsFrontNode(backNode->GetNodeName()))
         {
@@ -292,8 +363,76 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolIns
     }
 }
 
+template <>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::TryCreatePoolInstFromFactory(const char *objectType)
+{
+    _poolInstFactoryLock.Lock();
+    std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(objectType);
+    if (it == _poolInstFactories.end())
+    {
+        _poolInstFactoryLock.Unlock();
+        return NULL;
+    }
+
+    LLBC_IObjectPoolInst *poolInst = it->second->Create(this, false);
+    _poolInstFactoryLock.Unlock();
+
+    return poolInst;
+}
+
+template <>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::TryCreatePoolInstFromFactory(const char *objectType)
+{
+    _poolInstFactoryLock.Lock();
+    std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(objectType);
+    if (it == _poolInstFactories.end())
+    {
+        _poolInstFactoryLock.Unlock();
+        return NULL;
+    }
+
+    LLBC_IObjectPoolInst *poolInst = it->second->Create(this, true);
+    _poolInstFactoryLock.Unlock();
+
+    return poolInst;
+}
+
+template <>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::TryCreatePoolInstFromFactory(const char *objectType)
+{
+    _poolInstFactoryLock.Lock();
+    std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(objectType);
+    if (it == _poolInstFactories.end())
+    {
+        _poolInstFactoryLock.Unlock();
+        return NULL;
+    }
+
+    LLBC_IObjectPoolInst *poolInst = it->second->Create(this, false);
+    _poolInstFactoryLock.Unlock();
+
+    return poolInst;
+}
+
+template <>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::TryCreatePoolInstFromFactory(const char *objectType)
+{
+    _poolInstFactoryLock.Lock();
+    std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(objectType);
+    if (it == _poolInstFactories.end())
+    {
+        _poolInstFactoryLock.Unlock();
+        return NULL;
+    }
+
+    LLBC_IObjectPoolInst *poolInst = it->second->Create(this, true);
+    _poolInstFactoryLock.Unlock();
+
+    return poolInst;
+}
+
 template <typename PoolLockType, typename PoolInstLockType>
-void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
+LLBC_FORCE_INLINE void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
 {
     // Delete node pool instance.
     _PoolInsts::iterator instIt = _poolInsts.find(node->GetNodeName());

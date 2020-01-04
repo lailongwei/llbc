@@ -41,16 +41,14 @@ inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<Obj
 
 , _weakRef(false)
 {
-    const_cast<LLBC_ObjectGuard<ObjectType> &>(another).MakeWeakRef();
+    another.MakeWeakRef();
 }
 
 template <typename ObjectType>
 inline LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
 {
-    if (_weakRef)
-        return;
-
-    _poolInst->Release(_obj);
+    if (!_weakRef && _obj)
+        _poolInst->Release(_obj);
 }
 
 template <typename ObjectType>
@@ -102,10 +100,20 @@ inline const ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj() const
 }
 
 template <typename ObjectType>
-inline void LLBC_ObjectGuard<ObjectType>::MakeWeakRef()
+inline ObjectType *LLBC_ObjectGuard<ObjectType>::DetachObj()
 {
-    _weakRef = true;
+    ObjectType *obj = _obj;
+    _obj = NULL;
+
+    return obj;
 }
+
+template <typename ObjectType>
+inline void LLBC_ObjectGuard<ObjectType>::MakeWeakRef() const
+{
+    const_cast<LLBC_ObjectGuard<ObjectType> *>(this)->_weakRef = true;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__

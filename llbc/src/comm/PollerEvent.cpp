@@ -180,7 +180,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
         break;
 
     case _Ev::Send:
-        LLBC_Delete(ev.un.packet);
+        LLBC_Recycle(ev.un.packet);
         break;
 
     case _Ev::Close:

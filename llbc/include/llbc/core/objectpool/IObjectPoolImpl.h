@@ -19,22 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
+
+#include "llbc/core/objectpool/IObjectPoolInstFactory.h"
 
 __LLBC_NS_BEGIN
 
-template <typename ObjectType>
-inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *)
-{
-    obj->MarkPoolObject();
-}
-
-template <typename ObjectType>
-inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, ...)
-{
-    // Do nothing.
-}
+// Not used for now.
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__

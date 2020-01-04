@@ -19,31 +19,49 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
-#define __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#ifndef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INST_FACTORY_H__
+#define __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INST_FACTORY_H__
 
 #include "llbc/common/Common.h"
+
+#include "llbc/core/thread/SpinLock.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The pool object marker class encapsulation.
+ * Pre-declare some classes.
  */
-class LLBC_PoolObjectMarker
+class LLBC_IObjectPool;
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
+ * \brief The object pool instance factory, use for dynamic create pool instance.
+ */
+class LLBC_EXPORT LLBC_IObjectPoolInstFactory
 {
 public:
-    template <typename ObjectType, void (ObjectType::*)()>
-    struct markable_type;
-    template <typename ObjectType>
-    static void Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *);
+    virtual ~LLBC_IObjectPoolInstFactory() {  }
 
 public:
-    template <typename ObjectType>
-    static void Mark(ObjectType *obj, ...);
+    /**
+     * Get object pool instance name(object type name).
+     * @return const char * - the object pool instance name.
+     */
+    virtual const char *GetName() const = 0;
+
+    /**
+     * Create object pool instance.
+     * @param[in] pool         - the object pool.
+     * @param[in] threadSafety - thread safety flag.
+     * @return LLBC_IObjectPoolInst * - the object pool instance.
+     */
+    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, bool threadSafety) = 0;
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/PoolObjectMarkerImpl.h"
-
-#endif // !__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INST_FACTORY_H__

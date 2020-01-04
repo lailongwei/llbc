@@ -29,6 +29,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_String __g_dftStatusDesc;
+static const char *__g_msgBlockTypeName = typeid(LLBC_NS LLBC_MessageBlock).name();
 
 __LLBC_INTERNAL_NS_END
 
@@ -41,8 +42,6 @@ LLBC_Packet::LLBC_Packet()
 , _acceptSessionId(0)
 , _senderSvcId(0)
 , _recverSvcId(0)
-, _localAddr()
-, _peerAddr()
 
 , _opcode(0)
 , _status(0)
@@ -66,6 +65,9 @@ LLBC_Packet::LLBC_Packet()
 , _deletePayloadDeleteDelegWhenDestroy(false)
 
 , _dontDelAfterHandle(false)
+
+, _selfPoolInst(NULL)
+, _msgBlockPoolInst(NULL)
 {
 }
 
@@ -76,8 +78,8 @@ LLBC_Packet::~LLBC_Packet()
 
     CleanupPreHandleResult();
 
-    LLBC_XDelete(_encoder);
-    LLBC_XDelete(_decoder);
+    LLBC_XRecycle(_encoder);
+    LLBC_XRecycle(_decoder);
     LLBC_XDelete(_codecError);
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
@@ -108,14 +110,35 @@ const void *LLBC_Packet::GetPayload() const
     return _payload->GetDataStartWithReadPos();
 }
 
-void LLBC_Packet::SetPayload(LLBC_MessageBlock *block)
+size_t LLBC_Packet::GetPayloadLength() const
 {
-    if (UNLIKELY(block == _payload))
+    if (!_payload)
+        return 0;
+
+    return _payload->GetReadableSize();
+}
+
+LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
+{
+    return _payload;
+}
+
+LLBC_MessageBlock * LLBC_Packet::DetachPayload()
+{
+    LLBC_MessageBlock *payload = _payload;
+    _payload = NULL;
+
+    return payload;
+}
+
+void LLBC_Packet::SetPayload(LLBC_MessageBlock *payload)
+{
+    if (UNLIKELY(payload == _payload))
         return;
 
     CleanupPayload();
 
-    _payload = block;
+    _payload = payload;
 }
 
 void LLBC_Packet::SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy)
@@ -136,14 +159,6 @@ void LLBC_Packet::SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock 
         _deletePayloadDeleteDelegWhenDestroy = deleteWhenPacketDestroy;
 }
 
-size_t LLBC_Packet::GetPayloadLength() const
-{
-    if (!_payload)
-        return 0;
-
-    return _payload->GetReadableSize();
-}
-
 void LLBC_Packet::ResetPayload()
 {
     if (_payload)
@@ -153,11 +168,52 @@ void LLBC_Packet::ResetPayload()
     }
 }
 
+void LLBC_Packet::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+{
+    _selfPoolInst = &poolInst;
+    _msgBlockPoolInst = poolInst.GetIObjectPool()->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
+}
+
+bool LLBC_Packet::IsPoolObject() const
+{
+    return _selfPoolInst != NULL;
+}
+
+void LLBC_Packet::GiveBackToPool()
+{
+    _selfPoolInst->Release(this);
+}
+
+void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    // Set delete order.
+    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
+    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_Packet).name(), LLBC_INL_NS __g_msgBlockTypeName);
+
+    // Force create dependented pool instances(MessageBlock/...)
+    (void)objPool->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
+}
+
 void LLBC_Packet::Clear()
 {
-    ResetPayload();
-    LLBC_XDelete(_encoder);
-    LLBC_XDelete(_decoder);
+    if (_payload)
+    {
+        if (_payloadDeleteDeleg)
+            _payloadDeleteDeleg->Invoke(_payload);
+
+        if (_payload->IsPoolObject())
+        {
+            _payload->GiveBackToPool();
+            _payload = NULL;
+        }
+        else
+        {
+            _payload->Clear();
+        }
+    }
+
+    LLBC_XRecycle(_encoder);
+    LLBC_XRecycle(_decoder);
 }
 
 LLBC_ICoder *LLBC_Packet::GetEncoder() const
@@ -167,7 +223,10 @@ LLBC_ICoder *LLBC_Packet::GetEncoder() const
 
 void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
 {
-    LLBC_XDelete(_encoder);
+    if (UNLIKELY(encoder == _encoder))
+        return;
+
+    LLBC_XRecycle(_encoder);
     _encoder = encoder;
 }
 
@@ -186,7 +245,10 @@ LLBC_ICoder *LLBC_Packet::GetDecoder() const
 
 void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
 {
-    LLBC_XDelete(_decoder);
+    if (UNLIKELY(decoder == _decoder))
+        return;
+
+    LLBC_XRecycle(_decoder);
     _decoder = decoder;
 }
 
@@ -205,8 +267,7 @@ bool LLBC_Packet::Encode()
         if (!_encoder->Encode(*this))
             return false;
 
-        LLBC_Delete(_encoder);
-        _encoder = NULL;
+        LLBC_XRecycle(_encoder);
     }
 
     return true;
@@ -215,9 +276,7 @@ bool LLBC_Packet::Encode()
 bool LLBC_Packet::Decode()
 {
     if (_decoder)
-    {
         return _decoder->Decode(*this);
-    }
 
     return true;
 }
@@ -284,7 +343,7 @@ void LLBC_Packet::CleanupPayload()
     if (_payloadDeleteDeleg)
         _payloadDeleteDeleg->Invoke(_payload);
 
-    LLBC_Delete(_payload);
+    LLBC_Recycle(_payload);
     _payload = NULL;
 }
 

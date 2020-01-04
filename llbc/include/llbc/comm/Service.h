@@ -363,19 +363,6 @@ public:
 
 public:
     /**
-    * Get safety object pool.
-    * @return LLBC_SafetyObjectPool * - the safety object pool.
-    */
-    LLBC_SafetyObjectPool *GetSafetyObjectPool();
-
-    /**
-    * Get unsafety object pool.
-    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
-    */
-    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
-
-public:
-    /**
      * Post lazy task to service.
      * @param[in] deleg - the task delegate.
      * @param[in] data  - the task data, can be null.
@@ -390,6 +377,31 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
+
+public:
+    /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool();
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool();
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> &GetPacketObjectPool();
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> &GetMsgBlockObjectPool();
 
 public:
     /**
@@ -640,6 +652,8 @@ private:
 private:
     LLBC_SafetyObjectPool *_safetyObjectPool;
     LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
+    LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> *_packetObjectPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> *_msgBlockObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;

@@ -36,7 +36,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 // Define BeginingSymbol/EndSymbol, CheckSymbolSize.
-#if LLBC_DEBUG
+#if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 const size_t CheckSymbolSize = 8;
 
  #if LLBC_TARGET_PLATFORM_WIN32
@@ -48,7 +48,7 @@ const size_t CheckSymbolSize = 8;
  #endif // LLBC_TARGET_PLATFORM_WIN32
 #else // NDEBUG
 const size_t CheckSymbolSize = 0;
-#endif // LLBC_DEBUG
+#endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 
 __LLBC_INTERNAL_NS_END
 
@@ -74,8 +74,16 @@ private:
     {
         MemoryBlock *block;     // ownered this memory unit's block.
 
-        bool inited;            // Object has initialized or not.
-        bool referencableObj;   // Indicate object is referencable object or not.
+        union
+        {
+            struct
+            {
+                bool inited;            // Object has initialized or not.
+                bool referencableObj;   // Indicate object is referencable object or not.
+                bool inUsing;           // Using flag.
+            } flags;
+            uint32 flagsVal;            // all flags.
+        } unFlags;
         sint32 seq;             // The location seq of memory unit.
 
         uint8 buff[0];          // The begin address of buffer.
@@ -94,7 +102,7 @@ private:
     };
 
 public:
-    LLBC_ObjectPoolInst();
+    LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool);
     virtual ~LLBC_ObjectPoolInst();
 
 public:
@@ -139,6 +147,12 @@ public:
     */
     void ReleaseObject(ObjectType *obj);
 
+    /**
+     * Get pool instance name.
+     * @return const char * - the pool instance name.
+     */
+    virtual const char *GetPoolInstName();
+
 protected:
     /**
      * Release referencable object.
@@ -179,6 +193,8 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPoolInst);
 
 private:
+    const char *_poolInstName;
+
     const int _elemSize;
     const int _elemCnt;
     const int _blockSize;

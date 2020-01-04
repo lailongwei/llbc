@@ -23,20 +23,49 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/Comm.h"
+#include "llbc/core/objectpool/IObjectPool.h"
+#include "llbc/core/objectpool/IObjectPoolInstFactory.h"
 
 __LLBC_NS_BEGIN
 
-int __LLBC_CommStartup()
+LLBC_SpinLock LLBC_IObjectPool::_poolInstFactoryLock;
+std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *> LLBC_IObjectPool::_poolInstFactories;
+
+int LLBC_IObjectPool::RegisterPoolInstFactory(LLBC_IObjectPoolInstFactory *instFactory)
 {
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Packet>());
+    if (UNLIKELY(!instFactory))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    _poolInstFactoryLock.Lock();
+    std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(instFactory->GetName());
+    if (it != _poolInstFactories.end())
+    {
+        _poolInstFactoryLock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+
+        return LLBC_FAILED;
+    }
+
+    _poolInstFactories.insert(std::make_pair(instFactory->GetName(), instFactory));
+    _poolInstFactoryLock.Unlock();
 
     return LLBC_OK;
 }
 
-void __LLBC_CommCleanup()
+void LLBC_IObjectPool::DestroyAllPoolInstFactories()
 {
+    _poolInstFactoryLock.Lock();
+    for (std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.begin();
+         it != _poolInstFactories.end();
+         ++it)
+        LLBC_Delete(it->second);
+
+    _poolInstFactories.clear();
+
+    _poolInstFactoryLock.Unlock();
 }
 
 __LLBC_NS_END

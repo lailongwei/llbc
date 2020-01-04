@@ -22,6 +22,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/objectpool/ObjectPool.h"
+
 #include "llbc/core/thread/MessageBlock.h"
 
 namespace
@@ -39,6 +41,7 @@ LLBC_MessageBlock::LLBC_MessageBlock(size_t size)
 , _writePos(0)
 , _prev(NULL)
 , _next(NULL)
+, _poolInst(NULL)
 {
     if (LIKELY(size > 0))
         _buf = LLBC_Malloc(char, size);
@@ -52,6 +55,8 @@ LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size)
 , _writePos(0)
 , _prev(NULL)
 , _next(NULL)
+
+, _poolInst(NULL)
 {
 }
 
@@ -113,11 +118,6 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
     return LLBC_OK;
 }
 
-void LLBC_MessageBlock::Clear()
-{
-    _readPos = _writePos = 0;
-}
-
 void LLBC_MessageBlock::Release()
 {
     if (!_buf)
@@ -128,6 +128,26 @@ void LLBC_MessageBlock::Release()
     _buf = NULL;
 
     _size = 0;
+    _readPos = _writePos = 0;
+}
+
+void LLBC_MessageBlock::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+{
+    _poolInst = &poolInst;
+}
+
+bool LLBC_MessageBlock::IsPoolObject() const
+{
+    return _poolInst != NULL;
+}
+
+void LLBC_MessageBlock::GiveBackToPool()
+{
+    _poolInst->Release(this);
+}
+
+void LLBC_MessageBlock::Clear()
+{
     _readPos = _writePos = 0;
 }
 
@@ -294,6 +314,19 @@ void LLBC_MessageBlock::Resize(size_t newSize)
 
     _buf = LLBC_Realloc(char, _buf, newSize);
     _size = newSize;
+}
+
+const char *LLBC_MessageBlockObjectPoolInstFactory::GetName() const
+{
+    return typeid(LLBC_MessageBlock).name();
+}
+
+LLBC_IObjectPoolInst *LLBC_MessageBlockObjectPoolInstFactory::Create(LLBC_IObjectPool *pool, bool threadSafety)
+{
+    if (threadSafety)
+        return new LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock>(pool);
+    else
+        return new LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_DummyLock>(pool);
 }
 
 __LLBC_NS_END

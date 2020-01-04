@@ -19,35 +19,47 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_STRING_DATA_TYPE_H__
-#define __LLBC_COM_STRING_DATA_TYPE_H__
-
-#include "llbc/common/PFConfig.h"
-
-#include "llbc/common/Macro.h"
-#include "llbc/common/BasicString.h"
-#include "llbc/common/BasicCString.h"
+#ifdef __LLBC_COMM_ICODER_H__
 
 __LLBC_NS_BEGIN
 
-typedef LLBC_BasicString<char> LLBC_String;
-typedef LLBC_BasicString<wchar> LLBC_WString;
-typedef std::vector<LLBC_BasicString<char> > LLBC_Strings;
-typedef std::vector<LLBC_BasicString<wchar> > LLBC_WStrings;
+inline LLBC_ICoder::LLBC_ICoder()
+: _poolInst(NULL)
+{
+}
 
-typedef LLBC_BasicCString<char> LLBC_CString;
-typedef LLBC_BasicCString<wchar> LLBC_CWString;
+inline LLBC_ICoder::~LLBC_ICoder()
+{
+#if LLBC_DEBUG
+    ASSERT(_poolInst == NULL);
+#endif
+}
 
-#ifdef LLBC_UNICODE
- typedef LLBC_WString LLBC_TString;
- typedef LLBC_WStrings LLBC_TStrings;
- typedef LLBC_CWString LLBC_CTString;
-#else // !LLBC_UNICODE
- typedef LLBC_String LLBC_TString;
- typedef LLBC_Strings LLBC_TStrings;
- typedef LLBC_CString LLBC_TCString;
-#endif // LLBC_UNICODE
+inline void LLBC_ICoder::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+{
+    _poolInst = &poolInst;
+}
+
+inline bool LLBC_ICoder::IsPoolObject() const
+{
+    return _poolInst != NULL;
+}
+
+inline void LLBC_ICoder::GiveBackToPool()
+{
+    _poolInst->Release(this);
+}
+
+inline void LLBC_ICoder::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    // Do nothing.
+}
+
+inline void LLBC_ICoder::OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
+{
+    // Do nothing.
+}
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_STRING_DATA_TYPE_H__
+#endif // __LLBC_COMM_ICODER_H__

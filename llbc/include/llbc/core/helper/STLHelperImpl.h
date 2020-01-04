@@ -21,6 +21,8 @@
 
 #ifdef __LLBC_CORE_HELPER_STL_HELPER_H__
 
+#include "llbc/core/objectpool/ObjectPool.h"
+
 __LLBC_NS_BEGIN
 
 template <typename _Ty>
@@ -139,6 +141,42 @@ void LLBC_STLHelper::DeletesContainer(std::set<_Key *> &s, bool clear, bool reve
 
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::DeletesContainer(std::map<_Key, _Ty *> &m, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
+}
+
+template <typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::vector<_Ty *> &vec, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(vec, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::list<_Ty *> &l, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(l, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::deque<_Ty *> &dq, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(dq, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::stack<_Ty *> &stk, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(stk, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Key>
+void LLBC_STLHelper::RecycleContainer(std::set<_Key *> &s, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(s, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
     LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
 }
@@ -286,6 +324,10 @@ inline void LLBC_STLHelper::OperateElem(_Ty *&elem, int opcode)
         LLBC_Deletes(elem);
         break;
 
+    case LLBC_STLContainerOpcode::Recycle:
+        LLBC_Recycle(elem);
+        break;
+
     default:
         ASSERT(false && "LLBC_STLHelper::OperateElem(): invalid operation code");
         break;
@@ -310,6 +352,10 @@ inline void LLBC_STLHelper::OperateElem(_Ty * const &elem, int opcode)
 
     case LLBC_STLContainerOpcode::Deletes:
         LLBC_Deletes(elem);
+        break;
+
+    case LLBC_STLContainerOpcode::Recycle:
+        LLBC_Recycle(elem);
         break;
 
     default:

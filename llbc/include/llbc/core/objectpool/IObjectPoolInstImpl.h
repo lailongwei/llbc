@@ -25,16 +25,34 @@
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_IObjectPoolInst::SetPoolInstToReferencablePoolObj(void *obj)
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst::LLBC_IObjectPoolInst(LLBC_IObjectPool *objPool)
+: _objPool(objPool)
+{
+}
+
+LLBC_FORCE_INLINE LLBC_IObjectPool *LLBC_IObjectPoolInst::GetIObjectPool()
+{
+    return _objPool;
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType> * LLBC_IObjectPoolInst::GetObjectPool()
+{
+    return static_cast<LLBC_ObjectPool<PoolLockType, PoolInstLockType> *>(_objPool);
+}
+
+LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::SetPoolInstToReferencablePoolObj(void *obj)
 {
     reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = this;
 }
 
-inline void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolObj(void *obj)
+LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolObj(void *obj)
 {
     reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = NULL;
 }
 
 __LLBC_NS_END
+
+#include "llbc/core/objectpool/IObjectPoolImpl.h"
 
 #endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

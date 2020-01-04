@@ -48,7 +48,7 @@ void __DeletePacketsBlock(void *data)
 
     _Packet *packet;
     while (block->Read(&packet, sizeof(_Packet *)) == LLBC_OK)
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
 
     LLBC_Delete(block);
 }
@@ -255,7 +255,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
                 //  Just need delete decoded packets, and non-decode packets.
              
                 // Delete all decoded packets.
-                LLBC_STLHelper::DeleteContainer(packets);
+                LLBC_STLHelper::RecycleContainer(packets);
                 // Delete non-decode packets and the message-block.
                 // Yeah, this operation will done by LLBC_InvokeGuard, we don't need care it too.
                 return LLBC_FAILED;
@@ -292,14 +292,14 @@ int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *
     if (RecvRaw(block, _rawPackets, removeSession) != LLBC_OK)
         return LLBC_FAILED;
         
-    for (size_t i = 0;  i < _rawPackets.size(); ++i)
+    for (size_t i = 0;  i != _rawPackets.size(); ++i)
     {
         LLBC_Packet *packet;
         if (RecvCodec(_rawPackets[i], packet, removeSession) != LLBC_OK)
         {
-            LLBC_STLHelper::DeleteContainer(packets);
+            LLBC_STLHelper::RecycleContainer(packets);
             for (++i; i < _rawPackets.size(); ++i)
-                LLBC_Delete(_rawPackets[i]);
+                LLBC_Recycle(_rawPackets[i]);
 
             return LLBC_FAILED;
         }

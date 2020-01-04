@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_ObjectPoolOrderedDeleteNode;
-typedef std::map<const char *, LLBC_ObjectPoolOrderedDeleteNode *> LLBC_ObjectPoolOrderedDeleteNodes;
+typedef std::map<LLBC_CString, LLBC_ObjectPoolOrderedDeleteNode *> LLBC_ObjectPoolOrderedDeleteNodes;
 
 /**
  * \brief The object pool ordered delete node(object pool instance) encapsulation.
@@ -40,15 +40,15 @@ class LLBC_EXPORT LLBC_ObjectPoolOrderedDeleteNode
 public:
 
 public:
-    explicit LLBC_ObjectPoolOrderedDeleteNode(const char *name);
+    explicit LLBC_ObjectPoolOrderedDeleteNode(const LLBC_CString &name);
     ~LLBC_ObjectPoolOrderedDeleteNode();
 
 public:
     /**
      * Get the node name(pool instance name).
-     * @return const char * - the ordered node name.
+     * @return const LLBC_CString & - the ordered node name.
      */
-    const char *GetNodeName() const;
+    const LLBC_CString &GetNodeName() const;
 
     /**
      * Get front node.
@@ -82,7 +82,7 @@ public:
      * @param[in] del  - delete back lock flag.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveBackNode(const char *name, bool del);
+    int RemoveBackNode(const LLBC_CString &name, bool del);
 
     /**
      * Adjust back nodes front node.
@@ -96,14 +96,14 @@ public:
      * @name[in] name - the node name(pool instance name).
      * @return bool - return true if is front node. otherwise return false.
      */
-    bool IsFrontNode(const char *name) const;
+    bool IsFrontNode(const LLBC_CString &name) const;
 
     /**
      * Recursive check given node name is back node or not.
      * @param[in] name - the node name(pool instance name).
      * @return bool - return true if is back node, otherwise return false.
      */
-    bool IsBackNode(const char *name) const;
+    bool IsBackNode(const LLBC_CString &name) const;
 
 public:
     /**
@@ -112,7 +112,7 @@ public:
     bool operator ==(const LLBC_ObjectPoolOrderedDeleteNode &other) const;
 
 private:
-    const char *_name;
+    LLBC_CString _name;
     LLBC_ObjectPoolOrderedDeleteNode *_frontNode;
     LLBC_ObjectPoolOrderedDeleteNodes *_backNodes;
 };

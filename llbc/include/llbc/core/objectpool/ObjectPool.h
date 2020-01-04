@@ -94,13 +94,36 @@ public:
     LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
 
     /**
+     * Get object pool instance interface object.
+     * Note: If this object type pool instance not create before, this method will return NULL.
+     * @param[in] objectType - the object type.
+     * @return LLBC_IObjectPoolInst * - the object pool instance interface object.
+     */
+    virtual LLBC_IObjectPoolInst *GetIPoolInst(const char *objectType);
+
+    /**
      * Acquire ordered delete pool instance.
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename FrontObjectType, typename BackObjectType>
     int AcquireOrderedDeletePoolInst();
 
+    /**
+     * Acquire ordered delete pool instance.
+     * @param[in] frontObjectTypeName - the front object type name.
+     * @param[in] backObjectTypeName  - the back object type name.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName);
+
 private:
+    /**
+     * Try create object pool instance from factory.
+     * @param[in] objectType - the object type.
+     * @return LLBC_IObjectPoolInst * - the new object pool instance, if not found factory to create, return NULL.
+     */
+    LLBC_IObjectPoolInst *TryCreatePoolInstFromFactory(const char *objectType);
+
     /**
      * Delete acquire ordered delete pool instance.
      * @param[in] node - the ordered delete node.
@@ -112,7 +135,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPool);
 
 private:
-    typedef std::map<const char *, LLBC_IObjectPoolInst *> _PoolInsts;
+    typedef std::map<LLBC_CString, LLBC_IObjectPoolInst *> _PoolInsts;
 
     PoolLockType _lock;
     _PoolInsts _poolInsts;
