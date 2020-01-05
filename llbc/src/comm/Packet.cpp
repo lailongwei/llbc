@@ -264,6 +264,9 @@ bool LLBC_Packet::Encode()
 {
     if (_encoder)
     {
+        if (!_payload && _msgBlockPoolInst)
+            _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+
         if (!_encoder->Encode(*this))
             return false;
 
@@ -302,8 +305,10 @@ void LLBC_Packet::SetPreHandleResult(void *result, LLBC_IDelegate1<void, void *>
 {
     this->CleanupPreHandleResult();
     if ((_preHandleResult = result))
+    {
         if (clearDeleg)
             _resultClearDeleg = clearDeleg;
+    }
 }
 
 const LLBC_String &LLBC_Packet::GetCodecError() const

@@ -164,7 +164,7 @@ public:
         TestData *resData = LLBC_New(TestData);
         *resData = *data;
 
-        LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
         resPacket->SetHeader(packet, packet.GetOpcode(), 0);
         resPacket->SetEncoder(resData);
 
