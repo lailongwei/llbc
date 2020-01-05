@@ -29,10 +29,17 @@
 
 __LLBC_NS_BEGIN
 
+/**
+ * \brief The const string class encapsulation(simple encapsulation).
+ */
 template <typename _Elem>
 class LLBC_BasicCString
 {
 public:
+    /**
+     * Constructor.
+     * @param[in] cstr: the const string.
+     */
     LLBC_BasicCString(const _Elem *cstr):_cstr(cstr) {  }
 
 public:
@@ -45,40 +52,44 @@ public:
         return _cstr;
     }
 
+public:
     // operator <
     bool operator <(const LLBC_BasicCString<_Elem> &other) const
     {
+        if (_cstr == other._cstr)
+            return false;
+
         return ::strcmp(_cstr, other._cstr) < 0;
     }
 
     // operator ==
     bool operator ==(const LLBC_BasicCString<_Elem> &other) const
     {
-        return ::strcmp(_cstr, other._cstr) == 0;
+        return _cstr == other._cstr || ::strcmp(_cstr, other._cstr) == 0;
     }
 
     // operator !=
     bool operator !=(const LLBC_BasicCString<_Elem> &other) const
     {
-        return ::strcmp(_cstr, other._cstr) != 0;
+        return !(*this == other);
     }
 
     // operator <=
     bool operator <=(const LLBC_BasicCString<_Elem> &other) const
     {
-        return ::strcmp(_cstr, other._cstr) <= 0;
+        return !(other < *this);
     }
 
     // operator >
     bool operator >(const LLBC_BasicCString<_Elem> &other) const
     {
-        return ::strcmp(_cstr, other._cstr) > 0;
+        return other < *this;
     }
 
     // operator >=
     bool operator >=(const LLBC_BasicCString<_Elem> &other) const
     {
-        return ::strcmp(_cstr, other._cstr) >= 0;
+        return !(other < *this);
     }
 
 private:

@@ -149,7 +149,7 @@
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (1 || LLBC_DEBUG)
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (0 || LLBC_DEBUG)
 // object reset metch methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
