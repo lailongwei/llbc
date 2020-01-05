@@ -30,9 +30,6 @@ inline LLBC_ICoder::LLBC_ICoder()
 
 inline LLBC_ICoder::~LLBC_ICoder()
 {
-#if LLBC_DEBUG
-    ASSERT(_poolInst == NULL);
-#endif
 }
 
 inline void LLBC_ICoder::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
