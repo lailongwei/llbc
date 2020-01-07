@@ -210,6 +210,9 @@ LLBC_FORCE_INLINE size_t LLBC_Packet::GetPayloadLength() const
 
 LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
 {
+    if (!_payload && _msgBlockPoolInst)
+        _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+
     return _payload;
 }
 
