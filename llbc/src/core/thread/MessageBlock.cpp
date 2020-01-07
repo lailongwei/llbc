@@ -141,6 +141,11 @@ bool LLBC_MessageBlock::IsPoolObject() const
     return _poolInst != NULL;
 }
 
+LLBC_IObjectPoolInst * LLBC_MessageBlock::GetPoolInst()
+{
+    return _poolInst;
+}
+
 void LLBC_MessageBlock::GiveBackToPool()
 {
     _poolInst->Release(this);
@@ -321,12 +326,9 @@ const char *LLBC_MessageBlockObjectPoolInstFactory::GetName() const
     return typeid(LLBC_MessageBlock).name();
 }
 
-LLBC_IObjectPoolInst *LLBC_MessageBlockObjectPoolInstFactory::Create(LLBC_IObjectPool *pool, bool threadSafety)
+LLBC_IObjectPoolInst *LLBC_MessageBlockObjectPoolInstFactory::Create(LLBC_IObjectPool *pool, LLBC_ILock *lock)
 {
-    if (threadSafety)
-        return new LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock>(pool);
-    else
-        return new LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_DummyLock>(pool);
+    return new LLBC_ObjectPoolInst<LLBC_MessageBlock>(pool, lock);
 }
 
 __LLBC_NS_END

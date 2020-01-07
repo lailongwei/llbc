@@ -62,7 +62,7 @@ class LLBC_ObjectGuard;
 /**
 * \brief The object pool instance encapsulation.
 */
-template <typename ObjectType, typename LockType = LLBC_DummyLock>
+template <typename ObjectType>
 class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
 private:
@@ -102,7 +102,7 @@ private:
     };
 
 public:
-    LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool);
+    LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool, LLBC_ILock *lock);
     virtual ~LLBC_ObjectPoolInst();
 
 public:
@@ -152,6 +152,12 @@ public:
      * @return const char * - the pool instance name.
      */
     virtual const char *GetPoolInstName();
+
+    /**
+     * Check this object pool instance is thread safety or not.
+     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     */
+    virtual bool IsThreadSafety() const;
 
 protected:
     /**
@@ -203,7 +209,7 @@ private:
     MemoryBlock **_block;
     CircularBuffer<MemoryUnit *> **_memUnitUsageView;
 
-    LockType _lock;
+    LLBC_ILock *_lock;
 };
 
 __LLBC_NS_END

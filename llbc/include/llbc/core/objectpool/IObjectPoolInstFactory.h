@@ -55,11 +55,11 @@ public:
 
     /**
      * Create object pool instance.
-     * @param[in] pool         - the object pool.
-     * @param[in] threadSafety - thread safety flag.
+     * @param[in] pool - the object pool.
+     * @param[in] lock - the object pool instance lock.
      * @return LLBC_IObjectPoolInst * - the object pool instance.
      */
-    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, bool threadSafety) = 0;
+    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, LLBC_ILock *lock) = 0;
 };
 
 __LLBC_NS_END

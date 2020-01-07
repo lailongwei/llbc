@@ -87,12 +87,12 @@ inline LLBC_UnsafetyObjectPool &LLBC_Service::GetUnsafetyObjectPool()
     return *_unsafetyObjectPool;
 }
 
-inline LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & LLBC_Service::GetPacketObjectPool()
+inline LLBC_ObjectPoolInst<LLBC_Packet> & LLBC_Service::GetPacketObjectPool()
 {
     return *_packetObjectPool;
 }
 
-inline LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> &LLBC_Service::GetMsgBlockObjectPool()
+inline LLBC_ObjectPoolInst<LLBC_MessageBlock> &LLBC_Service::GetMsgBlockObjectPool()
 {
     return *_msgBlockObjectPool;
 }

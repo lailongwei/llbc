@@ -297,6 +297,11 @@ public:
     bool IsPoolObject() const;
 
     /**
+     * Object-Pool reflection support: Get pool instance.
+     */
+    LLBC_IObjectPoolInst *GetPoolInst();
+
+    /**
      * Object-Pool reflection support: Give back object to pool.
      */
     void GiveBackToPool();

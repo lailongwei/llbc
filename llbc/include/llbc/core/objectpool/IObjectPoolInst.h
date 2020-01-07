@@ -34,7 +34,7 @@ class LLBC_ReferencablePoolObj;
 template <typename PoolLockType, typename PoolInstLockType>
 class LLBC_ObjectPool;
 
-template <typename ObjectType, typename PoolInstLockType>
+template <typename ObjectType>
 class LLBC_ObjectPoolInst;
 
 __LLBC_NS_END
@@ -87,6 +87,12 @@ public:
      */
     template <typename PoolLockType, typename PoolInstLockType>
     LLBC_ObjectPool<PoolLockType, PoolInstLockType> *GetObjectPool();
+
+    /**
+     * Check this object pool instance is thread safety or not.
+     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     */
+    virtual bool IsThreadSafety() const = 0;
 
 protected:
     // Friend class: Referencable pool object.

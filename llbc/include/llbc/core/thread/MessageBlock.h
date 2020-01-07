@@ -107,6 +107,11 @@ public:
     bool IsPoolObject() const;
 
     /**
+     * Object-Pool reflection support: Get pool instance.
+     */
+    LLBC_IObjectPoolInst *GetPoolInst();
+
+    /**
      * Object-Pool reflection support: Give back object to pool.
      */
     void GiveBackToPool();
@@ -274,11 +279,11 @@ public:
 
     /**
      * Create object pool instance.
-     * @param[in] pool         - the object pool.
-     * @param[in] threadSafety - thread safety flag.
+     * @param[in] pool - the object pool.
+     * @param[in] lock - the pool instance lock.
      * @return LLBC_IObjectPoolInst * - the object pool instance.
      */
-    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, bool threadSafety);
+    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, LLBC_ILock *lock);
 };
 
 __LLBC_NS_END

@@ -102,45 +102,6 @@ void LLBC_Packet::SetStatusDesc(const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-const void *LLBC_Packet::GetPayload() const
-{
-    if (!_payload)
-        return NULL;
-
-    return _payload->GetDataStartWithReadPos();
-}
-
-size_t LLBC_Packet::GetPayloadLength() const
-{
-    if (!_payload)
-        return 0;
-
-    return _payload->GetReadableSize();
-}
-
-LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
-{
-    return _payload;
-}
-
-LLBC_MessageBlock * LLBC_Packet::DetachPayload()
-{
-    LLBC_MessageBlock *payload = _payload;
-    _payload = NULL;
-
-    return payload;
-}
-
-void LLBC_Packet::SetPayload(LLBC_MessageBlock *payload)
-{
-    if (UNLIKELY(payload == _payload))
-        return;
-
-    CleanupPayload();
-
-    _payload = payload;
-}
-
 void LLBC_Packet::SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy)
 {
     if (_payloadDeleteDeleg == deleg)
@@ -159,29 +120,10 @@ void LLBC_Packet::SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock 
         _deletePayloadDeleteDelegWhenDestroy = deleteWhenPacketDestroy;
 }
 
-void LLBC_Packet::ResetPayload()
-{
-    if (_payload)
-    {
-        _payload->SetReadPos(0);
-        _payload->SetWritePos(0);
-    }
-}
-
 void LLBC_Packet::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 {
     _selfPoolInst = &poolInst;
     _msgBlockPoolInst = poolInst.GetIObjectPool()->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
-}
-
-bool LLBC_Packet::IsPoolObject() const
-{
-    return _selfPoolInst != NULL;
-}
-
-void LLBC_Packet::GiveBackToPool()
-{
-    _selfPoolInst->Release(this);
 }
 
 void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)

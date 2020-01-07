@@ -192,6 +192,69 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opc
     SetStatus(status);
 }
 
+LLBC_FORCE_INLINE const void *LLBC_Packet::GetPayload() const
+{
+    if (!_payload)
+        return NULL;
+
+    return _payload->GetDataStartWithReadPos();
+}
+
+LLBC_FORCE_INLINE size_t LLBC_Packet::GetPayloadLength() const
+{
+    if (!_payload)
+        return 0;
+
+    return _payload->GetReadableSize();
+}
+
+LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
+{
+    return _payload;
+}
+
+LLBC_FORCE_INLINE LLBC_MessageBlock * LLBC_Packet::DetachPayload()
+{
+    LLBC_MessageBlock *payload = _payload;
+    _payload = NULL;
+
+    return payload;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::SetPayload(LLBC_MessageBlock *payload)
+{
+    if (UNLIKELY(payload == _payload))
+        return;
+
+    CleanupPayload();
+
+    _payload = payload;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
+{
+    if (_payload)
+    {
+        _payload->SetReadPos(0);
+        _payload->SetWritePos(0);
+    }
+}
+
+LLBC_FORCE_INLINE bool LLBC_Packet::IsPoolObject() const
+{
+    return _selfPoolInst != NULL;
+}
+
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
+{
+    return _selfPoolInst;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::GiveBackToPool()
+{
+    _selfPoolInst->Release(this);
+}
+
 LLBC_FORCE_INLINE bool LLBC_Packet::IsDontDeleteAfterHandle() const
 {
     return _dontDelAfterHandle;

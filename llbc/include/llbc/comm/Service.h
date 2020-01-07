@@ -395,13 +395,13 @@ public:
      * Get service packet object pool(thread safety).
      * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
      */
-    virtual LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> &GetPacketObjectPool();
+    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
 
     /**
      * Get message block object pool(thread safety).
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
-    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> &GetMsgBlockObjectPool();
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
 
 public:
     /**
@@ -652,8 +652,8 @@ private:
 private:
     LLBC_SafetyObjectPool *_safetyObjectPool;
     LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
-    LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> *_packetObjectPool;
-    LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> *_msgBlockObjectPool;
+    LLBC_ObjectPoolInst<LLBC_Packet> *_packetObjectPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> *_msgBlockObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;

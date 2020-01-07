@@ -104,8 +104,8 @@ bool LLBC_FastLock::TryLock()
     __asm {
         mov eax, 1
         mov ecx, lockPtr 
-        xchg eax, [ecx]        
-        mov oldLock, eax      
+        xchg eax, [ecx]
+        mov oldLock, eax
     }
  #endif
     return (oldLock == 0);
@@ -164,6 +164,11 @@ void LLBC_FastLock::Unlock()
     ::LeaveCriticalSection(&_handle);
  #endif
 #endif // LLBC_FAST_LOCK_ASM
+}
+
+bool LLBC_FastLock::IsDummyLock() const
+{
+    return false;
 }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32

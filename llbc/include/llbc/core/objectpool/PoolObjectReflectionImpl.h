@@ -21,6 +21,7 @@
 
 #include "PoolObjectReflection.h"
 #include "PoolObjectReflection.h"
+#include "PoolObjectReflection.h"
 #ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_H__
 
 __LLBC_NS_BEGIN
@@ -84,6 +85,26 @@ LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&o
                                                                   ...)
 {
     return false;
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInst(ObjectType *&obj)
+{
+    return GetPoolInstInl<ObjectType>(obj, NULL);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+{
+    return obj->GetPoolInst();
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                                  ...)
+{
+    return NULL;
 }
 
 template <typename ObjectType>

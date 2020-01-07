@@ -37,6 +37,8 @@
 # 31)【llbc core】LLBC_IObjectPoolInst增加GetIObjPool()方法, 以便支持访问所属LLBC_IObjectPool需求.
 # 32)【llbc core】增加LLBC_IObjectPoolInstFactory工厂类设计, 以支持在类型未知的情况下(LLBC_IObjectPool::GetIObjPoolInst())也能够动态创建对应类型的对象池实例, 最终结果依赖于使用者是否事先将未知类型对应的池工厂类有注入.
 # 33)【llbc core】Service/Session/Socket/Protocol/Protocol Stack/Packet/MessageBlock完成支持对象池, 协议收发完成对象池化.
+# 34)【llbc core】ObjectPoolInst去除<PoolInstLockType>模板参数, 调整为构造传入Lock, 以更易使用; 对象池对象反射方法要求增加一个LLBC_IObjectPoolInst *GetPoolInst()要求.
+# 35)【llbc core】LLBC_ILock及其所有实现类增加bool IsDummyLock() const支持.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.

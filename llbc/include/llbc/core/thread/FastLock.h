@@ -45,24 +45,30 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_FastLock : public LLBC_ILock
 {
 public:
-	LLBC_FastLock();
-	virtual ~LLBC_FastLock();
+    LLBC_FastLock();
+    virtual ~LLBC_FastLock();
 
 public:
     /**
      * Acquire lock.
      */
-	virtual void Lock();
+    virtual void Lock();
 
     /**
      * Try acquire lock.
      */
-	virtual bool TryLock();
+    virtual bool TryLock();
 
     /**
      * Release lock.
      */
-	virtual void Unlock();
+    virtual void Unlock();
+
+    /**
+     * Dummy lock check.
+     * @return bool - return true if is dummy lock, otherwise false.
+     */
+    virtual bool IsDummyLock() const;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 private:
@@ -70,14 +76,14 @@ private:
     virtual void *Handle();
 #endif
 
-	LLBC_DISABLE_ASSIGNMENT(LLBC_FastLock);
+    LLBC_DISABLE_ASSIGNMENT(LLBC_FastLock);
 
 private:
 #ifdef LLBC_FAST_LOCK_ASM
-	int _lock;
+    int _lock;
 #else // !defined(LLBC_FAST_LOCK_ASM)
  #if LLBC_TARGET_PLATFORM_WIN32
-	bool _locked;
+    bool _locked;
  #endif // LLBC_TARGET_PLATFORM_WIN32
     LLBC_MutexHandle _handle;
 #endif // LLBC_FAST_LOCK_ASM

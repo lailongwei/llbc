@@ -114,6 +114,11 @@ namespace
             return _poolInst != NULL;
         }
 
+        LLBC_IObjectPoolInst *GetPoolInst()
+        {
+            return _poolInst;
+        }
+
         void GiveBackToPool()
         {
             if (_poolInst)
@@ -309,7 +314,7 @@ namespace
 
         LLBC_FastLock _lock;
         LLBC_SafetyObjectPool  *_pool;
-        LLBC_ObjectPoolInst<std::vector<double>, LLBC_SpinLock> *_poolInst;
+        LLBC_ObjectPoolInst<std::vector<double>> *_poolInst;
     };
 }
 
@@ -386,11 +391,9 @@ void TestCase_Core_ObjectPool::DoBasicTest()
 
         ReflectionableTestObj *ro = pool.Get<ReflectionableTestObj>();
         LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
+        LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
         LLBC_PrintLine("Reflection method support:GiveBackToPool():");
         LLBC_PoolObjectReflection::GiveBackToPool(ro);
-
-        // TODO: for test
-        const std::type_info &tr = typeid(LLBC_MessageBlock);
 
         LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
         LLBC_ObjectGuard<LLBC_MessageBlock> block = pool.GetGuarded<LLBC_MessageBlock>();

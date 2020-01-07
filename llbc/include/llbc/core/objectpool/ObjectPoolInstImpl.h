@@ -19,7 +19,6 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Macro.h"
 #ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__
 
 #include "llbc/core/thread/Guard.h"
@@ -30,8 +29,8 @@
 
 __LLBC_NS_BEGIN
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType, LockType>::LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool)
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool, LLBC_ILock *lock)
 : LLBC_IObjectPoolInst(objPool)
 , _poolInstName(typeid(ObjectType).name())
 
@@ -45,19 +44,21 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType, LockType>::LLBC_ObjectPoolInst
 , _blockCnt(0)
 , _block(NULL)
 , _memUnitUsageView(NULL)
+
+, _lock(lock)
 {
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolInst()
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
 {
     // Lock pool instance.
-    LLBC_LockGuard guard(_lock);
+    _lock->Lock();
 
     // Notify ObjectType, whis type object pool instance will destroy.
     LLBC_ObjectManipulator::OnPoolInstDestroy<ObjectType>(*this);
 
-    // Do destroy.
+    // Destroy objects and recycle memory.
     if (_blockCnt != 0)
     {
         for (int blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
@@ -80,40 +81,44 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType, LockType>::~LLBC_ObjectPoolIns
         LLBC_Free(_block);
         LLBC_Free(_memUnitUsageView);
     }
+
+    // Unlock pool instance and destroy lock.
+    _lock->Unlock();
+    LLBC_Delete(_lock);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get()
+template <typename ObjectType>
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::Get()
 {
     return Get(false);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::GetReferencable()
+template <typename ObjectType>
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::GetReferencable()
 {
     return Get(true);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPoolInst<ObjectType, LockType>::GetObject()
+template <typename ObjectType>
+LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPoolInst<ObjectType>::GetObject()
 {
     return reinterpret_cast<ObjectType *>(Get(false));
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPoolInst<ObjectType, LockType>::GetReferencableObject()
+template <typename ObjectType>
+LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPoolInst<ObjectType>::GetReferencableObject()
 {
     return reinterpret_cast<ObjectType *>(Get(true));
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPoolInst<ObjectType, LockType>::GetGuarded()
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPoolInst<ObjectType>::GetGuarded()
 {
     return LLBC_ObjectGuard<ObjectType>(GetObject(), this);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void *obj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
 {
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(obj != NULL && "LLBC_ObjectPoolInst::Release() could not release NULL pointer object!");
@@ -129,20 +134,26 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(void *
     Release(memUnit, obj);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::ReleaseObject(ObjectType* obj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::ReleaseObject(ObjectType* obj)
 {
     Release(obj);
 }
 
-template <typename ObjectType, typename LockType>
-const char * LLBC_ObjectPoolInst<ObjectType, LockType>::GetPoolInstName()
+template <typename ObjectType>
+const char * LLBC_ObjectPoolInst<ObjectType>::GetPoolInstName()
 {
     return _poolInstName;
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::ReleaseReferencable(void *obj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE bool LLBC_ObjectPoolInst<ObjectType>::IsThreadSafety() const
+{
+    return !_lock->IsDummyLock();
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::ReleaseReferencable(void *obj)
 {
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(obj != NULL && "LLBC_ObjectPoolInst::ReleaseReferencable() could not release NULL pointer object!");
@@ -159,8 +170,8 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::ReleaseReferen
     Release(memUnit, obj);
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemoryBlock()
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
 {
     // Allocate new block and memory unit usage view.
     if (_blockCnt == 0)
@@ -211,8 +222,8 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::AllocateMemory
     ++_blockCnt;
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj)
 {
     CircularBuffer<MemoryUnit *> *&memUnitView = _memUnitUsageView[memBlock->seq];
     if (memUnitView->IsEmpty())
@@ -253,19 +264,19 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::FindFreeObj(M
     return obj;
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get(const bool &referencableObj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::Get(const bool &referencableObj)
 {
     void *obj;
 
-    _lock.Lock();
+    _lock->Lock();
 
     int oldBlockCnt = _blockCnt;
     for (int blockIdx = 0; blockIdx < oldBlockCnt; ++blockIdx)
     {
         if ((obj = FindFreeObj(_block[blockIdx], referencableObj)))
         {
-            _lock.Unlock();
+            _lock->Unlock();
             return reinterpret_cast<ObjectType *>(obj);
         }
     }
@@ -273,13 +284,13 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType, LockType>::Get(const boo
     AllocateMemoryBlock();
     obj = FindFreeObj(_block[oldBlockCnt], referencableObj);
 
-    _lock.Unlock();
+    _lock->Unlock();
 
     return obj;
 }
 
-template <typename ObjectType, typename LockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(MemoryUnit *memUnit, void *obj)
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memUnit, void *obj)
 {
     // Repeated release check(only available when LLBC_DEBUG/LLBC_CFG_CORE_OBJECT_POOL_DEBUG enabled).
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
@@ -294,9 +305,9 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType, LockType>::Release(Memory
     memUnit->unFlags.flags.inUsing = false;
 
     // Push back to Circular buffer.
-    _lock.Lock();
+    _lock->Lock();
     _memUnitUsageView[memUnit->block->seq]->Push(memUnit);
-    _lock.Unlock();
+    _lock->Unlock();
 }
 
 __LLBC_NS_END

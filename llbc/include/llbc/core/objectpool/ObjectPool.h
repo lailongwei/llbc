@@ -91,7 +91,7 @@ public:
     * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
     */
     template <typename ObjectType>
-    LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> *GetPoolInst();
+    LLBC_ObjectPoolInst<ObjectType> *GetPoolInst();
 
     /**
      * Get object pool instance interface object.

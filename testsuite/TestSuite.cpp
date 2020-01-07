@@ -75,6 +75,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_ObjBase_Array);
     // test = LLBC_New0(TestCase_ObjBase_Dictionary);
     // test = LLBC_New0(TestCase_Core_ObjectPool);
+    // test = LLBC_New0(TestCase_Core_Recycle);
 
     /* Communication module testcases. */
     // test = LLBC_New0(TestCase_Comm_EventInSvc);

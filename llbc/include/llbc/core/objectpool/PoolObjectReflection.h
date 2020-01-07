@@ -38,6 +38,7 @@ public:
     template <typename ObjectType,
               void (ObjectType::*)(LLBC_IObjectPoolInst &poolInst), // Mark object-pool object support: void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
               bool (ObjectType::*)() const, // Object-Pool object reflaction: bool IsPoolObject() const
+              LLBC_IObjectPoolInst *(ObjectType::*)(), // Object-Pool object reflaction: LLBC_IObjectPoolInst *GetPoolInst()
               void (ObjectType::*)()> // Release to object pool support: void GiveBackToPool()
     struct poolobject_reflection_detect_type;
 
@@ -45,6 +46,7 @@ public:
     #define __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF poolobject_reflection_detect_type<ObjectType, \
                                                                                                              &ObjectType::MarkPoolObject, \
                                                                                                              &ObjectType::IsPoolObject, \
+                                                                                                             &ObjectType::GetPoolInst, \
                                                                                                              &ObjectType::GiveBackToPool> \
 
 public:
@@ -95,6 +97,21 @@ private:
     template <typename ObjectType>
     static bool IsPoolObjectInl(ObjectType *&obj,
                                 ...);
+public:
+    /**
+     * Get object owned pool instance.
+     */
+    template <typename ObjectType>
+    static LLBC_IObjectPoolInst *GetPoolInst(ObjectType *&obj);
+
+private:
+    template <typename ObjectType>
+    static LLBC_IObjectPoolInst *GetPoolInstInl(ObjectType *&obj,
+                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *);
+
+    template <typename ObjectType>
+    static LLBC_IObjectPoolInst *GetPoolInstInl(ObjectType *&obj,
+                                                ...);
 
 public:
     /**
