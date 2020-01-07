@@ -314,7 +314,7 @@ namespace
 
         LLBC_FastLock _lock;
         LLBC_SafetyObjectPool  *_pool;
-        LLBC_ObjectPoolInst<std::vector<double>> *_poolInst;
+        LLBC_ObjectPoolInst<std::vector<double> > *_poolInst;
     };
 }
 
