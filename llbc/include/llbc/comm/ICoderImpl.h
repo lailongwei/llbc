@@ -42,6 +42,11 @@ inline bool LLBC_ICoder::IsPoolObject() const
     return _poolInst != NULL;
 }
 
+inline LLBC_IObjectPoolInst *LLBC_ICoder::GetPoolInst()
+{
+    return _poolInst;
+}
+
 inline void LLBC_ICoder::GiveBackToPool()
 {
     _poolInst->Release(this);

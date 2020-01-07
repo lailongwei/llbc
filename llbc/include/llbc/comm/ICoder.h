@@ -70,6 +70,12 @@ public:
     virtual bool IsPoolObject() const;
 
     /**
+     * Object-Pool reflection support:Get pool instance.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual LLBC_IObjectPoolInst *GetPoolInst();
+
+    /**
      * Object-Pool reflection support: Give back object to pool.
      * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
      */
