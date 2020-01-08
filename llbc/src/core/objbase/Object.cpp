@@ -52,6 +52,11 @@ int LLBC_Object::GetRefCount()
     return _ref;
 }
 
+int LLBC_Object::GetAutoRefCount()
+{
+    return _autoRef;
+}
+
 void LLBC_Object::Release()
 {
     if (--_ref == 0)

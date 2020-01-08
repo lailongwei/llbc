@@ -154,6 +154,14 @@ void LLBC_MessageBlock::GiveBackToPool()
 void LLBC_MessageBlock::Clear()
 {
     _readPos = _writePos = 0;
+    if (_attach)
+    {
+        _buf = 0;
+        _size = 0;
+        _attach = false;
+    }
+
+    _prev = _next = NULL;
 }
 
 bool LLBC_MessageBlock::IsAttach() const

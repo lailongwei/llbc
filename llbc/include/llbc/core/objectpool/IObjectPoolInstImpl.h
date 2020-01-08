@@ -51,6 +51,13 @@ LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolOb
     reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = NULL;
 }
 
+LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::CheckRefCount(void *obj)
+{
+    LLBC_ReferencablePoolObj *refObj = reinterpret_cast<LLBC_ReferencablePoolObj *>(obj);
+    ASSERT(refObj->GetRefCount() == 1 && refObj->GetAutoRefCount() == 0 && 
+           "Referencable pool object reference count must be 1 and auto-reference count must be 0!");
+}
+
 __LLBC_NS_END
 
 #include "llbc/core/objectpool/IObjectPoolImpl.h"

@@ -138,6 +138,7 @@ void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
 
 void LLBC_Packet::Clear()
 {
+    // Clear payload.
     if (_payload)
     {
         if (_payloadDeleteDeleg)
@@ -154,8 +155,41 @@ void LLBC_Packet::Clear()
         }
     }
 
+    // Clear payload delete delegate.
+    CleanupPayloadDeleteDeleg();
+
+    // Clear encoder/decoder
     LLBC_XRecycle(_encoder);
     LLBC_XRecycle(_decoder);
+
+    // Reset some normal members.
+    _length = 0;
+    _sessionId = 0;
+    _acceptSessionId = 0;
+    _senderSvcId = 0;
+    _recverSvcId = 0;
+    _localAddr.SetIp(0); _localAddr.SetPort(0);
+    _peerAddr.SetIp(0); _peerAddr.SetPort(0);
+
+    _opcode = 0;
+    _status = 0;
+#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    if (_statusDesc)
+        _statusDesc->clear();
+#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    _flags = 0;
+    _extData1 = 0;
+    _extData2 = 0;
+    _extData3 = 0;
+
+    // Clear codec error.
+    LLBC_XDelete(_codecError);
+
+    // Clear pre-handle result.
+    CleanupPreHandleResult();
+
+    // Reset don't delete after handle flag.
+    _dontDelAfterHandle = true;
 }
 
 LLBC_ICoder *LLBC_Packet::GetEncoder() const

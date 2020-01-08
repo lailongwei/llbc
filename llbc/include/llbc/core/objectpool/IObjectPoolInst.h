@@ -117,6 +117,11 @@ protected:
      */
     void ClearPoolInstFromReferencablePoolObj(void *obj);
 
+    /**
+     * Check object ref&auto-ref count.
+     */
+    void CheckRefCount(void *obj);
+
 private:
     // Disable assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_IObjectPoolInst);

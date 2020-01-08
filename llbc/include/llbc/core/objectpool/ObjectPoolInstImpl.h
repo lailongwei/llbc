@@ -71,6 +71,12 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
                     continue;
 
                 void *obj = reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize);
+                if (memUnit->unFlags.flags.referencableObj)
+                {
+                    #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+                    CheckRefCount(obj);
+                    #endif
+                }
                 LLBC_ObjectManipulator::Delete<ObjectType>(obj);
             }
 
