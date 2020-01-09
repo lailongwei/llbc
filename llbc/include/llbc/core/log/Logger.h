@@ -24,10 +24,13 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_DelegateImpl.h"
-#include "llbc/core/thread/RecursiveLock.h"
+#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/thread/RecursiveLock.h"
 
 __LLBC_NS_BEGIN
 
@@ -190,7 +193,7 @@ private:
                                int len);
 
 private:
-    LLBC_RecursiveLock _mutex;
+    LLBC_RecursiveLock _lock;
 
     LLBC_String _name;
 
@@ -198,7 +201,9 @@ private:
     const LLBC_LoggerConfigInfo *_config;
 
     LLBC_LogRunnable *_logRunnable;
-
+    LLBC_SafetyObjectPool _objPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
+    LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
     LLBC_IDelegate1<void, const LLBC_LogData *> *_hookDelegs[LLBC_LogLevel::End];
 };
 
@@ -207,3 +212,4 @@ __LLBC_NS_END
 #include "llbc/core/log/LoggerImpl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_H__
+

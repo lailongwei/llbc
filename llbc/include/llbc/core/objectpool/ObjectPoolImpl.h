@@ -76,14 +76,15 @@ LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::G
     if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
     {
         _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _lock.Unlock();
+
         LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
     }
     else
     {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
+        _lock.Unlock();
     }
-
-    _lock.Unlock();
 
     return poolInst->GetObject();
 }
@@ -101,14 +102,15 @@ LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::G
     if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
     {
         _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _lock.Unlock();
+
         LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
     }
     else
     {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
+        _lock.Unlock();
     }
-
-    _lock.Unlock();
 
     return reinterpret_cast<ObjectType *>(poolInst->GetReferencable());
 }
@@ -126,14 +128,15 @@ LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, Poo
     if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
     {
         _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _lock.Unlock();
+
         LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
     }
     else
     {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
+        _lock.Unlock();
     }
-
-    _lock.Unlock();
 
     return LLBC_ObjectGuard<ObjectType>(reinterpret_cast<ObjectType *>(poolInst->Get()), poolInst);
 }
@@ -182,14 +185,15 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType,
     if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
     {
         _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _lock.Unlock();
+
         LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
     }
     else
     {
         poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
+        _lock.Unlock();
     }
-
-    _lock.Unlock();
 
     return poolInst;
 }

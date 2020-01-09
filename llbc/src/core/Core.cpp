@@ -66,6 +66,7 @@ int __LLBC_CoreStartup()
         LLBC_StartupNetLibrary();
 
     // Supported object-pool reflection types assert.
+    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_LogData>());
     ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_MessageBlock>());
     // Add all framework internal implemented object pool factories.
     LLBC_IObjectPool::RegisterPoolInstFactory(new LLBC_MessageBlockObjectPoolInstFactory());

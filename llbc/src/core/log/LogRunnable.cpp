@@ -24,10 +24,10 @@
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/thread/MessageBlock.h"
+#include "llbc/core/objectpool/PoolObjectReflection.h"
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/ILogAppender.h"
-#include "llbc/core/log/LogAppenderBuilder.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
@@ -55,9 +55,9 @@ void LLBC_LogRunnable::Cleanup()
         block->Read(&logData, sizeof(LLBC_LogData *));
 
         Output(logData);
-        FreeLogData(logData);
+        LLBC_Recycle(logData);
 
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 
     // Flush all appenders(force).
@@ -89,9 +89,9 @@ void LLBC_LogRunnable::Svc()
         block->Read(&logData, sizeof(LLBC_LogData *));
 
         Output(logData);
-        FreeLogData(logData);
+        LLBC_Recycle(logData);
 
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 }
 
@@ -142,14 +142,6 @@ int LLBC_LogRunnable::Output(LLBC_LogData *data)
 void LLBC_LogRunnable::Stop()
 {
     _stoped = true;
-}
-
-void LLBC_LogRunnable::FreeLogData(LLBC_LogData *data)
-{
-    LLBC_XFree(data->msg);
-    LLBC_XFree(data->others);
-
-    LLBC_Delete(data);
 }
 
 void LLBC_LogRunnable::FlushAppenders(bool force)

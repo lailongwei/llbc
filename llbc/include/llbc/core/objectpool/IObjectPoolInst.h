@@ -31,6 +31,8 @@ __LLBC_NS_BEGIN
  */
 class LLBC_ReferencablePoolObj;
 
+class LLBC_IObjectPool;
+
 template <typename PoolLockType, typename PoolInstLockType>
 class LLBC_ObjectPool;
 
