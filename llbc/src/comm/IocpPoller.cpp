@@ -206,7 +206,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         if (ol->acceptSock != LLBC_INVALID_SOCKET_HANDLE)
             LLBC_CloseSocket(ol->acceptSock);
         if (ol->data)
-            LLBC_Delete(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
+            LLBC_Recycle(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
         LLBC_Delete(ol);
 
         return;

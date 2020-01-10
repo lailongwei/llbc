@@ -39,7 +39,7 @@ __LLBC_INTERNAL_NS_BEGIN
 void __OnOverlappedDelHook(void *data)
 {
     if (data)
-        LLBC_Delete(reinterpret_cast<
+        LLBC_Recycle(reinterpret_cast<
             LLBC_NS LLBC_MessageBlock *>(data));
 }
 

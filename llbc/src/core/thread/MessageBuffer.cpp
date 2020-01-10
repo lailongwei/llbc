@@ -22,6 +22,9 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/objectpool/ObjectPool.h"
+#include "llbc/core/objectpool/PoolObjectReflection.h"
+
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageBuffer.h"
 
@@ -64,7 +67,7 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
             {
                 LLBC_MessageBlock *block = _head;
                 _head = _head->GetNext();
-                LLBC_Delete(block);
+                LLBC_Recycle(block);
             }
 
             needReadLen = 0;
@@ -76,7 +79,7 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
 
         LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 
     if (needReadLen > 0)
@@ -103,7 +106,7 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
     block->Write(buf, len);
     if (Append(block) != LLBC_OK)
     {
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
         return LLBC_FAILED;
     }
 
@@ -128,7 +131,7 @@ LLBC_MessageBlock *LLBC_MessageBuffer::MergeBuffersAndDetach()
             curBlock->GetDataStartWithReadPos(), curBlock->GetWritePos() - curBlock->GetReadPos());
         LLBC_MessageBlock *next = curBlock->GetNext();
 
-        LLBC_Delete(curBlock);
+        LLBC_Recycle(curBlock);
         curBlock = next;
     }
 
@@ -148,7 +151,7 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
 
     if (UNLIKELY(block->GetReadableSize() == 0))
     {
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
         return LLBC_OK;
     }
 
@@ -189,7 +192,7 @@ size_t LLBC_MessageBuffer::Remove(size_t length)
             {
                 LLBC_MessageBlock *block = _head;
                 _head = _head->GetNext();
-                LLBC_Delete(block);
+                LLBC_Recycle(block);
             }
 
             needRemoveLength = 0;
@@ -200,7 +203,7 @@ size_t LLBC_MessageBuffer::Remove(size_t length)
 
         LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 
     if (needRemoveLength > 0)
@@ -218,7 +221,7 @@ void LLBC_MessageBuffer::Cleanup()
     {
         block = _head;
         _head = _head->GetNext();
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 }
 
