@@ -116,6 +116,15 @@ private:
 
 private:
     /**
+     * Some stl containers support, like:map/set.
+     */
+    template <typename ObjectType, void (ObjectType::_Mybase::*)()>
+    struct clearmethod_in_base_stl_container_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *);
+
+private:
+    /**
      * Reset object, default method.
      */
     template <typename ObjectType>

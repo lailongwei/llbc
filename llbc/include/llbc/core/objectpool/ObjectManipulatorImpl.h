@@ -38,7 +38,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectManipulator::Delete(void *obj)
 template <typename ObjectType>
 LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::Reset(void *obj)
 {
-    return ResetObj<ObjectType>(obj, 0);
+    return ResetObj<ObjectType>(reinterpret_cast<ObjectType *>(obj), NULL);
 }
 
 template <typename ObjectType>
@@ -88,6 +88,13 @@ LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_typ
     return false;
 }
 #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->clear();
+    return false;
+}
 
 template <typename ObjectType>
 LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
