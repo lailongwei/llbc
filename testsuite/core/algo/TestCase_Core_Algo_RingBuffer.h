@@ -19,51 +19,24 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMMON_CIRCULAR_BUFFER_H__
-#define __LLBC_COMMON_CIRCULAR_BUFFER_H__
+#ifndef __LLBC_TEST_CASE_CORE_ALGO_RING_BUFFER_H__
+#define __LLBC_TEST_CASE_CORE_ALGO_RING_BUFFER_H__
 
-template <typename ObjectType>
-class CircularBuffer
+#include "llbc.h"
+using namespace llbc;
+
+class TestCase_Core_Algo_RingBuffer : public LLBC_BaseTestCase
 {
 public:
-    CircularBuffer(const size_t capacity);
-    ~CircularBuffer();
+    TestCase_Core_Algo_RingBuffer();
+    virtual ~TestCase_Core_Algo_RingBuffer();
 
 public:
-    /**
-    * Determines whether the buffer is full.
-    * @return bool - return true if full, otherwise return false.
-    */
-    bool IsFull();
-
-    /**
-    * Determines whether the buffer is empty.
-    * @return bool - return true if empty, otherwise return false.
-    */
-    bool IsEmpty();
-
-    /**
-    * Insert object to the tail.
-    * @param[in] obj - The object.
-    */
-    void Push(const ObjectType &obj);
-
-    /**
-    * Get object from front.
-    * @return ObjectType - The object.
-    */
-    ObjectType Pop();
+    virtual int Run(int argc, char *argv[]);
 
 private:
-    const size_t _capacity;
-
-    int _front;
-    int _tail;
-    bool _isFull;
-    
-    ObjectType *_buffers;
+    void DoBasicTest();
+    void DoPerfTest();
 };
 
-#include "llbc/common/CircularBufferImpl.h"
-
-#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__
+#endif // !__LLBC_TEST_CASE_CORE_ALGO_RING_BUFFER_H__

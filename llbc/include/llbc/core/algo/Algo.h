@@ -19,60 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMMON_CIRCULAR_BUFFER_H__
+#ifndef __LLBC_CORE_ALGO_ALGO_H__
+#define __LLBC_CORE_ALGO_ALGO_H__
 
-template <typename ObjectType>
-inline CircularBuffer<ObjectType>::CircularBuffer(const size_t capacity)
-: _capacity(capacity)
+#include "llbc/core/algo/RingBuffer.h"
 
-, _front(0)
-, _tail(0)
-, _isFull(false)
-
-, _buffers(new ObjectType[capacity])
-{
-}
-
-template <typename ObjectType>
-inline CircularBuffer<ObjectType>::~CircularBuffer()
-{
-    LLBC_Deletes(_buffers);
-}
-
-template <typename ObjectType>
-inline bool CircularBuffer<ObjectType>::IsFull()
-{
-    return _isFull;
-}
-
-template <typename ObjectType>
-inline bool CircularBuffer<ObjectType>::IsEmpty()
-{
-    return !_isFull && _tail == _front;
-}
-
-template <typename ObjectType>
-inline void CircularBuffer<ObjectType>::Push(const ObjectType &obj)
-{
-    _buffers[_tail] = obj;
-    if (++_tail == _capacity)
-        _tail = 0;
-
-    _isFull = (_tail == _front);
-}
-
-template <typename ObjectType>
-inline ObjectType CircularBuffer<ObjectType>::Pop()
-{
-    ObjectType &obj = _buffers[_front];
-
-    if (++_front == _capacity)
-        _front = 0;
-
-    if (_isFull)
-        _isFull = false;
-
-    return obj;
-}
-
-#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__
+#endif // !_LLBC_CORE_ALGO_ALGO_H__

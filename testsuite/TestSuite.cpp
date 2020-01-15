@@ -41,6 +41,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_OS_Symbol);
     // test = LLBC_New0(TestCase_Core_OS_Thread);
     // test = LLBC_New0(TestCase_Core_OS_Console);
+    // test = LLBC_New0(TestCase_Core_Algo_RingBuffer);
     // test = LLBC_New0(TestCase_Core_Bundle);
     // test = LLBC_New0(TestCase_Core_Utils_Text);
     // test = LLBC_New0(TestCase_Core_Utils_Debug);

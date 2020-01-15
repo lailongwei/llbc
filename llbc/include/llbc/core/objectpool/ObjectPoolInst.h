@@ -23,6 +23,7 @@
 #define __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__
 
 #include "llbc/common/Common.h"
+#include "llbc/core/algo/Algo.h"
 #include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
@@ -98,6 +99,7 @@ private:
         #if LLBC_64BIT_PROCESSOR
         sint32 unused;         // if in 64bit arch, use for memory align.
         #endif
+        LLBC_RingBuffer<MemoryUnit *> *freeUnits; // the free units for the memory block.
         uint8 buff[0];         // The begin address of buffer.
     };
 
@@ -178,7 +180,7 @@ private:
      * @param[in] referencableObj - is referencable object or not.
      * @return void * - the object pointer.
      */
-    void *FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj);
+    void *FindFreeObj(MemoryBlock *&memBlock, const bool &referencableObj);
 
     /**
      * Internal get object implement.
@@ -207,7 +209,7 @@ private:
 
     int _blockCnt;
     MemoryBlock **_block;
-    CircularBuffer<MemoryUnit *> **_memUnitUsageView;
+    LLBC_RingBuffer<MemoryBlock *> _freeBlocks;
 
     LLBC_ILock *_lock;
 };

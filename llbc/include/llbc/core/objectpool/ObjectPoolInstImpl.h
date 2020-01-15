@@ -43,7 +43,6 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
 
 , _blockCnt(0)
 , _block(NULL)
-, _memUnitUsageView(NULL)
 
 , _lock(lock)
 {
@@ -80,12 +79,11 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
                 LLBC_ObjectManipulator::Delete<ObjectType>(obj);
             }
 
-            ::free(memBlock);
-            delete _memUnitUsageView[blockIdx];
+            LLBC_Delete(memBlock->freeUnits);
+            LLBC_Free(memBlock);
         }
 
         LLBC_Free(_block);
-        LLBC_Free(_memUnitUsageView);
     }
 
     // Unlock pool instance and destroy lock.
@@ -126,10 +124,12 @@ LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPoolInst<ObjectType>::
 template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
 {
+    // Do assert, makesure object is not null.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(obj != NULL && "LLBC_ObjectPoolInst::Release() could not release NULL pointer object!");
     #endif
 
+    // Get memory unit, and do assert, makesure will release object is not referencable object.
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
         reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
@@ -137,6 +137,8 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
            "LLBC_ObjectPoolInst::Release() could not release referencable object, "
            "please using LLBC_ReferencableObj::Release/AutoRelease methods to complete object release");
     #endif
+
+    // Execute real release.
     Release(memUnit, obj);
 }
 
@@ -180,18 +182,11 @@ template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
 {
     // Allocate new block and memory unit usage view.
-    if (_blockCnt == 0)
-    {
-        _block = reinterpret_cast<MemoryBlock **>(::malloc(sizeof(MemoryBlock *)));
-        _memUnitUsageView = reinterpret_cast<CircularBuffer<MemoryUnit *> **>(::malloc(sizeof(CircularBuffer<MemoryUnit *> *)));
-    }
+    if (UNLIKELY(_blockCnt == 0))
+        _block = LLBC_Malloc(MemoryBlock *, sizeof(MemoryBlock *));
     else
-    {
-        _block = reinterpret_cast<MemoryBlock **>(::realloc(_block, sizeof(MemoryBlock *) * (_blockCnt + 1)));
-        _memUnitUsageView = reinterpret_cast<CircularBuffer<MemoryUnit *> **>(::realloc(_memUnitUsageView, sizeof(CircularBuffer<MemoryUnit *> *) * (_blockCnt + 1)));
-    }
-
-    CircularBuffer<MemoryUnit *> *memUnitView = new CircularBuffer<MemoryUnit *>(_elemCnt);
+        _block = LLBC_Realloc(MemoryBlock *, _block, sizeof(MemoryBlock *) * (_blockCnt + 1));
+    LLBC_RingBuffer<MemoryUnit *> *freeUnits = new LLBC_RingBuffer<MemoryUnit *>(_elemCnt);
 
     // Fill new block content.
     MemoryBlock* memBlock = reinterpret_cast<MemoryBlock *>(::malloc(sizeof(MemoryBlock) + _blockSize));
@@ -204,6 +199,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
     #if LLBC_64BIT_PROCESSOR
     memBlock->unused = 0;
     #endif // 64bit-processor
+    memBlock->freeUnits = freeUnits;
 
     for (int idx = 0; idx < _elemCnt; ++idx)
     {
@@ -218,24 +214,40 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
         *(reinterpret_cast<sint64 *>(memUnit->buff)) = LLBC_INL_NS BeginingSymbol;
         *(reinterpret_cast<sint64 *>(reinterpret_cast<uint8 *>(memUnit) + _elemSize - LLBC_INL_NS CheckSymbolSize)) = LLBC_INL_NS EndingSymbol;
         #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-        memUnitView->Push(memUnit);
+        freeUnits->Push(memUnit);
     }
 
     _block[_blockCnt] = memBlock;
-    _memUnitUsageView[_blockCnt] = memUnitView;
+    _freeBlocks.Push(memBlock);
 
     // Update block number.
     ++_blockCnt;
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj)
+LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock *&memBlock, const bool &referencableObj)
 {
-    CircularBuffer<MemoryUnit *> *&memUnitView = _memUnitUsageView[memBlock->seq];
-    if (memUnitView->IsEmpty())
-        return NULL;
+    // Do assert(makesure given block has free units).
+    #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    ASSERT(!memBlock->freeUnits->IsEmpty() && "Try pop empty memory block!");
+    #endif
 
-    MemoryUnit *memUnit = memUnitView->Pop();
+    // Pop free unit, and then not exist any free units after pop, pop this block from _freeBlocks.
+    LLBC_RingBuffer<MemoryUnit *> *&freeUnits = memBlock->freeUnits;
+    MemoryUnit *memUnit = freeUnits->Pop();
+    if (UNLIKELY(freeUnits->IsEmpty()))
+    {
+        #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+        MemoryBlock *popBlock = _freeBlocks.Pop();
+        ASSERT(popBlock == memBlock && "Object pool instance internal error, memory blocks dismatch!");
+        #else
+        _freeBlocks.Pop();
+        #endif
+    }
+
+    // Unlock pool instance.
+    _lock->Unlock();
+
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(*(reinterpret_cast<sint64 *>(memUnit->buff)) == LLBC_INL_NS BeginingSymbol && "LLBC_ObjectPoolInst::Get() memory unit is dirty");
     ASSERT(*(reinterpret_cast<sint64 *>(
@@ -273,24 +285,14 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
 template <typename ObjectType>
 LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::Get(const bool &referencableObj)
 {
-    void *obj;
-
     _lock->Lock();
+    if (UNLIKELY(_freeBlocks.IsEmpty()))
+        AllocateMemoryBlock();
 
-    int oldBlockCnt = _blockCnt;
-    for (int blockIdx = 0; blockIdx < oldBlockCnt; ++blockIdx)
-    {
-        if ((obj = FindFreeObj(_block[blockIdx], referencableObj)))
-        {
-            _lock->Unlock();
-            return reinterpret_cast<ObjectType *>(obj);
-        }
-    }
+    void *obj = FindFreeObj(_freeBlocks.Front(), referencableObj);
 
-    AllocateMemoryBlock();
-    obj = FindFreeObj(_block[oldBlockCnt], referencableObj);
-
-    _lock->Unlock();
+    // Unlocked in FindFreeObj() method.
+    // _lock->Unlock();
 
     return obj;
 }
@@ -310,9 +312,19 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memU
     // Reset using flag.
     memUnit->unFlags.flags.inUsing = false;
 
-    // Push back to Circular buffer.
+    // Push back to freeUnits.
     _lock->Lock();
-    _memUnitUsageView[memUnit->block->seq]->Push(memUnit);
+
+    LLBC_RingBuffer<MemoryUnit *> *&freeUnits = memUnit->block->freeUnits;
+    if (UNLIKELY(freeUnits->IsEmpty())) // If the block has not free units before release object, push this memory block to _freeBlocks.
+        _freeBlocks.Push(memUnit->block);
+
+    // Makesure ring-buffer is not full.
+    #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    ASSERT(!freeUnits->IsFull() && "Try repeat release object!");
+    #endif
+
+    freeUnits->Push(memUnit);
     _lock->Unlock();
 }
 

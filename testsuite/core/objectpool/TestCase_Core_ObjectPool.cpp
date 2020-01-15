@@ -351,6 +351,12 @@ void TestCase_Core_ObjectPool::DoBasicTest()
     {
         LLBC_ObjectPool<> pool;
 
+        std::set<int> *set1 = pool.Get<std::set<int> >();
+        pool.Release(set1);
+
+        std::vector<int> *vec1 = pool.Get<std::vector<int> >();
+        pool.Release(vec1);
+
         const int testTimes = 10;
         LLBC_PrintLine("LLBC_ObjectPool<>:Get/Release test(test times:%d):", testTimes);
         for (int i = 0; i < testTimes; ++i)

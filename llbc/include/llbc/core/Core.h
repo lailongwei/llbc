@@ -25,6 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/os/Common.h"
+#include "llbc/core/algo/Algo.h"
 #include "llbc/core/bundle/Common.h"
 #include "llbc/core/utils/Common.h"
 #include "llbc/core/sampler/Common.h"

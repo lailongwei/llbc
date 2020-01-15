@@ -43,6 +43,12 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
+ * \brief core/algo about config options define.
+ */
+// Define RingBuffer init capacity.
+#define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
+
+/**
  * \brief core/file about config options define.
  */
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
