@@ -151,7 +151,7 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AdjustBackNodesFrontNode(LLBC_Objec
          it != _backNodes->end();
          ++it)
     {
-        auto &node = it->second;
+        LLBC_ObjectPoolOrderedDeleteNode *&node = it->second;
         node->_frontNode = frontNode;
         frontNode->_backNodes->insert(std::make_pair(node->GetNodeName(), node));
     }
