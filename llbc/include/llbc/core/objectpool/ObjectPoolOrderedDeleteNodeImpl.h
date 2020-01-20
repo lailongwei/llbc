@@ -112,6 +112,8 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const LLBC_CString &
         // Current node's back node is will remove node, remove it.
         if (!force)
             backNode->AdjustBackNodesFrontNode(this);
+        else
+            backNode->_frontNode = NULL;
 
         if (del)
             LLBC_Delete(backNode);
@@ -141,11 +143,18 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AdjustBackNodesFrontNode(LLBC_Objec
     if (!_backNodes)
         return LLBC_OK;
 
+    if (!frontNode->_backNodes)
+        frontNode->_backNodes = LLBC_New(LLBC_ObjectPoolOrderedDeleteNodes);
+
     // Foreach adjust all back nodes.
     for (LLBC_ObjectPoolOrderedDeleteNodes::iterator it = _backNodes->begin();
          it != _backNodes->end();
          ++it)
-        frontNode->AddBackNode(it->second);
+    {
+        auto &node = it->second;
+        node->_frontNode = frontNode;
+        frontNode->_backNodes->insert(std::make_pair(node->GetNodeName(), node));
+    }
 
     // Clear current node's _backNodes.
     _backNodes->clear();

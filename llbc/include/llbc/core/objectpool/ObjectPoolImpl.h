@@ -314,7 +314,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
         else // backNode is not top node.
         {
             LLBC_ObjectPoolOrderedDeleteNode *grandFrontNode = backNode->GetFrontNode();
-            grandFrontNode->RemoveBackNode(backNodeName, false);
+            grandFrontNode->RemoveBackNode(backNodeName, false, true);
 
             frontNode->AddBackNode(backNode);
             grandFrontNode->AddBackNode(frontNode);
