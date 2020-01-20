@@ -78,11 +78,12 @@ public:
 
     /**
      * Remove back node.
-     * @param[in] name - the back node name.
-     * @param[in] del  - delete back lock flag.
+     * @param[in] name  - the back node name.
+     * @param[in] del   - delete back lock flag.
+     * @param[in] force - force remove flag.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveBackNode(const LLBC_CString &name, bool del);
+    int RemoveBackNode(const LLBC_CString &name, bool del, bool force = false);
 
     /**
      * Adjust back nodes front node.

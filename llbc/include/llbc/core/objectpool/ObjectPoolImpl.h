@@ -352,13 +352,17 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
         //                         |--> J1 --> K1
         //                         |--> J2 --> K2
         LLBC_ObjectPoolOrderedDeleteNode *backNodeTopParentNode = backNode->GetTopFrontNode();
+        LLBC_ObjectPoolOrderedDeleteNode *frontNodeTopParentNode = frontNode->GetTopFrontNode();
         if (!backNodeTopParentNode)
             _topOrderedDeleteNodes->erase(backNodeName);
-        else
+        else if (frontNodeTopParentNode != backNodeTopParentNode)
             _topOrderedDeleteNodes->erase(backNodeTopParentNode->GetNodeName());
+        else
+            backNode->GetFrontNode()->RemoveBackNode(backNodeName, false, true);
 
         frontNode->AdjustBackNodesFrontNode(backNode);
-        if (backNodeTopParentNode)
+        if (backNodeTopParentNode &&
+            frontNodeTopParentNode != backNodeTopParentNode)
             frontNode->AddBackNode(backNodeTopParentNode);
         else
             frontNode->AddBackNode(backNode);

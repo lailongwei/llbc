@@ -517,7 +517,35 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
     }
 
-    LLBC_PrintLine("Test 5: Real ordered delete test:");
+    LLBC_PrintLine("Test 5: <FrontNode != NULL && BackNode != NULL>(has same parent node):");
+    {
+        // Before:
+        //    A --> X --> Y1 --> Z1
+        //     |--> I --> J1 --> K1
+        // Let:
+        //    X --> I
+        // After:
+        //    A --> X -- >I --> Y1 --> Z1
+        //                 |--> J1 --> K1
+
+        LLBC_UnsafetyObjectPool pool;
+        // Build A --> X
+        pool.AcquireOrderedDeletePoolInst<OD_A, OD_X>();
+        // Build A --> I
+        pool.AcquireOrderedDeletePoolInst<OD_A, OD_I>();
+
+        // Build: X --> Y1 --> Z1
+        pool.AcquireOrderedDeletePoolInst<OD_Y1, OD_Z1>();
+        pool.AcquireOrderedDeletePoolInst<OD_X, OD_Y1>();
+        // Build:  I --> J1 --> K1
+        pool.AcquireOrderedDeletePoolInst<OD_J1, OD_K1>();
+        pool.AcquireOrderedDeletePoolInst<OD_I, OD_J1>();
+
+        // Let: X --> I
+        pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
+    }
+
+    LLBC_PrintLine("Test 6: Real ordered delete test:");
     {
         // X --> A
 

@@ -80,7 +80,7 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AddBackNode(LLBC_ObjectPoolOrderedD
     return LLBC_OK;
 }
 
-inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const LLBC_CString &name, bool del)
+inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const LLBC_CString &name, bool del, bool force)
 {
     if (UNLIKELY(_name == name))
     {
@@ -110,7 +110,8 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const LLBC_CString &
         }
 
         // Current node's back node is will remove node, remove it.
-        backNode->AdjustBackNodesFrontNode(this);
+        if (!force)
+            backNode->AdjustBackNodesFrontNode(this);
 
         if (del)
             LLBC_Delete(backNode);
