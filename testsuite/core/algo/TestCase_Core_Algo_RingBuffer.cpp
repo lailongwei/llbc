@@ -63,7 +63,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
             std::cout << "  - pop: " << rb.Pop() << std::endl;
         std::cout << "- after pop, is empty: " << rb.IsEmpty() << ", is full: " << rb.IsFull() << std::endl;
 
-        size_t oldCap = rb.GetCapacity();
+        int oldCap = static_cast<int>(rb.GetCapacity());
         std::cout << "- auto recapacity test:" << std::endl;
         for (size_t i = 0; i < oldCap * 2; ++i)
         {
