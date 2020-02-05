@@ -55,7 +55,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Core_File_File);
     // test = LLBC_New0(TestCase_Core_File_Directory);
     // test = LLBC_New0(TestCase_Core_VariantTest);
-    // test = LLBC_New0(TestCase_Core_Config_Ini);
+    test = LLBC_New0(TestCase_Core_Config_Ini);
     // test = LLBC_New0(TestCase_Core_Time_Time);
     // test = LLBC_New0(TestCase_Core_Event);
     // test = LLBC_New0(TestCase_Core_Config_Property);
