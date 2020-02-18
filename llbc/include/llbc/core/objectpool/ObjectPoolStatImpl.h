@@ -202,6 +202,24 @@ inline const LLBC_String &LLBC_ObjectPoolStat::ToString() const
     return _strRepr;
 }
 
+inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_UsedMem(const LLBC_ObjectPoolInstStat * const &left,
+                                                                const LLBC_ObjectPoolInstStat * const &right)
+{
+    return (left->usedUnitsMemory + left->innerUsedMemory) > (right->usedUnitsMemory + right->innerUsedMemory);
+}
+
+inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_UsedElems(const LLBC_ObjectPoolInstStat * const &left,
+                                                                  const LLBC_ObjectPoolInstStat * const &right)
+{
+    return left->usedUnitsNum > right->usedUnitsNum;
+}
+
+inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_AllocatedMem(const LLBC_ObjectPoolInstStat * const &left,
+                                                                     const LLBC_ObjectPoolInstStat * const &right)
+{
+    return left->totalMemory > right->totalMemory;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_STAT_H__

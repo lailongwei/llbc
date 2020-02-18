@@ -172,6 +172,19 @@ private:
     LLBC_String _strRepr; // string representation.
 };
 
+/**
+ * \brief The object pool instance stat info comper encapsulation.
+ */
+class LLBC_ObjectPoolInstStatComper
+{
+public:
+    static bool CompBy_UsedMem(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+
+    static bool CompBy_UsedElems(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+
+    static bool CompBy_AllocatedMem(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+};
+
 __LLBC_NS_END
 
 /**

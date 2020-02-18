@@ -378,11 +378,14 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
 {
     typedef typename std::map<LLBC_CString, LLBC_ObjectPoolInstStat>::iterator _InstStatIt;
 
+    stat.Reset();
+
     LLBC_LockGuard guard(const_cast<LLBC_ObjectPool *>(this)->_lock);
     if (_poolInsts.empty())
         return;
 
     stat.poolInstsNum = _poolInsts.size();
+    std::vector<const LLBC_ObjectPoolInstStat *> instStats;
     for (_PoolInsts::const_iterator it = _poolInsts.begin();
          it != _poolInsts.end();
          ++it)
@@ -391,6 +394,8 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
             std::make_pair(it->first, LLBC_ObjectPoolInstStat())).first;
 
         LLBC_ObjectPoolInstStat &instStat = instStatIt->second;
+        instStats.push_back(&instStat);
+
         instStat.poolInstName = it->first.GetCStr();
 
         it->second->Stat(instStat);
@@ -398,13 +403,13 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
         stat.usedMemory += instStat.usedUnitsMemory;
         stat.innerUsedMemory += instStat.innerUsedMemory;
         stat.totalMemory += instStat.totalMemory;
-
-        StatTopNPoolInstStats(stat, &instStat);
     }
 
     const size_t selfInnerUsedMemory = sizeof(this);
     stat.innerUsedMemory += selfInnerUsedMemory;
     stat.totalMemory += selfInnerUsedMemory;
+
+    StatTopNPoolInstStats(stat, instStats);
 
     stat.UpdateStrRepr();
 }
@@ -448,32 +453,24 @@ LLBC_FORCE_INLINE void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAc
         DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 }
 
-#define __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(topNArray, poolInstStatCompField) \
-    do { \
-    for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)             \
-    {                                                                           \
-        const LLBC_ObjectPoolInstStat *&nowInstStat = topNArray[i];             \
-        if (!nowInstStat)                                                       \
-        {                                                                       \
-            nowInstStat = poolInstStat;                                         \
-            break;                                                              \
-        }                                                                       \
-        else if (poolInstStat->##poolInstStatCompField > nowInstStat->##poolInstStatCompField) \
-        {                                                                       \
-            for (int j = LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N - 2; j >= i; --j) \
-                topNArray[j + 1] = topNArray[j];                                \
-            topNArray[i] = poolInstStat;                                        \
-            break;                                                              \
-        }                                                                       \
-    }                                                                           \
-    } while (0)
-
 template <typename PoolLockType, typename PoolInstLockType>
-inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat, LLBC_ObjectPoolInstStat *poolInstStat) const
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat,
+                                                                            std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const
 {
-    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topUsedMemPoolInsts, usedUnitsMemory);
-    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topUsedElemsPoolInsts, usedUnitsNum);
-    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topAllocatedMemPoolInsts, totalMemory);
+    // top N used memory array:
+    std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedMem);
+    for (size_t i = 0; i < instStats.size() && i < LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
+        stat.topUsedMemPoolInsts[i] = instStats[i];
+
+    // top N used elems array:
+    std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedElems);
+    for (size_t i = 0; i < instStats.size() && i < LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
+        stat.topUsedElemsPoolInsts[i] = instStats[i];
+
+    // top N allocted memory array:
+    std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_AllocatedMem);
+    for (size_t i = 0; i < instStats.size() && i < LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
+        stat.topAllocatedMemPoolInsts[i] = instStats[i];
 }
 
 #undef __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT
