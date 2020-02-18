@@ -167,7 +167,11 @@ void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
 {
     LLBC_LockGuard guard(*_lock);
 
+    #if LLBC_TARGET_PLATFORM_WIN32
     stat.poolInstName = _poolInstName;
+    #else
+    stat.poolInstName = __LLBC_CxxDemangle(_poolInstName);
+    #endif
 
     stat.blockSize = _blockSize;
     stat.blocks.resize(_blockCnt);
