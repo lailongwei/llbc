@@ -97,7 +97,7 @@ inline void LLBC_ObjectPoolInstStat::Reset()
 {
     poolInstName = NULL;
 
-    blockSize = NULL;
+    blockSize = 0;
     blocks.clear();
 
     freeUnitsNum = 0;
