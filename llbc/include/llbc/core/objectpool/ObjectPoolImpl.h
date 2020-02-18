@@ -396,7 +396,11 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
         LLBC_ObjectPoolInstStat &instStat = instStatIt->second;
         instStats.push_back(&instStat);
 
+        #if LLBC_TARGET_PLATFORM_WIN32
         instStat.poolInstName = it->first.GetCStr();
+        #else
+        instStat.poolInstName = __LLBC_CxxDemangle(it->first.GetCStr());
+        #endif
 
         it->second->Stat(instStat);
         stat.freeMemory += instStat.freeUnitsMemory;

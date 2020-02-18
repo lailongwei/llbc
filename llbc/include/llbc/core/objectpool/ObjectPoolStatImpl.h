@@ -76,9 +76,7 @@ inline const LLBC_String &LLBC_ObjectPoolBlockStat::ToString() const
 }
 
 inline LLBC_ObjectPoolInstStat::LLBC_ObjectPoolInstStat()
-: poolInstName(NULL)
-
-, blockSize(0)
+: blockSize(0)
 
 , freeUnitsNum(0)
 , usedUnitsNum(0)
@@ -95,7 +93,7 @@ inline LLBC_ObjectPoolInstStat::LLBC_ObjectPoolInstStat()
 
 inline void LLBC_ObjectPoolInstStat::Reset()
 {
-    poolInstName = NULL;
+    poolInstName.clear();
 
     blockSize = 0;
     blocks.clear();
@@ -117,7 +115,7 @@ inline void LLBC_ObjectPoolInstStat::Reset()
 inline void LLBC_ObjectPoolInstStat::UpdateStrRepr()
 {
     _strRepr.format("name:%s, block_num:%lu, units_num:%lu[used:%lu, free:%lu], units_mem:%lu[used:%lu, free:%lu], inner_mem:%lu, total_mem:%lu",
-                    poolInstName.GetCStr(),
+                    poolInstName.c_str(),
                     blocks.size(),
                     allUnitsNum, usedUnitsNum, freeUnitsNum,
                     allUnitsMemory, usedUnitsMemory, freeUnitsMemory,
@@ -172,7 +170,7 @@ inline void LLBC_ObjectPoolStat::UpdateStrRepr()
         if (!instStat)
             _strRepr.append_format("\n- %d: null", i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.GetCStr(), instStat->usedUnitsMemory, instStat->allUnitsMemory);
+            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsMemory, instStat->allUnitsMemory);
     }
 
     _strRepr.append_format("\ntop %d used elems pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
@@ -182,7 +180,7 @@ inline void LLBC_ObjectPoolStat::UpdateStrRepr()
         if (!instStat)
             _strRepr.append_format("\n- %d: null", i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.GetCStr(), instStat->usedUnitsNum, instStat->allUnitsNum);
+            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsNum, instStat->allUnitsNum);
     }
 
     _strRepr.append_format("\ntop %d allocated memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
@@ -192,7 +190,7 @@ inline void LLBC_ObjectPoolStat::UpdateStrRepr()
         if (!instStat)
             _strRepr.append_format("\n- %d: null", i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.GetCStr(), instStat->totalMemory);
+            _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.c_str(), instStat->totalMemory);
     }
 
 }

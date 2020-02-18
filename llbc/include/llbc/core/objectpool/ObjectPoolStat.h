@@ -81,7 +81,7 @@ private:
 class LLBC_ObjectPoolInstStat
 {
 public:
-    LLBC_CString poolInstName; // the object pool instance name
+    LLBC_String poolInstName; // the object pool instance name
 
     size_t blockSize; // the object pool block memory size
     std::vector<LLBC_ObjectPoolBlockStat> blocks; // the blocks array, all blocks info are stored in here
