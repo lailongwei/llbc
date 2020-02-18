@@ -39,6 +39,8 @@ class LLBC_ObjectPool;
 template <typename ObjectType>
 class LLBC_ObjectPoolInst;
 
+class LLBC_ObjectPoolInstStat;
+
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -95,6 +97,13 @@ public:
      * @return bool - return true if is thread safety, otherwise thread unsafety.
      */
     virtual bool IsThreadSafety() const = 0;
+
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolInstStat &stat) const = 0;
 
 protected:
     // Friend class: Referencable pool object.

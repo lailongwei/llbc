@@ -161,6 +161,13 @@ public:
      */
     virtual bool IsThreadSafety() const;
 
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolInstStat &stat) const;
+
 protected:
     /**
      * Release referencable object.
@@ -208,7 +215,7 @@ private:
     const int _blockSize;
 
     int _blockCnt;
-    MemoryBlock **_block;
+    MemoryBlock **_blocks;
     LLBC_RingBuffer<MemoryBlock *> _freeBlocks;
 
     LLBC_ILock *_lock;

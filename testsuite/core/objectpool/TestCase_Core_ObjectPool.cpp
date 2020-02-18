@@ -331,6 +331,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     LLBC_PrintLine("core/objectpool test:");
 
     DoBasicTest();
+    DoStatTest();
     DoOrderedDeleteTest();
     DoConverienceMethodsTest();
     DoPerfTest();
@@ -426,6 +427,22 @@ void TestCase_Core_ObjectPool::DoBasicTest()
     }
 
     LLBC_PrintLine("Object pool basic test finished");
+}
+
+void TestCase_Core_ObjectPool::DoStatTest()
+{
+    LLBC_UnsafetyObjectPool ob;
+    ob.GetGuarded<char>();
+    ob.GetGuarded<sint16>();
+    ob.GetGuarded<std::vector<int> >();
+    ob.GetGuarded<LLBC_String>();
+    ob.GetGuarded<LLBC_Stream>();
+    ob.GetGuarded<LLBC_Packet>();
+
+    LLBC_ObjectPoolStat stat;
+    ob.Stat(stat);
+
+    LLBC_PrintLine("After stat: %s", stat.ToString().c_str());
 }
 
 void TestCase_Core_ObjectPool::DoOrderedDeleteTest()

@@ -116,6 +116,13 @@ public:
      */
     virtual int AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName);
 
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolStat &stat) const;
+
 private:
     /**
      * Try create object pool instance from factory.
@@ -129,6 +136,12 @@ private:
      * @param[in] node - the ordered delete node.
      */
     void DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node);
+
+private:
+    /**
+     * Statistic top N pool instance statistic infos.
+     */
+    void StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat, LLBC_ObjectPoolInstStat *poolInstStat) const;
 
 private:
     // Disable assignment.

@@ -27,6 +27,8 @@
 #include "llbc/core/objectpool/ObjectManipulator.h"
 #include "llbc/core/objectpool/PoolObjectReflection.h"
 
+#include "llbc/core/objectpool/ObjectPoolStat.h"
+
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
@@ -42,7 +44,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
 , _blockSize(_elemSize * _elemCnt)
 
 , _blockCnt(0)
-, _block(NULL)
+, _blocks(NULL)
 
 , _lock(lock)
 {
@@ -62,7 +64,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
     {
         for (int blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
         {
-            MemoryBlock *&memBlock = _block[blockIdx];
+            MemoryBlock *&memBlock = _blocks[blockIdx];
             for (int unitIdx = 0; unitIdx != _elemCnt; ++unitIdx)
             {
                 MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * unitIdx);
@@ -83,7 +85,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
             LLBC_Free(memBlock);
         }
 
-        LLBC_Free(_block);
+        LLBC_Free(_blocks);
     }
 
     // Unlock pool instance and destroy lock.
@@ -161,6 +163,63 @@ LLBC_FORCE_INLINE bool LLBC_ObjectPoolInst<ObjectType>::IsThreadSafety() const
 }
 
 template <typename ObjectType>
+void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
+{
+    LLBC_LockGuard guard(*_lock);
+
+    stat.poolInstName = _poolInstName;
+
+    stat.blockSize = _blockSize;
+    stat.blocks.resize(_blockCnt);
+    for (int i = 0; i < _blockCnt; ++i)
+    {
+        // Stat memory block.
+        MemoryBlock *&block = _blocks[i];
+        LLBC_ObjectPoolBlockStat &blockStat = stat.blocks[i];
+        blockStat.blockSeq = block->seq;
+        blockStat.unitMemory = _elemSize;
+
+        blockStat.freeUnitsNum = block->freeUnits->GetSize();
+        blockStat.usedUnitsNum = block->freeUnits->GetCapacity() - block->freeUnits->GetSize();
+        blockStat.allUnitsNum = block->freeUnits->GetCapacity();
+
+        blockStat.freeUnitsMemory = blockStat.freeUnitsNum * blockStat.unitMemory;
+        blockStat.usedUnitsMemory = blockStat.usedUnitsNum *blockStat.unitMemory;
+        blockStat.allUnitsMemory = blockStat.allUnitsNum * blockStat.unitMemory;
+
+        blockStat.innerUsedMemory = sizeof(MemoryBlock) + sizeof(LLBC_RingBuffer<MemoryUnit *>) + sizeof(MemoryUnit *) * _elemCnt;
+
+        blockStat.totalMemory = blockStat.allUnitsMemory + blockStat.innerUsedMemory;
+
+        blockStat.UpdateStrRepr();
+
+        // Add memory block stat info to object pool instance stat info.
+        stat.freeUnitsNum += blockStat.freeUnitsNum;
+        stat.usedUnitsNum += blockStat.usedUnitsNum;
+        stat.allUnitsNum += blockStat.allUnitsNum;
+
+        stat.freeUnitsMemory += blockStat.freeUnitsMemory;
+        stat.usedUnitsMemory += blockStat.usedUnitsMemory;
+        stat.allUnitsMemory += blockStat.allUnitsMemory;
+
+        stat.innerUsedMemory += blockStat.innerUsedMemory;
+
+        stat.totalMemory += blockStat.totalMemory;
+    }
+
+    // Stat object pool instance self inner used memory.
+    const size_t selfInnerUsedMemory = sizeof(this) + // this object size.
+                                       sizeof(MemoryBlock *) * _blockCnt + // allocated blocks pointer array size.
+                                       sizeof(LLBC_RingBuffer<MemoryBlock *>) + sizeof(MemoryBlock *) * _blockCnt + // block ring-buffer size.
+                                       sizeof(*_lock); // Lock object size.
+
+    stat.innerUsedMemory += selfInnerUsedMemory;
+    stat.totalMemory += selfInnerUsedMemory;
+
+    stat.UpdateStrRepr();
+}
+
+template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::ReleaseReferencable(void *obj)
 {
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
@@ -183,9 +242,9 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
 {
     // Allocate new block and memory unit usage view.
     if (UNLIKELY(_blockCnt == 0))
-        _block = LLBC_Malloc(MemoryBlock *, sizeof(MemoryBlock *));
+        _blocks = LLBC_Malloc(MemoryBlock *, sizeof(MemoryBlock *));
     else
-        _block = LLBC_Realloc(MemoryBlock *, _block, sizeof(MemoryBlock *) * (_blockCnt + 1));
+        _blocks = LLBC_Realloc(MemoryBlock *, _blocks, sizeof(MemoryBlock *) * (_blockCnt + 1));
     LLBC_RingBuffer<MemoryUnit *> *freeUnits = new LLBC_RingBuffer<MemoryUnit *>(_elemCnt);
 
     // Fill new block content.
@@ -217,7 +276,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
         freeUnits->Push(memUnit);
     }
 
-    _block[_blockCnt] = memBlock;
+    _blocks[_blockCnt] = memBlock;
     _freeBlocks.Push(memBlock);
 
     // Update block number.

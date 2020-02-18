@@ -78,6 +78,12 @@ public:
     const ElemType &Tail() const;
 
     /**
+     * Get ring buffer size(used capacity).
+     * @return size_t - the buffer size.
+     */
+    size_t GetSize() const;
+
+    /**
      * Get ring buffer capacity.
      * @return size_t - the ring bufer capacity.
      */
@@ -89,6 +95,7 @@ public:
      */
     void ReCapacity(size_t newCap);
 
+public:
     /**
      * Check ring buffer is full or not.
      * @return bool - return true if full, otherwise return false.
@@ -100,6 +107,11 @@ public:
      * @return bool - return true if empty, otherwise return false.
      */
     bool IsEmpty() const;
+
+    /**
+     * Clear ring buffer.
+     */
+    void Clear();
 
     /**
      * Disable assignment.

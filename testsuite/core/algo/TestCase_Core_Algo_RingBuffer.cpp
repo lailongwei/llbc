@@ -65,7 +65,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
 
         int oldCap = static_cast<int>(rb.GetCapacity());
         std::cout << "- auto recapacity test:" << std::endl;
-        for (size_t i = 0; i < oldCap * 2; ++i)
+        for (int i = 0; i < oldCap * 2; ++i)
         {
             std::cout << "  - push: " << i;
             rb.Push(i);
@@ -89,6 +89,33 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
         }
 
         std::cout << "- random push/pop test finished, please use dbg tools to check RingBuffer status" << std::endl;
+    }
+
+    std::cout << "get size test:" << std::endl;
+    {
+        LLBC_RingBuffer<int> rb(5);
+        rb.Push(1);
+        rb.Push(2);
+        rb.Push(3);
+        rb.Pop();
+        std::cout << "After push(1)->push(2)->push(3)->pop(), size: " << rb.GetSize() << std::endl;
+
+        rb.Clear();
+        rb.Push(3);
+        rb.Push(4);
+        rb.Push(5);
+        std::cout << "After push(3)->push(4)->push(5), size: " << rb.GetSize() << std::endl;
+
+        rb.Clear();
+        rb.Push(10);
+        rb.Push(20);
+        rb.Push(30);
+        rb.Push(40);
+        rb.Push(50);
+        std::cout << "After push(10/20/30/40/50), size: " << rb.GetSize() << ", empty?: " << rb.IsEmpty() << ", full?: " << rb.IsFull() << std::endl;
+
+        rb.Clear();
+        std::cout <<"After clear, size: " << rb.GetSize() << ", empty?: " << rb.IsEmpty() << ", full?: " << rb.IsFull() << std::endl;
     }
 }
 

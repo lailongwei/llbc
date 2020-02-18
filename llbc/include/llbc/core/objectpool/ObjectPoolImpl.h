@@ -24,6 +24,8 @@
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/helper/Common.h"
 
+#include "llbc/core/objectpool/ObjectPoolStat.h"
+
 __LLBC_NS_BEGIN
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -372,6 +374,42 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
+inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &stat) const
+{
+    typedef typename std::map<LLBC_CString, LLBC_ObjectPoolInstStat>::iterator _InstStatIt;
+
+    LLBC_LockGuard guard(const_cast<LLBC_ObjectPool *>(this)->_lock);
+    if (_poolInsts.empty())
+        return;
+
+    stat.poolInstsNum = _poolInsts.size();
+    for (_PoolInsts::const_iterator it = _poolInsts.begin();
+         it != _poolInsts.end();
+         ++it)
+    {
+        _InstStatIt instStatIt = stat.poolInsts.insert(
+            std::make_pair(it->first, LLBC_ObjectPoolInstStat())).first;
+
+        LLBC_ObjectPoolInstStat &instStat = instStatIt->second;
+        instStat.poolInstName = it->first.GetCStr();
+
+        it->second->Stat(instStat);
+        stat.freeMemory += instStat.freeUnitsMemory;
+        stat.usedMemory += instStat.usedUnitsMemory;
+        stat.innerUsedMemory += instStat.innerUsedMemory;
+        stat.totalMemory += instStat.totalMemory;
+
+        StatTopNPoolInstStats(stat, &instStat);
+    }
+
+    const size_t selfInnerUsedMemory = sizeof(this);
+    stat.innerUsedMemory += selfInnerUsedMemory;
+    stat.totalMemory += selfInnerUsedMemory;
+
+    stat.UpdateStrRepr();
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
 LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstLockType>::TryCreatePoolInstFromFactory(const char *objectType)
 {
     _poolInstFactoryLock.Lock();
@@ -409,6 +447,36 @@ LLBC_FORCE_INLINE void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAc
          ++nodeIt)
         DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 }
+
+#define __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(topNArray, poolInstStatCompField) \
+    do { \
+    for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)             \
+    {                                                                           \
+        const LLBC_ObjectPoolInstStat *&nowInstStat = topNArray[i];             \
+        if (!nowInstStat)                                                       \
+        {                                                                       \
+            nowInstStat = poolInstStat;                                         \
+            break;                                                              \
+        }                                                                       \
+        else if (poolInstStat->##poolInstStatCompField > nowInstStat->##poolInstStatCompField) \
+        {                                                                       \
+            for (int j = LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N - 2; j >= i; --j) \
+                topNArray[j + 1] = topNArray[j];                                \
+            topNArray[i] = poolInstStat;                                        \
+            break;                                                              \
+        }                                                                       \
+    }                                                                           \
+    } while (0)
+
+template <typename PoolLockType, typename PoolInstLockType>
+inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat, LLBC_ObjectPoolInstStat *poolInstStat) const
+{
+    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topUsedMemPoolInsts, usedUnitsMemory);
+    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topUsedElemsPoolInsts, usedUnitsNum);
+    __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT(stat.topAllocatedMemPoolInsts, totalMemory);
+}
+
+#undef __LLBC_OBJECT_POOL_EXPAND_TOPN_INSERT
 
 __LLBC_NS_END
 

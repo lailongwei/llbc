@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
+class LLBC_ObjectPoolStat;
 class LLBC_IObjectPoolInst;
 class LLBC_IObjectPoolInstFactory;
 
@@ -84,6 +85,13 @@ public:
      * Destroy all object pool instance factories(call by framework when framework destroy).
      */
     static void DestroyAllPoolInstFactories();
+
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolStat &stat) const = 0;
 
 private:
     // Disable assignment.

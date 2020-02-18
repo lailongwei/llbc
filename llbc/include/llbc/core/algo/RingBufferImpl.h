@@ -107,6 +107,17 @@ LLBC_FORCE_INLINE const ElemType &LLBC_RingBuffer<ElemType>::Tail() const
 }
 
 template <typename ElemType>
+LLBC_FORCE_INLINE size_t LLBC_RingBuffer<ElemType>::GetSize() const
+{
+    if (_tail > _front)
+        return _tail - _front;
+    else if (_tail == _front)
+        return _full ? _capacity : 0;
+    else
+        return _capacity - _front + _tail;
+}
+
+template <typename ElemType>
 LLBC_FORCE_INLINE size_t LLBC_RingBuffer<ElemType>::GetCapacity() const
 {
     return _capacity;
@@ -141,6 +152,31 @@ template <typename ElemType>
 LLBC_FORCE_INLINE bool LLBC_RingBuffer<ElemType>::IsEmpty() const
 {
     return !_full && _tail == _front;
+}
+
+template <typename ElemType>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Clear()
+{
+    if (_front < _tail)
+    {
+
+        for (; _front != _tail; ++_front)
+            _elems[_front].~ElemType();
+    }
+    else
+    {
+        if (IsEmpty())
+            return;
+
+        for (; _front != _capacity; ++_front)
+            _elems[_front].~ElemType();
+
+        _front = 0;
+        for (; _front != _tail; ++_front)
+            _elems[_front].~ElemType();
+
+        _full = false;
+    }
 }
 
 __LLBC_NS_END
