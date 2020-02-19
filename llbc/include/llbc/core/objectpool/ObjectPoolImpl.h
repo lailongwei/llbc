@@ -384,7 +384,6 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
     if (_poolInsts.empty())
         return;
 
-    stat.poolInstsNum = _poolInsts.size();
     std::vector<const LLBC_ObjectPoolInstStat *> instStats;
     for (_PoolInsts::const_iterator it = _poolInsts.begin();
          it != _poolInsts.end();
@@ -459,6 +458,11 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC
     std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedMem);
     for (size_t i = 0; i < instStats.size() && i < LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
         stat.topUsedMemPoolInsts[i] = instStats[i];
+
+    // top N elem memory array:
+    std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_ElemMem);
+    for (size_t i = 0; i < instStats.size() && i < LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
+        stat.topElemMemPoolInsts[i] = instStats[i];
 
     // top N used elems array:
     std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedElems);

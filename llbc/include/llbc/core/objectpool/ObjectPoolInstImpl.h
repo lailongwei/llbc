@@ -173,7 +173,8 @@ void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
     stat.poolInstName = __LLBC_CxxDemangle(_poolInstName);
     #endif
 
-    stat.blockSize = _blockSize;
+    stat.blockMemorySize = _blockSize;
+    stat.unitMemorySize = _elemSize;
     stat.blocks.resize(_blockCnt);
     for (int i = 0; i < _blockCnt; ++i)
     {
@@ -181,15 +182,15 @@ void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
         MemoryBlock *&block = _blocks[i];
         LLBC_ObjectPoolBlockStat &blockStat = stat.blocks[i];
         blockStat.blockSeq = block->seq;
-        blockStat.unitMemory = _elemSize;
+        blockStat.unitMemorySize = _elemSize;
 
         blockStat.freeUnitsNum = block->freeUnits->GetSize();
         blockStat.usedUnitsNum = block->freeUnits->GetCapacity() - block->freeUnits->GetSize();
         blockStat.allUnitsNum = block->freeUnits->GetCapacity();
 
-        blockStat.freeUnitsMemory = blockStat.freeUnitsNum * blockStat.unitMemory;
-        blockStat.usedUnitsMemory = blockStat.usedUnitsNum *blockStat.unitMemory;
-        blockStat.allUnitsMemory = blockStat.allUnitsNum * blockStat.unitMemory;
+        blockStat.freeUnitsMemory = blockStat.freeUnitsNum * blockStat.unitMemorySize;
+        blockStat.usedUnitsMemory = blockStat.usedUnitsNum *blockStat.unitMemorySize;
+        blockStat.allUnitsMemory = blockStat.allUnitsNum * blockStat.unitMemorySize;
 
         blockStat.innerUsedMemory = sizeof(MemoryBlock) + sizeof(LLBC_RingBuffer<MemoryUnit *>) + sizeof(MemoryUnit *) * _elemCnt;
 

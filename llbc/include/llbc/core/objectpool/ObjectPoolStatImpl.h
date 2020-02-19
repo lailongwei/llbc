@@ -25,7 +25,7 @@ __LLBC_NS_BEGIN
 
 inline LLBC_ObjectPoolBlockStat::LLBC_ObjectPoolBlockStat()
 : blockSeq(-1)
-, unitMemory(0)
+, unitMemorySize(0)
 
 , freeUnitsNum(0)
 , usedUnitsNum(0)
@@ -43,7 +43,7 @@ inline LLBC_ObjectPoolBlockStat::LLBC_ObjectPoolBlockStat()
 inline void LLBC_ObjectPoolBlockStat::Reset()
 {
     blockSeq = -1;
-    unitMemory = 0;
+    unitMemorySize = 0;
 
     freeUnitsNum = 0;
     usedUnitsNum = 0;
@@ -63,7 +63,7 @@ inline void LLBC_ObjectPoolBlockStat::UpdateStrRepr()
 {
     _strRepr.format("seq:%d, unit_mem:%lu, units_num:%lu[used:%lu, free:%lu], units_mem:%lu[used:%lu, free:%lu], inner_mem:%lu, total_mem:%lu",
                     blockSeq, 
-                    unitMemory, 
+                    unitMemorySize, 
                     allUnitsNum, usedUnitsNum, freeUnitsNum, 
                     allUnitsMemory, usedUnitsMemory, freeUnitsMemory, 
                     innerUsedMemory, 
@@ -76,7 +76,8 @@ inline const LLBC_String &LLBC_ObjectPoolBlockStat::ToString() const
 }
 
 inline LLBC_ObjectPoolInstStat::LLBC_ObjectPoolInstStat()
-: blockSize(0)
+: blockMemorySize(0)
+, unitMemorySize(0)
 
 , freeUnitsNum(0)
 , usedUnitsNum(0)
@@ -95,7 +96,8 @@ inline void LLBC_ObjectPoolInstStat::Reset()
 {
     poolInstName.clear();
 
-    blockSize = 0;
+    blockMemorySize = 0;
+    unitMemorySize = 0;
     blocks.clear();
 
     freeUnitsNum = 0;
@@ -129,21 +131,19 @@ inline const LLBC_String &LLBC_ObjectPoolInstStat::ToString() const
 }
 
 inline LLBC_ObjectPoolStat::LLBC_ObjectPoolStat()
-: poolInstsNum(0)
-
-, freeMemory(0)
+: freeMemory(0)
 , usedMemory(0)
 , innerUsedMemory(0)
 , totalMemory(0)
 {
     ::memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
+    ::memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
     ::memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
     ::memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
 }
 
 inline void LLBC_ObjectPoolStat::Reset()
 {
-    poolInstsNum = 0;
     poolInsts.clear();
 
     freeMemory = 0;
@@ -152,6 +152,7 @@ inline void LLBC_ObjectPoolStat::Reset()
     totalMemory = 0;
 
     ::memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
+    ::memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
     ::memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
     ::memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
 
@@ -161,24 +162,35 @@ inline void LLBC_ObjectPoolStat::Reset()
 inline void LLBC_ObjectPoolStat::UpdateStrRepr()
 {
     _strRepr.format("inst_num:%lu, mem:%lu[free:%lu, used:%lu]", 
-                    poolInstsNum, totalMemory, freeMemory, usedMemory + innerUsedMemory);
+                    poolInsts.size(), totalMemory, freeMemory, usedMemory + innerUsedMemory);
     
     _strRepr.append_format("\ntop %d used memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topUsedMemPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: null", i);
+            _strRepr.append_format("\n- %d: <empty>", i);
         else
             _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsMemory, instStat->allUnitsMemory);
     }
+
+    _strRepr.append_format("\ntop %d elems memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
+    for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
+    {
+        const LLBC_ObjectPoolInstStat *&instStat = topElemMemPoolInsts[i];
+        if (!instStat)
+            _strRepr.append_format("\n- %d: <empty>", i);
+        else
+            _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.c_str(), instStat->unitMemorySize);
+    }
+
 
     _strRepr.append_format("\ntop %d used elems pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topUsedElemsPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: null", i);
+            _strRepr.append_format("\n- %d: <empty>", i);
         else
             _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsNum, instStat->allUnitsNum);
     }
@@ -188,11 +200,10 @@ inline void LLBC_ObjectPoolStat::UpdateStrRepr()
     {
         const LLBC_ObjectPoolInstStat *&instStat = topAllocatedMemPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: null", i);
+            _strRepr.append_format("\n- %d: <empty>", i);
         else
             _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.c_str(), instStat->totalMemory);
     }
-
 }
 
 inline const LLBC_String &LLBC_ObjectPoolStat::ToString() const
@@ -204,6 +215,12 @@ inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_UsedMem(const LLBC_Objec
                                                                 const LLBC_ObjectPoolInstStat * const &right)
 {
     return (left->usedUnitsMemory + left->innerUsedMemory) > (right->usedUnitsMemory + right->innerUsedMemory);
+}
+
+inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_ElemMem(const LLBC_ObjectPoolInstStat * const &left,
+                                                                const LLBC_ObjectPoolInstStat * const &right)
+{
+    return left->unitMemorySize > right->unitMemorySize;
 }
 
 inline bool llbc::LLBC_ObjectPoolInstStatComper::CompBy_UsedElems(const LLBC_ObjectPoolInstStat * const &left,
