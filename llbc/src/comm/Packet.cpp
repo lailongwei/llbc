@@ -189,7 +189,7 @@ void LLBC_Packet::Clear()
     CleanupPreHandleResult();
 
     // Reset don't delete after handle flag.
-    _dontDelAfterHandle = true;
+    _dontDelAfterHandle = false;
 }
 
 LLBC_ICoder *LLBC_Packet::GetEncoder() const

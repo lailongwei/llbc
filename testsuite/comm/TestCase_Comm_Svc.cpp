@@ -91,7 +91,8 @@ public:
             _prevMb = nowMb;
         }
 
-        LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        // LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
         resPacket->SetHeader(packet, OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
@@ -176,7 +177,8 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             char *data = LLBC_Malloc(char, dataSize);
             ::memset(data, 1, dataSize);
 
-            LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+            LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();
             packet->SetHeader(sessionId, OPCODE, 0);
             packet->Write(data, dataSize);
 
@@ -185,7 +187,8 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             svc->Send(packet);
 
             // Test unhandled packet(unsubscribe opcode).
-            LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *unhandledPacket = svc->GetPacketObjectPool().GetObject();
             unhandledPacket->SetHeader(sessionId, OPCODE + 10000, 0);
             unhandledPacket->Write("Hello World", 12);
 
