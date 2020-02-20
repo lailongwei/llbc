@@ -407,8 +407,6 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
     stat.totalMemory += selfInnerUsedMemory;
 
     StatTopNPoolInstStats(stat, instStats);
-
-    stat.UpdateStrRepr();
 }
 
 template <typename PoolLockType, typename PoolInstLockType>

@@ -431,6 +431,7 @@ void TestCase_Core_ObjectPool::DoBasicTest()
 
 void TestCase_Core_ObjectPool::DoStatTest()
 {
+    LLBC_PrintLine("Object pool stat test:");
     LLBC_UnsafetyObjectPool ob;
     ob.GetGuarded<char>();
     ob.GetGuarded<sint16>();
@@ -442,7 +443,7 @@ void TestCase_Core_ObjectPool::DoStatTest()
     LLBC_ObjectPoolStat stat;
     ob.Stat(stat);
 
-    LLBC_PrintLine("After stat: %s", stat.ToString().c_str());
+    LLBC_PrintLine("After stat(use 2 shift spaces):\n%s", stat.ToString(2).c_str());
 }
 
 void TestCase_Core_ObjectPool::DoOrderedDeleteTest()

@@ -135,6 +135,8 @@ inline LLBC_ObjectPoolStat::LLBC_ObjectPoolStat()
 , usedMemory(0)
 , innerUsedMemory(0)
 , totalMemory(0)
+
+, _strReprShiftSpaceNum(0)
 {
     ::memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
     ::memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
@@ -157,57 +159,71 @@ inline void LLBC_ObjectPoolStat::Reset()
     ::memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
 
     _strRepr.clear();
+    _strReprShiftSpaceNum = 0;
 }
 
-inline void LLBC_ObjectPoolStat::UpdateStrRepr()
+inline void LLBC_ObjectPoolStat::UpdateStrRepr(size_t shiftSpaceNum)
 {
-    _strRepr.format("inst_num:%lu, mem:%lu[free:%lu, used:%lu]", 
-                    poolInsts.size(), totalMemory, freeMemory, usedMemory + innerUsedMemory);
+    const LLBC_String shiftSpaces(shiftSpaceNum, ' ');
+
+    _strRepr.format("%s- summary: inst_num:%lu, mem:%lu/%lu[free:%lu, elems_used:%lu, inner_used:%lu], managed_cost:%.03f, mem_usage:%.03f", 
+                    shiftSpaces.c_str(), poolInsts.size(), 
+                    usedMemory + innerUsedMemory, totalMemory, freeMemory, usedMemory, innerUsedMemory,
+                    static_cast<double>(innerUsedMemory) / totalMemory,
+                    static_cast<double>(usedMemory) / (usedMemory + freeMemory));
     
-    _strRepr.append_format("\ntop %d used memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
+    _strRepr.append_format("\n%s- top %d used memory pool instances:", shiftSpaces.c_str(), LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topUsedMemPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: <empty>", i);
+            _strRepr.append_format("\n%s  - %d: <empty>", shiftSpaces.c_str(), i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsMemory, instStat->allUnitsMemory);
+            _strRepr.append_format("\n%s  - %d: %s: %lu/%lu[free:%lu, elems_used:%lu, inner_used:%lu]", 
+                                   shiftSpaces.c_str(), i, instStat->poolInstName.c_str(), 
+                                   instStat->usedUnitsMemory + instStat->innerUsedMemory, instStat->totalMemory,
+                                   instStat->freeUnitsMemory, instStat->usedUnitsMemory, instStat->innerUsedMemory);
     }
 
-    _strRepr.append_format("\ntop %d elems memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
+    _strRepr.append_format("\n%s- top %d elems memory pool instances:", shiftSpaces.c_str(), LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topElemMemPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: <empty>", i);
+            _strRepr.append_format("\n%s  - %d: <empty>", shiftSpaces.c_str(), i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.c_str(), instStat->unitMemorySize);
+            _strRepr.append_format("\n%s  - %d: %s: %lu",shiftSpaces.c_str(), i, instStat->poolInstName.c_str(), instStat->unitMemorySize);
     }
 
 
-    _strRepr.append_format("\ntop %d used elems pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
+    _strRepr.append_format("\n%s- top %d used elems pool instances:", shiftSpaces.c_str(), LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topUsedElemsPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: <empty>", i);
+            _strRepr.append_format("\n%s  - %d: <empty>", shiftSpaces.c_str(), i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu/%lu", i, instStat->poolInstName.c_str(), instStat->usedUnitsNum, instStat->allUnitsNum);
+            _strRepr.append_format("\n%s  - %d: %s: %lu/%lu", shiftSpaces.c_str(), i, instStat->poolInstName.c_str(), instStat->usedUnitsNum, instStat->allUnitsNum);
     }
 
-    _strRepr.append_format("\ntop %d allocated memory pool instances:", LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
+    _strRepr.append_format("\n%stop %d allocated memory pool instances:", shiftSpaces.c_str(), LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N);
     for (int i = 0; i != LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N; ++i)
     {
         const LLBC_ObjectPoolInstStat *&instStat = topAllocatedMemPoolInsts[i];
         if (!instStat)
-            _strRepr.append_format("\n- %d: <empty>", i);
+            _strRepr.append_format("\n%s- %d: <empty>", shiftSpaces.c_str(), i);
         else
-            _strRepr.append_format("\n- %d: %s: %lu", i, instStat->poolInstName.c_str(), instStat->totalMemory);
+            _strRepr.append_format("\n%s- %d: %s: %lu", shiftSpaces.c_str(), i, instStat->poolInstName.c_str(), instStat->totalMemory);
     }
+
+    _strReprShiftSpaceNum = shiftSpaceNum;
 }
 
-inline const LLBC_String &LLBC_ObjectPoolStat::ToString() const
+inline const LLBC_String &LLBC_ObjectPoolStat::ToString(size_t shiftSpaceNum) const
 {
+    if (_strRepr.empty() || _strReprShiftSpaceNum != shiftSpaceNum)
+        const_cast<LLBC_ObjectPoolStat *>(this)->UpdateStrRepr(shiftSpaceNum);
+
     return _strRepr;
 }
 

@@ -157,20 +157,23 @@ public:
      */
     void Reset();
 
-public:
-    /**
-     * Update string representation.
-     */
-    void UpdateStrRepr();
-
     /**
      * Get string representation.
+     * @param[in] shiftSpaceNum - the shift space number, default is 0.
      * @return const LLBC_String & - the string representation.
      */
-    const LLBC_String &ToString() const;
+    const LLBC_String &ToString(size_t shiftSpaceNum = 0) const;
+
+private:
+    /**
+     * Update string representation.
+     * @param[in] shiftSpaceNum - the shift space number, default is 0.
+     */
+    void UpdateStrRepr(size_t shiftSpaceNum = 0);
 
 private:
     LLBC_String _strRepr; // string representation.
+    size_t _strReprShiftSpaceNum; // shift space number.
 };
 
 /**
