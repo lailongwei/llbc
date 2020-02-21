@@ -79,22 +79,22 @@ inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionI
 
 inline LLBC_SafetyObjectPool &LLBC_Service::GetSafetyObjectPool()
 {
-    return *_safetyObjectPool;
+    return _safetyObjectPool;
 }
 
 inline LLBC_UnsafetyObjectPool &LLBC_Service::GetUnsafetyObjectPool()
 {
-    return *_unsafetyObjectPool;
+    return _unsafetyObjectPool;
 }
 
 inline LLBC_ObjectPoolInst<LLBC_Packet> & LLBC_Service::GetPacketObjectPool()
 {
-    return *_packetObjectPool;
+    return _packetObjectPool;
 }
 
 inline LLBC_ObjectPoolInst<LLBC_MessageBlock> &LLBC_Service::GetMsgBlockObjectPool()
 {
-    return *_msgBlockObjectPool;
+    return _msgBlockObjectPool;
 }
 
 __LLBC_NS_END

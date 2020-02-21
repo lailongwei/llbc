@@ -51,6 +51,9 @@ public:
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
+        if (sessionInfo.IsListenSession())
+            return;
+
         _sessionIds.push_back(sessionInfo.GetSessionId());
     }
 

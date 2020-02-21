@@ -650,10 +650,10 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack;
 
 private:
-    LLBC_SafetyObjectPool *_safetyObjectPool;
-    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
-    LLBC_ObjectPoolInst<LLBC_Packet> *_packetObjectPool;
-    LLBC_ObjectPoolInst<LLBC_MessageBlock> *_msgBlockObjectPool;
+    LLBC_SafetyObjectPool _safetyObjectPool;
+    LLBC_UnsafetyObjectPool _unsafetyObjectPool;
+    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
@@ -664,6 +664,9 @@ private:
 
 private:
     LLBC_ServiceMgr &_svcMgr;
+
+private:
+    std::vector<LLBC_Packet *> _multicastOtherPackets;
 
 private:
     typedef void (LLBC_Service::*_EvHandler)(LLBC_ServiceEvent &);

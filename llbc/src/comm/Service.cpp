@@ -131,10 +131,8 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _releasePoolStack(NULL)
 
-, _safetyObjectPool(NULL)
-, _unsafetyObjectPool(NULL)
-, _packetObjectPool(NULL)
-, _msgBlockObjectPool(NULL)
+, _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
+, _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
 
 , _timerScheduler(NULL)
 
@@ -1939,15 +1937,6 @@ void LLBC_Service::ClearAutoReleasePool()
 
 void LLBC_Service::InitObjectPools()
 {
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!_safetyObjectPool)
-    {
-        _safetyObjectPool = reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
-        _unsafetyObjectPool = reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
-
-        _packetObjectPool = _safetyObjectPool->GetPoolInst<LLBC_Packet>();
-        _msgBlockObjectPool = _safetyObjectPool->GetPoolInst<LLBC_MessageBlock>();
-    }
 }
 
 void LLBC_Service::UpdateObjectPools()
@@ -1956,11 +1945,6 @@ void LLBC_Service::UpdateObjectPools()
 
 void LLBC_Service::ClearHoldedObjectPools()
 {
-    _safetyObjectPool = NULL;
-    _unsafetyObjectPool = NULL;
-
-    _packetObjectPool = NULL;
-    _msgBlockObjectPool = NULL;
 }
 
 void LLBC_Service::InitTimerScheduler()
@@ -2121,7 +2105,7 @@ int LLBC_Service::LockableSend(int svcId,
                                bool validCheck)
 {
     // Create packet(from object pool) and send.
-    LLBC_Packet *packet = _packetObjectPool->GetObject();
+    LLBC_Packet *packet = _packetObjectPool.GetObject();
     // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
     packet->SetHeader(svcId, sessionId, opcode, status);
     int ret = packet->Write(bytes, len);
@@ -2162,7 +2146,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
 
-    LLBC_Packet *firstPacket = _packetObjectPool->GetObject();
+    LLBC_Packet *firstPacket = _packetObjectPool.GetObject();
     // firstPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
     firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
 
@@ -2187,8 +2171,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (sessionCnt == 1)
         return LockableSend(firstPacket, false, validCheck);
 
-    LLBC_Packet **otherPackets =
-        LLBC_Calloc(LLBC_Packet *, (sizeof(LLBC_Packet *) * (sessionCnt - 1)));
+    _multicastOtherPackets.resize(sessionCnt - 1);
     if (LIKELY(hasCoder))
     {
         const void *payload = firstPacket->GetPayload();
@@ -2211,12 +2194,12 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = _packetObjectPool->GetObject();
+            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
             otherPacket->Write(payload, payloadLen);
 
-            otherPackets[i - 1] = otherPacket;
+            _multicastOtherPackets[i - 1] = otherPacket;
         }
 
         if (validCheck)
@@ -2241,11 +2224,11 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = _packetObjectPool->GetObject();
+            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
 
-            otherPackets[i - 1] = otherPacket;
+            _multicastOtherPackets[i - 1] = otherPacket;
         }
 
         if (validCheck)
@@ -2254,17 +2237,17 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
-    const size_t otherPacketCnt = sessionCnt - 1;
-    for (size_t i = 0; i < otherPacketCnt; ++i)
+    const typename SessionIds::size_type otherPacketCnt = sessionCnt - 1;
+    for (typename SessionIds::size_type i = 0; i != otherPacketCnt; ++i)
     {
-        LLBC_Packet *&otherPacket = otherPackets[i];
+        LLBC_Packet *&otherPacket = _multicastOtherPackets[i];
         if (UNLIKELY(!otherPacket))
             continue;
 
         LockableSend(otherPacket, false, false); // Don't need vaildate check.
     }
 
-    LLBC_Free(otherPackets);
+    _multicastOtherPackets.clear();
 
     return LLBC_OK;
 }
