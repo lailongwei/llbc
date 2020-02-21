@@ -40,7 +40,8 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
             (sizeof(ObjectType) % LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN ? 
                 LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN * (sizeof(ObjectType) / LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN + 1) : 
                 sizeof(ObjectType)) + (LLBC_INL_NS CheckSymbolSize << 1))) // CheckSymbolSize << 1 equivalent to CheckSymbolSize * 2
-, _elemCnt(LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE / _elemSize + (LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE % _elemSize != 0 ? 1 : 0))
+// , _elemCnt(LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE / _elemSize + (LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE % _elemSize != 0 ? 1 : 0))
+, _elemCnt(LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum<ObjectType>())
 , _blockSize(_elemSize * _elemCnt)
 
 , _blockCnt(0)

@@ -307,6 +307,11 @@ public:
     void GiveBackToPool();
 
     /**
+     * Object-Pool reflection support, get user-defined per-block units number.
+     */
+    size_t GetPoolInstPerBlockUnitsNum();
+
+    /**
      * Object-Pool reflection support: pool instance create event callback.
      */
     void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);

@@ -42,6 +42,12 @@ LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::Reset(void *obj)
 }
 
 template <typename ObjectType>
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum()
+{
+    return GetPoolInstPerBlockUnitsNum<ObjectType>(0);
+}
+
+template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
 {
     OnPoolInstCreateInl<ObjectType>(poolInst, 0);
@@ -104,25 +110,37 @@ LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *)
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
+{
+    return reinterpret_cast<ObjectType *>(NULL)->GetPoolInstPerBlockUnitsNum();
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum(...)
+{
+    return LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER;
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *)
 {
     reinterpret_cast<ObjectType *>(NULL)->OnPoolInstCreate(poolInst);
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, ...)
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, ...)
 {
     // Do nothing.
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *)
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *)
 {
     reinterpret_cast<ObjectType *>(NULL)->OnPoolInstDestroy(poolInst);
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, ...)
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, ...)
 {
     // Do nothing.
 }

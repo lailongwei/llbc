@@ -60,6 +60,14 @@ public:
     static bool Reset(void *obj);
 
     /**
+     * Pool instance per-block units number fetch support method, allow user-defined custom units number, 
+     * default use LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER.
+     * @return size_t - 
+     */
+    template <typename ObjectType>
+    static size_t GetPoolInstPerBlockUnitsNum();
+
+    /**
      * Pool instance create callback, this method is called when ObjectType object pool instance created.
      */
     template <typename ObjectType>
@@ -129,6 +137,23 @@ private:
      */
     template <typename ObjectType>
     static bool ResetObj(void *obj, ...);
+
+public:
+    /**
+     * Get user-defined object pool instance per-block units number.
+     * @return size_t - the per-block units number.
+     */
+    template <typename ObjectType, size_t (ObjectType::*GetPoolInstPerBlockUnitsNum)()>
+    struct poolinst_unitsnum_detectable_type;
+    template <typename ObjectType>
+    static size_t GetPoolInstPerBlockUnitsNum(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *);
+
+    /**
+     * Get default object pool instance per-block units number(LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER).
+     * @return size_t - the per-block units number.
+     */
+    template <typename ObjectType>
+    static size_t GetPoolInstPerBlockUnitsNum(...);
 
 private:
     /**

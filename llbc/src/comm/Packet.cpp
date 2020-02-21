@@ -126,6 +126,11 @@ void LLBC_Packet::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
     _msgBlockPoolInst = poolInst.GetIObjectPool()->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
 }
 
+size_t LLBC_Packet::GetPoolInstPerBlockUnitsNum()
+{
+    return LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER;
+}
+
 void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
 {
     // Set delete order.

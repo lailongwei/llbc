@@ -151,7 +151,11 @@ void LLBC_MessageBlock::GiveBackToPool()
     _poolInst->Release(this);
 }
 
-void LLBC_MessageBlock::Clear()
+size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
+{
+    return LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER;
+}
+void LLBC_MessageBlock::Clear()
 {
     _readPos = _writePos = 0;
     if (_attach)

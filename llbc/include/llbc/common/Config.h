@@ -138,7 +138,7 @@
 /**
  * \brief core/timer about configs.
  */
-// strict timer schedule mode.
+// Strict timer schedule mode.
 #define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
 // Long timeout time, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
 #define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
@@ -146,11 +146,11 @@
 /**
 * \brief core/objectpool about configs.
 */
-// object pool memory block size
-#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         (64 * 1024)
-// object pool statistic top N limit define.
-#define LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N                20
-// object pool memory allign config.
+// Object pool per-block units number define.
+#define LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER        64
+// Object pool statistic top N limit define.
+#define LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N                15
+// Object pool memory allign config.
 #if LLBC_64BIT_PROCESSOR
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             8
 #else
@@ -158,11 +158,14 @@
 #endif
 // Object pool debug option.
 #define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (1 || LLBC_DEBUG)
-// object reset metch methods control.
+// Object reset metch methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
+// Some llbc framework types object pool units number define.
+#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256     // LLBC_Packet
+#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256    // LLBC_MessageBlock
 
 /**
  * \brief ObjBase about configs.

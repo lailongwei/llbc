@@ -117,6 +117,11 @@ public:
     void GiveBackToPool();
 
     /**
+     * Object-Pool reflection support, get user-defined per-block units number.
+     */
+    size_t GetPoolInstPerBlockUnitsNum();
+
+    /**
      * Object-Pool reflection support: Clear message block, this operation will clear read&write position information.
      */
     void Clear();
