@@ -146,14 +146,14 @@ public:
     template <typename ObjectType, size_t (ObjectType::*GetPoolInstPerBlockUnitsNum)()>
     struct poolinst_unitsnum_detectable_type;
     template <typename ObjectType>
-    static size_t GetPoolInstPerBlockUnitsNum(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *);
+    static size_t GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *);
 
     /**
      * Get default object pool instance per-block units number(LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER).
      * @return size_t - the per-block units number.
      */
     template <typename ObjectType>
-    static size_t GetPoolInstPerBlockUnitsNum(...);
+    static size_t GetPoolInstPerBlockUnitsNumInl(...);
 
 private:
     /**

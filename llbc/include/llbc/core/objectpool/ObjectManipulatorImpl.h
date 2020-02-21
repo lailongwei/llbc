@@ -44,7 +44,7 @@ LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::Reset(void *obj)
 template <typename ObjectType>
 LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum()
 {
-    return GetPoolInstPerBlockUnitsNum<ObjectType>(0);
+    return GetPoolInstPerBlockUnitsNumInl<ObjectType>(0);
 }
 
 template <typename ObjectType>
@@ -110,13 +110,13 @@ LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
 {
     return reinterpret_cast<ObjectType *>(NULL)->GetPoolInstPerBlockUnitsNum();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum(...)
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(...)
 {
     return LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER;
 }
