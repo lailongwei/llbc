@@ -147,7 +147,7 @@
 * \brief core/objectpool about configs.
 */
 // object pool memory block size
-#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         (256 * 1024)
+#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         (64 * 1024)
 // object pool statistic top N limit define.
 #define LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N                20
 // object pool memory allign config.
