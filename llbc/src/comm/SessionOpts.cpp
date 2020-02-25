@@ -27,10 +27,10 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_EXPORT const LLBC_SessionOpts LLBC_DftSessionOpts(true,
-                                                       LLBC_CFG_COMM_DFT_SOCK_SEND_BUF_SIZE,
-                                                       LLBC_CFG_COMM_DFT_SOCK_RECV_BUF_SIZE,
-                                                       LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE);
+const LLBC_SessionOpts LLBC_DftSessionOpts(true,
+                                           LLBC_CFG_COMM_DFT_SOCK_SEND_BUF_SIZE,
+                                           LLBC_CFG_COMM_DFT_SOCK_RECV_BUF_SIZE,
+                                           LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE);
 
 __LLBC_NS_END
 
