@@ -122,7 +122,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
 
-        SetConnectedSocketDftOpts(sock, *ev.sessionOpts);
+        SetConnectedSocketOpts(sock, *ev.sessionOpts);
         AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, NULL));
 
         LLBC_XDelete(ev.sessionOpts);
@@ -353,7 +353,7 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
     LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
     if (connected)
     {
-        SetConnectedSocketDftOpts(sock, asyncInfo.sessionOpts);
+        SetConnectedSocketOpts(sock, asyncInfo.sessionOpts);
         AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
     }
     else
@@ -376,7 +376,7 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
 
         newSock->SetNonBlocking();
 
-        SetConnectedSocketDftOpts(newSock, session->GetSessionOpts());
+        SetConnectedSocketOpts(newSock, session->GetSessionOpts());
         AddToPoller(CreateSession(newSock, 0, session->GetSessionOpts(), session));
     }
 }
