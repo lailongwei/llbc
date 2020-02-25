@@ -169,8 +169,8 @@ int LLBC_Socket::DisableAddressReusable()
 
 bool LLBC_Socket::IsNoDelay() const
 {
-    bool noDelay = false;
-    LLBC_SocketLen len = sizeof(bool);
+    int noDelay = 0;
+    LLBC_SocketLen len = sizeof(int);
     if (const_cast<LLBC_Socket *>(this)->GetOption(IPPROTO_TCP,
                                                    TCP_NODELAY,
                                                    reinterpret_cast<void *>(&noDelay),
@@ -178,15 +178,16 @@ bool LLBC_Socket::IsNoDelay() const
         return false;
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    return noDelay;
+    return noDelay != 0;
 }
 
 int LLBC_Socket::SetNoDelay(bool noDelay)
 {
-    LLBC_SocketLen len = sizeof(bool);
+    int noDelayVal = noDelay ? 1 : 0;
+    LLBC_SocketLen len = sizeof(noDelayVal);
     return SetOption(IPPROTO_TCP,
                      TCP_NODELAY,
-                     reinterpret_cast<void *>(&noDelay),
+                     reinterpret_cast<void *>(&noDelayVal),
                      len);
 }
 
