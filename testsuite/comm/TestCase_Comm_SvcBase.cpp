@@ -63,6 +63,11 @@ struct TestData : public LLBC_ICoder
         return LLBC_ICoder::IsPoolObject();
     }
 
+    virtual LLBC_IObjectPoolInst *GetPoolInst()
+    {
+        return _poolInst;
+    }
+
     virtual void GiveBackToPool()
     {
         LLBC_ICoder::GiveBackToPool();

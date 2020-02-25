@@ -474,32 +474,43 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::Listen(const char *ip,
+                         uint16 port,
+                         LLBC_IProtocolFactory *protoFactory,
+                         const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Listen(ip, port, protoFactory);
+    const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, true);
 
     return sessionId;
 }
 
-int LLBC_Service::Connect(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::Connect(const char *ip,
+                          uint16 port,
+                          double timeout,
+                          LLBC_IProtocolFactory *protoFactory,
+                          const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Connect(ip, port, protoFactory);
+    const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, false);
 
     return sessionId;
 }
 
-int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::AsyncConn(const char *ip,
+                            uint16 port,
+                            double timeout,
+                            LLBC_IProtocolFactory *protoFactory,
+                            const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
 
     int pendingSessionId;
-    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory);
+    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory, sessionOpts);
 }
 
 bool LLBC_Service::IsSessionValidate(int sessionId)

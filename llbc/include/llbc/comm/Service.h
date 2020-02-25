@@ -158,9 +158,13 @@ public:
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Listen(const char *ip,
+                       uint16 port,
+                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Establishes a connection to a specified address.
@@ -171,9 +175,14 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Connect(const char *ip,
+                        uint16 port,
+                        double timeout = -1.0,
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Asynchronous establishes a connection to a specified address.
@@ -184,11 +193,16 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int AsyncConn(const char *ip,
+                          uint16 port,
+                          double timeout = -1.0,
+                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Check given sessionId is legal or not.

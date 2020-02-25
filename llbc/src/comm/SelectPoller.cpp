@@ -201,7 +201,11 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     {
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
-        AddSession(CreateSession(socket, ev.sessionId));
+
+        SetConnectedSocketOpts(socket, *ev.sessionOpts);
+        AddSession(CreateSession(socket, ev.sessionId, *ev.sessionOpts, NULL));
+
+        LLBC_XDelete(ev.sessionOpts);
     }
     else if (LLBC_GetLastError() == LLBC_ERROR_WBLOCK)
     {
@@ -209,17 +213,21 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         conn.socket = socket;
         conn.peerAddr = ev.peerAddr;
         conn.sessionId = ev.sessionId;
+        conn.sessionOpts = *ev.sessionOpts;
 
         _connecting.insert(std::make_pair(handle, conn));
 
         LLBC_SetFd(handle, &_writes);
         LLBC_SetFd(handle, &_excepts);
-
         UpdateMaxFd();
+
+        LLBC_XDelete(ev.sessionOpts);
     }
     else
     {
         LLBC_Delete(socket);
+        LLBC_XDelete(ev.sessionOpts);
+
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(ev.sessionId, false, LLBC_FormatLastError(), ev.peerAddr));
     }
@@ -293,8 +301,8 @@ void LLBC_SelectPoller::Accept(LLBC_Session *session)
     {
         newSocket->SetNonBlocking();
 
-        SetConnectedSocketDftOpts(newSocket);
-        AddToPoller(CreateSession(newSocket, 0, session));
+        SetConnectedSocketOpts(newSocket, session->GetSessionOpts());
+        AddToPoller(CreateSession(newSocket, 0, session->GetSessionOpts(), session));
     }
 }
 
@@ -371,8 +379,8 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
 
         if (connected)
         {
-            SetConnectedSocketDftOpts(socket);
-            AddSession(CreateSession(socket, asyncInfo.sessionId));
+            SetConnectedSocketOpts(socket, asyncInfo.sessionOpts);
+            AddSession(CreateSession(socket, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
         }
         else
         {

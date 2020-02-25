@@ -108,7 +108,9 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
     }
 
     if (_writePos + len > _size)
+    {
         Resize(MAX(_writePos + len, _size * 2));
+    }
 
     ASSERT((char *)(buf) + len < _buf || _buf + _size < buf);
 

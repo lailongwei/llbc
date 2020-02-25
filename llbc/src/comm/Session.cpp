@@ -80,29 +80,12 @@ LLBC_SessionCloseInfo::~LLBC_SessionCloseInfo()
 {
 }
 
-bool LLBC_SessionCloseInfo::IsFromService() const
-{
-    return _fromSvc;
-}
-
-const LLBC_String &LLBC_SessionCloseInfo::GetReason() const
-{
-    return _reason;
-}
-
-int LLBC_SessionCloseInfo::GetErrno() const
-{
-    return _errNo;
-}
-
-int LLBC_SessionCloseInfo::GetSubErrno() const
-{
-    return _subErrNo;
-}
-
-LLBC_Session::LLBC_Session()
+LLBC_Session::LLBC_Session(const LLBC_SessionOpts &sessionOpts)
 : _id(0)
 , _acceptId(0)
+
+, _sessionOpts(sessionOpts)
+
 , _socket(NULL)
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 
@@ -122,44 +105,9 @@ LLBC_Session::~LLBC_Session()
     LLBC_XDelete(_protoStack);
 }
 
-int LLBC_Session::GetId() const
-{
-    return _id;
-}
-
-void LLBC_Session::SetId(int id)
-{
-    _id = id;
-}
-
-int LLBC_Session::GetAcceptId() const
-{
-    return _acceptId;
-}
-
-void LLBC_Session::SetAcceptId(int acceptId)
-{
-    _acceptId = acceptId;
-}
-
-LLBC_SocketHandle LLBC_Session::GetSocketHandle() const
-{
-    return _sockHandle;
-}
-
 bool LLBC_Session::IsListen() const
 {
     return _socket->IsListen();
-}
-
-LLBC_Socket *LLBC_Session::GetSocket()
-{
-    return _socket;
-}
-
-const LLBC_Socket *LLBC_Session::GetSocket() const
-{
-    return _socket;
 }
 
 void LLBC_Session::SetSocket(LLBC_Socket *socket)
@@ -169,25 +117,24 @@ void LLBC_Session::SetSocket(LLBC_Socket *socket)
     _pollerType = socket->GetPollerType();
 }
 
-LLBC_IService *LLBC_Session::GetService()
-{
-    return _svc;
-}
-
 void LLBC_Session::SetService(LLBC_IService *svc)
 {
+    // Hold svc.
     _svc = svc;
+
+    // Create protocol stack.
     if ((_fullStack = svc->IsFullStack()))
         _protoStack = _svc->CreateFullStack(_id, _acceptId);
     else
         _protoStack = _svc->CreatePackStack(_id, _acceptId);
 
+    // Set session to protocol stack.
     _protoStack->SetSession(this);
-}
 
-LLBC_ProtocolStack *LLBC_Session::GetProtocolStack()
-{
-    return this->_protoStack;
+    // Set socket message block object-pool(if enabled).
+#if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    _socket->SetMsgBlockPoolInst(&_svc->GetMsgBlockObjectPool());
+#endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 }
 
 void LLBC_Session::SetProtocolStack(LLBC_ProtocolStack *protoStack)
@@ -196,18 +143,9 @@ void LLBC_Session::SetProtocolStack(LLBC_ProtocolStack *protoStack)
     _protoStack = protoStack;
 }
 
-LLBC_BasePoller *LLBC_Session::GetPoller()
-{
-    return _poller;
-}
-
-void LLBC_Session::SetPoller(LLBC_BasePoller *poller)
-{
-    _poller = poller;
-}
-
 int LLBC_Session::Send(LLBC_Packet *packet)
 {
+    // Serialize packet to block(throw protocol stack).
     int sendRet;
     bool removeSession;
     LLBC_MessageBlock *block;
@@ -221,6 +159,16 @@ int LLBC_Session::Send(LLBC_Packet *packet)
 
     if (block == NULL)
         return LLBC_OK;
+
+    // Check session send buffer size limit.
+    if (_sessionOpts.GetSessionSendBufSize() != LLBC_INFINITE && 
+        (_socket->GetWillSendBuffer().GetSize() + block->GetReadableSize()) >= _sessionOpts.GetSessionSendBufSize())
+    {
+        LLBC_Recycle(block);
+        LLBC_SetLastError(LLBC_ERROR_SESSION_SND_BUF_LIMIT);
+
+        return LLBC_FAILED;
+    }
 
     return Send(block);
 }

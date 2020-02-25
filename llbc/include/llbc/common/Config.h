@@ -188,10 +188,27 @@
 #define LLBC_CFG_COMM_MAX_EVENT_COUNT                       100
 // The epool max listen socket fd size(LINUX platform specific, only available before 2.6.8 version kernel before).
 #define LLBC_CFG_EPOLL_MAX_LISTEN_FD_SIZE                   10000
-// Default socket send buffer size.
-#define LLBC_CFG_COMM_DFT_SEND_BUF_SIZE                     65536
-// Default socket recv buffer size.
-#define LLBC_CFG_COMM_DFT_RECV_BUF_SIZE                     65536
+// Default socket send buffer size(0 means use system default and allow system dynamic adjust send buffer size, if supported).
+#define LLBC_CFG_COMM_DFT_SOCK_SEND_BUF_SIZE                0
+// Default socket recv buffer size(0 means use system default and allow system dynamic adjust recv buffer size, if supported).
+#define LLBC_CFG_COMM_DFT_SOCK_RECV_BUF_SIZE                0
+// Default session send buffer size(LLBC_INFINITE means no limit).
+// Note:
+// - this buffer size is send buffer size limit, if session will send data size greater than 
+//   or equal to setting value, will trigger LLBC_ERROR_SESSION_SND_BUF_LIMIT error.
+#define LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE             LLBC_INFINITE
+// Default session recv buffer size(not allow set to LLBC_INFINITE, is must be a actually size).
+// Note:
+// - this buffer size is initialize recv buffer size, if not enough to recv socket data, will auto expand.
+#define LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE             1024
+// Session recv buffer use object pool option, this option is performance option.
+// Note: 
+// - if enabled, can improvement read data from socket performance,
+//   but once you turn on this option, your server memory will be streteched very large.
+// - if enabled, LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE will no effect.
+#define LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL         0
+// Message buffer element(block) allow resize limit.
+#define LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT          (8 * 1024)
 // Default service FPS value.
 #define LLBC_CFG_COMM_DFT_SERVICE_FPS                       60
 // Min service FPS value.

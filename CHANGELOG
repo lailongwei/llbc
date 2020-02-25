@@ -41,6 +41,7 @@
 # 35)【llbc core】LLBC_ILock及其所有实现类增加bool IsDummyLock() const支持.
 # 36)【llbc core】对象池设计优化, 去除不需要的模板参数, 增加运行时动态创建能力, 增加依赖删除网状关系图自动(运行自动拓扑生成).
 # 37)【llbc core】增加对象池信息统计支持.
+# 38)【llbc core】完成优化网络相关代码, 提供更多选项给应用层自定义, 同时性能提升10倍+(整体).
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.

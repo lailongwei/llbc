@@ -19,36 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_ASYNC_CONN_INFO_H__
-#define __LLBC_COMM_ASYNC_CONN_INFO_H__
+#ifndef __LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__
+#define __LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#include "llbc.h"
+using namespace llbc;
 
-#include "llbc/comm/SessionOpts.h"
-
-__LLBC_NS_BEGIN
-
-/**
- * Previous-declare Socket class.
- */
-class LLBC_Socket;
-
-__LLBC_NS_END
-
-__LLBC_NS_BEGIN
-
-/**
- * \brief The asynchronous connect info structure encapsulation.
- */
-struct LLBC_HIDDEN LLBC_AsyncConnInfo
+class TestCase_Comm_MessageBuffer : public LLBC_BaseTestCase
 {
-    LLBC_Socket *socket;
-    LLBC_SockAddr_IN peerAddr;
-    int sessionId;
-    LLBC_SessionOpts sessionOpts;
+public:
+    TestCase_Comm_MessageBuffer();
+    virtual ~TestCase_Comm_MessageBuffer();
+
+public:
+    virtual int Run(int argc, char *argv[]);
 };
 
-__LLBC_NS_END
-
-#endif // !__LLBC_COMM_ASYNC_CONN_INFO_H__
+#endif // !__LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__

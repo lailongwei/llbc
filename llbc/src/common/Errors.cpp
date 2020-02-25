@@ -129,10 +129,12 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "a blocking windows Sockets 1.1 operations in progress", // 0x0029
     // WSA specific: WSAEPROCLIM
     "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x002a
-    // the specific socket is listen socket
+    // the specific socket is listen socket.
     "the specific socket is listen socket", // 0x002b
-    // object is not pool object
+    // object is not pool object.
     "object is not pool object", // 0x002c
+    // session send buffer limit.
+    "session send buffer limit", // 0x002d
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

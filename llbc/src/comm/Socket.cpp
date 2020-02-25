@@ -67,6 +67,10 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 , _nonBlocking(false)
 , _olGroup()
 #endif // LLBC_TARGET_PLATFORM_WIN32
+
+#if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+, _msgBlockPoolInst(NULL)
+#endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 {
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
         _handle = LLBC_CreateTcpSocket();
@@ -85,6 +89,12 @@ void LLBC_Socket::SetSession(LLBC_Session *session)
 {
     _session = session;
 }
+#if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+void LLBC_Socket::SetMsgBlockPoolInst(LLBC_ObjectPoolInst<LLBC_MessageBlock> *msgBlockPoolInst)
+{
+    _msgBlockPoolInst = msgBlockPoolInst;
+}
+#endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 
 int LLBC_Socket::GetPollerType() const
 {
@@ -157,6 +167,29 @@ int LLBC_Socket::DisableAddressReusable()
     return LLBC_DisableAddressReusable(_handle);
 }
 
+bool LLBC_Socket::IsNoDelay() const
+{
+    bool noDelay = false;
+    LLBC_SocketLen len = sizeof(bool);
+    if (const_cast<LLBC_Socket *>(this)->GetOption(IPPROTO_TCP,
+                                                   TCP_NODELAY,
+                                                   reinterpret_cast<void *>(&noDelay),
+                                                   &len) != LLBC_OK)
+        return false;
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return noDelay;
+}
+
+int LLBC_Socket::SetNoDelay(bool noDelay)
+{
+    LLBC_SocketLen len = sizeof(bool);
+    return SetOption(IPPROTO_TCP,
+                     TCP_NODELAY,
+                     reinterpret_cast<void *>(&noDelay),
+                     len);
+}
+
 bool LLBC_Socket::IsNonBlocking() const
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -186,9 +219,37 @@ int LLBC_Socket::SetNonBlocking()
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
+size_t LLBC_Socket::GetSendBufSize() const
+{
+    int sndBufSize = 0;
+    LLBC_SocketLen len = sizeof(int);
+    if (GetOption(SOL_SOCKET,
+                  SO_SNDBUF,
+                  reinterpret_cast<void *>(&sndBufSize),
+                  &len) != LLBC_OK)
+        return 0;
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return static_cast<size_t>(sndBufSize);
+}
+
 int LLBC_Socket::SetSendBufSize(size_t size)
 {
     return LLBC_SetSendBufSize(_handle, size);
+}
+
+size_t LLBC_Socket::GetRecvBufSize() const
+{
+    int rcvBufSize = 0;
+    LLBC_SocketLen len = sizeof(int);
+    if (GetOption(SOL_SOCKET,
+                  SO_RCVBUF,
+                  reinterpret_cast<void *>(&rcvBufSize),
+                  &len) != LLBC_OK)
+        return 0;
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    return static_cast<size_t>(rcvBufSize);
 }
 
 int LLBC_Socket::SetRecvBufSize(size_t size)
@@ -196,7 +257,7 @@ int LLBC_Socket::SetRecvBufSize(size_t size)
     return LLBC_SetRecvBufSize(_handle, size);
 }
 
-int LLBC_Socket::GetOption(int level, int optname, void *optval, LLBC_SocketLen *optlen)
+int LLBC_Socket::GetOption(int level, int optname, void *optval, LLBC_SocketLen *optlen) const
 {
     return LLBC_GetSocketOption(_handle, level, optname, optval, optlen);
 }
@@ -255,7 +316,7 @@ int LLBC_Socket::AcceptEx(LLBC_SocketHandle listenSock,
     return LLBC_AcceptClientEx(listenSock,
                                acceptSock,
                                _acceptExBuf,
-                               sizeof(_acceptExBuf) - ((sizeof(LLBC_SockAddr_IN) + 16) * 2),
+                               sizeof(_acceptExBuf) - (sizeof(LLBC_SockAddr_IN) + 16) * 2,
                                sizeof(LLBC_SockAddr_IN) + 16,
                                sizeof(LLBC_SockAddr_IN) + 16,
                                ol);
@@ -309,9 +370,10 @@ int LLBC_Socket::AsyncSend(const char *buf, int len)
 
 int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
 {
-    if (_willSend.Append(block) != LLBC_OK)
+    // Append to msg buffer.
+    if (UNLIKELY(_willSend.Append(block) != LLBC_OK))
     {
-        LLBC_XDelete(block);
+        LLBC_XRecycle(block);
         return LLBC_FAILED;
     }
 
@@ -319,7 +381,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     if (_pollerType != _PollerType::IocpPoller)
         return LLBC_OK;
 
-    LLBC_MessageBlock *mergedBlock = _willSend.MergeBuffersAndDetach();
+    LLBC_MessageBlock *mergedBlock = _willSend.MergeBlocksAndDetach();
 
     LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
     ol->sock = _handle;
@@ -446,17 +508,17 @@ void LLBC_Socket::OnSend()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
     int len = 0, totalLen = 0;
-    LLBC_MessageBlock *block = _willSend.FirstBlock();
-    while (block)
+    const LLBC_MessageBlock *firstBlock = _willSend.FirstBlock();
+    while (firstBlock)
     {
         if ((len = LLBC_Send(_handle, 
-                             block->GetDataStartWithReadPos(), 
-                             static_cast<int>(block->GetReadableSize()), 0)) < 0)
+                             firstBlock->GetDataStartWithReadPos(), 
+                             static_cast<int>(firstBlock->GetReadableSize()), 0)) < 0)
             break;
 
         totalLen += len;
         _willSend.Remove(len);
-        block = _willSend.FirstBlock();
+        firstBlock = _willSend.FirstBlock();
     }
 
     if (len < 0 && LLBC_GetLastError() != LLBC_ERROR_WBLOCK
@@ -477,7 +539,7 @@ void LLBC_Socket::OnSend()
     if (_pollerType != _PollerType::IocpPoller)
         return;
 
-    block = _willSend.MergeBuffersAndDetach();
+    LLBC_MessageBlock *block = _willSend.MergeBlocksAndDetach();
     if (!block)
         return;
 
@@ -539,18 +601,43 @@ void LLBC_Socket::OnRecv()
 
     int len = 0;
     bool recvFlag = false;
-    
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
+    #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    LLBC_MessageBlock *block = _msgBlockPoolInst->GetObject();
+    #else
+    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, _session->GetSessionOpts().GetSessionRecvBufSize());
+    #endif
     while ((len = LLBC_Recv(_handle,
                             block->GetDataStartWithWritePos(),
                             static_cast<int>(block->GetWritableSize()),
                             0)) > 0)
     {
+        recvFlag = true;
         block->ShiftWritePos(len);
         if (block->GetWritableSize() == 0)
-            block->Allocate();
+        {
+            unsigned long noReadLen;
+#if LLBC_TARGET_PLATFORM_WIN32
+            if (UNLIKELY(::ioctlsocket(_handle, FIONREAD, &noReadLen) == SOCKET_ERROR))
+            {
+                LLBC_SetLastError(LLBC_ERROR_NETAPI);
+#else // Non-Win32
+            if (UNLIKELY(::ioctl(_handle, FIONREAD, &noReadLen) != 0))
+            {
+                LLBC_SetLastError(LLBC_ERROR_CLIB);
+#endif
+                len = -1;
+                break;
+            }
 
-        recvFlag = true;
+            // If no any ready data to read, set errno to LLBC_ERROR_WBLOCK.
+            if (noReadLen == 0)
+            {
+                LLBC_SetLastError(LLBC_ERROR_WBLOCK);
+                break;
+            }
+
+            block->Allocate(noReadLen);
+        }
     }
 
     // If recv failed, firstly get last error.
@@ -588,7 +675,7 @@ void LLBC_Socket::OnRecv()
     }
     else
     {
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 
     // Process errors.

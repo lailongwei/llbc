@@ -93,6 +93,7 @@ int TestSuite_Main(int argc, char *argv[])
     // test = LLBC_New0(TestCase_Comm_ExternalDriveSvc);
     // test = LLBC_New0(TestCase_Comm_LazyTask);
     // test = LLBC_New0(TestCase_Comm_ProtoStackCtrl);
+    // test = LLBC_New0(TestCase_Comm_MessageBuffer);
 
     // test = LLBC_New0(TestCase_App_AppTest);
 

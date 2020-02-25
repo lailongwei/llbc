@@ -43,7 +43,7 @@ static const size_t __llbc_headerLen = 28;
 
 void LLBC_FORCE_INLINE __DelBlock(void *data)
 {
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data));
+    LLBC_Recycle(reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data));
 }
 
 void inline __DelPacketList(void *&data)

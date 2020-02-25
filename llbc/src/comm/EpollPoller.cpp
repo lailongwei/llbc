@@ -121,9 +121,11 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     {
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
-        
-        SetConnectedSocketDftOpts(sock);
-        AddSession(CreateSession(sock, ev.sessionId));
+
+        SetConnectedSocketDftOpts(sock, *ev.sessionOpts);
+        AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, NULL));
+
+        LLBC_XDelete(ev.sessionOpts);
     }
     else if (LLBC_GetLastError() == LLBC_ERROR_WBLOCK)
     {
@@ -131,6 +133,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         asyncInfo.socket = sock;
         asyncInfo.peerAddr = ev.peerAddr;
         asyncInfo.sessionId = ev.sessionId;
+        asyncInfo.sessionOpts = *ev.sessionOpts;
         _connecting.insert(std::make_pair(handle, asyncInfo));
 
         LLBC_EpollEvent epev;
@@ -138,6 +141,8 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         epev.data.u32 = ev.sessionId;
         epev.events = EPOLLOUT | EPOLLET;
         LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
+
+        LLBC_XDelete(ev.sessionOpts);
     }
     else
     {
@@ -145,6 +150,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(ev.sessionId, false, reason, ev.peerAddr));
 
         LLBC_Delete(sock);
+        LLBC_XDelete(ev.sessionOpts);
     }
 }
 
@@ -347,8 +353,8 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
     LLBC_EpollCtl(_epoll, EPOLL_CTL_DEL, handle, &epev);
     if (connected)
     {
-        SetConnectedSocketDftOpts(sock);
-        AddSession(CreateSession(sock, asyncInfo.sessionId));
+        SetConnectedSocketDftOpts(sock, asyncInfo.sessionOpts);
+        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
     }
     else
     {
@@ -370,8 +376,8 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
 
         newSock->SetNonBlocking();
 
-        SetConnectedSocketDftOpts(newSock);
-        AddToPoller(CreateSession(newSock, 0, session));
+        SetConnectedSocketDftOpts(newSock, session->GetSessionOpts());
+        AddToPoller(CreateSession(newSock, 0, session->GetSessionOpts(), session));
     }
 }
 
