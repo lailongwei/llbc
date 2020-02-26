@@ -429,6 +429,12 @@ public:
     void RemoveOverlapped(LLBC_POverlapped ol);
     void DeleteOverlapped(LLBC_POverlapped ol);
     void DeleteAllOverlappeds();
+
+    /**
+     * Get Iocp sending data size, only-available in <IocpPoller> poller mode.
+     * @return size_t - the sending data size.
+     */
+    size_t GetIocpSendingDataSize() const;
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 private:
@@ -467,6 +473,8 @@ private:
 #if LLBC_TARGET_PLATFORM_WIN32
     bool _nonBlocking;
     LLBC_OverlappedGroup _olGroup;
+
+    size_t _iocpSendingDataSize;
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL

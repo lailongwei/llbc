@@ -66,6 +66,8 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 #if LLBC_TARGET_PLATFORM_WIN32
 , _nonBlocking(false)
 , _olGroup()
+
+, _iocpSendingDataSize(0)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
@@ -389,8 +391,10 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     ol->data = mergedBlock;
     ol->opcode = _Opcode::Send;
 
+    size_t sendingSize = mergedBlock->GetReadableSize();
+
     LLBC_SockBuf buf;
-    buf.len = static_cast<ULONG>(mergedBlock->GetReadableSize());
+    buf.len = static_cast<ULONG>(sendingSize);
     buf.buf = reinterpret_cast<char *>(mergedBlock->GetDataStartWithReadPos());
 
     int ret = 0;
@@ -400,6 +404,8 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     {
         if (LLBC_GetLastError() == LLBC_ERROR_NETAPI && LLBC_GetSubErrorNo() == WSAENOBUFS)
         {
+            sendingSize = 0;
+
             ::memset(ol, 0, sizeof(OVERLAPPED));
             ol->data = NULL;
             buf.buf = NULL;
@@ -417,7 +423,10 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
         _olGroup.DeleteOverlapped(ol);
         return LLBC_FAILED;
     }
+
+    _iocpSendingDataSize += sendingSize;
 #endif // LLBC_TARGET_PLATFORM_WIN32
+
     return LLBC_OK;
 }
 
@@ -499,6 +508,9 @@ void LLBC_Socket::OnSend()
             size_t sent = block->GetReadableSize();
             _olGroup.DeleteOverlapped(ol);
 
+            ASSERT(sent <= _iocpSendingDataSize && "llbc library internal error for LLBC_Socket::OnSend(LLBC_POverlapped ol)");
+            _iocpSendingDataSize -= sent;
+
             _session->OnSent(sent);
 
             return;
@@ -550,9 +562,11 @@ void LLBC_Socket::OnSend()
     ol->sock = _handle;
     ol->data = block;
 
+    size_t sendingSize = block->GetReadableSize();
+
     LLBC_SockBuf buf;
+    buf.len = static_cast<ULONG>(sendingSize);
     buf.buf = reinterpret_cast<char *>(block->GetDataStartWithReadPos());
-    buf.len = static_cast<ULONG>(block->GetReadPos());
 
     ulong flags = 0;
     ulong bytesSent = 0;
@@ -563,6 +577,8 @@ void LLBC_Socket::OnSend()
         if (LLBC_GetLastError() == LLBC_ERROR_NETAPI &&
             LLBC_GetSubErrorNo() == WSAENOBUFS)
         {
+            sendingSize = 0;
+
             ::memset(ol, 0, sizeof(OVERLAPPED));
             ol->data = NULL;
             buf.buf = NULL;
@@ -583,6 +599,7 @@ void LLBC_Socket::OnSend()
         return;
     }
 
+    _iocpSendingDataSize += sendingSize;
     _olGroup.InsertOverlapped(ol);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
@@ -765,6 +782,11 @@ void LLBC_Socket::DeleteOverlapped(LLBC_POverlapped ol)
 void LLBC_Socket::DeleteAllOverlappeds()
 {
     _olGroup.DeleteAllOverlappeds();
+}
+
+size_t LLBC_Socket::GetIocpSendingDataSize() const
+{
+    return _iocpSendingDataSize;
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 

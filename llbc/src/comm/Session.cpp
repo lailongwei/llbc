@@ -160,9 +160,20 @@ int LLBC_Session::Send(LLBC_Packet *packet)
     if (block == NULL)
         return LLBC_OK;
 
+    return Send(block);
+}
+
+int LLBC_Session::Send(LLBC_MessageBlock *block)
+{
     // Check session send buffer size limit.
-    if (_sessionOpts.GetSessionSendBufSize() != LLBC_INFINITE && 
-        (_socket->GetWillSendBuffer().GetSize() + block->GetReadableSize()) >= _sessionOpts.GetSessionSendBufSize())
+    size_t sessionSndBufUsed = _socket->GetWillSendBuffer().GetSize();
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (_pollerType == LLBC_PollerType::IocpPoller)
+        sessionSndBufUsed += _socket->GetIocpSendingDataSize();
+#endif
+
+    if (_sessionOpts.GetSessionSendBufSize() != LLBC_INFINITE &&
+        (sessionSndBufUsed + block->GetReadableSize()) >= _sessionOpts.GetSessionSendBufSize())
     {
         LLBC_Recycle(block);
         LLBC_SetLastError(LLBC_ERROR_SESSION_SND_BUF_LIMIT);
@@ -170,11 +181,7 @@ int LLBC_Session::Send(LLBC_Packet *packet)
         return LLBC_FAILED;
     }
 
-    return Send(block);
-}
-
-int LLBC_Session::Send(LLBC_MessageBlock *block)
-{
+    // Send.
     if (_socket->AsyncSend(block) != LLBC_OK)
         return LLBC_FAILED;
 
