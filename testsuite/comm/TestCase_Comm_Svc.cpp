@@ -142,7 +142,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     svc->RegisterFacade(facade);
     svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
-    svc->Start(4);
+    svc->Start(8);
 
     // Connect to server / Create listen session to wait client connect.
     int sessionId;

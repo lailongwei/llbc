@@ -616,13 +616,14 @@ void LLBC_Socket::OnRecv()
         block->ShiftWritePos(len);
         if (block->GetWritableSize() == 0)
         {
-            unsigned long noReadLen;
 #if LLBC_TARGET_PLATFORM_WIN32
-            if (UNLIKELY(::ioctlsocket(_handle, FIONREAD, &noReadLen) == SOCKET_ERROR))
+            LLBC_NS ulong pendingBytes;
+            if (UNLIKELY(::ioctlsocket(_handle, FIONREAD, &pendingBytes) == SOCKET_ERROR))
             {
                 LLBC_SetLastError(LLBC_ERROR_NETAPI);
 #else // Non-Win32
-            if (UNLIKELY(::ioctl(_handle, FIONREAD, &noReadLen) != 0))
+            int pendingBytes;
+            if (UNLIKELY(::ioctl(_handle, FIONREAD, &pendingBytes) != 0))
             {
                 LLBC_SetLastError(LLBC_ERROR_CLIB);
 #endif
@@ -631,13 +632,13 @@ void LLBC_Socket::OnRecv()
             }
 
             // If no any ready data to read, set errno to LLBC_ERROR_WBLOCK.
-            if (noReadLen == 0)
+            if (pendingBytes == 0)
             {
                 LLBC_SetLastError(LLBC_ERROR_WBLOCK);
                 break;
             }
 
-            block->Allocate(noReadLen);
+            block->Allocate(pendingBytes);
         }
     }
 
