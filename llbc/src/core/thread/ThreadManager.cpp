@@ -895,9 +895,7 @@ int LLBC_ThreadManager::KillGroup(LLBC_Handle handle, int signum)
         threadDesc = threadDesc->GetGroupThreadNext();
 
         if (Kill(tmpThreadDesc->GetHandle(), signum) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
@@ -1048,17 +1046,15 @@ LLBC_ThreadDescriptor *LLBC_ThreadManager::FindThreadDescriptor(LLBC_Handle hand
 {
     int threadBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_threads[threadBucketIdx])
-    {
         return NULL;
-    }
 
     LLBC_ThreadDescriptor *desc = _threads[threadBucketIdx];
     while (desc)
     {
         if (desc->GetHandle() == handle)
-        {
             return desc;
-        }
+
+        desc = desc->GetThreadNext();
     }
 
     return NULL;
@@ -1068,9 +1064,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
 {
     int threadBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_threads[threadBucketIdx])
-    {
         return;
-    }
 
     LLBC_ThreadDescriptor *desc = _threads[threadBucketIdx];
     if (desc->GetHandle() == handle)
@@ -1080,9 +1074,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
             FindThreadGroupDescriptor(desc->GetGroupHandle());
         groupDesc->RemoveFromGroup(desc->GetHandle());
         if (groupDesc->GetThreadCount() == 0)
-        {
             RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
-        }
 
         LLBC_Delete(desc);
 
@@ -1098,9 +1090,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
                 FindThreadGroupDescriptor(tmpDesc->GetGroupHandle());
             groupDesc->RemoveFromGroup(tmpDesc->GetHandle());
             if (groupDesc->GetThreadCount() == 0)
-            {
                 RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
-            }
 
             desc->SetThreadNext(desc->GetThreadNext()->GetThreadNext());
 
@@ -1116,9 +1106,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
 void LLBC_ThreadManager::AddThreadGroupDescriptor(LLBC_ThreadGroupDescriptor *groupDesc)
 {
     if (FindThreadGroupDescriptor(groupDesc->GetGroupHandle()))
-    {
         return;
-    }
 
     groupDesc->SetGroupNext(NULL);
 
@@ -1131,9 +1119,7 @@ void LLBC_ThreadManager::AddThreadGroupDescriptor(LLBC_ThreadGroupDescriptor *gr
 
     LLBC_ThreadGroupDescriptor *tmpGroupDesc = _groups[groupBucketIdx];
     while (tmpGroupDesc->GetGroupNext())
-    {
         tmpGroupDesc = tmpGroupDesc->GetGroupNext();
-    }
 
     tmpGroupDesc->SetGroupNext(groupDesc);
 }
@@ -1142,17 +1128,15 @@ LLBC_ThreadGroupDescriptor *LLBC_ThreadManager::FindThreadGroupDescriptor(LLBC_H
 {
     int groupBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_groups[groupBucketIdx])
-    {
         return NULL;
-    }
 
     LLBC_ThreadGroupDescriptor *desc = _groups[groupBucketIdx];
     while (desc)
     {
         if (desc->GetGroupHandle() == handle)
-        {
             return desc;
-        }
+
+        desc = desc->GetGroupNext();
     }
 
     return NULL;
@@ -1162,9 +1146,7 @@ void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
 {
     int groupBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_groups[groupBucketIdx])
-    {
         return;
-    }
 
     LLBC_ThreadGroupDescriptor *groupDesc = _groups[groupBucketIdx];
     if (groupDesc->GetGroupHandle() == handle)
