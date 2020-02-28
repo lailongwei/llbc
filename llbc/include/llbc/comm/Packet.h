@@ -221,7 +221,7 @@ public:
     const sint64 &GetExtData3() const;
     /**
      * Set packet third extension data.
-     * @param[in] extData2 - the third extension data.
+     * @param[in] extData3 - the third extension data.
      */
     void SetExtData3(const sint64 &extData3);
 public:
@@ -531,18 +531,6 @@ public:
      */
     void SetCodecError(const LLBC_String &codecErr);
 
-public:
-    /**
-     * Get don't delete after packet handle flag.
-     * @return bool - the dont delete after handle flag.
-     */
-    bool IsDontDeleteAfterHandle() const;
-
-    /**
-     * Set don't delete after packet handle flag.
-     */
-    void SetDontDeleteAfterHandle();
-
 private:
     /**
      * Read raw type data from packet.
@@ -614,8 +602,6 @@ private:
     LLBC_MessageBlock *_payload;
     LLBC_IDelegate1<void, LLBC_MessageBlock *> *_payloadDeleteDeleg;
     bool _deletePayloadDeleteDelegWhenDestroy;
-
-    bool _dontDelAfterHandle;
 
     LLBC_IObjectPoolInst *_selfPoolInst;
     LLBC_IObjectPoolInst *_msgBlockPoolInst;

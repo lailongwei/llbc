@@ -258,16 +258,6 @@ LLBC_FORCE_INLINE void LLBC_Packet::GiveBackToPool()
     _selfPoolInst->Release(this);
 }
 
-LLBC_FORCE_INLINE bool LLBC_Packet::IsDontDeleteAfterHandle() const
-{
-    return _dontDelAfterHandle;
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::SetDontDeleteAfterHandle()
-{
-    _dontDelAfterHandle = true;
-}
-
 template<typename RetType>
 LLBC_FORCE_INLINE RetType *LLBC_Packet::GetPreHandleResult() const
 {

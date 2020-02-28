@@ -36,12 +36,6 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
-
-    inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
-    {
-        if (LIKELY(!packet->IsDontDeleteAfterHandle()))
-            LLBC_Recycle(packet);
-    }
 }
 
 __LLBC_NS_BEGIN
@@ -1626,7 +1620,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             if (stHandlerIt != stHandlers.end())
             {
                 stHandlerIt->second->Invoke(*packet);
-                __LLBC_DelPacketAfterHandle(packet);
+                LLBC_Recycle(packet);
                 return;
             }
         }
@@ -1643,7 +1637,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             if (!preIt->second->Invoke(*packet))
             {
-                __LLBC_DelPacketAfterHandle(packet);
+                LLBC_Recycle(packet);
                 return;
             }
 
@@ -1656,7 +1650,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     {
         if (!_unifyPreHandler->Invoke(*packet))
         {
-            __LLBC_DelPacketAfterHandle(packet);
+            LLBC_Recycle(packet);
             return;
         }
     }
@@ -1679,7 +1673,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         }
     }
 
-    __LLBC_DelPacketAfterHandle(packet);
+    LLBC_Recycle(packet);
 }
 
 void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)

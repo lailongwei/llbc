@@ -64,8 +64,6 @@ LLBC_Packet::LLBC_Packet()
 , _payloadDeleteDeleg(NULL)
 , _deletePayloadDeleteDelegWhenDestroy(false)
 
-, _dontDelAfterHandle(false)
-
 , _selfPoolInst(NULL)
 , _msgBlockPoolInst(NULL)
 {
@@ -192,9 +190,6 @@ void LLBC_Packet::Clear()
 
     // Clear pre-handle result.
     CleanupPreHandleResult();
-
-    // Reset don't delete after handle flag.
-    _dontDelAfterHandle = false;
 }
 
 LLBC_ICoder *LLBC_Packet::GetEncoder() const
