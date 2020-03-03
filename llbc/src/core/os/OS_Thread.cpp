@@ -389,7 +389,7 @@ LLBC_ThreadId LLBC_GetCurrentThreadId()
     #endif
 #else // LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC (FreeBSD kernel)
     // For get more information, see: https://www.freebsd.org/cgi/man.cgi?query=pthread_getthreadid_np&sektion=3&manpath=freebsd-release-ports
-    return pthread_getthreadid_np();
+    return pthread_mach_thread_np(pthread_self());
 #endif
 }
 
