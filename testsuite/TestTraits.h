@@ -41,26 +41,26 @@ struct __TraitsLoop<0>
     static void Generate() {}
 };
 
-#define __DEF_TEST_CASE_BEGIN                  \
-    enum                                     \
-    {                                        \
-        __TEST_CASE_ID_START = __LINE__ + 1, \
+#define __DEF_TEST_CASE_BEGIN            \
+    enum                                 \
+    {                                    \
+        __TEST_CASE_ID_START = __LINE__, \
     };
 
-#define __DEF_TEST_CASE_END                                    \
+#define __DEF_TEST_CASE_END                                  \
     enum                                                     \
     {                                                        \
         __TEST_CASE_COUNT = __LINE__ - __TEST_CASE_ID_START, \
     };                                                       \
     static __TestCaseFactory __g_testcaseFactory[ __TEST_CASE_COUNT ] = {};
 
-#define __DEFINE_TEST_CASE(cls)                              \
+#define __DEFINE_TEST_CASE(cls)                            \
     enum                                                   \
     {                                                      \
         __E_##cls = __LINE__ - __TEST_CASE_ID_START,       \
     };                                                     \
     template <>                                            \
-    struct __TestCaseTraits<__E_##cls>                       \
+    struct __TestCaseTraits<__E_##cls>                     \
     {                                                      \
         static ::llbc::LLBC_ITestCase* CreateTestCaseIns() \
         {                                                  \
@@ -75,4 +75,4 @@ struct __TraitsLoop<0>
 #define __TEST_CASE_NAME(idx) __g_testcaseFactory[ idx ].first
 #define __TEST_CASE_FUNC(idx) __g_testcaseFactory[ idx ].second
 
-#endif //_TEST_TRAITS_H_
+#endif  //_TEST_TRAITS_H_

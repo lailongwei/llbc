@@ -56,11 +56,11 @@ int TestSuite_Main(int argc, char* argv[])
             if (testcaseName == nullptr || testcaseFactory == nullptr)
                 continue;
 
-            LLBC_PrintLine("%d: %s", i, testcaseName);
+            LLBC_PrintLine("%d: %s", i+1, testcaseName);
         }
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 
-        LLBC_Print("Please input:\t");
+        LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
         int idx = -1;
         if (fscanf(stdin, "%d", &idx) != 1)
         {
@@ -68,22 +68,28 @@ int TestSuite_Main(int argc, char* argv[])
             continue;
         }
 
-		__ClearInputBuf()
-        if (idx < 0 || idx >= __TEST_CASE_COUNT)
-            break;
+		__ClearInputBuf();
+        if (idx <= 0)
+			break;
+
+        if (--idx >= __TEST_CASE_COUNT)
+        {
+            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
+            continue;
+        }
 
         auto testcaseName = __TEST_CASE_NAME(idx);
         auto testcaseFactory = __TEST_CASE_FUNC(idx);
         if (testcaseName == nullptr || testcaseFactory == nullptr)
         {
-            LLBC_PrintLine("unimplemented test case.");
+            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
         }
 
         ::llbc::LLBC_ITestCase* test = testcaseFactory();
         if (!test)
         {
-            LLBC_PrintLine("unimplemented test case.");
+            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
         }
 
