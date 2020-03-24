@@ -68,4 +68,8 @@ DEFINE_TEST_CASE(TestCase_Comm_MessageBuffer)
 DEFINE_TEST_CASE(TestCase_App_AppTest)
 DEF_TEST_CASE_END
 
-#endif
+#undef DEF_TEST_CASE_BEGIN
+#undef DEFINE_TEST_CASE
+#undef DEF_TEST_CASE_END
+
+#endif //_TEST_SUIT_DEF_H_

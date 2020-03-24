@@ -23,25 +23,28 @@
 #include "TestSuite.h"
 #include "TestSuiteDef.h"
 
-#define PrintLineC(color, fmt, ...)                              \
-	old = LLBC_GetConsoleColor(stdout);                          \
-	LLBC_SetConsoleColor(stdout, color);                         \
-	LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
-	LLBC_SetConsoleColor(stdout, old);                           \
-	LLBC_NS __LLBC_FilePrint(true, stdout, "");\
+#define __PrintLineC(color, fmt, ...)                                \
+    do                                                               \
+    {                                                                \
+        auto olcClr = LLBC_GetConsoleColor(stdout);                  \
+        LLBC_SetConsoleColor(stdout, color);                         \
+        LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
+        LLBC_SetConsoleColor(stdout, olcClr);                        \
+        LLBC_NS __LLBC_FilePrint(true, stdout, "");                  \
+    } while (0);\
+	
 
-#define DEPARATION_CHARACTER "--------------------------------------------------"
+#define __DEPARATION_CHARACTER "--------------------------------------------------"
 
 int TestSuite_Main(int argc, char *argv[])
 {
     ::llbc::LLBC_Startup();
-	TraitsLoop<test_case_count>::generate();
+    TraitsLoop<__TEST_CASE_COUNT>::Generate();
 
-	int old;
 	while (true)
 	{
-		PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, DEPARATION_CHARACTER);
-		for (int i = 0; i < test_case_count; ++i)
+		__PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
+        for (int i = 0; i < __TEST_CASE_COUNT; ++i)
 		{
 			auto name = TEST_CASE_NAME(i);
 			auto func = TEST_CASE_FUNC(i);
@@ -50,15 +53,15 @@ int TestSuite_Main(int argc, char *argv[])
 
 			LLBC_PrintLine("%d: %s", i, name);
 		}
-		PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, DEPARATION_CHARACTER);
+		__PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 
 		LLBC_Print("Please input:\t");
 		int idx = -1;
 		if (fscanf(stdin, "%d", &idx) != 1)
-			continue;
+			break;
 
-		std::getchar();  //清除缓冲区回车字符
-		if (idx < 0 || idx >= test_case_count)
+		std::getchar();  //clear enter character
+        if (idx < 0 || idx >= __TEST_CASE_COUNT)
 			break;
 
 		auto name = TEST_CASE_NAME(idx);
@@ -76,7 +79,7 @@ int TestSuite_Main(int argc, char *argv[])
 			continue;
 		}
 
-		PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_White, "%s selected.", name);
+		__PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_White, "%s selected.", name);
 
 		test->Run(argc, argv);
 		LLBC_Delete(test);
@@ -85,3 +88,6 @@ int TestSuite_Main(int argc, char *argv[])
     ::llbc::LLBC_Cleanup();
     return 0;
 }
+
+#undef __PrintLineC
+#undef __DEPARATION_CHARACTER
