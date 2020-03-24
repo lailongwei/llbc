@@ -3,8 +3,8 @@
 
 #include "llbc.h"
 
-using TestCaseFactoryFunc = ::llbc::LLBC_ITestCase* (*) ();
-using TestCaseFactory = std::pair<const char*, TestCaseFactoryFunc>;
+using __TestCaseFactoryFunc = ::llbc::LLBC_ITestCase* (*) ();
+using __TestCaseFactory = std::pair<const char*, __TestCaseFactoryFunc>;
 
 template <class ObjType, typename... Args>
 ObjType* __CreateTestCaseIns(Args&&... args)
@@ -13,7 +13,7 @@ ObjType* __CreateTestCaseIns(Args&&... args)
 }
 
 template <int idx>
-struct TestCaseTraits
+struct __TestCaseTraits
 {
     static const char* Name()
     {
@@ -26,41 +26,41 @@ struct TestCaseTraits
 };
 
 template <int i>
-struct TraitsLoop
+struct __TraitsLoop
 {
     static void Generate()
     {
-        TraitsLoop<i - 1>::Generate();
-        G_testCaseFactory[ i - 1 ] = TestCaseFactory(TestCaseTraits<i>::Name(), &TestCaseTraits<i>::CreateTestCaseIns);
+        __TraitsLoop<i - 1>::Generate();
+        __g_testcaseFactory[ i - 1 ] = __TestCaseFactory(__TestCaseTraits<i>::Name(), &__TestCaseTraits<i>::CreateTestCaseIns);
     }
 };
 
 template <>
-struct TraitsLoop<0>
+struct __TraitsLoop<0>
 {
     static void Generate() {}
 };
 
-#define DEF_TEST_CASE_BEGIN                  \
+#define __DEF_TEST_CASE_BEGIN                  \
     enum                                     \
     {                                        \
         __TEST_CASE_ID_START = __LINE__ + 1, \
     };
 
-#define DEF_TEST_CASE_END                                    \
+#define __DEF_TEST_CASE_END                                    \
     enum                                                     \
     {                                                        \
         __TEST_CASE_COUNT = __LINE__ - __TEST_CASE_ID_START, \
     };                                                       \
-    static TestCaseFactory G_testCaseFactory[ __TEST_CASE_COUNT ] = {};
+    static __TestCaseFactory __g_testcaseFactory[ __TEST_CASE_COUNT ] = {};
 
-#define DEFINE_TEST_CASE(cls)                              \
+#define __DEFINE_TEST_CASE(cls)                              \
     enum                                                   \
     {                                                      \
         __E_##cls = __LINE__ - __TEST_CASE_ID_START,       \
     };                                                     \
     template <>                                            \
-    struct TestCaseTraits<__E_##cls>                       \
+    struct __TestCaseTraits<__E_##cls>                       \
     {                                                      \
         static ::llbc::LLBC_ITestCase* CreateTestCaseIns() \
         {                                                  \
@@ -72,7 +72,7 @@ struct TraitsLoop<0>
         }                                                  \
     };
 
-#define TEST_CASE_NAME(idx) G_testCaseFactory[ idx ].first
-#define TEST_CASE_FUNC(idx) G_testCaseFactory[ idx ].second
+#define __TEST_CASE_NAME(idx) __g_testcaseFactory[ idx ].first
+#define __TEST_CASE_FUNC(idx) __g_testcaseFactory[ idx ].second
 
 #endif //_TEST_TRAITS_H_
