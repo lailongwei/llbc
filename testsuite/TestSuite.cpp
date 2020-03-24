@@ -53,11 +53,12 @@ int TestSuite_Main(int argc, char *argv[])
 		PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, DEPARATION_CHARACTER);
 
 		LLBC_Print("Please input:\t");
-		const int s = std::getchar();
-		std::getchar();  //清除缓冲区回车字符
+		int idx = -1;
+		if (fscanf(stdin, "%d", &idx) != 1)
+			continue;
 
-		const int idx = s - '0';
-		if (idx < 0 || idx > test_case_count)
+		std::getchar();  //清除缓冲区回车字符
+		if (idx < 0 || idx >= test_case_count)
 			break;
 
 		auto name = TEST_CASE_NAME(idx);
