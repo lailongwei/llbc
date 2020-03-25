@@ -46,24 +46,24 @@ void __GetConsoleColorCode(int color, const char*& begFmt, const char*& fgColorC
     if (LIKELY(color <= 0))
         return;
 
-	int fgColor = color & ((1 << __g_consoleFgColorNum) - 1);
+    int fgColor = color & ((1 << __g_consoleFgColorNum) - 1);
     int bgColor = (color >> __g_consoleFgColorNum) & ((1 << __g_consoleBgColorNum) - 1);
     int highColor = (color >> __g_consoleFgColorNum) >> __g_consoleBgColorNum;
     if (LIKELY(fgColor > 0))
-	{
+    {
         int idx = -1;
         while (++idx, fgColor = fgColor >> 1, fgColor > 0 && idx < __g_consoleFgColorNum);
         fgColorCode = __g_ConsoleFgColorCode[ idx ];
-	}
+    }
 
     if (LIKELY(bgColor > 0))
     {
-		int idx = -1;
+        int idx = -1;
         while (++idx, bgColor = bgColor >> 1, bgColor > 0 && idx < __g_consoleBgColorNum);
         bgColorCode = __g_ConsoleBgColorCode[ idx ];
     }
-	
-	begFmt = (highColor > 0) ? __g_consoleHighColorBeginFmt : __g_consoleColorBeginFmt;
+
+    begFmt = (highColor > 0) ? __g_consoleHighColorBeginFmt : __g_consoleColorBeginFmt;
     endFmt = __g_consoleColorEndFmt;
 }
 
