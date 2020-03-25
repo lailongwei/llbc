@@ -3,13 +3,13 @@
 
 #include "llbc.h"
 
-using __TestCaseFactoryFunc = ::llbc::LLBC_ITestCase* (*) ();
-using __TestCaseFactory = std::pair<const char*, __TestCaseFactoryFunc>;
+typedef ::llbc::LLBC_ITestCase * (*__TestCaseFactoryFunc)();
+typedef std::pair<const char*, __TestCaseFactoryFunc> __TestCaseFactory;
 
-template <class ObjType, typename... Args>
-ObjType* __CreateTestCaseIns(Args&&... args)
+template <class ObjType>
+ObjType* __CreateTestCaseIns()
 {
-    return new ObjType(std::forward<Args>(args)...);
+    return new ObjType;
 }
 
 template <int idx>
@@ -23,22 +23,6 @@ struct __TestCaseTraits
     {
         return nullptr;
     }
-};
-
-template <int i>
-struct __TraitsLoop
-{
-    static void Generate()
-    {
-        __TraitsLoop<i - 1>::Generate();
-        __g_testcaseFactory[ i - 1 ] = __TestCaseFactory(__TestCaseTraits<i>::Name(), &__TestCaseTraits<i>::CreateTestCaseIns);
-    }
-};
-
-template <>
-struct __TraitsLoop<0>
-{
-    static void Generate() {}
 };
 
 #define __DEF_TEST_CASE_BEGIN            \
@@ -71,6 +55,24 @@ struct __TraitsLoop<0>
             return #cls;                                   \
         }                                                  \
     };
+
+#include "TestSuiteDef.h"
+
+template <int i>
+struct __TraitsLoop
+{
+    static void Generate()
+    {
+        __TraitsLoop<i - 1>::Generate();
+        __g_testcaseFactory[ i - 1 ] = __TestCaseFactory(__TestCaseTraits<i>::Name(), &__TestCaseTraits<i>::CreateTestCaseIns);
+    }
+};
+
+template <>
+struct __TraitsLoop<0>
+{
+    static void Generate() {}
+};
 
 #define __TEST_CASE_NAME(idx) __g_testcaseFactory[ idx ].first
 #define __TEST_CASE_FUNC(idx) __g_testcaseFactory[ idx ].second
