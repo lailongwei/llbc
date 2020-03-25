@@ -25,7 +25,7 @@
 #define __PrintLineC(color, fmt, ...)                                \
     do                                                               \
     {                                                                \
-        auto olcClr = LLBC_GetConsoleColor(stdout);                  \
+        int olcClr = LLBC_GetConsoleColor(stdout);                  \
         LLBC_SetConsoleColor(stdout, color);                         \
         LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
@@ -52,8 +52,8 @@ int TestSuite_Main(int argc, char* argv[])
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
         for (int i = 0; i < __TEST_CASE_COUNT; ++i)
         {
-            auto testcaseName = __TEST_CASE_NAME(i);
-            auto testcaseFactory = __TEST_CASE_FUNC(i);
+            const char* testcaseName = __TEST_CASE_NAME(i);
+            __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(i);
             if (testcaseName == NULL || testcaseFactory == NULL)
                 continue;
 
@@ -78,8 +78,8 @@ int TestSuite_Main(int argc, char* argv[])
             continue;
         }
 
-        auto testcaseName = __TEST_CASE_NAME(idx);
-        auto testcaseFactory = __TEST_CASE_FUNC(idx);
+        const char* testcaseName = __TEST_CASE_NAME(idx);
+        __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(idx);
         if (testcaseName == NULL || testcaseFactory == NULL)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
