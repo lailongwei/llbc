@@ -25,7 +25,7 @@
 #define __PrintLineC(color, fmt, ...)                                \
     do                                                               \
     {                                                                \
-        int olcClr = LLBC_GetConsoleColor(stdout);                  \
+        int olcClr = LLBC_GetConsoleColor(stdout);                   \
         LLBC_SetConsoleColor(stdout, color);                         \
         LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
@@ -36,8 +36,7 @@
     do                                              \
     {                                               \
         int c;                                      \
-        while ((c = getchar()) != '\n' && c != EOF) \
-            ;                                       \
+        while ((c = getchar()) != '\n' && c != EOF);\
     } while (0);
 
 #define __DEPARATION_CHARACTER "--------------------------------------------------"
@@ -65,7 +64,8 @@ int TestSuite_Main(int argc, char* argv[])
         int idx = -1;
         if (fscanf(stdin, "%d", &idx) != 1)
         {
-            __ClearInputBuf() continue;
+            __ClearInputBuf();
+            continue;
         }
 
         __ClearInputBuf();
