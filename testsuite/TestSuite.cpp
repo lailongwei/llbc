@@ -54,7 +54,7 @@ int TestSuite_Main(int argc, char* argv[])
         {
             auto testcaseName = __TEST_CASE_NAME(i);
             auto testcaseFactory = __TEST_CASE_FUNC(i);
-            if (testcaseName == nullptr || testcaseFactory == nullptr)
+            if (testcaseName == NULL || testcaseFactory == NULL)
                 continue;
 
             LLBC_PrintLine("%d: %s", i + 1, testcaseName);
@@ -80,7 +80,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         auto testcaseName = __TEST_CASE_NAME(idx);
         auto testcaseFactory = __TEST_CASE_FUNC(idx);
-        if (testcaseName == nullptr || testcaseFactory == nullptr)
+        if (testcaseName == NULL || testcaseFactory == NULL)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
