@@ -20,12 +20,12 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "TestSuite.h"
-#include "TestSuiteDef.h"
+#include "TestTraits.h"
 
 #define __PrintLineC(color, fmt, ...)                                \
     do                                                               \
     {                                                                \
-        auto olcClr = LLBC_GetConsoleColor(stdout);                  \
+        int olcClr = LLBC_GetConsoleColor(stdout);                  \
         LLBC_SetConsoleColor(stdout, color);                         \
         LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
@@ -36,8 +36,9 @@
     do                                              \
     {                                               \
         int c;                                      \
-        while ((c = getchar()) != '\n' && c != EOF);\
-    } while (0);\
+        while ((c = getchar()) != '\n' && c != EOF) \
+            ;                                       \
+    } while (0);
 
 #define __DEPARATION_CHARACTER "--------------------------------------------------"
 
@@ -51,12 +52,12 @@ int TestSuite_Main(int argc, char* argv[])
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
         for (int i = 0; i < __TEST_CASE_COUNT; ++i)
         {
-            auto testcaseName = __TEST_CASE_NAME(i);
-            auto testcaseFactory = __TEST_CASE_FUNC(i);
-            if (testcaseName == nullptr || testcaseFactory == nullptr)
+            const char* testcaseName = __TEST_CASE_NAME(i);
+            __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(i);
+            if (testcaseName == NULL || testcaseFactory == NULL)
                 continue;
 
-            LLBC_PrintLine("%d: %s", i+1, testcaseName);
+            LLBC_PrintLine("%d: %s", i + 1, testcaseName);
         }
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 
@@ -64,13 +65,12 @@ int TestSuite_Main(int argc, char* argv[])
         int idx = -1;
         if (fscanf(stdin, "%d", &idx) != 1)
         {
-            __ClearInputBuf()
-            continue;
+            __ClearInputBuf() continue;
         }
 
-		__ClearInputBuf();
+        __ClearInputBuf();
         if (idx <= 0)
-			break;
+            break;
 
         if (--idx >= __TEST_CASE_COUNT)
         {
@@ -78,9 +78,9 @@ int TestSuite_Main(int argc, char* argv[])
             continue;
         }
 
-        auto testcaseName = __TEST_CASE_NAME(idx);
-        auto testcaseFactory = __TEST_CASE_FUNC(idx);
-        if (testcaseName == nullptr || testcaseFactory == nullptr)
+        const char* testcaseName = __TEST_CASE_NAME(idx);
+        __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(idx);
+        if (testcaseName == NULL || testcaseFactory == NULL)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;

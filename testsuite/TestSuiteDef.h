@@ -1,7 +1,5 @@
 #ifndef _TEST_SUIT_DEF_H_
 #define _TEST_SUIT_DEF_H_
-#include "TestTraits.h"
-#include "TestSuite.h"
 
 __DEF_TEST_CASE_BEGIN
 __DEFINE_TEST_CASE(TestCase_Com_Version)
