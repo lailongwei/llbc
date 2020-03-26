@@ -167,22 +167,22 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
     bool fmtPrint = false;
-	if (LIKELY(file == stdout || file == stderr))
-	{
+    if (LIKELY(file == stdout || file == stderr))
+    {
         const int color = LLBC_GetConsoleColor(file);
         if (LIKELY(color > 0))
         {
             fmtPrint = true;
-            char colorFmt[LLBC_INTERNAL_NS __g_consoleColorFmtLen] = { };
+            char colorFmt[LLBC_INTERNAL_NS __g_consoleColorFmtLen] = {};
             LLBC_INTERNAL_NS __GetConsoleColorCode(color, colorFmt);
             fprintf(file, (newline ? "%s%s%s\n" : "%s%s%s"), colorFmt, buf, LLBC_INTERNAL_NS __g_consoleColorEndFmt);
-		}
-	}
+        }
+    }
 
-	if (LIKELY(!fmtPrint))
-	{
+    if (LIKELY(!fmtPrint))
+    {
         fprintf(file, (newline ? "%s\n" : "%s"), buf);
-	}
+    }
     fflush(file);
     funlockfile(file);
 #else
