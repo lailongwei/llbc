@@ -48,8 +48,8 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
     if (LIKELY(color <= 0))
         return;
 
-    const int fgColor = color & 0xf - 1;
-    const int bgColor = ((color & 0xf0) >> 4) - 1;
+    const int fgColor = color & 0xf;
+    const int bgColor = ((color & 0xf0) >> 4);
     const bool high = (color & 0xf00) >> 8;
 
     int idx = strlen(__g_consoleColorBeginFmt);
@@ -63,7 +63,7 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
 	{
         const unsigned char pre = high ? 1 : 0;
         const unsigned char len = high ? 3 : 2;
-        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][fgColor], len);
+        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][fgColor - 1], len);
         idx += len;
 	}
 
@@ -71,7 +71,7 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
 	{
         const unsigned char pre = (high || fgColor > 0) ? 1 : 0;
         const unsigned char len = (high || fgColor > 0) ? 3 : 2;
-        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor], len);
+        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor - 1], len);
         idx += len;
 	}
     fmt[idx] = 'm';
