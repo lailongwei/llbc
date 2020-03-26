@@ -80,7 +80,7 @@ public:
         Highlight_Fg = FOREGROUND_INTENSITY,
         Highlight_Bg = BACKGROUND_INTENSITY,
 
-		Fg_Default = Fg_White,
+        Fg_Default = Fg_White,
         Bg_Default = Bg_Black
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     };
