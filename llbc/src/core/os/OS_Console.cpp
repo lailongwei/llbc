@@ -38,8 +38,8 @@ const static char* __g_consoleColorEndFmt = "\033[0m";
 static const int __g_consoleFgColorNum = 8;
 static const int __g_consoleBgColorNum = 8;
 static const char* __g_ConsoleColorCode[2][__g_consoleFgColorNum + __g_consoleBgColorNum] = {
-    {"30", "34", "32", "36", "31", "35", "33", "37", "40", "44", "42", "46", "41", "45", "43", "47",},
-	{";30", ";34", ";32", ";36", ";31", ";35", ";33", ";37", ";40", ";44", ";42", ";46", ";41", ";45", ";43", ";47",}
+    {"34", "32", "36", "31", "35", "33", "37", "30", "44", "42", "46", "41", "45", "43", "47","40", },
+	{";34", ";32", ";36", ";31", ";35", ";33", ";37",";30", ";44", ";42", ";46", ";41", ";45", ";43", ";47", ";40",}
 };
 
 static const int __g_consoleColorFmtLen = 11;
@@ -48,8 +48,8 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
     if (LIKELY(color <= 0))
         return;
 
-    const int fgColor = color & 0xf;
-    const int bgColor = (color & 0xf0) >> 4;
+    const int fgColor = color & 0xf - 1;
+    const int bgColor = ((color & 0xf0) >> 4) - 1;
     const bool high = (color & 0xf00) >> 8;
 
     int idx = strlen(__g_consoleColorBeginFmt);

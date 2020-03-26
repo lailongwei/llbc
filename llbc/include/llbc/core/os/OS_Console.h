@@ -35,7 +35,7 @@ public:
     enum
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        Fg_Black = 0,
+        Fg_Black = 8,
         Fg_Red = 4,
         Fg_Green = 2,
         Fg_Blue = 1,
@@ -44,7 +44,7 @@ public:
         Fg_Cyan = Fg_Green | Fg_Blue,
         Fg_White = Fg_Green | Fg_Blue | Fg_Red, 
 
-        Bg_Black = 0,
+        Bg_Black = Fg_Black << 4,
         Bg_Red = Fg_Red << 4,
         Bg_Green = Fg_Green << 4,
         Bg_Blue = Fg_Blue << 4,
@@ -56,6 +56,8 @@ public:
         Highlight_Fg = 1 << 8,
         Highlight_Bg = Highlight_Fg,
 
+		Fg_Default = 0,
+        Bg_Default = 0
 #else // LLBC_TARGET_PLATFORM_WIN32
         Fg_Black  = 0,
         Fg_Red    = FOREGROUND_RED,
@@ -77,10 +79,10 @@ public:
 
         Highlight_Fg = FOREGROUND_INTENSITY,
         Highlight_Bg = BACKGROUND_INTENSITY,
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
-        Fg_Default = Fg_White,
+		Fg_Default = Fg_White,
         Bg_Default = Bg_Black
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
     };
 };
 
