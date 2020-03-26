@@ -26,45 +26,55 @@
 #include "llbc/core/os/OS_Console.h"
 
 __LLBC_INTERNAL_NS_BEGIN
-static LLBC_NS LLBC_FastLock __g_consoleLock[ 2 ];
+static LLBC_NS LLBC_FastLock __g_consoleLock[2];
 __LLBC_INTERNAL_NS_END
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 __LLBC_INTERNAL_NS_BEGIN
-static int __g_consoleColor[ 2 ];
+static int __g_consoleColor[2];
 const static char* __g_consoleColorBeginFmt = "\033[";
-const static char* __g_consoleHighColorBeginFmt = "\033[1;";
 const static char* __g_consoleColorEndFmt = "\033[0m";
 
 static const int __g_consoleFgColorNum = 8;
 static const int __g_consoleBgColorNum = 8;
-static const char* __g_ConsoleFgColorCode[ __g_consoleFgColorNum ] = { "30", "31", "32", "34", "33", "35", "36", "37" };
-static const char* __g_ConsoleBgColorCode[ __g_consoleBgColorNum ] = { "40", "41", "42", "44", "43", "45", "46", "47" };
+static const char* __g_ConsoleColorCode[2][__g_consoleFgColorNum + __g_consoleBgColorNum] = {
+    {"30", "34", "32", "36", "31", "35", "33", "37", "40", "44", "42", "46", "41", "45", "43", "47",},
+	{";30", ";34", ";32", ";36", ";31", ";35", ";33", ";37", ";40", ";44", ";42", ";46", ";41", ";45", ";43", ";47",}
+};
 
-void __GetConsoleColorCode(int color, const char*& begFmt, const char*& fgColorCode, const char*& bgColorCode, const char*& endFmt)
+static const int __g_consoleColorFmtLen = 11;
+void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
 {
     if (LIKELY(color <= 0))
         return;
 
-    int fgColor = color & ((1 << __g_consoleFgColorNum) - 1);
-    int bgColor = (color >> __g_consoleFgColorNum) & ((1 << __g_consoleBgColorNum) - 1);
-    int highColor = (color >> __g_consoleFgColorNum) >> __g_consoleBgColorNum;
+    const int fgColor = color & 0xf;
+    const int bgColor = (color & 0xf0) >> 4;
+    const bool high = (color & 0xf00) >> 8;
+
+    int idx = strlen(__g_consoleColorBeginFmt);
+	memcpy(fmt, __g_consoleColorBeginFmt, __g_consoleColorFmtLen);
+	if (LIKELY(high))
+	{
+        fmt[idx++] = '1';
+	}
+
     if (LIKELY(fgColor > 0))
-    {
-        int idx = -1;
-        while (++idx, fgColor = fgColor >> 1, fgColor > 0 && idx < __g_consoleFgColorNum);
-        fgColorCode = __g_ConsoleFgColorCode[ idx ];
-    }
+	{
+        const unsigned char pre = high ? 1 : 0;
+        const unsigned char len = high ? 3 : 2;
+        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][fgColor], len);
+        idx += len;
+	}
 
-    if (LIKELY(bgColor > 0))
-    {
-        int idx = -1;
-        while (++idx, bgColor = bgColor >> 1, bgColor > 0 && idx < __g_consoleBgColorNum);
-        bgColorCode = __g_ConsoleBgColorCode[ idx ];
-    }
-
-    begFmt = (highColor > 0) ? __g_consoleHighColorBeginFmt : __g_consoleColorBeginFmt;
-    endFmt = __g_consoleColorEndFmt;
+	if (LIKELY(bgColor > 0))
+	{
+        const unsigned char pre = (high || fgColor > 0) ? 1 : 0;
+        const unsigned char len = (high || fgColor > 0) ? 3 : 2;
+        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor], len);
+        idx += len;
+	}
+    fmt[idx] = 'm';
 }
 
 __LLBC_INTERNAL_NS_END
@@ -86,13 +96,12 @@ int LLBC_GetConsoleColor(FILE *file)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Lock();
-    const int color = LLBC_INTERNAL_NS __g_consoleColor[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ];
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Unlock();
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+    const int color = LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
     return color;
 #else
-
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Lock();
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
 
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
@@ -124,13 +133,12 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Lock();
-    LLBC_INTERNAL_NS __g_consoleColor[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ] = color;
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Unlock();
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+    LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)] = color;
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
     return LLBC_OK;
 #else
-
-    LLBC_INTERNAL_NS __g_consoleLock[ (fileNo == 1 || fileNo == 2 ? 0 : 1) ].Lock();
+    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
 
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
@@ -159,30 +167,22 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
+    bool fmtPrint = false;
 	if (LIKELY(file == stdout || file == stderr))
 	{
-        const char* colorBegFmt = NULL;
-        const char* colorEndFmt = NULL;
-        const char* fgColorCode = NULL;
-        const char* bgColorCode = NULL;
-        LLBC_INTERNAL_NS __GetConsoleColorCode(LLBC_GetConsoleColor(file), colorBegFmt, fgColorCode, bgColorCode, colorEndFmt);
-        if (LIKELY(fgColorCode != NULL && bgColorCode != NULL))
+        const int color = LLBC_GetConsoleColor(file);
+        if (LIKELY(color > 0))
         {
-            fprintf(file, (newline ? "%s%s;%sm%s%s\n" : "%s%s;%sm%s%s"), colorBegFmt, fgColorCode, bgColorCode, buf, colorEndFmt);
-        }
-        else if (LIKELY(fgColorCode != NULL || bgColorCode != NULL))
-        {
-            fprintf(file, (newline ? "%s%sm%s%s\n" : "%s%sm%s%s"), colorBegFmt, (fgColorCode != NULL ? fgColorCode : bgColorCode), buf, colorEndFmt);
-        }
-        else
-        {
-            fprintf(file, (newline ? "%s\n" : "%s"), buf);
-        }
+            fmtPrint = true;
+            char colorFmt[LLBC_INTERNAL_NS __g_consoleColorFmtLen] = { };
+            LLBC_INTERNAL_NS __GetConsoleColorCode(color, colorFmt);
+            fprintf(file, (newline ? "%s%s%s\n" : "%s%s%s"), colorFmt, buf, LLBC_INTERNAL_NS __g_consoleColorEndFmt);
+		}
 	}
-	else
+
+	if (LIKELY(!fmtPrint))
 	{
         fprintf(file, (newline ? "%s\n" : "%s"), buf);
-
 	}
     fflush(file);
     funlockfile(file);
