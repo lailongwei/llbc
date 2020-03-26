@@ -42,7 +42,7 @@ public:
         Fg_Yellow = Fg_Green | Fg_Red,
         Fg_Purple = Fg_Red | Fg_Blue,
         Fg_Cyan = Fg_Green | Fg_Blue,
-        Fg_White = Fg_Green | Fg_Blue | Fg_Red, 
+        Fg_White = Fg_Green | Fg_Blue | Fg_Red,
 
         Bg_Black = Fg_Black << 4,
         Bg_Red = Fg_Red << 4,
@@ -56,7 +56,7 @@ public:
         Highlight_Fg = 1 << 8,
         Highlight_Bg = Highlight_Fg,
 
-		Fg_Default = 0,
+        Fg_Default = 0,
         Bg_Default = 0
 #else // LLBC_TARGET_PLATFORM_WIN32
         Fg_Black  = 0,

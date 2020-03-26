@@ -102,13 +102,13 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     LLBC_PrintLine("stdout, Fg_Default | Bg_Purple");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Cyan);
     LLBC_PrintLine("stdout, Fg_Default | Bg_Cyan");
-	LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Black | LLBC_ConsoleColor::Bg_White);
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Black | LLBC_ConsoleColor::Bg_White);
     LLBC_PrintLine("stdout, Fg_Black | Bg_White");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Black | LLBC_ConsoleColor::Bg_Cyan);
     LLBC_PrintLine("stdout, Fg_Black | Bg_Cyan");
-	LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_White | LLBC_ConsoleColor::Bg_Black);
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_White | LLBC_ConsoleColor::Bg_Black);
     LLBC_PrintLine("stdout, Fg_White | Bg_Black");
-	LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Cyan | LLBC_ConsoleColor::Bg_Black);
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Cyan | LLBC_ConsoleColor::Bg_Black);
     LLBC_PrintLine("stdout, Fg_Cyan | Bg_Black");
     LLBC_PrintLine("");
 
