@@ -37,9 +37,9 @@ const static char* __g_consoleColorEndFmt = "\033[0m";
 
 static const int __g_consoleFgColorNum = 8;
 static const int __g_consoleBgColorNum = 8;
-static const char* __g_ConsoleColorCode[2][__g_consoleFgColorNum + __g_consoleBgColorNum] = {
-    {"34", "32", "36", "31", "35", "33", "37", "30", "44", "42", "46", "41", "45", "43", "47","40", },
-	{";34", ";32", ";36", ";31", ";35", ";33", ";37",";30", ";44", ";42", ";46", ";41", ";45", ";43", ";47", ";40",}
+static const char* __g_ConsoleColorCode[2][__g_consoleFgColorNum + __g_consoleBgColorNum + 1] = {
+    { "", "34", "32", "36", "31", "35", "33", "37", "30", "44", "42", "46", "41", "45", "43", "47", "40" },
+    { "", ";34", ";32", ";36", ";31", ";35", ";33", ";37", ";30", ";44", ";42", ";46", ";41", ";45", ";43", ";47", ";40" }
 };
 
 static const int __g_consoleColorFmtLen = 11;
@@ -51,29 +51,28 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
     const int fgColor = color & 0xf;
     const int bgColor = ((color & 0xf0) >> 4);
     const bool high = (color & 0xf00) >> 8;
+    const static char beginLen = strlen(__g_consoleColorBeginFmt);
+    char idx = beginLen;
 
-    int idx = strlen(__g_consoleColorBeginFmt);
-	memcpy(fmt, __g_consoleColorBeginFmt, __g_consoleColorFmtLen);
-	if (LIKELY(high))
-	{
+    memcpy(fmt, __g_consoleColorBeginFmt, __g_consoleColorFmtLen);
+
+    if (high)  // highlight
         fmt[idx++] = '1';
-	}
 
-    if (LIKELY(fgColor > 0))
-	{
-        const unsigned char pre = high ? 1 : 0;
-        const unsigned char len = high ? 3 : 2;
-        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][fgColor - 1], len);
-        idx += len;
-	}
+    const static char pre2Len[2] = { 2, 3 };
+    if (fgColor > 0)  // front color
+    {
+        const char pre = high ? 1 : 0;
+        memcpy(fmt + idx, __g_ConsoleColorCode[pre][fgColor], pre2Len[pre]);
+        idx += pre2Len[pre];
+    }
 
-	if (LIKELY(bgColor > 0))
-	{
-        const unsigned char pre = (high || fgColor > 0) ? 1 : 0;
-        const unsigned char len = (high || fgColor > 0) ? 3 : 2;
-        memcpy(&fmt[idx], __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor - 1], len);
-        idx += len;
-	}
+    if (bgColor > 0)  // back color
+    {
+        const char pre = (high || fgColor > 0) ? 1 : 0;
+        memcpy(fmt + idx, __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor], pre2Len[pre]);
+        idx += pre2Len[pre];
+    }
     fmt[idx] = 'm';
 }
 
