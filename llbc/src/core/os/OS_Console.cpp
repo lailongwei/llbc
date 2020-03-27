@@ -85,7 +85,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_GetConsoleColor(FILE *file)
 {
-	const int fileNo = LLBC_File::GetFileNo(file);
+    const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
     {
         return LLBC_FAILED;
@@ -105,8 +105,7 @@ int LLBC_GetConsoleColor(FILE *file)
     lock.Unlock();
     return color;
 #else
-    HANDLE handle = (fileNo == 1 ? 
-        ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
+    HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
     CONSOLE_SCREEN_BUFFER_INFO info;
     if (::GetConsoleScreenBufferInfo(handle, &info) == 0)
     {
@@ -133,7 +132,7 @@ int LLBC_SetConsoleColor(FILE *file, int color)
         return LLBC_FAILED;
     }
 
-	const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
+    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
     LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
     lock.Lock();
 
@@ -142,21 +141,20 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     lock.Unlock();
     return LLBC_OK;
 #else
-    HANDLE handle = (fileNo == 1 ? 
-        ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
+    HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
     if (::SetConsoleTextAttribute(handle, color) == 0)
     {
         lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
     }
-    
+
     lock.Unlock();
     return LLBC_OK;
 #endif
 }
 
-int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
+int __LLBC_FilePrint(bool newline, FILE* file, const char* fmt, ...)
 {
     const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
@@ -193,7 +191,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
 
     lock.Lock();
-    fprintf(file, newline?"%s\n":"%s", buf);
+    fprintf(file, newline ? "%s\n" : "%s", buf);
     fflush(file);
     lock.Unlock();
 #endif
