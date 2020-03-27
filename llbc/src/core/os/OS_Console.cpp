@@ -51,27 +51,29 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
     const int fgColor = color & 0xf;
     const int bgColor = ((color & 0xf0) >> 4);
     const bool high = (color & 0xf00) >> 8;
-    const static char beginLen = strlen(__g_consoleColorBeginFmt);
-    char idx = beginLen;
+    const static int beginLen = strlen(__g_consoleColorBeginFmt);
+    int idx = beginLen;
 
     memcpy(fmt, __g_consoleColorBeginFmt, __g_consoleColorFmtLen);
 
     if (high)  // highlight
         fmt[idx++] = '1';
 
-    const static char pre2Len[2] = { 2, 3 };
+    const static int pre2Len[2] = { 2, 3 };
     if (fgColor > 0)  // front color
     {
-        const char pre = high ? 1 : 0;
-        memcpy(fmt + idx, __g_ConsoleColorCode[pre][fgColor], pre2Len[pre]);
-        idx += pre2Len[pre];
+        const int pre = high ? 1 : 0;
+        const int len = pre2Len[pre];
+        memcpy(fmt + idx, __g_ConsoleColorCode[pre][fgColor], len);
+        idx += len;
     }
 
     if (bgColor > 0)  // back color
     {
-        const char pre = (high || fgColor > 0) ? 1 : 0;
-        memcpy(fmt + idx, __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor], pre2Len[pre]);
-        idx += pre2Len[pre];
+        const int pre = (high || fgColor > 0) ? 1 : 0;
+        const int len = pre2Len[pre];
+        memcpy(fmt + idx, __g_ConsoleColorCode[pre][__g_consoleFgColorNum + bgColor], len);
+        idx += len;
     }
     fmt[idx] = 'm';
 }
@@ -94,26 +96,26 @@ int LLBC_GetConsoleColor(FILE *file)
         return LLBC_FAILED;
     }
 
+    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
+    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    lock.Lock();
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
-    const int color = LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    const int color = LLBC_INTERNAL_NS __g_consoleColor[clrIdx];
+    lock.Unlock();
     return color;
 #else
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
-
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
     CONSOLE_SCREEN_BUFFER_INFO info;
     if (::GetConsoleScreenBufferInfo(handle, &info) == 0)
     {
-        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+        lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
     }
 
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
-
+    lock.Unlock();
     return info.wAttributes;
 #endif
 }
@@ -131,24 +133,25 @@ int LLBC_SetConsoleColor(FILE *file, int color)
         return LLBC_FAILED;
     }
 
+	const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
+    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    lock.Lock();
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
-    LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)] = color;
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    LLBC_INTERNAL_NS __g_consoleColor[clrIdx] = color;
+    lock.Unlock();
     return LLBC_OK;
 #else
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
-
     HANDLE handle = (fileNo == 1 ? 
         ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
     if (::SetConsoleTextAttribute(handle, color) == 0)
     {
-        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+        lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
     }
     
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    lock.Unlock();
     return LLBC_OK;
 #endif
 }
@@ -186,10 +189,13 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     fflush(file);
     funlockfile(file);
 #else
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
+    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+
+    lock.Lock();
     fprintf(file, newline?"%s\n":"%s", buf);
     fflush(file);
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    lock.Unlock();
 #endif
 
     LLBC_Free(buf);
@@ -218,15 +224,17 @@ int LLBC_FlushFile(FILE *file)
     return LLBC_OK;
 #else // Win32
     const int fileNo = LLBC_File::GetFileNo(file);
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Lock();
+    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    lock.Lock();
+
     if (UNLIKELY(::fflush(file) != 0))
     {
-        LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+        lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
 
-    LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)].Unlock();
+    lock.Unlock();
     return LLBC_OK;
 #endif
 }

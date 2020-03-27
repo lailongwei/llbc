@@ -147,31 +147,26 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
 
     // test highlight.
     LLBC_SetConsoleColor(stdout, defaultClr);
-    std::cout <<"highlight test: " <<std::endl;
+    std::cout << "highlight test: " << std::endl;
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow);
-    std::cout <<"Normal" <<std::endl;
-    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | 
-        LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg);
-    std::cout <<"Highlight foreground" <<std::endl;
-    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | 
-        LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Bg);
-    std::cout <<"Highlight background" <<std::endl;
-    LLBC_SetConsoleColor(stdout, 
-        LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | 
-        LLBC_ConsoleColor::Highlight_Fg | LLBC_ConsoleColor::Highlight_Bg);
-    std::cout <<"Highlight foreground & background" <<std::endl;
-
-	LLBC_SetConsoleColor(stdout, defaultClr);
-   LLBC_PrintLine("highlight test: ");
-    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow);
-   LLBC_PrintLine("Normal");
+    std::cout << "Normal" << std::endl;
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg);
-   LLBC_PrintLine("Highlight foreground");
+    std::cout << "Highlight foreground" << std::endl;
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Bg);
-   LLBC_PrintLine("Highlight background");
-    LLBC_SetConsoleColor(
-        stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg | LLBC_ConsoleColor::Highlight_Bg);
-   LLBC_PrintLine("Highlight foreground & background");
+    std::cout << "Highlight background" << std::endl;
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg | LLBC_ConsoleColor::Highlight_Bg);
+    std::cout << "Highlight foreground & background" << std::endl;
+
+    LLBC_SetConsoleColor(stdout, defaultClr);
+    LLBC_PrintLine("highlight test: ");
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow);
+    LLBC_PrintLine("Normal");
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg);
+    LLBC_PrintLine("Highlight foreground");
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Bg);
+    LLBC_PrintLine("Highlight background");
+    LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg | LLBC_ConsoleColor::Highlight_Bg);
+    LLBC_PrintLine("Highlight foreground & background");
 
     LLBC_SetConsoleColor(stderr, defaultClr);
 
