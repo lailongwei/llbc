@@ -32,8 +32,8 @@ __LLBC_INTERNAL_NS_END
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 __LLBC_INTERNAL_NS_BEGIN
 static int __g_consoleColor[2];
-const static char* __g_consoleColorBeginFmt = "\033[";
-const static char* __g_consoleColorEndFmt = "\033[0m";
+const static char *__g_consoleColorBeginFmt = "\033[";
+const static char *__g_consoleColorEndFmt = "\033[0m";
 
 static const int __g_consoleFgColorNum = 8;
 static const int __g_consoleBgColorNum = 8;
@@ -97,7 +97,7 @@ int LLBC_GetConsoleColor(FILE *file)
     }
 
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
     lock.Lock();
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -133,7 +133,7 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     }
 
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
     lock.Lock();
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -154,7 +154,7 @@ int LLBC_SetConsoleColor(FILE *file, int color)
 #endif
 }
 
-int __LLBC_FilePrint(bool newline, FILE* file, const char* fmt, ...)
+int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 {
     const int fileNo = LLBC_File::GetFileNo(file);
     if (UNLIKELY(fileNo == -1))
@@ -188,7 +188,7 @@ int __LLBC_FilePrint(bool newline, FILE* file, const char* fmt, ...)
     funlockfile(file);
 #else
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
 
     lock.Lock();
     fprintf(file, newline ? "%s\n" : "%s", buf);
@@ -222,7 +222,7 @@ int LLBC_FlushFile(FILE *file)
     return LLBC_OK;
 #else // Win32
     const int fileNo = LLBC_File::GetFileNo(file);
-    LLBC_NS LLBC_FastLock& lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
     lock.Lock();
 
     if (UNLIKELY(::fflush(file) != 0))
