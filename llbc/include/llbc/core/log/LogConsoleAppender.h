@@ -26,7 +26,7 @@
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/FastLock.h"
-#endif //!LLBC_TARGET_PLATFORM_WIN32
+#endif  //  !LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN
