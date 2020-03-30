@@ -23,11 +23,11 @@
 #define __LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/log/BaseLogAppender.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/FastLock.h"
-#endif //LLBC_TARGET_PLATFORM_WIN32
+#endif //!LLBC_TARGET_PLATFORM_WIN32
+#include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN
 
