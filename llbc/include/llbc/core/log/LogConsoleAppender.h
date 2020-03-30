@@ -23,8 +23,11 @@
 #define __LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__
 
 #include "llbc/common/Common.h"
-
 #include "llbc/core/log/BaseLogAppender.h"
+
+#if LLBC_TARGET_PLATFORM_WIN32
+#include "llbc/core/thread/FastLock.h"
+#endif //LLBC_TARGET_PLATFORM_WIN32
 
 __LLBC_NS_BEGIN
 
@@ -67,26 +70,20 @@ public:
     virtual int Output(const LLBC_LogData &data);
 
 private:
-#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    /**
-     * Determine the log text output color, only available in Unix-like platform.
-     * @param[in] logLv - the log level.
-     * @return const char* - the output color.
-     */
-    const char *DetermineAnsiTextColor(int logLv);
-#else
     /**
      * Determine the log text output color, only available in WIN platform.
      * @param[in] logLv - the log level.
      * @return int - the output color.
      */
     int DetermineLogTextColor(int logLv);
-#endif
 
 private:
     bool _colourfulOutput;
+#if LLBC_TARGET_PLATFORM_WIN32
+    static LLBC_FastLock _colorLock;
+#endif
 };
 
 __LLBC_NS_END
 
-#endif // !__LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__
+#endif  // !__LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__

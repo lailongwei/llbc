@@ -31,7 +31,7 @@ __LLBC_INTERNAL_NS_END
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 __LLBC_INTERNAL_NS_BEGIN
-static int __g_consoleColor[2];
+static LLBC_THREAD_LOCAL int __g_consoleColor[2];
 const static char *__g_consoleColorBeginFmt = "\033[";
 const static char *__g_consoleColorEndFmt = "\033[0m";
 
@@ -96,16 +96,13 @@ int LLBC_GetConsoleColor(FILE *file)
         return LLBC_FAILED;
     }
 
-    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
-    lock.Lock();
-
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    const int color = LLBC_INTERNAL_NS __g_consoleColor[clrIdx];
-    lock.Unlock();
-    return color;
+    return LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    lock.Lock();
+
     CONSOLE_SCREEN_BUFFER_INFO info;
     if (::GetConsoleScreenBufferInfo(handle, &info) == 0)
     {
@@ -132,16 +129,14 @@ int LLBC_SetConsoleColor(FILE *file, int color)
         return LLBC_FAILED;
     }
 
-    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
-    lock.Lock();
-
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleColor[clrIdx] = color;
-    lock.Unlock();
+    LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)] = color;
     return LLBC_OK;
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    lock.Lock();
+
     if (::SetConsoleTextAttribute(handle, color) == 0)
     {
         lock.Unlock();
