@@ -402,7 +402,7 @@ inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoo
         stat.totalMemory += instStat.totalMemory;
     }
 
-    const size_t selfInnerUsedMemory = sizeof(this);
+    const size_t selfInnerUsedMemory = sizeof(LLBC_ObjectPool);
     stat.innerUsedMemory += selfInnerUsedMemory;
     stat.totalMemory += selfInnerUsedMemory;
 
