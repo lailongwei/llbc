@@ -26,14 +26,29 @@
 # 21)【llbc core】更新mtrandom库.
 # 22)【llbc core】增加LLBC_GetCurrentThreadId()支持, 对应LLBC_ThreadId数据类型增加.
 # 23)【llbc core】优化Log ThreadId/ProcessId Token打印信息.
-# 24)【llbc core】ObjectPool删除ObjectPoolInsts时, 增加删除顺序依赖支持.
+# 24)【llbc core】ObjectPool删除ObjectPoolInsts时, 增加删除顺序依赖支持(Ordered Delete).
+# 25)【llbc core】Packet增加GetMutablePayload支持, 以在实际情境中更灵活进行发送数据的操纵.
+# 26)【llbc core】ObjectPool增加自省(反射支持), 具体参见LLBC_PoolObjectReflection.
+# 26)【llbc core】LLBC_Packet/LLBC_MessageBlock增加完整对象池对象自省方法实现.
+# 27)【llbc core】LLBC_ObjectGuard增加DetachObj支持, 以使业务更灵活定制逻辑及做优化.
+# 28)【llbc core】LLBC_ICoder增加对象池反射方法支持(在多重继承时要求重写).
+# 29)【llbc core】LLBC_Packet中的Payload/Encoder/Decoder增加对象池对象识别.
+# 30)【llbc core】增加LLBC_BasicCString支持, 以支持对const char *的逻辑支持(如对象池).
+# 31)【llbc core】LLBC_IObjectPoolInst增加GetIObjPool()方法, 以便支持访问所属LLBC_IObjectPool需求.
+# 32)【llbc core】增加LLBC_IObjectPoolInstFactory工厂类设计, 以支持在类型未知的情况下(LLBC_IObjectPool::GetIObjPoolInst())也能够动态创建对应类型的对象池实例, 最终结果依赖于使用者是否事先将未知类型对应的池工厂类有注入.
+# 33)【llbc core】Service/Session/Socket/Protocol/Protocol Stack/Packet/MessageBlock完成支持对象池, 协议收发完成对象池化.
+# 34)【llbc core】ObjectPoolInst去除<PoolInstLockType>模板参数, 调整为构造传入Lock, 以更易使用; 对象池对象反射方法要求增加一个LLBC_IObjectPoolInst *GetPoolInst()要求.
+# 35)【llbc core】LLBC_ILock及其所有实现类增加bool IsDummyLock() const支持.
+# 36)【llbc core】对象池设计优化, 去除不需要的模板参数, 增加运行时动态创建能力, 增加依赖删除网状关系图自动(运行自动拓扑生成).
+# 37)【llbc core】增加对象池信息统计支持.
+# 38)【llbc core】完整优化网络相关代码, 提供更多选项给应用层自定义, 同时性能提升10倍+(整体).
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
 #   -【llbc core】修复Task::Wait/Cancel/...方法在Task所有线程并未完全创建就快速调用时,时引发的ThreadManager无法完全等待的bug.
 #   -【llbc core】修复LLBC_BasicString::split()在对空串进行split且strip_empty为True时还会返回包含空串的bug.
 #   -【llbc core】修复LLBC_Random构造函数在seed为0时未自动应用当前时间戳做seed的bug.
-factory.
+#   -【llbc core】修复ini解析类未特化long/ulong的value获取导致的bug.
 #
 # Version: 1.0.6
 # 1)【llbc core】增加ci支持（windows/linux/mac osx）.

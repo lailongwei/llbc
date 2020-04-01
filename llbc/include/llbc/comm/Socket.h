@@ -60,6 +60,14 @@ public:
      */
     void SetSession(LLBC_Session *session);
 
+    #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    /**
+     * Set message block pool instance.
+     * @param[in] msgBlockPoolInst - the message block pool instance.
+     */
+    void SetMsgBlockPoolInst(LLBC_ObjectPoolInst<LLBC_MessageBlock> *msgBlockPoolInst);
+    #endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+
     /**
      * Get the poller type.
      * @return int - the poller type.
@@ -139,10 +147,29 @@ public:
     bool IsNonBlocking() const;
 
     /**
+     * Check socket no-delay option.
+     * @return bool - return true if enabled no-delay option, otherwise return false(included error occurred).
+     */
+    bool IsNoDelay() const;
+
+    /**
+     * Set socket no-delay option.
+     * @param[in] noDelay - no-delay option.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetNoDelay(bool noDelay);
+
+    /**
      * Set socket to non-blocking.
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetNonBlocking();
+
+    /**
+     * Get send buffer size.
+     * @return size_t - the send buffer size.
+     */
+    size_t GetSendBufSize() const;
 
     /**
      * Set send buffer size.
@@ -150,6 +177,12 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetSendBufSize(size_t size);
+
+    /**
+     * Get recv buffer size.
+     * @return size_t - the recv buffer size.
+     */
+    size_t GetRecvBufSize() const;
 
     /**
      * Set recv buffer size.
@@ -166,7 +199,7 @@ public:
      * @param[in/out] optlen - pointer to the size of the optval buffer.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int GetOption(int level, int optname, void *optval, LLBC_SocketLen *optlen);
+    int GetOption(int level, int optname, void *optval, LLBC_SocketLen *optlen) const;
 
     /**
      * Set socket option.
@@ -396,6 +429,12 @@ public:
     void RemoveOverlapped(LLBC_POverlapped ol);
     void DeleteOverlapped(LLBC_POverlapped ol);
     void DeleteAllOverlappeds();
+
+    /**
+     * Get Iocp sending data size, only-available in <IocpPoller> poller mode.
+     * @return size_t - the sending data size.
+     */
+    size_t GetIocpSendingDataSize() const;
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 private:
@@ -434,7 +473,13 @@ private:
 #if LLBC_TARGET_PLATFORM_WIN32
     bool _nonBlocking;
     LLBC_OverlappedGroup _olGroup;
+
+    size_t _iocpSendingDataSize;
 #endif // LLBC_TARGET_PLATFORM_WIN32
+
+#if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> *_msgBlockPoolInst;
+#endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 
 private:
 #if LLBC_TARGET_PLATFORM_WIN32

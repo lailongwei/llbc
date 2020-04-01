@@ -53,28 +53,33 @@ int LLBC_CodecProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
 
 int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
 {
+    // Set packet payload(from object-pool).
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
-    if (UNLIKELY(!packet->Encode()))
+    if (packet->GetEncoder())
     {
-        LLBC_String reportMsg = LLBC_String().format(
+        // Encode coder to packet.
+        if (UNLIKELY(!packet->Encode()))
+        {
+            LLBC_String reportMsg = LLBC_String().format(
                 "Encode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
 
-        const LLBC_String &codecErr = packet->GetCodecError();
-        if (!codecErr.empty())
-            reportMsg.append_format("\ndetail error:%s", codecErr.c_str());
+            const LLBC_String &codecErr = packet->GetCodecError();
+            if (!codecErr.empty())
+                reportMsg.append_format("\ndetail error:%s", codecErr.c_str());
 
-        _stack->Report(packet->GetSessionId(),
-                       packet->GetOpcode(),
-                       this,
-                       LLBC_ProtoReportLevel::Warn,
-                       reportMsg);
+            _stack->Report(packet->GetSessionId(),
+                           packet->GetOpcode(),
+                           this,
+                           LLBC_ProtoReportLevel::Warn,
+                           reportMsg);
 
-        removeSession = false;
+            removeSession = false;
 
-        LLBC_Delete(packet);
-        LLBC_SetLastError(LLBC_ERROR_ENCODE);
+            LLBC_Recycle(packet);
+            LLBC_SetLastError(LLBC_ERROR_ENCODE);
 
-        return LLBC_FAILED;
+            return LLBC_FAILED;
+        }
     }
 
     out = packet;
@@ -105,8 +110,8 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 
             removeSession = true;
 
-            LLBC_Delete(coder);
-            LLBC_Delete(packet);
+            LLBC_Recycle(coder);
+            LLBC_Recycle(packet);
             LLBC_SetLastError(LLBC_ERROR_DECODE);
 
             return LLBC_FAILED;
@@ -126,7 +131,7 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 
         removeSession = false;
 
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
         LLBC_SetLastError(LLBC_ERROR_ENCODE);
 
         return LLBC_FAILED;

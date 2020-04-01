@@ -51,6 +51,9 @@ public:
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
+        if (sessionInfo.IsListenSession())
+            return;
+
         _sessionIds.push_back(sessionInfo.GetSessionId());
     }
 
@@ -138,6 +141,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     else
         PrepareServerLogic(svc);
 
+    svc->SetFPS(10);
     svc->Start();
 
     LLBC_PrintLine("Press any key to continue...");

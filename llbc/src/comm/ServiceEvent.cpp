@@ -93,7 +93,7 @@ LLBC_SvcEv_DataArrival::LLBC_SvcEv_DataArrival()
 
 LLBC_SvcEv_DataArrival::~LLBC_SvcEv_DataArrival()
 {
-    LLBC_XDelete(packet);
+    LLBC_XRecycle(packet);
 }
 
 LLBC_SvcEv_ProtoReport::LLBC_SvcEv_ProtoReport()

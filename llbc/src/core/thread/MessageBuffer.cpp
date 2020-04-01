@@ -22,13 +22,18 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/objectpool/ObjectPool.h"
+#include "llbc/core/objectpool/PoolObjectReflection.h"
+
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageBuffer.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_MessageBuffer::LLBC_MessageBuffer()
-: _head(NULL)
+: _size(0)
+, _head(NULL)
+, _tail(NULL)
 {
 }
 
@@ -58,14 +63,8 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
         if (availableSize >= needReadLen)
         {
             _head->Read(reinterpret_cast<char *>(buf) + (len - needReadLen), needReadLen);
-            _head->SetReadPos(_head->GetReadPos() + needReadLen);
-
             if (availableSize == needReadLen)
-            {
-                LLBC_MessageBlock *block = _head;
-                _head = _head->GetNext();
-                LLBC_Delete(block);
-            }
+                DeleteFirstBlock();
 
             needReadLen = 0;
             break;
@@ -74,9 +73,7 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
         _head->Read(reinterpret_cast<char *>(buf) + (len - needReadLen), availableSize);
         needReadLen -= availableSize;
 
-        LLBC_MessageBlock *block = _head;
-        _head = _head->GetNext();
-        LLBC_Delete(block);
+        DeleteFirstBlock();
     }
 
     if (needReadLen > 0)
@@ -84,11 +81,17 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
     else
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
-    return len - needReadLen;
+    const size_t alreadyRead = len - needReadLen;
+    ASSERT(alreadyRead <= _size && "llbc library internal error for LLBC_MessageBuffer");
+
+    _size -= alreadyRead;
+
+    return alreadyRead;
 }
 
 int LLBC_MessageBuffer::Write(const char *buf, size_t len)
 {
+    // Params check.
     if (!buf)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
@@ -99,23 +102,77 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
         return LLBC_OK;
     }
 
+    // If message buffer empty, execute fast write.
+    if (!_tail)
+    {
+        _head = _tail = new LLBC_MessageBlock(len);
+        _tail->Write(buf, len);
+
+        _size = len;
+
+        return LLBC_OK;
+    }
+
+    // If message buffer not empty and _tail block has writable size, try execute fast write.
+    const size_t tailWritableSize = _tail->GetWritableSize();
+    if (tailWritableSize >= len)
+
+    {
+        _tail->Write(buf, len);
+        _size += len;
+
+        return LLBC_OK;
+    }
+    else if (_tail->GetWritePos() + len < 
+                 LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT) // writableSize >= len or (writableSize < len and tail msg block auto resize not reach to limit).
+    {
+        _tail->Resize(MIN(MAX(_tail->GetWritePos() + len, _tail->GetSize() * 2), LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT));
+        _tail->Write(buf, len);
+        _size += len;
+
+        return LLBC_OK;
+    }
+
+    // Execute normal write(create new block and append to message buffer).
     LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, len);
     block->Write(buf, len);
-    if (Append(block) != LLBC_OK)
+    if (UNLIKELY(Append(block) != LLBC_OK))
     {
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
 }
 
-LLBC_MessageBlock *LLBC_MessageBuffer::FirstBlock() const
+size_t LLBC_MessageBuffer::GetSize() const
+{
+    return _size;
+}
+
+const LLBC_MessageBlock *LLBC_MessageBuffer::FirstBlock() const
 {
     return _head;
 }
 
-LLBC_MessageBlock *LLBC_MessageBuffer::MergeBuffersAndDetach()
+LLBC_MessageBlock *LLBC_MessageBuffer::DetachFirstBlock()
+{
+    if (!_head)
+        return NULL;
+
+    LLBC_MessageBlock *firstBlock = _head;
+    _head = _head->GetNext();
+    if (_head == NULL)
+        _tail = NULL;
+
+    _size -= firstBlock->GetReadableSize();
+
+    firstBlock->SetNext(NULL);
+
+    return firstBlock;
+}
+
+LLBC_MessageBlock *LLBC_MessageBuffer::MergeBlocksAndDetach()
 {
     if (!_head)
         return NULL;
@@ -128,11 +185,13 @@ LLBC_MessageBlock *LLBC_MessageBuffer::MergeBuffersAndDetach()
             curBlock->GetDataStartWithReadPos(), curBlock->GetWritePos() - curBlock->GetReadPos());
         LLBC_MessageBlock *next = curBlock->GetNext();
 
-        LLBC_Delete(curBlock);
+        LLBC_Recycle(curBlock);
         curBlock = next;
     }
 
+    _size = 0;
     _head = NULL;
+    _tail = NULL;
     mergedBlock->SetNext(NULL);
 
     return mergedBlock;
@@ -140,31 +199,45 @@ LLBC_MessageBlock *LLBC_MessageBuffer::MergeBuffersAndDetach()
 
 int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
 {
+    // Block ptr empty check.
     if (UNLIKELY(!block))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
+    // Block readable size zero check.
     if (UNLIKELY(block->GetReadableSize() == 0))
     {
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
         return LLBC_OK;
     }
 
+    // Force set block next to NULL.
     block->SetNext(NULL);
 
+    // Update message-buffer size first.
+    _size += block->GetReadableSize();
+
+    // If message buffer is empty, execute fast append.
     if (!_head)
     {
-        _head = block;
+        _head = _tail = block;
         return LLBC_OK;
     }
 
-    LLBC_MessageBlock *curBlock = _head;
-    while (curBlock->GetNext())
-        curBlock = curBlock->GetNext();
+    // If tail block writable size >= will append block readable size, execute fast append.
+    if (_tail->GetWritableSize() >= block->GetReadableSize())
+    {
+        _tail->Write(block->GetDataStartWithReadPos(), block->GetReadableSize());
+        LLBC_Recycle(block);
 
-    curBlock->SetNext(block);
+        return LLBC_OK;
+    }
+
+    // Execute normal append.
+    _tail->SetNext(block);
+    _tail = block;
 
     return LLBC_OK;
 }
@@ -186,21 +259,14 @@ size_t LLBC_MessageBuffer::Remove(size_t length)
             _head->SetReadPos(_head->GetReadPos() + needRemoveLength);
 
             if (availableSize == needRemoveLength)
-            {
-                LLBC_MessageBlock *block = _head;
-                _head = _head->GetNext();
-                LLBC_Delete(block);
-            }
+                DeleteFirstBlock();
 
             needRemoveLength = 0;
             break;
         }
 
         needRemoveLength -= availableSize;
-
-        LLBC_MessageBlock *block = _head;
-        _head = _head->GetNext();
-        LLBC_Delete(block);
+        DeleteFirstBlock();
     }
 
     if (needRemoveLength > 0)
@@ -208,17 +274,41 @@ size_t LLBC_MessageBuffer::Remove(size_t length)
     else
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
-    return length - needRemoveLength;
+    const size_t removedLen = length - needRemoveLength;
+    ASSERT(removedLen <= _size && "llbc library internal error for LLBC_MessageBuffer");
+
+    _size -= removedLen;
+    
+    return removedLen;
 }
 
 void LLBC_MessageBuffer::Cleanup()
 {
+    if (!_head)
+        return;
+
     LLBC_MessageBlock *block = NULL;
     while (_head)
     {
         block = _head;
         _head = _head->GetNext();
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
+    }
+
+    _tail = NULL;
+    _size = 0;
+}
+
+void LLBC_MessageBuffer::DeleteFirstBlock()
+{
+    if (LIKELY(_head))
+    {
+        LLBC_MessageBlock *block = _head;
+        _head = _head->GetNext();
+        LLBC_Recycle(block);
+
+        if (_head == NULL)
+            _tail = NULL;
     }
 }
 

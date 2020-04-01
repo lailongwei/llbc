@@ -187,7 +187,7 @@ typedef int LLBC_Handle;
 #elif LLBC_TARGET_PLATFORM_MAC
  typedef pthread_t LLBC_NativeThreadHandle;
  #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
- typedef pthread_id_np_t LLBC_ThreadId;
+ typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
  typedef pthread_mutex_t LLBC_SpinLockHandle;

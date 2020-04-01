@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -68,6 +70,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
     Type type;
     int sessionId;
     LLBC_SockAddr_IN peerAddr;
+    LLBC_SessionOpts *sessionOpts;
     union
     {
         LLBC_Socket *socket;
@@ -95,12 +98,15 @@ public:
     /**
      * Build AddSock event.
      */
-    static LLBC_MessageBlock *BuildAddSockEv(int sessionId, LLBC_Socket *sock);
+    static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
+                                             int sessionId,
+                                             const LLBC_SessionOpts &sessionOpts);
     
     /**
      * Build Async-Conn event.
      */
     static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
+                                               const LLBC_SessionOpts &sessionOpts,
                                                const LLBC_SockAddr_IN &peerAddr);
 
     /**
@@ -130,13 +136,6 @@ public:
      * Build take over session event.
      */
     static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
-
-    /**
-     * Build take over socket event(only available in WIN32 platform).
-     */
-#if LLBC_TARGET_PLATFORM_WIN32
-    static LLBC_MessageBlock *BuildTakeOverSocketEv(int sessionId, LLBC_Socket *sock);
-#endif
 
     /**
      * Build control protocol stack event.

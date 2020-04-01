@@ -19,22 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#ifndef __LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__
+#define __LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__
 
-__LLBC_NS_BEGIN
+#include "llbc.h"
+using namespace llbc;
 
-template <typename ObjectType>
-inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *)
+class TestCase_Comm_MessageBuffer : public LLBC_BaseTestCase
 {
-    obj->MarkPoolObject();
-}
+public:
+    TestCase_Comm_MessageBuffer();
+    virtual ~TestCase_Comm_MessageBuffer();
 
-template <typename ObjectType>
-inline void LLBC_PoolObjectMarker::Mark(ObjectType *obj, ...)
-{
-    // Do nothing.
-}
+public:
+    virtual int Run(int argc, char *argv[]);
+};
 
-__LLBC_NS_END
-
-#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#endif // !__LLBC_TEST_CASE_COMM_MESSAGE_BUFFER_H__

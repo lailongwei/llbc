@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -105,7 +107,7 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_Session();
+    LLBC_Session(const LLBC_SessionOpts &sessionOpts);
     ~LLBC_Session();
 
 public:
@@ -132,6 +134,12 @@ public:
      * @param[in] acceptId - the accept session Id.
      */
     void SetAcceptId(int acceptId);
+
+    /**
+     * Get session opts.
+     * @return const LLBC_SessionOpts & - the session opts.
+     */
+    const LLBC_SessionOpts &GetSessionOpts() const;
 
     /**
      * Get the socket handle.
@@ -273,6 +281,8 @@ private:
     int _id;
     int _acceptId;
 
+    LLBC_SessionOpts _sessionOpts;
+
     LLBC_Socket *_socket;
     LLBC_SocketHandle _sockHandle;
 
@@ -287,5 +297,7 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/comm/SessionImpl.h"
 
 #endif // !__LLBC_COMM_SESSION_H__

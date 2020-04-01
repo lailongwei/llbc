@@ -87,11 +87,17 @@ public:
      */
     const ObjectType *GetObj() const;
 
+    /**
+     * Delete guarded object.
+     * @return ObjectType * - the detached guarded object.
+     */
+    ObjectType *DetachObj();
+
 private:
     /**
      * Make guarded object weakref.
      */
-    void MakeWeakRef();
+    void MakeWeakRef() const;
 
 private:
     /**

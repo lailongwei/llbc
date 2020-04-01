@@ -23,7 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_ObjectPoolOrderedDeleteNode::LLBC_ObjectPoolOrderedDeleteNode(const char *name)
+inline LLBC_ObjectPoolOrderedDeleteNode::LLBC_ObjectPoolOrderedDeleteNode(const LLBC_CString &name)
 : _name(name)
 , _frontNode(NULL)
 , _backNodes(NULL)
@@ -36,7 +36,7 @@ inline LLBC_ObjectPoolOrderedDeleteNode::~LLBC_ObjectPoolOrderedDeleteNode()
         LLBC_Delete(_backNodes);
 }
 
-inline const char *LLBC_ObjectPoolOrderedDeleteNode::GetNodeName() const
+inline const LLBC_CString &LLBC_ObjectPoolOrderedDeleteNode::GetNodeName() const
 {
     return _name;
 }
@@ -80,7 +80,7 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AddBackNode(LLBC_ObjectPoolOrderedD
     return LLBC_OK;
 }
 
-inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const char *name, bool del)
+inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const LLBC_CString &name, bool del, bool force)
 {
     if (UNLIKELY(_name == name))
     {
@@ -110,7 +110,10 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::RemoveBackNode(const char *name, bo
         }
 
         // Current node's back node is will remove node, remove it.
-        backNode->AdjustBackNodesFrontNode(this);
+        if (!force)
+            backNode->AdjustBackNodesFrontNode(this);
+        else
+            backNode->_frontNode = NULL;
 
         if (del)
             LLBC_Delete(backNode);
@@ -140,11 +143,18 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AdjustBackNodesFrontNode(LLBC_Objec
     if (!_backNodes)
         return LLBC_OK;
 
+    if (!frontNode->_backNodes)
+        frontNode->_backNodes = LLBC_New(LLBC_ObjectPoolOrderedDeleteNodes);
+
     // Foreach adjust all back nodes.
     for (LLBC_ObjectPoolOrderedDeleteNodes::iterator it = _backNodes->begin();
          it != _backNodes->end();
          ++it)
-        frontNode->AddBackNode(it->second);
+    {
+        LLBC_ObjectPoolOrderedDeleteNode *&node = it->second;
+        node->_frontNode = frontNode;
+        frontNode->_backNodes->insert(std::make_pair(node->GetNodeName(), node));
+    }
 
     // Clear current node's _backNodes.
     _backNodes->clear();
@@ -154,7 +164,7 @@ inline int LLBC_ObjectPoolOrderedDeleteNode::AdjustBackNodesFrontNode(LLBC_Objec
     return LLBC_OK;
 }
 
-inline bool LLBC_ObjectPoolOrderedDeleteNode::IsFrontNode(const char *name) const
+inline bool LLBC_ObjectPoolOrderedDeleteNode::IsFrontNode(const LLBC_CString &name) const
 {
     if (!_frontNode)
         return false;
@@ -162,7 +172,7 @@ inline bool LLBC_ObjectPoolOrderedDeleteNode::IsFrontNode(const char *name) cons
     return (_frontNode->_name == name || _frontNode->IsFrontNode(name));
 }
 
-inline bool LLBC_ObjectPoolOrderedDeleteNode::IsBackNode(const char *name) const
+inline bool LLBC_ObjectPoolOrderedDeleteNode::IsBackNode(const LLBC_CString &name) const
 {
     if (!_backNodes)
         return false;

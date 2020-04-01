@@ -61,18 +61,30 @@ public:
      */
     int Write(const char *buf, size_t len);
 
+    /**
+     * Get message buffer size.
+     * @return size_t - the message buffer size.
+     */
+    size_t GetSize() const;
+
 public:
     /**
-     * Get the first block.
-     * @return LLBC_MessageBlock * - the message block.
+     * Get first block.
+     * @return const LLBC_MessageBlock * - the message block.
      */
-    LLBC_MessageBlock *FirstBlock() const;
+    const LLBC_MessageBlock *FirstBlock() const;
 
     /**
-     * Merge buffers and detach.
+     * Detach first block.
+     * @return LLBC_MessageBlock * - the first message block.
+     */
+    LLBC_MessageBlock *DetachFirstBlock();
+
+    /**
+     * Merge all message blocks and detach.
      * @return LLBC_MessageBlock * - merged message block.
      */
-    LLBC_MessageBlock *MergeBuffersAndDetach();
+    LLBC_MessageBlock *MergeBlocksAndDetach();
 
     /**
      * Append new block to buffer.
@@ -94,7 +106,15 @@ public:
     void Cleanup();
 
 private:
+    /**
+     * Delete first message block.
+     */
+    void DeleteFirstBlock();
+
+private:
+    size_t _size;
     LLBC_MessageBlock *_head;
+    LLBC_MessageBlock *_tail;
 };
 
 __LLBC_NS_END

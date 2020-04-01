@@ -58,10 +58,11 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
             data->validate = false;
             data->cancelling = true;
             data->timer->OnCancel();
-
-            if (--data->refCount == 0)
-                LLBC_Delete(data);
+            data->cancelling = false;
         }
+
+        if (--data->refCount == 0)
+            LLBC_Delete(data);
     }
 }
 

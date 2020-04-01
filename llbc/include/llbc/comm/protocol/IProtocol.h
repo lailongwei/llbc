@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
+class LLBC_Packet;
 class LLBC_Session;
 class LLBC_ICoderFactory;
 class LLBC_ProtocolStack;
@@ -143,26 +144,26 @@ private:
      * Set session.
      * @param[in] session - the session.
      */
-    void SetSession(LLBC_Session *session);
+    virtual void SetSession(LLBC_Session *session);
 
     /**
      * Set protocol stack to protocol.
      * @param[in] stack - the protocol stack.
      */
-    void SetStack(LLBC_ProtocolStack *stack);
+    virtual void SetStack(LLBC_ProtocolStack *stack);
 
     /**
      * Set protocol filter to protocol.
      * @param[in] filter - the protocol filter.
      */
-    void SetFilter(LLBC_IProtocolFilter *filter);
+    virtual void SetFilter(LLBC_IProtocolFilter *filter);
 
     /**
      * Set coder factories, only available in Codec-Layer.
      * @param[in] coders - the coder factories pointer.
      * @return int - reutrn 0 if success, otherwise return -1.
      */
-    int SetCoders(const Coders *coders);
+    virtual int SetCoders(const Coders *coders);
 
 protected:
     int _sessionId;
@@ -172,6 +173,7 @@ protected:
     LLBC_IService *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
+    LLBC_ObjectPoolInst<LLBC_Packet> *_pktPoolInst;
 };
 
 __LLBC_NS_END

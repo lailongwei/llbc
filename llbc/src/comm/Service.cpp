@@ -36,12 +36,6 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
-
-    inline void __LLBC_DelPacketAfterHandle(LLBC_NS LLBC_Packet *packet)
-    {
-        if (LIKELY(!packet->IsDontDeleteAfterHandle()))
-            LLBC_Delete(packet);
-    }
 }
 
 __LLBC_NS_BEGIN
@@ -131,8 +125,8 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _releasePoolStack(NULL)
 
-, _safetyObjectPool(NULL)
-, _unsafetyObjectPool(NULL)
+, _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
+, _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
 
 , _timerScheduler(NULL)
 
@@ -474,32 +468,43 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-int LLBC_Service::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::Listen(const char *ip,
+                         uint16 port,
+                         LLBC_IProtocolFactory *protoFactory,
+                         const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Listen(ip, port, protoFactory);
+    const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, true);
 
     return sessionId;
 }
 
-int LLBC_Service::Connect(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::Connect(const char *ip,
+                          uint16 port,
+                          double timeout,
+                          LLBC_IProtocolFactory *protoFactory,
+                          const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
-    const int sessionId = _pollerMgr.Connect(ip, port, protoFactory);
+    const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, false);
 
     return sessionId;
 }
 
-int LLBC_Service::AsyncConn(const char *ip, uint16 port, double timeout, LLBC_IProtocolFactory *protoFactory)
+int LLBC_Service::AsyncConn(const char *ip,
+                            uint16 port,
+                            double timeout,
+                            LLBC_IProtocolFactory *protoFactory,
+                            const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
 
     int pendingSessionId;
-    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory);
+    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory, sessionOpts);
 }
 
 bool LLBC_Service::IsSessionValidate(int sessionId)
@@ -1588,7 +1593,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         LLBC_IService *recverSvc = _svcMgr.GetService(recverSvcId);
         if (recverSvc == NULL || !recverSvc->IsStarted())
         {
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             return;
         }
 
@@ -1615,7 +1620,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             if (stHandlerIt != stHandlers.end())
             {
                 stHandlerIt->second->Invoke(*packet);
-                __LLBC_DelPacketAfterHandle(packet);
+                LLBC_Recycle(packet);
                 return;
             }
         }
@@ -1632,7 +1637,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             if (!preIt->second->Invoke(*packet))
             {
-                __LLBC_DelPacketAfterHandle(packet);
+                LLBC_Recycle(packet);
                 return;
             }
 
@@ -1645,7 +1650,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     {
         if (!_unifyPreHandler->Invoke(*packet))
         {
-            __LLBC_DelPacketAfterHandle(packet);
+            LLBC_Recycle(packet);
             return;
         }
     }
@@ -1668,7 +1673,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         }
     }
 
-    __LLBC_DelPacketAfterHandle(packet);
+    LLBC_Recycle(packet);
 }
 
 void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
@@ -1937,12 +1942,6 @@ void LLBC_Service::ClearAutoReleasePool()
 
 void LLBC_Service::InitObjectPools()
 {
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!_safetyObjectPool)
-        _safetyObjectPool = reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
-
-    if (!_unsafetyObjectPool)
-        _unsafetyObjectPool = reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
 }
 
 void LLBC_Service::UpdateObjectPools()
@@ -1951,8 +1950,6 @@ void LLBC_Service::UpdateObjectPools()
 
 void LLBC_Service::ClearHoldedObjectPools()
 {
-    _safetyObjectPool = NULL;
-    _unsafetyObjectPool = NULL;
 }
 
 void LLBC_Service::InitTimerScheduler()
@@ -2016,7 +2013,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
         if (lock)
             _lock.Unlock();
 
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
@@ -2038,7 +2035,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             if (lock)
                 _lock.Unlock();
 
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
 
             return LLBC_FAILED;
@@ -2053,7 +2050,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
             if (lock)
                 _lock.Unlock();
 
-            LLBC_Delete(packet);
+            LLBC_Recycle(packet);
             LLBC_SetLastError(LLBC_ERROR_IS_LISTEN_SOCKET);
 
             return LLBC_FAILED;
@@ -2112,14 +2109,14 @@ int LLBC_Service::LockableSend(int svcId,
                                bool lock,
                                bool validCheck)
 {
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    // Create packet(from object pool) and send.
+    LLBC_Packet *packet = _packetObjectPool.GetObject();
     // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
     packet->SetHeader(svcId, sessionId, opcode, status);
-
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))
     {
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
         return ret;
     }
 
@@ -2137,7 +2134,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (sessionIds.empty())
     {
         if(LIKELY(coder))
-            LLBC_Delete(coder);
+            LLBC_Recycle(coder);
 
         return LLBC_OK;
     }
@@ -2146,7 +2143,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (UNLIKELY(!_started))
     {
         if (LIKELY(coder))
-            LLBC_Delete(coder);
+            LLBC_Recycle(coder);
 
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
@@ -2154,20 +2151,21 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
 
-    LLBC_Packet *firstPacket = LLBC_New(LLBC_Packet);
+    LLBC_Packet *firstPacket = _packetObjectPool.GetObject();
     // firstPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
     firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
 
     bool hasCoder = true;
     if (LIKELY(coder))
     {
-        if (!coder->Encode(*firstPacket))
+        firstPacket->SetEncoder(coder);
+        if (!firstPacket->Encode())
         {
+            LLBC_Recycle(firstPacket);
             LLBC_SetLastError(LLBC_ERROR_ENCODE);
+
             return LLBC_FAILED;
         }
-
-        LLBC_Delete(coder);
     }
     else
     {
@@ -2178,8 +2176,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
     if (sessionCnt == 1)
         return LockableSend(firstPacket, false, validCheck);
 
-    LLBC_Packet **otherPackets =
-        LLBC_Calloc(LLBC_Packet *, (sizeof(LLBC_Packet *) * (sessionCnt - 1)));
+    _multicastOtherPackets.resize(sessionCnt - 1);
     if (LIKELY(hasCoder))
     {
         const void *payload = firstPacket->GetPayload();
@@ -2202,12 +2199,12 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
             otherPacket->Write(payload, payloadLen);
 
-            otherPackets[i - 1] = otherPacket;
+            _multicastOtherPackets[i - 1] = otherPacket;
         }
 
         if (validCheck)
@@ -2232,11 +2229,11 @@ int LLBC_Service::MulticastSendCoder(int svcId,
             if (readySInfo->isListenSession)
                 continue;
 
-            LLBC_Packet *otherPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
             // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
 
-            otherPackets[i - 1] = otherPacket;
+            _multicastOtherPackets[i - 1] = otherPacket;
         }
 
         if (validCheck)
@@ -2245,17 +2242,17 @@ int LLBC_Service::MulticastSendCoder(int svcId,
 
     LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
 
-    const size_t otherPacketCnt = sessionCnt - 1;
-    for (size_t i = 0; i < otherPacketCnt; ++i)
+    const typename SessionIds::size_type otherPacketCnt = sessionCnt - 1;
+    for (typename SessionIds::size_type i = 0; i != otherPacketCnt; ++i)
     {
-        LLBC_Packet *&otherPacket = otherPackets[i];
-        if (!otherPacket)
+        LLBC_Packet *&otherPacket = _multicastOtherPackets[i];
+        if (UNLIKELY(!otherPacket))
             continue;
 
         LockableSend(otherPacket, false, false); // Don't need vaildate check.
     }
 
-    LLBC_Free(otherPackets);
+    _multicastOtherPackets.clear();
 
     return LLBC_OK;
 }

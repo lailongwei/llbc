@@ -55,7 +55,7 @@ int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
 
     LLBC_MessageBlock *block = packet->GiveUp();
-    LLBC_Delete(packet);
+    LLBC_Recycle(packet);
 
     if (!block)
         return LLBC_OK;
@@ -69,15 +69,12 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
 
     // Create packet and write data.
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    LLBC_Packet *packet = _pktPoolInst->GetObject();
     const size_t readableSize = block->GetReadableSize();
 
     packet->SetLength(readableSize);
     packet->SetSessionId(_sessionId);
-    packet->Write(block->GetDataStartWithReadPos(), readableSize);
-
-    // Delete this block.
-    LLBC_Delete(block);
+    packet->SetPayload(block);
 
     // Create output.
     out = LLBC_New1(LLBC_MessageBlock, sizeof(LLBC_Packet *));

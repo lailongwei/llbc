@@ -36,13 +36,6 @@
 namespace
 {
     typedef LLBC_NS LLBC_BasePoller Base;
-
-    static void DestroyPollerEv(void *data)
-    {
-        LLBC_NS LLBC_PollerEvent *ev = 
-            reinterpret_cast<LLBC_NS LLBC_PollerEvent *>(data);
-        LLBC_NS LLBC_PollerEvUtil::DestroyEv(*ev);
-    }
 }
 
 __LLBC_NS_BEGIN
@@ -161,6 +154,7 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         asyncInfo.socket = socket;
         asyncInfo.peerAddr = ev.peerAddr;
         asyncInfo.sessionId = ev.sessionId;
+        asyncInfo.sessionOpts = *ev.sessionOpts;
 
         _connecting.insert(std::make_pair(handle, asyncInfo));
     } while (false);
@@ -168,6 +162,8 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     if (!succeed)
         _svc->Push(LLBC_SvcEvUtil::
                 BuildAsyncConnResultEv(ev.sessionId, succeed, reason, ev.peerAddr));
+
+    LLBC_XDelete(ev.sessionOpts);
 }
 
 void LLBC_IocpPoller::HandleEv_Send(LLBC_PollerEvent &ev)
@@ -206,7 +202,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
         if (ol->acceptSock != LLBC_INVALID_SOCKET_HANDLE)
             LLBC_CloseSocket(ol->acceptSock);
         if (ol->data)
-            LLBC_Delete(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
+            LLBC_Recycle(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
         LLBC_Delete(ol);
 
         return;
@@ -312,12 +308,12 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int err
     if (waitRet == LLBC_OK)
     {
         sock->SetOption(SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
-        SetConnectedSocketDftOpts(sock);
+        SetConnectedSocketOpts(sock, asyncInfo.sessionOpts);
 
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
             asyncInfo.sessionId, true, LLBC_StrError(LLBC_ERROR_SUCCESS), asyncInfo.peerAddr));
 
-        AddSession(CreateSession(sock, asyncInfo.sessionId), false);
+        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL), false);
     }
     else
     {
@@ -342,7 +338,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
                        sizeof(LLBC_SocketHandle));
     newSock->SetPollerType(LLBC_PollerType::IocpPoller);
 
-    SetConnectedSocketDftOpts(newSock);
+    SetConnectedSocketOpts(newSock, session->GetSessionOpts());
 
     // Delete overlapped.
     ol->acceptSock = LLBC_INVALID_SOCKET_HANDLE;
@@ -351,7 +347,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
     sock->PostAsyncAccept();
 
     // Create session and add to poller.
-    AddToPoller(CreateSession(newSock, 0, session));
+    AddToPoller(CreateSession(newSock, 0, session->GetSessionOpts(), session));
 }
 
 __LLBC_NS_END

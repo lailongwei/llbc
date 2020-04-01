@@ -111,7 +111,8 @@ void LLBC_AutoReleasePool::Purge()
     for (; iter != _arr->End(); ++iter)
     {
         LLBC_Object *obj = *iter;
-        --obj->_autoRef;
+        if (--obj->_autoRef == 0)
+            obj->_poolStack = NULL;
     }
 
     _arr->Clear();

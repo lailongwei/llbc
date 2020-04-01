@@ -19,60 +19,28 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMMON_CIRCULAR_BUFFER_H__
 
-template <typename ObjectType>
-inline CircularBuffer<ObjectType>::CircularBuffer(const size_t capacity)
-: _capacity(capacity)
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
 
-, _front(0)
-, _tail(0)
-, _isFull(false)
+#include "llbc/core/objectpool/ObjectPoolStat.h"
 
-, _buffers(new ObjectType[capacity])
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st)
 {
+    o << st.ToString();
+    return o;
 }
 
-template <typename ObjectType>
-inline CircularBuffer<ObjectType>::~CircularBuffer()
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st)
 {
-    LLBC_Deletes(_buffers);
+    o << st.ToString();
+    return o;
 }
 
-template <typename ObjectType>
-inline bool CircularBuffer<ObjectType>::IsFull()
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st)
 {
-    return _isFull;
+    o << st.ToString();
+    return o;
 }
 
-template <typename ObjectType>
-inline bool CircularBuffer<ObjectType>::IsEmpty()
-{
-    return !_isFull && _tail == _front;
-}
-
-template <typename ObjectType>
-inline void CircularBuffer<ObjectType>::Push(const ObjectType &obj)
-{
-    _buffers[_tail] = obj;
-    if (++_tail == _capacity)
-        _tail = 0;
-
-    _isFull = (_tail == _front);
-}
-
-template <typename ObjectType>
-inline ObjectType CircularBuffer<ObjectType>::Pop()
-{
-    ObjectType &obj = _buffers[_front];
-
-    if (++_front == _capacity)
-        _front = 0;
-
-    if (_isFull)
-        _isFull = false;
-
-    return obj;
-}
-
-#endif // !__LLBC_COMMON_CIRCULAR_BUFFER_H__
+#include "llbc/common/AfterIncl.h"

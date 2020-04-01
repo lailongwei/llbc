@@ -26,6 +26,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
+static LLBC_NS LLBC_SafetyObjectPool *__g_globalObjectPool = NULL;
 static LLBC_NS LLBC_SafetyObjectPool *__g_entryThreadSafetyObjectPool = NULL;
 static LLBC_NS LLBC_UnsafetyObjectPool *__g_entryThreadUnsafetyObjectPool = NULL;
 
@@ -35,6 +36,8 @@ __LLBC_NS_BEGIN
 
 int LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools()
 {
+    LLBC_INL_NS __g_globalObjectPool = LLBC_New0(LLBC_SafetyObjectPool);
+
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (!tls->coreTls.entryThread)
     {
@@ -74,10 +77,10 @@ int LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools()
     tls->coreTls.safetyObjectPool = NULL;
     tls->coreTls.unsafetyObjectPool = NULL;
 
-    LLBC_XDelete(LLBC_INTERNAL_NS __g_entryThreadSafetyObjectPool);
-    LLBC_XDelete(LLBC_INTERNAL_NS __g_entryThreadUnsafetyObjectPool);
-    LLBC_INTERNAL_NS __g_entryThreadSafetyObjectPool = NULL;
-    LLBC_INTERNAL_NS __g_entryThreadUnsafetyObjectPool = NULL;
+    LLBC_XDelete(LLBC_INL_NS __g_entryThreadSafetyObjectPool);
+    LLBC_XDelete(LLBC_INL_NS __g_entryThreadUnsafetyObjectPool);
+
+    LLBC_XDelete(LLBC_INL_NS __g_globalObjectPool);
 
     return LLBC_OK;
 }

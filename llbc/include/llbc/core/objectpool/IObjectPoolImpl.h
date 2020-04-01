@@ -19,31 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
-#define __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
 
-#include "llbc/common/Common.h"
+#include "llbc/core/objectpool/IObjectPoolInstFactory.h"
 
 __LLBC_NS_BEGIN
 
-/**
- * \brief The pool object marker class encapsulation.
- */
-class LLBC_PoolObjectMarker
-{
-public:
-    template <typename ObjectType, void (ObjectType::*)()>
-    struct markable_type;
-    template <typename ObjectType>
-    static void Mark(ObjectType *obj, markable_type<ObjectType, &ObjectType::MarkPoolObject> *);
-
-public:
-    template <typename ObjectType>
-    static void Mark(ObjectType *obj, ...);
-};
+// Not used for now.
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/PoolObjectMarkerImpl.h"
-
-#endif // !__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_MARKER_H__
+#endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__

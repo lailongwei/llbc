@@ -23,6 +23,7 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/comm/IService.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
@@ -37,6 +38,7 @@ LLBC_IProtocol::LLBC_IProtocol()
 , _svc(NULL)
 , _filter(NULL)
 , _coders(NULL)
+, _pktPoolInst(NULL)
 {
 }
 
@@ -86,6 +88,7 @@ void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
 {
     _stack = stack;
     _svc = _stack->GetService();
+    _pktPoolInst = &_svc->GetPacketObjectPool();
 }
 
 void LLBC_IProtocol::SetFilter(LLBC_IProtocolFilter *filter)

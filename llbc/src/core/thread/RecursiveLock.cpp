@@ -80,6 +80,11 @@ void LLBC_RecursiveLock::Unlock()
 #endif
 }
 
+bool LLBC_RecursiveLock::IsDummyLock() const
+{
+    return false;
+}
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 void *LLBC_RecursiveLock::Handle()
 {

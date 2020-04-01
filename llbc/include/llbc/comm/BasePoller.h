@@ -37,6 +37,7 @@ class LLBC_Socket;
 class LLBC_Session;
 class LLBC_IService;
 class LLBC_PollerMgr;
+class LLBC_SessionOpts;
 
 __LLBC_NS_END
 
@@ -126,7 +127,7 @@ protected:
     /**
      * Create new session from socket.
      */
-    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId = 0, LLBC_Session *acceptSession = NULL);
+    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession);
 
 protected:
     /**
@@ -151,10 +152,11 @@ protected:
 
 protected:
     /**
-     * Set connected socket default options.
-     * @param[in] sock - the connected socket.
+     * Set connected socket options.
+     * @param[in] sock        - the connected socket.
+     * @param[in] sessionOpts - the session opts.
      */
-    void SetConnectedSocketDftOpts(LLBC_Socket *sock);
+    void SetConnectedSocketOpts(LLBC_Socket *sock, const LLBC_SessionOpts &sessionOpts);
 
 private:
     /**

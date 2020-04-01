@@ -38,19 +38,23 @@ namespace
 
 __LLBC_NS_BEGIN
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(int sessionId, LLBC_Socket *sock)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(LLBC_Socket *sock,
+                                                     int sessionId,
+                                                     const LLBC_SessionOpts &sessionOpts)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::AddSock;
     ev.un.socket = sock;
     ev.sessionId = sessionId;
+    ev.sessionOpts = new LLBC_SessionOpts(sessionOpts);
 
     block->SetWritePos(sizeof(_Ev));
     return block;
 }
 
 LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
+                                                       const LLBC_SessionOpts &sessionOpts,
                                                        const LLBC_SockAddr_IN &peerAddr)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
@@ -58,6 +62,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
     ev.type = _Ev::AsyncConn;
     ev.sessionId = sessionId;
     ev.peerAddr = peerAddr;
+    ev.sessionOpts = new LLBC_SessionOpts(sessionOpts);
 
     block->SetWritePos(sizeof(_Ev));
     return block;
@@ -177,10 +182,15 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
     {
     case _Ev::AddSock:
         LLBC_Delete(ev.un.socket);
+        LLBC_XDelete(ev.sessionOpts);
+        break;
+
+    case _Ev::AsyncConn:
+        LLBC_XDelete(ev.sessionOpts);
         break;
 
     case _Ev::Send:
-        LLBC_Delete(ev.un.packet);
+        LLBC_Recycle(ev.un.packet);
         break;
 
     case _Ev::Close:
@@ -222,7 +232,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_MessageBlock *block)
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     This::DestroyEv(ev);
 
-    LLBC_Delete(block);
+    LLBC_Recycle(block);
 }
 
 __LLBC_NS_END

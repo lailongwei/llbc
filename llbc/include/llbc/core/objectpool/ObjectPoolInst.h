@@ -23,6 +23,7 @@
 #define __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_INSTANCE_H__
 
 #include "llbc/common/Common.h"
+#include "llbc/core/algo/Algo.h"
 #include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
@@ -36,7 +37,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 // Define BeginingSymbol/EndSymbol, CheckSymbolSize.
-#if LLBC_DEBUG
+#if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 const size_t CheckSymbolSize = 8;
 
  #if LLBC_TARGET_PLATFORM_WIN32
@@ -48,7 +49,7 @@ const size_t CheckSymbolSize = 8;
  #endif // LLBC_TARGET_PLATFORM_WIN32
 #else // NDEBUG
 const size_t CheckSymbolSize = 0;
-#endif // LLBC_DEBUG
+#endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 
 __LLBC_INTERNAL_NS_END
 
@@ -62,7 +63,7 @@ class LLBC_ObjectGuard;
 /**
 * \brief The object pool instance encapsulation.
 */
-template <typename ObjectType, typename LockType = LLBC_DummyLock>
+template <typename ObjectType>
 class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
 private:
@@ -74,8 +75,16 @@ private:
     {
         MemoryBlock *block;     // ownered this memory unit's block.
 
-        bool inited;            // Object has initialized or not.
-        bool referencableObj;   // Indicate object is referencable object or not.
+        union
+        {
+            struct
+            {
+                bool inited;            // Object has initialized or not.
+                bool referencableObj;   // Indicate object is referencable object or not.
+                bool inUsing;           // Using flag.
+            } flags;
+            uint32 flagsVal;            // all flags.
+        } unFlags;
         sint32 seq;             // The location seq of memory unit.
 
         uint8 buff[0];          // The begin address of buffer.
@@ -90,11 +99,12 @@ private:
         #if LLBC_64BIT_PROCESSOR
         sint32 unused;         // if in 64bit arch, use for memory align.
         #endif
+        LLBC_RingBuffer<MemoryUnit *> *freeUnits; // the free units for the memory block.
         uint8 buff[0];         // The begin address of buffer.
     };
 
 public:
-    LLBC_ObjectPoolInst();
+    LLBC_ObjectPoolInst(LLBC_IObjectPool *objPool, LLBC_ILock *lock);
     virtual ~LLBC_ObjectPoolInst();
 
 public:
@@ -139,6 +149,25 @@ public:
     */
     void ReleaseObject(ObjectType *obj);
 
+    /**
+     * Get pool instance name.
+     * @return const char * - the pool instance name.
+     */
+    virtual const char *GetPoolInstName();
+
+    /**
+     * Check this object pool instance is thread safety or not.
+     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     */
+    virtual bool IsThreadSafety() const;
+
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolInstStat &stat) const;
+
 protected:
     /**
      * Release referencable object.
@@ -158,7 +187,7 @@ private:
      * @param[in] referencableObj - is referencable object or not.
      * @return void * - the object pointer.
      */
-    void *FindFreeObj(MemoryBlock *memBlock, const bool &referencableObj);
+    void *FindFreeObj(MemoryBlock *&memBlock, const bool &referencableObj);
 
     /**
      * Internal get object implement.
@@ -179,15 +208,17 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_ObjectPoolInst);
 
 private:
+    const char *_poolInstName;
+
     const int _elemSize;
     const int _elemCnt;
     const int _blockSize;
 
     int _blockCnt;
-    MemoryBlock **_block;
-    CircularBuffer<MemoryUnit *> **_memUnitUsageView;
+    MemoryBlock **_blocks;
+    LLBC_RingBuffer<MemoryBlock *> _freeBlocks;
 
-    LockType _lock;
+    LLBC_ILock *_lock;
 };
 
 __LLBC_NS_END

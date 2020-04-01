@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -179,12 +181,19 @@ public:
 public:
     /**
      * Create a session and listening.
+     * Note:
+     *      If service not start when call this method, connection operation will 
+     *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int Listen(const char *ip,
+                       uint16 port,
+                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Establisthes a connection to a specified address.
@@ -192,9 +201,14 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int Connect(const char *ip,
+                        uint16 port,
+                        double timeout = -1.0,
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Asynchronous establishes a connection to a specified address.
@@ -202,11 +216,16 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int AsyncConn(const char *ip,
+                          uint16 port,
+                          double timeout = -1.0,
+                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Check given sessionId is validate or not.
@@ -546,6 +565,31 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const = 0;
+
+public:
+    /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool() = 0;
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool() = 0;
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool() = 0;
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
 
 public:
     /**

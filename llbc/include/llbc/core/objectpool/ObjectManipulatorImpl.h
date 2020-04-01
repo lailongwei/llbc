@@ -24,26 +24,44 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-inline void LLBC_ObjectManipulator::New(void *mem)
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::New(void *mem)
 {
     new (mem) ObjectType();
 }
 
 template <typename ObjectType>
-inline void LLBC_ObjectManipulator::Delete(void *obj)
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::Delete(void *obj)
 {
     (reinterpret_cast<ObjectType*>(obj))->~ObjectType();
 }
 
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::Reset(void *obj)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::Reset(void *obj)
 {
-    return ResetObj<ObjectType>(obj, 0);
+    return ResetObj<ObjectType>(reinterpret_cast<ObjectType *>(obj), NULL);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum()
+{
+    return GetPoolInstPerBlockUnitsNumInl<ObjectType>(0);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    OnPoolInstCreateInl<ObjectType>(poolInst, 0);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
+{
+    OnPoolInstDestroyInl<ObjectType>(poolInst, 0);
 }
 
 #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, clearable_type<ObjectType, &ObjectType::clear> *)
 {
     reinterpret_cast<ObjectType *>(obj)->clear();
     return false;
@@ -52,7 +70,7 @@ inline bool LLBC_ObjectManipulator::ResetObj(void *obj, clearable_type<ObjectTyp
 
 #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Clearable_type<ObjectType, &ObjectType::Clear> *)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, Clearable_type<ObjectType, &ObjectType::Clear> *)
 {
     reinterpret_cast<ObjectType *>(obj)->Clear();
     return false;
@@ -61,7 +79,7 @@ inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Clearable_type<ObjectTyp
 
 #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, resetable_type<ObjectType, &ObjectType::reset> *)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, resetable_type<ObjectType, &ObjectType::reset> *)
 {
     reinterpret_cast<ObjectType *>(obj)->reset();
     return false;
@@ -70,7 +88,7 @@ inline bool LLBC_ObjectManipulator::ResetObj(void *obj, resetable_type<ObjectTyp
 
 #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_type<ObjectType, &ObjectType::Reset> *)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_type<ObjectType, &ObjectType::Reset> *)
 {
     reinterpret_cast<ObjectType *>(obj)->Reset();
     return false;
@@ -78,10 +96,53 @@ inline bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_type<ObjectTyp
 #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
 
 template <typename ObjectType>
-inline bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->clear();
+    return false;
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
 {
     Delete<ObjectType>(obj);
     return true;
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
+{
+    return reinterpret_cast<ObjectType *>(NULL)->GetPoolInstPerBlockUnitsNum();
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(...)
+{
+    return LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER;
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *)
+{
+    reinterpret_cast<ObjectType *>(NULL)->OnPoolInstCreate(poolInst);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, ...)
+{
+    // Do nothing.
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *)
+{
+    reinterpret_cast<ObjectType *>(NULL)->OnPoolInstDestroy(poolInst);
+}
+
+template <typename ObjectType>
+LLBC_FORCE_INLINE void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, ...)
+{
+    // Do nothing.
 }
 
 __LLBC_NS_END

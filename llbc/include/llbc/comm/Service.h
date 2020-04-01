@@ -158,9 +158,13 @@ public:
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Listen(const char *ip,
+                       uint16 port,
+                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Establishes a connection to a specified address.
@@ -171,9 +175,14 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Connect(const char *ip,
+                        uint16 port,
+                        double timeout = -1.0,
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Asynchronous establishes a connection to a specified address.
@@ -184,11 +193,16 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
      *                     it only means post async-conn request to poller success.
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int AsyncConn(const char *ip,
+                          uint16 port,
+                          double timeout = -1.0,
+                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Check given sessionId is legal or not.
@@ -363,19 +377,6 @@ public:
 
 public:
     /**
-    * Get safety object pool.
-    * @return LLBC_SafetyObjectPool * - the safety object pool.
-    */
-    LLBC_SafetyObjectPool *GetSafetyObjectPool();
-
-    /**
-    * Get unsafety object pool.
-    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
-    */
-    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
-
-public:
-    /**
      * Post lazy task to service.
      * @param[in] deleg - the task delegate.
      * @param[in] data  - the task data, can be null.
@@ -390,6 +391,31 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
+
+public:
+    /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool();
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool();
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
 
 public:
     /**
@@ -638,8 +664,10 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack;
 
 private:
-    LLBC_SafetyObjectPool *_safetyObjectPool;
-    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
+    LLBC_SafetyObjectPool _safetyObjectPool;
+    LLBC_UnsafetyObjectPool _unsafetyObjectPool;
+    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
@@ -650,6 +678,9 @@ private:
 
 private:
     LLBC_ServiceMgr &_svcMgr;
+
+private:
+    std::vector<LLBC_Packet *> _multicastOtherPackets;
 
 private:
     typedef void (LLBC_Service::*_EvHandler)(LLBC_ServiceEvent &);
