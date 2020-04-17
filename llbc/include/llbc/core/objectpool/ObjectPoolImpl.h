@@ -25,6 +25,7 @@
 #include "llbc/core/helper/Common.h"
 
 #include "llbc/core/objectpool/ObjectPoolStat.h"
+#include "llbc/core/objectpool/IObjectPoolInstFactory.h"
 
 __LLBC_NS_BEGIN
 
