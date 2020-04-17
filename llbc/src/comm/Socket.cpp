@@ -558,7 +558,6 @@ void LLBC_Socket::OnSend()
 
     ol = LLBC_New(LLBC_Overlapped);
     ol->opcode = _Opcode::Send;
-    ol->sessionId = _session->GetId();
     ol->sock = _handle;
     ol->data = block;
 
@@ -795,7 +794,6 @@ int LLBC_Socket::PostZeroWSARecv()
 {
     LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
     ol->opcode = _Opcode::Receive;
-    ol->sessionId = _session->GetId();
     ol->sock = _handle;
 
     LLBC_SockBuf buf = {0};
@@ -826,7 +824,6 @@ int LLBC_Socket::PostAsyncAccept()
 {
     LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
     ol->opcode = LLBC_OverlappedOpcode::Accept;
-    ol->sessionId = _session->GetId();
     ol->sock = _handle;
     if (UNLIKELY((ol->acceptSock = 
             LLBC_CreateTcpSocketEx()) == 
