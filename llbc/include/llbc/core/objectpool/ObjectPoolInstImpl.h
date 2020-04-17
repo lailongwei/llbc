@@ -214,7 +214,7 @@ void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
     }
 
     // Stat object pool instance self inner used memory.
-    const size_t selfInnerUsedMemory = sizeof(this) + // this object size.
+    const size_t selfInnerUsedMemory = sizeof(LLBC_ObjectPoolInst) + // this object size.
                                        sizeof(MemoryBlock *) * _blockCnt + // allocated blocks pointer array size.
                                        sizeof(LLBC_RingBuffer<MemoryBlock *>) + sizeof(MemoryBlock *) * _blockCnt + // block ring-buffer size.
                                        sizeof(*_lock); // Lock object size.
