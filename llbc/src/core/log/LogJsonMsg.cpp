@@ -49,6 +49,7 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const c
 , _lv(lv)
 , _doc(*LLBC_GetObjectFromUnsafetyPool<LLBC_Json::Document>())
 {
+    _doc.SetObject();
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()

@@ -282,7 +282,6 @@ bool LLBC_SockAddr_IN::operator ==(const LLBC_SockAddr_IN &right) const
 
 LLBC_Overlapped::LLBC_Overlapped()
 : opcode(LLBC_OverlappedOpcode::End)
-, sessionId(0)
 , sock(LLBC_INVALID_SOCKET_HANDLE)
 , acceptSock(LLBC_INVALID_SOCKET_HANDLE)
 , data(NULL)

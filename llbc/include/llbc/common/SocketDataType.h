@@ -309,7 +309,6 @@ struct LLBC_Overlapped
 #endif // LLBC_TARGET_PLATFORM_WIN32 
 {
     int opcode;
-    int sessionId;
     LLBC_SocketHandle sock;
     LLBC_SocketHandle acceptSock;
     void *data;
