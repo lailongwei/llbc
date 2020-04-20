@@ -26,7 +26,7 @@
 #include "llbc/core/utils/Util_Algorithm.h"
 
 __LLBC_INTERNAL_NS_BEGIN
-static inline void __SetCharFlag(LLBC_NS sint64 flag[2], char c)
+static inline void __SetEscapeCharFlag(LLBC_NS sint64 flag[2], char c)
 {
     if (c >= 0 && c < 64)
         flag[0] |= (LLBC_NS sint64) 1 << c;
@@ -34,7 +34,7 @@ static inline void __SetCharFlag(LLBC_NS sint64 flag[2], char c)
         flag[1] |= (LLBC_NS sint64) 1 << c;
 }
 
-static inline bool __IsSetCharFlag(LLBC_NS sint64 flag[2], char c)
+static inline bool __IsSetEscapeCharFlag(LLBC_NS sint64 flag[2], char c)
 {
     if (c >= 0 && c < 64)
         return flag[0] & ((LLBC_NS sint64) 1 << c);
@@ -183,11 +183,11 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
         return str;
 
     sint64 flag[2] = { 0 };
-    LLBC_INTERNAL_NS __SetCharFlag(flag, escapeChar);
+    LLBC_INTERNAL_NS __SetEscapeCharFlag(flag, escapeChar);
 
     const size_t escapeLen = willbeEscapeChars.size();
     for (int i = 0; i < escapeLen; ++i) 
-        LLBC_INTERNAL_NS __SetCharFlag(flag, willbeEscapeChars[i]);
+        LLBC_INTERNAL_NS __SetEscapeCharFlag(flag, willbeEscapeChars[i]);
 
     // todo: cpp11 buffer move into str
     char *buffer = NULL;
@@ -196,7 +196,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
     for (int i = 0; i < strLen; ++i)
     {
         const char t = str[i];
-        if (!LLBC_INTERNAL_NS __IsSetCharFlag(flag, t))
+        if (!LLBC_INTERNAL_NS __IsSetEscapeCharFlag(flag, t))
             continue;
 
         if (buffer == NULL)
@@ -205,7 +205,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
             LLBC_MemSet(buffer, 0x0, strLen * 2);
         }
 
-        memcpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
+        LLBC_MemCpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
         bufIdx += i - copyIdx;
         buffer[bufIdx++] = escapeChar;
         buffer[bufIdx++] = t;
@@ -215,7 +215,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
     if (buffer != NULL)
     {
         if (copyIdx < strLen)
-            memcpy(buffer + bufIdx, &str[copyIdx], strLen - copyIdx);
+            LLBC_MemCpy(buffer + bufIdx, &str[copyIdx], strLen - copyIdx);
 
         str = buffer;
         LLBC_Free(buffer);
