@@ -86,6 +86,26 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_UItoA(uint32 value, int radix);
 LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_I64toA(sint64 value, int radix);
 LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
 
+/**
+ * Escape LLBC_String.
+ * @param[in] str - string to escape.
+ * @param[in] willbeEscapeChars - char set of need to escape.
+ * @param[in] escapeChar - char of escape.
+ *
+ * @return LLBC_String - string result (same with input str).
+ */
+LLBC_EXTERN LLBC_EXPORT LLBC_String& LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscapeChars,
+                                                char escapeChar);
+
+/**
+ * UnEscape LLBC_String.
+ * @param[in] str - string to unescape.
+ * @param[in] escapeChar - char of escape.
+ *
+ * @return LLBC_String - string result (same with input str).
+ */
+LLBC_EXTERN LLBC_EXPORT LLBC_String &LLBC_StringUnEscape(LLBC_String &str, char escapeChar);
+
 __LLBC_NS_END
 
 /**

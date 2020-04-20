@@ -155,6 +155,76 @@ LLBC_String LLBC_UI64toA(uint64 value, int radix)
     return buf;
 }
 
+static inline void SetCharFlag(sint64 flag[2], char c)
+{
+    if (c >= 0 && c < 64)
+        flag[0] |= (sint64) 1 << c;
+    else if (c >= 64 && c < 128)
+        flag[1] |= (sint64) 1 << c;
+}
+
+static inline bool IsSetCharFlag(sint64 flag[2], char c)
+{
+    if (c >= 0 && c < 64)
+        return flag[0] & ((sint64) 1 << c);
+    else if (c >= 64 && c < 128)
+        return flag[1] & ((sint64) 1 << c);
+
+    return false;
+}
+
+LLBC_String& LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscapeChars, char escapeChar)
+{
+    const size_t strLen = str.size();
+    if (strLen <= 0)
+        return str;
+
+    sint64 flag[2] = { 0 };
+    const size_t escapeLen = willbeEscapeChars.size();
+    for (int i = 0; i < escapeLen; ++i)
+        SetCharFlag(flag, willbeEscapeChars[i]);
+
+	SetCharFlag(flag, escapeChar);
+
+	//todo: cpp11 buffer move into str
+	char *buffer = NULL;
+    int bufIdx = 0;
+    int copyIdx = 0;
+	for (int i = 0; i < strLen; ++i)
+	{
+        const char t = str[i];
+        if (!IsSetCharFlag(flag, t))
+			continue;
+
+		if (buffer == NULL)
+		{
+            buffer = new char[strLen * 2];
+            memset(buffer, 0x0, strLen * 2);
+		}
+
+		memcpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
+        bufIdx += i - copyIdx;
+        buffer[bufIdx++] = escapeChar;
+        buffer[bufIdx++] = t;
+        copyIdx = i + 1;
+	}
+
+	if (buffer != NULL)
+	{
+        if (copyIdx < strLen)
+            memcpy(buffer + bufIdx, &str[copyIdx], strLen - copyIdx);
+
+        str = buffer;
+        delete[] buffer;
+	}
+    return str;
+}
+
+LLBC_String &LLBC_StringUnEscape(LLBC_String &str, char escapeChar)
+{
+    return str.unescape(escapeChar);
+}
+
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32

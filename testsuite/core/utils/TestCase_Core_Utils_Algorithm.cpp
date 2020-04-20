@@ -50,6 +50,29 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
 
     LLBC_PrintLine("test completed, press any key to exit");
 
+    LLBC_String willEscape = ".#=";
+    const static int nEscapeTestNum = 100000;
+	std::vector<LLBC_String> t1;
+    std::vector<LLBC_String> t2;
+    t1.resize(nEscapeTestNum, "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.");
+    t2.resize(nEscapeTestNum, "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.");
+
+	LLBC_Time begTestTime = LLBC_Time::Now();
+    for (int i = 0; i < nEscapeTestNum; ++i)
+	{
+        t1[i].escape(willEscape, '\\');
+	}
+    LLBC_PrintLine("LLBC_String escape test used time(ms): %lld",
+                   (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
+	begTestTime = LLBC_Time::Now();
+    for (int i = 0; i < nEscapeTestNum; ++i)
+    {
+        LLBC_StringEscape(t2[i], willEscape, '\\');
+    }
+    LLBC_PrintLine("Algorithm LLBC_String escape test used time(ms): %lld",
+                   (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
     getchar();
 
     return 0;
