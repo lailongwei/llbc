@@ -21,8 +21,29 @@
 
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
+#include "llbc/common/Macro.h"
 
 #include "llbc/core/utils/Util_Algorithm.h"
+
+__LLBC_INTERNAL_NS_BEGIN
+static inline void __SetCharFlag(LLBC_NS sint64 flag[2], char c)
+{
+    if (c >= 0 && c < 64)
+        flag[0] |= (LLBC_NS sint64) 1 << c;
+    else if (c >= 64 && c < 128)
+        flag[1] |= (LLBC_NS sint64) 1 << c;
+}
+
+static inline bool __IsSetCharFlag(LLBC_NS sint64 flag[2], char c)
+{
+    if (c >= 0 && c < 64)
+        return flag[0] & ((LLBC_NS sint64) 1 << c);
+    else if (c >= 64 && c < 128)
+        return flag[1] & ((LLBC_NS sint64) 1 << c);
+
+    return false;
+}
+__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -155,24 +176,6 @@ LLBC_String LLBC_UI64toA(uint64 value, int radix)
     return buf;
 }
 
-static inline void SetCharFlag(sint64 flag[2], char c)
-{
-    if (c >= 0 && c < 64)
-        flag[0] |= (sint64) 1 << c;
-    else if (c >= 64 && c < 128)
-        flag[1] |= (sint64) 1 << c;
-}
-
-static inline bool IsSetCharFlag(sint64 flag[2], char c)
-{
-    if (c >= 0 && c < 64)
-        return flag[0] & ((sint64) 1 << c);
-    else if (c >= 64 && c < 128)
-        return flag[1] & ((sint64) 1 << c);
-
-    return false;
-}
-
 LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscapeChars, char escapeChar)
 {
     const size_t strLen = str.size();
@@ -180,11 +183,11 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
         return str;
 
     sint64 flag[2] = { 0 };
+    LLBC_INTERNAL_NS __SetCharFlag(flag, escapeChar);
+
     const size_t escapeLen = willbeEscapeChars.size();
     for (int i = 0; i < escapeLen; ++i) 
-        SetCharFlag(flag, willbeEscapeChars[i]);
-
-    SetCharFlag(flag, escapeChar);
+        LLBC_INTERNAL_NS __SetCharFlag(flag, willbeEscapeChars[i]);
 
     // todo: cpp11 buffer move into str
     char *buffer = NULL;
@@ -193,13 +196,13 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
     for (int i = 0; i < strLen; ++i)
     {
         const char t = str[i];
-        if (!IsSetCharFlag(flag, t))
+        if (!LLBC_INTERNAL_NS __IsSetCharFlag(flag, t))
             continue;
 
         if (buffer == NULL)
         {
-            buffer = new char[strLen * 2];
-            memset(buffer, 0x0, strLen * 2);
+            buffer = LLBC_Malloc(char, strLen * 2);
+            LLBC_MemSet(buffer, 0x0, strLen * 2);
         }
 
         memcpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
@@ -215,7 +218,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
             memcpy(buffer + bufIdx, &str[copyIdx], strLen - copyIdx);
 
         str = buffer;
-        delete[] buffer;
+        LLBC_Free(buffer);
     }
     return str;
 }
