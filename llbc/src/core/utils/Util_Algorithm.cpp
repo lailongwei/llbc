@@ -173,7 +173,7 @@ static inline bool IsSetCharFlag(sint64 flag[2], char c)
     return false;
 }
 
-LLBC_String& LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscapeChars, char escapeChar)
+LLBC_String &LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscapeChars, char escapeChar)
 {
     const size_t strLen = str.size();
     if (strLen <= 0)
@@ -181,42 +181,42 @@ LLBC_String& LLBC_StringEscape(LLBC_String &str, const LLBC_String &willbeEscape
 
     sint64 flag[2] = { 0 };
     const size_t escapeLen = willbeEscapeChars.size();
-    for (int i = 0; i < escapeLen; ++i)
+    for (int i = 0; i < escapeLen; ++i) 
         SetCharFlag(flag, willbeEscapeChars[i]);
 
-	SetCharFlag(flag, escapeChar);
+    SetCharFlag(flag, escapeChar);
 
-	//todo: cpp11 buffer move into str
-	char *buffer = NULL;
+    // todo: cpp11 buffer move into str
+    char *buffer = NULL;
     int bufIdx = 0;
     int copyIdx = 0;
-	for (int i = 0; i < strLen; ++i)
-	{
+    for (int i = 0; i < strLen; ++i)
+    {
         const char t = str[i];
         if (!IsSetCharFlag(flag, t))
-			continue;
+            continue;
 
-		if (buffer == NULL)
-		{
+        if (buffer == NULL)
+        {
             buffer = new char[strLen * 2];
             memset(buffer, 0x0, strLen * 2);
-		}
+        }
 
-		memcpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
+        memcpy(buffer + bufIdx, &str[copyIdx], i - copyIdx);
         bufIdx += i - copyIdx;
         buffer[bufIdx++] = escapeChar;
         buffer[bufIdx++] = t;
         copyIdx = i + 1;
-	}
+    }
 
-	if (buffer != NULL)
-	{
+    if (buffer != NULL)
+    {
         if (copyIdx < strLen)
             memcpy(buffer + bufIdx, &str[copyIdx], strLen - copyIdx);
 
         str = buffer;
         delete[] buffer;
-	}
+    }
     return str;
 }
 
