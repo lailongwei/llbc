@@ -48,24 +48,27 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     LLBC_PrintLine("UNKNOWN string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::Unknown));
     LLBC_PrintLine("0xff3d string: %s", LLBC_FlowType::Type2Str(0xff3d));
 
-    LLBC_PrintLine("test completed, press any key to exit");
 
     LLBC_String willEscape = ".#=";
     const static int nEscapeTestNum = 100000;
-	std::vector<LLBC_String> t1;
+    std::vector<LLBC_String> t1;
     std::vector<LLBC_String> t2;
-    t1.resize(nEscapeTestNum, "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.");
-    t2.resize(nEscapeTestNum, "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.");
+    t1.resize(nEscapeTestNum,
+              "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn="
+              "abcdefghijklmn#abcdefghijklmn.");
+    t2.resize(nEscapeTestNum,
+              "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn="
+              "abcdefghijklmn#abcdefghijklmn.");
 
-	LLBC_Time begTestTime = LLBC_Time::Now();
+    LLBC_Time begTestTime = LLBC_Time::Now();
     for (int i = 0; i < nEscapeTestNum; ++i)
-	{
+    {
         t1[i].escape(willEscape, '\\');
-	}
+    }
     LLBC_PrintLine("LLBC_String escape test used time(ms): %lld",
                    (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
-	begTestTime = LLBC_Time::Now();
+    begTestTime = LLBC_Time::Now();
     for (int i = 0; i < nEscapeTestNum; ++i)
     {
         LLBC_StringEscape(t2[i], willEscape, '\\');
@@ -73,6 +76,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     LLBC_PrintLine("Algorithm LLBC_String escape test used time(ms): %lld",
                    (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
+    LLBC_PrintLine("test completed, press any key to exit");
     getchar();
 
     return 0;
