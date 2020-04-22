@@ -194,13 +194,13 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         if (!LLBC_INTERNAL_NS __IsSetEscapeCharFlag(flags, ch))
             continue;
 
-        if (buffer == NULL)
+        if (UNLIKELY(buffer == NULL))
             buffer = LLBC_Calloc(char, strLen * 2);
 
-        const size_t nCopyLen = i - copyIdx;
-        LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], nCopyLen);
+        const size_t copyLen = i - copyIdx;
+        LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
 
-        bufIdx += nCopyLen;
+        bufIdx += copyLen;
         buffer[bufIdx++] = escapeChar;
         buffer[bufIdx++] = ch;
         copyIdx = i + 1;
@@ -210,9 +210,9 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
     {
         if (copyIdx < strLen)
         {
-            const size_t nCopyLen = strLen - copyIdx;
-            LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], nCopyLen);
-            bufIdx += nCopyLen;
+            const size_t copyLen = strLen - copyIdx;
+            LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+            bufIdx += copyLen;
         }
 
         escapeString.assign(buffer, bufIdx);
