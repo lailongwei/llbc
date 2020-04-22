@@ -21,8 +21,25 @@
 
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
+#include "llbc/common/Macro.h"
 
 #include "llbc/core/utils/Util_Algorithm.h"
+
+__LLBC_INTERNAL_NS_BEGIN
+static inline void __SetEscapeCharFlag(LLBC_NS uint8 flags[16], char c)
+{
+    if (c >= 0)
+        flags[c >> 3] |= ((LLBC_NS uint8) 1 << (c % 8));
+}
+
+static inline bool __IsSetEscapeCharFlag(LLBC_NS uint8 flags[16], char c)
+{
+    if (c >= 0)
+        return flags[c >> 3] & ((LLBC_NS uint8) 1 << (c % 8));
+
+    return false;
+}
+__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -153,6 +170,60 @@ LLBC_String LLBC_UI64toA(uint64 value, int radix)
     } while (firstDigit < p);
 
     return buf;
+}
+
+LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &willEscapeChars, char escapeChar)
+{
+    const size_t strLen = escapeString.size();
+    if (strLen == 0)
+        return escapeString;
+
+    uint8 flags[16] = { 0 };
+    LLBC_INTERNAL_NS __SetEscapeCharFlag(flags, escapeChar);
+
+    const size_t escapeLen = willEscapeChars.size();
+    for (int i = 0; i < escapeLen; ++i) 
+        LLBC_INTERNAL_NS __SetEscapeCharFlag(flags, willEscapeChars[i]);
+
+    // todo: cpp11 buffer move into str
+    char *buffer = NULL;
+    size_t bufIdx = 0, copyIdx = 0;
+    for (int i = 0; i < strLen; ++i)
+    {
+        const char &ch = escapeString[i];
+        if (!LLBC_INTERNAL_NS __IsSetEscapeCharFlag(flags, ch))
+            continue;
+
+        if (UNLIKELY(buffer == NULL))
+            buffer = LLBC_Calloc(char, strLen * 2);
+
+        const size_t copyLen = i - copyIdx;
+        LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+
+        bufIdx += copyLen;
+        buffer[bufIdx++] = escapeChar;
+        buffer[bufIdx++] = ch;
+        copyIdx = i + 1;
+    }
+
+    if (buffer != NULL)
+    {
+        if (copyIdx < strLen)
+        {
+            const size_t copyLen = strLen - copyIdx;
+            LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+            bufIdx += copyLen;
+        }
+
+        escapeString.assign(buffer, bufIdx);
+        LLBC_Free(buffer);
+    }
+    return escapeString;
+}
+
+LLBC_String &LLBC_StringUnEscape(LLBC_String &escapeString, char escapeChar)
+{
+    return escapeString.unescape(escapeChar);
 }
 
 __LLBC_NS_END
