@@ -162,7 +162,7 @@ public:
 public:
     void OnRecvData(LLBC_Packet &packet)
     {
-        TestData *data = (TestData *)packet.GetDecoder();
+        TestData *data = packet.GetDecoder<TestData>();
         LLBC_PrintLine("Receive data[%d], iVal: %d, strVal: %s", 
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 

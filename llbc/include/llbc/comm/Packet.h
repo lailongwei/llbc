@@ -451,6 +451,8 @@ public:
      * @return LLBC_ICoder * - encoder.
      */
     LLBC_ICoder *GetEncoder() const;
+    template <typename CoderType>
+    CoderType *GetEncoder() const;
 
     /**
      * Set encoder.
@@ -469,6 +471,8 @@ public:
      * @return LLBC_ICoder * - decoder.
      */
     LLBC_ICoder *GetDecoder() const;
+    template <typename CoderType>
+    CoderType *GetDecoder() const;
 
     /**
      * Set decoder.
