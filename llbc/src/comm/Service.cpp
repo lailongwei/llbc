@@ -477,6 +477,8 @@ int LLBC_Service::Listen(const char *ip,
     const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, true);
+    else
+        LLBC_XDelete(protoFactory);
 
     return sessionId;
 }
@@ -491,6 +493,8 @@ int LLBC_Service::Connect(const char *ip,
     const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, false);
+    else
+        LLBC_XDelete(protoFactory);
 
     return sessionId;
 }
@@ -504,7 +508,15 @@ int LLBC_Service::AsyncConn(const char *ip,
     LLBC_LockGuard guard(_lock);
 
     int pendingSessionId;
-    return _pollerMgr.AsyncConn(ip, port, pendingSessionId, protoFactory, sessionOpts);
+    const int asyncConnRet = _pollerMgr.AsyncConn(ip,
+                                                  port,
+                                                  pendingSessionId,
+                                                  protoFactory,
+                                                  sessionOpts);
+    if (asyncConnRet != LLBC_OK)
+        LLBC_XDelete(protoFactory);
+
+    return asyncConnRet;
 }
 
 bool LLBC_Service::IsSessionValidate(int sessionId)

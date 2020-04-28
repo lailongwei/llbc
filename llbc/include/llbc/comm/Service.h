@@ -158,6 +158,7 @@ public:
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when Listen failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
@@ -175,6 +176,7 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when Connect failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
@@ -193,6 +195,7 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established,
