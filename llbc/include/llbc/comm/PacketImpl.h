@@ -723,6 +723,18 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t 
     return _payload;
 }
 
+template <typename CoderType>
+LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetDecoder() const
+{
+    return static_cast<CoderType *>(_decoder);
+}
+
+template <typename CoderType>
+LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetEncoder() const
+{
+    return static_cast<CoderType *>(_encoder);
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_COMM_PACKET_H__
