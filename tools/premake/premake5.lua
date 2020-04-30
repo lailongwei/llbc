@@ -227,6 +227,12 @@ project "testsuite"
         }
     filter {}
 
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
