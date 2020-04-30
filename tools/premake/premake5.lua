@@ -147,7 +147,7 @@ project "llbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "--std=c++11",
+            "-std=c++11",
         }
     filter {}
 
