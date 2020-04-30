@@ -21,17 +21,17 @@
 
 #ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
 
+#include "llbc/core/objectpool/IObjectPoolInst.h"
+
 __LLBC_NS_BEGIN
 
 inline LLBC_PoolObjectReflectionBase::LLBC_PoolObjectReflectionBase()
     : _poolInst(NULL)
 {
-    //do nothing
 }
 
 inline LLBC_PoolObjectReflectionBase::~LLBC_PoolObjectReflectionBase() 
 {
-    //do nothing
 }
 
 inline void LLBC_PoolObjectReflectionBase::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
