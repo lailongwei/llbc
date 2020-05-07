@@ -40,6 +40,7 @@ namespace
 __LLBC_INTERNAL_NS_BEGIN
 
 static const size_t __llbc_headerLen = 28;
+static const size_t __llbc_maxPacketLen = 64 * 1024;
 
 void LLBC_FORCE_INLINE __DelBlock(void *data)
 {
@@ -161,7 +162,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
             _packet->SetAcceptSessionId(_acceptSessionId);
             // Check length.
             const size_t packetLen = _packet->GetLength();
-            if (packetLen < LLBC_INL_NS __llbc_headerLen)
+            if (packetLen < LLBC_INL_NS __llbc_headerLen || packetLen > LLBC_INL_NS __llbc_maxPacketLen)
             {
                 _stack->Report(this,
                                LLBC_ProtoReportLevel::Error,
