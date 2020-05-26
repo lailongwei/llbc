@@ -37,6 +37,7 @@ public:
 private:
     void TestGuardFunc();
     void TestGuardMeth();
+    void TestGuardVariableArgument();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_THREAD_GUARD_H__
