@@ -201,6 +201,10 @@
 // Note:
 // - this buffer size is initialize recv buffer size, if not enough to recv socket data, will auto expand.
 #define LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE             1024
+// Default max packet size
+// Note:
+// - this packet size is PacketProcol limit, the size is only used for PacketProcol
+#define LLBC_CFG_COMM_DFT_MAX_PACKET_SIZE                   LLBC_INFINITE
 // Session recv buffer use object pool option, this option is performance option.
 // Note: 
 // - if enabled, can improvement read data from socket performance,

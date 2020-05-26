@@ -183,7 +183,8 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *p
              sock->SetNoDelay(sessionOpts.IsNoDelay()) ||
              (sessionOpts.GetSockSendBufSize() != 0 && sock->SetSendBufSize(sessionOpts.GetSockSendBufSize()) != LLBC_OK) ||
              (sessionOpts.GetSockRecvBufSize() != 0 && sock->SetRecvBufSize(sessionOpts.GetSockRecvBufSize()) != LLBC_OK) ||
-             sock->Listen() != LLBC_OK)
+             sock->Listen() != LLBC_OK ||
+             sock->SetMaxPacketSize(sessionOpts.GetMaxPacketSize()) != LLBC_OK)
     {
         LLBC_Delete(sock);
         return 0;

@@ -27,12 +27,14 @@ inline LLBC_SessionOpts::LLBC_SessionOpts(bool noDelay,
                                           size_t sockSendBufSize,
                                           size_t sockRecvBufSize,
                                           size_t sessionSendBufSize,
-                                          size_t sessionRecvBufSize)
+                                          size_t sessionRecvBufSize,
+                                          size_t maxPacketSize)
 : _noDelay(noDelay)
 , _sockSendBufSize(sockSendBufSize)
 , _sockRecvBufSize(sockRecvBufSize)
 , _sessionSendBufSize(sessionSendBufSize)
 , _sessionRecvBufSize(sessionRecvBufSize)
+, _maxPacketSize(maxPacketSize)
 {
 }
 
@@ -93,6 +95,16 @@ inline void LLBC_SessionOpts::SetSessionRecvBufSize(size_t sessionRecvBufSize)
 inline bool LLBC_SessionOpts::operator==(const LLBC_SessionOpts &another) const
 {
     return ::memcmp(this, &another, sizeof(LLBC_SessionOpts)) == 0;
+}
+
+inline size_t LLBC_SessionOpts::GetMaxPacketSize() const
+{
+    return _maxPacketSize;
+}
+
+inline void LLBC_SessionOpts::SetMaxPacketSize(size_t size)
+{ 
+    _maxPacketSize = size; 
 }
 
 __LLBC_NS_END

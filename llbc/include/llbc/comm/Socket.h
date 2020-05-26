@@ -211,6 +211,19 @@ public:
      */
     int SetOption(int level, int optname, const void *optval, LLBC_SocketLen optlen);
 
+     /**
+     * Get max packet size.
+     * @return size_t - the max packet size.
+     */
+    size_t GetMaxPacketSize() const;
+
+    /**
+     * Set max packet size.
+     * @param[in] size - packet size, in bytes.
+     * @return int - return 0 if succerss, otherwise return -1.
+     */
+    int SetMaxPacketSize(size_t size);
+
 public:
     /**
      * Bind current socket to specific ip address and port.
@@ -469,6 +482,7 @@ private:
     LLBC_SockAddr_IN _localAddr;
 
     LLBC_MessageBuffer _willSend;
+    size_t _maxPacketSize;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     bool _nonBlocking;

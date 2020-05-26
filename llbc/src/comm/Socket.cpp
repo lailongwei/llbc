@@ -63,6 +63,8 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 , _localAddr()
 
 , _willSend()
+, _maxPacketSize(LLBC_CFG_COMM_DFT_MAX_PACKET_SIZE)
+
 #if LLBC_TARGET_PLATFORM_WIN32
 , _nonBlocking(false)
 , _olGroup()
@@ -268,6 +270,20 @@ int LLBC_Socket::GetOption(int level, int optname, void *optval, LLBC_SocketLen 
 int LLBC_Socket::SetOption(int level, int optname, const void *optval, LLBC_SocketLen optlen)
 {
     return LLBC_SetSocketOption(_handle, level, optname, optval, optlen);
+}
+
+size_t LLBC_Socket::GetMaxPacketSize() const
+{
+    return _maxPacketSize;
+}
+
+int LLBC_Socket::SetMaxPacketSize(size_t size)
+{
+    if (UNLIKELY(size < 0))
+        return -1;
+
+    _maxPacketSize = (size != 0) ? size : LLBC_INFINITE;
+    return 0;
 }
 
 int LLBC_Socket::BindTo(const char *ip, uint16 port)
