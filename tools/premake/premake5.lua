@@ -7,7 +7,36 @@
 
 -- python tool define
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
-local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
+
+-- Capture shell cmd's output
+local function os_capture(cmd, raw)
+    local f = assert(io.popen(cmd, 'r'))
+    local s = assert(f:read('*a'))
+    f:close()
+    if raw then return s end
+    s = string.gsub(s, '^%s+', '')
+    s = string.gsub(s, '%s+$', '')
+    s = string.gsub(s, '[\n\r]+', ' ')
+    return s
+end
+
+-- PY target
+local PY
+if IS_WINDOWS then
+    PY = "$(ProjectDir)../../tools/py.exe"
+else
+    local output = os_capture("python --version")
+    if output:find("command not found") then
+        error("python command not found")
+    elseif output:find("Python 3") then
+        if os_capture("which python2"):len() == 0 then
+            error("Python3 is not yet supported, please install python2 and make sure python2 can be use")
+        end
+        PY = "python2"
+    else
+        PY = "python"
+    end
+end
 
 -- All libraries output directory
 LLBC_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
