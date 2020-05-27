@@ -29,6 +29,12 @@ namespace
         std::cout <<"  The data argument: " <<data <<std::endl;
     }
 
+    void GuardFuncArg3(void *data, int a1, int a2)
+    {
+        std::cout << "Test Guard 3 Args Function Called!" << std::endl;
+        fprintf(stdout, "  The data argument: %p, %d, %d\n", data, a1, a2);
+    }
+
     class GuardCls
     {
     public:
@@ -36,6 +42,12 @@ namespace
         {
             std::cout <<"Test Guard Method Called!" <<std::endl;
             std::cout <<"  The data argument: " <<data <<std::endl;
+        }
+
+        void GuardFuncArg3(void *data, int a1, int a2) 
+        {
+            std::cout << "Test Guard 3 Args Function Called!" << std::endl;
+            fprintf(stdout, "  The data argument: %p, %d, %d\n", data, a1, a2);
         }
     };
 }
@@ -53,7 +65,7 @@ int TestCase_Core_Thread_Guard::Run(int argc, char *argv[])
     std::cout <<"core/thread/guard test:" <<std::endl;
     TestGuardFunc();
     TestGuardMeth();
-
+    TestGuardVariableArgument();
     std::cout <<"Press any key to continue...";
     getchar();
 
@@ -72,5 +84,18 @@ void TestCase_Core_Thread_Guard::TestGuardMeth()
     GuardCls obj;
     {
         LLBC_InvokeGuard guard(&obj, &GuardCls::GuardMeth, (void *)0x02);
+    }
+}
+
+void TestCase_Core_Thread_Guard::TestGuardVariableArgument() 
+{
+    std::cout << "Guard Method test:" << std::endl;
+    { 
+        LLBC_InvokeGuardSpec guard(&GuardFuncArg3, (void *)0x01, 1, 2);
+    }
+
+    GuardCls obj;
+    { 
+        LLBC_InvokeGuardSpec guard(&GuardCls::GuardFuncArg3, &obj, (void *) 0x02, 3, 4);
     }
 }

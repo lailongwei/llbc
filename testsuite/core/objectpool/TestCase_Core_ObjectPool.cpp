@@ -189,6 +189,36 @@ namespace
         }
     };
 
+    class ObjectReflectionBaseTestObj : public LLBC_PoolObjectReflectionBase
+    {
+    public:
+        ObjectReflectionBaseTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        virtual ~ObjectReflectionBaseTestObj()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+
+        void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+        {
+            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+        }
+
+        void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
+        {
+            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+        }
+
+    public:
+        void Clear()
+        {
+            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+        }
+    };
+
     class ComplexObj
     {
     public:
@@ -409,6 +439,31 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         for (int i = 0; i < testTimes; ++i)
         {
             ReflectionableTestObj *obj = pool.Get<ReflectionableTestObj>();
+            pool.Release(obj);
+        }
+    }
+
+    {
+        LLBC_ObjectPool<> pool;
+
+        const int testTimes = 10;
+        LLBC_PrintLine("ObjectReflectionBaseTestObj object test(times:%d)", testTimes);
+        LLBC_PrintLine("Is <ObjectReflectionBaseTestObj supported pool-object reflection:%s",
+                       LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<ObjectReflectionBaseTestObj>() ? "True" : "False");
+
+        ObjectReflectionBaseTestObj *ro = pool.Get<ObjectReflectionBaseTestObj>();
+        LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
+        LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
+        LLBC_PrintLine("Reflection method support:GiveBackToPool():");
+        LLBC_PoolObjectReflection::GiveBackToPool(ro);
+
+        LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
+        LLBC_ObjectGuard<LLBC_MessageBlock> block = pool.GetGuarded<LLBC_MessageBlock>();
+        pkt->Write("hello world");
+
+        for (int i = 0; i < testTimes; ++i)
+        {
+            ObjectReflectionBaseTestObj *obj = pool.Get<ObjectReflectionBaseTestObj>();
             pool.Release(obj);
         }
     }

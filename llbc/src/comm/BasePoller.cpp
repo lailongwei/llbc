@@ -366,6 +366,7 @@ void LLBC_BasePoller::SetConnectedSocketOpts(LLBC_Socket *sock, const LLBC_Sessi
 {
     sock->UpdateLocalAddress();
     sock->UpdatePeerAddress();
+    sock->SetMaxPacketSize(sessionOpts.GetMaxPacketSize());
 
     if (sessionOpts.GetSockSendBufSize() != 0)
         sock->SetSendBufSize(sessionOpts.GetSockSendBufSize());

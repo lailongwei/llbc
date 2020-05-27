@@ -145,6 +145,29 @@ private:
     void *_data;
 };
 
+/**
+ * \brief The invoke guard spec helper class encapsulation.
+ */
+class LLBC_InvokeGuardSpec
+{
+public:
+    /**
+     * Create function type invoke guard.
+     * @param[in] func - the guard invoke function pointer.
+     * @param[in] args - the call data(variable argument).
+     */
+    template <typename Func, typename... Args>
+    LLBC_InvokeGuardSpec(Func &&func, Args &&... args);
+
+    ~LLBC_InvokeGuardSpec();
+
+private:
+    LLBC_DISABLE_ASSIGNMENT(LLBC_InvokeGuardSpec);
+
+private:
+    std::function<void()> _invoker;
+};
+
 __LLBC_NS_END
 
 #include "llbc/core/thread/GuardImpl.h"

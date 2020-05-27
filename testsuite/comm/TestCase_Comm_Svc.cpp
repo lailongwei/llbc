@@ -149,6 +149,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     LLBC_SessionOpts sessionOpts;
     sessionOpts.SetSockSendBufSize(1 * 1024 * 1024);
     sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
+    sessionOpts.SetMaxPacketSize(64 * 1024);
     if (!asClient)
     {
         LLBC_PrintLine("Will listening in %s:%d", ip, port);

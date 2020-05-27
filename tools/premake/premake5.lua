@@ -176,6 +176,7 @@ project "llbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -252,6 +253,12 @@ project "testsuite"
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
+        }
+    filter {}
+
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
         }
     filter {}
 

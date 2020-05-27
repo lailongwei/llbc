@@ -40,7 +40,8 @@ public:
                               size_t sockSendBufSize = 0,
                               size_t sockRecvBufSize = 0,
                               size_t sessionSendBufSize = LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE,
-                              size_t sessionRecvBufSize = LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE);
+                              size_t sessionRecvBufSize = LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE,
+                              size_t maxPacketSize = LLBC_CFG_COMM_DFT_MAX_PACKET_SIZE);
     ~LLBC_SessionOpts();
 
 public:
@@ -112,6 +113,19 @@ public:
 
 public:
     /**
+     * Get max packet size.
+     * @return size_t - the max packet size.
+     */
+    size_t GetMaxPacketSize() const;
+
+    /**
+     * Set max packet size.
+     * @param[in] size - packet size, in bytes.
+     */
+    void SetMaxPacketSize(size_t size);
+
+public:
+    /**
      * operator ==
      */
     bool operator ==(const LLBC_SessionOpts &another) const;
@@ -122,6 +136,7 @@ private:
     size_t _sockRecvBufSize; // socket recv buffer size, in bytes, default is 0, it means use os default.
     size_t _sessionSendBufSize; // session send buffer size, in bytes, default is LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE
     size_t _sessionRecvBufSize; // sessiontrecv buffer size(init size), in bytes, default is LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE.
+    size_t _maxPacketSize; // max packet seize in packet protocol
 };
 
 __LLBC_NS_END
