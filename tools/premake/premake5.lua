@@ -399,6 +399,7 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -472,6 +473,7 @@ project "csllbc_native"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -819,6 +821,7 @@ project "lullbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 

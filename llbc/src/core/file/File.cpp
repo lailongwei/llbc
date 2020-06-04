@@ -740,13 +740,29 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
     while (copiedSize != srcFileSize)
     {
         long copiableSize = MIN(srcFileSize - copiedSize, copyBufSize);
-        long actuallyCopy = srcFile.Read(copyBuf, copiableSize);
-        if (UNLIKELY(actuallyCopy == -1))
+        long actuallyRead = srcFile.Read(copyBuf, copiableSize);
+        if (UNLIKELY(actuallyRead == -1)) // encountered error, return failed.
         {
             LLBC_Free(copyBuf);
             return LLBC_FAILED;
         }
-        else if (UNLIKELY(actuallyCopy != copiableSize))
+
+        if (LIKELY(actuallyRead != 0)) // actually read some data from source file, copy to dest file.
+        {
+            long actuallyCopy = destFile.Write(copyBuf, actuallyRead);
+            if (UNLIKELY(actuallyCopy == -1)) // encountered error, return failed.
+            {
+                LLBC_Free(copyBuf);
+                return LLBC_FAILED;
+            }
+            else if (UNLIKELY(actuallyCopy != actuallyRead)) // could not write all data to dest file, return failed.
+            {
+                LLBC_Free(copyBuf);
+                return LLBC_FAILED;
+            }
+        }
+
+        if (UNLIKELY(actuallyRead != copiableSize))
         {
             LLBC_Free(copyBuf);
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
@@ -754,7 +770,7 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
             return LLBC_FAILED;
         }
 
-        copiedSize += actuallyCopy;
+        copiedSize += actuallyRead;
     }
 
     LLBC_Free(copyBuf);
