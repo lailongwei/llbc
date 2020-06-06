@@ -64,6 +64,11 @@ inline size_t LLBC_Event::GetIntKeyParamsCount() const
     return _intKeyParams != NULL ? _intKeyParams->size() : 0;
 }
 
+inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
+{
+    return _constantStrKeyParams != NULL ? _constantStrKeyParams->size() : 0;
+}
+
 inline size_t LLBC_Event::GetStrKeyParamsCount() const
 {
     return _strKeyParams != NULL ? _strKeyParams->size() : 0;

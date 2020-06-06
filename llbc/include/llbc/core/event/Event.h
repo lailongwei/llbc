@@ -139,6 +139,18 @@ public:
     size_t GetIntKeyParamsCount() const;
 
     /**
+    * Get all constant string key indexed params.
+    * @return const std::map<LLBC_CString, LLBC_Variant> & - the constant string key indexed params const reference.
+    */
+    const std::map<LLBC_CString, LLBC_Variant> &GetConstantStrKeyParams() const;
+
+    /**
+    * Get all constant string key indexed params count.
+    * @return size_t - the constant string key indexed params count.
+    */
+    size_t GetConstantStrKeyParamsCount() const;
+
+    /**
      * Get all string key indexed params.
      * @return const std::map<LLBC_String, LLBC_Variant> & - the string key indexed params const reference.
      */
@@ -172,6 +184,9 @@ protected:
 
     typedef std::map<int, LLBC_Variant> _IntKeyParams;
     _IntKeyParams *_intKeyParams;
+
+    typedef std::map<LLBC_CString, LLBC_Variant> _ConstantStrKeyParams;
+    _ConstantStrKeyParams *_constantStrKeyParams;
 
     typedef std::map<LLBC_String, LLBC_Variant> _StrKeyParams;
     _StrKeyParams *_strKeyParams;
