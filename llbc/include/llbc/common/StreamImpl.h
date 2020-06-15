@@ -401,6 +401,9 @@ inline bool LLBC_Stream::ReadBuffer(void *buf, size_t len)
 
 inline void LLBC_Stream::Resize(size_t newSize)
 {
+    if (UNLIKELY(_attach))
+        return;
+
     if (newSize > _size)
     {
         _buf = realloc(_buf, newSize);
