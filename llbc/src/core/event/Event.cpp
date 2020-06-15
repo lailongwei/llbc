@@ -31,7 +31,7 @@ static const LLBC_NS LLBC_Variant __nilVariant;
 
 static const std::map<int, LLBC_NS LLBC_Variant> __emptyIntKeyParams;
 static const std::map<LLBC_NS LLBC_String, LLBC_NS LLBC_Variant> __emptyStrKeyParams;
-static const std::map<const char*, LLBC_NS LLBC_Variant> __emptyConstantStrKeyParams;
+static const std::map<LLBC_NS LLBC_CString, LLBC_NS LLBC_Variant> __emptyConstantStrKeyParams;
 
 __LLBC_INTERNAL_NS_END
 
@@ -72,7 +72,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const char* key) const
     if (_constantStrKeyParams == NULL)
         return LLBC_INL_NS __nilVariant;
 
-    _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(key);
+    _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(LLBC_CString(key));
     return it != _constantStrKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
@@ -104,9 +104,10 @@ LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
     if (_constantStrKeyParams == NULL)
         _constantStrKeyParams = LLBC_New0(_ConstantStrKeyParams);
 
-    _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(key);
+    LLBC_CString csKey(key);
+    _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
     if (it == _constantStrKeyParams->end())
-        _constantStrKeyParams->insert(std::make_pair(key, param));
+        _constantStrKeyParams->insert(std::make_pair(csKey, param));
     else
         it->second = param;
 
@@ -132,7 +133,7 @@ const std::map<int, LLBC_Variant> &LLBC_Event::GetIntKeyParams() const
     return _intKeyParams != NULL ? *_intKeyParams: LLBC_INL_NS __emptyIntKeyParams;
 }
 
-const std::map<const char*, LLBC_Variant> &LLBC_Event::GetConstantStrKeyParams() const
+const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetConstantStrKeyParams() const
 {
     return _constantStrKeyParams != NULL ? *_constantStrKeyParams : LLBC_INL_NS __emptyConstantStrKeyParams;
 }
@@ -159,9 +160,10 @@ LLBC_Variant &LLBC_Event::operator [](const char *key)
     if (!_constantStrKeyParams)
         _constantStrKeyParams = LLBC_New0(_ConstantStrKeyParams);
 
-    _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(key);
+    LLBC_CString csKey(key);
+    _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
     if (it == _constantStrKeyParams->end())
-        return _constantStrKeyParams->insert(std::make_pair(key, LLBC_Variant())).first->second;
+        return _constantStrKeyParams->insert(std::make_pair(csKey, LLBC_Variant())).first->second;
     else
         return it->second;
 }
@@ -192,7 +194,7 @@ const LLBC_Variant &LLBC_Event::operator [](const char* key) const
     if (!_constantStrKeyParams)
         return LLBC_INL_NS __nilVariant;
 
-    _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(key);
+    _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(LLBC_CString(key));
     return it != _constantStrKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
