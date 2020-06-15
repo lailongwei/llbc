@@ -118,8 +118,7 @@ int pyllbc_Stream::SetSize(size_t size)
 
 LLBC_Stream &pyllbc_Stream::GetLLBCStream()
 {
-    const This *cthis = this;
-    return const_cast<LLBC_Stream &>(cthis->GetLLBCStream());
+    return _stream;
 }
 
 const LLBC_Stream &pyllbc_Stream::GetLLBCStream() const

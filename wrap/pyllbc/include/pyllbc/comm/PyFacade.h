@@ -183,6 +183,9 @@ private:
     PyObject *_keyCObj;
 
     PyObject *_pyPacketCls;
+
+    PyObject *_pyStream;
+    pyllbc_Stream *_nativeStream;
 };
 
 #endif // !__PYLLBC_COMM_PY_FACADE_H__

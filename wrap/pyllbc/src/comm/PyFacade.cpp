@@ -74,6 +74,9 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 , _keyCObj(Py_BuildValue("s", "cobj"))
 
 , _pyPacketCls(NULL)
+
+, _pyStream(NULL)
+, _nativeStream(NULL)
 {
 }
 
@@ -102,6 +105,14 @@ pyllbc_Facade::~pyllbc_Facade()
     Py_DECREF(_keyCObj);
 
     Py_XDECREF(_pyPacketCls);
+
+    if (_pyStream)
+    {
+        Py_DECREF(_pyStream);
+
+        _pyStream = NULL;
+        _nativeStream = NULL;
+    }
 }
 
 bool pyllbc_Facade::OnInitialize()
@@ -197,14 +208,16 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
 
     _Handlers &handlers = _svc->_handlers;
     _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
-    if (handlerIt == handlers.end())
+    if (UNLIKELY(handlerIt == handlers.end()))
         return;
 
-    pyllbc_PacketHandler *handler = handlerIt->second;
+    pyllbc_PacketHandler *&handler = handlerIt->second;
     PyObject *pyPacket = reinterpret_cast<PyObject *>(packet.GetPreHandleResult());
     if (!pyPacket)
+    {
         if (UNLIKELY(!(pyPacket = BuildPyPacket(packet))))
             return;
+    }
 
     PyObject *ret = handler->Handle(pyPacket);
     if (LIKELY(ret))
@@ -223,16 +236,15 @@ bool pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
 
     _Handlers &handlers = _svc->_preHandlers;
     _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
-    if (handlerIt == handlers.end())
+    if (UNLIKELY(handlerIt == handlers.end()))
         return true;
 
-    pyllbc_PacketHandler *handler = handlerIt->second;
+    pyllbc_PacketHandler *&handler = handlerIt->second;
     PyObject *pyPacket = BuildPyPacket(packet);
     if (UNLIKELY(!pyPacket))
         return false;
 
     packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
-
     PyObject *ret = handler->Handle(pyPacket);
     if (UNLIKELY(!ret))
         return false;
@@ -282,54 +294,52 @@ bool pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
 
 PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
 {
+    // Get python layer class: llbc.Packet
     if (UNLIKELY(!_pyPacketCls))
     {
         PyObject *modDict = pyllbc_TopModule->GetModuleDict();
-
         _pyPacketCls = PyDict_GetItemString(modDict, "Packet");
         Py_INCREF(_pyPacketCls);
     }
 
-    PyObject *pyData;
-    if (_svcType == LLBC_IService::Raw ||
-        _svc->_codec == pyllbc_Service::BinaryCodec)
+    // Create python layer instance: llbc.Stream
+    if (UNLIKELY(!_pyStream))
     {
-        // Create python layer instance: llbc.Stream
         PyObject *tupleArg = PyTuple_New(1);
 #if (LLBC_CUR_COMP == LLBC_COMP_MSVC) && defined(_M_X64)
         PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(static_cast<long>(packet.GetPayloadLength())));
 #else
         PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(packet.GetPayloadLength()));
 #endif
-        pyData = PyObject_CallObject(_svc->_streamCls, tupleArg);
+        _pyStream = PyObject_CallObject(_svc->_streamCls, tupleArg);
         Py_DECREF(tupleArg);
 
-        // Get pyllbc_Stream.
-        PyObject *cobj = PyObject_GetAttr(pyData, _keyCObj);
+        // Get pyllbc_Stream object.
+        PyObject *cobj = PyObject_GetAttr(_pyStream, _keyCObj);
         if (UNLIKELY(!cobj))
         {
-            Py_DECREF(pyData);
+            Py_DECREF(_pyStream);
             pyllbc_SetError("could not get llbc.Stream property 'cobj', recv data failed");
 
             return NULL;
         }
 
-        pyllbc_Stream *cstream = NULL;
-        PyArg_Parse(cobj, "l", &cstream);
+        PyArg_Parse(cobj, "l", &_nativeStream);
         Py_DECREF(cobj);
+    }
 
-        LLBC_Stream &rawStream = cstream->GetLLBCStream();
-        rawStream.Attach(const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
-
+    PyObject *pyData = NULL;
+    if (_svcType == LLBC_IService::Raw ||
+        _svc->_codec == pyllbc_Service::BinaryCodec)
+    {
+        _nativeStream->GetLLBCStream().Attach(const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
         if (_svc->_codec == pyllbc_Service::BinaryCodec)
         {
             pyllbc_Service::_Codecs::iterator decodeIt = 
                     _svc->_codecs.find(packet.GetOpcode());
             if (decodeIt != _svc->_codecs.end())
             {
-                PyObject *decoded = cstream->Read(decodeIt->second);
-                Py_DECREF(pyData);
-
+                PyObject *decoded = _nativeStream->Read(decodeIt->second);
                 if (!decoded)
                     return NULL;
 
