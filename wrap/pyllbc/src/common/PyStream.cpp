@@ -83,7 +83,7 @@ int pyllbc_Stream::SetPos(size_t pos)
 {
     if (pos > _stream.GetSize())
     {
-        pyllbc_SetError("pos too large", LLBC_ERROR_LIMIT);
+        pyllbc_SetError("pos out of range", LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
     }
 
@@ -99,6 +99,12 @@ size_t pyllbc_Stream::GetSize() const
 
 int pyllbc_Stream::SetSize(size_t size)
 {
+    if (_stream.IsAttach())
+    {
+        pyllbc_SetError("could not set attach buffer stream size(attached buffer maybe from pyllbc native library or other native libraries)", LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
     if (size <= _stream.GetSize())
     {
          pyllbc_SetError("stream new size must greater than old size", LLBC_ERROR_LIMIT);
@@ -358,6 +364,9 @@ PyObject *pyllbc_Stream::ReadPyLong()
 
 PyObject *pyllbc_Stream::ReadStr()
 {
+    if (UNLIKELY(_stream.GetPos() == _stream.GetSize()))
+        return PyString_FromStringAndSize("", 0);
+
     LLBC_String val;
     if (!_stream.Read(val))
     {
@@ -386,6 +395,15 @@ PyObject *pyllbc_Stream::ReadStr2()
     PyObject *pyStr = PyString_FromStringAndSize(
         reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), len);
     _stream.Skip(len);
+
+    return pyStr;
+}
+
+PyObject *pyllbc_Stream::ReadStr3()
+{
+    PyObject *pyStr = PyString_FromStringAndSize(
+        reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), _stream.GetSize() - _stream.GetPos());
+    _stream.SetPos(_stream.GetSize());
 
     return pyStr;
 }
@@ -716,7 +734,8 @@ int pyllbc_Stream::WriteStr(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.Write(LLBC_String(str, len));
+    _stream.WriteBuffer(str, static_cast<size_t>(len));
+    _stream.WriteBuffer("\0", 1);
 
     return LLBC_OK;
 }
@@ -733,6 +752,21 @@ int pyllbc_Stream::WriteStr2(PyObject *val)
 
     _stream.Write(static_cast<int>(len));
     _stream.WriteBuffer(str, len);
+
+    return LLBC_OK;
+}
+
+int pyllbc_Stream::WriteStr3(PyObject *val)
+{
+    char *str;
+    Py_ssize_t len;
+    if (PyString_AsStringAndSize(val, &str, &len) == -1)
+    {
+        pyllbc_TransferPyError();
+        return LLBC_FAILED;
+    }
+
+    _stream.WriteBuffer(str, static_cast<size_t>(len));
 
     return LLBC_OK;
 }

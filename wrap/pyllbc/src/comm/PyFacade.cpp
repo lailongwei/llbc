@@ -43,7 +43,8 @@ namespace
 }
 
 pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
-: _svc(svc)
+: LLBC_IFacade(LLBC_FacadeEvents::AllEvents)
+, _svc(svc)
 , _pySvc(svc->GetPyService())
 
 , _svcType(svc->GetType())
@@ -105,8 +106,7 @@ pyllbc_Facade::~pyllbc_Facade()
 
 bool pyllbc_Facade::OnInitialize()
 {
-    CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc));
-    return true;
+    return CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc));
 }
 
 void pyllbc_Facade::OnDestroy()
@@ -116,8 +116,7 @@ void pyllbc_Facade::OnDestroy()
 
 bool pyllbc_Facade::OnStart()
 {
-    CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc));
-    return true;
+    return CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc));
 }
 
 void pyllbc_Facade::OnStop()
@@ -320,8 +319,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
         Py_DECREF(cobj);
 
         LLBC_Stream &rawStream = cstream->GetLLBCStream();
-        rawStream.WriteBuffer(packet.GetPayload(), packet.GetPayloadLength());
-        rawStream.SetPos(0);
+        rawStream.Attach(const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
 
         if (_svc->_codec == pyllbc_Service::BinaryCodec)
         {
@@ -370,6 +368,10 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     Py_INCREF(pyStatusDesc);
 #endif
 
+    PyObject *pyExtData1 = PyLong_FromLongLong(packet.GetExtData1());
+    PyObject *pyExtData2 = PyLong_FromLongLong(packet.GetExtData2());
+    PyObject *pyExtData3 = PyLong_FromLongLong(packet.GetExtData3());
+
     PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
 
     PyObject *pyPacket = PyObject_CallFunctionObjArgs(_pyPacketCls,
@@ -384,6 +386,9 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
                                                       pyStatus,
                                                       pyStatusDesc,
                                                       pyData,
+                                                      pyExtData1,
+                                                      pyExtData2,
+                                                      pyExtData3,
                                                       pyPacketCObj,
                                                       NULL);
     Py_DECREF(pySenderSvcId);
@@ -396,6 +401,9 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     Py_DECREF(pyStatus);
     Py_DECREF(pyStatusDesc);
     Py_DECREF(pyData);
+    Py_DECREF(pyExtData1);
+    Py_DECREF(pyExtData2);
+    Py_DECREF(pyExtData3);
     Py_DECREF(pyPacketCObj);
 
     if (UNLIKELY(!pyPacket))
@@ -413,7 +421,7 @@ void pyllbc_Facade::DeletePyPacket(void *_)
     Py_DECREF(pyPacket);
 }
 
-void pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
+bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
 {
     typedef pyllbc_Service::_Facades _Facades;
     LLBC_InvokeGuard guard(&DecRefPyObj, ev);
@@ -430,10 +438,12 @@ void pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
             if (!pyRtn)
             {
                 pyllbc_TransferPyError();
-                return;
+                return false;
             }
 
             Py_DECREF(pyRtn);
         }
     }
+
+    return true;
 }

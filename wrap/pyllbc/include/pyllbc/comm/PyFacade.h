@@ -148,8 +148,9 @@ private:
      * Call python layer facade method.
      * @param[in] meth - method name, not steal reference, normal.
      * @param[in] ev   - call event object, steal reference.
+     * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
      */
-    void CallFacadeMeth(PyObject *meth, PyObject *ev);
+    bool CallFacadeMeth(PyObject *meth, PyObject *ev);
 
 private:
     pyllbc_Service *_svc;

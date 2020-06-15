@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import types as pyllbcTypes
 import inspect as pyllbcInspect
 
 import llbc
@@ -11,12 +12,14 @@ class pyllbcLog(object):
     ERROR = 3
     FATAL = 4
 
+    __inited = False
     __log_fileinfo = False
 
-    @staticmethod
-    def init(cfg_file):
+    @classmethod
+    def init(cls, cfg_file):
         """Initialize log"""
         llbc.inl.InitLoggerMgr(cfg_file)
+        cls.__inited = True
 
     @classmethod
     def enablelogfileinfo(cls):
@@ -69,6 +72,20 @@ class pyllbcLog(object):
                 msg = msg.encode('utf-8')
             else:
                 msg = str(msg)
+        
+        # normalize tag
+        if isinstance(tag, pyllbcTypes.MethodType):  # method type(included bound/unbound)
+            tag = '{}.{}'.format (tag.im_class.__name__, tag.__name__)
+        if hasattr(tag, '__name__'): # functions, builtin functions, class/object/type
+            tag = tag.__name__
+        elif isinstance(tag, unicode):  # unicode type
+            tag = tag.encode('utf-8')
+        elif not isinstance(tag, str):  # other type(not str)
+            tag = str(tag)
+
+        if not cls.__inited:
+            print('[Log] {}'.format(msg))
+            return
 
         llbc.inl.LogMsg(lv, filename, lineno, msg, logger, tag)
 

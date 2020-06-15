@@ -371,7 +371,7 @@ private:
     bool _inMainloop;
 
     pyllbc_Facade *_cppFacade;
-    typedef std::set<PyObject *> _Facades;
+    typedef std::vector<PyObject *> _Facades;
     _Facades _facades;
 
     typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
