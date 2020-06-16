@@ -49,10 +49,7 @@ pyllbc_ErrorHooker::~pyllbc_ErrorHooker()
 int pyllbc_ErrorHooker::Install()
 {
     if (_installed)
-    {
-        pyllbc_SetError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
+        return LLBC_OK;
 
     pyllbc_SetErrSetHock(LLBC_New2(_SetDeleg, this, &This::Hook_ErrSet));
     pyllbc_SetErrClearHook(LLBC_New2(_ClearDeleg, this, &This::Hook_ErrClear));

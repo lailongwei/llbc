@@ -265,26 +265,38 @@ def pyllbc_frame_exc_handler(handler):
 
 llbc.frame_exc_handler = pyllbc_frame_exc_handler
 
-def __pyllbc_normalize_opcodes(opcodes):
+def pyllbc_normalize_opcode(opcode):
     libkey = '__pyllbcreg__'
     RegCls = llbc.inl.SvcRegInfo
     
     normalized = []
-    for opcode in opcodes:
-        if hasattr(opcode, 'OP'):
-            normalized.append(opcode.OP)
-        elif hasattr(opcode, 'OPCODE'):
-            normalized.append(opcode.OPCODE)
-        elif hasattr(opcode, libkey):
-            opcode_reg = getattr(opcode, libkey)
-            if opcode_reg.regtype == RegCls.Coder:
-                for opcode_deopcode in opcode_reg.deopcodes:
-                    if opcode_deopcode not in normalized:
-                        normalized.append(opcode_deopcode)
-        else:
-            normalized.append(opcode)
+    if hasattr(opcode, 'OP'):
+        normalized.append(opcode.OP)
+    elif hasattr(opcode, 'OPCODE'):
+        normalized.append(opcode.OPCODE)
+    elif hasattr(opcode, libkey):
+        opcode_reg = getattr(opcode, libkey)
+        if opcode_reg.regtype == RegCls.Coder:
+            for opcode_deopcode in opcode_reg.deopcodes:
+                if opcode_deopcode not in normalized:
+                    normalized.append(opcode_deopcode)
+    else:
+        normalized.append(opcode)
 
     return normalized 
+
+llbc.inl.normalize_opcode = pyllbc_normalize_opcode
+
+def pyllbc_normalize_opcodes(opcodes):
+    normalized = []
+    for opcode in opcodes:
+        for op in llbc.inl.normalize_opcode(opcode):
+            if op not in normalized:
+                normalized.append(op)
+
+    return normalized 
+
+llbc.inl.normalize_opcodes = pyllbc_normalize_opcodes
 
 def pyllbc_handler(*opcodes):
     """
@@ -297,7 +309,7 @@ def pyllbc_handler(*opcodes):
 
         reg = pyllbc_extractreg(handler, RegCls.Handler)
 
-        converted = __pyllbc_normalize_opcodes(opcodes)
+        converted = llbc.inl.normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_hldropcodes(*converted))
         return handler 
 
@@ -316,7 +328,7 @@ def pyllbc_prehandler(*opcodes):
 
         reg = pyllbc_extractreg(handler, RegCls.PreHandler)
 
-        converted = __pyllbc_normalize_opcodes(opcodes)
+        converted = llbc.inl.normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_prehldropcodes(*converted))
         return handler
 
@@ -349,7 +361,7 @@ def pyllbc_exc_handler(*opcodes):
 
         reg = pyllbc_extractreg(handler, RegCls.ExcHandler)
 
-        converted = __pyllbc_normalize_opcodes(opcodes)
+        converted = llbc.inl.normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_exc_hldropcodes(*converted))
         return handler
     return generator
@@ -394,7 +406,7 @@ def pyllbc_exc_prehandler(*opcodes):
         RegsHolder = llbc.inl.SvcRegsHolder
         reg = pyllbc_extractreg(handler, RegCls.ExcPreHandler)
 
-        converted = __pyllbc_normalize_opcodes(opcodes)
+        converted = llbc.inl.normalize_opcodes(opcodes)
         RegsHolder.update(reg.add_exc_prehldropcodes(*converted))
         return handler
     return generator

@@ -581,15 +581,13 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
     LLBC_String value, comments;
     if (pos != LLBC_String::npos)
     {
-        pair = valueComments.split(This::CommentBeg, 1);
-
         value = valueComments.substr(0, pos)
             .rstrip().unescape(This::EscapeChar);
         comments = valueComments.substr(pos + 1).lstrip();
     }
     else
     {
-        value = valueComments.strip();
+        value = valueComments.strip().unescape(This::EscapeChar);
     }
 
     if (SetValue(name, value) == LLBC_OK)

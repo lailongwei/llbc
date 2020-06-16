@@ -121,6 +121,7 @@ class pyllbcStream(object):
 
            S: string value.
            S#: string value, use another pack/unpack algorithm, 4 bytes length + string content(not include NULL character).
+           S$: string value, will read stream to end as string content, write like 'S', but not append string end character '\0'.
            U: unicode value.
 
            A: byte array value.
@@ -182,6 +183,9 @@ class pyllbcStream(object):
     def unpackstr2(self):
         return llbc.inl.PyStreamRead_Str2(self.__c_obj)
 
+    def unpackstr3(self):
+        return llbc.inl.PyStreamRead_Str3(self.__c_obj)
+
     def unpackunicode(self):
         return llbc.inl.PyStreamRead_Unicode(self.__c_obj)
 
@@ -210,6 +214,7 @@ class pyllbcStream(object):
 
            S: string value.
            S#: string value, use another pack/unpack algorithm, 4 bytes length + string content(not include NULL character).
+           S$: string value, will read stream to end as string content, write like 'S', but not append string end character '\0'.
            U: unicode value.
 
            A: byte array value.
@@ -263,6 +268,9 @@ class pyllbcStream(object):
 
     def packstr2(self, obj):
         return llbc.inl.PyStreamWrite_Str2(self.__c_obj, obj)
+
+    def packstr3(self, obj):
+        return llbc.inl.PyStreamWrite_Str3(self.__c_obj, obj)
 
     def packunicode(self, obj):
         return llbc.inl.PyStreamWrite_Unicode(self.__c_obj, obj)

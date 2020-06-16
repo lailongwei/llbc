@@ -36,6 +36,8 @@ void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&trace
         errType = NULL;
         errStr.clear();
         traceback = NULL;
+
+        return;
     }
 
     PyObject *errVal;

@@ -432,6 +432,17 @@ LLBC_EXTERN_C PyObject *_pyllbc_ClearHookedErrors(PyObject *self, PyObject *args
     Py_RETURN_NONE;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_IsErrHookerInstalled(PyObject *self, PyObject *args)
+{
+    return PyBool_FromLong(pyllbc_Service::GetErrHooker()->IsInstalled() ? 1 : 0);
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_TransferHookedErrorToPython(PyObject *self, PyObject *args)
+{
+    pyllbc_Service::GetErrHooker()->TransferHookedErrorToPython();
+    Py_RETURN_NONE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;

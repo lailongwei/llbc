@@ -80,6 +80,6 @@ PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)
 
 LLBC_String pyllbc_PacketHandler::ToString() const
 {
-    return LLBC_String().format("opcode: %d, handler: %s", 
+    return LLBC_String().format("opcode:%d, handler:%s", 
         _opcode, pyllbc_ObjUtil::GetObjStr(_handler).c_str());
 }

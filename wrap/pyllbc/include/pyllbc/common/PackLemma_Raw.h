@@ -81,6 +81,7 @@ public:
 private:
     Symbol _symbol;
     bool _str2Flag;
+    bool _str3Flag;
 };
 
 #endif // !__PYLLBC_COM_PACK_LEMMA_RAW_H__

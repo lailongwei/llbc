@@ -173,15 +173,27 @@ int pyllbc_Service::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    _started = true;
+    // Force install error hooker
+    const bool errHookerInstalled = _errHooker->IsInstalled();
+    _errHooker->Install();
 
+    _started = true;
     if (_llbcSvc->Start(pollerCount) != LLBC_OK)
     {
         _started = false;
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
 
+        // Transfer hooked error to python, and Restore error hooker install status.
+        _errHooker->TransferHookedErrorToPython();
+        if (!errHookerInstalled)
+            _errHooker->Uninstall();
+
         return LLBC_FAILED;
     }
+
+    _errHooker->Cleanup();
+    if (!errHookerInstalled)
+        _errHooker->Uninstall();
 
     return LLBC_OK;
 }
@@ -209,7 +221,13 @@ void pyllbc_Service::Stop()
 
 int pyllbc_Service::RegisterFacade(PyObject *facade)
 {
-    if (!_facades.insert(facade).second)
+    if (_started)
+    {
+        pyllbc_SetError("service already started", LLBC_ERROR_INITED);
+        return LLBC_FAILED;
+    }
+
+    if (std::find(_facades.begin(), _facades.end(), facade) != _facades.end())
     {
         PyObject *pyFacadeStr = PyObject_Str(facade);
         LLBC_String facadeStr = PyString_AsString(pyFacadeStr);
@@ -222,6 +240,7 @@ int pyllbc_Service::RegisterFacade(PyObject *facade)
     }
 
     Py_INCREF(facade);
+    _facades.push_back(facade);
 
     return LLBC_OK;
 }
@@ -386,12 +405,7 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status)
 
 int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
 {
-    if (_started)
-    {
-        pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
+    if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
     {
         pyllbc_SetError(LLBC_String().format(
             "RAW type service could not subscribe opcode[%d] != 0's packet", opcode), LLBC_ERROR_INVALID);
@@ -404,9 +418,8 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         const LLBC_String handlerDesc = pyllbc_ObjUtil::GetObjStr(handler);
 
         LLBC_String err;
-        err.append_format("repeat to subscribeopcode: %d:%s, ", opcode, handlerDesc.c_str());
-        err.append_format("the opcode already subscribed by ");
-        err.append_format("%s", it->second->ToString().c_str());
+        err.append_format("repeat subscribe, subscribe opcode:%d, handler:%s, ", opcode, handlerDesc.c_str());
+        err.append_format("the opcode already subscribed, handler:[%s]", it->second->ToString().c_str());
 
         pyllbc_SetError(err, LLBC_ERROR_REPEAT);
 
@@ -420,24 +433,42 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         return LLBC_FAILED;
     }
 
+    if (_llbcSvc->Subscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataReceived) != LLBC_OK)
+    {
+        LLBC_Delete(wrapHandler);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::Subscribe() failed");
+
+        return LLBC_FAILED;
+    }
+
     _handlers.insert(std::make_pair(opcode, wrapHandler));
-    _llbcSvc->Subscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataReceived);
 
     return LLBC_OK;
 }
 
 int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 {
-    if (_started)
-    {
-        pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
+    if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
     {
         pyllbc_SetError("RAW type service could not pre-subscribe opcode != 0's packet", LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
+
+    _PacketHandlers::const_iterator it = _preHandlers.find(opcode);
+    if (it != _preHandlers.end())
+    {
+        const LLBC_String handlerDesc = pyllbc_ObjUtil::GetObjStr(preHandler);
+
+        LLBC_String err;
+        err.append_format("repeat pre-subscribe, pre-subscribe opcode:%d, handler:%s, ", opcode, handlerDesc.c_str());
+        err.append_format("the opcode already pre-subscribed, handler:[%s]", it->second->ToString().c_str());
+
+        pyllbc_SetError(err, LLBC_ERROR_REPEAT);
+
+        return LLBC_FAILED;
+    }
+
+
 
     pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, opcode);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
@@ -457,7 +488,14 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
         return LLBC_FAILED;
     }
 
-    _llbcSvc->PreSubscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataPreReceived);
+    if (_llbcSvc->PreSubscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataPreReceived) != LLBC_OK)
+    {
+        _preHandlers.erase(opcode);
+        LLBC_Delete(wrapHandler);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::PreSubscribe() failed");
+
+        return LLBC_FAILED;
+    }
 
     return LLBC_OK;
 }
@@ -465,12 +503,6 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 {
-    if (_started)
-    {
-        pyllbc_SetError("service already started", LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
     pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, 0);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
@@ -480,12 +512,20 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 
     if (_unifyPreHandler)
     {
+        LLBC_Delete(wrapHandler);
         pyllbc_SetError("repeat to unify pre-subscribe packet");
+
         return LLBC_FAILED;
     }
 
     _unifyPreHandler = wrapHandler;
-    _llbcSvc->UnifyPreSubscribe(_cppFacade, &pyllbc_Facade::OnDataUnifyPreReceived);
+    if (_llbcSvc->UnifyPreSubscribe(_cppFacade, &pyllbc_Facade::OnDataUnifyPreReceived) != LLBC_OK)
+    {
+        LLBC_XDelete(_unifyPreHandler);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::UnifyPreSubscribe() failed");
+
+        return LLBC_FAILED;
+    }
 
     return LLBC_OK;
 }
@@ -608,8 +648,8 @@ void pyllbc_Service::AfterStop()
     CreateLLBCService(_llbcSvcType, _llbcSvcName);
 
     // Cleanup all python layer facades.
-    for (_Facades::iterator it = _facades.begin();
-         it != _facades.end();
+    for (_Facades::reverse_iterator it = _facades.rbegin();
+         it != _facades.rend();
          it++)
         Py_DECREF(*it);
     _facades.clear();

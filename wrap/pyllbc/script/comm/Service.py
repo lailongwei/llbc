@@ -493,15 +493,11 @@ class pyllbcService(object):
                     ev.opcode: packet opcode.
 					ev.packet: packet object.
         """
-        if hasattr(facade, '__bases__') and llbc.ischild(facade, type):
-            raise llbc.error('facade could not be type(or derived from type) instance, facade:{}'.format(facade))
-        elif isinstance(facade, type):
-            raise llbc.error('facade could not be class type object, facade: {}'.format(facade))
-        else:
-            if isinstance(facade, _types.FunctionType):
-                raise llbc.error('facade could not be a function, facade: {}'.format(facade))
-            elif isinstance(facade, _types.MethodType):
-                raise llbc.error('facade could not be a method(included bound and unbound), facade: {}'.format(facade))
+        # normalize facade
+        if isinstance(facade, (_types.ObjectType, _types.ClassType)):
+            facade = facade()
+        if not isinstance(facade, object):
+            raise llbc.error('facade must be <object> instance, facade:{}, facade type:<{}>'.format(facade, type(facade)))
 
         llbc.inl.RegisterFacade(self._c_obj, facade)
         self._facades.update({facade.__class__: facade})
@@ -618,6 +614,7 @@ class pyllbcService(object):
         _WH = pyllbcSvcExcHandler
         wrap_handler = _WH(_WH.Subscribe, self, handler)
 
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         llbc.inl.Subscribe(self._c_obj, opcode, wrap_handler)
 
         if exc_handler is not None:
@@ -632,6 +629,7 @@ class pyllbcService(object):
                 traceback_obj: the traceback type instance.
                 error_value: the exception value.
         """
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         if exc_handler is None:
             if opcode in self._subscribe_exc_handlers:
                 del self._subscribe_exc_handlers[opcode]
@@ -664,6 +662,7 @@ class pyllbcService(object):
         _WH = pyllbcSvcExcHandler
         wrap_prehandler = _WH(_WH.PreSubscribe, self, prehandler)
 
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         llbc.inl.PreSubscribe(self._c_obj, opcode, wrap_prehandler)
 
         if exc_handler is not None:
@@ -678,6 +677,7 @@ class pyllbcService(object):
                 traceback_obj: the traceback type instance.
                 error_value: the exception value.
         """
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         if exc_handler is None:
             if opcode in self._presubscribe_exc_handlers:
                 del self._presubscribe_exc_handlers[opcode]
