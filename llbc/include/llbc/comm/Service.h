@@ -515,6 +515,7 @@ private:
     void DestroyWillRegFacades();
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
+    LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
     void ClearFacadesWhenInitFacadeFailed();
 
     /**
