@@ -229,6 +229,8 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
+// Dynamic create facade create method prefix name.
+#define LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX    "llbc_create_facade_"
 
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).

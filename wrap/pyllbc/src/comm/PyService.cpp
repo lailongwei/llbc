@@ -303,13 +303,11 @@ int pyllbc_Service::Connect(const char *ip, uint16 port)
 
 int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
 {
-    if (_llbcSvc->AsyncConn(ip, port) != LLBC_OK)
-    {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return LLBC_FAILED;
-    }
+    int sid = _llbcSvc->AsyncConn(ip, port);
+    if (sid == 0)
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, LLBC_String().format("async connect to %s:%d failed", ip, port).c_str());
 
-    return LLBC_OK;
+    return sid;
 }
 
 int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
@@ -324,7 +322,7 @@ int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status)
+int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, sint64 extData1, sint64 extData2, sint64 extData3)
 {
     // Started check.
     if (UNLIKELY(!IsStarted()))
@@ -348,6 +346,10 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status)
     {
         packet->SetOpcode(opcode);
         packet->SetStatus(status);
+
+        packet->SetExtData1(extData1);
+        packet->SetExtData2(extData2);
+        packet->SetExtData3(extData3);
     }
 
     if (UNLIKELY(_llbcSvc->Send(packet) == LLBC_FAILED))

@@ -182,13 +182,13 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
     LLBC_INTERNAL_NS __SetEscapeCharFlag(flags, escapeChar);
 
     const size_t escapeLen = willEscapeChars.size();
-    for (int i = 0; i < escapeLen; ++i) 
+    for (size_t i = 0; i < escapeLen; ++i) 
         LLBC_INTERNAL_NS __SetEscapeCharFlag(flags, willEscapeChars[i]);
 
     // todo: cpp11 buffer move into str
     char *buffer = NULL;
     size_t bufIdx = 0, copyIdx = 0;
-    for (int i = 0; i < strLen; ++i)
+    for (size_t i = 0; i < strLen; ++i)
     {
         const char &ch = escapeString[i];
         if (!LLBC_INTERNAL_NS __IsSetEscapeCharFlag(flags, ch))

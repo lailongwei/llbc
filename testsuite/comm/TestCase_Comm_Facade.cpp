@@ -139,6 +139,25 @@ int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, in
     svc->SetFPS(1);
     svc->RegisterFacade<TestFacadeFactory>();
 
+    // Try init library facade(not exist)
+    const LLBC_String notExistFacadeName = "Not exist facade name";
+    const LLBC_String notExistFacadeLibPath = "!!!!!!!!Not exist library!!!!!!!!";
+    LLBC_PrintLine("Test try register not exist third-party facade, libPath:%s, facadeName:%s",
+                   notExistFacadeLibPath.c_str(), notExistFacadeName.c_str());
+    int ret = svc->RegisterFacade(notExistFacadeLibPath, notExistFacadeName);
+    if (ret != LLBC_OK)
+    {
+        LLBC_PrintLine("Register not exist third-party facade failed, error:%s", LLBC_FormatLastError());
+    }
+    else
+    {
+        LLBC_PrintLine("Register not exist third-party facade success, internal error!!!");
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+
     LLBC_PrintLine("Start service...");
     if (svc->Start(10) != LLBC_OK)
     {

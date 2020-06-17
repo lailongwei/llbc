@@ -232,10 +232,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_AsyncConn(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "lsi", &svc, &ip, &port))
         return NULL;
 
-    if (svc->AsyncConn(ip, port) != LLBC_OK)
+    int sid = svc->AsyncConn(ip, port);
+    if (sid == 0)
         return NULL;
 
-    Py_RETURN_NONE;
+    return PyInt_FromLong(sid);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_RemoveSession(PyObject *self, PyObject *args)
@@ -262,10 +263,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_SendData(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     PyObject *data;
     int sessionId, opcode, status = 0;
-    if (!PyArg_ParseTuple(args, "liiO|i", &svc, &sessionId, &opcode, &data, &status))
+    sint64 extData1 = 0, extData2 = 0, extData3 = 0;
+    if (!PyArg_ParseTuple(args, "liiO|iLLL", &svc, &sessionId, &opcode, &data, &status, &extData1, &extData2, &extData3))
         return NULL;
 
-    if (svc->Send(sessionId, opcode, data, status) != LLBC_OK)
+    if (svc->Send(sessionId, opcode, data, status, extData1, extData2, extData3) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;

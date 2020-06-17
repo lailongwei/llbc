@@ -389,7 +389,7 @@ public:
     }
 
     // erase operations.
-    _This &erase(size_type p0, size_type n = npos)
+    _This &erase(size_type p0, size_type n = _This::npos)
     {
         _Base::erase(p0, n);
         return *this;
@@ -502,7 +502,7 @@ public:
             return *this;
 
         size_type found = 0;
-        while ((found = find(s1, found)) != npos)
+        while ((found = find(s1, found)) != _This::npos)
         {
             replace(found, s1.size(), s2);
             found += s2.size();
@@ -528,13 +528,13 @@ public:
         const size_type step = with_elem ? 1 : sep.size();
         for (; splitTimes < max_split; ++splitTimes)
         {
-            size_type findIdx = npos;
+            size_type findIdx = _This::npos;
             if (with_elem)
             {
                 for (size_t i = 0; i < sep.size(); ++i)
                 {
                     findIdx = this->find(sep[i], idx);
-                    if (findIdx != npos)
+                    if (findIdx != _This::npos)
                         break;
                 }
             }
@@ -543,7 +543,7 @@ public:
                 findIdx = this->find(sep, idx);
             }
 
-            if (findIdx == npos)
+            if (findIdx == _This::npos)
                 break;
 
             if (strip_empty && findIdx == idx)
@@ -600,7 +600,7 @@ public:
 
     // Reverse find operations.
     size_type rfind(const _This &str, 
-        size_type pos = npos) const
+        size_type pos = _This::npos) const
     {
         return _Base::rfind(str, pos);
     }
@@ -611,12 +611,12 @@ public:
         return _Base::rfind(s, pos, n);
     }
 
-    size_type rfind(const _Elem *s, size_type pos = npos) const
+    size_type rfind(const _Elem *s, size_type pos = _This::npos) const
     {
         return _Base::rfind(s, pos);
     }
 
-    size_type rfind(_Elem c, size_type pos = npos) const
+    size_type rfind(_Elem c, size_type pos = _This::npos) const
     {
         return _Base::rfind(c, pos);
     }
@@ -646,7 +646,7 @@ public:
 
     // find last of operations.
     size_type find_last_of(const _This &str,
-        size_type pos = npos) const
+        size_type pos = _This::npos) const
     {
         return _Base::find_last_of(str, pos);
     }
@@ -657,12 +657,12 @@ public:
         return _Base::find_last_of(s, pos, n);
     }
 
-    size_type find_last_of(const _Elem *s, size_type pos = npos) const
+    size_type find_last_of(const _Elem *s, size_type pos = _This::npos) const
     {
         return _Base::find_last_of(s, pos);
     }
 
-    size_type find_last_of(_Elem c, size_type pos = npos) const
+    size_type find_last_of(_Elem c, size_type pos = _This::npos) const
     {
         return _Base::find_last_of(c, pos);
     }
@@ -690,7 +690,7 @@ public:
     }
 
     size_type find_last_not_of(const _This &str,
-        size_type pos = npos) const
+        size_type pos = _This::npos) const
     {
         return _Base::find_last_not_of(str, pos);
     }
@@ -701,18 +701,18 @@ public:
         return _Base::find_last_not_of(s, pos, n);
     }
 
-    size_type find_last_not_of(const _Elem *s, size_type pos = npos) const
+    size_type find_last_not_of(const _Elem *s, size_type pos = _This::npos) const
     {
         return _Base::find_last_not_of(s, pos);
     }
 
-    size_type find_last_not_of(_Elem c, size_type pos = npos) const
+    size_type find_last_not_of(_Elem c, size_type pos = _This::npos) const
     {
         return _Base::find_last_not_of(c, pos);
     }
 
     // substr operations.
-    _This substr(size_type pos = 0, size_type n = npos) const
+    _This substr(size_type pos = 0, size_type n = _This::npos) const
     {
         return _Base::substr(pos, n);
     }
@@ -1237,14 +1237,14 @@ public:
 
         size_type count = 0;
         size_type bytePos = 0;
-        while ((bytePos = _This::next_utf8_char_pos(bytePos)) != npos)
+        while ((bytePos = _This::next_utf8_char_pos(bytePos)) != _This::npos)
             count++;
 
         return count;
     }
 
     // utf8 support: substring with utf8.
-    _This substr_with_utf8(size_type pos = 0, size_type n = npos) const
+    _This substr_with_utf8(size_type pos = 0, size_type n = _This::npos) const
     {
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
             return _This();
@@ -1260,7 +1260,7 @@ public:
 
         _This str1 = *substrs.rbegin();
         utf8Len = str1.length_with_utf8();
-        pos = (n == npos || n > utf8Len) ? utf8Len : n;
+        pos = (n == _This::npos || n > utf8Len) ? utf8Len : n;
 
         substrs.clear();
         str1.split_utf8_string(static_cast<long>(pos), substrs);
@@ -1286,7 +1286,7 @@ public:
         }
 
         size_type utf8Count = _This::length_with_utf8();
-        if (UNLIKELY(utf8Count == npos))
+        if (UNLIKELY(utf8Count == _This::npos))
         {
             strs.push_back(*this);
             return;
@@ -1318,8 +1318,8 @@ public:
         chars.clear();
 
         if (scatterCount == 0)
-            scatterCount = npos;
-        else if (scatterCount != npos)
+            scatterCount = _This::npos;
+        else if (scatterCount != _This::npos)
             scatterCount -= 1;
 
         if (scatterCount == 0)
@@ -1331,11 +1331,11 @@ public:
         size_type curPos = 0;
         size_type prevPos = 0;
         size_type curScatterCount = 0;
-        while ((curPos = this->next_utf8_char_pos(prevPos)) != npos)
+        while ((curPos = this->next_utf8_char_pos(prevPos)) != _This::npos)
         {
             chars.push_back(_This::substr(prevPos, curPos - prevPos));
 
-            if (scatterCount != npos && ++curScatterCount >= scatterCount)
+            if (scatterCount != _This::npos && ++curScatterCount >= scatterCount)
             {
                 chars.push_back(_This::substr(curPos));
                 break;
@@ -1428,15 +1428,15 @@ private:
     size_type next_utf8_char_pos(size_type &beginBytePos) const
     {
         if (sizeof(_Elem) != sizeof(char))
-            return npos;
+            return _This::npos;
 
         if (beginBytePos == 0 && this->has_utf8_bomb())
             beginBytePos += 3;
 
-        if (beginBytePos == npos || beginBytePos >= this->size())
-            return npos;
+        if (beginBytePos == _This::npos || beginBytePos >= this->size())
+            return _This::npos;
 
-        size_type waitCheckCount = npos;
+        size_type waitCheckCount = _This::npos;
 
         // 0xxx xxxx
         // Encoding len: 1 byte.
@@ -1464,19 +1464,19 @@ private:
         else if ((ch & 0xfe) == 0xfc)
             waitCheckCount = 5;
 
-        if (waitCheckCount == npos)
-            return npos;
+        if (waitCheckCount == _This::npos)
+            return _This::npos;
 
         size_type curPos = beginBytePos + 1;
         size_type endPos = curPos + waitCheckCount;
         if (endPos > _This::size())
-            return npos;
+            return _This::npos;
 
         for (; curPos != endPos; ++curPos)
         {
             ch = static_cast<uint8>(_Base::at(curPos));
             if ((ch & 0xc0) != 0x80)
-                return npos;
+                return _This::npos;
         }
 
         return endPos;
