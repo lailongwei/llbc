@@ -379,6 +379,16 @@ const Dict::mapped_type &LLBC_Variant::operator [](const LLBC_Variant &key) cons
     return LLBC_INL_NS __g_nilVariant;
 }
 
+LLBC_Variant &LLBC_Variant::operator =(bool val)
+{
+    CleanTypeData(_holder.type);
+
+    _holder.type = LLBC_VariantType::VT_RAW_BOOL;
+    _holder.raw.int64Val = val ? 1 : 0;
+
+    return *this;
+}
+
 LLBC_Variant &LLBC_Variant::operator =(sint8 val)
 {
     CleanTypeData(_holder.type);

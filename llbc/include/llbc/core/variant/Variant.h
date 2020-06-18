@@ -230,6 +230,7 @@ public:
 
     // Fetch variant data type and holder data.
     int GetType() const;
+    struct Holder &GetMutableHolder();
     const struct Holder &GetHolder() const;
 
     // Type diagnose.
@@ -350,6 +351,7 @@ public:
     const Dict::mapped_type &operator [](const _Kty &key) const;
 
     // assignment operators.
+    LLBC_Variant &operator =(bool val);
     LLBC_Variant &operator =(sint8 val);
     LLBC_Variant &operator =(uint8 val);
     LLBC_Variant &operator =(sint16 val);

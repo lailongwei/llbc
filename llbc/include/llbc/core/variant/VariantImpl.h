@@ -140,6 +140,11 @@ inline int LLBC_Variant::GetType() const
     return _holder.type;
 }
 
+inline LLBC_Variant::Holder &LLBC_Variant::GetMutableHolder()
+{
+    return _holder;
+}
+
 inline const LLBC_Variant::Holder &LLBC_Variant::GetHolder() const
 {
     return _holder;
@@ -392,7 +397,10 @@ inline LLBC_Variant &LLBC_Variant::BecomeDouble()
 inline LLBC_Variant &LLBC_Variant::BecomeStr()
 {
     if (!IsStr())
-        *this = AsStr();
+    {
+        CleanTypeData(_holder.type);
+        _holder.type = LLBC_VariantType::VT_STR_DFT;
+    }
 
     return *this;
 }
@@ -400,7 +408,10 @@ inline LLBC_Variant &LLBC_Variant::BecomeStr()
 inline LLBC_Variant &LLBC_Variant::BecomeDict()
 {
     if (!IsDict())
-        *this = AsDict();
+    {
+        CleanTypeData(_holder.type);
+        _holder.type = LLBC_VariantType::VT_DICT_DFT;
+    }
 
     return *this;
 }
