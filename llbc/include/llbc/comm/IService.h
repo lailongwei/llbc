@@ -413,7 +413,8 @@ public:
     int RegisterFacade();
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
     virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName) = 0;
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade) = 0;
 
     /**
      * Get facade/facades.

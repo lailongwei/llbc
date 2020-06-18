@@ -433,6 +433,12 @@ public:
 
 public:
     /**
+     * Get all facade methods.
+     * @return const LLBC_FacadeMethods * - the facade methods, maybe is null.
+     */
+    const LLBC_FacadeMethods *GetAllMethods() const;
+
+    /**
      * Add facade method.
      * @param[in] methName - the method name.
      * @param[in] meth     - the method.

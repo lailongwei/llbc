@@ -229,16 +229,112 @@ int pyllbc_Service::RegisterFacade(PyObject *facade)
 
     if (std::find(_facades.begin(), _facades.end(), facade) != _facades.end())
     {
-        PyObject *pyFacadeStr = PyObject_Str(facade);
-        LLBC_String facadeStr = PyString_AsString(pyFacadeStr);
-        Py_DECREF(pyFacadeStr);
-
         LLBC_String errStr;
+        const LLBC_String facadeStr = pyllbc_ObjUtil::GetObjStr(facade);
         pyllbc_SetError(errStr.format("repeat to register facade: %s", facadeStr.c_str()), LLBC_ERROR_REPEAT);
 
         return LLBC_FAILED;
     }
 
+    Py_INCREF(facade);
+    _facades.push_back(facade);
+
+    return LLBC_OK;
+}
+
+int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *&facade)
+{
+    // Force reset facade ptr.
+    facade = NULL;
+
+    // Started check.
+    if (_started)
+    {
+        pyllbc_SetError("service already started", LLBC_ERROR_INITED);
+        return LLBC_FAILED;
+    }
+
+    // Register native facade.
+    LLBC_IFacade *nativeFacade;
+    int ret = _llbcSvc->RegisterFacade(libPath, facadeName, nativeFacade);
+    if (ret != LLBC_OK)
+    {
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When register facade(from dynamic library)");
+        return LLBC_FAILED;
+    }
+
+    // Define python layer facade class and compile it.
+    LLBC_String facadeClsDef;
+    facadeClsDef.append_format("import llbc\n");
+    facadeClsDef.append_format("class %s(llbc.inl.BaseLibFacade):\n", facadeName.c_str());
+    facadeClsDef.append_format("    \"\"\"Dynamic load facade %s(from native dynamic library:%s) define\"\"\"\n", facadeName.c_str(), libPath.c_str());
+    facadeClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
+    facadeClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", facadeName.c_str());
+    const LLBC_FacadeMethods *nativeMeths = nativeFacade->GetAllMethods();
+    if (nativeMeths)
+    {
+        typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
+        const LLBC_FacadeMethods::Methods &nativeMethsDict = nativeMeths->GetAllMethods();
+        for (_NativeMethodsIter nativeMethIt = nativeMethsDict.begin();
+             nativeMethIt != nativeMethsDict.end();
+             ++nativeMethIt)
+        {
+            const char *nativeMeth = nativeMethIt->first.GetCStr();
+            facadeClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
+            facadeClsDef.append_format("        return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
+        }
+    }
+
+    facadeClsDef.append_format("\n");
+    if (PyRun_SimpleString(facadeClsDef.c_str()) != 0)
+    {
+        pyllbc_TransferPyError("When compile facade class");
+        return LLBC_FAILED;
+    }
+
+    // Get compiled python layer facade class.
+    PyObject *pyGbl = PyEval_GetGlobals(); // Borrowed reference.
+    if (!pyGbl)
+    {
+        pyllbc_TransferPyError("When get python global env");
+        return LLBC_FAILED;
+    }
+    PyObject *facadeCls = PyDict_GetItemString(pyGbl, facadeName.c_str()); // Borroewd reference for return.
+    if (!facadeCls)
+    {
+        pyllbc_TransferPyError("When get python layer facade class");
+        return LLBC_FAILED;
+    }
+
+    // Create python layer facade instance.
+    PyObject *pyCObj = PyLong_FromLongLong(reinterpret_cast<long long>(nativeFacade));
+    PyObject *pyFacadeName = PyString_FromString(facadeName.c_str());
+    PyObject *pyMeths = PySet_New(NULL);
+    if (nativeMeths)
+    {
+        typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
+        const LLBC_FacadeMethods::Methods &nativeMethsDict = nativeMeths->GetAllMethods();
+        for (_NativeMethodsIter nativeMethIt = nativeMethsDict.begin();
+             nativeMethIt != nativeMethsDict.end();
+             ++nativeMethIt)
+            PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.GetCStr())); // Steal referencce for o.
+    }
+
+    facade = PyObject_CallFunctionObjArgs(facadeCls,
+                                          pyCObj,
+                                          pyFacadeName,
+                                          pyMeths,
+                                          NULL);
+    Py_DECREF(pyCObj);
+    Py_DECREF(pyFacadeName);
+    Py_DECREF(pyMeths);
+    if (!facade)
+    {
+        pyllbc_TransferPyError("When create python layer facade instance");
+        return LLBC_FAILED;
+    }
+
+    // Hold python layer facade instances.
     Py_INCREF(facade);
     _facades.push_back(facade);
 

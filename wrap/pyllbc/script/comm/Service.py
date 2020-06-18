@@ -438,7 +438,7 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registerfacade(self, facade):
+    def registerfacade(self, facade, libpath=''):
         """
         Register facade.
             facade methods(all methods are optional):
@@ -495,13 +495,17 @@ class pyllbcService(object):
 					ev.packet: packet object.
         """
         # normalize facade
-        if isinstance(facade, (_types.ObjectType, _types.ClassType)):
-            facade = facade()
-        if not isinstance(facade, object):
-            raise llbc.error('facade must be <object> instance, facade:{}, facade type:<{}>'.format(facade, type(facade)))
+        if isinstance(facade, (str, unicode)):
+            if isinstance(facade, unicode):
+                facade = facade.encode('utf8')
 
-        llbc.inl.RegisterFacade(self._c_obj, facade)
+            facade = llbc.inl.RegisterLibFacade(self._c_obj, facade, libpath)
+        else:
+            facade = facade()
+            llbc.inl.RegisterFacade(self._c_obj, facade)
+
         self._facades.update({facade.__class__: facade})
+        return facade
 
     def getfacade(self, cls):
         """

@@ -302,7 +302,7 @@ public:
      */
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade);
 
     /**
      * Get facade/facades.
@@ -516,6 +516,7 @@ private:
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
     LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
+    void CloseFacadeLibrary(const LLBC_String &libPath);
     void ClearFacadesWhenInitFacadeFailed();
 
     /**
@@ -622,12 +623,8 @@ private:
         LLBC_IFacade *facade;
         LLBC_IFacadeFactory *facadeFactory;
 
-        LLBC_String libPath;
-        LLBC_String facadeName;
-
         _WillRegFacade(LLBC_IFacade *facade);
         _WillRegFacade(LLBC_IFacadeFactory *facadeFactory);
-        _WillRegFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
     };
     typedef std::vector<_WillRegFacade> _WillRegFacades;
     _WillRegFacades _willRegFacades;

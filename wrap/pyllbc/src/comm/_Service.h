@@ -180,6 +180,20 @@ LLBC_EXTERN_C PyObject *_pyllbc_RegisterFacade(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibFacade(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    const char *facadeName, *libPath;
+    if (!PyArg_ParseTuple(args, "lss", &svc, &facadeName, &libPath))
+        return NULL;
+
+    PyObject *facade;
+    if (svc->RegisterFacade(facadeName, libPath, facade) != LLBC_OK)
+        return NULL;
+
+    return facade;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_RegisterCodec(PyObject *self, PyObject *args)
 {
     int opcode;
@@ -456,6 +470,29 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
         return NULL;
 
     Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_CallFacadeMethod(PyObject *self, PyObject *args)
+{
+    LLBC_IFacade *facade;
+    const char *meth;
+    PyObject *arg;
+    if (!PyArg_ParseTuple(args, "lsO", &facade, &meth, &arg))
+        return NULL;
+
+    LLBC_Variant nativeArg;
+    if (pyllbc_ObjUtil::Obj2Variant(arg, nativeArg) != LLBC_OK)
+        return NULL;
+
+    int callMethRet;
+    LLBC_Variant nativeRet;
+    if ((callMethRet = facade->CallMethod(meth, nativeArg, nativeRet)) != LLBC_OK)
+    {
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When call native facade method");
+        return NULL;
+    }
+
+    return pyllbc_ObjUtil::Variant2Obj(nativeRet);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_ServiceMainLoop(PyObject *self, PyObject *args)

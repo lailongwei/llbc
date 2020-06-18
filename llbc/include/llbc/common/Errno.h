@@ -597,6 +597,15 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 //
 #define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002d))
 #define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002d))
+//
+// Message Id: LLBC_ERROR_NOT_SUPPORT
+//
+// MessageText:
+//
+// not support.
+//
+#define __LLBC_ERROR_NOT_SUPPORT         ((int)(0x0000002e))
+#define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc000002e))
 
 //
 //!! Sentinel error no.

@@ -40,6 +40,12 @@ inline int LLBC_IService::RegisterFacade()
     return LLBC_OK;
 }
 
+inline int LLBC_IService::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName)
+{
+    LLBC_IFacade *facade;
+    return RegisterFacade(libPath, facadeName, facade);
+}
+
 template <typename CoderFactoryCls>
 inline int LLBC_IService::RegisterCoder(int opcode)
 {

@@ -190,6 +190,15 @@ public:
     int RegisterFacade(PyObject *facade);
 
     /**
+     * Register facade from library.
+     * @param[in] facadeName - the facade name.
+     * @param[in] libPath    - the library path.
+     * @param[out] facade    - the created facade(new reference).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *&facade);
+
+    /**
      * Register codec(only available in CODEC_BINARY).
      * @param[in] opcode - the opcode.
      * @param[in] codec  - the codec class(not steal reference, normal).

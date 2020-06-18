@@ -37,6 +37,21 @@ public:
      *                       call PyErr_Occurred() to check this method execute succeed or not.
      */
     static LLBC_String GetObjStr(PyObject *obj);
+
+    /**
+     * Convert python object to LLBC_Variant object.
+     * @param[in] obj  - the python object.
+     * @param[out] var - the converted LLBC_Variant object, if convert failed, will not set this variant.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int Obj2Variant(PyObject *obj, LLBC_Variant &var);
+
+    /**
+     * Convert LLBC_Variant object to python object.
+     * @param[in] var - the LLBC_Variant object.
+     * @return PyObject * - the converted python object(new reference).
+     */
+    static PyObject *Variant2Obj(const LLBC_Variant &var);
 };
 
 #endif // !__PYLLBC_COM_OBJ_UTIL_H__
