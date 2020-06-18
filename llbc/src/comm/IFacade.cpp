@@ -217,6 +217,16 @@ void LLBC_AsyncConnResult::SetIsConnected(bool connected)
     _connected = connected;
 }
 
+int LLBC_AsyncConnResult::GetSessionId() const
+{
+    return _sessionId;
+}
+
+void LLBC_AsyncConnResult::SetSessionId(int sessionId)
+{
+    _sessionId = sessionId;
+}
+
 const LLBC_String &LLBC_AsyncConnResult::GetReason() const
 {
     return _reason;
@@ -330,12 +340,15 @@ LLBC_IFacade::LLBC_IFacade(uint64 caredEvents)
 , _started(false)
 , _caredEvents(caredEvents)
 
+, _meths(NULL)
+
 , _svc(NULL)
 {
 }
 
 LLBC_IFacade::~LLBC_IFacade()
 {
+    LLBC_XDelete(_meths);
 }
 
 bool LLBC_IFacade::OnInitialize()

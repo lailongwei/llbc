@@ -477,6 +477,7 @@ class pyllbcService(object):
                     ev.sub_errno: sub error number(only available when ev.destroyed_from_service is True).
                 onasyncconnresult(self, ev): async-connect result handler.
                     ev.svc: service object.
+                    ev.session_id: session Id,  whether the connection is successful or not, session Id will be assigned.
                     ev.peer_ip: peer ip address.
                     ev.peer_port: peer port number.
                     ev.connected: connected flag.
@@ -546,7 +547,7 @@ class pyllbcService(object):
         """
         Asynchronous connect to peer(non-blocking, direct return)
         """
-        llbc.inl.AsyncConn(self._c_obj, ip, port)
+        return llbc.inl.AsyncConn(self._c_obj, ip, port)
 
     def removesession(self, session_id, reason='', strict=False):
         """
@@ -557,7 +558,7 @@ class pyllbcService(object):
         """
         llbc.inl.RemoveSession(self._c_obj, session_id, reason, strict)
 
-    def send(self, session_id, data, opcode=None, status=0):
+    def send(self, session_id, data, opcode=None, status=0, extData1=0, extData2=0, extData3=0):
         """
         Send data to specific session
         """
@@ -576,7 +577,7 @@ class pyllbcService(object):
         if isinstance(session_id, Packet):
             session_id = session_id.session_id
 
-        llbc.inl.SendData(self._c_obj, session_id, opcode, data, status)
+        llbc.inl.SendData(self._c_obj, session_id, opcode, data, status, extData1, extData2, extData3)
 
     def multicast(self, session_ids, data, opcode=None, status=0):
         """

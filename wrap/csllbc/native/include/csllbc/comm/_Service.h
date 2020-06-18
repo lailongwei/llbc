@@ -155,7 +155,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Connect(csllbc_Service *svc, cons
  * @param[in] svc  - the service.
  * @param[in] ip   - the ip address.
  * @param[in] port - the port number.
- * @return int - return 0 if post success, otherwise return -1.
+ * @return int - return session Id(not yet connected), otherwise return 0.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_AsyncConn(csllbc_Service *svc, const char *ip, int port);
 

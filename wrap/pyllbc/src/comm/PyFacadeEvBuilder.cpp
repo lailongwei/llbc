@@ -127,6 +127,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLB
 PyObject *pyllbc_FacadeEvBuilder::BuildAsyncConnResultEv(PyObject *svc, const LLBC_AsyncConnResult &result)
 {
     PyObject *ev = This::CreateEv(svc);
+    This::SetAttr(ev, This::_attrSessionId, result.GetSessionId());
     This::SetAttr(ev, This::_attrConnected, result.IsConnected());
     This::SetAttr(ev, This::_attrReason, result.GetReason());
     This::SetAttr(ev, This::_attrPeerIp, result.GetPeerAddr().GetIpAsString());

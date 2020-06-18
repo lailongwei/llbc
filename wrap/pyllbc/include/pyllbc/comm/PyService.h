@@ -242,13 +242,16 @@ public:
     /**
      * Send data.
      * @param[in] sessionId - the peer session Id.
-     * @param[in] opcode - the opcode.
+     * @param[in] opcode   - the opcode.
      * @param[in] data - send data(normal, not steal reference).
      *                   Note, the object's class must has encode() method and return bytearray.
-     * @param[in] status - the status code, default is 0.
+     * @param[in] status   - the status code, default is 0.
+     * @param[in] extData1 - the extend data1, default is 0. 
+     * @param[in] extData2 - the extend data2, default is 0. 
+     * @param[in] extData3 - the extend data3, default is 0. 
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Send(int sessionId, int opcode, PyObject *data, int status = 0);
+    int Send(int sessionId, int opcode, PyObject *data, int status = 0, sint64 extData1 = 0, sint64 extData2 = 0, sint64 extData3 = 0);
 
     /**
      * Multicast data.

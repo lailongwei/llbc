@@ -198,8 +198,7 @@ public:
      *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
-     *               Note: return 0 is not means the connection was established,
-     *                     it only means post async-conn request to poller success.
+     * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
     virtual int AsyncConn(const char *ip,
                           uint16 port,
@@ -303,6 +302,7 @@ public:
      */
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
 
     /**
      * Get facade/facades.
@@ -515,6 +515,8 @@ private:
     void DestroyWillRegFacades();
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
+    LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
+    void ClearFacadesWhenInitFacadeFailed();
 
     /**
      * Auto-Release pool operation methods.
@@ -620,8 +622,12 @@ private:
         LLBC_IFacade *facade;
         LLBC_IFacadeFactory *facadeFactory;
 
+        LLBC_String libPath;
+        LLBC_String facadeName;
+
         _WillRegFacade(LLBC_IFacade *facade);
         _WillRegFacade(LLBC_IFacadeFactory *facadeFactory);
+        _WillRegFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
     };
     typedef std::vector<_WillRegFacade> _WillRegFacades;
     _WillRegFacades _willRegFacades;
@@ -636,6 +642,8 @@ private:
     typedef std::map<LLBC_String, _Facades> _Facades2;
     _Facades2 _facades2;
     _Facades *_caredEventFacades[LLBC_FacadeEventsOffset::End];
+    typedef std::map<LLBC_String, LLBC_Library *> _FacadeLibraries;
+    _FacadeLibraries _facadeLibraries;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;

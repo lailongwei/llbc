@@ -204,7 +204,7 @@ public:
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      *                           if use custom protocol factory, when Connect failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
-     * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
+     * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
     virtual int Connect(const char *ip,
                         uint16 port,
@@ -220,9 +220,7 @@ public:
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
-     * @return int - return 0 if success, otherwise return -1.
-     *               Note: return 0 is not means the connection was established,
-     *                     it only means post async-conn request to poller success.
+     * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
     virtual int AsyncConn(const char *ip,
                           uint16 port,
@@ -415,6 +413,7 @@ public:
     int RegisterFacade();
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
     virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName) = 0;
 
     /**
      * Get facade/facades.
