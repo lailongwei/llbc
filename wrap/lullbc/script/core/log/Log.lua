@@ -88,7 +88,7 @@ function Log.output(level, logger, tag, ...)
     LogMsg(level, logger, tag, file, line, ...)
 
     if level >= Log.FATAL then
-        error(...)
+        error(tostring(...)) -- Only output the first param
     end
 end
 
