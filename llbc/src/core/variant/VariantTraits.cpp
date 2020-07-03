@@ -474,7 +474,7 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
             typedef LLBC_Variant::Dict::const_iterator _It;
             for (_It rIt = rDict->begin(); 
                  rIt != rDict->end() && !lDict->empty(); 
-                 rIt++)
+                 ++rIt)
             {
                 lDict->erase(rIt->first);
             }
@@ -502,10 +502,11 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
 
         if (rSeq)
         {
-            typedef LLBC_Variant::Seq::const_iterator _It;
-            for (_It rIt = rSeq->begin(); 
+            typedef LLBC_Variant::Seq::iterator _It;
+            typedef LLBC_Variant::Seq::const_iterator _CIt;
+            for (_CIt rIt = rSeq->begin(); 
                  rIt != rSeq->end() && !lSeq->empty(); 
-                 rIt++)
+                 ++rIt)
             {
                 _It lIt;
                 while ((lIt = std::find(lSeq->begin(), lSeq->end(), *rIt)) != lSeq->end())
