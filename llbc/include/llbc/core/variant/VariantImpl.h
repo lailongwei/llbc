@@ -628,7 +628,7 @@ inline LLBC_Variant::DictIter LLBC_Variant::DictFind(const _Kty &key)
 template <typename _Kty>
 inline LLBC_Variant::DictConstIter LLBC_Variant::DictFind(const _Kty &key) const
 {
-    return this->Find(LLBC_Variant::Dict::key_type(key));
+    return this->DictFind(LLBC_Variant::Dict::key_type(key));
 }
 
 template <typename _Kty>
