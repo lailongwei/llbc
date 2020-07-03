@@ -176,6 +176,7 @@ LLBC_Service::~LLBC_Service()
 
     DestroyFacades();
     DestroyWillRegFacades();
+    CloseAllFacadeLibraries();
 
     LLBC_STLHelper::DeleteContainer(_coders);
     LLBC_STLHelper::DeleteContainer(_handlers);
@@ -801,6 +802,23 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
     return ret;
 }
 
+LLBC_IFacade *LLBC_Service::GetFacade(const char *facadeName)
+{
+    LLBC_LockGuard guard(_lock);
+
+    _facadeNameKey.assign(facadeName);
+    _Facades2::iterator it = _facades2.find(_facadeNameKey);
+    if (it == _facades2.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return NULL;
+    }
+
+    _Facades &facades = it->second;
+    return facades[0];
+
+}
+
 LLBC_IFacade *LLBC_Service::GetFacade(const LLBC_String &facadeName)
 {
     LLBC_LockGuard guard(_lock);
@@ -816,7 +834,7 @@ LLBC_IFacade *LLBC_Service::GetFacade(const LLBC_String &facadeName)
     return facades[0];
 }
 
-std::vector<LLBC_IFacade *> LLBC_Service::GetFacades(const LLBC_String &facadeName)
+const std::vector<LLBC_IFacade *> &LLBC_Service::GetFacades(const LLBC_String &facadeName)
 {
     static const std::vector<LLBC_IFacade *> emptyFacades;
 
@@ -1054,7 +1072,7 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
     if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
+        return LLBC_INVALID_LISTENER_STUB;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
@@ -1074,9 +1092,18 @@ void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
         BuildUnsubscribeEvEv(0, stub));
 }
 
-void LLBC_Service::FireEvent(LLBC_Event *ev)
+void LLBC_Service::FireEvent(LLBC_Event *ev,
+                             LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
+                             bool addiCtorBorrowed,
+                             LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
+                             bool customDtorBorrowed)
 {
-    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
+    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev, addiCtor, addiCtorBorrowed, customDtor, customDtorBorrowed));
+}
+
+LLBC_EventManager &LLBC_Service::GetEventManager()
+{
+    return _evManager;
 }
 
 int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
@@ -1822,7 +1849,11 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     _evManager.FireEvent(ev.ev);
-    ev.ev = NULL;
+    if (!ev.customDtor)
+    {
+        ev.ev = NULL;
+        return;
+    }
 }
 
 void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
@@ -1972,8 +2003,6 @@ void LLBC_Service::DestroyFacades()
         _Facades *&evFacades = _caredEventFacades[evOffset];
         LLBC_XDelete(evFacades);
     }
-
-    LLBC_STLHelper::DeleteContainer(_facadeLibraries);
 }
 
 void LLBC_Service::DestroyWillRegFacades()
@@ -1989,16 +2018,24 @@ void LLBC_Service::DestroyWillRegFacades()
     _willRegFacades.clear();
 }
 
+void LLBC_Service::CloseAllFacadeLibraries()
+{
+    LLBC_STLHelper::DeleteContainer(_facadeLibraries);
+}
+
 void LLBC_Service::AddFacade(LLBC_IFacade *facade)
 {
     // Add facade to _facades(vector)
     _facades.push_back(facade);
 
     // Add facade to _facades2(map<type, vector>)
+    const char *cFacadeName = LLBC_GetTypeName(*facade);
     const LLBC_String facadeName = LLBC_GetTypeName(*facade);
     _Facades2::iterator facadesIt = _facades2.find(facadeName);
     if (facadesIt == _facades2.end())
+    {
         facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+    }
     _Facades2::mapped_type &typeFacades = facadesIt->second;
     typeFacades.push_back(facade);
 
@@ -2061,6 +2098,8 @@ void LLBC_Service::ClearFacadesWhenInitFacadeFailed()
     StopFacades();
     DestroyFacades();
     DestroyWillRegFacades();
+
+    CloseAllFacadeLibraries();
 }
 
  void LLBC_Service::InitAutoReleasePool()

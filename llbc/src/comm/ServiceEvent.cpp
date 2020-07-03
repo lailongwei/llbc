@@ -149,12 +149,41 @@ LLBC_SvcEv_AppCfgReloadedEv::~LLBC_SvcEv_AppCfgReloadedEv()
 LLBC_SvcEv_FireEv::LLBC_SvcEv_FireEv()
 : Base(_EvType::FireEv)
 , ev(NULL)
+
+, addiCtor(NULL)
+, addiCtorBorrowed(false)
+, customDtor(NULL)
+, customDtorBorrowed(false)
 {
 }
 
 LLBC_SvcEv_FireEv::~LLBC_SvcEv_FireEv()
 {
-    LLBC_XDelete(ev);
+    // Clear additional constructor.
+    if (addiCtor && !addiCtorBorrowed)
+        LLBC_Delete(addiCtor);
+
+    // If event is NULL, clear custom destructor, and than return.
+    if (!ev)
+    {
+        if (customDtor && !customDtorBorrowed)
+            LLBC_Delete(customDtor);
+
+        return;
+    }
+
+    // Normal delete event if not found custom destructor.
+    if (!customDtor)
+    {
+        if (ev && !ev->IsDontDelAfterFire())
+            LLBC_Delete(ev);
+        return;
+    }
+
+    // Use custom destructor to destruct event, and than clear custom destructor.
+    customDtor->Invoke(ev);
+    if (!customDtorBorrowed)
+        LLBC_Delete(customDtor);
 }
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionCreateEv(const LLBC_SockAddr_IN &local,
@@ -269,12 +298,23 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEvEv(int id, const LLBC_Liste
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEvEv(LLBC_Event *ev)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEvEv(LLBC_Event *ev,
+                                                 LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
+                                                 bool addiCtorBorrowed,
+                                                 LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
+                                                 bool customDtorBorrowed)
 {
     typedef LLBC_SvcEv_FireEv _Ev;
 
     _Ev *wrapEv = LLBC_New(_Ev);
     wrapEv->ev = ev;
+    wrapEv->addiCtor = addiCtor;
+    wrapEv->addiCtorBorrowed = addiCtorBorrowed;
+    wrapEv->customDtor = customDtor;
+    wrapEv->customDtorBorrowed = customDtorBorrowed;
+
+    if (addiCtor)
+        addiCtor->Invoke(ev);
 
     return __CreateEvBlock(wrapEv);
 }

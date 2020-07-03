@@ -265,6 +265,12 @@ inline bool LLBC_Variant::IsStr() const
         LLBC_VariantType::VT_STR_DFT);
 }
 
+inline bool LLBC_Variant::IsSeq() const
+{
+    return ((_holder.type & LLBC_VariantType::VT_SEQ_DFT) ==
+        LLBC_VariantType::VT_SEQ_DFT);
+}
+
 inline bool LLBC_Variant::IsDict() const
 {
     return ((_holder.type & LLBC_VariantType::VT_DICT_DFT) ==
@@ -400,6 +406,17 @@ inline LLBC_Variant &LLBC_Variant::BecomeStr()
     {
         CleanTypeData(_holder.type);
         _holder.type = LLBC_VariantType::VT_STR_DFT;
+    }
+
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::BecomeSeq()
+{
+    if (!IsSeq())
+    {
+        CleanTypeData(_holder.type);
+        _holder.type = LLBC_VariantType::VT_SEQ_DFT;
     }
 
     return *this;
@@ -543,6 +560,11 @@ inline LLBC_Variant::operator LLBC_String () const
     return AsStr();
 }
 
+inline LLBC_Variant::operator const LLBC_Variant::Seq &() const
+{
+    return AsSeq();
+}
+
 inline LLBC_Variant::operator const LLBC_Variant::Dict &() const
 {
     return AsDict();
@@ -561,41 +583,70 @@ inline LLBC_Variant &LLBC_Variant::operator =(const _T * const &val)
     return *this;
 }
 
-template <typename _Kty, typename _Ty>
-inline std::pair<LLBC_Variant::DictIter, bool> LLBC_Variant::Insert(const _Kty &key, const _Ty &val)
+template <typename _Ty>
+inline LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, const _Ty &val)
 {
-    return this->Insert(LLBC_Variant::Dict::key_type(key),
+    return this->SeqInsert(it, LLBC_Variant(val));
+}
+template <typename _Ty>
+void LLBC_Variant::SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val)
+{
+    this->SeqInsert(it, n, LLBC_Variant(val));
+}
+
+template <typename _Ty>
+void LLBC_Variant::SeqPushBack(const _Ty &val)
+{
+    this->SeqPushBack(LLBC_Variant(val));
+}
+
+template <typename _Ty>
+void LLBC_Variant::SeqResize(Seq::size_type n, const _Ty &val)
+{
+    this->SeqResize(n, LLBC_Variant(val));
+}
+
+template <typename _Ty>
+void LLBC_Variant::SeqErase(const _Ty &val)
+{
+    this->SeqErase(LLBC_Variant(val));
+}
+
+template <typename _Kty, typename _Ty>
+inline std::pair<LLBC_Variant::DictIter, bool> LLBC_Variant::DictInsert(const _Kty &key, const _Ty &val)
+{
+    return this->DictInsert(LLBC_Variant::Dict::key_type(key),
         LLBC_Variant::Dict::mapped_type(val));
 }
 
 template <typename _Kty>
-inline LLBC_Variant::DictIter LLBC_Variant::Find(const _Kty &key)
+inline LLBC_Variant::DictIter LLBC_Variant::DictFind(const _Kty &key)
+{
+    return this->DictFind(LLBC_Variant::Dict::key_type(key));
+}
+
+template <typename _Kty>
+inline LLBC_Variant::DictConstIter LLBC_Variant::DictFind(const _Kty &key) const
 {
     return this->Find(LLBC_Variant::Dict::key_type(key));
 }
 
 template <typename _Kty>
-inline LLBC_Variant::DictConstIter LLBC_Variant::Find(const _Kty &key) const
+inline LLBC_Variant::Dict::size_type LLBC_Variant::DictErase(const _Kty &key)
 {
-    return this->Find(LLBC_Variant::Dict::key_type(key));
+    return this->DictErase(LLBC_Variant::Dict::key_type(key));
 }
 
 template <typename _Kty>
-inline LLBC_Variant::Dict::size_type LLBC_Variant::Erase(const _Kty &key)
+inline LLBC_Variant &LLBC_Variant::operator [](const _Kty &key)
 {
-    return this->Erase(LLBC_Variant::Dict::key_type(key));
+    return this->operator [](LLBC_Variant(key));
 }
 
 template <typename _Kty>
-inline LLBC_Variant::Dict::mapped_type &LLBC_Variant::operator [](const _Kty &key)
+inline const LLBC_Variant &LLBC_Variant::operator [](const _Kty &key) const
 {
-    return this->operator [](LLBC_Variant::Dict::key_type(key));
-}
-
-template <typename _Kty>
-inline const LLBC_Variant::Dict::mapped_type &LLBC_Variant::operator [](const _Kty &key) const
-{
-    return this->operator [](LLBC_Variant::Dict::key_type(key));
+    return this->operator [](LLBC_Variant(key));
 }
 
 __LLBC_NS_END

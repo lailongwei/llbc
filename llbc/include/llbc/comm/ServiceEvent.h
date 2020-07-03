@@ -182,6 +182,11 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 {
     LLBC_Event *ev;
 
+    LLBC_IDelegate1<void, LLBC_Event *> *addiCtor;
+    bool addiCtorBorrowed;
+    LLBC_IDelegate1<void, LLBC_Event *> *customDtor;
+    bool customDtorBorrowed;
+
     LLBC_SvcEv_FireEv();
     virtual ~LLBC_SvcEv_FireEv();
 };
@@ -263,7 +268,11 @@ public:
     /**
      * Build fire-event event.
      */
-    static LLBC_MessageBlock *BuildFireEvEv(LLBC_Event *ev);
+    static LLBC_MessageBlock *BuildFireEvEv(LLBC_Event *ev,
+                                            LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
+                                            bool addiCtorBorrowed,
+                                            LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
+                                            bool customDtorBorrowed);
 
     /**
      * Build application config reloaded event.

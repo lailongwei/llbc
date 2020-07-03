@@ -21,6 +21,7 @@
 
 #include "pyllbc/common/Export.h"
 
+#include "pyllbc/comm/PyEvent.h"
 #include "pyllbc/comm/PyObjCoder.h"
 #include "pyllbc/comm/PyPacketHandler.h"
 #include "pyllbc/comm/PyFacade.h"
@@ -38,6 +39,9 @@ namespace
     }
 }
 
+PyObject *pyllbc_Service::_pyEvCls = NULL;
+LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_addiEvCtor(&pyllbc_Service::AddiEventCtor);
+LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_customEvDtor(&pyllbc_Service::CustomEventDtor);
 PyObject *pyllbc_Service::_streamCls = NULL;
 pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
 
@@ -61,7 +65,6 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
 
 , _codec((This::Codec)(PYLLBC_CFG_DFT_SVC_CODEC))
 , _codecs()
-
 , _suppressedCoderNotFoundWarning(false)
 
 , _beforeFrameCallables()
@@ -80,6 +83,11 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
     // Create cobj python attribute key.
     _keyCObj = Py_BuildValue("s", "cobj");
 
+    // Get event class.
+    if (!This::_pyEvCls)
+        This::_pyEvCls = pyllbc_s_TopModule->GetObject("Event"); // Borrowed
+
+    // Get stream class.
     if (!This::_streamCls)
         This::_streamCls = pyllbc_s_TopModule->GetObject("Stream"); // Borrowed
 }
@@ -181,8 +189,9 @@ int pyllbc_Service::Start(int pollerCount)
     if (_llbcSvc->Start(pollerCount) != LLBC_OK)
     {
         _started = false;
-        pyllbc_TransferLLBCError(__FILE__, __LINE__);
 
+        // Maybe is native library occurred, force transfer llbc error.
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "when start native Service");
         // Transfer hooked error to python, and Restore error hooker install status.
         _errHooker->TransferHookedErrorToPython();
         if (!errHookerInstalled)
@@ -242,7 +251,7 @@ int pyllbc_Service::RegisterFacade(PyObject *facade)
     return LLBC_OK;
 }
 
-int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *&facade)
+int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *facadeCls, PyObject *&facade)
 {
     // Force reset facade ptr.
     facade = NULL;
@@ -263,47 +272,85 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
         return LLBC_FAILED;
     }
 
-    // Define python layer facade class and compile it.
-    LLBC_String facadeClsDef;
-    facadeClsDef.append_format("import llbc\n");
-    facadeClsDef.append_format("class %s(llbc.inl.BaseLibFacade):\n", facadeName.c_str());
-    facadeClsDef.append_format("    \"\"\"Dynamic load facade %s(from native dynamic library:%s) define\"\"\"\n", facadeName.c_str(), libPath.c_str());
-    facadeClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
-    facadeClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", facadeName.c_str());
-    const LLBC_FacadeMethods *nativeMeths = nativeFacade->GetAllMethods();
-    if (nativeMeths)
-    {
-        typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
-        const LLBC_FacadeMethods::Methods &nativeMethsDict = nativeMeths->GetAllMethods();
-        for (_NativeMethodsIter nativeMethIt = nativeMethsDict.begin();
-             nativeMethIt != nativeMethsDict.end();
-             ++nativeMethIt)
-        {
-            const char *nativeMeth = nativeMethIt->first.GetCStr();
-            facadeClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
-            facadeClsDef.append_format("        return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
-        }
-    }
-
-    facadeClsDef.append_format("\n");
-    if (PyRun_SimpleString(facadeClsDef.c_str()) != 0)
-    {
-        pyllbc_TransferPyError("When compile facade class");
-        return LLBC_FAILED;
-    }
-
-    // Get compiled python layer facade class.
+    // Get python global env.
     PyObject *pyGbl = PyEval_GetGlobals(); // Borrowed reference.
     if (!pyGbl)
     {
         pyllbc_TransferPyError("When get python global env");
         return LLBC_FAILED;
     }
-    PyObject *facadeCls = PyDict_GetItemString(pyGbl, facadeName.c_str()); // Borroewd reference for return.
-    if (!facadeCls)
+
+    // Get native facade native methods.
+    typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
+    const LLBC_FacadeMethods::Methods *nativeMeths = nativeFacade->GetAllMethods() ? &nativeFacade->GetAllMethods()->GetAllMethods() : NULL;
+
+    // If not specific python facade class, define python layer facade class and compile it.
+    if (!facadeCls || pyllbc_TypeDetector::IsNone(facadeCls))
     {
-        pyllbc_TransferPyError("When get python layer facade class");
-        return LLBC_FAILED;
+        LLBC_String facadeClsDef;
+        facadeClsDef.append_format("import llbc\n");
+        facadeClsDef.append_format("class %s(llbc.inl.BaseLibFacade):\n", facadeName.c_str());
+        facadeClsDef.append_format("    \"\"\"Dynamic load facade %s(from native dynamic library:%s) define\"\"\"\n", facadeName.c_str(), libPath.c_str());
+        facadeClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
+        facadeClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", facadeName.c_str());
+        if (nativeMeths)
+        {
+            for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
+                 nativeMethIt != nativeMeths->end();
+                 ++nativeMethIt)
+            {
+                const char *nativeMeth = nativeMethIt->first.GetCStr();
+                facadeClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
+                facadeClsDef.append_format("        return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
+            }
+        }
+
+        facadeClsDef.append_format("\n");
+        if (PyRun_SimpleString(facadeClsDef.c_str()) != 0)
+        {
+            pyllbc_TransferPyError("When compile facade class");
+            return LLBC_FAILED;
+        }
+
+        // Get compiled python layer facade class.
+        facadeCls = PyDict_GetItemString(pyGbl, facadeName.c_str()); // Borroewd reference for return.
+        if (!facadeCls)
+        {
+            pyllbc_TransferPyError("When get python layer facade class(auto generated by internal routine)");
+            return LLBC_FAILED;
+        }
+    }
+    else if (nativeMeths)
+    {
+        for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
+             nativeMethIt != nativeMeths->end();
+             ++nativeMethIt)
+        {
+            const char *nativeMeth = nativeMethIt->first.GetCStr();
+
+            LLBC_String facadeMethDef;
+            facadeMethDef.append_format("def %s(self, arg):\n", nativeMeth);
+            facadeMethDef.append_format("    return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
+
+            if (PyRun_SimpleString(facadeMethDef.c_str()) != 0)
+            {
+                pyllbc_TransferPyError("When compile facade method");
+                return LLBC_FAILED;
+            }
+
+            PyObject *pyFacadeMeth = PyDict_GetItemString(pyGbl, nativeMeth); // Borrow reference for return.
+            if (!pyFacadeMeth)
+            {
+                pyllbc_TransferPyError("When get python layer facade meth(auto generated by internal routine)");
+                return LLBC_FAILED;
+            }
+
+            if (PyObject_SetAttrString(facadeCls, nativeMeth, pyFacadeMeth) != 0) // not steal reference.
+            {
+                pyllbc_TransferPyError("When set auto generated facade meth to facade class");
+                return LLBC_FAILED;
+            }
+        }
     }
 
     // Create python layer facade instance.
@@ -312,10 +359,8 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
     PyObject *pyMeths = PySet_New(NULL);
     if (nativeMeths)
     {
-        typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
-        const LLBC_FacadeMethods::Methods &nativeMethsDict = nativeMeths->GetAllMethods();
-        for (_NativeMethodsIter nativeMethIt = nativeMethsDict.begin();
-             nativeMethIt != nativeMethsDict.end();
+        for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
+             nativeMethIt != nativeMeths->end();
              ++nativeMethIt)
             PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.GetCStr())); // Steal referencce for o.
     }
@@ -629,6 +674,49 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
+LLBC_ListenerStub pyllbc_Service::SubscribeEvent(int event, PyObject *listener)
+{
+    // Create pyllbc layer event delegate.
+    pyllbc_EventListener *evListener = LLBC_New(pyllbc_EventListener);
+    if (evListener->SetPyListener(listener) != LLBC_OK)
+        return LLBC_INVALID_LISTENER_STUB;
+
+    return _llbcSvc->SubscribeEvent(event, evListener);
+}
+
+void pyllbc_Service::UnsubscribeEvent(int event)
+{
+    _llbcSvc->UnsubscribeEvent(event);
+}
+
+void pyllbc_Service::UnsubscribeEvent(LLBC_ListenerStub stub)
+{
+    _llbcSvc->UnsubscribeEvent(stub);
+}
+
+int pyllbc_Service::FireEvent(PyObject *ev)
+{
+    if (!PyObject_IsInstance(ev, _pyEvCls))
+    {
+        pyllbc_SetError("event object is not instance of <Event> class");
+        return LLBC_FAILED;
+    }
+
+    PyObject *nativeEvObj = PyObject_GetAttr(ev, _keyCObj); // New reference.
+    if (!nativeEvObj)
+    {
+        pyllbc_TransferPyError("When get native event object");
+        return LLBC_FAILED;
+    }
+
+    LLBC_Event *nativeEv = reinterpret_cast<LLBC_Event *>(PyLong_AsUnsignedLongLong(nativeEvObj));
+    Py_DECREF(nativeEvObj);
+
+    _llbcSvc->FireEvent(nativeEv, &_addiEvCtor, true, &_customEvDtor, true);
+
+    return PyErr_Occurred() ? LLBC_FAILED : LLBC_OK;
+}
+
 int pyllbc_Service::Post(PyObject *callable)
 {
     if (!PyCallable_Check(callable))
@@ -770,7 +858,6 @@ void pyllbc_Service::AfterStop()
     _handledBeforeFrameCallables = false;
     DestroyFrameCallables(_beforeFrameCallables, _handlingBeforeFrameCallables);
     DestroyFrameCallables(_afterFrameCallables, _handlingAfterFrameCallables);
-
 }
 
 void pyllbc_Service::HandleFrameCallables(pyllbc_Service::_FrameCallables &callables, bool &usingFlag)
@@ -868,3 +955,16 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
         return LLBC_OK;
     }
 }
+
+void pyllbc_Service::AddiEventCtor(LLBC_Event *ev)
+{
+    PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
+    Py_INCREF(pyEv);
+}
+
+void pyllbc_Service::CustomEventDtor(LLBC_Event *ev)
+{
+    PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
+    Py_DECREF(pyEv);
+}
+

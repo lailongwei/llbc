@@ -117,6 +117,33 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
         return LLBC_OK;
     }
 
+    case PYLLBC_LIST_OBJ:
+    case PYLLBC_TUPLE_OBJ:
+    {
+        var.BecomeSeq();
+
+        PyObject *seq = PySequence_Fast(obj, NULL); // New reference
+        Py_ssize_t seqSize = PySequence_Fast_GET_SIZE(obj);
+        for (Py_ssize_t i = 0; i != seqSize; ++i)
+        {
+            PyObject *elem = PySequence_Fast_GET_ITEM(seq, i); // Borrowed reference
+
+            var.SeqPushBack(LLBC_Variant::nil);
+            LLBC_Variant &elemVar = var.SeqBack();
+            if (Obj2Variant(elem, elemVar) != LLBC_OK)
+            {
+                var.SeqPopBack();
+                Py_DECREF(seq);
+
+                return LLBC_FAILED;
+            }
+        }
+
+        Py_DECREF(seq);
+
+        return LLBC_OK;
+    }
+
     case PYLLBC_DICT_OBJ:
     {
         var.BecomeDict();
@@ -133,7 +160,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
             if (UNLIKELY(Obj2Variant(value, nativeValue) != LLBC_OK))
                 return LLBC_FAILED;
 
-            var.Insert(nativeKey, nativeValue);
+            var.DictInsert(nativeKey, nativeValue);
         }
 
         return LLBC_OK;
@@ -195,11 +222,30 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
     {
         return PyString_FromStringAndSize(var.GetHolder().obj.str->c_str(), var.GetHolder().obj.str->size());
     }
+    else if (var.IsSeq()) // Seq type
+    {
+        const size_t seqSize = var.Size();
+        PyObject *pyList = PyList_New(seqSize);
+        for (size_t i = 0; i != seqSize; ++i)
+        {
+            const LLBC_Variant &elem = var[i];
+            PyObject *pyElem = Variant2Obj(elem);
+            if (!pyElem)
+            {
+                Py_DECREF(pyList);
+                return NULL;
+            }
+
+            PyList_SET_ITEM(pyList, i, pyElem); // Steals pyElem reference.
+        }
+
+        return pyList;
+    }
     else if (var.IsDict()) // Dict type
     {
         PyObject *pyDict = PyDict_New();
-        for (LLBC_Variant::DictConstIter it = var.Begin();
-             it != var.End();
+        for (LLBC_Variant::DictConstIter it = var.DictBegin();
+             it != var.DictEnd();
              ++it)
         {
             const LLBC_Variant &key = it->first;

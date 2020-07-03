@@ -9,6 +9,9 @@ class pyllbcBaseLibFacade(object):
         self._name = name
         self._meths = meths
 
+    def __del__(self):
+        llbc.Log.d('!!!!!!!! will delete base lib facade, name:{}'.format(self.__class__.__name__))
+
     @property
     def is_lib_facade(object):
         return True
@@ -30,4 +33,4 @@ class pyllbcBaseLibFacade(object):
         """
         return llbc.inl.CallFacadeMethod(self._c_obj, meth, arg)
 
-llbc.inl.BaseLibFacade = pyllbcBaseLibFacade
+llbc.BaseLibFacade = pyllbcBaseLibFacade

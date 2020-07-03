@@ -450,7 +450,7 @@ bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
                 pyllbc_TransferPyError();
                 return false;
             }
-
+            
             Py_DECREF(pyRtn);
         }
     }

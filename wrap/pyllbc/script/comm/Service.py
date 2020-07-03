@@ -438,7 +438,7 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registerfacade(self, facade, libpath=''):
+    def registerfacade(self, facade, libpath='', libfacade_cls=None):
         """
         Register facade.
             facade methods(all methods are optional):
@@ -499,9 +499,8 @@ class pyllbcService(object):
             if isinstance(facade, unicode):
                 facade = facade.encode('utf8')
 
-            facade = llbc.inl.RegisterLibFacade(self._c_obj, facade, libpath)
+            facade = llbc.inl.RegisterLibFacade(self._c_obj, facade, libpath, libfacade_cls)
         else:
-            facade = facade()
             llbc.inl.RegisterFacade(self._c_obj, facade)
 
         self._facades.update({facade.__class__: facade})
@@ -713,6 +712,39 @@ class pyllbcService(object):
         For get more informations, see subscribe() method.
         """
         llbc.inl.UnifyPreSubscribe(self._c_obj, prehandler)
+
+    def subscribe_event(self, evid, listener):
+        """
+        Subscribe event.
+        :param evid: the event id, must be integer type.
+        :param listener: the event listener.
+        :return stub: the event stub.
+        """
+        return llbc.inl.SubscribeEvent(self._c_obj, evid, listener)
+
+    def unsubscribe_event(self, stub):
+        """
+        Unsubscribe event(by event stub).
+        :param stub: the event stub.
+        :return: None
+        """
+        llbc.inl.UnsubscribeEventByStub(self._c_obj, stub)
+
+    def unsubscribe_event2(self, evid):
+        """
+        Unsubscribe event(by event id).
+        :param evid: the event id.
+        :return: None
+        """
+        llbc.inl.UnsubscribeEventById(self._c_obj, evid)
+
+    def fire_event(self, ev):
+        """
+        Fire event.
+        :param ev: the event object.
+        :return: None
+        """
+        llbc.inl.FireEvent(self._c_obj, ev)
 
     def post(self, cble):
         """

@@ -23,7 +23,6 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/helper/STLHelper.h"
-#include "llbc/core/helper/GUIDHelper.h"
 
 #include "llbc/core/event/Event.h"
 #include "llbc/core/event/EventManager.h"
@@ -95,7 +94,9 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         stub = bindedStub;
     }
     else
+    {
         stub = ++_maxListenerStub;
+    }
 
     _Op op;
     op.addOp = true;
@@ -239,7 +240,7 @@ int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
                 LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
                 return LLBC_FAILED;
             }
-            
+
             const int evId = stubIt->second.evId;
             _ListenersMap::iterator mIt = _listeners.find(evId);
 

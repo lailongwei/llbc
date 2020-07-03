@@ -408,4 +408,19 @@ private:                                            \
 // Define rtti buffer size.
  #define __LLBC_RTTI_BUF_SIZE    512
 
+/**
+ * Facade generic call method converience macros define.
+ */
+// Define facade generic method interface code generate macro.
+#define LLBC_FACADE_GENERIC_METHOD_INTERFACE(methName)              \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) = 0 \
+
+// Define facade generic method code generate macro.
+#define LLBC_FACADE_GENERIC_METHOD(methName)                        \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+
+// Define facade generic method implement code macro.
+#define LLBC_FACADE_GENERIC_METHOD_IMPL(facadeCls, methName)  \
+    int facadeCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+
 #endif // !__LLBC_COM_MACRO_H__

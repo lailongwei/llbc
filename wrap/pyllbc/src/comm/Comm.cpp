@@ -106,6 +106,10 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.UnifyPreSubscribe);
     inlMod->AddMethod(methods.GetServiceCodec);
     inlMod->AddMethod(methods.SetServiceCodec);
+    inlMod->AddMethod(methods.SubscribeEvent);
+    inlMod->AddMethod(methods.UnsubscribeEventById);
+    inlMod->AddMethod(methods.UnsubscribeEventByStub);
+    inlMod->AddMethod(methods.FireEvent);
     inlMod->AddMethod(methods.InstallErrHooker);
     inlMod->AddMethod(methods.UninstallErrHooker);
     inlMod->AddMethod(methods.ClearHookedErrors);

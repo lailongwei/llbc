@@ -248,7 +248,7 @@ bool LLBC_Ini::IsHasSection(const LLBC_String &sectionName) const
 
 bool LLBC_Ini::IsHasKey(const LLBC_String &sectionName, const LLBC_String &key) const
 {
-    _Sections::const_iterator it = _sections.find(sectionName);
+    LLBC_IniSections::const_iterator it = _sections.find(sectionName);
     if (it == _sections.end())
         return false;
 
@@ -263,7 +263,7 @@ LLBC_IniSection *LLBC_Ini::GetSection(const LLBC_String &sectionName)
 
 const LLBC_IniSection *LLBC_Ini::GetSection(const LLBC_String &sectionName) const
 {
-    _Sections::const_iterator it = _sections.find(sectionName);
+    LLBC_IniSections::const_iterator it = _sections.find(sectionName);
     if (it == _sections.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -281,7 +281,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
         return LLBC_FAILED;
     }
 
-    _Sections::iterator it = _sections.find(sectionName);
+    LLBC_IniSections::iterator it = _sections.find(sectionName);
     if (it != _sections.end())
     {
         if (merge)
@@ -326,7 +326,7 @@ LLBC_String LLBC_Ini::GetComment(const LLBC_String &sectionName, const LLBC_Stri
     return section->GetComment(key);
 }
 
-const LLBC_Ini::_Sections &LLBC_Ini::GetAllSections() const
+const LLBC_IniSections &LLBC_Ini::GetAllSections() const
 {
     return _sections;
 }
@@ -574,7 +574,7 @@ void LLBC_Ini::Copy(const This &another)
     _sectionNames = another._sectionNames;
 
     LLBC_STLHelper::DeleteContainer(_sections, true);
-    for (_Sections::const_iterator it = another._sections.begin();
+    for (LLBC_IniSections::const_iterator it = another._sections.begin();
          it != another._sections.end();
          ++it)
         _sections.insert(std::make_pair(it->first, LLBC_New1(LLBC_IniSection, *it->second)));

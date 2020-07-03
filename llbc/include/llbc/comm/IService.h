@@ -422,11 +422,14 @@ public:
     template <typename FacadeCls>
     FacadeCls *GetFacade();
     template <typename FacadeCls>
-    std::vector<LLBC_IFacade *> GetFacades();
-    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
+    FacadeCls *GetFacade(const char *facadeName);
     template <typename FacadeCls>
     FacadeCls *GetFacade(const LLBC_String &facadeName);
-    virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName) = 0;
+    virtual LLBC_IFacade *GetFacade(const char *facadeName) = 0;
+    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
+    template <typename FacadeCls>
+    std::vector<LLBC_IFacade *> GetFacades();
+    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName) = 0;
 
 public:
     /**
@@ -531,9 +534,23 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev - the fill fire event pointer.
+     * @param[in] ev                 - the fill fire event pointer.
+     * @param[in] addiCtor           - the additional constructor.
+     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
+     * @param[in] customDtor         - the custom destructor.
+     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
      */
-    virtual void FireEvent(LLBC_Event *ev) = 0;
+    virtual void FireEvent(LLBC_Event *ev,
+                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
+                           bool addiCtorBorrowed = false,
+                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
+                           bool customDtorBorrowed = false) = 0;
+
+    /**
+     * Get event manager.
+     * @return LLBC_EventManager & - the event manager.
+     */
+    virtual LLBC_EventManager &GetEventManager() = 0;
 
 public:
     /**

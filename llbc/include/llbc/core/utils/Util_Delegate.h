@@ -178,7 +178,9 @@ public:
 LLBC_DELEGATE_TEMPLATE
 class LLBC_DELEGATE : public LLBC_DELEGATE_BASE
 {
+public:
     typedef Rtn (ObjectType::*Method)(LLBC_DELEGATE_ARG);
+
 public:
     LLBC_DELEGATE(ObjectType *object, Method method, bool destroyObjectWhenDestruct = false):
         _object(object), _method(method), _destroyObjectWhenDestruct(destroyObjectWhenDestruct) {  }
@@ -201,7 +203,9 @@ private:
 LLBC_DELEGATE_TEMPLATE_SPEC
 class LLBC_DELEGATE_SPEC : public LLBC_DELEGATE_BASE_SPEC
 {
+public:
     typedef void (ObjectType::*Method)(LLBC_DELEGATE_ARG);
+
 public:
     LLBC_DELEGATE(ObjectType *object, Method method, bool destroyObjectWhenDestruct = false):
         _object(object), _method(method), _destroyObjectWhenDestruct(destroyObjectWhenDestruct) {  }
@@ -224,7 +228,9 @@ private:
 LLBC_FUNC_DELEGATE_TEMPLATE
 class LLBC_FUNC_DELEGATE : public LLBC_DELEGATE_BASE
 {
+public:
     typedef Rtn (*Function)(LLBC_DELEGATE_ARG);
+
 public:
     explicit LLBC_FUNC_DELEGATE(Function function):
         _function(function) {  }

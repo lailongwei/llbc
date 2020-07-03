@@ -63,7 +63,12 @@ inline int LLBC_IService::RegisterCoder(int opcode)
 template <typename FacadeCls>
 inline FacadeCls *LLBC_IService::GetFacade()
 {
-    const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
+    return static_cast<FacadeCls *>(GetFacade(LLBC_GetTypeName(FacadeCls)));
+}
+
+template <typename FacadeCls>
+inline FacadeCls *LLBC_IService::GetFacade(const char *facadeName)
+{
     return static_cast<FacadeCls *>(GetFacade(facadeName));
 }
 

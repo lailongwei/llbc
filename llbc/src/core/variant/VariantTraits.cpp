@@ -42,9 +42,11 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
     }
     else if (right.IsRaw()) // Do RAW type data assignment.
     {
-        // If left type is STR/DICT type, clean first.
+        // If left type is STR/SEQ/DICT type, clean first.
         if (left.IsStr())
             left.CleanStrData();
+        else if (left.IsSeq())
+            left.CleanSeqData();
         else if (left.IsDict())
             left.CleanDictData();
 
@@ -54,9 +56,11 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
     }
     else if (right.IsStr()) // Do STR type data assignment.
     {
-        // If left type is RAW/DICT type, clean first.
+        // If left type is RAW/SEQ/DICT type, clean first.
         if (left.IsRaw())
             left.CleanRawData();
+        else if (left.IsSeq())
+            left.CleanSeqData();
         else if (left.IsDict())
             left.CleanDictData();
 
@@ -77,13 +81,41 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
                 *lHolder.obj.str = *rHolder.obj.str;
         }
     }
-    else if (right.IsDict()) // Do DICT type data assignment.
+    else if (right.IsSeq()) // Do SEQ type data assignment.
     {
-        // If left type is RAW/STR type, clean first.
+         // If left type is RAW/STR/DICT type, clean first.
         if (left.IsRaw())
             left.CleanRawData();
         else if (left.IsStr())
             left.CleanStrData();
+        else if (left.IsDict())
+            left.CleanDictData();
+
+        left.SetType(right.GetType());
+        LLBC_Variant::Holder &lHolder = left.GetHolder();
+        const LLBC_Variant::Holder &rHolder = right.GetHolder();
+        if (rHolder.obj.seq == NULL || rHolder.obj.seq->empty())
+        {
+            if (lHolder.obj.seq)
+                lHolder.obj.dict->clear();
+        }
+        else
+        {
+            if (lHolder.obj.seq == NULL)
+                lHolder.obj.seq = LLBC_New1(LLBC_Variant::Seq, *rHolder.obj.seq);
+            else if (lHolder.obj.seq != rHolder.obj.seq)
+                *lHolder.obj.seq = *rHolder.obj.seq;
+        }
+    }
+    else if (right.IsDict()) // Do DICT type data assignment.
+    {
+        // If left type is RAW/STR/SEQ type, clean first.
+        if (left.IsRaw())
+            left.CleanRawData();
+        else if (left.IsStr())
+            left.CleanStrData();
+        else if (left.IsSeq())
+            left.CleanSeqData();
 
         left.SetType(right.GetType());
         LLBC_Variant::Holder &lHolder = left.GetHolder();
@@ -127,6 +159,29 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
                 return true;
         }
     }
+    else if (left.IsSeq())
+    {
+        if (!right.IsSeq())
+            return false;
+
+        const LLBC_Variant::Seq *lSeq = lHolder.obj.seq;
+        const LLBC_Variant::Seq *rSeq = rHolder.obj.seq;
+        if (lSeq)
+        {
+            if (rSeq)
+                return *lSeq == *rSeq;
+            else
+                return lSeq->empty();
+        }
+        else
+        {
+            if (rSeq)
+                return rSeq->empty();
+            else
+                return true;
+        }
+    }
+
     else if (left.IsDict())
     {
         if (!right.IsDict())
@@ -191,35 +246,64 @@ bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
 
             return *lDict < *rDict;
         }
-        else // Str/Raw/Nil: true
+        else // Seq/Str/Raw/Nil: false
+        {
+            return false;
+        }
+    }
+    else if (left.IsSeq())
+    {
+        if (right.IsDict()) // Seq<Dict: true
         {
             return true;
+        }
+        if (right.IsSeq()) // Seq: exec compare
+        {
+            const LLBC_Variant::Seq *lSeq = left.GetHolder().obj.seq;
+            const LLBC_Variant::Seq *rSeq = right.GetHolder().obj.seq;
+
+            if (lSeq == rSeq)
+                return false;
+
+            if (lSeq == NULL || lSeq->empty())
+                return rSeq && !rSeq->empty();
+            if (rSeq == NULL || rSeq->empty())
+                return false;
+
+            return *lSeq < *rSeq;
+        }
+        else // Str/Raw/Nil: false
+        {
+            return false;
         }
     }
     else if (left.IsStr())
     {
-        if (right.IsDict()) // Dict: true
+        if (right.IsDict() ||
+            right.IsSeq()) // Dict: true
         {
             return false;
         }
         else if (right.IsStr()) // Str: exec compare
         {
-            return left.AsStr() < right.AsStr();
+            if (left._holder.obj.str &&
+                right._holder.obj.str)
+                return *left._holder.obj.str < *right._holder.obj.str;
+            else
+                return false;
         }
-        else // Raw/Nil: true
+        else // Raw/Nil: false
         {
-            return true;
+            return false;
         }
     }
     else if (left.IsRaw())
     {
-        if (right.IsDict()) // Dict: false
+        if (right.IsDict() ||
+            right.IsSeq() ||
+            right.IsStr()) // Dict/Seq/Str: true
         {
-            return false;
-        }
-        else if (right.IsStr()) // Str: false
-        {
-            return false;
+            return true;
         }
         else if (right.IsRaw()) // Raw: exec compare
         {
@@ -232,14 +316,15 @@ bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
             else
                 return left.AsUInt64() < right.AsUInt64();
         }
-        else // Nil: true
+        else // Nil: false
         {
-            return true;
+            return false;
         }
     }
-
-    // Nil < any type: false
-    return false;
+    else
+    {
+        return !right.IsNil();
+    }
 }
 
 bool LLBC_VariantTraits::gt(const LLBC_Variant &left, const LLBC_Variant &right)
@@ -319,6 +404,37 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
 
         return;
     }
+    else if (left.IsSeq() || right.IsSeq())
+    {
+        if (!left.IsSeq() || !right.IsSeq())
+        {
+            left.BecomeNil();
+            return;
+        }
+
+        LLBC_Variant::Seq *&lSeq = left.GetHolder().obj.seq;
+        const LLBC_Variant:: Seq *rSeq = right.GetHolder().obj.seq;
+        if (lSeq == NULL)
+        {
+            if (rSeq == NULL || rSeq->empty())
+                return;
+
+            lSeq = LLBC_New0(LLBC_Variant::Seq);
+        }
+
+        if (rSeq)
+        {
+            for (LLBC_Variant::SeqConstIter rIt = rSeq->begin();
+                 rIt != rSeq->end();
+                 ++rIt)
+            {
+                if (std::find(lSeq->begin(), lSeq->end(), *rIt) == lSeq->end())
+                    lSeq->push_back(*rIt);
+            }
+        }
+
+        return;
+    }
     else if (left.IsStr() || right.IsStr())
     {
         left = left.AsStr() + right.AsStr();
@@ -366,6 +482,39 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
 
         return;
     }
+    else if (left.IsSeq() || right.IsSeq())
+    {
+        if (!left.IsSeq() || !right.IsSeq())
+        {
+            left.BecomeNil();
+            return;
+        }
+
+        LLBC_Variant::Seq *&lSeq = left.GetHolder().obj.seq;
+        const LLBC_Variant::Seq *rSeq = right.GetHolder().obj.seq;
+        if (lSeq == NULL)
+        {
+            if (rSeq == NULL || rSeq->empty())
+                return;
+
+            lSeq = LLBC_New0(LLBC_Variant::Seq);
+        }
+
+        if (rSeq)
+        {
+            typedef LLBC_Variant::Seq::const_iterator _It;
+            for (_It rIt = rSeq->begin(); 
+                 rIt != rSeq->end() && !lSeq->empty(); 
+                 rIt++)
+            {
+                _It lIt;
+                while ((lIt = std::find(lSeq->begin(), lSeq->end(), *rIt)) != lSeq->end())
+                    lSeq->erase(lIt);
+            }
+        }
+
+        return;
+    }
     else if (left.IsStr() || right.IsStr())
     {
         left = LLBC_FilterOutString(left, right);
@@ -400,13 +549,44 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
             return;
         }
 
-        LLBC_Variant cLeft(left);
-        LLBC_Variant::Dict *clDict = cLeft.GetHolder().obj.dict;
-        for (LLBC_Variant::Dict::const_iterator clIt = clDict->begin();
-             clIt != clDict->end(); clIt++)
+        for (LLBC_Variant::DictIter lIt = lDict->begin();
+             lIt != lDict->end();
+             )
         {
-            if (rDict->find(clIt->first) == rDict->end())
-                lDict->erase(clIt->first);
+            if (rDict->find(lIt->first) == rDict->end())
+                lIt = lDict->erase(lIt);
+            else
+                ++lIt;
+        }
+
+        return;
+    }
+    else if (left.IsSeq() || right.IsSeq())
+    {
+        if (!left.IsSeq() || !right.IsSeq())
+        {
+            left.BecomeNil();
+            return;
+        }
+
+        LLBC_Variant::Seq *&lSeq = left.GetHolder().obj.seq;
+        const LLBC_Variant::Seq *rSeq= right.GetHolder().obj.seq;
+        if ((lSeq == NULL || lSeq->empty()) ||
+            (rSeq == NULL || rSeq->empty()))
+        {
+            if (lSeq)
+                lSeq->clear();
+            return;
+        }
+
+        for (LLBC_Variant::SeqIter lIt = lSeq->begin();
+             lIt != lSeq->end();
+             )
+        {
+            if (std::find(rSeq->begin(), rSeq->end(), *lIt) == rSeq->end())
+                lIt = lSeq->erase(lIt);
+            else
+                ++lIt;
         }
 
         return;
@@ -447,34 +627,98 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
 
         LLBC_Variant::Dict *&lDict = left.GetHolder().obj.dict;
         const LLBC_Variant::Dict *rDict = right.GetHolder().obj.dict;
-        if ((!lDict || lDict->empty()) ||
-            (!rDict || rDict->empty()))
+        const bool lDictIsEmpty = !lDict || lDict->empty();
+        const bool rDictIsEmpty = !rDict || rDict->empty();
+        if (lDictIsEmpty)
         {
-            if (lDict)
-                lDict->clear();
+            if (rDictIsEmpty)
+                return;
+
+            if (!lDict)
+                lDict = LLBC_New1(LLBC_Variant::Dict, *rDict);
+            else
+                *lDict = *rDict;
+
+            return;
+        }
+        else if (rDictIsEmpty)
+        {
             return;
         }
 
-        LLBC_Variant cLeft(left);
-        LLBC_Variant::Dict *clDict = cLeft.GetHolder().obj.dict;
-        for (LLBC_Variant::Dict::const_iterator clIt = clDict->begin();
-             clIt != clDict->end();
-             clIt++)
+        const LLBC_Variant intersection(left * right);
+        const LLBC_Variant::Dict * const &iDict = intersection.GetHolder().obj.dict;
+        for (LLBC_Variant::DictIter lIt = lDict->begin();
+             lIt != lDict->end();
+             )
         {
-            if (rDict->find(clIt->first) != rDict->end())
-                lDict->erase(clIt->first);
+            if (iDict->find(lIt->first) != iDict->end())
+                lIt = lDict->erase(lIt);
+            else
+                ++lIt;
         }
 
-        for (LLBC_Variant::Dict::const_iterator rIt = rDict->begin();
+        for (LLBC_Variant::DictConstIter rIt = rDict->begin();
              rIt != rDict->end();
-             rIt++)
+             ++rIt)
         {
-            if (clDict->find(rIt->first) == clDict->end())
+            if (iDict->find(rIt->first) == iDict->end())
                 lDict->insert(std::make_pair(rIt->first, rIt->second));
         }
 
         return;
  
+    }
+    else if (left.IsSeq() || right.IsSeq())
+    {
+        if (!left.IsSeq() || !right.IsSeq())
+        {
+            left.BecomeNil();
+            return;
+        }
+
+        LLBC_Variant::Seq *&lSeq = left.GetHolder().obj.seq;
+        const LLBC_Variant::Seq *rSeq = right.GetHolder().obj.seq;
+        const bool lSeqIsEmpty = !lSeq || lSeq->empty();
+        const bool rSeqIsEmpty = !rSeq || rSeq->empty();
+        if (lSeqIsEmpty)
+        {
+            if (rSeqIsEmpty)
+                return;
+
+            if (!lSeq)
+                lSeq = LLBC_New1(LLBC_Variant::Seq, *rSeq);
+            else
+                *lSeq = *rSeq;
+
+            return;
+        }
+        else if (rSeqIsEmpty)
+        {
+            return;
+        }
+
+        const LLBC_Variant intersection(left * right);
+        const LLBC_Variant::Seq * const &iSeq = intersection.GetHolder().obj.seq;
+        for (LLBC_Variant::SeqIter lIt = lSeq->begin();
+             lIt != lSeq->end();
+             )
+        {
+            if (std::find(iSeq->begin(), iSeq->end(), *lIt) != iSeq->end())
+                lIt = lSeq->erase(lIt);
+            else
+                ++lIt;
+        }
+
+        for (LLBC_Variant::SeqConstIter rIt = rSeq->begin();
+             rIt != rSeq->end();
+             ++rIt)
+        {
+            if (std::find(iSeq->begin(), iSeq->end(), *rIt) == iSeq->end())
+                lSeq->push_back(*rIt);
+        }
+
+        return;
     }
     else if (left.IsStr() || right.IsStr())
     {

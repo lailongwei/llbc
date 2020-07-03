@@ -47,7 +47,8 @@ public:
         // First type enumeration.
         VT_RAW                  = 0x01000000,
         VT_STR                  = 0x02000000,
-        VT_DICT                 = 0x04000000,
+        VT_SEQ                  = 0x04000000,
+        VT_DICT                 = 0x08000000,
 
         // Row type enumeration.
         // Bit view(first type always equal VT_RAW):
@@ -75,11 +76,17 @@ public:
         //             8 bits       24 bits
         VT_STR_DFT              = 0x02000001,
 
+        // Sequence enumeration.
+        // Bit view(first type always equal VT_SEQ):
+        //          [first type] [dictionary type]
+        //              8 bits       24 bits
+        VT_SEQ_DFT              = 0x04000001,
+
         // Dictionary type enumeration.
         // Bit view(first type always equal VT_DICT):
         //          [first type] [dictionary type]
         //              8 bits       24 bits
-        VT_DICT_DFT             = 0x04000001,
+        VT_DICT_DFT             = 0x08000001,
 
         /////////////////////////////////////////////////////////////////////
 
@@ -140,6 +147,12 @@ public:
      */
     typedef LLBC_String Str;
 
+    typedef std::vector<LLBC_Variant> Seq;
+    typedef Seq::iterator SeqIter;
+    typedef Seq::const_iterator SeqConstIter;
+    typedef Seq::reverse_iterator SeqReverseIter;
+    typedef Seq::const_reverse_iterator SeqConstReverseIter;
+
     typedef std::map<LLBC_Variant, LLBC_Variant> Dict;
     typedef Dict::iterator DictIter;
     typedef Dict::const_iterator DictConstIter;
@@ -162,6 +175,7 @@ public:
         {
             Str *str;
             Dict *dict;
+            Seq *seq;
         } obj;
 
         Holder();
@@ -191,6 +205,7 @@ public:
         DOUBLE = LLBC_VariantType::VT_RAW_DOUBLE,
 
         STR = LLBC_VariantType::VT_STR_DFT,
+        SEQ = LLBC_VariantType::VT_SEQ_DFT,
         DICT = LLBC_VariantType::VT_DICT_DFT
     };
 
@@ -225,6 +240,7 @@ public:
     explicit LLBC_Variant(const char *cstrVal);
     explicit LLBC_Variant(const std::string &strVal);
     explicit LLBC_Variant(const LLBC_String &strVal);
+    explicit LLBC_Variant(const Seq &seqVal);
     explicit LLBC_Variant(const Dict &dictVal);
     LLBC_Variant(const LLBC_Variant &varVal);
 
@@ -253,6 +269,7 @@ public:
     bool IsFloat() const;
     bool IsDouble() const;
     bool IsStr() const;
+    bool IsSeq() const;
     bool IsDict() const;
 
     // Type convert.
@@ -272,6 +289,7 @@ public:
     LLBC_Variant &BecomeFloat();
     LLBC_Variant &BecomeDouble();
     LLBC_Variant &BecomeStr();
+    LLBC_Variant &BecomeSeq();
     LLBC_Variant &BecomeDict();
 
     // Real data fetch.
@@ -291,6 +309,7 @@ public:
     float AsFloat() const;
     double AsDouble() const;
     LLBC_String AsStr() const;
+    const Seq &AsSeq() const;
     const Dict &AsDict() const;
 
     operator bool () const;
@@ -309,46 +328,95 @@ public:
     operator float () const;
     operator double () const;
     operator LLBC_String () const;
+    operator const Seq &() const;
     operator const Dict &() const;
 
-    // Dictionary type variant object specify operate methods.
-    DictIter Begin();
-    DictIter End();
-    DictConstIter Begin() const;
-    DictConstIter End() const;
-    DictReverseIter ReverseBegin();
-    DictReverseIter ReverseEnd();
-    DictConstReverseIter ReverseBegin() const;
-    DictConstReverseIter ReverseEnd() const;
+    // Common operation methods.
+    void Clear();
+    bool IsEmpty() const;
+    size_t Size() const;
+    size_t Capacity() const;
 
-    std::pair<DictIter, bool> Insert(const Dict::key_type &key, const Dict::mapped_type &val);
-    std::pair<DictIter, bool> Insert(const Dict::value_type &val);
+    // Dictionary type variant object specify operate methods.
+    SeqIter SeqBegin();
+    SeqIter SeqEnd();
+    SeqConstIter SeqBegin() const;
+    SeqConstIter SeqEnd() const;
+    SeqReverseIter SeqReverseBegin();
+    SeqReverseIter SeqReverseEnd();
+    SeqConstReverseIter SeqReverseBegin() const;
+    SeqConstReverseIter SeqReverseEnd() const;
+
+    Seq::reference SeqFront();
+    Seq::const_reference SeqFront() const;
+    Seq::reference SeqBack();
+    Seq::const_reference SeqBack() const;
+
+    SeqIter SeqInsert(SeqIter it, const Seq::value_type &val);
+    void SeqInsert(SeqIter it, Seq::size_type n, const Seq::value_type &val);
+    void SeqInsert(SeqIter it, SeqConstIter first, SeqConstIter last);
+
+    template <typename _Ty>
+    SeqIter SeqInsert(SeqIter it, const _Ty &val);
+    template <typename _Ty>
+    void SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val);
+
+    void SeqPushBack(const Seq::value_type &val);
+    template <typename _Ty>
+    void SeqPushBack(const _Ty &val);
+
+    void SeqPopBack();
+
+    void SeqResize(Seq::size_type n, const Seq::value_type &val = Seq::value_type::nil);
+    template <typename _Ty>
+    void SeqResize(Seq::size_type n, const _Ty &val = _Ty());
+
+    void SeqReserve(Seq::size_type n);
+
+    SeqIter SeqErase(SeqIter it);
+    SeqIter SeqErase(SeqIter first, SeqIter last);
+    void SeqErase(const Seq::value_type &val);
+    template <typename _Ty>
+    void SeqErase(const _Ty &val);
+
+    // Dictionary type variant object specify operate methods.
+    DictIter DictBegin();
+    DictIter DictEnd();
+    DictConstIter DictBegin() const;
+    DictConstIter DictEnd() const;
+    DictReverseIter DictReverseBegin();
+    DictReverseIter DictReverseEnd();
+    DictConstReverseIter DictReverseBegin() const;
+    DictConstReverseIter DictReverseEnd() const;
+
+    std::pair<DictIter, bool> DictInsert(const Dict::key_type &key, const Dict::mapped_type &val);
+    std::pair<DictIter, bool> DictInsert(const Dict::value_type &val);
 
     template <typename _Kty, typename _Ty>
-    std::pair<DictIter, bool> Insert(const _Kty &key, const _Ty &val);
+    std::pair<DictIter, bool> DictInsert(const _Kty &key, const _Ty &val);
 
-    DictIter Find(const Dict::key_type &key);
-    DictConstIter Find(const Dict::key_type &key) const;
-
-    template <typename _Kty>
-    DictIter Find(const _Kty &key);
-    template <typename _Kty>
-    DictConstIter Find(const _Kty &key) const;
-
-    void Erase(DictIter it);
-    Dict::size_type Erase(const Dict::key_type &key);
-    void Erase(DictIter first, DictIter last);
+    DictIter DictFind(const Dict::key_type &key);
+    DictConstIter DictFind(const Dict::key_type &key) const;
 
     template <typename _Kty>
-    Dict::size_type Erase(const _Kty &key);
+    DictIter DictFind(const _Kty &key);
+    template <typename _Kty>
+    DictConstIter DictFind(const _Kty &key) const;
 
-    Dict::mapped_type &operator [](const Dict::key_type &key);
-    const Dict::mapped_type &operator [](const Dict::key_type &key) const;
+    void DictErase(DictIter it);
+    Dict::size_type DictErase(const Dict::key_type &key);
+    void DictErase(DictIter first, DictIter last);
 
     template <typename _Kty>
-    Dict::mapped_type &operator [](const _Kty &key);
+    Dict::size_type DictErase(const _Kty &key);
+
+    LLBC_Variant &operator [](const LLBC_Variant &key);
+    const LLBC_Variant &operator [](const LLBC_Variant &key) const;
+
     template <typename _Kty>
-    const Dict::mapped_type &operator [](const _Kty &key) const;
+    LLBC_Variant &operator [](const _Kty &key);
+    template <typename _Kty>
+    const LLBC_Variant &operator [](const _Kty &key) const;
 
     // assignment operators.
     LLBC_Variant &operator =(bool val);
@@ -360,6 +428,7 @@ public:
     LLBC_Variant &operator =(uint32 val);
     LLBC_Variant &operator =(long val);
     LLBC_Variant &operator =(unsigned long val);
+    LLBC_Variant &operator =(const char * const &val);
     template <typename _T>
     LLBC_Variant &operator =(const _T * const &val);
     LLBC_Variant &operator =(const sint64 &val);
@@ -368,6 +437,7 @@ public:
     LLBC_Variant &operator =(const double &val);
     LLBC_Variant &operator =(const LLBC_String &val);
     LLBC_Variant &operator =(const Dict &val);
+    LLBC_Variant &operator =(const Seq &val);
     LLBC_Variant &operator =(const LLBC_Variant &val);
 
     // Relational operators.
@@ -417,6 +487,7 @@ private:
 
     void CleanRawData();
     void CleanStrData();
+    void CleanSeqData();
     void CleanDictData();
     void CleanTypeData(int type);
 

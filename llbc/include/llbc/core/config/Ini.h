@@ -138,6 +138,11 @@ private:
 };
 
 /**
+ * \brief The Ini sections class encapsulation(typedef).
+ */
+typedef std::map<LLBC_String, LLBC_IniSection *> LLBC_IniSections;
+
+/**
 * \brief The Ini file operation class encapsulation.
 */
 class LLBC_EXPORT LLBC_Ini
@@ -285,7 +290,7 @@ public:
      * Get all sections.
      * @return std::map<LLBC_String, LLBC_IniSection *> & - the all sections map.
      */
-    const std::map<LLBC_String, LLBC_IniSection *> &GetAllSections() const;
+    const LLBC_IniSections &GetAllSections() const;
 
 public:
     /**
@@ -330,11 +335,9 @@ private:
     void Err_SeparatorNotFound(size_t lineNum, size_t column, char sep);
 
 private:
-    typedef std::map<LLBC_String, LLBC_IniSection *> _Sections;
-
     LLBC_String _errMsg;
     LLBC_Strings _sectionNames;
-    _Sections _sections;
+    LLBC_IniSections _sections;
 };
 
 __LLBC_NS_END
