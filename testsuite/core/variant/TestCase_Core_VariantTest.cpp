@@ -321,6 +321,18 @@ void TestCase_Core_VariantTest::SeqTest()
     std::cout << "left - right: " << left - right << std::endl;
     std::cout << "left * right: " << left * right << std::endl;
     std::cout << "left / right: " << left / right << std::endl;
+
+    // Sequence + - * / non sequence test.
+    LLBC_Variant seq10;
+    seq10.SeqPushBack(10);
+    seq10.SeqPushBack("Hello world");
+    seq10.SeqPushBack(false);
+    std::cout << "Perform sequence +-*/ non seuqnce test:" << std::endl;
+    std::cout << "seq10: " << seq10 << std::endl;
+    std::cout << "seq10 + 10086: " << seq10 + 10086 << std::endl;
+    std::cout << "seq10 + nil: " << seq10 + LLBC_Variant::nil << std::endl;
+    std::cout << "seq10 + hello world: " << seq10 + "hello world" << std::endl;
+    std::cout << "seq10 - false: " << seq10 - false << std::endl;
 }
 
 void TestCase_Core_VariantTest::DictTtest()

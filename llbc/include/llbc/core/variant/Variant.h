@@ -460,6 +460,25 @@ public:
     LLBC_Variant &operator *=(const LLBC_Variant &another);
     LLBC_Variant &operator /=(const LLBC_Variant &another);
 
+    // Arithmetic operators(template base).
+    template <typename _T>
+    LLBC_Variant operator +(const _T &another) const;
+    template <typename _T>
+    LLBC_Variant operator -(const _T &another) const;
+    template <typename _T>
+    LLBC_Variant operator *(const _T &another) const;
+    template <typename _T>
+    LLBC_Variant operator /(const _T &another) const;
+
+    template <typename _T>
+    LLBC_Variant &operator +=(const _T &another);
+    template <typename _T>
+    LLBC_Variant &operator -=(const _T &another);
+    template <typename _T>
+    LLBC_Variant &operator *=(const _T &another);
+    template <typename _T>
+    LLBC_Variant &operator /=(const _T &another);
+
     // Type to string.
     const LLBC_String &TypeToString() const;
     // Value to string.
@@ -490,8 +509,6 @@ private:
     void CleanSeqData();
     void CleanDictData();
     void CleanTypeData(int type);
-
-    void OptimizePerformance();
 
 private:
     struct Holder _holder;

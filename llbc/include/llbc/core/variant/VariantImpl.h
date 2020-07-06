@@ -128,11 +128,17 @@ inline LLBC_Variant::LLBC_Variant(const LLBC_String &strVal)
         _holder.obj.str = LLBC_New1(LLBC_String, strVal);
 }
 
+inline LLBC_Variant::LLBC_Variant(const Seq &seqVal)
+{
+    _holder.type = LLBC_VariantType::VT_SEQ_DFT;
+    _holder.obj.seq = LLBC_New2(Seq, seqVal.begin(), seqVal.end());
+}
+
+
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant::Dict &dictVal)
 {
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
-    if (!dictVal.empty())
-        _holder.obj.dict = LLBC_New1(Dict, dictVal);
+    _holder.obj.dict = LLBC_New1(Dict, dictVal);
 }
 
 inline int LLBC_Variant::GetType() const
@@ -416,7 +422,9 @@ inline LLBC_Variant &LLBC_Variant::BecomeSeq()
     if (!IsSeq())
     {
         CleanTypeData(_holder.type);
+
         _holder.type = LLBC_VariantType::VT_SEQ_DFT;
+        _holder.obj.seq = new Seq();
     }
 
     return *this;
@@ -427,7 +435,9 @@ inline LLBC_Variant &LLBC_Variant::BecomeDict()
     if (!IsDict())
     {
         CleanTypeData(_holder.type);
+
         _holder.type = LLBC_VariantType::VT_DICT_DFT;
+        _holder.obj.dict = new Dict();
     }
 
     return *this;
@@ -570,19 +580,6 @@ inline LLBC_Variant::operator const LLBC_Variant::Dict &() const
     return AsDict();
 }
 
-template <typename _T>
-inline LLBC_Variant &LLBC_Variant::operator =(const _T * const &val)
-{
-    CleanTypeData(_holder.type);
-
-    _holder.type = LLBC_VariantType::VT_RAW_PTR;
-
-    _holder.raw.uint64Val = 0;
-    ::memcpy(&_holder.raw.uint64Val, &val, sizeof(_T *));
-
-    return *this;
-}
-
 template <typename _Ty>
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, const _Ty &val)
 {
@@ -647,6 +644,67 @@ template <typename _Kty>
 inline const LLBC_Variant &LLBC_Variant::operator [](const _Kty &key) const
 {
     return this->operator [](LLBC_Variant(key));
+}
+
+template <typename _T>
+inline LLBC_Variant &LLBC_Variant::operator =(const _T * const &val)
+{
+    CleanTypeData(_holder.type);
+
+    _holder.type = LLBC_VariantType::VT_RAW_PTR;
+
+    _holder.raw.uint64Val = 0;
+    ::memcpy(&_holder.raw.uint64Val, &val, sizeof(_T *));
+
+    return *this;
+}
+
+template <typename _T>
+LLBC_Variant LLBC_Variant::operator+(const _T &another) const
+{
+    return operator+(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant LLBC_Variant::operator-(const _T &another) const
+{
+    return operator-(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant LLBC_Variant::operator*(const _T &another) const
+{
+    return operator*(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant LLBC_Variant::operator/(const _T &another) const
+{
+    return operator/(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant &LLBC_Variant::operator+=(const _T &another)
+{
+    return operator+=(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant & LLBC_Variant::operator-=(const _T &another)
+{
+    return operator-=(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant & LLBC_Variant::operator*=(const _T &another)
+{
+    return operator*=(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant & LLBC_Variant::operator/=(const _T &another)
+{
+    return operator/=(LLBC_Variant(another));
 }
 
 __LLBC_NS_END
