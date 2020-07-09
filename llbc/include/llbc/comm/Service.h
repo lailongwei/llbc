@@ -302,13 +302,14 @@ public:
      */
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade);
 
     /**
      * Get facade/facades.
      */
+    virtual LLBC_IFacade *GetFacade(const char *facadeName);
     virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName);
-    virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName);
+    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName);
 
     /**
      * Register coder.
@@ -374,9 +375,23 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev - the will fire event pointer.
+     * @param[in] ev                 - the will fire event pointer.
+     * @param[in] addiCtor           - the additional constructor.
+     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
+     * @param[in] customDtor         - the custom destructor.
+     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
      */
-    virtual void FireEvent(LLBC_Event *ev);
+    virtual void FireEvent(LLBC_Event *ev,
+                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
+                           bool addiCtorBorrowed = false,
+                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
+                           bool customDtorBorrowed = false);
+
+    /**
+     * Get event manager.
+     * @return LLBC_EventManager & - the event manager.
+     */
+    virtual LLBC_EventManager &GetEventManager();
 
 public:
     /**
@@ -513,9 +528,11 @@ private:
     void StopFacades();
     void DestroyFacades();
     void DestroyWillRegFacades();
+    void CloseAllFacadeLibraries();
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
     LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
+    void CloseFacadeLibrary(const LLBC_String &libPath);
     void ClearFacadesWhenInitFacadeFailed();
 
     /**
@@ -622,12 +639,8 @@ private:
         LLBC_IFacade *facade;
         LLBC_IFacadeFactory *facadeFactory;
 
-        LLBC_String libPath;
-        LLBC_String facadeName;
-
         _WillRegFacade(LLBC_IFacade *facade);
         _WillRegFacade(LLBC_IFacadeFactory *facadeFactory);
-        _WillRegFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
     };
     typedef std::vector<_WillRegFacade> _WillRegFacades;
     _WillRegFacades _willRegFacades;
@@ -637,6 +650,7 @@ private:
     volatile int _facadesStartFinished;
     volatile int _facadesStartRet;
 
+    LLBC_String _facadeNameKey;
     typedef std::vector<LLBC_IFacade *> _Facades;
     _Facades _facades;
     typedef std::map<LLBC_String, _Facades> _Facades2;

@@ -71,12 +71,18 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 , _keyReason(Py_BuildValue("s", "reason"))
 , _keyConnected(Py_BuildValue("s", "connected"))
 , _keyIdleTime(Py_BuildValue("s", "idletime"))
+, _keyInlIdleTime(Py_BuildValue("s", "_idletime"))
 , _keyCObj(Py_BuildValue("s", "cobj"))
 
 , _pyPacketCls(NULL)
 
 , _pyStream(NULL)
 , _nativeStream(NULL)
+
+, _holdedOnIdleEv(_EvBuilder::BuildIdleEv(_pySvc, 0))
+, _holdedOnUpdateEv(_EvBuilder::BuildUpdateEv(_pySvc))
+
+, _facadeEvCallArgs(PyTuple_New(1))
 {
 }
 
@@ -102,6 +108,7 @@ pyllbc_Facade::~pyllbc_Facade()
     Py_DECREF(_keyReason);
     Py_DECREF(_keyConnected);
     Py_DECREF(_keyIdleTime);
+    Py_DECREF(_keyInlIdleTime);
     Py_DECREF(_keyCObj);
 
     Py_XDECREF(_pyPacketCls);
@@ -113,26 +120,31 @@ pyllbc_Facade::~pyllbc_Facade()
         _pyStream = NULL;
         _nativeStream = NULL;
     }
+
+    Py_DECREF(_holdedOnIdleEv);
+    Py_DECREF(_holdedOnUpdateEv);
+
+    Py_DECREF(_facadeEvCallArgs);
 }
 
 bool pyllbc_Facade::OnInitialize()
 {
-    return CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc));
+    return CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc), true);
 }
 
 void pyllbc_Facade::OnDestroy()
 {
-    CallFacadeMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc));
+    CallFacadeMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc), true);
 }
 
 bool pyllbc_Facade::OnStart()
 {
-    return CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc));
+    return CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc), true);
 }
 
 void pyllbc_Facade::OnStop()
 {
-    CallFacadeMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc));
+    CallFacadeMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc), true);
 }
 
 void pyllbc_Facade::OnUpdate()
@@ -140,7 +152,7 @@ void pyllbc_Facade::OnUpdate()
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnUpdate, _EvBuilder::BuildUpdateEv(_pySvc));
+    CallFacadeMeth(_methOnUpdate, _holdedOnUpdateEv, false);
 }
 
 void pyllbc_Facade::OnIdle(int idleTime)
@@ -148,7 +160,11 @@ void pyllbc_Facade::OnIdle(int idleTime)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnIdle, _EvBuilder::BuildIdleEv(_pySvc, idleTime));
+    PyObject *pyIdleTime = PyInt_FromLong(idleTime);
+    PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
+    Py_DECREF(pyIdleTime);
+
+    CallFacadeMeth(_methOnIdle, _holdedOnIdleEv, false);
 }
 
 void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
@@ -156,7 +172,7 @@ void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo));
+    CallFacadeMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo), true);
 }
 
 void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
@@ -164,7 +180,7 @@ void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo));
+    CallFacadeMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo), true);
 }
 
 void pyllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
@@ -172,7 +188,7 @@ void pyllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result));
+    CallFacadeMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result), true);
 }
 
 void pyllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
@@ -180,7 +196,7 @@ void pyllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report));
+    CallFacadeMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report), true);
 }
 
 void pyllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
@@ -196,7 +212,7 @@ void pyllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
         pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
     Py_DecRef(pyPacket); pyPacket = NULL;
 
-    CallFacadeMeth(_methOnUnHandledPacket, ev);
+    CallFacadeMeth(_methOnUnHandledPacket, ev, true);
 }
 
 void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
@@ -431,10 +447,13 @@ void pyllbc_Facade::DeletePyPacket(void *_)
     Py_DECREF(pyPacket);
 }
 
-bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
+bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv)
 {
     typedef pyllbc_Service::_Facades _Facades;
-    LLBC_InvokeGuard guard(&DecRefPyObj, ev);
+
+    // Set event to call args.
+    Py_INCREF(ev);
+    PyTuple_SetItem(_facadeEvCallArgs, 0, ev); // Steals reference.
 
     _Facades &facades = _svc->_facades;
     for (_Facades::iterator it = facades.begin();
@@ -442,18 +461,36 @@ bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev)
          it++)
     {
         PyObject *facade = *it;
-        if (PyObject_HasAttr(facade, meth))
-        {
-            PyObject *pyRtn = PyObject_CallMethodObjArgs(facade, meth, ev, NULL);
-            if (!pyRtn)
-            {
-                pyllbc_TransferPyError();
-                return false;
-            }
+        if (!PyObject_HasAttr(facade, meth)) // TODO: Optimize
+            continue;
 
-            Py_DECREF(pyRtn);
+        // Get method and call.
+        PyObject *pyMeth = PyObject_GetAttr(facade, meth); // New reference.
+        PyObject *pyRtn = PyObject_Call(pyMeth, _facadeEvCallArgs, NULL);
+        if (!pyRtn)
+        {
+            pyllbc_TransferPyError();
+
+            Py_DECREF(pyMeth);
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(_facadeEvCallArgs, 0, Py_None);
+            if (decRefEv)
+                Py_DECREF(ev);
+
+            return false;
         }
+
+        Py_DECREF(pyMeth);
+        Py_DECREF(pyRtn);
     }
+
+    // Clear call args.
+    Py_INCREF(Py_None);
+    PyTuple_SetItem(_facadeEvCallArgs, 0, Py_None);
+
+    // Decref event, if acquire.
+    if (decRefEv)
+        Py_DECREF(ev);
 
     return true;
 }

@@ -92,6 +92,12 @@ void pyllbc_AddCoreMethods()
     // core/utils
     top->AddMethod(methods.refcnt);
     inl->AddMethod(methods.HashString);
+
+    // core/event
+    inl->AddMethod(methods.Event_New);
+    inl->AddMethod(methods.Event_Del);
+    inl->AddMethod(methods.Event_GetItem);
+    inl->AddMethod(methods.Event_SetItem);
 }
 
 void pyllbc_AddCoreObjs()

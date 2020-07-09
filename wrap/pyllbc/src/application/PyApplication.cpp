@@ -19,39 +19,33 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_OBJ_UTIL_H__
-#define __PYLLBC_COM_OBJ_UTIL_H__
+#include "pyllbc/common/Export.h"
 
-#include "pyllbc/common/LibHeader.h"
+#include "pyllbc/application/PyApplication.h"
 
-/**
- * \brief The python layer object operation util encapsulation.
- */
-class LLBC_HIDDEN pyllbc_ObjUtil
+pyllbc_Application::pyllbc_Application(PyObject *pyApp)
+: _pyApp(pyApp)
 {
-public:
-    /**
-     * Get the object string representation.
-     * @param[in] obj - the python layer object.
-     * @return LLBC_String - the object string representation.
-     *                       call PyErr_Occurred() to check this method execute succeed or not.
-     */
-    static LLBC_String GetObjStr(PyObject *obj);
+}
 
-    /**
-     * Convert python object to LLBC_Variant object.
-     * @param[in] obj  - the python object.
-     * @param[out] var - the converted LLBC_Variant object, if convert failed, will not set this variant.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int Obj2Variant(PyObject *obj, LLBC_Variant &var);
+pyllbc_Application::~pyllbc_Application()
+{
+}
 
-    /**
-     * Convert LLBC_Variant object to python object.
-     * @param[in] var - the LLBC_Variant object.
-     * @return PyObject * - the converted python object(new reference).
-     */
-    static PyObject *Variant2Obj(const LLBC_Variant &var);
-};
+PyObject * pyllbc_Application::GetPyApp() const
+{
+    return _pyApp;
+}
 
-#endif // !__PYLLBC_COM_OBJ_UTIL_H__
+int pyllbc_Application::OnStart(int argc, char *argv[])
+{
+    return LLBC_OK;
+}
+
+void pyllbc_Application::OnStop()
+{
+}
+
+void pyllbc_Application::OnWait()
+{
+}

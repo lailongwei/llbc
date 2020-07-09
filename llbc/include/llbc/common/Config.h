@@ -218,7 +218,7 @@
 // Min service FPS value.
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
-#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       2000
+#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       500
 // Sampler support option, default is true.
 #define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.

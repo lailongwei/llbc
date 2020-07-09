@@ -92,6 +92,7 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);
     inlMod->AddMethod(methods.RegisterFacade);
+    inlMod->AddMethod(methods.RegisterLibFacade);
     inlMod->AddMethod(methods.RegisterCodec);
     inlMod->AddMethod(methods.Listen);
     inlMod->AddMethod(methods.Connect);
@@ -105,10 +106,15 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.UnifyPreSubscribe);
     inlMod->AddMethod(methods.GetServiceCodec);
     inlMod->AddMethod(methods.SetServiceCodec);
+    inlMod->AddMethod(methods.SubscribeEvent);
+    inlMod->AddMethod(methods.UnsubscribeEventById);
+    inlMod->AddMethod(methods.UnsubscribeEventByStub);
+    inlMod->AddMethod(methods.FireEvent);
     inlMod->AddMethod(methods.InstallErrHooker);
     inlMod->AddMethod(methods.UninstallErrHooker);
     inlMod->AddMethod(methods.ClearHookedErrors);
     inlMod->AddMethod(methods.Post);
+    inlMod->AddMethod(methods.CallFacadeMethod);
     inlMod->AddMethod(methods.ServiceMainLoop);
 
     // Add Obj<-->Json coder helper to top module.

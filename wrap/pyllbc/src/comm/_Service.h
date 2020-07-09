@@ -180,6 +180,21 @@ LLBC_EXTERN_C PyObject *_pyllbc_RegisterFacade(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibFacade(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    const char *facadeName, *libPath;
+    PyObject *facadeCls = NULL;
+    if (!PyArg_ParseTuple(args, "lss|O", &svc, &facadeName, &libPath, &facadeCls))
+        return NULL;
+
+    PyObject *facade;
+    if (svc->RegisterFacade(facadeName, libPath, facadeCls, facade) != LLBC_OK)
+        return NULL;
+
+    return facade;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_RegisterCodec(PyObject *self, PyObject *args)
 {
     int opcode;
@@ -394,6 +409,58 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnifyPreSubscribe(PyObject *self, PyObject *args
 #endif
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_SubscribeEvent(PyObject *self, PyObject *args)
+{
+    int evId;
+    pyllbc_Service *svc;
+    PyObject *listener;
+    if (!PyArg_ParseTuple(args, "liO", &svc, &evId, &listener))
+        return NULL;
+
+    LLBC_ListenerStub stub = svc->SubscribeEvent(evId, listener);
+    if (stub == LLBC_INVALID_LISTENER_STUB)
+        return NULL;
+
+    return PyLong_FromUnsignedLongLong(stub);
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_UnsubscribeEventById(PyObject *self, PyObject *args)
+{
+    int evId;
+    pyllbc_Service *svc;
+    if (!PyArg_ParseTuple(args, "li", &svc, &evId))
+        return NULL;
+
+    svc->UnsubscribeEvent(evId);
+
+    Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_UnsubscribeEventByStub(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    unsigned PY_LONG_LONG stub;
+    if (!PyArg_ParseTuple(args, "lK", &svc, &stub))
+        return NULL;
+
+    svc->UnsubscribeEvent(static_cast<LLBC_ListenerStub>(stub));
+
+    Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_FireEvent(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    PyObject *ev;
+    if (!PyArg_ParseTuple(args, "lO", &svc, &ev))
+        return NULL;
+
+    if (svc->FireEvent(ev) != LLBC_OK)
+        return NULL;
+
+    Py_RETURN_NONE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceCodec(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
@@ -456,6 +523,29 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
         return NULL;
 
     Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_CallFacadeMethod(PyObject *self, PyObject *args)
+{
+    LLBC_IFacade *facade;
+    const char *meth;
+    PyObject *arg;
+    if (!PyArg_ParseTuple(args, "lsO", &facade, &meth, &arg))
+        return NULL;
+
+    LLBC_Variant nativeArg;
+    if (pyllbc_ObjUtil::Obj2Variant(arg, nativeArg) != LLBC_OK)
+        return NULL;
+
+    int callMethRet;
+    LLBC_Variant nativeRet;
+    if ((callMethRet = facade->CallMethod(meth, nativeArg, nativeRet)) != LLBC_OK)
+    {
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When call native facade method");
+        return NULL;
+    }
+
+    return pyllbc_ObjUtil::Variant2Obj(nativeRet);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_ServiceMainLoop(PyObject *self, PyObject *args)

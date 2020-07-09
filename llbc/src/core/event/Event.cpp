@@ -40,20 +40,25 @@ __LLBC_NS_BEGIN
 LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
+
 , _intKeyParams(NULL)
 , _constantStrKeyParams(NULL)
 , _strKeyParams(NULL)
+
+, _extData(NULL)
+, _extDataClearDeleg(NULL)
+, _delClearDelegWhenDestroy(true)
 {
 }
 
 LLBC_Event::~LLBC_Event()
 {
+    ClearExtData();
+
     if (_intKeyParams)
         LLBC_Delete(_intKeyParams);
-
     if (_constantStrKeyParams)
         LLBC_Delete(_constantStrKeyParams);
-
     if (_strKeyParams)
         LLBC_Delete(_strKeyParams);
 }
@@ -142,6 +147,19 @@ const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetStrKeyParams() const
 {
     return _strKeyParams != NULL ? *_strKeyParams : LLBC_INL_NS __emptyStrKeyParams;
 }
+
+LLBC_Event * LLBC_Event::Clone() const
+{
+    LLBC_Event *clone = LLBC_New2(LLBC_Event, _id, false);
+    if (_intKeyParams)
+        clone->_intKeyParams = new std::map<int, LLBC_Variant>(*_intKeyParams);
+    if (_strKeyParams)
+        clone->_strKeyParams = new std::map<LLBC_String, LLBC_Variant>(*_strKeyParams);
+    if (_constantStrKeyParams)
+        clone->_constantStrKeyParams = new std::map<LLBC_CString, LLBC_Variant>(*_constantStrKeyParams);
+
+    return clone;
+} 
 
 LLBC_Variant &LLBC_Event::operator [](int key)
 {

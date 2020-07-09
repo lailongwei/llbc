@@ -307,7 +307,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
 
     // Construct callable arguments(tuple).
     PyObject *callArgs = PyTuple_New(1);
-    PyTuple_SET_ITEM(callArgs, 0, PyInt_FromLong(end - begin)); // Steals a reference to obj.
+    PyTuple_SetItem(callArgs, 0, PyInt_FromLong(end - begin)); // Steals a reference to obj.
     
     // Create python layer stream object instance.
     PyObject *pyStream = PyObject_CallObject(streamCls, callArgs);

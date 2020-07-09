@@ -210,7 +210,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetPropertyNames(PyObject *self, PyObje
     }
 
     for (LLBC_Strings::size_type i = 0; i < names.size(); ++i)
-        PyTuple_SET_ITEM(tuple, i, 
+        PyTuple_SetItem(tuple, i, 
             PyString_FromStringAndSize(names[i].data(), names[i].size()));
 
     return tuple;

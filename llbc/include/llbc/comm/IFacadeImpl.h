@@ -104,6 +104,11 @@ inline bool LLBC_IFacade::IsCaredEventOffset(int facadeEvOffset) const
 #endif
 }
 
+inline const LLBC_FacadeMethods *LLBC_IFacade::GetAllMethods() const
+{
+    return _meths;
+}
+
 template <typename FacadeCls>
 int LLBC_IFacade::AddMethod(const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {

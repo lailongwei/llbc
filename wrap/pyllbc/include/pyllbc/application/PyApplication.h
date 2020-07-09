@@ -19,54 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PYPACKET_HANDLER_H__
-#define __PYLLBC_COMM_PYPACKET_HANDLER_H__
+#ifndef __PYLLBC_APP_PY_APPLICATION_H__
+#define __PYLLBC_APP_PY_APPLICATION_H__
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
+#include "pyllbc/comm/Comm.h"
 
 /**
- * \brief The python packet handler class encapsulation.
+ * \brief The python layer native application encapsulation.
+ * TODO: for now simple encapsulation.
  */
-class LLBC_HIDDEN pyllbc_PacketHandler
+class LLBC_HIDDEN pyllbc_Application : public LLBC_IApplication
 {
 public:
     /**
-     * Constructor & Destructor.
-     * @param[in] opcode - the packet opcode.
+     * Ctor & Dtor.
      */
-    pyllbc_PacketHandler(int opcode);
-    ~pyllbc_PacketHandler();
+    pyllbc_Application(PyObject *pyApp);
+    virtual ~pyllbc_Application();
 
 public:
     /**
-     * Set packet handler.
-     * @param[in] handler - the packet handler, normal, not steal reference.
-     *                      if handler is bound method, will hold im_self object too.
-     * @return int - return 0 if success, otherwise return -1.
+     * Get python layer application.
+     * @return PyObject * - the python layer application, borrow reference.
      */
-    int SetHandler(PyObject *handler);
-
-    /**
-     * Handle packet.
-     * handler search order(HSO):
-     *      1> callable check(included function, bound method, callable object)
-     *      2> search object has handle() method or not
-     * @return PyObject * - the call returned PyObject object, if failed, return NULL.
-     */
-    PyObject *Handle(PyObject *packet);
+    PyObject *GetPyApp() const;
 
 public:
     /**
-     * Get object string representation.
-     * @return LLBC_String - the object representation.
+     * Application event method: OnStart.
      */
-    LLBC_String ToString() const;
+    virtual int OnStart(int argc, char *argv[]);
+
+    /**
+     * Application event method: OnStop.
+     */
+    virtual void OnStop();
+
+    /**
+     * Application event method: OnWait.
+     */
+    virtual void OnWait();
 
 private:
-    int _opcode;
-    PyObject *_handler;
-    PyObject *_callArgs;
+    PyObject *_pyApp; // Borrowed reference.
 };
 
-#endif // !__PYLLBC_COMM_PYPACKET_HANDLER_H__
+#endif // !__PYLLBC_APP_PY_APPLICATION_H__

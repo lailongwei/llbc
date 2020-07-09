@@ -14,7 +14,8 @@ class pyllbcRandom(object):
         self.__c_obj = llbc.inl.NewRandom(seed)
 
     def __del__(self):
-        llbc.inl.DelRandom(self.__c_obj)
+        if llbc is not None:
+            llbc.inl.DelRandom(self.__c_obj)
 
     def seed(self, seed):
         """

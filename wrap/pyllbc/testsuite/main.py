@@ -10,7 +10,7 @@ from communication import *
 
 def main():
     # #### common part.
-    LLBCInfoTest()()
+    # LLBCInfoTest()()
     # StreamTest()()
 
     import types
@@ -26,6 +26,7 @@ def main():
     # SvcBaseTest()()
     # MultiSvcTest()()
     # MulticastTest()()
+    EventTest()()
 
 
 if __name__ == '__main__':

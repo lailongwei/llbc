@@ -176,6 +176,7 @@ LLBC_Service::~LLBC_Service()
 
     DestroyFacades();
     DestroyWillRegFacades();
+    CloseAllFacadeLibraries();
 
     LLBC_STLHelper::DeleteContainer(_coders);
     LLBC_STLHelper::DeleteContainer(_handlers);
@@ -719,8 +720,12 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName)
+int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade)
 {
+    // Force reset out parameter: facade.
+    facade = NULL;
+
+    // Service started or not check.
     LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started))
     {
@@ -728,6 +733,7 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
         return LLBC_FAILED;
     }
 
+    // Argument check.
     if (facadeName.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
@@ -739,9 +745,77 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
         return LLBC_FAILED;
     }
 
-    _willRegFacades.push_back(_WillRegFacade(LLBC_Directory::AbsPath(libPath), facadeName));
+    // Open facade library(if cached, reuse it).
+    bool existingLib;
+    LLBC_Library *lib = OpenFacadeLibrary(libPath, existingLib);
+    if (!lib)
+        return LLBC_FAILED;
 
-    return LLBC_OK;
+    // Get facade create entry function.
+    LLBC_String facadeCreateFuncName;
+    facadeCreateFuncName.format("%s%s", LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX, facadeName.c_str());
+    LLBC_FacadeDynamicCreateFunc facadeCreateFunc = reinterpret_cast<
+        LLBC_FacadeDynamicCreateFunc>(lib->GetProcAddress(facadeCreateFuncName.c_str()));
+    if (!facadeCreateFunc)
+    {
+        if (!existingLib)
+            CloseFacadeLibrary(libPath);
+
+        return LLBC_FAILED;
+    }
+
+    // Create facade.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    facade = reinterpret_cast<LLBC_IFacade *>(facadeCreateFunc());
+    if (!facade)
+    {
+        if (!existingLib)
+            CloseFacadeLibrary(libPath);
+
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+
+        return LLBC_FAILED;
+    }
+
+    // Validate facade class name and giving facadeName is same or not.
+    if (UNLIKELY(LLBC_GetTypeName(*facade) != facadeName))
+    {
+        LLBC_XDelete(facade);
+        if (!existingLib)
+            CloseFacadeLibrary(libPath);
+
+        LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
+
+        return LLBC_FAILED;
+    }
+
+    // Call normalize register facade method to register.
+    int ret = RegisterFacade(facade);
+    if (ret != LLBC_OK)
+    {
+        LLBC_XDelete(facade);
+        if (!existingLib)
+            CloseFacadeLibrary(libPath);
+    }
+
+    return ret;
+}
+
+LLBC_IFacade *LLBC_Service::GetFacade(const char *facadeName)
+{
+    LLBC_LockGuard guard(_lock);
+
+    _facadeNameKey.assign(facadeName);
+    _Facades2::iterator it = _facades2.find(_facadeNameKey);
+    if (it == _facades2.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return NULL;
+    }
+
+    _Facades &facades = it->second;
+    return facades[0];
 
 }
 
@@ -760,7 +834,7 @@ LLBC_IFacade *LLBC_Service::GetFacade(const LLBC_String &facadeName)
     return facades[0];
 }
 
-std::vector<LLBC_IFacade *> LLBC_Service::GetFacades(const LLBC_String &facadeName)
+const std::vector<LLBC_IFacade *> &LLBC_Service::GetFacades(const LLBC_String &facadeName)
 {
     static const std::vector<LLBC_IFacade *> emptyFacades;
 
@@ -998,7 +1072,7 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
     if (UNLIKELY(_started && !_initingFacade))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
+        return LLBC_INVALID_LISTENER_STUB;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
@@ -1018,9 +1092,18 @@ void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
         BuildUnsubscribeEvEv(0, stub));
 }
 
-void LLBC_Service::FireEvent(LLBC_Event *ev)
+void LLBC_Service::FireEvent(LLBC_Event *ev,
+                             LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
+                             bool addiCtorBorrowed,
+                             LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
+                             bool customDtorBorrowed)
 {
-    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev));
+    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev, addiCtor, addiCtorBorrowed, customDtor, customDtorBorrowed));
+}
+
+LLBC_EventManager &LLBC_Service::GetEventManager()
+{
+    return _evManager;
 }
 
 int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
@@ -1766,7 +1849,11 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     _evManager.FireEvent(ev.ev);
-    ev.ev = NULL;
+    if (!ev.customDtor)
+    {
+        ev.ev = NULL;
+        return;
+    }
 }
 
 void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
@@ -1810,49 +1897,6 @@ int LLBC_Service::InitFacades()
         {
             facade = willRegFacade.facade;
             willRegFacade.facade = NULL;
-        }
-        else if (!willRegFacade.libPath.empty() &&
-                 !willRegFacade.facadeName.empty()) // Create facade from dynamic library.
-        {
-            // Open facade library(if cached, reuse it).
-            bool existingLib;
-            const LLBC_String &libPath = willRegFacade.libPath;
-            LLBC_Library *lib = OpenFacadeLibrary(libPath, existingLib);
-            if (!lib)
-            {
-                ClearFacadesWhenInitFacadeFailed();
-                initSuccess = false;
-
-                break;
-            }
-
-            // Get facade create entry function, create it.
-            LLBC_String facadeCreateFuncName;
-            const LLBC_String &facadeName = willRegFacade.facadeName;
-            facadeCreateFuncName.format("%s%s", LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX, facadeName.c_str());
-            LLBC_FacadeDynamicCreateFunc facadeCreateFunc = reinterpret_cast<
-                LLBC_FacadeDynamicCreateFunc>(lib->GetProcAddress(facadeCreateFuncName.c_str()));
-            if (!facadeCreateFunc ||
-                !(facade = reinterpret_cast<LLBC_IFacade *>(facadeCreateFunc())))
-            {
-                ClearFacadesWhenInitFacadeFailed();
-                initSuccess = false;
-
-                break;
-            }
-
-            // Validate facade class name and giving facadeName is same or not.
-            if (UNLIKELY(LLBC_GetTypeName(*facade) != facadeName))
-            {
-                LLBC_Delete(facade);
-
-                ClearFacadesWhenInitFacadeFailed();
-                initSuccess = false;
-
-                LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
-
-                break;
-            }
         }
 
         facade->SetService(this);
@@ -1959,8 +2003,6 @@ void LLBC_Service::DestroyFacades()
         _Facades *&evFacades = _caredEventFacades[evOffset];
         LLBC_XDelete(evFacades);
     }
-
-    LLBC_STLHelper::DeleteContainer(_facadeLibraries);
 }
 
 void LLBC_Service::DestroyWillRegFacades()
@@ -1976,16 +2018,24 @@ void LLBC_Service::DestroyWillRegFacades()
     _willRegFacades.clear();
 }
 
+void LLBC_Service::CloseAllFacadeLibraries()
+{
+    LLBC_STLHelper::DeleteContainer(_facadeLibraries);
+}
+
 void LLBC_Service::AddFacade(LLBC_IFacade *facade)
 {
     // Add facade to _facades(vector)
     _facades.push_back(facade);
 
     // Add facade to _facades2(map<type, vector>)
+    const char *cFacadeName = LLBC_GetTypeName(*facade);
     const LLBC_String facadeName = LLBC_GetTypeName(*facade);
     _Facades2::iterator facadesIt = _facades2.find(facadeName);
     if (facadesIt == _facades2.end())
+    {
         facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+    }
     _Facades2::mapped_type &typeFacades = facadesIt->second;
     typeFacades.push_back(facade);
 
@@ -2033,11 +2083,23 @@ LLBC_Library *LLBC_Service::OpenFacadeLibrary(const LLBC_String &libPath, bool &
     return lib;
 }
 
+void LLBC_Service::CloseFacadeLibrary(const LLBC_String &libPath)
+{
+    _FacadeLibraries::iterator libIt = _facadeLibraries.find(libPath);
+    if (libIt == _facadeLibraries.end())
+        return;
+
+    LLBC_Delete(libIt->second);
+    _facadeLibraries.erase(libIt);
+}
+
 void LLBC_Service::ClearFacadesWhenInitFacadeFailed()
 {
     StopFacades();
     DestroyFacades();
     DestroyWillRegFacades();
+
+    CloseAllFacadeLibraries();
 }
 
  void LLBC_Service::InitAutoReleasePool()
@@ -2397,15 +2459,6 @@ LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacadeFactory *facadeFactory)
 {
     facade = NULL;
     this->facadeFactory = facadeFactory;
-}
-
-LLBC_Service::_WillRegFacade::_WillRegFacade(const LLBC_String &libPath, const LLBC_String &facadeName)
-{
-    this->facade = NULL;
-    this->facadeFactory = NULL;
-
-    this->libPath = libPath;
-    this->facadeName = facadeName;
 }
 
 __LLBC_NS_END

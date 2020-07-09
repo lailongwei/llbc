@@ -135,6 +135,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "object is not pool object", // 0x002c
     // session send buffer limit.
     "session send buffer limit", // 0x002d
+    // not support.
+    "not support",              // 0x002e
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

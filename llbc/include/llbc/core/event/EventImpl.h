@@ -59,6 +59,13 @@ inline LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const ParamType 
     return SetParam(key, varParam);
 }
 
+inline std::map<int, LLBC_Variant> &LLBC_Event::GetMutableIntKeyParams()
+{
+    if (!_intKeyParams)
+        _intKeyParams = new std::map<int, LLBC_Variant>();
+    return *_intKeyParams;
+}
+
 inline size_t LLBC_Event::GetIntKeyParamsCount() const
 {
     return _intKeyParams != NULL ? _intKeyParams->size() : 0;
@@ -69,9 +76,68 @@ inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
     return _constantStrKeyParams != NULL ? _constantStrKeyParams->size() : 0;
 }
 
+inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKeyParams()
+{
+    if (!_constantStrKeyParams)
+        _constantStrKeyParams = new std::map<LLBC_CString, LLBC_Variant>();
+
+    return *_constantStrKeyParams;
+}
+
 inline size_t LLBC_Event::GetStrKeyParamsCount() const
 {
     return _strKeyParams != NULL ? _strKeyParams->size() : 0;
+}
+
+inline std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetMutableStrKeyParams()
+{
+    if (!_strKeyParams)
+        _strKeyParams = new std::map<LLBC_String, LLBC_Variant>();
+
+    return *_strKeyParams;
+}
+
+inline void * LLBC_Event::GetExtData() const
+{
+    return _extData;
+}
+
+inline void LLBC_Event::SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg, bool delClearDelegWhenDestroy)
+{
+    ClearExtData();
+    _extData = extData;
+    _extDataClearDeleg = clearDeleg;
+    _delClearDelegWhenDestroy = delClearDelegWhenDestroy;
+}
+
+inline void LLBC_Event::ClearExtData()
+{
+    if (!_extData)
+    {
+        if (_extDataClearDeleg)
+        {
+            if (_delClearDelegWhenDestroy)
+                LLBC_Delete(_extDataClearDeleg);
+
+            _extDataClearDeleg = NULL;
+        }
+
+        _delClearDelegWhenDestroy = true;
+
+        return;
+    }
+
+    if (_extDataClearDeleg)
+    {
+        _extDataClearDeleg->Invoke(_extData);
+        _extData = NULL;
+
+        if (_delClearDelegWhenDestroy)
+            LLBC_Delete(_extDataClearDeleg);
+
+        _extDataClearDeleg = NULL;
+        _delClearDelegWhenDestroy = true;
+    }
 }
 
 __LLBC_NS_END

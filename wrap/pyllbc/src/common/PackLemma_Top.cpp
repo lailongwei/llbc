@@ -112,7 +112,7 @@ PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
         if (!(value = lemma->Read(stream)))
             break;
 
-        PyTuple_SET_ITEM(values, idx, value);
+        PyTuple_SetItem(values, idx, value);
     }
 
     if (idx != _lemmas.size())

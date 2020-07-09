@@ -146,11 +146,12 @@ public:
 private:
     /**
      * Call python layer facade method.
-     * @param[in] meth - method name, not steal reference, normal.
-     * @param[in] ev   - call event object, steal reference.
+     * @param[in] meth     - method name, not steal reference, normal.
+     * @param[in] ev       - call event object, steal reference.
+     * @param[in] decRefEv - decref event.
      * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
      */
-    bool CallFacadeMeth(PyObject *meth, PyObject *ev);
+    bool CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv);
 
 private:
     pyllbc_Service *_svc;
@@ -180,12 +181,18 @@ private:
     PyObject *_keyReason;
     PyObject *_keyConnected;
     PyObject *_keyIdleTime;
+    PyObject *_keyInlIdleTime;
     PyObject *_keyCObj;
 
     PyObject *_pyPacketCls;
 
     PyObject *_pyStream;
     pyllbc_Stream *_nativeStream;
+
+    PyObject *_holdedOnIdleEv;
+    PyObject *_holdedOnUpdateEv;
+
+    PyObject *_facadeEvCallArgs;
 };
 
 #endif // !__PYLLBC_COMM_PY_FACADE_H__

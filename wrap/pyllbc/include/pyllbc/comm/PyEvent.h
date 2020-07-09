@@ -30,6 +30,8 @@
  */
 class LLBC_HIDDEN pyllbc_Event : public LLBC_Event
 {
+    typedef LLBC_Event _Base;
+
 public:
     /**
      * Constructor.
@@ -52,6 +54,40 @@ public:
 
 private:
     PyObject *_data;
+};
+
+/**
+ * \brief The event listener class encapsulation.
+ */
+class LLBC_HIDDEN pyllbc_EventListener : public LLBC_Delegate1<void, pyllbc_Event, LLBC_Event *>
+{
+    typedef LLBC_Delegate1<void, pyllbc_Event, LLBC_Event *> _Base;
+
+public:
+    /**
+     * Delegate ctor&dtor.
+     */
+    pyllbc_EventListener();
+    virtual ~pyllbc_EventListener();
+
+public:
+    /**
+     * Set python layer listener.
+     * @param[in] pyListener - the python layer listener, not steal ref.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetPyListener(PyObject *pyListener);
+
+    /**
+     * Delegate invoke method override.
+     */
+    virtual void Invoke(LLBC_Event *ev);
+
+private:
+    PyObject *_pyListenerObj;
+    PyObject *_pyListenerMeth;
+
+    static PyObject *_pyEvCls;
 };
 
 #endif // !__PYLLBC_COMM_PY_EVENT_H__

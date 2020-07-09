@@ -29,10 +29,16 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     BasicTest();
     std::cout <<std::endl;
 
+    CompareTest();
+    std::cout <<std::endl;
+
     CompositeKeyTest();
     std::cout <<std::endl;
 
     ArithmeticTest();
+    std::cout <<std::endl;
+
+    SeqTest();
     std::cout <<std::endl;
 
     DictTtest();
@@ -150,6 +156,63 @@ void TestCase_Core_VariantTest::BasicTest()
     std::cout <<"After ptrVal += 4, ptrVal -= 4, value: " <<*ptrVal.AsPtr<int>() <<std::endl;
 }
 
+void TestCase_Core_VariantTest::CompareTest()
+{
+    std::cout << "Compare test: " << std::endl;
+
+    LLBC_Variant nil;
+    LLBC_Variant boolTrue(true);
+    LLBC_Variant boolFalse(false);
+    std::cout << "nil < nil?: " << (nil < nil) << ", nil == nil?: " << (nil == nil) << std::endl;
+    std::cout << "nil < boolTrue?: " << (nil < boolTrue) << ", nil == boolTrue?: " << (nil == boolTrue) << std::endl;
+    std::cout << "nil < boolFalse?: " << (nil < boolFalse) << ", nil == boolFalse?: " << (nil == boolFalse) << std::endl;
+    std::cout << "boolTrue < boolTrue?: " << (boolTrue < boolTrue) << ", boolTrue == boolTrue?: " << (boolTrue == boolTrue) << std::endl;
+    std::cout << "boolFalse < boolFalse?: " << (boolFalse < boolFalse) << ", boolFalse == boolFalse?: " << (boolFalse == boolFalse) << std::endl;
+    std::cout << "boolTrue < boolFalse?: " << (boolTrue < boolFalse) << ", boolTrue == boolFalse?: " << (boolTrue == boolFalse) << std::endl;
+    std::cout << "boolFalse < boolTrue?: " << (boolFalse < boolTrue) << ", boolFalse == boolTrue?: " << (boolFalse == boolTrue) << std::endl;
+
+    LLBC_Variant int0(0);
+    LLBC_Variant int1(1);
+    LLBC_Variant int10010(10010);
+    LLBC_Variant int10086(10086);
+    std::cout << "nil < int10010?: " << (nil < int10010) << ", nil == int10010?: " << (nil == int10010) << std::endl;
+    std::cout << "int10010 < nil?: " << (int10010< nil) << ", nil == int10010?: " << (nil == int10010) << std::endl;
+    std::cout << "int0 < boolFalse?: " << (int0 < boolFalse) << ", int0 == boolFalse?: " << (int0 == boolFalse) << std::endl;
+    std::cout << "int1 < boolTrue?: " << (int1 < boolTrue) << ", int1 == boolTrue?: " << (int1 == boolTrue) << std::endl;
+    std::cout << "int10010 < int10086?: " << (int10010 < int10086) << ", int10010 == int10086?: " << (int10010 == int10086) << std::endl;
+    std::cout << "int10086 < int10010?: " << (int10086 < int10010) << ", int10086 == int10010?: " << (int10086 == int10010) << std::endl;
+    std::cout << "int10086 < int10086?: " << (int10086 < int10086) << ", int10086 == int10086?: " << (int10086 == int10086) << std::endl;
+
+    LLBC_Variant dbl10010(10010.0);
+    LLBC_Variant dbl10086(10086.0);
+    std::cout << "dbl10010 < int10010?: " << (dbl10010 < int10010) << ", dbl10010 == int10010?: " << (dbl10010 == int10010) << std::endl;
+    std::cout << "dbl10010 < dbl10086?: " << (dbl10010 < dbl10086) << ", dbl10010 == dbl10086?: " << (dbl10010 == dbl10086) << std::endl;
+    std::cout << "dbl10086 < dbl10086?: " << (dbl10086 < dbl10086) << ", dbl10086 == dbl10086?: " << (dbl10086 == dbl10086) << std::endl;
+
+    LLBC_Variant seq1;
+    LLBC_Variant seq2;
+    seq1.SeqPushBack(LLBC_Variant::nil);
+    seq2.SeqPushBack(1);
+    std::cout << "nil < seq1?: " << (nil < seq1) << ", nil == seq1?: " << (nil == seq1) << std::endl;
+    std::cout << "boolTrue < seq1?: " << (boolTrue < seq1) << ", boolTrue == seq1?: " << (boolTrue == seq1) << std::endl;
+    std::cout << "int10086 < seq1?: " << (int10086 < seq1) << ", int10086 == seq1?: " << (int10086 == seq1) << std::endl;
+    std::cout << "dbl10086 < seq1?: " << (dbl10086 < seq1) << ", dbl10086 == seq1?: " << (dbl10086 == seq1) << std::endl;
+    std::cout << "seq1 < seq1?: " << (seq1 < seq1) << ", seq1 == seq1?: " << (seq1 == seq1) << std::endl;
+    std::cout << "seq1 < seq2?: " << (seq1 < seq2) << ", seq1 == seq2?: " << (seq1 == seq2) << std::endl;
+
+    LLBC_Variant dict1;
+    LLBC_Variant dict2;
+    dict1["Key1"] = "Value1";
+    dict2["Key1"] = "Value2";
+    std::cout << "nil < ?: dict1?: " << (nil < dict1) << ", nil == dict1?: " << (nil == dict1) << std::endl;
+    std::cout << "boolTrue < dict1?: " << (boolTrue < dict1) << ", boolTrue == dict1?: " << (boolTrue == dict1) << std::endl;
+    std::cout << "int10086 < dict1?: " << (int10086 < dict1) << ", int10086 == dict1?: " << (int10086 == dict1) << std::endl;
+    std::cout << "dbl10086 < dict1?: " << (dbl10086 < dict1) << ", dbl10086 == dict1?: " << (dbl10086 == dict1) << std::endl;
+    std::cout << "seq1 < dict1?: " << (seq1 < dict1) << ", seq1 == dict1?: " << (seq1 == dict1) << std::endl;
+    std::cout << "dict1 < dict1?: " << (dict1 < dict1) << ", dict1 == dict1?: " << (dict1 == dict1) << std::endl;
+    std::cout << "dict1 < dict2?: " << (dict1 < dict2) << ", dict1 == dict2?: " << (dict1 == dict2) << std::endl;
+}
+
 void TestCase_Core_VariantTest::CompositeKeyTest()
 {
     std::cout <<"Composite key test:" <<std::endl;
@@ -221,18 +284,80 @@ void TestCase_Core_VariantTest::ArithmeticTest()
     std::cout <<std::endl;
 }
 
+void TestCase_Core_VariantTest::SeqTest()
+{
+    std::cout << "Sequence test" << std::endl;
+
+    // Construct default sequence.
+    LLBC_Variant subSeq;
+    subSeq["Hello"] = 3;
+    subSeq[LLBC_Variant::nil] = "The nil key value";
+
+    LLBC_Variant seq1;
+    seq1.SeqPushBack(3);
+    seq1.SeqPushBack(false);
+    seq1.SeqPushBack("Hello World");
+    seq1.SeqPushBack(subSeq);
+    std::cout << "seq1 data:" << seq1 << std::endl;
+
+    // Assignment test.
+    LLBC_Variant seq2 = seq1;
+    std::cout << "seq2 = seq1, seq2: " << seq2 << std::endl;
+
+    // Arithmetic test.
+    LLBC_Variant left;
+    left.SeqPushBack(1);
+    left.SeqPushBack(2);
+    left.SeqPushBack(2);
+    left.SeqPushBack(3);
+
+    LLBC_Variant right;
+    right.SeqPushBack(2);
+    right.SeqPushBack(3);
+    right.SeqPushBack(3);
+    right.SeqPushBack(4);
+    std::cout << "Perform sequence arithmetic test, left:" << left << ", right:" << right << std::endl;
+    std::cout << "left + right: " << left + right << std::endl;
+    std::cout << "left - right: " << left - right << std::endl;
+    std::cout << "left * right: " << left * right << std::endl;
+    std::cout << "left / right: " << left / right << std::endl;
+
+    // Sequence + - * / non sequence test.
+    LLBC_Variant seq10;
+    seq10.SeqPushBack(10);
+    seq10.SeqPushBack("Hello world");
+    seq10.SeqPushBack(false);
+    std::cout << "Perform sequence +-*/ non seuqnce test:" << std::endl;
+    std::cout << "seq10: " << seq10 << std::endl;
+    std::cout << "seq10 + 10086: " << seq10 + 10086 << std::endl;
+    std::cout << "seq10 + nil: " << seq10 + LLBC_Variant::nil << std::endl;
+    std::cout << "seq10 + hello world: " << seq10 + "hello world" << std::endl;
+    std::cout << "seq10 - false: " << seq10 - false << std::endl;
+}
+
 void TestCase_Core_VariantTest::DictTtest()
 {
     std::cout <<"Dict test" <<std::endl;
 
     // Raw key type dictionary test.
+    LLBC_Variant seqKey;
+    seqKey = 3;
+    seqKey = "Hello World";
+    seqKey = LLBC_Variant::Dict();
+    seqKey.SeqPushBack(3);
+    seqKey.SeqPushBack(4);
+    seqKey.SeqPushBack(false);
+    seqKey.SeqPushBack("Hello World");
+    seqKey.SeqInsert(seqKey.SeqBegin() + 3, LLBC_Variant::nil);
+
     LLBC_Variant rawDict1;
-    rawDict1.Insert(1, "Hello");
-    rawDict1.Insert(2, "World");
-    rawDict1.Insert(3, "Hey");
-    rawDict1.Insert(4, "Judy");
-    rawDict1.Insert(5.0, "Jack");
-    rawDict1.Insert(false, 34);
+    rawDict1.DictInsert(1, "Hello");
+    rawDict1.DictInsert(2, "World");
+    rawDict1.DictInsert(3, "Hey");
+    rawDict1.DictInsert(4, "Judy");
+    rawDict1.DictInsert(5.0, "Jack");
+    rawDict1.DictInsert(false, 34);
+    rawDict1[seqKey] = "The seq key value";
     std::cout <<"rawDict1 data: " <<rawDict1 <<std::endl;
 
     LLBC_Variant rawDict2(rawDict1);
@@ -293,6 +418,20 @@ void TestCase_Core_VariantTest::SerializeTest()
     stream.SetPos(0);
     stream>> deserStr;
     std::cout <<"Deserialized from stream: [" <<deserStr <<"]" <<std::endl;
+
+    // Serialize & Deserialize seq type.
+    LLBC_Variant seq;
+    seq.SeqPushBack(1);
+    seq.SeqPushBack(false);
+    seq.SeqPushBack("Hello world");
+    stream.SetPos(0);
+    stream <<seq;
+    std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetPos() << std::endl;
+
+    LLBC_Variant deserSeq;
+    stream.SetPos(0);
+    stream >> deserSeq;
+    std::cout << "Deserialized from stream:[" << deserSeq << "]" << std::endl;
 
     // Serialize & Deserialize dict type.
     LLBC_Variant dict;

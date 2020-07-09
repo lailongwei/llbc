@@ -85,7 +85,7 @@ public:
 
     /**
      * Set service FPS.
-     * @param[in] - service fps.
+     * @param[in] fps - service fps.
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetFPS(int fps);
@@ -190,6 +190,16 @@ public:
     int RegisterFacade(PyObject *facade);
 
     /**
+     * Register facade from library.
+     * @param[in] facadeName - the facade name.
+     * @param[in] libPath    - the library path.
+     * @param[in] facadeCls  - the python layer facade class, can be NULL.
+     * @param[out] facade    - the created facade(new reference).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *facadeCls, PyObject *&facade);
+
+    /**
      * Register codec(only available in CODEC_BINARY).
      * @param[in] opcode - the opcode.
      * @param[in] codec  - the codec class(not steal reference, normal).
@@ -266,7 +276,6 @@ public:
 
     /**
      * Broadcast data.
-     * @param[in] sessionIds - the peer session Ids.
      * @param[in] opcode     - the opcode.
      * @param[in] data       - the data(normal, not steal reference).
      *                         Note, the object's class must has encode() method and return bytearray.
@@ -291,9 +300,9 @@ public:
 
     /**
      * Set specific opcode packet PreSubscribe handler, if is RAW type service, the opcode parameter must be 0.
-     * @param[in] opcode  - opcode, in RAW type service, ignore.
-     * @param[in] handler - the handler object, to see more information about this parameter, see Subscribe() method.
-     * @param[in] flags   - flags, not used now.
+     * @param[in] opcode     - opcode, in RAW type service, ignore.
+     * @param[in] preHandler - the handler object, to see more information about this parameter, see Subscribe() method.
+     * @param[in] flags      - flags, not used now.
      * @return int - return 0 if success, otherwise return -1.
      */
     int PreSubscribe(int opcode, PyObject *preHandler, int flags = 0);
@@ -301,13 +310,42 @@ public:
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Set packet unify PreSubscribe handler, this method can pre-subscribe RAW type service's packets.
-     * @param[in] handler - the handler object, to see more information about this parameter, see Subscribe() method.
-     * @param[in] flags   - flags, not used now.
+     * @param[in] preHandler - the handler object, to see more information about this parameter, see Subscribe() method.
+     * @param[in] flags      - flags, not used now.
      * @return int - return 0 if success, otherwise return -1.
      */
     int UnifyPreSubscribe(PyObject *preHandler, int flags = 0);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
+public:
+    /**
+     * Subscribe event.
+     * @param[in] event    - the event Id.
+     * @param[in] listener - callable object, event handler(not steal ref).
+     * @return LLBC_ListenerStub - listener stub, return 0 if failed.
+     */
+    LLBC_ListenerStub SubscribeEvent(int event, PyObject *listener);
+
+    /**
+     * Unsubscribe event.
+     * @param[in] event - the event Id.
+     */
+    void UnsubscribeEvent(int event);
+
+    /**
+     * Unsubscribe event.
+     * @param[in] stub - the event stub.
+     */
+    void UnsubscribeEvent(LLBC_ListenerStub stub);
+
+    /**
+     * Fire event.
+     * @param[in] ev - the event object(not steal ref).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int FireEvent(PyObject *ev);
+
+public:
     /**
      * Post one callable to service, this callable will call in Service OnIdle stage or next Frame.
      * @param[in] callable - the callable object, normal, not steal reference.
@@ -359,6 +397,19 @@ private:
 
 private:
     /**
+     * The additional event constructor.
+     * @param[in] ev - the event object.
+     */
+    static void AddiEventCtor(LLBC_Event *ev);
+
+    /**
+     * The custom event destructor.
+     * @param;[in] - the event object.
+     */
+    static void CustomEventDtor(LLBC_Event *ev);
+
+private:
+    /**
      * Friend class: pyllbc_Facade.
      * Access all methods and data members.
      */
@@ -387,8 +438,11 @@ private:
     Codec _codec;
     typedef std::map<int, PyObject *> _Codecs;
     _Codecs _codecs;
-
     bool _suppressedCoderNotFoundWarning;
+
+    static PyObject *_pyEvCls;
+    static LLBC_Func1<void, LLBC_Event *> _addiEvCtor;
+    static LLBC_Func1<void, LLBC_Event *> _customEvDtor;
 
     _FrameCallables _beforeFrameCallables;
     _FrameCallables _afterFrameCallables;
