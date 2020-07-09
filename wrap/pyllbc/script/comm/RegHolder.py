@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from weakref import ref
-from types import TypeType, ClassType
+from types import TypeType, ClassType, FunctionType, MethodType
 import functools
 
 import llbc
@@ -151,20 +151,20 @@ class pyllbcSvcRegInfo(object):
                 map(lambda op: to_svc.registerdecoder(op, wrapped), self._deopcodes)
 
         elif ty == self.Handler:
-            map(lambda op: to_svc.subscribe(op, wrapped()), self._hldropcodes)
+            map(lambda op: to_svc.subscribe(op, self._normalize_callable(to_svc, wrapped)), self._hldropcodes)
         elif ty == self.PreHandler:
-            map(lambda op: to_svc.presubscribe(op, wrapped()), self._prehldropcodes)
+            map(lambda op: to_svc.presubscribe(op, self._normalize_callable(to_svc, wrapped)), self._prehldropcodes)
         elif ty == self.UnifyPreHandler:
-            to_svc.unify_presubscribe(wrapped())
+            to_svc.unify_presubscribe(self._normalize_callable(to_svc, wrapped))
 
         elif ty == self.ExcHandler:
-            map(lambda op: to_svc.set_subscribe_exc_handler(op, wrapped()), self._exc_hldropcodes)
+            map(lambda op: to_svc.set_subscribe_exc_handler(op, self._normalize_callable(to_svc, wrapped)), self._exc_hldropcodes)
         elif ty == self.ExcPreHandler:
-            map(lambda op: to_svc.set_presubscribe_exc_handler(op, wrapped()), self._exc_prehldropcodes)
+            map(lambda op: to_svc.set_presubscribe_exc_handler(op, self._normalize_callable(to_svc, wrapped)), self._exc_prehldropcodes)
         elif ty == self.DftExcHandler:
-            to_svc.set_default_subscribe_exc_handler(wrapped())
+            to_svc.set_default_subscribe_exc_handler(self._normalize_callable(to_svc, wrapped))
         elif ty == self.DftExcPreHandler:
-            to_svc.set_default_presubscribe_exc_handler(wrapped())
+            to_svc.set_default_presubscribe_exc_handler(self._normalize_callable(to_svc, wrapped))
 
         if self._asfacade:
             to_svc.registerfacade(wrapped())
@@ -177,6 +177,25 @@ class pyllbcSvcRegInfo(object):
         ty = self._type
         if ty == self.FrameExcHandler:
             to_svc_cls.set_frame_exc_handler(wrapped())
+
+    def _normalize_callable(self, svc, cb):
+        # callable object type(impl __call__ method)
+        if not isinstance(cb, FunctionType):
+            return cb()
+        
+        # maybe is facade method(decorated in facade class)
+        for facade in svc.facades.itervalues():
+            if not hasattr(facade, cb.__name__):
+                continue
+
+            facade_cb = getattr(facade, cb.__name__)
+            if facade_cb and \
+                    isinstance(facade_cb, MethodType) and \
+                    facade_cb.im_func.func_code is cb.func_code:
+                return facade_cb
+        
+        # function type callable
+        return cb
 
     def __str__(self):
         return 'wrapped:{}, regtype:{}, fmt:{}, enopcode:{}, deopcodes:{}, hldropcodes:{}, prehldropcodes:{}, \
@@ -211,8 +230,8 @@ class pyllbcSvcRegsHolder(object):
     def decorate(cls, to_svc):
         bound_regs = cls._bound_regs.get(to_svc.name)
         if bound_regs:
-            map(lambda reg: reg.decorate(to_svc), bound_regs)
-        map(lambda reg: reg.decorate(to_svc), cls._unbound_regs)
+            cls._decorate_regs_to_svc(bound_regs, to_svc)
+        cls._decorate_regs_to_svc(cls._unbound_regs, to_svc)
 
     @classmethod
     def decorate_cls(cls):
@@ -226,15 +245,24 @@ class pyllbcSvcRegsHolder(object):
 
         cls._cls_decorated = True
 
+    @classmethod
+    def _decorate_regs_to_svc(cls, regs, to_svc):
+        for reg in regs:
+            if reg.asfacade:
+                reg.decorate(to_svc)
+        for reg in regs:
+            if not reg.asfacade:
+                reg.decorate(to_svc)
+
 llbc.inl.SvcRegsHolder = pyllbcSvcRegsHolder
 
 def pyllbc_extractreg(wrapped, ty):
     """
     Extract wrapped class/function library register info data, if not exist, will create it.
     """
-    if not isinstance(wrapped, (TypeType, ClassType)):
+    if not isinstance(wrapped, (TypeType, ClassType, FunctionType)):
         raise llbc.error('@forsend/@forrecv/@handler/@prehandler/@unify_prehandler/@exc_handler/@exc_prehandler/@bindto decorator ' \
-                'must decorate class type object, could not decorate {}'.format(type(wrapped)))
+                'must decorate class type object or function type object, could not decorate {}'.format(type(wrapped)))
 
     RegCls = llbc.inl.SvcRegInfo
 

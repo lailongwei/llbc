@@ -221,9 +221,9 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
         }
 
         if (_seqType == Base::ListBegin)
-            PyList_SET_ITEM(seq, i, elem);
+            PyList_SetItem(seq, i, elem);
         else
-            PyTuple_SET_ITEM(seq, i, elem);
+            PyTuple_SetItem(seq, i, elem);
     }
 
     return seq;

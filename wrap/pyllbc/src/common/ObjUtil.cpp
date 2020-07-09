@@ -236,7 +236,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
                 return NULL;
             }
 
-            PyList_SET_ITEM(pyList, i, pyElem); // Steals pyElem reference.
+            PyList_SetItem(pyList, i, pyElem); // Steals pyElem reference.
         }
 
         return pyList;

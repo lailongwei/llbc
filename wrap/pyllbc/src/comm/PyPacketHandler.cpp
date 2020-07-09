@@ -26,12 +26,14 @@
 pyllbc_PacketHandler::pyllbc_PacketHandler(int opcode)
 : _opcode(opcode)
 , _handler(NULL)
+, _callArgs(PyTuple_New(1))
 {
 }
 
 pyllbc_PacketHandler::~pyllbc_PacketHandler()
 {
     Py_XDECREF(_handler);
+    Py_DECREF(_callArgs);
 }
 
 int pyllbc_PacketHandler::SetHandler(PyObject *handler)
@@ -58,9 +60,17 @@ int pyllbc_PacketHandler::SetHandler(PyObject *handler)
 
 PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)
 {
-    PyObject *rtn = PyObject_CallFunctionObjArgs(_handler, packet, NULL);
+    // Set packet to call args list(steals ref).
+    Py_INCREF(packet);
+    PyTuple_SetItem(_callArgs, 0, packet);
+
+    // Call.
+    PyObject *rtn = PyObject_Call(_handler, _callArgs, NULL);
     if (UNLIKELY(rtn == NULL))
     {
+        Py_INCREF(Py_None);
+        PyTuple_SetItem(_callArgs, 0, Py_None);
+
         const LLBC_String packetStr = pyllbc_ObjUtil::GetObjStr(packet);
         const LLBC_String handlerStr = pyllbc_ObjUtil::GetObjStr(_handler);
         if (LIKELY(PyErr_Occurred()))
@@ -74,6 +84,10 @@ PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)
 
         return NULL;
     }
+
+    // Release packet from call args.
+    Py_INCREF(Py_None);
+    PyTuple_SetItem(_callArgs, 0, Py_None);
 
     return rtn;
 }

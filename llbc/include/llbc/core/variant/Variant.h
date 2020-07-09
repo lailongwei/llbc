@@ -449,6 +449,21 @@ public:
     bool operator <=(const LLBC_Variant &another) const;
     bool operator >=(const LLBC_Variant &another) const;
 
+    // Relational operators.
+    template <typename _T>
+    bool operator ==(const _T &another) const;
+    template <typename _T>
+    bool operator !=(const _T &another) const;
+
+    template <typename _T>
+    bool operator <(const _T &another) const;
+    template <typename _T>
+    bool operator >(const _T &another) const;
+    template <typename _T>
+    bool operator <=(const _T &another) const;
+    template <typename _T>
+    bool operator >=(const _T &another) const;
+
     // Arithmetic operators.
     LLBC_Variant operator +(const LLBC_Variant &another) const;
     LLBC_Variant operator -(const LLBC_Variant &another) const;

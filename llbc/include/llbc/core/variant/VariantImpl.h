@@ -660,6 +660,42 @@ inline LLBC_Variant &LLBC_Variant::operator =(const _T * const &val)
 }
 
 template <typename _T>
+bool LLBC_Variant::operator==(const _T &another) const
+{
+    return operator==(LLBC_Variant(another));
+}
+
+template <typename _T>
+bool LLBC_Variant::operator!=(const _T &another) const
+{
+    return operator!=(LLBC_Variant(another));
+}
+
+template <typename _T>
+bool LLBC_Variant::operator<(const _T &another) const
+{
+    return operator<(LLBC_Variant(another));
+}
+
+template <typename _T>
+bool LLBC_Variant::operator>(const _T &another) const
+{
+    return operator>(LLBC_Variant(another));
+}
+
+template <typename _T>
+bool LLBC_Variant::operator<=(const _T &another) const
+{
+    return operator<=(LLBC_Variant(another));
+}
+
+template <typename _T>
+bool LLBC_Variant::operator>=(const _T &another) const
+{
+    return operator>=(LLBC_Variant(another));
+}
+
+template <typename _T>
 LLBC_Variant LLBC_Variant::operator+(const _T &another) const
 {
     return operator+(LLBC_Variant(another));

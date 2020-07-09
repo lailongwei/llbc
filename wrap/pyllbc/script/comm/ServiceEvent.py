@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import llbc
+import traceback
 
 class pyllbcServiceEvent(object):
     """
@@ -27,6 +28,8 @@ class pyllbcServiceEvent(object):
         self._destroyed_from_service = None
         self._errno = None
         self._sub_errno = None
+        self._traceback = None
+        self._exception = None
 
     @property
     def svc(self):
@@ -168,6 +171,20 @@ class pyllbcServiceEvent(object):
         """
         return self._sub_errno
 
+    @property
+    def traceback(self):
+        """
+        Traceback - exception traceback.
+        """
+        return self._traceback
+
+    @property
+    def exception(self):
+        """
+        Exception - exception object.
+        """
+        return self._exception
+
     def __str__(self):
         s = 'svc:[{}]'.format(self._svc)
         if self._idletime is not None:
@@ -202,6 +219,10 @@ class pyllbcServiceEvent(object):
             s += ', errno:{}'.format(self._errno)
         if self._sub_errno is not None:
             s += ', sub_errno:{}'.format(self._sub_errno)
+        if self._traceback is not None:
+            s += ", tb:{}".format(traceback.format_tb(self._traceback))
+        if self._exception is not None:
+            s += ", exc_type:{}, exc:{}".format(self._exception.__class__, self._exception)
 
         return s
 
