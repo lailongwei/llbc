@@ -528,7 +528,12 @@ class pyllbcService(object):
         else:
             llbc.inl.RegisterFacade(self._c_obj, facade)
 
+        # add some common members
+        facade.svc = self
+
+        # update facade dict
         self._facades.update({facade.__class__: facade})
+
         return facade
 
     def getfacade(self, cls):
