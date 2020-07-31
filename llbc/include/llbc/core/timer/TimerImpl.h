@@ -23,6 +23,20 @@
 
 __LLBC_NS_BEGIN
 
+template <typename ObjType>
+LLBC_Timer::LLBC_Timer(ObjType *obj,
+                       void(ObjType::*timeoutMeth)(LLBC_Timer *),
+                       void(ObjType::*cancelMeth)(LLBC_Timer *),
+                       Scheduler *scheduler)
+: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
+, _timerData(NULL)
+
+, _data(NULL)
+, _timeoutDeleg(obj && timeoutMeth ? new LLBC_Delegate1<void, ObjType, LLBC_Timer *>(obj, timeoutMeth) : NULL)
+, _cancelDeleg(obj && cancelMeth ? new LLBC_Delegate1<void, ObjType, LLBC_Timer *>(obj, cancelMeth) : NULL)
+{
+}
+
 template <typename ObjectType>
 inline void LLBC_Timer::SetTimeoutHandler(ObjectType *object, void ( ObjectType::*timeoutMeth)(LLBC_Timer *))
 {
