@@ -1743,7 +1743,7 @@ public:
 "        if self._sub_errno is not None:\n"
 "            s += ', sub_errno:{}'.format(self._sub_errno)\n"
 "        if self._traceback is not None:\n"
-"            s += \", tb:{}\".format(traceback.format_tb(self._traceback))\n"
+"            s += \", tb:{}\".format(''.join(traceback.format_tb(self._traceback)))\n"
 "        if self._exception is not None:\n"
 "            s += \", exc_type:{}, exc:{}\".format(self._exception.__class__, self._exception)\n"
 "\n"

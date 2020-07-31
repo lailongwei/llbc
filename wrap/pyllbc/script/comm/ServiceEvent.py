@@ -220,7 +220,7 @@ class pyllbcServiceEvent(object):
         if self._sub_errno is not None:
             s += ', sub_errno:{}'.format(self._sub_errno)
         if self._traceback is not None:
-            s += ", tb:{}".format(traceback.format_tb(self._traceback))
+            s += ", tb:{}".format(''.join(traceback.format_tb(self._traceback)))
         if self._exception is not None:
             s += ", exc_type:{}, exc:{}".format(self._exception.__class__, self._exception)
 
