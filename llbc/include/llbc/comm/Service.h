@@ -29,7 +29,6 @@
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
 __LLBC_NS_BEGIN
@@ -259,7 +258,6 @@ public:
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
@@ -269,7 +267,6 @@ public:
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
