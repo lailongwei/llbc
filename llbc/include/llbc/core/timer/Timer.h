@@ -50,6 +50,40 @@ class LLBC_EXPORT LLBC_Timer
 public:
     /**
      * Constructor.
+     * @param[in] timeoutFunc - the timeout handler function.
+     * @param[in] cancelFunc  - the cancel handler function(optional).
+     * @param[in] scheduler   - timer scheduler, if set to NULL, it means use default scheduler, 
+     *                           otherwise use you specific timer scheduler.
+     * Note:
+     *          The default scheduler is means:
+     *              In entry thread, use LLBC library Startup() API create's timer scheduler.
+     *              In llbc service logic thread, use Service's timer scheduler.
+     *              In other non-llbc library style thread, scheduler is NULL.
+     */
+    explicit LLBC_Timer(void(*timeoutFunc)(LLBC_Timer *),
+                        void(*cancelFunc)(LLBC_Timer *) = NULL,
+                        Scheduler *scheduler = NULL);
+
+    /**
+     * Constructor.
+     * @param[in] timeoutMeth - the timeout handler function.
+     * @param[in] cancelMeth  - the cancel handler function(optional).
+     * @param[in] scheduler   - timer scheduler, if set to NULL, it means use default scheduler, 
+     *                           otherwise use you specific timer scheduler.
+     * Note:
+     *          The default scheduler is means:
+     *              In entry thread, use LLBC library Startup() API create's timer scheduler.
+     *              In llbc service logic thread, use Service's timer scheduler.
+     *              In other non-llbc library style thread, scheduler is NULL.
+     */
+    template <typename ObjType>
+    LLBC_Timer(ObjType *obj,
+               void (ObjType::*timeoutMeth)(LLBC_Timer *),
+               void (ObjType::*cancelMeth)(LLBC_Timer *) = NULL,
+               Scheduler *scheduler = NULL);
+
+    /**
+     * Constructor.
      * @param[in] timeoutDeleg - the timeout handler delegate.
      * @param[in] cancelDeleg  - the cancel handler delegate(optional).
      * @param[in] scheduler    - timer scheduler, if set to NULL, it means use default scheduler, 
