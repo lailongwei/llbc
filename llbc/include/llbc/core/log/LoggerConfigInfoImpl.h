@@ -23,6 +23,16 @@
 
 __LLBC_NS_BEGIN
 
+inline const LLBC_String &LLBC_LoggerConfigInfo::GetLoggerName() const
+{
+    return _loggerName;
+}
+
+inline bool LLBC_LoggerConfigInfo::IsNotConfigUseRoot() const
+{
+    return _notConfigUseRoot;
+}
+
 inline int LLBC_LoggerConfigInfo::GetLogLevel() const
 {
     return _logLevel;

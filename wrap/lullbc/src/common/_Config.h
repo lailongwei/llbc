@@ -66,8 +66,8 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_LOG_TO_CONSOLE");
     lua_pushstring(l, LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN");
-    lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT);
-    lua_setfield(l, 1, "CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT");
+    lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT);
+    lua_setfield(l, 1, "CFG_LOG_DEFAULT_COLOURFUL_OUTPUT");
     lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_LOG_TO_FILE");
     lua_pushstring(l, LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);

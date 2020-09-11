@@ -46,8 +46,8 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultIsAsyncMode();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultLogToConsole();
 // LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen);
-// LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDeafaultEnabledColourfulOutput();
+// LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDeafaultColourfulOutput();
 // LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultLogToFile();
 // LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME

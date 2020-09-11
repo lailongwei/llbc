@@ -88,7 +88,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default log to console: %s\n", (LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE) ? "true" : "false");
     desc.append_format("    default console log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     desc.append_format("    default log to file: %s\n", (LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE) ? "true" : "false");
-    desc.append_format("    default log file name: %s\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
+    desc.append_format("    default log file name: <same with logger name>\n");
     desc.append_format("    default file log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     desc.append_format("    default daily mode enabled(available in file log): %s\n", (LLBC_CFG_LOG_DEFAULT_DAILY_MODE) ? "true" : "false");
     desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);

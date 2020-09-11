@@ -47,10 +47,27 @@ public:
 public:
     /**
      * Initialize logger config.
-     * @param[in] cfg - config property.
+     * @param[in] loggerName - the logger name.
+     * @param[in] cfg        - config property.
+     * @param[in] rootCfg    - the root logger config.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_Property &cfg);
+    int Initialize(const LLBC_String &loggerName,
+                   const LLBC_Property &cfg,
+                   const LLBC_LoggerConfigInfo *rootCfg);
+
+public:
+    /**
+     * Get logger name.
+     * @return const LLBC_String & - the logger name.
+     */
+    const LLBC_String &GetLoggerName() const;
+
+    /**
+     * Get not config use option from root or not(use library default).
+     * @return bool - the use root option.
+     */
+    bool IsNotConfigUseRoot() const;
 
 public:
     /**
@@ -189,6 +206,9 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
 
 private:
+    LLBC_String _loggerName;
+    bool _notConfigUseRoot;
+
     int _logLevel;
     bool _asyncMode;
     int _flushInterval;

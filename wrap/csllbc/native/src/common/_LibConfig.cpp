@@ -58,9 +58,9 @@ int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen
     return writable;
 }
 
-int csllbc_LibConfig_Log_IsDeafaultEnabledColourfulOutput()
+int csllbc_LibConfig_Log_IsDeafaultColourfulOutput()
 {
-    return LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT;
+    return LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT;
 }
 
 int csllbc_LibConfig_Log_IsDefaultLogToFile()
