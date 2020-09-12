@@ -30,6 +30,22 @@ int csllbc_LibConfig_DefaultBacklogSize()
     return LLBC_CFG_OS_DFT_BACKLOG_SIZE;
 }
 
+int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
+{
+    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_ROOT_LOGGER_NAME), nameLen);
+    LLBC_MemCpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
+
+    return writable;
+}
+
+int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(sint64 notConfigUse, int len)
+{
+    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE ), len);
+    LLBC_MemCpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
+
+    return writable;
+}
+
 int csllbc_LibConfig_Log_DefaultLogLevel()
 {
     return LLBC_CFG_LOG_DEFAULT_LEVEL;
@@ -58,7 +74,7 @@ int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen
     return writable;
 }
 
-int csllbc_LibConfig_Log_IsDeafaultColourfulOutput()
+int csllbc_LibConfig_Log_IsDefaultColourfulOutput()
 {
     return LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT;
 }
@@ -66,14 +82,6 @@ int csllbc_LibConfig_Log_IsDeafaultColourfulOutput()
 int csllbc_LibConfig_Log_IsDefaultLogToFile()
 {
     return LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE;
-}
-
-int csllbc_LibConfig_Log_DefaultLogFileName(sint64 name, int nameLen)
-{
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME), nameLen);
-    LLBC_MemCpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME, writable);
-
-    return writable;
 }
 
 int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen)

@@ -89,7 +89,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     else if (rootCfg)
         notCfgUseOpt = rootCfg->IsNotConfigUseRoot() ? "root" : "default";
     else
-        notCfgUseOpt = LLBC_CFG_LOG_NOT_CONFIG_OPTION_USE;
+        notCfgUseOpt = LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE;
     _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root" && rootCfg;
 
     // Common log configs.

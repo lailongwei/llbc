@@ -46,6 +46,41 @@ namespace llbc
         #endregion
 
         #region logger about configs
+
+        /// <summary>
+        /// root logger name.
+        /// <para>config layer: llbc core library</para>
+        /// </summary>
+        public static string logRootLoggerName
+        {
+            get
+            {
+                unsafe
+                {
+                    byte* loggerName = stackalloc byte[256];
+                    int wrote = LLBCNative.csllbc_LibConfig_Log_RootLoggerName((long)loggerName, 256);
+                    return new string((sbyte*)loggerName, 0, wrote, Encoding.UTF8);
+                }
+            }
+        }
+
+        /// <summary>
+        /// logger config option not config use option("root"/"default").
+        /// <para>config layer: llbc core library</para>
+        /// </summary>
+        public static string logDefaultNotConfigOptionUse
+        {
+            get
+            {
+                unsafe
+                {
+                    byte* notConfigUse = stackalloc byte[256];
+                    int wrote = LLBCNative.csllbc_LibConfig_Log_DefaultNotConfigOptionUse((long) notConfigUse, 256);
+                    return new string((sbyte*)notConfigUse, 0, wrote, Encoding.UTF8);
+                }
+            }
+        }
+
         /// <summary>
         /// Default log level.
         /// <para>config layer: llbc core library</para>
@@ -105,7 +140,7 @@ namespace llbc
         /// </summary>
         public static bool logDefaultEnabledColourfulOutput
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_IsDeafaultEnabledColourfulOutput() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Log_IsDefaultColourfulOutput() != 0; }
         }
 
         /// <summary>
@@ -116,23 +151,6 @@ namespace llbc
         {
             get
             { return LLBCNative.csllbc_LibConfig_Log_IsDefaultLogToFile() != 0; }
-        }
-
-        /// <summary>
-        /// Logger default log file name.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static string logDefaultLogFileName
-        {
-            get
-            {
-                unsafe
-                {
-                    byte* fileName = stackalloc byte[256];
-                    int wrote = LLBCNative.csllbc_LibConfig_Log_DefaultLogFileName((long)fileName, 256);
-                    return new string((sbyte*)fileName, 0, wrote, Encoding.UTF8);
-                }
-            }
         }
 
         /// <summary>

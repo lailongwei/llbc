@@ -134,8 +134,8 @@
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
 // Default logfile create option
 #define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
-// If log config item not config use default or root config(root/default).
-#define LLBC_CFG_LOG_NOT_CONFIG_OPTION_USE                  "root"
+// Default log config item not config use default or root config(root/default).
+#define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
 
 /**
  * \brief core/timer about configs.

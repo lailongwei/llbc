@@ -36,6 +36,12 @@ namespace llbc
         public extern static int csllbc_LibConfig_DefaultBacklogSize();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static int csllbc_LibConfig_Log_RootLoggerName(long name, int nameLen);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(long notConfigUse, int len);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Log_DefaultLogLevel();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -51,13 +57,10 @@ namespace llbc
         public extern static int csllbc_LibConfig_Log_DefaultConsoleLogPattern(long pattern, int patternLen);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Log_IsDeafaultEnabledColourfulOutput();
+        public extern static int csllbc_LibConfig_Log_IsDefaultColourfulOutput();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Log_IsDefaultLogToFile();
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Log_DefaultLogFileName(long name, int nameLen);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Log_DefaultFileLogPattern(long pattern, int patternLen);

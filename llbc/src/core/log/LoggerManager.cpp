@@ -33,7 +33,7 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_String LLBC_LoggerManager::_rootLoggerName = "root";
+LLBC_String LLBC_LoggerManager::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
 
 LLBC_LoggerManager::LLBC_LoggerManager()
 : _lock()
