@@ -62,16 +62,21 @@ int TestSuite_Main(int argc, char* argv[])
 
         int idx = -1;
         LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
+
         #if LLBC_TARGET_PLATFORM_WIN32
         #pragma warning(push)
         #pragma warning(disable: 4996)
+        #endif // LLBC_TARGET_PLATFORM_WIN32
+
         if (fscanf(stdin, "%d", &idx) != 1)
         {
-        #pragma warning(pop)
-        #endif
             __ClearInputBuf();
             continue;
         }
+
+        #if LLBC_TARGET_PLATFORM_WIN32
+        #pragma warning(pop)
+        #endif // LLBC_TARGET_PLATFORM_WIN32
 
         __ClearInputBuf();
         if (idx <= 0)
