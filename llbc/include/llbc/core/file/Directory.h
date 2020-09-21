@@ -55,6 +55,13 @@ public:
 
 public:
     /**
+     * Check given path is abs path or not.
+     * @param[in] path - the path.
+     * @return bool - return true if given path is abs path, otherwise return false.
+     */
+    static bool IsAbsPath(const LLBC_String &path);
+
+    /**
      * Convert path to normalized absolutize path.
      * @return LLBC_String - the normalized absolutize path.
      */

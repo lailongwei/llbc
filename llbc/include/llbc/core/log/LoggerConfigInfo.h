@@ -133,6 +133,12 @@ public:
     const LLBC_String &GetFilePattern() const;
 
     /**
+     * Get log directory.
+     * @return const LLBC_String & - log directory.
+     */
+    const LLBC_String &GetLogDir() const;
+
+    /**
      * Get log file name.
      * @return const LLBC_String & - log file name.
      */
@@ -220,6 +226,7 @@ private:
 
     bool _logToFile;
     int _fileLogLevel;
+    LLBC_String _logDir;
     LLBC_String _logFile;
     LLBC_String _logFileSuffix;
     bool _logCodeFilePath;

@@ -117,15 +117,43 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     _logToFile = __LLBC_GetLogCfg("logToFile", LOG_TO_FILE, IsLogToFile, AsBool);
     if (_logToFile)
     {
+        // File log level option.
         if (cfg.HasProperty("fileLogLevel"))
             _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : _logLevel;
 
-        _logFile = __LLBC_GetLogCfg2("logFile", _loggerName, GetLogFile, AsStr);
+        // Log dir option.
+        if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
+        {
+            #if LLBC_TARGET_PLATFORM_WIN32
+            _logDir = _logDir.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
+            #else
+            _logDir = _logDir.findreplace(LLBC_BACKLASH_A, LLBC_SLASH_A);
+            #endif
+        }
+
+        // Force application log path(log file place into application module file dir).
+        _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsBool);
+
+        // Log file path option.
+        if (cfg.HasProperty("logFile"))
+            _logFile = cfg.GetValue("logFile").AsStr().strip();
+        if (_logFile.empty())
+            _logFile = _loggerName;
+        if (!_logDir.empty())
+            _logFile = LLBC_Directory::Join(_logDir, _logFile);
+        if (!LLBC_Directory::IsAbsPath(_logFile))
+        {
+            if (_forceAppLogPath)
+                _logFile = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), _logFile);
+            else
+                _logFile = LLBC_Directory::AbsPath(_logFile);
+        }
+
+        // Other file log options.
         _logFileSuffix = __LLBC_GetLogCfg("logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
         _logCodeFilePath = __LLBC_GetLogCfg("logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsBool);
-        _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsBool);
         _filePattern = __LLBC_GetLogCfg("filePattern", FILE_LOG_PATTERN, GetFilePattern, AsStr);
         _dailyMode = __LLBC_GetLogCfg("dailyRollingMode", DAILY_MODE, IsDailyRollingMode, AsBool);
         _maxFileSize = __LLBC_GetLogCfg2("maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);

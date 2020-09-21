@@ -46,7 +46,7 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
 
 int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 {
-    // Load ini config file
+    // Load ini config file.
     LLBC_Property cfg;
     if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
         return LLBC_FAILED;

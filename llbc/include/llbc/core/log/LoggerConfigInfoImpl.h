@@ -83,6 +83,11 @@ inline const LLBC_String &LLBC_LoggerConfigInfo::GetFilePattern() const
     return _filePattern;
 }
 
+inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogDir() const
+{
+    return _logDir;
+}
+
 inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogFile() const
 {
     return _logFile;

@@ -43,11 +43,7 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_LogFileAppender::LLBC_LogFileAppender()
-: _basePath()
-, _baseName()
-, _fileSuffix()
-
-, _fileBufferSize(0)
+: _fileBufferSize(0)
 , _isDailyRolling(true)
 
 , _maxFileSize(LONG_MAX)
@@ -84,19 +80,12 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         return LLBC_FAILED;
     }
 
-    _baseName = initInfo.file;
+    _filePath = initInfo.file;
     _fileSuffix = initInfo.fileSuffix;
-    LLBC_String logDir = LLBC_Directory::DirName(_baseName);
-
-    if (initInfo.forceAppLogPath)
+    const LLBC_String fileDir = LLBC_Directory::DirName(_filePath);
+    if (!LLBC_Directory::Exists(fileDir))
     {
-        _basePath = LLBC_Directory::ModuleFileDir();
-        logDir = LLBC_Directory::Join(_basePath, logDir);
-    }
-
-    if (!logDir.empty() && !LLBC_Directory::Exists(logDir))
-    {
-        if (LLBC_Directory::Create(logDir) != LLBC_OK)
+        if (LLBC_Directory::Create(fileDir) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -144,8 +133,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
 void LLBC_LogFileAppender::Finalize()
 {
-    _basePath.clear();
-    _baseName.clear();
+    _filePath.clear();
     _fileSuffix.clear();
 
     _fileBufferSize = 0;
@@ -238,7 +226,7 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 
 LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 {
-    LLBC_String logFile(_basePath.empty() ? _baseName : LLBC_Directory::Join(_basePath, _baseName));
+    LLBC_String logFile = _filePath;
     if (_isDailyRolling)
     {
         struct tm timeStruct;
