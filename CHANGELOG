@@ -1,6 +1,10 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
+# Version: 1.0.9
+# 2020/9~
+#
+
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9
 # 1)【llbc core】增加Protocol Stack控制支持，以安全异步的完成Service层跟ProtocolStack层的通信.
