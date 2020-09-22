@@ -30,4 +30,7 @@
 //      1: Binary Codec
 #define PYLLBC_CFG_DFT_SVC_CODEC    1
 
+// Packet reuse option.
+#define PYLLBC_CFG_PACKET_REUSE     1
+
 #endif // !__PYLLBC_COM_CONFIG_H__

@@ -79,6 +79,16 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.PyTimerIsCancelling);
     inlMod->AddMethod(methods.PyTimerUpdateAllTimers);
 
+    // Add all packet about methods to inl module.
+    inlMod->AddMethod(methods.Packet_GetLocalIp);
+    inlMod->AddMethod(methods.Packet_GetLocalPort);
+    inlMod->AddMethod(methods.Packet_GetPeerIp);
+    inlMod->AddMethod(methods.Packet_GetPeerPort);
+    inlMod->AddMethod(methods.Packet_GetStatusDesc);
+    inlMod->AddMethod(methods.Packet_GetExtData1);
+    inlMod->AddMethod(methods.Packet_GetExtData2);
+    inlMod->AddMethod(methods.Packet_GetExtData3);
+
     // Add all service about methods to inl module.
     inlMod->AddMethod(methods.NewService);
     inlMod->AddMethod(methods.DelService);
