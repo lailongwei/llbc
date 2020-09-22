@@ -42,6 +42,9 @@
 # 36)【llbc core】对象池设计优化, 去除不需要的模板参数, 增加运行时动态创建能力, 增加依赖删除网状关系图自动(运行自动拓扑生成).
 # 37)【llbc core】增加对象池信息统计支持.
 # 38)【llbc core】完整优化网络相关代码, 提供更多选项给应用层自定义, 同时性能提升10倍+(整体).
+# 39)【llbc core】优化日志配置，提供root->其余logger配置继承及重写支持, 同时完善配置细节及代码优化.
+# 40)【pyllbc】优化python layer协议包构建代码，优化后协议包处理性能提供100%.
+# 41)【llbc core/pyllbc】提供Facade三方dll接入及注册支持, 特别对于python, 三方的c++facade只需要简单修改即可被python无缝接入使用.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
