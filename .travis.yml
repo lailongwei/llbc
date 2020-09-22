@@ -33,6 +33,7 @@ notifications:
             - 964855959@qq.com   # Longwei Lai
             - huangrongfu00@gmail.com  # Rongfu Huang
             - najoast@126.com # Yan Zhou
+            - caochunxi@hotmail.com # Chunxi Cao
         on_success: change
         on_failure: always
 
