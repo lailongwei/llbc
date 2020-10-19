@@ -153,6 +153,14 @@ private:
      */
     bool CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv);
 
+    #if PYLLBC_CFG_PACKET_REUSE
+    /**
+     * Create reuse python layer packet object.
+     * @return PyObject * - the python layer reuse packet(new reference).
+     */
+    PyObject *CreateReusePyPacket();
+    #endif // PYLLBC_CFG_PACKET_REUSE
+
 private:
     pyllbc_Service *_svc;
     PyObject *_pySvc;
@@ -185,6 +193,12 @@ private:
     PyObject *_keyCObj;
 
     PyObject *_pyPacketCls;
+    #if PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyReusePacket;
+    PyObject *_pyPacketReuseMeth;
+    #endif // PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyNullCObj;
+    PyObject *_pyPacketCreateArgs;
 
     PyObject *_pyStream;
     pyllbc_Stream *_nativeStream;

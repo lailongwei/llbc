@@ -34,13 +34,14 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine();
 
         Console.WriteLine("Log about configs:");
+        Console.WriteLine("  Log root logger name: {0}", LibConfig.logRootLoggerName);
+        Console.WriteLine("  Log default not config option use: {0}", LibConfig.logDefaultNotConfigOptionUse);
         Console.WriteLine("  Log default level: {0}", LibConfig.logDefaultLevel);
         Console.WriteLine("  Log direct flush to console: {0}", LibConfig.logDirectFlushToConsole);
         Console.WriteLine("  Log default is async-mode: {0}", LibConfig.logDefaultIsAsyncMode);
         Console.WriteLine("  Log default console log pattern: {0}", LibConfig.logDefaultConsoleLogPattern);
-        Console.WriteLine("  Log default enabled colourful output: {0}", LibConfig.logDefaultEnabledColourfulOutput);
+        Console.WriteLine("  Log default colourful output: {0}", LibConfig.logDefaultEnabledColourfulOutput);
         Console.WriteLine("  Log default log to file: {0}", LibConfig.logDefaultLogToFile);
-        Console.WriteLine("  Log default log file name: {0}", LibConfig.logDefaultLogFileName);
         Console.WriteLine("  Log default file log pattern: {0}", LibConfig.logDefaultFileLogPattern);
         Console.WriteLine("  Log default lazy create log file: {0}", LibConfig.lazyCreateLogFile);
         Console.WriteLine("  Log default enabled daily-rolling mode: {0}", LibConfig.logDefaultEnabledDailyMode);

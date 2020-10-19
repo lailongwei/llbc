@@ -91,7 +91,9 @@
 /**
  * \brief core/log about config options define.
  */
-// Default log level is set to DEBUG.
+// Root logger name.
+#define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
+// Default log level is set to DEBUG(DEBUG:0, INFO:1, WARN:2, ERROR:3, FATAL:4).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
@@ -101,24 +103,22 @@
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN            "%T [%N][%L] - %m%n"
-// Default console colourful output enabled flag.
-# define LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT      1
+// Default console colourful output flag.
+# define LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT              1
 // Default is not log to file.
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE                    0
-// Default log file name.
-#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME                  "llbc.log"
 // Default log file suffix.
-#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX                ""
+#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX                ".log"
 // Default force application log path
 #define LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH             false
 // Default log code file path control config
-#define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             true
+#define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             false
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default is daily rolling mode.
 #define LLBC_CFG_LOG_DEFAULT_DAILY_MODE                     1
 // Default max log file size.
-#define LLBC_CFG_LOG_MAX_FILE_SIZE                          (LONG_MAX)
+#define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
 // Default max backup file index.
 #define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       1000
 // Default log file buffer size, in bytes.
@@ -126,7 +126,7 @@
 // Default log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL             200
 // Default max log appenders flush interval, in milli-seconds.
-#define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 1000
+#define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 5000
 // Default log using mode.
 #define LLBC_CFG_LOG_USING_WITH_STREAM                      0
 // Default take over config, only using in root logger, when a message log to 
@@ -134,6 +134,8 @@
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
 // Default logfile create option
 #define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
+// Default log config item not config use default or root config(root/default).
+#define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
 
 /**
  * \brief core/timer about configs.

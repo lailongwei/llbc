@@ -1,8 +1,12 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
-# Version: 1.0.7
-# 2019/06~
+# Version: 1.0.9
+# 2020/9~
+#
+
+# Version: 1.0.7-1.0.8
+# 2019/06~2020/9
 # 1)【llbc core】增加Protocol Stack控制支持，以安全异步的完成Service层跟ProtocolStack层的通信.
 # 2)【llbc all】 规整所有for中的++/--使用，所有++/--统一调整为前置.
 # 3)【llbc core】增加Protocol Stack Control机制，以满足业务层安全的对协议栈实施控制.
@@ -42,6 +46,9 @@
 # 36)【llbc core】对象池设计优化, 去除不需要的模板参数, 增加运行时动态创建能力, 增加依赖删除网状关系图自动(运行自动拓扑生成).
 # 37)【llbc core】增加对象池信息统计支持.
 # 38)【llbc core】完整优化网络相关代码, 提供更多选项给应用层自定义, 同时性能提升10倍+(整体).
+# 39)【llbc core】优化日志配置，提供root->其余logger配置继承及重写支持, 同时完善配置细节及代码优化.
+# 40)【pyllbc】优化python layer协议包构建代码，优化后协议包处理性能提供100%.
+# 41)【llbc core/pyllbc】提供Facade三方dll接入及注册支持, 特别对于python, 三方的c++facade只需要简单修改即可被python无缝接入使用.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.

@@ -72,9 +72,15 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 , _keyConnected(Py_BuildValue("s", "connected"))
 , _keyIdleTime(Py_BuildValue("s", "idletime"))
 , _keyInlIdleTime(Py_BuildValue("s", "_idletime"))
-, _keyCObj(Py_BuildValue("s", "cobj"))
+, _keyCObj(Py_BuildValue("s", "_cobj"))
 
 , _pyPacketCls(NULL)
+#if PYLLBC_CFG_PACKET_REUSE
+, _pyReusePacket(NULL)
+, _pyPacketReuseMeth(NULL)
+#endif // PYLLBC_CFG_PACKET_REUSE
+, _pyNullCObj(PyInt_FromLong(0))
+, _pyPacketCreateArgs(PyTuple_New(7))
 
 , _pyStream(NULL)
 , _nativeStream(NULL)
@@ -84,6 +90,8 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 
 , _facadeEvCallArgs(PyTuple_New(1))
 {
+    Py_INCREF(_pySvc);
+    PyTuple_SetItem(_pyPacketCreateArgs, 0, _pySvc);
 }
 
 pyllbc_Facade::~pyllbc_Facade()
@@ -97,6 +105,8 @@ pyllbc_Facade::~pyllbc_Facade()
     Py_DECREF(_methOnSessionCreate);
     Py_DECREF(_methOnSessionDestroy);
     Py_DECREF(_methOnAsyncConnResult);
+    Py_DECREF(_methOnProtoReport);
+    Py_DECREF(_methOnUnHandledPacket);
 
     Py_DECREF(_keySVC);
     Py_DECREF(_keyIp);
@@ -112,6 +122,12 @@ pyllbc_Facade::~pyllbc_Facade()
     Py_DECREF(_keyCObj);
 
     Py_XDECREF(_pyPacketCls);
+    #if PYLLBC_CFG_PACKET_REUSE
+    Py_XDECREF(_pyReusePacket);
+    Py_XDECREF(_pyPacketReuseMeth);
+    #endif // PYLLBC_CFG_PACKET_REUSE
+    Py_XDECREF(_pyNullCObj);
+    Py_XDECREF(_pyPacketCreateArgs);
 
     if (_pyStream)
     {
@@ -219,14 +235,17 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
 {
     typedef pyllbc_Service::_PacketHandlers _Handlers;
 
+    // Stopping check.
     if (UNLIKELY(_svc->_stoping))
         return;
 
+    // Find handler.
     _Handlers &handlers = _svc->_handlers;
     _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
     if (UNLIKELY(handlerIt == handlers.end()))
         return;
 
+    // Build python layer packet.
     pyllbc_PacketHandler *&handler = handlerIt->second;
     PyObject *pyPacket = reinterpret_cast<PyObject *>(packet.GetPreHandleResult());
     if (!pyPacket)
@@ -235,10 +254,15 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
             return;
     }
 
+    // Handle packet.
     PyObject *ret = handler->Handle(pyPacket);
     if (LIKELY(ret))
         Py_DECREF(ret);
 
+    // Force clear pylayer packet._cobj field.
+    PyObject_SetAttr(pyPacket, _keyCObj, _pyNullCObj);
+
+    // Delete packet.
     if (!packet.GetPreHandleResult())
         Py_DECREF(pyPacket);
 }
@@ -316,6 +340,11 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
         PyObject *modDict = pyllbc_TopModule->GetModuleDict();
         _pyPacketCls = PyDict_GetItemString(modDict, "Packet");
         Py_INCREF(_pyPacketCls);
+
+        #if PYLLBC_CFG_PACKET_REUSE
+        _pyReusePacket = CreateReusePyPacket();
+        _pyPacketReuseMeth = PyObject_GetAttrString(_pyReusePacket, "_reuse");
+        #endif // PYLLBC_CFG_PACKET_REUSE
     }
 
     // Create python layer instance: llbc.Stream
@@ -331,7 +360,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
         Py_DECREF(tupleArg);
 
         // Get pyllbc_Stream object.
-        PyObject *cobj = PyObject_GetAttr(_pyStream, _keyCObj);
+        PyObject *cobj = PyObject_GetAttrString(_pyStream, "cobj");
         if (UNLIKELY(!cobj))
         {
             Py_DECREF(_pyStream);
@@ -371,66 +400,47 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
             return NULL;
     }
 
+    if (!pyData)
+    {
+        Py_IncRef(_pyStream);
+        pyData = _pyStream;
+    }
+
     PyObject *pySenderSvcId = PyInt_FromLong(packet.GetSenderServiceId());
     PyObject *pySessionId = PyInt_FromLong(packet.GetSessionId());
-
-    const LLBC_SockAddr_IN &localAddr = packet.GetLocalAddr();
-    PyObject *pyLocalIp = PyString_FromString(localAddr.GetIpAsString().c_str());
-    PyObject *pyLocalPort = PyInt_FromLong(localAddr.GetPort());
-
-    const LLBC_SockAddr_IN &peerAddr = packet.GetPeerAddr();
-    PyObject *pyPeerIp = PyString_FromString(peerAddr.GetIpAsString().c_str());
-    PyObject *pyPeerPort = PyInt_FromLong(peerAddr.GetPort());
 
     PyObject *pyOpcode = PyInt_FromLong(packet.GetOpcode());
     PyObject *pyStatus = PyInt_FromLong(packet.GetStatus());
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    const LLBC_String &statusDesc = packet.GetStatusDesc();
-    PyObject *pyStatusDesc = 
-        PyString_FromStringAndSize(statusDesc.c_str(), statusDesc.length());
-#else
-    PyObject *pyStatusDesc = Py_None;
-    Py_INCREF(pyStatusDesc);
-#endif
-
-    PyObject *pyExtData1 = PyLong_FromLongLong(packet.GetExtData1());
-    PyObject *pyExtData2 = PyLong_FromLongLong(packet.GetExtData2());
-    PyObject *pyExtData3 = PyLong_FromLongLong(packet.GetExtData3());
-
     PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
 
-    PyObject *pyPacket = PyObject_CallFunctionObjArgs(_pyPacketCls,
-                                                      _pySvc,
-                                                      pySenderSvcId,
-                                                      pySessionId,
-                                                      pyLocalIp,
-                                                      pyLocalPort,
-                                                      pyPeerIp,
-                                                      pyPeerPort,
-                                                      pyOpcode,
-                                                      pyStatus,
-                                                      pyStatusDesc,
-                                                      pyData,
-                                                      pyExtData1,
-                                                      pyExtData2,
-                                                      pyExtData3,
-                                                      pyPacketCObj,
-                                                      NULL);
-    Py_DECREF(pySenderSvcId);
-    Py_DECREF(pySessionId);
-    Py_DECREF(pyLocalIp);
-    Py_DECREF(pyLocalPort);
-    Py_DECREF(pyPeerIp);
-    Py_DECREF(pyPeerPort);
-    Py_DECREF(pyOpcode);
-    Py_DECREF(pyStatus);
-    Py_DECREF(pyStatusDesc);
-    Py_DECREF(pyData);
-    Py_DECREF(pyExtData1);
-    Py_DECREF(pyExtData2);
-    Py_DECREF(pyExtData3);
-    Py_DECREF(pyPacketCObj);
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySenderSvcId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 6, pyPacketCObj);
+    #if PYLLBC_CFG_PACKET_REUSE
+    PyObject *reuseRet = PyObject_CallObject(_pyPacketReuseMeth, _pyPacketCreateArgs);
+
+    Py_IncRef(Py_None);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, Py_None); // Only clear pyData item(index 5).
+
+    if (UNLIKELY(!reuseRet))
+    {
+        pyllbc_TransferPyError();
+        return NULL;
+    }
+
+    Py_DecRef(reuseRet);
+    Py_IncRef(_pyReusePacket);
+
+    return _pyReusePacket;
+    #else
+    PyObject *pyPacket = PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
+
+    Py_IncRef(Py_None);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, Py_None); // Only clear pyData item(index 5).
 
     if (UNLIKELY(!pyPacket))
     {
@@ -439,6 +449,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     }
 
     return pyPacket;
+    #endif // PYLLBC_CFG_PACKET_REUSE
 }
 
 void pyllbc_Facade::DeletePyPacket(void *_)
@@ -494,3 +505,26 @@ bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv)
 
     return true;
 }
+
+#if PYLLBC_CFG_PACKET_REUSE
+PyObject* pyllbc_Facade::CreateReusePyPacket()
+{
+    PyObject *pyData = Py_None;
+    Py_IncRef(pyData);
+
+    PyObject *pySenderSvcId = PyInt_FromLong(0);
+    PyObject *pySessionId = PyInt_FromLong(0);
+    PyObject *pyOpcode = PyInt_FromLong(0);
+    PyObject *pyStatus = PyInt_FromLong(0);
+    PyObject *pyPacketCObj = PyInt_FromLong(0);
+
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySenderSvcId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 6, pyPacketCObj);
+
+    return PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
+}
+#endif // PYLLBC_CFG_PACKET_REUSE

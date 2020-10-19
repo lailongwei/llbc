@@ -45,7 +45,7 @@ LLBC_FastLock LLBC_LogConsoleAppender::_colorLock;
 #endif  // LLBC_TARGET_PLATFORM_WIN32
 
 LLBC_LogConsoleAppender::LLBC_LogConsoleAppender()
-: _colourfulOutput(LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT)
+: _colourfulOutput(LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT)
 {
 }
 

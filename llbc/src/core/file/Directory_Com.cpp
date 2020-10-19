@@ -170,6 +170,21 @@ int LLBC_Directory::Remove(const LLBC_String &path)
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
+bool LLBC_Directory::IsAbsPath(const LLBC_String& path)
+{
+    if (UNLIKELY(path.empty()))
+        return false;
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    return (path.size() >= 3 &&
+            LLBC_String::isalpha(path[0]) &&
+            path[1] == ':' &&
+            path[2] == LLBC_BACKLASH_A);
+#else
+    return path[0] == LLBC_SLASH_A;
+#endif
+}
+
 LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
 {
     if (path.empty())
