@@ -188,6 +188,13 @@ int TestCase_Core_File_Directory::JoinTest()
 {
     LLBC_PrintLine("Join test:");
 
+    const auto p1 = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "test_prop.cfg");
+    const auto p2 = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "p1", "test_prop.cfg");
+    const auto p3 = LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "p1", "p2", "test_prop.cfg");
+    LLBC_PrintLine("P1 Done, Result: %s", p1.c_str());
+    LLBC_PrintLine("P2 Done, Result: %s", p2.c_str());
+    LLBC_PrintLine("P3 Done, Result: %s", p3.c_str());
+
     LLBC_Strings parts;
     parts.push_back("a"), parts.push_back("b"), parts.push_back("c"), JoinTest(parts);
     parts.clear(), parts.push_back("a/"), parts.push_back("b"), JoinTest(parts);
