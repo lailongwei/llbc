@@ -64,6 +64,7 @@ __DEFINE_TEST_CASE(TestCase_Comm_LazyTask)
 __DEFINE_TEST_CASE(TestCase_Comm_ProtoStackCtrl)
 __DEFINE_TEST_CASE(TestCase_Comm_MessageBuffer)
 __DEFINE_TEST_CASE(TestCase_Comm_DynLoadFacade)
+__DEFINE_TEST_CASE(TestCase_Comm_Echo)
 __DEFINE_TEST_CASE(TestCase_App_AppTest)
 __DEF_TEST_CASE_END
 
