@@ -323,51 +323,6 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
     return joined;
 }
 
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3)
-{
-    return Join(Join(path1, path2), path3);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4)
-{
-    return Join(Join(path1, path2, path3), path4);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5)
-{
-    return Join(Join(path1, path2, path3, path4), path5);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5,
-                                  const LLBC_String &path6)
-{
-    return Join(Join(path1, path2, path3, path4, path5), path6);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5,
-                                  const LLBC_String &path6,
-                                  const LLBC_String &path7)
-{
-    return Join(Join(path1, path2, path3, path4, path5, path6), path7);
-}
-
 LLBC_String LLBC_Directory::Join(const LLBC_Strings &paths)
 {
     LLBC_String finalPath;
