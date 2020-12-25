@@ -529,13 +529,6 @@ private:
     struct Holder _holder;
 };
 
-/**
- * \brief The Variant dictionary encapsulation.
- */
- typedef std::map<LLBC_NS LLBC_String, LLBC_NS LLBC_Variant> LLBC_VariantDictionary;
- typedef LLBC_VariantDictionary::iterator LLBC_VariantDictionaryIter;
- typedef LLBC_VariantDictionary::const_iterator LLBC_VariantDictionaryCIter;
-
 __LLBC_NS_END
 
 #include "llbc/core/variant/VariantImpl.h"

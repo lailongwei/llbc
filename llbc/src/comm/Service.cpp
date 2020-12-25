@@ -409,8 +409,8 @@ void LLBC_Service::Stop()
     if (_driveMode == This::SelfDrive) // Stop self-drive service.
     {
         // TODO: How to stop sink into loop service???
-        // if (_sinkIntoLoop) // Service sink into loop, direct return.
-        //     return;
+        if (_sinkIntoLoop) // Service sink into loop, direct return.
+            return;
 
         while (_started) // Service not sink into loop, wait service stop(LLBC_Task mechanism will ensure Cleanup method called).
             LLBC_ThreadManager::Sleep(20);

@@ -86,6 +86,7 @@
 #include "comm/TestCase_Comm_ProtoStackCtrl.h"
 #include "comm/TestCase_Comm_MessageBuffer.h"
 #include "comm/TestCase_Comm_DynLoadFacade.h"
+#include "comm/TestCase_Comm_Echo.h"
 
 #include "application/TestCase_App_AppTest.h"
 
