@@ -1069,7 +1069,7 @@ public:
     // strip operation: strip left. 
     _This &lstrip(const _This &chars = _This())
     {
-        _This willStripChars;
+        _This willStripChars = chars;
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
@@ -1116,7 +1116,7 @@ public:
     // strip operation: strip right.
     _This &rstrip(const _This &chars = _This())
     {
-        _This willStripChars;
+        _This willStripChars = chars;
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
