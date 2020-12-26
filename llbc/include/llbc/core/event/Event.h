@@ -24,6 +24,7 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/variant/Variant.h"
+#include "llbc/core/utils/Util_DelegateImpl.h"
 
 __LLBC_NS_BEGIN
 
@@ -131,6 +132,11 @@ public:
      * @return const std::map<int, LLBC_Variant> & - the int key indexed params const reference.
      */
     const std::map<int, LLBC_Variant> &GetIntKeyParams() const;
+    /**
+     * Get all int key indexed params(mutable).
+     * @return std::map<int, LLBC_Variant> & - the int key indexed params mutable reference.
+     */
+    std::map<int, LLBC_Variant> &GetMutableIntKeyParams();
 
     /**
      * Get all string key indexed params count.
@@ -140,9 +146,14 @@ public:
 
     /**
     * Get all constant string key indexed params.
-    * @return const std::map<const char*, LLBC_Variant> & - the constant string key indexed params const reference.
+    * @return const std::map<LLBC_CString, LLBC_Variant> & - the constant string key indexed params reference.
     */
-    const std::map<const char*, LLBC_Variant> &GetConstantStrKeyParams() const;
+    const std::map<LLBC_CString, LLBC_Variant> &GetConstantStrKeyParams() const;
+    /**
+    * Get all constant string key indexed params(mutable).
+    * @return const std::map<LLBC_CString, LLBC_Variant> & - the mutable constant string key indexed params reference.
+    */
+    std::map<LLBC_CString, LLBC_Variant> &GetMutableConstantStrKeyParams();
 
     /**
     * Get all constant string key indexed params count.
@@ -152,15 +163,50 @@ public:
 
     /**
      * Get all string key indexed params.
-     * @return const std::map<LLBC_String, LLBC_Variant> & - the string key indexed params const reference.
+     * @return const std::map<LLBC_String, LLBC_Variant> & - the constant string key indexed params reference.
      */
     const std::map<LLBC_String, LLBC_Variant> &GetStrKeyParams() const;
+    /**
+     * Get all string key indexed params(mutable).
+     * @return std::map<LLBC_String, LLBC_Variant> & - the mutable string key indexed params reference.
+     */
+    std::map<LLBC_String, LLBC_Variant> &GetMutableStrKeyParams();
 
     /**
      * Get all string key indexed params count.
      * @return size_t - the string key indexed params count.
      */
     size_t GetStrKeyParamsCount() const;
+
+public:
+    /**
+     * Clone event.
+     * Note:
+     *      - the clone event don't delete after handle flag always false.
+     *      - the clone event extend data always NULL.
+     * @return LLBC_Event * - the clone event.
+     */
+    LLBC_Event *Clone() const;
+
+public:
+    /**
+     * Get extend data.
+     * @return void * - the extend data.
+     */
+    void *GetExtData() const;
+
+    /**
+     * Set extend data.
+     * @param[in] extData                  - the extend data.
+     * @param[in] clearDeleg               - the extend data clear delegate.
+     * @param[in] delClearDelegWhenDestroy - delete clear delegate when event destroy.
+     */
+    void SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg = NULL, bool delClearDelegWhenDestroy = true);
+
+    /**
+     * Clear extend data.
+     */
+    void ClearExtData();
 
 public:
     /**
@@ -185,11 +231,15 @@ protected:
     typedef std::map<int, LLBC_Variant> _IntKeyParams;
     _IntKeyParams *_intKeyParams;
 
-    typedef std::map<const char*, LLBC_Variant> _ConstantStrKeyParams;
+    typedef std::map<LLBC_CString, LLBC_Variant> _ConstantStrKeyParams;
     _ConstantStrKeyParams *_constantStrKeyParams;
 
     typedef std::map<LLBC_String, LLBC_Variant> _StrKeyParams;
     _StrKeyParams *_strKeyParams;
+
+    void *_extData;
+    LLBC_IDelegate1<void, void *> *_extDataClearDeleg;
+    bool _delClearDelegWhenDestroy;
 };
 
 __LLBC_NS_END

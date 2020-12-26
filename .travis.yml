@@ -30,11 +30,10 @@ script:
 notifications:
     email:
         recipients:
-            - lailongwei@126.com # Longwei Lai
             - 964855959@qq.com   # Longwei Lai
-            - 852917130@qq.com   # Huasheng Liu
             - huangrongfu00@gmail.com  # Rongfu Huang
             - najoast@126.com # Yan Zhou
+            - caochunxi@hotmail.com # Chunxi Cao
         on_success: change
         on_failure: always
 

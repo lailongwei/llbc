@@ -25,7 +25,7 @@ class TestFacade(object):
     def onupdate(self, ev):
         # print 'service update: {}'.format(d)
         self._call_times += 1
-        if self._call_times == 1000:
+        if self._call_times == 100000:
             print 'Service update {} times, deschedule it'.format(self._call_times)
             Service.deschedule()
 
@@ -66,19 +66,30 @@ class TestData(object):
         assert isinstance(s, Stream)
         self.iVal, self.strVal, self.listVal, self.dictVal = s.unpack('iS[i]{i:S}')
 
+    def __str__(self):
+        return 'iVal:{},strVal:{}, listVal:{},dictVal:{}'.format(self.iVal, self.strVal, self.listVal, self.dictVal)
+
 
 @handler(TestData)
 @bindto('svcbase_test_svc')
 class TestHandler(object):
+    def __init__(self):
+        self._handleTimes = 0
+
     def __call__(self, packet):
         svc = packet.svc
         data = packet.data
         session_id = packet.session_id
-        print 'session[{}] recv data, opcode:{}, data:{}'.format(session_id, packet.opcode, data)
+        # print 'session[{}] recv data, opcode:{}, pkt:{}'.format(session_id, packet.opcode, packet)
 
-        print 'send response...'
+        # print 'send response...'
+        data.iVal = self._handleTimes
         svc.send(session_id, data)
         # raise Exception('Test exception, raise from TestData packet handler')
+
+        self._handleTimes += 1
+        if self._handleTimes % 1000 == 0:
+            print('Handle {} times'.format(self._handleTimes))
 
 @exc_handler(TestData)
 @bindto('svcbase_test_svc')
@@ -110,9 +121,13 @@ class SvcBaseTest(TestCase):
         # Connect to listen session.
         conn_sid = svc.connect(ip, port)
         print 'Connect to {}:{} success, sid: {}'.format(ip, port, conn_sid)
+        
+        # Set service fps.
+        svc.fps = 200
 
         # Send data.
-        svc.send(conn_sid, TestData())
+        for i in range(50):  # Note: You can modify range limit to execute performance test.
+            svc.send(conn_sid, TestData())
         # Test unhandled packet.
         svc.send(conn_sid, data=3, opcode=10086, status=0)
 

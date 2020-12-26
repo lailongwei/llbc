@@ -68,10 +68,12 @@ class pyllbcSvcExcHandler(object):
             else:
                 exc_handler = None
 
+            tb = _sys.exc_info()[2]
             if exc_handler is not None:
-                tb = _sys.exc_info()[2]
                 exc_handler(packet, tb, e)
+                self._fire_sessionexception_ev_to_facades(packet, e, tb)
             else:
+                self._fire_sessionexception_ev_to_facades(packet, e, tb)
                 raise
 
     def __repr__(self):
@@ -83,6 +85,19 @@ class pyllbcSvcExcHandler(object):
     def to_string(self):
         handler_type = self.type_2_str(self._ty)
         return 'handler type: {}, handler: {}, registered in service: [{}]'.format(handler_type, self._handler, self._svc())
+
+    def _fire_sessionexception_ev_to_facades(self, packet, e, tb):
+        svc = self._svc()
+        ev = llbc.ServiceEvent(svc)
+        ev._session_id = packet.session_id
+        ev._packet = packet
+        ev._traceback = tb
+        ev._exception = e
+        for facade in svc.facades.itervalues():
+            if not hasattr(facade, 'onsessionexception'):
+                continue
+
+            getattr(facade, 'onsessionexception')(ev)
 
 llbc.inl.SvcExcHandler = pyllbcSvcExcHandler 
 
@@ -274,6 +289,10 @@ class pyllbcService(object):
     def codec(self, c):
         llbc.inl.SetServiceCodec(self._c_obj, c)
 
+    @property
+    def facades(self):
+        return self._facades
+
     def suppress_codernotfound_warning(self):
         """
         Suppress all coder not found warning.
@@ -301,7 +320,7 @@ class pyllbcService(object):
         Set service per-frame exception handler(class method).
         handler can be function or method or callable object.
         handler method proto-type:
-            the_frame_exception_handler(service_obj, traceback_obj, exception_value)
+            the_frame_exception_handler(packet, traceback_obj, exception_value)
                 service_obj: the service instance, this params maybe None if raised in timer.
                 traceback_obj: the traceback type instance.
                 error_value: the exception value.
@@ -438,7 +457,7 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registerfacade(self, facade):
+    def registerfacade(self, facade, libpath='', libfacade_cls=None):
         """
         Register facade.
             facade methods(all methods are optional):
@@ -477,6 +496,7 @@ class pyllbcService(object):
                     ev.sub_errno: sub error number(only available when ev.destroyed_from_service is True).
                 onasyncconnresult(self, ev): async-connect result handler.
                     ev.svc: service object.
+                    ev.session_id: session Id,  whether the connection is successful or not, session Id will be assigned.
                     ev.peer_ip: peer ip address.
                     ev.peer_port: peer port number.
                     ev.connected: connected flag.
@@ -492,19 +512,29 @@ class pyllbcService(object):
 					ev.session_id: packet session Id.
                     ev.opcode: packet opcode.
 					ev.packet: packet object.
+                onsessionexception(self, ev): session exception.
+                    ev.svc: service object.
+                    ev.session_id: session Id.
+                    ev.packet: packet object.
+                    ev.traceback: exception traceback.
+                    ev.exception: exception object.
         """
-        if hasattr(facade, '__bases__') and llbc.ischild(facade, type):
-            raise llbc.error('facade could not be type(or derived from type) instance, facade:{}'.format(facade))
-        elif isinstance(facade, type):
-            raise llbc.error('facade could not be class type object, facade: {}'.format(facade))
-        else:
-            if isinstance(facade, _types.FunctionType):
-                raise llbc.error('facade could not be a function, facade: {}'.format(facade))
-            elif isinstance(facade, _types.MethodType):
-                raise llbc.error('facade could not be a method(included bound and unbound), facade: {}'.format(facade))
+        # normalize facade
+        if isinstance(facade, (str, unicode)):
+            if isinstance(facade, unicode):
+                facade = facade.encode('utf8')
 
-        llbc.inl.RegisterFacade(self._c_obj, facade)
+            facade = llbc.inl.RegisterLibFacade(self._c_obj, facade, libpath, libfacade_cls)
+        else:
+            llbc.inl.RegisterFacade(self._c_obj, facade)
+
+        # add some common members
+        facade.svc = self
+
+        # update facade dict
         self._facades.update({facade.__class__: facade})
+
+        return facade
 
     def getfacade(self, cls):
         """
@@ -550,7 +580,7 @@ class pyllbcService(object):
         """
         Asynchronous connect to peer(non-blocking, direct return)
         """
-        llbc.inl.AsyncConn(self._c_obj, ip, port)
+        return llbc.inl.AsyncConn(self._c_obj, ip, port)
 
     def removesession(self, session_id, reason='', strict=False):
         """
@@ -561,7 +591,7 @@ class pyllbcService(object):
         """
         llbc.inl.RemoveSession(self._c_obj, session_id, reason, strict)
 
-    def send(self, session_id, data, opcode=None, status=0):
+    def send(self, session_id, data, opcode=None, status=0, extData1=0, extData2=0, extData3=0):
         """
         Send data to specific session
         """
@@ -580,7 +610,7 @@ class pyllbcService(object):
         if isinstance(session_id, Packet):
             session_id = session_id.session_id
 
-        llbc.inl.SendData(self._c_obj, session_id, opcode, data, status)
+        llbc.inl.SendData(self._c_obj, session_id, opcode, data, status, extData1, extData2, extData3)
 
     def multicast(self, session_ids, data, opcode=None, status=0):
         """
@@ -618,6 +648,7 @@ class pyllbcService(object):
         _WH = pyllbcSvcExcHandler
         wrap_handler = _WH(_WH.Subscribe, self, handler)
 
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         llbc.inl.Subscribe(self._c_obj, opcode, wrap_handler)
 
         if exc_handler is not None:
@@ -632,6 +663,7 @@ class pyllbcService(object):
                 traceback_obj: the traceback type instance.
                 error_value: the exception value.
         """
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         if exc_handler is None:
             if opcode in self._subscribe_exc_handlers:
                 del self._subscribe_exc_handlers[opcode]
@@ -664,6 +696,7 @@ class pyllbcService(object):
         _WH = pyllbcSvcExcHandler
         wrap_prehandler = _WH(_WH.PreSubscribe, self, prehandler)
 
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         llbc.inl.PreSubscribe(self._c_obj, opcode, wrap_prehandler)
 
         if exc_handler is not None:
@@ -678,6 +711,7 @@ class pyllbcService(object):
                 traceback_obj: the traceback type instance.
                 error_value: the exception value.
         """
+        opcode = llbc.inl.normalize_opcode(opcode)[0]
         if exc_handler is None:
             if opcode in self._presubscribe_exc_handlers:
                 del self._presubscribe_exc_handlers[opcode]
@@ -708,6 +742,39 @@ class pyllbcService(object):
         For get more informations, see subscribe() method.
         """
         llbc.inl.UnifyPreSubscribe(self._c_obj, prehandler)
+
+    def subscribe_event(self, evid, listener):
+        """
+        Subscribe event.
+        :param evid: the event id, must be integer type.
+        :param listener: the event listener.
+        :return stub: the event stub.
+        """
+        return llbc.inl.SubscribeEvent(self._c_obj, evid, listener)
+
+    def unsubscribe_event(self, stub):
+        """
+        Unsubscribe event(by event stub).
+        :param stub: the event stub.
+        :return: None
+        """
+        llbc.inl.UnsubscribeEventByStub(self._c_obj, stub)
+
+    def unsubscribe_event2(self, evid):
+        """
+        Unsubscribe event(by event id).
+        :param evid: the event id.
+        :return: None
+        """
+        llbc.inl.UnsubscribeEventById(self._c_obj, evid)
+
+    def fire_event(self, ev):
+        """
+        Fire event.
+        :param ev: the event object.
+        :return: None
+        """
+        llbc.inl.FireEvent(self._c_obj, ev)
 
     def post(self, cble):
         """

@@ -362,7 +362,7 @@ int pyllbc_PackLemmaCompiler::Compile_Raw(char ch, char nextCh, PyObject *compil
 {
     const Symbol &smbl = static_cast<Symbol>(ch);
     pyllbc_PackLemma *topLemma = _compilingStack.top();
-    if (smbl == Type::StringLen &&
+    if ((smbl == Type::StringLen || smbl == Type::StringEnd) &&
         topLemma->GetType() == Type::RawType)
         return topLemma->Process(smbl, static_cast<Symbol>(nextCh));
 

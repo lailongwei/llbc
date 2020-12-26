@@ -24,6 +24,18 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/objectpool/IObjectPoolInstFactory.h"
+
+__LLBC_NS_BEGIN
+
+/**
+ * Pre-declare some classes.
+ */
+class LLBC_IObjectPool;
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
 __LLBC_NS_BEGIN
 
 /**
@@ -78,16 +90,41 @@ public:
      */
     int Write(const void *buf, size_t len);
 
-public:
-    /**
-     * Clear message block, this operation will clear read&write position information.
-     */
-    void Clear();
-
     /**
      * Release message block.
      */
     void Release();
+
+public:
+    /**
+     * Object-Pool reflection support: Mark pool object.
+     */
+    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: Is pool object.
+     */
+    bool IsPoolObject() const;
+
+    /**
+     * Object-Pool reflection support: Get pool instance.
+     */
+    LLBC_IObjectPoolInst *GetPoolInst();
+
+    /**
+     * Object-Pool reflection support: Give back object to pool.
+     */
+    void GiveBackToPool();
+
+    /**
+     * Object-Pool reflection support, get user-defined per-block units number.
+     */
+    size_t GetPoolInstPerBlockUnitsNum();
+
+    /**
+     * Object-Pool reflection support: Clear message block, this operation will clear read&write position information.
+     */
+    void Clear();
 
 public:
     /**
@@ -210,7 +247,6 @@ public:
      */
     void SetNext(LLBC_MessageBlock *next);
 
-private:
     /**
      * Adjust the message block's buffer size.
      * @param[in] newSize - new buffer size.
@@ -230,6 +266,29 @@ private:
 
     LLBC_MessageBlock *_prev;
     LLBC_MessageBlock *_next;
+
+    LLBC_IObjectPoolInst *_poolInst;
+};
+
+/**
+ * \brief The message block object pool instance factory encapsulation.
+ */
+class LLBC_HIDDEN LLBC_MessageBlockObjectPoolInstFactory : public LLBC_IObjectPoolInstFactory
+{
+public:
+    /**
+     * Get object pool instance name(object type name).
+     * @return const char * - the object pool instance name.
+     */
+    virtual const char *GetName() const;
+
+    /**
+     * Create object pool instance.
+     * @param[in] pool - the object pool.
+     * @param[in] lock - the pool instance lock.
+     * @return LLBC_IObjectPoolInst * - the object pool instance.
+     */
+    virtual LLBC_IObjectPoolInst *Create(LLBC_IObjectPool *pool, LLBC_ILock *lock);
 };
 
 __LLBC_NS_END

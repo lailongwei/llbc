@@ -126,6 +126,17 @@ inline LLBC_InvokeGuard::~LLBC_InvokeGuard()
     _deleg->Invoke(_data);
     LLBC_Delete(_deleg);
 }
+
+template <typename Func, typename... Args>
+inline LLBC_InvokeGuardSpec::LLBC_InvokeGuardSpec(Func&& func, Args&&... args)
+: _invoker(std::bind(std::forward<Func>(func), std::forward<Args>(args)...))
+{
+}
+
+inline LLBC_InvokeGuardSpec::~LLBC_InvokeGuardSpec()
+{
+    _invoker();
+}
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_THREAD_GUARD_H__

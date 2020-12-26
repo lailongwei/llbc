@@ -1,8 +1,12 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
-# Version: 1.0.7
-# 2019/06~
+# Version: 1.0.9
+# 2020/9~
+#
+
+# Version: 1.0.7-1.0.8
+# 2019/06~2020/9
 # 1)【llbc core】增加Protocol Stack控制支持，以安全异步的完成Service层跟ProtocolStack层的通信.
 # 2)【llbc all】 规整所有for中的++/--使用，所有++/--统一调整为前置.
 # 3)【llbc core】增加Protocol Stack Control机制，以满足业务层安全的对协议栈实施控制.
@@ -23,11 +27,35 @@
 # 18)【llbc core】优化EventManager代码, LLBC_ListenerStub类型由String调整为uint64.
 # 19)【llbc core】objectpool增加对象MarkPoolObject():void方法识别, 以在生成对象时标记此对象为池子内部对象, 以供业务及框架未来拓展用.
 # 20)【llbc core】完善配置加载支持，IApplication/IFacade增加配置加载事件方法定义(ServiceMgr部分方法暂时线程不安全, 因项目需要先行提交).
+# 21)【llbc core】更新mtrandom库.
+# 22)【llbc core】增加LLBC_GetCurrentThreadId()支持, 对应LLBC_ThreadId数据类型增加.
+# 23)【llbc core】优化Log ThreadId/ProcessId Token打印信息.
+# 24)【llbc core】ObjectPool删除ObjectPoolInsts时, 增加删除顺序依赖支持(Ordered Delete).
+# 25)【llbc core】Packet增加GetMutablePayload支持, 以在实际情境中更灵活进行发送数据的操纵.
+# 26)【llbc core】ObjectPool增加自省(反射支持), 具体参见LLBC_PoolObjectReflection.
+# 26)【llbc core】LLBC_Packet/LLBC_MessageBlock增加完整对象池对象自省方法实现.
+# 27)【llbc core】LLBC_ObjectGuard增加DetachObj支持, 以使业务更灵活定制逻辑及做优化.
+# 28)【llbc core】LLBC_ICoder增加对象池反射方法支持(在多重继承时要求重写).
+# 29)【llbc core】LLBC_Packet中的Payload/Encoder/Decoder增加对象池对象识别.
+# 30)【llbc core】增加LLBC_BasicCString支持, 以支持对const char *的逻辑支持(如对象池).
+# 31)【llbc core】LLBC_IObjectPoolInst增加GetIObjPool()方法, 以便支持访问所属LLBC_IObjectPool需求.
+# 32)【llbc core】增加LLBC_IObjectPoolInstFactory工厂类设计, 以支持在类型未知的情况下(LLBC_IObjectPool::GetIObjPoolInst())也能够动态创建对应类型的对象池实例, 最终结果依赖于使用者是否事先将未知类型对应的池工厂类有注入.
+# 33)【llbc core】Service/Session/Socket/Protocol/Protocol Stack/Packet/MessageBlock完成支持对象池, 协议收发完成对象池化.
+# 34)【llbc core】ObjectPoolInst去除<PoolInstLockType>模板参数, 调整为构造传入Lock, 以更易使用; 对象池对象反射方法要求增加一个LLBC_IObjectPoolInst *GetPoolInst()要求.
+# 35)【llbc core】LLBC_ILock及其所有实现类增加bool IsDummyLock() const支持.
+# 36)【llbc core】对象池设计优化, 去除不需要的模板参数, 增加运行时动态创建能力, 增加依赖删除网状关系图自动(运行自动拓扑生成).
+# 37)【llbc core】增加对象池信息统计支持.
+# 38)【llbc core】完整优化网络相关代码, 提供更多选项给应用层自定义, 同时性能提升10倍+(整体).
+# 39)【llbc core】优化日志配置，提供root->其余logger配置继承及重写支持, 同时完善配置细节及代码优化.
+# 40)【pyllbc】优化python layer协议包构建代码，优化后协议包处理性能提供100%.
+# 41)【llbc core/pyllbc】提供Facade三方dll接入及注册支持, 特别对于python, 三方的c++facade只需要简单修改即可被python无缝接入使用.
 # BugFix:
 #   -【llbc all】 解决在Service启动的后调用Listen/Connect/AsyncConn且指定的custom protocol时, custom protocol可能不被使用的bug.
 #   -【llbc core】修复对象池销毁时内存泄露问题.
 #   -【llbc core】修复Task::Wait/Cancel/...方法在Task所有线程并未完全创建就快速调用时,时引发的ThreadManager无法完全等待的bug.
-factory.
+#   -【llbc core】修复LLBC_BasicString::split()在对空串进行split且strip_empty为True时还会返回包含空串的bug.
+#   -【llbc core】修复LLBC_Random构造函数在seed为0时未自动应用当前时间戳做seed的bug.
+#   -【llbc core】修复ini解析类未特化long/ulong的value获取导致的bug.
 #
 # Version: 1.0.6
 # 1)【llbc core】增加ci支持（windows/linux/mac osx）.

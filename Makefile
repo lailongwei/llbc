@@ -1,5 +1,5 @@
 # File:  Makefile
-# Brief: easy to build llbc library and testsuite.
+# Brief: easy to build llbc libraries and testsuites.
 #############################################################################
 
 #****************************************************************************
@@ -110,7 +110,7 @@ help:
 	@echo "  make install_$(LUWRAP_TARGET)  - install csharp language specified library to system directory"
 	@echo "========================================================================="
 	@echo "  make tar      - tarball llbc framework(included core library, testsuite"
-	@echo "                  codes and all language specificed wrapped libraries"
+	@echo "                  codes and all language specificed wrapped libraries)"
 
 all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET) $(ALL_WRAP_TARGETS)
 

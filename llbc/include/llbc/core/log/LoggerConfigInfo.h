@@ -47,10 +47,27 @@ public:
 public:
     /**
      * Initialize logger config.
-     * @param[in] cfg - config property.
+     * @param[in] loggerName - the logger name.
+     * @param[in] cfg        - config property.
+     * @param[in] rootCfg    - the root logger config.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_Property &cfg);
+    int Initialize(const LLBC_String &loggerName,
+                   const LLBC_Property &cfg,
+                   const LLBC_LoggerConfigInfo *rootCfg);
+
+public:
+    /**
+     * Get logger name.
+     * @return const LLBC_String & - the logger name.
+     */
+    const LLBC_String &GetLoggerName() const;
+
+    /**
+     * Get not config use option from root or not(use library default).
+     * @return bool - the use root option.
+     */
+    bool IsNotConfigUseRoot() const;
 
 public:
     /**
@@ -114,6 +131,12 @@ public:
      * @return const LLBC_String & - file log pattern.
      */
     const LLBC_String &GetFilePattern() const;
+
+    /**
+     * Get log directory.
+     * @return const LLBC_String & - log directory.
+     */
+    const LLBC_String &GetLogDir() const;
 
     /**
      * Get log file name.
@@ -189,6 +212,9 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
 
 private:
+    LLBC_String _loggerName;
+    bool _notConfigUseRoot;
+
     int _logLevel;
     bool _asyncMode;
     int _flushInterval;
@@ -200,6 +226,7 @@ private:
 
     bool _logToFile;
     int _fileLogLevel;
+    LLBC_String _logDir;
     LLBC_String _logFile;
     LLBC_String _logFileSuffix;
     bool _logCodeFilePath;

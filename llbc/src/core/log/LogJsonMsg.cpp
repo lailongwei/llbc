@@ -23,6 +23,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
+#include "llbc/core/objectpool/Common.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
@@ -46,12 +47,14 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const c
 , _logger(logger)
 , _tag(tag)
 , _lv(lv)
-, _doc(LLBC_Json::kObjectType)
+, _doc(*LLBC_GetObjectFromUnsafetyPool<LLBC_Json::Document>())
 {
+    _doc.SetObject();
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 {
+    LLBC_ReleaseObjectToUnsafetyPool(&_doc);
 }
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)

@@ -239,10 +239,10 @@ private:                                            \
 
 /* Memory operations macros. */
 // allocate/reallocate/free.
-#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
-#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
-#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
-#define LLBC_Free(memblock)                 (free(memblock))
+#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(::malloc(size)))
+#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(::calloc(size, 1)))
+#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(::realloc((memblock), (size))))
+#define LLBC_Free(memblock)                 (::free(memblock))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
@@ -281,6 +281,9 @@ private:                                            \
             objsptr = NULL;         \
         }                           \
     } while(0)                      \
+
+#define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
+#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
 
 // memory set.
 #define LLBC_MemSet(dst, c, count)          (::memset(dst, c, count))
@@ -404,5 +407,20 @@ private:                                            \
  */
 // Define rtti buffer size.
  #define __LLBC_RTTI_BUF_SIZE    512
+
+/**
+ * Facade generic call method converience macros define.
+ */
+// Define facade generic method interface code generate macro.
+#define LLBC_FACADE_GENERIC_METHOD_INTERFACE(methName)              \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) = 0 \
+
+// Define facade generic method code generate macro.
+#define LLBC_FACADE_GENERIC_METHOD(methName)                        \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+
+// Define facade generic method implement code macro.
+#define LLBC_FACADE_GENERIC_METHOD_IMPL(facadeCls, methName)  \
+    int facadeCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
 
 #endif // !__LLBC_COM_MACRO_H__

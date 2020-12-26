@@ -27,6 +27,15 @@
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
  * \brief The log data structure encapsulation.
  */
 struct LLBC_EXPORT LLBC_LogData
@@ -38,6 +47,7 @@ struct LLBC_EXPORT LLBC_LogData
     const char *loggerName;               // Logger name.
 
     char *others;                         // Others data(allocate from heap).
+    uint32 othersSize;                    // Others data size.
     uint32 tagBeg;                        // Tag begin.
     uint32 tagLen;                        // Tag length.
 
@@ -47,7 +57,43 @@ struct LLBC_EXPORT LLBC_LogData
     uint32 fileLen;                       // Log source file name length.
     long line;                            // Log source file line number.
 
-    LLBC_NativeThreadHandle threadHandle; // Log native thread handle.
+    LLBC_ThreadId threadId;               // Log native thread Id.
+
+public:
+    /**
+     * Constructor & Destructor.
+     */
+    LLBC_LogData();
+    ~LLBC_LogData();
+
+public:
+    /**
+     * Object pool support method.
+     */
+    void Clear();
+
+    /**
+     * Object pool support method.
+     */
+    bool IsPoolObject() const;
+
+    /**
+     * Object pool support method.
+     */
+    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object pool support method.
+     */
+    void GiveBackToPool();
+
+    /**
+     * Object pool support method.
+     */
+    LLBC_IObjectPoolInst *GetPoolInst();
+
+private:
+    LLBC_IObjectPoolInst *_poolInst;
 };
 
 __LLBC_NS_END

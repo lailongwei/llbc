@@ -63,6 +63,7 @@ public:
 
         String = 'S',
         StringLen = '#',
+        StringEnd = '$',
         Unicode = 'U',
 
         ByteArray = 'A',

@@ -38,25 +38,31 @@ namespace
 
 __LLBC_NS_BEGIN
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(int sessionId, LLBC_Socket *sock)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(LLBC_Socket *sock,
+                                                     int sessionId,
+                                                     const LLBC_SessionOpts &sessionOpts)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::AddSock;
     ev.un.socket = sock;
     ev.sessionId = sessionId;
+    ev.sessionOpts = new LLBC_SessionOpts(sessionOpts);
 
     block->SetWritePos(sizeof(_Ev));
     return block;
 }
 
-LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId, const LLBC_SockAddr_IN &peerAddr)
+LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
+                                                       const LLBC_SessionOpts &sessionOpts,
+                                                       const LLBC_SockAddr_IN &peerAddr)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::AsyncConn;
     ev.sessionId = sessionId;
     ev.peerAddr = peerAddr;
+    ev.sessionOpts = new LLBC_SessionOpts(sessionOpts);
 
     block->SetWritePos(sizeof(_Ev));
     return block;
@@ -149,7 +155,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *sessi
     return block;
 }
 
-LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
     _Block *block = LLBC_New1(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
@@ -159,7 +165,7 @@ LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, i
 
     ev.type = _Ev::CtrlProtocolStack;
     ev.sessionId = sessionId;
-    ev.un.protocolStackCtrlInfo.ctrlType = ctrlType;
+    ev.un.protocolStackCtrlInfo.ctrlCmd = ctrlCmd;
     ev.un.protocolStackCtrlInfo.ctrlDataLen = ctrlDataStream.GetSize();
     ev.un.protocolStackCtrlInfo.ctrlData = LLBC_Malloc(void, ctrlDataStream.GetSize());
     ::memcpy(ev.un.protocolStackCtrlInfo.ctrlData, ctrlDataStream.GetBuf(), ctrlDataStream.GetSize());
@@ -176,10 +182,15 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
     {
     case _Ev::AddSock:
         LLBC_Delete(ev.un.socket);
+        LLBC_XDelete(ev.sessionOpts);
+        break;
+
+    case _Ev::AsyncConn:
+        LLBC_XDelete(ev.sessionOpts);
         break;
 
     case _Ev::Send:
-        LLBC_Delete(ev.un.packet);
+        LLBC_Recycle(ev.un.packet);
         break;
 
     case _Ev::Close:
@@ -204,7 +215,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
                 LLBC_Variant ctrlData;
                 ctrlDataStream.Read(ctrlData);
 
-                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlType, ctrlData);
+                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
             }
 
             LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
@@ -221,7 +232,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_MessageBlock *block)
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     This::DestroyEv(ev);
 
-    LLBC_Delete(block);
+    LLBC_Recycle(block);
 }
 
 __LLBC_NS_END

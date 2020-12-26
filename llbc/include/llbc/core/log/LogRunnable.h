@@ -82,12 +82,12 @@ public:
      */
     void Stop();
 
-public:
+private:
     /**
-     * Free log data.
-     * @param[in] data - the log data.
+     * Flush appenders.
+     * @param[in] force - force flush or not, default is false.
      */
-    static void FreeLogData(LLBC_LogData *data);
+    void FlushAppenders(bool force = false);
 
 private:
     volatile bool _stoped;

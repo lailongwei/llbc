@@ -17,6 +17,30 @@ class pyllbcProperty(object):
     def __del__(self):
         llbc.inl.Property_Delete(self._c_obj)
 
+    def __int__(self):
+        """
+        integer convert support.
+        """
+        return self.getvalue(as_type=int)
+
+    def __float__(self):
+        """
+        float convert support.
+        """
+        return self.getvalue(as_type=float)
+
+    def __str__(self):
+        """
+        str convert support.
+        """
+        return llbc.inl.Property_GetValue(self._c_obj, name) or ''
+
+    def __unicode__(self):
+        """
+        unicode convert support.
+        """
+        return self.__str__().decode('utf8')
+
     def from_content(self, content):
         """
         Load properties from string content.

@@ -24,6 +24,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Session.h"
+#include "llbc/comm/Socket.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
@@ -41,9 +42,9 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const size_t __llbc_headerLen = 28;
 
-void inline __DelBlock(void *data)
+void LLBC_FORCE_INLINE __DelBlock(void *data)
 {
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data));
+    LLBC_Recycle(reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data));
 }
 
 void inline __DelPacketList(void *&data)
@@ -56,7 +57,7 @@ void inline __DelPacketList(void *&data)
 
     LLBC_NS LLBC_Packet *packet;
     while (block->Read(&packet, sizeof(LLBC_NS LLBC_Packet *)) == LLBC_OK)
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
 
     LLBC_Delete(block);
 
@@ -78,7 +79,7 @@ LLBC_PacketProtocol::LLBC_PacketProtocol()
 
 LLBC_PacketProtocol::~LLBC_PacketProtocol()
 {
-    LLBC_XDelete(_packet);
+    LLBC_XRecycle(_packet);
 }
 
 int LLBC_PacketProtocol::GetLayer() const
@@ -128,7 +129,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
 
     // Write packet data and delete packet.
     block->Write(packet->GetPayload(), packet->GetPayloadLength());
-    LLBC_Delete(packet);
+    LLBC_Recycle(packet);
 
     out = block;
 
@@ -139,9 +140,10 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
     out = NULL;
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
+    const size_t maxPacketLen = _session->GetSocket()->GetMaxPacketSize();
 
     LLBC_InvokeGuard guard(&LLBC_INL_NS __DelBlock, block);
-    
+
     size_t readableSize;
     while ((readableSize = block->GetReadableSize()) > 0)
     {
@@ -155,12 +157,13 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
                 return LLBC_OK;
 
             // Create new packet.
-            _packet = LLBC_New(LLBC_Packet);
+            _packet = _pktPoolInst->GetObject();
             _headerAssembler.SetToPacket(*_packet);
             _packet->SetSessionId(_sessionId);
+            _packet->SetAcceptSessionId(_acceptSessionId);
             // Check length.
             const size_t packetLen = _packet->GetLength();
-            if (packetLen < LLBC_INL_NS __llbc_headerLen)
+            if (packetLen < LLBC_INL_NS __llbc_headerLen || packetLen > maxPacketLen)
             {
                 _stack->Report(this,
                                LLBC_ProtoReportLevel::Error,
@@ -168,7 +171,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 
                 _headerAssembler.Reset();
 
-                LLBC_XDelete(_packet);
+                LLBC_XRecycle(_packet);
                 _payloadNeedRecv = 0;
 
                 LLBC_INL_NS __DelPacketList(out);

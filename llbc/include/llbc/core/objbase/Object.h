@@ -48,9 +48,14 @@ public:
 
 public:
     /**
-     * Get ref
+     * Get ref count.
      */
     virtual int GetRefCount();
+
+    /**
+     * Get auto-ref count.
+     */
+    virtual int GetAutoRefCount();
 
     /**
      * Retain object.

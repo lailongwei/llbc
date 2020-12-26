@@ -170,6 +170,21 @@ int LLBC_Directory::Remove(const LLBC_String &path)
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
+bool LLBC_Directory::IsAbsPath(const LLBC_String& path)
+{
+    if (UNLIKELY(path.empty()))
+        return false;
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    return (path.size() >= 3 &&
+            LLBC_String::isalpha(path[0]) &&
+            path[1] == ':' &&
+            path[2] == LLBC_BACKLASH_A);
+#else
+    return path[0] == LLBC_SLASH_A;
+#endif
+}
+
 LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
 {
     if (path.empty())
@@ -306,51 +321,6 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
 #endif // Non-WIN32
 
     return joined;
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3)
-{
-    return Join(Join(path1, path2), path3);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4)
-{
-    return Join(Join(path1, path2, path3), path4);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5)
-{
-    return Join(Join(path1, path2, path3, path4), path5);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5,
-                                  const LLBC_String &path6)
-{
-    return Join(Join(path1, path2, path3, path4, path5), path6);
-}
-
-LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
-                                  const LLBC_String &path2,
-                                  const LLBC_String &path3,
-                                  const LLBC_String &path4,
-                                  const LLBC_String &path5,
-                                  const LLBC_String &path6,
-                                  const LLBC_String &path7)
-{
-    return Join(Join(path1, path2, path3, path4, path5, path6), path7);
 }
 
 LLBC_String LLBC_Directory::Join(const LLBC_Strings &paths)

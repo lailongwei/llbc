@@ -35,6 +35,4 @@ public:
     virtual int Run(int argc, char *argv[]);
 };
 
-// TODO: Will continue
-
 #endif // !__LLBC_TEST_CASE_CORE_CONFIG_INI_H__

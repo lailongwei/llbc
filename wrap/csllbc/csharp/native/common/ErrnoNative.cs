@@ -123,5 +123,9 @@ namespace llbc
 
         static public uint LLBC_ERROR_NOT_POOL_OBJECT        = 0xc000002c;
 
+        static public uint LLBC_ERROR_SESSION_SND_BUF_LIMIT  = 0xc000002d;
+
+        static public uint LLBC_ERROR_NOT_SUPPORT            = 0xc000002e;
+
     }
 }

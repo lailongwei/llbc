@@ -23,6 +23,18 @@
 #define __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
 
 #include "llbc/common/Common.h"
+#include "llbc/core/thread/SpinLock.h"
+
+__LLBC_NS_BEGIN
+
+/**
+ * Pre-declare some classes.
+ */
+class LLBC_ObjectPoolStat;
+class LLBC_IObjectPoolInst;
+class LLBC_IObjectPoolInstFactory;
+
+__LLBC_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -44,9 +56,50 @@ public:
      */
     virtual int Release(const char *objectType, void *obj) = 0;
 
+    /**
+     * Get object pool instance interface object.
+     * Note: If this object type pool instance not create before, this method will return NULL.
+     * @param[in] objectType - the object type.
+     * @return LLBC_IObjectPoolInst * - the object pool instance interface object.
+     */
+    virtual LLBC_IObjectPoolInst *GetIPoolInst(const char *objectType) = 0;
+
+public:
+    /**
+     * Acquire ordered delete pool instance.
+     * @param[in] frontObjectTypeName - the front object type name.
+     * @param[in] backObjectTypeName  - the back object type name.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName) = 0;
+
+public:
+    /**
+     * Register object pool instance factory.
+     * @param[in] instFactory - the pool instance factory.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    static int RegisterPoolInstFactory(LLBC_IObjectPoolInstFactory *instFactory);
+
+    /**
+     * Destroy all object pool instance factories(call by framework when framework destroy).
+     */
+    static void DestroyAllPoolInstFactories();
+
+public:
+    /**
+     * Perform object pool statistic.
+     * @param[out] stat - the statstic info.
+     */
+    virtual void Stat(LLBC_ObjectPoolStat &stat) const = 0;
+
 private:
     // Disable assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_IObjectPool);
+
+protected:
+    static LLBC_SpinLock _poolInstFactoryLock;
+    static std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *> _poolInstFactories;
 };
 
 __LLBC_NS_END

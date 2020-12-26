@@ -35,6 +35,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigurator::LLBC_LoggerConfigurator()
+: _rootConfig(NULL)
 {
 }
 
@@ -45,19 +46,41 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
 
 int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 {
+    // Load ini config file.
     LLBC_Property cfg;
     if (cfg.LoadFromFile(cfgFile) != LLBC_OK)
         return LLBC_FAILED;
 
-    // Get all logger names
+    // Create root logger config info.
+    const LLBC_Property *rootCfg = cfg.GetProperty(LLBC_CFG_LOG_ROOT_LOGGER_NAME);
+    if (UNLIKELY(!rootCfg))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    // Create root logger config info.
+    _rootConfig = LLBC_New0(LLBC_LoggerConfigInfo);
+    if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, *rootCfg, NULL) != LLBC_OK)
+    {
+        LLBC_XDelete(_rootConfig);
+        return LLBC_FAILED;
+    }
+
+    _configs.insert(std::make_pair(LLBC_CFG_LOG_ROOT_LOGGER_NAME, _rootConfig));
+
+    // Create all non-root logger config infos.
     const LLBC_Strings loggerNames = cfg.GetPropertyNames(false);
     for (LLBC_Strings::const_iterator it = loggerNames.begin();
          it != loggerNames.end();
          it++)
     {
         const LLBC_String &loggerName = *it;
+        if (loggerName == LLBC_CFG_LOG_ROOT_LOGGER_NAME)
+            continue;
+
         LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
-        if (info->Initialize(*cfg.GetProperty(loggerName)) != LLBC_OK)
+        if (info->Initialize(loggerName, *cfg.GetProperty(loggerName), _rootConfig) != LLBC_OK)
         {
             LLBC_Delete(info);
             LLBC_STLHelper::DeleteContainer(_configs, true);
@@ -89,7 +112,7 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
     {
         LLBC_Property cfg;
         LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
-        if (info->Initialize(cfg) != LLBC_OK)
+        if (info->Initialize(name, cfg, _rootConfig) != LLBC_OK)
         {
             LLBC_Delete(info);
             return LLBC_FAILED;

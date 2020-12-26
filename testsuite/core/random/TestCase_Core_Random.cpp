@@ -35,9 +35,9 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     LLBC_PrintLine("core/random test:");
 
     // Test RandInt.
-    LLBC_Random rand;
+    LLBC_Random rand(0xffffffff);
     LLBC_PrintLine("LLBC_Random::Rand(0, 100) test:");
-    for(int i = 0; i < 100; ++i)
+    for(int i = 0; i < 1000; ++i)
     {
         if(i != 0 && i % 20 == 0)
             LLBC_PrintLine("");
@@ -52,7 +52,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
         if (i != 0 && i % 20 == 0)
             LLBC_PrintLine("");
 
-        LLBC_Print("%3d ", LLBC_RandInt(-100, 100));
+        LLBC_Print("%3d ", rand.Rand(-100, 100));
     }
 
     // Test RandReal.

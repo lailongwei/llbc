@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -105,7 +107,7 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_Session();
+    LLBC_Session(const LLBC_SessionOpts &sessionOpts);
     ~LLBC_Session();
 
 public:
@@ -132,6 +134,12 @@ public:
      * @param[in] acceptId - the accept session Id.
      */
     void SetAcceptId(int acceptId);
+
+    /**
+     * Get session opts.
+     * @return const LLBC_SessionOpts & - the session opts.
+     */
+    const LLBC_SessionOpts &GetSessionOpts() const;
 
     /**
      * Get the socket handle.
@@ -262,14 +270,18 @@ public:
 public:
     /**
      * Control session protocol stack.
-     * @param[in] ctrlType  - the stack control type(user defined).
-     * @param[in] ctrlData  - the stack control data(user defined).
+     * @param[in] cmd           - the stack control command(user defined).
+     * @param[in] ctrlData      - the stack control data(user defined).
+     * @param[in] removeSession - when error occurred, this out param determine remove session or not,
+     *                            only used when return false.
      */
-    void CtrlProtocolStack(int ctrlType, const LLBC_Variant &ctrlData);
+    void CtrlProtocolStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession);
 
 private:
     int _id;
     int _acceptId;
+
+    LLBC_SessionOpts _sessionOpts;
 
     LLBC_Socket *_socket;
     LLBC_SocketHandle _sockHandle;
@@ -285,5 +297,7 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/comm/SessionImpl.h"
 
 #endif // !__LLBC_COMM_SESSION_H__

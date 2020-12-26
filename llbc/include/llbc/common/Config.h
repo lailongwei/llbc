@@ -43,6 +43,12 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
+ * \brief core/algo about config options define.
+ */
+// Define RingBuffer init capacity.
+#define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
+
+/**
  * \brief core/file about config options define.
  */
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
@@ -78,14 +84,16 @@
 // Minimum stack size.
 #define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (1 * 1024 * 1024)
 // Message block default size.
-#define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (64)
+#define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (256)
 // If you want debug guardians, enable this config option.
 #define LLBC_CFG_THREAD_GUARD_DEBUG                         0
 
 /**
  * \brief core/log about config options define.
  */
-// Default log level is set to DEBUG.
+// Root logger name.
+#define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
+// Default log level is set to DEBUG(DEBUG:0, INFO:1, WARN:2, ERROR:3, FATAL:4).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
@@ -95,24 +103,22 @@
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN            "%T [%N][%L] - %m%n"
-// Default console colourful output enabled flag.
-# define LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT      1
+// Default console colourful output flag.
+# define LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT              1
 // Default is not log to file.
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE                    0
-// Default log file name.
-#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME                  "llbc.log"
 // Default log file suffix.
-#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX                ""
+#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_SUFFIX                ".log"
 // Default force application log path
 #define LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH             false
 // Default log code file path control config
-#define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             true
+#define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             false
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default is daily rolling mode.
 #define LLBC_CFG_LOG_DEFAULT_DAILY_MODE                     1
 // Default max log file size.
-#define LLBC_CFG_LOG_MAX_FILE_SIZE                          (LONG_MAX)
+#define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
 // Default max backup file index.
 #define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       1000
 // Default log file buffer size, in bytes.
@@ -120,7 +126,7 @@
 // Default log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL             200
 // Default max log appenders flush interval, in milli-seconds.
-#define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 1000
+#define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 5000
 // Default log using mode.
 #define LLBC_CFG_LOG_USING_WITH_STREAM                      0
 // Default take over config, only using in root logger, when a message log to 
@@ -128,11 +134,13 @@
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
 // Default logfile create option
 #define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
+// Default log config item not config use default or root config(root/default).
+#define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
 
 /**
  * \brief core/timer about configs.
  */
-// strict timer schedule mode.
+// Strict timer schedule mode.
 #define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
 // Long timeout time, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
 #define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
@@ -140,19 +148,26 @@
 /**
 * \brief core/objectpool about configs.
 */
-// object pool memory block size
-#define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE         40960
-// object pool memory allign config.
+// Object pool per-block units number define.
+#define LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER        64
+// Object pool statistic top N limit define.
+#define LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N                15
+// Object pool memory allign config.
 #if LLBC_64BIT_PROCESSOR
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             8
 #else
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
-// object reset metch methods control.
+// Object pool debug option.
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (1 || LLBC_DEBUG)
+// Object reset metch methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
+// Some llbc framework types object pool units number define.
+#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256     // LLBC_Packet
+#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256    // LLBC_MessageBlock
 
 /**
  * \brief ObjBase about configs.
@@ -175,16 +190,37 @@
 #define LLBC_CFG_COMM_MAX_EVENT_COUNT                       100
 // The epool max listen socket fd size(LINUX platform specific, only available before 2.6.8 version kernel before).
 #define LLBC_CFG_EPOLL_MAX_LISTEN_FD_SIZE                   10000
-// Default socket send buffer size.
-#define LLBC_CFG_COMM_DFT_SEND_BUF_SIZE                     65536
-// Default socket recv buffer size.
-#define LLBC_CFG_COMM_DFT_RECV_BUF_SIZE                     65536
+// Default socket send buffer size(0 means use system default and allow system dynamic adjust send buffer size, if supported).
+#define LLBC_CFG_COMM_DFT_SOCK_SEND_BUF_SIZE                0
+// Default socket recv buffer size(0 means use system default and allow system dynamic adjust recv buffer size, if supported).
+#define LLBC_CFG_COMM_DFT_SOCK_RECV_BUF_SIZE                0
+// Default session send buffer size(LLBC_INFINITE means no limit).
+// Note:
+// - this buffer size is send buffer size limit, if session will send data size greater than 
+//   or equal to setting value, will trigger LLBC_ERROR_SESSION_SND_BUF_LIMIT error.
+#define LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE             LLBC_INFINITE
+// Default session recv buffer size(not allow set to LLBC_INFINITE, is must be a actually size).
+// Note:
+// - this buffer size is initialize recv buffer size, if not enough to recv socket data, will auto expand.
+#define LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE             1024
+// Default max packet size
+// Note:
+// - this packet size is PacketProcol limit, the size is only used for PacketProcol
+#define LLBC_CFG_COMM_DFT_MAX_PACKET_SIZE                   LLBC_INFINITE
+// Session recv buffer use object pool option, this option is performance option.
+// Note: 
+// - if enabled, can improvement read data from socket performance,
+//   but once you turn on this option, your server memory will be streteched very large.
+// - if enabled, LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE will no effect.
+#define LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL         0
+// Message buffer element(block) allow resize limit.
+#define LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT          (8 * 1024)
 // Default service FPS value.
 #define LLBC_CFG_COMM_DFT_SERVICE_FPS                       60
 // Min service FPS value.
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
-#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       2000
+#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       500
 // Sampler support option, default is true.
 #define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
@@ -195,6 +231,8 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
+// Dynamic create facade create method prefix name.
+#define LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX    "llbc_create_facade_"
 
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).

@@ -138,6 +138,7 @@ public:
     PyObject *ReadPyLong();
     PyObject *ReadStr();
     PyObject *ReadStr2();
+    PyObject *ReadStr3();
     PyObject *ReadUnicode();
     PyObject *ReadByteArray();
     PyObject *ReadBuffer();
@@ -199,6 +200,7 @@ public:
     int WritePyLong(PyObject *val);
     int WriteStr(PyObject *val);
     int WriteStr2(PyObject *val);
+    int WriteStr3(PyObject *val);
     int WriteUnicode(PyObject *val);
     int WriteByteArray(PyObject *val);
     int WriteBuffer(PyObject *val);

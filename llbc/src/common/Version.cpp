@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_majorVersion       = 1;
 int LLBC_minorVersion       = 0;
-int LLBC_updateNo           = 7;
+int LLBC_updateNo           = 9;
 
 #ifdef LLBC_DEBUG
 bool LLBC_isDebugVer        = true;
@@ -83,25 +83,29 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    message block size: %d\n", LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE);
     desc.append_format("    enabled guard debug: %s\n", LLBC_CFG_THREAD_GUARD_DEBUG ? "true" : "false");
     desc.append_format("  logger info: \n");
+    desc.append_format("    root logger name: %s\n", LLBC_CFG_LOG_ROOT_LOGGER_NAME);
+    desc.append_format("    default not config option use: %s\n", LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE);
+    desc.append_format("    take over unknown logger message?: %s\n", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED ? "true" : "false");
     desc.append_format("    default level: %d\n", LLBC_CFG_LOG_DEFAULT_LEVEL);
     desc.append_format("    default asynchronous mode: %s\n", (LLBC_CFG_LOG_DEFAULT_ASYNC_MODE) ? "true" : "false");
+    desc.append_format("    default flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
+    desc.append_format("    max flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
     desc.append_format("    default log to console: %s\n", (LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE) ? "true" : "false");
     desc.append_format("    default console log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     desc.append_format("    default log to file: %s\n", (LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE) ? "true" : "false");
-    desc.append_format("    default log file name: %s\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
+    desc.append_format("    default log file name: <same with logger name>\n");
     desc.append_format("    default file log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     desc.append_format("    default daily mode enabled(available in file log): %s\n", (LLBC_CFG_LOG_DEFAULT_DAILY_MODE) ? "true" : "false");
     desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);
     desc.append_format("    default max backup index: %d\n", LLBC_CFG_LOG_MAX_BACKUP_INDEX);
-    desc.append_format("    default flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL);
-    desc.append_format("    max flush interval(ms)(only available in asyn mode): %d\n", LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
-    desc.append_format("    take over unknown logger message?: %s\n", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED ? "true" : "false");
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
     desc.append_format("  timer info: \n");
     desc.append_format("    strict timer schedule: %s\n", LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE ? "true" : "false");
     desc.append_format("  objectpool info: \n");
-    desc.append_format("    object pool memory block size(bytes): %d\n", LLBC_CFG_CORE_OBJECT_POOL_MEMORY_BLOCK_SIZE);
+    desc.append_format("    object pool per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER);
+    desc.append_format("    framework type[LLBC_Packet] per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER);
+    desc.append_format("    framework type[LLBC_MessageBlock] per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER);
 
     // Append communication info.
     desc.append_format("communication info: \n");

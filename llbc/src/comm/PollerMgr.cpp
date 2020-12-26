@@ -124,15 +124,17 @@ int LLBC_PollerMgr::Start(int count)
          it != _pendingAddSocks.end();
          ++it)
          _pollers[it->first % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAddSockEv(it->first, it->second));
+                LLBC_PollerEvUtil::BuildAddSockEv(it->second.first, it->first, it->second.second));
     _pendingAddSocks.clear();
 
     // Process Async-connections.
     for (_PendingAsyncConns::iterator it = _pendingAsyncConns.begin();
          it != _pendingAsyncConns.end();
          ++it)
+    {
         _pollers[it->first % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second));
+            LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second.second, it->second.first));
+    }
     _pendingAsyncConns.clear();
 
     return LLBC_OK;
@@ -141,10 +143,16 @@ int LLBC_PollerMgr::Start(int count)
 void LLBC_PollerMgr::Stop()
 {
     // Always cleanup pending add-sock container.
-    LLBC_STLHelper::DeleteContainer(_pendingAddSocks);
+    for (_PendingAddSocks::iterator it = _pendingAddSocks.begin();
+         it != _pendingAddSocks.end();
+         ++it)
+        LLBC_Delete(it->second.first);
+    _pendingAddSocks.clear();
+
     // Always cleanup pending async-conn container.
     _pendingAsyncConns.clear();
 
+    // Delete all pollers.
     if (_pollers)
     {
         for (int i = 0; i < _pollerCount; ++i)
@@ -153,75 +161,92 @@ void LLBC_PollerMgr::Stop()
         _pollerCount = 0;
     }
 
+    // Reset max sessionId.
     _maxSessionId = 1;
 }
 
-int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
+int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_SockAddr_IN local;
     if (This::GetAddr(ip, port, local) != LLBC_OK)
         return 0;
 
+    // Create socket and listen.
     LLBC_Socket *sock;
     if (!(sock = LLBC_INL_NS __CreateSocket(_type)))
     {
         return 0;
     }
     else if (sock->SetNonBlocking() != LLBC_OK ||
-            sock->EnableAddressReusable() != LLBC_OK ||
-            sock->BindTo(local) != LLBC_OK ||
-            sock->Listen() != LLBC_OK)
+             sock->EnableAddressReusable() != LLBC_OK ||
+             sock->BindTo(local) != LLBC_OK ||
+             sock->SetNoDelay(sessionOpts.IsNoDelay()) ||
+             (sessionOpts.GetSockSendBufSize() != 0 && sock->SetSendBufSize(sessionOpts.GetSockSendBufSize()) != LLBC_OK) ||
+             (sessionOpts.GetSockRecvBufSize() != 0 && sock->SetRecvBufSize(sessionOpts.GetSockRecvBufSize()) != LLBC_OK) ||
+             sock->Listen() != LLBC_OK ||
+             sock->SetMaxPacketSize(sessionOpts.GetMaxPacketSize()) != LLBC_OK)
     {
         LLBC_Delete(sock);
         return 0;
     }
 
+    // Allocate sessionId and add proto factory to service(is exist).
     const int sessionId = AllocSessionId();
     if (protoFactory)
         _svc->AddSessionProtocolFactory(sessionId, protoFactory);
 
+    // Add to poller or pending.
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAddSockEv(sessionId, sock));
+                LLBC_PollerEvUtil::BuildAddSockEv(sock, sessionId, sessionOpts));
     else
-        _pendingAddSocks.insert(std::make_pair(sessionId, sock));
+        _pendingAddSocks.insert(std::make_pair(sessionId, std::make_pair(sock, sessionOpts)));
 
     return sessionId;
 }
 
-int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory)
+int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
         return 0;
 
+    // Create socket and connect.
     LLBC_Socket *sock;
     if (!(sock = LLBC_INL_NS __CreateSocket(_type)))
     {
         return 0;
     }
-    else if (sock->Connect(peer) != LLBC_OK)
+    else if ((sessionOpts.GetSockSendBufSize() != 0 && sock->SetSendBufSize(sessionOpts.GetSockSendBufSize()) != LLBC_OK) ||
+             (sessionOpts.GetSockRecvBufSize() != 0 && sock->SetRecvBufSize(sessionOpts.GetSockRecvBufSize()) != LLBC_OK) ||
+             sock->SetNoDelay(sessionOpts.IsNoDelay()) != LLBC_OK ||
+             sock->Connect(peer) != LLBC_OK ||
+             sock->SetNonBlocking() != LLBC_OK)
     {
         LLBC_Delete(sock);
         return 0;
     }
 
-    sock->SetNonBlocking();
-
+    // Allocate session and add protoFactory to service(if exist).
     const int sessionId = AllocSessionId();
     if (protoFactory)
         _svc->AddSessionProtocolFactory(sessionId, protoFactory);
 
+    // Add to poller or pending.
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAddSockEv(sessionId, sock));
+                LLBC_PollerEvUtil::BuildAddSockEv(sock, sessionId, sessionOpts));
     else
-        _pendingAddSocks.insert(std::make_pair(sessionId, sock));
+        _pendingAddSocks.insert(std::make_pair(sessionId, std::make_pair(sock, sessionOpts)));
 
     return sessionId;
 }
 
-int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId, LLBC_IProtocolFactory *protoFactory)
+int LLBC_PollerMgr::AsyncConn(const char *ip,
+                              uint16 port,
+                              int &pendingSessionId,
+                              LLBC_IProtocolFactory *protoFactory,
+                              const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_SockAddr_IN peer;
     if (This::GetAddr(ip, port, peer) != LLBC_OK)
@@ -236,9 +261,9 @@ int LLBC_PollerMgr::AsyncConn(const char *ip, uint16 port, int &pendingSessionId
 
     if (LIKELY(_pollers))
         _pollers[sessionId % _pollerCount]->Push(
-                LLBC_PollerEvUtil::BuildAsyncConnEv(sessionId, peer));
+                LLBC_PollerEvUtil::BuildAsyncConnEv(sessionId, sessionOpts, peer));
     else
-        _pendingAsyncConns.insert(std::make_pair(sessionId, peer));
+        _pendingAsyncConns.insert(std::make_pair(sessionId, std::make_pair(peer, sessionOpts)));
 
     pendingSessionId = sessionId;
 
@@ -257,9 +282,9 @@ void LLBC_PollerMgr::Close(int sessionId, const char *reason)
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
-void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg));
+    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg));
 }
 
 int LLBC_PollerMgr::AllocSessionId()
@@ -299,7 +324,7 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     }
 
     // Use LLBC_GetAddrInfo to fetch sockaddr.
-    struct addrinfo hints;
+    addrinfo hints;
     hints.ai_flags = 0;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;

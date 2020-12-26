@@ -23,6 +23,7 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/comm/IService.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
@@ -31,11 +32,13 @@ __LLBC_NS_BEGIN
 
 LLBC_IProtocol::LLBC_IProtocol()
 : _sessionId(0)
+, _acceptSessionId(0)
 , _session(NULL)
 , _stack(NULL)
 , _svc(NULL)
 , _filter(NULL)
 , _coders(NULL)
+, _pktPoolInst(NULL)
 {
 }
 
@@ -46,6 +49,11 @@ LLBC_IProtocol::~LLBC_IProtocol()
 int LLBC_IProtocol::GetSessionId() const
 {
     return _sessionId;
+}
+
+int LLBC_IProtocol::GetAcceptSessionId() const
+{
+    return _acceptSessionId;
 }
 
 LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
@@ -63,7 +71,7 @@ const LLBC_IProtocol::Coders *LLBC_IProtocol::GetCoders() const
     return _coders;
 }
 
-bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_IProtocol::Ctrl(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     return true;
 }
@@ -71,13 +79,16 @@ bool LLBC_IProtocol::Ctrl(int ctrlType, const LLBC_Variant &ctrlData)
 void LLBC_IProtocol::SetSession(LLBC_Session *session)
 {
     _session = session;
+
     _sessionId = session->GetId();
+    _acceptSessionId = session->GetAcceptId();
 }
 
 void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
 {
     _stack = stack;
     _svc = _stack->GetService();
+    _pktPoolInst = &_svc->GetPacketObjectPool();
 }
 
 void LLBC_IProtocol::SetFilter(LLBC_IProtocolFilter *filter)

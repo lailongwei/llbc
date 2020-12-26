@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -44,6 +46,7 @@ struct LLBC_HIDDEN LLBC_AsyncConnInfo
     LLBC_Socket *socket;
     LLBC_SockAddr_IN peerAddr;
     int sessionId;
+    LLBC_SessionOpts sessionOpts;
 };
 
 __LLBC_NS_END

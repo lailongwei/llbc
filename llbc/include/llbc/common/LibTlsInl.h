@@ -56,9 +56,11 @@ struct __LLBC_LibTls
         /* need init WinSock library, only available when entryThread is true */
         bool needInitWinSock;
 
-        /* thread handle. */
+        /* thread id/handle. */
         LLBC_Handle threadHandle;
-        /* native thread handle, can use to OS dependency API. */
+        /* native thread id, can use to OS dependency APIs. */
+        LLBC_ThreadId threadId;
+        /* native thread handle, can use to OS dependency APIs. */
         LLBC_NativeThreadHandle nativeThreadHandle;
 
         /* Task pointer. */

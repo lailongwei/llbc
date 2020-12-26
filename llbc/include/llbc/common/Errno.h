@@ -589,6 +589,25 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_NOT_POOL_OBJECT       ((int)(0xc000002c))
 
 //
+// Message Id: LLBC_ERROR_SOCK_MSG_BUF_LIMIT
+//
+// MessageText:
+//
+// session send buffer limit.
+//
+#define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002d))
+#define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002d))
+//
+// Message Id: LLBC_ERROR_NOT_SUPPORT
+//
+// MessageText:
+//
+// not support.
+//
+#define __LLBC_ERROR_NOT_SUPPORT         ((int)(0x0000002e))
+#define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc000002e))
+
+//
 //!! Sentinel error no.
 //
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))

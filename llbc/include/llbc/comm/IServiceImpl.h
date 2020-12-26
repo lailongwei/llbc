@@ -40,6 +40,12 @@ inline int LLBC_IService::RegisterFacade()
     return LLBC_OK;
 }
 
+inline int LLBC_IService::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName)
+{
+    LLBC_IFacade *facade;
+    return RegisterFacade(libPath, facadeName, facade);
+}
+
 template <typename CoderFactoryCls>
 inline int LLBC_IService::RegisterCoder(int opcode)
 {
@@ -57,7 +63,12 @@ inline int LLBC_IService::RegisterCoder(int opcode)
 template <typename FacadeCls>
 inline FacadeCls *LLBC_IService::GetFacade()
 {
-    const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
+    return static_cast<FacadeCls *>(GetFacade(LLBC_GetTypeName(FacadeCls)));
+}
+
+template <typename FacadeCls>
+inline FacadeCls *LLBC_IService::GetFacade(const char *facadeName)
+{
     return static_cast<FacadeCls *>(GetFacade(facadeName));
 }
 
@@ -108,7 +119,7 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, LLBC_ICoder
         return LLBC_FAILED;
     }
 
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    LLBC_Packet *packet = GetPacketObjectPool().GetObject();
     packet->SetEncoder(coder);
 
     if (svcType == Raw)
@@ -136,6 +147,7 @@ inline int LLBC_IService::Send(int sessionId, int opcode, const void *bytes, siz
 
 inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status)
 {
+    // Validate check.
     const int svcType = GetType();
     if (svcType == Raw && (bytes == NULL || len == 0))
     {
@@ -143,7 +155,8 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void 
         return LLBC_FAILED;
     }
 
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    // Create packet(from object pool) and send.
+    LLBC_Packet *packet = GetPacketObjectPool().GetObject();
     if (svcType == Raw)
         packet->SetSessionId(sessionId);
     else
@@ -151,7 +164,7 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void 
 
     if (UNLIKELY(packet->Write(bytes, len) != LLBC_OK))
     {
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
         return LLBC_FAILED;
     }
 
@@ -231,18 +244,18 @@ inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, i
     return Broadcast(0, opcode, bytes, len, status);
 }
 
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData)
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
 {
-    return CtrlProtocolStack(sessionId, ctrlType, ctrlData, reinterpret_cast<LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *>(NULL));
+    return CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, reinterpret_cast<LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *>(NULL));
 }
 
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &))
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &))
 {
     LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg = NULL;
     if (ctrlDataClearFunc)
         ctrlDataClearDeleg = new LLBC_Func3<void, int, int, const LLBC_Variant &>(ctrlDataClearFunc);
 
-    int ret = CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
+    int ret = CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
     if (ret != LLBC_OK)
     {
         LLBC_Delete(ctrlDataClearDeleg);
@@ -253,13 +266,13 @@ inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const L
 }
 
 template <typename ObjType>
-inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void ( ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &))
+inline int LLBC_IService::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void ( ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &))
 {
     LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg = NULL;
     if (obj && ctrlDataClearMeth)
         ctrlDataClearDeleg = new LLBC_Delegate3<void, ObjType, int, int, const LLBC_Variant &>(obj, ctrlDataClearMeth);
 
-    int ret = CtrlProtocolStack(sessionId, ctrlType, ctrlData, ctrlDataClearDeleg);
+    int ret = CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
     if (ret != LLBC_OK)
     {
         LLBC_Delete(ctrlDataClearDeleg);

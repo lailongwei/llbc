@@ -222,6 +222,17 @@ public:
     void SetIsConnected(bool connected);
 
     /**
+     * Get session Id.
+     * @return int - the session Id.
+     */
+    int GetSessionId() const;
+    /**
+     * Set session Id.
+     * @param[in] sessionId - the sessionId.
+     */
+    void SetSessionId(int sessionId);
+
+    /**
      * Get last error.
      * @return const LLBC_String & - the reason.
      */
@@ -317,6 +328,72 @@ private:
     LLBC_String _report;
 };
 
+// Pre-declare LLBC_IFacade, use for define LLBC_FacadeMethod type.
+class LLBC_IFacade;
+
+/**
+ * \brief The llibc library facade method encapsulation.
+ */
+typedef LLBC_IDelegate2<int, const LLBC_Variant &, LLBC_Variant &> LLBC_FacadeMethod;
+
+/**
+ * \brief The facade methods encapsulation.
+ */
+class LLBC_FacadeMethods
+{
+public:
+    typedef std::map<LLBC_CString, LLBC_FacadeMethod *> Methods;
+
+public:
+    /**
+     * Ctor & Dtor.
+     */
+    LLBC_FacadeMethods();
+    ~LLBC_FacadeMethods();
+
+public:
+    /**
+     * Get all facade methods.
+     * @return const Methods & - the methods dictionary.
+     */
+    const Methods &GetAllMethods() const;
+
+    /**
+     * Get facade method.
+     * @param[in] methName - the method name.
+     * @return LLBC_FacadeMethod * - the facade method, if not found return NULL.
+     */
+    LLBC_FacadeMethod *GetMethod(const char *methName) const;
+
+public:
+    /**
+     * Add facade method.
+     * @param[in] facade   - the facade object.
+     * @param[in] methName - the method name.
+     * @param[in] meth     - the method pointer.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename FacadeCls>
+    int AddMethod(FacadeCls *facade, const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+
+public:
+    /**
+     * Call facade method.
+     * @param[in] methName - the method name.
+     * @param[in] arg      - the argument.
+     * @param[in] ret      - the method execute result.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret);
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_FacadeMethods);
+
+private:
+    Methods _meths;
+};
+
 /**
  * \brief The facade interface class encapsulation.
  */
@@ -353,6 +430,31 @@ public:
      * @return bool - return true it means cared specified event offset, otherwise return false.
      */
     bool IsCaredEventOffset(int facadeEvOffset) const;
+
+public:
+    /**
+     * Get all facade methods.
+     * @return const LLBC_FacadeMethods * - the facade methods, maybe is null.
+     */
+    const LLBC_FacadeMethods *GetAllMethods() const;
+
+    /**
+     * Add facade method.
+     * @param[in] methName - the method name.
+     * @param[in] meth     - the method.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename FacadeCls>
+    int AddMethod(const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+
+    /**
+     * Call facade method.
+     * @param[in] methName - the method name.
+     * @param[in] arg      - the argument.
+     * @param[in] ret      - the method execute result.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret);
 
 public:
     /**
@@ -436,6 +538,7 @@ private:
      * Friend class: LLBC_Service.
      *  Access methods:
      *      void SetService()
+     *      void HoldLibrary(LLBC_Library *)
      * Access data members:
      *      _inited;
      */
@@ -451,6 +554,8 @@ private:
     bool _inited;
     bool _started;
     uint64 _caredEvents;
+
+    LLBC_FacadeMethods *_meths;
 
     LLBC_IService *_svc;
 };

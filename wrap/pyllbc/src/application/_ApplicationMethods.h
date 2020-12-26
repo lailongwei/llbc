@@ -26,14 +26,21 @@
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/Macro.h"
+#include "src/application/_Application.h"
 
 class pyllbc_ApplicationMethods
 {
 public:
     pyllbc_ApplicationMethods()
     {
+        SetDumpFile.ml_name = "SetDumpFile";
+        SetDumpFile.ml_meth = (PyCFunction)_pyllbc_SetDumpFile;
+        SetDumpFile.ml_flags = METH_VARARGS;
+        SetDumpFile.ml_doc = "pyllbc library method/function";
     }
 
+public:
+    ::PyMethodDef SetDumpFile;
 };
 
 #define pyllbc_s_ApplicationMethods LLBC_Singleton< ::pyllbc_ApplicationMethods, LLBC_DummyLock>::Instance()

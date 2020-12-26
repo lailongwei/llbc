@@ -66,6 +66,7 @@ public:
 private:
     int _opcode;
     PyObject *_handler;
+    PyObject *_callArgs;
 };
 
 #endif // !__PYLLBC_COMM_PYPACKET_HANDLER_H__

@@ -32,9 +32,9 @@
  * pyllbc library initialize function, call by python interpreter.
  */
 #ifndef LLBC_DEBUG
-PYLLBC_MOD_INIT_FUNC void initllbc();
+ PYLLBC_MOD_INIT_FUNC void initllbc();
 #else // defined LLBC_DEBUG macro
-PYLLBC_MOD_INIT_FUNC void initllbc_debug();
+ PYLLBC_MOD_INIT_FUNC void initllbc_debug();
 #endif // not define LLBC_DEBUG
 
 #endif // !__PYLLBC_H__

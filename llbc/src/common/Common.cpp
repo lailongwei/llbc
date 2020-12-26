@@ -40,6 +40,14 @@ int __LLBC_CommonStartup()
     tls->coreTls.entryThread = true;
     tls->coreTls.threadHandle = LLBC_INVALID_HANDLE;
 
+#if LLBC_TARGET_PLATFORM_WIN32
+    tls->coreTls.threadId = ::GetCurrentThreadId();
+#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    tls->coreTls.threadId = syscall(SYS_gettid);
+#else // LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC (FreeBSD kernel)
+    tls->coreTls.threadId = pthread_mach_thread_np(pthread_self());
+#endif
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     tls->coreTls.nativeThreadHandle = pthread_self();
 #else // LLBC_TARGET_PLATFORM_WIN32

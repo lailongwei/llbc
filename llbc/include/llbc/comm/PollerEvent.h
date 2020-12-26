@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -68,6 +70,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
     Type type;
     int sessionId;
     LLBC_SockAddr_IN peerAddr;
+    LLBC_SessionOpts *sessionOpts;
     union
     {
         LLBC_Socket *socket;
@@ -77,7 +80,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         char *closeReason;
         struct
         {
-            int ctrlType;
+            int ctrlCmd;
             void *ctrlData;
             size_t ctrlDataLen;
             LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg;
@@ -95,12 +98,15 @@ public:
     /**
      * Build AddSock event.
      */
-    static LLBC_MessageBlock *BuildAddSockEv(int sessionId, LLBC_Socket *sock);
+    static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
+                                             int sessionId,
+                                             const LLBC_SessionOpts &sessionOpts);
     
     /**
      * Build Async-Conn event.
      */
-    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId, 
+    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
+                                               const LLBC_SessionOpts &sessionOpts,
                                                const LLBC_SockAddr_IN &peerAddr);
 
     /**
@@ -132,16 +138,9 @@ public:
     static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
 
     /**
-     * Build take over socket event(only available in WIN32 platform).
-     */
-#if LLBC_TARGET_PLATFORM_WIN32
-    static LLBC_MessageBlock *BuildTakeOverSocketEv(int sessionId, LLBC_Socket *sock);
-#endif
-
-    /**
      * Build control protocol stack event.
      */
-    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 public:
     /**

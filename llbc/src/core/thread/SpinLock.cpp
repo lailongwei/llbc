@@ -101,6 +101,11 @@ void LLBC_SpinLock::Unlock()
 #endif
 }
 
+bool LLBC_SpinLock::IsDummyLock() const
+{
+    return false;
+}
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 void *LLBC_SpinLock::Handle()
 {

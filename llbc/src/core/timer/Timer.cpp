@@ -31,22 +31,30 @@
 
 __LLBC_NS_BEGIN
 
+LLBC_Timer::LLBC_Timer(void(*timeoutFunc)(LLBC_Timer *),
+                       void(*cancelFunc)(LLBC_Timer *),
+                       Scheduler *scheduler)
+: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
+, _timerData(NULL)
+
+, _data(NULL)
+, _timeoutDeleg(timeoutFunc ? new LLBC_Func1<void, LLBC_Timer *>(timeoutFunc) : NULL)
+, _cancelDeleg(cancelFunc ? new LLBC_Func1<void, LLBC_Timer *>(cancelFunc) : NULL)
+{
+}
+
 LLBC_Timer::LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg,
                        LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg,
                        LLBC_Timer::Scheduler *scheduler)
-: _scheduler(NULL)
+: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
 , _timerData(NULL)
 
 , _data(NULL)
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
-    if (scheduler)
-        _scheduler = scheduler;
-    else
-        _scheduler = reinterpret_cast<
-            Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
 }
+
 LLBC_Timer::~LLBC_Timer()
 {
     if (_timerData)

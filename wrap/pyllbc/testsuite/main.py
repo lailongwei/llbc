@@ -9,6 +9,10 @@ from communication import *
 
 
 def main():
+    # set dump file first.
+    import llbc
+    llbc.inl.SetDumpFile('pyllbc_testsuite_dumpfile')
+
     # #### common part.
     LLBCInfoTest()()
     # StreamTest()()
@@ -26,6 +30,7 @@ def main():
     # SvcBaseTest()()
     # MultiSvcTest()()
     # MulticastTest()()
+    # EventTest()()
 
 
 if __name__ == '__main__':

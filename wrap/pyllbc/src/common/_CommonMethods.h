@@ -103,6 +103,10 @@ public:
         PyStreamRead_Str.ml_meth = (PyCFunction)_pyllbc_PyStreamRead_Str;
         PyStreamRead_Str.ml_flags = METH_VARARGS;
         PyStreamRead_Str.ml_doc = "pyllbc library method/function";
+        PyStreamRead_Str3.ml_name = "PyStreamRead_Str3";
+        PyStreamRead_Str3.ml_meth = (PyCFunction)_pyllbc_PyStreamRead_Str3;
+        PyStreamRead_Str3.ml_flags = METH_VARARGS;
+        PyStreamRead_Str3.ml_doc = "pyllbc library method/function";
         DelPyStream.ml_name = "DelPyStream";
         DelPyStream.ml_meth = (PyCFunction)_pyllbc_DelPyStream;
         DelPyStream.ml_flags = METH_VARARGS;
@@ -131,6 +135,10 @@ public:
         SetPyStreamEndian.ml_meth = (PyCFunction)_pyllbc_SetPyStreamEndian;
         SetPyStreamEndian.ml_flags = METH_VARARGS;
         SetPyStreamEndian.ml_doc = "pyllbc library method/function";
+        PyStreamWrite_Str3.ml_name = "PyStreamWrite_Str3";
+        PyStreamWrite_Str3.ml_meth = (PyCFunction)_pyllbc_PyStreamWrite_Str3;
+        PyStreamWrite_Str3.ml_flags = METH_VARARGS;
+        PyStreamWrite_Str3.ml_doc = "pyllbc library method/function";
         PyStreamRead_Float.ml_name = "PyStreamRead_Float";
         PyStreamRead_Float.ml_meth = (PyCFunction)_pyllbc_PyStreamRead_Float;
         PyStreamRead_Float.ml_flags = METH_VARARGS;
@@ -291,6 +299,7 @@ public:
     ::PyMethodDef PyStreamWrite_Int16;
     ::PyMethodDef PyStreamGetCachedSize;
     ::PyMethodDef PyStreamRead_Str;
+    ::PyMethodDef PyStreamRead_Str3;
     ::PyMethodDef DelPyStream;
     ::PyMethodDef PyStreamWrite_Double;
     ::PyMethodDef PyStreamDiscardAllExprs;
@@ -298,6 +307,7 @@ public:
     ::PyMethodDef PyStreamRead_Int32;
     ::PyMethodDef PyStreamWrite_Buffer;
     ::PyMethodDef SetPyStreamEndian;
+    ::PyMethodDef PyStreamWrite_Str3;
     ::PyMethodDef PyStreamRead_Float;
     ::PyMethodDef GetVersionInfo;
     ::PyMethodDef PyStreamWrite_Byte;

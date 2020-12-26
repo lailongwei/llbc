@@ -79,6 +79,16 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.PyTimerIsCancelling);
     inlMod->AddMethod(methods.PyTimerUpdateAllTimers);
 
+    // Add all packet about methods to inl module.
+    inlMod->AddMethod(methods.Packet_GetLocalIp);
+    inlMod->AddMethod(methods.Packet_GetLocalPort);
+    inlMod->AddMethod(methods.Packet_GetPeerIp);
+    inlMod->AddMethod(methods.Packet_GetPeerPort);
+    inlMod->AddMethod(methods.Packet_GetStatusDesc);
+    inlMod->AddMethod(methods.Packet_GetExtData1);
+    inlMod->AddMethod(methods.Packet_GetExtData2);
+    inlMod->AddMethod(methods.Packet_GetExtData3);
+
     // Add all service about methods to inl module.
     inlMod->AddMethod(methods.NewService);
     inlMod->AddMethod(methods.DelService);
@@ -92,6 +102,7 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);
     inlMod->AddMethod(methods.RegisterFacade);
+    inlMod->AddMethod(methods.RegisterLibFacade);
     inlMod->AddMethod(methods.RegisterCodec);
     inlMod->AddMethod(methods.Listen);
     inlMod->AddMethod(methods.Connect);
@@ -105,10 +116,15 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.UnifyPreSubscribe);
     inlMod->AddMethod(methods.GetServiceCodec);
     inlMod->AddMethod(methods.SetServiceCodec);
+    inlMod->AddMethod(methods.SubscribeEvent);
+    inlMod->AddMethod(methods.UnsubscribeEventById);
+    inlMod->AddMethod(methods.UnsubscribeEventByStub);
+    inlMod->AddMethod(methods.FireEvent);
     inlMod->AddMethod(methods.InstallErrHooker);
     inlMod->AddMethod(methods.UninstallErrHooker);
     inlMod->AddMethod(methods.ClearHookedErrors);
     inlMod->AddMethod(methods.Post);
+    inlMod->AddMethod(methods.CallFacadeMethod);
     inlMod->AddMethod(methods.ServiceMainLoop);
 
     // Add Obj<-->Json coder helper to top module.

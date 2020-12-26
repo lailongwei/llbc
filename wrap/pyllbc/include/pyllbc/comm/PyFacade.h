@@ -146,10 +146,20 @@ public:
 private:
     /**
      * Call python layer facade method.
-     * @param[in] meth - method name, not steal reference, normal.
-     * @param[in] ev   - call event object, steal reference.
+     * @param[in] meth     - method name, not steal reference, normal.
+     * @param[in] ev       - call event object, steal reference.
+     * @param[in] decRefEv - decref event.
+     * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
      */
-    void CallFacadeMeth(PyObject *meth, PyObject *ev);
+    bool CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv);
+
+    #if PYLLBC_CFG_PACKET_REUSE
+    /**
+     * Create reuse python layer packet object.
+     * @return PyObject * - the python layer reuse packet(new reference).
+     */
+    PyObject *CreateReusePyPacket();
+    #endif // PYLLBC_CFG_PACKET_REUSE
 
 private:
     pyllbc_Service *_svc;
@@ -179,9 +189,24 @@ private:
     PyObject *_keyReason;
     PyObject *_keyConnected;
     PyObject *_keyIdleTime;
+    PyObject *_keyInlIdleTime;
     PyObject *_keyCObj;
 
     PyObject *_pyPacketCls;
+    #if PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyReusePacket;
+    PyObject *_pyPacketReuseMeth;
+    #endif // PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyNullCObj;
+    PyObject *_pyPacketCreateArgs;
+
+    PyObject *_pyStream;
+    pyllbc_Stream *_nativeStream;
+
+    PyObject *_holdedOnIdleEv;
+    PyObject *_holdedOnUpdateEv;
+
+    PyObject *_facadeEvCallArgs;
 };
 
 #endif // !__PYLLBC_COMM_PY_FACADE_H__

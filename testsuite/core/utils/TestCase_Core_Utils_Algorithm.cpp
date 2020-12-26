@@ -48,8 +48,62 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     LLBC_PrintLine("UNKNOWN string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::Unknown));
     LLBC_PrintLine("0xff3d string: %s", LLBC_FlowType::Type2Str(0xff3d));
 
-    LLBC_PrintLine("test completed, press any key to exit");
+	LLBC_PrintLine("\nLLBC_StringEscape test:");
 
+    LLBC_String willEscape = ".#=";
+    //Ä©Î²±àÂë²âÊÔ
+    LLBC_String escapeTail1 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.";
+    LLBC_String escapeTail2 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.";
+    escapeTail1.escape(willEscape, '\\');
+    LLBC_StringEscape(escapeTail2, willEscape, '\\');
+    ASSERT(escapeTail1 == escapeTail2);
+    LLBC_PrintLine("Tail escape test: %s", (escapeTail1 == escapeTail2) ? "true" : "false");
+
+    //·ÇÄ©±àÂë²âÊÔ
+    LLBC_String escapeNotTail1 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn";
+    LLBC_String escapeNotTail2 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn";
+    escapeNotTail1.escape(willEscape, '\\');
+    LLBC_StringEscape(escapeNotTail2, willEscape, '\\');
+    ASSERT(escapeNotTail1 == escapeNotTail2);
+    LLBC_PrintLine("Not Tail escape test: %s", (escapeNotTail1 == escapeNotTail2) ? "true" : "false");
+
+    //¶à×Ö·û²âÊÔ
+    LLBC_String speEscape2 = "!.#=$:?<>_^[]@+-{}~/|&*`";
+    LLBC_String speStr1 = "!.#=$:?<>_^[]@+-{}~/|&*`";
+    LLBC_String speStr2 = "!.#=$:?<>_^[]@+-{}~/|&*`";
+    speStr1.escape(speEscape2, '\\');
+    LLBC_StringEscape(speStr2, speEscape2, '\\');
+    ASSERT(speStr1 == speStr2);
+    LLBC_PrintLine("Special character escape test: %s", (speStr1 == speStr2) ? "true": "false");
+
+    const static int nEscapeTestNum = 100000;
+    std::vector<LLBC_String> t1;
+    std::vector<LLBC_String> t2;
+    t1.resize(nEscapeTestNum,
+              "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn="
+              "abcdefghijklmn#abcdefghijklmn.");
+    t2.resize(nEscapeTestNum,
+              "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.\\abcdefghijklmn.abcdefghijklmn="
+              "abcdefghijklmn#abcdefghijklmn.");
+
+    LLBC_Time begTestTime = LLBC_Time::Now();
+    for (int i = 0; i < nEscapeTestNum; ++i)
+    {
+        t1[i].escape(willEscape, '\\');
+    }
+    LLBC_PrintLine("LLBC_String escape test used time(ms): %lld",
+                   (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
+    begTestTime = LLBC_Time::Now();
+    for (int i = 0; i < nEscapeTestNum; ++i)
+    {
+        LLBC_StringEscape(t2[i], willEscape, '\\');
+    }
+    LLBC_PrintLine("Algorithm LLBC_String escape test used time(ms): %lld",
+                   (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+
+    ASSERT(t1[0] == t2[0]);
+    LLBC_PrintLine("test completed, press any key to exit");
     getchar();
 
     return 0;

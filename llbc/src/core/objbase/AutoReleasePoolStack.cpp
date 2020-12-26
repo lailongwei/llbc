@@ -144,6 +144,12 @@ void LLBC_AutoReleasePoolStack::Purge()
     }
 }
 
+LLBC_AutoReleasePoolStack::_This * LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack()
+{
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    return reinterpret_cast<_This *>(tls->objbaseTls.poolStack);
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"

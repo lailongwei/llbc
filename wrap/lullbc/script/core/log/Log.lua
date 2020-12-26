@@ -86,6 +86,10 @@ function Log.output(level, logger, tag, ...)
     end
 
     LogMsg(level, logger, tag, file, line, ...)
+
+    if level >= Log.FATAL then
+        error(tostring(...)) -- Only output the first param
+    end
 end
 
 local output = Log.output

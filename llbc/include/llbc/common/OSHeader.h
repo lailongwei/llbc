@@ -57,7 +57,9 @@
  #include <pthread.h>
  #include <libgen.h>
  #include <sys/time.h>
+ #include <sys/ioctl.h>
  #include <sys/socket.h>
+ #include <sys/syscall.h>
  #include <netdb.h>
  #include <dirent.h>
  #include <semaphore.h>
@@ -115,6 +117,7 @@
 #include <algorithm>
 #include <functional>
 #include <limits.h>
+#include <functional>
 
 // RTTI support header files.
 #include <typeinfo>

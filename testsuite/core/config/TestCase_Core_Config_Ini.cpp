@@ -50,6 +50,13 @@ int TestCase_Core_Config_Ini::Run(int argc, char *argv[])
     }
     LLBC_PrintLine("Success to load ini file");
 
+    // Test size_t/long/ulong
+    LLBC_PrintLine("Test long/ulong/size_t value read:");
+    long lVal = ini.GetValue<long>("Long_ULong_Size_t", "lVal", 3);
+    ulong ulVal = ini.GetValue<ulong>("Long_ULong_Size_t", "ulVal", 4);
+    size_t sizeVal = ini.GetValue<size_t>("Long_ULong_Size_t", "size_tVal", 5);
+    LLBC_PrintLine("longVal = %ld, ulongVal = %lu, size_tVal = %lu", lVal, ulVal, sizeVal);
+
     // Output all section names.
     LLBC_PrintLine("All section names:");
     const std::map<LLBC_String, LLBC_IniSection *> &sections = ini.GetAllSections();

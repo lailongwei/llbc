@@ -32,8 +32,8 @@ class TestFacade : public LLBC_IFacade
 public:
     TestFacade()
     {
-        _prevMb = 0;
         _recvBytes = 0;
+        _prevRecv100MB = 0;
         
         _packets = 0;
     }
@@ -84,14 +84,15 @@ public:
             LLBC_PrintLine("[%lld]Received %ld packets!", LLBC_GetMilliSeconds(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
-        const size_t nowMb = (_recvBytes / (1024 * 1024));
-        if (nowMb != _prevMb)
+        uint64 recv100MB = _recvBytes / (100 * 1024 * 1024);
+        if (recv100MB > _prevRecv100MB)
         {
-            LLBC_PrintLine("[%lld]Received %ld MB data!", LLBC_GetMilliSeconds(), nowMb);
-            _prevMb = nowMb;
+            LLBC_PrintLine("[%lld]Received %llu MB data!", LLBC_GetMilliSeconds(), _recvBytes / (1024 * 1024));
+            _prevRecv100MB = recv100MB;
         }
 
-        LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        // LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
         resPacket->SetHeader(packet, OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
@@ -99,8 +100,8 @@ public:
     }
 
 private:
-    size_t _prevMb;
-    size_t _recvBytes;
+    uint64 _recvBytes;
+    uint64 _prevRecv100MB;
 
     size_t _packets;
 };
@@ -141,14 +142,18 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     svc->RegisterFacade(facade);
     svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
-    svc->Start(2);
+    svc->Start(8);
 
     // Connect to server / Create listen session to wait client connect.
     int sessionId;
+    LLBC_SessionOpts sessionOpts;
+    sessionOpts.SetSockSendBufSize(1 * 1024 * 1024);
+    sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
+    sessionOpts.SetMaxPacketSize(64 * 1024);
     if (!asClient)
     {
         LLBC_PrintLine("Will listening in %s:%d", ip, port);
-        if ((sessionId = svc->Listen(ip, port)) == 0)
+        if ((sessionId = svc->Listen(ip, port, NULL, sessionOpts)) == 0)
         {
             LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
             LLBC_Delete(svc);
@@ -164,19 +169,20 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         if (pollerType == LLBC_PollerType::SelectPoller)
             clientCount = 50;
         else
-            clientCount = 1024;
+            clientCount = 200;
 
         LLBC_PrintLine("Create %d clients to test", clientCount);
 
         for (int i = 0; i < clientCount; ++i)
         {
-            const int sessionId = svc->Connect(ip, port);
+            const int sessionId = svc->Connect(ip, port, -1, NULL, sessionOpts);
 
-            const int dataSize = 4096;
+            const int dataSize = 512 * 1024;
             char *data = LLBC_Malloc(char, dataSize);
             ::memset(data, 1, dataSize);
 
-            LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+            LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();
             packet->SetHeader(sessionId, OPCODE, 0);
             packet->Write(data, dataSize);
 
@@ -185,7 +191,8 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             svc->Send(packet);
 
             // Test unhandled packet(unsubscribe opcode).
-            LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
+            LLBC_Packet *unhandledPacket = svc->GetPacketObjectPool().GetObject();
             unhandledPacket->SetHeader(sessionId, OPCODE + 10000, 0);
             unhandledPacket->Write("Hello World", 12);
 

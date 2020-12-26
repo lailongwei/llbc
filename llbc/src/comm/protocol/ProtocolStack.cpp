@@ -48,7 +48,7 @@ void __DeletePacketsBlock(void *data)
 
     _Packet *packet;
     while (block->Read(&packet, sizeof(_Packet *)) == LLBC_OK)
-        LLBC_Delete(packet);
+        LLBC_Recycle(packet);
 
     LLBC_Delete(block);
 }
@@ -255,7 +255,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
                 //  Just need delete decoded packets, and non-decode packets.
              
                 // Delete all decoded packets.
-                LLBC_STLHelper::DeleteContainer(packets);
+                LLBC_STLHelper::RecycleContainer(packets);
                 // Delete non-decode packets and the message-block.
                 // Yeah, this operation will done by LLBC_InvokeGuard, we don't need care it too.
                 return LLBC_FAILED;
@@ -292,14 +292,14 @@ int LLBC_ProtocolStack::Recv(LLBC_MessageBlock *block, std::vector<LLBC_Packet *
     if (RecvRaw(block, _rawPackets, removeSession) != LLBC_OK)
         return LLBC_FAILED;
         
-    for (size_t i = 0;  i < _rawPackets.size(); ++i)
+    for (size_t i = 0;  i != _rawPackets.size(); ++i)
     {
         LLBC_Packet *packet;
         if (RecvCodec(_rawPackets[i], packet, removeSession) != LLBC_OK)
         {
-            LLBC_STLHelper::DeleteContainer(packets);
+            LLBC_STLHelper::RecycleContainer(packets);
             for (++i; i < _rawPackets.size(); ++i)
-                LLBC_Delete(_rawPackets[i]);
+                LLBC_Recycle(_rawPackets[i]);
 
             return LLBC_FAILED;
         }
@@ -332,30 +332,32 @@ void LLBC_ProtocolStack::Report(int sessionId, int opcode, LLBC_IProtocol *proto
                                                   msg));
 }
 
-void LLBC_ProtocolStack::CtrlStack(int ctrlType, const LLBC_Variant &ctrlData)
+void LLBC_ProtocolStack::CtrlStack(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
-    if (!CtrlStackCodec(ctrlType, ctrlData))
+    if (!CtrlStackCodec(cmd, ctrlData, removeSession))
         return;
 
-    CtrlStackRaw(ctrlType, ctrlData);
+    CtrlStackRaw(cmd, ctrlData, removeSession);
 }
 
-bool LLBC_ProtocolStack::CtrlStackRaw(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_ProtocolStack::CtrlStackRaw(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     for (int layer = _Layer::PackLayer; layer <= _Layer::CompressLayer; ++layer)
     {
-        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+        removeSession = false;
+        if (!_protos[layer]->Ctrl(cmd, ctrlData, removeSession))
             return false;
     }
 
     return true;
 }
 
-bool LLBC_ProtocolStack::CtrlStackCodec(int ctrlType, const LLBC_Variant &ctrlData)
+bool LLBC_ProtocolStack::CtrlStackCodec(int cmd, const LLBC_Variant &ctrlData, bool &removeSession)
 {
     for (int layer = _Layer::CodecLayer; layer != _Layer::End; ++layer)
     {
-        if (!_protos[layer]->Ctrl(ctrlType, ctrlData))
+        removeSession = false;
+        if (!_protos[layer]->Ctrl(cmd, ctrlData, removeSession))
             return false;
     }
 

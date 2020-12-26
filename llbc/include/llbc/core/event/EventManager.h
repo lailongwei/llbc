@@ -115,6 +115,12 @@ public:
     virtual void FireEvent(LLBC_Event *event);
 
     /**
+     * Fire the event.
+     * @param[in] id - event Id.
+     */
+    void FireEvent(int id);
+
+    /**
      * Check event manager is firing or not.
      * @return bool - firing flag.
      */

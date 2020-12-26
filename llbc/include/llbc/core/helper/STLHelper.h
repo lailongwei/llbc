@@ -39,6 +39,7 @@ public:
         Delete = Begin,
         Free,
         Deletes,
+        Recycle,
 
         End
     };
@@ -112,6 +113,28 @@ public:
     static void DeletesContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
     static void DeletesContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+
+    /**
+     * Recycle STL container.
+     * @param[in/out] container - STL container object.
+     * @param[in]     clear     - clear container flag, default is true.
+     * @param[in]     reverse   - reverse free flag, default is falst.
+     */
+    template <typename _Ty>
+    static void RecycleContainer(std::vector<_Ty *> &vec, bool clear = true, bool reverse = false);
+    template <typename _Ty>
+    static void RecycleContainer(std::list<_Ty *> &l, bool clear = true, bool reverse = false);
+    template <typename _Ty>
+    static void RecycleContainer(std::deque<_Ty *> &dq, bool clear = true, bool reverse = false);
+    template <typename _Ty>
+    static void RecycleContainer(std::stack<_Ty *> &stk, bool clear = true, bool reverse = false);
+    template <typename _Ty>
+    static void RecycleContainer(std::queue<_Ty *> &stk, bool clear = true, bool reverse = false);
+    template <typename _Key>
+    static void RecycleContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
+    template <typename _Key, typename _Ty>
+    static void RecycleContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+
 
 public:
     /**

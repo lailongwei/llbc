@@ -56,6 +56,10 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_THREAD_MSG_BLOCK_DFT_SIZE");
 
     // Log
+    lua_pushstring(l, LLBC_CFG_LOG_ROOT_LOGGER_NAME);
+    lua_setfield(l, 1, "LLBC_CFG_LOG_ROOT_LOGGER_NAME");
+    lua_pushstring(l, LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE);
+    lua_setfield(l, 1, "LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE");
     lua_pushinteger(l, LLBC_CFG_LOG_DEFAULT_LEVEL);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_LEVEL");
     lua_pushboolean(l, LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE);
@@ -66,11 +70,9 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_LOG_TO_CONSOLE");
     lua_pushstring(l, LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN");
-    lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT);
-    lua_setfield(l, 1, "CFG_LOG_DEFAULT_ENABLED_COLOURFUL_OUTPUT");
+    lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_COLOURFUL_OUTPUT);
+    lua_setfield(l, 1, "CFG_LOG_DEFAULT_COLOURFUL_OUTPUT");
     lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE);
-    lua_setfield(l, 1, "CFG_LOG_DEFAULT_LOG_TO_FILE");
-    lua_pushstring(l, LLBC_CFG_LOG_DEFAULT_LOG_FILE_NAME);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_LOG_FILE_NAME");
     lua_pushboolean(l, LLBC_CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH");
@@ -112,10 +114,16 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_COMM_MAX_EVENT_COUNT");
     lua_pushinteger(l, LLBC_CFG_EPOLL_MAX_LISTEN_FD_SIZE);
     lua_setfield(l, 1, "CFG_EPOLL_MAX_LISTEN_FD_SIZE");
-    lua_pushinteger(l, LLBC_CFG_COMM_DFT_SEND_BUF_SIZE);
-    lua_setfield(l, 1, "CFG_COMM_DFT_SEND_BUF_SIZE");
-    lua_pushinteger(l, LLBC_CFG_COMM_DFT_RECV_BUF_SIZE);
-    lua_setfield(l, 1, "CFG_COMM_DFT_RECV_BUF_SIZE");
+    lua_pushinteger(l, LLBC_CFG_COMM_DFT_SOCK_SEND_BUF_SIZE);
+    lua_setfield(l, 1, "CFG_COMM_DFT_SOCK_SEND_BUF_SIZE");
+    lua_pushinteger(l, LLBC_CFG_COMM_DFT_SOCK_RECV_BUF_SIZE);
+    lua_setfield(l, 1, "CFG_COMM_DFT_SOCK_RECV_BUF_SIZE");
+    lua_pushinteger(l, LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE);
+    lua_setfield(l, 1, "CFG_COMM_DFT_SESSION_SEND_BUF_SIZE");
+    lua_pushinteger(l, LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE);
+    lua_setfield(l, 1, "CFG_COMM_DFT_SESSION_RECV_BUF_SIZE");
+    lua_pushinteger(l, LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL);
+    lua_setfield(l, 1, "CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL");
     lua_pushinteger(l, LLBC_CFG_COMM_DFT_SERVICE_FPS);
     lua_setfield(l, 1, "CFG_COMM_DFT_SERVICE_FPS");
     lua_pushinteger(l, LLBC_CFG_COMM_MIN_SERVICE_FPS);

@@ -37,6 +37,7 @@ pyllbc_PackLemma_Raw::pyllbc_PackLemma_Raw(PyObject *compileEnv)
 : Base(compileEnv)
 , _symbol(Base::InvalidSymbol)
 , _str2Flag(false)
+, _str3Flag(false)
 {
 }
 
@@ -69,17 +70,22 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
     }
     else if (_state == Base::Accepting)
     {
-        if (UNLIKELY(ch != Base::StringLen))
+        if (UNLIKELY(ch != Base::StringLen && 
+                     ch != Base::StringEnd))
         {
             _state = Base::Error;
 
             LLBC_String errStr;
-            pyllbc_SetError(errStr.format("str type raw-lemma except '#' lemma to done, but got: %c", ch));
+            pyllbc_SetError(errStr.format("str type raw-lemma except '#'/'$' lemma to done, but got: %c", ch));
 
             return LLBC_FAILED;
         }
 
-        _str2Flag = true;
+        if (ch == Base::StringLen)
+            _str2Flag = true;
+        else if (ch == Base::StringEnd)
+            _str3Flag = true;
+
         _state = Done;
 
         return LLBC_OK;
@@ -101,12 +107,19 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
         pyllbc_SetError("str len lemma '#' must place on str lemma 'S' later");
         return LLBC_FAILED;
     }
+    else if (ch == Base::StringEnd) // Special raw-lemma character, process it.
+    {
+        _state = Base::Error;
+
+        pyllbc_SetError("str end lemma '$' must place on str lemma 'S' later");
+        return LLBC_FAILED;
+    }
 
     _symbol = ch;
     _str.append(1, static_cast<char>(ch));
 
     _state = (_symbol == Base::String && 
-        nextCh == Base::StringLen) ? Base::Accepting : Base::Done;
+        (nextCh == Base::StringLen || nextCh == Base::StringEnd)) ? Base::Accepting : Base::Done;
 
     return LLBC_OK;
 }
@@ -159,8 +172,12 @@ PyObject *pyllbc_PackLemma_Raw::Read(pyllbc_Stream *stream)
         break;
 
     case Base::String:
-        obj = _str2Flag ? 
-            stream->ReadStr2() : stream->ReadStr();
+        if (_str2Flag)
+            obj = stream->ReadStr2();
+        else if (_str3Flag)
+            obj = stream->ReadStr3();
+        else
+            obj = stream->ReadStr();
         break;
 
     case Base::Unicode:
@@ -232,8 +249,12 @@ int pyllbc_PackLemma_Raw::Write(pyllbc_Stream *stream, PyObject *values)
         break;
 
     case Base::String:
-        rtn = _str2Flag ? 
-            stream->WriteStr2(values) : stream->WriteStr(values);
+        if (_str2Flag)
+            rtn = stream->WriteStr2(values);
+        else if (_str3Flag)
+            rtn = stream->WriteStr3(values);
+        else
+            rtn = stream->WriteStr(values);
         break;
 
     case Base::Unicode:

@@ -19,54 +19,50 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "mtrand.h"
 #ifdef __LLBC_CORE_RANDOM_RANDOM_H__
 
 __LLBC_NS_BEGIN
 
 inline LLBC_Random::LLBC_Random(int seed)
+: _mtRand(seed != 0 ? seed : static_cast<int>(::time(NULL)))
 {
-    if (seed == 0)
-        seed = static_cast<int>(::time(NULL));
-
-    _mtRand.seed(seed);
 }
 
 inline void LLBC_Random::Seed(int seed)
 {
-    _mtRand.seed(seed);
+    _mtRand.reset(seed);
 }
 
 inline int LLBC_Random::Rand()
 {
-    return static_cast<int>(_mtRand());
+    return static_cast<int>(_mtRand.rand());
 }
 
 inline int LLBC_Random::Rand(int end)
 {
     if (end >= 0)
-        return static_cast<int>(_mtRand()) % end;
+        return static_cast<int>(_mtRand.rand()) % end;
     else
-        return static_cast<int>(_mtRand()) % (-end) + end;
+        return static_cast<int>(_mtRand.rand()) % (-end) + end;
 }
 
 inline int LLBC_Random::Rand(int begin, int end)
 {
     if (LIKELY(begin <= end))
-        return _mtRand() % (end - begin) + begin;
+        return _mtRand.rand() % (end - begin) + begin;
     else
-        return _mtRand() % (begin - end) + end;
+        return _mtRand.rand() % (begin - end) + end;
 
 }
 
 inline double LLBC_Random::RandReal()
 {
-    return static_cast<double>(_mtRand()) * (1. / 4294967296.); // divided by 2^32
+    return _mtRand.real();
 }
 
 inline bool LLBC_Random::BoolJudge()
 {
-    return _mtRand() % 2 == 1;
+    return _mtRand.rand() % 2 == 1;
 }
 
 template <typename _RandomAccessIter>

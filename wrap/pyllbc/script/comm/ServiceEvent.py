@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import llbc
+import traceback
 
 class pyllbcServiceEvent(object):
     """
@@ -27,6 +28,8 @@ class pyllbcServiceEvent(object):
         self._destroyed_from_service = None
         self._errno = None
         self._sub_errno = None
+        self._traceback = None
+        self._exception = None
 
     @property
     def svc(self):
@@ -168,40 +171,58 @@ class pyllbcServiceEvent(object):
         """
         return self._sub_errno
 
+    @property
+    def traceback(self):
+        """
+        Traceback - exception traceback.
+        """
+        return self._traceback
+
+    @property
+    def exception(self):
+        """
+        Exception - exception object.
+        """
+        return self._exception
+
     def __str__(self):
-        s = 'svc: {}'.format(self._svc)
+        s = 'svc:[{}]'.format(self._svc)
         if self._idletime is not None:
-            s += ', idletime: {}'.format(self._idletime)
+            s += ', idletime:{}'.format(self._idletime)
         if self._session_id is not None:
-            s += ', session_id: {}'.format(self._session_id)
+            s += ', session_id:{}'.format(self._session_id)
         if self._connected is not None:
-            s += ', connected: {}'.format(self._connected)
+            s += ', connected:{}'.format(self._connected)
         if self._reason is not None:
-            s += ', reason: {}'.format(self._reason)
+            s += ', reason:{}'.format(self._reason)
         if self._local_ip is not None:
-            s += ', localaddr: {}:{}'.format(self._local_ip, self._local_port)
+            s += ', localaddr:{}:{}'.format(self._local_ip, self._local_port)
         if self._peer_ip is not None:
-            s += ', peeraddr: {}:{}'.format(self._peer_ip, self._peer_port)
+            s += ', peeraddr:{}:{}'.format(self._peer_ip, self._peer_port)
         if self._islisten is not None:
-            s += ', islisten: {}'.format(self._islisten)
+            s += ', islisten:{}'.format(self._islisten)
         if self._socket is not None:
-            s += ', socket: {}'.format(self._socket)
+            s += ', socket:{}'.format(self._socket)
         if self._packet is not None:
-            s += ', packet: [{}]'.format(self._packet)
+            s += ', packet:[{}]'.format(self._packet)
         if self._report_layer is not None:
-            s += ', report_layer: {}'.format(llbc.Protocol.layer2str(self._report_layer))
+            s += ', report_layer:{}'.format(llbc.Protocol.layer2str(self._report_layer))
         if self._report_level is not None:
-            s += ', report_level: {}'.format(llbc.Protocol.level2str(self._report_level))
+            s += ', report_level:{}'.format(llbc.Protocol.level2str(self._report_level))
         if self._report_msg is not None:
-            s += ', report_msg: {}'.format(self._report_msg)
+            s += ', report_msg:{}'.format(self._report_msg)
         if self._opcode is not None:
-            s += ', opcode: {}'.format(self._opcode)
+            s += ', opcode:{}'.format(self._opcode)
         if self._destroyed_from_service is not None:
-            s += ', from_service?: {}'.format(self._destroyed_from_service)
+            s += ', from_service?:{}'.format(self._destroyed_from_service)
         if self._errno is not None:
-            s += ', errno: {}'.format(self._errno)
+            s += ', errno:{}'.format(self._errno)
         if self._sub_errno is not None:
-            s += ', sub_errno: {}'.format(self._sub_errno)
+            s += ', sub_errno:{}'.format(self._sub_errno)
+        if self._traceback is not None:
+            s += ", tb:{}".format(''.join(traceback.format_tb(self._traceback)))
+        if self._exception is not None:
+            s += ", exc_type:{}, exc:{}".format(self._exception.__class__, self._exception)
 
         return s
 

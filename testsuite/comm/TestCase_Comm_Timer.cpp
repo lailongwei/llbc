@@ -45,9 +45,15 @@ public:
 
         for(int i = 1; i <=2000000; ++i) 
         {
-            LLBC_Timer *timer = LLBC_New2(LLBC_Timer,
-                                          LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
-                                          LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
+            // LLBC_Timer *timer = LLBC_New2(LLBC_Timer,
+                                          // LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
+                                          // LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
+
+            LLBC_Timer *timer = LLBC_New3(LLBC_Timer,
+                                          this,
+                                          &TestFacade::OnTimerTimeout,
+                                          &TestFacade::OnTimerCancel);
+
             timer->Schedule(LLBC_RandInt(5000, 15001), LLBC_RandInt(5000, 15001));
         }
 

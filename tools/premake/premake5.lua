@@ -7,7 +7,36 @@
 
 -- python tool define
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
-local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
+
+-- Capture shell cmd's output
+local function os_capture(cmd, raw)
+    local f = assert(io.popen(cmd, 'r'))
+    local s = assert(f:read('*a'))
+    f:close()
+    if raw then return s end
+    s = string.gsub(s, '^%s+', '')
+    s = string.gsub(s, '%s+$', '')
+    s = string.gsub(s, '[\n\r]+', ' ')
+    return s
+end
+
+-- PY target
+local PY
+if IS_WINDOWS then
+    PY = "$(ProjectDir)../../tools/py.exe"
+else
+    local output = os_capture("python --version")
+    if output:find("command not found") then
+        error("python command not found")
+    elseif output:find("Python 3") then
+        if os_capture("which python2"):len() == 0 then
+            error("Python3 is not yet supported, please install python2 and make sure python2 can be use")
+        end
+        PY = "python2"
+    else
+        PY = "python"
+    end
+end
 
 -- All libraries output directory
 LLBC_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
@@ -147,6 +176,7 @@ project "llbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -226,6 +256,12 @@ project "testsuite"
         }
     filter {}
 
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
     -- debug target suffix define
     filter { "configurations:debug*" }
         targetsuffix "_debug"
@@ -249,9 +285,16 @@ project "testsuite"
 -- import pylib_setting
 package.path = package.path .. ";" .. "../../wrap/pyllbc/?.lua"
 local PYLIB_SETTING = require "pylib_setting"
+local PYLIB_PY_VER = PYLIB_SETTING.py_ver or 2
+if PYLIB_PY_VER == 2 then
+elseif PYLIB_PY_VER == 3 then
+else
+    error('Please set the python version number correctly(in wrap/pyllbc/pylib_setting.lua)!')
+end
+
 local PYLIB_INCL_PATH = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[1] or ''
 local PYLIB_LIB_DIR = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[2] or ''
-local PYLIB_LIB_NAME = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[3] or 'python27'
+local PYLIB_LIB_NAME = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[3] or ''
 project "pyllbc"
     -- language, kind
     language "c++"
@@ -267,13 +310,23 @@ project "pyllbc"
 
     -- files
     files {
-        "../../wrap/pyllbc/**.h",
-        "../../wrap/pyllbc/**.cpp",
+        "../../wrap/pyllbc/include/**.h",
+        "../../wrap/pyllbc/src/**.h",
+        "../../wrap/pyllbc/src/**.cpp",
 
         "../../wrap/pyllbc/script/**.py",
 
         "../../wrap/pyllbc/testsuite/**.py",
     }
+    if PYLIB_PY_VER == 2 then
+        files {
+            "../../wrap/pyllbc/Python2.7.8/**.h",
+        }
+    elseif PYLIB_PY_VER == 3 then
+        files {
+            "../../wrap/pyllbc/Python3.8.5/**.h",
+        }
+    end
 
     -- includedirs
     includedirs {
@@ -287,20 +340,28 @@ project "pyllbc"
         includedirs { PYLIB_INCL_PATH }
     else -- if not specific python include path, windows platform will use specific version python, other platforms will auto detect.
         filter { "system:windows" }
-            includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
+            if PYLIB_PY_VER == 2 then
+                includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
+            elseif PYLIB_PY_VER == 3 then
+                includedirs { "../../wrap/pyllbc/Python3.8.5/Include" }
+            end
         filter {}
 
         filter { "system:not windows" }
-            includedirs { "/usr/include/python2.7" }
+            if PYLIB_PY_VER == 2 then
+                includedirs { "/usr/include/python2.7" }
+            elseif PYLIB_PY_VER == 3 then
+                includedirs { "/usr/include/python3.8" }
+            end
         filter {}
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
     filter { "action:vs2013 or vs2015 or vs2017" }
         defines { "HAVE_ROUND" }
+    filter {}
 
     -- prebuild commands
-    filter {}
     prebuildcommands {
         PY .. " ../../tools/building_script/py_prebuild.py pyllbc",
     }
@@ -335,27 +396,47 @@ project "pyllbc"
         libdirs { PYLIB_LIB_DIR }
     else
         filter { "system:windows", "architecture:x86" }
-            libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/32" }
+            if PYLIB_PY_VER == 2 then
+                libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/32" }
+            elseif PYLIB_PY_VER == 3 then
+                libdirs { "../../wrap/pyllbc/Python3.8.5/Libs/Win/32" }
+            end
         filter {}
         filter { "system:windows", "architecture:x64" }
-            libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/64" }
+            if PYLIB_PY_VER == 2 then
+                libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/64" }
+            elseif PYLIB_PY_VER == 3 then
+                libdirs { "../../wrap/pyllbc/Python3.8.5/Libs/Win/64" }
+            end
         filter {}
     end
 
-    if string.len(PYLIB_LIB_NAME) then
+    if string.len(PYLIB_LIB_NAME) > 0 then
         links { PYLIB_LIB_NAME }
     else
         -- in windows platform, python library use the python library file in the repo
         filter { "system:windows", "configurations:debug*" }
-            links { "python27_d" }
+            if PYLIB_PY_VER == 2 then
+                links { "python27_d" }
+            elseif PYLIB_PY_VER == 3 then
+                links { "python38_d" }
+            end
         filter {}
         filter { "system:windows", "configurations:release*" }
-            links { "python27" }
+            if PYLIB_PY_VER == 2 then
+                links { "python27" }
+            elseif PYLIB_PY_VER == 3 then
+                links { "python38" }
+            end
         filter {}
 
         -- in non-windows platform, python library default named: python2.7
         filter { "system:not windows" }
-            links { "python2.7" }
+            if PYLIB_PY_VER == 2 then
+                links { "python2.7" }
+            elseif PYLIB_PY_VER == 3 then
+                links { "python3.8" }
+            end
         filter {}
     end
 
@@ -363,6 +444,7 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -436,6 +518,7 @@ project "csllbc_native"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 
@@ -783,6 +866,7 @@ project "lullbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-std=c++11",
         }
     filter {}
 

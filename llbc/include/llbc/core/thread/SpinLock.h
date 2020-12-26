@@ -53,6 +53,12 @@ public:
      */
     virtual void Unlock();
 
+    /**
+     * Dummy lock check.
+     * @return bool - return true if is dummy lock, otherwise false.
+     */
+    virtual bool IsDummyLock() const;
+
 private:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     friend class LLBC_ConditionVariable;

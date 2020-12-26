@@ -55,6 +55,13 @@ public:
 
 public:
     /**
+     * Check given path is abs path or not.
+     * @param[in] path - the path.
+     * @return bool - return true if given path is abs path, otherwise return false.
+     */
+    static bool IsAbsPath(const LLBC_String &path);
+
+    /**
      * Convert path to normalized absolutize path.
      * @return LLBC_String - the normalized absolutize path.
      */
@@ -62,40 +69,19 @@ public:
 
     /**
      * Join one or more path components intelligently.
-     * @param[in] path1~7 - the path components.
+     * @param[in] path1~N - the path components.
      * @param[in] paths   - the paths list.
      * @return LLBC_String - the joined path.
      */
     static LLBC_String Join(const LLBC_String &path1,
                             const LLBC_String &path2);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2,
-                            const LLBC_String &path3);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2,
-                            const LLBC_String &path3,
-                            const LLBC_String &path4);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2,
-                            const LLBC_String &path3,
-                            const LLBC_String &path4,
-                            const LLBC_String &path5);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2,
-                            const LLBC_String &path3,
-                            const LLBC_String &path4,
-                            const LLBC_String &path5,
-                            const LLBC_String &path6);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2,
-                            const LLBC_String &path3,
-                            const LLBC_String &path4,
-                            const LLBC_String &path5,
-                            const LLBC_String &path6,
-                            const LLBC_String &path7);
+
     static LLBC_String Join(const LLBC_Strings &paths);
     static LLBC_String Join(const LLBC_String &path1,
                             const LLBC_Strings &paths);
+
+    template<typename ...Args>
+    static LLBC_String Join(const LLBC_String &path1, const LLBC_String &path2, Args... args);
 
     /**
      * Split file extension, always success.
@@ -199,5 +185,7 @@ public:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/file/DirectoryImpl.h"
 
 #endif // !__LLBC_CORE_FILE_DIRECTORY_H__

@@ -45,6 +45,7 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.entryThread = false;
     coreTls.needInitWinSock = true;
     coreTls.threadHandle = LLBC_INVALID_HANDLE;
+    coreTls.threadId = LLBC_INVALID_NATIVE_THREAD_ID;
     coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     coreTls.task = NULL;
     coreTls.timerScheduler = NULL;

@@ -250,6 +250,15 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str2(PyObject *self, PyObject *args
     return stream->ReadStr2();
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str3(PyObject *self, PyObject *args)
+{
+    pyllbc_Stream *stream;
+    if (!PyArg_ParseTuple(args, "l", &stream))
+        return NULL;
+
+    return stream->ReadStr3();
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Unicode(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
@@ -298,7 +307,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
 
     // Construct callable arguments(tuple).
     PyObject *callArgs = PyTuple_New(1);
-    PyTuple_SET_ITEM(callArgs, 0, PyInt_FromLong(end - begin)); // Steals a reference to obj.
+    PyTuple_SetItem(callArgs, 0, PyInt_FromLong(end - begin)); // Steals a reference to obj.
     
     // Create python layer stream object instance.
     PyObject *pyStream = PyObject_CallObject(streamCls, callArgs);
@@ -517,6 +526,19 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str2(PyObject *self, PyObject *arg
         return NULL;
 
     if (stream->WriteStr2(obj) != LLBC_OK)
+        return NULL;
+
+    return stream->GetPyObj();
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str3(PyObject *self, PyObject *args)
+{
+    PyObject *obj;
+    pyllbc_Stream *stream;
+    if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
+        return NULL;
+
+    if (stream->WriteStr3(obj) != LLBC_OK)
         return NULL;
 
     return stream->GetPyObj();

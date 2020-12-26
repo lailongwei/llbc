@@ -96,6 +96,11 @@ void LLBC_SimpleLock::Unlock()
 #endif
 }
 
+bool LLBC_SimpleLock::IsDummyLock() const
+{
+    return false;
+}
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 void *LLBC_SimpleLock::Handle()
 {

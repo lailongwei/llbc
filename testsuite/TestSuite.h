@@ -33,6 +33,7 @@
 #include "core/os/TestCase_Core_OS_Symbol.h"
 #include "core/os/TestCase_Core_OS_Thread.h"
 #include "core/os/TestCase_Core_OS_Console.h"
+#include "core/algo/TestCase_Core_Algo_RingBuffer.h"
 #include "core/bundle/TestCase_Core_Bundle.h"
 #include "core/utils/TestCase_Core_Utils_Text.h"
 #include "core/utils/TestCase_Core_Utils_Debug.h"
@@ -67,6 +68,7 @@
 #include "core/objbase/TestCase_ObjBase_Array.h"
 #include "core/objbase/TestCase_ObjBase_Dictionary.h"
 #include "core/objectpool/TestCase_Core_ObjectPool.h"
+#include "core/objectpool/TestCase_Core_Recycle.h"
 
 #include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"
@@ -82,6 +84,9 @@
 #include "comm/TestCase_Comm_ExternalDriveSvc.h"
 #include "comm/TestCase_Comm_LazyTask.h"
 #include "comm/TestCase_Comm_ProtoStackCtrl.h"
+#include "comm/TestCase_Comm_MessageBuffer.h"
+#include "comm/TestCase_Comm_DynLoadFacade.h"
+#include "comm/TestCase_Comm_Echo.h"
 
 #include "application/TestCase_App_AppTest.h"
 

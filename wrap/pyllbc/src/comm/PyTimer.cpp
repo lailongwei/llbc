@@ -180,7 +180,7 @@ namespace
 }
 
 pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObject *cancelCallable)
-: Base(NULL, NULL, NULL)
+: Base(reinterpret_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL), NULL, NULL)
 , _pyTimer(pyTimer)
 , _ignoredDeadRef(false)
 {

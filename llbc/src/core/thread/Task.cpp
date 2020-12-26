@@ -77,7 +77,6 @@ int LLBC_BaseTask::Activate(int threadNum,
 
     LLBC_XFree(_taskThreads);
     _taskThreads = LLBC_Calloc(LLBC_Handle, threadNum * sizeof(LLBC_Handle));
-
     if (_threadManager->CreateThreads(threadNum,
                                       &LLBC_INTERNAL_NS __LLBC_BaseTaskEntry,
                                       this,
@@ -89,7 +88,9 @@ int LLBC_BaseTask::Activate(int threadNum,
                                       NULL,
                                       _taskThreads) == LLBC_INVALID_HANDLE)
     {
+        LLBC_XFree(_taskThreads);
         _lock.Unlock();
+
         return LLBC_FAILED;
     }
 
@@ -98,43 +99,77 @@ int LLBC_BaseTask::Activate(int threadNum,
     _lock.Unlock();
 
     while (!_startCompleted)
-    {
         LLBC_ThreadManager::Sleep(20);
-    }
 
     return LLBC_OK;
 }
 
+bool LLBC_BaseTask::IsActivated() const
+{
+    LLBC_LockGuard guard(const_cast<LLBC_BaseTask *>(this)->_lock);
+    return _threadNum != 0;
+}
+
 int LLBC_BaseTask::GetThreadCount() const
 {
-    LLBC_BaseTask *nonConstTask = const_cast<LLBC_BaseTask *>(this);
-    LLBC_LockGuard guard(nonConstTask->_lock);
+    LLBC_BaseTask *ncThis = const_cast<LLBC_BaseTask *>(this);
+    LLBC_LockGuard guard(ncThis->_lock);
 
     return _threadNum;
 }
 
 int LLBC_BaseTask::Wait()
 {
+    if (!IsActivated())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _threadManager->WaitTask(this);
 }
 
 int LLBC_BaseTask::Suspend()
 {
+    if (!IsActivated())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _threadManager->SuspendTask(this);
 }
 
 int LLBC_BaseTask::Resume()
 {
+    if (!IsActivated())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _threadManager->ResumeTask(this);
 }
 
 int LLBC_BaseTask::Cancel()
 {
+    if (!IsActivated())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _threadManager->CancelTask(this);
 }
 
 int LLBC_BaseTask::Kill(int signo)
 {
+    if (!IsActivated())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _threadManager->KillTask(this, signo);
 }
 
@@ -166,6 +201,11 @@ int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
     return LLBC_FAILED;
 }
 
+size_t LLBC_BaseTask::GetMessageSize() const
+{
+    return _msgQueue.GetSize();
+}
+
 void LLBC_BaseTask::OnTaskThreadStart()
 {
     LLBC_LockGuard guard(_lock);
@@ -176,15 +216,15 @@ void LLBC_BaseTask::OnTaskThreadStart()
 void LLBC_BaseTask::OnTaskThreadStop()
 {
     while (!_startCompleted)
-    {
         LLBC_ThreadManager:: Sleep(20);
-    }
 
     _lock.Lock();
     if (--_curThreadNum == 0)
     {
-        _lock.Unlock();
         Cleanup();
+        InternalCleanup();
+
+        _lock.Unlock();
 
         return;
     }
@@ -192,8 +232,25 @@ void LLBC_BaseTask::OnTaskThreadStop()
     _lock.Unlock();
 }
 
+void LLBC_BaseTask::InternalCleanup()
+{
+    if (_threadNum == 0)
+        return;
+
+    _threadNum = 0;
+    _curThreadNum = 0;
+    _startCompleted = false;
+
+    LLBC_XFree(_taskThreads);
+
+    _msgQueue.Cleanup();
+}
+
 void LLBC_BaseTask::GetTaskThreads(std::vector<LLBC_Handle> &taskThreads)
 {
+    if (!IsActivated())
+        return;
+
     while (!_startCompleted)
         LLBC_ThreadManager::Sleep(10);
 

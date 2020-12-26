@@ -81,20 +81,22 @@ public:
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number. 
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory);
+    int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts);
 
     /**
      * Connect to peer address(call by service).
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number. 
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory);
+    int Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts);
 
     /**
      * Asynchronous connect to peer address(call by service).
@@ -102,11 +104,16 @@ public:
      * @param[in] port -              the port number. 
      * @param[out] pendingSessionId - pending sessionId, when return 0, this output parameter will assign the session Id, otherwise set to 0.
      * @param[in] protoFactory      - the protocol factory, default use service protocol factory.
+     * @param[in] sessionOpts       - the session options.
      * @return int - return 0 if success, otherwise return -1.
      *               Note: return 0 is not means the connection was established, 
      *                     it only means post async-conn request to poller success.
      */
-    int AsyncConn(const char *ip, uint16 port, int &pendingSessionId, LLBC_IProtocolFactory *protoFactory);
+    int AsyncConn(const char *ip,
+                  uint16 port,
+                  int &pendingSessionId,
+                  LLBC_IProtocolFactory *protoFactory,
+                  const LLBC_SessionOpts &sessionOpts);
 
     /**
      * Send packet.
@@ -125,12 +132,12 @@ public:
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control type(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    void CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    void CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 private:
     /**
@@ -175,10 +182,9 @@ private:
 
     int _maxSessionId;
 
-    typedef std::map<int, LLBC_Socket *> _PendingAddSocks;
+    typedef std::map<int, std::pair<LLBC_Socket *, LLBC_SessionOpts> > _PendingAddSocks;
     _PendingAddSocks _pendingAddSocks;
-
-    typedef std::map<int, LLBC_SockAddr_IN> _PendingAsyncConns;
+    typedef std::map<int, std::pair<LLBC_SockAddr_IN, LLBC_SessionOpts> > _PendingAsyncConns;
     _PendingAsyncConns _pendingAsyncConns;
 };
 

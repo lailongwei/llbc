@@ -29,7 +29,6 @@
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
 __LLBC_NS_BEGIN
@@ -158,9 +157,14 @@ public:
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when Listen failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Listen(const char *ip,
+                       uint16 port,
+                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Establishes a connection to a specified address.
@@ -171,9 +175,15 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when Connect failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int Connect(const char *ip,
+                        uint16 port,
+                        double timeout = -1.0,
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Asynchronous establishes a connection to a specified address.
@@ -184,11 +194,16 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
      * @return int - return 0 if success, otherwise return -1.
-     *               Note: return 0 is not means the connection was established,
-     *                     it only means post async-conn request to poller success.
+     * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL);
+    virtual int AsyncConn(const char *ip,
+                          uint16 port,
+                          double timeout = -1.0,
+                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
      * Check given sessionId is legal or not.
@@ -243,7 +258,6 @@ public:
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
@@ -253,7 +267,6 @@ public:
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
@@ -273,12 +286,12 @@ public:
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control command(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
 
 public:
     /**
@@ -286,12 +299,14 @@ public:
      */
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
     virtual int RegisterFacade(LLBC_IFacade *facade);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade);
 
     /**
      * Get facade/facades.
      */
+    virtual LLBC_IFacade *GetFacade(const char *facadeName);
     virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName);
-    virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName);
+    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName);
 
     /**
      * Register coder.
@@ -317,7 +332,7 @@ public:
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
@@ -357,22 +372,23 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev - the will fire event pointer.
+     * @param[in] ev                 - the will fire event pointer.
+     * @param[in] addiCtor           - the additional constructor.
+     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
+     * @param[in] customDtor         - the custom destructor.
+     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
      */
-    virtual void FireEvent(LLBC_Event *ev);
-
-public:
-    /**
-    * Get safety object pool.
-    * @return LLBC_SafetyObjectPool * - the safety object pool.
-    */
-    LLBC_SafetyObjectPool *GetSafetyObjectPool();
+    virtual void FireEvent(LLBC_Event *ev,
+                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
+                           bool addiCtorBorrowed = false,
+                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
+                           bool customDtorBorrowed = false);
 
     /**
-    * Get unsafety object pool.
-    * @return LLBC_UnsafetyObjectPool * - the unsafety object pool.
-    */
-    LLBC_UnsafetyObjectPool *GetUnsafetyObjectPool();
+     * Get event manager.
+     * @return LLBC_EventManager & - the event manager.
+     */
+    virtual LLBC_EventManager &GetEventManager();
 
 public:
     /**
@@ -390,6 +406,31 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
+
+public:
+    /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool();
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool();
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
 
 public:
     /**
@@ -484,15 +525,19 @@ private:
     void StopFacades();
     void DestroyFacades();
     void DestroyWillRegFacades();
+    void CloseAllFacadeLibraries();
     void AddFacade(LLBC_IFacade *facade);
     void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
+    LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
+    void CloseFacadeLibrary(const LLBC_String &libPath);
+    void ClearFacadesWhenInitFacadeFailed();
 
     /**
      * Auto-Release pool operation methods.
      */
-    void CreateAutoReleasePool();
+    void InitAutoReleasePool();
     void UpdateAutoReleasePool();
-    void DestroyAutoReleasePool();
+    void ClearAutoReleasePool();
 
     /**
     * Object pool operation methods.
@@ -551,7 +596,7 @@ private:
 
     volatile bool _started;
     volatile bool _stopping;
-    bool _initingFacade;
+    volatile bool _initingFacade;
 
     LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;
@@ -602,11 +647,14 @@ private:
     volatile int _facadesStartFinished;
     volatile int _facadesStartRet;
 
+    LLBC_String _facadeNameKey;
     typedef std::vector<LLBC_IFacade *> _Facades;
     _Facades _facades;
     typedef std::map<LLBC_String, _Facades> _Facades2;
     _Facades2 _facades2;
     _Facades *_caredEventFacades[LLBC_FacadeEventsOffset::End];
+    typedef std::map<LLBC_String, LLBC_Library *> _FacadeLibraries;
+    _FacadeLibraries _facadeLibraries;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;
@@ -638,8 +686,10 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack;
 
 private:
-    LLBC_SafetyObjectPool *_safetyObjectPool;
-    LLBC_UnsafetyObjectPool *_unsafetyObjectPool;
+    LLBC_SafetyObjectPool _safetyObjectPool;
+    LLBC_UnsafetyObjectPool _unsafetyObjectPool;
+    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
@@ -650,6 +700,9 @@ private:
 
 private:
     LLBC_ServiceMgr &_svcMgr;
+
+private:
+    std::vector<LLBC_Packet *> _multicastOtherPackets;
 
 private:
     typedef void (LLBC_Service::*_EvHandler)(LLBC_ServiceEvent &);

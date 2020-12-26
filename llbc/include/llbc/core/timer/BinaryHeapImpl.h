@@ -37,9 +37,7 @@ LLBC_BinaryHeap<T, Comp>::LLBC_BinaryHeap(const typename LLBC_BinaryHeap<T, Comp
     _elems.resize(elems.size() + 1);
 
     for (size_t i = 0; i < _size; ++i)
-    {
         _elems[i + 1] = elems[i];
-    }
 
     this->BuildHeap();
 }
@@ -75,17 +73,13 @@ void LLBC_BinaryHeap<T, Comp>::Insert(const T &elem)
 {
     size_t size = _elems.size();
     if (_size == size - 1)
-    {
         _elems.resize(size * 2);
-    }
 
     size_t pos = ++_size;
     size_t parentPos = pos / 2;
     for (; pos > 1 && _comp(elem, _elems[parentPos]); pos = parentPos, parentPos /= 2)
-    {
         _elems[pos] = _elems[parentPos];
-    }
-
+    
     _elems[pos] = elem;
 }
 
@@ -99,9 +93,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteTop()
     }
 
     if (_size != 1)
-    {
         _elems[1] = _elems[_size];
-    }
 
     _elems[_size--] = T();
 
@@ -242,9 +234,7 @@ template <typename T, typename Comp>
 void LLBC_BinaryHeap<T, Comp>::BuildHeap()
 {
     for (size_t i = _size / 2; i > 0; --i)
-    {
         this->PercolateDown(static_cast<int>(i));
-    }
 }
 
 template <typename T, typename Comp>
@@ -254,20 +244,14 @@ void LLBC_BinaryHeap<T, Comp>::PercolateDown(int index)
     T elem = _elems[index];
     for (; index * 2 <= static_cast<int>(_size); index = child)
     {
-        child= index * 2;
+        child = index * 2;
         if (child != static_cast<int>(_size) && _comp(_elems[child + 1], _elems[child]))
-        {
             ++child;
-        }
 
         if (_comp(_elems[child], elem))
-        {
             _elems[index] = _elems[child];
-        }
         else
-        {
             break;
-        }
     }
 
     _elems[index] = elem;

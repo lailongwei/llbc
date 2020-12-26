@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_CODER_H__
-#define __LLBC_COMM_CODER_H__
+#ifndef __LLBC_COMM_ICODER_H__
+#define __LLBC_COMM_ICODER_H__
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -42,7 +42,8 @@ __LLBC_NS_BEGIN
 class LLBC_ICoder
 {
 public:
-    virtual ~LLBC_ICoder() {  }
+    LLBC_ICoder();
+    virtual ~LLBC_ICoder();
 
 public:
     /**
@@ -54,6 +55,46 @@ public:
      * Decode pure virtual function, implement it to use decode packet data.
      */
     virtual bool Decode(LLBC_Packet &packet) = 0;
+
+public:
+    /**
+     * Object-Pool reflection support: Mark pool object.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: Is pool object.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual bool IsPoolObject() const;
+
+    /**
+     * Object-Pool reflection support:Get pool instance.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual LLBC_IObjectPoolInst *GetPoolInst();
+
+    /**
+     * Object-Pool reflection support: Give back object to pool.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual void GiveBackToPool();
+
+    /**
+     * Object-Pool reflection support: pool instance create event callback.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: pool instance destroy event callback.
+     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
+     */
+    virtual void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst);
+
+protected:
+    LLBC_IObjectPoolInst *_poolInst;
 };
 
 /**
@@ -74,4 +115,6 @@ public:
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COMM_CODER_H__
+#include "llbc/comm/ICoderImpl.h"
+
+#endif // !__LLBC_COMM_ICODER_H__

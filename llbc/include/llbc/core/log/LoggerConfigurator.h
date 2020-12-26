@@ -68,6 +68,7 @@ public:
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &GetAllConfigInfos() const;
 
 private:
+    LLBC_LoggerConfigInfo * _rootConfig;
     std::map<LLBC_String, LLBC_LoggerConfigInfo *> _configs;
 };
 

@@ -64,6 +64,12 @@ public:
                          const int stack_size[] = NULL);
 
     /**
+     * Check task is activated or not.
+     * @return bool - the activated flag.
+     */
+    bool IsActivated() const;
+
+    /**
      * Get thread count.
      * @return int - thread number.
      */
@@ -141,6 +147,12 @@ public:
      */
     virtual int TimedPop(LLBC_MessageBlock *&block, int interval);
 
+    /**
+     * Get unprocessed message size.
+     * @return size_t - the unprocessed message size.
+     */
+    size_t GetMessageSize() const;
+
 public:
     /**
      * When task thread start, will call this event handler.
@@ -156,6 +168,12 @@ public:
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_BaseTask);
+
+private:
+    /*
+     * Base task internal cleanup.
+     */
+    void InternalCleanup();
 
 private:
     /**

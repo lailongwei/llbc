@@ -80,6 +80,18 @@ inline uint32 LLBC_IniSection::GetValue(const LLBC_String &key, const uint32 &de
 }
 
 template <>
+inline long LLBC_IniSection::GetValue(const LLBC_String &key, const long &defaultValue) const
+{
+    return this->GetValue(key, LLBC_Variant(defaultValue));
+}
+
+template <>
+inline LLBC_NS ulong LLBC_IniSection::GetValue(const LLBC_String &key, const LLBC_NS ulong &defaultValue) const
+{
+    return this->GetValue(key, LLBC_Variant(defaultValue));
+}
+
+template <>
 inline sint64 LLBC_IniSection::GetValue(const LLBC_String &key, const sint64 &defaultValue) const
 {
     return this->GetValue(key, LLBC_Variant(defaultValue));

@@ -60,7 +60,7 @@ csllbc_Service::~csllbc_Service()
 {
     Stop();
 
-    LLBC_Delete(_packetHandler);
+    LLBC_Recycle(_packetHandler);
     RemovePacketDecodeDelegates(_llbcSvc->GetId());
 
     LLBC_Delete(_llbcSvc);

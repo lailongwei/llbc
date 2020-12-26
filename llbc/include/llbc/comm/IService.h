@@ -25,6 +25,8 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
+#include "llbc/comm/SessionOpts.h"
+
 __LLBC_NS_BEGIN
 
 /**
@@ -179,12 +181,20 @@ public:
 public:
     /**
      * Create a session and listening.
+     * Note:
+     *      If service not start when call this method, connection operation will 
+     *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
+     *                           if use custom protocol factory, when Listen failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int Listen(const char *ip,
+                       uint16 port,
+                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Establisthes a connection to a specified address.
@@ -192,9 +202,15 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
-     * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
+     *                           if use custom protocol factory, when Connect failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
+     * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Connect(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int Connect(const char *ip,
+                        uint16 port,
+                        double timeout = -1.0,
+                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Asynchronous establishes a connection to a specified address.
@@ -202,11 +218,15 @@ public:
      * @param[in] port         - the port number.
      * @param[in] timeout      - the timeout value on connect operation, default use OS setting.
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
-     * @return int - return 0 if success, otherwise return -1.
-     *               Note: return 0 is not means the connection was established,
-     *                     it only means post async-conn request to poller success.
+     *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
+     * @param[in] sessionOpts  - the session options.
+     * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
-    virtual int AsyncConn(const char *ip, uint16 port, double timeout = -1, LLBC_IProtocolFactory *protoFactory = NULL) = 0;
+    virtual int AsyncConn(const char *ip,
+                          uint16 port,
+                          double timeout = -1.0,
+                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
      * Check given sessionId is validate or not.
@@ -350,40 +370,40 @@ public:
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
-     * @param[in] ctrlData          - the stack control data(user defined).
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlCmd   - the stack control command(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData);
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearFunc - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlType          - the stack control type(user defined).
+     * @param[in] ctrlCmd           - the stack control type(user defined).
      * @param[in] ctrlData          - the stack control data(user defined).
      * @param[in] ctrlDataClearMeth - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
+    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
     /**
      * Control session protocol stack.
      * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlType           - the stack control type(user defined).
+     * @param[in] ctrlCmd            - the stack control command(user defined).
      * @param[in] ctrlData           - the stack control data(user defined).
      * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlType, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
+    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
 
 public:
     /**
@@ -393,6 +413,8 @@ public:
     int RegisterFacade();
     virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
     virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
+    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade) = 0;
 
     /**
      * Get facade/facades.
@@ -400,11 +422,14 @@ public:
     template <typename FacadeCls>
     FacadeCls *GetFacade();
     template <typename FacadeCls>
-    std::vector<LLBC_IFacade *> GetFacades();
-    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
+    FacadeCls *GetFacade(const char *facadeName);
     template <typename FacadeCls>
     FacadeCls *GetFacade(const LLBC_String &facadeName);
-    virtual std::vector<LLBC_IFacade *> GetFacades(const LLBC_String &facadeName) = 0;
+    virtual LLBC_IFacade *GetFacade(const char *facadeName) = 0;
+    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
+    template <typename FacadeCls>
+    std::vector<LLBC_IFacade *> GetFacades();
+    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName) = 0;
 
 public:
     /**
@@ -443,13 +468,13 @@ public:
     int PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
-     * Unify previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified handler method, if method return false, will stop packet process flow.
      */
     int UnifyPreSubscribe(bool(*func)(LLBC_Packet &));
     template <typename ObjType>
@@ -509,9 +534,23 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev - the fill fire event pointer.
+     * @param[in] ev                 - the fill fire event pointer.
+     * @param[in] addiCtor           - the additional constructor.
+     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
+     * @param[in] customDtor         - the custom destructor.
+     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
      */
-    virtual void FireEvent(LLBC_Event *ev) = 0;
+    virtual void FireEvent(LLBC_Event *ev,
+                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
+                           bool addiCtorBorrowed = false,
+                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
+                           bool customDtorBorrowed = false) = 0;
+
+    /**
+     * Get event manager.
+     * @return LLBC_EventManager & - the event manager.
+     */
+    virtual LLBC_EventManager &GetEventManager() = 0;
 
 public:
     /**
@@ -546,6 +585,31 @@ public:
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
     virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const = 0;
+
+public:
+    /**
+     * Get service safety object pool.
+     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     */
+    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool() = 0;
+
+    /**
+     * Get service unsafety object pool.
+     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     */
+    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool() = 0;
+
+    /**
+     * Get service packet object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool() = 0;
+
+    /**
+     * Get message block object pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
 
 public:
     /**

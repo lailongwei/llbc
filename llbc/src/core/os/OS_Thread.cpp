@@ -373,6 +373,26 @@ LLBC_NativeThreadHandle LLBC_GetCurrentThread()
 #endif
 }
 
+LLBC_ThreadId LLBC_GetCurrentThreadId()
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    return ::GetCurrentThreadId();
+#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+    // The gettid() system call first appeared on Linux in kernel 2.4.11.
+    // Library support was added in glibc 2.30.
+    // Earlier glibc versions did not provide a wrapper for this system call, necessitating the use of syscall().
+    // For get more information, see: http://man7.org/linux/man-pages/man2/gettid.2.html
+    #if __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 30
+    return ::gettid();
+    #else
+    return syscall(SYS_gettid);
+    #endif
+#else // LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC (FreeBSD kernel)
+    // For get more information, see: https://www.freebsd.org/cgi/man.cgi?query=pthread_getthreadid_np&sektion=3&manpath=freebsd-release-ports
+    return pthread_mach_thread_np(pthread_self());
+#endif
+}
+
 int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle)
 {
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)

@@ -23,149 +23,159 @@
 
 __LLBC_NS_BEGIN
 
-inline size_t LLBC_Packet::GetLength() const
+LLBC_FORCE_INLINE size_t LLBC_Packet::GetLength() const
 {
     return _length;
 }
 
-inline void LLBC_Packet::SetLength(size_t length)
+LLBC_FORCE_INLINE void LLBC_Packet::SetLength(size_t length)
 {
     _length = length;
 }
 
-inline int LLBC_Packet::GetSenderServiceId() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetSenderServiceId() const
 {
     return _senderSvcId;
 }
 
-inline void LLBC_Packet::SetSenderServiceId(int senderServiceId)
+LLBC_FORCE_INLINE void LLBC_Packet::SetSenderServiceId(int senderServiceId)
 {
     _senderSvcId = senderServiceId;
 }
 
-inline int LLBC_Packet::GetRecverServiceId() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetRecverServiceId() const
 {
     return _recverSvcId;
 }
 
-inline void LLBC_Packet::SetRecverServiceId(int recverServiceId)
+LLBC_FORCE_INLINE void LLBC_Packet::SetRecverServiceId(int recverServiceId)
 {
     _recverSvcId = recverServiceId;
 }
 
-inline int LLBC_Packet::GetSessionId() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetSessionId() const
 {
     return _sessionId;
 }
 
-inline void LLBC_Packet::SetSessionId(int sessionId)
+LLBC_FORCE_INLINE int LLBC_Packet::GetAcceptSessionId() const
+{
+    return _acceptSessionId;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::SetAcceptSessionId(int sessionId)
+{
+    _acceptSessionId = sessionId;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::SetSessionId(int sessionId)
 {
     _sessionId = sessionId;
 }
 
-inline const LLBC_SockAddr_IN &LLBC_Packet::GetLocalAddr() const
+LLBC_FORCE_INLINE const LLBC_SockAddr_IN &LLBC_Packet::GetLocalAddr() const
 {
     return _localAddr;
 }
 
-inline void LLBC_Packet::SetLocalAddr(const LLBC_SockAddr_IN &addr)
+LLBC_FORCE_INLINE void LLBC_Packet::SetLocalAddr(const LLBC_SockAddr_IN &addr)
 {
     _localAddr = addr;
 }
 
-inline const LLBC_SockAddr_IN &LLBC_Packet::GetPeerAddr() const
+LLBC_FORCE_INLINE const LLBC_SockAddr_IN &LLBC_Packet::GetPeerAddr() const
 {
     return _peerAddr;
 }
 
-inline void LLBC_Packet::SetPeerAddr(const LLBC_SockAddr_IN &addr)
+LLBC_FORCE_INLINE void LLBC_Packet::SetPeerAddr(const LLBC_SockAddr_IN &addr)
 {
     _peerAddr = addr;
 }
 
-inline int LLBC_Packet::GetOpcode() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetOpcode() const
 {
     return _opcode;
 }
 
-inline void LLBC_Packet::SetOpcode(int opcode)
+LLBC_FORCE_INLINE void LLBC_Packet::SetOpcode(int opcode)
 {
     _opcode = opcode;
 }
 
-inline int LLBC_Packet::GetStatus() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetStatus() const
 {
     return _status;
 }
 
-inline void LLBC_Packet::SetStatus(int status)
+LLBC_FORCE_INLINE void LLBC_Packet::SetStatus(int status)
 {
     _status = status;
 }
 
-inline int LLBC_Packet::GetFlags() const
+LLBC_FORCE_INLINE int LLBC_Packet::GetFlags() const
 {
     return _flags;
 }
 
-inline void LLBC_Packet::SetFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::SetFlags(int flags)
 {
     _flags = flags;
 }
 
-inline bool LLBC_Packet::HasFlags(int flags) const
+LLBC_FORCE_INLINE bool LLBC_Packet::HasFlags(int flags) const
 {
     return (_flags & flags) == flags;
 }
 
-inline void LLBC_Packet::AddFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::AddFlags(int flags)
 {
     SetFlags(_flags | flags);
 }
 
-inline void LLBC_Packet::RemoveFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::RemoveFlags(int flags)
 {
     SetFlags(_flags & (~flags));
 }
 
-inline const sint64 &LLBC_Packet::GetExtData1() const
+LLBC_FORCE_INLINE const sint64 &LLBC_Packet::GetExtData1() const
 {
     return _extData1;
 }
 
-inline void LLBC_Packet::SetExtData1(const sint64 &extData1)
+LLBC_FORCE_INLINE void LLBC_Packet::SetExtData1(const sint64 &extData1)
 {
     _extData1 = extData1;
 }
 
-inline const sint64 &LLBC_Packet::GetExtData2() const
+LLBC_FORCE_INLINE const sint64 &LLBC_Packet::GetExtData2() const
 {
     return _extData2;
 }
 
-inline void LLBC_Packet::SetExtData2(const sint64 &extData2)
+LLBC_FORCE_INLINE void LLBC_Packet::SetExtData2(const sint64 &extData2)
 {
     _extData2 = extData2;
 }
 
-inline const sint64 &LLBC_Packet::GetExtData3() const
+LLBC_FORCE_INLINE const sint64 &LLBC_Packet::GetExtData3() const
 {
     return _extData3;
 }
 
-inline void LLBC_Packet::SetExtData3(const sint64 &extData3)
+LLBC_FORCE_INLINE void LLBC_Packet::SetExtData3(const sint64 &extData3)
 {
     _extData3 = extData3;
 }
 
-inline void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
+LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
 {
     SetSessionId(sessionId);
     SetOpcode(opcode);
     SetStatus(status);
 }
 
-inline void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int status)
+LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int status)
 {
     SetRecverServiceId(svcId);
 
@@ -174,7 +184,7 @@ inline void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int sta
     SetStatus(status);
 }
 
-inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int status)
+LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int status)
 {
     SetSessionId(packet._sessionId);
 
@@ -182,88 +192,144 @@ inline void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int st
     SetStatus(status);
 }
 
-inline bool LLBC_Packet::IsDontDeleteAfterHandle() const
+LLBC_FORCE_INLINE const void *LLBC_Packet::GetPayload() const
 {
-    return _dontDelAfterHandle;
+    if (!_payload)
+        return NULL;
+
+    return _payload->GetDataStartWithReadPos();
 }
 
-inline void LLBC_Packet::SetDontDeleteAfterHandle()
+LLBC_FORCE_INLINE size_t LLBC_Packet::GetPayloadLength() const
 {
-    _dontDelAfterHandle = true;
+    if (!_payload)
+        return 0;
+
+    return _payload->GetReadableSize();
+}
+
+LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
+{
+    if (!_payload && _msgBlockPoolInst)
+        _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+
+    return _payload;
+}
+
+LLBC_FORCE_INLINE LLBC_MessageBlock * LLBC_Packet::DetachPayload()
+{
+    LLBC_MessageBlock *payload = _payload;
+    _payload = NULL;
+
+    return payload;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::SetPayload(LLBC_MessageBlock *payload)
+{
+    if (UNLIKELY(payload == _payload))
+        return;
+
+    CleanupPayload();
+
+    _payload = payload;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
+{
+    if (_payload)
+    {
+        _payload->SetReadPos(0);
+        _payload->SetWritePos(0);
+    }
+}
+
+LLBC_FORCE_INLINE bool LLBC_Packet::IsPoolObject() const
+{
+    return _selfPoolInst != NULL;
+}
+
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
+{
+    return _selfPoolInst;
+}
+
+LLBC_FORCE_INLINE void LLBC_Packet::GiveBackToPool()
+{
+    _selfPoolInst->Release(this);
 }
 
 template<typename RetType>
-inline RetType *LLBC_Packet::GetPreHandleResult() const
+LLBC_FORCE_INLINE RetType *LLBC_Packet::GetPreHandleResult() const
 {
     return reinterpret_cast<RetType *>(_preHandleResult);
 }
 
-inline int LLBC_Packet::Read(bool &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(bool &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(sint8 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(sint8 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(uint8 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(uint8 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(sint16 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(sint16 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(uint16 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(uint16 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(sint32 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(sint32 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(uint32 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(uint32 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(long &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(long &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(ulong &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(ulong &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(sint64 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(sint64 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(uint64 &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(uint64 &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(float &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(float &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(double &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(double &val)
 {
     return ReadRawType<>(val);
 }
 
-inline int LLBC_Packet::Read(void *buf, size_t len)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(void *buf, size_t len)
 {
     if (!_payload)
     {
@@ -275,7 +341,7 @@ inline int LLBC_Packet::Read(void *buf, size_t len)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Read(std::vector<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(std::vector<_Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
@@ -298,7 +364,7 @@ inline int LLBC_Packet::Read(std::vector<_Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Read(std::list<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(std::list<_Ty> &val)
 {
     uint32 len = 0; 
     if (this->Read(len) != LLBC_OK)
@@ -321,7 +387,7 @@ inline int LLBC_Packet::Read(std::list<_Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Read(std::deque<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(std::deque<_Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
@@ -344,7 +410,7 @@ inline int LLBC_Packet::Read(std::deque<_Ty> &val)
 }
 
 template <typename _Kty>
-inline int LLBC_Packet::Read(std::set<_Kty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(std::set<_Kty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
@@ -367,7 +433,7 @@ inline int LLBC_Packet::Read(std::set<_Kty> &val)
 }
 
 template <typename _Kty, typename _Ty>
-inline int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
@@ -396,7 +462,7 @@ inline int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Read(_Ty &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Read(_Ty &val)
 {
     if (_payload == NULL)
     {
@@ -418,103 +484,91 @@ inline int LLBC_Packet::Read(_Ty &val)
     return LLBC_OK;
 }
 
-inline int LLBC_Packet::Write(bool val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(bool val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(sint8 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(sint8 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(uint8 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(uint8 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(sint16 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(sint16 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(uint16 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(uint16 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(sint32 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(sint32 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(uint32 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(uint32 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(long val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(long val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(ulong val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(ulong val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(sint64 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(sint64 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(uint64 val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(uint64 val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(float val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(float val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(double val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(double val)
 {
     return WriteRawType<>(val);
 }
 
-inline int LLBC_Packet::Write(const char *val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const char *val)
 {
     if (LIKELY(val))
-    {
-        while (*val != '\0')
-        {
-            Write(val, 1);
-            val += 1;
-        }
-    }
-
-    return Write("\0", 1);
+        return Write(val, LLBC_StrLenA(val) + 1);
+    else
+        return LLBC_OK;
 }
 
-inline int LLBC_Packet::Write(const void *buf, size_t len)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const void *buf, size_t len)
 {
-    if (!_payload)
-        _payload = LLBC_New1(LLBC_MessageBlock, len);
-
-    return _payload->Write(buf, len);
+    return CheckAndCreatePayload(len)->Write(buf, len);
 }
 
-inline int LLBC_Packet::Write(const LLBC_Stream &stream)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const LLBC_Stream &stream)
 {
-    if (!_payload)
-        _payload = LLBC_New1(LLBC_MessageBlock, stream.GetPos());
-
-    return _payload->Write(stream.GetBuf(), stream.GetPos());
+    return CheckAndCreatePayload(stream.GetPos())->Write(stream.GetBuf(), stream.GetPos());
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Write(const std::vector<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::vector<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
@@ -528,7 +582,7 @@ inline int LLBC_Packet::Write(const std::vector<_Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Write(const std::list<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::list<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
@@ -544,7 +598,7 @@ inline int LLBC_Packet::Write(const std::list<_Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Write(const std::deque<_Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::deque<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
@@ -558,7 +612,7 @@ inline int LLBC_Packet::Write(const std::deque<_Ty> &val)
 }
 
 template <typename _Kty>
-inline int LLBC_Packet::Write(const std::set<_Kty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::set<_Kty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
@@ -574,7 +628,7 @@ inline int LLBC_Packet::Write(const std::set<_Kty> &val)
 }
 
 template <typename _Kty, typename _Ty>
-inline int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
@@ -591,7 +645,7 @@ inline int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
 }
 
 template <typename _Ty>
-inline int LLBC_Packet::Write(const _Ty &obj)
+LLBC_FORCE_INLINE int LLBC_Packet::Write(const _Ty &obj)
 {
     LLBC_Stream s;
     s.Write(obj);
@@ -600,20 +654,20 @@ inline int LLBC_Packet::Write(const _Ty &obj)
 }
 
 template <typename _Ty>
-LLBC_Packet &LLBC_Packet::operator <<(const _Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator <<(const _Ty &val)
 {
     this->Write(val);
     return *this;
 }
 
 template <typename _Ty>
-LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
 {
     this->Read(val);
     return *this;
 }
 
-inline void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
+LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
     typedef LLBC_Func1<void, void *> __PreHandleResultFuncDeleg;
 
@@ -622,7 +676,7 @@ inline void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void 
 }
 
 template <typename ObjType>
-inline void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
+LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
     typedef LLBC_Delegate1<void, ObjType, void *> __PreHandleResultMethDeleg;
 
@@ -631,7 +685,7 @@ inline void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(Obj
 }
 
 template <typename _RawTy>
-inline int LLBC_Packet::ReadRawType(_RawTy &val)
+LLBC_FORCE_INLINE int LLBC_Packet::ReadRawType(_RawTy &val)
 {
     if (this->Read(&val, sizeof(val)) != LLBC_OK)
     {
@@ -647,16 +701,38 @@ inline int LLBC_Packet::ReadRawType(_RawTy &val)
 }
 
 template <typename _RawTy>
-inline int LLBC_Packet::WriteRawType(_RawTy val)
+LLBC_FORCE_INLINE int LLBC_Packet::WriteRawType(_RawTy val)
 {
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
     LLBC_Host2Net(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
-    if (!_payload)
-        _payload = LLBC_New1(LLBC_MessageBlock, sizeof(val));
+    return CheckAndCreatePayload(sizeof(val))->Write(&val, sizeof(val));
+}
 
-    return _payload->Write(&val, sizeof(val));
+LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t initSize)
+{
+    if (!_payload)
+    {
+        if (_msgBlockPoolInst)
+            _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+        else
+            _payload = LLBC_New1(LLBC_MessageBlock, initSize);
+    }
+
+    return _payload;
+}
+
+template <typename CoderType>
+LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetDecoder() const
+{
+    return static_cast<CoderType *>(_decoder);
+}
+
+template <typename CoderType>
+LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetEncoder() const
+{
+    return static_cast<CoderType *>(_encoder);
 }
 
 __LLBC_NS_END
