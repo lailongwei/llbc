@@ -12,6 +12,7 @@ echo    vs2012
 echo    vs2013
 echo    vs2015
 echo    vs2017
+echo    vs2019
 set /p choose=Please input:
 
 cd tools\premake && premake5_windows.exe %choose%
