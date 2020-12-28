@@ -1069,7 +1069,7 @@ public:
     // strip operation: strip left. 
     _This &lstrip(const _This &chars = _This())
     {
-        _This willStripChars = chars;
+        _This willStripChars;
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
@@ -1078,6 +1078,10 @@ public:
                 willStripChars.append(reinterpret_cast<const _Elem *>(L" \t\v\r\n\f"));
             else
                 return *this;
+        }
+        else
+        {
+            willStripChars = chars;
         }
 
         _This &thisRef = *this;
@@ -1116,7 +1120,7 @@ public:
     // strip operation: strip right.
     _This &rstrip(const _This &chars = _This())
     {
-        _This willStripChars = chars;
+        _This willStripChars;
         if (chars.empty())
         {
             if (sizeof(_Elem) == 1)
@@ -1125,6 +1129,10 @@ public:
                 willStripChars.append(reinterpret_cast<const _Elem *>(L" \t\v\r\n\f"));
             else
                 return *this;
+        }
+        else
+        {
+            willStripChars = chars;
         }
 
         _This &thisRef = *this;
