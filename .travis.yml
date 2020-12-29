@@ -24,7 +24,7 @@ script:
     - make core_lib -j4 # make c++ core library
     - make test -j4     # make c++ core library testsuite
     # wrap library about make instructions
-    - make cs_wrap -j4  # make csharp wrap library
+    # - make cs_wrap -j4  # make csharp wrap library
     - make lu_wrap      # make lua wrap library
 
 notifications:
