@@ -28,6 +28,8 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 | [龙腾简合--苏丹的复仇](http://www.ltjianhe.com/koh.html)|[龙腾简合--苏丹传奇](https://www.mop.com/shouyou/60290.html)|[龙腾简合--帝国时代](http://www.ltjianhe.com/boe.html)|[龙腾简合--永恒之战](http://www.ltjianhe.com/woe.html)|[龙腾简合--诸王黎明](http://www.ltjianhe.com/rok.html) |
 | ------------ | ------------ | ------------ | ------------ | ------------ |
 |![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__苏丹的复仇.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__苏丹传奇.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__帝国时代.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__永恒之战.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__诸王黎明.png)|
+| [龙腾简合--阿拉伯传奇]() | [Seasun--天域幻想]() | [37--天启之门]() | [游爱--剑仙传]() | [游爱--掌上飞仙]() |
+|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__阿拉伯传奇.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__天域幻想.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__天启之门.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__剑仙传.png)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__掌上飞仙.png)|
 
 ## 支持：
 
