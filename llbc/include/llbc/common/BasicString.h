@@ -1079,6 +1079,10 @@ public:
             else
                 return *this;
         }
+        else
+        {
+            willStripChars = chars;
+        }
 
         _This &thisRef = *this;
         size_type stripTo = 0;
@@ -1125,6 +1129,10 @@ public:
                 willStripChars.append(reinterpret_cast<const _Elem *>(L" \t\v\r\n\f"));
             else
                 return *this;
+        }
+        else
+        {
+            willStripChars = chars;
         }
 
         _This &thisRef = *this;
