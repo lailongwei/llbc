@@ -61,7 +61,12 @@ uint64 LLBC_GetTickCount()
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     // LINUX & ANDROID Impl.
     struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
+    if (UNLIKELY(clock_gettime(CLOCK_MONOTONIC, &ts) != 0))
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return 0;
+    }
+
     return (static_cast<uint64>(ts.tv_sec)) * 1000 + ts.tv_nsec / (1000 * 1000);
 #elif LLBC_TARGET_PLATFORM_MAC
     // Mac Impl.
