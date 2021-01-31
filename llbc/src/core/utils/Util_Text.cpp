@@ -127,7 +127,10 @@ void LLBC_SplitString(const LLBC_String &str,
         return;
 
     if (UNLIKELY(separator.empty()))
+    {
         destStrList.push_back(str);
+        return;
+    }
 
     LLBC_String::size_type curPos = 0;
     LLBC_String::size_type prevPos = 0;
