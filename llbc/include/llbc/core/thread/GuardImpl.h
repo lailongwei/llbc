@@ -108,7 +108,7 @@ inline LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
 {
     typedef LLBC_Func1<void, void *> __InvokeFuncDeleg;
 
-    _deleg = LLBC_New1(__InvokeFuncDeleg, func);
+    _deleg = LLBC_New(__InvokeFuncDeleg, func);
 }
 
 template <typename Object>
@@ -118,7 +118,7 @@ inline LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void
 {
     typedef LLBC_Delegate1<void, Object, void *> __InvokeMethDeleg;
 
-    _deleg = LLBC_New2(__InvokeMethDeleg, obj, meth);
+    _deleg = LLBC_New(__InvokeMethDeleg, obj, meth);
 }
 
 inline LLBC_InvokeGuard::~LLBC_InvokeGuard()

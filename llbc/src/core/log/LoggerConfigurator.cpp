@@ -60,7 +60,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
     }
 
     // Create root logger config info.
-    _rootConfig = LLBC_New0(LLBC_LoggerConfigInfo);
+    _rootConfig = LLBC_New(LLBC_LoggerConfigInfo);
     if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, *rootCfg, NULL) != LLBC_OK)
     {
         LLBC_XDelete(_rootConfig);
@@ -79,7 +79,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
         if (loggerName == LLBC_CFG_LOG_ROOT_LOGGER_NAME)
             continue;
 
-        LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
+        LLBC_LoggerConfigInfo *info = LLBC_New(LLBC_LoggerConfigInfo);
         if (info->Initialize(loggerName, *cfg.GetProperty(loggerName), _rootConfig) != LLBC_OK)
         {
             LLBC_Delete(info);
@@ -111,7 +111,7 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
     if (iter == _configs.end())
     {
         LLBC_Property cfg;
-        LLBC_LoggerConfigInfo *info = LLBC_New0(LLBC_LoggerConfigInfo);
+        LLBC_LoggerConfigInfo *info = LLBC_New(LLBC_LoggerConfigInfo);
         if (info->Initialize(name, cfg, _rootConfig) != LLBC_OK)
         {
             LLBC_Delete(info);

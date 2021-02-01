@@ -291,11 +291,11 @@ LLBC_MessageBlock *LLBC_MessageBlock::Clone() const
     LLBC_MessageBlock *clone;
     if (IsAttach())
     {
-        clone = LLBC_New2(LLBC_MessageBlock, _buf, _size);
+        clone = LLBC_New(LLBC_MessageBlock, _buf, _size);
     }
     else
     {
-        clone = LLBC_New1(LLBC_MessageBlock, _size);
+        clone = LLBC_New(LLBC_MessageBlock, _size);
         memcpy(clone->_buf, _buf, _size);
     }
 

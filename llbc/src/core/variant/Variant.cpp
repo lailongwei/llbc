@@ -133,7 +133,7 @@ LLBC_Variant::LLBC_Variant(const char *cstrVal)
     {
         size_t strLen = LLBC_StrLenA(cstrVal);
         if (strLen != 0)
-            _holder.obj.str = LLBC_New2(LLBC_String, cstrVal, strLen);
+            _holder.obj.str = LLBC_New(LLBC_String, cstrVal, strLen);
     }
 }
 
@@ -683,7 +683,7 @@ LLBC_Variant & LLBC_Variant::operator=(const char * const &val)
         if (_holder.obj.str)
             _holder.obj.str->assign(val, len);
         else
-            _holder.obj.str = LLBC_New2(LLBC_String, val, len);
+            _holder.obj.str = LLBC_New(LLBC_String, val, len);
     }
 
     return *this;
@@ -747,7 +747,7 @@ LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &val)
         if (_holder.obj.str)
             *_holder.obj.str = val;
         else
-            _holder.obj.str = LLBC_New1(LLBC_String, val);
+            _holder.obj.str = LLBC_New(LLBC_String, val);
     }
 
     return *this;
@@ -1018,7 +1018,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
     else if (IsStr())
     {
         if (!_holder.obj.str)
-            _holder.obj.str = LLBC_New0(LLBC_String);
+            _holder.obj.str = LLBC_New(LLBC_String);
 
         if (!stream.ReadEx(*_holder.obj.str))
         {
@@ -1039,7 +1039,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return false;
         }
 
-        _holder.obj.seq = LLBC_New0(Seq);
+        _holder.obj.seq = LLBC_New(Seq);
         if (count == 0)
             return true;
 
@@ -1067,7 +1067,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
             return false;
         }
 
-        _holder.obj.dict = LLBC_New0(Dict);
+        _holder.obj.dict = LLBC_New(Dict);
         if (count == 0)
             return true;
 

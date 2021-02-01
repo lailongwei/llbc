@@ -277,8 +277,8 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 1: frontNode & backNode never add to <_orderedDeleteNodes> container.
     if (!frontNode && !backNode)
     {
-        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
-        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+        frontNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        backNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
 
         _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
         _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
@@ -292,7 +292,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 2: frontNode found, backNode not found.
     else if (frontNode && !backNode)
     {
-        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+        backNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
         _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
 
         frontNode->AddBackNode(backNode);
@@ -303,7 +303,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 3: frontNode not found, backNode found.
     else if (!frontNode && backNode)
     {
-        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        frontNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
         _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
 
         // backNode is top node.

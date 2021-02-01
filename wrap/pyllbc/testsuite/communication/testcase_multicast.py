@@ -28,7 +28,7 @@ class _TestMsg(object):
         return self._val
 
 
-class _TestFacade(object):
+class _TestComp(object):
     def __init__(self, asClient, useBst):
         self._asClient = asClient
         self._useBst = useBst
@@ -86,7 +86,7 @@ class MulticastTest(TestCase):
         self._svc = Service('multicast_test_svc')
 
         svc = self._svc
-        svc.registerfacade(_TestFacade(self._as_client, self._use_bst))
+        svc.registercomp(_TestComp(self._as_client, self._use_bst))
 
         if self._as_client:
             self._start_as_client()

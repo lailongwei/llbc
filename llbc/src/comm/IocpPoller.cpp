@@ -121,7 +121,7 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
             break;
         }
 
-        LLBC_Socket *socket = LLBC_New1(LLBC_Socket, handle);
+        LLBC_Socket *socket = LLBC_New(LLBC_Socket, handle);
 
         socket->SetNonBlocking();
         socket->SetPollerType(LLBC_PollerType::IocpPoller);
@@ -211,7 +211,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     LLBC_Session *session = it->second;
     if (waitRet == LLBC_FAILED)
     {
-        session->OnClose(ol, LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
+        session->OnClose(ol, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
     }
     else
     {
@@ -253,8 +253,8 @@ int LLBC_IocpPoller::StartupMonitor()
     typedef LLBC_Delegate0<void, LLBC_IocpPoller> __MonitorDeleg;
 
     LLBC_IDelegate0<void> *deleg = 
-        LLBC_New2(__MonitorDeleg, this, &LLBC_IocpPoller::MonitorSvc);
-    _monitor = LLBC_New1(LLBC_PollerMonitor, deleg);
+        LLBC_New(__MonitorDeleg, this, &LLBC_IocpPoller::MonitorSvc);
+    _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
@@ -330,7 +330,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
 {
     // Create accepted socket and set some options.
     LLBC_Socket *sock = session->GetSocket();
-    LLBC_Socket *newSock = LLBC_New1(LLBC_Socket, ol->acceptSock);
+    LLBC_Socket *newSock = LLBC_New(LLBC_Socket, ol->acceptSock);
     newSock->SetNonBlocking();
     newSock->SetOption(SOL_SOCKET,
                        SO_UPDATE_ACCEPT_CONTEXT,

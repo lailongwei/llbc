@@ -21,11 +21,11 @@
 
 #include "pyllbc/common/Export.h"
 
-#include "pyllbc/comm/PyFacadeEvBuilder.h"
+#include "pyllbc/comm/PyComponentEvBuilder.h"
 
 namespace
 {
-    typedef pyllbc_FacadeEvBuilder This;
+    typedef pyllbc_ComponentEvBuilder This;
 }
 
 PyObject *This::_evCls = NULL;
@@ -51,32 +51,32 @@ PyObject *This::_attrDestroyedFromSvc = PyString_FromString("_destroyed_from_ser
 PyObject *This::_attrErrNo = PyString_FromString("_errno");
 PyObject *This::_attrSubErrNo = PyString_FromString("_sub_errno");
 
-PyObject *pyllbc_FacadeEvBuilder::BuildInitializeEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::BuildInitializeEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildDestroyEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::BuildDestroyEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildStartEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::BuildStartEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildStopEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::BuildStopEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildUpdateEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::BuildUpdateEv(PyObject *svc)
 {
     return This::CreateEv(svc);
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildIdleEv(PyObject *svc, int idleTime)
+PyObject *pyllbc_ComponentEvBuilder::BuildIdleEv(PyObject *svc, int idleTime)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrIdleTime, idleTime / 1000.0);
@@ -84,7 +84,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildIdleEv(PyObject *svc, int idleTime)
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildSessionCreateEv(PyObject *svc, const LLBC_SessionInfo &si)
+PyObject *pyllbc_ComponentEvBuilder::BuildSessionCreateEv(PyObject *svc, const LLBC_SessionInfo &si)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrSocket, static_cast<int>(si.GetSocket()));
@@ -101,7 +101,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionCreateEv(PyObject *svc, const LLBC
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLBC_SessionDestroyInfo &destroyInfo)
+PyObject *pyllbc_ComponentEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLBC_SessionDestroyInfo &destroyInfo)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrReason, destroyInfo.GetReason());
@@ -124,7 +124,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildSessionDestroyEv(PyObject *svc, const LLB
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildAsyncConnResultEv(PyObject *svc, const LLBC_AsyncConnResult &result)
+PyObject *pyllbc_ComponentEvBuilder::BuildAsyncConnResultEv(PyObject *svc, const LLBC_AsyncConnResult &result)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrSessionId, result.GetSessionId());
@@ -136,7 +136,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildAsyncConnResultEv(PyObject *svc, const LL
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildProtoReportEv(PyObject *svc, const LLBC_ProtoReport &report)
+PyObject *pyllbc_ComponentEvBuilder::BuildProtoReportEv(PyObject *svc, const LLBC_ProtoReport &report)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrReportLayer, report.GetLayer());
@@ -147,7 +147,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildProtoReportEv(PyObject *svc, const LLBC_P
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(PyObject *svc, const LLBC_Packet &llbcPacket, PyObject *packet)
+PyObject *pyllbc_ComponentEvBuilder::BuildUnHandledPacketEv(PyObject *svc, const LLBC_Packet &llbcPacket, PyObject *packet)
 {
     PyObject *ev = This::CreateEv(svc);
     This::SetAttr(ev, This::_attrSessionId, llbcPacket.GetSessionId());
@@ -157,7 +157,7 @@ PyObject *pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(PyObject *svc, const LL
     return ev;
 }
 
-PyObject *pyllbc_FacadeEvBuilder::CreateEv(PyObject *svc)
+PyObject *pyllbc_ComponentEvBuilder::CreateEv(PyObject *svc)
 {
     if (UNLIKELY(!This::_evCls))
         This::_evCls = pyllbc_s_TopModule->GetObject("ServiceEvent");
@@ -165,13 +165,13 @@ PyObject *pyllbc_FacadeEvBuilder::CreateEv(PyObject *svc)
     return PyObject_CallFunctionObjArgs(This::_evCls, svc, NULL);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, bool val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, bool val)
 {
     PyObject *pyVal = val ? Py_True : Py_False;
     PyObject_SetAttr(ev, attr, pyVal);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, int val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, int val)
 {
     PyObject *pyVal =PyInt_FromLong(val);
     PyObject_SetAttr(ev, attr, pyVal);
@@ -179,7 +179,7 @@ void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, int val)
     Py_DECREF(pyVal);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, sint64 val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, sint64 val)
 {
     PyObject *pyVal = PyLong_FromLongLong(val);
     PyObject_SetAttr(ev, attr, pyVal);
@@ -187,7 +187,7 @@ void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, sint64 val)
     Py_DECREF(pyVal);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, double val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, double val)
 {
     PyObject *pyVal = PyFloat_FromDouble(val);
     PyObject_SetAttr(ev, attr, pyVal);
@@ -195,7 +195,7 @@ void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, double val)
     Py_DECREF(pyVal);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, const LLBC_String &val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, const LLBC_String &val)
 {
     PyObject *pyVal = PyString_FromStringAndSize(val.data(), val.size());
     PyObject_SetAttr(ev, attr, pyVal);
@@ -203,7 +203,7 @@ void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, const LLBC_St
     Py_DECREF(pyVal);
 }
 
-void pyllbc_FacadeEvBuilder::SetAttr(PyObject *ev, PyObject *attr, PyObject *val)
+void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, PyObject *val)
 {
     PyObject_SetAttr(ev, attr, val);
 }

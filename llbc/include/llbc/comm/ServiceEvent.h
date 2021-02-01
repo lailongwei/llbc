@@ -25,7 +25,7 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
-#include "llbc/comm/IFacade.h"
+#include "llbc/comm/IComponent.h"
 
 __LLBC_NS_BEGIN
 

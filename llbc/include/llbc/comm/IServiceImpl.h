@@ -26,24 +26,24 @@
 
 __LLBC_NS_BEGIN
 
-template <typename FacadeFactoryCls>
-inline int LLBC_IService::RegisterFacade()
+template <typename ComponentFactoryCls>
+inline int LLBC_IService::RegisterComponent()
 {
-    FacadeFactoryCls *facadeFactory = LLBC_New(FacadeFactoryCls);
-    int ret = RegisterFacade(facadeFactory);
+    ComponentFactoryCls *compFactory = LLBC_New(ComponentFactoryCls);
+    int ret = RegisterComponent(compFactory);
     if (ret != LLBC_OK)
     {
-        LLBC_Delete(facadeFactory);
+        LLBC_Delete(compFactory);
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
 }
 
-inline int LLBC_IService::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName)
+inline int LLBC_IService::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName)
 {
-    LLBC_IFacade *facade;
-    return RegisterFacade(libPath, facadeName, facade);
+    LLBC_IComponent *comp;
+    return RegisterComponent(libPath, compName, comp);
 }
 
 template <typename CoderFactoryCls>
@@ -60,29 +60,29 @@ inline int LLBC_IService::RegisterCoder(int opcode)
     return LLBC_OK;
 }
 
-template <typename FacadeCls>
-inline FacadeCls *LLBC_IService::GetFacade()
+template <typename ComponentCls>
+inline ComponentCls *LLBC_IService::GetComponent()
 {
-    return static_cast<FacadeCls *>(GetFacade(LLBC_GetTypeName(FacadeCls)));
+    return static_cast<ComponentCls *>(GetComponent(LLBC_GetTypeName(ComponentCls)));
 }
 
-template <typename FacadeCls>
-inline FacadeCls *LLBC_IService::GetFacade(const char *facadeName)
+template <typename ComponentCls>
+inline ComponentCls *LLBC_IService::GetComponent(const char *compName)
 {
-    return static_cast<FacadeCls *>(GetFacade(facadeName));
+    return static_cast<ComponentCls *>(GetComponent(compName));
 }
 
-template <typename FacadeCls>
-inline FacadeCls *LLBC_IService::GetFacade(const LLBC_String &facadeName)
+template <typename ComponentCls>
+inline ComponentCls *LLBC_IService::GetComponent(const LLBC_String &compName)
 {
-    return static_cast<FacadeCls *>(GetFacade(facadeName));
+    return static_cast<ComponentCls *>(GetComponent(compName));
 }
 
-template <typename FacadeCls>
-inline std::vector<LLBC_IFacade *> LLBC_IService::GetFacades()
+template <typename ComponentCls>
+inline std::vector<LLBC_IComponent *> LLBC_IService::GetComponents()
 {
-    const LLBC_String facadeName = LLBC_GetTypeName(FacadeCls);
-    return GetFacades(facadeName);
+    const LLBC_String compName = LLBC_GetTypeName(ComponentCls);
+    return GetComponents(compName);
 }
 
 inline int LLBC_IService::Send(int sessionId)
@@ -286,7 +286,7 @@ inline int LLBC_IService::Subscribe(int opcode, void(*func)(LLBC_Packet &))
 {
     typedef LLBC_Func1<void, LLBC_Packet &> __EvFuncDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New1(__EvFuncDeleg, func);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New(__EvFuncDeleg, func);
     if (Subscribe(opcode, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -301,7 +301,7 @@ inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*me
 {
     typedef LLBC_Delegate1<void, ObjType, LLBC_Packet &> __EvMethDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New2(__EvMethDeleg, obj, method);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New(__EvMethDeleg, obj, method);
     if (Subscribe(opcode, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -315,7 +315,7 @@ inline int LLBC_IService::PreSubscribe(int opcode, bool (*func)(LLBC_Packet &))
 {
     typedef LLBC_Func1<bool, LLBC_Packet &> __PreSubFuncDeleg;
 
-    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New1(__PreSubFuncDeleg, func);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New(__PreSubFuncDeleg, func);
     if (PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -330,7 +330,7 @@ inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::
 {
     typedef LLBC_Delegate1<bool, ObjType, LLBC_Packet &> __PreSubMethDeleg;
 
-    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New2(__PreSubMethDeleg, obj, method);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New(__PreSubMethDeleg, obj, method);
     if (PreSubscribe(opcode, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -345,7 +345,7 @@ inline int LLBC_IService::UnifyPreSubscribe(bool(*func)(LLBC_Packet &))
 {
     typedef LLBC_Func1<bool, LLBC_Packet &> __UnifyPreSubFuncDeleg;
 
-    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New1(__UnifyPreSubFuncDeleg, func);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New(__UnifyPreSubFuncDeleg, func);
     if (UnifyPreSubscribe(deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -360,7 +360,7 @@ inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method
 {
     typedef LLBC_Delegate1<bool, ObjType, LLBC_Packet &> __UnifyPreSubMethDeleg;
 
-    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New2(__UnifyPreSubMethDeleg, obj, method);
+    LLBC_IDelegate1<bool, LLBC_Packet &> *deleg = LLBC_New(__UnifyPreSubMethDeleg, obj, method);
     if (UnifyPreSubscribe(deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -376,7 +376,7 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, void(*func)(LL
 {
     typedef LLBC_Func1<void, LLBC_Packet &> __SubStFuncDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New1(__SubStFuncDeleg, func);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New(__SubStFuncDeleg, func);
     if (SubscribeStatus(opcode, status, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -391,7 +391,7 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, 
 {
     typedef LLBC_Delegate1<void, ObjType, LLBC_Packet &> __SubStMethDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New2(__SubStMethDeleg, obj, method);
+    LLBC_IDelegate1<void, LLBC_Packet &> *deleg = LLBC_New(__SubStMethDeleg, obj, method);
     if (SubscribeStatus(opcode, status, deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -406,7 +406,7 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, void(*func)(LL
 {
     typedef LLBC_Func1<void, LLBC_Event *> __SubEvFuncDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New1(__SubEvFuncDeleg, func);
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New(__SubEvFuncDeleg, func);
     return SubscribeEvent(event, deleg);
 }
 
@@ -415,7 +415,7 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
 {
     typedef LLBC_Delegate1<void, ObjType, LLBC_Event *> __SubEvMethDeleg;
 
-    LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New2(__SubEvMethDeleg, obj, method);
+    LLBC_IDelegate1<void, LLBC_Event *> *deleg = LLBC_New(__SubEvMethDeleg, obj, method);
     return SubscribeEvent(event, deleg);
 }
 
@@ -423,7 +423,7 @@ inline int LLBC_IService::Post(void(*func)(This *, const LLBC_Variant *), LLBC_V
 {
     typedef LLBC_Func2<void, This *, const LLBC_Variant *> __PostFuncDeleg;
 
-    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New1(__PostFuncDeleg, func);
+    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New(__PostFuncDeleg, func);
     if (Post(deleg) != LLBC_OK)
     {
         LLBC_Delete(deleg);
@@ -438,7 +438,7 @@ inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(This *, con
 {
     typedef LLBC_Delegate2<void, ObjType, This *, const LLBC_Variant *> __PostMethDeleg;
 
-    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New2(__PostMethDeleg, obj, method);
+    LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg = LLBC_New(__PostMethDeleg, obj, method);
     if (Post(deleg, data) != LLBC_OK)
     {
         LLBC_Delete(deleg);

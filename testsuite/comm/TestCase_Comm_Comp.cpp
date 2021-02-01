@@ -20,19 +20,19 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Facade.h"
+#include "comm/TestCase_Comm_Comp.h"
 
 namespace
 {
-    class TestFacade : public LLBC_IFacade
+    class TestComp : public LLBC_IComponent
     {
     public:
-        TestFacade()
+        TestComp()
         {
             _timer = NULL;
         }
 
-        virtual ~TestFacade()
+        virtual ~TestComp()
         {
         }
 
@@ -50,11 +50,11 @@ namespace
 
         virtual bool OnStart()
         {
-            typedef LLBC_Delegate1<void, TestFacade, LLBC_Timer *> __Deleg;
+            typedef LLBC_Delegate1<void, TestComp, LLBC_Timer *> __Deleg;
             LLBC_PrintLine("Service start");
-            _timer = LLBC_New2(LLBC_Timer,
-                               LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
-                               LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
+            _timer = LLBC_New(LLBC_Timer,
+                              LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
+                              LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
             _timer->Schedule(2000, 2000);
 
             return true;
@@ -93,27 +93,27 @@ namespace
         LLBC_Timer *_timer;
     };
 
-    class TestFacadeFactory : public LLBC_IFacadeFactory
+    class TestCompFactory : public LLBC_IComponentFactory
     {
     public:
-        virtual LLBC_IFacade *Create() const
+        virtual LLBC_IComponent *Create() const
         {
-            return LLBC_New(TestFacade);
+            return LLBC_New(TestComp);
         }
     };
 }
 
-TestCase_Comm_Facade::TestCase_Comm_Facade()
+TestCase_Comm_Comp::TestCase_Comm_Comp()
 {
 }
 
-TestCase_Comm_Facade::~TestCase_Comm_Facade()
+TestCase_Comm_Comp::~TestCase_Comm_Comp()
 {
 }
 
-int TestCase_Comm_Facade::Run(int argc, char *argv[])
+int TestCase_Comm_Comp::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Facade test:");
+    LLBC_PrintLine("Comp test:");
 
     // Parse arguments.
     if (argc < 4)
@@ -130,28 +130,28 @@ int TestCase_Comm_Facade::Run(int argc, char *argv[])
         return TestInExternalDriveService(argv[2], port);
 }
 
-int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, int port)
+int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int port)
 {
-    LLBC_PrintLine("Facade test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
+    LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
     svc->SetFPS(1);
-    svc->RegisterFacade<TestFacadeFactory>();
+    svc->RegisterComponent<TestCompFactory>();
 
-    // Try init library facade(not exist)
-    const LLBC_String notExistFacadeName = "Not exist facade name";
-    const LLBC_String notExistFacadeLibPath = "!!!!!!!!Not exist library!!!!!!!!";
-    LLBC_PrintLine("Test try register not exist third-party facade, libPath:%s, facadeName:%s",
-                   notExistFacadeLibPath.c_str(), notExistFacadeName.c_str());
-    int ret = svc->RegisterFacade(notExistFacadeLibPath, notExistFacadeName);
+    // Try init library comp(not exist)
+    const LLBC_String notExistCompName = "Not exist comp name";
+    const LLBC_String notExistCompLibPath = "!!!!!!!!Not exist library!!!!!!!!";
+    LLBC_PrintLine("Test try register not exist third-party comp, libPath:%s, compName:%s",
+                   notExistCompLibPath.c_str(), notExistCompName.c_str());
+    int ret = svc->RegisterComponent(notExistCompLibPath, notExistCompName);
     if (ret != LLBC_OK)
     {
-        LLBC_PrintLine("Register not exist third-party facade failed, error:%s", LLBC_FormatLastError());
+        LLBC_PrintLine("Register not exist third-party comp failed, error:%s", LLBC_FormatLastError());
     }
     else
     {
-        LLBC_PrintLine("Register not exist third-party facade success, internal error!!!");
+        LLBC_PrintLine("Register not exist third-party comp success, internal error!!!");
         getchar();
         LLBC_Delete(svc);
 
@@ -193,14 +193,14 @@ int TestCase_Comm_Facade::TestInInternalDriveService(const LLBC_String &host, in
     return LLBC_OK;
 }
 
-int TestCase_Comm_Facade::TestInExternalDriveService(const LLBC_String &host, int port)
+int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int port)
 {
-    LLBC_PrintLine("Facade test(In external-drive service), host: %s, port: %d", host.c_str(), port);
+    LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "FacadeTest");
+    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
     svc->SetFPS(1);
-    svc->RegisterFacade<TestFacadeFactory>();
+    svc->RegisterComponent<TestCompFactory>();
     svc->SetDriveMode(LLBC_IService::ExternalDrive);
 
     LLBC_PrintLine("Start service...");

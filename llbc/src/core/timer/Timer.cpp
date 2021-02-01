@@ -94,7 +94,7 @@ void LLBC_Timer::SetTimeoutHandler(void (*timeoutFunc)(LLBC_Timer *))
 
     LLBC_XDelete(_timeoutDeleg);
     if (timeoutFunc != NULL)
-        _timeoutDeleg = LLBC_New1(__TimeoutFuncDeleg, timeoutFunc);
+        _timeoutDeleg = LLBC_New(__TimeoutFuncDeleg, timeoutFunc);
 }
 
 void LLBC_Timer::SetTimeoutHandler(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg)
@@ -112,7 +112,7 @@ void LLBC_Timer::SetCancelHandler(void (*cancelFunc)(LLBC_Timer *))
 
     LLBC_XDelete(_cancelDeleg);
     if (cancelFunc != NULL)
-        _cancelDeleg = LLBC_New1(__CancelFuncDeleg, cancelFunc);
+        _cancelDeleg = LLBC_New(__CancelFuncDeleg, cancelFunc);
 }
 
 void LLBC_Timer::SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg)

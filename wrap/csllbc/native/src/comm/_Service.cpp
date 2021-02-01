@@ -22,7 +22,7 @@
 #include "csllbc/common/Export.h"
 
 #include "csllbc/comm/csCoder.h"
-#include "csllbc/comm/csFacade.h"
+#include "csllbc/comm/csComponent.h"
 #include "csllbc/comm/csService.h"
 
 #include "csllbc/comm/_Service.h"
@@ -46,16 +46,16 @@ csllbc_Service *csllbc_Service_Create(int svcType,
         return NULL;
     }
 
-    return LLBC_New9(csllbc_Service,
-                     static_cast<csllbc_Service::Type>(svcType),
-                     svcName,
-                     fullStack != 0,
-                     encodeDeleg,
-                     decodeDeleg,
-                     handlerDeleg,
-                     preHandlerDeleg,
-                     unifyPreHandlerDeleg,
-                     notFoundDecoderDeleg);
+    return LLBC_New(csllbc_Service,
+                    static_cast<csllbc_Service::Type>(svcType),
+                    svcName,
+                    fullStack != 0,
+                    encodeDeleg,
+                    decodeDeleg,
+                    handlerDeleg,
+                    preHandlerDeleg,
+                    unifyPreHandlerDeleg,
+                    notFoundDecoderDeleg);
 }
 
 void csllbc_Service_Delete(csllbc_Service *svc)
@@ -212,28 +212,28 @@ int csllbc_Service_Broadcast(csllbc_Service *svc,
     return svc->Broadcast(opcode, data, static_cast<size_t>(dataLen), status);
 }
 
-int csllbc_Service_RegisterFacade(csllbc_Service *svc,
-                                  csllbc_Delegates::Deleg_Facade_OnInit initDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnDestroy destroyDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnStart startDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnStop stopDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnUpdate updateDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnIdle idleDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnSessionCreate sessionCreateDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnSessionDestroy sessionDestroyDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnAsyncConnResult asyncConnResultDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnProtoReport protoReportDeleg,
-                                  csllbc_Delegates::Deleg_Facade_OnUnHandledPacket unHandledPacketDeleg)
+int csllbc_Service_RegisterComponent(csllbc_Service *svc,
+                                     csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                     csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
 {
-    csllbc_Facade *facade = new csllbc_Facade(initDeleg, destroyDeleg,
-                                              startDeleg, stopDeleg,
-                                              updateDeleg, idleDeleg,
-                                              sessionCreateDeleg, sessionDestroyDeleg, asyncConnResultDeleg,
-                                              protoReportDeleg, unHandledPacketDeleg);
+    csllbc_Component *comp = new csllbc_Component(initDeleg, destroyDeleg,
+                                                  startDeleg, stopDeleg,
+                                                  updateDeleg, idleDeleg,
+                                                  sessionCreateDeleg, sessionDestroyDeleg, asyncConnResultDeleg,
+                                                  protoReportDeleg, unHandledPacketDeleg);
 
-    if (svc->RegisterFacade(facade) != LLBC_OK)
+    if (svc->RegisterComponent(comp) != LLBC_OK)
     {
-        LLBC_Delete(facade);
+        LLBC_Delete(comp);
         return LLBC_FAILED;
     }
 

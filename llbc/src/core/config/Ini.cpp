@@ -192,7 +192,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
     LLBC_Strings *sortedSections = NULL;
     if (sortSections)
     {
-        sortedSections = LLBC_New1(LLBC_Strings, _sectionNames);
+        sortedSections = LLBC_New(LLBC_Strings, _sectionNames);
         std::sort(sortedSections->begin(), sortedSections->end());
     }
 
@@ -310,7 +310,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
         _sectionNames.push_back(sectionName);
     }
 
-    _sections.insert(std::make_pair(sectionName, LLBC_New1(LLBC_IniSection, section)));
+    _sections.insert(std::make_pair(sectionName, LLBC_New(LLBC_IniSection, section)));
     return LLBC_OK;
 }
 
@@ -577,7 +577,7 @@ void LLBC_Ini::Copy(const This &another)
     for (LLBC_IniSections::const_iterator it = another._sections.begin();
          it != another._sections.end();
          ++it)
-        _sections.insert(std::make_pair(it->first, LLBC_New1(LLBC_IniSection, *it->second)));
+        _sections.insert(std::make_pair(it->first, LLBC_New(LLBC_IniSection, *it->second)));
 }
 
 void LLBC_Ini::Err_UnSpecificSection(size_t lineNum, size_t columnNum)

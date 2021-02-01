@@ -34,11 +34,11 @@ __LLBC_NS_BEGIN
  */
 class LLBC_ICoder;
 class LLBC_Packet;
-class LLBC_IFacade;
+class LLBC_IComponent;
 class LLBC_Session;
 class LLBC_PollerMgr;
 class LLBC_ICoderFactory;
-class LLBC_IFacadeFactory;
+class LLBC_IComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 
@@ -407,29 +407,29 @@ public:
 
 public:
     /**
-     * Register facade.
+     * Register component.
      */
-    template <typename FacadeFactoryCls>
-    int RegisterFacade();
-    virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
-    virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade) = 0;
+    template <typename ComponentFactoryCls>
+    int RegisterComponent();
+    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory) = 0;
+    virtual int RegisterComponent(LLBC_IComponent *comp) = 0;
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp) = 0;
 
     /**
-     * Get facade/facades.
+     * Get component/components.
      */
-    template <typename FacadeCls>
-    FacadeCls *GetFacade();
-    template <typename FacadeCls>
-    FacadeCls *GetFacade(const char *facadeName);
-    template <typename FacadeCls>
-    FacadeCls *GetFacade(const LLBC_String &facadeName);
-    virtual LLBC_IFacade *GetFacade(const char *facadeName) = 0;
-    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
-    template <typename FacadeCls>
-    std::vector<LLBC_IFacade *> GetFacades();
-    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName) = 0;
+    template <typename ComponentCls>
+    ComponentCls *GetComponent();
+    template <typename ComponentCls>
+    ComponentCls *GetComponent(const char *compName);
+    template <typename ComponentCls>
+    ComponentCls *GetComponent(const LLBC_String &compName);
+    virtual LLBC_IComponent *GetComponent(const char *compName) = 0;
+    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName) = 0;
+    template <typename ComponentCls>
+    std::vector<LLBC_IComponent *> GetComponents();
+    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName) = 0;
 
 public:
     /**

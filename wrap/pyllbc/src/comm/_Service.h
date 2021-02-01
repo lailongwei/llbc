@@ -38,7 +38,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    pyllbc_Service *svc = LLBC_New3(pyllbc_Service, svcType, svcName, pySvc);
+    pyllbc_Service *svc = LLBC_New(pyllbc_Service, svcType, svcName, pySvc);
 
     return Py_BuildValue("l", svc);
 }
@@ -167,32 +167,32 @@ LLBC_EXTERN_C PyObject *_pyllbc_StopService(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RegisterFacade(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_RegisterComponent(PyObject *self, PyObject *args)
 {
-    PyObject *facade;
+    PyObject *comp;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "lO", &svc, &facade))
+    if (!PyArg_ParseTuple(args, "lO", &svc, &comp))
         return NULL;
 
-    if (svc->RegisterFacade(facade) != LLBC_OK)
+    if (svc->RegisterComponent(comp) != LLBC_OK)
         return NULL;
 
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibFacade(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibComponent(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    const char *facadeName, *libPath;
-    PyObject *facadeCls = NULL;
-    if (!PyArg_ParseTuple(args, "lss|O", &svc, &facadeName, &libPath, &facadeCls))
+    const char *compName, *libPath;
+    PyObject *compCls = NULL;
+    if (!PyArg_ParseTuple(args, "lss|O", &svc, &compName, &libPath, &compCls))
         return NULL;
 
-    PyObject *facade;
-    if (svc->RegisterFacade(facadeName, libPath, facadeCls, facade) != LLBC_OK)
+    PyObject *comp;
+    if (svc->RegisterComponent(compName, libPath, compCls, comp) != LLBC_OK)
         return NULL;
 
-    return facade;
+    return comp;
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_RegisterCodec(PyObject *self, PyObject *args)
@@ -525,12 +525,12 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_CallFacadeMethod(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_CallComponentMethod(PyObject *self, PyObject *args)
 {
-    LLBC_IFacade *facade;
+    LLBC_IComponent *comp;
     const char *meth;
     PyObject *arg;
-    if (!PyArg_ParseTuple(args, "lsO", &facade, &meth, &arg))
+    if (!PyArg_ParseTuple(args, "lsO", &comp, &meth, &arg))
         return NULL;
 
     LLBC_Variant nativeArg;
@@ -539,9 +539,9 @@ LLBC_EXTERN_C PyObject *_pyllbc_CallFacadeMethod(PyObject *self, PyObject *args)
 
     int callMethRet;
     LLBC_Variant nativeRet;
-    if ((callMethRet = facade->CallMethod(meth, nativeArg, nativeRet)) != LLBC_OK)
+    if ((callMethRet = comp->CallMethod(meth, nativeArg, nativeRet)) != LLBC_OK)
     {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When call native facade method");
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When call native comp method");
         return NULL;
     }
 

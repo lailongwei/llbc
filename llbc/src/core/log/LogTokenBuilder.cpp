@@ -52,44 +52,44 @@ LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
     switch(type)
     {
     case LLBC_LogTokenType::StrToken:
-        return LLBC_New0(LLBC_LogStrToken);
+        return LLBC_New(LLBC_LogStrToken);
 
     case LLBC_LogTokenType::NameToken:
-        return LLBC_New0(LLBC_LogNameToken);
+        return LLBC_New(LLBC_LogNameToken);
 
     case LLBC_LogTokenType::TagToken:
-        return LLBC_New0(LLBC_LogTagToken);
+        return LLBC_New(LLBC_LogTagToken);
 
     case LLBC_LogTokenType::FileToken:
-        return LLBC_New0(LLBC_LogFileToken);
+        return LLBC_New(LLBC_LogFileToken);
 
     case LLBC_LogTokenType::LineToken:
-        return LLBC_New0(LLBC_LogLineToken);
+        return LLBC_New(LLBC_LogLineToken);
 
     case LLBC_LogTokenType::ThreadIdToken:
-        return LLBC_New0(LLBC_LogThreadIdToken);
+        return LLBC_New(LLBC_LogThreadIdToken);
         break;
 
     case LLBC_LogTokenType::ProcessIdToken:
-        return LLBC_New0(LLBC_LogProcessIdToken);
+        return LLBC_New(LLBC_LogProcessIdToken);
 
     case LLBC_LogTokenType::LevelToken:
-        return LLBC_New0(LLBC_LogLevelToken);
+        return LLBC_New(LLBC_LogLevelToken);
 
     case LLBC_LogTokenType::NewLineToken:
-        return LLBC_New0(LLBC_LogNewLineToken);
+        return LLBC_New(LLBC_LogNewLineToken);
 
     case LLBC_LogTokenType::MsgToken:
-        return LLBC_New0(LLBC_LogMsgToken);
+        return LLBC_New(LLBC_LogMsgToken);
 
     case LLBC_LogTokenType::TimeToken:
-        return LLBC_New0(LLBC_LogTimeToken);
+        return LLBC_New(LLBC_LogTimeToken);
 
     case LLBC_LogTokenType::EscapeToken:
-        return LLBC_New0(LLBC_LogEscapeToken);
+        return LLBC_New(LLBC_LogEscapeToken);
 
     default:
-        return LLBC_New0(LLBC_LogNullToken);
+        return LLBC_New(LLBC_LogNullToken);
     }
 }
 

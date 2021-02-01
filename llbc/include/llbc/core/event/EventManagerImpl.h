@@ -37,7 +37,7 @@ inline LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
 
     typedef LLBC_Func1<void, LLBC_Event *> __EventFuncDeleg;
 
-    return AddListener(id, LLBC_New1(__EventFuncDeleg, listener), bindedStub);
+    return AddListener(id, LLBC_New(__EventFuncDeleg, listener), bindedStub);
 }
 
 template <typename ObjectType>
@@ -54,7 +54,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
 
     typedef LLBC_Delegate1<void, ObjectType, LLBC_Event *> __EventMethodDeleg;
 
-    return this->AddListener(id, LLBC_New2(__EventMethodDeleg, obj, listener), bindedStub);
+    return this->AddListener(id, LLBC_New(__EventMethodDeleg, obj, listener), bindedStub);
 }
 
 inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)

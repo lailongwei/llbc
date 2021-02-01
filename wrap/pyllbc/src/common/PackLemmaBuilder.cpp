@@ -40,19 +40,19 @@ pyllbc_PackLemma *pyllbc_PackLemmaBuilder::Build(Type type, PyObject *compileEnv
     switch (type)
     {
     case PackLemma::RawType:
-        return LLBC_New1(pyllbc_PackLemma_Raw, compileEnv);
+        return LLBC_New(pyllbc_PackLemma_Raw, compileEnv);
 
     case PackLemma::TopType:
-        return LLBC_New1(pyllbc_PackLemma_Top, compileEnv);
+        return LLBC_New(pyllbc_PackLemma_Top, compileEnv);
 
     case PackLemma::SequenceType:
-        return LLBC_New1(pyllbc_PackLemma_Sequence, compileEnv);
+        return LLBC_New(pyllbc_PackLemma_Sequence, compileEnv);
 
     case PackLemma::DictType:
-        return LLBC_New1(pyllbc_PackLemma_Dict, compileEnv);
+        return LLBC_New(pyllbc_PackLemma_Dict, compileEnv);
 
     case PackLemma::ClassType:
-        return LLBC_New1(pyllbc_PackLemma_Class, compileEnv);
+        return LLBC_New(pyllbc_PackLemma_Class, compileEnv);
         break;
 
     default:

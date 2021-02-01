@@ -1,6 +1,6 @@
 ## 简述
 
-llbc为一个精简、功能完整、多语言支持的服务端开发框架，面向Service及Facade，底层c++实现。
+llbc为一个精简、功能完整、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
 
 ## 构建状态
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)

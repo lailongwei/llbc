@@ -107,7 +107,7 @@
 // Force inline macro define.
 #if defined(_MSC_VER)
  #define LLBC_FORCE_INLINE __forceinline
-#elif defined(__GUNC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__)
  #define LLBC_FORCE_INLINE __inline__ __attribute__((always_inline))
 #else
  #define LLBC_FORCE_INLINE inline
@@ -252,17 +252,7 @@ private:                                            \
     } while(0)                      \
 
 // new/delete.
-#define LLBC_New(cls)                       LLBC_New0(cls)
-#define LLBC_New0(cls)                      (new cls())
-#define LLBC_New1(cls, arg1)                (new cls(arg1))
-#define LLBC_New2(cls, arg1, arg2)          (new cls((arg1), (arg2)))
-#define LLBC_New3(cls, arg1, arg2, arg3)    (new cls((arg1), (arg2), (arg3)))
-#define LLBC_New4(cls, arg1, arg2, arg3, arg4) (new cls((arg1), (arg2), (arg3), (arg4)))
-#define LLBC_New5(cls, arg1, arg2, arg3, arg4, arg5) (new cls((arg1), (arg2), (arg3), (arg4), (arg5)))
-#define LLBC_New6(cls, arg1, arg2, arg3, arg4, arg5, arg6) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6)))
-#define LLBC_New7(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7)))
-#define LLBC_New8(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8)))
-#define LLBC_New9(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8), (arg9)))
+#define LLBC_New(cls, ...)                  (new cls(__VA_ARGS__))
 #define LLBC_News(cls, size)                (new cls[size])
 #define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
@@ -409,18 +399,18 @@ private:                                            \
  #define __LLBC_RTTI_BUF_SIZE    512
 
 /**
- * Facade generic call method converience macros define.
+ * Component generic call method convenience macros define.
  */
-// Define facade generic method interface code generate macro.
-#define LLBC_FACADE_GENERIC_METHOD_INTERFACE(methName)              \
+// Define comp generic method interface code generate macro.
+#define LLBC_COMP_GENERIC_METHOD_INTERFACE(methName)                                     \
     virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) = 0 \
 
-// Define facade generic method code generate macro.
-#define LLBC_FACADE_GENERIC_METHOD(methName)                        \
-    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+// Define comp generic method code generate macro.
+#define LLBC_COMP_GENERIC_METHOD(methName)                                               \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret)     \
 
-// Define facade generic method implement code macro.
-#define LLBC_FACADE_GENERIC_METHOD_IMPL(facadeCls, methName)  \
-    int facadeCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+// Define comp generic method implement code macro.
+#define LLBC_COMP_GENERIC_METHOD_IMPL(compCls, methName)                                 \
+    int compCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret)    \
 
 #endif // !__LLBC_COM_MACRO_H__

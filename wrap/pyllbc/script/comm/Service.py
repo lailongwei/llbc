@@ -71,9 +71,9 @@ class pyllbcSvcExcHandler(object):
             tb = _sys.exc_info()[2]
             if exc_handler is not None:
                 exc_handler(packet, tb, e)
-                self._fire_sessionexception_ev_to_facades(packet, e, tb)
+                self._fire_sessionexception_ev_to_comps(packet, e, tb)
             else:
-                self._fire_sessionexception_ev_to_facades(packet, e, tb)
+                self._fire_sessionexception_ev_to_comps(packet, e, tb)
                 raise
 
     def __repr__(self):
@@ -86,18 +86,18 @@ class pyllbcSvcExcHandler(object):
         handler_type = self.type_2_str(self._ty)
         return 'handler type: {}, handler: {}, registered in service: [{}]'.format(handler_type, self._handler, self._svc())
 
-    def _fire_sessionexception_ev_to_facades(self, packet, e, tb):
+    def _fire_sessionexception_ev_to_comps(self, packet, e, tb):
         svc = self._svc()
         ev = llbc.ServiceEvent(svc)
         ev._session_id = packet.session_id
         ev._packet = packet
         ev._traceback = tb
         ev._exception = e
-        for facade in svc.facades.itervalues():
-            if not hasattr(facade, 'onsessionexception'):
+        for comp in svc.comps.itervalues():
+            if not hasattr(comp, 'onsessionexception'):
                 continue
 
-            getattr(facade, 'onsessionexception')(ev)
+            getattr(comp, 'onsessionexception')(ev)
 
 llbc.inl.SvcExcHandler = pyllbcSvcExcHandler 
 
@@ -217,7 +217,7 @@ class pyllbcService(object):
         self._svcid = llbc.inl.GetServiceId(self._c_obj)
 
         self._encoders = {}
-        self._facades = {}
+        self._comps = {}
 
         cobj = self._c_obj
         self._fps = llbc.inl.GetServiceFPS(cobj)
@@ -290,8 +290,8 @@ class pyllbcService(object):
         llbc.inl.SetServiceCodec(self._c_obj, c)
 
     @property
-    def facades(self):
-        return self._facades
+    def comps(self):
+        return self._comps
 
     def suppress_codernotfound_warning(self):
         """
@@ -457,10 +457,10 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registerfacade(self, facade, libpath='', libfacade_cls=None):
+    def registercomp(self, comp, libpath='', libcomp_cls=None):
         """
-        Register facade.
-            facade methods(all methods are optional):
+        Register component.
+            component methods(all methods are optional):
                 oninitialize(self, ev): service initialize handler.
                     ev.svc: service object.
                 ondestroy(self, ev): service destroy handler.
@@ -519,28 +519,28 @@ class pyllbcService(object):
                     ev.traceback: exception traceback.
                     ev.exception: exception object.
         """
-        # normalize facade
-        if isinstance(facade, (str, unicode)):
-            if isinstance(facade, unicode):
-                facade = facade.encode('utf8')
+        # normalize component
+        if isinstance(comp, (str, unicode)):
+            if isinstance(comp, unicode):
+                comp = comp.encode('utf8')
 
-            facade = llbc.inl.RegisterLibFacade(self._c_obj, facade, libpath, libfacade_cls)
+            comp = llbc.inl.RegisterLibComponent(self._c_obj, comp, libpath, libcomp_cls)
         else:
-            llbc.inl.RegisterFacade(self._c_obj, facade)
+            llbc.inl.RegisterComponent(self._c_obj, comp)
 
         # add some common members
-        facade.svc = self
+        comp.svc = self
 
-        # update facade dict
-        self._facades.update({facade.__class__: facade})
+        # update comp dict
+        self._comps.update({comp.__class__: comp})
 
-        return facade
+        return comp 
 
-    def getfacade(self, cls):
+    def getcomp(self, cls):
         """
-        Get facade by facade class.
+        Get component by component class.
         """
-        return self._facades.get(cls)
+        return self._comps.get(cls)
 
     def registerencoder(self, opcode, encoder):
         """

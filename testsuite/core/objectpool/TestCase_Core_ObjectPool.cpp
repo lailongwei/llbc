@@ -768,7 +768,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     begTime = LLBC_Time::Now();
 
     const int threadNums = 4;
-    ObjectPoolTestTask *task = LLBC_New0(ObjectPoolTestTask);
+    ObjectPoolTestTask *task = LLBC_New(ObjectPoolTestTask);
     task->Activate(threadNums);
     task->Wait();
     LLBC_Delete(task);

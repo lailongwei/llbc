@@ -2,11 +2,11 @@
 """
 Service basic 测试
 """
-from llbc import TestCase, facade, packet, bindto, Service, Stream, handler, exc_handler
+from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_handler
 
-@facade
+@comp
 @bindto('svcbase_test_svc')
-class TestFacade(object):
+class TestComp(object):
     def __init__(self):
         self._call_times = 0
 

@@ -61,7 +61,7 @@ int pyllbc_TaskMgr::CreateTask(const LLBC_String &script)
         return LLBC_FAILED;
     }
 
-    pyllbc_Task *task = LLBC_New2(pyllbc_Task, ++_maxTaskId, script);
+    pyllbc_Task *task = LLBC_New(pyllbc_Task, ++_maxTaskId, script);
     _tasks.insert(std::make_pair(_maxTaskId, task));
 
     if (task->Activate() != LLBC_OK)

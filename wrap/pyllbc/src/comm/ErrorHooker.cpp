@@ -51,8 +51,8 @@ int pyllbc_ErrorHooker::Install()
     if (_installed)
         return LLBC_OK;
 
-    pyllbc_SetErrSetHock(LLBC_New2(_SetDeleg, this, &This::Hook_ErrSet));
-    pyllbc_SetErrClearHook(LLBC_New2(_ClearDeleg, this, &This::Hook_ErrClear));
+    pyllbc_SetErrSetHock(LLBC_New(_SetDeleg, this, &This::Hook_ErrSet));
+    pyllbc_SetErrClearHook(LLBC_New(_ClearDeleg, this, &This::Hook_ErrClear));
 
     _installed = true;
     return LLBC_OK;

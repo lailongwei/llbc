@@ -117,10 +117,10 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "unpack error",             // 0x0023
     // not allow.
     "not allow",                // 0x0024
-    // initialize facade failed.
-    "initialize facade failed", // 0x0025
-    // start facade failed.
-    "start facade failed",      // 0x0026
+    // initialize comp failed.
+    "initialize comp failed", // 0x0025
+    // start comp failed.
+    "start comp failed",      // 0x0026
     // WSA specific: WSASYSNOTREADY
     "underlying network subsystem is not ready for network communication", // 0x0027
     // WSA specific: WSAVERNOTSUPPORTED

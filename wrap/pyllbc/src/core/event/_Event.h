@@ -28,7 +28,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_New(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "Oi", &pyEv, &evId))
         return NULL;
 
-    LLBC_Event *ev = LLBC_New2(LLBC_Event, evId, true);
+    LLBC_Event *ev = LLBC_New(LLBC_Event, evId, true);
     ev->SetExtData(pyEv, NULL);
 
     return PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(ev));

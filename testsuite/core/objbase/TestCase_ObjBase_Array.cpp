@@ -128,11 +128,11 @@ void TestCase_ObjBase_Array::BasicTest()
     std::cout <<"Basic test: " <<std::endl;
 
     std::cout <<"Insert 10 objects." <<std::endl;
-    LLBC_Array *arr = LLBC_New0(LLBC_Array);
+    LLBC_Array *arr = LLBC_New(LLBC_Array);
     const LLBC_Array &constArr = *arr;
     for(int i = 0; i < 10; ++i)
     {
-        LLBC_Object *obj = LLBC_New0(TestObj);
+        LLBC_Object *obj = LLBC_New(TestObj);
         arr->Insert(arr->End(), obj);
         obj->Release();
     }
@@ -182,7 +182,7 @@ void TestCase_ObjBase_Array::IterTest()
     std::cout <<"PushBack/PushFront" <<insertCnt <<" objects into array." <<std::endl;
     for(int i = 1; i <= insertCnt; ++i)
     {
-        LLBC_Object *obj = LLBC_New0(TestObj);
+        LLBC_Object *obj = LLBC_New(TestObj);
         arr.PushBack(obj);
 
         obj->Release();
@@ -209,14 +209,14 @@ void TestCase_ObjBase_Array::IterTest()
     std::cout <<"Done" <<std::endl;
 
     std::cout <<"Insert new object to front" <<std::endl;
-    LLBC_Object *obj = LLBC_New0(TestObj);
+    LLBC_Object *obj = LLBC_New(TestObj);
     arr.Insert(arr.Begin(), obj);
     obj->Release();
     std::cout <<"Done, ouput it: " <<std::endl;
     arr.Foreach(foreachFun);
 
     std::cout <<"Insert new object before position 1: " <<std::endl;
-    obj = LLBC_New0(TestObj);
+    obj = LLBC_New(TestObj);
     arr.Insert(++ arr.Begin(), obj);
     obj->Release();
     std::cout <<"Done, output it: " <<std::endl;
@@ -249,7 +249,7 @@ void TestCase_ObjBase_Array::SortTest()
     std::cout <<"Insert 10 elements: " <<std::endl;
     for(int i = 1; i <= 10; ++i)
     {
-        LLBC_Object *obj = LLBC_New0(TestObj);
+        LLBC_Object *obj = LLBC_New(TestObj);
         if(i % 2 == 0)
         {
             arr.PushBack(obj);

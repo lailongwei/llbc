@@ -23,7 +23,7 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/IFacade.h"
+#include "llbc/comm/IComponent.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
@@ -335,7 +335,7 @@ LLBC_String LLBC_ProtoReport::ToString() const
     return repr;
 }
 
-LLBC_IFacade::LLBC_IFacade(uint64 caredEvents)
+LLBC_IComponent::LLBC_IComponent(uint64 caredEvents)
 : _inited(false)
 , _started(false)
 , _caredEvents(caredEvents)
@@ -346,58 +346,58 @@ LLBC_IFacade::LLBC_IFacade(uint64 caredEvents)
 {
 }
 
-LLBC_IFacade::~LLBC_IFacade()
+LLBC_IComponent::~LLBC_IComponent()
 {
     LLBC_XDelete(_meths);
 }
 
-bool LLBC_IFacade::OnInitialize()
+bool LLBC_IComponent::OnInitialize()
 {
     return true;
 }
 
-void LLBC_IFacade::OnDestroy()
+void LLBC_IComponent::OnDestroy()
 {
 }
 
-bool LLBC_IFacade::OnStart()
+bool LLBC_IComponent::OnStart()
 {
     return true;
 }
 
-void LLBC_IFacade::OnStop()
+void LLBC_IComponent::OnStop()
 {
 }
 
-void LLBC_IFacade::OnApplicationIniConfigReload()
+void LLBC_IComponent::OnApplicationIniConfigReload()
 {
 }
 
-void LLBC_IFacade::OnApplicationPropertyConfigReload()
+void LLBC_IComponent::OnApplicationPropertyConfigReload()
 {
 }
 
-void LLBC_IFacade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+void LLBC_IComponent::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
 }
 
-void LLBC_IFacade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+void LLBC_IComponent::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
 }
 
-void LLBC_IFacade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+void LLBC_IComponent::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
 {
 }
 
-void LLBC_IFacade::OnProtoReport(const LLBC_ProtoReport &report)
+void LLBC_IComponent::OnProtoReport(const LLBC_ProtoReport &report)
 {
 }
 
-void LLBC_IFacade::OnUnHandledPacket(const LLBC_Packet &packet)
+void LLBC_IComponent::OnUnHandledPacket(const LLBC_Packet &packet)
 {
 }
 
-void LLBC_IFacade::SetService(LLBC_IService *svc)
+void LLBC_IComponent::SetService(LLBC_IService *svc)
 {
     _svc = svc;
 }

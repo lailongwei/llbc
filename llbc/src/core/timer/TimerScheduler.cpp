@@ -81,7 +81,7 @@ int LLBC_TimerScheduler::CreateEntryThreadScheduler()
     }
 
     tls->coreTls.timerScheduler = 
-        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = LLBC_New0(LLBC_TimerScheduler);
+        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = LLBC_New(LLBC_TimerScheduler);
 
     return LLBC_OK;
 }
@@ -122,6 +122,8 @@ LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
 void LLBC_TimerScheduler::Update()
 {
     if (UNLIKELY(!_enabled))
+        return;
+    else if (_heap.IsEmpty())
         return;
 
     LLBC_TimerData *data;
@@ -213,7 +215,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 peri
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = LLBC_New0(LLBC_TimerData);
+    LLBC_TimerData *data = LLBC_New(LLBC_TimerData);
     ::memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliSeconds() + dueTime;
     data->timerId = ++ _maxTimerId;

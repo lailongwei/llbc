@@ -86,7 +86,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
 
     _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
 
-    _logRunnable = LLBC_New0(LLBC_LogRunnable);
+    _logRunnable = LLBC_New(LLBC_LogRunnable);
     _logRunnable->SetFlushInterval(_config->GetFlushInterval());
 
     if (_config->IsLogToConsole())

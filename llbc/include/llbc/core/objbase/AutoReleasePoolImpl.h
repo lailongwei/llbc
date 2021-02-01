@@ -19,53 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifdef __LLBC_OBJBASE_AUTO_RELEASE_POOL_H__
 
-using System;
-using llbc;
+__LLBC_NS_BEGIN
 
-using Console = llbc.SafeConsole;
-
-public class TestCase_Comm_Timer : ITestCase
+LLBC_FORCE_INLINE LLBC_AutoReleasePool *LLBC_AutoReleasePool::GetPoolNext()
 {
-    public void Run(string[] args)
-    {
-        Console.WriteLine("Timer test:");
-
-        using (Service svc = new Service("TimerTestSvc"))
-        {
-            svc.Start();
-
-            Console.WriteLine("Press any key to pause TimerTest...");
-            Console.ReadKey();
-        }
-    }
+    return _next;
 }
 
-[BindTo("TimerTestSvc")]
-class TimerTestComponent : IComponent
+LLBC_FORCE_INLINE void LLBC_AutoReleasePool::SetPoolNext(LLBC_AutoReleasePool *next)
 {
-    public override void OnStart()
-    {
-        // _timer = new Timer(_OnTimeout, _OnCancel);
-        // _timer.Schedule(1.0, 0.5);
-
-        _timer = Timer.Schedule(_OnTimeout, 1.0, 0, _OnCancel);
-    }
-
-    public override void OnStop()
-    {
-        _timer.Cancel();
-    }
-
-    private void _OnTimeout(Timer timer)
-    {
-        Console.WriteLine("Timeout handler called!");
-    }
-
-    private void _OnCancel(Timer timer)
-    {
-        Console.WriteLine("Timer cancel handler called!");
-    }
-
-    private Timer _timer;
+    _next = next;
 }
+
+__LLBC_NS_END
+
+#endif // __LLBC_OBJBASE_AUTO_RELEASE_POOL_H__

@@ -27,11 +27,11 @@ namespace
 
 const int OPCODE = 1;
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
-    TestFacade(bool asClient, bool useBst)
-    : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents | LLBC_FacadeEvents::OnUpdate)
+    TestComp(bool asClient, bool useBst)
+    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
     , _asClient(asClient)
     , _useBst(useBst)
     {
@@ -132,9 +132,9 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create(_svcType, "MulticastTest");
     svc->SuppressCoderNotFoundWarning();
 
-    TestFacade *facade = LLBC_New2(TestFacade, _asClient, _useBst);
-    svc->RegisterFacade(facade);
-    svc->Subscribe(OPCODE, facade, &TestFacade::OnRecv);
+    TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
+    svc->RegisterComponent(comp);
+    svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
     if (_asClient)
         PrepareClientLogic(svc);

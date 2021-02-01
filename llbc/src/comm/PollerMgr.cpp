@@ -48,7 +48,7 @@ static LLBC_NS LLBC_Socket *__CreateSocket(int type)
 #endif
 
     LLBC_NS LLBC_Socket *sock = 
-        LLBC_New1(LLBC_NS LLBC_Socket, handle);
+        LLBC_New(LLBC_NS LLBC_Socket, handle);
     sock->SetPollerType(type);
 
     return sock;

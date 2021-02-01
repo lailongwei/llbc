@@ -27,7 +27,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_New(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &file))
         return NULL;
 
-    LLBC_Property *prop = LLBC_New0(LLBC_Property);
+    LLBC_Property *prop = LLBC_New(LLBC_Property);
     if (LLBC_StrLenA(file) == 0)
         return Py_BuildValue("l", prop);
 
@@ -156,7 +156,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
     }
 
     // Set new sub property.
-    LLBC_Property *copySubProp = LLBC_New1(LLBC_Property, *subProp);
+    LLBC_Property *copySubProp = LLBC_New(LLBC_Property, *subProp);
     if (attrOptr.SetAttr("_c_obj", reinterpret_cast<long>(copySubProp)) != LLBC_OK)
     {
         Py_DECREF(pySubProp);

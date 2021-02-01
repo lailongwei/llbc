@@ -95,7 +95,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     LLBC_PrintLine("core/thread/task test:");
 
     // Activate task.
-    TestTask *task = LLBC_New0(TestTask);
+    TestTask *task = LLBC_New(TestTask);
     task->Activate(2);
 
     // Send message to task.
@@ -104,7 +104,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
         LLBC_Stream stream;
         LLBC_String content = "Hello Tasks!";
         stream.Write(content);
-        LLBC_MessageBlock *block = LLBC_New0(LLBC_MessageBlock);
+        LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
         block->Write(stream.GetBuf(), stream.GetPos());
 
         task->Push(block);

@@ -63,7 +63,7 @@ namespace
         }
     };
 
-    class TestFacade : public LLBC_IFacade
+    class TestComp : public LLBC_IComponent
     {
     public:
         virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
@@ -93,8 +93,8 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     LLBC_PrintLine("Communication Service protocol stack control test:");
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
-    // Register facade.
-    _svc->RegisterFacade(new TestFacade());
+    // Register comp.
+    _svc->RegisterComponent(new TestComp());
 
     // Start service.
     LLBC_PrintLine("Start service...");

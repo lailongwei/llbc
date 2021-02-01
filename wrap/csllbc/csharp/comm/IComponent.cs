@@ -321,9 +321,9 @@ namespace llbc
     #endregion
 
     /// <summary>
-    /// Service facade base class encapsulation.
+    /// Service component base class encapsulation.
     /// </summary>
-    public class IFacade
+    public class IComponent
     {
         /// <summary>
         /// Service getter/setter.
@@ -336,12 +336,12 @@ namespace llbc
 
         #region OnInit/OnDestroy, OnStart/OnStop
         /// <summary>
-        /// When facade first start, will call this method to initialize Facade before OnStart method call.
+        /// When component first start, will call this method to initialize component before OnStart method call.
         /// </summary>
         public virtual void OnInit() { }
 
         /// <summary>
-        /// When service destroy, will call this method to destroy Facade.
+        /// When service destroy, will call this method to destroy component.
         /// </summary>
         public virtual void OnDestroy() { }
 

@@ -52,7 +52,7 @@ LLBC_BinaryHeap<T, Comp>::LLBC_BinaryHeap(const LLBC_BinaryHeap<T, Comp> &other)
 template <typename T, typename Comp>
 inline bool LLBC_BinaryHeap<T, Comp>::IsEmpty() const
 {
-    return _size == 0 ? true : false;
+    return _size == 0;
 }
 
 template <typename T, typename Comp>

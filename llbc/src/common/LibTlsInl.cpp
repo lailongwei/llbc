@@ -124,7 +124,7 @@ __LLBC_LibTls *__LLBC_GetLibTls()
 
     if (UNLIKELY(!libTls))
     {
-        libTls = LLBC_New0(__LLBC_LibTls);
+        libTls = LLBC_New(__LLBC_LibTls);
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         (void)pthread_setspecific(tlsHandle, libTls);
