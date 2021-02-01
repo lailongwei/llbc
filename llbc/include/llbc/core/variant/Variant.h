@@ -302,8 +302,8 @@ public:
     uint32 AsUInt32() const;
     long AsLong() const;
     unsigned long AsULong() const;
-    template <typename _T>
-    _T *AsPtr() const;
+    template <typename _Ty>
+    _Ty *AsPtr() const;
     sint64 AsInt64() const;
     uint64 AsUInt64() const;
     float AsFloat() const;
@@ -321,8 +321,8 @@ public:
     operator uint32 () const;
     operator long () const;
     operator ulong () const;
-    template <typename _T>
-    operator _T * () const;
+    template <typename _Ty>
+    operator _Ty * () const;
     operator sint64 () const;
     operator uint64 () const;
     operator float () const;

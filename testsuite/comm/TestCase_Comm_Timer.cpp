@@ -24,7 +24,7 @@
 
 namespace
 {
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
     bool OnInitialize()
@@ -34,25 +34,25 @@ public:
         _timeoutTimes = 0;
         _cancelTimes = 0;
 
-        typedef LLBC_Delegate1<void, TestFacade, LLBC_Timer *> __Deleg;
+        typedef LLBC_Delegate1<void, TestComp, LLBC_Timer *> __Deleg;
 
         // Create long time timer and try to cancel
-        LLBC_Timer *longTimeTimer = LLBC_New2(LLBC_Timer,
-                                              LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
-                                              LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
+        LLBC_Timer *longTimeTimer = LLBC_New(LLBC_Timer,
+                                             LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
+                                             LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
         longTimeTimer->Schedule(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1);
         LLBC_Delete(longTimeTimer);
 
         for(int i = 1; i <=2000000; ++i) 
         {
-            // LLBC_Timer *timer = LLBC_New2(LLBC_Timer,
-                                          // LLBC_New2(__Deleg, this, &TestFacade::OnTimerTimeout),
-                                          // LLBC_New2(__Deleg, this, &TestFacade::OnTimerCancel));
+            // LLBC_Timer *timer = LLBC_New(LLBC_Timer,
+                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
+                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
 
-            LLBC_Timer *timer = LLBC_New3(LLBC_Timer,
-                                          this,
-                                          &TestFacade::OnTimerTimeout,
-                                          &TestFacade::OnTimerCancel);
+            LLBC_Timer *timer = LLBC_New(LLBC_Timer,
+                                         this,
+                                         &TestComp::OnTimerTimeout,
+                                         &TestComp::OnTimerCancel);
 
             timer->Schedule(LLBC_RandInt(5000, 15001), LLBC_RandInt(5000, 15001));
         }
@@ -86,8 +86,8 @@ private:
     static int _cancelTimes;
 };
 
-int TestFacade::_timeoutTimes = 0;
-int TestFacade::_cancelTimes = 0;
+int TestComp::_timeoutTimes = 0;
+int TestComp::_cancelTimes = 0;
 }
 
 TestCase_Comm_Timer::TestCase_Comm_Timer()
@@ -103,7 +103,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     LLBC_PrintLine("Timer testcase:");
 
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "TimerTest");
-    svc->RegisterFacade(LLBC_New(TestFacade));
+    svc->RegisterComponent(LLBC_New(TestComp));
     if(svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());

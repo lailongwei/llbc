@@ -28,7 +28,7 @@
 
 void pyllbc_InitApplication()
 {
-    LLBC_New1(pyllbc_Application, NULL);
+    LLBC_New(pyllbc_Application, NULL);
 }
 
 void pyllbc_DestroyApplication()

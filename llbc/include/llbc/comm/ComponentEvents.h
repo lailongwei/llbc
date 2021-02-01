@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_FACADE_EVENTS_H__
-#define __LLBC_COMM_FACADE_EVENTS_H__
+#ifndef __LLBC_COMM_COMPONENT_EVENTS_H__
+#define __LLBC_COMM_COMPONENT_EVENTS_H__
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -28,9 +28,9 @@
 __LLBC_NS_BEGIN
 
 /**
- * \brief The facade events offset enumeration.
+ * \brief The component events offset enumeration.
  */
-class LLBC_EXPORT LLBC_FacadeEventsOffset
+class LLBC_EXPORT LLBC_ComponentEventsOffset
 {
 public:
     enum
@@ -59,9 +59,9 @@ public:
 };
 
 /**
- * \brief The facade events id define.
+ * \brief The component events id define.
  */
-class LLBC_EXPORT LLBC_FacadeEvents
+class LLBC_EXPORT LLBC_ComponentEvents
 {
 public:
     static const uint64 OnInitialize;
@@ -87,4 +87,4 @@ public:
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COMM_FACADE_EVENTS_H__
+#endif // !__LLBC_COMM_COMPONENT_EVENTS_H__

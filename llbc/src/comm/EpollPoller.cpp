@@ -200,11 +200,11 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             LLBC_SessionCloseInfo *closeInfo;
             if (sock->GetPendingError(sockErr) != LLBC_OK)
             {
-                closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
+                closeInfo = LLBC_New(LLBC_SessionCloseInfo);
             }
             else
             {
-                closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+                closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
             }
 
             session->OnClose(closeInfo);
@@ -294,8 +294,8 @@ int LLBC_EpollPoller::StartupMonitor()
     typedef LLBC_Delegate0<void, LLBC_EpollPoller> __MonitorDeleg;
 
     LLBC_IDelegate0<void> *deleg = 
-        LLBC_New2(__MonitorDeleg, this, &LLBC_EpollPoller::MonitorSvc);
-    _monitor = LLBC_New1(LLBC_PollerMonitor, deleg);
+        LLBC_New(__MonitorDeleg, this, &LLBC_EpollPoller::MonitorSvc);
+    _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);

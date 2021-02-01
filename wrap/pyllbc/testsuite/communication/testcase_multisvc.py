@@ -11,7 +11,7 @@ TEST_IP = '127.0.0.1'
 TEST_PORT = 17788
 
 
-class ClientFacade(object):
+class ClientComp(object):
     def oninitialize(self, ev):
         ev.svc.asyncconn(TEST_IP, TEST_PORT)
 
@@ -44,7 +44,7 @@ class ClientPacketUnifyPreHandler(object):
         return True
 
 
-class ServerFacade(object):
+class ServerComp(object):
     def onsessioncreate(self, ev):
         print 'Server session create, id: {}, send data: '.format(ev.session_id)
 
@@ -102,8 +102,8 @@ class MultiSvcTest(TestCase):
         client.codec = Service.CODEC_JSON
         server.codec = Service.CODEC_JSON
 
-        client.registerfacade(ClientFacade())
-        server.registerfacade(ServerFacade())
+        client.registercomp(ClientComp())
+        server.registercomp(ServerComp())
 
         client.subscribe(TEST_RES, ClientPacketHandler())
         server.subscribe(TEST_REQ, ServerPacketHandler())

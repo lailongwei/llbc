@@ -100,7 +100,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
         LLBC_INL_NS __llbc_headerLen + packet->GetPayloadLength());
 
     // Create block and write header in.
-    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, length);
+    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, length);
 
     sint32 opcode = packet->GetOpcode();
     uint16 status = static_cast<uint16>(packet->GetStatus());
@@ -211,7 +211,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
         // Readable data size >= content need receive size.
         _packet->Write(readableBuf, contentNeedRecv);
         if (!out)
-            out = LLBC_New1(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+            out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
         (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&_packet, sizeof(LLBC_Packet *));
 
         // Reset packet about data members.

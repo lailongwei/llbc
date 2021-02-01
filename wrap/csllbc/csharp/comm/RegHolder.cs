@@ -272,7 +272,7 @@ namespace llbc
             if (!IsRegistableTo(svc))
                 return;
 
-            _RegisterFacade(svc, ref obj);
+            _RegisterComp(svc, ref obj);
             _RegisterCoder(svc, ref obj);
             _RegisterGlobalCoder(svc, ref obj);
 
@@ -289,13 +289,13 @@ namespace llbc
             svc.RegisterCoder(coderOpcode, cls);
         }
 
-        private void _RegisterFacade(Service svc, ref object obj)
+        private void _RegisterComp(Service svc, ref object obj)
         {
-            if (!asFacade)
+            if (!asComp)
                 return;
 
             _CreateObject(ref obj);
-            svc.RegisterFacade(obj as IFacade);
+            svc.RegisterComponent(obj as IComponent);
         }
 
         private void _RegisterGlobalCoder(Service svc, ref object obj)
@@ -316,7 +316,7 @@ namespace llbc
 
         public Type cls;
 
-        public bool asFacade;
+        public bool asComp;
         public bool asCoder;
         public int coderOpcode;
         public bool asGlobalCoder;
@@ -483,12 +483,12 @@ namespace llbc
         private static ServiceRegHolderClass _CollectClass(Type cls)
         {
             ServiceRegHolderClass holderCls = null;
-            _DetectClass_Facade(cls, ref holderCls); // Facade detect.
+            _DetectClass_Comp(cls, ref holderCls); // Component detect.
             _DetectClass_Coder(cls, ref holderCls); // ICoder detect.
             _DetectClass_GlobalCoder(cls, ref holderCls); // Global coder detect.
             
-            // Collect all methods, only IFacade subclass can become service handlers.
-            if (holderCls == null || !holderCls.asFacade)
+            // Collect all methods, only IComponent subclass can become service handlers.
+            if (holderCls == null || !holderCls.asComp)
                 return holderCls;
 
             MethodInfo[] clsMethods = null;
@@ -497,13 +497,13 @@ namespace llbc
             return holderCls;
         }
 
-        public static void _DetectClass_Facade(Type cls, ref ServiceRegHolderClass holderCls)
+        public static void _DetectClass_Comp(Type cls, ref ServiceRegHolderClass holderCls)
         {
-            if (cls.BaseType != typeof(IFacade))
+            if (cls.BaseType != typeof(IComponent))
                 return;
 
             _CreateHolderClass(cls, ref holderCls);
-            holderCls.asFacade = true;
+            holderCls.asComp = true;
         }
 
         private static void _DetectClass_Coder(Type cls, ref ServiceRegHolderClass holderCls)

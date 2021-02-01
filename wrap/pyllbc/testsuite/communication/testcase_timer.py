@@ -26,7 +26,8 @@ class TimerTest(llbc.TestCase):
         # print 'timer[{}] cancelled!'.format(timer.timerid)
 
     def _createtimers(self):
+        random = llbc.Random()
         for i in range(0, 500000):
             timer = llbc.Timer(self.ontimeout, self.oncancel)
-            timer.schedule(llbc.Random.rand(5000, 15000), llbc.Random.rand(5000, 15000))
+            timer.schedule(random.rand(5000, 15000), random.rand(5000, 15000))
 

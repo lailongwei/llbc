@@ -23,7 +23,7 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_NewBundle(PyObject *self, PyObject *args)
 {
-    LLBC_Bundle *b = LLBC_New0(LLBC_Bundle);
+    LLBC_Bundle *b = LLBC_New(LLBC_Bundle);
     return Py_BuildValue("l", b);
 }
 

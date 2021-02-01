@@ -219,7 +219,7 @@ void LLBC_Session::OnClose(LLBC_SessionCloseInfo *closeInfo)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
     if (closeInfo == NULL)
-        closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
+        closeInfo = LLBC_New(LLBC_SessionCloseInfo);
 
     // Notify socket session closed.
     const LLBC_SocketHandle sockHandle = _socket->Handle();

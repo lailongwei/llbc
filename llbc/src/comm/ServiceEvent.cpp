@@ -38,7 +38,7 @@ namespace
     template <typename Ev>
     static _Block *__CreateEvBlock(Ev *ev)
     {
-        _Block *block = LLBC_New1(_Block, sizeof(int) + sizeof(Ev *));
+        _Block *block = LLBC_New(_Block, sizeof(int) + sizeof(Ev *));
         block->Write(&ev->type, sizeof(int));
         block->Write(&ev, sizeof(Ev *));
 

@@ -141,7 +141,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             token = LLBC_LogTokenBuilderSingleton->BuildLogToken(ch);
             if (!formatter)
             {
-                formatter = LLBC_New0(LLBC_LogFormattingInfo);
+                formatter = LLBC_New(LLBC_LogFormattingInfo);
             }
 
             token->Initialize(formatter, "");
@@ -158,7 +158,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
                 if (!formatter)
                 {
-                    formatter = LLBC_New3(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
+                    formatter = LLBC_New(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
                 }
                 else
                 {

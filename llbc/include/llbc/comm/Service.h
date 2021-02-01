@@ -25,7 +25,7 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
-#include "llbc/comm/FacadeEvents.h"
+#include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerMgr.h"
@@ -295,18 +295,18 @@ public:
 
 public:
     /**
-     * Register facade.
+     * Register component.
      */
-    virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory);
-    virtual int RegisterFacade(LLBC_IFacade *facade);
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade);
+    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory);
+    virtual int RegisterComponent(LLBC_IComponent *comp);
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp);
 
     /**
-     * Get facade/facades.
+     * Get component/componemts.
      */
-    virtual LLBC_IFacade *GetFacade(const char *facadeName);
-    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName);
-    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName);
+    virtual LLBC_IComponent *GetComponent(const char *compName);
+    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName);
+    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName);
 
     /**
      * Register coder.
@@ -517,20 +517,20 @@ private:
     void HandleEv_AppCfgReloaded(LLBC_ServiceEvent &ev);
 
     /**
-     * Facade operation methods.
+     * Component operation methods.
      */
-    int InitFacades();
-    int StartFacades();
-    void UpdateFacades();
-    void StopFacades();
-    void DestroyFacades();
-    void DestroyWillRegFacades();
-    void CloseAllFacadeLibraries();
-    void AddFacade(LLBC_IFacade *facade);
-    void AddFacadeToCaredEventsArray(LLBC_IFacade *facade);
-    LLBC_Library *OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib);
-    void CloseFacadeLibrary(const LLBC_String &libPath);
-    void ClearFacadesWhenInitFacadeFailed();
+    int InitComps();
+    int StartComps();
+    void UpdateComps();
+    void StopComps();
+    void DestroyComps();
+    void DestroyWillRegComps();
+    void CloseAllCompLibraries();
+    void AddComp(LLBC_IComponent *comp);
+    void AddCompToCaredEventsArray(LLBC_IComponent *comp);
+    LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
+    void CloseCompLibrary(const LLBC_String &libPath);
+    void ClearCompsWhenInitCompFailed();
 
     /**
      * Auto-Release pool operation methods.
@@ -596,7 +596,7 @@ private:
 
     volatile bool _started;
     volatile bool _stopping;
-    volatile bool _initingFacade;
+    volatile bool _initingComp;
 
     LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;
@@ -630,31 +630,31 @@ private:
     _ReadySessionInfos _readySessionInfos;
     LLBC_SpinLock _readySessionInfosLock;
 
-    class _WillRegFacade
+    class _WillRegComp
     {
     public:
-        LLBC_IFacade *facade;
-        LLBC_IFacadeFactory *facadeFactory;
+        LLBC_IComponent *comp;
+        LLBC_IComponentFactory *compFactory;
 
-        _WillRegFacade(LLBC_IFacade *facade);
-        _WillRegFacade(LLBC_IFacadeFactory *facadeFactory);
+        _WillRegComp(LLBC_IComponent *comp);
+        _WillRegComp(LLBC_IComponentFactory *compFactory);
     };
-    typedef std::vector<_WillRegFacade> _WillRegFacades;
-    _WillRegFacades _willRegFacades;
+    typedef std::vector<_WillRegComp> _WillRegComps;
+    _WillRegComps _willRegComps;
 
-    volatile int _facadesInitFinished;
-    volatile int _facadesInitRet;
-    volatile int _facadesStartFinished;
-    volatile int _facadesStartRet;
+    volatile int _compsInitFinished;
+    volatile int _compsInitRet;
+    volatile int _compsStartFinished;
+    volatile int _compsStartRet;
 
-    LLBC_String _facadeNameKey;
-    typedef std::vector<LLBC_IFacade *> _Facades;
-    _Facades _facades;
-    typedef std::map<LLBC_String, _Facades> _Facades2;
-    _Facades2 _facades2;
-    _Facades *_caredEventFacades[LLBC_FacadeEventsOffset::End];
-    typedef std::map<LLBC_String, LLBC_Library *> _FacadeLibraries;
-    _FacadeLibraries _facadeLibraries;
+    LLBC_String _compNameKey;
+    typedef std::vector<LLBC_IComponent *> _Comps;
+    _Comps _comps;
+    typedef std::map<LLBC_String, _Comps> _Comps2;
+    _Comps2 _comps2;
+    _Comps *_caredEventComps[LLBC_ComponentEventsOffset::End];
+    typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
+    _CompLibraries _compLibraries;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;

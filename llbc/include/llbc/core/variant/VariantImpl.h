@@ -118,27 +118,27 @@ inline LLBC_Variant::LLBC_Variant(const std::string &strVal)
 {
     _holder.type = LLBC_VariantType::VT_STR_DFT;
     if (!strVal.empty())
-        _holder.obj.str = LLBC_New2(LLBC_String, strVal.data(), strVal.size());
+        _holder.obj.str = LLBC_New(LLBC_String, strVal.data(), strVal.size());
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_String &strVal)
 {
     _holder.type = LLBC_VariantType::VT_STR_DFT;
     if (!strVal.empty())
-        _holder.obj.str = LLBC_New1(LLBC_String, strVal);
+        _holder.obj.str = LLBC_New(LLBC_String, strVal);
 }
 
 inline LLBC_Variant::LLBC_Variant(const Seq &seqVal)
 {
     _holder.type = LLBC_VariantType::VT_SEQ_DFT;
-    _holder.obj.seq = LLBC_New2(Seq, seqVal.begin(), seqVal.end());
+    _holder.obj.seq = LLBC_New(Seq, seqVal.begin(), seqVal.end());
 }
 
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant::Dict &dictVal)
 {
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
-    _holder.obj.dict = LLBC_New1(Dict, dictVal);
+    _holder.obj.dict = LLBC_New(Dict, dictVal);
 }
 
 inline int LLBC_Variant::GetType() const
@@ -483,10 +483,10 @@ inline unsigned long LLBC_Variant::AsULong() const
     return static_cast<unsigned long>(AsUInt64());
 }
 
-template <typename _T>
-inline _T *LLBC_Variant::AsPtr() const
+template <typename _Ty>
+inline _Ty *LLBC_Variant::AsPtr() const
 {
-    return reinterpret_cast<_T *>(AsUInt64());
+    return reinterpret_cast<_Ty *>(AsUInt64());
 }
 
 inline float LLBC_Variant::AsFloat() const
@@ -539,10 +539,10 @@ inline LLBC_Variant::operator ulong() const
     return AsULong();
 }
 
-template <typename _T>
-inline LLBC_Variant::operator _T *() const
+template <typename _Ty>
+inline LLBC_Variant::operator _Ty *() const
 {
-    return AsPtr<_T>();
+    return AsPtr<_Ty>();
 }
 
 inline LLBC_Variant::operator sint64() const

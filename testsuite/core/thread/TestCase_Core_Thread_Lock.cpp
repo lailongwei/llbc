@@ -69,12 +69,12 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"core/thread/lock test:" <<std::endl;
 
 
-    __LLBC_Thread_Test_Arg *threadArg = LLBC_New0(__LLBC_Thread_Test_Arg);
+    __LLBC_Thread_Test_Arg *threadArg = LLBC_New(__LLBC_Thread_Test_Arg);
     LLBC_NativeThreadHandle handles[__g_threads_num] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
 
     // SimpleLock test.
     std::cout <<"Test SimpleLock ..." <<std::endl;
-    threadArg->lock = LLBC_New0(LLBC_SimpleLock);
+    threadArg->lock = LLBC_New(LLBC_SimpleLock);
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -94,7 +94,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
     // RecursiveLock test.
     std::cout <<"Test RecursiveLock ..." <<std::endl;
-    threadArg->lock = LLBC_New0(LLBC_RecursiveLock);
+    threadArg->lock = LLBC_New(LLBC_RecursiveLock);
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -114,7 +114,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
     // FastLock test.
     std::cout <<"Test FastLock ..." <<std::endl;
-    threadArg->lock = LLBC_New0(LLBC_FastLock);
+    threadArg->lock = LLBC_New(LLBC_FastLock);
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -154,7 +154,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
     // DummyLock test.
     std::cout <<"Test DummyLock ..." <<std::endl;
-    threadArg->lock = LLBC_New0(LLBC_DummyLock);
+    threadArg->lock = LLBC_New(LLBC_DummyLock);
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {

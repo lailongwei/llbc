@@ -25,14 +25,14 @@
 namespace
 {
 
-class EchoServerFacade : public LLBC_IFacade
+class EchoServerComp : public LLBC_IComponent
 {
 public:
     virtual bool OnInitialize()
     {
         // 消息注册, 因echo实现为流式协议实现, opcode为0
         LLBC_IService *svc = GetService();
-        svc->Subscribe(0, this, &EchoServerFacade::_OnPkt);
+        svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
         return true;
     }
@@ -49,7 +49,7 @@ public:
         }
 
         // 打印启动消息
-        std::cout << "Echo server facade started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
+        std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
         return true;
     }
@@ -58,7 +58,7 @@ public:
     {
 
         // 打印将关闭消息
-        std::cout << "Echo server facade will stop" << std::endl;
+        std::cout << "Echo server component will stop" << std::endl;
     }
 
 private:
@@ -74,14 +74,14 @@ private:
     }
 };
 
-class EchoClientFacade : public LLBC_IFacade
+class EchoClientComp : public LLBC_IComponent
 {
 public:
     virtual bool OnInitialize()
     {
-        // 同EchoServerFacade, 订阅
+        // 同EchoServerComp, 订阅
         LLBC_IService *svc = GetService();
-        svc->Subscribe(0, this, &EchoClientFacade::_OnPkt);
+        svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
         return true;
     }
@@ -96,7 +96,7 @@ public:
             return false;
         }
 
-        std::cout << "Echo client facade started, input echo string, input 'bye' to exit echo client" << std::endl;
+        std::cout << "Echo client comp started, input echo string, input 'bye' to exit echo client" << std::endl;
         std::flush(std::cout);
 
         if (!_AcceptInput(true))
@@ -107,7 +107,7 @@ public:
 
     virtual void OnStop()
     {
-        std::cout << "Echo client facade will stop" << std::endl;
+        std::cout << "Echo client comp will stop" << std::endl;
     }
 
 private:
@@ -175,9 +175,9 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     // 创建&启动service
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Raw);
     if (asServer)
-        svc->RegisterFacade(new EchoServerFacade);
+        svc->RegisterComponent(new EchoServerComp);
     else
-        svc->RegisterFacade(new EchoClientFacade);
+        svc->RegisterComponent(new EchoClientComp);
 
     if (svc->Start() != LLBC_OK)
     {

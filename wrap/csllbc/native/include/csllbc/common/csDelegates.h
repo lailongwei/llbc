@@ -33,66 +33,89 @@ class LLBC_HIDDEN csllbc_Delegates
 public:
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    // Facade about delegates define:
+    // Component about delegates define:
     //
-    typedef void (__stdcall *Deleg_Facade_OnInit)();
-    typedef void (__stdcall *Deleg_Facade_OnDestroy)();
-    typedef void (__stdcall *Deleg_Facade_OnStart)();
-    typedef void (__stdcall *Deleg_Facade_OnStop)();
+    typedef void (__stdcall *Deleg_Comp_OnInit)();
+    typedef void (__stdcall *Deleg_Comp_OnDestroy)();
+    typedef void (__stdcall *Deleg_Comp_OnStart)();
+    typedef void (__stdcall *Deleg_Comp_OnStop)();
 
-    typedef void (__stdcall *Deleg_Facade_OnUpdate)();
-    typedef void (__stdcall *Deleg_Facade_OnIdle)(int idleTime);
+    typedef void (__stdcall *Deleg_Comp_OnUpdate)();
+    typedef void (__stdcall *Deleg_Comp_OnIdle)(int idleTime);
 
-    typedef void (__stdcall *Deleg_Facade_OnSessionCreate)(bool isListen,
-                                                           int sessionId,
-                                                           int acceptSessionId,
-                                                           int socketHandle,
-                                                           const char *localHost,
-                                                           int localHostLen,
-                                                           int localHostPort,
+    typedef void (__stdcall *Deleg_Comp_OnSessionCreate)(bool isListen,
+                                                         int sessionId,
+                                                         int acceptSessionId,
+                                                         int socketHandle,
+                                                         const char *localHost,
+                                                         int localHostLen,
+                                                         int localHostPort,
+                                                         const char *remoteHost,
+                                                         int remoteHostLen,
+                                                         int remoteHostPort);
+    typedef void (__stdcall *Deleg_Comp_OnSessionDestroy)(bool isListen,
+                                                          int sessionId,
+                                                          int acceptSessionId,
+                                                          int socketHandle,
+                                                          const char *localHost,
+                                                          int localHostLen,
+                                                          int localPort,
+                                                          const char *remoteHost,
+                                                          int remoteHostLen,
+                                                          int remotePort,
+                                                          bool fromSvc,
+                                                          const char *reason,
+                                                          int reasonLen,
+                                                          int errNo,
+                                                          int subErrNo);
+    typedef void (__stdcall *Deleg_Comp_OnAsyncConnResult)(bool connected,
+                                                           const char *reason,
+                                                           int reasonLen,
                                                            const char *remoteHost,
                                                            int remoteHostLen,
-                                                           int remoteHostPort);
-    typedef void (__stdcall *Deleg_Facade_OnSessionDestroy)(bool isListen,
-                                                            int sessionId,
-                                                            int acceptSessionId,
-                                                            int socketHandle,
-                                                            const char *localHost,
-                                                            int localHostLen,
-                                                            int localPort,
-                                                            const char *remoteHost,
-                                                            int remoteHostLen,
-                                                            int remotePort,
-                                                            bool fromSvc,
-                                                            const char *reason,
-                                                            int reasonLen,
-                                                            int errNo,
-                                                            int subErrNo);
-    typedef void (__stdcall *Deleg_Facade_OnAsyncConnResult)(bool connected,
-                                                             const char *reason,
-                                                             int reasonLen,
-                                                             const char *remoteHost,
-                                                             int remoteHostLen,
-                                                             int remotePort);
+                                                           int remotePort);
 
-    typedef void (__stdcall *Deleg_Facade_OnProtoReport)(int sessionId,
-                                                         int layer,
-                                                         int level,
-                                                         const char *report,
-                                                         int reportLen);
-    typedef void (__stdcall *Deleg_Facade_OnUnHandledPacket)(int sessionId, int opcode, void *data, int dataLen, int status);
+    typedef void (__stdcall *Deleg_Comp_OnProtoReport)(int sessionId,
+                                                       int layer,
+                                                       int level,
+                                                       const char *report,
+                                                       int reportLen);
+    typedef void (__stdcall *Deleg_Comp_OnUnHandledPacket)(int sessionId,
+                                                           int opcode,
+                                                           void *data,
+                                                           int dataLen,
+                                                           int status);
     ///////////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
     // Service about delegates.
     //
-    typedef void *(__stdcall *Deleg_Service_EncodePacket)(int sessionId, sint64 packetId, int *encodedSucceed, int *encodedLength, int *errMsgLength);
-    typedef void *(__stdcall *Deleg_Service_DecodePacket)(int sessionId, int opcode, const void *data, int dataLen, int status, int *errMsgLength);
-    typedef void (__stdcall *Deleg_Service_PacketHandler)(int sessionId, int opcode, const void *data);
-    typedef int (__stdcall *Deleg_Service_PacketPreHandler)(int sessionId, int opcode, const void *data);
-    typedef int (__stdcall *Deleg_Service_PacketUnifyPreHandler)(int sessionId, int opcode, const void *data);
-    typedef void (__stdcall *Deleg_Service_NativeCouldNotFoundDecoderReport)(int sessionId, int opcode, const void *data, int dataLen, int status);
+    typedef void *(__stdcall *Deleg_Service_EncodePacket)(int sessionId,
+                                                          sint64 packetId,
+                                                          int *encodedSucceed,
+                                                          int *encodedLength,
+                                                          int *errMsgLength);
+    typedef void *(__stdcall *Deleg_Service_DecodePacket)(int sessionId,
+                                                          int opcode,
+                                                          const void *data,
+                                                          int dataLen,
+                                                          int status,
+                                                          int *errMsgLength);
+    typedef void (__stdcall *Deleg_Service_PacketHandler)(int sessionId,
+                                                          int opcode,
+                                                          const void *data);
+    typedef int (__stdcall *Deleg_Service_PacketPreHandler)(int sessionId,
+                                                            int opcode,
+                                                            const void *data);
+    typedef int (__stdcall *Deleg_Service_PacketUnifyPreHandler)(int sessionId,
+                                                                 int opcode,
+                                                                 const void *data);
+    typedef void (__stdcall *Deleg_Service_NativeCouldNotFoundDecoderReport)(int sessionId,
+                                                                             int opcode,
+                                                                             const void *data,
+                                                                             int dataLen,
+                                                                             int status);
     ///////////////////////////////////////////////////////////////////////////////////
 
 
@@ -105,4 +128,4 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////
 };
 
-#endif // __CSLLBC_COM_CSDeleg_FacadeATES_H__
+#endif // __CSLLBC_COM_CSDELEGATES_H__

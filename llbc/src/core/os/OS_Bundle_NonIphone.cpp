@@ -64,7 +64,7 @@ LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
     if (!LLBC_Directory::Exists(realPath))
         return LLBC_INVALID_BUNDLE_HANDLE;
 
-    return LLBC_New1(LLBC_String, realPath);
+    return LLBC_New(LLBC_String, realPath);
 }
 
 void LLBC_ReleaseBundle(LLBC_BundleHandle bundle)

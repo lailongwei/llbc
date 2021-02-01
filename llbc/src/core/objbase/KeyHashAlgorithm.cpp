@@ -89,14 +89,14 @@ LLBC_KeyHashAlgorithm::LLBC_KeyHashAlgorithm()
 {
     typedef LLBC_KeyHashAlgorithmType _AlgoType;
 
-    m_algos[_AlgoType::SDBM] = LLBC_New0(LLBC_KeyHashAlgorithm::SDBMHash);
-    m_algos[_AlgoType::RS] = LLBC_New0(LLBC_KeyHashAlgorithm::RSHash);
-    m_algos[_AlgoType::JS] = LLBC_New0(LLBC_KeyHashAlgorithm::JSHash);
-    m_algos[_AlgoType::PJ] = LLBC_New0(LLBC_KeyHashAlgorithm::PJHash);
-    m_algos[_AlgoType::ELF] = LLBC_New0(LLBC_KeyHashAlgorithm::ELFHash);
-    m_algos[_AlgoType::BKDR] = LLBC_New0(LLBC_KeyHashAlgorithm::BKDRHash);
-    m_algos[_AlgoType::DJB] = LLBC_New0(LLBC_KeyHashAlgorithm::DJBHash);
-    m_algos[_AlgoType::AP] = LLBC_New0(LLBC_KeyHashAlgorithm::APHash);
+    m_algos[_AlgoType::SDBM] = LLBC_New(LLBC_KeyHashAlgorithm::SDBMHash);
+    m_algos[_AlgoType::RS] = LLBC_New(LLBC_KeyHashAlgorithm::RSHash);
+    m_algos[_AlgoType::JS] = LLBC_New(LLBC_KeyHashAlgorithm::JSHash);
+    m_algos[_AlgoType::PJ] = LLBC_New(LLBC_KeyHashAlgorithm::PJHash);
+    m_algos[_AlgoType::ELF] = LLBC_New(LLBC_KeyHashAlgorithm::ELFHash);
+    m_algos[_AlgoType::BKDR] = LLBC_New(LLBC_KeyHashAlgorithm::BKDRHash);
+    m_algos[_AlgoType::DJB] = LLBC_New(LLBC_KeyHashAlgorithm::DJBHash);
+    m_algos[_AlgoType::AP] = LLBC_New(LLBC_KeyHashAlgorithm::APHash);
 }
 
 LLBC_KeyHashAlgorithm::~LLBC_KeyHashAlgorithm()

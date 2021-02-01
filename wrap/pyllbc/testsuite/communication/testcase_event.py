@@ -2,20 +2,20 @@
 """
 Event 测试
 """
-from llbc import TestCase, Service, Event, facade, bindto
+from llbc import TestCase, Service, Event, comp, bindto
 
-@facade
+@comp
 @bindto('event_test_svc')
-class EventTestFacade(object):
+class EventTestComp(object):
     def oninitialize(self, ev):
         svc = ev.svc
-        print('Facade initialize, svc:{}'.format(svc))
+        print('Component initialize, svc:{}'.format(svc))
 
         svc.subscribe_event(10086, self._onev_10086)
         svc.subscribe_event(10010, self._onev_10010)
 
     def ondestroy(self, ev):
-        print('Facade destroy, svc:{}'.format(ev.svc))
+        print('Component destroy, svc:{}'.format(ev.svc))
 
     def onupdate(self, ev):
         svc = ev.svc

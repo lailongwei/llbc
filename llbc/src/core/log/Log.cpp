@@ -115,7 +115,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
     else if (LIKELY(_loggerManager))                                          \
         l = _loggerManager->GetLogger(logger);                                \
                                                                               \
-    return *LLBC_New4(LLBC_LogJsonMsg, _rootLogger != NULL, l, tag, lv);      \
+    return *LLBC_New(LLBC_LogJsonMsg, _rootLogger != NULL, l, tag, lv);       \
 
 
 int LLBC_LogHelper::init(const LLBC_String &cfgFile)

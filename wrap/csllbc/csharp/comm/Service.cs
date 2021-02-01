@@ -165,7 +165,7 @@ namespace llbc
 
     #region Service attributes
     /// <summary>
-    /// Bind to attribute, use in IFacade/ICoder/IGlobalCoder subclass, indicate decorated class bind to which services.
+    /// Bind to attribute, use in IComponent/ICoder/IGlobalCoder subclass, indicate decorated class bind to which services.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class BindToAttribute : Attribute
@@ -226,7 +226,7 @@ namespace llbc
     }
     
     /// <summary>
-    /// Packet handler attribute, only can'be use in IFacade's methods, if decorated, method will became packet handler.
+    /// Packet handler attribute, only can'be use in IComponent's methods, if decorated, method will became packet handler.
     /// <para>method declaration must accrod with PacketHandler delegate define</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
@@ -255,7 +255,7 @@ namespace llbc
     }
 
     /// <summary>
-    /// Packet pre-handler attribute, only can'be use in IFacade's methods, if decorated, method will became packet pre-handler.
+    /// Packet pre-handler attribute, only can'be use in IComponent's methods, if decorated, method will became packet pre-handler.
     /// <para>method declaration must accrod with PacketPreHandler delegate define</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
@@ -284,7 +284,7 @@ namespace llbc
     }
 
     /// <summary>
-    /// Packet unify pre-handler attribute, only can'be use in IFacade's methods, if decorated, method will became packet unify pre-handler.
+    /// Packet unify pre-handler attribute, only can'be use in IComponent's methods, if decorated, method will became packet unify pre-handler.
     /// <para>method declaration must accrod with PacketUnifyPreHandler delegate define</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
@@ -444,36 +444,36 @@ namespace llbc
                 _fullStack = fullStack;
 
                 // Create native service.
-                _nativeFacade = new NativeFacade(this);
-                _nativeFacadeDelegates = new NativeFacadeDelegates(_nativeFacade);
+                _nativeComp = new NativeComponent(this);
+                _nativeCompDelegates = new NativeComponentDelegates(_nativeComp);
 
                 IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName);
                 _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
                                                             nativeSvcName,
                                                             fullStack,
-                                                            _nativeFacadeDelegates.svcEncodePacket,
-                                                            _nativeFacadeDelegates.svcDecodePacket,
-                                                            _nativeFacadeDelegates.svcPacketHandler,
-                                                            _nativeFacadeDelegates.svcPacketPreHandler,
-                                                            _nativeFacadeDelegates.svcPacketUnifyPreHandler,
-                                                            _nativeFacadeDelegates.svcNativeCouldNotFoundDecoderReport);
+                                                            _nativeCompDelegates.svcEncodePacket,
+                                                            _nativeCompDelegates.svcDecodePacket,
+                                                            _nativeCompDelegates.svcPacketHandler,
+                                                            _nativeCompDelegates.svcPacketPreHandler,
+                                                            _nativeCompDelegates.svcPacketUnifyPreHandler,
+                                                            _nativeCompDelegates.svcNativeCouldNotFoundDecoderReport);
                 LibUtil.FreeNativePtr(ref nativeSvcName);
                 if (_llbcSvc.ToInt64() == 0)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
-                // Register native facade.
-                if (LLBCNative.csllbc_Service_RegisterFacade(_llbcSvc,
-                                                             _nativeFacadeDelegates.onInit,
-                                                             _nativeFacadeDelegates.onDestroy,
-                                                             _nativeFacadeDelegates.onStart,
-                                                             _nativeFacadeDelegates.onStop,
-                                                             _nativeFacadeDelegates.onUpdate,
-                                                             _nativeFacadeDelegates.onIdle,
-                                                             _nativeFacadeDelegates.onSessionCreate,
-                                                             _nativeFacadeDelegates.onSessionDestroy,
-                                                             _nativeFacadeDelegates.onAsyncConnResult,
-                                                             _nativeFacadeDelegates.onProtoReport,
-                                                             _nativeFacadeDelegates.onUnHandledPacket) != LLBCNative.LLBC_OK)
+                // Register native component.
+                if (LLBCNative.csllbc_Service_RegisterComponent(_llbcSvc,
+                                                                _nativeCompDelegates.onInit,
+                                                                _nativeCompDelegates.onDestroy,
+                                                                _nativeCompDelegates.onStart,
+                                                                _nativeCompDelegates.onStop,
+                                                                _nativeCompDelegates.onUpdate,
+                                                                _nativeCompDelegates.onIdle,
+                                                                _nativeCompDelegates.onSessionCreate,
+                                                                _nativeCompDelegates.onSessionDestroy,
+                                                                _nativeCompDelegates.onAsyncConnResult,
+                                                                _nativeCompDelegates.onProtoReport,
+                                                                _nativeCompDelegates.onUnHandledPacket) != LLBCNative.LLBC_OK)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
                 // Add new service to global svc dictionaries.
@@ -639,8 +639,8 @@ namespace llbc
                 // Stop native llbc service.
                 LLBCNative.csllbc_Service_Stop(_llbcSvc);
 
-                // Cleanup all buffered datas in InlFacade.
-                _nativeFacade.CleanupAllBufferedDatas();
+                // Cleanup all buffered datas in InlComponent.
+                _nativeComp.CleanupAllBufferedDatas();
             }
         }
         #endregion
@@ -856,19 +856,19 @@ namespace llbc
         }
         #endregion
 
-        #region RegisterFacade
+        #region RegisterComponent
         /// <summary>
-        /// Register new facade to service.
+        /// Register new component to service.
         /// </summary>
-        /// <param name="facade">the new facade object</param>
-        public void RegisterFacade(IFacade facade)
+        /// <param name="component">the new component object</param>
+        public void RegisterComponent(IComponent component)
         {
             lock (_lock)
             {
                 if (LLBCNative.csllbc_Service_IsStarted(_llbcSvc) != 0)
-                    throw new LLBCException("Could not register facade when service running");
+                    throw new LLBCException("Could not register component when service running");
 
-                _nativeFacade.RegisterFacade(facade);
+                _nativeComp.RegisterComponent(component);
             }
         }
         #endregion
@@ -1370,8 +1370,8 @@ namespace llbc
                     _svcName = null;
                     _svcType = ServiceType.Normal;
 
-                    // Cleanup wrap-facades.
-                    _CleanupFacades();
+                    // Cleanup wrap-components.
+                    _CleanupComps();
                     // Cleanup all coders.
                     _CleanupCoders();
                     // Cleanup all packet handlers.
@@ -1389,10 +1389,10 @@ namespace llbc
         #endregion
 
         #region Data members cleanup methods
-        private void _CleanupFacades()
+        private void _CleanupComps()
         {
-            _nativeFacade = null;
-            _nativeFacadeDelegates = null;
+            _nativeComp = null;
+            _nativeCompDelegates = null;
         }
 
         private void _CleanupCoders()
@@ -1430,7 +1430,7 @@ namespace llbc
                 throw ExceptionUtil.CreateExceptionFromCoreLib();
 
             // Push
-            _nativeFacade.PushWillEncodeObj(sessionId, coderInfo.opcode, obj, coderInfo.isICoder, packetId, status);
+            _nativeComp.PushWillEncodeObj(sessionId, coderInfo.opcode, obj, coderInfo.isICoder, packetId, status);
         }
         #endregion
 
@@ -1452,62 +1452,62 @@ namespace llbc
         #endregion
         #endregion
 
-        #region NativeFacade
-        private class NativeFacade
+        #region NativeComponent
+        private class NativeComponent
         {
             /// <summary>
             /// Constructor.
             /// </summary>
             /// <param name="svc">owned service object</param>
-            public NativeFacade(Service svc)
+            public NativeComponent(Service svc)
             {
                 _svc = svc;
                 _fullStack = svc.fullStack;
             }
 
-            #region RegisterFacade/CleanupFacades
+            #region RegisterComponent/CleanupComponents
             /// <summary>
-            /// Register csharp layer facade.
+            /// Register csharp layer component.
             /// </summary>
-            /// <param name="facade"></param>
-            public void RegisterFacade(IFacade facade)
+            /// <param name="component"></param>
+            public void RegisterComponent(IComponent component)
             {
-                if (facade == null)
+                if (component == null)
                     throw new ArgumentException();
-                else if (_facades.IndexOf(facade) >= 0)
+                else if (_comps.IndexOf(component) >= 0)
                     throw new LLBCException(
-                        "Could not repeat to register facade '{0}' in service: {1}", facade, _svc.svcName);
+                        "Could not repeat to register component '{0}' in service: {1}", component, _svc.svcName);
 
-                facade.svc = _svc;
-                _facades.Add(facade);
+                component.svc = _svc;
+                _comps.Add(component);
 
-                Type facadeTy = facade.GetType();
+                Type compTy = component.GetType();
                 BindingFlags methBindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
-                if (facadeTy.GetMethod("OnIdle", methBindFlags) != null)
-                    _overridedOnIdleFacades.Add(facade);
-                if (facadeTy.GetMethod("OnUpdate", methBindFlags) != null)
-                    _overridedOnUpdateFacades.Add(facade);
+                if (compTy.GetMethod("OnIdle", methBindFlags) != null)
+                    _overridedOnIdleComps.Add(component);
+                if (compTy.GetMethod("OnUpdate", methBindFlags) != null)
+                    _overridedOnUpdateComps.Add(component);
             }
 
             /// <summary>
-            /// Cleanup all csharp layer facades.
+            /// Cleanup all csharp layer components.
             /// </summary>
-            public void CleanupFacades()
+            public void CleanupComponents()
             {
-                _facades.Clear();
-                _overridedOnIdleFacades.Clear();
-                _overridedOnUpdateFacades.Clear();
+                _comps.Clear();
+                _overridedOnIdleComps.Clear();
+                _overridedOnUpdateComps.Clear();
             }
             #endregion
 
-            #region llbc native library facade interfaces
+            #region llbc native library component interfaces
             public void OnInit()
             {
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnInit();
+                        _comps[i].OnInit();
                     }
                     catch (Exception e)
                     {
@@ -1518,11 +1518,11 @@ namespace llbc
 
             public void OnDestroy()
             {
-                for (int i = _facades.Count - 1; i >= 0; --i)
+                for (int i = _comps.Count - 1; i >= 0; --i)
                 {
                     try
                     {
-                        _facades[i].OnDestroy();
+                        _comps[i].OnDestroy();
                     }
                     catch (Exception e)
                     {
@@ -1533,11 +1533,11 @@ namespace llbc
 
             public void OnStart()
             {
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnStart();
+                        _comps[i].OnStart();
                     }
                     catch (Exception e)
                     {
@@ -1548,11 +1548,11 @@ namespace llbc
 
             public void OnStop()
             {
-                for (int i = _facades.Count - 1; i >= 0; --i)
+                for (int i = _comps.Count - 1; i >= 0; --i)
                 {
                     try
                     {
-                        _facades[i].OnStop();
+                        _comps[i].OnStop();
                     }
                     catch (Exception e)
                     {
@@ -1563,11 +1563,11 @@ namespace llbc
 
             public void OnUpdate()
             {
-                for (int i = 0; i < _overridedOnUpdateFacades.Count; ++i)
+                for (int i = 0; i < _overridedOnUpdateComps.Count; ++i)
                 {
                     try
                     {
-                        _overridedOnUpdateFacades[i].OnUpdate();
+                        _overridedOnUpdateComps[i].OnUpdate();
                     }
                     catch (Exception e)
                     {
@@ -1578,11 +1578,11 @@ namespace llbc
 
             public void OnIdle(int idleTime)
             {
-                for (int i = 0; i < _overridedOnIdleFacades.Count; ++i)
+                for (int i = 0; i < _overridedOnIdleComps.Count; ++i)
                 {
                     try
                     {
-                        _overridedOnIdleFacades[i].OnIdle(idleTime);
+                        _overridedOnIdleComps[i].OnIdle(idleTime);
                     }
                     catch (Exception e)
                     {
@@ -1609,11 +1609,11 @@ namespace llbc
 
                 SessionInfo sessionInfo =
                     new SessionInfo(isListen, sessionId, acceptSessionId, socketHandle, localEndPoint, remoteEndPoint);
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnSessionCreate(sessionInfo);
+                        _comps[i].OnSessionCreate(sessionInfo);
                     }
                     catch (Exception e)
                     {
@@ -1642,7 +1642,7 @@ namespace llbc
                 RemoveWillSendPackets(sessionId);
                 RemoveQueuedPackets(sessionId);
 
-                // Foreach call csharp layer facade.OnSessionDestroy method.
+                // Foreach call csharp layer component.OnSessionDestroy method.
                 IPEndPoint localEndPoint = new IPEndPoint(
                     IPAddress.Parse(LibUtil.Ptr2Str(localHost, localHostLen)), localPort);
                 IPEndPoint remoteEndPoint = new IPEndPoint(
@@ -1655,11 +1655,11 @@ namespace llbc
 
                 SessionDestroyInfo destroyInfo =
                     new SessionDestroyInfo(sessionInfo, fromSvc, managedReason, errNo, subErrNo);
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnSessionDestroy(destroyInfo);
+                        _comps[i].OnSessionDestroy(destroyInfo);
                     }
                     catch (Exception e)
                     {
@@ -1682,11 +1682,11 @@ namespace llbc
                 AsyncConnResult asyncConnResult =
                     new AsyncConnResult(connected, managedReason, remoteEndPoint);
 
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnAsyncConnResult(asyncConnResult);
+                        _comps[i].OnAsyncConnResult(asyncConnResult);
                     }
 
                     catch (Exception e)
@@ -1708,8 +1708,8 @@ namespace llbc
                                                          (ProtoReportLevel)level,
                                                          managedReport);
 
-                for (int i = 0; i < _facades.Count; ++i)
-                    _facades[i].OnProtoReport(reportInfo);
+                for (int i = 0; i < _comps.Count; ++i)
+                    _comps[i].OnProtoReport(reportInfo);
             }
 
             public void OnUnHandledPacket(int sessionId,
@@ -1725,11 +1725,11 @@ namespace llbc
                 Packet packet = new Packet(
                     _svc, sessionId, opcode, dataStream, dataLen, status, data.ToInt64());
 
-                for (int i = 0; i < _facades.Count; ++i)
+                for (int i = 0; i < _comps.Count; ++i)
                 {
                     try
                     {
-                        _facades[i].OnUnHandledPacket(packet);
+                        _comps[i].OnUnHandledPacket(packet);
                     }
                     catch (Exception e)
                     {
@@ -2227,13 +2227,13 @@ namespace llbc
             #endregion
             #endregion
 
-            #region InlFacade data members
+            #region InlComponent data members
             private Service _svc;
             private bool _fullStack;
 
-            private List<IFacade> _facades = new List<IFacade>();
-            private List<IFacade> _overridedOnIdleFacades = new List<IFacade>();
-            private List<IFacade> _overridedOnUpdateFacades = new List<IFacade>();
+            private List<IComponent> _comps = new List<IComponent>();
+            private List<IComponent> _overridedOnIdleComps = new List<IComponent>();
+            private List<IComponent> _overridedOnUpdateComps = new List<IComponent>();
 
             private Dictionary<int, List<Packet>> _decodedPackets = new Dictionary<int, List<Packet>>();
 
@@ -2249,32 +2249,32 @@ namespace llbc
         }
         #endregion
 
-        #region NativeFacade delegates
-        private class NativeFacadeDelegates
+        #region NativeComponent delegates
+        private class NativeComponentDelegates
         {
-            public NativeFacadeDelegates(NativeFacade facade)
+            public NativeComponentDelegates(NativeComponent component)
             {
-                svcEncodePacket = facade.EncodeManagedObj;
-                svcDecodePacket = facade.DecodeNative;
-                svcPacketHandler = facade.HandlePacket;
-                svcPacketPreHandler = facade.PreHandlePacket;
-                svcPacketUnifyPreHandler = facade.UnifyPreHandlePacket;
-                svcNativeCouldNotFoundDecoderReport = facade.HandleCoderNotFound;
+                svcEncodePacket = component.EncodeManagedObj;
+                svcDecodePacket = component.DecodeNative;
+                svcPacketHandler = component.HandlePacket;
+                svcPacketPreHandler = component.PreHandlePacket;
+                svcPacketUnifyPreHandler = component.UnifyPreHandlePacket;
+                svcNativeCouldNotFoundDecoderReport = component.HandleCoderNotFound;
 
-                onInit = facade.OnInit;
-                onDestroy = facade.OnDestroy;
-                onStart = facade.OnStart;
-                onStop = facade.OnStop;
+                onInit = component.OnInit;
+                onDestroy = component.OnDestroy;
+                onStart = component.OnStart;
+                onStop = component.OnStop;
 
-                onUpdate = facade.OnUpdate;
-                onIdle = facade.OnIdle;
+                onUpdate = component.OnUpdate;
+                onIdle = component.OnIdle;
 
-                onSessionCreate = facade.OnSessionCreate;
-                onSessionDestroy = facade.OnSessionDestroy;
-                onAsyncConnResult = facade.OnAsyncConnResult;
+                onSessionCreate = component.OnSessionCreate;
+                onSessionDestroy = component.OnSessionDestroy;
+                onAsyncConnResult = component.OnAsyncConnResult;
 
-                onProtoReport = facade.OnProtoReport;
-                onUnHandledPacket = facade.OnUnHandledPacket;
+                onProtoReport = component.OnProtoReport;
+                onUnHandledPacket = component.OnUnHandledPacket;
             }
 
             public LLBCNative.Deleg_Service_EncodePacket svcEncodePacket;
@@ -2284,20 +2284,20 @@ namespace llbc
             public LLBCNative.Deleg_Service_PacketUnifyPreHandler svcPacketUnifyPreHandler;
             public LLBCNative.Deleg_Service_NativeCouldNotFoundDecoderReport svcNativeCouldNotFoundDecoderReport;
 
-            public LLBCNative.Deleg_Facade_OnInit onInit;
-            public LLBCNative.Deleg_Facade_OnDestroy onDestroy;
-            public LLBCNative.Deleg_Facade_OnStart onStart;
-            public LLBCNative.Deleg_Facade_OnStop onStop;
+            public LLBCNative.Deleg_Comp_OnInit onInit;
+            public LLBCNative.Deleg_Comp_OnDestroy onDestroy;
+            public LLBCNative.Deleg_Comp_OnStart onStart;
+            public LLBCNative.Deleg_Comp_OnStop onStop;
 
-            public LLBCNative.Deleg_Facade_OnUpdate onUpdate;
-            public LLBCNative.Deleg_Facade_OnIdle onIdle;
+            public LLBCNative.Deleg_Comp_OnUpdate onUpdate;
+            public LLBCNative.Deleg_Comp_OnIdle onIdle;
 
-            public LLBCNative.Deleg_Facade_OnSessionCreate onSessionCreate;
-            public LLBCNative.Deleg_Facade_OnSessionDestroy onSessionDestroy;
-            public LLBCNative.Deleg_Facade_OnAsyncConnResult onAsyncConnResult;
+            public LLBCNative.Deleg_Comp_OnSessionCreate onSessionCreate;
+            public LLBCNative.Deleg_Comp_OnSessionDestroy onSessionDestroy;
+            public LLBCNative.Deleg_Comp_OnAsyncConnResult onAsyncConnResult;
 
-            public LLBCNative.Deleg_Facade_OnProtoReport onProtoReport;
-            public LLBCNative.Deleg_Facade_OnUnHandledPacket onUnHandledPacket;
+            public LLBCNative.Deleg_Comp_OnProtoReport onProtoReport;
+            public LLBCNative.Deleg_Comp_OnUnHandledPacket onUnHandledPacket;
         }
         #endregion
 
@@ -2309,9 +2309,9 @@ namespace llbc
         private bool _fullStack;
         private IntPtr _llbcSvc = IntPtr.Zero;
 
-        // Facades about data members.
-        private NativeFacade _nativeFacade;
-        private NativeFacadeDelegates _nativeFacadeDelegates;
+        // Components about data members.
+        private NativeComponent _nativeComp;
+        private NativeComponentDelegates _nativeCompDelegates;
 
         // Coder about data members.
         IGlobalCoder _globalCoder;

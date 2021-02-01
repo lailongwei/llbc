@@ -39,18 +39,18 @@ public:
     }
 };
 
-class MyFacade : public LLBC_IFacade
+class MyComp : public LLBC_IComponent
 {
 public:
-    MyFacade() {  }
-    virtual ~MyFacade() {  }
+    MyComp() {  }
+    virtual ~MyComp() {  }
 
 public:
     virtual bool OnInitialize()
     {
-        LLBC_PrintLine("MyFacade initialize ...");
+        LLBC_PrintLine("MyComp initialize ...");
 
-        TestObj *obj = LLBC_New0(TestObj);
+        TestObj *obj = LLBC_New(TestObj);
         obj->AutoRelease();
 
         obj->Retain();
@@ -64,15 +64,15 @@ public:
 
     virtual void OnDestroy()
     {
-        LLBC_PrintLine("MyFacade destroy...");
+        LLBC_PrintLine("MyComp destroy...");
     }
 
     virtual void OnUpdate()
     {
         // Create new release pool.
-        LLBC_AutoReleasePool *pool = LLBC_New0(LLBC_AutoReleasePool);
+        LLBC_AutoReleasePool *pool = LLBC_New(LLBC_AutoReleasePool);
 
-        LLBC_Object *obj = LLBC_New0(TestObj);
+        LLBC_Object *obj = LLBC_New(TestObj);
         obj->AutoRelease();
 
         LLBC_Delete(pool);
@@ -95,7 +95,7 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
 
     // Create service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "ReleasePoolTest");
-    svc->RegisterFacade(LLBC_New(MyFacade));
+    svc->RegisterComponent(LLBC_New(MyComp));
     svc->Start();
 
     std::cout <<"press any key to continue ..." <<std::endl;

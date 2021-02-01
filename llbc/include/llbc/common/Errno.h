@@ -509,24 +509,24 @@ extern LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_NOT_ALLOW             ((int)(0xc0000024))
 
 //
-// Message Id: LLBC_ERROR_FACADE_INIT
+// Message Id: LLBC_ERROR_COMP_INIT
 //
 // MessageText:
 //
-// initialize facade failed.
+// initialize comp failed.
 //
-#define __LLBC_ERROR_FACADE_INIT         ((int)(0x00000025))
-#define LLBC_ERROR_FACADE_INIT           ((int)(0xc0000025))
+#define __LLBC_ERROR_COMP_INIT           ((int)(0x00000025))
+#define LLBC_ERROR_COMP_INIT             ((int)(0xc0000025))
 
 //
-// Message Id: LLBC_ERROR_FACADE_START
+// Message Id: LLBC_ERROR_COMP_START
 //
 // MessageText:
 //
-// start facade failed.
+// start comp failed.
 //
-#define __LLBC_ERROR_FACADE_START        ((int)(0x00000026))
-#define LLBC_ERROR_FACADE_START          ((int)(0xc0000026))
+#define __LLBC_ERROR_COMP_START          ((int)(0x00000026))
+#define LLBC_ERROR_COMP_START            ((int)(0xc0000026))
 
 //
 // Message Id: LLBC_ERROR_WSA_SYSNOTREADY

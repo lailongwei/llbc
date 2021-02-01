@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Packet;
-class LLBC_IFacade;
+class LLBC_IComponent;
 class LLBC_IService;
 
 __LLBC_NS_END

@@ -134,7 +134,7 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
     }
 
     // Execute normal write(create new block and append to message buffer).
-    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, len);
+    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, len);
     block->Write(buf, len);
     if (UNLIKELY(Append(block) != LLBC_OK))
     {

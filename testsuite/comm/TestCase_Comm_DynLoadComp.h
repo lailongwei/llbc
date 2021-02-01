@@ -19,17 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_COMM_DYN_LOAD_FACADE_H__
-#define __LLBC_TEST_CASE_COMM_DYN_LOAD_FACADE_H__
+#ifndef __LLBC_TEST_CASE_COMM_DYN_LOAD_COMP_H__
+#define __LLBC_TEST_CASE_COMM_DYN_LOAD_COMP_H__
 
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_DynLoadFacade : public LLBC_BaseTestCase
+class TestCase_Comm_DynLoadComp : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_DynLoadFacade();
-    virtual ~TestCase_Comm_DynLoadFacade();
+    TestCase_Comm_DynLoadComp();
+    virtual ~TestCase_Comm_DynLoadComp();
 
 public:
     virtual int Run(int argc, char *argv[]);
@@ -38,5 +38,5 @@ private:
     LLBC_IService *_svc;
 };
 
-#endif // !__LLBC_TEST_CASE_COMM_DYN_LOAD_FACADE_H__
+#endif // !__LLBC_TEST_CASE_COMM_DYN_LOAD_COMP_H__
 

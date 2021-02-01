@@ -38,10 +38,10 @@ class pyllbc_CommMethods
 public:
     pyllbc_CommMethods()
     {
-        RegisterFacade.ml_name = "RegisterFacade";
-        RegisterFacade.ml_meth = (PyCFunction)_pyllbc_RegisterFacade;
-        RegisterFacade.ml_flags = METH_VARARGS;
-        RegisterFacade.ml_doc = "pyllbc library method/function";
+        RegisterLibComponent.ml_name = "RegisterLibComponent";
+        RegisterLibComponent.ml_meth = (PyCFunction)_pyllbc_RegisterLibComponent;
+        RegisterLibComponent.ml_flags = METH_VARARGS;
+        RegisterLibComponent.ml_doc = "pyllbc library method/function";
         DelService.ml_name = "DelService";
         DelService.ml_meth = (PyCFunction)_pyllbc_DelService;
         DelService.ml_flags = METH_VARARGS;
@@ -62,6 +62,10 @@ public:
         StopService.ml_meth = (PyCFunction)_pyllbc_StopService;
         StopService.ml_flags = METH_VARARGS;
         StopService.ml_doc = "pyllbc library method/function";
+        NewService.ml_name = "NewService";
+        NewService.ml_meth = (PyCFunction)_pyllbc_NewService;
+        NewService.ml_flags = METH_VARARGS;
+        NewService.ml_doc = "pyllbc library method/function";
         UnsubscribeEventById.ml_name = "UnsubscribeEventById";
         UnsubscribeEventById.ml_meth = (PyCFunction)_pyllbc_UnsubscribeEventById;
         UnsubscribeEventById.ml_flags = METH_VARARGS;
@@ -98,10 +102,10 @@ public:
         SubscribeEvent.ml_meth = (PyCFunction)_pyllbc_SubscribeEvent;
         SubscribeEvent.ml_flags = METH_VARARGS;
         SubscribeEvent.ml_doc = "pyllbc library method/function";
-        RegisterLibFacade.ml_name = "RegisterLibFacade";
-        RegisterLibFacade.ml_meth = (PyCFunction)_pyllbc_RegisterLibFacade;
-        RegisterLibFacade.ml_flags = METH_VARARGS;
-        RegisterLibFacade.ml_doc = "pyllbc library method/function";
+        Listen.ml_name = "Listen";
+        Listen.ml_meth = (PyCFunction)_pyllbc_Listen;
+        Listen.ml_flags = METH_VARARGS;
+        Listen.ml_doc = "pyllbc library method/function";
         decode.ml_name = "decode";
         decode.ml_meth = (PyCFunction)_pyllbc_decode;
         decode.ml_flags = METH_VARARGS;
@@ -118,6 +122,10 @@ public:
         Subscribe.ml_meth = (PyCFunction)_pyllbc_Subscribe;
         Subscribe.ml_flags = METH_VARARGS;
         Subscribe.ml_doc = "pyllbc library method/function";
+        CallComponentMethod.ml_name = "CallComponentMethod";
+        CallComponentMethod.ml_meth = (PyCFunction)_pyllbc_CallComponentMethod;
+        CallComponentMethod.ml_flags = METH_VARARGS;
+        CallComponentMethod.ml_doc = "pyllbc library method/function";
         ClearHookedErrors.ml_name = "ClearHookedErrors";
         ClearHookedErrors.ml_meth = (PyCFunction)_pyllbc_ClearHookedErrors;
         ClearHookedErrors.ml_flags = METH_VARARGS;
@@ -154,10 +162,10 @@ public:
         Post.ml_meth = (PyCFunction)_pyllbc_Post;
         Post.ml_flags = METH_VARARGS;
         Post.ml_doc = "pyllbc library method/function";
-        Listen.ml_name = "Listen";
-        Listen.ml_meth = (PyCFunction)_pyllbc_Listen;
-        Listen.ml_flags = METH_VARARGS;
-        Listen.ml_doc = "pyllbc library method/function";
+        PyTimerSetIgnoredDeadRef.ml_name = "PyTimerSetIgnoredDeadRef";
+        PyTimerSetIgnoredDeadRef.ml_meth = (PyCFunction)_pyllbc_PyTimerSetIgnoredDeadRef;
+        PyTimerSetIgnoredDeadRef.ml_flags = METH_VARARGS;
+        PyTimerSetIgnoredDeadRef.ml_doc = "pyllbc library method/function";
         UninstallErrHooker.ml_name = "UninstallErrHooker";
         UninstallErrHooker.ml_meth = (PyCFunction)_pyllbc_UninstallErrHooker;
         UninstallErrHooker.ml_flags = METH_VARARGS;
@@ -218,10 +226,6 @@ public:
         Packet_GetExtData3.ml_meth = (PyCFunction)_pyllbc_Packet_GetExtData3;
         Packet_GetExtData3.ml_flags = METH_VARARGS;
         Packet_GetExtData3.ml_doc = "pyllbc library method/function";
-        PyTimerSetIgnoredDeadRef.ml_name = "PyTimerSetIgnoredDeadRef";
-        PyTimerSetIgnoredDeadRef.ml_meth = (PyCFunction)_pyllbc_PyTimerSetIgnoredDeadRef;
-        PyTimerSetIgnoredDeadRef.ml_flags = METH_VARARGS;
-        PyTimerSetIgnoredDeadRef.ml_doc = "pyllbc library method/function";
         GetServiceFPS.ml_name = "GetServiceFPS";
         GetServiceFPS.ml_meth = (PyCFunction)_pyllbc_GetServiceFPS;
         GetServiceFPS.ml_flags = METH_VARARGS;
@@ -250,18 +254,14 @@ public:
         PyTimerUpdateAllTimers.ml_meth = (PyCFunction)_pyllbc_PyTimerUpdateAllTimers;
         PyTimerUpdateAllTimers.ml_flags = METH_VARARGS;
         PyTimerUpdateAllTimers.ml_doc = "pyllbc library method/function";
-        NewService.ml_name = "NewService";
-        NewService.ml_meth = (PyCFunction)_pyllbc_NewService;
-        NewService.ml_flags = METH_VARARGS;
-        NewService.ml_doc = "pyllbc library method/function";
+        RegisterComponent.ml_name = "RegisterComponent";
+        RegisterComponent.ml_meth = (PyCFunction)_pyllbc_RegisterComponent;
+        RegisterComponent.ml_flags = METH_VARARGS;
+        RegisterComponent.ml_doc = "pyllbc library method/function";
         RegisterCodec.ml_name = "RegisterCodec";
         RegisterCodec.ml_meth = (PyCFunction)_pyllbc_RegisterCodec;
         RegisterCodec.ml_flags = METH_VARARGS;
         RegisterCodec.ml_doc = "pyllbc library method/function";
-        FireEvent.ml_name = "FireEvent";
-        FireEvent.ml_meth = (PyCFunction)_pyllbc_FireEvent;
-        FireEvent.ml_flags = METH_VARARGS;
-        FireEvent.ml_doc = "pyllbc library method/function";
         GetServiceFrameInterval.ml_name = "GetServiceFrameInterval";
         GetServiceFrameInterval.ml_meth = (PyCFunction)_pyllbc_GetServiceFrameInterval;
         GetServiceFrameInterval.ml_flags = METH_VARARGS;
@@ -294,19 +294,20 @@ public:
         ServiceMainLoop.ml_meth = (PyCFunction)_pyllbc_ServiceMainLoop;
         ServiceMainLoop.ml_flags = METH_VARARGS;
         ServiceMainLoop.ml_doc = "pyllbc library method/function";
-        CallFacadeMethod.ml_name = "CallFacadeMethod";
-        CallFacadeMethod.ml_meth = (PyCFunction)_pyllbc_CallFacadeMethod;
-        CallFacadeMethod.ml_flags = METH_VARARGS;
-        CallFacadeMethod.ml_doc = "pyllbc library method/function";
+        FireEvent.ml_name = "FireEvent";
+        FireEvent.ml_meth = (PyCFunction)_pyllbc_FireEvent;
+        FireEvent.ml_flags = METH_VARARGS;
+        FireEvent.ml_doc = "pyllbc library method/function";
     }
 
 public:
-    ::PyMethodDef RegisterFacade;
+    ::PyMethodDef RegisterLibComponent;
     ::PyMethodDef DelService;
     ::PyMethodDef PyTimerGetTimerId;
     ::PyMethodDef GetServiceTypeStr;
     ::PyMethodDef Packet_GetLocalIp;
     ::PyMethodDef StopService;
+    ::PyMethodDef NewService;
     ::PyMethodDef UnsubscribeEventById;
     ::PyMethodDef Packet_GetPeerPort;
     ::PyMethodDef PyTimerCancel;
@@ -316,11 +317,12 @@ public:
     ::PyMethodDef GetServiceId;
     ::PyMethodDef Packet_GetExtData2;
     ::PyMethodDef SubscribeEvent;
-    ::PyMethodDef RegisterLibFacade;
+    ::PyMethodDef Listen;
     ::PyMethodDef decode;
     ::PyMethodDef SetServiceFPS;
     ::PyMethodDef NewPyTimer;
     ::PyMethodDef Subscribe;
+    ::PyMethodDef CallComponentMethod;
     ::PyMethodDef ClearHookedErrors;
     ::PyMethodDef DelPyTimer;
     ::PyMethodDef InstallErrHooker;
@@ -330,7 +332,7 @@ public:
     ::PyMethodDef Packet_GetLocalPort;
     ::PyMethodDef PreSubscribe;
     ::PyMethodDef Post;
-    ::PyMethodDef Listen;
+    ::PyMethodDef PyTimerSetIgnoredDeadRef;
     ::PyMethodDef UninstallErrHooker;
     ::PyMethodDef Connect;
     ::PyMethodDef PyTimerSchedule;
@@ -346,7 +348,6 @@ public:
     ::PyMethodDef Packet_GetExtData1;
     ::PyMethodDef Packet_GetPeerIp;
     ::PyMethodDef Packet_GetExtData3;
-    ::PyMethodDef PyTimerSetIgnoredDeadRef;
     ::PyMethodDef GetServiceFPS;
     ::PyMethodDef PyTimerGetPeriod;
     ::PyMethodDef RemoveSession;
@@ -354,9 +355,8 @@ public:
     ::PyMethodDef PyTimerIsScheduling;
     ::PyMethodDef SuppressServiceCoderNotFoundWarning;
     ::PyMethodDef PyTimerUpdateAllTimers;
-    ::PyMethodDef NewService;
+    ::PyMethodDef RegisterComponent;
     ::PyMethodDef RegisterCodec;
-    ::PyMethodDef FireEvent;
     ::PyMethodDef GetServiceFrameInterval;
     ::PyMethodDef IsErrHookerInstalled;
     ::PyMethodDef GetServiceCodec;
@@ -365,7 +365,7 @@ public:
     ::PyMethodDef level2str;
     ::PyMethodDef UnsubscribeEventByStub;
     ::PyMethodDef ServiceMainLoop;
-    ::PyMethodDef CallFacadeMethod;
+    ::PyMethodDef FireEvent;
 };
 
 #define pyllbc_s_CommMethods LLBC_Singleton< ::pyllbc_CommMethods, LLBC_DummyLock>::Instance()

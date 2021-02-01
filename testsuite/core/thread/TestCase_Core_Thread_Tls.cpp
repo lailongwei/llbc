@@ -34,7 +34,7 @@ static int ThreadProc(void *arg)
     ::memcpy(&threadIndex, &arg, sizeof(long));
     LLBC_PrintLine("thread %d startup", threadIndex);
 
-    __g_tls.SetValue(LLBC_New0(long));
+    __g_tls.SetValue(LLBC_New(long));
     (*__g_tls) = threadIndex;
     for(int i = 0; i < 5000000; ++i)
         (*__g_tls) += 1;

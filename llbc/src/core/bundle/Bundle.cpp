@@ -56,7 +56,7 @@ int LLBC_Bundle::CreateMainBundle()
         return LLBC_FAILED;
     }
     
-    LLBC_INTERNAL_NS __g_mainBundle = LLBC_New0(LLBC_Bundle);
+    LLBC_INTERNAL_NS __g_mainBundle = LLBC_New(LLBC_Bundle);
     return (LLBC_INTERNAL_NS __g_mainBundle)->Initialize("");
 }
 

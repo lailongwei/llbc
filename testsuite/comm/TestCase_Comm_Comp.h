@@ -19,17 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_COMM_FACADE_H__
-#define __LLBC_TEST_CASE_COMM_FACADE_H__
+#ifndef __LLBC_TEST_CASE_COMM_COMP_H__
+#define __LLBC_TEST_CASE_COMM_COMP_H__
 
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_Facade : public LLBC_BaseTestCase
+class TestCase_Comm_Comp : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_Facade();
-    virtual ~TestCase_Comm_Facade();
+    TestCase_Comm_Comp();
+    virtual ~TestCase_Comm_Comp();
 
 public:
     virtual int Run(int argc, char *argv[]);
@@ -39,4 +39,4 @@ private:
     int TestInExternalDriveService(const LLBC_String &host, const int port);
 };
 
-#endif // __LLBC_TEST_CASE_COMM_FACADE_H__
+#endif // __LLBC_TEST_CASE_COMM_COMP_H__

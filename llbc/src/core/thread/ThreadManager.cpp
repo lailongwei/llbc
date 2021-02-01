@@ -80,13 +80,13 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     // Setup core tls some components.
-    tls->coreTls.safetyObjectPool = LLBC_New0(LLBC_NS LLBC_SafetyObjectPool);
-    tls->coreTls.unsafetyObjectPool = LLBC_New0(LLBC_NS LLBC_UnsafetyObjectPool);
-    tls->coreTls.timerScheduler = LLBC_New0(LLBC_NS LLBC_TimerScheduler);
+    tls->coreTls.safetyObjectPool = LLBC_New(LLBC_NS LLBC_SafetyObjectPool);
+    tls->coreTls.unsafetyObjectPool = LLBC_New(LLBC_NS LLBC_UnsafetyObjectPool);
+    tls->coreTls.timerScheduler = LLBC_New(LLBC_NS LLBC_TimerScheduler);
 
     // Setup objbase tls some components.
-    tls->objbaseTls.poolStack = LLBC_New0(LLBC_NS LLBC_AutoReleasePoolStack);
-    LLBC_New0(LLBC_NS LLBC_AutoReleasePool);
+    tls->objbaseTls.poolStack = LLBC_New(LLBC_NS LLBC_AutoReleasePoolStack);
+    LLBC_New(LLBC_NS LLBC_AutoReleasePool);
 
     // Delete arg.
     LLBC_Delete(threadArg);
@@ -972,7 +972,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
         nativeHandle = &tmpNativeThreadHandle;
 
     LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg *threadArg =
-        LLBC_New0(LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg);
+        LLBC_New(LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg);
     threadArg->realArg = arg;
     threadArg->realProc = proc;
     threadArg->threadHandle = _maxThreadHandle;
@@ -989,7 +989,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
         return LLBC_INVALID_HANDLE;
     }
 
-    LLBC_ThreadDescriptor *desc = LLBC_New0(LLBC_ThreadDescriptor);
+    LLBC_ThreadDescriptor *desc = LLBC_New(LLBC_ThreadDescriptor);
     desc->SetHandle(_maxThreadHandle);
     desc->SetNativeHandle(*nativeHandle);
     desc->SetGroupHandle(groupHandle);
@@ -1018,7 +1018,7 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
     LLBC_ThreadGroupDescriptor *groupDesc = FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
     if (!groupDesc)
     {
-        groupDesc = LLBC_New0(LLBC_ThreadGroupDescriptor);
+        groupDesc = LLBC_New(LLBC_ThreadGroupDescriptor);
         groupDesc->SetGroupHandle(threadDesc->GetGroupHandle());
         AddThreadGroupDescriptor(groupDesc);
     }

@@ -77,7 +77,7 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     packet->SetPayload(block);
 
     // Create output.
-    out = LLBC_New1(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+    out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
     (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&packet, sizeof(LLBC_Packet *));
 
     return LLBC_OK;

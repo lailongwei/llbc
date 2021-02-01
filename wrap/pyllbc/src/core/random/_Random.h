@@ -27,7 +27,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewRandom(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &seed))
         return NULL;
 
-    return PyLong_FromLong(reinterpret_cast<long>(LLBC_New1(LLBC_Random, seed)));
+    return PyLong_FromLong(reinterpret_cast<long>(LLBC_New(LLBC_Random, seed)));
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_DelRandom(PyObject *self, PyObject *args)

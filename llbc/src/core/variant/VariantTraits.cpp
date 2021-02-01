@@ -76,7 +76,7 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         else
         {
             if (lHolder.obj.str == NULL)
-                lHolder.obj.str = LLBC_New1(LLBC_String, *rHolder.obj.str);
+                lHolder.obj.str = LLBC_New(LLBC_String, *rHolder.obj.str);
             else if (lHolder.obj.str != rHolder.obj.str)
                 *lHolder.obj.str = *rHolder.obj.str;
         }
@@ -95,7 +95,7 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         LLBC_Variant::Holder &lHolder = left.GetHolder();
         const LLBC_Variant::Holder &rHolder = right.GetHolder();
         if (lHolder.obj.seq == NULL)
-            lHolder.obj.seq = LLBC_New1(LLBC_Variant::Seq, *rHolder.obj.seq);
+            lHolder.obj.seq = LLBC_New(LLBC_Variant::Seq, *rHolder.obj.seq);
         else if (lHolder.obj.seq != rHolder.obj.seq)
             *lHolder.obj.seq = *rHolder.obj.seq;
     }
@@ -113,7 +113,7 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
         LLBC_Variant::Holder &lHolder = left.GetHolder();
         const LLBC_Variant::Holder &rHolder = right.GetHolder();
         if (lHolder.obj.dict == NULL)
-            lHolder.obj.dict = LLBC_New1(LLBC_Variant::Dict, *rHolder.obj.dict);
+            lHolder.obj.dict = LLBC_New(LLBC_Variant::Dict, *rHolder.obj.dict);
         else if (lHolder.obj.dict != rHolder.obj.dict)
             *lHolder.obj.dict = *rHolder.obj.dict;
     }

@@ -671,7 +671,7 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, void(*clear
 {
     typedef LLBC_Func1<void, void *> __PreHandleResultFuncDeleg;
 
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New1(__PreHandleResultFuncDeleg, clearFunc);
+    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New(__PreHandleResultFuncDeleg, clearFunc);
     SetPreHandleResult(result, clearDeleg);
 }
 
@@ -680,7 +680,7 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, ObjType *ob
 {
     typedef LLBC_Delegate1<void, ObjType, void *> __PreHandleResultMethDeleg;
 
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New2(__PreHandleResultMethDeleg, obj, clearMethod);
+    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New(__PreHandleResultMethDeleg, obj, clearMethod);
     SetPreHandleResult(result, clearDeleg);
 }
 
@@ -717,7 +717,7 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t 
         if (_msgBlockPoolInst)
             _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
         else
-            _payload = LLBC_New1(LLBC_MessageBlock, initSize);
+            _payload = LLBC_New(LLBC_MessageBlock, initSize);
     }
 
     return _payload;

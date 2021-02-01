@@ -92,11 +92,11 @@ public:
     }
 };
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
-    TestFacade()
-    : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents)
+    TestComp()
+    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents)
     {}
 
 public:
@@ -182,7 +182,7 @@ public:
         LLBC_PrintLine("Pre-Receive data[%d], iVal: %d, strVal: %s",
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 
-        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
+        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
 
         return true;
     }
@@ -191,7 +191,7 @@ public:
     {
         LLBC_PrintLine("Unify Pre-Receive data[%d]", packet.GetSessionId());
 
-        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
+        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
 
         return true;
     }
@@ -213,12 +213,12 @@ private:
     }
 };
 
-class TestFacadeFactory : public LLBC_IFacadeFactory
+class TestCompFactory : public LLBC_IComponentFactory
 {
 public:
-    LLBC_IFacade *Create() const
+    LLBC_IComponent *Create() const
     {
-        return LLBC_New(TestFacade);
+        return LLBC_New(TestComp);
     }
 };
 
@@ -240,25 +240,25 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     LLBC_PrintLine("Communication Service Basic test:");
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
-    // Register facade.
-    TestFacade *facade = LLBC_New0(TestFacade);
-    _svc->RegisterFacade(facade);
+    // Register comp.
+    TestComp *comp = LLBC_New(TestComp);
+    _svc->RegisterComponent(comp);
     // Register coder.
-    _svc->RegisterCoder(1, LLBC_New0(TestDataFactory));
+    _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _svc->RegisterStatusDesc(1, "The test status describe");
 #endif
 
     // Subscribe handler.
-    _svc->Subscribe(1, facade, &TestFacade::OnRecvData);
-    _svc->PreSubscribe(1, facade, &TestFacade::OnPreRecvData);
+    _svc->Subscribe(1, comp, &TestComp::OnRecvData);
+    _svc->PreSubscribe(1, comp, &TestComp::OnPreRecvData);
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE // If want to test unifypre-subscribe function, you must comment above row.
-    _svc->UnifyPreSubscribe(facade, &TestFacade::OnUnifyPreRecvData);
+    _svc->UnifyPreSubscribe(comp, &TestComp::OnUnifyPreRecvData);
 #endif
     // Subscribe status handler(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    _svc->SubscribeStatus(1, 1, facade, &TestFacade::OnStatus_1);
+    _svc->SubscribeStatus(1, 1, comp, &TestComp::OnStatus_1);
 #endif
 
     _svc->Start();

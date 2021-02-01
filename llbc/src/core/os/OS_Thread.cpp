@@ -302,7 +302,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
     }
     stackSize = MAX(stackSize, LLBC_CFG_THREAD_MINIMUM_STACK_SIZE);
 
-    LLBC_INTERNAL_NS __ThreadEntryArg *threadArg = LLBC_New0(LLBC_INTERNAL_NS __ThreadEntryArg);
+    LLBC_INTERNAL_NS __ThreadEntryArg *threadArg = LLBC_New(LLBC_INTERNAL_NS __ThreadEntryArg);
     threadArg->proc = proc;
     threadArg->arg = arg;
 

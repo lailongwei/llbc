@@ -411,7 +411,7 @@ LLBC_Time &LLBC_Time::operator =(const LLBC_Time &time)
 LLBC_String LLBC_Time::ToString() const
 {
     LLBC_String repr;
-    return repr.format("%s.%06d", Format().c_str(), GetMilliSecond() * NumOfMicroSecondsPerMilliSecond + GetMicroSecond());
+    return repr.format("%s.%06lld", Format().c_str(), GetMilliSecond() * NumOfMicroSecondsPerMilliSecond + GetMicroSecond());
 }
 
 bool LLBC_Time::DeSerialize(LLBC_Stream &stream)

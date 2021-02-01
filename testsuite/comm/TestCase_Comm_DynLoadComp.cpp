@@ -20,50 +20,50 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_DynLoadFacade.h"
+#include "comm/TestCase_Comm_DynLoadComp.h"
 
-TestCase_Comm_DynLoadFacade::TestCase_Comm_DynLoadFacade()
+TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
 : _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", NULL, true))
 // : _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", NULL, false))
 {
 }
 
-TestCase_Comm_DynLoadFacade::~TestCase_Comm_DynLoadFacade()
+TestCase_Comm_DynLoadComp::~TestCase_Comm_DynLoadComp()
 {
     LLBC_Delete(_svc);
 }
 
-int TestCase_Comm_DynLoadFacade::Run(int argc, char *argv[])
+int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Communication Service Dynamic Load Facade Test:");
-    LLBC_PrintLine("Note: You must be build your facade library first!");
+    LLBC_PrintLine("Communication Service Dynamic Load Comp Test:");
+    LLBC_PrintLine("Note: You must be build your comp library first!");
 
-    LLBC_String libPath, facadeName;
-    LLBC_Print("Please input your facade library path:");
+    LLBC_String libPath, compName;
+    LLBC_Print("Please input your comp library path:");
     std::cin >> libPath;
 
-    LLBC_Print("Please input your facade name:");
-    std::cin >> facadeName;
+    LLBC_Print("Please input your comp name:");
+    std::cin >> compName;
 
-    LLBC_PrintLine("Will register facade in service");
-    int ret = _svc->RegisterFacade(libPath, facadeName);
+    LLBC_PrintLine("Will register comp in service");
+    int ret = _svc->RegisterComponent(libPath, compName);
     if (ret != LLBC_OK)
     {
-        LLBC_FilePrintLine(stderr, "Failed to register dynamic facade, error:%s", LLBC_FormatLastError());
+        LLBC_FilePrintLine(stderr, "Failed to register dynamic comp, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Register dynamic facade success, try start service");
+    LLBC_PrintLine("Register dynamic comp success, try start service");
     if ((ret = _svc->Start()) != LLBC_OK)
     {
         LLBC_FilePrintLine(stderr, "Start service failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLine("Try call facade method: Foo");
-    LLBC_IFacade *facade = _svc->GetFacade("TestFacade");
+    LLBC_PrintLine("Try call comp method: Foo");
+    LLBC_IComponent *comp = _svc->GetComponent("TestComp");
     LLBC_Variant arg(3);
     LLBC_Variant callRet(4);
-    ret = facade->CallMethod("Foo", arg, callRet);
+    ret = comp->CallMethod("Foo", arg, callRet);
     if (ret != LLBC_OK)
     {
         LLBC_PrintLine("Call method Foo success, but return code not equal to 0, error(maybe incorrect):%s", LLBC_FormatLastError());

@@ -24,11 +24,11 @@
 
 namespace
 {
-    class TestFacade : public LLBC_IFacade
+    class TestComp : public LLBC_IComponent
     {
     public:
-        TestFacade()
-        : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents | LLBC_FacadeEvents::OnUpdate)
+        TestComp()
+        : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
         {
         }
 
@@ -52,7 +52,7 @@ namespace
                 _beginUpdateTime = LLBC_GetMilliSeconds();
 
             ++_updateTimes;
-            if (_updateTimes % 10000000 == 0)
+            if (_updateTimes % 1000000 == 0)
             {
                 double elapsed = static_cast<double>(LLBC_GetMilliSeconds() - _beginUpdateTime);
                 double updateSpeed = _updateTimes / elapsed;
@@ -80,7 +80,7 @@ int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
     LLBC_PrintLine("Service FPS test:");
 
     LLBC_IService *fpsTestSvc = LLBC_IService::Create(LLBC_IService::Normal, "FPSTestService");
-    fpsTestSvc->RegisterFacade(LLBC_New(TestFacade));
+    fpsTestSvc->RegisterComponent(LLBC_New(TestComp));
     fpsTestSvc->SetFPS(LLBC_INFINITE);
 
     fpsTestSvc->Start();

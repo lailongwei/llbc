@@ -134,7 +134,7 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
 
     std::cout <<"Create new packet to test prehandle result clear callback method" <<std::endl;
     LLBC_Packet *preHandleTestPacket = LLBC_New(LLBC_Packet);
-    preHandleTestPacket->SetPreHandleResult(LLBC_New0(char), __DeletePreHandleResult);
+    preHandleTestPacket->SetPreHandleResult(LLBC_New(char), __DeletePreHandleResult);
 
     std::cout <<"Delete prehandle test packet" <<std::endl;
     LLBC_XDelete(preHandleTestPacket);
