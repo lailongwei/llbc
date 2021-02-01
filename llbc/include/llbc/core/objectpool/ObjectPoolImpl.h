@@ -428,7 +428,7 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstL
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
 {
     // Delete node pool instance.
     _PoolInsts::iterator instIt = _poolInsts.find(node->GetNodeName());
