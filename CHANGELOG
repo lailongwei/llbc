@@ -3,7 +3,16 @@
 ######################################################################################
 # Version: 1.0.9
 # 2020/9~
-#
+# 1)【llbc core】Facade->Component命名变更
+# 2)【llbc core】优化LLBC_Directory::Join()，使用变长模板参数简化原有实现(感谢caochunxi)
+# 3)【llbc core】标准化Variant排序实现, 确保行为跟python一致
+# 4)【llbc core】标准化Variant operator bool()/AsBool()操作，参考python，对于number: 0为false，对于string/seq/dict: 代为false
+# 5)【testsuite】testsuite运行时支持argc/argv输入(为之前testsuite改造时导致的机制缺失, 现已补上)
+# 6)【pyllbc】优化python层packet构造性能, 提供reuse机制以确保packet创建的高效(PYLLBC_CFG_PACKET_REUSE选项), 针对packet创建参数同样进行优化, 优化后的收包性能提升100%
+# 7)【pyllbc】针对python层的packet对象的不常访问的属性:local_ip/local_port/peer_ip/peer_port/extdata1/extdata2/extdata3, 进行惰式访问优化, 以最大限度提升性能
+# BugFix:
+#   - 【llbc core】修复若干string split bugs(感谢ericyonng)
+#   - 【llbc core】修复Time format一处格式化bug
 
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9
