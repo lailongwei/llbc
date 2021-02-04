@@ -39,13 +39,13 @@ LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectio
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     return true;
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
+bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
 {
     return __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_RESULT;
 }
@@ -58,33 +58,33 @@ LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObject(ObjectType *&ob
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
-                                                                    LLBC_IObjectPoolInst *poolInst,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                                  LLBC_IObjectPoolInst *poolInst,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     obj->MarkPoolObject(*poolInst);
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
-                                                                    LLBC_IObjectPoolInst *poolInst,
-                                                                    ...)
+void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                                  LLBC_IObjectPoolInst *poolInst,
+                                                  ...)
 {
     MarkPoolObjectInl<ObjectType>(obj, poolInst, __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_OBJ);
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
-                                                                    LLBC_IObjectPoolInst *poolInst,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
+void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                                  LLBC_IObjectPoolInst *poolInst,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
 {
     obj->MarkPoolObject(*poolInst);
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
-                                                                    LLBC_IObjectPoolInst *poolInst,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
+void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                                  LLBC_IObjectPoolInst *poolInst,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
 {
     // Do nothing.
 }
@@ -96,15 +96,15 @@ LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsPoolObject(ObjectType *&obj)
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
-                                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
+                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     return obj->IsPoolObject();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
-                                                                  ...)
+bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
+                                                ...)
 {
     return __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_RESULT;
 }
@@ -116,29 +116,29 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInst(O
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
-                                                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     return obj->GetPoolInst();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
-                                                                                  ...)
+LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                ...)
 {
     return GetPoolInstInl<ObjectType>(obj, __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_OBJ);
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
-                                                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
+LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
 {
     return obj->GetPoolInst();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
-                                                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
+LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
 {
     return NULL;
 }
@@ -150,29 +150,29 @@ LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPool(ObjectType *&ob
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
+void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     obj->GiveBackToPool();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                                    ...)
+void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
+                                                  ...)
 {
     GiveBackToPoolInl<ObjectType>(obj, __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_OBJ);
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
+void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_TRUE)
 {
     obj->GiveBackToPool();
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                                    __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
+void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
+                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
 {
     // Do nothing.
 }
