@@ -25,6 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/thread/SimpleLock.h"
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
@@ -38,8 +39,8 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
-class LLBC_LogRunnable;
 class LLBC_LoggerConfigInfo;
+class LLBC_ILogAppender;
 
 __LLBC_NS_END
 
@@ -98,6 +99,12 @@ public:
      * @return bool - take over option.
      */
     bool IsTakeOver() const;
+
+    /**
+     * Get asynchronous mode switch.
+     * @return bool - asynchronous mode switch.
+     */
+    bool IsAsyncMode() const;
 
 public:
     /**
@@ -193,6 +200,31 @@ private:
                                int len);
 
 private:
+    friend class LLBC_LogRunnable;
+    /**
+     * Add log appender.
+     * @param[in] appender - log appender.
+     */
+    void AddAppender(LLBC_ILogAppender *appender);
+
+    /**
+    * Flush log to appender.
+    */
+    void Flush();
+
+    /**
+     * Flush log data.
+     * @param[in] data - log data.
+     */
+    int Flush(LLBC_LogData *data);
+
+    /**
+     * Flush appenders.
+     * @param[in] force - force flush or not, default is false.
+     */
+    void FlushAppenders(bool force = false);
+
+private:
     LLBC_RecursiveLock _lock;
 
     LLBC_String _name;
@@ -200,7 +232,18 @@ private:
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;
 
-    LLBC_LogRunnable *_logRunnable;
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    LLBC_SimpleLock _logsLock;
+#else  // LLBC_TARGET_PLATFORM_WIN32
+    LLBC_SpinLock _logsLock;
+#endif  // LLBC_TARGET_PLATFORM_NON_WIN32
+    std::list<LLBC_MessageBlock*> _logs;
+
+    LLBC_ILogAppender *_head;
+    sint64 _lastFlushTime;
+    sint64 _flushInterval;
+
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
