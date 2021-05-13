@@ -60,41 +60,13 @@ public:
 
 public:
     /**
-     * Set runnable flush interval.
-     */
-    void SetFlushInterval(sint64 flushInterval);
-
-public:
-    /**
-     * Add log appender.
-     * @param[in] appender - log appender.
-     */
-    void AddAppender(LLBC_ILogAppender *appender);
-
-    /**
-     * Output log data.
-     * @param[in] data - log data.
-     */
-    int Output(LLBC_LogData *data);
-
-    /**
      * Stop log runnable, it just send stop signal to task, must call Wait() to real stop runnable.
      */
     void Stop();
 
-private:
-    /**
-     * Flush appenders.
-     * @param[in] force - force flush or not, default is false.
-     */
-    void FlushAppenders(bool force = false);
 
 private:
     volatile bool _stoped;
-    LLBC_ILogAppender *_head;
-
-    sint64 _lastFlushTime;
-    sint64 _flushInterval;
 };
 
 __LLBC_NS_END

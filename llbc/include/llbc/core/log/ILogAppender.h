@@ -129,7 +129,7 @@ protected:
     virtual LLBC_LogTokenChain *GetTokenChain() const = 0;
 
 protected:
-    friend class LLBC_LogRunnable;
+    friend class LLBC_Logger;
 
     /**
      * Get next appender.

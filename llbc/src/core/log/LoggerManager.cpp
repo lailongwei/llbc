@@ -30,6 +30,7 @@
 #include "llbc/core/log/LoggerConfigurator.h"
 #include "llbc/core/log/LoggerManager.h"
 #include "llbc/core/log/Log.h"
+#include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
 
@@ -40,6 +41,7 @@ LLBC_LoggerManager::LLBC_LoggerManager()
 , _root(NULL)
 , _loggers()
 , _configurator(NULL)
+, _logRunnable(NULL)
 {
 }
 
@@ -96,6 +98,20 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         _loggers.insert(std::make_pair(iter->first, logger));
     }
 
+    _logRunnable = LLBC_New(LLBC_LogRunnable);
+
+    for (auto logger : _loggers)
+    {
+        if (!logger.second->IsAsyncMode())
+            continue;
+
+        LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
+        block->Write(&logger.second, sizeof(LLBC_Logger *));
+        _logRunnable->Push(block);
+    }
+
+    _logRunnable->Activate(1);
+
     // Init Log helper class.
     LLBC_LogHelper::Initialize(this);
 
@@ -115,6 +131,10 @@ void LLBC_LoggerManager::Finalize()
 
     if (_root == NULL)
         return;
+
+    _logRunnable->Stop();
+    _logRunnable->Wait();
+    LLBC_XDelete(_logRunnable);
 
     // Finalize Log helper class.
     LLBC_LogHelper::Finalize();
