@@ -180,6 +180,13 @@ LLBC_Variant::LLBC_Variant(const LLBC_Variant &var)
     LLBC_VariantTraits::assign(*this, var);
 }
 
+LLBC_Variant::LLBC_Variant(LLBC_Variant &&var)
+: _holder(var._holder)
+{
+    var._holder.type = LLBC_VariantType::VT_NIL;
+    var._holder.data.raw.uint64Val = NULL;
+}
+
 bool LLBC_Variant::AsBool() const
 {
     const LLBC_VariantType::ENUM firstType = GetFirstType();
@@ -850,6 +857,17 @@ LLBC_Variant &LLBC_Variant::operator =(const Dict &dict)
         else
             _holder.data.obj.dict = LLBC_New(Dict, dict);
     }
+
+    return *this;
+}
+
+LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var)
+{
+    _holder.Clear();
+    _holder = var._holder;
+
+    var._holder.type = LLBC_VariantType::VT_NIL;
+    var._holder.data.raw.uint64Val = 0;
 
     return *this;
 }

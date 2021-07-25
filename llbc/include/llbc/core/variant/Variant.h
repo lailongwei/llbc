@@ -275,6 +275,7 @@ public:
     template <typename _Key, typename _Val>
     explicit LLBC_Variant(const std::unordered_map<_Key, _Val> &um);
     LLBC_Variant(const LLBC_Variant &var);
+    LLBC_Variant(LLBC_Variant &&var);
 
 public:
     // Fetch variant data type and holder data.
@@ -498,6 +499,7 @@ public:
     template <typename _Key, typename _Val>
     LLBC_Variant &operator =(const std::map<_Key, _Val> &m);
     LLBC_Variant &operator =(const LLBC_Variant &var);
+    LLBC_Variant &operator =(LLBC_Variant &&var);
 
     // Relational operators.
     bool operator ==(const LLBC_Variant &another) const;
