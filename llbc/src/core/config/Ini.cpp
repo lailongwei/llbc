@@ -69,7 +69,7 @@ int LLBC_IniSection::RemoveValue(const LLBC_String &key)
 
     _values.erase(valIt);
     _comments.erase(key);
-    std::remove(_keys.begin(), _keys.end(), key);
+    (void)std::remove(_keys.begin(), _keys.end(), key);
 
     return LLBC_OK;
 }
