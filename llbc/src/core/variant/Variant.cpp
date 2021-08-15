@@ -145,7 +145,7 @@ void LLBC_Variant::InitNumber2StrFastAccessTable()
         #if LLBC_TARGET_PLATFORM_WIN32
         _itoa_s(i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN, buf, 10);
         #else
-        itoa(i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN, buf, 10);
+        sprintf(buf, "%d", i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN);
         #endif
 
         _num2StrFastAccessTbl[i] = LLBC_New(Str, buf);
@@ -184,7 +184,7 @@ LLBC_Variant::LLBC_Variant(LLBC_Variant &&var)
 : _holder(var._holder)
 {
     var._holder.type = LLBC_VariantType::VT_NIL;
-    var._holder.data.raw.uint64Val = NULL;
+    var._holder.data.raw.uint64Val = 0;
 }
 
 bool LLBC_Variant::AsBool() const

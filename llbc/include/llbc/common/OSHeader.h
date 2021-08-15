@@ -97,6 +97,7 @@
 #include <signal.h>
 #include <math.h>
 #include <time.h>
+#include <float.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif
