@@ -155,8 +155,8 @@ void LLBC_LogFileAppender::Finalize()
 
 int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 {
-    LLBC_LogTokenChain *chain;
-    if (UNLIKELY(!(chain = GetTokenChain())))
+    LLBC_LogTokenChain *chain = GetTokenChain();
+    if (UNLIKELY(!chain))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;

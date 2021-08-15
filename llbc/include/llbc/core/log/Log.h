@@ -69,14 +69,14 @@ public:
     /**
      * Output debug level message.
      */
-    static void d(const char *fmt, ...);
-    static void d2(const char *tag, const char *fmt, ...);
+    static void d(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void d2(const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     template <typename Tag>
-    static void d2(const char *fmt, ...);
-    static void d3(const char *logger, const char *fmt, ...);
-    static void d4(const char *logger, const char *tag, const char *fmt, ...);
+    static void d2(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void d3(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+    static void d4(const char *logger, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
     template <typename Tag>
-    static void d4(const char *logger, const char *fmt, ...);
+    static void d4(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
 
     /**
      * Output debug level json message.
@@ -93,14 +93,14 @@ public:
     /**
      * Output info level message.
      */
-    static void i(const char *fmt, ...);
-    static void i2(const char *tag, const char *fmt, ...);
+    static void i(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void i2(const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     template <typename Tag>
-    static void i2(const char *fmt, ...);
-    static void i3(const char *logger, const char *fmt, ...);
-    static void i4(const char *logger, const char *tag, const char *fmt, ...);
+    static void i2(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void i3(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+    static void i4(const char *logger, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
     template <typename Tag>
-    static void i4(const char *logger, const char *fmt, ...);
+    static void i4(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
 
     /**
      * Output info level json message.
@@ -117,14 +117,14 @@ public:
     /**
      * Output warning level message.
      */
-    static void w(const char *fmt, ...);
-    static void w2(const char *tag, const char *fmt, ...);
+    static void w(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void w2(const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     template <typename Tag>
-    static void w2(const char *fmt, ...);
-    static void w3(const char *logger, const char *fmt, ...);
-    static void w4(const char *logger, const char *tag, const char *fmt, ...);
+    static void w2(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void w3(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+    static void w4(const char *logger, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
     template <typename Tag>
-    static void w4(const char *logger, const char *fmt, ...);
+    static void w4(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
 
     /**
      * Output warning level json message.
@@ -141,14 +141,14 @@ public:
     /**
      * Output error level message.
      */
-    static void e(const char *fmt, ...);
-    static void e2(const char *tag, const char *fmt, ...);
+    static void e(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void e2(const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     template <typename Tag>
-    static void e2(const char *fmt, ...);
-    static void e3(const char *logger, const char *fmt, ...);
-    static void e4(const char *logger, const char *tag, const char *fmt, ...);
+    static void e2(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void e3(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+    static void e4(const char *logger, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
     template <typename Tag>
-    static void e4(const char *logger, const char *fmt, ...);
+    static void e4(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
 
     /**
      * Output error level json message.
@@ -165,14 +165,14 @@ public:
     /**
      * Output fatal level message.
      */
-    static void f(const char *fmt, ...);
-    static void f2(const char *tag, const char *fmt, ...);
+    static void f(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void f2(const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     template <typename Tag>
-    static void f2(const char *fmt, ...);
-    static void f3(const char *logger, const char *fmt, ...);
-    static void f4(const char *logger, const char *tag, const char *fmt, ...);
+    static void f2(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(1, 2);
+    static void f3(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+    static void f4(const char *logger, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
     template <typename Tag>
-    static void f4(const char *logger, const char *fmt, ...);
+    static void f4(const char *logger, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
     
     /**
      * Output fatal level json message.

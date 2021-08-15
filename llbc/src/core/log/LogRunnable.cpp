@@ -65,7 +65,7 @@ void LLBC_LogRunnable::Svc()
         if (TimedPop(block, 50) != LLBC_OK)
             continue;
 
-        block->Read(&logger, sizeof(LLBC_LogData *));
+        block->Read(&logger, sizeof(LLBC_Logger *));
 
         logger->Flush();
 
