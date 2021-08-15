@@ -655,7 +655,7 @@ inline LLBC_Variant::operator const LLBC_Variant::Dict &() const
 }
 
 template <typename _Key, typename _Val>
-LLBC_Variant::operator const std::map<_Key, _Val>() const
+LLBC_Variant::operator std::map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
     if (IsDictX())
@@ -665,7 +665,7 @@ LLBC_Variant::operator const std::map<_Key, _Val>() const
 }
 
 template <typename _Key, typename _Val>
-LLBC_Variant::operator const std::unordered_map<_Key, _Val>() const
+LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
     if (IsDictX())

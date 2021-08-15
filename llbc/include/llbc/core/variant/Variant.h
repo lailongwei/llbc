@@ -377,9 +377,9 @@ public:
     operator std::deque<_Ty>() const;
     operator const Dict &() const;
     template <typename _Key, typename _Val>
-    operator const std::map<_Key, _Val>() const;
+    operator std::map<_Key, _Val>() const;
     template <typename _Key, typename _Val>
-    operator const std::unordered_map<_Key, _Val>() const;
+    operator std::unordered_map<_Key, _Val>() const;
 
     // Common operation methods.
     void Clear();

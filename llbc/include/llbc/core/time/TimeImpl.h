@@ -45,6 +45,31 @@ inline time_t LLBC_Time::NowTimeStamp()
     return ::time(NULL);
 }
 
+inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
+{
+    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
+}
+
+inline LLBC_Time LLBC_Time::FromMilliSeconds(sint64 clanderTimeInMilliSeconds)
+{
+    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
+}
+
+inline LLBC_Time LLBC_Time::FromMicroSeconds(sint64 clanderTimeInMicroSeconds)
+{
+    return LLBC_Time(clanderTimeInMicroSeconds);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
+{
+    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
+{
+    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
+}
+
 inline int LLBC_Time::GetYear() const
 {
     return _localTimeStruct.tm_year + 1900; // scene 1900
@@ -123,31 +148,6 @@ inline LLBC_String LLBC_Time::Format(const time_t &clanderTimeInSeconds, const c
 inline LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format)
 {
     return FromSeconds(clanderTimeInSeconds).FormatAsGmt(format);
-}
-
-inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
-{
-    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
-}
-
-inline LLBC_Time LLBC_Time::FromMilliSeconds(sint64 clanderTimeInMilliSeconds)
-{
-    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
-}
-
-inline LLBC_Time LLBC_Time::FromMicroSeconds(sint64 clanderTimeInMicroSeconds)
-{
-    return LLBC_Time(clanderTimeInMicroSeconds);
-}
-
-inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
-{
-    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
-}
-
-inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
-{
-    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
 }
 
 inline bool LLBC_Time::operator ==(const LLBC_Time &time) const

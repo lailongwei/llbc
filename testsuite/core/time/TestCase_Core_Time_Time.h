@@ -38,6 +38,7 @@ private:
     void OSTimeTest();
 
     void TimeClassTest();
+    void TimeSpanClassTest();
 
     void PrintTimeStruct(const LLBC_TimeStruct &ts);
     void PrintCLibTimeStruct(const struct tm &ts);
