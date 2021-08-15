@@ -88,14 +88,13 @@ public:
 private:
     LLBC_RecursiveLock _lock;
 
+    LLBC_LogRunnable *_logRunnable;
+    LLBC_LoggerConfigurator *_configurator;
+
     LLBC_Logger *_root;
     std::map<LLBC_String, LLBC_Logger *> _loggers;
 
-    LLBC_LoggerConfigurator *_configurator;
-
     static LLBC_String _rootLoggerName;
-
-    LLBC_LogRunnable *_logRunnable;
 };
 
 /**

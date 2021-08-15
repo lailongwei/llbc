@@ -39,115 +39,42 @@ std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 
 __LLBC_NS_BEGIN
 
-const int LLBC_Time::NumOfSecondsPerDay = 86400;
-const int LLBC_Time::NumOfMilliSecondsPerDay = 86400000;
-#if LLBC_TARGET_PLATFORM_WIN32
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000I64;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerDay = 86400000000000I64;
-#else
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerDay = 86400000000LL;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerDay = 86400000000000LL;
-#endif
+const int LLBC_Time::NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay; 
+const int LLBC_Time::NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay; 
+const sint64 LLBC_Time::NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay; 
+const sint64 LLBC_Time::NumOfNanoSecondsPerDay = LLBC_TimeConstant::NumOfNanoSecondsPerDay; 
 
-LLBC_EXPORT const int LLBC_Time::NumOfSecondsPerHour = 3600;
-LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerHour = 3600000;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerHour = 3600000000;
-#if LLBC_TARGET_PLATFORM_WIN32
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerHour = 3600000000000I64;
-#else
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerHour = 3600000000000LL;
-#endif
+const int LLBC_Time::NumOfSecondsPerHour = LLBC_TimeConstant::NumOfSecondsPerHour; 
+const int LLBC_Time::NumOfMilliSecondsPerHour = LLBC_TimeConstant::NumOfMilliSecondsPerHour; 
+const sint64 LLBC_Time::NumOfMicroSecondsPerHour = LLBC_TimeConstant::NumOfMicroSecondsPerHour; 
+const sint64 LLBC_Time::NumOfNanoSecondsPerHour = LLBC_TimeConstant::NumOfNanoSecondsPerHour; 
 
-LLBC_EXPORT const int LLBC_Time::NumOfSecondsPerMinute = 60;
-LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerMinute = 60000;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerMinute = 60000000;
-#if LLBC_TARGET_PLATFORM_WIN32
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerMinute = 60000000000I64;
-#else
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerMinute = 60000000000LL;
-#endif
+const int LLBC_Time::NumOfSecondsPerMinute = LLBC_TimeConstant::NumOfSecondsPerMinute; 
+const int LLBC_Time::NumOfMilliSecondsPerMinute = LLBC_TimeConstant::NumOfMilliSecondsPerMinute; 
+const sint64 LLBC_Time::NumOfMicroSecondsPerMinute = LLBC_TimeConstant::NumOfMicroSecondsPerMinute; 
+const sint64 LLBC_Time::NumOfNanoSecondsPerMinute = LLBC_TimeConstant::NumOfNanoSecondsPerMinute; 
 
-LLBC_EXPORT const int LLBC_Time::NumOfMilliSecondsPerSecond = 1000;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerSecond = 1000000;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerSecond = 1000000000;
+const int LLBC_Time::NumOfMilliSecondsPerSecond = LLBC_TimeConstant::NumOfMilliSecondsPerSecond; 
+const sint64 LLBC_Time::NumOfMicroSecondsPerSecond = LLBC_TimeConstant::NumOfMicroSecondsPerSecond; 
+const sint64 LLBC_Time::NumOfNanoSecondsPerSecond = LLBC_TimeConstant::NumOfNanoSecondsPerSecond; 
 
-LLBC_EXPORT const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = 1000;
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerMilliSecond = 1000000;
+const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond; 
+const sint64 LLBC_Time::NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond; 
 
-LLBC_EXPORT const sint64 LLBC_Time::NumOfNanoSecondsPerMicroSecond = 1000;
+const sint64 LLBC_Time::NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond; 
 
 LLBC_Time LLBC_Time::Now()
 {
     return LLBC_Time(LLBC_GetMicroSeconds());
 }
 
-int LLBC_Time::GetMilliSecond() const
+LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
 {
-    sint64 nowLocalMilliSeconds = 
-        _time / NumOfMicroSecondsPerMilliSecond - LLBC_GetTimezone() * NumOfMilliSecondsPerSecond;
-    return nowLocalMilliSeconds % NumOfMilliSecondsPerSecond;
-}
-
-int LLBC_Time::GetMicroSecond() const
-{
-    sint64 nowLocalMicroSeconds =
-        _time - static_cast<sint64>(LLBC_GetTimezone()) * NumOfMicroSecondsPerSecond;
-    return static_cast<int>(nowLocalMicroSeconds % NumOfMicroSecondsPerMilliSecond);
-}
-
-LLBC_Time LLBC_Time::GetDate() const
-{
-    sint64 timeZone = static_cast<sint64>(LLBC_GetTimezone() * NumOfMicroSecondsPerSecond);
-
-    sint64 localTime = _time - timeZone;
-    sint64 datePart = localTime / NumOfMicroSecondsPerDay * NumOfMicroSecondsPerDay;
-
-    datePart += timeZone;
-
-    return LLBC_Time(datePart);
-}
-
-LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
-{
-    sint64 timeZone = LLBC_GetTimezone() * NumOfMicroSecondsPerSecond;
-
-    sint64 localTime = _time - timeZone;
-    return localTime % NumOfMicroSecondsPerDay;
-}
-
-LLBC_String LLBC_Time::Format(const char *format) const
-{
-    char buf[32];
-    memset(buf, 0, sizeof(buf));
-
-    if (format)
-        strftime(buf, sizeof(buf), format, &_localTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
-
-    return buf;
-}
-
-LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
-{
-    char buf[32];
-    memset(buf, 0, sizeof(buf));
-
-    if (format)
-        strftime(buf, sizeof(buf), format, &_gmtTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_gmtTimeStruct);
-
-    return buf;
-}
-
-LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
-{
-    if (UNLIKELY(timeRepr.empty()))
+    if (UNLIKELY(timeStr.empty()))
         return LLBC_Time();
 
     // Split date, time
-    LLBC_Strings dateTimes = timeRepr.split(' ', 1);
+    LLBC_Strings dateTimes = timeStr.split(' ', 1, true);
     if (dateTimes.size() == 1) // Only has date part or time part(try guess).
     {
         if (dateTimes[0].find('-') != LLBC_String::npos) // Is date part, append default time part.
@@ -160,7 +87,7 @@ LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
     const LLBC_String &timePart = dateTimes[1];
 
     // Split year,month,day
-    LLBC_Strings dateParts = datePart.split('-', 2);
+    LLBC_Strings dateParts = datePart.split('-', 2, true);
     if (dateParts.size() == 1) // Only has day part.
     {
         dateParts.insert(dateParts.begin(), "1");
@@ -172,18 +99,18 @@ LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
     }
 
     // Split hour,minute,second
-    LLBC_Strings timeParts = timePart.split(':', 2);
-    if (timeParts.size() == 1) // Only has second part.
+    LLBC_Strings timeParts = timePart.split(':', 2, true);
+    if (timeParts.size() == 1) // Only has hour part.
     {
-        timeParts.insert(timeParts.begin(), "0");
-        timeParts.insert(timeParts.begin(), "0");
+        timeParts.push_back("0");
+        timeParts.push_back("0");
     }
-    else if (timeParts.size() == 2) // Only has second and minute parts.
+    else if (timeParts.size() == 2) // Only has hour and minute parts.
     {
-        timeParts.insert(timeParts.begin(), "0");
+        timeParts.push_back("0");
     }
 
-    // Split time, microseconds 
+    // Split second,millisecond
     LLBC_Strings secondParts = timeParts[2].split('.', 1);
     if (secondParts.size() == 1) // Only has second part.
         secondParts.push_back("0");
@@ -192,27 +119,26 @@ LLBC_Time LLBC_Time::FromTimeRepr(LLBC_String timeRepr)
     int year = LLBC_Str2Int32(dateParts[0].c_str());
     int month = LLBC_Str2Int32(dateParts[1].c_str());
     int day = LLBC_Str2Int32(dateParts[2].c_str());
-
     int hour = LLBC_Str2Int32(timeParts[0].c_str());
     int minute = LLBC_Str2Int32(timeParts[1].c_str());
-    int second = LLBC_Str2Int32(timeParts[2].c_str());
-    int microSecond = LLBC_Str2Int32(secondParts[1].c_str());
-
+    int second = LLBC_Str2Int32(secondParts[0].c_str());
+    int milliSecond = LLBC_Str2Int32(secondParts[1].c_str());
     return FromTimeParts(year,
                          month,
                          day,
                          hour,
                          minute,
                          second,
-                         static_cast<int>(microSecond / NumOfMicroSecondsPerMilliSecond),
-                         static_cast<int>(microSecond % NumOfMicroSecondsPerMilliSecond));
+                         milliSecond,
+                         0);
 }
 
 LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct, int milliSecond, int microSecond)
 {
     time_t clanderTimeInSecs = ::mktime(const_cast<tm *>(&timeStruct));
-    return LLBC_Time(static_cast<sint64>(clanderTimeInSecs) * NumOfMicroSecondsPerSecond +
-    milliSecond * NumOfMicroSecondsPerMilliSecond + microSecond);
+    return LLBC_Time(clanderTimeInSecs * NumOfMicroSecondsPerSecond +
+                     milliSecond * NumOfMicroSecondsPerMilliSecond +
+                     microSecond);
 }
 
 LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int minute, int second, int milliSecond, int microSecond)
@@ -241,6 +167,67 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
 
 
     return FromTimeStruct(timeStruct, milliSecond, microSecond);
+}
+
+int LLBC_Time::GetMilliSecond() const
+{
+    sint64 nowLocalMilliSeconds = 
+        _time / NumOfMicroSecondsPerMilliSecond - 
+        LLBC_GetTimezone() * NumOfMilliSecondsPerSecond;
+    return static_cast<int>(
+        nowLocalMilliSeconds % NumOfMilliSecondsPerSecond);
+}
+
+int LLBC_Time::GetMicroSecond() const
+{
+    sint64 nowLocalMicroSeconds =
+        _time - LLBC_GetTimezone() * NumOfMicroSecondsPerSecond;
+    return static_cast<int>(
+        nowLocalMicroSeconds % NumOfMicroSecondsPerMilliSecond);
+}
+
+LLBC_Time LLBC_Time::GetDate() const
+{
+    sint64 timeZone = LLBC_GetTimezone() * NumOfMicroSecondsPerSecond;
+
+    sint64 localTime = _time - timeZone;
+    sint64 datePart = localTime /
+        NumOfMicroSecondsPerDay *
+        NumOfMicroSecondsPerDay;
+
+    datePart += timeZone;
+
+    return LLBC_Time(datePart);
+}
+
+LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
+{
+    sint64 timeZone = LLBC_GetTimezone() * NumOfMicroSecondsPerSecond;
+
+    sint64 localTime = _time - timeZone;
+    return LLBC_TimeSpan(localTime % NumOfMicroSecondsPerDay);
+}
+
+LLBC_String LLBC_Time::Format(const char *format) const
+{
+    char buf[32];
+    if (format)
+        strftime(buf, sizeof(buf), format, &_localTimeStruct);
+    else
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
+
+    return buf;
+}
+
+LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
+{
+    char buf[32];
+    if (format)
+        strftime(buf, sizeof(buf), format, &_gmtTimeStruct);
+    else
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_gmtTimeStruct);
+
+    return buf;
 }
 
 LLBC_Time LLBC_Time::AddYears(int years) const
@@ -361,7 +348,11 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond) const
 {
-    return GetIntervalTo(LLBC_TimeSpan(0, hour, minute, second, milliSecond, microSecond));
+    return GetIntervalTo(LLBC_TimeSpan::FromHHMMSS(hour,
+                         minute, 
+                         second, 
+                         milliSecond, 
+                         microSecond));
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span)
@@ -396,9 +387,8 @@ LLBC_Time LLBC_Time::operator -(const LLBC_TimeSpan &span) const
 
 LLBC_Time &LLBC_Time::operator =(const LLBC_Time &time)
 {
-    if (this == &time)
-        return *this;
-    else if (*this == time)
+    if (this == &time ||
+        *this == time)
         return *this;
 
     _time = time._time;

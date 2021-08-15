@@ -36,6 +36,8 @@ int __LLBC_CoreStartup()
 
     // Initialize Variant Type->StrDesc dictionary.
     LLBC_VariantType::InitType2StrDict();
+    // Initialize Variant number to number string repr fast access table.
+    LLBC_Variant::InitNumber2StrFastAccessTable();
 
     // Create main bundle.
     if(LLBC_Bundle::CreateMainBundle() != LLBC_OK)
@@ -45,9 +47,9 @@ int __LLBC_CoreStartup()
     LLBC_TZSet();
 
     // WIN32 specific, initialize performance frequency.
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_CPUTime::InitFrequency();
-#endif
+    #endif
 
     // Set entry thread object pool.
     if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
@@ -94,6 +96,9 @@ void __LLBC_CoreCleanup()
     (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
     // Destroy all object pool instance factories.
     LLBC_IObjectPool::DestroyAllPoolInstFactories();
+
+    // Destroy Variant number to number string repr fast access table.
+    LLBC_Variant::DestroyNumber2StrFastAccessTable();
 }
 
 __LLBC_NS_END

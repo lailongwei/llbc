@@ -49,6 +49,14 @@
 #define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
 
 /**
+ * \brief core/variant about config options define.
+ */
+// Define variant number as string method fast access begin number(included).
+#define LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN         ((int)-256)
+// Define variant number as string method fast access end number(included).
+#define LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END           ((int)256)
+
+/**
  * \brief core/file about config options define.
  */
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.

@@ -97,6 +97,7 @@
 #include <signal.h>
 #include <math.h>
 #include <time.h>
+#include <float.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif
@@ -113,7 +114,9 @@
 #include <deque>
 #include <stack>
 #include <map>
+#include <unordered_map>
 #include <set>
+#include <unordered_set>
 #include <algorithm>
 #include <functional>
 #include <limits.h>

@@ -176,7 +176,6 @@ void TestCase_Core_VariantTest::CompareTest()
     LLBC_Variant int10010(10010);
     LLBC_Variant int10086(10086);
     std::cout << "nil < int10010?: " << (nil < int10010) << ", nil == int10010?: " << (nil == int10010) << std::endl;
-    std::cout << "int10010 < nil?: " << (int10010< nil) << ", nil == int10010?: " << (nil == int10010) << std::endl;
     std::cout << "int0 < boolFalse?: " << (int0 < boolFalse) << ", int0 == boolFalse?: " << (int0 == boolFalse) << std::endl;
     std::cout << "int1 < boolTrue?: " << (int1 < boolTrue) << ", int1 == boolTrue?: " << (int1 == boolTrue) << std::endl;
     std::cout << "int10010 < int10086?: " << (int10010 < int10086) << ", int10010 == int10086?: " << (int10010 == int10086) << std::endl;
@@ -185,20 +184,26 @@ void TestCase_Core_VariantTest::CompareTest()
 
     LLBC_Variant dbl10010(10010.0);
     LLBC_Variant dbl10086(10086.0);
+    std::cout << "nil < dbl10010?: " << (nil < dbl10010) << ", nil == dbl10010?:" << (nil == dbl10010) << std::endl;
+    std::cout << "int0 < dbl10010?: " << (int0 < dbl10010) << ", int0 == dbl10010?: " << (int0 == dbl10010) << std::endl;
+    std::cout << "int10010 < dbl10010?: " << (int10010 < dbl10010) << ", int10010 == dbl10010?: " << (int10010 == dbl10010) << std::endl;
     std::cout << "dbl10010 < int10010?: " << (dbl10010 < int10010) << ", dbl10010 == int10010?: " << (dbl10010 == int10010) << std::endl;
     std::cout << "dbl10010 < dbl10086?: " << (dbl10010 < dbl10086) << ", dbl10010 == dbl10086?: " << (dbl10010 == dbl10086) << std::endl;
     std::cout << "dbl10086 < dbl10086?: " << (dbl10086 < dbl10086) << ", dbl10086 == dbl10086?: " << (dbl10086 == dbl10086) << std::endl;
 
     LLBC_Variant seq1;
     LLBC_Variant seq2;
+    LLBC_Variant seq2Clone;
     seq1.SeqPushBack(LLBC_Variant::nil);
     seq2.SeqPushBack(1);
+    seq2Clone = seq2;
     std::cout << "nil < seq1?: " << (nil < seq1) << ", nil == seq1?: " << (nil == seq1) << std::endl;
     std::cout << "boolTrue < seq1?: " << (boolTrue < seq1) << ", boolTrue == seq1?: " << (boolTrue == seq1) << std::endl;
     std::cout << "int10086 < seq1?: " << (int10086 < seq1) << ", int10086 == seq1?: " << (int10086 == seq1) << std::endl;
     std::cout << "dbl10086 < seq1?: " << (dbl10086 < seq1) << ", dbl10086 == seq1?: " << (dbl10086 == seq1) << std::endl;
     std::cout << "seq1 < seq1?: " << (seq1 < seq1) << ", seq1 == seq1?: " << (seq1 == seq1) << std::endl;
     std::cout << "seq1 < seq2?: " << (seq1 < seq2) << ", seq1 == seq2?: " << (seq1 == seq2) << std::endl;
+    std::cout << "seq2 < seq2Clone?: " << (seq2 < seq2Clone) << ", seq2 == seq2Clone?: " << (seq2 == seq2Clone) << std::endl;
 
     LLBC_Variant dict1;
     LLBC_Variant dict2;
@@ -240,11 +245,11 @@ void TestCase_Core_VariantTest::ArithmeticTest()
 
     LLBC_Variant left( (sint32)3 );
     LLBC_Variant right( (sint64)-5 );
-    LLBC_Variant result = left + right;
     std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
-    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right.BecomeDouble() <<std::endl;
+    right = right.AsDouble();
+    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
     std::cout <<std::endl;
 
     left = -15;
@@ -252,6 +257,7 @@ void TestCase_Core_VariantTest::ArithmeticTest()
     std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
+    right = right.AsDouble();
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right.BecomeDouble() <<std::endl;
     std::cout <<std::endl;
 
@@ -281,6 +287,11 @@ void TestCase_Core_VariantTest::ArithmeticTest()
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<std::endl;
+    std::cout <<"[" <<right <<"] + [" <<left <<"] = " <<right + left <<std::endl;
+    std::cout <<"[" <<right <<"] - [" <<left <<"] = " <<right - left <<std::endl;
+    std::cout <<"[" <<right <<"] * [" <<left <<"] = " <<right * left <<std::endl;
+    std::cout <<"[" <<right <<"] / [" <<left <<"] = " <<right / left <<std::endl;
     std::cout <<std::endl;
 }
 
@@ -381,10 +392,10 @@ void TestCase_Core_VariantTest::DictTtest()
     set2[2] = true;
     set2[3] = true;
     std::cout << "Dictionary collection operation test:" << std::endl;
-    std::cout <<"union op: set1[" <<set1 <<"] + set2[" <<set2 <<"]: = " <<set1 + set2 <<std::endl;
-    std::cout <<"difference op: set1[" <<set1 <<"] - set2[" <<set2 <<"]: = " <<set1 - set2 <<std::endl;
-    std::cout <<"intersection op: set1[" <<set1 <<"] * set2[" <<set2 <<"]: = " <<set1 * set2 <<std::endl;
-    std::cout <<"union difference op: set1[" <<set1 <<"] / set2[" <<set2 <<"]: = " <<set1 / set2 <<std::endl;
+    std::cout <<"union op: set1[" <<set1 <<"] + set2[" <<set2 <<"] = " <<set1 + set2 <<std::endl;
+    std::cout <<"difference op: set1[" <<set1 <<"] - set2[" <<set2 <<"] = " <<set1 - set2 <<std::endl;
+    std::cout <<"intersection op: set1[" <<set1 <<"] * set2[" <<set2 <<"] = " <<set1 * set2 <<std::endl;
+    std::cout <<"union difference op: set1[" <<set1 <<"] / set2[" <<set2 <<"] = " <<set1 / set2 <<std::endl;
 
     // Use dictionary as key(low-performance)
     LLBC_Variant lowPerfDict;

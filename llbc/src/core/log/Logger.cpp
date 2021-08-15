@@ -34,7 +34,6 @@
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
-#include "llbc/core/log/LogRunnable.h"
 #include "llbc/core/log/Logger.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -50,17 +49,20 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
-: _lock()
-, _name()
-, _logLevel(LLBC_LogLevel::Debug)
+: _logLevel(LLBC_LogLevel::Debug)
 , _config(NULL)
-, _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
+
+, _curLogsIdx(0)
+, _logs()
+
 , _lastFlushTime(0)
-, _head(NULL)
+, _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
+, _appenders(NULL)
+
 , _msgBlockPoolInst(*_objPool.GetPoolInst<LLBC_MessageBlock>())
 , _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
+, _hookDelegs()
 {
-    LLBC_MemSet(_hookDelegs, 0, sizeof(_hookDelegs));
 }
 
 LLBC_Logger::~LLBC_Logger()
@@ -70,25 +72,36 @@ LLBC_Logger::~LLBC_Logger()
 
 int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config)
 {
+    // Parameters check.
     if (name.empty() || !config)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
-    else if (IsInit())
+
+    // Reentry check.
+    if (IsInit())
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
+    // Lock & Reentry check(again).
     LLBC_LockGuard guard(_lock);
-    _name.append(name);
+    if (IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
 
+    // Init basic data members.
+    _name.append(name);
     _config = config;
 
     _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
     _flushInterval = _config->GetFlushInterval();
 
+    // Create console appender, if acquire.
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
@@ -107,6 +120,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         this->AddAppender(appender);
     }
 
+    // Create file appender, if acquire.
     if (_config->IsLogToFile())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
@@ -150,20 +164,29 @@ void LLBC_Logger::Finalize()
 {
     LLBC_LockGuard guard(_lock);
 
+    // Flush logs.
+    Flush(true);
+
+    // Uninstall all hooks.
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
         UninstallHook(level);
 
-    // Delete all appender.
-    while (_head)
+    // Delete all appenders.
+    while (_appenders)
     {
-        LLBC_ILogAppender *appender = _head;
-        _head = _head->GetAppenderNext();
+        LLBC_ILogAppender *appender = _appenders;
+        _appenders = _appenders->GetAppenderNext();
 
         LLBC_Delete(appender);
     }
 
+    // Reset logs index.
+    _curLogsIdx = 0;
+
+    // Reset basic members.
     _name.clear();
     _config = NULL;
+    _logLevel = LLBC_LogLevel::Debug;
 }
 
 const LLBC_String &LLBC_Logger::GetLoggerName() const
@@ -183,7 +206,6 @@ int LLBC_Logger::GetLogLevel() const
 void LLBC_Logger::SetLogLevel(int level)
 {
     LLBC_LockGuard guard(_lock);
-
     _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
 }
 
@@ -197,6 +219,9 @@ bool LLBC_Logger::IsTakeOver() const
 
 bool LLBC_Logger::IsAsyncMode() const
 {
+    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
+    LLBC_LockGuard guard(ncThis->_lock);
+
     return _config->IsAsyncMode();
 }
 
@@ -314,7 +339,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->Flush(data);
+        const int ret = this->FlushLog(data);
         LLBC_Recycle(data);
 
         return ret;
@@ -322,10 +347,9 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
     block->Write(&data, sizeof(LLBC_LogData *));
-
     {
         LLBC_LockGuard guard(_logsLock);
-        _logs.push_back(block);
+        _logs[_curLogsIdx].push_back(block);
     }
 
     return LLBC_OK;
@@ -406,13 +430,13 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
 {
     appender->SetAppenderNext(NULL);
-    if (!_head)
+    if (!_appenders)
     {
-        _head = appender;
+        _appenders = appender;
         return;
     }
 
-    LLBC_ILogAppender *tmpAppender = _head;
+    LLBC_ILogAppender *tmpAppender = _appenders;
     while (tmpAppender->GetAppenderNext())
     {
         tmpAppender = tmpAppender->GetAppenderNext();
@@ -421,35 +445,44 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
     tmpAppender->SetAppenderNext(appender);
 }
 
-void LLBC_Logger::Flush() 
+void LLBC_Logger::Flush(bool force) 
 {
-    // Flush all appenders(not force).
-    FlushAppenders(false);
+    // Lock logger.
+    LLBC_LockGuard guard(_lock);
 
-    std::list<LLBC_MessageBlock *> logs;
+    // Swap logs container.
+    std::vector<LLBC_MessageBlock *> *logs;
     {
         LLBC_LockGuard guard(_logsLock);
-        if (_logs.empty())
+        logs = &_logs[_curLogsIdx];
+        if (logs->empty())
             return;
 
-        _logs.swap(logs);
+        _curLogsIdx = (_curLogsIdx + 1) % 2;
     }
 
+    // Flush logs.
     LLBC_LogData *logData = NULL;
-    for (auto block : logs)
+    for (auto &block : *logs)
     {
         block->Read(&logData, sizeof(LLBC_LogData *));
 
-        Flush(logData);
+        FlushLog(logData);
         LLBC_Recycle(logData);
 
         LLBC_Recycle(block);
     }
+
+    // Clear logs.
+    logs->clear();
+
+    // Flush appenders.
+    FlushAppenders(force);
 }
 
-int LLBC_Logger::Flush(LLBC_LogData *data)
+int LLBC_Logger::FlushLog(LLBC_LogData *data)
 {
-    LLBC_ILogAppender *appender = _head;
+    LLBC_ILogAppender *appender = _appenders;
     if (!appender)
     {
         return LLBC_OK;
@@ -480,7 +513,7 @@ void LLBC_Logger::FlushAppenders(bool force)
     }
 
     // Foreach appenders to flush.
-    LLBC_ILogAppender *appender = _head;
+    LLBC_ILogAppender *appender = _appenders;
     while (appender)
     {
         appender->Flush();

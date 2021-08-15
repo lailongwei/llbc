@@ -63,7 +63,9 @@ public:
     // Constructors.
     explicit LLBC_BasicString(const _Ax &al = _Ax()):_Base(al) {  }
     LLBC_BasicString(const _This &rhs):_Base(rhs) {  }
+    LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
+    LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
@@ -73,6 +75,24 @@ public:
     _This &operator =(const _This &rhs)
     {
         _Base::operator =(rhs);
+        return *this;
+    }
+
+    _This &operator =(_This &&rhs)
+    {
+        _Base::operator=(std::move(rhs));
+        return *this;
+    }
+
+    _This &operator =(const _Base &rhs)
+    {
+        _Base::operator =(rhs);
+        return *this;
+    }
+
+    _This &operator =(_Base &&rhs)
+    {
+        _Base::operator=(std::move(rhs));
         return *this;
     }
 
@@ -142,24 +162,22 @@ public:
     }
 
     // operator *
-    _This operator *(size_t right) const
+    _This operator *(int right) const
     {
         if (this->empty() || right == 1)
             return *this;
-        else if (right == 0)
-            return _This();
 
         _This copy(*this);
         copy *= right;
         return copy;
     }
 
-    _This &operator *=(size_t right)
+    _This &operator *=(int right)
     {
         if (this->empty() || right == 1)
             return *this;
         
-        if (right == 0)
+        if (right <= 0)
         {
             this->clear();
             return *this;
@@ -171,7 +189,7 @@ public:
 
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
-        for (size_type i = 1; i < right; ++i)
+        for (int i = 1; i < right; ++i)
             LLBC_MemCpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
 
         return *this;

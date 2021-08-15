@@ -24,8 +24,11 @@
 
 #include "llbc/common/Common.h"
 
+#if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/SpinLock.h"
-#include "llbc/core/thread/SimpleLock.h"
+#else
+#include "llbc/core/thread/RecursiveLock.h"
+#endif
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
@@ -148,11 +151,11 @@ public:
      * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Debug(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Info(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Warn(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Error(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Debug(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Info(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Warn(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Error(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
 
     /**
      * Output fmt using given level.
@@ -161,10 +164,10 @@ public:
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
-     * @param[in] argument - optional arguments.
+     * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...);
+    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) __attribute__((format(printf, 6, 7)));
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
@@ -208,15 +211,15 @@ private:
     void AddAppender(LLBC_ILogAppender *appender);
 
     /**
-    * Flush log to appender.
+    * Flush all logs and appenders.
     */
-    void Flush();
+    void Flush(bool force = false);
 
     /**
      * Flush log data.
      * @param[in] data - log data.
      */
-    int Flush(LLBC_LogData *data);
+    int FlushLog(LLBC_LogData *data);
 
     /**
      * Flush appenders.
@@ -225,24 +228,27 @@ private:
     void FlushAppenders(bool force = false);
 
 private:
-    LLBC_RecursiveLock _lock;
-
     LLBC_String _name;
+    #if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_SpinLock _lock;
+    #else
+    LLBC_RecursiveLock _lock;
+    #endif
 
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;
 
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_SimpleLock _logsLock;
-#else  // LLBC_TARGET_PLATFORM_WIN32
+    int _curLogsIdx;
+    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_SpinLock _logsLock;
-#endif  // LLBC_TARGET_PLATFORM_NON_WIN32
-    std::list<LLBC_MessageBlock*> _logs;
+    #else
+    LLBC_RecursiveLock _logsLock;
+    #endif
+    std::vector<LLBC_MessageBlock *> _logs[2];
 
-    LLBC_ILogAppender *_head;
     sint64 _lastFlushTime;
     sint64 _flushInterval;
+    LLBC_ILogAppender *_appenders;
 
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
