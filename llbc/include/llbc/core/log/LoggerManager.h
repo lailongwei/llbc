@@ -38,6 +38,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Logger;
 class LLBC_LoggerConfigurator;
+class LLBC_LogRunnable;
 
 __LLBC_NS_END
 
@@ -93,6 +94,8 @@ private:
     LLBC_LoggerConfigurator *_configurator;
 
     static LLBC_String _rootLoggerName;
+
+    LLBC_LogRunnable *_logRunnable;
 };
 
 /**

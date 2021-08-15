@@ -54,7 +54,9 @@ LLBC_Logger::LLBC_Logger()
 , _name()
 , _logLevel(LLBC_LogLevel::Debug)
 , _config(NULL)
-, _logRunnable(NULL)
+, _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
+, _lastFlushTime(0)
+, _head(NULL)
 , _msgBlockPoolInst(*_objPool.GetPoolInst<LLBC_MessageBlock>())
 , _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
 {
@@ -85,9 +87,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     _config = config;
 
     _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
-
-    _logRunnable = LLBC_New(LLBC_LogRunnable);
-    _logRunnable->SetFlushInterval(_config->GetFlushInterval());
+    _flushInterval = _config->GetFlushInterval();
 
     if (_config->IsLogToConsole())
     {
@@ -104,7 +104,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
             return LLBC_FAILED;
         }
 
-        _logRunnable->AddAppender(appender);
+        this->AddAppender(appender);
     }
 
     if (_config->IsLogToFile())
@@ -132,11 +132,8 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
             return LLBC_FAILED;
         }
 
-        _logRunnable->AddAppender(appender);
+        this->AddAppender(appender);
     }
-
-    if (_config->IsAsyncMode())
-        _logRunnable->Activate(1);
 
     return LLBC_OK;
 }
@@ -146,29 +143,24 @@ bool LLBC_Logger::IsInit() const
     LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
     LLBC_LockGuard guard(ncThis->_lock);
 
-    return (_logRunnable ? true : false);
+    return _config != NULL;
 }
 
 void LLBC_Logger::Finalize()
 {
     LLBC_LockGuard guard(_lock);
-    if (!_logRunnable)
-        return;
 
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
         UninstallHook(level);
 
-    if (_config->IsAsyncMode())
+    // Delete all appender.
+    while (_head)
     {
-        _logRunnable->Stop();
-        _logRunnable->Wait();
-    }
-    else
-    {
-        _logRunnable->Cleanup();
-    }
+        LLBC_ILogAppender *appender = _head;
+        _head = _head->GetAppenderNext();
 
-    LLBC_XDelete(_logRunnable);
+        LLBC_Delete(appender);
+    }
 
     _name.clear();
     _config = NULL;
@@ -178,11 +170,6 @@ const LLBC_String &LLBC_Logger::GetLoggerName() const
 {
     LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
     LLBC_LockGuard guard(nonConstThis->_lock);
-    if (!_logRunnable)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_INTERNAL_NS __g_invalidLoggerName;
-    }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return _name;
@@ -206,6 +193,11 @@ bool LLBC_Logger::IsTakeOver() const
     LLBC_LockGuard guard(ncThis->_lock);
 
     return _config->IsTakeOver();
+}
+
+bool LLBC_Logger::IsAsyncMode() const
+{
+    return _config->IsAsyncMode();
 }
 
 int LLBC_Logger::InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg)
@@ -322,7 +314,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = _logRunnable->Output(data);
+        const int ret = this->Flush(data);
         LLBC_Recycle(data);
 
         return ret;
@@ -331,7 +323,10 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
     LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
     block->Write(&data, sizeof(LLBC_LogData *));
 
-    _logRunnable->Push(block);
+    {
+        LLBC_LockGuard guard(_logsLock);
+        _logs.push_back(block);
+    }
 
     return LLBC_OK;
 }
@@ -406,6 +401,94 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->threadId = tls->coreTls.threadId;
 
     return data;
+}
+
+void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
+{
+    appender->SetAppenderNext(NULL);
+    if (!_head)
+    {
+        _head = appender;
+        return;
+    }
+
+    LLBC_ILogAppender *tmpAppender = _head;
+    while (tmpAppender->GetAppenderNext())
+    {
+        tmpAppender = tmpAppender->GetAppenderNext();
+    }
+
+    tmpAppender->SetAppenderNext(appender);
+}
+
+void LLBC_Logger::Flush() 
+{
+    // Flush all appenders(not force).
+    FlushAppenders(false);
+
+    std::list<LLBC_MessageBlock *> logs;
+    {
+        LLBC_LockGuard guard(_logsLock);
+        if (_logs.empty())
+            return;
+
+        _logs.swap(logs);
+    }
+
+    LLBC_LogData *logData = NULL;
+    for (auto block : logs)
+    {
+        block->Read(&logData, sizeof(LLBC_LogData *));
+
+        Flush(logData);
+        LLBC_Recycle(logData);
+
+        LLBC_Recycle(block);
+    }
+}
+
+int LLBC_Logger::Flush(LLBC_LogData *data)
+{
+    LLBC_ILogAppender *appender = _head;
+    if (!appender)
+    {
+        return LLBC_OK;
+    }
+
+    while (appender)
+    {
+        if (appender->Output(*data) != LLBC_OK)
+        {
+            return LLBC_FAILED;
+        }
+
+        appender = appender->GetAppenderNext();
+    }
+
+    return LLBC_OK;
+}
+
+void LLBC_Logger::FlushAppenders(bool force)
+{  
+    // If not force flush appenders and the flush time not reached, no flush.
+    if (!force)
+    {
+        sint64 now = LLBC_GetMilliSeconds();
+        sint64 diff = now - _lastFlushTime;
+        if (diff >= 0 && diff < _flushInterval)
+            return;
+    }
+
+    // Foreach appenders to flush.
+    LLBC_ILogAppender *appender = _head;
+    while (appender)
+    {
+        appender->Flush();
+        appender = appender->GetAppenderNext();
+    }
+
+    // Update last flush time(use flushed time to avoid logger performance problem).
+    _lastFlushTime = LLBC_GetMicroSeconds();
 }
 
 __LLBC_NS_END
