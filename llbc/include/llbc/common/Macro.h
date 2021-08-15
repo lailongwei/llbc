@@ -419,7 +419,7 @@ private:                                            \
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx)
 #else // Non-Win32
- #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx) __attribute__(format(printf(fmtIdx, fmtArgsBegIdx)))
+ #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx) __attribute__((format(printf, fmtIdx, fmtArgsBegIdx)))
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #endif // !__LLBC_COM_MACRO_H__
