@@ -151,11 +151,11 @@ public:
      * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Debug(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
-    int Info(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
-    int Warn(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
-    int Error(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
-    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
+    int Debug(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Info(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Warn(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Error(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
 
     /**
      * Output fmt using given level.
@@ -167,7 +167,7 @@ public:
      * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) __attribute__((format(printf, 6, 7)));
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
