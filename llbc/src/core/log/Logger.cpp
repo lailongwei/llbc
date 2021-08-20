@@ -162,10 +162,15 @@ bool LLBC_Logger::IsInit() const
 
 void LLBC_Logger::Finalize()
 {
+    // Lock logger.
     LLBC_LockGuard guard(_lock);
 
+    // Check inited or not.
+    if (!IsInit())
+        return;
+
     // Flush logs.
-    Flush(true);
+    FlushInl(true, 0);
 
     // Uninstall all hooks.
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
@@ -331,6 +336,29 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
     return DirectOutput(level, tag, file, line, copyMessage, static_cast<int>(messageLen));
 }
 
+int LLBC_Logger::Flush(bool force)
+{
+    if (!IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    LLBC_LockGuard guard(_lock);
+    if (!IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    if (!_config->IsAsyncMode())
+        return LLBC_OK;
+
+    FlushInl(force, LLBC_GetMilliSeconds());
+
+    return LLBC_OK;
+}
+
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
@@ -339,7 +367,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->FlushLog(data);
+        const int ret = this->OutputLogData(*data);
         LLBC_Recycle(data);
 
         return ret;
@@ -445,42 +473,7 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
     tmpAppender->SetAppenderNext(appender);
 }
 
-void LLBC_Logger::Flush(bool force) 
-{
-    // Lock logger.
-    LLBC_LockGuard guard(_lock);
-
-    // Swap logs container.
-    std::vector<LLBC_MessageBlock *> *logs;
-    {
-        LLBC_LockGuard guard(_logsLock);
-        logs = &_logs[_curLogsIdx];
-        if (logs->empty())
-            return;
-
-        _curLogsIdx = (_curLogsIdx + 1) % 2;
-    }
-
-    // Flush logs.
-    LLBC_LogData *logData = NULL;
-    for (auto &block : *logs)
-    {
-        block->Read(&logData, sizeof(LLBC_LogData *));
-
-        FlushLog(logData);
-        LLBC_Recycle(logData);
-
-        LLBC_Recycle(block);
-    }
-
-    // Clear logs.
-    logs->clear();
-
-    // Flush appenders.
-    FlushAppenders(force);
-}
-
-int LLBC_Logger::FlushLog(LLBC_LogData *data)
+int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
 {
     LLBC_ILogAppender *appender = _appenders;
     if (!appender)
@@ -490,7 +483,7 @@ int LLBC_Logger::FlushLog(LLBC_LogData *data)
 
     while (appender)
     {
-        if (appender->Output(*data) != LLBC_OK)
+        if (appender->Output(data) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -501,17 +494,61 @@ int LLBC_Logger::FlushLog(LLBC_LogData *data)
     return LLBC_OK;
 }
 
-void LLBC_Logger::FlushAppenders(bool force)
-{  
+void LLBC_Logger::FlushInl(bool force, sint64 now) 
+{
+    // Lock logger.
+    LLBC_LockGuard guard(_lock);
+
     // If not force flush appenders and the flush time not reached, no flush.
     if (!force)
     {
-        sint64 now = LLBC_GetMilliSeconds();
+        if (now == 0)
+            now = LLBC_GetMilliSeconds();
         sint64 diff = now - _lastFlushTime;
         if (diff >= 0 && diff < _flushInterval)
             return;
     }
 
+    // Output all cached log datas.
+    OutputCachedLogDatas();
+    // Flush appenders.
+    FlushAppenders(force);
+
+    // Update last flush time(use flushed time to avoid logger performance problem).
+    _lastFlushTime = now != 0 ? now : LLBC_GetMilliSeconds();
+}
+
+void LLBC_Logger::OutputCachedLogDatas()
+{
+    // Swap logs container.
+    std::vector<LLBC_MessageBlock *> *logs;
+    {
+        LLBC_LockGuard logsGuard(_logsLock);
+        logs = &_logs[_curLogsIdx];
+        if (logs->empty())
+            return;
+
+        _curLogsIdx = (_curLogsIdx + 1) % 2;
+    }
+
+    // Output all logs.
+    LLBC_LogData *logData = NULL;
+    for (auto &block : *logs)
+    {
+        block->Read(&logData, sizeof(LLBC_LogData *));
+
+        OutputLogData(*logData);
+        LLBC_Recycle(logData);
+
+        LLBC_Recycle(block);
+    }
+
+    // Clear logs.
+    logs->clear();
+}
+
+void LLBC_Logger::FlushAppenders(bool force)
+{  
     // Foreach appenders to flush.
     LLBC_ILogAppender *appender = _appenders;
     while (appender)
@@ -519,9 +556,6 @@ void LLBC_Logger::FlushAppenders(bool force)
         appender->Flush();
         appender = appender->GetAppenderNext();
     }
-
-    // Update last flush time(use flushed time to avoid logger performance problem).
-    _lastFlushTime = LLBC_GetMicroSeconds();
 }
 
 __LLBC_NS_END

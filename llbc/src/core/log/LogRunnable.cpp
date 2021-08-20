@@ -49,7 +49,7 @@ void LLBC_LogRunnable::Cleanup()
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&logger, sizeof(LLBC_LogData *));
-        logger->Flush();
+        logger->Flush(true);
 
         LLBC_Recycle(block);
     }
@@ -67,7 +67,7 @@ void LLBC_LogRunnable::Svc()
 
         block->Read(&logger, sizeof(LLBC_Logger *));
 
-        logger->Flush();
+        logger->FlushInl(false, 0);
 
         LLBC_Sleep(100);
 

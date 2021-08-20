@@ -179,6 +179,13 @@ public:
      */
     int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
 
+    /**
+     * Flush logger.
+     * @param[in] force - force flush or not.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Flush(bool force = false);
+
 private:
     /**
      * Direct output message using given level.
@@ -202,7 +209,11 @@ private:
                                int len);
 
 private:
+    // Friend class: LLBC_LogRunnable
+    // Asset methods:
+    // - Flush(bool force):void
     friend class LLBC_LogRunnable;
+
     /**
      * Add log appender.
      * @param[in] appender - log appender.
@@ -210,21 +221,26 @@ private:
     void AddAppender(LLBC_ILogAppender *appender);
 
     /**
-    * Flush all logs and appenders.
-    */
-    void Flush(bool force = false);
-
-    /**
-     * Flush log data.
+     * Output log data.
      * @param[in] data - log data.
      */
-    int FlushLog(LLBC_LogData *data);
+    int OutputLogData(const LLBC_LogData &data);
+
+    /**
+    * Flush all logs and appenders.
+    */
+    void FlushInl(bool force, sint64 now);
+
+    /**
+     * Output all cached log datas.
+     */
+    void OutputCachedLogDatas();
 
     /**
      * Flush appenders.
      * @param[in] force - force flush or not, default is false.
      */
-    void FlushAppenders(bool force = false);
+    void FlushAppenders(bool force);
 
 private:
     LLBC_String _name;
