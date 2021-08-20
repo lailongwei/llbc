@@ -64,7 +64,6 @@ public:
      */
     void Stop();
 
-
 private:
     volatile bool _stoped;
 };
