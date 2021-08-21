@@ -51,6 +51,7 @@ LLBC_LogConsoleAppender::LLBC_LogConsoleAppender()
 
 LLBC_LogConsoleAppender::~LLBC_LogConsoleAppender()
 {
+    Finalize();
 }
 
 int LLBC_LogConsoleAppender::GetType() const
@@ -75,8 +76,8 @@ void LLBC_LogConsoleAppender::Finalize()
 
 int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
 {
-    LLBC_LogTokenChain *chain = NULL;
-    if (UNLIKELY(!(chain = GetTokenChain())))
+    LLBC_LogTokenChain *chain = GetTokenChain();
+    if (UNLIKELY(!chain))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;

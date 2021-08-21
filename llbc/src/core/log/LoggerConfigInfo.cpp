@@ -47,6 +47,7 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 
 , _logLevel(LLBC_LogLevel::End)
 , _asyncMode(false)
+, _independentThread(false)
 , _flushInterval(0)
 
 , _logToConsole(true)
@@ -97,11 +98,13 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         _logLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str());
     else
         _logLevel = _notConfigUseRoot ? rootCfg->GetLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
-    _asyncMode = __LLBC_GetLogCfg("asynchronous", ASYNC_MODE, IsAsyncMode, AsBool);
+    _asyncMode = __LLBC_GetLogCfg("asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
+    if (_asyncMode)
+        _independentThread = __LLBC_GetLogCfg("independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
      _flushInterval = __LLBC_GetLogCfg("flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
 
     // Console log configs.
-     _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsBool);
+     _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
     if (_logToConsole)
     {
         if (cfg.HasProperty("consoleLogLevel"))
@@ -109,12 +112,16 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         else
             _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : _logLevel;
 
-        _consolePattern = __LLBC_GetLogCfg("consolePattern", CONSOLE_LOG_PATTERN, GetConsolePattern, AsStr);
-        _colourfulOutput = __LLBC_GetLogCfg("colourfulOutput", COLOURFUL_OUTPUT, IsColourfulOutput, AsBool);
+        if (cfg.HasProperty("consolePattern"))
+            _consolePattern = cfg.GetValue("consolePattern").AsStr().c_str();
+        else
+            _consolePattern = _notConfigUseRoot ? 
+                rootCfg->GetConsolePattern().c_str() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN;
+        _colourfulOutput = __LLBC_GetLogCfg("colourfulOutput", COLOURFUL_OUTPUT, IsColourfulOutput, AsLooseBool);
     }
 
     // File log configs.
-    _logToFile = __LLBC_GetLogCfg("logToFile", LOG_TO_FILE, IsLogToFile, AsBool);
+    _logToFile = __LLBC_GetLogCfg("logToFile", LOG_TO_FILE, IsLogToFile, AsLooseBool);
     if (_logToFile)
     {
         // File log level option.
@@ -134,7 +141,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         }
 
         // Force application log path(log file place into application module file dir).
-        _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsBool);
+        _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsLooseBool);
 
         // Log file path option.
         if (cfg.HasProperty("logFile"))
@@ -153,12 +160,16 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
         // Other file log options.
         _logFileSuffix = __LLBC_GetLogCfg("logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
-        _logCodeFilePath = __LLBC_GetLogCfg("logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsBool);
-        _filePattern = __LLBC_GetLogCfg("filePattern", FILE_LOG_PATTERN, GetFilePattern, AsStr);
-        _dailyMode = __LLBC_GetLogCfg("dailyRollingMode", DAILY_MODE, IsDailyRollingMode, AsBool);
+        _logCodeFilePath = __LLBC_GetLogCfg("logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
+        if (cfg.HasProperty("filePattern"))
+            _filePattern = cfg.GetValue("filePattern").AsStr().c_str();
+        else
+            _filePattern = _notConfigUseRoot ? 
+                rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
+        _dailyMode = __LLBC_GetLogCfg("dailyRollingMode", DAILY_MODE, IsDailyRollingMode, AsLooseBool);
         _maxFileSize = __LLBC_GetLogCfg2("maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);
         _maxBackupIndex = __LLBC_GetLogCfg2("maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
-        _lazyCreateLogFile = __LLBC_GetLogCfg2("lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsBool);
+        _lazyCreateLogFile = __LLBC_GetLogCfg2("lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);
 
         if (_asyncMode)
             _fileBufferSize = __LLBC_GetLogCfg("fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
@@ -166,7 +177,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
     // Misc configs.
     if (!rootCfg)
-        _takeOver = __LLBC_GetLogCfg2("takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsBool);
+        _takeOver = __LLBC_GetLogCfg2("takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsLooseBool);
 
     // Check configs.
     if (!LLBC_LogLevel::IsLegal(_logLevel))

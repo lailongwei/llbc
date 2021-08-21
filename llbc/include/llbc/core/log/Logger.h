@@ -24,11 +24,7 @@
 
 #include "llbc/common/Common.h"
 
-#if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/SpinLock.h"
-#else
-#include "llbc/core/thread/RecursiveLock.h"
-#endif
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
@@ -43,6 +39,7 @@ __LLBC_NS_BEGIN
 struct LLBC_LogData;
 class LLBC_LoggerConfigInfo;
 class LLBC_ILogAppender;
+class LLBC_LogRunnable;
 
 __LLBC_NS_END
 
@@ -60,11 +57,11 @@ public:
 public:
     /**
      * Initialize the loggeer.
-     * @param[in] name   - logger name.
-     * @param[in] config - logger config info.
+     * @param[in] config            - logger config info.
+     * @param[in] sharedLogRunnable - the shared log runnable.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config);
+    int Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnable *sharedLogRunnable);
 
     /**
      * Check logger initialized or not.
@@ -179,13 +176,6 @@ public:
      */
     int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
 
-    /**
-     * Flush logger.
-     * @param[in] force - force flush or not.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Flush(bool force = false);
-
 private:
     /**
      * Direct output message using given level.
@@ -209,9 +199,12 @@ private:
                                int len);
 
 private:
-    // Friend class: LLBC_LogRunnable
-    // Asset methods:
-    // - Flush(bool force):void
+    /**
+     * Friend classs: LLBC_LogRunnable.
+     * Asset method/data-members:
+     * - OutputLogData(const LLBC_LogData &data):int
+     * - Flush(bool force, sint64 now):void
+     */
     friend class LLBC_LogRunnable;
 
     /**
@@ -227,14 +220,11 @@ private:
     int OutputLogData(const LLBC_LogData &data);
 
     /**
-    * Flush all logs and appenders.
+    * Flush logger(for now, just only need flush all appenders).
+    * @param[in] force - force or not.
+    * @param[in] now   - now time in milli-seconds.
     */
-    void FlushInl(bool force, sint64 now);
-
-    /**
-     * Output all cached log datas.
-     */
-    void OutputCachedLogDatas();
+    void Flush(bool force, sint64 now);
 
     /**
      * Flush appenders.
@@ -244,22 +234,12 @@ private:
 
 private:
     LLBC_String _name;
-    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_SpinLock _lock;
-    #else
-    LLBC_RecursiveLock _lock;
-    #endif
 
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;
 
-    int _curLogsIdx;
-    #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_SpinLock _logsLock;
-    #else
-    LLBC_RecursiveLock _logsLock;
-    #endif
-    std::vector<LLBC_MessageBlock *> _logs[2];
+    LLBC_LogRunnable *_logRunnable;
 
     sint64 _lastFlushTime;
     sint64 _flushInterval;

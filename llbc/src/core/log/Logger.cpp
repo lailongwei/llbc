@@ -34,6 +34,8 @@
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
+#include "llbc/core/log/LogRunnable.h"
+
 #include "llbc/core/log/Logger.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -52,8 +54,7 @@ LLBC_Logger::LLBC_Logger()
 : _logLevel(LLBC_LogLevel::Debug)
 , _config(NULL)
 
-, _curLogsIdx(0)
-, _logs()
+, _logRunnable(NULL)
 
 , _lastFlushTime(0)
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
@@ -70,10 +71,10 @@ LLBC_Logger::~LLBC_Logger()
     Finalize();
 }
 
-int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config)
+int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnable *sharedLogRunnable)
 {
     // Parameters check.
-    if (name.empty() || !config)
+    if (!config)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -95,7 +96,7 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
     }
 
     // Init basic data members.
-    _name.append(name);
+    _name.append(config->GetLoggerName());
     _config = config;
 
     _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
@@ -149,6 +150,16 @@ int LLBC_Logger::Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo
         this->AddAppender(appender);
     }
 
+    // Set/Create log runnable.
+    if (_config->IsAsyncMode())
+    {
+        _logRunnable = _config->IsIndependentThread() ? LLBC_New(LLBC_LogRunnable) : sharedLogRunnable;
+        _logRunnable->AddLogger(this);
+
+        if (_config->IsIndependentThread())
+            _logRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
+    }
+
     return LLBC_OK;
 }
 
@@ -169,8 +180,16 @@ void LLBC_Logger::Finalize()
     if (!IsInit())
         return;
 
-    // Flush logs.
-    FlushInl(true, 0);
+    // Stop runnable, if is async mode and use independent logger thread.
+    if (_config->IsAsyncMode())
+    {
+        if (_config->IsIndependentThread())
+            _logRunnable->Stop();
+        else
+            Flush(true, false);
+
+        _logRunnable = nullptr;
+    }
 
     // Uninstall all hooks.
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
@@ -184,9 +203,6 @@ void LLBC_Logger::Finalize()
 
         LLBC_Delete(appender);
     }
-
-    // Reset logs index.
-    _curLogsIdx = 0;
 
     // Reset basic members.
     _name.clear();
@@ -336,29 +352,6 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
     return DirectOutput(level, tag, file, line, copyMessage, static_cast<int>(messageLen));
 }
 
-int LLBC_Logger::Flush(bool force)
-{
-    if (!IsInit())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (!IsInit())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    if (!_config->IsAsyncMode())
-        return LLBC_OK;
-
-    FlushInl(force, LLBC_GetMilliSeconds());
-
-    return LLBC_OK;
-}
-
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
@@ -375,10 +368,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 
     LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
     block->Write(&data, sizeof(LLBC_LogData *));
-    {
-        LLBC_LockGuard guard(_logsLock);
-        _logs[_curLogsIdx].push_back(block);
-    }
+    _logRunnable->Push(block);
 
     return LLBC_OK;
 }
@@ -391,7 +381,8 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                         int len)
 {
     LLBC_LogData *data = _logDataPoolInst.GetObject();
-    
+
+    data->logger = this;
     data->level = level;
     data->loggerName = _name.c_str();
 
@@ -494,11 +485,8 @@ int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
     return LLBC_OK;
 }
 
-void LLBC_Logger::FlushInl(bool force, sint64 now) 
+void LLBC_Logger::Flush(bool force, sint64 now) 
 {
-    // Lock logger.
-    LLBC_LockGuard guard(_lock);
-
     // If not force flush appenders and the flush time not reached, no flush.
     if (!force)
     {
@@ -509,42 +497,11 @@ void LLBC_Logger::FlushInl(bool force, sint64 now)
             return;
     }
 
-    // Output all cached log datas.
-    OutputCachedLogDatas();
     // Flush appenders.
     FlushAppenders(force);
 
     // Update last flush time(use flushed time to avoid logger performance problem).
     _lastFlushTime = now != 0 ? now : LLBC_GetMilliSeconds();
-}
-
-void LLBC_Logger::OutputCachedLogDatas()
-{
-    // Swap logs container.
-    std::vector<LLBC_MessageBlock *> *logs;
-    {
-        LLBC_LockGuard logsGuard(_logsLock);
-        logs = &_logs[_curLogsIdx];
-        if (logs->empty())
-            return;
-
-        _curLogsIdx = (_curLogsIdx + 1) % 2;
-    }
-
-    // Output all logs.
-    LLBC_LogData *logData = NULL;
-    for (auto &block : *logs)
-    {
-        block->Read(&logData, sizeof(LLBC_LogData *));
-
-        OutputLogData(*logData);
-        LLBC_Recycle(logData);
-
-        LLBC_Recycle(block);
-    }
-
-    // Clear logs.
-    logs->clear();
 }
 
 void LLBC_Logger::FlushAppenders(bool force)

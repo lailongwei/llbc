@@ -74,6 +74,13 @@ void TestCase_Core_VariantTest::BasicTest()
     LLBC_Variant floatVal( (float)88.0 );
     LLBC_Variant doubleVal( (double)-88.0 );
     LLBC_Variant strVal("Hello");
+    LLBC_Variant looseBoolVal1("   true ");
+    LLBC_Variant looseBoolVal2("   yes ");
+    LLBC_Variant looseBoolVal3("   false ");
+    LLBC_Variant looseBoolVal4("   -4 ");
+    LLBC_Variant looseBoolVal5("   0 ");
+    LLBC_Variant looseBoolVal6("   0.0 ");
+    LLBC_Variant looseBoolVal7("   1.3 ");
 
     std::cout <<"nil val, isNil: " 
         <<(nilVal.IsNil() ? "true" : "false") <<", ToString: " <<nilVal <<std::endl;
@@ -107,6 +114,20 @@ void TestCase_Core_VariantTest::BasicTest()
         <<(doubleVal.IsDouble() ? "true" : "false") <<", ToString: " <<doubleVal <<std::endl;
     std::cout <<"strVal, isStr: " 
         <<(strVal.IsStr() ? "true" : "false") <<", ToString: " <<strVal <<std::endl;
+    std::cout << "looseBoolVal1: "
+        <<looseBoolVal1 <<", AsBool(): " <<looseBoolVal1.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal2: "
+        <<looseBoolVal2 <<", AsBool(): " <<looseBoolVal2.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal3: "
+        <<looseBoolVal3 <<", AsBool(): " <<looseBoolVal3.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal4: "
+        <<looseBoolVal4 <<", AsBool(): " <<looseBoolVal4.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal5: "
+        <<looseBoolVal5 <<", AsBool(): " <<looseBoolVal5.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal6: "
+        <<looseBoolVal6 <<", AsBool(): " <<looseBoolVal6.AsLooseBool() <<std::endl;
+    std::cout << "looseBoolVal7: "
+        <<looseBoolVal7 <<", AsBool(): " <<looseBoolVal7.AsLooseBool() <<std::endl;
     std::cout <<std::endl;
 
     LLBC_Variant become(3);

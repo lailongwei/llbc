@@ -427,10 +427,8 @@ int LLBC_Ini::TryParseSectionName(const LLBC_String &content,
     LLBC_String rawSection = content;
 
     // Unescape.
-    int ret;
     size_t unescapedTimes;
-    if ((ret = UnEscape(
-        rawSection, lineNum, contentBeginPos, unescapedTimes)) != LLBC_OK)
+    if (UnEscape(rawSection, lineNum, contentBeginPos, unescapedTimes) != LLBC_OK)
     {
         failedContinue = false;
         Err_InvalidEscapeFormat(lineNum, contentBeginPos);

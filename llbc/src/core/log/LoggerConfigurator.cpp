@@ -93,7 +93,20 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
     return LLBC_OK;
 }
 
-int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger) const
+bool LLBC_LoggerConfigurator::HasSharedAsyncLoggerConfigs() const
+{
+    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = _configs.begin();
+    for (; iter != _configs.end(); ++iter)
+    {
+        if (iter->second->IsAsyncMode() && 
+            !iter->second->IsIndependentThread())
+            return true;
+    }
+
+    return false;
+}
+
+int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_LogRunnable *sharedLogRunnable, LLBC_Logger *logger) const
 {
     if (name.empty() || !logger)
     {
@@ -122,7 +135,7 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_Logger *logger
         iter = nonConstThis->_configs.insert(std::make_pair(name, info)).first;
     }
 
-    return logger->Initialize(name, iter->second);
+    return logger->Initialize(iter->second, sharedLogRunnable);
 }
 
 const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &LLBC_LoggerConfigurator::GetAllConfigInfos() const

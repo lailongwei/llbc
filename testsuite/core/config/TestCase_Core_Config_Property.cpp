@@ -43,7 +43,7 @@ int TestCase_Core_Config_Property::Run(int argc, char *argv[])
 	// Test SetValue()/SaveToContent().
 	LLBC_Property cfg;
 	std::cout <<"Basic test, add some properties:" <<std::endl;
-	cfg.SetValue("llbc.test.intVal", 30, "The integer value");
+	cfg.SetValue("llbc.test.intVal", 30, "The intege r value");
 	cfg.SetValue("llbc.test.boolFalse", false, "The bool false value");
 	cfg.SetValue("llbc.test.boolTrue", true); // Not add comments.
 	cfg.SetValue("llbc.test.strVal", "Hello #World!", "The string value ######\\#\\#");

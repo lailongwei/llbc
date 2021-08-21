@@ -29,6 +29,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
+class LLBC_Logger;
 class LLBC_IObjectPoolInst;
 
 __LLBC_NS_END
@@ -40,6 +41,7 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_EXPORT LLBC_LogData
 {
+    LLBC_Logger *logger;                  // Log data owner logger.
     char *msg;                            // Log message(allocate from heap).
     uint32 msgLen;                        // message length.
 

@@ -30,8 +30,11 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_Variant::Str __g_nullStr;
 static const LLBC_NS LLBC_Variant::Str __g_nilStr = "nil";
+static const LLBC_NS LLBC_Variant::Str __g_oneStr = "1";
+static const LLBC_NS LLBC_Variant::Str __g_zeroStr = "0";
 static const LLBC_NS LLBC_Variant::Str __g_trueStr = "true";
 static const LLBC_NS LLBC_Variant::Str __g_falseStr = "false";
+static const LLBC_NS LLBC_Variant::Str __g_yesStr = "yes";
 static const LLBC_NS LLBC_Variant::Str __g_emptySeqStr = "[]";
 static const LLBC_NS LLBC_Variant::Str __g_emptyDictStr = "{}";
 static const LLBC_NS LLBC_Variant::Seq __g_emptySeq;
@@ -213,6 +216,26 @@ bool LLBC_Variant::AsBool() const
     return false;
 }
 
+bool LLBC_Variant::AsLooseBool() const
+{
+    if (GetFirstType() == LLBC_VariantType::VT_STR)
+    {
+        const Str * const &str = _holder.data.obj.str;
+        if (!str || str->empty())
+            return false;
+
+        const Str nmlStr = str->strip().tolower();
+        if (nmlStr == LLBC_INL_NS __g_trueStr || nmlStr == LLBC_INL_NS __g_yesStr)
+            return true;
+        else if (nmlStr.find('.') != Str::npos)
+            return std::fabs(LLBC_Str2Double(nmlStr.c_str())) > DBL_EPSILON;
+        else
+            return AsInt64() != 0;
+    }
+
+    return AsBool();
+}
+
 sint64 LLBC_Variant::AsInt64() const
 {
     const LLBC_VariantType::ENUM firstType = GetFirstType();
@@ -222,7 +245,16 @@ sint64 LLBC_Variant::AsInt64() const
         return 0;
 
     if (firstType == LLBC_VariantType::VT_STR)
-        return (_holder.data.obj.str && !_holder.data.obj.str->empty()) ? LLBC_Str2Int64(_holder.data.obj.str->c_str()) : 0;
+    {
+        const Str * const &str = _holder.data.obj.str;
+        if (!str || str->empty())
+            return 0;
+
+        if (str->find('.'))
+            return static_cast<sint64>(LLBC_Str2Double(str->c_str()));
+        else
+            return LLBC_Str2Int64(str->c_str());
+    }
 
     if (_holder.type == LLBC_VariantType::VT_RAW_FLOAT ||
         _holder.type == LLBC_VariantType::VT_RAW_DOUBLE)
@@ -250,7 +282,8 @@ double LLBC_Variant::AsDouble() const
         return 0.0;
 
     if (firstType == LLBC_VariantType::VT_STR)
-        return (_holder.data.obj.str && !_holder.data.obj.str->empty()) ? LLBC_Str2Double(_holder.data.obj.str->c_str()) : 0.0;
+        return (_holder.data.obj.str && !_holder.data.obj.str->empty()) ? 
+                LLBC_Str2Double(_holder.data.obj.str->c_str()) : 0.0;
 
     if (firstType == LLBC_VariantType::VT_RAW)
     {
@@ -273,7 +306,7 @@ LLBC_String LLBC_Variant::AsStr() const
     {
         if (IsBool())
         {
-            return _holder.data.raw.uint64Val ? LLBC_INL_NS __g_trueStr : LLBC_INL_NS __g_falseStr;
+            return _holder.data.raw.uint64Val ? LLBC_INL_NS __g_oneStr : LLBC_INL_NS __g_zeroStr;
         }
         else if (IsFloat() || IsDouble())
         {

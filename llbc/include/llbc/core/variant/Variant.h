@@ -330,6 +330,7 @@ public:
 
     // Real data fetch.
     bool AsBool() const;
+    bool AsLooseBool() const;
     sint8 AsInt8() const;
     uint8 AsUInt8() const;
     sint16 AsInt16() const;
