@@ -173,8 +173,20 @@ public:
      * @param[in] line       - log file line.
      * @param[in] message    - message string, non-format.
      * @param[in] messageLen - message string length, if -1, will auto calculate.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
+
+    /**
+     * Like OutputNonFormat(), but this output method will steal 'message'.
+     * @param[in] level      - log level.
+     * @param[in] tag        - log tag, can set to NULL.
+     * @param[in] file       - log file name.
+     * @param[in] line       - log file line.
+     * @param[in] message    - message string, non-format.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int OutputNonFormat2(int level, const char *tag, const char *file, int line, char *message, size_t messageLen = -1);
 
 private:
     /**

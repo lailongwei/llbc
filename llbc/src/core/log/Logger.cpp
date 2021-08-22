@@ -352,6 +352,19 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
     return DirectOutput(level, tag, file, line, copyMessage, static_cast<int>(messageLen));
 }
 
+int LLBC_Logger::OutputNonFormat2(int level, const char *tag, const char *file, int line, char *message, size_t messageLen)
+{
+    if (level < _logLevel)
+    {
+        if (message)
+            LLBC_Free(message);
+
+        return LLBC_OK;
+    }
+
+    return DirectOutput(level, tag, file, line, message, static_cast<int>(messageLen));
+}
+
 int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len) 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
