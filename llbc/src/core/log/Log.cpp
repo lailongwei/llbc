@@ -62,9 +62,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
                                                                               \
             char *fmttedMsg; int msgLen;                                      \
             LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
-            _rootLogger->OutputNonFormat(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
-                                                                              \
-            LLBC_Free(fmttedMsg);                                             \
+            _rootLogger->OutputNonFormat2(level, NULL, __FILE__, __LINE__, fmttedMsg, msgLen); \
         }                                                                     \
         else                                                                  \
         {                                                                     \
@@ -102,9 +100,7 @@ LLBC_LoggerManager *LLBC_LogHelper::_loggerManager = NULL;
                                                                               \
             char *fmttedMsg; int msgLen;                                      \
             LLBC_FormatArg(fmt, fmttedMsg, msgLen);                           \
-            l->OutputNonFormat(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen); \
-                                                                              \
-            LLBC_Free(fmttedMsg);                                             \
+            l->OutputNonFormat2(level, tag, __FILE__, __LINE__, fmttedMsg, msgLen); \
         }                                                                     \
     } while (0)                                                               \
 

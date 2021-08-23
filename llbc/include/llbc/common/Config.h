@@ -107,6 +107,8 @@
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
 // Default log asynchronous mode is set to false.
 #define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     0
+// Default log independent logger thread is set to false.
+#define LLBC_CFG_LOG_DEFAULT_INDEPENDENT_THREAD             0
 // Default is log to console.
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.

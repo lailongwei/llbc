@@ -26,6 +26,7 @@
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/objectpool/PoolObjectReflection.h"
 
+#include "llbc/core/log/LogData.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogRunnable.h"
@@ -41,44 +42,76 @@ LLBC_LogRunnable::~LLBC_LogRunnable()
 {
 }
 
-void LLBC_LogRunnable::Cleanup()
+int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
 {
-    // Output all queued log messages.
-    LLBC_Logger *logger = NULL;
-    LLBC_MessageBlock *block = NULL;
-    while (TryPop(block) == LLBC_OK)
+    if (IsActivated())
     {
-        block->Read(&logger, sizeof(LLBC_LogData *));
-        logger->Flush();
-
-        LLBC_Recycle(block);
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
     }
-}
 
-void LLBC_LogRunnable::Svc()
-{
-    LLBC_Logger *logger = NULL;
-    LLBC_MessageBlock *block = NULL;
-    while (LIKELY(!_stoped))
+    if (std::find(_loggers.begin(), _loggers.end(), logger) != _loggers.end())
     {
-        // Try pop log message to output.
-        if (TimedPop(block, 50) != LLBC_OK)
-            continue;
-
-        block->Read(&logger, sizeof(LLBC_Logger *));
-
-        logger->Flush();
-
-        LLBC_Sleep(100);
-
-        block->SetReadPos(0);
-        Push(block);
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
     }
+
+    _loggers.push_back(logger);
+
+    return LLBC_OK;
 }
 
 void LLBC_LogRunnable::Stop()
 {
     _stoped = true;
+    Wait();
+}
+
+void LLBC_LogRunnable::Cleanup()
+{
+    while (TryPopAndProcLogData(10));
+
+    FlushLoggers(true, 0);
+    _loggers.clear();
+}
+
+void LLBC_LogRunnable::Svc()
+{
+    while (LIKELY(!_stoped))
+    {
+        if (!TryPopAndProcLogData(100))
+            continue;
+
+        FlushLoggers(false, LLBC_GetMilliSeconds());
+    }
+}
+
+LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogData(int maxPopWaitTime)
+{
+    LLBC_LogData *logData;
+    LLBC_MessageBlock *block;
+    if (TimedPop(block, maxPopWaitTime) != LLBC_OK)
+        return false;
+
+    if (UNLIKELY(block->Read(&logData, sizeof(LLBC_LogData *)) != LLBC_OK))
+    {
+        LLBC_Recycle(block);
+        return false;
+    }
+
+    LLBC_Recycle(block);
+
+    logData->logger->OutputLogData(*logData);
+    LLBC_Recycle(logData);
+
+    return true;
+}
+
+void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
+{
+    size_t loggerCnt = _loggers.size();
+    for (size_t i = 0; i < loggerCnt; ++i)
+        _loggers[i]->Flush(false, now);
 }
 
 __LLBC_NS_END

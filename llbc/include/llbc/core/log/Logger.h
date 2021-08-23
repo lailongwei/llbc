@@ -24,17 +24,12 @@
 
 #include "llbc/common/Common.h"
 
-#if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/SpinLock.h"
-#else
-#include "llbc/core/thread/RecursiveLock.h"
-#endif
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
-#include "llbc/core/thread/RecursiveLock.h"
 
 __LLBC_NS_BEGIN
 
@@ -44,6 +39,7 @@ __LLBC_NS_BEGIN
 struct LLBC_LogData;
 class LLBC_LoggerConfigInfo;
 class LLBC_ILogAppender;
+class LLBC_LogRunnable;
 
 __LLBC_NS_END
 
@@ -61,11 +57,11 @@ public:
 public:
     /**
      * Initialize the loggeer.
-     * @param[in] name   - logger name.
-     * @param[in] config - logger config info.
+     * @param[in] config            - logger config info.
+     * @param[in] sharedLogRunnable - the shared log runnable.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config);
+    int Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnable *sharedLogRunnable);
 
     /**
      * Check logger initialized or not.
@@ -167,7 +163,7 @@ public:
      * @param[in] ...      - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) __attribute__((format(printf, 6, 7)));
+    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
@@ -177,8 +173,20 @@ public:
      * @param[in] line       - log file line.
      * @param[in] message    - message string, non-format.
      * @param[in] messageLen - message string length, if -1, will auto calculate.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
+
+    /**
+     * Like OutputNonFormat(), but this output method will steal 'message'.
+     * @param[in] level      - log level.
+     * @param[in] tag        - log tag, can set to NULL.
+     * @param[in] file       - log file name.
+     * @param[in] line       - log file line.
+     * @param[in] message    - message string, non-format.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int OutputNonFormat2(int level, const char *tag, const char *file, int line, char *message, size_t messageLen = -1);
 
 private:
     /**
@@ -203,7 +211,14 @@ private:
                                int len);
 
 private:
+    /**
+     * Friend classs: LLBC_LogRunnable.
+     * Asset method/data-members:
+     * - OutputLogData(const LLBC_LogData &data):int
+     * - Flush(bool force, sint64 now):void
+     */
     friend class LLBC_LogRunnable;
+
     /**
      * Add log appender.
      * @param[in] appender - log appender.
@@ -211,40 +226,32 @@ private:
     void AddAppender(LLBC_ILogAppender *appender);
 
     /**
-    * Flush all logs and appenders.
-    */
-    void Flush(bool force = false);
-
-    /**
-     * Flush log data.
+     * Output log data.
      * @param[in] data - log data.
      */
-    int FlushLog(LLBC_LogData *data);
+    int OutputLogData(const LLBC_LogData &data);
+
+    /**
+    * Flush logger(for now, just only need flush all appenders).
+    * @param[in] force - force or not.
+    * @param[in] now   - now time in milli-seconds.
+    */
+    void Flush(bool force, sint64 now);
 
     /**
      * Flush appenders.
      * @param[in] force - force flush or not, default is false.
      */
-    void FlushAppenders(bool force = false);
+    void FlushAppenders(bool force);
 
 private:
     LLBC_String _name;
-    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_SpinLock _lock;
-    #else
-    LLBC_RecursiveLock _lock;
-    #endif
 
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;
 
-    int _curLogsIdx;
-    #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_SpinLock _logsLock;
-    #else
-    LLBC_RecursiveLock _logsLock;
-    #endif
-    std::vector<LLBC_MessageBlock *> _logs[2];
+    LLBC_LogRunnable *_logRunnable;
 
     sint64 _lastFlushTime;
     sint64 _flushInterval;

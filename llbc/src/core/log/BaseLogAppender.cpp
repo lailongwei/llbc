@@ -38,7 +38,6 @@ LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 
 LLBC_BaseLogAppender::~LLBC_BaseLogAppender()
 {
-    Finalize();
 }
 
 int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
@@ -65,10 +64,6 @@ void LLBC_BaseLogAppender::Finalize()
 {
     LLBC_XDelete(_chain);
     _level = LLBC_LogLevel::End;
-}
-
-void LLBC_BaseLogAppender::Flush()
-{
 }
 
 __LLBC_NS_END

@@ -43,6 +43,11 @@ inline bool LLBC_LoggerConfigInfo::IsAsyncMode() const
     return _asyncMode;
 }
 
+inline bool LLBC_LoggerConfigInfo::IsIndependentThread() const
+{
+    return _independentThread;
+}
+
 inline int LLBC_LoggerConfigInfo::GetFlushInterval() const
 {
     return _flushInterval;

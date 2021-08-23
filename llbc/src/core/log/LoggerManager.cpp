@@ -38,7 +38,7 @@ LLBC_String LLBC_LoggerManager::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
 
 LLBC_LoggerManager::LLBC_LoggerManager()
 : _configurator(NULL)
-, _logRunnable(NULL)
+, _sharedLogRunnable(NULL)
 
 , _root(NULL)
 {
@@ -66,9 +66,13 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    // First, config root logger.
+    // Create shared log runnable.
+    if (_configurator->HasSharedAsyncLoggerConfigs())
+        _sharedLogRunnable = LLBC_New(LLBC_LogRunnable);
+
+    // Config root logger.
     _root = LLBC_New(LLBC_Logger);
-    if (_configurator->Config(_rootLoggerName, _root) != LLBC_OK)
+    if (_configurator->Config(_rootLoggerName, _sharedLogRunnable, _root) != LLBC_OK)
     {
         LLBC_XDelete(_root);
         LLBC_XDelete(_configurator);
@@ -80,39 +84,29 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
-    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = configs.begin();
-    for (; iter != configs.end(); ++iter)
+    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator cfgIter = configs.begin();
+    for (; cfgIter != configs.end(); ++cfgIter)
     {
-        if (iter->first == _rootLoggerName)
+        if (cfgIter->first == _rootLoggerName)
             continue;
 
         LLBC_Logger *logger = LLBC_New(LLBC_Logger);
-        if (_configurator->Config(iter->first, logger) != LLBC_OK)
+        if (_configurator->Config(cfgIter->first, _sharedLogRunnable, logger) != LLBC_OK)
         {
             LLBC_Delete(logger);
             Finalize();
             return LLBC_FAILED;
         }
 
-        _loggers.insert(std::make_pair(iter->first, logger));
+        _loggers.insert(std::make_pair(cfgIter->first, logger));
     }
-
-    _logRunnable = LLBC_New(LLBC_LogRunnable);
-
-    for (auto logger : _loggers)
-    {
-        if (!logger.second->IsAsyncMode())
-            continue;
-
-        LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
-        block->Write(&logger.second, sizeof(LLBC_Logger *));
-        _logRunnable->Push(block);
-    }
-
-    _logRunnable->Activate(1);
 
     // Init Log helper class.
     LLBC_LogHelper::Initialize(this);
+
+    // Startup shared log runnable.
+    if (_sharedLogRunnable)
+        _sharedLogRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
 
     return LLBC_OK;
 }
@@ -131,16 +125,19 @@ void LLBC_LoggerManager::Finalize()
     if (_root == NULL)
         return;
 
-    _logRunnable->Stop();
-    _logRunnable->Wait();
-    LLBC_XDelete(_logRunnable);
+    if (_sharedLogRunnable)
+    {
+        _sharedLogRunnable->Stop();
+        LLBC_Delete(_sharedLogRunnable);
+        _sharedLogRunnable = NULL;
+    }
 
     // Finalize Log helper class.
     LLBC_LogHelper::Finalize();
 
     // Delete all loggers and set _root logger to NULL.
-    _root = NULL;
     LLBC_STLHelper::DeleteContainer(_loggers);
+    _root = NULL;
 
     // Delete logger configurator.
     LLBC_XDelete(_configurator);

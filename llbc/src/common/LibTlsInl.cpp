@@ -82,13 +82,12 @@ void __LLBC_CreateLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
 
-    bool tlsCreated = false;
+    bool tlsCreated;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     tlsCreated = (pthread_key_create(&tlsHandle, NULL) == 0) ? true : false;
 #else
     tlsCreated = ((tlsHandle = ::TlsAlloc()) != TLS_OUT_OF_INDEXES) ? true : false;
 #endif
-
     if (!tlsCreated)
     {
         ASSERT(!tlsCreated && "Create llbc library TLS handle failed!");
@@ -115,7 +114,7 @@ __LLBC_LibTls *__LLBC_GetLibTls()
     if (UNLIKELY(tlsHandle == LLBC_INVALID_TLS_HANDLE))
         return NULL;
 
-    __LLBC_LibTls *libTls = NULL;
+    __LLBC_LibTls *libTls;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     libTls = reinterpret_cast<__LLBC_LibTls *>(pthread_getspecific(tlsHandle));
 #else
@@ -140,7 +139,7 @@ void __LLBC_ResetLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
 
-    __LLBC_LibTls *libTls = NULL;
+    __LLBC_LibTls *libTls;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         pthread_getspecific(tlsHandle))))

@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
+class LLBC_LogRunnable;
 class LLBC_LoggerConfigInfo;
 
 __LLBC_NS_END
@@ -53,12 +54,19 @@ public:
     int Initialize(const LLBC_String &cfgFile);
 
     /**
+     * Check has any shared async loggers or not.
+     * @return bool - the async loggers flag.
+     */
+    bool HasSharedAsyncLoggerConfigs() const;
+
+    /**
      * Config given logger.
-     * @param[in] name   - logger name.
-     * @param[in] logger - will config logger.
+     * @param[in] name              - logger name.
+     * @param[in] sharedLogRunnable - the shared log runnable.
+     * @param[in] logger            - will config logger.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Config(const LLBC_String &name, LLBC_Logger *logger) const;
+    int Config(const LLBC_String &name, LLBC_LogRunnable *sharedLogRunnable, LLBC_Logger *logger) const;
 
 public:
     /**
