@@ -37,6 +37,8 @@ template <typename _Elem,
 class LLBC_BasicString : public 
     std::basic_string<_Elem, _Traits, _Ax>
 {
+    static_assert(sizeof(_Elem) <= 2, "LLBC_BasicString not support sizeof(_Elem) > 2 element type!");
+
     typedef LLBC_BasicString<_Elem, _Traits, _Ax> _This;
     typedef std::basic_string<_Elem, _Traits, _Ax> _Base;
 
