@@ -102,42 +102,23 @@ inline void * LLBC_Event::GetExtData() const
     return _extData;
 }
 
-inline void LLBC_Event::SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg, bool delClearDelegWhenDestroy)
+inline void LLBC_Event::SetExtData(void *extData, const std::function<void(void *)> &clearDeleg)
 {
     ClearExtData();
     _extData = extData;
     _extDataClearDeleg = clearDeleg;
-    _delClearDelegWhenDestroy = delClearDelegWhenDestroy;
 }
 
 inline void LLBC_Event::ClearExtData()
 {
-    if (!_extData)
+    if (_extData)
     {
         if (_extDataClearDeleg)
-        {
-            if (_delClearDelegWhenDestroy)
-                LLBC_Delete(_extDataClearDeleg);
-
-            _extDataClearDeleg = NULL;
-        }
-
-        _delClearDelegWhenDestroy = true;
-
-        return;
+            _extDataClearDeleg(_extData);
+        _extData = nullptr;
     }
 
-    if (_extDataClearDeleg)
-    {
-        _extDataClearDeleg->Invoke(_extData);
-        _extData = NULL;
-
-        if (_delClearDelegWhenDestroy)
-            LLBC_Delete(_extDataClearDeleg);
-
-        _extDataClearDeleg = NULL;
-        _delClearDelegWhenDestroy = true;
-    }
+    _extDataClearDeleg = nullptr;   
 }
 
 __LLBC_NS_END

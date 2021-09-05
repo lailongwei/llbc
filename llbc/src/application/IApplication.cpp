@@ -30,7 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = NULL;
-static LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String &> *__crashHook = NULL;
+static std::function<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -141,7 +141,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     ::CloseHandle(dmpFile);
     if (__crashHook)
-        __crashHook->Invoke(__dumpFileName);
+        __crashHook(__dumpFileName);
 
     LLBC_NS LLBC_String backTrace;
     __GetExceptionBackTrace(exception->ContextRecord, backTrace);
@@ -354,7 +354,7 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook)
+int LLBC_IApplication::SetCrashHook(const std::function<void(const LLBC_String &)> &crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);

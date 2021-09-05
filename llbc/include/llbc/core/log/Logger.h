@@ -108,29 +108,11 @@ public:
 public:
     /**
      * Install logger hook.
-     * @param[in] level    - the log level.
-     * @param[in] hookFunc - the hook function.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData));
-
-    /**
-     * Install logger hook.
-     * @param[in] level    - the log level.
-     * @param[in] obj      - the hook method bound obj.
-     * @param[in] hookMeth - the hook method.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename ObjType>
-    int InstallHook(int level, ObjType *obj, void (ObjType::*hookMeth)(const LLBC_LogData *logData));
-
-    /**
-     * Install logger hook.
      * @param[in] level     - the log level.
      * @param[in] hookDeleg - the hook delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg);
+    int InstallHook(int level, const std::function<void(const LLBC_LogData *)> &hookDeleg);
 
     /**
      * Uninstall error hook.
@@ -260,12 +242,10 @@ private:
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
-    LLBC_IDelegate1<void, const LLBC_LogData *> *_hookDelegs[LLBC_LogLevel::End];
+    std::function<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END
-
-#include "llbc/core/log/LoggerImpl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_H__
 

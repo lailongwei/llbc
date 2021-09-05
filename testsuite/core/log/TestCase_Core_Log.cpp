@@ -55,7 +55,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Install logger hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug, this, &TestCase_Core_Log::OnLogHook);
+    rootLogger->InstallHook(LLBC_LogLevel::Debug, std::bind(&TestCase_Core_Log::OnLogHook, this, std::placeholders::_1));
 
     // Use root logger to test.
     LLBC_DEBUG_LOG("This is a debug log message.");

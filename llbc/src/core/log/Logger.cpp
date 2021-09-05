@@ -246,7 +246,7 @@ bool LLBC_Logger::IsAsyncMode() const
     return _config->IsAsyncMode();
 }
 
-int LLBC_Logger::InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg)
+int LLBC_Logger::InstallHook(int level, const std::function<void(const LLBC_LogData *)> &hookDeleg)
 {
     if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
         !hookDeleg))
@@ -268,7 +268,7 @@ void LLBC_Logger::UninstallHook(int level)
     LLBC_LockGuard guard(_lock);
 
     if (LIKELY(LLBC_LogLevel::IsLegal(level)))
-        LLBC_XDelete(_hookDelegs[level]);
+        _hookDelegs[level] = nullptr;
 }
 
 int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *fmt, ...)
@@ -369,7 +369,7 @@ int LLBC_Logger::DirectOutput(int level, const char *tag, const char *file, int 
 {
     LLBC_LogData *data = BuildLogData(level, tag, file, line, message, len);
     if (_hookDelegs[level])
-        _hookDelegs[level]->Invoke(data);
+        _hookDelegs[level](data);
 
     if (!_config->IsAsyncMode())
     {
