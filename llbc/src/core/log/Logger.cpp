@@ -253,8 +253,6 @@ int LLBC_Logger::InstallHook(int level, const std::function<void(const LLBC_LogD
     }
 
     LLBC_LockGuard guard(_lock);
-
-    LLBC_XDelete(_hookDelegs[level]);
     _hookDelegs[level] = hookDeleg;
 
     return LLBC_OK;
