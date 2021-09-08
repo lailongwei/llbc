@@ -41,13 +41,12 @@ LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
 
-, _intKeyParams(NULL)
-, _constantStrKeyParams(NULL)
-, _strKeyParams(NULL)
+, _intKeyParams(nullptr)
+, _constantStrKeyParams(nullptr)
+, _strKeyParams(nullptr)
 
-, _extData(NULL)
-, _extDataClearDeleg(NULL)
-, _delClearDelegWhenDestroy(true)
+, _extData(nullptr)
+, _extDataClearDeleg(nullptr)
 {
 }
 

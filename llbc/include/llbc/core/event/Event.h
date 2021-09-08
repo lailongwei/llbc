@@ -197,11 +197,10 @@ public:
 
     /**
      * Set extend data.
-     * @param[in] extData                  - the extend data.
-     * @param[in] clearDeleg               - the extend data clear delegate.
-     * @param[in] delClearDelegWhenDestroy - delete clear delegate when event destroy.
+     * @param[in] extData    - the extend data.
+     * @param[in] clearDeleg - the extend data clear delegate.
      */
-    void SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg = NULL, bool delClearDelegWhenDestroy = true);
+    void SetExtData(void *extData, const std::function<void(void *)> &clearDeleg = nullptr);
 
     /**
      * Clear extend data.
@@ -238,8 +237,7 @@ protected:
     _StrKeyParams *_strKeyParams;
 
     void *_extData;
-    LLBC_IDelegate1<void, void *> *_extDataClearDeleg;
-    bool _delClearDelegWhenDestroy;
+    std::function<void(void *)> _extDataClearDeleg;
 };
 
 __LLBC_NS_END

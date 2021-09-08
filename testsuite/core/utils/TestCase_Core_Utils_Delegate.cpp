@@ -216,6 +216,51 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     funcDeleg7->Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     LLBC_Delete(funcDeleg7);
 
+    // New styled delegate test.
+    std::cout <<"New styled delegate test:" <<std::endl;
+    LLBC_NewDelegate<void()> nFunc0(&Func_Foo_0);
+    nFunc0();
+
+    const LLBC_NewDelegate<void(int)> nFunc1(&Func_Foo_1);
+    nFunc1(10086);
+
+    LLBC_NewDelegate<void(int, int)> nFunc2(&Func_Foo_2);
+    nFunc2(10010, 9527);
+
+    LLBC_NewDelegate<void(int, int, int)> nFunc3(&Func_Foo_3);
+    nFunc3(1, 2, 3);
+
+    LLBC_NewDelegate<void(int, int, int, int)> nFunc4(&Func_Foo_4);
+    nFunc4(4, 3, 2, 1);
+
+    LLBC_NewDelegate<void()> nMeth0(this, &TestCase_Core_Utils_Delegate::Foo_0);
+    nMeth0();
+
+    LLBC_NewDelegate<int()> nMeth0RtnInt(this, &TestCase_Core_Utils_Delegate::Foo_0_Rtn_Int);
+    std::cout <<"Call nMeth0RtnInt() ret:" <<nMeth0RtnInt();
+
+    std::string s("Hello world");
+    LLBC_NewDelegate<size_t()> strSizeMeth(&s, &std::string::size);
+    std::cout <<"call string[" <<s <<"] size() meth:" <<strSizeMeth() <<std::endl;
+    std::cout <<"strSizeMeth valid?:" <<!!strSizeMeth <<std::endl;
+
+    LLBC_NewDelegate<void()> nNullDeleg = nullptr;
+    std::cout <<"nNullDeleg valid?:" <<!!nNullDeleg <<std::endl;
+    nNullDeleg = &Func_Foo_0;
+    if (nNullDeleg)
+    {
+        std::cout <<"set nNullDeleg = &Func_Foo_0, valid, call it!" <<std::endl;
+        nNullDeleg();
+    }
+    else
+    {
+        std::cerr <<"set nNullDeleg = &Func_Foo_0, but deleg still invalid, error!" <<std::endl;
+        return LLBC_FAILED;
+    }
+
+    nNullDeleg = nullptr;
+    std::cout <<"set nNullDeleg to nullptr, valid?:" <<!!nNullDeleg <<std::endl;
+
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
 
