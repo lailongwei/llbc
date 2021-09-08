@@ -31,6 +31,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_LogTimeToken::LLBC_LogTimeToken()
+	: _lastFmtTime(0)
 {
 }
 
@@ -55,17 +56,19 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     int index = static_cast<int>(formattedData.size());
     time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
 
-    struct tm timeStruct;
-#if LLBC_TARGET_PLATFORM_WIN32
-    localtime_s(&timeStruct, &timeInSecond);
-#else
-    localtime_r(&timeInSecond, &timeStruct);
-#endif
+	if (timeInSecond != _lastFmtTime)
+	{
+	    struct tm timeStruct;
+	#if LLBC_TARGET_PLATFORM_WIN32
+    	localtime_s(&timeStruct, &timeInSecond);
+	#else
+    	localtime_r(&timeInSecond, &timeStruct);
+	#endif
+		_lastFmtTime = timeInSecond;
+    	strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
+	}
 
-    char fmttedBuf[19];
-    strftime(fmttedBuf, sizeof(fmttedBuf), "%y-%m-%d %H:%M:%S.", &timeStruct);
-
-    formattedData.append(fmttedBuf, 18);
+    formattedData.append(_fmtCache, 18);
 
     // Format millisecond part.
     formattedData.append_format("%03llu", data.logTime % 1000);

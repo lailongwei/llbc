@@ -223,6 +223,7 @@ project "testsuite"
     filter { "system:linux" }
         links {
             "dl",
+			"pthread",
         }
     filter {}
 
