@@ -223,7 +223,7 @@ project "testsuite"
     filter { "system:linux" }
         links {
             "dl",
-			"pthread",
+            "pthread",
         }
     filter {}
 
@@ -873,7 +873,7 @@ project "lullbc"
 
     -- linkoptions
     filter { "system:macosx" }
-    	linkoptions {
+        linkoptions {
             "-undefined dynamic_lookup",
         }
     filter {}
