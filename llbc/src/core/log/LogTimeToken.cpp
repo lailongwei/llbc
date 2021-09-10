@@ -57,17 +57,17 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     int index = static_cast<int>(formattedData.size());
     time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
 
-	if (timeInSecond != _lastFmtTime)
-	{
-	    struct tm timeStruct;
-	#if LLBC_TARGET_PLATFORM_WIN32
-    	localtime_s(&timeStruct, &timeInSecond);
-	#else
-    	localtime_r(&timeInSecond, &timeStruct);
-	#endif
-		_lastFmtTime = timeInSecond;
-    	strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
-	}
+    if (timeInSecond != _lastFmtTime)
+    {
+        struct tm timeStruct;
+    #if LLBC_TARGET_PLATFORM_WIN32
+        localtime_s(&timeStruct, &timeInSecond);
+    #else
+        localtime_r(&timeInSecond, &timeStruct);
+    #endif
+        _lastFmtTime = timeInSecond;
+        strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
+    }
 
     formattedData.append(_fmtCache, strlen(_fmtCache));
 
