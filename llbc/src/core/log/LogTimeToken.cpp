@@ -31,7 +31,8 @@
 __LLBC_NS_BEGIN
 
 LLBC_LogTimeToken::LLBC_LogTimeToken()
-    : _lastFmtTime(0)
+: _lastFmtTime(0)
+, _fmtCache("")
 {
 }
 
@@ -68,7 +69,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
         strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
     }
 
-    formattedData.append(_fmtCache, 18);
+    formattedData.append(_fmtCache, strlen(_fmtCache));
 
     // Format millisecond part.
     formattedData.append_format("%03llu", data.logTime % 1000);
