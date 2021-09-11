@@ -59,6 +59,7 @@ public:
 
 private:
     mutable time_t _lastFmtTime;
+    mutable sint8 _cacheLen;
     mutable char _fmtCache[32];
 };
 
