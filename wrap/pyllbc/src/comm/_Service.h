@@ -254,6 +254,19 @@ LLBC_EXTERN_C PyObject *_pyllbc_AsyncConn(PyObject *self, PyObject *args)
     return PyInt_FromLong(sid);
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_IsSessionValidate(PyObject *self, PyObject *args)
+{
+    int sid;
+    pyllbc_Service *svc;
+    if (!PyArg_ParseTuple(args, "li", &svc, &sid))
+        return NULL;
+
+    if (svc->IsSessionValidate(sid))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_RemoveSession(PyObject *self, PyObject *args)
 {
     int sid;

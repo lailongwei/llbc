@@ -108,6 +108,7 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.Connect);
     inlMod->AddMethod(methods.AsyncConn);
     inlMod->AddMethod(methods.RemoveSession);
+    inlMod->AddMethod(methods.IsSessionValidate);
     inlMod->AddMethod(methods.SendData);
     inlMod->AddMethod(methods.Multicast);
     inlMod->AddMethod(methods.Broadcast);

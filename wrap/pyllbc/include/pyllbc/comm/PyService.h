@@ -237,6 +237,13 @@ public:
     int AsyncConn(const char *ip, uint16 port);
 
     /**
+     * Check given sessionId is validate or not.
+     * @param[in] sessionId - the given session Id.
+     * @return bool - return true is given session Id validate, otherwise return false.
+     */
+    bool IsSessionValidate(int sessionId);
+
+    /**
      * Remove session.
      * Note:
      *      In llbc core library, RemoveSession() method return int value 
