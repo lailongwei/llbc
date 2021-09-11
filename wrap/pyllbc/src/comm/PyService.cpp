@@ -451,6 +451,11 @@ int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
     return sid;
 }
 
+bool pyllbc_Service::IsSessionValidate(int sessionId)
+{
+    return _llbcSvc->IsSessionValidate(sessionId);
+}
+
 int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
 {
     if (_llbcSvc->RemoveSession(sessionId, reason) != LLBC_OK)
