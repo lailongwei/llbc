@@ -165,9 +165,6 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
 bool LLBC_Logger::IsInit() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
     return _config != NULL;
 }
 
@@ -256,8 +253,6 @@ int LLBC_Logger::InstallHook(int level, const std::function<void(const LLBC_LogD
     }
 
     LLBC_LockGuard guard(_lock);
-
-    UninstallHook(level);
     _hookDelegs[level] = hookDeleg;
 
     return LLBC_OK;
