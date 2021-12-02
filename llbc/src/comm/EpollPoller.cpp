@@ -291,7 +291,7 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_EpollPoller::StartupMonitor()
 {
-    const LLBC_NewDelegate<void()> deleg(this, &LLBC_EpoolPoller::MonitorSvc);
+    const LLBC_NewDelegate<void()> deleg(this, &LLBC_EpollPoller::MonitorSvc);
     _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
