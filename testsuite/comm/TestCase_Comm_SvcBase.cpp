@@ -303,7 +303,11 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     const int clientCount = 10;
     LLBC_PrintLine("Create %d clients to connet to this listen session", clientCount);
     for (int i = 0; i < clientCount; ++i)
-        _svc->AsyncConn(ip, port);
+    {
+        auto connSid = _svc->AsyncConn(ip, port);
+        if (connSid == 0)
+            LLBC_PrintLine("connect to %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
+    }
 }
 
 void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
