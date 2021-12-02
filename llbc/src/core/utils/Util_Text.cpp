@@ -432,7 +432,7 @@ void *LLBC_Str2Ptr(const char *str)
     if (UNLIKELY(!str))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -447,7 +447,7 @@ void *LLBC_Str2Ptr(const char *str)
     }
 
     if (lowerStr.empty())
-        return NULL;
+        return nullptr;
 
     for (LLBC_String::size_type i = 0; i < lowerStr.size(); ++i)
     {
@@ -457,7 +457,7 @@ void *LLBC_Str2Ptr(const char *str)
                 (lowerStr[i] >= 'a' && lowerStr[i] <= 'f')))
             {
                 LLBC_SetLastError(LLBC_ERROR_ARG);
-                return NULL;
+                return nullptr;
             }
         }
         else
@@ -465,7 +465,7 @@ void *LLBC_Str2Ptr(const char *str)
             if (lowerStr[i] < '0' || lowerStr[i] > '9')
             {
                 LLBC_SetLastError(LLBC_ERROR_ARG);
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -503,7 +503,7 @@ int LLBC_HashString(const LLBC_String &str)
 
 int LLBC_HashString(const char *str, size_t strLen)
 {
-    if (UNLIKELY(str == NULL || strLen == 0))
+    if (UNLIKELY(str == nullptr || strLen == 0))
         return 0;
 
     if (strLen == static_cast<size_t>(-1))

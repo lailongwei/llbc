@@ -37,7 +37,7 @@ public:
      * @param[in] timeoutCallable - the timeout callable python object(normal, not steal reference).
      * @param[in] cancelCallable  - the cancel callable python object(normal, not steal reference).
      */
-    pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObject *cancelCallable = NULL);
+    pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObject *cancelCallable = nullptr);
 
     /**
      * Destructor.
@@ -64,7 +64,7 @@ public:
      * @param[in] period  - period value, in milli-seconds.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(uint64 dueTime, uint64 period);
+    virtual int Schedule(sint64 dueTime, sint64 period);
 
 public:
     /**

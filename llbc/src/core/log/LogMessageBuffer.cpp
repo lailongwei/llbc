@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 
 LLBC_LogMessageBuffer::LLBC_LogMessageBuffer()
 {
-    _stream = NULL;
+    _stream = nullptr;
 }
 
 LLBC_LogMessageBuffer::~LLBC_LogMessageBuffer()

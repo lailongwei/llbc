@@ -26,7 +26,6 @@
 
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/MessageBlock.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
@@ -122,7 +121,7 @@ public:
 public:
     /**
      * Output specific level message.
-     * @param[in] tag      - log tag, can set to NULL.
+     * @param[in] tag      - log tag, can set to nullptr.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
@@ -138,7 +137,7 @@ public:
     /**
      * Output fmt using given level.
      * @param[in] level    - log level.
-     * @param[in] tag      - log tag, can set to NULL.
+     * @param[in] tag      - log tag, can set to nullptr.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
@@ -150,7 +149,7 @@ public:
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
      * @param[in] level      - log level.
-     * @param[in] tag        - log tag, can set to NULL.
+     * @param[in] tag        - log tag, can set to nullptr.
      * @param[in] file       - log file name.
      * @param[in] line       - log file line.
      * @param[in] message    - message string, non-format.
@@ -162,7 +161,7 @@ public:
     /**
      * Like OutputNonFormat(), but this output method will steal 'message'.
      * @param[in] level      - log level.
-     * @param[in] tag        - log tag, can set to NULL.
+     * @param[in] tag        - log tag, can set to nullptr.
      * @param[in] file       - log file name.
      * @param[in] line       - log file line.
      * @param[in] message    - message string, non-format.

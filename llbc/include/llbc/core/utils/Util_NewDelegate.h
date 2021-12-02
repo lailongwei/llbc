@@ -40,17 +40,17 @@ struct LLBC_NewDelegate;
 template <typename Rtn, typename ...Args>
 struct LLBC_NewDelegate<Rtn(Args...)>
 {
+public:
     /**
-     * @brief The function pointer type define. 
+     * @brief The c-style function pointer type define. 
      * 
      */
-    typedef Rtn(*Func)(Args...);
+    typedef Rtn(*CFunc)(Args...);
 
     /**
-     * @brief The Class method point type define(as function).
-     * 
+     * @brief The stl function object type define.
      */
-    typedef Rtn(*Meth)(void *, Args...);
+    typedef std::function<Rtn(Args...)> StlFunc;
 
 public:
     /**
@@ -58,17 +58,22 @@ public:
      * 
      * @param[in] _ - unused parameter. 
      */
-    LLBC_NewDelegate(nullptr_t _);
+    LLBC_NewDelegate(nullptr_t _ = nullptr);
 
     /**
-     * @brief Construct a new Delegate object by function pointer.
+     * @brief Construct delegate object by c-style function pointer.
      * 
-     * @param[in] func 
+     * @param[in] cfunc - the c-style function pointer.
      */
-    LLBC_NewDelegate(Func func);
+    LLBC_NewDelegate(CFunc cfunc);
 
     /**
-     * @brief Construct a new Delegate object by object pointer and object method pointer.
+     * @brief Construct a new Delegate object by stl function object.
+     */
+    LLBC_NewDelegate(const StlFunc &stlFunc);
+
+    /**
+     * @brief Construct a delegate object by object pointer and object method pointer.
      * 
      * @param[in] obj  - the object pointer.
      * @param[in] meth - the object method pointer.
@@ -77,13 +82,33 @@ public:
     LLBC_NewDelegate(Obj *obj, Rtn(Obj::*meth)(Args...));
 
     /**
-     * @brief Construct a new Delegate object by const object pointer and const object method pointer.
+     * @brief Construct a delegate object by const object pointer and const object method pointer.
      * 
      * @param[in] obj  - the const object pointer.
      * @param[in] meth - the const object method pointer.
      */
     template <typename Obj>
     LLBC_NewDelegate(const Obj *, Rtn(Obj::*meth)(Args...) const);
+
+    /**
+     * @brief Construct a delegate object by function object other then c-style function/stl function/class method, eg: lambda.
+     *
+     * @param func - the function object.
+     */
+    template <typename Func>
+    LLBC_NewDelegate(const Func &func);
+
+    /**
+     * @brief Construct delegate object by another delegate object.
+     *
+     * @param[in] another - the another delegate object.
+     */
+    LLBC_NewDelegate(const LLBC_NewDelegate &another);
+
+    /**
+     * @brief Destructor.
+     */
+    ~LLBC_NewDelegate();
 
 public:
     /**
@@ -94,7 +119,8 @@ public:
     explicit operator bool() const;
 
     /**
-     * The invoke operator. 
+     * The invoke operator.
+     *
      * @param[in] args - the call args.
      * @return Rtn - the return value.
      */
@@ -110,29 +136,139 @@ public:
     LLBC_NewDelegate &operator=(nullptr_t _);
 
     /**
-     * @brief Assignment by new function pointer.
+     * @brief Assignment by c-style function pointer.
      * 
-     * @param[in] func - the function pointer.
+     * @param[in] cfunc - the c-style function pointer.
      * @return LLBC_NewDelegate & - the delegate object.
      */
-    LLBC_NewDelegate &operator=(Func func);
+    LLBC_NewDelegate &operator=(CFunc cfunc);
+
+    /**
+     * @brief Assignment by stl function object.
+     *
+     * @return LLBC_NewDelegate & - the delegate object.
+     */
+    LLBC_NewDelegate &operator=(const StlFunc &stlFunc);
+
+
+    /**
+     * @brief Assignment by function object other then c-style function/stl function/class method, eg: lambda.
+     *
+     * @param func - the function object.
+     *
+     *@return LLBC_NewDelegate & - the delegate object.
+     */
+    template <typename Func>
+    LLBC_NewDelegate &operator=(const Func &func);
+
+    /**
+     * @brief Assignment by another delegate object.
+     *
+     * @return LLBC_NewDelegate & - the delegate object.
+     */
+    LLBC_NewDelegate &operator=(const LLBC_NewDelegate &another);
 
 private:
     /**
-     * @brief Init delegate object by object pointer and method parts.
-     * 
-     * @param[in] obj   - the object pointer.
-     * @param methParts - the method parts.
+     * @brief Reset delegate object.
      */
-    void _InitByObjAndMethParts(void *obj, void *methParts[2]);
+    void Reset();
 
 private:
-    void *_obj;
-    union
+    /**
+     * @brief The method holder interface class define.
+     */
+    struct _IClsMethHolder
     {
-        Func func;
-        Meth meth;
-    } _func;
+        virtual Rtn Invoke(Args... args) const = 0;
+    };
+
+    /**
+     * @brief The method holder class define.
+     */
+    template <typename Obj>
+    struct _ClsMethHolder : public _IClsMethHolder
+    {
+    public:
+        bool cmeth;
+        union
+        {
+            struct
+            {
+                Obj *obj;
+                Rtn(Obj::*meth)(Args...);
+            } meth;
+
+            struct
+            {
+                const Obj *obj;
+                Rtn(Obj:: *meth)(Args...) const;
+            } cmeth;
+        } meth;
+
+        _ClsMethHolder(Obj *obj, Rtn(Obj::*meth)(Args...))
+        : cmeth(false)
+        , meth{}
+        {
+            this->meth.meth.obj = obj;
+            this->meth.meth.meth = meth;
+        }
+
+        _ClsMethHolder(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+        : cmeth(true)
+        , meth{}
+        {
+            this->meth.cmeth.obj = obj;
+            this->meth.cmeth.meth = meth;
+        }
+
+        virtual Rtn Invoke(Args... args) const
+        {
+            return cmeth ?
+                (meth.cmeth.obj->*meth.cmeth.meth)(std::forward<Args>(args)...) :
+                    (meth.meth.obj->*meth.meth.meth)(std::forward<Args>(args)...);
+        }
+    };
+
+    /**
+     * @brief The delegate holded function union define.
+     */
+    union _Func
+    {
+        CFunc cfunc;
+        char stlFunc[sizeof(std::function<Rtn(Args...)>)];
+        char methHolder[sizeof(void *) * 4 /* sizeof(vptr) + sizeof(bool cmeth) + sizeof(union meth) : default aligement */];
+
+        _Func()
+        {
+            ::memset(this, 0, sizeof(_Func));
+        }
+
+        _Func(CFunc cfunc)
+        : cfunc(cfunc)
+        {
+        }
+
+        _Func(const std::function<Rtn(Args...)> &stlFunc)
+        {
+            new (stlFunc) StlFunc(stlFunc);
+        }
+
+        template <typename Obj>
+        _Func(Obj *obj, Rtn(Obj::*meth)(Args...))
+        {
+            new (methHolder) _ClsMethHolder<Obj>(obj, meth);
+        }
+
+        template <typename Obj>
+        _Func(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+        {
+            new (methHolder) _ClsMethHolder<Obj>(obj, meth);
+        }
+    };
+
+    int _funcType; // function type, 0: nullptr, 1: c-style function, 2: stl-style function, 3: class method.
+    _Func _func; // function union object.
 };
 
 __LLBC_NS_END

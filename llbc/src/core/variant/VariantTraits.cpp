@@ -31,11 +31,11 @@
 #define __LLBC_INL_OBJ_TYPE_VARS_ASSIGN(ty, varName)                     \
     LLBC_Variant::ty *&lObj = left.GetMutableHolder()->data.obj.varName; \
     const LLBC_Variant::ty *rObj = right.GetHolder().data.obj.varName;   \
-    if (rObj == NULL || rObj->empty()) {                                 \
+    if (rObj == nullptr || rObj->empty()) {                              \
         if (lObj)                                                        \
             lObj->clear();                                               \
     } else {                                                             \
-        if (lObj == NULL)                                                \
+        if (lObj == nullptr)                                             \
             lObj = LLBC_New(LLBC_Variant::ty, *rObj);                    \
         else                                                             \
             *lObj = *rObj;                                               \

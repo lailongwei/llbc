@@ -52,7 +52,7 @@ public:
      * handler search order(HSO):
      *      1> callable check(included function, bound method, callable object)
      *      2> search object has handle() method or not
-     * @return PyObject * - the call returned PyObject object, if failed, return NULL.
+     * @return PyObject * - the call returned PyObject object, if failed, return nullptr.
      */
     PyObject *Handle(PyObject *packet);
 

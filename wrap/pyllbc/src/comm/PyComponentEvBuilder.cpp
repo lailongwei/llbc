@@ -28,7 +28,7 @@ namespace
     typedef pyllbc_ComponentEvBuilder This;
 }
 
-PyObject *This::_evCls = NULL;
+PyObject *This::_evCls = nullptr;
 
 PyObject *This::_attrSvc = PyString_FromString("_svc");
 PyObject *This::_attrSessionId = PyString_FromString("_session_id");
@@ -162,7 +162,7 @@ PyObject *pyllbc_ComponentEvBuilder::CreateEv(PyObject *svc)
     if (UNLIKELY(!This::_evCls))
         This::_evCls = pyllbc_s_TopModule->GetObject("ServiceEvent");
 
-    return PyObject_CallFunctionObjArgs(This::_evCls, svc, NULL);
+    return PyObject_CallFunctionObjArgs(This::_evCls, svc, nullptr);
 }
 
 void pyllbc_ComponentEvBuilder::SetAttr(PyObject *ev, PyObject *attr, bool val)

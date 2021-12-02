@@ -24,6 +24,9 @@ class pyllbcEvent(object):
     @property
     def cobj(self):
         return self._cobj
+    @cobj.setter
+    def cobj(self, value):
+        self._cobj = value 
 
     def __getitem__(self, key):
         try:

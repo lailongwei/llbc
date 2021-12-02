@@ -32,7 +32,7 @@ class LLBC_HIDDEN pyllbc_PackLemma_Dict : public pyllbc_PackLemma
 {
     typedef pyllbc_PackLemma Base;
 public:
-    pyllbc_PackLemma_Dict(PyObject *compileEnv = NULL);
+    pyllbc_PackLemma_Dict(PyObject *compileEnv = nullptr);
     virtual ~pyllbc_PackLemma_Dict();
 
 public:
@@ -65,13 +65,13 @@ public:
     /**
      * Read data from pystream according lemma format.
      * @param[in] stream - the pystream.
-     * @return PyObject * - the readed python layer object, new reference, if error occurred return NULL.
+     * @return PyObject * - the readed python layer object, new reference, if error occurred return nullptr.
      */
     virtual PyObject *Read(pyllbc_Stream *stream);
     /**
      * rite python layer data to given string according lemma format.
      * @param[in] stream - the pystream.
-     * @param[in] values - the python layer values, must be tuple or None, if error occurred return NULL.
+     * @param[in] values - the python layer values, must be tuple or None, if error occurred return nullptr.
      */
     virtual int Write(pyllbc_Stream *stream, PyObject *values);
 

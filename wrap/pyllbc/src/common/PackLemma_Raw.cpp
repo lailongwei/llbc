@@ -137,10 +137,10 @@ PyObject *pyllbc_PackLemma_Raw::Read(pyllbc_Stream *stream)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("raw-lemma not done to unpack data");
-        return NULL;
+        return nullptr;
     }
 
-    PyObject *obj = NULL;
+    PyObject *obj = nullptr;
     switch(_symbol)
     {
     case Base::Byte:
@@ -197,7 +197,7 @@ PyObject *pyllbc_PackLemma_Raw::Read(pyllbc_Stream *stream)
         break;
 
     default:
-        obj = NULL;
+        obj = nullptr;
         {
             LLBC_String errStr;
             pyllbc_SetError(

@@ -26,7 +26,7 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_PoolObjectReflectionBase::LLBC_PoolObjectReflectionBase()
-    : _poolInst(NULL)
+: _poolInst(nullptr)
 {
 }
 
@@ -41,7 +41,7 @@ inline void LLBC_PoolObjectReflectionBase::MarkPoolObject(LLBC_IObjectPoolInst &
 
 inline bool LLBC_PoolObjectReflectionBase::IsPoolObject() const
 {
-    return _poolInst != NULL;
+    return _poolInst != nullptr;
 }
 
 inline LLBC_IObjectPoolInst *LLBC_PoolObjectReflectionBase::GetPoolInst()
@@ -57,7 +57,7 @@ inline void LLBC_PoolObjectReflectionBase::GiveBackToPool()
 
 inline void LLBC_PoolObjectReflectionBase::Clear()
 {
-    _poolInst = NULL;
+    _poolInst = nullptr;
 }
 
 __LLBC_NS_END

@@ -38,9 +38,9 @@ LLBC_ThreadDescriptor::LLBC_ThreadDescriptor()
     _state = LLBC_ThreadState::Stoped;
     _flags = LLBC_ThreadFlag::Joinable;
 
-    _task = NULL;
-    _nextThread = NULL;
-    _groupNextThread = NULL;
+    _task = nullptr;
+    _nextThread = nullptr;
+    _groupNextThread = nullptr;
 }
 
 LLBC_ThreadDescriptor::~LLBC_ThreadDescriptor()

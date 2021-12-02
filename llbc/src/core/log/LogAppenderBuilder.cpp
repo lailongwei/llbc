@@ -40,7 +40,7 @@ LLBC_LogAppenderBuilder::~LLBC_LogAppenderBuilder()
 
 LLBC_ILogAppender *LLBC_LogAppenderBuilder::BuildAppender(int type) const
 {
-    LLBC_ILogAppender *appender = NULL;
+    LLBC_ILogAppender *appender = nullptr;
     switch (type)
     {
     case LLBC_LogAppenderType::Console:

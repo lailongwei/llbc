@@ -32,15 +32,15 @@ namespace
 
 pyllbc_Module::pyllbc_Module(const LLBC_String &name, This *parent)
 : _name(name)
-, _module(NULL)
+, _module(nullptr)
 , _methods()
 
-, _parent(NULL)
+, _parent(nullptr)
 , _subModules()
 
 , _lazyAddObjs()
 
-, _dict(NULL)
+, _dict(nullptr)
 {
     ASSERT(!_name.empty() &&
         "pyllbc_Module::ctor(): module name must be not null!");
@@ -77,7 +77,7 @@ PyObject *pyllbc_Module::GetModuleDict() const
     if (!_dict)
     {
         pyllbc_SetError("specific module not init, could not get module dict");
-        return NULL;
+        return nullptr;
     }
 
     return _dict;
@@ -87,13 +87,13 @@ PyObject *pyllbc_Module::GetObject(PyObject *name)
 {
     PyObject *dict = GetModuleDict();
     if (!dict)
-        return NULL;
+        return nullptr;
 
     PyObject *obj = PyDict_GetItem(dict, name);
     if (!obj)
     {
         pyllbc_SetError("could not found module object");
-        return NULL;
+        return nullptr;
     }
 
     return obj;
@@ -129,14 +129,14 @@ This *pyllbc_Module::GetSubModule(const LLBC_String &name) const
     if (names.empty())
     {
         pyllbc_SetError("module name empty", LLBC_ERROR_INVALID);
-        return NULL;
+        return nullptr;
     }
     
     _Modules::const_iterator it = _subModules.find(names[0]);
     if (it == _subModules.end())
     {
         pyllbc_SetError("not found sub module", LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     This *module = it->second;
@@ -146,11 +146,11 @@ This *pyllbc_Module::GetSubModule(const LLBC_String &name) const
         if (splittedName.empty())
         {
             pyllbc_SetError("module name empty", LLBC_ERROR_INVALID);
-            return NULL;
+            return nullptr;
         }
 
         if (!(module = module->GetSubModule(splittedName)))
-            return NULL;
+            return nullptr;
     }
 
     return module;
@@ -199,7 +199,7 @@ int pyllbc_Module::AddMethod(const LLBC_String &name,
     LLBC_MemCpy(hName, name.c_str(), name.size());
     hName[name.size()] = '\0';
 
-    char *hDoc = NULL;
+    char *hDoc = nullptr;
     if (!doc.empty())
     {
         hDoc = LLBC_Malloc(char, doc.size() + 1);

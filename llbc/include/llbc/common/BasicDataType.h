@@ -159,7 +159,7 @@ typedef int LLBC_Handle;
 // thread datatype define.
 #if LLBC_TARGET_PLATFORM_LINUX
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -177,7 +177,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((DWORD)(-1))
 #elif LLBC_TARGET_PLATFORM_IPHONE
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef pthread_id_np_t LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -186,7 +186,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((pthread_key_t)(-1))
 #elif LLBC_TARGET_PLATFORM_MAC
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -195,7 +195,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((pthread_key_t)(-1))
 #elif LLBC_TARGET_PLATFORM_ANDROID
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -217,7 +217,7 @@ typedef FILE * LLBC_FileHandle;
 #else
  typedef HANDLE LLBC_DirHandle;
 #endif
-#define LLBC_INVALID_FILE_HANDLE NULL
+#define LLBC_INVALID_FILE_HANDLE nullptr
 
 // library data type define.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -227,7 +227,7 @@ typedef FILE * LLBC_FileHandle;
  typedef HMODULE LLBC_LibraryHandle;
  typedef int (__cdecl *LLBC_LibraryFun)(void);
 #endif
-#define LLBC_INVALID_LIBRARY_HANDLE NULL
+#define LLBC_INVALID_LIBRARY_HANDLE nullptr
 
 // timer data type define.
 typedef uint64 LLBC_TimerId;
@@ -267,10 +267,10 @@ typedef void (*LLBC_GuardFunc)(void *);
 // Bundle data type define.
 #if LLBC_TARGET_PLATFORM_IPHONE
  #define LLBC_BundleHandle void *
- #define LLBC_INVALID_BUNDLE_HANDLE NULL
+ #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #else
  #define LLBC_BundleHandle void *
- #define LLBC_INVALID_BUNDLE_HANDLE NULL
+ #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #endif
 
 // Session Ids data type define.

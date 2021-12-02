@@ -168,7 +168,7 @@ public:
     static void Recycle(ObjectType *obj);
 
     /**
-     * Same as Recycle(), the difference is after recycle, will reset the object pointer to NULL.
+     * Same as Recycle(), the difference is after recycle, will reset the object pointer to nullptr.
      */
     template <typename ObjectType>
     static void RecycleX(ObjectType *&obj);

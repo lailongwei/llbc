@@ -27,7 +27,7 @@ LULLBC_LUA_METH int _lullbc_Util_String_HashString(lua_State *l)
 
     size_t strLen;
     const char *str = lua_tolstring(l, 1, &strLen);
-    if (str == NULL)
+    if (str == nullptr)
     {
         lua_pushinteger(l, 1);
         return 1;

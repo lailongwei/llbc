@@ -60,10 +60,10 @@ void TestCase_Core_Time_Time::OSTimeTest()
     std::cout <<"LLBC_GetMicroSeconds(): " <<nowTimeInUs <<std::endl;
 
     struct timeval tv;
-    LLBC_GetTimeOfDay(&tv, NULL);
+    LLBC_GetTimeOfDay(&tv, nullptr);
     std::cout <<"LLBC_GetTimeOfDay(), tv_sec: " <<tv.tv_sec <<", tv_usec: " <<tv.tv_usec <<std::endl;
 #if LLBC_TARGET_PLATFORM_WIN32 && LLBC_CFG_OS_IMPL_GETTIMEOFDAY
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     std::cout <<"WIN32 spec: gettimeofday(), tv_sec: " <<tv.tv_sec <<", tv_usec: " <<tv.tv_usec <<std::endl;
 #endif
 }

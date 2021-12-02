@@ -32,14 +32,14 @@ __LLBC_NS_BEGIN
  */
 class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_BaseTask
 {
-    typedef LLBC_IDelegate0<void> _Deleg;
+    typedef LLBC_NewDelegate<void()> _Deleg;
 
 public:
     /**
      * Parameter constructor.
      * @param[in] deleg - the monitor invoke delegate.
      */
-    LLBC_PollerMonitor(_Deleg *deleg);
+    LLBC_PollerMonitor(const _Deleg &deleg);
 
     /**
      * Destructor.
@@ -70,7 +70,7 @@ public:
     virtual void Cleanup();
 
 private:
-    _Deleg *_deleg;
+    _Deleg _deleg;
 
     volatile bool _started;
     volatile bool _stopping;

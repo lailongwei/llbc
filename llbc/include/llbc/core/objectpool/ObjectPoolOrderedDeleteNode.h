@@ -90,7 +90,7 @@ public:
      * @param[in] frontNode - the front node, if not specific, will use this node's front node.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AdjustBackNodesFrontNode(LLBC_ObjectPoolOrderedDeleteNode *frontNode = NULL);
+    int AdjustBackNodesFrontNode(LLBC_ObjectPoolOrderedDeleteNode *frontNode = nullptr);
 
     /**
      * Recursive check given node name is front node or node.

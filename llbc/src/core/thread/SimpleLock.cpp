@@ -29,7 +29,7 @@ __LLBC_NS_BEGIN
 LLBC_SimpleLock::LLBC_SimpleLock()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    pthread_mutex_init(&_handle, NULL);
+    pthread_mutex_init(&_handle, nullptr);
 #else
     _locked = false;
     ::InitializeCriticalSection(&_handle);

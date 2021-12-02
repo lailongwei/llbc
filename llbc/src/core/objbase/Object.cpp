@@ -35,7 +35,7 @@ LLBC_Object::LLBC_Object()
 : _ref(1)
 , _autoRef(0)
 
-, _poolStack(NULL)
+, _poolStack(nullptr)
 {
 }
 

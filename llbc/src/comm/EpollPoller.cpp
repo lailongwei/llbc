@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
 
 LLBC_EpollPoller::LLBC_EpollPoller()
 : _epoll(LLBC_INVALID_HANDLE)
-, _monitor(NULL)
+, _monitor(nullptr)
 {
 }
 
@@ -123,7 +123,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
 
         SetConnectedSocketOpts(sock, *ev.sessionOpts);
-        AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, NULL));
+        AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, nullptr));
 
         LLBC_XDelete(ev.sessionOpts);
     }
@@ -291,10 +291,7 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_EpollPoller::StartupMonitor()
 {
-    typedef LLBC_Delegate0<void, LLBC_EpollPoller> __MonitorDeleg;
-
-    LLBC_IDelegate0<void> *deleg = 
-        LLBC_New(__MonitorDeleg, this, &LLBC_EpollPoller::MonitorSvc);
+    const LLBC_NewDelegate<void()> deleg(this, &LLBC_EpoolPoller::MonitorSvc);
     _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
@@ -354,7 +351,7 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
     if (connected)
     {
         SetConnectedSocketOpts(sock, asyncInfo.sessionOpts);
-        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
+        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, nullptr));
     }
     else
     {

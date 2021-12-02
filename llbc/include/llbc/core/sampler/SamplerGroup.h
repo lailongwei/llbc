@@ -90,7 +90,7 @@ public:
      * @param[in] appData - append data.
      * return int - return true if success, otherwise return -1.
      */
-    int Sampling(const LLBC_String &name, sint64 value, void *appData = NULL);
+    int Sampling(const LLBC_String &name, sint64 value, void *appData = nullptr);
 
 private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_SamplerGroup);

@@ -30,15 +30,15 @@ __LLBC_NS_BEGIN
 LLBC_ConditionVariable::LLBC_ConditionVariable()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    pthread_cond_init(&m_handle, NULL);
+    pthread_cond_init(&m_handle, nullptr);
 #else // LLBC_TARGET_PLATFORM_WIN32
     _cond.waitersBlocked = 0;
     _cond.waitersGone = 0;
     _cond.waitersToUnblock = 0;
 
-    _cond.blockQueue = ::CreateSemaphoreW(NULL, 0, LONG_MAX, NULL);
+    _cond.blockQueue = ::CreateSemaphoreW(nullptr, 0, LONG_MAX, nullptr);
 
-    _cond.blockLock = ::CreateSemaphoreW(NULL, 1, LONG_MAX, NULL);
+    _cond.blockLock = ::CreateSemaphoreW(nullptr, 1, LONG_MAX, nullptr);
     ::InitializeCriticalSection(&_cond.unblockLock);
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
@@ -50,10 +50,10 @@ LLBC_ConditionVariable::~LLBC_ConditionVariable()
     pthread_cond_destroy(&m_handle);
 #else
     ::CloseHandle(_cond.blockQueue);
-    _cond.blockQueue = NULL;
+    _cond.blockQueue = nullptr;
 
     ::CloseHandle(_cond.blockLock);
-    _cond.blockLock = NULL;
+    _cond.blockLock = nullptr;
     ::DeleteCriticalSection(&_cond.unblockLock);
 #endif
 }
@@ -102,7 +102,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
-    ::gettimeofday(&tvStart, NULL);
+    ::gettimeofday(&tvStart, nullptr);
     tvEnd = tvStart;
     tvEnd.tv_sec += milliSeconds / 1000;
     tvEnd.tv_usec += (milliSeconds % 1000) * 1000;
@@ -131,7 +131,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
 #else // LLBC_TARGET_PLATFORM_WIN32
     ::WaitForSingleObject(_cond.blockLock, INFINITE);
     ++ _cond.waitersBlocked;
-    ::ReleaseSemaphore(_cond.blockLock, 1, NULL);
+    ::ReleaseSemaphore(_cond.blockLock, 1, nullptr);
 
  #ifdef _MSC_VER
   #pragma inline_depth(0)
@@ -212,7 +212,7 @@ void LLBC_ConditionVariable::Notify(bool unblockAll)
     }
 
     ::LeaveCriticalSection(&_cond.unblockLock);
-    ::ReleaseSemaphore(_cond.blockQueue, signalsToIssue, NULL);
+    ::ReleaseSemaphore(_cond.blockQueue, signalsToIssue, nullptr);
 }
 
 void LLBC_ConditionVariable::AfterWait(LLBC_ILock &lock)
@@ -232,7 +232,7 @@ void LLBC_ConditionVariable::AfterWait(LLBC_ILock &lock)
     {
         ::WaitForSingleObject(_cond.blockLock, INFINITE);
         _cond.waitersBlocked -= _cond.waitersGone;
-        ::ReleaseSemaphore(_cond.blockLock, 1, NULL);
+        ::ReleaseSemaphore(_cond.blockLock, 1, nullptr);
 
         _cond.waitersGone = 0;
     }
@@ -241,7 +241,7 @@ void LLBC_ConditionVariable::AfterWait(LLBC_ILock &lock)
 
     if (signalsWasLeft == 1)
     {
-        ::ReleaseSemaphore(_cond.blockLock, 1, NULL);
+        ::ReleaseSemaphore(_cond.blockLock, 1, nullptr);
     }
 
     lock.Lock();

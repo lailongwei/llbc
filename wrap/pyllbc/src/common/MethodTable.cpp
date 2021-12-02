@@ -30,7 +30,7 @@ namespace
 }
 
 pyllbc_MethodTable::pyllbc_MethodTable()
-: _methods(NULL)
+: _methods(nullptr)
 
 , _size(0)
 , _capacity(0)

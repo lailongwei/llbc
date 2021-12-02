@@ -24,7 +24,7 @@
 #include "pyllbc/comm/PyTimerScheduler.h"
 
 pyllbc_TimerScheduler::pyllbc_TimerScheduler()
-: _scheduler(NULL)
+: _scheduler(nullptr)
 {
 }
 

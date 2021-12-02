@@ -45,7 +45,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
 , _blockSize(_elemSize * _elemCnt)
 
 , _blockCnt(0)
-, _blocks(NULL)
+, _blocks(nullptr)
 
 , _lock(lock)
 {
@@ -129,7 +129,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
 {
     // Do assert, makesure object is not null.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(obj != NULL && "LLBC_ObjectPoolInst::Release() could not release NULL pointer object!");
+    ASSERT(obj != nullptr && "LLBC_ObjectPoolInst::Release() could not release nullptr pointer object!");
     #endif
 
     // Get memory unit, and do assert, makesure will release object is not referencable object.
@@ -229,7 +229,7 @@ template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::ReleaseReferencable(void *obj)
 {
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(obj != NULL && "LLBC_ObjectPoolInst::ReleaseReferencable() could not release NULL pointer object!");
+    ASSERT(obj != nullptr && "LLBC_ObjectPoolInst::ReleaseReferencable() could not release nullptr pointer object!");
     #endif
 
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(

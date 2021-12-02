@@ -334,7 +334,7 @@ class LLBC_IComponent;
 /**
  * \brief The llibc library component method encapsulation.
  */
-typedef LLBC_IDelegate2<int, const LLBC_Variant &, LLBC_Variant &> LLBC_ComponentMethod;
+typedef LLBC_NewDelegate<int(const LLBC_Variant &, LLBC_Variant &)> LLBC_ComponentMethod;
 
 /**
  * \brief The component methods encapsulation.
@@ -342,7 +342,7 @@ typedef LLBC_IDelegate2<int, const LLBC_Variant &, LLBC_Variant &> LLBC_Componen
 class LLBC_ComponentMethods
 {
 public:
-    typedef std::map<LLBC_CString, LLBC_ComponentMethod *> Methods;
+    typedef std::map<LLBC_CString, LLBC_ComponentMethod> Methods;
 
 public:
     /**
@@ -361,9 +361,9 @@ public:
     /**
      * Get component method.
      * @param[in] methName - the method name.
-     * @return LLBC_ComponentMethod * - the component method, if not found return NULL.
+     * @return const LLBC_ComponentMethod & - the component method, if not found return nullptr.
      */
-    LLBC_ComponentMethod *GetMethod(const char *methName) const;
+    const LLBC_ComponentMethod &GetMethod(const char *methName) const;
 
 public:
     /**

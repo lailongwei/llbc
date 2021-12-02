@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-static LLBC_Logger *__rootLogger = NULL;
-static LLBC_LoggerManager *__loggerManager = NULL;
+static LLBC_Logger *__rootLogger = nullptr;
+static LLBC_LoggerManager *__loggerManager = nullptr;
 
 // API: InitLog
 LULLBC_LUA_METH int _lullbc_InitLog(lua_State *l)
@@ -56,7 +56,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     for (int i = 6; i <= paramsCount; ++i)
     {
         partMsg = luaL_tolstring(l, i, &msgSize);
-        if (UNLIKELY(partMsg == NULL))
+        if (UNLIKELY(partMsg == nullptr))
             luaL_error(l, "'tostring' must return a string to '_lullbc.LogMsg'");
 
         msg.append(partMsg, msgSize);
@@ -70,7 +70,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     int level = lua_toint32(l, 1);
     if (level >= LLBC_LogLevel::Error)
     {
-        luaL_traceback(l, l, NULL, 4);
+        luaL_traceback(l, l, nullptr, 4);
         partMsg = lua_tolstring(l, paramsCount+1, &msgSize);
         msg.append(1, ' ');
         msg.append(partMsg, msgSize);
@@ -88,12 +88,12 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     // Parse logger.
     LLBC_Logger *logger;
     const char *loggerName = lua_tostring(l, 2);
-    if (UNLIKELY(loggerName == NULL))
+    if (UNLIKELY(loggerName == nullptr))
         logger = __rootLogger;
     else
         logger = __loggerManager->GetLogger(loggerName);
 
-    if (UNLIKELY(logger == NULL))
+    if (UNLIKELY(logger == nullptr))
         lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
 
     // Parse tag, file, line, traceback
@@ -113,12 +113,12 @@ LULLBC_LUA_METH int _lullbc_GetLogLevel(lua_State *l)
 {
     LLBC_Logger *logger;
     const char *loggerName = lua_tostring(l, 1);
-    if (UNLIKELY(loggerName == NULL))
+    if (UNLIKELY(loggerName == nullptr))
         logger = __rootLogger;
     else
         logger = __loggerManager->GetLogger(loggerName);
 
-    if (UNLIKELY(logger == NULL))
+    if (UNLIKELY(logger == nullptr))
         lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
 
     lua_pushinteger(l, logger->GetLogLevel());

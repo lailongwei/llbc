@@ -42,11 +42,6 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const size_t __llbc_headerLen = 28;
 
-void LLBC_FORCE_INLINE __DelBlock(void *data)
-{
-    LLBC_Recycle(reinterpret_cast<LLBC_NS LLBC_MessageBlock *>(data));
-}
-
 void inline __DelPacketList(void *&data)
 {
     if (!data)
@@ -61,7 +56,7 @@ void inline __DelPacketList(void *&data)
 
     LLBC_Delete(block);
 
-    data = NULL;
+    data = nullptr;
 }
 
 __LLBC_INTERNAL_NS_END
@@ -71,7 +66,7 @@ __LLBC_NS_BEGIN
 LLBC_PacketProtocol::LLBC_PacketProtocol()
 : _headerAssembler(LLBC_INL_NS __llbc_headerLen)
 
-, _packet(NULL)
+, _packet(nullptr)
 , _payloadNeedRecv(0)
 , _payloadRecved(0)
 {
@@ -138,11 +133,11 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
 
 int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 {
-    out = NULL;
+    out = nullptr;
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
     const size_t maxPacketLen = _session->GetSocket()->GetMaxPacketSize();
 
-    LLBC_InvokeGuard guard(&LLBC_INL_NS __DelBlock, block);
+    LLBC_Defer(LLBC_Recycle(block));
 
     size_t readableSize;
     while ((readableSize = block->GetReadableSize()) > 0)
@@ -215,7 +210,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
         (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&_packet, sizeof(LLBC_Packet *));
 
         // Reset packet about data members.
-        _packet = NULL;
+        _packet = nullptr;
         _payloadRecved = 0;
         _payloadNeedRecv = 0;
 

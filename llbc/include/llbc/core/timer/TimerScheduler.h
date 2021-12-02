@@ -128,7 +128,7 @@ private:
      * @param[in] period  - period time, in milli-seconds.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 period);
+    virtual int Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 period);
 
     /**
      * Cancel timer.

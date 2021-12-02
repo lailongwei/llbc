@@ -26,7 +26,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetLocalIp(PyObject *self, PyObject *args
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     const LLBC_String &ip = pkt->GetLocalAddr().GetIpAsString();
     return PyString_FromStringAndSize(ip.c_str(), ip.size());
@@ -36,7 +36,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetLocalPort(PyObject *self, PyObject *ar
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     return PyInt_FromLong(pkt->GetLocalAddr().GetPort());
 }
@@ -45,7 +45,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetPeerIp(PyObject *self, PyObject *args)
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     const LLBC_String &ip = pkt->GetPeerAddr().GetIpAsString();
     return PyString_FromStringAndSize(ip.c_str(), ip.size());
@@ -55,7 +55,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetPeerPort(PyObject *self, PyObject *arg
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     return PyInt_FromLong(pkt->GetPeerAddr().GetPort());
 }
@@ -64,7 +64,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetStatusDesc(PyObject *self, PyObject *a
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     const LLBC_String &statusDesc = pkt->GetStatusDesc();
@@ -78,7 +78,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetExtData1(PyObject *self, PyObject *arg
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     return PyLong_FromLongLong(pkt->GetExtData1());
 }
@@ -87,7 +87,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetExtData2(PyObject *self, PyObject *arg
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     return PyLong_FromLongLong(pkt->GetExtData2());
 }
@@ -96,7 +96,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Packet_GetExtData3(PyObject *self, PyObject *arg
 {
     LLBC_Packet *pkt;
     if (!PyArg_ParseTuple(args, "l", &pkt))
-        return NULL;
+        return nullptr;
 
     return PyLong_FromLongLong(pkt->GetExtData3());
 }

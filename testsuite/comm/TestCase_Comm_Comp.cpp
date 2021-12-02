@@ -29,7 +29,7 @@ namespace
     public:
         TestComp()
         {
-            _timer = NULL;
+            _timer = nullptr;
         }
 
         virtual ~TestComp()
@@ -50,12 +50,11 @@ namespace
 
         virtual bool OnStart()
         {
-            typedef LLBC_Delegate1<void, TestComp, LLBC_Timer *> __Deleg;
             LLBC_PrintLine("Service start");
             _timer = LLBC_New(LLBC_Timer,
-                              LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
-                              LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
-            _timer->Schedule(2000, 2000);
+                              std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
+                              std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
+            _timer->Schedule(LLBC_TimeSpan::FromSS(2), LLBC_TimeSpan::FromSS(5));
 
             return true;
         }

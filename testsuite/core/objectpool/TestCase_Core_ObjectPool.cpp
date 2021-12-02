@@ -41,8 +41,8 @@ namespace
     {
     public:
         OD_X()
-        : _a(NULL)
-        , _pool(NULL)
+        : _a(nullptr)
+        , _pool(nullptr)
         {
         }
 
@@ -92,7 +92,7 @@ namespace
     {
     public:
         ReflectionableTestObj()
-        : _poolInst(NULL)
+        : _poolInst(nullptr)
         {
             LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
@@ -111,7 +111,7 @@ namespace
 
         bool IsPoolObject() const
         {
-            return _poolInst != NULL;
+            return _poolInst != nullptr;
         }
 
         LLBC_IObjectPoolInst *GetPoolInst()
@@ -127,7 +127,7 @@ namespace
 
         bool HasBeenGiveBackToPool() const
         {
-            return _poolInst == NULL;
+            return _poolInst == nullptr;
         }
 
         void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
@@ -142,7 +142,7 @@ namespace
 
         void Clear()
         {
-            _poolInst = NULL;
+            _poolInst = nullptr;
         }
 
     private:
@@ -224,14 +224,14 @@ namespace
     public:
         ComplexObj()
         {
-            strdictptr = NULL;
-            strdict2ptr = NULL;
+            strdictptr = nullptr;
+            strdict2ptr = nullptr;
 
-            buf1 = NULL;
-            buf2 = NULL;
-            buf3 = NULL;
-            buf4 = NULL;
-            buf5 = NULL;
+            buf1 = nullptr;
+            buf2 = nullptr;
+            buf3 = nullptr;
+            buf4 = nullptr;
+            buf5 = nullptr;
         }
 
         ~ComplexObj()
@@ -505,13 +505,13 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
 {
     LLBC_PrintLine("Do ordered delete test(Please use debug tools too check test result):");
 
-    LLBC_PrintLine("Test case 1: <FrontNode == NULL && BackNode == NULL>:");
+    LLBC_PrintLine("Test case 1: <FrontNode == nullptr && BackNode == nullptr>:");
     {
         LLBC_UnsafetyObjectPool pool;
         pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
     }
 
-    LLBC_PrintLine("Test case 2: <FrontNode != NULL && BackNode == NULL>:");
+    LLBC_PrintLine("Test case 2: <FrontNode != nullptr && BackNode == nullptr>:");
     {
         {
             // Before:
@@ -539,7 +539,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         }
     }
 
-    LLBC_PrintLine("Test case 3: <FrontNode == NULL && BackNode != NULL>:");
+    LLBC_PrintLine("Test case 3: <FrontNode == nullptr && BackNode != nullptr>:");
     {
         {
             // Before:
@@ -566,7 +566,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         }
     }
 
-    LLBC_PrintLine("Test 4: <FrontNode != NULL && BackNode != NULL>:");
+    LLBC_PrintLine("Test 4: <FrontNode != nullptr && BackNode != nullptr>:");
     {
         // Before:
         //    A --> X --> Y1 --> Z1
@@ -590,7 +590,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
     }
 
-    LLBC_PrintLine("Test 5: <FrontNode != NULL && BackNode != NULL>(has same parent node):");
+    LLBC_PrintLine("Test 5: <FrontNode != nullptr && BackNode != nullptr>(has same parent node):");
     {
         // Before:
         //    A --> X --> Y1 --> Z1
@@ -902,7 +902,7 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
 
     // Test release null pointer.
     {
-        // pool.Release<LLBC_Packet>(NULL);
+        // pool.Release<LLBC_Packet>(nullptr);
     }
 
     // Test repeat release.

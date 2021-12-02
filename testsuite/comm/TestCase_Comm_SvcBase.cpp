@@ -32,7 +32,7 @@ struct TestData : public LLBC_ICoder
 
     TestData()
     : iVal(0)
-    , _poolInst(NULL)
+    , _poolInst(nullptr)
     {
     }
 
@@ -225,8 +225,8 @@ public:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, true))
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, false))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, true))
+// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, false))
 {
 }
 

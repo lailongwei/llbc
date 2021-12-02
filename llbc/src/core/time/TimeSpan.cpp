@@ -29,6 +29,13 @@
 
 __LLBC_NS_BEGIN
 
+
+const LLBC_TimeSpan LLBC_TimeSpan::zero = LLBC_TimeSpan::FromSS(0);
+const LLBC_TimeSpan LLBC_TimeSpan::oneSec = LLBC_TimeSpan::FromSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMin = LLBC_TimeSpan::FromMMSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneHour = LLBC_TimeSpan::FromHHMMSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneDay = LLBC_TimeSpan::FromDDHHMMSS(1);
+
 LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
 {
    // Add day part span.

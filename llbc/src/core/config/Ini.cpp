@@ -189,7 +189,7 @@ int LLBC_Ini::SaveToFile(const LLBC_String &file, const LLBC_Strings &headerLine
 
 int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKeys) const
 {
-    LLBC_Strings *sortedSections = NULL;
+    LLBC_Strings *sortedSections = nullptr;
     if (sortSections)
     {
         sortedSections = LLBC_New(LLBC_Strings, _sectionNames);
@@ -197,7 +197,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
     }
 
     const LLBC_Strings &finalSectionNames = 
-        sortedSections != NULL ? *sortedSections : _sectionNames;
+        sortedSections != nullptr ? *sortedSections : _sectionNames;
     for (LLBC_Strings::const_iterator sectionIt = finalSectionNames.begin();
          sectionIt != finalSectionNames.end();
          ++sectionIt)
@@ -267,7 +267,7 @@ const LLBC_IniSection *LLBC_Ini::GetSection(const LLBC_String &sectionName) cons
     if (it == _sections.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return it->second;
@@ -317,7 +317,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
 LLBC_String LLBC_Ini::GetComment(const LLBC_String &sectionName, const LLBC_String &key) const
 {
     const LLBC_IniSection *section = GetSection(sectionName);
-    if (section == NULL)
+    if (section == nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return "";

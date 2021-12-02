@@ -31,7 +31,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS LLBC_TimerScheduler *__g_entryThreadTimerScheduler = NULL;
+static LLBC_NS LLBC_TimerScheduler *__g_entryThreadTimerScheduler = nullptr;
 
 __LLBC_INTERNAL_NS_END
 
@@ -100,10 +100,10 @@ int LLBC_TimerScheduler::DestroyEntryThreadScheduler()
         return LLBC_FAILED;
     }
 
-    tls->coreTls.timerScheduler = NULL;
+    tls->coreTls.timerScheduler = nullptr;
 
     LLBC_Delete(LLBC_INTERNAL_NS __g_entryThreadTimerScheduler);
-    LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = NULL;
+    LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = nullptr;
 
     return LLBC_OK;
 }
@@ -127,7 +127,7 @@ void LLBC_TimerScheduler::Update()
         return;
 
     LLBC_TimerData *data;
-    uint64 now = LLBC_GetMilliSeconds();
+    sint64 now = LLBC_GetMilliSeconds();
     while (_heap.FindTop(data) == LLBC_OK)
     {
         if (now < data->handle)
@@ -147,7 +147,7 @@ void LLBC_TimerScheduler::Update()
         bool reSchedule = true;
         LLBC_Timer *timer = data->timer;
 #if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-        uint64 pseudoNow = now;
+        sint64 pseudoNow = now;
         while (pseudoNow >= data->handle)
 #endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         {
@@ -177,7 +177,7 @@ void LLBC_TimerScheduler::Update()
         data->timeouting = false;
         if (reSchedule)
         {
-            uint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
+            sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
             _heap.Insert(data);
@@ -210,7 +210,7 @@ bool LLBC_TimerScheduler::IsDstroyed() const
     return _destroyed;
 }
 
-int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, uint64 dueTime, uint64 period)
+int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 period)
 {
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
@@ -257,7 +257,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     if (data->timeouting)
         return LLBC_OK;
 
-    if (static_cast<sint64>(data->handle) - 
+    if (static_cast<sint64>(data->handle) -
             LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
         int delElemRet = _heap.DeleteElem(data);

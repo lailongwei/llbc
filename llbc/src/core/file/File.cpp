@@ -106,7 +106,7 @@ int LLBC_File::Open(const LLBC_String &path, int mode)
     }
 
     const char *modeRepr = ParseFileMode(mode);
-    if (modeRepr == NULL)
+    if (modeRepr == nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -215,7 +215,7 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
         return LLBC_FAILED;
     }
 
-    char *buffer = NULL;
+    char *buffer = nullptr;
     if (bufferMode == LLBC_FileBufferMode::NoBuf)
     {
         size = 0;
@@ -543,8 +543,8 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
 
         newFile.Close();
 
-        if ((!updateLastAccessTime || lastAccessTime == NULL) &&
-            (!updateLastModifyTime || lastModifyTime == NULL))
+        if ((!updateLastAccessTime || lastAccessTime == nullptr) &&
+            (!updateLastModifyTime || lastModifyTime == nullptr))
             return LLBC_OK;
     }
 
@@ -561,7 +561,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     bool gotNowTime = false;
     if (updateLastAccessTime)
     {
-        if (lastAccessTime == NULL)
+        if (lastAccessTime == nullptr)
         {
             const sint64 nowTime = LLBC_GetMicroSeconds();
             tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
@@ -572,14 +572,14 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
             lastAccessTime = &tsNowTime;
         }
     }
-    else if (lastAccessTime != NULL)
+    else if (lastAccessTime != nullptr)
     {
-        lastAccessTime = NULL;
+        lastAccessTime = nullptr;
     }
 
     if (updateLastModifyTime)
     {
-        if (lastModifyTime == NULL)
+        if (lastModifyTime == nullptr)
         {
             if (!gotNowTime)
             {
@@ -591,19 +591,19 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
             lastModifyTime = &tsNowTime;
         }
     }
-    else if (lastModifyTime != NULL)
+    else if (lastModifyTime != nullptr)
     {
-        lastModifyTime = NULL;
+        lastModifyTime = nullptr;
     }
 
 #if LLBC_TARGET_PLATFORM_WIN32
     HANDLE handle = ::CreateFileA(filePath.c_str(), 
                                   GENERIC_READ | FILE_WRITE_ATTRIBUTES,
                                   FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                  NULL,
+                                  nullptr,
                                   OPEN_EXISTING,
                                   FILE_ATTRIBUTE_NORMAL,
-                                  NULL);
+                                  nullptr);
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -617,9 +617,9 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         LLBC_WinTimeSpec2FileTime(*lastModifyTime, fileTimes[1]);
 
     if (!::SetFileTime(handle,
-                       NULL,
-                       lastAccessTime ? &fileTimes[0] : NULL,
-                       lastModifyTime ? &fileTimes[1] : NULL))
+                       nullptr,
+                       lastAccessTime ? &fileTimes[0] : nullptr,
+                       lastModifyTime ? &fileTimes[1] : nullptr))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         ::CloseHandle(handle);
@@ -873,7 +873,7 @@ const char *LLBC_File::ParseFileMode(int mode)
     case LLBC_FileMode::AppendReadWrite:
         return openAsText ? "a+" : "ab+";
     default:
-        return NULL;
+        return nullptr;
     }
 }
 

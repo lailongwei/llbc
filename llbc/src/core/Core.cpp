@@ -60,7 +60,7 @@ int __LLBC_CoreStartup()
         return LLBC_FAILED;
 
     // Set random seed.
-    LLBC_SeedRand(static_cast<int>(::time(NULL)));
+    LLBC_SeedRand(static_cast<int>(::time(nullptr)));
 
     // Initialize network library.
     __LLBC_LibTls *tls = __LLBC_GetLibTls();

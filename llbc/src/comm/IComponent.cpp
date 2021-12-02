@@ -340,9 +340,9 @@ LLBC_IComponent::LLBC_IComponent(uint64 caredEvents)
 , _started(false)
 , _caredEvents(caredEvents)
 
-, _meths(NULL)
+, _meths(nullptr)
 
-, _svc(NULL)
+, _svc(nullptr)
 {
 }
 

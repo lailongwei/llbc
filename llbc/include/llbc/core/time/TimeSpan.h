@@ -63,6 +63,16 @@ public:
 
 public:
     /**
+     * Converience constant variables.
+     */
+    static const LLBC_TimeSpan zero;
+    static const LLBC_TimeSpan oneSec;
+    static const LLBC_TimeSpan oneMin;
+    static const LLBC_TimeSpan oneHour;
+    static const LLBC_TimeSpan oneDay;
+
+public:
+    /**
      * Construct by time tick, in micro-seconds.
      * @param[in] span - the span tick.
      */

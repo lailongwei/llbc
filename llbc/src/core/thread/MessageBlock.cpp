@@ -35,13 +35,13 @@ __LLBC_NS_BEGIN
 
 LLBC_MessageBlock::LLBC_MessageBlock(size_t size)
 : _attach(false)
-, _buf(NULL)
+, _buf(nullptr)
 , _size(size)
 , _readPos(0)
 , _writePos(0)
-, _prev(NULL)
-, _next(NULL)
-, _poolInst(NULL)
+, _prev(nullptr)
+, _next(nullptr)
+, _poolInst(nullptr)
 {
     if (LIKELY(size > 0))
         _buf = LLBC_Malloc(char, size);
@@ -53,10 +53,10 @@ LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size)
 , _size(size)
 , _readPos(0)
 , _writePos(0)
-, _prev(NULL)
-, _next(NULL)
+, _prev(nullptr)
+, _next(nullptr)
 
-, _poolInst(NULL)
+, _poolInst(nullptr)
 {
 }
 
@@ -127,7 +127,7 @@ void LLBC_MessageBlock::Release()
 
     if (!_attach)
         LLBC_Free(_buf);
-    _buf = NULL;
+    _buf = nullptr;
 
     _size = 0;
     _readPos = _writePos = 0;
@@ -140,7 +140,7 @@ void LLBC_MessageBlock::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 
 bool LLBC_MessageBlock::IsPoolObject() const
 {
-    return _poolInst != NULL;
+    return _poolInst != nullptr;
 }
 
 LLBC_IObjectPoolInst * LLBC_MessageBlock::GetPoolInst()
@@ -167,7 +167,7 @@ size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
         _attach = false;
     }
 
-    _prev = _next = NULL;
+    _prev = _next = nullptr;
 }
 
 bool LLBC_MessageBlock::IsAttach() const

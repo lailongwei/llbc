@@ -39,6 +39,7 @@ public:
 public:
     TestEvent(int evId)
     : LLBC_Event(evId)
+    , comp(nullptr)
     {
     }
 
@@ -94,10 +95,10 @@ public:
     }
 
 public:
-    void HandleEvent(LLBC_Event *_)
+    void HandleEvent(LLBC_Event &_)
     {
-        TestEvent *ev = static_cast<TestEvent *>(_);
-        std::cout <<"handle event(class member method), data: " <<ev->data <<std::endl;
+        TestEvent &ev = static_cast<TestEvent &>(_);
+        std::cout <<"handle event(class member method), data: " <<ev.data <<std::endl;
 
         ++_handleTimes;
         LLBC_IService *svc = GetService();
@@ -109,12 +110,12 @@ public:
             svc->UnsubscribeEvent(TestEvent::TEST_EV_ID2);
     }
 
-    static void HandleEvent_Static(LLBC_Event *_)
+    static void HandleEvent_Static(LLBC_Event &_)
     {
-        TestEvent *ev = static_cast<TestEvent *>(_);
-        std::cout << "handle event(class static method(like function), data: " <<ev->data <<std::endl;
+        TestEvent &ev = static_cast<TestEvent &>(_);
+        std::cout << "handle event(class static method(like function), data: " <<ev.data <<std::endl;
 
-        EventTestComp *comp = ev->comp;
+        EventTestComp *comp = ev.comp;
         ++comp->_staticHandleTimes;
         LLBC_IService *svc = comp->GetService();
         if (comp->_staticHandleTimes == 1000)

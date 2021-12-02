@@ -44,7 +44,7 @@ static LLBC_NS LLBC_Socket *__CreateSocket(int type)
 #if LLBC_TARGET_PLATFORM_WIN32
     if (type == LLBC_NS LLBC_PollerType::IocpPoller)
         if (UNLIKELY((handle = LLBC_NS LLBC_CreateTcpSocketEx()) == LLBC_INVALID_SOCKET_HANDLE))
-            return NULL;
+            return nullptr;
 #endif
 
     LLBC_NS LLBC_Socket *sock = 
@@ -60,10 +60,10 @@ __LLBC_NS_BEGIN
 
 LLBC_PollerMgr::LLBC_PollerMgr()
 : _type(LLBC_PollerType::End)
-, _svc(NULL)
+, _svc(nullptr)
 
 , _pollerCount(0)
-, _pollers(NULL)
+, _pollers(nullptr)
 , _pollerLock()
 
 , _maxSessionId(1)
@@ -282,9 +282,12 @@ void LLBC_PollerMgr::Close(int sessionId, const char *reason)
     _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCloseEv(sessionId, reason));
 }
 
-void LLBC_PollerMgr::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+void LLBC_PollerMgr::CtrlProtocolStack(int sessionId,
+                                       int ctrlCmd,
+                                       const LLBC_Variant &ctrlData)
 {
-    _pollers[sessionId % _pollerCount]->Push(LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg));
+    _pollers[sessionId % _pollerCount]->Push(
+        LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(sessionId, ctrlCmd, ctrlData));
 }
 
 int LLBC_PollerMgr::AllocSessionId()
@@ -308,7 +311,7 @@ int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
 void LLBC_PollerMgr::OnPollerStop(int id)
 {
     _pollerLock.Lock();
-    _pollers[id] = NULL;
+    _pollers[id] = nullptr;
 
     _pollerLock.Unlock();
 }
@@ -330,9 +333,9 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_addrlen = 0;
-    hints.ai_addr = NULL;
-    hints.ai_canonname = NULL;
-    hints.ai_next = NULL;
+    hints.ai_addr = nullptr;
+    hints.ai_canonname = nullptr;
+    hints.ai_next = nullptr;
 
     struct addrinfo *ai;
     if (LLBC_GetAddrInfo(ip,                         // servname

@@ -186,6 +186,10 @@
 #define ASSERT(x) assert(x)
 #endif
 
+// Concat macro define.
+#define LLBC_Concat(x, y)  LLBC_IConcat(x, y)
+#define LLBC_IConcat(x, y) x##y
+
 // Define register keyword to empty n c++11(in c++11 standard, register is deprecated)
 #ifdef LLBC_CPP11
 #define register
@@ -237,6 +241,8 @@ private:                                            \
  #define LLBC_NO_EXCEPT
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+// Defer macro define.
+
 /* Memory operations macros. */
 // allocate/reallocate/free.
 #define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(::malloc(size)))
@@ -247,7 +253,7 @@ private:                                            \
     do {                            \
         if (LIKELY(memblock)) {     \
             LLBC_Free(memblock);    \
-            (memblock) = NULL;      \
+            (memblock) = nullptr;   \
         }                           \
     } while(0)                      \
 
@@ -259,7 +265,7 @@ private:                                            \
     do {                            \
         if (LIKELY(objptr)) {       \
             LLBC_Delete(objptr);    \
-            (objptr) = NULL;        \
+            (objptr) = nullptr;     \
         }                           \
     } while (0)                     \
 
@@ -268,7 +274,7 @@ private:                                            \
     do {                            \
         if (LIKELY(objsptr)) {      \
             LLBC_Deletes(objsptr);  \
-            objsptr = NULL;         \
+            objsptr = nullptr;      \
         }                           \
     } while(0)                      \
 
@@ -306,7 +312,7 @@ private:                                            \
  * Format argument.
  * @param[in] fmt  - the format string.
  * @param[out] buf - the formatted string, must call LLBC_Free to free memory.
- *                   if failed, this macro set retStr value to NULL and set last error.
+ *                   if failed, this macro set retStr value to nullptr and set last error.
  * @param[out] len - the formatted string length, in bytes, not including tailing character.
  *                   this macro always filled the tailing character.
  */
@@ -326,7 +332,7 @@ private:                                            \
         char *&___buf = (buf);                                                   \
                                                                                  \
         if (UNLIKELY(!(fmt))) {                                                  \
-            ___len = 0; ___buf = NULL;                                           \
+            ___len = 0; ___buf = nullptr;                                        \
             LLBC_SetLastError(LLBC_ERROR_INVALID);                               \
             break;                                                               \
         }                                                                        \
@@ -361,7 +367,7 @@ private:                                            \
         char *&___buf = (buf);                                      \
                                                                     \
         if (UNLIKELY(!(fmt))) {                                     \
-            ___len = 0; ___buf = NULL;                              \
+            ___len = 0; ___buf = nullptr;                           \
             LLBC_SetLastError(LLBC_ERROR_INVALID);                  \
             break;                                                  \
         }                                                           \
@@ -421,5 +427,10 @@ private:                                            \
 #else // Non-Win32
  #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx) __attribute__((format(printf, fmtIdx, fmtArgsBegIdx)))
 #endif // LLBC_TARGET_PLATFORM_WIN32
+
+/**
+ * The Defer macro impl(Dependency on LLBC_InvokeGuard class).
+ */
+#define LLBC_Defer(behav) LLBC_NS LLBC_InvokeGuard LLBC_Concat(__invokeGuard__, __LINE__)([&]() { behav; })
 
 #endif // !__LLBC_COM_MACRO_H__

@@ -63,12 +63,12 @@ int LLBC_LimitSampler::Sampling(sint64 value, void *appData)
     if (value < _minVal)
     {
         _minVal = value;
-        _minValSamplingTime = time(NULL);
+        _minValSamplingTime = time(nullptr);
     }
     else if (value > _maxVal)
     {
         _maxVal = value;
-        _maxValSamplingTime = time(NULL);
+        _maxValSamplingTime = time(nullptr);
     }
 
     return LLBC_OK;

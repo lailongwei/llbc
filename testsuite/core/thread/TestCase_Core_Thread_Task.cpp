@@ -41,7 +41,7 @@ private:
     static LLBC_THREAD_LOCAL int *_val;
 };
 
-LLBC_THREAD_LOCAL int *TestTask::_val = NULL;
+LLBC_THREAD_LOCAL int *TestTask::_val = nullptr;
 
 inline TestTask::TestTask()
     : _repeatCount(10000)
@@ -61,7 +61,7 @@ inline void TestTask::Svc()
     LLBC_PrintLine("Exec `*val += 1` finished, val:%d", *_val);
     LLBC_XDelete(_val);
 
-    LLBC_MessageBlock *block = NULL;
+    LLBC_MessageBlock *block = nullptr;
     while(--_repeatCount > 0)
     {
         Pop(block);

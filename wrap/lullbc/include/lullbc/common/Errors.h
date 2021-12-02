@@ -43,8 +43,8 @@
  * @param[in] additionMsg - addition message to transfer.
  * @param[in] ...         - addition message format arguments.
  */
-LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *additionMsg = NULL, ...);
-LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const char *additionMsg = NULL, ...);
+LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *additionMsg = nullptr, ...);
+LULLBC_HIDDEN void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const char *additionMsg = nullptr, ...);
 
 /**
  * Set error by errno/errDesc.

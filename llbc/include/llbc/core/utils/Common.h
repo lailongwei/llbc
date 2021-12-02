@@ -26,7 +26,6 @@
 #include "llbc/core/utils/Util_Algorithm.h"
 #include "llbc/core/utils/Util_Debug.h"
 #include "llbc/core/utils/Util_Text.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
 #include "llbc/core/utils/Util_NewDelegate.h"
 #include "llbc/core/utils/Util_MD5.h"
 #include "llbc/core/utils/Util_Base64.h"

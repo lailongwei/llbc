@@ -1077,17 +1077,17 @@ void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont)
 
 inline bool LLBC_Variant::IsStrX() const
 {
-    return IsStr() && _holder.data.obj.str != NULL;
+    return IsStr() && _holder.data.obj.str != nullptr;
 }
 
 inline bool LLBC_Variant::IsSeqX() const
 {
-    return IsSeq() && _holder.data.obj.seq != NULL;
+    return IsSeq() && _holder.data.obj.seq != nullptr;
 }
 
 inline bool LLBC_Variant::IsDictX() const
 {
-    return IsDict() && _holder.data.obj.dict != NULL;
+    return IsDict() && _holder.data.obj.dict != nullptr;
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeStrX()

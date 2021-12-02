@@ -64,7 +64,7 @@ LLBC_Event::~LLBC_Event()
 
 const LLBC_Variant &LLBC_Event::GetParam(int key) const
 {
-    if (_intKeyParams == NULL)
+    if (_intKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _IntKeyParams::const_iterator it = _intKeyParams->find(key);
@@ -73,7 +73,7 @@ const LLBC_Variant &LLBC_Event::GetParam(int key) const
 
 const LLBC_Variant &LLBC_Event::GetParam(const char* key) const
 {
-    if (_constantStrKeyParams == NULL)
+    if (_constantStrKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(LLBC_CString(key));
@@ -82,7 +82,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const char* key) const
 
 const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 {
-    if (_strKeyParams == NULL)
+    if (_strKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _StrKeyParams::const_iterator it = _strKeyParams->find(key);
@@ -91,7 +91,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 
 LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 {
-    if (_intKeyParams == NULL)
+    if (_intKeyParams == nullptr)
         _intKeyParams = LLBC_New(_IntKeyParams);
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
@@ -105,7 +105,7 @@ LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 
 LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 {
-    if (_constantStrKeyParams == NULL)
+    if (_constantStrKeyParams == nullptr)
         _constantStrKeyParams = LLBC_New(_ConstantStrKeyParams);
 
     LLBC_CString csKey(key);
@@ -120,7 +120,7 @@ LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 
 LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &param)
 {
-    if (_strKeyParams == NULL)
+    if (_strKeyParams == nullptr)
         _strKeyParams = LLBC_New(_StrKeyParams);
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
@@ -134,17 +134,17 @@ LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &par
 
 const std::map<int, LLBC_Variant> &LLBC_Event::GetIntKeyParams() const
 {
-    return _intKeyParams != NULL ? *_intKeyParams: LLBC_INL_NS __emptyIntKeyParams;
+    return _intKeyParams != nullptr ? *_intKeyParams: LLBC_INL_NS __emptyIntKeyParams;
 }
 
 const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetConstantStrKeyParams() const
 {
-    return _constantStrKeyParams != NULL ? *_constantStrKeyParams : LLBC_INL_NS __emptyConstantStrKeyParams;
+    return _constantStrKeyParams != nullptr ? *_constantStrKeyParams : LLBC_INL_NS __emptyConstantStrKeyParams;
 }
 
 const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetStrKeyParams() const
 {
-    return _strKeyParams != NULL ? *_strKeyParams : LLBC_INL_NS __emptyStrKeyParams;
+    return _strKeyParams != nullptr ? *_strKeyParams : LLBC_INL_NS __emptyStrKeyParams;
 }
 
 LLBC_Event * LLBC_Event::Clone() const

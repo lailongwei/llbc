@@ -40,9 +40,9 @@ private:
 
     void Foo_1(int arg1);
 
-    void Foo_2(int arg1, int arg2);
+    void Foo_2(int arg1, const LLBC_String &arg2);
 
-    void Foo_3(int arg1, int arg2, int arg3);
+    void Foo_3(int arg1, bool arg2, sint64 arg3);
 
     void Foo_4(int arg1, int arg2, int arg3, int arg4);
 

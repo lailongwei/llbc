@@ -59,7 +59,7 @@ const char *LLBC_FlowType::Type2Str(int type)
 
 int LLBC_FlowType::Str2Type(const char *type)
 {
-    if (UNLIKELY(type == NULL))
+    if (UNLIKELY(type == nullptr))
     {
         return LLBC_FlowType::Unknown;
     }
@@ -186,7 +186,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         LLBC_INTERNAL_NS __SetEscapeCharFlag(flags, willEscapeChars[i]);
 
     // todo: cpp11 buffer move into str
-    char *buffer = NULL;
+    char *buffer = nullptr;
     size_t bufIdx = 0, copyIdx = 0;
     for (size_t i = 0; i < strLen; ++i)
     {
@@ -194,7 +194,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         if (!LLBC_INTERNAL_NS __IsSetEscapeCharFlag(flags, ch))
             continue;
 
-        if (UNLIKELY(buffer == NULL))
+        if (UNLIKELY(buffer == nullptr))
             buffer = LLBC_Calloc(char, strLen * 2);
 
         const size_t copyLen = i - copyIdx;
@@ -206,7 +206,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         copyIdx = i + 1;
     }
 
-    if (buffer != NULL)
+    if (buffer != nullptr)
     {
         if (copyIdx < strLen)
         {
@@ -236,7 +236,7 @@ __LLBC_NS_END
       LLBC_String result = LLBC_ItoA(value, radix);
       ::strcmp(string, result.c_str());
 
-      return NULL;
+      return nullptr;
   }
  #endif
 
@@ -246,7 +246,7 @@ __LLBC_NS_END
       LLBC_String result = LLBC_I64toA(value, radix);
       ::strcmp(string, result.c_str());
 
-      return NULL;
+      return nullptr;
   }
  #endif
 
@@ -256,7 +256,7 @@ __LLBC_NS_END
       LLBC_String result = LLBC_UI64toA(value, radix);
       ::strcmp(string, result.c_str());
 
-      return NULL;
+      return nullptr;
   }
  #endif
 

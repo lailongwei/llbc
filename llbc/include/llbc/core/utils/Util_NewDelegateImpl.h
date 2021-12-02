@@ -25,88 +25,208 @@ __LLBC_NS_BEGIN
 
 template <typename Rtn, typename ...Args>
 LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(nullptr_t _)
-: _obj(nullptr)
-, _func{}
+: _funcType(0)
+, _func()
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(Func func)
-: _obj(nullptr)
+LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(CFunc cfunc)
+: _funcType(cfunc ? 1 : 0)
+, _func(cfunc)
 {
-    _func.func = func;
 }
 
-// Ignore pointer to member function warning.
-#if LLBC_CUR_COMP == LLBC_COMP_GCC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpmf-conversions"
-#endif // LLBC_CUR_COMP == LLBC_COMP_GCC
+template <typename Rtn, typename ...Args>
+LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const StlFunc &stlFunc)
+: _funcType(stlFunc != nullptr ? 2 : 0)
+, _func()
+{
+    if (_funcType == 2)
+        new (_func.stlFunc) StlFunc(stlFunc);
+}
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
 LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(Obj *obj, Rtn(Obj::*meth)(Args...))
+: _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
+, _func()
 {
-    void *methParts[2];
-    memcpy(methParts, &meth, sizeof(meth));
-    _InitByObjAndMethParts(obj, methParts);
+    if (_funcType == 3)
+        new (_func.methHolder) _ClsMethHolder<Obj>(obj, meth);
 }
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
 LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+: _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
+, _func()
 {
-    void *methParts[2];
-    memcpy(methParts, &meth, sizeof(meth));
-    _InitByObjAndMethParts(const_cast<Obj *>(obj), methParts);
+    if (_funcType == 3)
+        new (_func.methHolder) _ClsMethHolder<Obj>(obj, meth);
 }
 
-// Pop diagnostic settings.
-#if LLBC_CUR_COMP == LLBC_COMP_GCC
-#pragma GCC diagnostic pop
-#endif // LLBC_CUR_COMP == LLBC_COMP_GCC
+template <typename Rtn, typename ...Args>
+template <typename Func>
+LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const Func &func)
+: LLBC_NewDelegate(StlFunc(func))
+{
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const LLBC_NewDelegate &another)
+: _funcType(another._funcType)
+, _func()
+{
+    if (_funcType == 1)
+        _func.cfunc = another._func.cfunc;
+    else if (_funcType == 2)
+        new (_func.stlFunc) StlFunc(*reinterpret_cast<const StlFunc *>(another._func.stlFunc));
+    else if (_funcType == 3)
+        ::memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_NewDelegate<Rtn(Args...)>::~LLBC_NewDelegate()
+{
+    if (_funcType == 2)
+        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+}
 
 template <typename Rtn, typename ...Args>
 LLBC_NewDelegate<Rtn(Args...)>::operator bool() const
 {
-    return _func.func != nullptr;
+    return _funcType != 0;
 }
 
 template <typename Rtn, typename ...Args>
 Rtn LLBC_NewDelegate<Rtn(Args...)>::operator()(Args... args) const
 {
-    if (_obj)
-        return (*_func.meth)(_obj, std::forward<Args>(args)...);
+    if (_funcType == 1)
+        return (*_func.cfunc)(std::forward<Args>(args)...);
+    else if (_funcType == 2)
+        return (*reinterpret_cast<const StlFunc *>(_func.stlFunc))(std::forward<Args>(args)...);
+    else if (_funcType == 3)
+        return reinterpret_cast<const _IClsMethHolder *>(_func.methHolder)->Invoke(std::forward<Args>(args)...);
     else
-        return (*_func.func)(std::forward<Args>(args)...);
+        return Rtn();
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(nullptr_t _)
 {
-    _obj = nullptr;
-    memset(&_func, 0, sizeof(_func));
+    Reset();
+    return *this;
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(CFunc cfunc)
+{
+    if (cfunc == nullptr)
+    {
+        Reset();
+        return *this;
+    }
+
+    if (_funcType == 2)
+        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+
+    _funcType = 1;
+    _func.cfunc = cfunc;
 
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(Func func)
+LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const StlFunc &stlFunc)
 {
-    _obj = nullptr;
-    _func.func = func;
+    if (stlFunc == nullptr)
+    {
+        Reset();
+        return *this;
+    }
+
+    if (_funcType == 2)
+    {
+        *reinterpret_cast<StlFunc *>(_func.stlFunc) = stlFunc;
+    }
+    else
+    {
+        _funcType = 2;
+        new (_func.stlFunc) StlFunc(stlFunc);
+    }
+
+    return *this;
+}
+
+template <typename Rtn, typename ... Args>
+template <typename Func>
+LLBC_NewDelegate<Rtn(Args ...)> &LLBC_NewDelegate<Rtn(Args ...)>::operator=(const Func &func)
+{
+    return operator=(StlFunc(func));
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const LLBC_NewDelegate<Rtn(Args...)> &another)
+{
+    if (this == &another)
+        return *this;
+
+    if (another._funcType == 1)
+    {
+        if (_funcType == 2)
+            reinterpret_cast<StlFunc *>(_func.methHolder)->~StlFunc();
+
+        _funcType = 1;
+        _func.cfunc = another._func.cfunc;
+    }
+    else if (another._funcType == 2)
+    {
+        if (_funcType == 2)
+        {
+            *reinterpret_cast<StlFunc *>(_func.stlFunc) =
+                *reinterpret_cast<const StlFunc *>(another._func.stlFunc);
+        }
+        else
+        {
+            _funcType = 2;
+            new (_func.stlFunc) StlFunc(*reinterpret_cast<const StlFunc *>(another._func.stlFunc));
+        }
+    }
+    else if (another._funcType == 3)
+    {
+        if (_funcType == 2)
+            reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+
+        _funcType = 3;
+        ::memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
+    }
+    else
+    {
+        Reset();
+    }
 
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-void LLBC_NewDelegate<Rtn(Args...)>::_InitByObjAndMethParts(void *obj, void *methParts[2])
+void LLBC_NewDelegate<Rtn(Args...)>::Reset()
 {
-    uint64 objOffset = 0;
-    memcpy(&objOffset, &methParts[1], sizeof(void *));
-    _obj = reinterpret_cast<sint8 *>(obj) + objOffset;
+    if (_funcType == 1)
+    {
+        _func.cfunc = nullptr;
+    }
+    else if (_funcType == 2)
+    {
+        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+        ::memset(_func.stlFunc, 0, sizeof(_func.stlFunc));
+    }
+    else if (_funcType == 3)
+    {
+        ::memset(_func.methHolder, 0, sizeof(_func.methHolder));
+    }
 
-    memcpy(&_func.meth, &methParts[0], sizeof(void *));
+    _funcType = 0;
 }
 
 __LLBC_NS_END

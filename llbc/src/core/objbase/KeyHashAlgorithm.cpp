@@ -112,7 +112,7 @@ LLBC_KeyHashAlgorithm::~LLBC_KeyHashAlgorithm()
 
 const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(int type) const
 {
-    return LLBC_KeyHashAlgorithmType::IsLegal(type) ? m_algos[type] : NULL;
+    return LLBC_KeyHashAlgorithmType::IsLegal(type) ? m_algos[type] : nullptr;
 }
 
 const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(const LLBC_String &algoDesc) const

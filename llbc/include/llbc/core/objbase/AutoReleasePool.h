@@ -75,7 +75,7 @@ public:
 
     /**
      * Clone method, use to prevent call.
-     * @return LLBC_Object * - the cloned object, always return NULL, 
+     * @return LLBC_Object * - the cloned object, always return nullptr, 
      *                         and set last error to permission denied error.
      */
     virtual LLBC_Object *Clone() const;

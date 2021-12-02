@@ -97,14 +97,14 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
     LLBC_NativeThreadHandle readers[__g_readerCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
     for(long i = 0; i < __g_readerCount; ++i)
     {
-        void *threadArg = NULL;
+        void *threadArg = nullptr;
         ::memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&readers[i], &Reader_ThreadProc, threadArg);
     }
 
     // Create writer.
     LLBC_NativeThreadHandle writer = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&writer, &Writer_ThreadProc, NULL);
+    LLBC_CreateThread(&writer, &Writer_ThreadProc, nullptr);
 
     // Join writer.
     LLBC_JoinThread(writer);

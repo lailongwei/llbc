@@ -28,11 +28,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_encode(PyObject *self, PyObject *args)
 {
     PyObject *o;
     if (!PyArg_ParseTuple(args, "O", &o))
-        return NULL;
+        return nullptr;
 
     std::string str;
     if (pyllbc_ObjCoder::Encode(o, str) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return PyString_FromStringAndSize(str.data(), str.size());
 }
@@ -41,11 +41,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_decode(PyObject *self, PyObject *args)
 {
     char *str;
     if (!PyArg_ParseTuple(args, "s", &str))
-        return NULL;
+        return nullptr;
 
     PyObject *o;
     if (pyllbc_ObjCoder::Decode(str, o) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("N", o);
 }

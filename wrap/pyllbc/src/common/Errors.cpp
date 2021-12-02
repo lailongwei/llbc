@@ -24,18 +24,18 @@
 #include "pyllbc/common/ObjUtil.h"
 #include "pyllbc/common/Errors.h"
 
-PyObject *pyllbc_Exception = NULL;
+PyObject *pyllbc_Exception = nullptr;
 
-LLBC_IDelegate0<void> *pyllbc_ErrClearHook = NULL;
-LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *pyllbc_ErrSetHook = NULL;
+LLBC_NewDelegate<void()> pyllbc_ErrClearHook;
+LLBC_NewDelegate<void(const LLBC_String &, int, PyObject *, PyObject *)> pyllbc_ErrSetHook;
 
 void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback)
 {
     if (!PyErr_Occurred())
     {
-        errType = NULL;
+        errType = nullptr;
         errStr.clear();
-        traceback = NULL;
+        traceback = nullptr;
 
         return;
     }
@@ -84,9 +84,9 @@ void pyllbc_TransferLLBCError(const char *file, int lineNo, const LLBC_String &a
     if (pyllbc_ErrSetHook)
     {
         LLBC_String errStr;
-        PyObject *tbObj = NULL;
+        PyObject *tbObj = nullptr;
         pyllbc_PyErrFetch(errCls, errStr, tbObj);
-        pyllbc_ErrSetHook->Invoke(errDesc, LLBC_GetLastError(), errCls, tbObj);
+        pyllbc_ErrSetHook(errDesc, LLBC_GetLastError(), errCls, tbObj);
     }
 }
 
@@ -104,7 +104,7 @@ void pyllbc_TransferPyError(const LLBC_String &additionalMsg)
             if (!additionalMsg.empty())
                 errStr.append_format("%c%s", LLBC_LF, additionalMsg.c_str());
 
-            pyllbc_ErrSetHook->Invoke(errStr, LLBC_GetLastError(), errType, tbObj);
+            pyllbc_ErrSetHook(errStr, LLBC_GetLastError(), errType, tbObj);
         }
     }
 }
@@ -126,10 +126,10 @@ void pyllbc_SetError(const LLBC_String &errDesc, int llbcErr, PyObject *pyErrTyp
         if (pyllbc_ErrSetHook)
         {
             LLBC_String errStr;
-            PyObject *tbObj = NULL;
+            PyObject *tbObj = nullptr;
             pyllbc_PyErrFetch(pyErrType, errStr, tbObj);
 
-            pyllbc_ErrSetHook->Invoke(errStr, llbcErr, pyErrType, tbObj);
+            pyllbc_ErrSetHook(errStr, llbcErr, pyErrType, tbObj);
         }
     }
 
@@ -142,17 +142,15 @@ void pyllbc_ClearError()
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     if (pyllbc_ErrClearHook)
-        pyllbc_ErrClearHook->Invoke();
+        pyllbc_ErrClearHook();
 }
 
-void pyllbc_SetErrSetHock(LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *hook)
+void pyllbc_SetErrSetHock(const LLBC_NewDelegate<void(const LLBC_String &, int, PyObject *, PyObject *)> &hook)
 {
-    LLBC_XDelete(pyllbc_ErrSetHook);
     pyllbc_ErrSetHook = hook;
 }
 
-void pyllbc_SetErrClearHook(LLBC_IDelegate0<void> *hook)
+void pyllbc_SetErrClearHook(const LLBC_NewDelegate<void()> &hook)
 {
-    LLBC_XDelete(pyllbc_ErrClearHook);
     pyllbc_ErrClearHook = hook;
 }

@@ -147,6 +147,7 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_year = year - 1900;
     timeStruct.tm_mon = month - 1;
     timeStruct.tm_mday = day;
+    timeStruct.tm_isdst = 0;
 
     if (year == 1970 && month == 1 && day == 1)
     {
@@ -164,7 +165,6 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_hour = hour;
     timeStruct.tm_min = minute;
     timeStruct.tm_sec = second;
-
 
     return FromTimeStruct(timeStruct, milliSecond, microSecond);
 }

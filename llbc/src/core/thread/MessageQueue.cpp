@@ -29,8 +29,8 @@ __LLBC_NS_BEGIN
 
 LLBC_MessageQueue::LLBC_MessageQueue()
 {
-    _head = NULL;
-    _tail = NULL;
+    _head = nullptr;
+    _tail = nullptr;
 
     _size = 0;
 }
@@ -77,7 +77,7 @@ void LLBC_MessageQueue::Cleanup()
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     _size = 0;
-    _tail = NULL;
+    _tail = nullptr;
 
     _lock.Unlock();
 }
@@ -97,10 +97,10 @@ void LLBC_MessageQueue::Push(LLBC_MessageBlock *block, bool front)
 
 void LLBC_MessageQueue::PushFrontNonLock(LLBC_MessageBlock *block)
 {
-    block->SetPrev(NULL);
+    block->SetPrev(nullptr);
     if (!_head)
     {
-        block->SetNext(NULL);
+        block->SetNext(nullptr);
         _head = _tail = block;
     }
     else
@@ -115,10 +115,10 @@ void LLBC_MessageQueue::PushFrontNonLock(LLBC_MessageBlock *block)
 
 void LLBC_MessageQueue::PushBackNonLock(LLBC_MessageBlock *block)
 {
-    block->SetNext(NULL);
+    block->SetNext(nullptr);
     if (!_tail)
     {
-        block->SetPrev(NULL);
+        block->SetPrev(nullptr);
         _tail = _head = block;
     }
     else
@@ -136,7 +136,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (interval != 0)
     {
-        block = NULL;
+        block = nullptr;
         while (!block)
         {
             _lock.Lock();
@@ -217,9 +217,9 @@ void LLBC_MessageQueue::PopFrontNonLock(LLBC_MessageBlock *&block)
 {
     block = _head;
     if (!(_head = _head->GetNext()))
-        _tail = NULL;
+        _tail = nullptr;
     else
-        _head->SetPrev(NULL);
+        _head->SetPrev(nullptr);
 
     _size -= 1;
 }
@@ -228,9 +228,9 @@ void LLBC_MessageQueue::PopBackNonLock(LLBC_MessageBlock *&block)
 {
     block = _tail;
     if (!(_tail = _tail->GetPrev()))
-        _head = NULL;
+        _head = nullptr;
     else
-        _tail->SetNext(NULL);
+        _tail->SetNext(nullptr);
 
     _size -= 1;
 }

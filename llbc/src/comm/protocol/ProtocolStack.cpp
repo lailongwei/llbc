@@ -39,18 +39,15 @@ namespace
 
 __LLBC_INTERNAL_NS_BEGIN
 
-void __DeletePacketsBlock(void *data)
+void __DeletePacketsBlock(LLBC_NS LLBC_MessageBlock *block)
 {
     typedef LLBC_NS LLBC_Packet _Packet;
-    typedef LLBC_NS LLBC_MessageBlock _Block;
-
-    _Block *block = reinterpret_cast<_Block *>(data);
 
     _Packet *packet;
     while (block->Read(&packet, sizeof(_Packet *)) == LLBC_OK)
         LLBC_Recycle(packet);
 
-    LLBC_Delete(block);
+    LLBC_Recycle(block);
 }
 
 __LLBC_INTERNAL_NS_END
@@ -60,8 +57,8 @@ __LLBC_NS_BEGIN
 LLBC_ProtocolStack::LLBC_ProtocolStack(This::StackType type)
 : _type(type)
 
-, _svc(NULL)
-, _session(NULL)
+, _svc(nullptr)
+, _session(nullptr)
 , _suppressCoderNotFoundError(false)
 {
     ::memset(_protos, 0, sizeof(_protos));
@@ -194,7 +191,7 @@ int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded
         if (!_protos[i])
             continue;
 
-        in = out, out = NULL;
+        in = out, out = nullptr;
         if (_protos[i]->Send(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
@@ -211,7 +208,7 @@ int LLBC_ProtocolStack::SendRaw(LLBC_Packet *packet, LLBC_MessageBlock *&block, 
         if (!_protos[layer])
             continue;
 
-        in = out, out = NULL;
+        in = out, out = nullptr;
         if (_protos[layer]->Send(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }
@@ -230,14 +227,14 @@ int LLBC_ProtocolStack::Send(LLBC_Packet *packet, LLBC_MessageBlock *&block, boo
 
 int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packet *> &packets, bool &removeSession)
 {
-    void *in, *out = NULL;
+    void *in, *out = nullptr;
     if (UNLIKELY(_protos[_Layer::PackLayer]->Recv(block, out, removeSession) != LLBC_OK))
         return LLBC_FAILED;
     else if (!out)
         return LLBC_OK;
 
     LLBC_MessageBlock *packetsBlock = reinterpret_cast<LLBC_MessageBlock *>(out);
-    LLBC_InvokeGuard guard(&LLBC_INL_NS __DeletePacketsBlock, packetsBlock);
+    LLBC_Defer(LLBC_INL_NS __DeletePacketsBlock(packetsBlock));
 
     LLBC_Packet *packet;
     while (packetsBlock->Read(&packet, sizeof(LLBC_Packet *)) == LLBC_OK)
@@ -248,7 +245,7 @@ int LLBC_ProtocolStack::RecvRaw(LLBC_MessageBlock *block, std::vector<LLBC_Packe
             if (!_protos[layer])
                 continue;
 
-            in = out, out = NULL;
+            in = out, out = nullptr;
             if (_protos[layer]->Recv(in, out, removeSession) != LLBC_OK)
             {
                 //! Current in-data already deleted in specific protocol, we don't need care it.
@@ -277,7 +274,7 @@ int LLBC_ProtocolStack::RecvCodec(LLBC_Packet *willDecode, LLBC_Packet *&decoded
         if (!_protos[layer])
             continue;
 
-        in = out, out = NULL;
+        in = out, out = nullptr;
         if (_protos[layer]->Recv(in, out, removeSession) != LLBC_OK)
             return LLBC_FAILED;
     }

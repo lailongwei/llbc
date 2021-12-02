@@ -45,10 +45,10 @@ LLBC_Semaphore::LLBC_Semaphore(int initVal)
     _sem = sem_open(str.c_str(), O_CREAT | O_EXCL, 0644, 0);
  #endif
 #else
-    _sem = ::CreateSemaphore(NULL,
+    _sem = ::CreateSemaphore(nullptr,
                              initVal,
                              LONG_MAX,
-                             NULL);
+                             nullptr);
 #endif
 }
 
@@ -108,7 +108,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
-    ::gettimeofday(&tvStart, NULL);
+    ::gettimeofday(&tvStart, nullptr);
     tvEnd = tvStart;
     tvEnd.tv_sec += milliSeconds / 1000;
     tvEnd.tv_usec += (milliSeconds % 1000) * 1000;
@@ -185,7 +185,7 @@ void LLBC_Semaphore::Post(int count)
 
     pthread_testcancel();
 #else
-    ::ReleaseSemaphore(_sem, count, NULL);
+    ::ReleaseSemaphore(_sem, count, nullptr);
 #endif
 }
 

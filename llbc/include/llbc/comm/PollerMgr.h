@@ -125,19 +125,20 @@ public:
     /**
      * Close session.
      * @param[in] sessionId - the session Id.
-	 * @param[in] reason    - the session close reason, default is NULL.
+	 * @param[in] reason    - the session close reason, default is nullptr.
      */
-    void Close(int sessionId, const char *reason = NULL);
+    void Close(int sessionId, const char *reason = nullptr);
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlCmd            - the stack control type(user defined).
-     * @param[in] ctrlData           - the stack control data(user defined).
-     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlCmd   - the stack control type(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    void CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    void CtrlProtocolStack(int sessionId,
+                           int ctrlCmd,
+                           const LLBC_Variant &ctrlData);
 
 private:
     /**

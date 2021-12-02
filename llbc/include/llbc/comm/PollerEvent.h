@@ -81,9 +81,7 @@ struct LLBC_HIDDEN LLBC_PollerEvent
         struct
         {
             int ctrlCmd;
-            void *ctrlData;
-            size_t ctrlDataLen;
-            LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg;
+            LLBC_Variant *ctrlData;
         } protocolStackCtrlInfo;
     } un;
 };
@@ -140,7 +138,9 @@ public:
     /**
      * Build control protocol stack event.
      */
-    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
+                                                       int ctrlCmd,
+                                                       const LLBC_Variant &ctrlData);
 
 public:
     /**

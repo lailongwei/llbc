@@ -893,7 +893,7 @@ public:
     ulong ReadULong_2(ulong failRet = 0);
     float ReadFloat_2(float failRet = 0.0f);
     double ReadDouble_2(double failRet = 0.0);
-    void *ReadPtr_2(void *failRet = NULL);
+    void *ReadPtr_2(void *failRet = nullptr);
 
     void WriteBool(bool value);
     void WriteSInt8(sint8 value);

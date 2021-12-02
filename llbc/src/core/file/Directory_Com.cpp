@@ -89,7 +89,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
             continue;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (!::CreateDirectoryA(toPath.c_str(), NULL))
+        if (!::CreateDirectoryA(toPath.c_str(), nullptr))
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
             return LLBC_FAILED;
@@ -373,9 +373,9 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct stat fileStat;
-    struct dirent **direntList = NULL;
+    struct dirent **direntList = nullptr;
 
-    int fileCount = scandir(path.c_str(), &direntList, NULL, alphasort);
+    int fileCount = scandir(path.c_str(), &direntList, nullptr, alphasort);
     if (fileCount < 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -489,11 +489,11 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
 int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &directories, bool recursive)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct dirent **direntList = NULL;
+    struct dirent **direntList = nullptr;
     struct stat fileStat;
     int fileCount = 0;
 
-    fileCount = scandir(path.c_str(), &direntList, NULL, alphasort);
+    fileCount = scandir(path.c_str(), &direntList, nullptr, alphasort);
     if (fileCount < 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -610,7 +610,7 @@ LLBC_String LLBC_Directory::ModuleFileName()
     DWORD ret = 0;
     int bufLen = MAX_PATH + 1;
     char *buf = LLBC_Malloc(char, bufLen);
-    while ((ret = ::GetModuleFileNameA(NULL, buf, bufLen)) == bufLen)
+    while ((ret = ::GetModuleFileNameA(nullptr, buf, bufLen)) == bufLen)
     {
         buf = LLBC_Realloc(char, buf, bufLen * 2);
     }
@@ -706,9 +706,9 @@ LLBC_String LLBC_Directory::CurDir()
  
     return cwd;
 #else
-    LPSTR cwd = NULL;
+    LPSTR cwd = nullptr;
     DWORD cwdSize = 0;
-    cwdSize = ::GetCurrentDirectoryA(0, NULL);
+    cwdSize = ::GetCurrentDirectoryA(0, nullptr);
     cwd = reinterpret_cast<LPSTR>(::malloc(cwdSize * sizeof(CHAR)));
     if (::GetCurrentDirectoryA(cwdSize, cwd) == 0)
     {

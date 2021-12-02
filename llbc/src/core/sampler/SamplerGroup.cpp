@@ -58,7 +58,7 @@ int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
         return LLBC_FAILED;
     }
 
-    LLBC_ISampler *sampler = NULL;
+    LLBC_ISampler *sampler = nullptr;
     switch (type)
     {
     case LLBC_SamplerType::CountSampler:
@@ -105,14 +105,14 @@ LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name)
 {
     _SamplerMapIter iter = _samplers->find(name);
     return iter != _samplers->end() ? 
-        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)NULL);
+        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)nullptr);
 }
 
 const LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name) const
 {
     _SamplerMapCIter iter = _samplers->find(name);
     return iter != _samplers->end() ?
-        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)NULL);
+        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)nullptr);
 
 }
 

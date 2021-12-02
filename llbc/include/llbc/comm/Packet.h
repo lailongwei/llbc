@@ -275,10 +275,9 @@ public:
 
     /**
      * Set payload delete delegate.
-     * @param[in] deleg                   - the delete delegate.
-     * @param[in] deleteWhenPacketDestroy - when packet destroy, specific delegate need delete or not, default is true.
+     * @param[in] deleg - the payload delete delegate.
      */
-    void SetPayloadDeleteDeleg(LLBC_IDelegate1<void, LLBC_MessageBlock *> *deleg, bool deleteWhenPacketDestroy = true);
+    void SetPayloadDeleteDeleg(const LLBC_NewDelegate<void(LLBC_MessageBlock *)> &deleg);
 
     /**
      * Reset packet payload.
@@ -513,14 +512,13 @@ public:
 
     /**
      * Set the pre-handle result into the packet.
-     * @param[in] result      - the packet pre-handle result.
-     * @param[in] obj         - the clear method target, default is NULL.
-     * @param[in] clearMethod - the clear method, default is NULL.
+     * @param[in] result     - the packet pre-handle result.
+     * @param[in] clearDeleg - the result clear method, default is nullptr.
      */
     void SetPreHandleResult(void *result, void(*clearFunc)(void *));
     template <typename ObjType>
     void SetPreHandleResult(void *result, ObjType *obj, void (ObjType::*clearMethod)(void *));
-    void SetPreHandleResult(void *result, LLBC_IDelegate1<void, void *> *clearDeleg = NULL);
+    void SetPreHandleResult(void *result, const LLBC_NewDelegate<void(void *)> &clearDeleg = nullptr);
 
 public:
     /**
@@ -571,11 +569,6 @@ private:
      */
     void CleanupPayload();
 
-    /**
-     * Cleanup payload delete delegate.
-     */
-    void CleanupPayloadDeleteDeleg();
-
 private:
     size_t _length;
 
@@ -601,11 +594,10 @@ private:
     LLBC_String *_codecError;
 
     void *_preHandleResult;
-    LLBC_IDelegate1<void, void *> *_resultClearDeleg;
+    LLBC_NewDelegate<void(void *)> _resultClearDeleg;
 
     LLBC_MessageBlock *_payload;
-    LLBC_IDelegate1<void, LLBC_MessageBlock *> *_payloadDeleteDeleg;
-    bool _deletePayloadDeleteDelegWhenDestroy;
+    LLBC_NewDelegate<void(LLBC_MessageBlock *)> _payloadDeleteDeleg;
 
     LLBC_IObjectPoolInst *_selfPoolInst;
     LLBC_IObjectPoolInst *_msgBlockPoolInst;

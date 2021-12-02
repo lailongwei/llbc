@@ -23,8 +23,8 @@
 #include "comm/TestCase_Comm_DynLoadComp.h"
 
 TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", NULL, true))
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", NULL, false))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", nullptr, true))
+// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "DynLoadTestSvc", nullptr, false))
 {
 }
 

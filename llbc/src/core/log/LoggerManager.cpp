@@ -37,10 +37,10 @@ __LLBC_NS_BEGIN
 LLBC_String LLBC_LoggerManager::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
 
 LLBC_LoggerManager::LLBC_LoggerManager()
-: _configurator(NULL)
-, _sharedLogRunnable(NULL)
+: _configurator(nullptr)
+, _sharedLogRunnable(nullptr)
 
-, _root(NULL)
+, _root(nullptr)
 {
 }
 
@@ -115,29 +115,29 @@ bool LLBC_LoggerManager::IsInited() const
 {
     LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
     LLBC_LockGuard guard(nonConstThis->_lock);
-    return _root != NULL;
+    return _root != nullptr;
 }
 
 void LLBC_LoggerManager::Finalize()
 {
     LLBC_LockGuard guard(_lock);
 
-    if (_root == NULL)
+    if (_root == nullptr)
         return;
 
     if (_sharedLogRunnable)
     {
         _sharedLogRunnable->Stop();
         LLBC_Delete(_sharedLogRunnable);
-        _sharedLogRunnable = NULL;
+        _sharedLogRunnable = nullptr;
     }
 
     // Finalize Log helper class.
     LLBC_LogHelper::Finalize();
 
-    // Delete all loggers and set _root logger to NULL.
+    // Delete all loggers and set _root logger to nullptr.
     LLBC_STLHelper::DeleteContainer(_loggers);
-    _root = NULL;
+    _root = nullptr;
 
     // Delete logger configurator.
     LLBC_XDelete(_configurator);
@@ -150,7 +150,7 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
     if (UNLIKELY(!_root))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -162,7 +162,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     if (UNLIKELY(name.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
@@ -170,7 +170,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     if (UNLIKELY(!_root))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return NULL;
+        return nullptr;
     }
 
     std::map<LLBC_String, LLBC_Logger *>::const_iterator iter = _loggers.find(name);
@@ -180,7 +180,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
             return _root;
 
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);

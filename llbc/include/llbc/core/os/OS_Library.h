@@ -37,7 +37,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName
  * Retrieves the address of specified exported function from library.
  * @param[in] handle   - library handle.
  * @param[in] procName - function name.
- * @return LLBC_LibraryFun - library func address, if return NULL, see LLBC_GetLastError().
+ * @return LLBC_LibraryFun - library func address, if return nullptr, see LLBC_GetLastError().
  */
 LLBC_EXTERN LLBC_EXPORT LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const char *procName);
 

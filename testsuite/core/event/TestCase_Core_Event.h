@@ -35,10 +35,10 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    void OnEvent1(LLBC_Event *ev);
-    void OnEvent1Too(LLBC_Event *ev);
+    void OnEvent1(LLBC_Event &ev);
+    void OnEvent1Too(LLBC_Event &ev);
 
-    void OnEvent2(LLBC_Event *ev);
+    void OnEvent2(LLBC_Event &ev);
 
 private:
     LLBC_ListenerStub _ev1Stub;

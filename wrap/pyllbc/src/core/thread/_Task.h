@@ -28,11 +28,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_createtask(PyObject *self, PyObject *args)
 {
     char *script;
     if (!PyArg_ParseTuple(args, "s", &script))
-        return NULL;
+        return nullptr;
 
     int taskId = pyllbc_s_TaskMgr->CreateTask(script);
     if (taskId < 0)
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("i", taskId);
 }
@@ -43,7 +43,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_currenttaskid(PyObject *self, PyObject *args)
     if (taskId < 0)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return NULL;
+        return nullptr;
     }
 
     return Py_BuildValue("i", taskId);
@@ -58,7 +58,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_istaskexist(PyObject *self, PyObject *args)
 {
     int taskId;
     if (!PyArg_ParseTuple(args, "i", &taskId))
-        return NULL;
+        return nullptr;
 
     const bool exist = 
         pyllbc_s_TaskMgr->IsTaskExist(taskId);
@@ -70,7 +70,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_istaskactivated(PyObject *self, PyObject *args)
 {
     int taskId;
     if (!PyArg_ParseTuple(args, "i", &taskId))
-        return NULL;
+        return nullptr;
 
     const bool activated = 
         pyllbc_s_TaskMgr->IsTaskActivated(taskId);
@@ -81,11 +81,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_istaskactivated(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_pushmsg(PyObject *self, PyObject *args)
 {
     /* Fill stuff here */
-    return NULL;
+    return nullptr;
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_popmsg(PyObject *self, PyObject *args)
 {
     /* Fill stuff here */
-    return NULL;
+    return nullptr;
 }

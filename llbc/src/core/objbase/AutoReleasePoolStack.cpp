@@ -31,7 +31,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_AutoReleasePoolStack::LLBC_AutoReleasePoolStack()
-: _head(NULL)
+: _head(nullptr)
 {
 }
 
@@ -40,7 +40,7 @@ LLBC_AutoReleasePoolStack::~LLBC_AutoReleasePoolStack()
     typedef LLBC_AutoReleasePool _Pool;
     
     std::vector<_Pool *> pools;
-    for (_Pool *pool = _head; pool != NULL; pool = pool->GetPoolNext())
+    for (_Pool *pool = _head; pool != nullptr; pool = pool->GetPoolNext())
         pools.push_back(pool);
 
     for (size_t i = 0; i < pools.size(); ++i)
@@ -63,7 +63,7 @@ int LLBC_AutoReleasePoolStack::RemoveObject(LLBC_Object *o)
     }
 
     _Pool *pool = _head;
-    for (; pool != NULL; pool = pool->GetPoolNext())
+    for (; pool != nullptr; pool = pool->GetPoolNext())
     {
         if (pool->RemoveObject(o) == LLBC_OK)
             return LLBC_OK;

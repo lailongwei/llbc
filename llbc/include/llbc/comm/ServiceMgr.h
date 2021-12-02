@@ -58,14 +58,14 @@ public:
     /**
      * Get service by service Id.
      * @param[in] id - the service Id.
-     * @return LLBC_IService * - the service, if not found, return NULL.
+     * @return LLBC_IService * - the service, if not found, return nullptr.
      */
     LLBC_IService *GetService(int id);
 
     /**
      * Get service by service name.
      * @param[in] name - the service name.
-     * @return LLBC_IService * - the service, if not found, return NULL.
+     * @return LLBC_IService * - the service, if not found, return nullptr.
      */
     LLBC_IService *GetService(const LLBC_String &name);
 

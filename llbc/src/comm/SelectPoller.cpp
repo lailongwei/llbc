@@ -109,7 +109,7 @@ void LLBC_SelectPoller::Svc()
                 else
                     closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, sockErr);
 
-                session->OnClose(NULL, closeInfo);
+                session->OnClose(nullptr, closeInfo);
             }
 
             for (uint32 i = 0; i < reads.fd_count; ++i)
@@ -203,7 +203,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
 
         SetConnectedSocketOpts(socket, *ev.sessionOpts);
-        AddSession(CreateSession(socket, ev.sessionId, *ev.sessionOpts, NULL));
+        AddSession(CreateSession(socket, ev.sessionId, *ev.sessionOpts, nullptr));
 
         LLBC_XDelete(ev.sessionOpts);
     }
@@ -343,7 +343,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         processed += 1;
 
         int sockErr;
-        const char *reason = NULL;
+        const char *reason = nullptr;
         bool connected = inWriteSet;
         if (UNLIKELY(socket->GetPendingError(sockErr) != LLBC_OK))
         {
@@ -380,7 +380,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         if (connected)
         {
             SetConnectedSocketOpts(socket, asyncInfo.sessionOpts);
-            AddSession(CreateSession(socket, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
+            AddSession(CreateSession(socket, asyncInfo.sessionId, asyncInfo.sessionOpts, nullptr));
         }
         else
         {

@@ -38,8 +38,8 @@ pyllbc_PackLemma_Dict::pyllbc_PackLemma_Dict(PyObject *compileEnv)
 : Base(compileEnv)
 , _gotKwSep(false)
 
-, _keyLemma(NULL)
-, _valueLemma(NULL)
+, _keyLemma(nullptr)
+, _valueLemma(nullptr)
 {
 }
 
@@ -202,7 +202,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("dict-lemma not done for unpack data");
-        return NULL;
+        return nullptr;
     }
 
     int len;
@@ -210,13 +210,13 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
     if (!llbcStream.ReadSInt32(len))
     {
         pyllbc_SetError("not enough bytes to unpack dict data(head area)");
-        return NULL;
+        return nullptr;
     }
 
     if (UNLIKELY(len < 0))
     {
         pyllbc_SetError("when unpacking dict data, unpack len < 0");
-        return NULL;
+        return nullptr;
     }
 
     PyObject *dict = PyDict_New();
@@ -226,7 +226,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
         if (!key)
         {
             Py_DECREF(dict);
-            return NULL;
+            return nullptr;
         }
 
         PyObject *value = _valueLemma->Read(stream);
@@ -235,7 +235,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
             Py_DECREF(key);
             Py_DECREF(dict);
 
-            return NULL;
+            return nullptr;
         }
 
         if (PyDict_SetItem(dict, key, value) != 0)
@@ -246,7 +246,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
             Py_DECREF(dict);
 
             pyllbc_TransferPyError("when unpack dict data from stream");
-            return NULL;
+            return nullptr;
         }
 
         Py_DECREF(value);

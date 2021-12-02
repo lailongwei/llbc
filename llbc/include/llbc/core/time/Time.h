@@ -174,13 +174,13 @@ public:
     /**
      * Format local time, see strftime() api.
      */
-    LLBC_String Format(const char *format = NULL) const;
+    LLBC_String Format(const char *format = nullptr) const;
     static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
-    LLBC_String FormatAsGmt(const char *format = NULL) const;
+    LLBC_String FormatAsGmt(const char *format = nullptr) const;
     static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
 
 public:

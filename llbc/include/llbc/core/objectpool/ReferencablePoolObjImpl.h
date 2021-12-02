@@ -27,7 +27,7 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_ReferencablePoolObj::LLBC_ReferencablePoolObj()
-: _poolInst(NULL)
+: _poolInst(nullptr)
 {
 }
 
@@ -43,7 +43,7 @@ inline void LLBC_ReferencablePoolObj::Release()
         {
             _ref = 1;
             _autoRef = 0;
-            _poolStack = NULL;
+            _poolStack = nullptr;
 
             _poolInst->ReleaseReferencable(this);
         }
@@ -62,7 +62,7 @@ inline void LLBC_ReferencablePoolObj::SafeRelease()
         {
             _ref = 1;
             _autoRef = 0;
-            _poolStack = NULL;
+            _poolStack = nullptr;
 
             _poolInst->ReleaseReferencable(this);
         }

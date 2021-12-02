@@ -26,29 +26,29 @@
 
 __LLBC_NS_BEGIN
 
-// Object release macro, use for release object(not reset to NULL after released).
+// Object release macro, use for release object(not reset to nullptr after released).
 #define LLBC_Release(o)       \
         o->Release()          \
 
-// Object release macro, it check object and reset to NULL after released.
+// Object release macro, it check object and reset to nullptr after released.
 #define LLBC_XRelease(o)      \
     do {                      \
         if (LIKELY(o)) {      \
             o->Release();     \
-            o = NULL;         \
+            o = nullptr;      \
         }                     \
     } while(0)                \
 
-// Object auto-release macro, use for auto release object(not reset to NULL after auto-released).
+// Object auto-release macro, use for auto release object(not reset to nullptr after auto-released).
 #define LLBC_AutoRelease(o)   \
     o->AutoRelease()          \
 
-// Object auto-release macro, it check object and reset to NULL after auto-released.
+// Object auto-release macro, it check object and reset to nullptr after auto-released.
 #define LLBC_XAutoRelease(o)  \
     do {                      \
         if (LIKELY(o)) {      \
             o->AutoRelease(); \
-            o = NULL;         \
+            o = nullptr;      \
         }                     \
     } while (0)               \
 

@@ -24,12 +24,10 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/utils/Util_NewDelegate.h"
 
 __LLBC_NS_BEGIN
-
-class LLBC_Time;
-class LLBC_TimeSpan;
 
 struct LLBC_TimerData;
 class LLBC_TimerScheduler;
@@ -50,53 +48,19 @@ class LLBC_EXPORT LLBC_Timer
 public:
     /**
      * Constructor.
-     * @param[in] timeoutFunc - the timeout handler function.
-     * @param[in] cancelFunc  - the cancel handler function(optional).
-     * @param[in] scheduler   - timer scheduler, if set to NULL, it means use default scheduler, 
-     *                           otherwise use you specific timer scheduler.
-     * Note:
-     *          The default scheduler is means:
-     *              In entry thread, use LLBC library Startup() API create's timer scheduler.
-     *              In llbc service logic thread, use Service's timer scheduler.
-     *              In other non-llbc library style thread, scheduler is NULL.
-     */
-    explicit LLBC_Timer(void(*timeoutFunc)(LLBC_Timer *),
-                        void(*cancelFunc)(LLBC_Timer *) = NULL,
-                        Scheduler *scheduler = NULL);
-
-    /**
-     * Constructor.
-     * @param[in] timeoutMeth - the timeout handler function.
-     * @param[in] cancelMeth  - the cancel handler function(optional).
-     * @param[in] scheduler   - timer scheduler, if set to NULL, it means use default scheduler, 
-     *                           otherwise use you specific timer scheduler.
-     * Note:
-     *          The default scheduler is means:
-     *              In entry thread, use LLBC library Startup() API create's timer scheduler.
-     *              In llbc service logic thread, use Service's timer scheduler.
-     *              In other non-llbc library style thread, scheduler is NULL.
-     */
-    template <typename ObjType>
-    LLBC_Timer(ObjType *obj,
-               void (ObjType::*timeoutMeth)(LLBC_Timer *),
-               void (ObjType::*cancelMeth)(LLBC_Timer *) = NULL,
-               Scheduler *scheduler = NULL);
-
-    /**
-     * Constructor.
      * @param[in] timeoutDeleg - the timeout handler delegate.
      * @param[in] cancelDeleg  - the cancel handler delegate(optional).
-     * @param[in] scheduler    - timer scheduler, if set to NULL, it means use default scheduler, 
+     * @param[in] scheduler    - timer scheduler, if set to nullptr, it means use default scheduler, 
      *                           otherwise use you specific timer scheduler.
      * Note:
      *          The default scheduler is means:
      *              In entry thread, use LLBC library Startup() API create's timer scheduler.
      *              In llbc service logic thread, use Service's timer scheduler.
-     *              In other non-llbc library style thread, scheduler is NULL.
+     *              In other non-llbc library style thread, scheduler is nullptr.
      */
-    explicit LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg = NULL,
-                        LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg = NULL,
-                        Scheduler *scheduler = NULL);
+    explicit LLBC_Timer(const std::function<void(LLBC_Timer *)> &timeoutDeleg = nullptr,
+                        const std::function<void(LLBC_Timer *)> &cancelDeleg = nullptr,
+                        Scheduler *scheduler = nullptr);
     virtual ~LLBC_Timer();
 
 public:
@@ -120,21 +84,15 @@ public:
 
     /**
      * Set timeout handler.
-     * @param[in] timeoutFunc/timeoutMeth/timeoutDeleg - the timeout function/method/delegate.
+     * @param[in] timeoutDeleg - the timeout delegate.
      */
-    void SetTimeoutHandler(void(*timeoutFunc)(LLBC_Timer *));
-    template <typename ObjectType>
-    void SetTimeoutHandler(ObjectType *object, void (ObjectType::*timeoutMeth)(LLBC_Timer *));
-    void SetTimeoutHandler(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg);
+    void SetTimeoutHandler(const std::function<void(LLBC_Timer *)> &timeoutDeleg);
 
     /**
      * Set cancel handler.
-     * @param[in] cancelFunc/cancelMeth/cancelDeleg - the cancel function/method/delegate.
+     * @param[in] cancelDeleg - the cancel delegate.
      */
-    void SetCancelHandler(void(*cancelFunc)(LLBC_Timer *));
-    template <typename ObjectType>
-    void SetCancelHandler(ObjectType *object, void (ObjectType::*cancelMeth)(LLBC_Timer *));
-    void SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg);
+    void SetCancelHandler(const std::function<void(LLBC_Timer *)> &cancelDeleg);
 
 public:
     /**
@@ -162,30 +120,7 @@ public:
      * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(uint64 dueTime, uint64 period = 0);
-
-    /**
-     * Schedule timer.
-     * @param[in] dueTime - the absolute due time.
-     * @param[in] period  -period value, in milli-seconds, if is zero, will use dueTime to schedule. 
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Schedule(const LLBC_Time &dueTime, uint64 period = 0);
-
-    /**
-     * Schedule timer.
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Schedule(const LLBC_TimeSpan &dueTime);
-
-    /**
-     * Schedule timer.
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period);
+    virtual int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
 
     /**
      * Cancel this timer.
@@ -232,8 +167,8 @@ private:
     LLBC_TimerData *_timerData;
 
     LLBC_Variant *_data;
-    LLBC_IDelegate1<void, LLBC_Timer *> *_timeoutDeleg;
-    LLBC_IDelegate1<void, LLBC_Timer *> *_cancelDeleg;
+    std::function<void(LLBC_Timer *)> _timeoutDeleg;
+    std::function<void(LLBC_Timer *)> _cancelDeleg;
 };
 
 __LLBC_NS_END

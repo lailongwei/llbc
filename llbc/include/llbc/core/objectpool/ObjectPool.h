@@ -95,7 +95,7 @@ public:
 
     /**
      * Get object pool instance interface object.
-     * Note: If this object type pool instance not create before, this method will return NULL.
+     * Note: If this object type pool instance not create before, this method will return nullptr.
      * @param[in] objectType - the object type.
      * @return LLBC_IObjectPoolInst * - the object pool instance interface object.
      */
@@ -127,7 +127,7 @@ private:
     /**
      * Try create object pool instance from factory.
      * @param[in] objectType - the object type.
-     * @return LLBC_IObjectPoolInst * - the new object pool instance, if not found factory to create, return NULL.
+     * @return LLBC_IObjectPoolInst * - the new object pool instance, if not found factory to create, return nullptr.
      */
     LLBC_IObjectPoolInst *TryCreatePoolInstFromFactory(const char *objectType);
 

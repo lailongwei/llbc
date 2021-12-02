@@ -28,13 +28,13 @@
 
 __LLBC_NS_BEGIN
 LLBC_LogData::LLBC_LogData()
-: logger(NULL)
-, msg(NULL)
+: logger(nullptr)
+, msg(nullptr)
 , msgLen(0)
 , level(-1)
-, loggerName(NULL)
+, loggerName(nullptr)
 
-, others(NULL)
+, others(nullptr)
 , othersSize(0)
 , tagBeg(0)
 , tagLen(0)
@@ -47,7 +47,7 @@ LLBC_LogData::LLBC_LogData()
 
 , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
-, _poolInst(NULL)
+, _poolInst(nullptr)
 {
 }
 
@@ -59,12 +59,12 @@ LLBC_LogData::~LLBC_LogData()
 
 void LLBC_LogData::Clear()
 {
-    logger = NULL;
+    logger = nullptr;
     LLBC_XFree(msg);
     msgLen = 0;
 
     level = -1;
-    loggerName = NULL;
+    loggerName = nullptr;
 
     tagBeg = 0;
     tagLen = 0; 
@@ -80,7 +80,7 @@ void LLBC_LogData::Clear()
 
 bool LLBC_LogData::IsPoolObject() const
 {
-    return _poolInst != NULL;
+    return _poolInst != nullptr;
 }
 
 void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)

@@ -134,7 +134,7 @@ public:
     /**
      * Build python layer packet object according to LLBC_Packet object reference.
      * @param[in] packet - the core library packet object reference.
-     * @return PyObject * - the python layer packet object, if error occurred, return NULL.
+     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
      */
     PyObject *BuildPyPacket(const LLBC_Packet &packet);
 

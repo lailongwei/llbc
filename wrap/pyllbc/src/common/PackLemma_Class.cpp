@@ -41,7 +41,7 @@ pyllbc_PackLemma_Class::pyllbc_PackLemma_Class(PyObject *compileEnv)
 , _gotLeftAngle(false)
 
 , _clsName()
-, _class(NULL)
+, _class(nullptr)
 {
     if (UNLIKELY(_rawClasses.empty()))
     {
@@ -175,12 +175,12 @@ PyObject *pyllbc_PackLemma_Class::Read(pyllbc_Stream *stream)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("class-lemma not done to unpack data");
-        return NULL;
+        return nullptr;
     }
     else if (!_class)
     {
         pyllbc_SetError("not specific class to unpack data");
-        return NULL;
+        return nullptr;
     }
 
     return stream->Read(_class);
@@ -243,7 +243,7 @@ PyObject *pyllbc_PackLemma_Class::GetClassFromEnvAndName()
             if (!(nestedObj = PyDict_GetItemString(nowObj, subName.c_str()))) // Borrowed reference.
             {
                 Py_DECREF(nowObj);
-                return NULL;
+                return nullptr;
             }
 
             // Become nested-class to new reference.
@@ -254,7 +254,7 @@ PyObject *pyllbc_PackLemma_Class::GetClassFromEnvAndName()
             if (!(nestedObj = PyObject_GetAttrString(nowObj, subName.c_str()))) // New reference.
             {
                 Py_DECREF(nowObj);
-                return NULL;
+                return nullptr;
             }
         }
 

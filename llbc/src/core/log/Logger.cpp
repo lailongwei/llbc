@@ -52,13 +52,13 @@ __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
 : _logLevel(LLBC_LogLevel::Debug)
-, _config(NULL)
+, _config(nullptr)
 
-, _logRunnable(NULL)
+, _logRunnable(nullptr)
 
 , _lastFlushTime(0)
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
-, _appenders(NULL)
+, _appenders(nullptr)
 
 , _msgBlockPoolInst(*_objPool.GetPoolInst<LLBC_MessageBlock>())
 , _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
@@ -165,7 +165,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
 bool LLBC_Logger::IsInit() const
 {
-    return _config != NULL;
+    return _config != nullptr;
 }
 
 void LLBC_Logger::Finalize()
@@ -203,7 +203,7 @@ void LLBC_Logger::Finalize()
 
     // Reset basic members.
     _name.clear();
-    _config = NULL;
+    _config = nullptr;
     _logLevel = LLBC_LogLevel::Debug;
 }
 
@@ -337,8 +337,8 @@ int LLBC_Logger::OutputNonFormat(int level, const char *tag, const char *file, i
     if (level < _logLevel)
         return LLBC_OK;
 
-    if (UNLIKELY(message == NULL))
-        return DirectOutput(level, tag, file, line, NULL, 0);
+    if (UNLIKELY(message == nullptr))
+        return DirectOutput(level, tag, file, line, nullptr, 0);
 
     char *copyMessage = LLBC_Malloc(char, messageLen + 1);
     LLBC_MemCpy(copyMessage, message, messageLen);
@@ -406,7 +406,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 #else // Non-Win32
             const char *ps = strrchr(file, '/');
 #endif // Win32
-            if (ps != NULL)
+            if (ps != nullptr)
             {
                 data->fileLen -= (static_cast<uint32>(ps - file) + 1);
                 file = ps + 1;
@@ -414,7 +414,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 #if LLBC_TARGET_PLATFORM_WIN32 // In Win32 platform, search '/' again
             else
             {
-                if ((ps = strrchr(file, '/')) != NULL)
+                if ((ps = strrchr(file, '/')) != nullptr)
                 {
                     data->fileLen -= (static_cast<uint32>(ps - file) + 1);
                     file = ps + 1;
@@ -456,7 +456,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
 void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
 {
-    appender->SetAppenderNext(NULL);
+    appender->SetAppenderNext(nullptr);
     if (!_appenders)
     {
         _appenders = appender;

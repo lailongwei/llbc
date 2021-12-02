@@ -86,14 +86,14 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildCloseEv(int sessionId, const char *re
     ev.type = _Ev::Close;
     ev.sessionId = sessionId;
 
-    if (reason != NULL)
+    if (reason != nullptr)
     {
         ev.un.closeReason = LLBC_Malloc(char, LLBC_StrLenA(reason) + 1);
         LLBC_StrCpyA(ev.un.closeReason, reason);
     }
     else
     {
-        ev.un.closeReason = NULL;
+        ev.un.closeReason = nullptr;
     }
 
     block->SetWritePos(sizeof(_Ev));
@@ -155,7 +155,9 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *sessi
     return block;
 }
 
-LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId,
+                                                                int ctrlCmd,
+                                                                const LLBC_Variant &ctrlData)
 {
     _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
@@ -166,10 +168,7 @@ LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, i
     ev.type = _Ev::CtrlProtocolStack;
     ev.sessionId = sessionId;
     ev.un.protocolStackCtrlInfo.ctrlCmd = ctrlCmd;
-    ev.un.protocolStackCtrlInfo.ctrlDataLen = ctrlDataStream.GetSize();
-    ev.un.protocolStackCtrlInfo.ctrlData = LLBC_Malloc(void, ctrlDataStream.GetSize());
-    ::memcpy(ev.un.protocolStackCtrlInfo.ctrlData, ctrlDataStream.GetBuf(), ctrlDataStream.GetSize());
-    ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg = ctrlDataClearDeleg;
+    ev.un.protocolStackCtrlInfo.ctrlData = LLBC_New(LLBC_Variant, ctrlData);
 
     block->SetWritePos(sizeof(_Ev));
 
@@ -206,20 +205,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
         break;
 
     case _Ev::CtrlProtocolStack:
-        if (ev.un.protocolStackCtrlInfo.ctrlData)
-        {
-            if (ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg)
-            {
-                LLBC_Stream ctrlDataStream;
-                ctrlDataStream.Attach(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
-                LLBC_Variant ctrlData;
-                ctrlDataStream.Read(ctrlData);
-
-                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
-            }
-
-            LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
-        }
+        LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
         break;
 
     default:

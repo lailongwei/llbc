@@ -39,14 +39,14 @@ namespace
     }
 }
 
-PyObject *pyllbc_Service::_pyEvCls = NULL;
-LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_addiEvCtor(&pyllbc_Service::AddiEventCtor);
-LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_customEvDtor(&pyllbc_Service::CustomEventDtor);
-PyObject *pyllbc_Service::_streamCls = NULL;
+PyObject *pyllbc_Service::_pyEvCls = nullptr;
+LLBC_NewDelegate<void(LLBC_Event *)> pyllbc_Service::_evEnqueueHandler(&pyllbc_Service::EventEnqueueHandler);
+LLBC_NewDelegate<void(LLBC_Event *)> pyllbc_Service::_evDequeueHandler(&pyllbc_Service::EventDequeueHandler);
+PyObject *pyllbc_Service::_streamCls = nullptr;
 pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
 
 pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc)
-: _llbcSvc(NULL)
+: _llbcSvc(nullptr)
 , _llbcSvcType(type)
 , _llbcSvcName(name.c_str(), name.length())
 
@@ -54,13 +54,13 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
 
 , _inMainloop()
 
-, _cppComp(NULL)
+, _cppComp(nullptr)
 , _comps()
 
 , _handlers()
 , _preHandlers()
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler(NULL)
+, _unifyPreHandler(nullptr)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 , _codec((This::Codec)(PYLLBC_CFG_DFT_SVC_CODEC))
@@ -254,7 +254,7 @@ int pyllbc_Service::RegisterComponent(PyObject *comp)
 int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp)
 {
     // Force reset comp ptr.
-    comp = NULL;
+    comp = nullptr;
 
     // Started check.
     if (_started)
@@ -282,7 +282,7 @@ int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_St
 
     // Get native comp native methods.
     typedef LLBC_ComponentMethods::Methods::const_iterator _NativeMethodsIter;
-    const LLBC_ComponentMethods::Methods *nativeMeths = nativeComp->GetAllMethods() ? &nativeComp->GetAllMethods()->GetAllMethods() : NULL;
+    const LLBC_ComponentMethods::Methods *nativeMeths = nativeComp->GetAllMethods() ? &nativeComp->GetAllMethods()->GetAllMethods() : nullptr;
 
     // If not specific python comp class, define python layer comp class and compile it.
     if (!compCls || pyllbc_TypeDetector::IsNone(compCls))
@@ -356,7 +356,7 @@ int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_St
     // Create python layer comp instance.
     PyObject *pyCObj = PyLong_FromLongLong(reinterpret_cast<long long>(nativeComp));
     PyObject *pyCompName = PyString_FromString(compName.c_str());
-    PyObject *pyMeths = PySet_New(NULL);
+    PyObject *pyMeths = PySet_New(nullptr);
     if (nativeMeths)
     {
         for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
@@ -369,7 +369,7 @@ int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_St
                                         pyCObj,
                                         pyCompName,
                                         pyMeths,
-                                        NULL);
+                                        nullptr);
     Py_DECREF(pyCObj);
     Py_DECREF(pyCompName);
     Py_DECREF(pyMeths);
@@ -717,7 +717,7 @@ int pyllbc_Service::FireEvent(PyObject *ev)
     LLBC_Event *nativeEv = reinterpret_cast<LLBC_Event *>(PyLong_AsUnsignedLongLong(nativeEvObj));
     Py_DECREF(nativeEvObj);
 
-    _llbcSvc->FireEvent(nativeEv, &_addiEvCtor, true, &_customEvDtor, true);
+    _llbcSvc->FireEvent(nativeEv, _evEnqueueHandler, _evDequeueHandler);
 
     return PyErr_Occurred() ? LLBC_FAILED : LLBC_OK;
 }
@@ -819,9 +819,9 @@ pyllbc_ErrorHooker *pyllbc_Service::GetErrHooker()
 
 void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName)
 {
-    ASSERT(!_llbcSvc && "llbc service pointer not NULL");
+    ASSERT(!_llbcSvc && "llbc service pointer not nullptr");
 
-    _llbcSvc = LLBC_IService::Create(svcType, svcName, NULL, false);
+    _llbcSvc = LLBC_IService::Create(svcType, svcName, nullptr, false);
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
@@ -832,7 +832,7 @@ void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_S
 
 void pyllbc_Service::AfterStop()
 {
-    _cppComp = NULL;
+    _cppComp = nullptr;
 
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
@@ -873,7 +873,7 @@ void pyllbc_Service::HandleFrameCallables(pyllbc_Service::_FrameCallables &calla
          it++)
     {
         PyObject *callable = *it;
-        PyObject *ret = PyObject_CallFunctionObjArgs(callable, _pySvc, NULL);
+        PyObject *ret = PyObject_CallFunctionObjArgs(callable, _pySvc, nullptr);
         if (ret)
         {
             Py_DECREF(ret);
@@ -943,7 +943,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
         }
 
         // Convert to pyllbc_Stream *.
-        pyllbc_Stream *cstream = NULL;
+        pyllbc_Stream *cstream = nullptr;
         PyArg_Parse(cobj, "l", &cstream);
 
         // Let stream attach to inlStream.
@@ -961,13 +961,13 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
     }
 }
 
-void pyllbc_Service::AddiEventCtor(LLBC_Event *ev)
+void pyllbc_Service::EventEnqueueHandler(LLBC_Event *ev)
 {
     PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
     Py_INCREF(pyEv);
 }
 
-void pyllbc_Service::CustomEventDtor(LLBC_Event *ev)
+void pyllbc_Service::EventDequeueHandler(LLBC_Event *ev)
 {
     PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
     Py_DECREF(pyEv);

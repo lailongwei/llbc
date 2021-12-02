@@ -103,7 +103,7 @@ template <typename ObjectType>
 inline ObjectType *LLBC_ObjectGuard<ObjectType>::DetachObj()
 {
     ObjectType *obj = _obj;
-    _obj = NULL;
+    _obj = nullptr;
 
     return obj;
 }

@@ -60,7 +60,7 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
     LLBC_NativeThreadHandle threads[__g_threadNum] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
     for(long i = 0; i < __g_threadNum; ++i)
     {
-        void *threadArg = NULL;
+        void *threadArg = nullptr;
         ::memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&threads[i], &ThreadProc, threadArg);
     }

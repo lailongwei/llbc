@@ -25,9 +25,6 @@
 namespace
 {
     typedef pyllbc_ErrorHooker This;
-
-    typedef LLBC_Delegate0<void, This> _ClearDeleg;
-    typedef LLBC_Delegate4<void, This, const LLBC_String &, int, PyObject *, PyObject *> _SetDeleg;
 }
 
 pyllbc_ErrorHooker::pyllbc_ErrorHooker()
@@ -36,8 +33,8 @@ pyllbc_ErrorHooker::pyllbc_ErrorHooker()
 
 , _llbcErrNo(LLBC_ERROR_SUCCESS)
 , _errDesc(LLBC_StrError(LLBC_ERROR_SUCCESS))
-, _errCls(NULL)
-, _tbObj(NULL)
+, _errCls(nullptr)
+, _tbObj(nullptr)
 {
 }
 
@@ -51,8 +48,8 @@ int pyllbc_ErrorHooker::Install()
     if (_installed)
         return LLBC_OK;
 
-    pyllbc_SetErrSetHock(LLBC_New(_SetDeleg, this, &This::Hook_ErrSet));
-    pyllbc_SetErrClearHook(LLBC_New(_ClearDeleg, this, &This::Hook_ErrClear));
+    pyllbc_SetErrSetHock(LLBC_NewDelegate<void(const LLBC_String &, int, PyObject *, PyObject *)>(this, &This::Hook_ErrSet));
+    pyllbc_SetErrClearHook(LLBC_NewDelegate<void()>(this, &This::Hook_ErrClear));
 
     _installed = true;
     return LLBC_OK;
@@ -60,8 +57,8 @@ int pyllbc_ErrorHooker::Install()
 
 void pyllbc_ErrorHooker::Uninstall()
 {
-    pyllbc_SetErrSetHock(NULL);
-    pyllbc_SetErrClearHook(NULL);
+    pyllbc_SetErrSetHock(nullptr);
+    pyllbc_SetErrClearHook(nullptr);
 
     _installed = false;
 }
@@ -76,7 +73,7 @@ void pyllbc_ErrorHooker::Cleanup()
     if (_errCls)
     {
         Py_DECREF(_errCls);
-        _errCls = NULL;
+        _errCls = nullptr;
 
         _llbcErrNo = LLBC_ERROR_SUCCESS;
         _errDesc = LLBC_StrError(_llbcErrNo);
@@ -84,7 +81,7 @@ void pyllbc_ErrorHooker::Cleanup()
         if (_tbObj)
         {
             Py_DECREF(_tbObj);
-            _tbObj = NULL;
+            _tbObj = nullptr;
         }
     }
 }
@@ -104,7 +101,7 @@ void pyllbc_ErrorHooker::TransferHookedErrorToPython()
             PyErr_Fetch(&errType, &errVal, &errTb);
             PyErr_NormalizeException(&errType, &errVal, &errTb);
 
-            if (errTb == NULL)
+            if (errTb == nullptr)
             {
                 errTb = _tbObj;
             }
@@ -116,7 +113,7 @@ void pyllbc_ErrorHooker::TransferHookedErrorToPython()
                 perTb->tb_next = reinterpret_cast<PyTracebackObject *>(_tbObj);
             }
 
-            _tbObj = NULL;
+            _tbObj = nullptr;
             PyErr_Restore(errType, errVal, errTb);
         }
 

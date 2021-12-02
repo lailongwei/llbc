@@ -58,7 +58,7 @@ namespace
                     return new LLBC_CompressProtocol();
 
                 default:
-                    return NULL;
+                    return nullptr;
             }
         }
     };
