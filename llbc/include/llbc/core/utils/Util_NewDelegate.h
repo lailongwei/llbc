@@ -237,7 +237,7 @@ private:
     {
         CFunc cfunc;
         char stlFunc[sizeof(std::function<Rtn(Args...)>)];
-        char methHolder[sizeof(void *) * 4 /* sizeof(vptr) + sizeof(bool cmeth) + sizeof(union meth) : default aligement */];
+        char methHolder[sizeof(void *) * 5 /* sizeof(vptr) + sizeof(bool)(aligement to 8) + sizeof(union meth) : default aligement */];
 
         _Func()
         {
