@@ -112,7 +112,7 @@ bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
 template <typename ObjectType>
 size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
 {
-    return reinterpret_cast<ObjectType *>(nullptr)->GetPoolInstPerBlockUnitsNum();
+    return reinterpret_cast<ObjectType *>(NULL)->GetPoolInstPerBlockUnitsNum();
 }
 
 template <typename ObjectType>
@@ -124,7 +124,7 @@ size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(...)
 template <typename ObjectType>
 void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *)
 {
-    reinterpret_cast<ObjectType *>(nullptr)->OnPoolInstCreate(poolInst);
+    reinterpret_cast<ObjectType *>(NULL)->OnPoolInstCreate(poolInst);
 }
 
 template <typename ObjectType>
@@ -136,7 +136,7 @@ void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst,
 template <typename ObjectType>
 void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *)
 {
-    reinterpret_cast<ObjectType *>(nullptr)->OnPoolInstDestroy(poolInst);
+    reinterpret_cast<ObjectType *>(NULL)->OnPoolInstDestroy(poolInst);
 }
 
 template <typename ObjectType>
