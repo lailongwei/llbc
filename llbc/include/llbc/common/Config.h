@@ -72,6 +72,8 @@
 #define LLBC_CFG_CORE_UTILS_IMPL__I64TOA                    0
 // Determine library impl _ui64toa() API or not, Non-WIN32 Platform specific.
 #define LLBC_CFG_CORE_UTILS_IMPL__UI64TOA                   0
+// Determine define win32-styled string datatypes or not, eg:LPSTR/LPTSTR/...
+#define LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES  0
 
 /**
  * \brief core/sampler about config options define.

@@ -28,20 +28,37 @@
  * Non-WIN32 platform compatible APIs. see MSDN.
  */
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-LLBC_EXTERN LLBC_EXPORT int lstrlenA(LPCSTR lpString);
-LLBC_EXTERN LLBC_EXPORT int lstrlenW(LPCWSTR lpString);
-
-LLBC_EXTERN LLBC_EXPORT LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2);
-LLBC_EXTERN LLBC_EXPORT LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2);
-
-LLBC_EXTERN LLBC_EXPORT int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2);
-LLBC_EXTERN LLBC_EXPORT int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2);
-
-LLBC_EXTERN LLBC_EXPORT int lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2);
-LLBC_EXTERN LLBC_EXPORT int lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2);
-
-LLBC_EXTERN LLBC_EXPORT LPSTR lstrcpyA(LPSTR lpString1, LPCSTR lpString2);
-LLBC_EXTERN LLBC_EXPORT LPWSTR lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2);
+ #if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
+  LLBC_EXTERN LLBC_EXPORT int lstrlenA(LPCSTR lpString);
+  LLBC_EXTERN LLBC_EXPORT int lstrlenW(LPCWSTR lpString);
+  
+  LLBC_EXTERN LLBC_EXPORT LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2);
+  LLBC_EXTERN LLBC_EXPORT LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2);
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2);
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT LPSTR lstrcpyA(LPSTR lpString1, LPCSTR lpString2);
+  LLBC_EXTERN LLBC_EXPORT LPWSTR lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2);
+ #else // !LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
+  LLBC_EXTERN LLBC_EXPORT int lstrlenA(const char *lpString);
+  LLBC_EXTERN LLBC_EXPORT int lstrlenW(const wchar_t *lpString);
+  
+  LLBC_EXTERN LLBC_EXPORT char *lstrcatA(char *lpString1, const char *lpString2);
+  LLBC_EXTERN LLBC_EXPORT wchar_t *lstrcatW(wchar_t *lpString1, const wchar_t *lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpA(const char *lpString1, const char *lpString2);
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpW(const wchar_t *lpString1, const wchar_t *lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpiA(const char *lpString1, const char *lpString2);
+  LLBC_EXTERN LLBC_EXPORT int lstrcmpiW(const wchar_t *lpString1, const wchar_t *lpString2);
+  
+  LLBC_EXTERN LLBC_EXPORT char *lstrcpyA(char *lpString1, const char *lpString2);
+  LLBC_EXTERN LLBC_EXPORT wchar_t *lstrcpyW(wchar_t *lpString1, const wchar_t *lpString2);
+#endif // LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 
 #ifdef LLBC_UNICODE
 #define lstrlen lstrlenW
@@ -101,10 +118,10 @@ __LLBC_NS_BEGIN
  * @param[in]  escapeChar     - escape character, default is '\0'.
  */
 LLBC_EXTERN LLBC_EXPORT void LLBC_SplitString(const LLBC_String &str,
-                                         const LLBC_String &separator,
-                                         std::vector<LLBC_String> &destStrList,
-                                         bool justSplitFirst = false,
-                                         char escapeChar = '\0');
+                                              const LLBC_String &separator,
+                                              std::vector<LLBC_String> &destStrList,
+                                              bool justSplitFirst = false,
+                                              char escapeChar = '\0');
 
 /**
  * Filter out specific string in given string.

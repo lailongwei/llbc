@@ -31,16 +31,24 @@
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrlenA(LPCSTR lpString)
+#else
+int lstrlenA(const char *lpString)
+#endif
 {
-#if LLBC_TARGET_PLATFORM_NON_IPHONE
+    #if LLBC_TARGET_PLATFORM_NON_IPHONE
     return ::strlen(lpString);
-#else // iPhone
+    #else // iPhone
     return static_cast<int>(::strlen(lpString));
-#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
+    #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrlenW(LPCWSTR lpString)
+#else
+int lstrlenW(const wchar_t *lpString)
+#endif
 {
     if (UNLIKELY(!lpString))
         return 0;
@@ -50,12 +58,20 @@ int lstrlenW(LPCWSTR lpString)
     return i;
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2)
+#else
+char *lstrcatA(char *lpString1, const char *lpString2)
+#endif
 {
     return ::strcat(lpString1, lpString2);
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2)
+#else
+wchar_t *lstrcatW(wchar_t *lpString1, const wchar_t *lpString2)
+#endif
 {
     if (UNLIKELY(!lpString2))
         return lpString1;
@@ -67,12 +83,20 @@ LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2)
     return lpString1;
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2)
+#else
+int lstrcmpA(const char *lpString1, const char *lpString2)
+#endif
 {
     return ::strcmp(lpString1, lpString2);
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
+#else
+int lstrcmpW(const wchar_t *lpString1, const wchar_t *lpString2)
+#endif
 {
     int str1Len = ::lstrlenW(lpString1);
     int str2Len = ::lstrlenW(lpString2);
@@ -89,22 +113,38 @@ int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
         (str1Len == str2Len ? 0 : 1));
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2)
+#else
+int lstrcmpiA(const char *lpString1, const char *lpString2)
+#endif
 {
     return ::lstrcmpA(lpString1,lpString2);
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 int lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2)
+#else
+int lstrcmpiW(const wchar_t *lpString1, const wchar_t *lpString2)
+#endif
 {
     return ::lstrcmpW(lpString1, lpString2);
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 LPSTR lstrcpyA(LPSTR lpString1, LPCSTR lpString2)
+#else
+char *lstrcpyA(char *lpString1, const char *lpString2)
+#endif
 {
     return strcpy(lpString1, lpString2);
 }
 
+#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 LPWSTR lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2)
+#else
+wchar_t *lstrcpyW(wchar_t *lpString1, const wchar_t *lpString2)
+#endif
 {
     int str2Len = ::lstrlenW(lpString2);
     memcpy(lpString1, lpString2, str2Len * sizeof(LLBC_NS wchar));
