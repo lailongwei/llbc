@@ -18,6 +18,8 @@
 # 13)【llbc core】LLBC_BasicString::format/append_format性能改进
 # 14)【llbc core】日志记录器时间访问优化(原10w+/s优化成1000/s)
 # 15)【llbc all】其它细节优化, bug fix
+# 16)【llbc core】修正epoll中数据访问问题
+# 17)【premake】对wrap实行清晰分组
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
