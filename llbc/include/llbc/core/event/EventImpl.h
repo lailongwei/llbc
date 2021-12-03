@@ -102,7 +102,7 @@ inline void * LLBC_Event::GetExtData() const
     return _extData;
 }
 
-inline void LLBC_Event::SetExtData(void *extData, const std::function<void(void *)> &clearDeleg)
+inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg)
 {
     ClearExtData();
     _extData = extData;

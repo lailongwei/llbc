@@ -30,7 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const char *__dumpFileName = nullptr;
-static std::function<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
+static LLBC_NS LLBC_Delegate<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -354,7 +354,7 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-int LLBC_IApplication::SetCrashHook(const std::function<void(const LLBC_String &)> &crashHook)
+int LLBC_IApplication::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);

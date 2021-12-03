@@ -1124,7 +1124,7 @@ LLBC_EventManager &LLBC_Service::GetEventManager()
     return _evManager;
 }
 
-int LLBC_Service::Post(const std::function<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
+int LLBC_Service::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
     if (UNLIKELY(!runnable))
     {
@@ -1876,7 +1876,7 @@ int LLBC_Service::InitComps()
          regIt != _willRegComps.end();
          ++regIt)
     {
-        LLBC_IComponent *comp = nullptr;
+        LLBC_IComponent *comp;
         _WillRegComp &willRegComp = *regIt;
         if (willRegComp.compFactory != nullptr) // Create comp from comp factory.
         {

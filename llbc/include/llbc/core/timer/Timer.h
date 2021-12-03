@@ -86,13 +86,13 @@ public:
      * Set timeout handler.
      * @param[in] timeoutDeleg - the timeout delegate.
      */
-    void SetTimeoutHandler(const std::function<void(LLBC_Timer *)> &timeoutDeleg);
+    void SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg);
 
     /**
      * Set cancel handler.
      * @param[in] cancelDeleg - the cancel delegate.
      */
-    void SetCancelHandler(const std::function<void(LLBC_Timer *)> &cancelDeleg);
+    void SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg);
 
 public:
     /**

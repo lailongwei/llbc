@@ -400,7 +400,7 @@ public:
      * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const std::function<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil);
+    virtual int Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil);
 
     /**
      * Get service protocol stack, only full-stack option disabled available.
@@ -501,7 +501,7 @@ private:
     /**
      * Frame tasks operation methods.
      */
-    typedef std::vector<std::pair<std::function<void(Base *, const LLBC_Variant &)>, LLBC_Variant> > _FrameTasks;
+    typedef std::vector<std::pair<LLBC_Delegate<void(Base *, const LLBC_Variant &)>, LLBC_Variant> > _FrameTasks;
     void HandleFrameTasks();
     void DestroyFrameTasks();
 

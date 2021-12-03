@@ -308,13 +308,13 @@ inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, 
 
 inline int LLBC_IService::Post(void(*func)(This *, const LLBC_Variant &), const LLBC_Variant &data)
 {
-    return Post(std::function<void(This *, const LLBC_Variant &)>(func), data);
+    return Post(LLBC_Delegate<void(This *, const LLBC_Variant &)>(func), data);
 }
 
 template <typename ObjType>
 inline int LLBC_IService::Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant &), const LLBC_Variant &data)
 {
-    return Post(std::bind(method, obj, std::placeholders::_1, std::placeholders::_2), data);
+    return Post(LLBC_Delegate<void(This *, const LLBC_Variant &)>(obj, method), data);
 }
 
 __LLBC_NS_END

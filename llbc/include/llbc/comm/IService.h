@@ -549,7 +549,7 @@ public:
      * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const std::function<void(This *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil) = 0;
+    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil) = 0;
 
     /**
      * Get service codec protocol stack, only full-stack option disabled available.

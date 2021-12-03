@@ -72,12 +72,12 @@ LLBC_TimerId LLBC_Timer::GetTimerId() const
     return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
 }
 
-void LLBC_Timer::SetTimeoutHandler(const std::function<void(LLBC_Timer *)> &timeoutDeleg)
+void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg)
 {
     _timeoutDeleg = timeoutDeleg;
 }
 
-void LLBC_Timer::SetCancelHandler(const std::function<void(LLBC_Timer *)> &cancelDeleg)
+void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
 {
     _cancelDeleg = cancelDeleg;
 }

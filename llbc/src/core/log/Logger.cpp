@@ -243,7 +243,7 @@ bool LLBC_Logger::IsAsyncMode() const
     return _config->IsAsyncMode();
 }
 
-int LLBC_Logger::InstallHook(int level, const std::function<void(const LLBC_LogData *)> &hookDeleg)
+int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg)
 {
     if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
         !hookDeleg))

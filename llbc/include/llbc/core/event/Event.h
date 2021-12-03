@@ -24,6 +24,7 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/variant/Variant.h"
+#include "llbc/core/utils/Util_Delegate.h"
 
 __LLBC_NS_BEGIN
 
@@ -199,7 +200,7 @@ public:
      * @param[in] extData    - the extend data.
      * @param[in] clearDeleg - the extend data clear delegate.
      */
-    void SetExtData(void *extData, const std::function<void(void *)> &clearDeleg = nullptr);
+    void SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg = nullptr);
 
     /**
      * Clear extend data.
@@ -236,7 +237,7 @@ protected:
     _StrKeyParams *_strKeyParams;
 
     void *_extData;
-    std::function<void(void *)> _extDataClearDeleg;
+    LLBC_Delegate<void(void *)> _extDataClearDeleg;
 };
 
 /**

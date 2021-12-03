@@ -26,6 +26,7 @@
 
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/MessageBlock.h"
+#include "llbc/core/utils/Util_Delegate.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
@@ -111,7 +112,7 @@ public:
      * @param[in] hookDeleg - the hook delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, const std::function<void(const LLBC_LogData *)> &hookDeleg);
+    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg);
 
     /**
      * Uninstall error hook.
@@ -241,7 +242,7 @@ private:
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
-    std::function<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
+    LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END
