@@ -186,9 +186,13 @@
 #define ASSERT(x) assert(x)
 #endif
 
-// Concat macro define.
+// Symbol concat macro define.
 #define LLBC_Concat(x, y)  LLBC_IConcat(x, y)
 #define LLBC_IConcat(x, y) x##y
+
+// String concat macro define.
+#define LLBC_ConcatStr(x, y)  LLBC_IConcatStr(x, y)
+#define LLBC_IConcatStr(x, y) #x#y
 
 // Define register keyword to empty n c++11(in c++11 standard, register is deprecated)
 #ifdef LLBC_CPP11

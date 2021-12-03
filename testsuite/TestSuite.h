@@ -29,6 +29,7 @@
 #include "common/TestCase_Com_Version.h"
 #include "common/TestCase_Com_Compiler.h"
 #include "common/TestCase_Com_RTTI.h"
+#include "common/TestCase_Com_ConcatMacro.h"
 
 #include "core/os/TestCase_Core_OS_Symbol.h"
 #include "core/os/TestCase_Core_OS_Thread.h"
