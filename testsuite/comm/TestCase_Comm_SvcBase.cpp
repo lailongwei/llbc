@@ -331,7 +331,7 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
     if (LLBC_StrCmpA(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
         clientCount = 5;
     else
-        clientCount = 50;
+        clientCount = 100;
 
     LLBC_PrintLine("Async connect to %s:%d", ip, port);
     for (int i = 0; i < clientCount; ++i)
