@@ -898,7 +898,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-int LLBC_Service::Subscribe(int opcode, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg)
+int LLBC_Service::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -926,7 +926,7 @@ int LLBC_Service::Subscribe(int opcode, const LLBC_NewDelegate<void(LLBC_Packet 
     return LLBC_OK;
 }
 
-int LLBC_Service::PreSubscribe(int opcode, const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg)
+int LLBC_Service::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -955,7 +955,7 @@ int LLBC_Service::PreSubscribe(int opcode, const LLBC_NewDelegate<bool(LLBC_Pack
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-int LLBC_Service::UnifyPreSubscribe(const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg)
+int LLBC_Service::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -982,7 +982,7 @@ int LLBC_Service::UnifyPreSubscribe(const LLBC_NewDelegate<bool(LLBC_Packet &)> 
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg)
+int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -1058,7 +1058,7 @@ int LLBC_Service::DisableTimerScheduler()
     return LLBC_OK;
 }
 
-LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_NewDelegate<void(LLBC_Event &)> &deleg)
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -1111,8 +1111,8 @@ void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
 }
 
 void LLBC_Service::FireEvent(LLBC_Event *ev,
-                             const LLBC_NewDelegate<void(LLBC_Event *)> &enqueueHandler,
-                             const LLBC_NewDelegate<void(LLBC_Event *)> &dequeueHandler)
+                             const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler,
+                             const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
     Push(LLBC_SvcEvUtil::BuildFireEventEv(ev, dequeueHandler));
     if (enqueueHandler)

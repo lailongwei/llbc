@@ -57,7 +57,7 @@ LLBC_EventManager::~LLBC_EventManager()
 }
 
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                 const LLBC_NewDelegate<void(LLBC_Event &)> &listener,
+                                                 const LLBC_Delegate<void(LLBC_Event &)> &listener,
                                                  const LLBC_ListenerStub &boundStub)
 {
     if (id <= 0 || !listener)

@@ -96,7 +96,7 @@ void LLBC_Packet::SetStatusDesc(const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-void LLBC_Packet::SetPayloadDeleteDeleg(const LLBC_NewDelegate<void(LLBC_MessageBlock *)> &deleg)
+void LLBC_Packet::SetPayloadDeleteDeleg(const LLBC_Delegate<void(LLBC_MessageBlock *)> &deleg)
 {
     _payloadDeleteDeleg = deleg;
 }
@@ -262,7 +262,7 @@ void *LLBC_Packet::GetPreHandleResult() const
     return _preHandleResult;
 }
 
-void LLBC_Packet::SetPreHandleResult(void *result, const LLBC_NewDelegate<void(void *)> &clearDeleg)
+void LLBC_Packet::SetPreHandleResult(void *result, const LLBC_Delegate<void(void *)> &clearDeleg)
 {
     this->CleanupPreHandleResult();
     _preHandleResult = result;

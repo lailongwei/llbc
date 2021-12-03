@@ -25,7 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/time/TimeSpan.h"
-#include "llbc/core/utils/Util_NewDelegate.h"
+#include "llbc/core/utils/Util_Delegate.h"
 
 __LLBC_NS_BEGIN
 
@@ -58,8 +58,8 @@ public:
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is nullptr.
      */
-    explicit LLBC_Timer(const std::function<void(LLBC_Timer *)> &timeoutDeleg = nullptr,
-                        const std::function<void(LLBC_Timer *)> &cancelDeleg = nullptr,
+    explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg = nullptr,
+                        const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg = nullptr,
                         Scheduler *scheduler = nullptr);
     virtual ~LLBC_Timer();
 
@@ -167,8 +167,8 @@ private:
     LLBC_TimerData *_timerData;
 
     LLBC_Variant *_data;
-    std::function<void(LLBC_Timer *)> _timeoutDeleg;
-    std::function<void(LLBC_Timer *)> _cancelDeleg;
+    LLBC_Delegate<void(LLBC_Timer *)> _timeoutDeleg;
+    LLBC_Delegate<void(LLBC_Timer *)> _cancelDeleg;
 };
 
 __LLBC_NS_END

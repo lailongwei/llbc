@@ -324,25 +324,25 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg);
+    virtual int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
 
     /**
      * Previous subscribe message to specified delegate, if method return nullptr, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg);
+    virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg);
+    virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg);
+    virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
@@ -357,7 +357,7 @@ public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_NewDelegate<void(LLBC_Event &)> &deleg);
+    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg);
 
     /**
      * Subscribe event to specified event listener.
@@ -383,8 +383,8 @@ public:
      * @param[in] dequeueHandler - the event dequeue handler.
      */
     virtual void FireEvent(LLBC_Event *ev,
-                           const LLBC_NewDelegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
-                           const LLBC_NewDelegate<void(LLBC_Event *)> &dequeueHandler = nullptr);
+                           const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
+                           const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr);
 
 
     /**
@@ -660,15 +660,15 @@ private:
     _CompLibraries _compLibraries;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
-    typedef std::map<int, LLBC_NewDelegate<void(LLBC_Packet &)> > _Handlers;
+    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _Handlers;
     _Handlers _handlers;
-    typedef std::map<int, LLBC_NewDelegate<bool(LLBC_Packet &)> > _PreHandlers;
+    typedef std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _PreHandlers;
     _PreHandlers _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_NewDelegate<bool(LLBC_Packet &)> _unifyPreHandler;
+    LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    typedef std::map<int, LLBC_NewDelegate<void(LLBC_Packet &)> > _StatusHandlers;
+    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _StatusHandlers;
     typedef std::map<int, _StatusHandlers *> _OpStatusHandlers;
     _OpStatusHandlers _statusHandlers;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER

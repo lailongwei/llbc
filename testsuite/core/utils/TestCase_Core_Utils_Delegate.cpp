@@ -109,33 +109,33 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     int arg4 = 4, arg5 = 5, arg6 = 6, arg7 = 7;
 
     std::cout <<"Delegate test:" <<std::endl;
-    LLBC_NewDelegate<void()> func0(&Func_Foo_0);
+    LLBC_Delegate<void()> func0(&Func_Foo_0);
     func0();
 
-    const LLBC_NewDelegate<void(int)> func1(&Func_Foo_1);
+    const LLBC_Delegate<void(int)> func1(&Func_Foo_1);
     func1(10086);
 
-    LLBC_NewDelegate<void(int, const LLBC_String &)> func2(&Func_Foo_2);
+    LLBC_Delegate<void(int, const LLBC_String &)> func2(&Func_Foo_2);
     func2(10010, "The argument 2");
 
-    LLBC_NewDelegate<void(int, bool , sint64)> func3(&Func_Foo_3);
+    LLBC_Delegate<void(int, bool , sint64)> func3(&Func_Foo_3);
     func3(1, false, 3ll);
 
-    LLBC_NewDelegate<void(int, int, int, int)> func4(&Func_Foo_4);
+    LLBC_Delegate<void(int, int, int, int)> func4(&Func_Foo_4);
     func4(4, 3, 2, 1);
 
-    LLBC_NewDelegate<void()> func5(this, &DelegObj::Foo_0);
+    LLBC_Delegate<void()> func5(this, &DelegObj::Foo_0);
     func5();
 
-    LLBC_NewDelegate<int()> meth0RtnInt(this, &DelegObj::Foo_0_Rtn_Int);
+    LLBC_Delegate<int()> meth0RtnInt(this, &DelegObj::Foo_0_Rtn_Int);
     std::cout <<"Call meth0RtnInt() ret:" <<meth0RtnInt();
 
     std::string s("Hello world");
-    LLBC_NewDelegate<size_t()> strSizeMeth(&s, &std::string::size);
+    LLBC_Delegate<size_t()> strSizeMeth(&s, &std::string::size);
     std::cout <<"call string[" <<s <<"] size() meth:" <<strSizeMeth() <<std::endl;
     std::cout <<"strSizeMeth valid?:" <<!!strSizeMeth <<std::endl;
 
-    LLBC_NewDelegate<void()> nullDeleg = nullptr;
+    LLBC_Delegate<void()> nullDeleg = nullptr;
     std::cout <<"nullDeleg valid?:" <<!!nullDeleg <<std::endl;
     nullDeleg = &Func_Foo_0;
     if (nullDeleg)
@@ -149,14 +149,14 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
 
-    LLBC_NewDelegate<void(int)> stlFuncDeleg;
+    LLBC_Delegate<void(int)> stlFuncDeleg;
     stlFuncDeleg = std::function<void(int)>([](int)
     {
         std::cout << "lambda function void(int) called!" << std::endl;
     });
     stlFuncDeleg(33);
 
-    LLBC_NewDelegate<void(int)> stlFuncDeleg2 = [](int)
+    LLBC_Delegate<void(int)> stlFuncDeleg2 = [](int)
     {
         std::cout << "lambda function void(int) called(another)!" << std::endl;
     };

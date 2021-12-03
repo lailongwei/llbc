@@ -31,8 +31,8 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_Timer::LLBC_Timer(const std::function<void(LLBC_Timer *)> &timeoutDeleg,
-                       const std::function<void(LLBC_Timer *)> &cancelDeleg,
+LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
+                       const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
                        LLBC_Timer::Scheduler *scheduler)
 : _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
 , _timerData(nullptr)

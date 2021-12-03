@@ -76,7 +76,7 @@ public:
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
-                                          const LLBC_NewDelegate<void(LLBC_Event &)> &listener,
+                                          const LLBC_Delegate<void(LLBC_Event &)> &listener,
                                           const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
 
     /**
@@ -160,7 +160,7 @@ protected:
         int evId;
         LLBC_ListenerStub stub;
         LLBC_EventListener *listener;
-        LLBC_NewDelegate<void(LLBC_Event &)> deleg;
+        LLBC_Delegate<void(LLBC_Event &)> deleg;
 
         _ListenerInfo();
         ~_ListenerInfo();

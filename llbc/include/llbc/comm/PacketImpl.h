@@ -669,13 +669,13 @@ LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
 
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
-    SetPreHandleResult(result, LLBC_NewDelegate<void(void *)>(clearFunc));
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(clearFunc));
 }
 
 template <typename ObjType>
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
-    SetPreHandleResult(result, LLBC_NewDelegate<void(void *)>(obj, clearMethod));
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(obj, clearMethod));
 }
 
 template <typename _RawTy>

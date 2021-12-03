@@ -157,7 +157,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 {
     int id;
     LLBC_ListenerStub stub;
-    LLBC_NewDelegate<void(LLBC_Event &)> deleg;
+    LLBC_Delegate<void(LLBC_Event &)> deleg;
     LLBC_EventListener *listener;
 
     LLBC_SvcEv_SubscribeEv();
@@ -182,7 +182,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
 struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 {
     LLBC_Event *ev;
-    LLBC_NewDelegate<void(LLBC_Event *)> dequeueHandler;
+    LLBC_Delegate<void(LLBC_Event *)> dequeueHandler;
 
     LLBC_SvcEv_FireEv();
     virtual ~LLBC_SvcEv_FireEv();
@@ -246,7 +246,7 @@ public:
      */
     static LLBC_MessageBlock *BuildSubscribeEventEv(int id,
                                                     const LLBC_ListenerStub &stub,
-                                                    const LLBC_NewDelegate<void(LLBC_Event &)> &deleg,
+                                                    const LLBC_Delegate<void(LLBC_Event &)> &deleg,
                                                     LLBC_EventListener *listener);
 
     /**
@@ -267,7 +267,7 @@ public:
      * Build fire-event event.
      */
     static LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev,
-                                               const LLBC_NewDelegate<void(LLBC_Event *)> &dequeueHandler);
+                                               const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
      * Build application config reloaded event.

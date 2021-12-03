@@ -35,7 +35,7 @@ inline LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return AddListener(id, LLBC_NewDelegate<void(LLBC_Event &)>(listener), boundStub);
+    return AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(listener), boundStub);
 }
 
 template <typename ObjectType>
@@ -50,7 +50,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return this->AddListener(id, LLBC_NewDelegate<void(LLBC_Event &)>(obj, listener), boundStub);
+    return this->AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(obj, listener), boundStub);
 }
 
 inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)

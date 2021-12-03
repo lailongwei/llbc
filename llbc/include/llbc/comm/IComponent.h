@@ -334,7 +334,7 @@ class LLBC_IComponent;
 /**
  * \brief The llibc library component method encapsulation.
  */
-typedef LLBC_NewDelegate<int(const LLBC_Variant &, LLBC_Variant &)> LLBC_ComponentMethod;
+typedef LLBC_Delegate<int(const LLBC_Variant &, LLBC_Variant &)> LLBC_ComponentMethod;
 
 /**
  * \brief The component methods encapsulation.

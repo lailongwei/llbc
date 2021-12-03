@@ -448,8 +448,8 @@ private:
     bool _suppressedCoderNotFoundWarning;
 
     static PyObject *_pyEvCls;
-    static LLBC_NewDelegate<void(LLBC_Event *)> _evEnqueueHandler;
-    static LLBC_NewDelegate<void(LLBC_Event *)> _evDequeueHandler;
+    static LLBC_Delegate<void(LLBC_Event *)> _evEnqueueHandler;
+    static LLBC_Delegate<void(LLBC_Event *)> _evDequeueHandler;
 
     _FrameCallables _beforeFrameCallables;
     _FrameCallables _afterFrameCallables;

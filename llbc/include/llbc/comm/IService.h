@@ -430,7 +430,7 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg) = 0;
+    virtual int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) = 0;
 
     /**
      * Previous subscribe message to specified handler method, if method return false, will stop packet process flow.
@@ -442,7 +442,7 @@ public:
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg) = 0;
+    virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
@@ -455,7 +455,7 @@ public:
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(const LLBC_NewDelegate<bool(LLBC_Packet &)> &deleg) = 0;
+    virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
@@ -469,7 +469,7 @@ public:
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, const LLBC_NewDelegate<void(LLBC_Packet &)> &deleg) = 0;
+    virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
@@ -490,7 +490,7 @@ public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_NewDelegate<void(LLBC_Event &)> &deleg) = 0;
+    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg) = 0;
 
     /**
      * Subscribe event to specified event listener.
@@ -516,8 +516,8 @@ public:
      * @param[in] dequeueHandler - the event dequeue handler.
      */
     virtual void FireEvent(LLBC_Event *ev,
-                           const LLBC_NewDelegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
-                           const LLBC_NewDelegate<void(LLBC_Event *)> &dequeueHandler = nullptr) = 0;
+                           const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
+                           const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr) = 0;
 
     /**
      * Get event manager.

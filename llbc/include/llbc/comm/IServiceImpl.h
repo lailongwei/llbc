@@ -246,49 +246,49 @@ inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, i
 
 inline int LLBC_IService::Subscribe(int opcode, void(*func)(LLBC_Packet &))
 {
-    return Subscribe(opcode, LLBC_NewDelegate<void(LLBC_Packet &)>(func));
+    return Subscribe(opcode, LLBC_Delegate<void(LLBC_Packet &)>(func));
 }
 
 template <typename ObjType>
 inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
-    return Subscribe(opcode, LLBC_NewDelegate<void(LLBC_Packet &)>(obj, method));
+    return Subscribe(opcode, LLBC_Delegate<void(LLBC_Packet &)>(obj, method));
 }
 
 inline int LLBC_IService::PreSubscribe(int opcode, bool (*func)(LLBC_Packet &))
 {
-    return PreSubscribe(opcode, LLBC_NewDelegate<bool(LLBC_Packet &)>(func));
+    return PreSubscribe(opcode, LLBC_Delegate<bool(LLBC_Packet &)>(func));
 }
 
 template <typename ObjType>
 inline int LLBC_IService::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
-    return PreSubscribe(opcode, LLBC_NewDelegate<bool(LLBC_Packet &)>(obj, method));
+    return PreSubscribe(opcode, LLBC_Delegate<bool(LLBC_Packet &)>(obj, method));
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 inline int LLBC_IService::UnifyPreSubscribe(bool(*func)(LLBC_Packet &))
 {
-    return UnifyPreSubscribe(LLBC_NewDelegate<bool(LLBC_Packet &)>(func));
+    return UnifyPreSubscribe(LLBC_Delegate<bool(LLBC_Packet &)>(func));
 }
 
 template <typename ObjType>
 inline int LLBC_IService::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
-    return UnifyPreSubscribe(LLBC_NewDelegate<bool(LLBC_Packet &)>(obj, method));
+    return UnifyPreSubscribe(LLBC_Delegate<bool(LLBC_Packet &)>(obj, method));
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 inline int LLBC_IService::SubscribeStatus(int opcode, int status, void(*func)(LLBC_Packet &))
 {
-    return SubscribeStatus(opcode, status, LLBC_NewDelegate<void(LLBC_Packet &)>(func));
+    return SubscribeStatus(opcode, status, LLBC_Delegate<void(LLBC_Packet &)>(func));
 }
 
 template <typename ObjType>
 inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
-    if (SubscribeStatus(opcode, status, LLBC_NewDelegate<void(LLBC_Packet &)>(obj, method)) != LLBC_OK)
+    if (SubscribeStatus(opcode, status, LLBC_Delegate<void(LLBC_Packet &)>(obj, method)) != LLBC_OK)
         return LLBC_FAILED;
 
     return LLBC_OK;
@@ -297,13 +297,13 @@ inline int LLBC_IService::SubscribeStatus(int opcode, int status, ObjType *obj, 
 
 inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, void(*func)(LLBC_Event &))
 {
-    return SubscribeEvent(event, LLBC_NewDelegate<void(LLBC_Event &)>(func));
+    return SubscribeEvent(event, LLBC_Delegate<void(LLBC_Event &)>(func));
 }
 
 template <typename ObjType>
 inline LLBC_ListenerStub LLBC_IService::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &))
 {
-    return SubscribeEvent(event, LLBC_NewDelegate<void(LLBC_Event &)>(obj, method));
+    return SubscribeEvent(event, LLBC_Delegate<void(LLBC_Event &)>(obj, method));
 }
 
 inline int LLBC_IService::Post(void(*func)(This *, const LLBC_Variant &), const LLBC_Variant &data)

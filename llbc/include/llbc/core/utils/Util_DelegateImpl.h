@@ -19,26 +19,26 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_UTILS_UTIL_NEWDELEGATE_H__
+#ifdef __LLBC_CORE_UTILS_UTIL_DELEGATE_H__
 
 __LLBC_NS_BEGIN
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(nullptr_t _)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(nullptr_t _)
 : _funcType(0)
 , _func()
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(CFunc cfunc)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(CFunc cfunc)
 : _funcType(cfunc ? 1 : 0)
 , _func(cfunc)
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const StlFunc &stlFunc)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const StlFunc &stlFunc)
 : _funcType(stlFunc != nullptr ? 2 : 0)
 , _func()
 {
@@ -48,7 +48,7 @@ LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const StlFunc &stlFunc)
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(Obj *obj, Rtn(Obj::*meth)(Args...))
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...))
 : _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
 , _func()
 {
@@ -58,7 +58,7 @@ LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(Obj *obj, Rtn(Obj::*meth)(Args.
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
 : _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
 , _func()
 {
@@ -68,13 +68,13 @@ LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const Obj *obj, Rtn(Obj::*meth)
 
 template <typename Rtn, typename ...Args>
 template <typename Func>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const Func &func)
-: LLBC_NewDelegate(StlFunc(func))
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Func &func)
+: LLBC_Delegate(StlFunc(func))
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const LLBC_NewDelegate &another)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
 : _funcType(another._funcType)
 , _func()
 {
@@ -87,20 +87,20 @@ LLBC_NewDelegate<Rtn(Args...)>::LLBC_NewDelegate(const LLBC_NewDelegate &another
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::~LLBC_NewDelegate()
+LLBC_Delegate<Rtn(Args...)>::~LLBC_Delegate()
 {
     if (_funcType == 2)
         reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)>::operator bool() const
+LLBC_Delegate<Rtn(Args...)>::operator bool() const
 {
     return _funcType != 0;
 }
 
 template <typename Rtn, typename ...Args>
-Rtn LLBC_NewDelegate<Rtn(Args...)>::operator()(Args... args) const
+Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 {
     if (_funcType == 1)
         return (*_func.cfunc)(std::forward<Args>(args)...);
@@ -113,14 +113,14 @@ Rtn LLBC_NewDelegate<Rtn(Args...)>::operator()(Args... args) const
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(nullptr_t _)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(nullptr_t _)
 {
     Reset();
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(CFunc cfunc)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(CFunc cfunc)
 {
     if (cfunc == nullptr)
     {
@@ -138,7 +138,7 @@ LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(CFunc 
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const StlFunc &stlFunc)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const StlFunc &stlFunc)
 {
     if (stlFunc == nullptr)
     {
@@ -161,13 +161,13 @@ LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const 
 
 template <typename Rtn, typename ... Args>
 template <typename Func>
-LLBC_NewDelegate<Rtn(Args ...)> &LLBC_NewDelegate<Rtn(Args ...)>::operator=(const Func &func)
+LLBC_Delegate<Rtn(Args ...)> &LLBC_Delegate<Rtn(Args ...)>::operator=(const Func &func)
 {
     return operator=(StlFunc(func));
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const LLBC_NewDelegate<Rtn(Args...)> &another)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_Delegate<Rtn(Args...)> &another)
 {
     if (this == &another)
         return *this;
@@ -210,7 +210,7 @@ LLBC_NewDelegate<Rtn(Args...)> &LLBC_NewDelegate<Rtn(Args...)>::operator=(const 
 }
 
 template <typename Rtn, typename ...Args>
-void LLBC_NewDelegate<Rtn(Args...)>::Reset()
+void LLBC_Delegate<Rtn(Args...)>::Reset()
 {
     if (_funcType == 1)
     {
@@ -231,4 +231,4 @@ void LLBC_NewDelegate<Rtn(Args...)>::Reset()
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_UTILS_UTIL_NEWDELEGATE_H__
+#endif // __LLBC_CORE_UTILS_UTIL_DELEGATE_H__

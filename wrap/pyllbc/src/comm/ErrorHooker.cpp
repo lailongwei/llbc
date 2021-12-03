@@ -48,8 +48,8 @@ int pyllbc_ErrorHooker::Install()
     if (_installed)
         return LLBC_OK;
 
-    pyllbc_SetErrSetHock(LLBC_NewDelegate<void(const LLBC_String &, int, PyObject *, PyObject *)>(this, &This::Hook_ErrSet));
-    pyllbc_SetErrClearHook(LLBC_NewDelegate<void()>(this, &This::Hook_ErrClear));
+    pyllbc_SetErrSetHock(LLBC_Delegate<void(const LLBC_String &, int, PyObject *, PyObject *)>(this, &This::Hook_ErrSet));
+    pyllbc_SetErrClearHook(LLBC_Delegate<void()>(this, &This::Hook_ErrClear));
 
     _installed = true;
     return LLBC_OK;

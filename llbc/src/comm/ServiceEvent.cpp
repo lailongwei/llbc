@@ -254,7 +254,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSubscribeEventEv(int id,
                                                          const LLBC_ListenerStub &stub,
-                                                         const LLBC_NewDelegate<void(LLBC_Event &)> &deleg,
+                                                         const LLBC_Delegate<void(LLBC_Event &)> &deleg,
                                                          LLBC_EventListener *listener)
 {
     typedef LLBC_SvcEv_SubscribeEv _Ev;
@@ -282,7 +282,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEventEv(int id, const LLBC_Li
 }
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEventEv(LLBC_Event *ev,
-                                                    const LLBC_NewDelegate<void(LLBC_Event *)> &dequeueHandler)
+                                                    const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
     typedef LLBC_SvcEv_FireEv _Ev;
 

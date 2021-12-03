@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_UTIL_NEWDELEGATE_H__
-#define __LLBC_CORE_UTILS_UTIL_NEWDELEGATE_H__
+#ifndef __LLBC_CORE_UTILS_UTIL_DELEGATE_H__
+#define __LLBC_CORE_UTILS_UTIL_DELEGATE_H__
 
 #include "llbc/common/Common.h"
 
@@ -31,14 +31,14 @@ __LLBC_NS_BEGIN
  * 
  */
 template <typename Rtn, typename ...Args>
-struct LLBC_NewDelegate;
+struct LLBC_Delegate;
 
 /**
  * @brief The Delegate encapsulation(template specification).
  * 
  */
 template <typename Rtn, typename ...Args>
-struct LLBC_NewDelegate<Rtn(Args...)>
+struct LLBC_Delegate<Rtn(Args...)>
 {
 public:
     /**
@@ -58,19 +58,19 @@ public:
      * 
      * @param[in] _ - unused parameter. 
      */
-    LLBC_NewDelegate(nullptr_t _ = nullptr);
+    LLBC_Delegate(nullptr_t _ = nullptr);
 
     /**
      * @brief Construct delegate object by c-style function pointer.
      * 
      * @param[in] cfunc - the c-style function pointer.
      */
-    LLBC_NewDelegate(CFunc cfunc);
+    LLBC_Delegate(CFunc cfunc);
 
     /**
      * @brief Construct a new Delegate object by stl function object.
      */
-    LLBC_NewDelegate(const StlFunc &stlFunc);
+    LLBC_Delegate(const StlFunc &stlFunc);
 
     /**
      * @brief Construct a delegate object by object pointer and object method pointer.
@@ -79,7 +79,7 @@ public:
      * @param[in] meth - the object method pointer.
      */
     template <typename Obj>
-    LLBC_NewDelegate(Obj *obj, Rtn(Obj::*meth)(Args...));
+    LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...));
 
     /**
      * @brief Construct a delegate object by const object pointer and const object method pointer.
@@ -88,7 +88,7 @@ public:
      * @param[in] meth - the const object method pointer.
      */
     template <typename Obj>
-    LLBC_NewDelegate(const Obj *, Rtn(Obj::*meth)(Args...) const);
+    LLBC_Delegate(const Obj *, Rtn(Obj::*meth)(Args...) const);
 
     /**
      * @brief Construct a delegate object by function object other then c-style function/stl function/class method, eg: lambda.
@@ -96,19 +96,19 @@ public:
      * @param func - the function object.
      */
     template <typename Func>
-    LLBC_NewDelegate(const Func &func);
+    LLBC_Delegate(const Func &func);
 
     /**
      * @brief Construct delegate object by another delegate object.
      *
      * @param[in] another - the another delegate object.
      */
-    LLBC_NewDelegate(const LLBC_NewDelegate &another);
+    LLBC_Delegate(const LLBC_Delegate &another);
 
     /**
      * @brief Destructor.
      */
-    ~LLBC_NewDelegate();
+    ~LLBC_Delegate();
 
 public:
     /**
@@ -131,24 +131,24 @@ public:
      * @brief Assignemnt by nullptr(make delegate invalidate).
      * 
      * @param[in] _ - unused parameter.
-     * @return LLBC_NewDelegate & - the delegate object.
+     * @return LLBC_Delegate & - the delegate object.
      */
-    LLBC_NewDelegate &operator=(nullptr_t _);
+    LLBC_Delegate &operator=(nullptr_t _);
 
     /**
      * @brief Assignment by c-style function pointer.
      * 
      * @param[in] cfunc - the c-style function pointer.
-     * @return LLBC_NewDelegate & - the delegate object.
+     * @return LLBC_Delegate & - the delegate object.
      */
-    LLBC_NewDelegate &operator=(CFunc cfunc);
+    LLBC_Delegate &operator=(CFunc cfunc);
 
     /**
      * @brief Assignment by stl function object.
      *
-     * @return LLBC_NewDelegate & - the delegate object.
+     * @return LLBC_Delegate & - the delegate object.
      */
-    LLBC_NewDelegate &operator=(const StlFunc &stlFunc);
+    LLBC_Delegate &operator=(const StlFunc &stlFunc);
 
 
     /**
@@ -156,17 +156,17 @@ public:
      *
      * @param func - the function object.
      *
-     *@return LLBC_NewDelegate & - the delegate object.
+     *@return LLBC_Delegate & - the delegate object.
      */
     template <typename Func>
-    LLBC_NewDelegate &operator=(const Func &func);
+    LLBC_Delegate &operator=(const Func &func);
 
     /**
      * @brief Assignment by another delegate object.
      *
-     * @return LLBC_NewDelegate & - the delegate object.
+     * @return LLBC_Delegate & - the delegate object.
      */
-    LLBC_NewDelegate &operator=(const LLBC_NewDelegate &another);
+    LLBC_Delegate &operator=(const LLBC_Delegate &another);
 
 private:
     /**
@@ -273,6 +273,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_NewDelegateImpl.h"
+#include "llbc/core/utils/Util_DelegateImpl.h"
 
-#endif // !__LLBC_CORE_UTILS_UTIL_NEWDELEGATE_H__
+#endif // !__LLBC_CORE_UTILS_UTIL_DELEGATE_H__

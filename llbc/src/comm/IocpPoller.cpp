@@ -250,7 +250,7 @@ void LLBC_IocpPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_IocpPoller::StartupMonitor()
 {
-    const LLBC_NewDelegate<void()> deleg(this, &LLBC_IocpPoller::MonitorSvc);
+    const LLBC_Delegate<void()> deleg(this, &LLBC_IocpPoller::MonitorSvc);
     _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {

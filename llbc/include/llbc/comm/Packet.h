@@ -277,7 +277,7 @@ public:
      * Set payload delete delegate.
      * @param[in] deleg - the payload delete delegate.
      */
-    void SetPayloadDeleteDeleg(const LLBC_NewDelegate<void(LLBC_MessageBlock *)> &deleg);
+    void SetPayloadDeleteDeleg(const LLBC_Delegate<void(LLBC_MessageBlock *)> &deleg);
 
     /**
      * Reset packet payload.
@@ -518,7 +518,7 @@ public:
     void SetPreHandleResult(void *result, void(*clearFunc)(void *));
     template <typename ObjType>
     void SetPreHandleResult(void *result, ObjType *obj, void (ObjType::*clearMethod)(void *));
-    void SetPreHandleResult(void *result, const LLBC_NewDelegate<void(void *)> &clearDeleg = nullptr);
+    void SetPreHandleResult(void *result, const LLBC_Delegate<void(void *)> &clearDeleg = nullptr);
 
 public:
     /**
@@ -594,10 +594,10 @@ private:
     LLBC_String *_codecError;
 
     void *_preHandleResult;
-    LLBC_NewDelegate<void(void *)> _resultClearDeleg;
+    LLBC_Delegate<void(void *)> _resultClearDeleg;
 
     LLBC_MessageBlock *_payload;
-    LLBC_NewDelegate<void(LLBC_MessageBlock *)> _payloadDeleteDeleg;
+    LLBC_Delegate<void(LLBC_MessageBlock *)> _payloadDeleteDeleg;
 
     LLBC_IObjectPoolInst *_selfPoolInst;
     LLBC_IObjectPoolInst *_msgBlockPoolInst;
