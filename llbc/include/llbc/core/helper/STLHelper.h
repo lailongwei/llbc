@@ -71,6 +71,10 @@ public:
     static void FreeContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
     static void FreeContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Key, typename _Ty>
+    static void FreeContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Ty, std::size_t _Nm>
+    static void FreeContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
 
     /**
      * Delete STL container.
@@ -92,6 +96,10 @@ public:
     static void DeleteContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
     static void DeleteContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Key, typename _Ty>
+    static void DeleteContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Ty, std::size_t _Nm>
+    static void DeleteContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
 
     /**
      * Deletes STL container.
@@ -113,6 +121,10 @@ public:
     static void DeletesContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
     static void DeletesContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Key, typename _Ty>
+    static void DeletesContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
+    template <typename _Ty, std::size_t _Nm>
+    static void DeletesContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
 
     /**
      * Recycle STL container.
@@ -134,7 +146,10 @@ public:
     static void RecycleContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
     static void RecycleContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-
+    template <typename _Key, typename _Ty>
+    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse = false);
+    template <typename _Ty, std::size_t _Nm>
+    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse = false);
 
 public:
     /**
@@ -158,6 +173,10 @@ public:
     static void OperateContainer(std::set<_Key *> &s, int opcode, bool clear, bool reverse);
     template <typename _Key, typename _Ty>
     static void OperateContainer(std::map<_Key, _Ty *> &m, int opcode, bool clear, bool reverse);
+    template <typename _Key, typename _Ty>
+    static void OperateContainer(std::unordered_map<_Key, _Ty *> &m, int opcode, bool clear, bool reverse);
+    template <typename _Ty, std::size_t _Nm>
+    static void OperateContainer(std::array<_Ty *, _Nm> &arr, int opcode, bool clear, bool reverse);
 
 private:
     /**
