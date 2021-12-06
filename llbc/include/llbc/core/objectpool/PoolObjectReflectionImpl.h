@@ -220,7 +220,6 @@ template <typename ObjectType>
 void LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj, 
                                            __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_INHERIT_DETECT_FALSE)
 {
-    bool supportedReflection = IsSupportedPoolObjectReflection<ObjectType>();
     LLBC_Delete(obj);
 }
 
