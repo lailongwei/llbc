@@ -55,14 +55,14 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Install logger hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug, std::bind(&TestCase_Core_Log::OnLogHook, this, std::placeholders::_1));
+    rootLogger->InstallHook(LLBC_LogLevel::Debug, LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
-    LLBC_DEBUG_LOG("This is a debug log message.");
+    LLBC_DEUG_LOG("This is a debug log message.");
     LLBC_DEBUG_LOG2("test_tag", "This is a debug log message.");
 
-    Log.d("This is a debug log message(from Log.d())");
-    Log.d2("test_tag", "This is a debug log message(from Log.d2())");
+    LLog.d("This is a debug log message(from LLog.d())");
+    LLog.d2("test_tag", "This is a debug log message(from LLog.d2())");
 
     // Uninstall logger hook(from root logger).
     rootLogger->UninstallHook(LLBC_LogLevel::Debug);
@@ -92,58 +92,58 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     LLBC_INFO_LOG("This is a info log message.");
     LLBC_INFO_LOG2("test_tag", "This is a info log message.");
-    Log.i("This is a info log message(from Log.i()).");
-    Log.i2("test_tag", "This is a info log message(from Log.i2()).");
-    Log.i2<TestCase_Core_Log>("This is a info log message(from Log.i2<>()).");
+    LLog.i("This is a info log message(from LLog.i()).");
+    LLog.i2("test_tag", "This is a info log message(from LLog.i2()).");
+    LLog.i2<TestCase_Core_Log>("This is a info log message(from LLog.i2<>()).");
 
     LLBC_WARN_LOG("This is a warn log message.");
     LLBC_WARN_LOG2("test_tag", "This is a warn log message.");
-    Log.w("This is a warn log message(from Log.w()).");
-    Log.w2("test_tag", "This is a warn log message(from Log.w2()).");
-    Log.w2<TestCase_Core_Log>("This is a warn log message(from Log.w2<>()).");
+    LLog.w("This is a warn log message(from LLog.w()).");
+    LLog.w2("test_tag", "This is a warn log message(from LLog.w2()).");
+    LLog.w2<TestCase_Core_Log>("This is a warn log message(from LLog.w2<>()).");
 
     LLBC_ERROR_LOG("This is a error log message.");
     LLBC_ERROR_LOG2("test_tag", "This is a error log message.");
-    Log.e("This is a error log message(from Log.e()).");
-    Log.e2("test_tag", "This is a error log message(from Log.e2()).");
-    Log.e2<TestCase_Core_Log>("This is a error log message(from Log.e2<>()).");
+    LLog.e("This is a error log message(from LLog.e()).");
+    LLog.e2("test_tag", "This is a error log message(from LLog.e2()).");
+    LLog.e2<TestCase_Core_Log>("This is a error log message(from LLog.e2<>()).");
 
     LLBC_FATAL_LOG("This is a fatal log message.");
     LLBC_FATAL_LOG2("test_tag", "This is a fatal log message.");
-    Log.f("This is a fatal log message(from Log.f()).");
-    Log.f2("test_tag", "This is a fatal log message(from Log.f2()).");
-    Log.f2<TestCase_Core_Log>("This is a fatal log message(from Log.f2<>()).");
+    LLog.f("This is a fatal log message(from LLog.f()).");
+    LLog.f2("test_tag", "This is a fatal log message(from LLog.f2()).");
+    LLog.f2<TestCase_Core_Log>("This is a fatal log message(from LLog.f2<>()).");
 
     // Use test logger to test.
     LLBC_DEBUG_LOG_SPEC("test", "This is a debug log message.");
     LLBC_DEBUG_LOG_SPEC2("test", "test_tag", "This is a debug log message.");
-    Log.d3("test", "This is a debug log message(from Log.d3()).");
-    Log.d4("test", "test_tag", "This is a debug log message(from Log.d4()).");
-    Log.d4<TestCase_Core_Log>("test", "This is a debug log message(from Log.d4<>()).");
+    LLog.d3("test", "This is a debug log message(from LLog.d3()).");
+    LLog.d4("test", "test_tag", "This is a debug log message(from LLog.d4()).");
+    LLog.d4<TestCase_Core_Log>("test", "This is a debug log message(from LLog.d4<>()).");
 
     LLBC_INFO_LOG_SPEC("test", "This is a info log message.");
     LLBC_INFO_LOG_SPEC2("test", "test_tag", "This is a info log message.");
-    Log.i3("test", "This is a info log message(from Log.i3()).");
-    Log.i4("test", "test_tag", "This is a info log message(from Log.i4()).");
-    Log.i4<TestCase_Core_Log>("test", "This is a info log message(from Log.i4<>()).");
+    LLog.i3("test", "This is a info log message(from LLog.i3()).");
+    LLog.i4("test", "test_tag", "This is a info log message(from LLog.i4()).");
+    LLog.i4<TestCase_Core_Log>("test", "This is a info log message(from LLog.i4<>()).");
 
     LLBC_WARN_LOG_SPEC("test", "This is a warn log message.");
     LLBC_WARN_LOG_SPEC2("test", "test_tag", "This is a warn log message.");
-    Log.w3("test", "This is a warn log message(from Log.w3()).");
-    Log.w4("test", "test_tag", "This is a warn log message(from Log.w4()).");
-    Log.w4<TestCase_Core_Log>("test", "This is a warn log message(from Log.w4<>()).");
+    LLog.w3("test", "This is a warn log message(from LLog.w3()).");
+    LLog.w4("test", "test_tag", "This is a warn log message(from LLog.w4()).");
+    LLog.w4<TestCase_Core_Log>("test", "This is a warn log message(from LLog.w4<>()).");
 
     LLBC_ERROR_LOG_SPEC("test", "This is a error log message.");
     LLBC_ERROR_LOG_SPEC2("test", "test_tag", "This is a error log message.");
-    Log.e3("test", "This is a error log message(from Log.e3()).");
-    Log.e4("test", "test_tag", "This is a error log message(from Log.e4()).");
-    Log.e4<TestCase_Core_Log>("test", "This is a error log message(from Log.e4<>()).");
+    LLog.e3("test", "This is a error log message(from LLog.e3()).");
+    LLog.e4("test", "test_tag", "This is a error log message(from LLog.e4()).");
+    LLog.e4<TestCase_Core_Log>("test", "This is a error log message(from LLog.e4<>()).");
 
     LLBC_FATAL_LOG_SPEC("test", "This is a fatal log message.");
     LLBC_FATAL_LOG_SPEC2("test", "test_tag", "This is a fatal log message.");
-    Log.f3("test", "This is a fatal log message(from Log.f3()).");
-    Log.f4("test", "test_tag", "This is a fatal log message(from Log.f4()).");
-    Log.f4<TestCase_Core_Log>("test", "This is a fatal log message(from Log.f4<>()).");
+    LLog.f3("test", "This is a fatal log message(from LLog.f3()).");
+    LLog.f4("test", "test_tag", "This is a fatal log message(from LLog.f4()).");
+    LLog.f4<TestCase_Core_Log>("test", "This is a fatal log message(from LLog.f4<>()).");
 
     // Log file delete test.
     for (int i = 0; i < 20; ++i)
@@ -185,127 +185,127 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 void TestCase_Core_Log::DoJsonLogTest()
 {
     LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
-    Log.jd().Add("testKey", "testValue->jd.1").Finish("");
-    Log.jd().Add("testKey", "testValue->jd.2").Finish("%s", "Finish Test");
-    Log.jd().Add("testKey", "testValue->jd.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jd().Add("testKey", "testValue->jd.1").Finish("");
+    LLog.jd().Add("testKey", "testValue->jd.2").Finish("%s", "Finish Test");
+    LLog.jd().Add("testKey", "testValue->jd.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jd2("testTag").Add("testKey", "testValue->jd2.1").Finish("");
-    Log.jd2("testTag").Add("testKey", "testValue->jd2.2").Finish("%s", "Finish Test");
-    Log.jd2("testTag").Add("testKey", "testValue->jd2.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jd2("testTag").Add("testKey", "testValue->jd2.1").Finish("");
+    LLog.jd2("testTag").Add("testKey", "testValue->jd2.2").Finish("%s", "Finish Test");
+    LLog.jd2("testTag").Add("testKey", "testValue->jd2.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jd2<TestCase_Core_Log>().Add("testKey", LLBC_Variant()).Finish("");
-    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.1").Finish("");
-    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.2").Finish("%s", "Finish Test");
-    Log.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jd2<TestCase_Core_Log>().Add("testKey", LLBC_Variant()).Finish("");
+    LLog.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.1").Finish("");
+    LLog.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.2").Finish("%s", "Finish Test");
+    LLog.jd2<TestCase_Core_Log>().Add("testKey", "testValue->jd2<>.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jd3(nullptr).Add("testKey", "testValue->Log.jd3(1).").Finish("");
-    Log.jd3("").Add("testKey", "testValue->jd3(2).").Finish("");
-    Log.jd3("test").Add("testKey", "testValue->jd3(3).").Finish("");
-    Log.jd3("test").Add("testKey", "testValue->jd3(4).").Finish("%s", "Finish Test");
-    Log.jd3("test").Add("testKey", "testValue->jd3(5).").Finish("%s%d", "Finish Test", 2);
+    LLog.jd3(nullptr).Add("testKey", "testValue->Log.jd3(1).").Finish("");
+    LLog.jd3("").Add("testKey", "testValue->jd3(2).").Finish("");
+    LLog.jd3("test").Add("testKey", "testValue->jd3(3).").Finish("");
+    LLog.jd3("test").Add("testKey", "testValue->jd3(4).").Finish("%s", "Finish Test");
+    LLog.jd3("test").Add("testKey", "testValue->jd3(5).").Finish("%s%d", "Finish Test", 2);
 
-    Log.jd4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jd4<>.1").Finish("");
-    Log.jd4<TestCase_Core_Log>("").Add("testKey", "testValue->jd4<>.2").Finish("");
-    Log.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.3").Finish("%s", "Finish Test");
-    Log.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.4").Finish("%s%d", "Finish Test", 2);
+    LLog.jd4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jd4<>.1").Finish("");
+    LLog.jd4<TestCase_Core_Log>("").Add("testKey", "testValue->jd4<>.2").Finish("");
+    LLog.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.3").Finish("%s", "Finish Test");
+    LLog.jd4<TestCase_Core_Log>("test").Add("testKey", "testValue->jd4<>.4").Finish("%s%d", "Finish Test", 2);
 
-    Log.ji().Add("testKey", "testValue->ji.1").Finish("");
-    Log.ji().Add("testKey", "testValue->ji.2").Finish("%s", "Finish Test");
-    Log.ji().Add("testKey", "testValue->ji.3").Finish("%s%d", "Finish Test", 2);
+    LLog.ji().Add("testKey", "testValue->ji.1").Finish("");
+    LLog.ji().Add("testKey", "testValue->ji.2").Finish("%s", "Finish Test");
+    LLog.ji().Add("testKey", "testValue->ji.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.ji2("testTag").Add("testKey", "testValue->ji2.1").Finish("");
-    Log.ji2("testTag").Add("testKey", "testValue->ji2.2").Finish("%s", "Finish Test");
-    Log.ji2("testTag").Add("testKey", "testValue->ji2.3").Finish("%s%d", "Finish Test", 2);
+    LLog.ji2("testTag").Add("testKey", "testValue->ji2.1").Finish("");
+    LLog.ji2("testTag").Add("testKey", "testValue->ji2.2").Finish("%s", "Finish Test");
+    LLog.ji2("testTag").Add("testKey", "testValue->ji2.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.1").Finish("");
-    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.2").Finish("%s", "Finish Test");
-    Log.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.3").Finish("%s%d", "Finish Test", 2);
+    LLog.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.1").Finish("");
+    LLog.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.2").Finish("%s", "Finish Test");
+    LLog.ji2<TestCase_Core_Log>().Add("testKey", "testValue->ji2<>.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.ji3(nullptr).Add("testKey", "testValue->Log.ji3().1").Finish("");
-    Log.ji3("").Add("testKey", "testValue->ji3().2").Finish("");
-    Log.ji3("test").Add("testKey", "testValue->ji3().3").Finish("");
-    Log.ji3("test").Add("testKey", "testValue->ji3().4").Finish("%s", "Finish Test");
-    Log.ji3("test").Add("testKey", "testValue->ji3().5").Finish("%s%d", "Finish Test", 2);
+    LLog.ji3(nullptr).Add("testKey", "testValue->Log.ji3().1").Finish("");
+    LLog.ji3("").Add("testKey", "testValue->ji3().2").Finish("");
+    LLog.ji3("test").Add("testKey", "testValue->ji3().3").Finish("");
+    LLog.ji3("test").Add("testKey", "testValue->ji3().4").Finish("%s", "Finish Test");
+    LLog.ji3("test").Add("testKey", "testValue->ji3().5").Finish("%s%d", "Finish Test", 2);
 
-    Log.ji4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->ji4<>1").Finish("");
-    Log.ji4<TestCase_Core_Log>("").Add("testKey", "testValue->ji4<>2").Finish("");
-    Log.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>3").Finish("%s", "Finish Test");
-    Log.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>4").Finish("%s%d", "Finish Test", 2);
+    LLog.ji4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->ji4<>1").Finish("");
+    LLog.ji4<TestCase_Core_Log>("").Add("testKey", "testValue->ji4<>2").Finish("");
+    LLog.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>3").Finish("%s", "Finish Test");
+    LLog.ji4<TestCase_Core_Log>("test").Add("testKey", "testValue->ji4<>4").Finish("%s%d", "Finish Test", 2);
 
-    Log.jw().Add("testKey", "testValue->jw.1").Finish("");
-    Log.jw().Add("testKey", "testValue->jw.2").Finish("%s", "Finish Test");
-    Log.jw().Add("testKey", "testValue->jw.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jw().Add("testKey", "testValue->jw.1").Finish("");
+    LLog.jw().Add("testKey", "testValue->jw.2").Finish("%s", "Finish Test");
+    LLog.jw().Add("testKey", "testValue->jw.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jw2("testTag").Add("testKey", "testValue->jw2.1").Finish("");
-    Log.jw2("testTag").Add("testKey", "testValue->jw2.2").Finish("%s", "Finish Test");
-    Log.jw2("testTag").Add("testKey", "testValue->jw2.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jw2("testTag").Add("testKey", "testValue->jw2.1").Finish("");
+    LLog.jw2("testTag").Add("testKey", "testValue->jw2.2").Finish("%s", "Finish Test");
+    LLog.jw2("testTag").Add("testKey", "testValue->jw2.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.1").Finish("");
-    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.2").Finish("%s", "Finish Test");
-    Log.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.1").Finish("");
+    LLog.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.2").Finish("%s", "Finish Test");
+    LLog.jw2<TestCase_Core_Log>().Add("testKey", "testValue->jw2<>.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jw3(nullptr).Add("testKey", "testValue->Log.jw3().1").Finish("");
-    Log.jw3("").Add("testKey", "testValue->jw3().2").Finish("");
-    Log.jw3("test").Add("testKey", "testValue->jw3().3").Finish("");
-    Log.jw3("test").Add("testKey", "testValue->jw3().4").Finish("%s", "Finish Test");
-    Log.jw3("test").Add("testKey", "testValue->jw3().5").Finish("%s%d", "Finish Test", 2);
+    LLog.jw3(nullptr).Add("testKey", "testValue->Log.jw3().1").Finish("");
+    LLog.jw3("").Add("testKey", "testValue->jw3().2").Finish("");
+    LLog.jw3("test").Add("testKey", "testValue->jw3().3").Finish("");
+    LLog.jw3("test").Add("testKey", "testValue->jw3().4").Finish("%s", "Finish Test");
+    LLog.jw3("test").Add("testKey", "testValue->jw3().5").Finish("%s%d", "Finish Test", 2);
 
-    Log.jw4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jw4<>1").Finish("");
-    Log.jw4<TestCase_Core_Log>("").Add("testKey", "testValue->jw4<>2").Finish("");
-    Log.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>3").Finish("%s", "Finish Test");
-    Log.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>4").Finish("%s%d", "Finish Test", 2);
+    LLog.jw4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jw4<>1").Finish("");
+    LLog.jw4<TestCase_Core_Log>("").Add("testKey", "testValue->jw4<>2").Finish("");
+    LLog.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>3").Finish("%s", "Finish Test");
+    LLog.jw4<TestCase_Core_Log>("test").Add("testKey", "testValue->jw4<>4").Finish("%s%d", "Finish Test", 2);
 
-    Log.je().Add("testKey", "testValue->je.1").Finish("");
-    Log.je().Add("testKey", "testValue->je.2").Finish("%s", "Finish Test");
-    Log.je().Add("testKey", "testValue->je.3").Finish("%s%d", "Finish Test", 2);
+    LLog.je().Add("testKey", "testValue->je.1").Finish("");
+    LLog.je().Add("testKey", "testValue->je.2").Finish("%s", "Finish Test");
+    LLog.je().Add("testKey", "testValue->je.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.je2("testTag").Add("testKey", "testValue->je2.1").Finish("");
-    Log.je2("testTag").Add("testKey", "testValue->je2.2").Finish("%s", "Finish Test");
-    Log.je2("testTag").Add("testKey", "testValue->je2.3").Finish("%s%d", "Finish Test", 2);
+    LLog.je2("testTag").Add("testKey", "testValue->je2.1").Finish("");
+    LLog.je2("testTag").Add("testKey", "testValue->je2.2").Finish("%s", "Finish Test");
+    LLog.je2("testTag").Add("testKey", "testValue->je2.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.1").Finish("");
-    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.2").Finish("%s", "Finish Test");
-    Log.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.3").Finish("%s%d", "Finish Test", 2);
+    LLog.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.1").Finish("");
+    LLog.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.2").Finish("%s", "Finish Test");
+    LLog.je2<TestCase_Core_Log>().Add("testKey", "testValue->je2<>.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.je3(nullptr).Add("testKey", "testValue->Log.je3().1").Finish("");
-    Log.je3("").Add("testKey", "testValue->je3().2").Finish("");
-    Log.je3("test").Add("testKey", "testValue->je3().3").Finish("");
-    Log.je3("test").Add("testKey", "testValue->je3().4").Finish("%s", "Finish Test");
-    Log.je3("test").Add("testKey", "testValue->je3().5").Finish("%s%d", "Finish Test", 2);
+    LLog.je3(nullptr).Add("testKey", "testValue->Log.je3().1").Finish("");
+    LLog.je3("").Add("testKey", "testValue->je3().2").Finish("");
+    LLog.je3("test").Add("testKey", "testValue->je3().3").Finish("");
+    LLog.je3("test").Add("testKey", "testValue->je3().4").Finish("%s", "Finish Test");
+    LLog.je3("test").Add("testKey", "testValue->je3().5").Finish("%s%d", "Finish Test", 2);
 
-    Log.je4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->je4<>1").Finish("");
-    Log.je4<TestCase_Core_Log>("").Add("testKey", "testValue->je4<>2").Finish("");
-    Log.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>3").Finish("%s", "Finish Test");
-    Log.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>4").Finish("%s%d", "Finish Test", 2);
+    LLog.je4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->je4<>1").Finish("");
+    LLog.je4<TestCase_Core_Log>("").Add("testKey", "testValue->je4<>2").Finish("");
+    LLog.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>3").Finish("%s", "Finish Test");
+    LLog.je4<TestCase_Core_Log>("test").Add("testKey", "testValue->je4<>4").Finish("%s%d", "Finish Test", 2);
 
-    Log.jf().Add("testKey", "testValue->jf.1").Finish("");
-    Log.jf().Add("testKey", "testValue->jf.2").Finish("%s", "Finish Test");
-    Log.jf().Add("testKey", "testValue->jf.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jf().Add("testKey", "testValue->jf.1").Finish("");
+    LLog.jf().Add("testKey", "testValue->jf.2").Finish("%s", "Finish Test");
+    LLog.jf().Add("testKey", "testValue->jf.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jf2("testTag").Add("testKey", "testValue->jf2.1").Finish("");
-    Log.jf2("testTag").Add("testKey", "testValue->jf2.2").Finish("%s", "Finish Test");
-    Log.jf2("testTag").Add("testKey", "testValue->jf2.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jf2("testTag").Add("testKey", "testValue->jf2.1").Finish("");
+    LLog.jf2("testTag").Add("testKey", "testValue->jf2.2").Finish("%s", "Finish Test");
+    LLog.jf2("testTag").Add("testKey", "testValue->jf2.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.1").Finish("");
-    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.2").Finish("%s", "Finish Test");
-    Log.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.3").Finish("%s%d", "Finish Test", 2);
+    LLog.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.1").Finish("");
+    LLog.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.2").Finish("%s", "Finish Test");
+    LLog.jf2<TestCase_Core_Log>().Add("testKey", "testValue->jf2<>.3").Finish("%s%d", "Finish Test", 2);
 
-    Log.jf3(nullptr).Add("testKey", "testValue->Log.jf3().1").Finish("");
-    Log.jf3("").Add("testKey", "testValue->jf3().2").Finish("");
-    Log.jf3("test").Add("testKey", "testValue->jf3().3").Finish("");
-    Log.jf3("test").Add("testKey", "testValue->jf3().4").Finish("%s", "Finish Test");
-    Log.jf3("test").Add("testKey", "testValue->jf3().5").Finish("%s%d", "Finish Test", 2);
+    LLog.jf3(nullptr).Add("testKey", "testValue->Log.jf3().1").Finish("");
+    LLog.jf3("").Add("testKey", "testValue->jf3().2").Finish("");
+    LLog.jf3("test").Add("testKey", "testValue->jf3().3").Finish("");
+    LLog.jf3("test").Add("testKey", "testValue->jf3().4").Finish("%s", "Finish Test");
+    LLog.jf3("test").Add("testKey", "testValue->jf3().5").Finish("%s%d", "Finish Test", 2);
 
-    Log.jf4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jf4<>1").Finish("");
-    Log.jf4<TestCase_Core_Log>("").Add("testKey", "testValue->jf4<>2").Finish("");
-    Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>3").Finish("%s", "Finish Test");
-    Log.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>4").Finish("%s%d", "Finish Test", 2);
+    LLog.jf4<TestCase_Core_Log>(nullptr).Add("testKey", "testValue->jf4<>1").Finish("");
+    LLog.jf4<TestCase_Core_Log>("").Add("testKey", "testValue->jf4<>2").Finish("");
+    LLog.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>3").Finish("%s", "Finish Test");
+    LLog.jf4<TestCase_Core_Log>("test").Add("testKey", "testValue->jf4<>4").Finish("%s%d", "Finish Test", 2);
 }
 
 void TestCase_Core_Log::DoUninitLogTest()
 {
-    Log.d("This is a uninited log message");
-    Log.jd().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
+    LLog.d("This is a uninited log message");
+    LLog.jd().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)

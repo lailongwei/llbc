@@ -46,11 +46,11 @@ __LLBC_NS_BEGIN
 LLBC_EXTERN LLBC_EXPORT LLBC_LogHelper &__LLBC_GetLogHelper();
 
 // Log macro define.
-#ifdef Log
+#ifdef LLog
  #error Already defined Log macro in your application/library, please undef it first!
 #else
- #define Log (__LLBC_GetLogHelper())
-#endif // Log
+ #define LLog (__LLBC_GetLogHelper())
+#endif // LLog
 
 /**
  * \brief The log helper class encapsulation.
