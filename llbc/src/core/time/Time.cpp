@@ -39,8 +39,6 @@ std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 
 __LLBC_NS_BEGIN
 
-const LLBC_Time LLBC_Time::UTCBegin;
-
 const int LLBC_Time::NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay; 
 const int LLBC_Time::NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay; 
 const sint64 LLBC_Time::NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay; 
@@ -64,6 +62,8 @@ const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = LLBC_TimeConstant::Num
 const sint64 LLBC_Time::NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond; 
 
 const sint64 LLBC_Time::NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond; 
+
+const LLBC_Time LLBC_Time::UTCBegin;
 
 LLBC_Time LLBC_Time::Now()
 {
