@@ -261,9 +261,6 @@ typedef GUID LLBC_GUID;
 typedef LLBC_GUID & LLBC_GUIDRef;
 typedef const LLBC_GUID & LLBC_GUIDCRef;
 
-// guard func function type define.
-typedef void (*LLBC_GuardFunc)(void *);
-
 // Bundle data type define.
 #if LLBC_TARGET_PLATFORM_IPHONE
  #define LLBC_BundleHandle void *
