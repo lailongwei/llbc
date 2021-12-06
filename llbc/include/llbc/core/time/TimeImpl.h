@@ -90,6 +90,11 @@ inline int LLBC_Time::GetDayOfWeek() const
     return _localTimeStruct.tm_wday;
 }
 
+inline int LLBC_Time::GetDayOfMonth() const
+{
+        return GetDayOfYear() - GetMonthSpanDays(GetYear(), GetMonth() - 1);
+}
+
 inline int LLBC_Time::GetDayOfYear() const
 {
     return _localTimeStruct.tm_yday + 1; // start by 1

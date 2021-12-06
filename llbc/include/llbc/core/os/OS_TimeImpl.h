@@ -69,6 +69,15 @@ inline int LLBC_GetMonthMaxDays(int year, int month)
     }
 }
 
+inline int LLBC_GetMonthSpanDays(int year, int month)
+{
+    int spanDays = 0;
+    for (int m = 1; m <= month; ++m)
+        spanDays += LLBC_GetMonthMaxDays(year, m);
+
+    return spanDays;
+}
+
 inline sint64 LLBC_GetMilliSeconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32

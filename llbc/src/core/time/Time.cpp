@@ -39,6 +39,8 @@ std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 
 __LLBC_NS_BEGIN
 
+const LLBC_Time LLBC_Time::UTCBegin;
+
 const int LLBC_Time::NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay; 
 const int LLBC_Time::NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay; 
 const sint64 LLBC_Time::NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay; 
@@ -330,6 +332,11 @@ bool LLBC_Time::IsLeapYear(int year)
 int LLBC_Time::GetMonthMaxDays(int year, int month)
 {
     return LLBC_GetMonthMaxDays(year, month);
+}
+
+int LLBC_Time::GetMonthSpanDays(int year, int month)
+{
+    return LLBC_GetMonthSpanDays(year, month);
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
