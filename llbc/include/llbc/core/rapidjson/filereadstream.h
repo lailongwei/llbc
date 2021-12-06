@@ -12,20 +12,20 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_FILEREADSTREAM_H_
-#define RAPIDJSON_FILEREADSTREAM_H_
+#ifndef LLBC_RAPIDJSON_FILEREADSTREAM_H_
+#define LLBC_RAPIDJSON_FILEREADSTREAM_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include <cstdio>
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(padded)
-RAPIDJSON_DIAG_OFF(unreachable-code)
-RAPIDJSON_DIAG_OFF(missing-noreturn)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(padded)
+LLBC_RAPIDJSON_DIAG_OFF(unreachable-code)
+LLBC_RAPIDJSON_DIAG_OFF(missing-noreturn)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! File byte stream for input using fread().
 /*!
@@ -42,8 +42,8 @@ public:
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
     FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
-        RAPIDJSON_ASSERT(fp_ != 0);
-        RAPIDJSON_ASSERT(bufferSize >= 4);
+        LLBC_RAPIDJSON_ASSERT(fp_ != 0);
+        LLBC_RAPIDJSON_ASSERT(bufferSize >= 4);
         Read();
     }
 
@@ -52,10 +52,10 @@ public:
     size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
 
     // Not implemented
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    void Put(Ch) { LLBC_RAPIDJSON_ASSERT(false); }
+    void Flush() { LLBC_RAPIDJSON_ASSERT(false); } 
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.
     const Ch* Peek4() const {
@@ -90,10 +90,10 @@ private:
     bool eof_;
 };
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #ifdef __clang__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_FILESTREAM_H_
+#endif // LLBC_RAPIDJSON_FILESTREAM_H_

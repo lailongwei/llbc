@@ -12,23 +12,23 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_ENCODEDSTREAM_H_
-#define RAPIDJSON_ENCODEDSTREAM_H_
+#ifndef LLBC_RAPIDJSON_ENCODEDSTREAM_H_
+#define LLBC_RAPIDJSON_ENCODEDSTREAM_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include "llbc/core/rapidjson/memorystream.h"
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(padded)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(padded)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Input byte stream wrapper with a statically bound encoding.
 /*!
@@ -37,7 +37,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 */
 template <typename Encoding, typename InputByteStream>
 class EncodedInputStream {
-    RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
 public:
     typedef typename Encoding::Ch Ch;
 
@@ -50,10 +50,10 @@ public:
     size_t Tell() const { return is_.Tell(); }
 
     // Not implemented
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    void Put(Ch) { LLBC_RAPIDJSON_ASSERT(false); }
+    void Flush() { LLBC_RAPIDJSON_ASSERT(false); } 
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     EncodedInputStream(const EncodedInputStream&);
@@ -98,7 +98,7 @@ private:
 */
 template <typename Encoding, typename OutputByteStream>
 class EncodedOutputStream {
-    RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
 public:
     typedef typename Encoding::Ch Ch;
 
@@ -111,11 +111,11 @@ public:
     void Flush() { os_.Flush(); }
 
     // Not implemented
-    Ch Peek() const { RAPIDJSON_ASSERT(false); return 0;}
-    Ch Take() { RAPIDJSON_ASSERT(false); return 0;}
-    size_t Tell() const { RAPIDJSON_ASSERT(false);  return 0; }
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    Ch Peek() const { LLBC_RAPIDJSON_ASSERT(false); return 0;}
+    Ch Take() { LLBC_RAPIDJSON_ASSERT(false); return 0;}
+    size_t Tell() const { LLBC_RAPIDJSON_ASSERT(false);  return 0; }
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     EncodedOutputStream(const EncodedOutputStream&);
@@ -124,7 +124,7 @@ private:
     OutputByteStream& os_;
 };
 
-#define RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
+#define LLBC_RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
 
 //! Input stream wrapper with dynamically bound encoding and automatic encoding detection.
 /*!
@@ -133,7 +133,7 @@ private:
 */
 template <typename CharType, typename InputByteStream>
 class AutoUTFInputStream {
-    RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
 public:
     typedef CharType Ch;
 
@@ -143,9 +143,9 @@ public:
         \param type UTF encoding type if it is not detected from the stream.
     */
     AutoUTFInputStream(InputByteStream& is, UTFType type = kUTF8) : is_(&is), type_(type), hasBOM_(false) {
-        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);        
+        LLBC_RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);        
         DetectType();
-        static const TakeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Take) };
+        static const TakeFunc f[] = { LLBC_RAPIDJSON_ENCODINGS_FUNC(Take) };
         takeFunc_ = f[type_];
         current_ = takeFunc_(*is_);
     }
@@ -158,10 +158,10 @@ public:
     size_t Tell() const { return is_->Tell(); }
 
     // Not implemented
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    void Put(Ch) { LLBC_RAPIDJSON_ASSERT(false); }
+    void Flush() { LLBC_RAPIDJSON_ASSERT(false); } 
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     AutoUTFInputStream(const AutoUTFInputStream&);
@@ -212,8 +212,8 @@ private:
         }
 
         // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
-        if (type_ == kUTF16LE || type_ == kUTF16BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-        if (type_ == kUTF32LE || type_ == kUTF32BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
+        if (type_ == kUTF16LE || type_ == kUTF16BE) LLBC_RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
+        if (type_ == kUTF32LE || type_ == kUTF32BE) LLBC_RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
     }
 
     typedef Ch (*TakeFunc)(InputByteStream& is);
@@ -231,7 +231,7 @@ private:
 */
 template <typename CharType, typename OutputByteStream>
 class AutoUTFOutputStream {
-    RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
 public:
     typedef CharType Ch;
 
@@ -242,13 +242,13 @@ public:
         \param putBOM Whether to write BOM at the beginning of the stream.
     */
     AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(&os), type_(type) {
-        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);
+        LLBC_RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);
 
         // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
-        if (type_ == kUTF16LE || type_ == kUTF16BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-        if (type_ == kUTF32LE || type_ == kUTF32BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
+        if (type_ == kUTF16LE || type_ == kUTF16BE) LLBC_RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
+        if (type_ == kUTF32LE || type_ == kUTF32BE) LLBC_RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
 
-        static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };
+        static const PutFunc f[] = { LLBC_RAPIDJSON_ENCODINGS_FUNC(Put) };
         putFunc_ = f[type_];
 
         if (putBOM)
@@ -261,11 +261,11 @@ public:
     void Flush() { os_->Flush(); } 
 
     // Not implemented
-    Ch Peek() const { RAPIDJSON_ASSERT(false); return 0;}
-    Ch Take() { RAPIDJSON_ASSERT(false); return 0;}
-    size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    Ch Peek() const { LLBC_RAPIDJSON_ASSERT(false); return 0;}
+    Ch Take() { LLBC_RAPIDJSON_ASSERT(false); return 0;}
+    size_t Tell() const { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     AutoUTFOutputStream(const AutoUTFOutputStream&);
@@ -273,7 +273,7 @@ private:
 
     void PutBOM() { 
         typedef void (*PutBOMFunc)(OutputByteStream&);
-        static const PutBOMFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(PutBOM) };
+        static const PutBOMFunc f[] = { LLBC_RAPIDJSON_ENCODINGS_FUNC(PutBOM) };
         f[type_](*os_);
     }
 
@@ -284,16 +284,16 @@ private:
     PutFunc putFunc_;
 };
 
-#undef RAPIDJSON_ENCODINGS_FUNC
+#undef LLBC_RAPIDJSON_ENCODINGS_FUNC
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #ifdef __clang__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_FILESTREAM_H_
+#endif // LLBC_RAPIDJSON_FILESTREAM_H_

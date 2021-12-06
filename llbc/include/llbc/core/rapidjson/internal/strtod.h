@@ -12,8 +12,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_STRTOD_
-#define RAPIDJSON_STRTOD_
+#ifndef LLBC_RAPIDJSON_STRTOD_
+#define LLBC_RAPIDJSON_STRTOD_
 
 #include "llbc/core/rapidjson/internal/ieee754.h"
 #include "llbc/core/rapidjson/internal/biginteger.h"
@@ -22,7 +22,7 @@
 #include <climits>
 #include <limits>
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 inline double FastPath(double significand, int exp) {
@@ -132,8 +132,8 @@ inline bool StrtodDiyFp(const char* decimals, int dLen, int dExp, double* result
     uint64_t significand = 0;
     int i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
     for (; i < dLen; i++) {
-        if (significand  >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
-            (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5'))
+        if (significand  >  LLBC_RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
+            (significand == LLBC_RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5'))
             break;
         significand = significand * 10u + static_cast<unsigned>(decimals[i] - '0');
     }
@@ -156,16 +156,16 @@ inline bool StrtodDiyFp(const char* decimals, int dLen, int dExp, double* result
     DiyFp cachedPower = GetCachedPower10(dExp, &actualExp);
     if (actualExp != dExp) {
         static const DiyFp kPow10[] = {
-            DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 0x00000000), -60),  // 10^1
-            DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 0x00000000), -57),  // 10^2
-            DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 0x00000000), -54),  // 10^3
-            DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 0x00000000), -50),  // 10^4
-            DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 0x00000000), -47),  // 10^5
-            DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 0x00000000), -44),  // 10^6
-            DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 0x00000000), -40)   // 10^7
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0xa0000000, 0x00000000), -60),  // 10^1
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0xc8000000, 0x00000000), -57),  // 10^2
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0xfa000000, 0x00000000), -54),  // 10^3
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0x9c400000, 0x00000000), -50),  // 10^4
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0xc3500000, 0x00000000), -47),  // 10^5
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0xf4240000, 0x00000000), -44),  // 10^6
+            DiyFp(LLBC_RAPIDJSON_UINT64_C2(0x98968000, 0x00000000), -40)   // 10^7
         };
         int adjustment = dExp - actualExp;
-        RAPIDJSON_ASSERT(adjustment >= 1 && adjustment < 8);
+        LLBC_RAPIDJSON_ASSERT(adjustment >= 1 && adjustment < 8);
         v = v * kPow10[adjustment - 1];
         if (dLen + adjustment > 19) // has more digits than decimal digits in 64-bit
             error += kUlp / 2;
@@ -206,7 +206,7 @@ inline bool StrtodDiyFp(const char* decimals, int dLen, int dExp, double* result
 }
 
 inline double StrtodBigInteger(double approx, const char* decimals, int dLen, int dExp) {
-    RAPIDJSON_ASSERT(dLen >= 0);
+    LLBC_RAPIDJSON_ASSERT(dLen >= 0);
     const BigInteger dInt(decimals, static_cast<unsigned>(dLen));
     Double a(approx);
     int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
@@ -224,25 +224,25 @@ inline double StrtodBigInteger(double approx, const char* decimals, int dLen, in
 }
 
 inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
-    RAPIDJSON_ASSERT(d >= 0.0);
-    RAPIDJSON_ASSERT(length >= 1);
+    LLBC_RAPIDJSON_ASSERT(d >= 0.0);
+    LLBC_RAPIDJSON_ASSERT(length >= 1);
 
     double result = 0.0;
     if (StrtodFast(d, p, &result))
         return result;
 
-    RAPIDJSON_ASSERT(length <= INT_MAX);
+    LLBC_RAPIDJSON_ASSERT(length <= INT_MAX);
     int dLen = static_cast<int>(length);
 
-    RAPIDJSON_ASSERT(length >= decimalPosition);
-    RAPIDJSON_ASSERT(length - decimalPosition <= INT_MAX);
+    LLBC_RAPIDJSON_ASSERT(length >= decimalPosition);
+    LLBC_RAPIDJSON_ASSERT(length - decimalPosition <= INT_MAX);
     int dExpAdjust = static_cast<int>(length - decimalPosition);
 
-    RAPIDJSON_ASSERT(exp >= INT_MIN + dExpAdjust);
+    LLBC_RAPIDJSON_ASSERT(exp >= INT_MIN + dExpAdjust);
     int dExp = exp - dExpAdjust;
 
     // Make sure length+dExp does not overflow
-    RAPIDJSON_ASSERT(dExp <= INT_MAX - dLen);
+    LLBC_RAPIDJSON_ASSERT(dExp <= INT_MAX - dLen);
 
     // Trim leading zeros
     while (dLen > 0 && *decimals == '0') {
@@ -285,6 +285,6 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
 }
 
 } // namespace internal
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_STRTOD_
+#endif // LLBC_RAPIDJSON_STRTOD_

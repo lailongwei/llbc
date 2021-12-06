@@ -12,53 +12,53 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_ERROR_ERROR_H_
-#define RAPIDJSON_ERROR_ERROR_H_
+#ifndef LLBC_RAPIDJSON_ERROR_ERROR_H_
+#define LLBC_RAPIDJSON_ERROR_ERROR_H_
 
 #include "llbc/core/rapidjson/rapidjson.h"
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(padded)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 /*! \file error.h */
 
-/*! \defgroup RAPIDJSON_ERRORS RapidJSON error handling */
+/*! \defgroup LLBC_RAPIDJSON_ERRORS RapidJSON error handling */
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_ERROR_CHARTYPE
+// LLBC_RAPIDJSON_ERROR_CHARTYPE
 
 //! Character type of error messages.
-/*! \ingroup RAPIDJSON_ERRORS
+/*! \ingroup LLBC_RAPIDJSON_ERRORS
     The default character type is \c char.
     On Windows, user can define this macro as \c TCHAR for supporting both
     unicode/non-unicode settings.
 */
-#ifndef RAPIDJSON_ERROR_CHARTYPE
-#define RAPIDJSON_ERROR_CHARTYPE char
+#ifndef LLBC_RAPIDJSON_ERROR_CHARTYPE
+#define LLBC_RAPIDJSON_ERROR_CHARTYPE char
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_ERROR_STRING
+// LLBC_RAPIDJSON_ERROR_STRING
 
-//! Macro for converting string literial to \ref RAPIDJSON_ERROR_CHARTYPE[].
-/*! \ingroup RAPIDJSON_ERRORS
+//! Macro for converting string literial to \ref LLBC_RAPIDJSON_ERROR_CHARTYPE[].
+/*! \ingroup LLBC_RAPIDJSON_ERRORS
     By default this conversion macro does nothing.
     On Windows, user can define this macro as \c _T(x) for supporting both
     unicode/non-unicode settings.
 */
-#ifndef RAPIDJSON_ERROR_STRING
-#define RAPIDJSON_ERROR_STRING(x) x
+#ifndef LLBC_RAPIDJSON_ERROR_STRING
+#define LLBC_RAPIDJSON_ERROR_STRING(x) x
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // ParseErrorCode
 
 //! Error code of parsing.
-/*! \ingroup RAPIDJSON_ERRORS
+/*! \ingroup LLBC_RAPIDJSON_ERRORS
     \see GenericReader::Parse, GenericReader::GetParseErrorCode
 */
 enum ParseErrorCode {
@@ -91,7 +91,7 @@ enum ParseErrorCode {
 
 //! Result of parsing (wraps ParseErrorCode)
 /*!
-    \ingroup RAPIDJSON_ERRORS
+    \ingroup LLBC_RAPIDJSON_ERRORS
     \code
         Document doc;
         ParseResult ok = doc.Parse("[42]");
@@ -141,21 +141,21 @@ private:
 };
 
 //! Function pointer type of GetParseError().
-/*! \ingroup RAPIDJSON_ERRORS
+/*! \ingroup LLBC_RAPIDJSON_ERRORS
 
     This is the prototype for \c GetParseError_X(), where \c X is a locale.
     User can dynamically change locale in runtime, e.g.:
 \code
     GetParseErrorFunc GetParseError = GetParseError_En; // or whatever
-    const RAPIDJSON_ERROR_CHARTYPE* s = GetParseError(document.GetParseErrorCode());
+    const LLBC_RAPIDJSON_ERROR_CHARTYPE* s = GetParseError(document.GetParseErrorCode());
 \endcode
 */
-typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
+typedef const LLBC_RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #ifdef __clang__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_ERROR_ERROR_H_
+#endif // LLBC_RAPIDJSON_ERROR_ERROR_H_

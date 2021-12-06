@@ -12,24 +12,24 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_STRINGBUFFER_H_
-#define RAPIDJSON_STRINGBUFFER_H_
+#ifndef LLBC_RAPIDJSON_STRINGBUFFER_H_
+#define LLBC_RAPIDJSON_STRINGBUFFER_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include "llbc/core/rapidjson/internal/stack.h"
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#if LLBC_RAPIDJSON_HAS_CXX11_RVALUE_REFS
 #include <utility> // std::move
 #endif
 
 #include "llbc/core/rapidjson/internal/stack.h"
 
 #if defined(__clang__)
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(c++98-compat)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory output stream.
 /*!
@@ -44,7 +44,7 @@ public:
 
     GenericStringBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#if LLBC_RAPIDJSON_HAS_CXX11_RVALUE_REFS
     GenericStringBuffer(GenericStringBuffer&& rhs) : stack_(std::move(rhs.stack_)) {}
     GenericStringBuffer& operator=(GenericStringBuffer&& rhs) {
         if (&rhs != this)
@@ -112,10 +112,10 @@ inline void PutN(GenericStringBuffer<UTF8<> >& stream, char c, size_t n) {
     std::memset(stream.stack_.Push<char>(n), c, n * sizeof(c));
 }
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #if defined(__clang__)
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_STRINGBUFFER_H_
+#endif // LLBC_RAPIDJSON_STRINGBUFFER_H_

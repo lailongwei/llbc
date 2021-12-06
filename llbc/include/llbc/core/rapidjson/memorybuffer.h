@@ -12,13 +12,13 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_MEMORYBUFFER_H_
-#define RAPIDJSON_MEMORYBUFFER_H_
+#ifndef LLBC_RAPIDJSON_MEMORYBUFFER_H_
+#define LLBC_RAPIDJSON_MEMORYBUFFER_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include "llbc/core/rapidjson/internal/stack.h"
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory output byte stream.
 /*!
@@ -65,6 +65,6 @@ inline void PutN(MemoryBuffer& memoryBuffer, char c, size_t n) {
     std::memset(memoryBuffer.stack_.Push<char>(n), c, n * sizeof(c));
 }
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_MEMORYBUFFER_H_
+#endif // LLBC_RAPIDJSON_MEMORYBUFFER_H_
