@@ -58,7 +58,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     rootLogger->InstallHook(LLBC_LogLevel::Debug, LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
-    LLBC_DEUG_LOG("This is a debug log message.");
+    LLBC_DEBUG_LOG("This is a debug log message.");
     LLBC_DEBUG_LOG2("test_tag", "This is a debug log message.");
 
     LLog.d("This is a debug log message(from LLog.d())");
