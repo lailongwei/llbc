@@ -31,126 +31,78 @@
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrlenA(LPCSTR lpString)
-#else
-int lstrlenA(const char *lpString)
-#endif
+size_t LLBC_StrLenW(const wchar_t *s)
 {
-    #if LLBC_TARGET_PLATFORM_NON_IPHONE
-    return ::strlen(lpString);
-    #else // iPhone
-    return static_cast<int>(::strlen(lpString));
-    #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
-}
-
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrlenW(LPCWSTR lpString)
-#else
-int lstrlenW(const wchar_t *lpString)
-#endif
-{
-    if (UNLIKELY(!lpString))
+    if (UNLIKELY(!s))
         return 0;
 
-    int i = 0;
-    for (; lpString[i] != LLBC_WTEXT('\0'); ++i);
+    size_t i = 0;
+    for (; s[i] != L'\0'; ++i);
     return i;
 }
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2)
-#else
-char *lstrcatA(char *lpString1, const char *lpString2)
-#endif
+wchar_t *LLBC_StrCatW(wchar_t *s1, const wchar_t *s2)
 {
-    return ::strcat(lpString1, lpString2);
+    if (UNLIKELY(!s2))
+        return s1;
+
+    size_t s1Len = LLBC_StrLenW(s1);
+    size_t s2Len = LLBC_StrLenW(s2);
+    memcpy(s1 + s1Len, s2, sizeof(wchar_t) * s2Len);
+
+    return s1;
 }
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2)
-#else
-wchar_t *lstrcatW(wchar_t *lpString1, const wchar_t *lpString2)
-#endif
+int LLBC_StrCmpW(const wchar_t *s1, const wchar_t *s2)
 {
-    if (UNLIKELY(!lpString2))
-        return lpString1;
-
-    int str1Len = ::lstrlenW(lpString1);
-    int str2Len = ::lstrlenW(lpString2);
-    memcpy(lpString1 + str1Len, lpString2, str2Len * sizeof(LLBC_NS wchar));
-
-    return lpString1;
-}
-
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2)
-#else
-int lstrcmpA(const char *lpString1, const char *lpString2)
-#endif
-{
-    return ::strcmp(lpString1, lpString2);
-}
-
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
-#else
-int lstrcmpW(const wchar_t *lpString1, const wchar_t *lpString2)
-#endif
-{
-    int str1Len = ::lstrlenW(lpString1);
-    int str2Len = ::lstrlenW(lpString2);
-    int len = MIN(str1Len, str2Len);
-    for (int i = 0; i < len; ++i)
+    while (*s1)
     {
-        if (lpString1[i] < lpString2[i])
-            return -1;
-        else if (lpString1[i] == lpString2[i])
-            return 1;
+        if (*s1 != *s2)
+            break;
+
+        s1++;
+        s2++;
     }
 
-    return (str1Len < str2Len ? -1 : 
-        (str1Len == str2Len ? 0 : 1));
+    return *s1 - *s2;
 }
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2)
-#else
-int lstrcmpiA(const char *lpString1, const char *lpString2)
-#endif
+int LLBC_StrCmpiW(const wchar_t *s1, const wchar_t *s2)
 {
-    return ::lstrcmpA(lpString1,lpString2);
+    while (*s1)
+    {
+        if (*s1 != *s2)
+        {
+            if (*s1 >= static_cast<wchar_t>('A') &&
+                *s1 <= static_cast<wchar_t>('Z'))
+            {
+                if (*s2 - *s1 == 'a' - 'A')
+                    continue;
+            }
+            else if (*s1 >= static_cast<wchar_t>('a') &&
+                     *s1 <= static_cast<wchar_t>('z'))
+            {
+                if (*s1 - *s2 == 'a' - 'A')
+                    continue;
+            }
+
+            break;
+        }
+
+        s1++;
+        s2++;
+    }
+
+    return *s1 - *s2;
 }
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-int lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2)
-#else
-int lstrcmpiW(const wchar_t *lpString1, const wchar_t *lpString2)
-#endif
+wchar_t *LLBC_StrCpyW(wchar_t *s1, const wchar_t *s2)
 {
-    return ::lstrcmpW(lpString1, lpString2);
-}
+    size_t s2Len = LLBC_StrLenW(s2);
+    ::memcpy(s1, s2, sizeof(wchar_t) * s2Len);
+    s1[s2Len] = L'\0';
 
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-LPSTR lstrcpyA(LPSTR lpString1, LPCSTR lpString2)
-#else
-char *lstrcpyA(char *lpString1, const char *lpString2)
-#endif
-{
-    return strcpy(lpString1, lpString2);
-}
-
-#if LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
-LPWSTR lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2)
-#else
-wchar_t *lstrcpyW(wchar_t *lpString1, const wchar_t *lpString2)
-#endif
-{
-    int str2Len = ::lstrlenW(lpString2);
-    memcpy(lpString1, lpString2, str2Len * sizeof(LLBC_NS wchar));
-    lpString1[str2Len] = LLBC_WTEXT('\0');
-
-    return lpString1;
+    return s1;
 }
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
