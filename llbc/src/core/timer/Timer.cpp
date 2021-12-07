@@ -120,8 +120,12 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
 
     if (UNLIKELY(!_scheduler))
     {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
+        _scheduler = reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
+        if (UNLIKELY(!_scheduler))
+        {
+            LLBC_SetLastError(LLBC_ERROR_INVALID);
+            return LLBC_FAILED;
+        }
     }
 
     const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMilliSeconds());
