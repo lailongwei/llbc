@@ -26,7 +26,7 @@
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/OSHeader.h"
-#include "Config.h"
+#include "llbc/common/Config.h"
 
 __LLBC_NS_BEGIN
 
@@ -260,9 +260,6 @@ typedef GUID LLBC_GUID;
 
 typedef LLBC_GUID & LLBC_GUIDRef;
 typedef const LLBC_GUID & LLBC_GUIDCRef;
-
-// guard func function type define.
-typedef void (*LLBC_GuardFunc)(void *);
 
 // Bundle data type define.
 #if LLBC_TARGET_PLATFORM_IPHONE

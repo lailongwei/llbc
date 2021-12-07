@@ -70,7 +70,7 @@ void LLBC_STLHelper::FreeContainer(std::map<_Key, _Ty *> &m, bool clear, bool re
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::FreeContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
-    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Free, clear);
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Free, clear, reverse);
 }
 
 template <typename _Ty, std::size_t _Nm>
@@ -124,7 +124,7 @@ void LLBC_STLHelper::DeleteContainer(std::map<_Key, _Ty *> &m, bool clear, bool 
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::DeleteContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
-    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Delete, clear);
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Delete, clear, reverse);
 }
 
 template <typename _Ty, std::size_t _Nm>
@@ -172,7 +172,7 @@ void LLBC_STLHelper::DeletesContainer(std::map<_Key, _Ty *> &m, bool clear, bool
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::DeletesContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
-    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear);
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
 }
 
 template <typename _Ty, std::size_t _Nm>
@@ -220,7 +220,7 @@ void LLBC_STLHelper::RecycleContainer(std::map<_Key, _Ty *> &m, bool clear, bool
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
-    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Recycle, clear);
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Recycle, clear, reverse);
 }
 
 template <typename _Ty, std::size_t _Nm>
