@@ -34,13 +34,19 @@ __LLBC_NS_BEGIN
 LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                        const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
                        LLBC_Timer::Scheduler *scheduler)
-: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
+: _scheduler(scheduler)
 , _timerData(nullptr)
 
 , _data(nullptr)
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
+    if (!scheduler)
+    {
+        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+        if (libTls)
+            _scheduler = reinterpret_cast<Scheduler *>(libTls->coreTls.timerScheduler);
+    }
 }
 
 LLBC_Timer::~LLBC_Timer()
