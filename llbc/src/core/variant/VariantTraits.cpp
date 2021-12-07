@@ -43,7 +43,7 @@
 
 // The object type Variant equal compare macro define.
 #define __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(ty, varName)                    \
-    if (!left.Is##ty())                                                  \
+    if (!right.Is##ty())                                                 \
         return false;                                                    \
     if (lHolder.data.obj.varName) {                                      \
         if (rHolder.data.obj.varName)                                    \

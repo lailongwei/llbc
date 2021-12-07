@@ -212,6 +212,18 @@ void TestCase_Core_VariantTest::CompareTest()
     std::cout << "dbl10010 < dbl10086?: " << (dbl10010 < dbl10086) << ", dbl10010 == dbl10086?: " << (dbl10010 == dbl10086) << std::endl;
     std::cout << "dbl10086 < dbl10086?: " << (dbl10086 < dbl10086) << ", dbl10086 == dbl10086?: " << (dbl10086 == dbl10086) << std::endl;
 
+    LLBC_Variant str1_FromStringLiteral("Hello world(string literal)");
+    LLBC_Variant str1_FromStlString(std::string("Hello world(stl string)"));
+    LLBC_Variant str1_FromLLBCString(LLBC_String("Hello world(llbc string)"));
+    LLBC_Variant str2_FromStringLiteral("Hello world(string literal)");
+    std::cout << "str1_FromStringLiteral: " << str1_FromStringLiteral << std::endl;
+    std::cout << "str2_FromStringLiteral: " << str2_FromStringLiteral << std::endl;
+    std::cout << "str1_FromStlString: " << str1_FromStlString << std::endl;
+    std::cout << "str1_FromLLBCString: " << str1_FromLLBCString << std::endl;
+    std::cout << "str1_FromStringLiteral == str1_FromStlString?: " << (str1_FromStringLiteral == str1_FromStlString) << std::endl;
+    std::cout << "str1_FromStringLiteral == str2_FromStringLiteral?: " << (str1_FromStringLiteral == str2_FromStringLiteral) << std::endl;
+    std::cout << "str1_FromStringLiteral == dbl10086?: " << (str1_FromStringLiteral == dbl10086) << std::endl;
+
     LLBC_Variant seq1;
     LLBC_Variant seq2;
     LLBC_Variant seq2Clone;
