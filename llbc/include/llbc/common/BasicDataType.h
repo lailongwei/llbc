@@ -26,7 +26,7 @@
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/OSHeader.h"
-#include "Config.h"
+#include "llbc/common/Config.h"
 
 __LLBC_NS_BEGIN
 
