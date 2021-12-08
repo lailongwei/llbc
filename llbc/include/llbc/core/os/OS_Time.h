@@ -54,6 +54,14 @@ LLBC_EXTERN bool LLBC_IsLeapYear(int year);
 LLBC_EXTERN int LLBC_GetMonthMaxDays(int year, int month);
 
 /**
+ * Get specific month span days.
+ * @param[in] year  - the year.
+ * @param[in] month - the month - [1, 12].
+ * @return int - the month span days(not included giving month).
+ */
+LLBC_EXTERN int LLBC_GetMonthSpanDays(int year, int month);
+
+/**
  * Get the current time.
  * @return sint64 - current time, in milli-seconds since midnight(0:0:0), 
  *                  January 1, 1970, coordinated universal time(UTC).

@@ -31,10 +31,10 @@ LLBC_BaseSampler::LLBC_BaseSampler()
 
 , _firstSamplingTime(0)
 , _firstSamplingValue(0)
-, _firstSamplingAppData(NULL)
+, _firstSamplingAppData(nullptr)
 
 , _lastSamplingValue(0)
-, _lastSamplingAppData(NULL)
+, _lastSamplingAppData(nullptr)
 
 , _lastUpdateTime(0)
 {
@@ -50,10 +50,10 @@ void LLBC_BaseSampler::Reset()
 
     _firstSamplingTime = 0;
     _firstSamplingValue = 0;
-    _firstSamplingAppData = NULL;
+    _firstSamplingAppData = nullptr;
 
     _lastSamplingValue = 0;
-    _lastSamplingAppData = NULL;
+    _lastSamplingAppData = nullptr;
 
     _lastUpdateTime = 0;
 }
@@ -67,7 +67,7 @@ int LLBC_BaseSampler::Sampling(sint64 value, void *appData)
 {
     if (UNLIKELY(!_beginSampling))
     {
-        _firstSamplingTime = time(NULL);
+        _firstSamplingTime = time(nullptr);
         _firstSamplingValue = value;
         _firstSamplingAppData = appData;
 

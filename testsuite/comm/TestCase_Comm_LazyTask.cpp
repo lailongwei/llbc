@@ -27,20 +27,17 @@ namespace
     class LazyClass
     {
     public:
-        void BeforeRun(LLBC_IService *svc, const LLBC_Variant *data)
+        void BeforeRun(LLBC_IService *svc, const LLBC_Variant &data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data ? data->ToString().c_str() : "Null");
-
-            LLBC_Variant *afterRunData = new LLBC_Variant(data ? *data : LLBC_Variant());
-            svc->Post(this, &LazyClass::AfterRun, afterRunData);
+            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
+            svc->Post(this, &LazyClass::AfterRun, data);
         }
 
-        void AfterRun(LLBC_IService *svc, const LLBC_Variant *data)
+        void AfterRun(LLBC_IService *svc, const LLBC_Variant &data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data ? data->ToString().c_str() : "Null");
+            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
 
-            LLBC_Variant *beforeRunTask = new LLBC_Variant(data ? *data : LLBC_Variant());
-            svc->Post(this, &LazyClass::BeforeRun, beforeRunTask);
+            svc->Post(this, &LazyClass::BeforeRun, data);
         }
     };
 }
@@ -60,11 +57,11 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "LazyTaskTest");
 
     LazyClass *taskObj = LLBC_New(LazyClass);
-    LLBC_Variant *taskData = new LLBC_Variant();
-    (*taskData)["IntVal"] = 51215;
-    (*taskData)["StrVal"] = "Hello World";
-    (*taskData)["DictData"] = LLBC_Variant();
-    (*taskData)["DictData"]["EmbeddedVal"] = 3.1415926;
+    LLBC_Variant taskData;
+    taskData["IntVal"] = 51215;
+    taskData["StrVal"] = "Hello World";
+    taskData["DictData"] = LLBC_Variant();
+    taskData["DictData"]["EmbeddedVal"] = 3.1415926;
     svc->Post(taskObj, &LazyClass::BeforeRun, taskData);
 
     svc->Start();

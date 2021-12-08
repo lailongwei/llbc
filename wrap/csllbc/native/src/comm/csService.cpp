@@ -40,7 +40,7 @@ csllbc_Service::csllbc_Service(Type type,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
-    _llbcSvc = LLBC_IService::Create(type, name, NULL, fullStack);
+    _llbcSvc = LLBC_IService::Create(type, name, nullptr, fullStack);
 
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
@@ -233,7 +233,7 @@ csllbc_Service::PacketDecodeDelegates *csllbc_Service::GetPacketDecodeDelegates(
 {
     _packetDelegatesLock.Lock();
     _PacketDecodeDelegs::iterator it = _packetDecodeDelegs.find(svcId);
-    PacketDecodeDelegates *delegs = (it != _packetDecodeDelegs.end() ? it->second : NULL);
+    PacketDecodeDelegates *delegs = (it != _packetDecodeDelegs.end() ? it->second : nullptr);
 
     _packetDelegatesLock.Unlock();
 

@@ -299,7 +299,7 @@ const uint32 LLBC_MD5::_chainingValD = 0x10325476;
 LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
 {
     long fileSize = 0;
-    char *fileContent = NULL;
+    char *fileContent = nullptr;
 
     LLBC_File fileObj;
     if (fileObj.Open(file, LLBC_FileMode::BinaryRead) != LLBC_OK)
@@ -336,10 +336,10 @@ LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
     size_t realGroupCnt = len / MD5Group::GROUP_SIZE;
     uint32 modVal = len % MD5Group::GROUP_SIZE;
 
-    unsigned char *secondaryBuf = NULL;
+    unsigned char *secondaryBuf = nullptr;
     size_t secondaryBufSize = 0;
 
-    if (buf == NULL || len == 0 || modVal == 0)
+    if (buf == nullptr || len == 0 || modVal == 0)
     {
         secondaryBufSize = MD5Group::GROUP_SIZE;
         secondaryBuf = LLBC_Malloc(unsigned char, secondaryBufSize);
@@ -365,7 +365,7 @@ LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
         secondaryBuf[modVal] = 0x80;
     }
 
-    if (buf == NULL || len == 0)
+    if (buf == nullptr || len == 0)
     {
         *reinterpret_cast<unsigned long long *>(secondaryBuf + secondaryBufSize - MD5Group::MESSAGE_LEN) = 0;
     }

@@ -24,7 +24,7 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_ICoder::LLBC_ICoder()
-: _poolInst(NULL)
+: _poolInst(nullptr)
 {
 }
 
@@ -39,7 +39,7 @@ inline void LLBC_ICoder::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 
 inline bool LLBC_ICoder::IsPoolObject() const
 {
-    return _poolInst != NULL;
+    return _poolInst != nullptr;
 }
 
 inline LLBC_IObjectPoolInst *LLBC_ICoder::GetPoolInst()

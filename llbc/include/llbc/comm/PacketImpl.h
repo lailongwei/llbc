@@ -195,7 +195,7 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opc
 LLBC_FORCE_INLINE const void *LLBC_Packet::GetPayload() const
 {
     if (!_payload)
-        return NULL;
+        return nullptr;
 
     return _payload->GetDataStartWithReadPos();
 }
@@ -219,7 +219,7 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
 LLBC_FORCE_INLINE LLBC_MessageBlock * LLBC_Packet::DetachPayload()
 {
     LLBC_MessageBlock *payload = _payload;
-    _payload = NULL;
+    _payload = nullptr;
 
     return payload;
 }
@@ -245,7 +245,7 @@ LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
 
 LLBC_FORCE_INLINE bool LLBC_Packet::IsPoolObject() const
 {
-    return _selfPoolInst != NULL;
+    return _selfPoolInst != nullptr;
 }
 
 LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
@@ -464,7 +464,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 template <typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Read(_Ty &val)
 {
-    if (_payload == NULL)
+    if (_payload == nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
@@ -669,19 +669,13 @@ LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
 
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
-    typedef LLBC_Func1<void, void *> __PreHandleResultFuncDeleg;
-
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New(__PreHandleResultFuncDeleg, clearFunc);
-    SetPreHandleResult(result, clearDeleg);
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(clearFunc));
 }
 
 template <typename ObjType>
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
-    typedef LLBC_Delegate1<void, ObjType, void *> __PreHandleResultMethDeleg;
-
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New(__PreHandleResultMethDeleg, obj, clearMethod);
-    SetPreHandleResult(result, clearDeleg);
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(obj, clearMethod));
 }
 
 template <typename _RawTy>

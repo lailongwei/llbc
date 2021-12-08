@@ -1064,7 +1064,7 @@ void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
     for (typename _BinaryContainer::const_iterator it = binaryCont.begin();
          it != endIt;
          ++it)
-        dict->emplace(it->first, it->second);
+        dict->emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
 }
 
 template <typename _Key, typename _Val, typename _BinaryContainer>
@@ -1072,22 +1072,22 @@ void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont)
 {
     DictConstIter endIt = _holder.data.obj.dict->end();
     for (DictConstIter it = _holder.data.obj.dict->begin(); it != endIt; ++it)
-        binaryCont.emplace(it->first, it->second);
+        binaryCont.emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
 }
 
 inline bool LLBC_Variant::IsStrX() const
 {
-    return IsStr() && _holder.data.obj.str != NULL;
+    return IsStr() && _holder.data.obj.str != nullptr;
 }
 
 inline bool LLBC_Variant::IsSeqX() const
 {
-    return IsSeq() && _holder.data.obj.seq != NULL;
+    return IsSeq() && _holder.data.obj.seq != nullptr;
 }
 
 inline bool LLBC_Variant::IsDictX() const
 {
-    return IsDict() && _holder.data.obj.dict != NULL;
+    return IsDict() && _holder.data.obj.dict != nullptr;
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeStrX()

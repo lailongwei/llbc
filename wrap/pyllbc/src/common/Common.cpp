@@ -49,7 +49,7 @@ void pyllbc_AddCommonObjs()
     /* Add exception type. */
     LLBC_String excName;
     excName.format("%s.error", PYLLBC_MOD_NAME);
-    pyllbc_Exception = PyErr_NewException(const_cast<char *>(excName.c_str()), NULL, NULL);
+    pyllbc_Exception = PyErr_NewException(const_cast<char *>(excName.c_str()), nullptr, nullptr);
 
     Py_INCREF(pyllbc_Exception);
     top->AddObject("error", pyllbc_Exception);

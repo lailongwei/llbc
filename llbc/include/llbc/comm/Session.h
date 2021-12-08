@@ -226,7 +226,7 @@ public:
      * @param[in] ol - overlapped structure(WIN32 specified).
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    void OnSend(LLBC_POverlapped ol = NULL);
+    void OnSend(LLBC_POverlapped ol = nullptr);
 #else
     void OnSend();
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -236,7 +236,7 @@ public:
      * @param[in] ol - overlapped structure(WIN3 specified).
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    void OnRecv(LLBC_POverlapped ol = NULL);
+    void OnRecv(LLBC_POverlapped ol = nullptr);
 #else
     void OnRecv();
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -244,12 +244,12 @@ public:
     /**
      * Close event handler method, call by poller or socket.
      * @param[in] ol        - overlapped structure(WIN32 specified).
-     * @param[in] closeInfo - session close info, default is NULL, method will auto create close info.
+     * @param[in] closeInfo - session close info, default is nullptr, method will auto create close info.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    void OnClose(LLBC_POverlapped ol = NULL, LLBC_SessionCloseInfo *closeInfo = NULL);
+    void OnClose(LLBC_POverlapped ol = nullptr, LLBC_SessionCloseInfo *closeInfo = nullptr);
 #else
-    void OnClose(LLBC_SessionCloseInfo *info = NULL);
+    void OnClose(LLBC_SessionCloseInfo *info = nullptr);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 public:

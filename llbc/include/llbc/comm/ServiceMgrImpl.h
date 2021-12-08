@@ -36,13 +36,13 @@ inline const LLBC_ServiceMgr::Name2Services &LLBC_ServiceMgr::GetAllIndexedByNam
 inline LLBC_IService *LLBC_ServiceMgr::GetServiceNonLock(int id)
 {
     Id2Services::iterator it = _id2Services.find(id);
-    return it != _id2Services.end() ? it->second : NULL;
+    return it != _id2Services.end() ? it->second : nullptr;
 }
 
 inline LLBC_IService *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_String &name)
 {
     Name2Services::iterator it = _name2Services.find(name);
-    return it != _name2Services.end() ? it->second : NULL;
+    return it != _name2Services.end() ? it->second : nullptr;
 }
 
 __LLBC_NS_END

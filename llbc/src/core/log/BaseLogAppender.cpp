@@ -31,8 +31,8 @@ __LLBC_NS_BEGIN
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 : _level(LLBC_LogLevel::End)
 
-, _chain(NULL)
-, _next(NULL)
+, _chain(nullptr)
+, _next(nullptr)
 {
 }
 

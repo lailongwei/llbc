@@ -47,12 +47,12 @@ const char * const LLBC_Property::EscapeChars = ".=#";
 
 LLBC_Property::LLBC_Property(const This &another)
 {
-    _parent = NULL;
+    _parent = nullptr;
 
     if (another._value)
         _value = LLBC_New(LLBC_Variant, *another._value);
     else
-        _value = NULL;
+        _value = nullptr;
 
     if (another._properties)
     {
@@ -64,7 +64,7 @@ LLBC_Property::LLBC_Property(const This &another)
     }
     else
     {
-        _properties = NULL;
+        _properties = nullptr;
     }
 
     _comments = another._comments;
@@ -74,8 +74,8 @@ LLBC_Property::LLBC_Property(const This &another)
 LLBC_Property::LLBC_Property(LLBC_Property *parent)
 : _parent(parent)
 
-, _value(NULL)
-, _properties(NULL)
+, _value(nullptr)
+, _properties(nullptr)
 
 , _comments()
 
@@ -99,15 +99,15 @@ int LLBC_Property::LoadFromFile(const LLBC_String &file)
 
 int LLBC_Property::LoadFromContent(const LLBC_String &content)
 {
-    // Backup all data members & set to NULL.
+    // Backup all data members & set to nullptr.
     This *backParent = _parent;
     LLBC_Variant *backValue = _value;
     This::Properties *backProperties = _properties;
     LLBC_String backComments = _comments;
 
-    _parent = NULL;
-    _value = NULL;
-    _properties = NULL;
+    _parent = nullptr;
+    _value = nullptr;
+    _properties = nullptr;
     _comments.clear();
 
     // Clear error message.
@@ -295,12 +295,12 @@ const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
     if (!_properties)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
     else if (!CheckName(name))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return NULL;
+        return nullptr;
     }
 
     const LLBC_Strings names = name.split(This::NameSeparator, 1);
@@ -310,7 +310,7 @@ const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
     if (it == _properties->end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return (names.size() == 1 ? 
@@ -414,7 +414,7 @@ int LLBC_Property::SetComments(const LLBC_String &name, const LLBC_String &comme
 
 This &LLBC_Property::operator =(const This &another)
 {
-    _parent = NULL;
+    _parent = nullptr;
 
     Cleanup();
     if (another._value)

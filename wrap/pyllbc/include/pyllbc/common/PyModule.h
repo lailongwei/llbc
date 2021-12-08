@@ -35,7 +35,7 @@ public:
      * @param[in] name   - the module name.
      * @param[in] parent - the parent module, default is null.
      */
-    pyllbc_Module(const LLBC_String &name, This *parent = NULL);
+    pyllbc_Module(const LLBC_String &name, This *parent = nullptr);
 
     /**
      * Destructor.
@@ -60,7 +60,7 @@ public:
     /**
      * Get module object.
      * @param[in] name - the object name(object/string).
-     * @return PyObject * - the module object, return NULL if fail(borrowed reference).
+     * @return PyObject * - the module object, return nullptr if fail(borrowed reference).
      */
     PyObject *GetObject(PyObject *name);
     PyObject *GetObject(const LLBC_String &name);

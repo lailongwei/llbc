@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
 
 LLBC_IocpPoller::LLBC_IocpPoller()
 : _iocp(LLBC_INVALID_IOCP_HANDLE)
-, _monitor(NULL)
+, _monitor(nullptr)
 {
 }
 
@@ -250,10 +250,7 @@ void LLBC_IocpPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_IocpPoller::StartupMonitor()
 {
-    typedef LLBC_Delegate0<void, LLBC_IocpPoller> __MonitorDeleg;
-
-    LLBC_IDelegate0<void> *deleg = 
-        LLBC_New(__MonitorDeleg, this, &LLBC_IocpPoller::MonitorSvc);
+    const LLBC_Delegate<void()> deleg(this, &LLBC_IocpPoller::MonitorSvc);
     _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
@@ -307,13 +304,13 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int err
 
     if (waitRet == LLBC_OK)
     {
-        sock->SetOption(SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
+        sock->SetOption(SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, nullptr, 0);
         SetConnectedSocketOpts(sock, asyncInfo.sessionOpts);
 
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
             asyncInfo.sessionId, true, LLBC_StrError(LLBC_ERROR_SUCCESS), asyncInfo.peerAddr));
 
-        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL), false);
+        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, nullptr), false);
     }
     else
     {

@@ -38,7 +38,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectManipulator::Delete(void *obj)
 template <typename ObjectType>
 LLBC_FORCE_INLINE bool LLBC_ObjectManipulator::Reset(void *obj)
 {
-    return ResetObj<ObjectType>(reinterpret_cast<ObjectType *>(obj), NULL);
+    return ResetObj<ObjectType>(reinterpret_cast<ObjectType *>(obj), nullptr);
 }
 
 template <typename ObjectType>

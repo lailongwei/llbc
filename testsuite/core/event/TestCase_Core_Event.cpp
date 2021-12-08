@@ -82,24 +82,24 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Event::OnEvent1(LLBC_Event *ev)
+void TestCase_Core_Event::OnEvent1(LLBC_Event &ev)
 {
     std::cout <<"OnEvent1() called! event int key indexed params:" <<std::endl;
-    const std::map<int, LLBC_Variant> &intKeyParams = ev->GetIntKeyParams();
+    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
     for (std::map<int, LLBC_Variant>::const_iterator it = intKeyParams.begin();
          it != intKeyParams.end();
          it++)
         std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
 
     std::cout <<"string key indexed params: " <<std::endl;
-    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev->GetStrKeyParams();
+    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
     for (std::map<LLBC_String, LLBC_Variant>::const_iterator it = strKeyParams.begin();
          it != strKeyParams.end();
          it++)
         std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
 }
 
-void TestCase_Core_Event::OnEvent1Too(LLBC_Event *ev)
+void TestCase_Core_Event::OnEvent1Too(LLBC_Event &ev)
 {
     std::cout <<"OnEvent1Too()called! add Event2 event listener OnEvent2()" <<std::endl;
 
@@ -107,7 +107,7 @@ void TestCase_Core_Event::OnEvent1Too(LLBC_Event *ev)
     evMgr.AddListener(EventIds::Event2, this, &TestCase_Core_Event::OnEvent2);
 }
 
-void TestCase_Core_Event::OnEvent2(LLBC_Event *ev)
+void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
 {
     std::cout <<"OnEvent2() called! remove Event1 event listener OnEvent1Too() and remove self listener" <<std::endl;
 

@@ -284,7 +284,7 @@ LLBC_Overlapped::LLBC_Overlapped()
 : opcode(LLBC_OverlappedOpcode::End)
 , sock(LLBC_INVALID_SOCKET_HANDLE)
 , acceptSock(LLBC_INVALID_SOCKET_HANDLE)
-, data(NULL)
+, data(nullptr)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
     ::memset(this, 0, sizeof(OVERLAPPED));
@@ -295,7 +295,7 @@ LLBC_OverlappedGroup::LLBC_OverlappedGroup()
 : _sock(LLBC_INVALID_SOCKET_HANDLE)
 , _ols()
 
-, _delDataProc(NULL)
+, _delDataProc(nullptr)
 {
 }
 
@@ -367,7 +367,7 @@ void LLBC_OverlappedGroup::ClearOverlappedMembers(LLBC_POverlapped ol)
     if (ol->data && _delDataProc)
     {
         (*_delDataProc)(ol->data);
-        ol->data = NULL;
+        ol->data = nullptr;
     }
 }
 

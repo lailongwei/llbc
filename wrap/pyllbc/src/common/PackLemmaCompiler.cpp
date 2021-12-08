@@ -123,7 +123,7 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
     if (UNLIKELY(expr.empty()))
     {
         pyllbc_SetError("could not compile empty pack format characters");
-        return NULL;
+        return nullptr;
     }
 
     if (LIKELY(!force))
@@ -150,13 +150,13 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
         if (CompileChar(ch, nextCh, compileEnv) != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
-            return NULL;
+            return nullptr;
         }
 
         if (ReduceStack() != LLBC_OK)
         {
             LLBC_STLHelper::DeleteContainer(_compilingStack);
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -165,7 +165,7 @@ pyllbc_PackLemma *pyllbc_PackLemmaCompiler::Compile(const LLBC_String &expr, boo
         LLBC_STLHelper::DeleteContainer(_compilingStack);
         pyllbc_SetError("pack string format error, maybe missing close character') ] > }'");
 
-        return NULL;
+        return nullptr;
     }
 
     pyllbc_PackLemma *lemma = _compilingStack.top();

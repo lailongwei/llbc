@@ -25,7 +25,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewRandom(PyObject *self, PyObject *args)
 {
     int seed;
     if (!PyArg_ParseTuple(args, "i", &seed))
-        return NULL;
+        return nullptr;
 
     return PyLong_FromLong(reinterpret_cast<long>(LLBC_New(LLBC_Random, seed)));
 }
@@ -34,7 +34,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelRandom(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
     if (!PyArg_ParseTuple(args, "l", &random))
-        return NULL;
+        return nullptr;
 
     LLBC_Delete(random);
 
@@ -46,7 +46,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SeedRand(PyObject *self, PyObject *args)
     int seed;
     LLBC_Random *random;
     if (!PyArg_ParseTuple(args, "li", &random, &seed))
-        return NULL;
+        return nullptr;
 
     random->Seed(seed);
 
@@ -56,10 +56,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_SeedRand(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_RandInt(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
-    PyObject *beginObj = NULL;
-    PyObject *endObj = NULL;
+    PyObject *beginObj = nullptr;
+    PyObject *endObj = nullptr;
     if (!PyArg_ParseTuple(args, "l|OO", &random, &beginObj, &endObj))
-        return NULL;
+        return nullptr;
 
     const bool isObj1None = !beginObj || PyObject_IsInstance(beginObj, PYLLBC_NONE_CLS);
     const bool isObj1Int = beginObj && PyObject_IsInstance(beginObj, PYLLBC_INT_CLS);
@@ -75,7 +75,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RandInt(PyObject *self, PyObject *args)
         (!isObj2None && !isObj2Int && !isObj2Long && !isObj2Float))
     {
         pyllbc_SetError("rand arg type error", PYLLBC_ERROR_COMMON, PyExc_TypeError);
-        return NULL;
+        return nullptr;
     }
 
     if (isObj1None)
@@ -115,7 +115,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RandReal(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
     if (!PyArg_ParseTuple(args, "l", &random))
-        return NULL;
+        return nullptr;
 
     return PyFloat_FromDouble(random->RandReal());
 }
@@ -124,7 +124,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_BoolJudge(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
     if (!PyArg_ParseTuple(args, "l", &random))
-        return NULL;
+        return nullptr;
 
     PyObject *judgeResult = random->BoolJudge() ? Py_True : Py_False;
     Py_INCREF(judgeResult);

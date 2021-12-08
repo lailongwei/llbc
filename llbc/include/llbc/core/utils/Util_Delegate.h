@@ -19,269 +19,260 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_UTILS_UTIL_DELEGATE_IMPL_H__
+#ifndef __LLBC_CORE_UTILS_UTIL_DELEGATE_H__
+#define __LLBC_CORE_UTILS_UTIL_DELEGATE_H__
 
-#define LLBC_DELEGATE_CAT(x, y)   LLBC_DELEGATE_CAT_I(x, y)
-#define LLBC_DELEGATE_CAT_I(x, y) x ## y
+#include "llbc/common/Common.h"
 
-#define LLBC_IDELEGATE     LLBC_DELEGATE_CAT(LLBC_IDelegate, LLBC_DELEGATE_N)
-#define LLBC_DELEGATE      LLBC_DELEGATE_CAT(LLBC_Delegate,  LLBC_DELEGATE_N)
-#define LLBC_FUNC_DELEGATE LLBC_DELEGATE_CAT(LLBC_Func, LLBC_DELEGATE_N)
-
-#if LLBC_DELEGATE_N == 0 // ----------------------- LLBC_Delegate0
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType>
-#define LLBC_DELEGATE_ARG           void
-#define LLBC_DELEGATE_VALUE 
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void>
-
-#elif LLBC_DELEGATE_N == 1 // ---------------------- LLBC_Delegate1
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1>
-#define LLBC_DELEGATE_ARG           Arg1 arg1
-#define LLBC_DELEGATE_VALUE         arg1
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1>
-
-#elif LLBC_DELEGATE_N == 2 // ---------------------- LLBC_Delegate2
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2
-#define LLBC_DELEGATE_VALUE         arg1, arg2
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2>
-
-#elif LLBC_DELEGATE_N == 3 // ---------------------- LLBC_Delegate3
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2, typename Arg3>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2, Arg3>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2, typename Arg3>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2, Arg3 arg3
-#define LLBC_DELEGATE_VALUE         arg1, arg2, arg3
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2, typename Arg3>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2, Arg3>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2, Arg3>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2, typename Arg3>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2, Arg3>
-
-#elif LLBC_DELEGATE_N == 4 // ---------------------- LLBC_Delegate4
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2, Arg3, Arg4>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4
-#define LLBC_DELEGATE_VALUE         arg1, arg2, arg3, arg4
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2, Arg3, Arg4>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2, Arg3, Arg4>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2, Arg3, Arg4>
-
-#elif LLBC_DELEGATE_N == 5 // ---------------------- LLBC_Delegate5
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2, Arg3, Arg4, Arg5>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5
-#define LLBC_DELEGATE_VALUE         arg1, arg2, arg3, arg4, arg5
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2, Arg3, Arg4, Arg5>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5>
-
-#elif LLBC_DELEGATE_N == 6 // ---------------------- LLBC_Delegate6
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6
-#define LLBC_DELEGATE_VALUE         arg1, arg2, arg3, arg4, arg5, arg6
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
-
-#elif LLBC_DELEGATE_N == 7 // ---------------------- LLBC_Delegate7
-#define LLBC_IDELEGATE_TEMPLATE     template <typename Rtn, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-#define LLBC_DELEGATE_BASE          LLBC_IDELEGATE<Rtn, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>
-#define LLBC_DELEGATE_TEMPLATE      template <typename Rtn, typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-#define LLBC_DELEGATE_ARG           Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7
-#define LLBC_DELEGATE_VALUE         arg1, arg2, arg3, arg4, arg5, arg6, arg7
-#define LLBC_DELEGATE_RTN           Rtn
-#define LLBC_FUNC_DELEGATE_TEMPLATE LLBC_IDELEGATE_TEMPLATE
-
-#define LLBC_DELEGATE_TEMPLATE_SPEC template <typename ObjectType, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-#define LLBC_DELEGATE_BASE_SPEC     LLBC_IDELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>
-#define LLBC_DELEGATE_SPEC          LLBC_DELEGATE<void, ObjectType, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>
-#define LLBC_FUNC_DELEGATE_TEMPLATE_SPEC template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-#define LLBC_FUNC_DELEGATE_BASE_SPEC LLBC_DELEGATE_BASE_SPEC
-#define LLBC_FUNC_DELEGATE_SPEC     LLBC_FUNC_DELEGATE<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>
-
-#endif
+__LLBC_NS_BEGIN
 
 /**
- * \brief Interface for delegate.
+ * @brief The Delegate define(undefined).
+ * 
  */
-LLBC_IDELEGATE_TEMPLATE
-class LLBC_IDELEGATE
-{
-public:
-    virtual ~LLBC_IDELEGATE() {  }
-
-public:
-    virtual Rtn Invoke(LLBC_DELEGATE_ARG) = 0;
-};
+template <typename Rtn, typename ...Args>
+struct LLBC_Delegate;
 
 /**
- * \brief Delegate class encapsulation.
- *        Storage object and it's method.
+ * @brief The Delegate encapsulation(template specification).
+ * 
  */
-LLBC_DELEGATE_TEMPLATE
-class LLBC_DELEGATE : public LLBC_DELEGATE_BASE
+template <typename Rtn, typename ...Args>
+struct LLBC_Delegate<Rtn(Args...)>
 {
 public:
-    typedef Rtn (ObjectType::*Method)(LLBC_DELEGATE_ARG);
+    /**
+     * @brief The c-style function pointer type define. 
+     * 
+     */
+    typedef Rtn(*CFunc)(Args...);
+
+    /**
+     * @brief The stl function object type define.
+     */
+    typedef std::function<Rtn(Args...)> StlFunc;
 
 public:
-    LLBC_DELEGATE(ObjectType *object, Method method, bool destroyObjectWhenDestruct = false):
-        _object(object), _method(method), _destroyObjectWhenDestruct(destroyObjectWhenDestruct) {  }
+    /**
+     * @brief Construct a new invalidate Delegate object.
+     * 
+     * @param[in] _ - unused parameter. 
+     */
+    LLBC_Delegate(nullptr_t _ = nullptr);
 
-    ~LLBC_DELEGATE() { if (_destroyObjectWhenDestruct) LLBC_XDelete(_object); }
+    /**
+     * @brief Construct delegate object by c-style function pointer.
+     * 
+     * @param[in] cfunc - the c-style function pointer.
+     */
+    LLBC_Delegate(CFunc cfunc);
+
+    /**
+     * @brief Construct a new Delegate object by stl function object.
+     */
+    LLBC_Delegate(const StlFunc &stlFunc);
+
+    /**
+     * @brief Construct a delegate object by object pointer and object method pointer.
+     * 
+     * @param[in] obj  - the object pointer.
+     * @param[in] meth - the object method pointer.
+     */
+    template <typename Obj>
+    LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...));
+
+    /**
+     * @brief Construct a delegate object by const object pointer and const object method pointer.
+     * 
+     * @param[in] obj  - the const object pointer.
+     * @param[in] meth - the const object method pointer.
+     */
+    template <typename Obj>
+    LLBC_Delegate(const Obj *, Rtn(Obj::*meth)(Args...) const);
+
+    /**
+     * @brief Construct a delegate object by function object other then c-style function/stl function/class method, eg: lambda.
+     *
+     * @param func - the function object.
+     */
+    template <typename Func>
+    LLBC_Delegate(const Func &func);
+
+    /**
+     * @brief Construct delegate object by another delegate object.
+     *
+     * @param[in] another - the another delegate object.
+     */
+    LLBC_Delegate(const LLBC_Delegate &another);
+
+    /**
+     * @brief Destructor.
+     */
+    ~LLBC_Delegate();
 
 public:
-    Rtn Invoke(LLBC_DELEGATE_ARG) { return (_object->*_method)(LLBC_DELEGATE_VALUE); }
+    /**
+     * @brief Check delegate object validate or not.
+     * 
+     * @return bool - return true if validate, otherwise return false.
+     */
+    explicit operator bool() const;
+
+    /**
+     * The invoke operator.
+     *
+     * @param[in] args - the call args.
+     * @return Rtn - the return value.
+     */
+    Rtn operator()(Args... args) const;
+
+public:
+    /**
+     * @brief Assignemnt by nullptr(make delegate invalidate).
+     * 
+     * @param[in] _ - unused parameter.
+     * @return LLBC_Delegate & - the delegate object.
+     */
+    LLBC_Delegate &operator=(nullptr_t _);
+
+    /**
+     * @brief Assignment by c-style function pointer.
+     * 
+     * @param[in] cfunc - the c-style function pointer.
+     * @return LLBC_Delegate & - the delegate object.
+     */
+    LLBC_Delegate &operator=(CFunc cfunc);
+
+    /**
+     * @brief Assignment by stl function object.
+     *
+     * @return LLBC_Delegate & - the delegate object.
+     */
+    LLBC_Delegate &operator=(const StlFunc &stlFunc);
+
+
+    /**
+     * @brief Assignment by function object other then c-style function/stl function/class method, eg: lambda.
+     *
+     * @param func - the function object.
+     *
+     *@return LLBC_Delegate & - the delegate object.
+     */
+    template <typename Func>
+    LLBC_Delegate &operator=(const Func &func);
+
+    /**
+     * @brief Assignment by another delegate object.
+     *
+     * @return LLBC_Delegate & - the delegate object.
+     */
+    LLBC_Delegate &operator=(const LLBC_Delegate &another);
 
 private:
-    ObjectType *_object;
-    Method _method;
-    bool _destroyObjectWhenDestruct;
-};
-
-/**
- * \brief Return type partial specialized(to void) class encapsulation.
- *        Storage object and it's method.
- */
-LLBC_DELEGATE_TEMPLATE_SPEC
-class LLBC_DELEGATE_SPEC : public LLBC_DELEGATE_BASE_SPEC
-{
-public:
-    typedef void (ObjectType::*Method)(LLBC_DELEGATE_ARG);
-
-public:
-    LLBC_DELEGATE(ObjectType *object, Method method, bool destroyObjectWhenDestruct = false):
-        _object(object), _method(method), _destroyObjectWhenDestruct(destroyObjectWhenDestruct) {  }
-
-    ~LLBC_DELEGATE() { if (_destroyObjectWhenDestruct) LLBC_XDelete(_object); }
-
-public:
-    void Invoke(LLBC_DELEGATE_ARG) { (_object->*_method)(LLBC_DELEGATE_VALUE); }
+    /**
+     * @brief Reset delegate object.
+     */
+    void Reset();
 
 private:
-    ObjectType *_object;
-    Method _method;
-    bool _destroyObjectWhenDestruct;
+    /**
+     * @brief The method holder interface class define.
+     */
+    struct _IClsMethHolder
+    {
+        virtual Rtn Invoke(Args... args) const = 0;
+    };
+
+    /**
+     * @brief The method holder class define.
+     */
+    template <typename Obj>
+    struct _ClsMethHolder : public _IClsMethHolder
+    {
+    public:
+        bool cmeth;
+        union
+        {
+            struct
+            {
+                Obj *obj;
+                Rtn(Obj::*meth)(Args...);
+            } meth;
+
+            struct
+            {
+                const Obj *obj;
+                Rtn(Obj:: *meth)(Args...) const;
+            } cmeth;
+        } meth;
+
+        _ClsMethHolder(Obj *obj, Rtn(Obj::*meth)(Args...))
+        : cmeth(false)
+        , meth{}
+        {
+            this->meth.meth.obj = obj;
+            this->meth.meth.meth = meth;
+        }
+
+        _ClsMethHolder(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+        : cmeth(true)
+        , meth{}
+        {
+            this->meth.cmeth.obj = obj;
+            this->meth.cmeth.meth = meth;
+        }
+
+        virtual Rtn Invoke(Args... args) const
+        {
+            return cmeth ?
+                (meth.cmeth.obj->*meth.cmeth.meth)(std::forward<Args>(args)...) :
+                    (meth.meth.obj->*meth.meth.meth)(std::forward<Args>(args)...);
+        }
+    };
+
+    /**
+     * @brief The delegate holded function union define.
+     */
+    union _Func
+    {
+        CFunc cfunc;
+        char stlFunc[sizeof(std::function<Rtn(Args...)>)];
+        char methHolder[sizeof(void *) * 5 /* sizeof(vptr) + sizeof(bool)(aligement to 8) + sizeof(union meth) : default aligement */];
+
+        _Func()
+        {
+            ::memset(this, 0, sizeof(_Func));
+        }
+
+        _Func(CFunc cfunc)
+        : cfunc(cfunc)
+        {
+        }
+
+        _Func(const std::function<Rtn(Args...)> &stlFunc)
+        {
+            new (stlFunc) StlFunc(stlFunc);
+        }
+
+        template <typename Obj>
+        _Func(Obj *obj, Rtn(Obj::*meth)(Args...))
+        {
+            new (methHolder) _ClsMethHolder<Obj>(obj, meth);
+        }
+
+        template <typename Obj>
+        _Func(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
+        {
+            new (methHolder) _ClsMethHolder<Obj>(obj, meth);
+        }
+    };
+
+    int _funcType; // function type, 0: nullptr, 1: c-style function, 2: stl-style function, 3: class method.
+    _Func _func; // function union object.
 };
 
-/**
- * \brief Function specific delegate class encapsulation.
- *        Storage function.
- */
-LLBC_FUNC_DELEGATE_TEMPLATE
-class LLBC_FUNC_DELEGATE : public LLBC_DELEGATE_BASE
-{
-public:
-    typedef Rtn (*Function)(LLBC_DELEGATE_ARG);
+__LLBC_NS_END
 
-public:
-    explicit LLBC_FUNC_DELEGATE(Function function):
-        _function(function) {  }
+#include "llbc/core/utils/Util_DelegateImpl.h"
 
-    ~LLBC_FUNC_DELEGATE() {  }
-
-public:
-    Rtn Invoke(LLBC_DELEGATE_ARG) { return (*_function)(LLBC_DELEGATE_VALUE); }
-
-private:
-    Function _function;
-};
-
-/**
- * \brief Return type partial specialized(to void) function delegate class encapsulation.
- *        Storage function.
- */
-LLBC_FUNC_DELEGATE_TEMPLATE_SPEC
-class LLBC_FUNC_DELEGATE_SPEC : public LLBC_FUNC_DELEGATE_BASE_SPEC
-{
-    typedef void (*Function)(LLBC_DELEGATE_ARG);
-public:
-    explicit LLBC_FUNC_DELEGATE(Function function):
-        _function(function) {  }
-
-    ~LLBC_FUNC_DELEGATE() {  }
-
-public:
-    void Invoke(LLBC_DELEGATE_ARG) { (*_function)(LLBC_DELEGATE_VALUE); }
-
-private:
-    Function _function;
-};
-
-#undef LLBC_DELEGATE_CAT
-#undef LLBC_DELEGATE_CAT_I
-#undef LLBC_IDELEGATE
-#undef LLBC_DELEGATE
-#undef LLBC_IDELEGATE_TEMPLATE
-#undef LLBC_DELEGATE_BASE
-#undef LLBC_DELEGATE_TEMPLATE
-#undef LLBC_DELEGATE_ARG
-#undef LLBC_DELEGATE_VALUE
-#undef LLBC_DELEGATE_RTN
-#undef LLBC_FUNC_DELEGATE
-#undef LLBC_FUNC_DELEGATE_TEMPLATE
-#undef LLBC_DELEGATE_TEMPLATE_SPEC
-#undef LLBC_DELEGATE_BASE_SPEC
-#undef LLBC_DELEGATE_SPEC
-#undef LLBC_FUNC_DELEGATE_TEMPLATE_SPEC
-#undef LLBC_FUNC_DELEGATE_BASE_SPEC
-#undef LLBC_FUNC_DELEGATE_SPEC
-
-#endif // __LLBC_CORE_UTILS_UTIL_DELEGATE_IMPL_H__
+#endif // !__LLBC_CORE_UTILS_UTIL_DELEGATE_H__

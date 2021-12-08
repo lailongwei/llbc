@@ -44,14 +44,14 @@ LLBC_EXTERN LLBC_HIDDEN PyObject *pyllbc_Exception;
  * Fetch python layer error informations.
  * @param[out] errType   - the error class type, borrowed reference.
  * @param[out] errStr    - error string.
- * @param[out] traceback - the error traceback, borrowed reference, maybe NULL.
+ * @param[out] traceback - the error traceback, borrowed reference, maybe nullptr.
  */
 LLBC_EXTERN LLBC_HIDDEN void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback);
 
 /**
  * Transfer llbc library error to python.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = NULL, int lineNo = 0, const LLBC_String &additionalMsg = "");
+LLBC_EXTERN LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = nullptr, int lineNo = 0, const LLBC_String &additionalMsg = "");
 
 /**
  * Transfer python error to llbc.
@@ -73,7 +73,7 @@ LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetError(int errNo);
  */
 LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetError(const LLBC_String &errDesc, 
                                              int llbcErr = PYLLBC_ERROR_COMMON,
-                                             PyObject *pyErrType = NULL);
+                                             PyObject *pyErrType = nullptr);
 
 /**
  * Clear llbc library error and python error.
@@ -89,12 +89,12 @@ LLBC_EXTERN LLBC_HIDDEN void pyllbc_ClearError();
  *                     PyObject *          - exception class.
  *                     PyObject *          - traceback object.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrSetHock(LLBC_IDelegate4<void, const LLBC_String &, int, PyObject *, PyObject *> *hook);
+LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrSetHock(const LLBC_Delegate<void(const LLBC_String &, int, PyObject *, PyObject *)> &hook);
 
 /**
  * Error clear hook setter.
  * @param[in] hook - the error clear hook.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrClearHook(LLBC_IDelegate0<void> *hook);
+LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrClearHook(const LLBC_Delegate<void()> &hook);
 
 #endif // !__PYLLBC_COM_ERROR_H__

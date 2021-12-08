@@ -24,7 +24,7 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/variant/Variant.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_Delegate.h"
 
 __LLBC_NS_BEGIN
 
@@ -183,7 +183,7 @@ public:
      * Clone event.
      * Note:
      *      - the clone event don't delete after handle flag always false.
-     *      - the clone event extend data always NULL.
+     *      - the clone event extend data always nullptr.
      * @return LLBC_Event * - the clone event.
      */
     LLBC_Event *Clone() const;
@@ -200,7 +200,7 @@ public:
      * @param[in] extData    - the extend data.
      * @param[in] clearDeleg - the extend data clear delegate.
      */
-    void SetExtData(void *extData, const std::function<void(void *)> &clearDeleg = nullptr);
+    void SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg = nullptr);
 
     /**
      * Clear extend data.
@@ -237,7 +237,27 @@ protected:
     _StrKeyParams *_strKeyParams;
 
     void *_extData;
-    std::function<void(void *)> _extDataClearDeleg;
+    LLBC_Delegate<void(void *)> _extDataClearDeleg;
+};
+
+/**
+ * \brief The event deleg class encapsulation.
+ */
+class LLBC_EXPORT LLBC_EventListener
+{
+public:
+    /**
+     * Ctor & Detor.
+     */
+    LLBC_EventListener() = default;
+    virtual ~LLBC_EventListener() = default;
+
+public:
+    /**
+     * Listener invoke method.
+     * @param[in] ev - the event object.
+     */
+    virtual void Invoke(LLBC_Event &ev) = 0;
 };
 
 __LLBC_NS_END

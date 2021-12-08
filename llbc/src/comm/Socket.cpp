@@ -55,7 +55,7 @@ char LLBC_Socket::_acceptExBuf[(sizeof(LLBC_SockAddr_IN) + 16) * 2] = {0};
 LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 : _handle(handle)
 
-, _session(NULL)
+, _session(nullptr)
 , _pollerType(_PollerType::End)
 
 , _listenSocket(false)
@@ -73,7 +73,7 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
-, _msgBlockPoolInst(NULL)
+, _msgBlockPoolInst(nullptr)
 #endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 {
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
@@ -318,7 +318,7 @@ LLBC_Socket *LLBC_Socket::Accept()
 {
     LLBC_SocketHandle newHandle = LLBC_AcceptClient(_handle, &_peerAddr);
     if (newHandle == LLBC_INVALID_SOCKET_HANDLE)
-        return NULL;
+        return nullptr;
 
     LLBC_Socket *newSocket = LLBC_New(LLBC_Socket, newHandle);
     newSocket->_pollerType = _pollerType;
@@ -360,9 +360,9 @@ int LLBC_Socket::ConnectEx(const LLBC_SockAddr_IN &addr, LLBC_POverlapped ol)
 {
     return LLBC_ConnectToPeerEx(_handle,    // in
                                 addr,       // in
-                                NULL,       // in_opt
+                                nullptr,       // in_opt
                                 0,          // in
-                                NULL,       // out(if send buffer is null, ignored) 
+                                nullptr,       // out(if send buffer is null, ignored) 
                                 ol);        // out
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -423,8 +423,8 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
             sendingSize = 0;
 
             ::memset(ol, 0, sizeof(OVERLAPPED));
-            ol->data = NULL;
-            buf.buf = NULL;
+            ol->data = nullptr;
+            buf.buf = nullptr;
             buf.len = 0;
 
             // Failed and error is WSAENOBUFS, rebuff the mergedBlock, wait next time to send.
@@ -595,8 +595,8 @@ void LLBC_Socket::OnSend()
             sendingSize = 0;
 
             ::memset(ol, 0, sizeof(OVERLAPPED));
-            ol->data = NULL;
-            buf.buf = NULL;
+            ol->data = nullptr;
+            buf.buf = nullptr;
             buf.len = 0;
 
             _willSend.Append(block);
@@ -726,7 +726,7 @@ void LLBC_Socket::OnRecv()
             #if LLBC_TARGET_PLATFORM_NON_WIN32
             _session->OnClose(LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
             #else
-            _session->OnClose(NULL, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+            _session->OnClose(nullptr, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
             #endif
             return;
         }
@@ -742,7 +742,7 @@ void LLBC_Socket::OnRecv()
         #else
         LLBC_SessionCloseInfo *closeInfo =
             LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, WSAECONNRESET);
-        _session->OnClose(NULL, closeInfo);
+        _session->OnClose(nullptr, closeInfo);
         #endif
         return;
     }
@@ -764,7 +764,7 @@ void LLBC_Socket::OnClose()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
     #if LLBC_TARGET_PLATFORM_WIN32
-    if (ol != NULL)
+    if (ol != nullptr)
         DeleteOverlapped(ol);
     #endif
 

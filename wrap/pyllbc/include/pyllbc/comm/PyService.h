@@ -193,7 +193,7 @@ public:
      * Register comp from library.
      * @param[in] compName - the comp name.
      * @param[in] libPath  - the library path.
-     * @param[in] compCls  - the python layer comp class, can be NULL.
+     * @param[in] compCls  - the python layer comp class, can be nullptr.
      * @param[out] comp    - the created comp(new reference).
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -237,6 +237,13 @@ public:
     int AsyncConn(const char *ip, uint16 port);
 
     /**
+     * Check given sessionId is validate or not.
+     * @param[in] sessionId - the given session Id.
+     * @return bool - return true is given session Id validate, otherwise return false.
+     */
+    bool IsSessionValidate(int sessionId);
+
+    /**
      * Remove session.
      * Note:
      *      In llbc core library, RemoveSession() method return int value 
@@ -246,7 +253,7 @@ public:
      * @param[in] reason    - the remove reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveSession(int sessionId, const char *reason = NULL);
+    int RemoveSession(int sessionId, const char *reason = nullptr);
 
 public:
     /**
@@ -400,13 +407,13 @@ private:
      * The additional event constructor.
      * @param[in] ev - the event object.
      */
-    static void AddiEventCtor(LLBC_Event *ev);
+    static void EventEnqueueHandler(LLBC_Event *ev);
 
     /**
      * The custom event destructor.
      * @param;[in] - the event object.
      */
-    static void CustomEventDtor(LLBC_Event *ev);
+    static void EventDequeueHandler(LLBC_Event *ev);
 
 private:
     /**
@@ -441,8 +448,8 @@ private:
     bool _suppressedCoderNotFoundWarning;
 
     static PyObject *_pyEvCls;
-    static LLBC_Func1<void, LLBC_Event *> _addiEvCtor;
-    static LLBC_Func1<void, LLBC_Event *> _customEvDtor;
+    static LLBC_Delegate<void(LLBC_Event *)> _evEnqueueHandler;
+    static LLBC_Delegate<void(LLBC_Event *)> _evDequeueHandler;
 
     _FrameCallables _beforeFrameCallables;
     _FrameCallables _afterFrameCallables;

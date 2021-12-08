@@ -25,9 +25,9 @@
 
 csllbc_Coder::csllbc_Coder()
 : _packetId(0)
-, _encodeDeleg(NULL)
+, _encodeDeleg(nullptr)
 
-, _decodeDelegs(NULL)
+, _decodeDelegs(nullptr)
 {
 }
 
@@ -87,7 +87,7 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
                                                     static_cast<int>(packet.GetPayloadLength()),
                                                     packet.GetStatus(),
                                                     &errMsgLen);
-    if (decodeRet == NULL)
+    if (decodeRet == nullptr)
         return true;
 
     packet.SetCodecError(LLBC_String(reinterpret_cast<char *>(decodeRet), errMsgLen));

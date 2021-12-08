@@ -12,19 +12,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_INTERNAL_STACK_H_
-#define RAPIDJSON_INTERNAL_STACK_H_
+#ifndef LLBC_RAPIDJSON_INTERNAL_STACK_H_
+#define LLBC_RAPIDJSON_INTERNAL_STACK_H_
 
 #include "llbc/core/rapidjson/allocators.h"
 #include "llbc/core/rapidjson/internal/swap.h"
 #include <cstddef>
 
 #if defined(__clang__)
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(c++98-compat)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ public:
     Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
     }
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#if LLBC_RAPIDJSON_HAS_CXX11_RVALUE_REFS
     Stack(Stack&& rhs)
         : allocator_(rhs.allocator_),
           ownAllocator_(rhs.ownAllocator_),
@@ -63,7 +63,7 @@ public:
         Destroy();
     }
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#if LLBC_RAPIDJSON_HAS_CXX11_RVALUE_REFS
     Stack& operator=(Stack&& rhs) {
         if (&rhs != this)
         {
@@ -87,7 +87,7 @@ public:
     }
 #endif
 
-    void Swap(Stack& rhs) RAPIDJSON_NOEXCEPT {
+    void Swap(Stack& rhs) LLBC_RAPIDJSON_NOEXCEPT {
         internal::Swap(allocator_, rhs.allocator_);
         internal::Swap(ownAllocator_, rhs.ownAllocator_);
         internal::Swap(stack_, rhs.stack_);
@@ -113,22 +113,22 @@ public:
     // Optimization note: try to minimize the size of this function for force inline.
     // Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
     template<typename T>
-    RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
+    LLBC_RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
          // Expand the stack if needed
-        if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
+        if (LLBC_RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
             Expand<T>(count);
     }
 
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+    LLBC_RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
         Reserve<T>(count);
         return PushUnsafe<T>(count);
     }
 
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
-        RAPIDJSON_ASSERT(stackTop_);
-        RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
+    LLBC_RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
+        LLBC_RAPIDJSON_ASSERT(stackTop_);
+        LLBC_RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
         return ret;
@@ -136,20 +136,20 @@ public:
 
     template<typename T>
     T* Pop(size_t count) {
-        RAPIDJSON_ASSERT(GetSize() >= count * sizeof(T));
+        LLBC_RAPIDJSON_ASSERT(GetSize() >= count * sizeof(T));
         stackTop_ -= count * sizeof(T);
         return reinterpret_cast<T*>(stackTop_);
     }
 
     template<typename T>
     T* Top() { 
-        RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
+        LLBC_RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
         return reinterpret_cast<T*>(stackTop_ - sizeof(T));
     }
 
     template<typename T>
     const T* Top() const {
-        RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
+        LLBC_RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
         return reinterpret_cast<T*>(stackTop_ - sizeof(T));
     }
 
@@ -170,7 +170,7 @@ public:
     }
 
     Allocator& GetAllocator() {
-        RAPIDJSON_ASSERT(allocator_);
+        LLBC_RAPIDJSON_ASSERT(allocator_);
         return *allocator_;
     }
 
@@ -185,7 +185,7 @@ private:
         size_t newCapacity;
         if (stack_ == 0) {
             if (!allocator_)
-                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
+                ownAllocator_ = allocator_ = LLBC_RAPIDJSON_NEW(Allocator)();
             newCapacity = initialCapacity_;
         } else {
             newCapacity = GetCapacity();
@@ -207,7 +207,7 @@ private:
 
     void Destroy() {
         Allocator::Free(stack_);
-        RAPIDJSON_DELETE(ownAllocator_); // Only delete if it is owned by the stack
+        LLBC_RAPIDJSON_DELETE(ownAllocator_); // Only delete if it is owned by the stack
     }
 
     // Prohibit copy constructor & assignment operator.
@@ -223,10 +223,10 @@ private:
 };
 
 } // namespace internal
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #if defined(__clang__)
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_STACK_H_
+#endif // LLBC_RAPIDJSON_STACK_H_

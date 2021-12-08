@@ -69,11 +69,20 @@ inline int LLBC_GetMonthMaxDays(int year, int month)
     }
 }
 
+inline int LLBC_GetMonthSpanDays(int year, int month)
+{
+    int spanDays = 0;
+    for (int m = 1; m <= month; ++m)
+        spanDays += LLBC_GetMonthMaxDays(year, m);
+
+    return spanDays;
+}
+
 inline sint64 LLBC_GetMilliSeconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct timeval timeVal;
-    gettimeofday(&timeVal, NULL);
+    gettimeofday(&timeVal, nullptr);
 
     return (sint64)timeVal.tv_sec * 1000 + timeVal.tv_usec / 1000;
 #else // LLBC_TARGET_PLATFORM_WIN32
@@ -90,7 +99,7 @@ inline sint64 LLBC_GetMicroSeconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct timeval timeVal;
-    gettimeofday(&timeVal, NULL);
+    gettimeofday(&timeVal, nullptr);
 
     return (sint64)timeVal.tv_sec * 1000000 + timeVal.tv_usec;
 #else // LLBC_TARGET_PLATFORM_WIN32

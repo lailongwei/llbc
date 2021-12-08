@@ -63,6 +63,8 @@ const sint64 LLBC_Time::NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumO
 
 const sint64 LLBC_Time::NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond; 
 
+const LLBC_Time LLBC_Time::UTCBegin;
+
 LLBC_Time LLBC_Time::Now()
 {
     return LLBC_Time(LLBC_GetMicroSeconds());
@@ -147,6 +149,7 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_year = year - 1900;
     timeStruct.tm_mon = month - 1;
     timeStruct.tm_mday = day;
+    timeStruct.tm_isdst = 0;
 
     if (year == 1970 && month == 1 && day == 1)
     {
@@ -164,7 +167,6 @@ LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int m
     timeStruct.tm_hour = hour;
     timeStruct.tm_min = minute;
     timeStruct.tm_sec = second;
-
 
     return FromTimeStruct(timeStruct, milliSecond, microSecond);
 }
@@ -330,6 +332,11 @@ bool LLBC_Time::IsLeapYear(int year)
 int LLBC_Time::GetMonthMaxDays(int year, int month)
 {
     return LLBC_GetMonthMaxDays(year, month);
+}
+
+int LLBC_Time::GetMonthSpanDays(int year, int month)
+{
+    return LLBC_GetMonthSpanDays(year, month);
 }
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const

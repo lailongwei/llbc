@@ -32,7 +32,7 @@ static int __Timer_PCallErrorHandler(lua_State *l)
     size_t errMsgLen;
     const char *errMsg = luaL_tolstring(l, 1, &errMsgLen);
 
-    luaL_traceback(l, l, NULL, 2);
+    luaL_traceback(l, l, nullptr, 2);
     size_t tbInfoLen;
     const char *tbInfo = luaL_tolstring(l, -1, &tbInfoLen);
 
@@ -48,7 +48,7 @@ static int __Timer_PCallErrorHandler(lua_State *l)
 }
 
 lullbc_Timer::lullbc_Timer(lua_State *l)
-: LLBC_Timer(reinterpret_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL), NULL, lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
+: LLBC_Timer(nullptr, nullptr, lullbc_TimerScheduler::GetLLBCTimerScheduler(l))
 , _luaState(l)
 , _callableInfo(0)
 {

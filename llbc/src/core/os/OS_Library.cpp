@@ -100,7 +100,7 @@ LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
     if (libName.empty())
         libName = LLBC_Directory::ModuleFileName();
 
-    if ((handle = ::LoadLibraryExA(libName.c_str(), NULL, 0)) == LLBC_INVALID_LIBRARY_HANDLE)
+    if ((handle = ::LoadLibraryExA(libName.c_str(), nullptr, 0)) == LLBC_INVALID_LIBRARY_HANDLE)
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
 
     return handle;
@@ -114,16 +114,16 @@ LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const char *procN
     dlerror();
 
     void *proc = dlsym(handle, procName);
-    if (dlerror() != NULL)
+    if (dlerror() != nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return NULL;
+        return nullptr;
     }
 
     if (!proc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return (LLBC_LibraryFun)proc;

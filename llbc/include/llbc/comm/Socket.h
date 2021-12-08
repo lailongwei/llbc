@@ -250,7 +250,7 @@ public:
 
     /**
      * Permits a incoming connection attempt on the socket.
-     * @return LLBC_Socket * - the new socket, if error occurred, return NULL.
+     * @return LLBC_Socket * - the new socket, if error occurred, return nullptr.
      */
     LLBC_Socket *Accept();
 
@@ -421,7 +421,7 @@ public:
      * @param[in] ol - overlapped, available in WIN32 platform and IOCP poller model.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    void OnClose(LLBC_POverlapped ol = NULL);
+    void OnClose(LLBC_POverlapped ol = nullptr);
 #else
     void OnClose();
 #endif // LLBC_TARGET_PLATFORM_WIN32

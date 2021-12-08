@@ -582,6 +582,12 @@ class pyllbcService(object):
         """
         return llbc.inl.AsyncConn(self._c_obj, ip, port)
 
+    def issessionvalidate(self, session_id):
+        """
+        Check given session validate or not.
+        """
+        return llbc.inl.IsSessionValidate(self._c_obj, session_id)
+
     def removesession(self, session_id, reason='', strict=False):
         """
         Remove session

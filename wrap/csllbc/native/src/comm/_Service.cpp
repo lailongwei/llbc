@@ -43,7 +43,7 @@ csllbc_Service *csllbc_Service_Create(int svcType,
         svcType != static_cast<int>(LLBC_IService::Normal))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     return LLBC_New(csllbc_Service,
@@ -138,7 +138,7 @@ int csllbc_Service_RemoveSession(csllbc_Service *svc, int sessionId, const char 
     char *nativeReason;
     if (reasonLength == 0)
     {
-        nativeReason = NULL;
+        nativeReason = nullptr;
     }
     else
     {

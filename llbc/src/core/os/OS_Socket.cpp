@@ -33,9 +33,9 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 #if LLBC_TARGET_PLATFORM_WIN32
-static LPFN_ACCEPTEX __g_AcceptExProc = NULL;
-static LPFN_CONNECTEX __g_ConnectExProc = NULL;
-static LPFN_GETACCEPTEXSOCKADDRS __g_GetAcceptExSockAddrs = NULL;
+static LPFN_ACCEPTEX __g_AcceptExProc = nullptr;
+static LPFN_CONNECTEX __g_ConnectExProc = nullptr;
+static LPFN_GETACCEPTEXSOCKADDRS __g_GetAcceptExSockAddrs = nullptr;
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 __LLBC_INTERNAL_NS_END
@@ -87,8 +87,8 @@ int LLBC_StartupNetLibrary()
                             &(LLBC_INTERNAL_NS __g_AcceptExProc),
                             sizeof(LPFN_ACCEPTEX),
                             &bytesReturn,
-                            NULL,
-                            NULL);
+                            nullptr,
+                            nullptr);
     if (ctlRet != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
@@ -107,8 +107,8 @@ int LLBC_StartupNetLibrary()
                         &(LLBC_INTERNAL_NS __g_ConnectExProc),
                         sizeof(LPFN_CONNECTEX),
                         &bytesReturn,
-                        NULL,
-                        NULL);
+                        nullptr,
+                        nullptr);
     if (ctlRet != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
@@ -127,8 +127,8 @@ int LLBC_StartupNetLibrary()
                         &(LLBC_INTERNAL_NS __g_GetAcceptExSockAddrs),
                         sizeof(LPFN_GETACCEPTEXSOCKADDRS),
                         &bytesReturn,
-                        NULL,
-                        NULL);
+                        nullptr,
+                        nullptr);
     if (ctlRet != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
@@ -150,9 +150,9 @@ int LLBC_CleanupNetLibrary()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_OK;
 #else
-    LLBC_INTERNAL_NS __g_AcceptExProc = NULL;
-    LLBC_INTERNAL_NS __g_ConnectExProc = NULL;
-    LLBC_INTERNAL_NS __g_GetAcceptExSockAddrs = NULL;
+    LLBC_INTERNAL_NS __g_AcceptExProc = nullptr;
+    LLBC_INTERNAL_NS __g_ConnectExProc = nullptr;
+    LLBC_INTERNAL_NS __g_GetAcceptExSockAddrs = nullptr;
 
     if (::WSACleanup() == SOCKET_ERROR)
     {
@@ -190,7 +190,7 @@ LLBC_SocketHandle LLBC_CreateTcpSocketEx()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_CreateTcpSocket();
 #else // LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_SocketHandle handle = ::WSASocketA(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+    LLBC_SocketHandle handle = ::WSASocketA(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
     if (handle == LLBC_INVALID_SOCKET_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_NETAPI);
@@ -343,7 +343,7 @@ int LLBC_SendEx(LLBC_SocketHandle handle,
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
-    int ret = ::WSASend(handle, buffers, bufferCount, numOfBytesSent, flags, ol, NULL);
+    int ret = ::WSASend(handle, buffers, bufferCount, numOfBytesSent, flags, ol, nullptr);
     if (ret == SOCKET_ERROR)
     {
         int netLastError = ::WSAGetLastError();
@@ -429,7 +429,7 @@ int LLBC_RecvEx(LLBC_SocketHandle handle,
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else // LLBC_TARGET_PLATFORM_WIN32
-    int ret = ::WSARecv(handle, buffers, bufferCount, numOfBytesRecvd, flags, ol, NULL);
+    int ret = ::WSARecv(handle, buffers, bufferCount, numOfBytesRecvd, flags, ol, nullptr);
     if (ret == SOCKET_ERROR)
     {
         int netLastError = ::WSAGetLastError();
@@ -826,8 +826,8 @@ int LLBC_GetAcceptExSocketAddrs(const void *outBuf,
         return LLBC_FAILED;
     }
 
-    struct sockaddr *sysLocalAddr = NULL;
-    struct sockaddr *sysRemoteAddr = NULL;
+    struct sockaddr *sysLocalAddr = nullptr;
+    struct sockaddr *sysRemoteAddr = nullptr;
     LLBC_SocketLen localSockAddrLen = sizeof(struct sockaddr);
     LLBC_SocketLen remoteSockAddrLen = sizeof(struct sockaddr);
 

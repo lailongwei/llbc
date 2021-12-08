@@ -67,6 +67,18 @@ void LLBC_STLHelper::FreeContainer(std::map<_Key, _Ty *> &m, bool clear, bool re
     LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Free, clear, reverse);
 }
 
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::FreeContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Free, clear, reverse);
+}
+
+template <typename _Ty, std::size_t _Nm>
+void LLBC_STLHelper::FreeContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(arr, LLBC_STLContainerOpcode::Free, clear, reverse);
+}
+
 template <typename _Ty>
 void LLBC_STLHelper::DeleteContainer(std::vector<_Ty *> &vec, bool clear, bool reverse)
 {
@@ -109,6 +121,18 @@ void LLBC_STLHelper::DeleteContainer(std::map<_Key, _Ty *> &m, bool clear, bool 
     LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Delete, clear, reverse);
 }
 
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::DeleteContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Delete, clear, reverse);
+}
+
+template <typename _Ty, std::size_t _Nm>
+void LLBC_STLHelper::DeleteContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(arr, LLBC_STLContainerOpcode::Delete, clear, reverse);
+}
+
 template <typename _Ty>
 void LLBC_STLHelper::DeletesContainer(std::vector<_Ty *> &vec, bool clear, bool reverse)
 {
@@ -145,6 +169,18 @@ void LLBC_STLHelper::DeletesContainer(std::map<_Key, _Ty *> &m, bool clear, bool
     LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
 }
 
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::DeletesContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
+}
+
+template <typename _Ty, std::size_t _Nm>
+void LLBC_STLHelper::DeletesContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(arr, LLBC_STLContainerOpcode::Deletes, clear, reverse);
+}
+
 template <typename _Ty>
 void LLBC_STLHelper::RecycleContainer(std::vector<_Ty *> &vec, bool clear, bool reverse)
 {
@@ -178,7 +214,19 @@ void LLBC_STLHelper::RecycleContainer(std::set<_Key *> &s, bool clear, bool reve
 template <typename _Key, typename _Ty>
 void LLBC_STLHelper::RecycleContainer(std::map<_Key, _Ty *> &m, bool clear, bool reverse)
 {
-    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Deletes, clear, reverse);
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(m, LLBC_STLContainerOpcode::Recycle, clear, reverse);
+}
+
+template <typename _Ty, std::size_t _Nm>
+void LLBC_STLHelper::RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse)
+{
+    LLBC_STLHelper::OperateContainer(arr, LLBC_STLContainerOpcode::Recycle, clear, reverse);
 }
 
 template <typename _Ty>
@@ -305,6 +353,41 @@ void LLBC_STLHelper::OperateContainer(std::map<_Key, _Ty *> &m, int opcode, bool
 
     if (LIKELY(clear))
         m.clear();
+}
+
+template <typename _Key, typename _Ty>
+void LLBC_STLHelper::OperateContainer(std::unordered_map<_Key, _Ty *> &m, int opcode, bool clear, bool reverse)
+{
+    if (m.empty())
+        return;
+
+    typedef typename std::unordered_map<_Key, _Ty *>::iterator MapIter;
+
+    for (MapIter iter = m.begin(); iter != m.end(); ++iter)
+        LLBC_STLHelper::OperateElem(iter->second, opcode);
+
+    if (LIKELY(clear))
+        m.clear();
+}
+
+template <typename _Ty, std::size_t _Nm>
+void LLBC_STLHelper::OperateContainer(std::array<_Ty *, _Nm> &arr, int opcode, bool clear, bool reverse)
+{
+    if (arr.empty())
+        return;
+
+    typedef typename std::array<_Ty *, _Nm>::size_type SizeType;
+
+    const SizeType arrSize = arr.size();
+    if (!reverse)
+        for (SizeType i = 0; i < arrSize; ++i)
+            LLBC_STLHelper::OperateElem(arr[i], opcode);
+    else
+        for (SizeType i = arrSize - 1; i != SizeType(-1); --i)
+            LLBC_STLHelper::OperateElem(arr[i], opcode);
+
+    if (LIKELY(clear))
+        arr.fill(nullptr);
 }
 
 template <typename _Ty>

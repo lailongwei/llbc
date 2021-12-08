@@ -896,6 +896,9 @@ LLBC_Variant &LLBC_Variant::operator =(const Dict &dict)
 
 LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var)
 {
+    if (this == &var)
+        return *this;
+
     _holder.Clear();
     _holder = var._holder;
 

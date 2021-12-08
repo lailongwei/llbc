@@ -191,7 +191,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_TlsFree(LLBC_TlsHandle handle);
 /**
  * Get specific local storage handle's value.
  * @param[in] handle - thread local storage handle.
- * @return void * - if return NULL and LLBC_GetLastError() != 0, 
+ * @return void * - if return nullptr and LLBC_GetLastError() != 0, 
  *                  it success, otherwise means error occurred.
  */
 LLBC_EXTERN LLBC_EXPORT void *LLBC_TlsGetValue(LLBC_TlsHandle handle);

@@ -91,11 +91,11 @@ void TestCase_Core_Thread_Guard::TestGuardVariableArgument()
 {
     std::cout << "Guard Method test:" << std::endl;
     { 
-        LLBC_InvokeGuardSpec guard(&GuardFuncArg3, (void *)0x01, 1, 2);
+        LLBC_InvokeGuard guard(&GuardFuncArg3, (void *)0x01, 1, 2);
     }
 
     GuardCls obj;
     { 
-        LLBC_InvokeGuardSpec guard(&GuardCls::GuardFuncArg3, &obj, (void *) 0x02, 3, 4);
+        LLBC_InvokeGuard guard(&obj, &GuardCls::GuardFuncArg3, (void *) 0x02, 3, 4);
     }
 }

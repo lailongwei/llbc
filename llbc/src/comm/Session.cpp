@@ -86,14 +86,14 @@ LLBC_Session::LLBC_Session(const LLBC_SessionOpts &sessionOpts)
 
 , _sessionOpts(sessionOpts)
 
-, _socket(NULL)
+, _socket(nullptr)
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 
 , _fullStack(false)
-, _svc(NULL)
-, _poller(NULL)
+, _svc(nullptr)
+, _poller(nullptr)
 
-, _protoStack(NULL)
+, _protoStack(nullptr)
 
 , _pollerType(LLBC_PollerType::End)
 {
@@ -157,7 +157,7 @@ int LLBC_Session::Send(LLBC_Packet *packet)
     if (UNLIKELY(sendRet != LLBC_OK))
         return removeSession ? LLBC_FAILED : LLBC_OK;
 
-    if (block == NULL)
+    if (block == nullptr)
         return LLBC_OK;
 
     return Send(block);
@@ -218,7 +218,7 @@ void LLBC_Session::OnClose(LLBC_POverlapped ol, LLBC_SessionCloseInfo *closeInfo
 void LLBC_Session::OnClose(LLBC_SessionCloseInfo *closeInfo)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
-    if (closeInfo == NULL)
+    if (closeInfo == nullptr)
         closeInfo = LLBC_New(LLBC_SessionCloseInfo);
 
     // Notify socket session closed.

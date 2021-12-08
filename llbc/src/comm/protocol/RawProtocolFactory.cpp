@@ -37,7 +37,7 @@ LLBC_IProtocol *LLBC_RawProtocolFactory::Create(int layer) const
         return LLBC_New(LLBC_RawProtocol);
 
     default:
-        return NULL;
+        return nullptr;
     }
 }
 

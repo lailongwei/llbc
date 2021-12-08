@@ -74,16 +74,16 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 , _keyInlIdleTime(Py_BuildValue("s", "_idletime"))
 , _keyCObj(Py_BuildValue("s", "_cobj"))
 
-, _pyPacketCls(NULL)
+, _pyPacketCls(nullptr)
 #if PYLLBC_CFG_PACKET_REUSE
-, _pyReusePacket(NULL)
-, _pyPacketReuseMeth(NULL)
+, _pyReusePacket(nullptr)
+, _pyPacketReuseMeth(nullptr)
 #endif // PYLLBC_CFG_PACKET_REUSE
 , _pyNullCObj(PyInt_FromLong(0))
 , _pyPacketCreateArgs(PyTuple_New(7))
 
-, _pyStream(NULL)
-, _nativeStream(NULL)
+, _pyStream(nullptr)
+, _nativeStream(nullptr)
 
 , _holdedOnIdleEv(_EvBuilder::BuildIdleEv(_pySvc, 0))
 , _holdedOnUpdateEv(_EvBuilder::BuildUpdateEv(_pySvc))
@@ -133,8 +133,8 @@ pyllbc_Component::~pyllbc_Component()
     {
         Py_DECREF(_pyStream);
 
-        _pyStream = NULL;
-        _nativeStream = NULL;
+        _pyStream = nullptr;
+        _nativeStream = nullptr;
     }
 
     Py_DECREF(_holdedOnIdleEv);
@@ -221,12 +221,12 @@ void pyllbc_Component::OnUnHandledPacket(const LLBC_Packet &packet)
         return;
 
     PyObject *pyPacket = BuildPyPacket(packet);
-    if (UNLIKELY(pyPacket == NULL))
+    if (UNLIKELY(pyPacket == nullptr))
         return;
 
     PyObject *ev = 
         pyllbc_ComponentEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
-    Py_DecRef(pyPacket); pyPacket = NULL;
+    Py_DecRef(pyPacket); pyPacket = nullptr;
 
     CallComponentMeth(_methOnUnHandledPacket, ev, true);
 }
@@ -366,14 +366,14 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
             Py_DECREF(_pyStream);
             pyllbc_SetError("could not get llbc.Stream property 'cobj', recv data failed");
 
-            return NULL;
+            return nullptr;
         }
 
         PyArg_Parse(cobj, "l", &_nativeStream);
         Py_DECREF(cobj);
     }
 
-    PyObject *pyData = NULL;
+    PyObject *pyData = nullptr;
     if (_svcType == LLBC_IService::Raw ||
         _svc->_codec == pyllbc_Service::BinaryCodec)
     {
@@ -386,7 +386,7 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
             {
                 PyObject *decoded = _nativeStream->Read(decodeIt->second);
                 if (!decoded)
-                    return NULL;
+                    return nullptr;
 
                 pyData = decoded;
             }
@@ -397,7 +397,7 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
         const std::string j(reinterpret_cast<
             const char *>(packet.GetPayload()), packet.GetPayloadLength());
         if ((pyllbc_ObjCoder::Decode(j, pyData)) != LLBC_OK)
-            return NULL;
+            return nullptr;
     }
 
     if (!pyData)
@@ -429,7 +429,7 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
     if (UNLIKELY(!reuseRet))
     {
         pyllbc_TransferPyError();
-        return NULL;
+        return nullptr;
     }
 
     Py_DecRef(reuseRet);
@@ -445,7 +445,7 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
     if (UNLIKELY(!pyPacket))
     {
         pyllbc_TransferPyError();
-        return NULL;
+        return nullptr;
     }
 
     return pyPacket;
@@ -477,7 +477,7 @@ bool pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool decR
 
         // Get method and call.
         PyObject *pyMeth = PyObject_GetAttr(comp, meth); // New reference.
-        PyObject *pyRtn = PyObject_Call(pyMeth, _compEvCallArgs, NULL);
+        PyObject *pyRtn = PyObject_Call(pyMeth, _compEvCallArgs, nullptr);
         if (!pyRtn)
         {
             pyllbc_TransferPyError();

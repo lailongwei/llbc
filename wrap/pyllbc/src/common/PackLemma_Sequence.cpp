@@ -179,7 +179,7 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
     if (UNLIKELY(_state != Base::Done))
     {
         pyllbc_SetError("sequence-lemma state not done, could not execute unpack");
-        return NULL;
+        return nullptr;
     }
 
     int len;
@@ -187,13 +187,13 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
     if (!llbcStream.ReadSInt32(len))
     {
         pyllbc_SetError("not enough bytes to unpack sequence(head-part)");
-        return NULL;
+        return nullptr;
     }
 
     if (UNLIKELY(len < 0))
     {
         pyllbc_SetError("when unpacking sequence data, unpack len < 0");
-        return NULL;
+        return nullptr;
     }
 
     const int lemmasCount = static_cast<int>(_lemmas.size());
@@ -201,7 +201,7 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
     {
         pyllbc_SetError("when unpacking sequence data, format string len > 1, "
             "and sequence head len(from stream) not equal the format stream len");
-        return NULL;
+        return nullptr;
     }
 
     PyObject *seq;
@@ -217,7 +217,7 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
         if (!elem)
         {
             Py_DECREF(seq);
-            return NULL;
+            return nullptr;
         }
 
         if (_seqType == Base::ListBegin)

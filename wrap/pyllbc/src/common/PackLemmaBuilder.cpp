@@ -59,5 +59,5 @@ pyllbc_PackLemma *pyllbc_PackLemmaBuilder::Build(Type type, PyObject *compileEnv
         break;
     }
 
-    return NULL;
+    return nullptr;
 }

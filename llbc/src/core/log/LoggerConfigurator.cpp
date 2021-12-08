@@ -35,7 +35,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigurator::LLBC_LoggerConfigurator()
-: _rootConfig(NULL)
+: _rootConfig(nullptr)
 {
 }
 
@@ -61,7 +61,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
 
     // Create root logger config info.
     _rootConfig = LLBC_New(LLBC_LoggerConfigInfo);
-    if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, *rootCfg, NULL) != LLBC_OK)
+    if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, *rootCfg, nullptr) != LLBC_OK)
     {
         LLBC_XDelete(_rootConfig);
         return LLBC_FAILED;

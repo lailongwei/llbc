@@ -3,6 +3,7 @@
 pyllbc测试主文件
 """
 
+import sys
 from common import *
 from core import *
 from communication import *
@@ -11,7 +12,8 @@ from communication import *
 def main():
     # set dump file first.
     import llbc
-    llbc.inl.SetDumpFile('pyllbc_testsuite_dumpfile')
+    if sys.platform == 'win32':
+        llbc.inl.SetDumpFile('pyllbc_testsuite_dumpfile')
 
     # #### common part.
     LLBCInfoTest()()

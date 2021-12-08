@@ -123,7 +123,7 @@ public:
      * @param[in] crashHook - the crash hook.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetCrashHook(const std::function<void(const LLBC_String &)> &crashHook);
+    int SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook);
 
 public:
     /**
@@ -217,7 +217,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
-    std::function<void(const LLBC_String &)> _crashHook;
+    LLBC_Delegate<void(const LLBC_String &)> _crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;

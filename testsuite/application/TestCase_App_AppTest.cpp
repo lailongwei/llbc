@@ -28,7 +28,7 @@ namespace
     public:
         TestApp()
         {
-            _testSvc = NULL;
+            _testSvc = nullptr;
         }
 
     public:
@@ -96,7 +96,7 @@ namespace
         {
             LLBC_PrintLine("Test invalid pointer write");
 
-            int *invalidPtr4Write = NULL;
+            int *invalidPtr4Write = nullptr;
             *invalidPtr4Write = 3;
 
             LLBC_PrintLine("%d", *invalidPtr4Write);
@@ -106,7 +106,7 @@ namespace
         {
             LLBC_PrintLine("Test invalid pointer read");
 
-            int *invalidPtr4Write = NULL;
+            int *invalidPtr4Write = nullptr;
             LLBC_PrintLine("%d", *invalidPtr4Write);
         }
     private:

@@ -227,10 +227,10 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_ListenForConnection(LLBC_SocketHandle handle, i
 /**
  * Permits an incoming connection attempt on a socket.
  * @param[in] handle - socket handle.
- * @param[out] addr  - storage location for socket address, can set to NULL.
+ * @param[out] addr  - storage location for socket address, can set to nullptr.
  * @return LLBC_SocketHandle - socket handle, if failed, return LLBC_INVALID_SOCKET_HANDLE.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_SocketHandle LLBC_AcceptClient(LLBC_SocketHandle handle, LLBC_SockAddr_IN *addr = NULL);
+LLBC_EXTERN LLBC_EXPORT LLBC_SocketHandle LLBC_AcceptClient(LLBC_SocketHandle handle, LLBC_SockAddr_IN *addr = nullptr);
 
 /**
  * Accepts a new connection, returns the local and remote address, and receives the first block of data sent by the client application.

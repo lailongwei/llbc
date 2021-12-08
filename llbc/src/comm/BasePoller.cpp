@@ -63,8 +63,8 @@ LLBC_BasePoller::LLBC_BasePoller()
 
 , _id(-1)
 , _brotherCount(0)
-, _svc(NULL)
-, _pollerMgr(NULL)
+, _svc(nullptr)
+, _pollerMgr(nullptr)
 
 , _sockets()
 , _sessions()
@@ -79,7 +79,7 @@ LLBC_BasePoller::~LLBC_BasePoller()
 
 This *LLBC_BasePoller::Create(int type)
 {
-    This *poller = NULL;
+    This *poller = nullptr;
     switch (type)
     {
     case LLBC_PollerType::SelectPoller:
@@ -202,7 +202,7 @@ void LLBC_BasePoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
     AddSession(CreateSession(ev.un.socket,
                              ev.sessionId,
                              *ev.sessionOpts,
-                             NULL));
+                             nullptr));
 
     LLBC_XDelete(ev.sessionOpts);
 }
@@ -245,7 +245,7 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     session->OnClose(closeInfo);
 #else
-    session->OnClose(NULL, closeInfo);
+    session->OnClose(nullptr, closeInfo);
 #endif
 }
 
@@ -265,26 +265,22 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
     {
-        LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
+        LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+        ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
+
         return;
     }
-
-    // Control data deserialize.
-    LLBC_Variant ctrlData;
-    LLBC_Stream ctrlDataStream(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
-    ASSERT(ctrlDataStream.Read(ctrlData) && "llbc library internal error: deserialize protocol stack control data failed!");
 
     // Do protocol stack control.
     bool removeSession = false;
     LLBC_Session *&session = it->second;
-    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData, removeSession);
+    session->CtrlProtocolStack(ev.un.protocolStackCtrlInfo.ctrlCmd,
+                               *ev.un.protocolStackCtrlInfo.ctrlData,
+                               removeSession);
 
-    // Clear control data.
-    if (ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg)
-        ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
-
-    // Free ctrl data pointer.
-    LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
+    // Delete ctrl data.
+    LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+    ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
 
     // Remove session, if specified(Error number must be set when business logic determine remove this session).
     if (removeSession)

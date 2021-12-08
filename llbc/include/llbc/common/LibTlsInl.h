@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The Library TLS structure encapsulation.
  */
-struct __LLBC_LibTls
+struct LLBC_EXPORT __LLBC_LibTls
 {
     /* Common-Module TLS value. */
     struct  
@@ -55,6 +55,9 @@ struct __LLBC_LibTls
 
         /* need init WinSock library, only available when entryThread is true */
         bool needInitWinSock;
+
+        /* logger format buffer */
+        char loggerFmtBuf[LLBC_CFG_LOG_FORMAT_BUF_SIZE + 1];
 
         /* thread id/handle. */
         LLBC_Handle threadHandle;

@@ -29,7 +29,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS LLBC_Bundle *__g_mainBundle = NULL;
+static LLBC_NS LLBC_Bundle *__g_mainBundle = nullptr;
 
 __LLBC_INTERNAL_NS_END
 

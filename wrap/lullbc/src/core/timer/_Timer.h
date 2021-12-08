@@ -34,7 +34,7 @@ static inline lullbc_Timer *__Get_LuTimer(lua_State *l)
 {
     lullbc_Timer *timer = 
         reinterpret_cast<lullbc_Timer *>(lua_touserdata(l, 1));
-    if (UNLIKELY(timer == NULL))
+    if (UNLIKELY(timer == nullptr))
         lullbc_SetError(l, "argument error, except #1 is a c timer object");
 
     return timer;
@@ -106,8 +106,10 @@ LULLBC_LUA_METH int _lullbc_Timer_Schedule(lua_State *l)
     if (UNLIKELY(!lua_isnumber(l, -1)))
         lullbc_SetError(l, "period except number type");
 
-    uint64 dueTime = static_cast<uint64>(static_cast<double>(lua_tonumber(l, -2)) * 1000);
-    uint64 period = static_cast<uint64>(static_cast<double>(lua_tonumber(l, -1)) * 1000);
+    const LLBC_TimeSpan dueTime = LLBC_TimeSpan::FromMillis(
+        static_cast<sint64>(static_cast<double>(lua_tonumber(l, -2)) * 1000));
+    const LLBC_TimeSpan period = LLBC_TimeSpan::FromMillis(
+        static_cast<sint64>(static_cast<double>(lua_tonumber(l, -1)) * 1000));
 
     // Schedule timer
     lullbc_Timer *timer = __Get_LuTimer(l);

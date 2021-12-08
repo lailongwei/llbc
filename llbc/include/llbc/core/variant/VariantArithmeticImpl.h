@@ -78,7 +78,7 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
         break;
     }
 
-    void *finalPtr = NULL;
+    void *finalPtr = nullptr;
     ::memcpy(&finalPtr, &leftVal, sizeof(void *));
 
     return finalPtr;

@@ -54,7 +54,7 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     // Get thread arguments.
     __LLBC_ThreadMgr_Thread_Arg *threadArg = 
         reinterpret_cast<__LLBC_ThreadMgr_Thread_Arg *>(arg);
-    ASSERT(threadArg && "llbc library internal error, threadArg NULL!");
+    ASSERT(threadArg && "llbc library internal error, threadArg nullptr!");
 
     LLBC_NS LLBC_ThreadArg realArg = threadArg->realArg;
     LLBC_NS LLBC_ThreadProc realProc = threadArg->realProc;
@@ -101,12 +101,12 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     threadMgr->OnThreadTerminate(threadHandle);
 
     // Cleanup objbase tls components.
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)); tls->objbaseTls.poolStack = NULL;
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)); tls->objbaseTls.poolStack = nullptr;
 
     // Cleanup core tls components.
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler)); tls->coreTls.timerScheduler = NULL;
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool)); tls->coreTls.safetyObjectPool = NULL;
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool)); tls->coreTls.unsafetyObjectPool = NULL;
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler)); tls->coreTls.timerScheduler = nullptr;
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool)); tls->coreTls.safetyObjectPool = nullptr;
+    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool)); tls->coreTls.unsafetyObjectPool = nullptr;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
@@ -163,8 +163,8 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
                                  stackSize ? stackSize[i] : LLBC_CFG_THREAD_DFT_STACK_SIZE,
                                  task,
                                  groupHandle,
-                                 nativeHandles ? &nativeHandles[i] : NULL,
-                                 handles ? &handles[i] : NULL) == LLBC_INVALID_HANDLE)
+                                 nativeHandles ? &nativeHandles[i] : nullptr,
+                                 handles ? &handles[i] : nullptr) == LLBC_INVALID_HANDLE)
             return LLBC_FAILED;
     }
 
@@ -257,7 +257,7 @@ LLBC_BaseTask *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_ThreadManager *nonConstThis = const_cast<LLBC_ThreadManager *>(this);
@@ -267,7 +267,7 @@ LLBC_BaseTask *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
     if (!threadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -1010,8 +1010,8 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
     if (FindThreadDescriptor(threadDesc->GetHandle()))
         return;
 
-    // Force set thread next to NULL.
-    threadDesc->SetThreadNext(NULL);
+    // Force set thread next to nullptr.
+    threadDesc->SetThreadNext(nullptr);
 
     // Get thread group descriptor, if not exist, add new group descriptor
     // and add to thread group hash bucket.
@@ -1046,7 +1046,7 @@ LLBC_ThreadDescriptor *LLBC_ThreadManager::FindThreadDescriptor(LLBC_Handle hand
 {
     int threadBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_threads[threadBucketIdx])
-        return NULL;
+        return nullptr;
 
     LLBC_ThreadDescriptor *desc = _threads[threadBucketIdx];
     while (desc)
@@ -1057,7 +1057,7 @@ LLBC_ThreadDescriptor *LLBC_ThreadManager::FindThreadDescriptor(LLBC_Handle hand
         desc = desc->GetThreadNext();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
@@ -1108,7 +1108,7 @@ void LLBC_ThreadManager::AddThreadGroupDescriptor(LLBC_ThreadGroupDescriptor *gr
     if (FindThreadGroupDescriptor(groupDesc->GetGroupHandle()))
         return;
 
-    groupDesc->SetGroupNext(NULL);
+    groupDesc->SetGroupNext(nullptr);
 
     int groupBucketIdx = groupDesc->GetGroupHandle() % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_groups[groupBucketIdx])
@@ -1128,7 +1128,7 @@ LLBC_ThreadGroupDescriptor *LLBC_ThreadManager::FindThreadGroupDescriptor(LLBC_H
 {
     int groupBucketIdx = handle % LLBC_CFG_THREAD_MAX_THREAD_NUM;
     if (!_groups[groupBucketIdx])
-        return NULL;
+        return nullptr;
 
     LLBC_ThreadGroupDescriptor *desc = _groups[groupBucketIdx];
     while (desc)
@@ -1139,7 +1139,7 @@ LLBC_ThreadGroupDescriptor *LLBC_ThreadManager::FindThreadGroupDescriptor(LLBC_H
         desc = desc->GetGroupNext();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)

@@ -19,6 +19,8 @@ class EventTestComp(object):
 
     def onupdate(self, ev):
         svc = ev.svc
+        import time
+        # time.sleep(40)
         ev1 = Event(10086)
         ev1['key1'] = {'a': 3, 'b': True, 'c': {'c1': 3.5, 'c2': 'hello world'}}
         ev1['key2'] = 'the key2 value'
@@ -30,11 +32,11 @@ class EventTestComp(object):
         svc.fire_event(ev2)
 
     def _onev_10086(self, ev):
-        print(ev)
+        print('recv event:{}'.format(ev))
         print('Recv 10086 event, evid:{}, key1:{}, key2:{}'.format(ev.evid, ev['key1'], ev['key2']))
 
     def _onev_10010(self, ev):
-        print(ev)
+        print('recv event:{}'.format(ev))
         print('Recv 10010 event, evid:{}, key1{}, key2:{}'.format(ev.evid, ev['key1'], ev['key2']))
 
 

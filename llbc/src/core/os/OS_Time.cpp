@@ -41,7 +41,7 @@ void LLBC_TZSet()
  #if defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE)
     LLBC_INTERNAL_NS __g_timezone = static_cast<int>(timezone);
  #else
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     LLBC_INTERNAL_NS __g_timezone = 
         static_cast<int>(localtime(&now)->tm_gmtoff);
  #endif // defined _SVID_SOURCE || _XOPEN_SOURCE
@@ -83,7 +83,7 @@ uint64 LLBC_GetTickCount()
 #elif LLBC_TARGET_PLATFORM_IPHONE
     // Iphone Impl.
     struct timeval tv;
-    ::gettimeofday(&tv, NULL);
+    ::gettimeofday(&tv, nullptr);
     return static_cast<uint64>(tv.tv_sec) * 1000 + static_cast<uint64>(tv.tv_usec / 1000);
 #elif LLBC_TARGET_PLATFORM_WIN32
     // WIN32 Impl.

@@ -71,7 +71,7 @@ public:
      * @param[in] callerEnv - the compile environment.
      * @return pyllbc_PackLemma * - the compiled pack-lemma object.
      */
-    pyllbc_PackLemma *Compile(const LLBC_String &expr, bool force = false, PyObject *compileEnv = NULL);
+    pyllbc_PackLemma *Compile(const LLBC_String &expr, bool force = false, PyObject *compileEnv = nullptr);
 
     /**
      * Discard specific expression pack-lemma object in compiler.

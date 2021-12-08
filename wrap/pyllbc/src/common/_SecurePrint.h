@@ -23,10 +23,10 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_output(PyObject *self, PyObject *args)
 {
-    PyObject *obj = NULL;
+    PyObject *obj = nullptr;
     int outputDest = 1;
     if (!PyArg_ParseTuple(args, "|Oi", &obj, &outputDest))
-        return NULL;
+        return nullptr;
 
     if (!obj)
         Py_RETURN_NONE;
@@ -35,7 +35,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_output(PyObject *self, PyObject *args)
     if (!PyObject_IsInstance(obj, PYLLBC_STR_CLS))
     {
         if (!(strObj = PyObject_Str(obj)))
-            return NULL;
+            return nullptr;
     }
     else
     {
@@ -46,7 +46,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_output(PyObject *self, PyObject *args)
     if (!PyArg_Parse(strObj, "s", &str))
     {
         Py_DECREF(strObj);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_Print("%s", str);

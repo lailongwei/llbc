@@ -42,7 +42,7 @@ inline LLBC_Time::~LLBC_Time()
 
 inline time_t LLBC_Time::NowTimeStamp()
 {
-    return ::time(NULL);
+    return ::time(nullptr);
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
@@ -88,6 +88,11 @@ inline int LLBC_Time::GetDay() const
 inline int LLBC_Time::GetDayOfWeek() const
 {
     return _localTimeStruct.tm_wday;
+}
+
+inline int LLBC_Time::GetDayOfMonth() const
+{
+        return GetDayOfYear() - GetMonthSpanDays(GetYear(), GetMonth() - 1);
 }
 
 inline int LLBC_Time::GetDayOfYear() const

@@ -51,7 +51,7 @@ LLBC_LogFileAppender::LLBC_LogFileAppender()
 
 , _fileName()
 
-, _file(NULL)
+, _file(nullptr)
 , _fileSize(0)
 
 , _nonFlushLogCount(0)

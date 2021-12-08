@@ -36,7 +36,7 @@ char *csllbc_PInvokeUtil::BuildCSharpStr(const LLBC_String &nativeStr, int *nati
 char *csllbc_PInvokeUtil::BuildCSharpStr(const LLBC_String &nativeStr, size_t *nativeStrLen)
 {
     if (nativeStr.empty())
-        return NULL;
+        return nullptr;
 
     char *csStr = BuildCSharpStr(nativeStr.c_str(), nativeStr.length());
     if (nativeStrLen)
@@ -47,8 +47,8 @@ char *csllbc_PInvokeUtil::BuildCSharpStr(const LLBC_String &nativeStr, size_t *n
 
 char *csllbc_PInvokeUtil::BuildCSharpStr(const char *nativeStr, size_t nativeStrLen)
 {
-    if (UNLIKELY(nativeStr == NULL || nativeStrLen == 0))
-        return NULL;
+    if (UNLIKELY(nativeStr == nullptr || nativeStrLen == 0))
+        return nullptr;
 
     char *csStr = LLBC_Malloc(char, nativeStrLen);
     LLBC_MemCpy(csStr, nativeStr, nativeStrLen);

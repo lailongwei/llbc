@@ -43,7 +43,7 @@ int static __LLBC_BaseTaskEntry(void *arg)
     task->Svc();
     task->OnTaskThreadStop();
 
-    tls->coreTls.task = NULL;
+    tls->coreTls.task = nullptr;
 
     return 0;
 }
@@ -57,7 +57,7 @@ LLBC_BaseTask::LLBC_BaseTask(LLBC_ThreadManager *threadMgr)
 , _curThreadNum(0)
 , _startCompleted(false)
 , _threadManager(threadMgr ? threadMgr : LLBC_ThreadManagerSingleton)
-, _taskThreads(NULL)
+, _taskThreads(nullptr)
 {
 }
 
@@ -85,7 +85,7 @@ int LLBC_BaseTask::Activate(int threadNum,
                                       stackSize,
                                       this,
                                       groupHandle,
-                                      NULL,
+                                      nullptr,
                                       _taskThreads) == LLBC_INVALID_HANDLE)
     {
         LLBC_XFree(_taskThreads);

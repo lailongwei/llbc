@@ -26,9 +26,9 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS LLBC_SafetyObjectPool *__g_globalObjectPool = NULL;
-static LLBC_NS LLBC_SafetyObjectPool *__g_entryThreadSafetyObjectPool = NULL;
-static LLBC_NS LLBC_UnsafetyObjectPool *__g_entryThreadUnsafetyObjectPool = NULL;
+static LLBC_NS LLBC_SafetyObjectPool *__g_globalObjectPool = nullptr;
+static LLBC_NS LLBC_SafetyObjectPool *__g_entryThreadSafetyObjectPool = nullptr;
+static LLBC_NS LLBC_UnsafetyObjectPool *__g_entryThreadUnsafetyObjectPool = nullptr;
 
 __LLBC_INTERNAL_NS_END
 
@@ -74,8 +74,8 @@ int LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools()
         return LLBC_FAILED;
     }
 
-    tls->coreTls.safetyObjectPool = NULL;
-    tls->coreTls.unsafetyObjectPool = NULL;
+    tls->coreTls.safetyObjectPool = nullptr;
+    tls->coreTls.unsafetyObjectPool = nullptr;
 
     LLBC_XDelete(LLBC_INL_NS __g_entryThreadSafetyObjectPool);
     LLBC_XDelete(LLBC_INL_NS __g_entryThreadUnsafetyObjectPool);

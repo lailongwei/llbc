@@ -151,7 +151,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     if (!asClient)
     {
         LLBC_PrintLine("Will listening in %s:%d", ip, port);
-        int sessionId = svc->Listen(ip, port, NULL, sessionOpts);
+        int sessionId = svc->Listen(ip, port, nullptr, sessionOpts);
         if (sessionId == 0)
         {
             LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
@@ -173,7 +173,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         LLBC_PrintLine("Create %d clients to test", clientCount);
         for (int i = 0; i < clientCount; ++i)
         {
-            int sessionId = svc->Connect(ip, port, -1, NULL, sessionOpts);
+            int sessionId = svc->Connect(ip, port, -1, nullptr, sessionOpts);
             if (sessionId == 0)
             {
                 LLBC_PrintLine("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());

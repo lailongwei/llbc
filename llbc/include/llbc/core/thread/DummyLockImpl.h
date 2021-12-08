@@ -55,7 +55,7 @@ inline bool LLBC_DummyLock::IsDummyLock() const
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 inline void *LLBC_DummyLock::Handle()
 {
-    return NULL;
+    return nullptr;
 }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 

@@ -109,11 +109,12 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _comps()
 , _comps2()
+, _caredEventComps{}
 , _coders()
 , _handlers()
 , _preHandlers()
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler(NULL)
+, _unifyPreHandler()
 #endif
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 , _statusHandlers()
@@ -122,19 +123,15 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _statusDescs()
 #endif
 
-, _beforeFrameTasks()
-, _afterFrameTasks()
+, _frameTaskIdx(0)
+, _frameTasks{}
 
-, _handlingBeforeFrameTasks(false)
-, _handledBeforeFrameTasks(false)
-, _handlingAfterFrameTasks(false)
-
-, _releasePoolStack(NULL)
+, _releasePoolStack(nullptr)
 
 , _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
 , _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
 
-, _timerScheduler(NULL)
+, _timerScheduler(nullptr)
 
 , _evManager()
 , _evManagerMaxListenerStub(0)
@@ -156,7 +153,7 @@ LLBC_Service::LLBC_Service(This::Type type,
     }
     else
     {
-        ASSERT(_protoFactory != NULL && "Service type is Custom, but not pass Protocol Factory to Service!");
+        ASSERT(_protoFactory != nullptr && "Service type is Custom, but not pass Protocol Factory to Service!");
     }
 
     // Initialize cared event comps array.
@@ -185,27 +182,19 @@ LLBC_Service::~LLBC_Service()
     CloseAllCompLibraries();
 
     LLBC_STLHelper::DeleteContainer(_coders);
-    LLBC_STLHelper::DeleteContainer(_handlers);
-    LLBC_STLHelper::DeleteContainer(_preHandlers);
+    _handlers.clear();
+    _preHandlers.clear();
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_XDelete(_unifyPreHandler);
+    _unifyPreHandler = nullptr;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    for (_OpStatusHandlers::iterator it = _statusHandlers.begin();
-         it != _statusHandlers.end();
-         ++it)
-    {
-        LLBC_STLHelper::DeleteContainer(*it->second);
-        LLBC_Delete(it->second);
-    }
+    _statusHandlers.clear();
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     RemoveAllReadySessions();
 
-    _handledBeforeFrameTasks = false;
-    DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
-    DestroyFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
+    DestroyFrameTasks();
 
     LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
     LLBC_XDelete(_protoFactory);
@@ -618,7 +607,9 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+int LLBC_Service::CtrlProtocolStack(int sessionId,
+                                    int ctrlCmd,
+                                    const LLBC_Variant &ctrlData)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -645,7 +636,8 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Varia
         {
             _readySessionInfosLock.Unlock();
             if (removeSession)
-                RemoveSession(sessionId, "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
+                RemoveSession(sessionId,
+                              "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
 
             return LLBC_OK;
         }
@@ -653,7 +645,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Varia
 
     _readySessionInfosLock.Unlock();
 
-    _pollerMgr.CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlCmd, ctrlData);
 
     return LLBC_OK;
 }
@@ -677,7 +669,7 @@ int LLBC_Service::RegisterComponent(LLBC_IComponentFactory *compFactory)
          it != _willRegComps.end();
          ++it)
     {
-        if (it->compFactory != NULL && it->compFactory == compFactory)
+        if (it->compFactory != nullptr && it->compFactory == compFactory)
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_FAILED;
@@ -714,7 +706,7 @@ int LLBC_Service::RegisterComponent(LLBC_IComponent *comp)
          regIt != _willRegComps.end();
          ++regIt)
     {
-        if (regIt->comp != NULL && regIt->comp == comp)
+        if (regIt->comp != nullptr && regIt->comp == comp)
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_FAILED;
@@ -729,7 +721,7 @@ int LLBC_Service::RegisterComponent(LLBC_IComponent *comp)
 int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp)
 {
     // Force reset out parameter: comp.
-    comp = NULL;
+    comp = nullptr;
 
     // Service started or not check.
     LLBC_LockGuard guard(_lock);
@@ -817,7 +809,7 @@ LLBC_IComponent *LLBC_Service::GetComponent(const char *compName)
     if (it == _comps2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     _Comps &comps = it->second;
@@ -833,7 +825,7 @@ LLBC_IComponent *LLBC_Service::GetComponent(const LLBC_String &compName)
     if (it == _comps2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     _Comps &comps = it->second;
@@ -906,7 +898,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
+int LLBC_Service::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -934,7 +926,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *de
     return LLBC_OK;
 }
 
-int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
+int LLBC_Service::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -963,7 +955,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> 
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
+int LLBC_Service::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -990,7 +982,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
+int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -1066,7 +1058,7 @@ int LLBC_Service::DisableTimerScheduler()
     return LLBC_OK;
 }
 
-LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg)
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -1081,7 +1073,27 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
+    Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, deleg, nullptr));
+
+    return _evManagerMaxListenerStub;
+}
+
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *listener)
+{
+    if (!listener)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_INVALID_LISTENER_STUB;
+    }
+
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_started && !_initingComp))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_INVALID_LISTENER_STUB;
+    }
+
+    Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, nullptr, listener));
 
     return _evManagerMaxListenerStub;
 }
@@ -1089,22 +1101,22 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
 void LLBC_Service::UnsubscribeEvent(int event)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEvEv(event, LLBC_INVALID_LISTENER_STUB));
+        BuildUnsubscribeEventEv(event, LLBC_INVALID_LISTENER_STUB));
 }
 
 void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEvEv(0, stub));
+        BuildUnsubscribeEventEv(0, stub));
 }
 
 void LLBC_Service::FireEvent(LLBC_Event *ev,
-                             LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
-                             bool addiCtorBorrowed,
-                             LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
-                             bool customDtorBorrowed)
+                             const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler,
+                             const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
-    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev, addiCtor, addiCtorBorrowed, customDtor, customDtorBorrowed));
+    Push(LLBC_SvcEvUtil::BuildFireEventEv(ev, dequeueHandler));
+    if (enqueueHandler)
+        enqueueHandler(ev);
 }
 
 LLBC_EventManager &LLBC_Service::GetEventManager()
@@ -1112,64 +1124,34 @@ LLBC_EventManager &LLBC_Service::GetEventManager()
     return _evManager;
 }
 
-int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
+int LLBC_Service::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
-    if (UNLIKELY(!deleg))
+    if (UNLIKELY(!runnable))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_handlingBeforeFrameTasks && _handlingAfterFrameTasks))
-    {
-        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
-        return LLBC_FAILED;
-    }
-
-    if (_beforeFrameTasks.find(deleg) != _beforeFrameTasks.end() ||
-        _afterFrameTasks.find(deleg) != _afterFrameTasks.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    if (_handlingBeforeFrameTasks)
-    {
-        _afterFrameTasks.insert(std::make_pair(deleg, data));
-    }
-    else
-    {
-        if (!_handledBeforeFrameTasks)
-        {
-            _beforeFrameTasks.insert(std::make_pair(deleg, data));
-        }
-        else
-        {
-            if (!_handlingAfterFrameTasks)
-                _afterFrameTasks.insert(std::make_pair(deleg, data));
-            else
-                _beforeFrameTasks.insert(std::make_pair(deleg, data));
-        }
-    }
+    _frameTasks[_frameTaskIdx].emplace_back(runnable, data);
 
     return LLBC_OK;
 }
 
 const LLBC_ProtocolStack *LLBC_Service::GetCodecProtocolStack(int sessionId) const
 {
-    // If enabled full-stack option, return NULL.
+    // If enabled full-stack option, return nullptr.
     if (_fullStack)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     // Not enabled full-stack option, return session codec protocol-stack.
     LLBC_Service *ncThis = const_cast<LLBC_Service *>(this);
     ncThis->_readySessionInfosLock.Lock();
     _ReadySessionInfosCIter it = _readySessionInfos.find(sessionId);
-    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : NULL;
+    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
     ncThis->_readySessionInfosLock.Unlock();
 
     if (!codecStack)
@@ -1197,9 +1179,8 @@ void LLBC_Service::OnSvc(bool fullFrame)
     if (fullFrame)
         _begHeartbeatTime = LLBC_GetMilliSeconds();
 
-    // Handle before frame-tasks.
-    HandleFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
-    _handledBeforeFrameTasks = true;
+    // Handle frame-tasks.
+    HandleFrameTasks();
 
     // Process queued events.
     HandleQueuedEvents();
@@ -1209,9 +1190,8 @@ void LLBC_Service::OnSvc(bool fullFrame)
     UpdateTimers();
     UpdateAutoReleasePool();
 
-    // Handle after frame-tasks.
-    HandleFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
-    _handledBeforeFrameTasks = false;
+    // Handle frame-tasks.
+    HandleFrameTasks();
 
     // Process Idle.
     ProcessIdle(fullFrame);
@@ -1365,7 +1345,7 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
                                                               isListenSession,
-                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
+                                                              _fullStack ? nullptr : CreateCodecStack(sessionId, acceptSessionId, nullptr));
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
     }
@@ -1374,7 +1354,7 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
                                                               isListenSession,
-                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
+                                                              _fullStack ? nullptr : CreateCodecStack(sessionId, acceptSessionId, nullptr));
         _readySessionInfosLock.Lock();
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
@@ -1531,40 +1511,35 @@ bool LLBC_Service::IsCanContinueDriveService()
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
     for (; checkIdx <= lmt; ++checkIdx)
     {
-        if (tls->commTls.services[checkIdx] == NULL)
+        if (tls->commTls.services[checkIdx] == nullptr)
             break;
     }
 
     return checkIdx < lmt ? true : false;
 }
 
-void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usingFlag)
+void LLBC_Service::HandleFrameTasks()
 {
-    if (tasks.size() == 0)
+    int frameTaskIdx = _frameTaskIdx;
+    _frameTaskIdx = (_frameTaskIdx + 1) % 2;
+
+    _FrameTasks &tasks = _frameTasks[frameTaskIdx];
+    if (tasks.empty())
         return;
 
-    usingFlag = true;
-    for (_FrameTasks::iterator it = tasks.begin();
-         it != tasks.end();
+    const _FrameTasks::const_iterator endIt = tasks.end();    for (_FrameTasks::const_iterator it = tasks.begin();
+         it != endIt;
          ++it)
-        (it->first)->Invoke(this, it->second);
-
-    DestroyFrameTasks(tasks, usingFlag);
-}
-
-void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
-{
-    usingFlag = false;
-    for (_FrameTasks::iterator it = tasks.begin();
-         it != tasks.end();
-         ++it)
-    {
-        LLBC_Delete(it->first);
-        if (it->second)
-            LLBC_Delete(it->second);
-    }
+        (it->first)(this, it->second);
 
     tasks.clear();
+}
+
+void LLBC_Service::DestroyFrameTasks()
+{
+    for (size_t i = 0; i < sizeof(_frameTasks) / sizeof(_frameTasks[0]); ++i)
+        _frameTasks[i].clear();
+    _frameTaskIdx = 0;
 }
 
 void LLBC_Service::HandleQueuedEvents()
@@ -1638,7 +1613,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
 
         // Build session destroy info.
         LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
-        ev.closeInfo = NULL;
+        ev.closeInfo = nullptr;
 
         // Dispatch session-destroy event to all comps.
         _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnSessionDestroy];
@@ -1695,7 +1670,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         return;
     }
 
-    ev.packet = NULL;
+    ev.packet = nullptr;
 
     if (!_fullStack)
     {
@@ -1722,7 +1697,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     else if (recverSvcId != _id)
     {
         LLBC_IService *recverSvc = _svcMgr.GetService(recverSvcId);
-        if (recverSvc == NULL || !recverSvc->IsStarted())
+        if (recverSvc == nullptr || !recverSvc->IsStarted())
         {
             LLBC_Recycle(packet);
             return;
@@ -1750,7 +1725,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             _StatusHandlers::iterator stHandlerIt = stHandlers.find(status);
             if (stHandlerIt != stHandlers.end())
             {
-                stHandlerIt->second->Invoke(*packet);
+                stHandlerIt->second(*packet);
                 LLBC_Recycle(packet);
                 return;
             }
@@ -1766,7 +1741,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         _PreHandlers::iterator preIt = _preHandlers.find(opcode);
         if (preIt != _preHandlers.end())
         {
-            if (!preIt->second->Invoke(*packet))
+            if (!preIt->second(*packet))
             {
                 LLBC_Recycle(packet);
                 return;
@@ -1779,7 +1754,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     // Secondary, we recognize generalized pre-handler, if registered, call it(all service type available).
     if (!preHandled && _unifyPreHandler)
     {
-        if (!_unifyPreHandler->Invoke(*packet))
+        if (!_unifyPreHandler(*packet))
         {
             LLBC_Recycle(packet);
             return;
@@ -1791,7 +1766,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     _Handlers::iterator it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
-        it->second->Invoke(*packet);
+        it->second(*packet);
     }
     else
     {
@@ -1834,8 +1809,15 @@ void LLBC_Service::HandleEv_SubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_SubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    _evManager.AddListener(ev.id, ev.deleg, ev.stub);
-    ev.deleg = NULL;
+    if (ev.deleg)
+    {
+        _evManager.AddListener(ev.id, ev.deleg, ev.stub);
+    }
+    else
+    {
+        _evManager.AddListener(ev.id, ev.listener, ev.stub);
+        ev.listener = nullptr;
+    }
 }
 
 void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
@@ -1854,12 +1836,14 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_FireEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
+    const bool dontDelAfterFire = ev.ev->IsDontDelAfterFire();
     _evManager.FireEvent(ev.ev);
-    if (!ev.customDtor)
-    {
-        ev.ev = NULL;
-        return;
-    }
+
+    if (ev.dequeueHandler &&
+        dontDelAfterFire)
+        ev.dequeueHandler(ev.ev);
+
+    ev.ev = nullptr;
 }
 
 void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
@@ -1892,17 +1876,21 @@ int LLBC_Service::InitComps()
          regIt != _willRegComps.end();
          ++regIt)
     {
-        LLBC_IComponent *comp = NULL;
+        LLBC_IComponent *comp;
         _WillRegComp &willRegComp = *regIt;
-        if (willRegComp.compFactory != NULL) // Create comp from comp factory.
+        if (willRegComp.compFactory != nullptr) // Create comp from comp factory.
         {
             comp = willRegComp.compFactory->Create();
             LLBC_XDelete(willRegComp.compFactory);
         }
-        else if (willRegComp.comp != NULL) // Create comp from giving comp(borrow).
+        else if (willRegComp.comp != nullptr) // Create comp from giving comp(borrow).
         {
             comp = willRegComp.comp;
-            willRegComp.comp = NULL;
+            willRegComp.comp = nullptr;
+        }
+        else
+        {
+            continue;
         }
 
         comp->SetService(this);
@@ -2058,7 +2046,7 @@ void LLBC_Service::AddCompToCaredEventsArray(LLBC_IComponent *comp)
             continue;
 
         _Comps *&evComps = _caredEventComps[evOffset];
-        if (evComps == NULL)
+        if (evComps == nullptr)
             evComps = new _Comps();
         evComps->push_back(comp);
     }
@@ -2068,7 +2056,6 @@ LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &ex
 {
     existingLib = false;
 
-    LLBC_Library *lib = NULL;
     _CompLibraries::iterator libIt = _compLibraries.find(libPath);
     if (libIt != _compLibraries.end())
     {
@@ -2076,11 +2063,11 @@ LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &ex
         return libIt->second;
     }
 
-    lib = LLBC_New(LLBC_Library);
+    LLBC_Library *lib = LLBC_New(LLBC_Library);
     if (lib->Open(libPath.c_str()) != LLBC_OK)
     {
         LLBC_Delete(lib);
-        return NULL;
+        return nullptr;
     }
 
     _compLibraries.insert(std::make_pair(libPath, lib));
@@ -2120,7 +2107,7 @@ void LLBC_Service::UpdateAutoReleasePool()
 
 void LLBC_Service::ClearAutoReleasePool()
 {
-    _releasePoolStack = NULL;
+    _releasePoolStack = nullptr;
 }
 
 void LLBC_Service::InitObjectPools()
@@ -2151,7 +2138,7 @@ void LLBC_Service::UpdateTimers()
 
 void LLBC_Service::ClearHoldedTimerScheduler()
 {
-    _timerScheduler = NULL;
+    _timerScheduler = nullptr;
 }
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
@@ -2457,12 +2444,12 @@ LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
 LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponent *comp)
 {
     this->comp = comp;
-    compFactory = NULL;
+    compFactory = nullptr;
 }
 
 LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponentFactory *compFactory)
 {
-    comp = NULL;
+    comp = nullptr;
     this->compFactory = compFactory;
 }
 

@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 int LLBC_InitSymbol()
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    if (::SymInitialize(::GetCurrentProcess(), NULL, TRUE) != TRUE)
+    if (::SymInitialize(::GetCurrentProcess(), nullptr, TRUE) != TRUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
@@ -62,7 +62,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     const WORD frames = ::CaptureStackBackTrace(static_cast<DWORD>(skipFrames) + 1,
                                                 static_cast<DWORD>(captureFrames),
                                                 stack,
-                                                NULL);
+                                                nullptr);
 
     for (WORD frame = 0; frame != frames; ++frame)
     {
@@ -91,7 +91,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
         {
             backTrace.append_format("#%d ", frames - i - 1);
 
-            char *parenthesisEnd = NULL;
+            char *parenthesisEnd = nullptr;
             char *parenthesisBeg = strchr(strs[i], '(');
             if (parenthesisBeg)
             {
@@ -103,7 +103,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
                 parenthesisBeg != parenthesisEnd)
             {
                 char *addrOffsetBeg = strchr(parenthesisBeg, '+');
-                if (addrOffsetBeg == NULL)
+                if (addrOffsetBeg == nullptr)
                     addrOffsetBeg= parenthesisEnd;
 
                 const char oldAddrOffsetBegCh = *addrOffsetBeg;

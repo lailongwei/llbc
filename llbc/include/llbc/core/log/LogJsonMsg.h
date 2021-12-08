@@ -38,7 +38,7 @@ class LLBC_Logger;
 class LLBC_EXPORT LLBC_LogJsonMsg
 {
 public:
-    explicit LLBC_LogJsonMsg(bool loggerInited, LLBC_Logger *logger, const char* tag, int lv);
+    explicit LLBC_LogJsonMsg(LLBC_Logger *logger, const char* tag, int lv);
     ~LLBC_LogJsonMsg();
 
 public:
@@ -61,7 +61,6 @@ private:
     static void UnInitOutput(FILE *to, const char *msg);
 
 private:
-    bool _loggerInited;
     LLBC_Logger *_logger;
     const char *_tag;
     int _lv;

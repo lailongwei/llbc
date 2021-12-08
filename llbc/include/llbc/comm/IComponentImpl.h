@@ -29,7 +29,6 @@ inline LLBC_ComponentMethods::LLBC_ComponentMethods()
 
 inline LLBC_ComponentMethods::~LLBC_ComponentMethods()
 {
-    LLBC_STLHelper::DeleteContainer(_meths);
 }
 
 inline const LLBC_ComponentMethods::Methods &LLBC_ComponentMethods::GetAllMethods() const
@@ -37,13 +36,14 @@ inline const LLBC_ComponentMethods::Methods &LLBC_ComponentMethods::GetAllMethod
     return _meths;
 }
 
-inline LLBC_ComponentMethod *LLBC_ComponentMethods::GetMethod(const char *methName) const
+inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const char *methName) const
 {
+    static const LLBC_ComponentMethod nullMeth;
     Methods::const_iterator it = _meths.find(methName);
     if (UNLIKELY(it == _meths.end()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullMeth;
     }
 
     return it->second;
@@ -58,13 +58,9 @@ int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methNa
         return LLBC_FAILED;
     }
 
-    LLBC_ComponentMethod *methDeleg = new LLBC_Delegate2<
-        int, ComponentCls, const LLBC_Variant &, LLBC_Variant &>(component, meth);
-    if (UNLIKELY(!_meths.insert(std::make_pair(methName, methDeleg)).second))
+    if (UNLIKELY(!_meths.emplace(methName, LLBC_ComponentMethod(component, meth)).second))
     {
-        LLBC_Delete(methDeleg);
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-
         return LLBC_FAILED;
     }
 
@@ -73,11 +69,11 @@ int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methNa
 
 inline int LLBC_ComponentMethods::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
-    LLBC_ComponentMethod *meth = GetMethod(methName);
+    const LLBC_ComponentMethod &meth = GetMethod(methName);
     if (UNLIKELY(!meth))
         return LLBC_FAILED;
 
-    return meth->Invoke(arg, ret);
+    return meth(arg, ret);
 }
 
 inline LLBC_IService *LLBC_IComponent::GetService() const

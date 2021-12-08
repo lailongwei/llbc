@@ -122,7 +122,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
     {
         var.BecomeSeq();
 
-        PyObject *seq = PySequence_Fast(obj, NULL); // New reference
+        PyObject *seq = PySequence_Fast(obj, nullptr); // New reference
         Py_ssize_t seqSize = PySequence_Fast_GET_SIZE(obj);
         for (Py_ssize_t i = 0; i != seqSize; ++i)
         {
@@ -223,7 +223,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
         if (!var.IsEmpty())
             return PyString_FromStringAndSize(var.GetHolder().data.obj.str->c_str(), var.GetHolder().data.obj.str->size());
         else
-            return PyString_FromStringAndSize(NULL, 0);
+            return PyString_FromStringAndSize(nullptr, 0);
     }
     else if (var.IsSeq()) // Seq type
     {
@@ -236,7 +236,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
             if (!pyElem)
             {
                 Py_DECREF(pyList);
-                return NULL;
+                return nullptr;
             }
 
             PyList_SetItem(pyList, i, pyElem); // Steals pyElem reference.
@@ -257,7 +257,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
             if (!pyKey)
             {
                 Py_DECREF(pyDict);
-                return NULL;
+                return nullptr;
             }
 
             PyObject *pyValue = Variant2Obj(value); // New reference.
@@ -266,7 +266,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
                 Py_DECREF(pyKey);
                 Py_DECREF(pyDict);
 
-                return NULL;
+                return nullptr;
             }
 
             if (PyDict_SetItem(pyDict, pyKey, pyValue) != 0) // No steal reference.
@@ -276,7 +276,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
                 Py_DECREF(pyDict);
                 pyllbc_TransferPyError("When set item to dict");
 
-                return NULL;
+                return nullptr;
             }
         }
 
@@ -284,5 +284,5 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
     }
 
     pyllbc_SetError("Not support LLBC_Variant type when convert to python object", LLBC_ERROR_NOT_SUPPORT);
-    return NULL;
+    return nullptr;
 }

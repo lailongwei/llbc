@@ -46,7 +46,7 @@ public:
     /**
      * Get library process address.
      * @param[in] procName - Pointer to a null-terminated string containing the function name.
-     * @return LLBC_LibraryFun - library function address, if failed, return NULL.
+     * @return LLBC_LibraryFun - library function address, if failed, return nullptr.
      */
     LLBC_LibraryFun GetProcAddress(const char *procName);
 

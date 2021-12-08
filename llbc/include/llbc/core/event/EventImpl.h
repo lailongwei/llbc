@@ -68,12 +68,12 @@ inline std::map<int, LLBC_Variant> &LLBC_Event::GetMutableIntKeyParams()
 
 inline size_t LLBC_Event::GetIntKeyParamsCount() const
 {
-    return _intKeyParams != NULL ? _intKeyParams->size() : 0;
+    return _intKeyParams != nullptr ? _intKeyParams->size() : 0;
 }
 
 inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
 {
-    return _constantStrKeyParams != NULL ? _constantStrKeyParams->size() : 0;
+    return _constantStrKeyParams != nullptr ? _constantStrKeyParams->size() : 0;
 }
 
 inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKeyParams()
@@ -86,7 +86,7 @@ inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKe
 
 inline size_t LLBC_Event::GetStrKeyParamsCount() const
 {
-    return _strKeyParams != NULL ? _strKeyParams->size() : 0;
+    return _strKeyParams != nullptr ? _strKeyParams->size() : 0;
 }
 
 inline std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetMutableStrKeyParams()
@@ -102,7 +102,7 @@ inline void * LLBC_Event::GetExtData() const
     return _extData;
 }
 
-inline void LLBC_Event::SetExtData(void *extData, const std::function<void(void *)> &clearDeleg)
+inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg)
 {
     ClearExtData();
     _extData = extData;

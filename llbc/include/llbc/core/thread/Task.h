@@ -44,7 +44,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_BaseTask
 {
 public:
-    LLBC_BaseTask(LLBC_ThreadManager *threadMgr = NULL);
+    LLBC_BaseTask(LLBC_ThreadManager *threadMgr = nullptr);
     virtual ~LLBC_BaseTask();
 
 public:
@@ -61,7 +61,7 @@ public:
                          int flags = LLBC_ThreadFlag::Joinable,
                          int priority = LLBC_ThreadPriority::Normal,
                          LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                         const int stack_size[] = NULL);
+                         const int stack_size[] = nullptr);
 
     /**
      * Check task is activated or not.

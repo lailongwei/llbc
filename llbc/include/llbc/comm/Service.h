@@ -42,7 +42,7 @@ __LLBC_NS_END
 
 __LLBC_NS_BEGIN
 
-class LLBC_HIDDEN LLBC_Service : public LLBC_IService
+class LLBC_HIDDEN LLBC_Service final : public LLBC_IService
 {
     typedef LLBC_IService Base;
     typedef LLBC_Service This;
@@ -57,7 +57,7 @@ public:
      */
     LLBC_Service(Type type,
                  const LLBC_String &name = "",
-                 LLBC_IProtocolFactory *protoFactory = NULL,
+                 LLBC_IProtocolFactory *protoFactory = nullptr,
                  bool fullStack = true);
 
     /**
@@ -163,7 +163,7 @@ public:
      */
     virtual int Listen(const char *ip,
                        uint16 port,
-                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       LLBC_IProtocolFactory *protoFactory = nullptr,
                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
@@ -182,7 +182,7 @@ public:
     virtual int Connect(const char *ip,
                         uint16 port,
                         double timeout = -1.0,
-                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        LLBC_IProtocolFactory *protoFactory = nullptr,
                         const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
@@ -202,7 +202,7 @@ public:
     virtual int AsyncConn(const char *ip,
                           uint16 port,
                           double timeout = -1.0,
-                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          LLBC_IProtocolFactory *protoFactory = nullptr,
                           const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
 
     /**
@@ -281,17 +281,18 @@ public:
 	 * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int RemoveSession(int sessionId, const char *reason = NULL);
+    virtual int RemoveSession(int sessionId, const char *reason = nullptr);
 
     /**
      * Control session protocol stack.
-     * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlCmd            - the stack control command(user defined).
-     * @param[in] ctrlData           - the stack control data(user defined).
-     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
+     * @param[in] sessionId - the sessionId.
+     * @param[in] ctrlCmd   - the stack control command(user defined).
+     * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg);
+    virtual int CtrlProtocolStack(int sessionId,
+                                  int ctrlCmd,
+                                  const LLBC_Variant &ctrlData);
 
 public:
     /**
@@ -323,25 +324,25 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
+    virtual int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
 
     /**
-     * Previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Previous subscribe message to specified delegate, if method return nullptr, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
+    virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg);
+    virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg);
+    virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
@@ -356,7 +357,12 @@ public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg);
+    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg);
+
+    /**
+     * Subscribe event to specified event listener.
+     */
+    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_EventListener *listener);
 
     /**
      * Unsubscribe event.
@@ -372,17 +378,14 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev                 - the will fire event pointer.
-     * @param[in] addiCtor           - the additional constructor.
-     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
-     * @param[in] customDtor         - the custom destructor.
-     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
+     * @param[in] ev             - the will fire event pointer.
+     * @param[in] enqueueHandler - the event enqueue handler.
+     * @param[in] dequeueHandler - the event dequeue handler.
      */
     virtual void FireEvent(LLBC_Event *ev,
-                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
-                           bool addiCtorBorrowed = false,
-                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
-                           bool customDtorBorrowed = false);
+                           const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
+                           const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr);
+
 
     /**
      * Get event manager.
@@ -393,11 +396,11 @@ public:
 public:
     /**
      * Post lazy task to service.
-     * @param[in] deleg - the task delegate.
-     * @param[in] data  - the task data, can be null.
+     * @param[in] runnable - the runnable obj.
+     * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL);
+    virtual int Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil);
 
     /**
      * Get service protocol stack, only full-stack option disabled available.
@@ -443,8 +446,8 @@ protected:
     /**
      * Stack create helper method(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
-    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL);
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
 
 protected:
@@ -498,9 +501,9 @@ private:
     /**
      * Frame tasks operation methods.
      */
-    typedef std::map<LLBC_IDelegate2<void, Base *, const LLBC_Variant *> *, LLBC_Variant *> _FrameTasks;
-    void HandleFrameTasks(_FrameTasks &tasks, bool &usingFlag);
-    void DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag);
+    typedef std::vector<std::pair<LLBC_Delegate<void(Base *, const LLBC_Variant &)>, LLBC_Variant> > _FrameTasks;
+    void HandleFrameTasks();
+    void DestroyFrameTasks();
 
     /**
      * Queued event operation methods.
@@ -621,7 +624,7 @@ private:
         LLBC_ProtocolStack *codecStack;
 
     public:
-        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack = NULL);
+        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
     typedef std::map<int, _ReadySessionInfo *> _ReadySessionInfos;
@@ -657,15 +660,15 @@ private:
     _CompLibraries _compLibraries;
     typedef std::map<int, LLBC_ICoderFactory *> _Coders;
     _Coders _coders;
-    typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _Handlers;
+    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _Handlers;
     _Handlers _handlers;
-    typedef std::map<int, LLBC_IDelegate1<bool, LLBC_Packet &> *> _PreHandlers;
+    typedef std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _PreHandlers;
     _PreHandlers _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_IDelegate1<bool, LLBC_Packet &> *_unifyPreHandler;
+    LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    typedef std::map<int, LLBC_IDelegate1<void, LLBC_Packet &> *> _StatusHandlers;
+    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _StatusHandlers;
     typedef std::map<int, _StatusHandlers *> _OpStatusHandlers;
     _OpStatusHandlers _statusHandlers;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
@@ -675,12 +678,8 @@ private:
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 private:
-    _FrameTasks _beforeFrameTasks;
-    _FrameTasks _afterFrameTasks;
-
-    bool _handlingBeforeFrameTasks;
-    bool _handledBeforeFrameTasks;
-    bool _handlingAfterFrameTasks;
+    uint32 _frameTaskIdx;
+    _FrameTasks _frameTasks[2];
 
 private:
     LLBC_AutoReleasePoolStack *_releasePoolStack;

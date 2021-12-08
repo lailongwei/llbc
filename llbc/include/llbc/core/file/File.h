@@ -76,7 +76,7 @@ public:
     {
         NoBuf = _IONBF,   // No buffer is used, all file read/write operation will direct synchronous to store device.
         LineBuf = _IOLBF, // For some systems, this provides line buffering. However, for Win32, the behavior is the same as NoBuf - Full Buffering.
-        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and size is used as the size of the buffer. If buffer is NULL, an automatically allocated buffer size bytes long is used.
+        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and size is used as the size of the buffer. If buffer is nullptr, an automatically allocated buffer size bytes long is used.
     };
 };
 
@@ -385,16 +385,16 @@ public:
      *      In this two platforms, if lastAccessTime and lastModifyTime not set, will update to now.
      * @param[in] filePath - the file path.
      * @param[in] updateLastAccessTime - need update last access time?
-     * @param[in] lastAccessTime       - the last access time, if NULL, will update to now.
+     * @param[in] lastAccessTime       - the last access time, if nullptr, will update to now.
      * @param[in] updateLastModifyTime - need update last modify time?
-     * @param[in] lastModifyTime       - the last modify time, if NULL, will update to now.
+     * @param[in] lastModifyTime       - the last modify time, if nullptr, will update to now.
      * @return int - return 0 if success, otherwise return -1.
      */
     static int TouchFile(const LLBC_String &filePath, 
                          bool updateLastAccessTime = true, 
-                         const timespec *lastAccessTime = NULL,
+                         const timespec *lastAccessTime = nullptr,
                          bool updateLastModifyTime = true,
-                         const timespec *lastModifyTime = NULL);
+                         const timespec *lastModifyTime = nullptr);
 
 public:
     /**

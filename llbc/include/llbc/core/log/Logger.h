@@ -26,7 +26,7 @@
 
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/MessageBlock.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_Delegate.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
@@ -112,7 +112,7 @@ public:
      * @param[in] hookDeleg - the hook delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, const std::function<void(const LLBC_LogData *)> &hookDeleg);
+    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg);
 
     /**
      * Uninstall error hook.
@@ -122,7 +122,7 @@ public:
 public:
     /**
      * Output specific level message.
-     * @param[in] tag      - log tag, can set to NULL.
+     * @param[in] tag      - log tag, can set to nullptr.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
@@ -138,7 +138,7 @@ public:
     /**
      * Output fmt using given level.
      * @param[in] level    - log level.
-     * @param[in] tag      - log tag, can set to NULL.
+     * @param[in] tag      - log tag, can set to nullptr.
      * @param[in] file     - log file name.
      * @param[in] line     - log file line.
      * @param[in] fmt      - format control string.
@@ -148,49 +148,69 @@ public:
     int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
 
     /**
-     * Like Output() method, but message is non-format message, use to improve performance.
-     * @param[in] level      - log level.
-     * @param[in] tag        - log tag, can set to NULL.
-     * @param[in] file       - log file name.
-     * @param[in] line       - log file line.
-     * @param[in] message    - message string, non-format.
-     * @param[in] messageLen - message string length, if -1, will auto calculate.
-     * @return int - return 0 if success, otherwise return -1.
+     * Direct output message by va_list.
      */
-    int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
+    int FormatOutput(int level, const char *tag, const char *file, int line, const char *fmt, va_list va);
 
     /**
-     * Like OutputNonFormat(), but this output method will steal 'message'.
-     * @param[in] level      - log level.
-     * @param[in] tag        - log tag, can set to NULL.
-     * @param[in] file       - log file name.
-     * @param[in] line       - log file line.
-     * @param[in] message    - message string, non-format.
+     * Like Output() method, but message is non-format message, use to improve performance.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag, can set to nullptr.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] msg    - message string.
+     * @param[in] msgLen - message string length, if -1, will auto calculate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int OutputNonFormat2(int level, const char *tag, const char *file, int line, char *message, size_t messageLen = -1);
+    int NonFormatOutput(int level, const char *tag, const char *file, int line, const char *msg, size_t msgLen);
 
 private:
     /**
-     * Direct output message using given level.
-     */
-    int DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len);
-    /**
-     * Build log data.
-     * @param[in] level   - log level.
-     * @param[in] tag     - log tag.
-     * @param[in] file    - log file name.
-     * @param[in] line    - log file line.
-     * @param[in] message - log format control string.
-     * @param[in] len     - the message length, not include tailing character.
+     * Build log data by format control string and variable parameter list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] fmt   - log format control string.
+     * @param[in] va    - the message variable parameter list.
      * @return LLBC_LogData * - the log data.
      */
     LLBC_LogData *BuildLogData(int level,
                                const char *tag,
                                const char *file,
                                int line,
-                               char *message,
-                               int len);
+                               const char *fmt,
+                               va_list va);
+
+    /**
+     * Build log data by msg and length.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     */
+    LLBC_LogData *BuildLogData(int level,
+                               const char *tag,
+                               const char *file,
+                               int line,
+                               const char *msg,
+                               size_t msgLen);
+
+    /**
+     * Fill log data non-msg members.
+     * @param[in] level   - log level.
+     * @param[in] tag     - log tag.
+     * @param[in] file    - log file name.
+     * @param[in] line    - log file line.
+     * @param[in] logData - log data.
+     * @param[in] libTls  - log tls.
+     */
+    void FillLogDataNonMsgMembers(int level,
+                                  const char *tag,
+                                  const char *file,
+                                  int line,
+                                  LLBC_LogData *logData,
+                                  __LLBC_LibTls *libTls);
 
 private:
     /**
@@ -242,10 +262,12 @@ private:
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
-    std::function<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
+    LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/log/LoggerImpl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_H__
 

@@ -33,12 +33,12 @@ __LLBC_NS_BEGIN
 LLBC_IProtocol::LLBC_IProtocol()
 : _sessionId(0)
 , _acceptSessionId(0)
-, _session(NULL)
-, _stack(NULL)
-, _svc(NULL)
-, _filter(NULL)
-, _coders(NULL)
-, _pktPoolInst(NULL)
+, _session(nullptr)
+, _stack(nullptr)
+, _svc(nullptr)
+, _filter(nullptr)
+, _coders(nullptr)
+, _pktPoolInst(nullptr)
 {
 }
 

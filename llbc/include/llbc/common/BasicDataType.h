@@ -26,7 +26,7 @@
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/OSHeader.h"
-#include "Config.h"
+#include "llbc/common/Config.h"
 
 __LLBC_NS_BEGIN
 
@@ -122,7 +122,7 @@ struct LLBC_TimeStruct
 __LLBC_NS_END
 
 // Like WIN32, we define Some char/wchar/tchar pointer/const pointer.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+#if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
  typedef char * LPSTR;
  typedef LLBC_NS wchar * LPWSTR;
  typedef const char * LPCSTR;
@@ -135,22 +135,22 @@ __LLBC_NS_END
   #define LPTSTR  LPSTR
   #define LPCTSTR LPCSTR
  #endif // !LLBC_UNICODE
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 
 // Like WIN32, we define the TCHAR data type.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+#if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
  typedef LLBC_NS tchar TCHAR;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32 
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 
 __LLBC_NS_BEGIN
 
 // Like WIN32, we define the _T, __TEXT, TEXT macro to simple use LLBC_TEXT() macro.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+#if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
  #define __TEXT()       LLBC_TEXT(x)
  #define TEXT()         __TEXT(x)
  #define __T(x)         LLBC_TEXT(x)
  #define _T(x)          __T(x)
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 
 // handle datatype define.
 typedef int LLBC_Handle;
@@ -159,7 +159,7 @@ typedef int LLBC_Handle;
 // thread datatype define.
 #if LLBC_TARGET_PLATFORM_LINUX
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -177,7 +177,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((DWORD)(-1))
 #elif LLBC_TARGET_PLATFORM_IPHONE
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef pthread_id_np_t LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -186,7 +186,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((pthread_key_t)(-1))
 #elif LLBC_TARGET_PLATFORM_MAC
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -195,7 +195,7 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((pthread_key_t)(-1))
 #elif LLBC_TARGET_PLATFORM_ANDROID
  typedef pthread_t LLBC_NativeThreadHandle;
- #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(NULL))
+ #define LLBC_INVALID_NATIVE_THREAD_HANDLE   ((pthread_t)(nullptr))
  typedef int LLBC_ThreadId;
  #define LLBC_INVALID_NATIVE_THREAD_ID       0
  typedef pthread_mutex_t LLBC_MutexHandle;
@@ -217,7 +217,7 @@ typedef FILE * LLBC_FileHandle;
 #else
  typedef HANDLE LLBC_DirHandle;
 #endif
-#define LLBC_INVALID_FILE_HANDLE NULL
+#define LLBC_INVALID_FILE_HANDLE nullptr
 
 // library data type define.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -227,7 +227,7 @@ typedef FILE * LLBC_FileHandle;
  typedef HMODULE LLBC_LibraryHandle;
  typedef int (__cdecl *LLBC_LibraryFun)(void);
 #endif
-#define LLBC_INVALID_LIBRARY_HANDLE NULL
+#define LLBC_INVALID_LIBRARY_HANDLE nullptr
 
 // timer data type define.
 typedef uint64 LLBC_TimerId;
@@ -261,16 +261,13 @@ typedef GUID LLBC_GUID;
 typedef LLBC_GUID & LLBC_GUIDRef;
 typedef const LLBC_GUID & LLBC_GUIDCRef;
 
-// guard func function type define.
-typedef void (*LLBC_GuardFunc)(void *);
-
 // Bundle data type define.
 #if LLBC_TARGET_PLATFORM_IPHONE
  #define LLBC_BundleHandle void *
- #define LLBC_INVALID_BUNDLE_HANDLE NULL
+ #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #else
  #define LLBC_BundleHandle void *
- #define LLBC_INVALID_BUNDLE_HANDLE NULL
+ #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #endif
 
 // Session Ids data type define.

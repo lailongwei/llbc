@@ -32,11 +32,11 @@ namespace
     typedef pyllbc_Stream This;
 }
 
-PyObject *pyllbc_Stream::_methEncode = NULL;
-PyObject *pyllbc_Stream::_methDecode = NULL;
+PyObject *pyllbc_Stream::_methEncode = nullptr;
+PyObject *pyllbc_Stream::_methDecode = nullptr;
 
-PyObject *pyllbc_Stream::_keyDict = NULL;
-PyObject *pyllbc_Stream::_keySlots = NULL;
+PyObject *pyllbc_Stream::_keyDict = nullptr;
+PyObject *pyllbc_Stream::_keySlots = nullptr;
 
 pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t size)
 : _stream(size)
@@ -140,7 +140,7 @@ PyObject *pyllbc_Stream::GetRaw()
 
 int pyllbc_Stream::SetRaw(PyObject *raw)
 {
-    char *buf = NULL;
+    char *buf = nullptr;
     Py_ssize_t len = 0;
 
     const pyllbc_ObjType type = pyllbc_TypeDetector::Detect(raw);
@@ -159,7 +159,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
     }
     else if (type == PYLLBC_BUFFER_OBJ)
     {
-        const void *cbuf = NULL;
+        const void *cbuf = nullptr;
         if (PyObject_AsReadBuffer(raw, &cbuf, &len) != 0)
         {
             pyllbc_TransferPyError();
@@ -215,11 +215,11 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
     case PYLLBC_TUPLE_OBJ:
     case PYLLBC_LIST_OBJ:
         pyllbc_SetError("not support to read 'tuple/list' type data", LLBC_ERROR_NOT_IMPL);
-        return NULL;
+        return nullptr;
 
     case PYLLBC_DICT_OBJ:
         pyllbc_SetError("not support to read 'dict' type data", LLBC_ERROR_NOT_IMPL);
-        return NULL;
+        return nullptr;
 
     default:
         break;
@@ -228,10 +228,10 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
     if (!PyObject_HasAttr(cls, _methDecode))
     {
         pyllbc_SetError("will decode class not exist 'decode' method", LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
-    PyObject *obj = PyObject_CallObject(cls, NULL);
+    PyObject *obj = PyObject_CallObject(cls, nullptr);
     if (!obj)
     {
         PyObject *pyClsStr = PyObject_Str(cls);
@@ -241,16 +241,16 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
         LLBC_String addiMsg;
         pyllbc_TransferPyError(addiMsg.format(
             "When create class[%s] instance in Stream.unpack() method", clsStr.c_str()));
-        return NULL;
+        return nullptr;
     }
 
-    PyObject *rtn = PyObject_CallMethodObjArgs(obj, _methDecode, _pyStream, NULL);
+    PyObject *rtn = PyObject_CallMethodObjArgs(obj, _methDecode, _pyStream, nullptr);
     if (!rtn)
     {
         pyllbc_TransferPyError();
         Py_DECREF(obj);
 
-        return NULL;
+        return nullptr;
     }
 
     Py_DECREF(rtn);
@@ -269,7 +269,7 @@ PyObject *pyllbc_Stream::ReadByte()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'byte'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyString_FromStringAndSize(&val, sizeof(sint8));
@@ -281,7 +281,7 @@ PyObject *pyllbc_Stream::ReadBool()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode'bool'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     PyObject *pyVal = val ? Py_True : Py_False;
@@ -296,7 +296,7 @@ PyObject *pyllbc_Stream::ReadInt16()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'int16'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyInt_FromLong(val);
@@ -308,7 +308,7 @@ PyObject *pyllbc_Stream::ReadInt32()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'int32'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyInt_FromLong(val);
@@ -320,7 +320,7 @@ PyObject *pyllbc_Stream::ReadInt64()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'int64'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return Py_BuildValue("L", val);
@@ -332,7 +332,7 @@ PyObject *pyllbc_Stream::ReadFloat()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'float'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyFloat_FromDouble(val);
@@ -344,7 +344,7 @@ PyObject *pyllbc_Stream::ReadDouble()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'double'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyFloat_FromDouble(val);
@@ -370,7 +370,7 @@ PyObject *pyllbc_Stream::ReadStr()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyString_FromStringAndSize(val.data(), val.size());
@@ -382,13 +382,13 @@ PyObject *pyllbc_Stream::ReadStr2()
     if (!_stream.Read(len))
     {
         pyllbc_SetError("not enough bytes to decode 'str' len part", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     if (static_cast<int>(_stream.GetSize() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     PyObject *pyStr = PyString_FromStringAndSize(
@@ -413,7 +413,7 @@ PyObject *pyllbc_Stream::ReadUnicode()
     if (!_stream.Read(val))
     {
         pyllbc_SetError("not enough bytes to decode 'unicode'", LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     return PyUnicode_FromStringAndSize(val.data(), val.size());
@@ -427,7 +427,7 @@ PyObject *pyllbc_Stream::ReadByteArray()
     if (!_stream.Read(len))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     char *buf = LLBC_Malloc(char, len);
@@ -436,7 +436,7 @@ PyObject *pyllbc_Stream::ReadByteArray()
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
         LLBC_Free(buf);
 
-        return NULL;
+        return nullptr;
     }
 
     PyObject *pyVal = 
@@ -454,14 +454,14 @@ PyObject *pyllbc_Stream::ReadBuffer()
     if (!_stream.Read(len))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
-        return NULL;
+        return nullptr;
     }
 
     PyObject *pyVal = PyBuffer_New(len);
     if (!pyVal)
     {
         pyllbc_TransferPyError();
-        return NULL;
+        return nullptr;
     }
 
     void *buf;
@@ -471,7 +471,7 @@ PyObject *pyllbc_Stream::ReadBuffer()
         Py_DECREF(pyVal);
         pyllbc_TransferPyError();
 
-        return NULL;
+        return nullptr;
     }
 
     if (!_stream.ReadBuffer(buf, bufLen))
@@ -479,7 +479,7 @@ PyObject *pyllbc_Stream::ReadBuffer()
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
 
         Py_DECREF(pyVal);
-        return NULL;
+        return nullptr;
     }
 
     return pyVal;
@@ -490,7 +490,7 @@ PyObject *pyllbc_Stream::FmtRead(const LLBC_String &fmt, PyObject *callerEnv)
     pyllbc_PackLemma *lemma = 
         pyllbc_s_PackLemmaCompiler->Compile(fmt, false, callerEnv);
     if (!lemma)
-        return NULL;
+        return nullptr;
 
     return lemma->Read(this);
 }
@@ -870,7 +870,7 @@ int pyllbc_Stream::WriteInst(PyObject *val)
     // 1) Search encode() method.
     if (PyObject_HasAttr(val, _methEncode))
     {
-        PyObject *rtn = PyObject_CallMethodObjArgs(val, _methEncode, _pyStream, NULL);
+        PyObject *rtn = PyObject_CallMethodObjArgs(val, _methEncode, _pyStream, nullptr);
         if (!rtn)
         {
             pyllbc_TransferPyError();

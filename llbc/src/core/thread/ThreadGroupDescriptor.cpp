@@ -29,8 +29,8 @@ __LLBC_NS_BEGIN
 
 LLBC_ThreadGroupDescriptor::LLBC_ThreadGroupDescriptor()
     : _groupHandle(LLBC_INVALID_HANDLE)
-    , _nextGroup(NULL)
-    , _firstThreadDesc(NULL)
+    , _nextGroup(nullptr)
+    , _firstThreadDesc(nullptr)
 {
 }
 
@@ -69,7 +69,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
 
     if (!_firstThreadDesc)
     {
-        desc->SetGroupThreadNext(NULL);
+        desc->SetGroupThreadNext(nullptr);
         desc->SetGroupHandle(_groupHandle);
 
         _firstThreadDesc = desc;
@@ -89,7 +89,7 @@ int LLBC_ThreadGroupDescriptor::AddToGroup(LLBC_ThreadDescriptor *desc)
         }
     }
 
-    desc->SetGroupThreadNext(NULL);
+    desc->SetGroupThreadNext(nullptr);
     desc->SetGroupHandle(_groupHandle);
 
     threadDesc->SetGroupThreadNext(desc);
@@ -196,13 +196,13 @@ LLBC_ThreadDescriptor *LLBC_ThreadGroupDescriptor::FindThreadDescriptor(LLBC_Han
     if (UNLIKELY(threadHandle))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     if (!_firstThreadDesc)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_ThreadDescriptor *threadDesc = _firstThreadDesc;
@@ -217,7 +217,7 @@ LLBC_ThreadDescriptor *LLBC_ThreadGroupDescriptor::FindThreadDescriptor(LLBC_Han
     }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return NULL;
+    return nullptr;
 }
 
 LLBC_ThreadDescriptor *LLBC_ThreadGroupDescriptor::FindFirstThreadDescriptor() const

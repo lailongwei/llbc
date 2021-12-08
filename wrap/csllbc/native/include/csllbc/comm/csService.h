@@ -139,7 +139,7 @@ public:
     /**
      * Remove specific session.
      */
-    int RemoveSession(int sessionId, const char *reason = NULL);
+    int RemoveSession(int sessionId, const char *reason = nullptr);
 
 public:
     /**

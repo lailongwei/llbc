@@ -33,12 +33,12 @@ __LLBC_NS_BEGIN
 LLBC_Dictionary::LLBC_Dictionary(LLBC_Dictionary::size_type bucketSize)
 : _size(0)
 , _head(0)
-, _tail(NULL)
+, _tail(nullptr)
 
 , _bucketSize(bucketSize)
-, _bucket(NULL)
+, _bucket(nullptr)
 
-, _objFactory(NULL)
+, _objFactory(nullptr)
 {
     _bucket = reinterpret_cast<LLBC_DictionaryElem **>(
         malloc(_bucketSize * sizeof(LLBC_DictionaryElem *)));
@@ -65,7 +65,7 @@ void LLBC_Dictionary::Clear()
     }
 
     _size = 0;
-    _head = _tail = NULL;
+    _head = _tail = nullptr;
 
     LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 }
@@ -290,7 +290,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)
 {
     int hash = key % _bucketSize;
     LLBC_DictionaryElem *elem = _bucket[hash];
-    for (; elem != NULL; elem = elem->GetBucketElemNext())
+    for (; elem != nullptr; elem = elem->GetBucketElemNext())
     {
         if (elem->IsIntKey() && elem->GetIntKey() == key)
         {
@@ -310,7 +310,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(const LLBC_String &key)
 
     uint32 hash = hashFun(key.c_str(), key.size()) % _bucketSize;
     LLBC_DictionaryElem *elem = _bucket[hash];
-    for (; elem != NULL; elem = elem->GetBucketElemNext())
+    for (; elem != nullptr; elem = elem->GetBucketElemNext())
     {
         if (elem->IsStrKey() && elem->GetStrKey() == key)
         {
@@ -362,12 +362,12 @@ LLBC_Dictionary::ConstIter LLBC_Dictionary::Begin() const
 
 LLBC_Dictionary::Iter LLBC_Dictionary::End()
 {
-    return Iter(Iter::pointer(NULL));
+    return Iter(Iter::pointer(nullptr));
 }
 
 LLBC_Dictionary::ConstIter LLBC_Dictionary::End() const
 {
-    return ConstIter(ConstIter::cpointer(NULL));
+    return ConstIter(ConstIter::cpointer(nullptr));
 }
 
 LLBC_Dictionary::ReverseIter LLBC_Dictionary::ReverseBegin()
@@ -382,24 +382,24 @@ LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseBegin() const
 
 LLBC_Dictionary::ReverseIter LLBC_Dictionary::ReverseEnd()
 {
-    return ReverseIter(Iter::pointer(NULL));
+    return ReverseIter(Iter::pointer(nullptr));
 }
 
 LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseEnd() const
 {
-    return ConstReverseIter(ConstIter::cpointer(NULL));
+    return ConstReverseIter(ConstIter::cpointer(nullptr));
 }
 
 LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](int key) const
 {
     ConstIter it = Find(key);
-    return it != End() ? it.Obj() : NULL;
+    return it != End() ? it.Obj() : nullptr;
 }
 
 LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](const LLBC_String &key) const
 {
     ConstIter it = Find(key);
-    return it != End() ? it.Obj() : NULL;
+    return it != End() ? it.Obj() : nullptr;
 }
 
 void LLBC_Dictionary::SetObjectFactory(LLBC_ObjectFactory *factory)

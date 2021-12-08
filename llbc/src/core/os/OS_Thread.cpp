@@ -332,12 +332,12 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
 
     pthread_attr_destroy(&attr);
 #else
-    *handle = (HANDLE)_beginthreadex(NULL,
+    *handle = (HANDLE)_beginthreadex(nullptr,
                                      stackSize, 
                                      &LLBC_INTERNAL_NS __ThreadEntry,
                                      threadArg,
                                      0,
-                                     NULL);
+                                     nullptr);
     if (!*handle)
     {
         LLBC_Delete(threadArg);
@@ -549,7 +549,7 @@ int LLBC_JoinThread(LLBC_NativeThreadHandle handle)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    int status = pthread_join(handle, NULL);
+    int status = pthread_join(handle, nullptr);
     if (status != 0)
     {
         errno = status;
@@ -639,7 +639,7 @@ void LLBC_Sleep(int milliSeconds)
         struct timespec ts;
         ts.tv_sec = milliSeconds / 1000;
         ts.tv_nsec = (milliSeconds % 1000) * 1000 * 1000;
-        nanosleep(&ts, NULL);
+        nanosleep(&ts, nullptr);
     }
 #else
     ::Sleep(milliSeconds);
@@ -655,7 +655,7 @@ int LLBC_TlsAlloc(LLBC_TlsHandle *handle)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    int status = pthread_key_create(handle, NULL);
+    int status = pthread_key_create(handle, nullptr);
     if (status != 0)
     {
         errno = status;
@@ -709,7 +709,7 @@ void *LLBC_TlsGetValue(LLBC_TlsHandle handle)
     if (handle == LLBC_INVALID_TLS_HANDLE)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32

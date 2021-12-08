@@ -36,7 +36,7 @@ class csllbc_Service;
  * @param[in] svcName   - the service name.
  * @param[in] fullStack - the full-stack option.
  * @param[in] ...       - the delegates, internal used.
- * @return csllbc_Service * - the created service, if failed, return NULL.
+ * @return csllbc_Service * - the created service, if failed, return nullptr.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
                                                                   const char *svcName,

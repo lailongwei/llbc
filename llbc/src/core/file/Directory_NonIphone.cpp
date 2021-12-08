@@ -35,7 +35,7 @@ LLBC_String LLBC_Directory::DocDir()
 #else // Win32
     CHAR buf[MAX_PATH];
     memset(buf, 0, sizeof(CHAR) * MAX_PATH);
-    if (::SHGetSpecialFolderPathA(NULL, buf, CSIDL_COMMON_DOCUMENTS, FALSE) == FALSE)
+    if (::SHGetSpecialFolderPathA(nullptr, buf, CSIDL_COMMON_DOCUMENTS, FALSE) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return "";
@@ -49,7 +49,7 @@ LLBC_String LLBC_Directory::HomeDir()
 {
 #if LLBC_TARGET_PLATFORM_WIN32
     size_t requiredSize = 0;
-    if (getenv_s(&requiredSize, NULL, 0, "HOMEPATH") != 0)
+    if (getenv_s(&requiredSize, nullptr, 0, "HOMEPATH") != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_String();
@@ -118,7 +118,7 @@ LLBC_String LLBC_Directory::TempDir()
     return "/tmp";
 #else // Win32
     DWORD bufLen = 0;
-    bufLen = ::GetTempPathA(0, NULL);
+    bufLen = ::GetTempPathA(0, nullptr);
     bufLen += 1;
 
     LPSTR buf = reinterpret_cast<LPSTR>(::malloc(sizeof(CHAR) * bufLen));
@@ -146,7 +146,7 @@ LLBC_String LLBC_Directory::CacheDir()
 #else // Win32
     CHAR buf[MAX_PATH];
     memset(buf, 0, sizeof(CHAR) * MAX_PATH);
-    if (::SHGetSpecialFolderPathA(NULL, buf, CSIDL_INTERNET_CACHE, FALSE) == FALSE)
+    if (::SHGetSpecialFolderPathA(nullptr, buf, CSIDL_INTERNET_CACHE, FALSE) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return "";

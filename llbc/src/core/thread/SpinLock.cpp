@@ -33,11 +33,11 @@ LLBC_SpinLock::LLBC_SpinLock()
 #elif LLBC_TARGET_PLATFORM_WIN32
     ::InitializeCriticalSectionAndSpinCount(&_handle, 8000);
 #elif LLBC_TARGET_PLATFORM_MAC
-    pthread_mutex_init(&_handle, NULL);
+    pthread_mutex_init(&_handle, nullptr);
 #elif LLBC_TARGET_PLATFORM_IPHONE
-    pthread_mutex_init(&_handle, NULL);
+    pthread_mutex_init(&_handle, nullptr);
 #elif LLBC_TARGET_PLATFORM_ANDROID
-    pthread_spin_init(&_handle, NULL);
+    pthread_spin_init(&_handle, nullptr);
 #endif
 }
 
@@ -109,7 +109,7 @@ bool LLBC_SpinLock::IsDummyLock() const
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 void *LLBC_SpinLock::Handle()
 {
-    return NULL;
+    return nullptr;
 }
 #endif
 

@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
 LLBC_LogTimeToken::LLBC_LogTimeToken()
 : _lastFmtTime(0)
 , _cacheLen(0)
-, _fmtCache("")
+, _fmtCache{}
 {
 }
 

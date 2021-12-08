@@ -58,7 +58,7 @@ int TestSuite_Main(int argc, char* argv[])
         {
             const char* testcaseName = __TEST_CASE_NAME(i);
             __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(i);
-            if (testcaseName == NULL || testcaseFactory == NULL)
+            if (testcaseName == nullptr || testcaseFactory == nullptr)
                 continue;
 
             LLBC_PrintLine("%d: %s", i + 1, testcaseName);
@@ -69,7 +69,7 @@ int TestSuite_Main(int argc, char* argv[])
         LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
 
         char inputBuf[8192];
-        if (fgets(inputBuf, sizeof(inputBuf), stdin) == NULL)
+        if (fgets(inputBuf, sizeof(inputBuf), stdin) == nullptr)
         {
             // __ClearInputBuf();
             continue;
@@ -90,7 +90,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         const char* testcaseName = __TEST_CASE_NAME(idx);
         __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(idx);
-        if (testcaseName == NULL || testcaseFactory == NULL)
+        if (testcaseName == nullptr || testcaseFactory == nullptr)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
@@ -105,7 +105,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_White, "%s selected.", testcaseName);
 
-        int testArgc = inputs.size();
+        int testArgc = static_cast<int>(inputs.size());
         const char **testArgv = LLBC_Malloc(const char *, sizeof(char *) * testArgc);
         testArgv[0] = argv[0];
         for (int i = 1; i < testArgc; ++i)

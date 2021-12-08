@@ -26,43 +26,10 @@
 #include "pyllbc/core/Core.h"
 
 /**
- * \brief The python event c++ wrap class encapsulation.
- */
-class LLBC_HIDDEN pyllbc_Event : public LLBC_Event
-{
-    typedef LLBC_Event _Base;
-
-public:
-    /**
-     * Constructor.
-     * @param[in] id   - the event Id.
-     * @param[in] data - the event data, normal, not steal reference to data.
-     */
-    pyllbc_Event(int id, PyObject *data);
-
-    /**
-     * Destructor.
-     */
-    virtual ~pyllbc_Event();
-
-public:
-    /**
-     * Get event data(new reference).
-     * @return PyObject * - the event data.
-     */
-    PyObject *GetData();
-
-private:
-    PyObject *_data;
-};
-
-/**
  * \brief The event listener class encapsulation.
  */
-class LLBC_HIDDEN pyllbc_EventListener : public LLBC_Delegate1<void, pyllbc_Event, LLBC_Event *>
+class LLBC_HIDDEN pyllbc_EventListener : public LLBC_EventListener
 {
-    typedef LLBC_Delegate1<void, pyllbc_Event, LLBC_Event *> _Base;
-
 public:
     /**
      * Delegate ctor&dtor.
@@ -79,9 +46,10 @@ public:
     int SetPyListener(PyObject *pyListener);
 
     /**
-     * Delegate invoke method override.
+     * Listener invoke method.
+     * @param[in] ev - the event object.
      */
-    virtual void Invoke(LLBC_Event *ev);
+    virtual void Invoke(LLBC_Event &ev);
 
 private:
     PyObject *_pyListenerObj;

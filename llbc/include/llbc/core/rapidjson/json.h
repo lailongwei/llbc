@@ -15,7 +15,7 @@
 __LLBC_NS_BEGIN
 
 // replace rapidjson with LLBC_Json
-namespace LLBC_Json = ::rapidjson;
+namespace LLBC_Json = ::llbc_rapidjson;
 // rapidjson's value
 typedef LLBC_Json::Value LLBC_JsonValue;
 // iterator of rapidjson's value

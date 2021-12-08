@@ -32,7 +32,7 @@ struct TestData : public LLBC_ICoder
 
     TestData()
     : iVal(0)
-    , _poolInst(NULL)
+    , _poolInst(nullptr)
     {
     }
 
@@ -225,8 +225,8 @@ public:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, true))
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, false))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, true))
+// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, false))
 {
 }
 
@@ -303,7 +303,11 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     const int clientCount = 10;
     LLBC_PrintLine("Create %d clients to connet to this listen session", clientCount);
     for (int i = 0; i < clientCount; ++i)
-        _svc->AsyncConn(ip, port);
+    {
+        auto connSid = _svc->AsyncConn(ip, port);
+        if (connSid == 0)
+            LLBC_PrintLine("connect to %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
+    }
 }
 
 void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
@@ -327,7 +331,7 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
     if (LLBC_StrCmpA(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
         clientCount = 5;
     else
-        clientCount = 50;
+        clientCount = 100;
 
     LLBC_PrintLine("Async connect to %s:%d", ip, port);
     for (int i = 0; i < clientCount; ++i)

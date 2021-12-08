@@ -72,6 +72,8 @@
 #define LLBC_CFG_CORE_UTILS_IMPL__I64TOA                    0
 // Determine library impl _ui64toa() API or not, Non-WIN32 Platform specific.
 #define LLBC_CFG_CORE_UTILS_IMPL__UI64TOA                   0
+// Determine define win32-styled string datatypes or not, eg:LPSTR/LPTSTR/...
+#define LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES  0
 
 /**
  * \brief core/sampler about config options define.
@@ -101,6 +103,8 @@
  */
 // Root logger name.
 #define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
+// Logger format buf size.
+#define LLBC_CFG_LOG_FORMAT_BUF_SIZE                        16 * 1024
 // Default log level is set to DEBUG(DEBUG:0, INFO:1, WARN:2, ERROR:3, FATAL:4).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
@@ -152,7 +156,7 @@
  */
 // Strict timer schedule mode.
 #define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
-// Long timeout time, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
+// Long timeout time, in milli-seconds, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
 #define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
 
 /**

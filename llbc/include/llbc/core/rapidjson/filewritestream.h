@@ -12,18 +12,18 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_FILEWRITESTREAM_H_
-#define RAPIDJSON_FILEWRITESTREAM_H_
+#ifndef LLBC_RAPIDJSON_FILEWRITESTREAM_H_
+#define LLBC_RAPIDJSON_FILEWRITESTREAM_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include <cstdio>
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(unreachable-code)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(unreachable-code)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of C file stream for output using fwrite().
 /*!
@@ -34,7 +34,7 @@ public:
     typedef char Ch;    //!< Character type. Only support char.
 
     FileWriteStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferEnd_(buffer + bufferSize), current_(buffer_) { 
-        RAPIDJSON_ASSERT(fp_ != 0);
+        LLBC_RAPIDJSON_ASSERT(fp_ != 0);
     }
 
     void Put(char c) { 
@@ -72,11 +72,11 @@ public:
     }
 
     // Not implemented
-    char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
-    char Take() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
+    char Peek() const { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    char Take() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t Tell() const { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(char*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     // Prohibit copy constructor & assignment operator.
@@ -95,10 +95,10 @@ inline void PutN(FileWriteStream& stream, char c, size_t n) {
     stream.PutN(c, n);
 }
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
 #ifdef __clang__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_FILESTREAM_H_
+#endif // LLBC_RAPIDJSON_FILESTREAM_H_

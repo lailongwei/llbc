@@ -514,11 +514,11 @@ int pyllbc_ObjCoder::DecodeArray(const LLBC_JsonValue &in, PyObject *&out)
     {
         const LLBC_JsonValue &elemJson = *it;
 
-        PyObject *elemObj = NULL;
+        PyObject *elemObj = nullptr;
         if (This::_Decode(elemJson, elemObj) != LLBC_OK)
         {
             Py_DECREF(out);
-            out = NULL;
+            out = nullptr;
 
             return LLBC_FAILED;
         }
@@ -530,7 +530,7 @@ int pyllbc_ObjCoder::DecodeArray(const LLBC_JsonValue &in, PyObject *&out)
             Py_DECREF(elemObj);
 
             Py_DECREF(out);
-            out = NULL;
+            out = nullptr;
 
             return LLBC_FAILED;
         }
@@ -557,17 +557,17 @@ int pyllbc_ObjCoder::DecodeObj(const LLBC_JsonValue &in, PyObject *&out)
             pyllbc_SetError("dict key not string type", LLBC_ERROR_INVALID);
 
             Py_DECREF(out);
-            out = NULL;
+            out = nullptr;
 
             return LLBC_FAILED;
         }
 
-        PyObject *elemObj = NULL;
+        PyObject *elemObj = nullptr;
         const LLBC_JsonValue &elemJson = it->value;
         if (This::_Decode(elemJson, elemObj) != LLBC_OK)
         {
             Py_DECREF(out);
-            out = NULL;
+            out = nullptr;
 
             return LLBC_FAILED;
         }
@@ -579,7 +579,7 @@ int pyllbc_ObjCoder::DecodeObj(const LLBC_JsonValue &in, PyObject *&out)
             Py_DECREF(elemObj);
 
             Py_DECREF(out);
-            out = NULL;
+            out = nullptr;
 
             return LLBC_FAILED;
         }

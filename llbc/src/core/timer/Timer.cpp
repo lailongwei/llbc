@@ -31,28 +31,22 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_Timer::LLBC_Timer(void(*timeoutFunc)(LLBC_Timer *),
-                       void(*cancelFunc)(LLBC_Timer *),
-                       Scheduler *scheduler)
-: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
-, _timerData(NULL)
-
-, _data(NULL)
-, _timeoutDeleg(timeoutFunc ? new LLBC_Func1<void, LLBC_Timer *>(timeoutFunc) : NULL)
-, _cancelDeleg(cancelFunc ? new LLBC_Func1<void, LLBC_Timer *>(cancelFunc) : NULL)
-{
-}
-
-LLBC_Timer::LLBC_Timer(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg,
-                       LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg,
+LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
+                       const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
                        LLBC_Timer::Scheduler *scheduler)
-: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
-, _timerData(NULL)
+: _scheduler(scheduler)
+, _timerData(nullptr)
 
-, _data(NULL)
+, _data(nullptr)
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
+    if (!scheduler)
+    {
+        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+        if (libTls)
+            _scheduler = reinterpret_cast<Scheduler *>(libTls->coreTls.timerScheduler);
+    }
 }
 
 LLBC_Timer::~LLBC_Timer()
@@ -62,15 +56,11 @@ LLBC_Timer::~LLBC_Timer()
         Cancel();
         if (--_timerData->refCount == 0)
             LLBC_Delete(_timerData);
-
-        _timerData = NULL;
+;
     }
 
-    LLBC_XDelete(_data);
-    LLBC_XDelete(_timeoutDeleg);
-    LLBC_XDelete(_cancelDeleg);
-
-    _scheduler = NULL;
+    if (_data)
+        LLBC_Delete(_data);
 }
 
 uint64 LLBC_Timer::GetDueTime() const
@@ -88,39 +78,13 @@ LLBC_TimerId LLBC_Timer::GetTimerId() const
     return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
 }
 
-void LLBC_Timer::SetTimeoutHandler(void (*timeoutFunc)(LLBC_Timer *))
+void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg)
 {
-    typedef LLBC_Func1<void, LLBC_Timer *> __TimeoutFuncDeleg;
-
-    LLBC_XDelete(_timeoutDeleg);
-    if (timeoutFunc != NULL)
-        _timeoutDeleg = LLBC_New(__TimeoutFuncDeleg, timeoutFunc);
-}
-
-void LLBC_Timer::SetTimeoutHandler(LLBC_IDelegate1<void, LLBC_Timer *> *timeoutDeleg)
-{
-    if (UNLIKELY(timeoutDeleg == _timeoutDeleg))
-        return;
-
-    LLBC_XDelete(_timeoutDeleg);
     _timeoutDeleg = timeoutDeleg;
 }
 
-void LLBC_Timer::SetCancelHandler(void (*cancelFunc)(LLBC_Timer *))
+void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
 {
-    typedef LLBC_Func1<void, LLBC_Timer *> __CancelFuncDeleg;
-
-    LLBC_XDelete(_cancelDeleg);
-    if (cancelFunc != NULL)
-        _cancelDeleg = LLBC_New(__CancelFuncDeleg, cancelFunc);
-}
-
-void LLBC_Timer::SetCancelHandler(LLBC_IDelegate1<void, LLBC_Timer *> *cancelDeleg)
-{
-    if (UNLIKELY(cancelDeleg == _cancelDeleg))
-        return;
-
-    LLBC_XDelete(_cancelDeleg);
     _cancelDeleg = cancelDeleg;
 }
 
@@ -139,16 +103,16 @@ const LLBC_Variant & LLBC_Timer::GetTimerData() const
     void LLBC_Timer::OnTimeout()
 {
     if (LIKELY(_timeoutDeleg))
-        _timeoutDeleg->Invoke(this);
+        _timeoutDeleg(this);
 }
 
 void LLBC_Timer::OnCancel()
 {
     if (_cancelDeleg)
-        _cancelDeleg->Invoke(this);
+        _cancelDeleg(this);
 }
 
-int LLBC_Timer::Schedule(uint64 dueTime, uint64 period)
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
 {
     if (_timerData && _timerData->cancelling)
     {
@@ -156,39 +120,26 @@ int LLBC_Timer::Schedule(uint64 dueTime, uint64 period)
         return LLBC_FAILED;
     }
 
-    int cancelRet = Cancel();
-    if (UNLIKELY(cancelRet!= LLBC_OK))
+    const int cancelRet = Cancel();
+    if (UNLIKELY(cancelRet != LLBC_OK))
         return cancelRet;
 
     if (UNLIKELY(!_scheduler))
     {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
+        _scheduler = reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
+        if (UNLIKELY(!_scheduler))
+        {
+            LLBC_SetLastError(LLBC_ERROR_INVALID);
+            return LLBC_FAILED;
+        }
     }
 
-    period = period == 0 ? dueTime : period;
-    return _scheduler->Schedule(this, dueTime, period);
-}
+    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMilliSeconds());
+    sint64 periodMillis = MAX(0ll, period.GetTotalMilliSeconds());
+    if (periodMillis == 0ll)
+        periodMillis = dueTimeMillis;
 
-int LLBC_Timer::Schedule(const LLBC_Time &dueTime, uint64 period)
-{
-    const LLBC_TimeSpan span = dueTime - LLBC_Time::Now();
-    return Schedule(LIKELY(span.GetTotalMilliSeconds() >= 0) ? 
-        static_cast<uint64>(span.GetTotalMilliSeconds()) : 0, period);
-}
-
-int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime)
-{
-    return Schedule(LIKELY(dueTime.GetTotalMilliSeconds() >= 0) ?
-        static_cast<uint64>(dueTime.GetTotalMilliSeconds()) : 0, 0);
-}
-
-int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
-{
-    return Schedule(LIKELY(dueTime.GetTotalMilliSeconds() >= 0) ?
-            static_cast<uint64>(dueTime.GetTotalMilliSeconds()) : 0, 
-                    LIKELY(period.GetTotalMilliSeconds() >= 0) ? 
-            static_cast<uint64>(period.GetTotalMilliSeconds()) : 0);
+    return _scheduler->Schedule(this, dueTimeMillis, periodMillis);
 }
 
 int LLBC_Timer::Cancel()
@@ -207,7 +158,7 @@ int LLBC_Timer::Cancel()
 
 bool LLBC_Timer::IsScheduling() const
 {
-    return (_timerData != NULL && _timerData->validate);
+    return (_timerData != nullptr && _timerData->validate);
 }
 
 bool LLBC_Timer::IsTimeouting() const

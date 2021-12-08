@@ -230,22 +230,22 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #if LLBC_TARGET_PLATFORM_WIN32
     else if (LLBC_ERROR_TYPE_IS_OSAPI(no) || LLBC_ERROR_TYPE_IS_NETAPI(no) || LLBC_ERROR_TYPE_IS_GAI(no))
     {
-        HLOCAL hLocal = NULL;
+        HLOCAL hLocal = nullptr;
         const DWORD sysLocale = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
         // const DWORD sysLocale = MAKELANGID(LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
         ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | 
                              FORMAT_MESSAGE_ALLOCATE_BUFFER |
                              FORMAT_MESSAGE_IGNORE_INSERTS,
-                         NULL,
+                         nullptr,
                          subErrno,
                          sysLocale,
                          (PSTR)&hLocal,
                          0,
-                         NULL);
+                         nullptr);
         if (!hLocal)
         {
-            HMODULE netDll = LoadLibraryExA("netmsg.dll", NULL, DONT_RESOLVE_DLL_REFERENCES);
-            if (netDll != NULL)
+            HMODULE netDll = LoadLibraryExA("netmsg.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
+            if (netDll != nullptr)
             {
                 ::FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE | 
                                     FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -255,13 +255,13 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
                                  sysLocale,
                                  (PSTR)&hLocal,
                                  0,
-                                 NULL);
+                                 nullptr);
                                     
                 ::FreeLibrary(netDll);
             }
         }
 
-        if (hLocal != NULL)
+        if (hLocal != nullptr)
         {
             PSTR sysErr = (PSTR)::LocalLock(hLocal);
 
@@ -412,7 +412,7 @@ int LLBC_RemoveAllCustomErrnos()
 void __LLBC_InitErrors()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    pthread_mutex_init(&__g_customErrLock, NULL);
+    pthread_mutex_init(&__g_customErrLock, nullptr);
 #else // LLBC_TARGET_PLATFORM_WIN32
     ::InitializeCriticalSection(&__g_customErrLock);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32

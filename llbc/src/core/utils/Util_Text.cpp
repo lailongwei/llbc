@@ -31,86 +31,78 @@
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
-int lstrlenA(LPCSTR lpString)
+size_t LLBC_StrLenW(const wchar_t *s)
 {
-#if LLBC_TARGET_PLATFORM_NON_IPHONE
-    return ::strlen(lpString);
-#else // iPhone
-    return static_cast<int>(::strlen(lpString));
-#endif // LLBC_TARGET_PLATFORM_NON_IPHONE
-}
-
-int lstrlenW(LPCWSTR lpString)
-{
-    if (UNLIKELY(!lpString))
+    if (UNLIKELY(!s))
         return 0;
 
-    int i = 0;
-    for (; lpString[i] != LLBC_WTEXT('\0'); ++i);
+    size_t i = 0;
+    for (; s[i] != L'\0'; ++i);
     return i;
 }
 
-LPSTR lstrcatA(LPSTR lpString1, LPCSTR lpString2)
+wchar_t *LLBC_StrCatW(wchar_t *s1, const wchar_t *s2)
 {
-    return ::strcat(lpString1, lpString2);
+    if (UNLIKELY(!s2))
+        return s1;
+
+    size_t s1Len = LLBC_StrLenW(s1);
+    size_t s2Len = LLBC_StrLenW(s2);
+    memcpy(s1 + s1Len, s2, sizeof(wchar_t) * s2Len);
+
+    return s1;
 }
 
-LPWSTR lstrcatW(LPWSTR lpString1, LPCWSTR lpString2)
+int LLBC_StrCmpW(const wchar_t *s1, const wchar_t *s2)
 {
-    if (UNLIKELY(!lpString2))
-        return lpString1;
-
-    int str1Len = ::lstrlenW(lpString1);
-    int str2Len = ::lstrlenW(lpString2);
-    memcpy(lpString1 + str1Len, lpString2, str2Len * sizeof(LLBC_NS wchar));
-
-    return lpString1;
-}
-
-int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2)
-{
-    return ::strcmp(lpString1, lpString2);
-}
-
-int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
-{
-    int str1Len = ::lstrlenW(lpString1);
-    int str2Len = ::lstrlenW(lpString2);
-    int len = MIN(str1Len, str2Len);
-    for (int i = 0; i < len; ++i)
+    while (*s1)
     {
-        if (lpString1[i] < lpString2[i])
-            return -1;
-        else if (lpString1[i] == lpString2[i])
-            return 1;
+        if (*s1 != *s2)
+            break;
+
+        s1++;
+        s2++;
     }
 
-    return (str1Len < str2Len ? -1 : 
-        (str1Len == str2Len ? 0 : 1));
+    return *s1 - *s2;
 }
 
-int lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2)
+int LLBC_StrCmpiW(const wchar_t *s1, const wchar_t *s2)
 {
-    return ::lstrcmpA(lpString1,lpString2);
+    while (*s1)
+    {
+        if (*s1 != *s2)
+        {
+            if (*s1 >= static_cast<wchar_t>('A') &&
+                *s1 <= static_cast<wchar_t>('Z'))
+            {
+                if (*s2 - *s1 == 'a' - 'A')
+                    continue;
+            }
+            else if (*s1 >= static_cast<wchar_t>('a') &&
+                     *s1 <= static_cast<wchar_t>('z'))
+            {
+                if (*s1 - *s2 == 'a' - 'A')
+                    continue;
+            }
+
+            break;
+        }
+
+        s1++;
+        s2++;
+    }
+
+    return *s1 - *s2;
 }
 
-int lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2)
+wchar_t *LLBC_StrCpyW(wchar_t *s1, const wchar_t *s2)
 {
-    return ::lstrcmpW(lpString1, lpString2);
-}
+    size_t s2Len = LLBC_StrLenW(s2);
+    ::memcpy(s1, s2, sizeof(wchar_t) * s2Len);
+    s1[s2Len] = L'\0';
 
-LPSTR lstrcpyA(LPSTR lpString1, LPCSTR lpString2)
-{
-    return strcpy(lpString1, lpString2);
-}
-
-LPWSTR lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2)
-{
-    int str2Len = ::lstrlenW(lpString2);
-    memcpy(lpString1, lpString2, str2Len * sizeof(LLBC_NS wchar));
-    lpString1[str2Len] = LLBC_WTEXT('\0');
-
-    return lpString1;
+    return s1;
 }
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
@@ -432,7 +424,7 @@ void *LLBC_Str2Ptr(const char *str)
     if (UNLIKELY(!str))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -447,7 +439,7 @@ void *LLBC_Str2Ptr(const char *str)
     }
 
     if (lowerStr.empty())
-        return NULL;
+        return nullptr;
 
     for (LLBC_String::size_type i = 0; i < lowerStr.size(); ++i)
     {
@@ -457,7 +449,7 @@ void *LLBC_Str2Ptr(const char *str)
                 (lowerStr[i] >= 'a' && lowerStr[i] <= 'f')))
             {
                 LLBC_SetLastError(LLBC_ERROR_ARG);
-                return NULL;
+                return nullptr;
             }
         }
         else
@@ -465,7 +457,7 @@ void *LLBC_Str2Ptr(const char *str)
             if (lowerStr[i] < '0' || lowerStr[i] > '9')
             {
                 LLBC_SetLastError(LLBC_ERROR_ARG);
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -503,7 +495,7 @@ int LLBC_HashString(const LLBC_String &str)
 
 int LLBC_HashString(const char *str, size_t strLen)
 {
-    if (UNLIKELY(str == NULL || strLen == 0))
+    if (UNLIKELY(str == nullptr || strLen == 0))
         return 0;
 
     if (strLen == static_cast<size_t>(-1))

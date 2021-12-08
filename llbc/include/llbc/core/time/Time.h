@@ -48,6 +48,8 @@ public:
     /**
      * Some constants variables define.
      */
+    static const LLBC_Time UTCBegin; // UTC begin time.
+
     static const int NumOfSecondsPerDay; // Number of seconds per-day.
     static const int NumOfMilliSecondsPerDay; // Number of milli-seconds per-day.
     static const sint64 NumOfMicroSecondsPerDay; // Number of micro-seconds per-day.
@@ -124,6 +126,7 @@ public:
     int GetMonth() const;
     int GetDay() const;
     int GetDayOfWeek() const;
+    int GetDayOfMonth() const;
     int GetDayOfYear() const;
     int GetHour() const;
     int GetMinute() const;
@@ -174,13 +177,13 @@ public:
     /**
      * Format local time, see strftime() api.
      */
-    LLBC_String Format(const char *format = NULL) const;
+    LLBC_String Format(const char *format = nullptr) const;
     static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
-    LLBC_String FormatAsGmt(const char *format = NULL) const;
+    LLBC_String FormatAsGmt(const char *format = nullptr) const;
     static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
 
 public:
@@ -214,6 +217,14 @@ public:
      * @return int - the specific month max days, if failed, return 0.
      */
     static int GetMonthMaxDays(int year, int month);
+
+    /**
+     * Get specific month span days.
+     * @param[in] year  - the year.
+     * @param[in] month - the month - [1, 12].
+     * @return int - the month span days(not included giving month).
+     */
+    static int GetMonthSpanDays(int year, int month);
 
 public:
     /**

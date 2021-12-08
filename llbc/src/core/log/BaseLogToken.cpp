@@ -28,8 +28,8 @@
 __LLBC_NS_BEGIN
 
 LLBC_BaseLogToken::LLBC_BaseLogToken()
-: _formatter(NULL)
-, _nextToken(NULL)
+: _formatter(nullptr)
+, _nextToken(nullptr)
 {
 }
 

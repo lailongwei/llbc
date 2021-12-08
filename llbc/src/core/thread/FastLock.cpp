@@ -32,7 +32,7 @@ LLBC_FastLock::LLBC_FastLock()
     _lock = 0;
 #else
  #if LLBC_TARGET_PLATFORM_NON_WIN32
-    pthread_mutex_init(&_handle, NULL);
+    pthread_mutex_init(&_handle, nullptr);
  #else
     ::InitializeCriticalSection(&_handle);
     _locked = false;
@@ -174,7 +174,7 @@ bool LLBC_FastLock::IsDummyLock() const
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 void *LLBC_FastLock::Handle()
 {
-    return NULL;
+    return nullptr;
 }
 #endif
 

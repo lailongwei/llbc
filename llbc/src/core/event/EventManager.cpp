@@ -29,12 +29,17 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_EventManager::_Listener::_Listener()
-: stub(LLBC_INVALID_LISTENER_STUB)
-
-, evId(0)
-, listener(NULL)
+LLBC_EventManager::_ListenerInfo::_ListenerInfo()
+: evId(0)
+, stub(LLBC_INVALID_LISTENER_STUB)
+, listener(nullptr)
 {
+}
+
+LLBC_EventManager::_ListenerInfo::~_ListenerInfo()
+{
+    if (listener)
+        LLBC_Delete(listener);
 }
 
 LLBC_EventManager::LLBC_EventManager()
@@ -45,80 +50,58 @@ LLBC_EventManager::LLBC_EventManager()
 
 LLBC_EventManager::~LLBC_EventManager()
 {
-    for (_DelayedOps::iterator it = _delayedOps.begin();
-         it != _delayedOps.end();
+    for (_Id2Listeners::iterator it = _id2Listeners.begin();
+         it != _id2Listeners.end();
          ++it)
-    {
-        _Op &op = *it;
-        LLBC_Delete(op.listener.listener);
-    }
-
-    for (_ListenersMap::iterator mIt = _listeners.begin();
-         mIt != _listeners.end();
-         ++mIt)
-    {
-        _Listeners listeners = mIt->second;
-        for (_Listeners::iterator lIt = listeners.begin();
-             lIt != listeners.end();
-             ++lIt)
-        {
-            _Listener &listener = *lIt;
-            LLBC_Delete(listener.listener);
-        }
-    }
+        LLBC_STLHelper::DeleteContainer(it->second);
 }
 
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                 LLBC_IDelegate1<void, LLBC_Event *> *listener,
-                                                 const LLBC_ListenerStub &bindedStub)
+                                                 const LLBC_Delegate<void(LLBC_Event &)> &listener,
+                                                 const LLBC_ListenerStub &boundStub)
 {
-    if (id <= 0 || listener == NULL)
+    if (id <= 0 || !listener)
     {
-        LLBC_XDelete(listener);
-
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_INVALID_LISTENER_STUB;
     }
 
     LLBC_ListenerStub stub;
-    if (bindedStub != LLBC_INVALID_LISTENER_STUB)
+    if (AddListenerCheck(boundStub, stub) != LLBC_OK)
+        return LLBC_INVALID_LISTENER_STUB;
+
+    _ListenerInfo *li = LLBC_New(_ListenerInfo);
+    li->evId = id;
+    li->stub = stub;
+    li->deleg = listener;
+
+    AddListenerInfo(li);
+
+    return stub;
+}
+
+LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
+                                                 LLBC_EventListener *listener,
+                                                 const LLBC_ListenerStub &boundStub)
+{
+    if (id <= 0 || !listener)
     {
-        if (SearchStub(bindedStub))
-        {
-            LLBC_Delete(listener);
-
-            LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_INVALID_LISTENER_STUB;
-        }
-
-        stub = bindedStub;
-    }
-    else
-    {
-        stub = ++_maxListenerStub;
-    }
-
-    _Op op;
-    op.addOp = true;
-    op.listener.evId = id;
-    op.listener.stub = stub;
-    op.listener.listener = listener;
-
-    if (IsFiring())
-    {
-        _delayedOps.push_back(op);
-
-        LLBC_SetLastError(LLBC_ERROR_PENDING);
-        return op.listener.stub;
-    }
-
-    if (ProcessEventOperation(op) != LLBC_OK)
-    {
-        LLBC_Delete(listener);
+        LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    return op.listener.stub;
+    LLBC_ListenerStub stub;
+    if (AddListenerCheck(boundStub, stub) != LLBC_OK)
+        return LLBC_INVALID_LISTENER_STUB;
+
+    _ListenerInfo *li = LLBC_New(_ListenerInfo);
+    li->evId = id;
+    li->stub = stub;
+    li->listener = listener;
+
+    AddListenerInfo(li);
+
+    return stub;
 }
 
 int LLBC_EventManager::RemoveListener(int id)
@@ -129,143 +112,105 @@ int LLBC_EventManager::RemoveListener(int id)
         return LLBC_FAILED;
     }
 
-    _Op op;
-    op.addOp = false;
-    op.listener.evId = id;
-
-    if (IsFiring())
+    _Id2Listeners::iterator idIt = _id2Listeners.find(id);
+    if (idIt == _id2Listeners.end())
     {
-        _delayedOps.push_back(op);
-
-        LLBC_SetLastError(LLBC_ERROR_PENDING);
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
-    return ProcessEventOperation(op);
+    if (IsFiring())
+    {
+        if (!_pendingRemoveEvIds.insert(id).second)
+            LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        else
+            LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
+    }
+
+    _Listeners &listeners = idIt->second;
+    for (_Listeners::iterator it = listeners.begin();
+         it != listeners.end();
+         ++it)
+        _stub2Listeners.erase((*it)->stub);
+
+    LLBC_STLHelper::DeleteContainer(idIt->second);
+    _id2Listeners.erase(idIt);
+
+    return LLBC_OK;
 }
 
 int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
 {
-    _Op op;
-    op.addOp = false;
-    op.listener.stub = stub;
-
-    if (IsFiring())
+    if (stub == LLBC_INVALID_LISTENER_STUB)
     {
-        _delayedOps.push_back(op);
-
-        LLBC_SetLastError(LLBC_ERROR_PENDING);
+        LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    return ProcessEventOperation(op);
+    _Stub2Listeners::iterator stubIt = _stub2Listeners.find(stub);
+    if (stubIt == _stub2Listeners.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    if (IsFiring())
+    {
+        if (!_pendingRemoveEvStubs.insert(stub).second)
+            LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        else
+            LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
+    }
+
+    int &evId = stubIt->second.first;
+    _Id2Listeners::iterator idIt = _id2Listeners.find(evId);
+    _Listeners &listeners = idIt->second;
+
+    _Listeners::iterator liIt = stubIt->second.second;
+    LLBC_Delete(*liIt);
+    listeners.erase(liIt);
+    if (listeners.empty())
+        _id2Listeners.erase(idIt);
+
+    _stub2Listeners.erase(stubIt);
+
+    return LLBC_OK;
 }
 
 void LLBC_EventManager::FireEvent(LLBC_Event *event)
 {
     BeforeFireEvent();
 
-    _ListenersMap::iterator mIt = _listeners.find(event->GetId());
-    if (mIt != _listeners.end())
+    _Id2Listeners::iterator idIt = _id2Listeners.find(event->GetId());
+    if (idIt != _id2Listeners.end())
     {
-        _Listeners &listeners = mIt->second;
-        for (_Listeners::iterator lIt = listeners.begin();
-             lIt != listeners.end();
+        _Listeners &listeners = idIt->second;
+        const _Listeners::const_iterator lItEnd = listeners.end();
+        for (_Listeners::const_iterator lIt = listeners.begin();
+             lIt != lItEnd;
              ++lIt)
         {
-            _Listener &listener = *lIt;
-            listener.listener->Invoke(event);
+            const _ListenerInfo * const &listener = *lIt;
+            if (listener->deleg)
+                listener->deleg(*event);
+            else
+                listener->listener->Invoke(*event);
         }
     }
 
-    if (event->IsDontDelAfterFire())
-    {
-        AfterFireEvent();
-    }
-    else
-    {
+    if (!event->IsDontDelAfterFire())
         LLBC_Delete(event);
-        AfterFireEvent();
-    }
+
+    AfterFireEvent();
 }
 
-bool LLBC_EventManager::SearchStub(const LLBC_ListenerStub &stub) const
+bool LLBC_EventManager::HasStub(const LLBC_ListenerStub &stub) const
 {
-    return _stubListeners.find(stub) != _stubListeners.end();
-}
-
-int LLBC_EventManager::ProcessEventOperation(LLBC_EventManager::_Op &op)
-{
-    _Listener &listener = op.listener;
-    if (op.addOp)
-    {
-        _ListenersMap::iterator mIt = _listeners.find(listener.evId);
-        if (mIt == _listeners.end())
-            mIt = _listeners.insert(std::make_pair(listener.evId, std::vector<_Listener>())).first;
-
-        _Listeners &listeners = mIt->second;
-        listeners.push_back(listener);
-
-        _stubListeners.insert(std::make_pair(listener.stub, listener));
-    }
-    else
-    {
-        if (listener.evId > 0)
-        {
-            _ListenersMap::iterator mIt = _listeners.find(listener.evId);
-            if (mIt == _listeners.end())
-            {
-                LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-                return LLBC_FAILED;
-            }
-
-            _Listeners &listeners = mIt->second;
-            for (_Listeners::iterator lIt = listeners.begin();
-                 lIt != listeners.end();
-                 lIt++)
-            {
-                _Listener &l = *lIt;
-
-                _stubListeners.erase(l.stub);
-                LLBC_Delete(l.listener);
-            }
-
-            _listeners.erase(mIt);
-        }
-        else
-        {
-            _StubIndexedListeners::iterator stubIt = _stubListeners.find(listener.stub);
-            if (stubIt == _stubListeners.end())
-            {
-                LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-                return LLBC_FAILED;
-            }
-
-            const int evId = stubIt->second.evId;
-            _ListenersMap::iterator mIt = _listeners.find(evId);
-
-            _Listeners &listeners = mIt->second;
-            for (_Listeners::iterator lIt = listeners.begin();
-                 lIt != listeners.end();
-                 lIt++)
-            {
-                _Listener &l = *lIt;
-                if (l.stub == listener.stub)
-                {
-                    LLBC_Delete(l.listener);
-                    listeners.erase(lIt);
-                    break;
-                }
-            }
-
-            if (listeners.empty())
-                _listeners.erase(mIt);
-
-            _stubListeners.erase(stubIt);
-        }
-    }
-
-    return LLBC_OK;
+    return _stub2Listeners.find(stub) != _stub2Listeners.end();
 }
 
 void LLBC_EventManager::BeforeFireEvent()
@@ -277,11 +222,54 @@ void LLBC_EventManager::AfterFireEvent()
 {
     if (--_firing == 0)
     {
-        for (size_t i = 0; i < _delayedOps.size(); ++i)
-            ProcessEventOperation(_delayedOps[i]);
+        if (!_pendingRemoveEvIds.empty())
+        {
+            for (std::set<int>::const_iterator it = _pendingRemoveEvIds.begin();
+                 it != _pendingRemoveEvIds.end();
+                 ++it)
+                RemoveListener(*it);
 
-        _delayedOps.clear();
+            _pendingRemoveEvIds.clear();
+        }
+
+        if (!_pendingRemoveEvStubs.empty())
+        {
+            for (std::set<LLBC_ListenerStub>::const_iterator it = _pendingRemoveEvStubs.begin();
+                 it != _pendingRemoveEvStubs.end();
+                 ++it)
+                RemoveListener(*it);
+
+            _pendingRemoveEvStubs.clear();
+        }
     }
+}
+
+int LLBC_EventManager::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub)
+{
+    if (boundStub != LLBC_INVALID_LISTENER_STUB)
+    {
+        if (HasStub(boundStub))
+        {
+            LLBC_SetLastError(LLBC_ERROR_REPEAT);
+            return LLBC_FAILED;
+        }
+
+        stub = boundStub;
+    }
+    else
+    {
+        stub = ++_maxListenerStub;
+    }
+
+    return LLBC_OK;
+}
+
+void LLBC_EventManager::AddListenerInfo(_ListenerInfo *li)
+{
+    auto &idListeners = _id2Listeners[li->evId];
+    idListeners.push_back(li);
+
+    _stub2Listeners[li->stub] = std::make_pair(li->evId, --idListeners.end());
 }
 
 __LLBC_NS_END

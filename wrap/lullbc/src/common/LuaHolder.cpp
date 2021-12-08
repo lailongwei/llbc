@@ -28,7 +28,7 @@
 
 void lullbc_LuaHolder::Hold(lua_State *l, int fromStackPos, const char *toKey, bool remove)
 {
-    if (UNLIKELY(l == NULL || toKey == NULL))
+    if (UNLIKELY(l == nullptr || toKey == nullptr))
         lullbc_SetError(l, LLBC_ERROR_ARG);
 
     if (UNLIKELY(lua_isnil(l, fromStackPos)))
@@ -47,7 +47,7 @@ void lullbc_LuaHolder::Hold(lua_State *l, int fromStackPos, const char *toKey, b
 
 void lullbc_LuaHolder::Hold(lua_State *l, const char *fromGlobalKey, const char *toKey, bool remove)
 {
-    if (UNLIKELY(l == NULL || fromGlobalKey == NULL || toKey == NULL))
+    if (UNLIKELY(l == nullptr || fromGlobalKey == nullptr || toKey == nullptr))
         lullbc_SetError(l, LLBC_ERROR_ARG);
 
     PushHoldTable(l);
@@ -72,7 +72,7 @@ void lullbc_LuaHolder::Hold(lua_State *l, const char *fromGlobalKey, const char 
 
 void lullbc_LuaHolder::UnHold(lua_State *l, const char *key)
 {
-    if (UNLIKELY(l == NULL || key == NULL))
+    if (UNLIKELY(l == nullptr || key == nullptr))
         lullbc_SetError(l, LLBC_ERROR_ARG);
 
     PushHoldTable(l);
@@ -84,7 +84,7 @@ void lullbc_LuaHolder::UnHold(lua_State *l, const char *key)
 
 void lullbc_LuaHolder::Get(lua_State *l, const char *key)
 {
-    if (UNLIKELY(l == NULL || key == NULL))
+    if (UNLIKELY(l == nullptr || key == nullptr))
         lullbc_SetError(l, LLBC_ERROR_ARG);
 
     PushHoldTable(l);

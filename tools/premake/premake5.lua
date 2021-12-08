@@ -281,6 +281,8 @@ project "testsuite"
     -- optimize
     set_optimize_opts()
 
+group "wrap"
+
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting
 -- import pylib_setting
@@ -460,6 +462,8 @@ project "pyllbc"
     -- enable multithread compile
     enable_multithread_comp()
 
+group "wrap/csllbc"
+
 -- ****************************************************************************
 -- csharp wrap library(csllbc) native library compile setting
 project "csllbc_native"
@@ -637,6 +641,8 @@ project "csllbc_testsuite"
         "System.Core",
         "csllbc",
     }
+
+group "wrap/lullbc"
 
 -- ****************************************************************************
 -- luasrc library(liblua) compile setting
@@ -883,3 +889,4 @@ project "lullbc"
         targetsuffix "_debug"
     filter {}
 
+group ""
