@@ -28,7 +28,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *fmt, ...)
+inline int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Debug < _logLevel)
         return LLBC_OK;
@@ -41,7 +41,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::Debug(const char *tag, const char *file, int 
     return ret;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *fmt, ...)
+inline int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Info < _logLevel)
         return LLBC_OK;
@@ -54,7 +54,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::Info(const char *tag, const char *file, int l
     return ret;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *fmt, ...)
+inline int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Warn < _logLevel)
         return LLBC_OK;
@@ -67,7 +67,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::Warn(const char *tag, const char *file, int l
     return ret;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *fmt, ...)
+inline int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Error < _logLevel)
         return LLBC_OK;
@@ -80,7 +80,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::Error(const char *tag, const char *file, int 
     return ret;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *fmt, ...)
+inline int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *fmt, ...)
 {
     if (LLBC_LogLevel::Fatal < _logLevel)
         return LLBC_OK;
@@ -93,7 +93,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::Fatal(const char *tag, const char *file, int 
     return ret;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) 
+inline int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) 
 {
     if (level < _logLevel)
         return LLBC_OK;
