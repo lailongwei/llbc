@@ -112,35 +112,35 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
     do {                                                                               \
         LLBC_NS LLBC_LogMessageBuffer oss;                                             \
         LLBC_NS LLBC_Logger *l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
-        l->Debug(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());     \
+        l->Debug(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());  \
     } while(0)                                                                         \
 
 #define LLBC_INFO_LOG(message)                                                         \
     do {                                                                               \
         LLBC_NS LLBC_LogMessageBuffer oss;                                             \
         LLBC_NS LLBC_Logger *l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
-        l->Info(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());      \
+        l->Info(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());   \
     } while(0)                                                                         \
 
 #define LLBC_WARN_LOG(message)                                                         \
     do {                                                                               \
         LLBC_NS LLBC_LogMessageBuffer oss;                                             \
         LLBC_NS LLBC_Logger *l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
-        l->Warn(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());      \
+        l->Warn(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());   \
     } while(0)                                                                         \
 
 #define LLBC_ERROR_LOG(message)                                                        \
     do {                                                                               \
         LLBC_NS LLBC_LogMessageBuffer oss;                                             \
         LLBC_NS LLBC_Logger *l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
-        l->Error(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());     \
+        l->Error(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());  \
     } while(0)                                                                         \
 
 #define LLBC_FATAL_LOG(message)                                                        \
     do {                                                                               \
         LLBC_NS LLBC_LogMessageBuffer oss;                                             \
         LLBC_NS LLBC_Logger *l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
-        l->Fatal(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());     \
+        l->Fatal(nullptr, __FILE__, __LINE__, "%s", oss.str(oss << message).c_str());  \
     } while(0)                                                                         \
 
 #define LLBC_DEBUG_LOG2(tag, message)                                                  \

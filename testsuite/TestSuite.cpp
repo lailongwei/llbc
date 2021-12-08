@@ -105,7 +105,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_White, "%s selected.", testcaseName);
 
-        int testArgc = inputs.size();
+        int testArgc = static_cast<int>(inputs.size());
         const char **testArgv = LLBC_Malloc(const char *, sizeof(char *) * testArgc);
         testArgv[0] = argv[0];
         for (int i = 1; i < testArgc; ++i)

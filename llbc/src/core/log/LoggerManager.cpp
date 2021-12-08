@@ -153,7 +153,6 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
         return nullptr;
     }
 
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return _root;
 }
 
@@ -183,7 +182,6 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
         return nullptr;
     }
 
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return iter->second;
 }
 

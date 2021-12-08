@@ -41,25 +41,26 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_EXPORT LLBC_LogData
 {
-    LLBC_Logger *logger;                  // Log data owner logger.
-    char *msg;                            // Log message(allocate from heap).
-    uint32 msgLen;                        // message length.
+    LLBC_Logger *logger;    // Log data owner logger.
+    const char *loggerName; // Logger name.
 
-    int level;                            // Log level.
-    const char *loggerName;               // Logger name.
+    char *msg;              // Log message.
+    int msgLen;             // message length.
+    int msgCap;             // message capacity.
 
-    char *others;                         // Others data(allocate from heap).
-    uint32 othersSize;                    // Others data size.
-    uint32 tagBeg;                        // Tag begin.
-    uint32 tagLen;                        // Tag length.
+    int level;              // Log level.
+    sint64 logTime;         // Log time.
 
-    sint64 logTime;                       // Log time.
+    char *others;           // Other infos[file, tag].
+    uint32 othersCap;       // Others data size.
+    uint32 fileBeg;         // File begin.
+    uint32 fileLen;         // Log source file name length.
+    uint32 tagBeg;          // Tag begin.
+    uint32 tagLen;          // Tag length.
 
-    uint32 fileBeg;                       // Log source file name begin.
-    uint32 fileLen;                       // Log source file name length.
-    long line;                            // Log source file line number.
+    long line;              // Log source file line number.
 
-    LLBC_ThreadId threadId;               // Log native thread Id.
+    LLBC_ThreadId threadId; // Log native thread Id.
 
 public:
     /**
@@ -93,6 +94,9 @@ public:
      * Object pool support method.
      */
     LLBC_IObjectPoolInst *GetPoolInst();
+
+    // Disable log data assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_LogData);
 
 private:
     LLBC_IObjectPoolInst *_poolInst;

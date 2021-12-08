@@ -103,6 +103,8 @@
  */
 // Root logger name.
 #define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
+// Logger format buf size.
+#define LLBC_CFG_LOG_FORMAT_BUF_SIZE                        16 * 1024
 // Default log level is set to DEBUG(DEBUG:0, INFO:1, WARN:2, ERROR:3, FATAL:4).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.

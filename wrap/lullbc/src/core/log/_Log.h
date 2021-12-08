@@ -102,7 +102,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     int line = lua_toint32(l, 5);
 
     // Output message.
-    if (UNLIKELY(logger->OutputNonFormat(level, tag, file, line, msg.data(), msg.size()) != LLBC_OK))
+    if (UNLIKELY(logger->NonFormatOutput(level, tag, file, line, msg.data(), msg.size()) != LLBC_OK))
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
 
     return 0;

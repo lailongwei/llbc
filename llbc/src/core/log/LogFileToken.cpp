@@ -50,7 +50,7 @@ int LLBC_LogFileToken::GetType() const
 void LLBC_LogFileToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     int index = static_cast<int>(formattedData.size());
-    if (data.fileLen)
+    if (data.fileLen > 0)
         formattedData.append(data.others + data.fileBeg, data.fileLen);
 
     LLBC_LogFormattingInfo *formatter = GetFormatter();

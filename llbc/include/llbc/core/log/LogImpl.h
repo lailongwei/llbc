@@ -19,182 +19,374 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifdef __LLBC_CORE_LOG_LOG_H__
+
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogJsonMsg.h"
 
-#ifdef __LLBC_CORE_LOG_LOG_H__
-
 __LLBC_NS_BEGIN
 
-template <typename Tag>
-inline void LLBC_LogHelper::d2(const char *fmt, ...)
+#define __LLBC_LOG_TO_SPEC(logger, level, tag, fmt)                        \
+    do                                                                     \
+    {                                                                      \
+        if (UNLIKELY(!_rootLogger))                                        \
+        {                                                                  \
+            char *fmttedMsg; int msgLen;                                   \
+            LLBC_FormatArg(fmt, fmttedMsg, msgLen);                        \
+            UnInitOutput(level >= LLBC_NS LLBC_LogLevel::Warn ? stderr : stdout, fmttedMsg); \
+                                                                           \
+            LLBC_Free(fmttedMsg);                                          \
+            break;                                                         \
+        }                                                                  \
+                                                                           \
+        LLBC_NS LLBC_Logger *l = nullptr;                                  \
+        if (logger == nullptr)                                             \
+            l = _rootLogger;                                               \
+        else                                                               \
+            l = _loggerManager->GetLogger(logger);                         \
+                                                                           \
+        if (LIKELY(l))                                                     \
+        {                                                                  \
+            va_list va;                                                    \
+            va_start(va, fmt);                                             \
+            l->FormatOutput(level, tag, __FILE__, __LINE__, fmt, va);      \
+            va_end(va);                                                    \
+        }                                                                  \
+    } while (0)                                                            \
+
+#define __LLBC_JLOG_TO_SPEC(logger, tag, lv)                               \
+    LLBC_Logger *l = nullptr;                                              \
+    if (logger == nullptr)                                                 \
+        l = _rootLogger;                                                   \
+    else if (LIKELY(_loggerManager))                                       \
+        l = _loggerManager->GetLogger(logger);                             \
+                                                                           \
+    return *LLBC_New(LLBC_LogJsonMsg, l, tag, lv);                         \
+
+
+inline void LLBC_LogHelper::d(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
-
-    d2(LLBC_GetTypeName(Tag), "%s", fmttedMsg);
-
-    LLBC_Free(fmttedMsg);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Debug, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::d4(const char *logger, const char *fmt, ...)
+void LLBC_LogHelper::d2(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Debug, LLBC_GetTypeName(Tag), fmt);
+}
 
-    d4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::d2(const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Debug, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline void LLBC_LogHelper::d3(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Debug, nullptr, fmt);
+}
+
+template <typename Tag>
+void LLBC_LogHelper::d4(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Debug, LLBC_GetTypeName(Tag), fmt);
+}
+
+inline void LLBC_LogHelper::d4(const char *logger, const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Debug, tag, fmt);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jd()
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, nullptr, LLBC_LogLevel::Debug);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jd2()
 {
-    return jd2(LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(nullptr, LLBC_GetTypeName(Tag), LLBC_LogLevel::Debug);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jd2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, tag, LLBC_LogLevel::Debug);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jd3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, nullptr, LLBC_LogLevel::Debug);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jd4(const char *logger)
 {
-    return jd4(logger, LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(Tag), LLBC_LogLevel::Debug);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jd4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, tag, LLBC_LogLevel::Debug);
+}
+
+inline void LLBC_LogHelper::i(const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Info, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::i2(const char *fmt, ...)
+void LLBC_LogHelper::i2(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Info, LLBC_GetTypeName(Tag), fmt);
+}
 
-    i2(LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::i2(const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Info, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline void LLBC_LogHelper::i3(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Info, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::i4(const char *logger, const char *fmt, ...)
+void LLBC_LogHelper::i4(const char *logger, const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Info, LLBC_GetTypeName(Tag), fmt);
+}
 
-    i4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::i4(const char *logger, const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Info, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline LLBC_LogJsonMsg &LLBC_LogHelper::ji()
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, nullptr, LLBC_LogLevel::Info);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::ji2()
 {
-    return ji2(LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(nullptr, LLBC_GetTypeName(Tag), LLBC_LogLevel::Info);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::ji2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, tag, LLBC_LogLevel::Info);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::ji3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, nullptr, LLBC_LogLevel::Info);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::ji4(const char *logger)
 {
-    return ji4(logger, LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(Tag), LLBC_LogLevel::Info);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::ji4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, tag, LLBC_LogLevel::Info);
+}
+
+inline void LLBC_LogHelper::w(const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Warn, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::w2(const char *fmt, ...)
+void LLBC_LogHelper::w2(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Warn, LLBC_GetTypeName(Tag), fmt);
+}
 
-    w2(LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::w2(const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Warn, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline void LLBC_LogHelper::w3(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Warn, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::w4(const char *logger, const char *fmt, ...)
+void LLBC_LogHelper::w4(const char *logger, const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Warn, LLBC_GetTypeName(Tag), fmt);
+}
 
-    w4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::w4(const char *logger, const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Warn, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jw()
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, nullptr, LLBC_LogLevel::Warn);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jw2()
 {
-    return jw2(LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(nullptr, LLBC_GetTypeName(Tag), LLBC_LogLevel::Warn);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jw2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, tag, LLBC_LogLevel::Warn);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jw3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, nullptr, LLBC_LogLevel::Warn);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jw4(const char *logger)
 {
-    return jw4(logger, LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(Tag), LLBC_LogLevel::Warn);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jw4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, tag, LLBC_LogLevel::Warn);
+}
+
+inline void LLBC_LogHelper::e(const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Error, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::e2(const char *fmt, ...)
+void LLBC_LogHelper::e2(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Error, LLBC_GetTypeName(Tag), fmt);
+}
 
-    e2(LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::e2(const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Error, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline void LLBC_LogHelper::e3(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Error, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::e4(const char *logger, const char *fmt, ...)
+void LLBC_LogHelper::e4(const char *logger, const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Error, LLBC_GetTypeName(Tag), fmt);
+}
 
-    e4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::e4(const char *logger, const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Error, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline LLBC_LogJsonMsg &LLBC_LogHelper::je()
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, nullptr, LLBC_LogLevel::Error);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::je2()
 {
-    return je2(LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(nullptr, LLBC_GetTypeName(Tag), LLBC_LogLevel::Error);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::je2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, tag, LLBC_LogLevel::Error);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::je3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, nullptr, LLBC_LogLevel::Error);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger)
 {
-    return je4(logger, LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(Tag), LLBC_LogLevel::Error);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::je4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, tag, LLBC_LogLevel::Error);
+}
+
+inline void LLBC_LogHelper::f(const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Fatal, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::f2(const char *fmt, ...)
+void LLBC_LogHelper::f2(const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Fatal, LLBC_GetTypeName(Tag), fmt);
+}
 
-    f2(LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::f2(const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(nullptr, LLBC_LogLevel::Fatal, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline void LLBC_LogHelper::f3(const char *logger, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Fatal, nullptr, fmt);
 }
 
 template <typename Tag>
-inline void LLBC_LogHelper::f4(const char *logger, const char *fmt, ...)
+void LLBC_LogHelper::f4(const char *logger, const char *fmt, ...)
 {
-    char *fmttedMsg; int msgLen;
-    LLBC_FormatArg(fmt, fmttedMsg, msgLen);
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Fatal, LLBC_GetTypeName(Tag), fmt);
+}
 
-    f4(logger, LLBC_GetTypeName(Tag), "%s", fmttedMsg);
+inline void LLBC_LogHelper::f4(const char *logger, const char *tag, const char *fmt, ...)
+{
+    __LLBC_LOG_TO_SPEC(logger, LLBC_LogLevel::Fatal, tag, fmt);
+}
 
-    LLBC_Free(fmttedMsg);
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jf()
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, nullptr, LLBC_LogLevel::Fatal);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jf2()
 {
-    return jf2(LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(nullptr, LLBC_GetTypeName(Tag), LLBC_LogLevel::Fatal);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jf2(const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(nullptr, tag, LLBC_LogLevel::Fatal);
+}
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jf3(const char *logger)
+{
+    __LLBC_JLOG_TO_SPEC(logger, nullptr, LLBC_LogLevel::Fatal);
 }
 
 template <typename Tag>
 LLBC_LogJsonMsg &LLBC_LogHelper::jf4(const char *logger)
 {
-    return jf4(logger, LLBC_GetTypeName(Tag));
+    __LLBC_JLOG_TO_SPEC(logger, LLBC_GetTypeName(Tag), LLBC_LogLevel::Fatal);
 }
+
+inline LLBC_LogJsonMsg &LLBC_LogHelper::jf4(const char *logger, const char *tag)
+{
+    __LLBC_JLOG_TO_SPEC(logger, tag, LLBC_LogLevel::Fatal);
+}
+
+//! At latest, undef code define macros.
+#undef __LLBC_LOG_TO_SPEC
+#undef __LLBC_JLOG_TO_SPEC
 
 __LLBC_NS_END
 
