@@ -21,6 +21,7 @@
 # 16)【llbc core】修正epoll中数据访问问题
 # 17)【premake】对wrap实行清晰分组
 # 18)【llbc core】为了更好的其他库结合, 针对win32平台特有的字符串数据类型在非win32平台的定义, llbc提供可选项让使用者项目中有其他项目有定义的情况下取消定义, 宏: LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
+# 19)【llbc core】优化Log输出性能, 做到Log输出时的0 malloc/free以及只有一次的log message format操作, 对接口及设计进行优化
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
