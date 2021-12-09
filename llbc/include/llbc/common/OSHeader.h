@@ -90,6 +90,7 @@
 // C standard heder files.
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
@@ -103,6 +104,7 @@
 #endif
 
 // C++ standard header files.
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <fstream>
