@@ -155,7 +155,6 @@ project "llbc"
     -- links
     filter { "system:linux" }
         links {
-            "rt",
             "uuid",
         }
 
