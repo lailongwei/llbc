@@ -90,13 +90,11 @@
 // C standard heder files.
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
-#include <math.h>
 #include <time.h>
 #include <float.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32

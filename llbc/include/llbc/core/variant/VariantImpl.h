@@ -1035,7 +1035,7 @@ void LLBC_Variant::CtFromUnaryCont(const _UnaryContainer &unaryCont)
     // execute elements copy.
     const typename _UnaryContainer::const_iterator endIt = unaryCont.end();
     for (typename _UnaryContainer::const_iterator it = unaryCont.begin();
-         it != unaryCont.end();
+         it != endIt;
          ++it)
         seq->emplace_back(*it);
 }
@@ -1070,7 +1070,7 @@ void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
 template <typename _Key, typename _Val, typename _BinaryContainer>
 void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont)
 {
-    DictConstIter endIt = _holder.data.obj.dict->end();
+    const DictConstIter endIt = _holder.data.obj.dict->end();
     for (DictConstIter it = _holder.data.obj.dict->begin(); it != endIt; ++it)
         binaryCont.emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
 }
