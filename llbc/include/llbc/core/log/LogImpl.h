@@ -45,7 +45,7 @@ __LLBC_NS_BEGIN
         else                                                          \
             l = _loggerManager->GetLogger(loggerName);                \
                                                                       \
-        if (LIKELY(l))                                                \
+        if (LIKELY(l != nullptr))                                     \
         {                                                             \
             va_list va;                                               \
             va_start(va, fmt);                                        \
@@ -55,11 +55,13 @@ __LLBC_NS_BEGIN
     } while (0)                                                       \
 
 #define __LLBC_DO_JLOG(loggerName, tag, lv)                           \
-    LLBC_Logger *l = nullptr;                                         \
+    LLBC_Logger *l;                                                   \
     if (!loggerName)                                                  \
         l = _rootLogger;                                              \
-    else if (LIKELY(_loggerManager))                                  \
+    else if (LIKELY(_loggerManager != nullptr))                       \
         l = _loggerManager->GetLogger(loggerName);                    \
+    else                                                              \
+        l = nullptr;                                                  \
                                                                       \
     return *LLBC_New(LLBC_LogJsonMsg, l, tag, lv);                    \
 

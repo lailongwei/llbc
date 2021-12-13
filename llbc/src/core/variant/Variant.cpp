@@ -22,6 +22,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include <float.h>
+
 #include "llbc/core/utils/Util_Text.h"
 
 #include "llbc/core/variant/Variant.h"
