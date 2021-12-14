@@ -22,88 +22,39 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/objectpool/IObjectPoolInst.h"
-
 #include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogFormattingInfo.h"
+#include "llbc/core/log/LogFunctionToken.h"
 
 __LLBC_NS_BEGIN
-LLBC_LogData::LLBC_LogData()
-: logger(nullptr)
-, loggerName(nullptr)
 
-, msg(nullptr)
-, msgLen(0)
-, msgCap(0)
-
-, level(-1)
-, logTime(0)
-
-, others(nullptr)
-, othersCap(0)
-, fileBeg(0)
-, fileLen(0)
-, tagBeg(0)
-, tagLen(0)
-
-, line(0)
-
-, threadId(LLBC_INVALID_NATIVE_THREAD_ID)
-
-, _poolInst(nullptr)
+LLBC_LogFunctionToken::LLBC_LogFunctionToken()
 {
 }
 
-LLBC_LogData::~LLBC_LogData()
+LLBC_LogFunctionToken::~LLBC_LogFunctionToken()
 {
-    if (msg)
-        LLBC_Free(msg);
-    if (others)
-        LLBC_Free(others);
 }
 
-void LLBC_LogData::Clear()
+int LLBC_LogFunctionToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
-    logger = nullptr;
-    loggerName = nullptr;
-
-    msgLen = 0;
-
-    level = -1;
-    logTime = 0;
-
-    tagBeg = 0;
-    tagLen = 0; 
-
-    fileBeg = 0;
-    fileLen = 0;
-    tagBeg = 0;
-    tagLen = 0;
-    funcBeg = 0;
-    funcLen = 0;
-
-    line = 0;
-
-    threadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    SetFormatter(formatter);
+    return LLBC_OK;
 }
 
-bool LLBC_LogData::IsPoolObject() const
+int LLBC_LogFunctionToken::GetType() const
 {
-    return _poolInst != nullptr;
+    return LLBC_LogTokenType::FunctionToken;
 }
 
-void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+void LLBC_LogFunctionToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    _poolInst = &poolInst;
-}
+    int index = static_cast<int>(formattedData.size());
+    if (data.funcLen > 0)
+        formattedData.append(data.others + data.funcBeg, data.funcLen);
 
-void LLBC_LogData::GiveBackToPool()
-{
-    _poolInst->Release(this);
-}
-
-LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()
-{
-    return _poolInst;
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
+    formatter->Format(formattedData, index);
 }
 
 __LLBC_NS_END

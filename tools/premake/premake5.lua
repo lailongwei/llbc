@@ -156,6 +156,7 @@ project "llbc"
     filter { "system:linux" }
         links {
             "uuid",
+            "pthread",
         }
 
     filter { "system:windows" }

@@ -142,7 +142,7 @@
 // Default max log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 5000
 // Default log using mode.
-#define LLBC_CFG_LOG_USING_WITH_STREAM                      0
+#define LLBC_CFG_LOG_USING_WITH_STREAM                      1
 // Default take over config, only using in root logger, when a message log to 
 // unconfiged logger, root logger will take over, if configed takeover to true.
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1

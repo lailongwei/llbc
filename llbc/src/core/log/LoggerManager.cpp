@@ -22,14 +22,16 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Console.h"
+
 #include "llbc/core/helper/STLHelper.h"
 
 #include "llbc/core/thread/Guard.h"
 
+#include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerConfigurator.h"
 #include "llbc/core/log/LoggerManager.h"
-#include "llbc/core/log/Log.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
@@ -40,7 +42,7 @@ LLBC_LoggerManager::LLBC_LoggerManager()
 : _configurator(nullptr)
 , _sharedLogRunnable(nullptr)
 
-, _root(nullptr)
+, _rootLogger(nullptr)
 {
 }
 
@@ -53,7 +55,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 {
     LLBC_LockGuard guard(_lock);
 
-    if (_root)
+    if (_rootLogger)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -71,16 +73,16 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         _sharedLogRunnable = LLBC_New(LLBC_LogRunnable);
 
     // Config root logger.
-    _root = LLBC_New(LLBC_Logger);
-    if (_configurator->Config(_rootLoggerName, _sharedLogRunnable, _root) != LLBC_OK)
+    _rootLogger = LLBC_New(LLBC_Logger);
+    if (_configurator->Config(_rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
     {
-        LLBC_XDelete(_root);
+        LLBC_XDelete(_rootLogger);
         LLBC_XDelete(_configurator);
 
         return LLBC_FAILED;
     }
 
-    _loggers.insert(std::make_pair(_rootLoggerName, _root));
+    _loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
@@ -101,9 +103,6 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         _loggers.insert(std::make_pair(cfgIter->first, logger));
     }
 
-    // Init Log helper class.
-    LLBC_LogHelper::Initialize(this);
-
     // Startup shared log runnable.
     if (_sharedLogRunnable)
         _sharedLogRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
@@ -113,16 +112,14 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 
 bool LLBC_LoggerManager::IsInited() const
 {
-    LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-    return _root != nullptr;
+    return _rootLogger != nullptr;
 }
 
 void LLBC_LoggerManager::Finalize()
 {
     LLBC_LockGuard guard(_lock);
 
-    if (_root == nullptr)
+    if (_rootLogger == nullptr)
         return;
 
     if (_sharedLogRunnable)
@@ -132,12 +129,9 @@ void LLBC_LoggerManager::Finalize()
         _sharedLogRunnable = nullptr;
     }
 
-    // Finalize Log helper class.
-    LLBC_LogHelper::Finalize();
-
-    // Delete all loggers and set _root logger to nullptr.
+    // Delete all loggers and set _rootLogger logger to nullptr.
     LLBC_STLHelper::DeleteContainer(_loggers);
-    _root = nullptr;
+    _rootLogger = nullptr;
 
     // Delete logger configurator.
     LLBC_XDelete(_configurator);
@@ -145,15 +139,13 @@ void LLBC_LoggerManager::Finalize()
 
 LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
 {
-    LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-    if (UNLIKELY(!_root))
+    if (UNLIKELY(!_rootLogger))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return nullptr;
     }
 
-    return _root;
+    return _rootLogger;
 }
 
 LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
@@ -164,9 +156,8 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
         return nullptr;
     }
 
-    LLBC_LoggerManager *nonConstThis = const_cast<LLBC_LoggerManager *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-    if (UNLIKELY(!_root))
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(!_rootLogger))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return nullptr;
@@ -175,14 +166,21 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     std::map<LLBC_String, LLBC_Logger *>::const_iterator iter = _loggers.find(name);
     if (iter == _loggers.end())
     {
-        if (_root->IsTakeOver())
-            return _root;
+        if (_rootLogger->IsTakeOver())
+            return _rootLogger;
 
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return nullptr;
     }
 
     return iter->second;
+}
+
+void LLBC_LoggerManager::UnInitOutput(int logLv, const char *msg)
+{
+    FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
+    const LLBC_String &lvDesc = LLBC_LogLevel::GetLevelDesc(logLv);
+    LLBC_FilePrint(to, "[Log][%s] %s\n", lvDesc.c_str(), msg);
 }
 
 __LLBC_NS_END

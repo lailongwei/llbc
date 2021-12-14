@@ -19,62 +19,48 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_JSONMSG_H__
-#define __LLBC_CORE_LOG_LOG_JSONMSG_H__
+#ifndef __LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__
+#define __LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/rapidjson/json.h"
+#include "llbc/core/log/BaseLogToken.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * Pre-declare some classes.
+ * \brief The function log token class encapsulation.
  */
-class LLBC_Logger;
-
-/**
- * \brief The json log msg class encapsulation.
- */
-class LLBC_EXPORT LLBC_LogJsonMsg
+class LLBC_HIDDEN LLBC_LogFunctionToken : public LLBC_BaseLogToken
 {
 public:
-    explicit LLBC_LogJsonMsg(const char *loggerName,
-                             const char* tag,
-                             int lv,
-                             const char *file,
-                             int line,
-                             const char *func);
-    ~LLBC_LogJsonMsg();
+    LLBC_LogFunctionToken();
+    virtual ~LLBC_LogFunctionToken();
 
 public:
     /**
-    * Add json styled message.
-    */
-    LLBC_LogJsonMsg &Add(const char *key, const char *value);
-    template <typename T>
-    LLBC_LogJsonMsg &Add(const char *key, const T &value);
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
 
     /**
-    * Output json styled message.
-    */
-    void Finish(const char *fmt, ...);
+     * Get token type.
+     * @return int - token type.
+     */
+    virtual int GetType() const;
 
-private:
-    bool _loggerMgrInited;
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
-    LLBC_Logger *_logger;
-    const char *_tag;
-    int _lv;
-    const char *_file;
-    int _line;
-    const char *_func;
-
-    LLBC_Json::Document &_doc;
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LogJsonMsgImpl.h"
-
-#endif // !__LLBC_CORE_LOG_LOG_JSONMSG_H__
+#endif // !__LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__

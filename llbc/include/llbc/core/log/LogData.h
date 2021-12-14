@@ -51,12 +51,14 @@ struct LLBC_EXPORT LLBC_LogData
     int level;              // Log level.
     sint64 logTime;         // Log time.
 
-    char *others;           // Other infos[file, tag].
+    char *others;           // Other infos[file, tag, func].
     uint32 othersCap;       // Others data size.
     uint32 fileBeg;         // File begin.
     uint32 fileLen;         // Log source file name length.
     uint32 tagBeg;          // Tag begin.
     uint32 tagLen;          // Tag length.
+    uint32 funcBeg;         // Function begin.
+    uint32 funcLen;         // Function length.
 
     long line;              // Log source file line number.
 
