@@ -190,7 +190,7 @@ void LLBC_Logger::Finalize()
 
     // Uninstall all hooks.
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
-        UninstallHook(level);
+        UninstallHookLockless(level);
 
     // Delete all appenders.
     while (_appenders)
@@ -256,7 +256,11 @@ int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogD
 void LLBC_Logger::UninstallHook(int level)
 {
     LLBC_LockGuard guard(_lock);
+    UninstallHookLockless(level);
+}
 
+void LLBC_Logger::UninstallHookLockless(int level)
+{
     if (LIKELY(LLBC_LogLevel::IsLegal(level)))
         _hookDelegs[level] = nullptr;
 }
