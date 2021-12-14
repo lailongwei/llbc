@@ -35,6 +35,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Log_GetLogLevel(LLBC_Logger *logger);
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Log_LogMsg(LLBC_Logger *logger,
                                                   const char *fileName,
                                                   int lineNo,
+                                                  const char *func,
                                                   int level,
                                                   const char *msg,
                                                   const char *tag);
