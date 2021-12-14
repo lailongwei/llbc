@@ -36,7 +36,7 @@
 
 
 // The pyllbc python exception class define.
-LLBC_EXTERN LLBC_HIDDEN PyObject *pyllbc_Exception;
+LLBC_HIDDEN PyObject *pyllbc_Exception;
 
 
 // Some error operator functions define.
@@ -46,24 +46,24 @@ LLBC_EXTERN LLBC_HIDDEN PyObject *pyllbc_Exception;
  * @param[out] errStr    - error string.
  * @param[out] traceback - the error traceback, borrowed reference, maybe nullptr.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback);
+LLBC_HIDDEN void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&traceback);
 
 /**
  * Transfer llbc library error to python.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = nullptr, int lineNo = 0, const LLBC_String &additionalMsg = "");
+LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = nullptr, int lineNo = 0, const LLBC_String &additionalMsg = "");
 
 /**
  * Transfer python error to llbc.
   *@param[in] additionalMsg - the additional message.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_TransferPyError(const LLBC_String &additionalMsg = "");
+LLBC_HIDDEN void pyllbc_TransferPyError(const LLBC_String &additionalMsg = "");
 
 /**
  * Set pyllbc module last error.
  * @param[in] errNo - must according to llbc library errno constraint.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetError(int errNo);
+LLBC_HIDDEN void pyllbc_SetError(int errNo);
 
 /**
  * Set pyllbc module error.
@@ -71,14 +71,14 @@ LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetError(int errNo);
  * @param[in] llbcErr   - the llbc library error no.
  * @param[in] pyErrType - the python error, normal, not steal reference.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetError(const LLBC_String &errDesc, 
-                                             int llbcErr = PYLLBC_ERROR_COMMON,
-                                             PyObject *pyErrType = nullptr);
+LLBC_HIDDEN void pyllbc_SetError(const LLBC_String &errDesc,
+                                 int llbcErr = PYLLBC_ERROR_COMMON,
+                                 PyObject *pyErrType = nullptr);
 
 /**
  * Clear llbc library error and python error.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_ClearError();
+LLBC_HIDDEN void pyllbc_ClearError();
 
 /**
  * Error set hook setter.
@@ -89,12 +89,12 @@ LLBC_EXTERN LLBC_HIDDEN void pyllbc_ClearError();
  *                     PyObject *          - exception class.
  *                     PyObject *          - traceback object.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrSetHock(const LLBC_Delegate<void(const LLBC_String &, int, PyObject *, PyObject *)> &hook);
+LLBC_HIDDEN void pyllbc_SetErrSetHock(const LLBC_Delegate<void(const LLBC_String &, int, PyObject *, PyObject *)> &hook);
 
 /**
  * Error clear hook setter.
  * @param[in] hook - the error clear hook.
  */
-LLBC_EXTERN LLBC_HIDDEN void pyllbc_SetErrClearHook(const LLBC_Delegate<void()> &hook);
+LLBC_HIDDEN void pyllbc_SetErrClearHook(const LLBC_Delegate<void()> &hook);
 
 #endif // !__PYLLBC_COM_ERROR_H__

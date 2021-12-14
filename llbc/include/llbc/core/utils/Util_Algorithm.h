@@ -81,10 +81,10 @@ int LLBC_CheckFlowUseSub(T value, T subtrahend);
  *
  * @return LLBC_String - string result.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_ItoA(sint32 value, int radix);
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_UItoA(uint32 value, int radix);
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_I64toA(sint64 value, int radix);
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
+LLBC_EXPORT LLBC_String LLBC_ItoA(sint32 value, int radix);
+LLBC_EXPORT LLBC_String LLBC_UItoA(uint32 value, int radix);
+LLBC_EXPORT LLBC_String LLBC_I64toA(sint64 value, int radix);
+LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
 
 /**
  * Escape LLBC_String.
@@ -94,8 +94,9 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
  *
  * @return LLBC_String - string result (same with input str).
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &willEscapeChars,
-                                                       char escapeChar);
+LLBC_EXPORT LLBC_String &LLBC_StringEscape(LLBC_String &escapeString,
+                                           const LLBC_String &willEscapeChars,
+                                           char escapeChar);
 
 /**
  * UnEscape LLBC_String.
@@ -104,7 +105,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String &LLBC_StringEscape(LLBC_String &escapeString
  *
  * @return LLBC_String - string result (same with input str).
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String &LLBC_StringUnEscape(LLBC_String &escapeString, char escapeChar);
+LLBC_EXPORT LLBC_String &LLBC_StringUnEscape(LLBC_String &escapeString, char escapeChar);
 
 __LLBC_NS_END
 
@@ -120,15 +121,15 @@ __LLBC_NS_END
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
  #if LLBC_CFG_CORE_UTILS_IMPL__ITOA
-  LLBC_EXTERN LLBC_EXPORT char *_itoa(int value, char *string, int radix);
+  LLBC_EXPORT char *_itoa(int value, char *string, int radix);
  #endif
 
  #if LLBC_CFG_CORE_UTILS_IMPL__I64TOA
-  LLBC_EXTERN LLBC_EXPORT char *_i64toa(long long value, char *string, int radix);
+  LLBC_EXPORT char *_i64toa(long long value, char *string, int radix);
  #endif
 
  #if LLBC_CFG_CORE_UTILS_IMPL__UI64TOA
-  LLBC_EXTERN LLBC_EXPORT char *_ui64toa(unsigned long long value, char *string, int radix);
+  LLBC_EXPORT char *_ui64toa(unsigned long long value, char *string, int radix);
  #endif
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32

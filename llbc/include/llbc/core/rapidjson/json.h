@@ -33,12 +33,12 @@ typedef LLBC_JsonValue::ConstMemberIterator LLBC_JsonMemberCIter;
  * @param[out] outStr - output string
  * @param[in] isPretty - when it is true, then json output a pretty string.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool isPretty = false);
+LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool isPretty = false);
 
 /**
  * LLBC_JsonValue output to stream operator function(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
 
 __LLBC_NS_END
 

@@ -30,27 +30,27 @@ __LLBC_NS_BEGIN
  * Get main bundle path.
  * @return LLBC_String - main bundle path.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetMainBundlePath();
+LLBC_EXPORT LLBC_String LLBC_GetMainBundlePath();
 
 /**
  * Create Bundle.
  * @param[in] path - bundle path(if path is empty(.empty() is true), will return main bundle handle.
  * @return LLBC_BundleHandle - bundle handle.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path);
+LLBC_EXPORT LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path);
 
 /**
  * Release bundle handle.
  * @param[in] bundle - bundle handle.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_ReleaseBundle(LLBC_BundleHandle bundle);
+LLBC_EXPORT void LLBC_ReleaseBundle(LLBC_BundleHandle bundle);
 
 /**
  * Get bundle path.
  * @param[in] bundle - bundle handle.
  * @return LLBC_String - bundle path.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle);
+LLBC_EXPORT LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle);
 
 /**
  * Get resource path by name.
@@ -58,7 +58,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)
  * @param[in] name   - resource name.
  * @return LLBC_String - resource path.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name);
 
 /**
  * Get resource path by name and extension name.
@@ -67,7 +67,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bund
  * @param[in] ext   - resource extension.
  * @return LLBC_String - resource path.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext);
 
 /**
  * Get resource path by name and extension name and relative path.
@@ -77,7 +77,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bund
  * @param[in] inDir  - relative directory path.
  * @return LLBC_String - resource path.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir);
 
 
 __LLBC_NS_END

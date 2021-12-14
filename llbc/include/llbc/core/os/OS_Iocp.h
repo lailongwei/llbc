@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
  * @param[in] numOfConcurrentThreads - the number of concurrent threads, default is 0.
  * @return LLBC_IocpHandle - IOCP handle.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_IocpHandle LLBC_CreateIocp();
+LLBC_EXPORT LLBC_IocpHandle LLBC_CreateIocp();
 
 /**
  * Add socket to iocp.
@@ -42,7 +42,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_IocpHandle LLBC_CreateIocp();
  * @param[in] completionKey - completion key.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_AddSocketToIocp(LLBC_IocpHandle handle, 
+LLBC_EXPORT int LLBC_AddSocketToIocp(LLBC_IocpHandle handle, 
                                                  LLBC_SocketHandle sock, 
                                                  void *completionKey);
 
@@ -51,7 +51,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_AddSocketToIocp(LLBC_IocpHandle handle,
  * @param[in] handle - IOCP handle.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_CloseIocp(LLBC_IocpHandle handle);
+LLBC_EXPORT int LLBC_CloseIocp(LLBC_IocpHandle handle);
 
 /**
  * Attempts to dequeue an I/O completion packet from a specified I/O completion port.
@@ -62,11 +62,11 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_CloseIocp(LLBC_IocpHandle handle);
  * @param[in]  milliSeconds - wait time.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
-                                                           void *numOfBytes,
-                                                           void **compKey,
-                                                           LLBC_POverlapped *ol,
-                                                           ulong milliSeconds);
+LLBC_EXPORT int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
+                                               void *numOfBytes,
+                                               void **compKey,
+                                               LLBC_POverlapped *ol,
+                                               ulong milliSeconds);
 
 __LLBC_NS_END
 

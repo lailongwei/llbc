@@ -36,17 +36,17 @@ __LLBC_NS_BEGIN
  * @param[out] res     - Pointer to a linked list of one or more addrinfo structures containing response information about the host.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetAddrInfo(const char *nodename,
-                                             const char *servname,
-                                             const struct addrinfo *hints,
-                                             struct addrinfo **res);
+LLBC_EXPORT int LLBC_GetAddrInfo(const char *nodename,
+                                 const char *servname,
+                                 const struct addrinfo *hints,
+                                 struct addrinfo **res);
 
 /**
  * This function frees address information the the LLBC_GetAddrInfo function dynamically allocates its addrinfo structures.
  * Note: For more about this function information, see MSDN or linux manual.
  * @param[ai] - the addrinfo pointer.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_FreeAddrInfo(struct addrinfo *ai);
+LLBC_EXPORT void LLBC_FreeAddrInfo(struct addrinfo *ai);
 
 __LLBC_NS_END
 

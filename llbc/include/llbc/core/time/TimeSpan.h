@@ -37,7 +37,7 @@ __LLBC_NS_END
 /**
  * TimeSpan class stream output operators previous declare.
  */
-LLBC_EXTERN std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
+std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 __LLBC_NS_BEGIN
 

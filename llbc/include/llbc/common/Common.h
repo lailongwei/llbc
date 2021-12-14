@@ -58,12 +58,12 @@ __LLBC_NS_BEGIN
  * @return int - return 0 if success, otherwise return -1.
  */
 
-LLBC_EXTERN LLBC_HIDDEN int __LLBC_CommonStartup();
+LLBC_HIDDEN int __LLBC_CommonStartup();
 
 /**
  * LLBC library Common-Module cleanup function.
  */
-LLBC_EXTERN LLBC_HIDDEN void __LLBC_CommonCleanup();
+LLBC_HIDDEN void __LLBC_CommonCleanup();
 
 __LLBC_NS_END
 

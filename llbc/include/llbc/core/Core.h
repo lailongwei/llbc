@@ -54,12 +54,12 @@ __LLBC_NS_BEGIN
  * functions or classes, must call this function to initialize the module.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_HIDDEN int __LLBC_CoreStartup();
+LLBC_HIDDEN int __LLBC_CoreStartup();
 
 /**
  * LLBC library Core-Module cleanup function.
  */
-LLBC_EXTERN LLBC_HIDDEN void __LLBC_CoreCleanup();
+LLBC_HIDDEN void __LLBC_CoreCleanup();
 
 __LLBC_NS_END
 

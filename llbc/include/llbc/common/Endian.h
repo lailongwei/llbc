@@ -80,7 +80,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_DefaultEndian;
  * Get machine endian type, about the endian type, see LLBC_Endian class.
  * @return int - machine endian type.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetMachineEndianType();
+LLBC_EXPORT int LLBC_GetMachineEndianType();
 
 /**
  * Reverse c/c++ basic data type byte order.
