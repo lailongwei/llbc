@@ -265,6 +265,11 @@ private:
      */
     void FlushAppenders(bool force);
 
+    /**
+     * Lockless uninstall error hook.
+     */
+    void UninstallHookLockless(int level);
+
 private:
     LLBC_String _name;
     LLBC_SpinLock _lock;
