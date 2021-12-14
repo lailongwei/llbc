@@ -29,7 +29,7 @@ local function Main(...)
     llbc.startup()
 
     -- All common module testcases.
-    -- TestCase_Com_VerInfo.run(...)
+    TestCase_Com_VerInfo.run(...)
     -- TestCase_Com_MonkeyPatch.run(...)
     -- TestCase_Com_ObjectOriented.run(...)
 
