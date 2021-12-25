@@ -36,7 +36,7 @@
 
 
 // The pyllbc python exception class define.
-LLBC_HIDDEN PyObject *pyllbc_Exception;
+LLBC_EXTERN LLBC_HIDDEN PyObject *pyllbc_Exception;
 
 
 // Some error operator functions define.

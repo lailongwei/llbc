@@ -77,6 +77,11 @@ inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionI
     return LLBC_OK;
 }
 
+inline LLBC_EventManager &LLBC_Service::GetEventManager()
+{
+    return _evManager;
+}
+
 inline LLBC_SafetyObjectPool &LLBC_Service::GetSafetyObjectPool()
 {
     return _safetyObjectPool;

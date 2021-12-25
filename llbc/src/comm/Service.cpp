@@ -1119,11 +1119,6 @@ void LLBC_Service::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_EventManager &LLBC_Service::GetEventManager()
-{
-    return _evManager;
-}
-
 int LLBC_Service::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
     if (UNLIKELY(!runnable))

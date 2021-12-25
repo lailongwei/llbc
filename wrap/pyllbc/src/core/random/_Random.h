@@ -53,7 +53,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SeedRand(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RandInt(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_Rand(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
     PyObject *beginObj = nullptr;

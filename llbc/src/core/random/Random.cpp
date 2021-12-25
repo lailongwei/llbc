@@ -42,19 +42,19 @@ void LLBC_SeedRand(int seed)
     LLBC_INL_NS __g_random.Seed(seed);
 }
 
-int LLBC_RandInt()
+int LLBC_Rand()
 {
     LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
     return LLBC_INL_NS __g_random.Rand();
 }
 
-int LLBC_RandInt(int end)
+int LLBC_Rand(int end)
 {
     LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
     return LLBC_INL_NS __g_random.Rand(end);
 }
 
-int LLBC_RandInt(int begin, int end)
+int LLBC_Rand(int begin, int end)
 {
     LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
     return LLBC_INL_NS __g_random.Rand(begin, end);

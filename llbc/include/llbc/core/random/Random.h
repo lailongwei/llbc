@@ -88,9 +88,9 @@ private:
  * Some global random support functions definition.
  */
 LLBC_EXPORT void LLBC_SeedRand(int seed);
-LLBC_EXPORT int LLBC_RandInt();
-LLBC_EXPORT int LLBC_RandInt(int end);
-LLBC_EXPORT int LLBC_RandInt(int begin, int end);
+LLBC_EXPORT int LLBC_Rand();
+LLBC_EXPORT int LLBC_Rand(int end);
+LLBC_EXPORT int LLBC_Rand(int begin, int end);
 LLBC_EXPORT double LLBC_RandReal();
 LLBC_EXPORT bool LLBC_BoolJudge();
 
