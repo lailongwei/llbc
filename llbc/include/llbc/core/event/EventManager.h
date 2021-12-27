@@ -119,9 +119,9 @@ public:
 public:
     /**
      * Fire the event.
-     * @param[in] event - event object.
+     * @param[in] ev - event object.
      */
-    virtual void FireEvent(LLBC_Event *event);
+    virtual void FireEvent(LLBC_Event *ev);
 
     /**
      * Fire the event.
@@ -153,7 +153,7 @@ protected:
 
 protected:
     /**
-     * \brief The event deleg info encapsulation.
+     * \brief The event listener info encapsulation.
      */
     struct _ListenerInfo
     {
@@ -171,15 +171,15 @@ private:
     void AddListenerInfo(_ListenerInfo *li);
 
 protected:
-    typedef std::list<_ListenerInfo *> _Listeners; // deleg info list
-    typedef std::map<int, _Listeners> _Id2Listeners; // event id 2 listeners
-    typedef std::map<LLBC_ListenerStub, std::pair<int, _Listeners::iterator> > _Stub2Listeners; // stub id 2 listeners
+    typedef std::list<_ListenerInfo *> _ListenerInfos; // deleg info list
+    typedef std::map<int, _ListenerInfos> _Id2ListenerInfos; // event id 2 listeners
+    typedef std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _Stub2ListenerInfos; // stub id 2 listeners
 
     int _firing;
     LLBC_ListenerStub _maxListenerStub;
 
-    _Id2Listeners _id2Listeners;
-    _Stub2Listeners _stub2Listeners;
+    _Id2ListenerInfos _id2ListenerInfos;
+    _Stub2ListenerInfos _stub2ListenerInfos;
 
     std::set<int> _pendingRemoveEvIds;
     std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
