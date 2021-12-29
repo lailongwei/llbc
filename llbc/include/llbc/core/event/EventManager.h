@@ -27,6 +27,7 @@
 
 __LLBC_NS_BEGIN
 class LLBC_Event;
+class LLBC_EventFirer;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -44,17 +45,6 @@ public:
     virtual ~LLBC_EventManager();
 
 public:
-    /**
-     * Add event deleg.
-     * @param[in] id         - event Id.
-     * @param[in] listener   - event deleg.
-     * @param[in] boundStub - the binded stub, if not specified, will auto gen stub.
-     * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
-     */
-    virtual LLBC_ListenerStub AddListener(int id,
-                                          void (*listener)(LLBC_Event &),
-                                          const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
-
     /**
      * Add event deleg.
      * @param[in] id         - event Id.
@@ -118,16 +108,17 @@ public:
 
 public:
     /**
-     * Fire the event.
+     * Fire event.
      * @param[in] ev - event object.
      */
-    virtual void FireEvent(LLBC_Event *ev);
+    virtual void Fire(LLBC_Event *ev);
 
     /**
-     * Fire the event.
-     * @param[in] id - event Id.
+     * Begin fire event.
+     * @param[in] evId - the event id.
+     * @return LLBC_EventFirer & - the event firer object.
      */
-    void FireEvent(int id);
+    LLBC_EventFirer &BeginFire(int evId);
 
     /**
      * Check event manager is firing or not.

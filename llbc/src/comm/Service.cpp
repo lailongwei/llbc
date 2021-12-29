@@ -1832,7 +1832,7 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     const bool dontDelAfterFire = ev.ev->IsDontDelAfterFire();
-    _evManager.FireEvent(ev.ev);
+    _evManager.Fire(ev.ev);
 
     if (ev.dequeueHandler &&
         dontDelAfterFire)

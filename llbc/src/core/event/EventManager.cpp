@@ -24,7 +24,9 @@
 
 #include "llbc/core/helper/STLHelper.h"
 
-#include "llbc/core/event/Event.h"
+#include "llbc/core/objectpool/Common.h"
+
+#include "llbc/core/event/EventFirer.h"
 #include "llbc/core/event/EventManager.h"
 
 __LLBC_NS_BEGIN
@@ -181,7 +183,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
-void LLBC_EventManager::FireEvent(LLBC_Event *ev)
+void LLBC_EventManager::Fire(LLBC_Event *ev)
 {
     BeforeFireEvent();
 
@@ -206,6 +208,14 @@ void LLBC_EventManager::FireEvent(LLBC_Event *ev)
         LLBC_Recycle(ev);
 
     AfterFireEvent();
+}
+
+LLBC_EventFirer &LLBC_EventManager::BeginFire(int evId)
+{
+    auto evFirer = LLBC_GetObjectFromUnsafetyPool<LLBC_EventFirer>();
+    evFirer->SetEventInfo(LLBC_New(LLBC_Event, evId), this);
+
+    return *evFirer;
 }
 
 bool LLBC_EventManager::HasStub(const LLBC_ListenerStub &stub) const

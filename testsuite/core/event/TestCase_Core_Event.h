@@ -41,6 +41,9 @@ private:
     void OnEvent2(LLBC_Event &ev);
 
 private:
+    void DumpEvParams(const LLBC_Event &ev);
+
+private:
     LLBC_ListenerStub _ev1Stub;
     LLBC_ListenerStub _ev1TooStub;
 };

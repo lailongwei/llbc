@@ -126,7 +126,7 @@ __LLBC_NS_END
 /**
  * \brief LLBC_Variant stream output function.
  */
-extern LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
 
 __LLBC_NS_BEGIN
 

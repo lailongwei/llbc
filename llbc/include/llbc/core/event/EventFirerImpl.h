@@ -19,10 +19,32 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_EVENT_COMMON_H__
-#define __LLBC_CORE_EVENT_COMMON_H__
+#ifdef __LLBC_CORE_EVENT_EVENT_FIRER_H__
 
-#include "llbc/core/event/EventFirer.h"
-#include "llbc/core/event/EventManager.h"
+#include "llbc/core/event/Event.h"
 
-#endif // !__LLBC_CORE_EVENT_COMMON_H__
+__LLBC_NS_BEGIN
+
+inline LLBC_EventFirer::LLBC_EventFirer()
+: _ev(nullptr)
+, _evMgr(nullptr)
+{
+}
+
+inline LLBC_EventFirer::~LLBC_EventFirer()
+{
+    Clear();
+}
+
+template <typename KeyType, typename ParamType>
+LLBC_EventFirer &LLBC_EventFirer::SetParam(const KeyType &paramKey, const ParamType &param)
+{
+    if (LIKELY(_ev))
+        _ev->SetParam(paramKey, param);
+
+    return *this;
+}
+
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_EVENT_EVENT_FIRER_H__

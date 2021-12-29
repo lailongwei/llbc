@@ -19,10 +19,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_EVENT_COMMON_H__
-#define __LLBC_CORE_EVENT_COMMON_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
+
+#include "llbc/core/objectpool/Common.h"
 
 #include "llbc/core/event/EventFirer.h"
 #include "llbc/core/event/EventManager.h"
 
-#endif // !__LLBC_CORE_EVENT_COMMON_H__
+__LLBC_NS_BEGIN
+
+void LLBC_EventFirer::Fire()
+{
+    if (LIKELY(_ev))
+    {
+        _evMgr->Fire(_ev);
+        _ev = nullptr;
+        _evMgr = nullptr;
+    }
+
+    LLBC_Recycle(this);
+}
+
+void LLBC_EventFirer::Clear()
+{
+    if (LIKELY(_ev))
+    {
+        LLBC_Recycle(_ev);
+        _ev = nullptr;
+
+        _evMgr = nullptr;
+    }
+}
+
+void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
+{
+    _ev = ev;
+    _evMgr = evMgr;
+}
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"

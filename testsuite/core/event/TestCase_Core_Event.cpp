@@ -30,6 +30,7 @@ namespace
         {
             Event1 = 1,
             Event2 = 2,
+            Event3 = 3,
         };
     };
 
@@ -68,13 +69,25 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     ev->SetParam("Key1", "Hello world");
     (*ev)["Key2"] =  "Hey, Judy";
     // Fire Event1(Event2 listener already add in Event1 handler).
-    evMgr.FireEvent(ev);
+    evMgr.Fire(ev);
 
     std::cout <<"Fire Event2" <<std::endl;
-    evMgr.FireEvent(LLBC_New(LLBC_Event, EventIds::Event2));
+    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event2));
 
     std::cout <<"Fire Event1" <<std::endl;
-    evMgr.FireEvent(LLBC_New(LLBC_Event, EventIds::Event1));
+    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event1));
+
+    std::cout <<"Test chain call event fire" <<std::endl;
+    evMgr.AddListener(EventIds::Event3, [this](LLBC_Event &ev){
+        std::cout <<"Event3 handler, func:" <<__FUNCTION__ <<std::endl;
+        std::cout <<"event params: " <<std::endl;
+        DumpEvParams(ev);
+    });
+    evMgr.BeginFire(EventIds::Event3)
+        .SetParam(1, "Hello World")
+        .SetParam("hey", "judy")
+        .SetParam(LLBC_String("hey too"), 3.1415926)
+        .Fire();
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
@@ -84,19 +97,8 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
 void TestCase_Core_Event::OnEvent1(LLBC_Event &ev)
 {
-    std::cout <<"OnEvent1() called! event int key indexed params:" <<std::endl;
-    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
-    for (std::map<int, LLBC_Variant>::const_iterator it = intKeyParams.begin();
-         it != intKeyParams.end();
-         it++)
-        std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
-
-    std::cout <<"string key indexed params: " <<std::endl;
-    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator it = strKeyParams.begin();
-         it != strKeyParams.end();
-         it++)
-        std::cout <<"  " <<it->first <<": " <<it->second <<std::endl;
+    std::cout <<"OnEvent1() called! event params:" <<std::endl;
+    DumpEvParams(ev);
 }
 
 void TestCase_Core_Event::OnEvent1Too(LLBC_Event &ev)
@@ -115,4 +117,28 @@ void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
     evMgr.RemoveListener(_ev1TooStub);
     // Remove Event2 OnEvent2() listener.
     evMgr.RemoveListener(EventIds::Event2);
+}
+
+void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
+{
+    std::cout <<"- Event " <<ev.GetId() <<" const char * indexed params:" <<std::endl;
+    const std::map<LLBC_CString, LLBC_Variant> &cstrKeyParams = ev.GetConstantStrKeyParams();
+    for (std::map<LLBC_CString, LLBC_Variant>::const_iterator cstrKeyIt = cstrKeyParams.begin();
+         cstrKeyIt != cstrKeyParams.end();
+         ++cstrKeyIt)
+        std::cout <<"  - " <<cstrKeyIt->first <<": " <<cstrKeyIt->second <<std::endl;
+
+    std::cout <<"- Event " <<ev.GetId() <<" int indexed params:" <<std::endl;
+    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
+    for (std::map<int, LLBC_Variant>::const_iterator intKeyIt = intKeyParams.begin();
+         intKeyIt != intKeyParams.end();
+         ++intKeyIt)
+        std::cout <<"  - " <<intKeyIt->first <<": " <<intKeyIt->second <<std::endl;
+
+    std::cout <<"- Event " <<ev.GetId() <<" LLBC_String indexed params:" <<std::endl;
+    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
+    for (std::map<LLBC_String, LLBC_Variant>::const_iterator strKeyIt = strKeyParams.begin();
+         strKeyIt != strKeyParams.end();
+         ++strKeyIt)
+        std::cout <<"  - " <<strKeyIt->first <<": " <<strKeyIt->second <<std::endl;
 }
