@@ -96,6 +96,18 @@ private:
     const char *_cstr;
 };
 
+/**
+ * \brief The const string stream output function.
+ */
+template <typename _Elem>
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
+{
+    if (cstr.GetCStr())
+        return o <<cstr.GetCStr();
+    else
+        return o <<"";
+}
+
 __LLBC_NS_END
 
 #endif // !__LLBC_COM_BASIC_CSTRING_H__
