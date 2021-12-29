@@ -24,7 +24,7 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/objectpool/PoolObjectReflectionBase.h"
+#include "llbc/core/objectpool/PoolObject.h"
 
 __LLBC_NS_BEGIN
 class LLBC_Variant;
@@ -38,7 +38,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event firer class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventFirer : public LLBC_PoolObjectReflectionBase
+class LLBC_EXPORT LLBC_EventFirer : public LLBC_PoolObject
 {
 public:
     /**
@@ -49,7 +49,7 @@ public:
 
 public:
     /**
-     * @brief Set event param.
+     * Set event param.
      * 
      * @param[in] paramKey - the event param key.
      * @param[in] param    - the event param.
@@ -59,15 +59,20 @@ public:
     LLBC_EventFirer &SetParam(const KeyType &paramKey, const ParamType &param);
 
     /**
-     * @brief Fire firer holded event.
+     * Fire firer holded event.
      */
     void Fire();
 
 public:
     /**
-     * @brief Object pool support:clear firer object.
+     * Object-Pool reflection support: clear firer object.
      */
     void Clear();
+
+    /**
+     * Object-Pool reflection support: pool instance create event callback.
+     */
+    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
 
 private:
     /**

@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
-#define __LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
+#ifndef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
+#define __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
 
 #include "llbc/common/Common.h"
 
@@ -38,11 +38,11 @@ __LLBC_NS_BEGIN
 /**
  * \brief The pool object refrection base encapsulation.
  */
-class LLBC_EXPORT LLBC_PoolObjectReflectionBase
+class LLBC_EXPORT LLBC_PoolObject
 {
 public:
-    LLBC_PoolObjectReflectionBase();
-    virtual ~LLBC_PoolObjectReflectionBase();
+    LLBC_PoolObject();
+    virtual ~LLBC_PoolObject();
 
 public:
     /**
@@ -76,6 +76,6 @@ protected:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/PoolObjectReflectionBaseImpl.h"
+#include "llbc/core/objectpool/PoolObjectImpl.h"
 
-#endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
+#endif // !__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__

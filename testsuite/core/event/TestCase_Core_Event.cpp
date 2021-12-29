@@ -79,7 +79,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     std::cout <<"Test chain call event fire" <<std::endl;
     evMgr.AddListener(EventIds::Event3, [this](LLBC_Event &ev){
-        std::cout <<"Event3 handler, func:" <<__FUNCTION__ <<std::endl;
+        std::cout <<"Event3 handler, func: " <<__FUNCTION__ <<", ev: 0x" <<this <<std::endl;
         std::cout <<"event params: " <<std::endl;
         DumpEvParams(ev);
     });
@@ -89,6 +89,8 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
         .SetParam(LLBC_String("hey too"), 3.1415926)
         .Fire();
 
+    evMgr.BeginFire(EventIds::Event3);
+
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
 
@@ -97,7 +99,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
 void TestCase_Core_Event::OnEvent1(LLBC_Event &ev)
 {
-    std::cout <<"OnEvent1() called! event params:" <<std::endl;
+    std::cout <<"OnEvent1() called! event params(this: 0x" <<this <<"):" <<std::endl;
     DumpEvParams(ev);
 }
 

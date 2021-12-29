@@ -212,8 +212,11 @@ void LLBC_EventManager::Fire(LLBC_Event *ev)
 
 LLBC_EventFirer &LLBC_EventManager::BeginFire(int evId)
 {
-    auto evFirer = LLBC_GetObjectFromUnsafetyPool<LLBC_EventFirer>();
-    evFirer->SetEventInfo(LLBC_New(LLBC_Event, evId), this);
+    LLBC_Event *ev = LLBC_GetObjectFromUnsafetyPool<LLBC_Event>();
+    ev->SetId(evId);
+
+    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafetyPool<LLBC_EventFirer>();
+    evFirer->SetEventInfo(ev, this);
 
     return *evFirer;
 }

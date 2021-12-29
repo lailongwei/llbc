@@ -52,6 +52,12 @@ void LLBC_EventFirer::Clear()
     }
 }
 
+void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
+    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
+}
+
 void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
 {
     _ev = ev;

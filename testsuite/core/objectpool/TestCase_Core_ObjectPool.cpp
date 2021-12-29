@@ -189,7 +189,7 @@ namespace
         }
     };
 
-    class ObjectReflectionBaseTestObj : public LLBC_PoolObjectReflectionBase
+    class ObjectReflectionBaseTestObj : public LLBC_PoolObject
     {
     public:
         ObjectReflectionBaseTestObj()

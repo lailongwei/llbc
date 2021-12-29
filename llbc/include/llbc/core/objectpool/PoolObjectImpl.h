@@ -19,47 +19,47 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
+#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
 
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
 __LLBC_NS_BEGIN
 
-inline LLBC_PoolObjectReflectionBase::LLBC_PoolObjectReflectionBase()
+inline LLBC_PoolObject::LLBC_PoolObject()
 : _poolInst(nullptr)
 {
 }
 
-inline LLBC_PoolObjectReflectionBase::~LLBC_PoolObjectReflectionBase() 
+inline LLBC_PoolObject::~LLBC_PoolObject() 
 {
 }
 
-inline void LLBC_PoolObjectReflectionBase::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+inline void LLBC_PoolObject::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 {
     _poolInst = &poolInst;
 }
 
-inline bool LLBC_PoolObjectReflectionBase::IsPoolObject() const
+inline bool LLBC_PoolObject::IsPoolObject() const
 {
     return _poolInst != nullptr;
 }
 
-inline LLBC_IObjectPoolInst *LLBC_PoolObjectReflectionBase::GetPoolInst()
+inline LLBC_IObjectPoolInst *LLBC_PoolObject::GetPoolInst()
 {
     return _poolInst;
 }
 
-inline void LLBC_PoolObjectReflectionBase::GiveBackToPool()
+inline void LLBC_PoolObject::GiveBackToPool()
 {
     if (_poolInst)
         _poolInst->Release(this);
 }
 
-inline void LLBC_PoolObjectReflectionBase::Clear()
+inline void LLBC_PoolObject::Clear()
 {
     _poolInst = nullptr;
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_OBJECT_POOL_OBJECT_REFRECTION_BASE_H__
+#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
