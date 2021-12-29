@@ -91,7 +91,7 @@ public:
         typedef LLBC_BinaryFunction<const void *, size_t, uint32>::Argument2_Type Argument2_Type;
         typedef LLBC_BinaryFunction<const void *, size_t, uint32>::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const = 0;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const = 0;
     };
 
 public:
@@ -120,7 +120,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -132,7 +132,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -144,7 +144,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -156,7 +156,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -168,7 +168,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -180,7 +180,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -192,7 +192,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
     /**
@@ -204,7 +204,7 @@ private:
         typedef HashBase::Argument2_Type Argument2_Type;
         typedef HashBase::Result_Type Result_Type;
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size) const;
+        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
     };
 
 private:
