@@ -65,11 +65,6 @@ public:
      */
     virtual void GiveBackToPool();
 
-    /**
-     * Object-Pool reflection support: pool instance clear callback.
-     */
-    virtual void Clear();
-
 protected:
     LLBC_IObjectPoolInst *_poolInst;
 };

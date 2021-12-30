@@ -55,11 +55,6 @@ inline void LLBC_PoolObject::GiveBackToPool()
         _poolInst->Release(this);
 }
 
-inline void LLBC_PoolObject::Clear()
-{
-    _poolInst = nullptr;
-}
-
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__

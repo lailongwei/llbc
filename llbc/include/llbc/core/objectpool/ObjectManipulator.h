@@ -113,6 +113,7 @@ private:
     #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset
 
     #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+private:
     /**
      * Reset object, this method is called when object has Reset():void function.
      */
@@ -121,6 +122,28 @@ private:
     template <typename ObjectType>
     static bool ResetObj(void *obj, Resetable_type<ObjectType, &ObjectType::Reset> *);
     #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse
+private:
+    /**
+     * Reset object, this method is called when object has reuse():void function.
+     */
+    template <typename ObjectType, void (ObjectType::*)()>
+    struct reusable_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, reusable_type<ObjectType, &ObjectType::reuse> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
+
+    #if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse
+private:
+    /**
+     * Reset object, this method is called when object has Reuse():void function.
+     */
+    template <typename ObjectType, void (ObjectType::*)()>
+    struct Reusable_type;
+    template <typename ObjectType>
+    static bool ResetObj(void *obj, Reusable_type<ObjectType, &ObjectType::Reuse> *);
+    #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse
 
 private:
     /**

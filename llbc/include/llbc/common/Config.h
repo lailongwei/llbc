@@ -179,9 +179,11 @@
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse      1
 // Some llbc framework types object pool units number define.
-#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256     // LLBC_Packet
-#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256    // LLBC_MessageBlock
+#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256 // LLBC_Packet
+#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256 // LLBC_MessageBlock
 
 /**
  * \brief ObjBase about configs.
