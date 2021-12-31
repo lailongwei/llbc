@@ -27,6 +27,7 @@
 # 22)【llbc core】对象池可重用方法识别增加reuse()/Reuse()支持
 # 23)【llbc core】LLBC_BasicCString增加std::ostream &operator <<(std::ostream &operator <<, const LLBC_BasicCString &)方法支持
 # 24)【llbc core】相关多余LLBC_EXTERN宏使用去除
+# 25)【llbc core】对象池反射方法简化, 去除IsPoolObject()/GiveBackToPool()方法要求, 以让对象池使用者以更轻的负担编写反射支持的类实现
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
