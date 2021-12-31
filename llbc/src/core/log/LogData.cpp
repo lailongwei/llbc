@@ -86,19 +86,9 @@ void LLBC_LogData::Clear()
     threadId = LLBC_INVALID_NATIVE_THREAD_ID;
 }
 
-bool LLBC_LogData::IsPoolObject() const
-{
-    return _poolInst != nullptr;
-}
-
 void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 {
     _poolInst = &poolInst;
-}
-
-void LLBC_LogData::GiveBackToPool()
-{
-    _poolInst->Release(this);
 }
 
 LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()

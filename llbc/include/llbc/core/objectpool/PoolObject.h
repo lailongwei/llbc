@@ -51,19 +51,9 @@ public:
     virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
 
     /**
-     * Object-Pool reflection support: Is pool object.
-     */
-    virtual bool IsPoolObject() const;
-
-    /**
      * Object-Pool reflection support:Get pool instance.
      */
     virtual LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object-Pool reflection support: Give back object to pool.
-     */
-    virtual void GiveBackToPool();
 
 protected:
     LLBC_IObjectPoolInst *_poolInst;

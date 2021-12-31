@@ -134,9 +134,10 @@ void LLBC_Packet::Clear()
         }
         else
         {
-            if (_payload->IsPoolObject())
+            LLBC_IObjectPoolInst *payloadPoolInst = _payload->GetPoolInst();
+            if (payloadPoolInst)
             {
-                _payload->GiveBackToPool();
+                payloadPoolInst->Release(_payload);
                 _payload = nullptr;
             }
             else

@@ -80,17 +80,7 @@ public:
     /**
      * Object pool support method.
      */
-    bool IsPoolObject() const;
-
-    /**
-     * Object pool support method.
-     */
     void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object pool support method.
-     */
-    void GiveBackToPool();
 
     /**
      * Object pool support method.

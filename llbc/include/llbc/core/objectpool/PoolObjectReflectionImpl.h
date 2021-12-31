@@ -85,30 +85,7 @@ void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
 template <typename ObjectType>
 LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsPoolObject(ObjectType *&obj)
 {
-    return IsPoolObjectInl<ObjectType>(obj, nullptr);
-}
-
-template <typename ObjectType>
-bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
-                                                __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
-{
-    return obj->IsPoolObject();
-}
-
-template <typename ObjectType>
-typename std::enable_if<std::is_base_of<
-    LLBC_PoolObject, ObjectType>::value, bool>::type
-LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
-                                           std::nullptr_t)
-{
-    return obj->IsPoolObject();
-}
-
-template <typename ObjectType>
-bool LLBC_PoolObjectReflection::IsPoolObjectInl(ObjectType *&obj,
-                                                ...)
-{
-    return false;
+    return GetPoolInst<ObjectType>(obj) != nullptr;
 }
 
 template <typename ObjectType>
@@ -141,35 +118,6 @@ LLBC_IObjectPoolInst *LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::GiveBackToPool(ObjectType *&obj)
-{
-    GiveBackToPoolInl<ObjectType>(obj, nullptr);
-}
-
-template <typename ObjectType>
-void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                  __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
-{
-    obj->GiveBackToPool();
-}
-
-template <typename ObjectType>
-typename std::enable_if<std::is_base_of<
-    LLBC_PoolObject, ObjectType>::value, void>::type
-LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                             std::nullptr_t)
-{
-    obj->GiveBackToPool();
-}
-
-template <typename ObjectType>
-void LLBC_PoolObjectReflection::GiveBackToPoolInl(ObjectType *&obj,
-                                                  ...)
-{
-    // Do nothing.
-}
-
-template <typename ObjectType>
 void LLBC_PoolObjectReflection::Recycle(ObjectType *obj)
 {
     RecycleInl<ObjectType>(obj, nullptr);
@@ -191,8 +139,9 @@ void LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
 {
     if (obj)
     {
-        if (obj->IsPoolObject())
-            obj->GiveBackToPool();
+        LLBC_IObjectPoolInst *poolInst = obj->GetPoolInst();
+        if (poolInst)
+            poolInst->Release(obj);
         else
             LLBC_Delete(obj);
     }
@@ -206,8 +155,9 @@ LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
 {
     if (obj)
     {
-        if (obj->IsPoolObject())
-            obj->GiveBackToPool();
+        LLBC_IObjectPoolInst *poolInst = obj->GetPoolInst();
+        if (poolInst)
+            poolInst->Release(obj);
         else
             LLBC_Delete(obj);
     }

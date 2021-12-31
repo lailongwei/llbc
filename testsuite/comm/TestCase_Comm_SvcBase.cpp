@@ -32,13 +32,12 @@ struct TestData : public LLBC_ICoder
 
     TestData()
     : iVal(0)
-    , _poolInst(nullptr)
     {
     }
 
     virtual ~TestData()
     {
-        std::cout <<"Test data destroyed!" <<std::endl;
+        std::cout <<"0x" <<this <<": Test data destroyed!" <<std::endl;
     }
 
     virtual bool Encode(LLBC_Packet &packet)
@@ -53,34 +52,11 @@ struct TestData : public LLBC_ICoder
         return true;
     }
 
-    virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-    {
-        LLBC_ICoder::MarkPoolObject(poolInst);
-    }
-
-    virtual bool IsPoolObject() const
-    {
-        return LLBC_ICoder::IsPoolObject();
-    }
-
-    virtual LLBC_IObjectPoolInst *GetPoolInst()
-    {
-        return _poolInst;
-    }
-
-    virtual void GiveBackToPool()
-    {
-        LLBC_ICoder::GiveBackToPool();
-    }
-
     virtual void Clear()
     {
         iVal = 0;
         strVal.clear();
     }
-
-private:
-    LLBC_IObjectPoolInst *_poolInst;
 };
 
 class TestDataFactory : public LLBC_ICoderFactory
@@ -373,7 +349,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     _svc->Send(packet);
 
     // Create status == 1 packet to send to peer(if enabled).
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     encoder = _svc->GetSafetyObjectPool().Get<TestData>();
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
@@ -383,7 +359,6 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     packet->SetEncoder(encoder);
 
     _svc->Send(packet);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 }
 

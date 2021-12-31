@@ -24,42 +24,11 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_ICoder::LLBC_ICoder()
-: _poolInst(nullptr)
 {
 }
 
 inline LLBC_ICoder::~LLBC_ICoder()
 {
-}
-
-inline void LLBC_ICoder::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-{
-    _poolInst = &poolInst;
-}
-
-inline bool LLBC_ICoder::IsPoolObject() const
-{
-    return _poolInst != nullptr;
-}
-
-inline LLBC_IObjectPoolInst *LLBC_ICoder::GetPoolInst()
-{
-    return _poolInst;
-}
-
-inline void LLBC_ICoder::GiveBackToPool()
-{
-    _poolInst->Release(this);
-}
-
-inline void LLBC_ICoder::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
-{
-    // Do nothing.
-}
-
-inline void LLBC_ICoder::OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
-{
-    // Do nothing.
 }
 
 __LLBC_NS_END

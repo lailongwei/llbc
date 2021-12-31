@@ -39,20 +39,9 @@ inline void LLBC_PoolObject::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
     _poolInst = &poolInst;
 }
 
-inline bool LLBC_PoolObject::IsPoolObject() const
-{
-    return _poolInst != nullptr;
-}
-
 inline LLBC_IObjectPoolInst *LLBC_PoolObject::GetPoolInst()
 {
     return _poolInst;
-}
-
-inline void LLBC_PoolObject::GiveBackToPool()
-{
-    if (_poolInst)
-        _poolInst->Release(this);
 }
 
 __LLBC_NS_END
