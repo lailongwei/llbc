@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_VariantType
 {
 public:
-    enum ENUM 
+    enum ENUM : uint32
     {
         // Nil type enumeration.
         VT_NIL                  = 0x00000000,
@@ -109,7 +109,7 @@ public:
     static void InitType2StrDict();
 
 private:
-    static std::map<int, LLBC_String> _typeDescs;
+    static std::map<LLBC_VariantType::ENUM, LLBC_String> _typeDescs;
 };
 
 __LLBC_NS_END
@@ -126,7 +126,7 @@ __LLBC_NS_END
 /**
  * \brief LLBC_Variant stream output function.
  */
-extern LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
 
 __LLBC_NS_BEGIN
 
@@ -163,23 +163,33 @@ public:
     {
         LLBC_VariantType::ENUM type;
 
-        union RawType 
+        union DataType
         {
-            sint64 int64Val;
-            uint64 uint64Val;
+            union RawType
+            {
+                sint64 int64Val;
+                uint64 uint64Val;
+                double doubleVal;
+            } raw;
 
-            double doubleVal;
-        } raw;
-
-        union ObjType
-        {
-            Str *str;
-            Dict *dict;
-            Seq *seq;
-        } obj;
+            union ObjType
+            {
+                Str *str;
+                Dict *dict;
+                Seq *seq;
+            } obj;
+        } data;
 
         Holder();
         ~Holder();
+
+        LLBC_VariantType::ENUM GetFirstType() const;
+
+        void Clear();
+
+    private:
+        friend class LLBC_Variant;
+        void ClearData();
     };
 
     /**
@@ -219,34 +229,59 @@ public:
     };
 
 public:
+    // Initialize the number to string fast access table.
+    static void InitNumber2StrFastAccessTable();
+    // Destroy the number to string fast access table.
+    static void DestroyNumber2StrFastAccessTable();
+
+public:
     LLBC_Variant();
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
-    explicit LLBC_Variant(const bool &boolVal);
-    explicit LLBC_Variant(const sint8 &sint8Val);
-    explicit LLBC_Variant(const uint8 &uint8Val);
-    explicit LLBC_Variant(const sint16 &sint16Val);
-    explicit LLBC_Variant(const uint16 &uint16Val);
-    explicit LLBC_Variant(const sint32 &sint32Val);
-    explicit LLBC_Variant(const uint32 &uint32Val);
-    explicit LLBC_Variant(const long &longVal);
-    explicit LLBC_Variant(const ulong &ulongVal);
+    explicit LLBC_Variant(const bool &b);
+    explicit LLBC_Variant(const sint8 &i8);
+    explicit LLBC_Variant(const uint8 &ui8);
+    explicit LLBC_Variant(const sint16 &i16);
+    explicit LLBC_Variant(const uint16 &ui16);
+    explicit LLBC_Variant(const sint32 &i32);
+    explicit LLBC_Variant(const uint32 &ui32);
+    explicit LLBC_Variant(const long &l);
+    explicit LLBC_Variant(const ulong &ul);
     template <typename _T>
-    explicit LLBC_Variant(const _T * const &ptrVal);
-    explicit LLBC_Variant(const sint64 &int64Val);
-    explicit LLBC_Variant(const uint64 &uint64Val); 
-    explicit LLBC_Variant(const float &floatVal);
-    explicit LLBC_Variant(const double &doubleVal);
-    explicit LLBC_Variant(const char *cstrVal);
-    explicit LLBC_Variant(const std::string &strVal);
-    explicit LLBC_Variant(const LLBC_String &strVal);
-    explicit LLBC_Variant(const Seq &seqVal);
-    explicit LLBC_Variant(const Dict &dictVal);
-    LLBC_Variant(const LLBC_Variant &varVal);
+    explicit LLBC_Variant(const _T * const &ptr);
+    explicit LLBC_Variant(const sint64 &i64);
+    explicit LLBC_Variant(const uint64 &ui64); 
+    explicit LLBC_Variant(const float &f);
+    explicit LLBC_Variant(const double &d);
+    explicit LLBC_Variant(const char *str);
+    explicit LLBC_Variant(const std::string &str);
+    explicit LLBC_Variant(const LLBC_String &str);
+    explicit LLBC_Variant(const Seq &seq);
+    template <typename _T>
+    explicit LLBC_Variant(const std::vector<_T> &vec);
+    template <typename _T>
+    explicit LLBC_Variant(const std::list<_T> &lst);
+    template <typename _T>
+    explicit LLBC_Variant(const std::deque<_T> &dqe);
+    template <typename _T>
+    explicit LLBC_Variant(const std::queue<_T> &que);
+    template <typename _T>
+    explicit LLBC_Variant(const std::set<_T> &s);
+    template <typename _T>
+    explicit LLBC_Variant(const std::unordered_set<_T> &us);
+    explicit LLBC_Variant(const Dict &dict);
+    template <typename _Key, typename _Val>
+    explicit LLBC_Variant(const std::map<_Key, _Val> &m);
+    template <typename _Key, typename _Val>
+    explicit LLBC_Variant(const std::unordered_map<_Key, _Val> &um);
+    LLBC_Variant(const LLBC_Variant &var);
+    LLBC_Variant(LLBC_Variant &&var);
 
+public:
     // Fetch variant data type and holder data.
-    int GetType() const;
-    struct Holder &GetMutableHolder();
+    LLBC_VariantType::ENUM GetType() const;
+    LLBC_VariantType::ENUM GetFirstType() const;
+    struct Holder *GetMutableHolder();
     const struct Holder &GetHolder() const;
 
     // Type diagnose.
@@ -291,9 +326,11 @@ public:
     LLBC_Variant &BecomeStr();
     LLBC_Variant &BecomeSeq();
     LLBC_Variant &BecomeDict();
+    LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
 
     // Real data fetch.
     bool AsBool() const;
+    bool AsLooseBool() const;
     sint8 AsInt8() const;
     uint8 AsUInt8() const;
     sint16 AsInt16() const;
@@ -302,8 +339,8 @@ public:
     uint32 AsUInt32() const;
     long AsLong() const;
     unsigned long AsULong() const;
-    template <typename _T>
-    _T *AsPtr() const;
+    template <typename _Ty>
+    _Ty *AsPtr() const;
     sint64 AsInt64() const;
     uint64 AsUInt64() const;
     float AsFloat() const;
@@ -321,15 +358,29 @@ public:
     operator uint32 () const;
     operator long () const;
     operator ulong () const;
-    template <typename _T>
-    operator _T * () const;
+    template <typename _Ty>
+    operator _Ty * () const;
     operator sint64 () const;
     operator uint64 () const;
     operator float () const;
     operator double () const;
     operator LLBC_String () const;
     operator const Seq &() const;
+    template <typename _Ty>
+    operator std::vector<_Ty>() const;
+    template <typename _Ty>
+    operator std::set<_Ty>() const;
+    template <typename _Ty>
+    operator std::unordered_set<_Ty>() const;
+    template <typename _Ty>
+    operator std::queue<_Ty>() const;
+    template <typename _Ty>
+    operator std::deque<_Ty>() const;
     operator const Dict &() const;
+    template <typename _Key, typename _Val>
+    operator std::map<_Key, _Val>() const;
+    template <typename _Key, typename _Val>
+    operator std::unordered_map<_Key, _Val>() const;
 
     // Common operation methods.
     void Clear();
@@ -348,8 +399,8 @@ public:
     SeqConstReverseIter SeqReverseEnd() const;
 
     Seq::reference SeqFront();
-    Seq::const_reference SeqFront() const;
     Seq::reference SeqBack();
+    Seq::const_reference SeqFront() const;
     Seq::const_reference SeqBack() const;
 
     SeqIter SeqInsert(SeqIter it, const Seq::value_type &val);
@@ -392,53 +443,64 @@ public:
     std::pair<DictIter, bool> DictInsert(const Dict::key_type &key, const Dict::mapped_type &val);
     std::pair<DictIter, bool> DictInsert(const Dict::value_type &val);
 
-    template <typename _Kty, typename _Ty>
-    std::pair<DictIter, bool> DictInsert(const _Kty &key, const _Ty &val);
+    template <typename _Key, typename _Val>
+    std::pair<DictIter, bool> DictInsert(const _Key &key, const _Val &val);
 
     DictIter DictFind(const Dict::key_type &key);
     DictConstIter DictFind(const Dict::key_type &key) const;
 
-    template <typename _Kty>
-    DictIter DictFind(const _Kty &key);
-    template <typename _Kty>
-    DictConstIter DictFind(const _Kty &key) const;
+    template <typename _Key>
+    DictIter DictFind(const _Key &key);
+    template <typename _Key>
+    DictConstIter DictFind(const _Key &key) const;
 
-    void DictErase(DictIter it);
+    DictIter DictErase(DictIter it);
     Dict::size_type DictErase(const Dict::key_type &key);
-    void DictErase(DictIter first, DictIter last);
+    DictIter DictErase(DictIter first, DictIter last);
 
-    template <typename _Kty>
-    Dict::size_type DictErase(const _Kty &key);
+    template <typename _Key>
+    Dict::size_type DictErase(const _Key &key);
 
     LLBC_Variant &operator [](const LLBC_Variant &key);
     const LLBC_Variant &operator [](const LLBC_Variant &key) const;
 
-    template <typename _Kty>
-    LLBC_Variant &operator [](const _Kty &key);
-    template <typename _Kty>
-    const LLBC_Variant &operator [](const _Kty &key) const;
+    template <typename _Key>
+    LLBC_Variant &operator [](const _Key &key);
+    template <typename _Key>
+    const LLBC_Variant &operator [](const _Key &key) const;
 
     // assignment operators.
-    LLBC_Variant &operator =(bool val);
-    LLBC_Variant &operator =(sint8 val);
-    LLBC_Variant &operator =(uint8 val);
-    LLBC_Variant &operator =(sint16 val);
-    LLBC_Variant &operator =(uint16 val);
-    LLBC_Variant &operator =(sint32 val);
-    LLBC_Variant &operator =(uint32 val);
-    LLBC_Variant &operator =(long val);
-    LLBC_Variant &operator =(unsigned long val);
-    LLBC_Variant &operator =(const char * const &val);
+    LLBC_Variant &operator =(bool b);
+    LLBC_Variant &operator =(sint8 i8);
+    LLBC_Variant &operator =(uint8 ui8);
+    LLBC_Variant &operator =(sint16 i16);
+    LLBC_Variant &operator =(uint16 ui16);
+    LLBC_Variant &operator =(sint32 i32);
+    LLBC_Variant &operator =(uint32 ui32);
+    LLBC_Variant &operator =(long l);
+    LLBC_Variant &operator =(unsigned long ul);
+    LLBC_Variant &operator =(const char * const &str);
     template <typename _T>
-    LLBC_Variant &operator =(const _T * const &val);
-    LLBC_Variant &operator =(const sint64 &val);
-    LLBC_Variant &operator =(const uint64 &val);
-    LLBC_Variant &operator =(float val);
-    LLBC_Variant &operator =(const double &val);
-    LLBC_Variant &operator =(const LLBC_String &val);
-    LLBC_Variant &operator =(const Dict &val);
-    LLBC_Variant &operator =(const Seq &val);
-    LLBC_Variant &operator =(const LLBC_Variant &val);
+    LLBC_Variant &operator =(const _T * const &ptr);
+    LLBC_Variant &operator =(const sint64 &i64);
+    LLBC_Variant &operator =(const uint64 &ui64);
+    LLBC_Variant &operator =(float f);
+    LLBC_Variant &operator =(const double &d);
+    LLBC_Variant &operator =(const LLBC_String &str);
+    LLBC_Variant &operator =(const Seq &seq);
+    template <typename _T>
+    LLBC_Variant &operator =(const std::vector<_T> &vec);
+    template <typename _T>
+    LLBC_Variant &operator =(const std::list<_T> &lst);
+    template <typename _T>
+    LLBC_Variant &operator =(const std::queue<_T> &que);
+    template <typename _T>
+    LLBC_Variant &operator =(const std::set<_T> &s);
+    LLBC_Variant &operator =(const Dict &dict);
+    template <typename _Key, typename _Val>
+    LLBC_Variant &operator =(const std::map<_Key, _Val> &m);
+    LLBC_Variant &operator =(const LLBC_Variant &var);
+    LLBC_Variant &operator =(LLBC_Variant &&var);
 
     // Relational operators.
     bool operator ==(const LLBC_Variant &another) const;
@@ -516,17 +578,28 @@ private:
     friend class LLBC_VariantTraits;
 
     void SetType(int type);
+    void ClearData();
 
-    Holder &GetHolder();
+    void CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty);
+    template <typename _T, typename _UnaryContainer>
+    void CtFromUnaryCont(const _UnaryContainer &unaryCont);
+    template <typename _Key, typename _Val, typename _BinaryContainer>
+    void CtFromBinaryCont(const _BinaryContainer &binaryCont);
 
-    void CleanRawData();
-    void CleanStrData();
-    void CleanSeqData();
-    void CleanDictData();
-    void CleanTypeData(int type);
+    template <typename _Key, typename _Val, typename _BinaryContainer>
+    void CpToBinaryCont(_BinaryContainer &binaryCont);
+
+    bool IsStrX() const;
+    bool IsSeqX() const;
+    bool IsDictX() const;
+
+    LLBC_Variant &BecomeStrX();
+    LLBC_Variant &BecomeSeqX();
+    LLBC_Variant &BecomeDictX();
 
 private:
     struct Holder _holder;
+    static Str **_num2StrFastAccessTbl;
 };
 
 __LLBC_NS_END

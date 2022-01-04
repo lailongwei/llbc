@@ -58,7 +58,7 @@ int TestCase_ObjBase_Object::Run(int arg, char *argv[])
 {
     std::cout <<"objbase/object test: " <<std::endl;
     
-    MyObj *obj = LLBC_New0(MyObj);
+    MyObj *obj = LLBC_New(MyObj);
     obj->Retain();
     obj->Release();
     obj->Release();

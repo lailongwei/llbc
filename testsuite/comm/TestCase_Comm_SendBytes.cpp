@@ -27,7 +27,7 @@ namespace
 
 const int OPCODE = 0;
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
     virtual bool OnInitialize()
@@ -89,10 +89,10 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create(_svcType, "SendBytesTest");
     svc->SuppressCoderNotFoundWarning();
 
-    TestFacade *facade = LLBC_New(TestFacade);
-    svc->RegisterFacade(facade);
+    TestComp *comp = LLBC_New(TestComp);
+    svc->RegisterComponent(comp);
 
-    svc->Subscribe(OPCODE, facade, &TestFacade::OnRecv);
+    svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
     int sid = 0;
     if (_asClient)

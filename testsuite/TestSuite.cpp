@@ -22,6 +22,11 @@
 #include "TestSuite.h"
 #include "TestTraits.h"
 
+#if LLBC_TARGET_PLATFORM_WIN32
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
 #define __PrintLineC(color, fmt, ...)                                \
     do                                                               \
     {                                                                \
@@ -53,7 +58,7 @@ int TestSuite_Main(int argc, char* argv[])
         {
             const char* testcaseName = __TEST_CASE_NAME(i);
             __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(i);
-            if (testcaseName == NULL || testcaseFactory == NULL)
+            if (testcaseName == nullptr || testcaseFactory == nullptr)
                 continue;
 
             LLBC_PrintLine("%d: %s", i + 1, testcaseName);
@@ -63,26 +68,21 @@ int TestSuite_Main(int argc, char* argv[])
         int idx = -1;
         LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
 
-        #if LLBC_TARGET_PLATFORM_WIN32
-        #pragma warning(push)
-        #pragma warning(disable: 4996)
-        #endif // LLBC_TARGET_PLATFORM_WIN32
-
-        if (fscanf(stdin, "%d", &idx) != 1)
+        char inputBuf[8192];
+        if (fgets(inputBuf, sizeof(inputBuf), stdin) == nullptr)
         {
-            __ClearInputBuf();
+            // __ClearInputBuf();
             continue;
         }
 
-        #if LLBC_TARGET_PLATFORM_WIN32
-        #pragma warning(pop)
-        #endif // LLBC_TARGET_PLATFORM_WIN32
-
-        __ClearInputBuf();
+        // __ClearInputBuf();
+        const LLBC_Strings inputs = LLBC_String(inputBuf).strip().split(' ');
+        idx = LLBC_Str2Int32(inputs[0].c_str());
         if (idx <= 0)
+        {
             break;
-
-        if (--idx >= __TEST_CASE_COUNT)
+        }
+        else if (--idx >= __TEST_CASE_COUNT)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
@@ -90,7 +90,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         const char* testcaseName = __TEST_CASE_NAME(idx);
         __TestCaseFactoryFunc testcaseFactory = __TEST_CASE_FUNC(idx);
-        if (testcaseName == NULL || testcaseFactory == NULL)
+        if (testcaseName == nullptr || testcaseFactory == nullptr)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
             continue;
@@ -105,8 +105,21 @@ int TestSuite_Main(int argc, char* argv[])
 
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_White, "%s selected.", testcaseName);
 
-        test->Run(argc, argv);
+        int testArgc = static_cast<int>(inputs.size());
+        const char **testArgv = LLBC_Malloc(const char *, sizeof(char *) * testArgc);
+        testArgv[0] = argv[0];
+        for (int i = 1; i < testArgc; ++i)
+            testArgv[i] = inputs[i].c_str();
+
+        int testCaseRet = test->Run(testArgc, const_cast<char **>(testArgv));
+        LLBC_Free(testArgv);
         LLBC_Delete(test);
+
+        if (testCaseRet != LLBC_OK)
+        {
+            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "%s run failed, retCode:%d, press any key to continue...", testcaseName, testCaseRet);
+            getchar();
+        }
     }
 
     ::llbc::LLBC_Cleanup();
@@ -116,3 +129,8 @@ int TestSuite_Main(int argc, char* argv[])
 #undef __PrintLineC
 #undef __DEPARATION_CHARACTER
 #undef __ClearInputBuf
+ 
+#if LLBC_TARGET_PLATFORM_WIN32
+#pragma warning(pop)
+#endif // LLBC_TARGET_PLATFORM_WIN32
+

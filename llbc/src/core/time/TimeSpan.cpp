@@ -25,44 +25,46 @@
 #include "llbc/core/utils/Util_Text.h"
 
 #include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/time/Time.h"
 
 __LLBC_NS_BEGIN
 
+
+const LLBC_TimeSpan LLBC_TimeSpan::zero = LLBC_TimeSpan::FromSS(0);
+const LLBC_TimeSpan LLBC_TimeSpan::oneSec = LLBC_TimeSpan::FromSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMin = LLBC_TimeSpan::FromMMSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneHour = LLBC_TimeSpan::FromHHMMSS(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneDay = LLBC_TimeSpan::FromDDHHMMSS(1);
+
 LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
 {
-
-    // Ensure the span string is time format, not datetime format.
-    LLBC_String spanRepr = span;
-    LLBC_String::size_type spaceIdx = span.find(' ');
-    if (spaceIdx != LLBC_String::npos)
-        spanRepr = span.substr(spaceIdx + 1);
-
-    // If the span string is empty, set span value to 0.
-    if (spanRepr.empty())
+   // Add day part span.
+    LLBC_String strippedSpan = span.strip();
+    size_t dayIdx = strippedSpan.find(' ');
+    if (dayIdx != LLBC_String::npos)
+    {
+        _span = atoll(strippedSpan.substr(0, dayIdx).c_str()) * LLBC_Time::NumOfMicroSecondsPerDay;
+        strippedSpan = strippedSpan.substr(dayIdx + 1);
+    }
+    else
     {
         _span = 0;
-        return;
     }
 
-    // Split by ':', fetch hour,minute,second, microsecond parts.
-    LLBC_Strings spanParts = span.split(':');
-    if (spanParts.size() == 1) // Only has second part.
+    // Split by ':', fetch hour/minute/second/micro-second parts.
+    LLBC_Strings hmsParts = strippedSpan.strip().split(':');
+    const LLBC_String &secSpan = hmsParts[hmsParts.size() - 1];
+    if (hmsParts.size() >= 2)
     {
-        spanParts.insert(spanParts.begin(), "0");
-        spanParts.insert(spanParts.begin(), "0");
-    }
-    else if (spanParts.size() == 2) // Only has second and minute parts.
-    {
-        spanParts.insert(spanParts.begin(), "0");
+        _span += atoll(hmsParts[hmsParts.size() - 2].c_str()) * LLBC_Time::NumOfMicroSecondsPerMinute;
+        if (hmsParts.size() >= 3)
+            _span += atoll(hmsParts[hmsParts.size() - 3].c_str()) * LLBC_Time::NumOfMicroSecondsPerHour;
     }
 
-    _span = LLBC_Str2Int32(spanParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerHour +
-        LLBC_Str2Int32(spanParts[1].c_str()) * LLBC_Time::NumOfMicroSecondsPerMinute;
-
-    LLBC_Strings secParts = spanParts[2].split('.', 1);
-    _span += LLBC_Str2Int32(secParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerSecond;
+    LLBC_Strings secParts = secSpan.strip().split('.', 1);
+    _span += atoll(secParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerSecond;
     if (secParts.size() == 2)
-        _span += LLBC_Str2Int32(secParts[1].c_str());
+        _span += atoll(secParts[1].c_str()) * LLBC_Time::NumOfMicroSecondsPerMilliSecond;
 }
 
 __LLBC_NS_END

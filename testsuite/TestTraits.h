@@ -17,11 +17,11 @@ struct __TestCaseTraits
 {
     static const char* Name()
     {
-        return NULL;
+        return nullptr;
     }
     static ::llbc::LLBC_ITestCase* CreateTestCaseIns()
     {
-        return NULL;
+        return nullptr;
     }
 };
 

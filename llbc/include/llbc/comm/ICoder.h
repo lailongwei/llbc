@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The packet coder interface class encapsulation.
  */
-class LLBC_ICoder
+class LLBC_ICoder : public LLBC_PoolObject
 {
 public:
     LLBC_ICoder();
@@ -55,46 +55,6 @@ public:
      * Decode pure virtual function, implement it to use decode packet data.
      */
     virtual bool Decode(LLBC_Packet &packet) = 0;
-
-public:
-    /**
-     * Object-Pool reflection support: Mark pool object.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Is pool object.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual bool IsPoolObject() const;
-
-    /**
-     * Object-Pool reflection support:Get pool instance.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object-Pool reflection support: Give back object to pool.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual void GiveBackToPool();
-
-    /**
-     * Object-Pool reflection support: pool instance create event callback.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: pool instance destroy event callback.
-     * Note: When you use coder for multiple inheritance, please force rewrite this method for makesure object release exactly.
-     */
-    virtual void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst);
-
-protected:
-    LLBC_IObjectPoolInst *_poolInst;
 };
 
 /**

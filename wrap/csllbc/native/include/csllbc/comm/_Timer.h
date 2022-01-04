@@ -41,7 +41,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Timer_Destroy(csllbc_Timer *timer);
 /**
  * Schedule timer.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Timer_Schedule(csllbc_Timer *timer, uint64 dueTime, uint64 period);
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Timer_Schedule(csllbc_Timer *timer, sint64 dueTime, sint64 period);
 
 /**
  * Check given timer in scheduling or not.

@@ -19,72 +19,48 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_FACADE_EVENTS_H__
-#define __LLBC_COMM_FACADE_EVENTS_H__
+#ifndef __LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__
+#define __LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__
 
 #include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+
+#include "llbc/core/log/BaseLogToken.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The facade events offset enumeration.
+ * \brief The function log token class encapsulation.
  */
-class LLBC_EXPORT LLBC_FacadeEventsOffset
+class LLBC_HIDDEN LLBC_LogFunctionToken : public LLBC_BaseLogToken
 {
 public:
-    enum
-    {
-        Begin = 0,
-
-        OnInitialize = Begin,
-        OnDestroy,
-
-        OnStart,
-        OnStop,
-
-        OnUpdate,
-        OnIdle,
-
-        OnSessionCreate,
-        OnSessionDestroy,
-        OnAsyncConnResult,
-        OnProtoReport,
-        OnUnHandledPacket,
-
-        OnAppCfgReloaded,
-
-        End,
-    };
-};
-
-/**
- * \brief The facade events id define.
- */
-class LLBC_EXPORT LLBC_FacadeEvents
-{
-public:
-    static const uint64 OnInitialize;
-    static const uint64 OnDestroy;
-    
-    static const uint64 OnStart;
-    static const uint64 OnStop;
-
-    static const uint64 OnUpdate;
-    static const uint64 OnIdle;
-
-    static const uint64 OnSessionCreate;
-    static const uint64 OnSessionDestroy;
-    static const uint64 OnAsyncConnResult;
-    static const uint64 OnProtoReport;
-    static const uint64 OnUnHandledPacket;
-    static const uint64 OnAppCfgReloaded;
+    LLBC_LogFunctionToken();
+    virtual ~LLBC_LogFunctionToken();
 
 public:
-    static const uint64 AllEvents;
-    static const uint64 DefaultEvents;
+    /**
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
+
+    /**
+     * Get token type.
+     * @return int - token type.
+     */
+    virtual int GetType() const;
+
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
+
 };
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COMM_FACADE_EVENTS_H__
+#endif // !__LLBC_CORE_LOG_LOG_FUNCTION_TOKEN_H__

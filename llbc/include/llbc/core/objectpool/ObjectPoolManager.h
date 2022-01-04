@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
 /**
  * The global object pool define.
  */
-extern LLBC_EXPORT LLBC_SafetyObjectPool &__LLBC_GlobalObjectPool();
+LLBC_EXPORT LLBC_SafetyObjectPool &__LLBC_GlobalObjectPool();
 #define LLBC_GlobalObjectPool (LLBC_NS __LLBC_GlobalObjectPool())
 
 /**

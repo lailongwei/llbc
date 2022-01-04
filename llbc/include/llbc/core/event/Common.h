@@ -22,7 +22,7 @@
 #ifndef __LLBC_CORE_EVENT_COMMON_H__
 #define __LLBC_CORE_EVENT_COMMON_H__
 
-#include "llbc/core/event/Event.h"
+#include "llbc/core/event/EventFirer.h"
 #include "llbc/core/event/EventManager.h"
 
 #endif // !__LLBC_CORE_EVENT_COMMON_H__

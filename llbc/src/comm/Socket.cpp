@@ -55,7 +55,7 @@ char LLBC_Socket::_acceptExBuf[(sizeof(LLBC_SockAddr_IN) + 16) * 2] = {0};
 LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 : _handle(handle)
 
-, _session(NULL)
+, _session(nullptr)
 , _pollerType(_PollerType::End)
 
 , _listenSocket(false)
@@ -73,7 +73,7 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
-, _msgBlockPoolInst(NULL)
+, _msgBlockPoolInst(nullptr)
 #endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 {
     if (_handle == LLBC_INVALID_SOCKET_HANDLE)
@@ -318,9 +318,9 @@ LLBC_Socket *LLBC_Socket::Accept()
 {
     LLBC_SocketHandle newHandle = LLBC_AcceptClient(_handle, &_peerAddr);
     if (newHandle == LLBC_INVALID_SOCKET_HANDLE)
-        return NULL;
+        return nullptr;
 
-    LLBC_Socket *newSocket = LLBC_New1(LLBC_Socket, newHandle);
+    LLBC_Socket *newSocket = LLBC_New(LLBC_Socket, newHandle);
     newSocket->_pollerType = _pollerType;
 
     return newSocket;
@@ -360,9 +360,9 @@ int LLBC_Socket::ConnectEx(const LLBC_SockAddr_IN &addr, LLBC_POverlapped ol)
 {
     return LLBC_ConnectToPeerEx(_handle,    // in
                                 addr,       // in
-                                NULL,       // in_opt
+                                nullptr,       // in_opt
                                 0,          // in
-                                NULL,       // out(if send buffer is null, ignored) 
+                                nullptr,       // out(if send buffer is null, ignored) 
                                 ol);        // out
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -381,7 +381,7 @@ int LLBC_Socket::Send(const char *buf, int len)
 
 int LLBC_Socket::AsyncSend(const char *buf, int len)
 {
-    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, len);
+    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, len);
     block->Write(buf, len);
 
     return AsyncSend(block);
@@ -423,8 +423,8 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
             sendingSize = 0;
 
             ::memset(ol, 0, sizeof(OVERLAPPED));
-            ol->data = NULL;
-            buf.buf = NULL;
+            ol->data = nullptr;
+            buf.buf = nullptr;
             buf.len = 0;
 
             // Failed and error is WSAENOBUFS, rebuff the mergedBlock, wait next time to send.
@@ -595,8 +595,8 @@ void LLBC_Socket::OnSend()
             sendingSize = 0;
 
             ::memset(ol, 0, sizeof(OVERLAPPED));
-            ol->data = NULL;
-            buf.buf = NULL;
+            ol->data = nullptr;
+            buf.buf = nullptr;
             buf.len = 0;
 
             _willSend.Append(block);
@@ -637,7 +637,7 @@ void LLBC_Socket::OnRecv()
     #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
     LLBC_MessageBlock *block = _msgBlockPoolInst->GetObject();
     #else
-    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, _session->GetSessionOpts().GetSessionRecvBufSize());
+    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, _session->GetSessionOpts().GetSessionRecvBufSize());
     #endif
     while ((len = LLBC_Recv(_handle,
                             block->GetDataStartWithWritePos(),
@@ -648,17 +648,17 @@ void LLBC_Socket::OnRecv()
         block->ShiftWritePos(len);
         if (block->GetWritableSize() == 0)
         {
-#if LLBC_TARGET_PLATFORM_WIN32
+            #if LLBC_TARGET_PLATFORM_WIN32
             LLBC_NS ulong pendingBytes;
             if (UNLIKELY(::ioctlsocket(_handle, FIONREAD, &pendingBytes) == SOCKET_ERROR))
             {
                 LLBC_SetLastError(LLBC_ERROR_NETAPI);
-#else // Non-Win32
+            #else // Non-Win32
             int pendingBytes;
             if (UNLIKELY(::ioctl(_handle, FIONREAD, &pendingBytes) != 0))
             {
                 LLBC_SetLastError(LLBC_ERROR_CLIB);
-#endif
+            #endif
                 len = -1;
                 break;
             }
@@ -697,7 +697,8 @@ void LLBC_Socket::OnRecv()
                 return;
 
             // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
-            if (_pollerType == _PollerType::IocpPoller)
+            if (len > 0 &&
+                _pollerType == _PollerType::IocpPoller)
             {
                 if (UNLIKELY(PostZeroWSARecv() != LLBC_OK))
                     _session->OnClose();
@@ -716,17 +717,17 @@ void LLBC_Socket::OnRecv()
     if (len < 0)
     {
         if (errNo != LLBC_ERROR_WBLOCK
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+            #if LLBC_TARGET_PLATFORM_NON_WIN32
             // In Non-WIN32 platform, recv() API return errnor maybe EAGAIN or EWOULDBLOCK.
             && errNo != LLBC_ERROR_AGAIN
-#endif
+            #endif
            )
         {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-            _session->OnClose(LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
-#else
-            _session->OnClose(NULL, LLBC_New2(LLBC_SessionCloseInfo, errNo, subErrNo));
-#endif
+            #if LLBC_TARGET_PLATFORM_NON_WIN32
+            _session->OnClose(LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+            #else
+            _session->OnClose(nullptr, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+            #endif
             return;
         }
     }
@@ -734,24 +735,26 @@ void LLBC_Socket::OnRecv()
                        // In Non-Win32 platform: Set to ECONNRESET(104)
                        // In Win32 platform    : set to WSAECONNRESET(10054)
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+        #if LLBC_TARGET_PLATFORM_NON_WIN32
         LLBC_SessionCloseInfo *closeInfo = 
-            LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, ECONNRESET);
+            LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, ECONNRESET);
         _session->OnClose(closeInfo);
-#else
+        #else
         LLBC_SessionCloseInfo *closeInfo =
-            LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, WSAECONNRESET);
-        _session->OnClose(NULL, closeInfo);
-#endif
+            LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, WSAECONNRESET);
+        _session->OnClose(nullptr, closeInfo);
+        #endif
         return;
     }
 
     // In WIN32 platform & poller model is IOCP model, we post a Zero-WSASend overlapped.
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == _PollerType::IocpPoller)
+    {
         if (PostZeroWSARecv() != LLBC_OK)
             _session->OnClose();
-#endif // LLBC_TARGET_PLATFORM_WIN32
+    }
+    #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -760,10 +763,10 @@ void LLBC_Socket::OnClose(LLBC_POverlapped ol)
 void LLBC_Socket::OnClose()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-    if (ol != NULL)
+    #if LLBC_TARGET_PLATFORM_WIN32
+    if (ol != nullptr)
         DeleteOverlapped(ol);
-#endif
+    #endif
 
     Close();
 }

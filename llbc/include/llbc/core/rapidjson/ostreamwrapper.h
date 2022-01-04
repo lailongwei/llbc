@@ -12,18 +12,18 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_OSTREAMWRAPPER_H_
-#define RAPIDJSON_OSTREAMWRAPPER_H_
+#ifndef LLBC_RAPIDJSON_OSTREAMWRAPPER_H_
+#define LLBC_RAPIDJSON_OSTREAMWRAPPER_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include <iosfwd>
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(padded)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(padded)
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of \c std::basic_ostream into RapidJSON's Stream concept.
 /*!
@@ -56,11 +56,11 @@ public:
     }
 
     // Not implemented
-    char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
-    char Take() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
+    char Peek() const { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    char Take() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t Tell() const { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(char*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
 private:
     BasicOStreamWrapper(const BasicOStreamWrapper&);
@@ -73,9 +73,9 @@ typedef BasicOStreamWrapper<std::ostream> OStreamWrapper;
 typedef BasicOStreamWrapper<std::wostream> WOStreamWrapper;
 
 #ifdef __clang__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_OSTREAMWRAPPER_H_
+#endif // LLBC_RAPIDJSON_OSTREAMWRAPPER_H_

@@ -109,7 +109,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("StartStopTest")]
-    class TestFacade_StartStop : IFacade
+    class TestComponentStartStop : IComponent
     {
         public override void OnInit()
         {
@@ -181,7 +181,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("ListenTest")]
-    class TestFacade_ListenTest : IFacade
+    class TestComponentListenTest : IComponent
     {
         public override void OnInit()
         {
@@ -233,7 +233,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("ConnectTest")]
-    class TestFacade_ConnectTest : IFacade
+    class TestComponentConnectTest : IComponent
     {
         public override void OnAsyncConnResult(AsyncConnResult asyncConnResult)
         {
@@ -350,7 +350,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("SendRecvTest")]
-    class TestFacade_SendRecvTest : IFacade
+    class TestComponentSendRecvTest : IComponent
     {
         public override void OnInit()
         {
@@ -417,7 +417,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("PreHandleTest")]
-    class TestFacade_PreHandleTest : IFacade
+    class TestComponentPreHandleTest : IComponent
     {
         public override void OnInit()
         {
@@ -476,7 +476,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("PacketExcTest")]
-    class TestFacade_PacketExcTest : IFacade
+    class TestComponentPacketExcTest : IComponent
     {
         public override void OnInit()
         {
@@ -542,17 +542,17 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("FrameExcTest")]
-    class TestFacade_FrameExcTest : IFacade
+    class TestComponentFrameExcTest : IComponent
     {
         public override void OnInit()
         {
-            Console.WriteLine("Service {0} init(By Facade)", svc.svcName);
+            Console.WriteLine("Service {0} init(By Component)", svc.svcName);
             throw new Exception("Test Exception throw by OnInit!!!");
         }
 
         public override void OnDestroy()
         {
-            Console.WriteLine("Service {0} destroy(By Facade)", svc.svcName);
+            Console.WriteLine("Service {0} destroy(By Component)", svc.svcName);
         }
 
         [FrameExcHandler]
@@ -563,16 +563,16 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("FrameExcTest")]
-    class TestFacade_FrameExcTest2 : IFacade
+    class TestComponentFrameExcTest2 : IComponent
     {
         public override void OnInit()
         {
-            Console.WriteLine("Service {0} init(By Facade2)", svc.svcName);
+            Console.WriteLine("Service {0} init(By Component2)", svc.svcName);
         }
 
         public override void OnDestroy()
         {
-            Console.WriteLine("Service {0} destroy(By Facade2)", svc.svcName);
+            Console.WriteLine("Service {0} destroy(By Component2)", svc.svcName);
         }
     }
     #endregion
@@ -600,7 +600,7 @@ class TestCase_Comm_Service : ITestCase
     }
 
     [BindTo("ExternalDriveTest")]
-    class _SelfDriveTestFacade : IFacade
+    class SelfDriveTestComponent : IComponent
     {
         public override void OnInit()
         {

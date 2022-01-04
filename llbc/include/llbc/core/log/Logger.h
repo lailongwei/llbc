@@ -26,11 +26,10 @@
 
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/MessageBlock.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_Delegate.h"
 #include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 #include "llbc/core/log/LogLevel.h"
-#include "llbc/core/thread/RecursiveLock.h"
 
 __LLBC_NS_BEGIN
 
@@ -38,8 +37,9 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
-class LLBC_LogRunnable;
 class LLBC_LoggerConfigInfo;
+class LLBC_ILogAppender;
+class LLBC_LogRunnable;
 
 __LLBC_NS_END
 
@@ -57,11 +57,11 @@ public:
 public:
     /**
      * Initialize the loggeer.
-     * @param[in] name   - logger name.
-     * @param[in] config - logger config info.
+     * @param[in] config            - logger config info.
+     * @param[in] sharedLogRunnable - the shared log runnable.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &name, const LLBC_LoggerConfigInfo *config);
+    int Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnable *sharedLogRunnable);
 
     /**
      * Check logger initialized or not.
@@ -99,32 +99,20 @@ public:
      */
     bool IsTakeOver() const;
 
+    /**
+     * Get asynchronous mode switch.
+     * @return bool - asynchronous mode switch.
+     */
+    bool IsAsyncMode() const;
+
 public:
-    /**
-     * Install logger hook.
-     * @param[in] level    - the log level.
-     * @param[in] hookFunc - the hook function.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData));
-
-    /**
-     * Install logger hook.
-     * @param[in] level    - the log level.
-     * @param[in] obj      - the hook method bound obj.
-     * @param[in] hookMeth - the hook method.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename ObjType>
-    int InstallHook(int level, ObjType *obj, void (ObjType::*hookMeth)(const LLBC_LogData *logData));
-
     /**
      * Install logger hook.
      * @param[in] level     - the log level.
      * @param[in] hookDeleg - the hook delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg);
+    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg);
 
     /**
      * Uninstall error hook.
@@ -134,77 +122,171 @@ public:
 public:
     /**
      * Output specific level message.
-     * @param[in] tag      - log tag, can set to NULL.
-     * @param[in] file     - log file name.
-     * @param[in] line     - log file line.
-     * @param[in] fmt      - format control string.
-     * @param[in] ...      - optional arguments.
+     * @param[in] tag  - log tag, can set to nullptr.
+     * @param[in] file - log file name.
+     * @param[in] line - log file line.
+     * @param[in] func - log function.
+     * @param[in] fmt  - format control string.
+     * @param[in] ...  - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Debug(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Info(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Warn(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Error(const char *tag, const char *file, int line, const char *fmt, ...);
-    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...);
+    int Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Error(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Fatal(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
 
     /**
      * Output fmt using given level.
-     * @param[in] level    - log level.
-     * @param[in] tag      - log tag, can set to NULL.
-     * @param[in] file     - log file name.
-     * @param[in] line     - log file line.
-     * @param[in] fmt      - format control string.
-     * @param[in] argument - optional arguments.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag, can set to nullptr.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] fmt    - format control string.
+     * @param[in] ...    - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...);
+    int Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(7, 8);
+
+    /**
+     * Output message by va_list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag, can set to nullptr.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] func  - log function.
+     * @param[in] fmt   - format control string.
+     * @param[in] va    - variadic parameter list.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va);
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
-     * @param[in] level      - log level.
-     * @param[in] tag        - log tag, can set to NULL.
-     * @param[in] file       - log file name.
-     * @param[in] line       - log file line.
-     * @param[in] message    - message string, non-format.
-     * @param[in] messageLen - message string length, if -1, will auto calculate.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag, can set to nullptr.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] msg    - message string.
+     * @param[in] msgLen - message string length, if -1, will auto calculate.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    int OutputNonFormat(int level, const char *tag, const char *file, int line, const char *message, size_t messageLen = -1);
+    int NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen);
 
 private:
     /**
-     * Direct output message using given level.
-     */
-    int DirectOutput(int level, const char *tag, const char *file, int line, char *message, int len);
-    /**
-     * Build log data.
-     * @param[in] level   - log level.
-     * @param[in] tag     - log tag.
-     * @param[in] file    - log file name.
-     * @param[in] line    - log file line.
-     * @param[in] message - log format control string.
-     * @param[in] len     - the message length, not include tailing character.
+     * Build log data by format control string and variable parameter list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] func  - log function.
+     * @param[in] fmt   - log format control string.
+     * @param[in] va    - the message variable parameter list.
      * @return LLBC_LogData * - the log data.
      */
     LLBC_LogData *BuildLogData(int level,
                                const char *tag,
                                const char *file,
                                int line,
-                               char *message,
-                               int len);
+                               const char *func,
+                               const char *fmt,
+                               va_list va);
+
+    /**
+     * Build log data by msg and length.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] msg    - log message.
+     * @param[in] msgLen - log message length.
+     */
+    LLBC_LogData *BuildLogData(int level,
+                               const char *tag,
+                               const char *file,
+                               int line,
+                               const char *func,
+                               const char *msg,
+                               size_t msgLen);
+
+    /**
+     * Fill log data non-msg members.
+     * @param[in] level   - log level.
+     * @param[in] tag     - log tag.
+     * @param[in] file    - log file name.
+     * @param[in] line    - log file line.
+     * @param[in] func    - log function.
+     * @param[in] logData - log data.
+     * @param[in] libTls  - log tls.
+     */
+    void FillLogDataNonMsgMembers(int level,
+                                  const char *tag,
+                                  const char *file,
+                                  int line,
+                                  const char *func,
+                                  LLBC_LogData *logData,
+                                  __LLBC_LibTls *libTls);
 
 private:
-    LLBC_RecursiveLock _lock;
+    /**
+     * Friend classs: LLBC_LogRunnable.
+     * Asset method/data-members:
+     * - OutputLogData(const LLBC_LogData &data):int
+     * - Flush(bool force, sint64 now):void
+     */
+    friend class LLBC_LogRunnable;
 
+    /**
+     * Add log appender.
+     * @param[in] appender - log appender.
+     */
+    void AddAppender(LLBC_ILogAppender *appender);
+
+    /**
+     * Output log data.
+     * @param[in] data - log data.
+     */
+    int OutputLogData(const LLBC_LogData &data);
+
+    /**
+    * Flush logger(for now, just only need flush all appenders).
+    * @param[in] force - force or not.
+    * @param[in] now   - now time in milli-seconds.
+    */
+    void Flush(bool force, sint64 now);
+
+    /**
+     * Flush appenders.
+     * @param[in] force - force flush or not, default is false.
+     */
+    void FlushAppenders(bool force);
+
+    /**
+     * Lockless uninstall error hook.
+     */
+    void UninstallHookLockless(int level);
+
+private:
     LLBC_String _name;
+    LLBC_SpinLock _lock;
 
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;
 
     LLBC_LogRunnable *_logRunnable;
+
+    sint64 _lastFlushTime;
+    sint64 _flushInterval;
+    LLBC_ILogAppender *_appenders;
+
     LLBC_SafetyObjectPool _objPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
-    LLBC_IDelegate1<void, const LLBC_LogData *> *_hookDelegs[LLBC_LogLevel::End];
+    LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END

@@ -23,9 +23,9 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetVersionInfo(PyObject *obj, PyObject *args)
 {
-    int verbose;
-    if (!PyArg_ParseTuple(args, "i", &verbose))
-        return NULL;
+    int verbose = 0;
+    if (!PyArg_ParseTuple(args, "|i", &verbose))
+        return nullptr;
 
     const LLBC_String verInfo = 
         LLBC_GetVersionInfo(verbose ? true : false);

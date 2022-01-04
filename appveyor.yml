@@ -10,12 +10,11 @@ install:
     - cmd: >-
         git submodule update --init --recursive
         
-        echo vs2013 | call WinPreBuild.bat 0
+        echo vs2017 | call WinPreBuild.bat 0
         
-        echo vs2015 | call WinPreBuild.bat 0
+        echo vs2019 | call WinPreBuild.bat 0
 image: 
-    - Visual Studio 2013
-    - Visual Studio 2015
+    - Visual Studio 2019
 
 configuration: 
     - release32
@@ -37,4 +36,4 @@ for:
 
 build:
     verbosity: normal
-    project: build\vs2013\llbc_vs2013.sln
+    project: build\vs2019\llbc_vs2019.sln

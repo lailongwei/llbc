@@ -25,26 +25,11 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                        void (*listener)(LLBC_Event *),
-                                                        const LLBC_ListenerStub &bindedStub)
-{
-    if (id <= 0 || listener == NULL)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INVALID_LISTENER_STUB;
-    }
-
-    typedef LLBC_Func1<void, LLBC_Event *> __EventFuncDeleg;
-
-    return AddListener(id, LLBC_New1(__EventFuncDeleg, listener), bindedStub);
-}
-
 template <typename ObjectType>
 LLBC_ListenerStub LLBC_EventManager::AddListener(int id, 
                                                  ObjectType *obj, 
-                                                 void (ObjectType::*listener)(LLBC_Event *),
-                                                 const LLBC_ListenerStub &bindedStub)
+                                                 void (ObjectType::*listener)(LLBC_Event &),
+                                                 const LLBC_ListenerStub &boundStub)
 {
     if(!obj || !listener)
     {
@@ -52,9 +37,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    typedef LLBC_Delegate1<void, ObjectType, LLBC_Event *> __EventMethodDeleg;
-
-    return this->AddListener(id, LLBC_New2(__EventMethodDeleg, obj, listener), bindedStub);
+    return this->AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(obj, listener), boundStub);
 }
 
 inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
@@ -68,11 +51,6 @@ inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
     stub = LLBC_INVALID_LISTENER_STUB;
 
     return LLBC_OK;
-}
-
-inline void LLBC_EventManager::FireEvent(int id)
-{
-    FireEvent(new LLBC_Event(id));
 }
 
 inline bool LLBC_EventManager::IsFiring() const

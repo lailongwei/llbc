@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PY_FACADE_H__
-#define __PYLLBC_COMM_PY_FACADE_H__
+#ifndef __PYLLBC_COMM_PY_COMPONENT_H__
+#define __PYLLBC_COMM_PY_COMPONENT_H__
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
@@ -28,25 +28,25 @@
 class pyllbc_Service;
 
 /**
- * \brief The pyllbc facade class encapsulation.
+ * \brief The pyllbc comp class encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Facade : public LLBC_IFacade
+class LLBC_HIDDEN pyllbc_Component : public LLBC_IComponent
 {
 public:
     /**
      * Constructor.
      * @param[in] svc - adapted to python c++ wrapped service.
      */
-    pyllbc_Facade(pyllbc_Service *svc);
+    pyllbc_Component(pyllbc_Service *svc);
 
     /**
      * Destructor.
      */
-    virtual ~pyllbc_Facade();
+    virtual ~pyllbc_Component();
 
 public:
     /**
-     * When service start and not not init facade before, will call then event handler function.
+     * When service start and not not init comp before, will call then event handler function.
      */
     virtual bool OnInitialize();
 
@@ -134,7 +134,7 @@ public:
     /**
      * Build python layer packet object according to LLBC_Packet object reference.
      * @param[in] packet - the core library packet object reference.
-     * @return PyObject * - the python layer packet object, if error occurred, return NULL.
+     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
      */
     PyObject *BuildPyPacket(const LLBC_Packet &packet);
 
@@ -145,13 +145,13 @@ public:
 
 private:
     /**
-     * Call python layer facade method.
+     * Call python layer comp method.
      * @param[in] meth     - method name, not steal reference, normal.
      * @param[in] ev       - call event object, steal reference.
      * @param[in] decRefEv - decref event.
      * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
      */
-    bool CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv);
+    bool CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv);
 
     #if PYLLBC_CFG_PACKET_REUSE
     /**
@@ -206,7 +206,7 @@ private:
     PyObject *_holdedOnIdleEv;
     PyObject *_holdedOnUpdateEv;
 
-    PyObject *_facadeEvCallArgs;
+    PyObject *_compEvCallArgs;
 };
 
-#endif // !__PYLLBC_COMM_PY_FACADE_H__
+#endif // !__PYLLBC_COMM_PY_COMPONENT_H__

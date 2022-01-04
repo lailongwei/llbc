@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  * Initialize symbol.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_InitSymbol();
+LLBC_EXPORT int LLBC_InitSymbol();
 
 /**
  * Capture stack back trace.
@@ -41,7 +41,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_InitSymbol();
  *                              the infinite value limitd by LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES config option.
  * @return LLBC_String - The stack back trace string representation.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = LLBC_INFINITE);
+LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = LLBC_INFINITE);
 
 #endif // LLBC_CFG_OS_IMPL_SYMBOL
 

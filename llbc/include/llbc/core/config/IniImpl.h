@@ -174,7 +174,7 @@ inline _ValueType LLBC_Ini::GetValue(const LLBC_String &sectionName,
                             const _ValueType &defaultValue) const
 {
     const LLBC_IniSection *section = GetSection(sectionName);
-    if (section == NULL)
+    if (section == nullptr)
         return defaultValue;
 
     return section->GetValue<_ValueType>(key, defaultValue);
@@ -187,7 +187,7 @@ inline int LLBC_Ini::SetValue(const LLBC_String &sectionName,
                               const LLBC_String &comment)
 {
     LLBC_IniSection *section = GetSection(sectionName);
-    if (section == NULL)
+    if (section == nullptr)
         return LLBC_FAILED;
 
     return section->SetValue<_ValueType>(key, value, comment);

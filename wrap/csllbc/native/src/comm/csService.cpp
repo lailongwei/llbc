@@ -22,7 +22,7 @@
 #include "csllbc/common/Export.h"
 
 #include "csllbc/comm/csCoder.h"
-#include "csllbc/comm/csFacade.h"
+#include "csllbc/comm/csComponent.h"
 #include "csllbc/comm/csService.h"
 #include "csllbc/comm/csPacketHandler.h"
 
@@ -40,7 +40,7 @@ csllbc_Service::csllbc_Service(Type type,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
-    _llbcSvc = LLBC_IService::Create(type, name, NULL, fullStack);
+    _llbcSvc = LLBC_IService::Create(type, name, nullptr, fullStack);
 
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
@@ -53,7 +53,7 @@ csllbc_Service::csllbc_Service(Type type,
     AddPacketDecodeDelegates(_llbcSvc->GetId(), delegs);
 
     // Create packet handler object.
-    _packetHandler = LLBC_New1(csllbc_PacketHandler, notFoundDecoderDeleg);
+    _packetHandler = LLBC_New(csllbc_PacketHandler, notFoundDecoderDeleg);
 }
 
 csllbc_Service::~csllbc_Service()
@@ -180,9 +180,9 @@ int csllbc_Service::Broadcast(int opcode, const void *bytes, size_t len, int sta
     return _llbcSvc->Broadcast(opcode, bytes, len, status);
 }
 
-int csllbc_Service::RegisterFacade(csllbc_Facade *facade)
+int csllbc_Service::RegisterComponent(csllbc_Component *comp)
 {
-    return _llbcSvc->RegisterFacade(facade);
+    return _llbcSvc->RegisterComponent(comp);
 }
 
 int csllbc_Service::RegisterCoder(int opcode)
@@ -233,7 +233,7 @@ csllbc_Service::PacketDecodeDelegates *csllbc_Service::GetPacketDecodeDelegates(
 {
     _packetDelegatesLock.Lock();
     _PacketDecodeDelegs::iterator it = _packetDecodeDelegs.find(svcId);
-    PacketDecodeDelegates *delegs = (it != _packetDecodeDelegs.end() ? it->second : NULL);
+    PacketDecodeDelegates *delegs = (it != _packetDecodeDelegs.end() ? it->second : nullptr);
 
     _packetDelegatesLock.Unlock();
 

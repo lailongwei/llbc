@@ -23,30 +23,11 @@
 
 #include "pyllbc/comm/PyEvent.h"
 
-pyllbc_Event::pyllbc_Event(int id, PyObject *data)
-: _Base(id)
-, _data(data)
-{
-    Py_INCREF(_data);
-}
-
-pyllbc_Event::~pyllbc_Event()
-{
-    Py_DECREF(_data);
-}
-
-PyObject *pyllbc_Event::GetData()
-{
-    Py_INCREF(_data);
-    return _data;
-}
-
-PyObject *pyllbc_EventListener::_pyEvCls = NULL;
+PyObject *pyllbc_EventListener::_pyEvCls = nullptr;
 
 pyllbc_EventListener::pyllbc_EventListener()
-: _Base(NULL, NULL, false)
-, _pyListenerObj(NULL)
-, _pyListenerMeth(NULL)
+: _pyListenerObj(nullptr)
+, _pyListenerMeth(nullptr)
 {
     if (UNLIKELY(!_pyEvCls))
         _pyEvCls = pyllbc_s_TopModule->GetObject("Event");
@@ -85,12 +66,12 @@ int pyllbc_EventListener::SetPyListener(PyObject *pyListener)
             return LLBC_FAILED;
         }
 
-        if (UNLIKELY(!(_pyListenerObj = PyWeakref_NewRef(obj, NULL))))
+        if (UNLIKELY(!(_pyListenerObj = PyWeakref_NewRef(obj, nullptr))))
         {
             pyllbc_TransferPyError("When create listener bound self object weakref");
             return LLBC_FAILED;
         }
-        if (UNLIKELY(!(_pyListenerMeth = PyWeakref_NewRef(meth, NULL))))
+        if (UNLIKELY(!(_pyListenerMeth = PyWeakref_NewRef(meth, nullptr))))
         {
             pyllbc_TransferPyError("When create listener function weakref");
             return LLBC_FAILED;
@@ -98,7 +79,7 @@ int pyllbc_EventListener::SetPyListener(PyObject *pyListener)
     }
     else
     {
-        if (UNLIKELY(!(_pyListenerMeth = PyWeakref_NewRef(pyListener, NULL))))
+        if (UNLIKELY(!(_pyListenerMeth = PyWeakref_NewRef(pyListener, nullptr))))
         {
             pyllbc_TransferPyError("When create listener function weakref");
             return LLBC_FAILED;
@@ -108,7 +89,7 @@ int pyllbc_EventListener::SetPyListener(PyObject *pyListener)
     return LLBC_OK;
 }
 
-void pyllbc_EventListener::Invoke(LLBC_Event *ev)
+void pyllbc_EventListener::Invoke(LLBC_Event &ev)
 {
     if (!_pyListenerMeth)
         return;
@@ -118,12 +99,12 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
     if (meth == Py_None)
     {
         Py_DECREF(_pyListenerMeth);
-        _pyListenerMeth = NULL;
+        _pyListenerMeth = nullptr;
 
         if (_pyListenerObj)
         {
             Py_DECREF(_pyListenerObj);
-            _pyListenerObj = NULL;
+            _pyListenerObj = nullptr;
         }
 
         return;
@@ -131,7 +112,7 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
     Py_INCREF(meth);
 
     // Object alive check.
-    PyObject *selfObj = NULL;
+    PyObject *selfObj = nullptr;
     if (_pyListenerObj)
     {
         selfObj = PyWeakref_GET_OBJECT(_pyListenerObj); // Borrow reference.
@@ -141,8 +122,8 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
 
             Py_DECREF(_pyListenerObj);
             Py_DECREF(_pyListenerMeth);
-            _pyListenerObj = NULL;
-            _pyListenerMeth = NULL;
+            _pyListenerObj = nullptr;
+            _pyListenerMeth = nullptr;
 
             return;
         }
@@ -151,15 +132,15 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
     }
 
     // Get python layer event object.
-    LLBC_Event *cloneEv = NULL;
-    PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
+    LLBC_Event *cloneEv = nullptr;
+    PyObject *pyEv = reinterpret_cast<PyObject *>(ev.GetExtData());
     if (!pyEv) // Not python layer generate event, fire from native layer or other language wrap, clone native event object to create new python layer event object.
     {
-        cloneEv = ev->Clone();
+        cloneEv = ev.Clone();
         cloneEv->SetDontDelAfterFire(true);
-        PyObject *pyEvId = PyInt_FromLong(ev->GetId());
+        PyObject *pyEvId = PyInt_FromLong(ev.GetId());
         PyObject *pyCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(cloneEv));
-        pyEv = PyObject_CallFunctionObjArgs(_pyEvCls, pyEvId, pyCObj, NULL); // TODO: optimize call performance.
+        pyEv = PyObject_CallFunctionObjArgs(_pyEvCls, pyEvId, pyCObj, nullptr); // TODO: optimize call performance.
         if (!pyEv)
         {
             Py_DECREF(pyEvId);
@@ -180,10 +161,10 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
     // Call object. TODO: optimize call performance.
     PyObject *ret;
     if (selfObj)
-        ret = PyObject_CallFunctionObjArgs(meth, selfObj, pyEv, NULL);
+        ret = PyObject_CallFunctionObjArgs(meth, selfObj, pyEv, nullptr);
     else
-        ret = PyObject_CallFunctionObjArgs(meth, pyEv, NULL);
-    if (ret == NULL)
+        ret = PyObject_CallFunctionObjArgs(meth, pyEv, nullptr);
+    if (ret == nullptr)
     {
         if (cloneEv)
             Py_DECREF(pyEv);
@@ -191,8 +172,9 @@ void pyllbc_EventListener::Invoke(LLBC_Event *ev)
         Py_DECREF(meth);
         Py_XDECREF(selfObj);
 
-        pyllbc_TransferPyError(LLBC_String().format("When call event listener, evId:%d, listener meth:%s, obj:%s", 
-                                                    ev->GetId(), pyllbc_ObjUtil::GetObjStr(meth).c_str(), selfObj ? pyllbc_ObjUtil::GetObjStr(selfObj).c_str() : "None"));
+        pyllbc_TransferPyError(LLBC_String().format(
+            "When call event listener, evId:%d, listener meth:%s, obj:%s", 
+            ev.GetId(), pyllbc_ObjUtil::GetObjStr(meth).c_str(), selfObj ? pyllbc_ObjUtil::GetObjStr(selfObj).c_str() : "None"));
         return;
     }
 

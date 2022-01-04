@@ -27,6 +27,7 @@
 #include "llbc/core/objectpool/PoolObjectReflection.h"
 
 #include "llbc/core/log/LogData.h"
+#include "llbc/core/log/Logger.h"
 #include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogRunnable.h"
 
@@ -34,10 +35,6 @@ __LLBC_NS_BEGIN
 
 LLBC_LogRunnable::LLBC_LogRunnable()
 : _stoped(false)
-, _head(NULL)
-
-, _lastFlushTime(0)
-, _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 {
 }
 
@@ -45,96 +42,21 @@ LLBC_LogRunnable::~LLBC_LogRunnable()
 {
 }
 
-void LLBC_LogRunnable::Cleanup()
+int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
 {
-    // Output all queued log messages.
-    LLBC_LogData *logData = NULL;
-    LLBC_MessageBlock *block = NULL;
-    while (TryPop(block) == LLBC_OK)
+    if (IsActivated())
     {
-        block->Read(&logData, sizeof(LLBC_LogData *));
-
-        Output(logData);
-        LLBC_Recycle(logData);
-
-        LLBC_Recycle(block);
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
     }
 
-    // Flush all appenders(force).
-    FlushAppenders(true);
-
-    // Delete all appender.
-    while (_head)
+    if (std::find(_loggers.begin(), _loggers.end(), logger) != _loggers.end())
     {
-        LLBC_ILogAppender *appender = _head;
-        _head = _head->GetAppenderNext();
-
-        LLBC_Delete(appender);
-    }
-}
-
-void LLBC_LogRunnable::Svc()
-{
-    LLBC_LogData *logData = NULL;
-    LLBC_MessageBlock *block = NULL;
-    while (LIKELY(!_stoped))
-    {
-        // Flush all appenders(not force).
-        FlushAppenders(false);
-
-        // Try pop log message to output.
-        if (TimedPop(block, 50) != LLBC_OK)
-            continue;
-
-        block->Read(&logData, sizeof(LLBC_LogData *));
-
-        Output(logData);
-        LLBC_Recycle(logData);
-
-        LLBC_Recycle(block);
-    }
-}
-
-void LLBC_LogRunnable::SetFlushInterval(sint64 flushInterval)
-{
-    _flushInterval = flushInterval;
-}
-
-void LLBC_LogRunnable::AddAppender(LLBC_ILogAppender *appender)
-{
-    appender->SetAppenderNext(NULL);
-    if (!_head)
-    {
-        _head = appender;
-        return;
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
     }
 
-    LLBC_ILogAppender *tmpAppender = _head;
-    while (tmpAppender->GetAppenderNext())
-    {
-        tmpAppender = tmpAppender->GetAppenderNext();
-    }
-
-    tmpAppender->SetAppenderNext(appender);
-}
-
-int LLBC_LogRunnable::Output(LLBC_LogData *data)
-{
-    LLBC_ILogAppender *appender = _head;
-    if (!appender)
-    {
-        return LLBC_OK;
-    }
-    
-    while (appender)
-    {
-        if (appender->Output(*data) != LLBC_OK)
-        {
-            return LLBC_FAILED;
-        }
-
-        appender = appender->GetAppenderNext();
-    }
+    _loggers.push_back(logger);
 
     return LLBC_OK;
 }
@@ -142,29 +64,54 @@ int LLBC_LogRunnable::Output(LLBC_LogData *data)
 void LLBC_LogRunnable::Stop()
 {
     _stoped = true;
+    Wait();
 }
 
-void LLBC_LogRunnable::FlushAppenders(bool force)
+void LLBC_LogRunnable::Cleanup()
 {
-    // If not force flush appenders and the flush time not reached, no flush.
-    if (!force)
+    while (TryPopAndProcLogData(10));
+
+    FlushLoggers(true, 0);
+    _loggers.clear();
+}
+
+void LLBC_LogRunnable::Svc()
+{
+    while (LIKELY(!_stoped))
     {
-        sint64 now = LLBC_GetMilliSeconds();
-        sint64 diff = now - _lastFlushTime;
-        if (diff >= 0 && diff < _flushInterval)
-            return;
+        if (!TryPopAndProcLogData(100))
+            continue;
+
+        FlushLoggers(false, LLBC_GetMilliSeconds());
+    }
+}
+
+LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogData(int maxPopWaitTime)
+{
+    LLBC_LogData *logData;
+    LLBC_MessageBlock *block;
+    if (TimedPop(block, maxPopWaitTime) != LLBC_OK)
+        return false;
+
+    if (UNLIKELY(block->Read(&logData, sizeof(LLBC_LogData *)) != LLBC_OK))
+    {
+        LLBC_Recycle(block);
+        return false;
     }
 
-    // Foreach appenders to flush.
-    LLBC_ILogAppender *appender = _head;
-    while (appender)
-    {
-        appender->Flush();
-        appender = appender->GetAppenderNext();
-    }
+    LLBC_Recycle(block);
 
-    // Update last flush time(use flushed time to avoid logger performance problem).
-    _lastFlushTime = LLBC_GetMicroSeconds();
+    logData->logger->OutputLogData(*logData);
+    LLBC_Recycle(logData);
+
+    return true;
+}
+
+void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
+{
+    size_t loggerCnt = _loggers.size();
+    for (size_t i = 0; i < loggerCnt; ++i)
+        _loggers[i]->Flush(false, now);
 }
 
 __LLBC_NS_END

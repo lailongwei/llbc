@@ -25,14 +25,9 @@
 
 #include "llbc/comm/PollerMonitor.h"
 
-namespace
-{
-    typedef LLBC_NS LLBC_IDelegate0<void> _Deleg;
-}
-
 __LLBC_NS_BEGIN
 
-LLBC_PollerMonitor::LLBC_PollerMonitor(_Deleg *deleg)
+LLBC_PollerMonitor::LLBC_PollerMonitor(const _Deleg &deleg)
 : _deleg(deleg)
 
 , _started(false)
@@ -43,7 +38,6 @@ LLBC_PollerMonitor::LLBC_PollerMonitor(_Deleg *deleg)
 LLBC_PollerMonitor::~LLBC_PollerMonitor()
 {
     Stop();
-    LLBC_Delete(_deleg);
 }
 
 int LLBC_PollerMonitor::Start()
@@ -78,7 +72,7 @@ void LLBC_PollerMonitor::Svc()
         LLBC_Sleep(20);
 
     while (!_stopping)
-        _deleg->Invoke();
+        _deleg();
 }
 
 void LLBC_PollerMonitor::Cleanup()

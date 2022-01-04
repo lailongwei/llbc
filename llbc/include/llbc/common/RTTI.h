@@ -35,14 +35,14 @@ __LLBC_NS_BEGIN
 /**
  * Get type name(demangled).
  */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
+LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 
 /**
  * Demangle cxx type name(only available in non-windows platform).
  */
-LLBC_EXTERN LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
+LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
 
 #endif // Non-Win32
 

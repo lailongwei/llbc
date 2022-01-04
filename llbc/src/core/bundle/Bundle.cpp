@@ -29,7 +29,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS LLBC_Bundle *__g_mainBundle = NULL;
+static LLBC_NS LLBC_Bundle *__g_mainBundle = nullptr;
 
 __LLBC_INTERNAL_NS_END
 
@@ -56,7 +56,7 @@ int LLBC_Bundle::CreateMainBundle()
         return LLBC_FAILED;
     }
     
-    LLBC_INTERNAL_NS __g_mainBundle = LLBC_New0(LLBC_Bundle);
+    LLBC_INTERNAL_NS __g_mainBundle = LLBC_New(LLBC_Bundle);
     return (LLBC_INTERNAL_NS __g_mainBundle)->Initialize("");
 }
 

@@ -15,7 +15,7 @@
 __LLBC_NS_BEGIN
 
 // replace rapidjson with LLBC_Json
-namespace LLBC_Json = ::rapidjson;
+namespace LLBC_Json = ::llbc_rapidjson;
 // rapidjson's value
 typedef LLBC_Json::Value LLBC_JsonValue;
 // iterator of rapidjson's value
@@ -33,12 +33,12 @@ typedef LLBC_JsonValue::ConstMemberIterator LLBC_JsonMemberCIter;
  * @param[out] outStr - output string
  * @param[in] isPretty - when it is true, then json output a pretty string.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool isPretty = false);
+LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool isPretty = false);
 
 /**
  * LLBC_JsonValue output to stream operator function(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
 
 __LLBC_NS_END
 

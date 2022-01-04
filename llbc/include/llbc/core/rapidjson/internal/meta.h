@@ -12,27 +12,27 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_INTERNAL_META_H_
-#define RAPIDJSON_INTERNAL_META_H_
+#ifndef LLBC_RAPIDJSON_INTERNAL_META_H_
+#define LLBC_RAPIDJSON_INTERNAL_META_H_
 
-#include "../rapidjson.h"
+#include "llbc/core/rapidjson/rapidjson.h"
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #if defined(_MSC_VER) && !defined(__clang__)
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(6334)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(6334)
 #endif
 
-#if RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if LLBC_RAPIDJSON_HAS_CXX11_TYPETRAITS
 #include <type_traits>
 #endif
 
-//@cond RAPIDJSON_INTERNAL
-RAPIDJSON_NAMESPACE_BEGIN
+//@cond LLBC_RAPIDJSON_INTERNAL
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 // Helper to wrap/convert arbitrary types to void, useful for arbitrary type matching
@@ -97,7 +97,7 @@ template <typename T> struct IsPointer<T*> : TrueType {};
 ///////////////////////////////////////////////////////////////////////////////
 // IsBaseOf
 //
-#if RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if LLBC_RAPIDJSON_HAS_CXX11_TYPETRAITS
 
 template <typename B, typename D> struct IsBaseOf
     : BoolType< ::std::is_base_of<B,D>::value> {};
@@ -105,8 +105,8 @@ template <typename B, typename D> struct IsBaseOf
 #else // simplified version adopted from Boost
 
 template<typename B, typename D> struct IsBaseOfImpl {
-    RAPIDJSON_STATIC_ASSERT(sizeof(B) != 0);
-    RAPIDJSON_STATIC_ASSERT(sizeof(D) != 0);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(B) != 0);
+    LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(D) != 0);
 
     typedef char (&Yes)[1];
     typedef char (&No) [2];
@@ -126,7 +126,7 @@ template<typename B, typename D> struct IsBaseOfImpl {
 template <typename B, typename D> struct IsBaseOf
     : OrExpr<IsSame<B, D>, BoolExpr<IsBaseOfImpl<B, D> > >::Type {};
 
-#endif // RAPIDJSON_HAS_CXX11_TYPETRAITS
+#endif // LLBC_RAPIDJSON_HAS_CXX11_TYPETRAITS
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -149,38 +149,38 @@ struct SfinaeTag {};
 template <typename T> struct RemoveSfinaeTag;
 template <typename T> struct RemoveSfinaeTag<SfinaeTag&(*)(T)> { typedef T Type; };
 
-#define RAPIDJSON_REMOVEFPTR_(type) \
-    typename ::RAPIDJSON_NAMESPACE::internal::RemoveSfinaeTag \
-        < ::RAPIDJSON_NAMESPACE::internal::SfinaeTag&(*) type>::Type
+#define LLBC_RAPIDJSON_REMOVEFPTR_(type) \
+    typename ::LLBC_RAPIDJSON_NAMESPACE::internal::RemoveSfinaeTag \
+        < ::LLBC_RAPIDJSON_NAMESPACE::internal::SfinaeTag&(*) type>::Type
 
-#define RAPIDJSON_ENABLEIF(cond) \
-    typename ::RAPIDJSON_NAMESPACE::internal::EnableIf \
-        <RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
+#define LLBC_RAPIDJSON_ENABLEIF(cond) \
+    typename ::LLBC_RAPIDJSON_NAMESPACE::internal::EnableIf \
+        <LLBC_RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
 
-#define RAPIDJSON_DISABLEIF(cond) \
-    typename ::RAPIDJSON_NAMESPACE::internal::DisableIf \
-        <RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
+#define LLBC_RAPIDJSON_DISABLEIF(cond) \
+    typename ::LLBC_RAPIDJSON_NAMESPACE::internal::DisableIf \
+        <LLBC_RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
 
-#define RAPIDJSON_ENABLEIF_RETURN(cond,returntype) \
-    typename ::RAPIDJSON_NAMESPACE::internal::EnableIf \
-        <RAPIDJSON_REMOVEFPTR_(cond), \
-         RAPIDJSON_REMOVEFPTR_(returntype)>::Type
+#define LLBC_RAPIDJSON_ENABLEIF_RETURN(cond,returntype) \
+    typename ::LLBC_RAPIDJSON_NAMESPACE::internal::EnableIf \
+        <LLBC_RAPIDJSON_REMOVEFPTR_(cond), \
+         LLBC_RAPIDJSON_REMOVEFPTR_(returntype)>::Type
 
-#define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \
-    typename ::RAPIDJSON_NAMESPACE::internal::DisableIf \
-        <RAPIDJSON_REMOVEFPTR_(cond), \
-         RAPIDJSON_REMOVEFPTR_(returntype)>::Type
+#define LLBC_RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \
+    typename ::LLBC_RAPIDJSON_NAMESPACE::internal::DisableIf \
+        <LLBC_RAPIDJSON_REMOVEFPTR_(cond), \
+         LLBC_RAPIDJSON_REMOVEFPTR_(returntype)>::Type
 
 } // namespace internal
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 //@endcond
 
 #if defined(_MSC_VER) && !defined(__clang__)
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_INTERNAL_META_H_
+#endif // LLBC_RAPIDJSON_INTERNAL_META_H_

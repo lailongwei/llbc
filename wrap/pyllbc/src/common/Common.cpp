@@ -49,7 +49,7 @@ void pyllbc_AddCommonObjs()
     /* Add exception type. */
     LLBC_String excName;
     excName.format("%s.error", PYLLBC_MOD_NAME);
-    pyllbc_Exception = PyErr_NewException(const_cast<char *>(excName.c_str()), NULL, NULL);
+    pyllbc_Exception = PyErr_NewException(const_cast<char *>(excName.c_str()), nullptr, nullptr);
 
     Py_INCREF(pyllbc_Exception);
     top->AddObject("error", pyllbc_Exception);
@@ -67,7 +67,7 @@ void pyllbc_AddCommonObjs()
     top->AddObject("VerboseVerInfo", LLBC_GetVersionInfo(true));
 
     /* Add endian module. */
-    pyllbc_Module *endianMod = LLBC_New2(pyllbc_Module, "Endian", top);
+    pyllbc_Module *endianMod = LLBC_New(pyllbc_Module, "Endian", top);
     endianMod->AddObject("BigEndian", LLBC_Endian::BigEndian);
     endianMod->AddObject("NetEndian", LLBC_Endian::NetEndian);
     endianMod->AddObject("LittleEndian", LLBC_Endian::LittleEndian);
@@ -136,7 +136,7 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.PyStreamDiscardAllExprs);
 
     /* Add test data. */
-    pyllbc_Module *testMod = LLBC_New2(pyllbc_Module, "test", top);
+    pyllbc_Module *testMod = LLBC_New(pyllbc_Module, "test", top);
     testMod->AddObject("boolVal", true);
     testMod->AddObject("charVal", 'A');
     testMod->AddObject("sint32Val", -32);

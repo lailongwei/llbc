@@ -101,7 +101,7 @@ void LLBC_Tls<ValueType>::SetValue(ValueType *value, int valueClearMeth)
 template <typename ValueType>
 void LLBC_Tls<ValueType>::ClearValue(int valueClearMeth)
 {
-    this->SetValue(NULL, valueClearMeth);
+    this->SetValue(nullptr, valueClearMeth);
 }
 
 __LLBC_NS_END

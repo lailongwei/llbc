@@ -38,7 +38,7 @@ namespace
     template <typename Ev>
     static _Block *__CreateEvBlock(Ev *ev)
     {
-        _Block *block = LLBC_New1(_Block, sizeof(int) + sizeof(Ev *));
+        _Block *block = LLBC_New(_Block, sizeof(int) + sizeof(Ev *));
         block->Write(&ev->type, sizeof(int));
         block->Write(&ev, sizeof(Ev *));
 
@@ -87,7 +87,7 @@ LLBC_SvcEv_AsyncConn::~LLBC_SvcEv_AsyncConn()
 
 LLBC_SvcEv_DataArrival::LLBC_SvcEv_DataArrival()
 : Base(_EvType::DataArrival)
-, packet(NULL)
+, packet(nullptr)
 {
 }
 
@@ -115,13 +115,15 @@ LLBC_SvcEv_SubscribeEv::LLBC_SvcEv_SubscribeEv()
 : Base(_EvType::SubscribeEv)
 , id(0)
 , stub(LLBC_INVALID_LISTENER_STUB)
-, deleg(NULL)
+, deleg(nullptr)
+, listener(nullptr)
 {
 }
 
 LLBC_SvcEv_SubscribeEv::~LLBC_SvcEv_SubscribeEv()
 {
-    LLBC_XDelete(deleg);
+    if (listener)
+        LLBC_Delete(listener);
 }
 
 LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
@@ -142,48 +144,25 @@ LLBC_SvcEv_AppCfgReloadedEv::~LLBC_SvcEv_AppCfgReloadedEv()
 {
 }
 
-    LLBC_SvcEv_UnsubscribeEv::~LLBC_SvcEv_UnsubscribeEv()
+LLBC_SvcEv_UnsubscribeEv::~LLBC_SvcEv_UnsubscribeEv()
 {
 }
 
 LLBC_SvcEv_FireEv::LLBC_SvcEv_FireEv()
 : Base(_EvType::FireEv)
-, ev(NULL)
-
-, addiCtor(NULL)
-, addiCtorBorrowed(false)
-, customDtor(NULL)
-, customDtorBorrowed(false)
+, ev(nullptr)
 {
 }
 
 LLBC_SvcEv_FireEv::~LLBC_SvcEv_FireEv()
 {
-    // Clear additional constructor.
-    if (addiCtor && !addiCtorBorrowed)
-        LLBC_Delete(addiCtor);
-
-    // If event is NULL, clear custom destructor, and than return.
-    if (!ev)
+    if (ev)
     {
-        if (customDtor && !customDtorBorrowed)
-            LLBC_Delete(customDtor);
-
-        return;
-    }
-
-    // Normal delete event if not found custom destructor.
-    if (!customDtor)
-    {
-        if (ev && !ev->IsDontDelAfterFire())
+        if (!ev->IsDontDelAfterFire())
             LLBC_Delete(ev);
-        return;
+        else if (dequeueHandler)
+            dequeueHandler(ev);
     }
-
-    // Use custom destructor to destruct event, and than clear custom destructor.
-    customDtor->Invoke(ev);
-    if (!customDtorBorrowed)
-        LLBC_Delete(customDtor);
 }
 
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSessionCreateEv(const LLBC_SockAddr_IN &local,
@@ -273,21 +252,25 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildProtoReportEv(int sessionId,
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSubscribeEvEv(int id,
-                                                      const LLBC_ListenerStub &stub,
-                                                      LLBC_IDelegate1<void, LLBC_Event *> *deleg)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildSubscribeEventEv(int id,
+                                                         const LLBC_ListenerStub &stub,
+                                                         const LLBC_Delegate<void(LLBC_Event &)> &deleg,
+                                                         LLBC_EventListener *listener)
 {
     typedef LLBC_SvcEv_SubscribeEv _Ev;
 
     _Ev *ev = LLBC_New(_Ev);
     ev->id = id;
     ev->stub = stub;
-    ev->deleg = deleg;
+    if (deleg)
+        ev->deleg = deleg;
+    if (listener)
+        ev->listener = listener;
 
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEvEv(int id, const LLBC_ListenerStub &stub)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEventEv(int id, const LLBC_ListenerStub &stub)
 {
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
 
@@ -298,23 +281,15 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildUnsubscribeEvEv(int id, const LLBC_Liste
     return __CreateEvBlock(ev);
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEvEv(LLBC_Event *ev,
-                                                 LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
-                                                 bool addiCtorBorrowed,
-                                                 LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
-                                                 bool customDtorBorrowed)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEventEv(LLBC_Event *ev,
+                                                    const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
     typedef LLBC_SvcEv_FireEv _Ev;
 
     _Ev *wrapEv = LLBC_New(_Ev);
     wrapEv->ev = ev;
-    wrapEv->addiCtor = addiCtor;
-    wrapEv->addiCtorBorrowed = addiCtorBorrowed;
-    wrapEv->customDtor = customDtor;
-    wrapEv->customDtorBorrowed = customDtorBorrowed;
-
-    if (addiCtor)
-        addiCtor->Invoke(ev);
+    if (dequeueHandler)
+        wrapEv->dequeueHandler = dequeueHandler;
 
     return __CreateEvBlock(wrapEv);
 }

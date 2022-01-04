@@ -195,7 +195,7 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opc
 LLBC_FORCE_INLINE const void *LLBC_Packet::GetPayload() const
 {
     if (!_payload)
-        return NULL;
+        return nullptr;
 
     return _payload->GetDataStartWithReadPos();
 }
@@ -219,7 +219,7 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
 LLBC_FORCE_INLINE LLBC_MessageBlock * LLBC_Packet::DetachPayload()
 {
     LLBC_MessageBlock *payload = _payload;
-    _payload = NULL;
+    _payload = nullptr;
 
     return payload;
 }
@@ -243,19 +243,9 @@ LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
     }
 }
 
-LLBC_FORCE_INLINE bool LLBC_Packet::IsPoolObject() const
-{
-    return _selfPoolInst != NULL;
-}
-
 LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
 {
     return _selfPoolInst;
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::GiveBackToPool()
-{
-    _selfPoolInst->Release(this);
 }
 
 template<typename RetType>
@@ -464,7 +454,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 template <typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Read(_Ty &val)
 {
-    if (_payload == NULL)
+    if (_payload == nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
@@ -669,19 +659,13 @@ LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
 
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, void(*clearFunc)(void *))
 {
-    typedef LLBC_Func1<void, void *> __PreHandleResultFuncDeleg;
-
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New1(__PreHandleResultFuncDeleg, clearFunc);
-    SetPreHandleResult(result, clearDeleg);
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(clearFunc));
 }
 
 template <typename ObjType>
 LLBC_FORCE_INLINE void LLBC_Packet::SetPreHandleResult(void *result, ObjType *obj, void(ObjType::*clearMethod)(void *))
 {
-    typedef LLBC_Delegate1<void, ObjType, void *> __PreHandleResultMethDeleg;
-
-    LLBC_IDelegate1<void, void *> *clearDeleg = LLBC_New2(__PreHandleResultMethDeleg, obj, clearMethod);
-    SetPreHandleResult(result, clearDeleg);
+    SetPreHandleResult(result, LLBC_Delegate<void(void *)>(obj, clearMethod));
 }
 
 template <typename _RawTy>
@@ -717,7 +701,7 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t 
         if (_msgBlockPoolInst)
             _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
         else
-            _payload = LLBC_New1(LLBC_MessageBlock, initSize);
+            _payload = LLBC_New(LLBC_MessageBlock, initSize);
     }
 
     return _payload;

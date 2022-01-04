@@ -29,7 +29,7 @@ namespace
     {
         const std::map<LLBC_String, LLBC_IniSection *> &sections = ini->GetAllSections();
         if ((*sectionCount = static_cast<int>(sections.size())) == 0)
-            return NULL;
+            return nullptr;
 
         int sectionIdx = 0;
         csllbc_Ini_IniSection *nativeSections = LLBC_Malloc(csllbc_Ini_IniSection, sizeof(csllbc_Ini_IniSection) * *sectionCount);
@@ -53,10 +53,10 @@ namespace
             nativeSection->count = static_cast<int>(values.size());
             if (valueCount == 0)
             {
-                nativeSection->keys = NULL;
-                nativeSection->keysLen = NULL;
-                nativeSection->values = NULL;
-                nativeSection->valuesLen = NULL;
+                nativeSection->keys = nullptr;
+                nativeSection->keysLen = nullptr;
+                nativeSection->values = nullptr;
+                nativeSection->valuesLen = nullptr;
                 continue;
             }
 
@@ -110,7 +110,7 @@ csllbc_Ini_IniSection *csllbc_Ini_LoadFromContent(const char *content, int *sect
 
 void csllbc_Ini_FreeNativeSections(csllbc_Ini_IniSection *sections, int sectionCount)
 {
-    if (UNLIKELY(sections == NULL))
+    if (UNLIKELY(sections == nullptr))
         return;
 
     for (int sectionIdx = 0; sectionIdx < sectionCount; ++sectionIdx)

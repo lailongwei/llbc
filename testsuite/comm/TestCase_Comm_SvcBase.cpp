@@ -32,13 +32,12 @@ struct TestData : public LLBC_ICoder
 
     TestData()
     : iVal(0)
-    , _poolInst(NULL)
     {
     }
 
     virtual ~TestData()
     {
-        std::cout <<"Test data destroyed!" <<std::endl;
+        std::cout <<"0x" <<this <<": Test data destroyed!" <<std::endl;
     }
 
     virtual bool Encode(LLBC_Packet &packet)
@@ -53,34 +52,11 @@ struct TestData : public LLBC_ICoder
         return true;
     }
 
-    virtual void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-    {
-        LLBC_ICoder::MarkPoolObject(poolInst);
-    }
-
-    virtual bool IsPoolObject() const
-    {
-        return LLBC_ICoder::IsPoolObject();
-    }
-
-    virtual LLBC_IObjectPoolInst *GetPoolInst()
-    {
-        return _poolInst;
-    }
-
-    virtual void GiveBackToPool()
-    {
-        LLBC_ICoder::GiveBackToPool();
-    }
-
     virtual void Clear()
     {
         iVal = 0;
         strVal.clear();
     }
-
-private:
-    LLBC_IObjectPoolInst *_poolInst;
 };
 
 class TestDataFactory : public LLBC_ICoderFactory
@@ -92,11 +68,11 @@ public:
     }
 };
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
-    TestFacade()
-    : LLBC_IFacade(LLBC_FacadeEvents::DefaultEvents)
+    TestComp()
+    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents)
     {}
 
 public:
@@ -125,7 +101,7 @@ public:
 public:
     virtual void OnUpdate()
     {
-        int fps = LLBC_RandInt(20, 61);
+        int fps = LLBC_Rand(20, 61);
         // LLBC_PrintLine("Service update, set fps to %d", fps);
 
         GetService()->SetFPS(fps);
@@ -182,7 +158,7 @@ public:
         LLBC_PrintLine("Pre-Receive data[%d], iVal: %d, strVal: %s",
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 
-        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
+        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
 
         return true;
     }
@@ -191,7 +167,7 @@ public:
     {
         LLBC_PrintLine("Unify Pre-Receive data[%d]", packet.GetSessionId());
 
-        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestFacade::DelPreHandleResult);
+        packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
 
         return true;
     }
@@ -213,20 +189,20 @@ private:
     }
 };
 
-class TestFacadeFactory : public LLBC_IFacadeFactory
+class TestCompFactory : public LLBC_IComponentFactory
 {
 public:
-    LLBC_IFacade *Create() const
+    LLBC_IComponent *Create() const
     {
-        return LLBC_New(TestFacade);
+        return LLBC_New(TestComp);
     }
 };
 
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, true))
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", NULL, false))
+: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, true))
+// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, false))
 {
 }
 
@@ -240,25 +216,25 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     LLBC_PrintLine("Communication Service Basic test:");
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
-    // Register facade.
-    TestFacade *facade = LLBC_New0(TestFacade);
-    _svc->RegisterFacade(facade);
+    // Register comp.
+    TestComp *comp = LLBC_New(TestComp);
+    _svc->RegisterComponent(comp);
     // Register coder.
-    _svc->RegisterCoder(1, LLBC_New0(TestDataFactory));
+    _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _svc->RegisterStatusDesc(1, "The test status describe");
 #endif
 
     // Subscribe handler.
-    _svc->Subscribe(1, facade, &TestFacade::OnRecvData);
-    _svc->PreSubscribe(1, facade, &TestFacade::OnPreRecvData);
+    _svc->Subscribe(1, comp, &TestComp::OnRecvData);
+    _svc->PreSubscribe(1, comp, &TestComp::OnPreRecvData);
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE // If want to test unifypre-subscribe function, you must comment above row.
-    _svc->UnifyPreSubscribe(facade, &TestFacade::OnUnifyPreRecvData);
+    _svc->UnifyPreSubscribe(comp, &TestComp::OnUnifyPreRecvData);
 #endif
     // Subscribe status handler(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    _svc->SubscribeStatus(1, 1, facade, &TestFacade::OnStatus_1);
+    _svc->SubscribeStatus(1, 1, comp, &TestComp::OnStatus_1);
 #endif
 
     _svc->Start();
@@ -303,7 +279,11 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     const int clientCount = 10;
     LLBC_PrintLine("Create %d clients to connet to this listen session", clientCount);
     for (int i = 0; i < clientCount; ++i)
-        _svc->AsyncConn(ip, port);
+    {
+        auto connSid = _svc->AsyncConn(ip, port);
+        if (connSid == 0)
+            LLBC_PrintLine("connect to %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
+    }
 }
 
 void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
@@ -327,7 +307,7 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
     if (LLBC_StrCmpA(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
         clientCount = 5;
     else
-        clientCount = 50;
+        clientCount = 100;
 
     LLBC_PrintLine("Async connect to %s:%d", ip, port);
     for (int i = 0; i < clientCount; ++i)
@@ -369,7 +349,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     _svc->Send(packet);
 
     // Create status == 1 packet to send to peer(if enabled).
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     encoder = _svc->GetSafetyObjectPool().Get<TestData>();
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
@@ -379,7 +359,6 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     packet->SetEncoder(encoder);
 
     _svc->Send(packet);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 }
 

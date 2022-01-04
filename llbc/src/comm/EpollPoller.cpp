@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
 
 LLBC_EpollPoller::LLBC_EpollPoller()
 : _epoll(LLBC_INVALID_HANDLE)
-, _monitor(NULL)
+, _monitor(nullptr)
 {
 }
 
@@ -123,7 +123,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
                 BuildAsyncConnResultEv(ev.sessionId, true, "Success", ev.peerAddr));
 
         SetConnectedSocketOpts(sock, *ev.sessionOpts);
-        AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, NULL));
+        AddSession(CreateSession(sock, ev.sessionId, *ev.sessionOpts, nullptr));
 
         LLBC_XDelete(ev.sessionOpts);
     }
@@ -137,11 +137,10 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         _connecting.insert(std::make_pair(handle, asyncInfo));
 
         LLBC_EpollEvent epev;
-        epev.data.fd = handle;
-        epev.data.u32 = ev.sessionId;
         epev.events = EPOLLOUT | EPOLLET;
+        epev.data.u64 = (static_cast<uint64>(ev.sessionId) << 32) | static_cast<uint64>(handle);
         LLBC_EpollCtl(_epoll, EPOLL_CTL_ADD, handle, &epev);
-
+        
         LLBC_XDelete(ev.sessionOpts);
     }
     else
@@ -182,17 +181,18 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 
     for (int i = 0; i < count; ++i)
     {
-        const LLBC_EpollEvent &ev = evs[i];
-        if (HandleConnecting(ev.data.fd, ev.events))
+        const LLBC_EpollEvent &epev = evs[i];
+        const LLBC_SocketHandle handle = static_cast<int>(epev.data.u64 & 0xffffffffull);
+        if (HandleConnecting(handle, epev.events))
             continue;
 
-        const int &sessionId = ev.data.u32;
+        const int sessionId = static_cast<int>(epev.data.u64 >> 32);
         _Sessions::iterator it = _sessions.find(sessionId);
         if (UNLIKELY(it == _sessions.end()))
             continue;
 
         LLBC_Session *session = it->second;
-        if (ev.events & (EPOLLHUP | EPOLLERR))
+        if (epev.events & (EPOLLHUP | EPOLLERR))
         {
             LLBC_Socket *sock = session->GetSocket();
 
@@ -200,18 +200,18 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             LLBC_SessionCloseInfo *closeInfo;
             if (sock->GetPendingError(sockErr) != LLBC_OK)
             {
-                closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
+                closeInfo = LLBC_New(LLBC_SessionCloseInfo);
             }
             else
             {
-                closeInfo = LLBC_New2(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+                closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
             }
 
             session->OnClose(closeInfo);
         }
         else
         {
-            if (ev.events & EPOLLIN)
+            if (epev.events & EPOLLIN)
             {
                 if (session->IsListen())
                 {
@@ -223,10 +223,10 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
                     session->OnRecv();
                 }
             }
-            if (ev.events & EPOLLOUT)
+            if (epev.events & EPOLLOUT)
             {
                 // Maybe in session removed while calling OnRecv() method.
-                if ((ev.events & EPOLLIN) && 
+                if ((epev.events & EPOLLIN) && 
                         UNLIKELY(_sessions.find(sessionId) == _sessions.end()))
                     continue;
 
@@ -269,9 +269,8 @@ void LLBC_EpollPoller::AddSession(LLBC_Session *session)
     const LLBC_SocketHandle handle = sock->Handle();
 
     LLBC_EpollEvent epev;
-    epev.data.fd = handle;
-    epev.data.u32 = session->GetId();
     epev.events = EPOLLIN | EPOLLET | EPOLLHUP | EPOLLERR;
+    epev.data.u64 = (static_cast<uint64>(session->GetId()) << 32) | static_cast<uint64>(handle);
     if (!sock->IsListen())
         epev.events |= EPOLLOUT;
 
@@ -291,11 +290,8 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
 
 int LLBC_EpollPoller::StartupMonitor()
 {
-    typedef LLBC_Delegate0<void, LLBC_EpollPoller> __MonitorDeleg;
-
-    LLBC_IDelegate0<void> *deleg = 
-        LLBC_New2(__MonitorDeleg, this, &LLBC_EpollPoller::MonitorSvc);
-    _monitor = LLBC_New1(LLBC_PollerMonitor, deleg);
+    const LLBC_Delegate<void()> deleg(this, &LLBC_EpollPoller::MonitorSvc);
+    _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
@@ -342,7 +338,7 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
                             &optlen) == LLBC_OK && optval == 0)
             connected = true;
     }
-    
+
     _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(asyncInfo.sessionId,
                                                       connected,
                                                       connected ? "Success" : LLBC_FormatLastError(),
@@ -354,7 +350,7 @@ bool LLBC_EpollPoller::HandleConnecting(LLBC_SocketHandle handle, int events)
     if (connected)
     {
         SetConnectedSocketOpts(sock, asyncInfo.sessionOpts);
-        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, NULL));
+        AddSession(CreateSession(sock, asyncInfo.sessionId, asyncInfo.sessionOpts, nullptr));
     }
     else
     {

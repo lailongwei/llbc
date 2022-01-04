@@ -1,3 +1,9 @@
+/*
+ * @Author: Your name
+ * @Date:   2021-01-14 09:44:17
+ * @Last Modified by:   Your name
+ * @Last Modified time: 2021-01-14 09:51:23
+ */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
@@ -78,7 +84,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _started(false)
 , _stopping(false)
-, _initingFacade(false)
+, _initingComp(false)
 
 , _lock()
 , _protoLock()
@@ -94,20 +100,21 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _readySessionInfos()
 , _readySessionInfosLock()
 
-, _willRegFacades()
+, _willRegComps()
 
-, _facadesInitFinished(0)
-, _facadesInitRet(LLBC_OK)
-, _facadesStartFinished(0)
-, _facadesStartRet(LLBC_OK)
+, _compsInitFinished(0)
+, _compsInitRet(LLBC_OK)
+, _compsStartFinished(0)
+, _compsStartRet(LLBC_OK)
 
-, _facades()
-, _facades2()
+, _comps()
+, _comps2()
+, _caredEventComps{}
 , _coders()
 , _handlers()
 , _preHandlers()
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler(NULL)
+, _unifyPreHandler()
 #endif
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 , _statusHandlers()
@@ -116,19 +123,15 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _statusDescs()
 #endif
 
-, _beforeFrameTasks()
-, _afterFrameTasks()
+, _frameTaskIdx(0)
+, _frameTasks{}
 
-, _handlingBeforeFrameTasks(false)
-, _handledBeforeFrameTasks(false)
-, _handlingAfterFrameTasks(false)
-
-, _releasePoolStack(NULL)
+, _releasePoolStack(nullptr)
 
 , _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
 , _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
 
-, _timerScheduler(NULL)
+, _timerScheduler(nullptr)
 
 , _evManager()
 , _evManagerMaxListenerStub(0)
@@ -150,11 +153,11 @@ LLBC_Service::LLBC_Service(This::Type type,
     }
     else
     {
-        ASSERT(_protoFactory != NULL && "Service type is Custom, but not pass Protocol Factory to Service!");
+        ASSERT(_protoFactory != nullptr && "Service type is Custom, but not pass Protocol Factory to Service!");
     }
 
-    // Initialize cared event facades array.
-    LLBC_MemSet(_caredEventFacades, 0, sizeof(_caredEventFacades));
+    // Initialize cared event comps array.
+    LLBC_MemSet(_caredEventComps, 0, sizeof(_caredEventComps));
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -174,32 +177,24 @@ LLBC_Service::~LLBC_Service()
 {
     Stop();
 
-    DestroyFacades();
-    DestroyWillRegFacades();
-    CloseAllFacadeLibraries();
+    DestroyComps();
+    DestroyWillRegComps();
+    CloseAllCompLibraries();
 
     LLBC_STLHelper::DeleteContainer(_coders);
-    LLBC_STLHelper::DeleteContainer(_handlers);
-    LLBC_STLHelper::DeleteContainer(_preHandlers);
+    _handlers.clear();
+    _preHandlers.clear();
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_XDelete(_unifyPreHandler);
+    _unifyPreHandler = nullptr;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    for (_OpStatusHandlers::iterator it = _statusHandlers.begin();
-         it != _statusHandlers.end();
-         ++it)
-    {
-        LLBC_STLHelper::DeleteContainer(*it->second);
-        LLBC_Delete(it->second);
-    }
+    _statusHandlers.clear();
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     RemoveAllReadySessions();
 
-    _handledBeforeFrameTasks = false;
-    DestroyFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
-    DestroyFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
+    DestroyFrameTasks();
 
     LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
     LLBC_XDelete(_protoFactory);
@@ -342,9 +337,9 @@ int LLBC_Service::Start(int pollerCount)
 
     if (_driveMode == This::ExternalDrive)
     {
-        // Waiting for all facade init & start finished.
-        if (InitFacades() != LLBC_OK || 
-            StartFacades() != LLBC_OK)
+        // Waiting for all comp init & start finished.
+        if (InitComps() != LLBC_OK || 
+            StartComps() != LLBC_OK)
         {
             int errNo = LLBC_GetLastError();
 
@@ -363,24 +358,24 @@ int LLBC_Service::Start(int pollerCount)
         // Unlock first.
         _lock.Unlock();
 
-        // Waiting for all facades init finished.
-        while (!_facadesInitFinished)
+        // Waiting for all comps init finished.
+        while (!_compsInitFinished)
             LLBC_Sleep(2);
-        if (_facadesInitRet != LLBC_OK)
+        if (_compsInitRet != LLBC_OK)
         {
             Stop();
-            LLBC_SetLastError(LLBC_ERROR_FACADE_INIT);
+            LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
 
             return LLBC_FAILED;
         }
 
-        // Waiting for all facades start finished.
-        while (!_facadesStartFinished)
+        // Waiting for all comps start finished.
+        while (!_compsStartFinished)
             LLBC_Sleep(2);
-        if (_facadesStartRet != LLBC_OK)
+        if (_compsStartRet != LLBC_OK)
         {
             Stop();
-            LLBC_SetLastError(LLBC_ERROR_FACADE_START);
+            LLBC_SetLastError(LLBC_ERROR_COMP_START);
 
             return LLBC_FAILED;
         }
@@ -409,8 +404,8 @@ void LLBC_Service::Stop()
     if (_driveMode == This::SelfDrive) // Stop self-drive service.
     {
         // TODO: How to stop sink into loop service???
-        if (_sinkIntoLoop) // Service sink into loop, direct return.
-            return;
+        // if (_sinkIntoLoop) // Service sink into loop, direct return.
+            // return;
 
         while (_started) // Service not sink into loop, wait service stop(LLBC_Task mechanism will ensure Cleanup method called).
             LLBC_ThreadManager::Sleep(20);
@@ -612,7 +607,9 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     return LLBC_OK;
 }
 
-int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+int LLBC_Service::CtrlProtocolStack(int sessionId,
+                                    int ctrlCmd,
+                                    const LLBC_Variant &ctrlData)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -639,7 +636,8 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Varia
         {
             _readySessionInfosLock.Unlock();
             if (removeSession)
-                RemoveSession(sessionId, "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
+                RemoveSession(sessionId,
+                              "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
 
             return LLBC_OK;
         }
@@ -647,14 +645,14 @@ int LLBC_Service::CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Varia
 
     _readySessionInfosLock.Unlock();
 
-    _pollerMgr.CtrlProtocolStack(sessionId, ctrlCmd, ctrlData, ctrlDataClearDeleg);
+    _pollerMgr.CtrlProtocolStack(sessionId, ctrlCmd, ctrlData);
 
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
+int LLBC_Service::RegisterComponent(LLBC_IComponentFactory *compFactory)
 {
-    if (UNLIKELY(!facadeFactory))
+    if (UNLIKELY(!compFactory))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -667,25 +665,25 @@ int LLBC_Service::RegisterFacade(LLBC_IFacadeFactory *facadeFactory)
         return LLBC_FAILED;
     }
 
-    for (_WillRegFacades::iterator it = _willRegFacades.begin();
-         it != _willRegFacades.end();
+    for (_WillRegComps::iterator it = _willRegComps.begin();
+         it != _willRegComps.end();
          ++it)
     {
-        if (it->facadeFactory != NULL && it->facadeFactory == facadeFactory)
+        if (it->compFactory != nullptr && it->compFactory == compFactory)
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_FAILED;
         }
     }
 
-    _willRegFacades.push_back(_WillRegFacade(facadeFactory));
+    _willRegComps.push_back(_WillRegComp(compFactory));
 
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
+int LLBC_Service::RegisterComponent(LLBC_IComponent *comp)
 {
-    if (UNLIKELY(!facade))
+    if (UNLIKELY(!comp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -697,33 +695,33 @@ int LLBC_Service::RegisterFacade(LLBC_IFacade *facade)
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
-    else if (std::find(_facades.begin(), 
-            _facades.end(), facade) != _facades.end())
+    else if (std::find(_comps.begin(), 
+            _comps.end(), comp) != _comps.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
-    for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
-         regIt != _willRegFacades.end();
+    for (_WillRegComps::iterator regIt = _willRegComps.begin();
+         regIt != _willRegComps.end();
          ++regIt)
     {
-        if (regIt->facade != NULL && regIt->facade == facade)
+        if (regIt->comp != nullptr && regIt->comp == comp)
         {
             LLBC_SetLastError(LLBC_ERROR_REPEAT);
             return LLBC_FAILED;
         }
     }
 
-    _willRegFacades.push_back(_WillRegFacade(facade));
+    _willRegComps.push_back(_WillRegComp(comp));
 
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade)
+int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp)
 {
-    // Force reset out parameter: facade.
-    facade = NULL;
+    // Force reset out parameter: comp.
+    comp = nullptr;
 
     // Service started or not check.
     LLBC_LockGuard guard(_lock);
@@ -734,7 +732,7 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
     }
 
     // Argument check.
-    if (facadeName.empty())
+    if (compName.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -745,32 +743,32 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
         return LLBC_FAILED;
     }
 
-    // Open facade library(if cached, reuse it).
+    // Open comp library(if cached, reuse it).
     bool existingLib;
-    LLBC_Library *lib = OpenFacadeLibrary(libPath, existingLib);
+    LLBC_Library *lib = OpenCompLibrary(libPath, existingLib);
     if (!lib)
         return LLBC_FAILED;
 
-    // Get facade create entry function.
-    LLBC_String facadeCreateFuncName;
-    facadeCreateFuncName.format("%s%s", LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX, facadeName.c_str());
-    LLBC_FacadeDynamicCreateFunc facadeCreateFunc = reinterpret_cast<
-        LLBC_FacadeDynamicCreateFunc>(lib->GetProcAddress(facadeCreateFuncName.c_str()));
-    if (!facadeCreateFunc)
+    // Get comp create entry function.
+    LLBC_String compCreateFuncName;
+    compCreateFuncName.format("%s%s", LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX, compName.c_str());
+    LLBC_CompDynamicCreateFunc compCreateFunc = reinterpret_cast<
+        LLBC_CompDynamicCreateFunc>(lib->GetProcAddress(compCreateFuncName.c_str()));
+    if (!compCreateFunc)
     {
         if (!existingLib)
-            CloseFacadeLibrary(libPath);
+            CloseCompLibrary(libPath);
 
         return LLBC_FAILED;
     }
 
-    // Create facade.
+    // Create comp.
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    facade = reinterpret_cast<LLBC_IFacade *>(facadeCreateFunc());
-    if (!facade)
+    comp = reinterpret_cast<LLBC_IComponent *>(compCreateFunc());
+    if (!comp)
     {
         if (!existingLib)
-            CloseFacadeLibrary(libPath);
+            CloseCompLibrary(libPath);
 
         if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
             LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
@@ -778,73 +776,73 @@ int LLBC_Service::RegisterFacade(const LLBC_String &libPath, const LLBC_String &
         return LLBC_FAILED;
     }
 
-    // Validate facade class name and giving facadeName is same or not.
-    if (UNLIKELY(LLBC_GetTypeName(*facade) != facadeName))
+    // Validate comp class name and giving compName is same or not.
+    if (UNLIKELY(LLBC_GetTypeName(*comp) != compName))
     {
-        LLBC_XDelete(facade);
+        LLBC_XDelete(comp);
         if (!existingLib)
-            CloseFacadeLibrary(libPath);
+            CloseCompLibrary(libPath);
 
         LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
 
         return LLBC_FAILED;
     }
 
-    // Call normalize register facade method to register.
-    int ret = RegisterFacade(facade);
+    // Call normalize register comp method to register.
+    int ret = RegisterComponent(comp);
     if (ret != LLBC_OK)
     {
-        LLBC_XDelete(facade);
+        LLBC_XDelete(comp);
         if (!existingLib)
-            CloseFacadeLibrary(libPath);
+            CloseCompLibrary(libPath);
     }
 
     return ret;
 }
 
-LLBC_IFacade *LLBC_Service::GetFacade(const char *facadeName)
+LLBC_IComponent *LLBC_Service::GetComponent(const char *compName)
 {
     LLBC_LockGuard guard(_lock);
 
-    _facadeNameKey.assign(facadeName);
-    _Facades2::iterator it = _facades2.find(_facadeNameKey);
-    if (it == _facades2.end())
+    _compNameKey.assign(compName);
+    _Comps2::iterator it = _comps2.find(_compNameKey);
+    if (it == _comps2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
-    _Facades &facades = it->second;
-    return facades[0];
+    _Comps &comps = it->second;
+    return comps[0];
 
 }
 
-LLBC_IFacade *LLBC_Service::GetFacade(const LLBC_String &facadeName)
+LLBC_IComponent *LLBC_Service::GetComponent(const LLBC_String &compName)
 {
     LLBC_LockGuard guard(_lock);
 
-    _Facades2::iterator it = _facades2.find(facadeName);
-    if (it == _facades2.end())
+    _Comps2::iterator it = _comps2.find(compName);
+    if (it == _comps2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
-    _Facades &facades = it->second;
-    return facades[0];
+    _Comps &comps = it->second;
+    return comps[0];
 }
 
-const std::vector<LLBC_IFacade *> &LLBC_Service::GetFacades(const LLBC_String &facadeName)
+const std::vector<LLBC_IComponent *> &LLBC_Service::GetComponents(const LLBC_String &compName)
 {
-    static const std::vector<LLBC_IFacade *> emptyFacades;
+    static const std::vector<LLBC_IComponent *> emptyComps;
 
     LLBC_LockGuard guard(_lock);
 
-    _Facades2::iterator it = _facades2.find(facadeName);
-    if (it == _facades2.end())
+    _Comps2::iterator it = _comps2.find(compName);
+    if (it == _comps2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return emptyFacades;
+        return emptyComps;
     }
 
     return it->second;
@@ -859,7 +857,7 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -883,7 +881,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -900,7 +898,7 @@ int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
+int LLBC_Service::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -909,7 +907,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *de
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -928,7 +926,7 @@ int LLBC_Service::Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *de
     return LLBC_OK;
 }
 
-int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
+int LLBC_Service::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -937,7 +935,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> 
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -957,7 +955,7 @@ int LLBC_Service::PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> 
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
+int LLBC_Service::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -966,7 +964,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -984,7 +982,7 @@ int LLBC_Service::UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg)
+int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -993,7 +991,7 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, 
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -1027,7 +1025,7 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, 
 int LLBC_Service::EnableTimerScheduler()
 {
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
@@ -1045,7 +1043,7 @@ int LLBC_Service::EnableTimerScheduler()
 int LLBC_Service::DisableTimerScheduler()
 {
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -1060,7 +1058,7 @@ int LLBC_Service::DisableTimerScheduler()
     return LLBC_OK;
 }
 
-LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg)
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg)
 {
     if (UNLIKELY(!deleg))
     {
@@ -1069,13 +1067,33 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingFacade))
+    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_INVALID_LISTENER_STUB;
     }
 
-    Push(LLBC_SvcEvUtil::BuildSubscribeEvEv(event, ++_evManagerMaxListenerStub, deleg));
+    Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, deleg, nullptr));
+
+    return _evManagerMaxListenerStub;
+}
+
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *listener)
+{
+    if (!listener)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_INVALID_LISTENER_STUB;
+    }
+
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_started && !_initingComp))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_INVALID_LISTENER_STUB;
+    }
+
+    Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, nullptr, listener));
 
     return _evManagerMaxListenerStub;
 }
@@ -1083,87 +1101,52 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_IDelegate1<void, 
 void LLBC_Service::UnsubscribeEvent(int event)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEvEv(event, LLBC_INVALID_LISTENER_STUB));
+        BuildUnsubscribeEventEv(event, LLBC_INVALID_LISTENER_STUB));
 }
 
 void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEvEv(0, stub));
+        BuildUnsubscribeEventEv(0, stub));
 }
 
 void LLBC_Service::FireEvent(LLBC_Event *ev,
-                             LLBC_IDelegate1<void, LLBC_Event *> *addiCtor,
-                             bool addiCtorBorrowed,
-                             LLBC_IDelegate1<void, LLBC_Event *> *customDtor,
-                             bool customDtorBorrowed)
+                             const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler,
+                             const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
-    Push(LLBC_SvcEvUtil::BuildFireEvEv(ev, addiCtor, addiCtorBorrowed, customDtor, customDtorBorrowed));
+    Push(LLBC_SvcEvUtil::BuildFireEventEv(ev, dequeueHandler));
+    if (enqueueHandler)
+        enqueueHandler(ev);
 }
 
-LLBC_EventManager &LLBC_Service::GetEventManager()
+int LLBC_Service::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
-    return _evManager;
-}
-
-int LLBC_Service::Post(LLBC_IDelegate2<void, LLBC_Service::Base *, const LLBC_Variant *> *deleg, LLBC_Variant *data)
-{
-    if (UNLIKELY(!deleg))
+    if (UNLIKELY(!runnable))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_handlingBeforeFrameTasks && _handlingAfterFrameTasks))
-    {
-        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
-        return LLBC_FAILED;
-    }
-
-    if (_beforeFrameTasks.find(deleg) != _beforeFrameTasks.end() ||
-        _afterFrameTasks.find(deleg) != _afterFrameTasks.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    if (_handlingBeforeFrameTasks)
-    {
-        _afterFrameTasks.insert(std::make_pair(deleg, data));
-    }
-    else
-    {
-        if (!_handledBeforeFrameTasks)
-        {
-            _beforeFrameTasks.insert(std::make_pair(deleg, data));
-        }
-        else
-        {
-            if (!_handlingAfterFrameTasks)
-                _afterFrameTasks.insert(std::make_pair(deleg, data));
-            else
-                _beforeFrameTasks.insert(std::make_pair(deleg, data));
-        }
-    }
+    _frameTasks[_frameTaskIdx].emplace_back(runnable, data);
 
     return LLBC_OK;
 }
 
 const LLBC_ProtocolStack *LLBC_Service::GetCodecProtocolStack(int sessionId) const
 {
-    // If enabled full-stack option, return NULL.
+    // If enabled full-stack option, return nullptr.
     if (_fullStack)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     // Not enabled full-stack option, return session codec protocol-stack.
     LLBC_Service *ncThis = const_cast<LLBC_Service *>(this);
     ncThis->_readySessionInfosLock.Lock();
     _ReadySessionInfosCIter it = _readySessionInfos.find(sessionId);
-    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : NULL;
+    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
     ncThis->_readySessionInfosLock.Unlock();
 
     if (!codecStack)
@@ -1191,21 +1174,19 @@ void LLBC_Service::OnSvc(bool fullFrame)
     if (fullFrame)
         _begHeartbeatTime = LLBC_GetMilliSeconds();
 
-    // Handle before frame-tasks.
-    HandleFrameTasks(_beforeFrameTasks, _handlingBeforeFrameTasks);
-    _handledBeforeFrameTasks = true;
+    // Handle frame-tasks.
+    HandleFrameTasks();
 
     // Process queued events.
     HandleQueuedEvents();
 
     // Update all components.
-    UpdateFacades();
+    UpdateComps();
     UpdateTimers();
     UpdateAutoReleasePool();
 
-    // Handle after frame-tasks.
-    HandleFrameTasks(_afterFrameTasks, _handlingAfterFrameTasks);
-    _handledBeforeFrameTasks = false;
+    // Handle frame-tasks.
+    HandleFrameTasks();
 
     // Process Idle.
     ProcessIdle(fullFrame);
@@ -1233,7 +1214,7 @@ LLBC_ProtocolStack *LLBC_Service::CreatePackStack(int sessionId, int acceptSessi
 {
     if (!stack)
     {
-        stack = LLBC_New1(_Stack, _Stack::PackStack);
+        stack = LLBC_New(_Stack, _Stack::PackStack);
         stack->SetService(this);
     }
 
@@ -1262,7 +1243,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(int sessionId, int acceptSess
 {
     if (!stack)
     {
-        stack = LLBC_New1(_Stack, _Stack::CodecStack);
+        stack = LLBC_New(_Stack, _Stack::CodecStack);
         stack->SetService(this);
         stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
     }
@@ -1287,7 +1268,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(int sessionId, int acceptSess
 
 LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessionId)
 {
-    _Stack *stack = LLBC_New1(_Stack, _Stack::FullStack);
+    _Stack *stack = LLBC_New(_Stack, _Stack::FullStack);
     stack->SetService(this);
     stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
 
@@ -1359,7 +1340,7 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
                                                               isListenSession,
-                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
+                                                              _fullStack ? nullptr : CreateCodecStack(sessionId, acceptSessionId, nullptr));
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
     }
@@ -1368,7 +1349,7 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
         _ReadySessionInfo *readySInfo = new _ReadySessionInfo(sessionId,
                                                               0,
                                                               isListenSession,
-                                                              _fullStack ? NULL : CreateCodecStack(sessionId, acceptSessionId, NULL));
+                                                              _fullStack ? nullptr : CreateCodecStack(sessionId, acceptSessionId, nullptr));
         _readySessionInfosLock.Lock();
         _readySessionInfos.insert(std::make_pair(sessionId, readySInfo));
         _readySessionInfosLock.Unlock();
@@ -1417,17 +1398,17 @@ void LLBC_Service::Svc()
     InitObjectPools();
     InitTimerScheduler();
     InitAutoReleasePool();
-    _facadesInitRet = InitFacades();
-    _facadesInitFinished = 1;
-    if (UNLIKELY(_facadesInitRet != LLBC_OK))
+    _compsInitRet = InitComps();
+    _compsInitFinished = 1;
+    if (UNLIKELY(_compsInitRet != LLBC_OK))
     {
         _lock.Unlock();
         return;
     }
 
-    _facadesStartRet = StartFacades();
-    _facadesStartFinished = 1;
-    if (UNLIKELY(_facadesStartRet != LLBC_OK))
+    _compsStartRet = StartComps();
+    _compsStartFinished = 1;
+    if (UNLIKELY(_compsStartRet != LLBC_OK))
     {
         _lock.Unlock();
         return;
@@ -1453,8 +1434,8 @@ void LLBC_Service::Cleanup()
     // Cleanup ready-sessionInfos map.
     RemoveAllReadySessions();
 
-    // Stop facades, destroy release-pool.
-    StopFacades();
+    // Stop components, destroy release-pool.
+    StopComps();
     ClearAutoReleasePool();
 
     // Clear holded timer-scheduler & object-pools.
@@ -1476,10 +1457,10 @@ void LLBC_Service::Cleanup()
     // Reset some variables.
     _relaxTimes = 0;
 
-    _facadesInitFinished = 0;
-    _facadesInitRet = LLBC_OK;
-    _facadesStartFinished = 0;
-    _facadesStartRet = LLBC_OK;
+    _compsInitFinished = 0;
+    _compsInitRet = LLBC_OK;
+    _compsStartFinished = 0;
+    _compsStartRet = LLBC_OK;
 
     _started = false;
     _stopping = false;
@@ -1525,40 +1506,35 @@ bool LLBC_Service::IsCanContinueDriveService()
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
     for (; checkIdx <= lmt; ++checkIdx)
     {
-        if (tls->commTls.services[checkIdx] == NULL)
+        if (tls->commTls.services[checkIdx] == nullptr)
             break;
     }
 
     return checkIdx < lmt ? true : false;
 }
 
-void LLBC_Service::HandleFrameTasks(LLBC_Service::_FrameTasks &tasks, bool &usingFlag)
+void LLBC_Service::HandleFrameTasks()
 {
-    if (tasks.size() == 0)
+    int frameTaskIdx = _frameTaskIdx;
+    _frameTaskIdx = (_frameTaskIdx + 1) % 2;
+
+    _FrameTasks &tasks = _frameTasks[frameTaskIdx];
+    if (tasks.empty())
         return;
 
-    usingFlag = true;
-    for (_FrameTasks::iterator it = tasks.begin();
-         it != tasks.end();
+    const _FrameTasks::const_iterator endIt = tasks.end();    for (_FrameTasks::const_iterator it = tasks.begin();
+         it != endIt;
          ++it)
-        (it->first)->Invoke(this, it->second);
-
-    DestroyFrameTasks(tasks, usingFlag);
-}
-
-void LLBC_Service::DestroyFrameTasks(_FrameTasks &tasks, bool &usingFlag)
-{
-    usingFlag = false;
-    for (_FrameTasks::iterator it = tasks.begin();
-         it != tasks.end();
-         ++it)
-    {
-        LLBC_Delete(it->first);
-        if (it->second)
-            LLBC_Delete(it->second);
-    }
+        (it->first)(this, it->second);
 
     tasks.clear();
+}
+
+void LLBC_Service::DestroyFrameTasks()
+{
+    for (size_t i = 0; i < sizeof(_frameTasks) / sizeof(_frameTasks[0]); ++i)
+        _frameTasks[i].clear();
+    _frameTaskIdx = 0;
 }
 
 void LLBC_Service::HandleQueuedEvents()
@@ -1588,8 +1564,8 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         AddReadySession(ev.sessionId, ev.acceptSessionId, ev.isListen, true);
     }
 
-    // Check has care session-create ev facades or not, if has cared event facades, dispatch event.
-    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate])
+    // Check has care session-create ev comps or not, if has cared event comps, dispatch event.
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnSessionCreate])
     {
         // Build session info.
         LLBC_SessionInfo info;
@@ -1600,11 +1576,11 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         info.SetPeerAddr(ev.peer);
         info.SetSocket(ev.handle);
 
-        // Dispatch session-create event to all facades.
-        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionCreate];
-        const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-            caredEvFacades[facadeIdx]->OnSessionCreate(info);
+        // Dispatch session-create event to all comps.
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnSessionCreate];
+        const size_t compsSize = caredComps.size();
+        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+            caredComps[compIdx]->OnSessionCreate(info);
     }
 }
 
@@ -1618,8 +1594,8 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         RemoveReadySession(ev.sessionId);
     }
 
-    // Check has care session-destroy ev facades or not, if has cared event facades, dispatch event.
-    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy])
+    // Check has care session-destroy ev comps or not, if has cared event comps, dispatch event.
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnSessionDestroy])
     {
         // Build session info.
         LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
@@ -1632,13 +1608,13 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
 
         // Build session destroy info.
         LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
-        ev.closeInfo = NULL;
+        ev.closeInfo = nullptr;
 
-        // Dispatch session-destroy event to all facades.
-        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnSessionDestroy];
-        const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-             caredEvFacades[facadeIdx]->OnSessionDestroy(destroyInfo);
+        // Dispatch session-destroy event to all comps.
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnSessionDestroy];
+        const size_t compsSize = caredComps.size();
+        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+             caredComps[compIdx]->OnSessionDestroy(destroyInfo);
     }
 
     // Remove session protocol factory.
@@ -1652,8 +1628,8 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
 
-    // Check has care asyncconn-result ev facades or not, if has cared event facades, dispatch event.
-    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult])
+    // Check has care asyncconn-result ev comps or not, if has cared event comps, dispatch event.
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAsyncConnResult])
     {
         LLBC_AsyncConnResult result;
         result.SetIsConnected(ev.connected);
@@ -1661,10 +1637,10 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
         result.SetReason(ev.reason);
         result.SetPeerAddr(ev.peer);
 
-        _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAsyncConnResult];
-        const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-             caredFacades[facadeIdx]->OnAsyncConnResult(result);
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAsyncConnResult];
+        const size_t compsSize = caredComps.size();
+        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+             caredComps[compIdx]->OnAsyncConnResult(result);
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1689,7 +1665,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         return;
     }
 
-    ev.packet = NULL;
+    ev.packet = nullptr;
 
     if (!_fullStack)
     {
@@ -1716,7 +1692,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     else if (recverSvcId != _id)
     {
         LLBC_IService *recverSvc = _svcMgr.GetService(recverSvcId);
-        if (recverSvc == NULL || !recverSvc->IsStarted())
+        if (recverSvc == nullptr || !recverSvc->IsStarted())
         {
             LLBC_Recycle(packet);
             return;
@@ -1744,7 +1720,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             _StatusHandlers::iterator stHandlerIt = stHandlers.find(status);
             if (stHandlerIt != stHandlers.end())
             {
-                stHandlerIt->second->Invoke(*packet);
+                stHandlerIt->second(*packet);
                 LLBC_Recycle(packet);
                 return;
             }
@@ -1760,7 +1736,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         _PreHandlers::iterator preIt = _preHandlers.find(opcode);
         if (preIt != _preHandlers.end())
         {
-            if (!preIt->second->Invoke(*packet))
+            if (!preIt->second(*packet))
             {
                 LLBC_Recycle(packet);
                 return;
@@ -1773,7 +1749,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     // Secondary, we recognize generalized pre-handler, if registered, call it(all service type available).
     if (!preHandled && _unifyPreHandler)
     {
-        if (!_unifyPreHandler->Invoke(*packet))
+        if (!_unifyPreHandler(*packet))
         {
             LLBC_Recycle(packet);
             return;
@@ -1781,20 +1757,20 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-    // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all facades.
+    // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all comps.
     _Handlers::iterator it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
-        it->second->Invoke(*packet);
+        it->second(*packet);
     }
     else
     {
-        if (_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket])
+        if (_caredEventComps[LLBC_ComponentEventsOffset::OnUnHandledPacket])
         {
-            _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnUnHandledPacket];
-            const size_t facadesSize = caredFacades.size();
-            for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-                 caredFacades[facadeIdx]->OnUnHandledPacket(*packet);
+            _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnUnHandledPacket];
+            const size_t compsSize = caredComps.size();
+            for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+                 caredComps[compIdx]->OnUnHandledPacket(*packet);
         }
     }
 
@@ -1806,8 +1782,8 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_ProtoReport _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    // Check has care proto-report ev facades or not, if has cared event facades, dispatch event.
-    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport])
+    // Check has care proto-report ev comps or not, if has cared event comps, dispatch event.
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnProtoReport])
     {
         LLBC_ProtoReport report;
         report.SetSessionId(ev.sessionId);
@@ -1816,10 +1792,10 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
         report.SetLevel(ev.level);
         report.SetReport(ev.report);
 
-        _Facades &caredFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnProtoReport];
-        const size_t facadesSize = caredFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-             caredFacades[facadeIdx]->OnProtoReport(report);
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnProtoReport];
+        const size_t compsSize = caredComps.size();
+        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+             caredComps[compIdx]->OnProtoReport(report);
     }
 }
 
@@ -1828,8 +1804,15 @@ void LLBC_Service::HandleEv_SubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_SubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    _evManager.AddListener(ev.id, ev.deleg, ev.stub);
-    ev.deleg = NULL;
+    if (ev.deleg)
+    {
+        _evManager.AddListener(ev.id, ev.deleg, ev.stub);
+    }
+    else
+    {
+        _evManager.AddListener(ev.id, ev.listener, ev.stub);
+        ev.listener = nullptr;
+    }
 }
 
 void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
@@ -1848,12 +1831,14 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_FireEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    _evManager.FireEvent(ev.ev);
-    if (!ev.customDtor)
-    {
-        ev.ev = NULL;
-        return;
-    }
+    const bool dontDelAfterFire = ev.ev->IsDontDelAfterFire();
+    _evManager.Fire(ev.ev);
+
+    if (ev.dequeueHandler &&
+        dontDelAfterFire)
+        ev.dequeueHandler(ev.ev);
+
+    ev.ev = nullptr;
 }
 
 void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
@@ -1861,245 +1846,247 @@ void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_AppCfgReloadedEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    // Check has care application config reloaded ev facades or not, if has cared event facades, dispatch event.
-    if (_caredEventFacades[LLBC_FacadeEventsOffset::OnAppCfgReloaded])
+    // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReloaded])
     {
-        // Dispatch application config reloaded event to all facades.
-        _Facades &caredEvFacades = *_caredEventFacades[LLBC_FacadeEventsOffset::OnAppCfgReloaded];
-        const size_t facadesSize = caredEvFacades.size();
-        for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
+        // Dispatch application config reloaded event to all comps.
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReloaded];
+        const size_t compsSize = caredComps.size();
+        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
         {
             if (ev.iniReloaded)
-                caredEvFacades[facadeIdx]->OnApplicationIniConfigReload();
+                caredComps[compIdx]->OnApplicationIniConfigReload();
             if (ev.propReloaded)
-                caredEvFacades[facadeIdx]->OnApplicationPropertyConfigReload();
+                caredComps[compIdx]->OnApplicationPropertyConfigReload();
         }
     }
 }
 
-int LLBC_Service::InitFacades()
+int LLBC_Service::InitComps()
 {
-    _initingFacade = true;
+    _initingComp = true;
 
     bool initSuccess = true;
-    for (_WillRegFacades::iterator regIt = _willRegFacades.begin();
-         regIt != _willRegFacades.end();
+    for (_WillRegComps::iterator regIt = _willRegComps.begin();
+         regIt != _willRegComps.end();
          ++regIt)
     {
-        LLBC_IFacade *facade = NULL;
-        _WillRegFacade &willRegFacade = *regIt;
-        if (willRegFacade.facadeFactory != NULL) // Create facade from facade factory.
+        LLBC_IComponent *comp;
+        _WillRegComp &willRegComp = *regIt;
+        if (willRegComp.compFactory != nullptr) // Create comp from comp factory.
         {
-            facade = willRegFacade.facadeFactory->Create();
-            LLBC_XDelete(willRegFacade.facadeFactory);
+            comp = willRegComp.compFactory->Create();
+            LLBC_XDelete(willRegComp.compFactory);
         }
-        else if (willRegFacade.facade != NULL) // Create facade from giving facade(borrow).
+        else if (willRegComp.comp != nullptr) // Create comp from giving comp(borrow).
         {
-            facade = willRegFacade.facade;
-            willRegFacade.facade = NULL;
+            comp = willRegComp.comp;
+            willRegComp.comp = nullptr;
+        }
+        else
+        {
+            continue;
         }
 
-        facade->SetService(this);
-        AddFacade(facade);
+        comp->SetService(this);
+        AddComp(comp);
 
-        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnInitialize) &&
-            UNLIKELY(!facade->OnInitialize()))
+        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize) &&
+            UNLIKELY(!comp->OnInitialize()))
         {
-            ClearFacadesWhenInitFacadeFailed();
+            ClearCompsWhenInitCompFailed();
             initSuccess = false;
 
-            LLBC_SetLastError(LLBC_ERROR_FACADE_INIT);
+            LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
 
             break;
         }
 
-        facade->_inited = true;
+        comp->_inited = true;
     }
 
     if (initSuccess)
-        _willRegFacades.clear();
+        _willRegComps.clear();
 
-    _initingFacade = false;
+    _initingComp = false;
 
     return initSuccess ? LLBC_OK : LLBC_FAILED;
 }
 
-int LLBC_Service::StartFacades()
+int LLBC_Service::StartComps()
 {
-    size_t startIndex = 0;
-    const size_t facadesSize = _facades.size();
-    for (; startIndex < facadesSize; ++startIndex)
+    size_t compIdx = 0;
+    const size_t compsSize = _comps.size();
+    for (; compIdx < compsSize; ++compIdx)
     {
-        LLBC_IFacade *facade = _facades[startIndex];
-        if (facade->_started)
+        LLBC_IComponent *comp = _comps[compIdx];
+        if (comp->_started)
             continue;
 
-        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnStart) && 
-            !facade->OnStart())
+        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStart) && 
+            !comp->OnStart())
             break;
 
-        facade->_started = true;
+        comp->_started = true;
     }
 
-    if (startIndex == facadesSize)
+    if (compIdx == compsSize)
         return LLBC_OK;
 
-    StopFacades();
-    LLBC_SetLastError(LLBC_ERROR_FACADE_START);
+    StopComps();
+    LLBC_SetLastError(LLBC_ERROR_COMP_START);
 
     return LLBC_FAILED;
 }
 
-void LLBC_Service::StopFacades()
+void LLBC_Service::StopComps()
 {
-    for (_Facades::reverse_iterator it = _facades.rbegin();
-         it != _facades.rend();
+    for (_Comps::reverse_iterator it = _comps.rbegin();
+         it != _comps.rend();
          ++it)
     {
-        LLBC_IFacade *facade = *it;
-        if (!facade->_started)
+        LLBC_IComponent *comp = *it;
+        if (!comp->_started)
             continue;
 
-        if (facade->IsCaredEvents(LLBC_FacadeEvents::OnStop))
-            facade->OnStop();
+        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStop))
+            comp->OnStop();
 
-        facade->_started = false;
+        comp->_started = false;
     }
 }
 
-void LLBC_Service::UpdateFacades()
+void LLBC_Service::UpdateComps()
 {
-    _Facades *&caredFacadesPtr = _caredEventFacades[LLBC_FacadeEventsOffset::OnUpdate];
-    if (!caredFacadesPtr)
+    _Comps *&caredCompsPtr = _caredEventComps[LLBC_ComponentEventsOffset::OnUpdate];
+    if (!caredCompsPtr)
         return;
 
-    _Facades &caredFacades = *caredFacadesPtr;
-    const size_t facadesSize = caredFacades.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
-        caredFacades[facadeIdx]->OnUpdate();
+    _Comps &caredComps = *caredCompsPtr;
+    const size_t compsSize = caredComps.size();
+    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+        caredComps[compIdx]->OnUpdate();
 }
 
-void LLBC_Service::DestroyFacades()
+void LLBC_Service::DestroyComps()
 {
-    for (_Facades::reverse_iterator it = _facades.rbegin();
-         it != _facades.rend();
+    for (_Comps::reverse_iterator it = _comps.rbegin();
+         it != _comps.rend();
          ++it)
     {
-        LLBC_IFacade *facade = *it;
-        if (!facade->_inited)
+        LLBC_IComponent *comp = *it;
+        if (!comp->_inited)
             continue;
 
-        if (facade->IsCaredEvents(LLBC_FacadeEventsOffset::OnDestroy))
-            facade->OnDestroy();
+        if (comp->IsCaredEvents(LLBC_ComponentEventsOffset::OnDestroy))
+            comp->OnDestroy();
     }
 
-    LLBC_STLHelper::DeleteContainer(_facades, true, true);
-    _facades2.clear();
+    LLBC_STLHelper::DeleteContainer(_comps, true, true);
+    _comps2.clear();
 
-    for (int evOffset = LLBC_FacadeEventsOffset::Begin;
-         evOffset != LLBC_FacadeEventsOffset::End;
+    for (int evOffset = LLBC_ComponentEventsOffset::Begin;
+         evOffset != LLBC_ComponentEventsOffset::End;
          ++evOffset)
     {
-        _Facades *&evFacades = _caredEventFacades[evOffset];
-        LLBC_XDelete(evFacades);
+        _Comps *&evComps = _caredEventComps[evOffset];
+        LLBC_XDelete(evComps);
     }
 }
 
-void LLBC_Service::DestroyWillRegFacades()
+void LLBC_Service::DestroyWillRegComps()
 {
-    for (_WillRegFacades::iterator it = _willRegFacades.begin();
-         it != _willRegFacades.end();
+    for (_WillRegComps::iterator it = _willRegComps.begin();
+         it != _willRegComps.end();
          ++it)
     {
-        LLBC_XDelete((*it).facade);
-        LLBC_XDelete((*it).facadeFactory);
+        LLBC_XDelete((*it).comp);
+        LLBC_XDelete((*it).compFactory);
     }
 
-    _willRegFacades.clear();
+    _willRegComps.clear();
 }
 
-void LLBC_Service::CloseAllFacadeLibraries()
+void LLBC_Service::CloseAllCompLibraries()
 {
-    LLBC_STLHelper::DeleteContainer(_facadeLibraries);
+    LLBC_STLHelper::DeleteContainer(_compLibraries);
 }
 
-void LLBC_Service::AddFacade(LLBC_IFacade *facade)
+void LLBC_Service::AddComp(LLBC_IComponent *comp)
 {
-    // Add facade to _facades(vector)
-    _facades.push_back(facade);
+    // Add comp to _comps(vector)
+    _comps.push_back(comp);
 
-    // Add facade to _facades2(map<type, vector>)
-    const char *cFacadeName = LLBC_GetTypeName(*facade);
-    const LLBC_String facadeName = LLBC_GetTypeName(*facade);
-    _Facades2::iterator facadesIt = _facades2.find(facadeName);
-    if (facadesIt == _facades2.end())
+    // Add comp to _comps2(map<type, vector>)
+    const LLBC_String compName = LLBC_GetTypeName(*comp);
+    _Comps2::iterator compsIt = _comps2.find(compName);
+    if (compsIt == _comps2.end())
     {
-        facadesIt = _facades2.insert(std::make_pair(facadeName, _Facades())).first;
+        compsIt = _comps2.insert(std::make_pair(compName, _Comps())).first;
     }
-    _Facades2::mapped_type &typeFacades = facadesIt->second;
-    typeFacades.push_back(facade);
+    _Comps2::mapped_type &typeComps = compsIt->second;
+    typeComps.push_back(comp);
 
-    // Add facade to cared events array
-    AddFacadeToCaredEventsArray(facade);
+    // Add comp to cared events array
+    AddCompToCaredEventsArray(comp);
 }
 
-void LLBC_Service::AddFacadeToCaredEventsArray(LLBC_IFacade *facade)
+void LLBC_Service::AddCompToCaredEventsArray(LLBC_IComponent *comp)
 {
-    for (int evOffset = LLBC_FacadeEventsOffset::Begin;
-         evOffset != LLBC_FacadeEventsOffset::End;
+    for (int evOffset = LLBC_ComponentEventsOffset::Begin;
+         evOffset != LLBC_ComponentEventsOffset::End;
          ++evOffset)
     {
-        if (!facade->IsCaredEventOffset(evOffset))
+        if (!comp->IsCaredEventOffset(evOffset))
             continue;
 
-        _Facades *&evFacades = _caredEventFacades[evOffset];
-        if (evFacades == NULL)
-            evFacades = new _Facades();
-        evFacades->push_back(facade);
+        _Comps *&evComps = _caredEventComps[evOffset];
+        if (evComps == nullptr)
+            evComps = new _Comps();
+        evComps->push_back(comp);
     }
 }
 
-LLBC_Library *LLBC_Service::OpenFacadeLibrary(const LLBC_String &libPath, bool &existingLib)
+LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &existingLib)
 {
     existingLib = false;
 
-    LLBC_Library *lib = NULL;
-    _FacadeLibraries::iterator libIt = _facadeLibraries.find(libPath);
-    if (libIt != _facadeLibraries.end())
+    _CompLibraries::iterator libIt = _compLibraries.find(libPath);
+    if (libIt != _compLibraries.end())
     {
         existingLib = true;
         return libIt->second;
     }
 
-    lib = LLBC_New(LLBC_Library);
+    LLBC_Library *lib = LLBC_New(LLBC_Library);
     if (lib->Open(libPath.c_str()) != LLBC_OK)
     {
         LLBC_Delete(lib);
-        return NULL;
+        return nullptr;
     }
 
-    _facadeLibraries.insert(std::make_pair(libPath, lib));
+    _compLibraries.insert(std::make_pair(libPath, lib));
 
     return lib;
 }
 
-void LLBC_Service::CloseFacadeLibrary(const LLBC_String &libPath)
+void LLBC_Service::CloseCompLibrary(const LLBC_String &libPath)
 {
-    _FacadeLibraries::iterator libIt = _facadeLibraries.find(libPath);
-    if (libIt == _facadeLibraries.end())
+    _CompLibraries::iterator libIt = _compLibraries.find(libPath);
+    if (libIt == _compLibraries.end())
         return;
 
     LLBC_Delete(libIt->second);
-    _facadeLibraries.erase(libIt);
+    _compLibraries.erase(libIt);
 }
 
-void LLBC_Service::ClearFacadesWhenInitFacadeFailed()
+void LLBC_Service::ClearCompsWhenInitCompFailed()
 {
-    StopFacades();
-    DestroyFacades();
-    DestroyWillRegFacades();
+    StopComps();
+    DestroyComps();
+    DestroyWillRegComps();
 
-    CloseAllFacadeLibraries();
+    CloseAllCompLibraries();
 }
 
  void LLBC_Service::InitAutoReleasePool()
@@ -2115,7 +2102,7 @@ void LLBC_Service::UpdateAutoReleasePool()
 
 void LLBC_Service::ClearAutoReleasePool()
 {
-    _releasePoolStack = NULL;
+    _releasePoolStack = nullptr;
 }
 
 void LLBC_Service::InitObjectPools()
@@ -2146,18 +2133,18 @@ void LLBC_Service::UpdateTimers()
 
 void LLBC_Service::ClearHoldedTimerScheduler()
 {
-    _timerScheduler = NULL;
+    _timerScheduler = nullptr;
 }
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
 {
-    _Facades *&caredEvsPtr = _caredEventFacades[LLBC_FacadeEventsOffset::OnIdle];
+    _Comps *&caredEvsPtr = _caredEventComps[LLBC_ComponentEventsOffset::OnIdle];
     if (!caredEvsPtr)
         return;
 
-    _Facades &caredEvs = *caredEvsPtr;
-    const size_t facadesSize = caredEvs.size();
-    for (size_t facadeIdx = 0; facadeIdx != facadesSize; ++facadeIdx)
+    _Comps &caredEvs = *caredEvsPtr;
+    const size_t compsSize = caredEvs.size();
+    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
         if (fullFrame)
         {
@@ -2167,12 +2154,12 @@ void LLBC_Service::ProcessIdle(bool fullFrame)
                 if (elapsed >= _frameInterval)
                     break;
 
-                caredEvs[facadeIdx]->OnIdle(static_cast<int>(_frameInterval - elapsed));
+                caredEvs[compIdx]->OnIdle(static_cast<int>(_frameInterval - elapsed));
             }
         }
         else
         {
-            caredEvs[facadeIdx]->OnIdle(0);
+            caredEvs[compIdx]->OnIdle(0);
         }
     }
 }
@@ -2449,16 +2436,16 @@ LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
         LLBC_Delete(codecStack);
 }
 
-LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacade *facade)
+LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponent *comp)
 {
-    this->facade = facade;
-    facadeFactory = NULL;
+    this->comp = comp;
+    compFactory = nullptr;
 }
 
-LLBC_Service::_WillRegFacade::_WillRegFacade(LLBC_IFacadeFactory *facadeFactory)
+LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponentFactory *compFactory)
 {
-    facade = NULL;
-    this->facadeFactory = facadeFactory;
+    comp = nullptr;
+    this->compFactory = compFactory;
 }
 
 __LLBC_NS_END

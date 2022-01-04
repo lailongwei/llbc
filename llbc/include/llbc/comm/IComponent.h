@@ -19,13 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_IFACADE_H__
-#define __LLBC_COMM_IFACADE_H__
+#ifndef __LLBC_COMM_ICOMPONENT_H__
+#define __LLBC_COMM_ICOMPONENT_H__
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
-#include "llbc/comm/FacadeEvents.h"
+#include "llbc/comm/ComponentEvents.h"
 
 __LLBC_NS_BEGIN
 
@@ -328,57 +328,57 @@ private:
     LLBC_String _report;
 };
 
-// Pre-declare LLBC_IFacade, use for define LLBC_FacadeMethod type.
-class LLBC_IFacade;
+// Pre-declare LLBC_IComponent, use for define LLBC_ComponentMethod type.
+class LLBC_IComponent;
 
 /**
- * \brief The llibc library facade method encapsulation.
+ * \brief The llibc library component method encapsulation.
  */
-typedef LLBC_IDelegate2<int, const LLBC_Variant &, LLBC_Variant &> LLBC_FacadeMethod;
+typedef LLBC_Delegate<int(const LLBC_Variant &, LLBC_Variant &)> LLBC_ComponentMethod;
 
 /**
- * \brief The facade methods encapsulation.
+ * \brief The component methods encapsulation.
  */
-class LLBC_FacadeMethods
+class LLBC_ComponentMethods
 {
 public:
-    typedef std::map<LLBC_CString, LLBC_FacadeMethod *> Methods;
+    typedef std::map<LLBC_CString, LLBC_ComponentMethod> Methods;
 
 public:
     /**
      * Ctor & Dtor.
      */
-    LLBC_FacadeMethods();
-    ~LLBC_FacadeMethods();
+    LLBC_ComponentMethods();
+    ~LLBC_ComponentMethods();
 
 public:
     /**
-     * Get all facade methods.
+     * Get all component methods.
      * @return const Methods & - the methods dictionary.
      */
     const Methods &GetAllMethods() const;
 
     /**
-     * Get facade method.
+     * Get component method.
      * @param[in] methName - the method name.
-     * @return LLBC_FacadeMethod * - the facade method, if not found return NULL.
+     * @return const LLBC_ComponentMethod & - the component method, if not found return nullptr.
      */
-    LLBC_FacadeMethod *GetMethod(const char *methName) const;
+    const LLBC_ComponentMethod &GetMethod(const char *methName) const;
 
 public:
     /**
-     * Add facade method.
-     * @param[in] facade   - the facade object.
-     * @param[in] methName - the method name.
-     * @param[in] meth     - the method pointer.
+     * Add component method.
+     * @param[in] component - the component object.
+     * @param[in] methName  - the method name.
+     * @param[in] meth      - the method pointer.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename FacadeCls>
-    int AddMethod(FacadeCls *facade, const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    template <typename ComponentCls>
+    int AddMethod(ComponentCls *component, const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
 public:
     /**
-     * Call facade method.
+     * Call component method.
      * @param[in] methName - the method name.
      * @param[in] arg      - the argument.
      * @param[in] ret      - the method execute result.
@@ -388,20 +388,20 @@ public:
 
 private:
     // Disable assignment.
-    LLBC_DISABLE_ASSIGNMENT(LLBC_FacadeMethods);
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ComponentMethods);
 
 private:
     Methods _meths;
 };
 
 /**
- * \brief The facade interface class encapsulation.
+ * \brief The component interface class encapsulation.
  */
-class LLBC_EXPORT LLBC_IFacade
+class LLBC_EXPORT LLBC_IComponent
 {
 public:
-    LLBC_IFacade(uint64 caredEvents = LLBC_FacadeEvents::DefaultEvents);
-    virtual ~LLBC_IFacade();
+    LLBC_IComponent(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
+    virtual ~LLBC_IComponent();
 
 public:
     /**
@@ -418,37 +418,37 @@ public:
     uint64 GetCaredEvents() const;
 
     /**
-     * Get cared specified facade events or not.
-     * @param[in] facadeEvs - the facade events(bit collection).
+     * Get cared specified components events or not.
+     * @param[in] compEvs - the comp events(bit collection).
      * @return bool - return true it means cared specified events, otherwise return false.
      */
-    bool IsCaredEvents(uint64 facadeEvs) const;
+    bool IsCaredEvents(uint64 compEvs) const;
 
     /**
-     * Get cared specified facade events offset or not.
-     * @param[in] facadeEvOffset - the facade event offset.
+     * Get cared specified component events offset or not.
+     * @param[in] compEvOffset - the comp event offset.
      * @return bool - return true it means cared specified event offset, otherwise return false.
      */
-    bool IsCaredEventOffset(int facadeEvOffset) const;
+    bool IsCaredEventOffset(int compEvOffset) const;
 
 public:
     /**
-     * Get all facade methods.
-     * @return const LLBC_FacadeMethods * - the facade methods, maybe is null.
+     * Get all component methods.
+     * @return const LLBC_ComponentMethods * - the component methods, maybe is null.
      */
-    const LLBC_FacadeMethods *GetAllMethods() const;
+    const LLBC_ComponentMethods *GetAllMethods() const;
 
     /**
-     * Add facade method.
+     * Add component method.
      * @param[in] methName - the method name.
      * @param[in] meth     - the method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename FacadeCls>
-    int AddMethod(const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    template <typename ComponentCls>
+    int AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
     /**
-     * Call facade method.
+     * Call component method.
      * @param[in] methName - the method name.
      * @param[in] arg      - the argument.
      * @param[in] ret      - the method execute result.
@@ -458,7 +458,7 @@ public:
 
 public:
     /**
-     * When service start and not not init facade before, will call then event handler.
+     * When service start and not not init component before, will call then event handler.
      */
     virtual bool OnInitialize();
 
@@ -522,8 +522,7 @@ public:
 public:
     /**
      * When protocol layer report something, will call this event handler.
-     * @param[in] layer  - protocol layer.
-     * @param[in] report - the report string.
+     * @param[in] report - the report information.
      */
     virtual void OnProtoReport(const LLBC_ProtoReport &report);
 
@@ -555,21 +554,21 @@ private:
     bool _started;
     uint64 _caredEvents;
 
-    LLBC_FacadeMethods *_meths;
+    LLBC_ComponentMethods *_meths;
 
     LLBC_IService *_svc;
 };
 
 /**
- * \brief The facade factory class encapsulation.
+ * \brief The component factory class encapsulation.
  */
-class LLBC_EXPORT LLBC_IFacadeFactory
+class LLBC_EXPORT LLBC_IComponentFactory
 {
 public:
-    virtual ~LLBC_IFacadeFactory() {  }
+    virtual ~LLBC_IComponentFactory() {  }
 
 public:
-    virtual LLBC_IFacade *Create() const = 0;
+    virtual LLBC_IComponent *Create() const = 0;
 };
 
 __LLBC_NS_END
@@ -577,11 +576,11 @@ __LLBC_NS_END
 /**
  * Some stream output operator functions(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si);
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy);
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
-#include "llbc/comm/IFacadeImpl.h"
+#include "llbc/comm/IComponentImpl.h"
 
-#endif // !__LLBC_COMM_IFACADE_H__
+#endif // !__LLBC_COMM_ICOMPONENT_H__

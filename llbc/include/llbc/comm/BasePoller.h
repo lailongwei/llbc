@@ -65,7 +65,7 @@ public:
     /**
      * Factory method, use to create specified type's poller.
      * @param[in] type - the poller type.
-     * @return This * - the poller, if failed, return NULL.
+     * @return This * - the poller, if failed, return nullptr.
      */
     static This *Create(int type);
 

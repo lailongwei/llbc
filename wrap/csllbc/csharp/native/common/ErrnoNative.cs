@@ -107,9 +107,9 @@ namespace llbc
 
         static public uint LLBC_ERROR_NOT_ALLOW              = 0xc0000024;
 
-        static public uint LLBC_ERROR_FACADE_INIT            = 0xc0000025;
+        static public uint LLBC_ERROR_COMP_INIT              = 0xc0000025;
 
-        static public uint LLBC_ERROR_FACADE_START           = 0xc0000026;
+        static public uint LLBC_ERROR_COMP_START             = 0xc0000026;
 
         static public uint LLBC_ERROR_WSA_SYSNOTREADY        = 0xc0000027;
 

@@ -37,7 +37,7 @@ This *LLBC_IService::Create(Type type,
                             LLBC_IProtocolFactory *protoFactory,
                             bool fullStack)
 {
-    return LLBC_New4(LLBC_Service, type, name, protoFactory, fullStack);
+    return LLBC_New(LLBC_Service, type, name, protoFactory, fullStack);
 }
 
 __LLBC_NS_END

@@ -24,17 +24,18 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/time/TimeSpan.h"
+
 __LLBC_NS_BEGIN
 
 class LLBC_Time;
-class LLBC_TimeSpan;
 
 __LLBC_NS_END
 
 /**
  * Time class stream output operators previous declare.
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
+LLBC_EXPORT std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
 
 __LLBC_NS_BEGIN
 
@@ -47,6 +48,8 @@ public:
     /**
      * Some constants variables define.
      */
+    static const LLBC_Time UTCBegin; // UTC begin time.
+
     static const int NumOfSecondsPerDay; // Number of seconds per-day.
     static const int NumOfMilliSecondsPerDay; // Number of milli-seconds per-day.
     static const sint64 NumOfMicroSecondsPerDay; // Number of micro-seconds per-day.
@@ -94,6 +97,26 @@ public:
      */
     static time_t NowTimeStamp();
 
+public:
+    /**
+     * Create time object from some ways.
+     * @param[in] clanderTimeInXXX - calendar time, in seconds/milli-seconds/micro-seconds.
+     * @param[in] timeVal          - calendar time in milliseconds representation by timeval struct.
+     * @param[in] timeSpec         - calendar time in milliseconds representation by timespec struct.
+     * @param[in] timeStr          - time string representation, for example: "2015-12-25 00:00:00.000".
+     * @param[in] <time parts>     - the all time parts(year, month, day, ...). 
+     * @return LLBC_Time - Time object.
+     */
+    static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
+    static LLBC_Time FromMilliSeconds(sint64 clanderTimeInMilliSeconds);
+    static LLBC_Time FromMicroSeconds(sint64 clanderTimeInMicroSeconds);
+    static LLBC_Time FromTimeVal(const timeval &timeVal);
+    static LLBC_Time FromTimeSpec(const timespec &timeSpec);
+    static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
+    static LLBC_Time FromTimeStruct(const tm &timeStruct, int milliSecond = 0, int microSecond = 0);
+    static LLBC_Time FromTimeParts(int year, int month, int day, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
+
+public:
     /**
      * Get local time parts(year, month, day, hour, minute, second, dayofweek).
      * Notes: GetMonth() start by 1, GetDayOfWeek() start by 0(sunday), GetDayOfYear() start by 1.
@@ -103,6 +126,7 @@ public:
     int GetMonth() const;
     int GetDay() const;
     int GetDayOfWeek() const;
+    int GetDayOfMonth() const;
     int GetDayOfYear() const;
     int GetHour() const;
     int GetMinute() const;
@@ -153,33 +177,14 @@ public:
     /**
      * Format local time, see strftime() api.
      */
-    LLBC_String Format(const char *format = NULL) const;
+    LLBC_String Format(const char *format = nullptr) const;
     static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
-    LLBC_String FormatAsGmt(const char *format = NULL) const;
+    LLBC_String FormatAsGmt(const char *format = nullptr) const;
     static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
-
-public:
-    /**
-     * Create time object from some ways.
-     * @param[in] clanderTimeInXXX - calendar time, in seconds/milli-seconds/micro-seconds.
-     * @param[in] timeVal          - calendar time in milliseconds representation by timeval struct.
-     * @param[in] timeSpec         - calendar time in milliseconds representation by timespec struct.
-     * @param[in] timeRepr         - time string representation, for example: "2015-12-25 00:00:00.000000".
-     * @param[in] <time parts>     - the all time parts(year, month, day, ...). 
-     * @return LLBC_Time - Time object.
-     */
-    static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMilliSeconds(sint64 clanderTimeInMilliSeconds);
-    static LLBC_Time FromMicroSeconds(sint64 clanderTimeInMicroSeconds);
-    static LLBC_Time FromTimeVal(const timeval &timeVal);
-    static LLBC_Time FromTimeSpec(const timespec &timeSpec);
-    static LLBC_Time FromTimeRepr(LLBC_String timeRepr);
-    static LLBC_Time FromTimeStruct(const tm &timeStruct, int milliSecond = 0, int microSecond = 0);
-    static LLBC_Time FromTimeParts(int year, int month, int day, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
 
 public:
     /**
@@ -212,6 +217,14 @@ public:
      * @return int - the specific month max days, if failed, return 0.
      */
     static int GetMonthMaxDays(int year, int month);
+
+    /**
+     * Get specific month span days.
+     * @param[in] year  - the year.
+     * @param[in] month - the month - [1, 12].
+     * @return int - the month span days(not included giving month).
+     */
+    static int GetMonthSpanDays(int year, int month);
 
 public:
     /**

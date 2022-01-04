@@ -27,6 +27,7 @@
 
 __LLBC_NS_BEGIN
 class LLBC_Event;
+class LLBC_EventFirer;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -45,43 +46,41 @@ public:
 
 public:
     /**
-     * Add event listener.
-     * @param[in] id         - event Id.
-     * @param[in] listener   - event listener.
-     * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
-     * @return LLBC_ListenerStub - return if failed, otherwise return validate stub.
-     */
-    virtual LLBC_ListenerStub AddListener(int id,
-                                          void (*listener)(LLBC_Event *),
-                                          const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
-
-    /**
-     * Add event listener.
+     * Add event deleg.
      * @param[in] id         - event Id.
      * @param[in] obj        - object.
-     * @param[in] listener   - listener.
-     * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
+     * @param[in] listener   - deleg.
+     * @param[in] boundStub - the binded stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     template <typename ObjectType>
     LLBC_ListenerStub AddListener(int id,
                                   ObjectType *obj,
-                                  void (ObjectType::*listener)(LLBC_Event *),
-                                  const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
-
+                                  void (ObjectType::*listener)(LLBC_Event &),
+                                  const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
     /**
-     * Add event listener.
-     * @param[in] id         - event Id.
-     * @param[in] listener   - event listener.
-     * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub.
+     * Add event deleg.
+     * @param[in] id        - event Id.
+     * @param[in] listener  - event deleg.
+     * @param[in] boundStub - the bound stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
-                                          LLBC_IDelegate1<void, LLBC_Event *> *listener,
-                                          const LLBC_ListenerStub &bindedStub = LLBC_INVALID_LISTENER_STUB);
+                                          const LLBC_Delegate<void(LLBC_Event &)> &listener,
+                                          const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
 
     /**
-     * Remove event listener.
+     * Add event listener.
+     * @param[in] id - event Id.
+     * @param[in] listener - event listener.
+     * @return LLBC_ListenerStub - return LLBC_INAVLID_LISTENER_STUB if failed, otherwise return validate stub.
+     */
+    virtual LLBC_ListenerStub AddListener(int id,
+                                          LLBC_EventListener *listener,
+                                          const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
+
+    /**
+     * Remove event deleg.
      * @param[in] id - event Id.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
      *               specially, if return LLBC_FAILED,  and fetch the last error is pending,
@@ -90,8 +89,8 @@ public:
     virtual int RemoveListener(int id);
 
     /**
-     * Remove event listener using listener stub.
-     * @param[in] stub - event listener stub.
+     * Remove event deleg using deleg stub.
+     * @param[in] stub - event deleg stub.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
@@ -99,8 +98,8 @@ public:
     virtual int RemoveListener(const LLBC_ListenerStub &stub);
 
     /**
-     * Remove event listener using listener stub and clear the listener stub.
-     * @param[in] stub - event listener stub.
+     * Remove event deleg using deleg stub and clear the deleg stub.
+     * @param[in] stub - event deleg stub.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
@@ -109,16 +108,17 @@ public:
 
 public:
     /**
-     * Fire the event.
-     * @param[in] event - event object.
+     * Fire event.
+     * @param[in] ev - event object.
      */
-    virtual void FireEvent(LLBC_Event *event);
+    virtual void Fire(LLBC_Event *ev);
 
     /**
-     * Fire the event.
-     * @param[in] id - event Id.
+     * Begin fire event.
+     * @param[in] evId - the event id.
+     * @return LLBC_EventFirer & - the event firer object.
      */
-    void FireEvent(int id);
+    LLBC_EventFirer &BeginFire(int evId);
 
     /**
      * Check event manager is firing or not.
@@ -128,37 +128,9 @@ public:
 
 protected:
     /**
-     * \brief Wrap the event listener.
+     * Check given listen stub in the event manager exist or not.
      */
-    struct _Listener
-    {
-        LLBC_ListenerStub stub;
-
-        int evId;
-        LLBC_IDelegate1<void, LLBC_Event *> *listener;
-
-        _Listener();
-    };
-
-    /**
-     * \brief Wrap the event operation information.
-     */
-    struct _Op
-    {
-        bool addOp;
-        _Listener listener;
-    };
-
-protected:
-    /**
-     * Search given listen stub in the event manager.
-     */
-    bool SearchStub(const LLBC_ListenerStub &stub) const;
-
-    /**
-     * Process event operation.
-     */
-    int ProcessEventOperation(_Op &op);
+    bool HasStub(const LLBC_ListenerStub &stub) const;
 
     /**
      * Before fire event method.
@@ -171,18 +143,37 @@ protected:
     void AfterFireEvent();
 
 protected:
+    /**
+     * \brief The event listener info encapsulation.
+     */
+    struct _ListenerInfo
+    {
+        int evId;
+        LLBC_ListenerStub stub;
+        LLBC_EventListener *listener;
+        LLBC_Delegate<void(LLBC_Event &)> deleg;
+
+        _ListenerInfo();
+        ~_ListenerInfo();
+    };
+
+private:
+    int AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub);
+    void AddListenerInfo(_ListenerInfo *li);
+
+protected:
+    typedef std::list<_ListenerInfo *> _ListenerInfos; // deleg info list
+    typedef std::map<int, _ListenerInfos> _Id2ListenerInfos; // event id 2 listeners
+    typedef std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _Stub2ListenerInfos; // stub id 2 listeners
+
     int _firing;
     LLBC_ListenerStub _maxListenerStub;
 
-    typedef std::vector<_Op> _DelayedOps;
-    _DelayedOps _delayedOps;
+    _Id2ListenerInfos _id2ListenerInfos;
+    _Stub2ListenerInfos _stub2ListenerInfos;
 
-    typedef std::vector<_Listener> _Listeners;
-    typedef std::map<int, _Listeners> _ListenersMap;
-    _ListenersMap _listeners;
-
-    typedef std::map<LLBC_ListenerStub, _Listener> _StubIndexedListeners;
-    _StubIndexedListeners _stubListeners;
+    std::set<int> _pendingRemoveEvIds;
+    std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
 };
 
 __LLBC_NS_END

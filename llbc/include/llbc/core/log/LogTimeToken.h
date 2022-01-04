@@ -56,6 +56,11 @@ public:
      * @param[out] formattedData - store location for formatted log string.
      */
     virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
+
+private:
+    mutable time_t _lastFmtTime;
+    mutable size_t _cacheLen;
+    mutable char _fmtCache[32];
 };
 
 __LLBC_NS_END

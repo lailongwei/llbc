@@ -29,7 +29,7 @@ LLBC_BEGIN_C_DECL
 csllbc_Timer *csllbc_Timer_Create(csllbc_Delegates::Deleg_Timer_OnTimeout timeoutDeleg,
                                   csllbc_Delegates::Deleg_Timer_OnCancel cancelDeleg)
 {
-    return LLBC_New2(csllbc_Timer, timeoutDeleg, cancelDeleg);
+    return LLBC_New(csllbc_Timer, timeoutDeleg, cancelDeleg);
 }
 
 void csllbc_Timer_Destroy(csllbc_Timer *timer)
@@ -37,9 +37,10 @@ void csllbc_Timer_Destroy(csllbc_Timer *timer)
     LLBC_Delete(timer);
 }
 
-int csllbc_Timer_Schedule(csllbc_Timer *timer, uint64 dueTime, uint64 period)
+int csllbc_Timer_Schedule(csllbc_Timer *timer, sint64 dueTime, sint64 period)
 {
-    return timer->Schedule(dueTime, period);
+    return timer->Schedule(LLBC_TimeSpan::FromMillis(dueTime),
+                           LLBC_TimeSpan::FromMillis(period));
 }
 
 int csllbc_Timer_IsScheduling(csllbc_Timer *timer)

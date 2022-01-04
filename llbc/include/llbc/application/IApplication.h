@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Packet;
-class LLBC_IFacade;
+class LLBC_IComponent;
 class LLBC_IService;
 
 __LLBC_NS_END
@@ -123,7 +123,7 @@ public:
      * @param[in] crashHook - the crash hook.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook);
+    int SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook);
 
 public:
     /**
@@ -217,7 +217,7 @@ private:
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String _dumpFileName;
-    LLBC_IDelegate1<void, const LLBC_String &> *_crashHook;
+    LLBC_Delegate<void(const LLBC_String &)> _crashHook;
 #endif // Win32
 
     static LLBC_IApplication *_thisApp;

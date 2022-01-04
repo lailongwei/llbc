@@ -19,38 +19,38 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMM_IFACADE_H__
+#ifdef __LLBC_COMM_ICOMPONENT_H__
 
 __LLBC_NS_BEGIN
 
-inline LLBC_FacadeMethods::LLBC_FacadeMethods()
+inline LLBC_ComponentMethods::LLBC_ComponentMethods()
 {
 }
 
-inline LLBC_FacadeMethods::~LLBC_FacadeMethods()
+inline LLBC_ComponentMethods::~LLBC_ComponentMethods()
 {
-    LLBC_STLHelper::DeleteContainer(_meths);
 }
 
-inline const LLBC_FacadeMethods::Methods &LLBC_FacadeMethods::GetAllMethods() const
+inline const LLBC_ComponentMethods::Methods &LLBC_ComponentMethods::GetAllMethods() const
 {
     return _meths;
 }
 
-inline LLBC_FacadeMethod *LLBC_FacadeMethods::GetMethod(const char *methName) const
+inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const char *methName) const
 {
+    static const LLBC_ComponentMethod nullMeth;
     Methods::const_iterator it = _meths.find(methName);
     if (UNLIKELY(it == _meths.end()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullMeth;
     }
 
     return it->second;
 }
 
-template <typename FacadeCls>
-int LLBC_FacadeMethods::AddMethod(FacadeCls *facade, const char *methName, int ( FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+template <typename ComponentCls>
+int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methName, int ( ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     if (UNLIKELY(!methName || LLBC_StrLenA(methName) == 0 || !meth))
     {
@@ -58,67 +58,63 @@ int LLBC_FacadeMethods::AddMethod(FacadeCls *facade, const char *methName, int (
         return LLBC_FAILED;
     }
 
-    LLBC_FacadeMethod *methDeleg = new LLBC_Delegate2<
-        int, FacadeCls, const LLBC_Variant &, LLBC_Variant &>(facade, meth);
-    if (UNLIKELY(!_meths.insert(std::make_pair(methName, methDeleg)).second))
+    if (UNLIKELY(!_meths.emplace(methName, LLBC_ComponentMethod(component, meth)).second))
     {
-        LLBC_Delete(methDeleg);
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
-
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
 }
 
-inline int LLBC_FacadeMethods::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_ComponentMethods::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
-    LLBC_FacadeMethod *meth = GetMethod(methName);
+    const LLBC_ComponentMethod &meth = GetMethod(methName);
     if (UNLIKELY(!meth))
         return LLBC_FAILED;
 
-    return meth->Invoke(arg, ret);
+    return meth(arg, ret);
 }
 
-inline LLBC_IService *LLBC_IFacade::GetService() const
+inline LLBC_IService *LLBC_IComponent::GetService() const
 {
     return _svc;
 }
 
-inline uint64 LLBC_IFacade::GetCaredEvents() const
+inline uint64 LLBC_IComponent::GetCaredEvents() const
 {
     return _caredEvents;
 }
 
-inline bool LLBC_IFacade::IsCaredEvents(uint64 facadeEvs) const
+inline bool LLBC_IComponent::IsCaredEvents(uint64 compEvs) const
 {
-    return (_caredEvents & facadeEvs) == facadeEvs;
+    return (_caredEvents & compEvs) == compEvs;
 }
 
-inline bool LLBC_IFacade::IsCaredEventOffset(int facadeEvOffset) const
+inline bool LLBC_IComponent::IsCaredEventOffset(int compEvOffset) const
 {
  #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
-    return IsCaredEvents(1Ui64 << facadeEvOffset);
+    return IsCaredEvents(1Ui64 << compEvOffset);
 #else
-    return IsCaredEvents(1ULL << facadeEvOffset);
+    return IsCaredEvents(1ULL << compEvOffset);
 #endif
 }
 
-inline const LLBC_FacadeMethods *LLBC_IFacade::GetAllMethods() const
+inline const LLBC_ComponentMethods *LLBC_IComponent::GetAllMethods() const
 {
     return _meths;
 }
 
-template <typename FacadeCls>
-int LLBC_IFacade::AddMethod(const char *methName, int (FacadeCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+template <typename ComponentCls>
+int LLBC_IComponent::AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     if (!_meths)
-        _meths = LLBC_New(LLBC_FacadeMethods);
+        _meths = LLBC_New(LLBC_ComponentMethods);
 
-    return _meths->AddMethod<FacadeCls>(dynamic_cast<FacadeCls *>(this), methName, meth);
+    return _meths->AddMethod<ComponentCls>(dynamic_cast<ComponentCls *>(this), methName, meth);
 }
 
-inline int LLBC_IFacade::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_IComponent::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     if (UNLIKELY(!_meths))
     {
@@ -129,14 +125,14 @@ inline int LLBC_IFacade::CallMethod(const char *methName, const LLBC_Variant &ar
     return _meths->CallMethod(methName, arg, ret);
 }
 
-inline void LLBC_IFacade::OnUpdate()
+inline void LLBC_IComponent::OnUpdate()
 {
 }
 
-inline void LLBC_IFacade::OnIdle(int idleTime)
+inline void LLBC_IComponent::OnIdle(int idleTime)
 {
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_IFACADE_H__
+#endif // __LLBC_COMM_ICOMPONENT_H__

@@ -34,11 +34,11 @@ __LLBC_NS_BEGIN
  */
 class LLBC_ICoder;
 class LLBC_Packet;
-class LLBC_IFacade;
+class LLBC_IComponent;
 class LLBC_Session;
 class LLBC_PollerMgr;
 class LLBC_ICoderFactory;
-class LLBC_IFacadeFactory;
+class LLBC_IComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 
@@ -92,7 +92,7 @@ public:
      */
     static This *Create(Type type,
                         const LLBC_String &name = "",
-                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        LLBC_IProtocolFactory *protoFactory = nullptr,
                         bool fullStack = true);
 
 public:
@@ -193,7 +193,7 @@ public:
      */
     virtual int Listen(const char *ip,
                        uint16 port,
-                       LLBC_IProtocolFactory *protoFactory = NULL,
+                       LLBC_IProtocolFactory *protoFactory = nullptr,
                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
@@ -209,7 +209,7 @@ public:
     virtual int Connect(const char *ip,
                         uint16 port,
                         double timeout = -1.0,
-                        LLBC_IProtocolFactory *protoFactory = NULL,
+                        LLBC_IProtocolFactory *protoFactory = nullptr,
                         const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
@@ -225,7 +225,7 @@ public:
     virtual int AsyncConn(const char *ip,
                           uint16 port,
                           double timeout = -1.0,
-                          LLBC_IProtocolFactory *protoFactory = NULL,
+                          LLBC_IProtocolFactory *protoFactory = nullptr,
                           const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) = 0;
 
     /**
@@ -335,7 +335,6 @@ public:
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
@@ -349,7 +348,6 @@ public:
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
@@ -366,7 +364,7 @@ public:
      * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int RemoveSession(int sessionId, const char *reason = NULL) = 0;
+    virtual int RemoveSession(int sessionId, const char *reason = nullptr) = 0;
 
     /**
      * Control session protocol stack.
@@ -375,61 +373,35 @@ public:
      * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
-    /**
-     * Control session protocol stack.
-     * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlCmd           - the stack control type(user defined).
-     * @param[in] ctrlData          - the stack control data(user defined).
-     * @param[in] ctrlDataClearFunc - the stack control data clear delegate(will be call when scene ctrl info force delete).
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, void (*ctrlDataClearFunc)(int, int, const LLBC_Variant &));
-    /**
-     * Control session protocol stack.
-     * @param[in] sessionId         - the sessionId.
-     * @param[in] ctrlCmd           - the stack control type(user defined).
-     * @param[in] ctrlData          - the stack control data(user defined).
-     * @param[in] ctrlDataClearMeth - the stack control data clear delegate(will be call when scene ctrl info force delete).
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename ObjType>
-    int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, ObjType *obj, void (ObjType::*ctrlDataClearMeth)(int, int, const LLBC_Variant &));
-    /**
-     * Control session protocol stack.
-     * @param[in] sessionId          - the sessionId.
-     * @param[in] ctrlCmd            - the stack control command(user defined).
-     * @param[in] ctrlData           - the stack control data(user defined).
-     * @param[in] ctrlDataClearDeleg - the stack control data clear delegate(will be call when scene ctrl info force delete).
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int CtrlProtocolStack(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg) = 0;
+    virtual int CtrlProtocolStack(int sessionId,
+                                  int ctrlCmd,
+                                  const LLBC_Variant &ctrlData) = 0;
 
 public:
     /**
-     * Register facade.
+     * Register component.
      */
-    template <typename FacadeFactoryCls>
-    int RegisterFacade();
-    virtual int RegisterFacade(LLBC_IFacadeFactory *facadeFactory) = 0;
-    virtual int RegisterFacade(LLBC_IFacade *facade) = 0;
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName);
-    virtual int RegisterFacade(const LLBC_String &libPath, const LLBC_String &facadeName, LLBC_IFacade *&facade) = 0;
+    template <typename ComponentFactoryCls>
+    int RegisterComponent();
+    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory) = 0;
+    virtual int RegisterComponent(LLBC_IComponent *comp) = 0;
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp) = 0;
 
     /**
-     * Get facade/facades.
+     * Get component/components.
      */
-    template <typename FacadeCls>
-    FacadeCls *GetFacade();
-    template <typename FacadeCls>
-    FacadeCls *GetFacade(const char *facadeName);
-    template <typename FacadeCls>
-    FacadeCls *GetFacade(const LLBC_String &facadeName);
-    virtual LLBC_IFacade *GetFacade(const char *facadeName) = 0;
-    virtual LLBC_IFacade *GetFacade(const LLBC_String &facadeName) = 0;
-    template <typename FacadeCls>
-    std::vector<LLBC_IFacade *> GetFacades();
-    virtual const std::vector<LLBC_IFacade *> &GetFacades(const LLBC_String &facadeName) = 0;
+    template <typename ComponentCls>
+    ComponentCls *GetComponent();
+    template <typename ComponentCls>
+    ComponentCls *GetComponent(const char *compName);
+    template <typename ComponentCls>
+    ComponentCls *GetComponent(const LLBC_String &compName);
+    virtual LLBC_IComponent *GetComponent(const char *compName) = 0;
+    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName) = 0;
+    template <typename ComponentCls>
+    std::vector<LLBC_IComponent *> GetComponents();
+    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName) = 0;
 
 public:
     /**
@@ -458,10 +430,10 @@ public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
+    virtual int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) = 0;
 
     /**
-     * Previous subscribe message to specified handler method, if method return NULL, will stop packet process flow.
+     * Previous subscribe message to specified handler method, if method return false, will stop packet process flow.
      */
     int PreSubscribe(int opcode, bool (*func)(LLBC_Packet &));
     template <typename ObjType>
@@ -470,7 +442,7 @@ public:
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
+    virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
@@ -481,9 +453,9 @@ public:
     int UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &));
 
     /**
-     * Unify previous subscribe message to specified delegate, if method return NULL, will stop packet process flow.
+     * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(LLBC_IDelegate1<bool, LLBC_Packet &> *deleg) = 0;
+    virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
@@ -497,7 +469,7 @@ public:
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, LLBC_IDelegate1<void, LLBC_Packet &> *deleg) = 0;
+    virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) = 0;
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
@@ -511,14 +483,19 @@ public:
     /**
      * Subscribe event to specified handler method.
      */
-    LLBC_ListenerStub SubscribeEvent(int event, void(*func)(LLBC_Event *));
+    LLBC_ListenerStub SubscribeEvent(int event, void(*func)(LLBC_Event &));
     template <typename ObjType>
-    LLBC_ListenerStub SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event *));
+    LLBC_ListenerStub SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &));
 
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_IDelegate1<void, LLBC_Event *> *deleg) = 0;
+    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg) = 0;
+
+    /**
+     * Subscribe event to specified event listener.
+     */
+    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_EventListener *listener) = 0;
 
     /**
      * Unsubscribe event.
@@ -534,17 +511,13 @@ public:
 
     /**
      * Fire event(asynchronous operation).
-     * @param[in] ev                 - the fill fire event pointer.
-     * @param[in] addiCtor           - the additional constructor.
-     * @param[in] addiCtorBorrowed   - the additional cunstructor is borrowed or not.
-     * @param[in] customDtor         - the custom destructor.
-     * @param[in] customDtorBorrowed - the custom destructor is borrowed or not.
+     * @param[in] ev             - the fill fire event pointer.
+     * @param[in] enqueueHandler - the event enqueue handler.
+     * @param[in] dequeueHandler - the event dequeue handler.
      */
     virtual void FireEvent(LLBC_Event *ev,
-                           LLBC_IDelegate1<void, LLBC_Event *> *addiCtor = NULL,
-                           bool addiCtorBorrowed = false,
-                           LLBC_IDelegate1<void, LLBC_Event *> *customDtor = NULL,
-                           bool customDtorBorrowed = false) = 0;
+                           const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
+                           const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr) = 0;
 
     /**
      * Get event manager.
@@ -554,29 +527,29 @@ public:
 
 public:
     /**
-     * Post lazy task to service.
-     * @param[in] func - the task function.
-     * @param[in] data - the task data, can be null.
+     * Post runnable to service.
+     * @param[in] func - the runnable function.
+     * @param[in] data - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Post(void(*func)(This *, const LLBC_Variant *data), LLBC_Variant *data = NULL);
+    int Post(void(*func)(This *, const LLBC_Variant &data), const LLBC_Variant &data = LLBC_Variant::nil);
     /**
-     * Post lazy task to service.
-     * @param[in] obj    - the task object.
-     * @param[in] method - the task method.
-     * @param[in] data   - the task data, can be null.
+     * Post runnable to service.
+     * @param[in] obj    - the runnable object.
+     * @param[in] method - the runnable method.
+     * @param[in] data   - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant *data), LLBC_Variant *data = NULL);
+    int Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant &data), const LLBC_Variant &data = LLBC_Variant::nil);
 
     /**
-     * Post lazy task to service.
-     * @param[in] deleg - the task delegate.
-     * @param[in] data  - the task data, can be null.
+     * Post runnable to service.
+     * @param[in] runnable - the runnable obj.
+     * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(LLBC_IDelegate2<void, This *, const LLBC_Variant *> *deleg, LLBC_Variant *data = NULL) = 0;
+    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil) = 0;
 
     /**
      * Get service codec protocol stack, only full-stack option disabled available.
@@ -630,8 +603,8 @@ protected:
     /**
      * Stack create helper methods(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
-    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = NULL) = 0;
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr) = 0;
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr) = 0;
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
 
 protected:

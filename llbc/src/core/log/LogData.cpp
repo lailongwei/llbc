@@ -28,57 +28,62 @@
 
 __LLBC_NS_BEGIN
 LLBC_LogData::LLBC_LogData()
-: msg(NULL)
-, msgLen(0)
-, level(-1)
-, loggerName(NULL)
+: logger(nullptr)
+, loggerName(nullptr)
 
-, others(NULL)
-, othersSize(0)
+, msg(nullptr)
+, msgLen(0)
+, msgCap(0)
+
+, level(-1)
+, logTime(0)
+
+, others(nullptr)
+, othersCap(0)
+, fileBeg(0)
+, fileLen(0)
 , tagBeg(0)
 , tagLen(0)
 
- , logTime(0)
-
-, fileBeg(0)
-, fileLen(0)
 , line(0)
 
 , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
-, _poolInst(NULL)
+, _poolInst(nullptr)
 {
 }
 
 LLBC_LogData::~LLBC_LogData()
 {
-    LLBC_XFree(msg);
-    LLBC_XFree(others);
+    if (msg)
+        LLBC_Free(msg);
+    if (others)
+        LLBC_Free(others);
 }
 
 void LLBC_LogData::Clear()
 {
-    LLBC_XFree(msg);
+    logger = nullptr;
+    loggerName = nullptr;
+
     msgLen = 0;
 
     level = -1;
-    loggerName = NULL;
+    logTime = 0;
 
     tagBeg = 0;
     tagLen = 0; 
 
-    logTime = 0;
-
     fileBeg = 0;
     fileLen = 0;
+    tagBeg = 0;
+    tagLen = 0;
+    funcBeg = 0;
+    funcLen = 0;
+
     line = 0;
 
     threadId = LLBC_INVALID_NATIVE_THREAD_ID;
-}
-
-bool LLBC_LogData::IsPoolObject() const
-{
-    return _poolInst != NULL;
 }
 
 void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
@@ -86,12 +91,7 @@ void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
     _poolInst = &poolInst;
 }
 
-void LLBC_LogData::GiveBackToPool()
-{
-    _poolInst->Release(this);
-}
-
-LLBC_IObjectPoolInst * LLBC_LogData::GetPoolInst()
+LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()
 {
     return _poolInst;
 }

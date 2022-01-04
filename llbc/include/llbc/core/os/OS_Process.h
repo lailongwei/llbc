@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
  * Get current process Id.
  * @return int - the current process Id.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetCurrentProcessId();
+LLBC_EXPORT int LLBC_GetCurrentProcessId();
 
 __LLBC_NS_END
 

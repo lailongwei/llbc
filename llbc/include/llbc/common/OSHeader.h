@@ -95,13 +95,13 @@
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
-#include <math.h>
 #include <time.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif
 
 // C++ standard header files.
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -112,10 +112,12 @@
 #include <queue>
 #include <deque>
 #include <stack>
+#include <array>
 #include <map>
+#include <unordered_map>
 #include <set>
+#include <unordered_set>
 #include <algorithm>
-#include <functional>
 #include <limits.h>
 #include <functional>
 

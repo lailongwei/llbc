@@ -43,6 +43,10 @@ inline void LLBC_BaseLogAppender::SetAppenderNext(LLBC_ILogAppender *next)
     _next = next;
 }
 
+inline void LLBC_BaseLogAppender::Flush()
+{
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_LOG_BASE_LOG_APPENDER_H__

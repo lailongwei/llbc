@@ -117,21 +117,21 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     std::cout <<"core/thread/semaphore test: " <<std::endl;
 
     // Create test value structure.
-    __g_testVal = LLBC_New0(__LLBC_SemTestType);
+    __g_testVal = LLBC_New(__LLBC_SemTestType);
     __g_testVal->value = 0;
 
     // Create waiters.
     LLBC_NativeThreadHandle waiters[__g_waitersCount] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
     for(long i = 0; i < __g_waitersCount; ++i)
     {
-        void *threadArg = NULL;
+        void *threadArg = nullptr;
         ::memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
     }
 
     // Create signaler.
     LLBC_NativeThreadHandle signaler = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&signaler, &SignalerThreadProc, NULL);
+    LLBC_CreateThread(&signaler, &SignalerThreadProc, nullptr);
 
     // Join signaler.
     LLBC_JoinThread(signaler);

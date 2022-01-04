@@ -12,22 +12,22 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_ISTREAMWRAPPER_H_
-#define RAPIDJSON_ISTREAMWRAPPER_H_
+#ifndef LLBC_RAPIDJSON_ISTREAMWRAPPER_H_
+#define LLBC_RAPIDJSON_ISTREAMWRAPPER_H_
 
 #include "llbc/core/rapidjson/stream.h"
 #include <iosfwd>
 #include <ios>
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(padded)
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(padded)
 #elif defined(_MSC_VER)
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4351) // new behavior: elements of array 'array' will be default initialized
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(4351) // new behavior: elements of array 'array' will be default initialized
 #endif
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of \c std::basic_istream into RapidJSON's Stream concept.
 /*!
@@ -65,7 +65,7 @@ public:
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
     BasicIStreamWrapper(StreamType &stream, char* buffer, size_t bufferSize) : stream_(stream), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
-        RAPIDJSON_ASSERT(bufferSize >= 4);
+        LLBC_RAPIDJSON_ASSERT(bufferSize >= 4);
         Read();
     }
 
@@ -74,10 +74,10 @@ public:
     size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
 
     // Not implemented
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    void Put(Ch) { LLBC_RAPIDJSON_ASSERT(false); }
+    void Flush() { LLBC_RAPIDJSON_ASSERT(false); } 
+    Ch* PutBegin() { LLBC_RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { LLBC_RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.
     const Ch* Peek4() const {
@@ -120,9 +120,9 @@ typedef BasicIStreamWrapper<std::istream> IStreamWrapper;
 typedef BasicIStreamWrapper<std::wistream> WIStreamWrapper;
 
 #if defined(__clang__) || defined(_MSC_VER)
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_ISTREAMWRAPPER_H_
+#endif // LLBC_RAPIDJSON_ISTREAMWRAPPER_H_

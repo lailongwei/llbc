@@ -63,7 +63,7 @@ __LLBC_NS_BEGIN
  * @return int - return the total number of socket handles that are ready and contained in the fd_set structures, zero if
  *               timeout, if error occurs, return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval);
+LLBC_EXPORT int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval);
 
 __LLBC_NS_END
 

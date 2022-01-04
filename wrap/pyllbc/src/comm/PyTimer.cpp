@@ -40,7 +40,7 @@ namespace
                 pyllbc_SetError(errStr.format("timeout/cancel handler must callable, handler: %s", objDesc.c_str()));
             }
 
-            method = boundedObj = NULL;
+            method = boundedObj = nullptr;
             return LLBC_FAILED;
         }
         else if (PyMethod_Check(obj))
@@ -55,7 +55,7 @@ namespace
                         "could not pass unbound method object to timer, obj: %s", objDesc.c_str()));
                 }
 
-                method = NULL;
+                method = nullptr;
                 return LLBC_FAILED;
             }
 
@@ -64,18 +64,18 @@ namespace
         else
         {
             method = obj;
-            boundedObj = NULL;
+            boundedObj = nullptr;
         }
 
         methodDesc = pyllbc_ObjUtil::GetObjStr(method);
         if (boundedObj)
             boundedObjDesc = pyllbc_ObjUtil::GetObjStr(boundedObj);
 
-        PyObject *refMethod = PyWeakref_NewRef(method, NULL);
+        PyObject *refMethod = PyWeakref_NewRef(method, nullptr);
         if (UNLIKELY(!refMethod))
         {
             pyllbc_TransferPyError(couldNotCreateRefStr);
-            method = boundedObj = NULL;
+            method = boundedObj = nullptr;
 
             return LLBC_FAILED;
         }
@@ -83,13 +83,13 @@ namespace
         method = refMethod;
         if (boundedObj)
         {
-            PyObject *refBoundedObj = PyWeakref_NewRef(boundedObj, NULL);
+            PyObject *refBoundedObj = PyWeakref_NewRef(boundedObj, nullptr);
             if (UNLIKELY(!refBoundedObj))
             {
                 pyllbc_TransferPyError(couldNotCreateRefStr);
 
                 Py_DECREF(method);
-                method = boundedObj = NULL;
+                method = boundedObj = nullptr;
 
                 return LLBC_FAILED;
             }
@@ -128,7 +128,7 @@ namespace
                 return LLBC_FAILED;
         }
 
-        PyObject *rawBoundedObj = NULL;
+        PyObject *rawBoundedObj = nullptr;
         if (boundedObj)
         {
             if ((rawBoundedObj = PyWeakref_GET_OBJECT(boundedObj)) == Py_None) // Borrowed reference.
@@ -161,9 +161,9 @@ namespace
         PyObject *pyRtn;
         Py_INCREF(timer);
         if (rawBoundedObj)
-            pyRtn = PyObject_CallFunctionObjArgs(rawMethod, rawBoundedObj, timer, NULL);
+            pyRtn = PyObject_CallFunctionObjArgs(rawMethod, rawBoundedObj, timer, nullptr);
         else
-            pyRtn = PyObject_CallFunctionObjArgs(rawMethod, timer, NULL);
+            pyRtn = PyObject_CallFunctionObjArgs(rawMethod, timer, nullptr);
         Py_DECREF(timer);
 
         if (!pyRtn)
@@ -180,7 +180,7 @@ namespace
 }
 
 pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObject *cancelCallable)
-: Base(reinterpret_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL), NULL, NULL)
+: Base()
 , _pyTimer(pyTimer)
 , _ignoredDeadRef(false)
 {
@@ -203,8 +203,8 @@ pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObjec
     }
     else
     {
-        _cancelCallable = NULL;
-        _boundedCancelObj = NULL;
+        _cancelCallable = nullptr;
+        _boundedCancelObj = nullptr;
     }
 
 }
@@ -230,9 +230,9 @@ void pyllbc_Timer::SetIgnoredDeadRef(bool flag)
     _ignoredDeadRef = flag;
 }
 
-int pyllbc_Timer::Schedule(uint64 dueTime, uint64 period)
+int pyllbc_Timer::Schedule(sint64 dueTime, sint64 period)
 {
-    if (Base::Schedule(dueTime, period) != LLBC_OK)
+    if (Base::Schedule(LLBC_TimeSpan::FromMillis(dueTime), LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
     {
         const LLBC_String desc = ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, desc);

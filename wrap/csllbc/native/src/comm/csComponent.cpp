@@ -21,24 +21,19 @@
 
 #include "csllbc/common/Export.h"
 
-#include "csllbc/comm/csFacade.h"
+#include "csllbc/comm/csComponent.h"
 
-namespace
-{
-    typedef csllbc_Delegates _D;
-}
-
-csllbc_Facade::csllbc_Facade(_D::Deleg_Facade_OnInit initDeleg,
-                             _D::Deleg_Facade_OnDestroy destroyDeleg,
-                             _D::Deleg_Facade_OnStart startDeleg,
-                             _D::Deleg_Facade_OnStop stopDeleg,
-                             _D::Deleg_Facade_OnUpdate updateDeleg,
-                             _D::Deleg_Facade_OnIdle idleDeleg,
-                             _D::Deleg_Facade_OnSessionCreate sessionCreateDeleg,
-                             _D::Deleg_Facade_OnSessionDestroy sessionDestroyDeleg,
-                             _D::Deleg_Facade_OnAsyncConnResult asyncConnResultDeleg,
-                             _D::Deleg_Facade_OnProtoReport protoReportDeleg,
-                             _D::Deleg_Facade_OnUnHandledPacket unHandledPacketDeleg)
+csllbc_Component::csllbc_Component(_D::Deleg_Comp_OnInit initDeleg,
+                                   _D::Deleg_Comp_OnDestroy destroyDeleg,
+                                   _D::Deleg_Comp_OnStart startDeleg,
+                                   _D::Deleg_Comp_OnStop stopDeleg,
+                                   _D::Deleg_Comp_OnUpdate updateDeleg,
+                                   _D::Deleg_Comp_OnIdle idleDeleg,
+                                   _D::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                   _D::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                   _D::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                   _D::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                   _D::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
 {
     _initDeleg = initDeleg;
     _destroyDeleg = destroyDeleg;
@@ -56,39 +51,39 @@ csllbc_Facade::csllbc_Facade(_D::Deleg_Facade_OnInit initDeleg,
     _unHandledPacketDeleg = unHandledPacketDeleg;
 }
 
-bool csllbc_Facade::OnInitialize()
+bool csllbc_Component::OnInitialize()
 {
     (*_initDeleg)();
     return true;
 }
 
-void csllbc_Facade::OnDestroy()
+void csllbc_Component::OnDestroy()
 {
     (*_destroyDeleg)();
 }
 
-bool csllbc_Facade::OnStart()
+bool csllbc_Component::OnStart()
 {
     (*_startDeleg)();
     return true;
 }
 
-void csllbc_Facade::OnStop()
+void csllbc_Component::OnStop()
 {
     (*_stopDeleg)();
 }
 
-void csllbc_Facade::OnUpdate()
+void csllbc_Component::OnUpdate()
 {
     (*_updateDeleg)();
 }
 
-void csllbc_Facade::OnIdle(int idleTime)
+void csllbc_Component::OnIdle(int idleTime)
 {
     (*_idleDeleg)(idleTime);
 }
 
-void csllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+void csllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
     const LLBC_SockAddr_IN &localAddr = sessionInfo.GetLocalAddr();
     const LLBC_String localHost = localAddr.GetIpAsString();
@@ -108,7 +103,7 @@ void csllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
                            remoteAddr.GetPort());
 }
 
-void csllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+void csllbc_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
     const LLBC_SessionInfo &sessionInfo = destroyInfo.GetSessionInfo();
     const LLBC_SockAddr_IN &localAddr = sessionInfo.GetLocalAddr();
@@ -134,7 +129,7 @@ void csllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
                             destroyInfo.GetSubErrno());
 }
 
-void csllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+void csllbc_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
 {
     const LLBC_SockAddr_IN &remoteAddr = result.GetPeerAddr();
     const LLBC_String remoteHost = remoteAddr.GetIpAsString();
@@ -147,7 +142,7 @@ void csllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
                              remoteAddr.GetPort());
 }
 
-void csllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
+void csllbc_Component::OnProtoReport(const LLBC_ProtoReport &report)
 {
     (*_protoReportDeleg)(report.GetSessionId(),
                          report.GetLayer(),
@@ -156,7 +151,7 @@ void csllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
                          static_cast<int>(report.GetReport().length()));
 }
 
-void csllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
+void csllbc_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 {
     (*_unHandledPacketDeleg)(packet.GetSessionId(),
                              packet.GetOpcode(),

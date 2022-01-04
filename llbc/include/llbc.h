@@ -45,14 +45,14 @@ __LLBC_NS_BEGIN
  * @return int - return 0 if success, otherwise return -1, to get extended
  *               error information, call LLBC_GetLastError().
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_Startup(bool initWinSock = true);
+LLBC_EXPORT int LLBC_Startup(bool initWinSock = true);
 
 /**
  * LLBC library cleanup function, when your program will terminate,
  * must call this function to cleanup LLBC library.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_Cleanup();
+LLBC_EXPORT int LLBC_Cleanup();
 
 __LLBC_NS_END
 

@@ -50,7 +50,7 @@ public:
      * Create threads.
      * @param[in] threadNum       - thread number, must >= 1.
      * @param[in] proc            - thread routine.
-     * @param[in] arg             - thread routine argument, default is NULL.
+     * @param[in] arg             - thread routine argument, default is nullptr.
      * @param[in] flags           - thread flags, default is Joinable.
      * @param[in] priority        - thread priority, default is Normal.
      * @param[in] task            - task pointer.
@@ -61,19 +61,19 @@ public:
      */
     LLBC_Handle CreateThreads(int threadNum,
                               LLBC_ThreadProc proc,
-                              LLBC_ThreadArg arg = NULL,
+                              LLBC_ThreadArg arg = nullptr,
                               int flags = LLBC_ThreadFlag::Joinable,
                               int priority = LLBC_ThreadPriority::Normal,
-                              const int stackSize[] = NULL,
-                              LLBC_BaseTask *task = NULL,
+                              const int stackSize[] = nullptr,
+                              LLBC_BaseTask *task = nullptr,
                               LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                              LLBC_NativeThreadHandle nativeHandles[] = NULL,
-                              LLBC_Handle handles[] = NULL);
+                              LLBC_NativeThreadHandle nativeHandles[] = nullptr,
+                              LLBC_Handle handles[] = nullptr);
 
     /**
      * Create thread.
      * @param[in] proc          - thread routine.
-     * @param[in] arg           - thread argument, default is NULL.
+     * @param[in] arg           - thread argument, default is nullptr.
      * @param[in] flags         - thread flags, default is Joinable.
      * @param[in] priority      - thread priority, default is Normal.
      * @param[in] stackSize     - default stack size, default is DFT_SIZE.
@@ -83,14 +83,14 @@ public:
      * @return LLBC_Handle - return thread group handle if success, otherwise return LLBC_INVALID_HANDLE.
      */
     LLBC_Handle CreateThread(LLBC_ThreadProc proc,
-                             LLBC_ThreadArg arg = NULL,
+                             LLBC_ThreadArg arg = nullptr,
                              int flags = LLBC_ThreadFlag::Joinable,
                              int priority = LLBC_ThreadPriority::Normal,
                              int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE,
-                             LLBC_BaseTask *task = NULL,
+                             LLBC_BaseTask *task = nullptr,
                              LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                             LLBC_NativeThreadHandle *nativeHandle = NULL,
-                             LLBC_Handle *handle = NULL);
+                             LLBC_NativeThreadHandle *nativeHandle = nullptr,
+                             LLBC_Handle *handle = nullptr);
 
 public:
     /**
@@ -315,7 +315,7 @@ private:
     /**
      * Create thread(non lock).
      * @param[in] proc          - thread routine.
-     * @param[in] arg           - thread argument, default is NULL.
+     * @param[in] arg           - thread argument, default is nullptr.
      * @param[in] flags         - thread flags, default is Joinable.
      * @param[in] priority      - thread priority, default is Normal.
      * @param[in] stackSize     - default stack size, default is DFT_SIZE.
@@ -325,14 +325,14 @@ private:
      * @return LLBC_Handle - return thread group handle if success, otherwise return LLBC_INVALID_HANDLE.
      */
     LLBC_Handle CreateThread_NonLock(LLBC_ThreadProc proc,
-                                     LLBC_ThreadArg arg = NULL,
+                                     LLBC_ThreadArg arg = nullptr,
                                      int flags = LLBC_ThreadFlag::Joinable,
                                      int priority = LLBC_ThreadPriority::Normal,
                                      int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE,
-                                     LLBC_BaseTask *task = NULL,
+                                     LLBC_BaseTask *task = nullptr,
                                      LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                                     LLBC_NativeThreadHandle *nativeHandle = NULL,
-                                     LLBC_Handle *handle = NULL);
+                                     LLBC_NativeThreadHandle *nativeHandle = nullptr,
+                                     LLBC_Handle *handle = nullptr);
 
 private:
     /**

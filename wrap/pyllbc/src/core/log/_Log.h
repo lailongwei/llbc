@@ -25,13 +25,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
 {
     char *cfgFile;
     if (!PyArg_ParseTuple(args, "s", &cfgFile))
-        return NULL;
+        return nullptr;
 
     LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
     if (loggerMgr->Initialize(cfgFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -43,13 +43,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
 
     int line;
     char *msg;
-    PyObject *fileObj;
+    PyObject *fileNameObj;
+    PyObject *funcNameObj;
 
-    char *tag = NULL;
-    char *loggerName = NULL;
+    char *tag = nullptr;
+    char *loggerName = nullptr;
 
-    if (!PyArg_ParseTuple(args, "iOis|ss", &level, &fileObj, &line, &msg, &loggerName, &tag))
-        return NULL;
+    if (!PyArg_ParseTuple(args, "iOOis|ss", &level, &fileNameObj, &funcNameObj, &line, &msg, &loggerName, &tag))
+        return nullptr;
 
     LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
     LLBC_Logger *logger = (!loggerName || LLBC_StrCmp(loggerName, "root") == 0) ? 
@@ -57,46 +58,28 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
     if (!logger)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return NULL;
+        return nullptr;
     }
 
-    char *file = NULL;
-    if (PyObject_IsInstance(fileObj, PYLLBC_STR_CLS))
-        if (!PyArg_Parse(fileObj, "s", &file))
-            return NULL;
-
-    int rtn;
-    switch(level)
+    char *file = nullptr;
+    if (PyObject_IsInstance(fileNameObj, PYLLBC_STR_CLS))
     {
-    case LLBC_LogLevel::Debug:
-        rtn = logger->Debug(tag, file, line, "%s", msg);
-        break;
-
-    case LLBC_LogLevel::Info:
-        rtn = logger->Info(tag, file, line, "%s", msg);
-        break;
-
-    case LLBC_LogLevel::Warn:
-        rtn = logger->Warn(tag, file, line, "%s", msg);
-        break;
-
-    case LLBC_LogLevel::Error:
-        rtn = logger->Error(tag, file, line, "%s", msg);
-        break;
-
-    case LLBC_LogLevel::Fatal:
-        rtn = logger->Fatal(tag, file, line, "%s", msg);
-        break;
-
-    default:
-        pyllbc_SetError("Unknown log level");
-        return NULL;
+        if (!PyArg_Parse(fileNameObj, "s", &file))
+            return nullptr;
+    }
+    
+    char *func = nullptr;
+    if (PyObject_IsInstance(funcNameObj, PYLLBC_STR_CLS))
+    {
+        if (!PyArg_Parse(funcNameObj, "s", &func))
+            return nullptr;
     }
 
+    int rtn = logger->NonFormatOutput(level, tag, file, line, func, msg, -1);
     if (UNLIKELY(rtn != LLBC_OK))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;

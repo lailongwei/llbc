@@ -42,7 +42,7 @@ public class TestCase_Comm_Timer : ITestCase
 }
 
 [BindTo("TimerTestSvc")]
-class TimerTestFacade : IFacade
+class TimerTestComponent : IComponent
 {
     public override void OnStart()
     {

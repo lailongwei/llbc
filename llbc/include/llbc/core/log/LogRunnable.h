@@ -31,8 +31,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
-struct LLBC_LogData;
-class LLBC_ILogAppender;
+class LLBC_Logger;
 
 __LLBC_NS_END
 
@@ -44,8 +43,24 @@ __LLBC_NS_BEGIN
 class LLBC_LogRunnable : public LLBC_BaseTask
 {
 public:
+    /**
+     * Constructor/Destructor.
+     */
     LLBC_LogRunnable();
     virtual ~LLBC_LogRunnable();
+
+public:
+    /**
+     * Add logger to runnable.
+     * @param[in] logger - the logger.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddLogger(LLBC_Logger *logger);
+
+    /**
+     * Stop log runnable, it just send stop signal to task, must call Wait() to real stop runnable.
+     */
+    void Stop();
 
 public:
     /**
@@ -58,43 +73,24 @@ public:
      */
     virtual void Svc();
 
-public:
-    /**
-     * Set runnable flush interval.
-     */
-    void SetFlushInterval(sint64 flushInterval);
-
-public:
-    /**
-     * Add log appender.
-     * @param[in] appender - log appender.
-     */
-    void AddAppender(LLBC_ILogAppender *appender);
-
-    /**
-     * Output log data.
-     * @param[in] data - log data.
-     */
-    int Output(LLBC_LogData *data);
-
-    /**
-     * Stop log runnable, it just send stop signal to task, must call Wait() to real stop runnable.
-     */
-    void Stop();
-
 private:
     /**
-     * Flush appenders.
-     * @param[in] force - force flush or not, default is false.
+     * Try pop and process log data.
+     * @param[in] maxPopWaitTime - the max pop wait time, in milli-second.
+     * @return bool - return true if process success, otherwise return false.
      */
-    void FlushAppenders(bool force = false);
+    bool TryPopAndProcLogData(int maxPopWaitTime);
+
+    /**
+     * Flush all loggers.
+     * @param[in] force - force or not.
+     * @param[in] now   - now time, in milli-seconds. if is set to 0, will call LLBC_GetMilliSeconds() to fetch now time.
+     */
+    void FlushLoggers(bool force, sint64 now);
 
 private:
     volatile bool _stoped;
-    LLBC_ILogAppender *_head;
-
-    sint64 _lastFlushTime;
-    sint64 _flushInterval;
+    std::vector<LLBC_Logger *> _loggers;
 };
 
 __LLBC_NS_END

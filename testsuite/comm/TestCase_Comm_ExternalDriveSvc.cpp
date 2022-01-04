@@ -27,18 +27,18 @@ namespace
 
 const int OPCODE = 0;
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
-    TestFacade()
+    TestComp()
     : _recvTimes(0)
     {
-        LLBC_PrintLine(">>> Facade ctor called!");
+        LLBC_PrintLine(">>> Comp ctor called!");
     }
 
-    virtual ~TestFacade()
+    virtual ~TestComp()
     {
-        LLBC_PrintLine(">>> Facade dtor called!");
+        LLBC_PrintLine(">>> Comp dtor called!");
     }
 
 public:
@@ -86,7 +86,7 @@ public:
 
         if (++_recvTimes == 100)
         {
-            LLBC_PrintLine("Facade received %d times, stop this service", _recvTimes);
+            LLBC_PrintLine("Comp received %d times, stop this service", _recvTimes);
 
             LLBC_PrintLine("Print any key to stop...");
             getchar();
@@ -134,10 +134,10 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     const char *ip = argv[1];
     const uint16 port = LLBC_Str2Int32(argv[2]);
 
-    // Create facade and register it.
-    TestFacade *facade = LLBC_New(TestFacade);
-    _svc->RegisterFacade(facade);
-    _svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);
+    // Create comp and register it.
+    TestComp *comp = LLBC_New(TestComp);
+    _svc->RegisterComponent(comp);
+    _svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
 
     // Set drive mode and start it.
     _svc->SetDriveMode(LLBC_IService::ExternalDrive);

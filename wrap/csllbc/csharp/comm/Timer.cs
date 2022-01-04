@@ -122,7 +122,7 @@ namespace llbc
         public void Schedule(double dueTime, double period = 0.0)
         {
             int ret = LLBCNative.csllbc_Timer_Schedule(
-                _nativeTimer, (ulong)(dueTime * 1000), (ulong)(period * 1000));
+                _nativeTimer, (long)(dueTime * 1000), (long)(period * 1000));
             if (ret != LLBCNative.LLBC_OK)
                 throw ExceptionUtil.CreateExceptionFromCoreLib();
         }

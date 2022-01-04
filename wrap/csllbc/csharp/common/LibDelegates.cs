@@ -31,66 +31,89 @@ namespace llbc
     {
         /////////////////////////////////////////////////////////////////////////////////////
         //
-        // All facade delegates define.
+        // All component delegates define.
         //
-        public delegate void Deleg_Facade_OnInit();
-        public delegate void Deleg_Facade_OnDestroy();
-        public delegate void Deleg_Facade_OnStart();
-        public delegate void Deleg_Facade_OnStop();
+        public delegate void Deleg_Comp_OnInit();
+        public delegate void Deleg_Comp_OnDestroy();
+        public delegate void Deleg_Comp_OnStart();
+        public delegate void Deleg_Comp_OnStop();
 
-        public delegate void Deleg_Facade_OnUpdate();
-        public delegate void Deleg_Facade_OnIdle(int idleTime);
+        public delegate void Deleg_Comp_OnUpdate();
+        public delegate void Deleg_Comp_OnIdle(int idleTime);
 
-        public delegate void Deleg_Facade_OnSessionCreate(bool isListen,
-                                                          int sessionId,
-                                                          int acceptSessionId,
-                                                          int socketHandle,
-                                                          IntPtr localHost,
-                                                          int localHostLen,
-                                                          int localPort,
+        public delegate void Deleg_Comp_OnSessionCreate(bool isListen,
+                                                        int sessionId,
+                                                        int acceptSessionId,
+                                                        int socketHandle,
+                                                        IntPtr localHost,
+                                                        int localHostLen,
+                                                        int localPort,
+                                                        IntPtr remoteHost,
+                                                        int remoteHostLen,
+                                                        int remotePort);
+        public delegate void Deleg_Comp_OnSessionDestroy(bool isListen,
+                                                         int sessionId,
+                                                         int acceptSessionId,
+                                                         int socketHandle,
+                                                         IntPtr localHost,
+                                                         int localHostLen,
+                                                         int localPort,
+                                                         IntPtr remoteHost,
+                                                         int remoteHostLen,
+                                                         int remotePort,
+                                                         bool fromSvc,
+                                                         IntPtr reason,
+                                                         int reasonLen,
+                                                         int errNo,
+                                                         int subErrNo);
+        public delegate void Deleg_Comp_OnAsyncConnResult(bool connected,
+                                                          IntPtr reason,
+                                                          int reasonLen,
                                                           IntPtr remoteHost,
                                                           int remoteHostLen,
                                                           int remotePort);
-        public delegate void Deleg_Facade_OnSessionDestroy(bool isListen,
-                                                           int sessionId,
-                                                           int acceptSessionId,
-                                                           int socketHandle,
-                                                           IntPtr localHost,
-                                                           int localHostLen,
-                                                           int localPort,
-                                                           IntPtr remoteHost,
-                                                           int remoteHostLen,
-                                                           int remotePort,
-                                                           bool fromSvc,
-                                                           IntPtr reason,
-                                                           int reasonLen,
-                                                           int errNo,
-                                                           int subErrNo);
-        public delegate void Deleg_Facade_OnAsyncConnResult(bool connected,
-                                                            IntPtr reason,
-                                                            int reasonLen,
-                                                            IntPtr remoteHost,
-                                                            int remoteHostLen,
-                                                            int remotePort);
 
-        public delegate void Deleg_Facade_OnProtoReport(int sessionId,
-                                                        int layer,
-                                                        int level,
-                                                        IntPtr report,
-                                                        int reportLen);
-        public delegate void Deleg_Facade_OnUnHandledPacket(int sessionId, int opcode, IntPtr data, int dataLen, int status);
+        public delegate void Deleg_Comp_OnProtoReport(int sessionId,
+                                                      int layer,
+                                                      int level,
+                                                      IntPtr report,
+                                                      int reportLen);
+        public delegate void Deleg_Comp_OnUnHandledPacket(int sessionId,
+                                                          int opcode,
+                                                          IntPtr data,
+                                                          int dataLen,
+                                                          int status);
         /////////////////////////////////////////////////////////////////////////////////////
 
         /////////////////////////////////////////////////////////////////////////////////////
         //
         // Service about delegates.
         //
-        public delegate IntPtr Deleg_Service_EncodePacket(int sessionId, long packetId, IntPtr encodedSucceed, IntPtr encodedLength, IntPtr errMsgLength);
-        public delegate IntPtr Deleg_Service_DecodePacket(int sessionId, int opcode, IntPtr data, int dataLen, int status, IntPtr errMsgLength);
-        public delegate void Deleg_Service_PacketHandler(int sessionId, int opcode, IntPtr data);
-        public delegate int Deleg_Service_PacketPreHandler(int sessionId, int opcode, IntPtr data);
-        public delegate int Deleg_Service_PacketUnifyPreHandler(int sessionId, int opcode, IntPtr data);
-        public delegate void Deleg_Service_NativeCouldNotFoundDecoderReport(int sessionId, int opcode, IntPtr data, int dataLen, int status);
+        public delegate IntPtr Deleg_Service_EncodePacket(int sessionId,
+                                                          long packetId,
+                                                          IntPtr encodedSucceed,
+                                                          IntPtr encodedLength,
+                                                          IntPtr errMsgLength);
+        public delegate IntPtr Deleg_Service_DecodePacket(int sessionId,
+                                                          int opcode,
+                                                          IntPtr data,
+                                                          int dataLen,
+                                                          int status,
+                                                          IntPtr errMsgLength);
+        public delegate void Deleg_Service_PacketHandler(int sessionId,
+                                                         int opcode,
+                                                         IntPtr data);
+        public delegate int Deleg_Service_PacketPreHandler(int sessionId,
+                                                           int opcode,
+                                                           IntPtr data);
+        public delegate int Deleg_Service_PacketUnifyPreHandler(int sessionId,
+                                                                int opcode,
+                                                                IntPtr data);
+        public delegate void Deleg_Service_NativeCouldNotFoundDecoderReport(int sessionId,
+                                                                            int opcode,
+                                                                            IntPtr data,
+                                                                            int dataLen,
+                                                                            int status);
         /////////////////////////////////////////////////////////////////////////////////////
 
         /////////////////////////////////////////////////////////////////////////////////////

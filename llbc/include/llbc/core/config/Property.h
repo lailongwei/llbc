@@ -54,7 +54,7 @@ public:
 	 * Constructor / Destructor.
 	 */
     LLBC_Property(const This &another);
-	explicit LLBC_Property(LLBC_Property *parent = NULL);
+	explicit LLBC_Property(LLBC_Property *parent = nullptr);
 
 	virtual ~LLBC_Property();
 

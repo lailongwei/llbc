@@ -16,20 +16,20 @@
 // Loitsch, Florian. "Printing floating-point numbers quickly and accurately with
 // integers." ACM Sigplan Notices 45.6 (2010): 233-243.
 
-#ifndef RAPIDJSON_DTOA_
-#define RAPIDJSON_DTOA_
+#ifndef LLBC_RAPIDJSON_DTOA_
+#define LLBC_RAPIDJSON_DTOA_
 
 #include "llbc/core/rapidjson/internal/itoa.h" // GetDigitsLut()
 #include "llbc/core/rapidjson/internal/diyfp.h"
 #include "llbc/core/rapidjson/internal/ieee754.h"
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++)
-RAPIDJSON_DIAG_OFF(array-bounds) // some gcc versions generate wrong warnings https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59124
+LLBC_RAPIDJSON_DIAG_PUSH
+LLBC_RAPIDJSON_DIAG_OFF(effc++)
+LLBC_RAPIDJSON_DIAG_OFF(array-bounds) // some gcc versions generate wrong warnings https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59124
 #endif
 
 inline void GrisuRound(char* buffer, int len, uint64_t delta, uint64_t rest, uint64_t ten_kappa, uint64_t wp_w) {
@@ -214,7 +214,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
 }
 
 inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
-    RAPIDJSON_ASSERT(maxDecimalPlaces >= 1);
+    LLBC_RAPIDJSON_ASSERT(maxDecimalPlaces >= 1);
     Double d(value);
     if (d.IsZero()) {
         if (d.Sign())
@@ -236,10 +236,10 @@ inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
 }
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_POP
+LLBC_RAPIDJSON_DIAG_POP
 #endif
 
 } // namespace internal
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_DTOA_
+#endif // LLBC_RAPIDJSON_DTOA_

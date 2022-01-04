@@ -93,7 +93,7 @@ sint64 LLBC_IntervalSampler::GetSpeedInSecs(int secs) const
         return 0;
     }
 
-    int nowTime = static_cast<int>(time(NULL));
+    int nowTime = static_cast<int>(time(nullptr));
     int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {
@@ -128,7 +128,7 @@ sint64 LLBC_IntervalSampler::GetSpeedInMins(int mins) const
         return 0;
     }
 
-    int nowTime = static_cast<int>(time(NULL));
+    int nowTime = static_cast<int>(time(nullptr));
     int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {
@@ -170,7 +170,7 @@ sint64 LLBC_IntervalSampler::GetSpeedInHours(int hours) const
         return 0;
     }
 
-    int nowTime = static_cast<int>(time(NULL));
+    int nowTime = static_cast<int>(time(nullptr));
     int firstSamplingTime = static_cast<int>(GetFirstSamplingTime());
     if(nowTime <= firstSamplingTime)
     {

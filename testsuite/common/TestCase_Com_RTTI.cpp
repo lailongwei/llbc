@@ -66,10 +66,10 @@ int TestCase_Com_RTTI::Run(int argc, char *argv[])
 
     LLBC_PrintLine("\nPoint type test:");
     LLBC_PrintLine("  LLBC_GetTypeName((int *)): %s", LLBC_GetTypeName(int*));
-    LLBC_PrintLine("  LLBC_GetTypeName((int *)NULL): %s", LLBC_GetTypeName((int*)NULL));
+    LLBC_PrintLine("  LLBC_GetTypeName((int *)nullptr): %s", LLBC_GetTypeName((int*)nullptr));
     LLBC_PrintLine("  LLBC_GetTypeName(int **): %s", LLBC_GetTypeName(int**));
-    LLBC_PrintLine("  LLBC_GetTypeName((int **)NULL): %s", LLBC_GetTypeName((int**)NULL));
-    LLBC_PrintLine("  LLBC_GetTypeName((int ***)NULL): %s", LLBC_GetTypeName((int***)NULL));
+    LLBC_PrintLine("  LLBC_GetTypeName((int **)nullptr): %s", LLBC_GetTypeName((int**)nullptr));
+    LLBC_PrintLine("  LLBC_GetTypeName((int ***)nullptr): %s", LLBC_GetTypeName((int***)nullptr));
 
     LLBC_PrintLine("\nUser defined classes/structs test:");
     LLBC_PrintLine("  LLBC_GetTypeName(UserDefineStruct): %s", LLBC_GetTypeName(UserDefineStruct));

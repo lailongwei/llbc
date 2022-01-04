@@ -25,7 +25,7 @@
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
 
-class pyllbc_Facade;
+class pyllbc_Component;
 class pyllbc_PacketHandler;
 class pyllbc_ErrorHooker;
 class pyllbc_FrameCallable;
@@ -138,9 +138,9 @@ public:
 
 public:
     /**
-     * Register facade.
-     * @param[in] facade - the facade instance(normal, not steal reference).
-     *      facade methods(all methods are optional):
+     * Register comp.
+     * @param[in] comp - the comp instance(normal, not steal reference).
+     *      comp methods(all methods are optional):
      *          oninitialize(self, ev): service initialize handler.
      *              ev.svc: service object.
      *          ondestroy(self, ev): service destroy handler.
@@ -187,17 +187,17 @@ public:
      *              ev.opcode: packet opcode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterFacade(PyObject *facade);
+    int RegisterComponent(PyObject *comp);
 
     /**
-     * Register facade from library.
-     * @param[in] facadeName - the facade name.
-     * @param[in] libPath    - the library path.
-     * @param[in] facadeCls  - the python layer facade class, can be NULL.
-     * @param[out] facade    - the created facade(new reference).
+     * Register comp from library.
+     * @param[in] compName - the comp name.
+     * @param[in] libPath  - the library path.
+     * @param[in] compCls  - the python layer comp class, can be nullptr.
+     * @param[out] comp    - the created comp(new reference).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *facadeCls, PyObject *&facade);
+    int RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
 
     /**
      * Register codec(only available in CODEC_BINARY).
@@ -237,6 +237,13 @@ public:
     int AsyncConn(const char *ip, uint16 port);
 
     /**
+     * Check given sessionId is validate or not.
+     * @param[in] sessionId - the given session Id.
+     * @return bool - return true is given session Id validate, otherwise return false.
+     */
+    bool IsSessionValidate(int sessionId);
+
+    /**
      * Remove session.
      * Note:
      *      In llbc core library, RemoveSession() method return int value 
@@ -246,7 +253,7 @@ public:
      * @param[in] reason    - the remove reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveSession(int sessionId, const char *reason = NULL);
+    int RemoveSession(int sessionId, const char *reason = nullptr);
 
 public:
     /**
@@ -400,20 +407,20 @@ private:
      * The additional event constructor.
      * @param[in] ev - the event object.
      */
-    static void AddiEventCtor(LLBC_Event *ev);
+    static void EventEnqueueHandler(LLBC_Event *ev);
 
     /**
      * The custom event destructor.
      * @param;[in] - the event object.
      */
-    static void CustomEventDtor(LLBC_Event *ev);
+    static void EventDequeueHandler(LLBC_Event *ev);
 
 private:
     /**
-     * Friend class: pyllbc_Facade.
+     * Friend class: pyllbc_Component.
      * Access all methods and data members.
      */
-    friend class pyllbc_Facade;
+    friend class pyllbc_Component;
 
 private:
     LLBC_IService *_llbcSvc;
@@ -424,9 +431,9 @@ private:
 
     bool _inMainloop;
 
-    pyllbc_Facade *_cppFacade;
-    typedef std::vector<PyObject *> _Facades;
-    _Facades _facades;
+    pyllbc_Component *_cppComp;
+    typedef std::vector<PyObject *> _Comps;
+    _Comps _comps;
 
     typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
     _PacketHandlers _handlers;
@@ -441,8 +448,8 @@ private:
     bool _suppressedCoderNotFoundWarning;
 
     static PyObject *_pyEvCls;
-    static LLBC_Func1<void, LLBC_Event *> _addiEvCtor;
-    static LLBC_Func1<void, LLBC_Event *> _customEvDtor;
+    static LLBC_Delegate<void(LLBC_Event *)> _evEnqueueHandler;
+    static LLBC_Delegate<void(LLBC_Event *)> _evDequeueHandler;
 
     _FrameCallables _beforeFrameCallables;
     _FrameCallables _afterFrameCallables;

@@ -75,7 +75,7 @@ public:
 
     /**
      * Clone method, use to prevent call.
-     * @return LLBC_Object * - the cloned object, always return NULL, 
+     * @return LLBC_Object * - the cloned object, always return nullptr, 
      *                         and set last error to permission denied error.
      */
     virtual LLBC_Object *Clone() const;
@@ -109,5 +109,7 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/objbase/AutoReleasePoolImpl.h"
 
 #endif // !__LLBC_OBJBASE_AUTO_RELEASE_POOL_H__

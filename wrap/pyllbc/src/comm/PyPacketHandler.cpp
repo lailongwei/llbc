@@ -25,7 +25,7 @@
 
 pyllbc_PacketHandler::pyllbc_PacketHandler(int opcode)
 : _opcode(opcode)
-, _handler(NULL)
+, _handler(nullptr)
 , _callArgs(PyTuple_New(1))
 {
 }
@@ -65,8 +65,8 @@ PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)
     PyTuple_SetItem(_callArgs, 0, packet);
 
     // Call.
-    PyObject *rtn = PyObject_Call(_handler, _callArgs, NULL);
-    if (UNLIKELY(rtn == NULL))
+    PyObject *rtn = PyObject_Call(_handler, _callArgs, nullptr);
+    if (UNLIKELY(rtn == nullptr))
     {
         Py_INCREF(Py_None);
         PyTuple_SetItem(_callArgs, 0, Py_None);
@@ -82,7 +82,7 @@ PyObject *pyllbc_PacketHandler::Handle(PyObject *packet)
             pyllbc_TransferPyError(additionalMsg);
         }
 
-        return NULL;
+        return nullptr;
     }
 
     // Release packet from call args.

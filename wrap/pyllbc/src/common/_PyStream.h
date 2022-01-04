@@ -29,13 +29,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewPyStream(PyObject *self, PyObject *args)
     PyObject *pyStream;
     int endian = LLBC_MachineEndian;
     if (!PyArg_ParseTuple(args, "O|ii", &pyStream, &initSize, &endian))
-        return NULL;
+        return nullptr;
 
-    pyllbc_Stream *stream = LLBC_New2(pyllbc_Stream, pyStream, initSize);
+    pyllbc_Stream *stream = LLBC_New(pyllbc_Stream, pyStream, initSize);
     if (UNLIKELY(stream->SetEndian(endian) != LLBC_OK))
     {
         LLBC_Delete(stream);
-        return NULL;
+        return nullptr;
     }
 
     return Py_BuildValue("l", stream);
@@ -45,7 +45,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelPyStream(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     LLBC_Delete(stream);
 
@@ -56,7 +56,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetPyStreamEndian(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("i", stream->GetEndian());
 };
@@ -66,10 +66,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamEndian(PyObject *self, PyObject *args
     pyllbc_Stream *stream;
     int endian;
     if (!PyArg_ParseTuple(args, "li", &stream, &endian))
-        return NULL;
+        return nullptr;
 
     if (stream->SetEndian(endian) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }
@@ -78,7 +78,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetPyStreamPos(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("I", stream->GetPos());
 }
@@ -88,10 +88,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamPos(PyObject *self, PyObject *args)
     uint32 pos;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lI", &stream, &pos))
-        return NULL;
+        return nullptr;
     
     if (stream->SetPos(pos) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }
@@ -100,7 +100,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetPyStreamSize(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("I", stream->GetSize());
 }
@@ -110,10 +110,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamSize(PyObject *self, PyObject *args)
     uint32 newSize;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lI", &stream, &newSize))
-        return NULL;
+        return nullptr;
 
     if (stream->SetSize(newSize) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }
@@ -124,10 +124,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamFmtRead(PyObject *self, PyObject *args)
     pyllbc_Stream *stream;
     PyObject *callerEnv;
     if (!PyArg_ParseTuple(args, "lsO", &stream, &fmt, &callerEnv))
-        return NULL;
+        return nullptr;
 
     if (pyllbc_TypeDetector::IsNone(callerEnv))
-        callerEnv = NULL;
+        callerEnv = nullptr;
 
     return stream->FmtRead(fmt, callerEnv);
 }
@@ -137,7 +137,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead(PyObject *self, PyObject *args)
     PyObject *cls;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &cls))
-        return NULL;
+        return nullptr;
 
     return stream->Read(cls);
 }
@@ -146,7 +146,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_None(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadNone();
 }
@@ -155,7 +155,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Byte(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadByte();
 }
@@ -164,7 +164,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Bool(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadBool();
 }
@@ -173,7 +173,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Int16(PyObject *self, PyObject *arg
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadInt16();
 }
@@ -182,7 +182,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Int32(PyObject *self, PyObject *arg
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadInt32();
 }
@@ -191,7 +191,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Int64(PyObject *self ,PyObject *arg
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadInt64();
 }
@@ -200,7 +200,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Float(PyObject *self, PyObject *arg
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadFloat();
 }
@@ -209,7 +209,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Double(PyObject *self, PyObject *ar
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadDouble();
 }
@@ -218,7 +218,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_PyInt(PyObject *self, PyObject *arg
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadPyInt();
 }
@@ -227,7 +227,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_PyLong(PyObject *self, PyObject *ar
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadPyLong();
 }
@@ -236,7 +236,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadStr();
 }
@@ -245,7 +245,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str2(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadStr2();
 }
@@ -254,7 +254,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str3(PyObject *self, PyObject *args
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadStr3();
 }
@@ -263,7 +263,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Unicode(PyObject *self, PyObject *a
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadUnicode();
 }
@@ -272,7 +272,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_ByteArray(PyObject *self, PyObject 
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadByteArray();
 }
@@ -281,7 +281,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Buffer(PyObject *self, PyObject *ar
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->ReadBuffer();
 }
@@ -291,7 +291,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
     pyllbc_Stream *willReadStream;
     int begin = 0, end = -1;
     if (!PyArg_ParseTuple(args, "l|ii", &willReadStream, &begin, &end))
-        return NULL;
+        return nullptr;
 
     LLBC_Stream &llbcWillRead = willReadStream->GetLLBCStream();
 
@@ -314,14 +314,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
     Py_DECREF(callArgs);
 
     if (UNLIKELY(!pyStream))
-        return NULL;
+        return nullptr;
 
     // Get stream's cobj as pyllbc_Stream.
     PyObject *pyCObj = PyObject_GetAttrString(pyStream, "cobj"); // New reference.
     if (UNLIKELY(!pyCObj))
     {
         Py_DECREF(pyStream);
-        return NULL;
+        return nullptr;
     }
 
     pyllbc_Stream *stream;
@@ -330,7 +330,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
         Py_DECREF(pyStream);
         Py_DECREF(pyCObj);
         
-        return NULL;
+        return nullptr;
     }
 
     Py_DECREF(pyCObj);
@@ -350,14 +350,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamFmtWrite(PyObject *self, PyObject *args)
     pyllbc_Stream *stream;
     PyObject *callerEnv;
     if (!PyArg_ParseTuple(args, "lsOO", &stream, &fmt, &values, &callerEnv))
-        return NULL;
+        return nullptr;
 
     if (pyllbc_TypeDetector::IsNone(callerEnv))
-        callerEnv = NULL;
+        callerEnv = nullptr;
 
 
     if (stream->FmtWrite(fmt, values, callerEnv) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -367,10 +367,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite(PyObject *self, PyObject *args)
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->Write(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -380,10 +380,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_None(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteNone(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -393,10 +393,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Byte(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteByte(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -406,10 +406,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Bool(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteBool(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -419,10 +419,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Int16(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteInt16(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -432,10 +432,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Int32(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteInt32(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -445,10 +445,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Int64(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteInt64(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -458,10 +458,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Float(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteFloat(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -471,10 +471,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Double(PyObject *self, PyObject *a
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteDouble(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -484,10 +484,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_PyInt(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WritePyInt(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -497,10 +497,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_PyLong(PyObject *self, PyObject *a
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WritePyLong(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -510,10 +510,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str(PyObject *self, PyObject *args
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteStr(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -523,10 +523,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str2(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteStr2(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -536,10 +536,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str3(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteStr3(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -549,10 +549,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Unicode(PyObject *self, PyObject *
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteUnicode(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -562,10 +562,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_ByteArray(PyObject *self, PyObject
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteByteArray(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -575,10 +575,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Buffer(PyObject *self, PyObject *a
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteBuffer(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -588,10 +588,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Tuple(PyObject *self, PyObject *ar
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteTuple(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -601,10 +601,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_List(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteList(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -614,10 +614,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Sequence(PyObject *self, PyObject 
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteSequence(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -627,10 +627,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Dict(PyObject *self, PyObject *arg
     PyObject *obj;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return NULL;
+        return nullptr;
 
     if (stream->WriteDict(obj) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     return stream->GetPyObj();
 }
@@ -641,7 +641,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Stream(PyObject *self, PyObject *a
     pyllbc_Stream *willWrite;
     int beginPos = 0, endPos = -1;
     if (!PyArg_ParseTuple(args, "ll|ii", &stream, &willWrite, &beginPos, &endPos))
-        return NULL;
+        return nullptr;
 
     beginPos = MIN(MAX(0, beginPos), static_cast<int>(willWrite->GetSize()));
 
@@ -665,7 +665,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamGetRaw(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
-        return NULL;
+        return nullptr;
 
     return stream->GetRaw();
 }
@@ -675,10 +675,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamSetRaw(PyObject *self, PyObject *args)
     PyObject *raw;
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "lO", &stream, &raw))
-        return NULL;
+        return nullptr;
 
     if (stream->SetRaw(raw) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }
@@ -687,7 +687,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamEncodeSelf(PyObject *self, PyObject *arg
 {
     pyllbc_Stream *pyStream1, *pyStream2;
     if (!PyArg_ParseTuple(args, "ll", &pyStream1, &pyStream2))
-        return NULL;
+        return nullptr;
 
     LLBC_Stream &s1 = pyStream1->GetLLBCStream();
     LLBC_Stream &s2 = pyStream2->GetLLBCStream();
@@ -711,7 +711,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamIsExprCompiled(PyObject *self, PyObject 
 {
     char *expr;
     if (!PyArg_ParseTuple(args, "s", &expr))
-        return NULL;
+        return nullptr;
 
     if (pyllbc_s_PackLemmaCompiler->IsExprCompiled(expr))
         Py_RETURN_TRUE;
@@ -733,11 +733,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamSetCacheLimit(PyObject *self, PyObject *
 {
     LLBC_NS ulong cacheLimit;
     if (!PyArg_ParseTuple(args, "k", &cacheLimit))
-        return NULL;
+        return nullptr;
 
     pyllbc_PackLemmaCompiler *compiler = pyllbc_s_PackLemmaCompiler;
     if (compiler->SetCacheLimit(cacheLimit) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }
@@ -746,7 +746,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamDiscardExpr(PyObject *self, PyObject *ar
 {
     char *expr;
     if (!PyArg_ParseTuple(args, "s", &expr))
-        return NULL;
+        return nullptr;
 
     pyllbc_s_PackLemmaCompiler->DiscardCache(expr);
 

@@ -19,13 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PY_FACADE_EV_BUILDER_H__
-#define __PYLLBC_COMM_PY_FACADE_EV_BUILDER_H__
+#ifndef __PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__
+#define __PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
 
-class LLBC_HIDDEN pyllbc_FacadeEvBuilder
+class LLBC_HIDDEN pyllbc_ComponentEvBuilder
 {
 public:
     /**
@@ -149,4 +149,4 @@ private:
     static PyObject *_attrSubErrNo;
 };
 
-#endif // !__PYLLBC_COMM_PY_FACADE_EV_BUILDER_H__
+#endif // !__PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__

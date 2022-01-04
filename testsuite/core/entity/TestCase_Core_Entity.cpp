@@ -44,9 +44,9 @@ int TestCase_Core_Entity::Run(int argc, char *argv[])
     entity.AddProperty("sint64Prop", LLBC_Variant((sint64)-64));
     entity.AddProperty("uint64Prop", LLBC_Variant((uint64)64));
 
-    entity.AddBehavior(1, LLBC_New0(int), "behavior1");
-    entity.AddBehavior(2, LLBC_New0(uint64), "behavior2");
-    entity.AddBehavior(3, LLBC_New0(LLBC_String), "behavior3");
+    entity.AddBehavior(1, LLBC_New(int), "behavior1");
+    entity.AddBehavior(2, LLBC_New(uint64), "behavior2");
+    entity.AddBehavior(3, LLBC_New(LLBC_String), "behavior3");
 
     std::cout <<entity.GetProperty("sint8Prop") <<std::endl;
     std::cout <<entity.GetProperty("uint8Prop") <<std::endl;

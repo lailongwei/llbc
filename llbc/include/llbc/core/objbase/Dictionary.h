@@ -53,7 +53,7 @@ public:
 
 public:
     LLBC_Dictionary_Const_Iterator_Base()
-    : _elem(NULL)
+    : _elem(nullptr)
     {   // construct with null pointer.
     }
 

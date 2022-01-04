@@ -107,7 +107,7 @@
 // Force inline macro define.
 #if defined(_MSC_VER)
  #define LLBC_FORCE_INLINE __forceinline
-#elif defined(__GUNC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__)
  #define LLBC_FORCE_INLINE __inline__ __attribute__((always_inline))
 #else
  #define LLBC_FORCE_INLINE inline
@@ -186,6 +186,14 @@
 #define ASSERT(x) assert(x)
 #endif
 
+// Symbol concat macro define.
+#define LLBC_Concat(x, y)  LLBC_IConcat(x, y)
+#define LLBC_IConcat(x, y) x##y
+
+// String concat macro define.
+#define LLBC_ConcatStr(x, y)  LLBC_IConcatStr(x, y)
+#define LLBC_IConcatStr(x, y) #x#y
+
 // Define register keyword to empty n c++11(in c++11 standard, register is deprecated)
 #ifdef LLBC_CPP11
 #define register
@@ -194,8 +202,8 @@
 // Disable assignments of objects.
 #define LLBC_DISABLE_ASSIGNMENT(name)               \
 private:                                            \
-    name(const name &);                             \
-    name &operator =(const name &)                  \
+    name(const name &) = delete;                    \
+    name &operator =(const name &) = delete         \
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX
@@ -237,6 +245,8 @@ private:                                            \
  #define LLBC_NO_EXCEPT
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+// Defer macro define.
+
 /* Memory operations macros. */
 // allocate/reallocate/free.
 #define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(::malloc(size)))
@@ -247,29 +257,19 @@ private:                                            \
     do {                            \
         if (LIKELY(memblock)) {     \
             LLBC_Free(memblock);    \
-            (memblock) = NULL;      \
+            (memblock) = nullptr;   \
         }                           \
     } while(0)                      \
 
 // new/delete.
-#define LLBC_New(cls)                       LLBC_New0(cls)
-#define LLBC_New0(cls)                      (new cls())
-#define LLBC_New1(cls, arg1)                (new cls(arg1))
-#define LLBC_New2(cls, arg1, arg2)          (new cls((arg1), (arg2)))
-#define LLBC_New3(cls, arg1, arg2, arg3)    (new cls((arg1), (arg2), (arg3)))
-#define LLBC_New4(cls, arg1, arg2, arg3, arg4) (new cls((arg1), (arg2), (arg3), (arg4)))
-#define LLBC_New5(cls, arg1, arg2, arg3, arg4, arg5) (new cls((arg1), (arg2), (arg3), (arg4), (arg5)))
-#define LLBC_New6(cls, arg1, arg2, arg3, arg4, arg5, arg6) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6)))
-#define LLBC_New7(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7)))
-#define LLBC_New8(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8)))
-#define LLBC_New9(cls, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) (new cls((arg1), (arg2), (arg3), (arg4), (arg5), (arg6), (arg7), (arg8), (arg9)))
+#define LLBC_New(cls, ...)                  (new cls(__VA_ARGS__))
 #define LLBC_News(cls, size)                (new cls[size])
 #define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
     do {                            \
         if (LIKELY(objptr)) {       \
             LLBC_Delete(objptr);    \
-            (objptr) = NULL;        \
+            (objptr) = nullptr;     \
         }                           \
     } while (0)                     \
 
@@ -278,7 +278,7 @@ private:                                            \
     do {                            \
         if (LIKELY(objsptr)) {      \
             LLBC_Deletes(objsptr);  \
-            objsptr = NULL;         \
+            objsptr = nullptr;      \
         }                           \
     } while(0)                      \
 
@@ -316,91 +316,42 @@ private:                                            \
  * Format argument.
  * @param[in] fmt  - the format string.
  * @param[out] buf - the formatted string, must call LLBC_Free to free memory.
- *                   if failed, this macro set retStr value to NULL and set last error.
+ *                   if failed, this macro set retStr value to nullptr and set last error.
  * @param[out] len - the formatted string length, in bytes, not including tailing character.
  *                   this macro always filled the tailing character.
  */
-#if LLBC_TARGET_PLATFORM_WIN32
- #define LLBC_FormatArg __LLBC_FormatArg_WIN32
-#else // LLBC_TARGET_PLATFORM_NON_WIN32
- #define LLBC_FormatArg __LLBC_FormatArg_NonWIN32
-#endif // LLBC_TARGET_PLATFORM_WIN32
-
-/**
- * WIN32 specified internal macro, use to format string.
- */
-#if LLBC_TARGET_PLATFORM_WIN32
-#define __LLBC_FormatArg_WIN32(fmt, buf, len)                                    \
-    do {                                                                         \
-        int &___len = (len);                                                     \
-        char *&___buf = (buf);                                                   \
-                                                                                 \
-        if (UNLIKELY(!(fmt))) {                                                  \
-            ___len = 0; ___buf = NULL;                                           \
-            LLBC_SetLastError(LLBC_ERROR_INVALID);                               \
-            break;                                                               \
-        }                                                                        \
-                                                                                 \
-        va_list ___ap;                                                           \
-                                                                                 \
-        int ___bufSize = 1024; ___len = 0;                                       \
-        ___buf = LLBC_Malloc(char, ___bufSize + 1);                              \
-        while (true) {                                                           \
-            va_start(___ap, fmt);                                                \
-            ___len = ::vsnprintf_s(___buf, ___bufSize, _TRUNCATE, (fmt), ___ap); \
-            va_end(___ap);                                                       \
-                                                                                 \
-            if (___len >= 0)                                                     \
-                break;                                                           \
-                                                                                 \
-            ___bufSize <<= 1;                                                    \
-            ___buf = LLBC_Realloc(char, ___buf, ___bufSize + 1);                 \
-        }                                                                        \
-        ___buf[___len] = '\0';                                                   \
-    } while (0)                                                                  \
-
-#endif // LLBC_TARGET_PLATFORM_WIN32
-
-/**
- * Non-WIN32 platform specified internal macro, use to format string.
- */
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#define __LLBC_FormatArg_NonWIN32(fmt, buf, len)                    \
+#define LLBC_FormatArg(fmt, buf, len)                               \
     do {                                                            \
-        int &___len = (len);                                        \
-        char *&___buf = (buf);                                      \
-                                                                    \
-        if (UNLIKELY(!(fmt))) {                                     \
-            ___len = 0; ___buf = NULL;                              \
-            LLBC_SetLastError(LLBC_ERROR_INVALID);                  \
+        if (UNLIKELY((fmt) == nullptr)) {                           \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_INVALID);          \
             break;                                                  \
         }                                                           \
                                                                     \
-        va_list ___ap;                                              \
-                                                                    \
-        int ___bufSize = 1024; ___len = 0;                          \
-        ___buf = LLBC_Malloc(char, ___bufSize);                     \
-        while (true) {                                              \
-            va_start(___ap, (fmt));                                 \
-            ___len = ::vsnprintf(___buf, ___bufSize, (fmt), ___ap); \
-            va_end(___ap);                                          \
-                                                                    \
-            /* Workded, break */                                    \
-            if (___len > -1 && ___len < ___bufSize)                 \
-                break;                                              \
-                                                                    \
-            /* Try again with more space */                         \
-            if (LIKELY(___len > -1)) /* glibc 2.1 and later */      \
-                ___bufSize = ___len + 1;                            \
-            else /* glibc 2.0 */                                    \
-                ___bufSize <<= 1;                                   \
-                                                                    \
-            ___buf = LLBC_Realloc(char, ___buf, ___bufSize);        \
+        va_list ___llbc_macro_inl_argfmt_ap;                        \
+        va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
+        int ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        va_end(___llbc_macro_inl_argfmt_ap);                        \
+        if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
+            break;                                                  \
         }                                                           \
-        ___buf[___len] = '\0';                                      \
+                                                                    \
+        buf = LLBC_Malloc(char, ___llbc_macro_inl_argfmt_vsnp_len + 1); \
+        va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
+        ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        va_end(___llbc_macro_inl_argfmt_ap);                        \
+        if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
+            LLBC_Free(buf);                                         \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
+            break;                                                  \
+        }                                                           \
+                                                                    \
+        len = static_cast<std::remove_reference<decltype(len)>::type>(___llbc_macro_inl_argfmt_vsnp_len); \
+        buf[len] = '\0';                                            \
     } while(0)                                                      \
-
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 /**
  * RTTI support.
@@ -409,18 +360,32 @@ private:                                            \
  #define __LLBC_RTTI_BUF_SIZE    512
 
 /**
- * Facade generic call method converience macros define.
+ * Component generic call method convenience macros define.
  */
-// Define facade generic method interface code generate macro.
-#define LLBC_FACADE_GENERIC_METHOD_INTERFACE(methName)              \
+// Define comp generic method interface code generate macro.
+#define LLBC_COMP_GENERIC_METHOD_INTERFACE(methName)                                     \
     virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) = 0 \
 
-// Define facade generic method code generate macro.
-#define LLBC_FACADE_GENERIC_METHOD(methName)                        \
-    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+// Define comp generic method code generate macro.
+#define LLBC_COMP_GENERIC_METHOD(methName)                                               \
+    virtual int methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret)     \
 
-// Define facade generic method implement code macro.
-#define LLBC_FACADE_GENERIC_METHOD_IMPL(facadeCls, methName)  \
-    int facadeCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret) \
+// Define comp generic method implement code macro.
+#define LLBC_COMP_GENERIC_METHOD_IMPL(compCls, methName)                                 \
+    int compCls::methName(const LLBC_NS LLBC_Variant &arg, LLBC_NS LLBC_Variant &ret)    \
+
+/**
+ * Function string format arguments check macro define.
+ */
+#if LLBC_TARGET_PLATFORM_WIN32
+ #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx)
+#else // Non-Win32
+ #define LLBC_STRING_FORMAT_CHECK(fmtIdx, fmtArgsBegIdx) __attribute__((format(printf, fmtIdx, fmtArgsBegIdx)))
+#endif // LLBC_TARGET_PLATFORM_WIN32
+
+/**
+ * The Defer macro impl(Dependency on LLBC_InvokeGuard class).
+ */
+#define LLBC_Defer(behav) LLBC_NS LLBC_InvokeGuard LLBC_Concat(__invokeGuard__, __LINE__)([&]() { behav; })
 
 #endif // !__LLBC_COM_MACRO_H__

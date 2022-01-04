@@ -24,13 +24,13 @@
 #include "pyllbc/comm/PyObjCoder.h"
 #include "pyllbc/comm/PyPacketHandler.h"
 #include "pyllbc/comm/PyService.h"
-#include "pyllbc/comm/PyFacade.h"
-#include "pyllbc/comm/PyFacadeEvBuilder.h"
+#include "pyllbc/comm/PyComponent.h"
+#include "pyllbc/comm/PyComponentEvBuilder.h"
 
 namespace
 {
-    typedef pyllbc_Facade This;
-    typedef pyllbc_FacadeEvBuilder _EvBuilder;
+    typedef pyllbc_Component This;
+    typedef pyllbc_ComponentEvBuilder _EvBuilder;
 }
 
 namespace
@@ -42,8 +42,8 @@ namespace
     }
 }
 
-pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
-: LLBC_IFacade(LLBC_FacadeEvents::AllEvents)
+pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
+: LLBC_IComponent(LLBC_ComponentEvents::AllEvents)
 , _svc(svc)
 , _pySvc(svc->GetPyService())
 
@@ -74,27 +74,27 @@ pyllbc_Facade::pyllbc_Facade(pyllbc_Service *svc)
 , _keyInlIdleTime(Py_BuildValue("s", "_idletime"))
 , _keyCObj(Py_BuildValue("s", "_cobj"))
 
-, _pyPacketCls(NULL)
+, _pyPacketCls(nullptr)
 #if PYLLBC_CFG_PACKET_REUSE
-, _pyReusePacket(NULL)
-, _pyPacketReuseMeth(NULL)
+, _pyReusePacket(nullptr)
+, _pyPacketReuseMeth(nullptr)
 #endif // PYLLBC_CFG_PACKET_REUSE
 , _pyNullCObj(PyInt_FromLong(0))
 , _pyPacketCreateArgs(PyTuple_New(7))
 
-, _pyStream(NULL)
-, _nativeStream(NULL)
+, _pyStream(nullptr)
+, _nativeStream(nullptr)
 
 , _holdedOnIdleEv(_EvBuilder::BuildIdleEv(_pySvc, 0))
 , _holdedOnUpdateEv(_EvBuilder::BuildUpdateEv(_pySvc))
 
-, _facadeEvCallArgs(PyTuple_New(1))
+, _compEvCallArgs(PyTuple_New(1))
 {
     Py_INCREF(_pySvc);
     PyTuple_SetItem(_pyPacketCreateArgs, 0, _pySvc);
 }
 
-pyllbc_Facade::~pyllbc_Facade()
+pyllbc_Component::~pyllbc_Component()
 {
     Py_DECREF(_methOnInitialize);
     Py_DECREF(_methOnDestroy);
@@ -133,45 +133,45 @@ pyllbc_Facade::~pyllbc_Facade()
     {
         Py_DECREF(_pyStream);
 
-        _pyStream = NULL;
-        _nativeStream = NULL;
+        _pyStream = nullptr;
+        _nativeStream = nullptr;
     }
 
     Py_DECREF(_holdedOnIdleEv);
     Py_DECREF(_holdedOnUpdateEv);
 
-    Py_DECREF(_facadeEvCallArgs);
+    Py_DECREF(_compEvCallArgs);
 }
 
-bool pyllbc_Facade::OnInitialize()
+bool pyllbc_Component::OnInitialize()
 {
-    return CallFacadeMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc), true);
+    return CallComponentMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc), true);
 }
 
-void pyllbc_Facade::OnDestroy()
+void pyllbc_Component::OnDestroy()
 {
-    CallFacadeMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc), true);
+    CallComponentMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc), true);
 }
 
-bool pyllbc_Facade::OnStart()
+bool pyllbc_Component::OnStart()
 {
-    return CallFacadeMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc), true);
+    return CallComponentMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc), true);
 }
 
-void pyllbc_Facade::OnStop()
+void pyllbc_Component::OnStop()
 {
-    CallFacadeMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc), true);
+    CallComponentMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc), true);
 }
 
-void pyllbc_Facade::OnUpdate()
+void pyllbc_Component::OnUpdate()
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnUpdate, _holdedOnUpdateEv, false);
+    CallComponentMeth(_methOnUpdate, _holdedOnUpdateEv, false);
 }
 
-void pyllbc_Facade::OnIdle(int idleTime)
+void pyllbc_Component::OnIdle(int idleTime)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
@@ -180,58 +180,58 @@ void pyllbc_Facade::OnIdle(int idleTime)
     PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
     Py_DECREF(pyIdleTime);
 
-    CallFacadeMeth(_methOnIdle, _holdedOnIdleEv, false);
+    CallComponentMeth(_methOnIdle, _holdedOnIdleEv, false);
 }
 
-void pyllbc_Facade::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+void pyllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo), true);
+    CallComponentMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo), true);
 }
 
-void pyllbc_Facade::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+void pyllbc_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo), true);
+    CallComponentMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo), true);
 }
 
-void pyllbc_Facade::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+void pyllbc_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result), true);
+    CallComponentMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result), true);
 }
 
-void pyllbc_Facade::OnProtoReport(const LLBC_ProtoReport &report)
+void pyllbc_Component::OnProtoReport(const LLBC_ProtoReport &report)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    CallFacadeMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report), true);
+    CallComponentMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report), true);
 }
 
-void pyllbc_Facade::OnUnHandledPacket(const LLBC_Packet &packet)
+void pyllbc_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
     PyObject *pyPacket = BuildPyPacket(packet);
-    if (UNLIKELY(pyPacket == NULL))
+    if (UNLIKELY(pyPacket == nullptr))
         return;
 
     PyObject *ev = 
-        pyllbc_FacadeEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
-    Py_DecRef(pyPacket); pyPacket = NULL;
+        pyllbc_ComponentEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
+    Py_DecRef(pyPacket); pyPacket = nullptr;
 
-    CallFacadeMeth(_methOnUnHandledPacket, ev, true);
+    CallComponentMeth(_methOnUnHandledPacket, ev, true);
 }
 
-void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
+void pyllbc_Component::OnDataReceived(LLBC_Packet &packet)
 {
     typedef pyllbc_Service::_PacketHandlers _Handlers;
 
@@ -267,7 +267,7 @@ void pyllbc_Facade::OnDataReceived(LLBC_Packet &packet)
         Py_DECREF(pyPacket);
 }
 
-bool pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
+bool pyllbc_Component::OnDataPreReceived(LLBC_Packet &packet)
 {
     typedef pyllbc_Service::_PacketHandlers _Handlers;
 
@@ -303,7 +303,7 @@ bool pyllbc_Facade::OnDataPreReceived(LLBC_Packet &packet)
 }
 
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-bool pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
+bool pyllbc_Component::OnDataUnifyPreReceived(LLBC_Packet &packet)
 {
     if (UNLIKELY(_svc->_stoping))
         return true;
@@ -332,7 +332,7 @@ bool pyllbc_Facade::OnDataUnifyPreReceived(LLBC_Packet &packet)
 }
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
+PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
 {
     // Get python layer class: llbc.Packet
     if (UNLIKELY(!_pyPacketCls))
@@ -366,14 +366,14 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
             Py_DECREF(_pyStream);
             pyllbc_SetError("could not get llbc.Stream property 'cobj', recv data failed");
 
-            return NULL;
+            return nullptr;
         }
 
         PyArg_Parse(cobj, "l", &_nativeStream);
         Py_DECREF(cobj);
     }
 
-    PyObject *pyData = NULL;
+    PyObject *pyData = nullptr;
     if (_svcType == LLBC_IService::Raw ||
         _svc->_codec == pyllbc_Service::BinaryCodec)
     {
@@ -386,7 +386,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
             {
                 PyObject *decoded = _nativeStream->Read(decodeIt->second);
                 if (!decoded)
-                    return NULL;
+                    return nullptr;
 
                 pyData = decoded;
             }
@@ -397,7 +397,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
         const std::string j(reinterpret_cast<
             const char *>(packet.GetPayload()), packet.GetPayloadLength());
         if ((pyllbc_ObjCoder::Decode(j, pyData)) != LLBC_OK)
-            return NULL;
+            return nullptr;
     }
 
     if (!pyData)
@@ -429,7 +429,7 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     if (UNLIKELY(!reuseRet))
     {
         pyllbc_TransferPyError();
-        return NULL;
+        return nullptr;
     }
 
     Py_DecRef(reuseRet);
@@ -445,46 +445,46 @@ PyObject *pyllbc_Facade::BuildPyPacket(const LLBC_Packet &packet)
     if (UNLIKELY(!pyPacket))
     {
         pyllbc_TransferPyError();
-        return NULL;
+        return nullptr;
     }
 
     return pyPacket;
     #endif // PYLLBC_CFG_PACKET_REUSE
 }
 
-void pyllbc_Facade::DeletePyPacket(void *_)
+void pyllbc_Component::DeletePyPacket(void *_)
 {
     PyObject *pyPacket = reinterpret_cast<PyObject *>(_);
     Py_DECREF(pyPacket);
 }
 
-bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv)
+bool pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv)
 {
-    typedef pyllbc_Service::_Facades _Facades;
+    typedef pyllbc_Service::_Comps _Comps;
 
     // Set event to call args.
     Py_INCREF(ev);
-    PyTuple_SetItem(_facadeEvCallArgs, 0, ev); // Steals reference.
+    PyTuple_SetItem(_compEvCallArgs, 0, ev); // Steals reference.
 
-    _Facades &facades = _svc->_facades;
-    for (_Facades::iterator it = facades.begin();
-         it != facades.end();
+    _Comps &comps = _svc->_comps;
+    for (_Comps::iterator it = comps.begin();
+         it != comps.end();
          it++)
     {
-        PyObject *facade = *it;
-        if (!PyObject_HasAttr(facade, meth)) // TODO: Optimize
+        PyObject *&comp = *it;
+        if (!PyObject_HasAttr(comp, meth)) // TODO: Optimize
             continue;
 
         // Get method and call.
-        PyObject *pyMeth = PyObject_GetAttr(facade, meth); // New reference.
-        PyObject *pyRtn = PyObject_Call(pyMeth, _facadeEvCallArgs, NULL);
+        PyObject *pyMeth = PyObject_GetAttr(comp, meth); // New reference.
+        PyObject *pyRtn = PyObject_Call(pyMeth, _compEvCallArgs, nullptr);
         if (!pyRtn)
         {
             pyllbc_TransferPyError();
 
             Py_DECREF(pyMeth);
             Py_INCREF(Py_None);
-            PyTuple_SetItem(_facadeEvCallArgs, 0, Py_None);
+            PyTuple_SetItem(_compEvCallArgs, 0, Py_None);
             if (decRefEv)
                 Py_DECREF(ev);
 
@@ -497,7 +497,7 @@ bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv)
 
     // Clear call args.
     Py_INCREF(Py_None);
-    PyTuple_SetItem(_facadeEvCallArgs, 0, Py_None);
+    PyTuple_SetItem(_compEvCallArgs, 0, Py_None);
 
     // Decref event, if acquire.
     if (decRefEv)
@@ -507,7 +507,7 @@ bool pyllbc_Facade::CallFacadeMeth(PyObject *meth, PyObject *ev, bool decRefEv)
 }
 
 #if PYLLBC_CFG_PACKET_REUSE
-PyObject* pyllbc_Facade::CreateReusePyPacket()
+PyObject* pyllbc_Component::CreateReusePyPacket()
 {
     PyObject *pyData = Py_None;
     Py_IncRef(pyData);

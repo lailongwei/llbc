@@ -37,6 +37,8 @@ template <typename _Elem,
 class LLBC_BasicString : public 
     std::basic_string<_Elem, _Traits, _Ax>
 {
+    static_assert(sizeof(_Elem) <= 2, "LLBC_BasicString not support sizeof(_Elem) > 2 element type!");
+
     typedef LLBC_BasicString<_Elem, _Traits, _Ax> _This;
     typedef std::basic_string<_Elem, _Traits, _Ax> _Base;
 
@@ -63,7 +65,9 @@ public:
     // Constructors.
     explicit LLBC_BasicString(const _Ax &al = _Ax()):_Base(al) {  }
     LLBC_BasicString(const _This &rhs):_Base(rhs) {  }
+    LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
+    LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
@@ -73,6 +77,24 @@ public:
     _This &operator =(const _This &rhs)
     {
         _Base::operator =(rhs);
+        return *this;
+    }
+
+    _This &operator =(_This &&rhs)
+    {
+        _Base::operator=(std::move(rhs));
+        return *this;
+    }
+
+    _This &operator =(const _Base &rhs)
+    {
+        _Base::operator =(rhs);
+        return *this;
+    }
+
+    _This &operator =(_Base &&rhs)
+    {
+        _Base::operator=(std::move(rhs));
         return *this;
     }
 
@@ -142,24 +164,22 @@ public:
     }
 
     // operator *
-    _This operator *(size_t right) const
+    _This operator *(int right) const
     {
         if (this->empty() || right == 1)
             return *this;
-        else if (right == 0)
-            return _This();
 
         _This copy(*this);
         copy *= right;
         return copy;
     }
 
-    _This &operator *=(size_t right)
+    _This &operator *=(int right)
     {
         if (this->empty() || right == 1)
             return *this;
         
-        if (right == 0)
+        if (right <= 0)
         {
             this->clear();
             return *this;
@@ -171,7 +191,7 @@ public:
 
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
-        for (size_type i = 1; i < right; ++i)
+        for (int i = 1; i < right; ++i)
             LLBC_MemCpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
 
         return *this;
@@ -572,6 +592,35 @@ public:
     void swap(_This &str)
     {
         _Base::swap(str);
+    }
+
+    // assign to raw array(templated).
+    template <size_t _ArrLen>
+    void assign_to_raw_array(_Elem (&arr)[_ArrLen]) const
+    {
+        assign_to_raw_array(arr, _ArrLen);
+    }
+
+    // assign to raw array.
+    void assign_to_raw_array(_Elem *arr, size_t arr_len) const
+    {
+        if (UNLIKELY(!arr || arr_len == 0))
+            return;
+
+        if (this->empty())
+        {
+            arr[0] = _Elem();
+        }
+        else if (this->length() < arr_len)
+        {
+            memcpy(arr, this->data(), sizeof(_Elem) * this->length());
+            arr[this->length()] = _Elem();
+        }
+        else
+        {
+            memcpy(arr, this->data(), sizeof(_Elem) * (arr_len - 1));
+            arr[arr_len - 1] = _Elem();
+        }
     }
 
     // find operations.
@@ -1020,14 +1069,54 @@ public:
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
             return *this;
 
-        this->clear();
+        // if fmt args is null, clear and return.
+        if (!fmt)
+        {
+            this->clear();
+            return *this;
+        }
 
-        char *buf; int len;
-        LLBC_FormatArg(fmt, buf, len);
+        // if string obj is empty, try detach format require buffers and resize it.
+        va_list ap;
+        if (this->empty())
+        {
+            va_start(ap, fmt);
+            int len = ::vsnprintf(nullptr, 0, fmt, ap);
+            va_end(ap);
 
-        this->append(reinterpret_cast<const _Elem *>(buf), len);
+            if (len <= 0)
+                return *this;
 
-        LLBC_Free(buf);
+            this->resize(len);
+        }
+
+        // try format.
+        va_start(ap, fmt);
+        int len = ::vsnprintf(const_cast<char *>(this->data()),
+                              this->size() + 1,
+                              fmt,
+                              ap);
+        va_end(ap);
+        if (len <= static_cast<int>(this->size()))
+        {
+            if (len < 0)
+                this->clear();
+            else if (len < static_cast<int>(this->size()))
+                this->resize(len);
+
+            return *this;
+        }
+
+        // resize, try format again.
+        this->resize(len);
+        va_start(ap, fmt);
+        len = ::vsnprintf(const_cast<char *>(this->data()),
+                          this->size() + 1,
+                          fmt,
+                          ap);
+        va_end(ap);
+        if (len != static_cast<int>(this->size()))
+            this->clear();
 
         return *this;
     }
@@ -1038,31 +1127,31 @@ public:
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
             return *this;
 
-        char *buf; int len;
-        LLBC_FormatArg(fmt, buf, len);
-
-        this->append(reinterpret_cast<const _Elem *>(buf), len);
-
-        LLBC_Free(buf);
-
-        return *this;
-    }
-
-    _This append_format(const _Elem *fmt, ...) const
-    {
-        
-        if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
+        // if fmt args is null, return.
+        if (!fmt)
             return *this;
 
-        char *buf; int len;
-        LLBC_FormatArg(fmt, buf, len);
+        // try detach detach format require buffers and resize it.
+        va_list ap;
+        const size_type oldSize = this->size();
+        va_start(ap, fmt);
+        int len =::vsnprintf(nullptr, 0, fmt, ap);
+        va_end(ap);
+        if (len <= 0)
+            return *this;
 
-        _This s(*this);
-        s.append(reinterpret_cast<const _Elem *>(buf), len);
+        // exec format.
+        this->resize(oldSize + len);
+        va_start(ap, fmt);
+        len = ::vsnprintf(const_cast<char *>(this->data() + oldSize),
+                          len + 1,
+                          fmt,
+                          ap);
+        va_end(ap);
+        if (oldSize + len != this->size())
+            this->resize(oldSize);
 
-        LLBC_Free(buf);
-
-        return s;
+        return *this;
     }
 
 public:

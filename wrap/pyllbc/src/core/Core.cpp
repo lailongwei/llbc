@@ -63,7 +63,7 @@ void pyllbc_AddCoreMethods()
     inl->AddMethod(methods.NewRandom);
     inl->AddMethod(methods.DelRandom);
     inl->AddMethod(methods.SeedRand);
-    inl->AddMethod(methods.RandInt);
+    inl->AddMethod(methods.Rand);
     inl->AddMethod(methods.RandReal);
     inl->AddMethod(methods.BoolJudge);
 

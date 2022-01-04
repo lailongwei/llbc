@@ -31,12 +31,12 @@
 __LLBC_NS_BEGIN
 
 LLBC_AutoReleasePool::LLBC_AutoReleasePool()
-: _arr(NULL)
-, _next(NULL)
+: _arr(nullptr)
+, _next(nullptr)
 {
     typedef LLBC_AutoReleasePoolStack _Stack;
 
-    _arr = LLBC_New0(LLBC_Array);
+    _arr = LLBC_New(LLBC_Array);
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     _Stack *stack = reinterpret_cast<_Stack *>(tls->objbaseTls.poolStack);
@@ -58,7 +58,7 @@ LLBC_AutoReleasePool::~LLBC_AutoReleasePool()
     LLBC_Array::Iter it = _arr->Begin();
     for (; it != _arr->End(); ++it)
     {
-        (*it)->_poolStack = NULL;
+        (*it)->_poolStack = nullptr;
     }
 
     // Release array.
@@ -107,12 +107,15 @@ int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
 
 void LLBC_AutoReleasePool::Purge()
 {
+    if (_arr->IsEmpty())
+        return;
+
     LLBC_Array::Iter iter = _arr->Begin();
     for (; iter != _arr->End(); ++iter)
     {
         LLBC_Object *obj = *iter;
         if (--obj->_autoRef == 0)
-            obj->_poolStack = NULL;
+            obj->_poolStack = nullptr;
     }
 
     _arr->Clear();
@@ -127,17 +130,7 @@ int LLBC_AutoReleasePool::AutoRelease()
 LLBC_Object *LLBC_AutoReleasePool::Clone() const
 {
     LLBC_SetLastError(LLBC_ERROR_PERM);
-    return NULL;
-}
-
-LLBC_AutoReleasePool *LLBC_AutoReleasePool::GetPoolNext()
-{
-    return _next;
-}
-
-void LLBC_AutoReleasePool::SetPoolNext(LLBC_AutoReleasePool *next)
-{
-    _next = next;
+    return nullptr;
 }
 
 __LLBC_NS_END

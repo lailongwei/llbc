@@ -41,7 +41,7 @@ private:
     static LLBC_THREAD_LOCAL int *_val;
 };
 
-LLBC_THREAD_LOCAL int *TestTask::_val = NULL;
+LLBC_THREAD_LOCAL int *TestTask::_val = nullptr;
 
 inline TestTask::TestTask()
     : _repeatCount(10000)
@@ -61,7 +61,7 @@ inline void TestTask::Svc()
     LLBC_PrintLine("Exec `*val += 1` finished, val:%d", *_val);
     LLBC_XDelete(_val);
 
-    LLBC_MessageBlock *block = NULL;
+    LLBC_MessageBlock *block = nullptr;
     while(--_repeatCount > 0)
     {
         Pop(block);
@@ -95,7 +95,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     LLBC_PrintLine("core/thread/task test:");
 
     // Activate task.
-    TestTask *task = LLBC_New0(TestTask);
+    TestTask *task = LLBC_New(TestTask);
     task->Activate(2);
 
     // Send message to task.
@@ -104,7 +104,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
         LLBC_Stream stream;
         LLBC_String content = "Hello Tasks!";
         stream.Write(content);
-        LLBC_MessageBlock *block = LLBC_New0(LLBC_MessageBlock);
+        LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
         block->Write(stream.GetBuf(), stream.GetPos());
 
         task->Push(block);

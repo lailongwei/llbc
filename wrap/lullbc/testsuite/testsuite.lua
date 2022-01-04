@@ -10,7 +10,7 @@
 llbc = require 'llbc'
 
 -- Import all common module testcases.
-local TestCase_Com_VerInfo = require 'common.testcase_com_verInfo'
+local TestCase_Com_VerInfo = require 'common.testcase_com_verinfo'
 local TestCase_Com_MonkeyPatch = require 'common.testcase_com_monkey_patch'
 local TestCase_Com_ObjectOriented = require 'common.testcase_com_object_oriented'
 -- Import all core module testcases.

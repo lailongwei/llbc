@@ -19,24 +19,44 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_COMM_FACADE_H__
-#define __LLBC_TEST_CASE_COMM_FACADE_H__
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogFormattingInfo.h"
+#include "llbc/core/log/LogFunctionToken.h"
 
-class TestCase_Comm_Facade : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+LLBC_LogFunctionToken::LLBC_LogFunctionToken()
 {
-public:
-    TestCase_Comm_Facade();
-    virtual ~TestCase_Comm_Facade();
+}
 
-public:
-    virtual int Run(int argc, char *argv[]);
+LLBC_LogFunctionToken::~LLBC_LogFunctionToken()
+{
+}
 
-private:
-    int TestInInternalDriveService(const LLBC_String &host, const int port);
-    int TestInExternalDriveService(const LLBC_String &host, const int port);
-};
+int LLBC_LogFunctionToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+{
+    SetFormatter(formatter);
+    return LLBC_OK;
+}
 
-#endif // __LLBC_TEST_CASE_COMM_FACADE_H__
+int LLBC_LogFunctionToken::GetType() const
+{
+    return LLBC_LogTokenType::FunctionToken;
+}
+
+void LLBC_LogFunctionToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
+{
+    int index = static_cast<int>(formattedData.size());
+    if (data.funcLen > 0)
+        formattedData.append(data.others + data.funcBeg, data.funcLen);
+
+    LLBC_LogFormattingInfo *formatter = GetFormatter();
+    formatter->Format(formattedData, index);
+}
+
+__LLBC_NS_END
+
+#include "llbc/common/AfterIncl.h"

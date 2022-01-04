@@ -21,8 +21,6 @@
 
 #ifdef __LLBC_CORE_THREAD_GUARD_H__
 
-#include "llbc/core/utils/Util_DelegateImpl.h"
-
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/utils/Util_Debug.h"
@@ -31,14 +29,14 @@
 __LLBC_NS_BEGIN
 
 template <typename T>
-inline LLBC_DeleteGuard<T>::LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete)
+LLBC_DeleteGuard<T>::LLBC_DeleteGuard(T *&ptr, bool setNullAfterDelete)
 : _ptr(ptr)
 , _setNullAfterDelete(setNullAfterDelete)
 {
 }
 
 template <typename T>
-inline LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
+LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeleteGuard: ptr[%p] will delete", _ptr);
@@ -55,14 +53,14 @@ inline LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
 }
 
 template <typename T>
-inline LLBC_DeletesGuard<T>::LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes)
+LLBC_DeletesGuard<T>::LLBC_DeletesGuard(T *&ptr, bool setNullAfterDeletes)
 : _ptr(ptr)
 , _setNullAfterDeletes(setNullAfterDeletes)
 {
 }
 
 template <typename T>
-inline LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
+LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeletesGuard: ptr array[%p] will delete", _ptr);
@@ -79,14 +77,14 @@ inline LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
 }
 
 template <typename T>
-inline LLBC_FreeGuard<T>::LLBC_FreeGuard(T *&ptr, bool setNullAfterFree)
+LLBC_FreeGuard<T>::LLBC_FreeGuard(T *&ptr, bool setNullAfterFree)
 : _ptr(ptr)
 , _setNullAfterFree(setNullAfterFree)
 {
 }
 
 template <typename T>
-inline LLBC_FreeGuard<T>::~LLBC_FreeGuard()
+LLBC_FreeGuard<T>::~LLBC_FreeGuard()
 {
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_FreeGuard: ptr[%p] will free", _ptr);
@@ -102,41 +100,23 @@ inline LLBC_FreeGuard<T>::~LLBC_FreeGuard()
 #endif // Guard debug
 }
 
-inline LLBC_InvokeGuard::LLBC_InvokeGuard(LLBC_GuardFunc func, void *data)
-: _deleg(NULL)
-, _data(data)
+template <typename Func, typename ...Args>
+LLBC_InvokeGuard::LLBC_InvokeGuard(const Func &func, Args ...args)
+: _deleg(std::bind(func, std::forward<Args>(args)...))
 {
-    typedef LLBC_Func1<void, void *> __InvokeFuncDeleg;
-
-    _deleg = LLBC_New1(__InvokeFuncDeleg, func);
 }
 
-template <typename Object>
-inline LLBC_InvokeGuard::LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data)
-: _deleg(NULL)
-, _data(data)
+template <typename Obj, typename ...Args>
+LLBC_InvokeGuard::LLBC_InvokeGuard(Obj *obj, void (Obj::*meth)(Args ...), Args ...args)
+: _deleg(std::bind(meth, obj, std::forward<Args>(args)...))
 {
-    typedef LLBC_Delegate1<void, Object, void *> __InvokeMethDeleg;
-
-    _deleg = LLBC_New2(__InvokeMethDeleg, obj, meth);
 }
 
 inline LLBC_InvokeGuard::~LLBC_InvokeGuard()
 {
-    _deleg->Invoke(_data);
-    LLBC_Delete(_deleg);
+    _deleg();
 }
 
-template <typename Func, typename... Args>
-inline LLBC_InvokeGuardSpec::LLBC_InvokeGuardSpec(Func&& func, Args&&... args)
-: _invoker(std::bind(std::forward<Func>(func), std::forward<Args>(args)...))
-{
-}
-
-inline LLBC_InvokeGuardSpec::~LLBC_InvokeGuardSpec()
-{
-    _invoker();
-}
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_THREAD_GUARD_H__

@@ -23,15 +23,17 @@
 #define __LLBC_CORE_EVENT_EVENT_H__
 
 #include "llbc/common/Common.h"
+
 #include "llbc/core/variant/Variant.h"
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_Delegate.h"
+#include "llbc/core/objectpool/PoolObject.h"
 
 __LLBC_NS_BEGIN
 
 /**
  * \brief The event class encapsulation.
  */
-class LLBC_EXPORT LLBC_Event
+class LLBC_EXPORT LLBC_Event : public LLBC_PoolObject
 {
 public:
     LLBC_Event(int id = 0, bool dontDelAfterFire = false);
@@ -43,6 +45,12 @@ public:
      * @return int - the event Id.
      */
     int GetId() const;
+
+    /**
+     * Set the event Id.
+     * @param[in] id - the event Id.
+     */
+    void SetId(int id);
 
     /**
      * Check dont delete after fire option.
@@ -183,7 +191,7 @@ public:
      * Clone event.
      * Note:
      *      - the clone event don't delete after handle flag always false.
-     *      - the clone event extend data always NULL.
+     *      - the clone event extend data always nullptr.
      * @return LLBC_Event * - the clone event.
      */
     LLBC_Event *Clone() const;
@@ -197,11 +205,10 @@ public:
 
     /**
      * Set extend data.
-     * @param[in] extData                  - the extend data.
-     * @param[in] clearDeleg               - the extend data clear delegate.
-     * @param[in] delClearDelegWhenDestroy - delete clear delegate when event destroy.
+     * @param[in] extData    - the extend data.
+     * @param[in] clearDeleg - the extend data clear delegate.
      */
-    void SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg = NULL, bool delClearDelegWhenDestroy = true);
+    void SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg = nullptr);
 
     /**
      * Clear extend data.
@@ -218,6 +225,12 @@ public:
     const LLBC_Variant &operator [](int key) const;
     const LLBC_Variant &operator [](const char* key) const;
     const LLBC_Variant &operator [](const LLBC_String &key) const;
+
+public:
+    /**
+     * Object-Pool reflection support: clear firer object.
+     */
+    void Clear();
 
     /**
      * Disable assignment.
@@ -238,8 +251,27 @@ protected:
     _StrKeyParams *_strKeyParams;
 
     void *_extData;
-    LLBC_IDelegate1<void, void *> *_extDataClearDeleg;
-    bool _delClearDelegWhenDestroy;
+    LLBC_Delegate<void(void *)> _extDataClearDeleg;
+};
+
+/**
+ * \brief The event deleg class encapsulation.
+ */
+class LLBC_EXPORT LLBC_EventListener
+{
+public:
+    /**
+     * Ctor & Detor.
+     */
+    LLBC_EventListener() = default;
+    virtual ~LLBC_EventListener() = default;
+
+public:
+    /**
+     * Listener invoke method.
+     * @param[in] ev - the event object.
+     */
+    virtual void Invoke(LLBC_Event &ev) = 0;
 };
 
 __LLBC_NS_END

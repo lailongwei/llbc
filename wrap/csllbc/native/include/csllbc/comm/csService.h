@@ -29,7 +29,7 @@
  * Predeclare some classes.
  */
 class csllbc_Coder;
-class csllbc_Facade;
+class csllbc_Component;
 class csllbc_PacketHandler;
  
 /**
@@ -139,7 +139,7 @@ public:
     /**
      * Remove specific session.
      */
-    int RemoveSession(int sessionId, const char *reason = NULL);
+    int RemoveSession(int sessionId, const char *reason = nullptr);
 
 public:
     /**
@@ -158,9 +158,9 @@ public:
 
 public:
     /**
-     * Register csharp layer facades.
+     * Register csharp layer components.
      */
-    int RegisterFacade(csllbc_Facade *facade);
+    int RegisterComponent(csllbc_Component *comp);
 
     /**
      * Register csharp layer coder.

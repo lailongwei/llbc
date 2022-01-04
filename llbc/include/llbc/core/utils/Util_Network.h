@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
  * @param[in] addr - the address.
  * @return bool - return true if given address format string is IPv4 format, otherwise return false.
  */
-LLBC_EXTERN LLBC_EXPORT bool LLBC_IsIPv4Addr(const LLBC_String &addr);
+LLBC_EXPORT bool LLBC_IsIPv4Addr(const LLBC_String &addr);
 
 __LLBC_NS_END
 

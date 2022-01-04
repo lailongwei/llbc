@@ -25,11 +25,11 @@
 LLBC_EXTERN_C PyObject *_pyllbc_NewPyTimer(PyObject *self, PyObject *args)
 {
     PyObject *pyObj;
-    PyObject *timeoutCallable, *cancelCallable = NULL;
+    PyObject *timeoutCallable, *cancelCallable = nullptr;
     if (!PyArg_ParseTuple(args, "OO|O", &pyObj, &timeoutCallable, &cancelCallable))
-        return NULL;
+        return nullptr;
 
-    pyllbc_Timer *timer = LLBC_New3(pyllbc_Timer, pyObj, timeoutCallable, cancelCallable);
+    pyllbc_Timer *timer = LLBC_New(pyllbc_Timer, pyObj, timeoutCallable, cancelCallable);
 
     return Py_BuildValue("l", timer);
 }
@@ -38,7 +38,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelPyTimer(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     LLBC_Delete(timer);
 
@@ -49,7 +49,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsIgnoredDeadRef(PyObject *self, PyObject
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     PyObject *retVal = 
         timer->IsIgnoredDeadRef() ? Py_True : Py_False;
@@ -63,7 +63,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSetIgnoredDeadRef(PyObject *self, PyObjec
     PyObject *flagObj;
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "lO", &timer, &flagObj))
-        return NULL;
+        return nullptr;
 
     const bool flag = !!PyObject_IsTrue(flagObj);
     timer->SetIgnoredDeadRef(flag);
@@ -75,7 +75,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetDueTime(PyObject *self, PyObject *args
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("K", timer->GetDueTime());
 }
@@ -84,7 +84,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetPeriod(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("K", timer->GetPeriod());
 }
@@ -93,7 +93,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetTimerId(PyObject *self, PyObject *args
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     return Py_BuildValue("K", timer->GetTimerId());
 }
@@ -103,14 +103,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSchedule(PyObject *self, PyObject *args)
     pyllbc_Timer *timer;
     uint64 dueTime, period;
     if (!PyArg_ParseTuple(args, "lKK", &timer, &dueTime, &period))
-        return NULL;
+        return nullptr;
 
     if (timer->Schedule(dueTime, period) != LLBC_OK)
     {
         const LLBC_String timerDesc = timer->ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, timerDesc);
 
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -120,14 +120,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerCancel(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     if (timer->Cancel() != LLBC_OK)
     {
         const LLBC_String timerDesc = timer->ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, timerDesc);
 
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -137,7 +137,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsScheduling(PyObject *self, PyObject *ar
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     PyObject *rtn = timer->IsScheduling() ? Py_True : Py_False;
     Py_INCREF(rtn);
@@ -149,7 +149,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsTimeouting(PyObject *self, PyObject *ar
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     PyObject *rtn = timer->IsTimeouting() ? Py_True : Py_False;
     Py_INCREF(rtn);
@@ -161,7 +161,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsCancelling(PyObject *self, PyObject *ar
 {
     pyllbc_Timer *timer;
     if (!PyArg_ParseTuple(args, "l", &timer))
-        return NULL;
+        return nullptr;
 
     PyObject *rtn = timer->IsCancelling() ? Py_True : Py_False;
     Py_INCREF(rtn);
@@ -173,7 +173,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerUpdateAllTimers(PyObject *self, PyObject 
 {
     pyllbc_s_TimerScheduler->Schedule();
     if (PyErr_Occurred())
-        return NULL;
+        return nullptr;
 
     Py_RETURN_NONE;
 }

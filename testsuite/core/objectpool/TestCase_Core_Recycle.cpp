@@ -49,7 +49,7 @@ namespace
     {
     public:
         PoolObj()
-        : _poolInst(NULL)
+        : _poolInst(nullptr)
         {
             std::cout << "<PoolObj>: Constructor call!" << std::endl;
         }
@@ -70,22 +70,10 @@ namespace
             std::cout << "PoolObj::MarkPoolObject() called!" << std::endl;
         }
 
-        bool IsPoolObject() const
-        {
-            std::cout << "PoolObj::IsPoolObject() const called!" << std::endl;
-            return _poolInst != NULL;
-        }
-
         LLBC_IObjectPoolInst *GetPoolInst()
         {
             std::cout << "PoolObj::GetPoolInst() called!" << std::endl;
             return _poolInst;
-        }
-
-        void GiveBackToPool()
-        {
-            std::cout << "PoolObj::GiveBackToPool() called!" << std::endl;
-            _poolInst->Release(this);
         }
 
     private:

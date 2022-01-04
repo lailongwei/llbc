@@ -48,7 +48,7 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_LogTokenChain::LLBC_LogTokenChain()
-: _head(NULL)
+: _head(nullptr)
 {
 }
 
@@ -66,12 +66,12 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     }
 
     char ch = '\0';
-    const char *curPattern = NULL;
+    const char *curPattern = nullptr;
     LLBC_String::size_type patternLength = 0;
     int state = LLBC_INTERNAL_NS __g_literal_state;
 
-    LLBC_ILogToken *token = NULL;
-    LLBC_LogFormattingInfo *formatter = NULL;
+    LLBC_ILogToken *token = nullptr;
+    LLBC_LogFormattingInfo *formatter = nullptr;
 
     LLBC_String buf;
     if (pattern.empty())
@@ -113,7 +113,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                         AppendToken(token);
 
                         buf.clear();
-                        formatter = NULL;
+                        formatter = nullptr;
                     }
 
                     buf.append(1, ch);
@@ -140,14 +140,12 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             buf.erase(buf.rfind(LLBC_LogTokenType::EscapeToken));
             token = LLBC_LogTokenBuilderSingleton->BuildLogToken(ch);
             if (!formatter)
-            {
-                formatter = LLBC_New0(LLBC_LogFormattingInfo);
-            }
+                formatter = LLBC_New(LLBC_LogFormattingInfo);
 
             token->Initialize(formatter, "");
             AppendToken(token);
 
-            formatter = NULL;
+            formatter = nullptr;
             state = LLBC_INTERNAL_NS __g_literal_state;
 
             break;
@@ -158,7 +156,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
                 if (!formatter)
                 {
-                    formatter = LLBC_New3(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
+                    formatter = LLBC_New(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
                 }
                 else
                 {
@@ -190,7 +188,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     if (!buf.empty())
     {
         token = LLBC_LogTokenBuilderSingleton->BuildLogToken(LLBC_LogTokenType::StrToken);
-        token->Initialize(NULL, buf);
+        token->Initialize(nullptr, buf);
         AppendToken(token);
     }
 
@@ -220,7 +218,7 @@ void LLBC_LogTokenChain::Cleanup()
 
 void LLBC_LogTokenChain::AppendToken(LLBC_ILogToken *token)
 {
-    token->SetTokenNext(NULL);
+    token->SetTokenNext(nullptr);
 
     if (!_head)
     {

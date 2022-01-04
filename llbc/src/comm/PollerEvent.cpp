@@ -42,7 +42,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAddSockEv(LLBC_Socket *sock,
                                                      int sessionId,
                                                      const LLBC_SessionOpts &sessionOpts)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::AddSock;
     ev.un.socket = sock;
@@ -57,7 +57,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
                                                        const LLBC_SessionOpts &sessionOpts,
                                                        const LLBC_SockAddr_IN &peerAddr)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::AsyncConn;
     ev.sessionId = sessionId;
@@ -70,7 +70,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildAsyncConnEv(int sessionId,
 
 LLBC_MessageBlock *LLBC_PollerEvUtil::BuildSendEv(LLBC_Packet *packet)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::Send;
     ev.un.packet = packet;
@@ -81,19 +81,19 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildSendEv(LLBC_Packet *packet)
 
 LLBC_MessageBlock *LLBC_PollerEvUtil::BuildCloseEv(int sessionId, const char *reason)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::Close;
     ev.sessionId = sessionId;
 
-    if (reason != NULL)
+    if (reason != nullptr)
     {
         ev.un.closeReason = LLBC_Malloc(char, LLBC_StrLenA(reason) + 1);
         LLBC_StrCpyA(ev.un.closeReason, reason);
     }
     else
     {
-        ev.un.closeReason = NULL;
+        ev.un.closeReason = nullptr;
     }
 
     block->SetWritePos(sizeof(_Ev));
@@ -106,7 +106,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildIocpMonitorEv(int ret,
                                                          int errNo, 
                                                          int subErrNo)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::Monitor;
     ev.un.monitorEv = LLBC_Malloc(char, sizeof(int) + sizeof(LLBC_POverlapped) + sizeof(int) * 2);
@@ -129,7 +129,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildIocpMonitorEv(int ret,
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 LLBC_MessageBlock *LLBC_PollerEvUtil::BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::Monitor;
     ev.un.monitorEv = LLBC_Malloc(char, sizeof(int) + sizeof(LLBC_EpollEvent) * count);
@@ -146,7 +146,7 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildEpollMonitorEv(const LLBC_EpollEvent 
 
 LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *session)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
     ev.type = _Ev::TakeOverSession;
     ev.un.session = session;
@@ -155,9 +155,11 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildTakeOverSessionEv(LLBC_Session *sessi
     return block;
 }
 
-LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData, LLBC_IDelegate3<void, int, int, const LLBC_Variant &> *ctrlDataClearDeleg)
+LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId,
+                                                                int ctrlCmd,
+                                                                const LLBC_Variant &ctrlData)
 {
-    _Block *block = LLBC_New1(_Block, sizeof(_Ev));
+    _Block *block = LLBC_New(_Block, sizeof(_Ev));
     _Ev &ev = *reinterpret_cast<_Ev *>(block->GetData());
 
     LLBC_Stream ctrlDataStream;
@@ -166,10 +168,7 @@ LLBC_MessageBlock * LLBC_PollerEvUtil::BuildCtrlProtocolStackEv(int sessionId, i
     ev.type = _Ev::CtrlProtocolStack;
     ev.sessionId = sessionId;
     ev.un.protocolStackCtrlInfo.ctrlCmd = ctrlCmd;
-    ev.un.protocolStackCtrlInfo.ctrlDataLen = ctrlDataStream.GetSize();
-    ev.un.protocolStackCtrlInfo.ctrlData = LLBC_Malloc(void, ctrlDataStream.GetSize());
-    ::memcpy(ev.un.protocolStackCtrlInfo.ctrlData, ctrlDataStream.GetBuf(), ctrlDataStream.GetSize());
-    ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg = ctrlDataClearDeleg;
+    ev.un.protocolStackCtrlInfo.ctrlData = LLBC_New(LLBC_Variant, ctrlData);
 
     block->SetWritePos(sizeof(_Ev));
 
@@ -206,20 +205,7 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_PollerEvent &ev)
         break;
 
     case _Ev::CtrlProtocolStack:
-        if (ev.un.protocolStackCtrlInfo.ctrlData)
-        {
-            if (ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg)
-            {
-                LLBC_Stream ctrlDataStream;
-                ctrlDataStream.Attach(ev.un.protocolStackCtrlInfo.ctrlData, ev.un.protocolStackCtrlInfo.ctrlDataLen);
-                LLBC_Variant ctrlData;
-                ctrlDataStream.Read(ctrlData);
-
-                ev.un.protocolStackCtrlInfo.ctrlDataClearDeleg->Invoke(ev.sessionId, ev.un.protocolStackCtrlInfo.ctrlCmd, ctrlData);
-            }
-
-            LLBC_XFree(ev.un.protocolStackCtrlInfo.ctrlData);
-        }
+        LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
         break;
 
     default:

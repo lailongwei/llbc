@@ -24,7 +24,7 @@
 #include "pyllbc/comm/PyEvent.h"
 #include "pyllbc/comm/PyObjCoder.h"
 #include "pyllbc/comm/PyPacketHandler.h"
-#include "pyllbc/comm/PyFacade.h"
+#include "pyllbc/comm/PyComponent.h"
 #include "pyllbc/comm/ErrorHooker.h"
 #include "pyllbc/comm/PyService.h"
 
@@ -39,14 +39,14 @@ namespace
     }
 }
 
-PyObject *pyllbc_Service::_pyEvCls = NULL;
-LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_addiEvCtor(&pyllbc_Service::AddiEventCtor);
-LLBC_Func1<void, LLBC_Event *> pyllbc_Service::_customEvDtor(&pyllbc_Service::CustomEventDtor);
-PyObject *pyllbc_Service::_streamCls = NULL;
+PyObject *pyllbc_Service::_pyEvCls = nullptr;
+LLBC_Delegate<void(LLBC_Event *)> pyllbc_Service::_evEnqueueHandler(&pyllbc_Service::EventEnqueueHandler);
+LLBC_Delegate<void(LLBC_Event *)> pyllbc_Service::_evDequeueHandler(&pyllbc_Service::EventDequeueHandler);
+PyObject *pyllbc_Service::_streamCls = nullptr;
 pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
 
 pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc)
-: _llbcSvc(NULL)
+: _llbcSvc(nullptr)
 , _llbcSvcType(type)
 , _llbcSvcName(name.c_str(), name.length())
 
@@ -54,13 +54,13 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
 
 , _inMainloop()
 
-, _cppFacade(NULL)
-, _facades()
+, _cppComp(nullptr)
+, _comps()
 
 , _handlers()
 , _preHandlers()
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler(NULL)
+, _unifyPreHandler(nullptr)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
 , _codec((This::Codec)(PYLLBC_CFG_DFT_SVC_CODEC))
@@ -228,7 +228,7 @@ void pyllbc_Service::Stop()
     }
 }
 
-int pyllbc_Service::RegisterFacade(PyObject *facade)
+int pyllbc_Service::RegisterComponent(PyObject *comp)
 {
     if (_started)
     {
@@ -236,25 +236,25 @@ int pyllbc_Service::RegisterFacade(PyObject *facade)
         return LLBC_FAILED;
     }
 
-    if (std::find(_facades.begin(), _facades.end(), facade) != _facades.end())
+    if (std::find(_comps.begin(), _comps.end(), comp) != _comps.end())
     {
         LLBC_String errStr;
-        const LLBC_String facadeStr = pyllbc_ObjUtil::GetObjStr(facade);
-        pyllbc_SetError(errStr.format("repeat to register facade: %s", facadeStr.c_str()), LLBC_ERROR_REPEAT);
+        const LLBC_String compStr = pyllbc_ObjUtil::GetObjStr(comp);
+        pyllbc_SetError(errStr.format("repeat to register comp: %s", compStr.c_str()), LLBC_ERROR_REPEAT);
 
         return LLBC_FAILED;
     }
 
-    Py_INCREF(facade);
-    _facades.push_back(facade);
+    Py_INCREF(comp);
+    _comps.push_back(comp);
 
     return LLBC_OK;
 }
 
-int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_String &libPath, PyObject *facadeCls, PyObject *&facade)
+int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp)
 {
-    // Force reset facade ptr.
-    facade = NULL;
+    // Force reset comp ptr.
+    comp = nullptr;
 
     // Started check.
     if (_started)
@@ -263,12 +263,12 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
         return LLBC_FAILED;
     }
 
-    // Register native facade.
-    LLBC_IFacade *nativeFacade;
-    int ret = _llbcSvc->RegisterFacade(libPath, facadeName, nativeFacade);
+    // Register native comp.
+    LLBC_IComponent *nativeComp;
+    int ret = _llbcSvc->RegisterComponent(libPath, compName, nativeComp);
     if (ret != LLBC_OK)
     {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When register facade(from dynamic library)");
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, "When register comp(from dynamic library)");
         return LLBC_FAILED;
     }
 
@@ -280,19 +280,19 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
         return LLBC_FAILED;
     }
 
-    // Get native facade native methods.
-    typedef LLBC_FacadeMethods::Methods::const_iterator _NativeMethodsIter;
-    const LLBC_FacadeMethods::Methods *nativeMeths = nativeFacade->GetAllMethods() ? &nativeFacade->GetAllMethods()->GetAllMethods() : NULL;
+    // Get native comp native methods.
+    typedef LLBC_ComponentMethods::Methods::const_iterator _NativeMethodsIter;
+    const LLBC_ComponentMethods::Methods *nativeMeths = nativeComp->GetAllMethods() ? &nativeComp->GetAllMethods()->GetAllMethods() : nullptr;
 
-    // If not specific python facade class, define python layer facade class and compile it.
-    if (!facadeCls || pyllbc_TypeDetector::IsNone(facadeCls))
+    // If not specific python comp class, define python layer comp class and compile it.
+    if (!compCls || pyllbc_TypeDetector::IsNone(compCls))
     {
-        LLBC_String facadeClsDef;
-        facadeClsDef.append_format("import llbc\n");
-        facadeClsDef.append_format("class %s(llbc.inl.BaseLibFacade):\n", facadeName.c_str());
-        facadeClsDef.append_format("    \"\"\"Dynamic load facade %s(from native dynamic library:%s) define\"\"\"\n", facadeName.c_str(), libPath.c_str());
-        facadeClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
-        facadeClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", facadeName.c_str());
+        LLBC_String compClsDef;
+        compClsDef.append_format("import llbc\n");
+        compClsDef.append_format("class %s(llbc.inl.BaseLibComp):\n", compName.c_str());
+        compClsDef.append_format("    \"\"\"Dynamic load comp %s(from native dynamic library:%s) define\"\"\"\n", compName.c_str(), libPath.c_str());
+        compClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
+        compClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", compName.c_str());
         if (nativeMeths)
         {
             for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
@@ -300,23 +300,23 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
                  ++nativeMethIt)
             {
                 const char *nativeMeth = nativeMethIt->first.GetCStr();
-                facadeClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
-                facadeClsDef.append_format("        return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
+                compClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
+                compClsDef.append_format("        return llbc.inl.CallComponentMethod(self._c_obj, '%s', arg)\n", nativeMeth);
             }
         }
 
-        facadeClsDef.append_format("\n");
-        if (PyRun_SimpleString(facadeClsDef.c_str()) != 0)
+        compClsDef.append_format("\n");
+        if (PyRun_SimpleString(compClsDef.c_str()) != 0)
         {
-            pyllbc_TransferPyError("When compile facade class");
+            pyllbc_TransferPyError("When compile comp class");
             return LLBC_FAILED;
         }
 
-        // Get compiled python layer facade class.
-        facadeCls = PyDict_GetItemString(pyGbl, facadeName.c_str()); // Borroewd reference for return.
-        if (!facadeCls)
+        // Get compiled python layer comp class.
+        compCls = PyDict_GetItemString(pyGbl, compName.c_str()); // Borroewd reference for return.
+        if (!compCls)
         {
-            pyllbc_TransferPyError("When get python layer facade class(auto generated by internal routine)");
+            pyllbc_TransferPyError("When get python layer comp class(auto generated by internal routine)");
             return LLBC_FAILED;
         }
     }
@@ -328,35 +328,35 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
         {
             const char *nativeMeth = nativeMethIt->first.GetCStr();
 
-            LLBC_String facadeMethDef;
-            facadeMethDef.append_format("def %s(self, arg):\n", nativeMeth);
-            facadeMethDef.append_format("    return llbc.inl.CallFacadeMethod(self._c_obj, '%s', arg)\n", nativeMeth);
+            LLBC_String compMethDef;
+            compMethDef.append_format("def %s(self, arg):\n", nativeMeth);
+            compMethDef.append_format("    return llbc.inl.CallComponentMethod(self._c_obj, '%s', arg)\n", nativeMeth);
 
-            if (PyRun_SimpleString(facadeMethDef.c_str()) != 0)
+            if (PyRun_SimpleString(compMethDef.c_str()) != 0)
             {
-                pyllbc_TransferPyError("When compile facade method");
+                pyllbc_TransferPyError("When compile comp method");
                 return LLBC_FAILED;
             }
 
-            PyObject *pyFacadeMeth = PyDict_GetItemString(pyGbl, nativeMeth); // Borrow reference for return.
-            if (!pyFacadeMeth)
+            PyObject *pyCompMeth = PyDict_GetItemString(pyGbl, nativeMeth); // Borrow reference for return.
+            if (!pyCompMeth)
             {
-                pyllbc_TransferPyError("When get python layer facade meth(auto generated by internal routine)");
+                pyllbc_TransferPyError("When get python layer comp meth(auto generated by internal routine)");
                 return LLBC_FAILED;
             }
 
-            if (PyObject_SetAttrString(facadeCls, nativeMeth, pyFacadeMeth) != 0) // not steal reference.
+            if (PyObject_SetAttrString(compCls, nativeMeth, pyCompMeth) != 0) // not steal reference.
             {
-                pyllbc_TransferPyError("When set auto generated facade meth to facade class");
+                pyllbc_TransferPyError("When set auto generated comp meth to comp class");
                 return LLBC_FAILED;
             }
         }
     }
 
-    // Create python layer facade instance.
-    PyObject *pyCObj = PyLong_FromLongLong(reinterpret_cast<long long>(nativeFacade));
-    PyObject *pyFacadeName = PyString_FromString(facadeName.c_str());
-    PyObject *pyMeths = PySet_New(NULL);
+    // Create python layer comp instance.
+    PyObject *pyCObj = PyLong_FromLongLong(reinterpret_cast<long long>(nativeComp));
+    PyObject *pyCompName = PyString_FromString(compName.c_str());
+    PyObject *pyMeths = PySet_New(nullptr);
     if (nativeMeths)
     {
         for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
@@ -365,23 +365,23 @@ int pyllbc_Service::RegisterFacade(const LLBC_String &facadeName, const LLBC_Str
             PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.GetCStr())); // Steal referencce for o.
     }
 
-    facade = PyObject_CallFunctionObjArgs(facadeCls,
-                                          pyCObj,
-                                          pyFacadeName,
-                                          pyMeths,
-                                          NULL);
+    comp = PyObject_CallFunctionObjArgs(compCls,
+                                        pyCObj,
+                                        pyCompName,
+                                        pyMeths,
+                                        nullptr);
     Py_DECREF(pyCObj);
-    Py_DECREF(pyFacadeName);
+    Py_DECREF(pyCompName);
     Py_DECREF(pyMeths);
-    if (!facade)
+    if (!comp)
     {
-        pyllbc_TransferPyError("When create python layer facade instance");
+        pyllbc_TransferPyError("When create python layer comp instance");
         return LLBC_FAILED;
     }
 
-    // Hold python layer facade instances.
-    Py_INCREF(facade);
-    _facades.push_back(facade);
+    // Hold python layer comp instances.
+    Py_INCREF(comp);
+    _comps.push_back(comp);
 
     return LLBC_OK;
 }
@@ -449,6 +449,11 @@ int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
         pyllbc_TransferLLBCError(__FILE__, __LINE__, LLBC_String().format("async connect to %s:%d failed", ip, port).c_str());
 
     return sid;
+}
+
+bool pyllbc_Service::IsSessionValidate(int sessionId)
+{
+    return _llbcSvc->IsSessionValidate(sessionId);
 }
 
 int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
@@ -569,14 +574,14 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         return LLBC_FAILED;
     }
 
-    pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, opcode);
+    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, opcode);
     if (wrapHandler->SetHandler(handler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
         return LLBC_FAILED;
     }
 
-    if (_llbcSvc->Subscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataReceived) != LLBC_OK)
+    if (_llbcSvc->Subscribe(opcode, _cppComp, &pyllbc_Component::OnDataReceived) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::Subscribe() failed");
@@ -613,7 +618,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 
 
 
-    pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, opcode);
+    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, opcode);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
@@ -631,7 +636,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
         return LLBC_FAILED;
     }
 
-    if (_llbcSvc->PreSubscribe(opcode, _cppFacade, &pyllbc_Facade::OnDataPreReceived) != LLBC_OK)
+    if (_llbcSvc->PreSubscribe(opcode, _cppComp, &pyllbc_Component::OnDataPreReceived) != LLBC_OK)
     {
         _preHandlers.erase(opcode);
         LLBC_Delete(wrapHandler);
@@ -646,7 +651,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 {
-    pyllbc_PacketHandler *wrapHandler = LLBC_New1(pyllbc_PacketHandler, 0);
+    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, 0);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
         LLBC_Delete(wrapHandler);
@@ -662,7 +667,7 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
     }
 
     _unifyPreHandler = wrapHandler;
-    if (_llbcSvc->UnifyPreSubscribe(_cppFacade, &pyllbc_Facade::OnDataUnifyPreReceived) != LLBC_OK)
+    if (_llbcSvc->UnifyPreSubscribe(_cppComp, &pyllbc_Component::OnDataUnifyPreReceived) != LLBC_OK)
     {
         LLBC_XDelete(_unifyPreHandler);
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::UnifyPreSubscribe() failed");
@@ -712,7 +717,7 @@ int pyllbc_Service::FireEvent(PyObject *ev)
     LLBC_Event *nativeEv = reinterpret_cast<LLBC_Event *>(PyLong_AsUnsignedLongLong(nativeEvObj));
     Py_DECREF(nativeEvObj);
 
-    _llbcSvc->FireEvent(nativeEv, &_addiEvCtor, true, &_customEvDtor, true);
+    _llbcSvc->FireEvent(nativeEv, _evEnqueueHandler, _evDequeueHandler);
 
     return PyErr_Occurred() ? LLBC_FAILED : LLBC_OK;
 }
@@ -814,31 +819,31 @@ pyllbc_ErrorHooker *pyllbc_Service::GetErrHooker()
 
 void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName)
 {
-    ASSERT(!_llbcSvc && "llbc service pointer not NULL");
+    ASSERT(!_llbcSvc && "llbc service pointer not nullptr");
 
-    _llbcSvc = LLBC_IService::Create(svcType, svcName, NULL, false);
+    _llbcSvc = LLBC_IService::Create(svcType, svcName, nullptr, false);
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
 
-    _cppFacade = LLBC_New1(pyllbc_Facade, this);
-    _llbcSvc->RegisterFacade(_cppFacade);
+    _cppComp = LLBC_New(pyllbc_Component, this);
+    _llbcSvc->RegisterComponent(_cppComp);
 }
 
 void pyllbc_Service::AfterStop()
 {
-    _cppFacade = NULL;
+    _cppComp = nullptr;
 
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
     CreateLLBCService(_llbcSvcType, _llbcSvcName);
 
-    // Cleanup all python layer facades.
-    for (_Facades::reverse_iterator it = _facades.rbegin();
-         it != _facades.rend();
+    // Cleanup all python layer components.
+    for (_Comps::reverse_iterator it = _comps.rbegin();
+         it != _comps.rend();
          it++)
         Py_DECREF(*it);
-    _facades.clear();
+    _comps.clear();
 
     // Cleanup all python layer codecs.
     for (_Codecs::iterator it = _codecs.begin();
@@ -868,7 +873,7 @@ void pyllbc_Service::HandleFrameCallables(pyllbc_Service::_FrameCallables &calla
          it++)
     {
         PyObject *callable = *it;
-        PyObject *ret = PyObject_CallFunctionObjArgs(callable, _pySvc, NULL);
+        PyObject *ret = PyObject_CallFunctionObjArgs(callable, _pySvc, nullptr);
         if (ret)
         {
             Py_DECREF(ret);
@@ -938,7 +943,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
         }
 
         // Convert to pyllbc_Stream *.
-        pyllbc_Stream *cstream = NULL;
+        pyllbc_Stream *cstream = nullptr;
         PyArg_Parse(cobj, "l", &cstream);
 
         // Let stream attach to inlStream.
@@ -956,13 +961,13 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
     }
 }
 
-void pyllbc_Service::AddiEventCtor(LLBC_Event *ev)
+void pyllbc_Service::EventEnqueueHandler(LLBC_Event *ev)
 {
     PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
     Py_INCREF(pyEv);
 }
 
-void pyllbc_Service::CustomEventDtor(LLBC_Event *ev)
+void pyllbc_Service::EventDequeueHandler(LLBC_Event *ev)
 {
     PyObject *pyEv = reinterpret_cast<PyObject *>(ev->GetExtData());
     Py_DECREF(pyEv);

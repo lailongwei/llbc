@@ -38,15 +38,15 @@ __LLBC_NS_BEGIN
 struct LLBC_HIDDEN LLBC_TimerData
 {
     // Timer handle, use to build timer heap.
-    uint64 handle;
+    sint64 handle;
 
     // Timer Id.
     LLBC_TimerId timerId;
 
     // Due time.
-    uint64 dueTime; 
+    sint64 dueTime; 
     // Period.
-    uint64 period;
+    sint64 period;
 
     // Repeat times.
     uint64 repeatTimes;

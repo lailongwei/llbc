@@ -12,12 +12,12 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_ALLOCATORS_H_
-#define RAPIDJSON_ALLOCATORS_H_
+#ifndef LLBC_RAPIDJSON_ALLOCATORS_H_
+#define LLBC_RAPIDJSON_ALLOCATORS_H_
 
 #include "llbc/core/rapidjson/rapidjson.h"
 
-RAPIDJSON_NAMESPACE_BEGIN
+LLBC_RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // Allocator
@@ -53,15 +53,15 @@ concept Allocator {
 */
 
 
-/*! \def RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY
-    \ingroup RAPIDJSON_CONFIG
+/*! \def LLBC_RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY
+    \ingroup LLBC_RAPIDJSON_CONFIG
     \brief User-defined kDefaultChunkCapacity definition.
 
     User can define this as any \c size that is a power of 2.
 */
 
-#ifndef RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY
-#define RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY (64 * 1024)
+#ifndef LLBC_RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY
+#define LLBC_RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY (64 * 1024)
 #endif
 
 
@@ -138,8 +138,8 @@ public:
     MemoryPoolAllocator(void *buffer, size_t size, size_t chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) :
         chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(buffer), baseAllocator_(baseAllocator), ownBaseAllocator_(0)
     {
-        RAPIDJSON_ASSERT(buffer != 0);
-        RAPIDJSON_ASSERT(size > sizeof(ChunkHeader));
+        LLBC_RAPIDJSON_ASSERT(buffer != 0);
+        LLBC_RAPIDJSON_ASSERT(size > sizeof(ChunkHeader));
         chunkHead_ = reinterpret_cast<ChunkHeader*>(buffer);
         chunkHead_->capacity = size - sizeof(ChunkHeader);
         chunkHead_->size = 0;
@@ -151,7 +151,7 @@ public:
     */
     ~MemoryPoolAllocator() {
         Clear();
-        RAPIDJSON_DELETE(ownBaseAllocator_);
+        LLBC_RAPIDJSON_DELETE(ownBaseAllocator_);
     }
 
     //! Deallocates all memory chunks, excluding the user-supplied buffer.
@@ -190,12 +190,12 @@ public:
         if (!size)
             return NULL;
 
-        size = RAPIDJSON_ALIGN(size);
+        size = LLBC_RAPIDJSON_ALIGN(size);
         if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity)
             if (!AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size))
                 return NULL;
 
-        void *buffer = reinterpret_cast<char *>(chunkHead_) + RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size;
+        void *buffer = reinterpret_cast<char *>(chunkHead_) + LLBC_RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size;
         chunkHead_->size += size;
         return buffer;
     }
@@ -208,15 +208,15 @@ public:
         if (newSize == 0)
             return NULL;
 
-        originalSize = RAPIDJSON_ALIGN(originalSize);
-        newSize = RAPIDJSON_ALIGN(newSize);
+        originalSize = LLBC_RAPIDJSON_ALIGN(originalSize);
+        newSize = LLBC_RAPIDJSON_ALIGN(newSize);
 
         // Do not shrink if new size is smaller than original
         if (originalSize >= newSize)
             return originalPtr;
 
         // Simply expand it if it is the last allocation and there is sufficient space
-        if (originalPtr == reinterpret_cast<char *>(chunkHead_) + RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size - originalSize) {
+        if (originalPtr == reinterpret_cast<char *>(chunkHead_) + LLBC_RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size - originalSize) {
             size_t increment = static_cast<size_t>(newSize - originalSize);
             if (chunkHead_->size + increment <= chunkHead_->capacity) {
                 chunkHead_->size += increment;
@@ -249,8 +249,8 @@ private:
     */
     bool AddChunk(size_t capacity) {
         if (!baseAllocator_)
-            ownBaseAllocator_ = baseAllocator_ = RAPIDJSON_NEW(BaseAllocator)();
-        if (ChunkHeader* chunk = reinterpret_cast<ChunkHeader*>(baseAllocator_->Malloc(RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + capacity))) {
+            ownBaseAllocator_ = baseAllocator_ = LLBC_RAPIDJSON_NEW(BaseAllocator)();
+        if (ChunkHeader* chunk = reinterpret_cast<ChunkHeader*>(baseAllocator_->Malloc(LLBC_RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + capacity))) {
             chunk->capacity = capacity;
             chunk->size = 0;
             chunk->next = chunkHead_;
@@ -261,7 +261,7 @@ private:
             return false;
     }
 
-    static const int kDefaultChunkCapacity = RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY; //!< Default chunk capacity.
+    static const int kDefaultChunkCapacity = LLBC_RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY; //!< Default chunk capacity.
 
     //! Chunk header for perpending to each chunk.
     /*! Chunks are stored as a singly linked list.
@@ -279,6 +279,6 @@ private:
     BaseAllocator* ownBaseAllocator_;   //!< base allocator created by this object.
 };
 
-RAPIDJSON_NAMESPACE_END
+LLBC_RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_ENCODINGS_H_
+#endif // LLBC_RAPIDJSON_ENCODINGS_H_

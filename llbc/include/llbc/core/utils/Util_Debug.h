@@ -35,7 +35,7 @@ __LLBC_NS_BEGIN
  * @param[in] lineWidth - line width, default is 16.
  * @return std::string - the formatted string data.
  */
-LLBC_EXTERN LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
+LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
 
 /**
  * Trace function define.

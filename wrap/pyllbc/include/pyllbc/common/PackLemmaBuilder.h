@@ -37,7 +37,7 @@ public:
      * @param[in] compileEnv - the compile environment.
      * @return pyllbc_PackLemma * - the pack-lemma object.
      */
-    static pyllbc_PackLemma *Build(pyllbc_PackLemma::Type type, PyObject *compileEnv = NULL);
+    static pyllbc_PackLemma *Build(pyllbc_PackLemma::Type type, PyObject *compileEnv = nullptr);
 };
 
 #endif // !__PYLLBC_COM_PACK_LEMMA_BUILDER_H__

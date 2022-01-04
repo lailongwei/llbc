@@ -50,7 +50,7 @@ public:
 
 public:
     LLBC_Array_Const_Iterator_Base()
-    : _arr(NULL)
+    : _arr(nullptr)
     , _idx(-1)
     {   // construct with null pointer.
     }

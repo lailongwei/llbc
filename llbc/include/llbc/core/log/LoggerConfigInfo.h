@@ -83,6 +83,12 @@ public:
     bool IsAsyncMode() const;
 
     /**
+     * Independent logger thread switch, only available in Async-Mode.
+     * @return bool - independent logger thread switch.
+     */
+    bool IsIndependentThread() const;
+
+    /**
      * Get file refresh interval.
      * @return int - the file refresh interval.
      */
@@ -217,6 +223,7 @@ private:
 
     int _logLevel;
     bool _asyncMode;
+    bool _independentThread;
     int _flushInterval;
 
     bool _logToConsole;

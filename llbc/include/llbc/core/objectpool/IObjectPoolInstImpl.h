@@ -48,7 +48,7 @@ LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::SetPoolInstToReferencablePoolObj(vo
 
 LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::ClearPoolInstFromReferencablePoolObj(void *obj)
 {
-    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = NULL;
+    reinterpret_cast<LLBC_ReferencablePoolObj *>(obj)->_poolInst = nullptr;
 }
 
 LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::CheckRefCount(void *obj)

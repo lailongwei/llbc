@@ -54,6 +54,7 @@ public:
         TagToken      = 'g',          // %g: tag type token.
         FileToken     = 'f',          // %f: file name type token.
         LineToken     = 'l',          // %l: file line type token.
+        FunctionToken = 'F',          // %F: function token.
         ThreadIdToken = 't',          // %t: thread id type token.
         ProcessIdToken= 'p',          // %p: process id type token.
         LevelToken    = 'L',          // %L: level type token, like DEBUG, INFO, eg ...

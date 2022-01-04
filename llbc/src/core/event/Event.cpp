@@ -41,13 +41,12 @@ LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
 
-, _intKeyParams(NULL)
-, _constantStrKeyParams(NULL)
-, _strKeyParams(NULL)
+, _intKeyParams(nullptr)
+, _constantStrKeyParams(nullptr)
+, _strKeyParams(nullptr)
 
-, _extData(NULL)
-, _extDataClearDeleg(NULL)
-, _delClearDelegWhenDestroy(true)
+, _extData(nullptr)
+, _extDataClearDeleg(nullptr)
 {
 }
 
@@ -65,7 +64,7 @@ LLBC_Event::~LLBC_Event()
 
 const LLBC_Variant &LLBC_Event::GetParam(int key) const
 {
-    if (_intKeyParams == NULL)
+    if (_intKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _IntKeyParams::const_iterator it = _intKeyParams->find(key);
@@ -74,7 +73,7 @@ const LLBC_Variant &LLBC_Event::GetParam(int key) const
 
 const LLBC_Variant &LLBC_Event::GetParam(const char* key) const
 {
-    if (_constantStrKeyParams == NULL)
+    if (_constantStrKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _ConstantStrKeyParams::const_iterator it = _constantStrKeyParams->find(LLBC_CString(key));
@@ -83,7 +82,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const char* key) const
 
 const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 {
-    if (_strKeyParams == NULL)
+    if (_strKeyParams == nullptr)
         return LLBC_INL_NS __nilVariant;
 
     _StrKeyParams::const_iterator it = _strKeyParams->find(key);
@@ -92,8 +91,8 @@ const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 
 LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 {
-    if (_intKeyParams == NULL)
-        _intKeyParams = LLBC_New0(_IntKeyParams);
+    if (_intKeyParams == nullptr)
+        _intKeyParams = LLBC_New(_IntKeyParams);
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -106,8 +105,8 @@ LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 
 LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 {
-    if (_constantStrKeyParams == NULL)
-        _constantStrKeyParams = LLBC_New0(_ConstantStrKeyParams);
+    if (_constantStrKeyParams == nullptr)
+        _constantStrKeyParams = LLBC_New(_ConstantStrKeyParams);
 
     LLBC_CString csKey(key);
     _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
@@ -121,8 +120,8 @@ LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 
 LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &param)
 {
-    if (_strKeyParams == NULL)
-        _strKeyParams = LLBC_New0(_StrKeyParams);
+    if (_strKeyParams == nullptr)
+        _strKeyParams = LLBC_New(_StrKeyParams);
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())
@@ -135,22 +134,22 @@ LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &par
 
 const std::map<int, LLBC_Variant> &LLBC_Event::GetIntKeyParams() const
 {
-    return _intKeyParams != NULL ? *_intKeyParams: LLBC_INL_NS __emptyIntKeyParams;
+    return _intKeyParams != nullptr ? *_intKeyParams: LLBC_INL_NS __emptyIntKeyParams;
 }
 
 const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetConstantStrKeyParams() const
 {
-    return _constantStrKeyParams != NULL ? *_constantStrKeyParams : LLBC_INL_NS __emptyConstantStrKeyParams;
+    return _constantStrKeyParams != nullptr ? *_constantStrKeyParams : LLBC_INL_NS __emptyConstantStrKeyParams;
 }
 
 const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetStrKeyParams() const
 {
-    return _strKeyParams != NULL ? *_strKeyParams : LLBC_INL_NS __emptyStrKeyParams;
+    return _strKeyParams != nullptr ? *_strKeyParams : LLBC_INL_NS __emptyStrKeyParams;
 }
 
 LLBC_Event * LLBC_Event::Clone() const
 {
-    LLBC_Event *clone = LLBC_New2(LLBC_Event, _id, false);
+    LLBC_Event *clone = LLBC_New(LLBC_Event, _id, false);
     if (_intKeyParams)
         clone->_intKeyParams = new std::map<int, LLBC_Variant>(*_intKeyParams);
     if (_strKeyParams)
@@ -164,7 +163,7 @@ LLBC_Event * LLBC_Event::Clone() const
 LLBC_Variant &LLBC_Event::operator [](int key)
 {
     if (!_intKeyParams)
-        _intKeyParams = LLBC_New0(_IntKeyParams);
+        _intKeyParams = LLBC_New(_IntKeyParams);
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -176,7 +175,7 @@ LLBC_Variant &LLBC_Event::operator [](int key)
 LLBC_Variant &LLBC_Event::operator [](const char *key)
 {
     if (!_constantStrKeyParams)
-        _constantStrKeyParams = LLBC_New0(_ConstantStrKeyParams);
+        _constantStrKeyParams = LLBC_New(_ConstantStrKeyParams);
 
     LLBC_CString csKey(key);
     _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
@@ -189,7 +188,7 @@ LLBC_Variant &LLBC_Event::operator [](const char *key)
 LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key)
 {
     if (!_strKeyParams)
-        _strKeyParams = LLBC_New0(_StrKeyParams);
+        _strKeyParams = LLBC_New(_StrKeyParams);
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())
@@ -223,6 +222,21 @@ const LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key) const
 
     _StrKeyParams::const_iterator it = _strKeyParams->find(key);
     return it != _strKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
+}
+
+void LLBC_Event::Clear()
+{
+    _id = 0;
+    _dontDelAfterFire = false;
+
+    ClearExtData();
+
+    if (_intKeyParams)
+        _intKeyParams->clear();
+    if (_constantStrKeyParams)
+        _constantStrKeyParams->clear();
+    if (_strKeyParams)
+        _strKeyParams->clear();
 }
 
 __LLBC_NS_END

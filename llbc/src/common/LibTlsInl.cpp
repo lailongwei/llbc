@@ -47,10 +47,10 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.threadHandle = LLBC_INVALID_HANDLE;
     coreTls.threadId = LLBC_INVALID_NATIVE_THREAD_ID;
     coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    coreTls.task = NULL;
-    coreTls.timerScheduler = NULL;
-    coreTls.safetyObjectPool = NULL;
-    coreTls.unsafetyObjectPool = NULL;
+    coreTls.task = nullptr;
+    coreTls.timerScheduler = nullptr;
+    coreTls.safetyObjectPool = nullptr;
+    coreTls.unsafetyObjectPool = nullptr;
 
     #if LLBC_CFG_OS_IMPL_SYMBOL
      #if LLBC_TARGET_PLATFORM_WIN32
@@ -64,7 +64,7 @@ __LLBC_LibTls::__LLBC_LibTls()
      #endif // LLBC_TARGET_PLATFORM_WIN32
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    objbaseTls.poolStack = NULL;
+    objbaseTls.poolStack = nullptr;
 
     ::memset(commTls.services, 0, sizeof(commTls.services));
 }
@@ -82,13 +82,12 @@ void __LLBC_CreateLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
 
-    bool tlsCreated = false;
+    bool tlsCreated;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    tlsCreated = (pthread_key_create(&tlsHandle, NULL) == 0) ? true : false;
+    tlsCreated = (pthread_key_create(&tlsHandle, nullptr) == 0) ? true : false;
 #else
     tlsCreated = ((tlsHandle = ::TlsAlloc()) != TLS_OUT_OF_INDEXES) ? true : false;
 #endif
-
     if (!tlsCreated)
     {
         ASSERT(!tlsCreated && "Create llbc library TLS handle failed!");
@@ -113,9 +112,9 @@ __LLBC_LibTls *__LLBC_GetLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
     if (UNLIKELY(tlsHandle == LLBC_INVALID_TLS_HANDLE))
-        return NULL;
+        return nullptr;
 
-    __LLBC_LibTls *libTls = NULL;
+    __LLBC_LibTls *libTls;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     libTls = reinterpret_cast<__LLBC_LibTls *>(pthread_getspecific(tlsHandle));
 #else
@@ -124,7 +123,7 @@ __LLBC_LibTls *__LLBC_GetLibTls()
 
     if (UNLIKELY(!libTls))
     {
-        libTls = LLBC_New0(__LLBC_LibTls);
+        libTls = LLBC_New(__LLBC_LibTls);
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         (void)pthread_setspecific(tlsHandle, libTls);
@@ -140,20 +139,20 @@ void __LLBC_ResetLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
 
-    __LLBC_LibTls *libTls = NULL;
+    __LLBC_LibTls *libTls;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         pthread_getspecific(tlsHandle))))
     {
         LLBC_Delete(libTls);
-        pthread_setspecific(tlsHandle, NULL);
+        pthread_setspecific(tlsHandle, nullptr);
     }
 #else
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         ::TlsGetValue(tlsHandle))))
     {
         LLBC_Delete(libTls);
-        ::TlsSetValue(tlsHandle, NULL);
+        ::TlsSetValue(tlsHandle, nullptr);
     }
 #endif
 }

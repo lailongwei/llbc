@@ -69,7 +69,7 @@ int LLBC_IniSection::RemoveValue(const LLBC_String &key)
 
     _values.erase(valIt);
     _comments.erase(key);
-    std::remove(_keys.begin(), _keys.end(), key);
+    (void)std::remove(_keys.begin(), _keys.end(), key);
 
     return LLBC_OK;
 }
@@ -189,15 +189,15 @@ int LLBC_Ini::SaveToFile(const LLBC_String &file, const LLBC_Strings &headerLine
 
 int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKeys) const
 {
-    LLBC_Strings *sortedSections = NULL;
+    LLBC_Strings *sortedSections = nullptr;
     if (sortSections)
     {
-        sortedSections = LLBC_New1(LLBC_Strings, _sectionNames);
+        sortedSections = LLBC_New(LLBC_Strings, _sectionNames);
         std::sort(sortedSections->begin(), sortedSections->end());
     }
 
     const LLBC_Strings &finalSectionNames = 
-        sortedSections != NULL ? *sortedSections : _sectionNames;
+        sortedSections != nullptr ? *sortedSections : _sectionNames;
     for (LLBC_Strings::const_iterator sectionIt = finalSectionNames.begin();
          sectionIt != finalSectionNames.end();
          ++sectionIt)
@@ -267,7 +267,7 @@ const LLBC_IniSection *LLBC_Ini::GetSection(const LLBC_String &sectionName) cons
     if (it == _sections.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return it->second;
@@ -310,14 +310,14 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
         _sectionNames.push_back(sectionName);
     }
 
-    _sections.insert(std::make_pair(sectionName, LLBC_New1(LLBC_IniSection, section)));
+    _sections.insert(std::make_pair(sectionName, LLBC_New(LLBC_IniSection, section)));
     return LLBC_OK;
 }
 
 LLBC_String LLBC_Ini::GetComment(const LLBC_String &sectionName, const LLBC_String &key) const
 {
     const LLBC_IniSection *section = GetSection(sectionName);
-    if (section == NULL)
+    if (section == nullptr)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return "";
@@ -427,10 +427,8 @@ int LLBC_Ini::TryParseSectionName(const LLBC_String &content,
     LLBC_String rawSection = content;
 
     // Unescape.
-    int ret;
     size_t unescapedTimes;
-    if ((ret = UnEscape(
-        rawSection, lineNum, contentBeginPos, unescapedTimes)) != LLBC_OK)
+    if (UnEscape(rawSection, lineNum, contentBeginPos, unescapedTimes) != LLBC_OK)
     {
         failedContinue = false;
         Err_InvalidEscapeFormat(lineNum, contentBeginPos);
@@ -577,7 +575,7 @@ void LLBC_Ini::Copy(const This &another)
     for (LLBC_IniSections::const_iterator it = another._sections.begin();
          it != another._sections.end();
          ++it)
-        _sections.insert(std::make_pair(it->first, LLBC_New1(LLBC_IniSection, *it->second)));
+        _sections.insert(std::make_pair(it->first, LLBC_New(LLBC_IniSection, *it->second)));
 }
 
 void LLBC_Ini::Err_UnSpecificSection(size_t lineNum, size_t columnNum)

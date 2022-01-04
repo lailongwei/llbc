@@ -23,41 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-template <typename ObjType>
-LLBC_Timer::LLBC_Timer(ObjType *obj,
-                       void(ObjType::*timeoutMeth)(LLBC_Timer *),
-                       void(ObjType::*cancelMeth)(LLBC_Timer *),
-                       Scheduler *scheduler)
-: _scheduler(scheduler ? scheduler : reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler))
-, _timerData(NULL)
-
-, _data(NULL)
-, _timeoutDeleg(obj && timeoutMeth ? new LLBC_Delegate1<void, ObjType, LLBC_Timer *>(obj, timeoutMeth) : NULL)
-, _cancelDeleg(obj && cancelMeth ? new LLBC_Delegate1<void, ObjType, LLBC_Timer *>(obj, cancelMeth) : NULL)
-{
-}
-
-template <typename ObjectType>
-inline void LLBC_Timer::SetTimeoutHandler(ObjectType *object, void ( ObjectType::*timeoutMeth)(LLBC_Timer *))
-{
-    typedef LLBC_Delegate1<void, ObjectType, LLBC_Timer *> __TimeoutMethDeleg;
-
-    if (UNLIKELY(object == NULL || timeoutMeth == NULL))
-        SetTimeoutHandler(static_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL));
-    else
-        SetTimeoutHandler(LLBC_New2(__TimeoutMethDeleg, object, timeoutMeth));
-}
-
-template <typename ObjectType>
-void LLBC_Timer::SetCancelHandler(ObjectType *object, void ( ObjectType::*cancelMeth)(LLBC_Timer *))
-{
-    typedef LLBC_Delegate1<void, ObjectType, LLBC_Timer *> __CancelMethDeleg;
-
-    if (UNLIKELY(object == NULL || cancelMeth == NULL))
-        SetCancelHandler(static_cast<LLBC_IDelegate1<void, LLBC_Timer *> *>(NULL));
-    else
-        SetCancelHandler(LLBC_New2(__CancelMethDeleg, object, cancelMeth));
-}
+// ... ...
 
 __LLBC_NS_END
 

@@ -44,7 +44,7 @@ int LLBC_Entity::AddBehavior(int id, BehaviorType *value, const LLBC_String &nam
     LLBC_BehaviorValue behaviorValue;
     behaviorValue.id = id;
     behaviorValue.name = name;
-    behaviorValue.holder = LLBC_New1(LLBC_Holder<BehaviorType>, value);
+    behaviorValue.holder = LLBC_New(LLBC_Holder<BehaviorType>, value);
 
     _behaviors.insert(std::make_pair(id, behaviorValue));
     if (!name.empty())
@@ -60,7 +60,7 @@ BehaviorType *LLBC_Entity::GetBehavior(int id)
     if (iter == _behaviors.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return static_cast<BehaviorType *>(iter->second.holder->GetValue());
@@ -73,7 +73,7 @@ const BehaviorType *LLBC_Entity::GetBehavior(int id) const
     if (iter == _behaviors.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return static_cast<const BehaviorType *>(iter->second.holder->GetValue());
@@ -85,14 +85,14 @@ BehaviorType *LLBC_Entity::GetBehavior(const LLBC_String &name)
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     std::map<LLBC_String, LLBC_BehaviorValue>::iterator iter = _behaviors2.find(name);
     if (iter == _behaviors2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return static_cast<BehaviorType *>(iter->second.holder->GetValue());
@@ -104,14 +104,14 @@ const BehaviorType *LLBC_Entity::GetBehavior(const LLBC_String &name) const
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return NULL;
+        return nullptr;
     }
 
     std::map<LLBC_String, LLBC_BehaviorValue>::const_iterator iter = _behaviors2.find(name);
     if (iter == _behaviors2.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return static_cast<const BehaviorType *>(iter->second.holder->GetValue());

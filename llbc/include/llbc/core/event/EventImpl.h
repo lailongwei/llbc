@@ -28,6 +28,11 @@ inline int LLBC_Event::GetId() const
     return _id;
 }
 
+inline void LLBC_Event::SetId(int id)
+{
+    _id = id;
+}
+
 inline bool LLBC_Event::IsDontDelAfterFire() const
 {
     return _dontDelAfterFire;
@@ -68,12 +73,12 @@ inline std::map<int, LLBC_Variant> &LLBC_Event::GetMutableIntKeyParams()
 
 inline size_t LLBC_Event::GetIntKeyParamsCount() const
 {
-    return _intKeyParams != NULL ? _intKeyParams->size() : 0;
+    return _intKeyParams != nullptr ? _intKeyParams->size() : 0;
 }
 
 inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
 {
-    return _constantStrKeyParams != NULL ? _constantStrKeyParams->size() : 0;
+    return _constantStrKeyParams != nullptr ? _constantStrKeyParams->size() : 0;
 }
 
 inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKeyParams()
@@ -86,7 +91,7 @@ inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKe
 
 inline size_t LLBC_Event::GetStrKeyParamsCount() const
 {
-    return _strKeyParams != NULL ? _strKeyParams->size() : 0;
+    return _strKeyParams != nullptr ? _strKeyParams->size() : 0;
 }
 
 inline std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetMutableStrKeyParams()
@@ -102,42 +107,23 @@ inline void * LLBC_Event::GetExtData() const
     return _extData;
 }
 
-inline void LLBC_Event::SetExtData(void *extData, LLBC_IDelegate1<void, void *> *clearDeleg, bool delClearDelegWhenDestroy)
+inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg)
 {
     ClearExtData();
     _extData = extData;
     _extDataClearDeleg = clearDeleg;
-    _delClearDelegWhenDestroy = delClearDelegWhenDestroy;
 }
 
 inline void LLBC_Event::ClearExtData()
 {
-    if (!_extData)
+    if (_extData)
     {
         if (_extDataClearDeleg)
-        {
-            if (_delClearDelegWhenDestroy)
-                LLBC_Delete(_extDataClearDeleg);
-
-            _extDataClearDeleg = NULL;
-        }
-
-        _delClearDelegWhenDestroy = true;
-
-        return;
+            _extDataClearDeleg(_extData);
+        _extData = nullptr;
     }
 
-    if (_extDataClearDeleg)
-    {
-        _extDataClearDeleg->Invoke(_extData);
-        _extData = NULL;
-
-        if (_delClearDelegWhenDestroy)
-            LLBC_Delete(_extDataClearDeleg);
-
-        _extDataClearDeleg = NULL;
-        _delClearDelegWhenDestroy = true;
-    }
+    _extDataClearDeleg = nullptr;   
 }
 
 __LLBC_NS_END

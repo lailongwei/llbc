@@ -89,14 +89,14 @@ LLBC_KeyHashAlgorithm::LLBC_KeyHashAlgorithm()
 {
     typedef LLBC_KeyHashAlgorithmType _AlgoType;
 
-    m_algos[_AlgoType::SDBM] = LLBC_New0(LLBC_KeyHashAlgorithm::SDBMHash);
-    m_algos[_AlgoType::RS] = LLBC_New0(LLBC_KeyHashAlgorithm::RSHash);
-    m_algos[_AlgoType::JS] = LLBC_New0(LLBC_KeyHashAlgorithm::JSHash);
-    m_algos[_AlgoType::PJ] = LLBC_New0(LLBC_KeyHashAlgorithm::PJHash);
-    m_algos[_AlgoType::ELF] = LLBC_New0(LLBC_KeyHashAlgorithm::ELFHash);
-    m_algos[_AlgoType::BKDR] = LLBC_New0(LLBC_KeyHashAlgorithm::BKDRHash);
-    m_algos[_AlgoType::DJB] = LLBC_New0(LLBC_KeyHashAlgorithm::DJBHash);
-    m_algos[_AlgoType::AP] = LLBC_New0(LLBC_KeyHashAlgorithm::APHash);
+    m_algos[_AlgoType::SDBM] = LLBC_New(LLBC_KeyHashAlgorithm::SDBMHash);
+    m_algos[_AlgoType::RS] = LLBC_New(LLBC_KeyHashAlgorithm::RSHash);
+    m_algos[_AlgoType::JS] = LLBC_New(LLBC_KeyHashAlgorithm::JSHash);
+    m_algos[_AlgoType::PJ] = LLBC_New(LLBC_KeyHashAlgorithm::PJHash);
+    m_algos[_AlgoType::ELF] = LLBC_New(LLBC_KeyHashAlgorithm::ELFHash);
+    m_algos[_AlgoType::BKDR] = LLBC_New(LLBC_KeyHashAlgorithm::BKDRHash);
+    m_algos[_AlgoType::DJB] = LLBC_New(LLBC_KeyHashAlgorithm::DJBHash);
+    m_algos[_AlgoType::AP] = LLBC_New(LLBC_KeyHashAlgorithm::APHash);
 }
 
 LLBC_KeyHashAlgorithm::~LLBC_KeyHashAlgorithm()
@@ -112,7 +112,7 @@ LLBC_KeyHashAlgorithm::~LLBC_KeyHashAlgorithm()
 
 const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(int type) const
 {
-    return LLBC_KeyHashAlgorithmType::IsLegal(type) ? m_algos[type] : NULL;
+    return LLBC_KeyHashAlgorithmType::IsLegal(type) ? m_algos[type] : nullptr;
 }
 
 const LLBC_KeyHashAlgorithm::HashBase *LLBC_KeyHashAlgorithm::GetAlgorithm(const LLBC_String &algoDesc) const
@@ -126,6 +126,9 @@ LLBC_KeyHashAlgorithm::SDBMHash::Result_Type
         LLBC_KeyHashAlgorithm::SDBMHash::Argument2_Type size) const
 {
     uint32 hash = 0;
+
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
@@ -146,6 +149,9 @@ LLBC_KeyHashAlgorithm::RSHash::Result_Type
     uint32 b = 378551;
     uint32 hash = 0;
 
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
+
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
     {
@@ -162,6 +168,9 @@ LLBC_KeyHashAlgorithm::JSHash::Result_Type
         LLBC_KeyHashAlgorithm::JSHash::Argument2_Type size) const
 {
     uint32 hash = 1315423911;
+
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
@@ -185,6 +194,9 @@ LLBC_KeyHashAlgorithm::PJHash::Result_Type
     uint32 hash = 0;
     uint32 test = 0;
 
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
+
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
     {
@@ -205,6 +217,9 @@ LLBC_KeyHashAlgorithm::ELFHash::Result_Type
 {
     uint32 x = 0;
     uint32 hash = 0;
+
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
@@ -228,6 +243,9 @@ LLBC_KeyHashAlgorithm::BKDRHash::Result_Type
     uint32 seed = 131;
     uint32 hash = 0;
 
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
+
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
     {
@@ -244,6 +262,9 @@ LLBC_KeyHashAlgorithm::DJBHash::Result_Type
 {
     uint32 hash = 5381;
 
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
+
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)
     {
@@ -259,6 +280,9 @@ LLBC_KeyHashAlgorithm::APHash::Result_Type
         LLBC_KeyHashAlgorithm::APHash::Argument2_Type size) const
 {
     uint32 hash = 0;
+
+    if (size == 0)
+        size = strlen(reinterpret_cast<const char *>(buf));
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for(size_t i = 0; i < size; ++i)

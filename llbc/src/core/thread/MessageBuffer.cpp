@@ -32,8 +32,8 @@ __LLBC_NS_BEGIN
 
 LLBC_MessageBuffer::LLBC_MessageBuffer()
 : _size(0)
-, _head(NULL)
-, _tail(NULL)
+, _head(nullptr)
+, _tail(nullptr)
 {
 }
 
@@ -134,7 +134,7 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
     }
 
     // Execute normal write(create new block and append to message buffer).
-    LLBC_MessageBlock *block = LLBC_New1(LLBC_MessageBlock, len);
+    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, len);
     block->Write(buf, len);
     if (UNLIKELY(Append(block) != LLBC_OK))
     {
@@ -158,16 +158,16 @@ const LLBC_MessageBlock *LLBC_MessageBuffer::FirstBlock() const
 LLBC_MessageBlock *LLBC_MessageBuffer::DetachFirstBlock()
 {
     if (!_head)
-        return NULL;
+        return nullptr;
 
     LLBC_MessageBlock *firstBlock = _head;
     _head = _head->GetNext();
-    if (_head == NULL)
-        _tail = NULL;
+    if (_head == nullptr)
+        _tail = nullptr;
 
     _size -= firstBlock->GetReadableSize();
 
-    firstBlock->SetNext(NULL);
+    firstBlock->SetNext(nullptr);
 
     return firstBlock;
 }
@@ -175,7 +175,7 @@ LLBC_MessageBlock *LLBC_MessageBuffer::DetachFirstBlock()
 LLBC_MessageBlock *LLBC_MessageBuffer::MergeBlocksAndDetach()
 {
     if (!_head)
-        return NULL;
+        return nullptr;
 
     LLBC_MessageBlock *mergedBlock = _head;
     LLBC_MessageBlock *curBlock = _head->GetNext();
@@ -190,9 +190,9 @@ LLBC_MessageBlock *LLBC_MessageBuffer::MergeBlocksAndDetach()
     }
 
     _size = 0;
-    _head = NULL;
-    _tail = NULL;
-    mergedBlock->SetNext(NULL);
+    _head = nullptr;
+    _tail = nullptr;
+    mergedBlock->SetNext(nullptr);
 
     return mergedBlock;
 }
@@ -213,8 +213,8 @@ int LLBC_MessageBuffer::Append(LLBC_MessageBlock *block)
         return LLBC_OK;
     }
 
-    // Force set block next to NULL.
-    block->SetNext(NULL);
+    // Force set block next to nullptr.
+    block->SetNext(nullptr);
 
     // Update message-buffer size first.
     _size += block->GetReadableSize();
@@ -287,7 +287,7 @@ void LLBC_MessageBuffer::Cleanup()
     if (!_head)
         return;
 
-    LLBC_MessageBlock *block = NULL;
+    LLBC_MessageBlock *block = nullptr;
     while (_head)
     {
         block = _head;
@@ -295,7 +295,7 @@ void LLBC_MessageBuffer::Cleanup()
         LLBC_Recycle(block);
     }
 
-    _tail = NULL;
+    _tail = nullptr;
     _size = 0;
 }
 
@@ -307,8 +307,8 @@ void LLBC_MessageBuffer::DeleteFirstBlock()
         _head = _head->GetNext();
         LLBC_Recycle(block);
 
-        if (_head == NULL)
-            _tail = NULL;
+        if (_head == nullptr)
+            _tail = nullptr;
     }
 }
 

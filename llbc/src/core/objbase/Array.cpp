@@ -33,9 +33,9 @@ __LLBC_NS_BEGIN
 LLBC_Array::LLBC_Array()
 : _size(0)
 , _capacity(0) 
-, _objs(NULL)
+, _objs(nullptr)
 
-, _objFactory(NULL)
+, _objFactory(nullptr)
 {
     Recapacity(1);
 }
@@ -161,7 +161,7 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     for (difference_type i = n0._idx; i < n1._idx; ++i)
     {
         _objs[i]->Release();
-        _objs[i] = NULL;
+        _objs[i] = nullptr;
     }
 
     difference_type shift = other._size - (n1._idx - n0._idx);
@@ -178,7 +178,7 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
 LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
 {
     size_type erasedCount = 0;
-    if (UNLIKELY(o == NULL))
+    if (UNLIKELY(o == nullptr))
         return erasedCount;
 
     for (difference_type i = _size - 1; i >= 0; --i)
@@ -192,7 +192,7 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
             }
 
             LLBC_MemCpy(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
-            _objs[--_size] = NULL;
+            _objs[--_size] = nullptr;
         }
     }
 
@@ -324,7 +324,7 @@ LLBC_Array::Obj *LLBC_Array::FirstObject()
     if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return *Begin();
@@ -335,7 +335,7 @@ LLBC_Array::ConstObj *LLBC_Array::FirstObject() const
     if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return *Begin();
@@ -346,7 +346,7 @@ LLBC_Array::Obj *LLBC_Array::LastObject()
     if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return *(--End());
@@ -357,7 +357,7 @@ LLBC_Array::ConstObj *LLBC_Array::LastObject() const
     if (IsEmpty())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return NULL;
+        return nullptr;
     }
 
     return *(--End());
@@ -370,7 +370,7 @@ LLBC_Array::Obj *LLBC_Array::ObjectAtIndex(difference_type off)
         return *iter;
 
     LLBC_SetLastError(LLBC_ERROR_ARG);
-    return NULL;
+    return nullptr;
 }
 
 LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
@@ -380,17 +380,17 @@ LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
         return *iter;
 
     LLBC_SetLastError(LLBC_ERROR_ARG);
-    return NULL;
+    return nullptr;
 }
 
 LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
 {
-    Obj *o = NULL;
+    Obj *o = nullptr;
 
     int errNo = LLBC_GetLastError();
     int subErrNo = LLBC_GetSubErrorNo();
 
-    LLBC_Array *arr = LLBC_New0(LLBC_Array);
+    LLBC_Array *arr = LLBC_New(LLBC_Array);
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); ++iter)
     {
@@ -430,7 +430,7 @@ void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
 
 LLBC_Object *LLBC_Array::Clone() const
 {
-    LLBC_Array *clone = LLBC_New0(LLBC_Array);
+    LLBC_Array *clone = LLBC_New(LLBC_Array);
 
     // Clone object factory.
     if (_objFactory)

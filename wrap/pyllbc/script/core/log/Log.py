@@ -63,9 +63,11 @@ class pyllbcLog(object):
             caller_stack = pyllbcInspect.stack()[2]
             filename = caller_stack[1]
             lineno = caller_stack[2]
+            func = caller_stack[3]
         else:
             filename = None
             lineno = 0
+            func = None
 
         if not isinstance(msg, str):
             if isinstance(msg, unicode):
@@ -87,7 +89,7 @@ class pyllbcLog(object):
             print('[Log] {}'.format(msg))
             return
 
-        llbc.inl.LogMsg(lv, filename, lineno, msg, logger, tag)
+        llbc.inl.LogMsg(lv, filename, lineno, func, msg, logger, tag)
 
 
 llbc.Log = pyllbcLog

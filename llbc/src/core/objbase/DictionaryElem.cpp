@@ -41,19 +41,19 @@ __LLBC_NS_BEGIN
 
 LLBC_DictionaryElem::LLBC_DictionaryElem(int key, LLBC_Object *o)
 : _intKey(key)
-, _strKey(NULL)
+, _strKey(nullptr)
 , _hash(0)
 
 , _obj(o)
 
-, _bucket(NULL)
+, _bucket(nullptr)
 , _bucketSize(0)
 
-, _prev(NULL)
-, _next(NULL)
+, _prev(nullptr)
+, _next(nullptr)
 
-, _bucketPrev(NULL)
-, _bucketNext(NULL)
+, _bucketPrev(nullptr)
+, _bucketNext(nullptr)
 
 , _hashFun(*LLBC_KeyHashAlgorithmSingleton->GetAlgorithm(LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO))
 {
@@ -62,19 +62,19 @@ LLBC_DictionaryElem::LLBC_DictionaryElem(int key, LLBC_Object *o)
 
 LLBC_DictionaryElem::LLBC_DictionaryElem(const LLBC_String &key, LLBC_Object *o)
 : _intKey(0)
-, _strKey(LLBC_New1(LLBC_String, key))
+, _strKey(LLBC_New(LLBC_String, key))
 , _hash(0)
 
 , _obj(o)
 
-, _bucket(NULL)
+, _bucket(nullptr)
 , _bucketSize(0)
 
-, _prev(NULL)
-, _next(NULL)
+, _prev(nullptr)
+, _next(nullptr)
 
-, _bucketPrev(NULL)
-, _bucketNext(NULL)
+, _bucketPrev(nullptr)
+, _bucketNext(nullptr)
 
 , _hashFun(*LLBC_KeyHashAlgorithmSingleton->GetAlgorithm(LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO))
 {
@@ -139,11 +139,11 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
     }
 
     // Link to hash bucket.
-    SetBucketElemPrev(NULL);
+    SetBucketElemPrev(nullptr);
     LLBC_DictionaryElem *&hashed = _bucket[_hash];
     if(!hashed)
     {
-        SetBucketElemNext(NULL);
+        SetBucketElemNext(nullptr);
         hashed = this;
     }
     else
@@ -155,7 +155,7 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
 #ifdef LLBC_DEBUG
         int confictCount = 0;
         LLBC_DictionaryElem *countElem = hashed;
-        for(; countElem != NULL; countElem = countElem->GetBucketElemNext())
+        for(; countElem != nullptr; countElem = countElem->GetBucketElemNext())
         {
             confictCount += 1;
         }

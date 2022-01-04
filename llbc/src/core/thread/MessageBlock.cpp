@@ -35,13 +35,13 @@ __LLBC_NS_BEGIN
 
 LLBC_MessageBlock::LLBC_MessageBlock(size_t size)
 : _attach(false)
-, _buf(NULL)
+, _buf(nullptr)
 , _size(size)
 , _readPos(0)
 , _writePos(0)
-, _prev(NULL)
-, _next(NULL)
-, _poolInst(NULL)
+, _prev(nullptr)
+, _next(nullptr)
+, _poolInst(nullptr)
 {
     if (LIKELY(size > 0))
         _buf = LLBC_Malloc(char, size);
@@ -53,10 +53,10 @@ LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size)
 , _size(size)
 , _readPos(0)
 , _writePos(0)
-, _prev(NULL)
-, _next(NULL)
+, _prev(nullptr)
+, _next(nullptr)
 
-, _poolInst(NULL)
+, _poolInst(nullptr)
 {
 }
 
@@ -127,7 +127,7 @@ void LLBC_MessageBlock::Release()
 
     if (!_attach)
         LLBC_Free(_buf);
-    _buf = NULL;
+    _buf = nullptr;
 
     _size = 0;
     _readPos = _writePos = 0;
@@ -138,26 +138,17 @@ void LLBC_MessageBlock::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
     _poolInst = &poolInst;
 }
 
-bool LLBC_MessageBlock::IsPoolObject() const
-{
-    return _poolInst != NULL;
-}
-
 LLBC_IObjectPoolInst * LLBC_MessageBlock::GetPoolInst()
 {
     return _poolInst;
-}
-
-void LLBC_MessageBlock::GiveBackToPool()
-{
-    _poolInst->Release(this);
 }
 
 size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
 {
     return LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER;
 }
-void LLBC_MessageBlock::Clear()
+
+void LLBC_MessageBlock::Clear()
 {
     _readPos = _writePos = 0;
     if (_attach)
@@ -167,7 +158,7 @@ size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
         _attach = false;
     }
 
-    _prev = _next = NULL;
+    _prev = _next = nullptr;
 }
 
 bool LLBC_MessageBlock::IsAttach() const
@@ -291,11 +282,11 @@ LLBC_MessageBlock *LLBC_MessageBlock::Clone() const
     LLBC_MessageBlock *clone;
     if (IsAttach())
     {
-        clone = LLBC_New2(LLBC_MessageBlock, _buf, _size);
+        clone = LLBC_New(LLBC_MessageBlock, _buf, _size);
     }
     else
     {
-        clone = LLBC_New1(LLBC_MessageBlock, _size);
+        clone = LLBC_New(LLBC_MessageBlock, _size);
         memcpy(clone->_buf, _buf, _size);
     }
 

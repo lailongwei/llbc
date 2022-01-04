@@ -40,7 +40,7 @@ namespace llbc
         public extern static void csllbc_Timer_Destroy(IntPtr timer);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Timer_Schedule(IntPtr timer, ulong dueTime, ulong period);
+        public extern static int csllbc_Timer_Schedule(IntPtr timer, long dueTime, long period);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Timer_IsScheduling(IntPtr timer);

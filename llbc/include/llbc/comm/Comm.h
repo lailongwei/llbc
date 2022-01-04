@@ -29,7 +29,7 @@
 #include "llbc/comm/Session.h"
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/ICoder.h"
-#include "llbc/comm/IFacade.h"
+#include "llbc/comm/IComponent.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/IService.h"
@@ -53,12 +53,12 @@ __LLBC_NS_BEGIN
  * the module.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_HIDDEN int __LLBC_CommStartup();
+LLBC_HIDDEN int __LLBC_CommStartup();
 
 /**
  * LLBC library Communication-Module cleanup function.
  */
-LLBC_EXTERN LLBC_HIDDEN void __LLBC_CommCleanup();
+LLBC_HIDDEN void __LLBC_CommCleanup();
 
 __LLBC_NS_END
 

@@ -88,7 +88,7 @@ public:
      * @param[in]  in            - the in data.
      *                             in this protocol, in data type: LLBC_MessageBlock.
      * @param[out] out           - the out data.
-     *                             in this protocol, out data type: LLBC_MessageBlock *, NULL if not packet constructed.
+     *                             in this protocol, out data type: LLBC_MessageBlock *, nullptr if not packet constructed.
      *                             in LLBC_MessageBlock, store the LLBC_Packet * list.
      * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.

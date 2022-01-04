@@ -52,7 +52,7 @@ int TestCase_Core_Library::Run(int argc, char *argv[])
     LLBC_PrintLine("Open library %s successed.", libName);
 
     LLBC_LibraryFun fun = lib.GetProcAddress(procName);
-    if(fun == NULL)
+    if(fun == nullptr)
     {
         LLBC_PrintLine("Retrieve library symbol [%s] failed, reason: %s", procName, LLBC_FormatLastError());
         return -1;
@@ -70,7 +70,7 @@ int TestCase_Core_Library::Run(int argc, char *argv[])
 
     // Open self library.
     LLBC_Library selfLib;
-	if(selfLib.Open(NULL) != LLBC_OK)
+	if(selfLib.Open(nullptr) != LLBC_OK)
     {
         LLBC_PrintLine("Open self library failed, reason: %s", LLBC_FormatLastError());
         return -1;

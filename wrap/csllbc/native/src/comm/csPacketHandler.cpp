@@ -37,8 +37,8 @@ csllbc_PacketHandler::csllbc_PacketHandler(_NotFoundDecoderReport notFoundDecode
 void csllbc_PacketHandler::Handle(LLBC_Packet &packet)
 {
     csllbc_Coder *coder = (csllbc_Coder *)packet.GetDecoder();
-    if (coder == NULL &&
-            packet.GetPreHandleResult() == NULL)
+    if (coder == nullptr &&
+            packet.GetPreHandleResult() == nullptr)
         ReportNotFoundDecoder(Phase_PreHandle, packet);
 
     _DecodeDelegs *delegs = coder->GetDecodeDelegates();
@@ -50,8 +50,8 @@ void csllbc_PacketHandler::Handle(LLBC_Packet &packet)
 bool csllbc_PacketHandler::PreHandle(LLBC_Packet &packet)
 {
     csllbc_Coder *coder = (csllbc_Coder *)packet.GetDecoder();
-    if (coder == NULL &&
-            packet.GetPreHandleResult() == NULL)
+    if (coder == nullptr &&
+            packet.GetPreHandleResult() == nullptr)
         ReportNotFoundDecoder(Phase_PreHandle, packet);
 
     _DecodeDelegs *delegs = coder->GetDecodeDelegates();
@@ -63,8 +63,8 @@ bool csllbc_PacketHandler::PreHandle(LLBC_Packet &packet)
 bool csllbc_PacketHandler::UnifyPreHandle(LLBC_Packet &packet)
 {
     csllbc_Coder *coder = (csllbc_Coder *)packet.GetDecoder();
-    if (coder == NULL &&
-            packet.GetPreHandleResult() == NULL)
+    if (coder == nullptr &&
+            packet.GetPreHandleResult() == nullptr)
         ReportNotFoundDecoder(Phase_PreHandle, packet);
 
     _DecodeDelegs *delegs = coder->GetDecodeDelegates();
@@ -80,5 +80,5 @@ void csllbc_PacketHandler::ReportNotFoundDecoder(int phase, LLBC_Packet &packet)
                               packet.GetPayload(),
                               static_cast<int>(packet.GetPayloadLength()),
                               packet.GetStatus());
-    packet.SetPreHandleResult<csllbc_PacketHandler>((void *)1, NULL, NULL);
+    packet.SetPreHandleResult<csllbc_PacketHandler>((void *)1, nullptr, nullptr);
 }

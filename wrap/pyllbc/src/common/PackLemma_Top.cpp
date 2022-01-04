@@ -100,7 +100,7 @@ PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
     if (UNLIKELY(!IsDone()))
     {
         pyllbc_SetError("top-lemma not done, could not unpack data");
-        return NULL;
+        return nullptr;
     }
 
     size_t idx = 0;
@@ -118,7 +118,7 @@ PyObject *pyllbc_PackLemma_Top::Read(pyllbc_Stream *stream)
     if (idx != _lemmas.size())
     {
         Py_DECREF(values);
-        values = NULL;
+        values = nullptr;
     }
 
     return values;

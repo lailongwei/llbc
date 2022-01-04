@@ -36,7 +36,7 @@ class csllbc_Service;
  * @param[in] svcName   - the service name.
  * @param[in] fullStack - the full-stack option.
  * @param[in] ...       - the delegates, internal used.
- * @return csllbc_Service * - the created service, if failed, return NULL.
+ * @return csllbc_Service * - the created service, if failed, return nullptr.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
                                                                   const char *svcName,
@@ -244,23 +244,23 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Broadcast(csllbc_Service *svc,
                                                          int status);
 
 /**
- * Register all csharp facade delegates.
+ * Register all csharp comp delegates.
  * @param[in] svc       - the service.
- * @param[in] delegates - all facade event handler delegates.
+ * @param[in] delegates - all comp event handler delegates.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_RegisterFacade(csllbc_Service *svc,
-                                                              csllbc_Delegates::Deleg_Facade_OnInit initDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnDestroy destroyDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnStart startDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnStop stopDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnUpdate updateDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnIdle idleDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnSessionCreate sessionCreateDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnSessionDestroy sessionDestroyDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnAsyncConnResult asyncConnResultDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnProtoReport protoReportDeleg,
-                                                              csllbc_Delegates::Deleg_Facade_OnUnHandledPacket unHandledPacketDeleg);
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_RegisterComponent(csllbc_Service *svc,
+                                                                 csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                                                 csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg);
 
 /**
  * Register csharp layer coder.

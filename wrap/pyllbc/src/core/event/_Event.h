@@ -26,10 +26,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_New(PyObject *self, PyObject *args)
     int evId;
     PyObject *pyEv;
     if (!PyArg_ParseTuple(args, "Oi", &pyEv, &evId))
-        return NULL;
+        return nullptr;
 
-    LLBC_Event *ev = LLBC_New2(LLBC_Event, evId, true);
-    ev->SetExtData(pyEv, NULL);
+    LLBC_Event *ev = LLBC_New(LLBC_Event, evId, true);
+    ev->SetExtData(pyEv, nullptr);
 
     return PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(ev));
 }
@@ -38,7 +38,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_Del(PyObject *self, PyObject *args)
 {
     LLBC_Event *ev;
     if (!PyArg_ParseTuple(args, "l", &ev))
-        return NULL;
+        return nullptr;
 
     LLBC_Delete(ev);
 
@@ -50,7 +50,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
     LLBC_Event *ev;
     const char *evParamKey;
     if (!PyArg_ParseTuple(args, "ls", &ev, &evParamKey))
-        return NULL;
+        return nullptr;
 
     // Try find event param from constant string_key params.
     std::map<LLBC_CString, LLBC_Variant>::const_iterator cit = ev->GetConstantStrKeyParams().find(evParamKey);
@@ -64,7 +64,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
 
     // Not found, set index error.
     pyllbc_SetError(LLBC_String().format("not found event param, key:%s", evParamKey), LLBC_ERROR_NOT_FOUND, PyExc_IndexError);
-    return NULL;
+    return nullptr;
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_Event_SetItem(PyObject *self, PyObject *args)
@@ -73,11 +73,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_SetItem(PyObject *self, PyObject *args)
     const char *evParamKey;
     PyObject *evParamValue;
     if (!PyArg_ParseTuple(args, "lsO", &ev, &evParamKey, &evParamValue))
-        return NULL;
+        return nullptr;
 
     LLBC_Variant nativeEvParamValue;
     if (pyllbc_ObjUtil::Obj2Variant(evParamValue, nativeEvParamValue) != LLBC_OK)
-        return NULL;
+        return nullptr;
 
     (*ev)[LLBC_String(evParamKey)] = nativeEvParamValue;
 

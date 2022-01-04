@@ -49,6 +49,14 @@
 #define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
 
 /**
+ * \brief core/variant about config options define.
+ */
+// Define variant number as string method fast access begin number(included).
+#define LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN         ((int)-256)
+// Define variant number as string method fast access end number(included).
+#define LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END           ((int)256)
+
+/**
  * \brief core/file about config options define.
  */
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
@@ -64,6 +72,8 @@
 #define LLBC_CFG_CORE_UTILS_IMPL__I64TOA                    0
 // Determine library impl _ui64toa() API or not, Non-WIN32 Platform specific.
 #define LLBC_CFG_CORE_UTILS_IMPL__UI64TOA                   0
+// Determine define win32-styled string datatypes or not, eg:LPSTR/LPTSTR/...
+#define LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES  0
 
 /**
  * \brief core/sampler about config options define.
@@ -93,12 +103,16 @@
  */
 // Root logger name.
 #define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
+// Logger format buf size.
+#define LLBC_CFG_LOG_FORMAT_BUF_SIZE                        16 * 1024
 // Default log level is set to DEBUG(DEBUG:0, INFO:1, WARN:2, ERROR:3, FATAL:4).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
 // Default log asynchronous mode is set to false.
 #define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     0
+// Default log independent logger thread is set to false.
+#define LLBC_CFG_LOG_DEFAULT_INDEPENDENT_THREAD             0
 // Default is log to console.
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.
@@ -128,7 +142,7 @@
 // Default max log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL                 5000
 // Default log using mode.
-#define LLBC_CFG_LOG_USING_WITH_STREAM                      0
+#define LLBC_CFG_LOG_USING_WITH_STREAM                      1
 // Default take over config, only using in root logger, when a message log to 
 // unconfiged logger, root logger will take over, if configed takeover to true.
 #define LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED       1
@@ -142,7 +156,7 @@
  */
 // Strict timer schedule mode.
 #define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
-// Long timeout time, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
+// Long timeout time, in milli-seconds, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
 #define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
 
 /**
@@ -165,9 +179,11 @@
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse      1
+#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse      1
 // Some llbc framework types object pool units number define.
-#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256     // LLBC_Packet
-#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256    // LLBC_MessageBlock
+#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256 // LLBC_Packet
+#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256 // LLBC_MessageBlock
 
 /**
  * \brief ObjBase about configs.
@@ -231,8 +247,8 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
-// Dynamic create facade create method prefix name.
-#define LLBC_CFG_COMM_CREATE_FACADE_FROM_LIB_FUNC_PREFIX    "llbc_create_facade_"
+// Dynamic create comp create method prefix name.
+#define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).

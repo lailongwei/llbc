@@ -19,9 +19,24 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_COMSTRING_COMMON_H__
-#define __LLBC_CORE_COMSTRING_COMMON_H__
+#ifndef __LLBC_TEST_CASE_COMM_COMP_H__
+#define __LLBC_TEST_CASE_COMM_COMP_H__
 
-#include "llbc/core/comstring/ComString.h"
+#include "llbc.h"
+using namespace llbc;
 
-#endif // !__LLBC_CORE_COMSTRING_COMMON_H__
+class TestCase_Comm_Comp : public LLBC_BaseTestCase
+{
+public:
+    TestCase_Comm_Comp();
+    virtual ~TestCase_Comm_Comp();
+
+public:
+    virtual int Run(int argc, char *argv[]);
+
+private:
+    int TestInInternalDriveService(const LLBC_String &host, const int port);
+    int TestInExternalDriveService(const LLBC_String &host, const int port);
+};
+
+#endif // __LLBC_TEST_CASE_COMM_COMP_H__

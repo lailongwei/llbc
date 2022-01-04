@@ -123,7 +123,7 @@ public:
     /**
      * Read data.
      * @param[in] cls - class object(not steal reference, will increment it).
-     * @return PyObject * - the readed instance object(new reference), return NULL means failed.
+     * @return PyObject * - the readed instance object(new reference), return nullptr means failed.
      */
     PyObject *Read(PyObject *cls);
     PyObject *ReadNone();
@@ -158,7 +158,7 @@ public:
      *  f: float value.
      *  d: double value(only support Fomat method).
      *  S: string value.
-     *  S#:string value(use another coder algorithm, 4bytes length + string content(not include NULL character).
+     *  S#:string value(use another coder algorithm, 4bytes length + string content(not include nullptr character).
      *  U: unicode value.
      *  A: byte array value.
      *  F: buffer value.
@@ -179,7 +179,7 @@ public:
      *      {i:(C<int>)}
      *      ([SC<int>NA(i)]{int:S}B
      */
-    PyObject *FmtRead(const LLBC_String &fmt, PyObject *callerEnv = NULL);
+    PyObject *FmtRead(const LLBC_String &fmt, PyObject *callerEnv = nullptr);
 
     /**
      * Write data to stream.
@@ -218,7 +218,7 @@ public:
      * @return int - 0 if success, otherwise return -1.
      *               About the fmt characters decription, see FmtRead() method doc.
      */
-    int FmtWrite(const LLBC_String &fmt, PyObject *values, PyObject *callerEnv = NULL);
+    int FmtWrite(const LLBC_String &fmt, PyObject *values, PyObject *callerEnv = nullptr);
 
 private:
     LLBC_Stream _stream;

@@ -32,8 +32,8 @@ __LLBC_NS_BEGIN
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
 : LLBC_IObjectPool()
-, _orderedDeleteNodes(NULL)
-, _topOrderedDeleteNodes(NULL)
+, _orderedDeleteNodes(nullptr)
+, _topOrderedDeleteNodes(nullptr)
 {
 }
 
@@ -215,7 +215,7 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLo
         if (!(poolInst = TryCreatePoolInstFromFactory(objectType)))
         {
             _lock.Unlock();
-            return NULL;
+            return nullptr;
         }
 
         _poolInsts.insert(std::make_pair(poolInst->GetPoolInstName(), poolInst));
@@ -264,12 +264,12 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     }
 
     // Try fetch frontNode & backNode.
-    LLBC_ObjectPoolOrderedDeleteNode *frontNode = NULL;
+    LLBC_ObjectPoolOrderedDeleteNode *frontNode = nullptr;
     LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _orderedDeleteNodes->find(frontNodeName);
     if (nodeIt != _orderedDeleteNodes->end())
         frontNode = nodeIt->second;
 
-    LLBC_ObjectPoolOrderedDeleteNode *backNode = NULL;
+    LLBC_ObjectPoolOrderedDeleteNode *backNode = nullptr;
     nodeIt = _orderedDeleteNodes->find(backNodeName);
     if (nodeIt != _orderedDeleteNodes->end())
         backNode = nodeIt->second;
@@ -277,8 +277,8 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 1: frontNode & backNode never add to <_orderedDeleteNodes> container.
     if (!frontNode && !backNode)
     {
-        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
-        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+        frontNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        backNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
 
         _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
         _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
@@ -292,7 +292,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 2: frontNode found, backNode not found.
     else if (frontNode && !backNode)
     {
-        backNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
+        backNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, backNodeName);
         _orderedDeleteNodes->insert(std::make_pair(backNodeName, backNode));
 
         frontNode->AddBackNode(backNode);
@@ -303,7 +303,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
     // Case 3: frontNode not found, backNode found.
     else if (!frontNode && backNode)
     {
-        frontNode = LLBC_New1(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
+        frontNode = LLBC_New(LLBC_ObjectPoolOrderedDeleteNode, frontNodeName);
         _orderedDeleteNodes->insert(std::make_pair(frontNodeName, frontNode));
 
         // backNode is top node.
@@ -418,7 +418,7 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstL
     if (it == _poolInstFactories.end())
     {
         _poolInstFactoryLock.Unlock();
-        return NULL;
+        return nullptr;
     }
 
     LLBC_IObjectPoolInst *poolInst = it->second->Create(this, new PoolInstLockType());
@@ -428,7 +428,7 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstL
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_FORCE_INLINE void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
 {
     // Delete node pool instance.
     _PoolInsts::iterator instIt = _poolInsts.find(node->GetNodeName());

@@ -310,7 +310,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
 
     LLBC_PrintLine("Touch file test, file: %s", _testFileName.c_str());
     LLBC_PrintLine("Touch all times to now:");
-    if (LLBC_File::TouchFile(_testFileName, true, NULL, true, NULL) != LLBC_OK)
+    if (LLBC_File::TouchFile(_testFileName, true, nullptr, true, nullptr) != LLBC_OK)
     {
         LLBC_PrintLine("Failed to touch file: %s, error: %s", _testFileName.c_str(), LLBC_FormatLastError());
         return false;
@@ -323,7 +323,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     LLBC_PrintLine("Sleep 2 seconds...");
     LLBC_Sleep(2000);
     LLBC_PrintLine("Touch last access time to now");
-    LLBC_File::TouchFile(_testFileName, true, NULL, false, NULL);
+    LLBC_File::TouchFile(_testFileName, true, nullptr, false, nullptr);
     LLBC_PrintLine("Touched, attributes:");
     LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
     PrintFileAttributes(fileAttrs);
@@ -331,7 +331,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     LLBC_PrintLine("Sleep 2 seconds...");
     LLBC_Sleep(2000);
     LLBC_PrintLine("Touch last modify time to now");
-    LLBC_File::TouchFile(_testFileName, false, NULL, true, NULL);
+    LLBC_File::TouchFile(_testFileName, false, nullptr, true, nullptr);
     LLBC_PrintLine("Touched, attributes:");
     LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
     PrintFileAttributes(fileAttrs);

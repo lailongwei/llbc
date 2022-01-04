@@ -102,19 +102,9 @@ public:
     void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
 
     /**
-     * Object-Pool reflection support: Is pool object.
-     */
-    bool IsPoolObject() const;
-
-    /**
      * Object-Pool reflection support: Get pool instance.
      */
     LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object-Pool reflection support: Give back object to pool.
-     */
-    void GiveBackToPool();
 
     /**
      * Object-Pool reflection support, get user-defined per-block units number.

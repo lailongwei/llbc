@@ -23,31 +23,90 @@
 
 __LLBC_NS_BEGIN
 
-inline int LLBC_Logger::InstallHook(int level, void (*hookFunc)(const LLBC_LogData *logData))
+LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
 {
-    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg = 
-        new LLBC_Func1<void, const LLBC_LogData *>(hookFunc);
-
-    int installRet = InstallHook(level, hookDeleg);
-    if (installRet != LLBC_OK)
-        LLBC_Delete(hookDeleg);
-
-    return installRet;
+    return _logLevel;
 }
 
-template <typename ObjType>
-inline int LLBC_Logger::InstallHook(int level, ObjType *obj, void ( ObjType::*hookMeth)(const LLBC_LogData *logData))
+inline int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
 {
-    LLBC_IDelegate1<void, const LLBC_LogData *> *hookDeleg =
-        new LLBC_Delegate1<void, ObjType, const LLBC_LogData *>(obj, hookMeth);
+    if (LLBC_LogLevel::Debug < _logLevel)
+        return LLBC_OK;
 
-    int installRet = InstallHook(level, hookDeleg);
-    if (installRet != LLBC_OK)
-        LLBC_Delete(hookDeleg);
+    va_list va;
+    va_start(va, fmt);
+    int ret = VOutput(LLBC_LogLevel::Debug, tag, file, line, func, fmt, va);
+    va_end(va);
 
-    return installRet;
+    return ret;
+}
+
+inline int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
+{
+    if (LLBC_LogLevel::Info < _logLevel)
+        return LLBC_OK;
+
+    va_list va;
+    va_start(va, fmt);
+    int ret = VOutput(LLBC_LogLevel::Info, tag, file, line, func, fmt, va);
+    va_end(va);
+
+    return ret;
+}
+
+inline int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
+{
+    if (LLBC_LogLevel::Warn < _logLevel)
+        return LLBC_OK;
+
+    va_list va;
+    va_start(va, fmt);
+    int ret = VOutput(LLBC_LogLevel::Warn, tag, file, line, func, fmt, va);
+    va_end(va);
+
+    return ret;
+}
+
+inline int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
+{
+    if (LLBC_LogLevel::Error < _logLevel)
+        return LLBC_OK;
+
+    va_list va;
+    va_start(va, fmt);
+    int ret = VOutput(LLBC_LogLevel::Error, tag, file, line, func, fmt, va);
+    va_end(va);
+
+    return ret;
+}
+
+inline int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
+{
+    if (LLBC_LogLevel::Fatal < _logLevel)
+        return LLBC_OK;
+
+    va_list va;
+    va_start(va, fmt);
+    const int ret = VOutput(LLBC_LogLevel::Fatal, tag, file, line, func, fmt, va);
+    va_end(va);
+
+    return ret;
+}
+
+inline int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) 
+{
+    if (level < _logLevel)
+        return LLBC_OK;
+
+    va_list va;
+    va_start(va, fmt);
+    const int ret = VOutput(level, tag, file, line, func, fmt, va);
+    va_end(va);
+
+    return ret;
 }
 
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_LOG_LOGGER_H__
+

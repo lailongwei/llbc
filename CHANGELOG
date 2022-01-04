@@ -3,7 +3,37 @@
 ######################################################################################
 # Version: 1.0.9
 # 2020/9~
-#
+# 1)【llbc core】Facade->Component命名变更
+# 2)【llbc core】优化LLBC_Directory::Join()，使用变长模板参数简化原有实现(感谢caochunxi)
+# 3)【llbc core】标准化Variant排序实现, 确保行为跟python一致
+# 4)【llbc core】标准化Variant operator bool()/AsBool()操作，参考python，对于number: 0为false，对于string/seq/dict: 代为false
+# 5)【testsuite】testsuite运行时支持argc/argv输入(为之前testsuite改造时导致的机制缺失, 现已补上)
+# 6)【pyllbc】优化python层packet构造性能, 提供reuse机制以确保packet创建的高效(PYLLBC_CFG_PACKET_REUSE选项), 针对packet创建参数同样进行优化, 优化后的收包性能提升100%
+# 7)【pyllbc】针对python层的packet对象的不常访问的属性:local_ip/local_port/peer_ip/peer_port/extdata1/extdata2/extdata3, 进行惰式访问优化, 以最大限度提升性能
+# 8)【llbc core】提供新式Delegate实现, 在兼容std::funtion的同时, 对c function/c++ method提供更好的性能, 同时废除旧式Delegate实现, 所有代码配套调整
+# 9)【llbc core】标准化LLBC_TimeSpan构建接口: FromSS/FromMMSS/FromHHMMSS/...
+# 10)【llbc core】Timer接口简化, 只保留LLBC_TimeSpan参数接口, 超时数据类型从uint64调整到sint64, 以跟time api保持一致
+# 11)【pyllbc】python Service.fire_event接口设计优化, 去除复杂的addiHandler/customHandler, 统一清晰化成enqueueHandler/dequeueHandler, 以正确处理python event object的ref inc/dec
+# 12)【llbc all】去除NULL使用, 调整成nullptr
+# 13)【llbc core】LLBC_BasicString::format/append_format性能改进
+# 14)【llbc core】日志记录器时间访问优化(原10w+/s优化成1000/s)
+# 15)【llbc all】其它细节优化, bug fix
+# 16)【llbc core】修正epoll中数据访问问题
+# 17)【premake】对wrap实行清晰分组
+# 18)【llbc core】为了更好的其他库结合, 针对win32平台特有的字符串数据类型在非win32平台的定义, llbc提供可选项让使用者项目中有其他项目有定义的情况下取消定义, 宏: LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
+# 19)【llbc core】优化Log输出性能, 做到Log输出时的0 malloc/free以及只有一次的log message format操作, 对接口及设计进行优化
+# 20)【llbc core】事件系统支持链式事件调用, 以做到使用最简洁，同时事件对象对象池化, 做到最高效性能
+# 21)【llbc core】对象池反射识别优化, 使用更简洁方式反射对象池方法列表，同时对象池对象基类命名简化：LLBC_PoolObjectReflectionBase->LLBC_PoolObject
+# 22)【llbc core】对象池可重用方法识别增加reuse()/Reuse()支持
+# 23)【llbc core】LLBC_BasicCString增加std::ostream &operator <<(std::ostream &operator <<, const LLBC_BasicCString &)方法支持
+# 24)【llbc core】相关多余LLBC_EXTERN宏使用去除
+# 25)【llbc core】对象池反射方法简化, 去除IsPoolObject()/GiveBackToPool()方法要求, 以让对象池使用者以更轻的负担编写反射支持的类实现
+# BugFix:
+#   - 【llbc core】修复若干string split bugs(感谢ericyonng)
+#   - 【llbc core】修复Time format一处格式化bug
+#   - 【llbc core】修复logger finalize一处死锁问题(by caochunxi)
+#   - 【llbc core】修复一处variant构造bug
+#   - 【llbc core】修复Random中RandInt()接口返回可能不在指定区间的Bug
 
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9
@@ -524,4 +554,3 @@
 # 
 # long long ago
 # 1)设计框架,设计common, core基础核心部分代码.
-

@@ -31,9 +31,6 @@ __LLBC_NS_BEGIN
  */
 class LLBC_ILock;
 
-template <typename Rtn, typename Arg1>
-class LLBC_IDelegate1;
-
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -119,21 +116,17 @@ private:
 class LLBC_InvokeGuard
 {
 public:
+    template <typename Func, typename ...Args>
+    explicit LLBC_InvokeGuard(const Func &func, Args ...args);
+
     /**
-     * Create function type invoke guard.
-     * @param[in] func - the guard invoke function pointer.
-     * @param[in] data - the call data, default is NULL.
+     * Create invoke guard by class method, and arguments.
+     * @param[in] obj  - the object pointer.
+     * @param[in] meth - the class method.
+     * @param[in] args - the guard call arguments.
      */
-    explicit LLBC_InvokeGuard(LLBC_GuardFunc func, void *data = NULL);
-    
-    /**
-     * Create method type invoke guard.
-     * @param[in] obj  - the class instance pointer.
-     * @param[in] meth - the guard invoke method pointer
-     * @param[in] data - the call data, default is NULL.
-     */
-    template <typename Object>
-    LLBC_InvokeGuard(Object *obj, void (Object::*meth)(void *), void *data = NULL);
+    template <typename Obj, typename ...Args>
+    explicit LLBC_InvokeGuard(Obj *obj, void (Obj::*meth)(Args...), Args ...args);
 
     ~LLBC_InvokeGuard();
 
@@ -141,31 +134,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_InvokeGuard);
 
 private:
-    LLBC_IDelegate1<void, void *> *_deleg;
-    void *_data;
-};
-
-/**
- * \brief The invoke guard spec helper class encapsulation.
- */
-class LLBC_InvokeGuardSpec
-{
-public:
-    /**
-     * Create function type invoke guard.
-     * @param[in] func - the guard invoke function pointer.
-     * @param[in] args - the call data(variable argument).
-     */
-    template <typename Func, typename... Args>
-    LLBC_InvokeGuardSpec(Func &&func, Args &&... args);
-
-    ~LLBC_InvokeGuardSpec();
-
-private:
-    LLBC_DISABLE_ASSIGNMENT(LLBC_InvokeGuardSpec);
-
-private:
-    std::function<void()> _invoker;
+    std::function<void()> _deleg;
 };
 
 __LLBC_NS_END

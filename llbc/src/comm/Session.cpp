@@ -86,14 +86,14 @@ LLBC_Session::LLBC_Session(const LLBC_SessionOpts &sessionOpts)
 
 , _sessionOpts(sessionOpts)
 
-, _socket(NULL)
+, _socket(nullptr)
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 
 , _fullStack(false)
-, _svc(NULL)
-, _poller(NULL)
+, _svc(nullptr)
+, _poller(nullptr)
 
-, _protoStack(NULL)
+, _protoStack(nullptr)
 
 , _pollerType(LLBC_PollerType::End)
 {
@@ -132,9 +132,9 @@ void LLBC_Session::SetService(LLBC_IService *svc)
     _protoStack->SetSession(this);
 
     // Set socket message block object-pool(if enabled).
-#if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
     _socket->SetMsgBlockPoolInst(&_svc->GetMsgBlockObjectPool());
-#endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
+    #endif // LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
 }
 
 void LLBC_Session::SetProtocolStack(LLBC_ProtocolStack *protoStack)
@@ -157,7 +157,7 @@ int LLBC_Session::Send(LLBC_Packet *packet)
     if (UNLIKELY(sendRet != LLBC_OK))
         return removeSession ? LLBC_FAILED : LLBC_OK;
 
-    if (block == NULL)
+    if (block == nullptr)
         return LLBC_OK;
 
     return Send(block);
@@ -167,10 +167,10 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
 {
     // Check session send buffer size limit.
     size_t sessionSndBufUsed = _socket->GetWillSendBuffer().GetSize();
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     if (_pollerType == LLBC_PollerType::IocpPoller)
         sessionSndBufUsed += _socket->GetIocpSendingDataSize();
-#endif
+    #endif
 
     if (_sessionOpts.GetSessionSendBufSize() != LLBC_INFINITE &&
         (sessionSndBufUsed + block->GetReadableSize()) >= _sessionOpts.GetSessionSendBufSize())
@@ -218,16 +218,16 @@ void LLBC_Session::OnClose(LLBC_POverlapped ol, LLBC_SessionCloseInfo *closeInfo
 void LLBC_Session::OnClose(LLBC_SessionCloseInfo *closeInfo)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 {
-    if (closeInfo == NULL)
-        closeInfo = LLBC_New0(LLBC_SessionCloseInfo);
+    if (closeInfo == nullptr)
+        closeInfo = LLBC_New(LLBC_SessionCloseInfo);
 
     // Notify socket session closed.
     const LLBC_SocketHandle sockHandle = _socket->Handle();
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     _socket->OnClose(ol);
-#else
+    #else
     _socket->OnClose();
-#endif // LLBC_TARGET_PLATFORM_WIN32
+    #endif // LLBC_TARGET_PLATFORM_WIN32
 
     // Build session-destroy event and push to service.
     _svc->Push(LLBC_SvcEvUtil::BuildSessionDestroyEv(_socket->GetLocalAddress(),

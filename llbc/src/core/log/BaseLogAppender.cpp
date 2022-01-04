@@ -31,14 +31,13 @@ __LLBC_NS_BEGIN
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 : _level(LLBC_LogLevel::End)
 
-, _chain(NULL)
-, _next(NULL)
+, _chain(nullptr)
+, _next(nullptr)
 {
 }
 
 LLBC_BaseLogAppender::~LLBC_BaseLogAppender()
 {
-    Finalize();
 }
 
 int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
@@ -51,7 +50,7 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
     _level = initInfo.level;
 
-    _chain = LLBC_New0(LLBC_LogTokenChain);
+    _chain = LLBC_New(LLBC_LogTokenChain);
     if (_chain->Build(initInfo.pattern) != LLBC_OK)
     {
         LLBC_XDelete(_chain);
@@ -65,10 +64,6 @@ void LLBC_BaseLogAppender::Finalize()
 {
     LLBC_XDelete(_chain);
     _level = LLBC_LogLevel::End;
-}
-
-void LLBC_BaseLogAppender::Flush()
-{
 }
 
 __LLBC_NS_END

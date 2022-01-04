@@ -49,7 +49,7 @@ LLBC_EXTERN LLBC_EXPORT bool LLBC_isDebugVer;
  * @param[in] verbose - verbose option.
  * @return LLBC_String - Version describe.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_String LLBC_GetVersionInfo(bool verbose = false);
+LLBC_EXPORT LLBC_String LLBC_GetVersionInfo(bool verbose = false);
 
 __LLBC_NS_END
 

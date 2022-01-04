@@ -60,7 +60,7 @@ public:
       *@param[in] appData - current time sampling value.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Sampling(sint64 value, void *appData = NULL) = 0;
+    virtual int Sampling(sint64 value, void *appData = nullptr) = 0;
 
 public:
     /**

@@ -40,6 +40,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     TimeClassTest();
     std::cout <<std::endl;
 
+    TimeSpanClassTest();
+    std::cout <<std::endl;
+
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
 
@@ -57,10 +60,10 @@ void TestCase_Core_Time_Time::OSTimeTest()
     std::cout <<"LLBC_GetMicroSeconds(): " <<nowTimeInUs <<std::endl;
 
     struct timeval tv;
-    LLBC_GetTimeOfDay(&tv, NULL);
+    LLBC_GetTimeOfDay(&tv, nullptr);
     std::cout <<"LLBC_GetTimeOfDay(), tv_sec: " <<tv.tv_sec <<", tv_usec: " <<tv.tv_usec <<std::endl;
 #if LLBC_TARGET_PLATFORM_WIN32 && LLBC_CFG_OS_IMPL_GETTIMEOFDAY
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     std::cout <<"WIN32 spec: gettimeofday(), tv_sec: " <<tv.tv_sec <<", tv_usec: " <<tv.tv_usec <<std::endl;
 #endif
 }
@@ -179,34 +182,34 @@ void TestCase_Core_Time_Time::TimeClassTest()
     ts.tv_sec = 10000000; ts.tv_nsec = 123456;
     std::cout <<"FromTimeSpec(ts.sec=10000000, ts.tv_nsec=123456): " <<LLBC_Time::FromTimeSpec(ts) <<std::endl;
 
-    std::string timeRepr = "2000-12-13 19:21:35.333435";
-    LLBC_Time fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    std::string timeStr = "2000-12-13 19:21:35.333435";
+    LLBC_Time fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "12-13 21:35";
-    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    timeStr = "12-13 21:35";
+    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "12-13";
-    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    timeStr = "12-13";
+    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "1970-1-1 0:0:0";
-    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    timeStr = "1970-1-1 0:0:0";
+    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "07:21:35";
-    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    timeStr = "07:21:35";
+    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
-    timeRepr = "13 35";
-    fromTimeRepr = LLBC_Time::FromTimeRepr(timeRepr);
-    std::cout <<"FromTimeRepr(" <<timeRepr <<"): " <<fromTimeRepr <<std::endl;
+    timeStr = "13 35";
+    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
     std::cout <<"    millisec: " <<fromTimeRepr.GetMilliSecond() <<", microsec: " <<fromTimeRepr.GetMicroSecond() <<std::endl;
 
     int yearPart = 1971, monthPart = 12, dayPart = 21;
@@ -222,6 +225,28 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // GetIntervalTo test:
     std::cout <<"now: " <<now <<", GetInterval To 3600 seconds: " <<now.GetIntervalTo(LLBC_TimeSpan(3600)) <<std::endl;
+}
+
+void TestCase_Core_Time_Time::TimeSpanClassTest()
+{
+    std::cout << "LLBC_TimeSpan test:" << std::endl;
+
+    LLBC_TimeSpan tsFromMicros = LLBC_TimeSpan::FromMicros(123);
+    LLBC_TimeSpan tsFromMillis = LLBC_TimeSpan::FromMillis(456);
+    LLBC_TimeSpan tsFromMillisMicros = LLBC_TimeSpan::FromMillisMicros(-123, -456);
+    LLBC_TimeSpan tsFromSS = LLBC_TimeSpan::FromSS(10, 20, -30);
+    LLBC_TimeSpan tsFromMMSS1 = LLBC_TimeSpan::FromMMSS(100, -100, 300);
+    LLBC_TimeSpan tsFromMMSS2 = LLBC_TimeSpan::FromMMSS(-100, 100, 300);
+    LLBC_TimeSpan tsFromHHMMSS = LLBC_TimeSpan::FromHHMMSS(5, -400, 500, -600, 700);
+    LLBC_TimeSpan tsFromDDHHMMSS = LLBC_TimeSpan::FromDDHHMMSS(1, 2, 3, 4, 500, 600);
+    std::cout << "LLBC_TimeSpan::FromMicros(123): " << tsFromMicros << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMillis(456): " << tsFromMillis << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMillisMicros(-123, -456): " << tsFromMillisMicros << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSS(10, 20, -30): " << tsFromSS << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMMSS(100, -100, 300): " << tsFromMMSS1 << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMMSS(-100, 100, 300): " << tsFromMMSS2 << std::endl;
+    std::cout << "LLBC_TimeSpan::FromHHMMSS(5, -400, 500, -600, 700): " << tsFromHHMMSS << std::endl;
+    std::cout << "LLBC_TimeSpan::FromDDHHMMSS(1, 2, 3, 4, 500, 600): " << tsFromDDHHMMSS << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

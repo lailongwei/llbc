@@ -45,7 +45,7 @@ LLBC_IProtocol *LLBC_NormalProtocolFactory::Create(int layer) const
         return LLBC_New(LLBC_PacketProtocol);
 
     default:
-        return NULL;
+        return nullptr;
     }
 }
 

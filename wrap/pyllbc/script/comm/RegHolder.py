@@ -41,7 +41,7 @@ class pyllbcSvcRegInfo(object):
 
         self._svcs = set()
 
-        self._asfacade = False
+        self._ascomp = False
 
     @property
     def wrapped(self):
@@ -93,11 +93,11 @@ class pyllbcSvcRegInfo(object):
         return self._svcs
 
     @property
-    def asfacade(self):
-        return self._asfacade
-    @asfacade.setter
-    def asfacade(self, value):
-        self._asfacade = value
+    def ascomp(self):
+        return self._ascomp
+    @ascomp.setter
+    def ascomp(self, value):
+        self._ascomp = value
 
     def add_deocodes(self, *opcodes):
         for op in opcodes:
@@ -166,8 +166,8 @@ class pyllbcSvcRegInfo(object):
         elif ty == self.DftExcPreHandler:
             to_svc.set_default_presubscribe_exc_handler(self._normalize_callable(to_svc, wrapped))
 
-        if self._asfacade:
-            to_svc.registerfacade(wrapped())
+        if self._ascomp:
+            to_svc.registercomp(wrapped())
 
     def decorate_cls(self, to_svc_cls):
         wrapped = self._wrapped()
@@ -183,25 +183,25 @@ class pyllbcSvcRegInfo(object):
         if not isinstance(cb, FunctionType):
             return cb()
         
-        # maybe is facade method(decorated in facade class)
-        for facade in svc.facades.itervalues():
-            if not hasattr(facade, cb.__name__):
+        # maybe is comp method(decorated in component class)
+        for comp in svc.comps.itervalues():
+            if not hasattr(comp, cb.__name__):
                 continue
 
-            facade_cb = getattr(facade, cb.__name__)
-            if facade_cb and \
-                    isinstance(facade_cb, MethodType) and \
-                    facade_cb.im_func.func_code is cb.func_code:
-                return facade_cb
+            comp_cb = getattr(comp, cb.__name__)
+            if comp_cb and \
+                    isinstance(comp_cb, MethodType) and \
+                    comp_cb.im_func.func_code is cb.func_code:
+                return comp_cb
         
         # function type callable
         return cb
 
     def __str__(self):
         return 'wrapped:{}, regtype:{}, fmt:{}, enopcode:{}, deopcodes:{}, hldropcodes:{}, prehldropcodes:{}, \
-                exc_hldropcodes: {}, exc_prehldropcodes: {}, svcs:{}, asfacade:{}'.format(
+                exc_hldropcodes: {}, exc_prehldropcodes: {}, svcs:{}, ascomp:{}'.format(
                 self.wrapped, self._type, self._fmt, self._enopcode, self._deopcodes, self._hldropcodes, self._prehldropcodes, 
-                self._exc_hldropcodes, self._exc_prehldropcodes, self._svcs, self._asfacade)
+                self._exc_hldropcodes, self._exc_prehldropcodes, self._svcs, self._ascomp)
 
 llbc.inl.SvcRegInfo = pyllbcSvcRegInfo
 
@@ -248,10 +248,10 @@ class pyllbcSvcRegsHolder(object):
     @classmethod
     def _decorate_regs_to_svc(cls, regs, to_svc):
         for reg in regs:
-            if reg.asfacade:
+            if reg.ascomp:
                 reg.decorate(to_svc)
         for reg in regs:
-            if not reg.asfacade:
+            if not reg.ascomp:
                 reg.decorate(to_svc)
 
 llbc.inl.SvcRegsHolder = pyllbcSvcRegsHolder
@@ -536,7 +536,7 @@ llbc.packet = pyllbc_packet
 
 def pyllbc_bindto(*svcs):
     """
-    Specific packet-handler/coder/facade bind to which service.
+    Specific packet-handler/coder/component bind to which service.
     """
     def generator(cls):
         RegCls = llbc.inl.SvcRegInfo
@@ -550,18 +550,18 @@ def pyllbc_bindto(*svcs):
 
 llbc.bindto = pyllbc_bindto
 
-def pyllbc_facade(cls):
+def pyllbc_comp(cls):
     """
-    Decorate facade class, once decorate, in startup, llbc library 
-    will auto create facade object and register to specific services.
+    Decorate component class, once decorate, in startup, llbc library 
+    will auto create component object and register to specific services.
     """
     RegCls = llbc.inl.SvcRegInfo
     RegsHolder = llbc.inl.SvcRegsHolder
 
     reg = pyllbc_extractreg(cls, RegCls.UnSpecific)
-    reg.asfacade = True
+    reg.ascomp = True
     RegsHolder.update(reg)
     return cls
 
-llbc.facade = pyllbc_facade
+llbc.comp = pyllbc_comp
 

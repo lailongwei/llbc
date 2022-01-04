@@ -29,6 +29,7 @@
 #include "common/TestCase_Com_Version.h"
 #include "common/TestCase_Com_Compiler.h"
 #include "common/TestCase_Com_RTTI.h"
+#include "common/TestCase_Com_ConcatMacro.h"
 
 #include "core/os/TestCase_Core_OS_Symbol.h"
 #include "core/os/TestCase_Core_OS_Thread.h"
@@ -74,7 +75,7 @@
 #include "comm/TestCase_Comm_Timer.h"
 #include "comm/TestCase_Comm_PacketOp.h"
 #include "comm/TestCase_Comm_ReleasePool.h"
-#include "comm/TestCase_Comm_Facade.h"
+#include "comm/TestCase_Comm_Comp.h"
 #include "comm/TestCase_Comm_SvcBase.h"
 #include "comm/TestCase_Comm_SvcFps.h"
 #include "comm/TestCase_Comm_SvcStartStop.h"
@@ -85,7 +86,7 @@
 #include "comm/TestCase_Comm_LazyTask.h"
 #include "comm/TestCase_Comm_ProtoStackCtrl.h"
 #include "comm/TestCase_Comm_MessageBuffer.h"
-#include "comm/TestCase_Comm_DynLoadFacade.h"
+#include "comm/TestCase_Comm_DynLoadComp.h"
 #include "comm/TestCase_Comm_Echo.h"
 
 #include "application/TestCase_App_AppTest.h"

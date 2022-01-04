@@ -35,7 +35,7 @@ LLBC_Object::LLBC_Object()
 : _ref(1)
 , _autoRef(0)
 
-, _poolStack(NULL)
+, _poolStack(nullptr)
 {
 }
 
@@ -93,7 +93,7 @@ int LLBC_Object::AutoRelease()
 
 LLBC_Object *LLBC_Object::Clone() const
 {
-    return LLBC_New0(LLBC_Object);
+    return LLBC_New(LLBC_Object);
 }
 
 LLBC_String LLBC_Object::ToString() const

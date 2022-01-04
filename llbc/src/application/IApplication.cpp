@@ -29,8 +29,8 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const char *__dumpFileName = NULL;
-static LLBC_NS LLBC_IDelegate1<void, const LLBC_NS LLBC_String &> *__crashHook = NULL;
+static const char *__dumpFileName = nullptr;
+static LLBC_NS LLBC_Delegate<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
 {
@@ -70,10 +70,10 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
                            curThread,
                            &stackFrame64,
                            ctx,
-                           NULL,
+                           nullptr,
                            ::SymFunctionTableAccess64,
                            ::SymGetModuleBase64,
-                           NULL))
+                           nullptr))
             break;
 
         if (stackFrame64.AddrFrame.Offset == 0)
@@ -84,7 +84,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
         symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
         symbol->MaxNameLen = 511;
 
-        if (!::SymFromAddr(curProc, stackFrame64.AddrPC.Offset, NULL, symbol))
+        if (!::SymFromAddr(curProc, stackFrame64.AddrPC.Offset, nullptr, symbol))
             break;
 
         DWORD symDisplacement = 0;
@@ -110,10 +110,10 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     HANDLE dmpFile = ::CreateFileA(__dumpFileName,
                                    GENERIC_WRITE,
                                    FILE_SHARE_READ,
-                                   NULL,
+                                   nullptr,
                                    CREATE_ALWAYS,
                                    FILE_ATTRIBUTE_NORMAL,
-                                   NULL);
+                                   nullptr);
     if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
         return EXCEPTION_CONTINUE_SEARCH;
 
@@ -131,8 +131,8 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
                                                    dmpFile,
                                                    (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
                                                    &dmpInfo,
-                                                   NULL,
-                                                   NULL);
+                                                   nullptr,
+                                                   nullptr);
     if (UNLIKELY(!writeDumpSucc))
     {
         LLBC_NS LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -141,7 +141,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     ::CloseHandle(dmpFile);
     if (__crashHook)
-        __crashHook->Invoke(__dumpFileName);
+        __crashHook(__dumpFileName);
 
     LLBC_NS LLBC_String backTrace;
     __GetExceptionBackTrace(exception->ContextRecord, backTrace);
@@ -149,7 +149,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     LLBC_NS LLBC_String mbTitle;
     mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::BaseName(LLBC_NS LLBC_Directory::ModuleFileName()).c_str());
-    ::MessageBoxA(NULL, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
+    ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -157,11 +157,11 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 static BOOL __PreventSetUnhandledExceptionFilter()
 {
     HMODULE kernel32 = ::LoadLibraryA("kernel32.dll");
-    if (kernel32 == NULL)
+    if (kernel32 == nullptr)
         return FALSE;
 
     void *orgEntry = (void *)::GetProcAddress(kernel32, "SetUnhandledExceptionFilter");
-    if (orgEntry == NULL)
+    if (orgEntry == nullptr)
         return FALSE;
 
 #ifdef _M_IX86
@@ -192,7 +192,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_IApplication *LLBC_IApplication::_thisApp = NULL;
+LLBC_IApplication *LLBC_IApplication::_thisApp = nullptr;
 
 LLBC_IApplication::LLBC_IApplication()
 : _name()
@@ -208,10 +208,10 @@ LLBC_IApplication::LLBC_IApplication()
 , _waited(false)
 
 #if LLBC_TARGET_PLATFORM_WIN32
-, _crashHook(NULL)
+, _crashHook(nullptr)
 #endif // Win32
 {
-    if (_thisApp == NULL)
+    if (_thisApp == nullptr)
         _thisApp = this;
 }
 
@@ -354,7 +354,7 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-int LLBC_IApplication::SetCrashHook(LLBC_IDelegate1<void, const LLBC_String &> *crashHook)
+int LLBC_IApplication::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);

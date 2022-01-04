@@ -27,10 +27,10 @@ namespace
 
 const int OPCODE = 0;
 
-class TestFacade : public LLBC_IFacade
+class TestComp : public LLBC_IComponent
 {
 public:
-    TestFacade()
+    TestComp()
     {
         _recvBytes = 0;
         _prevRecv100MB = 0;
@@ -81,13 +81,13 @@ public:
     void OnDataArrival(LLBC_Packet &packet)
     {
         if ((_packets += 1) % 1000 == 0)
-            LLBC_PrintLine("[%lld]Received %ld packets!", LLBC_GetMilliSeconds(), _packets);
+            LLBC_PrintLine("[%s]Received %ld packets!", LLBC_Time::Now().ToString().c_str(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
         uint64 recv100MB = _recvBytes / (100 * 1024 * 1024);
         if (recv100MB > _prevRecv100MB)
         {
-            LLBC_PrintLine("[%lld]Received %llu MB data!", LLBC_GetMilliSeconds(), _recvBytes / (1024 * 1024));
+            LLBC_PrintLine("[%s]Received %llu MB data!", LLBC_Time::Now().ToString().c_str(), _recvBytes / (1024 * 1024));
             _prevRecv100MB = recv100MB;
         }
 
@@ -138,22 +138,21 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
     // Create service
     LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
-    TestFacade *facade = LLBC_New(TestFacade);
-    svc->RegisterFacade(facade);
-    svc->Subscribe(OPCODE, facade, &TestFacade::OnDataArrival);
+    TestComp *comp = LLBC_New(TestComp);
+    svc->RegisterComponent(comp);
+    svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
     svc->Start(8);
 
     // Connect to server / Create listen session to wait client connect.
-    int sessionId;
     LLBC_SessionOpts sessionOpts;
-    sessionOpts.SetSockSendBufSize(1 * 1024 * 1024);
-    sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
-    sessionOpts.SetMaxPacketSize(64 * 1024);
+    // sessionOpts.SetSockSendBufSize(1 * 1024 * 1024);
+    // sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
     if (!asClient)
     {
         LLBC_PrintLine("Will listening in %s:%d", ip, port);
-        if ((sessionId = svc->Listen(ip, port, NULL, sessionOpts)) == 0)
+        int sessionId = svc->Listen(ip, port, nullptr, sessionOpts);
+        if (sessionId == 0)
         {
             LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
             LLBC_Delete(svc);
@@ -172,10 +171,14 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             clientCount = 200;
 
         LLBC_PrintLine("Create %d clients to test", clientCount);
-
         for (int i = 0; i < clientCount; ++i)
         {
-            const int sessionId = svc->Connect(ip, port, -1, NULL, sessionOpts);
+            int sessionId = svc->Connect(ip, port, -1, nullptr, sessionOpts);
+            if (sessionId == 0)
+            {
+                LLBC_PrintLine("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());
+                continue;
+            }
 
             const int dataSize = 512 * 1024;
             char *data = LLBC_Malloc(char, dataSize);
@@ -202,6 +205,8 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();
+
+    LLBC_Delete(svc);
 
     return 0;
 }
