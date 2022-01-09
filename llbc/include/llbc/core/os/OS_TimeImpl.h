@@ -178,10 +178,10 @@ inline uint64 LLBC_GetCpuCounterFrequancy()
 
         // start calculate using clock_gettime CLOCK_MONOTONIC nanoseconds since system boot
         uint64 startNano = ::clock_gettime(CLOCK_MONOTONIC, &tpStart);    // start time
-        tscStart = LLBC_OrderdRdTscStart();                             // start tsc
+        tscStart = LLBC_OrderedTscStart();                             // start tsc
         for(int idx = 0; idx < tscLoop; ++idx)
             ::sleep(0);
-        tscEnd = LLBC_OrderdRdTscEnd();
+        tscEnd = LLBC_OrderedTscEnd();
         ::clock_gettime(CLOCK_MONOTONIC, &tpEnd);
 
         const uint64 nanoSecondPerSecond = 1000000000;
@@ -196,7 +196,7 @@ inline uint64 LLBC_GetCpuCounterFrequancy()
     #endif
 }
 
-inline uint64 LLBC_OrderdRdTscStart()
+inline uint64 LLBC_OrderedTscStart()
 {
     #if LLBC_TARGET_PLATFORM_WIN32
         int cpuinfo[4] = {0};
@@ -214,7 +214,7 @@ inline uint64 LLBC_OrderdRdTscStart()
     #endif
 }
 
-inline uint64 LLBC_OrderdRdTscEnd()
+inline uint64 LLBC_OrderedTscEnd()
 {
     #if LLBC_TARGET_PLATFORM_WIN32
         uint64 ticksNum = static_cast<uint64>(__rdtsc());
