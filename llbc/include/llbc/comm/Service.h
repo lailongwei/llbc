@@ -149,14 +149,14 @@ public:
     virtual int GetFrameInterval() const;
 
     /**
-     * Set service piece nanoseconds, in milli-seconds.
+     * Set service piece time, windows precision in micro-seconds, linux precision in nano-seconds.
      */
-    virtual void SetPieceNanoseconds(uint64 pieceNs);
+    virtual void SetPieceTime(uint64 pieceTime);
 
     /**
-     * Get service piece nanoseconds, in milli-seconds.
+     * Get service piece time, windows precision in micro-seconds, linux precision in nano-seconds.
      */
-    virtual uint64 GetPieceNanoseconds() const;
+    virtual uint64 GetPieceTime() const;
 
 public:
     /**
@@ -618,7 +618,7 @@ private:
     int _frameInterval;
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
-    uint64 _pieceNanoseconds;
+    uint64 _pieceTime;          // 处理超时时间 linux in nanoseconds, windows in microseconds
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;

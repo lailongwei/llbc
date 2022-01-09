@@ -93,7 +93,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
-, _pieceNanoseconds(LLBC_Time::NumOfNanoSecondsPerMilliSecond)  // 1ms piece time out default
+, _pieceTime(LLBC_Time::NumOfNanoSecondsPerMilliSecond)  // 1ms piece time out default
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
@@ -465,14 +465,14 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-void LLBC_Service::SetPieceNanoseconds(uint64 pieceNs)
+void LLBC_Service::SetPieceTime(uint64 pieceTime)
 {
-    _pieceNanoseconds = pieceNs;
+    _pieceTime = pieceTime;
 }
 
-uint64 LLBC_Service::GetPieceNanoseconds() const
+uint64 LLBC_Service::GetPieceTime() const
 {
-    return _pieceNanoseconds;
+    return _pieceTime;
 }
 
 int LLBC_Service::Listen(const char *ip,
@@ -1564,7 +1564,7 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
-        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime) > _pieceNanoseconds))
+        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime) > _pieceTime))
             break;
     }
 }

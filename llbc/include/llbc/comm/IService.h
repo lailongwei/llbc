@@ -179,14 +179,14 @@ public:
     virtual int GetFrameInterval() const = 0;
 
     /**
-     * Set service piece nanoseconds, in milli-seconds.
+     * Set service piece time, windows precision in micro-seconds, linux precision in nano-seconds.
      */
-    virtual void SetPieceNanoseconds(uint64 pieceNs) = 0;
+    virtual void SetPieceTime(uint64 pieceTime) = 0;
 
     /**
-     * Get service piece nanoseconds, in milli-seconds.
+     * Get service piece time, windows precision in micro-seconds, linux precision in nano-seconds.
      */
-    virtual uint64 GetPieceNanoseconds() const = 0;
+    virtual uint64 GetPieceTime() const = 0;
 
 public:
     /**
