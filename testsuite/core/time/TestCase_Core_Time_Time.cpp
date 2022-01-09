@@ -43,6 +43,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     TimeSpanClassTest();
     std::cout <<std::endl;
 
+    CpuTimeTest();
+    std::cout <<std::endl;
+
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
 
@@ -247,6 +250,17 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan::FromMMSS(-100, 100, 300): " << tsFromMMSS2 << std::endl;
     std::cout << "LLBC_TimeSpan::FromHHMMSS(5, -400, 500, -600, 700): " << tsFromHHMMSS << std::endl;
     std::cout << "LLBC_TimeSpan::FromDDHHMMSS(1, 2, 3, 4, 500, 600): " << tsFromDDHHMMSS << std::endl;
+}
+
+void TestCase_Core_Time_Time::CpuTimeTest()
+{
+    std::cout <<"\t test cpu time tsc: " << std::endl;
+    for(sint32 idx = 0; idx < 10; ++idx)
+    {
+        auto freq = LLBC_GetCpuCounterFrequancy();
+        std::cout << "\t current idx:" << std::to_string(idx) << ", tsc frequancy:" << std::to_string(freq) << std::endl;
+    }
+    std::cout <<"\t test cpu time tsc end: " << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

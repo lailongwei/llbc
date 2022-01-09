@@ -148,6 +148,16 @@ public:
      */
     virtual int GetFrameInterval() const;
 
+    /**
+     * Set service piece nanoseconds, in milli-seconds.
+     */
+    virtual void SetPieceNanoseconds(uint64 pieceNs);
+
+    /**
+     * Get service piece nanoseconds, in milli-seconds.
+     */
+    virtual uint64 GetPieceNanoseconds() const;
+
 public:
     /**
      * Create a session and listening.
@@ -608,6 +618,7 @@ private:
     int _frameInterval;
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
+    uint64 _pieceNanoseconds;
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;

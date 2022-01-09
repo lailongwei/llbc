@@ -93,6 +93,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
+, _pieceNanoseconds(LLBC_Time::NumOfNanoSecondsPerMilliSecond)  // 1ms piece time out default
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
@@ -462,6 +463,16 @@ int LLBC_Service::GetFrameInterval() const
 
     LLBC_LockGuard guard(ncThis->_lock);
     return _frameInterval;
+}
+
+void LLBC_Service::SetPieceNanoseconds(uint64 pieceNs)
+{
+    _pieceNanoseconds = pieceNs;
+}
+
+uint64 LLBC_Service::GetPieceNanoseconds() const
+{
+    return _pieceNanoseconds;
 }
 
 int LLBC_Service::Listen(const char *ip,
@@ -1542,6 +1553,7 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
+    LLBC_CPUTime cpuTime = LLBC_CPUTime::CurrentCodeStart();
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
@@ -1551,6 +1563,9 @@ void LLBC_Service::HandleQueuedEvents()
 
         LLBC_Delete(ev);
         LLBC_Delete(block);
+
+        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime) > _pieceNanoseconds))
+            break;
     }
 }
 

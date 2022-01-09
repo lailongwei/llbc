@@ -78,7 +78,7 @@ void TestCase_Core_OS_Symbol::Goo3()
 
 void TestCase_Core_OS_Symbol::PrintBackTrace()
 {
-    LLBC_CPUTime begTime = LLBC_CPUTime::Current();
+    LLBC_CPUTime begTime = LLBC_CPUTime::CurrentCodeStart();
 
     #if LLBC_CFG_OS_IMPL_SYMBOL
     LLBC_String backTrace = LLBC_CaptureStackBackTrace(1);
@@ -87,6 +87,6 @@ void TestCase_Core_OS_Symbol::PrintBackTrace()
     LLBC_PrintLine("Not implement Symbol function(Try enable LLBC_CFG_OS_IMPL_SYMBOL option and rebuild llbc library to enable Symbol function)");
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    LLBC_CPUTime usedTime = LLBC_CPUTime::Current() - begTime;
+    LLBC_CPUTime usedTime = LLBC_CPUTime::CurrentCodeEnd() - begTime;
     LLBC_PrintLine("Capture stack backtrace used time(ms):%s", usedTime.ToString().c_str());
 }

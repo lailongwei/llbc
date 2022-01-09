@@ -23,6 +23,7 @@
 #include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Debug.h"
+#include "llbc/core/os/OS_Time.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
@@ -99,9 +100,7 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     return ret;
 }
 
-#if LLBC_TARGET_PLATFORM_WIN32
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_freq = 0;
-#endif
 
 LLBC_CPUTime::LLBC_CPUTime():_count(0)
 {
@@ -115,12 +114,23 @@ LLBC_CPUTime::~LLBC_CPUTime()
 {
 }
 
-LLBC_CPUTime LLBC_CPUTime::Current()
+LLBC_CPUTime LLBC_CPUTime::CurrentCodeStart()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    return LLBC_CPUTime(tv.tv_sec * static_cast<CPUTimeCount>(1000000) + tv.tv_usec);
+    auto ticks = LLBC_OrderdRdTscStart();
+    return LLBC_CPUTime(ticks);
+#else
+    LARGE_INTEGER cur;
+    ::QueryPerformanceCounter(&cur);
+    return LLBC_CPUTime(cur.QuadPart);
+#endif
+}
+
+LLBC_CPUTime LLBC_CPUTime::CurrentCodeEnd()
+{
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    auto ticks = LLBC_OrderdRdTscEnd();
+    return LLBC_CPUTime(ticks);
 #else
     LARGE_INTEGER cur;
     ::QueryPerformanceCounter(&cur);
@@ -130,29 +140,17 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToSeconds() const
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(_count / 1000000.0);
-#else
     return static_cast<CPUTimeCount>(_count / _freq);
-#endif
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMilliSeconds() const
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(_count / 1000.0);
-#else
     return static_cast<CPUTimeCount>(_count * 1000.0 / _freq);
-#endif
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return _count;
-#else
     return static_cast<CPUTimeCount>(_count * 1000000.0 / _freq);
-#endif
 }
 
 std::string LLBC_CPUTime::ToString() const
@@ -228,14 +226,10 @@ bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
     return _count != right._count;
 }
 
-#if LLBC_TARGET_PLATFORM_WIN32
 void LLBC_CPUTime::InitFrequency()
 {
-    LARGE_INTEGER freq;
-    ::QueryPerformanceFrequency(&freq);
-    _freq = freq.QuadPart;
+    _freq = LLBC_GetCpuCounterFrequancy();
 }
-#endif
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)

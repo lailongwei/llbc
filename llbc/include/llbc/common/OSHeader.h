@@ -84,7 +84,8 @@
 
 #if LLBC_TARGET_PLATFORM_WIN32
  #include <io.h>
- #include <intrin.h>
+// tsc cpuid
+ #include <intrin.h>    
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 // C standard heder files.

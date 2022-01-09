@@ -164,6 +164,77 @@ inline void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTim
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+inline uint64 LLBC_GetCpuCounterFrequancy()
+{
+    #if LLBC_TARGET_PLATFORM_WIN32
+        LARGE_INTEGER freq;
+        ::QueryPerformanceFrequency(&freq);
+        return static_cast<uint64>(freq.QuadPart);
+    #else
+        // params
+        const sint32 tscLoop = 1000000;
+        struct timespec tpStart, tpEnd;
+        uint64 tscStart, tscEnd;
+
+        // start calculate using clock_gettime CLOCK_MONOTONIC nanoseconds since system boot
+        uint64 startNano = ::clock_gettime(CLOCK_MONOTONIC, &tpStart);    // start time
+        tscStart = LLBC_OrderdRdTscStart();                             // start tsc
+        for(int idx = 0; idx < tscLoop; ++idx)
+            ::sleep(0);
+        tscEnd = LLBC_OrderdRdTscEnd();
+        ::clock_gettime(CLOCK_MONOTONIC, &tpEnd);
+
+        const uint64 nanoSecondPerSecond = 1000000000;
+        // calculate elapsed
+        const uint64 nanoEndTime = ((tpEnd.tv_sec * nanoSecondPerSecond) + tpEnd.tv_nsec);
+        const uint64 nanoStartTime = (tpStart.tv_sec * nanoSecondPerSecond + tpStart.tv_nsec);
+        const uint64 nanosecElapsed = nanoEndTime - nanoStartTime;
+        const uint64 tscElapsed = tscEnd - tscStart;
+
+        // calculate tsc frequancy = elapsedTsc * nanoSecondPerSecond / elapsedNanoSecond;
+        return tscElapsed * nanoSecondPerSecond / nanosecElapsed;
+    #endif
+}
+
+inline uint64 LLBC_OrderdRdTscStart()
+{
+    #if LLBC_TARGET_PLATFORM_WIN32
+        int cpuinfo[4] = {0};
+        __cpuid(cpuinfo ,0);
+        return __rdtsc();
+    #else
+        uint64 var;
+        uint32 hi, lo;
+        __asm__ volatile ("cpuid\n\t"
+                        "rdtsc\n\t" : "=a" (lo), "=d" (hi)
+                        ::"%rbx", "%rcx");
+
+        var = ((uint64)(hi) << 32) | lo;
+        return var;
+    #endif
+}
+
+inline uint64 LLBC_OrderdRdTscEnd()
+{
+    #if LLBC_TARGET_PLATFORM_WIN32
+        uint64 ticksNum = static_cast<uint64>(__rdtsc());
+        int cpuinfo[4] = {0};
+        __cpuid(cpuinfo ,0);
+        return ticksNum;
+    #else
+        uint64 var;
+        uint32 hi, lo;
+        __asm__ volatile ("rdtsc\n\t"
+            "mov %%edx, %1\n\t"
+            "mov %%eax, %0\n\t"
+            "cpuid\n\t"  : "=r" (lo), "=r" (hi)
+            :: "%rax", "%rbx", "%rcx", "%rdx");
+
+        var = ((uint64)(hi) << 32) | lo;
+        return var;
+    #endif
+}
+
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -178,6 +178,16 @@ public:
      */
     virtual int GetFrameInterval() const = 0;
 
+    /**
+     * Set service piece nanoseconds, in milli-seconds.
+     */
+    virtual void SetPieceNanoseconds(uint64 pieceNs) = 0;
+
+    /**
+     * Get service piece nanoseconds, in milli-seconds.
+     */
+    virtual uint64 GetPieceNanoseconds() const = 0;
+
 public:
     /**
      * Create a session and listening.
