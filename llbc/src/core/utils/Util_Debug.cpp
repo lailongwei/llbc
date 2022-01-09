@@ -117,7 +117,7 @@ LLBC_CPUTime::~LLBC_CPUTime()
 LLBC_CPUTime LLBC_CPUTime::CurrentCodeStart()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_OrderedTscStart();
+    auto ticks = LLBC_OrderedRdTscStart();
     return LLBC_CPUTime(ticks);
 #else
     LARGE_INTEGER cur;
@@ -129,7 +129,7 @@ LLBC_CPUTime LLBC_CPUTime::CurrentCodeStart()
 LLBC_CPUTime LLBC_CPUTime::CurrentCodeEnd()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_OrderedTscEnd();
+    auto ticks = LLBC_OrderedRdTscEnd();
     return LLBC_CPUTime(ticks);
 #else
     LARGE_INTEGER cur;

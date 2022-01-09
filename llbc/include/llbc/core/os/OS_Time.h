@@ -149,14 +149,14 @@ uint64 LLBC_GetCpuCounterFrequancy();
  * brief: use in code beginning
  * @return uint64 - current tsc ticks num
  */
-uint64 LLBC_OrderedTscStart();
+uint64 LLBC_OrderedRdTscStart();
 
 /**
  * Get Tsc End Count.
  * brief: use in code ending
  * @return uint64 - current tsc ticks num
  */
-uint64 LLBC_OrderedTscEnd();
+uint64 LLBC_OrderedRdTscEnd();
 
 __LLBC_NS_END
 
