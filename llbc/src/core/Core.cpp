@@ -46,10 +46,8 @@ int __LLBC_CoreStartup()
     // Set timezone.
     LLBC_TZSet();
 
-    // WIN32 specific, initialize performance frequency.
-    #if LLBC_TARGET_PLATFORM_WIN32
+    // linux/windows specific, initialize performance frequency.
     LLBC_CPUTime::InitFrequency();
-    #endif
 
     // Set entry thread object pool.
     if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)

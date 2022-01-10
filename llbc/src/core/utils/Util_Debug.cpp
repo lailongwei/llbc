@@ -153,10 +153,15 @@ LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
     return static_cast<CPUTimeCount>(_count * 1000000.0 / _freq);
 }
 
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToNanoSeconds() const
+{
+    return static_cast<CPUTimeCount>(_count * 1000000000.0 / _freq);
+}
+
 std::string LLBC_CPUTime::ToString() const
 {
     char buf[32];
-    sprintf(buf, "%f", ToMicroSeconds() / 1000.0);
+    sprintf(buf, "%f", ToNanoSeconds() / 1000000.0);
 
     return buf;
 }

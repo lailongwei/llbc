@@ -1564,7 +1564,7 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
-        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime) > _pieceTime))
+        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime).ToNanoSeconds() > _pieceTime))
             break;
     }
 }

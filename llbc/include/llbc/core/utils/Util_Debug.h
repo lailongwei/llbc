@@ -76,6 +76,7 @@ public:
     CPUTimeCount ToMilliSeconds() const;
 
     CPUTimeCount ToMicroSeconds() const;
+    CPUTimeCount ToNanoSeconds() const;
 
     std::string ToString() const;
 
