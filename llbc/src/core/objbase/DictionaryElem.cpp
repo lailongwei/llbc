@@ -54,8 +54,6 @@ LLBC_DictionaryElem::LLBC_DictionaryElem(int key, LLBC_Object *o)
 
 , _bucketPrev(nullptr)
 , _bucketNext(nullptr)
-
-, _hashFun(*LLBC_KeyHashAlgorithmSingleton->GetAlgorithm(LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO))
 {
     o->Retain();
 }
@@ -75,8 +73,6 @@ LLBC_DictionaryElem::LLBC_DictionaryElem(const LLBC_String &key, LLBC_Object *o)
 
 , _bucketPrev(nullptr)
 , _bucketNext(nullptr)
-
-, _hashFun(*LLBC_KeyHashAlgorithmSingleton->GetAlgorithm(LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO))
 {
     o->Retain();
 }
@@ -134,7 +130,7 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
     }
     else
     {
-        _hash = _hashFun(_strKey->c_str(), 
+        _hash = LLBC_Hash(_strKey->c_str(), 
             _strKey->size()) % static_cast<uint32>(_bucketSize);
     }
 

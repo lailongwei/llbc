@@ -117,6 +117,20 @@ template <typename ObjectType>
 void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj);
 
 /**
+ * Object pool converience method, get guarded object from safety object-pool.
+ * @return LLBC_ObjectGuard<ObjectType> - the guarded object.
+ */
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromSafetyPool();
+
+/**
+ * Object pool converience method, get guarded object from unsafety object-pool.
+ * @return LLBC_ObjectGuard<ObjectType> - the guarded object.
+ */
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromUnsafetyPool();
+
+/**
  * Object pool converience method, get referencable object from object pool(unsafety object-pool).
  * @param[in] autoRelease - the auto-release flag, default is false.
  * @return ReferencableObjectType * - the referencable object pointer.

@@ -304,11 +304,7 @@ LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)
 
 LLBC_Dictionary::Iter LLBC_Dictionary::Find(const LLBC_String &key)
 {
-    LLBC_KeyHashAlgorithm *hashAlgo = LLBC_KeyHashAlgorithmSingleton;
-    const LLBC_KeyHashAlgorithm::HashBase &hashFun = 
-        *hashAlgo->GetAlgorithm(LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO);
-
-    uint32 hash = hashFun(key.c_str(), key.size()) % _bucketSize;
+    uint32 hash = LLBC_Hash(key.c_str(), key.size()) % _bucketSize;
     LLBC_DictionaryElem *elem = _bucket[hash];
     for (; elem != nullptr; elem = elem->GetBucketElemNext())
     {

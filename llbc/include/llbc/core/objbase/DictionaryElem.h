@@ -210,8 +210,6 @@ private:
 
     _MyThis *_bucketPrev;
     _MyThis *_bucketNext;
-
-    const LLBC_KeyHashAlgorithm::HashBase &_hashFun;
 };
 
 __LLBC_NS_END

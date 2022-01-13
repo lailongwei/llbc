@@ -24,27 +24,43 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-inline ObjectType *LLBC_GetObjectFromSafetyPool()
+ObjectType *LLBC_GetObjectFromSafetyPool()
 {
     return LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
-inline void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj)
+void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj)
 {
     LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Release(obj);
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_GetObjectFromUnsafetyPool()
+ObjectType *LLBC_GetObjectFromUnsafetyPool()
 {
     return LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
-inline void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
+void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
 {
     LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromSafetyPool()
+{
+    LLBC_ObjectPoolInst<ObjectType> *poolInst =
+        LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->GetPoolInst<ObjectType>();
+    return LLBC_ObjectGuard<ObjectType>(poolInst->GetObject(), poolInst);
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromUnsafetyPool()
+{
+    LLBC_ObjectPoolInst<ObjectType> *poolInst =
+        LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->GetPoolInst<ObjectType>();
+    return LLBC_ObjectGuard<ObjectType>(poolInst->GetObject(), poolInst);
 }
 
 template <typename ReferencableObjectType>
