@@ -145,18 +145,11 @@ void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTime);
 uint64 LLBC_GetCpuCounterFrequancy();
 
 /**
- * Get Tsc Start Count.
- * brief: use in code beginning
+ * Get Tsc Count.
+ * 
  * @return uint64 - current tsc ticks num
  */
-uint64 LLBC_OrderedRdTscStart();
-
-/**
- * Get Tsc End Count.
- * brief: use in code ending
- * @return uint64 - current tsc ticks num
- */
-uint64 LLBC_OrderedRdTscEnd();
+uint64 LLBC_OrderedRdTsc();
 
 __LLBC_NS_END
 

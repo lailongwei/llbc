@@ -37,11 +37,11 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     LLBC_PrintLine("");
 
     // CPUTime test.
-    LLBC_CPUTime begin = LLBC_CPUTime::CurrentCodeStart();
+    LLBC_CPUTime begin = LLBC_CPUTime::Current();
     for(int i = 0; i < 10000000; ++ i)
     {
     }
-    LLBC_CPUTime diff = LLBC_CPUTime::CurrentCodeEnd() - begin;
+    LLBC_CPUTime diff = LLBC_CPUTime::Current() - begin;
     LLBC_PrintLine("CPUTime, diff time: %s", diff.ToString().c_str());
     LLBC_PrintLine("");
 

@@ -179,14 +179,14 @@ public:
     virtual int GetFrameInterval() const = 0;
 
     /**
-     * Set service piece time, in nano-seconds.
+     * Set service frame max time out.
      */
-    virtual void SetPieceTime(uint64 pieceTime) = 0;
+    virtual void SetFrameMaxTimeout(const LLBC_TimeSpan &pieceTime) = 0;
 
     /**
-     * Get service piece time, in nano-seconds.
+     * Get service frame max time out.
      */
-    virtual uint64 GetPieceTime() const = 0;
+    virtual const LLBC_TimeSpan &GetFrameMaxTimeout() const = 0;
 
 public:
     /**

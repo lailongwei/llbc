@@ -114,22 +114,10 @@ LLBC_CPUTime::~LLBC_CPUTime()
 {
 }
 
-LLBC_CPUTime LLBC_CPUTime::CurrentCodeStart()
+LLBC_CPUTime LLBC_CPUTime::Current()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_OrderedRdTscStart();
-    return LLBC_CPUTime(ticks);
-#else
-    LARGE_INTEGER cur;
-    ::QueryPerformanceCounter(&cur);
-    return LLBC_CPUTime(cur.QuadPart);
-#endif
-}
-
-LLBC_CPUTime LLBC_CPUTime::CurrentCodeEnd()
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_OrderedRdTscEnd();
+    auto ticks = LLBC_OrderedRdTsc();
     return LLBC_CPUTime(ticks);
 #else
     LARGE_INTEGER cur;

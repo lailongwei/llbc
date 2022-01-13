@@ -117,12 +117,12 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Peform performance test.
     LLBC_PrintLine("Perform preformance test:");
-    LLBC_CPUTime begin = LLBC_CPUTime::CurrentCodeStart();
+    LLBC_CPUTime begin = LLBC_CPUTime::Current();
     const int loopLmt = 500000;
     for (int i = 0; i < loopLmt; ++i)
         LLOG_DEBUG3("perftest", "performance test msg");
 
-    LLBC_CPUTime elapsed = LLBC_CPUTime::CurrentCodeEnd() - begin;
+    LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
     LLBC_PrintLine("Performance test completed, "
         "log size:%d, elapsed time: %s", loopLmt, elapsed.ToString().c_str());
 

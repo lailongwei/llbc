@@ -93,7 +93,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
-, _pieceTime(LLBC_Time::NumOfNanoSecondsPerMilliSecond)  // 1ms piece time out default
+, _frameMaxTimeout(LLBC_TimeSpan::FromSS(0, 1, 0))  // 1ms time out default
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
@@ -465,14 +465,14 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-void LLBC_Service::SetPieceTime(uint64 pieceTime)
+void LLBC_Service::SetFrameMaxTimeout(const LLBC_TimeSpan &frameMaxTimeout)
 {
-    _pieceTime = pieceTime;
+    _frameMaxTimeout = frameMaxTimeout;
 }
 
-uint64 LLBC_Service::GetPieceTime() const
+const LLBC_TimeSpan &LLBC_Service::GetFrameMaxTimeout() const
 {
-    return _pieceTime;
+    return _frameMaxTimeout;
 }
 
 int LLBC_Service::Listen(const char *ip,
@@ -1553,7 +1553,7 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
-    LLBC_CPUTime cpuTime = LLBC_CPUTime::CurrentCodeStart();
+    LLBC_CPUTime cpuTime = LLBC_CPUTime::Current();
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
@@ -1564,7 +1564,7 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
-        if(UNLIKELY((cpuTime.CurrentCodeEnd() - cpuTime).ToNanoSeconds() > _pieceTime))
+        if(UNLIKELY( _frameMaxTimeout.GetTotalMicroSeconds() <= (cpuTime.Current() - cpuTime).ToMicroSeconds()))
             break;
     }
 }

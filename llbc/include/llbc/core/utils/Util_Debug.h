@@ -68,8 +68,7 @@ public:
     ~LLBC_CPUTime();
 
 public:
-    static LLBC_CPUTime CurrentCodeStart();
-    static LLBC_CPUTime CurrentCodeEnd();
+    static LLBC_CPUTime Current();
     
     CPUTimeCount ToSeconds() const;
 
@@ -96,8 +95,8 @@ public:
     static void InitFrequency();
 
 private:
-    static CPUTimeCount _freq;     // linux下取tsc频率, windows下formanceFrequency (单位HZ)
-    CPUTimeCount _count;            // linux 下tsc计数,  windows下QueryPerformanceCounter
+    static CPUTimeCount _freq;
+    CPUTimeCount _count;
 };
 
 /**

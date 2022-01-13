@@ -149,14 +149,14 @@ public:
     virtual int GetFrameInterval() const;
 
     /**
-     * Set service piece time, in nano-seconds.
+     * Set service frame max time out.
      */
-    virtual void SetPieceTime(uint64 pieceTime);
+    virtual void SetFrameMaxTimeout(const LLBC_TimeSpan &pieceTime);
 
     /**
-     * Get service piece time, in nano-seconds.
+     * Get service frame max time out.
      */
-    virtual uint64 GetPieceTime() const;
+    virtual const LLBC_TimeSpan &GetFrameMaxTimeout() const;
 
 public:
     /**
@@ -618,7 +618,7 @@ private:
     int _frameInterval;
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
-    uint64 _pieceTime;          // 处理超时时间 linux in nanoseconds, windows in microseconds
+    LLBC_TimeSpan _frameMaxTimeout;
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;
