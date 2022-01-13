@@ -29,15 +29,12 @@
 __LLBC_NS_BEGIN
 
 /**
- * \brief The hash algorithms encapsulation.
+ * \brief The hash algorithm encapsulation. 
  */
-class LLBC_EXPORT __LLBC_Hash
+class LLBC_EXPORT LLBC_HashAlgo
 {
 public:
-    /**
-     * The hash algorithm encapsulation. 
-     */
-    enum HashAlgorithm
+    enum
     {
         Begin, 
 
@@ -54,7 +51,13 @@ public:
 
         Default = LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO
     };
+};
 
+/**
+ * \brief The hash algorithms encapsulation.
+ */
+class LLBC_EXPORT __LLBC_Hash
+{
 public:
     /**
      * @brief Ctor&Dtor
@@ -69,7 +72,7 @@ public:
      * @param len   - the will has bytes length.
      * @return uint32 - the hash value.
      */
-    template <int Algo = HashAlgorithm::Default>
+    template <int Algo = LLBC_HashAlgo::Default>
     uint32 operator()(const void *bytes, size_t size);
 
     /**

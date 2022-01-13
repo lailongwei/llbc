@@ -46,21 +46,21 @@ __LLBC_Hash::~__LLBC_Hash()
 
 uint32 __LLBC_Hash::operator()(int algo, const void *bytes, size_t size)
 {
-    if (algo == BKDR)
+    if (algo == LLBC_HashAlgo::BKDR)
         return _bkdrHash(bytes, size);
-    else if (algo == DJB)
+    else if (algo == LLBC_HashAlgo::DJB)
         return _djbHash(bytes, size);
-    else if (algo == SDBM)
+    else if (algo == LLBC_HashAlgo::SDBM)
         return _sdbmHash(bytes, size);
-    else if (algo == RS)
+    else if (algo == LLBC_HashAlgo::RS)
         return _rsHash(bytes, size);
-    else if (algo == JS)
+    else if (algo == LLBC_HashAlgo::JS)
         return _jsHash(bytes, size);
-    else if (algo == PJ)
+    else if (algo == LLBC_HashAlgo::PJ)
         return _pjHash(bytes, size);
-    else if (algo == ELF)
+    else if (algo == LLBC_HashAlgo::ELF)
         return _elfHash(bytes, size);
-    else if (algo == AP)
+    else if (algo == LLBC_HashAlgo::AP)
         return _apHash(bytes, size);
     else
         return 0;
