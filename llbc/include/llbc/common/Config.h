@@ -193,7 +193,7 @@
 // Dictionary string key hash algorithm(case insensitive).
 // Supports: SDBM, RS, JS, PJW, ELF, BKDR, DJB, AP
 // Default: BKDR
-#define LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO                 "BKDR"
+#define LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO                 BKDR
 
 /**
  * \brief Communication about configs.

@@ -29,192 +29,151 @@
 __LLBC_NS_BEGIN
 
 /**
- * \brief The key hash algorithm type enumeration.
+ * \brief The hash algorithms encapsulation.
  */
-class LLBC_EXPORT LLBC_KeyHashAlgorithmType
+class LLBC_EXPORT __LLBC_Hash
 {
-    typedef LLBC_KeyHashAlgorithmType _This;
-
 public:
-    enum
+    /**
+     * The hash algorithm encapsulation. 
+     */
+    enum HashAlgorithm
     {
         Begin, 
 
-        SDBM = Begin,
+        BKDR = Begin,
+        DJB,
+        SDBM,
         RS,
         JS,
         PJ,
         ELF,
-        BKDR,
-        DJB,
         AP,
 
-        End
-    };
+        End,
 
-    /**
-     * Check given type is legal or not.
-     * @param[in] type - algorithm type.
-     * @return bool - return true if legal, otherwise return false.
-     */
-    static bool IsLegal(int type);
-
-    /**
-     * Get type describe.
-     * @param[in] type - algorithm type.
-     * @return const LLBC_String & - the type describe.
-     */
-    static const LLBC_String &Type2Str(int type);
-
-    /**
-     * Get type by algorithm describe.
-     * @param[in] algoDesc - the algorithm describe.
-     * @return int - the algorithm type.
-     */
-    static int Str2Type(const LLBC_String &algoDesc);
-};
-
-/**
- * \brief The key hash algorithms encapsulation.
- */
-class LLBC_EXPORT LLBC_KeyHashAlgorithm
-{
-public:
-    /**
-     * All hash algorithm base function object.
-     */
-    struct HashBase : 
-        public LLBC_BinaryFunction<const void *, size_t, uint32>
-    {
-        virtual ~HashBase() {  }
-        typedef LLBC_BinaryFunction<const void *, size_t, uint32>::Argument1_Type Argument1_Type;
-        typedef LLBC_BinaryFunction<const void *, size_t, uint32>::Argument2_Type Argument2_Type;
-        typedef LLBC_BinaryFunction<const void *, size_t, uint32>::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const = 0;
+        Default = LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO
     };
 
 public:
-    LLBC_KeyHashAlgorithm();
-    ~LLBC_KeyHashAlgorithm();
+    /**
+     * @brief Ctor&Dtor
+     */
+    __LLBC_Hash();
+    ~__LLBC_Hash();
 
 public:
     /**
-     * Get algorithm by type.
-     * @return const HashBase * - the base hash function object reference.
+     * Hash specific bytes.
+     * @param bytes - the will hash bytes.
+     * @param len   - the will has bytes length.
+     * @return uint32 - the hash value.
      */
-    const HashBase *GetAlgorithm(int type) const;
+    template <int Algo = HashAlgorithm::Default>
+    uint32 operator()(const void *bytes, size_t size);
+
     /**
-     * Get algorithm by type describe.
-     * @return const HashBase * - the base hash function object reference.
+     * Hash specific bytes.
+     * @param[in] algo  - the key hash algorithm type.
+     * @param[in] bytes - the will has bytes.
+     * @param[in] len   - the will hash bytes length.
+     * @return uint32 - the hash value.
      */
-    const HashBase *GetAlgorithm(const LLBC_String &algoDesc) const;
+    uint32 operator()(int algo, const void *bytes, size_t size);
 
 private:
     /**
-     * SDBM hash algorithm.
+     * Define Hash base class. 
      */
-    struct SDBMHash : public HashBase
-    {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
-    };
-
-    /**
-     * RS hash algorithm.
-     */
-    struct RSHash : public HashBase
-    {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
-    };
-
-    /**
-     * JS hash algorithm.
-     */
-    struct JSHash : public HashBase
-    {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
-    };
-
-    /**
-     * P. J. Weinberger hash algorithm.
-     */
-    struct PJHash : public HashBase
-    {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
-    };
-
-    /**
-     * ELF hash algorithm.
-     */
-    struct ELFHash : public HashBase
-    {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
-    };
+    typedef std::binary_function<const void *, size_t, uint32> _HashBase;
 
     /**
      * BKDR hash algorithm.
      */
-    struct BKDRHash : public HashBase
+    struct _BKDRHash : public _HashBase
     {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
+        uint32 operator()(const void *buf, size_t size) const;
     };
 
     /**
      * DJB hash algorithm.
      */
-    struct DJBHash : public HashBase
+    struct _DJBHash : public _HashBase
     {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
+        uint32 operator()(const void *buf, size_t size) const;
+    };
 
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
+    /**
+     * SDBM hash algorithm.
+     */
+    struct _SDBMHash : public _HashBase
+    {
+        uint32 operator()(const void *buf, size_t size) const;
+    };
+
+    /**
+     * RS hash algorithm.
+     */
+    struct _RSHash : public _HashBase
+    {
+        uint32 operator()(const void *buf, size_t size) const;
+    };
+
+    /**
+     * JS hash algorithm.
+     */
+    struct _JSHash : public _HashBase
+    {
+        uint32 operator()(const void *buf, size_t size) const;
+    };
+
+    /**
+     * P. J. Weinberger hash algorithm.
+     */
+    struct _PJHash : public _HashBase
+    {
+        uint32 operator()(const void *buf, size_t size) const;
+    };
+
+    /**
+     * ELF hash algorithm.
+     */
+    struct _ELFHash : public _HashBase
+    {
+        uint32 operator()(const void *buf, size_t size) const;
     };
 
     /**
      * AP hash algorithm.
      */
-    struct APHash : public HashBase
+    struct _APHash : public _HashBase
     {
-        typedef HashBase::Argument1_Type Argument1_Type;
-        typedef HashBase::Argument2_Type Argument2_Type;
-        typedef HashBase::Result_Type Result_Type;
-
-        virtual Result_Type operator()(Argument1_Type buf, Argument2_Type size = 0) const;
+        uint32 operator()(const void *buf, size_t size) const;
     };
 
 private:
-    HashBase *m_algos[LLBC_KeyHashAlgorithmType::End];
+    /**
+     * Disable assignment. 
+     */
+    LLBC_DISABLE_ASSIGNMENT(__LLBC_Hash);
+
+private:
+    const _BKDRHash _bkdrHash;
+    const _DJBHash _djbHash;
+    const _SDBMHash _sdbmHash;
+    const _RSHash _rsHash;
+    const _JSHash _jsHash;
+    const _PJHash _pjHash;
+    const _ELFHash _elfHash;
+    const _APHash _apHash;
 };
 
-// Singleton macro define.
-template class LLBC_EXPORT LLBC_Singleton<LLBC_KeyHashAlgorithm>;
-#define LLBC_KeyHashAlgorithmSingleton LLBC_Singleton<LLBC_KeyHashAlgorithm>::Instance()
-
 __LLBC_NS_END
+
+#include "llbc/core/objbase/KeyHashAlgorithmImpl.h"
+
+// Singleton macro define.
+template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>;
+#define LLBC_Hash (*(LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>::Instance()))
 
 #endif // !__LLBC_OBJBASE_KEY_HASH_ALGORITHM_H__
