@@ -9,7 +9,9 @@ clone_folder: c:\projects\llbc
 install:
     - cmd: >-
         git submodule update --init --recursive
+        
         echo vs2017 | call WinPreBuild.bat 0
+        
         echo vs2019 | call WinPreBuild.bat 0
        
 image: 
