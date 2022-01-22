@@ -24,6 +24,7 @@
 
 #include "llbc/core/utils/Util_Debug.h"
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/time/Time.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
@@ -100,7 +101,10 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     return ret;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_freq = 0;
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerSecond = 0;
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerMillisecond = 0;
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerMicroSecond = 0;
+LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerNanoSecond = 0;
 
 LLBC_CPUTime::LLBC_CPUTime():_count(0)
 {
@@ -128,22 +132,22 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count / _freq);
+    return static_cast<CPUTimeCount>(_count / _countPerSecond);
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMilliSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count * 1000.0 / _freq);
+    return static_cast<CPUTimeCount>(_count / _countPerMillisecond);
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count * 1000000.0 / _freq);
+    return static_cast<CPUTimeCount>(_count / _countPerMicroSecond);
 }
 
 LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToNanoSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count * 1000000000.0 / _freq);
+    return static_cast<CPUTimeCount>(_count / _countPerNanoSecond);
 }
 
 std::string LLBC_CPUTime::ToString() const
@@ -221,7 +225,10 @@ bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
 
 void LLBC_CPUTime::InitFrequency()
 {
-    _freq = LLBC_GetCpuCounterFrequancy();
+    _countPerSecond = LLBC_GetCpuCounterFrequancy();
+    _countPerMillisecond = _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond;
+    _countPerMicroSecond = _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond;
+    _countPerNanoSecond = _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond;
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32

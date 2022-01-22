@@ -95,7 +95,10 @@ public:
     static void InitFrequency();
 
 private:
-    static CPUTimeCount _freq;
+    static CPUTimeCount _countPerSecond;
+    static CPUTimeCount _countPerMillisecond;
+    static CPUTimeCount _countPerMicroSecond;
+    static CPUTimeCount _countPerNanoSecond;
     CPUTimeCount _count;
 };
 

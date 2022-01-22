@@ -139,14 +139,12 @@ void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTime);
 
 /**
  * Get CpuCounter Frequancy.
- * @param[in] microSeconds - the microseconds.
  * @return uint64 - cpucounter frequancy(ticks per second)
  */
 uint64 LLBC_GetCpuCounterFrequancy();
 
 /**
- * Get Tsc Count.
- * 
+ * Get cpu timestamp counter value.
  * @return uint64 - current tsc ticks num
  */
 uint64 LLBC_OrderedRdTsc();

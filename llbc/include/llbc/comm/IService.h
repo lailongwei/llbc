@@ -180,13 +180,15 @@ public:
 
     /**
      * Set service frame max time out.
+     * @param[in] frameMaxTimeout         - in nano-seconds.
      */
-    virtual void SetFrameMaxTimeout(const LLBC_TimeSpan &pieceTime) = 0;
+    virtual void SetFrameMaxTimeout(uint64 frameMaxTimeout) = 0;
 
     /**
      * Get service frame max time out.
+     * @return LLBC_TimeSpan
      */
-    virtual const LLBC_TimeSpan &GetFrameMaxTimeout() const = 0;
+    virtual LLBC_TimeSpan GetFrameMaxTimeout() const = 0;
 
 public:
     /**

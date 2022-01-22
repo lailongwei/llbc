@@ -93,7 +93,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
-, _frameMaxTimeout(LLBC_TimeSpan::FromSS(0, 1, 0))  // 1ms time out default
+, _frameMaxTimeout(static_cast<uint64>(LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT))
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
@@ -446,12 +446,28 @@ int LLBC_Service::SetFPS(int fps)
     _fps = fps;
     if (_fps != static_cast<int>(LLBC_INFINITE))
     {
+        const uint64 oldIntervalInNano = _frameInterval * LLBC_Time::NumOfNanoSecondsPerMilliSecond;
         _frameInterval = 1000 / _fps;
+        const uint64 newIntervalInNano = _frameInterval * LLBC_Time::NumOfNanoSecondsPerMilliSecond;
+
+        // 比例缩放_frameMaxTimeout
+        if(UNLIKELY(!_frameMaxTimeout || !oldIntervalInNano))
+        {
+            _frameMaxTimeout = newIntervalInNano;
+        }
+        else
+        {
+            _frameMaxTimeout = static_cast<uint64>(_frameMaxTimeout * newIntervalInNano * 1.0 / oldIntervalInNano);
+        }
+
+        if(UNLIKELY(_frameMaxTimeout < newIntervalInNano))
+            _frameMaxTimeout = newIntervalInNano;
     }
     else
     {
         _relaxTimes = 0;
         _frameInterval = 0;
+        _frameMaxTimeout = 0;
     }
 
     return LLBC_OK;
@@ -465,14 +481,17 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-void LLBC_Service::SetFrameMaxTimeout(const LLBC_TimeSpan &frameMaxTimeout)
+void LLBC_Service::SetFrameMaxTimeout(uint64 frameMaxTimeout)
 {
+    const uint64 intervalNanoSeconds = static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMilliSecond * _frameInterval);
+    if(UNLIKELY(frameMaxTimeout <  intervalNanoSeconds || intervalNanoSeconds == 0))
+        frameMaxTimeout = intervalNanoSeconds;
     _frameMaxTimeout = frameMaxTimeout;
 }
 
-const LLBC_TimeSpan &LLBC_Service::GetFrameMaxTimeout() const
+LLBC_TimeSpan LLBC_Service::GetFrameMaxTimeout() const
 {
-    return _frameMaxTimeout;
+    return LLBC_TimeSpan(_frameMaxTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
 }
 
 int LLBC_Service::Listen(const char *ip,
@@ -1564,7 +1583,7 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
-        if(UNLIKELY( _frameMaxTimeout.GetTotalMicroSeconds() <= (cpuTime.Current() - cpuTime).ToMicroSeconds()))
+        if(UNLIKELY(_frameMaxTimeout && (_frameMaxTimeout <= (cpuTime.Current() - cpuTime).ToNanoSeconds())))
             break;
     }
 }

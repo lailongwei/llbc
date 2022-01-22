@@ -281,4 +281,8 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 
+#ifndef LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT
+#define LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT (LLBC_INFINITE)
+#endif
+
 #endif // !__LLBC_COM_CONFIG_H__

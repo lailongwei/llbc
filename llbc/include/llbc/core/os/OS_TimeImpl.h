@@ -171,25 +171,12 @@ inline uint64 LLBC_GetCpuCounterFrequancy()
     ::QueryPerformanceFrequency(&freq);
     return static_cast<uint64>(freq.QuadPart);
 #else
-    // params
-    struct timespec tpStart, tpEnd;
     uint64 tscStart, tscEnd;
-
-    // start calculate using clock_gettime CLOCK_MONOTONIC nanoseconds since system boot
-    uint64 startNano = ::clock_gettime(CLOCK_MONOTONIC, &tpStart);    // start time
-    tscStart = LLBC_OrderedRdTsc();                             // start tsc
+    tscStart = LLBC_OrderedRdTsc();
     ::sleep(1);
     tscEnd = LLBC_OrderedRdTsc();
-    ::clock_gettime(CLOCK_MONOTONIC, &tpEnd);
-    const uint64 nanoSecondPerSecond = 1000000000;
-    // calculate elapsed
-    const uint64 nanoEndTime = ((tpEnd.tv_sec * nanoSecondPerSecond) + tpEnd.tv_nsec);
-    const uint64 nanoStartTime = (tpStart.tv_sec * nanoSecondPerSecond + tpStart.tv_nsec);
-    const uint64 nanosecElapsed = nanoEndTime - nanoStartTime;
-    const uint64 tscElapsed = tscEnd - tscStart;
 
-    // calculate tsc frequancy = elapsedTsc * nanoSecondPerSecond / elapsedNanoSecond;
-    return tscElapsed * nanoSecondPerSecond / nanosecElapsed;
+    return tscEnd - tscStart;
 #endif
 }
 
