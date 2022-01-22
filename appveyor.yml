@@ -13,6 +13,7 @@ install:
         echo vs2017 | call WinPreBuild.bat 0
         
         echo vs2019 | call WinPreBuild.bat 0
+       
 image: 
     - Visual Studio 2019
 
