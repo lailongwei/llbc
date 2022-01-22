@@ -183,9 +183,10 @@ inline uint64 LLBC_GetCpuCounterFrequancy()
 inline uint64 LLBC_OrderedRdTsc()
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    int cpuinfo[4] = {0};
-    __cpuid(cpuinfo ,0);
-    return __rdtsc();
+    _mm_lfence();
+    uint64 ticks = __rdtsc();
+    _mm_lfence();
+    return ticks;
 #else
     uint64 var;
     __asm__ volatile ("lfence\n\t"

@@ -180,7 +180,7 @@ public:
 
     /**
      * Set service frame max time out.
-     * @param[in] frameMaxTimeout         - in nano-seconds.
+     * @param[in] frameMaxTimeout - in nano-seconds.
      */
     virtual void SetFrameMaxTimeout(uint64 frameMaxTimeout) = 0;
 
