@@ -60,22 +60,21 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 class LLBC_EXPORT LLBC_CPUTime
 {
 public:
-    typedef uint64 CPUTimeCount;
 
 public:
     LLBC_CPUTime();
-    LLBC_CPUTime(CPUTimeCount count);
+    LLBC_CPUTime(uint64 count);
     ~LLBC_CPUTime();
 
 public:
     static LLBC_CPUTime Current();
     
-    CPUTimeCount ToSeconds() const;
+    uint64 ToSeconds() const;
 
-    CPUTimeCount ToMilliSeconds() const;
+    uint64 ToMilliSeconds() const;
 
-    CPUTimeCount ToMicroSeconds() const;
-    CPUTimeCount ToNanoSeconds() const;
+    uint64 ToMicroSeconds() const;
+    uint64 ToNanoSeconds() const;
 
     std::string ToString() const;
 
@@ -95,11 +94,7 @@ public:
     static void InitFrequency();
 
 private:
-    static CPUTimeCount _countPerSecond;
-    static CPUTimeCount _countPerMillisecond;
-    static CPUTimeCount _countPerMicroSecond;
-    static CPUTimeCount _countPerNanoSecond;
-    CPUTimeCount _count;
+    uint64 _count;
 };
 
 /**

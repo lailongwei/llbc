@@ -172,21 +172,20 @@ inline uint64 LLBC_GetCpuCounterFrequancy()
     return static_cast<uint64>(freq.QuadPart);
 #else
     uint64 tscStart, tscEnd;
-    tscStart = LLBC_OrderedRdTsc();
+    tscStart = LLBC_RdTsc();
     ::sleep(1);
-    tscEnd = LLBC_OrderedRdTsc();
+    tscEnd = LLBC_RdTsc();
 
     return tscEnd - tscStart;
 #endif
 }
 
-inline uint64 LLBC_OrderedRdTsc()
+inline uint64 LLBC_RdTsc()
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    _mm_lfence();
-    uint64 ticks = __rdtsc();
-    _mm_lfence();
-    return ticks;
+    LARGE_INTEGER cur;
+    ::QueryPerformanceCounter(&cur);
+    return static_cast<uint64>(cur.QuadPart);
 #else
     uint64 var;
     __asm__ volatile ("lfence\n\t"

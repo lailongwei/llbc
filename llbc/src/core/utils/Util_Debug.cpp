@@ -52,6 +52,11 @@ static const char *__g_hexTable[256] =
     "f0 ",  "f1 ",  "f2 ",  "f3 ",  "f4 ",  "f5 ",  "f6 ",  "f7 ",  "f8 ",  "f9 ",  "fa ",  "fb ",  "fc ",  "fd ",  "fe ",  "ff "
 };
 
+static LLBC_NS uint64 _countPerSecond = 0;
+static LLBC_NS uint64 _countPerMillisecond = 0;
+static LLBC_NS uint64 _countPerMicroSecond = 0;
+static LLBC_NS uint64 _countPerNanoSecond = 0;
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -101,16 +106,11 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     return ret;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerSecond = 0;
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerMillisecond = 0;
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerMicroSecond = 0;
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_countPerNanoSecond = 0;
-
 LLBC_CPUTime::LLBC_CPUTime():_count(0)
 {
 }
 
-LLBC_CPUTime::LLBC_CPUTime(CPUTimeCount count):_count(count)
+LLBC_CPUTime::LLBC_CPUTime(uint64 count):_count(count)
 {
 }
 
@@ -121,7 +121,7 @@ LLBC_CPUTime::~LLBC_CPUTime()
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_OrderedRdTsc();
+    auto ticks = LLBC_RdTsc();
     return LLBC_CPUTime(ticks);
 #else
     LARGE_INTEGER cur;
@@ -130,24 +130,24 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 #endif
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToSeconds() const
+uint64 LLBC_CPUTime::ToSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count / _countPerSecond);
+    return _count / LLBC_INL_NS _countPerSecond;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMilliSeconds() const
+uint64 LLBC_CPUTime::ToMilliSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count / _countPerMillisecond);
+    return _count / LLBC_INL_NS _countPerMillisecond;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
+uint64 LLBC_CPUTime::ToMicroSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count / _countPerMicroSecond);
+    return _count / LLBC_INL_NS _countPerMicroSecond;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToNanoSeconds() const
+uint64 LLBC_CPUTime::ToNanoSeconds() const
 {
-    return static_cast<CPUTimeCount>(_count / _countPerNanoSecond);
+    return _count / LLBC_INL_NS _countPerNanoSecond;
 }
 
 std::string LLBC_CPUTime::ToString() const
@@ -225,10 +225,10 @@ bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
 
 void LLBC_CPUTime::InitFrequency()
 {
-    _countPerSecond = LLBC_GetCpuCounterFrequancy();
-    _countPerMillisecond = _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond;
-    _countPerMicroSecond = _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond;
-    _countPerNanoSecond = _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond;
+    LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequancy();
+    LLBC_INL_NS _countPerMillisecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond;
+    LLBC_INL_NS _countPerMicroSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond;
+    LLBC_INL_NS _countPerNanoSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond;
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32

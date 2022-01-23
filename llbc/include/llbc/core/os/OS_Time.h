@@ -147,7 +147,7 @@ uint64 LLBC_GetCpuCounterFrequancy();
  * Get cpu timestamp counter value.
  * @return uint64 - current tsc ticks num
  */
-uint64 LLBC_OrderedRdTsc();
+uint64 LLBC_RdTsc();
 
 __LLBC_NS_END
 
