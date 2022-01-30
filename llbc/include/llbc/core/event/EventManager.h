@@ -106,6 +106,11 @@ public:
      */
     virtual int RemoveListenerX(LLBC_ListenerStub &stub);
 
+    /**
+     * Remove all listeners.
+     */
+    virtual void RemoveAllListeners();
+
 public:
     /**
      * Fire event.
@@ -172,6 +177,7 @@ protected:
     _Id2ListenerInfos _id2ListenerInfos;
     _Stub2ListenerInfos _stub2ListenerInfos;
 
+    bool _pendingRemoveAllListeners;
     std::set<int> _pendingRemoveEvIds;
     std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
 };

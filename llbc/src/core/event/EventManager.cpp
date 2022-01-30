@@ -47,6 +47,8 @@ LLBC_EventManager::_ListenerInfo::~_ListenerInfo()
 LLBC_EventManager::LLBC_EventManager()
 : _firing(0)
 , _maxListenerStub(0)
+
+, _pendingRemoveAllListeners(false)
 {
 }
 
@@ -183,6 +185,21 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
+void LLBC_EventManager::RemoveAllListeners()
+{
+    if (IsFiring())
+    {
+        _pendingRemoveAllListeners = true;
+        return;
+    }
+
+    _stub2ListenerInfos.clear();
+    for (_Id2ListenerInfos::iterator it = _id2ListenerInfos.begin();
+         it != _id2ListenerInfos.end();
+         ++it)
+        LLBC_STLHelper::RecycleContainer(it->second);
+}
+
 void LLBC_EventManager::Fire(LLBC_Event *ev)
 {
     BeforeFireEvent();
@@ -233,27 +250,38 @@ void LLBC_EventManager::BeforeFireEvent()
 
 void LLBC_EventManager::AfterFireEvent()
 {
-    if (--_firing == 0)
+    if (--_firing != 0)
+        return;
+
+    if (_pendingRemoveAllListeners)
     {
-        if (!_pendingRemoveEvIds.empty())
-        {
-            for (std::set<int>::const_iterator it = _pendingRemoveEvIds.begin();
-                 it != _pendingRemoveEvIds.end();
-                 ++it)
-                RemoveListener(*it);
+        _pendingRemoveEvIds.clear();
+        _pendingRemoveEvStubs.clear();
 
-            _pendingRemoveEvIds.clear();
-        }
+        RemoveAllListeners();
+        _pendingRemoveAllListeners = false;
 
-        if (!_pendingRemoveEvStubs.empty())
-        {
-            for (std::set<LLBC_ListenerStub>::const_iterator it = _pendingRemoveEvStubs.begin();
-                 it != _pendingRemoveEvStubs.end();
-                 ++it)
-                RemoveListener(*it);
+        return;
+    }
 
-            _pendingRemoveEvStubs.clear();
-        }
+    if (!_pendingRemoveEvIds.empty())
+    {
+        for (std::set<int>::const_iterator it = _pendingRemoveEvIds.begin();
+             it != _pendingRemoveEvIds.end();
+             ++it)
+            RemoveListener(*it);
+
+        _pendingRemoveEvIds.clear();
+    }
+
+    if (!_pendingRemoveEvStubs.empty())
+    {
+        for (std::set<LLBC_ListenerStub>::const_iterator it = _pendingRemoveEvStubs.begin();
+             it != _pendingRemoveEvStubs.end();
+             ++it)
+            RemoveListener(*it);
+
+        _pendingRemoveEvStubs.clear();
     }
 }
 
