@@ -22,9 +22,9 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/utils/Util_Debug.h"
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/time/Time.h"
+#include "llbc/core/utils/Util_Debug.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
@@ -225,10 +225,17 @@ bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
 
 void LLBC_CPUTime::InitFrequency()
 {
+#if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
     LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequancy();
     LLBC_INL_NS _countPerMillisecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond;
     LLBC_INL_NS _countPerMicroSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond;
     LLBC_INL_NS _countPerNanoSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond;
+#else
+    LLBC_INL_NS _countPerSecond = LLBC_INFINITE;
+    LLBC_INL_NS _countPerMillisecond = LLBC_INFINITE;
+    LLBC_INL_NS _countPerMicroSecond = LLBC_INFINITE;
+    LLBC_INL_NS _countPerNanoSecond = LLBC_INFINITE;
+#endif
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32

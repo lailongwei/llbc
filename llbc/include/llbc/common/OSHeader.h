@@ -84,7 +84,6 @@
 
 #if LLBC_TARGET_PLATFORM_WIN32
  #include <io.h>
-// tsc cpuid
  #include <intrin.h>    
 #endif // LLBC_TARGET_PLATFORM_WIN32
 

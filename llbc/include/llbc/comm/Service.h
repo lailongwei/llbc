@@ -150,15 +150,15 @@ public:
 
     /**
      * Set service frame max time out.
-     * @param[in] frameMaxTimeout.
+     * @param[in] frameTimeout.
      */
-    virtual void SetFrameMaxTimeout(const LLBC_TimeSpan &frameMaxTimeout);
+    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
 
     /**
      * Get service frame max time out.
      * @return LLBC_TimeSpan
      */
-    virtual LLBC_TimeSpan GetFrameMaxTimeout() const;
+    virtual LLBC_TimeSpan GetFrameTimeout() const;
 
 public:
     /**
@@ -620,7 +620,7 @@ private:
     int _frameInterval;
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
-    uint64 _frameMaxTimeout;
+    uint64 _frameTimeout;
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;

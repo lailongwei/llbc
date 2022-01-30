@@ -93,7 +93,7 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
-, _frameMaxTimeout(LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT)
+, _frameTimeout(LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT)
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
@@ -448,9 +448,7 @@ int LLBC_Service::SetFPS(int fps)
     {
         _frameInterval = 1000 / _fps;
         const uint64 newIntervalInNano = _frameInterval * LLBC_Time::NumOfNanoSecondsPerMilliSecond;
-
-        if(UNLIKELY(_frameMaxTimeout < newIntervalInNano))
-            _frameMaxTimeout = newIntervalInNano;
+        _frameTimeout = MAX(newIntervalInNano, _frameTimeout);
     }
     else
     {
@@ -469,20 +467,16 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
-void LLBC_Service::SetFrameMaxTimeout(const LLBC_TimeSpan &frameMaxTimeout)
+void LLBC_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
 {
     const uint64 intervalNanoSeconds = static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMilliSecond * _frameInterval);
-    uint64 frameMaxTimeoutInNanosec = frameMaxTimeout.GetTotalMicroSeconds() * static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond);
-    
-    if(UNLIKELY(frameMaxTimeoutInNanosec <  intervalNanoSeconds))
-        frameMaxTimeoutInNanosec = intervalNanoSeconds;
-    
-    _frameMaxTimeout = frameMaxTimeoutInNanosec;
+    _frameTimeout = frameTimeout.GetTotalMicroSeconds() * static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond);
+    _frameTimeout = MAX(intervalNanoSeconds, _frameTimeout);
 }
 
-LLBC_TimeSpan LLBC_Service::GetFrameMaxTimeout() const
+LLBC_TimeSpan LLBC_Service::GetFrameTimeout() const
 {
-    return LLBC_TimeSpan(_frameMaxTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
+    return LLBC_TimeSpan::FromMicros(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
 }
 
 int LLBC_Service::Listen(const char *ip,
@@ -1574,7 +1568,7 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
-        if(UNLIKELY(_frameMaxTimeout && (_frameMaxTimeout <= (cpuTime.Current() - cpuTime).ToNanoSeconds())))
+        if(UNLIKELY(_frameTimeout && (_frameTimeout != LLBC_INFINITE)  && (_frameTimeout <= (cpuTime.Current() - cpuTime).ToNanoSeconds())))
             break;
     }
 }
