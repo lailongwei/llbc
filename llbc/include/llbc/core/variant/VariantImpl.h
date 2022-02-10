@@ -574,7 +574,7 @@ LLBC_Variant::operator std::set<_ElemTy>() const
     {
         DictConstIter endIt = _holder.data.obj.dict->end();
         for (DictConstIter it = _holder.data.obj.dict->begin(); it != endIt; ++it)
-            s.insert(it->second);
+            s.insert(it->first);
     }
 
     return s;
