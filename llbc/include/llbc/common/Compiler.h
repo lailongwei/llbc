@@ -44,6 +44,8 @@
 //  MSVC++12.0  -> 1800(Visual Studio 2013)
 //  MSVC++14.0  -> 1900(Visual Studio 2015)
 //  MSVC++15.0  -> 1910(Visual Studio 2017)
+//  MSVC++16.0  -> 1920(Visual Studio 2019)
+//  MSVC++17.0  -> 1930(Visual Studio 2022)
 //  ... ...
 #if LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
  #define LLBC_CUR_COMP          LLBC_COMP_MSVC
