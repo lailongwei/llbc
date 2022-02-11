@@ -38,7 +38,8 @@ for:
 build:
     verbosity: normal
     project: build\vs2019\llbc_vs2019.sln
-    
+
+
 notifications:
     - provider: Email
         to:
