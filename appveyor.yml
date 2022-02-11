@@ -38,3 +38,15 @@ for:
 build:
     verbosity: normal
     project: build\vs2019\llbc_vs2019.sln
+    
+notifications:
+    - provider: Email
+        to:
+            - 964855959@qq.com  # Longwei Lai
+            - huangrongfu00@gmail.com  # Rongfu Huang
+            - najoast@126.com # Yan Zhou
+            - caochunxi@hotmail.com # Chunxi Cao
+            - 120453674@qq.com # Huiya Song
+    on_build_success: true
+    on_build_failure: true
+    on_build_status_changed: true
