@@ -41,10 +41,16 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     SeqTest();
     std::cout <<std::endl;
 
-    DictTtest();
+    DictTest();
     std::cout <<std::endl;
 
     SerializeTest();
+    std::cout <<std::endl;
+
+    HashTest();
+    std::cout <<std::endl;
+
+    ConvertToUnurderedStlContainerTest();
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
@@ -379,7 +385,7 @@ void TestCase_Core_VariantTest::SeqTest()
     std::cout << "seq10 - false: " << seq10 - false << std::endl;
 }
 
-void TestCase_Core_VariantTest::DictTtest()
+void TestCase_Core_VariantTest::DictTest()
 {
     std::cout <<"Dict test" <<std::endl;
 
@@ -489,4 +495,52 @@ void TestCase_Core_VariantTest::SerializeTest()
     stream.SetPos(0);
     stream>> deserDict;
     std::cout <<"Deserialized from stream: [" <<deserDict <<"]" <<std::endl;
+}
+
+void TestCase_Core_VariantTest::HashTest()
+{
+    std::cout <<"Hash test" <<std::endl;
+
+    auto doHash = [](const LLBC_Variant &v)
+    {
+        std::cout <<"Hash " <<v <<": " <<std::hash<LLBC_Variant>()(v) <<std::endl;
+    };
+
+    doHash(LLBC_Variant::nil); 
+    doHash(LLBC_Variant(true));
+    doHash(LLBC_Variant(false));
+    doHash(LLBC_Variant(0));
+    doHash(LLBC_Variant(1));
+    doHash(LLBC_Variant(2));
+    doHash(LLBC_Variant(-1));
+    doHash(LLBC_Variant(-2));
+    doHash(LLBC_Variant(3.1415926f));
+    doHash(LLBC_Variant(6.18));
+    doHash(LLBC_Variant("Hello world"));
+    doHash(LLBC_Variant(""));
+
+    LLBC_Variant seq;
+    seq.SeqPushBack(LLBC_Variant(true));
+    seq.SeqPushBack(LLBC_Variant(9527));
+    seq.SeqPushBack(LLBC_Variant(3.1415926));
+    seq.SeqPushBack(LLBC_Variant());
+    seq[seq.Size() - 1].DictInsert("hello world", 6.18);
+    doHash(seq);
+}
+
+void TestCase_Core_VariantTest::ConvertToUnurderedStlContainerTest()
+{
+    std::cout <<"Convert to unordered stl container test:" <<std::endl;
+
+    LLBC_Variant v;
+    v["hello world"] = 3;
+    v[false] = "hey judy";
+    v[LLBC_Variant::nil] = LLBC_Variant::nil;
+    v[3.1415926] = 9527;
+
+    std::unordered_set<LLBC_Variant> us = v;
+    std::cout <<"Variant: " <<v <<std::endl;
+    std::cout <<"Convert to " <<LLBC_GetTypeName(us) <<"(size:" <<us.size() <<"):" <<std::endl;
+    for (auto &elem : us)
+        std::cout <<"- " <<elem <<std::endl;
 }

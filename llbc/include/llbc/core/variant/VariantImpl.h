@@ -1119,4 +1119,74 @@ inline LLBC_Variant &LLBC_Variant::BecomeDictX()
 
 __LLBC_NS_END
 
+namespace std
+{
+
+/**
+ * \brief The explicit specialization of std::hash<LLBC_Variant> impl.
+ * 
+ */
+template <>
+struct hash<LLBC_NS LLBC_Variant>
+{
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    __attribute__((pure)) 
+    #endif // Comp == Gcc or Comp == Clang
+    size_t operator()(const LLBC_NS LLBC_Variant &var) const
+    {
+        if (var.IsRaw())
+        {
+            const LLBC_NS LLBC_Variant::Holder &holder = var.GetHolder();
+            if (var.IsFloat() || var.IsDouble())
+                return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
+            else
+                return static_cast<size_t>(holder.data.raw.uint64Val);
+        }
+        else if (var.IsStr())
+        {
+            const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
+            if (str && !str->empty())
+                return ::std::_Hash_impl::hash(str->data(), str->size());
+            else
+                return ::std::_Hash_impl::hash(nullptr, 0);
+        }
+        else if (var.IsSeq())
+        {
+            size_t hashVal = 10000;
+            const LLBC_NS LLBC_Variant::Seq * const &seq = var.GetHolder().data.obj.seq;
+            if (!seq || seq->empty())
+                return hashVal;
+
+            const LLBC_NS LLBC_Variant::SeqConstIter endIt = seq->end();
+            for (LLBC_NS LLBC_Variant::SeqConstIter it = seq->begin();
+                 it != endIt;
+                 ++it)
+                 hashVal += (*this)(*it);
+
+            return hashVal;
+        }
+        else if (var.IsDict())
+        {
+            size_t hashVal = 20000;
+            const LLBC_NS LLBC_Variant::Dict * const &dict = var.GetHolder().data.obj.dict;
+            if (!dict || dict->empty())
+                return hashVal;
+
+            const LLBC_NS LLBC_Variant::DictConstIter endIt = dict->end();
+            for (LLBC_NS LLBC_Variant::DictConstIter it = dict->begin();
+                 it != endIt;
+                 ++it)
+                hashVal += (*this)(it->first);
+
+            return hashVal;
+        }
+        else // Nil
+        {
+            return 0;
+        }
+    }
+};
+
+}
+
 #endif // __LLBC_CORE_VARIANT_VARIANT_H__
