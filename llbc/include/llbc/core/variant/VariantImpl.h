@@ -1132,23 +1132,35 @@ struct hash<LLBC_NS LLBC_Variant>
     #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
     __attribute__((pure)) 
     #endif // Comp == Gcc or Comp == Clang
-    size_t operator()(const LLBC_NS LLBC_Variant &var) const
+    size_t operator()(const LLBC_NS LLBC_Variant &var) const noexcept
     {
         if (var.IsRaw())
         {
             const LLBC_NS LLBC_Variant::Holder &holder = var.GetHolder();
             if (var.IsFloat() || var.IsDouble())
+                #if LLBC_TARGET_PLATFORM_WIN32
+                return ::std::_Hash_representation(
+                    holder.data.raw.doubleVal == 0.0f ? 0.0f : holder.data.raw.doubleVal);
+                #else
                 return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
+                #endif
             else
                 return static_cast<size_t>(holder.data.raw.uint64Val);
         }
         else if (var.IsStr())
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
+            #if LLBC_TARGET_PLATFORM_WIN32
+            if (str && !str->empty())
+                return ::std::_Hash_array_representation(str->data(), str->size());
+            else
+                return ::std::_Hash_representation(nullptr);
+            #else
             if (str && !str->empty())
                 return ::std::_Hash_impl::hash(str->data(), str->size());
             else
                 return ::std::_Hash_impl::hash(nullptr, 0);
+            #endif
         }
         else if (var.IsSeq())
         {
