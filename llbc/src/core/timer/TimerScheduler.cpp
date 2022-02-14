@@ -257,8 +257,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     if (data->timeouting)
         return LLBC_OK;
 
-    if (static_cast<sint64>(data->handle) -
-            LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
+    if (data->handle - LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
         int delElemRet = _heap.DeleteElem(data);
         ASSERT(delElemRet == LLBC_OK &&
