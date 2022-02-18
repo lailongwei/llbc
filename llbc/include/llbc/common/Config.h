@@ -281,8 +281,9 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 
-#ifndef LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT
- #define LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT LLBC_INFINITE
-#endif
+// - if enabled, provide set/get max frame time out method for service.
+#define LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE         0
+// default max frame time out for service.
+#define LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT        LLBC_INFINITE
 
 #endif // !__LLBC_COM_CONFIG_H__

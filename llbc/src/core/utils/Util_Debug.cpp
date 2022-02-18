@@ -121,8 +121,7 @@ LLBC_CPUTime::~LLBC_CPUTime()
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    auto ticks = LLBC_RdTsc();
-    return LLBC_CPUTime(ticks);
+    return LLBC_CPUTime(LLBC_RdTsc());
 #else
     LARGE_INTEGER cur;
     ::QueryPerformanceCounter(&cur);
@@ -150,12 +149,12 @@ uint64 LLBC_CPUTime::ToNanoSeconds() const
     return _count / LLBC_INL_NS _countPerNanoSecond;
 }
 
-std::string LLBC_CPUTime::ToString() const
+LLBC_String LLBC_CPUTime::ToString() const
 {
-    char buf[32];
-    sprintf(buf, "%f", ToNanoSeconds() / 1000000.0);
+    LLBC_String info;
+    info.append_format("%f", ToNanoSeconds() / 1000000.0);
 
-    return buf;
+    return info;
 }
 
 LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const
@@ -227,9 +226,15 @@ void LLBC_CPUTime::InitFrequency()
 {
 #if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
     LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequancy();
-    LLBC_INL_NS _countPerMillisecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond;
-    LLBC_INL_NS _countPerMicroSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond;
-    LLBC_INL_NS _countPerNanoSecond = LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond;
+    LLBC_INL_NS _countPerMillisecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
+    LLBC_INL_NS _countPerMicroSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
+    LLBC_INL_NS _countPerNanoSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
+    
+    if (LLBC_INL_NS _countPerNanoSecond == 1)
+    {
+        LLBC_INL_NS _countPerMicroSecond = LLBC_INL_NS _countPerNanoSecond * 1000;
+        LLBC_INL_NS _countPerMillisecond = LLBC_INL_NS _countPerMicroSecond * 1000;
+    }
 #else
     LLBC_INL_NS _countPerSecond = LLBC_INFINITE;
     LLBC_INL_NS _countPerMillisecond = LLBC_INFINITE;
@@ -243,5 +248,12 @@ void LLBC_CPUTime::InitFrequency()
 #endif
 
 __LLBC_NS_END
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime)
+{
+    o << cpuTime.ToString();
+
+    return o;
+}
 
 #include "llbc/common/AfterIncl.h"

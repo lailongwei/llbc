@@ -46,7 +46,7 @@ int __LLBC_CoreStartup()
     // Set timezone.
     LLBC_TZSet();
 
-    // linux/windows specific, initialize performance frequency.
+    // initialize performance frequency.
     LLBC_CPUTime::InitFrequency();
 
     // Set entry thread object pool.

@@ -148,17 +148,19 @@ public:
      */
     virtual int GetFrameInterval() const;
 
-    /**
-     * Set service frame max time out.
-     * @param[in] frameTimeout.
-     */
-    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
-
+#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
     /**
      * Get service frame max time out.
-     * @return LLBC_TimeSpan
+     * @return LLBC_TimeSpan - return the max frame time out span.
      */
     virtual LLBC_TimeSpan GetFrameTimeout() const;
+
+    /**
+     * Set service frame max time out.
+     * @param[in] frameTimeout - the max frame time out span.
+     */
+    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
+#endif // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
 
 public:
     /**

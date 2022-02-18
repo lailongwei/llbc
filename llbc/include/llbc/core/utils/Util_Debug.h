@@ -76,7 +76,7 @@ public:
     uint64 ToMicroSeconds() const;
     uint64 ToNanoSeconds() const;
 
-    std::string ToString() const;
+    LLBC_String ToString() const;
 
     LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
     LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
@@ -248,6 +248,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * stream output operator function for cpu time(in global ns).
+ */
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
 

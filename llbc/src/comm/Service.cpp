@@ -447,8 +447,11 @@ int LLBC_Service::SetFPS(int fps)
     if (_fps != static_cast<int>(LLBC_INFINITE))
     {
         _frameInterval = 1000 / _fps;
+
+#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
         const uint64 newIntervalInNano = _frameInterval * LLBC_Time::NumOfNanoSecondsPerMilliSecond;
         _frameTimeout = MAX(newIntervalInNano, _frameTimeout);
+#endif // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
     }
     else
     {
@@ -467,17 +470,19 @@ int LLBC_Service::GetFrameInterval() const
     return _frameInterval;
 }
 
+#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
+LLBC_TimeSpan LLBC_Service::GetFrameTimeout() const
+{
+    return LLBC_TimeSpan::FromMicros(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
+}
+
 void LLBC_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
 {
     const uint64 intervalNanoSeconds = static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMilliSecond * _frameInterval);
     _frameTimeout = frameTimeout.GetTotalMicroSeconds() * static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond);
     _frameTimeout = MAX(intervalNanoSeconds, _frameTimeout);
 }
-
-LLBC_TimeSpan LLBC_Service::GetFrameTimeout() const
-{
-    return LLBC_TimeSpan::FromMicros(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
-}
+#endif // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
 
 int LLBC_Service::Listen(const char *ip,
                          uint16 port,
@@ -1557,7 +1562,11 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
+
+#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
     LLBC_CPUTime cpuTime = LLBC_CPUTime::Current();
+#endif // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
+
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
@@ -1568,8 +1577,10 @@ void LLBC_Service::HandleQueuedEvents()
         LLBC_Delete(ev);
         LLBC_Delete(block);
 
+#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
         if(UNLIKELY(_frameTimeout && (_frameTimeout != LLBC_INFINITE)  && (_frameTimeout <= (cpuTime.Current() - cpuTime).ToNanoSeconds())))
             break;
+#endif  // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
     }
 }
 

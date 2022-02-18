@@ -254,13 +254,17 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
 
 void TestCase_Core_Time_Time::CpuTimeTest()
 {
-    std::cout <<"\t test cpu time tsc: " << std::endl;
+    std::cout << "Cpu time tsc test: " << std::endl;
     for(sint32 idx = 0; idx < 10; ++idx)
     {
         auto freq = LLBC_GetCpuCounterFrequancy();
-        std::cout << "\t current idx:" << std::to_string(idx) << ", tsc frequancy:" << std::to_string(freq) << std::endl;
+        std::cout << "Current idx:" << std::to_string(idx) << ", tsc frequancy:" << std::to_string(freq) << std::endl;
     }
-    std::cout <<"\t test cpu time tsc end: " << std::endl;
+    std::cout << "Cpu time tsc end: \n" << std::endl;
+
+    std::cout << "Cpu time stream out test: " << std::endl;
+    std::cout << "Stream out current cpu time: " << LLBC_CPUTime::Current() << std::endl;
+    std::cout << "Cpu time stream out end: " << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
