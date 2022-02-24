@@ -164,7 +164,7 @@ inline void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTim
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-inline uint64 LLBC_GetCpuCounterFrequancy()
+inline uint64 LLBC_GetCpuCounterFrequency()
 {
 #if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
     #if LLBC_TARGET_PLATFORM_WIN32

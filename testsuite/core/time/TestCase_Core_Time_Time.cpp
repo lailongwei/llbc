@@ -257,8 +257,8 @@ void TestCase_Core_Time_Time::CpuTimeTest()
     std::cout << "Cpu time tsc test: " << std::endl;
     for(sint32 idx = 0; idx < 10; ++idx)
     {
-        auto freq = LLBC_GetCpuCounterFrequancy();
-        std::cout << "Current idx:" << std::to_string(idx) << ", tsc frequancy:" << std::to_string(freq) << std::endl;
+        auto freq = LLBC_GetCpuCounterFrequency();
+        std::cout << "Current idx:" << std::to_string(idx) << ", tsc frequency:" << std::to_string(freq) << std::endl;
     }
     std::cout << "Cpu time tsc end: \n" << std::endl;
 

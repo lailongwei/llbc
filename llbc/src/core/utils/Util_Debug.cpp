@@ -225,7 +225,7 @@ bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
 void LLBC_CPUTime::InitFrequency()
 {
 #if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
-    LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequancy();
+    LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequency();
     LLBC_INL_NS _countPerMillisecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
     LLBC_INL_NS _countPerMicroSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
     LLBC_INL_NS _countPerNanoSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
