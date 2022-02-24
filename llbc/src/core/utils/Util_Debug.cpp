@@ -252,7 +252,6 @@ __LLBC_NS_END
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime)
 {
     o << cpuTime.ToString();
-
     return o;
 }
 

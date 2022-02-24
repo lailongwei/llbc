@@ -148,19 +148,19 @@ public:
      */
     virtual int GetFrameInterval() const;
 
-#if LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     /**
-     * Get service frame max time out.
-     * @return LLBC_TimeSpan - return the max frame time out span.
+     * Get service frame time out.
+     * @return LLBC_TimeSpan - return the service frame-timeout.
      */
     virtual LLBC_TimeSpan GetFrameTimeout() const;
 
     /**
-     * Set service frame max time out.
-     * @param[in] frameTimeout - the max frame time out span.
+     * Set service frame time out.
+     * @param[in] frameTimeout - then service frame-timeout.
      */
     virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
-#endif // LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
 public:
     /**
@@ -328,12 +328,12 @@ public:
      */
     virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory);
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     /**
      * Register status code describe.
      */
     virtual int RegisterStatusDesc(int status, const LLBC_String &desc);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC 
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC 
 
     /**
      * Subscribe message to specified delegate.
@@ -345,19 +345,19 @@ public:
      */
     virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
 
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
     virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
     /**
@@ -622,7 +622,9 @@ private:
     int _frameInterval;
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     uint64 _frameTimeout;
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;
@@ -679,18 +681,18 @@ private:
     _Handlers _handlers;
     typedef std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _PreHandlers;
     _PreHandlers _preHandlers;
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler;
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _StatusHandlers;
     typedef std::map<int, _StatusHandlers *> _OpStatusHandlers;
     _OpStatusHandlers _statusHandlers;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     typedef std::map<int, LLBC_String> _StatusDescs;
     _StatusDescs _statusDescs;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 private:
     uint32 _frameTaskIdx;

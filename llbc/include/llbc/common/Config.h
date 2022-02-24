@@ -236,7 +236,7 @@
 // Min service FPS value.
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
-#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       500
+#define LLBC_CFG_COMM_MAX_SERVICE_FPS                       1000
 // Sampler support option, default is true.
 #define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
@@ -249,6 +249,9 @@
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
+// Service frame-timeout function switch, if enabled, the service will has frame-timeout limit function, default is 0.
+#define LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT          1
+
 
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).
@@ -280,10 +283,5 @@
                                                      MiniDumpWithHandleData | \
                                                      MiniDumpWithThreadInfo)
 #endif
-
-// - if enabled, provide set/get max frame time out method for service.
-#define LLBC_CFG_SERVICE_MAX_FRAME_TIME_OUT_ENABLE         0
-// default max frame time out for service.
-#define LLBC_CFG_DEFAULT_MAX_FRAME_TIME_OUT        LLBC_INFINITE
 
 #endif // !__LLBC_COM_CONFIG_H__
