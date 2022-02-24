@@ -164,6 +164,48 @@ inline void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTim
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+inline uint64 LLBC_GetCpuCounterFrequancy()
+{
+#if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
+    #if LLBC_TARGET_PLATFORM_WIN32
+    LARGE_INTEGER freq;
+    ::QueryPerformanceFrequency(&freq);
+    return static_cast<uint64>(freq.QuadPart);
+    #else
+    uint64 tscStart, tscEnd;
+    tscStart = LLBC_RdTsc();
+    ::sleep(1);
+    tscEnd = LLBC_RdTsc();
+    return tscEnd - tscStart;
+    #endif // LLBC_TARGET_PLATFORM_WIN32
+#else
+    return LLBC_INFINITE;
+#endif // (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
+}
+
+inline uint64 LLBC_RdTsc()
+{
+#if (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
+    #if LLBC_TARGET_PLATFORM_WIN32
+    LARGE_INTEGER cur;
+    ::QueryPerformanceCounter(&cur);
+    return static_cast<uint64>(cur.QuadPart);
+    #else
+    uint32 lo = 0, hi = 0;
+    __asm__ volatile ("lfence\n\t"
+                    "rdtsc\n\t"
+                    "mov %%edx, %1;"
+                    "mov %%eax, %0;"
+                    "lfence\n\t":"=r"(lo), "=r"(hi)
+                    ::"%eax", "%ebx", "%ecx", "%edx");
+
+    return (static_cast<uint64>(hi) << 32) | lo;
+    #endif // LLBC_TARGET_PLATFORM_WIN32
+#else
+    return 0;
+#endif // (LLBC_TARGET_PROCESSOR_X86_64 | LLBC_TARGET_PROCESSOR_X86)
+}
+
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -60,23 +60,23 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 class LLBC_EXPORT LLBC_CPUTime
 {
 public:
-    typedef uint64 CPUTimeCount;
 
 public:
     LLBC_CPUTime();
-    LLBC_CPUTime(CPUTimeCount count);
+    LLBC_CPUTime(uint64 count);
     ~LLBC_CPUTime();
 
 public:
     static LLBC_CPUTime Current();
     
-    CPUTimeCount ToSeconds() const;
+    uint64 ToSeconds() const;
 
-    CPUTimeCount ToMilliSeconds() const;
+    uint64 ToMilliSeconds() const;
 
-    CPUTimeCount ToMicroSeconds() const;
+    uint64 ToMicroSeconds() const;
+    uint64 ToNanoSeconds() const;
 
-    std::string ToString() const;
+    LLBC_String ToString() const;
 
     LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
     LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
@@ -91,16 +91,10 @@ public:
     bool operator !=(const LLBC_CPUTime &right) const;
 
 public:
-#if LLBC_TARGET_PLATFORM_WIN32
     static void InitFrequency();
-#endif
 
 private:
-#if LLBC_TARGET_PLATFORM_WIN32
-    static CPUTimeCount _freq;
-#endif
-
-    CPUTimeCount _count;
+    uint64 _count;
 };
 
 /**
@@ -254,6 +248,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * stream output operator function for cpu time(in global ns).
+ */
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
 
