@@ -63,21 +63,33 @@ public:
 
 public:
     LLBC_CPUTime();
-    LLBC_CPUTime(uint64 count);
+    LLBC_CPUTime(uint64 cpuCount);
     ~LLBC_CPUTime();
+
+public:
+    static uint64 GetCPUFreqPerSecond();
+    static uint64 GetCPUFreqPerMilliSecond();
+    static uint64 GetCPUFreqPerMicroSecond();
+    static uint64 GetCPUFreqPerNanoSecond();
 
 public:
     static LLBC_CPUTime Current();
     
-    uint64 ToSeconds() const;
+    uint64 GetCpuCount() const;
 
-    uint64 ToMilliSeconds() const;
+    int ToSeconds() const;
+    sint64 ToMilliSeconds() const;
+    sint64 ToMicroSeconds() const;
+    sint64 ToNanoSeconds() const;
 
-    uint64 ToMicroSeconds() const;
-    uint64 ToNanoSeconds() const;
+    static int ToSeconds(uint64 cpuCount);
+    static sint64 ToMilliSeconds(uint64 cpuCount);
+    static sint64 ToMicroSeconds(uint64 cpuCount);
+    static sint64 ToNanoSeconds(uint64 cpuCount);
 
     LLBC_String ToString() const;
 
+public:
     LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
     LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
     LLBC_CPUTime &operator +=(const LLBC_CPUTime &right);
@@ -94,7 +106,7 @@ public:
     static void InitFrequency();
 
 private:
-    uint64 _count;
+    uint64 _cpuCount;
 };
 
 /**

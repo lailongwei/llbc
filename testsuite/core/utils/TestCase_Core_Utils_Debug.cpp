@@ -37,12 +37,38 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     LLBC_PrintLine("");
 
     // CPUTime test.
-    LLBC_CPUTime begin = LLBC_CPUTime::Current();
-    for(int i = 0; i < 10000000; ++i)
+    LLBC_PrintLine("Test CPUTime:");
     {
+        LLBC_PrintLine("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
+        LLBC_PrintLine("- CpuFreq per milli-second:%llu", LLBC_CPUTime::GetCPUFreqPerMilliSecond());
+        LLBC_PrintLine("- CpuFreq per micro-second:%llu", LLBC_CPUTime::GetCPUFreqPerMicroSecond());
+        LLBC_PrintLine("- CpuFreq per nano-second:%llu", LLBC_CPUTime::GetCPUFreqPerNanoSecond());
+        LLBC_PrintLine("");
     }
-    LLBC_CPUTime diff = LLBC_CPUTime::Current() - begin;
-    LLBC_PrintLine("CPUTime, diff time: %s", diff.ToString().c_str());
+
+    {
+        int loopTimes = 10000000;
+        LLBC_PrintLine("- Test foreach empty loop %d times time cost", loopTimes);
+        LLBC_CPUTime beg = LLBC_CPUTime::Current();
+        for (int i = 0; i < loopTimes; ++i)
+        {
+        }
+
+        LLBC_CPUTime cost = LLBC_CPUTime::Current() - beg;
+        LLBC_PrintLine("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
+                       cost.GetCpuCount(), cost.ToString().c_str());
+        LLBC_PrintLine("");
+    }
+
+    {
+        LLBC_PrintLine("- Test static LLBC_CPUTime::ToXXX() method:");
+        LLBC_PrintLine("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
+        LLBC_PrintLine("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%d", LLBC_CPUTime::ToMilliSeconds(100000000llu));
+        LLBC_PrintLine("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%d", LLBC_CPUTime::ToMicroSeconds(10000000llu));
+        LLBC_PrintLine("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%d", LLBC_CPUTime::ToNanoSeconds(1000000llu));
+        LLBC_PrintLine("");
+    }
+
     LLBC_PrintLine("");
 
     LLBC_PrintLine("Press any key to continue ...");
