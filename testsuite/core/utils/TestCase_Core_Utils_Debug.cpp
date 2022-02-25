@@ -47,6 +47,35 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     }
 
     {
+        LLBC_PrintLine("- LLBC_CPUTime(1000) + LLBC_CPUTime(1000) = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) + LLBC_CPUTime(1000)));
+        LLBC_PrintLine("- LLBC_CPUTime(1000) - LLBC_CPUTime(500) = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(500)));
+        LLBC_PrintLine("- LLBC_CPUTime(1000) - LLBC_CPUTime(2000) = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(2000)));
+
+        LLBC_PrintLine("- LLBC_CPUTime(1000) += 500 = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) += 500));
+        LLBC_PrintLine("- LLBC_CPUTime(1000) -= 500 = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) -= 500));
+        LLBC_PrintLine("- LLBC_CPUTime(1000) -= 2000 = %llu", 
+                       static_cast<uint64>(LLBC_CPUTime(1000) -= 2000));
+
+        LLBC_PrintLine("- LLBC_CPUTime(1000) > LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) > LLBC_CPUTime(500) ? "true" : "false");
+        LLBC_PrintLine("- LLBC_CPUTime(1000) >= LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) >= LLBC_CPUTime(500) ? "true" : "false");
+        LLBC_PrintLine("- LLBC_CPUTime(1000) < LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) < LLBC_CPUTime(500) ? "true" : "false");
+        LLBC_PrintLine("- LLBC_CPUTime(1000) <= LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) <= LLBC_CPUTime(500) ? "true" : "false");
+        LLBC_PrintLine("- LLBC_CPUTime(1000) == LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) == LLBC_CPUTime(500) ? "true" : "false");
+        LLBC_PrintLine("- LLBC_CPUTime(1000) != LLBC_CPUTime(500) = %s",
+                       LLBC_CPUTime(1000) != LLBC_CPUTime(500) ? "true" : "false");
+    }
+
+    {
         int loopTimes = 10000000;
         LLBC_PrintLine("- Test foreach empty loop %d times time cost", loopTimes);
         LLBC_CPUTime beg = LLBC_CPUTime::Current();

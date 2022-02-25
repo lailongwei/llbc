@@ -102,11 +102,18 @@ public:
     bool operator ==(const LLBC_CPUTime &right) const;
     bool operator !=(const LLBC_CPUTime &right) const;
 
+    operator uint64() const;
+
 public:
     static void InitFrequency();
 
 private:
     uint64 _cpuCount;
+
+    static uint64 _freqPerSecond;
+    static uint64 _freqPerMillisecond;
+    static uint64 _freqPerMicroSecond;
+    static uint64 _freqPerNanoSecond;
 };
 
 /**
@@ -265,6 +272,8 @@ __LLBC_NS_END
  * stream output operator function for cpu time(in global ns).
  */
 LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+
+#include "llbc/core/utils/Util_DebugImpl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
 

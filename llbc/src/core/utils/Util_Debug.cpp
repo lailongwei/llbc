@@ -52,11 +52,6 @@ static const char *__g_hexTable[256] =
     "f0 ",  "f1 ",  "f2 ",  "f3 ",  "f4 ",  "f5 ",  "f6 ",  "f7 ",  "f8 ",  "f9 ",  "fa ",  "fb ",  "fc ",  "fd ",  "fe ",  "ff "
 };
 
-static LLBC_NS uint64 _countPerSecond = 0;
-static LLBC_NS uint64 _countPerMillisecond = 0;
-static LLBC_NS uint64 _countPerMicroSecond = 0;
-static LLBC_NS uint64 _countPerNanoSecond = 0;
-
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -106,188 +101,50 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     return ret;
 }
 
-LLBC_CPUTime::LLBC_CPUTime():_cpuCount(0)
-{
-}
-
-LLBC_CPUTime::LLBC_CPUTime(uint64 cpuCount):_cpuCount(cpuCount)
-{
-}
-
-LLBC_CPUTime::~LLBC_CPUTime()
-{
-}
-
-uint64 LLBC_CPUTime::GetCPUFreqPerSecond()
-{
-    return LLBC_INL_NS _countPerSecond;
-}
-
-uint64 LLBC_CPUTime::GetCPUFreqPerMilliSecond()
-{
-    return LLBC_INL_NS _countPerMillisecond;
-}
-
-uint64 LLBC_CPUTime::GetCPUFreqPerMicroSecond()
-{
-    return LLBC_INL_NS _countPerMicroSecond;
-}
-
-uint64 LLBC_CPUTime::GetCPUFreqPerNanoSecond()
-{
-    return LLBC_INL_NS _countPerNanoSecond;
-}
+uint64 LLBC_CPUTime::_freqPerSecond = 0;
+uint64 LLBC_CPUTime::_freqPerMillisecond = 0;
+uint64 LLBC_CPUTime::_freqPerMicroSecond = 0;
+uint64 LLBC_CPUTime::_freqPerNanoSecond = 0;
 
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_CPUTime(LLBC_RdTsc());
-#else
+#else // Win32
     LARGE_INTEGER cur;
     ::QueryPerformanceCounter(&cur);
     return LLBC_CPUTime(cur.QuadPart);
-#endif
-}
-
-
-uint64 LLBC_CPUTime::GetCpuCount() const
-{
-    return _cpuCount;
-}
-
-int LLBC_CPUTime::ToSeconds() const
-{
-    return static_cast<int>(_cpuCount / LLBC_INL_NS _countPerSecond);
-}
-
-sint64 LLBC_CPUTime::ToMilliSeconds() const
-{
-    return _cpuCount / LLBC_INL_NS _countPerMillisecond;
-}
-
-sint64 LLBC_CPUTime::ToMicroSeconds() const
-{
-    return _cpuCount / LLBC_INL_NS _countPerMicroSecond;
-}
-
-sint64 LLBC_CPUTime::ToNanoSeconds() const
-{
-    return _cpuCount / LLBC_INL_NS _countPerNanoSecond;
-}
-
-int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
-{
-    return static_cast<int>(cpuCount / LLBC_INL_NS _countPerSecond);
-}
-
-sint64 LLBC_CPUTime::ToMilliSeconds(uint64 cpuCount)
-{
-    return cpuCount / LLBC_INL_NS _countPerMillisecond;
-}
-
-sint64 LLBC_CPUTime::ToMicroSeconds(uint64 cpuCount)
-{
-    return cpuCount / LLBC_INL_NS _countPerMicroSecond;
-}
-
-sint64 LLBC_CPUTime::ToNanoSeconds(uint64 cpuCount)
-{
-    return cpuCount / LLBC_INL_NS _countPerNanoSecond;
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
 LLBC_String LLBC_CPUTime::ToString() const
 {
     LLBC_String info;
     sint64 microSecs = ToMicroSeconds();
-    info.append_format("%f", static_cast<double>(_cpuCount) / LLBC_INL_NS _countPerMillisecond);
+    info.append_format("%f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
 
     return info;
 }
 
-LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const
-{
-    return LLBC_CPUTime(_cpuCount + right._cpuCount);
-}
-
-LLBC_CPUTime LLBC_CPUTime::operator -(const LLBC_CPUTime &right) const
-{
-    if (_cpuCount < right._cpuCount)
-    {
-        return LLBC_CPUTime(0);
-    }
-
-    return LLBC_CPUTime(_cpuCount - right._cpuCount);
-}
-
-LLBC_CPUTime &LLBC_CPUTime::operator +=(const LLBC_CPUTime &right)
-{
-    _cpuCount += right._cpuCount;
-    return *this;
-}
-
-LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
-{
-    if (_cpuCount < right._cpuCount)
-    {
-        _cpuCount = 0;
-    }
-    else
-    {
-        _cpuCount -= right._cpuCount;
-    }
-
-    return *this;
-}
-
-bool LLBC_CPUTime::operator <(const LLBC_CPUTime &right) const
-{
-    return _cpuCount < right._cpuCount;
-}
-
-bool LLBC_CPUTime::operator >(const LLBC_CPUTime &right) const
-{
-    return _cpuCount > right._cpuCount;
-}
-
-bool LLBC_CPUTime::operator <=(const LLBC_CPUTime &right) const
-{
-    return _cpuCount <= right._cpuCount;
-}
-
-bool LLBC_CPUTime::operator >=(const LLBC_CPUTime &right) const
-{
-    return _cpuCount >= right._cpuCount;
-}
-
-bool LLBC_CPUTime::operator ==(const LLBC_CPUTime &right) const
-{
-    return _cpuCount == right._cpuCount;
-}
-
-bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
-{
-    return _cpuCount != right._cpuCount;
-}
-
 void LLBC_CPUTime::InitFrequency()
 {
-    #if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
-    LLBC_INL_NS _countPerSecond = LLBC_GetCpuCounterFrequency();
-    LLBC_INL_NS _countPerMillisecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
-    LLBC_INL_NS _countPerMicroSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
-    LLBC_INL_NS _countPerNanoSecond = MAX(LLBC_INL_NS _countPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
+#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+    _freqPerSecond = LLBC_GetCpuCounterFrequency();
+    _freqPerMillisecond = MAX(_freqPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
+    _freqPerMicroSecond = MAX(_freqPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
+    _freqPerNanoSecond = MAX(_freqPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
     
-    if (LLBC_INL_NS _countPerNanoSecond == 1)
+    if (_freqPerNanoSecond == 1)
     {
-        LLBC_INL_NS _countPerMicroSecond = LLBC_INL_NS _countPerNanoSecond * 1000;
-        LLBC_INL_NS _countPerMillisecond = LLBC_INL_NS _countPerMicroSecond * 1000;
+        _freqPerMicroSecond = _freqPerNanoSecond * 1000;
+        _freqPerMillisecond = _freqPerMicroSecond * 1000;
     }
-    #else
-    LLBC_INL_NS _countPerSecond = LLBC_INFINITE;
-    LLBC_INL_NS _countPerMillisecond = LLBC_INFINITE;
-    LLBC_INL_NS _countPerMicroSecond = LLBC_INFINITE;
-    LLBC_INL_NS _countPerNanoSecond = LLBC_INFINITE;
-    #endif
+#else
+    _freqPerSecond = LLBC_INFINITE;
+    _freqPerMillisecond = LLBC_INFINITE;
+    _freqPerMicroSecond = LLBC_INFINITE;
+    _freqPerNanoSecond = LLBC_INFINITE;
+#endif
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
