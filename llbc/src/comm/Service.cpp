@@ -91,11 +91,11 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
-, _relaxTimes(0)
-, _begHeartbeatTime(0)
 #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 , _frameTimeout(LLBC_INFINITE)
 #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+, _relaxTimes(0)
+, _begHeartbeatTime(0)
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
