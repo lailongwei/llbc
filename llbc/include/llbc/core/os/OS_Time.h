@@ -138,10 +138,10 @@ void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTime);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 /**
- * Get CpuCounter Frequancy.
- * @return uint64 - cpucounter frequancy(ticks per second).
+ * Get CpuCounter Frequency.
+ * @return uint64 - cpucounter frequency(ticks per second).
  */
-uint64 LLBC_GetCpuCounterFrequancy();
+uint64 LLBC_GetCpuCounterFrequency();
 
 /**
  * Get cpu timestamp counter value.
