@@ -625,6 +625,7 @@ private:
     #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     uint64 _relaxTimes;
     sint64 _begHeartbeatTime;
+    LLBC_CPUTime _begSvcTime;
 
     volatile bool _sinkIntoLoop;
     volatile bool _afterStop;
