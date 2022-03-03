@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2022-01-10 10:29:52
+ * @LastEditTime: 2022-03-03 12:43:08
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: \llbc\wrap\pyllbc\include\pyllbc\common\Config.h
+ */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
@@ -23,14 +31,17 @@
 #define __PYLLBC_COM_CONFIG_H__
 
 // Define task count limit, default is 16.
-#define PYLLBC_CFG_TASK_LMT         16
+#define PYLLBC_CFG_TASK_LMT                                     16
 
 // The service default CODEC config.
 //      0: Json Codec
 //      1: Binary Codec
-#define PYLLBC_CFG_DFT_SVC_CODEC    1
+#define PYLLBC_CFG_DFT_SVC_CODEC                                1
 
 // Packet reuse option.
-#define PYLLBC_CFG_PACKET_REUSE     1
+#define PYLLBC_CFG_PACKET_REUSE                                 1
+
+// Service frame-timeout function switch, if enabled, the service will has frame-timeout limit function, default is 0.
+#define PYLLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT            1
 
 #endif // !__PYLLBC_COM_CONFIG_H__

@@ -96,6 +96,20 @@ public:
      */
     int GetFrameInterval() const;
 
+    #if PYLLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+    /**
+     * Get service frame time out.
+     * @return LLBC_TimeSpan - return the service frame-timeout.
+     */
+    virtual LLBC_TimeSpan GetFrameTimeout() const;
+
+    /**
+     * Set service frame time out.
+     * @param[in] frameTimeout - then service frame-timeout.
+     */
+    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
+    #endif // PYLLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
 public:
     /**
      * Suppress coder not found warning in protocol-stack.
