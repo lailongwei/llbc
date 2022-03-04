@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-01-10 10:29:52
- * @LastEditTime: 2022-03-03 12:43:08
+ * @LastEditTime: 2022-03-04 11:03:02
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \llbc\wrap\pyllbc\include\pyllbc\common\Config.h
@@ -40,8 +40,5 @@
 
 // Packet reuse option.
 #define PYLLBC_CFG_PACKET_REUSE                                 1
-
-// Service frame-timeout function switch, if enabled, the service will has frame-timeout limit function, default is 0.
-#define PYLLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT            1
 
 #endif // !__PYLLBC_COM_CONFIG_H__

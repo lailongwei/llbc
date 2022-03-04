@@ -546,7 +546,7 @@ namespace llbc
         }
         #endregion
 
-        #region fps, frameInterval
+        #region fps, frameInterval, frameTimeout
         /// <summary>
         ///  Get/Set service fps.
         ///  <para>service fps is limit to LibConfig.commMaxServiceFPS, if greater then this config value, will raise exception</para>
@@ -581,6 +581,30 @@ namespace llbc
                 lock (_lock)
                 {
                     return LLBCNative.csllbc_Service_GetFrameInterval(_llbcSvc);
+                }
+            }
+        }
+
+        /// <summary>
+        ///  Get/Set service frameTimeout.
+        ///  <para>service fps is limit to LibConfig.commMaxServiceFrameTimeout, if greater then this config value, will raise exception</para>
+        /// </summary>
+        public int frameTimeout
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return LLBCNative.csllbc_Service_GetFrameTimeout(_llbcSvc);
+                }
+            }
+
+            set
+            {
+                lock (_lock)
+                {
+                    if (LLBCNative.csllbc_Service_SetFrameTimeout(_llbcSvc, value) != LLBCNative.LLBC_OK)
+                        throw ExceptionUtil.CreateExceptionFromCoreLib();
                 }
             }
         }

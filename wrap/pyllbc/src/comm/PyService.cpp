@@ -136,6 +136,19 @@ int pyllbc_Service::GetFrameInterval() const
     return _llbcSvc->GetFrameInterval();
 }
 
+#if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+LLBC_TimeSpan pyllbc_Service::GetFrameTimeout() const
+{
+    return _llbcSvc->GetFrameTimeout();
+}
+
+void pyllbc_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
+{
+    _llbcSvc->SetFrameTimeout(frameTimeout);
+}
+#endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
+
 int pyllbc_Service::SuppressCoderNotFoundWarning()
 {
     if (_llbcSvc->SuppressCoderNotFoundWarning() != LLBC_OK)
