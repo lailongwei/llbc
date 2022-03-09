@@ -231,15 +231,6 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLo
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-template <typename FrontObjectType, typename BackObjectType>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
-{
-    const char *frontNodeName = typeid(FrontObjectType).name();
-    const char *backNodeName = typeid(BackObjectType).name();
-    return AcquireOrderedDeletePoolInst(frontNodeName, backNodeName);
-}
-
-template <typename PoolLockType, typename PoolInstLockType>
 inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
 {
     // Make node name reference(const) to shorten the param name.

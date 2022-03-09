@@ -67,6 +67,13 @@ public:
 public:
     /**
      * Acquire ordered delete pool instance.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename FrontObjectType, typename BackObjectType>
+    int AcquireOrderedDeletePoolInst();
+
+    /**
+     * Acquire ordered delete pool instance.
      * @param[in] frontObjectTypeName - the front object type name.
      * @param[in] backObjectTypeName  - the back object type name.
      * @return int - return 0 if success, otherwise return -1.
@@ -103,5 +110,7 @@ protected:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/objectpool/IObjectPoolImpl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
