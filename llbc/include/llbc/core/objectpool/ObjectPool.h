@@ -103,13 +103,6 @@ public:
 
     /**
      * Acquire ordered delete pool instance.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename FrontObjectType, typename BackObjectType>
-    int AcquireOrderedDeletePoolInst();
-
-    /**
-     * Acquire ordered delete pool instance.
      * @param[in] frontObjectTypeName - the front object type name.
      * @param[in] backObjectTypeName  - the back object type name.
      * @return int - return 0 if success, otherwise return -1.
