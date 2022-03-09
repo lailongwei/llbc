@@ -83,7 +83,7 @@ namespace llbc
         public extern static ulong csllbc_Service_GetFrameTimeout(IntPtr svc);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Service_SetFrameTimeout(IntPtr svc,const LLBC_TimeSpan &frameTimeout);
+        public extern static void csllbc_Service_SetFrameTimeout(IntPtr svc, ulong frameTimeout);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Service_Listen(IntPtr svc, IntPtr ip, int port);

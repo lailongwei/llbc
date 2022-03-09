@@ -120,6 +120,16 @@ int csllbc_Service::GetFrameInterval() const
     return _llbcSvc->GetFrameInterval();
 }
 
+LLBC_TimeSpan csllbc_Service::GetFrameTimeout() const
+{
+    return _llbcSvc->GetFrameTimeout();
+}
+
+void csllbc_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
+{
+    _llbcSvc->SetFrameTimeout(frameTimeout);
+}
+
 csllbc_Service::DriveMode csllbc_Service::GetDriveMode() const
 {
     return _llbcSvc->GetDriveMode();

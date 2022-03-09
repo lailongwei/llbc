@@ -587,9 +587,8 @@ namespace llbc
 
         /// <summary>
         ///  Get/Set service frameTimeout.
-        ///  <para>service fps is limit to LibConfig.commMaxServiceFrameTimeout, if greater then this config value, will raise exception</para>
         /// </summary>
-        public int frameTimeout
+        public ulong frameTimeout
         {
             get
             {
@@ -603,8 +602,7 @@ namespace llbc
             {
                 lock (_lock)
                 {
-                    if (LLBCNative.csllbc_Service_SetFrameTimeout(_llbcSvc, value) != LLBCNative.LLBC_OK)
-                        throw ExceptionUtil.CreateExceptionFromCoreLib();
+                    LLBCNative.csllbc_Service_SetFrameTimeout(_llbcSvc, value);
                 }
             }
         }
@@ -990,14 +988,14 @@ namespace llbc
                 if (handlePhase == PacketHandlePhase.Handle)
                 {
                     if (_excHandlers.ContainsKey(opcode))
-                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{£±}, phase: {2}", 
+                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{ï¼‘}, phase: {2}", 
                             svcName, opcode, handlePhase);
                     _excHandlers.Add(opcode, excHandler);
                 }
                 else if (handlePhase == PacketHandlePhase.PreHandle)
                 {
                     if (_preExcHandlers.ContainsKey(opcode))
-                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{£±}, phase: {2}",
+                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{ï¼‘}, phase: {2}",
                             svcName, opcode, handlePhase);
                     _preExcHandlers.Add(opcode, excHandler);
                 }

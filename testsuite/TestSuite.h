@@ -78,6 +78,7 @@
 #include "comm/TestCase_Comm_Comp.h"
 #include "comm/TestCase_Comm_SvcBase.h"
 #include "comm/TestCase_Comm_SvcFps.h"
+#include "comm/TestCase_Comm_SvcFrameTimeout.h"
 #include "comm/TestCase_Comm_SvcStartStop.h"
 #include "comm/TestCase_Comm_Svc.h"
 #include "comm/TestCase_Comm_SendBytes.h"

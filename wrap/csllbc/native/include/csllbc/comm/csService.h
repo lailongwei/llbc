@@ -101,6 +101,15 @@ public:
      */
     int GetFrameInterval() const;
 
+    /**
+     * Get service frame timeout.
+     */
+    LLBC_TimeSpan GetFrameTimeout() const;
+    /**
+     * Set service frame timeout.
+     */
+    void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
+
 public:
     /**
      * Get service drive mode.
