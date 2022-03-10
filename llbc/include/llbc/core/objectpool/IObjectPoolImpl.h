@@ -26,7 +26,7 @@
 __LLBC_NS_BEGIN
 
 template <typename FrontObjectType, typename BackObjectType>
-int LLBC_IObjectPool::AcquireOrderedDeletePoolInst()
+LLBC_FORCE_INLINE int LLBC_IObjectPool::AcquireOrderedDeletePoolInst()
 {
     const char *frontNodeName = typeid(FrontObjectType).name();
     const char *backNodeName = typeid(BackObjectType).name();
