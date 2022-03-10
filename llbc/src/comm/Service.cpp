@@ -1587,7 +1587,8 @@ void LLBC_Service::HandleQueuedEvents()
         if (_frameTimeout == LLBC_INFINITE)
             continue;
 
-        if(UNLIKELY((LLBC_CPUTime::Current() - begTime).ToNanoSeconds() >= _frameTimeout))
+        if(UNLIKELY(static_cast<uint64>(
+            (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
             break;
         #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
