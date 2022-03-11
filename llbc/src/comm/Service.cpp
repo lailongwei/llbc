@@ -1194,6 +1194,11 @@ void LLBC_Service::OnSvc(bool fullFrame)
 
     _sinkIntoLoop = true;
 
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+    if (_frameTimeout != LLBC_INFINITE)
+        _begSvcTime = LLBC_CPUTime::Current();
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
     // Record begin heartbeat time.
     if (fullFrame)
         _begHeartbeatTime = LLBC_GetMilliSeconds();
@@ -1567,12 +1572,6 @@ void LLBC_Service::HandleQueuedEvents()
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
 
-    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-    LLBC_CPUTime begTime;
-    if (_frameTimeout != LLBC_INFINITE)
-        begTime = LLBC_CPUTime::Current();
-    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
@@ -1587,8 +1586,7 @@ void LLBC_Service::HandleQueuedEvents()
         if (_frameTimeout == LLBC_INFINITE)
             continue;
 
-        if(UNLIKELY(static_cast<uint64>(
-            (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
+        if(UNLIKELY((LLBC_CPUTime::Current() - _begSvcTime).ToNanoSeconds() >= _frameTimeout))
             break;
         #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
