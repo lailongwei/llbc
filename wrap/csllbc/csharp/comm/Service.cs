@@ -586,7 +586,7 @@ namespace llbc
         }
 
         /// <summary>
-        ///  Get/Set service frameTimeout.
+        ///  Get/Set service frameTimeout, in milli-seconds.
         /// </summary>
         public ulong frameTimeout
         {

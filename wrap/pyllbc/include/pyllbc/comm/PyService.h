@@ -105,7 +105,7 @@ public:
 
     /**
      * Set service frame time out.
-     * @param[in] frameTimeout - then service frame-timeout.
+     * @param[in] frameTimeout - the service frame-timeout.
      */
     void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout);
     #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT

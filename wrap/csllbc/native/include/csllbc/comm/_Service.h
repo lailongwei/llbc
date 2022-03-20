@@ -136,14 +136,14 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetFrameInterval(csllbc_Service *
 /**
  * Get service FrameTimeout.
  * @param[in] svc - the service.
- * @return uint64 - the service FrameTimeout in microseconds.
+ * @return uint64 - the service FrameTimeout in milliseconds.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT uint64 csllbc_Service_GetFrameTimeout(csllbc_Service *svc);
 
 /**
  * Set service FrameTimeout.
  * @param[in] svc - the service.
- * @param[in] frameTimeout - the new FrameTimeout in microseconds.
+ * @param[in] frameTimeout - the new FrameTimeout in milliseconds.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_SetFrameTimeout(csllbc_Service *svc, uint64 frameTimeout);
 
