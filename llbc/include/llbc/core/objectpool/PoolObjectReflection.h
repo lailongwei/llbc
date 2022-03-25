@@ -53,20 +53,20 @@ public:
      * Check given object type is supported pool obje ct reflection or not.
      */
     template <typename ObjectType>
-    static bool IsSupportedPoolObjectReflection();
+    static constexpr bool IsSupportedPoolObjectReflection();
 
 private:
     template <typename ObjectType>
-    static bool IsSupportedPoolObjectReflectionInl(
+    static constexpr bool IsSupportedPoolObjectReflectionInl(
         __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *);
 
     template <typename ObjectType>
-    static
+    static constexpr
     typename std::enable_if<std::is_base_of<LLBC_PoolObject, ObjectType>::value, bool>::type
     IsSupportedPoolObjectReflectionInl(std::nullptr_t);
 
     template <typename ObjectType>
-    static bool IsSupportedPoolObjectReflectionInl(...);
+    static constexpr bool IsSupportedPoolObjectReflectionInl(...);
 
 public:
     /**
