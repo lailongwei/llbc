@@ -24,8 +24,8 @@
 
 #include "llbc/common/PFConfig.h"
 
-#include "llbc/common/Macro.h"
 #include "llbc/common/OSHeader.h"
+#include "llbc/common/BasicString.h"
 
 __LLBC_NS_BEGIN
 
@@ -54,6 +54,10 @@ public:
 
 public:
     // operator <
+    bool operator <(const _Elem *other) const
+    {
+        return operator<(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator <(const LLBC_BasicCString<_Elem> &other) const
     {
         if (_cstr == other._cstr)
@@ -61,40 +65,96 @@ public:
 
         return ::strcmp(_cstr, other._cstr) < 0;
     }
+    bool operator <(const std::basic_string<_Elem> &other) const
+    {
+        return operator<(other.c_str());
+    }
 
     // operator ==
+    bool operator ==(const _Elem *other) const
+    {
+        return operator==(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator ==(const LLBC_BasicCString<_Elem> &other) const
     {
         return _cstr == other._cstr || ::strcmp(_cstr, other._cstr) == 0;
     }
+    bool operator ==(const std::basic_string<_Elem> &other) const
+    {
+        return operator==(other.c_str());
+    }
 
     // operator !=
+    bool operator !=(const _Elem *other) const
+    {
+        return operator!=(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator !=(const LLBC_BasicCString<_Elem> &other) const
     {
         return !(*this == other);
     }
+    bool operator !=(const std::basic_string<_Elem> &other) const
+    {
+        return operator!=(other.c_str());
+    }
 
     // operator <=
+    bool operator <=(const _Elem *other) const
+    {
+        return operator<=(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator <=(const LLBC_BasicCString<_Elem> &other) const
     {
         return !(other < *this);
     }
+    bool operator <=(const std::basic_string<_Elem> &other) const
+    {
+        return operator<=(other.c_str());
+    }
 
     // operator >
+    bool operator >(const _Elem *other) const
+    {
+        return operator>(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator >(const LLBC_BasicCString<_Elem> &other) const
     {
         return other < *this;
     }
+    bool operator >(const std::basic_string<_Elem> &other) const
+    {
+        return operator>(other.c_str());
+    }
 
     // operator >=
+    bool operator >=(const _Elem *other) const
+    {
+        return operator>=(LLBC_BasicCString<_Elem>(other));
+    }
     bool operator >=(const LLBC_BasicCString<_Elem> &other) const
     {
         return !(other < *this);
+    }
+    bool operator >=(const std::basic_string<_Elem> &other) const
+    {
+        return operator>=(other.c_str());
     }
 
 private:
     const char *_cstr;
 };
+
+/**
+ * \brief The const string stream output function.
+ */
+template <typename _Elem>
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
+{
+    if (cstr.GetCStr())
+        return o <<cstr.GetCStr();
+    else
+        return o <<"";
+}
 
 __LLBC_NS_END
 

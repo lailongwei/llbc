@@ -24,7 +24,7 @@
 __LLBC_NS_BEGIN
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(nullptr_t _)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(std::nullptr_t _)
 : _funcType(0)
 , _func()
 {
@@ -113,7 +113,7 @@ Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(nullptr_t _)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(std::nullptr_t _)
 {
     Reset();
     return *this;

@@ -232,15 +232,13 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLo
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename FrontObjectType, typename BackObjectType>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
+int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst()
 {
-    const char *frontNodeName = typeid(FrontObjectType).name();
-    const char *backNodeName = typeid(BackObjectType).name();
-    return AcquireOrderedDeletePoolInst(frontNodeName, backNodeName);
+    return LLBC_IObjectPool::AcquireOrderedDeletePoolInst<FrontObjectType, BackObjectType>();
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
+int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
 {
     // Make node name reference(const) to shorten the param name.
     const LLBC_CString frontNodeName(frontObjectTypeName);
@@ -375,7 +373,7 @@ inline int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDelete
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-inline void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &stat) const
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &stat) const
 {
     typedef typename std::map<LLBC_CString, LLBC_ObjectPoolInstStat>::iterator _InstStatIt;
 

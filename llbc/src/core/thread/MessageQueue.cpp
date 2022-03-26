@@ -22,6 +22,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/objectpool/ObjectPool.h"
+
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageQueue.h"
 
@@ -67,7 +69,7 @@ void LLBC_MessageQueue::Cleanup()
         LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
 
-        LLBC_Delete(block);
+        LLBC_Recycle(block);
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32

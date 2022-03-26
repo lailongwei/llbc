@@ -54,7 +54,7 @@ void __GetConsoleColorCode(int color, char fmt[__g_consoleColorFmtLen])
     const static int beginLen = strlen(__g_consoleColorBeginFmt);
     int idx = beginLen;
 
-    memcpy(fmt, __g_consoleColorBeginFmt, __g_consoleColorFmtLen);
+    memcpy(fmt, __g_consoleColorBeginFmt, beginLen);
 
     if (high)  // highlight
         fmt[idx++] = '1';
@@ -160,7 +160,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     char *buf; int len;
     LLBC_FormatArg(fmt, buf, len);
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
     bool fmtPrint = false;
     if (file == stdout || file == stderr)
@@ -181,7 +181,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     }
     fflush(file);
     funlockfile(file);
-#else
+    #else // Win32
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
     LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
 
@@ -189,7 +189,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     fprintf(file, newline ? "%s\n" : "%s", buf);
     fflush(file);
     lock.Unlock();
-#endif
+    #endif // !Non-Win32
 
     LLBC_Free(buf);
 

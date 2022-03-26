@@ -109,20 +109,9 @@ namespace
             _poolInst = &poolInst;
         }
 
-        bool IsPoolObject() const
-        {
-            return _poolInst != nullptr;
-        }
-
         LLBC_IObjectPoolInst *GetPoolInst()
         {
             return _poolInst;
-        }
-
-        void GiveBackToPool()
-        {
-            if (_poolInst)
-                _poolInst->Release(this);
         }
 
         bool HasBeenGiveBackToPool() const
@@ -189,7 +178,7 @@ namespace
         }
     };
 
-    class ObjectReflectionBaseTestObj : public LLBC_PoolObjectReflectionBase
+    class ObjectReflectionBaseTestObj : public LLBC_PoolObject
     {
     public:
         ObjectReflectionBaseTestObj()
@@ -429,8 +418,8 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         ReflectionableTestObj *ro = pool.Get<ReflectionableTestObj>();
         LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
         LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
-        LLBC_PrintLine("Reflection method support:GiveBackToPool():");
-        LLBC_PoolObjectReflection::GiveBackToPool(ro);
+        LLBC_PrintLine("Reflection method support:Recycle():");
+        LLBC_PoolObjectReflection::Recycle(ro);
 
         LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
         LLBC_ObjectGuard<LLBC_MessageBlock> block = pool.GetGuarded<LLBC_MessageBlock>();
@@ -454,8 +443,8 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         ObjectReflectionBaseTestObj *ro = pool.Get<ObjectReflectionBaseTestObj>();
         LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
         LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
-        LLBC_PrintLine("Reflection method support:GiveBackToPool():");
-        LLBC_PoolObjectReflection::GiveBackToPool(ro);
+        LLBC_PrintLine("Reflection method support:Recycle():");
+        LLBC_PoolObjectReflection::Recycle(ro);
 
         LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
         LLBC_ObjectGuard<LLBC_MessageBlock> block = pool.GetGuarded<LLBC_MessageBlock>();

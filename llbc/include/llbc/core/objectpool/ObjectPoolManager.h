@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
 /**
  * The global object pool define.
  */
-extern LLBC_EXPORT LLBC_SafetyObjectPool &__LLBC_GlobalObjectPool();
+LLBC_EXPORT LLBC_SafetyObjectPool &__LLBC_GlobalObjectPool();
 #define LLBC_GlobalObjectPool (LLBC_NS __LLBC_GlobalObjectPool())
 
 /**
@@ -115,6 +115,20 @@ ObjectType *LLBC_GetObjectFromUnsafetyPool();
  */
 template <typename ObjectType>
 void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj);
+
+/**
+ * Object pool converience method, get guarded object from safety object-pool.
+ * @return LLBC_ObjectGuard<ObjectType> - the guarded object.
+ */
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromSafetyPool();
+
+/**
+ * Object pool converience method, get guarded object from unsafety object-pool.
+ * @return LLBC_ObjectGuard<ObjectType> - the guarded object.
+ */
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromUnsafetyPool();
 
 /**
  * Object pool converience method, get referencable object from object pool(unsafety object-pool).

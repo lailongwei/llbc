@@ -91,7 +91,7 @@ public:
  * @param[in] file - console type, can set to stdout or stderr.
  * @return int - console color, if return -1, it means error occurred.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetConsoleColor(FILE *file);
+LLBC_EXPORT int LLBC_GetConsoleColor(FILE *file);
 
 /**
  * Set console color value.
@@ -99,7 +99,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_GetConsoleColor(FILE *file);
  * @param[in] color - color value.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_SetConsoleColor(FILE *file, int color);
+LLBC_EXPORT int LLBC_SetConsoleColor(FILE *file, int color);
 
 /**
  * Secure output message to console.
@@ -109,7 +109,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_SetConsoleColor(FILE *file, int color);
  * @param[in] ...     - option arguments.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...);
+LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...);
 
 #define LLBC_Print(fmt, ...) \
     LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__)
@@ -125,7 +125,7 @@ LLBC_EXTERN LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const cha
  * @param[in] file - file pointer.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_FlushFile(FILE *file);
+LLBC_EXPORT int LLBC_FlushFile(FILE *file);
 
 __LLBC_NS_END
 

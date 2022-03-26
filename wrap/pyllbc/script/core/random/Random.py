@@ -34,7 +34,7 @@ class pyllbcRandom(object):
         if begin is not None and end is not None, generate a random integer N such that: begin <= N < end for begin <= end and end <= N < begin for begin > end.
         :return: the random integer.
         """
-        return llbc.inl.RandInt(self.__c_obj, begin, end)
+        return llbc.inl.Rand(self.__c_obj, begin, end)
 
     def randreal(self):
         """
@@ -69,10 +69,10 @@ def pyllbcSeedRand(seed):
 
 llbc.seedrand = pyllbcSeedRand
 
-def pyllbcRandInt(begin=None, end=None):
+def pyllbcRand(begin=None, end=None):
     return __gbl_random.rand(begin, end)
 
-llbc.randint = pyllbcRandInt
+llbc.rand = pyllbcRand
 
 def pyllbcRandReal():
     return __gbl_random.randreal()

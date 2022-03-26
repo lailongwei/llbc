@@ -58,7 +58,7 @@ public:
      * 
      * @param[in] _ - unused parameter. 
      */
-    LLBC_Delegate(nullptr_t _ = nullptr);
+    LLBC_Delegate(std::nullptr_t _ = nullptr);
 
     /**
      * @brief Construct delegate object by c-style function pointer.
@@ -133,7 +133,7 @@ public:
      * @param[in] _ - unused parameter.
      * @return LLBC_Delegate & - the delegate object.
      */
-    LLBC_Delegate &operator=(nullptr_t _);
+    LLBC_Delegate &operator=(std::nullptr_t _);
 
     /**
      * @brief Assignment by c-style function pointer.

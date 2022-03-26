@@ -37,7 +37,7 @@ __LLBC_NS_END
 /**
  * TimeSpan class stream output operators previous declare.
  */
-LLBC_EXTERN std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
+std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 __LLBC_NS_BEGIN
 
@@ -51,8 +51,8 @@ public:
      * Convenience span construct methods.
      */
     static LLBC_TimeSpan FromSS(int seconds, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMMSS(int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromHHMMSS(int hours = 0, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromMMSS(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromHHMMSS(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
     static LLBC_TimeSpan FromDDHHMMSS(int days, int hours = 0, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
 
     static LLBC_TimeSpan FromMillis(sint64 millisecs);

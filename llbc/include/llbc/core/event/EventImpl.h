@@ -28,6 +28,11 @@ inline int LLBC_Event::GetId() const
     return _id;
 }
 
+inline void LLBC_Event::SetId(int id)
+{
+    _id = id;
+}
+
 inline bool LLBC_Event::IsDontDelAfterFire() const
 {
     return _dontDelAfterFire;

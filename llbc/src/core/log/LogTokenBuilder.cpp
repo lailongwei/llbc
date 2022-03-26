@@ -28,6 +28,7 @@
 #include "llbc/core/log/LogTagToken.h"
 #include "llbc/core/log/LogFileToken.h"
 #include "llbc/core/log/LogLineToken.h"
+#include "llbc/core/log/LogFunctionToken.h"
 #include "llbc/core/log/LogProcessIdToken.h"
 #include "llbc/core/log/LogThreadIdToken.h"
 #include "llbc/core/log/LogLevelToken.h"
@@ -65,6 +66,9 @@ LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 
     case LLBC_LogTokenType::LineToken:
         return LLBC_New(LLBC_LogLineToken);
+
+    case LLBC_LogTokenType::FunctionToken:
+        return LLBC_New(LLBC_LogFunctionToken);
 
     case LLBC_LogTokenType::ThreadIdToken:
         return LLBC_New(LLBC_LogThreadIdToken);

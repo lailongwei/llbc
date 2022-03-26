@@ -408,7 +408,8 @@ namespace llbc
                 return;
 
             IntPtr fileName = IntPtr.Zero;
-            // Get filename, lineno, if enabled.
+            IntPtr funcName = IntPtr.Zero;
+            // Get filename, lineno, funcName, if enabled.
             int lineNo = -1;
             if (_enabledLogFileInfo)
             {
@@ -419,6 +420,7 @@ namespace llbc
                 {
                     lineNo = frame.GetFileLineNumber();
                     fileName = LibUtil.CreateNativeStr(frame.GetFileName());
+                    funcName = LibUtil.CreateNativeStr(frame.GetMethod().Name);
                 }
             }
 
@@ -434,7 +436,7 @@ namespace llbc
 
                 // Build log message.
                 nativeMsg = LibUtil.CreateNativeStr(string.Format(fmt, args));
-                LLBCNative.csllbc_Log_LogMsg(_nativeLogger, fileName, lineNo, (int)level, nativeMsg, nativeTag);
+                LLBCNative.csllbc_Log_LogMsg(_nativeLogger, fileName, lineNo, funcName, (int)level, nativeMsg, nativeTag);
             }
             catch (Exception e)
             {
@@ -445,7 +447,7 @@ namespace llbc
                 string errMsg = string.Format("Log [{0}] failed, exception:{1}, stacktrace:\n{2}",
                     fmt, e.Message, new System.Diagnostics.StackTrace().ToString());
                 nativeMsg = LibUtil.CreateNativeStr(errMsg);
-                LLBCNative.csllbc_Log_LogMsg(_nativeLogger, fileName, lineNo, (int)LogLevel.Fatal, nativeMsg, nativeTag);
+                LLBCNative.csllbc_Log_LogMsg(_nativeLogger, fileName, lineNo, funcName, (int)LogLevel.Fatal, nativeMsg, nativeTag);
             }
             finally
             {
@@ -454,6 +456,7 @@ namespace llbc
             }
 
             System.Runtime.InteropServices.Marshal.FreeHGlobal(fileName);
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(funcName);
         }
         #endregion // Internal methods
 

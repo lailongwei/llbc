@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
  * @param[in] fileName - module file name.
  * @return LLBC_LibraryHandle - Library handle.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName);
+LLBC_EXPORT LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName);
 
 /**
  * Retrieves the address of specified exported function from library.
@@ -39,14 +39,14 @@ LLBC_EXTERN LLBC_EXPORT LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName
  * @param[in] procName - function name.
  * @return LLBC_LibraryFun - library func address, if return nullptr, see LLBC_GetLastError().
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const char *procName);
+LLBC_EXPORT LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const char *procName);
 
 /**
  * Close library.
  * @param[in] handle - library handle.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_CloseLibrary(LLBC_LibraryHandle handle);
+LLBC_EXPORT int LLBC_CloseLibrary(LLBC_LibraryHandle handle);
 
 __LLBC_NS_END
 

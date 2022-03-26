@@ -114,18 +114,18 @@ struct LLBC_EXPORT __LLBC_LibTls
 /**
  * The Lib TLS handle create function.
  */
-LLBC_EXTERN void __LLBC_CreateLibTls();
+LLBC_HIDDEN void __LLBC_CreateLibTls();
 
 /**
  * The lib TLS handle destroy function.
  */
-LLBC_EXTERN void __LLBC_DestroyLibTls();
+LLBC_HIDDEN void __LLBC_DestroyLibTls();
 
 /**
  * Get lib TLS value.
  * @return __LLBC_LibTls * - lib TLS value pointer.
  */
-LLBC_EXTERN LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
+LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
 
 /**
  * Reset lib TLS value.

@@ -48,6 +48,7 @@ namespace llbc
         public extern static int csllbc_Log_LogMsg(IntPtr logger,
                                                    IntPtr fileName,
                                                    int lineNo,
+                                                   IntPtr func,
                                                    int level,
                                                    IntPtr msg,
                                                    IntPtr tag);

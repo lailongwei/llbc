@@ -46,9 +46,14 @@ local _logsLevel = {}
 local function _canOutput(level, logger)
     local logLevel = _logsLevel[logger or ROOT_LOGGER]
     if not logLevel then
+        if not Log.isinit() then
+            return true
+        end
+
         logLevel = _llbc.GetLogLevel(logger)
         _logsLevel[logger or ROOT_LOGGER] = logLevel
     end
+
     return level >= logLevel
 end
 
@@ -63,14 +68,14 @@ function Log.output(level, logger, tag, ...)
         return
     end
 
-    local file, line
+    local file, line, func_name
     if Log.logFileInfo then
         local defaultFileInfo = Log.defaultFileInfo
         if defaultFileInfo then
             file, line = defaultFileInfo()
         else
-            local di = getinfo(3, 'Sl')
-            file, line = di.source, di.currentline
+            local di = getinfo(3, 'Sln')
+            file, line, func_name = di.source, di.currentline, di.name
         end
     end
 
@@ -85,7 +90,7 @@ function Log.output(level, logger, tag, ...)
         end
     end
 
-    LogMsg(level, logger, tag, file, line, ...)
+    LogMsg(level, logger, tag, file, line, func_name, ...)
 
     if level >= Log.FATAL then
         error(tostring(...)) -- Only output the first param

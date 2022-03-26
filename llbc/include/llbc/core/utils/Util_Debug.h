@@ -35,7 +35,7 @@ __LLBC_NS_BEGIN
  * @param[in] lineWidth - line width, default is 16.
  * @return std::string - the formatted string data.
  */
-LLBC_EXTERN LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
+LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
 
 /**
  * Trace function define.
@@ -60,24 +60,36 @@ LLBC_EXTERN LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, u
 class LLBC_EXPORT LLBC_CPUTime
 {
 public:
-    typedef uint64 CPUTimeCount;
 
 public:
     LLBC_CPUTime();
-    LLBC_CPUTime(CPUTimeCount count);
+    LLBC_CPUTime(uint64 cpuCount);
     ~LLBC_CPUTime();
+
+public:
+    static uint64 GetCPUFreqPerSecond();
+    static uint64 GetCPUFreqPerMilliSecond();
+    static uint64 GetCPUFreqPerMicroSecond();
+    static uint64 GetCPUFreqPerNanoSecond();
 
 public:
     static LLBC_CPUTime Current();
     
-    CPUTimeCount ToSeconds() const;
+    uint64 GetCpuCount() const;
 
-    CPUTimeCount ToMilliSeconds() const;
+    int ToSeconds() const;
+    sint64 ToMilliSeconds() const;
+    sint64 ToMicroSeconds() const;
+    sint64 ToNanoSeconds() const;
 
-    CPUTimeCount ToMicroSeconds() const;
+    static int ToSeconds(uint64 cpuCount);
+    static sint64 ToMilliSeconds(uint64 cpuCount);
+    static sint64 ToMicroSeconds(uint64 cpuCount);
+    static sint64 ToNanoSeconds(uint64 cpuCount);
 
-    std::string ToString() const;
+    LLBC_String ToString() const;
 
+public:
     LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
     LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
     LLBC_CPUTime &operator +=(const LLBC_CPUTime &right);
@@ -90,17 +102,18 @@ public:
     bool operator ==(const LLBC_CPUTime &right) const;
     bool operator !=(const LLBC_CPUTime &right) const;
 
+    operator uint64() const;
+
 public:
-#if LLBC_TARGET_PLATFORM_WIN32
     static void InitFrequency();
-#endif
 
 private:
-#if LLBC_TARGET_PLATFORM_WIN32
-    static CPUTimeCount _freq;
-#endif
+    uint64 _cpuCount;
 
-    CPUTimeCount _count;
+    static uint64 _freqPerSecond;
+    static uint64 _freqPerMillisecond;
+    static uint64 _freqPerMicroSecond;
+    static uint64 _freqPerNanoSecond;
 };
 
 /**
@@ -254,6 +267,13 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * stream output operator function for cpu time(in global ns).
+ */
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+
+#include "llbc/core/utils/Util_DebugImpl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
 

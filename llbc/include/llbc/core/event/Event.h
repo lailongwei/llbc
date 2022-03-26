@@ -23,15 +23,17 @@
 #define __LLBC_CORE_EVENT_EVENT_H__
 
 #include "llbc/common/Common.h"
+
 #include "llbc/core/variant/Variant.h"
 #include "llbc/core/utils/Util_Delegate.h"
+#include "llbc/core/objectpool/PoolObject.h"
 
 __LLBC_NS_BEGIN
 
 /**
  * \brief The event class encapsulation.
  */
-class LLBC_EXPORT LLBC_Event
+class LLBC_EXPORT LLBC_Event : public LLBC_PoolObject
 {
 public:
     LLBC_Event(int id = 0, bool dontDelAfterFire = false);
@@ -43,6 +45,12 @@ public:
      * @return int - the event Id.
      */
     int GetId() const;
+
+    /**
+     * Set the event Id.
+     * @param[in] id - the event Id.
+     */
+    void SetId(int id);
 
     /**
      * Check dont delete after fire option.
@@ -217,6 +225,12 @@ public:
     const LLBC_Variant &operator [](int key) const;
     const LLBC_Variant &operator [](const char* key) const;
     const LLBC_Variant &operator [](const LLBC_String &key) const;
+
+public:
+    /**
+     * Object-Pool reflection support: clear firer object.
+     */
+    void Clear();
 
     /**
      * Disable assignment.

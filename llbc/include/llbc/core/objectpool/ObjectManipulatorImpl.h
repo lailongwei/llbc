@@ -95,6 +95,24 @@ bool LLBC_ObjectManipulator::ResetObj(void *obj, Resetable_type<ObjectType, &Obj
 }
 #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset
 
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse
+template <typename ObjectType>
+bool LLBC_ObjectManipulator::ResetObj(void *obj, reusable_type<ObjectType, &ObjectType::reuse> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->reuse();
+    return false;
+}
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse
+
+#if LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse
+template <typename ObjectType>
+bool LLBC_ObjectManipulator::ResetObj(void *obj, Reusable_type<ObjectType, &ObjectType::Reuse> *)
+{
+    reinterpret_cast<ObjectType *>(obj)->Reuse();
+    return false;
+}
+#endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse
+
 template <typename ObjectType>
 bool LLBC_ObjectManipulator::ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *)
 {

@@ -91,6 +91,9 @@ LLBC_Service::LLBC_Service(This::Type type,
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
+#if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+, _frameTimeout(LLBC_INFINITE)
+#endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 , _relaxTimes(0)
 , _begHeartbeatTime(0)
 , _sinkIntoLoop(false)
@@ -184,13 +187,13 @@ LLBC_Service::~LLBC_Service()
     LLBC_STLHelper::DeleteContainer(_coders);
     _handlers.clear();
     _preHandlers.clear();
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     _unifyPreHandler = nullptr;
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     _statusHandlers.clear();
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     RemoveAllReadySessions();
 
@@ -446,11 +449,18 @@ int LLBC_Service::SetFPS(int fps)
     if (_fps != static_cast<int>(LLBC_INFINITE))
     {
         _frameInterval = 1000 / _fps;
+
+        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+        const uint64 ivlInNanos = _frameInterval * LLBC_Time::NumOfNanoSecondsPerMilliSecond;
+        if (_frameTimeout != LLBC_INFINITE)
+            _frameTimeout = MAX(ivlInNanos, _frameTimeout);
+        #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
     else
     {
         _relaxTimes = 0;
         _frameInterval = 0;
+        _frameTimeout = LLBC_INFINITE;
     }
 
     return LLBC_OK;
@@ -463,6 +473,20 @@ int LLBC_Service::GetFrameInterval() const
     LLBC_LockGuard guard(ncThis->_lock);
     return _frameInterval;
 }
+
+#if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+LLBC_TimeSpan LLBC_Service::GetFrameTimeout() const
+{
+    return LLBC_TimeSpan::FromMicros(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
+}
+
+void LLBC_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
+{
+    const uint64 ivlInNanoSecs = static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMilliSecond * _frameInterval);
+    _frameTimeout = frameTimeout.GetTotalMicroSeconds() * static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond);
+    _frameTimeout = MAX(ivlInNanoSecs, _frameTimeout);
+}
+#endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
 int LLBC_Service::Listen(const char *ip,
                          uint16 port,
@@ -1119,11 +1143,6 @@ void LLBC_Service::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_EventManager &LLBC_Service::GetEventManager()
-{
-    return _evManager;
-}
-
 int LLBC_Service::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
     if (UNLIKELY(!runnable))
@@ -1547,6 +1566,13 @@ void LLBC_Service::HandleQueuedEvents()
     int type;
     LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block;
+
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+    LLBC_CPUTime begTime;
+    if (_frameTimeout != LLBC_INFINITE)
+        begTime = LLBC_CPUTime::Current();
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
     while (TryPop(block) == LLBC_OK)
     {
         block->Read(&type, sizeof(int));
@@ -1556,6 +1582,15 @@ void LLBC_Service::HandleQueuedEvents()
 
         LLBC_Delete(ev);
         LLBC_Delete(block);
+
+        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+        if (_frameTimeout == LLBC_INFINITE)
+            continue;
+
+        if(UNLIKELY(static_cast<uint64>(
+            (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
+            break;
+        #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
 }
 
@@ -1708,16 +1743,16 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
 
     const int opcode = packet->GetOpcode();
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
     const int status = packet->GetStatus();
     if (status != 0)
     {
-# if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+        #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
         _StatusDescs::const_iterator statusDescIt = _statusDescs.find(status);
         if (statusDescIt != _statusDescs.end())
             packet->SetStatusDesc(statusDescIt->second);
-# endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-# if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+        #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
+        # if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
         _OpStatusHandlers::iterator stHandlersIt = _statusHandlers.find(opcode);
         if (stHandlersIt != _statusHandlers.end())
         {
@@ -1730,9 +1765,9 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
                 return;
             }
         }
-# endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+        # endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     }
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
     // Firstly, we recognize specified opcode's pre-handler, if registered, call it(Non-RAW service type).
     bool preHandled = false;
@@ -1750,7 +1785,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             preHandled = true;
         }
     }
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     // Secondary, we recognize generalized pre-handler, if registered, call it(all service type available).
     if (!preHandled && _unifyPreHandler)
     {
@@ -1760,7 +1795,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
             return;
         }
     }
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
     // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all comps.
     _Handlers::iterator it = _handlers.find(opcode);
@@ -1837,7 +1872,7 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     const bool dontDelAfterFire = ev.ev->IsDontDelAfterFire();
-    _evManager.FireEvent(ev.ev);
+    _evManager.Fire(ev.ev);
 
     if (ev.dequeueHandler &&
         dontDelAfterFire)

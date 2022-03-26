@@ -56,8 +56,8 @@ public:
                                          std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
                                          std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
 
-            timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_RandInt(5000, 15001)),
-                            LLBC_TimeSpan::FromMillis(LLBC_RandInt(5000, 15001)));
+            timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)),
+                            LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)));
         }
 
         LLBC_PrintLine("Done!");
@@ -81,7 +81,7 @@ public:
             LLBC_PrintLine("%s: Timer <%s> trigger %d times timeout",
                            LLBC_Time::Now().ToString().c_str(),
                            timer->ToString().c_str(), _timeoutTimes);
-        timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_RandInt(5000, 15001)));
+        timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)));
     }
 
     void OnTimerCancel(LLBC_Timer *timer)

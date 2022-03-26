@@ -92,24 +92,24 @@ public:
  * @param[in] stackSize           - thread stack size, in bytes.
  * @return int - return 0 if create successed, otherwise return false.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
-                                              LLBC_ThreadProc proc,
-                                              LLBC_ThreadArg arg,
-                                              int flags = LLBC_ThreadFlag::Joinable,
-                                              int priority = LLBC_ThreadPriority::Normal,
-                                              int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE);
+LLBC_EXPORT int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
+                                  LLBC_ThreadProc proc,
+                                  LLBC_ThreadArg arg,
+                                  int flags = LLBC_ThreadFlag::Joinable,
+                                  int priority = LLBC_ThreadPriority::Normal,
+                                  int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE);
 
 /**
  * Get current native thread handle.
  * @return LLBC_NativeThreadHandle - native thread handle.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_NativeThreadHandle LLBC_GetCurrentThread();
+LLBC_EXPORT LLBC_NativeThreadHandle LLBC_GetCurrentThread();
 
 /**
  * Get current native thread Id.
  * @return LLBC_ThreadId - native thread Id.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_ThreadId LLBC_GetCurrentThreadId();
+LLBC_EXPORT LLBC_ThreadId LLBC_GetCurrentThreadId();
 
 /**
  * Get thread priority.
@@ -117,7 +117,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_ThreadId LLBC_GetCurrentThreadId();
  * @return int - the thread priority, if return -1, it means error occurred, call
  *               LLBC_GetLastError()/LLBC_StrError() to get more error describe.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle);
+LLBC_EXPORT int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handle);
 
 /**
  * Set thread priority.
@@ -125,35 +125,35 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_GetThreadPriority(LLBC_NativeThreadHandle handl
  * @param[in] priority - thread priority.
  * @return int - old thread priority, if error occurred, return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_SetThreadPriority(LLBC_NativeThreadHandle handle, int priority);
+LLBC_EXPORT int LLBC_SetThreadPriority(LLBC_NativeThreadHandle handle, int priority);
 
 /**
  * Suspend thread.
  * @param[in] handle - native thread handle.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_SuspendThread(LLBC_NativeThreadHandle handle);
+LLBC_EXPORT int LLBC_SuspendThread(LLBC_NativeThreadHandle handle);
 
 /**
  * Resume thread.
  * @param[in] handle - native thread handle.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_ResumeThread(LLBC_NativeThreadHandle handle);
+LLBC_EXPORT int LLBC_ResumeThread(LLBC_NativeThreadHandle handle);
 
 /**
  * Join thread.
  * @param[in] handle - native thread handle.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_JoinThread(LLBC_NativeThreadHandle handle);
+LLBC_EXPORT int LLBC_JoinThread(LLBC_NativeThreadHandle handle);
 
 /**
  * Cancel thread.
  * @param[in] handle - native thread handle.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_CancelThread(LLBC_NativeThreadHandle handle);
+LLBC_EXPORT int LLBC_CancelThread(LLBC_NativeThreadHandle handle);
 
 /**
  * Kill thread.
@@ -161,32 +161,32 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_CancelThread(LLBC_NativeThreadHandle handle);
  * @param[in] signo  - signal number.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo);
+LLBC_EXPORT int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo);
 
 /**
  * Sleep function.
  * @param[in] milliSeconds - time-out values.
  */
-LLBC_EXTERN LLBC_EXPORT void LLBC_Sleep(int milliSeconds);
+LLBC_EXPORT void LLBC_Sleep(int milliSeconds);
 
 /**
  * Relax CPU.
  */
-LLBC_EXTERN void LLBC_CPURelax();
+void LLBC_CPURelax();
 
 /**
  * Alloc thread local storage handle.
  * @param[out] handle - thread local storage handle.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_TlsAlloc(LLBC_TlsHandle *handle);
+LLBC_EXPORT int LLBC_TlsAlloc(LLBC_TlsHandle *handle);
 
 /**
  * Free thread local storage handle.
  * @param[in] handle - thread local storage handle.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_TlsFree(LLBC_TlsHandle handle);
+LLBC_EXPORT int LLBC_TlsFree(LLBC_TlsHandle handle);
 
 /**
  * Get specific local storage handle's value.
@@ -194,7 +194,7 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_TlsFree(LLBC_TlsHandle handle);
  * @return void * - if return nullptr and LLBC_GetLastError() != 0, 
  *                  it success, otherwise means error occurred.
  */
-LLBC_EXTERN LLBC_EXPORT void *LLBC_TlsGetValue(LLBC_TlsHandle handle);
+LLBC_EXPORT void *LLBC_TlsGetValue(LLBC_TlsHandle handle);
 
 /**
  * Set specific local storage handle's value.
@@ -202,7 +202,7 @@ LLBC_EXTERN LLBC_EXPORT void *LLBC_TlsGetValue(LLBC_TlsHandle handle);
  * @param[in] value  - thread specific value.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value);
+LLBC_EXPORT int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value);
 
 __LLBC_NS_END
 

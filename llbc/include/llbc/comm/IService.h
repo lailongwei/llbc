@@ -178,6 +178,20 @@ public:
      */
     virtual int GetFrameInterval() const = 0;
 
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+    /**
+     * Get service frame time out.
+     * @return LLBC_TimeSpan - return the service frame-timeout.
+     */
+    virtual LLBC_TimeSpan GetFrameTimeout() const = 0;
+
+    /**
+     * Set service frame time out.
+     * @param[in] frameTimeout - then service frame-timeout.
+     */
+    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout) = 0;
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
 public:
     /**
      * Create a session and listening.
@@ -411,13 +425,13 @@ public:
     int RegisterCoder(int opcode);
     virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coder) = 0;
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
 public:
     /**
      * Register status code describe.
      */
     virtual int RegisterStatusDesc(int status, const LLBC_String &desc) = 0;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 public:
     /**
@@ -444,7 +458,7 @@ public:
      */
     virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
 
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified handler method, if method return false, will stop packet process flow.
      */
@@ -456,9 +470,9 @@ public:
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
     virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) = 0;
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified method, if subscribed, service will not call default opcode handler.
      */
@@ -470,7 +484,7 @@ public:
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
     virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) = 0;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
     /**

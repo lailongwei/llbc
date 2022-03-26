@@ -140,9 +140,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             buf.erase(buf.rfind(LLBC_LogTokenType::EscapeToken));
             token = LLBC_LogTokenBuilderSingleton->BuildLogToken(ch);
             if (!formatter)
-            {
                 formatter = LLBC_New(LLBC_LogFormattingInfo);
-            }
 
             token->Initialize(formatter, "");
             AppendToken(token);

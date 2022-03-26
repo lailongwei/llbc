@@ -138,26 +138,17 @@ void LLBC_MessageBlock::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
     _poolInst = &poolInst;
 }
 
-bool LLBC_MessageBlock::IsPoolObject() const
-{
-    return _poolInst != nullptr;
-}
-
 LLBC_IObjectPoolInst * LLBC_MessageBlock::GetPoolInst()
 {
     return _poolInst;
-}
-
-void LLBC_MessageBlock::GiveBackToPool()
-{
-    _poolInst->Release(this);
 }
 
 size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
 {
     return LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER;
 }
-void LLBC_MessageBlock::Clear()
+
+void LLBC_MessageBlock::Clear()
 {
     _readPos = _writePos = 0;
     if (_attach)

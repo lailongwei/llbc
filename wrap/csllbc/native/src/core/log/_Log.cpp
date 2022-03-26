@@ -48,11 +48,12 @@ int csllbc_Log_GetLogLevel(LLBC_Logger *logger)
 int csllbc_Log_LogMsg(LLBC_Logger *logger,
                       const char *fileName,
                       int lineNo,
+                      const char *func,
                       int level,
                       const char *msg,
                       const char *tag)
 {
-    return logger->NonFormatOutput(level, tag, fileName, lineNo, msg, LLBC_StrLen(msg)); 
+    return logger->NonFormatOutput(level, tag, fileName, lineNo, func, msg, LLBC_StrLen(msg)); 
 }
 
 void csllbc_Log_Destroy()

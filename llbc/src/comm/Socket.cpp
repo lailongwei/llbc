@@ -331,7 +331,6 @@ int LLBC_Socket::AcceptEx(LLBC_SocketHandle listenSock,
                           LLBC_SocketHandle acceptSock,
                           LLBC_POverlapped ol)
 {
-    static char _acceptExBuf[(sizeof(LLBC_SockAddr_IN) + 16) * 2];
     return LLBC_AcceptClientEx(listenSock,
                                acceptSock,
                                _acceptExBuf,

@@ -243,19 +243,9 @@ LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
     }
 }
 
-LLBC_FORCE_INLINE bool LLBC_Packet::IsPoolObject() const
-{
-    return _selfPoolInst != nullptr;
-}
-
 LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
 {
     return _selfPoolInst;
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::GiveBackToPool()
-{
-    _selfPoolInst->Release(this);
 }
 
 template<typename RetType>

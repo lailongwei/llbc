@@ -122,35 +122,45 @@ public:
 public:
     /**
      * Output specific level message.
-     * @param[in] tag      - log tag, can set to nullptr.
-     * @param[in] file     - log file name.
-     * @param[in] line     - log file line.
-     * @param[in] fmt      - format control string.
-     * @param[in] ...      - optional arguments.
+     * @param[in] tag  - log tag, can set to nullptr.
+     * @param[in] file - log file name.
+     * @param[in] line - log file line.
+     * @param[in] func - log function.
+     * @param[in] fmt  - format control string.
+     * @param[in] ...  - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Debug(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
-    int Info(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
-    int Warn(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
-    int Error(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
-    int Fatal(const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(5, 6);
+    int Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Error(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Fatal(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
 
     /**
      * Output fmt using given level.
-     * @param[in] level    - log level.
-     * @param[in] tag      - log tag, can set to nullptr.
-     * @param[in] file     - log file name.
-     * @param[in] line     - log file line.
-     * @param[in] fmt      - format control string.
-     * @param[in] ...      - optional arguments.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag, can set to nullptr.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] fmt    - format control string.
+     * @param[in] ...    - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(7, 8);
 
     /**
-     * Direct output message by va_list.
+     * Output message by va_list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag, can set to nullptr.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] func  - log function.
+     * @param[in] fmt   - format control string.
+     * @param[in] va    - variadic parameter list.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    int FormatOutput(int level, const char *tag, const char *file, int line, const char *fmt, va_list va);
+    int VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va);
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
@@ -158,11 +168,12 @@ public:
      * @param[in] tag    - log tag, can set to nullptr.
      * @param[in] file   - log file name.
      * @param[in] line   - log file line.
+     * @param[in] func   - log function.
      * @param[in] msg    - message string.
      * @param[in] msgLen - message string length, if -1, will auto calculate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int NonFormatOutput(int level, const char *tag, const char *file, int line, const char *msg, size_t msgLen);
+    int NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen);
 
 private:
     /**
@@ -171,6 +182,7 @@ private:
      * @param[in] tag   - log tag.
      * @param[in] file  - log file name.
      * @param[in] line  - log file line.
+     * @param[in] func  - log function.
      * @param[in] fmt   - log format control string.
      * @param[in] va    - the message variable parameter list.
      * @return LLBC_LogData * - the log data.
@@ -179,20 +191,25 @@ private:
                                const char *tag,
                                const char *file,
                                int line,
+                               const char *func,
                                const char *fmt,
                                va_list va);
 
     /**
      * Build log data by msg and length.
-     * @param[in] level - log level.
-     * @param[in] tag   - log tag.
-     * @param[in] file  - log file name.
-     * @param[in] line  - log file line.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] msg    - log message.
+     * @param[in] msgLen - log message length.
      */
     LLBC_LogData *BuildLogData(int level,
                                const char *tag,
                                const char *file,
                                int line,
+                               const char *func,
                                const char *msg,
                                size_t msgLen);
 
@@ -202,6 +219,7 @@ private:
      * @param[in] tag     - log tag.
      * @param[in] file    - log file name.
      * @param[in] line    - log file line.
+     * @param[in] func    - log function.
      * @param[in] logData - log data.
      * @param[in] libTls  - log tls.
      */
@@ -209,6 +227,7 @@ private:
                                   const char *tag,
                                   const char *file,
                                   int line,
+                                  const char *func,
                                   LLBC_LogData *logData,
                                   __LLBC_LibTls *libTls);
 

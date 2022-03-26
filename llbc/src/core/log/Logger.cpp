@@ -265,9 +265,9 @@ void LLBC_Logger::UninstallHookLockless(int level)
         _hookDelegs[level] = nullptr;
 }
 
-int LLBC_Logger::FormatOutput(int level, const char *tag, const char *file, int line, const char *fmt, va_list va) 
+int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va) 
 {
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, fmt, va);
+    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, fmt, va);
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
@@ -289,12 +289,12 @@ int LLBC_Logger::FormatOutput(int level, const char *tag, const char *file, int 
     return LLBC_OK;
 }
 
-int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, int line, const char *msg, size_t msgLen)
+int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen)
 {
     if (level < _logLevel)
         return LLBC_OK;
 
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, msg, msgLen);
+    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, msg, msgLen);
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
@@ -320,6 +320,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                         const char *tag,
                                         const char *file,
                                         int line,
+                                        const char *func,
                                         const char *fmt,
                                         va_list va)
 {
@@ -356,7 +357,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[len] = '\0';
 
     // Fill other LogData members.
-    FillLogDataNonMsgMembers(level, tag, file, line, data, libTls);
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls);
 
     return data;
 }
@@ -365,6 +366,7 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                         const char *tag,
                                         const char *file,
                                         int line,
+                                        const char *func,
                                         const char *msg,
                                         size_t msgLen)
 {
@@ -390,13 +392,13 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     }
 
     // Copy message to LogData.
-    data->msgLen = msgLen;
+    data->msgLen = static_cast<int>(msgLen);
     if (msgLen > 0)
         ::memcpy(data->msg, msg, msgLen);
     data->msg[msgLen] = '\0';
 
     // Fill LogData other members.
-    FillLogDataNonMsgMembers(level, tag, file, line, data, __LLBC_GetLibTls());
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls());
 
     return data;
 }
@@ -405,6 +407,7 @@ void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                            const char *tag,
                                            const char *file,
                                            int line,
+                                           const char *func,
                                            LLBC_LogData *logData,
                                            __LLBC_LibTls *libTls)
 {
@@ -416,7 +419,7 @@ void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->level = level;
     logData->logTime = LLBC_GetMilliSeconds();
 
-    // fill: other infos(file, tag).
+    // fill: other infos(file, tag, func).
     if (file)
     {
         // data->fileBeg = 0; // fileBeg always is 0.
@@ -441,9 +444,19 @@ void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     }
 
     if (tag)
+    {
         logData->tagLen = LLBC_StrLenA(tag);
+        logData->funcBeg = logData->tagBeg + logData->tagLen;
+    }
+    else
+    {
+        logData->funcBeg = logData->fileLen;
+    }
 
-    const uint32 othersSize = logData->fileLen + logData->tagLen;
+    if (func)
+        logData->funcLen = LLBC_StrLenA(func);
+
+    const uint32 othersSize = logData->fileLen + logData->tagLen + logData->funcLen;
     if (othersSize != 0)
     {
         if (logData->othersCap < othersSize)
@@ -456,6 +469,8 @@ void LLBC_Logger::FillLogDataNonMsgMembers(int level,
             ::memcpy(logData->others, file, logData->fileLen);
         if (tag)
             ::memcpy(logData->others + logData->tagBeg, tag, logData->tagLen);
+        if (func)
+            ::memcpy(logData->others + logData->funcBeg, func, logData->funcLen);
     }
 
     logData->line = line;

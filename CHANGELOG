@@ -22,9 +22,18 @@
 # 17)【premake】对wrap实行清晰分组
 # 18)【llbc core】为了更好的其他库结合, 针对win32平台特有的字符串数据类型在非win32平台的定义, llbc提供可选项让使用者项目中有其他项目有定义的情况下取消定义, 宏: LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES
 # 19)【llbc core】优化Log输出性能, 做到Log输出时的0 malloc/free以及只有一次的log message format操作, 对接口及设计进行优化
+# 20)【llbc core】事件系统支持链式事件调用, 以做到使用最简洁，同时事件对象对象池化, 做到最高效性能
+# 21)【llbc core】对象池反射识别优化, 使用更简洁方式反射对象池方法列表，同时对象池对象基类命名简化：LLBC_PoolObjectReflectionBase->LLBC_PoolObject
+# 22)【llbc core】对象池可重用方法识别增加reuse()/Reuse()支持
+# 23)【llbc core】LLBC_BasicCString增加std::ostream &operator <<(std::ostream &operator <<, const LLBC_BasicCString &)方法支持
+# 24)【llbc core】相关多余LLBC_EXTERN宏使用去除
+# 25)【llbc core】对象池反射方法简化, 去除IsPoolObject()/GiveBackToPool()方法要求, 以让对象池使用者以更轻的负担编写反射支持的类实现
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
+#   - 【llbc core】修复logger finalize一处死锁问题(by caochunxi)
+#   - 【llbc core】修复一处variant构造bug
+#   - 【llbc core】修复Random中RandInt()接口返回可能不在指定区间的Bug
 
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9
@@ -545,4 +554,3 @@
 # 
 # long long ago
 # 1)设计框架,设计common, core基础核心部分代码.
-

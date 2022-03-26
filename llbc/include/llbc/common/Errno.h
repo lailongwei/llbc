@@ -30,10 +30,10 @@
 __LLBC_NS_BEGIN
 
 // LLBC library error number.
-extern LLBC_EXPORT int *__LLBC_Errno();
+LLBC_EXPORT int *__LLBC_Errno();
 #define LLBC_Errno (*__LLBC_Errno())
 // LLBC library sub error number of OS-API errno.
-extern LLBC_EXPORT int *__LLBC_SubErrno();
+LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_SubErrno (*__LLBC_SubErrno())
 
 //

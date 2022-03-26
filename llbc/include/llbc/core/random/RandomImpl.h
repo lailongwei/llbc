@@ -40,19 +40,34 @@ inline int LLBC_Random::Rand()
 
 inline int LLBC_Random::Rand(int end)
 {
-    if (end >= 0)
-        return static_cast<int>(_mtRand.rand()) % end;
+    if (LIKELY(end != 0))
+    {
+        const long long randVal = llabs(static_cast<int>(_mtRand.rand()));
+        if (end > 0)
+            return static_cast<int>(randVal % end);
+        else
+            return static_cast<int>(randVal % end + end);
+    }
     else
-        return static_cast<int>(_mtRand.rand()) % (-end) + end;
+    {
+        return 0;
+    }
 }
 
 inline int LLBC_Random::Rand(int begin, int end)
 {
-    if (LIKELY(begin <= end))
-        return _mtRand.rand() % (end - begin) + begin;
+    if (LIKELY(begin != end))
+    {
+        const long long randVal = llabs(static_cast<int>(_mtRand.rand()));
+        if (begin < end)
+            return randVal % (end - begin) + begin;
+        else
+            return randVal % (begin - end) + end;
+    }
     else
-        return _mtRand.rand() % (begin - end) + end;
-
+    {
+        return begin;
+    }
 }
 
 inline double LLBC_Random::RandReal()
@@ -71,7 +86,8 @@ inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, con
     long diff = static_cast<long>(end - begin);
     if (UNLIKELY(diff <= 0))
         return end;
-    return begin + Rand(0, diff);
+
+    return begin + Rand(diff);
 }
 
 __LLBC_NS_END

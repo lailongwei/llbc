@@ -22,6 +22,8 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Time.h"
+#include "llbc/core/time/Time.h"
 #include "llbc/core/utils/Util_Debug.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -99,148 +101,62 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
     return ret;
 }
 
-#if LLBC_TARGET_PLATFORM_WIN32
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::_freq = 0;
-#endif
-
-LLBC_CPUTime::LLBC_CPUTime():_count(0)
-{
-}
-
-LLBC_CPUTime::LLBC_CPUTime(CPUTimeCount count):_count(count)
-{
-}
-
-LLBC_CPUTime::~LLBC_CPUTime()
-{
-}
+uint64 LLBC_CPUTime::_freqPerSecond = 0;
+uint64 LLBC_CPUTime::_freqPerMillisecond = 0;
+uint64 LLBC_CPUTime::_freqPerMicroSecond = 0;
+uint64 LLBC_CPUTime::_freqPerNanoSecond = 0;
 
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    return LLBC_CPUTime(tv.tv_sec * static_cast<CPUTimeCount>(1000000) + tv.tv_usec);
-#else
+    return LLBC_CPUTime(LLBC_RdTsc());
+#else // Win32
     LARGE_INTEGER cur;
     ::QueryPerformanceCounter(&cur);
     return LLBC_CPUTime(cur.QuadPart);
-#endif
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToSeconds() const
+LLBC_String LLBC_CPUTime::ToString() const
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(_count / 1000000.0);
-#else
-    return static_cast<CPUTimeCount>(_count / _freq);
-#endif
+    LLBC_String info;
+    sint64 microSecs = ToMicroSeconds();
+    info.append_format("%f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
+
+    return info;
 }
 
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMilliSeconds() const
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return static_cast<CPUTimeCount>(_count / 1000.0);
-#else
-    return static_cast<CPUTimeCount>(_count * 1000.0 / _freq);
-#endif
-}
-
-LLBC_CPUTime::CPUTimeCount LLBC_CPUTime::ToMicroSeconds() const
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    return _count;
-#else
-    return static_cast<CPUTimeCount>(_count * 1000000.0 / _freq);
-#endif
-}
-
-std::string LLBC_CPUTime::ToString() const
-{
-    char buf[32];
-    sprintf(buf, "%f", ToMicroSeconds() / 1000.0);
-
-    return buf;
-}
-
-LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const
-{
-    return LLBC_CPUTime(_count + right._count);
-}
-
-LLBC_CPUTime LLBC_CPUTime::operator -(const LLBC_CPUTime &right) const
-{
-    if (_count < right._count)
-    {
-        return LLBC_CPUTime(0);
-    }
-
-    return LLBC_CPUTime(_count - right._count);
-}
-
-LLBC_CPUTime &LLBC_CPUTime::operator +=(const LLBC_CPUTime &right)
-{
-    _count += right._count;
-    return *this;
-}
-
-LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
-{
-    if (_count < right._count)
-    {
-        _count = 0;
-    }
-    else
-    {
-        _count -= right._count;
-    }
-
-    return *this;
-}
-
-bool LLBC_CPUTime::operator <(const LLBC_CPUTime &right) const
-{
-    return _count < right._count;
-}
-
-bool LLBC_CPUTime::operator >(const LLBC_CPUTime &right) const
-{
-    return _count > right._count;
-}
-
-bool LLBC_CPUTime::operator <=(const LLBC_CPUTime &right) const
-{
-    return _count <= right._count;
-}
-
-bool LLBC_CPUTime::operator >=(const LLBC_CPUTime &right) const
-{
-    return _count >= right._count;
-}
-
-bool LLBC_CPUTime::operator ==(const LLBC_CPUTime &right) const
-{
-    return _count == right._count;
-}
-
-bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
-{
-    return _count != right._count;
-}
-
-#if LLBC_TARGET_PLATFORM_WIN32
 void LLBC_CPUTime::InitFrequency()
 {
-    LARGE_INTEGER freq;
-    ::QueryPerformanceFrequency(&freq);
-    _freq = freq.QuadPart;
-}
+#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+    _freqPerSecond = LLBC_GetCpuCounterFrequency();
+    _freqPerMillisecond = MAX(_freqPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
+    _freqPerMicroSecond = MAX(_freqPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
+    _freqPerNanoSecond = MAX(_freqPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
+    
+    if (_freqPerNanoSecond == 1)
+    {
+        _freqPerMicroSecond = _freqPerNanoSecond * 1000;
+        _freqPerMillisecond = _freqPerMicroSecond * 1000;
+    }
+#else
+    _freqPerSecond = LLBC_INFINITE;
+    _freqPerMillisecond = LLBC_INFINITE;
+    _freqPerMicroSecond = LLBC_INFINITE;
+    _freqPerNanoSecond = LLBC_INFINITE;
 #endif
+}
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
 #endif
 
 __LLBC_NS_END
+
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime)
+{
+    o << cpuTime.ToString();
+    return o;
+}
 
 #include "llbc/common/AfterIncl.h"

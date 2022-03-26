@@ -22,16 +22,16 @@ install:
 script:
     # core library about make instructions
     - make core_lib -j4 # make c++ core library
-    - make test -j4     # make c++ core library testsuite
+    - make test -j4 # make c++ core library testsuite
     # wrap library about make instructions
     # - make cs_wrap -j4  # make csharp wrap library
-    - make lu_wrap      # make lua wrap library
+    - make lu_wrap # make lua wrap library
 
 notifications:
     email:
         recipients:
-            - 964855959@qq.com   # Longwei Lai
-            - huangrongfu00@gmail.com  # Rongfu Huang
+            - 964855959@qq.com # Longwei Lai
+            - huangrongfu00@gmail.com # Rongfu Huang
             - najoast@126.com # Yan Zhou
             - caochunxi@hotmail.com # Chunxi Cao
             - 120453674@qq.com # Huiya Song

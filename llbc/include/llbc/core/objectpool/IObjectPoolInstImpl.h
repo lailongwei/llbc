@@ -60,6 +60,4 @@ LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::CheckRefCount(void *obj)
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/IObjectPoolImpl.h"
-
 #endif // __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

@@ -44,16 +44,16 @@ LULLBC_LUA_METH int _lullbc_IsLogInit(lua_State *l)
 // API: LogMsg
 LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 {
-    // Params: level, logger, tag, file, line, ...<msg>(optional)
+    // Params: level, logger, tag, file, line, func_name, ...<msg>(optional)
     int paramsCount = lua_gettop(l);
-    if (paramsCount < 5)
+    if (paramsCount < 6)
         lullbc_SetError(l, "failed to log message, parameters count must be equal or greater than 5");
 
     // Concat messages to output.
     size_t msgSize;
     LLBC_String msg;
     const char *partMsg;
-    for (int i = 6; i <= paramsCount; ++i)
+    for (int i = 7; i <= paramsCount; ++i)
     {
         partMsg = luaL_tolstring(l, i, &msgSize);
         if (UNLIKELY(partMsg == nullptr))
@@ -71,7 +71,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     if (level >= LLBC_LogLevel::Error)
     {
         luaL_traceback(l, l, nullptr, 4);
-        partMsg = lua_tolstring(l, paramsCount+1, &msgSize);
+        partMsg = lua_tolstring(l, paramsCount + 1, &msgSize);
         msg.append(1, ' ');
         msg.append(partMsg, msgSize);
         lua_pop(l, 1);
@@ -96,13 +96,14 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     if (UNLIKELY(logger == nullptr))
         lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
 
-    // Parse tag, file, line, traceback
+    // Parse tag, file, line, func, traceback
     const char *tag = lua_tostring(l, 3);
     const char *file = lua_tostring(l, 4);
     int line = lua_toint32(l, 5);
+    const char *func = lua_tostring(l, 6);
 
     // Output message.
-    if (UNLIKELY(logger->NonFormatOutput(level, tag, file, line, msg.data(), msg.size()) != LLBC_OK))
+    if (UNLIKELY(logger->NonFormatOutput(level, tag, file, line, func, msg.data(), msg.size()) != LLBC_OK))
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
 
     return 0;

@@ -13,7 +13,7 @@ function TestCase.run(...)
 
     -- Initialize Log component
     print 'Initialize log component...'
-    Log.init('core/log/Logger_Cfg.cfg')
+    Log.init('core/log/Logger_Cfg.cfg', true)
     print('Call Log.isinit():', Log.isinit())
 
     -- Test base log methods(all messages log to root logger).

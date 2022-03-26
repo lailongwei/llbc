@@ -224,6 +224,21 @@ const LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key) const
     return it != _strKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
+void LLBC_Event::Clear()
+{
+    _id = 0;
+    _dontDelAfterFire = false;
+
+    ClearExtData();
+
+    if (_intKeyParams)
+        _intKeyParams->clear();
+    if (_constantStrKeyParams)
+        _constantStrKeyParams->clear();
+    if (_strKeyParams)
+        _strKeyParams->clear();
+}
+
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"

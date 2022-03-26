@@ -23,6 +23,7 @@
 #define __LLBC_CORE_LOG_LOG_JSONMSG_H__
 
 #include "llbc/common/Common.h"
+
 #include "llbc/core/rapidjson/json.h"
 
 __LLBC_NS_BEGIN
@@ -38,32 +39,36 @@ class LLBC_Logger;
 class LLBC_EXPORT LLBC_LogJsonMsg
 {
 public:
-    explicit LLBC_LogJsonMsg(LLBC_Logger *logger, const char* tag, int lv);
+    explicit LLBC_LogJsonMsg(const char *loggerName,
+                             const char* tag,
+                             int lv,
+                             const char *file,
+                             int line,
+                             const char *func);
     ~LLBC_LogJsonMsg();
 
 public:
     /**
-    * Add json styled message
+    * Add json styled message.
     */
     LLBC_LogJsonMsg &Add(const char *key, const char *value);
     template <typename T>
     LLBC_LogJsonMsg &Add(const char *key, const T &value);
 
     /**
-    * Output json styled message
+    * Output json styled message.
     */
     void Finish(const char *fmt, ...);
 
 private:
-    /**
-    * When logger component not initialize, will use this function to output message.
-    */
-    static void UnInitOutput(FILE *to, const char *msg);
+    bool _loggerMgrInited;
 
-private:
     LLBC_Logger *_logger;
     const char *_tag;
     int _lv;
+    const char *_file;
+    int _line;
+    const char *_func;
 
     LLBC_Json::Document &_doc;
 };

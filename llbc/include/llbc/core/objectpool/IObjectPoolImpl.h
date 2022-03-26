@@ -25,7 +25,13 @@
 
 __LLBC_NS_BEGIN
 
-// Not used for now.
+template <typename FrontObjectType, typename BackObjectType>
+int LLBC_IObjectPool::AcquireOrderedDeletePoolInst()
+{
+    const char *frontNodeName = typeid(FrontObjectType).name();
+    const char *backNodeName = typeid(BackObjectType).name();
+    return AcquireOrderedDeletePoolInst(frontNodeName, backNodeName);
+}
 
 __LLBC_NS_END
 

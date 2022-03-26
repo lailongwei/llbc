@@ -42,9 +42,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const LLBC_String &msg
 {
     _buf.append(msg);
     if (_stream)
-    {
         *_stream <<static_cast<const std::basic_string<char> &>(msg);
-    }
 
     return *this;
 }
@@ -53,9 +51,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const std::basic_strin
 {
     _buf.append(msg.c_str(), msg.length());
     if (_stream)
-    {
         *_stream <<msg;
-    }
 
     return *this;
 }
@@ -69,15 +65,11 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const char *msg)
 {
     const char *actualMsg = msg;
     if (UNLIKELY(!actualMsg))
-    {
         actualMsg = "null";
-    }
 
     _buf.append(actualMsg);
     if (_stream)
-    {
         *_stream <<actualMsg;
-    }
 
     return *this;
 }
@@ -86,9 +78,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(char msg)
 {
     _buf.append(1, msg);
     if (_stream)
-    {
         *_stream <<msg;
-    }
 
     return *this;
 }
@@ -177,9 +167,7 @@ LLBC_LogMessageBuffer::operator std::basic_ostream<char> &()
     {
         _stream = LLBC_New(std::basic_ostringstream<char>, std::ios_base::ate);
         if (!_buf.empty())
-        {
             *_stream <<_buf;
-        }
     }
 
     return *_stream;

@@ -320,87 +320,38 @@ private:                                            \
  * @param[out] len - the formatted string length, in bytes, not including tailing character.
  *                   this macro always filled the tailing character.
  */
-#if LLBC_TARGET_PLATFORM_WIN32
- #define LLBC_FormatArg __LLBC_FormatArg_WIN32
-#else // LLBC_TARGET_PLATFORM_NON_WIN32
- #define LLBC_FormatArg __LLBC_FormatArg_NonWIN32
-#endif // LLBC_TARGET_PLATFORM_WIN32
-
-/**
- * WIN32 specified internal macro, use to format string.
- */
-#if LLBC_TARGET_PLATFORM_WIN32
-#define __LLBC_FormatArg_WIN32(fmt, buf, len)                                    \
-    do {                                                                         \
-        int &___len = (len);                                                     \
-        char *&___buf = (buf);                                                   \
-                                                                                 \
-        if (UNLIKELY(!(fmt))) {                                                  \
-            ___len = 0; ___buf = nullptr;                                        \
-            LLBC_SetLastError(LLBC_ERROR_INVALID);                               \
-            break;                                                               \
-        }                                                                        \
-                                                                                 \
-        va_list ___ap;                                                           \
-                                                                                 \
-        int ___bufSize = 1024; ___len = 0;                                       \
-        ___buf = LLBC_Malloc(char, ___bufSize + 1);                              \
-        while (true) {                                                           \
-            va_start(___ap, fmt);                                                \
-            ___len = ::vsnprintf_s(___buf, ___bufSize, _TRUNCATE, (fmt), ___ap); \
-            va_end(___ap);                                                       \
-                                                                                 \
-            if (___len >= 0)                                                     \
-                break;                                                           \
-                                                                                 \
-            ___bufSize <<= 1;                                                    \
-            ___buf = LLBC_Realloc(char, ___buf, ___bufSize + 1);                 \
-        }                                                                        \
-        ___buf[___len] = '\0';                                                   \
-    } while (0)                                                                  \
-
-#endif // LLBC_TARGET_PLATFORM_WIN32
-
-/**
- * Non-WIN32 platform specified internal macro, use to format string.
- */
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#define __LLBC_FormatArg_NonWIN32(fmt, buf, len)                    \
+#define LLBC_FormatArg(fmt, buf, len)                               \
     do {                                                            \
-        int &___len = (len);                                        \
-        char *&___buf = (buf);                                      \
-                                                                    \
-        if (UNLIKELY(!(fmt))) {                                     \
-            ___len = 0; ___buf = nullptr;                           \
-            LLBC_SetLastError(LLBC_ERROR_INVALID);                  \
+        if (UNLIKELY((fmt) == nullptr)) {                           \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_INVALID);          \
             break;                                                  \
         }                                                           \
                                                                     \
-        va_list ___ap;                                              \
-                                                                    \
-        int ___bufSize = 1024; ___len = 0;                          \
-        ___buf = LLBC_Malloc(char, ___bufSize);                     \
-        while (true) {                                              \
-            va_start(___ap, (fmt));                                 \
-            ___len = ::vsnprintf(___buf, ___bufSize, (fmt), ___ap); \
-            va_end(___ap);                                          \
-                                                                    \
-            /* Workded, break */                                    \
-            if (___len > -1 && ___len < ___bufSize)                 \
-                break;                                              \
-                                                                    \
-            /* Try again with more space */                         \
-            if (LIKELY(___len > -1)) /* glibc 2.1 and later */      \
-                ___bufSize = ___len + 1;                            \
-            else /* glibc 2.0 */                                    \
-                ___bufSize <<= 1;                                   \
-                                                                    \
-            ___buf = LLBC_Realloc(char, ___buf, ___bufSize);        \
+        va_list ___llbc_macro_inl_argfmt_ap;                        \
+        va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
+        int ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        va_end(___llbc_macro_inl_argfmt_ap);                        \
+        if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
+            break;                                                  \
         }                                                           \
-        ___buf[___len] = '\0';                                      \
+                                                                    \
+        buf = LLBC_Malloc(char, ___llbc_macro_inl_argfmt_vsnp_len + 1); \
+        va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
+        ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        va_end(___llbc_macro_inl_argfmt_ap);                        \
+        if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
+            LLBC_Free(buf);                                         \
+            buf = nullptr; len = 0;                                 \
+            LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
+            break;                                                  \
+        }                                                           \
+                                                                    \
+        len = static_cast<std::remove_reference<decltype(len)>::type>(___llbc_macro_inl_argfmt_vsnp_len); \
+        buf[len] = '\0';                                            \
     } while(0)                                                      \
-
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 /**
  * RTTI support.

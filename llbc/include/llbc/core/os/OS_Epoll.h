@@ -49,7 +49,7 @@ typedef struct epoll_event LLBC_EpollEvent;
  *                   older kernels.
  * @return LLBC_Handle - epool file descriptor, if error occurred, return LLBC_INVALID_HANDLE.
  */
-LLBC_EXTERN LLBC_EXPORT LLBC_Handle LLBC_EpollCreate(int size);
+LLBC_EXPORT LLBC_Handle LLBC_EpollCreate(int size);
 
 /**
  * Control interface for an epool descriptor.
@@ -59,7 +59,7 @@ LLBC_EXTERN LLBC_EXPORT LLBC_Handle LLBC_EpollCreate(int size);
  * @param[in] event - event data.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_EpollCtl(LLBC_Handle epfd, int op, int fd, LLBC_EpollEvent *event);
+LLBC_EXPORT int LLBC_EpollCtl(LLBC_Handle epfd, int op, int fd, LLBC_EpollEvent *event);
 
 /**
  * Wait for an I/O event on an epoll file descriptor.
@@ -71,14 +71,14 @@ LLBC_EXTERN LLBC_EXPORT int LLBC_EpollCtl(LLBC_Handle epfd, int op, int fd, LLBC
  *               or zero if no file descriptor became ready during the requested timeout milliseconds.
  *               When an error occurs, the function return -1 and to call LLBC_GetLastError() to fetch error.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_EpollWait(LLBC_Handle epfd, LLBC_EpollEvent *events, int maxEvents, int timeout);
+LLBC_EXPORT int LLBC_EpollWait(LLBC_Handle epfd, LLBC_EpollEvent *events, int maxEvents, int timeout);
 
 /**
  * Close the epoll handle.
  * @param[in] epfd - the epoll handle.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_EpollClose(LLBC_Handle epfd);
+LLBC_EXPORT int LLBC_EpollClose(LLBC_Handle epfd);
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 

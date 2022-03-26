@@ -36,8 +36,10 @@ private:
     void CompositeKeyTest();
     void ArithmeticTest();
     void SeqTest();
-    void DictTtest();
+    void DictTest();
     void SerializeTest();
+    void HashTest();
+    void ConvertToUnurderedStlContainerTest();
 };
 
 #endif // !__LLBC_TEST_CORE_VARIANT_TEST_H__
