@@ -54,7 +54,7 @@ namespace
             _timer = LLBC_New(LLBC_Timer,
                               std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
-            _timer->Schedule(LLBC_TimeSpan::FromSS(2), LLBC_TimeSpan::FromSS(5));
+            _timer->Schedule(LLBC_TimeSpan::FromSeconds(2), LLBC_TimeSpan::FromSeconds(5));
 
             return true;
         }

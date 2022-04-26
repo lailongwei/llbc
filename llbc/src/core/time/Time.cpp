@@ -355,7 +355,7 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::FromHHMMSS(hour,
+    return GetIntervalTo(LLBC_TimeSpan::FromHours(hour,
                          minute, 
                          second, 
                          milliSecond, 
