@@ -5,7 +5,7 @@
 #****************************************************************************
 # Determine platform name
 #****************************************************************************
-SUPPORTED_PLATFORMS	:= linux darwin
+SUPPORTED_PLATFORMS := linux,darwin
 PLATFORMNAME		?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
 $(if $(findstring $(PLATFORMNAME),$(SUPPORTED_PLATFORMS)),,$(error "Unsupported os, must be one of '$(SUPPORTED_PLATFORMS)'"))
 
@@ -21,11 +21,9 @@ endif
 #****************************************************************************
 # Parse debug option
 CONFIG_OPT		?= $(shell echo $(config) | tr "[:upper:]" "[:lower:]")
-ifeq ($(CONFIG_OPT),debug)
-  DEBUG_OPT=TRUE
-else
-  DEBUG_OPT=FALSE
-endif
+SUPPORTED_CONFIGS   :=debug32,release32,debug64,release64
+$(if $(findstring $(CONFIG_OPT),$(SUPPORTED_CONFIGS)),,$(error "Unsupported config, must be one of'$(SUPPORTED_CONFIGS)'))
+DEBUG_OPT			:= $(shell echo $(CONFIG_OPT) | tr -d "[:digit:]" | tr "[:lower:]" "[:upper:]")
 
 # All make targets define
 PREMAKE_TARGET  := build_makefiles
@@ -54,7 +52,7 @@ DEBUG_SUFFIX    := _debug
 EXE_SUFFIX      :=
 
 # Target names/paths define
-ifeq ($(DEBUG_OPT),FALSE)
+ifeq ($(DEBUG_OPT),RELEASE)
   CORELIB_TARGET_NAME   := libllbc$(DYNLIB_SUFFIX)
   TESTSUITE_TARGET_NAME := testsuite$(EXE_SUFFIX)
   PYWRAP_TARGET_NAME    := llbc$(DYNLIB_SUFFIX)
