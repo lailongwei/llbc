@@ -107,7 +107,7 @@ public:
     LLBC_IObjectPoolInst *GetPoolInst();
 
     /**
-     * Object-Pool reflection support, get user-defined per-block units number.
+     * Object-Pool reflection support: get user-defined per-block units number.
      */
     size_t GetPoolInstPerBlockUnitsNum();
 
