@@ -70,25 +70,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Get()
 {
-    const char *objectType = typeid(ObjectType).name();
-
-    _PoolInsts::iterator it;
-    LLBC_ObjectPoolInst<ObjectType> *poolInst;
-
-    _lock.Lock();
-    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
-    {
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
-    }
-    else
-    {
-        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
-        _lock.Unlock();
-    }
-
+    LLBC_ObjectPoolInst<ObjectType> *poolInst = GetPoolInst<ObjectType>();
     return poolInst->GetObject();
 }
 
@@ -96,25 +78,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 LLBC_FORCE_INLINE ObjectType *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetReferencable()
 {
-    const char *objectType = typeid(ObjectType).name();
-
-    _PoolInsts::iterator it;
-    LLBC_ObjectPoolInst<ObjectType> *poolInst;
-
-    _lock.Lock();
-    if ((it = _poolInsts.find(objectType)) == _poolInsts.end())
-    {
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
-    }
-    else
-    {
-        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
-        _lock.Unlock();
-    }
-
+    LLBC_ObjectPoolInst<ObjectType> *poolInst = GetPoolInst<ObjectType>();
     return reinterpret_cast<ObjectType *>(poolInst->GetReferencable());
 }
 
@@ -122,25 +86,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetGuarded()
 {
-    const char *objectType = typeid(ObjectType).name();
-
-    _PoolInsts::iterator it;
-    LLBC_IObjectPoolInst *poolInst;
-
-    _lock.Lock();
-    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
-    {
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
-    }
-    else
-    {
-        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
-        _lock.Unlock();
-    }
-
+    LLBC_IObjectPoolInst *poolInst = GetPoolInst<ObjectType>();
     return LLBC_ObjectGuard<ObjectType>(reinterpret_cast<ObjectType *>(poolInst->Get()), poolInst);
 }
 
