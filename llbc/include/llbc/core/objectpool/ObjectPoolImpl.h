@@ -244,6 +244,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLo
 
         LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
     }
+
     return _stdStringPoolInst;
 }
 
@@ -259,6 +260,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLoc
 
         LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
     }
+
     return _stdStringPoolInst;
 }
 
@@ -274,6 +276,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLo
 
         LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
     }
+
     return _stdStringPoolInst;
 }
 
@@ -289,6 +292,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLoc
 
         LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
     }
+
     return _stdStringPoolInst;
 }
 

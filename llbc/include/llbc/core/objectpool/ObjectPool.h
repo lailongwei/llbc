@@ -155,7 +155,7 @@ private:
      LLBC_ObjectPoolOrderedDeleteNodes *_orderedDeleteNodes;
      LLBC_ObjectPoolOrderedDeleteNodes *_topOrderedDeleteNodes;
 
-     // specialization pool inst of two strings 
+     // specialization pool inst of std::string and LLBC_String
      LLBC_ObjectPoolInst<std::string> *_stdStringPoolInst;
      LLBC_ObjectPoolInst<LLBC_String> *_llbcStringPoolInst;
 };
