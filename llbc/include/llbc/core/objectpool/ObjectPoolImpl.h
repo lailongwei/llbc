@@ -34,6 +34,8 @@ LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPo
 : LLBC_IObjectPool()
 , _orderedDeleteNodes(nullptr)
 , _topOrderedDeleteNodes(nullptr)
+, _stdStringPoolInst(nullptr)
+, _llbcStringPoolInst(nullptr)
 {
 }
 
@@ -64,6 +66,9 @@ LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectP
          poolIt != _poolInsts.end();
          ++poolIt)
         LLBC_Delete(poolIt->second);
+
+    LLBC_Delete(_stdStringPoolInst);
+    LLBC_Delete(_llbcStringPoolInst);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -95,6 +100,86 @@ template <typename ObjectType>
 LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(ObjectType *obj)
 {
     return Release(typeid(ObjectType).name(), obj);
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::Release(std::string *obj)
+{
+    if (_stdStringPoolInst != nullptr)
+        _stdStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::Release(std::string *obj)
+{
+    if (_stdStringPoolInst != nullptr)
+        _stdStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::Release(std::string *obj)
+{
+    if (_stdStringPoolInst != nullptr)
+        _stdStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::Release(std::string *obj)
+{
+    if (_stdStringPoolInst != nullptr)
+        _stdStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::Release(LLBC_String *obj)
+{
+    if (_llbcStringPoolInst != nullptr)
+        _llbcStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::Release(LLBC_String *obj)
+{
+    if (_llbcStringPoolInst != nullptr)
+        _llbcStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::Release(LLBC_String *obj)
+{
+    if (_llbcStringPoolInst != nullptr)
+        _llbcStringPoolInst->Release(obj);
+
+    return LLBC_OK;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::Release(LLBC_String *obj)
+{
+    if (_llbcStringPoolInst != nullptr)
+        _llbcStringPoolInst->Release(obj);
+
+    return LLBC_OK;
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -145,6 +230,126 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType,
     }
 
     return poolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::GetPoolInst()
+{
+    if (_stdStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_DummyLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
+    }
+    return _stdStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::GetPoolInst()
+{
+    if (_stdStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_DummyLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
+    }
+    return _stdStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::GetPoolInst()
+{
+    if (_stdStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_SpinLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
+    }
+    return _stdStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::GetPoolInst()
+{
+    if (_stdStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_SpinLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
+    }
+    return _stdStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::GetPoolInst()
+{
+    if (_llbcStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_DummyLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
+    }
+    return _llbcStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::GetPoolInst()
+{
+    if (_llbcStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_DummyLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
+    }
+    return _llbcStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::GetPoolInst()
+{
+    if (_llbcStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_SpinLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
+    }
+    return _llbcStringPoolInst;
+}
+
+template <>
+template <>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::GetPoolInst()
+{
+    if (_llbcStringPoolInst == nullptr)
+    {
+        _lock.Lock();
+        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_SpinLock());
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
+    }
+    return _llbcStringPoolInst;
 }
 
 template <typename PoolLockType, typename PoolInstLockType>

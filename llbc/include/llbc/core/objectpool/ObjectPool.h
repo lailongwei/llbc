@@ -76,7 +76,6 @@ public:
      */
     template <typename ObjectType>
     int Release(ObjectType *obj);
-
     /**
      * Release object.
      * @param[in] objectType - the object type string representation.
@@ -155,6 +154,10 @@ private:
     _PoolInsts _poolInsts;
      LLBC_ObjectPoolOrderedDeleteNodes *_orderedDeleteNodes;
      LLBC_ObjectPoolOrderedDeleteNodes *_topOrderedDeleteNodes;
+
+     // specialization pool inst of two strings 
+     LLBC_ObjectPoolInst<std::string> *_stdStringPoolInst;
+     LLBC_ObjectPoolInst<LLBC_String> *_llbcStringPoolInst;
 };
 
 __LLBC_NS_END

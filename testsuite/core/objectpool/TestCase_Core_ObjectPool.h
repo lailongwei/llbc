@@ -42,6 +42,7 @@ private:
     void DoPerfTest();
     void DoComplexObjPerfTest();
     void DoPoolDebugAssetTest();
+    void DoStringSpecificPoolInstTest();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_OBJECT_POOL_H__

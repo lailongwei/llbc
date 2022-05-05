@@ -356,6 +356,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     DoPerfTest();
     DoComplexObjPerfTest();
     DoPoolDebugAssetTest();
+    DoStringSpecificPoolInstTest();
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
@@ -900,4 +901,26 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
         // pool.Release(pkt);
         // pool.Release(pkt);
     }
+}
+
+void TestCase_Core_ObjectPool::DoStringSpecificPoolInstTest()
+{
+    LLBC_PrintLine("DoStringSpecificPoolInstTest begin...");
+    LLBC_UnsafetyObjectPool pool;
+
+    LLBC_ObjectPoolInst<std::string> *stdStringPoolInst = pool.GetPoolInst<std::string>();
+    //LLBC_PrintLine("std::string pool inst ptr %p  %p", stdStringPoolInst, pool.GetStdStringPoolInst());
+    std::string *stdString = stdStringPoolInst->GetObject();
+    stdString->assign("std::string specific test...");
+    LLBC_PrintLine("%s", stdString->c_str());
+    stdStringPoolInst->Release(stdString);
+
+    LLBC_ObjectPoolInst<LLBC_String> *llbcStringPoolInst = pool.GetPoolInst<LLBC_String>();
+    //LLBC_PrintLine("std::string pool inst ptr %p  %p", llbcStringPoolInst, pool.GetLLBCStringPoolInst());
+    LLBC_String *llbcString = llbcStringPoolInst->GetObject();
+    stdString->assign("LLBC_String specific test...");
+    LLBC_PrintLine("%s", llbcString->c_str());
+    llbcStringPoolInst->Release(llbcString);
+
+    LLBC_PrintLine("DoStringSpecificPoolInstTest end...");
 }
