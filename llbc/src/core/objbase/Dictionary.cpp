@@ -444,31 +444,8 @@ LLBC_Object *LLBC_Dictionary::Clone() const
 
 void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
 {
-    SerializeInl(s, false);
-}
-
-bool LLBC_Dictionary::DeSerialize(LLBC_Stream &s)
-{
-    return DeSerializeInl(s, false);
-}
-
-void LLBC_Dictionary::SerializeEx(LLBC_Stream &s) const
-{
-    SerializeInl(s, true);
-}
-
-bool LLBC_Dictionary::DeSerializeEx(LLBC_Stream &s)
-{
-    return DeSerializeInl(s, true);
-}
-
-void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
-{
-    LLBC_STREAM_BEGIN_WRITE(s);
-
-    LLBC_STREAM_WRITE(static_cast<uint64>(_bucketSize));
-
-    LLBC_STREAM_WRITE(static_cast<uint64>(_size));
+    s <<static_cast<uint32>(_bucketSize)
+      <<static_cast<uint32>(_size);
 
     ConstIter it = Begin(), endIt = End();
     for (; it != endIt; ++it)
@@ -476,42 +453,35 @@ void LLBC_Dictionary::SerializeInl(LLBC_Stream &s, bool extended) const
         const LLBC_DictionaryElem * const elem = it.Elem();
 
         const uint8 intKeyFlag = elem->IsIntKey() ? 1 : 0;
-        LLBC_STREAM_WRITE(intKeyFlag);
+        s <<intKeyFlag;
 
         if (intKeyFlag)
-        {
-            LLBC_STREAM_WRITE(elem->GetIntKey());
-        }
+            s <<elem->GetIntKey();
         else
-        {
-            !extended ? s.Write(
-                elem->GetStrKey()) : s.WriteEx(elem->GetStrKey());
-        }
+            s <<elem->GetStrKey();
 
-        !extended ? s.Write(*it) : s.WriteEx(*it);
+        s <<*it;
     }
-
-    LLBC_STREAM_END_WRITE();
 }
 
-bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
+bool LLBC_Dictionary::DeSerialize(LLBC_Stream &s)
 {
     if (!_objFactory)
-    {
         return false;
-    }
-
-    Clear();
 
     LLBC_STREAM_BEGIN_READ(s, bool, false);
 
-    uint64 bucketSize = 0;
+    uint32 bucketSize = 0;
     LLBC_STREAM_READ(bucketSize);
     SetHashBucketSize(static_cast<size_type>(bucketSize));
 
-    uint64 size = 0;
+    Clear();
+    if (bucketSize == 0)
+        return true;
+
+    uint32 size = 0;
     LLBC_STREAM_READ(size);
-    for (uint64 i = 0; i < size; ++i)
+    for (uint32 i = 0; i < size; ++i)
     {
         uint8 intKeyFlag = 0;
         LLBC_STREAM_READ(intKeyFlag);
@@ -522,7 +492,7 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
             LLBC_STREAM_READ(intKey);
 
             LLBC_Object *o = _objFactory->CreateObject();
-            if (!(!extended ? s.Read(*o) : s.ReadEx(*o)))
+            if (!s.Read(*o))
             {
                 o->Release();
                 return false;
@@ -537,7 +507,7 @@ bool LLBC_Dictionary::DeSerializeInl(LLBC_Stream &s, bool extended)
             LLBC_STREAM_READ(strKey);
 
             LLBC_Object *o = _objFactory->CreateObject();
-            if (!(!extended ? s.Read(*o) : s.ReadEx(*o)))
+            if (!s.Read(*o))
             {
                 o->Release();
                 return false;

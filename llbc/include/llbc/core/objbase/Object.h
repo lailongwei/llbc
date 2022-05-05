@@ -109,19 +109,6 @@ public:
      */
     virtual bool DeSerialize(LLBC_Stream &s);
 
-    /**
-     * Extensional serialize method, use to serialize the object to stream.
-     * @param[out] s - the stream object.
-     */
-    virtual void SerializeEx(LLBC_Stream &s) const;
-
-    /**
-     * Extensional deserialize method, use to deserialize the object from stream.
-     * @param[in] s - the stream object.
-     * @return bool - return true if serialize success, otherwise return false.
-     */
-    virtual bool DeSerializeEx(LLBC_Stream &s);
-
     LLBC_DISABLE_ASSIGNMENT(LLBC_Object);
 
 private:

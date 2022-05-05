@@ -423,18 +423,6 @@ bool LLBC_Time::DeSerialize(LLBC_Stream &stream)
     return true;
 }
 
-bool LLBC_Time::DeSerializeEx(LLBC_Stream &stream)
-{
-    sint64 timeVal = 0;
-    if (!stream.ReadEx(timeVal))
-        return false;
-
-    _time = timeVal;
-    UpdateTimeStructs();
-
-    return true;
-}
-
 void LLBC_Time::UpdateTimeStructs()
 {
     time_t calendarTime = static_cast<time_t>(_time / NumOfMicroSecondsPerSecond);

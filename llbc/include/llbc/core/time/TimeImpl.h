@@ -190,11 +190,6 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
     stream.Write(_time);
 }
 
-inline void LLBC_Time::SerializeEx(LLBC_Stream &stream) const
-{
-    stream.WriteEx(_time);
-}
-
 inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroSeconds)
 : _time(clanderTimeInMicroSeconds)
 {

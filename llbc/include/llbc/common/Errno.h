@@ -106,15 +106,15 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 
 // Error part getter helper functions(implement with macro).
 // Get errno severity part value.
-#define LLBC_GetErrnoSeverityPart(no) ((((uint32)(no)) & LLBC_ERROR_MASK_SEVERITY) >> LLBC_ERROR_SEV_RSHIFT)
+#define LLBC_GetErrnoSeverityPart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_SEVERITY) >> LLBC_ERROR_SEV_RSHIFT)
 // Get errno custom flag value.
-#define LLBC_GetErrnoCustomPart(no) ((((uint32)(no)) & LLBC_ERROR_MASK_CUSTOM) >> LLBC_ERROR_CUSTOM_RSHIFT)
+#define LLBC_GetErrnoCustomPart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_CUSTOM) >> LLBC_ERROR_CUSTOM_RSHIFT)
 // Get errno reversed part value.
-#define LLBC_GetErrnoReservedPart(no) ((((uint32)(no)) & LLBC_ERROR_MASK_RESERVED) >> LLBC_ERROR_RESERVED_RSHIFT)
+#define LLBC_GetErrnoReservedPart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_RESERVED) >> LLBC_ERROR_RESERVED_RSHIFT)
 // Get errno type part value.
-#define LLBC_GetErrnoTypePart(no) ((((uint32)(no)) & LLBC_ERROR_MASK_TYPE) >> LLBC_ERROR_TYPE_RSHIFT)
+#define LLBC_GetErrnoTypePart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_TYPE) >> LLBC_ERROR_TYPE_RSHIFT)
 // Get errno value part value.
-#define LLBC_GetErrnoNoPart(no) ((((uint32)(no)) & LLBC_ERROR_MASK_NO) >> LLBC_ERROR_NO_RSHIFT)
+#define LLBC_GetErrnoNoPart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_NO) >> LLBC_ERROR_NO_RSHIFT)
 
 // Build custom error number(error value part | severity part value(error level) | custom flag).
 #define LLBC_BuildCustomErrno(customErrNo) ( LLBC_GetErrnoNoPart(customErrNo) | \

@@ -570,21 +570,12 @@ public:
     virtual bool DeSerialize(LLBC_Stream &s);
 
     /**
-     * Extensional serialize/deserialize support.
-     */
-    virtual void SerializeEx(LLBC_Stream &s) const;
-    virtual bool DeSerializeEx(LLBC_Stream &s);
-
-    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_Array);
 
 private:
     void Recapacity(size_type cap);
-
-    void SerializeInl(LLBC_Stream &s, bool extended) const;
-    bool DeSerializeInl(LLBC_Stream &s, bool extended);
 
 public:
     size_type _size;
