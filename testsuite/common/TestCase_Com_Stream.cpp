@@ -180,9 +180,9 @@ static void STLContainersSerializeTest()
 
     // std::vector<std::vector<int> > test.
     std::vector<std::vector<int> > nestingVec;
-    nestingVec.push_back( std::vector<int>() );
-    nestingVec.push_back( std::vector<int>() );
-    nestingVec.push_back( std::vector<int>() );
+    nestingVec.push_back(std::vector<int>());
+    nestingVec.push_back(std::vector<int>());
+    nestingVec.push_back(std::vector<int>());
     for (size_t i = 0; i < nestingVec.size(); ++i)
     {
         for (int j = 0; j < 3; ++j)
@@ -215,9 +215,9 @@ static void STLContainersSerializeTest()
 
     // std::map<int, int> test.
     std::map<int, int> m;
-    m.insert( std::make_pair(1, 10) );
-    m.insert( std::make_pair(2, 20) );
-    m.insert( std::make_pair(3, 30) );
+    m.insert(std::make_pair(1, 10));
+    m.insert(std::make_pair(2, 20));
+    m.insert(std::make_pair(3, 30));
     LLBC_PrintLine("before serialize std::map<int, int>: %s", ToStringMap(m).c_str());
 
     stream.SetPos(0);
@@ -300,7 +300,7 @@ static LLBC_String ToStringNestingVec(const std::vector<std::vector<int> > &vec)
         out.append_format("{%d|", vec.size());
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            out.append_format( "{%s}", ToStringVec(vec[i]).c_str() );
+            out.append_format("{%s}", ToStringVec(vec[i]).c_str());
             if (i != vec.size() - 1)
                 out.append(",");
         }

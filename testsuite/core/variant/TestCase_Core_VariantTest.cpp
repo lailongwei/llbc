@@ -64,21 +64,21 @@ void TestCase_Core_VariantTest::BasicTest()
 
     LLBC_Variant nilVal;
     LLBC_Variant boolVal(true);
-    LLBC_Variant int8Val( (sint8)-8 );
-    LLBC_Variant uint8Val( (uint8)8 );
-    LLBC_Variant int16Val( (sint16)-16 );
-    LLBC_Variant uint16Val( (uint16)16 );
-    LLBC_Variant int32Val( (sint32)-32 );
-    LLBC_Variant uint32Val( (uint32)32 );
-    LLBC_Variant longVal( (long)-10086 );
-    LLBC_Variant ulongVal( (LLBC_NS ulong)10086 );
+    LLBC_Variant int8Val((sint8)-8);
+    LLBC_Variant uint8Val((uint8)8);
+    LLBC_Variant int16Val((sint16)-16);
+    LLBC_Variant uint16Val((uint16)16);
+    LLBC_Variant int32Val((sint32)-32);
+    LLBC_Variant uint32Val((uint32)32);
+    LLBC_Variant longVal((long)-10086);
+    LLBC_Variant ulongVal((LLBC_NS ulong)10086);
     uint64 ptrAddr = 0x80000000;
     void *ptr; ::memcpy(&ptr, &ptrAddr, sizeof(void *));
     LLBC_Variant ptrVal(ptr);
-    LLBC_Variant int64Val( (sint64)-64 );
-    LLBC_Variant uint64Val( (uint64)64 );
-    LLBC_Variant floatVal( (float)88.0 );
-    LLBC_Variant doubleVal( (double)-88.0 );
+    LLBC_Variant int64Val((sint64)-64);
+    LLBC_Variant uint64Val((uint64)64);
+    LLBC_Variant floatVal((float)88.0);
+    LLBC_Variant doubleVal((double)-88.0);
     LLBC_Variant strVal("Hello");
     LLBC_Variant looseBoolVal1("   true ");
     LLBC_Variant looseBoolVal2("   yes ");
@@ -282,8 +282,8 @@ void TestCase_Core_VariantTest::ArithmeticTest()
 {
     std::cout <<"Arithmetic test:" <<std::endl;
 
-    LLBC_Variant left( (sint32)3 );
-    LLBC_Variant right( (sint64)-5 );
+    LLBC_Variant left((sint32)3);
+    LLBC_Variant right((sint64)-5);
     std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;

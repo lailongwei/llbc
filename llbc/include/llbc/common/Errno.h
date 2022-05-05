@@ -117,9 +117,9 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_GetErrnoNoPart(no) ((((LLBC_NS uint32)(no)) & LLBC_ERROR_MASK_NO) >> LLBC_ERROR_NO_RSHIFT)
 
 // Build custom error number(error value part | severity part value(error level) | custom flag).
-#define LLBC_BuildCustomErrno(customErrNo) ( LLBC_GetErrnoNoPart(customErrNo) | \
+#define LLBC_BuildCustomErrno(customErrNo) (LLBC_GetErrnoNoPart(customErrNo) | \
                                             (LLBC_ERROR_SEV_ERROR << LLBC_ERROR_SEV_RSHIFT) | \
-                                            (LLBC_ERROR_CUSTOM << LLBC_ERROR_CUSTOM_RSHIFT) )
+                                            (LLBC_ERROR_CUSTOM << LLBC_ERROR_CUSTOM_RSHIFT))
 
 // error type getter helper macro define.
 //
