@@ -50,7 +50,7 @@ inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const char *
 }
 
 template <typename ComponentCls>
-int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methName, int ( ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     if (UNLIKELY(!methName || LLBC_StrLenA(methName) == 0 || !meth))
     {

@@ -920,7 +920,7 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsStr())
     {
-        stream.WriteEx(_holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr);
+        stream.Write(_holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr);
     }
     else if (IsSeq())
     {
@@ -975,7 +975,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
         else
             _holder.data.obj.str = LLBC_New(LLBC_String);
 
-        if (!stream.ReadEx(*_holder.data.obj.str))
+        if (!stream.Read(*_holder.data.obj.str))
         {
             BecomeNil();
             return false;

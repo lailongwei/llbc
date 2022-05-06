@@ -28,18 +28,18 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
 
     LLBC_PrintLine("flow check test:");
     LLBC_PrintLine("3 + 4: %s", 
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseAdd(3, 4)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd(3, 4)));
     LLBC_PrintLine("(sint16)32767 + (sint16)2: %s",
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseAdd( (sint16)32767, (sint16)2)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd((sint16)32767, (sint16)2)));
     LLBC_PrintLine("(sint16)-32768 + (sint16)-2: %s",
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseAdd( (sint16)-32768, (sint16)-2)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd((sint16)-32768, (sint16)-2)));
 
     LLBC_PrintLine("2 - 1: %s", 
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseSub(2, 1)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub(2, 1)));
     LLBC_PrintLine("(sint16)-32768 - (sing16)1: %s",
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseSub( (sint16)-32768, (sint16)1)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)-32768, (sint16)1)));
     LLBC_PrintLine("(sint16)32767 - (sint16)-2: %s",
-        LLBC_FlowType::Type2Str( LLBC_CheckFlowUseSub( (sint16)32767, (sint16)-2)));
+        LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)32767, (sint16)-2)));
     LLBC_PrintLine("");
 
     LLBC_PrintLine("NOFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::NoFlow));

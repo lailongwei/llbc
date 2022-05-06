@@ -282,9 +282,6 @@ public:
     void Serialize(LLBC_Stream &stream) const;
     bool DeSerialize(LLBC_Stream &stream);
 
-    void SerializeEx(LLBC_Stream &stream) const;
-    bool DeSerializeEx(LLBC_Stream &stream);
-
 private:
     explicit LLBC_Time(const sint64 &clanderTimeInMicroSeconds);
 

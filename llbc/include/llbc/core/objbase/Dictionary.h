@@ -415,12 +415,6 @@ public:
     virtual bool DeSerialize(LLBC_Stream &s);
 
     /**
-     * Extensional serialize/deserialize support.
-     */
-    virtual void SerializeEx(LLBC_Stream &s) const;
-    virtual bool DeSerializeEx(LLBC_Stream &s);
-
-    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_Dictionary);
@@ -428,9 +422,6 @@ public:
 private:
     void AddToDoublyLinkedList(LLBC_DictionaryElem *elem);
     void RemoveFromDoublyLinkedList(LLBC_DictionaryElem *elem);
-
-    void SerializeInl(LLBC_Stream &s, bool extended) const;
-    bool DeSerializeInl(LLBC_Stream &s, bool extended);
 
 private:
     size_type _size;

@@ -45,8 +45,8 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
 
     // Upper<->Lower test.
     str = "AaBbCcDd eEfFgG";
-    LLBC_PrintLine("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper( str.c_str()).c_str());
-    LLBC_PrintLine("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower( str.c_str()).c_str());
+    LLBC_PrintLine("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper(str.c_str()).c_str());
+    LLBC_PrintLine("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower(str.c_str()).c_str());
     LLBC_PrintLine("");
 
     // Trim test(include left, right).
@@ -63,23 +63,23 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     // String -> Number test.
     str = "-30";
     LLBC_PrintLine("string [%s] to number(Str2Int32): %d", 
-        str.c_str(), LLBC_Str2Int32( str.c_str()));
+        str.c_str(), LLBC_Str2Int32(str.c_str()));
     LLBC_PrintLine("string [%s] to number(Str2Long): %ld", 
-        str.c_str(), LLBC_Str2Long( str.c_str()));
+        str.c_str(), LLBC_Str2Long(str.c_str()));
     LLBC_PrintLine("string [%s] to number(Str2Int64): %lld", 
-        str.c_str(), LLBC_Str2Int64( str.c_str()));
+        str.c_str(), LLBC_Str2Int64(str.c_str()));
     LLBC_PrintLine("string [%s] to number(Str2UInt32): %u", 
-        str.c_str(), LLBC_Str2UInt32( str.c_str()));
+        str.c_str(), LLBC_Str2UInt32(str.c_str()));
     LLBC_PrintLine("string [%s] to number(Str2ULong): %lu", 
-        str.c_str(), LLBC_Str2ULong( str.c_str()));
+        str.c_str(), LLBC_Str2ULong(str.c_str()));
     LLBC_PrintLine("string [%s] to pointer(Str2Ptr): %p",
         "30", LLBC_Str2Ptr("30"));
     LLBC_PrintLine("string [%s] to pointer(Str2Ptr): %p",
         "0xcdcdcdcd", LLBC_Str2Ptr("0xcdcdcdcd"));
     LLBC_PrintLine("string [%s] to number(Str2UInt64): %llu", 
-        str.c_str(), LLBC_Str2UInt64( str.c_str()));
+        str.c_str(), LLBC_Str2UInt64(str.c_str()));
     LLBC_PrintLine("string [%s] to number(Str2Double): %f", 
-        str.c_str(), LLBC_Str2Double( str.c_str()));
+        str.c_str(), LLBC_Str2Double(str.c_str()));
     LLBC_PrintLine("");
 
     // Number -> String test.

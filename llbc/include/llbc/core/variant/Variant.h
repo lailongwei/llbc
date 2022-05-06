@@ -567,10 +567,6 @@ public:
     void Serialize(LLBC_Stream &stream) const;
     bool DeSerialize(LLBC_Stream &stream);
 
-    // SerializeEx / DeSerializeEx support.
-    void SerializeEx(LLBC_Stream &stream) const;
-    bool DeSerializeEx(LLBC_Stream &stream);
-
 public:
     friend std::ostream &::operator <<(std::ostream &o, const LLBC_Variant &variant);
 

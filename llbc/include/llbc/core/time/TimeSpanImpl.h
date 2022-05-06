@@ -304,22 +304,6 @@ inline bool LLBC_TimeSpan::DeSerialize(LLBC_Stream &stream)
     return true;
 }
 
-inline void LLBC_TimeSpan::SerializeEx(LLBC_Stream &stream) const
-{
-    stream.WriteEx(_span);
-}
-
-inline bool LLBC_TimeSpan::DeSerializeEx(LLBC_Stream &stream)
-{
-    sint64 spanVal = 0;
-    if (!stream.ReadEx(spanVal))
-        return false;
-
-    _span = spanVal;
-
-    return true;
-}
-
 __LLBC_NS_END
 
 #endif // __LLBC_CORE_TIME_TIMESPAN_H__

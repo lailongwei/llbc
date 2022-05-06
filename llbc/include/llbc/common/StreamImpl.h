@@ -46,7 +46,7 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs)
 
 , _attach(false)
 {
-    this->Assign(rhs);
+    Assign(rhs);
 }
 
 inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
@@ -59,9 +59,9 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
 , _attach(false)
 {
     if (attach)
-        this->Attach(rhs);
+        Attach(rhs);
     else
-        this->Assign(rhs);
+        Assign(rhs);
 }
 
 inline LLBC_Stream::LLBC_Stream(size_t size)
@@ -248,7 +248,7 @@ inline bool LLBC_Stream::Skip(long size)
     if (skipped > _size)
         return false;
 
-    this->SetPos(skipped);
+    SetPos(skipped);
 
     return true;
 }
@@ -277,6 +277,11 @@ inline size_t LLBC_Stream::GetSize() const
     return _size;
 }
 
+inline size_t LLBC_Stream::GetAvailableSize() const
+{
+    return _size - _pos;
+}
+
 inline void *LLBC_Stream::GetBuf() const
 {
     return _buf;
@@ -290,7 +295,7 @@ inline void *LLBC_Stream::GetBufStartWithPos() const
 
 inline void LLBC_Stream::Insert(size_t pos, const void *buf, size_t len)
 {
-    this->Replace(pos, pos, buf, len);
+    Replace(pos, pos, buf, len);
 }
 
 inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t len)
@@ -357,6 +362,24 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
     _pos = _pos + len - (n1 - n0);
 }
 
+inline bool LLBC_Stream::ReadBuffer(void *buf, size_t len)
+{
+    if (len == 0)
+        return true;
+    else if (_pos + len > _size)
+        return false;
+
+    ASSERT(buf && "LLBC_Stream::ReadBuffer(): expect not-null buf pointer to read");
+
+    // check memory overlapped
+    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::ReadBuffer() buffer overlapped!");
+
+    memcpy(buf, (const uint8 *)_buf + _pos, len);
+    _pos += len;
+
+    return true;
+}
+
 inline void LLBC_Stream::WriteBuffer(const void *buf, size_t len)
 {
     if (UNLIKELY(!buf || len <= 0))
@@ -375,28 +398,10 @@ inline void LLBC_Stream::WriteBuffer(const void *buf, size_t len)
     }
 
     // Check memory overlapped
-    ASSERT(this->OverlappedCheck(buf, len) && "LLBC_Stream::WriteBuffer() buffer overlapped!");
+    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::WriteBuffer() buffer overlapped!");
 
     memcpy((uint8 *)_buf + _pos, buf, len);
     _pos += len;
-}
-
-inline bool LLBC_Stream::ReadBuffer(void *buf, size_t len)
-{
-    if (len == 0)
-        return true;
-    else if (_pos + len > _size)
-        return false;
-
-    ASSERT(buf && "LLBC_Stream::ReadBuffer(): expect not-null buf pointer to read");
-
-    // check memory overlapped
-    ASSERT(this->OverlappedCheck(buf, len) && "LLBC_Stream::ReadBuffer() buffer overlapped!");
-
-    memcpy(buf, (const uint8 *)_buf + _pos, len);
-    _pos += len;
-
-    return true;
 }
 
 inline void LLBC_Stream::Resize(size_t newSize)
@@ -430,238 +435,238 @@ inline void LLBC_Stream::Clear()
 
 inline bool LLBC_Stream::ReadBool(bool &value)
 {
-    return this->ReadBuffer(&value, sizeof(bool));
+    return ReadBuffer(&value, sizeof(bool));
 }
 
 inline bool LLBC_Stream::ReadSInt8(sint8 &value)
 {
-    return this->ReadBuffer(&value, sizeof(sint8));
+    return ReadBuffer(&value, sizeof(sint8));
 }
 
 inline bool LLBC_Stream::ReadUInt8(uint8 &value)
 {
-    return this->ReadBuffer(&value, sizeof(uint8));
+    return ReadBuffer(&value, sizeof(uint8));
 }
 
 inline bool LLBC_Stream::ReadSInt16(sint16 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadUInt16(uint16 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadSInt32(sint32 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadUInt32(uint32 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadSInt64(sint64 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadUInt64(uint64 &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadLong(long &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadULong(ulong &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadFloat(float &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadDouble(double &value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadPtr(void *&value)
 {
-    return this->ReadRawType(value);
+    return ReadRawType(value);
 }
 
 inline bool LLBC_Stream::ReadBool_2(bool failRet)
 {
-    this->ReadBuffer(&failRet, sizeof(bool));
+    ReadBuffer(&failRet, sizeof(bool));
     return failRet;
 }
 
 inline sint8 LLBC_Stream::ReadSInt8_2(sint8 failRet)
 {
-    this->ReadBuffer(&failRet, sizeof(sint8));
+    ReadBuffer(&failRet, sizeof(sint8));
     return failRet;
 }
 
 inline uint8 LLBC_Stream::ReadUInt8_2(uint8 failRet)
 {
-    this->ReadBuffer(&failRet, sizeof(uint8));
+    ReadBuffer(&failRet, sizeof(uint8));
     return failRet;
 }
 
 inline sint16 LLBC_Stream::ReadSInt16_2(sint16 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline uint16 LLBC_Stream::ReadUInt16_2(uint16 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline sint32 LLBC_Stream::ReadSInt32_2(sint32 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline uint32 LLBC_Stream::ReadUInt32_2(uint32 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline sint64 LLBC_Stream::ReadSInt64_2(sint64 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline uint64 LLBC_Stream::ReadUInt64_2(uint64 failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline long LLBC_Stream::ReadLong_2(long failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline ulong LLBC_Stream::ReadULong_2(ulong failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline float LLBC_Stream::ReadFloat_2(float failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline double LLBC_Stream::ReadDouble_2(double failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline void *LLBC_Stream::ReadPtr_2(void *failRet)
 {
-    this->ReadRawType(failRet);
+    ReadRawType(failRet);
     return failRet;
 }
 
 inline void LLBC_Stream::WriteBool(bool value)
 {
-    this->WriteBuffer(&value, sizeof(bool));
+    WriteBuffer(&value, sizeof(bool));
 }
 
 inline void LLBC_Stream::WriteSInt8(sint8 value)
 {
-    this->WriteBuffer(&value, sizeof(sint8));
+    WriteBuffer(&value, sizeof(sint8));
 }
 
 inline void LLBC_Stream::WriteUInt8(uint8 value)
 {
-    this->WriteBuffer(&value, sizeof(uint8));
+    WriteBuffer(&value, sizeof(uint8));
 }
 
 inline void LLBC_Stream::WriteSint16(sint16 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteUInt16(uint16 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteSInt32(sint32 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteUInt32(uint32 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteSInt64(sint64 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteUInt64(uint64 value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteLong(long value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteULong(ulong value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteFloat(float value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WriteDouble(double value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline void LLBC_Stream::WritePtr(const void *value)
 {
-    this->WriteRawType(value);
+    WriteRawType(value);
 }
 
 inline LLBC_Stream &LLBC_Stream::operator =(const LLBC_Stream &rhs)
 {
-    this->Assign(rhs);
+    Assign(rhs);
     return *this;
 }
 
 template <typename T>
 inline bool LLBC_Stream::ReadRawType(T &value)
 {
-    if (!this->ReadBuffer(&value, sizeof(T)))
+    if (!ReadBuffer(&value, sizeof(T)))
         return false;
 
     if (_endian != LLBC_MachineEndian)
@@ -674,11 +679,11 @@ template <typename T>
 inline void LLBC_Stream::WriteRawType(const T &value)
 {
     if (_endian == LLBC_MachineEndian)
-        this->WriteBuffer(&value, sizeof(T));
+        WriteBuffer(&value, sizeof(T));
     else
     {
         const T reversedVal = LLBC_ReverseBytes2(value);
-        this->WriteBuffer(&reversedVal, sizeof(T));
+        WriteBuffer(&reversedVal, sizeof(T));
     }
 }
 
