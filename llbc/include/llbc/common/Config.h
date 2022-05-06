@@ -43,6 +43,12 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
+ * \brief Common about config options define.
+ */
+// The stream object auto resize increment limit, in bytes.
+#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          256
+
+/**
  * \brief core/algo about config options define.
  */
 // Define RingBuffer init capacity.

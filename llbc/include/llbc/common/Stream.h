@@ -659,6 +659,8 @@ public:
     LLBC_Stream &operator =(const LLBC_Stream &rhs);
 
 private:
+    void AutoResize(size_t needSize);
+
     template <typename T>
     bool ReadRawType(T &value);
     
