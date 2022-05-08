@@ -25,7 +25,7 @@
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/MethodTable.h"
 
-class LLBC_HIDDEN pyllbc_Module
+class pyllbc_Module
 {
     typedef pyllbc_Module This;
 

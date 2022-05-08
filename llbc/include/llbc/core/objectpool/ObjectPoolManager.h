@@ -83,7 +83,7 @@ public:
 
     /**
      * Get current thread unsafety object pool, thread must be LLBC style thread.
-     * @return LLBC_UnsafetyObjectPool * - safety object-pool pointer.
+     * @return LLBC_UnsafetyObjectPool * - unsafety object-pool pointer.
      */
     static LLBC_UnsafetyObjectPool *GetCurThreadUnsafetyObjectPool();
 };

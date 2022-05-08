@@ -996,16 +996,6 @@ inline LLBC_String LLBC_Variant::ToString() const
     return strRepr;
 }
 
-inline void LLBC_Variant::SerializeEx(LLBC_Stream &stream) const
-{
-    Serialize(stream);
-}
-
-inline bool LLBC_Variant::DeSerializeEx(LLBC_Stream &stream)
-{
-    return DeSerialize(stream);
-}
-
 inline void LLBC_Variant::CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty)
 {
 }

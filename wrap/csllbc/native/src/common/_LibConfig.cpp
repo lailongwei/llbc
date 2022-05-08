@@ -40,7 +40,7 @@ int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
 
 int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(sint64 notConfigUse, int len)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE ), len);
+    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), len);
     LLBC_MemCpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
 
     return writable;

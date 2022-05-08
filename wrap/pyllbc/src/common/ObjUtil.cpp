@@ -271,13 +271,16 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
 
             if (PyDict_SetItem(pyDict, pyKey, pyValue) != 0) // No steal reference.
             {
-                Py_DECREF(pyKey);
                 Py_DECREF(pyValue);
+                Py_DECREF(pyKey);
                 Py_DECREF(pyDict);
                 pyllbc_TransferPyError("When set item to dict");
 
                 return nullptr;
             }
+
+            Py_DECREF(pyValue);
+            Py_DECREF(pyKey);
         }
 
         return pyDict;

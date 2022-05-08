@@ -46,21 +46,9 @@
         return __r_failRet;                                     \
     }                                                           \
 
-// DeSerializeEx macro define.
-#define LLBC_STREAM_READ_EX(field)                              \
-    if (!__r_stream.ReadEx(field)) {                            \
-        return __r_failRet;                                     \
-    }                                                           \
-
 // Peek macro define.
 #define LLBC_STREAM_PEEK(field)                                 \
     if (!__r_stream.Peek(field)) {                              \
-        return __r_failRet;                                     \
-    }                                                           \
-
-// PeekEx macro define.
-#define LLBC_STREAM_PEEK_EX(field)                              \
-    if (!__r_stream.PeekEx(field)) {                            \
         return __r_failRet;                                     \
     }                                                           \
 
@@ -93,10 +81,6 @@
 #define LLBC_STREAM_WRITE_BUF(buf, len)                         \
     __w_stream.WriteBuffer(buf, len)                            \
 
-// SerializeEx macro define.
-#define LLBC_STREAM_WRITE_EX(field)                             \
-    __w_stream.WriteEx(field)                                   \
-
 // Fill macro define ,use to fill some null bytes to stream.
 #define LLBC_STREAM_FILL(size)                                  \
     __w_stream.Fill(size)                                       \
@@ -110,6 +94,7 @@
 #define LLBC_STREAM_END_WRITE_RET(retVal)                       \
     } while(0);                                                 \
     return (retVal)                                             \
+
 
 __LLBC_NS_BEGIN
 
@@ -252,6 +237,13 @@ public:
     size_t GetSize() const;
 
     /**
+     * @brief Get available buffer size.
+     * 
+     * @return size_t - available size.
+     */
+    size_t GetAvailableSize() const;
+
+    /**
      * Get current buffer pointer.
      * @return void * - current buffer pointer.
      */
@@ -285,13 +277,6 @@ public:
     void Replace(size_t n0, size_t n1, const void *buf, size_t len);
 
     /**
-     * Write buffer data to stream.
-     * @param[in] buf - buffer pointer.
-     * @param[in] len - buffer size, in bytes.
-     */
-    void WriteBuffer(const void *buf, size_t len);
-
-    /**
      * Read buffer data from stream.
      * @param[out] buf  - buffer pointer.
      * @param[in]  size - require read size, in bytes.
@@ -300,235 +285,13 @@ public:
     bool ReadBuffer(void *buf, size_t size);
 
     /**
-     * Write template function, will automatch functio to write, if
-     * this class exist Serialize method, will call Serialize method
-     * to write, else use WriteBuffer(&obj, sizeof(obj)).
-     * @param[in] obj - will serialize's object(can be set to any type's object).
+     * Write buffer data to stream.
+     * @param[in] buf - buffer pointer.
+     * @param[in] len - buffer size, in bytes.
      */
-    template <typename T>
-    void Write(const T &obj)
-    {
-        this->write_data<T>(obj, 0);
-    }
+    void WriteBuffer(const void *buf, size_t len);
 
-    /**
-     * T::Serialize method impl.
-     */
-    template <typename T, void (T::*)(LLBC_Stream &) const>
-    struct serializable_type;
-    template <typename T>
-    void write_data(const T &obj, serializable_type<T, &T::Serialize> *)
-    {
-        obj.Serialize(*this);
-    }
-
-    /**
-     * T::SerializeToArray method impl.
-     */
-    template <typename T, bool (T::*)() const, int (T::*)() const>
-    class protobuf_type;
-    template <typename T>
-    void write_data(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
-    {
-        // Check initialized first.
-        obj.CheckInitialized();
-
-        // Resize Stream.
-        size_t needSize = static_cast<size_t>(obj.ByteSize());
-        if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)));
-
-        Write(static_cast<uint32>(needSize));
-        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
-        _pos += needSize;
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * Adapted pair container, like: map.
-     */
-    template <typename T, typename T::iterator (T::*)(typename T::iterator, const std::pair<const typename T::key_type, typename T::referent_type> &)>
-    struct adapted_stl_pair_write_fun;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * Adapted non-pair container, like: vector, list, deque(not include queue, stack).
-     * adapt insert() function.
-     */
-    template <typename T, typename T::iterator (T::*)(typename T::iterator, const typename T::value_type &)>
-    struct adapted_stl_non_pair_write_fun;
-#else // LLBC_TARGET_PLATFORM_WIN32
-    /**
-     * Adapted non-pair container, like: vector, list, deque(not include queue, stack, set).
-     * adapt const version begin() and non-const begin() functions.
-     */
-    template <typename T, typename T::iterator (T::*)(), typename T::const_iterator (T::*)() const>
-    struct adapted_stl_non_pair_write_fun;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * Adapted stl container type.
-     */
-    template <typename T>
-    void write_data(const T &obj, ...)
-    {
-        return this->adapt_write_data<T>(obj, 0);
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32 
-    /**
-     * STL container pair type write method impl.
-     */
-    template <typename T>
-    void adapt_write_data(const T &obj, adapted_stl_pair_write_fun<T, &T::insert> *)
-    {
-        this->Write<uint32>(static_cast<uint32>(obj.size()));
-        typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); ++iter)
-        {
-            typedef typename T::key_type KeyType;
-            typedef typename T::referent_type ValType;
-            
-            const KeyType &key = iter->first;
-            this->Write<KeyType>(key);
-
-            const ValType &val = iter->second;
-            this->Write<ValType>(val);
-        }
-    }
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * STL container non-pair type write method impl.
-     */
-    template <typename T>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    void adapt_write_data(const T &obj, adapted_stl_non_pair_write_fun<T, &T::insert> *)
-#else
-    void adapt_write_data(const T &obj, adapted_stl_non_pair_write_fun<T, &T::begin, &T::end> *)
-#endif
-    {
-        this->Write<uint32>(static_cast<uint32>(obj.size()));
-        typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); ++iter)
-        {
-            typedef typename T::value_type ElemType;
-
-            const ElemType &elem = *iter;
-            this->Write<ElemType>(elem);
-        }
-    }
-
-    /**
-     * Raw type write method impl.
-     */
-    template <typename T>
-    void adapt_write_data(const T &obj, ...)
-    {
-        this->WriteBuffer(&obj, sizeof(obj));
-    }
-
-    /**
-     * Write template function, will automatch function to write, see Write
-     * method, but math method name is SerializeEx.
-     * @param[in] obj - will serialize's object.
-     */
-    template <typename T>
-    void WriteEx(const T &obj)
-    {
-        this->write_data_ex<T>(obj, 0);
-    }
-
-    /**
-     * T::SerializeEx method impl.
-     */
-    template <typename T>
-    void write_data_ex(const T &obj, serializable_type<T, &T::SerializeEx> *)
-    {
-        obj.SerializeEx(*this);
-    }
-
-    /**
-     * T::SerializeToString method impl.
-     */
-    template <typename T>
-    void write_data_ex(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
-    {
-        // Check initialized first.
-        obj.CheckInitialized();
-
-        // Resize Stream.
-        size_t needSize = static_cast<size_t>(obj.ByteSize());
-        if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)));
-
-        Write(static_cast<uint32>(needSize));
-        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
-        _pos += needSize;
-    }
-
-    /**
-     * Adapted stl container type.
-     */
-    template <typename T>
-    void write_data_ex(const T &obj, ...)
-    {
-        return this->adapt_write_data_ex<T>(obj, 0);
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * STL container pair type writeex method impl.
-     */
-    template <typename T>
-    void adapt_write_data_ex(const T &obj, adapted_stl_pair_write_fun<T, &T::insert> *)
-    {
-        this->WriteEx<uint32>(static_cast<uint32>(obj.size()));
-        typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); ++iter)
-        {
-            typedef typename T::key_type KeyType;
-            typedef typename T::referent_type ValType;
-
-            const KeyType &key = iter->first;
-            this->WriteEx<KeyType>(key);
-
-            const ValType &val = iter->second;
-            this->WriteEx<ValType>(val);
-        }
-    }
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * STL container non-pair type writeex method impl.
-     */
-    template <typename T>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    void adapt_write_data_ex(const T &obj, adapted_stl_non_pair_write_fun<T, &T::insert> *)
-#else
-    void adapt_write_data_ex(const T &obj, adapted_stl_non_pair_write_fun<T, &T::begin, &T::end> *)
-#endif
-    {
-        this->WriteEx<uint32>(static_cast<uint32>(obj.size()));
-        typename T::const_iterator iter = obj.begin();
-        for (; iter != obj.end(); ++iter)
-        {
-            typedef typename T::value_type ElemType;
-
-            const ElemType &elem = *iter;
-            this->WriteEx<ElemType>(elem);
-        }
-    }
-
-    /**
-     * Raw type writeex method impl.
-     */
-    template <typename T>
-    void adapt_write_data_ex(const T&obj, ...)
-    {
-        this->WriteBuffer(&obj, sizeof(obj));
-    }
-
+public:
     /**
      * Read template function, will automatch function to read, if this class
      * exist DeSerialize method, will call DeSerialize method to read, otherwise
@@ -539,167 +302,39 @@ public:
     template <typename T>
     bool Read(T &obj)
     {
-        return this->read_data<T>(obj, 0);
+        return ReadImpl<T>(obj, 0);
     }
 
+private:
     /**
-     * T::DeSerialize method impl.
+     * Try adapt T::DeSerialize.
      */
     template <typename T, bool (T::*)(LLBC_Stream &)>
-    struct deserializable_type;
+    struct upper_camel_case_deserializable_type;
     template <typename T>
-    bool read_data(T &obj, deserializable_type<T, &T::DeSerialize> *)
+    bool ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::DeSerialize> *)
     {
         return obj.DeSerialize(*this);
     }
 
     /**
-     * T::ParseFrommArray ethod impl.
+     * Try adapt T::deserialize.
      */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct lower_camel_case_deserializable_type;
     template <typename T>
-    bool read_data(T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
+    bool ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *)
     {
-        uint32 pbDataSize;
-        if (UNLIKELY(Read(pbDataSize) == false))
-            return false;
-
-        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
-        if (!ret)
-            return false;
-
-        _pos += pbDataSize;
-        return true;
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * Adapted pair container, like: map.
-     */
-    template <typename T, typename T::iterator (T::*)(typename T::iterator, const std::pair<const typename T::key_type, typename T::referent_type> &)>
-    struct adapted_stl_pair_read_fun;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * Adapted non-pair container, like: vector, list, deque(not include queue, stack).
-     * adapt insert() function.
-     */
-    template <typename T, typename T::iterator (T::*)(typename T::iterator, const typename T::value_type &)>
-    struct adapted_stl_non_pair_read_fun;
-#else // LLBC_TARGET_PLATFORM_WIN32.
-    /**
-     * Adapted non-pair container, like: vector, list, deque(not include queue, stack, set).
-     * adapt const version begin() and non-const begin() functions.
-     */
-    template <typename T, typename T::iterator (T::*)(), typename T::const_iterator (T::*)() const>
-    struct adapted_stl_non_pair_read_fun;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * Adapted stl container type.
-     */
-    template <typename T>
-    bool read_data(T &obj, ...)
-    {
-        return this->adapt_read_data<T>(obj, 0);
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * STL container pair type read method impl.
-     */
-    template <typename T>
-    bool adapt_read_data(T &obj, adapted_stl_pair_read_fun<T, &T::insert> *)
-    {
-        obj.clear();
-
-        uint32 count;
-        if (!this->Read<uint32>(count))
-            return false;
-
-        typedef typename T::key_type KeyType;
-        typedef typename T::referent_type ValType;
-        for (uint32 i = 0; i < count; ++i)
-        {
-            KeyType key;
-            if (!this->Read<KeyType>(key))
-                return false;
-
-            ValType val;
-            if (!this->Read<ValType>(val))
-                return false;
-
-            obj.insert(std::make_pair(key, val));
-        }
-
-        return true;
-    }
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * STL container non-pair type read method impl.
-     */
-    template <typename T>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    bool adapt_read_data(T &obj, adapted_stl_non_pair_read_fun<T, &T::insert> *)
-#else
-    bool adapt_read_data(T &obj, adapted_stl_non_pair_read_fun<T, &T::begin, &T::end> *)
-#endif
-    {
-        obj.clear();
-
-        uint32 count;
-        if (!this->Read<uint32>(count))
-            return false;
-
-        for (uint32 i = 0; i < count; ++i)
-        {
-            typedef typename T::value_type ElemType;
-
-            ElemType elem;
-            if (!this->Read<ElemType>(elem))
-                return false;
-
-            obj.insert(obj.end(), elem);
-        }
-
-        return true;
+        return obj.deserialize(*this);
     }
 
     /**
-     * Raw type read method impl.
+     * Try adapt T::ParseFrommArray(protobuf message obj).
      */
+    template <typename T, bool (T::*)() const, int (T::*)() const>
+    class protobuf_type;
     template <typename T>
-    bool adapt_read_data(T &obj, ...)
-    {
-        if (_size >= _pos + sizeof(T))
-            return this->ReadBuffer(&obj, sizeof(T));
-
-        return false;
-    }
-
-    /**
-     * Read template function, like Read() function, but automatch function is
-     * DeSerializeEx, see Read() function brief
-     * @param[out] obj - will deserialize's object.
-     * @return bool - return true if successed, otherwise return false.
-     */
-    template <typename T>
-    bool ReadEx(T &obj)
-    {
-        return this->read_data_ex<T>(obj, 0);
-    }
-
-    /**
-     * T::DeSerializeEx method impl.
-     */
-    template <typename T>
-    bool read_data_ex(T &obj, deserializable_type<T, &T::DeSerializeEx> *)
-    {
-        return obj.DeSerializeEx(*this);
-    }
-
-    template <typename T>
-    bool read_data_ex(T &obj,  protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
+    bool ReadImpl(T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
     {
         uint32 pbDataSize;
         if (UNLIKELY(Read(pbDataSize) == false))
@@ -714,88 +349,213 @@ public:
     }
 
     /**
-     * Adapted stl container type.
+     * Try adapt STL unsorted unary container(std::list/std::vector/std::deque/...).
      */
+    template <typename T, 
+              void (T::*)(const typename T::value_type &),
+              void (T::*)(typename T::size_type)>
+    struct stl_unsorted_unary_container;
     template <typename T>
-    bool read_data_ex(T &obj, ...)
+    bool ReadImpl(T &obj, stl_unsorted_unary_container<T, &T::push_back, &T::resize> *)
     {
-        return this->adapt_read_data_ex<T>(obj, 0);
-    }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    /**
-     * STL container pair type readex method impl.
-     */
-    template <typename T>
-    bool adapt_read_data_ex(T &obj, adapted_stl_pair_read_fun<T, &T::insert> *)
-    {
-        obj.clear();
-
         uint32 count;
-        if (!this->ReadEx<uint32>(count))
+        if (!Read(count))
             return false;
 
-        typedef typename T::key_type KeyType;
-        typedef typename T::referent_type ValType;
-        for (uint32 i = 0; i < count; ++i)
-        {
-            KeyType key;
-            if (!this->ReadEx<KeyType>(key))
-                return false;
-
-            ValType val;
-            if (!this->ReadEx<ValType>(val))
-                return false;
-
-            obj.insert(std::make_pair(key, val));
-        }
-
-        return true;
-    }
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    /**
-     * STL container non-pair type readex method impl.
-     */
-    template <typename T>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    bool adapt_read_data_ex(T &obj, adapted_stl_non_pair_read_fun<T, &T::insert> *)
-#else
-    bool adapt_read_data_ex(T &obj, adapted_stl_non_pair_read_fun<T, &T::begin, &T::end> *)
-#endif
-    {
         obj.clear();
+        if (count == 0)
+            return true;
 
-        uint32 count;
-        if (!this->ReadEx<uint32>(count))
-            return false;
-
+        typename T::value_type val;
         for (uint32 i = 0; i < count; ++i)
         {
-            typedef typename T::value_type ElemType;
-
-            ElemType elem;
-            if (!this->ReadEx<ElemType>(elem))
+            if (!Read(val))
                 return false;
 
-            obj.insert(obj.end(), elem);
+            obj.emplace_back(val);
         }
 
         return true;
     }
 
     /**
-     * Raw type readex method impl.
+     * Try adapt STL sorted unary container(std::set/std::unordered_set/...).
      */
     template <typename T>
-    bool adapt_read_data_ex(T &obj, ...)
+    typename std::enable_if<std::is_same<typename T::key_type,
+                                         typename T::value_type>::value,
+                            bool>::type
+    ReadImpl(T &obj, T *)
+    {
+        uint32 count;
+        if (!Read(count))
+            return false;
+
+        obj.clear();
+        if (count == 0)
+            return true;
+
+        typename T::key_type key;
+        for (uint32 i = 0; i < count; ++i)
+        {
+            if (!Read(key))
+                return false;
+
+            obj.emplace(key);
+        }
+
+        return true;
+    }
+
+    /**
+     * Try adapt STL binary container.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_same<typename T::value_type,
+                                         std::pair<const typename T::key_type, typename T::mapped_type>>::value,
+                            bool>::type
+    ReadImpl(T &obj, T *)
+    {
+        uint32 count;
+        if (!Read(count))
+            return false;
+
+        obj.clear();
+        if (count == 0)
+            return true;
+
+        typename T::key_type key;
+        typename T::mapped_type mapped;
+        for (uint32 i = 0; i < count; ++i)
+        {
+            if (!Read(key) ||
+                !Read(mapped))
+                return false;
+
+            obj.emplace(key, mapped);
+        }
+
+        return true;
+    }
+
+    /**
+     * Final Read implement: memcpy obj memory.
+     */
+    template <typename T>
+    bool ReadImpl(T &obj, ...)
     {
         if (_size >= _pos + sizeof(T))
-            return this->ReadBuffer(&obj, sizeof(T));
+            return ReadBuffer(&obj, sizeof(T));
 
         return false;
     }
 
+public:
+    /**
+     * Write template function, will automatch functio to write, if
+     * this class exist Serialize method, will call Serialize method
+     * to write, else use WriteBuffer(&obj, sizeof(obj)).
+     * @param[in] obj - will serialize's object(can be set to any type's object).
+     */
+    template <typename T>
+    void Write(const T &obj)
+    {
+        WriteImpl<T>(obj, 0);
+    }
+
+private:
+    /**
+     * Try adapt T::Serialize.
+     */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct upper_camel_case_serializable_type;
+    template <typename T>
+    void WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
+    {
+        obj.Serialize(*this);
+    }
+
+    /**
+     * Try adapt T::serialize.
+     */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct lower_camel_case_serializable_type;
+    template <typename T>
+    void WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
+    {
+        obj.serialize(*this);
+    }
+    /**
+     * Try adapt T::SerializeToArray(protobuf message object).
+     */
+    template <typename T>
+    void WriteImpl(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
+    {
+        // Check initialized first.
+        obj.CheckInitialized();
+
+        // Resize Stream.
+        size_t needSize = static_cast<size_t>(obj.ByteSize());
+        if ((_size - _pos) < needSize + sizeof(uint32))
+            Resize(_size + (needSize + sizeof(uint32)));
+
+        Write(static_cast<uint32>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
+        _pos += needSize;
+    }
+
+    /**
+     * Try adapt STL unsorted unary container(std::list/std::vector/std::deque/...).
+     */
+    template <typename T>
+    void WriteImpl(const T &obj, stl_unsorted_unary_container<T, &T::push_back, &T::resize> *)
+    {
+        Write(static_cast<uint32>(obj.size()));
+        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
+            Write(*it);
+    }
+
+    /**
+     * Try adapt STL sorted unary container(std::set, std::unordered_set/...).
+     */
+    template <typename T>
+    typename std::enable_if<std::is_same<typename T::key_type,
+                                         typename T::value_type>::value,
+                            void>::type
+    WriteImpl(const T &obj, T *)
+    {
+        Write(static_cast<uint32>(obj.size()));
+        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
+            Write(*it);
+    }
+
+    /**
+     * Try adapt STL binary container(std::map/std::unordered_map/...).
+     */
+    template <typename T>
+    typename std::enable_if<std::is_same<typename T::value_type,
+                                         std::pair<const typename T::key_type, typename T::mapped_type> >::value,
+                            void>::type
+    WriteImpl(const T &obj, T *)
+    {
+        Write(static_cast<uint32>(obj.size()));
+        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
+        {
+            Write(it->first);
+            Write(it->second);
+        }
+    }
+
+    /**
+     * Final write implement: memcpy obj memory.
+     */
+    template <typename T>
+    void WriteImpl(const T &obj, ...)
+    {
+        WriteBuffer(&obj, sizeof(obj));
+    }
+
+public:
     /**
      * Peek data[use Read()], but don't modify stream object.
      * @param[out] obj - will deserialize's object.
@@ -805,23 +565,8 @@ public:
     bool Peek(T &obj)
     {
         size_t oldPos = _pos;
-        bool ret = Read<T>(obj);
-        this->SetPos(oldPos);
-
-        return ret;
-    }
-
-    /**
-     * Peek data[use ReadEx()], but don't modify stream object.
-     * @param[out] obj - will deserialize's object.
-     * @return bool - return true if successed, otherwise return false.
-     */
-    template <typename T>
-    bool PeekEx(T &obj)
-    {
-        size_t oldPos = _pos;
-        bool ret = ReadEx<T>(obj);
-        this->SetPos(oldPos);
+        bool ret = Read(obj);
+        SetPos(oldPos);
 
         return ret;
     }
@@ -833,7 +578,7 @@ public:
     template<typename T>
     LLBC_Stream &operator >>(T &val)
     {
-        this->Read(val);
+        Read(val);
         return *this;
     }
 
@@ -844,7 +589,7 @@ public:
     template<typename T>
     LLBC_Stream &operator <<(const T &val)
     {
-        this->Write(val);
+        Write(val);
         return *this;
     }
 
@@ -914,6 +659,8 @@ public:
     LLBC_Stream &operator =(const LLBC_Stream &rhs);
 
 private:
+    void AutoResize(size_t needSize);
+
     template <typename T>
     bool ReadRawType(T &value);
     

@@ -43,6 +43,12 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 
 /**
+ * \brief Common about config options define.
+ */
+// The stream object auto resize increment limit, in bytes.
+#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          256
+
+/**
  * \brief core/algo about config options define.
  */
 // Define RingBuffer init capacity.
@@ -174,7 +180,7 @@
 #endif
 // Object pool debug option.
 #define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (1 || LLBC_DEBUG)
-// Object reset metch methods control.
+// Object reset match methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1

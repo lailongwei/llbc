@@ -104,7 +104,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         return -1;
     }
     LLBC_PrintLine("GBK->UTF8 consvert successed, utf8 binary view: %s", 
-        LLBC_Byte2Hex(utf8Str.c_str(), utf8Str.length()).c_str() );
+        LLBC_Byte2Hex(utf8Str.c_str(), utf8Str.length()).c_str());
     // Test GBK->UTF16.
     LLBC_WString utf16Str;
     if(LLBC_Transcoder::MultiByteToWideChar("GBK", gbkStr, utf16Str) != LLBC_OK)
@@ -113,7 +113,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         return -1;
     }
     LLBC_PrintLine("GBK->UTF16 convert successed, utf16 binary view: %s",
-        LLBC_Byte2Hex(utf16Str.data(), utf16Str.size() * sizeof(wchar)).c_str() );
+        LLBC_Byte2Hex(utf16Str.data(), utf16Str.size() * sizeof(wchar)).c_str());
 
     // Test UTF8->GBK.
     if(LLBC_Transcoder::MultiByteToMultiByte("UTF-8", utf8Str, "GBK", gbkStr) != LLBC_OK)
@@ -122,7 +122,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         return -1;
     }
     LLBC_PrintLine("UTF8->GBK convert successed, gbk binary view: %s",
-        LLBC_Byte2Hex(gbkStr.c_str(), gbkStr.length()).c_str() );
+        LLBC_Byte2Hex(gbkStr.c_str(), gbkStr.length()).c_str());
     // Test UTF8->UTF16.
     if(LLBC_Transcoder::MultiByteToWideChar("UTF8", utf8Str, utf16Str) != LLBC_OK)
     {
@@ -130,7 +130,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
         return -1;
     }
     LLBC_PrintLine("UTF8->UTF16-LE convert successed, utf16 binary view: %s",
-        LLBC_Byte2Hex(utf16Str.c_str(), utf16Str.length() * sizeof(wchar)).c_str() );
+        LLBC_Byte2Hex(utf16Str.c_str(), utf16Str.length() * sizeof(wchar)).c_str());
 
     return 0;
 }

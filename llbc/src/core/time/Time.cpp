@@ -355,7 +355,7 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::FromHHMMSS(hour,
+    return GetIntervalTo(LLBC_TimeSpan::FromHours(hour,
                          minute, 
                          second, 
                          milliSecond, 
@@ -415,18 +415,6 @@ bool LLBC_Time::DeSerialize(LLBC_Stream &stream)
 {
     sint64 timeVal = 0;
     if (!stream.Read(timeVal))
-        return false;
-
-    _time = timeVal;
-    UpdateTimeStructs();
-
-    return true;
-}
-
-bool LLBC_Time::DeSerializeEx(LLBC_Stream &stream)
-{
-    sint64 timeVal = 0;
-    if (!stream.ReadEx(timeVal))
         return false;
 
     _time = timeVal;

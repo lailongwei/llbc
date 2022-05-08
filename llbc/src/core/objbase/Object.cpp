@@ -117,20 +117,6 @@ bool LLBC_Object::DeSerialize(LLBC_Stream &s)
     return true;
 }
 
-void LLBC_Object::SerializeEx(LLBC_Stream &s) const
-{
-    // Do nothing.
-    // ... ...
-}
-
-bool LLBC_Object::DeSerializeEx(LLBC_Stream &s)
-{
-    // Do nothing.
-    // ... ...
-
-    return true;
-}
-
 __LLBC_NS_END
 
 #include "llbc/common/AfterIncl.h"

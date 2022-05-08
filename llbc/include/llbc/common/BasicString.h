@@ -275,6 +275,12 @@ public:
         return _Base::at(off);
     }
 
+    // resize
+    void resize(size_type count)
+    {
+        _Base::resize(count);
+    }
+
     // append operations.
     _This &append(const _Base &str)
     {
@@ -1468,57 +1474,24 @@ public:
     }
 
 public:
-    void Serialize(LLBC_Stream &stream) const
+    void serialize(LLBC_Stream &stream) const
     {
-        if (!_Base::empty())
-            stream.WriteBuffer(_Base::data(), _Base::size() * sizeof(_Elem));
-
-        const _Elem nullElem = _Elem(0);
-        stream.WriteBuffer(&nullElem, sizeof(_Elem));
+        stream.Write(static_cast<uint32>(this->size()));
+        stream.WriteBuffer(_Base::data(), _Base::size() * sizeof(_Elem));
     }
 
-    bool DeSerialize(LLBC_Stream &stream)
+    bool deserialize(LLBC_Stream &stream)
     {
-        _Base::clear();
-
-        if (stream.GetSize() - stream.GetPos() == 0)
+        uint32 len;
+        if (!stream.Read(len))
             return false;
 
-        const _Elem nullElem = _Elem(0);
-
-        _Elem elem = _Elem();
-        while (stream.Read(elem))
-        {
-            if (elem == nullElem)
-                return true;
-
-            this->append(1, elem);
-        }
-
-        return true;
-    }
-
-    void SerializeEx(LLBC_Stream &stream) const
-    {
-        LLBC_STREAM_BEGIN_WRITE(stream);
-
-        LLBC_STREAM_WRITE_EX(static_cast<uint32>(this->size() * sizeof(_Elem)));
-        LLBC_STREAM_WRITE_BUF(this->data(), this->size() * sizeof(_Elem));
-
-        LLBC_STREAM_END_WRITE();
-    }
-
-    bool DeSerializeEx(LLBC_Stream &stream)
-    {
-        LLBC_STREAM_BEGIN_READ(stream, bool, false);
-
-        uint32 len = 0;
-        LLBC_STREAM_READ_EX(len);
+        _Base::clear();
+        if (len == 0)
+            return true;
 
         this->resize(len);
-        LLBC_STREAM_READ_BUF(const_cast<_Elem *>(this->data()), this->size() * sizeof(_Elem));
-
-        LLBC_STREAM_END_READ_RET(true);
+        return stream.ReadBuffer(const_cast<char *>(this->data()), sizeof(_Elem) * this->size());
     }
 
 private:
