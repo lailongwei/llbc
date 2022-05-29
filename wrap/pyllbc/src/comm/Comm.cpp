@@ -98,6 +98,10 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.GetServiceFPS);
     inlMod->AddMethod(methods.SetServiceFPS);
     inlMod->AddMethod(methods.GetServiceFrameInterval);
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+     inlMod->AddMethod(methods.GetServiceFrameTimeout);
+     inlMod->AddMethod(methods.SetServiceFrameTimeout);
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     inlMod->AddMethod(methods.SuppressServiceCoderNotFoundWarning);
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);

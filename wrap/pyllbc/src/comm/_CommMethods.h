@@ -298,6 +298,16 @@ public:
         GetServiceFrameInterval.ml_meth = (PyCFunction)_pyllbc_GetServiceFrameInterval;
         GetServiceFrameInterval.ml_flags = METH_VARARGS;
         GetServiceFrameInterval.ml_doc = "pyllbc library method/function";
+        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+         GetServiceFrameTimeout.ml_name = "GetServiceFrameTimeout";
+         GetServiceFrameTimeout.ml_meth = (PyCFunction)_pyllbc_GetServiceFrameTimeout;
+         GetServiceFrameTimeout.ml_flags = METH_VARARGS;
+         GetServiceFrameTimeout.ml_doc = "pyllbc library method/function";
+         SetServiceFrameTimeout.ml_name = "SetServiceFrameTimeout";
+         SetServiceFrameTimeout.ml_meth = (PyCFunction)_pyllbc_SetServiceFrameTimeout;
+         SetServiceFrameTimeout.ml_flags = METH_VARARGS;
+         SetServiceFrameTimeout.ml_doc = "pyllbc library method/function";
+        #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
         Subscribe.ml_name = "Subscribe";
         Subscribe.ml_meth = (PyCFunction)_pyllbc_Subscribe;
         Subscribe.ml_flags = METH_VARARGS;
@@ -370,6 +380,10 @@ public:
     ::PyMethodDef PyTimerIsScheduling;
     ::PyMethodDef RegisterComponent;
     ::PyMethodDef GetServiceFrameInterval;
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+     ::PyMethodDef GetServiceFrameTimeout;
+     ::PyMethodDef SetServiceFrameTimeout;
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     ::PyMethodDef Subscribe;
 };
 

@@ -79,12 +79,16 @@ int TestCase_Comm_SvcFrameTimeout::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Service FrameTimeout test:");
 
-    LLBC_IService *fpsTestSvc = LLBC_IService::Create(LLBC_IService::Normal, "FrameTimeoutService");
-    fpsTestSvc->RegisterComponent(LLBC_New(TestComp));
-    const auto frameTimeout = LLBC_TimeSpan::FromMicros(1000);
-    fpsTestSvc->SetFrameTimeout(frameTimeout);
+    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+     LLBC_IService *fpsTestSvc = LLBC_IService::Create(LLBC_IService::Normal, "FrameTimeoutService");
+     fpsTestSvc->RegisterComponent(LLBC_New(TestComp));
+     const auto frameTimeout = LLBC_TimeSpan::FromMicroSeconds(1000);
+     fpsTestSvc->SetFrameTimeout(frameTimeout);
 
-    fpsTestSvc->Start();
+     fpsTestSvc->Start();
+    #else
+     LLBC_PrintLine("llbc frame time out feature not open.");
+    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
     LLBC_PrintLine("Press any key to continue...");
     getchar();

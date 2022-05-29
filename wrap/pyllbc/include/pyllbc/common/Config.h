@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2022-01-10 10:29:52
- * @LastEditTime: 2022-03-04 11:03:02
- * @LastEditors: Please set LastEditors
- * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- * @FilePath: \llbc\wrap\pyllbc\include\pyllbc\common\Config.h
- */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>

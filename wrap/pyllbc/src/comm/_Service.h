@@ -121,6 +121,30 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFrameInterval(PyObject *self, PyObject
     return PyFloat_FromDouble(svc->GetFrameInterval() / 1000.0);
 }
 
+#if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFrameTimeout(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    if (!PyArg_ParseTuple(args, "l", &svc))
+        return nullptr;
+
+    return PyFloat_FromDouble(static_cast<double>(svc->GetFrameTimeout().GetTotalMicroSeconds()));
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_SetServiceFrameTimeout(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    uint64 frameTimeout = LLBC_INFINITE;
+
+    if (!PyArg_ParseTuple(args, "l|i", &svc, &frameTimeout))
+        return nullptr;
+
+    svc->SetFrameTimeout(LLBC_TimeSpan::FromMicroSeconds(frameTimeout));
+
+    Py_RETURN_NONE;
+}
+#endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+
 LLBC_EXTERN_C PyObject *_pyllbc_SuppressServiceCoderNotFoundWarning(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;

@@ -223,6 +223,11 @@ class pyllbcService(object):
         self._fps = llbc.inl.GetServiceFPS(cobj)
         self._frameinterval = llbc.inl.GetServiceFrameInterval(cobj)
 
+        if hasattr(llbc.inl, 'GetServiceFrameTimeout') and callable(llbc.inl.GetServiceFrameTimeout):
+            self._frame_timeout = llbc.inl.GetServiceFrameTimeout(cobj)
+        else
+            self._frame_timeout = None
+
         self._last_schedule_time = 0
         self._started = False
 
@@ -277,9 +282,25 @@ class pyllbcService(object):
         self._fps = newfps
         self._frameinterval = llbc.inl.GetServiceFrameInterval(self._c_obj)
 
+        if self._frame_timeout is not None:
+            in_microseconds = self._frameInterval * 1000000
+            if self._frame_timeout < in_microseconds:
+                self._frame_timeout = in_microseconds
+                llbc.inl.SetServiceFrameTimeout(self._c_obj, self._frame_timeout)
+
     @property
     def frameinterval(self):
         return self._frameinterval
+
+    @property
+    def frametimeout(self):
+        return self._frame_timeout
+
+    @frametimeout.setter
+    def frametimeout(self, new_frame_timeout):
+        llbc.inl.SetServiceFrameTimeout(self._c_obj, new_frame_timeout)
+
+        self._frame_timeout = new_frame_timeout
 
     @property
     def codec(self):

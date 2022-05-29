@@ -118,6 +118,7 @@ int csllbc_Service_GetFrameInterval(csllbc_Service *svc)
     return svc->GetFrameInterval();
 }
 
+#if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 uint64 csllbc_Service_GetFrameTimeout(csllbc_Service *svc)
 {
     return svc->GetFrameTimeout().GetTotalMilliSeconds();
@@ -125,8 +126,9 @@ uint64 csllbc_Service_GetFrameTimeout(csllbc_Service *svc)
 
 void csllbc_Service_SetFrameTimeout(csllbc_Service *svc, uint64 frameTimeout)
 {
-    svc->SetFrameTimeout(LLBC_TimeSpan::FromMillis(frameTimeout));
+    svc->SetFrameTimeout(LLBC_TimeSpan::FromMilliSeconds(frameTimeout));
 }
+#endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
 int csllbc_Service_Listen(csllbc_Service *svc, const char *ip, int port)
 {
