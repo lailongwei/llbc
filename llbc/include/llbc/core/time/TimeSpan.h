@@ -50,14 +50,12 @@ public:
     /**
      * Convenience span construct methods.
      */
-    static LLBC_TimeSpan FromSS(int seconds, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMMSS(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromHHMMSS(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromDDHHMMSS(int days, int hours = 0, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
-
-    static LLBC_TimeSpan FromMillis(sint64 millisecs);
-    static LLBC_TimeSpan FromMicros(sint64 microsecs);
-    static LLBC_TimeSpan FromMillisMicros(sint64 millisecs, sint64 microsecs = 0);
+    static LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromSeconds(int seconds, int millisecs = 0, int microsecs = 0);
+    static LLBC_TimeSpan FromMilliSeconds(sint64 millisecs, sint64 microsecs = 0);
+    static LLBC_TimeSpan FromMicroSeconds(sint64 microsecs);
 
     static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
@@ -155,9 +153,6 @@ public:
      */
     void Serialize(LLBC_Stream &stream) const;
     bool DeSerialize(LLBC_Stream &stream);
-
-    void SerializeEx(LLBC_Stream &stream) const;
-    bool DeSerializeEx(LLBC_Stream &stream);
 
 private:
     // Declare friend class:LLBC_Time.

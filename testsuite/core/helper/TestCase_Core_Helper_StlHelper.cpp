@@ -36,7 +36,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     for(sint32 i = 0; i < 10; ++i)
         vec.push_back(LLBC_New(sint8));
     LLBC_STLHelper::DeleteContainer(vec, true, true);
-    LLBC_PrintLine("after free vector, size: %lu", vec.size() );
+    LLBC_PrintLine("after free vector, size: %lu", vec.size());
 
     // List test.
     std::list<sint32 *> list;
@@ -55,12 +55,12 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     for(sint32 i = 0; i < 10; ++i)
         dq.push_back(LLBC_Malloc(sint32, sizeof(sint32)));
     LLBC_STLHelper::FreeContainer(dq);
-    LLBC_PrintLine("after free deque, size: %lu", list.size() );
+    LLBC_PrintLine("after free deque, size: %lu", list.size());
 
     for(sint32 i = 0; i < 10; ++i)
         dq.push_back(LLBC_New(sint32));
     LLBC_STLHelper::DeleteContainer(dq, true, true);
-    LLBC_PrintLine("after delete deque, size: %lu", list.size() );
+    LLBC_PrintLine("after delete deque, size: %lu", list.size());
 
     // Stack test.
     std::stack<sint32 *> stk;

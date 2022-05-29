@@ -30,31 +30,7 @@ inline std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSp
 
 __LLBC_NS_BEGIN
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromSS(int seconds, int millisecs, int microsecs)
-{
-    return LLBC_TimeSpan(seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
-                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
-                         microsecs);
-}
-
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMMSS(int minutes, int seconds, int millisecs, int microsecs)
-{
-    return LLBC_TimeSpan(minutes * LLBC_TimeConstant::NumOfMicroSecondsPerMinute +
-                         seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
-                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
-                         microsecs);
-}
-
-inline LLBC_TimeSpan LLBC_TimeSpan::FromHHMMSS(int hours, int minutes, int seconds, int millisecs, int microsecs)
-{
-    return LLBC_TimeSpan(hours * LLBC_TimeConstant::NumOfMicroSecondsPerHour +
-                         minutes * LLBC_TimeConstant::NumOfMicroSecondsPerMinute +
-                         seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
-                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
-                         microsecs);
-}
-
-inline LLBC_TimeSpan LLBC_TimeSpan::FromDDHHMMSS(int days, int hours, int minutes, int seconds, int millisecs, int microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromDays(int days, int hours, int minutes, int seconds, int millisecs, int microsecs)
 {
     return LLBC_TimeSpan(days * LLBC_TimeConstant::NumOfMicroSecondsPerDay +
                          hours * LLBC_TimeConstant::NumOfMicroSecondsPerHour +
@@ -64,20 +40,39 @@ inline LLBC_TimeSpan LLBC_TimeSpan::FromDDHHMMSS(int days, int hours, int minute
                          microsecs);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMillis(sint64 millisecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromHours(int hours, int minutes, int seconds, int millisecs, int microsecs)
 {
-    return LLBC_TimeSpan(millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond);
+    return LLBC_TimeSpan(hours * LLBC_TimeConstant::NumOfMicroSecondsPerHour +
+                         minutes * LLBC_TimeConstant::NumOfMicroSecondsPerMinute +
+                         seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
+                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
+                         microsecs);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMicros(sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMinutes(int minutes, int seconds, int millisecs, int microsecs)
 {
-    return LLBC_TimeSpan(microsecs);
+    return LLBC_TimeSpan(minutes * LLBC_TimeConstant::NumOfMicroSecondsPerMinute +
+                         seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
+                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
+                         microsecs);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMillisMicros(sint64 millisecs, sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromSeconds(int seconds, int millisecs, int microsecs)
+{
+    return LLBC_TimeSpan(seconds * LLBC_TimeConstant::NumOfMicroSecondsPerSecond +
+                         millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
+                         microsecs);
+}
+
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMilliSeconds(sint64 millisecs, sint64 microsecs)
 {
     return LLBC_TimeSpan(millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
                          microsecs);
+}
+
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMicroSeconds(sint64 microsecs)
+{
+    return LLBC_TimeSpan(microsecs);
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const LLBC_String &spanStr)
@@ -302,22 +297,6 @@ inline bool LLBC_TimeSpan::DeSerialize(LLBC_Stream &stream)
 {
     sint64 spanVal = 0;
     if (!stream.Read(spanVal))
-        return false;
-
-    _span = spanVal;
-
-    return true;
-}
-
-inline void LLBC_TimeSpan::SerializeEx(LLBC_Stream &stream) const
-{
-    stream.WriteEx(_span);
-}
-
-inline bool LLBC_TimeSpan::DeSerializeEx(LLBC_Stream &stream)
-{
-    sint64 spanVal = 0;
-    if (!stream.ReadEx(spanVal))
         return false;
 
     _span = spanVal;

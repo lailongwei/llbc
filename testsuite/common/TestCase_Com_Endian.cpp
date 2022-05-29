@@ -28,33 +28,33 @@ int TestCase_Com_Endian::Run(int argc, char *argv[])
 
     // Get machine endian type.
     LLBC_PrintLine("machine endian type: %s\n", 
-        LLBC_Endian::Type2Str( LLBC_GetMachineEndianType() ) );
+        LLBC_Endian::Type2Str(LLBC_GetMachineEndianType()));
 
     // Endian type -> Endian describe test.
     LLBC_PrintLine("LLBC_Endian::BigEndian describe: %s", 
-        LLBC_Endian::Type2Str(LLBC_Endian::BigEndian) );
+        LLBC_Endian::Type2Str(LLBC_Endian::BigEndian));
     LLBC_PrintLine("LLBC_Endian::LittleEndian describe: %s",
-        LLBC_Endian::Type2Str(LLBC_Endian::LittleEndian) );
+        LLBC_Endian::Type2Str(LLBC_Endian::LittleEndian));
     LLBC_PrintLine("LLBC_Endian::UnknownEndian describe: %s",
-        LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian) );
+        LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian));
     LLBC_PrintLine("LLBC_Endian::UnknownEndian + 300 describe: %s",
-        LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian + 300) );
+        LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian + 300));
     LLBC_PrintLine("");
 
     // Endian describe -> Endian type test.
-    LLBC_PrintLine("'big endian' type: %d", LLBC_Endian::Str2Type("big endian") );
-    LLBC_PrintLine("'little endian' type: %d", LLBC_Endian::Str2Type("little endian") );
-    LLBC_PrintLine("'unknown endian' type: %d", LLBC_Endian::Str2Type("unknown type") );
-    LLBC_PrintLine("'hello' type: %d", LLBC_Endian::Str2Type("hello") );
+    LLBC_PrintLine("'big endian' type: %d", LLBC_Endian::Str2Type("big endian"));
+    LLBC_PrintLine("'little endian' type: %d", LLBC_Endian::Str2Type("little endian"));
+    LLBC_PrintLine("'unknown endian' type: %d", LLBC_Endian::Str2Type("unknown type"));
+    LLBC_PrintLine("'hello' type: %d", LLBC_Endian::Str2Type("hello"));
     LLBC_PrintLine("");
 
     // Test host <-> net.
     int data = 0x01020304;
     LLBC_PrintLine("host to net test, host: 0x%08x, net: 0x%08x",
-        data, LLBC_Host2Net2(data) );
+        data, LLBC_Host2Net2(data));
     LLBC_Host2Net(data);
     LLBC_PrintLine("net to host test, net: 0x%08x, host: 0x%08x",
-        data, LLBC_Net2Host2(data) );
+        data, LLBC_Net2Host2(data));
     LLBC_PrintLine("");
     sint64 longData = 0x0506070801020304L;
     LLBC_PrintLine("host to net test(long data), host: 0x%16llx, net: 0x%16llx", longData, LLBC_Host2Net2(longData));

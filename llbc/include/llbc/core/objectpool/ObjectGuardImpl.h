@@ -47,7 +47,7 @@ inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<Obj
 template <typename ObjectType>
 inline LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
 {
-    if (!_weakRef && _obj)
+    if (!_weakRef && _obj && _poolInst)
         _poolInst->Release(_obj);
 }
 

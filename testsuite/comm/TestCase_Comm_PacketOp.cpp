@@ -91,8 +91,8 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     // STL containers test.
     std::cout <<"STL container test: " <<std::endl;
     std::vector<std::list<LLBC_String> > stlCont;
-    stlCont.push_back( std::list<LLBC_String>() );
-    stlCont.push_back( std::list<LLBC_String>() );
+    stlCont.push_back(std::list<LLBC_String>());
+    stlCont.push_back(std::list<LLBC_String>());
     stlCont[0].push_back("World");
     stlCont[0].push_front("Primer");
     stlCont[1].push_back("Foot");

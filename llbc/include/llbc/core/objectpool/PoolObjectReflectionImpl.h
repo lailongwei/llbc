@@ -24,28 +24,29 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection()
+LLBC_FORCE_INLINE constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection()
 {
     return IsSupportedPoolObjectReflectionInl<ObjectType>(nullptr);
 }
 
 template <typename ObjectType>
-bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(
+constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(
     __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     return true;
 }
 
 template <typename ObjectType>
+LLBC_FORCE_INLINE constexpr
 typename std::enable_if<std::is_base_of<
     LLBC_PoolObject, ObjectType>::value, bool>::type
-LLBC_FORCE_INLINE LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
+LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
 {
     return true;
 }
 
 template <typename ObjectType>
-bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
+constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
 {
     return false;
 }

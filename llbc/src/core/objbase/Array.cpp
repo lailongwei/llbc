@@ -457,69 +457,30 @@ LLBC_Object *LLBC_Array::Clone() const
 
 void LLBC_Array::Serialize(LLBC_Stream &s) const
 {
-    SerializeInl(s, false);
+    s <<static_cast<uint32>(_size);
+    ConstIter it = Begin(), endIt = End();
+    for (; it != endIt; ++it)
+        s <<*it;
 }
 
 bool LLBC_Array::DeSerialize(LLBC_Stream &s)
 {
-    return DeSerializeInl(s, false);
-}
-
-void LLBC_Array::SerializeEx(LLBC_Stream &s) const
-{
-    SerializeInl(s, true);
-}
-
-bool LLBC_Array::DeSerializeEx(LLBC_Stream &s)
-{
-    return DeSerializeInl(s, true);
-}
-
-void LLBC_Array::Recapacity(size_type cap)
-{
-    if (cap <= _capacity)
-        return;
-
-    _objs = reinterpret_cast<Obj **>(realloc(_objs, cap * sizeof(Obj *)));
-    LLBC_MemSet(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
-
-    _capacity = cap;
-}
-
-void LLBC_Array::SerializeInl(LLBC_Stream &s, bool extended) const
-{
-    LLBC_STREAM_BEGIN_WRITE(s);
-
-    LLBC_STREAM_WRITE(static_cast<uint64>(_size));
-
-    ConstIter it = Begin(), endIt = End();
-    for (; it != endIt; ++it)
-    {
-        if (!extended)
-            LLBC_STREAM_WRITE(*it);
-        else
-            LLBC_STREAM_WRITE_EX(*it);
-    }
-
-    LLBC_STREAM_END_WRITE();
-}
-
-bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
-{
     if (UNLIKELY(!_objFactory))
         return false;
 
-    Clear();
-
     LLBC_STREAM_BEGIN_READ(s, bool, false);
 
-    uint64 size = 0;
+    uint32 size = 0;
     LLBC_STREAM_READ(size);
 
-    for (uint64 i = 0; i < size; ++i)
+    Clear();
+    if (size == 0)
+        return true;
+
+    for (uint32 i = 0; i < size; ++i)
     {
         LLBC_Object *o = _objFactory->CreateObject();
-        if (!(!extended ? s.Read(*o) : s.ReadEx(*o)))
+        if (!s.Read(*o))
         {
             o->Release();
             Clear();
@@ -532,6 +493,17 @@ bool LLBC_Array::DeSerializeInl(LLBC_Stream &s, bool extended)
     }
 
     LLBC_STREAM_END_READ_RET(true);
+}
+
+void LLBC_Array::Recapacity(size_type cap)
+{
+    if (cap <= _capacity)
+        return;
+
+    _objs = reinterpret_cast<Obj **>(realloc(_objs, cap * sizeof(Obj *)));
+    LLBC_MemSet(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
+
+    _capacity = cap;
 }
 
 __LLBC_NS_END

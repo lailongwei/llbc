@@ -65,17 +65,17 @@ struct ForeachFun
     void operator()(LLBC_DictionaryElem *elem)
     {
         LLBC_String str;
-        str.append_format( "key(type:%s): ", (elem->IsIntKey() ? "Int" : "String") );
-        if( elem->IsIntKey() )
+        str.append_format("key(type:%s): ", (elem->IsIntKey() ? "Int" : "String"));
+        if(elem->IsIntKey())
         {
-            str.append_format( "%d", elem->GetIntKey() );
+            str.append_format("%d", elem->GetIntKey());
         }
         else
         {
-            str.append_format( "%s", elem->GetStrKey().c_str() );
+            str.append_format("%s", elem->GetStrKey().c_str());
         }
 
-        str.append_format( ", value: %s", elem->GetObject()->ToString().c_str() );
+        str.append_format(", value: %s", elem->GetObject()->ToString().c_str());
 
         std::cout <<str <<std::endl;
     }
@@ -85,8 +85,8 @@ struct LessThanFun
 {
     bool operator()(const LLBC_DictionaryElem *elem1, const LLBC_DictionaryElem *elem2) const
     {
-        const TestObj *obj1 = static_cast<const TestObj *>( elem1->GetObject() );
-        const TestObj *obj2 = static_cast<const TestObj *>( elem2->GetObject() );
+        const TestObj *obj1 = static_cast<const TestObj *>(elem1->GetObject());
+        const TestObj *obj2 = static_cast<const TestObj *>(elem2->GetObject());
 
         return obj1->GetSerialNum() < obj2->GetSerialNum();
     }
@@ -96,8 +96,8 @@ struct GreaterThanFun
 {
     bool operator()(const LLBC_DictionaryElem *elem1, const LLBC_DictionaryElem *elem2) const
     {
-        const TestObj *obj1 = static_cast<const TestObj *>( elem1->GetObject() );
-        const TestObj *obj2 = static_cast<const TestObj *>( elem2->GetObject() );
+        const TestObj *obj1 = static_cast<const TestObj *>(elem1->GetObject());
+        const TestObj *obj2 = static_cast<const TestObj *>(elem2->GetObject());
 
         return obj1->GetSerialNum() > obj2->GetSerialNum();
     }

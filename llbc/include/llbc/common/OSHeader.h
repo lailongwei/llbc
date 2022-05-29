@@ -96,6 +96,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <time.h>
+#include <math.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif

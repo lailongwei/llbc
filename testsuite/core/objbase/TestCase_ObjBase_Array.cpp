@@ -233,7 +233,7 @@ void TestCase_ObjBase_Array::IterTest()
     arr.Foreach(foreachFun);
 
     std::cout <<"Erase range[begin, end): " <<std::endl;
-    arr.Erase( arr.Begin(), arr.End() );
+    arr.Erase(arr.Begin(), arr.End());
     std::cout <<"Done, output it: " <<std::endl;
     arr.Foreach(foreachFun);
 
