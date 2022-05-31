@@ -23,7 +23,17 @@
 
 __LLBC_NS_BEGIN
 
-// ... ...
+template <typename ObjType>
+void LLBC_Timer::SetTimeoutHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *))
+{
+    _timeoutDeleg = LLBC_Delegate<void(LLBC_Timer *)>(obj, method);
+}
+
+template <typename ObjType>
+void LLBC_Timer::SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *))
+{
+    _cancelDeleg = LLBC_Delegate<void(LLBC_Timer *)>(obj, method);
+}
 
 __LLBC_NS_END
 

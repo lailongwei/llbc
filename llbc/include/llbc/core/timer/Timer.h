@@ -89,10 +89,26 @@ public:
     void SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg);
 
     /**
+     * @brief Set timeout handler(obj method).
+     * @param obj    - the object.
+     * @param method - the object method.
+     */
+    template <typename ObjType>
+    void SetTimeoutHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *));
+
+    /**
      * Set cancel handler.
      * @param[in] cancelDeleg - the cancel delegate.
      */
     void SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg);
+
+    /**
+     * @brief Set cancel handler(obj method).
+     * @param obj    - the object.
+     * @param method - the object method.
+     */
+    template <typename ObjType>
+    void SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *));
 
 public:
     /**

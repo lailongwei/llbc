@@ -41,12 +41,6 @@ LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
-    if (!scheduler)
-    {
-        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-        if (libTls)
-            _scheduler = reinterpret_cast<Scheduler *>(libTls->coreTls.timerScheduler);
-    }
 }
 
 LLBC_Timer::~LLBC_Timer()
