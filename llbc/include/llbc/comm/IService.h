@@ -437,7 +437,6 @@ public:
     /**
      * Subscribe message to specified handler method.
      */
-    int Subscribe(int opcode, void(*func)(LLBC_Packet &));
     template <typename ObjType>
     int Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &));
 

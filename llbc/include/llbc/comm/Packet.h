@@ -486,10 +486,10 @@ public:
     bool Decode();
 
     /**
-     * Giveup the message block.
-     * @return LLBC_MessageBlock * - message block.
+     * Giveup payload.
+     * @return LLBC_MessageBlock * - payload.
      */
-    LLBC_MessageBlock *GiveUp();
+    LLBC_MessageBlock *GiveUpPayload();
 
 public:
     /**
