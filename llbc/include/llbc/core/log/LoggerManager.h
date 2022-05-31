@@ -109,7 +109,7 @@ private:
  * Singleton class macro define.
  */
 template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
-#define LLBC_LoggerManagerSingleton LLBC_Singleton<LLBC_NS LLBC_LoggerManager>::Instance()
+#define LLBC_LoggerManagerSingleton LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerManager>::Instance()
 
 /**
  * @brief The llbc library log macro define.
@@ -121,7 +121,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  */
 #define LLOG(loggerName, tag, level, fmt, ...)                            \
     {                                                                     \
-        if (UNLIKELY(!LLBC_NS LLBC_LoggerManagerSingleton->IsInited())) { \
+        if (UNLIKELY(!LLBC_LoggerManagerSingleton->IsInited())) {         \
             LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();   \
             int len = ::snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls), fmt, ##__VA_ARGS__); \
             if (len >= 0)                                                 \
@@ -132,9 +132,9 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         {                                                                 \
             LLBC_NS LLBC_Logger *l;                                       \
             if (loggerName == nullptr)                                    \
-                l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
+                l = LLBC_LoggerManagerSingleton->GetRootLogger();         \
             else                                                          \
-                l = LLBC_NS LLBC_LoggerManagerSingleton->GetLogger(loggerName); \
+                l = LLBC_LoggerManagerSingleton->GetLogger(loggerName);   \
                                                                           \
             if (LIKELY(l))                                                \
                 l->Output(LLBC_NS LLBC_LogLevel::level,                   \
@@ -224,9 +224,9 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         else {                                                            \
             LLBC_NS LLBC_Logger *l;                                       \
             if (loggerName == nullptr)                                    \
-                l = LLBC_NS LLBC_LoggerManagerSingleton->GetRootLogger(); \
+                l = LLBC_LoggerManagerSingleton->GetRootLogger();         \
             else                                                          \
-                l = LLBC_NS LLBC_LoggerManagerSingleton->GetLogger(loggerName); \
+                l = LLBC_LoggerManagerSingleton->GetLogger(loggerName);   \
                                                                           \
             if (LIKELY(l)) {                                              \
                 LLBC_NS LLBC_LogMessageBuffer lmb;                        \
