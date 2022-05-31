@@ -246,7 +246,7 @@ bool LLBC_Packet::Decode()
     return true;
 }
 
-LLBC_MessageBlock *LLBC_Packet::GiveUp()
+LLBC_MessageBlock *LLBC_Packet::GiveUpPayload()
 {
     Encode();
     if (!_payload)
