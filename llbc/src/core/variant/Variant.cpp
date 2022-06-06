@@ -41,6 +41,7 @@ static const LLBC_NS LLBC_Variant::Str __g_emptySeqStr = "[]";
 static const LLBC_NS LLBC_Variant::Str __g_emptyDictStr = "{}";
 static const LLBC_NS LLBC_Variant::Seq __g_emptySeq;
 static const LLBC_NS LLBC_Variant::Dict __g_emptyDict;
+static const LLBC_NS LLBC_Variant::Dict __g_emptyDeleg;
 
 static const LLBC_NS LLBC_Variant __g_nilVariant;
 
@@ -64,26 +65,26 @@ void LLBC_VariantType::InitType2StrDict()
     {
         _typeDescs.insert(std::make_pair(VT_NIL, "Nil"));
 
-        _typeDescs.insert(std::make_pair(VT_RAW_BOOL, "bool"));
-        _typeDescs.insert(std::make_pair(VT_RAW_SINT8, "int8"));
-        _typeDescs.insert(std::make_pair(VT_RAW_UINT8, "uint8"));
-        _typeDescs.insert(std::make_pair(VT_RAW_SINT16, "sint16"));
-        _typeDescs.insert(std::make_pair(VT_RAW_UINT16, "uint16"));
-        _typeDescs.insert(std::make_pair(VT_RAW_SINT32, "int32"));
-        _typeDescs.insert(std::make_pair(VT_RAW_UINT32, "uint32"));
-        _typeDescs.insert(std::make_pair(VT_RAW_LONG, "long"));
-        _typeDescs.insert(std::make_pair(VT_RAW_ULONG, "ulong"));
-        _typeDescs.insert(std::make_pair(VT_RAW_PTR, "ptr"));
-        _typeDescs.insert(std::make_pair(VT_RAW_SINT64, "int64"));
-        _typeDescs.insert(std::make_pair(VT_RAW_UINT64, "uint64"));
-        _typeDescs.insert(std::make_pair(VT_RAW_FLOAT, "float"));
-        _typeDescs.insert(std::make_pair(VT_RAW_DOUBLE, "double"));
+        _typeDescs.emplace(VT_RAW_BOOL, "bool");
+        _typeDescs.emplace(VT_RAW_SINT8, "int8");
+        _typeDescs.emplace(VT_RAW_UINT8, "uint8");
+        _typeDescs.emplace(VT_RAW_SINT16, "sint16");
+        _typeDescs.emplace(VT_RAW_UINT16, "uint16");
+        _typeDescs.emplace(VT_RAW_SINT32, "int32");
+        _typeDescs.emplace(VT_RAW_UINT32, "uint32");
+        _typeDescs.emplace(VT_RAW_LONG, "long");
+        _typeDescs.emplace(VT_RAW_ULONG, "ulong");
+        _typeDescs.emplace(VT_RAW_PTR, "ptr");
+        _typeDescs.emplace(VT_RAW_SINT64, "int64");
+        _typeDescs.emplace(VT_RAW_UINT64, "uint64");
+        _typeDescs.emplace(VT_RAW_FLOAT, "float");
+        _typeDescs.emplace(VT_RAW_DOUBLE, "double");
 
-        _typeDescs.insert(std::make_pair(VT_STR_DFT, "string"));
+        _typeDescs.emplace(VT_STR_DFT, "string");
 
-        _typeDescs.insert(std::make_pair(VT_SEQ_DFT, "sequence"));
+        _typeDescs.emplace(VT_SEQ_DFT, "sequence");
 
-        _typeDescs.insert(std::make_pair(VT_DICT_DFT, "dictionary"));
+        _typeDescs.emplace(VT_DICT_DFT, "dictionary");
     }
 }
 
@@ -308,7 +309,7 @@ LLBC_String LLBC_Variant::AsStr() const
     {
         if (IsBool())
         {
-            return _holder.data.raw.uint64Val ? LLBC_INL_NS __g_oneStr : LLBC_INL_NS __g_zeroStr;
+            return _holder.data.raw.uint64Val ? LLBC_INL_NS __g_trueStr : LLBC_INL_NS __g_falseStr;
         }
         else if (IsFloat() || IsDouble())
         {
