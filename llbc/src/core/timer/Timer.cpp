@@ -94,7 +94,7 @@ const LLBC_Variant & LLBC_Timer::GetTimerData() const
     return const_cast<LLBC_Timer *>(this)->GetTimerData();
 }
 
-    void LLBC_Timer::OnTimeout()
+void LLBC_Timer::OnTimeout()
 {
     if (LIKELY(_timeoutDeleg))
         _timeoutDeleg(this);
