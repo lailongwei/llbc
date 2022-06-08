@@ -46,6 +46,15 @@ LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
 }
 
 template <typename ObjectType>
+LLBC_FORCE_INLINE constexpr
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, bool>::type
+LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
+{
+    return true;
+}
+
+template <typename ObjectType>
 constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
 {
     return false;
@@ -73,6 +82,15 @@ LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                              std::nullptr_t)
 {
     obj->MarkPoolObject(*poolInst);
+}
+
+template <typename ObjectType>
+typename std::enable_if<std::is_base_of<LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
+LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                             LLBC_IObjectPoolInst *poolInst,
+                                             std::nullptr_t)
+{
+    obj->_poolInst = poolInst;
 }
 
 template <typename ObjectType>
@@ -109,6 +127,15 @@ LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
                                           std::nullptr_t)
 {
     return obj->GetPoolInst();
+}
+
+template <typename ObjectType>
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, LLBC_IObjectPoolInst *>::type
+LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                          std::nullptr_t)
+{
+    return obj->_poolInst;
 }
 
 template <typename ObjectType>
@@ -162,6 +189,15 @@ LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
         else
             LLBC_Delete(obj);
     }
+}
+
+template <typename ObjectType>
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
+LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
+                                      std::nullptr_t)
+{
+    obj->Release();
 }
 
 template <typename ObjectType>

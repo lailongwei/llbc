@@ -70,6 +70,7 @@
 #include "core/objbase/TestCase_ObjBase_Dictionary.h"
 #include "core/objectpool/TestCase_Core_ObjectPool.h"
 #include "core/objectpool/TestCase_Core_Recycle.h"
+#include "core/objectpool/TestCase_Core_ObjectGuard.h"
 
 #include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"

@@ -333,10 +333,7 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
         ObjectType *typeObj = reinterpret_cast<ObjectType *>(obj);
         LLBC_PoolObjectReflection::MarkPoolObject<ObjectType>(typeObj, this);
         if (referencableObj)
-        {
             memUnit->unFlags.flags.referencableObj = true;
-            SetPoolInstToReferencablePoolObj(obj);
-        }
 
         memUnit->unFlags.flags.inited = true;
     }
