@@ -214,7 +214,7 @@ LLBC_String LLBC_ObjectGuard<ObjectType>::ToString() const
 
     LLBC_String repr;
     return LLBC_String().format("ObjectGuard[obj(%s):0x%p, poolInst:0x%p, weak?:%s]",
-                                __LLBC_CxxDemangle(typeid(*_obj).name()), _obj, _poolInst, _weakRef ? "true" : "false");
+                                LLBC_GetTypeName(_obj), _obj, _poolInst, _weakRef ? "true" : "false");
 }
 
 __LLBC_NS_END
