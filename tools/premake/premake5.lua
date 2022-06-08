@@ -56,15 +56,9 @@ end
 
 -- Set optimize options.
 function set_optimize_opts()
-    filter { "configurations:debug*", "language:c++", "system:not windows" }
-        buildoptions {
-            "-ggdb -g",
-        }
-    filter {}
-
-    filter { "configurations:debug*", "language:c++", "system:windows" }
+    filter { "configurations:debug*", "language:c++" }
         runtime "Debug"
-        optimize "Debug"
+        optimize "On"
     filter {}
 
     filter { "configurations:debug*", "language:not c++" }
@@ -102,11 +96,6 @@ workspace ("llbc_" .. _ACTION)
         defines {
             "DEBUG"
         }
-    filter {}
-
-    -- control symbols
-    filter { "system:macosx", "language:c++" }
-        symbols("On")
     filter {}
 
     -- characterset architecture
