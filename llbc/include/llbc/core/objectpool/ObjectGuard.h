@@ -39,6 +39,7 @@ public:
     LLBC_ObjectGuard();
     LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst);
     LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another);
+    LLBC_ObjectGuard(LLBC_ObjectGuard<ObjectType> &&another);
 
     ~LLBC_ObjectGuard();
 
@@ -72,9 +73,10 @@ public:
     explicit operator bool() const;
 
     /**
-     * Copy assignment.
+     * Copy/Move assignment.
      */
     LLBC_ObjectGuard &operator=(const LLBC_ObjectGuard &another);
+    LLBC_ObjectGuard &operator=(LLBC_ObjectGuard &&another);
 
 public:
     /**

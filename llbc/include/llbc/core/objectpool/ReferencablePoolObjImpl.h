@@ -27,7 +27,8 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_ReferencablePoolObj::LLBC_ReferencablePoolObj()
-: _poolInst(nullptr)
+: _referencableObj(false)
+, _poolInst(nullptr)
 {
 }
 
@@ -37,40 +38,48 @@ inline LLBC_ReferencablePoolObj::~LLBC_ReferencablePoolObj()
 
 inline void LLBC_ReferencablePoolObj::Release()
 {
-    if (--_ref == 0)
-    {
-        if (_poolInst)
-        {
-            _ref = 1;
-            _autoRef = 0;
-            _poolStack = nullptr;
+    if (UNLIKELY(_ref <= 0))
+        return;
 
-            _poolInst->ReleaseReferencable(this);
-        }
-        else
-        {
-            LLBC_Delete(this);
-        }
+    if (--_ref > 0)
+        return;
+
+    if (!_poolInst)
+    {
+        LLBC_Delete(this);
+        return;
     }
+
+    _ref = 1;
+    _autoRef = 0;
+    _poolStack = nullptr;
+    if (_referencableObj)
+        _poolInst->ReleaseReferencable(this);
+    else
+        _poolInst->Release(this);
 }
 
 inline void LLBC_ReferencablePoolObj::SafeRelease()
 {
-    if (LLBC_AtomicFetchAndSub(&_ref, 1) == 1)
-    {
-        if (_poolInst)
-        {
-            _ref = 1;
-            _autoRef = 0;
-            _poolStack = nullptr;
+    if (UNLIKELY(LLBC_AtomicGet(&_ref) <= 0))
+        return;
 
-            _poolInst->ReleaseReferencable(this);
-        }
-        else
-        {
-            LLBC_Delete(this);
-        }
+    if (LLBC_AtomicFetchAndSub(&_ref, 1) > 1)
+        return;
+
+    if (!_poolInst)
+    {
+        LLBC_Delete(this);
+        return;
     }
+
+    _ref = 1;
+    _autoRef = 0;
+    _poolStack = nullptr;
+    if (_referencableObj)
+        _poolInst->ReleaseReferencable(this);
+    else
+        _poolInst->Release(this);
 }
 
 __LLBC_NS_END

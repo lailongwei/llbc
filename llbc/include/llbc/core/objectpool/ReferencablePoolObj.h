@@ -68,6 +68,7 @@ private:
     friend class LLBC_IObjectPoolInst;
     friend class LLBC_PoolObjectReflection;
 
+    bool _referencableObj;
     LLBC_IObjectPoolInst *_poolInst;
 };
 

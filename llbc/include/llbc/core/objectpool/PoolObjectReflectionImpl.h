@@ -62,14 +62,16 @@ constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...
 
 template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObject(ObjectType *&obj,
-                                                                 LLBC_IObjectPoolInst *poolInst)
+                                                                 LLBC_IObjectPoolInst *poolInst,
+                                                                 bool referencableObj)
 {
-    MarkPoolObjectInl<ObjectType>(obj, poolInst, nullptr);
+    MarkPoolObjectInl<ObjectType>(obj, poolInst, referencableObj, nullptr);
 }
 
 template <typename ObjectType>
 void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                                   LLBC_IObjectPoolInst *poolInst,
+                                                  bool referencableObj,
                                                   __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     obj->MarkPoolObject(*poolInst);
@@ -79,6 +81,7 @@ template <typename ObjectType>
 typename std::enable_if<std::is_base_of<LLBC_PoolObject, ObjectType>::value, void>::type
 LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                              LLBC_IObjectPoolInst *poolInst,
+                                             bool referencableObj,
                                              std::nullptr_t)
 {
     obj->MarkPoolObject(*poolInst);
@@ -88,14 +91,17 @@ template <typename ObjectType>
 typename std::enable_if<std::is_base_of<LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
 LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                              LLBC_IObjectPoolInst *poolInst,
+                                             bool referencableObj,
                                              std::nullptr_t)
 {
     obj->_poolInst = poolInst;
+    obj->_referencableObj = referencableObj;
 }
 
 template <typename ObjectType>
 void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                                   LLBC_IObjectPoolInst *poolInst,
+                                                  bool referencableObj,
                                                   ...)
 {
     // Do nothing

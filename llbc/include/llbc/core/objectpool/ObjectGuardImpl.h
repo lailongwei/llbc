@@ -55,6 +55,18 @@ LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType
 }
 
 template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(LLBC_ObjectGuard<ObjectType> &&another)
+: _obj(another._obj)
+, _poolInst(another._poolInst)
+
+, _weakRef(another._weakRef)
+{
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
+    another.ReleaseObj();
+}
+
+template <typename ObjectType>
 LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
 {
     if (_obj && !_weakRef)
@@ -94,6 +106,9 @@ LLBC_ObjectGuard<ObjectType>::operator bool() const
 template <typename ObjectType>
 LLBC_ObjectGuard<ObjectType> &LLBC_ObjectGuard<ObjectType>::operator=(const LLBC_ObjectGuard &another)
 {
+    if (this == &another)
+        return *this;
+
     if (_obj && !_weakRef)
         _poolInst->Release(_obj);
 
@@ -103,6 +118,27 @@ LLBC_ObjectGuard<ObjectType> &LLBC_ObjectGuard<ObjectType>::operator=(const LLBC
 
     if (another._obj && !another._weakRef)
         another._weakRef = true;
+
+    return *this;
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> &LLBC_ObjectGuard<ObjectType>::operator=(LLBC_ObjectGuard &&another)
+{
+    if (this == &another)
+        return *this;
+
+    if (_obj && !_weakRef)
+        _poolInst->Release(_obj);
+
+    _obj = another._obj;
+    _poolInst = another._poolInst;
+    _weakRef = another._weakRef;
+
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
+
+    another.ReleaseObj();
 
     return *this;
 }

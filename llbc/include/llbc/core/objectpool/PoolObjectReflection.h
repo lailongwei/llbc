@@ -79,12 +79,14 @@ public:
      */
     template <typename ObjectType>
     static void MarkPoolObject(ObjectType *&obj,
-                               LLBC_IObjectPoolInst *poolInst);
+                               LLBC_IObjectPoolInst *poolInst,
+                               bool referencableObj);
 
 private:
     template <typename ObjectType>
     static void MarkPoolObjectInl(ObjectType *&obj,
                                   LLBC_IObjectPoolInst *poolInst,
+                                  bool referencableObj,
                                   __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *);
 
     template <typename ObjectType>
@@ -92,6 +94,7 @@ private:
     typename std::enable_if<std::is_base_of<LLBC_PoolObject, ObjectType>::value, void>::type
     MarkPoolObjectInl(ObjectType *&obj,
                       LLBC_IObjectPoolInst *poolInst,
+                      bool referencableObj,
                       std::nullptr_t);
 
     template <typename ObjectType>
@@ -99,11 +102,13 @@ private:
     typename std::enable_if<std::is_base_of<LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
     MarkPoolObjectInl(ObjectType *&obj,
                       LLBC_IObjectPoolInst *poolInst,
+                      bool referencableObj,
                       std::nullptr_t);
 
     template <typename ObjectType>
     static void MarkPoolObjectInl(ObjectType *&obj,
                                   LLBC_IObjectPoolInst *poolInst,
+                                  bool referencableObj,
                                   ...);
 
 public:
