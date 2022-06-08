@@ -56,17 +56,13 @@ end
 
 -- Set optimize options.
 function set_optimize_opts()
-    filter { "configurations:debug*", "language:c++" }
+    filter { "configurations:debug*" }
         runtime "Debug"
-        optimize "On"
-    filter {}
-
-    filter { "configurations:debug*", "language:not c++" }
         optimize "Debug"
     filter {}
 
     filter { "configurations:release*" }
-        optimize "Speed"
+        optimize "On"
     filter {}
 end
 
@@ -98,6 +94,9 @@ workspace ("llbc_" .. _ACTION)
         }
     filter {}
 
+    -- enable symbols
+    symbols "On"
+
     -- characterset architecture
     filter { "language:c++" }
         characterset "MBCS"
@@ -114,9 +113,6 @@ project "llbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- files
     files {
@@ -186,9 +182,6 @@ project "testsuite"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -291,9 +284,6 @@ project "pyllbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -459,9 +449,6 @@ project "csllbc_native"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -641,9 +628,6 @@ project "lullbc_lualib"
     language "c++"
     kind "SharedLib"
 
-    -- symbols
-    symbols "On"
-
     -- files
     files {
         LUA_SRC_PATH .. "/*.h",
@@ -692,9 +676,6 @@ project "lullbc_luaexec"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
-
-    -- symbols
-    symbols "On"
 
     -- files
     files {
@@ -756,9 +737,6 @@ project "lullbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
