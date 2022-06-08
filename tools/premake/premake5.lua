@@ -46,26 +46,6 @@ else
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
 end
 
--- Common functional functions define
--- Enable multithread compile
-function enable_multithread_comp()
-    filter { "system:windows" }
-        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
-    filter {}
-end
-
--- Set optimize options.
-function set_optimize_opts()
-    filter { "configurations:debug*" }
-        runtime "Debug"
-        optimize "Debug"
-    filter {}
-
-    filter { "configurations:release*" }
-        optimize "On"
-    filter {}
-end
-
 -- zlib library:
 local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
@@ -96,6 +76,25 @@ workspace ("llbc_" .. _ACTION)
 
     -- enable symbols
     symbols "On"
+
+    -- set optimize options
+    filter { "configurations:debug*" }
+        runtime "Debug"
+        optimize "Debug"
+    filter {}
+    filter { "configurations:release*" }
+        optimize "On"
+    filter {}
+
+    -- set debug target suffix
+    filter { "configurations:debug*" }
+        targetsuffix "_debug"
+    filter {}
+
+    -- enable multithread compile(only avabilable on windows)
+    filter { "system:windows" }
+        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
+    filter {}
 
     -- characterset architecture
     filter { "language:c++" }
@@ -164,17 +163,6 @@ project "llbc"
             "-std=c++11",
         }
     filter {}
-
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
 -- ****************************************************************************
 -- core library testsuite compile setting
@@ -245,23 +233,12 @@ project "testsuite"
         }
     filter {}
 
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
-
     -- warnings
     filter { "system:not windows" }
         disablewarnings {
             "invalid-source-encoding",
         }
     filter {}
-
-    -- optimize
-    set_optimize_opts()
 
 group "wrap"
 
@@ -355,7 +332,7 @@ project "pyllbc"
         targetextension ".pyd"
     filter {}
 
-    -- links 
+    -- links
     -- link llbc library
     libdirs { LLBC_OUTPUT_DIR }
 
@@ -430,17 +407,6 @@ project "pyllbc"
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
-
 group "wrap/csllbc"
 
 -- ****************************************************************************
@@ -502,17 +468,6 @@ project "csllbc_native"
             "-std=c++11",
         }
     filter {}
-
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
     -- disable warnings
     filter { "system:not windows" }
@@ -577,9 +532,6 @@ project "csllbc"
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
     -- links
     filter {}
     links {
@@ -606,9 +558,6 @@ project "csllbc_testsuite"
     files {
         "../../wrap/csllbc/testsuite/**.cs",
     }
-
-    -- optimize
-    set_optimize_opts()
 
     -- links
     links {
@@ -650,9 +599,6 @@ project "lullbc_lualib"
         defines { "LUA_USE_DLOPEN" }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
     -- links
     filter { "system:not windows" }
         links { "dl" }
@@ -661,14 +607,6 @@ project "lullbc_lualib"
     -- target name, target prefix
     targetname "lua"
     targetprefix "lib"
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
 -- lua executable compile setting
 local LUA_SRC_PATH = "../../wrap/lullbc/lua"
@@ -694,9 +632,6 @@ project "lullbc_luaexec"
         "lullbc_lualib"
     }
 
-    -- optimize
-    set_optimize_opts()
-
     -- links 
     libdirs { 
         LLBC_OUTPUT_DIR,
@@ -721,11 +656,6 @@ project "lullbc_luaexec"
  
     -- target name, target prefix
     targetname "lua"
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
 
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
@@ -803,9 +733,6 @@ project "lullbc"
     targetname "_lullbc"
     targetprefix ""
 
-    -- optimize
-    set_optimize_opts()
-
     -- links 
     libdirs { 
         LLBC_OUTPUT_DIR,
@@ -849,11 +776,6 @@ project "lullbc"
     	linkoptions {
             "-undefined dynamic_lookup",
         }
-    filter {}
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
     filter {}
 
 group ""
