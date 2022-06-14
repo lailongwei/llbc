@@ -22,6 +22,13 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <signal.h>
+#endif // Non-Win32
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+ #include <sys/syscall.h>
+#endif // Linux or Android
+
 #include "llbc/core/os/OS_Thread.h"
 
 __LLBC_INTERNAL_NS_BEGIN

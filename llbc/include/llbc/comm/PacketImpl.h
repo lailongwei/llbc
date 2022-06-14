@@ -721,4 +721,9 @@ LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetEncoder() const
 
 __LLBC_NS_END
 
+inline std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet)
+{
+    return (o << packet.ToString());
+}
+
 #endif // __LLBC_COMM_PACKET_H__

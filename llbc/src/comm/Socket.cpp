@@ -23,6 +23,11 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <sys/ioctl.h>
+ #include <netinet/tcp.h>
+#endif // Non-Win32
+
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"

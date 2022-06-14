@@ -22,6 +22,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <dirent.h>
+#endif // Non-Win32
+
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/file/File.h"
 
@@ -435,7 +439,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
     LLBC_String findPath = Join(path, "*.*");
 
     WIN32_FIND_DATAA findData;
-    LLBC_DirHandle handle = ::FindFirstFileA(findPath.c_str(), &findData);
+    HANDLE handle = ::FindFirstFileA(findPath.c_str(), &findData);
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -553,7 +557,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     LLBC_String dirName = Join(path, "*.*");
 
     WIN32_FIND_DATAA findData;
-    LLBC_DirHandle handle = ::FindFirstFileA(dirName.c_str(), &findData);
+    HANDLE handle = ::FindFirstFileA(dirName.c_str(), &findData);
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);

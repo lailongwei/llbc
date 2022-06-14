@@ -22,6 +22,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <cxxabi.h>
+#endif
+
 #include "llbc/common/LibTlsInl.h"
 #include "llbc/common/RTTI.h"
 

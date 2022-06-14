@@ -22,10 +22,14 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/file/File.h"
+// iconv lib header file.
 #if LLBC_TARGET_PLATFORM_WIN32
-#include "llbc/core/iconv/iconv.h"
-#endif // LLBC_TARGET_PLATFORM_WIN32
+ #include "llbc/core/iconv/iconv.h"
+#else // Non-Win32
+ #include <iconv.h>
+#endif // Win32
+
+#include "llbc/core/file/File.h"
 
 #include "llbc/core/transcoder/Transcoder.h"
 

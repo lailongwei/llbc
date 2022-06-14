@@ -22,8 +22,6 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/common/PFConfig.h"
-
 #include "llbc/common/OSHeader.h"
 #include "llbc/common/Define.h"
 #include "llbc/common/Errno.h"

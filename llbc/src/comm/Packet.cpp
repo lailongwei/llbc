@@ -284,6 +284,15 @@ void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
     _codecError = LLBC_New(LLBC_String, codecErr.c_str(), codecErr.length());
 }
 
+LLBC_String LLBC_Packet::ToString() const
+{
+    return LLBC_String().format(
+        "Packet[sid:%d, acceptSid:%d, senderSvcId:%d, recverSvcId:%d, opcode:%d, st:%d, "
+        "payload:(read_pos:%lu, write_pos:%lu)]",
+        _sessionId, _acceptSessionId, _senderSvcId, _recverSvcId, _opcode, _status,
+        _payload ? _payload->GetReadPos() : 0lu, _payload ? _payload->GetWritePos() : 0lu);
+}
+
 void LLBC_Packet::CleanupPreHandleResult()
 {
     if (_preHandleResult)

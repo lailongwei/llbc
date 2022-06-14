@@ -210,13 +210,6 @@ typedef LLBC_ThreadRtn (*LLBC_ThreadProc)(LLBC_ThreadArg);
 
 // file data type define.
 typedef FILE * LLBC_FileHandle;
-
-// directory data type define.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
- typedef DIR * LLBC_DirHandle;
-#else
- typedef HANDLE LLBC_DirHandle;
-#endif
 #define LLBC_INVALID_FILE_HANDLE nullptr
 
 // library data type define.

@@ -48,24 +48,15 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
- #include <fcntl.h>
  #include <netinet/in.h>
- #include <netinet/tcp.h>
  #include <pthread.h>
- #include <libgen.h>
  #include <sys/time.h>
- #include <sys/ioctl.h>
  #include <sys/socket.h>
- #include <sys/syscall.h>
  #include <netdb.h>
- #include <dirent.h>
  #include <semaphore.h>
  #include <arpa/inet.h>
- #include <dlfcn.h>
- #include <execinfo.h>
 
  #if LLBC_TARGET_PLATFORM_LINUX
   #include <sys/epoll.h>
@@ -94,19 +85,14 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
-#include <signal.h>
 #include <time.h>
-#include <math.h>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif
 
 // C++ standard header files.
-#include <cstddef>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <iomanip>
 #include <memory>
 #include <vector>
 #include <list>
@@ -120,23 +106,9 @@
 #include <unordered_set>
 #include <algorithm>
 #include <limits.h>
-#include <functional>
 
 // RTTI support header files.
 #include <typeinfo>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <cxxabi.h>
-#endif
-
-// UUID lib header file.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <uuid/uuid.h>
-#endif
-
-// iconv lib header file.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <iconv.h>
-#endif
 
 // Enable posix support, if in WIN32 platform.
 #if LLBC_TARGET_PLATFORM_WIN32
