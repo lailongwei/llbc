@@ -86,6 +86,17 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
     filter {}
 
+    -- enable c++11 support
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+
+    -- set warning as error
+    filter { "system:not windows" }
+        buildoptions { "-Werror" }
+    filter {}
+
     -- set debug target suffix
     filter { "configurations:debug*" }
         targetsuffix "_debug"
@@ -160,7 +171,6 @@ project "llbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-std=c++11",
         }
     filter {}
 
@@ -224,12 +234,6 @@ project "testsuite"
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
-        }
-    filter {}
-
-    filter { "system:not windows" }
-        buildoptions {
-            "-std=c++11",
         }
     filter {}
 
@@ -403,7 +407,6 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-std=c++11",
         }
     filter {}
 
@@ -465,7 +468,6 @@ project "csllbc_native"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-std=c++11",
         }
     filter {}
 
@@ -767,7 +769,6 @@ project "lullbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-std=c++11",
         }
     filter {}
 
