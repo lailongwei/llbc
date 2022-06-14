@@ -23,6 +23,11 @@
 
 __LLBC_NS_BEGIN
 
+inline void LLBC_SetLastError(uint32 no)
+{
+    LLBC_SetLastError(static_cast<int>(no));
+}
+
 template <typename EnumTy>
 typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
 LLBC_SetLastError(EnumTy no)

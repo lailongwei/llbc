@@ -39,6 +39,13 @@ LLBC_EXPORT int LLBC_GetLastError();
 LLBC_EXPORT void LLBC_SetLastError(int no);
 
 /**
+ * @brief Set llbc library last error.
+ * 
+ * @param[in] no - error no.
+ */
+void LLBC_SetLastError(uint32 no);
+
+/**
  * Set llbc last error(enum type).
  * @param[in] no - error no.
  */
