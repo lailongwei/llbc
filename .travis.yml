@@ -35,6 +35,7 @@ notifications:
             - najoast@126.com # Yan Zhou
             - caochunxi@hotmail.com # Chunxi Cao
             - 120453674@qq.com # Huiya Song
+            - snakeflutes@gmail.com # Reckful
         on_success: change
         on_failure: always
 

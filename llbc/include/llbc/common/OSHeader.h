@@ -106,6 +106,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <limits.h>
+#include <functional>
 
 // RTTI support header files.
 #include <typeinfo>
