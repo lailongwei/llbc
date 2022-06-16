@@ -116,24 +116,24 @@ $(PREMAKE_TARGET):
 	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) gmake)
 
 $(CORELIB_TARGET): $(PREMAKE_TARGET)
-	@(cd build/gmake && $(MAKE) -f llbc.make)
+	$(MAKE) -C build/gmake -f llbc.make
 
 $(TEST_TARGET): $(CORELIB_TARGET)
-	@(cd build/gmake && $(MAKE) -f testsuite.make)
+	$(MAKE) -C build/gmake -f testsuite.make
 
 $(WRAPS_TARGET): $(ALL_WRAP_TARGETS)
 $(PYWRAP_TARGET): $(CORELIB_TARGET)
-	@(cd build/gmake && $(MAKE) -f pyllbc.make)
+	$(MAKE) -C build/gmake -f pyllbc.make
 $(CSWRAP_TARGET): $(CORELIB_TARGET)
-	@(cd build/gmake && $(MAKE) -f csllbc_native.make)
-	@(cd build/gmake && $(MAKE) -f csllbc.make)
-	@(cd build/gmake && $(MAKE) -f csllbc_testsuite.make)
+	$(MAKE) -C build/gmake -f csllbc_native.make
+	$(MAKE) -C build/gmake -f csllbc.make
+	$(MAKE) -C build/gmake -f csllbc_testsuite.make
 $(LUWRAP_LUALIB_TARGET):
-	@(cd build/gmake && $(MAKE) -f lullbc_lualib.make)
-$(LUWRAP_LUAEXE_TARGET):
-	@(cd build/gmake && $(MAKE) -f lullbc_luaexec.make)
+	$(MAKE) -C build/gmake -f lullbc_lualib.make
+$(LUWRAP_LUAEXE_TARGET): $(LUWRAP_LUALIB_TARGET)
+	$(MAKE) -C build/gmake -f lullbc_luaexec.make
 $(LUWRAP_TARGET): $(CORELIB_TARGET) $(LUWRAP_LUALIB_TARGET) $(LUWRAP_LUAEXE_TARGET)
-	@(cd build/gmake && $(MAKE) -f lullbc.make)
+	$(MAKE) -C build/gmake -f lullbc.make
 
 clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(WRAPS_TARGET))
 	@$(shell find ./ -name "._*" -exec rm {} \;)
@@ -141,23 +141,23 @@ clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(WRAPS_TARGET))
 	@$(shell find ./ -type f -name "*.buildlog" -exec rm {} \;)
 
 clean_$(CORELIB_TARGET):
-	@(if [ -e build/gmake/llbc.make ]; then cd build/gmake && $(MAKE) clean -f llbc.make; fi)
+	@(if [ -e build/gmake/llbc.make ]; then $(MAKE) -C build/gmake -f llbc.make clean; fi)
 
 clean_$(TEST_TARGET):
-	@(if [ -e build/gmake/testsuite.make ]; then cd build/gmake && $(MAKE) clean -f testsuite.make; fi)
+	@(if [ -e build/gmake/testsuite.make ]; then $(MAKE) -C build/gmake -f testsuite.make clean; fi)
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):
-	@(if [ -e build/gmake/pyllbc.make ]; then cd build/gmake && $(MAKE) clean -f pyllbc.make; fi)
+	@(if [ -e build/gmake/pyllbc.make ]; then $(MAKE) -C build/gmake -f pyllbc.make clean; fi)
 	@$(shell find ./wrap/pyllbc -type f -name "*.pyc" -exec rm {} \;)
 clean_$(CSWRAP_TARGET):
-	@(if [ -e build/gmake/csllbc_native.make ]; then cd build/gmake && $(MAKE) clean -f csllbc_native.make; fi)
-	@(if [ -e build/gmake/csllbc.make ]; then cd build/gmake && $(MAKE) clean -f csllbc.make; fi)
-	@(if [ -e build/gmake/csllbc_testsuite.make ]; then cd build/gmake && $(MAKE) clean -f csllbc_testsuite.make; fi)
+	@(if [ -e build/gmake/csllbc_native.make ]; then $(MAKE) -C build/gmake -f csllbc_native.make clean; fi)
+	@(if [ -e build/gmake/csllbc.make ]; then $(MAKE) -C build/gmake -f csllbc.make clean; fi)
+	@(if [ -e build/gmake/csllbc_testsuite.make ]; then $(MAKE) -C build/gmake -f csllbc_testsuite.make clean; fi)
 clean_$(LUWRAP_TARGET):
-	@(if [ -e build/gmake/lullbc.make ]; then cd build/gmake && $(MAKE) clean -f lullbc.make; fi)
-	@(if [ -e build/gmake/lullbc_lualib.make ]; then cd build/gmake && $(MAKE) clean -f lullbc_lualib.make; fi)
-	@(if [ -e build/gmake/lullbc_luaexec.make ]; then cd build/gmake && $(MAKE) clean -f lullbc_luaexec.make; fi)
+	@(if [ -e build/gmake/lullbc.make ]; then $(MAKE) -C build/gmake -f lullbc.make clean; fi)
+	@(if [ -e build/gmake/lullbc_lualib.make ]; then $(MAKE) -C build/gmake -f lullbc_lualib.make clean; fi)
+	@(if [ -e build/gmake/lullbc_luaexec.make ]; then $(MAKE) -C build/gmake -f lullbc_luaexec.make clean; fi)
 
 install: install_$(CORELIB_TARGET) install_$(WRAPS_TARGET)
 
