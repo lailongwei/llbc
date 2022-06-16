@@ -86,12 +86,6 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
     filter {}
 
-    -- enable c++11 support
-    filter { "system:not windows" }
-        buildoptions {
-            "-std=c++11",
-        }
-
     -- set warning as error
     filter { "system:not windows" }
         buildoptions { "-Werror" }
@@ -153,21 +147,26 @@ project "llbc"
             "uuid",
             "pthread",
         }
-
     filter { "system:windows" }
         links {
             "ws2_32",
             "Mswsock",
             "DbgHelp",
         }
-
     filter { "system:macosx" }
         links {
             "iconv",
         }
     filter {}
 
-    -- flags
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
@@ -241,6 +240,13 @@ project "testsuite"
     filter { "system:not windows" }
         disablewarnings {
             "invalid-source-encoding",
+        }
+    filter {}
+
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
         }
     filter {}
 
@@ -403,7 +409,14 @@ project "pyllbc"
         filter {}
     end
 
-    -- flags
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
@@ -464,19 +477,27 @@ project "csllbc_native"
         }
     filter {}
 
-    -- flags
-    filter { "system:not windows" }
-        buildoptions {
-            "-fvisibility=hidden",
-        }
-    filter {}
-
     -- disable warnings
     filter { "system:not windows" }
         disablewarnings {
             "attributes"
         }
     filter {}
+
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
+    filter {}
+
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) compile setting
@@ -765,7 +786,14 @@ project "lullbc"
         }
     filter {}
 
-    -- flags
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
