@@ -44,7 +44,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief Time span class encapsulation.
  */
-class LLBC_EXPORT LLBC_TimeSpan
+class LLBC_EXPORT LLBC_TimeSpan final
 {
 public:
     /**

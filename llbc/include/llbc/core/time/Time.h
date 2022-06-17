@@ -25,6 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/time/TimeConstant.h"
 
 __LLBC_NS_BEGIN
 
@@ -42,7 +43,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief LLBC library Time class encapsulation.
  */
-class LLBC_EXPORT LLBC_Time
+class LLBC_EXPORT LLBC_Time final
 {
 public:
     /**
@@ -50,29 +51,29 @@ public:
      */
     static const LLBC_Time UTCBegin; // UTC begin time.
 
-    static const int NumOfSecondsPerDay; // Number of seconds per-day.
-    static const int NumOfMilliSecondsPerDay; // Number of milli-seconds per-day.
-    static const sint64 NumOfMicroSecondsPerDay; // Number of micro-seconds per-day.
-    static const sint64 NumOfNanoSecondsPerDay; // Number of nano-seconds per-day.
+    static constexpr int NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay; // Number of seconds per-day.
+    static constexpr int NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay; // Number of milli-seconds per-day.
+    static constexpr sint64 NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay; // Number of micro-seconds per-day.
+    static constexpr sint64 NumOfNanoSecondsPerDay = LLBC_TimeConstant::NumOfNanoSecondsPerDay; // Number of nano-seconds per-day.
 
-    static const int NumOfSecondsPerHour; // Number of seconds per-hour.
-    static const int NumOfMilliSecondsPerHour; // Number of milli-seconds per-hour.
-    static const sint64 NumOfMicroSecondsPerHour; // Number of micro-seconds per-hour.
-    static const sint64 NumOfNanoSecondsPerHour; // Number of nano-seconds per-hour.
+    static constexpr int NumOfSecondsPerHour = LLBC_TimeConstant::NumOfSecondsPerHour; // Number of seconds per-hour.
+    static constexpr int NumOfMilliSecondsPerHour = LLBC_TimeConstant::NumOfMilliSecondsPerHour; // Number of milli-seconds per-hour.
+    static constexpr sint64 NumOfMicroSecondsPerHour = LLBC_TimeConstant::NumOfMicroSecondsPerHour; // Number of micro-seconds per-hour.
+    static constexpr sint64 NumOfNanoSecondsPerHour = LLBC_TimeConstant::NumOfNanoSecondsPerHour; // Number of nano-seconds per-hour.
 
-    static const int NumOfSecondsPerMinute; // Number of seconds per-minute.
-    static const int NumOfMilliSecondsPerMinute; // Number of milli-seconds per-minute.
-    static const sint64 NumOfMicroSecondsPerMinute; // Number of micro-seconds per-minute.
-    static const sint64 NumOfNanoSecondsPerMinute; // Number of nano-seconds per-minute.
+    static constexpr int NumOfSecondsPerMinute = LLBC_TimeConstant::NumOfSecondsPerMinute; // Number of seconds per-minute.
+    static constexpr int NumOfMilliSecondsPerMinute = LLBC_TimeConstant::NumOfMilliSecondsPerMinute; // Number of milli-seconds per-minute.
+    static constexpr sint64 NumOfMicroSecondsPerMinute = LLBC_TimeConstant::NumOfMicroSecondsPerMinute; // Number of micro-seconds per-minute.
+    static constexpr sint64 NumOfNanoSecondsPerMinute = LLBC_TimeConstant::NumOfNanoSecondsPerMinute; // Number of nano-seconds per-minute.
 
-    static const int NumOfMilliSecondsPerSecond; // Number of milli-seconds per-second.
-    static const sint64 NumOfMicroSecondsPerSecond; // Number of micro-seconds per-second.
-    static const sint64 NumOfNanoSecondsPerSecond; // Number of nano-seconds per-second.
+    static constexpr int NumOfMilliSecondsPerSecond = LLBC_TimeConstant::NumOfMilliSecondsPerSecond; // Number of milli-seconds per-second.
+    static constexpr sint64 NumOfMicroSecondsPerSecond = LLBC_TimeConstant::NumOfMicroSecondsPerSecond; // Number of micro-seconds per-second.
+    static constexpr sint64 NumOfNanoSecondsPerSecond = LLBC_TimeConstant::NumOfNanoSecondsPerSecond; // Number of nano-seconds per-second.
 
-    static const sint64 NumOfMicroSecondsPerMilliSecond; // Number of micro-seconds per-millisecond.
-    static const sint64 NumOfNanoSecondsPerMilliSecond; // Number of nano-seconds per-millisecond.
+    static constexpr sint64 NumOfMicroSecondsPerMilliSecond = LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond; // Number of micro-seconds per-millisecond.
+    static constexpr sint64 NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond; // Number of nano-seconds per-millisecond.
 
-    static const sint64 NumOfNanoSecondsPerMicroSecond; // Number of nano-seconds per-microsecond.
+    static constexpr sint64 NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond; // Number of nano-seconds per-microsecond.
 
 public:
     /**

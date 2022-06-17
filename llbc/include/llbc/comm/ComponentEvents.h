@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The component events offset enumeration.
  */
-class LLBC_EXPORT LLBC_ComponentEventsOffset
+class LLBC_ComponentEventsOffset
 {
 public:
     enum
@@ -61,28 +61,35 @@ public:
 /**
  * \brief The component events id define.
  */
-class LLBC_EXPORT LLBC_ComponentEvents
+class LLBC_ComponentEvents
 {
 public:
-    static const uint64 OnInitialize;
-    static const uint64 OnDestroy;
+    static constexpr uint64 OnInitialize = 1 << LLBC_ComponentEventsOffset::OnInitialize;
+    static constexpr uint64 OnDestroy = 1 << LLBC_ComponentEventsOffset::OnDestroy;
     
-    static const uint64 OnStart;
-    static const uint64 OnStop;
+    static constexpr uint64 OnStart = 1 << LLBC_ComponentEventsOffset::OnStart;
+    static constexpr uint64 OnStop = 1 << LLBC_ComponentEventsOffset::OnStop;
 
-    static const uint64 OnUpdate;
-    static const uint64 OnIdle;
+    static constexpr uint64 OnUpdate = 1 << LLBC_ComponentEventsOffset::OnUpdate;
+    static constexpr uint64 OnIdle = 1 << LLBC_ComponentEventsOffset::OnIdle;
 
-    static const uint64 OnSessionCreate;
-    static const uint64 OnSessionDestroy;
-    static const uint64 OnAsyncConnResult;
-    static const uint64 OnProtoReport;
-    static const uint64 OnUnHandledPacket;
-    static const uint64 OnAppCfgReloaded;
+    static constexpr uint64 OnSessionCreate = 1 << LLBC_ComponentEventsOffset::OnSessionCreate;
+    static constexpr uint64 OnSessionDestroy = 1 << LLBC_ComponentEventsOffset::OnSessionDestroy;
+    static constexpr uint64 OnAsyncConnResult = 1 << LLBC_ComponentEventsOffset::OnAsyncConnResult;
+    static constexpr uint64 OnProtoReport = 1 << LLBC_ComponentEventsOffset::OnProtoReport;
+    static constexpr uint64 OnUnHandledPacket = 1 << LLBC_ComponentEventsOffset::OnUnHandledPacket;
+    static constexpr uint64 OnAppCfgReloaded = 1 << LLBC_ComponentEventsOffset::OnAppCfgReloaded;
 
 public:
-    static const uint64 AllEvents;
-    static const uint64 DefaultEvents;
+    static constexpr uint64 AllEvents = LLBC_ComponentEvents::OnInitialize | LLBC_ComponentEvents::OnDestroy |
+                                        LLBC_ComponentEvents::OnStart | LLBC_ComponentEvents::OnStop |
+                                        LLBC_ComponentEvents::OnUpdate | LLBC_ComponentEvents::OnIdle |
+                                        LLBC_ComponentEvents::OnSessionCreate | LLBC_ComponentEvents::OnSessionDestroy |
+                                        LLBC_ComponentEvents::OnAsyncConnResult | LLBC_ComponentEvents::OnProtoReport |
+                                        LLBC_ComponentEvents::OnUnHandledPacket |
+                                        LLBC_ComponentEvents::OnAppCfgReloaded;
+
+    static constexpr uint64 DefaultEvents = LLBC_ComponentEvents::AllEvents & ~(LLBC_ComponentEvents::OnUpdate | LLBC_ComponentEvents::OnIdle);
 };
 
 __LLBC_NS_END
