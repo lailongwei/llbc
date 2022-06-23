@@ -28,6 +28,25 @@
 # 23)【llbc core】LLBC_BasicCString增加std::ostream &operator <<(std::ostream &operator <<, const LLBC_BasicCString &)方法支持
 # 24)【llbc core】相关多余LLBC_EXTERN宏使用去除
 # 25)【llbc core】对象池反射方法简化, 去除IsPoolObject()/GiveBackToPool()方法要求, 以让对象池使用者以更轻的负担编写反射支持的类实现
+# 26)【llbc core】简化Hash包装, 提供LLBC_Hash<algo>(bytes, size) 及 LLBC_Hash()方法支持
+# 27)【llbc core】对象池结合推进中项目进行优化:
+#   - 便利性接口提供
+#   - 泛化GC对象、非GC对象的接口访问及使用, 标准化LLBC_ObjectGuard, 能统一管理GC/非GC对象, 支持copy construct/copy assignment
+#   - 对象池反射改进及简化: 简化反射支持接口约束, 增加c++11的泛型反射支持, LLBC_Recycle优化、完善
+#   - 对象重用代码优化
+# 28)【llbc core】Event模块整体代码简化及命名优化
+# 29)【llbc core】RDTSC/LLBC_CPUTime完整重构, 标准化cpu时间获取支持
+# 30)【llbc core】框架代码中的static const number变量定义调整成constexpr
+# 31)【pyllbc】修复一处dist操作内存泄漏
+# 32)【llbc all】完整简化Makefile, 同时修复部分projs有并发编译时的依赖报错问题
+# 33)【llbc all】部分旧风格代码的整理(2015年前)
+# 34)【llbc core】完整优化LLBC_Stream内部的resize实现, 确保在内存分配时有一个可控的分配策略
+# 35)【llbc core】修正部分宏在未引入namespace时的报错问题(集中行log module)
+# 36)【llbc core】完整简化llbc对不是大部分模块都有使用的OS API/C lib/C++ lib头文件引用, 以降低编译耗时及减少不必要的耦合, 同时也增强可移植性
+# 37)【llbc core】Timer timeout handler/cancel handler及Service相关Subscribe方法简化, 支持(Obj *, void (Obj *)(xxx))接口
+# 38)【llbc core】LLBC_Time/LLBC_TimeSpan接口规整及简化
+# 39)【llcb core】LLBC_Timer的TimerScheduler获取隋式延迟到Schedule调用处, 以确保跨线程创建的Timer可被实际执行线程Schedule
+# 40)【llbc core】优化LLBC_Packet payload相关接口访问
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
