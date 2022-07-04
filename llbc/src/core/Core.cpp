@@ -45,25 +45,25 @@ int __LLBC_CoreStartup()
 
     // Set timezone.
     LLBC_TZSet();
-
     // initialize performance frequency.
     LLBC_CPUTime::InitFrequency();
-
-    // Set entry thread object pool.
-    if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
-        return LLBC_FAILED;
-
     // Set entry thread timer scheduler.
-    if (LLBC_TimerScheduler::CreateEntryThreadScheduler() != LLBC_OK)
-        return LLBC_FAILED;
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    tls->coreTls.timerScheduler = LLBC_New(LLBC_TimerScheduler);
 
     // Set random seed.
     LLBC_SeedRand(static_cast<int>(::time(nullptr)));
 
     // Initialize network library.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->coreTls.needInitWinSock)
         LLBC_StartupNetLibrary();
+
+    // Create entry thread auto-release pool stack.
+    tls->objbaseTls.poolStack = LLBC_New(LLBC_AutoReleasePoolStack);
+
+    // Set entry thread object pool.
+    if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
+        return LLBC_FAILED;
 
     // Supported object-pool reflection types assert.
     ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_LogData>());
@@ -76,27 +76,38 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
-    // Destroy entry thread timer scheduler.
-    (void)LLBC_TimerScheduler::DestroyEntryThreadScheduler();
-
-    // Destroy main bundle.
-    LLBC_Bundle::DestroyMainBundle();
-
-    // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
-
-    // Cleanup network library.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (tls->coreTls.needInitWinSock)
-        LLBC_CleanupNetLibrary();
-
     // Destroy entry thread object pool.
     (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
     // Destroy all object pool instance factories.
     LLBC_IObjectPool::DestroyAllPoolInstFactories();
 
+    // Destroy entry thread auto-release pool stack.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (tls->objbaseTls.poolStack)
+    {
+        LLBC_Delete(reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack));
+        tls->objbaseTls.poolStack = nullptr;
+    }
+
+    // Cleanup network library.
+    if (tls->coreTls.needInitWinSock)
+        LLBC_CleanupNetLibrary();
+
+    // Destroy entry thread timer scheduler.
+    if (tls->coreTls.timerScheduler)
+    {
+        LLBC_Delete(reinterpret_cast<LLBC_TimerScheduler *>(tls->coreTls.timerScheduler));
+        tls->coreTls.timerScheduler = nullptr;
+    }
+
+    // Destroy main bundle.
+    LLBC_Bundle::DestroyMainBundle();
+
     // Destroy Variant number to number string repr fast access table.
     LLBC_Variant::DestroyNumber2StrFastAccessTable();
+
+    // Finalize logger manager.
+    LLBC_LoggerManagerSingleton->Finalize();
 }
 
 __LLBC_NS_END

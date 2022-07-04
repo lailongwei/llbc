@@ -29,12 +29,6 @@
 
 #include "llbc/core/timer/TimerScheduler.h"
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static LLBC_NS LLBC_TimerScheduler *__g_entryThreadTimerScheduler = nullptr;
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 LLBC_TimerScheduler::LLBC_TimerScheduler()
@@ -64,53 +58,6 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
         if (--data->refCount == 0)
             LLBC_Delete(data);
     }
-}
-
-int LLBC_TimerScheduler::CreateEntryThreadScheduler()
-{
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!tls->coreTls.entryThread)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-    else if (tls->coreTls.timerScheduler)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    tls->coreTls.timerScheduler = 
-        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = LLBC_New(LLBC_TimerScheduler);
-
-    return LLBC_OK;
-}
-
-int LLBC_TimerScheduler::DestroyEntryThreadScheduler()
-{
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!tls->coreTls.entryThread)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-    else if (!tls->coreTls.timerScheduler)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    tls->coreTls.timerScheduler = nullptr;
-
-    LLBC_Delete(LLBC_INTERNAL_NS __g_entryThreadTimerScheduler);
-    LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = nullptr;
-
-    return LLBC_OK;
-}
-
-LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetEntryThreadScheduler()
-{
-    return LLBC_INTERNAL_NS __g_entryThreadTimerScheduler;
 }
 
 LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
