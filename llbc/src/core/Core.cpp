@@ -60,6 +60,7 @@ int __LLBC_CoreStartup()
 
     // Create entry thread auto-release pool stack.
     tls->objbaseTls.poolStack = LLBC_New(LLBC_AutoReleasePoolStack);
+    LLBC_New(LLBC_NS LLBC_AutoReleasePool);
 
     // Set entry thread object pool.
     if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
