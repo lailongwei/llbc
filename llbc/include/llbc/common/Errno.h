@@ -339,14 +339,14 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_FORMAT                ((int)(0xc0000013))
 
 //
-// Message Id: LLBC_ERROR_TIMEOUT
+// Message Id: LLBC_ERROR_TIMEOUTED
 //
 // MessageText:
 //
-// timeout.
+// timeouted.
 //
-#define __LLBC_ERROR_TIMEOUT             ((int)(0x00000014))
-#define LLBC_ERROR_TIMEOUT               ((int)(0xc0000014))
+#define __LLBC_ERROR_TIMEOUTED           ((int)(0x00000014))
+#define LLBC_ERROR_TIMEOUTED             ((int)(0xc0000014))
 
 //
 // Message Id: LLBC_ERROR_BUSY
@@ -597,6 +597,7 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 //
 #define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002d))
 #define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002d))
+
 //
 // Message Id: LLBC_ERROR_NOT_SUPPORT
 //
@@ -606,6 +607,16 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 //
 #define __LLBC_ERROR_NOT_SUPPORT         ((int)(0x0000002e))
 #define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc000002e))
+
+//
+// Message Id: LLBC_ERROR_CANCELLED
+//
+// MessageText:
+//
+// cancelled.
+//
+#define __LLBC_ERROR_CANCELLED           ((int)(0x0000002f))
+#define LLBC_ERROR_CANCELLED             ((int)(0xc000002f))
 
 //
 //!! Sentinel error no.

@@ -35,7 +35,7 @@ int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet 
     int ret = ::select(nfds, readfds, writefds, exceptfds, &timeout);
     if (ret == 0)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     }
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (ret == -1)

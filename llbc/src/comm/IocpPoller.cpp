@@ -279,7 +279,7 @@ void LLBC_IocpPoller::MonitorSvc()
                                              20);
 
     int errNo = LLBC_ERROR_SUCCESS, subErrNo = 0;
-    if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
+    if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUTED)
     {
         if (ret != LLBC_OK)
         {

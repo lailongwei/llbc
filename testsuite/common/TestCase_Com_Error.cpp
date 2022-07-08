@@ -111,7 +111,7 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_PrintLine("\tLLBC_ERROR_TRUNCATED: %s", LLBC_StrError(LLBC_ERROR_TRUNCATED));
     LLBC_PrintLine("\tLLBC_ERROR_INVALID: %s", LLBC_StrError(LLBC_ERROR_INVALID));
     LLBC_PrintLine("\tLLBC_ERROR_FORMAT: %s", LLBC_StrError(LLBC_ERROR_FORMAT));
-    LLBC_PrintLine("\tLLBC_ERROR_TIMEOUT: %s", LLBC_StrError(LLBC_ERROR_TIMEOUT));
+    LLBC_PrintLine("\tLLBC_ERROR_TIMEOUTED: %s", LLBC_StrError(LLBC_ERROR_TIMEOUTED));
     LLBC_PrintLine("\tLLBC_ERROR_BUSY: %s", LLBC_StrError(LLBC_ERROR_BUSY));
     LLBC_PrintLine("\tLLBC_ERROR_REENTRY: %s", LLBC_StrError(LLBC_ERROR_REENTRY));
     LLBC_PrintLine("\tLLBC_ERROR_NO_SUCH: %s", LLBC_StrError(LLBC_ERROR_NO_SUCH));
@@ -136,6 +136,8 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_PrintLine("\tLLBC_ERROR_IS_LISTEN_SOCKET: %s", LLBC_StrError(LLBC_ERROR_IS_LISTEN_SOCKET));
     LLBC_PrintLine("\tLLBC_ERROR_NOT_POOL_OBJECT: %s", LLBC_StrError(LLBC_ERROR_NOT_POOL_OBJECT));
     LLBC_PrintLine("\tLLBC_ERROR_SESSION_SND_BUF_LIMIT: %s", LLBC_StrError(LLBC_ERROR_SESSION_SND_BUF_LIMIT));
+    LLBC_PrintLine("\tLLBC_ERROR_NOT_SUPPORT: %s", LLBC_StrError(LLBC_ERROR_NOT_SUPPORT));
+    LLBC_PrintLine("\tLLBC_ERROR_CANCELLED: %s", LLBC_StrError(LLBC_ERROR_CANCELLED));
 
     // Custom erorr test.
     LLBC_PrintLine("LLBC library custom error test:");

@@ -56,7 +56,7 @@ static int WaiterThreadProc(void *arg)
         {
             if(__g_testData.cv.TimedWait(__g_testData.lock, 510) != LLBC_OK)
             {
-                if(LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
+                if(LLBC_GetLastError() != LLBC_ERROR_TIMEOUTED)
                 {
                     __g_outLock.Lock();
                     std::cout <<"thread [" <<threadIndex 
