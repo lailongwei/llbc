@@ -100,6 +100,18 @@ LLBC_Delegate<Rtn(Args...)>::operator bool() const
 }
 
 template <typename Rtn, typename ...Args>
+bool LLBC_Delegate<Rtn(Args...)>::operator==(std::nullptr_t _) const
+{
+    return _funcType == 0;
+}
+
+template <typename Rtn, typename ...Args>
+bool LLBC_Delegate<Rtn(Args...)>::operator!=(std::nullptr_t _) const
+{
+    return _funcType != 0;
+}
+
+template <typename Rtn, typename ...Args>
 Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 {
     if (_funcType == 1)

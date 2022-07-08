@@ -119,6 +119,20 @@ public:
     explicit operator bool() const;
 
     /**
+     * @brief Compare the delegate with nullptr.
+     * 
+     * @return bool - return true if delegate invalidate, otherwise return false.
+     */
+    bool operator==(std::nullptr_t _) const;
+
+    /**
+     * @brief Compare the delegate with nullptr.
+     * 
+     * @return bool - return true if delegate validate, otherwise return false.
+     */
+    bool operator!=(std::nullptr_t _) const;
+
+    /**
      * The invoke operator.
      *
      * @param[in] args - the call args.
@@ -149,7 +163,6 @@ public:
      * @return LLBC_Delegate & - the delegate object.
      */
     LLBC_Delegate &operator=(const StlFunc &stlFunc);
-
 
     /**
      * @brief Assignment by function object other then c-style function/stl function/class method, eg: lambda.
