@@ -35,6 +35,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The timer data structure encapsulation.
  */
+#pragma pack(push, 1)
 struct LLBC_HIDDEN LLBC_TimerData
 {
     // Timer handle, use to build timer heap.
@@ -49,7 +50,7 @@ struct LLBC_HIDDEN LLBC_TimerData
     sint64 period;
 
     // Repeat times.
-    uint64 repeatTimes;
+    sint64 repeatTimes;
 
     // timer object.
     LLBC_Timer *timer;
@@ -64,6 +65,7 @@ struct LLBC_HIDDEN LLBC_TimerData
     // ref count.
     uint8 refCount;
 };
+#pragma pack(pop)
 
 __LLBC_NS_END
 
