@@ -22,8 +22,6 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
-#include "llbc/common/PFConfig.h"
-
 #include "llbc/common/OSHeader.h"
 #include "llbc/common/Define.h"
 #include "llbc/common/Errno.h"
@@ -83,8 +81,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "invalidate",               // 0x0012
     // format error.
     "format error",             // 0x0013
-    // timeout.
-    "timeout",                  // 0x0014
+    // timeouted.
+    "timeouted",                // 0x0014
     // busy.
     "busy",                     // 0x0015
     // reentry.
@@ -118,9 +116,9 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     // not allow.
     "not allow",                // 0x0024
     // initialize comp failed.
-    "initialize comp failed", // 0x0025
+    "initialize comp failed",   // 0x0025
     // start comp failed.
-    "start comp failed",      // 0x0026
+    "start comp failed",        // 0x0026
     // WSA specific: WSASYSNOTREADY
     "underlying network subsystem is not ready for network communication", // 0x0027
     // WSA specific: WSAVERNOTSUPPORTED
@@ -132,11 +130,13 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     // the specific socket is listen socket.
     "the specific socket is listen socket", // 0x002b
     // object is not pool object.
-    "object is not pool object", // 0x002c
+    "object is not pool object",// 0x002c
     // session send buffer limit.
-    "session send buffer limit", // 0x002d
+    "session send buffer limit",// 0x002d
     // not support.
     "not support",              // 0x002e
+    // cancelled.
+    "cancelled",                // 0x002f
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

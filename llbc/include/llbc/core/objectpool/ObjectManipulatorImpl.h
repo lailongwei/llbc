@@ -21,6 +21,11 @@
 
 #ifdef __LLBC_CORE_OBJECT_POOL_OBJECT_MANIPULATOR_H__
 
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnonnull"
+#endif // GCC compiler
+
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
@@ -164,5 +169,9 @@ void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst
 }
 
 __LLBC_NS_END
+
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#pragma GCC diagnostic pop
+#endif // GCC compiler
 
 #endif // __LLBC_CORE_OBJECT_POOL_OBJECT_MANIPULATOR_H__

@@ -147,7 +147,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         }
     } while(LLBC_GetMilliSeconds() < expireTime);
 
-    LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+    LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     return false;
 #else
     DWORD waitRet = 0;
@@ -157,7 +157,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
     }
     else if(waitRet == WAIT_TIMEOUT)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         return false;
     }
 

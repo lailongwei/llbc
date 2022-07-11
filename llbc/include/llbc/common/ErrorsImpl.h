@@ -19,40 +19,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
-
-#include "llbc/core/os/OS_Select.h"
+#ifdef __LLBC_COM_ERRORS_H__
 
 __LLBC_NS_BEGIN
 
-int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval)
+inline void LLBC_SetLastError(uint32 no)
 {
-    struct timeval timeout;
-    timeout.tv_sec = interval / 1000;
-    timeout.tv_usec = (interval % 1000) * 1000;
+    LLBC_SetLastError(static_cast<int>(no));
+}
 
-    int ret = ::select(nfds, readfds, writefds, exceptfds, &timeout);
-    if (ret == 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
-    }
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    else if (ret == -1)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return ret;
-    }
-#else
-    else if (ret == SOCKET_ERROR)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NETAPI);
-    }
-#endif
-
-    return ret;
+template <typename EnumTy>
+typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
+LLBC_SetLastError(EnumTy no)
+{
+    LLBC_SetLastError(static_cast<int>(no));
 }
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"
+#endif // __LLBC_COM_ERRORS_H__

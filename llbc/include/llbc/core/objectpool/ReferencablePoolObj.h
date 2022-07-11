@@ -32,6 +32,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_IObjectPoolInst;
+class LLBC_PoolObjectReflection;
 
 __LLBC_NS_END
 
@@ -65,7 +66,9 @@ private:
      * Declare friend classes.
      */
     friend class LLBC_IObjectPoolInst;
+    friend class LLBC_PoolObjectReflection;
 
+    bool _referencableObj;
     LLBC_IObjectPoolInst *_poolInst;
 };
 

@@ -54,7 +54,7 @@ int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
 
-    LLBC_MessageBlock *block = packet->GiveUp();
+    LLBC_MessageBlock *block = packet->GiveUpPayload();
     LLBC_Recycle(packet);
 
     if (!block)

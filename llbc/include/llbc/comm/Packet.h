@@ -486,10 +486,10 @@ public:
     bool Decode();
 
     /**
-     * Giveup the message block.
-     * @return LLBC_MessageBlock * - message block.
+     * Giveup payload.
+     * @return LLBC_MessageBlock * - payload.
      */
-    LLBC_MessageBlock *GiveUp();
+    LLBC_MessageBlock *GiveUpPayload();
 
 public:
     /**
@@ -522,6 +522,13 @@ public:
      * @param[in] codecErr - the codec error.
      */
     void SetCodecError(const LLBC_String &codecErr);
+
+public:
+    /**
+     * Get packet string representation.
+     * @return LLBC_String - the packet string representation.
+     */
+    LLBC_String ToString() const;
 
 private:
     /**
@@ -594,6 +601,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support. 
+ */
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
 
 #include "llbc/comm/PacketImpl.h"
 

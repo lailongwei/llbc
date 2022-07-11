@@ -22,6 +22,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <dlfcn.h>
+#endif // Non-Win32
+
 #include "llbc/core/file/Directory.h"
 
 #include "llbc/core/os/OS_Library.h"

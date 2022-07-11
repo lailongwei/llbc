@@ -89,7 +89,7 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
     {
         if (::GetLastError() == WAIT_TIMEOUT)
         {
-            LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+            LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         }
         else
         {

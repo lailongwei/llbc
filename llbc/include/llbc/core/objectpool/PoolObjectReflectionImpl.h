@@ -46,6 +46,15 @@ LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
 }
 
 template <typename ObjectType>
+LLBC_FORCE_INLINE constexpr
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, bool>::type
+LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(std::nullptr_t)
+{
+    return true;
+}
+
+template <typename ObjectType>
 constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...)
 {
     return false;
@@ -53,14 +62,16 @@ constexpr bool LLBC_PoolObjectReflection::IsSupportedPoolObjectReflectionInl(...
 
 template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_PoolObjectReflection::MarkPoolObject(ObjectType *&obj,
-                                                                 LLBC_IObjectPoolInst *poolInst)
+                                                                 LLBC_IObjectPoolInst *poolInst,
+                                                                 bool referencableObj)
 {
-    MarkPoolObjectInl<ObjectType>(obj, poolInst, nullptr);
+    MarkPoolObjectInl<ObjectType>(obj, poolInst, referencableObj, nullptr);
 }
 
 template <typename ObjectType>
 void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                                   LLBC_IObjectPoolInst *poolInst,
+                                                  bool referencableObj,
                                                   __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF *)
 {
     obj->MarkPoolObject(*poolInst);
@@ -70,14 +81,27 @@ template <typename ObjectType>
 typename std::enable_if<std::is_base_of<LLBC_PoolObject, ObjectType>::value, void>::type
 LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                              LLBC_IObjectPoolInst *poolInst,
+                                             bool referencableObj,
                                              std::nullptr_t)
 {
     obj->MarkPoolObject(*poolInst);
 }
 
 template <typename ObjectType>
+typename std::enable_if<std::is_base_of<LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
+LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
+                                             LLBC_IObjectPoolInst *poolInst,
+                                             bool referencableObj,
+                                             std::nullptr_t)
+{
+    obj->_poolInst = poolInst;
+    obj->_referencableObj = referencableObj;
+}
+
+template <typename ObjectType>
 void LLBC_PoolObjectReflection::MarkPoolObjectInl(ObjectType *&obj,
                                                   LLBC_IObjectPoolInst *poolInst,
+                                                  bool referencableObj,
                                                   ...)
 {
     // Do nothing
@@ -109,6 +133,15 @@ LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
                                           std::nullptr_t)
 {
     return obj->GetPoolInst();
+}
+
+template <typename ObjectType>
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, LLBC_IObjectPoolInst *>::type
+LLBC_PoolObjectReflection::GetPoolInstInl(ObjectType *&obj,
+                                          std::nullptr_t)
+{
+    return obj->_poolInst;
 }
 
 template <typename ObjectType>
@@ -162,6 +195,15 @@ LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
         else
             LLBC_Delete(obj);
     }
+}
+
+template <typename ObjectType>
+typename std::enable_if<std::is_base_of<
+    LLBC_ReferencablePoolObj, ObjectType>::value, void>::type
+LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
+                                      std::nullptr_t)
+{
+    obj->Release();
 }
 
 template <typename ObjectType>

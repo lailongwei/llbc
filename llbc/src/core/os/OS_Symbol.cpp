@@ -22,6 +22,11 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <cxxabi.h>
+ #include <execinfo.h>
+#endif
+
 #include "llbc/core/os/OS_Symbol.h"
 
 __LLBC_NS_BEGIN

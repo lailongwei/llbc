@@ -22,6 +22,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+ #include <sys/syscall.h>
+#endif // Linux or Android
+
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN

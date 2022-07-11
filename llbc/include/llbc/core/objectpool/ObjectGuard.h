@@ -36,34 +36,47 @@ template <typename ObjectType>
 class LLBC_ObjectGuard
 {
 public:
+    LLBC_ObjectGuard();
     LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst);
     LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another);
+    LLBC_ObjectGuard(LLBC_ObjectGuard<ObjectType> &&another);
 
     ~LLBC_ObjectGuard();
 
 public:
     /**
      * Get guarded object pointer.
-     * @return ObjectType *& - the guarded object pointer.
+     * @return ObjectType * - the guarded object pointer.
      */
-    ObjectType *&operator ->();
+    ObjectType *operator->();
     /**
      * Get guarded object pointer.
-     * @return const ObjectType * const & - the guarded object pointer.
+     * @return const ObjectType * - the guarded object pointer.
      */
-    const ObjectType * const &operator ->() const;
+    const ObjectType *operator->() const;
 
-public:
     /**
      * Get guarded object.
      * @return ObjectType & - the guarded object reference.
      */
-    ObjectType &operator *();
+    ObjectType &operator*();
     /**
      * Get guarded object.
      * @return const const ObjectType & - the guarded object reference.
      */
-    const ObjectType &operator *() const;
+    const ObjectType &operator*() const;
+
+    /**
+     * Guard object available operator.
+     * @return bool - return true if available, otherwise return false.
+     */
+    explicit operator bool() const;
+
+    /**
+     * Copy/Move assignment.
+     */
+    LLBC_ObjectGuard &operator=(const LLBC_ObjectGuard &another);
+    LLBC_ObjectGuard &operator=(LLBC_ObjectGuard &&another);
 
 public:
     /**
@@ -88,31 +101,44 @@ public:
     const ObjectType *GetObj() const;
 
     /**
+     * Check guarded object is weak ref object or not.
+     * @return bool - weak reference flag.
+     */
+    bool IsWeakRef() const;
+
+    /**
      * Delete guarded object.
      * @return ObjectType * - the detached guarded object.
      */
     ObjectType *DetachObj();
 
-private:
     /**
-     * Make guarded object weakref.
+     * Release guarded object.
+     * 
      */
-    void MakeWeakRef() const;
+    void ReleaseObj();
 
-private:
+public:
     /**
-     * Disable assignment.
+     * Get object guard string representation.
+     * @return LLBC_String - the object guard string representation.
      */
-    LLBC_ObjectGuard &operator =(const LLBC_ObjectGuard &another);
+    LLBC_String ToString() const;
 
 private:
     ObjectType *_obj;
     LLBC_IObjectPoolInst *_poolInst;
 
-    bool _weakRef;
+    mutable bool _weakRef;
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support. 
+ */
+template <typename ObjectType>
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard);
 
 #include "llbc/core/objectpool/ObjectGuardImpl.h"
 

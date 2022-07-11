@@ -39,12 +39,26 @@ LLBC_EXPORT int LLBC_GetLastError();
 LLBC_EXPORT void LLBC_SetLastError(int no);
 
 /**
+ * @brief Set llbc library last error.
+ * 
+ * @param[in] no - error no.
+ */
+void LLBC_SetLastError(uint32 no);
+
+/**
+ * Set llbc last error(enum type).
+ * @param[in] no - error no.
+ */
+template <typename EnumTy>
+typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
+LLBC_SetLastError(EnumTy no);
+
+/**
  * Format error message.
  * @param[in] no - error number.
  * @return const char *error describe.
  */
 LLBC_EXPORT const char *LLBC_StrError(int no);
-
 
 /**
  * Format error message(extend version).
@@ -109,6 +123,8 @@ LLBC_HIDDEN void __LLBC_InitErrors();
 LLBC_HIDDEN void __LLBC_DestroyErrors();
 
 __LLBC_NS_END
+
+#include <llbc/common/ErrorsImpl.h>
 
 #endif // !__LLBC_COM_ERRORS_H__
 

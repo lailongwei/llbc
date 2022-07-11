@@ -244,11 +244,6 @@ inline int LLBC_IService::Broadcast(int opcode, const void *bytes, size_t len, i
     return Broadcast(0, opcode, bytes, len, status);
 }
 
-inline int LLBC_IService::Subscribe(int opcode, void(*func)(LLBC_Packet &))
-{
-    return Subscribe(opcode, LLBC_Delegate<void(LLBC_Packet &)>(func));
-}
-
 template <typename ObjType>
 inline int LLBC_IService::Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {

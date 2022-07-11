@@ -46,36 +46,6 @@ else
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
 end
 
--- Common functional functions define
--- Enable multithread compile
-function enable_multithread_comp()
-    filter { "system:windows" }
-        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
-    filter {}
-end
-
--- Set optimize options.
-function set_optimize_opts()
-    filter { "configurations:debug*", "language:c++", "system:not windows" }
-        buildoptions {
-            "-ggdb -g",
-        }
-    filter {}
-
-    filter { "configurations:debug*", "language:c++", "system:windows" }
-        runtime "Debug"
-        optimize "Debug"
-    filter {}
-
-    filter { "configurations:debug*", "language:not c++" }
-        optimize "Debug"
-    filter {}
-
-    filter { "configurations:release*" }
-        optimize "Speed"
-    filter {}
-end
-
 -- zlib library:
 local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
@@ -104,9 +74,31 @@ workspace ("llbc_" .. _ACTION)
         }
     filter {}
 
-    -- control symbols
-    filter { "system:macosx", "language:c++" }
-        symbols("On")
+    -- enable symbols
+    symbols "On"
+
+    -- set optimize options
+    filter { "configurations:debug*" }
+        runtime "Debug"
+        optimize "Debug"
+    filter {}
+    filter { "configurations:release*" }
+        optimize "On"
+    filter {}
+
+    -- set warning as error
+    filter { "system:not windows" }
+        buildoptions { "-Werror" }
+    filter {}
+
+    -- set debug target suffix
+    filter { "configurations:debug*" }
+        targetsuffix "_debug"
+    filter {}
+
+    -- enable multithread compile(only avabilable on windows)
+    filter { "system:windows" }
+        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
     filter {}
 
     -- characterset architecture
@@ -125,9 +117,6 @@ project "llbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- files
     files {
@@ -158,38 +147,31 @@ project "llbc"
             "uuid",
             "pthread",
         }
-
     filter { "system:windows" }
         links {
             "ws2_32",
             "Mswsock",
             "DbgHelp",
         }
-
     filter { "system:macosx" }
         links {
             "iconv",
         }
     filter {}
 
-    -- flags
+    -- Enable c++11 support.
     filter { "system:not windows" }
         buildoptions {
-            "-fvisibility=hidden",
             "-std=c++11",
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
+    -- Default hidden symbols.
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
     filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
 -- ****************************************************************************
 -- core library testsuite compile setting
@@ -197,9 +179,6 @@ project "testsuite"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -257,20 +236,6 @@ project "testsuite"
         }
     filter {}
 
-    filter { "system:not windows" }
-        buildoptions {
-            "-std=c++11",
-        }
-    filter {}
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
-
     -- warnings
     filter { "system:not windows" }
         disablewarnings {
@@ -278,8 +243,12 @@ project "testsuite"
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
 
 group "wrap"
 
@@ -302,9 +271,6 @@ project "pyllbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -376,7 +342,7 @@ project "pyllbc"
         targetextension ".pyd"
     filter {}
 
-    -- links 
+    -- links
     -- link llbc library
     libdirs { LLBC_OUTPUT_DIR }
 
@@ -443,24 +409,19 @@ project "pyllbc"
         filter {}
     end
 
-    -- flags
+    -- Enable c++11 support.
     filter { "system:not windows" }
         buildoptions {
-            "-fvisibility=hidden",
             "-std=c++11",
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
+    -- Default hidden symbols.
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
     filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
 
 group "wrap/csllbc"
 
@@ -470,9 +431,6 @@ project "csllbc_native"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -519,31 +477,27 @@ project "csllbc_native"
         }
     filter {}
 
-    -- flags
-    filter { "system:not windows" }
-        buildoptions {
-            "-fvisibility=hidden",
-            "-std=c++11",
-        }
-    filter {}
-
-    -- optimize
-    set_optimize_opts()
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
-
     -- disable warnings
     filter { "system:not windows" }
         disablewarnings {
             "attributes"
         }
     filter {}
+
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
+    filter { "system:not windows" }
+        buildoptions {
+            "-fvisibility=hidden",
+        }
+    filter {}
+
 
 -- ****************************************************************************
 -- csharp wrap library(csllbc) compile setting
@@ -601,9 +555,6 @@ project "csllbc"
         }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
     -- links
     filter {}
     links {
@@ -631,9 +582,6 @@ project "csllbc_testsuite"
         "../../wrap/csllbc/testsuite/**.cs",
     }
 
-    -- optimize
-    set_optimize_opts()
-
     -- links
     links {
         "System",
@@ -651,9 +599,6 @@ project "lullbc_lualib"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- files
     files {
@@ -677,9 +622,6 @@ project "lullbc_lualib"
         defines { "LUA_USE_DLOPEN" }
     filter {}
 
-    -- optimize
-    set_optimize_opts()
-
     -- links
     filter { "system:not windows" }
         links { "dl" }
@@ -689,23 +631,12 @@ project "lullbc_lualib"
     targetname "lua"
     targetprefix "lib"
 
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
-    -- enable multithread compile
-    enable_multithread_comp()
-
 -- lua executable compile setting
 local LUA_SRC_PATH = "../../wrap/lullbc/lua"
 project "lullbc_luaexec"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
-
-    -- symbols
-    symbols "On"
 
     -- files
     files {
@@ -723,9 +654,6 @@ project "lullbc_luaexec"
     dependson {
         "lullbc_lualib"
     }
-
-    -- optimize
-    set_optimize_opts()
 
     -- links 
     libdirs { 
@@ -752,11 +680,6 @@ project "lullbc_luaexec"
     -- target name, target prefix
     targetname "lua"
 
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
-
 -- lua wrap library(lullbc) compile setting
 -- import lualib_setting
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
@@ -767,9 +690,6 @@ project "lullbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-    -- symbols
-    symbols "On"
 
     -- dependents
     dependson {
@@ -836,9 +756,6 @@ project "lullbc"
     targetname "_lullbc"
     targetprefix ""
 
-    -- optimize
-    set_optimize_opts()
-
     -- links 
     libdirs { 
         LLBC_OUTPUT_DIR,
@@ -869,11 +786,17 @@ project "lullbc"
         }
     filter {}
 
-    -- flags
+    -- Enable c++11 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++11",
+        }
+    filter {}
+
+    -- Default hidden symbols.
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-std=c++11",
         }
     filter {}
 
@@ -882,11 +805,6 @@ project "lullbc"
     	linkoptions {
             "-undefined dynamic_lookup",
         }
-    filter {}
-
-    -- debug target suffix define
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
     filter {}
 
 group ""

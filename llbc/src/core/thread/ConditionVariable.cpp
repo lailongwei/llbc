@@ -117,7 +117,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
         errno = errNo;
         if (errNo == ETIMEDOUT)
         {
-            LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+            LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         }
         else
         {
@@ -145,7 +145,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     bool successed = (waitRet == WAIT_OBJECT_0) ? true : false;
     if (!successed)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     }
 
     AfterWait(lock);

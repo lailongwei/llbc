@@ -26,7 +26,16 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst)
+LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard()
+: _obj(nullptr)
+, _poolInst(nullptr)
+
+, _weakRef(false)
+{
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObjectPoolInst *poolInst)
 : _obj(obj)
 , _poolInst(poolInst)
 
@@ -35,85 +44,185 @@ inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(ObjectType *obj, LLBC_IObj
 }
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another)
+LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(const LLBC_ObjectGuard<ObjectType> &another)
 : _obj(another._obj)
 , _poolInst(another._poolInst)
 
-, _weakRef(false)
+, _weakRef(another._weakRef)
 {
-    another.MakeWeakRef();
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
 }
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
+LLBC_ObjectGuard<ObjectType>::LLBC_ObjectGuard(LLBC_ObjectGuard<ObjectType> &&another)
+: _obj(another._obj)
+, _poolInst(another._poolInst)
+
+, _weakRef(another._weakRef)
 {
-    if (!_weakRef && _obj && _poolInst)
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
+    another.ReleaseObj();
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType>::~LLBC_ObjectGuard()
+{
+    if (_obj && !_weakRef)
         _poolInst->Release(_obj);
 }
 
 template <typename ObjectType>
-inline ObjectType *&LLBC_ObjectGuard<ObjectType>::operator ->()
+ObjectType *LLBC_ObjectGuard<ObjectType>::operator->()
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline const ObjectType * const &LLBC_ObjectGuard<ObjectType>::operator ->() const
+const ObjectType *LLBC_ObjectGuard<ObjectType>::operator->() const
 {
     return _obj;
 }
 
 template <typename ObjectType>
-ObjectType &LLBC_ObjectGuard<ObjectType>::operator *()
+ObjectType &LLBC_ObjectGuard<ObjectType>::operator*()
 {
     return *_obj;
 }
 
 template <typename ObjectType>
-const ObjectType &LLBC_ObjectGuard<ObjectType>::operator *() const
+const ObjectType &LLBC_ObjectGuard<ObjectType>::operator*() const
 {
     return *_obj;
 }
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::operator ObjectType *()
+LLBC_ObjectGuard<ObjectType>::operator bool() const
+{
+    return _obj != nullptr;
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> &LLBC_ObjectGuard<ObjectType>::operator=(const LLBC_ObjectGuard &another)
+{
+    if (this == &another)
+        return *this;
+
+    if (_obj && !_weakRef)
+        _poolInst->Release(_obj);
+
+    _obj = another._obj;
+    _poolInst = another._poolInst;
+    _weakRef = another._weakRef;
+
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
+
+    return *this;
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType> &LLBC_ObjectGuard<ObjectType>::operator=(LLBC_ObjectGuard &&another)
+{
+    if (this == &another)
+        return *this;
+
+    if (_obj && !_weakRef)
+        _poolInst->Release(_obj);
+
+    _obj = another._obj;
+    _poolInst = another._poolInst;
+    _weakRef = another._weakRef;
+
+    if (another._obj && !another._weakRef)
+        another._weakRef = true;
+
+    another.ReleaseObj();
+
+    return *this;
+}
+
+template <typename ObjectType>
+LLBC_ObjectGuard<ObjectType>::operator ObjectType*()
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline LLBC_ObjectGuard<ObjectType>::operator const ObjectType *() const
+LLBC_ObjectGuard<ObjectType>::operator const ObjectType*() const
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj()
+ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj()
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline const ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj() const
+const ObjectType *LLBC_ObjectGuard<ObjectType>::GetObj() const
 {
     return _obj;
 }
 
 template <typename ObjectType>
-inline ObjectType *LLBC_ObjectGuard<ObjectType>::DetachObj()
+bool LLBC_ObjectGuard<ObjectType>::IsWeakRef() const
 {
-    ObjectType *obj = _obj;
+    return _weakRef;
+}
+
+template <typename ObjectType>
+ObjectType *LLBC_ObjectGuard<ObjectType>::DetachObj()
+{
+    if (_obj)
+    {
+        ObjectType *obj = _obj;
+        _obj = nullptr;
+        _poolInst = nullptr;
+        _weakRef = false;
+
+        return obj;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+template <typename ObjectType>
+void LLBC_ObjectGuard<ObjectType>::ReleaseObj()
+{
+    if (!_obj)
+        return;
+
+    if (!_weakRef)
+        _poolInst->Release(_obj);
+    else
+        _weakRef = false;
+
     _obj = nullptr;
-
-    return obj;
+    _poolInst = nullptr;
 }
 
 template <typename ObjectType>
-inline void LLBC_ObjectGuard<ObjectType>::MakeWeakRef() const
+LLBC_String LLBC_ObjectGuard<ObjectType>::ToString() const
 {
-    const_cast<LLBC_ObjectGuard<ObjectType> *>(this)->_weakRef = true;
+    if (!_obj)
+        return "ObjectGuard[null]";
+
+    LLBC_String repr;
+    return LLBC_String().format("ObjectGuard[obj(%s):0x%p, poolInst:0x%p, weak?:%s]",
+                                LLBC_GetTypeName(_obj), _obj, _poolInst, _weakRef ? "true" : "false");
 }
 
 __LLBC_NS_END
+
+template <typename ObjectType>
+std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard)
+{
+    return (o << objGuard.ToString());
+}
 
 #endif // __LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__

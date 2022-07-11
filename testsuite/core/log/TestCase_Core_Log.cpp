@@ -21,6 +21,7 @@
 
 
 #include "core/log/TestCase_Core_Log.h"
+#include <iomanip>
 
 TestCase_Core_Log::TestCase_Core_Log()
 {

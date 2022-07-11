@@ -2142,7 +2142,11 @@ void LLBC_Service::UpdateAutoReleasePool()
 
 void LLBC_Service::ClearAutoReleasePool()
 {
-    _releasePoolStack = nullptr;
+    if (_releasePoolStack)
+    {
+        _releasePoolStack->Purge();
+        _releasePoolStack = nullptr;
+    }
 }
 
 void LLBC_Service::InitObjectPools()
@@ -2173,7 +2177,11 @@ void LLBC_Service::UpdateTimers()
 
 void LLBC_Service::ClearHoldedTimerScheduler()
 {
-    _timerScheduler = nullptr;
+    if (_timerScheduler)
+    {
+        _timerScheduler->CancelAll();
+        _timerScheduler = nullptr;
+    }
 }
 
 void LLBC_Service::ProcessIdle(bool fullFrame)

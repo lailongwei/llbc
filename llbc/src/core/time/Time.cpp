@@ -39,30 +39,6 @@ std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 
 __LLBC_NS_BEGIN
 
-const int LLBC_Time::NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay; 
-const int LLBC_Time::NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay; 
-const sint64 LLBC_Time::NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay; 
-const sint64 LLBC_Time::NumOfNanoSecondsPerDay = LLBC_TimeConstant::NumOfNanoSecondsPerDay; 
-
-const int LLBC_Time::NumOfSecondsPerHour = LLBC_TimeConstant::NumOfSecondsPerHour; 
-const int LLBC_Time::NumOfMilliSecondsPerHour = LLBC_TimeConstant::NumOfMilliSecondsPerHour; 
-const sint64 LLBC_Time::NumOfMicroSecondsPerHour = LLBC_TimeConstant::NumOfMicroSecondsPerHour; 
-const sint64 LLBC_Time::NumOfNanoSecondsPerHour = LLBC_TimeConstant::NumOfNanoSecondsPerHour; 
-
-const int LLBC_Time::NumOfSecondsPerMinute = LLBC_TimeConstant::NumOfSecondsPerMinute; 
-const int LLBC_Time::NumOfMilliSecondsPerMinute = LLBC_TimeConstant::NumOfMilliSecondsPerMinute; 
-const sint64 LLBC_Time::NumOfMicroSecondsPerMinute = LLBC_TimeConstant::NumOfMicroSecondsPerMinute; 
-const sint64 LLBC_Time::NumOfNanoSecondsPerMinute = LLBC_TimeConstant::NumOfNanoSecondsPerMinute; 
-
-const int LLBC_Time::NumOfMilliSecondsPerSecond = LLBC_TimeConstant::NumOfMilliSecondsPerSecond; 
-const sint64 LLBC_Time::NumOfMicroSecondsPerSecond = LLBC_TimeConstant::NumOfMicroSecondsPerSecond; 
-const sint64 LLBC_Time::NumOfNanoSecondsPerSecond = LLBC_TimeConstant::NumOfNanoSecondsPerSecond; 
-
-const sint64 LLBC_Time::NumOfMicroSecondsPerMilliSecond = LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond; 
-const sint64 LLBC_Time::NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond; 
-
-const sint64 LLBC_Time::NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond; 
-
 const LLBC_Time LLBC_Time::UTCBegin;
 
 LLBC_Time LLBC_Time::Now()

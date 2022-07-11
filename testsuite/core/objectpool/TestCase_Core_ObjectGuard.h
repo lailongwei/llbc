@@ -19,40 +19,25 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+#ifndef __LLBC_TEST_CASE_CORE_OBJECT_GUARD_H__
+#define __LLBC_TEST_CASE_CORE_OBJECT_GUARD_H__
 
-#include "llbc/core/os/OS_Select.h"
+#include "llbc.h"
+using namespace llbc;
 
-__LLBC_NS_BEGIN
-
-int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval)
+class TestCase_Core_ObjectGuard : public LLBC_BaseTestCase
 {
-    struct timeval timeout;
-    timeout.tv_sec = interval / 1000;
-    timeout.tv_usec = (interval % 1000) * 1000;
+public:
+    TestCase_Core_ObjectGuard();
+    virtual ~TestCase_Core_ObjectGuard();
 
-    int ret = ::select(nfds, readfds, writefds, exceptfds, &timeout);
-    if (ret == 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
-    }
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    else if (ret == -1)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return ret;
-    }
-#else
-    else if (ret == SOCKET_ERROR)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NETAPI);
-    }
-#endif
+public:
+    int Run(int argc, char *argv[]);
 
-    return ret;
-}
+private:
+    int BaseTest();
+    int WeakRefTest();
+    int AccessorOperatorsTest();
+};
 
-__LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"
+#endif // !__LLBC_TEST_CASE_CORE_OBJECT_GUARD_H__

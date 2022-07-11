@@ -22,6 +22,10 @@
 #include "llbc/common/Export.h"
 #include "llbc/common/BeforeIncl.h"
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <uuid/uuid.h>
+#endif // Non-Win32
+
 #include "llbc/core/helper/GUIDHelper.h"
 
 __LLBC_NS_BEGIN
