@@ -29,13 +29,38 @@
 
 __LLBC_NS_BEGIN
 
+#define SPECIALIZATION_RELEASE_FUNCTION(SpeObjectType, SpePoolVariable, PoolLockType, PoolInstLockType) \
+template <>                                                                                             \
+template <>                                                                                             \
+LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(SpeObjectType *obj)      \
+{                                                                                                       \
+    if (SpePoolVariable != nullptr)                                                                     \
+        SpePoolVariable->Release(obj);                                                                  \
+    return LLBC_OK;                                                                                     \
+}                                                                                                       \
+
+#define SPECIALIZATION_GETPOOLINST_FUNCTION(SpeObjectType, SpePoolVariable, PoolLockType, PoolInstLockType)             \
+template <>                                                                                                             \
+template <>                                                                                                             \
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<SpeObjectType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()    \
+{                                                                                                                       \
+    if (SpePoolVariable == nullptr)                                                                                     \
+    {                                                                                                                   \
+        _lock.Lock();                                                                                                   \
+        SpePoolVariable = new LLBC_ObjectPoolInst<SpeObjectType>(this, new PoolInstLockType());                         \
+        _lock.Unlock();                                                                                                 \
+        LLBC_ObjectManipulator::OnPoolInstCreate<SpeObjectType>(*SpePoolVariable);                                      \
+    }                                                                                                                   \
+    return SpePoolVariable;                                                                                             \
+}                                                                                                                       \
+
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
-: LLBC_IObjectPool()
-, _orderedDeleteNodes(nullptr)
-, _topOrderedDeleteNodes(nullptr)
-, _stdStringPoolInst(nullptr)
-, _llbcStringPoolInst(nullptr)
+    : LLBC_IObjectPool()
+    , _orderedDeleteNodes(nullptr)
+    , _topOrderedDeleteNodes(nullptr)
+    , _stdStringPoolInst(nullptr)
+    , _llbcStringPoolInst(nullptr)
 {
 }
 
@@ -49,13 +74,13 @@ LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectP
     if (_orderedDeleteNodes)
     {
         for (LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _topOrderedDeleteNodes->begin();
-             nodeIt != _topOrderedDeleteNodes->end();
-             ++nodeIt)
+            nodeIt != _topOrderedDeleteNodes->end();
+            ++nodeIt)
             DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 
         for (LLBC_ObjectPoolOrderedDeleteNodes::iterator nodeIt = _orderedDeleteNodes->begin();
-             nodeIt != _orderedDeleteNodes->end();
-             ++nodeIt)
+            nodeIt != _orderedDeleteNodes->end();
+            ++nodeIt)
             LLBC_Delete(nodeIt->second);
         LLBC_Delete(_orderedDeleteNodes);
         LLBC_Delete(_topOrderedDeleteNodes);
@@ -63,8 +88,8 @@ LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::~LLBC_ObjectP
 
     // Delete unacquire ordered delete pool instances.
     for (_PoolInsts::iterator poolIt = _poolInsts.begin();
-         poolIt != _poolInsts.end();
-         ++poolIt)
+        poolIt != _poolInsts.end();
+        ++poolIt)
         LLBC_Delete(poolIt->second);
 
     LLBC_Delete(_stdStringPoolInst);
@@ -102,85 +127,29 @@ LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(O
     return Release(typeid(ObjectType).name(), obj);
 }
 
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::Release(std::string *obj)
-{
-    if (_stdStringPoolInst != nullptr)
-        _stdStringPoolInst->Release(obj);
+// specialization pool inst(std::string) Release funtion
+SPECIALIZATION_RELEASE_FUNCTION(std::string, _stdStringPoolInst, LLBC_DummyLock, LLBC_DummyLock)
+SPECIALIZATION_RELEASE_FUNCTION(std::string, _stdStringPoolInst, LLBC_SpinLock, LLBC_DummyLock)
+SPECIALIZATION_RELEASE_FUNCTION(std::string, _stdStringPoolInst, LLBC_DummyLock, LLBC_SpinLock)
+SPECIALIZATION_RELEASE_FUNCTION(std::string, _stdStringPoolInst, LLBC_SpinLock, LLBC_SpinLock)
 
-    return LLBC_OK;
-}
+// specialization pool inst(std::string) GetPoolInst funtion
+SPECIALIZATION_GETPOOLINST_FUNCTION(std::string, _stdStringPoolInst, LLBC_DummyLock, LLBC_DummyLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(std::string, _stdStringPoolInst, LLBC_SpinLock, LLBC_DummyLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(std::string, _stdStringPoolInst, LLBC_DummyLock, LLBC_SpinLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(std::string, _stdStringPoolInst, LLBC_SpinLock, LLBC_SpinLock)
 
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::Release(std::string *obj)
-{
-    if (_stdStringPoolInst != nullptr)
-        _stdStringPoolInst->Release(obj);
+// specialization pool inst(LLBC_String) Release funtion
+SPECIALIZATION_RELEASE_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_DummyLock, LLBC_DummyLock)
+SPECIALIZATION_RELEASE_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_SpinLock, LLBC_DummyLock)
+SPECIALIZATION_RELEASE_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_DummyLock, LLBC_SpinLock)
+SPECIALIZATION_RELEASE_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_SpinLock, LLBC_SpinLock)
 
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::Release(std::string *obj)
-{
-    if (_stdStringPoolInst != nullptr)
-        _stdStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::Release(std::string *obj)
-{
-    if (_stdStringPoolInst != nullptr)
-        _stdStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::Release(LLBC_String *obj)
-{
-    if (_llbcStringPoolInst != nullptr)
-        _llbcStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::Release(LLBC_String *obj)
-{
-    if (_llbcStringPoolInst != nullptr)
-        _llbcStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::Release(LLBC_String *obj)
-{
-    if (_llbcStringPoolInst != nullptr)
-        _llbcStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE int LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::Release(LLBC_String *obj)
-{
-    if (_llbcStringPoolInst != nullptr)
-        _llbcStringPoolInst->Release(obj);
-
-    return LLBC_OK;
-}
+// specialization pool inst(LLBC_String) GetPoolInst funtion
+SPECIALIZATION_GETPOOLINST_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_DummyLock, LLBC_DummyLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_SpinLock, LLBC_DummyLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_DummyLock, LLBC_SpinLock)
+SPECIALIZATION_GETPOOLINST_FUNCTION(LLBC_String, _llbcStringPoolInst, LLBC_SpinLock, LLBC_SpinLock)
 
 template <typename PoolLockType, typename PoolInstLockType>
 int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectType, void *obj)
@@ -230,130 +199,6 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType,
     }
 
     return poolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::GetPoolInst()
-{
-    if (_stdStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_DummyLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
-    }
-
-    return _stdStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::GetPoolInst()
-{
-    if (_stdStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_DummyLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
-    }
-
-    return _stdStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::GetPoolInst()
-{
-    if (_stdStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_SpinLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
-    }
-
-    return _stdStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<std::string> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::GetPoolInst()
-{
-    if (_stdStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _stdStringPoolInst = new LLBC_ObjectPoolInst<std::string>(this, new LLBC_SpinLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<std::string>(*_stdStringPoolInst);
-    }
-
-    return _stdStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>::GetPoolInst()
-{
-    if (_llbcStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_DummyLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
-    }
-    return _llbcStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>::GetPoolInst()
-{
-    if (_llbcStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_DummyLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
-    }
-    return _llbcStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>::GetPoolInst()
-{
-    if (_llbcStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_SpinLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
-    }
-    return _llbcStringPoolInst;
-}
-
-template <>
-template <>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<LLBC_String> *LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>::GetPoolInst()
-{
-    if (_llbcStringPoolInst == nullptr)
-    {
-        _lock.Lock();
-        _llbcStringPoolInst = new LLBC_ObjectPoolInst<LLBC_String>(this, new LLBC_SpinLock());
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<LLBC_String>(*_llbcStringPoolInst);
-    }
-    return _llbcStringPoolInst;
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -540,8 +385,8 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &
 
     std::vector<const LLBC_ObjectPoolInstStat *> instStats;
     for (_PoolInsts::const_iterator it = _poolInsts.begin();
-         it != _poolInsts.end();
-         ++it)
+        it != _poolInsts.end();
+        ++it)
     {
         _InstStatIt instStatIt = stat.poolInsts.insert(
             std::make_pair(it->first, LLBC_ObjectPoolInstStat())).first;
@@ -597,14 +442,14 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDelete
         return;
 
     for (LLBC_ObjectPoolOrderedDeleteNodes::const_iterator nodeIt = backNodes->begin();
-         nodeIt != backNodes->end();
-         ++nodeIt)
+        nodeIt != backNodes->end();
+        ++nodeIt)
         DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
 void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat,
-                                                                            std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const
+    std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const
 {
     // top N used memory array:
     std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedMem);

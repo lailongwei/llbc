@@ -4,6 +4,7 @@ namespace llbc
 {
     public class Errno
     {
+
         static public uint LLBC_ERROR_MASK_SEVERITY          = 0xc0000000;
         static public uint LLBC_ERROR_MASK_CUSTOM            = 0x20000000;
         static public uint LLBC_ERROR_MASK_RESERVED          = 0x1ff00000;
@@ -125,7 +126,8 @@ namespace llbc
         static public uint LLBC_ERROR_SESSION_SND_BUF_LIMIT  = 0xc000002d;
 
         static public uint LLBC_ERROR_NOT_SUPPORT            = 0xc000002e;
-        
-        static public uint LLBC_ERROR_NOT_CANCELLED          = 0xc000002f;
+
+        static public uint LLBC_ERROR_CANCELLED              = 0xc000002f;
+
     }
 }

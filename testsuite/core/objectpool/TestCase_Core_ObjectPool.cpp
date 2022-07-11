@@ -905,7 +905,7 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
 
 void TestCase_Core_ObjectPool::DoStringSpecificPoolInstTest()
 {
-    LLBC_PrintLine("DoStringSpecificPoolInstTest begin...");
+    LLBC_PrintLine("\nDoStringSpecificPoolInstTest begin...");
     LLBC_UnsafetyObjectPool pool;
 
     LLBC_ObjectPoolInst<std::string> *stdStringPoolInst = pool.GetPoolInst<std::string>();
@@ -918,9 +918,9 @@ void TestCase_Core_ObjectPool::DoStringSpecificPoolInstTest()
     LLBC_ObjectPoolInst<LLBC_String> *llbcStringPoolInst = pool.GetPoolInst<LLBC_String>();
     //LLBC_PrintLine("std::string pool inst ptr %p  %p", llbcStringPoolInst, pool.GetLLBCStringPoolInst());
     LLBC_String *llbcString = llbcStringPoolInst->GetObject();
-    stdString->assign("LLBC_String specific test...");
+    llbcString->assign("LLBC_String specific test...");
     LLBC_PrintLine("%s", llbcString->c_str());
     llbcStringPoolInst->Release(llbcString);
 
-    LLBC_PrintLine("DoStringSpecificPoolInstTest end...");
+    LLBC_PrintLine("DoStringSpecificPoolInstTest end...\n");
 }
