@@ -445,8 +445,8 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDelete
         return;
 
     for (LLBC_ObjectPoolOrderedDeleteNodes::const_iterator nodeIt = backNodes->begin();
-        nodeIt != backNodes->end();
-        ++nodeIt)
+         nodeIt != backNodes->end();
+         ++nodeIt)
         DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
 }
 
