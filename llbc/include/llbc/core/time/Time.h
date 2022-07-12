@@ -109,8 +109,8 @@ public:
      * @return LLBC_Time - Time object.
      */
     static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMilliSeconds(sint64 clanderTimeInMilliSeconds);
-    static LLBC_Time FromMicroSeconds(sint64 clanderTimeInMicroSeconds);
+    static LLBC_Time FromMillis(sint64 clanderTimeInMilliSeconds);
+    static LLBC_Time FromMicros(sint64 clanderTimeInMicroSeconds);
     static LLBC_Time FromTimeVal(const timeval &timeVal);
     static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     static LLBC_Time FromTimeStr(const LLBC_String &timeStr);

@@ -232,7 +232,7 @@ void pyllbc_Timer::SetIgnoredDeadRef(bool flag)
 
 int pyllbc_Timer::Schedule(sint64 dueTime, sint64 period)
 {
-    if (Base::Schedule(LLBC_TimeSpan::FromMilliSeconds(dueTime), LLBC_TimeSpan::FromMilliSeconds(period)) != LLBC_OK)
+    if (Base::Schedule(LLBC_TimeSpan::FromMillis(dueTime), LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
     {
         const LLBC_String desc = ToString();
         pyllbc_TransferLLBCError(__FILE__, __LINE__, desc);
