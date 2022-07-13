@@ -64,13 +64,13 @@ inline LLBC_TimeSpan LLBC_TimeSpan::FromSeconds(int seconds, int millisecs, int 
                          microsecs);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMilliSeconds(sint64 millisecs, sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMillis(sint64 millisecs, sint64 microsecs)
 {
     return LLBC_TimeSpan(millisecs * LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond +
                          microsecs);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMicroSeconds(sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMicros(sint64 microsecs)
 {
     return LLBC_TimeSpan(microsecs);
 }

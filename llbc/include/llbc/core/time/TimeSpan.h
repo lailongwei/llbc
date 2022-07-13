@@ -54,8 +54,8 @@ public:
     static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
     static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
     static LLBC_TimeSpan FromSeconds(int seconds, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMilliSeconds(sint64 millisecs, sint64 microsecs = 0);
-    static LLBC_TimeSpan FromMicroSeconds(sint64 microsecs);
+    static LLBC_TimeSpan FromMillis(sint64 millisecs, sint64 microsecs = 0);
+    static LLBC_TimeSpan FromMicros(sint64 microsecs);
 
     static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 

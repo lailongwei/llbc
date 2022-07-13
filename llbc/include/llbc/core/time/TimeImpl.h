@@ -50,12 +50,12 @@ inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
     return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMilliSeconds(sint64 clanderTimeInMilliSeconds)
+inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMilliSeconds)
 {
     return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMicroSeconds(sint64 clanderTimeInMicroSeconds)
+inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicroSeconds)
 {
     return LLBC_Time(clanderTimeInMicroSeconds);
 }

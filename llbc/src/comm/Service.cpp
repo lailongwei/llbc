@@ -477,7 +477,7 @@ int LLBC_Service::GetFrameInterval() const
 #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 LLBC_TimeSpan LLBC_Service::GetFrameTimeout() const
 {
-    return LLBC_TimeSpan::FromMicroSeconds(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
+    return LLBC_TimeSpan::FromMicros(_frameTimeout / static_cast<uint64>(LLBC_Time::NumOfNanoSecondsPerMicroSecond));
 }
 
 void LLBC_Service::SetFrameTimeout(const LLBC_TimeSpan &frameTimeout)
