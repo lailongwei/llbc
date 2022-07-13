@@ -137,6 +137,13 @@ private:
      */
     void DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node);
 
+    /**
+    * internal Get pool instance.
+    * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
+    */
+    template <typename ObjectType>
+    LLBC_ObjectPoolInst<ObjectType> *GetPoolInstInl();
+
 private:
     /**
      * Statistic top N pool instance statistic infos.

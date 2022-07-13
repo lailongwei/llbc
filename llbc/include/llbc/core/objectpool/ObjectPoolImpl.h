@@ -51,13 +51,7 @@ LLBC_FORCE_INLINE decltype(LLBC_ObjectPool<PoolLockType, PoolInstLockType>::speP
 {                                                                                                                       \
     if (spePoolVariable == nullptr)                                                                                     \
     {                                                                                                                   \
-        const char *objTypeName = typeid(std::remove_pointer<decltype(spePoolVariable)>::type::value_type).name();      \
-        _lock.Lock();                                                                                                   \
-        spePoolVariable = new std::remove_pointer<decltype(spePoolVariable)>::type(this, new PoolInstLockType());       \
-        _poolInsts.insert(std::make_pair(objTypeName, spePoolVariable));                                                \
-        _lock.Unlock();                                                                                                 \
-        LLBC_ObjectManipulator::OnPoolInstCreate<                                                                       \
-            std::remove_pointer<decltype(spePoolVariable)>::type::value_type>(*spePoolVariable);                        \
+        spePoolVariable = GetPoolInstInl<std::remove_pointer<decltype(spePoolVariable)>::type::value_type>();           \
     }                                                                                                                   \
     return spePoolVariable;                                                                                             \
 }                                                                                                                       \
@@ -182,26 +176,7 @@ template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
 LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
 {
-    const char *objectType = typeid(ObjectType).name();
-
-    _PoolInsts::iterator it;
-    LLBC_ObjectPoolInst<ObjectType> *poolInst;
-
-    _lock.Lock();
-    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
-    {
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
-        _lock.Unlock();
-
-        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
-    }
-    else
-    {
-        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
-        _lock.Unlock();
-    }
-
-    return poolInst;
+    return GetPoolInstInl<ObjectType>();
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
@@ -448,6 +423,32 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDelete
          nodeIt != backNodes->end();
          ++nodeIt)
         DeleteAcquireOrderedDeletePoolInst(nodeIt->second);
+}
+
+template <typename PoolLockType, typename PoolInstLockType>
+template <typename ObjectType>
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInstInl()
+{
+    const char *objectType = typeid(ObjectType).name();
+
+    _PoolInsts::iterator it;
+    LLBC_ObjectPoolInst<ObjectType> *poolInst;
+
+    _lock.Lock();
+    if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
+    {
+        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _lock.Unlock();
+
+        LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
+    }
+    else
+    {
+        poolInst = reinterpret_cast<LLBC_ObjectPoolInst<ObjectType> *>(it->second);
+        _lock.Unlock();
+    }
+
+    return poolInst;
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
