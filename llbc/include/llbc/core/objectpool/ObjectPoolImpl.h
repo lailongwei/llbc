@@ -29,47 +29,47 @@
 
 __LLBC_NS_BEGIN
 
-#define __LLBC_SPE_OBJPOOL_RELEASE_METH(PoolLockType, PoolInstLockType, spePoolVariable)                \
-template <>                                                                                             \
-template <>                                                                                             \
-LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(                         \
-    std::remove_pointer<decltype(spePoolVariable)>::type::value_type *obj)                              \
-{                                                                                                       \
-    if (LIKELY(spePoolVariable))                                                                        \
-    {                                                                                                   \
-        spePoolVariable->Release(obj);                                                                  \
-        return LLBC_OK;                                                                                 \
-    }                                                                                                   \
-    return LLBC_ERROR_INVALID;                                                                          \
-}                                                                                                       \
+#define __LLBC_SPE_OBJPOOL_RELEASE_METH(PoolLockType, PoolInstLockType, spePoolVariable)\
+template <>                                                                             \
+template <>                                                                             \
+LLBC_FORCE_INLINE int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(         \
+    std::remove_pointer<decltype(spePoolVariable)>::type::value_type *obj)              \
+{                                                                                       \
+    if (LIKELY(spePoolVariable))                                                        \
+    {                                                                                   \
+        spePoolVariable->Release(obj);                                                  \
+        return LLBC_OK;                                                                 \
+    }                                                                                   \
+    return LLBC_ERROR_INVALID;                                                          \
+}                                                                                       \
 
-#define __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(PoolLockType, PoolInstLockType, spePoolVariable)                            \
-template <>                                                                                                             \
-template <>                                                                                                             \
-LLBC_FORCE_INLINE decltype(LLBC_ObjectPool<PoolLockType, PoolInstLockType>::spePoolVariable)                            \
-    LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()                                                      \
-{                                                                                                                       \
-    if (spePoolVariable == nullptr)                                                                                     \
-    {                                                                                                                   \
-        spePoolVariable = GetPoolInstInl<std::remove_pointer<decltype(spePoolVariable)>::type::value_type>();           \
-    }                                                                                                                   \
-    return spePoolVariable;                                                                                             \
-}                                                                                                                       \
+#define __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(PoolLockType, PoolInstLockType, spePoolVariable)                 \
+template <>                                                                                                  \
+template <>                                                                                                  \
+LLBC_FORCE_INLINE decltype(LLBC_ObjectPool<PoolLockType, PoolInstLockType>::spePoolVariable)                 \
+    LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()                                           \
+{                                                                                                            \
+    if (spePoolVariable == nullptr)                                                                          \
+    {                                                                                                        \
+        spePoolVariable = GetPoolInstInl<std::remove_pointer<decltype(spePoolVariable)>::type::value_type>();\
+    }                                                                                                        \
+    return spePoolVariable;                                                                                  \
+}                                                                                                            \
 
-#define __LLBC_SPE_OBJPOOL_METHS(spePoolVariable)                                            \
-    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_DummyLock, LLBC_DummyLock, spePoolVariable)         \
-    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_SpinLock, LLBC_DummyLock, spePoolVariable)          \
-    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_DummyLock, LLBC_SpinLock, spePoolVariable)          \
-    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_SpinLock, LLBC_SpinLock, spePoolVariable)           \
-    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_DummyLock, LLBC_DummyLock, spePoolVariable)     \
-    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_SpinLock, LLBC_DummyLock, spePoolVariable)      \
-    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_DummyLock, LLBC_SpinLock, spePoolVariable)      \
-    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_SpinLock, LLBC_SpinLock, spePoolVariable)       \
+#define __LLBC_SPE_OBJPOOL_METHS(spePoolVariable)                                       \
+    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_DummyLock, LLBC_DummyLock, spePoolVariable)    \
+    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_SpinLock, LLBC_DummyLock, spePoolVariable)     \
+    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_DummyLock, LLBC_SpinLock, spePoolVariable)     \
+    __LLBC_SPE_OBJPOOL_RELEASE_METH(LLBC_SpinLock, LLBC_SpinLock, spePoolVariable)      \
+    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_DummyLock, LLBC_DummyLock, spePoolVariable)\
+    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_SpinLock, LLBC_DummyLock, spePoolVariable) \
+    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_DummyLock, LLBC_SpinLock, spePoolVariable) \
+    __LLBC_SPE_OBJPOOL_GETPOOLINST_METH(LLBC_SpinLock, LLBC_SpinLock, spePoolVariable)  \
 
 // specialization pool inst of common types(std::string, LLBC_String, std::vector<int>...).
 __LLBC_SPE_OBJPOOL_METHS(_stdStringPoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_llbcStringPoolInst)
-__LLBC_SPE_OBJPOOL_METHS(_vectorIntPoolInst)
+__LLBC_SPE_OBJPOOL_METHS(_vectorInt32PoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorUint64PoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorUint32PoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorInt64PoolInst)
@@ -81,10 +81,10 @@ LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPo
 , _topOrderedDeleteNodes(nullptr)
 , _stdStringPoolInst(nullptr)
 , _llbcStringPoolInst(nullptr)
-, _vectorIntPoolInst(nullptr)
-, _vectorUint64PoolInst(nullptr)
+, _vectorInt32PoolInst(nullptr)
 , _vectorUint32PoolInst(nullptr)
 , _vectorInt64PoolInst(nullptr)
+, _vectorUint64PoolInst(nullptr)
 {
 }
 
