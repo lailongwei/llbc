@@ -516,12 +516,6 @@ void LLBC_Variant::SeqInsert(SeqIter it, SeqConstIter first, SeqConstIter last)
     _holder.data.obj.seq->insert(it, first, last);
 }
 
-void LLBC_Variant::SeqPushBack(const Seq::value_type &val)
-{
-    BecomeSeqX();
-    _holder.data.obj.seq->push_back(val);
-}
-
 void LLBC_Variant::SeqPopBack()
 {
     BecomeSeq();
@@ -635,12 +629,6 @@ LLBC_Variant::DictIter LLBC_Variant::DictErase(DictIter it)
 {
     BecomeDictX();
     return _holder.data.obj.dict->erase(it);
-}
-
-LLBC_Variant::Dict::size_type LLBC_Variant::DictErase(const Dict::key_type &key)
-{
-    BecomeDictX();
-    return _holder.data.obj.dict->erase(key);
 }
 
 LLBC_Variant::DictIter LLBC_Variant::DictErase(DictIter first, DictIter last)
@@ -1049,6 +1037,18 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
     }
     
     return false;
+}
+
+void LLBC_Variant::SeqPushBackElem(const Seq::value_type &val)
+{
+    BecomeSeqX();
+    _holder.data.obj.seq->push_back(val);
+}
+
+LLBC_Variant::Dict::size_type LLBC_Variant::DictEraseKey(const Dict::key_type &key)
+{
+    BecomeDictX();
+    return _holder.data.obj.dict->erase(key);
 }
 
 __LLBC_NS_END

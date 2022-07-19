@@ -383,6 +383,12 @@ void TestCase_Core_VariantTest::SeqTest()
     std::cout << "seq10 + nil: " << seq10 + LLBC_Variant::nil << std::endl;
     std::cout << "seq10 + hello world: " << seq10 + "hello world" << std::endl;
     std::cout << "seq10 - false: " << seq10 - false << std::endl;
+
+    // Sequence batch push back test.
+    std::cout <<"Sequence batch push back test:" <<std::endl;
+    LLBC_Variant batchPushBackTestSeq;
+    batchPushBackTestSeq.SeqPushBack(true, false, 1, LLBC_Variant(2), "Hello world", 5.8, LLBC_Variant::nil);
+    std::cout <<"- After batch push back:" <<batchPushBackTestSeq <<std::endl;
 }
 
 void TestCase_Core_VariantTest::DictTest()
@@ -441,6 +447,25 @@ void TestCase_Core_VariantTest::DictTest()
     lowPerfDict[rawDict1] = "Hello";
     lowPerfDict[rawDict2] = "World";
     std::cout <<"lowPerfDict: " <<lowPerfDict <<std::endl;
+
+    // Batch erase test.
+    LLBC_Variant batchEraseTestDict;
+    batchEraseTestDict["a"] = 3;
+    batchEraseTestDict[false] = "Hello world";
+    batchEraseTestDict[true] = "Hey Judy";
+    batchEraseTestDict[6] = true;
+    batchEraseTestDict[5] = true;
+    std::cout <<"Batch erase dict test:" <<std::endl;
+    std::cout <<"- Before erase(\"a\", false, 5):" <<batchEraseTestDict <<std::endl;
+    auto batchEraseRet = batchEraseTestDict.DictErase("a", false, LLBC_Variant(5));
+    std::cout <<"- After erase:" <<batchEraseTestDict <<std::endl;
+    std::cout <<"- Erase return:" <<batchEraseRet <<std::endl;
+
+    batchEraseTestDict.DictErase(batchEraseTestDict.DictFind(true));
+    std::cout <<"- After call DictErase(iter(true)):" <<batchEraseTestDict <<std::endl;
+
+    batchEraseTestDict.DictErase(6);
+    std::cout <<"- After call DictErase(6):" <<batchEraseTestDict <<std::endl;
 }
 
 void TestCase_Core_VariantTest::SerializeTest()

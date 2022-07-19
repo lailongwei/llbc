@@ -697,10 +697,20 @@ void LLBC_Variant::SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val)
     this->SeqInsert(it, n, LLBC_Variant(val));
 }
 
-template <typename _Ty>
-void LLBC_Variant::SeqPushBack(const _Ty &val)
+template <typename _Ty1, typename... _Tys>
+typename ::std::enable_if<::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
+LLBC_Variant::SeqPushBack(_Ty1 &&val1, _Tys &&... vals)
 {
-    this->SeqPushBack(LLBC_Variant(val));
+    this->SeqPushBackElem(val1);
+    this->SeqPushBack(std::forward<_Tys>(vals)...);
+}
+
+template <typename _Ty1, typename... _Tys>
+typename ::std::enable_if<!::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
+LLBC_Variant::SeqPushBack(_Ty1 &&val1, _Tys &&... vals)
+{
+    this->SeqPushBackElem(Seq::value_type(val1));
+    this->SeqPushBack(std::forward<_Tys>(vals)...);
 }
 
 template <typename _Ty>
@@ -716,43 +726,51 @@ void LLBC_Variant::SeqErase(const _Ty &val)
 }
 
 template <typename _Key, typename _Val>
-inline std::pair<LLBC_Variant::DictIter, bool> LLBC_Variant::DictInsert(const _Key &key, const _Val &val)
+std::pair<LLBC_Variant::DictIter, bool> LLBC_Variant::DictInsert(const _Key &key, const _Val &val)
 {
     return this->DictInsert(Dict::key_type(key), Dict::mapped_type(val));
 }
 
 template <typename _Key>
-inline LLBC_Variant::DictIter LLBC_Variant::DictFind(const _Key &key)
+LLBC_Variant::DictIter LLBC_Variant::DictFind(const _Key &key)
 {
     return this->DictFind(Dict::key_type(key));
 }
 
 template <typename _Key>
-inline LLBC_Variant::DictConstIter LLBC_Variant::DictFind(const _Key &key) const
+LLBC_Variant::DictConstIter LLBC_Variant::DictFind(const _Key &key) const
 {
     return this->DictFind(Dict::key_type(key));
 }
 
-template <typename _Key>
-inline LLBC_Variant::Dict::size_type LLBC_Variant::DictErase(const _Key &key)
+template <typename _Key1, typename... _Keys>
+typename ::std::enable_if<::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
+LLBC_Variant::DictErase(_Key1 &&key1, _Keys &&... keys)
 {
-    return this->DictErase(Dict::key_type(key));
+    return this->DictEraseKey(key1) + this->DictErase(std::forward<_Keys>(keys)...);
+}
+
+template <typename _Key1, typename... _Keys>
+typename ::std::enable_if<!::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
+LLBC_Variant::DictErase(_Key1 &&key1, _Keys &&... keys)
+{
+    return this->DictEraseKey(Dict::key_type(key1)) + this->DictErase(std::forward<_Keys>(keys)...);
 }
 
 template <typename _Key>
-inline LLBC_Variant &LLBC_Variant::operator [](const _Key &key)
+LLBC_Variant &LLBC_Variant::operator [](const _Key &key)
 {
     return this->operator [](LLBC_Variant(key));
 }
 
 template <typename _Key>
-inline const LLBC_Variant &LLBC_Variant::operator [](const _Key &key) const
+const LLBC_Variant &LLBC_Variant::operator [](const _Key &key) const
 {
     return this->operator [](LLBC_Variant(key));
 }
 
 template <typename _T>
-inline LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
+LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
 {
     _holder.ClearData();
     _holder.type = LLBC_VariantType::VT_RAW_PTR;
@@ -1105,6 +1123,15 @@ inline LLBC_Variant &LLBC_Variant::BecomeDictX()
         _holder.data.obj.dict = LLBC_New(Dict);
 
     return *this;
+}
+
+inline void LLBC_Variant::SeqPushBack()
+{
+}
+
+inline LLBC_Variant::Dict::size_type LLBC_Variant::DictErase()
+{
+    return 0;
 }
 
 __LLBC_NS_END

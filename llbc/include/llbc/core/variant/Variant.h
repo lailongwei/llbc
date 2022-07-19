@@ -412,9 +412,12 @@ public:
     template <typename _Ty>
     void SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val);
 
-    void SeqPushBack(const Seq::value_type &val);
-    template <typename _Ty>
-    void SeqPushBack(const _Ty &val);
+    template <typename _Ty1, typename... _Tys>
+    typename ::std::enable_if<::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
+    SeqPushBack(_Ty1 &&val1, _Tys &&... vals);
+    template <typename _Ty1, typename... _Tys>
+    typename ::std::enable_if<!::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
+    SeqPushBack(_Ty1 &&val1, _Tys &&... vals);
 
     void SeqPopBack();
 
@@ -455,11 +458,14 @@ public:
     DictConstIter DictFind(const _Key &key) const;
 
     DictIter DictErase(DictIter it);
-    Dict::size_type DictErase(const Dict::key_type &key);
     DictIter DictErase(DictIter first, DictIter last);
 
-    template <typename _Key>
-    Dict::size_type DictErase(const _Key &key);
+    template <typename _Key1, typename... _Keys>
+    typename ::std::enable_if<::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
+    DictErase(_Key1 &&key1, _Keys &&... keys);
+    template <typename _Key1, typename... _Keys>
+    typename ::std::enable_if<!::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
+    DictErase(_Key1 &&key1, _Keys &&... keys);
 
     LLBC_Variant &operator [](const LLBC_Variant &key);
     const LLBC_Variant &operator [](const LLBC_Variant &key) const;
@@ -592,6 +598,12 @@ private:
     LLBC_Variant &BecomeStrX();
     LLBC_Variant &BecomeSeqX();
     LLBC_Variant &BecomeDictX();
+
+    void SeqPushBack();
+    void SeqPushBackElem(const Seq::value_type &val);
+
+    Dict::size_type DictErase();
+    Dict::size_type DictEraseKey(const Dict::key_type &key);
 
 private:
     struct Holder _holder;
