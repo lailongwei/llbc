@@ -75,7 +75,7 @@ public:
 public:
     static LLBC_CPUTime Current();
     
-    uint64 GetCpuCount() const;
+    uint64 GetCPUCount() const;
 
     int ToSeconds() const;
     sint64 ToMilliSeconds() const;

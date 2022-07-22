@@ -85,7 +85,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
 
         LLBC_CPUTime cost = LLBC_CPUTime::Current() - beg;
         LLBC_PrintLine("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
-                       cost.GetCpuCount(), cost.ToString().c_str());
+                       cost.GetCPUCount(), cost.ToString().c_str());
         LLBC_PrintLine("");
     }
 

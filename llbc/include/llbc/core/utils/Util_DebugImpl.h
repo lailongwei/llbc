@@ -58,7 +58,7 @@ inline uint64 LLBC_CPUTime::GetCPUFreqPerNanoSecond()
     return _freqPerNanoSecond;
 }
 
-inline uint64 LLBC_CPUTime::GetCpuCount() const
+inline uint64 LLBC_CPUTime::GetCPUCount() const
 {
     return _cpuCount;
 }
