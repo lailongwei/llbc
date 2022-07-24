@@ -108,7 +108,7 @@ workspace ("llbc_" .. _ACTION)
 
     -- disable some warnings
     filter { "system:windows", "language:c++" }
-        disablewarnings { "4091" }
+        disablewarnings { "4091", "4068" }
     filter {}
 
 -- ****************************************************************************

@@ -66,6 +66,12 @@ class LLBC_ObjectGuard;
 template <typename ObjectType>
 class LLBC_ObjectPoolInst : public LLBC_IObjectPoolInst
 {
+public:
+    /**
+     * using definition.
+     */
+    using value_type = ObjectType;
+
 private:
     /**
      * The structure of memory unit.

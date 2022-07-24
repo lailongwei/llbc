@@ -138,6 +138,13 @@ private:
      */
     void DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node);
 
+    /**
+    * internal Get pool instance.
+    * @return LLBC_ObjectPoolInst<ObjectType, PoolInstLockType> * - the object instance pointer, never null.
+    */
+    template <typename ObjectType>
+    LLBC_ObjectPoolInst<ObjectType> *GetPoolInstInl();
+
 private:
     /**
      * Statistic top N pool instance statistic infos.
@@ -155,6 +162,14 @@ private:
     _PoolInsts _poolInsts;
      LLBC_ObjectPoolOrderedDeleteNodes *_orderedDeleteNodes;
      LLBC_ObjectPoolOrderedDeleteNodes *_topOrderedDeleteNodes;
+
+     // specialization pool inst of common types(std::string, LLBC_String, std::vector<int>, ...).
+     LLBC_ObjectPoolInst<std::string> *_stdStringPoolInst;
+     LLBC_ObjectPoolInst<LLBC_String> *_llbcStringPoolInst;
+     LLBC_ObjectPoolInst<std::vector<sint32>> *_vectorInt32PoolInst;
+     LLBC_ObjectPoolInst<std::vector<llbc::sint64>> *_vectorInt64PoolInst;
+     LLBC_ObjectPoolInst<std::vector<llbc::uint32>> *_vectorUint32PoolInst;
+     LLBC_ObjectPoolInst<std::vector<llbc::uint64>> *_vectorUint64PoolInst;
 };
 
 __LLBC_NS_END
