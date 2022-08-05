@@ -1133,11 +1133,11 @@ struct hash<LLBC_NS LLBC_Variant>
                 return ::std::_Hash_representation(
                     holder.data.raw.doubleVal == 0.0f ? 0.0f : holder.data.raw.doubleVal);
                 #else // Non-win32 platform.
-                #if LLBC_CUR_COMP == LLBC_COMP_CLANG
-                    return std::hash<double>()(holder.data.raw.doubleVal);
-                #else // LLBC_CUR_COMP == LLBC_COMP_GCC
-                    return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
-                #endif
+                    #if LLBC_CUR_COMP == LLBC_COMP_GCC
+                        return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
+                    #else // Non-GCC comp
+                        return std::hash<double>()(holder.data.raw.doubleVal);
+                    #endif
                 #endif
             else
                 return static_cast<size_t>(holder.data.raw.uint64Val);
