@@ -22,6 +22,7 @@
 #ifdef __LLBC_CORE_VARIANT_VARIANT_H__
 
 #include "llbc/core/variant/VariantTraits.h"
+#include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 __LLBC_NS_BEGIN
 
@@ -1131,8 +1132,12 @@ struct hash<LLBC_NS LLBC_Variant>
                 #if LLBC_TARGET_PLATFORM_WIN32
                 return ::std::_Hash_representation(
                     holder.data.raw.doubleVal == 0.0f ? 0.0f : holder.data.raw.doubleVal);
-                #else
-                return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
+                #else // Non-win32 platform.
+                #if LLBC_CUR_COMP == LLBC_COMP_CLANG
+                    return std::hash<double>()(holder.data.raw.doubleVal);
+                #else // LLBC_CUR_COMP == LLBC_COMP_GCC
+                    return ::std::_Hash_impl::hash(holder.data.raw.doubleVal);
+                #endif
                 #endif
             else
                 return static_cast<size_t>(holder.data.raw.uint64Val);
@@ -1140,17 +1145,10 @@ struct hash<LLBC_NS LLBC_Variant>
         else if (var.IsStr())
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
-            #if LLBC_TARGET_PLATFORM_WIN32
-            if (str && !str->empty())
-                return ::std::_Hash_array_representation(str->data(), str->size());
+            if(str && !str->empty())
+                return LLBC_Hash(str->data(), str->size());
             else
-                return ::std::_Hash_representation(nullptr);
-            #else
-            if (str && !str->empty())
-                return ::std::_Hash_impl::hash(str->data(), str->size());
-            else
-                return ::std::_Hash_impl::hash(nullptr, 0);
-            #endif
+                return LLBC_Hash(nullptr, 0);
         }
         else if (var.IsSeq())
         {

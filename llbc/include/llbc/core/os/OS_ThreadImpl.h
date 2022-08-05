@@ -26,7 +26,9 @@ __LLBC_NS_BEGIN
 LLBC_FORCE_INLINE void LLBC_CPURelax()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
- #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID || LLBC_TARGET_PLATFORM_MAC
+ #if defined(__arm__) || defined(__arm64__)
+    asm volatile("yield" ::: "memory");
+ #elif defined(__x86_64__) || defined(__i386__)
     asm volatile ("rep;nop" : : : "memory");
  #else
     asm volatile ("nop");
