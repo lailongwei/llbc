@@ -173,39 +173,6 @@ int LLBC_BaseTask::Kill(int signo)
     return _threadManager->KillTask(this, signo);
 }
 
-int LLBC_BaseTask::Push(LLBC_MessageBlock *block)
-{
-    _msgQueue.PushBack(block);
-    return LLBC_OK;
-}
-
-int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
-{
-    _msgQueue.TimedPopFront(block, LLBC_INFINITE);
-    return LLBC_OK;
-}
-
-int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
-{
-    if (_msgQueue.TryPopFront(block))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
-}
-
-int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
-{
-    if (_msgQueue.TimedPopFront(block, interval))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
-}
-
-size_t LLBC_BaseTask::GetMessageSize() const
-{
-    return _msgQueue.GetSize();
-}
-
 void LLBC_BaseTask::OnTaskThreadStart()
 {
     LLBC_LockGuard guard(_lock);

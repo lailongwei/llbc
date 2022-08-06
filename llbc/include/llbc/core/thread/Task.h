@@ -203,4 +203,6 @@ private:
 
 __LLBC_NS_END
 
+#include "llbc/core/thread/TaskImpl.h"
+
 #endif // !__LLBC_CORE_THREAD_TASK_H__

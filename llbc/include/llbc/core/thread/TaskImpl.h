@@ -19,56 +19,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-#ifdef __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+#ifdef __LLBC_CORE_THREAD_TASK_H__
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_MessageQueue::PushFront(LLBC_MessageBlock *block)
+inline int LLBC_BaseTask::Push(LLBC_MessageBlock *block)
 {
-    Push(block, true);
+    _msgQueue.PushBack(block);
+    return LLBC_OK;
 }
 
-inline void LLBC_MessageQueue::PushBack(LLBC_MessageBlock *block)
+inline int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
 {
-    Push(block, false);
+    _msgQueue.PopFront(block);
+    return LLBC_OK;
 }
 
-inline void LLBC_MessageQueue::PopFront(LLBC_MessageBlock *&block)
+inline int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
 {
-    Pop(block, LLBC_INFINITE, true);
+    if (_msgQueue.TryPopFront(block))
+        return LLBC_OK;
+
+    return LLBC_FAILED;
 }
 
-inline void LLBC_MessageQueue::PopBack(LLBC_MessageBlock *&block)
+inline int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
 {
-    Pop(block, LLBC_INFINITE, false);
+    if (_msgQueue.TimedPopFront(block, interval))
+        return LLBC_OK;
+
+    return LLBC_FAILED;
 }
 
-inline bool LLBC_MessageQueue::TryPopFront(LLBC_MessageBlock *&block)
+inline size_t LLBC_BaseTask::GetMessageSize() const
 {
-    return Pop(block, 0, true);
+    return _msgQueue.GetSize();
 }
 
-inline bool LLBC_MessageQueue::TryPopBack(LLBC_MessageBlock *&block)
-{
-    return Pop(block, 0, false);
-}
 
-inline bool LLBC_MessageQueue::TimedPopFront(LLBC_MessageBlock *&block, int interval)
-{
-    return Pop(block, interval, true);
-}
-
-inline bool LLBC_MessageQueue::TimedPopBack(LLBC_MessageBlock *&block, int interval)
-{
-    return Pop(block, interval, false);
-}
-
-inline size_t LLBC_MessageQueue::GetSize() const
-{
-    return _size;
-}
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+#endif // __LLBC_CORE_THREAD_TASK_H__

@@ -62,6 +62,24 @@ public:
 
 public:
     /**
+     * Pop all message blocks.
+     * @return bool - return true if has block(s), otherwise return false.
+     */
+    bool PopAll(LLBC_MessageBlock *&block);
+
+    /**
+     * Fetch and remove the first message block of the controlled sequence.
+     * @param[out] block - message block.
+     */
+    void PopFront(LLBC_MessageBlock *&block);
+
+    /**
+     * Fetch and remove the last message block of the controlled sequence.
+     * @param[out] block - message block.
+     */
+    void PopBack(LLBC_MessageBlock *&block);
+
+    /**
      * Try fetch and remove the first message block.
      * @param[out] block - message block.
      * @return bool - return true if success, otherwise return false.
@@ -94,9 +112,9 @@ public:
 public:
     /**
      * Get the message block current size.
-     * @return ulong - current size.
+     * @return size_t - current size.
      */
-    ulong GetSize() const;
+    size_t GetSize() const;
 
     /**
      * Cleanup the message queue.
@@ -157,7 +175,7 @@ public:
     LLBC_MessageBlock *_head;
     LLBC_MessageBlock *_tail;
 
-    ulong _size;
+    volatile size_t _size;
 };
 
 __LLBC_NS_END
