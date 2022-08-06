@@ -59,7 +59,7 @@
 // GNU C compiler.
 // The compiler version is converted, if gcc version is 3.2.0
 // the version value is 30200
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_GCC
  #define LLBC_CUR_COMP_DESC     "gcc"
  #define LLBC_COMP_VER          (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -70,12 +70,12 @@
 
 // CLang compiler.
 // The compile version is converted, like GUN C compiler
-#if defined(__clang__) && !defined(LLBC_CUR_COMP)
+#if defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_CLANG
  #define LLBC_CUR_COMP_DESC     "clang"
- #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minar__ *100 + __clang_patchlevel__)
+ #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minor__ *100 + __clang_patchlevel__)
  #define LLBC_COMP_MAJOR_VER    __clang_major__
- #define LLBC_COMP_MINOR_VER    __clang_minar__
+ #define LLBC_COMP_MINOR_VER    __clang_minor__
  #define LLBC_COMP_PATCH_LEVEL  __clang_patchlevel__
 #endif
 
