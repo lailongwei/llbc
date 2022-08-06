@@ -413,6 +413,7 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-std=c++11",
+	    "-Wno-deprecated-register",
         }
     filter {}
 
@@ -420,7 +421,6 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
-            "-Wno-deprecated-register"
         }
     filter {}
 
