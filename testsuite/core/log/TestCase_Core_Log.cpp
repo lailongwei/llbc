@@ -59,6 +59,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     rootLogger->InstallHook(LLBC_LogLevel::Debug, LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
+    LLOG_TRACE("This is a trace log message.");
+    LLOG_TRACE2("test_tag", "This is a trace log message.");
     LLOG_DEBUG("This is a debug log message.");
     LLOG_DEBUG2("test_tag", "This is a debug log message.");
 
@@ -98,6 +100,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL2("test_tag", "This is a fatal log message.");
 
     // Use test logger to test.
+    LLOG_TRACE3("test", "This is a trace log message.");
+    LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
     LLOG_DEBUG3("test", "This is a debug log message.");
     LLOG_DEBUG4("test", "test_tag", "This is a debug log message.");
     LLOG_INFO3("test", "This is a info log message.");
@@ -148,6 +152,27 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
 void TestCase_Core_Log::DoJsonLogTest()
 {
+    // Test LJLOG_TRACE macros.
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
+    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE3(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
+    LJLOG_TRACE3("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
+    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
+    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
+    LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_3").Add("testKey", "testValue->LJLOG_TRACE4().3").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_4").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE4("test", "testTraceTag4_5").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
+
     // Test LJLOG_DEBUG macros.
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().1").Finish("");
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().2").Finish("%s", "Finish Test");

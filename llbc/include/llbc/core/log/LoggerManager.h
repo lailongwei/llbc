@@ -147,6 +147,11 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         }                                                                 \
     }                                                                     \
 
+#define LLOG_TRACE(fmt, ...) LLOG(nullptr, nullptr, Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE2(tag, fmt, ...) LLOG(nullptr, tag, Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Trace, fmt, ##__VA_ARGS__)
+
 #define LLOG_DEBUG(fmt, ...) LLOG(nullptr, nullptr, Debug, fmt, ##__VA_ARGS__)
 #define LLOG_DEBUG2(tag, fmt, ...) LLOG(nullptr, tag, Debug, fmt, ##__VA_ARGS__)
 #define LLOG_DEBUG3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Debug, fmt, ##__VA_ARGS__)
@@ -180,6 +185,11 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  */
 #define LJLOG(loggerName, tag, level)                    \
     (*LLBC_New(LLBC_NS LLBC_LogJsonMsg, loggerName, tag, LLBC_NS LLBC_LogLevel::level, __FILE__, __LINE__, __FUNCTION__)) \
+
+#define LJLOG_TRACE() LJLOG(nullptr, nullptr, Trace)
+#define LJLOG_TRACE2(tag) LJLOG(nullptr, tag, Trace)
+#define LJLOG_TRACE3(loggerName) LJLOG(loggerName, nullptr, Trace)
+#define LJLOG_TRACE4(loggerName, tag) LJLOG(loggerName, tag, Trace)
 
 #define LJLOG_DEBUG() LJLOG(nullptr, nullptr, Debug)
 #define LJLOG_DEBUG2(tag) LJLOG(nullptr, tag, Debug)
@@ -241,6 +251,11 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
             }                                                             \
         }                                                                 \
     }                                                                     \
+
+#define LSLOG_TRACE(streamMsg) LSLOG(nullptr, nullptr, Trace, streamMsg)
+#define LSLOG_TRACE2(tag, streamMsg) LSLOG(nullptr, tag, Trace, streamMsg)
+#define LSLOG_TRACE3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Trace, streamMsg
+#define LSLOG_TRACE4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Trace, streamMsg)
 
 #define LSLOG_DEBUG(streamMsg) LSLOG(nullptr, nullptr, Debug, streamMsg)
 #define LSLOG_DEBUG2(tag, streamMsg) LSLOG(nullptr, tag, Debug, streamMsg)

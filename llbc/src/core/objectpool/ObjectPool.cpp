@@ -19,47 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "pyllbc/common/Export.h"
 
-#include "pyllbc/core/thread/PyTask.h"
-#include "pyllbc/core/thread/PyTaskMgr.h"
+#include "llbc/common/Export.h"
+#include "llbc/common/BeforeIncl.h"
 
-pyllbc_Task::pyllbc_Task(int taskId, const LLBC_String &script)
-{
-    _taskId = taskId;
-    _script.append(script);
+#include "llbc/core/objectpool/ObjectPool.h"
 
-    _activated = false;
-}
+__LLBC_NS_BEGIN
 
-pyllbc_Task::~pyllbc_Task()
-{
-}
+__LLBC_NS_END
 
-int pyllbc_Task::GetId() const
-{
-    return _taskId;
-}
-
-bool pyllbc_Task::IsActivated() const
-{
-    return _activated;
-}
-
-void pyllbc_Task::Svc()
-{
-    Py_Initialize();
-    PyRun_SimpleString(_script.c_str());
-
-    _activated = true;
-    pyllbc_s_TaskMgr->OnTaskCreated(this);
-}
-
-void pyllbc_Task::Cleanup()
-{
-    pyllbc_s_TaskMgr->OnTaskDestroy(this);
-    _activated = false;
-
-    Py_Finalize();
-}
-
+#include "llbc/common/AfterIncl.h"

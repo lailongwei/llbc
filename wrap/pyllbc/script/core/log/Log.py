@@ -6,11 +6,12 @@ import inspect as pyllbcInspect
 import llbc
 
 class pyllbcLog(object):
-    DEBUG = 0
-    INFO = 1
-    WARN = 2
-    ERROR = 3
-    FATAL = 4
+    TRACE = 0
+    DEBUG = 1
+    INFO = 2
+    WARN = 3
+    ERROR = 4
+    FATAL = 5
 
     __inited = False
     __log_fileinfo = False
@@ -30,6 +31,11 @@ class pyllbcLog(object):
     def disablelogfileinfo(cls):
         """Disabl log file name and lineno informations to log file"""
         cls.__log_fileinfo = False
+
+    @classmethod
+    def t(cls, msg, logger='root', tag=''):
+        """Log trace level message"""
+        cls.__logmsg(cls.TRACE, msg, logger, tag)
 
     @classmethod
     def d(cls, msg, logger='root', tag=''):

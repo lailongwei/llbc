@@ -87,7 +87,7 @@ void LLBC_MessageQueue::Cleanup()
 void LLBC_MessageQueue::Push(LLBC_MessageBlock *block, bool front)
 {
     _lock.Lock();
-    PushNonLock(block, front);
+    front ? PushFrontNonLock(block) : PushBackNonLock(block);
     _lock.Unlock();
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -144,7 +144,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
             _lock.Lock();
             if (_size > 0)
             {
-                PopNonLock(block, front);
+                front ? PopFrontNonLock(block) : PopBackNonLock(block);
                 _lock.Unlock();
 
                 return true;
@@ -153,7 +153,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
             _cond.TimedWait(_lock, interval);
             if (_size > 0)
             {
-                PopNonLock(block, front);
+                front ? PopFrontNonLock(block) : PopBackNonLock(block);
                 _lock.Unlock();
 
                 return true;
@@ -169,7 +169,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         _lock.Lock();
         if (_size > 0)
         {
-            PopNonLock(block, front);
+            front ? PopFrontNonLock(block) : PopBackNonLock(block);
             _lock.Unlock();
 
             return true;
@@ -183,7 +183,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         _sem.Wait();
 
         _lock.Lock();
-        PopNonLock(block, front);
+        front ? PopFrontNonLock(block) : PopBackNonLock(block);
         _lock.Unlock();
 
         return true;
@@ -193,7 +193,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         if (_sem.TryWait())
         {
             _lock.Lock();
-            PopNonLock(block, front);
+            front ? PopFrontNonLock(block) : PopBackNonLock(block);
             _lock.Unlock();
 
             return true;
@@ -204,7 +204,7 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         if (_sem.TimedWait(interval))
         {
             _lock.Lock();
-            PopNonLock(block, front);
+            front ? PopFrontNonLock(block) : PopBackNonLock(block);
             _lock.Unlock();
 
             return true;

@@ -60,18 +60,7 @@ public:
      */
     void PushBack(LLBC_MessageBlock *block);
 
-    /**
-     * Fetch and remove the first message block of the controlled sequence.
-     * @param[out] block - message block.
-     */
-    void PopFront(LLBC_MessageBlock *&block);
-
-    /**
-     * Fetch and remove the last message block of the controlled sequence.
-     * @param[out] block - message block.
-     */
-    void PopBack(LLBC_MessageBlock *&block);
-
+public:
     /**
      * Try fetch and remove the first message block.
      * @param[out] block - message block.
@@ -123,13 +112,6 @@ private:
     void Push(LLBC_MessageBlock *block, bool front);
 
     /**
-     * Insert the message of the controlled sequence, non lock.
-     * @param[in] block - message block.
-     * @param[in] front - front flag, if false, will append to tail.
-     */
-    void PushNonLock(LLBC_MessageBlock *block, bool front);
-
-    /**
      * Insert the message block at the begin of the controlled sequence, non lock.
      * @param[in] block - message block.
      */
@@ -150,13 +132,6 @@ private:
      * @return bool - return true if success, otherwise return false.
      */
     bool Pop(LLBC_MessageBlock *&block, int interval, bool front);
-
-    /**
-     * Pop the message block of the controlled sequence, non lock.
-     * @param[out] block - message block.
-     * @param[in]  front - front flag, if false, will fetch from tail.
-     */
-    void PopNonLock(LLBC_MessageBlock *&block, bool front);
 
     /**
      * Pop the first mesage block of the controlled sequence, non lock.

@@ -26,6 +26,7 @@ def main():
     # RandomTest()()
     # PropertyTest()()
     # EventTestCase()()
+    LogTest()()
 
     # #### communication part.
     # TimerTest()()

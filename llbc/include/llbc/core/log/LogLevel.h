@@ -39,7 +39,8 @@ public:
     {
         Begin,
 
-        Debug = Begin,
+        Trace = Begin,
+        Debug,
         Info,
         Warn,
         Error,
@@ -49,36 +50,6 @@ public:
     };
 
 public:
-    /**
-     * Get Debug level string describe.
-     * @return const LLBC_String & - Debug level describe.
-     */
-    static const LLBC_String &GetDebugDesc();
-
-    /**
-     * Get Info level string describe.
-     * @return const LLBC_String & - Info level describe.
-     */
-    static const LLBC_String &GetInfoDesc();
-
-    /**
-     * Get Warn level string describe.
-     * @return const LLBC_String & - Warn level describe.
-     */
-    static const LLBC_String &GetWarnDesc();
-
-    /**
-     * Get Error level string describe.
-     * @return const LLBC_String & - Error level describe.
-     */
-    static const LLBC_String &GetErrorDesc();
-
-    /**
-     * Get Fatal level string describe.
-     * @return const LLBC_String & - Fatal level describe.
-     */
-    static const LLBC_String &GetFatalDesc();
-
     /**
      * Get specific log level string describe.
      * @param[in] level - log level.

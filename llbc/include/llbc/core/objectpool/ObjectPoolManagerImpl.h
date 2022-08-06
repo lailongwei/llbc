@@ -66,7 +66,8 @@ LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromUnsafetyPool()
 template <typename ReferencableObjectType>
 ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease)
 {
-    ReferencableObjectType *refObj = LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->GetReferencable<ReferencableObjectType>();
+    auto objPool = LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool();
+    ReferencableObjectType *refObj = objPool->GetReferencable<ReferencableObjectType>();
     if (autoRelease)
         refObj->AutoRelease();
 

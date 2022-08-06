@@ -99,9 +99,18 @@
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+class LLBC_IObjectPoolInst;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
  * \brief Stream class encapsulation, support serialize/deserialize operations.
  */
-class LLBC_Stream
+class LLBC_Stream final
 {
 public:
     static const size_t npos = -1;
@@ -607,6 +616,17 @@ public:
 
 public:
     /**
+     * Object-Pool reflection support: Mark pool object.
+     */
+    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
+
+    /**
+     * Object-Pool reflection support: Get pool instance.
+     */
+    LLBC_IObjectPoolInst *GetPoolInst();
+
+public:
+    /**
      * Raw data type read/write support.
      * Note: All this raw data type read/write API support endian type flag.
      */
@@ -675,8 +695,9 @@ private:
     size_t _size;
 
     int _endian;
-
     bool _attach;
+
+    LLBC_IObjectPoolInst *_poolInst;
 };
 
 __LLBC_NS_END

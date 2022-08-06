@@ -25,7 +25,6 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/objectpool/ObjectPool.h"
-#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
 
 __LLBC_NS_BEGIN
 

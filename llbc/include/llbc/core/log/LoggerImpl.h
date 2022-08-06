@@ -28,70 +28,26 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
-inline int LLBC_Logger::Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
-{
-    if (LLBC_LogLevel::Debug < _logLevel)
-        return LLBC_OK;
+#define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
+    inline int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) \
+    {                                             \
+        if (_logLevel > LLBC_LogLevel::level)     \
+            return LLBC_OK;                       \
+                                                  \
+        va_list va;                               \
+        va_start(va, fmt);                        \
+        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, fmt, va); \
+        va_end(va);                               \
+                                                  \
+        return ret;                               \
+    }                                             \
 
-    va_list va;
-    va_start(va, fmt);
-    int ret = VOutput(LLBC_LogLevel::Debug, tag, file, line, func, fmt, va);
-    va_end(va);
-
-    return ret;
-}
-
-inline int LLBC_Logger::Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
-{
-    if (LLBC_LogLevel::Info < _logLevel)
-        return LLBC_OK;
-
-    va_list va;
-    va_start(va, fmt);
-    int ret = VOutput(LLBC_LogLevel::Info, tag, file, line, func, fmt, va);
-    va_end(va);
-
-    return ret;
-}
-
-inline int LLBC_Logger::Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
-{
-    if (LLBC_LogLevel::Warn < _logLevel)
-        return LLBC_OK;
-
-    va_list va;
-    va_start(va, fmt);
-    int ret = VOutput(LLBC_LogLevel::Warn, tag, file, line, func, fmt, va);
-    va_end(va);
-
-    return ret;
-}
-
-inline int LLBC_Logger::Error(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
-{
-    if (LLBC_LogLevel::Error < _logLevel)
-        return LLBC_OK;
-
-    va_list va;
-    va_start(va, fmt);
-    int ret = VOutput(LLBC_LogLevel::Error, tag, file, line, func, fmt, va);
-    va_end(va);
-
-    return ret;
-}
-
-inline int LLBC_Logger::Fatal(const char *tag, const char *file, int line, const char *func, const char *fmt, ...)
-{
-    if (LLBC_LogLevel::Fatal < _logLevel)
-        return LLBC_OK;
-
-    va_list va;
-    va_start(va, fmt);
-    const int ret = VOutput(LLBC_LogLevel::Fatal, tag, file, line, func, fmt, va);
-    va_end(va);
-
-    return ret;
-}
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Trace)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Debug)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Info)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Warn)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Error)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Fatal)
 
 inline int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) 
 {

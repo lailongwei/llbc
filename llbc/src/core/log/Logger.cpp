@@ -51,7 +51,7 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
-: _logLevel(LLBC_LogLevel::Debug)
+: _logLevel(LLBC_LogLevel::Begin)
 , _config(nullptr)
 
 , _logRunnable(nullptr)
@@ -204,7 +204,7 @@ void LLBC_Logger::Finalize()
     // Reset basic members.
     _name.clear();
     _config = nullptr;
-    _logLevel = LLBC_LogLevel::Debug;
+    _logLevel = LLBC_LogLevel::Begin;
 }
 
 const LLBC_String &LLBC_Logger::GetLoggerName() const
@@ -267,6 +267,9 @@ void LLBC_Logger::UninstallHookLockless(int level)
 
 int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va) 
 {
+    if (_logLevel > level)
+        return LLBC_OK;
+        
     LLBC_LogData *data = BuildLogData(level, tag, file, line, func, fmt, va);
     if (UNLIKELY(!data))
         return LLBC_FAILED;

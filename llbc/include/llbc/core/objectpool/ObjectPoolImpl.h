@@ -70,9 +70,9 @@ LLBC_FORCE_INLINE decltype(LLBC_ObjectPool<PoolLockType, PoolInstLockType>::speP
 __LLBC_SPE_OBJPOOL_METHS(_stdStringPoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_llbcStringPoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorInt32PoolInst)
-__LLBC_SPE_OBJPOOL_METHS(_vectorUint64PoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorUint32PoolInst)
 __LLBC_SPE_OBJPOOL_METHS(_vectorInt64PoolInst)
+__LLBC_SPE_OBJPOOL_METHS(_vectorUint64PoolInst)
 
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()

@@ -33,11 +33,6 @@ inline bool LLBC_LoggerConfigInfo::IsNotConfigUseRoot() const
     return _notConfigUseRoot;
 }
 
-inline int LLBC_LoggerConfigInfo::GetLogLevel() const
-{
-    return _logLevel;
-}
-
 inline bool LLBC_LoggerConfigInfo::IsAsyncMode() const
 {
     return _asyncMode;

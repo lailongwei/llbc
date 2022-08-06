@@ -5,11 +5,12 @@ local getinfo = debug.getinfo
 local LogMsg = _llbc.LogMsg
 
 -- Log levels enumeration.
-Log.DEBUG = 0
-Log.INFO = 1
-Log.WARN = 2
-Log.ERROR = 3
-Log.FATAL = 4
+Log.TRACE = 0
+Log.DEBUG = 1
+Log.INFO = 2
+Log.WARN = 3
+Log.ERROR = 4
+Log.FATAL = 5
 
 -- logFileInfo: to control output message included file&line information or not, default is false.
 Log.logFileInfo = false
@@ -99,11 +100,35 @@ end
 
 local output = Log.output
 
+-- Log TRACE level message to root logger.
+-- @param ... - log message.
+-- @returns - no return.
+function Log.t(...)
+    output(Log.TRACE, nil, nil, ...)
+end
+
+-- Log TRACE level message to specific logger.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
+function Log.t2(logger, ...)
+    output(Log.TRACE, logger, nil, ...)
+end
+
+-- Log TRACE level message to specific logger, and append tag.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
+function Log.t3(logger, tag, ...)
+    output(Log.TRACE, logger, tag, ...)
+end
+
 -- Log DEBUG level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
 function Log.d(...)
-    output(0, nil, nil, ...)
+    output(Log.Debug, nil, nil, ...)
 end
 
 -- Log DEBUG level message to specific logger.
@@ -111,7 +136,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.d2(logger, ...)
-    output(0, logger, nil, ...)
+    output(Log.DEBUG, logger, nil, ...)
 end
 
 -- Log DEBUG level message to specific logger, and append tag.
@@ -120,14 +145,14 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.d3(logger, tag, ...)
-    output(0, logger, tag, ...)
+    output(Log.Debug, logger, tag, ...)
 end
 
 -- Log INFO level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
 function Log.i(...)
-    output(1, nil, nil, ...)
+    output(Log.INFO, nil, nil, ...)
 end
 
 -- Log INFO level message to specific logger.
@@ -135,7 +160,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.i2(logger, ...)
-    output(1, logger, nil, ...)
+    output(Log.INFO, logger, nil, ...)
 end
 
 -- Log INFO level message to specific logger, and append tag.
@@ -144,14 +169,14 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.i3(logger, tag, ...)
-    output(1, logger, tag, ...)
+    output(Log.INFO, logger, tag, ...)
 end
 
 -- Log WARN level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
 function Log.w(...)
-    output(2, nil, nil, ...)
+    output(Log.WARN, nil, nil, ...)
 end
 
 -- Log WARN level message to specific logger.
@@ -159,7 +184,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.w2(logger, ...)
-    output(2, logger, nil, ...)
+    output(Log.WARN, logger, nil, ...)
 end
 
 -- Log WARN level message to specific logger.
@@ -168,14 +193,14 @@ end
 -- @param ... -              log message.
 -- @returns - no return.
 function Log.w3(logger, tag, ...)
-    output(2, logger, tag, ...)
+    output(Log.WARN, logger, tag, ...)
 end
 
 -- Log ERROR level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
 function Log.e(...)
-    output(3, nil, nil, ...)
+    output(Log.ERROR, nil, nil, ...)
 end
 
 -- Log ERROR level message to specific logger.
@@ -183,7 +208,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.e2(logger, ...)
-    output(3, logger, nil, ...)
+    output(Log.ERROR, logger, nil, ...)
 end
 
 -- Log ERROR level message to specific logger, and append tag.
@@ -192,14 +217,14 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.e3(logger, tag, ...)
-    output(3, logger, tag, ...)
+    output(Log.ERROR, logger, tag, ...)
 end
 
 -- Log FATAL level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
 function Log.f(...)
-    output(4, nil, nil, ...)
+    output(Log.FATAL, nil, nil, ...)
 end
 
 -- Log FATAL level message to specific logger.
@@ -207,7 +232,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.f2(logger, ...)
-    output(4, logger, nil, ...)
+    output(Log.FATAL, logger, nil, ...)
 end
 
 -- Log FATAL level message to specific logger, and append tag.
@@ -216,7 +241,7 @@ end
 -- @param ...              - log message.
 -- @returns - no return.
 function Log.f3(logger, tag, ...)
-    output(4, logger, tag, ...)
+    output(Log.FATAL, logger, tag, ...)
 end
 
 -- Set Log table to llbc

@@ -90,8 +90,9 @@ inline LLBC_Stream::LLBC_Stream(void *buf, size_t len, bool attach)
 , _size(0)
 
 , _endian(LLBC_DefaultEndian)
-
 , _attach(false)
+
+, _poolInst(nullptr)
 {
     if (attach)
     {
@@ -408,6 +409,16 @@ inline void LLBC_Stream::Clear()
     {
         _pos = 0;
     }
+}
+
+inline void LLBC_Stream::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+{
+    _poolInst = &poolInst;
+}
+
+inline LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
+{
+    return _poolInst;
 }
 
 inline bool LLBC_Stream::ReadBool(bool &value)

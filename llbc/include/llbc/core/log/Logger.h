@@ -27,7 +27,7 @@
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/utils/Util_Delegate.h"
-#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
+#include "llbc/core/objectpool/ObjectPool.h"
 
 #include "llbc/core/log/LogLevel.h"
 
@@ -130,6 +130,7 @@ public:
      * @param[in] ...  - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
+    int Trace(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
     int Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
     int Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
     int Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);

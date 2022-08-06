@@ -71,12 +71,6 @@ public:
 
 public:
     /**
-     * Get log level.
-     * @return int - log level.
-     */
-    int GetLogLevel() const;
-
-    /**
      * Get asynchronous mode switch.
      * @return bool - asynchronous mode switch.
      */

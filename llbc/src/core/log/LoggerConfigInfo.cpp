@@ -97,7 +97,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     if (cfg.HasProperty("level"))
         _logLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str());
     else
-        _logLevel = _notConfigUseRoot ? rootCfg->GetLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
+        _logLevel = _notConfigUseRoot ? rootCfg->_logLevel : LLBC_CFG_LOG_DEFAULT_LEVEL;
     _asyncMode = __LLBC_GetLogCfg("asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
         _independentThread = __LLBC_GetLogCfg("independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);

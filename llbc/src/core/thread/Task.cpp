@@ -181,7 +181,7 @@ int LLBC_BaseTask::Push(LLBC_MessageBlock *block)
 
 int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
 {
-    _msgQueue.PopFront(block);
+    _msgQueue.TimedPopFront(block, LLBC_INFINITE);
     return LLBC_OK;
 }
 

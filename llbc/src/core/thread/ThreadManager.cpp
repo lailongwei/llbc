@@ -27,7 +27,7 @@
 #include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
-#include "llbc/core/objectpool/ExportedObjectPoolTypes.h"
+#include "llbc/core/objectpool/ObjectPool.h"
 #include "llbc/core/objbase/ObjBase.h"
 
 #include "llbc/core/thread/Guard.h"

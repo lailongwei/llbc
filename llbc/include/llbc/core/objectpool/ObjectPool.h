@@ -24,6 +24,7 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/thread/DummyLock.h"
 
 #include "llbc/core/objectpool/IObjectPool.h"
@@ -166,14 +167,32 @@ private:
      // specialization pool inst of common types(std::string, LLBC_String, std::vector<int>, ...).
      LLBC_ObjectPoolInst<std::string> *_stdStringPoolInst;
      LLBC_ObjectPoolInst<LLBC_String> *_llbcStringPoolInst;
-     LLBC_ObjectPoolInst<std::vector<sint32>> *_vectorInt32PoolInst;
-     LLBC_ObjectPoolInst<std::vector<llbc::sint64>> *_vectorInt64PoolInst;
+     LLBC_ObjectPoolInst<std::vector<llbc::sint32>> *_vectorInt32PoolInst;
      LLBC_ObjectPoolInst<std::vector<llbc::uint32>> *_vectorUint32PoolInst;
+     LLBC_ObjectPoolInst<std::vector<llbc::sint64>> *_vectorInt64PoolInst;
      LLBC_ObjectPoolInst<std::vector<llbc::uint64>> *_vectorUint64PoolInst;
 };
+
+/**
+ * Export some object pool classes.
+ */
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock>;
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_SpinLock, LLBC_DummyLock>;
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_SpinLock>;
+template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
 
 __LLBC_NS_END
 
 #include "llbc/core/objectpool/ObjectPoolImpl.h"
+
+__LLBC_NS_BEGIN
+
+/**
+ * Typedef safety/unsafety object pool.
+ */
+typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafetyObjectPool;
+typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafetyObjectPool;
+
+__LLBC_NS_END
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_H__
