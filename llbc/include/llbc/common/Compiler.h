@@ -73,7 +73,7 @@
 #if defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_CLANG
  #define LLBC_CUR_COMP_DESC     "clang"
- #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minor__ *100 + __clang_patchlevel__)
+ #define LLBC_COMP_VER          (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
  #define LLBC_COMP_MAJOR_VER    __clang_major__
  #define LLBC_COMP_MINOR_VER    __clang_minor__
  #define LLBC_COMP_PATCH_LEVEL  __clang_patchlevel__

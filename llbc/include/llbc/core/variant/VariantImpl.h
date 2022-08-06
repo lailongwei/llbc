@@ -1172,10 +1172,7 @@ struct hash<LLBC_NS LLBC_Variant>
         else if (var.IsStr())
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
-            if(str && !str->empty())
-                return LLBC_Hash(str->data(), str->size());
-            else
-                return LLBC_Hash(nullptr, 0);
+            return str && !str->empty() ? LLBC_Hash(str->data(), str->size()) : LLBC_Hash(nullptr, 0);
         }
         else if (var.IsSeq())
         {

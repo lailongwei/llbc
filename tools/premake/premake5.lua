@@ -423,6 +423,10 @@ project "pyllbc"
         }
     filter {}
 
+    buildoptions {
+        "-Wno-deprecated-register"
+    }
+
 group "wrap/csllbc"
 
 -- ****************************************************************************
