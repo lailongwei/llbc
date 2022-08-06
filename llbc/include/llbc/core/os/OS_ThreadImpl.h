@@ -26,9 +26,9 @@ __LLBC_NS_BEGIN
 LLBC_FORCE_INLINE void LLBC_CPURelax()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
- #if defined(__arm__) || defined(__arm64__)
+ #if LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_ARM || LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_ARM_THUMB || LLBC_PROCESSOR_ARM_64
     asm volatile("yield" ::: "memory");
- #elif defined(__x86_64__) || defined(__i386__)
+ #elif LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86 || LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86_64
     asm volatile ("rep;nop" : : : "memory");
  #else
     asm volatile ("nop");
