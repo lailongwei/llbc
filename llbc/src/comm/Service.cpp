@@ -460,7 +460,9 @@ int LLBC_Service::SetFPS(int fps)
     {
         _relaxTimes = 0;
         _frameInterval = 0;
+        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
         _frameTimeout = LLBC_INFINITE;
+        #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
 
     return LLBC_OK;
@@ -1565,7 +1567,6 @@ void LLBC_Service::HandleQueuedEvents()
 {
     int type;
     LLBC_ServiceEvent *ev;
-    LLBC_MessageBlock *block;
 
     #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     LLBC_CPUTime begTime;
@@ -1573,24 +1574,31 @@ void LLBC_Service::HandleQueuedEvents()
         begTime = LLBC_CPUTime::Current();
     #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
-    while (TryPop(block) == LLBC_OK)
+    LLBC_MessageBlock *block, *blocks;
+    if (PopAll(blocks) == LLBC_OK)
     {
-        block->Read(&type, sizeof(int));
-        block->Read(&ev, sizeof(LLBC_ServiceEvent *));
+        while (blocks)
+        {
+            block = blocks;
+            blocks = blocks->GetNext();
 
-        (this->*_evHandlers[type])(*ev);
+            block->Read(&type, sizeof(int));
+            block->Read(&ev, sizeof(LLBC_ServiceEvent *));
 
-        LLBC_Delete(ev);
-        LLBC_Delete(block);
+            (this->*_evHandlers[type])(*ev);
 
-        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-        if (_frameTimeout == LLBC_INFINITE)
-            continue;
+            LLBC_Delete(ev);
+            LLBC_Delete(block);
 
-        if(UNLIKELY(static_cast<uint64>(
-            (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
-            break;
-        #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+            #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+            if (_frameTimeout == LLBC_INFINITE)
+                continue;
+
+            if (UNLIKELY(static_cast<uint64>(
+                (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
+                break;
+            #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+        }
     }
 }
 

@@ -133,6 +133,13 @@ public:
     virtual int Pop(LLBC_MessageBlock *&block);
 
     /**
+     * Pop all message blocks from task.
+     * @param[out] blocks - the message blocks.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int PopAll(LLBC_MessageBlock *&blocks);
+
+    /**
      * Try pop message block from task.
      * @param[out] block - message block.
      * @return int - return 0 if success, otherwise return -1.

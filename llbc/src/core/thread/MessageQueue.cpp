@@ -42,12 +42,12 @@ LLBC_MessageQueue::~LLBC_MessageQueue()
     Cleanup();
 }
 
-bool LLBC_MessageQueue::PopAll(LLBC_MessageBlock *&block)
+bool LLBC_MessageQueue::PopAll(LLBC_MessageBlock *&blocks)
 {
     _lock.Lock();
     if (_head)
     {
-        block = _head;
+        blocks = _head;
 
         _head = _tail = nullptr;
         _size = 0;

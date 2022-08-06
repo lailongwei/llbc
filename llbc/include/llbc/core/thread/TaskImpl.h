@@ -35,6 +35,14 @@ inline int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
     return LLBC_OK;
 }
 
+inline int LLBC_BaseTask::PopAll(LLBC_MessageBlock *&blocks)
+{
+    if (_msgQueue.PopAll(blocks))
+        return LLBC_OK;
+
+    return LLBC_FAILED;
+}
+
 inline int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
 {
     if (_msgQueue.TryPopFront(block))
@@ -55,8 +63,6 @@ inline size_t LLBC_BaseTask::GetMessageSize() const
 {
     return _msgQueue.GetSize();
 }
-
-
 
 __LLBC_NS_END
 

@@ -63,9 +63,10 @@ public:
 public:
     /**
      * Pop all message blocks.
+     * @param[out] blocks - the message blocks.
      * @return bool - return true if has block(s), otherwise return false.
      */
-    bool PopAll(LLBC_MessageBlock *&block);
+    bool PopAll(LLBC_MessageBlock *&blocks);
 
     /**
      * Fetch and remove the first message block of the controlled sequence.
