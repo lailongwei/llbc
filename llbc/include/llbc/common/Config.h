@@ -256,7 +256,7 @@
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // Service frame-timeout function switch, if enabled, the service will has frame-timeout limit function, default is 0.
-#define LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT          1
+#define LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT          0
 
 
 // The poller model config(Platform specific).
