@@ -420,12 +420,9 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-Wno-deprecated-register"
         }
     filter {}
-
-    buildoptions {
-        "-Wno-deprecated-register"
-    }
 
 group "wrap/csllbc"
 
