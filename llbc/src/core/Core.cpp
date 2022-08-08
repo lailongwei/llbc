@@ -77,13 +77,17 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
+    // Purge auto-release pool stack.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (tls->objbaseTls.poolStack)
+        reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)->Purge();
+
     // Destroy entry thread object pool.
     (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
     // Destroy all object pool instance factories.
     LLBC_IObjectPool::DestroyAllPoolInstFactories();
 
     // Destroy entry thread auto-release pool stack.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->objbaseTls.poolStack)
     {
         LLBC_Delete(reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack));
