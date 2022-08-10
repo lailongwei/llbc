@@ -80,6 +80,13 @@ public:
     LLBC_Logger *GetRootLogger() const;
 
     /**
+     * Get logger.
+     * @param[in] name - logger name.
+     * @return LLBC_ILogger * - logger.
+     */
+    LLBC_Logger *GetLogger(const char *name) const;
+
+    /**
      * Get logger by name.
      * @param[in] name - logger name.
      * @return LLBC_Logger * - logger.
@@ -101,6 +108,7 @@ private:
 
     LLBC_Logger * volatile _rootLogger;
     std::map<LLBC_String, LLBC_Logger *> _loggers;
+    std::map<LLBC_CString, LLBC_Logger *> _loggers2;
 
     static LLBC_String _rootLoggerName;
 };
