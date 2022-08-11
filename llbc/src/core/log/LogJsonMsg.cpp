@@ -37,20 +37,13 @@
 
 __LLBC_NS_BEGIN
 
-namespace
-{
-    typedef LLBC_NS LLBC_LogLevel _LV;
-}
-
-LLBC_LogJsonMsg::LLBC_LogJsonMsg(const char *loggerName,
+LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger,
                                  const char *tag,
                                  int lv,
                                  const char *file,
                                  int line,
                                  const char *func)
-: _loggerMgrInited(LLBC_LoggerManagerSingleton->IsInited())
-
-, _logger(nullptr)
+: _logger(logger)
 , _tag(tag)
 , _lv(lv)
 , _file(file)
@@ -60,13 +53,6 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(const char *loggerName,
 , _doc(*LLBC_GetObjectFromUnsafetyPool<LLBC_Json::Document>())
 {
     _doc.SetObject();
-    if (_loggerMgrInited)
-    {
-        if (!loggerName)
-            _logger = LLBC_LoggerManagerSingleton->GetRootLogger();
-        else
-            _logger = LLBC_LoggerManagerSingleton->GetLogger(loggerName);
-    }
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
@@ -76,9 +62,6 @@ LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 {
-    // Logger not found process.
-    if (_loggerMgrInited && !_logger)
-        return;
     // Log level judge.
     if (_logger && _lv < _logger->GetLogLevel())
         return;
@@ -104,13 +87,13 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     _doc.Accept(writer);
 
     // Output json log.
-    if (UNLIKELY(!_loggerMgrInited))
+    if (UNLIKELY(!_logger))
         LLBC_LoggerManagerSingleton->UnInitOutput(_lv, buffer.GetString());
     else
         _logger->NonFormatOutput(_lv, _tag, _file, _line, _func, buffer.GetString(), buffer.GetLength());
 
-    // Delete self.
-    LLBC_Delete(this);
+    // Recycle self.
+    LLBC_Recycle(this);
 }
 
 __LLBC_NS_END
