@@ -28,6 +28,7 @@ testsuite/linux/
 
 wrap/pyllbc/lib/
 wrap/pyllbc/linux/
+wrap/pyllbc/testsuite/log/
 
 !.gitignore
 
