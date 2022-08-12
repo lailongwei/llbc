@@ -87,7 +87,7 @@ int LLBC_MessageBlock::Read(void *buf, size_t len)
         return LLBC_FAILED;
     }
 
-    ASSERT((char *)buf + len < _buf || _buf + _size < buf);
+    ASSERT((char *)buf + len <= _buf || _buf + _size <= buf);
 
     memcpy(buf, _buf + _readPos, len);
     _readPos += len;
@@ -112,7 +112,7 @@ int LLBC_MessageBlock::Write(const void *buf, size_t len)
         Resize(MAX(_writePos + len, _size * 2));
     }
 
-    ASSERT((char *)(buf) + len < _buf || _buf + _size < buf);
+    ASSERT((char *)(buf) + len <= _buf || _buf + _size <= buf);
 
     memcpy(_buf + _writePos, buf, len);
     _writePos += len;
