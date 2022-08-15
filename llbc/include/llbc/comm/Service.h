@@ -722,7 +722,7 @@ private:
 
 private:
     typedef void (LLBC_Service::*_EvHandler)(LLBC_ServiceEvent &);
-    static _EvHandler _evHandlers[LLBC_SvcEvType::End];
+    static _EvHandler _evHandlers[LLBC_ServiceEventType::End];
 };
 
 __LLBC_NS_END

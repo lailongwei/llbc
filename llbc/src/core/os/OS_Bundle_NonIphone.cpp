@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/File.h"
 #include "llbc/core/file/Directory.h"
@@ -177,5 +176,3 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &n
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
-
-#include "llbc/common/AfterIncl.h"

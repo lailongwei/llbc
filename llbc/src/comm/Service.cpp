@@ -27,7 +27,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PollerType.h"
@@ -35,6 +34,7 @@
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
+#include "llbc/comm/IComponent.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
@@ -48,7 +48,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_Service::_maxId = 1;
 
-LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] = 
+LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_ServiceEventType::End] = 
 {
     &LLBC_Service::HandleEv_SessionCreate,
     &LLBC_Service::HandleEv_SessionDestroy,
@@ -1089,14 +1089,14 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<vo
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, deleg, nullptr));
@@ -1109,14 +1109,14 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *li
     if (!listener)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, nullptr, listener));
@@ -1127,7 +1127,7 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *li
 void LLBC_Service::UnsubscribeEvent(int event)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEventEv(event, LLBC_INVALID_LISTENER_STUB));
+        BuildUnsubscribeEventEv(event, 0));
 }
 
 void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
@@ -1565,15 +1565,13 @@ void LLBC_Service::DestroyFrameTasks()
 
 void LLBC_Service::HandleQueuedEvents()
 {
-    int type;
-    LLBC_ServiceEvent *ev;
-
     #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     LLBC_CPUTime begTime;
     if (_frameTimeout != LLBC_INFINITE)
         begTime = LLBC_CPUTime::Current();
     #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
+    LLBC_ServiceEvent *ev;
     LLBC_MessageBlock *block, *blocks;
     if (PopAll(blocks) == LLBC_OK)
     {
@@ -1582,10 +1580,8 @@ void LLBC_Service::HandleQueuedEvents()
             block = blocks;
             blocks = blocks->GetNext();
 
-            block->Read(&type, sizeof(int));
-            block->Read(&ev, sizeof(LLBC_ServiceEvent *));
-
-            (this->*_evHandlers[type])(*ev);
+            ev = reinterpret_cast<LLBC_ServiceEvent *>(block->GetDataStartWithReadPos());
+            (this->*_evHandlers[ev->type])(*ev);
 
             LLBC_Delete(ev);
             LLBC_Delete(block);
@@ -1868,7 +1864,7 @@ void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    if (ev.stub == LLBC_INVALID_LISTENER_STUB)
+    if (ev.stub == 0)
         _evManager.RemoveListener(ev.id);
     else
         _evManager.RemoveListener(ev.stub);
@@ -2505,5 +2501,3 @@ LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponentFactory *compFactory)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

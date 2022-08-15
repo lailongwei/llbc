@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/ICoder.h"
 #include "llbc/comm/Packet.h"
@@ -142,5 +141,3 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

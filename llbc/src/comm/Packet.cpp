@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/ICoder.h"
 #include "llbc/comm/Packet.h"
@@ -326,5 +325,3 @@ void LLBC_Packet::CleanupPayload()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

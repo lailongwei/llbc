@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 
@@ -53,5 +52,3 @@ const LLBC_String & LLBC_ProtoReportLevel::Level2Str(int level)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

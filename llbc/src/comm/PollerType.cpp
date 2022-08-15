@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/PollerType.h"
 
@@ -71,5 +70,3 @@ int LLBC_PollerType::Str2Type(const LLBC_String &typeStr)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

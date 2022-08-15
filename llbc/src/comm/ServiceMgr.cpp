@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/IService.h"
 #include "llbc/comm/ServiceMgr.h"
@@ -187,5 +186,3 @@ void LLBC_ServiceMgr::OnServiceStop(LLBC_IService *svc)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

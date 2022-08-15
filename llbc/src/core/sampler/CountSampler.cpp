@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/sampler/SamplerType.h"
 #include "llbc/core/sampler/CountSampler.h"
@@ -80,5 +80,3 @@ double LLBC_CountSampler::GetAverageSamplingValue() const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

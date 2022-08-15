@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/Socket.h"
@@ -222,5 +221,3 @@ void LLBC_PollerEvUtil::DestroyEv(LLBC_MessageBlock *block)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

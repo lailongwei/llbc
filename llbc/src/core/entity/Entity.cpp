@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/entity/Entity.h"
 
@@ -258,5 +257,3 @@ void LLBC_Entity::RemoveAllBehaviors()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

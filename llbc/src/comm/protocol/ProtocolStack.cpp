@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/protocol/IProtocol.h"
@@ -362,5 +361,3 @@ bool LLBC_ProtocolStack::CtrlStackCodec(int cmd, const LLBC_Variant &ctrlData, b
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

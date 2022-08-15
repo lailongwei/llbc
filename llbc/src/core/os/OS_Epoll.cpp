@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Epoll.h"
 
@@ -76,5 +76,3 @@ int LLBC_EpollClose(LLBC_Handle epfd)
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

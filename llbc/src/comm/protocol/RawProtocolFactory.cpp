@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/RawProtocol.h"
@@ -42,5 +41,3 @@ LLBC_IProtocol *LLBC_RawProtocolFactory::Create(int layer) const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

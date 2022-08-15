@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 
@@ -56,5 +55,3 @@ const LLBC_String &LLBC_ProtocolLayer::Layer2Str(int layer)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/objectpool/Common.h"
@@ -97,5 +97,3 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

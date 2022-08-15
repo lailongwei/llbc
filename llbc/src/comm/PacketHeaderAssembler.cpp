@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PacketHeaderAssembler.h"
@@ -103,5 +102,3 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

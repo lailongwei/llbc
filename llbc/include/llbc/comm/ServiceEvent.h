@@ -25,8 +25,6 @@
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
-#include "llbc/comm/IComponent.h"
-
 __LLBC_NS_BEGIN
 
 /**
@@ -42,7 +40,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The service event type enumeration.
  */
-class LLBC_HIDDEN LLBC_SvcEvType
+class LLBC_HIDDEN LLBC_ServiceEventType
 {
 public:
     enum
@@ -71,8 +69,8 @@ struct LLBC_HIDDEN LLBC_ServiceEvent
 {
     int type;
 
-    LLBC_ServiceEvent(int type);
-    virtual ~LLBC_ServiceEvent();
+    LLBC_ServiceEvent(int evType);
+    virtual ~LLBC_ServiceEvent() = default;
 };
 
 /**
@@ -88,7 +86,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
     LLBC_SocketHandle handle;
 
     LLBC_SvcEv_SessionCreate();
-    virtual ~LLBC_SvcEv_SessionCreate();
 };
 
 /**
@@ -120,7 +117,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
     LLBC_SockAddr_IN peer;
 
     LLBC_SvcEv_AsyncConn();
-    virtual ~LLBC_SvcEv_AsyncConn();
 };
 
 /**
@@ -147,7 +143,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
     LLBC_String report;
 
     LLBC_SvcEv_ProtoReport();
-    virtual ~LLBC_SvcEv_ProtoReport();
 };
 
 /**
@@ -173,7 +168,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
     LLBC_ListenerStub stub;
 
     LLBC_SvcEv_UnsubscribeEv();
-    virtual ~LLBC_SvcEv_UnsubscribeEv();
 };
 
 /**
@@ -197,7 +191,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
     bool propReloaded;
 
     LLBC_SvcEv_AppCfgReloadedEv();
-    virtual ~LLBC_SvcEv_AppCfgReloadedEv();
 };
 
 /**
@@ -283,4 +276,6 @@ public:
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_SERVICE_EVENT_H__
+#include "llbc/comm/ServiceEventImpl.h"
+
+#endif // !__LLBC_COMM_SERVICE_EVENT_H__

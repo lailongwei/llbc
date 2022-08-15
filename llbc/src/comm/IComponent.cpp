@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/IComponent.h"
 #include "llbc/comm/Session.h"
@@ -423,5 +422,3 @@ std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &repor
 {
     return o <<report.ToString();
 }
-
-#include "llbc/common/AfterIncl.h"

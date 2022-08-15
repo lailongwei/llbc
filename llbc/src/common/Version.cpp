@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/ThirdHeader.h"
 #include "llbc/common/Config.h"
@@ -125,5 +124,3 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

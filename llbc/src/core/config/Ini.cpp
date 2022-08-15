@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/File.h"
 #include "llbc/core/variant/Variant.h"
@@ -606,5 +605,3 @@ void LLBC_Ini::Err_SeparatorNotFound(size_t lineNum, size_t columnNum, char sep)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

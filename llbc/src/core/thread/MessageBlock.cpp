@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/objectpool/ObjectPool.h"
 
@@ -47,8 +47,8 @@ LLBC_MessageBlock::LLBC_MessageBlock(size_t size)
         _buf = LLBC_Malloc(char, size);
 }
 
-LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size)
-: _attach(true)
+LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size, bool attach)
+: _attach(attach)
 , _buf(reinterpret_cast<char *>(buf))
 , _size(size)
 , _readPos(0)
@@ -337,5 +337,3 @@ LLBC_IObjectPoolInst *LLBC_MessageBlockObjectPoolInstFactory::Create(LLBC_IObjec
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

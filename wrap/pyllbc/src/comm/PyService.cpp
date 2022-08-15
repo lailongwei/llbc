@@ -684,7 +684,7 @@ LLBC_ListenerStub pyllbc_Service::SubscribeEvent(int event, PyObject *listener)
     // Create pyllbc layer event delegate.
     pyllbc_EventListener *evListener = LLBC_New(pyllbc_EventListener);
     if (evListener->SetPyListener(listener) != LLBC_OK)
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
 
     return _llbcSvc->SubscribeEvent(event, evListener);
 }

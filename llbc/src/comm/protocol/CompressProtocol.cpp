@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/CompressProtocol.h"
@@ -65,5 +64,3 @@ int LLBC_CompressProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

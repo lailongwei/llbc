@@ -34,7 +34,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     if(!obj || !listener)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     return this->AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(obj, listener), boundStub);
@@ -44,11 +44,11 @@ inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
 {
     if (RemoveListener(stub) != LLBC_OK)
     {
-        stub = LLBC_INVALID_LISTENER_STUB;
+        stub = 0;
         return LLBC_FAILED;
     }
 
-    stub = LLBC_INVALID_LISTENER_STUB;
+    stub = 0;
 
     return LLBC_OK;
 }

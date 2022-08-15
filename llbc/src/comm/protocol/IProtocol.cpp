@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/IService.h"
 #include "llbc/comm/Session.h"
@@ -109,5 +108,3 @@ int LLBC_IProtocol::SetCoders(const Coders *coders)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"
