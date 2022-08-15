@@ -86,9 +86,12 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
     filter {}
 
-    -- set warning as error
-    filter { "system:not windows" }
-        buildoptions { "-Werror" }
+    -- warnings setting
+    filter { "system:windows", "language:c++" }
+        disablewarnings { "4091", "4068", "4251" }
+    filter {}
+    filter { "system:not windows", "language:c++" }
+        buildoptions { "-Wall -Werror" }
     filter {}
 
     -- set debug target suffix
@@ -104,11 +107,6 @@ workspace ("llbc_" .. _ACTION)
     -- characterset architecture
     filter { "language:c++" }
         characterset "MBCS"
-    filter {}
-
-    -- disable some warnings
-    filter { "system:windows", "language:c++" }
-        disablewarnings { "4091", "4068" }
     filter {}
 
 -- ****************************************************************************
@@ -326,7 +324,7 @@ project "pyllbc"
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
-    filter { "action:vs2013 or vs2015 or vs2017" }
+    filter { "action:vs20*" }
         defines { "HAVE_ROUND" }
     filter {}
 
