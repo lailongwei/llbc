@@ -88,10 +88,17 @@ workspace ("llbc_" .. _ACTION)
 
     -- warnings setting
     filter { "system:windows", "language:c++" }
-        disablewarnings { "4091", "4068", "4251" }
+        disablewarnings {
+            "4091",
+            "4068",
+            "4251",
+        }
     filter {}
     filter { "system:not windows", "language:c++" }
-        buildoptions { "-Wall -Werror" }
+        buildoptions { 
+            "-Wall -Werror",
+            "-Wno-strict-aliasing",
+        }
     filter {}
 
     -- set debug target suffix
