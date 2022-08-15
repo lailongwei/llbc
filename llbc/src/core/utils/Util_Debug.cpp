@@ -120,8 +120,7 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 LLBC_String LLBC_CPUTime::ToString() const
 {
     LLBC_String info;
-    sint64 microSecs = ToMicroSeconds();
-    info.append_format("%f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
+    info.append_format("%.06f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
 
     return info;
 }

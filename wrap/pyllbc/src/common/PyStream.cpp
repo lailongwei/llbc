@@ -175,7 +175,7 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
     }
 
     _stream.SetPos(0);
-    _stream.WriteBuffer(buf, len);
+    _stream.Write(buf, len);
 
     return LLBC_OK;
 }
@@ -431,7 +431,7 @@ PyObject *pyllbc_Stream::ReadByteArray()
     }
 
     char *buf = LLBC_Malloc(char, len);
-    if (!_stream.ReadBuffer(buf, len))
+    if (!_stream.Read(buf, len))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
         LLBC_Free(buf);
@@ -474,7 +474,7 @@ PyObject *pyllbc_Stream::ReadBuffer()
         return nullptr;
     }
 
-    if (!_stream.ReadBuffer(buf, bufLen))
+    if (!_stream.Read(buf, bufLen))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
 
@@ -569,7 +569,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(str, 1);
+        _stream.Write(str, 1);
 
         return LLBC_OK;
     }
@@ -589,7 +589,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(buf, 1);
+        _stream.Write(buf, 1);
 
         return LLBC_OK;
     }
@@ -610,7 +610,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(buffer.buf, 1);
+        _stream.Write(buffer.buf, 1);
         PyBuffer_Release(&buffer);
 
         return LLBC_OK;
@@ -626,7 +626,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         pyllbc_TypeDetector::IsLong(val))
     {
         const long longVal = PyLong_AsLong(val);
-        _stream.WriteBuffer(&longVal, 1);
+        _stream.Write(&longVal, 1);
 
         return LLBC_OK;
     }
@@ -733,8 +733,8 @@ int pyllbc_Stream::WriteStr(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.WriteBuffer(str, static_cast<size_t>(len));
-    _stream.WriteBuffer("\0", 1);
+    _stream.Write(str, static_cast<size_t>(len));
+    _stream.Write("\0", 1);
 
     return LLBC_OK;
 }
@@ -750,7 +750,7 @@ int pyllbc_Stream::WriteStr2(PyObject *val)
     }
 
     _stream.Write(static_cast<int>(len));
-    _stream.WriteBuffer(str, len);
+    _stream.Write(str, len);
 
     return LLBC_OK;
 }
@@ -765,7 +765,7 @@ int pyllbc_Stream::WriteStr3(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.WriteBuffer(str, static_cast<size_t>(len));
+    _stream.Write(str, static_cast<size_t>(len));
 
     return LLBC_OK;
 }
@@ -792,7 +792,7 @@ int pyllbc_Stream::WriteByteArray(PyObject *val)
 
     _stream.Write(static_cast<sint32>(len));
     if (len > 0)
-        _stream.WriteBuffer(buf, len);
+        _stream.Write(buf, len);
 
     return LLBC_OK;
 }
@@ -809,7 +809,7 @@ int pyllbc_Stream::WriteBuffer(PyObject *val)
 
     _stream.Write(static_cast<sint32>(len));
     if (len > 0)
-        _stream.WriteBuffer(buf, len);
+        _stream.Write(buf, len);
 
     return LLBC_OK;
 }

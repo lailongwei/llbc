@@ -908,7 +908,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
         if (UNLIKELY(pyllbc_ObjCoder::Encode(pyObj, out) != LLBC_OK))
             return LLBC_FAILED;
 
-        stream.WriteBuffer(out.data(), out.size());
+        stream.Write(out.data(), out.size());
 
         return LLBC_OK;
     }

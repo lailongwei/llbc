@@ -89,8 +89,7 @@ LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
     if (_size == _capacity)
         Recapacity(MAX(1, _size * 2));
 
-    LLBC_MemCpy(_objs + n0._idx + 1, 
-        _objs + n0._idx, (_size - n0._idx) * sizeof(Obj *));
+    ::memmove(_objs + n0._idx + 1, _objs + n0._idx, (_size - n0._idx) * sizeof(Obj *));
 
     _objs[n0._idx] = o;
     _objs[n0._idx]->Retain();
@@ -165,8 +164,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     }
 
     difference_type shift = other._size - (n1._idx - n0._idx);
-    LLBC_MemCpy(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
-    LLBC_MemCpy(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
+    ::memmove(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
+    ::memmove(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
     for (difference_type i = n0._idx; i < n0._idx + other._size; ++i)
         _objs[i]->Retain();
 
@@ -191,7 +190,7 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
                 ++erasedCount;
             }
 
-            LLBC_MemCpy(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
+            ::memmove(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
             _objs[--_size] = nullptr;
         }
     }
@@ -232,8 +231,8 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
     for (difference_type i = n0._idx; i < n1._idx; ++i)
         _objs[i]->Release();
 
-    LLBC_MemCpy(_objs + n0._idx, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
-    LLBC_MemSet(_objs + _size - (n1._idx - n0._idx), 0, (n1._idx - n0._idx) * sizeof(Obj *));
+    ::memmove(_objs + n0._idx, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
+    ::memset(_objs + _size - (n1._idx - n0._idx), 0, (n1._idx - n0._idx) * sizeof(Obj *));
 
     _size -= (n1._idx - n0._idx);
 
@@ -501,7 +500,7 @@ void LLBC_Array::Recapacity(size_type cap)
         return;
 
     _objs = reinterpret_cast<Obj **>(realloc(_objs, cap * sizeof(Obj *)));
-    LLBC_MemSet(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
+    ::memset(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
 
     _capacity = cap;
 }

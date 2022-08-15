@@ -53,7 +53,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     LLBC_String backTrace;
 
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    if (captureFrames == LLBC_INFINITE)
+    if (captureFrames == static_cast<size_t>(LLBC_INFINITE))
         captureFrames = LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES;
     else
         captureFrames = MIN(captureFrames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);

@@ -160,7 +160,7 @@ LLBC_Service::LLBC_Service(This::Type type,
     }
 
     // Initialize cared event comps array.
-    LLBC_MemSet(_caredEventComps, 0, sizeof(_caredEventComps));
+    ::memset(_caredEventComps, 0, sizeof(_caredEventComps));
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -1519,9 +1519,9 @@ void LLBC_Service::RemoveServiceFromTls()
             break;
     }
 
-    LLBC_MemCpy(&tls->commTls.services[idx],
-                &tls->commTls.services[idx + 1],
-                sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
+    ::memmove(&tls->commTls.services[idx],
+              &tls->commTls.services[idx + 1],
+              sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
 }
 
 bool LLBC_Service::IsCanContinueDriveService()
@@ -2237,7 +2237,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     }
 
     // Validate check, if need.
-    const _ReadySessionInfo *readySInfo;
+    const _ReadySessionInfo *readySInfo = nullptr;
     const int sessionId = packet->GetSessionId();
     if (!_fullStack || validCheck)
     {

@@ -285,33 +285,6 @@ private:                                            \
 #define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
 #define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
 
-// memory set.
-#define LLBC_MemSet(dst, c, count)          (::memset(dst, c, count))
-// memory copy.
-#define LLBC_MemCpy(dst, src, s)                                    \
-    do {                                                            \
-        size_t ___s = static_cast<size_t>(s);                       \
-        char *___dst = reinterpret_cast<char *>(dst);               \
-        const char *___src = reinterpret_cast<const char *>(src);   \
-        if (UNLIKELY(!___dst || !___src || ___s <= 0))              \
-        {                                                           \
-            break;                                                  \
-        }                                                           \
-                                                                    \
-        if (___dst + ___s <= ___src || ___dst >= ___src + ___s)     \
-        {                                                           \
-            memcpy(___dst, ___src, ___s);                           \
-        }                                                           \
-        else                                                        \
-        {                                                           \
-            char *buf = reinterpret_cast<                           \
-                char *>(malloc(___s));                              \
-            memcpy(buf, ___src, ___s);                              \
-            memcpy(___dst, buf, ___s);                              \
-            free(buf);                                              \
-        }                                                           \
-    } while (0)                                                     \
-
 /**
  * Format argument.
  * @param[in] fmt  - the format string.

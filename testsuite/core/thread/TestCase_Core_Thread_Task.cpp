@@ -101,7 +101,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     task->Activate(5);
 
     // Send message to task.
-    for(int i = 0; i < pushMsgSize; ++i)
+    for(size_t i = 0; i < pushMsgSize; ++i)
     {
         LLBC_Stream stream;
         stream.Write(LLBC_String().format("Hello Message, seq:%d", i));

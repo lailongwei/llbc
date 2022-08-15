@@ -46,7 +46,7 @@ LULLBC_LUA_METH int _lullbc_Timer_New(lua_State *l)
     // Create userdata(sizeof(lullbc_Timer)), and set metatable: { __gc }
     void *timerBuf = lua_newuserdata(l, sizeof(lullbc_Timer));
     // Explicit call lullbc_Timer constructor
-    lullbc_Timer *timer = new (timerBuf) lullbc_Timer(l);
+    new (timerBuf) lullbc_Timer(l);
 
     // Set metatable.
     if (UNLIKELY(luaL_newmetatable(l, "lullbc_Timer.__Del_LuTimer") == 1))

@@ -105,9 +105,6 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
 {
     typedef TestCase_Core_Utils_Delegate DelegObj;
 
-    int arg1 = 1, arg2 = 2, arg3 = 3;
-    int arg4 = 4, arg5 = 5, arg6 = 6, arg7 = 7;
-
     std::cout <<"Delegate test:" <<std::endl;
     LLBC_Delegate<void()> func0(&Func_Foo_0);
     func0();

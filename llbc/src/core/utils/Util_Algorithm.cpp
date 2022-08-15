@@ -198,7 +198,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
             buffer = LLBC_Calloc(char, strLen * 2);
 
         const size_t copyLen = i - copyIdx;
-        LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+        ::memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
 
         bufIdx += copyLen;
         buffer[bufIdx++] = escapeChar;
@@ -211,7 +211,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         if (copyIdx < strLen)
         {
             const size_t copyLen = strLen - copyIdx;
-            LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+            ::memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
             bufIdx += copyLen;
         }
 
