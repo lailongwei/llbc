@@ -406,13 +406,13 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     return data;
 }
 
-void LLBC_Logger::FillLogDataNonMsgMembers(int level,
-                                           const char *tag,
-                                           const char *file,
-                                           int line,
-                                           const char *func,
-                                           LLBC_LogData *logData,
-                                           __LLBC_LibTls *libTls)
+LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
+                                                             const char *tag,
+                                                             const char *file,
+                                                             int line,
+                                                             const char *func,
+                                                             LLBC_LogData *logData,
+                                                             __LLBC_LibTls *libTls)
 {
     // fill: logger&logger name.
     logData->logger = this;

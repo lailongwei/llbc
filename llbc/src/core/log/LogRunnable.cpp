@@ -107,7 +107,7 @@ LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogData(int maxPopWaitTime
     return true;
 }
 
-void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
+LLBC_FORCE_INLINE void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
 {
     size_t loggerCnt = _loggers.size();
     for (size_t i = 0; i < loggerCnt; ++i)
