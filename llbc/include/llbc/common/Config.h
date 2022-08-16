@@ -179,7 +179,7 @@
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (1 || LLBC_DEBUG)
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (0 || LLBC_DEBUG)
 // Object reset match methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
@@ -238,7 +238,7 @@
 // Message buffer element(block) allow resize limit.
 #define LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT          (8 * 1024)
 // Default service FPS value.
-#define LLBC_CFG_COMM_DFT_SERVICE_FPS                       60
+#define LLBC_CFG_COMM_DFT_SERVICE_FPS                       200
 // Min service FPS value.
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
