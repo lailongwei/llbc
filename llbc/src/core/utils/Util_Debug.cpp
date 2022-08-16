@@ -108,13 +108,7 @@ uint64 LLBC_CPUTime::_freqPerNanoSecond = 0;
 
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_CPUTime(LLBC_RdTsc());
-#else // Win32
-    LARGE_INTEGER cur;
-    ::QueryPerformanceCounter(&cur);
-    return LLBC_CPUTime(cur.QuadPart);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
 LLBC_String LLBC_CPUTime::ToString() const
