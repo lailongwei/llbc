@@ -3,6 +3,8 @@ max_jobs: 8
 branches:
     only:
         - master
+        - onemt/master
+        - onemt/branches/koh
 
 clone_depth: 50
 clone_folder: c:\projects\llbc
