@@ -36,6 +36,7 @@
 #include "src/core/thread/_Thread.h"
 #include "src/core/timer/_Timer.h"
 #include "src/core/timer/_TimerScheduler.h"
+#include "src/core/utils/_Util_CPUTime.h"
 #include "src/core/utils/_Util_Misc.h"
 #include "src/core/utils/_Util_String.h"
 #include "src/core/utils/_Util_Table.h"
@@ -43,6 +44,7 @@
 static luaL_Reg lullbc_NativeMethods[] = {
     {"InitLog", _lullbc_InitLog},
     {"Util_Misc_ToPointer", _lullbc_Util_Misc_ToPointer},
+    {"CPUTimeToUniversalTime", _lullbc_Util_CPUTimeToUniversalTime},
     {"GetVersionInfo", _lullbc_GetVersionInfo},
     {"Timer_GetPeriod", _lullbc_Timer_GetPeriod},
     {"Cleanup", _lullbc_Cleanup},
@@ -54,6 +56,7 @@ static luaL_Reg lullbc_NativeMethods[] = {
     {"Dir_AbsPath", _lullbc_Dir_AbsPath},
     {"Dir_Create", _lullbc_Dir_Create},
     {"Util_String_HashString", _lullbc_Util_String_HashString},
+    {"CPUTime", _lullbc_Util_CPUTime},
     {"TimerScheduler_Update", _lullbc_TimerScheduler_Update},
     {"TimerScheduler_SetEnabled", _lullbc_TimerScheduler_SetEnabled},
     {"TimerScheduler_IsEnabled", _lullbc_TimerScheduler_IsEnabled},

@@ -614,12 +614,14 @@ project "lullbc_lualib"
     removefiles {
         LUA_SRC_PATH .. "/lua.c",
         LUA_SRC_PATH .. "/luac.c",
+        LUA_SRC_PATH .. "/onelua.c",
     }
 
     -- defines
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
+        "LUA_COMPAT_5_3",
     }
     filter { "system:windows" }
         defines { "LUA_BUILD_AS_DLL" }
@@ -654,6 +656,7 @@ project "lullbc_luaexec"
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
+        "LUA_COMPAT_5_3",
     }
 
     -- dependents
@@ -690,8 +693,8 @@ project "lullbc_luaexec"
 -- import lualib_setting
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
 local LUALIB_SETTING = require "lualib_setting"
-local LUALIB_INCL_PATH = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
-local LUALIB_LIB_DIR = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
+local LUALIB_INCL_PATH = (LUALIB_SETTING.lua_path[1] ~= nil and LUALIB_SETTING.lua_path[1] ~= "") and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
+local LUALIB_LIB_DIR = (LUALIB_SETTING.lua_path[2] ~= nil and LUALIB_SETTING.lua_path[2] ~= "") and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
 project "lullbc"
     -- language, kind
     language "c++"
@@ -770,25 +773,25 @@ project "lullbc"
     filter { "configurations:debug*", "system:windows" }
         links {
             "libllbc_debug",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua_debug",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua_debug",
         }
     filter {}
     filter { "configurations:debug*", "system:not windows" }
         links {
             "llbc_debug",
-            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua_debug",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua_debug",
         }
     filter {}
     filter { "configurations:release*", "system:windows" }
         links {
             "libllbc",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua",
         }
     filter {}
     filter { "configurations:release*", "system:not windows" }
         links {
             "llbc",
-            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua",
         }
     filter {}
 

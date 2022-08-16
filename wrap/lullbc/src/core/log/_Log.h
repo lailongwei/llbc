@@ -49,41 +49,75 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     if (paramsCount < 6)
         lullbc_SetError(l, "failed to log message, parameters count must be equal or greater than 5");
 
+    // Get logger format buf.
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    char *fmtBuf = libTls->coreTls.loggerFmtBuf;
+
     // Concat messages to output.
-    size_t msgSize;
-    LLBC_String msg;
+    size_t partMsgSize;
     const char *partMsg;
+    size_t availableFmtBufSize = sizeof(libTls->coreTls.loggerFmtBuf) - 1;
     for (int i = 7; i <= paramsCount; ++i)
     {
-        partMsg = luaL_tolstring(l, i, &msgSize);
+        partMsg = luaL_tolstring(l, i, &partMsgSize);
         if (UNLIKELY(partMsg == nullptr))
             luaL_error(l, "'tostring' must return a string to '_lullbc.LogMsg'");
 
-        msg.append(partMsg, msgSize);
-        if (i < paramsCount)
-            msg.append(1, ' ');
+        const size_t copySize = MIN(partMsgSize, availableFmtBufSize);
+        ::memcpy(fmtBuf, partMsg, copySize);
+        fmtBuf += copySize;
+        if (UNLIKELY((availableFmtBufSize -= copySize) == 0))
+        {
+            lua_pop(l, 1);
+            break;
+        }
+
+        if (i < paramsCount &&
+            LIKELY(availableFmtBufSize > 0))
+        {
+            *fmtBuf++ = ' ';
+            if (UNLIKELY(--availableFmtBufSize == 0))
+            {
+                lua_pop(l, 1);
+                break;
+            }
+        }
 
         lua_pop(l, 1);
     }
 
     // Append traceback.
     int level = lua_toint32(l, 1);
-    if (level >= LLBC_LogLevel::Error)
+    if (level >= LLBC_LogLevel::Error &&
+        LIKELY(availableFmtBufSize > 1))
     {
-        luaL_traceback(l, l, nullptr, 4);
-        partMsg = lua_tolstring(l, paramsCount + 1, &msgSize);
-        msg.append(1, ' ');
-        msg.append(partMsg, msgSize);
+        *fmtBuf++ = '\n';
+        --availableFmtBufSize;
+
+        luaL_traceback(l, l, nullptr, 3);
+        partMsg = lua_tolstring(l, paramsCount + 1, &partMsgSize);
+
+        const size_t copySize = MIN(partMsgSize, availableFmtBufSize);
+        ::memcpy(fmtBuf, partMsg, copySize);
+        fmtBuf += copySize;
+        availableFmtBufSize -= copySize;
+
         lua_pop(l, 1);
     }
 
     // If Log not init, direct output to console.
     if (UNLIKELY(!__loggerManager))
     {
-        fprintf(stdout, "[Log] %s\n", msg.c_str());
+        *fmtBuf = '\0';
+        fprintf(stdout, "[Log] %s\n", fmtBuf);
         fflush(stdout);
+
         return 0;
     }
+
+    // Finish log msg.
+    *fmtBuf = '\0';
+    const size_t msgSize = fmtBuf - libTls->coreTls.loggerFmtBuf;
 
     // Parse logger.
     LLBC_Logger *logger;
@@ -103,7 +137,12 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     const char *func = lua_tostring(l, 6);
 
     // Output message.
-    if (UNLIKELY(logger->NonFormatOutput(level, tag, file, line, func, msg.data(), msg.size()) != LLBC_OK))
+    if (UNLIKELY(logger->NonFormatOutput(level,
+                                         tag,
+                                         file,
+                                         line,
+                                         func,
+                                         libTls->coreTls.loggerFmtBuf, msgSize) != LLBC_OK))
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
 
     return 0;
