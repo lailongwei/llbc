@@ -51,7 +51,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
         std::cout << "- is empty: " << rb.IsEmpty() << ", is full: " << rb.IsFull() << std::endl;
 
         std::cout << "- push some elems..." << std::endl;
-        for (int i = 0; i != rb.GetCapacity() / 2; ++i)
+        for (size_t i = 0; i != rb.GetCapacity() / 2; ++i)
         {
             std::cout << "  - push: " << i << std::endl;
             rb.Push(i);

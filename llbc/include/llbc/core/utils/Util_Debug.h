@@ -60,11 +60,8 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 class LLBC_EXPORT LLBC_CPUTime
 {
 public:
-
-public:
-    LLBC_CPUTime();
-    LLBC_CPUTime(uint64 cpuCount);
-    ~LLBC_CPUTime();
+    LLBC_CPUTime(uint64 cpuCount = 0);
+    ~LLBC_CPUTime() = default;
 
 public:
     static uint64 GetCPUFreqPerSecond();

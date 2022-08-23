@@ -157,14 +157,14 @@ inline bool LLBC_Stream::Read(std::string &obj)
         return true;
 
     obj.resize(len);
-    return ReadBuffer(const_cast<char *>(obj.data()), obj.size());
+    return Read(const_cast<char *>(obj.data()), obj.size());
 }
 
 template <>
 inline void LLBC_Stream::Write(const std::string &obj)
 {
     Write(static_cast<uint32>(obj.size()));
-    WriteBuffer(obj.data(), obj.size());
+    Write(obj.data(), obj.size());
 }
 
 __LLBC_NS_END

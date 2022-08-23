@@ -46,8 +46,8 @@ pyllbc_MethodTable::~pyllbc_MethodTable()
 int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
 {
     if (!method.ml_name ||
-            LLBC_StrLen(method.ml_name) < 1 ||
-            !method.ml_meth)
+        LLBC_StrLen(method.ml_name) < 1 ||
+        !method.ml_meth)
     {
         pyllbc_SetError("method def structure invalid", LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -56,8 +56,8 @@ int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)
     if (_capacity - _size <= 1)
         ReCapacity(_capacity * 2);
 
-    LLBC_MemCpy(_methods + 1, _methods, sizeof(PyMethodDef) * _size);
-    LLBC_MemCpy(_methods, &method, sizeof(PyMethodDef));
+    ::memmove(_methods + 1, _methods, sizeof(PyMethodDef) * _size);
+    ::memcpy(_methods, &method, sizeof(PyMethodDef));
 
     _size += 1;
 
@@ -71,8 +71,8 @@ int pyllbc_MethodTable::RemoveMethod(const LLBC_String &name)
         const PyMethodDef &method = _methods[i];
         if (name == method.ml_name)
         {
-            LLBC_MemCpy(_methods + i, _methods + i + 1, _size - i - 1);
-            LLBC_MemSet(_methods + _size - 1, 0, sizeof(PyMethodDef));
+            ::memmove(_methods + i, _methods + i + 1, _size - i - 1);
+            ::memset(_methods + _size - 1, 0, sizeof(PyMethodDef));
 
             _size -= 1;
 
@@ -104,9 +104,9 @@ void pyllbc_MethodTable::ReCapacity(sint32 cap)
                             _methods, 
                             cap * sizeof(PyMethodDef));
 
-    LLBC_MemSet(_methods + _capacity, 
-                0, 
-                sizeof(PyMethodDef) * (cap - _capacity));
+    ::memset(_methods + _capacity, 
+             0, 
+             sizeof(PyMethodDef) * (cap - _capacity));
 
     _capacity = cap;
 }

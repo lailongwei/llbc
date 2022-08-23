@@ -86,9 +86,19 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
     filter {}
 
-    -- set warning as error
-    filter { "system:not windows" }
-        buildoptions { "-Werror" }
+    -- warnings setting
+    filter { "system:windows", "language:c++" }
+        disablewarnings {
+            "4091",
+            "4068",
+            "4251",
+        }
+    filter {}
+    filter { "system:not windows", "language:c++" }
+        buildoptions { 
+            "-Wall -Werror",
+            "-Wno-strict-aliasing",
+        }
     filter {}
 
     -- set debug target suffix
@@ -104,11 +114,6 @@ workspace ("llbc_" .. _ACTION)
     -- characterset architecture
     filter { "language:c++" }
         characterset "MBCS"
-    filter {}
-
-    -- disable some warnings
-    filter { "system:windows", "language:c++" }
-        disablewarnings { "4091", "4068" }
     filter {}
 
 -- ****************************************************************************
@@ -326,7 +331,7 @@ project "pyllbc"
     end
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
-    filter { "action:vs2013 or vs2015 or vs2017" }
+    filter { "action:vs20*" }
         defines { "HAVE_ROUND" }
     filter {}
 
@@ -609,12 +614,14 @@ project "lullbc_lualib"
     removefiles {
         LUA_SRC_PATH .. "/lua.c",
         LUA_SRC_PATH .. "/luac.c",
+        LUA_SRC_PATH .. "/onelua.c",
     }
 
     -- defines
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
+        "LUA_COMPAT_5_3",
     }
     filter { "system:windows" }
         defines { "LUA_BUILD_AS_DLL" }
@@ -649,6 +656,7 @@ project "lullbc_luaexec"
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
+        "LUA_COMPAT_5_3",
     }
 
     -- dependents
@@ -685,8 +693,8 @@ project "lullbc_luaexec"
 -- import lualib_setting
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
 local LUALIB_SETTING = require "lualib_setting"
-local LUALIB_INCL_PATH = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
-local LUALIB_LIB_DIR = LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
+local LUALIB_INCL_PATH = (LUALIB_SETTING.lua_path[1] ~= nil and LUALIB_SETTING.lua_path[1] ~= "") and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
+local LUALIB_LIB_DIR = (LUALIB_SETTING.lua_path[2] ~= nil and LUALIB_SETTING.lua_path[2] ~= "") and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
 project "lullbc"
     -- language, kind
     language "c++"
@@ -765,25 +773,25 @@ project "lullbc"
     filter { "configurations:debug*", "system:windows" }
         links {
             "libllbc_debug",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua_debug",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua_debug",
         }
     filter {}
     filter { "configurations:debug*", "system:not windows" }
         links {
             "llbc_debug",
-            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua_debug",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua_debug",
         }
     filter {}
     filter { "configurations:release*", "system:windows" }
         links {
             "libllbc",
-            LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "liblua",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua",
         }
     filter {}
     filter { "configurations:release*", "system:not windows" }
         links {
             "llbc",
-            -- LUALIB_SETTING.use_setting and LUALIB_SETTING.lua_path[3] or "lua",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua",
         }
     filter {}
 

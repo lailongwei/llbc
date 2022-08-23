@@ -19,16 +19,19 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_BEFORE_INCL_H__
-#define __LLBC_COM_BEFORE_INCL_H__
+// Api: CPUTime
+LULLBC_LUA_METH int _lullbc_Util_CPUTime(lua_State *l)
+{
+    lua_pushinteger(l, static_cast<sint64>(LLBC_RdTsc()));
+    return 1;
+}
 
-#include "llbc/common/PFConfig.h"
-#include "llbc/common/Compiler.h"
+// Api: CPUTimeToUniversalTime
+LULLBC_LUA_METH int _lullbc_Util_CPUTimeToUniversalTime(lua_State *l)
+{
+    const uint64 cpuTsc = lua_tonumber(l, 1);
+    lua_pushnumber(l, LLBC_CPUTime(
+        cpuTsc).ToNanoSeconds() / static_cast<double>(LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond));
 
-// WIN32 platform MSVC compiler specific: push old warning settings, and set library warning settings.
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC
-#pragma warning(push, 3) // push project warning settings, and set library warning level to 3.
-#pragma warning(disable: 4251) // disable the 4251 warning, we ignore it, about C4251, see MSDN.
-#endif // LLBC_COMP_MSVC
-
-#endif // !__LLBC_COM_BEFORE_INCL_H__
+    return 1;
+}

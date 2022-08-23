@@ -55,10 +55,11 @@ public:
 
     /**
      * Init and construct message block using external buffer.
-     * @param[in] buf  - buffer.
-     * @param[in] size - buffer size.
+     * @param[in] buf    - buffer.
+     * @param[in] size   - buffer size.
+     * @param[in] attach - attach flag, default is true.
      */
-    LLBC_MessageBlock(void *buf, size_t size);
+    LLBC_MessageBlock(void *buf, size_t size, bool attach = true);
 
     /**
      * Destructor.

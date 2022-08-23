@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/objectpool/IObjectPool.h"
 #include "llbc/core/objectpool/IObjectPoolInstFactory.h"
@@ -69,5 +68,3 @@ void LLBC_IObjectPool::DestroyAllPoolInstFactories()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

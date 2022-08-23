@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
  #include "llbc/core/os/OS_Time.h"
@@ -190,5 +190,3 @@ void LLBC_Semaphore::Post(int count)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

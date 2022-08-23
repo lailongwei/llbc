@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
@@ -380,5 +379,3 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-
-#include "llbc/common/AfterIncl.h"

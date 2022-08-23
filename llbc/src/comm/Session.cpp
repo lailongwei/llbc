@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolStack.h"
 
@@ -172,7 +171,7 @@ int LLBC_Session::Send(LLBC_MessageBlock *block)
         sessionSndBufUsed += _socket->GetIocpSendingDataSize();
     #endif
 
-    if (_sessionOpts.GetSessionSendBufSize() != LLBC_INFINITE &&
+    if (_sessionOpts.GetSessionSendBufSize() != static_cast<size_t>(LLBC_INFINITE) &&
         (sessionSndBufUsed + block->GetReadableSize()) >= _sessionOpts.GetSessionSendBufSize())
     {
         LLBC_Recycle(block);
@@ -292,5 +291,3 @@ void LLBC_Session::CtrlProtocolStack(int cmd, const LLBC_Variant &ctrlData, bool
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

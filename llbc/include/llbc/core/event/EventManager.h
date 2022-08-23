@@ -57,7 +57,7 @@ public:
     LLBC_ListenerStub AddListener(int id,
                                   ObjectType *obj,
                                   void (ObjectType::*listener)(LLBC_Event &),
-                                  const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
+                                  const LLBC_ListenerStub &boundStub = 0);
     /**
      * Add event deleg.
      * @param[in] id        - event Id.
@@ -67,7 +67,7 @@ public:
      */
     virtual LLBC_ListenerStub AddListener(int id,
                                           const LLBC_Delegate<void(LLBC_Event &)> &listener,
-                                          const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
+                                          const LLBC_ListenerStub &boundStub = 0);
 
     /**
      * Add event listener.
@@ -77,7 +77,7 @@ public:
      */
     virtual LLBC_ListenerStub AddListener(int id,
                                           LLBC_EventListener *listener,
-                                          const LLBC_ListenerStub &boundStub = LLBC_INVALID_LISTENER_STUB);
+                                          const LLBC_ListenerStub &boundStub = 0);
 
     /**
      * Remove event deleg.

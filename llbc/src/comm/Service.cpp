@@ -27,7 +27,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PollerType.h"
@@ -35,6 +34,7 @@
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
+#include "llbc/comm/IComponent.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
@@ -48,7 +48,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_Service::_maxId = 1;
 
-LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_SvcEvType::End] = 
+LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_ServiceEventType::End] = 
 {
     &LLBC_Service::HandleEv_SessionCreate,
     &LLBC_Service::HandleEv_SessionDestroy,
@@ -160,7 +160,7 @@ LLBC_Service::LLBC_Service(This::Type type,
     }
 
     // Initialize cared event comps array.
-    LLBC_MemSet(_caredEventComps, 0, sizeof(_caredEventComps));
+    ::memset(_caredEventComps, 0, sizeof(_caredEventComps));
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -460,7 +460,9 @@ int LLBC_Service::SetFPS(int fps)
     {
         _relaxTimes = 0;
         _frameInterval = 0;
+        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
         _frameTimeout = LLBC_INFINITE;
+        #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     }
 
     return LLBC_OK;
@@ -1087,14 +1089,14 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<vo
     if (UNLIKELY(!deleg))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, deleg, nullptr));
@@ -1107,14 +1109,14 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *li
     if (!listener)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_LockGuard guard(_lock);
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, nullptr, listener));
@@ -1125,7 +1127,7 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *li
 void LLBC_Service::UnsubscribeEvent(int event)
 {
     Push(LLBC_SvcEvUtil::
-        BuildUnsubscribeEventEv(event, LLBC_INVALID_LISTENER_STUB));
+        BuildUnsubscribeEventEv(event, 0));
 }
 
 void LLBC_Service::UnsubscribeEvent(const LLBC_ListenerStub &stub)
@@ -1517,9 +1519,9 @@ void LLBC_Service::RemoveServiceFromTls()
             break;
     }
 
-    LLBC_MemCpy(&tls->commTls.services[idx],
-                &tls->commTls.services[idx + 1],
-                sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
+    ::memmove(&tls->commTls.services[idx],
+              &tls->commTls.services[idx + 1],
+              sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
 }
 
 bool LLBC_Service::IsCanContinueDriveService()
@@ -1563,34 +1565,36 @@ void LLBC_Service::DestroyFrameTasks()
 
 void LLBC_Service::HandleQueuedEvents()
 {
-    int type;
-    LLBC_ServiceEvent *ev;
-    LLBC_MessageBlock *block;
-
     #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
     LLBC_CPUTime begTime;
     if (_frameTimeout != LLBC_INFINITE)
         begTime = LLBC_CPUTime::Current();
     #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
 
-    while (TryPop(block) == LLBC_OK)
+    LLBC_ServiceEvent *ev;
+    LLBC_MessageBlock *block, *blocks;
+    if (PopAll(blocks) == LLBC_OK)
     {
-        block->Read(&type, sizeof(int));
-        block->Read(&ev, sizeof(LLBC_ServiceEvent *));
+        while (blocks)
+        {
+            block = blocks;
+            blocks = blocks->GetNext();
 
-        (this->*_evHandlers[type])(*ev);
+            ev = reinterpret_cast<LLBC_ServiceEvent *>(block->GetDataStartWithReadPos());
+            (this->*_evHandlers[ev->type])(*ev);
 
-        LLBC_Delete(ev);
-        LLBC_Delete(block);
+            LLBC_Delete(ev);
+            LLBC_Delete(block);
 
-        #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-        if (_frameTimeout == LLBC_INFINITE)
-            continue;
+            #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+            if (_frameTimeout == LLBC_INFINITE)
+                continue;
 
-        if(UNLIKELY(static_cast<uint64>(
-            (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
-            break;
-        #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+            if (UNLIKELY(static_cast<uint64>(
+                (LLBC_CPUTime::Current() - begTime).ToNanoSeconds()) >= _frameTimeout))
+                break;
+            #endif  // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
+        }
     }
 }
 
@@ -1860,7 +1864,7 @@ void LLBC_Service::HandleEv_UnsubscribeEv(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_UnsubscribeEv _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    if (ev.stub == LLBC_INVALID_LISTENER_STUB)
+    if (ev.stub == 0)
         _evManager.RemoveListener(ev.id);
     else
         _evManager.RemoveListener(ev.stub);
@@ -2233,7 +2237,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     }
 
     // Validate check, if need.
-    const _ReadySessionInfo *readySInfo;
+    const _ReadySessionInfo *readySInfo = nullptr;
     const int sessionId = packet->GetSessionId();
     if (!_fullStack || validCheck)
     {
@@ -2497,5 +2501,3 @@ LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponentFactory *compFactory)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

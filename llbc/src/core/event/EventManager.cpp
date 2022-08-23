@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/helper/STLHelper.h"
 
@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
 
 LLBC_EventManager::_ListenerInfo::_ListenerInfo()
 : evId(0)
-, stub(LLBC_INVALID_LISTENER_STUB)
+, stub(0)
 , listener(nullptr)
 {
 }
@@ -67,12 +67,12 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     if (id <= 0 || !listener)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_ListenerStub stub;
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
 
     _ListenerInfo *li = LLBC_New(_ListenerInfo);
     li->evId = id;
@@ -91,12 +91,12 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     if (id <= 0 || !listener)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
     }
 
     LLBC_ListenerStub stub;
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
-        return LLBC_INVALID_LISTENER_STUB;
+        return 0;
 
     _ListenerInfo *li = LLBC_New(_ListenerInfo);
     li->evId = id;
@@ -147,7 +147,7 @@ int LLBC_EventManager::RemoveListener(int id)
 
 int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
 {
-    if (stub == LLBC_INVALID_LISTENER_STUB)
+    if (stub == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -287,7 +287,7 @@ void LLBC_EventManager::AfterFireEvent()
 
 int LLBC_EventManager::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub)
 {
-    if (boundStub != LLBC_INVALID_LISTENER_STUB)
+    if (boundStub != 0)
     {
         if (HasStub(boundStub))
         {
@@ -314,5 +314,3 @@ void LLBC_EventManager::AddListenerInfo(_ListenerInfo *li)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

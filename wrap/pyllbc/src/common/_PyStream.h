@@ -337,7 +337,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
 
     // Get wrapped LLBC_Stream object, and write self stream data into it.
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
-    llbcStream.WriteBuffer(reinterpret_cast<
+    llbcStream.Write(reinterpret_cast<
         const char *>(llbcWillRead.GetBuf()) + begin, end - begin);
 
     return pyStream;
@@ -655,7 +655,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Stream(PyObject *self, PyObject *a
 
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
     LLBC_Stream &llbcWillWrite = willWrite->GetLLBCStream();
-    llbcStream.WriteBuffer(reinterpret_cast<
+    llbcStream.Write(reinterpret_cast<
         const char *>(llbcWillWrite.GetBuf()) + beginPos, endPos - beginPos);
 
     return stream->GetPyObj();
@@ -692,7 +692,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamEncodeSelf(PyObject *self, PyObject *arg
     LLBC_Stream &s1 = pyStream1->GetLLBCStream();
     LLBC_Stream &s2 = pyStream2->GetLLBCStream();
 
-    s2.WriteBuffer(s1.GetBuf(), s1.GetPos());
+    s2.Write(s1.GetBuf(), s1.GetPos());
 
     return pyStream1->GetPyObj();
 }

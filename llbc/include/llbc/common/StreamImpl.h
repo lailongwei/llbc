@@ -100,7 +100,7 @@ inline LLBC_Stream::LLBC_Stream(void *buf, size_t len, bool attach)
         return;
     }
 
-    WriteBuffer(buf, len);
+    Write(buf, len);
     _pos = 0;
 }
 
@@ -352,17 +352,15 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
     _pos = _pos + len - (n1 - n0);
 }
 
-inline bool LLBC_Stream::ReadBuffer(void *buf, size_t len)
+inline bool LLBC_Stream::Read(void *buf, size_t len)
 {
-    if (len == 0)
+    if (len <= 0)
         return true;
-    else if (_pos + len > _size)
+    else if (UNLIKELY(!buf) || _pos + len > _size)
         return false;
 
-    ASSERT(buf && "LLBC_Stream::ReadBuffer(): expect not-null buf pointer to read");
-
     // check memory overlapped
-    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::ReadBuffer() buffer overlapped!");
+    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Read(void *, size_t) buffer overlapped!");
 
     ::memcpy(buf, (const uint8 *)_buf + _pos, len);
     _pos += len;
@@ -370,12 +368,12 @@ inline bool LLBC_Stream::ReadBuffer(void *buf, size_t len)
     return true;
 }
 
-inline void LLBC_Stream::WriteBuffer(const void *buf, size_t len)
+inline void LLBC_Stream::Write(const void *buf, size_t len)
 {
     if (UNLIKELY(!buf || len <= 0))
         return;
 
-    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::WriteBuffer() buffer overlapped!");
+    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Write(const void *, size_t) buffer overlapped!");
 
     AutoResize(len);
     ::memcpy((uint8 *)_buf + _pos, buf, len);
@@ -423,17 +421,17 @@ inline LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
 
 inline bool LLBC_Stream::ReadBool(bool &value)
 {
-    return ReadBuffer(&value, sizeof(bool));
+    return Read(&value, sizeof(bool));
 }
 
 inline bool LLBC_Stream::ReadSInt8(sint8 &value)
 {
-    return ReadBuffer(&value, sizeof(sint8));
+    return Read(&value, sizeof(sint8));
 }
 
 inline bool LLBC_Stream::ReadUInt8(uint8 &value)
 {
-    return ReadBuffer(&value, sizeof(uint8));
+    return Read(&value, sizeof(uint8));
 }
 
 inline bool LLBC_Stream::ReadSInt16(sint16 &value)
@@ -493,19 +491,19 @@ inline bool LLBC_Stream::ReadPtr(void *&value)
 
 inline bool LLBC_Stream::ReadBool_2(bool failRet)
 {
-    ReadBuffer(&failRet, sizeof(bool));
+    Read(&failRet, sizeof(bool));
     return failRet;
 }
 
 inline sint8 LLBC_Stream::ReadSInt8_2(sint8 failRet)
 {
-    ReadBuffer(&failRet, sizeof(sint8));
+    Read(&failRet, sizeof(sint8));
     return failRet;
 }
 
 inline uint8 LLBC_Stream::ReadUInt8_2(uint8 failRet)
 {
-    ReadBuffer(&failRet, sizeof(uint8));
+    Read(&failRet, sizeof(uint8));
     return failRet;
 }
 
@@ -577,17 +575,17 @@ inline void *LLBC_Stream::ReadPtr_2(void *failRet)
 
 inline void LLBC_Stream::WriteBool(bool value)
 {
-    WriteBuffer(&value, sizeof(bool));
+    Write(&value, sizeof(bool));
 }
 
 inline void LLBC_Stream::WriteSInt8(sint8 value)
 {
-    WriteBuffer(&value, sizeof(sint8));
+    Write(&value, sizeof(sint8));
 }
 
 inline void LLBC_Stream::WriteUInt8(uint8 value)
 {
-    WriteBuffer(&value, sizeof(uint8));
+    Write(&value, sizeof(uint8));
 }
 
 inline void LLBC_Stream::WriteSint16(sint16 value)
@@ -671,7 +669,7 @@ inline void LLBC_Stream::AutoResize(size_t needSize)
 template <typename T>
 inline bool LLBC_Stream::ReadRawType(T &value)
 {
-    if (!ReadBuffer(&value, sizeof(T)))
+    if (!Read(&value, sizeof(T)))
         return false;
 
     if (_endian != LLBC_MachineEndian)
@@ -684,11 +682,13 @@ template <typename T>
 inline void LLBC_Stream::WriteRawType(const T &value)
 {
     if (_endian == LLBC_MachineEndian)
-        WriteBuffer(&value, sizeof(T));
+    {
+        Write(&value, sizeof(T));
+    }
     else
     {
         const T reversedVal = LLBC_ReverseBytes2(value);
-        WriteBuffer(&reversedVal, sizeof(T));
+        Write(&reversedVal, sizeof(T));
     }
 }
 

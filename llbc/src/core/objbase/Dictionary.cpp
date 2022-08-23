@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -41,14 +41,14 @@ LLBC_Dictionary::LLBC_Dictionary(LLBC_Dictionary::size_type bucketSize)
 , _objFactory(nullptr)
 {
     _bucket = reinterpret_cast<LLBC_DictionaryElem **>(
-        malloc(_bucketSize * sizeof(LLBC_DictionaryElem *)));
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+        ::malloc(_bucketSize * sizeof(LLBC_DictionaryElem *)));
+    ::memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 }
 
 LLBC_Dictionary::~LLBC_Dictionary()
 {
     Clear();
-    free(_bucket);
+    ::free(_bucket);
 
     LLBC_XRelease(_objFactory);
 }
@@ -67,7 +67,7 @@ void LLBC_Dictionary::Clear()
     _size = 0;
     _head = _tail = nullptr;
 
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+    ::memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 }
 
 LLBC_Dictionary::size_type LLBC_Dictionary::GetSize() const
@@ -98,8 +98,8 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
     // ReAlloc bucket.
     _bucketSize = bucketSize;
     _bucket = reinterpret_cast<LLBC_DictionaryElem **>(
-        realloc(_bucket, _bucketSize * sizeof(LLBC_DictionaryElem *)));
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+        ::realloc(_bucket, _bucketSize * sizeof(LLBC_DictionaryElem *)));
+    ::memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 
     // ReHash.
     it = Begin();
@@ -557,5 +557,3 @@ void LLBC_Dictionary::RemoveFromDoublyLinkedList(LLBC_DictionaryElem *elem)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

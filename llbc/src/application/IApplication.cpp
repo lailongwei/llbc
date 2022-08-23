@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/IApplication.h"
@@ -639,4 +638,3 @@ void LLBC_IApplication::AfterReloadConfig(bool iniReloaded, bool propReloaded, b
 
 __LLBC_NS_END
 
-#include "llbc/common/AfterIncl.h"

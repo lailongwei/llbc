@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
 
@@ -83,6 +83,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     }
 
     _loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
+    _loggers2.insert(std::make_pair(_rootLoggerName.c_str(), _rootLogger));
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
@@ -101,6 +102,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         }
 
         _loggers.insert(std::make_pair(cfgIter->first, logger));
+        _loggers2.insert(std::make_pair(cfgIter->first.c_str(), logger));
     }
 
     // Startup shared log runnable.
@@ -130,6 +132,7 @@ void LLBC_LoggerManager::Finalize()
     }
 
     // Delete all loggers and set _rootLogger logger to nullptr.
+    _loggers2.clear();
     LLBC_STLHelper::DeleteContainer(_loggers);
     _rootLogger = nullptr;
 
@@ -148,6 +151,34 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
     return _rootLogger;
 }
 
+LLBC_Logger *LLBC_LoggerManager::GetLogger(const char *name) const
+{
+    if (UNLIKELY(!name))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return nullptr;
+    }
+
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(!_rootLogger))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return nullptr;
+    }
+
+    auto iter = _loggers2.find(name);
+    if (iter == _loggers2.end())
+    {
+        if (_rootLogger->IsTakeOver())
+            return _rootLogger;
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return nullptr;
+    }
+
+    return iter->second;
+}
+
 LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
 {
     if (UNLIKELY(name.empty()))
@@ -163,7 +194,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
         return nullptr;
     }
 
-    std::map<LLBC_String, LLBC_Logger *>::const_iterator iter = _loggers.find(name);
+    auto iter = _loggers.find(name);
     if (iter == _loggers.end())
     {
         if (_rootLogger->IsTakeOver())
@@ -184,5 +215,3 @@ void LLBC_LoggerManager::UnInitOutput(int logLv, const char *msg)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

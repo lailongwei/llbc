@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
@@ -350,5 +349,3 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-#include "llbc/common/AfterIncl.h"

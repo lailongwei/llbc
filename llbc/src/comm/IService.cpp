@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Service.h"
 
@@ -41,5 +40,3 @@ This *LLBC_IService::Create(Type type,
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

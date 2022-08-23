@@ -192,7 +192,7 @@ public:
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
         for (int i = 1; i < right; ++i)
-            LLBC_MemCpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
+            ::memcpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
 
         return *this;
     }
@@ -1477,7 +1477,7 @@ public:
     void serialize(LLBC_Stream &stream) const
     {
         stream.Write(static_cast<uint32>(this->size()));
-        stream.WriteBuffer(_Base::data(), _Base::size() * sizeof(_Elem));
+        stream.Write(_Base::data(), _Base::size() * sizeof(_Elem));
     }
 
     bool deserialize(LLBC_Stream &stream)
@@ -1491,7 +1491,7 @@ public:
             return true;
 
         this->resize(len);
-        return stream.ReadBuffer(const_cast<char *>(this->data()), sizeof(_Elem) * this->size());
+        return stream.Read(const_cast<char *>(this->data()), sizeof(_Elem) * this->size());
     }
 
 private:

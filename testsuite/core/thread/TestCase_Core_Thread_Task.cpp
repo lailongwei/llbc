@@ -28,7 +28,7 @@
 class TestTask : public LLBC_BaseTask
 {
 public:
-    TestTask();
+    explicit TestTask(size_t perThreadPopTimes);
     virtual ~TestTask();
     
 public:
@@ -37,14 +37,14 @@ public:
     virtual void Cleanup();
 
 private:
-    volatile int _repeatCount;
+    const size_t _perThreadPopTimes;
     static LLBC_THREAD_LOCAL int *_val;
 };
 
 LLBC_THREAD_LOCAL int *TestTask::_val = nullptr;
 
-inline TestTask::TestTask()
-    : _repeatCount(10000)
+inline TestTask::TestTask(size_t perThreadPopTimes)
+: _perThreadPopTimes(perThreadPopTimes)
 {
 }
 
@@ -62,14 +62,14 @@ inline void TestTask::Svc()
     LLBC_XDelete(_val);
 
     LLBC_MessageBlock *block = nullptr;
-    while(--_repeatCount > 0)
+    for (size_t i = 0; i < _perThreadPopTimes; ++i)
     {
         Pop(block);
         LLBC_String content;
         LLBC_Stream stream(block->GetData(), block->GetReadableSize());
         stream.Read(content);
 
-        LLBC_PrintLine("task fetch data: %s", content.c_str());
+        LLBC_PrintLine("[%d] fetch data: %s",  LLBC_GetCurrentThreadId(), content.c_str());
 
         LLBC_Delete(block);
     }
@@ -79,7 +79,7 @@ inline void TestTask::Svc()
 
 inline void TestTask::Cleanup()
 {
-    LLBC_PrintLine("Task cleanup!!!!!!!!!!");
+    LLBC_PrintLine("Task cleanup, queue size:%lu", GetMessageSize());
 }
 
 TestCase_Core_Thread_Task::TestCase_Core_Thread_Task()
@@ -95,15 +95,16 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     LLBC_PrintLine("core/thread/task test:");
 
     // Activate task.
-    TestTask *task = LLBC_New(TestTask);
-    task->Activate(2);
+    const int threadNum = 5;
+    const size_t pushMsgSize = 10000 * threadNum;
+    TestTask *task = LLBC_New(TestTask, pushMsgSize / threadNum);
+    task->Activate(5);
 
     // Send message to task.
-    for(int i = 0; i < 50000; ++i)
+    for(size_t i = 0; i < pushMsgSize; ++i)
     {
         LLBC_Stream stream;
-        LLBC_String content = "Hello Tasks!";
-        stream.Write(content);
+        stream.Write(LLBC_String().format("Hello Message, seq:%d", i));
         LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
         block->Write(stream.GetBuf(), stream.GetPos());
 
@@ -112,6 +113,8 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
 
     // Wait task.
     task->Wait();
+    // Dump message queue size.
+    LLBC_PrintLine("After task finished, queue size:%lu", task->GetMessageSize());
     // Delete task.
     LLBC_Delete(task);
 

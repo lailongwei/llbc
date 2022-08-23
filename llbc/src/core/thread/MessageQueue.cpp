@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/objectpool/ObjectPool.h"
 
@@ -30,11 +30,11 @@
 __LLBC_NS_BEGIN
 
 LLBC_MessageQueue::LLBC_MessageQueue()
-{
-    _head = nullptr;
-    _tail = nullptr;
+: _head(nullptr)
+, _tail(nullptr)
 
-    _size = 0;
+, _size(0)
+{
 }
 
 LLBC_MessageQueue::~LLBC_MessageQueue()
@@ -42,16 +42,22 @@ LLBC_MessageQueue::~LLBC_MessageQueue()
     Cleanup();
 }
 
-ulong LLBC_MessageQueue::GetSize() const
+bool LLBC_MessageQueue::PopAll(LLBC_MessageBlock *&blocks)
 {
-    LLBC_MessageQueue *nonConstThis = 
-        const_cast<LLBC_MessageQueue *>(this);
+    _lock.Lock();
+    if (_head)
+    {
+        blocks = _head;
 
-    nonConstThis->_lock.Lock();
-    ulong ret = _size;
-    nonConstThis->_lock.Unlock();
+        _head = _tail = nullptr;
+        _size = 0;
 
-    return ret;
+        _lock.Unlock();
+        return true;
+    }
+
+    _lock.Unlock();
+    return false;
 }
 
 void LLBC_MessageQueue::Cleanup()
@@ -97,7 +103,7 @@ void LLBC_MessageQueue::Push(LLBC_MessageBlock *block, bool front)
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
-void LLBC_MessageQueue::PushFrontNonLock(LLBC_MessageBlock *block)
+LLBC_FORCE_INLINE void LLBC_MessageQueue::PushFrontNonLock(LLBC_MessageBlock *block)
 {
     block->SetPrev(nullptr);
     if (!_head)
@@ -115,7 +121,7 @@ void LLBC_MessageQueue::PushFrontNonLock(LLBC_MessageBlock *block)
     _size += 1;
 }
 
-void LLBC_MessageQueue::PushBackNonLock(LLBC_MessageBlock *block)
+LLBC_FORCE_INLINE void LLBC_MessageQueue::PushBackNonLock(LLBC_MessageBlock *block)
 {
     block->SetNext(nullptr);
     if (!_tail)
@@ -135,7 +141,7 @@ void LLBC_MessageQueue::PushBackNonLock(LLBC_MessageBlock *block)
 
 bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (interval != 0)
     {
         block = nullptr;
@@ -163,9 +169,14 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
             if (interval != LLBC_INFINITE)
                 break;
         }
+
+        return false;
     }
-    else
+    else // interval == 0
     {
+        if (_size == 0)
+            return false;
+
         _lock.Lock();
         if (_size > 0)
         {
@@ -176,46 +187,76 @@ bool LLBC_MessageQueue::Pop(LLBC_MessageBlock *&block, int interval, bool front)
         }
 
         _lock.Unlock();
+        return false;
     }
-#else // LLBC_TARGET_PLATFORM_WIN32
+    #else // Win32
     if (interval == LLBC_INFINITE)
     {
-        _sem.Wait();
+        while (true)
+        {
+            _sem.Wait();
 
-        _lock.Lock();
-        front ? PopFrontNonLock(block) : PopBackNonLock(block);
-        _lock.Unlock();
+            _lock.Lock();
+            if (_size > 0)
+            {
+                front ? PopFrontNonLock(block) : PopBackNonLock(block);
+                _lock.Unlock();
 
-        return true;
+                return true;
+            }
+
+            _lock.Unlock();
+        }
     }
     else if (interval == 0)
     {
+        if (_size == 0)
+            return false;
+
         if (_sem.TryWait())
         {
-            _lock.Lock();
-            front ? PopFrontNonLock(block) : PopBackNonLock(block);
-            _lock.Unlock();
+            if (_size == 0)
+                return false;
 
-            return true;
+            _lock.Lock();
+            if (_size > 0)
+            {
+                front ? PopFrontNonLock(block) : PopBackNonLock(block);
+                _lock.Unlock();
+
+                return true;
+            }
+
+            _lock.Unlock();
         }
+
+        return false;
     }
-    else
+    else // interval != INFINITE && interval != 0
     {
         if (_sem.TimedWait(interval))
         {
+            if (_size == 0)
+                return false;
+
             _lock.Lock();
-            front ? PopFrontNonLock(block) : PopBackNonLock(block);
+            if (_size > 0)
+            {
+                front ? PopFrontNonLock(block) : PopBackNonLock(block);
+                _lock.Unlock();
+
+                return true;
+            }
+
             _lock.Unlock();
-
-            return true;
         }
-    }
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
-    return false;
+        return false;
+    }
+    #endif // Non-Win32
 }
 
-void LLBC_MessageQueue::PopFrontNonLock(LLBC_MessageBlock *&block)
+LLBC_FORCE_INLINE void LLBC_MessageQueue::PopFrontNonLock(LLBC_MessageBlock *&block)
 {
     block = _head;
     if (!(_head = _head->GetNext()))
@@ -226,7 +267,7 @@ void LLBC_MessageQueue::PopFrontNonLock(LLBC_MessageBlock *&block)
     _size -= 1;
 }
 
-void LLBC_MessageQueue::PopBackNonLock(LLBC_MessageBlock *&block)
+LLBC_FORCE_INLINE void LLBC_MessageQueue::PopBackNonLock(LLBC_MessageBlock *&block)
 {
     block = _tail;
     if (!(_tail = _tail->GetPrev()))
@@ -238,5 +279,3 @@ void LLBC_MessageQueue::PopBackNonLock(LLBC_MessageBlock *&block)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

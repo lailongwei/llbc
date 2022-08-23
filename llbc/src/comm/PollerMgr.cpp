@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/Socket.h"
@@ -352,5 +351,3 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

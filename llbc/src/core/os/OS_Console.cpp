@@ -19,8 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
 #include "llbc/core/file/File.h"
 #include "llbc/core/thread/FastLock.h"
 #include "llbc/core/os/OS_Console.h"
@@ -233,5 +234,3 @@ int LLBC_FlushFile(FILE *file)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

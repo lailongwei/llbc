@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/SessionOpts.h"
 
@@ -33,5 +32,3 @@ const LLBC_SessionOpts LLBC_DftSessionOpts(true,
                                            LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE);
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

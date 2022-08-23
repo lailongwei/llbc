@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/Core.h"
 
@@ -77,13 +77,17 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
+    // Purge auto-release pool stack.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (tls->objbaseTls.poolStack)
+        reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)->Purge();
+
     // Destroy entry thread object pool.
     (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
     // Destroy all object pool instance factories.
     LLBC_IObjectPool::DestroyAllPoolInstFactories();
 
     // Destroy entry thread auto-release pool stack.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->objbaseTls.poolStack)
     {
         LLBC_Delete(reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack));
@@ -112,5 +116,3 @@ void __LLBC_CoreCleanup()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

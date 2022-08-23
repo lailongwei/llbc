@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 
@@ -90,5 +89,3 @@ int LLBC_RawProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

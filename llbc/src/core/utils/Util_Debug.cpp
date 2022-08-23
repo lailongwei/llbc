@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/time/Time.h"
@@ -108,20 +108,13 @@ uint64 LLBC_CPUTime::_freqPerNanoSecond = 0;
 
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
     return LLBC_CPUTime(LLBC_RdTsc());
-#else // Win32
-    LARGE_INTEGER cur;
-    ::QueryPerformanceCounter(&cur);
-    return LLBC_CPUTime(cur.QuadPart);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
 LLBC_String LLBC_CPUTime::ToString() const
 {
     LLBC_String info;
-    sint64 microSecs = ToMicroSeconds();
-    info.append_format("%f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
+    info.append_format("%.06f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
 
     return info;
 }
@@ -158,5 +151,3 @@ std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime)
     o << cpuTime.ToString();
     return o;
 }
-
-#include "llbc/common/AfterIncl.h"

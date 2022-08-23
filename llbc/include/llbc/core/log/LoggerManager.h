@@ -80,6 +80,13 @@ public:
     LLBC_Logger *GetRootLogger() const;
 
     /**
+     * Get logger.
+     * @param[in] name - logger name.
+     * @return LLBC_ILogger * - logger.
+     */
+    LLBC_Logger *GetLogger(const char *name) const;
+
+    /**
      * Get logger by name.
      * @param[in] name - logger name.
      * @return LLBC_Logger * - logger.
@@ -101,6 +108,7 @@ private:
 
     LLBC_Logger * volatile _rootLogger;
     std::map<LLBC_String, LLBC_Logger *> _loggers;
+    std::map<LLBC_CString, LLBC_Logger *> _loggers2;
 
     static LLBC_String _rootLoggerName;
 };
@@ -119,63 +127,69 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  * @param[in] fmt        - the log message format string.
  * @param[in] ...        - the variadic log message parameters.
  */
-#define LLOG(loggerName, tag, level, fmt, ...)                            \
-    {                                                                     \
-        if (UNLIKELY(!LLBC_LoggerManagerSingleton->IsInited())) {         \
-            LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();   \
+#define LLOG(loggerName, tag, level, fmt, ...)        \
+    do {                                              \
+        auto loggerMgr = LLBC_LoggerManagerSingleton; \
+        if (UNLIKELY(!loggerMgr->IsInited())) {       \
+            LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls(); \
             int len = ::snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls), fmt, ##__VA_ARGS__); \
-            if (len >= 0)                                                 \
-                LLBC_LoggerManagerSingleton->UnInitOutput(                \
-                    LLBC_NS LLBC_LogLevel::level, libTls->coreTls.loggerFmtBuf); \
-        }                                                                 \
-        else                                                              \
-        {                                                                 \
-            LLBC_NS LLBC_Logger *l;                                       \
-            if (loggerName == nullptr)                                    \
-                l = LLBC_LoggerManagerSingleton->GetRootLogger();         \
-            else                                                          \
-                l = LLBC_LoggerManagerSingleton->GetLogger(loggerName);   \
-                                                                          \
-            if (LIKELY(l))                                                \
-                l->Output(LLBC_NS LLBC_LogLevel::level,                   \
-                          tag,                                            \
-                          __FILE__,                                       \
-                          __LINE__,                                       \
-                          __FUNCTION__,                                   \
-                          fmt,                                            \
-                          ##__VA_ARGS__);                                 \
-        }                                                                 \
-    }                                                                     \
+            if (len >= 0)                             \
+                loggerMgr->UnInitOutput(              \
+                    level, libTls->coreTls.loggerFmtBuf); \
+        }                                             \
+        else {                                        \
+            LLBC_NS LLBC_Logger *l;                   \
+            if (loggerName != nullptr) {              \
+                l = loggerMgr->GetLogger(loggerName); \
+                if (UNLIKELY(l == nullptr))           \
+                    break;                            \
+            }                                         \
+            else {                                    \
+                l = loggerMgr->GetRootLogger();       \
+            }                                         \
+                                                      \
+            if (level < l->GetLogLevel())             \
+                break;                                \
+                                                      \
+            l->Output(level,                          \
+                      tag,                            \
+                      __FILE__,                       \
+                      __LINE__,                       \
+                      __FUNCTION__,                   \
+                      fmt,                            \
+                      ##__VA_ARGS__);                 \
+        }                                             \
+    } while (false)                                   \
 
-#define LLOG_TRACE(fmt, ...) LLOG(nullptr, nullptr, Trace, fmt, ##__VA_ARGS__)
-#define LLOG_TRACE2(tag, fmt, ...) LLOG(nullptr, tag, Trace, fmt, ##__VA_ARGS__)
-#define LLOG_TRACE3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Trace, fmt, ##__VA_ARGS__)
-#define LLOG_TRACE4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
+#define LLOG_TRACE4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
 
-#define LLOG_DEBUG(fmt, ...) LLOG(nullptr, nullptr, Debug, fmt, ##__VA_ARGS__)
-#define LLOG_DEBUG2(tag, fmt, ...) LLOG(nullptr, tag, Debug, fmt, ##__VA_ARGS__)
-#define LLOG_DEBUG3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Debug, fmt, ##__VA_ARGS__)
-#define LLOG_DEBUG4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Debug, fmt, ##__VA_ARGS__)
+#define LLOG_DEBUG(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)
+#define LLOG_DEBUG2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)
+#define LLOG_DEBUG3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)
+#define LLOG_DEBUG4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)
 
-#define LLOG_INFO(fmt, ...) LLOG(nullptr, nullptr, Info, fmt, ##__VA_ARGS__)
-#define LLOG_INFO2(tag, fmt, ...) LLOG(nullptr, tag, Info, fmt, ##__VA_ARGS__)
-#define LLOG_INFO3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Info, fmt, ##__VA_ARGS__)
-#define LLOG_INFO4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Info, fmt, ##__VA_ARGS__)
+#define LLOG_INFO(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Info, fmt, ##__VA_ARGS__)
+#define LLOG_INFO2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Info, fmt, ##__VA_ARGS__)
+#define LLOG_INFO3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Info, fmt, ##__VA_ARGS__)
+#define LLOG_INFO4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Info, fmt, ##__VA_ARGS__)
 
-#define LLOG_WARN(fmt, ...) LLOG(nullptr, nullptr, Warn, fmt, ##__VA_ARGS__)
-#define LLOG_WARN2(tag, fmt, ...) LLOG(nullptr, tag, Warn, fmt, ##__VA_ARGS__)
-#define LLOG_WARN3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Warn, fmt, ##__VA_ARGS__)
-#define LLOG_WARN4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Warn, fmt, ##__VA_ARGS__)
+#define LLOG_WARN(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Warn, fmt, ##__VA_ARGS__)
+#define LLOG_WARN2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Warn, fmt, ##__VA_ARGS__)
+#define LLOG_WARN3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Warn, fmt, ##__VA_ARGS__)
+#define LLOG_WARN4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Warn, fmt, ##__VA_ARGS__)
 
-#define LLOG_ERROR(fmt, ...) LLOG(nullptr, nullptr, Error, fmt, ##__VA_ARGS__)
-#define LLOG_ERROR2(tag, fmt, ...) LLOG(nullptr, tag, Error, fmt, ##__VA_ARGS__)
-#define LLOG_ERROR3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Error, fmt, ##__VA_ARGS__)
-#define LLOG_ERROR4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Error, fmt, ##__VA_ARGS__)
+#define LLOG_ERROR(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Error, fmt, ##__VA_ARGS__)
+#define LLOG_ERROR2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Error, fmt, ##__VA_ARGS__)
+#define LLOG_ERROR3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Error, fmt, ##__VA_ARGS__)
+#define LLOG_ERROR4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Error, fmt, ##__VA_ARGS__)
 
-#define LLOG_FATAL(fmt, ...) LLOG(nullptr, nullptr, Fatal, fmt, ##__VA_ARGS__)
-#define LLOG_FATAL2(tag, fmt, ...) LLOG(nullptr, tag, Fatal, fmt, ##__VA_ARGS__)
-#define LLOG_FATAL3(loggerName, fmt, ...) LLOG(loggerName, nullptr, Fatal, fmt, ##__VA_ARGS__)
-#define LLOG_FATAL4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, Fatal, fmt, ##__VA_ARGS__)
+#define LLOG_FATAL(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Fatal, fmt, ##__VA_ARGS__)
+#define LLOG_FATAL2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Fatal, fmt, ##__VA_ARGS__)
+#define LLOG_FATAL3(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Fatal, fmt, ##__VA_ARGS__)
+#define LLOG_FATAL4(loggerName, tag, fmt, ...) LLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Fatal, fmt, ##__VA_ARGS__)
 
 /**
  * The llbc library json log macro define.
@@ -184,37 +198,45 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  * @param[in] level      - log level.
  */
 #define LJLOG(loggerName, tag, level)                    \
-    (*LLBC_New(LLBC_NS LLBC_LogJsonMsg, loggerName, tag, LLBC_NS LLBC_LogLevel::level, __FILE__, __LINE__, __FUNCTION__)) \
+        (*LLBC_New(LLBC_NS LLBC_LogJsonMsg,              \
+                   LIKELY(LLBC_LoggerManagerSingleton->IsInited()) ? \
+                        (loggerName != nullptr ?         \
+                            LLBC_LoggerManagerSingleton->GetLogger(loggerName) : LLBC_LoggerManagerSingleton->GetRootLogger()) : nullptr, \
+                   tag,                                  \
+                   level,                                \
+                   __FILE__,                             \
+                   __LINE__,                             \
+                   __FUNCTION__))                        \
 
-#define LJLOG_TRACE() LJLOG(nullptr, nullptr, Trace)
-#define LJLOG_TRACE2(tag) LJLOG(nullptr, tag, Trace)
-#define LJLOG_TRACE3(loggerName) LJLOG(loggerName, nullptr, Trace)
-#define LJLOG_TRACE4(loggerName, tag) LJLOG(loggerName, tag, Trace)
+#define LJLOG_TRACE() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Trace)
+#define LJLOG_TRACE2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Trace)
+#define LJLOG_TRACE3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Trace)
+#define LJLOG_TRACE4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Trace)
 
-#define LJLOG_DEBUG() LJLOG(nullptr, nullptr, Debug)
-#define LJLOG_DEBUG2(tag) LJLOG(nullptr, tag, Debug)
-#define LJLOG_DEBUG3(loggerName) LJLOG(loggerName, nullptr, Debug)
-#define LJLOG_DEBUG4(loggerName, tag) LJLOG(loggerName, tag, Debug)
+#define LJLOG_DEBUG() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug)
+#define LJLOG_DEBUG2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Debug)
+#define LJLOG_DEBUG3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug)
+#define LJLOG_DEBUG4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Debug)
 
-#define LJLOG_INFO() LJLOG(nullptr, nullptr, Info)
-#define LJLOG_INFO2(tag) LJLOG(nullptr, tag, Info)
-#define LJLOG_INFO3(loggerName) LJLOG(loggerName, nullptr, Info)
-#define LJLOG_INFO4(loggerName, tag) LJLOG(loggerName, tag, Info)
+#define LJLOG_INFO() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Info)
+#define LJLOG_INFO2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Info)
+#define LJLOG_INFO3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Info)
+#define LJLOG_INFO4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Info)
 
-#define LJLOG_WARN() LJLOG(nullptr, nullptr, Warn)
-#define LJLOG_WARN2(tag) LJLOG(nullptr, tag, Warn)
-#define LJLOG_WARN3(loggerName) LJLOG(loggerName, nullptr, Warn)
-#define LJLOG_WARN4(loggerName, tag) LJLOG(loggerName, tag, Warn)
+#define LJLOG_WARN() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Warn)
+#define LJLOG_WARN2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Warn)
+#define LJLOG_WARN3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Warn)
+#define LJLOG_WARN4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Warn)
 
-#define LJLOG_ERROR() LJLOG(nullptr, nullptr, Error) 
-#define LJLOG_ERROR2(tag) LJLOG(nullptr, tag, Error)
-#define LJLOG_ERROR3(loggerName) LJLOG(loggerName, nullptr, Error)
-#define LJLOG_ERROR4(loggerName, tag) LJLOG(loggerName, tag, Error)
+#define LJLOG_ERROR() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Error) 
+#define LJLOG_ERROR2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Error)
+#define LJLOG_ERROR3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Error)
+#define LJLOG_ERROR4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Error)
 
-#define LJLOG_FATAL() LJLOG(nullptr, nullptr, Fatal)
-#define LJLOG_FATAL2(tag) LJLOG(nullptr, tag, Fatal)
-#define LJLOG_FATAL3(loggerName) LJLOG(loggerName, nullptr, Fatal)
-#define LJLOG_FATAL4(loggerName, tag) LJLOG(loggerName, tag, Fatal)
+#define LJLOG_FATAL() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Fatal)
+#define LJLOG_FATAL2(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Fatal)
+#define LJLOG_FATAL3(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Fatal)
+#define LJLOG_FATAL4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Fatal)
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
 /**
@@ -224,63 +246,69 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  * @param[in] level      - log level.
  * @param[in] streamMsg  - stream message, like: '"the log message, intVal:" << 3 <<", strVal:" << "strMsg"'
  */
-#define LSLOG(loggerName, tag, level, streamMsg)                          \
-    {                                                                     \
-        if (UNLIKELY(!LLBC_LoggerManagerSingleton->IsInited())) {         \
-            LLBC_NS LLBC_LogMessageBuffer lmb;                            \
-            LLBC_LoggerManagerSingleton->UnInitOutput(                    \
-                LLBC_NS LLBC_LogLevel::level, lmb.str(lmb << streamMsg).c_str()); \
-        }                                                                 \
-        else {                                                            \
-            LLBC_NS LLBC_Logger *l;                                       \
-            if (loggerName == nullptr)                                    \
-                l = LLBC_LoggerManagerSingleton->GetRootLogger();         \
-            else                                                          \
-                l = LLBC_LoggerManagerSingleton->GetLogger(loggerName);   \
-                                                                          \
-            if (LIKELY(l)) {                                              \
-                LLBC_NS LLBC_LogMessageBuffer lmb;                        \
-                const LLBC_String &formattedLogMsg = lmb.str(lmb << streamMsg); \
-                l->NonFormatOutput(LLBC_NS LLBC_LogLevel::level,          \
-                                   tag,                                   \
-                                   __FILE__,                              \
-                                   __LINE__,                              \
-                                   __FUNCTION__,                          \
-                                   formattedLogMsg.c_str(),               \
-                                   formattedLogMsg.length());             \
-            }                                                             \
-        }                                                                 \
-    }                                                                     \
+#define LSLOG(loggerName, tag, level, streamMsg)           \
+    do {                                                   \
+        auto loggerMgr = LLBC_LoggerManagerSingleton;      \
+        if (UNLIKELY(!loggerMgr->IsInited())) {            \
+            LLBC_NS LLBC_LogMessageBuffer lmb;             \
+            LLBC_LoggerManagerSingleton->UnInitOutput(     \
+                level, lmb.str(lmb << streamMsg).c_str()); \
+        }                                                  \
+        else {                                             \
+            LLBC_NS LLBC_Logger *l;                        \
+            if (loggerName != nullptr) {                   \
+                l = loggerMgr->GetLogger(loggerName);      \
+                if (UNLIKELY(l == nullptr))                \
+                    break;                                 \
+            }                                              \
+            else {                                         \
+                l = loggerMgr->GetRootLogger();            \
+            }                                              \
+                                                           \
+            if (level < l->GetLogLevel())                  \
+                break;                                     \
+                                                           \
+            LLBC_NS LLBC_LogMessageBuffer lmb;             \
+            const LLBC_String &formattedLogMsg = lmb.str(lmb << streamMsg); \
+            l->NonFormatOutput(level,                      \
+                               tag,                        \
+                               __FILE__,                   \
+                               __LINE__,                   \
+                               __FUNCTION__,               \
+                               formattedLogMsg.c_str(),    \
+                               formattedLogMsg.length());  \
+        }                                                  \
+    } while (false)                                        \
 
-#define LSLOG_TRACE(streamMsg) LSLOG(nullptr, nullptr, Trace, streamMsg)
-#define LSLOG_TRACE2(tag, streamMsg) LSLOG(nullptr, tag, Trace, streamMsg)
-#define LSLOG_TRACE3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Trace, streamMsg
-#define LSLOG_TRACE4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Trace, streamMsg)
+#define LSLOG_TRACE(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
+#define LSLOG_TRACE2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
+#define LSLOG_TRACE3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
+#define LSLOG_TRACE4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
 
-#define LSLOG_DEBUG(streamMsg) LSLOG(nullptr, nullptr, Debug, streamMsg)
-#define LSLOG_DEBUG2(tag, streamMsg) LSLOG(nullptr, tag, Debug, streamMsg)
-#define LSLOG_DEBUG3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Debug, streamMsg
-#define LSLOG_DEBUG4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Debug, streamMsg)
+#define LSLOG_DEBUG(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug, streamMsg)
+#define LSLOG_DEBUG2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Debug, streamMsg)
+#define LSLOG_DEBUG3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug, streamMsg)
+#define LSLOG_DEBUG4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Debug, streamMsg)
 
-#define LSLOG_INFO(streamMsg) LSLOG(nullptr, nullptr, Info, streamMsg)
-#define LSLOG_INFO2(tag, streamMsg) LSLOG(nullptr, tag, Info, streamMsg)
-#define LSLOG_INFO3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Info, streamMsg)
-#define LSLOG_INFO4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Info, streamMsg)
+#define LSLOG_INFO(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Info, streamMsg)
+#define LSLOG_INFO2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Info, streamMsg)
+#define LSLOG_INFO3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Info, streamMsg)
+#define LSLOG_INFO4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Info, streamMsg)
 
-#define LSLOG_WARN(streamMsg) LSLOG(nullptr, nullptr, Warn, streamMsg)
-#define LSLOG_WARN2(tag, streamMsg) LSLOG(nullptr, tag, Warn, streamMsg)
-#define LSLOG_WARN3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Warn, streamMsg)
-#define LSLOG_WARN4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Warn, streamMsg)
+#define LSLOG_WARN(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Warn, streamMsg)
+#define LSLOG_WARN2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Warn, streamMsg)
+#define LSLOG_WARN3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Warn, streamMsg)
+#define LSLOG_WARN4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Warn, streamMsg)
 
-#define LSLOG_ERROR(streamMsg) LSLOG(nullptr, nullptr, Error, streamMsg)
-#define LSLOG_ERROR2(tag, streamMsg) LSLOG(nullptr, tag, Error, streamMsg)
-#define LSLOG_ERROR3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Error, streamMsg
-#define LSLOG_ERROR4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Error, streamMsg)
+#define LSLOG_ERROR(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Error, streamMsg)
+#define LSLOG_ERROR2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Error, streamMsg)
+#define LSLOG_ERROR3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Error, streamMsg)
+#define LSLOG_ERROR4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Error, streamMsg)
 
-#define LSLOG_FATAL(streamMsg) LSLOG(nullptr, nullptr, Fatal, streamMsg)
-#define LSLOG_FATAL2(tag, streamMsg) LSLOG(nullptr, tag, Fatal, streamMsg)
-#define LSLOG_FATAL3(loggerName, streamMsg) LSLOG(loggerName, nullptr, Fatal, streamMsg)
-#define LSLOG_FATAL4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, Fatal, streamMsg)
+#define LSLOG_FATAL(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Fatal, streamMsg)
+#define LSLOG_FATAL2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Fatal, streamMsg)
+#define LSLOG_FATAL3(loggerName, streamMsg) LSLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Fatal, streamMsg)
+#define LSLOG_FATAL4(loggerName, tag, streamMsg) LSLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Fatal, streamMsg)
 
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 

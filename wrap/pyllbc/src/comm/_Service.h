@@ -431,7 +431,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SubscribeEvent(PyObject *self, PyObject *args)
         return nullptr;
 
     LLBC_ListenerStub stub = svc->SubscribeEvent(evId, listener);
-    if (stub == LLBC_INVALID_LISTENER_STUB)
+    if (stub == 0)
         return nullptr;
 
     return PyLong_FromUnsignedLongLong(stub);

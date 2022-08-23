@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 
@@ -406,13 +406,13 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     return data;
 }
 
-void LLBC_Logger::FillLogDataNonMsgMembers(int level,
-                                           const char *tag,
-                                           const char *file,
-                                           int line,
-                                           const char *func,
-                                           LLBC_LogData *logData,
-                                           __LLBC_LibTls *libTls)
+LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
+                                                             const char *tag,
+                                                             const char *file,
+                                                             int line,
+                                                             const char *func,
+                                                             LLBC_LogData *logData,
+                                                             __LLBC_LibTls *libTls)
 {
     // fill: logger&logger name.
     logData->logger = this;
@@ -551,5 +551,3 @@ __LLBC_NS_END
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
 #endif
-
-#include "llbc/common/AfterIncl.h"

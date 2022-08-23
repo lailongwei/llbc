@@ -42,7 +42,7 @@
     }                                                           \
 
 #define LLBC_STREAM_READ_BUF(buf, len)                          \
-    if (!__r_stream.ReadBuffer(buf, len)) {                     \
+    if (!__r_stream.Read(buf, len)) {                           \
         return __r_failRet;                                     \
     }                                                           \
 
@@ -79,7 +79,7 @@
     __w_stream.Write(field)                                     \
 
 #define LLBC_STREAM_WRITE_BUF(buf, len)                         \
-    __w_stream.WriteBuffer(buf, len)                            \
+    __w_stream.Write(buf, len)                                  \
 
 // Fill macro define ,use to fill some null bytes to stream.
 #define LLBC_STREAM_FILL(size)                                  \
@@ -291,20 +291,20 @@ public:
      * @param[in]  size - require read size, in bytes.
      * @return bool - return true if successed, otherwise return false.
      */
-    bool ReadBuffer(void *buf, size_t size);
+    bool Read(void *buf, size_t size);
 
     /**
      * Write buffer data to stream.
      * @param[in] buf - buffer pointer.
      * @param[in] len - buffer size, in bytes.
      */
-    void WriteBuffer(const void *buf, size_t len);
+    void Write(const void *buf, size_t len);
 
 public:
     /**
      * Read template function, will automatch function to read, if this class
      * exist DeSerialize method, will call DeSerialize method to read, otherwise
-     * use ReadBuffer(&obj, sizeof(obj)).
+     * use Read(&obj, sizeof(obj)).
      * @param[out] obj - will deserialize's object.
      * @return bool - return true if successed, otherwise return false.
      */
@@ -454,7 +454,7 @@ private:
     bool ReadImpl(T &obj, ...)
     {
         if (_size >= _pos + sizeof(T))
-            return ReadBuffer(&obj, sizeof(T));
+            return Read(&obj, sizeof(T));
 
         return false;
     }
@@ -463,7 +463,7 @@ public:
     /**
      * Write template function, will automatch functio to write, if
      * this class exist Serialize method, will call Serialize method
-     * to write, else use WriteBuffer(&obj, sizeof(obj)).
+     * to write, else use Write(&obj, sizeof(obj)).
      * @param[in] obj - will serialize's object(can be set to any type's object).
      */
     template <typename T>
@@ -561,7 +561,7 @@ private:
     template <typename T>
     void WriteImpl(const T &obj, ...)
     {
-        WriteBuffer(&obj, sizeof(obj));
+        Write(&obj, sizeof(obj));
     }
 
 public:

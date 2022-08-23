@@ -19,20 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_AFTER_INCL_H__
-#define __LLBC_COM_AFTER_INCL_H__
+#ifdef __LLBC_CORE_THREAD_TASK_H__
 
-#ifndef __LLBC_COM_BEFORE_INCL_H__
-#error "Please first include llbc/common/BeforeIncl.h header in source file head!"
-#endif // !__LLBC_COM_BEFORE_INCL_H__
+__LLBC_NS_BEGIN
 
-#include "llbc/common/PFConfig.h"
-#include "llbc/common/Compiler.h"
+inline int LLBC_BaseTask::Push(LLBC_MessageBlock *block)
+{
+    _msgQueue.PushBack(block);
+    return LLBC_OK;
+}
 
-// WIN32 platform MSVC compiler specific: pop warning settings.
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC
-#pragma warning(pop)
-#endif // LLBC_COMP_MSVC
+inline int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
+{
+    _msgQueue.PopFront(block);
+    return LLBC_OK;
+}
 
+inline int LLBC_BaseTask::PopAll(LLBC_MessageBlock *&blocks)
+{
+    if (_msgQueue.PopAll(blocks))
+        return LLBC_OK;
 
-#endif // !__LLBC_COM_AFTER_INCL_H__
+    return LLBC_FAILED;
+}
+
+inline int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
+{
+    if (_msgQueue.TryPopFront(block))
+        return LLBC_OK;
+
+    return LLBC_FAILED;
+}
+
+inline int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
+{
+    if (_msgQueue.TimedPopFront(block, interval))
+        return LLBC_OK;
+
+    return LLBC_FAILED;
+}
+
+inline size_t LLBC_BaseTask::GetMessageSize() const
+{
+    return _msgQueue.GetSize();
+}
+
+__LLBC_NS_END
+
+#endif // __LLBC_CORE_THREAD_TASK_H__
