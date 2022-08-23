@@ -220,7 +220,7 @@ LLBC_IApplication::~LLBC_IApplication()
     Stop();
 }
 
-    int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
+int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
 {
     // Multi application check.
     if (_thisApp != this)
