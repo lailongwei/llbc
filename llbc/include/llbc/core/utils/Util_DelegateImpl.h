@@ -224,19 +224,8 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_D
 template <typename Rtn, typename ...Args>
 void LLBC_Delegate<Rtn(Args...)>::Reset()
 {
-    if (_funcType == 1)
-    {
-        _func.cfunc = nullptr;
-    }
-    else if (_funcType == 2)
-    {
+    if (_funcType == 2)
         reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
-        ::memset(_func.stlFunc, 0, sizeof(_func.stlFunc));
-    }
-    else if (_funcType == 3)
-    {
-        ::memset(_func.methHolder, 0, sizeof(_func.methHolder));
-    }
 
     _funcType = 0;
 }

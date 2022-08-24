@@ -254,7 +254,6 @@ private:
 
         _Func()
         {
-            ::memset(this, 0, sizeof(_Func));
         }
 
         _Func(CFunc cfunc)
