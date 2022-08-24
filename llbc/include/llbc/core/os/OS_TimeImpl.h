@@ -166,7 +166,7 @@ inline void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTim
 
 inline uint64 LLBC_GetCpuCounterFrequency()
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     #if LLBC_TARGET_PLATFORM_WIN32
     LARGE_INTEGER freq;
     ::QueryPerformanceFrequency(&freq);
@@ -178,14 +178,14 @@ inline uint64 LLBC_GetCpuCounterFrequency()
     tscEnd = LLBC_RdTsc();
     return tscEnd - tscStart;
     #endif // LLBC_TARGET_PLATFORM_WIN32
-#else
+#else // Not supp rdtsc
     return LLBC_INFINITE;
-#endif // (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#endif // Supp rdtsc
 }
 
 inline uint64 LLBC_RdTsc()
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     #if LLBC_TARGET_PLATFORM_WIN32
     LARGE_INTEGER cur;
     ::QueryPerformanceCounter(&cur);
@@ -203,7 +203,7 @@ inline uint64 LLBC_RdTsc()
     #endif // LLBC_TARGET_PLATFORM_WIN32
 #else
     return LLBC_GetMicroSeconds();
-#endif // (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#endif
 }
 
 __LLBC_NS_END

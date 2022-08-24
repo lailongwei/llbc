@@ -27,6 +27,15 @@
 __LLBC_NS_BEGIN
 
 /**
+ * The LLBC_RdTsc() support macro define.
+ */
+#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+ #define LLBC_SUPPORT_RDTSC 1
+#else // Non x86 and x86_64
+ #define LLBC_SUPPORT_RDTSC 0
+#endif // x86 or x86_64
+
+/**
  * Set timezone.
  */
 LLBC_EXPORT void LLBC_TZSet();
