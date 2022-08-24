@@ -219,7 +219,6 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
         return LLBC_FAILED;
     }
 
-    char *buffer = nullptr;
     if (bufferMode == LLBC_FileBufferMode::NoBuf)
     {
         size = 0;
@@ -230,13 +229,9 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
         return LLBC_FAILED;
     }
 
-    if (size > 0)
-        buffer = LLBC_Malloc(char, size);
-    if (setvbuf(_handle, buffer, bufferMode, size) != 0)
+    if (setvbuf(_handle, nullptr, bufferMode, size) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        LLBC_Free(buffer);
-
         return LLBC_FAILED;
     }
 
