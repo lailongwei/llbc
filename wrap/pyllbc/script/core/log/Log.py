@@ -19,8 +19,20 @@ class pyllbcLog(object):
     @classmethod
     def init(cls, cfg_file):
         """Initialize log"""
+        if cls.__inited:
+            raise Exception('Repeatly repeat Log')
+
         llbc.inl.InitLoggerMgr(cfg_file)
         cls.__inited = True
+
+    @classmethod
+    def uninit(cls):
+        """Finalize log"""
+        if not cls.__inited:
+            return
+
+        llbc.inl.UnInitLoggerMgr()
+        cls.__inited = False
 
     @classmethod
     def enablelogfileinfo(cls):

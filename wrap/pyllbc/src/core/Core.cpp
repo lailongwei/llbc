@@ -87,6 +87,7 @@ void pyllbc_AddCoreMethods()
 
     // core/log
     inl->AddMethod(methods.InitLoggerMgr);
+    inl->AddMethod(methods.UnInitLoggerMgr);
     inl->AddMethod(methods.LogMsg);
 
     // core/utils

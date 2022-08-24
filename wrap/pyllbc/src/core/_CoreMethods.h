@@ -77,6 +77,10 @@ public:
         Property_GetComments.ml_meth = (PyCFunction)_pyllbc_Property_GetComments;
         Property_GetComments.ml_flags = METH_VARARGS;
         Property_GetComments.ml_doc = "pyllbc library method/function";
+        UnInitLoggerMgr.ml_name = "UnInitLoggerMgr";
+        UnInitLoggerMgr.ml_meth = (PyCFunction)_pyllbc_UnInitLoggerMgr;
+        UnInitLoggerMgr.ml_flags = METH_VARARGS;
+        UnInitLoggerMgr.ml_doc = "pyllbc library method/function";
         Property_FromContent.ml_name = "Property_FromContent";
         Property_FromContent.ml_meth = (PyCFunction)_pyllbc_Property_FromContent;
         Property_FromContent.ml_flags = METH_VARARGS;
@@ -209,6 +213,7 @@ public:
     ::PyMethodDef Event_GetItem;
     ::PyMethodDef GetModuleFileName;
     ::PyMethodDef Property_GetComments;
+    ::PyMethodDef UnInitLoggerMgr;
     ::PyMethodDef Property_FromContent;
     ::PyMethodDef Property_GetPropertyNames;
     ::PyMethodDef RandReal;
