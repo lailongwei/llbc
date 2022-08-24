@@ -30,20 +30,6 @@
 
 __LLBC_NS_BEGIN
 
-__LLBC_Hash::__LLBC_Hash()
-: _bkdrHash()
-, _djbHash()
-, _sdbmHash()
-, _rsHash()
-, _jsHash()
-, _pjHash()
-, _elfHash()
-, _apHash()
-{}
-
-__LLBC_Hash::~__LLBC_Hash()
-{}
-
 uint32 __LLBC_Hash::operator()(int algo, const void *bytes, size_t size)
 {
     if (algo == LLBC_HashAlgo::BKDR)

@@ -62,8 +62,8 @@ public:
     /**
      * @brief Ctor&Dtor
      */
-    __LLBC_Hash();
-    ~__LLBC_Hash();
+    __LLBC_Hash() = default;
+    ~__LLBC_Hash() = default;
 
 public:
     /**
