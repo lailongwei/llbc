@@ -29,8 +29,8 @@ LULLBC_LUA_METH int _lullbc_Util_Table_Concat(lua_State *l)
     const char *fmtStr = lua_tolstring(l, 2, &fmtStrLen);
 
     LLBC_String concatResult;
-    size_t tableLen = lua_objlen(l, 1);
-    for (size_t i = 1; i <= tableLen; ++i)
+    const lua_Unsigned tableLen = lua_objlen(l, 1);
+    for (lua_Unsigned i = 1; i <= tableLen; ++i)
     {
         lua_geti(l, 1, i);
 

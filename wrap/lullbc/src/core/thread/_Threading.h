@@ -29,7 +29,7 @@ LULLBC_LUA_METH int _lullbc_Threading_Sleep(lua_State *l)
         milliSecs = lua_tointeger(l, 1);
     }
 
-    LLBC_Sleep(milliSecs);
+    LLBC_Sleep(static_cast<int>(milliSecs));
 
     return 0;
 }

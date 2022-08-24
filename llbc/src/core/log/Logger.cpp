@@ -218,7 +218,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
     // Init time fetch optimize about members.
     #if LLBC_SUPPORT_RDTSC
-    _oneMilliSecCPUTime = static_cast<double>(LLBC_CPUTime::GetCPUFreqPerMilliSecond() * 0.1);
+    _oneMilliSecCPUTime = static_cast<uint64>(LLBC_CPUTime::GetCPUFreqPerMilliSecond() * 0.1);
     #endif // Supp rdtsc
 
     // Set/Create log runnable.
@@ -498,7 +498,9 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->level = level;
 
     // fill: log time.
-    #if LLBC_SUPPORT_RDTSC
+    // Note: temporary disable LLBC_RdTsc() optimize.
+    // #if LLBC_SUPPORT_RDTSC
+    #if 0
     const auto nowCPUTime = LLBC_RdTsc();
     if (nowCPUTime < _lastGetTimeCPUTime ||
         nowCPUTime - _lastGetTimeCPUTime >= _oneMilliSecCPUTime)

@@ -27,7 +27,7 @@
 
 __LLBC_NS_BEGIN
 
-inline const char *LLBC_MessageBlockObjectPoolInstFactory::GetName() const
+const char *LLBC_MessageBlockObjectPoolInstFactory::GetName() const
 {
     return typeid(LLBC_MessageBlock).name();
 }

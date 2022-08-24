@@ -32,18 +32,18 @@ int csllbc_LibConfig_DefaultBacklogSize()
 
 int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
 {
-    const int writable = MIN(strlen(LLBC_CFG_LOG_ROOT_LOGGER_NAME), nameLen);
+    const size_t writable = MIN(strlen(LLBC_CFG_LOG_ROOT_LOGGER_NAME), static_cast<size_t>(nameLen));
     ::memcpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
 
-    return writable;
+    return static_cast<int>(writable);
 }
 
 int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(sint64 notConfigUse, int len)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), len);
+    const size_t writable = MIN(strlen(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), static_cast<size_t>(len));
     ::memcpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
 
-    return writable;
+    return static_cast<int>(writable);
 }
 
 int csllbc_LibConfig_Log_DefaultLogLevel()

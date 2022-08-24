@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
-class LLBC_LogData;
+struct LLBC_LogData;
 
 __LLBC_NS_END
 

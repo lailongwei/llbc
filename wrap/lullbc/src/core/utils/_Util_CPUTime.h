@@ -29,7 +29,7 @@ LULLBC_LUA_METH int _lullbc_Util_GetCPUTime(lua_State *l)
 // Api: Util_CPUTimeToUTCTime
 LULLBC_LUA_METH int _lullbc_Util_CPUTimeToUTCTime(lua_State *l)
 {
-    const uint64 cpuTsc = lua_tonumber(l, 1);
+    const uint64 cpuTsc = lua_tointeger(l, 1);
     lua_pushnumber(l, LLBC_CPUTime(cpuTsc).ToNanoSeconds() / 
         static_cast<double>(LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond));
 
