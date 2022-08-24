@@ -114,7 +114,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL4("test", "test_tag", "This is a fatal log message.");
 
     // Log file delete test.
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         LLOG_DEBUG3("deltest", "This is a deltest logger message.");
         LLBC_ThreadManager::Sleep(1000);
@@ -123,7 +123,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Peform performance test.
     LLBC_PrintLine("Perform preformance test:");
     LLBC_CPUTime begin = LLBC_CPUTime::Current();
-    const int loopLmt = 5000000;
+    const int loopLmt = 2000000;
     for (int i = 0; i < loopLmt; ++i)
         LLOG_DEBUG3("perftest", "performance test msg");
 
@@ -135,18 +135,18 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to begin json log test");
     getchar();
 
-    // test json styled log
+    // Test json styled log.
     DoJsonLogTest();
 
-    int jsonLogTestTimes = 100;
+    int jsonLogTestTimes = 10;
     for (int i = 0; i < jsonLogTestTimes; ++i)
         DoJsonLogTest();
 
+    // Finalize logger.
+    LLBC_LoggerManagerSingleton->Finalize();
+
     LLBC_PrintLine("Press any key to continue ...");
     getchar();
-
-    // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
 
     return 0;
 }
