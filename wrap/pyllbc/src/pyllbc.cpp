@@ -34,17 +34,15 @@ void initllbc_debug()
 #endif // not define LLBC_DEBUG
 {
     /* Init llbc library. */
-    if (LLBC_Startup() == LLBC_FAILED)
+    if (LLBC_Startup() != LLBC_OK &&
+        LLBC_GetLastError() != LLBC_ERROR_REENTRY)
     {
-        if (LLBC_GetLastError() != LLBC_ERROR_REENTRY)
-        {
-            LLBC_String errStr;
-            errStr.format("Initialize llbc library failed, err: %s", LLBC_FormatLastError());
+        LLBC_String errStr;
+        errStr.format("Initialize llbc library failed, err: %s", LLBC_FormatLastError());
 
-            PyErr_SetString(PyExc_Exception, errStr.c_str());
+        PyErr_SetString(PyExc_Exception, errStr.c_str());
 
-            return;
-        }
+        return;
     }
 
     /* Init pyllbc modules. */
