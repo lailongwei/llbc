@@ -121,7 +121,7 @@ LLBC_String LLBC_CPUTime::ToString() const
 
 void LLBC_CPUTime::InitFrequency()
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     _freqPerSecond = LLBC_GetCpuCounterFrequency();
     _freqPerMillisecond = MAX(_freqPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
     _freqPerMicroSecond = MAX(_freqPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
@@ -132,12 +132,12 @@ void LLBC_CPUTime::InitFrequency()
         _freqPerMicroSecond = _freqPerNanoSecond * 1000;
         _freqPerMillisecond = _freqPerMicroSecond * 1000;
     }
-#else
+#else // Not supp rdtsc
     _freqPerSecond = LLBC_INFINITE;
     _freqPerMillisecond = LLBC_INFINITE;
     _freqPerMicroSecond = LLBC_INFINITE;
     _freqPerNanoSecond = LLBC_INFINITE;
-#endif
+#endif // Supp rdtsc
 }
 
 #if LLBC_TARGET_PLATFORM_WIN32
