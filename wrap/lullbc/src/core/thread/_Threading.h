@@ -19,10 +19,31 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// Api: GUID_Generate
-LULLBC_LUA_METH int _lullbc_GUID_Generate(lua_State *l)
+// Api: Threading_Sleep
+LULLBC_LUA_METH int _lullbc_Threading_Sleep(lua_State *l)
 {
-    const LLBC_String guid = LLBC_GUIDHelper::GenStr();
-    lua_pushlstring(l, guid.data(), guid.size());
+    uint64 milliSecs = 0;
+    if (lua_gettop(l) > 0)
+    {
+        lullbc_ArgCheck(l, lua_isnumber(l, 1), 1, "sleep arguments must be a number");
+        milliSecs = lua_tointeger(l, 1);
+    }
+
+    LLBC_Sleep(milliSecs);
+
+    return 0;
+}
+
+// Api: Threading_GetCurrentProcessId
+LULLBC_LUA_METH int _lullbc_Threading_GetCurrentProcessId(lua_State *l)
+{
+    lua_pushinteger(l, LLBC_GetCurrentProcessId());
+    return 1;
+}
+
+// Api: Threading_GetCurrentThreadId
+LULLBC_LUA_METH int _lullbc_Threading_GetCurrentThreadId(lua_State *l)
+{
+    lua_pushinteger(l, LLBC_GetCurrentThreadId());
     return 1;
 }

@@ -1,8 +1,12 @@
+local CPUTime = llbc.newclass('llbc.CPUTime')
+
 -- Get cpu time.
 -- @return number - the cpu time(cpu timestamp counter).
-llbc.cputime = _llbc.CPUTime
+CPUTime.get_cputime = _llbc.Util_GetCPUTime
 
--- Convert cpu time to universal time.
+-- Convert cpu time to UTC time.
 -- @param[in] cputime - the cpu time.
--- @return number - the universal time, in micro-seconds.
-llbc.cputime_to_universal_time = _llbc.CPUTimeToUniversalTime
+-- @return number - the UTC time, in milli-seconds.
+CPUTime.to_utc_time = _llbc.Util_CPUTimeToUTCTime
+
+llbc.CPUTime = CPUTime

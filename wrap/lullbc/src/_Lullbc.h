@@ -30,7 +30,8 @@ LULLBC_LUA_METH int _lullbc_Startup(lua_State *l)
 #endif // Win32
 
     int ret = LLBC_Startup(initWinSock);
-    if (ret != LLBC_OK)
+    if (ret != LLBC_OK &&
+        LLBC_GetLastError() != LLBC_ERROR_REENTRY)
         lullbc_TransferLLBCError(
             l, __FILE__, __LINE__, "when startup llbc core library");
 

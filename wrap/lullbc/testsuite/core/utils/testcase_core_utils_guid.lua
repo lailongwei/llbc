@@ -1,7 +1,7 @@
 local TestCase = {}
 
 function TestCase.run(...)
-    print('Core/Helper/GUIDHelper test:')
+    print('guid test:')
 
     local gen_count = 100
     print('Generate 100 GUIDs...')

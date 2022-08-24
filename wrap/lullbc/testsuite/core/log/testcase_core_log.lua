@@ -12,7 +12,7 @@ function TestCase.run(...)
 
     -- Initialize Log component.
     print 'Initialize log component...'
-    Log.init('Logger_Cfg.cfg', true)
+    Log.init('Logger_Cfg.cfg', false)
     print('Call Log.isinit():', Log.isinit())
 
     -- Base test.
@@ -64,17 +64,20 @@ function TestCase.perf_test(logger)
     Log.i('Begin perf test:')
 
     local testTimes = 1000000
-    local begTestTime = llbc.cputime()
+    local begTestTime = llbc.Chrono.utc_microseconds()
     for i = 1, testTimes do
         if logger == nil then
-            Log.t2('perftest', string.format('Test debug log, times:%d', i))
-            Log.d2('perftest', string.format('Test debug log, times:%d', i))
-            Log.i2('perftest', string.format('Test info log, times:%d', i))
+            -- Log.t2('perftest', string.format('Test debug log, times:%d', i))
+            -- Log.d2('perftest', string.format('Test debug log, times:%d', i))
+            -- Log.i2('perftest', string.format('Test info log, times:%d', i))
+            Log.t2('perftest', 'Test trace log, times')
+            Log.d2('perftest', 'Test debug log, times')
+            Log.i2('perftest', 'Test info log, times')
         else
         end
     end
 
-    local costTime = llbc.cputime_to_universal_time(llbc.cputime() - begTestTime)
+    local costTime = llbc.Chrono.utc_microseconds() - begTestTime
     Log.i(string.format('Perf test finish, log times: %d, cost time:%s us, per-time log cost: %.3f us',
           testTimes * 3,
           costTime,

@@ -34,6 +34,19 @@ LULLBC_LUA_METH int _lullbc_InitLog(lua_State *l)
     return 0;
 }
 
+// API: UnInitLog
+LULLBC_LUA_METH int _lullbc_UnInitLog(lua_State *l)
+{
+    if (!__loggerManager)
+        return 0;
+
+    __rootLogger = nullptr;
+    __loggerManager = nullptr;
+    LLBC_LoggerManagerSingleton->Finalize();
+
+    return 0;
+}
+
 // API: IsLogInit
 LULLBC_LUA_METH int _lullbc_IsLogInit(lua_State *l)
 {
@@ -51,12 +64,13 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 
     // Get logger format buf.
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    char *fmtBuf = libTls->coreTls.loggerFmtBuf;
+    char * const fmtBufBeg = libTls->coreTls.loggerFmtBuf;
+    size_t availableFmtBufSize = sizeof(libTls->coreTls.loggerFmtBuf) - 1;
 
     // Concat messages to output.
     size_t partMsgSize;
     const char *partMsg;
-    size_t availableFmtBufSize = sizeof(libTls->coreTls.loggerFmtBuf) - 1;
+    char *fmtBuf = fmtBufBeg;
     for (int i = 7; i <= paramsCount; ++i)
     {
         partMsg = luaL_tolstring(l, i, &partMsgSize);
@@ -109,7 +123,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
     if (UNLIKELY(!__loggerManager))
     {
         *fmtBuf = '\0';
-        fprintf(stdout, "[Log] %s\n", fmtBuf);
+        fprintf(stdout, "[Log] %s\n", fmtBufBeg);
         fflush(stdout);
 
         return 0;
@@ -117,7 +131,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
 
     // Finish log msg.
     *fmtBuf = '\0';
-    const size_t msgSize = fmtBuf - libTls->coreTls.loggerFmtBuf;
+    const size_t msgSize = fmtBuf - fmtBufBeg;
 
     // Parse logger.
     LLBC_Logger *logger;
@@ -128,7 +142,10 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         logger = __loggerManager->GetLogger(loggerName);
 
     if (UNLIKELY(logger == nullptr))
+    {
         lullbc_SetError(l, "failed to log message, logger[%s] not found", loggerName);
+        return 0;
+    }
 
     // Parse tag, file, line, func, traceback
     const char *tag = lua_tostring(l, 3);
@@ -142,8 +159,9 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
                                          file,
                                          line,
                                          func,
-                                         libTls->coreTls.loggerFmtBuf, msgSize) != LLBC_OK))
-        lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, Output call failed");
+                                         fmtBufBeg,
+                                         msgSize) != LLBC_OK))
+        lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, native Output() method call failed");
 
     return 0;
 }

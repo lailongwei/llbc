@@ -31,12 +31,13 @@
 #include "src/common/_MonkeyPatch.h"
 #include "src/common/_VerInfo.h"
 #include "src/core/file/_Dir.h"
-#include "src/core/helper/_GUIDHelper.h"
 #include "src/core/log/_Log.h"
-#include "src/core/thread/_Thread.h"
+#include "src/core/thread/_Threading.h"
+#include "src/core/time/_Chrono.h"
 #include "src/core/timer/_Timer.h"
 #include "src/core/timer/_TimerScheduler.h"
 #include "src/core/utils/_Util_CPUTime.h"
+#include "src/core/utils/_Util_GUID.h"
 #include "src/core/utils/_Util_Misc.h"
 #include "src/core/utils/_Util_String.h"
 #include "src/core/utils/_Util_Table.h"
@@ -44,36 +45,50 @@
 static luaL_Reg lullbc_NativeMethods[] = {
     {"InitLog", _lullbc_InitLog},
     {"Util_Misc_ToPointer", _lullbc_Util_Misc_ToPointer},
-    {"CPUTimeToUniversalTime", _lullbc_Util_CPUTimeToUniversalTime},
-    {"GetVersionInfo", _lullbc_GetVersionInfo},
+    {"Dir_GetDirectories", _lullbc_Dir_GetDirectories},
     {"Timer_GetPeriod", _lullbc_Timer_GetPeriod},
-    {"Cleanup", _lullbc_Cleanup},
-    {"Dir_Remove", _lullbc_Dir_Remove},
     {"LogMsg", _lullbc_LogMsg},
+    {"SetLibConfigToLua", _lullbc_SetLibConfigToLua},
+    {"Dir_SplitExt", _lullbc_Dir_SplitExt},
+    {"MonkeyPatch", _lullbc_MonkeyPatch},
+    {"Dir_CurDir", _lullbc_Dir_CurDir},
+    {"Dir_Create", _lullbc_Dir_Create},
+    {"Threading_Sleep", _lullbc_Threading_Sleep},
+    {"Util_String_HashString", _lullbc_Util_String_HashString},
+    {"Timer_IsScheduling", _lullbc_Timer_IsScheduling},
+    {"TimerScheduler_SetTimerErrorHandler", _lullbc_TimerScheduler_SetTimerErrorHandler},
+    {"UnInitLog", _lullbc_UnInitLog},
+    {"Timer_New", _lullbc_Timer_New},
+    {"Dir_GetFiles", _lullbc_Dir_GetFiles},
+    {"Dir_IsDir", _lullbc_Dir_IsDir},
+    {"Timer_Schedule", _lullbc_Timer_Schedule},
+    {"Dir_Remove", _lullbc_Dir_Remove},
+    {"Chrono_UTC_Seconds", _lullbc_Chrono_UTC_Seconds},
+    {"Dir_DirName", _lullbc_Dir_DirName},
+    {"Util_GetCPUTime", _lullbc_Util_GetCPUTime},
+    {"GetVersionInfo", _lullbc_GetVersionInfo},
+    {"Threading_GetCurrentThreadId", _lullbc_Threading_GetCurrentThreadId},
+    {"Cleanup", _lullbc_Cleanup},
     {"Timer_GetDueTime", _lullbc_Timer_GetDueTime},
     {"Timer_GetTimerId", _lullbc_Timer_GetTimerId},
-    {"MonkeyPatch", _lullbc_MonkeyPatch},
+    {"Dir_BaseName", _lullbc_Dir_BaseName},
+    {"Util_GUID_Generate", _lullbc_Util_GUID_Generate},
     {"Dir_AbsPath", _lullbc_Dir_AbsPath},
-    {"Dir_Create", _lullbc_Dir_Create},
-    {"Util_String_HashString", _lullbc_Util_String_HashString},
-    {"CPUTime", _lullbc_Util_CPUTime},
-    {"TimerScheduler_Update", _lullbc_TimerScheduler_Update},
+    {"Chrono_UTC_MicroSeconds", _lullbc_Chrono_UTC_MicroSeconds},
+    {"Chrono_UTC_MilliSeconds", _lullbc_Chrono_UTC_MilliSeconds},
+    {"Threading_GetCurrentProcessId", _lullbc_Threading_GetCurrentProcessId},
     {"TimerScheduler_SetEnabled", _lullbc_TimerScheduler_SetEnabled},
     {"TimerScheduler_IsEnabled", _lullbc_TimerScheduler_IsEnabled},
-    {"Dir_IsDir", _lullbc_Dir_IsDir},
-    {"Timer_IsScheduling", _lullbc_Timer_IsScheduling},
+    {"Util_CPUTimeToUTCTime", _lullbc_Util_CPUTimeToUTCTime},
     {"GetLogLevel", _lullbc_GetLogLevel},
-    {"TimerScheduler_SetTimerErrorHandler", _lullbc_TimerScheduler_SetTimerErrorHandler},
+    {"TimerScheduler_Update", _lullbc_TimerScheduler_Update},
     {"Startup", _lullbc_Startup},
     {"Util_Table_Concat", _lullbc_Util_Table_Concat},
-    {"SetLibConfigToLua", _lullbc_SetLibConfigToLua},
     {"TimerScheduler_GetTimerCount", _lullbc_TimerScheduler_GetTimerCount},
-    {"Timer_New", _lullbc_Timer_New},
-    {"GUID_Generate", _lullbc_GUID_Generate},
+    {"Dir_SetCurDir", _lullbc_Dir_SetCurDir},
     {"Dir_Join", _lullbc_Dir_Join},
     {"IsLogInit", _lullbc_IsLogInit},
-    {"Thread_Sleep", _lullbc_Thread_Sleep},
-    {"Timer_Schedule", _lullbc_Timer_Schedule},
+    {"Dir_IsAbsPath", _lullbc_Dir_IsAbsPath},
     {NULL, NULL}
 };
 #endif // !__LULLBC_AUTOGEN_SRC__LULLBCMETHODS_H__

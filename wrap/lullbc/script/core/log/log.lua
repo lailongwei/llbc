@@ -42,6 +42,9 @@ function Log.init(cfgFile, log_file_info)
     end
 end
 
+-- Uninitialize Log component.
+Log.uninit = _llbc.UnInitLog
+
 -- Check Log init or log.
 -- @returns boolean - init flag.
 function Log.isinit()

@@ -19,19 +19,24 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// Api: Util_GetCPUTime
-LULLBC_LUA_METH int _lullbc_Util_GetCPUTime(lua_State *l)
+
+// Api: Chrono_UTC_Seconds
+LULLBC_LUA_METH int _lullbc_Chrono_UTC_Seconds(lua_State *l)
 {
-    lua_pushinteger(l, static_cast<sint64>(LLBC_RdTsc()));
+    lua_pushinteger(l, time(NULL));
     return 1;
 }
 
-// Api: Util_CPUTimeToUTCTime
-LULLBC_LUA_METH int _lullbc_Util_CPUTimeToUTCTime(lua_State *l)
+// Api: Chrono_UTC_MilliSeconds
+LULLBC_LUA_METH int _lullbc_Chrono_UTC_MilliSeconds(lua_State *l)
 {
-    const uint64 cpuTsc = lua_tonumber(l, 1);
-    lua_pushnumber(l, LLBC_CPUTime(cpuTsc).ToNanoSeconds() / 
-        static_cast<double>(LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond));
+    lua_pushinteger(l, LLBC_GetMilliSeconds());
+    return 1;
+}
 
+// Api: Chrono_UTC_MicroSeconds
+LULLBC_LUA_METH int _lullbc_Chrono_UTC_MicroSeconds(lua_State *l)
+{
+    lua_pushinteger(l, LLBC_GetMicroSeconds());
     return 1;
 }
