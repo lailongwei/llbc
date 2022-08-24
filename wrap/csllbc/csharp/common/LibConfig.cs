@@ -176,7 +176,7 @@ namespace llbc
         /// </summary>
         public static bool logDefaultEnabledDailyMode
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_IsDefaultEnabledDailyMode() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Log_IsDefaultEnabledDailyRolling() != 0; }
         }
 
         /// <summary>

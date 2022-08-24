@@ -92,9 +92,9 @@ int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen)
     return writable;
 }
 
-int csllbc_LibConfig_Log_IsDefaultEnabledDailyMode()
+int csllbc_LibConfig_Log_IsDefaultEnabledDailyRolling()
 {
-    return LLBC_CFG_LOG_DEFAULT_DAILY_MODE;
+    return LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING;
 }
 
 sint64 csllbc_LibConfig_Log_MaxFileSize()
