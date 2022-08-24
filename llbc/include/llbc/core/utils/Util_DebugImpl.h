@@ -22,6 +22,8 @@
 
 #ifdef __LLBC_CORE_UTILS_UTIL_DEBUG_H__
 
+#include "llbc/core/os/OS_Time.h"
+
 __LLBC_NS_BEGIN
 
 inline LLBC_CPUTime::LLBC_CPUTime(uint64 cpuCount)
@@ -56,38 +58,38 @@ inline uint64 LLBC_CPUTime::GetCPUCount() const
 
 inline int LLBC_CPUTime::ToSeconds() const
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     return static_cast<int>(_cpuCount / _freqPerSecond);
-#else // Non x86/x86_64 arch
+#else // Not supp rdtsc
     return _cpuCount / LLBC_TimeConstant::NumOfMicroSecondsPerSecond;
-#endif // x86/x86_64 arch
+#endif // Supp rdtsc
 }
 
 inline sint64 LLBC_CPUTime::ToMilliSeconds() const
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     return _cpuCount / _freqPerMillisecond;
-#else // Non x86/x86_64 arch
+#else // Not supp rdtsc
     return _cpuCount / LLBC_TimeConstant::NumOfMilliSecondsPerSecond;
-#endif // x86/x86_64 arch
+#endif // Supp rdtsc
 }
 
 inline sint64 LLBC_CPUTime::ToMicroSeconds() const
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     return _cpuCount / _freqPerMicroSecond;
-#else // Non x86/x86_64 arch
+#else // Not supp rdtsc
     return _cpuCount;
-#endif // x86/x86_64 arch
+#endif // Supp rdtsc
 }
 
 inline sint64 LLBC_CPUTime::ToNanoSeconds() const
 {
-#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+#if LLBC_SUPPORT_RDTSC
     return _cpuCount / _freqPerNanoSecond;
-#else // Non x86/x86_64 arch
+#else // Not supp rdtsc
     return _cpuCount * LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond;
-#endif // x86/x86_64 arch
+#endif // Supp rdtsc
 }
 
 inline int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
