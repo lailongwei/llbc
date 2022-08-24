@@ -77,6 +77,9 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
+    // Finalize logger manager.
+    LLBC_LoggerManagerSingleton->Finalize();
+
     // Purge auto-release pool stack.
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->objbaseTls.poolStack)
@@ -110,9 +113,6 @@ void __LLBC_CoreCleanup()
 
     // Destroy Variant number to number string repr fast access table.
     LLBC_Variant::DestroyNumber2StrFastAccessTable();
-
-    // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
 }
 
 __LLBC_NS_END
