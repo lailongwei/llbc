@@ -47,12 +47,38 @@
 # 38)【llbc core】LLBC_Time/LLBC_TimeSpan接口规整及简化
 # 39)【llcb core】LLBC_Timer的TimerScheduler获取隋式延迟到Schedule调用处, 以确保跨线程创建的Timer可被实际执行线程Schedule
 # 40)【llbc core】优化LLBC_Packet payload相关接口访问
+# 41)【llbc all】处理新g++编译器编译问题
+# 42)【llbc core】LLBC_Delegate性能优化, 增加operator == nullptr/operator != nullptr支持
+# 43)【llbc core】LLBC_TimerData内存占用优化
+# 44)【llbc core】LLBC_Variant性能优化，泛型变参支持
+# 45)【llbc core】对象池代码规整，性能优化，部分常用类型在llbc框架内直接特化(感谢@bravepan)
+# 46)【llbc all】兼容macos arm平台编译(感谢@reckzhang)
+# 47)【llbc all】更新premake, 增加vs2022支持
+# 48)【llbc core】LLBC_MessageQueue完整优化
+# 49)【llbc core】LLBC_Service队列消息创建、处理完整优化
+# 50)【llbc core】提升日志库性能(提升100%), 日志相关代码规整
+# 50)【lullbc】提升日志库性能(提升100%), 日志相关代码规整(为龙腾《苏丹的复仇》项目进行)
+# 51)【pyllbc】去除vs20xx后的HAS_ROUND宏报错
+# 52)【llbc all】去除BeforeIncl.h/AfterIncl.h文件(统一通过premake完成)
+# 53)【llbc core】去除LLBC_MemCpy/LLBC_MemSet多余宏, 使用c库memcpy/memmove/memset代替
+# 54)【llbc core】规整LLBC_Stream中的Read/Write接口(去除ReadBuffer/WriteBuffer)
+# 55)【llbc core】Service默认帧率调整到200, 暂时禁止service frame time特性
+# 56)【llbc core】标准化RDTSC支持宏及相关代码, 包括LLBC_CPUTime
+# 57)【lullbc】lua库升级到5.4.0_patch
+# 58)【lullbc】标准化lullbc库,提供Chrono/Directory/CPUTime/Threading模块支持, 旧有支持执行命名及模块标准化
+# 59)【lullbc】lulib_setting.lua简化, 去除use_setting标记
+# 60)【pyllbc】pylib_setting.lua简化, 去除use_setting标记
+# 61)【llbc all】其他诸多细节完善, 优化
+
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
 #   - 【llbc core】修复logger finalize一处死锁问题(by caochunxi)
 #   - 【llbc core】修复一处variant构造bug
 #   - 【llbc core】修复Random中RandInt()接口返回可能不在指定区间的Bug
+#   - 【llbc core】修复LLBC_MessageBlock一处memory overlapped检查bug(黏连属于合法但旧代码认为非法)
+#   - 【llbc core】修复LLBC_LogData中funcbeg/funclen未初始化导致的coredump问题
+#   - 【llbc core】LLBC_File设置BufMode的泄漏问题修复
 
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9
