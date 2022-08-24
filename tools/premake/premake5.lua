@@ -269,9 +269,9 @@ else
     error('Please set the python version number correctly(in wrap/pyllbc/pylib_setting.lua)!')
 end
 
-local PYLIB_INCL_PATH = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[1] or ''
-local PYLIB_LIB_DIR = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[2] or ''
-local PYLIB_LIB_NAME = PYLIB_SETTING.use_setting and PYLIB_SETTING.py_path[3] or ''
+local PYLIB_INCL_PATH = (PYLIB_SETTING.py_path[1] ~= nil and PYLIB_SETTING.py_path[1] ~= "") and PYLIB_SETTING.py_path[1] or ""
+local PYLIB_LIB_DIR = (PYLIB_SETTING.py_path[2] ~= nil and PYLIB_SETTING.py_path[2] ~= "") and PYLIB_SETTING.py_path[2] or ""
+local PYLIB_LIB_NAME = (PYLIB_SETTING.py_path[3] ~= nil and PYLIB_SETTING.py_path[3] ~= "") and PYLIB_SETTING.py_path[3] or ""
 project "pyllbc"
     -- language, kind
     language "c++"
