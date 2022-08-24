@@ -44,6 +44,8 @@ LLBC_LogData::LLBC_LogData()
 , fileLen(0)
 , tagBeg(0)
 , tagLen(0)
+, funcBeg(0)
+, funcLen(0)
 
 , line(0)
 
