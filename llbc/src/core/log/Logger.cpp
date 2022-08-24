@@ -23,6 +23,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/utils/Util_Text.h"
+#include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/os/OS_Time.h"
 
@@ -48,6 +49,66 @@ static const LLBC_NS LLBC_String __g_invalidLoggerName;
 
 __LLBC_INTERNAL_NS_END
 
+// Internal macro: build log data object.
+#define __LLBC_InlMacro_BuildLogData(level, tag, file, line, func, msg, msgLen, data) { \
+    if (msgLen == static_cast<size_t>(-1) && msg) \
+        msgLen = LLBC_StrLen(msg); \
+    \
+    if (!msg) \
+        msgLen = 0; \
+    \
+    if (msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE) \
+        msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1; \
+    \
+    data = _logDataPoolInst.GetObject(); \
+    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 256); \
+    if (data->msgCap < msgCap) { \
+        data->msgCap = msgCap; \
+        data->msg = LLBC_Realloc(char, data->msg, msgCap); \
+    } \
+    \
+    data->msgLen = static_cast<int>(msgLen); \
+    if (msgLen > 0) \
+        ::memcpy(data->msg, msg, msgLen); \
+    data->msg[msgLen] = '\0'; \
+    \
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls()); \
+} \
+
+// Internal macro: build log data object(by va list).
+#define __LLBC_InlMacro_BuildLogDataV(level, tag, file, line, func, fmt, va, data) \
+do { \
+    data = _logDataPoolInst.GetObject(); \
+    \
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls(); \
+    int len = ::vsnprintf(libTls->coreTls.loggerFmtBuf, \
+                          sizeof(libTls->coreTls.loggerFmtBuf), \
+                          fmt, \
+                          va); \
+    if (UNLIKELY(len < 0)) { \
+        LLBC_SetLastError(LLBC_ERROR_CLIB); \
+        LLBC_Recycle(data); \
+        data = nullptr; \
+        \
+        break; \
+    } \
+    \
+    if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)) \
+        len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1); \
+    \
+    if (data->msgCap < len + 1) { \
+        data->msgCap = MAX(len + 1, 256); \
+        data->msg = LLBC_Realloc(char, data->msg, data->msgCap); \
+    } \
+    \
+    data->msgLen = len; \
+    if (len > 0) \
+        ::memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len); \
+    data->msg[len] = '\0'; \
+    \
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls); \
+} while (false) \
+
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
@@ -60,7 +121,12 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
-, _msgBlockPoolInst(*_objPool.GetPoolInst<LLBC_MessageBlock>())
+#if LLBC_SUPPORT_RDTSC
+, _nowTime(0)
+, _lastGetTimeCPUTime(0)
+, _oneMilliSecCPUTime(0)
+#endif // Supp rdtsc
+
 , _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
 , _hookDelegs()
 {
@@ -150,6 +216,11 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         this->AddAppender(appender);
     }
 
+    // Init time fetch optimize about members.
+    #if LLBC_SUPPORT_RDTSC
+    _oneMilliSecCPUTime = static_cast<double>(LLBC_CPUTime::GetCPUFreqPerMilliSecond() * 0.1);
+    #endif // Supp rdtsc
+
     // Set/Create log runnable.
     if (_config->IsAsyncMode())
     {
@@ -181,9 +252,14 @@ void LLBC_Logger::Finalize()
     if (_config->IsAsyncMode())
     {
         if (_config->IsIndependentThread())
+        {
             _logRunnable->Stop();
+            LLBC_Delete(_logRunnable);
+        }
         else
+        {
             Flush(true, false);
+        }
 
         _logRunnable = nullptr;
     }
@@ -205,6 +281,10 @@ void LLBC_Logger::Finalize()
     _name.clear();
     _config = nullptr;
     _logLevel = LLBC_LogLevel::Begin;
+
+    _nowTime = 0;
+    _lastGetTimeCPUTime = 0;
+    _oneMilliSecCPUTime = 0;
 }
 
 const LLBC_String &LLBC_Logger::GetLoggerName() const
@@ -269,8 +349,9 @@ int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line,
 {
     if (_logLevel > level)
         return LLBC_OK;
-        
+
     LLBC_LogData *data = BuildLogData(level, tag, file, line, func, fmt, va);
+    // __LLBC_InlMacro_BuildLogDataV(level, tag, file, line, func, fmt, va, data);
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
@@ -285,9 +366,7 @@ int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line,
         return ret;
     }
 
-    LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
-    block->Write(&data, sizeof(LLBC_LogData *));
-    _logRunnable->Push(block);
+    _logRunnable->PushLogData(data);
 
     return LLBC_OK;
 }
@@ -298,8 +377,7 @@ int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, i
         return LLBC_OK;
 
     LLBC_LogData *data = BuildLogData(level, tag, file, line, func, msg, msgLen);
-    if (UNLIKELY(!data))
-        return LLBC_FAILED;
+    // __LLBC_InlMacro_BuildLogData(level, tag, file, line, func, msg, msgLen, data);
 
     if (_hookDelegs[level])
         _hookDelegs[level](data);
@@ -312,20 +390,18 @@ int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, i
         return ret;
     }
 
-    LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
-    block->Write(&data, sizeof(LLBC_LogData *));
-    _logRunnable->Push(block);
+    _logRunnable->PushLogData(data);
 
     return LLBC_OK;
 }
 
-LLBC_LogData *LLBC_Logger::BuildLogData(int level,
-                                        const char *tag,
-                                        const char *file,
-                                        int line,
-                                        const char *func,
-                                        const char *fmt,
-                                        va_list va)
+LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
+                                                          const char *tag,
+                                                          const char *file,
+                                                          int line,
+                                                          const char *func,
+                                                          const char *fmt,
+                                                          va_list va)
 {
     LLBC_LogData *data = _logDataPoolInst.GetObject();
 
@@ -365,13 +441,13 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     return data;
 }
 
-LLBC_LogData *LLBC_Logger::BuildLogData(int level,
-                                        const char *tag,
-                                        const char *file,
-                                        int line,
-                                        const char *func,
-                                        const char *msg,
-                                        size_t msgLen)
+LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
+                                                          const char *tag,
+                                                          const char *file,
+                                                          int line,
+                                                          const char *func,
+                                                          const char *msg,
+                                                          size_t msgLen)
 {
     // Calculate message length, if required.
     if (msgLen == static_cast<size_t>(-1) && msg)
@@ -418,9 +494,22 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->logger = this;
     logData->loggerName = _name.c_str();
 
-    // fill: log level&log time.
+    // fill: log level.
     logData->level = level;
+
+    // fill: log time.
+    #if LLBC_SUPPORT_RDTSC
+    const auto nowCPUTime = LLBC_RdTsc();
+    if (nowCPUTime < _lastGetTimeCPUTime ||
+        nowCPUTime - _lastGetTimeCPUTime >= _oneMilliSecCPUTime)
+    {
+        _lastGetTimeCPUTime = nowCPUTime;
+        _nowTime = LLBC_GetMilliSeconds();
+    }
+    logData->logTime = _nowTime;
+    #else // Not supp rdtsc
     logData->logTime = LLBC_GetMilliSeconds();
+    #endif // Supp rdtsc
 
     // fill: other infos(file, tag, func).
     if (file)
@@ -547,6 +636,9 @@ void LLBC_Logger::FlushAppenders(bool force)
 }
 
 __LLBC_NS_END
+
+#undef __LLBC_InlMacro_BuildLogData
+#undef __LLBC_InlMacro_BuildLogDataV
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)

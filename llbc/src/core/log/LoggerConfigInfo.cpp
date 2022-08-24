@@ -166,7 +166,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         else
             _filePattern = _notConfigUseRoot ? 
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
-        _dailyMode = __LLBC_GetLogCfg("dailyRollingMode", DAILY_MODE, IsDailyRollingMode, AsLooseBool);
+        _dailyMode = __LLBC_GetLogCfg("dailyRolling", DAILY_ROLLING, IsDailyRollingMode, AsLooseBool);
         _maxFileSize = __LLBC_GetLogCfg2("maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);
         _maxBackupIndex = __LLBC_GetLogCfg2("maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
         _lazyCreateLogFile = __LLBC_GetLogCfg2("lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);

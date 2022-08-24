@@ -25,7 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/singleton/Singleton.h"
-#include "llbc/core/thread/RecursiveLock.h"
+#include "llbc/core/thread/DummyLock.h"
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
 #include "llbc/core/log/LogMessageBuffer.h"
@@ -101,14 +101,16 @@ public:
     void UnInitOutput(int logLv, const char *msg);
 
 private:
-    mutable LLBC_RecursiveLock _lock;
+    mutable LLBC_DummyLock _lock;
 
     LLBC_LoggerConfigurator *_configurator;
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;
-    std::map<LLBC_String, LLBC_Logger *> _loggers;
-    std::map<LLBC_CString, LLBC_Logger *> _loggers2;
+    std::map<LLBC_String, LLBC_Logger *> _str2Loggers;
+    std::map<LLBC_CString, LLBC_Logger *> _cstr2Loggers;
+    std::map<LLBC_String, LLBC_Logger *>::const_iterator _str2LoggersEnd;
+    std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 
     static LLBC_String _rootLoggerName;
 };

@@ -82,8 +82,8 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    _loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
-    _loggers2.insert(std::make_pair(_rootLoggerName.c_str(), _rootLogger));
+    _str2Loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
+    _cstr2Loggers.insert(std::make_pair(_rootLoggerName.c_str(), _rootLogger));
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
@@ -101,9 +101,12 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
             return LLBC_FAILED;
         }
 
-        _loggers.insert(std::make_pair(cfgIter->first, logger));
-        _loggers2.insert(std::make_pair(cfgIter->first.c_str(), logger));
+        _str2Loggers.insert(std::make_pair(cfgIter->first, logger));
+        _cstr2Loggers.insert(std::make_pair(cfgIter->first.c_str(), logger));
     }
+
+    _str2LoggersEnd = _str2Loggers.end();
+    _cstr2LoggersEnd = _cstr2Loggers.end();
 
     // Startup shared log runnable.
     if (_sharedLogRunnable)
@@ -120,10 +123,10 @@ bool LLBC_LoggerManager::IsInited() const
 void LLBC_LoggerManager::Finalize()
 {
     LLBC_LockGuard guard(_lock);
-
     if (_rootLogger == nullptr)
         return;
 
+    // Delete shared log runnable.
     if (_sharedLogRunnable)
     {
         _sharedLogRunnable->Stop();
@@ -132,8 +135,12 @@ void LLBC_LoggerManager::Finalize()
     }
 
     // Delete all loggers and set _rootLogger logger to nullptr.
-    _loggers2.clear();
-    LLBC_STLHelper::DeleteContainer(_loggers);
+    _cstr2Loggers.clear();
+    LLBC_STLHelper::DeleteContainer(_str2Loggers);
+
+    _str2LoggersEnd = _str2Loggers.end();
+    _cstr2LoggersEnd = _cstr2Loggers.end();
+
     _rootLogger = nullptr;
 
     // Delete logger configurator.
@@ -142,7 +149,7 @@ void LLBC_LoggerManager::Finalize()
 
 LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
 {
-    if (UNLIKELY(!_rootLogger))
+    if (UNLIKELY(_rootLogger == nullptr))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return nullptr;
@@ -153,57 +160,73 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
 
 LLBC_Logger *LLBC_LoggerManager::GetLogger(const char *name) const
 {
-    if (UNLIKELY(!name))
+    _lock.Lock();
+    if (UNLIKELY(_rootLogger == nullptr))
     {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return nullptr;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_rootLogger))
-    {
+        _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+
         return nullptr;
     }
 
-    auto iter = _loggers2.find(name);
-    if (iter == _loggers2.end())
+    if (name == nullptr || name[0] == '\0')
+    {
+        _lock.Unlock();
+        return _rootLogger;
+    }
+
+    auto iter = _cstr2Loggers.find(name);
+    if (iter == _cstr2LoggersEnd)
     {
         if (_rootLogger->IsTakeOver())
+        {
+            _lock.Unlock();
             return _rootLogger;
+        }
 
+        _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return nullptr;
     }
 
+    _lock.Unlock();
     return iter->second;
 }
 
 LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
 {
+    _lock.Lock();
+    if (UNLIKELY(_rootLogger == nullptr))
+    {
+        _lock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+
+        return nullptr;
+    }
+
     if (UNLIKELY(name.empty()))
     {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return nullptr;
+        _lock.Unlock();
+        return _rootLogger;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_rootLogger))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return nullptr;
-    }
-
-    auto iter = _loggers.find(name);
-    if (iter == _loggers.end())
+    auto iter = _str2Loggers.find(name);
+    if (iter == _str2LoggersEnd)
     {
         if (_rootLogger->IsTakeOver())
+        {
+            _lock.Unlock();
             return _rootLogger;
+        }
 
+        _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return nullptr;
     }
 
+    _lock.Unlock();
     return iter->second;
 }
 

@@ -35,6 +35,9 @@ __LLBC_NS_BEGIN
 
 LLBC_LogRunnable::LLBC_LogRunnable()
 : _stoped(false)
+
+, _usingLogDataIdx(0)
+, _logDatas{}
 {
 }
 
@@ -67,9 +70,16 @@ void LLBC_LogRunnable::Stop()
     Wait();
 }
 
+void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
+{
+    _logDataLock.Lock();
+    _logDatas[_usingLogDataIdx].push_back(logData);
+    _logDataLock.Unlock();
+}
+
 void LLBC_LogRunnable::Cleanup()
 {
-    while (TryPopAndProcLogData(10));
+    (void)TryPopAndProcLogDatas();
 
     FlushLoggers(true, 0);
     _loggers.clear();
@@ -79,37 +89,39 @@ void LLBC_LogRunnable::Svc()
 {
     while (LIKELY(!_stoped))
     {
-        if (!TryPopAndProcLogData(100))
-            continue;
+        if (!TryPopAndProcLogDatas())
+            LLBC_Sleep(5);
 
         FlushLoggers(false, LLBC_GetMilliSeconds());
     }
 }
 
-LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogData(int maxPopWaitTime)
+LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
 {
-    LLBC_LogData *logData;
-    LLBC_MessageBlock *block;
-    if (TimedPop(block, maxPopWaitTime) != LLBC_OK)
+    std::vector<LLBC_LogData *> *logDatas;
+
+    _logDataLock.Lock();
+    logDatas = &_logDatas[_usingLogDataIdx];
+    _usingLogDataIdx ^= 1u;
+    _logDataLock.Unlock();
+
+    if (logDatas->empty())
         return false;
 
-    if (UNLIKELY(block->Read(&logData, sizeof(LLBC_LogData *)) != LLBC_OK))
+    for (auto &logData : *logDatas)
     {
-        LLBC_Recycle(block);
-        return false;
+        logData->logger->OutputLogData(*logData);
+        LLBC_Recycle(logData);
     }
 
-    LLBC_Recycle(block);
-
-    logData->logger->OutputLogData(*logData);
-    LLBC_Recycle(logData);
+    logDatas->clear();
 
     return true;
 }
 
 LLBC_FORCE_INLINE void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
 {
-    size_t loggerCnt = _loggers.size();
+    const size_t loggerCnt = _loggers.size();
     for (size_t i = 0; i < loggerCnt; ++i)
         _loggers[i]->Flush(false, now);
 }

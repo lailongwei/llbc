@@ -284,8 +284,13 @@ private:
     sint64 _flushInterval;
     LLBC_ILogAppender *_appenders;
 
+    #if LLBC_SUPPORT_RDTSC
+    sint64 _nowTime;
+    uint64 _lastGetTimeCPUTime;
+    uint64 _oneMilliSecCPUTime;
+    #endif // Supp rdtsc
+
     LLBC_SafetyObjectPool _objPool;
-    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockPoolInst;
     LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
     LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };

@@ -32,6 +32,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
+class LLBC_LogData;
 
 __LLBC_NS_END
 
@@ -62,6 +63,12 @@ public:
      */
     void Stop();
 
+    /**
+     * Push log data.
+     * @param[in] logData - the log data.
+     */
+    void PushLogData(LLBC_LogData *logData);
+
 public:
     /**
      * Cleanup method, when task terminated, will call this method.
@@ -75,11 +82,10 @@ public:
 
 private:
     /**
-     * Try pop and process log data.
-     * @param[in] maxPopWaitTime - the max pop wait time, in milli-second.
+     * Try pop and process log datas.
      * @return bool - return true if process success, otherwise return false.
      */
-    bool TryPopAndProcLogData(int maxPopWaitTime);
+    bool TryPopAndProcLogDatas();
 
     /**
      * Flush all loggers.
@@ -91,6 +97,10 @@ private:
 private:
     volatile bool _stoped;
     std::vector<LLBC_Logger *> _loggers;
+
+    uint32 _usingLogDataIdx;
+    LLBC_SpinLock _logDataLock;
+    std::vector<LLBC_LogData *> _logDatas[2];
 };
 
 __LLBC_NS_END
