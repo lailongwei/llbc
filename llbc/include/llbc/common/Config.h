@@ -136,7 +136,7 @@
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default is daily rolling mode.
-#define LLBC_CFG_LOG_DEFAULT_DAILY_MODE                     1
+#define LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING                  1
 // Default max log file size.
 #define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
 // Default max backup file index.
@@ -179,7 +179,7 @@
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     (0 || LLBC_DEBUG)
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     0
 // Object reset match methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
