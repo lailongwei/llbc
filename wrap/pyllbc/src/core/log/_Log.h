@@ -37,6 +37,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+LLBC_EXTERN_C PyObject *_pyllbc_UnInitLoggerMgr(PyObject *self, PyObject *args)
+{
+    LLBC_LoggerManagerSingleton->Finalize();
+
+    Py_RETURN_NONE;
+}
+
 LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
 {
     int level;
@@ -49,7 +56,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
     char *tag = nullptr;
     char *loggerName = nullptr;
 
-    if (!PyArg_ParseTuple(args, "iOOis|ss", &level, &fileNameObj, &funcNameObj, &line, &msg, &loggerName, &tag))
+    if (!PyArg_ParseTuple(args, "iOiOs|ss", &level, &fileNameObj, &line, &funcNameObj, &msg, &loggerName, &tag))
         return nullptr;
 
     LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
