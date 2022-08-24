@@ -11,11 +11,17 @@ class LogTest(TestCase):
     def run(self, *args, **kwargs):
         print 'Log test:'
 
-        # Init log
+        # Init log.
         Log.init('Logger_Cfg.cfg')
 
-        # base log test
+        # Enable log fileinfo.
+        Log.enablelogfileinfo()
+
+        # base log test.
         self._base_log_test()
+
+        # UnInit log.
+        Log.uninit()
 
     def _base_log_test(self):
         """bae log functions test"""
