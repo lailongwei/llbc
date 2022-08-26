@@ -1,8 +1,11 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
+# Version: 1.1.0
+# 2022/8~
+#
 # Version: 1.0.9
-# 2020/9~
+# 2020/9~2022/8
 # 1)【llbc core】Facade->Component命名变更
 # 2)【llbc core】优化LLBC_Directory::Join()，使用变长模板参数简化原有实现(感谢caochunxi)
 # 3)【llbc core】标准化Variant排序实现, 确保行为跟python一致
