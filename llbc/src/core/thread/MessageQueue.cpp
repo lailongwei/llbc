@@ -81,7 +81,7 @@ void LLBC_MessageQueue::Cleanup()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     _cond.Broadcast();
 #else // LLBC_TARGET_PLATFORM_WIN32
-    _sem.Post(_size);
+    _sem.Post(static_cast<int>(_size));
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     _size = 0;
