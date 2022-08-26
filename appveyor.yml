@@ -45,11 +45,8 @@ notifications:
     - provider: Email
       to:
           - 964855959@qq.com # Longwei Lai
-          - huangrongfu00@gmail.com # Rongfu Huang
           - najoast@126.com # Yan Zhou
-          - caochunxi@hotmail.com # Chunxi Cao
-          - 120453674@qq.com # Huiya Song
-          - snakeflutes@gmail.com # Reckful
+          - gustars@126.com # Gang Wei
       on_build_success: false
       on_build_failure: true
       on_build_status_changed: true
