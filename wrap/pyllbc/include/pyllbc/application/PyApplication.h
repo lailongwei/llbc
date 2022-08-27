@@ -30,7 +30,7 @@
  * \brief The python layer native application encapsulation.
  * TODO: for now simple encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Application : public LLBC_IApplication
+class LLBC_HIDDEN pyllbc_Application : public LLBC_Application
 {
 public:
     /**

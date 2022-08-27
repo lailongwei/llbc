@@ -22,13 +22,13 @@
 #include "llbc/common/Export.h"
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
-#include "llbc/application/IApplication.h"
+#include "llbc/application/Application.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const char *__dumpFileName = nullptr;
+static const char *__dumpFilePath = nullptr;
 static LLBC_NS LLBC_Delegate<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
@@ -106,7 +106,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace
 
 static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 {
-    HANDLE dmpFile = ::CreateFileA(__dumpFileName,
+    HANDLE dmpFile = ::CreateFileA(__dumpFilePath,
                                    GENERIC_WRITE,
                                    FILE_SHARE_READ,
                                    nullptr,
@@ -118,7 +118,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     LLBC_NS LLBC_String errMsg;
     errMsg.append("Unhandled exception!\n");
-    errMsg.append_format("Mini dump file path:%s\n", __dumpFileName);
+    errMsg.append_format("Mini dump file path:%s\n", __dumpFilePath);
 
     ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
     dmpInfo.ExceptionPointers = exception;
@@ -140,7 +140,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     ::CloseHandle(dmpFile);
     if (__crashHook)
-        __crashHook(__dumpFileName);
+        __crashHook(__dumpFilePath);
 
     LLBC_NS LLBC_String backTrace;
     __GetExceptionBackTrace(exception->ContextRecord, backTrace);
@@ -191,9 +191,9 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_IApplication *LLBC_IApplication::_thisApp = nullptr;
+LLBC_Application *LLBC_Application::_thisApp = nullptr;
 
-LLBC_IApplication::LLBC_IApplication()
+LLBC_Application::LLBC_Application()
 : _name()
 
 , _iniConfig()
@@ -214,13 +214,13 @@ LLBC_IApplication::LLBC_IApplication()
         _thisApp = this;
 }
 
-LLBC_IApplication::~LLBC_IApplication()
+LLBC_Application::~LLBC_Application()
 {
     Wait();
     Stop();
 }
 
-int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
+int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 {
     // Multi application check.
     if (_thisApp != this)
@@ -279,12 +279,12 @@ int LLBC_IApplication::Start(const LLBC_String &name, int argc, char *argv[])
     return LLBC_OK;
 }
 
-bool LLBC_IApplication::IsStarted() const
+bool LLBC_Application::IsStarted() const
 {
     return _started;
 }
 
-void LLBC_IApplication::Wait()
+void LLBC_Application::Wait()
 {
     if (!_started || _waited)
         return;
@@ -295,7 +295,7 @@ void LLBC_IApplication::Wait()
     _waited = true;
 }
 
-void LLBC_IApplication::Stop()
+void LLBC_Application::Stop()
 {
     if (!_started)
         return;
@@ -311,37 +311,37 @@ void LLBC_IApplication::Stop()
     _started = false;
 }
 
-int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
+int LLBC_Application::SetDumpFile(const LLBC_String &dumpFilePath)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else // Win32
-    if (UNLIKELY(dumpFileName.empty()))
+    if (UNLIKELY(dumpFilePath.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
-    else if (UNLIKELY(!_dumpFileName.empty()))
+    else if (UNLIKELY(!_dumpFilePath.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
-    _dumpFileName = dumpFileName;
-    LLBC_Strings dumpFileNameParts = LLBC_Directory::SplitExt(_dumpFileName);
+    _dumpFilePath = dumpFilePath;
+    const LLBC_Strings dumpFileNameParts = LLBC_Directory::SplitExt(_dumpFilePath);
 
     LLBC_Time now = LLBC_Time::Now();
-    _dumpFileName = dumpFileNameParts[0];
-    _dumpFileName.append_format("_%d%02d%02d_%02d%02d%02d_%06d%s",
+    _dumpFilePath = dumpFileNameParts[0];
+    _dumpFilePath.append_format("_%d%02d%02d_%02d%02d%02d_%06d%s",
         now.GetYear(), now.GetMonth(), now.GetDay(), now.GetHour(), now.GetMinute(),
         now.GetSecond(), now.GetMilliSecond() * 1000 + now.GetMicroSecond(), dumpFileNameParts[1].c_str());
     if (dumpFileNameParts[1] != ".dmp")
-        _dumpFileName += ".dmp";
+        _dumpFilePath += ".dmp";
 
-    _dumpFileName = LLBC_Directory::AbsPath(_dumpFileName);
+    _dumpFilePath = LLBC_Directory::AbsPath(_dumpFilePath);
 
-    LLBC_INL_NS __dumpFileName = _dumpFileName.c_str();
+    LLBC_INL_NS __dumpFilePath = _dumpFilePath.c_str();
 
     ::SetUnhandledExceptionFilter(LLBC_INL_NS __AppCrashHandler);
 
@@ -353,7 +353,7 @@ int LLBC_IApplication::SetDumpFile(const LLBC_String &dumpFileName)
 #endif // Non Win32
 }
 
-int LLBC_IApplication::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook)
+int LLBC_Application::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
@@ -365,27 +365,27 @@ int LLBC_IApplication::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &
 #endif // Non Win32
 }
 
-const LLBC_String &LLBC_IApplication::GetName() const
+const LLBC_String &LLBC_Application::GetName() const
 {
     return _name;
 }
 
-const LLBC_StartArgs &LLBC_IApplication::GetStartArgs() const
+const LLBC_StartArgs &LLBC_Application::GetStartArgs() const
 {
     return _startArgs;
 }
 
-const LLBC_Ini &LLBC_IApplication::GetIniConfig() const
+const LLBC_Ini &LLBC_Application::GetIniConfig() const
 {
     return _iniConfig;
 }
 
-const LLBC_Property &LLBC_IApplication::GetPropertyConfig() const
+const LLBC_Property &LLBC_Application::GetPropertyConfig() const
 {
     return _propertyConfig;
 }
 
-int LLBC_IApplication::ReloadIniConfig(bool callEvMeth)
+int LLBC_Application::ReloadIniConfig(bool callEvMeth)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -419,7 +419,7 @@ int LLBC_IApplication::ReloadIniConfig(bool callEvMeth)
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth)
+int LLBC_Application::ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -454,7 +454,7 @@ int LLBC_IApplication::ReloadIniConfig(const LLBC_String &configPath, bool callE
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadPropertyConfig(bool callEvMeth)
+int LLBC_Application::ReloadPropertyConfig(bool callEvMeth)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -488,7 +488,7 @@ int LLBC_IApplication::ReloadPropertyConfig(bool callEvMeth)
     return LLBC_OK;
 }
 
-int LLBC_IApplication::ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth)
+int LLBC_Application::ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -523,17 +523,17 @@ int LLBC_IApplication::ReloadPropertyConfig(const LLBC_String &configPath, bool 
     return LLBC_OK;
 }
 
-LLBC_IService *LLBC_IApplication::GetService(int id) const
+LLBC_IService *LLBC_Application::GetService(int id) const
 {
     return _services.GetService(id);
 }
 
-int LLBC_IApplication::RemoveService(int id)
+int LLBC_Application::RemoveService(int id)
 {
     return _services.RemoveService(id);
 }
 
-int LLBC_IApplication::Send(LLBC_Packet *packet)
+int LLBC_Application::Send(LLBC_Packet *packet)
 {
     LLBC_IService *service = _services.GetService(packet->GetSenderServiceId());
     if(!service)
@@ -545,13 +545,13 @@ int LLBC_IApplication::Send(LLBC_Packet *packet)
     return service->Send(packet);
 }
 
-int LLBC_IApplication::TryLoadConfig(bool tryIni, bool tryPropCfg)
+int LLBC_Application::TryLoadConfig(bool tryIni, bool tryPropCfg)
 {
     bool loaded = false;
     return TryLoadConfig(loaded, tryIni, tryPropCfg);
 }
 
-int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryPropCfg)
+int LLBC_Application::TryLoadConfig(bool &loaded, bool tryIni, bool tryPropCfg)
 {
     loaded = false;
 
@@ -584,7 +584,7 @@ int LLBC_IApplication::TryLoadConfig(bool &loaded, bool tryIni, bool tryPropCfg)
     return LLBC_OK;
 }
 
-int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryPropCfg)
+int LLBC_Application::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryPropCfg)
 {
     loaded = false;
 
@@ -618,7 +618,7 @@ int LLBC_IApplication::TryLoadConfig(const LLBC_String &path, bool &loaded, bool
     return LLBC_OK;
 }
 
-void LLBC_IApplication::AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth)
+void LLBC_Application::AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth)
 {
     if (!callEvMeth)
         return;

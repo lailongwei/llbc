@@ -31,7 +31,7 @@
 /* llbc/testcase part */
 #include "llbc/testcase/BaseTestCase.h"
 /* llbc/application part */
-#include "llbc/application/IApplication.h"
+#include "llbc/application/Application.h"
 
 __LLBC_NS_BEGIN
 

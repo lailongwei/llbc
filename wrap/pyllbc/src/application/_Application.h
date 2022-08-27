@@ -29,7 +29,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetDumpFile(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &dumpFile))
         return nullptr;
 
-    if (LLBC_IApplication::ThisApp()->SetDumpFile(dumpFile) != LLBC_OK)
+    if (LLBC_Application::ThisApp()->SetDumpFile(dumpFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When set dump file");
         return nullptr;

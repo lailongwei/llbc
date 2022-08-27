@@ -43,11 +43,11 @@ __LLBC_NS_BEGIN
  * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
-class LLBC_EXPORT LLBC_IApplication
+class LLBC_EXPORT LLBC_Application
 {
 public:
-    LLBC_IApplication();
-    virtual ~LLBC_IApplication();
+    LLBC_Application();
+    virtual ~LLBC_Application();
 
 public:
     /**
@@ -85,7 +85,7 @@ public:
      */
     template <typename App>
     static App *ThisApp();
-    static LLBC_IApplication *ThisApp();
+    static LLBC_Application *ThisApp();
 
 public:
     /**
@@ -113,10 +113,10 @@ public:
 
     /**
      * Set dump file when application dump.
-     * @param[in] dumpFileName - the dump file name.
+     * @param[in] dumpFilePath - the dump file path.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetDumpFile(const LLBC_String &dumpFileName);
+    int SetDumpFile(const LLBC_String &dumpFilePath);
 
     /**
      * Set crash hook, invoke after crashed.
@@ -216,15 +216,15 @@ private:
     LLBC_StartArgs _startArgs;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_String _dumpFileName;
+    LLBC_String _dumpFilePath;
     LLBC_Delegate<void(const LLBC_String &)> _crashHook;
 #endif // Win32
 
-    static LLBC_IApplication *_thisApp;
+    static LLBC_Application *_thisApp;
 };
 
 __LLBC_NS_END
 
-#include "llbc/application/IApplicationImpl.h"
+#include "llbc/application/ApplicationImpl.h"
 
 #endif // !__LLBC_APP_IAPPLICATION_H__

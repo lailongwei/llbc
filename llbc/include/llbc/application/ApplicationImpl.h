@@ -23,21 +23,21 @@
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_IApplication::OnIniConfigReloaded()
+inline void LLBC_Application::OnIniConfigReloaded()
 {
 }
 
-inline void LLBC_IApplication::OnPropertyConfigReloaded()
+inline void LLBC_Application::OnPropertyConfigReloaded()
 {
 }
 
 template <typename App>
-inline App *LLBC_IApplication::ThisApp()
+inline App *LLBC_Application::ThisApp()
 {
     return static_cast<App *>(_thisApp);
 }
 
-inline LLBC_IApplication *LLBC_IApplication::ThisApp()
+inline LLBC_Application *LLBC_Application::ThisApp()
 {
     return _thisApp;
 }
