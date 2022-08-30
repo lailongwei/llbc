@@ -130,12 +130,12 @@ class pyllbcProperty(object):
         """
         return llbc.inl.Property_GetProperty(self._c_obj, name)
 
-    def get_property_count(self):
+    def get_properties_count(self):
         """
-        Get property count.
-        :return: the property count.
+        Get properties count.
+        :return: the properties count.
         """
-        return llbc.inl.Property_GetPropertyCount(self._c_obj)
+        return llbc.inl.Property_GetPropertiesCount(self._c_obj)
 
     def get_property_names(self, nest=False):
         """
