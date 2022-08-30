@@ -68,6 +68,7 @@ __DEFINE_TEST_CASE(TestCase_Comm_MessageBuffer)
 __DEFINE_TEST_CASE(TestCase_Comm_DynLoadComp)
 __DEFINE_TEST_CASE(TestCase_Comm_Echo)
 __DEFINE_TEST_CASE(TestCase_App_AppTest)
+__DEFINE_TEST_CASE(TestCase_App_AppCfgTest)
 __DEF_TEST_CASE_END
 
 #undef __DEF_TEST_CASE_BEGIN

@@ -91,6 +91,7 @@
 #include "comm/TestCase_Comm_Echo.h"
 
 #include "application/TestCase_App_AppTest.h"
+#include "application/TestCase_App_AppCfgTest.h"
 
 extern int TestSuite_Main(int argc, char *argv[]);
 

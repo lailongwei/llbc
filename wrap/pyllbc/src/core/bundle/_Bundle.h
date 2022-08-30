@@ -41,7 +41,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelBundle(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetMainBundle(PyObject *self, PyObject *args)
 {
     const LLBC_Bundle *b = LLBC_Bundle::GetMainBundle();
-    return PyLong_FromLong(reinterpret_cast<long>(b));
+    return PyLong_FromLongLong(reinterpret_cast<sint64>(b));
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetBundlePath(PyObject *self, PyObject *args)

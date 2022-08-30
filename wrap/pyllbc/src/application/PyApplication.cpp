@@ -37,15 +37,12 @@ PyObject * pyllbc_Application::GetPyApp() const
     return _pyApp;
 }
 
-int pyllbc_Application::OnStart(int argc, char *argv[])
+int pyllbc_Application::OnStart(int argc, char *argv[], bool &startFinished)
 {
     return LLBC_OK;
 }
 
-void pyllbc_Application::OnStop()
+bool pyllbc_Application::OnStop()
 {
-}
-
-void pyllbc_Application::OnWait()
-{
+    return true;
 }

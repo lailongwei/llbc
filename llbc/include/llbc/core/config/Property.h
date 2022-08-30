@@ -34,6 +34,7 @@ __LLBC_NS_BEGIN
 
 class LLBC_EXPORT LLBC_Property
 {
+public:
 	static const char NameSeparator;
 	static const char NameValueSeparator;
 	static const char CommentBeg;
@@ -111,7 +112,7 @@ public:
      * Get the property count.
      * @return size_t - the properties count.
      */
-    size_t GetPropertyCount() const;
+    size_t GetPropertiesCount() const;
 
 	/**
 	 * Get the property names.

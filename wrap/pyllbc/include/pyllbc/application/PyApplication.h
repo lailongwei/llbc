@@ -30,7 +30,7 @@
  * \brief The python layer native application encapsulation.
  * TODO: for now simple encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Application : public LLBC_IApplication
+class LLBC_HIDDEN pyllbc_Application : public LLBC_Application
 {
 public:
     /**
@@ -50,17 +50,12 @@ public:
     /**
      * Application event method: OnStart.
      */
-    virtual int OnStart(int argc, char *argv[]);
+    virtual int OnStart(int argc, char *argv[], bool &startFinished);
 
     /**
      * Application event method: OnStop.
      */
-    virtual void OnStop();
-
-    /**
-     * Application event method: OnWait.
-     */
-    virtual void OnWait();
+    virtual bool OnStop();
 
 private:
     PyObject *_pyApp; // Borrowed reference.

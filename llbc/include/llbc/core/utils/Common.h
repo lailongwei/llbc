@@ -31,5 +31,6 @@
 #include "llbc/core/utils/Util_Base64.h"
 #include "llbc/core/utils/Util_Misc.h"
 #include "llbc/core/utils/Util_Network.h"
+#include "llbc/core/utils/Util_Variant.h"
 
 #endif // !__LLBC_CORE_UTILS_COMMON_H__

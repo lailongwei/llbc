@@ -74,7 +74,7 @@ void pyllbc_AddCoreMethods()
     inl->AddMethod(methods.Property_FromFile);
     inl->AddMethod(methods.Property_ToContent);
     inl->AddMethod(methods.Property_ToFile);
-    inl->AddMethod(methods.Property_GetPropertyCount);
+    inl->AddMethod(methods.Property_GetPropertiesCount);
     inl->AddMethod(methods.Property_GetPropertyNames);
     inl->AddMethod(methods.Property_GetValue);
     inl->AddMethod(methods.Property_SetValue);
