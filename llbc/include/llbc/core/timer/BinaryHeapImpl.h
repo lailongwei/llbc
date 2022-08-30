@@ -132,7 +132,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(size_t index)
         return LLBC_FAILED;
     }
 
-    if (index <= 0 || index > static_cast<int>(_size))
+    if (index <= 0 || index > _size)
     {
         LLBC_SetLastError(LLBC_ERROR_RANGE);
         return LLBC_FAILED;
