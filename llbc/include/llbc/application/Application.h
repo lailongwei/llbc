@@ -40,6 +40,37 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
+ * \brief The application config type enumeration.
+ */
+class LLBC_EXPORT LLBC_ApplicationConfigType
+{
+public:
+    enum ENUM
+    {
+        Begin = 0,
+        Ini = Begin,
+        Xml,
+        Property,
+
+        End
+    };
+
+    /**
+     * Get appliation config suffix.
+     * @param[in] cfgType - the application config type.
+     * @return const LLBC_String & - the config suffix.
+     */
+    static const LLBC_String &GetConfigSuffix(int cfgType);
+
+    /**
+     * Get config type. 
+     * @param cfgSuffix - the config suffix, case insensitive.
+     * @return ENUM - the config type, if unsupported application config, return End.
+     */
+    static ENUM GetConfigType(const LLBC_String &cfgSuffix);
+};
+
+/**
  * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
@@ -52,31 +83,23 @@ public:
 public:
     /**
      * Application start event method, please override this method in your project.
-     * @param[in] argc - the application startup arguments count.
-     * @param[in] argv - the application startup arguments.
+     * @param[in] argc           - the application startup arguments count.
+     * @param[in] argv           - the application startup arguments.
+     * @param[out] startFinished - if startup finished set true, otherwise set false, default is true.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    virtual int OnStart(int argc, char *argv[]) = 0;
-
-    /**
-     * Application wait event method, please override this method in your project.
-     */
-    virtual void OnWait() = 0;
+    virtual int OnStart(int argc, char *argv[], bool &startFinished) = 0;
 
     /**
      * Application stop event method, please override this method in your project.
+     * @return bool - return true if stop finished, otherwise return false.
      */
-    virtual void OnStop() = 0;
+    virtual bool OnStop() = 0;
 
     /**
-     * Application ini config reloaded event method, please override this method in your project.
+     * Application config reloaded event method, please override this method in your project.
      */
-    virtual void OnIniConfigReloaded();
-
-    /**
-     * Application property config reloaded event method, please override this method in your project.
-     */
-    virtual void OnPropertyConfigReloaded();
+    virtual void OnConfigReload();
 
 public:
     /**
@@ -89,6 +112,51 @@ public:
 
 public:
     /**
+     * Check have application config or not.
+     * @return bool - return true if has config, otherwise return false.
+     */
+    bool HasConfig() const;
+
+    /**
+     * Get property type config.
+     * @return const LLBC_Property & - the property config.
+     */
+    const LLBC_Property &GetPropertyConfig() const;
+
+    /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    const LLBC_Variant &GetNonPropertyConfig() const;
+
+    /**
+     * Get application config type.
+     * @return LLBC_ApplicationConfigType::ENUM - application config type.
+     */
+    LLBC_ApplicationConfigType::ENUM GetConfigType() const;
+
+    /**
+     * Get application config path.
+     * @return const LLBC_String & - the application config path.
+     */
+    const LLBC_String &GetConfigPath() const;
+
+    /**
+     * Set application config path.
+     * @param[in] cfgPath - the config path.
+     * @return int - return 0 if success, other return -1.
+     */
+    int SetConfigPath(const LLBC_String &cfgPath);
+
+    /**
+     * Reload application config.
+     * @param[in] callEvMeth - specific call event method when reload success or not.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReloadConfig(bool callEvMeth = true);
+
+public:
+    /**
      * Start application.
      * @param[in] name - the application name.
      * @param[in] argv - the application startup arguments.
@@ -97,20 +165,16 @@ public:
     int Start(const LLBC_String &name, int argc, char *argv[]);
 
     /**
-     * Check application started or not.
-     */
-    bool IsStarted() const;
-
-    /**
-     * Wait application.
-     */
-    void Wait();
-
-    /**
      * Stop application.
      */
     void Stop();
 
+    /**
+     * Check application started or not.
+     */
+    bool IsStarted() const;
+
+public:
     /**
      * Set dump file when application dump.
      * @param[in] dumpFilePath - the dump file path.
@@ -140,37 +204,6 @@ public:
 
 public:
     /**
-     * Get application ini format config.
-     * @return const LLBC_Ini & - ini config.
-     */
-    const LLBC_Ini &GetIniConfig() const;
-
-    /**
-     * Get application property format config.
-     * @return const LLBC_Property & - property config.
-     */
-    const LLBC_Property &GetPropertyConfig() const;
-
-    /**
-     * Reload application ini format config.
-     * @param[in] configPath - the config file path.
-     * @param[in] callEvMeth - specific call event method when reload success or not.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int ReloadIniConfig(bool callEvMeth = true);
-    int ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth = true);
-
-    /**
-     * Reload application property format config.
-     * @param[in] configPath - the config file path.
-     * @param[in] callEvMeth - specific call event method when reload success or not.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int ReloadPropertyConfig(bool callEvMeth = true);
-    int ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth = true);
-
-public:
-    /**
      * Get service.
      * @param[in] id - service Id.
      * @return LLBC_IService * - service.
@@ -184,35 +217,40 @@ public:
      */
     int RemoveService(int id);
 
-public:
+private:
     /**
-     * Send packet.
-     * @param[in] packet - packet.
+     * Locate application config path.
+     * @param[in] appName  - the application name.
+     * @param[out] cfgType - the application config type.
+     * @return LLBC_String - the application config path, return enpty string if failed.
+     */
+    static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
+
+    /**
+     * Reload application config.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Send(LLBC_Packet *packet);
-
-private:
-    int TryLoadConfig(bool tryIni = true, bool tryPropCfg = true);
-    int TryLoadConfig(bool &loaded, bool tryIni = true, bool tryPropCfg = true);
-    int TryLoadConfig(const LLBC_String &cfgPath, bool &loaded, bool tryIni = true, bool tryPropCfg = true);
-
-    void AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth);
+    int LoadConfig();
+    int LoadIniConfig();
+    int LoadXmlConfig();
+    int LoadPropertyConfig();
 
 protected:
     LLBC_String _name;
-    LLBC_SpinLock _lock;
+    LLBC_SpinLock _cfgLock;
 
-    LLBC_Ini _iniConfig;
-    LLBC_Property _propertyConfig;
-    bool _loadingIniCfg;
-    bool _loadingPropertyCfg;
+    bool _llbcLibStartupInApp;
+
+    volatile bool _loadingCfg;
+    LLBC_Property _propCfg;
+    LLBC_Variant _nonPropCfg;
+    LLBC_String _cfgPath;
+    LLBC_ApplicationConfigType::ENUM _cfgType;
 
     LLBC_ServiceMgr &_services;
 
 private:
     volatile bool _started;
-    bool _waited;
     LLBC_StartArgs _startArgs;
 
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -5,8 +5,17 @@
 -- #########################################################################
 -- Global compile settings
 
--- python tool define
+-- flags.
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
+
+-- solution/projects path
+SLN_PATH = "../../"
+CORELIB_PATH = SLN_PATH .. "/llbc"
+TESTSUITE_PATH = SLN_PATH .. "/testsuite"
+WRAPS_PATH = SLN_PATH .. "/wrap"
+PY_WRAP_PATH = WRAPS_PATH .. "/pyllbc"
+LU_WRAP_PATH = WRAPS_PATH .. "/lullbc"
+CS_WRAP_PATH = WRAPS_PATH .. "/csllbc"
 
 -- Capture shell cmd's output
 local function os_capture(cmd, raw)
@@ -39,20 +48,18 @@ else
 end
 
 -- All libraries output directory
-LLBC_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
+LLBC_OUTPUT_BASE_DIR = SLN_PATH .. "/output/" .. _ACTION
 if IS_WINDOWS then
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(Configuration)"
 else
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(config)"
 end
 
--- zlib library:
-local ZLIB_LIB = "../../llbc/3rd_party/zlib"
 -- #########################################################################
 
 workspace ("llbc_" .. _ACTION)
     -- location define
-    location ("../../build/" .. _ACTION)
+    location (SLN_PATH .. "/build/" .. _ACTION)
     -- target directory define
     targetdir (LLBC_OUTPUT_DIR)
 
@@ -125,22 +132,24 @@ project "llbc"
 
     -- files
     files {
-        "../../CHANGELOG",
-        "../../README.md",
-        "../../llbc/**.h",
-        "../../llbc/**.c",
-        "../../llbc/**.cpp",
+        SLN_PATH .. "/CHANGELOG",
+        SLN_PATH .. "/README.md",
+
+        CORELIB_PATH .. "/**.h",
+        CORELIB_PATH .. "/**.c",
+        CORELIB_PATH .. "/**.cpp",
     }
 
     filter { "system:macosx" }
-    files {
-        "../../llbc/**.mm",
-    }
+        files {
+            CORELIB_PATH .. "/**.mm",
+        }
     filter {}
 
     -- includedirs
     includedirs {
-        "../../llbc/include",
+        SLN_PATH,
+        CORELIB_PATH .. "/include",
     }
 
     -- target prefix
@@ -192,14 +201,14 @@ project "testsuite"
 
     -- files
     files {
-        "../../testsuite/**.h",
-        "../../testsuite/**.cpp",
+        TESTSUITE_PATH .. "/**.h",
+        TESTSUITE_PATH .. "/**.cpp",
     }
 
     -- includedirswrap\csllbc\csharp\script_tools
     includedirs {
-        "../../llbc/include",
-        "../../testsuite",
+        CORELIB_PATH .. "/include",
+        TESTSUITE_PATH,
     }
 
     -- links
@@ -284,30 +293,31 @@ project "pyllbc"
 
     -- files
     files {
-        "../../wrap/pyllbc/include/**.h",
-        "../../wrap/pyllbc/src/**.h",
-        "../../wrap/pyllbc/src/**.cpp",
+        PY_WRAP_PATH .. "/include/**.h",
+        PY_WRAP_PATH .. "/src/**.h",
+        PY_WRAP_PATH .. "/src/**.cpp",
 
-        "../../wrap/pyllbc/script/**.py",
+        PY_WRAP_PATH .. "/script/**.py",
 
-        "../../wrap/pyllbc/testsuite/**.py",
+        PY_WRAP_PATH .. "/testsuite/**.py",
     }
+
     if PYLIB_PY_VER == 2 then
         files {
-            "../../wrap/pyllbc/Python2.7.8/**.h",
+            PY_WRAP_PATH .. "/Python2.7.8/**.h" ,
         }
     elseif PYLIB_PY_VER == 3 then
         files {
-            "../../wrap/pyllbc/Python3.8.5/**.h",
+            PY_WRAP_PATH .. "/Python3.8.5/**.h",
         }
     end
 
     -- includedirs
     includedirs {
-        "../../llbc/include",
+        CORELIB_PATH .. "/include",
 
-        "../../wrap/pyllbc/include",
-        "../../wrap/pyllbc",
+        PY_WRAP_PATH .. "/include",
+        PY_WRAP_PATH,
     }
 
     if string.len(PYLIB_INCL_PATH) > 0 then
@@ -315,9 +325,9 @@ project "pyllbc"
     else -- if not specific python include path, windows platform will use specific version python, other platforms will auto detect.
         filter { "system:windows" }
             if PYLIB_PY_VER == 2 then
-                includedirs { "../../wrap/pyllbc/Python2.7.8/Include" }
+                includedirs { PY_WRAP_PATH .. "/Python2.7.8/Include" }
             elseif PYLIB_PY_VER == 3 then
-                includedirs { "../../wrap/pyllbc/Python3.8.5/Include" }
+                includedirs { PY_WRAP_PATH .. "/Python3.8.5/Include" }
             end
         filter {}
 
@@ -371,16 +381,16 @@ project "pyllbc"
     else
         filter { "system:windows", "architecture:x86" }
             if PYLIB_PY_VER == 2 then
-                libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/32" }
+                libdirs { PY_WRAP_PATH .. "/Python2.7.8/Libs/Win/32" }
             elseif PYLIB_PY_VER == 3 then
-                libdirs { "../../wrap/pyllbc/Python3.8.5/Libs/Win/32" }
+                libdirs { PY_WRAP_PATH .. "/Python3.8.5/Libs/Win/32" }
             end
         filter {}
         filter { "system:windows", "architecture:x64" }
             if PYLIB_PY_VER == 2 then
-                libdirs { "../../wrap/pyllbc/Python2.7.8/Libs/Win/64" }
+                libdirs { PY_WRAP_PATH .. "/Python2.7.8/Libs/Win/64" }
             elseif PYLIB_PY_VER == 3 then
-                libdirs { "../../wrap/pyllbc/Python3.8.5/Libs/Win/64" }
+                libdirs { PY_WRAP_PATH .. "/Python3.8.5/Libs/Win/64" }
             end
         filter {}
     end
@@ -448,14 +458,14 @@ project "csllbc_native"
 
     -- files
     files {
-        "../../wrap/csllbc/native/**.h",
-        "../../wrap/csllbc/native/**.cpp",
+        CS_WRAP_PATH .. "/native/**.h",
+        CS_WRAP_PATH .. "/native/**.cpp",
     }
 
     -- includedirs
     includedirs {
-        "../../llbc/include",
-        "../../wrap/csllbc/native/include",
+        CORELIB_PATH .. "/include",
+        CS_WRAP_PATH .. "/native/include",
     }
 
     -- links
@@ -514,7 +524,7 @@ project "csllbc"
 
     -- files
     files {
-        "../../wrap/csllbc/csharp/**.cs",
+        CS_WRAP_PATH .. "/csharp/**.cs",
     }
 
     -- dependents
@@ -585,7 +595,7 @@ project "csllbc_testsuite"
 
     -- files
     files {
-        "../../wrap/csllbc/testsuite/**.cs",
+        CS_WRAP_PATH .. "/csllbc/testsuite/**.cs",
     }
 
     -- links
@@ -640,7 +650,7 @@ project "lullbc_lualib"
     targetprefix "lib"
 
 -- lua executable compile setting
-local LUA_SRC_PATH = "../../wrap/lullbc/lua"
+local LUA_SRC_PATH = LU_WRAP_PATH .. "/lua"
 project "lullbc_luaexec"
     -- language, kind
     language "c++"
@@ -709,17 +719,17 @@ project "lullbc"
 
     -- files
     files {
-        "../../wrap/lullbc/lua/*.h",
+        LU_WRAP_PATH .. "/lua/*.h",
 
-        "../../wrap/lullbc/include/**.h",
-        "../../wrap/lullbc/src/**.h",
-        "../../wrap/lullbc/src/**.c",
-        "../../wrap/lullbc/src/**.cpp",
+        LU_WRAP_PATH .. "/include/**.h",
+        LU_WRAP_PATH .. "/src/**.h",
+        LU_WRAP_PATH .. "/src/**.c",
+        LU_WRAP_PATH .. "/src/**.cpp",
 
-        "../../wrap/lullbc/script/**.lua",
+        LU_WRAP_PATH .. "/script/**.lua",
 
-        "../../wrap/lullbc/testsuite/**.lua",
-        "../../wrap/lullbc/testsuite/**.cfg",
+        LU_WRAP_PATH .. "/testsuite/**.lua",
+        LU_WRAP_PATH .. "/testsuite/**.cfg",
     }
 
     -- define targetextension
@@ -730,9 +740,9 @@ project "lullbc"
     -- includedirs
     includedirs {
         LUALIB_INCL_PATH,
-        "../../llbc/include",
-        "../../wrap/lullbc/include",
-        "../../wrap/lullbc",
+        CORELIB_PATH .. "/include",
+        LU_WRAP_PATH .. "/include",
+        LU_WRAP_PATH,
     }
 
     -- defines

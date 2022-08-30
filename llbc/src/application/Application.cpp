@@ -189,110 +189,189 @@ __LLBC_INTERNAL_NS_END
 
 #endif // Win32
 
+__LLBC_INTERNAL_NS_BEGIN
+
+static const LLBC_NS LLBC_String __cfgSuffix_Ini = ".ini";
+static const LLBC_NS LLBC_String __cfgSuffix_Xml = ".xml";
+static const LLBC_NS LLBC_String __cfgSuffix_Property = ".cfg";
+static const LLBC_NS LLBC_String __cfgSuffix_Unknown = "";
+
+__LLBC_INTERNAL_NS_END
+
 __LLBC_NS_BEGIN
+
+const LLBC_String &LLBC_ApplicationConfigType::GetConfigSuffix(int cfgType)
+{
+    if (cfgType == Ini)
+        return LLBC_INL_NS __cfgSuffix_Ini;
+    else if (cfgType == Xml)
+        return LLBC_INL_NS __cfgSuffix_Xml;
+    else if (cfgType == Property)
+        return LLBC_INL_NS __cfgSuffix_Property;
+    else
+        return LLBC_INL_NS __cfgSuffix_Unknown;
+}
+
+auto LLBC_ApplicationConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
+{
+    auto nmlCfgSuffix = cfgSuffix.strip().tolower();
+    if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Ini)
+        return Ini;
+    else if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Xml)
+        return Xml;
+    else if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Property)
+        return Property;
+    else
+        return End;
+}
 
 LLBC_Application *LLBC_Application::_thisApp = nullptr;
 
 LLBC_Application::LLBC_Application()
 : _name()
 
-, _iniConfig()
-, _propertyConfig()
-, _loadingIniCfg(false)
-, _loadingPropertyCfg(false)
+, _llbcLibStartupInApp(false)
+
+, _loadingCfg(false)
+, _cfgType(LLBC_ApplicationConfigType::End)
 
 , _services(*LLBC_ServiceMgrSingleton)
 
 , _started(false)
-, _waited(false)
 
 #if LLBC_TARGET_PLATFORM_WIN32
 , _crashHook(nullptr)
 #endif // Win32
 {
-    if (_thisApp == nullptr)
-        _thisApp = this;
+    LLBC_DoIf(_thisApp == nullptr, _thisApp = this);
 }
 
 LLBC_Application::~LLBC_Application()
 {
-    Wait();
     Stop();
+}
+
+int LLBC_Application::SetConfigPath(const LLBC_String &cfgPath)
+{
+    // Check config file exists or not.
+    LLBC_SetErrAndReturnIf(!LLBC_File::Exists(cfgPath), LLBC_ERROR_ARG, LLBC_FAILED);
+
+    // Get config type.
+    const auto ext = LLBC_Directory::SplitExt(cfgPath)[1];
+    const auto cfgType = LLBC_ApplicationConfigType::GetConfigType(ext);
+    LLBC_SetErrAndReturnIf(cfgType < LLBC_ApplicationConfigType::Begin || 
+                                cfgType >= LLBC_ApplicationConfigType::End,
+                           LLBC_ERROR_NOT_SUPPORT,
+                           LLBC_FAILED);
+
+    // Check _started flag.
+    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Lock and check _started flag again.
+    LLBC_LockGuard guard(_cfgLock);
+    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Save config info.
+    _cfgType = cfgType;
+    _cfgPath = cfgPath;
+
+    return LLBC_OK;
+}
+
+int LLBC_Application::ReloadConfig(bool callEvMeth)
+{
+    // Not allow reload config if application not start.
+    LLBC_SetErrAndReturnIf(!_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Lock and check again.
+    LLBC_LockGuard guard(_cfgLock);
+    LLBC_SetErrAndReturnIf(!_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Config not found when application start.
+    LLBC_SetErrAndReturnIf(_cfgType == LLBC_ApplicationConfigType::End, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
+
+    // Reload.
+    LLBC_ReturnIf(LoadConfig() != LLBC_OK, LLBC_FAILED);
+
+    // Call config reload event method.
+    LLBC_DoIf(callEvMeth, OnConfigReload());
+
+    return LLBC_OK;
 }
 
 int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 {
     // Multi application check.
-    if (_thisApp != this)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
+    LLBC_SetErrAndReturnIf(_thisApp != this, LLBC_ERROR_REPEAT, LLBC_FAILED);
     // Application name check.
-    if (name.empty())
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
+    LLBC_SetErrAndReturnIf(name.empty(), LLBC_ERROR_INVALID, LLBC_FAILED);
 
     // Reentry check.
-    if (_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
+    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
     // Parse startup arguments.
-    if (_startArgs.Parse(argc, argv) != LLBC_OK)
-        return LLBC_FAILED;
+    LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
 
     // Startup llbc library.
+    int ret = LLBC_FAILED;
+    _llbcLibStartupInApp = true;
     if (LLBC_Startup() != LLBC_OK)
     {
-        if (LLBC_Errno != LLBC_ERROR_REENTRY)
-            return LLBC_FAILED;
+        LLBC_ReturnIf(LLBC_Errno != LLBC_ERROR_REENTRY, LLBC_FAILED);
 
+        _llbcLibStartupInApp = false;
         LLBC_SetLastError(LLBC_OK);
     }
 
     // Set application name.
     _name = name;
 
-    // Try load config.
-    if (TryLoadConfig() != LLBC_OK)
-    {
+    // Define app start failed defer.
+    LLBC_Defer(if (ret != LLBC_OK) { 
+        _cfgPath.clear();
+        _cfgType = LLBC_ApplicationConfigType::End;
+        _propCfg.RemoveAllProperties();
+        _nonPropCfg.BecomeNil();
+
         _name.clear();
-        return LLBC_FAILED;
+
+        LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
+    });
+
+    // Locate config path.
+    if (_cfgPath.empty())
+    {
+        int intCfgType;
+        if (!(_cfgPath = LocateConfigPath(name, intCfgType)).empty())
+            _cfgType = static_cast<LLBC_ApplicationConfigType::ENUM>(intCfgType);
     }
 
+    // Load config.
+    LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig() != LLBC_OK, LLBC_FAILED);
+
     // Call OnStart event method.
-    if (OnStart(argc, argv) != LLBC_OK)
+    while (true)
     {
-        LLBC_Cleanup();
-        return LLBC_FAILED;
+        bool startFinished = true;
+
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+        if (OnStart(argc, argv, startFinished) != LLBC_OK)
+        {
+            if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+                LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+            return LLBC_FAILED;
+        }
+
+        LLBC_BreakIf(startFinished);
+        LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
     }
 
     // Mark started.
     _started = true;
 
-    return LLBC_OK;
-}
-
-bool LLBC_Application::IsStarted() const
-{
-    return _started;
-}
-
-void LLBC_Application::Wait()
-{
-    if (!_started || _waited)
-        return;
-
-    OnWait();
-    _services.Wait();
-
-    _waited = true;
+    // Return ok.
+    ret = LLBC_OK;
+    return ret;
 }
 
 void LLBC_Application::Stop()
@@ -300,13 +379,20 @@ void LLBC_Application::Stop()
     if (!_started)
         return;
 
-    if (!_waited)
-        Wait();
+    while (true)
+    {
+        LLBC_BreakIf(OnStop());
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+    }
 
-    OnStop();
     _services.Stop();
 
-    LLBC_Cleanup();
+    _cfgPath.clear();
+    _cfgType = LLBC_ApplicationConfigType::End;
+    _propCfg.RemoveAllProperties();
+    _nonPropCfg.BecomeNil();
+
+    LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
 
     _started = false;
 }
@@ -317,16 +403,8 @@ int LLBC_Application::SetDumpFile(const LLBC_String &dumpFilePath)
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else // Win32
-    if (UNLIKELY(dumpFilePath.empty()))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-    else if (UNLIKELY(!_dumpFilePath.empty()))
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
+    LLBC_SetErrAndReturnIf(dumpFilePath.empty(), LLBC_ERROR_ARG, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(!_dumpFilePath.empty(), LLBC_ERROR_REPEAT, LLBC_FAILED);
 
     _dumpFilePath = dumpFilePath;
     const LLBC_Strings dumpFileNameParts = LLBC_Directory::SplitExt(_dumpFilePath);
@@ -365,275 +443,125 @@ int LLBC_Application::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)
 #endif // Non Win32
 }
 
-const LLBC_String &LLBC_Application::GetName() const
+LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)
 {
-    return _name;
-}
+    // Application config directory locate order:
+    // -> <cwd>
+    // -> <module file directory>
+    //    -> <cwd>/Config -> config -> Conf -> conf -> Cfg -> cfg
+    //    -> <module file directory>/Config -> config -> Conf -> conf -> Cfg -> cfg
+    //       -> <cwd>/../Config -> config -> Conf -> conf -> Cfg -> cfg
+    //       -> <module file directory>/../Config -> config -> Conf -> conf -> Cfg -> cfg
+    //          -> <cwd>/..
+    //          -> <module file directory>/..
+    //
+    // Application config filename locate order:
+    // -> app_name
+    //    -> stripped _d/_debug suffix app_name
+    //       -> executable_name
+    //          -> stripped _d/_debug suffix executable_name
+    //
+    // Application config type locate order:
+    // -> .ini
+    //    -> .xml
+    //       -> .cfg
 
-const LLBC_StartArgs &LLBC_Application::GetStartArgs() const
-{
-    return _startArgs;
-}
+    // Build config directories.
+    // -> <cwd>
+    //    -> <module file directory>
+    LLBC_Strings cfgFileDirs{LLBC_Directory::CurDir(),
+                             LLBC_Directory::ModuleFileDir()};
 
-const LLBC_Ini &LLBC_Application::GetIniConfig() const
-{
-    return _iniConfig;
-}
+    // -> <cwd>/xxxxx
+    //    -> <module file directory/xxxxx
+    const char *interDirs[] = {"Config", "config", "Conf", "conf", "Cfg", "cfg"};
+    for (auto &cfgDir : interDirs)
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), cfgDir));
+    for (auto &cfgDir : interDirs)
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), cfgDir));
+    // -> <cwd>/../xxxxx
+    //    -> <module file directory>/../xxxxx
+    for (auto &cfgDir : interDirs)
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), "..", cfgDir));
+    for (auto &cfgDir : interDirs)
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "..", cfgDir));
+    // -> <cwd>/..
+    //    -> <module file directory>/..
+    cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), ".."));
+    cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), ".."));
 
-const LLBC_Property &LLBC_Application::GetPropertyConfig() const
-{
-    return _propertyConfig;
-}
+    // Building config filenames.
+    LLBC_Strings cfgFileNames{appName};
+    if (appName.endswith("_d") || appName.endswith("_debug"))
+              cfgFileNames.push_back(appName.substr(0, appName.rfind('_')));
+    const auto execName = LLBC_Directory::SplitExt(LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName()))[0];
+    cfgFileNames.push_back(execName);
+    if (execName.endswith("_d") || execName.endswith("_debug"))
+        cfgFileNames.push_back(execName.substr(0, execName.rfind('_')));
 
-int LLBC_Application::ReloadIniConfig(bool callEvMeth)
-{
-    LLBC_LockGuard guard(_lock);
-
-    if (_loadingIniCfg)
+    // Execute config file locate.
+    for (auto &cfgFileDir : cfgFileDirs)
     {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    _loadingIniCfg = true;
-
-    bool loaded = false;
-    if (TryLoadConfig(loaded, true, false) != LLBC_OK)
-    {
-        _loadingIniCfg = false;
-        return LLBC_FAILED;
-    }
-
-    if (!loaded)
-    {
-        _loadingIniCfg = false;
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-
-        return LLBC_FAILED;
-    }
-
-    _loadingIniCfg = false;
-
-    AfterReloadConfig(true, false, callEvMeth);
-
-    return LLBC_OK;
-}
-
-int LLBC_Application::ReloadIniConfig(const LLBC_String &configPath, bool callEvMeth)
-{
-    LLBC_LockGuard guard(_lock);
-
-    if (_loadingIniCfg)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    _loadingIniCfg = true;
-
-    bool loaded = false;
-    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
-    if (TryLoadConfig(splited[0], loaded, true, false) != LLBC_OK)
-    {
-        _loadingIniCfg = false;
-        return LLBC_FAILED;
-    }
-
-    if (!loaded)
-    {
-        _loadingIniCfg = false;
-
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    _loadingIniCfg = false;
-
-    AfterReloadConfig(true, false, callEvMeth);
-
-    return LLBC_OK;
-}
-
-int LLBC_Application::ReloadPropertyConfig(bool callEvMeth)
-{
-    LLBC_LockGuard guard(_lock);
-
-    if (_loadingPropertyCfg)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    _loadingPropertyCfg = true;
-
-    bool loaded = false;
-    if (TryLoadConfig(loaded, false, true) != LLBC_OK)
-    {
-        _loadingPropertyCfg = false;
-        return LLBC_FAILED;
-    }
-
-    if (!loaded)
-    {
-        _loadingPropertyCfg = false;
-
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    _loadingPropertyCfg = false;
-
-    AfterReloadConfig(false, true, callEvMeth);
-
-    return LLBC_OK;
-}
-
-int LLBC_Application::ReloadPropertyConfig(const LLBC_String &configPath, bool callEvMeth)
-{
-    LLBC_LockGuard guard(_lock);
-
-    if (_loadingPropertyCfg)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    _loadingPropertyCfg = true;
-
-    bool loaded = false;
-    LLBC_Strings splited = LLBC_Directory::SplitExt(configPath);
-    if (TryLoadConfig(splited[0], loaded, false, true) != LLBC_OK)
-    {
-        _loadingPropertyCfg = false;
-        return LLBC_FAILED;
-    }
-
-    if (!loaded)
-    {
-        _loadingPropertyCfg = false;
-
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    _loadingPropertyCfg = false;
-
-    AfterReloadConfig(false, true, callEvMeth);
-
-    return LLBC_OK;
-}
-
-LLBC_IService *LLBC_Application::GetService(int id) const
-{
-    return _services.GetService(id);
-}
-
-int LLBC_Application::RemoveService(int id)
-{
-    return _services.RemoveService(id);
-}
-
-int LLBC_Application::Send(LLBC_Packet *packet)
-{
-    LLBC_IService *service = _services.GetService(packet->GetSenderServiceId());
-    if(!service)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
-    return service->Send(packet);
-}
-
-int LLBC_Application::TryLoadConfig(bool tryIni, bool tryPropCfg)
-{
-    bool loaded = false;
-    return TryLoadConfig(loaded, tryIni, tryPropCfg);
-}
-
-int LLBC_Application::TryLoadConfig(bool &loaded, bool tryIni, bool tryPropCfg)
-{
-    loaded = false;
-
-    // Build all try paths.
-    LLBC_Strings tryPaths;
-    tryPaths.push_back("Config/" + _name);
-    tryPaths.push_back("config/" + _name);
-    tryPaths.push_back("Conf/" + _name);
-    tryPaths.push_back("conf/" + _name);
-    tryPaths.push_back("Cfg/" + _name);
-    tryPaths.push_back("cfg/" + _name);
-    tryPaths.push_back(_name);
-
-    const size_t tryPathsCount = tryPaths.size();
-    for (size_t i = 0; i < tryPathsCount; ++i)
-        tryPaths.push_back("../" + tryPaths[i]);
-
-    // Try load.
-    for (LLBC_Strings::const_iterator iter = tryPaths.begin();
-        iter != tryPaths.end();
-        ++iter)
-    {
-        if (TryLoadConfig(*iter, loaded, tryIni, tryPropCfg) != LLBC_OK)
-            return LLBC_FAILED;
-
-        if (loaded)
-            break;
-    }
-
-    return LLBC_OK;
-}
-
-int LLBC_Application::TryLoadConfig(const LLBC_String &path, bool &loaded, bool tryIni, bool tryPropCfg)
-{
-    loaded = false;
-
-    // Try load ini config file.
-    if (tryIni)
-    {
-        const LLBC_String iniPath = path + ".ini";
-        if (LLBC_File::Exists(iniPath))
+        for (auto &cfgFileName : cfgFileNames)
         {
-            if (_iniConfig.LoadFromFile(iniPath) != LLBC_OK)
-                return LLBC_FAILED;
-
-            loaded = true;
+            for (cfgType = LLBC_ApplicationConfigType::Begin;
+                 cfgType != LLBC_ApplicationConfigType::End;
+                 ++cfgType)
+            {
+                const auto cfgPath = LLBC_Directory::Join(
+                    cfgFileDir, cfgFileName + LLBC_ApplicationConfigType::GetConfigSuffix(cfgType));
+                LLBC_ReturnIf(LLBC_File::Exists(cfgPath), cfgPath);
+            }
         }
     }
 
-    // Try load property config file.
-    if (tryPropCfg)
-    {
-        const LLBC_String propPath = path + ".cfg";
-        if (LLBC_File::Exists(propPath))
-        {
-            if (_propertyConfig.LoadFromFile(propPath) != LLBC_OK)
-                return LLBC_FAILED;
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+    return "";
+}
 
-            loaded = true;
-        }
-    }
+int LLBC_Application::LoadConfig()
+{
+    // Reentry check.
+    LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
-    // Finally, not found any llbc library supported config format file, return OK.
+    // Lock and check again.
+    LLBC_LockGuard guard(_cfgLock);
+    LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
+
+    // Check config file exist or not.
+    LLBC_SetErrAndReturnIf(!LLBC_File::Exists(_cfgPath), LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
+
+    _loadingCfg = true;
+    LLBC_Defer(_loadingCfg = false);
+
+    LLBC_DoIf(_cfgType == LLBC_ApplicationConfigType::Ini, return LoadIniConfig());
+    LLBC_DoIf(_cfgType == LLBC_ApplicationConfigType::Xml, return LoadXmlConfig());
+    LLBC_DoIf(true, return LoadPropertyConfig());
+}
+
+int LLBC_Application::LoadIniConfig()
+{
+    LLBC_Ini ini;
+    LLBC_ReturnIf(ini.LoadFromFile(_cfgPath) != LLBC_OK, LLBC_FAILED);
+
+    LLBC_VariantUtil::Ini2Variant(ini, _nonPropCfg);
     return LLBC_OK;
 }
 
-void LLBC_Application::AfterReloadConfig(bool iniReloaded, bool propReloaded, bool callEvMeth)
+int LLBC_Application::LoadXmlConfig()
 {
-    if (!callEvMeth)
-        return;
+    ::llbc::tinyxml2::XMLDocument doc;
+    LLBC_SetErrAndReturnIf(doc.LoadFile(_cfgPath.c_str()) != ::llbc::tinyxml2::XML_SUCCESS,
+                           LLBC_ERROR_FORMAT,
+                           LLBC_FAILED);
 
-    if (iniReloaded)
-        OnIniConfigReloaded();
-    if (propReloaded)
-        OnPropertyConfigReloaded();
+    LLBC_VariantUtil::Xml2Variant(doc, _nonPropCfg);
+    return LLBC_OK;
+}
 
-    typedef LLBC_ServiceMgr::Id2Services _Services;
-    const _Services &services = _services.GetAllIndexedByIdServices();
-    for (_Services::const_iterator it = services.begin();
-         it != services.end();
-         ++it)
-        it->second->NtyApplicationConfigReloaded(iniReloaded, propReloaded);
+int LLBC_Application::LoadPropertyConfig()
+{
+    return _propCfg.LoadFromFile(_cfgPath);
 }
 
 __LLBC_NS_END

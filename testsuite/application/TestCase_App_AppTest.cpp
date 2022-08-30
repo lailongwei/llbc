@@ -32,7 +32,7 @@ namespace
         }
 
     public:
-        virtual int OnStart(int argc, char *arg[])
+        virtual int OnStart(int argc, char *arg[], bool &startFinished)
         {
             LLBC_PrintLine("Application start, create new service for test");
 
@@ -46,15 +46,12 @@ namespace
             return 0;
         }
 
-        virtual void OnWait()
-        {
-            LLBC_PrintLine("Application wait");
-        }
-
-        virtual void OnStop()
+        virtual bool OnStop()
         {
             LLBC_PrintLine("Application stop");
             LLBC_XDelete(_testSvc);
+
+            return true;
         }
 
     private:

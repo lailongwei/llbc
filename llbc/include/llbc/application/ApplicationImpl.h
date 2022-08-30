@@ -23,11 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_Application::OnIniConfigReloaded()
-{
-}
-
-inline void LLBC_Application::OnPropertyConfigReloaded()
+inline void LLBC_Application::OnConfigReload()
 {
 }
 
@@ -40,6 +36,56 @@ inline App *LLBC_Application::ThisApp()
 inline LLBC_Application *LLBC_Application::ThisApp()
 {
     return _thisApp;
+}
+
+inline bool LLBC_Application::HasConfig() const
+{
+    return !_cfgPath.empty();
+}
+
+inline const LLBC_Property &LLBC_Application::GetPropertyConfig() const
+{
+    return _propCfg;
+}
+
+inline const LLBC_Variant &LLBC_Application::GetNonPropertyConfig() const
+{
+    return _nonPropCfg;
+}
+
+inline LLBC_ApplicationConfigType::ENUM LLBC_Application::GetConfigType() const
+{
+    return _cfgType;
+}
+
+inline const LLBC_String &LLBC_Application::GetConfigPath() const
+{
+    return _cfgPath;
+}
+
+inline bool LLBC_Application::IsStarted() const
+{
+    return _started;
+}
+
+inline const LLBC_String &LLBC_Application::GetName() const
+{
+    return _name;
+}
+
+inline const LLBC_StartArgs &LLBC_Application::GetStartArgs() const
+{
+    return _startArgs;
+}
+
+inline LLBC_IService *LLBC_Application::GetService(int id) const
+{
+    return _services.GetService(id);
+}
+
+inline int LLBC_Application::RemoveService(int id)
+{
+    return _services.RemoveService(id);
 }
 
 __LLBC_NS_END
