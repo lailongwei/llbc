@@ -138,6 +138,8 @@ project "llbc"
         CORELIB_PATH .. "/**.h",
         CORELIB_PATH .. "/**.c",
         CORELIB_PATH .. "/**.cpp",
+
+        SLN_PATH .. "/tools/premake/*.lua",
     }
 
     filter { "system:macosx" }
@@ -595,7 +597,7 @@ project "csllbc_testsuite"
 
     -- files
     files {
-        CS_WRAP_PATH .. "/csllbc/testsuite/**.cs",
+        CS_WRAP_PATH .. "/testsuite/**.cs",
     }
 
     -- links
