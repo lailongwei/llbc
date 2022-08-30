@@ -225,7 +225,7 @@ LLBC_String LLBC_Property::GetName() const
     return name;
 }
 
-size_t LLBC_Property::GetPropertyCount() const
+size_t LLBC_Property::GetPropertiesCount() const
 {
     return (_properties ? _properties->size() : 0);
 }

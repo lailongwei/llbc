@@ -361,4 +361,22 @@ private:                                            \
  */
 #define LLBC_Defer(behav) LLBC_NS LLBC_InvokeGuard LLBC_Concat(__invokeGuard__, __LINE__)([&]() { behav; })
 
+/**
+ * Some condition judge helper macros.
+ */
+#define LLBC_DoIf(cond, behav) \
+    if (cond) { behav; }       \
+
+#define LLBC_BreakIf(cond) \
+    if (cond) break        \
+
+#define LLBC_SetErrAndBreakIf(cond, err)                 \
+    if (cond) { LLBC_NS LLBC_SetLastError(err); break; } \
+
+#define LLBC_ReturnIf(cond, ret) \
+    if (cond) { return ret; }    \
+
+#define LLBC_SetErrAndReturnIf(cond, err, ret)                \
+    if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
+
 #endif // !__LLBC_COM_MACRO_H__

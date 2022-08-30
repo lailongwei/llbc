@@ -622,12 +622,12 @@ protected:
 
 protected:
     /**
-     * Declare friend class: LLBC_IApplication.
+     * Declare friend class: LLBC_Application.
      *  Access method list:
      *      NtyApplicationIniConfigReload()
      *      NtyApplicationPropertyConfigReload()
      */
-    friend class LLBC_IApplication;
+    friend class LLBC_Application;
 
     /**
      * Application ini/property config reload event notifiy method.
