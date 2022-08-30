@@ -148,7 +148,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
     // Get the new old sub property.
     pyllbc_ObjAttrOptr attrOptr(pySubProp);
 
-    long oldSubProp = 0;
+    sint64 oldSubProp = 0;
     if (attrOptr.GetAttr("_c_obj", oldSubProp) != LLBC_OK)
     {
         Py_DECREF(pySubProp);
@@ -157,7 +157,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
 
     // Set new sub property.
     LLBC_Property *copySubProp = LLBC_New(LLBC_Property, *subProp);
-    if (attrOptr.SetAttr("_c_obj", reinterpret_cast<long>(copySubProp)) != LLBC_OK)
+    if (attrOptr.SetAttr("_c_obj", reinterpret_cast<sint64>(copySubProp)) != LLBC_OK)
     {
         Py_DECREF(pySubProp);
         LLBC_Delete(copySubProp);
@@ -171,13 +171,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
     return pySubProp;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_Property_GetPropertyCount(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_Property_GetPropertiesCount(PyObject *self, PyObject *args)
 {
     LLBC_Property *prop;
     if (!PyArg_ParseTuple(args, "l", &prop))
         return nullptr;
 
-    return PyInt_FromSize_t(prop->GetPropertyCount());
+    return PyInt_FromSize_t(prop->GetPropertiesCount());
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_Property_GetPropertyNames(PyObject *self, PyObject *args)
