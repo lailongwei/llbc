@@ -19,175 +19,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/Application.h"
-
-#if LLBC_TARGET_PLATFORM_WIN32
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static const char *__dumpFilePath = nullptr;
-static LLBC_NS LLBC_Delegate<void(const LLBC_NS LLBC_String &)> __crashHook = nullptr;
-
-static void __GetExceptionBackTrace(PCONTEXT ctx, LLBC_NS LLBC_String &backTrace)
-{
-#if LLBC_TARGET_PROCESSOR_X86
-    DWORD machineType = IMAGE_FILE_MACHINE_I386;
-#elif LLBC_TARGET_PROCESSOR_X86_64
-    DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
-#else // Not supported dump processor types.
-    return;
-#endif
-
-    STACKFRAME64 stackFrame64;
-    ::memset(&stackFrame64, 0, sizeof(STACKFRAME64));
-#if LLBC_TARGET_PROCESSOR_X86
-    stackFrame64.AddrPC.Offset = ctx->Eip;
-    stackFrame64.AddrPC.Mode = AddrModeFlat;
-    stackFrame64.AddrStack.Offset = ctx->Esp;
-    stackFrame64.AddrStack.Mode = AddrModeFlat;
-    stackFrame64.AddrFrame.Offset = ctx->Ebp;
-    stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#elif LLBC_TARGET_PROCESSOR_X86_64
-    stackFrame64.AddrPC.Offset = ctx->Rip;
-    stackFrame64.AddrPC.Mode = AddrModeFlat;
-    stackFrame64.AddrStack.Offset = ctx->Rsp;
-    stackFrame64.AddrStack.Mode = AddrModeFlat;
-    stackFrame64.AddrFrame.Offset = ctx->Rbp;
-    stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#endif
-
-    HANDLE curProc = ::GetCurrentProcess();
-    HANDLE curThread = ::GetCurrentThread();
-    LLBC_NS LLBC_Strings backTraces;
-    while (true)
-    {
-        if (!::StackWalk64(machineType,
-                           curProc,
-                           curThread,
-                           &stackFrame64,
-                           ctx,
-                           nullptr,
-                           ::SymFunctionTableAccess64,
-                           ::SymGetModuleBase64,
-                           nullptr))
-            break;
-
-        if (stackFrame64.AddrFrame.Offset == 0)
-            break;
-
-        BYTE symbolBuffer[sizeof(SYMBOL_INFO) + 512];
-        PSYMBOL_INFO symbol = (PSYMBOL_INFO)(symbolBuffer);
-        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-        symbol->MaxNameLen = 511;
-
-        if (!::SymFromAddr(curProc, stackFrame64.AddrPC.Offset, nullptr, symbol))
-            break;
-
-        DWORD symDisplacement = 0;
-        IMAGEHLP_LINE64 lineInfo = { sizeof(IMAGEHLP_LINE64) };
-        if (::SymGetLineFromAddr64(curProc, stackFrame64.AddrPC.Offset, &symDisplacement, &lineInfo))
-        {
-            backTraces.push_back(LLBC_NS LLBC_String().format("0x%x in %s at %s:%d",
-                (void *)symbol->Address, symbol->Name, lineInfo.FileName, lineInfo.LineNumber));
-        }
-        else
-        {
-            backTraces.push_back(LLBC_NS LLBC_String().format("0x%x in %s at %s:%d",
-                (void *)symbol->Address, symbol->Name, "", 0));
-        }
-    }
-
-    for (size_t i = 0; i < backTraces.size(); ++i)
-        backTrace.append_format("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
-}
-
-static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
-{
-    HANDLE dmpFile = ::CreateFileA(__dumpFilePath,
-                                   GENERIC_WRITE,
-                                   FILE_SHARE_READ,
-                                   nullptr,
-                                   CREATE_ALWAYS,
-                                   FILE_ATTRIBUTE_NORMAL,
-                                   nullptr);
-    if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
-        return EXCEPTION_CONTINUE_SEARCH;
-
-    LLBC_NS LLBC_String errMsg;
-    errMsg.append("Unhandled exception!\n");
-    errMsg.append_format("Mini dump file path:%s\n", __dumpFilePath);
-
-    ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
-    dmpInfo.ExceptionPointers = exception;
-    dmpInfo.ThreadId = GetCurrentThreadId();
-    dmpInfo.ClientPointers = TRUE;
-
-    const ::BOOL writeDumpSucc = MiniDumpWriteDump(::GetCurrentProcess(),
-                                                   ::GetCurrentProcessId(),
-                                                   dmpFile,
-                                                   (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
-                                                   &dmpInfo,
-                                                   nullptr,
-                                                   nullptr);
-    if (UNLIKELY(!writeDumpSucc))
-    {
-        LLBC_NS LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        errMsg.append_format("Write dump failed, error:%s\n", LLBC_NS LLBC_FormatLastError());
-    }
-
-    ::CloseHandle(dmpFile);
-    if (__crashHook)
-        __crashHook(__dumpFilePath);
-
-    LLBC_NS LLBC_String backTrace;
-    __GetExceptionBackTrace(exception->ContextRecord, backTrace);
-    errMsg.append_format("Stack BackTrace:\n%s\n", backTrace.c_str());
-
-    LLBC_NS LLBC_String mbTitle;
-    mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::BaseName(LLBC_NS LLBC_Directory::ModuleFileName()).c_str());
-    ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
-
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-
-static BOOL __PreventSetUnhandledExceptionFilter()
-{
-    HMODULE kernel32 = ::LoadLibraryA("kernel32.dll");
-    if (kernel32 == nullptr)
-        return FALSE;
-
-    void *orgEntry = (void *)::GetProcAddress(kernel32, "SetUnhandledExceptionFilter");
-    if (orgEntry == nullptr)
-        return FALSE;
-
-#ifdef _M_IX86
-    // Code for x86:
-    // 33 C0    xor eax, eax
-    // C2 04 00 ret 4
-    unsigned char execute[] = { 0x33, 0xc0, 0xc2, 0x04, 0x00 };
-#elif _M_X64
-    // Code for x64
-    // 33 c0    xor eax, eax
-    // c3       ret
-    unsigned char execute[] = { 0x33, 0xc0, 0xc3 };
-#else
- #error "Unsupported architecture(on windows platform)!"
-#endif
-
-    SIZE_T bytesWritten = 0;
-    return ::WriteProcessMemory(GetCurrentProcess(),
-                                orgEntry,
-                                execute,
-                                sizeof(execute),
-                                &bytesWritten);
-}
-
-__LLBC_INTERNAL_NS_END
-
-#endif // Win32
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -323,7 +159,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
         LLBC_SetLastError(LLBC_OK);
     }
 
-    // Set application name.
+    // Set name.
     _name = name;
 
     // Define app start failed defer.
@@ -395,52 +231,6 @@ void LLBC_Application::Stop()
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
 
     _started = false;
-}
-
-int LLBC_Application::SetDumpFile(const LLBC_String &dumpFilePath)
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_FAILED;
-#else // Win32
-    LLBC_SetErrAndReturnIf(dumpFilePath.empty(), LLBC_ERROR_ARG, LLBC_FAILED);
-    LLBC_SetErrAndReturnIf(!_dumpFilePath.empty(), LLBC_ERROR_REPEAT, LLBC_FAILED);
-
-    _dumpFilePath = dumpFilePath;
-    const LLBC_Strings dumpFileNameParts = LLBC_Directory::SplitExt(_dumpFilePath);
-
-    LLBC_Time now = LLBC_Time::Now();
-    _dumpFilePath = dumpFileNameParts[0];
-    _dumpFilePath.append_format("_%d%02d%02d_%02d%02d%02d_%06d%s",
-        now.GetYear(), now.GetMonth(), now.GetDay(), now.GetHour(), now.GetMinute(),
-        now.GetSecond(), now.GetMilliSecond() * 1000 + now.GetMicroSecond(), dumpFileNameParts[1].c_str());
-    if (dumpFileNameParts[1] != ".dmp")
-        _dumpFilePath += ".dmp";
-
-    _dumpFilePath = LLBC_Directory::AbsPath(_dumpFilePath);
-
-    LLBC_INL_NS __dumpFilePath = _dumpFilePath.c_str();
-
-    ::SetUnhandledExceptionFilter(LLBC_INL_NS __AppCrashHandler);
-
-#ifdef LLBC_RELEASE
-    LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
-#endif // Release
-
-    return LLBC_OK;
-#endif // Non Win32
-}
-
-int LLBC_Application::SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook)
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_FAILED;
-#else // Win32
-    _crashHook = crashHook;
-    LLBC_INL_NS __crashHook = crashHook;
-    return LLBC_OK;
-#endif // Non Win32
 }
 
 LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)
