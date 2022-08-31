@@ -125,6 +125,11 @@ workspace ("llbc_" .. _ACTION)
         characterset "MBCS"
     filter {}
 
+    -- enable obtaining backtraces from within a program
+    filter { "system:not windows", "language:c++" }
+        linkoptions { "-rdynamic" }
+    filter {}
+
 -- ****************************************************************************
 -- llbc core library compile setting
 project "llbc"
@@ -255,11 +260,11 @@ project "testsuite"
     filter {}
 
     -- warnings
-    filter { "system:not windows" }
-        disablewarnings {
-            "invalid-source-encoding",
-        }
-    filter {}
+    -- filter { "system:not windows" }
+    --     disablewarnings {
+    --         "invalid-source-encoding",
+    --     }
+    -- filter {}
 
     -- Enable c++11 support.
     filter { "system:not windows" }
