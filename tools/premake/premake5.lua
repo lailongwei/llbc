@@ -62,6 +62,8 @@ workspace ("llbc_" .. _ACTION)
     location (SLN_PATH .. "/build/" .. _ACTION)
     -- target directory define
     targetdir (LLBC_OUTPUT_DIR)
+    -- start project
+    startproject("testsuite")
 
     -- configurations
     configurations { "release32", "debug32", "release64", "debug64" }
