@@ -36,7 +36,10 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    int TestCrashHook();
+    int TestCrash();
+    void TestCrash_DivisionByZero();
+    void TestCrash_InvalidPtrWrite();
+    void TestCrash_InvalidPtrRead();
 };
 
 #endif // !__LLBC_TEST_CASE_CORE_OS_PROCESS_H__

@@ -22,6 +22,7 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/time/time.h"
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HOOK_PROCESS_CRASH
 #include "llbc/core/file/Directory.h"
@@ -52,9 +53,9 @@ __LLBC_INTERNAL_NS_END
 #if LLBC_TARGET_PLATFORM_WIN32
 __LLBC_INTERNAL_NS_BEGIN
 
-static char __dumpFilePath[PATH_MAX + 1];
+static char __dumpFilePath[MAX_PATH + 1];
 
-static void __GetExceptionBackTrace(PCONTEXT ctx, const char *stackBacktrace, size_t backtraceSize)
+static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t backtraceSize)
 {
     // Dump backtrace head line.
     stackBacktrace[0] = '\0';
@@ -118,10 +119,12 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, const char *stackBacktrace, si
         if (!::SymFromAddr(curProc, stackFrame64.AddrPC.Offset, nullptr, symbol))
             break;
 
-        const int lineNo = 0;
+        int lineNo = 0;
         const char *fileName = nullptr;
         DWORD symDisplacement = 0;
-        IMAGEHLP_LINE64 lineInfo = { sizeof(IMAGEHLP_LINE64) };
+        IMAGEHLP_LINE64 lineInfo;
+        memset(&lineInfo, 0, sizeof(IMAGEHLP_LINE64));
+        lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
         if (::SymGetLineFromAddr64(curProc, stackFrame64.AddrPC.Offset, &symDisplacement, &lineInfo))
         {
             fileName = lineInfo.FileName;
@@ -130,10 +133,10 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, const char *stackBacktrace, si
 
         const auto usedCap = snprintf(stackBacktrace,
                                       backtraceSize,
-                                      "#%d 0x%x in %s at %s:%d\n",
-                                      frameNo++, (void *)symbol->Address, symbol->Name, fileName ? fileName : "", lineNo);
+                                      "#%d 0x%p in %s at %s:%d\n",
+                                      frameNo++, reinterpret_cast<void *>(symbol->Address), symbol->Name, fileName ? fileName : "", lineNo);
         if (usedCap <= 0 ||
-            usedCap >= backtraceSize - 1)
+            usedCap >= static_cast<int>(backtraceSize) - 1)
             return;
 
         backtraceSize -= usedCap;
@@ -177,7 +180,7 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
 
     ::CloseHandle(dmpFile);
     __GetExceptionBackTrace(exception->ContextRecord, __stackBacktrace, sizeof(__stackBacktrace));
-    errMsg.append_format("Stack BackTrace:\n%s\n", __stackBacktrace.c_str());
+    errMsg.append_format("%s\n", __stackBacktrace);
 
     LLBC_NS LLBC_String mbTitle;
     mbTitle.format("Unhandled Exception(%s)",
@@ -338,13 +341,10 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     LLBC_String nmlDumpFilePath = dumpFilePath;
     if (nmlDumpFilePath.empty())
     {
+        const auto now = LLBC_Time::Now();
         const auto modName = LLBC_Directory::ModuleFileName();
-        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0] + ".dmp";
-    }
-    else if (LLBC_Directory::Exists(nmlDumpFilePath))
-    {
-        const auto execFileName = LLBC_Directory::DirName(LLBC_Directory::ModuleFileName());
-        nmlDumpFilePath = LLBC_Directory::Join(nmlDumpFilePath, LLBC_Directory::SplitExt(execFileName)[0] + ".dmp");
+        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+        nmlDumpFilePath.append_format("_%d_%s.dmp", LLBC_GetCurrentProcessId(), now.Format("%Y%m%d_%H%M%S").c_str());
     }
 
     if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
@@ -354,7 +354,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     }
 
     ::memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
-    __dumpFilePath[nmlDumpFilePath.size()] = '\0';
+    LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
     if (!LLBC_INL_NS __hookedCrash)
     {

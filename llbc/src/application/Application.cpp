@@ -75,9 +75,6 @@ LLBC_Application::LLBC_Application()
 
 , _started(false)
 
-#if LLBC_TARGET_PLATFORM_WIN32
-, _crashHook(nullptr)
-#endif // Win32
 {
     LLBC_DoIf(_thisApp == nullptr, _thisApp = this);
 }

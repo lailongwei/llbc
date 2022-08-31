@@ -27,7 +27,7 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
     std::cout <<"core/os/process test:" <<std::endl;
 
     // Test crash hook.
-    if (TestCrashHook() != LLBC_OK)
+    if (TestCrash() != LLBC_OK)
         return LLBC_FAILED;
 
     std::cout <<"Press any key to continue..." <<std::endl;
@@ -36,36 +36,22 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
     return 0;
 }
 
-int TestCase_Core_OS_Process::TestCrashHook()
+int TestCase_Core_OS_Process::TestCrash()
 {
-    std::cout <<"Crash hook test:" <<std::endl;
+    std::cout << "Crash hook test:" << std::endl;
 
 #if LLBC_SUPPORT_HOOK_PROCESS_CRASH
     // Set crash hook.
-    std::cout <<"Hook process crash..." <<std::endl;
+    std::cout << "Hook process crash..." << std::endl;
     if (LLBC_HookProcessCrash() != LLBC_OK)
     {
-        std::cerr <<"Hook process crash failed, err:" <<LLBC_FormatLastError() <<std::endl;
+        std::cerr << "Hook process crash failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
 
-    #if LLBC_TARGET_PLATFORM_WIN32
-    #else // Linux and Macosx
-    // Raise SIGPIPE
-    std::cout <<"Trigger SIGFPE signal..." <<std::endl;
-    #if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdiv-by-zero"
-    #endif // GCC compiler
-    std::cout <<"3 / 0= " <<3 / 0 <<std::endl;
-    #if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
-    #pragma GCC diagnostic pop
-    #endif // GCC compiler
-
-    // Raise SIGSEGV
-    std::cout <<"Trigger SIGSEGV signal..." <<std::endl;
-    std::cout <<"*((int *)3) = " <<*((int *)3) <<std::endl;
-    #endif // Win32
+    TestCrash_DivisionByZero();
+    TestCrash_InvalidPtrRead();
+    TestCrash_InvalidPtrWrite();
 
     return LLBC_OK;
 #else
@@ -73,3 +59,28 @@ int TestCase_Core_OS_Process::TestCrashHook()
     return LLBC_OK;
 #endif
 }
+
+void TestCase_Core_OS_Process::TestCrash_DivisionByZero()
+{
+    std::cout << "Trigger division by 0 exception..." << std::endl;
+    std::cout << "3 / 0 = " << 3 / LLBC_Str2Int32("0") << std::endl;
+}
+
+void TestCase_Core_OS_Process::TestCrash_InvalidPtrWrite()
+{
+    std::cout << "Test invalid pointer write" << std::endl;
+
+    int *invalidPtr4Write = nullptr;
+    *invalidPtr4Write = 3;
+
+    std::cout << *invalidPtr4Write << std::endl;
+}
+
+void TestCase_Core_OS_Process::TestCrash_InvalidPtrRead()
+{
+    LLBC_PrintLine("Test invalid pointer read");
+
+    int *invalidPtr4Write = nullptr;
+    std::cout << *invalidPtr4Write << std::endl;
+}
+ 
