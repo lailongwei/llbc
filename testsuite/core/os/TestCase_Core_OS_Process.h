@@ -19,56 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "application/TestCase_App_AppTest.h"
 
-namespace
+#ifndef __LLBC_TEST_CASE_CORE_OS_PROCESS_H__
+#define __LLBC_TEST_CASE_CORE_OS_PROCESS_H__
+
+#include "llbc.h"
+using namespace llbc;
+
+class TestCase_Core_OS_Process : public LLBC_BaseTestCase
 {
-    class TestApp : public LLBC_Application
-    {
-    public:
-        TestApp()
-        {
-            _testSvc = nullptr;
-        }
+public:
+    TestCase_Core_OS_Process() = default;
+    virtual ~TestCase_Core_OS_Process() = default;
 
-    public:
-        virtual int OnStart(int argc, char *arg[], bool &startFinished)
-        {
-            LLBC_PrintLine("Application start, create new service for test");
-            return LLBC_OK;
-        }
+public:
+    virtual int Run(int argc, char *argv[]);
 
-        virtual bool OnStop()
-        {
-            LLBC_PrintLine("Application stop");
-            LLBC_XDelete(_testSvc);
+private:
+    int TestCrash();
+    void TestCrash_DivisionByZero();
+    void TestCrash_InvalidPtrWrite();
+    void TestCrash_InvalidPtrRead();
+};
 
-            return true;
-        }
-
-    private:
-        LLBC_IService *_testSvc;
-    };
-}
-
-TestCase_App_AppTest::TestCase_App_AppTest()
-{
-}
-
-TestCase_App_AppTest::~TestCase_App_AppTest()
-{
-}
-
-int TestCase_App_AppTest::Run(int argc, char *argv[])
-{
-    LLBC_PrintLine("Application/AppTest:");
-
-    TestApp app;
-    app.Start("TestApp", argc, argv);
-    app.Stop();
-
-    LLBC_PrintLine("Press any key to continue...");
-    getchar();
-
-    return LLBC_OK;
-}
+#endif // !__LLBC_TEST_CASE_CORE_OS_PROCESS_H__

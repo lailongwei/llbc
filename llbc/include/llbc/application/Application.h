@@ -176,21 +176,6 @@ public:
 
 public:
     /**
-     * Set dump file when application dump.
-     * @param[in] dumpFilePath - the dump file path.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int SetDumpFile(const LLBC_String &dumpFilePath);
-
-    /**
-     * Set crash hook, invoke after crashed.
-     * @param[in] crashHook - the crash hook.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int SetCrashHook(const LLBC_Delegate<void(const LLBC_String &)> &crashHook);
-
-public:
-    /**
      * Get application name.
      * @return const LLBC_String & - application name.
      */
@@ -252,11 +237,6 @@ protected:
 private:
     volatile bool _started;
     LLBC_StartArgs _startArgs;
-
-#if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_String _dumpFilePath;
-    LLBC_Delegate<void(const LLBC_String &)> _crashHook;
-#endif // Win32
 
     static LLBC_Application *_thisApp;
 };

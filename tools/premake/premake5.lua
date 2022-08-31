@@ -62,6 +62,8 @@ workspace ("llbc_" .. _ACTION)
     location (SLN_PATH .. "/build/" .. _ACTION)
     -- target directory define
     targetdir (LLBC_OUTPUT_DIR)
+    -- start project
+    startproject("testsuite")
 
     -- configurations
     configurations { "release32", "debug32", "release64", "debug64" }
@@ -121,6 +123,11 @@ workspace ("llbc_" .. _ACTION)
     -- characterset architecture
     filter { "language:c++" }
         characterset "MBCS"
+    filter {}
+
+    -- enable obtaining backtraces from within a program
+    filter { "system:not windows", "language:c++" }
+        linkoptions { "-rdynamic" }
     filter {}
 
 -- ****************************************************************************
@@ -253,11 +260,11 @@ project "testsuite"
     filter {}
 
     -- warnings
-    filter { "system:not windows" }
-        disablewarnings {
-            "invalid-source-encoding",
-        }
-    filter {}
+    -- filter { "system:not windows" }
+    --     disablewarnings {
+    --         "invalid-source-encoding",
+    --     }
+    -- filter {}
 
     -- Enable c++11 support.
     filter { "system:not windows" }

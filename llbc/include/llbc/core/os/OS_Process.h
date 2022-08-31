@@ -23,6 +23,14 @@
 #define __LLBC_CORE_OS_OS_PROCESS_H__
 
 #include "llbc/common/Common.h"
+#include "llbc/core/utils/Util_Delegate.h"
+
+// Hook process crash support macro define.
+#if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+ #define LLBC_SUPPORT_HOOK_PROCESS_CRASH 1
+#else // Non Win32 and Linux
+ #define LLBC_SUPPORT_HOOK_PROCESS_CRASH 0
+#endif
 
 __LLBC_NS_BEGIN
 
@@ -31,6 +39,17 @@ __LLBC_NS_BEGIN
  * @return int - the current process Id.
  */
 LLBC_EXPORT int LLBC_GetCurrentProcessId();
+
+/**
+ * Hook process crash.
+ * @param[in] dumpFilePath - the dump file path.
+ *                           in Windows platform, is a dump file path, if is empty, dump file path is <your_app_path>.dmp.
+ *                           in Non-Windows platform, is a core pattern, if is empty, will use system default config.
+ * @param[in] callback     - the crash callback delegate.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath = "",
+                                      const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &callback = nullptr);
 
 __LLBC_NS_END
 
