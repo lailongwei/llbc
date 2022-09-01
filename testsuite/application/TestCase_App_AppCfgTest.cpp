@@ -62,7 +62,7 @@ public:
         return LLBC_OK;
     }
 
-    virtual bool OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
         if (_stopTime == LLBC_Time::UTCBegin)
             _stopTime = LLBC_Time::Now();
@@ -70,13 +70,12 @@ public:
         auto cost = LLBC_Time::Now() - _stopTime;
         if (cost < _stopNeedTime)
         {
+            stopFinished = false;
             std::cout <<"App " <<GetName() <<" stopping, cost:" <<cost <<std::endl;
-            return false;
         }
         else
         {
             std::cout <<"App " <<GetName() <<" stop finished" <<std::endl;
-            return true;
         }
     }
 

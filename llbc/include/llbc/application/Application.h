@@ -92,9 +92,9 @@ public:
 
     /**
      * Application stop event method, please override this method in your project.
-     * @return bool - return true if stop finished, otherwise return false.
+     * @param[in] stopFinished - application stop finished flag, if stop finished, set to true, otherwise set to false.
      */
-    virtual bool OnStop() = 0;
+    virtual void OnStop(bool &stopFinished) = 0;
 
     /**
      * Application config reloaded event method, please override this method in your project.

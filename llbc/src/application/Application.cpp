@@ -127,7 +127,12 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     LLBC_ReturnIf(LoadConfig() != LLBC_OK, LLBC_FAILED);
 
     // Call config reload event method.
-    LLBC_DoIf(callEvMeth, OnConfigReload());
+    if (callEvMeth)
+    {
+        OnConfigReload();
+        for (auto &svcPair : this->_services.GetAllIndexedByIdServices())
+            svcPair.second->ProcessAppConfigReload();
+    }
 
     return LLBC_OK;
 }
@@ -214,7 +219,10 @@ void LLBC_Application::Stop()
 
     while (true)
     {
-        LLBC_BreakIf(OnStop());
+        bool stopFinished = true;
+        OnStop(stopFinished);
+        LLBC_BreakIf(stopFinished);
+
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
 
