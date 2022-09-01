@@ -42,7 +42,6 @@ int pyllbc_Application::OnStart(int argc, char *argv[], bool &startFinished)
     return LLBC_OK;
 }
 
-bool pyllbc_Application::OnStop()
+void pyllbc_Application::OnStop(bool &stopFinished)
 {
-    return true;
 }
