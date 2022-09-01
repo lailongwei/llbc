@@ -83,9 +83,19 @@ inline LLBC_IService *LLBC_Application::GetService(int id) const
     return _services.GetService(id);
 }
 
-inline int LLBC_Application::RemoveService(int id)
+inline LLBC_IService *LLBC_Application::GetService(const LLBC_String &name) const
 {
-    return _services.RemoveService(id);
+    return _services.GetService(name);
+}
+
+inline int LLBC_Application::StopService(int id, bool del)
+{
+    return _services.Stop(id, del);
+}
+
+inline int LLBC_Application::StopService(const LLBC_String &name, bool del)
+{
+    return _services.Stop(name, del);
 }
 
 __LLBC_NS_END

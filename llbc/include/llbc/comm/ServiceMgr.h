@@ -69,34 +69,38 @@ public:
      */
     LLBC_IService *GetService(const LLBC_String &name);
 
+public:
     /**
-     * Remove specified id service.
+     * Stop specific id service.
      * Note:
      *  1. Not allow to remove self thread drive's service, if try to call, 
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] id - the service Id.
+     * @param[in] id  - the service Id.
+     * @param[in] del - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveService(int id);
+    int Stop(int id, bool del = true);
 
     /**
-     * Remove specified name service, like Remove(int id) method.
+     * Stop specified name service, like Remove(int id) method.
+     * Note:
+     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
      * @param[in] name - the service name.
+     * @param[in] del  - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveService(const LLBC_String &name);
-
-    /**
-     * Wait all services.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Wait();
+    int Stop(const LLBC_String &name, bool del = true);
 
     /**
      * Stop all services.
+     * Note:
+     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
+     * @param[in] del - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop();
+    int StopAll(bool del = true);
 
 public:
     /**
@@ -133,14 +137,13 @@ private:
     void OnServiceStop(LLBC_IService *svc);
 
 private:
+    int Stop(LLBC_IService *svc, bool del);
+
     LLBC_IService *GetServiceNonLock(int id);
     LLBC_IService *GetServiceNonLock(const LLBC_String &name);
 
-private:
     static bool InTls(const LLBC_IService *svc);
-
     static bool InTls(const Id2Services &svcs);
-
     typedef std::map<LLBC_String, LLBC_IService *> _Services2;
     static bool InTls(const _Services2 &svcs);
 
