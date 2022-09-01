@@ -187,9 +187,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
 {
-    bool iniReloaded;
-    bool propReloaded;
-
     LLBC_SvcEv_AppCfgReloadedEv();
 };
 
@@ -263,9 +260,9 @@ public:
                                                const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
-     * Build application config reloaded event.
+     * Build application config reload event.
      */
-    static LLBC_MessageBlock *BuildAppCfgReloadedEv(bool iniReloaded, bool propReloaded);
+    static LLBC_MessageBlock *BuildAppCfgReloadEv();
 
 public:
     /**

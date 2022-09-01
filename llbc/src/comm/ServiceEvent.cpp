@@ -164,12 +164,10 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEventEv(LLBC_Event *ev,
     return evBlock;
 }
 
-LLBC_MessageBlock * LLBC_SvcEvUtil::BuildAppCfgReloadedEv(bool iniReloaded, bool propReloaded)
+LLBC_MessageBlock * LLBC_SvcEvUtil::BuildAppCfgReloadEv()
 {
     LLBC_SvcEv_AppCfgReloadedEv *ev;
     auto evBlock = __CreateEvBlock(ev);
-    ev->iniReloaded = iniReloaded;
-    ev->propReloaded = propReloaded;
 
     return evBlock;
 }

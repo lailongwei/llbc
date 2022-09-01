@@ -624,15 +624,14 @@ protected:
     /**
      * Declare friend class: LLBC_Application.
      *  Access method list:
-     *      NtyApplicationIniConfigReload()
-     *      NtyApplicationPropertyConfigReload()
+     *      ProcessAppConfigReload()
      */
     friend class LLBC_Application;
 
     /**
-     * Application ini/property config reload event notifiy method.
+     * Process application config reload event.
      */
-    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded) = 0;
+    virtual void ProcessAppConfigReload() = 0;
 
 protected:
     /**

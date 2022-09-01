@@ -38,12 +38,10 @@ namespace
             return LLBC_OK;
         }
 
-        virtual bool OnStop()
+        virtual void OnStop(bool &stopFinished)
         {
             LLBC_PrintLine("Application stop");
             LLBC_XDelete(_testSvc);
-
-            return true;
         }
 
     private:

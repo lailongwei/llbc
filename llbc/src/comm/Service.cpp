@@ -60,7 +60,7 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_ServiceEventType::End] =
     &LLBC_Service::HandleEv_UnsubscribeEv,
     &LLBC_Service::HandleEv_FireEv,
 
-    &LLBC_Service::HandleEv_AppCfgReloaded,
+    &LLBC_Service::HandleEv_AppCfgReload,
 };
 
 // VS2005 and later version compiler support initialize array in construct list.
@@ -1302,13 +1302,16 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
             CreateCodecStack(sessionId, acceptSessionId, stack));
 }
 
-void LLBC_Service::NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded)
+void LLBC_Service::ProcessAppConfigReload()
 {
+    if (!IsStarted())
+        return;
+
     LLBC_LockGuard guard(_lock);
     if (!IsStarted())
         return;
 
-    Push(LLBC_SvcEvUtil::BuildAppCfgReloadedEv(iniReloaded, propReloaded));
+    Push(LLBC_SvcEvUtil::BuildAppCfgReloadEv());
 }
 
 void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
@@ -1885,24 +1888,16 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     ev.ev = nullptr;
 }
 
-void LLBC_Service::HandleEv_AppCfgReloaded(LLBC_ServiceEvent &_)
+void LLBC_Service::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 {
-    typedef LLBC_SvcEv_AppCfgReloadedEv _Ev;
-    _Ev &ev = static_cast<_Ev &>(_);
-
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReloaded])
+    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReload])
     {
         // Dispatch application config reloaded event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReloaded];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReload];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        {
-            if (ev.iniReloaded)
-                caredComps[compIdx]->OnApplicationIniConfigReload();
-            if (ev.propReloaded)
-                caredComps[compIdx]->OnApplicationPropertyConfigReload();
-        }
+            caredComps[compIdx]->OnApplicationConfigReload();
     }
 }
 

@@ -55,7 +55,7 @@ public:
     /**
      * Application event method: OnStop.
      */
-    virtual bool OnStop();
+    virtual void OnStop(bool &stopFinished);
 
 private:
     PyObject *_pyApp; // Borrowed reference.

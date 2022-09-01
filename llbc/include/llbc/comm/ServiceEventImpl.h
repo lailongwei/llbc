@@ -110,8 +110,6 @@ inline LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
 
 inline LLBC_SvcEv_AppCfgReloadedEv::LLBC_SvcEv_AppCfgReloadedEv()
 : LLBC_ServiceEvent(LLBC_ServiceEventType::AppCfgReloaded)
-, iniReloaded(false)
-, propReloaded(false)
 {
 }
 
