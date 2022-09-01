@@ -68,7 +68,7 @@ int csllbc_LibConfig_Log_DefaultLogToConsole()
 
 int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN), patternLen);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN)), patternLen);
     ::memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN, writable);
 
     return writable;
@@ -86,7 +86,7 @@ int csllbc_LibConfig_Log_IsDefaultLogToFile()
 
 int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN), patternLen);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN)), patternLen);
     ::memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN, writable);
 
     return writable;
@@ -199,7 +199,7 @@ int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()
 
 int csllbc_LibConfig_Comm_PollerModel(sint64 model, int modelLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_COMM_POLLER_MODEL), modelLen);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_COMM_POLLER_MODEL)), modelLen);
     ::memcpy(reinterpret_cast<char *>(model), LLBC_CFG_COMM_POLLER_MODEL, writable);
 
     return writable;

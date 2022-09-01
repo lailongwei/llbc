@@ -25,6 +25,7 @@
 #include "llbc/common/Common.h"
 
 #include "llbc/core/thread/Task.h"
+#include "llbc/core/thread/SpinLock.h"
 
 __LLBC_NS_BEGIN
 
@@ -98,7 +99,6 @@ private:
     volatile bool _stoped;
     std::vector<LLBC_Logger *> _loggers;
 
-    uint32 _usingLogDataIdx;
     LLBC_SpinLock _logDataLock;
     std::vector<LLBC_LogData *> _logDatas[2];
 };

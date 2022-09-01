@@ -491,14 +491,9 @@ public:
 
 public:
     /**
-     * When application ini config reload, will call this event handler.
+     * When application config reload, will call this event handler.
      */
-    virtual void OnApplicationIniConfigReload();
-
-    /**
-     * When application property config reload, will call this event handler.
-     */
-    virtual void OnApplicationPropertyConfigReload();
+    virtual void OnApplicationConfigReload();
 
 public:
     /**

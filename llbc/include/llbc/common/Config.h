@@ -38,9 +38,11 @@
 // Determine implement symbol about functions or not.
 #define LLBC_CFG_OS_IMPL_SYMBOL                             1
 // Determine max symbol name when enabled OS/Symbol functions.
-#define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  63
+#define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  127
 // Determine max cpature frames count when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
+// Determine hook crash single set.
+#define LLBC_CFG_OS_HOOK_CRASH_SINGLES                      {SIGSEGV, SIGABRT, SIGFPE}
 
 /**
  * \brief Common about config options define.
@@ -290,8 +292,8 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 // Application try start interval(Call OnStart() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_START_INTERVAL             100
+#define LLBC_CFG_APP_TRY_START_INTERVAL             10
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
+#define LLBC_CFG_APP_TRY_STOP_INTERVAL              10
 
 #endif // !__LLBC_COM_CONFIG_H__

@@ -19,46 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_APP_PY_APPLICATION_H__
-#define __PYLLBC_APP_PY_APPLICATION_H__
 
-#include "pyllbc/common/Common.h"
-#include "pyllbc/core/Core.h"
-#include "pyllbc/comm/Comm.h"
+#ifndef __LLBC_TEST_CASE_CORE_OS_PROCESS_H__
+#define __LLBC_TEST_CASE_CORE_OS_PROCESS_H__
 
-/**
- * \brief The python layer native application encapsulation.
- * TODO: for now simple encapsulation.
- */
-class LLBC_HIDDEN pyllbc_Application : public LLBC_Application
+#include "llbc.h"
+using namespace llbc;
+
+class TestCase_Core_OS_Process : public LLBC_BaseTestCase
 {
 public:
-    /**
-     * Ctor & Dtor.
-     */
-    pyllbc_Application(PyObject *pyApp);
-    virtual ~pyllbc_Application();
+    TestCase_Core_OS_Process() = default;
+    virtual ~TestCase_Core_OS_Process() = default;
 
 public:
-    /**
-     * Get python layer application.
-     * @return PyObject * - the python layer application, borrow reference.
-     */
-    PyObject *GetPyApp() const;
-
-public:
-    /**
-     * Application event method: OnStart.
-     */
-    virtual int OnStart(int argc, char *argv[], bool &startFinished);
-
-    /**
-     * Application event method: OnStop.
-     */
-    virtual void OnStop(bool &stopFinished);
+    virtual int Run(int argc, char *argv[]);
 
 private:
-    PyObject *_pyApp; // Borrowed reference.
+    int TestCrash();
+    void TestCrash_DivisionByZero();
+    void TestCrash_InvalidPtrWrite();
+    void TestCrash_InvalidPtrRead();
 };
 
-#endif // !__PYLLBC_APP_PY_APPLICATION_H__
+#endif // !__LLBC_TEST_CASE_CORE_OS_PROCESS_H__

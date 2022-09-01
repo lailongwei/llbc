@@ -52,7 +52,7 @@ public:
         OnProtoReport,
         OnUnHandledPacket,
 
-        OnAppCfgReloaded,
+        OnAppCfgReload,
 
         End,
     };
@@ -78,7 +78,7 @@ public:
     static constexpr uint64 OnAsyncConnResult = 1 << LLBC_ComponentEventsOffset::OnAsyncConnResult;
     static constexpr uint64 OnProtoReport = 1 << LLBC_ComponentEventsOffset::OnProtoReport;
     static constexpr uint64 OnUnHandledPacket = 1 << LLBC_ComponentEventsOffset::OnUnHandledPacket;
-    static constexpr uint64 OnAppCfgReloaded = 1 << LLBC_ComponentEventsOffset::OnAppCfgReloaded;
+    static constexpr uint64 OnAppCfgReload = 1 << LLBC_ComponentEventsOffset::OnAppCfgReload;
 
 public:
     static constexpr uint64 AllEvents = LLBC_ComponentEvents::OnInitialize | LLBC_ComponentEvents::OnDestroy |
@@ -87,7 +87,7 @@ public:
                                         LLBC_ComponentEvents::OnSessionCreate | LLBC_ComponentEvents::OnSessionDestroy |
                                         LLBC_ComponentEvents::OnAsyncConnResult | LLBC_ComponentEvents::OnProtoReport |
                                         LLBC_ComponentEvents::OnUnHandledPacket |
-                                        LLBC_ComponentEvents::OnAppCfgReloaded;
+                                        LLBC_ComponentEvents::OnAppCfgReload;
 
     static constexpr uint64 DefaultEvents = LLBC_ComponentEvents::AllEvents & ~(LLBC_ComponentEvents::OnUpdate | LLBC_ComponentEvents::OnIdle);
 };

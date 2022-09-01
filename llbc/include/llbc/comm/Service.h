@@ -466,9 +466,9 @@ protected:
 
 protected:
     /**
-     * Application ini/property config reload event notifiy method.
+     * Process application config reload event.
      */
-    virtual void NtyApplicationConfigReloaded(bool iniReloaded, bool propReloaded);
+    virtual void ProcessAppConfigReload();
 
 protected:
     /**
@@ -531,7 +531,7 @@ private:
     void HandleEv_SubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
-    void HandleEv_AppCfgReloaded(LLBC_ServiceEvent &ev);
+    void HandleEv_AppCfgReload(LLBC_ServiceEvent &ev);
 
     /**
      * Component operation methods.

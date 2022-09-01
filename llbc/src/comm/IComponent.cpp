@@ -368,11 +368,7 @@ void LLBC_IComponent::OnStop()
 {
 }
 
-void LLBC_IComponent::OnApplicationIniConfigReload()
-{
-}
-
-void LLBC_IComponent::OnApplicationPropertyConfigReload()
+void LLBC_IComponent::OnApplicationConfigReload()
 {
 }
 

@@ -36,7 +36,6 @@ __LLBC_NS_BEGIN
 LLBC_LogRunnable::LLBC_LogRunnable()
 : _stoped(false)
 
-, _usingLogDataIdx(0)
 , _logDatas{}
 {
 }
@@ -73,7 +72,7 @@ void LLBC_LogRunnable::Stop()
 void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
 {
     _logDataLock.Lock();
-    _logDatas[_usingLogDataIdx].push_back(logData);
+    _logDatas[0].push_back(logData);
     _logDataLock.Unlock();
 }
 
@@ -98,23 +97,21 @@ void LLBC_LogRunnable::Svc()
 
 LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
 {
-    std::vector<LLBC_LogData *> *logDatas;
-
     _logDataLock.Lock();
-    logDatas = &_logDatas[_usingLogDataIdx];
-    _usingLogDataIdx ^= 1u;
+    _logDatas[0].swap(_logDatas[1]);
     _logDataLock.Unlock();
 
-    if (logDatas->empty())
+    auto &logDatas = _logDatas[1];
+    if (logDatas.empty())
         return false;
 
-    for (auto &logData : *logDatas)
+    for (auto &logData : logDatas)
     {
         logData->logger->OutputLogData(*logData);
         LLBC_Recycle(logData);
     }
 
-    logDatas->clear();
+    logDatas.clear();
 
     return true;
 }
