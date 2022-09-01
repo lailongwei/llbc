@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/time/time.h"
+#include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HOOK_PROCESS_CRASH
 #include "llbc/core/file/Directory.h"
