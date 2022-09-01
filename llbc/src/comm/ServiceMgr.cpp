@@ -84,6 +84,8 @@ int LLBC_ServiceMgr::Stop(const LLBC_String &name, bool del)
     if (!svc)
     {
         _lock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return LLBC_FAILED;
     }
 
@@ -122,6 +124,7 @@ int LLBC_ServiceMgr::Stop(LLBC_IService *svc, bool del)
     {
         _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_PERM);
+
         return LLBC_FAILED;
     }
 
