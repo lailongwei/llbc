@@ -229,7 +229,7 @@ private:
      * Reload application config.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int LoadConfig();
+    int LoadConfig(bool lock);
     int LoadIniConfig();
     int LoadXmlConfig();
     int LoadPropertyConfig();
