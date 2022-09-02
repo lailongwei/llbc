@@ -62,13 +62,13 @@ void csllbc_Component::OnDestroy()
     (*_destroyDeleg)();
 }
 
-bool csllbc_Component::OnStart()
+bool csllbc_Component::OnStart(bool &startFinished)
 {
     (*_startDeleg)();
     return true;
 }
 
-void csllbc_Component::OnStop()
+void csllbc_Component::OnStop(bool &stopFinished)
 {
     (*_stopDeleg)();
 }

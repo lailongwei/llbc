@@ -143,22 +143,22 @@ pyllbc_Component::~pyllbc_Component()
     Py_DECREF(_compEvCallArgs);
 }
 
-bool pyllbc_Component::OnInitialize()
+bool pyllbc_Component::OnInitialize(bool &initFinished)
 {
     return CallComponentMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc), true);
 }
 
-void pyllbc_Component::OnDestroy()
+void pyllbc_Component::OnDestroy(bool &destroyFinished)
 {
     CallComponentMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc), true);
 }
 
-bool pyllbc_Component::OnStart()
+bool pyllbc_Component::OnStart(bool &startFinished)
 {
     return CallComponentMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc), true);
 }
 
-void pyllbc_Component::OnStop()
+void pyllbc_Component::OnStop(bool &stopFinished)
 {
     CallComponentMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc), true);
 }

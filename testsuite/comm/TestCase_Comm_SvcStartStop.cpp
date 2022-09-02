@@ -27,18 +27,18 @@ namespace
     class SvcStartStopTestComp : public LLBC_IComponent
     {
     public:
-        virtual bool OnInitialize()
+        virtual bool OnInitialize(bool &initFinished)
         {
             LLBC_PrintLine("Service initialize");
             return true;
         }
 
-        virtual void OnDestroy()
+        virtual void OnDestroy(bool &destroyFinished)
         {
             LLBC_PrintLine("Service destroy");
         }
 
-        virtual bool OnStart()
+        virtual bool OnStart(bool &startFinished)
         {
             _updateOutputTimes = 0;
             _idleOutputTimes = 0;
@@ -47,7 +47,7 @@ namespace
             return true;
         }
 
-        virtual void OnStop()
+        virtual void OnStop(bool &stopFinished)
         {
             LLBC_PrintLine("Service stop");
         }

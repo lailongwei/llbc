@@ -32,7 +32,7 @@ namespace
         {
         }
 
-        virtual bool OnStart()
+        virtual bool OnStart(bool &startFinished)
         {
             _updateTimes = 0;
             _beginUpdateTime = 0;
@@ -41,7 +41,7 @@ namespace
             return true;
         }
 
-        virtual void OnStop()
+        virtual void OnStop(bool &stopFinished)
         {
             LLBC_PrintLine("Service %s stop", GetService()->GetName().c_str());
         }

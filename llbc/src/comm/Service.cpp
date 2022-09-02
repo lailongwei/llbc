@@ -1930,8 +1930,28 @@ int LLBC_Service::InitComps()
         comp->SetService(this);
         AddComp(comp);
 
-        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize) &&
-            UNLIKELY(!comp->OnInitialize()))
+        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize))
+        {
+            comp->_inited = true;
+            continue;
+        }
+
+        while (true)
+        {
+            bool initFinished = true;
+            if (!comp->OnInitialize(initFinished))
+                break;
+
+            if (initFinished)
+            {
+                comp->_inited = true;
+                break;
+            }
+
+            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
+        }
+
+        if (!comp->_inited)
         {
             ClearCompsWhenInitCompFailed();
             initSuccess = false;
@@ -1940,8 +1960,6 @@ int LLBC_Service::InitComps()
 
             break;
         }
-
-        comp->_inited = true;
     }
 
     if (initSuccess)
@@ -1962,11 +1980,29 @@ int LLBC_Service::StartComps()
         if (comp->_started)
             continue;
 
-        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStart) && 
-            !comp->OnStart())
-            break;
+        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnStart))
+        {
+            comp->_started = true;
+            continue;
+        }
 
-        comp->_started = true;
+        while (true)
+        {
+            bool startFinished = true;
+            if (!comp->OnStart(startFinished))
+                break;
+
+            if (startFinished)
+            {
+                comp->_started = true;
+                break;
+            }
+
+            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
+        }
+
+        if (!comp->_started)
+            break;
     }
 
     if (compIdx == compsSize)
@@ -1988,10 +2024,24 @@ void LLBC_Service::StopComps()
         if (!comp->_started)
             continue;
 
-        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStop))
-            comp->OnStop();
+        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnStop))
+        {
+            comp->_started = false;
+            continue;
+        }
 
-        comp->_started = false;
+        while (true)
+        {
+            bool stopFinished = true;
+            comp->OnStop(stopFinished);
+            if (stopFinished)
+            {
+                comp->_started = false;
+                break;
+            }
+
+            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+        }
     }
 }
 
@@ -2017,8 +2067,25 @@ void LLBC_Service::DestroyComps()
         if (!comp->_inited)
             continue;
 
-        if (comp->IsCaredEvents(LLBC_ComponentEventsOffset::OnDestroy))
-            comp->OnDestroy();
+        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnDestroy))
+        {
+            comp->_inited = false;
+            continue;
+        }
+
+        while (true)
+        {
+            bool destroyFinished = true;
+            comp->OnDestroy(destroyFinished);
+
+            if (destroyFinished)
+            {
+                comp->_inited = false;
+                break;
+            }
+
+            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+        }
     }
 
     LLBC_STLHelper::DeleteContainer(_comps, true, true);

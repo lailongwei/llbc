@@ -30,7 +30,7 @@ const int OPCODE = 0;
 class TestComp : public LLBC_IComponent
 {
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         LLBC_IService *svc = GetService();
         LLBC_PrintLine("Service create: %p", svc);
@@ -38,7 +38,7 @@ public:
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
         LLBC_IService *svc = GetService();
         LLBC_PrintLine("Service destroy: %p", svc);

@@ -39,13 +39,13 @@ public:
     }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         LLBC_PrintLine("Service create!");
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
         LLBC_PrintLine("Service destroy!");
     }

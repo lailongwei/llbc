@@ -123,12 +123,12 @@ class TestCase_Comm_Service : ITestCase
             Console.WriteLine("Service [{0}] destroy", svc.svcName);
         }
 
-        public override void OnStart()
+        public override void OnStart(bool &startFinished)
         {
             Console.WriteLine("Service [{0}] start", svc.svcName);
         }
 
-        public override void OnStop()
+        public override void OnStop(bool &stopFinished)
         {
             Console.WriteLine("Service [{0}] stop", svc.svcName);
             _idleOutputTimes = 0;
@@ -612,7 +612,7 @@ class TestCase_Comm_Service : ITestCase
             Console.WriteLine("Service[{0}] destroy", svc);
         }
 
-        public override void OnStart()
+        public override void OnStart(bool &startFinished)
         {
             var ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7788);
             _connSessionId = svc.Connect(ep);

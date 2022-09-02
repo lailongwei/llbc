@@ -76,24 +76,24 @@ public:
     {}
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         LLBC_PrintLine("Service initialize");
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
         LLBC_PrintLine("Service Destroy");
     }
 
-    virtual bool OnStart()
+    virtual bool OnStart(bool &startFinished)
     {
         LLBC_PrintLine("Service start");
         return true;
     }
 
-    virtual void OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
         LLBC_PrintLine("Service stop");
     }
