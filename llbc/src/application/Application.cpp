@@ -217,6 +217,8 @@ void LLBC_Application::Stop()
     if (!_started)
         return;
 
+    _services.StopAll(true);
+
     while (true)
     {
         bool stopFinished = true;
@@ -225,8 +227,6 @@ void LLBC_Application::Stop()
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
-
-    _services.StopAll(true);
 
     _cfgPath.clear();
     _cfgType = LLBC_ApplicationConfigType::End;
