@@ -51,13 +51,13 @@ csllbc_Component::csllbc_Component(_D::Deleg_Comp_OnInit initDeleg,
     _unHandledPacketDeleg = unHandledPacketDeleg;
 }
 
-bool csllbc_Component::OnInitialize()
+bool csllbc_Component::OnInitialize(bool &initFinished)
 {
     (*_initDeleg)();
     return true;
 }
 
-void csllbc_Component::OnDestroy()
+void csllbc_Component::OnDestroy(bool &destroyFinished)
 {
     (*_destroyDeleg)();
 }
