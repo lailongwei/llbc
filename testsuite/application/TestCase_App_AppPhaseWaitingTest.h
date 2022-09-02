@@ -19,53 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef __LLBC_TEST_CASE_APP_APP_PHASE_WAITING_TEST_H__
+#define __LLBC_TEST_CASE_APP_APP_PHASE_WAITING_TEST_H__
 
-using System;
-using llbc;
+#include "llbc.h"
+using namespace llbc;
 
-using Console = llbc.SafeConsole;
-
-public class TestCase_Comm_Timer : ITestCase
+class TestCase_App_AppPhaseWaitingTest : public LLBC_BaseTestCase
 {
-    public void Run(string[] args)
-    {
-        Console.WriteLine("Timer test:");
+public:
+    TestCase_App_AppPhaseWaitingTest() = default;
+    virtual ~TestCase_App_AppPhaseWaitingTest() = default;
 
-        using (Service svc = new Service("TimerTestSvc"))
-        {
-            svc.Start();
+public:
+    virtual int Run(int argc, char *argv[]);
+};
 
-            Console.WriteLine("Press any key to pause TimerTest...");
-            Console.ReadKey();
-        }
-    }
-}
-
-[BindTo("TimerTestSvc")]
-class TimerTestComponent : IComponent
-{
-    public override void OnStart(bool &startFinished)
-    {
-        // _timer = new Timer(_OnTimeout, _OnCancel);
-        // _timer.Schedule(1.0, 0.5);
-
-        _timer = Timer.Schedule(_OnTimeout, 1.0, 0, _OnCancel);
-    }
-
-    public override void OnStop(bool &stopFinished)
-    {
-        _timer.Cancel();
-    }
-
-    private void _OnTimeout(Timer timer)
-    {
-        Console.WriteLine("Timeout handler called!");
-    }
-
-    private void _OnCancel(Timer timer)
-    {
-        Console.WriteLine("Timer cancel handler called!");
-    }
-
-    private Timer _timer;
-}
+#endif // !__LLBC_TEST_CASE_APP_APP_PHASE_WAITING_TEST_H__

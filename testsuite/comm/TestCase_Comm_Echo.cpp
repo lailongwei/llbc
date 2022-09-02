@@ -28,7 +28,7 @@ namespace
 class EchoServerComp : public LLBC_IComponent
 {
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         // 消息注册, 因echo实现为流式协议实现, opcode为0
         LLBC_IService *svc = GetService();
@@ -37,7 +37,7 @@ public:
         return true;
     }
 
-    virtual bool OnStart()
+    virtual bool OnStart(bool &startFinished)
     {
         // 执行端口监听
         LLBC_IService *svc = GetService();
@@ -54,9 +54,8 @@ public:
         return true;
     }
 
-    virtual void OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
-
         // 打印将关闭消息
         std::cout << "Echo server component will stop" << std::endl;
     }
@@ -77,7 +76,7 @@ private:
 class EchoClientComp : public LLBC_IComponent
 {
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         // 同EchoServerComp, 订阅
         LLBC_IService *svc = GetService();
@@ -86,7 +85,7 @@ public:
         return true;
     }
 
-    virtual bool OnStart()
+    virtual bool OnStart(bool &startFinished)
     {
         LLBC_IService *svc = GetService();
         _sId = svc->Connect("127.0.0.1", 9527);
@@ -105,7 +104,7 @@ public:
         return true;
     }
 
-    virtual void OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
         std::cout << "Echo client comp will stop" << std::endl;
     }

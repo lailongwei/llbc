@@ -46,7 +46,7 @@ public:
     virtual ~MyComp() {  }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInitialize(bool &initFinished)
     {
         LLBC_PrintLine("MyComp initialize ...");
 
@@ -62,7 +62,7 @@ public:
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
         LLBC_PrintLine("MyComp destroy...");
     }

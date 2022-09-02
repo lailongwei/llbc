@@ -52,11 +52,11 @@ public:
     /**
      * All comp event handlers.
      */
-    virtual bool OnInitialize();
-    virtual void OnDestroy();
+    virtual bool OnInitialize(bool &initFinished);
+    virtual void OnDestroy(bool &destroyFinished);
 
-    virtual bool OnStart();
-    virtual void OnStop();
+    virtual bool OnStart(bool &startFinished);
+    virtual void OnStop(bool &stopFinished);
 
     virtual void OnUpdate();
     virtual void OnIdle(int idleTime);

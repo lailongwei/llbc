@@ -189,18 +189,32 @@ public:
 
 public:
     /**
-     * Get service.
+     * Get service by service Id.
      * @param[in] id - service Id.
      * @return LLBC_IService * - service.
      */
     LLBC_IService *GetService(int id) const;
+    /**
+     * Get service by service name.
+     * @param[in] name - service name.
+     * @return LLBC_IService * - service.
+     */
+    LLBC_IService *GetService(const LLBC_String &name) const;
 
     /**
-     * Remove service.
-     * @param[in] id - service Id.
+     * Stop service by service Id.
+     * @param[in] id  - service Id.
+     * @param[in] del - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveService(int id);
+    int StopService(int id, bool del = true);
+    /**
+     * Stop service by service name.
+     * @param[in] name - service name.
+     * @param[in] del  - delete service or not, default is true.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int StopService(const LLBC_String &name, bool del = true);
 
 private:
     /**
@@ -215,7 +229,7 @@ private:
      * Reload application config.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int LoadConfig();
+    int LoadConfig(bool lock);
     int LoadIniConfig();
     int LoadXmlConfig();
     int LoadPropertyConfig();

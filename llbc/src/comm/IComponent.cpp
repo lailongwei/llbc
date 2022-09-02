@@ -350,21 +350,21 @@ LLBC_IComponent::~LLBC_IComponent()
     LLBC_XDelete(_meths);
 }
 
-bool LLBC_IComponent::OnInitialize()
+bool LLBC_IComponent::OnInitialize(bool &initFinished)
 {
     return true;
 }
 
-void LLBC_IComponent::OnDestroy()
+void LLBC_IComponent::OnDestroy(bool &destroyFinished)
 {
 }
 
-bool LLBC_IComponent::OnStart()
+bool LLBC_IComponent::OnStart(bool &startFinished)
 {
     return true;
 }
 
-void LLBC_IComponent::OnStop()
+void LLBC_IComponent::OnStop(bool &stopFinished)
 {
 }
 

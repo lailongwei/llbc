@@ -460,22 +460,22 @@ public:
     /**
      * When service start and not not init component before, will call then event handler.
      */
-    virtual bool OnInitialize();
+    virtual bool OnInitialize(bool &initFinished);
 
     /**
      * When service destroy, will call this event handler.
      */
-    virtual void OnDestroy();
+    virtual void OnDestroy(bool &destroyFinished);
 
     /**
      * When service start, will call this event handler.
      */
-    virtual bool OnStart();
+    virtual bool OnStart(bool &startFinished);
 
     /**
      * When service stop, will call this event handler.
      */
-    virtual void OnStop();
+    virtual void OnStop(bool &stopFinished);
 
 public:
     /**

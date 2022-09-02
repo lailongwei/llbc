@@ -124,7 +124,7 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     LLBC_SetErrAndReturnIf(_cfgType == LLBC_ApplicationConfigType::End, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
 
     // Reload.
-    LLBC_ReturnIf(LoadConfig() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(LoadConfig(false) != LLBC_OK, LLBC_FAILED);
 
     // Call config reload event method.
     if (callEvMeth)
@@ -185,7 +185,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     }
 
     // Load config.
-    LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
     // Call OnStart event method.
     while (true)
@@ -217,6 +217,8 @@ void LLBC_Application::Stop()
     if (!_started)
         return;
 
+    _services.StopAll(true);
+
     while (true)
     {
         bool stopFinished = true;
@@ -225,8 +227,6 @@ void LLBC_Application::Stop()
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
-
-    _services.Stop();
 
     _cfgPath.clear();
     _cfgType = LLBC_ApplicationConfigType::End;
@@ -314,13 +314,15 @@ LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &
     return "";
 }
 
-int LLBC_Application::LoadConfig()
+int LLBC_Application::LoadConfig(bool lock)
 {
     // Reentry check.
     LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
     // Lock and check again.
-    LLBC_LockGuard guard(_cfgLock);
+    if (lock)
+        _cfgLock.Lock();
+    LLBC_Defer(if (lock) _cfgLock.Unlock());
     LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
     // Check config file exist or not.
