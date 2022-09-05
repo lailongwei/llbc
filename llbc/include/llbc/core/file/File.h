@@ -332,6 +332,7 @@ public:
     int Write(const float &floatVal);
     int Write(const double &doubleVal);
     int Write(const ldouble &ldoubleVal);
+    int Write(const char *cstr);
     int Write(const LLBC_String &str);
     int Write(const LLBC_WString &wstr);
     int Write(const std::string &str);
