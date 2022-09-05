@@ -23,6 +23,14 @@
 
 __LLBC_NS_BEGIN
 
+inline void LLBC_Application::OnStartFinish()
+{
+}
+
+inline void LLBC_Application::OnStopFinish()
+{
+}
+
 inline void LLBC_Application::OnConfigReload()
 {
 }

@@ -207,6 +207,9 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     // Mark started.
     _started = true;
 
+    // Call OnStartFinish event method.
+    OnStartFinish();
+
     // Return ok.
     ret = LLBC_OK;
     return ret;
@@ -236,6 +239,8 @@ void LLBC_Application::Stop()
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
 
     _started = false;
+
+    OnStopFinish();
 }
 
 LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)

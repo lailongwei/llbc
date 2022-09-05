@@ -91,10 +91,20 @@ public:
     virtual int OnStart(int argc, char *argv[], bool &startFinished) = 0;
 
     /**
+     * Application start finish event method, when application start finish, will call this event method.
+     */
+    virtual void OnStartFinish();
+
+    /**
      * Application stop event method, please override this method in your project.
      * @param[in] stopFinished - application stop finished flag, if stop finished, set to true, otherwise set to false.
      */
     virtual void OnStop(bool &stopFinished) = 0;
+
+    /**
+     * Application stop finish event method, when application stop finish, will call this event method.
+     */
+    virtual void OnStopFinish();
 
     /**
      * Application config reloaded event method, please override this method in your project.
