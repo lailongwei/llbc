@@ -187,6 +187,15 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     // Load config.
     LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
+    // Call OnWillStart event method.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    if (OnWillStart(argc, argv) != LLBC_OK)
+    {
+        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        return LLBC_FAILED;
+    }
+
     // Call OnStart event method.
     while (true)
     {
@@ -208,7 +217,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     _started = true;
 
     // Call OnStartFinish event method.
-    OnStartFinish();
+    OnStartFinish(argc, argv);
 
     // Return ok.
     ret = LLBC_OK;
@@ -217,11 +226,17 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 
 void LLBC_Application::Stop()
 {
+    // Not start judge.
     if (!_started)
         return;
 
+    // Call OnWillStop event method.
+    OnWillStop();
+
+    // Stop all services.
     _services.StopAll(true);
 
+    // Stop app.
     while (true)
     {
         bool stopFinished = true;
@@ -231,16 +246,20 @@ void LLBC_Application::Stop()
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
 
+    // Mask stopped.
+    _started = false;
+
+    // Call OnStopFinish event method.
+    OnStopFinish();
+
+    // Cleanup members.
     _cfgPath.clear();
     _cfgType = LLBC_ApplicationConfigType::End;
     _propCfg.RemoveAllProperties();
     _nonPropCfg.BecomeNil();
 
+    // Cleanup llbc.
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
-
-    _started = false;
-
-    OnStopFinish();
 }
 
 LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)

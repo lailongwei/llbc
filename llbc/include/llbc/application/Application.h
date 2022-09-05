@@ -82,6 +82,14 @@ public:
 
 public:
     /**
+     * Application will start event method, when application will start, will call this event method.
+     * @param[in] argc - the application startup arguments count.
+     * @param[in] argv - the application startup arguments.
+     * @return int - return 0 if start success, otherwise return -1.
+     */
+    virtual int OnWillStart(int argc, char *argv[]);
+
+    /**
      * Application start event method, please override this method in your project.
      * @param[in] argc           - the application startup arguments count.
      * @param[in] argv           - the application startup arguments.
@@ -92,8 +100,16 @@ public:
 
     /**
      * Application start finish event method, when application start finish, will call this event method.
+     * @param[in] argc - the application startup arguments count.
+     * @param[in] argv - the application startup arguments.
      */
-    virtual void OnStartFinish();
+    virtual void OnStartFinish(int argc, char *argv[]);
+
+
+    /**
+     * Application will stop event method, when application will stop, will call this event method.
+     */
+    virtual void OnWillStop();
 
     /**
      * Application stop event method, please override this method in your project.
