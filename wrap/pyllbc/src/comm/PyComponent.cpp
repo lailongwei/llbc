@@ -43,7 +43,7 @@ namespace
 }
 
 pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
-: LLBC_IComponent(LLBC_ComponentEvents::AllEvents)
+: LLBC_Component(LLBC_ComponentEvents::AllEvents)
 , _svc(svc)
 , _pySvc(svc->GetPyService())
 

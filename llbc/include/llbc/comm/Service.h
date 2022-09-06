@@ -313,15 +313,15 @@ public:
      * Register component.
      */
     virtual int RegisterComponent(LLBC_IComponentFactory *compFactory);
-    virtual int RegisterComponent(LLBC_IComponent *comp);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp);
+    virtual int RegisterComponent(LLBC_Component *comp);
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp);
 
     /**
      * Get component/componemts.
      */
-    virtual LLBC_IComponent *GetComponent(const char *compName);
-    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName);
-    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName);
+    virtual LLBC_Component *GetComponent(const char *compName);
+    virtual LLBC_Component *GetComponent(const LLBC_String &compName);
+    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName);
 
     /**
      * Register coder.
@@ -543,8 +543,8 @@ private:
     void DestroyComps();
     void DestroyWillRegComps();
     void CloseAllCompLibraries();
-    void AddComp(LLBC_IComponent *comp);
-    void AddCompToCaredEventsArray(LLBC_IComponent *comp);
+    void AddComp(LLBC_Component *comp);
+    void AddCompToCaredEventsArray(LLBC_Component *comp);
     LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
     void CloseCompLibrary(const LLBC_String &libPath);
     void ClearCompsWhenInitCompFailed();
@@ -653,10 +653,10 @@ private:
     class _WillRegComp
     {
     public:
-        LLBC_IComponent *comp;
+        LLBC_Component *comp;
         LLBC_IComponentFactory *compFactory;
 
-        _WillRegComp(LLBC_IComponent *comp);
+        _WillRegComp(LLBC_Component *comp);
         _WillRegComp(LLBC_IComponentFactory *compFactory);
     };
     typedef std::vector<_WillRegComp> _WillRegComps;
@@ -668,7 +668,7 @@ private:
     volatile int _compsStartRet;
 
     LLBC_String _compNameKey;
-    typedef std::vector<LLBC_IComponent *> _Comps;
+    typedef std::vector<LLBC_Component *> _Comps;
     _Comps _comps;
     typedef std::map<LLBC_String, _Comps> _Comps2;
     _Comps2 _comps2;

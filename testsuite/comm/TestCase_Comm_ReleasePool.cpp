@@ -39,7 +39,7 @@ public:
     }
 };
 
-class MyComp : public LLBC_IComponent
+class MyComp : public LLBC_Component
 {
 public:
     MyComp() {  }

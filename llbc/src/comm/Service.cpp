@@ -34,7 +34,7 @@
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
-#include "llbc/comm/IComponent.h"
+#include "llbc/comm/Component.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
@@ -707,7 +707,7 @@ int LLBC_Service::RegisterComponent(LLBC_IComponentFactory *compFactory)
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(LLBC_IComponent *comp)
+int LLBC_Service::RegisterComponent(LLBC_Component *comp)
 {
     if (UNLIKELY(!comp))
     {
@@ -744,7 +744,7 @@ int LLBC_Service::RegisterComponent(LLBC_IComponent *comp)
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp)
+int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp)
 {
     // Force reset out parameter: comp.
     comp = nullptr;
@@ -790,7 +790,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
 
     // Create comp.
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    comp = reinterpret_cast<LLBC_IComponent *>(compCreateFunc());
+    comp = reinterpret_cast<LLBC_Component *>(compCreateFunc());
     if (!comp)
     {
         if (!existingLib)
@@ -826,7 +826,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     return ret;
 }
 
-LLBC_IComponent *LLBC_Service::GetComponent(const char *compName)
+LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -843,7 +843,7 @@ LLBC_IComponent *LLBC_Service::GetComponent(const char *compName)
 
 }
 
-LLBC_IComponent *LLBC_Service::GetComponent(const LLBC_String &compName)
+LLBC_Component *LLBC_Service::GetComponent(const LLBC_String &compName)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -858,9 +858,9 @@ LLBC_IComponent *LLBC_Service::GetComponent(const LLBC_String &compName)
     return comps[0];
 }
 
-const std::vector<LLBC_IComponent *> &LLBC_Service::GetComponents(const LLBC_String &compName)
+const std::vector<LLBC_Component *> &LLBC_Service::GetComponents(const LLBC_String &compName)
 {
-    static const std::vector<LLBC_IComponent *> emptyComps;
+    static const std::vector<LLBC_Component *> emptyComps;
 
     LLBC_LockGuard guard(_lock);
 
@@ -1910,7 +1910,7 @@ int LLBC_Service::InitComps()
          regIt != _willRegComps.end();
          ++regIt)
     {
-        LLBC_IComponent *comp;
+        LLBC_Component *comp;
         _WillRegComp &willRegComp = *regIt;
         if (willRegComp.compFactory != nullptr) // Create comp from comp factory.
         {
@@ -1976,7 +1976,7 @@ int LLBC_Service::StartComps()
     const size_t compsSize = _comps.size();
     for (; compIdx < compsSize; ++compIdx)
     {
-        LLBC_IComponent *comp = _comps[compIdx];
+        LLBC_Component *comp = _comps[compIdx];
         if (comp->_started)
             continue;
 
@@ -2020,7 +2020,7 @@ void LLBC_Service::StopComps()
          it != _comps.rend();
          ++it)
     {
-        LLBC_IComponent *comp = *it;
+        LLBC_Component *comp = *it;
         if (!comp->_started)
             continue;
 
@@ -2063,7 +2063,7 @@ void LLBC_Service::DestroyComps()
          it != _comps.rend();
          ++it)
     {
-        LLBC_IComponent *comp = *it;
+        LLBC_Component *comp = *it;
         if (!comp->_inited)
             continue;
 
@@ -2118,7 +2118,7 @@ void LLBC_Service::CloseAllCompLibraries()
     LLBC_STLHelper::DeleteContainer(_compLibraries);
 }
 
-void LLBC_Service::AddComp(LLBC_IComponent *comp)
+void LLBC_Service::AddComp(LLBC_Component *comp)
 {
     // Add comp to _comps(vector)
     _comps.push_back(comp);
@@ -2137,7 +2137,7 @@ void LLBC_Service::AddComp(LLBC_IComponent *comp)
     AddCompToCaredEventsArray(comp);
 }
 
-void LLBC_Service::AddCompToCaredEventsArray(LLBC_IComponent *comp)
+void LLBC_Service::AddCompToCaredEventsArray(LLBC_Component *comp)
 {
     for (int evOffset = LLBC_ComponentEventsOffset::Begin;
          evOffset != LLBC_ComponentEventsOffset::End;
@@ -2550,7 +2550,7 @@ LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
         LLBC_Delete(codecStack);
 }
 
-LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponent *comp)
+LLBC_Service::_WillRegComp::_WillRegComp(LLBC_Component *comp)
 {
     this->comp = comp;
     compFactory = nullptr;

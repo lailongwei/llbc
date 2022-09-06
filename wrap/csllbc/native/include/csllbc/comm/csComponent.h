@@ -28,7 +28,7 @@
 /**
  * \brief The csharp wrap service comp encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_Component : public LLBC_IComponent
+class CSLLBC_HIDDEN csllbc_Component : public LLBC_Component
 {
     typedef csllbc_Delegates _D;
 

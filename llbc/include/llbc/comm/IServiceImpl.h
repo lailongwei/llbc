@@ -42,7 +42,7 @@ inline int LLBC_IService::RegisterComponent()
 
 inline int LLBC_IService::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName)
 {
-    LLBC_IComponent *comp;
+    LLBC_Component *comp;
     return RegisterComponent(libPath, compName, comp);
 }
 
@@ -79,7 +79,7 @@ inline ComponentCls *LLBC_IService::GetComponent(const LLBC_String &compName)
 }
 
 template <typename ComponentCls>
-inline std::vector<LLBC_IComponent *> LLBC_IService::GetComponents()
+inline std::vector<LLBC_Component *> LLBC_IService::GetComponents()
 {
     const LLBC_String compName = LLBC_GetTypeName(ComponentCls);
     return GetComponents(compName);

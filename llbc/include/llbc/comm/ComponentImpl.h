@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMM_ICOMPONENT_H__
+#ifdef __LLBC_COMM_COMPONENT_H__
 
 __LLBC_NS_BEGIN
 
@@ -76,22 +76,22 @@ inline int LLBC_ComponentMethods::CallMethod(const char *methName, const LLBC_Va
     return meth(arg, ret);
 }
 
-inline LLBC_IService *LLBC_IComponent::GetService() const
+inline LLBC_IService *LLBC_Component::GetService() const
 {
     return _svc;
 }
 
-inline uint64 LLBC_IComponent::GetCaredEvents() const
+inline uint64 LLBC_Component::GetCaredEvents() const
 {
     return _caredEvents;
 }
 
-inline bool LLBC_IComponent::IsCaredEvents(uint64 compEvs) const
+inline bool LLBC_Component::IsCaredEvents(uint64 compEvs) const
 {
     return (_caredEvents & compEvs) == compEvs;
 }
 
-inline bool LLBC_IComponent::IsCaredEventOffset(int compEvOffset) const
+inline bool LLBC_Component::IsCaredEventOffset(int compEvOffset) const
 {
  #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
     return IsCaredEvents(1Ui64 << compEvOffset);
@@ -100,13 +100,13 @@ inline bool LLBC_IComponent::IsCaredEventOffset(int compEvOffset) const
 #endif
 }
 
-inline const LLBC_ComponentMethods *LLBC_IComponent::GetAllMethods() const
+inline const LLBC_ComponentMethods *LLBC_Component::GetAllMethods() const
 {
     return _meths;
 }
 
 template <typename ComponentCls>
-int LLBC_IComponent::AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+int LLBC_Component::AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     if (!_meths)
         _meths = LLBC_New(LLBC_ComponentMethods);
@@ -114,7 +114,7 @@ int LLBC_IComponent::AddMethod(const char *methName, int (ComponentCls::*meth)(c
     return _meths->AddMethod<ComponentCls>(dynamic_cast<ComponentCls *>(this), methName, meth);
 }
 
-inline int LLBC_IComponent::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_Component::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     if (UNLIKELY(!_meths))
     {
@@ -125,14 +125,14 @@ inline int LLBC_IComponent::CallMethod(const char *methName, const LLBC_Variant 
     return _meths->CallMethod(methName, arg, ret);
 }
 
-inline void LLBC_IComponent::OnUpdate()
+inline void LLBC_Component::OnUpdate()
 {
 }
 
-inline void LLBC_IComponent::OnIdle(int idleTime)
+inline void LLBC_Component::OnIdle(int idleTime)
 {
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_ICOMPONENT_H__
+#endif // __LLBC_COMM_COMPONENT_H__

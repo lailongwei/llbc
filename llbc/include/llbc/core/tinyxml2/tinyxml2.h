@@ -26,7 +26,6 @@ distribution.
 
 #include "llbc/common/Common.h"
 
-__LLBC_NS_BEGIN
 
 #if defined(ANDROID_NDK) || defined(__BORLANDC__) || defined(__QNXNTO__)
 #   include <ctype.h>
@@ -56,6 +55,8 @@ __LLBC_NS_BEGIN
     Formatting, Artistic Style:
         AStyle.exe --style=1tbs --indent-switches --break-closing-brackets --indent-preprocessor tinyxml2.cpp tinyxml2.h
 */
+
+__LLBC_NS_BEGIN
 
 #if defined(LLBC_DEBUG)
 #   ifndef TINYXML2_DEBUG

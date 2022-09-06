@@ -44,7 +44,7 @@ public class TestCase_Comm_Timer : ITestCase
 [BindTo("TimerTestSvc")]
 class TimerTestComponent : IComponent
 {
-    public override void OnStart(bool &startFinished)
+    public override void OnStart()
     {
         // _timer = new Timer(_OnTimeout, _OnCancel);
         // _timer.Schedule(1.0, 0.5);
@@ -52,7 +52,7 @@ class TimerTestComponent : IComponent
         _timer = Timer.Schedule(_OnTimeout, 1.0, 0, _OnCancel);
     }
 
-    public override void OnStop(bool &stopFinished)
+    public override void OnStop()
     {
         _timer.Cancel();
     }

@@ -24,11 +24,11 @@
 
 namespace
 {
-    class TestComp : public LLBC_IComponent
+    class TestComp : public LLBC_Component
     {
     public:
         TestComp()
-        : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+        : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
         {
         }
 

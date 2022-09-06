@@ -34,7 +34,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_ICoder;
 class LLBC_Packet;
-class LLBC_IComponent;
+class LLBC_Component;
 class LLBC_Session;
 class LLBC_PollerMgr;
 class LLBC_ICoderFactory;
@@ -398,9 +398,9 @@ public:
     template <typename ComponentFactoryCls>
     int RegisterComponent();
     virtual int RegisterComponent(LLBC_IComponentFactory *compFactory) = 0;
-    virtual int RegisterComponent(LLBC_IComponent *comp) = 0;
+    virtual int RegisterComponent(LLBC_Component *comp) = 0;
     virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp) = 0;
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
 
     /**
      * Get component/components.
@@ -411,11 +411,11 @@ public:
     ComponentCls *GetComponent(const char *compName);
     template <typename ComponentCls>
     ComponentCls *GetComponent(const LLBC_String &compName);
-    virtual LLBC_IComponent *GetComponent(const char *compName) = 0;
-    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName) = 0;
+    virtual LLBC_Component *GetComponent(const char *compName) = 0;
+    virtual LLBC_Component *GetComponent(const LLBC_String &compName) = 0;
     template <typename ComponentCls>
-    std::vector<LLBC_IComponent *> GetComponents();
-    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName) = 0;
+    std::vector<LLBC_Component *> GetComponents();
+    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName) = 0;
 
 public:
     /**

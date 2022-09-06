@@ -264,7 +264,7 @@ int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_St
     }
 
     // Register native comp.
-    LLBC_IComponent *nativeComp;
+    LLBC_Component *nativeComp;
     int ret = _llbcSvc->RegisterComponent(libPath, compName, nativeComp);
     if (ret != LLBC_OK)
     {

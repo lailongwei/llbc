@@ -24,7 +24,7 @@
 
 namespace
 {
-    class TestComp : public LLBC_IComponent
+    class TestComp : public LLBC_Component
     {
     public:
         TestComp()
@@ -95,7 +95,7 @@ namespace
     class TestCompFactory : public LLBC_IComponentFactory
     {
     public:
-        virtual LLBC_IComponent *Create() const
+        virtual LLBC_Component *Create() const
         {
             return LLBC_New(TestComp);
         }

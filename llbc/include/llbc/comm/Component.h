@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_ICOMPONENT_H__
-#define __LLBC_COMM_ICOMPONENT_H__
+#ifndef __LLBC_COMM_COMPONENT_H__
+#define __LLBC_COMM_COMPONENT_H__
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -328,8 +328,8 @@ private:
     LLBC_String _report;
 };
 
-// Pre-declare LLBC_IComponent, use for define LLBC_ComponentMethod type.
-class LLBC_IComponent;
+// Pre-declare LLBC_Component, use for define LLBC_ComponentMethod type.
+class LLBC_Component;
 
 /**
  * \brief The llibc library component method encapsulation.
@@ -397,11 +397,11 @@ private:
 /**
  * \brief The component interface class encapsulation.
  */
-class LLBC_EXPORT LLBC_IComponent
+class LLBC_EXPORT LLBC_Component
 {
 public:
-    LLBC_IComponent(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
-    virtual ~LLBC_IComponent();
+    LLBC_Component(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
+    virtual ~LLBC_Component();
 
 public:
     /**
@@ -563,7 +563,7 @@ public:
     virtual ~LLBC_IComponentFactory() {  }
 
 public:
-    virtual LLBC_IComponent *Create() const = 0;
+    virtual LLBC_Component *Create() const = 0;
 };
 
 __LLBC_NS_END
@@ -576,6 +576,6 @@ LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Sessio
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
-#include "llbc/comm/IComponentImpl.h"
+#include "llbc/comm/ComponentImpl.h"
 
-#endif // !__LLBC_COMM_ICOMPONENT_H__
+#endif // !__LLBC_COMM_COMPONENT_H__

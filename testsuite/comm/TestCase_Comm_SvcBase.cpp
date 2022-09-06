@@ -68,11 +68,11 @@ public:
     }
 };
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp()
-    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents)
+    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents)
     {}
 
 public:
@@ -192,7 +192,7 @@ private:
 class TestCompFactory : public LLBC_IComponentFactory
 {
 public:
-    LLBC_IComponent *Create() const
+    LLBC_Component *Create() const
     {
         return LLBC_New(TestComp);
     }
