@@ -191,7 +191,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     if (OnWillStart(argc, argv) != LLBC_OK)
     {
-        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
             LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
         return LLBC_FAILED;
     }
