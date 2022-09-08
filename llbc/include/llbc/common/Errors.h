@@ -41,18 +41,19 @@ LLBC_EXPORT void LLBC_SetLastError(int no, const char *customErrStr = nullptr);
 
 /**
  * @brief Set llbc library last error.
- * 
- * @param[in] no - error no.
+ * @param[in] no           - error no.
+ * @param[in] customErrStr - custom error string.
  */
-void LLBC_SetLastError(uint32 no);
+void LLBC_SetLastError(uint32 no, const char *customErrStr = nullptr);
 
 /**
  * Set llbc last error(enum type).
- * @param[in] no - error no.
+ * @param[in] no           - error no.
+ * @param[in] customErrStr - custom error string.
  */
 template <typename EnumTy>
 typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
-LLBC_SetLastError(EnumTy no);
+LLBC_SetLastError(EnumTy no, const char *customErrStr = nullptr);
 
 /**
  * Format error message.

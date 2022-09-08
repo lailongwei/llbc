@@ -23,16 +23,16 @@
 
 __LLBC_NS_BEGIN
 
-inline void LLBC_SetLastError(uint32 no)
+inline void LLBC_SetLastError(uint32 no, const char *customErrStr)
 {
-    LLBC_SetLastError(static_cast<int>(no));
+    LLBC_SetLastError(static_cast<int>(no), customErrStr);
 }
 
 template <typename EnumTy>
 typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
-LLBC_SetLastError(EnumTy no)
+LLBC_SetLastError(EnumTy no, const char *customErrStr)
 {
-    LLBC_SetLastError(static_cast<int>(no));
+    LLBC_SetLastError(static_cast<int>(no), customErrStr);
 }
 
 __LLBC_NS_END
