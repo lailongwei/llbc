@@ -96,7 +96,7 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
     return false;
 }
 
-LLBC_ICoder *csllbc_CoderFactory::Create() const
+LLBC_Coder *csllbc_CoderFactory::Create() const
 {
     return LLBC_New(csllbc_Coder);
 }

@@ -540,7 +540,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
 
 LLBC_EXTERN_C PyObject *_pyllbc_CallComponentMethod(PyObject *self, PyObject *args)
 {
-    LLBC_IComponent *comp;
+    LLBC_Component *comp;
     const char *meth;
     PyObject *arg;
     if (!PyArg_ParseTuple(args, "lsO", &comp, &meth, &arg))

@@ -58,7 +58,7 @@ public:
     }
 };
 
-class TestCompBase : public LLBC_IComponent
+class TestCompBase : public LLBC_Component
 {
 public:
     TestCompBase()

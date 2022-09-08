@@ -209,6 +209,26 @@ inline int LLBC_File::Write(const ldouble &ldoubleVal)
     return WriteRawObj<ldouble>(ldoubleVal);
 }
 
+inline int LLBC_File::Write(const char *cstr)
+{
+    const auto strSize = cstr ? strlen(cstr) : 0;
+    if (strSize == 0)
+        return LLBC_OK;
+
+    const long actuallyWrote = Write(cstr, strSize);
+    if (actuallyWrote == -1)
+    {
+        return LLBC_FAILED;
+    }
+    else if (actuallyWrote != static_cast<long>(strSize))
+    {
+        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 inline int LLBC_File::Write(const LLBC_String &str)
 {
     const long actuallyWrote = Write(str.data(), str.size());

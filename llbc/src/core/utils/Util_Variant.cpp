@@ -20,7 +20,6 @@
 
 #include "llbc/core/variant/Variant.h"
 #include "llbc/core/config/Ini.h"
-#include "llbc/core/config/Property.h"
 #include "llbc/core/tinyxml2/tinyxml2.h"
 #include "llbc/core/utils/Util_Variant.h"
 

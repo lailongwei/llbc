@@ -250,8 +250,8 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status);
     /**
      * Multicast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -277,7 +277,7 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status);
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -312,21 +312,21 @@ public:
     /**
      * Register component.
      */
-    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory);
-    virtual int RegisterComponent(LLBC_IComponent *comp);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp);
+    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory);
+    virtual int RegisterComponent(LLBC_Component *comp);
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp);
 
     /**
      * Get component/componemts.
      */
-    virtual LLBC_IComponent *GetComponent(const char *compName);
-    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName);
-    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName);
+    virtual LLBC_Component *GetComponent(const char *compName);
+    virtual LLBC_Component *GetComponent(const LLBC_String &compName);
+    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName);
 
     /**
      * Register coder.
      */
-    virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory);
+    virtual int RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory);
 
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     /**
@@ -543,8 +543,8 @@ private:
     void DestroyComps();
     void DestroyWillRegComps();
     void CloseAllCompLibraries();
-    void AddComp(LLBC_IComponent *comp);
-    void AddCompToCaredEventsArray(LLBC_IComponent *comp);
+    void AddComp(LLBC_Component *comp);
+    void AddCompToCaredEventsArray(LLBC_Component *comp);
     LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
     void CloseCompLibrary(const LLBC_String &libPath);
     void ClearCompsWhenInitCompFailed();
@@ -595,7 +595,7 @@ private:
     int MulticastSendCoder(int svcId,
                            const SessionIds &sessionIds,
                            int opcode,
-                           LLBC_ICoder *coder,
+                           LLBC_Coder *coder,
                            int status,
                            bool validCheck = true);
 
@@ -653,11 +653,11 @@ private:
     class _WillRegComp
     {
     public:
-        LLBC_IComponent *comp;
-        LLBC_IComponentFactory *compFactory;
+        LLBC_Component *comp;
+        LLBC_ComponentFactory *compFactory;
 
-        _WillRegComp(LLBC_IComponent *comp);
-        _WillRegComp(LLBC_IComponentFactory *compFactory);
+        _WillRegComp(LLBC_Component *comp);
+        _WillRegComp(LLBC_ComponentFactory *compFactory);
     };
     typedef std::vector<_WillRegComp> _WillRegComps;
     _WillRegComps _willRegComps;
@@ -668,14 +668,14 @@ private:
     volatile int _compsStartRet;
 
     LLBC_String _compNameKey;
-    typedef std::vector<LLBC_IComponent *> _Comps;
+    typedef std::vector<LLBC_Component *> _Comps;
     _Comps _comps;
     typedef std::map<LLBC_String, _Comps> _Comps2;
     _Comps2 _comps2;
-    _Comps *_caredEventComps[LLBC_ComponentEventsOffset::End];
+    _Comps *_caredEventComps[LLBC_ComponentEventIndex::End];
     typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
     _CompLibraries _compLibraries;
-    typedef std::map<int, LLBC_ICoderFactory *> _Coders;
+    typedef std::map<int, LLBC_CoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _Handlers;
     _Handlers _handlers;

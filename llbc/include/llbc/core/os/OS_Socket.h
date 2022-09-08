@@ -139,7 +139,7 @@ LLBC_EXPORT int LLBC_CloseSocket(LLBC_SocketHandle handle);
  * Determine given socket is in non-blocking mode or not.
  * Note: 
  *      !!!Only avaliable in Non-WIN32 platform, in WIN3 platform, always return false 
- *      and LLBC_Errno always equal LLBC_ERROR_NOTIMPL.
+ *      and LLBC_GetLastError() always equal LLBC_ERROR_NOTIMPL.
  * @return bool - if return true, it means this socket working in non-blocking mode,
  *                if return false and LLBC_GetLastError() == 0, it means this socket working in blocking mode.
  *                otherwise LLBC_GetLastError() != 0, means error occurred.

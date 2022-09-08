@@ -25,7 +25,6 @@
 #include <float.h>
 
 #include "llbc/core/utils/Util_Text.h"
-
 #include "llbc/core/variant/Variant.h"
 
 __LLBC_INTERNAL_NS_BEGIN

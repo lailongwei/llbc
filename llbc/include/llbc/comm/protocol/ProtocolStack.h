@@ -35,7 +35,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_IProtocolFilter;
-class LLBC_ICoderFactory;
+class LLBC_CoderFactory;
 class LLBC_Session;
 class LLBC_IService;
 

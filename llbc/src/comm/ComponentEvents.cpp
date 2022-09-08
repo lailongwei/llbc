@@ -20,52 +20,29 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-using System;
-using llbc;
+#include "llbc/common/Export.h"
 
-using Console = llbc.SafeConsole;
+#include "llbc/comm/ComponentEvents.h"
 
-public class TestCase_Comm_Timer : ITestCase
+__LLBC_INTERNAL_NS_BEGIN
+
+static LLBC_FORCE_INLINE int __FastLog2(LLBC_NS uint64 v)
 {
-    public void Run(string[] args)
-    {
-        Console.WriteLine("Timer test:");
-
-        using (Service svc = new Service("TimerTestSvc"))
-        {
-            svc.Start();
-
-            Console.WriteLine("Press any key to pause TimerTest...");
-            Console.ReadKey();
-        }
-    }
+    LLBC_NS uint32 r = (v > 0xffffffff) << 5; v >>= r;
+    LLBC_NS uint32 shift = (v > 0xffff) << 4; v >>= shift; r |= shift;
+    shift = (v > 0xff) << 3; v >>= shift; r |= shift;
+    shift = (v > 0xf) << 2; v >>= shift; r |= shift;
+    shift = (v > 0x3) << 1; v >>= shift; r |= shift;
+    return r | static_cast<LLBC_NS uint32>((v >> 1));
 }
 
-[BindTo("TimerTestSvc")]
-class TimerTestComponent : IComponent
+__LLBC_INTERNAL_NS_END
+
+__LLBC_NS_BEGIN
+
+int LLBC_ComponentEvents::IndexOf(uint64 ev)
 {
-    public override void OnStart()
-    {
-        // _timer = new Timer(_OnTimeout, _OnCancel);
-        // _timer.Schedule(1.0, 0.5);
-
-        _timer = Timer.Schedule(_OnTimeout, 1.0, 0, _OnCancel);
-    }
-
-    public override void OnStop()
-    {
-        _timer.Cancel();
-    }
-
-    private void _OnTimeout(Timer timer)
-    {
-        Console.WriteLine("Timeout handler called!");
-    }
-
-    private void _OnCancel(Timer timer)
-    {
-        Console.WriteLine("Timer cancel handler called!");
-    }
-
-    private Timer _timer;
+    return LLBC_INL_NS __FastLog2(ev);
 }
+
+__LLBC_NS_END

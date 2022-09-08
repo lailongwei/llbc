@@ -19,53 +19,21 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "comm/TestCase_Comm_CompEvent.h"
 
-using System;
-using llbc;
-
-using Console = llbc.SafeConsole;
-
-public class TestCase_Comm_Timer : ITestCase
+int TestCase_Comm_CompEvent::Run(int argc, char *argv[])
 {
-    public void Run(string[] args)
-    {
-        Console.WriteLine("Timer test:");
+    std::cout << "ComponentEvent test:" << std::endl;
 
-        using (Service svc = new Service("TimerTestSvc"))
-        {
-            svc.Start();
+    std::cout << "Component events list:" << std::endl;
+    for (int i = LLBC_ComponentEventIndex::Begin; i < LLBC_ComponentEventIndex::End; ++i)
+        fprintf(stdout, "- Comp event:%08llu index:%d\n", 1llu << i, LLBC_ComponentEvents::IndexOf(1llu << i));
 
-            Console.WriteLine("Press any key to pause TimerTest...");
-            Console.ReadKey();
-        }
-    }
-}
+    fprintf(stdout, "All events:%08llu, Default events:%08llu\n",
+            LLBC_ComponentEvents::AllEvents, LLBC_ComponentEvents::DefaultEvents);
 
-[BindTo("TimerTestSvc")]
-class TimerTestComponent : IComponent
-{
-    public override void OnStart()
-    {
-        // _timer = new Timer(_OnTimeout, _OnCancel);
-        // _timer.Schedule(1.0, 0.5);
+    std::cout << "Press any key to continue..." << std::endl;
+    getchar();
 
-        _timer = Timer.Schedule(_OnTimeout, 1.0, 0, _OnCancel);
-    }
-
-    public override void OnStop()
-    {
-        _timer.Cancel();
-    }
-
-    private void _OnTimeout(Timer timer)
-    {
-        Console.WriteLine("Timeout handler called!");
-    }
-
-    private void _OnCancel(Timer timer)
-    {
-        Console.WriteLine("Timer cancel handler called!");
-    }
-
-    private Timer _timer;
+    return LLBC_OK;
 }

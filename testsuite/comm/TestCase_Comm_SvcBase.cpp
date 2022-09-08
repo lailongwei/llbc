@@ -25,7 +25,7 @@
 namespace
 {
 
-struct TestData : public LLBC_ICoder
+struct TestData : public LLBC_Coder
 {
     int iVal;
     LLBC_String strVal;
@@ -59,20 +59,20 @@ struct TestData : public LLBC_ICoder
     }
 };
 
-class TestDataFactory : public LLBC_ICoderFactory
+class TestDataFactory : public LLBC_CoderFactory
 {
 public:
-    virtual LLBC_ICoder *Create() const
+    virtual LLBC_Coder *Create() const
     {
         return LLBC_New(TestData);
     }
 };
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp()
-    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents)
+    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents)
     {}
 
 public:
@@ -189,10 +189,10 @@ private:
     }
 };
 
-class TestCompFactory : public LLBC_IComponentFactory
+class TestCompFactory : public LLBC_ComponentFactory
 {
 public:
-    LLBC_IComponent *Create() const
+    LLBC_Component *Create() const
     {
         return LLBC_New(TestComp);
     }

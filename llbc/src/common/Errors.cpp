@@ -166,36 +166,74 @@ static void __LLBC_UnlockCustomErr()
 
 int LLBC_GetLastError()
 {
-    return LLBC_Errno;
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (LIKELY(libTls))
+        return libTls->commonTls.errNo;
+
+    return LLBC_ERROR_SUCCESS;
 }
 
-void LLBC_SetLastError(int no)
+void LLBC_SetLastError(int no, const char *customErrStr)
 {
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (UNLIKELY(!libTls))
+        return;
+
+    // Set errNo.
+    libTls->commonTls.errNo = no;
+
+    // Set subErrNo.
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
-        LLBC_SubErrno = errno;
+    {
+        libTls->commonTls.subErrNo = errno;
+    }
 #if LLBC_TARGET_PLATFORM_WIN32
     else if (LLBC_ERROR_TYPE_IS_OSAPI(no))
-        LLBC_SubErrno = ::GetLastError();
+    {
+        libTls->commonTls.subErrNo = ::GetLastError();
+    }
     else if (LLBC_ERROR_TYPE_IS_NETAPI(no))
     {
-        int wsaErr = ::WSAGetLastError();
-        LLBC_SubErrno = wsaErr;
+        libTls->commonTls.subErrNo = ::WSAGetLastError();
     }
 #endif
-
-    LLBC_Errno = no;
+    else // Library error or Custom error.
+    {
+        // Set custom error string(only set when error type is LIBRARY or is CUSTOM errno).
+        size_t customErrStrLen;
+        if (customErrStr &&
+            (LLBC_ERROR_TYPE_IS_LIBRARY(no) || (no & LLBC_ERROR_MASK_CUSTOM) != 0) &&
+            (customErrStrLen = strlen(customErrStr)) > 0)
+        {
+            const size_t copyLen = MIN(customErrStrLen, sizeof(libTls->commonTls.customErrDesc) - 1);
+            memcpy(libTls->commonTls.customErrDesc, customErrStr, copyLen);
+            libTls->commonTls.customErrDesc[copyLen] = '\0';
+        }
+        else
+        {
+            libTls->commonTls.customErrDesc[0] = '\0';
+        }
+    }
 }
 
 const char *LLBC_StrError(int no)
 {
-    return LLBC_StrErrorEx(no, LLBC_SubErrno);
+    return LLBC_StrErrorEx(no, LLBC_GetSubErrorNo());
 }
 
 const char *LLBC_StrErrorEx(int no, int subErrno)
 {
-    //! First, process custom type error.
+    //！First, get lib tls.
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (UNLIKELY(!libTls))
+        return LLBC_INTERNAL_NS __g_invalidErrDesc;
+
+    // Process custom type error.
     if (UNLIKELY(LLBC_GetErrnoCustomPart(no) == LLBC_ERROR_CUSTOM))
     {
+        if (libTls->commonTls.customErrDesc[0] != '\0')
+            return libTls->commonTls.customErrDesc;
+
         __LLBC_LockCustomErr();
         
         typedef std::map<int, LLBC_String>::iterator _Iter;
@@ -210,10 +248,6 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         return errDesc;
     }
 
-    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    if (UNLIKELY(!libTls))
-        return LLBC_INTERNAL_NS __g_invalidErrDesc;
-
     uint32 noPart = LLBC_GetErrnoNoPart(no);
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
@@ -226,6 +260,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         ::sprintf_s(libTls->commonTls.errDesc, 
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
+        return libTls->commonTls.errDesc;
     }
 #if LLBC_TARGET_PLATFORM_WIN32
     else if (LLBC_ERROR_TYPE_IS_OSAPI(no) || LLBC_ERROR_TYPE_IS_NETAPI(no) || LLBC_ERROR_TYPE_IS_GAI(no))
@@ -290,6 +326,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             ::sprintf_s(libTls->commonTls.errDesc, 
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], unknownErrDesc);
         }
+
+        return libTls->commonTls.errDesc;
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -308,18 +346,22 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #else // LLBC_TARGET_PLATFORM_WIN32
         ::strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, "unknown error");
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
         return libTls->commonTls.errDesc;
     }
-    else
+    else // Library error.
     {
+        if (libTls->commonTls.customErrDesc[0] != '\0')
+            return libTls->commonTls.customErrDesc;
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         ::strcpy(libTls->commonTls.errDesc, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #else // LLBC_TARGET_PLATFORM_WIN32
         ::strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
-    }
 
-    return libTls->commonTls.errDesc;
+        return libTls->commonTls.errDesc;
+    }
 }
 
 bool LLBC_HasSubErrorNo(int no)
@@ -334,12 +376,18 @@ const char *LLBC_FormatLastError()
 
 int LLBC_GetSubErrorNo()
 {
-    return LLBC_SubErrno;
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (LIKELY(libTls))
+        return libTls->commonTls.subErrNo;
+
+    return 0;
 }
 
 void LLBC_SetSubErrorNo(int subErrorNo)
 {
-    LLBC_SubErrno = subErrorNo;
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (LIKELY(libTls))
+        libTls->commonTls.subErrNo = subErrorNo;
 }
 
 int LLBC_AddCustomErrno(int no, const char *desc)

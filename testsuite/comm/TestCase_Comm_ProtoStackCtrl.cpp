@@ -63,7 +63,7 @@ namespace
         }
     };
 
-    class TestComp : public LLBC_IComponent
+    class TestComp : public LLBC_Component
     {
     public:
         virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)

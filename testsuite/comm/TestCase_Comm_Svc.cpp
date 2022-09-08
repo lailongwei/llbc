@@ -27,7 +27,7 @@ namespace
 
 const int OPCODE = 0;
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp()

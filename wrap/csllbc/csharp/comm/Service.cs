@@ -1741,7 +1741,7 @@ namespace llbc
 
             #region Encode about methods
             /// <summary>
-            /// Push will encode object to wait native LLBC_ICoder::Encoder() call.
+            /// Push will encode object to wait native LLBC_Coder::Encode() call.
             /// </summary>
             public void PushWillEncodeObj(int sessionId, int opcode, object obj, bool isCoder, long packetId, int status)
             {

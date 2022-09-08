@@ -60,7 +60,7 @@ int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
     }
 
     LLBC_PrintLine("Try call comp method: Foo");
-    LLBC_IComponent *comp = _svc->GetComponent("TestComp");
+    LLBC_Component *comp = _svc->GetComponent("TestComp");
     LLBC_Variant arg(3);
     LLBC_Variant callRet(4);
     ret = comp->CallMethod("Foo", arg, callRet);

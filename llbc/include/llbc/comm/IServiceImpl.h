@@ -21,7 +21,7 @@
 
 #ifdef __LLBC_COMM_ISERVICE_H__
 
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
 __LLBC_NS_BEGIN
@@ -42,7 +42,7 @@ inline int LLBC_IService::RegisterComponent()
 
 inline int LLBC_IService::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName)
 {
-    LLBC_IComponent *comp;
+    LLBC_Component *comp;
     return RegisterComponent(libPath, compName, comp);
 }
 
@@ -79,7 +79,7 @@ inline ComponentCls *LLBC_IService::GetComponent(const LLBC_String &compName)
 }
 
 template <typename ComponentCls>
-inline std::vector<LLBC_IComponent *> LLBC_IService::GetComponents()
+inline std::vector<LLBC_Component *> LLBC_IService::GetComponents()
 {
     const LLBC_String compName = LLBC_GetTypeName(ComponentCls);
     return GetComponents(compName);
@@ -87,30 +87,30 @@ inline std::vector<LLBC_IComponent *> LLBC_IService::GetComponents()
 
 inline int LLBC_IService::Send(int sessionId)
 {
-    return Send(0, sessionId, 0, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Send(0, sessionId, 0, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 inline int LLBC_IService::Send(int sessionId, int opcode)
 {
-    return Send(0, sessionId, opcode, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Send(0, sessionId, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
-inline int LLBC_IService::Send(int sessionId, LLBC_ICoder *coder)
+inline int LLBC_IService::Send(int sessionId, LLBC_Coder *coder)
 {
     return Send(0, sessionId, 0, coder, 0);
 }
 
-inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_ICoder *coder)
+inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_Coder *coder)
 {
     return Send(0, sessionId, opcode, coder, 0);
 }
 
-inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_Coder *coder, int status)
 {
     return Send(0, sessionId, opcode, coder, status);
 }
 
-inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status)
 {
     const int svcType = GetType();
     if (svcType == Raw && coder == nullptr)
@@ -174,29 +174,29 @@ inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void 
 template <typename SessionIds>
 inline int LLBC_IService::Multicast(const SessionIds &sessionIds)
 {
-    return Multicast(0, sessionIds, 0, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Multicast(0, sessionIds, 0, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 template <typename SessionIds>
 inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode)
 {
-    return Multicast(0, sessionIds, opcode, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Multicast(0, sessionIds, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_IService::Multicast(const SessionIds &sessionIds, LLBC_ICoder *coder)
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, LLBC_Coder *coder)
 {
     return Multicast(0, sessionIds, 0, coder, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder)
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder)
 {
     return Multicast(0, sessionIds, opcode, coder, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
     return Multicast(0, sessionIds, opcode, coder, status);
 }
@@ -221,15 +221,15 @@ inline int LLBC_IService::Multicast(const SessionIds &sessionIds, int opcode, co
 
 inline int LLBC_IService::Broadcast()
 {
-    return Broadcast(0, 0, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Broadcast(0, 0, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 inline int LLBC_IService::Broadcast(int opcode)
 {
-    return Broadcast(0, opcode, static_cast<LLBC_ICoder *>(nullptr), 0);
+    return Broadcast(0, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
-inline int LLBC_IService::Broadcast(int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_IService::Broadcast(int opcode, LLBC_Coder *coder, int status)
 {
     return Broadcast(0, opcode, coder, status);
 }

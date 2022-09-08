@@ -30,7 +30,7 @@ class pyllbc_Service;
 /**
  * \brief The pyllbc comp class encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Component : public LLBC_IComponent
+class LLBC_HIDDEN pyllbc_Component : public LLBC_Component
 {
 public:
     /**

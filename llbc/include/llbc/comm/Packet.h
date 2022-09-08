@@ -29,7 +29,7 @@
  * Pre-declare some classes.
  */
 __LLBC_NS_BEGIN
-class LLBC_ICoder;
+class LLBC_Coder;
 class LLBC_Session;
 __LLBC_NS_END
 
@@ -437,9 +437,9 @@ public:
 public:
     /**
      * Get encoder.
-     * @return LLBC_ICoder * - encoder.
+     * @return LLBC_Coder * - encoder.
      */
-    LLBC_ICoder *GetEncoder() const;
+    LLBC_Coder *GetEncoder() const;
     template <typename CoderType>
     CoderType *GetEncoder() const;
 
@@ -447,19 +447,19 @@ public:
      * Set encoder.
      * @param[in] encoder - encoder.
      */
-    void SetEncoder(LLBC_ICoder *encoder);
+    void SetEncoder(LLBC_Coder *encoder);
 
     /**
      * Give up encoder.
-     * @return LLBC_ICoder * - the already give up encoder object pointer.
+     * @return LLBC_Coder * - the already give up encoder object pointer.
      */
-    LLBC_ICoder *GiveUpEncoder();
+    LLBC_Coder *GiveUpEncoder();
 
     /**
      * Get decoder.
-     * @return LLBC_ICoder * - decoder.
+     * @return LLBC_Coder * - decoder.
      */
-    LLBC_ICoder *GetDecoder() const;
+    LLBC_Coder *GetDecoder() const;
     template <typename CoderType>
     CoderType *GetDecoder() const;
 
@@ -467,13 +467,13 @@ public:
      * Set decoder.
      * @param[in] decoder - decoder.
      */
-    void SetDecoder(LLBC_ICoder *decoder);
+    void SetDecoder(LLBC_Coder *decoder);
 
     /**
      * Give up decoder.
-     * @return[in] LLBC_ICoder * - the already give up decoder object pointer.
+     * @return[in] LLBC_Coder * - the already give up decoder object pointer.
      */
-    LLBC_ICoder *GiveUpDecoder();
+    LLBC_Coder *GiveUpDecoder();
 
     /**
      * Encode packet data.
@@ -586,8 +586,8 @@ private:
     sint64 _extData2;
     sint64 _extData3;
 
-    LLBC_ICoder *_encoder;
-    LLBC_ICoder *_decoder;
+    LLBC_Coder *_encoder;
+    LLBC_Coder *_decoder;
     LLBC_String *_codecError;
 
     void *_preHandleResult;

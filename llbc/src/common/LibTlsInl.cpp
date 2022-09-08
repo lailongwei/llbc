@@ -38,7 +38,8 @@ __LLBC_LibTls::__LLBC_LibTls()
 {
     commonTls.errNo = LLBC_ERROR_SUCCESS;
     commonTls.subErrNo = LLBC_ERROR_SUCCESS;
-    ::memset(&commonTls.errDesc, 0, __LLBC_ERROR_DESC_SIZE);
+    ::memset(&commonTls.errDesc, 0, sizeof(commonTls.errDesc));
+    ::memset(&commonTls.customErrDesc, 0, sizeof(commonTls.customErrDesc));
 
     coreTls.llbcThread = false;
     coreTls.entryThread = false;

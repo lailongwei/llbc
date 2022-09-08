@@ -23,6 +23,23 @@
 
 __LLBC_NS_BEGIN
 
+inline int LLBC_Application::OnWillStart(int argc, char *argv[])
+{
+    return LLBC_OK;
+}
+
+inline void LLBC_Application::OnStartFinish(int argc, char *argv[])
+{
+}
+
+inline void LLBC_Application::OnWillStop()
+{
+}
+
+inline void LLBC_Application::OnStopFinish()
+{
+}
+
 inline void LLBC_Application::OnConfigReload()
 {
 }

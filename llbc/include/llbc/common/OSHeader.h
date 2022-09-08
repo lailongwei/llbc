@@ -108,6 +108,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <functional>
+#include <utility>
 
 // RTTI support header files.
 #include <typeinfo>

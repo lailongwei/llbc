@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
 __LLBC_INTERNAL_NS_BEGIN
@@ -177,12 +177,12 @@ void LLBC_Packet::Clear()
     CleanupPreHandleResult();
 }
 
-LLBC_ICoder *LLBC_Packet::GetEncoder() const
+LLBC_Coder *LLBC_Packet::GetEncoder() const
 {
     return _encoder;
 }
 
-void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
+void LLBC_Packet::SetEncoder(LLBC_Coder *encoder)
 {
     if (UNLIKELY(encoder == _encoder))
         return;
@@ -191,20 +191,20 @@ void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
     _encoder = encoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GiveUpEncoder()
+LLBC_Coder *LLBC_Packet::GiveUpEncoder()
 {
-    LLBC_ICoder *encoder = _encoder;
+    LLBC_Coder *encoder = _encoder;
     _encoder = nullptr;
 
     return encoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GetDecoder() const
+LLBC_Coder *LLBC_Packet::GetDecoder() const
 {
     return _decoder;
 }
 
-void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
+void LLBC_Packet::SetDecoder(LLBC_Coder *decoder)
 {
     if (UNLIKELY(decoder == _decoder))
         return;
@@ -213,9 +213,9 @@ void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
     _decoder = decoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GiveUpDecoder()
+LLBC_Coder *LLBC_Packet::GiveUpDecoder()
 {
-    LLBC_ICoder *decoder = _decoder;
+    LLBC_Coder *decoder = _decoder;
     _decoder = nullptr;
 
     return decoder;

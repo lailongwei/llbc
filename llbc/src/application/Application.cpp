@@ -155,7 +155,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     _llbcLibStartupInApp = true;
     if (LLBC_Startup() != LLBC_OK)
     {
-        LLBC_ReturnIf(LLBC_Errno != LLBC_ERROR_REENTRY, LLBC_FAILED);
+        LLBC_ReturnIf(LLBC_GetLastError() != LLBC_ERROR_REENTRY, LLBC_FAILED);
 
         _llbcLibStartupInApp = false;
         LLBC_SetLastError(LLBC_OK);
@@ -187,6 +187,15 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     // Load config.
     LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
+    // Call OnWillStart event method.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    if (OnWillStart(argc, argv) != LLBC_OK)
+    {
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        return LLBC_FAILED;
+    }
+
     // Call OnStart event method.
     while (true)
     {
@@ -207,6 +216,9 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     // Mark started.
     _started = true;
 
+    // Call OnStartFinish event method.
+    OnStartFinish(argc, argv);
+
     // Return ok.
     ret = LLBC_OK;
     return ret;
@@ -214,11 +226,17 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 
 void LLBC_Application::Stop()
 {
+    // Not start judge.
     if (!_started)
         return;
 
+    // Call OnWillStop event method.
+    OnWillStop();
+
+    // Stop all services.
     _services.StopAll(true);
 
+    // Stop app.
     while (true)
     {
         bool stopFinished = true;
@@ -228,14 +246,20 @@ void LLBC_Application::Stop()
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
 
+    // Mask stopped.
+    _started = false;
+
+    // Call OnStopFinish event method.
+    OnStopFinish();
+
+    // Cleanup members.
     _cfgPath.clear();
     _cfgType = LLBC_ApplicationConfigType::End;
     _propCfg.RemoveAllProperties();
     _nonPropCfg.BecomeNil();
 
+    // Cleanup llbc.
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
-
-    _started = false;
 }
 
 LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)
@@ -348,9 +372,15 @@ int LLBC_Application::LoadIniConfig()
 int LLBC_Application::LoadXmlConfig()
 {
     ::llbc::tinyxml2::XMLDocument doc;
-    LLBC_SetErrAndReturnIf(doc.LoadFile(_cfgPath.c_str()) != ::llbc::tinyxml2::XML_SUCCESS,
-                           LLBC_ERROR_FORMAT,
-                           LLBC_FAILED);
+    const auto xmlLoadRet = doc.LoadFile(_cfgPath.c_str());
+    if (xmlLoadRet != ::llbc::tinyxml2::XML_SUCCESS)
+    {
+        LLBC_String customErrStr;
+        customErrStr.format("load xml config file failed, file:%s, errno(tinyxml2):%d, error str:%s",
+                            _cfgPath.c_str(), xmlLoadRet, doc.ErrorStr());
+        LLBC_SetLastError(LLBC_ERROR_FORMAT, customErrStr.c_str());
+        return LLBC_FAILED;
+    }
 
     LLBC_VariantUtil::Xml2Variant(doc, _nonPropCfg);
     return LLBC_OK;

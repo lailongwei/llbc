@@ -24,7 +24,7 @@
 
 namespace
 {
-    class TestComp : public LLBC_IComponent
+    class TestComp : public LLBC_Component
     {
     public:
         TestComp()
@@ -92,10 +92,10 @@ namespace
         LLBC_Timer *_timer;
     };
 
-    class TestCompFactory : public LLBC_IComponentFactory
+    class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual LLBC_IComponent *Create() const
+        virtual LLBC_Component *Create() const
         {
             return LLBC_New(TestComp);
         }

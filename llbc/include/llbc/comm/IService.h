@@ -32,13 +32,13 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_ICoder;
+class LLBC_Coder;
 class LLBC_Packet;
-class LLBC_IComponent;
+class LLBC_Component;
 class LLBC_Session;
 class LLBC_PollerMgr;
-class LLBC_ICoderFactory;
-class LLBC_IComponentFactory;
+class LLBC_CoderFactory;
+class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 
@@ -276,10 +276,10 @@ public:
      */
     virtual int Send(int sessionId);
     virtual int Send(int sessionId, int opcode);
-    virtual int Send(int sessionId, LLBC_ICoder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Send(int sessionId, LLBC_Coder *coder);
+    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder);
+    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder, int status);
+    virtual int Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status);
 
     /**
      * Send bytes(these methods will automatics create packet to send).
@@ -315,13 +315,13 @@ public:
     template <typename SessionIds>
     int Multicast(const SessionIds &sessionIds, int opcode);
     template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, LLBC_ICoder *coder);
+    int Multicast(const SessionIds &sessionIds, LLBC_Coder *coder);
     template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder);
+    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder);
     template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status) = 0;
+    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
+    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
 
     /**
      * Multicast bytes(these methods will automatics create packet to send).
@@ -356,8 +356,8 @@ public:
      */
     virtual int Broadcast();
     virtual int Broadcast(int opcode);
-    virtual int Broadcast(int opcode, LLBC_ICoder *coder, int status);
-    virtual int Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status) = 0;
+    virtual int Broadcast(int opcode, LLBC_Coder *coder, int status);
+    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status) = 0;
 
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
@@ -397,10 +397,10 @@ public:
      */
     template <typename ComponentFactoryCls>
     int RegisterComponent();
-    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory) = 0;
-    virtual int RegisterComponent(LLBC_IComponent *comp) = 0;
+    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory) = 0;
+    virtual int RegisterComponent(LLBC_Component *comp) = 0;
     virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_IComponent *&comp) = 0;
+    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
 
     /**
      * Get component/components.
@@ -411,11 +411,11 @@ public:
     ComponentCls *GetComponent(const char *compName);
     template <typename ComponentCls>
     ComponentCls *GetComponent(const LLBC_String &compName);
-    virtual LLBC_IComponent *GetComponent(const char *compName) = 0;
-    virtual LLBC_IComponent *GetComponent(const LLBC_String &compName) = 0;
+    virtual LLBC_Component *GetComponent(const char *compName) = 0;
+    virtual LLBC_Component *GetComponent(const LLBC_String &compName) = 0;
     template <typename ComponentCls>
-    std::vector<LLBC_IComponent *> GetComponents();
-    virtual const std::vector<LLBC_IComponent *> &GetComponents(const LLBC_String &compName) = 0;
+    std::vector<LLBC_Component *> GetComponents();
+    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName) = 0;
 
 public:
     /**
@@ -423,7 +423,7 @@ public:
      */
     template <typename CoderFactoryCls>
     int RegisterCoder(int opcode);
-    virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coder) = 0;
+    virtual int RegisterCoder(int opcode, LLBC_CoderFactory *coder) = 0;
 
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
 public:

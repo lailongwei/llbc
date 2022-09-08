@@ -27,11 +27,11 @@ namespace
 
 const int OPCODE = 1;
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp(bool asClient, bool useBst)
-    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
     , _asClient(asClient)
     , _useBst(useBst)
     {

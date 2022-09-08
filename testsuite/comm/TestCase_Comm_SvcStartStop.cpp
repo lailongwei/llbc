@@ -24,7 +24,7 @@
 
 namespace
 {
-    class SvcStartStopTestComp : public LLBC_IComponent
+    class SvcStartStopTestComp : public LLBC_Component
     {
     public:
         virtual bool OnInitialize(bool &initFinished)

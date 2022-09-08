@@ -19,18 +19,18 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMM_ICODER_H__
+#ifdef __LLBC_COMM_CODER_H__
 
 __LLBC_NS_BEGIN
 
-inline LLBC_ICoder::LLBC_ICoder()
+inline LLBC_Coder::LLBC_Coder()
 {
 }
 
-inline LLBC_ICoder::~LLBC_ICoder()
+inline LLBC_Coder::~LLBC_Coder()
 {
 }
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_ICODER_H__
+#endif // __LLBC_COMM_CODER_H__

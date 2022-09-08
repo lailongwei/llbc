@@ -29,13 +29,6 @@
 
 __LLBC_NS_BEGIN
 
-// LLBC library error number.
-LLBC_EXPORT int *__LLBC_Errno();
-#define LLBC_Errno (*__LLBC_Errno())
-// LLBC library sub error number of OS-API errno.
-LLBC_EXPORT int *__LLBC_SubErrno();
-#define LLBC_SubErrno (*__LLBC_SubErrno())
-
 //
 // Values are 32 bit values laid out as follow:
 

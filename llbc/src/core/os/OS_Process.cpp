@@ -245,7 +245,7 @@ static int __catchSignals[] LLBC_CFG_OS_HOOK_CRASH_SINGLES;
 
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
-static void __LinuxCrashHandler(int sig)
+static void __NonWin32CrashHandler(int sig)
 {
     // Get executable file path.
     ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, PATH_MAX);
@@ -405,7 +405,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
         sigemptyset(&ss);
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
-        sa.sa_handler = LLBC_INL_NS __LinuxCrashHandler;
+        sa.sa_handler = LLBC_INL_NS __NonWin32CrashHandler;
         for (auto sig : LLBC_INL_NS __catchSignals)
         {
             sigaddset(&ss, sig);

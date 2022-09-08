@@ -51,7 +51,7 @@ public:
     LLBC_String data;
 };
 
-class EventTestComp : public LLBC_IComponent
+class EventTestComp : public LLBC_Component
 {
 public:
     EventTestComp()

@@ -25,7 +25,7 @@
 namespace
 {
 
-class EchoServerComp : public LLBC_IComponent
+class EchoServerComp : public LLBC_Component
 {
 public:
     virtual bool OnInitialize(bool &initFinished)
@@ -73,7 +73,7 @@ private:
     }
 };
 
-class EchoClientComp : public LLBC_IComponent
+class EchoClientComp : public LLBC_Component
 {
 public:
     virtual bool OnInitialize(bool &initFinished)
