@@ -30,7 +30,7 @@
 /**
  * \brief The csharp coder class encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_Coder : public LLBC_ICoder
+class CSLLBC_HIDDEN csllbc_Coder : public LLBC_Coder
 {
     typedef csllbc_Delegates _D;
 
@@ -77,13 +77,13 @@ private:
 /**
  * \brief The csharp codr factory class encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_CoderFactory : public LLBC_ICoderFactory
+class CSLLBC_HIDDEN csllbc_CoderFactory : public LLBC_CoderFactory
 {
 public:
     /**
      * Create csharp layer coder.
      */
-    virtual LLBC_ICoder *Create() const;
+    virtual LLBC_Coder *Create() const;
 
 private:
     sint64 _packetId;

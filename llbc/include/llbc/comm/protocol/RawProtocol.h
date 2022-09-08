@@ -81,7 +81,7 @@ public:
      *        It means that you must self manage your coder memory.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder);
+    virtual int AddCoder(int opcode, LLBC_CoderFactory *coder);
 };
 
 __LLBC_NS_END

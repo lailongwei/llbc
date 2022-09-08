@@ -25,7 +25,7 @@
 namespace
 {
 
-struct TestData : public LLBC_ICoder
+struct TestData : public LLBC_Coder
 {
     int iVal;
     LLBC_String strVal;
@@ -59,10 +59,10 @@ struct TestData : public LLBC_ICoder
     }
 };
 
-class TestDataFactory : public LLBC_ICoderFactory
+class TestDataFactory : public LLBC_CoderFactory
 {
 public:
-    virtual LLBC_ICoder *Create() const
+    virtual LLBC_Coder *Create() const
     {
         return LLBC_New(TestData);
     }

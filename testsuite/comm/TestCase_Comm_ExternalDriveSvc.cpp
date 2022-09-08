@@ -170,7 +170,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     _svc->Send(packet);
 
     // Send data(high level Send() methods).
-    _svc->Send(connSid, OPCODE, reinterpret_cast<LLBC_ICoder *>(NULL), 0);
+    _svc->Send(connSid, OPCODE, reinterpret_cast<LLBC_Coder *>(NULL), 0);
 
     while (_svc->IsStarted())
         _svc->OnSvc(true);

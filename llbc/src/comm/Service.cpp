@@ -564,7 +564,7 @@ int LLBC_Service::Send(LLBC_Packet *packet)
     return LockableSend(packet);
 }
 
-int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status)
+int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status)
 {
     // Copy all connected session Ids.
     _readySessionInfosLock.Lock();
@@ -874,7 +874,7 @@ const std::vector<LLBC_Component *> &LLBC_Service::GetComponents(const LLBC_Stri
     return it->second;
 }
 
-int LLBC_Service::RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory)
+int LLBC_Service::RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory)
 {
     if (UNLIKELY(!coderFactory))
     {
@@ -2406,7 +2406,7 @@ template <typename SessionIds>
 int LLBC_Service::MulticastSendCoder(int svcId,
                                      const SessionIds &sessionIds,
                                      int opcode,
-                                     LLBC_ICoder *coder,
+                                     LLBC_Coder *coder,
                                      int status,
                                      bool validCheck)
 {

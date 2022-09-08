@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -91,7 +91,7 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
     Coders::const_iterator it = _coders->find(packet->GetOpcode());
     if (it != _coders->end())
     {
-        LLBC_ICoder *coder = it->second->Create();
+        LLBC_Coder *coder = it->second->Create();
         if (UNLIKELY(!coder->Decode(*packet)))
         {
             LLBC_String reportMsg = LLBC_String().format(

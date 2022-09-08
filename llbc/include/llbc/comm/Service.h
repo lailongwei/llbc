@@ -250,8 +250,8 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status);
+    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status);
     /**
      * Multicast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -277,7 +277,7 @@ public:
      * @param[in] status    - the status, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int svcId, int opcode, LLBC_ICoder *coder, int status);
+    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status);
     /**
      * Broadcast bytes(these methods will automatics create packet to send).
      * @param[in] svcId      - the service Id.
@@ -326,7 +326,7 @@ public:
     /**
      * Register coder.
      */
-    virtual int RegisterCoder(int opcode, LLBC_ICoderFactory *coderFactory);
+    virtual int RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory);
 
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     /**
@@ -595,7 +595,7 @@ private:
     int MulticastSendCoder(int svcId,
                            const SessionIds &sessionIds,
                            int opcode,
-                           LLBC_ICoder *coder,
+                           LLBC_Coder *coder,
                            int status,
                            bool validCheck = true);
 
@@ -675,7 +675,7 @@ private:
     _Comps *_caredEventComps[LLBC_ComponentEventsOffset::End];
     typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
     _CompLibraries _compLibraries;
-    typedef std::map<int, LLBC_ICoderFactory *> _Coders;
+    typedef std::map<int, LLBC_CoderFactory *> _Coders;
     _Coders _coders;
     typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _Handlers;
     _Handlers _handlers;

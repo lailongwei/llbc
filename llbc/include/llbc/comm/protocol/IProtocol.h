@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Session;
-class LLBC_ICoderFactory;
+class LLBC_CoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
 class LLBC_IService;
@@ -49,7 +49,7 @@ class LLBC_EXPORT LLBC_IProtocol
     typedef LLBC_IProtocol This;
 
 public:
-    typedef std::map<int, LLBC_ICoderFactory *> Coders;
+    typedef std::map<int, LLBC_CoderFactory *> Coders;
 
 public:
     LLBC_IProtocol();

@@ -28,7 +28,7 @@
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/Packet.h"
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/BasePoller.h"

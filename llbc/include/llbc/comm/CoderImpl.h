@@ -19,62 +19,18 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_ICODER_H__
-#define __LLBC_COMM_ICODER_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#ifdef __LLBC_COMM_CODER_H__
 
 __LLBC_NS_BEGIN
 
-/**
- * Pre-declare some classes.
- */
-class LLBC_Packet;
+inline LLBC_Coder::LLBC_Coder()
+{
+}
+
+inline LLBC_Coder::~LLBC_Coder()
+{
+}
 
 __LLBC_NS_END
 
-__LLBC_NS_BEGIN
-
-/**
- * \brief The packet coder interface class encapsulation.
- */
-class LLBC_ICoder : public LLBC_PoolObject
-{
-public:
-    LLBC_ICoder();
-    virtual ~LLBC_ICoder();
-
-public:
-    /**
-     * Encode pure virtual function, implement it to use encode packet data.
-     */
-    virtual bool Encode(LLBC_Packet &packet) = 0;
-
-    /**
-     * Decode pure virtual function, implement it to use decode packet data.
-     */
-    virtual bool Decode(LLBC_Packet &packet) = 0;
-};
-
-/**
- * \brief The packet coder factory interface class encapsulation.
- */
-class LLBC_ICoderFactory
-{
-public:
-    virtual ~LLBC_ICoderFactory() {  }
-
-public:
-    /**
-     * Create coder.
-     * @return LLBC_ICoder * - coder.
-     */
-    virtual LLBC_ICoder *Create() const = 0;
-};
-
-__LLBC_NS_END
-
-#include "llbc/comm/ICoderImpl.h"
-
-#endif // !__LLBC_COMM_ICODER_H__
+#endif // __LLBC_COMM_CODER_H__

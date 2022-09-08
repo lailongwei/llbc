@@ -23,14 +23,14 @@
 
 __LLBC_NS_BEGIN
 
-inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
     // Call internal MulticastSendCoder<> template method to complete.
     // validCheck = true
     return MulticastSendCoder<LLBC_SessionIdSet>(svcId, sessionIds, opcode, coder, status);
 }
 
-inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_ICoder *coder, int status)
+inline int LLBC_Service::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
     // Call internal MulticastSendCoder<> template method to complete.
     // validCheck = true

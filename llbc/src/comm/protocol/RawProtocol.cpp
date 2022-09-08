@@ -82,7 +82,7 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     return LLBC_OK;
 }
 
-int LLBC_RawProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
+int LLBC_RawProtocol::AddCoder(int opcode, LLBC_CoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
