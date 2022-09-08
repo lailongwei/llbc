@@ -557,10 +557,10 @@ private:
 /**
  * \brief The component factory class encapsulation.
  */
-class LLBC_EXPORT LLBC_IComponentFactory
+class LLBC_EXPORT LLBC_ComponentFactory
 {
 public:
-    virtual ~LLBC_IComponentFactory() {  }
+    virtual ~LLBC_ComponentFactory() {  }
 
 public:
     virtual LLBC_Component *Create() const = 0;

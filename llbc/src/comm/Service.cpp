@@ -676,7 +676,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId,
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(LLBC_IComponentFactory *compFactory)
+int LLBC_Service::RegisterComponent(LLBC_ComponentFactory *compFactory)
 {
     if (UNLIKELY(!compFactory))
     {
@@ -2556,7 +2556,7 @@ LLBC_Service::_WillRegComp::_WillRegComp(LLBC_Component *comp)
     compFactory = nullptr;
 }
 
-LLBC_Service::_WillRegComp::_WillRegComp(LLBC_IComponentFactory *compFactory)
+LLBC_Service::_WillRegComp::_WillRegComp(LLBC_ComponentFactory *compFactory)
 {
     comp = nullptr;
     this->compFactory = compFactory;

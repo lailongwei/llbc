@@ -38,7 +38,7 @@ class LLBC_Component;
 class LLBC_Session;
 class LLBC_PollerMgr;
 class LLBC_ICoderFactory;
-class LLBC_IComponentFactory;
+class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
 
@@ -397,7 +397,7 @@ public:
      */
     template <typename ComponentFactoryCls>
     int RegisterComponent();
-    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory) = 0;
+    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory) = 0;
     virtual int RegisterComponent(LLBC_Component *comp) = 0;
     virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
     virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;

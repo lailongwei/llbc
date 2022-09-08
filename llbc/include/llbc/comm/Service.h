@@ -312,7 +312,7 @@ public:
     /**
      * Register component.
      */
-    virtual int RegisterComponent(LLBC_IComponentFactory *compFactory);
+    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory);
     virtual int RegisterComponent(LLBC_Component *comp);
     virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp);
 
@@ -654,10 +654,10 @@ private:
     {
     public:
         LLBC_Component *comp;
-        LLBC_IComponentFactory *compFactory;
+        LLBC_ComponentFactory *compFactory;
 
         _WillRegComp(LLBC_Component *comp);
-        _WillRegComp(LLBC_IComponentFactory *compFactory);
+        _WillRegComp(LLBC_ComponentFactory *compFactory);
     };
     typedef std::vector<_WillRegComp> _WillRegComps;
     _WillRegComps _willRegComps;

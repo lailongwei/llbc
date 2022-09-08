@@ -189,7 +189,7 @@ private:
     }
 };
 
-class TestCompFactory : public LLBC_IComponentFactory
+class TestCompFactory : public LLBC_ComponentFactory
 {
 public:
     LLBC_Component *Create() const
