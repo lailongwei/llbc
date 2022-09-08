@@ -155,7 +155,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     _llbcLibStartupInApp = true;
     if (LLBC_Startup() != LLBC_OK)
     {
-        LLBC_ReturnIf(LLBC_Errno != LLBC_ERROR_REENTRY, LLBC_FAILED);
+        LLBC_ReturnIf(LLBC_GetLastError() != LLBC_ERROR_REENTRY, LLBC_FAILED);
 
         _llbcLibStartupInApp = false;
         LLBC_SetLastError(LLBC_OK);
@@ -372,9 +372,15 @@ int LLBC_Application::LoadIniConfig()
 int LLBC_Application::LoadXmlConfig()
 {
     ::llbc::tinyxml2::XMLDocument doc;
-    LLBC_SetErrAndReturnIf(doc.LoadFile(_cfgPath.c_str()) != ::llbc::tinyxml2::XML_SUCCESS,
-                           LLBC_ERROR_FORMAT,
-                           LLBC_FAILED);
+    const auto xmlLoadRet = doc.LoadFile(_cfgPath.c_str());
+    if (xmlLoadRet != ::llbc::tinyxml2::XML_SUCCESS)
+    {
+        LLBC_String customErrStr;
+        customErrStr.format("load xml config file failed, file:%s, errno(tinyxml2):%d, error str:%s",
+                            _cfgPath.c_str(), xmlLoadRet, doc.ErrorStr());
+        LLBC_SetLastError(LLBC_ERROR_FORMAT, customErrStr.c_str());
+        return LLBC_FAILED;
+    }
 
     LLBC_VariantUtil::Xml2Variant(doc, _nonPropCfg);
     return LLBC_OK;

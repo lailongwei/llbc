@@ -34,9 +34,10 @@ LLBC_EXPORT int LLBC_GetLastError();
 
 /**
  * Set llbc library last error.
- * @param[in] no - error no.
+ * @param[in] no           - error no.
+ * @param[in] customErrStr - custom error string.
  */
-LLBC_EXPORT void LLBC_SetLastError(int no);
+LLBC_EXPORT void LLBC_SetLastError(int no, const char *customErrStr = nullptr);
 
 /**
  * @brief Set llbc library last error.

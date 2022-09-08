@@ -155,6 +155,15 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
 
     LLBC_PrintLine("Custom error 0x%x desc: %s", customErr1, LLBC_StrError(customErr1));
 
+    // Custom error string test.
+    LLBC_PrintLine("Custom error string test:");
+    LLBC_SetLastError(LLBC_ERROR_FORMAT, "The custom error string for LLBC_ERROR_FORMAT");
+    LLBC_PrintLine("\tSet LLBC_ERROR_FORMAT error string to: \"The custom error string for LLBC_ERROR_FORMAT\"");
+    LLBC_PrintLine("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
+    LLBC_PrintLine("\tReset last eror:LLBC_ERROR_FORMAT:");
+    LLBC_SetLastError(LLBC_ERROR_FORMAT);
+    LLBC_PrintLine("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
+
     LLBC_PrintLine("");
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

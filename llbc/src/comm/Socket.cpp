@@ -682,11 +682,11 @@ void LLBC_Socket::OnRecv()
     int subErrNo = LLBC_ERROR_SUCCESS;
     if (len < 0)
     {
-        errNo = LLBC_Errno;
+        errNo = LLBC_GetLastError();
         if (LLBC_ERROR_TYPE_IS_LIBRARY(errNo))
             subErrNo = 0;
         else
-            subErrNo = LLBC_SubErrno;
+            subErrNo = LLBC_GetSubErrorNo();
     }
 
     // Try process already received data, whether the errors occurred or not.

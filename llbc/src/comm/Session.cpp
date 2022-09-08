@@ -41,7 +41,7 @@ LLBC_SessionCloseInfo::LLBC_SessionCloseInfo()
     _reason = LLBC_FormatLastError();
 
     // Fill errNo & subErrNo.
-    _errNo = LLBC_Errno;
+    _errNo = LLBC_GetLastError();
     if (LLBC_HasSubErrorNo(_errNo))
         _subErrNo = LLBC_GetSubErrorNo();
     else
