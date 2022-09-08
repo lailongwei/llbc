@@ -78,6 +78,7 @@
 #include "comm/TestCase_Comm_PacketOp.h"
 #include "comm/TestCase_Comm_ReleasePool.h"
 #include "comm/TestCase_Comm_Comp.h"
+#include "comm/TestCase_Comm_CompEvent.h"
 #include "comm/TestCase_Comm_SvcBase.h"
 #include "comm/TestCase_Comm_SvcFps.h"
 #include "comm/TestCase_Comm_SvcStartStop.h"

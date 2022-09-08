@@ -1612,7 +1612,7 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     }
 
     // Check has care session-create ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnSessionCreate])
+    if (_caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate])
     {
         // Build session info.
         LLBC_SessionInfo info;
@@ -1624,7 +1624,7 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         info.SetSocket(ev.handle);
 
         // Dispatch session-create event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnSessionCreate];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
             caredComps[compIdx]->OnSessionCreate(info);
@@ -1642,7 +1642,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     }
 
     // Check has care session-destroy ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnSessionDestroy])
+    if (_caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy])
     {
         // Build session info.
         LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
@@ -1658,7 +1658,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         ev.closeInfo = nullptr;
 
         // Dispatch session-destroy event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnSessionDestroy];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnSessionDestroy(destroyInfo);
@@ -1676,7 +1676,7 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
 
 
     // Check has care asyncconn-result ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAsyncConnResult])
+    if (_caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult])
     {
         LLBC_AsyncConnResult result;
         result.SetIsConnected(ev.connected);
@@ -1684,7 +1684,7 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
         result.SetReason(ev.reason);
         result.SetPeerAddr(ev.peer);
 
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAsyncConnResult];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnAsyncConnResult(result);
@@ -1812,9 +1812,9 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     else
     {
-        if (_caredEventComps[LLBC_ComponentEventsOffset::OnUnHandledPacket])
+        if (_caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket])
         {
-            _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnUnHandledPacket];
+            _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket];
             const size_t compsSize = caredComps.size();
             for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
                  caredComps[compIdx]->OnUnHandledPacket(*packet);
@@ -1830,7 +1830,7 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     // Check has care proto-report ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnProtoReport])
+    if (_caredEventComps[LLBC_ComponentEventIndex::OnProtoReport])
     {
         LLBC_ProtoReport report;
         report.SetSessionId(ev.sessionId);
@@ -1839,7 +1839,7 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
         report.SetLevel(ev.level);
         report.SetReport(ev.report);
 
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnProtoReport];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnProtoReport];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnProtoReport(report);
@@ -1891,10 +1891,10 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
 void LLBC_Service::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 {
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReload])
+    if (_caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload])
     {
         // Dispatch application config reloaded event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventsOffset::OnAppCfgReload];
+        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
             caredComps[compIdx]->OnApplicationConfigReload();
@@ -2047,7 +2047,7 @@ void LLBC_Service::StopComps()
 
 void LLBC_Service::UpdateComps()
 {
-    _Comps *&caredCompsPtr = _caredEventComps[LLBC_ComponentEventsOffset::OnUpdate];
+    _Comps *&caredCompsPtr = _caredEventComps[LLBC_ComponentEventIndex::OnUpdate];
     if (!caredCompsPtr)
         return;
 
@@ -2091,8 +2091,8 @@ void LLBC_Service::DestroyComps()
     LLBC_STLHelper::DeleteContainer(_comps, true, true);
     _comps2.clear();
 
-    for (int evOffset = LLBC_ComponentEventsOffset::Begin;
-         evOffset != LLBC_ComponentEventsOffset::End;
+    for (int evOffset = LLBC_ComponentEventIndex::Begin;
+         evOffset != LLBC_ComponentEventIndex::End;
          ++evOffset)
     {
         _Comps *&evComps = _caredEventComps[evOffset];
@@ -2139,8 +2139,8 @@ void LLBC_Service::AddComp(LLBC_Component *comp)
 
 void LLBC_Service::AddCompToCaredEventsArray(LLBC_Component *comp)
 {
-    for (int evOffset = LLBC_ComponentEventsOffset::Begin;
-         evOffset != LLBC_ComponentEventsOffset::End;
+    for (int evOffset = LLBC_ComponentEventIndex::Begin;
+         evOffset != LLBC_ComponentEventIndex::End;
          ++evOffset)
     {
         if (!comp->IsCaredEventOffset(evOffset))
@@ -2252,7 +2252,7 @@ void LLBC_Service::ClearHoldedTimerScheduler()
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
 {
-    _Comps *&caredEvsPtr = _caredEventComps[LLBC_ComponentEventsOffset::OnIdle];
+    _Comps *&caredEvsPtr = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
     if (!caredEvsPtr)
         return;
 

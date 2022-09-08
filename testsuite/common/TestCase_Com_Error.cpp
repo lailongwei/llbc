@@ -26,7 +26,6 @@
  #include <netdb.h>
 #endif // Non-Win32
 
-
 TestCase_Com_Error::TestCase_Com_Error()
 {
 }

@@ -672,7 +672,7 @@ private:
     _Comps _comps;
     typedef std::map<LLBC_String, _Comps> _Comps2;
     _Comps2 _comps2;
-    _Comps *_caredEventComps[LLBC_ComponentEventsOffset::End];
+    _Comps *_caredEventComps[LLBC_ComponentEventIndex::End];
     typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
     _CompLibraries _compLibraries;
     typedef std::map<int, LLBC_CoderFactory *> _Coders;
