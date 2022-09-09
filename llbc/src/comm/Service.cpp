@@ -1998,6 +1998,14 @@ int LLBC_Service::StartComps()
                 break;
             }
 
+            for (size_t upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
+            {
+                auto &upComp = _comps[upCompIdx];
+                if (upComp->_started &&
+                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                    upComp->OnUpdate();
+            }
+
             LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         }
 
@@ -2016,11 +2024,9 @@ int LLBC_Service::StartComps()
 
 void LLBC_Service::StopComps()
 {
-    for (_Comps::reverse_iterator it = _comps.rbegin();
-         it != _comps.rend();
-         ++it)
+    for (int compIdx = static_cast<int>(_comps.size()) - 1; compIdx >= 0; --compIdx)
     {
-        LLBC_Component *comp = *it;
+        auto &comp = _comps[compIdx];
         if (!comp->_started)
             continue;
 
@@ -2038,6 +2044,14 @@ void LLBC_Service::StopComps()
             {
                 comp->_started = false;
                 break;
+            }
+
+            for (int upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
+            {
+                auto &upComp = _comps[upCompIdx];
+                if (upComp->_started &&
+                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                    upComp->OnUpdate();
             }
 
             LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
@@ -2143,7 +2157,7 @@ void LLBC_Service::AddCompToCaredEventsArray(LLBC_Component *comp)
          evOffset != LLBC_ComponentEventIndex::End;
          ++evOffset)
     {
-        if (!comp->IsCaredEventOffset(evOffset))
+        if (!comp->IsCaredEventIndex(evOffset))
             continue;
 
         _Comps *&evComps = _caredEventComps[evOffset];

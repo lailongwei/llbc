@@ -91,7 +91,7 @@ inline bool LLBC_Component::IsCaredEvents(uint64 compEvs) const
     return (_caredEvents & compEvs) == compEvs;
 }
 
-inline bool LLBC_Component::IsCaredEventOffset(int compEvOffset) const
+inline bool LLBC_Component::IsCaredEventIndex(int compEvOffset) const
 {
  #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
     return IsCaredEvents(1Ui64 << compEvOffset);
