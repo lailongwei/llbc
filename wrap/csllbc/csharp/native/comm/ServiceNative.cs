@@ -126,21 +126,21 @@ namespace llbc
                                                           int status);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Service_RegisterComponent(IntPtr svc,
-                                                                  Deleg_Comp_OnInit initDeleg,
-                                                                  Deleg_Comp_OnDestroy destroyDeleg,
-                                                                  Deleg_Comp_OnStart startDeleg,
-                                                                  Deleg_Comp_OnStop stopDeleg,
-                                                                  Deleg_Comp_OnUpdate updateDeleg,
-                                                                  Deleg_Comp_OnIdle idleDeleg,
-                                                                  Deleg_Comp_OnSessionCreate sessionCreateDeleg,
-                                                                  Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
-                                                                  Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
-                                                                  Deleg_Comp_OnProtoReport protoReportDeleg,
-                                                                  Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg);
+        public extern static int csllbc_Service_AddComponent(IntPtr svc,
+                                                             Deleg_Comp_OnInit initDeleg,
+                                                             Deleg_Comp_OnDestroy destroyDeleg,
+                                                             Deleg_Comp_OnStart startDeleg,
+                                                             Deleg_Comp_OnStop stopDeleg,
+                                                             Deleg_Comp_OnUpdate updateDeleg,
+                                                             Deleg_Comp_OnIdle idleDeleg,
+                                                             Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                                             Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                                             Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                                             Deleg_Comp_OnProtoReport protoReportDeleg,
+                                                             Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Service_RegisterCoder(IntPtr svc, int opcode);
+        public extern static int csllbc_Service_AddCoder(IntPtr svc, int opcode);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Service_Subscribe(IntPtr svc, int opcode);

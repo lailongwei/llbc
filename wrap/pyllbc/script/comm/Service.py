@@ -457,9 +457,9 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registercomp(self, comp, libpath='', libcomp_cls=None):
+    def addcomp(self, comp, libpath='', libcomp_cls=None):
         """
-        Register component.
+        Add component.
             component methods(all methods are optional):
                 oninitialize(self, ev): service initialize handler.
                     ev.svc: service object.
@@ -524,9 +524,9 @@ class pyllbcService(object):
             if isinstance(comp, unicode):
                 comp = comp.encode('utf8')
 
-            comp = llbc.inl.RegisterLibComponent(self._c_obj, comp, libpath, libcomp_cls)
+            comp = llbc.inl.AddLibComponent(self._c_obj, comp, libpath, libcomp_cls)
         else:
-            llbc.inl.RegisterComponent(self._c_obj, comp)
+            llbc.inl.AddComponent(self._c_obj, comp)
 
         # add some common members
         comp.svc = self
@@ -542,9 +542,9 @@ class pyllbcService(object):
         """
         return self._comps.get(cls)
 
-    def registerencoder(self, opcode, encoder):
+    def addencoder(self, opcode, encoder):
         """
-        Register specific opcode's encoder(only available in CODEC_BINARY codec mode).
+        Add specific opcode's encoder(only available in CODEC_BINARY codec mode).
         """
         if not hasattr(encoder, 'encode') or not callable(encoder.encode):
             raise llbc.error('invalid encoder, opcode: {}, encoder: {}'.format(opcode, encoder))
@@ -553,9 +553,9 @@ class pyllbcService(object):
 
         self._encoders.update({encoder:opcode})
 
-    def registerdecoder(self, opcode, coder):
+    def adddecoder(self, opcode, coder):
         """
-        Register specific opcode's decoder(only available in CODEC_BINARY codec mode).
+        Add specific opcode's decoder(only available in CODEC_BINARY codec mode).
         Note: must raw types(eg:int, long, float, str, bytearray, unicode...) or exist follow methods' class:
               decode(self, stream): decode data from stream.
         """

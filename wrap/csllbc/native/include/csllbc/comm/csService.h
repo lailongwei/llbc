@@ -158,14 +158,14 @@ public:
 
 public:
     /**
-     * Register csharp layer components.
+     * Add csharp layer components.
      */
-    int RegisterComponent(csllbc_Component *comp);
+    int AddComponent(csllbc_Component *comp);
 
     /**
      * Register csharp layer coder.
      */
-    int RegisterCoder(int opcode);
+    int AddCoder(int opcode);
 
     /**
      * Subscribe/PreSubscribe/Unify-PreSubscribe specific opcode's packet.

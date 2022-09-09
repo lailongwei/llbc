@@ -228,7 +228,7 @@ void pyllbc_Service::Stop()
     }
 }
 
-int pyllbc_Service::RegisterComponent(PyObject *comp)
+int pyllbc_Service::AddComponent(PyObject *comp)
 {
     if (_started)
     {
@@ -251,7 +251,7 @@ int pyllbc_Service::RegisterComponent(PyObject *comp)
     return LLBC_OK;
 }
 
-int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp)
+int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp)
 {
     // Force reset comp ptr.
     comp = nullptr;
