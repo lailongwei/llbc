@@ -26,18 +26,17 @@
 #include "llbc/core/Core.h"
 
 #include "llbc/comm/SessionOpts.h"
+#include "llbc/comm/Coder.h"
+#include "llbc/comm/Component.h"
 
 __LLBC_NS_BEGIN
 
 /**
  * Previous declare some classes.
  */
-class LLBC_Coder;
 class LLBC_Packet;
-class LLBC_Component;
 class LLBC_Session;
 class LLBC_PollerMgr;
-class LLBC_CoderFactory;
 class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
@@ -393,44 +392,52 @@ public:
 
 public:
     /**
-     * Register component.
+     * Add component by component class or pointer.
      */
-    template <typename ComponentFactoryCls>
-    int RegisterComponent();
-    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory) = 0;
-    virtual int RegisterComponent(LLBC_Component *comp) = 0;
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
+    template <typename Comp>
+    typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, int>::type
+    AddComponent();
+    virtual int AddComponent(LLBC_Component *comp) = 0;
+
+    /**
+     * Add component by component factory class or pointer.
+     */
+    template <typename CompFactory>
+    typename std::enable_if<std::is_base_of<LLBC_ComponentFactory, CompFactory>::value, int>::type
+    AddComponent();
+    int AddComponent(LLBC_ComponentFactory *compFactory);
+
+    /**
+     * Add component by shared library.
+     */
+    int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName);
+    virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
 
     /**
      * Get component/components.
      */
-    template <typename ComponentCls>
-    ComponentCls *GetComponent();
-    template <typename ComponentCls>
-    ComponentCls *GetComponent(const char *compName);
-    template <typename ComponentCls>
-    ComponentCls *GetComponent(const LLBC_String &compName);
+    template <typename Comp>
+    typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+    GetComponent();
+    LLBC_Component *GetComponent(const LLBC_String &compName);
+    LLBC_Component *GetComponent(const std::string &compName);
     virtual LLBC_Component *GetComponent(const char *compName) = 0;
-    virtual LLBC_Component *GetComponent(const LLBC_String &compName) = 0;
-    template <typename ComponentCls>
-    std::vector<LLBC_Component *> GetComponents();
-    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName) = 0;
 
 public:
     /**
-     * Register coder.
+     * Add coder factory.
      */
-    template <typename CoderFactoryCls>
-    int RegisterCoder(int opcode);
-    virtual int RegisterCoder(int opcode, LLBC_CoderFactory *coder) = 0;
+    template <typename CoderFactory>
+    typename std::enable_if<std::is_base_of<LLBC_CoderFactory, CoderFactory>::value, int>::type
+    AddCoderFactory(int opcode);
+    virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory) = 0;
 
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
 public:
     /**
-     * Register status code describe.
+     * Add status code describe.
      */
-    virtual int RegisterStatusDesc(int status, const LLBC_String &desc) = 0;
+    virtual int AddStatusDesc(int status, const LLBC_String &desc) = 0;
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 public:

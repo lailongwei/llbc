@@ -26,63 +26,83 @@
 
 __LLBC_NS_BEGIN
 
-template <typename ComponentFactoryCls>
-inline int LLBC_IService::RegisterComponent()
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, int>::type
+LLBC_IService::AddComponent()
 {
-    ComponentFactoryCls *compFactory = LLBC_New(ComponentFactoryCls);
-    int ret = RegisterComponent(compFactory);
+    auto comp = new Comp;
+    const int ret = AddComponent(comp);
     if (ret != LLBC_OK)
+        delete comp;
+
+    return ret;
+}
+
+template <typename CompFactory>
+typename std::enable_if<std::is_base_of<LLBC_ComponentFactory, CompFactory>::value, int>::type
+LLBC_IService::AddComponent()
+{
+    auto compFactory = new CompFactory;
+    LLBC_Defer(delete compFactory);
+
+    const int ret = AddComponent(compFactory->Create());
+    if (ret != LLBC_OK)
+        delete compFactory;
+
+    return ret;
+}
+
+inline int LLBC_IService::AddComponent(LLBC_ComponentFactory *compFactory)
+{
+    if (UNLIKELY(!compFactory))
     {
-        LLBC_Delete(compFactory);
+        LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    return LLBC_OK;
-}
-
-inline int LLBC_IService::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName)
-{
-    LLBC_Component *comp;
-    return RegisterComponent(libPath, compName, comp);
-}
-
-template <typename CoderFactoryCls>
-inline int LLBC_IService::RegisterCoder(int opcode)
-{
-    CoderFactoryCls *coderFactory = LLBC_New(CoderFactoryCls);
-    int ret = RegisterCoder(opcode, coderFactory);
+    auto comp = compFactory->Create();
+    const int ret = AddComponent(comp);
     if (ret != LLBC_OK)
-    {
+        LLBC_XDelete(comp);
+    else
+        delete compFactory;
+
+    return ret;
+}
+
+inline int LLBC_IService::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName)
+{
+    LLBC_Component *_;
+    return AddComponent(compSharedLibPath, compName, _);
+}
+
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+LLBC_IService::GetComponent()
+{
+    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+}
+
+inline LLBC_Component *LLBC_IService::GetComponent(const LLBC_String &compName)
+{
+    return GetComponent(compName.c_str());
+}
+
+inline LLBC_Component *LLBC_IService::GetComponent(const std::string &compName)
+{
+    return GetComponent(compName.c_str());
+}
+
+template <typename CoderFactory>
+typename std::enable_if<std::is_base_of<LLBC_CoderFactory, CoderFactory>::value, int>::type
+LLBC_IService::AddCoderFactory(int opcode)
+{
+    auto coderFactory = new CoderFactory;
+    const int ret = AddCoderFactory(opcode, coderFactory);
+    if (ret != LLBC_OK)
         LLBC_Delete(coderFactory);
-        return LLBC_FAILED;
-    }
 
-    return LLBC_OK;
-}
-
-template <typename ComponentCls>
-inline ComponentCls *LLBC_IService::GetComponent()
-{
-    return static_cast<ComponentCls *>(GetComponent(LLBC_GetTypeName(ComponentCls)));
-}
-
-template <typename ComponentCls>
-inline ComponentCls *LLBC_IService::GetComponent(const char *compName)
-{
-    return static_cast<ComponentCls *>(GetComponent(compName));
-}
-
-template <typename ComponentCls>
-inline ComponentCls *LLBC_IService::GetComponent(const LLBC_String &compName)
-{
-    return static_cast<ComponentCls *>(GetComponent(compName));
-}
-
-template <typename ComponentCls>
-inline std::vector<LLBC_Component *> LLBC_IService::GetComponents()
-{
-    const LLBC_String compName = LLBC_GetTypeName(ComponentCls);
-    return GetComponents(compName);
+    return ret;
 }
 
 inline int LLBC_IService::Send(int sessionId)

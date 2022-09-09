@@ -182,13 +182,13 @@ int csllbc_Service::Broadcast(int opcode, const void *bytes, size_t len, int sta
 
 int csllbc_Service::RegisterComponent(csllbc_Component *comp)
 {
-    return _llbcSvc->RegisterComponent(comp);
+    return _llbcSvc->AddComponent(comp);
 }
 
 int csllbc_Service::RegisterCoder(int opcode)
 {
     csllbc_CoderFactory *coderFactory = LLBC_New(csllbc_CoderFactory);
-    if (_llbcSvc->RegisterCoder(opcode, coderFactory) != LLBC_OK)
+    if (_llbcSvc->AddCoderFactory(opcode, coderFactory) != LLBC_OK)
     {
         LLBC_Delete(coderFactory);
         return LLBC_FAILED;

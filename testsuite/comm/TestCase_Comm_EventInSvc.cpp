@@ -146,7 +146,7 @@ int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
 
     // We create a service to test.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "EventTest");
-    svc->RegisterComponent(LLBC_New(EventTestComp));
+    svc->AddComponent(LLBC_New(EventTestComp));
     svc->Start();
 
     std::cout <<"Press any key to continue..." <<std::endl;

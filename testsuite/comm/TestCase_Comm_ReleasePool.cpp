@@ -95,7 +95,7 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
 
     // Create service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "ReleasePoolTest");
-    svc->RegisterComponent(LLBC_New(MyComp));
+    svc->AddComponent(LLBC_New(MyComp));
     svc->Start();
 
     std::cout <<"press any key to continue ..." <<std::endl;

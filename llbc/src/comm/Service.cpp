@@ -676,38 +676,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId,
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(LLBC_ComponentFactory *compFactory)
-{
-    if (UNLIKELY(!compFactory))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
-    for (_WillRegComps::iterator it = _willRegComps.begin();
-         it != _willRegComps.end();
-         ++it)
-    {
-        if (it->compFactory != nullptr && it->compFactory == compFactory)
-        {
-            LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_FAILED;
-        }
-    }
-
-    _willRegComps.push_back(_WillRegComp(compFactory));
-
-    return LLBC_OK;
-}
-
-int LLBC_Service::RegisterComponent(LLBC_Component *comp)
+int LLBC_Service::AddComponent(LLBC_Component *comp)
 {
     if (UNLIKELY(!comp))
     {
@@ -744,7 +713,7 @@ int LLBC_Service::RegisterComponent(LLBC_Component *comp)
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp)
+int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp)
 {
     // Force reset out parameter: comp.
     comp = nullptr;
@@ -763,7 +732,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
-    else if (!LLBC_File::Exists(libPath))
+    else if (!LLBC_File::Exists(compSharedLibPath))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
@@ -771,7 +740,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
 
     // Open comp library(if cached, reuse it).
     bool existingLib;
-    LLBC_Library *lib = OpenCompLibrary(libPath, existingLib);
+    LLBC_Library *lib = OpenCompLibrary(compSharedLibPath, existingLib);
     if (!lib)
         return LLBC_FAILED;
 
@@ -783,7 +752,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     if (!compCreateFunc)
     {
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         return LLBC_FAILED;
     }
@@ -794,7 +763,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     if (!comp)
     {
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
             LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
@@ -807,7 +776,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     {
         LLBC_XDelete(comp);
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
 
@@ -815,12 +784,12 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     }
 
     // Call normalize register comp method to register.
-    int ret = RegisterComponent(comp);
+    int ret = AddComponent(comp);
     if (ret != LLBC_OK)
     {
         LLBC_XDelete(comp);
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
     }
 
     return ret;
@@ -840,41 +809,9 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 
     _Comps &comps = it->second;
     return comps[0];
-
 }
 
-LLBC_Component *LLBC_Service::GetComponent(const LLBC_String &compName)
-{
-    LLBC_LockGuard guard(_lock);
-
-    _Comps2::iterator it = _comps2.find(compName);
-    if (it == _comps2.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return nullptr;
-    }
-
-    _Comps &comps = it->second;
-    return comps[0];
-}
-
-const std::vector<LLBC_Component *> &LLBC_Service::GetComponents(const LLBC_String &compName)
-{
-    static const std::vector<LLBC_Component *> emptyComps;
-
-    LLBC_LockGuard guard(_lock);
-
-    _Comps2::iterator it = _comps2.find(compName);
-    if (it == _comps2.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return emptyComps;
-    }
-
-    return it->second;
-}
-
-int LLBC_Service::RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory)
+int LLBC_Service::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory)
 {
     if (UNLIKELY(!coderFactory))
     {
@@ -898,7 +835,7 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory)
 }
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
+int LLBC_Service::AddStatusDesc(int status, const LLBC_String &desc)
 {
     if (status == 0 || desc.empty())
     {

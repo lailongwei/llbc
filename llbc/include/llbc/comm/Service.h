@@ -312,29 +312,29 @@ public:
     /**
      * Register component.
      */
-    virtual int RegisterComponent(LLBC_ComponentFactory *compFactory);
-    virtual int RegisterComponent(LLBC_Component *comp);
-    virtual int RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp);
+    virtual int AddComponent(LLBC_Component *comp);
+    virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp);
 
     /**
      * Get component/componemts.
      */
     virtual LLBC_Component *GetComponent(const char *compName);
-    virtual LLBC_Component *GetComponent(const LLBC_String &compName);
-    virtual const std::vector<LLBC_Component *> &GetComponents(const LLBC_String &compName);
 
+public:
     /**
-     * Register coder.
+     * Add coder factory.
      */
-    virtual int RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory);
+    virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory);
 
+public:
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     /**
-     * Register status code describe.
+     * Add status code describe.
      */
-    virtual int RegisterStatusDesc(int status, const LLBC_String &desc);
+    virtual int AddStatusDesc(int status, const LLBC_String &desc);
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC 
 
+public:
     /**
      * Subscribe message to specified delegate.
      */

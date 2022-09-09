@@ -295,7 +295,7 @@ namespace llbc
                 return;
 
             _CreateObject(ref obj);
-            svc.RegisterComponent(obj as IComponent);
+            svc.AddComponent(obj as IComponent);
         }
 
         private void _RegisterGlobalCoder(Service svc, ref object obj)

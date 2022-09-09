@@ -265,7 +265,7 @@ int pyllbc_Service::RegisterComponent(const LLBC_String &compName, const LLBC_St
 
     // Register native comp.
     LLBC_Component *nativeComp;
-    int ret = _llbcSvc->RegisterComponent(libPath, compName, nativeComp);
+    int ret = _llbcSvc->AddComponent(libPath, compName, nativeComp);
     if (ret != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When register comp(from dynamic library)");
@@ -827,7 +827,7 @@ void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_S
     _llbcSvc->SuppressCoderNotFoundWarning();
 
     _cppComp = LLBC_New(pyllbc_Component, this);
-    _llbcSvc->RegisterComponent(_cppComp);
+    _llbcSvc->AddComponent(_cppComp);
 }
 
 void pyllbc_Service::AfterStop()

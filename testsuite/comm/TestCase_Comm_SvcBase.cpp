@@ -218,12 +218,12 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
 
     // Register comp.
     TestComp *comp = LLBC_New(TestComp);
-    _svc->RegisterComponent(comp);
+    _svc->AddComponent(comp);
     // Register coder.
-    _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
+    _svc->AddCoderFactory(1, LLBC_New(TestDataFactory));
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    _svc->RegisterStatusDesc(1, "The test status describe");
+    _svc->AddStatusDesc(1, "The test status describe");
 #endif
 
     // Subscribe handler.

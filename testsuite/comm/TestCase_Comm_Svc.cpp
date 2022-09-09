@@ -139,7 +139,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     // Create service
     LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
     TestComp *comp = LLBC_New(TestComp);
-    svc->RegisterComponent(comp);
+    svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
     svc->Start(8);

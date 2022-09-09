@@ -136,7 +136,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
 
     // Create comp and register it.
     TestComp *comp = LLBC_New(TestComp);
-    _svc->RegisterComponent(comp);
+    _svc->AddComponent(comp);
     _svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
 
     // Set drive mode and start it.
