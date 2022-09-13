@@ -832,15 +832,19 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 
     _compNameKey.assign(compName);
     _Comps2::iterator it = _comps2.find(_compNameKey);
-    if (it == _comps2.end())
+    if (it != _comps2.end())
+        return it->second[0];
+
+    if (_compNameKey.size() > 1 &&
+        _compNameKey[0] == 'I')
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return nullptr;
+        _compNameKey.erase(_compNameKey.begin());
+        if ((it = _comps2.find(_compNameKey)) != _comps2.end())
+            return it->second[0];
     }
 
-    _Comps &comps = it->second;
-    return comps[0];
-
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+    return nullptr;
 }
 
 LLBC_Component *LLBC_Service::GetComponent(const LLBC_String &compName)
