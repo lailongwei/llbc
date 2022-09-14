@@ -206,11 +206,13 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = LLBC_Application::HandleSignal_Stop;
-    for (auto &stopSig : LLBC_CFG_APP_STOP_SIGNALS)
+    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+    for (auto &stopSig : stopSigs)
         sigaction(stopSig, &sa, nullptr);
     // - App config reload signal
+    const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
     sa.sa_handler = LLBC_Application::HandleSignal_ReloadAppCfg;
-    for (auto &cfgReloadSig : LLBC_CFG_APP_CFG_RELOAD_SIGNALS)
+    for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
 
     // Call OnWillStart event method.
@@ -289,9 +291,11 @@ void LLBC_Application::Stop()
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = SIG_DFL;
-    for (auto &stopSig : LLBC_CFG_APP_STOP_SIGNALS)
+    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+    for (auto &stopSig : stopSigs)
         sigaction(stopSig, &sa, nullptr);
-    for (auto &cfgReloadSig : LLBC_CFG_APP_CFG_RELOAD_SIGNALS)
+    const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
+    for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
 
     // Cleanup members.
