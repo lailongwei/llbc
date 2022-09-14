@@ -81,6 +81,8 @@ __LLBC_LibTls::~__LLBC_LibTls()
 void __LLBC_CreateLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
+    if (tlsHandle != LLBC_INVALID_TLS_HANDLE)
+        return;
 
     bool tlsCreated;
 #if LLBC_TARGET_PLATFORM_NON_WIN32

@@ -22,6 +22,8 @@
 
 #include "llbc/common/Export.h"
 
+#include <signal.h>
+
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/application/Application.h"
 
@@ -73,15 +75,23 @@ LLBC_Application::LLBC_Application()
 
 , _services(*LLBC_ServiceMgrSingleton)
 
-, _started(false)
+, _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
+, _requireStop(false)
 {
-    LLBC_DoIf(_thisApp == nullptr, _thisApp = this);
+    ASSERT(!_thisApp && "Not allow create more than one application object");
+
+    _thisApp = this;
+    _libEventHandlers.emplace(LLBC_ApplicationEventType::Stop,
+        LLBC_Delegate<void(const LLBC_ApplicationEvent &)>(this, &LLBC_Application::HandleEvent_Stop));
+    _libEventHandlers.emplace(LLBC_ApplicationEventType::ReloadApplicationConfig,
+        LLBC_Delegate<void(const LLBC_ApplicationEvent &)>(this, &LLBC_Application::HandleEvent_ReloadAppCfg));
 }
 
 LLBC_Application::~LLBC_Application()
 {
-    Stop();
+    ASSERT(!IsStarted() && "Please stop application before destruct");
+    _thisApp = nullptr;
 }
 
 int LLBC_Application::SetConfigPath(const LLBC_String &cfgPath)
@@ -97,12 +107,12 @@ int LLBC_Application::SetConfigPath(const LLBC_String &cfgPath)
                            LLBC_ERROR_NOT_SUPPORT,
                            LLBC_FAILED);
 
-    // Check _started flag.
-    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    // Check started flag.
+    LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Lock and check _started flag again.
     LLBC_LockGuard guard(_cfgLock);
-    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Save config info.
     _cfgType = cfgType;
@@ -114,11 +124,11 @@ int LLBC_Application::SetConfigPath(const LLBC_String &cfgPath)
 int LLBC_Application::ReloadConfig(bool callEvMeth)
 {
     // Not allow reload config if application not start.
-    LLBC_SetErrAndReturnIf(!_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Lock and check again.
     LLBC_LockGuard guard(_cfgLock);
-    LLBC_SetErrAndReturnIf(!_started, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Config not found when application start.
     LLBC_SetErrAndReturnIf(_cfgType == LLBC_ApplicationConfigType::End, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
@@ -145,7 +155,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     LLBC_SetErrAndReturnIf(name.empty(), LLBC_ERROR_INVALID, LLBC_FAILED);
 
     // Reentry check.
-    LLBC_SetErrAndReturnIf(_started, LLBC_ERROR_REENTRY, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_REENTRY, LLBC_FAILED);
 
     // Parse startup arguments.
     LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
@@ -187,6 +197,22 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     // Load config.
     LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
+    // Hook process crash.
+    if (LLBC_HookProcessCrash() != LLBC_OK)
+        return LLBC_FAILED;
+
+    // Install required signal handlers.
+    // - App stop signals
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = LLBC_Application::HandleSignal_Stop;
+    for (auto &stopSig : LLBC_CFG_APP_STOP_SIGNALS)
+        sigaction(stopSig, &sa, nullptr);
+    // - App config reload signal
+    sa.sa_handler = LLBC_Application::HandleSignal_ReloadAppCfg;
+    for (auto &cfgReloadSig : LLBC_CFG_APP_CFG_RELOAD_SIGNALS)
+        sigaction(cfgReloadSig, &sa, nullptr);
+
     // Call OnWillStart event method.
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     if (OnWillStart(argc, argv) != LLBC_OK)
@@ -214,7 +240,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     }
 
     // Mark started.
-    _started = true;
+    _startThreadId = LLBC_GetCurrentThreadId();
 
     // Call OnStartFinish event method.
     OnStartFinish(argc, argv);
@@ -227,8 +253,15 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 void LLBC_Application::Stop()
 {
     // Not start judge.
-    if (!_started)
+    if (!IsStarted())
         return;
+
+    // If caller thread is not application start thread, push AppStop event and return.
+    if (LLBC_GetCurrentThreadId() != _startThreadId)
+    {
+        PushEvent(LLBC_ApplicationEventType::Stop);
+        return;
+    }
 
     // Call OnWillStop event method.
     OnWillStop();
@@ -247,10 +280,19 @@ void LLBC_Application::Stop()
     }
 
     // Mask stopped.
-    _started = false;
+    _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 
     // Call OnStopFinish event method.
     OnStopFinish();
+
+    // Uninstall required signal handlers.
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = SIG_DFL;
+    for (auto &stopSig : LLBC_CFG_APP_STOP_SIGNALS)
+        sigaction(stopSig, &sa, nullptr);
+    for (auto &cfgReloadSig : LLBC_CFG_APP_CFG_RELOAD_SIGNALS)
+        sigaction(cfgReloadSig, &sa, nullptr);
 
     // Cleanup members.
     _cfgPath.clear();
@@ -258,8 +300,86 @@ void LLBC_Application::Stop()
     _propCfg.RemoveAllProperties();
     _nonPropCfg.BecomeNil();
 
+    for (auto &events : _events)
+        LLBC_STLHelper::RecycleContainer(events);
+
+    _requireStop = false;
+
     // Cleanup llbc.
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
+}
+
+int LLBC_Application::Run()
+{
+    // If not started, return failed.
+    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_INIT, LLBC_FAILED);
+    // If not start thread, return failed.
+    LLBC_SetErrAndReturnIf(LLBC_GetCurrentThreadId() != _startThreadId, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Run loop.
+    while (true)
+    {
+        // Call OnRun event method.
+        bool runDoNothing = true;
+        OnRun(runDoNothing);
+        // Handle events.
+        bool handleEvsDoNothing = true;
+        HandleEvents(handleEvsDoNothing);
+
+        // If require stop, execute stop.
+        if (_requireStop)
+        {
+            Stop();
+            return LLBC_OK;
+        }
+
+        // Execute sleep, if not do anything.
+        if (runDoNothing && handleEvsDoNothing)
+            LLBC_Sleep(1);
+    }
+}
+
+int LLBC_Application::PushEvent(LLBC_ApplicationEvent *ev)
+{
+    LLBC_LockGuard guard(_eventLock);
+    if (!IsStarted() &&
+        ev->evType != LLBC_ApplicationEventType::Stop)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    _events[0].push_back(ev);
+
+    return LLBC_OK;
+}
+
+int LLBC_Application::SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_ApplicationEvent &)> &evHandler)
+{
+    // Check event type & event handler.
+    if (evType < LLBC_ApplicationEventType::LibBegin ||
+        evType >= LLBC_ApplicationEventType::LogicEnd ||
+        !evHandler)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    // Lock.
+    LLBC_LockGuard guard(_eventLock);
+    // Not allow subscribe event when app has been start.
+    LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Repeat subscribe check.
+    if (_logicEventHandlers.find(evType) != _logicEventHandlers.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    _logicEventHandlers.emplace(evType, evHandler);
+
+    return LLBC_OK;
 }
 
 LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &cfgType)
@@ -389,6 +509,58 @@ int LLBC_Application::LoadXmlConfig()
 int LLBC_Application::LoadPropertyConfig()
 {
     return _propCfg.LoadFromFile(_cfgPath);
+}
+
+void LLBC_Application::HandleEvents(bool &doNothing)
+{
+    _eventLock.Lock();
+    _events[0].swap(_events[1]);
+    _eventLock.Unlock();
+
+    auto &events = _events[1];
+    if (events.empty())
+        return;
+
+    LLBC_Defer(doNothing = false);
+    LLBC_Defer(LLBC_STLHelper::RecycleContainer(events));
+    for (auto &ev : events)
+    {
+        const auto &evType = ev->evType;
+        if (evType >= LLBC_ApplicationEventType::LibBegin &&
+            evType < LLBC_ApplicationEventType::LibEnd)
+        {
+            auto libHandlerIt = _libEventHandlers.find(evType);
+            if (libHandlerIt != _libEventHandlers.end())
+                libHandlerIt->second(*ev);
+        }
+
+        auto logicHandlerIt = _logicEventHandlers.find(evType);
+        if (logicHandlerIt != _logicEventHandlers.end())
+            logicHandlerIt->second(*ev);
+
+        if (evType == LLBC_ApplicationEventType::Stop)
+            return;
+    }
+}
+
+void LLBC_Application::HandleEvent_ReloadAppCfg(const LLBC_ApplicationEvent &ev)
+{
+    ReloadConfig();
+}
+
+void LLBC_Application::HandleEvent_Stop(const LLBC_ApplicationEvent &ev)
+{
+    _requireStop = true;
+}
+
+void LLBC_Application::HandleSignal_Stop(int sig)
+{
+    ThisApp()->PushEvent(LLBC_ApplicationEventType::Stop);
+}
+
+void LLBC_Application::HandleSignal_ReloadAppCfg(int sig)
+{
+    ThisApp()->PushEvent(LLBC_ApplicationEventType::ReloadApplicationConfig);
 }
 
 __LLBC_NS_END

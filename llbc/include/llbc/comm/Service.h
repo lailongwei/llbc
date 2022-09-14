@@ -650,29 +650,16 @@ private:
     _ReadySessionInfos _readySessionInfos;
     LLBC_SpinLock _readySessionInfosLock;
 
-    class _WillRegComp
-    {
-    public:
-        LLBC_Component *comp;
-        LLBC_ComponentFactory *compFactory;
-
-        _WillRegComp(LLBC_Component *comp);
-        _WillRegComp(LLBC_ComponentFactory *compFactory);
-    };
-    typedef std::vector<_WillRegComp> _WillRegComps;
-    _WillRegComps _willRegComps;
-
+    std::vector<LLBC_Component *> _willRegComps;
     volatile int _compsInitFinished;
     volatile int _compsInitRet;
     volatile int _compsStartFinished;
     volatile int _compsStartRet;
 
     LLBC_String _compNameKey;
-    typedef std::vector<LLBC_Component *> _Comps;
-    _Comps _comps;
-    typedef std::map<LLBC_String, _Comps> _Comps2;
-    _Comps2 _comps2;
-    _Comps *_caredEventComps[LLBC_ComponentEventIndex::End];
+    std::vector<LLBC_Component *> _compList;
+    std::map<LLBC_String, LLBC_Component *> _name2Comps;
+    std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
     typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
     _CompLibraries _compLibraries;
     typedef std::map<int, LLBC_CoderFactory *> _Coders;

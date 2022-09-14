@@ -23,6 +23,11 @@
 
 __LLBC_NS_BEGIN
 
+inline LLBC_ApplicationEvent::LLBC_ApplicationEvent(int evType)
+: evType(evType)
+{
+}
+
 inline int LLBC_Application::OnWillStart(int argc, char *argv[])
 {
     return LLBC_OK;
@@ -37,6 +42,10 @@ inline void LLBC_Application::OnWillStop()
 }
 
 inline void LLBC_Application::OnStopFinish()
+{
+}
+
+inline void LLBC_Application::OnRun(bool &doNothing)
 {
 }
 
@@ -82,7 +91,12 @@ inline const LLBC_String &LLBC_Application::GetConfigPath() const
 
 inline bool LLBC_Application::IsStarted() const
 {
-    return _started;
+    return _startThreadId != LLBC_INVALID_NATIVE_THREAD_ID;
+}
+
+inline int LLBC_Application::PushEvent(int evType)
+{
+    return PushEvent(new LLBC_ApplicationEvent(evType));
 }
 
 inline const LLBC_String &LLBC_Application::GetName() const

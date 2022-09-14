@@ -45,9 +45,13 @@ LLBC_IService::AddComponent()
     auto compFactory = new CompFactory;
     LLBC_Defer(delete compFactory);
 
-    const int ret = AddComponent(compFactory->Create());
+    auto comp = compFactory->Create();
+    const int ret = AddComponent(comp);
     if (ret != LLBC_OK)
-        delete compFactory;
+    {
+        LLBC_XDelete(comp);
+        return LLBC_FAILED;
+    }
 
     return ret;
 }

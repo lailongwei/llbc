@@ -71,6 +71,37 @@ public:
 };
 
 /**
+ * \brief The application event type enumeration.
+ */
+class LLBC_ApplicationEventType
+{
+public:
+    enum ENUM
+    {
+        // llbc library event enumeration range[0,100).
+        LibBegin = 0,
+        Stop = LibBegin, // Application stop event.
+        ReloadApplicationConfig, // Application config reload event.
+        LibEnd = 100,
+
+        // Logic event enumeration range[100, 100000).
+        LogicBegin = LibEnd,
+        LogicEnd = 100000
+    };
+};
+
+/**
+ * \brief The application event class encapsulation.
+ */
+struct LLBC_ApplicationEvent
+{
+    int evType;
+    LLBC_Variant evData;
+
+    explicit LLBC_ApplicationEvent(int evType);
+};
+
+/**
  * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
@@ -105,7 +136,6 @@ public:
      */
     virtual void OnStartFinish(int argc, char *argv[]);
 
-
     /**
      * Application will stop event method, when application will stop, will call this event method.
      */
@@ -121,6 +151,12 @@ public:
      * Application stop finish event method, when application stop finish, will call this event method.
      */
     virtual void OnStopFinish();
+
+    /**
+     * Application main-loop event method, when application running, will call this event method per-tick.
+     * @param[out] doNothing - if event method do nothing, set to true(default is true), otherwise set to false.
+     */
+    virtual void OnRun(bool &doNothing);
 
     /**
      * Application config reloaded event method, please override this method in your project.
@@ -196,9 +232,38 @@ public:
     void Stop();
 
     /**
+     * Application run method.
+     * @return int - return 0 if run success, otherwise return -1.
+     */
+    int Run();
+
+    /**
      * Check application started or not.
      */
     bool IsStarted() const;
+
+public:
+    /**
+     * Push application event by event type.
+     * @param[in] evType - the event type.
+     * @return int - reutrn 0 if success, otherwise return -1.
+     */
+    int PushEvent(int evType);
+
+    /**
+     * Push application event by event object.
+     * @param[in] ev - the event object.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int PushEvent(LLBC_ApplicationEvent *ev);
+
+    /**
+     * Subscribe application event handler.
+     * @param[in] evType    - will subscribe event type.
+     * @param[in] evHandler - event handler.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_ApplicationEvent &)> &evHandler);
 
 public:
     /**
@@ -260,6 +325,14 @@ private:
     int LoadXmlConfig();
     int LoadPropertyConfig();
 
+private:
+    void HandleEvents(bool &doNothing);
+    void HandleEvent_Stop(const LLBC_ApplicationEvent &ev);
+    void HandleEvent_ReloadAppCfg(const LLBC_ApplicationEvent &ev);
+
+    static void HandleSignal_Stop(int sig);
+    static void HandleSignal_ReloadAppCfg(int sig);
+
 protected:
     LLBC_String _name;
     LLBC_SpinLock _cfgLock;
@@ -275,8 +348,15 @@ protected:
     LLBC_ServiceMgr &_services;
 
 private:
-    volatile bool _started;
+    volatile LLBC_ThreadId _startThreadId;
     LLBC_StartArgs _startArgs;
+
+    bool _requireStop;
+
+    LLBC_SpinLock _eventLock;
+    std::vector<LLBC_ApplicationEvent *> _events[2];
+    std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _libEventHandlers;
+    std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _logicEventHandlers;
 
     static LLBC_Application *_thisApp;
 };
