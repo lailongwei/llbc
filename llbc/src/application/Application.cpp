@@ -203,17 +203,25 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 
     // Install required signal handlers.
     // - App stop signals
+    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+#if LLBC_TARGET_PLATFORM_WIN32
+    for (auto &stopSig : stopSigs)
+        signal(stopSig, LLBC_Application::HandleSignal_Stop);
+#else // Non-Win32
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = LLBC_Application::HandleSignal_Stop;
-    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
     for (auto &stopSig : stopSigs)
         sigaction(stopSig, &sa, nullptr);
+#endif // Win32
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
     // - App config reload signal
     const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
     sa.sa_handler = LLBC_Application::HandleSignal_ReloadAppCfg;
     for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
+#endif // Non-Win32
 
     // Call OnWillStart event method.
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -288,15 +296,22 @@ void LLBC_Application::Stop()
     OnStopFinish();
 
     // Uninstall required signal handlers.
+    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+#if LLBC_TARGET_PLATFORM_WIN32
+    for (auto &stopSig : stopSigs)
+        signal(stopSig, SIG_DFL);
+#else // Non-Win32
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = SIG_DFL;
-    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
     for (auto &stopSig : stopSigs)
         sigaction(stopSig, &sa, nullptr);
+#endif // Win32
+#if LLBC_TARGET_PLATFORM_NON_WIN32
     const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
     for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
+#endif // Non-Win32
 
     // Cleanup members.
     _cfgPath.clear();

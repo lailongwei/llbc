@@ -298,6 +298,10 @@
 // Application stop signals.
 #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGFPE}
 // Application config reload signals.
+#if LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {}
+#else // Non-Win32
 #define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {SIGUSR2}
+#endif // Win32
 
 #endif // !__LLBC_COM_CONFIG_H__
