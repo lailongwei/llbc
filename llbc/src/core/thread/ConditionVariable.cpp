@@ -102,7 +102,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
-    ::gettimeofday(&tvStart, nullptr);
+    gettimeofday(&tvStart, nullptr);
     tvEnd = tvStart;
     tvEnd.tv_sec += milliSeconds / 1000;
     tvEnd.tv_usec += (milliSeconds % 1000) * 1000;

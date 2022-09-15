@@ -174,9 +174,9 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     // ´´½¨&Æô¶¯service
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Raw);
     if (asServer)
-        svc->RegisterComponent(new EchoServerComp);
+        svc->AddComponent(new EchoServerComp);
     else
-        svc->RegisterComponent(new EchoClientComp);
+        svc->AddComponent(new EchoClientComp);
 
     if (svc->Start() != LLBC_OK)
     {

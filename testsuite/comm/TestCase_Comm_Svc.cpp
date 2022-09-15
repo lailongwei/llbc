@@ -139,7 +139,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     // Create service
     LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
     TestComp *comp = LLBC_New(TestComp);
-    svc->RegisterComponent(comp);
+    svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
     svc->Start(8);
@@ -182,7 +182,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
             const int dataSize = 512 * 1024;
             char *data = LLBC_Malloc(char, dataSize);
-            ::memset(data, 1, dataSize);
+            memset(data, 1, dataSize);
 
             // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
             LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();

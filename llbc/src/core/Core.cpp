@@ -52,7 +52,7 @@ int __LLBC_CoreStartup()
     tls->coreTls.timerScheduler = LLBC_New(LLBC_TimerScheduler);
 
     // Set random seed.
-    LLBC_SeedRand(static_cast<int>(::time(nullptr)));
+    LLBC_SeedRand(static_cast<int>(time(nullptr)));
 
     // Initialize network library.
     if (tls->coreTls.needInitWinSock)

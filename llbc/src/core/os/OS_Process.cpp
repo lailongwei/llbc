@@ -74,7 +74,7 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
 #endif
 
     STACKFRAME64 stackFrame64;
-    ::memset(&stackFrame64, 0, sizeof(STACKFRAME64));
+    memset(&stackFrame64, 0, sizeof(STACKFRAME64));
 #if LLBC_TARGET_PROCESSOR_X86
     stackFrame64.AddrPC.Offset = ctx->Eip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
@@ -353,7 +353,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
         return LLBC_FAILED;
     }
 
-    ::memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
+    memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
     LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
     if (!LLBC_INL_NS __hookedCrash)

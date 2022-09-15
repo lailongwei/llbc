@@ -78,7 +78,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
             luaL_error(l, "'tostring' must return a string to '_lullbc.LogMsg'");
 
         const size_t copySize = MIN(partMsgSize, availableFmtBufSize);
-        ::memcpy(fmtBuf, partMsg, copySize);
+        memcpy(fmtBuf, partMsg, copySize);
         fmtBuf += copySize;
         if (UNLIKELY((availableFmtBufSize -= copySize) == 0))
         {
@@ -112,7 +112,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
         partMsg = lua_tolstring(l, paramsCount + 1, &partMsgSize);
 
         const size_t copySize = MIN(partMsgSize, availableFmtBufSize);
-        ::memcpy(fmtBuf, partMsg, copySize);
+        memcpy(fmtBuf, partMsg, copySize);
         fmtBuf += copySize;
         availableFmtBufSize -= copySize;
 

@@ -187,7 +187,7 @@ public:
      *              ev.opcode: packet opcode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterComponent(PyObject *comp);
+    int AddComponent(PyObject *comp);
 
     /**
      * Register comp from library.
@@ -197,7 +197,7 @@ public:
      * @param[out] comp    - the created comp(new reference).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
+    int AddComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
 
     /**
      * Register codec(only available in CODEC_BINARY).

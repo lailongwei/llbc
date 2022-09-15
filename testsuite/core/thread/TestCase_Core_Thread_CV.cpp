@@ -35,7 +35,7 @@ static const long __g_waiterThreadCount = 5;
 static int WaiterThreadProc(void *arg)
 {
     long threadIndex;
-    ::memcpy(&threadIndex, &arg, sizeof(long));
+    memcpy(&threadIndex, &arg, sizeof(long));
 
     __g_outLock.Lock();
     std::cout <<"I'm waiter thread " <<threadIndex <<std::endl;
@@ -161,7 +161,7 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
     for(long i = 0; i < __g_waiterThreadCount; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
+        memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
     }
 

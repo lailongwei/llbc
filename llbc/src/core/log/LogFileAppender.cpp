@@ -263,7 +263,7 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
         return true;
     }
     else if (newFileName.size() != _fileName.size() ||
-            ::memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
+            memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
     {
         clear = false;
         backup = false;

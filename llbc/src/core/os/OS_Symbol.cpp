@@ -88,8 +88,8 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
             backTrace.append(1, '\n');
     }
 #else // Non-Win32
-    const int frames = ::backtrace(stack, captureFrames + skipFrames);
-    char **strs = ::backtrace_symbols(stack, frames);
+    const int frames = backtrace(stack, captureFrames + skipFrames);
+    char **strs = backtrace_symbols(stack, frames);
     if (LIKELY(strs))
     {
         for (int i = skipFrames; i < frames; ++i)

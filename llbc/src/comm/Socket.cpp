@@ -425,7 +425,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
         {
             sendingSize = 0;
 
-            ::memset(ol, 0, sizeof(OVERLAPPED));
+            memset(ol, 0, sizeof(OVERLAPPED));
             ol->data = nullptr;
             buf.buf = nullptr;
             buf.len = 0;
@@ -597,7 +597,7 @@ void LLBC_Socket::OnSend()
         {
             sendingSize = 0;
 
-            ::memset(ol, 0, sizeof(OVERLAPPED));
+            memset(ol, 0, sizeof(OVERLAPPED));
             ol->data = nullptr;
             buf.buf = nullptr;
             buf.len = 0;
@@ -653,7 +653,7 @@ void LLBC_Socket::OnRecv()
         {
             #if LLBC_TARGET_PLATFORM_WIN32
             LLBC_NS ulong pendingBytes;
-            if (UNLIKELY(::ioctlsocket(_handle, FIONREAD, &pendingBytes) == SOCKET_ERROR))
+            if (UNLIKELY(ioctlsocket(_handle, FIONREAD, &pendingBytes) == SOCKET_ERROR))
             {
                 LLBC_SetLastError(LLBC_ERROR_NETAPI);
             #else // Non-Win32

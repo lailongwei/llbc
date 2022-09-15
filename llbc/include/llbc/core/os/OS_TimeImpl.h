@@ -174,7 +174,7 @@ inline uint64 LLBC_GetCpuCounterFrequency()
     #else
     uint64 tscStart, tscEnd;
     tscStart = LLBC_RdTsc();
-    ::sleep(1);
+    sleep(1);
     tscEnd = LLBC_RdTsc();
     return tscEnd - tscStart;
     #endif // LLBC_TARGET_PLATFORM_WIN32

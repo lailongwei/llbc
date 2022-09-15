@@ -27,62 +27,6 @@
 __LLBC_NS_BEGIN
 
 /**
- * llbc library Raw string operation APIs(aprtial).
- */
-#if LLBC_TARGET_PLATFORM_WIN32
-
-#define LLBC_StrLenA lstrlenA
-#define LLBC_StrLenW lstrlenW
-
-#define LLBC_StrCatA lstrcatA
-#define LLBC_StrCatW lstrcatW
-
-#define LLBC_StrCmpA lstrcmpA
-#define LLBC_StrCmpW lstrcmpW
-
-#define LLBC_StrCmpiA lstrcmpiA
-#define LLBC_StrCmpiW lstrcmpiW
-
-#define LLBC_StrCpyA lstrcpyA
-#define LLBC_StrCpyW lstrcpyW
-
-#else // Non-Win32
-
-#define LLBC_StrLenA ::strlen
-LLBC_EXPORT size_t LLBC_StrLenW(const wchar_t *s);
-
-#define LLBC_StrCatA ::strcat
-LLBC_EXPORT wchar_t *LLCB_StrCatW(wchar_t *s1, const wchar_t *s2);
-
-#define LLBC_StrCmpA ::strcmp
-LLBC_EXPORT int LLBC_StrCmpW(const wchar_t *s1, const wchar_t *s2);
-
-#define LLBC_StrCmpiA ::strcmpi
-LLBC_EXPORT int LLBC_StrCmpiW(const wchar_t *s1, const wchar_t *s2);
-
-#define LLBC_StrCpyA ::strcpy
-LLBC_EXPORT wchar_t *LLBC_StrCpyW(wchar_t *s1, const wchar_t *s2);
-
-#endif // Win32
-
-/**
- * the adapted LLBC_UNICODE macro RAW string operation macros define. 
- */
-#ifdef LLBC_UNICODE
-#define LLBC_StrLen     LLBC_StrLenW
-#define LLBC_StrCat     LLBC_StrCatW
-#define LLBC_StrCmp     LLBC_StrCmpW
-#define LLBC_StrCmpi    LLBC_StrCmpiW
-#define LLBC_StrCpy     LLBC_StrCmpW
-#else // !LLBC_UNICODE
-#define LLBC_StrLen     LLBC_StrLenA
-#define LLBC_StrCat     LLBC_StrCatA
-#define LLBC_StrCmp     LLBC_StrCmpA
-#define LLBC_StrCmpi    LLBC_StrCmpiA
-#define LLBC_StrCpy     LLBC_StrCpyA
-#endif // !LLBC_UNICODE
-
-/**
  * Split string using specific separator.
  * @param[in]  str            - the source string.
  * @param[in]  separator      - separator string.
@@ -117,61 +61,6 @@ LLBC_EXPORT LLBC_String LLBC_ToUpper(const char *str);
  * @return LLBC_String - the converted string.
  */
 LLBC_EXPORT LLBC_String LLBC_ToLower(const char *str);
-
-/**
- * @Trim string left & right ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str, const char *targets);
-
-/**
- * Trim string left ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets);
-
-/**
- * Trim string right ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets);
-
-/**
- * Get given path's directory name.
- * @param[in] path - given path.
- * @return LLBC_String - directory part name.
- */
-LLBC_EXPORT LLBC_String LLBC_DirName(const LLBC_String &path);
-
-/**
- * Get given path's file name.
- * @param[in] path         - given path.
- * @param[in] incExtension - include extension name.
- * @return LLBC_String - file name part name.
- */
-LLBC_EXPORT LLBC_String LLBC_BaseName(const LLBC_String &path, bool incExtension = true);
-
-/**
- * Get given path's file extension name, not include '.' character.
- * @param[in] path - given path.
- * @return LLBC_String - file extension name.
- */
-LLBC_EXPORT LLBC_String LLBC_ExtensionName(const LLBC_String &path);
 
 /**
  * Convert string to number(signed/unsigned)(int, long, long long, pointer, double) type.

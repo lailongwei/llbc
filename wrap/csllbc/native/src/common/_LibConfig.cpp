@@ -33,7 +33,7 @@ int csllbc_LibConfig_DefaultBacklogSize()
 int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
 {
     const size_t writable = MIN(strlen(LLBC_CFG_LOG_ROOT_LOGGER_NAME), static_cast<size_t>(nameLen));
-    ::memcpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
+    memcpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
 
     return static_cast<int>(writable);
 }
@@ -41,7 +41,7 @@ int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
 int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(sint64 notConfigUse, int len)
 {
     const size_t writable = MIN(strlen(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), static_cast<size_t>(len));
-    ::memcpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
+    memcpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
 
     return static_cast<int>(writable);
 }
@@ -69,7 +69,7 @@ int csllbc_LibConfig_Log_DefaultLogToConsole()
 int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen)
 {
     const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN)), patternLen);
-    ::memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN, writable);
+    memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN, writable);
 
     return writable;
 }
@@ -87,7 +87,7 @@ int csllbc_LibConfig_Log_IsDefaultLogToFile()
 int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen)
 {
     const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN)), patternLen);
-    ::memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN, writable);
+    memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN, writable);
 
     return writable;
 }
@@ -200,7 +200,7 @@ int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()
 int csllbc_LibConfig_Comm_PollerModel(sint64 model, int modelLen)
 {
     const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_COMM_POLLER_MODEL)), modelLen);
-    ::memcpy(reinterpret_cast<char *>(model), LLBC_CFG_COMM_POLLER_MODEL, writable);
+    memcpy(reinterpret_cast<char *>(model), LLBC_CFG_COMM_POLLER_MODEL, writable);
 
     return writable;
 }

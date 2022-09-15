@@ -36,7 +36,7 @@ static LLBC_SimpleLock __g_outLock;
 static int WaiterThreadProc(void *arg)
 {
     int threadIndex = 0;
-    ::memcpy(&threadIndex, &arg, sizeof(int));
+    memcpy(&threadIndex, &arg, sizeof(int));
 
     __g_testVal->sem.Wait();
     __g_outLock.Lock();
@@ -125,7 +125,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     for(long i = 0; i < __g_waitersCount; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
+        memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
     }
 

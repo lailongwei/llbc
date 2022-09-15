@@ -41,7 +41,7 @@ static const int __g_number_state = 2;
 /**
  * Default pattern.
  */
-static const char *__g_default_pattern = "%T [%L] - %m%n";
+static const char __g_default_pattern[] = "%T [%L] - %m%n";
 
 __LLBC_INTERNAL_NS_END
 
@@ -77,7 +77,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     if (pattern.empty())
     {
         curPattern = LLBC_INTERNAL_NS __g_default_pattern;
-        patternLength = LLBC_StrLenA(LLBC_INTERNAL_NS __g_default_pattern);
+        patternLength = sizeof(LLBC_INTERNAL_NS __g_default_pattern) - 1;
     }
     else
     {
@@ -156,7 +156,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
                 if (!formatter)
                 {
-                    formatter = LLBC_New(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
+                    formatter = LLBC_New(LLBC_LogFormattingInfo, minLength < 0 ? true : false, abs(minLength), INT_MAX);
                 }
                 else
                 {

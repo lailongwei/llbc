@@ -542,7 +542,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(double val)
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const char *val)
 {
     if (LIKELY(val))
-        return Write(val, LLBC_StrLenA(val) + 1);
+        return Write(val, strlen(val) + 1);
     else
         return LLBC_OK;
 }

@@ -136,14 +136,14 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     // Create and init service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
     svc->SetFPS(1);
-    svc->RegisterComponent<TestCompFactory>();
+    svc->AddComponent<TestCompFactory>();
 
     // Try init library comp(not exist)
     const LLBC_String notExistCompName = "Not exist comp name";
     const LLBC_String notExistCompLibPath = "!!!!!!!!Not exist library!!!!!!!!";
     LLBC_PrintLine("Test try register not exist third-party comp, libPath:%s, compName:%s",
                    notExistCompLibPath.c_str(), notExistCompName.c_str());
-    int ret = svc->RegisterComponent(notExistCompLibPath, notExistCompName);
+    int ret = svc->AddComponent(notExistCompLibPath, notExistCompName);
     if (ret != LLBC_OK)
     {
         LLBC_PrintLine("Register not exist third-party comp failed, error:%s", LLBC_FormatLastError());
@@ -199,7 +199,7 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
     // Create and init service.
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
     svc->SetFPS(1);
-    svc->RegisterComponent<TestCompFactory>();
+    svc->AddComponent<TestCompFactory>();
     svc->SetDriveMode(LLBC_IService::ExternalDrive);
 
     LLBC_PrintLine("Start service...");

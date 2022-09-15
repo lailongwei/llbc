@@ -147,7 +147,7 @@ inline void LLBC_Stream::Assign(const LLBC_Stream &rhs)
     if (rhs._buf)
     {
         _buf = malloc(rhs._size);
-        ::memcpy(_buf, rhs._buf, rhs._size);
+        memcpy(_buf, rhs._buf, rhs._size);
     }
     else
     {
@@ -170,7 +170,7 @@ inline void LLBC_Stream::Assign(void *buf, size_t len)
     if (buf && len > 0)
     {
         _buf = malloc(len);
-        ::memcpy(_buf, buf, len);
+        memcpy(_buf, buf, len);
 
         _size = len;
     }
@@ -257,7 +257,7 @@ inline bool LLBC_Stream::Skip(long size)
 inline void LLBC_Stream::Fill(size_t size)
 {
     AutoResize(size);
-    ::memset((char *)_buf + _pos, 0, size);
+    memset((char *)_buf + _pos, 0, size);
 
     _pos += size;
 }
@@ -313,14 +313,14 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
     if (eraseLen == 0)
     {
         if (n1 == _pos)
-            ::memcpy((uint8 *)_buf + n1, buf, len);
+            memcpy((uint8 *)_buf + n1, buf, len);
         else
         {
             tmpBuf = (uint8 *)malloc(_pos - n1);
 
-            ::memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
-            ::memcpy((uint8 *)_buf + n1, buf, len);
-            ::memcpy((uint8 *)_buf + n1 + len, tmpBuf, _pos - n1);
+            memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
+            memcpy((uint8 *)_buf + n1, buf, len);
+            memcpy((uint8 *)_buf + n1 + len, tmpBuf, _pos - n1);
 
             free(tmpBuf);
         }
@@ -331,21 +331,21 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
 
     if (eraseLen == len)
     {
-        ::memcpy((uint8 *)_buf + n0, buf, len);
+        memcpy((uint8 *)_buf + n0, buf, len);
         return;
     }
 
     if (n1 != _pos)
     {
         tmpBuf = (uint8 *)malloc(_pos - n1);
-        ::memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
+        memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
     }
 
-    ::memcpy((uint8 *)_buf + n0, buf, len);
+    memcpy((uint8 *)_buf + n0, buf, len);
 
     if (tmpBuf)
     {
-        ::memcpy((uint8 *)_buf + n0 + len, tmpBuf, _pos - n1);
+        memcpy((uint8 *)_buf + n0 + len, tmpBuf, _pos - n1);
         free(tmpBuf);
     }
 
@@ -362,7 +362,7 @@ inline bool LLBC_Stream::Read(void *buf, size_t len)
     // check memory overlapped
     ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Read(void *, size_t) buffer overlapped!");
 
-    ::memcpy(buf, (const uint8 *)_buf + _pos, len);
+    memcpy(buf, (const uint8 *)_buf + _pos, len);
     _pos += len;
 
     return true;
@@ -376,7 +376,7 @@ inline void LLBC_Stream::Write(const void *buf, size_t len)
     ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Write(const void *, size_t) buffer overlapped!");
 
     AutoResize(len);
-    ::memcpy((uint8 *)_buf + _pos, buf, len);
+    memcpy((uint8 *)_buf + _pos, buf, len);
     _pos += len;
 }
 

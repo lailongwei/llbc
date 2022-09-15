@@ -138,10 +138,10 @@ inline LLBC_ObjectPoolStat::LLBC_ObjectPoolStat()
 
 , _strReprShiftSpaceNum(0)
 {
-    ::memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
-    ::memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
-    ::memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
-    ::memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
+    memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
+    memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
+    memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
+    memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
 }
 
 inline void LLBC_ObjectPoolStat::Reset()
@@ -153,10 +153,10 @@ inline void LLBC_ObjectPoolStat::Reset()
     innerUsedMemory = 0;
     totalMemory = 0;
 
-    ::memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
-    ::memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
-    ::memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
-    ::memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
+    memset(topUsedMemPoolInsts, 0, sizeof(topUsedMemPoolInsts));
+    memset(topElemMemPoolInsts, 0, sizeof(topElemMemPoolInsts));
+    memset(topUsedElemsPoolInsts, 0, sizeof(topUsedElemsPoolInsts));
+    memset(topAllocatedMemPoolInsts, 0, sizeof(topAllocatedMemPoolInsts));
 
     _strRepr.clear();
     _strReprShiftSpaceNum = 0;

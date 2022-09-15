@@ -192,7 +192,7 @@ public:
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
         for (int i = 1; i < right; ++i)
-            ::memcpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
+            memcpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
 
         return *this;
     }
@@ -1087,7 +1087,7 @@ public:
         if (this->empty())
         {
             va_start(ap, fmt);
-            int len = ::vsnprintf(nullptr, 0, fmt, ap);
+            int len = vsnprintf(nullptr, 0, fmt, ap);
             va_end(ap);
 
             if (len <= 0)
@@ -1098,10 +1098,10 @@ public:
 
         // try format.
         va_start(ap, fmt);
-        int len = ::vsnprintf(const_cast<char *>(this->data()),
-                              this->size() + 1,
-                              fmt,
-                              ap);
+        int len = vsnprintf(const_cast<char *>(this->data()),
+                            this->size() + 1,
+                            fmt,
+                            ap);
         va_end(ap);
         if (len <= static_cast<int>(this->size()))
         {
@@ -1116,10 +1116,10 @@ public:
         // resize, try format again.
         this->resize(len);
         va_start(ap, fmt);
-        len = ::vsnprintf(const_cast<char *>(this->data()),
-                          this->size() + 1,
-                          fmt,
-                          ap);
+        len = vsnprintf(const_cast<char *>(this->data()),
+                        this->size() + 1,
+                        fmt,
+                        ap);
         va_end(ap);
         if (len != static_cast<int>(this->size()))
             this->clear();
@@ -1149,10 +1149,10 @@ public:
         // exec format.
         this->resize(oldSize + len);
         va_start(ap, fmt);
-        len = ::vsnprintf(const_cast<char *>(this->data() + oldSize),
-                          len + 1,
-                          fmt,
-                          ap);
+        len = vsnprintf(const_cast<char *>(this->data() + oldSize),
+                        len + 1,
+                        fmt,
+                        ap);
         va_end(ap);
         if (oldSize + len != this->size())
             this->resize(oldSize);
@@ -1454,7 +1454,7 @@ public:
         if (sizeof(_Elem) != sizeof(char) || _This::size() < 3)
             return false;
         
-        return (::memcmp(reinterpret_cast<const char *>(this->data()), 
+        return (memcmp(reinterpret_cast<const char *>(this->data()), 
             reinterpret_cast<const char *>("\xef\xbb\xbf"), 3) == 0) ? true : false;
 
     }

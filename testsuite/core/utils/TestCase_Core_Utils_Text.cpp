@@ -42,22 +42,11 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     LLBC_PrintLine("filter out string: %s", str.c_str());
     LLBC_PrintLine("result: %s", LLBC_FilterOutString(str, " ").c_str());
     LLBC_PrintLine("");
-
+    
     // Upper<->Lower test.
     str = "AaBbCcDd eEfFgG";
     LLBC_PrintLine("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper(str.c_str()).c_str());
     LLBC_PrintLine("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower(str.c_str()).c_str());
-    LLBC_PrintLine("");
-
-    // Trim test(include left, right).
-    str = "     Hello World     \t\t\t";
-    LLBC_PrintLine("trim test, string: %s", str.c_str());
-    LLBC_PrintLine("after trim left(len: %lu): %s", 
-        LLBC_TrimLeft(str).length(), LLBC_TrimLeft(str).c_str());
-    LLBC_PrintLine("after trim right(len: %lu): %s",
-        LLBC_TrimRight(str).length(), LLBC_TrimRight(str).c_str());
-    LLBC_PrintLine("after trim(left and right)(len: %lu): %s",
-        LLBC_Trim(str).length(), LLBC_Trim(str).c_str());
     LLBC_PrintLine("");
 
     // String -> Number test.
@@ -127,29 +116,17 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
             doubleVal, LLBC_Num2Str(doubleVal).c_str());
 
         sint64 intPtrAddr = 0xcdcdcdcd;
-        int *intPtr; ::memcpy(&intPtr, &intPtrAddr, sizeof(int *));
+        int *intPtr; memcpy(&intPtr, &intPtrAddr, sizeof(int *));
         LLBC_PrintLine("LLBC_Num2Str<int *>()[%p] -> string: %s",
             intPtr, LLBC_Num2Str(intPtr, 16).c_str());
 
         sint64 voidPtrAddr = 0xfffffffe;
-        void *voidPtr; ::memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
+        void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
         LLBC_PrintLine("LLBC_Num2Str<void *>()[%p] -> string: %s",
             voidPtr, LLBC_Num2Str(voidPtr, 16).c_str());
     }
 
     LLBC_PrintLine("");
-
-    // DirName, BaseName, ExtensionName test.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_String path = "/usr/tmp/a.txt";
-#else
-    LLBC_String path = "c:\\Windows\\a.txt";
-#endif
-    LLBC_PrintLine("path: %s", path.c_str());
-    LLBC_PrintLine("\tdirname: %s", LLBC_DirName(path).c_str());
-    LLBC_PrintLine("\tbasename(include extension): %s", LLBC_BaseName(path).c_str());
-    LLBC_PrintLine("\tbasename(not-include extension): %s", LLBC_BaseName(path, false).c_str());
-    LLBC_PrintLine("\textension: %s", LLBC_ExtensionName(path).c_str());
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

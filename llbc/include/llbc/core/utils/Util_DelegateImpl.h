@@ -83,7 +83,7 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
     else if (_funcType == 2)
         new (_func.stlFunc) StlFunc(*reinterpret_cast<const StlFunc *>(another._func.stlFunc));
     else if (_funcType == 3)
-        ::memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
+        memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
 }
 
 template <typename Rtn, typename ...Args>
@@ -211,7 +211,7 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_D
             reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
 
         _funcType = 3;
-        ::memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
+        memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
     }
     else
     {

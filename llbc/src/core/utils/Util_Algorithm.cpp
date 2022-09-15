@@ -198,7 +198,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
             buffer = LLBC_Calloc(char, strLen * 2);
 
         const size_t copyLen = i - copyIdx;
-        ::memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+        memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
 
         bufIdx += copyLen;
         buffer[bufIdx++] = escapeChar;
@@ -211,7 +211,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         if (copyIdx < strLen)
         {
             const size_t copyLen = strLen - copyIdx;
-            ::memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+            memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
             bufIdx += copyLen;
         }
 
@@ -234,7 +234,7 @@ __LLBC_NS_END
   char *_itoa(int value, char *string, int radix)
   {
       LLBC_String result = LLBC_ItoA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }
@@ -244,7 +244,7 @@ __LLBC_NS_END
   char *_i64toa(long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_I64toA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }
@@ -254,7 +254,7 @@ __LLBC_NS_END
   char *_ui64toa(unsigned long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_UI64toA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }

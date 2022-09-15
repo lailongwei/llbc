@@ -388,7 +388,7 @@ LLBC_ThreadId LLBC_GetCurrentThreadId()
     // Earlier glibc versions did not provide a wrapper for this system call, necessitating the use of syscall().
     // For get more information, see: http://man7.org/linux/man-pages/man2/gettid.2.html
     #if __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 30
-    return ::gettid();
+    return gettid();
     #else
     return syscall(SYS_gettid);
     #endif

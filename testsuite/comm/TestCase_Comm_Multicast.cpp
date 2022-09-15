@@ -133,7 +133,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     svc->SuppressCoderNotFoundWarning();
 
     TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
-    svc->RegisterComponent(comp);
+    svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
     if (_asClient)

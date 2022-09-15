@@ -148,7 +148,9 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
 
     // Test UTF8->UTF16
     LLBC_File output;
-    const LLBC_String utf16FileName = LLBC_BaseName(inputFile, false) + "_out_utf8_to_utf16." + LLBC_ExtensionName(inputFile);
+    const LLBC_String utf16FileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0]
+            + "_out_utf8_to_utf16." + LLBC_Directory::SplitExt(inputFile)[1];
     if(output.Open(utf16FileName, LLBC_FileMode::BinaryWrite))
     {
         LLBC_PrintLine("UTF16 output file open failed, reason: %s", LLBC_FormatLastError());
@@ -169,7 +171,9 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
     LLBC_PrintLine("UTF8 file[%s] convert to UTF16 successfully, output file: %s", inputFile.c_str(), utf16FileName.c_str());
 
     // Test UTF8->GBK.
-    const LLBC_String gbkFileName = LLBC_BaseName(inputFile, false) + "_out_utf8_to_gbk." + LLBC_ExtensionName(inputFile);
+    const LLBC_String gbkFileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0] + 
+            "_out_utf8_to_gbk." + LLBC_Directory::SplitExt(inputFile)[1];
     if(output.Open(gbkFileName, LLBC_FileMode::BinaryWrite) != LLBC_OK)
     {
         LLBC_PrintLine("UTF8 output file open failed, reason: %s", LLBC_FormatLastError());
@@ -210,7 +214,9 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
 
     // GBK->UTF16.
     LLBC_File output;
-    const LLBC_String utf16FileName = LLBC_BaseName(inputFile) + "_out_gbk_to_utf16." + LLBC_ExtensionName(inputFile);
+    const LLBC_String utf16FileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0]
+            + "_out_gbk_to_utf16." + LLBC_Directory::SplitExt(inputFile)[1];
     if(output.Open(utf16FileName, LLBC_FileMode::BinaryWrite) != LLBC_OK)
     {
         LLBC_PrintLine("UTF16 output file [%s] open failed, reason: %s", utf16FileName.c_str(), LLBC_FormatLastError());
@@ -230,7 +236,9 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
     LLBC_PrintLine("GBK file[%s] convert to UTF16 successfully, output file: %s", inputFile.c_str(), utf16FileName.c_str());
 
     // GBK->UTF8.
-    const LLBC_String utf8FileName = LLBC_BaseName(inputFile) + "_out_gbk_to_utf8." + LLBC_ExtensionName(inputFile);
+    const LLBC_String utf8FileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0]
+            + "_out_gbk_to_utf8." + LLBC_Directory::SplitExt(inputFile)[1];
     if(output.Open(utf8FileName, LLBC_FileMode::BinaryWrite) != LLBC_OK)
     {
         LLBC_PrintLine("GBK->UTF8 output file [%s] open failed, reason: %s", utf8FileName.c_str(), LLBC_FormatLastError());
@@ -260,7 +268,9 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
 int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
 {
     // Test UTF16->UTF8.
-    const LLBC_String utf8FileName = LLBC_BaseName(inputFile) + "_out_utf16_to_utf8." + LLBC_ExtensionName(inputFile);
+    const LLBC_String utf8FileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0] + 
+            "_out_utf16_to_utf8." + LLBC_Directory::SplitExt(inputFile)[1];
     if(LLBC_Transcoder::WideCharFileToMultiByteFile("UTF8", inputFile, utf8FileName) != LLBC_OK)
     {
         LLBC_PrintLine("UTF16->UTF8 convert failed, reason: %s", LLBC_FormatLastError());
@@ -270,7 +280,9 @@ int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
     LLBC_PrintLine("UTF16 file[%s] convert to UTF8 successfully, output file: %s", inputFile.c_str(), utf8FileName.c_str());
 
     // Test UTF16->GBK.
-    const LLBC_String gbkFileName = LLBC_BaseName(inputFile) + "_out_utf16_to_gbk." + LLBC_ExtensionName(inputFile);
+    const LLBC_String gbkFileName = 
+        LLBC_Directory::SplitExt(LLBC_Directory::BaseName(inputFile))[0] + 
+            "_out_utf16_to_gbk." + LLBC_Directory::SplitExt(inputFile)[1];
     if(LLBC_Transcoder::WideCharFileToMultiByteFile("GBK", inputFile, gbkFileName) != LLBC_OK)
     {
         LLBC_PrintLine("UTF16->GBK convert failed, reason: %s", LLBC_FormatLastError());

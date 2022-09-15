@@ -115,7 +115,7 @@ inline LLBC_String LLBC_Num2Str(T val, int radix)
         str += "0x";
 
     uint64 ptrVal = 0;
-    ::memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
+    memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
     return (str + LLBC_Num2Str<uint64>(ptrVal, radix));
 }
 

@@ -70,10 +70,10 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    int len = ::vsnprintf(libTls->coreTls.loggerFmtBuf,
-                          sizeof(libTls->coreTls.loggerFmtBuf),
-                          fmt,
-                          va);
+    int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
+                        sizeof(libTls->coreTls.loggerFmtBuf),
+                        fmt,
+                        va);
     va_end(va);
     if (UNLIKELY(len < 0))
         return;

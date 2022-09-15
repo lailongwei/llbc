@@ -22,7 +22,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Bundle.h"
-#include "llbc/core/utils/Util_Text.h"
+#include "llbc/core/file/Directory.h"
 
 #include "llbc/core/bundle/Bundle.h"
 
@@ -81,7 +81,7 @@ int LLBC_Bundle::Initialize(const LLBC_String &path)
         return LLBC_FAILED;
 
     _bundlePath = LLBC_GetBundlePath(_bundle);
-    _bundleName = LLBC_BaseName(_bundlePath, true);
+    _bundleName = LLBC_Directory::BaseName(_bundlePath);
 
     return LLBC_OK;
 }
