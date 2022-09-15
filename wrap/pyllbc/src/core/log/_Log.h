@@ -60,7 +60,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
         return nullptr;
 
     LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
-    LLBC_Logger *logger = (!loggerName || LLBC_StrCmp(loggerName, "root") == 0) ? 
+    LLBC_Logger *logger = (!loggerName || strcmp(loggerName, "root") == 0) ? 
             loggerMgr->GetRootLogger() : loggerMgr->GetLogger(loggerName);
     if (!logger)
     {

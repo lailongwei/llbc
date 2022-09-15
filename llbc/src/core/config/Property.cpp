@@ -519,7 +519,7 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
     const char *unixLineEnd = "\n";
 
     const char *winLineEnd = "\r\n";
-    size_t lineEndLen = LLBC_StrLenA(winLineEnd);
+    size_t lineEndLen = strlen(winLineEnd);
 
     LLBC_String::size_type pos;
     LLBC_String normalizedContent(content);
@@ -528,7 +528,7 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
 
     // Replace MAC style line-end to UNIX style.
     const char *macLineEnd = "\r";
-    lineEndLen = LLBC_StrLenA(macLineEnd);
+    lineEndLen = strlen(macLineEnd);
     while ((pos = normalizedContent.find(macLineEnd)) != LLBC_String::npos)
         normalizedContent.replace(pos, lineEndLen, unixLineEnd);
 

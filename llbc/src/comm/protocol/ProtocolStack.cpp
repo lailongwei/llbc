@@ -60,7 +60,7 @@ LLBC_ProtocolStack::LLBC_ProtocolStack(This::StackType type)
 , _session(nullptr)
 , _suppressCoderNotFoundError(false)
 {
-    ::memset(_protos, 0, sizeof(_protos));
+    memset(_protos, 0, sizeof(_protos));
 }
 
 LLBC_ProtocolStack::~LLBC_ProtocolStack()

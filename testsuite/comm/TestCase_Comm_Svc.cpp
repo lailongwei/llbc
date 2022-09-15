@@ -182,7 +182,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
             const int dataSize = 512 * 1024;
             char *data = LLBC_Malloc(char, dataSize);
-            ::memset(data, 1, dataSize);
+            memset(data, 1, dataSize);
 
             // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
             LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();

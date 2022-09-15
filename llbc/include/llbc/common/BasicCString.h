@@ -63,7 +63,7 @@ public:
         if (_cstr == other._cstr)
             return false;
 
-        return ::strcmp(_cstr, other._cstr) < 0;
+        return strcmp(_cstr, other._cstr) < 0;
     }
     bool operator <(const std::basic_string<_Elem> &other) const
     {
@@ -77,7 +77,7 @@ public:
     }
     bool operator ==(const LLBC_BasicCString<_Elem> &other) const
     {
-        return _cstr == other._cstr || ::strcmp(_cstr, other._cstr) == 0;
+        return _cstr == other._cstr || strcmp(_cstr, other._cstr) == 0;
     }
     bool operator ==(const std::basic_string<_Elem> &other) const
     {

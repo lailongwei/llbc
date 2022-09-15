@@ -42,7 +42,7 @@ inline LLBC_Time::~LLBC_Time()
 
 inline time_t LLBC_Time::NowTimeStamp()
 {
-    return ::time(nullptr);
+    return time(nullptr);
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)

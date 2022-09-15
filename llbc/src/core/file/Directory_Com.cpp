@@ -452,7 +452,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
         if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (!recursive ||
-                ::strcmp(findData.cFileName, "..") == 0)
+                strcmp(findData.cFileName, "..") == 0)
                 continue;
 
             if (GetFiles(Join(path, findData.cFileName), files, recursive) != LLBC_OK)
@@ -713,16 +713,16 @@ LLBC_String LLBC_Directory::CurDir()
     LPSTR cwd = nullptr;
     DWORD cwdSize = 0;
     cwdSize = ::GetCurrentDirectoryA(0, nullptr);
-    cwd = reinterpret_cast<LPSTR>(::malloc(cwdSize * sizeof(CHAR)));
+    cwd = reinterpret_cast<LPSTR>(malloc(cwdSize * sizeof(CHAR)));
     if (::GetCurrentDirectoryA(cwdSize, cwd) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        ::free(cwd);
+        free(cwd);
         return "";
     }
     
     const LLBC_String path(cwd);
-    ::free(cwd);
+    free(cwd);
 
     return path;
 #endif

@@ -254,10 +254,10 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
     LLBC_RingBuffer<MemoryUnit *> *freeUnits = new LLBC_RingBuffer<MemoryUnit *>(_elemCnt);
 
     // Fill new block content.
-    MemoryBlock* memBlock = reinterpret_cast<MemoryBlock *>(::malloc(sizeof(MemoryBlock) + _blockSize));
+    MemoryBlock* memBlock = reinterpret_cast<MemoryBlock *>(malloc(sizeof(MemoryBlock) + _blockSize));
 
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ::memset(memBlock->buff, 0, _blockSize);
+    memset(memBlock->buff, 0, _blockSize);
     #endif
 
     memBlock->seq = _blockCnt;

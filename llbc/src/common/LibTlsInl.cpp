@@ -38,8 +38,8 @@ __LLBC_LibTls::__LLBC_LibTls()
 {
     commonTls.errNo = LLBC_ERROR_SUCCESS;
     commonTls.subErrNo = LLBC_ERROR_SUCCESS;
-    ::memset(&commonTls.errDesc, 0, sizeof(commonTls.errDesc));
-    ::memset(&commonTls.customErrDesc, 0, sizeof(commonTls.customErrDesc));
+    memset(&commonTls.errDesc, 0, sizeof(commonTls.errDesc));
+    memset(&commonTls.customErrDesc, 0, sizeof(commonTls.customErrDesc));
 
     coreTls.llbcThread = false;
     coreTls.entryThread = false;
@@ -59,14 +59,14 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.symbol.win32Symbol->SizeOfStruct = sizeof(::SYMBOL_INFO);
     coreTls.symbol.win32Symbol->MaxNameLen = LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME;
 
-    ::memset(&coreTls.symbol.win32ImgHelpLine64, 0, sizeof(coreTls.symbol.win32ImgHelpLine64));
+    memset(&coreTls.symbol.win32ImgHelpLine64, 0, sizeof(coreTls.symbol.win32ImgHelpLine64));
     coreTls.symbol.win32ImgHelpLine64.SizeOfStruct = sizeof(coreTls.symbol.win32ImgHelpLine64);
      #endif // LLBC_TARGET_PLATFORM_WIN32
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
     objbaseTls.poolStack = nullptr;
 
-    ::memset(commTls.services, 0, sizeof(commTls.services));
+    memset(commTls.services, 0, sizeof(commTls.services));
 }
 
 __LLBC_LibTls::~__LLBC_LibTls()

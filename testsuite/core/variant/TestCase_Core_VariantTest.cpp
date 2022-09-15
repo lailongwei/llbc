@@ -73,7 +73,7 @@ void TestCase_Core_VariantTest::BasicTest()
     LLBC_Variant longVal((long)-10086);
     LLBC_Variant ulongVal((LLBC_NS ulong)10086);
     uint64 ptrAddr = 0x80000000;
-    void *ptr; ::memcpy(&ptr, &ptrAddr, sizeof(void *));
+    void *ptr; memcpy(&ptr, &ptrAddr, sizeof(void *));
     LLBC_Variant ptrVal(ptr);
     LLBC_Variant int64Val((sint64)-64);
     LLBC_Variant uint64Val((uint64)64);

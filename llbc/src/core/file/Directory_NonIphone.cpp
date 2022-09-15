@@ -121,16 +121,16 @@ LLBC_String LLBC_Directory::TempDir()
     bufLen = ::GetTempPathA(0, nullptr);
     bufLen += 1;
 
-    LPSTR buf = reinterpret_cast<LPSTR>(::malloc(sizeof(CHAR) * bufLen));
+    LPSTR buf = reinterpret_cast<LPSTR>(malloc(sizeof(CHAR) * bufLen));
     if (::GetTempPathA(bufLen, buf) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        ::free(buf);
+        free(buf);
         return "";
     }
 
     LLBC_String path = buf;
-    ::free(buf);
+    free(buf);
 
     if (path[path.length() - 1] == LLBC_BACKLASH_A)
         return path.substr(0, path.length() - 1);

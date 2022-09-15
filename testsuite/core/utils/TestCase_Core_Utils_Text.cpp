@@ -127,29 +127,17 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
             doubleVal, LLBC_Num2Str(doubleVal).c_str());
 
         sint64 intPtrAddr = 0xcdcdcdcd;
-        int *intPtr; ::memcpy(&intPtr, &intPtrAddr, sizeof(int *));
+        int *intPtr; memcpy(&intPtr, &intPtrAddr, sizeof(int *));
         LLBC_PrintLine("LLBC_Num2Str<int *>()[%p] -> string: %s",
             intPtr, LLBC_Num2Str(intPtr, 16).c_str());
 
         sint64 voidPtrAddr = 0xfffffffe;
-        void *voidPtr; ::memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
+        void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
         LLBC_PrintLine("LLBC_Num2Str<void *>()[%p] -> string: %s",
             voidPtr, LLBC_Num2Str(voidPtr, 16).c_str());
     }
 
     LLBC_PrintLine("");
-
-    // DirName, BaseName, ExtensionName test.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_String path = "/usr/tmp/a.txt";
-#else
-    LLBC_String path = "c:\\Windows\\a.txt";
-#endif
-    LLBC_PrintLine("path: %s", path.c_str());
-    LLBC_PrintLine("\tdirname: %s", LLBC_DirName(path).c_str());
-    LLBC_PrintLine("\tbasename(include extension): %s", LLBC_BaseName(path).c_str());
-    LLBC_PrintLine("\tbasename(not-include extension): %s", LLBC_BaseName(path, false).c_str());
-    LLBC_PrintLine("\textension: %s", LLBC_ExtensionName(path).c_str());
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

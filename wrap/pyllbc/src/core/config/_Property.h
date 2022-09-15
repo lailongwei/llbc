@@ -28,7 +28,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_New(PyObject *self, PyObject *args)
         return nullptr;
 
     LLBC_Property *prop = LLBC_New(LLBC_Property);
-    if (LLBC_StrLenA(file) == 0)
+    if (strlen(file) == 0)
         return Py_BuildValue("l", prop);
 
     if (prop->LoadFromFile(file) != LLBC_OK)

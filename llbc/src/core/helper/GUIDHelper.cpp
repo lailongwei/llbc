@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
 LLBC_GUID LLBC_GUIDHelper::Gen()
 {
     LLBC_GUID guid;
-    ::memset(&guid, 0, sizeof(LLBC_GUID));
+    memset(&guid, 0, sizeof(LLBC_GUID));
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     uuid_generate(reinterpret_cast<unsigned char *>(&guid));

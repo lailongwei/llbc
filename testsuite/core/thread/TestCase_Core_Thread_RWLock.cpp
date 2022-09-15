@@ -35,7 +35,7 @@ static struct
 static int Reader_ThreadProc(void *arg)
 {
     long threadIndex;
-    ::memcpy(&threadIndex, &arg, sizeof(long));
+    memcpy(&threadIndex, &arg, sizeof(long));
 
     __g_outLock.Lock();
     std::cout <<"I'm reader: " <<threadIndex <<std::endl;
@@ -98,7 +98,7 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
     for(long i = 0; i < __g_readerCount; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
+        memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&readers[i], &Reader_ThreadProc, threadArg);
     }
 

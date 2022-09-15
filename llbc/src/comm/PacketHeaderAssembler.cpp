@@ -49,7 +49,7 @@ bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &
     size_t needSize = _headerLen - _curRecved;
     if (len >= needSize)
     {
-        ::memcpy(_header + _curRecved, data, needSize);
+        memcpy(_header + _curRecved, data, needSize);
         _curRecved = _headerLen;
 
         used = needSize;
@@ -58,7 +58,7 @@ bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &
     }
     else
     {
-        ::memcpy(_header + _curRecved, data, len);
+        memcpy(_header + _curRecved, data, len);
         _curRecved += len;
 
         used = len;

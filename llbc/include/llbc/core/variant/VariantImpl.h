@@ -90,7 +90,7 @@ inline LLBC_Variant::LLBC_Variant(const _T * const &ptr)
     _holder.type = LLBC_VariantType::VT_RAW_PTR;
 
     _holder.data.raw.uint64Val = 0;
-    ::memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
+    memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
 }
 
 inline LLBC_Variant::LLBC_Variant(const sint64 &i64)
@@ -776,7 +776,7 @@ LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
     _holder.ClearData();
     _holder.type = LLBC_VariantType::VT_RAW_PTR;
 
-    ::memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
+    memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
 
     return *this;
 }
