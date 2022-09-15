@@ -63,39 +63,6 @@ LLBC_EXPORT LLBC_String LLBC_ToUpper(const char *str);
 LLBC_EXPORT LLBC_String LLBC_ToLower(const char *str);
 
 /**
- * @Trim string left & right ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_Trim(const LLBC_String &str, const char *targets);
-
-/**
- * Trim string left ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets);
-
-/**
- * Trim string right ' ' or '\t' character.
- * @param[in] str     - the will trim's string.
- * @param[in] target  - the target character to be trimed.
- * @param[in] targets - A pointer to string containing the target characters to be trimed.
- * @return LLBC_String - the trimed string.
- */
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str);
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str, char target);
-LLBC_EXPORT LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets);
-
-/**
  * Convert string to number(signed/unsigned)(int, long, long long, pointer, double) type.
  * @param[in] str - the string value.
  * @return number - the converted vavlue.

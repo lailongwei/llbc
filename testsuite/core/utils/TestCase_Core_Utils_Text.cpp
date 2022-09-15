@@ -42,22 +42,11 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     LLBC_PrintLine("filter out string: %s", str.c_str());
     LLBC_PrintLine("result: %s", LLBC_FilterOutString(str, " ").c_str());
     LLBC_PrintLine("");
-
+    
     // Upper<->Lower test.
     str = "AaBbCcDd eEfFgG";
     LLBC_PrintLine("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper(str.c_str()).c_str());
     LLBC_PrintLine("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower(str.c_str()).c_str());
-    LLBC_PrintLine("");
-
-    // Trim test(include left, right).
-    str = "     Hello World     \t\t\t";
-    LLBC_PrintLine("trim test, string: %s", str.c_str());
-    LLBC_PrintLine("after trim left(len: %lu): %s", 
-        LLBC_TrimLeft(str).length(), LLBC_TrimLeft(str).c_str());
-    LLBC_PrintLine("after trim right(len: %lu): %s",
-        LLBC_TrimRight(str).length(), LLBC_TrimRight(str).c_str());
-    LLBC_PrintLine("after trim(left and right)(len: %lu): %s",
-        LLBC_Trim(str).length(), LLBC_Trim(str).c_str());
     LLBC_PrintLine("");
 
     // String -> Number test.

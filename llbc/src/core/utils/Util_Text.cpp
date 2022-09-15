@@ -124,99 +124,6 @@ LLBC_String LLBC_ToLower(const char *str)
     return convertedStr;
 }
 
-LLBC_String LLBC_Trim(const LLBC_String &str)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String(); 
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str));
-}
-
-LLBC_String LLBC_Trim(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String();
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str, target), target);
-}
-
-LLBC_String LLBC_Trim(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String();
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str, targets), targets);
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str)
-{
-    return LLBC_TrimLeft(str, "\t ");
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-        return LLBC_String();
-
-    LLBC_String::size_type leftPos = 0;
-    const LLBC_String::size_type length = str.size();
-    for (; str[leftPos] == target && leftPos < length; ++leftPos);
-
-    if (leftPos >= length)
-        return LLBC_String();
-
-    return str.substr(leftPos, LLBC_String::npos);
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(!targets))
-        return str;
-
-    LLBC_String retStr = str;
-    const size_t len = strlen(targets);
-    for (size_t i = 0; i < len; ++i)
-        retStr = LLBC_TrimLeft(retStr, targets[i]);
-
-    return retStr;
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str)
-{
-    return LLBC_TrimRight(str, "\t ");
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-        return LLBC_String();
-
-    const LLBC_String::size_type length = str.size();
-    LLBC_String::size_type rightPos = length - 1;
-    for (; str[rightPos] == target && rightPos != 0; --rightPos);
-
-    return str.substr(0, rightPos + 1);
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(!targets))
-        return str;
-
-    LLBC_String retStr = str;
-    const size_t len = strlen(targets);
-    for (size_t i = 0; i < len; ++i)
-        retStr = LLBC_TrimRight(retStr, targets[i]);
-
-    return retStr;
-}
-
 sint32 LLBC_Str2Int32(const char *str)
 {
     return atoi(str);
@@ -262,8 +169,7 @@ void *LLBC_Str2Ptr(const char *str)
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     bool hexFormat = false;
-    LLBC_String lowerStr = LLBC_ToLower(str);
-    lowerStr = LLBC_Trim(lowerStr);
+    LLBC_String lowerStr = LLBC_ToLower(str).strip();
     if (lowerStr.size() >= 2 && (lowerStr[0] == '0' && lowerStr[1] == 'x'))
     {
         hexFormat = true;
