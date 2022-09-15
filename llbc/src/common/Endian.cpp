@@ -62,22 +62,21 @@ int LLBC_Endian::Str2Type(const char *str)
     if (!str)
         return LLBC_Endian::UnknownEndian;
 
-    size_t len = ::strlen(str);
-
+    const size_t len = strlen(str);
     char *lowerCaseStr = reinterpret_cast<char *>(malloc(len + 1));
     for (size_t i = 0; i < len; ++i)
-        lowerCaseStr[i] = ::tolower(str[i]);
+        lowerCaseStr[i] = tolower(str[i]);
 
     lowerCaseStr[len] = '\0';
 
     int type;
-    if (::memcmp(LLBC_INTERNAL_NS 
+    if (memcmp(LLBC_INTERNAL_NS 
         __g_endian_type_desc[LLBC_Endian::BigEndian], lowerCaseStr, len) == 0)
     {
         type = LLBC_Endian::BigEndian;
         goto finally;
     }
-    else if (::memcmp(LLBC_INTERNAL_NS
+    else if (memcmp(LLBC_INTERNAL_NS
         __g_endian_type_desc[LLBC_Endian::LittleEndian], lowerCaseStr, len) == 0)
     {
         type = LLBC_Endian::LittleEndian;

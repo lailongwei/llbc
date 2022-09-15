@@ -124,8 +124,8 @@ public:
         if (startFinished)
         {
             auto testSvc = LLBC_IService::Create(LLBC_IService::Normal);
-            testSvc->RegisterComponent(new TestCompA);
-            testSvc->RegisterComponent(new TestCompB);
+            testSvc->AddComponent(new TestCompA);
+            testSvc->AddComponent(new TestCompB);
 
             testSvc->Start();
         }

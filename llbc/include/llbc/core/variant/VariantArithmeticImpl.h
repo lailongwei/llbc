@@ -52,8 +52,8 @@ template <>
 inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *right, int type)
 {
     sint64 leftVal = 0, rightVal = 0;
-    ::memcpy(&leftVal, &left, sizeof(void *));
-    ::memcpy(&rightVal, &right, sizeof(void *));
+    memcpy(&leftVal, &left, sizeof(void *));
+    memcpy(&rightVal, &right, sizeof(void *));
 
     switch (type)
     {
@@ -79,7 +79,7 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
     }
 
     void *finalPtr = nullptr;
-    ::memcpy(&finalPtr, &leftVal, sizeof(void *));
+    memcpy(&finalPtr, &leftVal, sizeof(void *));
 
     return finalPtr;
 }

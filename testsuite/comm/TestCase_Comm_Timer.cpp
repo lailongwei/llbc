@@ -112,7 +112,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     LLBC_PrintLine("Timer testcase:");
 
     LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "TimerTest");
-    svc->RegisterComponent(LLBC_New(TestComp));
+    svc->AddComponent(LLBC_New(TestComp));
     if(svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());

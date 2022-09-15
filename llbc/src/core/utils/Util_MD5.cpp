@@ -328,7 +328,7 @@ LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
 
 LLBC_String LLBC_MD5::MD5_String(const char *str)
 {
-    return MD5_Buffer(str, LLBC_StrLenA(str));
+    return MD5_Buffer(str, strlen(str));
 }
 
 LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)

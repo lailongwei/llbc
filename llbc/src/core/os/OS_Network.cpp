@@ -31,7 +31,7 @@ int LLBC_GetAddrInfo(const char *nodename,
                      const struct addrinfo *hints,
                      struct addrinfo **res)
 {
-    int ret = ::getaddrinfo(nodename, servname, hints, res);
+    int ret = getaddrinfo(nodename, servname, hints, res);
     if (ret != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_GAI);
@@ -45,7 +45,7 @@ int LLBC_GetAddrInfo(const char *nodename,
 
 void LLBC_FreeAddrInfo(struct addrinfo *ai)
 {
-    ::freeaddrinfo(ai);
+    freeaddrinfo(ai);
 }
 
 __LLBC_NS_END

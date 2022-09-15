@@ -212,18 +212,18 @@ int csllbc_Service_Broadcast(csllbc_Service *svc,
     return svc->Broadcast(opcode, data, static_cast<size_t>(dataLen), status);
 }
 
-int csllbc_Service_RegisterComponent(csllbc_Service *svc,
-                                     csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
+int csllbc_Service_AddComponent(csllbc_Service *svc,
+                                csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
 {
     csllbc_Component *comp = new csllbc_Component(initDeleg, destroyDeleg,
                                                   startDeleg, stopDeleg,
@@ -231,7 +231,7 @@ int csllbc_Service_RegisterComponent(csllbc_Service *svc,
                                                   sessionCreateDeleg, sessionDestroyDeleg, asyncConnResultDeleg,
                                                   protoReportDeleg, unHandledPacketDeleg);
 
-    if (svc->RegisterComponent(comp) != LLBC_OK)
+    if (svc->AddComponent(comp) != LLBC_OK)
     {
         LLBC_Delete(comp);
         return LLBC_FAILED;
@@ -240,9 +240,9 @@ int csllbc_Service_RegisterComponent(csllbc_Service *svc,
     return LLBC_OK;
 }
 
-int csllbc_Service_RegisterCoder(csllbc_Service *svc, int opcode)
+int csllbc_Service_AddCoder(csllbc_Service *svc, int opcode)
 {
-    return svc->RegisterCoder(opcode);
+    return svc->AddCoder(opcode);
 }
 
 int csllbc_Service_Subscribe(csllbc_Service *svc, int opcode)

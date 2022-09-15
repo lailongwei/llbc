@@ -102,8 +102,8 @@ class MultiSvcTest(TestCase):
         client.codec = Service.CODEC_JSON
         server.codec = Service.CODEC_JSON
 
-        client.registercomp(ClientComp())
-        server.registercomp(ServerComp())
+        client.addcomp(ClientComp())
+        server.addcomp(ServerComp())
 
         client.subscribe(TEST_RES, ClientPacketHandler())
         server.subscribe(TEST_REQ, ServerPacketHandler())

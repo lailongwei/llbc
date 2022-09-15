@@ -429,7 +429,7 @@ public:
      * @param[in] compEvOffset - the comp event offset.
      * @return bool - return true it means cared specified event offset, otherwise return false.
      */
-    bool IsCaredEventOffset(int compEvOffset) const;
+    bool IsCaredEventIndex(int compEvOffset) const;
 
 public:
     /**

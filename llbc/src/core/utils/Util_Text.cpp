@@ -32,84 +32,6 @@
 #pragma warning(disable:4996)
 #endif
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-
-size_t LLBC_StrLenW(const wchar_t *s)
-{
-    if (UNLIKELY(!s))
-        return 0;
-
-    size_t i = 0;
-    for (; s[i] != L'\0'; ++i);
-    return i;
-}
-
-wchar_t *LLBC_StrCatW(wchar_t *s1, const wchar_t *s2)
-{
-    if (UNLIKELY(!s2))
-        return s1;
-
-    size_t s1Len = LLBC_StrLenW(s1);
-    size_t s2Len = LLBC_StrLenW(s2);
-    memcpy(s1 + s1Len, s2, sizeof(wchar_t) * s2Len);
-
-    return s1;
-}
-
-int LLBC_StrCmpW(const wchar_t *s1, const wchar_t *s2)
-{
-    while (*s1)
-    {
-        if (*s1 != *s2)
-            break;
-
-        s1++;
-        s2++;
-    }
-
-    return *s1 - *s2;
-}
-
-int LLBC_StrCmpiW(const wchar_t *s1, const wchar_t *s2)
-{
-    while (*s1)
-    {
-        if (*s1 != *s2)
-        {
-            if (*s1 >= static_cast<wchar_t>('A') &&
-                *s1 <= static_cast<wchar_t>('Z'))
-            {
-                if (*s2 - *s1 == 'a' - 'A')
-                    continue;
-            }
-            else if (*s1 >= static_cast<wchar_t>('a') &&
-                     *s1 <= static_cast<wchar_t>('z'))
-            {
-                if (*s1 - *s2 == 'a' - 'A')
-                    continue;
-            }
-
-            break;
-        }
-
-        s1++;
-        s2++;
-    }
-
-    return *s1 - *s2;
-}
-
-wchar_t *LLBC_StrCpyW(wchar_t *s1, const wchar_t *s2)
-{
-    size_t s2Len = LLBC_StrLenW(s2);
-    ::memcpy(s1, s2, sizeof(wchar_t) * s2Len);
-    s1[s2Len] = L'\0';
-
-    return s1;
-}
-
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
 __LLBC_NS_BEGIN
 
 void LLBC_SplitString(const LLBC_String &str,
@@ -202,195 +124,9 @@ LLBC_String LLBC_ToLower(const char *str)
     return convertedStr;
 }
 
-LLBC_String LLBC_Trim(const LLBC_String &str)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String(); 
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str));
-}
-
-LLBC_String LLBC_Trim(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String();
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str, target), target);
-}
-
-LLBC_String LLBC_Trim(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(str.empty()))
-    {
-        return LLBC_String();
-    }
-
-    return LLBC_TrimRight(LLBC_TrimLeft(str, targets), targets);
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str)
-{
-    return LLBC_TrimLeft(str, "\t ");
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-        return LLBC_String();
-
-    LLBC_String::size_type leftPos = 0;
-    const LLBC_String::size_type length = str.size();
-    for (; str[leftPos] == target && leftPos < length; ++leftPos);
-
-    if (leftPos >= length)
-        return LLBC_String();
-
-    return str.substr(leftPos, LLBC_String::npos);
-}
-
-LLBC_String LLBC_TrimLeft(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(!targets))
-        return str;
-
-    LLBC_String retStr = str;
-    const uint32 len = LLBC_StrLenA(targets);
-    for (uint32 i = 0; i < len; ++i)
-        retStr = LLBC_TrimLeft(retStr, targets[i]);
-
-    return retStr;
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str)
-{
-    return LLBC_TrimRight(str, "\t ");
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str, char target)
-{
-    if (UNLIKELY(str.empty()))
-        return LLBC_String();
-
-    const LLBC_String::size_type length = str.size();
-    LLBC_String::size_type rightPos = length - 1;
-    for (; str[rightPos] == target && rightPos != 0; --rightPos);
-
-    return str.substr(0, rightPos + 1);
-}
-
-LLBC_String LLBC_TrimRight(const LLBC_String &str, const char *targets)
-{
-    if (UNLIKELY(!targets))
-        return str;
-
-    LLBC_String retStr = str;
-    const uint32 len = LLBC_StrLenA(targets);
-    for (uint32 i = 0; i < len; ++i)
-        retStr = LLBC_TrimRight(retStr, targets[i]);
-
-    return retStr;
-}
-
-LLBC_String LLBC_DirName(const LLBC_String &path)
-{
-    if (UNLIKELY(path.empty()))
-        return LLBC_String();
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    char *buf = reinterpret_cast<char *>(::malloc(path.size() + 1));
-    ::memcpy(buf,  path.data(), path.size());
-    buf[path.size()] = '\0';
-
-    ::dirname(buf);
-
-    LLBC_String dirName = buf;
-    ::free(buf);
-
-    return dirName;
-#else
-    if (path[path.length() - 1] == ':')
-        return path;
-
-    LLBC_String::size_type slashPos = path.rfind(LLBC_SLASH_A);
-    LLBC_String::size_type backlashPos = path.rfind(LLBC_BACKLASH_A);
-
-    if (slashPos == LLBC_String::npos)
-    {
-        if (backlashPos == LLBC_String::npos)
-            return LLBC_String();
-
-        return path.substr(0, backlashPos);
-    }
-    else
-    {
-        if (backlashPos == LLBC_String::npos)
-            return path.substr(0, slashPos);
-    }
-
-    return path.substr(0, MAX(slashPos, backlashPos));
-#endif
-}
-
-LLBC_String LLBC_BaseName(const LLBC_String &path, bool incExtension)
-{
-    if (UNLIKELY(path.empty()))
-    {
-        return LLBC_String();
-    }
-
-    LLBC_String baseName;
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    baseName = ::basename(const_cast<char *>(path.c_str()));
-#else
-    LLBC_String::size_type slashPos = path.rfind(LLBC_SLASH_A);
-    LLBC_String::size_type backlashPos = path.rfind(LLBC_BACKLASH_A);
-
-    if (slashPos == LLBC_String::npos)
-    {
-        if (backlashPos == LLBC_String::npos)
-            baseName = path;
-        else
-            baseName = path.substr(backlashPos + 1);
-    }
-    else
-    {
-        if (backlashPos == LLBC_String::npos)
-            baseName = path.substr(slashPos + 1);
-        else
-            baseName = path.substr(MAX(slashPos, backlashPos) + 1);
-    }
-#endif
-
-    if (!incExtension)
-    {
-        LLBC_String::size_type dotPos = baseName.rfind('.');
-        if (dotPos != LLBC_String::npos && dotPos != 0)
-            baseName.erase(dotPos);
-    }
-
-    return baseName;
-}
-
-LLBC_String LLBC_ExtensionName(const LLBC_String &path)
-{
-    LLBC_String basename = LLBC_BaseName(path);
-    if (UNLIKELY(basename.empty()))
-        return LLBC_String();
-
-    LLBC_String::size_type pos = basename.rfind(".");
-    if (pos == LLBC_String::npos)
-        return LLBC_String();
-
-    return basename.substr(pos + 1);
-}
-
 sint32 LLBC_Str2Int32(const char *str)
 {
-    return ::atoi(str);
+    return atoi(str);
 }
 
 uint32 LLBC_Str2UInt32(const char *str)
@@ -400,7 +136,7 @@ uint32 LLBC_Str2UInt32(const char *str)
 
 long LLBC_Str2Long(const char *str)
 {
-    return ::atol(str);
+    return atol(str);
 }
 
 ulong LLBC_Str2ULong(const char *str)
@@ -411,9 +147,9 @@ ulong LLBC_Str2ULong(const char *str)
 sint64 LLBC_Str2Int64(const char *str)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return ::atoll(str);
+    return atoll(str);
 #else
-    return ::_atoi64(str);
+    return _atoi64(str);
 #endif
 }
 
@@ -433,8 +169,7 @@ void *LLBC_Str2Ptr(const char *str)
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     bool hexFormat = false;
-    LLBC_String lowerStr = LLBC_ToLower(str);
-    lowerStr = LLBC_Trim(lowerStr);
+    LLBC_String lowerStr = LLBC_ToLower(str).strip();
     if (lowerStr.size() >= 2 && (lowerStr[0] == '0' && lowerStr[1] == 'x'))
     {
         hexFormat = true;
@@ -477,7 +212,7 @@ void *LLBC_Str2Ptr(const char *str)
     }
 
     void *ptr;
-    ::memcpy(&ptr, &ptrVal, sizeof(void *));
+    memcpy(&ptr, &ptrVal, sizeof(void *));
 
     return ptr;
 }
@@ -485,9 +220,9 @@ void *LLBC_Str2Ptr(const char *str)
 double LLBC_Str2Double(const char *str)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return ::atof(str);
+    return atof(str);
 #else
-    return ::atof(str);
+    return atof(str);
 #endif
 }
 
@@ -502,7 +237,7 @@ int LLBC_HashString(const char *str, size_t strLen)
         return 0;
 
     if (strLen == static_cast<size_t>(-1))
-        strLen = LLBC_StrLenA(str);
+        strLen = strlen(str);
 
     int hashVal = 0;
     for (size_t i = 0; i < strLen; ++i)

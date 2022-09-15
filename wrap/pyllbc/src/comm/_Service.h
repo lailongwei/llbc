@@ -167,20 +167,20 @@ LLBC_EXTERN_C PyObject *_pyllbc_StopService(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RegisterComponent(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_AddComponent(PyObject *self, PyObject *args)
 {
     PyObject *comp;
     pyllbc_Service *svc;
     if (!PyArg_ParseTuple(args, "lO", &svc, &comp))
         return nullptr;
 
-    if (svc->RegisterComponent(comp) != LLBC_OK)
+    if (svc->AddComponent(comp) != LLBC_OK)
         return nullptr;
 
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibComponent(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_AddLibComponent(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     const char *compName, *libPath;
@@ -189,7 +189,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RegisterLibComponent(PyObject *self, PyObject *a
         return nullptr;
 
     PyObject *comp;
-    if (svc->RegisterComponent(compName, libPath, compCls, comp) != LLBC_OK)
+    if (svc->AddComponent(compName, libPath, compCls, comp) != LLBC_OK)
         return nullptr;
 
     return comp;

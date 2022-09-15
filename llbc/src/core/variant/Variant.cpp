@@ -174,7 +174,7 @@ LLBC_Variant::LLBC_Variant(const char *str)
     _holder.type = LLBC_VariantType::VT_STR_DFT;
     if (str)
     {
-        size_t strLen = LLBC_StrLenA(str);
+        const size_t strLen = strlen(str);
         if (strLen != 0)
             _holder.data.obj.str = LLBC_New(Str, str, strLen);
     }
@@ -770,7 +770,7 @@ LLBC_Variant & LLBC_Variant::operator =(const char * const &str)
         _holder.type = LLBC_VariantType::VT_STR_DFT;
     }
 
-    const size_t len = str ? ::strlen(str) : 0;
+    const size_t len = str ? strlen(str) : 0;
     if (len == 0)
     {
         if (_holder.data.obj.str)

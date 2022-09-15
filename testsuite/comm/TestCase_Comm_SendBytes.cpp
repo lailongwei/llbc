@@ -90,7 +90,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     svc->SuppressCoderNotFoundWarning();
 
     TestComp *comp = LLBC_New(TestComp);
-    svc->RegisterComponent(comp);
+    svc->AddComponent(comp);
 
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 

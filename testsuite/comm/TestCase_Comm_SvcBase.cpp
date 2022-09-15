@@ -218,12 +218,12 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
 
     // Register comp.
     TestComp *comp = LLBC_New(TestComp);
-    _svc->RegisterComponent(comp);
+    _svc->AddComponent(comp);
     // Register coder.
-    _svc->RegisterCoder(1, LLBC_New(TestDataFactory));
+    _svc->AddCoderFactory(1, LLBC_New(TestDataFactory));
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    _svc->RegisterStatusDesc(1, "The test status describe");
+    _svc->AddStatusDesc(1, "The test status describe");
 #endif
 
     // Subscribe handler.
@@ -304,7 +304,7 @@ void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
 void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
 {
     int clientCount;
-    if (LLBC_StrCmpA(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
+    if (strcmp(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
         clientCount = 5;
     else
         clientCount = 100;

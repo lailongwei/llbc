@@ -94,7 +94,7 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register comp.
-    _svc->RegisterComponent(new TestComp());
+    _svc->AddComponent(new TestComp());
 
     // Start service.
     LLBC_PrintLine("Start service...");

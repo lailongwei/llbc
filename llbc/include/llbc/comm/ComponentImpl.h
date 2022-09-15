@@ -52,7 +52,7 @@ inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const char *
 template <typename ComponentCls>
 int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
-    if (UNLIKELY(!methName || LLBC_StrLenA(methName) == 0 || !meth))
+    if (UNLIKELY(!methName || strlen(methName) == 0 || !meth))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -91,7 +91,7 @@ inline bool LLBC_Component::IsCaredEvents(uint64 compEvs) const
     return (_caredEvents & compEvs) == compEvs;
 }
 
-inline bool LLBC_Component::IsCaredEventOffset(int compEvOffset) const
+inline bool LLBC_Component::IsCaredEventIndex(int compEvOffset) const
 {
  #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
     return IsCaredEvents(1Ui64 << compEvOffset);

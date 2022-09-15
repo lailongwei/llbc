@@ -272,8 +272,8 @@ namespace llbc
             if (!IsRegistableTo(svc))
                 return;
 
-            _RegisterComp(svc, ref obj);
-            _RegisterCoder(svc, ref obj);
+            _AddComp(svc, ref obj);
+            _AddCoder(svc, ref obj);
             _RegisterGlobalCoder(svc, ref obj);
 
             foreach (var holderMethod in methods.Values)
@@ -281,21 +281,21 @@ namespace llbc
         }
 
         #region Internal implementation
-        private void _RegisterCoder(Service svc, ref object obj)
+        private void _AddCoder(Service svc, ref object obj)
         {
             if (!asCoder)
                 return;
 
-            svc.RegisterCoder(coderOpcode, cls);
+            svc.AddCoder(coderOpcode, cls);
         }
 
-        private void _RegisterComp(Service svc, ref object obj)
+        private void _AddComp(Service svc, ref object obj)
         {
             if (!asComp)
                 return;
 
             _CreateObject(ref obj);
-            svc.RegisterComponent(obj as IComponent);
+            svc.AddComponent(obj as IComponent);
         }
 
         private void _RegisterGlobalCoder(Service svc, ref object obj)

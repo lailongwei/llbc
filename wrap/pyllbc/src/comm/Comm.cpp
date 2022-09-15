@@ -101,8 +101,8 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.SuppressServiceCoderNotFoundWarning);
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);
-    inlMod->AddMethod(methods.RegisterComponent);
-    inlMod->AddMethod(methods.RegisterLibComponent);
+    inlMod->AddMethod(methods.AddComponent);
+    inlMod->AddMethod(methods.AddLibComponent);
     inlMod->AddMethod(methods.RegisterCodec);
     inlMod->AddMethod(methods.Listen);
     inlMod->AddMethod(methods.Connect);

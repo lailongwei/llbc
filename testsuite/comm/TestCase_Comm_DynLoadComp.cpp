@@ -46,7 +46,7 @@ int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
     std::cin >> compName;
 
     LLBC_PrintLine("Will register comp in service");
-    int ret = _svc->RegisterComponent(libPath, compName);
+    int ret = _svc->AddComponent(libPath, compName);
     if (ret != LLBC_OK)
     {
         LLBC_FilePrintLine(stderr, "Failed to register dynamic comp, error:%s", LLBC_FormatLastError());

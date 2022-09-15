@@ -79,6 +79,12 @@ public:
         }
     }
 
+    virtual void OnRun(bool &doNothing)
+    {
+        std::cout <<"TestApp::OnRun()..." <<std::endl;
+        LLBC_Sleep(500);
+    }
+
 private:
     LLBC_Time _startTime;
     LLBC_Time _stopTime;
@@ -131,8 +137,8 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
     // Do some stuff.
     // ... ...
 
-    // Stop app object(you can skip this step, because app will stop in app destructor).
-    app.Stop();
+    // Run app.
+    app.Run();
 
     return LLBC_OK;
 }

@@ -51,7 +51,7 @@ char *csllbc_PInvokeUtil::BuildCSharpStr(const char *nativeStr, size_t nativeStr
         return nullptr;
 
     char *csStr = LLBC_Malloc(char, nativeStrLen);
-    ::memcpy(csStr, nativeStr, nativeStrLen);
+    memcpy(csStr, nativeStr, nativeStrLen);
 
     return csStr;
 }

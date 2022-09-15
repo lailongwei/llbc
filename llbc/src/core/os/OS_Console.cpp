@@ -207,7 +207,7 @@ int LLBC_FlushFile(FILE *file)
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
-    if (UNLIKELY(::fflush(file) != 0))
+    if (UNLIKELY(fflush(file) != 0))
     {
         funlockfile(file);
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -221,7 +221,7 @@ int LLBC_FlushFile(FILE *file)
     LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
     lock.Lock();
 
-    if (UNLIKELY(::fflush(file) != 0))
+    if (UNLIKELY(fflush(file) != 0))
     {
         lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_CLIB);

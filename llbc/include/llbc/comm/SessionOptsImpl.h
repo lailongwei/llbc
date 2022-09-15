@@ -94,7 +94,7 @@ inline void LLBC_SessionOpts::SetSessionRecvBufSize(size_t sessionRecvBufSize)
 
 inline bool LLBC_SessionOpts::operator==(const LLBC_SessionOpts &another) const
 {
-    return ::memcmp(this, &another, sizeof(LLBC_SessionOpts)) == 0;
+    return memcmp(this, &another, sizeof(LLBC_SessionOpts)) == 0;
 }
 
 inline size_t LLBC_SessionOpts::GetMaxPacketSize() const

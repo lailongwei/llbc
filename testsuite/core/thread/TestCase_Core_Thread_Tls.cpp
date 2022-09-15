@@ -31,7 +31,7 @@ namespace
 static int ThreadProc(void *arg)
 {
     long threadIndex;
-    ::memcpy(&threadIndex, &arg, sizeof(long));
+    memcpy(&threadIndex, &arg, sizeof(long));
     LLBC_PrintLine("thread %d startup", threadIndex);
 
     __g_tls.SetValue(LLBC_New(long));
@@ -61,7 +61,7 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
     for(long i = 0; i < __g_threadNum; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
+        memcpy(&threadArg, &i, sizeof(long));
         LLBC_CreateThread(&threads[i], &ThreadProc, threadArg);
     }
 

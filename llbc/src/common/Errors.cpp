@@ -252,12 +252,12 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        ::sprintf(libTls->commonTls.errDesc, 
+        sprintf(libTls->commonTls.errDesc, 
                 __g_errDesc[noPart], subErrno, strerror(subErrno));
 #else // LLBC_TARGET_PLATFORM_WIN32
         char libcErrDesc[__LLBC_ERROR_DESC_SIZE] = {0};
-        ::strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
-        ::sprintf_s(libTls->commonTls.errDesc, 
+        strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
+        sprintf_s(libTls->commonTls.errDesc, 
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
@@ -302,7 +302,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             PSTR sysErr = (PSTR)::LocalLock(hLocal);
 
             bool hasCRLF = false;
-            const size_t sysErrLen = ::strlen(sysErr);
+            const size_t sysErrLen = strlen(sysErr);
             if (sysErrLen >= 2)
                 if (sysErr[sysErrLen - 2] == LLBC_CR_A && 
                     sysErr[sysErrLen - 1] == LLBC_LF_A)
@@ -313,17 +313,17 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 
             ::LocalUnlock(hLocal);
 
-            ::sprintf_s(libTls->commonTls.errDesc, 
-                    __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, sysErr);
+            sprintf_s(libTls->commonTls.errDesc, 
+                  __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, sysErr);
 
             ::LocalFree(hLocal);
         }
         else
         {
             char unknownErrDesc[64] = {0};
-            ::sprintf_s(unknownErrDesc, 
+            sprintf_s(unknownErrDesc, 
                 sizeof(unknownErrDesc), "Unknown error, error code: %d", subErrno);
-            ::sprintf_s(libTls->commonTls.errDesc, 
+            sprintf_s(libTls->commonTls.errDesc, 
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], unknownErrDesc);
         }
 
@@ -333,8 +333,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (LLBC_ERROR_TYPE_IS_GAI(no))
     {
-        ::sprintf(libTls->commonTls.errDesc, 
-                __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
+        sprintf(libTls->commonTls.errDesc, 
+              __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
         return libTls->commonTls.errDesc;
     }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
@@ -342,9 +342,9 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         noPart >= __LLBC_ERROR_SENTINEL)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        ::strcpy(libTls->commonTls.errDesc, "unknown error");
+        strcpy(libTls->commonTls.errDesc, "unknown error");
 #else // LLBC_TARGET_PLATFORM_WIN32
-        ::strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, "unknown error");
+        strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, "unknown error");
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
         return libTls->commonTls.errDesc;
@@ -355,9 +355,9 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             return libTls->commonTls.customErrDesc;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        ::strcpy(libTls->commonTls.errDesc, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
+        strcpy(libTls->commonTls.errDesc, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #else // LLBC_TARGET_PLATFORM_WIN32
-        ::strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
+        strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
         return libTls->commonTls.errDesc;

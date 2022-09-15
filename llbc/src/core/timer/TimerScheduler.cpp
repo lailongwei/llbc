@@ -163,7 +163,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
         return LLBC_ERROR_INVALID;
 
     LLBC_TimerData *data = LLBC_New(LLBC_TimerData);
-    ::memset(data, 0, sizeof(LLBC_TimerData));
+    memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliSeconds() + dueTime;
     data->timerId = ++ _maxTimerId;
     data->dueTime = dueTime;

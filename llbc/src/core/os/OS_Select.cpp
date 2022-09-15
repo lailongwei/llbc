@@ -32,7 +32,7 @@ int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet 
     timeout.tv_sec = interval / 1000;
     timeout.tv_usec = (interval % 1000) * 1000;
 
-    int ret = ::select(nfds, readfds, writefds, exceptfds, &timeout);
+    int ret = select(nfds, readfds, writefds, exceptfds, &timeout);
     if (ret == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);

@@ -102,7 +102,7 @@ int LLBC_PollerMgr::Start(int count)
 
     _pollerCount = count;
     _pollers = LLBC_Malloc(LLBC_BasePoller *, sizeof(LLBC_BasePoller *) * count);
-    ::memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
+    memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
 
     // Create pollers.
     for (int i = 0; i < count; ++i)

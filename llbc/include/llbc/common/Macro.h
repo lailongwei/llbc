@@ -249,10 +249,10 @@ private:                                            \
 
 /* Memory operations macros. */
 // allocate/reallocate/free.
-#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(::malloc(size)))
-#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(::calloc(size, 1)))
-#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(::realloc((memblock), (size))))
-#define LLBC_Free(memblock)                 (::free(memblock))
+#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
+#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
+#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
+#define LLBC_Free(memblock)                 (free(memblock))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
@@ -303,7 +303,7 @@ private:                                            \
                                                                     \
         va_list ___llbc_macro_inl_argfmt_ap;                        \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        int ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        int ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
             buf = nullptr; len = 0;                                 \
@@ -313,7 +313,7 @@ private:                                            \
                                                                     \
         buf = LLBC_Malloc(char, ___llbc_macro_inl_argfmt_vsnp_len + 1); \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
             LLBC_Free(buf);                                         \

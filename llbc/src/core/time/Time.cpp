@@ -113,7 +113,7 @@ LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
 
 LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct, int milliSecond, int microSecond)
 {
-    time_t clanderTimeInSecs = ::mktime(const_cast<tm *>(&timeStruct));
+    time_t clanderTimeInSecs = mktime(const_cast<tm *>(&timeStruct));
     return LLBC_Time(clanderTimeInSecs * NumOfMicroSecondsPerSecond +
                      milliSecond * NumOfMicroSecondsPerMilliSecond +
                      microSecond);
@@ -403,11 +403,11 @@ void LLBC_Time::UpdateTimeStructs()
 {
     time_t calendarTime = static_cast<time_t>(_time / NumOfMicroSecondsPerSecond);
     #if LLBC_TARGET_PLATFORM_WIN32
-    ::localtime_s(&_localTimeStruct, &calendarTime);
-    ::gmtime_s(&_gmtTimeStruct, &calendarTime);
+    localtime_s(&_localTimeStruct, &calendarTime);
+    gmtime_s(&_gmtTimeStruct, &calendarTime);
     #else
-    ::localtime_r(&calendarTime, &_localTimeStruct);
-    ::gmtime_r(&calendarTime, &_gmtTimeStruct);
+    localtime_r(&calendarTime, &_localTimeStruct);
+    gmtime_r(&calendarTime, &_gmtTimeStruct);
     #endif
 }
 

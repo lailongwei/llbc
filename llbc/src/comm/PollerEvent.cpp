@@ -87,8 +87,9 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildCloseEv(int sessionId, const char *re
 
     if (reason != nullptr)
     {
-        ev.un.closeReason = LLBC_Malloc(char, LLBC_StrLenA(reason) + 1);
-        LLBC_StrCpyA(ev.un.closeReason, reason);
+        const size_t reasonLen = strlen(reason);
+        ev.un.closeReason = LLBC_Malloc(char, reasonLen + 1);
+        memcpy(ev.un.closeReason, reason, reasonLen + 1);
     }
     else
     {
@@ -112,13 +113,13 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildIocpMonitorEv(int ret,
 
     size_t off = 0;
     // Wait return value.
-    ::memcpy(ev.un.monitorEv, &ret, sizeof(int)), off += sizeof(int);
+    memcpy(ev.un.monitorEv, &ret, sizeof(int)), off += sizeof(int);
     // Overlapped data.
-    ::memcpy(ev.un.monitorEv + off, &ol, sizeof(LLBC_POverlapped)), off += sizeof(LLBC_POverlapped);
+    memcpy(ev.un.monitorEv + off, &ol, sizeof(LLBC_POverlapped)), off += sizeof(LLBC_POverlapped);
     // Error no.
-    ::memcpy(ev.un.monitorEv + off, &errNo, sizeof(int)), off += sizeof(int);
+    memcpy(ev.un.monitorEv + off, &errNo, sizeof(int)), off += sizeof(int);
     // Sub error no.
-    ::memcpy(ev.un.monitorEv + off, &subErrNo, sizeof(int));
+    memcpy(ev.un.monitorEv + off, &subErrNo, sizeof(int));
 
     block->SetWritePos(sizeof(_Ev));
     return block;
@@ -134,9 +135,9 @@ LLBC_MessageBlock *LLBC_PollerEvUtil::BuildEpollMonitorEv(const LLBC_EpollEvent 
     ev.un.monitorEv = LLBC_Malloc(char, sizeof(int) + sizeof(LLBC_EpollEvent) * count);
 
     // Write count.
-    ::memcpy(ev.un.monitorEv, &count, sizeof(int));
+    memcpy(ev.un.monitorEv, &count, sizeof(int));
     // Write events.
-    ::memcpy(ev.un.monitorEv + sizeof(int), evs, sizeof(LLBC_EpollEvent) * count);
+    memcpy(ev.un.monitorEv + sizeof(int), evs, sizeof(LLBC_EpollEvent) * count);
 
     block->SetWritePos(sizeof(_Ev));
     return block;

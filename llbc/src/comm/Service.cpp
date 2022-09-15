@@ -110,8 +110,6 @@ LLBC_Service::LLBC_Service(This::Type type,
 , _compsStartFinished(0)
 , _compsStartRet(LLBC_OK)
 
-, _comps()
-, _comps2()
 , _caredEventComps{}
 , _coders()
 , _handlers()
@@ -160,7 +158,7 @@ LLBC_Service::LLBC_Service(This::Type type,
     }
 
     // Initialize cared event comps array.
-    ::memset(_caredEventComps, 0, sizeof(_caredEventComps));
+    memset(_caredEventComps, 0, sizeof(_caredEventComps));
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -676,38 +674,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId,
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(LLBC_ComponentFactory *compFactory)
-{
-    if (UNLIKELY(!compFactory))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
-    for (_WillRegComps::iterator it = _willRegComps.begin();
-         it != _willRegComps.end();
-         ++it)
-    {
-        if (it->compFactory != nullptr && it->compFactory == compFactory)
-        {
-            LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_FAILED;
-        }
-    }
-
-    _willRegComps.push_back(_WillRegComp(compFactory));
-
-    return LLBC_OK;
-}
-
-int LLBC_Service::RegisterComponent(LLBC_Component *comp)
+int LLBC_Service::AddComponent(LLBC_Component *comp)
 {
     if (UNLIKELY(!comp))
     {
@@ -721,30 +688,37 @@ int LLBC_Service::RegisterComponent(LLBC_Component *comp)
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
-    else if (std::find(_comps.begin(), 
-            _comps.end(), comp) != _comps.end())
+
+    char compName[512];
+    const char *compRttiName = LLBC_GetTypeName(*comp);
+    const size_t compNameLen = strlen(compRttiName);
+    if (compNameLen >= sizeof(compName))
+    {
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
+    memcpy(compName, compRttiName, compNameLen + 1);
+
+    if (std::find_if(_willRegComps.begin(), _willRegComps.end(), [comp, compName, compNameLen](LLBC_Component *regComp) {
+        if (comp == regComp)
+            return true;
+
+        const char *regCompName = LLBC_GetTypeName(*regComp);
+        return (strlen(regCompName) == compNameLen &&
+                memcmp(compName, regCompName, compNameLen) == 0);
+    }) != _willRegComps.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
-    for (_WillRegComps::iterator regIt = _willRegComps.begin();
-         regIt != _willRegComps.end();
-         ++regIt)
-    {
-        if (regIt->comp != nullptr && regIt->comp == comp)
-        {
-            LLBC_SetLastError(LLBC_ERROR_REPEAT);
-            return LLBC_FAILED;
-        }
-    }
-
-    _willRegComps.push_back(_WillRegComp(comp));
+    _willRegComps.push_back(comp);
 
     return LLBC_OK;
 }
 
-int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_String &compName, LLBC_Component *&comp)
+int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp)
 {
     // Force reset out parameter: comp.
     comp = nullptr;
@@ -763,7 +737,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
-    else if (!LLBC_File::Exists(libPath))
+    else if (!LLBC_File::Exists(compSharedLibPath))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
@@ -771,7 +745,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
 
     // Open comp library(if cached, reuse it).
     bool existingLib;
-    LLBC_Library *lib = OpenCompLibrary(libPath, existingLib);
+    LLBC_Library *lib = OpenCompLibrary(compSharedLibPath, existingLib);
     if (!lib)
         return LLBC_FAILED;
 
@@ -783,7 +757,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     if (!compCreateFunc)
     {
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         return LLBC_FAILED;
     }
@@ -794,7 +768,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     if (!comp)
     {
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
             LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
@@ -807,7 +781,7 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     {
         LLBC_XDelete(comp);
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
 
         LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
 
@@ -815,12 +789,12 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
     }
 
     // Call normalize register comp method to register.
-    int ret = RegisterComponent(comp);
+    int ret = AddComponent(comp);
     if (ret != LLBC_OK)
     {
         LLBC_XDelete(comp);
         if (!existingLib)
-            CloseCompLibrary(libPath);
+            CloseCompLibrary(compSharedLibPath);
     }
 
     return ret;
@@ -828,53 +802,32 @@ int LLBC_Service::RegisterComponent(const LLBC_String &libPath, const LLBC_Strin
 
 LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 {
-    LLBC_LockGuard guard(_lock);
-
-    _compNameKey.assign(compName);
-    _Comps2::iterator it = _comps2.find(_compNameKey);
-    if (it == _comps2.end())
+    size_t compNameLen = 0;
+    if (UNLIKELY(!compName || (compNameLen = strlen(compName)) == 0))
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
         return nullptr;
     }
 
-    _Comps &comps = it->second;
-    return comps[0];
-
-}
-
-LLBC_Component *LLBC_Service::GetComponent(const LLBC_String &compName)
-{
     LLBC_LockGuard guard(_lock);
 
-    _Comps2::iterator it = _comps2.find(compName);
-    if (it == _comps2.end())
+    _compNameKey.assign(compName, compNameLen);
+    auto it = _name2Comps.find(_compNameKey);
+    if (it != _name2Comps.end())
+        return it->second;
+
+    if (compNameLen > 1 && _compNameKey[0] == 'I')
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return nullptr;
+        _compNameKey.erase(_compNameKey.begin());
+        if ((it = _name2Comps.find(_compNameKey)) != _name2Comps.end())
+            return it->second;
     }
 
-    _Comps &comps = it->second;
-    return comps[0];
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+    return nullptr;
 }
 
-const std::vector<LLBC_Component *> &LLBC_Service::GetComponents(const LLBC_String &compName)
-{
-    static const std::vector<LLBC_Component *> emptyComps;
-
-    LLBC_LockGuard guard(_lock);
-
-    _Comps2::iterator it = _comps2.find(compName);
-    if (it == _comps2.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return emptyComps;
-    }
-
-    return it->second;
-}
-
-int LLBC_Service::RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory)
+int LLBC_Service::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory)
 {
     if (UNLIKELY(!coderFactory))
     {
@@ -898,7 +851,7 @@ int LLBC_Service::RegisterCoder(int opcode, LLBC_CoderFactory *coderFactory)
 }
 
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-int LLBC_Service::RegisterStatusDesc(int status, const LLBC_String &desc)
+int LLBC_Service::AddStatusDesc(int status, const LLBC_String &desc)
 {
     if (status == 0 || desc.empty())
     {
@@ -1522,9 +1475,9 @@ void LLBC_Service::RemoveServiceFromTls()
             break;
     }
 
-    ::memmove(&tls->commTls.services[idx],
-              &tls->commTls.services[idx + 1],
-              sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
+    memmove(&tls->commTls.services[idx],
+            &tls->commTls.services[idx + 1],
+            sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
 }
 
 bool LLBC_Service::IsCanContinueDriveService()
@@ -1612,7 +1565,8 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     }
 
     // Check has care session-create ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate])
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate];
+    if (!caredComps.empty())
     {
         // Build session info.
         LLBC_SessionInfo info;
@@ -1624,7 +1578,6 @@ void LLBC_Service::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         info.SetSocket(ev.handle);
 
         // Dispatch session-create event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
             caredComps[compIdx]->OnSessionCreate(info);
@@ -1642,7 +1595,8 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     }
 
     // Check has care session-destroy ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy])
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy];
+    if (!caredComps.empty())
     {
         // Build session info.
         LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
@@ -1658,7 +1612,6 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         ev.closeInfo = nullptr;
 
         // Dispatch session-destroy event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnSessionDestroy(destroyInfo);
@@ -1676,7 +1629,8 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
 
 
     // Check has care asyncconn-result ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult])
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult];
+    if (!caredComps.empty())
     {
         LLBC_AsyncConnResult result;
         result.SetIsConnected(ev.connected);
@@ -1684,7 +1638,6 @@ void LLBC_Service::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
         result.SetReason(ev.reason);
         result.SetPeerAddr(ev.peer);
 
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnAsyncConnResult(result);
@@ -1812,9 +1765,9 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     else
     {
-        if (_caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket])
+        auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket];
+        if (!caredComps.empty())
         {
-            _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket];
             const size_t compsSize = caredComps.size();
             for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
                  caredComps[compIdx]->OnUnHandledPacket(*packet);
@@ -1830,7 +1783,8 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     _Ev &ev = static_cast<_Ev &>(_);
 
     // Check has care proto-report ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventIndex::OnProtoReport])
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnProtoReport];
+    if (!caredComps.empty())
     {
         LLBC_ProtoReport report;
         report.SetSessionId(ev.sessionId);
@@ -1839,7 +1793,6 @@ void LLBC_Service::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
         report.SetLevel(ev.level);
         report.SetReport(ev.report);
 
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnProtoReport];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
              caredComps[compIdx]->OnProtoReport(report);
@@ -1891,10 +1844,10 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
 void LLBC_Service::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 {
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
-    if (_caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload])
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload];
+    if (!caredComps.empty())
     {
         // Dispatch application config reloaded event to all comps.
-        _Comps &caredComps = *_caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload];
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
             caredComps[compIdx]->OnApplicationConfigReload();
@@ -1906,52 +1859,33 @@ int LLBC_Service::InitComps()
     _initingComp = true;
 
     bool initSuccess = true;
-    for (_WillRegComps::iterator regIt = _willRegComps.begin();
-         regIt != _willRegComps.end();
-         ++regIt)
+    for (auto &willRegComp : _willRegComps)
     {
-        LLBC_Component *comp;
-        _WillRegComp &willRegComp = *regIt;
-        if (willRegComp.compFactory != nullptr) // Create comp from comp factory.
-        {
-            comp = willRegComp.compFactory->Create();
-            LLBC_XDelete(willRegComp.compFactory);
-        }
-        else if (willRegComp.comp != nullptr) // Create comp from giving comp(borrow).
-        {
-            comp = willRegComp.comp;
-            willRegComp.comp = nullptr;
-        }
-        else
-        {
-            continue;
-        }
+        willRegComp->SetService(this);
+        AddComp(willRegComp);
 
-        comp->SetService(this);
-        AddComp(comp);
-
-        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize))
+        if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize))
         {
-            comp->_inited = true;
+            willRegComp->_inited = true;
             continue;
         }
 
         while (true)
         {
             bool initFinished = true;
-            if (!comp->OnInitialize(initFinished))
+            if (!willRegComp->OnInitialize(initFinished))
                 break;
 
             if (initFinished)
             {
-                comp->_inited = true;
+                willRegComp->_inited = true;
                 break;
             }
 
             LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         }
 
-        if (!comp->_inited)
+        if (!willRegComp->_inited)
         {
             ClearCompsWhenInitCompFailed();
             initSuccess = false;
@@ -1973,10 +1907,10 @@ int LLBC_Service::InitComps()
 int LLBC_Service::StartComps()
 {
     size_t compIdx = 0;
-    const size_t compsSize = _comps.size();
+    const size_t compsSize = _compList.size();
     for (; compIdx < compsSize; ++compIdx)
     {
-        LLBC_Component *comp = _comps[compIdx];
+        auto &comp = _compList[compIdx];
         if (comp->_started)
             continue;
 
@@ -1998,6 +1932,14 @@ int LLBC_Service::StartComps()
                 break;
             }
 
+            for (size_t upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
+            {
+                auto &upComp = _compList[upCompIdx];
+                if (upComp->_started &&
+                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                    upComp->OnUpdate();
+            }
+
             LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         }
 
@@ -2016,11 +1958,9 @@ int LLBC_Service::StartComps()
 
 void LLBC_Service::StopComps()
 {
-    for (_Comps::reverse_iterator it = _comps.rbegin();
-         it != _comps.rend();
-         ++it)
+    for (int compIdx = static_cast<int>(_compList.size()) - 1; compIdx >= 0; --compIdx)
     {
-        LLBC_Component *comp = *it;
+        auto &comp = _compList[compIdx];
         if (!comp->_started)
             continue;
 
@@ -2040,6 +1980,14 @@ void LLBC_Service::StopComps()
                 break;
             }
 
+            for (int upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
+            {
+                auto &upComp = _compList[upCompIdx];
+                if (upComp->_started &&
+                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                    upComp->OnUpdate();
+            }
+
             LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
         }
     }
@@ -2047,11 +1995,10 @@ void LLBC_Service::StopComps()
 
 void LLBC_Service::UpdateComps()
 {
-    _Comps *&caredCompsPtr = _caredEventComps[LLBC_ComponentEventIndex::OnUpdate];
-    if (!caredCompsPtr)
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnUpdate];
+    if (caredComps.empty())
         return;
 
-    _Comps &caredComps = *caredCompsPtr;
     const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
         caredComps[compIdx]->OnUpdate();
@@ -2059,9 +2006,7 @@ void LLBC_Service::UpdateComps()
 
 void LLBC_Service::DestroyComps()
 {
-    for (_Comps::reverse_iterator it = _comps.rbegin();
-         it != _comps.rend();
-         ++it)
+    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {
         LLBC_Component *comp = *it;
         if (!comp->_inited)
@@ -2088,29 +2033,15 @@ void LLBC_Service::DestroyComps()
         }
     }
 
-    LLBC_STLHelper::DeleteContainer(_comps, true, true);
-    _comps2.clear();
-
-    for (int evOffset = LLBC_ComponentEventIndex::Begin;
-         evOffset != LLBC_ComponentEventIndex::End;
-         ++evOffset)
-    {
-        _Comps *&evComps = _caredEventComps[evOffset];
-        LLBC_XDelete(evComps);
-    }
+    LLBC_STLHelper::DeleteContainer(_compList, true, true);
+    _name2Comps.clear();
+    for (auto &evComps: _caredEventComps)
+        evComps.clear();
 }
 
 void LLBC_Service::DestroyWillRegComps()
 {
-    for (_WillRegComps::iterator it = _willRegComps.begin();
-         it != _willRegComps.end();
-         ++it)
-    {
-        LLBC_XDelete((*it).comp);
-        LLBC_XDelete((*it).compFactory);
-    }
-
-    _willRegComps.clear();
+    LLBC_STLHelper::RecycleContainer(_willRegComps, true, true);
 }
 
 void LLBC_Service::CloseAllCompLibraries()
@@ -2120,20 +2051,9 @@ void LLBC_Service::CloseAllCompLibraries()
 
 void LLBC_Service::AddComp(LLBC_Component *comp)
 {
-    // Add comp to _comps(vector)
-    _comps.push_back(comp);
+    _compList.push_back(comp);
+    _name2Comps.emplace(LLBC_GetTypeName(*comp), comp);
 
-    // Add comp to _comps2(map<type, vector>)
-    const LLBC_String compName = LLBC_GetTypeName(*comp);
-    _Comps2::iterator compsIt = _comps2.find(compName);
-    if (compsIt == _comps2.end())
-    {
-        compsIt = _comps2.insert(std::make_pair(compName, _Comps())).first;
-    }
-    _Comps2::mapped_type &typeComps = compsIt->second;
-    typeComps.push_back(comp);
-
-    // Add comp to cared events array
     AddCompToCaredEventsArray(comp);
 }
 
@@ -2143,13 +2063,8 @@ void LLBC_Service::AddCompToCaredEventsArray(LLBC_Component *comp)
          evOffset != LLBC_ComponentEventIndex::End;
          ++evOffset)
     {
-        if (!comp->IsCaredEventOffset(evOffset))
-            continue;
-
-        _Comps *&evComps = _caredEventComps[evOffset];
-        if (evComps == nullptr)
-            evComps = new _Comps();
-        evComps->push_back(comp);
+        if (comp->IsCaredEventIndex(evOffset))
+            _caredEventComps[evOffset].push_back(comp);
     }
 }
 
@@ -2252,11 +2167,10 @@ void LLBC_Service::ClearHoldedTimerScheduler()
 
 void LLBC_Service::ProcessIdle(bool fullFrame)
 {
-    _Comps *&caredEvsPtr = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
-    if (!caredEvsPtr)
+    auto caredEvs = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
+    if (caredEvs.empty())
         return;
 
-    _Comps &caredEvs = *caredEvsPtr;
     const size_t compsSize = caredEvs.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
@@ -2548,18 +2462,6 @@ LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
 {
     if (codecStack)
         LLBC_Delete(codecStack);
-}
-
-LLBC_Service::_WillRegComp::_WillRegComp(LLBC_Component *comp)
-{
-    this->comp = comp;
-    compFactory = nullptr;
-}
-
-LLBC_Service::_WillRegComp::_WillRegComp(LLBC_ComponentFactory *compFactory)
-{
-    comp = nullptr;
-    this->compFactory = compFactory;
 }
 
 __LLBC_NS_END

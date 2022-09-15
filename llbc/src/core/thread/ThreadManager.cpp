@@ -124,8 +124,8 @@ LLBC_ThreadManager::LLBC_ThreadManager()
 : _maxThreadHandle(LLBC_INVALID_HANDLE)
 , _maxGroupHandle(LLBC_INVALID_HANDLE)
 {
-    ::memset(_groups, 0, sizeof(_groups));
-    ::memset(_threads, 0, sizeof(_threads));
+    memset(_groups, 0, sizeof(_groups));
+    memset(_threads, 0, sizeof(_threads));
 }
 
 LLBC_ThreadManager::~LLBC_ThreadManager()

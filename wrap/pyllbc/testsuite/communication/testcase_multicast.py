@@ -86,7 +86,7 @@ class MulticastTest(TestCase):
         self._svc = Service('multicast_test_svc')
 
         svc = self._svc
-        svc.registercomp(_TestComp(self._as_client, self._use_bst))
+        svc.addcomp(_TestComp(self._as_client, self._use_bst))
 
         if self._as_client:
             self._start_as_client()
