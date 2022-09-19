@@ -1368,7 +1368,7 @@ void LLBC_Service::RemoveAllReadySessions()
 void LLBC_Service::Svc()
 {
     while (!_started)
-        LLBC_Sleep(20);
+        LLBC_Sleep(5);
 
     _lock.Lock();
 
