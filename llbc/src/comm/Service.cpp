@@ -42,6 +42,9 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
+
+    static thread_local LLBC_NS LLBC_String __compNameKey;
+    static thread_local LLBC_NS LLBC_String __compInterfaceNameKey;
 }
 
 __LLBC_NS_BEGIN
@@ -802,26 +805,27 @@ int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_
 
 LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 {
-    size_t compNameLen = 0;
-    if (UNLIKELY(!compName || (compNameLen = strlen(compName)) == 0))
+    const size_t compNameLen = LIKELY(compName) ? strlen(compName) : 0;
+    if (UNLIKELY(compNameLen == 0))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return nullptr;
     }
 
-    LLBC_LockGuard guard(_lock);
+    __compNameKey.assign(compName, compNameLen);
+    if (compNameLen > 1 && compName[0] == 'I')
+        __compInterfaceNameKey.assign(compName + 1, compNameLen - 1);
+    else
+        __compInterfaceNameKey.clear();
 
-    _compNameKey.assign(compName, compNameLen);
-    auto it = _name2Comps.find(_compNameKey);
+    LLBC_LockGuard guard(_lock);
+    auto it = _name2Comps.find(__compNameKey);
     if (it != _name2Comps.end())
         return it->second;
 
-    if (compNameLen > 1 && _compNameKey[0] == 'I')
-    {
-        _compNameKey.erase(_compNameKey.begin());
-        if ((it = _name2Comps.find(_compNameKey)) != _name2Comps.end())
-            return it->second;
-    }
+    if (!__compInterfaceNameKey.empty() &&
+        (it = _name2Comps.find(__compInterfaceNameKey)) != _name2Comps.end())
+        return it->second;
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
     return nullptr;

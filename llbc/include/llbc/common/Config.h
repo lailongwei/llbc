@@ -296,7 +296,7 @@
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
 #define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
 // Application stop signals.
-#define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGFPE}
+#define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGQUIT, SIGFPE}
 // Application config reload signals.
 #if LLBC_TARGET_PLATFORM_WIN32
 #define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {}

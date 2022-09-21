@@ -251,9 +251,30 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
 
     // Mark started.
     _startThreadId = LLBC_GetCurrentThreadId();
-
     // Call OnStartFinish event method.
     OnStartFinish(argc, argv);
+
+    // Enter app loop.
+    while (true)
+    {
+        // Call OnUpdate event method.
+        bool runDoNothing = true;
+        OnUpdate(runDoNothing);
+        // Handle events.
+        bool handleEvsDoNothing = true;
+        HandleEvents(handleEvsDoNothing);
+
+        // If require stop, execute stop.
+        if (_requireStop)
+        {
+            Stop();
+            return LLBC_OK;
+        }
+
+        // Execute sleep, if not do anything.
+        if (runDoNothing && handleEvsDoNothing)
+            LLBC_Sleep(1);
+    }
 
     // Return ok.
     ret = LLBC_OK;
@@ -326,36 +347,6 @@ void LLBC_Application::Stop()
 
     // Cleanup llbc.
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
-}
-
-int LLBC_Application::Run()
-{
-    // If not started, return failed.
-    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_INIT, LLBC_FAILED);
-    // If not start thread, return failed.
-    LLBC_SetErrAndReturnIf(LLBC_GetCurrentThreadId() != _startThreadId, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
-
-    // Run loop.
-    while (true)
-    {
-        // Call OnRun event method.
-        bool runDoNothing = true;
-        OnRun(runDoNothing);
-        // Handle events.
-        bool handleEvsDoNothing = true;
-        HandleEvents(handleEvsDoNothing);
-
-        // If require stop, execute stop.
-        if (_requireStop)
-        {
-            Stop();
-            return LLBC_OK;
-        }
-
-        // Execute sleep, if not do anything.
-        if (runDoNothing && handleEvsDoNothing)
-            LLBC_Sleep(1);
-    }
 }
 
 int LLBC_Application::PushEvent(LLBC_ApplicationEvent *ev)

@@ -156,7 +156,7 @@ public:
      * Application main-loop event method, when application running, will call this event method per-tick.
      * @param[out] doNothing - if event method do nothing, set to true(default is true), otherwise set to false.
      */
-    virtual void OnRun(bool &doNothing);
+    virtual void OnUpdate(bool &doNothing);
 
     /**
      * Application config reloaded event method, please override this method in your project.
@@ -230,12 +230,6 @@ public:
      * Stop application.
      */
     void Stop();
-
-    /**
-     * Application run method.
-     * @return int - return 0 if run success, otherwise return -1.
-     */
-    int Run();
 
     /**
      * Check application started or not.

@@ -364,17 +364,35 @@ private:                                            \
 /**
  * Some condition judge helper macros.
  */
-#define LLBC_DoIf(cond, behav) \
-    if (cond) { behav; }       \
+#define LLBC_DoIf(cond, behav)                                \
+    if (cond) { behav; }                                      \
 
-#define LLBC_BreakIf(cond) \
-    if (cond) break        \
+#define LLBC_LogAndDoIf(cond, logLv, behav)                   \
+    if (cond) {                                               \
+        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<" #cond "> is true, do:%s", #behav); \
+        behav;                                                \
+    }                                                         \
 
-#define LLBC_SetErrAndBreakIf(cond, err)                 \
-    if (cond) { LLBC_NS LLBC_SetLastError(err); break; } \
+#define LLBC_BreakIf(cond)                                    \
+    if (cond) break                                           \
 
-#define LLBC_ReturnIf(cond, ret) \
-    if (cond) { return ret; }    \
+#define LLBC_LogAndBreakIf(cond, logLv)                       \
+    if (cond) {                                               \
+        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_BreakIf:<" #cond "> is true"); \
+        break;                                                \
+    }                                                         \
+
+#define LLBC_SetErrAndBreakIf(cond, err)                      \
+    if (cond) { LLBC_NS LLBC_SetLastError(err); break; }      \
+
+#define LLBC_ReturnIf(cond, ret)                              \
+    if (cond) { return ret; }                                 \
+
+#define LLBC_LogAndReturnIf(cond, logLv, ret)                 \
+    if (cond) {                                               \
+        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<" #cond "> is true"); \
+        return ret;                                           \
+    }                                                         \
 
 #define LLBC_SetErrAndReturnIf(cond, err, ret)                \
     if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
