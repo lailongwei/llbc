@@ -644,10 +644,7 @@ private:
         _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
-    typedef std::map<int, _ReadySessionInfo *> _ReadySessionInfos;
-    typedef _ReadySessionInfos::iterator _ReadySessionInfosIter;
-    typedef _ReadySessionInfos::const_iterator _ReadySessionInfosCIter;
-    _ReadySessionInfos _readySessionInfos;
+    std::map<int, _ReadySessionInfo *> _readySessionInfos;
     LLBC_SpinLock _readySessionInfosLock;
 
     std::vector<LLBC_Component *> _willRegComps;
@@ -656,29 +653,21 @@ private:
     volatile int _compsStartFinished;
     volatile int _compsStartRet;
 
-    LLBC_String _compNameKey;
     std::vector<LLBC_Component *> _compList;
     std::map<LLBC_String, LLBC_Component *> _name2Comps;
     std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
-    typedef std::map<LLBC_String, LLBC_Library *> _CompLibraries;
-    _CompLibraries _compLibraries;
-    typedef std::map<int, LLBC_CoderFactory *> _Coders;
-    _Coders _coders;
-    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _Handlers;
-    _Handlers _handlers;
-    typedef std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _PreHandlers;
-    _PreHandlers _preHandlers;
+    std::map<LLBC_String, LLBC_Library *> _compLibraries;
+    std::map<int, LLBC_CoderFactory *> _coders;
+    std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _handlers;
+    std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _preHandlers;
     #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler;
     #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    typedef std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _StatusHandlers;
-    typedef std::map<int, _StatusHandlers *> _OpStatusHandlers;
-    _OpStatusHandlers _statusHandlers;
+    std::map<int, std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > > _statusHandlers;
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    typedef std::map<int, LLBC_String> _StatusDescs;
-    _StatusDescs _statusDescs;
+    std::map<int, LLBC_String> _statusDescs;
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 private:

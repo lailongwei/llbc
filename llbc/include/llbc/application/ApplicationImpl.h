@@ -45,7 +45,7 @@ inline void LLBC_Application::OnStopFinish()
 {
 }
 
-inline void LLBC_Application::OnRun(bool &doNothing)
+inline void LLBC_Application::OnUpdate(bool &doNothing)
 {
 }
 

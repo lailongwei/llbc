@@ -42,6 +42,9 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
+
+    static thread_local LLBC_NS LLBC_String __compNameKey;
+    static thread_local LLBC_NS LLBC_String __compInterfaceNameKey;
 }
 
 __LLBC_NS_BEGIN
@@ -567,7 +570,7 @@ int LLBC_Service::Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status
     // Copy all connected session Ids.
     _readySessionInfosLock.Lock();
     LLBC_SessionIdList connSIds;
-    for (_ReadySessionInfosCIter readySInfoIt = _readySessionInfos.begin();
+    for (auto readySInfoIt = _readySessionInfos.begin();
          readySInfoIt != _readySessionInfos.end();
          ++readySInfoIt)
     {
@@ -592,7 +595,7 @@ int LLBC_Service::Broadcast(int svcId, int opcode, const void *bytes, size_t len
     // lock = false
     // validCheck = false
     LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
-    for (_ReadySessionInfosCIter readySInfoIt = _readySessionInfos.begin();
+    for (auto readySInfoIt = _readySessionInfos.begin();
          readySInfoIt != _readySessionInfos.end();
          ++readySInfoIt)
     {
@@ -616,7 +619,7 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
     }
 
     LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
-    _ReadySessionInfosIter readySInfoIt = _readySessionInfos.find(sessionId);
+    auto readySInfoIt = _readySessionInfos.find(sessionId);
     if (readySInfoIt == _readySessionInfos.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -643,7 +646,7 @@ int LLBC_Service::CtrlProtocolStack(int sessionId,
     }
 
     _readySessionInfosLock.Lock();
-    _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+    auto readySInfoIt = _readySessionInfos.find(sessionId);
     if (readySInfoIt == _readySessionInfos.end())
     {
         _readySessionInfosLock.Unlock();
@@ -802,26 +805,27 @@ int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_
 
 LLBC_Component *LLBC_Service::GetComponent(const char *compName)
 {
-    size_t compNameLen = 0;
-    if (UNLIKELY(!compName || (compNameLen = strlen(compName)) == 0))
+    const size_t compNameLen = LIKELY(compName) ? strlen(compName) : 0;
+    if (UNLIKELY(compNameLen == 0))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return nullptr;
     }
 
-    LLBC_LockGuard guard(_lock);
+    __compNameKey.assign(compName, compNameLen);
+    if (compNameLen > 1 && compName[0] == 'I')
+        __compInterfaceNameKey.assign(compName + 1, compNameLen - 1);
+    else
+        __compInterfaceNameKey.clear();
 
-    _compNameKey.assign(compName, compNameLen);
-    auto it = _name2Comps.find(_compNameKey);
+    LLBC_LockGuard guard(_lock);
+    auto it = _name2Comps.find(__compNameKey);
     if (it != _name2Comps.end())
         return it->second;
 
-    if (compNameLen > 1 && _compNameKey[0] == 'I')
-    {
-        _compNameKey.erase(_compNameKey.begin());
-        if ((it = _name2Comps.find(_compNameKey)) != _name2Comps.end())
-            return it->second;
-    }
+    if (!__compInterfaceNameKey.empty() &&
+        (it = _name2Comps.find(__compInterfaceNameKey)) != _name2Comps.end())
+        return it->second;
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
     return nullptr;
@@ -986,11 +990,7 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_Delegate<vo
         return LLBC_FAILED;
     }
 
-    _OpStatusHandlers::iterator it = _statusHandlers.find(opcode);
-    if (it == _statusHandlers.end())
-        it = _statusHandlers.insert(std::make_pair(opcode, LLBC_New(_StatusHandlers))).first;
-    
-    _StatusHandlers &stHandlers = *it->second;
+    auto &stHandlers = _statusHandlers[opcode];
     if (!stHandlers.insert(std::make_pair(status, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
@@ -1124,7 +1124,7 @@ const LLBC_ProtocolStack *LLBC_Service::GetCodecProtocolStack(int sessionId) con
     // Not enabled full-stack option, return session codec protocol-stack.
     LLBC_Service *ncThis = const_cast<LLBC_Service *>(this);
     ncThis->_readySessionInfosLock.Lock();
-    _ReadySessionInfosCIter it = _readySessionInfos.find(sessionId);
+    auto it = _readySessionInfos.find(sessionId);
     const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
     ncThis->_readySessionInfosLock.Unlock();
 
@@ -1312,7 +1312,7 @@ void LLBC_Service::AddReadySession(int sessionId, int acceptSessionId, bool isLi
     if (repeatCheck)
     {
         _readySessionInfosLock.Lock();
-        const _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+        const auto readySInfoIt = _readySessionInfos.find(sessionId);
         if (readySInfoIt != _readySessionInfos.end())
         {
             _readySessionInfosLock.Unlock();
@@ -1344,7 +1344,7 @@ void LLBC_Service::RemoveReadySession(int sessionId)
     _readySessionInfosLock.Lock();
 
     // Find ready session info, if not found, return.
-    _ReadySessionInfosIter readySInfoIt = _readySessionInfos.find(sessionId);
+    auto readySInfoIt = _readySessionInfos.find(sessionId);
     if (readySInfoIt == _readySessionInfos.end())
     {
         _readySessionInfosLock.Unlock();
@@ -1372,7 +1372,7 @@ void LLBC_Service::RemoveAllReadySessions()
 void LLBC_Service::Svc()
 {
     while (!_started)
-        LLBC_Sleep(20);
+        LLBC_Sleep(5);
 
     _lock.Lock();
 
@@ -1658,7 +1658,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     const int sessionId = packet->GetSessionId();
 
     _readySessionInfosLock.Lock();
-    _ReadySessionInfosCIter readySInfoIt = _readySessionInfos.find(sessionId);
+    auto readySInfoIt = _readySessionInfos.find(sessionId);
     if (readySInfoIt == _readySessionInfos.end())
     {
         _readySessionInfosLock.Unlock();
@@ -1708,16 +1708,16 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     if (status != 0)
     {
         #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-        _StatusDescs::const_iterator statusDescIt = _statusDescs.find(status);
+        auto statusDescIt = _statusDescs.find(status);
         if (statusDescIt != _statusDescs.end())
             packet->SetStatusDesc(statusDescIt->second);
         #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
         # if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-        _OpStatusHandlers::iterator stHandlersIt = _statusHandlers.find(opcode);
+        auto stHandlersIt = _statusHandlers.find(opcode);
         if (stHandlersIt != _statusHandlers.end())
         {
-            _StatusHandlers &stHandlers = *stHandlersIt->second;
-            _StatusHandlers::iterator stHandlerIt = stHandlers.find(status);
+            auto &stHandlers = stHandlersIt->second;
+            auto stHandlerIt = stHandlers.find(status);
             if (stHandlerIt != stHandlers.end())
             {
                 stHandlerIt->second(*packet);
@@ -1733,7 +1733,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     bool preHandled = false;
     if (_type != This::Raw)
     {
-        _PreHandlers::iterator preIt = _preHandlers.find(opcode);
+        auto preIt = _preHandlers.find(opcode);
         if (preIt != _preHandlers.end())
         {
             if (!preIt->second(*packet))
@@ -1758,7 +1758,7 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
     // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all comps.
-    _Handlers::iterator it = _handlers.find(opcode);
+    auto it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
         it->second(*packet);
@@ -2072,7 +2072,7 @@ LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &ex
 {
     existingLib = false;
 
-    _CompLibraries::iterator libIt = _compLibraries.find(libPath);
+    auto libIt = _compLibraries.find(libPath);
     if (libIt != _compLibraries.end())
     {
         existingLib = true;
@@ -2093,7 +2093,7 @@ LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &ex
 
 void LLBC_Service::CloseCompLibrary(const LLBC_String &libPath)
 {
-    _CompLibraries::iterator libIt = _compLibraries.find(libPath);
+    auto libIt = _compLibraries.find(libPath);
     if (libIt == _compLibraries.end())
         return;
 
@@ -2217,7 +2217,7 @@ int LLBC_Service::LockableSend(LLBC_Packet *packet,
     const int sessionId = packet->GetSessionId();
     if (!_fullStack || validCheck)
     {
-        _ReadySessionInfosCIter readySInfoIt;
+        decltype(_readySessionInfos)::const_iterator readySInfoIt;
 
         // Check _ReadySessionInfo exist or not.
         _readySessionInfosLock.Lock();
@@ -2378,7 +2378,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (validCheck)
             _readySessionInfosLock.Lock();
 
-        _ReadySessionInfosCIter readySInfoIt;
+        decltype(_readySessionInfos)::const_iterator readySInfoIt;
         for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
              ++i)
@@ -2408,7 +2408,7 @@ int LLBC_Service::MulticastSendCoder(int svcId,
         if (validCheck)
             _readySessionInfosLock.Lock();
 
-        _ReadySessionInfosCIter readySInfoIt;
+        decltype(_readySessionInfos)::const_iterator readySInfoIt;
         for (typename SessionIds::size_type i = 1;
              i < sessionCnt;
              ++i)

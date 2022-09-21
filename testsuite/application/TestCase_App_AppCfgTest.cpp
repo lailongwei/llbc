@@ -40,6 +40,27 @@ public:
     }
 
 public:
+    virtual int OnWillStart(int argc, char *argv[])
+    {
+        if (HasConfig())
+        {
+            std::cout << "App has config" << std::endl;
+            std::cout << "- cfg path:" << GetConfigPath() << std::endl;
+            if (GetConfigType() == LLBC_ApplicationConfigType::Property)
+            {
+                LLBC_String propCnt;
+                GetPropertyConfig().SaveToContent(propCnt);
+                std::cout << "- cfg cnt:" << propCnt << std::endl;
+            }
+            else
+            {
+                std::cout << "- cfg cnt:" << GetNonPropertyConfig().ToString() << std::endl;
+            }
+        }
+
+        return LLBC_OK;
+    }
+
     virtual int OnStart(int argc, char *argv[], bool &startFinished)
     {
         if (_startTime == LLBC_Time::UTCBegin)
@@ -79,9 +100,9 @@ public:
         }
     }
 
-    virtual void OnRun(bool &doNothing)
+    virtual void OnUpdate(bool &doNothing)
     {
-        std::cout <<"TestApp::OnRun()..." <<std::endl;
+        std::cout <<"TestApp::OnUpdate()..." <<std::endl;
         LLBC_Sleep(500);
     }
 
@@ -95,10 +116,12 @@ private:
 }
 
 TestCase_App_AppCfgTest::TestCase_App_AppCfgTest()
-{}
+{
+}
 
 TestCase_App_AppCfgTest::~TestCase_App_AppCfgTest()
-{}
+{
+}
 
 int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 {
@@ -117,28 +140,6 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
     std::cout <<"App start finished" <<std::endl;
-
-    if (app.HasConfig())
-    {
-        std::cout <<"App has config" <<std::endl;
-        std::cout <<"- cfg path:" <<app.GetConfigPath() <<std::endl;
-        if (app.GetConfigType() == LLBC_ApplicationConfigType::Property)
-        {
-            LLBC_String propCnt;
-            app.GetPropertyConfig().SaveToContent(propCnt);
-            std::cout <<"- cfg cnt:" <<propCnt <<std::endl;
-        }
-        else
-        {
-            std::cout <<"- cfg cnt:" <<app.GetNonPropertyConfig().ToString() <<std::endl;
-        }
-    }
-
-    // Do some stuff.
-    // ... ...
-
-    // Run app.
-    app.Run();
 
     return LLBC_OK;
 }
