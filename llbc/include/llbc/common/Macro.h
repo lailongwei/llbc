@@ -373,6 +373,15 @@ private:                                            \
         behav;                                                \
     }                                                         \
 
+#define LLBC_ContinueIf(cond)                                 \
+    if (cond) continue                                        \
+
+#define LLBC_LogAndContinueIf(cond, logLv)                    \
+    if (cond) {                                               \
+        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<" #cond "> is true"); \
+        continue;                                             \
+    }                                                         \
+
 #define LLBC_BreakIf(cond)                                    \
     if (cond) break                                           \
 
