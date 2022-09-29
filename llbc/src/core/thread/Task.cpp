@@ -99,7 +99,7 @@ int LLBC_BaseTask::Activate(int threadNum,
     _lock.Unlock();
 
     while (!_startCompleted)
-        LLBC_ThreadManager::Sleep(20);
+        LLBC_ThreadManager::Sleep(1);
 
     return LLBC_OK;
 }
@@ -183,7 +183,7 @@ void LLBC_BaseTask::OnTaskThreadStart()
 void LLBC_BaseTask::OnTaskThreadStop()
 {
     while (!_startCompleted)
-        LLBC_ThreadManager:: Sleep(20);
+        LLBC_ThreadManager::Sleep(1);
 
     _lock.Lock();
     if (--_curThreadNum == 0)
@@ -219,7 +219,7 @@ void LLBC_BaseTask::GetTaskThreads(std::vector<LLBC_Handle> &taskThreads)
         return;
 
     while (!_startCompleted)
-        LLBC_ThreadManager::Sleep(10);
+        LLBC_ThreadManager::Sleep(1);
 
     LLBC_LockGuard guard(_lock);
     for (int i = 0; i != _threadNum; ++i)
