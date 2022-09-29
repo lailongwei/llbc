@@ -364,6 +364,9 @@ private:                                            \
 /**
  * Some condition judge helper macros.
  */
+#define LLBC_Foreach(cont, behav)                             \
+    for (auto &item : cont) { behav; }                        \
+
 #define LLBC_DoIf(cond, behav)                                \
     if (cond) { behav; }                                      \
 
