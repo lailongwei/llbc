@@ -129,7 +129,7 @@ inline void LLBC_Component::OnUpdate()
 {
 }
 
-inline void LLBC_Component::OnIdle(int idleTime)
+inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 

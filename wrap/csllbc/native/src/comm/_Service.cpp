@@ -29,8 +29,8 @@
 
 LLBC_BEGIN_C_DECL
 
-csllbc_Service *csllbc_Service_Create(int svcType,
-                                      const char *svcName,
+csllbc_Service *csllbc_Service_Create(const char *svcName,
+                                      bool useNormalProtocolFactory,
                                       bool fullStack,
                                       csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                       csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
@@ -39,17 +39,10 @@ csllbc_Service *csllbc_Service_Create(int svcType,
                                       csllbc_Delegates::Deleg_Service_PacketUnifyPreHandler unifyPreHandlerDeleg,
                                       csllbc_Delegates::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
-    if (svcType != static_cast<int>(LLBC_IService::Raw) &&
-        svcType != static_cast<int>(LLBC_IService::Normal))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return nullptr;
-    }
-
     return LLBC_New(csllbc_Service,
-                    static_cast<csllbc_Service::Type>(svcType),
                     svcName,
-                    fullStack != 0,
+                    useNormalProtocolFactory,
+                    fullStack,
                     encodeDeleg,
                     decodeDeleg,
                     handlerDeleg,
@@ -61,11 +54,6 @@ csllbc_Service *csllbc_Service_Create(int svcType,
 void csllbc_Service_Delete(csllbc_Service *svc)
 {
     LLBC_XDelete(svc);
-}
-
-int csllbc_Service_GetType(csllbc_Service *svc)
-{
-    return static_cast<int>(svc->GetType());
 }
 
 int csllbc_Service_GetId(csllbc_Service *svc)

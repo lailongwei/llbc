@@ -365,7 +365,7 @@ namespace llbc
         /// <summary>
         /// Service per-frame idle handler.
         /// </summary>
-        /// <param name="idleTime">idle time, in milli-seconds</param>
+        /// <param name="idleTime">idle time, in micro-seconds</param>
         public virtual void OnIdle(int idleTime) { }
         #endregion
 

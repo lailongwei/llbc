@@ -73,9 +73,9 @@ public:
         LLBC_PrintLine("Service update");
     }
 
-    virtual void OnIdle(int idleTime)
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime)
     {
-        LLBC_PrintLine("Service idle, idleTime: %d", idleTime);
+        LLBC_PrintLine("Service idle, idleTime: %s", idleTime.ToString().c_str());
     }
 
 public:
@@ -110,7 +110,7 @@ private:
 }
 
 TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "ExternalDriveSvc"))
+: _svc(LLBC_IService::Create("ExternalDriveSvc"))
 {
     _svc->SuppressCoderNotFoundWarning();
 }

@@ -60,6 +60,24 @@ public:
         std::cout << "Echo server component will stop" << std::endl;
     }
 
+    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        if (!sessionInfo.IsListenSession())
+            std::cout << "Session[sId:" << sessionInfo.GetSessionId()
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <create>" << std::endl;
+    }
+
+    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        if (!destroyInfo.GetSessionInfo().IsListenSession())
+        {
+            auto &sessionInfo = destroyInfo.GetSessionInfo();
+            std::cout << "Session[sId:" << sessionInfo.GetSessionId()
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:" 
+                      << destroyInfo.GetReason() << ">" << std::endl;
+        }
+    }
+
 private:
     void _OnPkt(LLBC_Packet &pkt)
     {
@@ -172,7 +190,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     asServer = choice == "Y" || choice == "YES";
 
     // 创建&启动service
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Raw);
+    LLBC_IService *svc = LLBC_IService::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
         svc->AddComponent(new EchoServerComp);
     else
@@ -185,8 +203,17 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
 
-    // wait当前service结束
-    svc->Wait();
+    // if is client, wait service, otherwise press any key to exit test case(server).
+    if (asServer)
+    {
+        std::cout <<"Press any key to exit..." <<std::endl;
+        getchar();
+        getchar();
+    }
+    else
+    {
+        svc->Wait();
+    }
 
     // 删除service
     delete svc;

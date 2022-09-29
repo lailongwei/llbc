@@ -31,12 +31,11 @@ namespace
 
 __LLBC_NS_BEGIN
 
-This *LLBC_IService::Create(Type type,
-                            const LLBC_String &name,
-                            LLBC_IProtocolFactory *protoFactory,
+This *LLBC_IService::Create(const LLBC_String &name,
+                            LLBC_IProtocolFactory *dftProtocolFactory,
                             bool fullStack)
 {
-    return LLBC_New(LLBC_Service, type, name, protoFactory, fullStack);
+    return new LLBC_Service(name, dftProtocolFactory, fullStack);
 }
 
 __LLBC_NS_END

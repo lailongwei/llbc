@@ -54,16 +54,6 @@ class LLBC_EXPORT LLBC_IService : protected LLBC_BaseTask
 
 public:
     /**
-     * The service type enumeration.
-     */
-    enum Type
-    {
-        Raw,
-        Normal,
-        Custom,
-    };
-
-    /**
      * The service drive mode enumeration.
      */
     enum DriveMode
@@ -83,15 +73,13 @@ public:
 public:
     /**
      * Factory method, create service type service type.
-     * @param[in] type         - the service type.
-     * @param[in] name         - the service name.
-     * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
-     * @param[in] fullStack    - the full stack option, default is true.
+     * @param[in] name               - the service name.
+     * @param[in] dftProtocolFactory - the service default protocol factory, if null will use library normal protocol factory.
+     * @param[in] fullStack          - the full stack option, default is true.
      * @return This * - new service.
      */
-    static This *Create(Type type,
-                        const LLBC_String &name = "",
-                        LLBC_IProtocolFactory *protoFactory = nullptr,
+    static This *Create(const LLBC_String &name = "",
+                        LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
                         bool fullStack = true);
 
 public:
@@ -100,12 +88,6 @@ public:
      * @return int - the service Id.
      */
     virtual int GetId() const = 0;
-
-    /**
-     * Get the service type.
-     * @return Type - the service type.
-     */
-    virtual Type GetType() const = 0;
 
     /**
      * Get the service name.

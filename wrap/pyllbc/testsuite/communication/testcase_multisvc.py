@@ -99,9 +99,6 @@ class MultiSvcTest(TestCase):
         client = Service('multisvc_test_client')
         server = Service('multisvc_test_server')
 
-        client.codec = Service.CODEC_JSON
-        server.codec = Service.CODEC_JSON
-
         client.addcomp(ClientComp())
         server.addcomp(ServerComp())
 

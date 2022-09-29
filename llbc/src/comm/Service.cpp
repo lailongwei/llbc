@@ -72,17 +72,18 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_ServiceEventType::End] =
 # pragma warning(disable:4351)
 #endif
 
-LLBC_Service::LLBC_Service(This::Type type,
-                           const LLBC_String &name,
-                           LLBC_IProtocolFactory *protoFactory,
+LLBC_Service::LLBC_Service(const LLBC_String &name,
+                           LLBC_IProtocolFactory *dftProtocolFactory,
                            bool fullStack)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
-, _type(type)
+
+, _svcThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
+
 , _fullStack(fullStack)
 , _name(name.c_str(), name.length())
-, _protoFactory(protoFactory)
+, _dftProtocolFactory(dftProtocolFactory)
 , _sessionProtoFactory()
-, _driveMode(This::SelfDrive)
+, _driveMode(SelfDrive)
 , _suppressedCoderNotFoundWarning(false)
 
 , _started(false)
@@ -146,19 +147,9 @@ LLBC_Service::LLBC_Service(This::Type type,
     if (_name.empty())
         _name.format("S%d-%s", _id, LLBC_GUIDHelper::GenStr().c_str());
 
-    // Create protocol stack, if type is not Custom.
-    if (_type != This::Custom)
-    {
-        LLBC_XDelete(_protoFactory);
-        if (_type == This::Raw)
-            _protoFactory = LLBC_New(LLBC_RawProtocolFactory);
-        else
-            _protoFactory = LLBC_New(LLBC_NormalProtocolFactory);
-    }
-    else
-    {
-        ASSERT(_protoFactory != nullptr && "Service type is Custom, but not pass Protocol Factory to Service!");
-    }
+    // Create protocol stack, if is null.
+    if (!_dftProtocolFactory)
+        _dftProtocolFactory = LLBC_New(LLBC_NormalProtocolFactory);
 
     // Initialize cared event comps array.
     memset(_caredEventComps, 0, sizeof(_caredEventComps));
@@ -201,17 +192,12 @@ LLBC_Service::~LLBC_Service()
     DestroyFrameTasks();
 
     LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
-    LLBC_XDelete(_protoFactory);
+    LLBC_XDelete(_dftProtocolFactory);
 }
 
 int LLBC_Service::GetId() const
 {
     return _id;
-}
-
-This::Type LLBC_Service::GetType() const
-{
-    return _type;
 }
 
 const LLBC_String &LLBC_Service::GetName() const
@@ -224,15 +210,15 @@ bool LLBC_Service::IsFullStack() const
     return _fullStack;
 }
 
-This::DriveMode LLBC_Service::GetDriveMode() const
+auto LLBC_Service::GetDriveMode() const -> DriveMode
 {
     return _driveMode;
 }
 
-int LLBC_Service::SetDriveMode(This::DriveMode mode)
+int LLBC_Service::SetDriveMode(DriveMode mode)
 {
     // Drive mode vlidate check.
-    if (mode != This::SelfDrive && mode != This::ExternalDrive)
+    if (mode != SelfDrive && mode != ExternalDrive)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -252,7 +238,7 @@ int LLBC_Service::SetDriveMode(This::DriveMode mode)
     }
 
     // If drive mode is external drive, Reinit object-pools, timer-scheduler, ...
-    if ((_driveMode = mode) == This::ExternalDrive)
+    if ((_driveMode = mode) == ExternalDrive)
     {
         ClearHoldedObjectPools();
         ClearHoldedTimerScheduler();
@@ -312,7 +298,7 @@ int LLBC_Service::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    if (_driveMode == This::ExternalDrive)
+    if (_driveMode == ExternalDrive)
     {
         if (!IsCanContinueDriveService())
         {
@@ -339,7 +325,7 @@ int LLBC_Service::Start(int pollerCount)
 
     _started = true;
 
-    if (_driveMode == This::ExternalDrive)
+    if (_driveMode == ExternalDrive)
     {
         // Waiting for all comp init & start finished.
         if (InitComps() != LLBC_OK || 
@@ -364,7 +350,7 @@ int LLBC_Service::Start(int pollerCount)
 
         // Waiting for all comps init finished.
         while (!_compsInitFinished)
-            LLBC_Sleep(2);
+            LLBC_Sleep(1);
         if (_compsInitRet != LLBC_OK)
         {
             Stop();
@@ -375,7 +361,7 @@ int LLBC_Service::Start(int pollerCount)
 
         // Waiting for all comps start finished.
         while (!_compsStartFinished)
-            LLBC_Sleep(2);
+            LLBC_Sleep(1);
         if (_compsStartRet != LLBC_OK)
         {
             Stop();
@@ -402,17 +388,20 @@ void LLBC_Service::Stop()
         return;
     }
 
+    LLBC_ThreadId svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    if (_driveMode == SelfDrive)
+        svcThreadId = _svcThreadId;
     _stopping = true;
     _lock.Unlock();
 
-    if (_driveMode == This::SelfDrive) // Stop self-drive service.
+    if (_driveMode == SelfDrive) // Stop self-drive service.
     {
-        // TODO: How to stop sink into loop service???
-        // if (_sinkIntoLoop) // Service sink into loop, direct return.
-            // return;
+        // Call Stop() in self thread, do nothing.
+        if (LLBC_GetCurrentThreadId() == svcThreadId)
+            return;
 
-        while (_started) // Service not sink into loop, wait service stop(LLBC_Task mechanism will ensure Cleanup method called).
-            LLBC_ThreadManager::Sleep(20);
+        while (_started)
+            LLBC_Sleep(1);
     }
     else // Stop external-drive service.
     {
@@ -895,11 +884,6 @@ int LLBC_Service::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)>
         LLBC_SetLastError(LLBC_ERROR_INITED);
         return LLBC_FAILED;
     }
-    else if (_type == This::Raw && opcode != 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
     else if (!_handlers.insert(std::make_pair(opcode, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
@@ -921,11 +905,6 @@ int LLBC_Service::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet 
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_type == This::Raw && opcode != 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
     else if (!_preHandlers.insert(std::make_pair(opcode, deleg)).second)
@@ -977,11 +956,6 @@ int LLBC_Service::SubscribeStatus(int opcode, int status, const LLBC_Delegate<vo
     if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_type == This::Raw)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
     else if (status == 0)
@@ -1045,13 +1019,6 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<vo
         return 0;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return 0;
-    }
-
     Push(LLBC_SvcEvUtil::BuildSubscribeEventEv(event, ++_evManagerMaxListenerStub, deleg, nullptr));
 
     return _evManagerMaxListenerStub;
@@ -1060,13 +1027,6 @@ LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, const LLBC_Delegate<vo
 LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, LLBC_EventListener *listener)
 {
     if (!listener)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return 0;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return 0;
@@ -1168,7 +1128,8 @@ void LLBC_Service::OnSvc(bool fullFrame)
     HandleFrameTasks();
 
     // Process Idle.
-    ProcessIdle(fullFrame);
+    if (fullFrame)
+        ProcessIdle();
 
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
@@ -1176,12 +1137,6 @@ void LLBC_Service::OnSvc(bool fullFrame)
         const sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
         if (elapsed >= 0 && elapsed < _frameInterval)
             LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
-    }
-    else
-    {
-        LLBC_CPURelax();
-        if ((++_relaxTimes) % 10000 == 0)
-            LLBC_Sleep(0);
     }
 
     _sinkIntoLoop = false;
@@ -1286,14 +1241,14 @@ void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactor
 LLBC_IProtocolFactory *LLBC_Service::FindSessionProtocolFactory(int sessionId)
 {
     if (sessionId == 0)
-        return _protoFactory;
+        return _dftProtocolFactory;
 
     LLBC_LockGuard guard(_protoLock);
     std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
     if (it != _sessionProtoFactory.end())
         return it->second;
 
-    return _protoFactory;
+    return _dftProtocolFactory;
 }
 
 void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
@@ -1371,6 +1326,7 @@ void LLBC_Service::RemoveAllReadySessions()
 
 void LLBC_Service::Svc()
 {
+    _svcThreadId = LLBC_GetCurrentThreadId();
     while (!_started)
         LLBC_Sleep(5);
 
@@ -1410,7 +1366,7 @@ void LLBC_Service::Cleanup()
     _pollerMgr.Stop();
 
     // If drivemode is external-drive, cancel all timers first.
-    if (_driveMode == This::ExternalDrive)
+    if (_driveMode == ExternalDrive)
         _timerScheduler->CancelAll();
 
     // Cleanup ready-sessionInfos map.
@@ -1433,7 +1389,7 @@ void LLBC_Service::Cleanup()
         LLBC_SvcEvUtil::DestroyEvBlock(block);
 
     // If is self-drive servie, notify service manager self stopped.
-    if (_driveMode == This::SelfDrive)
+    if (_driveMode == SelfDrive)
         _svcMgr.OnServiceStop(this);
 
     // Reset some variables.
@@ -1446,6 +1402,8 @@ void LLBC_Service::Cleanup()
 
     _started = false;
     _stopping = false;
+
+    _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 }
 
 void LLBC_Service::AddServiceToTls()
@@ -1729,21 +1687,18 @@ void LLBC_Service::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
-    // Firstly, we recognize specified opcode's pre-handler, if registered, call it(Non-RAW service type).
+    // Firstly, we recognize specified opcode's pre-handler, if registered, call it.
     bool preHandled = false;
-    if (_type != This::Raw)
+    auto preIt = _preHandlers.find(opcode);
+    if (preIt != _preHandlers.end())
     {
-        auto preIt = _preHandlers.find(opcode);
-        if (preIt != _preHandlers.end())
+        if (!preIt->second(*packet))
         {
-            if (!preIt->second(*packet))
-            {
-                LLBC_Recycle(packet);
-                return;
-            }
-
-            preHandled = true;
+            LLBC_Recycle(packet);
+            return;
         }
+
+        preHandled = true;
     }
     #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     // Secondary, we recognize generalized pre-handler, if registered, call it(all service type available).
@@ -2117,7 +2072,7 @@ void LLBC_Service::ClearCompsWhenInitCompFailed()
 
 void LLBC_Service::UpdateAutoReleasePool()
 {
-    if (_driveMode == This::SelfDrive)
+    if (_driveMode == SelfDrive)
         _releasePoolStack->Purge();
 }
 
@@ -2165,29 +2120,21 @@ void LLBC_Service::ClearHoldedTimerScheduler()
     }
 }
 
-void LLBC_Service::ProcessIdle(bool fullFrame)
+void LLBC_Service::ProcessIdle()
 {
-    auto caredEvs = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
-    if (caredEvs.empty())
-        return;
+    auto &comps = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
+    LLBC_ReturnIf(comps.empty(), void());
 
-    const size_t compsSize = caredEvs.size();
+    const size_t compsSize = comps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
-        if (fullFrame)
+        sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
+        if (LIKELY(elapsed >= 0))
         {
-            sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
-            if (LIKELY(elapsed >= 0))
-            {
-                if (elapsed >= _frameInterval)
-                    break;
+            if (elapsed >= _frameInterval)
+                break;
 
-                caredEvs[compIdx]->OnIdle(static_cast<int>(_frameInterval - elapsed));
-            }
-        }
-        else
-        {
-            caredEvs[compIdx]->OnIdle(0);
+            comps[compIdx]->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
         }
     }
 }

@@ -104,7 +104,7 @@ const int TestCase_Comm_Multicast::_clientCnt = 50;
 
 TestCase_Comm_Multicast::TestCase_Comm_Multicast()
 : _asClient(true)
-, _svcType(LLBC_IService::Normal)
+, _useNmlProtocolFactory(true)
 
 , _runIp("127.0.0.1")
 , _runPort(0)
@@ -129,7 +129,12 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     // Fetch arguments.
     FetchArgs(argc, argv);
 
-    LLBC_IService *svc = LLBC_IService::Create(_svcType, "MulticastTest");
+    LLBC_IProtocolFactory *protoFactory;
+    if (_useNmlProtocolFactory)
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
+    LLBC_IService *svc = LLBC_IService::Create("MulticastTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
     TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
@@ -155,7 +160,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
 {
     _asClient = LLBC_ToLower(argv[1]) == "client" ? true : false;
-    _svcType = LLBC_ToLower(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
+    _useNmlProtocolFactory = LLBC_ToLower(argv[2]) == "normal" ? true : false;
 
     _runIp = argv[3];
     _runPort = LLBC_Str2Int32(argv[4]);

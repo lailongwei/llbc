@@ -55,7 +55,8 @@ class EventTestComp : public LLBC_Component
 {
 public:
     EventTestComp()
-    : _handleTimes(0)
+    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+    , _handleTimes(0)
     , _staticHandleTimes(0)
     , _ev1HandlerStub()
     , _ev1StaticHandlerStub()
@@ -145,8 +146,8 @@ int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
     std::cout <<"Core/Event component testcase..." <<std::endl;
 
     // We create a service to test.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "EventTest");
-    svc->AddComponent(LLBC_New(EventTestComp));
+    LLBC_IService *svc = LLBC_IService::Create("EventTest");
+    svc->AddComponent<EventTestComp>();
     svc->Start();
 
     std::cout <<"Press any key to continue..." <<std::endl;

@@ -149,7 +149,7 @@ class TestCase_Comm_Service : ITestCase
             if (_idleOutputTimes == 5)
                 return;
 
-            Console.WriteLine("Service [{0}] idle, idleTime: {1}", svc.svcName, idleTime);
+            Console.WriteLine("Service [{0}] idle, idleTime(micro-seconds): {1}", svc.svcName, idleTime);
             _idleOutputTimes += 1;
         }
 

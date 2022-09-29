@@ -485,9 +485,9 @@ public:
 
     /**
      * Idle event handler.
-     * @param[in] idleTime - idle time, in milliseconds.
+     * @param[in] idleTime - idle time. 
      */
-    virtual void OnIdle(int idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
 public:
     /**

@@ -47,8 +47,6 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 , _svc(svc)
 , _pySvc(svc->GetPyService())
 
-, _svcType(svc->GetType())
-
 , _methOnInitialize(Py_BuildValue("s", "oninitialize"))
 , _methOnDestroy(Py_BuildValue("s", "ondestroy"))
 , _methOnStart(Py_BuildValue("s", "onstart"))
@@ -171,12 +169,13 @@ void pyllbc_Component::OnUpdate()
     CallComponentMeth(_methOnUpdate, _holdedOnUpdateEv, false);
 }
 
-void pyllbc_Component::OnIdle(int idleTime)
+void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
     if (UNLIKELY(_svc->_stoping))
         return;
 
-    PyObject *pyIdleTime = PyInt_FromLong(idleTime);
+    PyObject *pyIdleTime = PyFloat_FromDouble(
+        idleTime.GetTotalMicroSeconds() / static_cast<double>(LLBC_TimeConstant::NumOfMicroSecondsPerSecond));
     PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
     Py_DECREF(pyIdleTime);
 
@@ -374,30 +373,17 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
     }
 
     PyObject *pyData = nullptr;
-    if (_svcType == LLBC_IService::Raw ||
-        _svc->_codec == pyllbc_Service::BinaryCodec)
+    const auto &decoders = _svc->_decoders;
+    const auto decoderIt = decoders.find(packet.GetOpcode());
+    if (decoderIt != decoders.end())
     {
-        _nativeStream->GetLLBCStream().Attach(const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
-        if (_svc->_codec == pyllbc_Service::BinaryCodec)
-        {
-            pyllbc_Service::_Codecs::iterator decodeIt = 
-                    _svc->_codecs.find(packet.GetOpcode());
-            if (decodeIt != _svc->_codecs.end())
-            {
-                PyObject *decoded = _nativeStream->Read(decodeIt->second);
-                if (!decoded)
-                    return nullptr;
-
-                pyData = decoded;
-            }
-        }
-    }
-    else
-    {
-        const std::string j(reinterpret_cast<
-            const char *>(packet.GetPayload()), packet.GetPayloadLength());
-        if ((pyllbc_ObjCoder::Decode(j, pyData)) != LLBC_OK)
+        _nativeStream->GetLLBCStream().Attach(
+            const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
+        PyObject *decoded = _nativeStream->Read(decoderIt->second);
+        if (!decoded)
             return nullptr;
+
+        pyData = decoded;
     }
 
     if (!pyData)

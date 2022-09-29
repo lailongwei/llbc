@@ -78,9 +78,9 @@ void csllbc_Component::OnUpdate()
     (*_updateDeleg)();
 }
 
-void csllbc_Component::OnIdle(int idleTime)
+void csllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
-    (*_idleDeleg)(idleTime);
+    (*_idleDeleg)(idleTime.GetTotalMicroSeconds());
 }
 
 void csllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)

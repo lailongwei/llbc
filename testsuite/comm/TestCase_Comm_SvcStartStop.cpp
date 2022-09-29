@@ -54,18 +54,14 @@ namespace
 
         virtual void OnUpdate()
         {
-            if (_updateOutputTimes == 5)
-                return;
-
-            LLBC_PrintLine("OnUpdate call, times: %d", ++_updateOutputTimes);
+            if (++_updateOutputTimes % 5 == 0)
+                LLBC_PrintLine("OnUpdate call, times: %d", _updateOutputTimes);
         }
 
-        virtual void OnIdle(int idleTime)
+        virtual void OnIdle(const LLBC_TimeSpan &idleTime)
         {
-            if (_idleOutputTimes == 5)
-                return;
-
-            LLBC_PrintLine("OnIdle call, times: %d", ++_idleOutputTimes);
+            if (++_idleOutputTimes % 5 == 0)
+                LLBC_PrintLine("OnIdle call, times: %d", _idleOutputTimes);
         }
 
     private:
@@ -85,7 +81,7 @@ TestCase_Comm_SvcStartStop::~TestCase_Comm_SvcStartStop()
 int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Service start/stop test:");
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "SvcStartStopTest");
+    LLBC_IService *svc = LLBC_IService::Create("SvcStartStopTest");
     svc->AddComponent(LLBC_New(SvcStartStopTestComp));
     svc->Start();
 
