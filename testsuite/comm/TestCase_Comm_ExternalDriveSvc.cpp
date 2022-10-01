@@ -31,7 +31,8 @@ class TestComp : public LLBC_Component
 {
 public:
     TestComp()
-    : _recvTimes(0)
+    : LLBC_Component(LLBC_ComponentEvents::AllEvents)
+    , _recvTimes(0)
     {
         LLBC_PrintLine(">>> Comp ctor called!");
     }

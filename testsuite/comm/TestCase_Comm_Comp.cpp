@@ -28,6 +28,7 @@ namespace
     {
     public:
         TestComp()
+        : LLBC_Component(LLBC_ComponentEvents::AllEvents)
         {
             _timer = nullptr;
         }
