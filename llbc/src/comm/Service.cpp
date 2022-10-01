@@ -1455,16 +1455,13 @@ bool LLBC_Service::IsCanContinueDriveService()
 
 void LLBC_Service::HandleFrameTasks()
 {
-    int frameTaskIdx = _frameTaskIdx;
-    _frameTaskIdx = (_frameTaskIdx + 1) % 2;
-
-    _FrameTasks &tasks = _frameTasks[frameTaskIdx];
+    auto &tasks = _frameTasks[_frameTaskIdx];
     if (tasks.empty())
         return;
 
-    const _FrameTasks::const_iterator endIt = tasks.end();    for (_FrameTasks::const_iterator it = tasks.begin();
-         it != endIt;
-         ++it)
+    _frameTaskIdx ^= 1;
+    const auto endIt = tasks.end();
+    for (auto it = tasks.begin(); it != endIt; ++it)
         (it->first)(this, it->second);
 
     tasks.clear();
