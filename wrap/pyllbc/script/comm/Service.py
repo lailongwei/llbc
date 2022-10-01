@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from statistics import NormalDist
 import sys as _sys
 import types as _types
 from time import time as _pyllbc_time
@@ -249,7 +248,7 @@ class pyllbcService(object):
 
     @property
     def typestr(self):
-        return llbc.inl.GetServiceTypeStr(self._svctype)
+        return 'NORMAL' if self._svctype == self.NORMAL else 'RAW'
 
     @property
     def id(self):
