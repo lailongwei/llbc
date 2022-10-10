@@ -46,7 +46,6 @@ class EventTest(TestCase):
 
         # Create service: event_test_svc
         svc = Service('event_test_svc')
-        svc.codec = Service.CODEC_BINARY
         svc.start()
         svc.fps = 1
 
