@@ -272,15 +272,16 @@ inline size_t LLBC_Stream::GetAvailableSize() const
     return _size - _pos;
 }
 
-inline void *LLBC_Stream::GetBuf() const
+template <typename T>
+T *LLBC_Stream::GetBuf() const
 {
-    return _buf;
+    return reinterpret_cast<T *>(_buf);
 }
 
-inline void *LLBC_Stream::GetBufStartWithPos() const
+template <typename T>
+T *LLBC_Stream::GetBufStartWithPos() const
 {
-    return reinterpret_cast<
-        char *>(const_cast<void *>(_buf)) + _pos;
+    return reinterpret_cast<T *>(GetBuf<char>() + _pos);
 }
 
 inline void LLBC_Stream::Insert(size_t pos, const void *buf, size_t len)

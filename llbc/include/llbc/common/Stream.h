@@ -256,13 +256,15 @@ public:
      * Get current buffer pointer.
      * @return void * - current buffer pointer.
      */
-    void *GetBuf() const;
+    template <typename T = void>
+    T *GetBuf() const;
 
     /**
      * Get buffer pointer start with position.
      * @return void * - buffer pointer.
      */
-    void *GetBufStartWithPos() const;
+    template <typename T = void>
+    T *GetBufStartWithPos() const;
 
     /**
      * Insert buffer to current string.
