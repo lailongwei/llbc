@@ -293,6 +293,9 @@ void LLBC_Application::Stop()
         return;
     }
 
+    // Mask stopped.
+    _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+
     // Call OnWillStop event method.
     OnWillStop();
 
@@ -308,9 +311,6 @@ void LLBC_Application::Stop()
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
-
-    // Mask stopped.
-    _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 
     // Call OnStopFinish event method.
     OnStopFinish();
