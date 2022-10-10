@@ -548,7 +548,7 @@ class pyllbcService(object):
               decode(self, stream): decode data from stream.
         """
 
-        llbc.inl.AddCoderClass(self._c_obj, opcode, coder)
+        llbc.inl.AddDecoder(self._c_obj, opcode, coder)
 
     def listen(self, ip, port):
         """
