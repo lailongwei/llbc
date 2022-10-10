@@ -21,6 +21,8 @@
 
 #ifdef __LLBC_CORE_TIME_TIME_H__
 
+#include "llbc/core/os/OS_Time.h"
+
 __LLBC_NS_BEGIN
 
 inline LLBC_Time::LLBC_Time()
@@ -40,9 +42,19 @@ inline LLBC_Time::~LLBC_Time()
 {
 }
 
-inline time_t LLBC_Time::NowTimeStamp()
+inline time_t LLBC_Time::NowTimestampInSecs()
 {
     return time(nullptr);
+}
+
+inline sint64 LLBC_Time::NowTimestampInMillis()
+{
+    return LLBC_GetMilliSeconds();
+}
+
+inline sint64 LLBC_Time::NowTimestampInMicros()
+{
+    return LLBC_GetMicroSeconds();
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
@@ -115,14 +127,19 @@ inline int LLBC_Time::GetSecond() const
     return _localTimeStruct.tm_sec;
 }
 
-inline const sint64 &LLBC_Time::GetTimeTick() const
+inline time_t LLBC_Time::GetTimestampInSecs() const
 {
-    return _time;
+    return static_cast<time_t>(_time / LLBC_TimeConstant::NumOfMicroSecondsPerSecond);
 }
 
-inline time_t LLBC_Time::GetTimeStamp() const
+inline sint64 LLBC_Time::GetTimestampInMillis() const
 {
-    return static_cast<time_t>(_time / NumOfMicroSecondsPerSecond);
+    return _time / LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond;
+}
+
+inline sint64 LLBC_Time::GetTimestampInMicros() const
+{
+    return _time;
 }
 
 inline const tm &LLBC_Time::GetGmtTime() const

@@ -94,9 +94,12 @@ public:
     static LLBC_Time Now();
 
     /**
-     * Get current timestamp.
+     * Get now timestamp, in specific precision.
+     * @return time_t/sint64 - now timestamp.
      */
-    static time_t NowTimeStamp();
+    static time_t NowTimestampInSecs();
+    static sint64 NowTimestampInMillis();
+    static sint64 NowTimestampInMicros();
 
 public:
     /**
@@ -146,16 +149,14 @@ public:
      */
     LLBC_TimeSpan GetTimeOfDay() const;
 
+public:
     /**
-     * Get time tick, in micro seconds.
-     * @return const sint64 & - the time tick, in micro seconds.
+     * Get timetamp, in specific precision.
+     * @return time_t/sint64 - the timestamp.
      */
-    const sint64 &GetTimeTick() const;
-    /**
-     * Get timestamp, in seconds.
-     * @return time_t - the timestamp, in seconds.
-     */
-    time_t GetTimeStamp() const;
+    time_t GetTimestampInSecs() const;
+    sint64 GetTimestampInMillis() const;
+    sint64 GetTimestampInMicros() const;
 
 public:
     /**
