@@ -26,19 +26,12 @@
 LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
 {
     PyObject *pySvc;
-    LLBC_IService::Type svcType;
     char *svcName = nullptr;
-    if (!PyArg_ParseTuple(args, "Ois", &pySvc, &svcType, &svcName))
+    bool useNormalProtocolFactory;
+    if (!PyArg_ParseTuple(args, "Osb", &pySvc, &svcName, &useNormalProtocolFactory))
         return nullptr;
 
-    if (svcType != LLBC_IService::Normal &&
-        svcType != LLBC_IService::Raw)
-    {
-        pyllbc_SetError("service type invalidate", LLBC_ERROR_INVALID);
-        return nullptr;
-    }
-
-    pyllbc_Service *svc = LLBC_New(pyllbc_Service, svcType, svcName, pySvc);
+    pyllbc_Service *svc = LLBC_New(pyllbc_Service, svcName, useNormalProtocolFactory, pySvc);
 
     return Py_BuildValue("l", svc);
 }
@@ -61,32 +54,6 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetServiceId(PyObject *self, PyObject *args)
         return nullptr;
 
     return PyInt_FromLong(svc->GetId());
-}
-
-LLBC_EXTERN_C PyObject *_pyllbc_GetServiceType(PyObject *self, PyObject *args)
-{
-    pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
-
-    return PyInt_FromLong(svc->GetType());
-}
-
-LLBC_EXTERN_C PyObject *_pyllbc_GetServiceTypeStr(PyObject *self, PyObject *args)
-{
-    int type;
-    if (UNLIKELY(!PyArg_ParseTuple(args, "i", &type)))
-        return nullptr;
-
-    const char *str;
-    if (type == LLBC_IService::Normal)
-        str = "NORMAL";
-    else if (type == LLBC_IService::Raw)
-        str = "RAW";
-    else
-        str = "UNKNOWN";
-
-    return PyString_FromString(str);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFPS(PyObject *self, PyObject *args)
@@ -195,15 +162,15 @@ LLBC_EXTERN_C PyObject *_pyllbc_AddLibComponent(PyObject *self, PyObject *args)
     return comp;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_RegisterCodec(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_AddDecoder(PyObject *self, PyObject *args)
 {
     int opcode;
-    PyObject *codec;
+    PyObject *decoder;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &codec))
+    if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &decoder))
         return nullptr;
 
-    if (svc->RegisterCodec(opcode, codec) != LLBC_OK)
+    if (svc->AddDecoder(opcode, decoder) != LLBC_OK)
         return nullptr;
 
     Py_RETURN_NONE;
@@ -469,28 +436,6 @@ LLBC_EXTERN_C PyObject *_pyllbc_FireEvent(PyObject *self, PyObject *args)
         return nullptr;
 
     if (svc->FireEvent(ev) != LLBC_OK)
-        return nullptr;
-
-    Py_RETURN_NONE;
-}
-
-LLBC_EXTERN_C PyObject *_pyllbc_GetServiceCodec(PyObject *self, PyObject *args)
-{
-    pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
-
-    return PyInt_FromLong(svc->GetCodec());
-}
-
-LLBC_EXTERN_C PyObject *_pyllbc_SetServiceCodec(PyObject *self, PyObject *args)
-{
-    pyllbc_Service *svc;
-    pyllbc_Service::Codec codec;
-    if (!PyArg_ParseTuple(args, "li", &svc, &codec))
-        return nullptr;
-
-    if (svc->SetCodec(codec) != LLBC_OK)
         return nullptr;
 
     Py_RETURN_NONE;

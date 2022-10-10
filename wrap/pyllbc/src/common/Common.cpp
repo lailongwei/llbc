@@ -98,7 +98,6 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.PyStreamRead_PyLong);
     inlMod->AddMethod(methods.PyStreamRead_Str);
     inlMod->AddMethod(methods.PyStreamRead_Str2);
-    inlMod->AddMethod(methods.PyStreamRead_Str3);
     inlMod->AddMethod(methods.PyStreamRead_Unicode);
     inlMod->AddMethod(methods.PyStreamRead_ByteArray);
     inlMod->AddMethod(methods.PyStreamRead_Buffer);
@@ -117,7 +116,6 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.PyStreamWrite_PyLong);
     inlMod->AddMethod(methods.PyStreamWrite_Str);
     inlMod->AddMethod(methods.PyStreamWrite_Str2);
-    inlMod->AddMethod(methods.PyStreamWrite_Str3);
     inlMod->AddMethod(methods.PyStreamWrite_Unicode);
     inlMod->AddMethod(methods.PyStreamWrite_ByteArray);
     inlMod->AddMethod(methods.PyStreamWrite_Buffer);

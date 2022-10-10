@@ -28,6 +28,7 @@ namespace
     {
     public:
         TestComp()
+        : LLBC_Component(LLBC_ComponentEvents::AllEvents)
         {
             _timer = nullptr;
         }
@@ -72,9 +73,9 @@ namespace
             LLBC_PrintLine("Update...");
         }
 
-        virtual void OnIdle(int idleTime)
+        virtual void OnIdle(const LLBC_TimeSpan &idleTime)
         {
-            LLBC_PrintLine("Idle, idle time: %d...", idleTime);
+            LLBC_PrintLine("Idle, idle time: %s...", idleTime.ToString().c_str());
         }
 
     public:
@@ -134,7 +135,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
+    LLBC_IService *svc = LLBC_IService::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
 
@@ -197,7 +198,7 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "CompTest");
+    LLBC_IService *svc = LLBC_IService::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
     svc->SetDriveMode(LLBC_IService::ExternalDrive);

@@ -364,6 +364,9 @@ private:                                            \
 /**
  * Some condition judge helper macros.
  */
+#define LLBC_Foreach(cont, behav)                             \
+    for (auto &item : cont) { behav; }                        \
+
 #define LLBC_DoIf(cond, behav)                                \
     if (cond) { behav; }                                      \
 
@@ -371,6 +374,15 @@ private:                                            \
     if (cond) {                                               \
         LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<" #cond "> is true, do:%s", #behav); \
         behav;                                                \
+    }                                                         \
+
+#define LLBC_ContinueIf(cond)                                 \
+    if (cond) continue                                        \
+
+#define LLBC_LogAndContinueIf(cond, logLv)                    \
+    if (cond) {                                               \
+        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<" #cond "> is true"); \
+        continue;                                             \
     }                                                         \
 
 #define LLBC_BreakIf(cond)                                    \

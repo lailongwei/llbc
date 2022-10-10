@@ -45,10 +45,10 @@ LLBC_Delegate<void(LLBC_Event *)> pyllbc_Service::_evDequeueHandler(&pyllbc_Serv
 PyObject *pyllbc_Service::_streamCls = nullptr;
 pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
 
-pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc)
+pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFactory, PyObject *pySvc)
 : _llbcSvc(nullptr)
-, _llbcSvcType(type)
 , _llbcSvcName(name.c_str(), name.length())
+, _useNormalProtocolFactory(useNormalProtocolFactory)
 
 , _pySvc(pySvc)
 
@@ -63,8 +63,7 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
 , _unifyPreHandler(nullptr)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-, _codec((This::Codec)(PYLLBC_CFG_DFT_SVC_CODEC))
-, _codecs()
+, _decoders()
 , _suppressedCoderNotFoundWarning(false)
 
 , _beforeFrameCallables()
@@ -78,7 +77,7 @@ pyllbc_Service::pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name
 , _stoping(false)
 {
     // Create llbc library Service object and set some service attributes.
-    CreateLLBCService(type, name);
+    CreateLLBCService(name, _useNormalProtocolFactory);
 
     // Create cobj python attribute key.
     _keyCObj = Py_BuildValue("s", "cobj");
@@ -105,9 +104,9 @@ int pyllbc_Service::GetId() const
     return _llbcSvc->GetId();
 }
 
-LLBC_IService::Type pyllbc_Service::GetType() const
+const LLBC_String &pyllbc_Service::GetName() const
 {
-    return _llbcSvcType;
+    return _llbcSvc->GetName();
 }
 
 PyObject *pyllbc_Service::GetPyService() const
@@ -145,31 +144,6 @@ int pyllbc_Service::SuppressCoderNotFoundWarning()
     }
 
     _suppressedCoderNotFoundWarning = true;
-    return LLBC_OK;
-}
-
-This::Codec pyllbc_Service::GetCodec() const
-{
-    return _codec;
-}
-
-int pyllbc_Service::SetCodec(Codec codec)
-{
-    if (codec != This::JsonCodec &&
-        codec != This::BinaryCodec)
-    {
-        pyllbc_SetError("invalid codec type", LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-    else if (_started)
-    {
-        pyllbc_SetError("service already start, could not change codec strategy");
-        return LLBC_FAILED;
-    }
-
-    if (codec != _codec)
-        _codec = codec;
-
     return LLBC_OK;
 }
 
@@ -386,34 +360,24 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
     return LLBC_OK;
 }
 
-int pyllbc_Service::RegisterCodec(int opcode, PyObject *codec)
+int pyllbc_Service::AddDecoder(int opcode, PyObject *decoder)
 {
-    if (_codec != This::BinaryCodec)
-    {
-        pyllbc_SetError("current codec strategy not BINARY, don't need register codec");
-        return LLBC_FAILED;
-    }
-    else if (_llbcSvcType == LLBC_IService::Raw)
-    {
-        pyllbc_SetError("RAW type service don't need register codec");
-        return LLBC_FAILED;
-    }
-    else if (!PyCallable_Check(codec))
+    if (!PyCallable_Check(decoder))
     {
         pyllbc_SetError("codec not callable");
         return LLBC_FAILED;
     }
 
-    if (!_codecs.insert(std::make_pair(opcode, codec)).second)
+    if (!_decoders.insert(std::make_pair(opcode, decoder)).second)
     {
         LLBC_String err;
         pyllbc_SetError(err.append_format(
-            "repeat to register specify opcode's codec, opcode: %d", opcode));
+            "repeat to register specify opcode's coder class, opcode: %d", opcode));
 
         return LLBC_FAILED;
     }
 
-    Py_INCREF(codec);
+    Py_INCREF(decoder);
 
     return LLBC_OK;
 }
@@ -488,15 +452,11 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     packet->Write(stream.GetBuf(), stream.GetPos());
 
     packet->SetSessionId(sessionId);
-    if (_llbcSvcType != LLBC_IService::Raw)
-    {
-        packet->SetOpcode(opcode);
-        packet->SetStatus(status);
-
-        packet->SetExtData1(extData1);
-        packet->SetExtData2(extData2);
-        packet->SetExtData3(extData3);
-    }
+    packet->SetOpcode(opcode);
+    packet->SetStatus(status);
+    packet->SetExtData1(extData1);
+    packet->SetExtData2(extData2);
+    packet->SetExtData3(extData3);
 
     if (UNLIKELY(_llbcSvc->Send(packet) == LLBC_FAILED))
     {
@@ -553,13 +513,6 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status)
 
 int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
 {
-    if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
-    {
-        pyllbc_SetError(LLBC_String().format(
-            "RAW type service could not subscribe opcode[%d] != 0's packet", opcode), LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
     _PacketHandlers::const_iterator it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
@@ -596,12 +549,6 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
 
 int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 {
-    if (_llbcSvcType == LLBC_IService::Raw && opcode != 0)
-    {
-        pyllbc_SetError("RAW type service could not pre-subscribe opcode != 0's packet", LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
     _PacketHandlers::const_iterator it = _preHandlers.find(opcode);
     if (it != _preHandlers.end())
     {
@@ -817,11 +764,17 @@ pyllbc_ErrorHooker *pyllbc_Service::GetErrHooker()
     return This::_errHooker;
 }
 
-void pyllbc_Service::CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName)
+void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNormalProtocolFactory)
 {
     ASSERT(!_llbcSvc && "llbc service pointer not nullptr");
 
-    _llbcSvc = LLBC_IService::Create(svcType, svcName, nullptr, false);
+    LLBC_IProtocolFactory *protoFactory = nullptr;
+    if (useNormalProtocolFactory)
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
+
+    _llbcSvc = LLBC_IService::Create(svcName, protoFactory, false);
     _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
@@ -836,7 +789,7 @@ void pyllbc_Service::AfterStop()
 
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
-    CreateLLBCService(_llbcSvcType, _llbcSvcName);
+    CreateLLBCService(_llbcSvcName, _useNormalProtocolFactory);
 
     // Cleanup all python layer components.
     for (_Comps::reverse_iterator it = _comps.rbegin();
@@ -846,11 +799,8 @@ void pyllbc_Service::AfterStop()
     _comps.clear();
 
     // Cleanup all python layer codecs.
-    for (_Codecs::iterator it = _codecs.begin();
-         it != _codecs.end();
-         it++)
-        Py_DECREF(it->second);
-    _codecs.clear();
+    LLBC_Foreach(_decoders, Py_DECREF(item.second));
+    _decoders.clear();
 
     // Cleanup all python layer handlers/prehandlers/unify_prehandlers(if enabled).
     LLBC_STLHelper::DeleteContainer(_handlers);
@@ -902,63 +852,50 @@ void pyllbc_Service::DestroyFrameCallables(_FrameCallables &callables, bool &usi
 
 int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
 {
-    if (_codec == This::JsonCodec)
-    {
-        std::string out;
-        if (UNLIKELY(pyllbc_ObjCoder::Encode(pyObj, out) != LLBC_OK))
-            return LLBC_FAILED;
-
-        stream.Write(out.data(), out.size());
-
-        return LLBC_OK;
-    }
-    else
-    {
-        // Create python layer Stream instance.
-        PyObject *arg = PyTuple_New(2);
-        PyTuple_SetItem(arg, 0, PyInt_FromLong(0)); // stream init size = 0.
+    // Create python layer Stream instance.
+    PyObject *arg = PyTuple_New(2);
+    PyTuple_SetItem(arg, 0, PyInt_FromLong(0)); // stream init size = 0.
         
-        Py_INCREF(pyObj);
-        PyTuple_SetItem(arg, 1, pyObj); // initWrite = pyObj(steal reference).
+    Py_INCREF(pyObj);
+    PyTuple_SetItem(arg, 1, pyObj); // initWrite = pyObj(steal reference).
 
-        PyObject *pyStreamObj = PyObject_CallObject(This::_streamCls, arg);
-        if (UNLIKELY(!pyStreamObj))
-        {
-            Py_DECREF(arg);
-            pyllbc_TransferPyError();
+    PyObject *pyStreamObj = PyObject_CallObject(This::_streamCls, arg);
+    if (UNLIKELY(!pyStreamObj))
+    {
+        Py_DECREF(arg);
+        pyllbc_TransferPyError();
 
-            return LLBC_FAILED;
-        }
+        return LLBC_FAILED;
+    }
 
-        // Get cobj property.
-        PyObject *cobj = PyObject_GetAttr(pyStreamObj, _keyCObj);
-        if (UNLIKELY(!cobj))
-        {
-            Py_DECREF(pyStreamObj);
-            Py_DECREF(arg);
-
-            pyllbc_SetError("could not get llbc.Stream property 'cobj'");
-
-            return LLBC_FAILED;
-        }
-
-        // Convert to pyllbc_Stream *.
-        pyllbc_Stream *cstream = nullptr;
-        PyArg_Parse(cobj, "l", &cstream);
-
-        // Let stream attach to inlStream.
-        LLBC_Stream &inlStream = cstream->GetLLBCStream();
-
-        stream.Attach(inlStream);
-        (void)inlStream.Detach();
-        stream.SetAttachAttr(false);
-
-        Py_DECREF(cobj);
+    // Get cobj property.
+    PyObject *cobj = PyObject_GetAttr(pyStreamObj, _keyCObj);
+    if (UNLIKELY(!cobj))
+    {
         Py_DECREF(pyStreamObj);
         Py_DECREF(arg);
 
-        return LLBC_OK;
+        pyllbc_SetError("could not get llbc.Stream property 'cobj'");
+
+        return LLBC_FAILED;
     }
+
+    // Convert to pyllbc_Stream *.
+    pyllbc_Stream *cstream = nullptr;
+    PyArg_Parse(cobj, "l", &cstream);
+
+    // Let stream attach to inlStream.
+    LLBC_Stream &inlStream = cstream->GetLLBCStream();
+
+    stream.Attach(inlStream);
+    (void)inlStream.Detach();
+    stream.SetAttachAttr(false);
+
+    Py_DECREF(cobj);
+    Py_DECREF(pyStreamObj);
+    Py_DECREF(arg);
+
+    return LLBC_OK;
 }
 
 void pyllbc_Service::EventEnqueueHandler(LLBC_Event *ev)

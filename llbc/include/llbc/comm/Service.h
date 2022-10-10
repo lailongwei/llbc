@@ -50,14 +50,12 @@ class LLBC_HIDDEN LLBC_Service final : public LLBC_IService
 public:
     /**
      * Create specified type service.
-     * @param[in] type         - the service type, see LLBC_IService::Type enumeration.
-     * @param[in] name         - type service name.
-     * @param[in] protoFactory - the protocol factory, when type is Custom, will use this protocol factory to create protocols.
-     * @param[in] fullStack    - the full stack option, default is true.
+     * @param[in] name               - type service name.
+     * @param[in] dftProtocolFactory - the default protocol factory.
+     * @param[in] fullStack          - the full stack option, default is true.
      */
-    LLBC_Service(Type type,
-                 const LLBC_String &name = "",
-                 LLBC_IProtocolFactory *protoFactory = nullptr,
+    LLBC_Service(const LLBC_String &name = "",
+                 LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
                  bool fullStack = true);
 
     /**
@@ -71,12 +69,6 @@ public:
      * @return int - the service Id.
      */
     virtual int GetId() const;
-
-    /**
-     * Get the service type.
-     * @return Type - the service type.
-     */
-    virtual Type GetType() const;
 
     /**
      * Get the service name.
@@ -573,7 +565,7 @@ private:
     /**
      * Idle process method.
      */
-    void ProcessIdle(bool fullFrame);
+    void ProcessIdle();
 
 private:
     /**
@@ -603,10 +595,11 @@ private:
     int _id;
     static int _maxId;
 
-    Type _type;
+    LLBC_ThreadId _svcThreadId;
+
     bool _fullStack;
     LLBC_String _name;
-    LLBC_IProtocolFactory *_protoFactory;
+    LLBC_IProtocolFactory *_dftProtocolFactory;
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory;
     DriveMode _driveMode;
     bool _suppressedCoderNotFoundWarning;

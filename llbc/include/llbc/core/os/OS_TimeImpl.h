@@ -172,11 +172,9 @@ inline uint64 LLBC_GetCpuCounterFrequency()
     ::QueryPerformanceFrequency(&freq);
     return static_cast<uint64>(freq.QuadPart);
     #else
-    uint64 tscStart, tscEnd;
-    tscStart = LLBC_RdTsc();
-    sleep(1);
-    tscEnd = LLBC_RdTsc();
-    return tscEnd - tscStart;
+    const auto tscBegin = LLBC_RdTsc();
+    usleep(200 * 1000);
+    return (LLBC_RdTsc() - tscBegin) * 5;
     #endif // LLBC_TARGET_PLATFORM_WIN32
 #else // Not supp rdtsc
     return LLBC_INFINITE;

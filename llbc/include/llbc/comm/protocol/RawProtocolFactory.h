@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The llbc library raw protocol factory encapsulation.
  */
-class LLBC_HIDDEN LLBC_RawProtocolFactory : public LLBC_IProtocolFactory
+class LLBC_EXPORT LLBC_RawProtocolFactory : public LLBC_IProtocolFactory
 {
 public:
     /**

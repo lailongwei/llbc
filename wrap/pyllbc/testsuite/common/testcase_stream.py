@@ -132,9 +132,11 @@ class StreamTest(TestCase):
 
         s.pos = 0
         meths[0](val)
+        print ' packed, pos:{}'.format(s.pos)
 
         s.pos = 0
         unpacked = meths[1]()
+        print ' unpacked, pos:{}'.format(s.pos)
         print '{} <--> {}'.format(val, unpacked)
 
     def _obj_pack_test(self):

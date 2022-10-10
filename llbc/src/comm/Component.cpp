@@ -22,6 +22,7 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/comm/IService.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -350,51 +351,14 @@ LLBC_Component::~LLBC_Component()
     LLBC_XDelete(_meths);
 }
 
-bool LLBC_Component::OnInitialize(bool &initFinished)
-{
-    return true;
-}
-
-void LLBC_Component::OnDestroy(bool &destroyFinished)
-{
-}
-
-bool LLBC_Component::OnStart(bool &startFinished)
-{
-    return true;
-}
-
-void LLBC_Component::OnStop(bool &stopFinished)
-{
-}
-
-void LLBC_Component::OnApplicationConfigReload()
-{
-}
-
-void LLBC_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
-{
-}
-
-void LLBC_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-{
-}
-
-void LLBC_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-{
-}
-
-void LLBC_Component::OnProtoReport(const LLBC_ProtoReport &report)
-{
-}
-
-void LLBC_Component::OnUnHandledPacket(const LLBC_Packet &packet)
-{
-}
-
 void LLBC_Component::SetService(LLBC_IService *svc)
 {
     _svc = svc;
+}
+
+LLBC_Component *LLBC_Component::GetComponent(const char *compName)
+{
+    return _svc->GetComponent(compName);
 }
 
 __LLBC_NS_END

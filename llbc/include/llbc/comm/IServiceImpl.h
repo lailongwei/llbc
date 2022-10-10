@@ -136,20 +136,9 @@ inline int LLBC_IService::Send(int sessionId, int opcode, LLBC_Coder *coder, int
 
 inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status)
 {
-    const int svcType = GetType();
-    if (svcType == Raw && coder == nullptr)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
     LLBC_Packet *packet = GetPacketObjectPool().GetObject();
     packet->SetEncoder(coder);
-
-    if (svcType == Raw)
-        packet->SetSessionId(sessionId);
-    else
-        packet->SetHeader(svcId, sessionId, opcode, status);
+    packet->SetHeader(svcId, sessionId, opcode, status);
 
     return Send(packet);
 }
@@ -171,21 +160,9 @@ inline int LLBC_IService::Send(int sessionId, int opcode, const void *bytes, siz
 
 inline int LLBC_IService::Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status)
 {
-    // Validate check.
-    const int svcType = GetType();
-    if (svcType == Raw && (bytes == nullptr || len == 0))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
     // Create packet(from object pool) and send.
     LLBC_Packet *packet = GetPacketObjectPool().GetObject();
-    if (svcType == Raw)
-        packet->SetSessionId(sessionId);
-    else
-        packet->SetHeader(svcId, sessionId, opcode, status);
-
+    packet->SetHeader(svcId, sessionId, opcode, status);
     if (UNLIKELY(packet->Write(bytes, len) != LLBC_OK))
     {
         LLBC_Recycle(packet);

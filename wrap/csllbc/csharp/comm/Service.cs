@@ -448,8 +448,8 @@ namespace llbc
                 _nativeCompDelegates = new NativeComponentDelegates(_nativeComp);
 
                 IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName);
-                _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
-                                                            nativeSvcName,
+                _llbcSvc = LLBCNative.csllbc_Service_Create(nativeSvcName,
+                                                            svcType == ServiceType.Normal,
                                                             fullStack,
                                                             _nativeCompDelegates.svcEncodePacket,
                                                             _nativeCompDelegates.svcDecodePacket,

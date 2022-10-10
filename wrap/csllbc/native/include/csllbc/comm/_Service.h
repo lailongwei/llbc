@@ -32,14 +32,14 @@ class csllbc_Service;
 
 /**
  * Create new service.
- * @param[in] svcType   - the service type, see csllbc_Service::Type enumeration.
- * @param[in] svcName   - the service name.
- * @param[in] fullStack - the full-stack option.
- * @param[in] ...       - the delegates, internal used.
+ * @param[in] svcName                  - the service name.
+ * @param[in] useNormalProtocolFactory - the service type, see csllbc_Service::Type enumeration.
+ * @param[in] fullStack                - the full-stack option.
+ * @param[in] ...                      - the delegates, internal used.
  * @return csllbc_Service * - the created service, if failed, return nullptr.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
-                                                                  const char *svcName,
+LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(const char *svcName,
+                                                                  bool useNormalProtocolFactory,
                                                                   bool fullStack,
                                                                   csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
@@ -53,13 +53,6 @@ LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
  * @param[in] svc - will delete service.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_Delete(csllbc_Service *svc);
-
-/**
- * Get service type.
- * @param[in] svc - the service.
- * @return int - the service type, see csllbc_Service::Type enumerations.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetType(csllbc_Service *svc);
 
 /**
  * Get service Id.

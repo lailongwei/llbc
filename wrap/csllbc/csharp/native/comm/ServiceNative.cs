@@ -33,8 +33,8 @@ namespace llbc
     internal partial class LLBCNative
     {
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static IntPtr csllbc_Service_Create(int svcType,
-                                                          IntPtr svcName,
+        public extern static IntPtr csllbc_Service_Create(IntPtr svcName,
+                                                          bool useNormalProtocolFactory,
                                                           bool fullStack,
                                                           Deleg_Service_EncodePacket encodeDeleg,
                                                           Deleg_Service_DecodePacket decodeDeleg,
@@ -45,9 +45,6 @@ namespace llbc
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static void csllbc_Service_Delete(IntPtr svc);
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Service_GetType(IntPtr svc);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_Service_GetId(IntPtr svc);

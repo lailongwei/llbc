@@ -42,7 +42,7 @@ private:
 
 private:
     bool _asClient;
-    LLBC_IService::Type _svcType;
+    bool _useNmlProtocolFactory;
 
     LLBC_String _runIp;
     int _runPort;
