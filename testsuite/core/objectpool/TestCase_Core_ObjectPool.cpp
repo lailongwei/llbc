@@ -276,7 +276,7 @@ namespace
         , _poolInst(_pool->GetPoolInst<std::vector<double> >())
         {
             LLBC_Random rand;
-            rand.Seed(static_cast<int>(LLBC_Time::NowTimeStamp()));
+            rand.Seed(static_cast<int>(LLBC_Time::NowTimestampInSecs()));
 
             for (int i = 0; i < TestTimes; ++i)
             {
@@ -702,7 +702,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     std::vector<double> *mallocObjs[ListSize];
 
     LLBC_Random rand;
-    rand.Seed(static_cast<int>(LLBC_Time::Now().GetTimeStamp()));
+    rand.Seed(static_cast<int>(LLBC_Time::NowTimestampInSecs()));
 
     int randTimes[TestTimes];
     int pushElems[TestTimes];
@@ -796,7 +796,7 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
     ComplexObj *mallocObjs[ListSize];
 
     LLBC_Random rand;
-    rand.Seed(static_cast<int>(LLBC_Time::Now().GetTimeStamp()));
+    rand.Seed(static_cast<int>(LLBC_Time::NowTimestampInSecs()));
 
     int randTimes[ComplexTestTimes];
     int pushElems[ComplexTestTimes];

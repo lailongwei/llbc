@@ -81,7 +81,10 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // Now(), GetTimeTick(), Format(), FormatAsGmt() test.
     LLBC_Time now = LLBC_Time::Now();
-    std::cout <<"now time: " <<now <<", Time Ticks: " <<now.GetTimeTick() <<std::endl;
+    std::cout <<"now time: " <<now 
+              <<", Timestamp(in secs): " <<now.GetTimestampInSecs()
+              <<", Timestamp(in millis): " <<now.GetTimestampInMillis()
+              <<", Timestamp(in micros): " <<now.GetTimestampInMicros() <<std::endl;
     std::cout <<"Default format, LOCAL: " <<now.Format() <<", UTC: " <<now.FormatAsGmt() <<std::endl;
     std::cout <<"Special format(%y-%m) LOCAL: " <<now.Format("%y-%m") <<", UTC: " <<now.FormatAsGmt("%y-%m") <<std::endl;
 
@@ -139,8 +142,8 @@ void TestCase_Core_Time_Time::TimeClassTest()
     for (int i = 1; i <= 3; ++i)
     {
         int addMilliSecs = addMilliSecsStep * i;
-        std::cout << i <<"(" <<addMilliSecs <<"): " <<now.AddMilliSeconds(addMilliSecs).GetTimeTick() <<", -"
-            <<i <<"(" <<-addMilliSecs <<"): " <<now.AddMilliSeconds(-addMilliSecs).GetTimeTick() <<"\n";
+        std::cout << i <<"(" <<addMilliSecs <<"): " <<now.AddMilliSeconds(addMilliSecs).GetTimestampInMicros() <<", -"
+            <<i <<"(" <<-addMilliSecs <<"): " <<now.AddMilliSeconds(-addMilliSecs).GetTimestampInMicros() <<"\n";
     }
     std::cout <<std::endl;
 
@@ -149,8 +152,8 @@ void TestCase_Core_Time_Time::TimeClassTest()
     for (int i = 1; i <= 3; ++i)
     {
         int addMicroSecs = addMicroSecsStep * i;
-        std::cout <<i <<"(" <<addMicroSecs <<"): " <<now.AddMicroSeconds(addMicroSecs).GetTimeTick() <<", -"
-            <<i <<"(" <<-addMicroSecs <<"): " <<now.AddMicroSeconds(-addMicroSecs).GetTimeTick() <<"\n";
+        std::cout <<i <<"(" <<addMicroSecs <<"): " <<now.AddMicroSeconds(addMicroSecs).GetTimestampInMicros() <<", -"
+            <<i <<"(" <<-addMicroSecs <<"): " <<now.AddMicroSeconds(-addMicroSecs).GetTimestampInMicros() <<"\n";
     }
     std::cout <<std::endl;
 

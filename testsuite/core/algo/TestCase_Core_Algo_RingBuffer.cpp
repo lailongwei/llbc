@@ -77,7 +77,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
     std::cout << "- random push/pop test: " << std::endl;
     {
         LLBC_RingBuffer<int> rb;
-        LLBC_Random rand(static_cast<int>(LLBC_Time::NowTimeStamp()));
+        LLBC_Random rand(static_cast<int>(LLBC_Time::NowTimestampInSecs()));
         for (int i = 0; i <100; ++i)
         {
             int pushTimes = rand.Rand(2, 1000);
