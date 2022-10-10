@@ -363,60 +363,70 @@ PyObject *pyllbc_Stream::ReadPyLong()
 
 PyObject *pyllbc_Stream::ReadStr()
 {
-    if (UNLIKELY(_stream.GetPos() == _stream.GetSize()))
+    auto pos = _stream.GetPos();
+    const auto size = _stream.GetSize();
+    if (UNLIKELY(pos == size))
         return PyString_FromStringAndSize("", 0);
 
-    LLBC_String val;
-    if (!_stream.Read(val))
+    const char *buf = reinterpret_cast<const char *>(_stream.GetBuf());
+    for (auto i = pos; i < size; ++i)
     {
-        pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
-        return nullptr;
+        if (buf[i] == '\0')
+        {
+            const auto len = i - pos;
+            PyObject *pyStr = PyString_FromStringAndSize(buf + pos, len);
+            _stream.Skip(len + 1);
+
+            return pyStr;
+        }
     }
 
-    return PyString_FromStringAndSize(val.data(), val.size());
+    PyObject *pyStr = PyString_FromStringAndSize(buf + pos, size - pos);
+    _stream.SetPos(size);
+
+    return pyStr;
 }
 
 PyObject *pyllbc_Stream::ReadStr2()
 {
-    int len;
+    uint32 len;
     if (!_stream.Read(len))
     {
         pyllbc_SetError("not enough bytes to decode 'str' len part", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    if (static_cast<int>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    PyObject *pyStr = PyString_FromStringAndSize(
-        reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), len);
+    PyObject *pyStr = PyString_FromStringAndSize(_stream.GetBufStartWithPos<char>(), len);
     _stream.Skip(len);
-
-    return pyStr;
-}
-
-PyObject *pyllbc_Stream::ReadStr3()
-{
-    PyObject *pyStr = PyString_FromStringAndSize(
-        reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), _stream.GetSize() - _stream.GetPos());
-    _stream.SetPos(_stream.GetSize());
 
     return pyStr;
 }
 
 PyObject *pyllbc_Stream::ReadUnicode()
 {
-    LLBC_String val;
-    if (!_stream.Read(val))
+    uint32 len;
+    if (!_stream.Read(len))
+    {
+        pyllbc_SetError("not enough bytes to decode 'unicode' len part", LLBC_ERROR_LIMIT);
+        return nullptr;
+    }
+
+    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'unicode'", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    return PyUnicode_FromStringAndSize(val.data(), val.size());
+    PyObject *pyUni = PyUnicode_FromStringAndSize(_stream.GetBufStartWithPos<char>(), len);
+    _stream.Skip(len);
+
+    return pyUni;
 }
 
 PyObject *pyllbc_Stream::ReadByteArray()
@@ -733,8 +743,9 @@ int pyllbc_Stream::WriteStr(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.Write(str, static_cast<size_t>(len));
-    _stream.Write("\0", 1);
+    if (str && len > 0)
+        _stream.Write(str, len);
+    _stream.Write('\0');
 
     return LLBC_OK;
 }
@@ -749,23 +760,8 @@ int pyllbc_Stream::WriteStr2(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.Write(static_cast<int>(len));
+    _stream.Write(static_cast<uint32>(len));
     _stream.Write(str, len);
-
-    return LLBC_OK;
-}
-
-int pyllbc_Stream::WriteStr3(PyObject *val)
-{
-    char *str;
-    Py_ssize_t len;
-    if (PyString_AsStringAndSize(val, &str, &len) == -1)
-    {
-        pyllbc_TransferPyError();
-        return LLBC_FAILED;
-    }
-
-    _stream.Write(str, static_cast<size_t>(len));
 
     return LLBC_OK;
 }
@@ -779,7 +775,7 @@ int pyllbc_Stream::WriteUnicode(PyObject *val)
         return LLBC_FAILED;
     }
 
-    const int rtn = WriteStr(str);
+    const int rtn = WriteStr2(str);
     Py_DECREF(str);
 
     return rtn;
