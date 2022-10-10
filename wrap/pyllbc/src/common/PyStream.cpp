@@ -375,7 +375,7 @@ PyObject *pyllbc_Stream::ReadStr()
         {
             const auto len = i - pos;
             PyObject *pyStr = PyString_FromStringAndSize(buf + pos, len);
-            _stream.Skip(len + 1);
+            _stream.Skip(static_cast<long>(len + 1));
 
             return pyStr;
         }

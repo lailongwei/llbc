@@ -40,8 +40,14 @@ csllbc_Service::csllbc_Service(const LLBC_String &name,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
+    LLBC_IProtocolFactory *protocolFactory;
+    if (useNormalProtocolFactory)
+        protocolFactory = new LLBC_NormalProtocolFactory;
+    else
+        protocolFactory = new LLBC_RawProtocolFactory;
+
     _llbcSvc = LLBC_IService::Create(name,
-                                     useNormalProtocolFactory ? new LLBC_NormalProtocolFactory : new LLBC_RawProtocolFactory,
+                                     protocolFactory,
                                      fullStack);
 
     // Set packet encode delegate.
@@ -90,11 +96,6 @@ void csllbc_Service::Stop()
 bool csllbc_Service::IsStarted() const
 {
     return _llbcSvc->IsStarted();
-}
-
-csllbc_Service::Type csllbc_Service::GetType() const
-{
-    return _llbcSvc->GetType();
 }
 
 int csllbc_Service::GetId() const
