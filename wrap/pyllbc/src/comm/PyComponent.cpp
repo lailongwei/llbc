@@ -371,14 +371,15 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
         PyArg_Parse(cobj, "l", &_nativeStream);
         Py_DECREF(cobj);
     }
+        
+    _nativeStream->GetLLBCStream().Attach(
+        const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
 
     PyObject *pyData = nullptr;
     const auto &decoders = _svc->_decoders;
     const auto decoderIt = decoders.find(packet.GetOpcode());
     if (decoderIt != decoders.end())
     {
-        _nativeStream->GetLLBCStream().Attach(
-            const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
         PyObject *decoded = _nativeStream->Read(decoderIt->second);
         if (!decoded)
             return nullptr;
