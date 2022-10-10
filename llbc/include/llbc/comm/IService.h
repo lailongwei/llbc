@@ -396,7 +396,7 @@ public:
     virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
 
     /**
-     * Get component/components.
+     * Get component.
      */
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
