@@ -81,6 +81,23 @@ inline LLBC_IService *LLBC_Component::GetService() const
     return _svc;
 }
 
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+LLBC_Component::GetComponent()
+{
+    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+}
+
+inline LLBC_Component *LLBC_Component::GetComponent(const LLBC_String &compName)
+{
+    return GetComponent(compName.c_str());
+}
+
+inline LLBC_Component *LLBC_Component::GetComponent(const std::string &compName)
+{
+    return GetComponent(compName.c_str());
+}
+
 inline uint64 LLBC_Component::GetCaredEvents() const
 {
     return _caredEvents;
@@ -125,11 +142,53 @@ inline int LLBC_Component::CallMethod(const char *methName, const LLBC_Variant &
     return _meths->CallMethod(methName, arg, ret);
 }
 
+inline bool LLBC_Component::OnInitialize(bool &initFinished)
+{
+    return true;
+}
+
+inline void LLBC_Component::OnDestroy(bool &destroyFinished)
+{
+}
+
+inline bool LLBC_Component::OnStart(bool &startFinished)
+{
+    return true;
+}
+
+inline void LLBC_Component::OnStop(bool &stopFinished)
+{
+}
+
 inline void LLBC_Component::OnUpdate()
 {
 }
 
 inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
+{
+}
+
+inline void LLBC_Component::OnApplicationConfigReload()
+{
+}
+
+inline void LLBC_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+{
+}
+
+inline void LLBC_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+{
+}
+
+inline void LLBC_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+{
+}
+
+inline void LLBC_Component::OnProtoReport(const LLBC_ProtoReport &report)
+{
+}
+
+inline void LLBC_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 {
 }
 
