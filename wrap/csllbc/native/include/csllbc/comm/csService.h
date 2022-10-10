@@ -40,15 +40,14 @@ class CSLLBC_HIDDEN csllbc_Service
     typedef csllbc_Delegates _D;
 
 public:
-    typedef LLBC_IService::Type Type;
     typedef LLBC_IService::DriveMode DriveMode;
 
 public:
     /**
      * Constructor & Destructor.
      */
-    csllbc_Service(Type type, 
-                   const LLBC_String &name,
+    csllbc_Service(const LLBC_String &name,
+                   bool useNormalProtocolFactory,
                    bool fullStack,
                    _D::Deleg_Service_EncodePacket encodeDeleg,
                    _D::Deleg_Service_DecodePacket decodeDeleg,
@@ -73,11 +72,6 @@ public:
     bool IsStarted() const;
 
 public:
-    /**
-     * Get service type.
-     */
-    Type GetType() const;
-
     /**
      * Get service Id.
      */

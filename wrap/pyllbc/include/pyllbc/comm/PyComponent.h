@@ -73,9 +73,9 @@ public:
 
     /**
      * Idle event handler.
-     * @param[in] idleTime - idle time, in milliseconds.
+     * @param[in] idleTime - idle time.
      */
-    virtual void OnIdle(int idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
 public:
     /**
@@ -164,8 +164,6 @@ private:
 private:
     pyllbc_Service *_svc;
     PyObject *_pySvc;
-
-    const LLBC_IService::Type _svcType;
 
     PyObject *_methOnInitialize;
     PyObject *_methOnDestroy;

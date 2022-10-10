@@ -277,8 +277,7 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
     }
 
     // Return ok.
-    ret = LLBC_OK;
-    return ret;
+    return ret = LLBC_OK;
 }
 
 void LLBC_Application::Stop()

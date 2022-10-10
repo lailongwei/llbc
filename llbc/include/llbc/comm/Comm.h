@@ -37,7 +37,8 @@
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
-#include "llbc/comm/protocol/IProtocolFactory.h"
+#include "llbc/comm/protocol/RawProtocolFactory.h"
+#include "llbc/comm/protocol/NormalProtocolFactory.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 #include "llbc/comm/protocol/PacketProtocol.h"
 #include "llbc/comm/protocol/CompressProtocol.h"

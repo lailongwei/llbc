@@ -107,9 +107,9 @@ public:
         GetService()->SetFPS(fps);
     }
 
-    virtual void OnIdle(int idleTime)
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime)
     {
-        // LLBC_PrintLine("Service idle, idle time: %d", idleTime);
+        // LLBC_PrintLine("Service idle, idle time: %s", idleTime.ToString().c_str());
     }
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
@@ -201,8 +201,8 @@ public:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, true))
-// : _svc(LLBC_IService::Create(LLBC_IService::Normal, "SvcBaseTest", nullptr, false))
+: _svc(LLBC_IService::Create("SvcBaseTest"))
+// : _svc(LLBC_IService::Create("SvcBaseTest", nullptr, false))
 {
 }
 

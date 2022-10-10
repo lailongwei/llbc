@@ -59,7 +59,7 @@ public:
     virtual void OnStop(bool &stopFinished);
 
     virtual void OnUpdate();
-    virtual void OnIdle(int idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
 public:
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);

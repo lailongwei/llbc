@@ -111,7 +111,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Timer testcase:");
 
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "TimerTest");
+    LLBC_IService *svc = LLBC_IService::Create("TimerTest");
     svc->AddComponent(LLBC_New(TestComp));
     if(svc->Start() != LLBC_OK)
     {

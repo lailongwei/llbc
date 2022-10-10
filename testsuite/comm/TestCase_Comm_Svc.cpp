@@ -129,15 +129,17 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     const char *ip = argv[3];
     const int port = LLBC_Str2Int32(argv[4]);
     const bool asClient = LLBC_String(argv[1]) == "client" ? true : false;
-    LLBC_IService::Type svcType = 
-        LLBC_String(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
-
+    LLBC_IProtocolFactory *protoFactory;
+    if (LLBC_String(argv[2]) == "normal")
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
     LLBC_PrintLine("Will start %s type service, service type: %s",
         asClient ? "CLIENT" : "SERVER",
-        svcType == LLBC_IService::Normal ? "Normal" : "Raw");
+        LLBC_String(argv[2]) == "normal" ? "Normal" : "Raw");
 
     // Create service
-    LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
+    LLBC_IService *svc = LLBC_IService::Create("SvcTest", protoFactory);
     TestComp *comp = LLBC_New(TestComp);
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);

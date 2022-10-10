@@ -2,6 +2,8 @@
 """
 Service basic 测试
 """
+
+import traceback
 from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_handler
 
 @comp
@@ -85,7 +87,7 @@ class TestHandler(object):
         # print 'send response...'
         data.iVal = self._handleTimes
         svc.send(session_id, data)
-        # raise Exception('Test exception, raise from TestData packet handler')
+        raise Exception('Test exception, raise from TestData packet handler')
 
         self._handleTimes += 1
         if self._handleTimes % 1000 == 0:
@@ -95,7 +97,8 @@ class TestHandler(object):
 @bindto('svcbase_test_svc')
 class ExcHandler(object):
     def __call__(self, svc, tb, e):
-        print 'Exc handler, tb: {}, e: {}'.format(tb, e)
+        print 'Exc handler, e: {}, tb:'.format(e)
+        traceback.print_tb(tb)
 
 class SvcBaseTest(TestCase):
     def misc_test(self):
@@ -109,7 +112,6 @@ class SvcBaseTest(TestCase):
 
         # Create service: my_svc
         svc = Service('svcbase_test_svc')
-        svc.codec = Service.CODEC_BINARY
         svc.start()
 
         # Listen
@@ -133,7 +135,6 @@ class SvcBaseTest(TestCase):
 
         # Create service: another_svc
         another = Service('another')
-        another.codec = Service.CODEC_BINARY
         another.start()
 
         # Schedule.

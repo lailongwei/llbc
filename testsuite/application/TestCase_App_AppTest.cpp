@@ -59,14 +59,10 @@ TestCase_App_AppTest::~TestCase_App_AppTest()
 
 int TestCase_App_AppTest::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Application/AppTest:");
+    LLBC_PrintLine("Application/AppTest(Press Ctrl+C to exit):");
 
     TestApp app;
     app.Start("TestApp", argc, argv);
-    app.Stop();
-
-    LLBC_PrintLine("Press any key to continue...");
-    getchar();
 
     return LLBC_OK;
 }

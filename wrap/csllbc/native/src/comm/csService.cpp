@@ -29,8 +29,8 @@
 LLBC_SpinLock csllbc_Service::_packetDelegatesLock;
 csllbc_Service::_PacketDecodeDelegs csllbc_Service::_packetDecodeDelegs;
 
-csllbc_Service::csllbc_Service(Type type,
-                               const LLBC_String &name,
+csllbc_Service::csllbc_Service(const LLBC_String &name,
+                               bool useNormalProtocolFactory,
                                bool fullStack,
                                _D::Deleg_Service_EncodePacket encodeDeleg,
                                _D::Deleg_Service_DecodePacket decodeDeleg, 
@@ -40,7 +40,15 @@ csllbc_Service::csllbc_Service(Type type,
                                _D::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
     // Create llbc service.
-    _llbcSvc = LLBC_IService::Create(type, name, nullptr, fullStack);
+    LLBC_IProtocolFactory *protocolFactory;
+    if (useNormalProtocolFactory)
+        protocolFactory = new LLBC_NormalProtocolFactory;
+    else
+        protocolFactory = new LLBC_RawProtocolFactory;
+
+    _llbcSvc = LLBC_IService::Create(name,
+                                     protocolFactory,
+                                     fullStack);
 
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
@@ -88,11 +96,6 @@ void csllbc_Service::Stop()
 bool csllbc_Service::IsStarted() const
 {
     return _llbcSvc->IsStarted();
-}
-
-csllbc_Service::Type csllbc_Service::GetType() const
-{
-    return _llbcSvc->GetType();
 }
 
 int csllbc_Service::GetId() const

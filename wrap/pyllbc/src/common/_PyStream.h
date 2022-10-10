@@ -250,15 +250,6 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str2(PyObject *self, PyObject *args
     return stream->ReadStr2();
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Str3(PyObject *self, PyObject *args)
-{
-    pyllbc_Stream *stream;
-    if (!PyArg_ParseTuple(args, "l", &stream))
-        return nullptr;
-
-    return stream->ReadStr3();
-}
-
 LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Unicode(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
@@ -526,19 +517,6 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str2(PyObject *self, PyObject *arg
         return nullptr;
 
     if (stream->WriteStr2(obj) != LLBC_OK)
-        return nullptr;
-
-    return stream->GetPyObj();
-}
-
-LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Str3(PyObject *self, PyObject *args)
-{
-    PyObject *obj;
-    pyllbc_Stream *stream;
-    if (!PyArg_ParseTuple(args, "lO", &stream, &obj))
-        return nullptr;
-
-    if (stream->WriteStr3(obj) != LLBC_OK)
         return nullptr;
 
     return stream->GetPyObj();

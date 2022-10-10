@@ -37,22 +37,12 @@ class LLBC_HIDDEN pyllbc_Service
 {
 public:
     /**
-     * The codec policy enumeration.
-     */
-    enum Codec
-    {
-        JsonCodec,
-        BinaryCodec 
-    };
-
-public:
-    /**
      * Parameter constructor.
-     * @param[in] type  - the service type, see enumeration: SvcType.
-     * @param[in] name  - the service name.
-     * @param[in] pySvc - the python layer service instance(borrow instance).
+     * @param[in] name                     - the service name.
+     * @param[in] useNormalProtocolFactory - use normal protocol facroty or raw protocol factory.
+     * @param[in] pySvc                    - the python layer service instance(borrow instance).
      */
-    pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc);
+    pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFactory, PyObject *pySvc);
     /**
      * Destructor.
      */
@@ -66,10 +56,10 @@ public:
     int GetId() const;
 
     /**
-     * Get the python service type.
-     * @return SvcType - the service type enumeration.
+     * Get the service name.
+     * @return const LLBC_String & - the service name.
      */
-    LLBC_IService::Type GetType() const;
+    const LLBC_String &GetName() const;
 
     /**
      * Get python service.
@@ -102,20 +92,6 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SuppressCoderNotFoundWarning();
-
-public:
-    /**
-     * Get service codec strategy(default is Json).
-     * @return  Codec - the codec.
-     */
-    Codec GetCodec() const;
-
-    /**
-     * Set service codec strategy(default is Json).
-     * @param[in] codec - the codec.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int SetCodec(Codec codec);
 
 public:
     /**
@@ -200,16 +176,16 @@ public:
     int AddComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
 
     /**
-     * Register codec(only available in CODEC_BINARY).
-     * @param[in] opcode - the opcode.
-     * @param[in] codec  - the codec class(not steal reference, normal).
-     *                     constraints:
-     *                      raw types(None, byte, bool, int, long, float, bytearray, buffer, str, unicode) or exist flowwow methods's cls:
-     *                          encode(self, stream): Encode data to stream.
-     *                          decode(self, stream): Decode data from stream.
+     * Register coder factory.
+     * @param[in] opcode  - the opcode.
+     * @param[in] decoder - the decoder(callable obj, not steal reference, normal).
+     *                      constraints:
+     *                       raw types(None, byte, bool, int, long, float, bytearray, buffer, str, unicode) or exist follow methods's cls:
+     *                           encode(self, stream): Encode data to stream.
+     *                           decode(self, stream): Decode data from stream.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterCodec(int opcode, PyObject *codec);
+    int AddDecoder(int opcode, PyObject *decoder);
 
 public:
     /**
@@ -376,10 +352,10 @@ public:
 private:
     /**
      * Create llbc layer service object.
-     * @param[in] svcType - the service type.
-     * @param[in] svcName - the service name.
+     * @param[in] svcName                  - the service name.
+     * @param[in] useNormalProtocolFactory - use normal protocol facroty or raw protocol factory.
      */
-    void CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName);
+    void CreateLLBCService(const LLBC_String &svcName, bool useNormalProtocolFactory);
 
     /**
      * After stop method, use to purge all python type data.
@@ -424,8 +400,8 @@ private:
 
 private:
     LLBC_IService *_llbcSvc;
-    LLBC_IService::Type _llbcSvcType;
     LLBC_String _llbcSvcName;
+    bool _useNormalProtocolFactory;
 
     PyObject *_pySvc;
 
@@ -442,9 +418,7 @@ private:
     pyllbc_PacketHandler *_unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-    Codec _codec;
-    typedef std::map<int, PyObject *> _Codecs;
-    _Codecs _codecs;
+    std::map<int, PyObject *> _decoders;
     bool _suppressedCoderNotFoundWarning;
 
     static PyObject *_pyEvCls;

@@ -79,7 +79,7 @@ namespace
 }
 
 TestCase_Comm_ProtoStackCtrl::TestCase_Comm_ProtoStackCtrl()
-: _svc(LLBC_IService::Create(LLBC_IService::Normal, "ProtoStackCtrl"))
+: _svc(LLBC_IService::Create("ProtoStackCtrl"))
 {
 }
 
