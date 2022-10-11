@@ -147,12 +147,10 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     return LLBC_OK;
 }
 
-int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
+int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
 {
     // Multi application check.
     LLBC_SetErrAndReturnIf(_thisApp != this, LLBC_ERROR_REPEAT, LLBC_FAILED);
-    // Application name check.
-    LLBC_SetErrAndReturnIf(name.empty(), LLBC_ERROR_INVALID, LLBC_FAILED);
 
     // Reentry check.
     LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_REENTRY, LLBC_FAILED);
@@ -171,8 +169,15 @@ int LLBC_Application::Start(const LLBC_String &name, int argc, char *argv[])
         LLBC_SetLastError(LLBC_OK);
     }
 
-    // Set name.
+    // Normalize application name.
     _name = name;
+    if (_name.empty())
+    {
+        _name = LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName());
+        const auto dotPos = _name.find('.');
+        if (dotPos != LLBC_String::npos && dotPos > 0)
+            _name = _name.substr(0, dotPos);
+    }
 
     // Define app start failed defer.
     LLBC_Defer(if (ret != LLBC_OK) { 

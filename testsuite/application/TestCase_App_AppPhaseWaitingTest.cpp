@@ -150,7 +150,7 @@ private:
 int TestCase_App_AppPhaseWaitingTest::Run(int argc, char *argv[])
 {
     TestApp app;
-    if (app.Start("TestApp", argc, argv) != LLBC_OK)
+    if (app.Start(argc, argv, "AppPhaseWaitingTestApp") != LLBC_OK)
     {
         fprintf(stderr, "App start failed, err:%s\n", LLBC_FormatLastError());
         return LLBC_FAILED;

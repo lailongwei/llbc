@@ -220,11 +220,12 @@ public:
 public:
     /**
      * Start application.
-     * @param[in] name - the application name.
+     * @param[in] argc - the application startup argument number.
      * @param[in] argv - the application startup arguments.
+     * @param[in] name - the application name, default is executable file name(extension splited, if has extension).
      * @return int - return 0 if start success, otherwise return -1.
      */
-    int Start(const LLBC_String &name, int argc, char *argv[]);
+    int Start(int argc, char *argv[], const LLBC_String &name = "");
 
     /**
      * Stop application.

@@ -134,7 +134,7 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 
     // Startup app object.
     std::cout <<"Start app..." <<std::endl;
-    if (app.Start("CfgTestApp", argc, argv) != LLBC_OK)
+    if (app.Start(argc, argv, "CfgTestApp") != LLBC_OK)
     {
         std::cerr <<"App start failed, err:" <<LLBC_FormatLastError() <<std::endl;
         return LLBC_FAILED;
