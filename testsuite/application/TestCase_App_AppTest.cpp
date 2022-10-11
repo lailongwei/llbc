@@ -34,7 +34,7 @@ namespace
     public:
         virtual int OnStart(int argc, char *arg[], bool &startFinished)
         {
-            LLBC_PrintLine("Application start, create new service for test");
+            LLBC_PrintLine("Application start, name:%s", GetName().c_str());
             return LLBC_OK;
         }
 
@@ -62,7 +62,7 @@ int TestCase_App_AppTest::Run(int argc, char *argv[])
     LLBC_PrintLine("Application/AppTest(Press Ctrl+C to exit):");
 
     TestApp app;
-    app.Start("TestApp", argc, argv);
+    app.Start(argc, argv);
 
     return LLBC_OK;
 }
