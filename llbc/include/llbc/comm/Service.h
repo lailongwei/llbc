@@ -523,6 +523,7 @@ private:
     void HandleEv_SubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
+    void HandleEv_AppPhaseEv(LLBC_ServiceEvent &ev);
     void HandleEv_AppCfgReload(LLBC_ServiceEvent &ev);
 
     /**
@@ -641,9 +642,9 @@ private:
     LLBC_SpinLock _readySessionInfosLock;
 
     std::vector<LLBC_Component *> _willRegComps;
-    volatile int _compsInitFinished;
+    volatile bool _compsInitFinished;
     volatile int _compsInitRet;
-    volatile int _compsStartFinished;
+    volatile bool _compsStartFinished;
     volatile int _compsStartRet;
 
     std::vector<LLBC_Component *> _compList;

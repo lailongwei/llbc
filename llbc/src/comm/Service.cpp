@@ -63,6 +63,7 @@ LLBC_Service::_EvHandler LLBC_Service::_evHandlers[LLBC_ServiceEventType::End] =
     &LLBC_Service::HandleEv_UnsubscribeEv,
     &LLBC_Service::HandleEv_FireEv,
 
+    &LLBC_Service::HandleEv_AppPhaseEv,
     &LLBC_Service::HandleEv_AppCfgReload,
 };
 
@@ -109,10 +110,10 @@ LLBC_Service::LLBC_Service(const LLBC_String &name,
 
 , _willRegComps()
 
-, _compsInitFinished(0)
-, _compsInitRet(LLBC_OK)
-, _compsStartFinished(0)
-, _compsStartRet(LLBC_OK)
+, _compsInitFinished(false)
+, _compsInitRet(LLBC_ERROR_SUCCESS)
+, _compsStartFinished(false)
+, _compsStartRet(LLBC_ERROR_SUCCESS)
 
 , _caredEventComps{}
 , _coders()
@@ -150,9 +151,6 @@ LLBC_Service::LLBC_Service(const LLBC_String &name,
     // Create protocol stack, if is null.
     if (!_dftProtocolFactory)
         _dftProtocolFactory = LLBC_New(LLBC_NormalProtocolFactory);
-
-    // Initialize cared event comps array.
-    memset(_caredEventComps, 0, sizeof(_caredEventComps));
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -341,9 +339,10 @@ int LLBC_Service::Start(int pollerCount)
             return LLBC_FAILED;
         }
 
+        _svcMgr.OnServiceStart(this);
         _lock.Unlock();
     }
-    else
+    else // Self-Drive
     {
         // Unlock first.
         _lock.Unlock();
@@ -354,7 +353,7 @@ int LLBC_Service::Start(int pollerCount)
         if (_compsInitRet != LLBC_OK)
         {
             Stop();
-            LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
+            LLBC_SetLastError(_compsInitRet);
 
             return LLBC_FAILED;
         }
@@ -365,7 +364,7 @@ int LLBC_Service::Start(int pollerCount)
         if (_compsStartRet != LLBC_OK)
         {
             Stop();
-            LLBC_SetLastError(LLBC_ERROR_COMP_START);
+            LLBC_SetLastError(_compsStartRet);
 
             return LLBC_FAILED;
         }
@@ -1336,25 +1335,21 @@ void LLBC_Service::Svc()
     InitObjectPools();
     InitTimerScheduler();
     InitAutoReleasePool();
-    _compsInitRet = InitComps();
-    _compsInitFinished = 1;
-    if (UNLIKELY(_compsInitRet != LLBC_OK))
+    if (UNLIKELY(InitComps() != LLBC_OK))
     {
         _lock.Unlock();
         return;
     }
 
-    _compsStartRet = StartComps();
-    _compsStartFinished = 1;
-    if (UNLIKELY(_compsStartRet != LLBC_OK))
+    if (UNLIKELY(StartComps() != LLBC_OK))
     {
         _lock.Unlock();
         return;
     }
-
-    _lock.Unlock();
 
     _svcMgr.OnServiceStart(this);
+
+    _lock.Unlock();
 
     while (!_stopping)
         OnSvc();
@@ -1362,6 +1357,13 @@ void LLBC_Service::Svc()
 
 void LLBC_Service::Cleanup()
 {
+    // Force handle queued events.
+    if (_started &&
+        _stopping &&
+        _compsStartFinished && 
+        _compsStartRet == LLBC_ERROR_SUCCESS)
+        HandleQueuedEvents();
+
     // Stop poller manager.
     _pollerMgr.Stop();
 
@@ -1395,10 +1397,10 @@ void LLBC_Service::Cleanup()
     // Reset some variables.
     _relaxTimes = 0;
 
-    _compsInitFinished = 0;
-    _compsInitRet = LLBC_OK;
-    _compsStartFinished = 0;
-    _compsStartRet = LLBC_OK;
+    _compsInitFinished = false;
+    _compsInitRet = LLBC_ERROR_SUCCESS;
+    _compsStartFinished = false;
+    _compsStartRet = LLBC_ERROR_SUCCESS;
 
     _started = false;
     _stopping = false;
@@ -1793,6 +1795,32 @@ void LLBC_Service::HandleEv_FireEv(LLBC_ServiceEvent &_)
     ev.ev = nullptr;
 }
 
+void LLBC_Service::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
+{
+    typedef LLBC_SvcEv_AppPhaseEv _Ev;
+    auto &ev = static_cast<_Ev &>(_);
+    if (ev.willStart)
+    {
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStart])
+            comp->OnApplicationWillStart();
+    }
+    else if (ev.startFail)
+    {
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFail])
+            comp->OnApplicationStartFail();
+    }
+    else if (ev.startFinish)
+    {
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFinish])
+            comp->OnApplicationStartFinish();
+    }
+    else if (ev.willStop)
+    {
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStop])
+            comp->OnApplicationWillStop();
+    }
+}
+
 void LLBC_Service::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 {
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
@@ -1809,24 +1837,39 @@ void LLBC_Service::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 int LLBC_Service::InitComps()
 {
     _initingComp = true;
+    LLBC_Defer(_initingComp = false);
 
-    bool initSuccess = true;
+    _compsInitRet = LLBC_ERROR_SUCCESS;
     for (auto &willRegComp : _willRegComps)
     {
+        // Set service to comp & add to service's comps dict.
         willRegComp->SetService(this);
         AddComp(willRegComp);
 
+        // If inited, continue.
+        if (willRegComp->_inited)
+            continue;
+
+        // If comp uncare <OnInitialize> event, set to inited, and than continue.
         if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize))
         {
             willRegComp->_inited = true;
             continue;
         }
 
+        // Init comp.
         while (true)
         {
             bool initFinished = true;
+            LLBC_SetLastError(LLBC_ERROR_SUCCESS);
             if (!willRegComp->OnInitialize(initFinished))
+            {
+                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+                    LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
+                _compsInitRet = LLBC_GetLastError();
+
                 break;
+            }
 
             if (initFinished)
             {
@@ -1840,24 +1883,32 @@ int LLBC_Service::InitComps()
         if (!willRegComp->_inited)
         {
             ClearCompsWhenInitCompFailed();
-            initSuccess = false;
-
-            LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
-
             break;
         }
     }
 
-    if (initSuccess)
-        _willRegComps.clear();
+    _willRegComps.clear();
 
-    _initingComp = false;
+    LLBC_SetLastError(_compsInitRet);
+    _compsInitFinished = true;
 
-    return initSuccess ? LLBC_OK : LLBC_FAILED;
+    return _compsInitRet == LLBC_ERROR_SUCCESS ? LLBC_OK : LLBC_FAILED;
 }
 
 int LLBC_Service::StartComps()
 {
+    auto updateStartedComps = [this](size_t toCompIdx) {
+        for (size_t upCompIdx = 0; upCompIdx < toCompIdx; ++upCompIdx)
+        {
+            auto &upComp = _compList[upCompIdx];
+            if (upComp->_started &&
+                upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                upComp->OnUpdate();
+        }
+    };
+
+    _compsStartRet = LLBC_ERROR_SUCCESS;
+
     size_t compIdx = 0;
     const size_t compsSize = _compList.size();
     for (; compIdx < compsSize; ++compIdx)
@@ -1866,56 +1917,105 @@ int LLBC_Service::StartComps()
         if (comp->_started)
             continue;
 
+        // Call component OnStart() event method.
         if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnStart))
         {
             comp->_started = true;
-            continue;
         }
-
-        while (true)
+        else
         {
-            bool startFinished = true;
-            if (!comp->OnStart(startFinished))
-                break;
-
-            if (startFinished)
+            while (true)
             {
-                comp->_started = true;
-                break;
-            }
+                bool startFinished = true;
+                LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+                if (!comp->OnStart(startFinished))
+                {
+                    if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+                        LLBC_SetLastError(LLBC_ERROR_COMP_START);
+                    _compsStartRet = LLBC_GetLastError();
+                    break;
+                }
+                else if (startFinished)
+                {
+                    comp->_started = true;
+                    break;
+                }
 
-            for (size_t upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
-            {
-                auto &upComp = _compList[upCompIdx];
-                if (upComp->_started &&
-                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
-                    upComp->OnUpdate();
+                updateStartedComps(compIdx);
+                LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
             }
-
-            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         }
 
+        // If comp start failed, stop all comps stop process.
         if (!comp->_started)
             break;
+
+        // Call component OnStartFinish() event method.
+        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStartFinish))
+        {
+            while (true)
+            {
+                bool canPassStartFinish = true;
+                comp->OnStartFinish(canPassStartFinish);
+                if (canPassStartFinish)
+                    break;
+
+                updateStartedComps(compIdx);
+                LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
+            }
+        }
     }
 
     if (compIdx == compsSize)
-        return LLBC_OK;
+    {
+        _compsStartRet = LLBC_OK;
+    }
+    else
+    {
+        StopComps();
+        LLBC_SetLastError(_compsStartRet);
+    }
 
-    StopComps();
-    LLBC_SetLastError(LLBC_ERROR_COMP_START);
+    LLBC_SetLastError(_compsStartRet);
+    _compsStartFinished = true;
 
-    return LLBC_FAILED;
+    return _compsStartRet == LLBC_ERROR_SUCCESS ? LLBC_OK : LLBC_FAILED;
 }
 
 void LLBC_Service::StopComps()
 {
+    auto updateStartedComps = [this](int toCompIdx) {
+        for (int upCompIdx = 0; upCompIdx < toCompIdx; ++upCompIdx)
+        {
+            auto &upComp = _compList[upCompIdx];
+            if (upComp->_started &&
+                upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
+                upComp->OnUpdate();
+        }
+    };
+
     for (int compIdx = static_cast<int>(_compList.size()) - 1; compIdx >= 0; --compIdx)
     {
         auto &comp = _compList[compIdx];
         if (!comp->_started)
             continue;
 
+        // Call comp OnWillStop() event method.
+        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnWillStop))
+        {
+            while (true)
+            {
+                bool canPassWillStop = true;
+                comp->OnWillStop(canPassWillStop);
+                if (canPassWillStop)
+                    break;
+
+                updateStartedComps(compIdx);
+                LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+            }
+        }
+
+        // Call comp OnStop() event method.
         if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnStop))
         {
             comp->_started = false;
@@ -1932,14 +2032,7 @@ void LLBC_Service::StopComps()
                 break;
             }
 
-            for (int upCompIdx = 0; upCompIdx < compIdx; ++upCompIdx)
-            {
-                auto &upComp = _compList[upCompIdx];
-                if (upComp->_started &&
-                    upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
-                    upComp->OnUpdate();
-            }
-
+            updateStartedComps(compIdx);
             LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
         }
     }

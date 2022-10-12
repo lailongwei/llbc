@@ -41,6 +41,8 @@ public:
         OnDestroy,
 
         OnStart,
+        OnStartFinish,
+        OnWillStop,
         OnStop,
 
         OnUpdate,
@@ -52,6 +54,13 @@ public:
         OnProtoReport,
         OnUnHandledPacket,
 
+        OnApplicationWillStart,
+        OnApplicationStartFail,
+        OnApplicationStartFinish,
+        OnApplicationWillStop,
+        // OnApplicationStopFinish, // Note: 
+                                    //       When application stop finished, all service(s) and it's component(s) 
+                                    //       has been deleted, so this event index will not define.
         OnApplicationConfigReload,
 
         End,
@@ -68,6 +77,8 @@ public:
     static constexpr uint64 OnDestroy = 1 << LLBC_ComponentEventIndex::OnDestroy;
     
     static constexpr uint64 OnStart = 1 << LLBC_ComponentEventIndex::OnStart;
+    static constexpr uint64 OnStartFinish = 1 << LLBC_ComponentEventIndex::OnStartFinish;
+    static constexpr uint64 OnWillStop = 1 << LLBC_ComponentEventIndex::OnWillStop;
     static constexpr uint64 OnStop = 1 << LLBC_ComponentEventIndex::OnStop;
 
     static constexpr uint64 OnUpdate = 1 << LLBC_ComponentEventIndex::OnUpdate;
@@ -78,6 +89,11 @@ public:
     static constexpr uint64 OnAsyncConnResult = 1 << LLBC_ComponentEventIndex::OnAsyncConnResult;
     static constexpr uint64 OnProtoReport = 1 << LLBC_ComponentEventIndex::OnProtoReport;
     static constexpr uint64 OnUnHandledPacket = 1 << LLBC_ComponentEventIndex::OnUnHandledPacket;
+
+    static constexpr uint64 OnApplicationWillStart = 1 << LLBC_ComponentEventIndex::OnApplicationWillStart;
+    static constexpr uint64 OnApplicationStartFail = 1 << LLBC_ComponentEventIndex::OnApplicationStartFail;
+    static constexpr uint64 OnApplicationStartFinish = 1 << LLBC_ComponentEventIndex::OnApplicationStartFinish;
+    static constexpr uint64 OnApplicationWillStop = 1 << LLBC_ComponentEventIndex::OnApplicationWillStop;
     static constexpr uint64 OnApplicationConfigReload = 1 << LLBC_ComponentEventIndex::OnApplicationConfigReload;
 
 public:

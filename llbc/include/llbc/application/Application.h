@@ -354,6 +354,12 @@ private:
     static void HandleSignal_Stop(int sig);
     static void HandleSignal_ReloadAppCfg(int sig);
 
+private:
+    void FireAppPhaseChangeEvToServices(bool willStart,
+                                        bool startFail,
+                                        bool startFinish,
+                                        bool willStop);
+
 protected:
     LLBC_String _name;
     LLBC_ApplicationStartPhase::ENUM _startPhase;

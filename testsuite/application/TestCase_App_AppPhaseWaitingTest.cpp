@@ -54,7 +54,6 @@ public:
             finFlag = true;
             fprintf(stdout, "%s %s %s finished\n", operatorType, name.c_str(), phaseStr);
         }
- 
     }
 };
 
@@ -63,8 +62,8 @@ class TestCompBase : public LLBC_Component
 public:
     TestCompBase()
     {
-        _initWaitTime = _destroyWaitTime = LLBC_TimeSpan::FromSeconds(5);
-        _startWaitTime = _stopWaitTime = LLBC_TimeSpan::FromSeconds(5);
+        _initWaitTime = _destroyWaitTime = LLBC_TimeSpan::FromSeconds(3);
+        _startWaitTime = _startFinishWaitTime = _willStopWaitTime = _stopWaitTime = LLBC_TimeSpan::FromSeconds(2);
     }
 
     virtual ~TestCompBase() = default;
@@ -72,32 +71,62 @@ public:
 public:
     virtual bool OnInitialize(bool &initFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(this), "init", _initTime, _initWaitTime, initFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "init", _initTime, _initWaitTime, initFinished);
         return true;
     }
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(this), "destroy", _destroyTime, _destroyWaitTime, destroyFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "destroy", _destroyTime, _destroyWaitTime, destroyFinished);
     }
 
     virtual bool OnStart(bool &startFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(this), "start", _startTime, _startWaitTime, startFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "start", _startTime, _startWaitTime, startFinished);
         return true;
+    }
+
+    virtual void OnStartFinish(bool &canPass)
+    {
+        TestWaiter()(false, LLBC_GetTypeName(*this), "start-finish", _startFinishTime, _startFinishWaitTime, canPass);
+    }
+
+    virtual void OnWillStop(bool &willStopFinish)
+    {
+        TestWaiter()(false, LLBC_GetTypeName(*this), "will-stop", _willStopTime, _willStopWaitTime, willStopFinish);
     }
 
     virtual void OnStop(bool &stopFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(this), "stop", _stopTime, _stopWaitTime, stopFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "stop", _stopTime, _stopWaitTime, stopFinished);
+    }
+
+    virtual void OnApplicationWillStart()
+    {
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationWillStart()..." << std::endl;
+    }
+
+    virtual void OnApplicationStartFail()
+    {
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationStartFail()..." << std::endl;
+    }
+
+    virtual void OnApplicationStartFinish()
+    {
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationStartFinish()..." << std::endl;
+    }
+
+    virtual void OnApplicationWillStop()
+    {
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationWillStop()..." << std::endl;
     }
 
 private:
     LLBC_Time _initTime, _destroyTime;
-    LLBC_Time _startTime, _stopTime;
+    LLBC_Time _startTime, _startFinishTime, _willStopTime, _stopTime;
 
     LLBC_TimeSpan _initWaitTime, _destroyWaitTime;
-    LLBC_TimeSpan _startWaitTime, _stopWaitTime;
+    LLBC_TimeSpan _startWaitTime, _startFinishWaitTime, _willStopWaitTime, _stopWaitTime;
 };
 
 class TestCompA : public TestCompBase
