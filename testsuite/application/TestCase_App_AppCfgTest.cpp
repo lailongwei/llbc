@@ -139,7 +139,6 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
         std::cerr <<"App start failed, err:" <<LLBC_FormatLastError() <<std::endl;
         return LLBC_FAILED;
     }
-    std::cout <<"App start finished" <<std::endl;
 
     return LLBC_OK;
 }
