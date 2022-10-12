@@ -23,6 +23,7 @@
 #ifdef __LLBC_CORE_UTILS_UTIL_DEBUG_H__
 
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/time/Common.h"
 
 __LLBC_NS_BEGIN
 

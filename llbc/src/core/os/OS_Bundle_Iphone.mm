@@ -8,7 +8,6 @@
  */
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Bundle.h"
 
@@ -138,6 +137,4 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &n
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_IPHONE
-
-#include "llbc/common/AfterIncl.h"
 
