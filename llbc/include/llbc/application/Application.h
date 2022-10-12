@@ -102,6 +102,23 @@ struct LLBC_ApplicationEvent
 };
 
 /**
+ * \brief The application start phase encapsulation.
+ */
+class LLBC_ApplicationStartPhase
+{
+public:
+    enum ENUM
+    {
+        Stopped, // Application stopped.
+        Starting, // Application starting.
+        Started, // Application started.
+        Stopping, // Application stopping.
+
+        End,
+    };
+};
+
+/**
  * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
@@ -233,9 +250,18 @@ public:
     void Stop();
 
     /**
-     * Check application started or not.
+     * Check application start phase.
      */
+    bool IsStarting() const;
     bool IsStarted() const;
+    bool IsStopping() const;
+    bool IsStopped() const;
+
+    /**
+     * Get application start phase.
+     * @return int - the application start phase.
+     */
+    int GetStartPhase() const;
 
 public:
     /**
@@ -330,10 +356,11 @@ private:
 
 protected:
     LLBC_String _name;
-    LLBC_SpinLock _cfgLock;
+    LLBC_ApplicationStartPhase::ENUM _startPhase;
 
     bool _llbcLibStartupInApp;
 
+    LLBC_SpinLock _cfgLock;
     volatile bool _loadingCfg;
     LLBC_Property _propCfg;
     LLBC_Variant _nonPropCfg;

@@ -67,6 +67,7 @@ LLBC_Application *LLBC_Application::_thisApp = nullptr;
 
 LLBC_Application::LLBC_Application()
 : _name()
+, _startPhase(LLBC_ApplicationStartPhase::Stopped)
 
 , _llbcLibStartupInApp(false)
 
@@ -153,7 +154,7 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
     LLBC_SetErrAndReturnIf(_thisApp != this, LLBC_ERROR_REPEAT, LLBC_FAILED);
 
     // Reentry check.
-    LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_REENTRY, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(!IsStopped(), LLBC_ERROR_REENTRY, LLBC_FAILED);
 
     // Parse startup arguments.
     LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
@@ -189,7 +190,17 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
         _name.clear();
 
         LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
+
+        _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+
+        _startPhase = LLBC_ApplicationStartPhase::Stopped;
     });
+
+    // Set start phase to starting.
+    _startPhase = LLBC_ApplicationStartPhase::Starting;
+
+    // Set start threadId.
+    _startThreadId = LLBC_GetCurrentThreadId();
 
     // Locate config path.
     if (_cfgPath.empty())
@@ -254,8 +265,9 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
         LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
     }
 
-    // Mark started.
-    _startThreadId = LLBC_GetCurrentThreadId();
+    // Update start phase to Started.
+    _startPhase = LLBC_ApplicationStartPhase::Started;
+
     // Call OnStartFinish event method.
     OnStartFinish(argc, argv);
 
@@ -298,8 +310,8 @@ void LLBC_Application::Stop()
         return;
     }
 
-    // Mask stopped.
-    _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    // Set start phase to Stopping.
+    _startPhase = LLBC_ApplicationStartPhase::Stopping;
 
     // Call OnWillStop event method.
     OnWillStop();
@@ -316,6 +328,9 @@ void LLBC_Application::Stop()
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
     }
+
+    // Set phase to Stopped.
+    _startPhase = LLBC_ApplicationStartPhase::Stopped;
 
     // Call OnStopFinish event method.
     OnStopFinish();
@@ -343,6 +358,8 @@ void LLBC_Application::Stop()
     _cfgType = LLBC_ApplicationConfigType::End;
     _propCfg.RemoveAllProperties();
     _nonPropCfg.BecomeNil();
+
+    _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 
     for (auto &events : _events)
         LLBC_STLHelper::RecycleContainer(events);
