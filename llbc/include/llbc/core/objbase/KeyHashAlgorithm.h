@@ -161,14 +161,14 @@ private:
     LLBC_DISABLE_ASSIGNMENT(__LLBC_Hash);
 
 private:
-    const _BKDRHash _bkdrHash;
-    const _DJBHash _djbHash;
-    const _SDBMHash _sdbmHash;
-    const _RSHash _rsHash;
-    const _JSHash _jsHash;
-    const _PJHash _pjHash;
-    const _ELFHash _elfHash;
-    const _APHash _apHash;
+    const _BKDRHash _bkdrHash{};
+    const _DJBHash _djbHash{};
+    const _SDBMHash _sdbmHash{};
+    const _RSHash _rsHash{};
+    const _JSHash _jsHash{};
+    const _PJHash _pjHash{};
+    const _ELFHash _elfHash{};
+    const _APHash _apHash{};
 };
 
 __LLBC_NS_END

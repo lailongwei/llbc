@@ -275,9 +275,12 @@ void LLBC_Logger::Finalize()
     _config = nullptr;
     _logLevel = LLBC_LogLevel::Begin;
 
+#if LLBC_SUPPORT_RDTSC
     _nowTime = 0;
     _lastGetTimeCPUTime = 0;
     _oneMilliSecCPUTime = 0;
+#endif // Supp rdtsc
+    
 }
 
 const LLBC_String &LLBC_Logger::GetLoggerName() const

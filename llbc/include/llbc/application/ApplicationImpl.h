@@ -89,9 +89,29 @@ inline const LLBC_String &LLBC_Application::GetConfigPath() const
     return _cfgPath;
 }
 
+inline bool LLBC_Application::IsStopped() const
+{
+    return _startPhase == LLBC_ApplicationStartPhase::Stopped;
+}
+
+inline bool LLBC_Application::IsStarting() const
+{
+    return _startPhase == LLBC_ApplicationStartPhase::Starting;
+}
+
 inline bool LLBC_Application::IsStarted() const
 {
-    return _startThreadId != LLBC_INVALID_NATIVE_THREAD_ID;
+    return _startPhase == LLBC_ApplicationStartPhase::Started;
+}
+
+inline bool LLBC_Application::IsStopping() const
+{
+    return _startPhase == LLBC_ApplicationStartPhase::Stopping;
+}
+
+inline int LLBC_Application::GetStartPhase() const
+{
+    return _startPhase;
 }
 
 inline int LLBC_Application::PushEvent(int evType)
