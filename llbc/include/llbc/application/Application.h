@@ -109,7 +109,8 @@ class LLBC_ApplicationStartPhase
 public:
     enum ENUM
     {
-        Stopped, // Application stopped.
+        Begin = 0,
+        Stopped = Begin, // Application stopped.
         Starting, // Application starting.
         Started, // Application started.
         Stopping, // Application stopping.
