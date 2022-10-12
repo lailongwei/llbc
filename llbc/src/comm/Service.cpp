@@ -694,11 +694,17 @@ int LLBC_Service::AddComponent(LLBC_Component *comp)
 
     if (std::find_if(_willRegComps.begin(), _willRegComps.end(), [comp, compName, compNameLen](LLBC_Component *regComp) {
         if (comp == regComp)
+        {
             return true;
+        }
 
+        if(typeid(comp) == typeid(regComp))
+        {
+            return true;
+        }
+        
         const char *regCompName = LLBC_GetTypeName(*regComp);
-        return (strlen(regCompName) == compNameLen &&
-                memcmp(compName, regCompName, compNameLen) == 0);
+        return strlen(regCompName) == compNameLen && memcmp(compName, regCompName, compNameLen) == 0;
     }) != _willRegComps.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
@@ -816,6 +822,18 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
         (it = _name2Comps.find(__compInterfaceNameKey)) != _name2Comps.end())
         return it->second;
 
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+    return nullptr;
+}
+
+LLBC_Component *LLBC_Service::GetComponent(const std::type_index &compType)
+{
+    LLBC_LockGuard guard(_lock);
+    
+    auto it = _type2Comps.find(compType);
+    if(it != _type2Comps.end())
+        return it->second;
+    
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
     return nullptr;
 }
@@ -2005,6 +2023,7 @@ void LLBC_Service::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
     _name2Comps.emplace(LLBC_GetTypeName(*comp), comp);
+    _type2Comps.emplace(typeid(comp), comp);
 
     AddCompToCaredEventsArray(comp);
 }

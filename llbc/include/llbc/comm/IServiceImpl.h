@@ -84,7 +84,8 @@ template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
 LLBC_IService::GetComponent()
 {
-    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+    auto* comp = GetComponent(typeid(Comp));
+    return comp == nullptr ? GetComponent(LLBC_GetTypeName(Comp)) : comp;
 }
 
 inline LLBC_Component *LLBC_IService::GetComponent(const LLBC_String &compName)

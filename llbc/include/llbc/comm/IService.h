@@ -404,6 +404,7 @@ public:
     LLBC_Component *GetComponent(const LLBC_String &compName);
     LLBC_Component *GetComponent(const std::string &compName);
     virtual LLBC_Component *GetComponent(const char *compName) = 0;
+    virtual LLBC_Component *GetComponent(const std::type_index &compType) = 0;
 
 public:
     /**

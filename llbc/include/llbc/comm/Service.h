@@ -308,10 +308,15 @@ public:
     virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp);
 
     /**
-     * Get component/componemts.
+     * Get component.
      */
     virtual LLBC_Component *GetComponent(const char *compName);
 
+    /**
+     * Get component.
+     */
+    virtual LLBC_Component *GetComponent(const std::type_index &compType);
+ 
 public:
     /**
      * Add coder factory.
@@ -648,6 +653,7 @@ private:
 
     std::vector<LLBC_Component *> _compList;
     std::map<LLBC_String, LLBC_Component *> _name2Comps;
+    std::map<std::type_index, LLBC_Component *> _type2Comps;
     std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
     std::map<LLBC_String, LLBC_Library *> _compLibraries;
     std::map<int, LLBC_CoderFactory *> _coders;
