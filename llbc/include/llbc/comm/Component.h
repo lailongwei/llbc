@@ -405,6 +405,18 @@ public:
 
 public:
     /**
+     * Check component inited or not.
+     * @return bool - init flag.
+     */
+    bool IsInited() const;
+
+    /**
+     * Check component started or not.
+     * @return bool - start flag.
+     */
+    bool IsStarted() const;
+
+    /**
      * Get service.
      * @return LLBC_IService * - service object.
      */
