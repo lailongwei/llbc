@@ -108,6 +108,15 @@ inline LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
 {
 }
 
+inline LLBC_SvcEv_AppPhaseEv::LLBC_SvcEv_AppPhaseEv()
+: LLBC_ServiceEvent(LLBC_ServiceEventType::AppPhaseEv)
+, willStart(false)
+, startFail(false)
+, startFinish(false)
+, willStop(false)
+{
+}
+
 inline LLBC_SvcEv_AppCfgReloadedEv::LLBC_SvcEv_AppCfgReloadedEv()
 : LLBC_ServiceEvent(LLBC_ServiceEventType::AppCfgReloaded)
 {

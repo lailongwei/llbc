@@ -25,6 +25,7 @@
 #include <signal.h>
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
+#include "llbc/comm/ServiceEvent.h"
 #include "llbc/application/Application.h"
 
 __LLBC_INTERNAL_NS_BEGIN
@@ -245,8 +246,12 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
     {
         if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
             LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+
         return LLBC_FAILED;
     }
+
+    // Fire App-WillStart event to all service(s).
+    FireAppPhaseChangeEvToServices(true, false, false, false);
 
     // Call OnStart event method.
     while (true)
@@ -258,6 +263,10 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
         {
             if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
                 LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+
+            // Fire App-StartFail event to all service(s).
+            FireAppPhaseChangeEvToServices(false, true, false, false);
+
             return LLBC_FAILED;
         }
 
@@ -270,6 +279,9 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
 
     // Call OnStartFinish event method.
     OnStartFinish(argc, argv);
+
+    // Fire App-StartFinish event to all service(s).
+    FireAppPhaseChangeEvToServices(false, false, true, false);
 
     // Enter app loop.
     while (true)
@@ -315,6 +327,9 @@ void LLBC_Application::Stop()
 
     // Call OnWillStop event method.
     OnWillStop();
+
+    // Fire App-WillStop event to all service(s).
+    FireAppPhaseChangeEvToServices(false, false, false, true);
 
     // Stop all services.
     _services.StopAll(true);
@@ -592,6 +607,16 @@ void LLBC_Application::HandleSignal_Stop(int sig)
 void LLBC_Application::HandleSignal_ReloadAppCfg(int sig)
 {
     ThisApp()->PushEvent(LLBC_ApplicationEventType::ReloadApplicationConfig);
+}
+
+void LLBC_Application::FireAppPhaseChangeEvToServices(bool willStart,
+                                                      bool startFail,
+                                                      bool startFinish,
+                                                      bool willStop)
+{
+    for (auto svcItem : _services.GetAllIndexedByIdServices())
+        svcItem.second->Push(
+            LLBC_SvcEvUtil::BuildAppPhaseEv(willStart, startFail, startFinish, willStop));
 }
 
 __LLBC_NS_END

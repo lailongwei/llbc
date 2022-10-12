@@ -470,22 +470,33 @@ public:
     /**
      * When service start and not not init component before, will call then event handler.
      */
-    virtual bool OnInitialize(bool &initFinished);
+    virtual bool OnInitialize(bool &finished);
 
     /**
      * When service destroy, will call this event handler.
      */
-    virtual void OnDestroy(bool &destroyFinished);
+    virtual void OnDestroy(bool &finished);
 
+public:
     /**
      * When service start, will call this event handler.
      */
-    virtual bool OnStart(bool &startFinished);
+    virtual bool OnStart(bool &finished);
+
+    /**
+     * When service start finish, will call this event handler.
+     */
+    virtual void OnStartFinish(bool &finished);
+
+    /**
+     * When service will stop, will call this event handler.
+     */
+    virtual void OnWillStop(bool &finished);
 
     /**
      * When service stop, will call this event handler.
      */
-    virtual void OnStop(bool &stopFinished);
+    virtual void OnStop(bool &finished);
 
 public:
     /**
@@ -500,6 +511,14 @@ public:
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
 public:
+    /**
+     * Application phase change event handler, when application start phase changed, will call these event handlers.
+     */
+    virtual void OnApplicationWillStart();
+    virtual void OnApplicationStartFail();
+    virtual void OnApplicationStartFinish();
+    virtual void OnApplicationWillStop();
+
     /**
      * When application config reload, will call this event handler.
      */

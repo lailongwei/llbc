@@ -142,21 +142,29 @@ inline int LLBC_Component::CallMethod(const char *methName, const LLBC_Variant &
     return _meths->CallMethod(methName, arg, ret);
 }
 
-inline bool LLBC_Component::OnInitialize(bool &initFinished)
+inline bool LLBC_Component::OnInitialize(bool &finished)
 {
     return true;
 }
 
-inline void LLBC_Component::OnDestroy(bool &destroyFinished)
+inline void LLBC_Component::OnDestroy(bool &finished)
 {
 }
 
-inline bool LLBC_Component::OnStart(bool &startFinished)
+inline bool LLBC_Component::OnStart(bool &finished)
 {
     return true;
 }
 
-inline void LLBC_Component::OnStop(bool &stopFinished)
+inline void LLBC_Component::OnStartFinish(bool &finished)
+{
+}
+
+inline void LLBC_Component::OnWillStop(bool &finished)
+{
+}
+
+inline void LLBC_Component::OnStop(bool &finished)
 {
 }
 
@@ -165,6 +173,22 @@ inline void LLBC_Component::OnUpdate()
 }
 
 inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
+{
+}
+
+inline void LLBC_Component::OnApplicationWillStart()
+{
+}
+
+inline void LLBC_Component::OnApplicationStartFail()
+{
+}
+
+inline void LLBC_Component::OnApplicationStartFinish()
+{
+}
+
+inline void LLBC_Component::OnApplicationWillStop()
 {
 }
 

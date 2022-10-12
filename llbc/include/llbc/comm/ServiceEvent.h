@@ -56,6 +56,7 @@ public:
         UnsubscribeEv,
         FireEv,
 
+        AppPhaseEv,
         AppCfgReloaded,
 
         End
@@ -183,6 +184,19 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 };
 
 /**
+ * \brief The application phase event structure encapsulation.
+ */
+struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
+{
+    bool willStart;
+    bool startFail;
+    bool startFinish;
+    bool willStop;
+
+    LLBC_SvcEv_AppPhaseEv();
+};
+
+/**
  * \brief The application config reloaded event structure encapsulation.
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
@@ -258,6 +272,14 @@ public:
      */
     static LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev,
                                                const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
+
+    /**
+     * Build application phase event.
+     */
+    static LLBC_MessageBlock *BuildAppPhaseEv(bool willStart,
+                                              bool startFail,
+                                              bool startFinish,
+                                              bool willStop);
 
     /**
      * Build application config reload event.

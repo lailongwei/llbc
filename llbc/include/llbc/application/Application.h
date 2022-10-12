@@ -109,7 +109,8 @@ class LLBC_ApplicationStartPhase
 public:
     enum ENUM
     {
-        Stopped, // Application stopped.
+        Begin = 0,
+        Stopped = Begin, // Application stopped.
         Starting, // Application starting.
         Started, // Application started.
         Stopping, // Application stopping.
@@ -353,6 +354,12 @@ private:
 
     static void HandleSignal_Stop(int sig);
     static void HandleSignal_ReloadAppCfg(int sig);
+
+private:
+    void FireAppPhaseChangeEvToServices(bool willStart,
+                                        bool startFail,
+                                        bool startFinish,
+                                        bool willStop);
 
 protected:
     LLBC_String _name;
