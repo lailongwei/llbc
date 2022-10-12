@@ -76,6 +76,16 @@ inline int LLBC_ComponentMethods::CallMethod(const char *methName, const LLBC_Va
     return meth(arg, ret);
 }
 
+inline bool LLBC_Component::IsInited() const
+{
+    return _inited;
+}
+
+inline bool LLBC_Component::IsStarted() const
+{
+    return _started;
+}
+
 inline LLBC_IService *LLBC_Component::GetService() const
 {
     return _svc;
