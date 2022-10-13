@@ -164,17 +164,17 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEventEv(LLBC_Event *ev,
     return evBlock;
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppPhaseEv(bool willStart,
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppPhaseEv(bool earlyStart,
                                                    bool startFail,
                                                    bool startFinish,
-                                                   bool willStop)
+                                                   bool earlyStop)
 {
     LLBC_SvcEv_AppPhaseEv *wrapEv;
     auto evBlock = __CreateEvBlock(wrapEv);
-    wrapEv->willStart = willStart;
+    wrapEv->earlyStart = earlyStart;
     wrapEv->startFail = startFail;
     wrapEv->startFinish = startFinish;
-    wrapEv->willStop = willStop;
+    wrapEv->earlyStop = earlyStop;
 
     return evBlock;
 }

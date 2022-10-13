@@ -63,7 +63,7 @@ public:
     TestCompBase()
     {
         _initWaitTime = _destroyWaitTime = LLBC_TimeSpan::FromSeconds(3);
-        _startWaitTime = _startFinishWaitTime = _willStopWaitTime = _stopWaitTime = LLBC_TimeSpan::FromSeconds(2);
+        _startWaitTime = _lateStartWaitTime = _earlyStopWaitTime = _stopWaitTime = LLBC_TimeSpan::FromSeconds(2);
     }
 
     virtual ~TestCompBase() = default;
@@ -86,14 +86,14 @@ public:
         return true;
     }
 
-    virtual void OnStartFinish(bool &canPass)
+    virtual void OnLateStart(bool &lateStartFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "start-finish", _startFinishTime, _startFinishWaitTime, canPass);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "late-start", _lateStartTime, _lateStartWaitTime, lateStartFinished);
     }
 
-    virtual void OnWillStop(bool &willStopFinish)
+    virtual void OnEarlyStop(bool &earlyStopFinished)
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "will-stop", _willStopTime, _willStopWaitTime, willStopFinish);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "early-stop", _earlyStopTime, _earlyStopWaitTime, earlyStopFinished);
     }
 
     virtual void OnStop(bool &stopFinished)
@@ -101,9 +101,9 @@ public:
         TestWaiter()(false, LLBC_GetTypeName(*this), "stop", _stopTime, _stopWaitTime, stopFinished);
     }
 
-    virtual void OnApplicationWillStart()
+    virtual void OnApplicationEarlyStart()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationWillStart()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationEarlyStart()..." << std::endl;
     }
 
     virtual void OnApplicationStartFail()
@@ -116,17 +116,17 @@ public:
         std::cout << LLBC_GetTypeName(*this) << ": OnApplicationStartFinish()..." << std::endl;
     }
 
-    virtual void OnApplicationWillStop()
+    virtual void OnApplicationEarlyStop()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationWillStop()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnApplicationEarlyStop()..." << std::endl;
     }
 
 private:
     LLBC_Time _initTime, _destroyTime;
-    LLBC_Time _startTime, _startFinishTime, _willStopTime, _stopTime;
+    LLBC_Time _startTime, _lateStartTime, _earlyStopTime, _stopTime;
 
     LLBC_TimeSpan _initWaitTime, _destroyWaitTime;
-    LLBC_TimeSpan _startWaitTime, _startFinishWaitTime, _willStopWaitTime, _stopWaitTime;
+    LLBC_TimeSpan _startWaitTime, _lateStartWaitTime, _earlyStopWaitTime, _stopWaitTime;
 };
 
 class TestCompA : public TestCompBase

@@ -81,10 +81,20 @@ inline int LLBC_IService::AddComponent(const LLBC_String &compSharedLibPath, con
 }
 
 template <typename Comp>
-typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value
+                        && std::is_same<LLBC_Component, Comp>::value == false,
+                        LLBC_Component *>::type
 LLBC_IService::GetComponent()
 {
-    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+    const auto &compList = GetComponentList();
+    for(auto *comp : compList)
+    {
+        if(dynamic_cast<Comp *>(comp) != nullptr)
+        {
+            return comp;
+        }
+    }
+    return GetComponent(LLBC_GetTypeName(Comp));
 }
 
 inline LLBC_Component *LLBC_IService::GetComponent(const LLBC_String &compName)

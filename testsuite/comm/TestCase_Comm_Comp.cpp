@@ -24,17 +24,27 @@
 
 namespace
 {
-    class TestComp : public LLBC_Component
+    class ITestComp : public LLBC_Component
+    {
+    public:
+        ITestComp() : LLBC_Component(LLBC_ComponentEvents::AllEvents) {}
+        virtual ~ITestComp() = default;
+    };
+    
+    class TestComp : public ITestComp
     {
     public:
         TestComp()
-        : LLBC_Component(LLBC_ComponentEvents::AllEvents)
         {
             _timer = nullptr;
         }
 
-        virtual ~TestComp()
+        virtual ~TestComp() = default;
+
+    public:
+        void OnPrint()
         {
+            LLBC_PrintLine("TestComp");
         }
 
     public:
@@ -96,9 +106,34 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual LLBC_Component *Create() const
+        virtual ITestComp *Create() const
         {
-            return LLBC_New(TestComp);
+            return new TestComp;
+        }
+    };
+
+    class IEchoComp : public LLBC_Component
+    {
+    public:
+        IEchoComp() : LLBC_Component(LLBC_ComponentEvents::AllEvents) {}
+        virtual ~IEchoComp() = default;
+    };
+
+    class EchoComp : public IEchoComp
+    {
+    public:
+        void OnPrint()
+        {
+            LLBC_PrintLine("EchoComp");
+        }
+    };
+
+    class EchoCompFactory : public LLBC_ComponentFactory
+    {
+    public:
+        virtual IEchoComp *Create() const
+        {
+            return new EchoComp;
         }
     };
 }
@@ -138,6 +173,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     LLBC_IService *svc = LLBC_IService::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
+    svc->AddComponent<EchoCompFactory>();
 
     // Try init library comp(not exist)
     const LLBC_String notExistCompName = "Not exist comp name";
@@ -167,7 +203,32 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
 
         return LLBC_FAILED;
     }
+    LLBC_PrintLine("Test componet load success.");
     LLBC_PrintLine("Call Service::Start() finished!");
+
+    auto* testComp = svc->GetComponent<ITestComp>();
+    if(testComp == nullptr)
+    {
+        LLBC_PrintLine("Test component get failed, error: %s", LLBC_FormatLastError());
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    dynamic_cast<TestComp *>(testComp)->OnPrint();
+
+    auto* echoComp = svc->GetComponent<IEchoComp>();
+    if(echoComp == nullptr)
+    {
+        LLBC_PrintLine("Echo component get failed, error: %s", LLBC_FormatLastError());
+        getchar();
+        LLBC_Delete(svc);
+
+        return LLBC_FAILED;
+    }
+    dynamic_cast<EchoComp *>(testComp)->OnPrint();
+
+    
 
     LLBC_PrintLine("Press any key to restart service(stop->start)...");
     getchar();

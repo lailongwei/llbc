@@ -166,11 +166,11 @@ inline bool LLBC_Component::OnStart(bool &finished)
     return true;
 }
 
-inline void LLBC_Component::OnStartFinish(bool &finished)
+inline void LLBC_Component::OnLateStart(bool &finished)
 {
 }
 
-inline void LLBC_Component::OnWillStop(bool &finished)
+inline void LLBC_Component::OnEarlyStop(bool &finished)
 {
 }
 
@@ -186,7 +186,7 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
-inline void LLBC_Component::OnApplicationWillStart()
+inline void LLBC_Component::OnApplicationEarlyStart()
 {
 }
 
@@ -198,7 +198,7 @@ inline void LLBC_Component::OnApplicationStartFinish()
 {
 }
 
-inline void LLBC_Component::OnApplicationWillStop()
+inline void LLBC_Component::OnApplicationEarlyStop()
 {
 }
 

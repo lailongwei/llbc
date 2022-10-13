@@ -496,14 +496,14 @@ public:
     virtual bool OnStart(bool &finished);
 
     /**
-     * When service start finish, will call this event handler.
+     * When service all components started, will call this event handler.
      */
-    virtual void OnStartFinish(bool &finished);
+    virtual void OnLateStart(bool &finished);
 
     /**
-     * When service will stop, will call this event handler.
+     * When service all component will stop, will call this event handler.
      */
-    virtual void OnWillStop(bool &finished);
+    virtual void OnEarlyStop(bool &finished);
 
     /**
      * When service stop, will call this event handler.
@@ -526,10 +526,10 @@ public:
     /**
      * Application phase change event handler, when application start phase changed, will call these event handlers.
      */
-    virtual void OnApplicationWillStart();
+    virtual void OnApplicationEarlyStart();
     virtual void OnApplicationStartFail();
     virtual void OnApplicationStartFinish();
-    virtual void OnApplicationWillStop();
+    virtual void OnApplicationEarlyStop();
 
     /**
      * When application config reload, will call this event handler.

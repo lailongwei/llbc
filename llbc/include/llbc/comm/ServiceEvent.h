@@ -188,10 +188,10 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
 {
-    bool willStart;
+    bool earlyStart;
     bool startFail;
     bool startFinish;
-    bool willStop;
+    bool earlyStop;
 
     LLBC_SvcEv_AppPhaseEv();
 };
@@ -276,10 +276,10 @@ public:
     /**
      * Build application phase event.
      */
-    static LLBC_MessageBlock *BuildAppPhaseEv(bool willStart,
+    static LLBC_MessageBlock *BuildAppPhaseEv(bool earlyStart,
                                               bool startFail,
                                               bool startFinish,
-                                              bool willStop);
+                                              bool earlyStop);
 
     /**
      * Build application config reload event.
