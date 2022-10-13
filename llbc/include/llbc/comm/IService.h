@@ -401,7 +401,7 @@ public:
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value
                             && std::is_same<LLBC_Component, Comp>::value == false,
-                            LLBC_Component *>::type
+                            Comp *>::type
     GetComponent();
     LLBC_Component *GetComponent(const LLBC_String &compName);
     LLBC_Component *GetComponent(const std::string &compName);
