@@ -308,10 +308,11 @@ public:
     virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp);
 
     /**
-     * Get component/componemts.
+     * Get component.
      */
     virtual LLBC_Component *GetComponent(const char *compName);
 
+ 
 public:
     /**
      * Add coder factory.
@@ -455,6 +456,12 @@ protected:
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
+
+protected:
+    /**
+     * Get component list.
+     */
+    virtual const std::vector<LLBC_Component *> &GetComponentList() const;
 
 protected:
     /**

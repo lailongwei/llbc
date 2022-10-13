@@ -693,11 +693,12 @@ int LLBC_Service::AddComponent(LLBC_Component *comp)
 
     if (std::find_if(_willRegComps.begin(), _willRegComps.end(), [comp, compName, compNameLen](LLBC_Component *regComp) {
         if (comp == regComp)
+        {
             return true;
-
+        }
+        
         const char *regCompName = LLBC_GetTypeName(*regComp);
-        return (strlen(regCompName) == compNameLen &&
-                memcmp(compName, regCompName, compNameLen) == 0);
+        return strlen(regCompName) == compNameLen && memcmp(compName, regCompName, compNameLen) == 0;
     }) != _willRegComps.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
@@ -818,6 +819,7 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
     return nullptr;
 }
+
 
 int LLBC_Service::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory)
 {
@@ -1207,6 +1209,11 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
 
     return CreatePackStack(sessionId, acceptSessionId,
             CreateCodecStack(sessionId, acceptSessionId, stack));
+}
+
+const std::vector<LLBC_Component *> &LLBC_Service::GetComponentList() const
+{
+    return _compList;
 }
 
 void LLBC_Service::ProcessAppConfigReload()
