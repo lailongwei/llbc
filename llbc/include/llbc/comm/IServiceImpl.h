@@ -91,9 +91,7 @@ LLBC_IService::GetComponent()
     for(auto *comp : compList)
     {
         if((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
-        {
             return castComp;
-        }
     }
 
     return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
