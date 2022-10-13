@@ -28,20 +28,20 @@ inline LLBC_ApplicationEvent::LLBC_ApplicationEvent(int evType)
 {
 }
 
-inline int LLBC_Application::OnWillStart(int argc, char *argv[])
+inline int LLBC_Application::OnEarlyStart(int argc, char *argv[])
 {
     return LLBC_OK;
 }
 
-inline void LLBC_Application::OnStartFinish(int argc, char *argv[])
+inline void LLBC_Application::OnLateStart(int argc, char *argv[])
 {
 }
 
-inline void LLBC_Application::OnWillStop()
+inline void LLBC_Application::OnEarlyStop()
 {
 }
 
-inline void LLBC_Application::OnStopFinish()
+inline void LLBC_Application::OnLateStop()
 {
 }
 

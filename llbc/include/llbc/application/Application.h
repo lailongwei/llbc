@@ -136,7 +136,7 @@ public:
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    virtual int OnWillStart(int argc, char *argv[]);
+    virtual int OnEarlyStart(int argc, char *argv[]);
 
     /**
      * Application start event method, please override this method in your project.
@@ -152,12 +152,12 @@ public:
      * @param[in] argc - the application startup arguments count.
      * @param[in] argv - the application startup arguments.
      */
-    virtual void OnStartFinish(int argc, char *argv[]);
+    virtual void OnLateStart(int argc, char *argv[]);
 
     /**
      * Application will stop event method, when application will stop, will call this event method.
      */
-    virtual void OnWillStop();
+    virtual void OnEarlyStop();
 
     /**
      * Application stop event method, please override this method in your project.
@@ -168,7 +168,7 @@ public:
     /**
      * Application stop finish event method, when application stop finish, will call this event method.
      */
-    virtual void OnStopFinish();
+    virtual void OnLateStop();
 
     /**
      * Application main-loop event method, when application running, will call this event method per-tick.
@@ -356,10 +356,10 @@ private:
     static void HandleSignal_ReloadAppCfg(int sig);
 
 private:
-    void FireAppPhaseChangeEvToServices(bool willStart,
+    void FireAppPhaseChangeEvToServices(bool earlyStart,
                                         bool startFail,
                                         bool startFinish,
-                                        bool willStop);
+                                        bool earlyStop);
 
 protected:
     LLBC_String _name;

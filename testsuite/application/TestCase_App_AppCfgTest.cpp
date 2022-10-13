@@ -40,7 +40,7 @@ public:
     }
 
 public:
-    virtual int OnWillStart(int argc, char *argv[])
+    virtual int OnEarlyStart(int argc, char *argv[])
     {
         if (HasConfig())
         {

@@ -110,10 +110,10 @@ inline LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
 
 inline LLBC_SvcEv_AppPhaseEv::LLBC_SvcEv_AppPhaseEv()
 : LLBC_ServiceEvent(LLBC_ServiceEventType::AppPhaseEv)
-, willStart(false)
+, earlyStart(false)
 , startFail(false)
 , startFinish(false)
-, willStop(false)
+, earlyStop(false)
 {
 }
 

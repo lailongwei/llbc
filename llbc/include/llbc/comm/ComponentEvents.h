@@ -41,8 +41,8 @@ public:
         OnDestroy,
 
         OnStart,
-        OnStartFinish,
-        OnWillStop,
+        OnLateStart,
+        OnEarlyStop,
         OnStop,
 
         OnUpdate,
@@ -77,8 +77,8 @@ public:
     static constexpr uint64 OnDestroy = 1 << LLBC_ComponentEventIndex::OnDestroy;
     
     static constexpr uint64 OnStart = 1 << LLBC_ComponentEventIndex::OnStart;
-    static constexpr uint64 OnStartFinish = 1 << LLBC_ComponentEventIndex::OnStartFinish;
-    static constexpr uint64 OnWillStop = 1 << LLBC_ComponentEventIndex::OnWillStop;
+    static constexpr uint64 OnLateStart = 1 << LLBC_ComponentEventIndex::OnLateStart;
+    static constexpr uint64 OnEarlyStop = 1 << LLBC_ComponentEventIndex::OnEarlyStop;
     static constexpr uint64 OnStop = 1 << LLBC_ComponentEventIndex::OnStop;
 
     static constexpr uint64 OnUpdate = 1 << LLBC_ComponentEventIndex::OnUpdate;
