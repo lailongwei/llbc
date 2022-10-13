@@ -697,11 +697,6 @@ int LLBC_Service::AddComponent(LLBC_Component *comp)
         {
             return true;
         }
-
-        if(typeid(comp) == typeid(regComp))
-        {
-            return true;
-        }
         
         const char *regCompName = LLBC_GetTypeName(*regComp);
         return strlen(regCompName) == compNameLen && memcmp(compName, regCompName, compNameLen) == 0;
@@ -826,17 +821,6 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
     return nullptr;
 }
 
-LLBC_Component *LLBC_Service::GetComponent(const std::type_index &compType)
-{
-    LLBC_LockGuard guard(_lock);
-    
-    auto it = _type2Comps.find(compType);
-    if(it != _type2Comps.end())
-        return it->second;
-    
-    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-    return nullptr;
-}
 
 int LLBC_Service::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory)
 {
@@ -1226,6 +1210,11 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
 
     return CreatePackStack(sessionId, acceptSessionId,
             CreateCodecStack(sessionId, acceptSessionId, stack));
+}
+
+const std::vector<LLBC_Component *> &LLBC_Service::GetComponentList()
+{
+    return _compList;
 }
 
 void LLBC_Service::ProcessAppConfigReload()
@@ -2023,7 +2012,6 @@ void LLBC_Service::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
     _name2Comps.emplace(LLBC_GetTypeName(*comp), comp);
-    _type2Comps.emplace(typeid(comp), comp);
 
     AddCompToCaredEventsArray(comp);
 }

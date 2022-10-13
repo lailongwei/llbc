@@ -312,10 +312,6 @@ public:
      */
     virtual LLBC_Component *GetComponent(const char *compName);
 
-    /**
-     * Get component.
-     */
-    virtual LLBC_Component *GetComponent(const std::type_index &compType);
  
 public:
     /**
@@ -460,6 +456,12 @@ protected:
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
+
+protected:
+    /**
+     * Get component list.
+     */
+    virtual const std::vector<LLBC_Component *> &GetComponentList();
 
 protected:
     /**
@@ -653,7 +655,6 @@ private:
 
     std::vector<LLBC_Component *> _compList;
     std::map<LLBC_String, LLBC_Component *> _name2Comps;
-    std::map<std::type_index, LLBC_Component *> _type2Comps;
     std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
     std::map<LLBC_String, LLBC_Library *> _compLibraries;
     std::map<int, LLBC_CoderFactory *> _coders;
