@@ -86,15 +86,17 @@ typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value
                         Comp *>::type
 LLBC_IService::GetComponent()
 {
+    Comp *castComp;
     const auto &compList = GetComponentList();
     for(auto *comp : compList)
     {
-        if(dynamic_cast<Comp *>(comp) != nullptr)
+        if((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
         {
-            return comp;
+            return castComp;
         }
     }
-    return GetComponent(LLBC_GetTypeName(Comp));
+
+    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
 }
 
 inline LLBC_Component *LLBC_IService::GetComponent(const LLBC_String &compName)
