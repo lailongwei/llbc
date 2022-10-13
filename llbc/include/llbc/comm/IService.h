@@ -399,7 +399,9 @@ public:
      * Get component.
      */
     template <typename Comp>
-    typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value && std::is_same<LLBC_Component, Comp>::value == false, LLBC_Component *>::type
+    typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value
+                            && std::is_same<LLBC_Component, Comp>::value == false,
+                            LLBC_Component *>::type
     GetComponent();
     LLBC_Component *GetComponent(const LLBC_String &compName);
     LLBC_Component *GetComponent(const std::string &compName);
@@ -613,7 +615,7 @@ protected:
     /**
      * Get component list.
      */
-    virtual const std::vector<LLBC_Component *> &GetComponentList() = 0;
+    virtual const std::vector<LLBC_Component *> &GetComponentList() const = 0;
 
 protected:
     /**

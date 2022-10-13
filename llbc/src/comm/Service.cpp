@@ -1212,7 +1212,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessi
             CreateCodecStack(sessionId, acceptSessionId, stack));
 }
 
-const std::vector<LLBC_Component *> &LLBC_Service::GetComponentList()
+const std::vector<LLBC_Component *> &LLBC_Service::GetComponentList() const
 {
     return _compList;
 }

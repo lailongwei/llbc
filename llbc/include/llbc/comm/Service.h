@@ -461,7 +461,7 @@ protected:
     /**
      * Get component list.
      */
-    virtual const std::vector<LLBC_Component *> &GetComponentList();
+    virtual const std::vector<LLBC_Component *> &GetComponentList() const;
 
 protected:
     /**
