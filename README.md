@@ -9,8 +9,8 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 
 | 平台 | 编译器 | 类型 | 状态 |
 |---   |---   |---   |---   |
-| **Linux** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
-| **OSX** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://travis-ci.org/lailongwei/llbc.svg?branch=master)](https://travis-ci.org/lailongwei/llbc) |
+| **Linux** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/c-cpp.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/c-cpp.yml) |
+| **OSX** | g++, clang++ | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/c-cpp.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/c-cpp.yml) |
 | **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://ci.appveyor.com/api/projects/status/1bjwlbciimde29al?svg=true)](https://ci.appveyor.com/project/lailongwei/llbc) |  
 
 
