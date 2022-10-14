@@ -243,12 +243,12 @@ public:
      * @param[in] name - the application name, default is executable file name(extension splited, if has extension).
      * @return int - return 0 if start success, otherwise return -1.
      */
-    int Start(int argc, char *argv[], const LLBC_String &name = "");
+    virtual int Start(int argc, char *argv[], const LLBC_String &name = "");
 
     /**
      * Stop application.
      */
-    void Stop();
+    virtual void Stop();
 
     /**
      * Check application start phase.
