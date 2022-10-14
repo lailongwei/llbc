@@ -20,7 +20,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: intall deps
-        run: yum install -y wget tar gcc gcc-c++ automake autoconf libtool make
+        run: yum install -y wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
       - name: Compile core lib code
         run: make core_lib -j4
       - name: Compile test code
