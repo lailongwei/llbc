@@ -7,23 +7,58 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-    name: Build job
+  linux-build:
+    name: Linux build job
     runs-on: ubuntu-latest
     container: docker.io/centos:7
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
       - name: Check out repository code
         uses: actions/checkout@v3
+        
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      
       - name: intall deps
         run: yum install -y wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
+        
       - name: Compile core lib code
         run: make core_lib -j4
+        
       - name: Compile test code
         run: make test -j4
+        
       - run: echo "🍏 This job's status is ${{ job.status }}."
         
+  windows-build:
+    name: Windows build job
+    runs-on: windows-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      
+      - name: Install MSBuild
+        uses: microsoft/setup-msbuild@master
+        
+      - name: PreBuild
+        run: echo vs2022 | ./WinPreBuild.bat 0
+        
+      - name: Compile core lib code
+        run: msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+        
+      - name: Compile test code
+        run: msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
+        
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+    
+  
