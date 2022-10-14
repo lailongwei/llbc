@@ -24,8 +24,6 @@ distribution.
 #include "llbc/common/Export.h"
 #include "llbc/core/tinyxml2/tinyxml2.h"
 
-__LLBC_NS_BEGIN
-
 #include <new>		// yes, this one new style header, is in the Android SDK.
 #if defined(ANDROID_NDK) || defined(__BORLANDC__) || defined(__QNXNTO__)
 #   include <stddef.h>
@@ -34,6 +32,8 @@ __LLBC_NS_BEGIN
 #   include <cstddef>
 #   include <cstdarg>
 #endif
+
+__LLBC_NS_BEGIN
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)
 	// Microsoft Visual Studio, version 2005 and higher. Not WinCE.
