@@ -494,20 +494,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->level = level;
 
     // fill: log time.
-    // Note: temporary disable LLBC_RdTsc() optimize.
-    // #if LLBC_SUPPORT_RDTSC
-    #if 0
-    const auto nowCPUTime = LLBC_RdTsc();
-    if (nowCPUTime < _lastGetTimeCPUTime ||
-        nowCPUTime - _lastGetTimeCPUTime >= _oneMilliSecCPUTime)
-    {
-        _lastGetTimeCPUTime = nowCPUTime;
-        _nowTime = LLBC_GetMilliSeconds();
-    }
-    logData->logTime = _nowTime;
-    #else // Not supp rdtsc
-    logData->logTime = LLBC_GetMilliSeconds();
-    #endif // Supp rdtsc
+    logData->logTime = LLBC_GetMicroSeconds();
 
     // fill: other infos(file, tag, func).
     if (file)

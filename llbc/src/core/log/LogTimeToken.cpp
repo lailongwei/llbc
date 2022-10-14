@@ -56,7 +56,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
 {
     // Format non millisecond part.
     int index = static_cast<int>(formattedData.size());
-    time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
+    time_t timeInSecond = static_cast<time_t>(data.logTime / 1000000);
 
     if (timeInSecond != _lastFmtTime)
     {
@@ -73,7 +73,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     formattedData.append(_fmtCache, _cacheLen);
 
     // Format millisecond part.
-    formattedData.append_format("%03llu", data.logTime % 1000);
+    formattedData.append_format("%06llu", data.logTime % 1000000);
 
     LLBC_LogFormattingInfo *formatter = GetFormatter();
     formatter->Format(formattedData, index);
