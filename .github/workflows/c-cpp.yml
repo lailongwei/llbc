@@ -51,13 +51,13 @@ jobs:
         uses: microsoft/setup-msbuild@master
         
       - name: PreBuild
-        run: echo vs2022 | ./WinPreBuild.bat 0
+        run: echo vs2019 | ./WinPreBuild.bat 0
         
       - name: Compile core lib code
-        run: msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+        run: msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
         
       - name: Compile test code
-        run: msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
+        run: msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
     
