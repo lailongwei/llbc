@@ -18,8 +18,6 @@ jobs:
       
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Check out submodules
-        run: git submodule update --init --recursive
         
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
@@ -54,8 +52,6 @@ jobs:
       
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Check out submodules
-        run: git submodule update --init --recursive
         
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
