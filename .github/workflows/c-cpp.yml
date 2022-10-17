@@ -26,10 +26,14 @@ jobs:
         run: yum install -y wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
         
       - name: Compile core lib code
-        run: make core_lib -j4
+        run: |
+          make core_lib config=debug64 -j4
+          make core_lib config=release64 -j4
         
       - name: Compile test code
-        run: make test -j4
+        run: |
+          make test config=debug64 -j4
+          make test config=release64 -j4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
         
@@ -54,10 +58,18 @@ jobs:
         run: echo vs2019 | ./WinPreBuild.bat 0
         
       - name: Compile core lib code
-        run: msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+        run: |
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:llbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:llbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
         
       - name: Compile test code
-        run: msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
+        run: |
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:testsuite
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:testsuite
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:testsuite
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
     
