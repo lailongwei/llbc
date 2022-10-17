@@ -29,10 +29,15 @@ jobs:
         run: |
           make core_lib config=debug64 -j4
           make core_lib config=release64 -j4
+          
+      - name: Compile lua wrapped lib code(lullbc)
+        run: |
+          # make lu_wrap config=debug64 -j4
+          make lu_wrap config=release64 -j4
         
       - name: Compile test code
         run: |
-          make test config=debug64 -j4
+          # make test config=debug64 -j4
           make test config=release64 -j4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
@@ -63,12 +68,19 @@ jobs:
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:llbc
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+          
+      - name: Compile lua wrapped lib code(lullbc)
+        run: |
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:lullbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:lullbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
         
       - name: Compile test code
         run: |
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:testsuite
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:testsuite
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:testsuite
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
