@@ -114,7 +114,7 @@ LLBC_IService::AddCoderFactory(int opcode)
     auto coderFactory = new CoderFactory;
     const int ret = AddCoderFactory(opcode, coderFactory);
     if (ret != LLBC_OK)
-        LLBC_Delete(coderFactory);
+        delete coderFactory;
 
     return ret;
 }

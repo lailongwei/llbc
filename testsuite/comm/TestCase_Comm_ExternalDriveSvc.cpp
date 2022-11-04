@@ -97,7 +97,7 @@ public:
             return;
         }
 
-        LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        LLBC_Packet *resPacket = new LLBC_Packet;
         resPacket->SetHeader(packet, OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
@@ -118,7 +118,7 @@ TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
 
 TestCase_Comm_ExternalDriveSvc::~TestCase_Comm_ExternalDriveSvc()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
@@ -136,7 +136,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     const uint16 port = LLBC_Str2Int32(argv[2]);
 
     // Create comp and register it.
-    TestComp *comp = LLBC_New(TestComp);
+    TestComp *comp = new TestComp;
     _svc->AddComponent(comp);
     _svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
 
@@ -165,7 +165,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     }
 
     // Send data(Send(LLBC_Packet *) method).
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    LLBC_Packet *packet = new LLBC_Packet;
     packet->SetHeader(connSid, OPCODE, 0);
     *packet <<"Hello World!";
     _svc->Send(packet);

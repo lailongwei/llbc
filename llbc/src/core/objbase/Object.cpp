@@ -60,7 +60,7 @@ int LLBC_Object::GetAutoRefCount()
 void LLBC_Object::Release()
 {
     if (--_ref == 0)
-        LLBC_Delete(this);
+        delete this;
 }
 
 void LLBC_Object::SafeRetain()
@@ -71,7 +71,7 @@ void LLBC_Object::SafeRetain()
 void LLBC_Object::SafeRelease()
 {
     if (LLBC_AtomicFetchAndSub(&_ref, 1) == 1)
-        LLBC_Delete(this);
+        delete this;
 }
 
 void LLBC_Object::Retain()
@@ -93,7 +93,7 @@ int LLBC_Object::AutoRelease()
 
 LLBC_Object *LLBC_Object::Clone() const
 {
-    return LLBC_New(LLBC_Object);
+    return new LLBC_Object;
 }
 
 LLBC_String LLBC_Object::ToString() const

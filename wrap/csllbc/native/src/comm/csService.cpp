@@ -53,7 +53,7 @@ csllbc_Service::csllbc_Service(const LLBC_String &name,
     // Set packet encode delegate.
     _packetEncodeDeleg = encodeDeleg;
     // Set all packet decode/handle about csharp delegates.
-    PacketDecodeDelegates *delegs = LLBC_New(PacketDecodeDelegates);
+    PacketDecodeDelegates *delegs = new PacketDecodeDelegates;
     delegs->decodeDeleg = decodeDeleg;
     delegs->handlerDeleg = handlerDeleg;
     delegs->preHandlerDeleg = preHandlerDeleg;
@@ -61,7 +61,7 @@ csllbc_Service::csllbc_Service(const LLBC_String &name,
     AddPacketDecodeDelegates(_llbcSvc->GetId(), delegs);
 
     // Create packet handler object.
-    _packetHandler = LLBC_New(csllbc_PacketHandler, notFoundDecoderDeleg);
+    _packetHandler = new csllbc_PacketHandler(notFoundDecoderDeleg);
 }
 
 csllbc_Service::~csllbc_Service()
@@ -71,7 +71,7 @@ csllbc_Service::~csllbc_Service()
     LLBC_Recycle(_packetHandler);
     RemovePacketDecodeDelegates(_llbcSvc->GetId());
 
-    LLBC_Delete(_llbcSvc);
+    delete _llbcSvc;
 }
 
 int csllbc_Service::Start(int pollerCount)
@@ -190,10 +190,10 @@ int csllbc_Service::AddComponent(csllbc_Component *comp)
 
 int csllbc_Service::AddCoder(int opcode)
 {
-    csllbc_CoderFactory *coderFactory = LLBC_New(csllbc_CoderFactory);
+    csllbc_CoderFactory *coderFactory = new csllbc_CoderFactory;
     if (_llbcSvc->AddCoderFactory(opcode, coderFactory) != LLBC_OK)
     {
-        LLBC_Delete(coderFactory);
+        delete coderFactory;
         return LLBC_FAILED;
     }
 
@@ -249,7 +249,7 @@ void csllbc_Service::RemovePacketDecodeDelegates(int svcId)
     _PacketDecodeDelegs::iterator it = _packetDecodeDelegs.find(svcId);
     if (it != _packetDecodeDelegs.end())
     {
-        LLBC_Delete(it->second);
+        delete it->second;
         _packetDecodeDelegs.erase(it);
     }
 

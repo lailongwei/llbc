@@ -137,7 +137,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create("MulticastTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
-    TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
+    TestComp *comp = new TestComp(_asClient, _useBst);
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
@@ -152,7 +152,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }

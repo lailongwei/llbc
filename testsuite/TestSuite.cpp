@@ -112,8 +112,8 @@ int TestSuite_Main(int argc, char* argv[])
             testArgv[i] = inputs[i].c_str();
 
         int testCaseRet = test->Run(testArgc, const_cast<char **>(testArgv));
-        LLBC_Free(testArgv);
-        LLBC_Delete(test);
+        free(testArgv);
+        delete test;
 
         if (testCaseRet != LLBC_OK)
         {

@@ -61,7 +61,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    _configurator = LLBC_New(LLBC_LoggerConfigurator);
+    _configurator = new LLBC_LoggerConfigurator;
     if (_configurator->Initialize(cfgFile) != LLBC_OK)
     {
         LLBC_XDelete(_configurator);
@@ -70,10 +70,10 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 
     // Create shared log runnable.
     if (_configurator->HasSharedAsyncLoggerConfigs())
-        _sharedLogRunnable = LLBC_New(LLBC_LogRunnable);
+        _sharedLogRunnable = new LLBC_LogRunnable;
 
     // Config root logger.
-    _rootLogger = LLBC_New(LLBC_Logger);
+    _rootLogger = new LLBC_Logger;
     if (_configurator->Config(_rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
     {
         LLBC_XDelete(_rootLogger);
@@ -93,10 +93,10 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         if (cfgIter->first == _rootLoggerName)
             continue;
 
-        LLBC_Logger *logger = LLBC_New(LLBC_Logger);
+        LLBC_Logger *logger = new LLBC_Logger;
         if (_configurator->Config(cfgIter->first, _sharedLogRunnable, logger) != LLBC_OK)
         {
-            LLBC_Delete(logger);
+            delete logger;
             Finalize();
             return LLBC_FAILED;
         }
@@ -130,7 +130,7 @@ void LLBC_LoggerManager::Finalize()
     if (_sharedLogRunnable)
     {
         _sharedLogRunnable->Stop();
-        LLBC_Delete(_sharedLogRunnable);
+        delete _sharedLogRunnable;
         _sharedLogRunnable = nullptr;
     }
 

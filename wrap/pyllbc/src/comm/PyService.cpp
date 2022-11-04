@@ -43,7 +43,7 @@ PyObject *pyllbc_Service::_pyEvCls = nullptr;
 LLBC_Delegate<void(LLBC_Event *)> pyllbc_Service::_evEnqueueHandler(&pyllbc_Service::EventEnqueueHandler);
 LLBC_Delegate<void(LLBC_Event *)> pyllbc_Service::_evDequeueHandler(&pyllbc_Service::EventDequeueHandler);
 PyObject *pyllbc_Service::_streamCls = nullptr;
-pyllbc_ErrorHooker *pyllbc_Service::_errHooker = LLBC_New(pyllbc_ErrorHooker);
+pyllbc_ErrorHooker *pyllbc_Service::_errHooker = new pyllbc_ErrorHooker;
 
 pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFactory, PyObject *pySvc)
 : _llbcSvc(nullptr)
@@ -448,7 +448,7 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
         return LLBC_FAILED;
 
     // Build packet & send.
-    LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+    LLBC_Packet *packet = new LLBC_Packet;
     packet->Write(stream.GetBuf(), stream.GetPos());
 
     packet->SetSessionId(sessionId);
@@ -527,16 +527,16 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         return LLBC_FAILED;
     }
 
-    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, opcode);
+    pyllbc_PacketHandler *wrapHandler = new pyllbc_PacketHandler(opcode);
     if (wrapHandler->SetHandler(handler) != LLBC_OK)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         return LLBC_FAILED;
     }
 
     if (_llbcSvc->Subscribe(opcode, _cppComp, &pyllbc_Component::OnDataReceived) != LLBC_OK)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::Subscribe() failed");
 
         return LLBC_FAILED;
@@ -565,16 +565,16 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 
 
 
-    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, opcode);
+    pyllbc_PacketHandler *wrapHandler = new pyllbc_PacketHandler(opcode);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         return LLBC_FAILED;
     }
 
     if (!_preHandlers.insert(std::make_pair(opcode, wrapHandler)).second)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
 
         LLBC_String err;
         pyllbc_SetError(err.format(
@@ -586,7 +586,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
     if (_llbcSvc->PreSubscribe(opcode, _cppComp, &pyllbc_Component::OnDataPreReceived) != LLBC_OK)
     {
         _preHandlers.erase(opcode);
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::PreSubscribe() failed");
 
         return LLBC_FAILED;
@@ -598,16 +598,16 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 {
-    pyllbc_PacketHandler *wrapHandler = LLBC_New(pyllbc_PacketHandler, 0);
+    pyllbc_PacketHandler *wrapHandler = new pyllbc_PacketHandler(0);
     if (wrapHandler->SetHandler(preHandler) != LLBC_OK)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         return LLBC_FAILED;
     }
 
     if (_unifyPreHandler)
     {
-        LLBC_Delete(wrapHandler);
+        delete wrapHandler;
         pyllbc_SetError("repeat to unify pre-subscribe packet");
 
         return LLBC_FAILED;
@@ -629,7 +629,7 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
 LLBC_ListenerStub pyllbc_Service::SubscribeEvent(int event, PyObject *listener)
 {
     // Create pyllbc layer event delegate.
-    pyllbc_EventListener *evListener = LLBC_New(pyllbc_EventListener);
+    pyllbc_EventListener *evListener = new pyllbc_EventListener;
     if (evListener->SetPyListener(listener) != LLBC_OK)
         return 0;
 
@@ -779,7 +779,7 @@ void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNorma
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
 
-    _cppComp = LLBC_New(pyllbc_Component, this);
+    _cppComp = new pyllbc_Component(this);
     _llbcSvc->AddComponent(_cppComp);
 }
 

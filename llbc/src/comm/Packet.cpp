@@ -91,7 +91,7 @@ void LLBC_Packet::SetStatusDesc(const LLBC_String &desc)
     if (_statusDesc)
         _statusDesc->assign(desc.data(), desc.size());
     else
-        _statusDesc = LLBC_New(LLBC_String, desc.data(), desc.size());
+        _statusDesc = new LLBC_String(desc.data(), desc.size());
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
@@ -278,9 +278,9 @@ const LLBC_String &LLBC_Packet::GetCodecError() const
 void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
 {
     if (_codecError)
-        LLBC_Delete(_codecError);
+        delete _codecError;
 
-    _codecError = LLBC_New(LLBC_String, codecErr.c_str(), codecErr.length());
+    _codecError = new LLBC_String(codecErr.c_str(), codecErr.length());
 }
 
 LLBC_String LLBC_Packet::ToString() const

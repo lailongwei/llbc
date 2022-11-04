@@ -136,7 +136,7 @@ template <typename ComponentCls>
 int LLBC_Component::AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     if (!_meths)
-        _meths = LLBC_New(LLBC_ComponentMethods);
+        _meths = new LLBC_ComponentMethods;
 
     return _meths->AddMethod<ComponentCls>(dynamic_cast<ComponentCls *>(this), methName, meth);
 }

@@ -216,7 +216,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         }
 
         escapeString.assign(buffer, bufIdx);
-        LLBC_Free(buffer);
+        free(buffer);
     }
     return escapeString;
 }

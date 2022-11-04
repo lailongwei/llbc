@@ -39,7 +39,7 @@ csllbc_Service *csllbc_Service_Create(const char *svcName,
                                       csllbc_Delegates::Deleg_Service_PacketUnifyPreHandler unifyPreHandlerDeleg,
                                       csllbc_Delegates::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
-    return LLBC_New(csllbc_Service,
+    return new csllbc_Service(
                     svcName,
                     useNormalProtocolFactory,
                     fullStack,
@@ -162,12 +162,12 @@ int csllbc_Service_SendPacket(csllbc_Service *svc,
                               sint64 packetId,
                               int status)
 {
-    csllbc_Coder *coder = LLBC_New(csllbc_Coder);
+    csllbc_Coder *coder = new csllbc_Coder;
     coder->SetEncodeInfo(packetId, svc->GetEncodePacketDeleg());
 
     if (svc->Send(sessionId, opcode, coder, status) != LLBC_OK)
     {
-        LLBC_Delete(coder);
+        delete coder;
         return LLBC_FAILED;
     }
 
@@ -221,7 +221,7 @@ int csllbc_Service_AddComponent(csllbc_Service *svc,
 
     if (svc->AddComponent(comp) != LLBC_OK)
     {
-        LLBC_Delete(comp);
+        delete comp;
         return LLBC_FAILED;
     }
 

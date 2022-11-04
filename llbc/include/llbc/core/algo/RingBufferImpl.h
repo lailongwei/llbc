@@ -46,7 +46,7 @@ LLBC_FORCE_INLINE LLBC_RingBuffer<ElemType>::~LLBC_RingBuffer()
             _full = false;
     }
 
-    LLBC_Free(_elems);
+    free(_elems);
 }
 
 template <typename ElemType>
@@ -134,7 +134,7 @@ LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::ReCapacity(size_t newCap)
     while (!IsEmpty())
         new (&newElems[tail++]) ElemType(Pop());
 
-    LLBC_Free(_elems);
+    free(_elems);
     _elems = newElems;
 
     _front = 0;

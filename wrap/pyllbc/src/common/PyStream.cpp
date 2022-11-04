@@ -444,14 +444,14 @@ PyObject *pyllbc_Stream::ReadByteArray()
     if (!_stream.Read(buf, len))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
-        LLBC_Free(buf);
+        free(buf);
 
         return nullptr;
     }
 
     PyObject *pyVal = 
         PyByteArray_FromStringAndSize(buf, len);
-    LLBC_Free(buf);
+    free(buf);
 
     return pyVal;
 }

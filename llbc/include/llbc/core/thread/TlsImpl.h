@@ -86,11 +86,11 @@ void LLBC_Tls<ValueType>::SetValue(ValueType *value, int valueClearMeth)
         switch (valueClearMeth)
         {
         case LLBC_TlsValueClearMeth::Free:
-            LLBC_Free(oldValue);
+            free(oldValue);
             break;
 
         default: // Default using delete to clear value.
-            LLBC_Delete(reinterpret_cast<ValueType *>(oldValue));
+            delete reinterpret_cast<ValueType *>(oldValue);
             break;
         }
     }

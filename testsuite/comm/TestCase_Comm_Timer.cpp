@@ -35,11 +35,10 @@ public:
         _cancelTimes = 0;
 
         // Create long time timer and try to cancel
-        LLBC_Timer *longTimeTimer = LLBC_New(LLBC_Timer,
-                                             std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
-                                             std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
+        LLBC_Timer *longTimeTimer = new LLBC_Timer(std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
+                                                   std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
         longTimeTimer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1));
-        LLBC_Delete(longTimeTimer);
+        delete longTimeTimer;
 
         #ifdef LLBC_DEBUG
         const int testTimerCount = 200;
@@ -48,13 +47,8 @@ public:
         #endif
         for(int i = 1; i <=testTimerCount ; ++i) 
         {
-            // LLBC_Timer *timer = LLBC_New(LLBC_Timer,
-                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
-                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
-
-            LLBC_Timer *timer = LLBC_New(LLBC_Timer,
-                                         std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
-                                         std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
+            LLBC_Timer *timer = new LLBC_Timer(std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
+                                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
 
             timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)),
                             LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)));
@@ -112,11 +106,11 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     LLBC_PrintLine("Timer testcase:");
 
     LLBC_IService *svc = LLBC_IService::Create("TimerTest");
-    svc->AddComponent(LLBC_New(TestComp));
+    svc->AddComponent(new TestComp);
     if(svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());
-        LLBC_Delete(svc);
+        delete svc;
         return -1;
     }
 
@@ -130,7 +124,7 @@ int TestCase_Comm_Timer::Run(int argc, char *argv[])
     getchar();
 #endif // iPhone
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

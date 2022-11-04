@@ -121,10 +121,10 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
         return LLBC_FAILED;
     }
 
-    Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
+    Base *lemma = new pyllbc_PackLemma_Raw;
     if (lemma->Process(ch) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         _state = Base::Error;
 
         return LLBC_FAILED;

@@ -53,7 +53,7 @@ void inline __DelPacketList(void *&data)
     while (block->Read(&packet, sizeof(LLBC_NS LLBC_Packet *)) == LLBC_OK)
         LLBC_Recycle(packet);
 
-    LLBC_Delete(block);
+    delete block;
 
     data = nullptr;
 }
@@ -94,7 +94,7 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
         LLBC_INL_NS __llbc_headerLen + packet->GetPayloadLength());
 
     // Create block and write header in.
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, length);
+    LLBC_MessageBlock *block = new LLBC_MessageBlock(length);
 
     sint32 opcode = packet->GetOpcode();
     uint16 status = static_cast<uint16>(packet->GetStatus());
@@ -205,7 +205,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
         // Readable data size >= content need receive size.
         _packet->Write(readableBuf, contentNeedRecv);
         if (!out)
-            out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+            out = new LLBC_MessageBlock(sizeof(LLBC_Packet *));
         (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&_packet, sizeof(LLBC_Packet *));
 
         // Reset packet about data members.

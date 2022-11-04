@@ -82,16 +82,16 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
                 LLBC_ObjectManipulator::Delete<ObjectType>(obj);
             }
 
-            LLBC_Delete(memBlock->freeUnits);
-            LLBC_Free(memBlock);
+            delete memBlock->freeUnits;
+            free(memBlock);
         }
 
-        LLBC_Free(_blocks);
+        free(_blocks);
     }
 
     // Unlock pool instance and destroy lock.
     _lock->Unlock();
-    LLBC_Delete(_lock);
+    delete _lock;
 }
 
 template <typename ObjectType>

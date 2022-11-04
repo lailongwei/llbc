@@ -91,7 +91,7 @@ public:
             _prevRecv100MB = recv100MB;
         }
 
-        // LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
+        // LLBC_Packet *resPacket = new LLBC_Packet;
         LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
         resPacket->SetHeader(packet, OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
@@ -140,7 +140,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
     // Create service
     LLBC_IService *svc = LLBC_IService::Create("SvcTest", protoFactory);
-    TestComp *comp = LLBC_New(TestComp);
+    TestComp *comp = new TestComp;
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
@@ -157,7 +157,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         if (sessionId == 0)
         {
             LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            delete svc;
 
             return -1;
         }
@@ -186,17 +186,17 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             char *data = LLBC_Malloc(char, dataSize);
             memset(data, 1, dataSize);
 
-            // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *packet = new LLBC_Packet;
             LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();
             packet->SetHeader(sessionId, OPCODE, 0);
             packet->Write(data, dataSize);
 
-            LLBC_Free(data);
+            free(data);
 
             svc->Send(packet);
 
             // Test unhandled packet(unsubscribe opcode).
-            // LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
+            // LLBC_Packet *unhandledPacket = new LLBC_Packet;
             LLBC_Packet *unhandledPacket = svc->GetPacketObjectPool().GetObject();
             unhandledPacket->SetHeader(sessionId, OPCODE + 10000, 0);
             unhandledPacket->Write("Hello World", 12);
@@ -208,7 +208,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

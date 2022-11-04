@@ -58,9 +58,9 @@ LLBC_LogData::LLBC_LogData()
 LLBC_LogData::~LLBC_LogData()
 {
     if (msg)
-        LLBC_Free(msg);
+        free(msg);
     if (others)
-        LLBC_Free(others);
+        free(others);
 }
 
 void LLBC_LogData::Clear()

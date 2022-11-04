@@ -150,7 +150,7 @@ LLBC_Service::LLBC_Service(const LLBC_String &name,
 
     // Create protocol stack, if is null.
     if (!_dftProtocolFactory)
-        _dftProtocolFactory = LLBC_New(LLBC_NormalProtocolFactory);
+        _dftProtocolFactory = new LLBC_NormalProtocolFactory;
 
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
@@ -616,7 +616,7 @@ int LLBC_Service::RemoveSession(int sessionId, const char *reason)
 
     _pollerMgr.Close(sessionId, reason);
 
-    LLBC_Delete(readySInfoIt->second);
+    delete readySInfoIt->second;
     _readySessionInfos.erase(readySInfoIt);
 
     return LLBC_OK;
@@ -1149,7 +1149,7 @@ LLBC_ProtocolStack *LLBC_Service::CreatePackStack(int sessionId, int acceptSessi
 {
     if (!stack)
     {
-        stack = LLBC_New(_Stack, _Stack::PackStack);
+        stack = new _Stack(_Stack::PackStack);
         stack->SetService(this);
     }
 
@@ -1178,7 +1178,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(int sessionId, int acceptSess
 {
     if (!stack)
     {
-        stack = LLBC_New(_Stack, _Stack::CodecStack);
+        stack = new _Stack(_Stack::CodecStack);
         stack->SetService(this);
         stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
     }
@@ -1203,7 +1203,7 @@ LLBC_ProtocolStack *LLBC_Service::CreateCodecStack(int sessionId, int acceptSess
 
 LLBC_ProtocolStack *LLBC_Service::CreateFullStack(int sessionId, int acceptSessionId)
 {
-    _Stack *stack = LLBC_New(_Stack, _Stack::FullStack);
+    _Stack *stack = new _Stack(_Stack::FullStack);
     stack->SetService(this);
     stack->SetIsSuppressedCoderNotFoundWarning(_suppressedCoderNotFoundWarning);
 
@@ -1235,7 +1235,7 @@ void LLBC_Service::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactor
     std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
     if (it != _sessionProtoFactory.end())
     {
-        LLBC_Delete(it->second);
+        delete it->second;
         _sessionProtoFactory.erase(it);
     }
 
@@ -1263,7 +1263,7 @@ void LLBC_Service::RemoveSessionProtocolFactory(int sessionId)
     std::map<int, LLBC_IProtocolFactory *>::iterator it = _sessionProtoFactory.find(sessionId);
     if (it != _sessionProtoFactory.end())
     {
-        LLBC_Delete(it->second);
+        delete it->second;
         _sessionProtoFactory.erase(it);
     }
 }
@@ -1320,7 +1320,7 @@ void LLBC_Service::RemoveReadySession(int sessionId)
     _readySessionInfosLock.Unlock();
 
     // At last, delete ready session info.
-    LLBC_Delete(readySInfo);
+    delete readySInfo;
 }
 
 void LLBC_Service::RemoveAllReadySessions()
@@ -1503,8 +1503,8 @@ void LLBC_Service::HandleQueuedEvents()
             ev = reinterpret_cast<LLBC_ServiceEvent *>(block->GetDataStartWithReadPos());
             (this->*_evHandlers[ev->type])(*ev);
 
-            LLBC_Delete(ev);
-            LLBC_Delete(block);
+            delete ev;
+            delete block;
 
             #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
             if (_frameTimeout == LLBC_INFINITE)
@@ -1563,7 +1563,7 @@ void LLBC_Service::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     if (!caredComps.empty())
     {
         // Build session info.
-        LLBC_SessionInfo *sessionInfo = LLBC_New(LLBC_SessionInfo);
+        LLBC_SessionInfo *sessionInfo = new LLBC_SessionInfo;
         sessionInfo->SetIsListenSession(ev.isListen);
         sessionInfo->SetSessionId(ev.sessionId);
         sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
@@ -2135,10 +2135,10 @@ LLBC_Library *LLBC_Service::OpenCompLibrary(const LLBC_String &libPath, bool &ex
         return libIt->second;
     }
 
-    LLBC_Library *lib = LLBC_New(LLBC_Library);
+    LLBC_Library *lib = new LLBC_Library;
     if (lib->Open(libPath.c_str()) != LLBC_OK)
     {
-        LLBC_Delete(lib);
+        delete lib;
         return nullptr;
     }
 
@@ -2153,7 +2153,7 @@ void LLBC_Service::CloseCompLibrary(const LLBC_String &libPath)
     if (libIt == _compLibraries.end())
         return;
 
-    LLBC_Delete(libIt->second);
+    delete libIt->second;
     _compLibraries.erase(libIt);
 }
 
@@ -2509,7 +2509,7 @@ LLBC_Service::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSess
 LLBC_Service::_ReadySessionInfo::~_ReadySessionInfo()
 {
     if (codecStack)
-        LLBC_Delete(codecStack);
+        delete codecStack;
 }
 
 __LLBC_NS_END

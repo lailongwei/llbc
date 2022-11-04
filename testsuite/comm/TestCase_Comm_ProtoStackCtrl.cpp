@@ -85,7 +85,7 @@ TestCase_Comm_ProtoStackCtrl::TestCase_Comm_ProtoStackCtrl()
 
 TestCase_Comm_ProtoStackCtrl::~TestCase_Comm_ProtoStackCtrl()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])

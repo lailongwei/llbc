@@ -44,7 +44,7 @@ int LLBC_Entity::AddBehavior(int id, BehaviorType *value, const LLBC_String &nam
     LLBC_BehaviorValue behaviorValue;
     behaviorValue.id = id;
     behaviorValue.name = name;
-    behaviorValue.holder = LLBC_New(LLBC_Holder<BehaviorType>, value);
+    behaviorValue.holder = new LLBC_Holder<BehaviorType>(value);
 
     _behaviors.insert(std::make_pair(id, behaviorValue));
     if (!name.empty())

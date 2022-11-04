@@ -54,7 +54,7 @@ inline LLBC_SvcEv_SessionDestroy::LLBC_SvcEv_SessionDestroy()
 inline LLBC_SvcEv_SessionDestroy::~LLBC_SvcEv_SessionDestroy()
 {
     if (closeInfo)
-        LLBC_Delete(closeInfo);
+        delete closeInfo;
 }
 
 inline LLBC_SvcEv_AsyncConn::LLBC_SvcEv_AsyncConn()
@@ -98,7 +98,7 @@ inline LLBC_SvcEv_SubscribeEv::LLBC_SvcEv_SubscribeEv()
 inline LLBC_SvcEv_SubscribeEv::~LLBC_SvcEv_SubscribeEv()
 {
     if (listener)
-        LLBC_Delete(listener);
+        delete listener;
 }
 
 inline LLBC_SvcEv_UnsubscribeEv::LLBC_SvcEv_UnsubscribeEv()
@@ -133,7 +133,7 @@ inline LLBC_SvcEv_FireEv::~LLBC_SvcEv_FireEv()
     if (ev)
     {
         if (!ev->IsDontDelAfterFire())
-            LLBC_Delete(ev);
+            delete ev;
         else if (dequeueHandler)
             dequeueHandler(ev);
     }

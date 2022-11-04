@@ -49,12 +49,12 @@ LLBC_Timer::~LLBC_Timer()
     {
         Cancel();
         if (--_timerData->refCount == 0)
-            LLBC_Delete(_timerData);
+            delete _timerData;
 ;
     }
 
     if (_data)
-        LLBC_Delete(_data);
+        delete _data;
 }
 
 uint64 LLBC_Timer::GetDueTime() const

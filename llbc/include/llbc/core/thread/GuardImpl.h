@@ -45,7 +45,7 @@ LLBC_DeleteGuard<T>::~LLBC_DeleteGuard()
     if (LIKELY(_setNullAfterDelete))
         LLBC_XDelete(_ptr);
     else
-        LLBC_Delete(_ptr);
+        delete _ptr;
 
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeleteGuard: ptr[%p] deleted", _ptr);
@@ -69,7 +69,7 @@ LLBC_DeletesGuard<T>::~LLBC_DeletesGuard()
     if (LIKELY(_setNullAfterDeletes))
         LLBC_XDeletes(_ptr);
     else
-        LLBC_Deletes(_ptr);
+        delete[] _ptr;
 
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_DeletesGuard: ptr array[%p] deleted", _ptr);
@@ -93,7 +93,7 @@ LLBC_FreeGuard<T>::~LLBC_FreeGuard()
     if (LIKELY(_setNullAfterFree))
         LLBC_XFree(_ptr);
     else
-        LLBC_Free(_ptr);
+        free(_ptr);
 
 #if LLBC_DEBUG && LLBC_CFG_THREAD_GUARD_DEBUG
     traceline("LLBC_FreeGuard: ptr[%p] freed", _ptr);

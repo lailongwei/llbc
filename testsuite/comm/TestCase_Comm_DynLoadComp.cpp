@@ -29,7 +29,7 @@ TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
 
 TestCase_Comm_DynLoadComp::~TestCase_Comm_DynLoadComp()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])

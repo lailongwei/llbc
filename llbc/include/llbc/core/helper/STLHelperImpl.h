@@ -396,15 +396,15 @@ inline void LLBC_STLHelper::OperateElem(_Ty *&elem, int opcode)
     switch (opcode)
     {
     case LLBC_STLContainerOpcode::Delete:
-        LLBC_Delete(elem);
+        delete elem;
         break;
 
     case LLBC_STLContainerOpcode::Free:
-        LLBC_Free(elem);
+        free(elem);
         break;
 
     case LLBC_STLContainerOpcode::Deletes:
-        LLBC_Deletes(elem);
+        delete[] elem;
         break;
 
     case LLBC_STLContainerOpcode::Recycle:
@@ -426,15 +426,15 @@ inline void LLBC_STLHelper::OperateElem(_Ty * const &elem, int opcode)
     switch (opcode)
     {
     case LLBC_STLContainerOpcode::Delete:
-        LLBC_Delete(elem);
+        delete elem;
         break;
 
     case LLBC_STLContainerOpcode::Free:
-        LLBC_Free(elem);
+        free(elem);
         break;
 
     case LLBC_STLContainerOpcode::Deletes:
-        LLBC_Deletes(elem);
+        delete[] elem;
         break;
 
     case LLBC_STLContainerOpcode::Recycle:

@@ -56,7 +56,7 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 
     LLBC_IService *svc = LLBC_IService::Create("LazyTaskTest");
 
-    LazyClass *taskObj = LLBC_New(LazyClass);
+    LazyClass *taskObj = new LazyClass;
     LLBC_Variant taskData;
     taskData["IntVal"] = 51215;
     taskData["StrVal"] = "Hello World";
@@ -69,8 +69,8 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to exit...");
     getchar();
 
-    LLBC_Delete(svc);
-    LLBC_Delete(taskObj);
+    delete svc;
+    delete taskObj;
 
     return LLBC_OK;
 }

@@ -125,7 +125,7 @@ __LLBC_LibTls *__LLBC_GetLibTls()
 
     if (UNLIKELY(!libTls))
     {
-        libTls = LLBC_New(__LLBC_LibTls);
+        libTls = new __LLBC_LibTls;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         (void)pthread_setspecific(tlsHandle, libTls);
@@ -146,14 +146,14 @@ void __LLBC_ResetLibTls()
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         pthread_getspecific(tlsHandle))))
     {
-        LLBC_Delete(libTls);
+        delete libTls;
         pthread_setspecific(tlsHandle, nullptr);
     }
 #else
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         ::TlsGetValue(tlsHandle))))
     {
-        LLBC_Delete(libTls);
+        delete libTls;
         ::TlsSetValue(tlsHandle, nullptr);
     }
 #endif

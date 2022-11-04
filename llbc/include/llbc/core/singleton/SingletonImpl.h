@@ -43,7 +43,7 @@ T *LLBC_Singleton<T, LockType, ThreadUnit>::Instance()
         {
             _lock.Lock();
             if (!_tls)
-                _tls = LLBC_New(LLBC_Tls<T>);
+                _tls = new LLBC_Tls<T>;
 
             _lock.Unlock();
         }
@@ -51,7 +51,7 @@ T *LLBC_Singleton<T, LockType, ThreadUnit>::Instance()
         if (LIKELY(_tls->GetValue()))
             return _tls->GetValue();
 
-        _tls->SetValue(LLBC_New(T));
+        _tls->SetValue(new T);
 
         return _tls->GetValue();
     }
@@ -60,7 +60,7 @@ T *LLBC_Singleton<T, LockType, ThreadUnit>::Instance()
     {
         _lock.Lock();
         if (!_instance)
-            _instance = LLBC_New(T);
+            _instance = new T;
 
         _lock.Unlock();
     }

@@ -128,7 +128,7 @@ static void ClearTest()
     s2.Clear();
     LLBC_PrintLine("After clear attach stream, s.pos:%lu, s.size:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetSize(), s2.GetBuf(), s2.IsAttach());
 
-    LLBC_Free(buf);
+    free(buf);
 }
 
 static void RawSerializeTest()

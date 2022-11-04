@@ -53,7 +53,7 @@ inline LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size, bool attach)
 inline LLBC_MessageBlock::~LLBC_MessageBlock()
 {
     if (_buf && !_attach)
-        LLBC_Free(_buf);
+        free(_buf);
 }
 
 inline int LLBC_MessageBlock::Allocate(size_t size)
@@ -116,7 +116,7 @@ inline void LLBC_MessageBlock::Release()
         return;
 
     if (!_attach)
-        LLBC_Free(_buf);
+        free(_buf);
     _buf = nullptr;
 
     _size = 0;
@@ -272,11 +272,11 @@ inline LLBC_MessageBlock *LLBC_MessageBlock::Clone() const
     LLBC_MessageBlock *clone;
     if (IsAttach())
     {
-        clone = LLBC_New(LLBC_MessageBlock, _buf, _size);
+        clone = new LLBC_MessageBlock(_buf, _size);
     }
     else
     {
-        clone = LLBC_New(LLBC_MessageBlock, _size);
+        clone = new LLBC_MessageBlock(_size);
         memcpy(clone->_buf, _buf, _size);
     }
 

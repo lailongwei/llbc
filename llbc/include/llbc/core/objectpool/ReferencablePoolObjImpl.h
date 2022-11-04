@@ -46,7 +46,7 @@ inline void LLBC_ReferencablePoolObj::Release()
 
     if (!_poolInst)
     {
-        LLBC_Delete(this);
+        delete this;
         return;
     }
 
@@ -69,7 +69,7 @@ inline void LLBC_ReferencablePoolObj::SafeRelease()
 
     if (!_poolInst)
     {
-        LLBC_Delete(this);
+        delete this;
         return;
     }
 

@@ -31,10 +31,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewPyStream(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "O|ii", &pyStream, &initSize, &endian))
         return nullptr;
 
-    pyllbc_Stream *stream = LLBC_New(pyllbc_Stream, pyStream, initSize);
+    pyllbc_Stream *stream = new pyllbc_Stream(pyStream, initSize);
     if (UNLIKELY(stream->SetEndian(endian) != LLBC_OK))
     {
-        LLBC_Delete(stream);
+        delete stream;
         return nullptr;
     }
 
@@ -47,7 +47,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelPyStream(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &stream))
         return nullptr;
 
-    LLBC_Delete(stream);
+    delete stream;
 
     Py_RETURN_NONE;
 }

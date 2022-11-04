@@ -177,7 +177,7 @@ void LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
         if (poolInst)
             poolInst->Release(obj);
         else
-            LLBC_Delete(obj);
+            delete obj;
     }
 }
 
@@ -193,7 +193,7 @@ LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
         if (poolInst)
             poolInst->Release(obj);
         else
-            LLBC_Delete(obj);
+            delete obj;
     }
 }
 
@@ -210,7 +210,7 @@ template <typename ObjectType>
 void LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
                                            ...)
 {
-    LLBC_Delete(obj);
+    delete obj;
 }
 
 // Undefine pool object reflection detect type definition macro.

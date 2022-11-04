@@ -61,7 +61,7 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
         if (data)
         {
             packet.SetCodecError(LLBC_String(reinterpret_cast<char *>(data), errMsgLen));
-            LLBC_Free(data);
+            free(data);
         }
 
         return false;
@@ -71,7 +71,7 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
     if (data)
     {
         packet.Write(data, encodedLen);
-        LLBC_Free(data);
+        free(data);
     }
 
     return true;
@@ -91,12 +91,12 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
         return true;
 
     packet.SetCodecError(LLBC_String(reinterpret_cast<char *>(decodeRet), errMsgLen));
-    LLBC_Free(decodeRet);
+    free(decodeRet);
 
     return false;
 }
 
 LLBC_Coder *csllbc_CoderFactory::Create() const
 {
-    return LLBC_New(csllbc_Coder);
+    return new csllbc_Coder;
 }

@@ -55,11 +55,11 @@ LLBC_Event::~LLBC_Event()
     ClearExtData();
 
     if (_intKeyParams)
-        LLBC_Delete(_intKeyParams);
+        delete _intKeyParams;
     if (_constantStrKeyParams)
-        LLBC_Delete(_constantStrKeyParams);
+        delete _constantStrKeyParams;
     if (_strKeyParams)
-        LLBC_Delete(_strKeyParams);
+        delete _strKeyParams;
 }
 
 const LLBC_Variant &LLBC_Event::GetParam(int key) const
@@ -92,7 +92,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const LLBC_String &key) const
 LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 {
     if (_intKeyParams == nullptr)
-        _intKeyParams = LLBC_New(_IntKeyParams);
+        _intKeyParams = new _IntKeyParams;
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -106,7 +106,7 @@ LLBC_Event &LLBC_Event::SetParam(int key, const LLBC_Variant &param)
 LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 {
     if (_constantStrKeyParams == nullptr)
-        _constantStrKeyParams = LLBC_New(_ConstantStrKeyParams);
+        _constantStrKeyParams = new _ConstantStrKeyParams;
 
     LLBC_CString csKey(key);
     _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
@@ -121,7 +121,7 @@ LLBC_Event &LLBC_Event::SetParam(const char* key, const LLBC_Variant &param)
 LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const LLBC_Variant &param)
 {
     if (_strKeyParams == nullptr)
-        _strKeyParams = LLBC_New(_StrKeyParams);
+        _strKeyParams = new _StrKeyParams;
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())
@@ -149,7 +149,7 @@ const std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetStrKeyParams() const
 
 LLBC_Event * LLBC_Event::Clone() const
 {
-    LLBC_Event *clone = LLBC_New(LLBC_Event, _id, false);
+    LLBC_Event *clone = new LLBC_Event(_id, false);
     if (_intKeyParams)
         clone->_intKeyParams = new std::map<int, LLBC_Variant>(*_intKeyParams);
     if (_strKeyParams)
@@ -163,7 +163,7 @@ LLBC_Event * LLBC_Event::Clone() const
 LLBC_Variant &LLBC_Event::operator [](int key)
 {
     if (!_intKeyParams)
-        _intKeyParams = LLBC_New(_IntKeyParams);
+        _intKeyParams = new _IntKeyParams;
 
     _IntKeyParams::iterator it = _intKeyParams->find(key);
     if (it == _intKeyParams->end())
@@ -175,7 +175,7 @@ LLBC_Variant &LLBC_Event::operator [](int key)
 LLBC_Variant &LLBC_Event::operator [](const char *key)
 {
     if (!_constantStrKeyParams)
-        _constantStrKeyParams = LLBC_New(_ConstantStrKeyParams);
+        _constantStrKeyParams = new _ConstantStrKeyParams;
 
     LLBC_CString csKey(key);
     _ConstantStrKeyParams::iterator it = _constantStrKeyParams->find(csKey);
@@ -188,7 +188,7 @@ LLBC_Variant &LLBC_Event::operator [](const char *key)
 LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key)
 {
     if (!_strKeyParams)
-        _strKeyParams = LLBC_New(_StrKeyParams);
+        _strKeyParams = new _StrKeyParams;
 
     _StrKeyParams::iterator it = _strKeyParams->find(key);
     if (it == _strKeyParams->end())

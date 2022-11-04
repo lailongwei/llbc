@@ -701,7 +701,7 @@ LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t 
         if (_msgBlockPoolInst)
             _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
         else
-            _payload = LLBC_New(LLBC_MessageBlock, initSize);
+            _payload = new LLBC_MessageBlock(initSize);
     }
 
     return _payload;

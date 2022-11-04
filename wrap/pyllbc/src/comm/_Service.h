@@ -31,7 +31,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "Osb", &pySvc, &svcName, &useNormalProtocolFactory))
         return nullptr;
 
-    pyllbc_Service *svc = LLBC_New(pyllbc_Service, svcName, useNormalProtocolFactory, pySvc);
+    pyllbc_Service *svc = new pyllbc_Service(svcName, useNormalProtocolFactory, pySvc);
 
     return Py_BuildValue("l", svc);
 }
@@ -42,7 +42,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelService(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &svc))
         return nullptr;
 
-    LLBC_Delete(svc);
+    delete svc;
 
     Py_RETURN_NONE;
 }

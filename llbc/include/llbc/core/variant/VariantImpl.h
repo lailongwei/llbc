@@ -121,21 +121,21 @@ inline LLBC_Variant::LLBC_Variant(const std::string &str)
 {
     _holder.type = LLBC_VariantType::VT_STR_DFT;
     if (!str.empty())
-        _holder.data.obj.str = LLBC_New(LLBC_String, str.data(), str.size());
+        _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
 {
     _holder.type = LLBC_VariantType::VT_STR_DFT;
     if (!str.empty())
-        _holder.data.obj.str = LLBC_New(LLBC_String, str.data(), str.size());
+        _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
 inline LLBC_Variant::LLBC_Variant(const Seq &seq)
 {
     _holder.type = LLBC_VariantType::VT_SEQ_DFT;
     if (!seq.empty())
-        _holder.data.obj.seq = LLBC_New(Seq, seq.begin(), seq.end());
+        _holder.data.obj.seq = new Seq(seq.begin(), seq.end());
 }
 
 template <typename _T>
@@ -175,7 +175,7 @@ LLBC_Variant::LLBC_Variant(const std::unordered_set<_T> &us)
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant::Dict &dict)
 {
     _holder.type = LLBC_VariantType::VT_DICT_DFT;
-    _holder.data.obj.dict = LLBC_New(Dict, dict);
+    _holder.data.obj.dict = new Dict(dict);
 }
 
 template <typename _Key, typename _Val>
@@ -1036,7 +1036,7 @@ void LLBC_Variant::CtFromUnaryCont(const _UnaryContainer &unaryCont)
 
     // create sequence object if it has not been created before.
     if (!seq)
-        seq = LLBC_New(Seq);
+        seq = new Seq;
     // makesure the capacity greater than or equal to the giving unary container elements size.
     if (seq->capacity() < unaryCont.size())
         seq->reserve(unaryCont.size());
@@ -1066,7 +1066,7 @@ void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
 
     // create dictionary object if it has not been created before.
     if (!dict)
-        dict = LLBC_New(Dict);
+        dict = new Dict;
 
     // execute elements copy.
     const typename _BinaryContainer::const_iterator endIt = binaryCont.end();
@@ -1103,7 +1103,7 @@ inline LLBC_Variant &LLBC_Variant::BecomeStrX()
 {
     BecomeStr();
     if (!_holder.data.obj.str)
-        _holder.data.obj.str = LLBC_New(Str);
+        _holder.data.obj.str = new Str;
 
     return *this;
 }
@@ -1112,7 +1112,7 @@ inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
 {
     BecomeSeq();
     if (!_holder.data.obj.seq)
-        _holder.data.obj.seq = LLBC_New(Seq);
+        _holder.data.obj.seq = new Seq;
 
     return *this;
 }
@@ -1121,7 +1121,7 @@ inline LLBC_Variant &LLBC_Variant::BecomeDictX()
 {
     BecomeDict();
     if (!_holder.data.obj.dict)
-        _holder.data.obj.dict = LLBC_New(Dict);
+        _holder.data.obj.dict = new Dict;
 
     return *this;
 }

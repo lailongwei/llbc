@@ -36,9 +36,9 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
     {
         this->Cleanup();
 		if (!value.IsStr())
-			_value = LLBC_New(LLBC_Variant, value.ValueToString());
+			_value = new LLBC_Variant(value.ValueToString());
 		else
-			_value = LLBC_New(LLBC_Variant, value);
+			_value = new LLBC_Variant(value);
 
 		_comments = comments;
 

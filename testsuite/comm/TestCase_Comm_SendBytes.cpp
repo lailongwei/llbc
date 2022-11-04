@@ -94,7 +94,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     LLBC_IService *svc = LLBC_IService::Create("SendBytesTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
-    TestComp *comp = LLBC_New(TestComp);
+    TestComp *comp = new TestComp;
     svc->AddComponent(comp);
 
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
@@ -107,7 +107,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
         {
             LLBC_FilePrintLine(stderr, "connect to %s:%d failed, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            delete svc;
 
             return LLBC_FAILED;
         }
@@ -121,7 +121,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
         {
             LLBC_FilePrintLine(stderr, "failed to listen on %s:%d, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            delete svc;
 
             return LLBC_FAILED;
         }
@@ -133,7 +133,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 
     if (_asClient)
     {
-        LLBC_Packet *pkt = LLBC_New(LLBC_Packet);
+        LLBC_Packet *pkt = new LLBC_Packet;
         pkt->SetHeader(sid, OPCODE, 0);
         pkt->Write("Hello, world");
         pkt->Write(0);
@@ -144,7 +144,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }
