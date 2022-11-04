@@ -315,7 +315,7 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int err
     {
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
                 asyncInfo.sessionId, false, LLBC_StrErrorEx(errNo, subErrNo), asyncInfo.peerAddr));
-        delete asyncInfo->socket;
+        delete asyncInfo.socket;
     }
 
     _connecting.erase(it);
