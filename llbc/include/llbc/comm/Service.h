@@ -140,7 +140,6 @@ public:
      */
     virtual int GetFrameInterval() const;
 
-
 public:
     /**
      * Create a session and listening.
