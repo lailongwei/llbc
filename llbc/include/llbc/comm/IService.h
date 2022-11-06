@@ -159,20 +159,6 @@ public:
      */
     virtual int GetFrameInterval() const = 0;
 
-    #if LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-    /**
-     * Get service frame time out.
-     * @return LLBC_TimeSpan - return the service frame-timeout.
-     */
-    virtual LLBC_TimeSpan GetFrameTimeout() const = 0;
-
-    /**
-     * Set service frame time out.
-     * @param[in] frameTimeout - then service frame-timeout.
-     */
-    virtual void SetFrameTimeout(const LLBC_TimeSpan &frameTimeout) = 0;
-    #endif // LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT
-
 public:
     /**
      * Create a session and listening.
