@@ -638,7 +638,7 @@ private:
     volatile int _compsStartRet;
 
     std::vector<LLBC_Component *> _compList;
-    std::map<LLBC_String, LLBC_Component *> _name2Comps;
+    std::map<LLBC_CString, LLBC_Component *> _name2Comps;
     std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
     std::map<LLBC_String, LLBC_Library *> _compLibraries;
     std::map<int, LLBC_CoderFactory *> _coders;

@@ -42,9 +42,6 @@ namespace
 {
     typedef LLBC_NS LLBC_Service This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
-
-    static thread_local LLBC_NS LLBC_String __compNameKey;
-    static thread_local LLBC_NS LLBC_String __compInterfaceNameKey;
 }
 
 __LLBC_NS_BEGIN
@@ -775,25 +772,21 @@ LLBC_Component *LLBC_Service::GetComponent(const char *compName)
         return nullptr;
     }
 
-    __compNameKey.assign(compName, compNameLen);
-    if (compNameLen > 1 && compName[0] == 'I')
-        __compInterfaceNameKey.assign(compName + 1, compNameLen - 1);
-    else
-        __compInterfaceNameKey.clear();
-
+    const auto compsEnd = _name2Comps.end();
     LLBC_LockGuard guard(_lock);
-    auto it = _name2Comps.find(__compNameKey);
-    if (it != _name2Comps.end())
+    auto it = _name2Comps.find(compName);
+    if (it != compsEnd)
         return it->second;
 
-    if (!__compInterfaceNameKey.empty() &&
-        (it = _name2Comps.find(__compInterfaceNameKey)) != _name2Comps.end())
-        return it->second;
+    if (compNameLen > 1 && compName[0] == 'I')
+    {
+        if ((it = _name2Comps.find(compName + 1)) != compsEnd)
+            return it->second;
+    }
 
     LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
     return nullptr;
 }
-
 
 int LLBC_Service::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory)
 {
@@ -2049,7 +2042,15 @@ void LLBC_Service::DestroyComps()
     }
 
     LLBC_STLHelper::DeleteContainer(_compList, true, true);
-    _name2Comps.clear();
+    while (!_name2Comps.empty())
+    {
+        auto it = _name2Comps.begin();
+        auto compName = it->first;
+        _name2Comps.erase(it);
+
+        free(const_cast<char *>(compName.GetCStr()));
+    }
+
     for (auto &evComps: _caredEventComps)
         evComps.clear();
 }
@@ -2067,7 +2068,20 @@ void LLBC_Service::CloseAllCompLibraries()
 void LLBC_Service::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
-    _name2Comps.emplace(LLBC_GetTypeName(*comp), comp);
+
+    #if LLBC_TARGET_PLATFORM_WIN32
+    auto compName = typeid(*comp).name();
+    #else
+    auto compName = LLBC_GetTypeName(*comp);
+    #endif
+    const auto colonPos = strrchr(compName, ':');
+    if (colonPos)
+        compName = colonPos + 1;
+    const auto compNameLen = strlen(compName);
+
+    auto allocCompName = LLBC_Malloc(char, compNameLen + 1);
+    memcpy(allocCompName, compName, compNameLen + 1);
+    _name2Comps.emplace(allocCompName, comp);
 
     AddCompToCaredEventsArray(comp);
 }

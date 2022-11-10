@@ -82,19 +82,28 @@ inline int LLBC_IService::AddComponent(const LLBC_String &compSharedLibPath, con
 
 template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
-                        std::is_same<LLBC_Component, Comp>::value == false,
+                        !std::is_same<LLBC_Component, Comp>::value,
                         Comp *>::type
 LLBC_IService::GetComponent()
 {
-    Comp *castComp;
     const auto &compList = GetComponentList();
-    for(auto *comp : compList)
+    if (compList.size() <= 32)
     {
-        if((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
-            return castComp;
+        Comp *castComp;
+        for (auto *comp : compList)
+        {
+            if ((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
+                return castComp;
+        }
     }
 
-    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+    #if LLBC_TARGET_PLATFORM_WIN32
+    auto compName = typeid(Comp).name();
+    #else
+    auto compName = LLBC_GetTypeName(Comp);
+    #endif
+    const auto colonPos = strrchr(compName, ':');
+    return static_cast<Comp *>(GetComponent(colonPos ? colonPos + 1 : compName));
 }
 
 inline LLBC_Component *LLBC_IService::GetComponent(const LLBC_String &compName)
