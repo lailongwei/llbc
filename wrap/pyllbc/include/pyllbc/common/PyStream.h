@@ -229,4 +229,6 @@ private:
     static PyObject *_keySlots;
 };
 
+#include "pyllbc/common/PyStreamImpl.h"
+
 #endif // !__PYLLBC_COM_PY_STREAM_H__
