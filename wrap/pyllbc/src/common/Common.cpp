@@ -81,8 +81,8 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.SetPyStreamEndian);
     inlMod->AddMethod(methods.GetPyStreamPos);
     inlMod->AddMethod(methods.SetPyStreamPos);
-    inlMod->AddMethod(methods.GetPyStreamSize);
-    inlMod->AddMethod(methods.SetPyStreamSize);
+    inlMod->AddMethod(methods.GetPyStreamCap);
+    inlMod->AddMethod(methods.SetPyStreamCap);
     inlMod->AddMethod(methods.PyStreamGetRaw);
     inlMod->AddMethod(methods.PyStreamSetRaw);
     inlMod->AddMethod(methods.PyStreamRead);

@@ -48,7 +48,7 @@
  * \brief Common about config options define.
  */
 // The stream object auto resize increment limit, in bytes.
-#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          256
+#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          512
 
 /**
  * \brief core/algo about config options define.

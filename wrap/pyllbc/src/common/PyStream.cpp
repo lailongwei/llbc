@@ -38,8 +38,8 @@ PyObject *pyllbc_Stream::_methDecode = nullptr;
 PyObject *pyllbc_Stream::_keyDict = nullptr;
 PyObject *pyllbc_Stream::_keySlots = nullptr;
 
-pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t size)
-: _stream(size)
+pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t cap)
+: _stream(cap)
 , _pyStream(pyStream)
 {
     if (UNLIKELY(!_methEncode))
@@ -81,7 +81,7 @@ size_t pyllbc_Stream::GetPos() const
 
 int pyllbc_Stream::SetPos(size_t pos)
 {
-    if (pos > _stream.GetSize())
+    if (pos > _stream.GetCap())
     {
         pyllbc_SetError("pos out of range", LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
@@ -92,26 +92,22 @@ int pyllbc_Stream::SetPos(size_t pos)
     return LLBC_OK;
 }
 
-size_t pyllbc_Stream::GetSize() const
+size_t pyllbc_Stream::GetCap() const
 {
-    return _stream.GetSize();
+    return _stream.GetCap();
 }
 
-int pyllbc_Stream::SetSize(size_t size)
+int pyllbc_Stream::Recap(size_t newCap)
 {
     if (_stream.IsAttach())
     {
-        pyllbc_SetError("could not set attach buffer stream size(attached buffer maybe from pyllbc native library or other native libraries)", LLBC_ERROR_NOT_ALLOW);
+        pyllbc_SetError("could not set attach buffer stream newCap"
+                        "(attached buffer maybe from pyllbc native library or other native libraries)",
+                        LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
 
-    if (size <= _stream.GetSize())
-    {
-         pyllbc_SetError("stream new size must greater than old size", LLBC_ERROR_LIMIT);
-         return LLBC_FAILED;
-    }
-
-    _stream.Resize(size);
+    _stream.Recap(newCap);
 
     return LLBC_OK;
 }
@@ -364,7 +360,7 @@ PyObject *pyllbc_Stream::ReadPyLong()
 PyObject *pyllbc_Stream::ReadStr()
 {
     auto pos = _stream.GetPos();
-    const auto size = _stream.GetSize();
+    const auto size = _stream.GetCap();
     if (UNLIKELY(pos == size))
         return PyString_FromStringAndSize("", 0);
 
@@ -396,7 +392,7 @@ PyObject *pyllbc_Stream::ReadStr2()
         return nullptr;
     }
 
-    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetCap() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
         return nullptr;
@@ -417,7 +413,7 @@ PyObject *pyllbc_Stream::ReadUnicode()
         return nullptr;
     }
 
-    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetCap() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'unicode'", LLBC_ERROR_LIMIT);
         return nullptr;
