@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
@@ -60,7 +60,7 @@ LLBC_ProtocolStack *LLBC_IProtocol::GetStack()
     return _stack;
 }
 
-LLBC_IService *LLBC_IProtocol::GetService()
+LLBC_Service *LLBC_IProtocol::GetService()
 {
     return _svc;
 }

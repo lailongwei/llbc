@@ -111,7 +111,7 @@ private:
 }
 
 TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
-: _svc(LLBC_IService::Create("ExternalDriveSvc"))
+: _svc(LLBC_Service::Create("ExternalDriveSvc"))
 {
     _svc->SuppressCoderNotFoundWarning();
 }
@@ -141,7 +141,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     _svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
 
     // Set drive mode and start it.
-    _svc->SetDriveMode(LLBC_IService::ExternalDrive);
+    _svc->SetDriveMode(LLBC_Service::ExternalDrive);
     if (_svc->Start() != LLBC_OK)
     {
         LLBC_PrintLine("Service startup failed, reason: %s", LLBC_FormatLastError());

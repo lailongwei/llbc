@@ -37,7 +37,7 @@ class LLBC_Packet;
 class LLBC_IProtocolFilter;
 class LLBC_CoderFactory;
 class LLBC_Session;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -74,15 +74,15 @@ public:
 public:
     /**
      * Get service.
-     * @return LLBC_IService * - the service.
+     * @return LLBC_Service * - the service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
     /**
      * Set service to protocol stack, use to report something to service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Get session.
@@ -238,7 +238,7 @@ public:
 private:
     StackType _type;
 
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_Session *_session;
     bool _suppressCoderNotFoundError;
 

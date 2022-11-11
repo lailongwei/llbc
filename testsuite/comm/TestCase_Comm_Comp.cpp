@@ -170,7 +170,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create("CompTest");
+    LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
     svc->AddComponent<EchoCompFactory>();
@@ -259,10 +259,10 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create("CompTest");
+    LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
-    svc->SetDriveMode(LLBC_IService::ExternalDrive);
+    svc->SetDriveMode(LLBC_Service::ExternalDrive);
 
     LLBC_PrintLine("Start service...");
     if (svc->Start(2) != LLBC_OK)

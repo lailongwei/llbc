@@ -36,7 +36,7 @@
  #include "llbc/comm/EpollPoller.h"
 #endif // Linux or Android
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -117,7 +117,7 @@ void LLBC_BasePoller::SetBrothersCount(int count)
     _brotherCount = count;
 }
 
-void LLBC_BasePoller::SetService(LLBC_IService *svc)
+void LLBC_BasePoller::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }

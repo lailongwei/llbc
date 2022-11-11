@@ -79,7 +79,7 @@ int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Service FPS test:");
 
-    LLBC_IService *fpsTestSvc = LLBC_IService::Create("FPSTestService");
+    LLBC_Service *fpsTestSvc = LLBC_Service::Create("FPSTestService");
     fpsTestSvc->AddComponent(new TestComp);
     fpsTestSvc->SetFPS(LLBC_INFINITE);
 

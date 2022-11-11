@@ -83,7 +83,7 @@ inline const LLBC_Socket *LLBC_Session::GetSocket() const
     return _socket;
 }
 
-inline LLBC_IService *LLBC_Session::GetService()
+inline LLBC_Service *LLBC_Session::GetService()
 {
     return _svc;
 }

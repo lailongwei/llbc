@@ -30,7 +30,7 @@
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/ServiceEvent.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
 
@@ -116,7 +116,7 @@ void LLBC_Session::SetSocket(LLBC_Socket *socket)
     _pollerType = socket->GetPollerType();
 }
 
-void LLBC_Session::SetService(LLBC_IService *svc)
+void LLBC_Session::SetService(LLBC_Service *svc)
 {
     // Hold svc.
     _svc = svc;

@@ -30,7 +30,7 @@
 #include "llbc/comm/protocol/PacketProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {

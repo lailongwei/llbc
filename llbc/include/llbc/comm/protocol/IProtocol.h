@@ -35,7 +35,7 @@ class LLBC_Session;
 class LLBC_CoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -119,9 +119,9 @@ protected:
 
     /**
      * Get service.
-     * @return LLBC_IService * - the service.
+     * @return LLBC_Service * - the service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
 private:
     /**
@@ -162,7 +162,7 @@ protected:
     int _acceptSessionId;
     LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
     LLBC_ObjectPoolInst<LLBC_Packet> *_pktPoolInst;

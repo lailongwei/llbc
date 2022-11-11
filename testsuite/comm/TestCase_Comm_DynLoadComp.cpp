@@ -23,7 +23,7 @@
 #include "comm/TestCase_Comm_DynLoadComp.h"
 
 TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
-: _svc(LLBC_IService::Create("DynLoadTestSvc"))
+: _svc(LLBC_Service::Create("DynLoadTestSvc"))
 {
 }
 

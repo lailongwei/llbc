@@ -86,7 +86,7 @@ inline bool LLBC_Component::IsStarted() const
     return _started;
 }
 
-inline LLBC_IService *LLBC_Component::GetService() const
+inline LLBC_Service *LLBC_Component::GetService() const
 {
     return _svc;
 }

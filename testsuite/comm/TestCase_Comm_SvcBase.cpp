@@ -201,8 +201,8 @@ public:
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create("SvcBaseTest"))
-// : _svc(LLBC_IService::Create("SvcBaseTest", nullptr, false))
+: _svc(LLBC_Service::Create("SvcBaseTest"))
+// : _svc(LLBC_Service::Create("SvcBaseTest", nullptr, false))
 {
 }
 

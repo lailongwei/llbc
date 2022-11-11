@@ -774,8 +774,8 @@ void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNorma
     else
         protoFactory = new LLBC_RawProtocolFactory;
 
-    _llbcSvc = LLBC_IService::Create(svcName, protoFactory, false);
-    _llbcSvc->SetDriveMode(LLBC_IService::ExternalDrive);
+    _llbcSvc = LLBC_Service::Create(svcName, protoFactory, false);
+    _llbcSvc->SetDriveMode(LLBC_Service::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
 

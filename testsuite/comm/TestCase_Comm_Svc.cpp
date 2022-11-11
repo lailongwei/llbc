@@ -139,7 +139,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         LLBC_String(argv[2]) == "normal" ? "Normal" : "Raw");
 
     // Create service
-    LLBC_IService *svc = LLBC_IService::Create("SvcTest", protoFactory);
+    LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
     TestComp *comp = new TestComp;
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);

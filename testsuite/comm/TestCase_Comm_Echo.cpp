@@ -31,7 +31,7 @@ public:
     virtual bool OnInitialize(bool &initFinished)
     {
         // 消息注册, 因echo实现为流式协议实现, opcode为0
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
         return true;
@@ -40,7 +40,7 @@ public:
     virtual bool OnStart(bool &startFinished)
     {
         // 执行端口监听
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         int sId = svc->Listen("0.0.0.0", 9527);
         if (sId == 0)
         {
@@ -82,7 +82,7 @@ private:
     void _OnPkt(LLBC_Packet &pkt)
     {
         // Log
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
@@ -97,7 +97,7 @@ public:
     virtual bool OnInitialize(bool &initFinished)
     {
         // 同EchoServerComp, 订阅
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
         return true;
@@ -105,7 +105,7 @@ public:
 
     virtual bool OnStart(bool &startFinished)
     {
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         _sId = svc->Connect("127.0.0.1", 9527);
         if (_sId == 0)
         {
@@ -156,7 +156,7 @@ private:
         }
 
         // 发送
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         svc->Send(_sId, input.data(), input.size() + 1);
 
         return true;
@@ -190,7 +190,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     asServer = choice == "Y" || choice == "YES";
 
     // 创建&启动service
-    LLBC_IService *svc = LLBC_IService::Create("EchoSvc", new LLBC_RawProtocolFactory);
+    LLBC_Service *svc = LLBC_Service::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
         svc->AddComponent(new EchoServerComp);
     else

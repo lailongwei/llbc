@@ -73,7 +73,7 @@ int csllbc_Service_GetDriveMode(csllbc_Service *svc)
 
 int csllbc_Service_SetDriveMode(csllbc_Service *svc, int driveMode)
 {
-    return svc->SetDriveMode(static_cast<LLBC_IService::DriveMode>(driveMode));
+    return svc->SetDriveMode(static_cast<LLBC_Service::DriveMode>(driveMode));
 }
 
 int csllbc_Service_Start(csllbc_Service *svc, int pollerCount)

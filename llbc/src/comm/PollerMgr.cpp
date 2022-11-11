@@ -28,7 +28,7 @@
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/Service.h"
+#include "llbc/comm/ServiceImpl.h"
 
 namespace
 {
@@ -82,7 +82,7 @@ void LLBC_PollerMgr::SetPollerType(int type)
     _type = type;
 }
 
-void LLBC_PollerMgr::SetService(LLBC_IService *svc)
+void LLBC_PollerMgr::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }

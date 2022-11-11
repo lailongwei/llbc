@@ -46,7 +46,7 @@ csllbc_Service::csllbc_Service(const LLBC_String &name,
     else
         protocolFactory = new LLBC_RawProtocolFactory;
 
-    _llbcSvc = LLBC_IService::Create(name,
+    _llbcSvc = LLBC_Service::Create(name,
                                      protocolFactory,
                                      fullStack);
 

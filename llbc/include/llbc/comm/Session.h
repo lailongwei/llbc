@@ -34,7 +34,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Socket;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_BasePoller;
 class LLBC_ProtocolStack;
 
@@ -169,15 +169,15 @@ public:
 
     /**
      * Get service.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
     /**
      * Set service.
      * @param[in] svc - service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Get protocol stack.
@@ -287,7 +287,7 @@ private:
     LLBC_SocketHandle _sockHandle;
 
     bool _fullStack;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_BasePoller *_poller;
 
     LLBC_ProtocolStack *_protoStack;

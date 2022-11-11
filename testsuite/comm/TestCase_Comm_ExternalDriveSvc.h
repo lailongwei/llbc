@@ -35,7 +35,7 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
 };
 
 #endif // !__LLBC_TEST_CASE_COMM_EXTERNAL_DRIVE_SVC_H__

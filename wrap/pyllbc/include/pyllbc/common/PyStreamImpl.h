@@ -21,6 +21,8 @@
 
 #ifdef __PYLLBC_COM_PY_STREAM_H__
 
+#include "pyllbc/common/Errors.h"
+
 inline int pyllbc_Stream::GetEndian() const
 {
     return _stream.GetEndian();

@@ -129,12 +129,12 @@ inline const LLBC_StartArgs &LLBC_Application::GetStartArgs() const
     return _startArgs;
 }
 
-inline LLBC_IService *LLBC_Application::GetService(int id) const
+inline LLBC_Service *LLBC_Application::GetService(int id) const
 {
     return _services.GetService(id);
 }
 
-inline LLBC_IService *LLBC_Application::GetService(const LLBC_String &name) const
+inline LLBC_Service *LLBC_Application::GetService(const LLBC_String &name) const
 {
     return _services.GetService(name);
 }

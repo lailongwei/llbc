@@ -26,7 +26,7 @@
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/Session.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
 
 namespace
@@ -69,12 +69,12 @@ LLBC_ProtocolStack::~LLBC_ProtocolStack()
         LLBC_XDelete(_protos[i]);
 }
 
-LLBC_IService *LLBC_ProtocolStack::GetService()
+LLBC_Service *LLBC_ProtocolStack::GetService()
 {
     return _svc;
 }
 
-void LLBC_ProtocolStack::SetService(LLBC_IService *svc)
+void LLBC_ProtocolStack::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }

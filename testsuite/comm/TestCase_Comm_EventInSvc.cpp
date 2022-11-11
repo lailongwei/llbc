@@ -68,7 +68,7 @@ public:
     {
         LLBC_ThreadManager::Sleep(1000);
 
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestComp::HandleEvent);
         _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestComp::HandleEvent_Static);
 
@@ -82,7 +82,7 @@ public:
 
     virtual void OnUpdate()
     {
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
 
         TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
         ev->comp = this;
@@ -102,7 +102,7 @@ public:
         std::cout <<"handle event(class member method), data: " <<ev.data <<std::endl;
 
         ++_handleTimes;
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         if (_handleTimes == 5)
             svc->SubscribeEvent(TestEvent::TEST_EV_ID2, this, &EventTestComp::HandleEvent);
         else if (_handleTimes == 10)
@@ -118,7 +118,7 @@ public:
 
         EventTestComp *comp = ev.comp;
         ++comp->_staticHandleTimes;
-        LLBC_IService *svc = comp->GetService();
+        LLBC_Service *svc = comp->GetService();
         if (comp->_staticHandleTimes == 1000)
             svc->UnsubscribeEvent(comp->_ev1StaticHandlerStub);
     }
@@ -146,7 +146,7 @@ int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
     std::cout <<"Core/Event component testcase..." <<std::endl;
 
     // We create a service to test.
-    LLBC_IService *svc = LLBC_IService::Create("EventTest");
+    LLBC_Service *svc = LLBC_Service::Create("EventTest");
     svc->AddComponent<EventTestComp>();
     svc->Start();
 

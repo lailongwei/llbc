@@ -27,7 +27,7 @@
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/SelectPoller.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {

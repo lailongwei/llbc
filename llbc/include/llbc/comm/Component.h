@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
  * Previous declare Packet/Session/Service class.
  */
 class LLBC_Packet;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_SessionCloseInfo;
 
 __LLBC_NS_END
@@ -418,9 +418,9 @@ public:
 
     /**
      * Get service.
-     * @return LLBC_IService * - service object.
+     * @return LLBC_Service * - service object.
      */
-    virtual LLBC_IService *GetService() const;
+    virtual LLBC_Service *GetService() const;
 
     /**
      * Get component.
@@ -570,20 +570,19 @@ public:
 
 private:
     /**
-     * Friend class: LLBC_Service.
+     * Friend class: LLBC_ServiceImpl.
      *  Access methods:
      *      void SetService()
-     *      void HoldLibrary(LLBC_Library *)
      * Access data members:
      *      _inited;
      */
-    friend class LLBC_Service;
+    friend class LLBC_ServiceImpl;
 
     /**
      * Set service.
      * @param[in] service - service object.
      */
-    virtual void SetService(LLBC_IService *service);
+    virtual void SetService(LLBC_Service *service);
 
 private:
     bool _inited;
@@ -592,7 +591,7 @@ private:
 
     LLBC_ComponentMethods *_meths;
 
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
 };
 
 /**

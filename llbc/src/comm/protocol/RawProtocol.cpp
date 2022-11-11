@@ -27,7 +27,7 @@
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
 

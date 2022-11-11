@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -351,7 +351,7 @@ LLBC_Component::~LLBC_Component()
     LLBC_XDelete(_meths);
 }
 
-void LLBC_Component::SetService(LLBC_IService *svc)
+void LLBC_Component::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }

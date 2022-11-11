@@ -28,7 +28,7 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/EpollPoller.h"
 #include "llbc/comm/PollerMonitor.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 
