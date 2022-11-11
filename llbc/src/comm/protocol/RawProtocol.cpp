@@ -44,11 +44,6 @@ int LLBC_RawProtocol::GetLayer() const
     return LLBC_ProtocolLayer::PackLayer;
 }
 
-int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);

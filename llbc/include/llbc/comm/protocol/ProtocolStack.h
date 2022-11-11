@@ -140,8 +140,6 @@ public:
     int SetFilter(LLBC_IProtocolFilter *filter, int toProto);
 
 public:
-    int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer);
-
     /**
      * When packet send, will use this protocol stack method to filter and encode packet.
      * @param[in] willEncode     - the will send packet.

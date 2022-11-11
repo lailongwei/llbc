@@ -81,11 +81,6 @@ int LLBC_PacketProtocol::GetLayer() const
     return _Layer::PackLayer;
 }
 
-int LLBC_PacketProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);

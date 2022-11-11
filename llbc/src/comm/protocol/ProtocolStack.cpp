@@ -168,20 +168,6 @@ int LLBC_ProtocolStack::SetFilter(LLBC_IProtocolFilter *filter, int toProto)
     return LLBC_OK;
 }
 
-int LLBC_ProtocolStack::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    for (int i = _Layer::Begin; i != _Layer::End; ++i)
-    {
-        if (!_protos[i])
-            continue;
-
-        if (_protos[i]->Connect(local, peer) != LLBC_OK)
-            return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-
 int LLBC_ProtocolStack::SendCodec(LLBC_Packet *willEncode, LLBC_Packet *&encoded, bool &removeSession)
 {
     void *in, *out = willEncode;
