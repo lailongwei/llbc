@@ -346,8 +346,10 @@ int LLBC_Service::Start(int pollerCount)
             LLBC_Sleep(1);
         if (_compsInitRet != LLBC_OK)
         {
+            const int compsInitRet = _compsInitRet;
             Stop();
-            LLBC_SetLastError(_compsInitRet);
+
+            LLBC_SetLastError(compsInitRet);
 
             return LLBC_FAILED;
         }
@@ -357,8 +359,10 @@ int LLBC_Service::Start(int pollerCount)
             LLBC_Sleep(1);
         if (_compsStartRet != LLBC_OK)
         {
+            const int compsStartRet = _compsStartRet;
             Stop();
-            LLBC_SetLastError(_compsStartRet);
+
+            LLBC_SetLastError(compsStartRet);
 
             return LLBC_FAILED;
         }
@@ -740,7 +744,11 @@ int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_
     }
 
     // Validate comp class name and giving compName is same or not.
-    if (UNLIKELY(LLBC_GetTypeName(*comp) != compName))
+    auto realCompName = LLBC_GetTypeName(*comp);
+    const auto colonPos = strrchr(realCompName, ':');
+    if (colonPos != nullptr)
+        realCompName = colonPos + 1;
+    if (UNLIKELY(realCompName != compName))
     {
         LLBC_XDelete(comp);
         if (!existingLib)
