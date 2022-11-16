@@ -194,7 +194,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 
     LLBC_TimerData *data = timer->_timerData;
     ASSERT(data->timer == timer && 
-        "Timer manager internal error, LLBC_TimerData::timer != argument: timer!");
+        "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
 
     data->validate = false;
     data->cancelling = true;
@@ -208,9 +208,12 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     {
         int delElemRet = _heap.DeleteElem(data);
         ASSERT(delElemRet == LLBC_OK &&
-            "Timer manager internal error, Could not found timer data when Cancel long timeout timer!");
+            "Timer scheduler internal error, Could not found timer data when Cancel long timeout timer!");
         if (--data->refCount == 0)
+        {
             delete data;
+            timer->_timerData = nullptr;
+        }
     }
 
     return LLBC_OK;

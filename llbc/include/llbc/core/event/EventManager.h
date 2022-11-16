@@ -184,6 +184,6 @@ protected:
 
 __LLBC_NS_END
 
-#include "llbc/core/event/EventManagerImpl.h"
+#include "llbc/core/event/EventManagerInl.h"
 
 #endif // !__LLBC_CORE_EVENT_EVENT_MANAGER_H__

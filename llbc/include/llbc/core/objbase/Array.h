@@ -587,6 +587,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/ArrayImpl.h"
+#include "llbc/core/objbase/ArrayInl.h"
 
 #endif // !__LLBC_OBJBASE_ARRAY_H__

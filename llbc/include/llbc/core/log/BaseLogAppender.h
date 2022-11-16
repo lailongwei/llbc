@@ -93,6 +93,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/BaseLogAppenderImpl.h"
+#include "llbc/core/log/BaseLogAppenderInl.h"
 
 #endif // !__LLBC_CORE_LOG_BASE_LOG_APPENDER_H__

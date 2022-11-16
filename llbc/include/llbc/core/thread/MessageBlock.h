@@ -284,6 +284,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/MessageBlockImpl.h"
+#include "llbc/core/thread/MessageBlockInl.h"
 
 #endif // !__LLBC_CORE_THREAD_MESSAGE_BLOCK_H__

@@ -616,6 +616,6 @@ LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Sessio
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
-#include "llbc/comm/ComponentImpl.h"
+#include "llbc/comm/ComponentInl.h"
 
 #endif // !__LLBC_COMM_COMPONENT_H__

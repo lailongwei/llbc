@@ -139,6 +139,6 @@ ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease = fa
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectPoolManagerImpl.h"
+#include "llbc/core/objectpool/ObjectPoolManagerInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_THREAD_OBJECT_POOL_MANAGER_H__

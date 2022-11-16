@@ -704,7 +704,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/common/StreamImpl.h"
-#include "llbc/common/StreamSpecImpl.h"
+#include "llbc/common/StreamInl.h"
+#include "llbc/common/StreamSpecInl.h"
 
 #endif // !__LLBC_COM_STREAM_H__

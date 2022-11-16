@@ -170,6 +170,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/time/TimeSpanImpl.h"
+#include "llbc/core/time/TimeSpanInl.h"
 
 #endif // !__LLBC_CORE_TIME_TIMESPAN_H__

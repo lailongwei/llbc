@@ -295,6 +295,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/comm/ServiceEventImpl.h"
+#include "llbc/comm/ServiceEventInl.h"
 
 #endif // !__LLBC_COMM_SERVICE_EVENT_H__

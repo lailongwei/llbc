@@ -226,6 +226,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/entity/EntityImpl.h"
+#include "llbc/core/entity/EntityInl.h"
 
 #endif // !__LLBC_CORE_ENTITY_ENTITY_H__

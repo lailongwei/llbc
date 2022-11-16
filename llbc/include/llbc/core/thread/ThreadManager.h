@@ -391,6 +391,6 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ThreadManager>;
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/ThreadManagerImpl.h"
+#include "llbc/core/thread/ThreadManagerInl.h"
 
 #endif // !__LLBC_CORE_THREAD_THREAD_MANAGER_H__

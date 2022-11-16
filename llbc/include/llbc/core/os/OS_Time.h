@@ -172,6 +172,6 @@ __LLBC_NS_END
  #endif // LLBC_CFG_OS_IMPL_GETTIMEOFDAY
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-#include "llbc/core/os/OS_TimeImpl.h"
+#include "llbc/core/os/OS_TimeInl.h"
 
 #endif // !__LLBC_CORE_OS_OS_TIME_H__

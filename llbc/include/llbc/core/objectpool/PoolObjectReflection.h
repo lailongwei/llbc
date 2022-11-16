@@ -183,6 +183,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/PoolObjectReflectionImpl.h"
+#include "llbc/core/objectpool/PoolObjectReflectionInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_H__

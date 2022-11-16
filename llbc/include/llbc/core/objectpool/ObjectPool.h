@@ -183,7 +183,7 @@ template class LLBC_EXPORT LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock>;
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectPoolImpl.h"
+#include "llbc/core/objectpool/ObjectPoolInl.h"
 
 __LLBC_NS_BEGIN
 

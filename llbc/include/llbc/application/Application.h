@@ -392,6 +392,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/application/ApplicationImpl.h"
+#include "llbc/application/ApplicationInl.h"
 
 #endif // !__LLBC_APP_IAPPLICATION_H__

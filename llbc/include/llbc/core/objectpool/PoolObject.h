@@ -61,6 +61,6 @@ protected:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/PoolObjectImpl.h"
+#include "llbc/core/objectpool/PoolObjectInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__

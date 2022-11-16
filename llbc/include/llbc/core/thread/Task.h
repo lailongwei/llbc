@@ -210,6 +210,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/TaskImpl.h"
+#include "llbc/core/thread/TaskInl.h"
 
 #endif // !__LLBC_CORE_THREAD_TASK_H__

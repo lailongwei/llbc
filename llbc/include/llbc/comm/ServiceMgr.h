@@ -162,7 +162,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ServiceMgr>;
 
 __LLBC_NS_END
 
-#include "llbc/comm/ServiceMgrImpl.h"
+#include "llbc/comm/ServiceMgrInl.h"
 
 #endif // !__LLBC_COMM_SERVICE_MGR_H__
 

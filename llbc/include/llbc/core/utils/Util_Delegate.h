@@ -285,6 +285,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_DelegateInl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DELEGATE_H__

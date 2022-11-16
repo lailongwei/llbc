@@ -276,6 +276,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/event/EventImpl.h"
+#include "llbc/core/event/EventInl.h"
 
 #endif // !__LLBC_CORE_EVENT_EVENT_H__

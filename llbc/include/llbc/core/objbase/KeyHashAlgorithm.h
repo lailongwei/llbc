@@ -173,7 +173,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/KeyHashAlgorithmImpl.h"
+#include "llbc/core/objbase/KeyHashAlgorithmInl.h"
 
 // Singleton macro define.
 template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>;

@@ -228,6 +228,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/config/PropertyImpl.h"
+#include "llbc/core/config/PropertyInl.h"
 
 #endif // !__LLBC_CORE_CONFIG_PROPERTY_H__

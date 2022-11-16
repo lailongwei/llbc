@@ -298,6 +298,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/comm/SessionImpl.h"
+#include "llbc/comm/SessionInl.h"
 
 #endif // !__LLBC_COMM_SESSION_H__

@@ -73,6 +73,6 @@ private:
     PyObject *_obj;
 };
 
-#include "pyllbc/common/ObjAttrOptrImpl.h"
+#include "pyllbc/common/ObjAttrOptrInl.h"
 
 #endif // !__PYLLBC_COM_OBJ_ATTR_OPTR_H__
