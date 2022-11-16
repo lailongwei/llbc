@@ -41,12 +41,11 @@ public:
         delete longTimeTimer;
 
         // Test reschedule timer in OnCancel event meth
-        LLBC_Timer *rescheduleInCancelTimer = LLBC_New(LLBC_Timer,
-                                                       [](LLBC_Timer *timer) {
+        LLBC_Timer *rescheduleInCancelTimer = new LLBC_Timer([](LLBC_Timer *timer) {
             LLBC_PrintLine("RescheduleInCancelTimer timeout, cancel it!!!!!!");
             timer->Cancel();
         },
-                                                       [](LLBC_Timer *timer) {
+                                                             [](LLBC_Timer *timer) {
             LLBC_PrintLine("RescheduleInCancelTimer cancel, try reschedule!");
             timer->Schedule(LLBC_TimeSpan::FromSeconds(2));
         });
