@@ -41,6 +41,20 @@ public:
         longTimeTimer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1));
         LLBC_Delete(longTimeTimer);
 
+        // Test reschedule timer in OnCancel event meth
+        LLBC_Timer *rescheduleInCancelTimer = LLBC_New(LLBC_Timer,
+                                                       [](LLBC_Timer *timer) {
+            LLBC_PrintLine("RescheduleInCancelTimer timeout, cancel it!!!!!!");
+            timer->Cancel();
+        },
+                                                       [](LLBC_Timer *timer) {
+            LLBC_PrintLine("RescheduleInCancelTimer cancel, try reschedule!");
+            timer->Schedule(LLBC_TimeSpan::FromSeconds(2));
+        });
+        rescheduleInCancelTimer->Schedule(LLBC_TimeSpan::FromSeconds(1));
+        rescheduleInCancelTimer->Cancel();
+
+        // Timer performance test
         #ifdef LLBC_DEBUG
         const int testTimerCount = 200;
         #else // !defined(LLBC_DEBUG)
