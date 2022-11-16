@@ -109,7 +109,7 @@ __LLBC_NS_END
 template <typename T>
 std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val);
 
-#include "llbc/core/log/LogMessageBufferImpl.h"
+#include "llbc/core/log/LogMessageBufferInl.h"
 
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 

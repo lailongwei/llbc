@@ -36,9 +36,9 @@ public:
     /**
      * Parameter constructor.
      * @param[in] pyStream - the python stream(steal reference).
-     * @param[in] size     - the stream initialize capacity, default is 0.
+     * @param[in] cap      - the stream initialize capacity, default is 0.
      */
-    pyllbc_Stream(PyObject *pyStream, size_t size = 0);
+    pyllbc_Stream(PyObject *pyStream, size_t cap = 0);
 
     /**
      * Destructor.
@@ -74,17 +74,17 @@ public:
     int SetPos(size_t pos);
 
     /**
-     * Get stream size.
-     * return size_t - the size.
+     * Get stream capacity.
+     * return size_t - the capacity, in bytes.
      */
-    size_t GetSize() const;
+    size_t GetCap() const;
 
     /**
-     * Set stream size(the new size must greater than old size).
-     * @param[in] size - the new stream size.
+     * Recapacity stream(the new capacity must greater than old newCap).
+     * @param[in] newCap - the new stream capacity.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetSize(size_t size);
+    int Recap(size_t newCap);
 
 public:
     /**
@@ -228,5 +228,7 @@ private:
     static PyObject *_keyDict;
     static PyObject *_keySlots;
 };
+
+#include "pyllbc/common/PyStreamInl.h"
 
 #endif // !__PYLLBC_COM_PY_STREAM_H__

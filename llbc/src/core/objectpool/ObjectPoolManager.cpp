@@ -36,7 +36,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools()
 {
-    LLBC_INL_NS __g_globalObjectPool = LLBC_New(LLBC_SafetyObjectPool);
+    LLBC_INL_NS __g_globalObjectPool = new LLBC_SafetyObjectPool;
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (!tls->coreTls.entryThread)
@@ -52,9 +52,9 @@ int LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools()
     }
 
     tls->coreTls.safetyObjectPool = 
-        LLBC_INL_NS __g_entryThreadSafetyObjectPool = LLBC_New(LLBC_SafetyObjectPool);
+        LLBC_INL_NS __g_entryThreadSafetyObjectPool = new LLBC_SafetyObjectPool;
     tls->coreTls.unsafetyObjectPool =
-        LLBC_INL_NS __g_entryThreadUnsafetyObjectPool = LLBC_New(::llbc::LLBC_UnsafetyObjectPool);
+        LLBC_INL_NS __g_entryThreadUnsafetyObjectPool = new ::llbc::LLBC_UnsafetyObjectPool;
 
     return LLBC_OK;
 }

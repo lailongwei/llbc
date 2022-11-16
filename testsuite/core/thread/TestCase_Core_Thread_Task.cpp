@@ -71,7 +71,7 @@ inline void TestTask::Svc()
 
         LLBC_PrintLine("[%d] fetch data: %s",  LLBC_GetCurrentThreadId(), content.c_str());
 
-        LLBC_Delete(block);
+        delete block;
     }
 
     return;
@@ -97,7 +97,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     // Activate task.
     const int threadNum = 5;
     const size_t pushMsgSize = 10000 * threadNum;
-    TestTask *task = LLBC_New(TestTask, pushMsgSize / threadNum);
+    TestTask *task = new TestTask(pushMsgSize / threadNum);
     task->Activate(5);
 
     // Send message to task.
@@ -105,7 +105,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     {
         LLBC_Stream stream;
         stream.Write(LLBC_String().format("Hello Message, seq:%d", i));
-        LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock);
+        LLBC_MessageBlock *block = new LLBC_MessageBlock;
         block->Write(stream.GetBuf(), stream.GetPos());
 
         task->Push(block);
@@ -116,7 +116,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     // Dump message queue size.
     LLBC_PrintLine("After task finished, queue size:%lu", task->GetMessageSize());
     // Delete task.
-    LLBC_Delete(task);
+    delete task;
 
     LLBC_PrintLine("Press any key to continue ...");
     getchar();

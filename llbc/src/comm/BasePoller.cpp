@@ -36,7 +36,7 @@
  #include "llbc/comm/EpollPoller.h"
 #endif // Linux or Android
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -82,18 +82,18 @@ This *LLBC_BasePoller::Create(int type)
     switch (type)
     {
     case LLBC_PollerType::SelectPoller:
-        poller = LLBC_New(LLBC_SelectPoller);
+        poller = new LLBC_SelectPoller;
         break;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     case LLBC_PollerType::IocpPoller:
-        poller = LLBC_New(LLBC_IocpPoller);
+        poller = new LLBC_IocpPoller;
         break;
 #endif
 
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     case LLBC_PollerType::EpollPoller:
-        poller = LLBC_New(LLBC_EpollPoller);
+        poller = new LLBC_EpollPoller;
         break;
 #endif
 
@@ -117,7 +117,7 @@ void LLBC_BasePoller::SetBrothersCount(int count)
     _brotherCount = count;
 }
 
-void LLBC_BasePoller::SetService(LLBC_IService *svc)
+void LLBC_BasePoller::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }
@@ -159,7 +159,7 @@ void LLBC_BasePoller::Cleanup()
         block->Read(&ev, sizeof(LLBC_PollerEvent));
         LLBC_PollerEvUtil::DestroyEv(ev);
 
-        LLBC_Delete(block);
+        delete block;
     }
 
     // Delete all sessions.
@@ -176,7 +176,7 @@ void LLBC_BasePoller::Cleanup()
     for (_Connecting::iterator it = _connecting.begin();
          it != _connecting.end();
          ++it)
-        LLBC_Delete(it->second.socket);
+        delete it->second.socket;
     _connecting.clear();
 
     _started = false;
@@ -192,7 +192,7 @@ void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
 
         (this->*_handlers[ev.type])(ev);
 
-        LLBC_Delete(block);
+        delete block;
     }
 }
 
@@ -237,7 +237,7 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
     }
 
     LLBC_SessionCloseInfo *closeInfo = 
-        LLBC_New(LLBC_SessionCloseInfo, ev.un.closeReason);
+        new LLBC_SessionCloseInfo(ev.un.closeReason);
     LLBC_XFree(ev.un.closeReason);
 
     LLBC_Session *session = it->second;
@@ -264,7 +264,7 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
     {
-        LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+        delete ev.un.protocolStackCtrlInfo.ctrlData;
         ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
 
         return;
@@ -278,7 +278,7 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
                                removeSession);
 
     // Delete ctrl data.
-    LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+    delete ev.un.protocolStackCtrlInfo.ctrlData;
     ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
 
     // Remove session, if specified(Error number must be set when business logic determine remove this session).
@@ -294,7 +294,7 @@ LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId,
     if (sessionId == 0)
         sessionId = _pollerMgr->AllocSessionId();
 
-    LLBC_Session *session = LLBC_New(LLBC_Session, sessionOpts);
+    LLBC_Session *session = new LLBC_Session(sessionOpts);
     session->SetId(sessionId);
     session->SetSocket(socket);
     socket->SetSession(session);
@@ -354,7 +354,7 @@ void LLBC_BasePoller::RemoveSession(LLBC_Session *session)
 {
     _sessions.erase(session->GetId());
     _sockets.erase(session->GetSocketHandle());
-    LLBC_Delete(session);
+    delete session;
 }
 
 void LLBC_BasePoller::SetConnectedSocketOpts(LLBC_Socket *sock, const LLBC_SessionOpts &sessionOpts)

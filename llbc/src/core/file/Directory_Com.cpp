@@ -621,7 +621,7 @@ LLBC_String LLBC_Directory::ModuleFileName()
 
     if (ret == 0)
     {
-        LLBC_Free(buf);
+        free(buf);
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_String();
     }
@@ -629,7 +629,7 @@ LLBC_String LLBC_Directory::ModuleFileName()
     buf[ret] = '\0';
 
     const LLBC_String modFileName(buf);
-    LLBC_Free(buf);
+    free(buf);
 
     return modFileName;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32

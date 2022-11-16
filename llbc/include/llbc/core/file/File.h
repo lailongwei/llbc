@@ -453,6 +453,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/file/FileImpl.h"
+#include "llbc/core/file/FileInl.h"
 
 #endif // !__LLBC_CORE_FILE_FILE_H__

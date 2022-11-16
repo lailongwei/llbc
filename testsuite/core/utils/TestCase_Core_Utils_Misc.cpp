@@ -21,25 +21,6 @@
 
 #include "core/utils/TestCase_Core_Utils_Misc.h"
 
-namespace
-{
-    void GuardFunc(void *data)
-    {
-        std::cout <<"Test Guard Function Called!" <<std::endl;
-        std::cout <<"  The data argument: " <<data <<std::endl;
-    }
-
-    class GuardCls
-    {
-    public:
-        void GuardMeth(void *data)
-        {
-            std::cout <<"Test Guard Method Called!" <<std::endl;
-            std::cout <<"  The data argument: " <<data <<std::endl;
-        }
-    };
-}
-
 int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
 {
     std::cout <<"core/utils/Util_Misc test:" <<std::endl;

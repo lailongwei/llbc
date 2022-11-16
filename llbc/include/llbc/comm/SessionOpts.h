@@ -141,7 +141,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/comm/SessionOptsImpl.h"
+#include "llbc/comm/SessionOptsInl.h"
 
 __LLBC_NS_BEGIN
 

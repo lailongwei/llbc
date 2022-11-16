@@ -8,8 +8,8 @@ class pyllbcStream(object):
     """
     Stream class encapsulation, use to pack/unpack data sequence.
     """
-    def __init__(self, size=0, init_obj=None, endian=llbc.Endian.MachineEndian):
-        self.__c_obj = llbc.inl.NewPyStream(self, size, endian)
+    def __init__(self, cap=0, init_obj=None, endian=llbc.Endian.MachineEndian):
+        self.__c_obj = llbc.inl.NewPyStream(self, cap, endian)
         self.packobj(init_obj)
 
     def __del__(self):
@@ -44,18 +44,18 @@ class pyllbcStream(object):
         llbc.inl.SetPyStreamPos(self.__c_obj, p)
 
     @property
-    def size(self):
+    def cap(self):
         """
-        Get stream size(unsafe method, size will automatic adjust by stream).
+        Get stream capacity(unsafe method, capacity will automatic adjust by stream).
         """
-        return llbc.inl.GetPyStreamSize(self.__c_obj)
+        return llbc.inl.GetPyStreamCap(self.__c_obj)
 
-    @size.setter
-    def size(self, s):
+    @cap.setter
+    def cap(self, s):
         """
-        Set stream size(unsafe method, size will automatic adjust by stream).
+        Set stream capacity(unsafe method, capacity will automatic adjust by stream).
         """
-        llbc.inl.SetPyStreamSize(self.__c_obj, s)
+        llbc.inl.SetPyStreamCap(self.__c_obj, s)
 
     @property
     def raw(self):

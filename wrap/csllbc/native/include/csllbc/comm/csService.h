@@ -40,7 +40,7 @@ class CSLLBC_HIDDEN csllbc_Service
     typedef csllbc_Delegates _D;
 
 public:
-    typedef LLBC_IService::DriveMode DriveMode;
+    typedef LLBC_Service::DriveMode DriveMode;
 
 public:
     /**
@@ -207,7 +207,7 @@ public:
     static void RemovePacketDecodeDelegates(int svcId);
 
 private:
-    LLBC_IService *_llbcSvc;
+    LLBC_Service *_llbcSvc;
     csllbc_PacketHandler *_packetHandler;
 
     static LLBC_SpinLock _packetDelegatesLock;

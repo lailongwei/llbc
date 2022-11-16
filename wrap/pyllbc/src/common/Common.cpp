@@ -67,7 +67,7 @@ void pyllbc_AddCommonObjs()
     top->AddObject("VerboseVerInfo", LLBC_GetVersionInfo(true));
 
     /* Add endian module. */
-    pyllbc_Module *endianMod = LLBC_New(pyllbc_Module, "Endian", top);
+    pyllbc_Module *endianMod = new pyllbc_Module("Endian", top);
     endianMod->AddObject("BigEndian", LLBC_Endian::BigEndian);
     endianMod->AddObject("NetEndian", LLBC_Endian::NetEndian);
     endianMod->AddObject("LittleEndian", LLBC_Endian::LittleEndian);
@@ -81,8 +81,8 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.SetPyStreamEndian);
     inlMod->AddMethod(methods.GetPyStreamPos);
     inlMod->AddMethod(methods.SetPyStreamPos);
-    inlMod->AddMethod(methods.GetPyStreamSize);
-    inlMod->AddMethod(methods.SetPyStreamSize);
+    inlMod->AddMethod(methods.GetPyStreamCap);
+    inlMod->AddMethod(methods.SetPyStreamCap);
     inlMod->AddMethod(methods.PyStreamGetRaw);
     inlMod->AddMethod(methods.PyStreamSetRaw);
     inlMod->AddMethod(methods.PyStreamRead);
@@ -134,7 +134,7 @@ void pyllbc_AddCommonObjs()
     inlMod->AddMethod(methods.PyStreamDiscardAllExprs);
 
     /* Add test data. */
-    pyllbc_Module *testMod = LLBC_New(pyllbc_Module, "test", top);
+    pyllbc_Module *testMod = new pyllbc_Module("test", top);
     testMod->AddObject("boolVal", true);
     testMod->AddObject("charVal", 'A');
     testMod->AddObject("sint32Val", -32);

@@ -134,10 +134,10 @@ public:
     LLBC_Stream(const LLBC_Stream &rhs, bool attach);
 
     /**
-     * Parameter constructor, constructor will allocate size bytes in stream.
-     * @param[in] size - buffer size, in bytes.
+     * Parameter constructor, constructor will allocate cap bytes in stream.
+     * @param[in] cap - buffer cap, in bytes.
      */
-    explicit LLBC_Stream(size_t size);
+    explicit LLBC_Stream(size_t cap);
 
     /**
      * Parameter constructor, will copy or attach external buffer.
@@ -240,17 +240,17 @@ public:
     void Fill(size_t size);
 
     /**
-     * Get current stream buffer size.
-     * @return size_t - the stream buffer size, in bytes.
+     * Get current stream buffer capacity.
+     * @return size_t - the stream buffer capacity, in bytes.
      */
-    size_t GetSize() const;
+    size_t GetCap() const;
 
     /**
-     * @brief Get available buffer size.
+     * @brief Get free capacity.
      * 
-     * @return size_t - available size.
+     * @return size_t - free capacity, in bytes.
      */
-    size_t GetAvailableSize() const;
+    size_t GetFreeCap() const;
 
     /**
      * Get current buffer pointer.
@@ -455,7 +455,7 @@ private:
     template <typename T>
     bool ReadImpl(T &obj, ...)
     {
-        if (_size >= _pos + sizeof(T))
+        if (_cap >= _pos + sizeof(T))
             return Read(&obj, sizeof(T));
 
         return false;
@@ -505,10 +505,10 @@ private:
         // Check initialized first.
         obj.CheckInitialized();
 
-        // Resize Stream.
+        // Recap Stream.
         size_t needSize = static_cast<size_t>(obj.ByteSize());
-        if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)));
+        if ((_cap - _pos) < needSize + sizeof(uint32))
+            Recap(_cap + (needSize + sizeof(uint32)));
 
         Write(static_cast<uint32>(needSize));
         obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
@@ -606,10 +606,10 @@ public:
 
 public:
     /**
-     * Resize stream object.
-     * @param[in] newSize - new size, must greater than current size.
+     * Recapacity stream.
+     * @param[in] newCap - new capacity, must greater than current capacity.
      */
-    void Resize(size_t newSize);
+    void Recap(size_t newCap);
 
     /**
      * Clear stream.
@@ -681,7 +681,7 @@ public:
     LLBC_Stream &operator =(const LLBC_Stream &rhs);
 
 private:
-    void AutoResize(size_t needSize);
+    void AutoRecap(size_t needCap);
 
     template <typename T>
     bool ReadRawType(T &value);
@@ -694,7 +694,7 @@ private:
 private:
     void *_buf;
     size_t _pos;
-    size_t _size;
+    size_t _cap;
 
     int _endian;
     bool _attach;
@@ -704,7 +704,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/common/StreamImpl.h"
-#include "llbc/common/StreamSpecImpl.h"
+#include "llbc/common/StreamInl.h"
+#include "llbc/common/StreamSpecInl.h"
 
 #endif // !__LLBC_COM_STREAM_H__

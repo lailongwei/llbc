@@ -38,12 +38,12 @@ LLBC_ObjectFactory::~LLBC_ObjectFactory()
 
 LLBC_Object *LLBC_ObjectFactory::CreateObject() const
 {
-    return LLBC_New(LLBC_Object);
+    return new LLBC_Object;
 }
 
 LLBC_Object *LLBC_ObjectFactory::Clone() const
 {
-    return LLBC_New(LLBC_ObjectFactory);
+    return new LLBC_ObjectFactory;
 }
 
 __LLBC_NS_END

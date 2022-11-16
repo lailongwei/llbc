@@ -41,7 +41,7 @@ private:
     void SendRecvTest(const char *ip, uint16 port);
 
 private:
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
 };
 
 #endif // !__LLBC_TEST_CASE_COMM_SVC_BASE_H__

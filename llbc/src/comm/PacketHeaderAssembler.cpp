@@ -37,7 +37,7 @@ LLBC_PacketHeaderAssembler::LLBC_PacketHeaderAssembler(size_t headerLen)
 
 LLBC_PacketHeaderAssembler::~LLBC_PacketHeaderAssembler()
 {
-    LLBC_Free(_header);
+    free(_header);
 }
 
 bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &used)

@@ -36,7 +36,7 @@ T LLBC_Abs(const T &val);
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_MathImpl.h"
+#include "llbc/core/utils/Util_MathInl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_MATH_H__
 

@@ -200,6 +200,6 @@ LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Object
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st);
 LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st);
 
-#include "llbc/core/objectpool/ObjectPoolStatImpl.h"
+#include "llbc/core/objectpool/ObjectPoolStatInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_STAT_H__

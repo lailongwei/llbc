@@ -120,6 +120,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectPoolOrderedDeleteNodeImpl.h"
+#include "llbc/core/objectpool/ObjectPoolOrderedDeleteNodeInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_ORDERED_DELETE_NODE_H__

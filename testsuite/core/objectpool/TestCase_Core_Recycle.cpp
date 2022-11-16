@@ -100,7 +100,7 @@ void TestCase_Core_Recycle::DoBasicTest()
 
     std::cout << "- Test NormalObj(non-pool-object) new release:" << std::endl;
     std::cout << ">> Begin new NormalObject..." << std::endl;
-    NormalObj *nmlObj = LLBC_New(NormalObj);
+    NormalObj *nmlObj = new NormalObj;
     std::cout << ">> Call LLBC_Recycle(nmlObj) to release object..." << std::endl;
     LLBC_Recycle(nmlObj);
 
@@ -131,10 +131,10 @@ void TestCase_Core_Recycle::DoPerfTest()
     for (int i = 0; i != TEST_TIMES; ++i)
     {
         for (int j = 0; j != BATCH_TEST_TIMES; ++j)
-            pkts[j] = LLBC_New(LLBC_Packet);
+            pkts[j] = new LLBC_Packet;
 
         for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
-            LLBC_Delete(pkts[j]);
+            delete pkts[j];
     }
     sint64 usedTime = LLBC_GetMicroSeconds() - beginTestTime;
     std::cout << "Normal LLBC_Packet new/delete test used time:" << usedTime << std::endl;
@@ -145,7 +145,7 @@ void TestCase_Core_Recycle::DoPerfTest()
     for (int i = 0; i != TEST_TIMES; ++i)
     {
         for (int j = 0; j != BATCH_TEST_TIMES; ++j)
-            pkts[j] = LLBC_New(LLBC_Packet);
+            pkts[j] = new LLBC_Packet;
 
         for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
             LLBC_Recycle(pkts[j]);

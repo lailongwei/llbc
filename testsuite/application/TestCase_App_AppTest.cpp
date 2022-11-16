@@ -45,7 +45,7 @@ namespace
         }
 
     private:
-        LLBC_IService *_testSvc;
+        LLBC_Service *_testSvc;
     };
 }
 

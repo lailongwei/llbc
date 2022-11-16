@@ -28,7 +28,7 @@
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/Service.h"
+#include "llbc/comm/ServiceImpl.h"
 
 namespace
 {
@@ -47,7 +47,7 @@ static LLBC_NS LLBC_Socket *__CreateSocket(int type)
 #endif
 
     LLBC_NS LLBC_Socket *sock = 
-        LLBC_New(LLBC_NS LLBC_Socket, handle);
+        new LLBC_NS LLBC_Socket(handle);
     sock->SetPollerType(type);
 
     return sock;
@@ -82,7 +82,7 @@ void LLBC_PollerMgr::SetPollerType(int type)
     _type = type;
 }
 
-void LLBC_PollerMgr::SetService(LLBC_IService *svc)
+void LLBC_PollerMgr::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }
@@ -145,7 +145,7 @@ void LLBC_PollerMgr::Stop()
     for (_PendingAddSocks::iterator it = _pendingAddSocks.begin();
          it != _pendingAddSocks.end();
          ++it)
-        LLBC_Delete(it->second.first);
+        delete it->second.first;
     _pendingAddSocks.clear();
 
     // Always cleanup pending async-conn container.
@@ -155,7 +155,7 @@ void LLBC_PollerMgr::Stop()
     if (_pollers)
     {
         for (int i = 0; i < _pollerCount; ++i)
-            LLBC_Delete(_pollers[i]);
+            delete _pollers[i];
         LLBC_XFree(_pollers);
         _pollerCount = 0;
     }
@@ -185,7 +185,7 @@ int LLBC_PollerMgr::Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *p
              sock->Listen() != LLBC_OK ||
              sock->SetMaxPacketSize(sessionOpts.GetMaxPacketSize()) != LLBC_OK)
     {
-        LLBC_Delete(sock);
+        delete sock;
         return 0;
     }
 
@@ -222,7 +222,7 @@ int LLBC_PollerMgr::Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *
              sock->Connect(peer) != LLBC_OK ||
              sock->SetNonBlocking() != LLBC_OK)
     {
-        LLBC_Delete(sock);
+        delete sock;
         return 0;
     }
 

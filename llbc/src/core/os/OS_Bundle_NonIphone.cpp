@@ -63,13 +63,13 @@ LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
     if (!LLBC_Directory::Exists(realPath))
         return LLBC_INVALID_BUNDLE_HANDLE;
 
-    return LLBC_New(LLBC_String, realPath);
+    return new LLBC_String(realPath);
 }
 
 void LLBC_ReleaseBundle(LLBC_BundleHandle bundle)
 {
     if (LIKELY(bundle != LLBC_INVALID_BUNDLE_HANDLE))
-        LLBC_Delete(reinterpret_cast<LLBC_String *>(bundle));
+        delete reinterpret_cast<LLBC_String *>(bundle);
 }
 
 LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)

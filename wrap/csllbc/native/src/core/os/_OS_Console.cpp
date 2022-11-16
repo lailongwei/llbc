@@ -46,7 +46,7 @@ void csllbc_Console_Trace(const char *value, int valueLen)
 
         nativeValue[valueLen] = '\0';
         trace("%s", nativeValue);
-        LLBC_Free(nativeValue);
+        free(nativeValue);
     }
 #endif // LLBC_DEBUG
 }
@@ -80,7 +80,7 @@ void csllbc_Console_SafePrint(bool toStdout, bool newLine, const char *value, in
 
         nativeValue[valueLen] = '\0';
         LLBC_FilePrint(file, fmtter, nativeValue);
-        LLBC_Free(nativeValue);
+        free(nativeValue);
     }
 }
 

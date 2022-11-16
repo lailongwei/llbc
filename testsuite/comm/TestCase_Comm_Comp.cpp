@@ -62,7 +62,7 @@ namespace
         virtual bool OnStart(bool &startFinished)
         {
             LLBC_PrintLine("Service start");
-            _timer = LLBC_New(LLBC_Timer,
+            _timer = new LLBC_Timer(
                               std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
             _timer->Schedule(LLBC_TimeSpan::FromSeconds(2), LLBC_TimeSpan::FromSeconds(5));
@@ -170,7 +170,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create("CompTest");
+    LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
     svc->AddComponent<EchoCompFactory>();
@@ -189,7 +189,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Register not exist third-party comp success, internal error!!!");
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -199,7 +199,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -211,7 +211,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Test component get failed, error: %s", LLBC_FormatLastError());
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -222,7 +222,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Echo component get failed, error: %s", LLBC_FormatLastError());
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -237,7 +237,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Failed to restart service, error: %s", LLBC_FormatLastError());
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -249,7 +249,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
 
     LLBC_PrintLine("Press any key to destroy service...");
     getchar();
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }
@@ -259,17 +259,17 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
     LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
-    LLBC_IService *svc = LLBC_IService::Create("CompTest");
+    LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
-    svc->SetDriveMode(LLBC_IService::ExternalDrive);
+    svc->SetDriveMode(LLBC_Service::ExternalDrive);
 
     LLBC_PrintLine("Start service...");
     if (svc->Start(2) != LLBC_OK)
     {
         LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -289,7 +289,7 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
     {
         LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
         getchar();
-        LLBC_Delete(svc);
+        delete svc;
 
         return LLBC_FAILED;
     }
@@ -308,7 +308,7 @@ int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int 
 
     LLBC_PrintLine("Press any key to destroy service...");
     getchar();
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }

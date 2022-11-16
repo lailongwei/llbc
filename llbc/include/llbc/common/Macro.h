@@ -248,36 +248,30 @@ private:                                            \
 // Defer macro define.
 
 /* Memory operations macros. */
-// allocate/reallocate/free.
+// allocate/reallocate/free/delete/recycle.
 #define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
 #define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
 #define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
-#define LLBC_Free(memblock)                 (free(memblock))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
-            LLBC_Free(memblock);    \
+            free(memblock);         \
             (memblock) = nullptr;   \
         }                           \
     } while(0)                      \
 
-// new/delete.
-#define LLBC_New(cls, ...)                  (new cls(__VA_ARGS__))
-#define LLBC_News(cls, size)                (new cls[size])
-#define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
     do {                            \
         if (LIKELY(objptr)) {       \
-            LLBC_Delete(objptr);    \
+            delete (objptr);        \
             (objptr) = nullptr;     \
         }                           \
     } while (0)                     \
 
-#define LLBC_Deletes(objsptr)               (delete [](objsptr))
 #define LLBC_XDeletes(objsptr)      \
     do {                            \
         if (LIKELY(objsptr)) {      \
-            LLBC_Deletes(objsptr);  \
+            delete[] (objsptr);     \
             objsptr = nullptr;      \
         }                           \
     } while(0)                      \
@@ -288,7 +282,7 @@ private:                                            \
 /**
  * Format argument.
  * @param[in] fmt  - the format string.
- * @param[out] buf - the formatted string, must call LLBC_Free to free memory.
+ * @param[out] buf - the formatted string, must call free() to free memory.
  *                   if failed, this macro set retStr value to nullptr and set last error.
  * @param[out] len - the formatted string length, in bytes, not including tailing character.
  *                   this macro always filled the tailing character.
@@ -316,7 +310,7 @@ private:                                            \
         ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
-            LLBC_Free(buf);                                         \
+            free(buf);                                              \
             buf = nullptr; len = 0;                                 \
             LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
             break;                                                  \

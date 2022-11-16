@@ -56,7 +56,7 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
         }
 
         if (--data->refCount == 0)
-            LLBC_Delete(data);
+            delete data;
     }
 }
 
@@ -84,7 +84,7 @@ void LLBC_TimerScheduler::Update()
         if (!data->validate)
         {
             if (--data->refCount == 0)
-                LLBC_Delete(data);
+                delete data;
 
             continue;
         }
@@ -132,7 +132,7 @@ void LLBC_TimerScheduler::Update()
         else
         {
             if (--data->refCount == 0)
-                LLBC_Delete(data);
+                delete data;
         }
     }
 }
@@ -162,7 +162,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = LLBC_New(LLBC_TimerData);
+    LLBC_TimerData *data = new LLBC_TimerData;
     memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliSeconds() + dueTime;
     data->timerId = ++ _maxTimerId;
@@ -178,7 +178,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     if (timer->_timerData)
     {
         if (--timer->_timerData->refCount == 0)
-            LLBC_Delete(timer->_timerData);
+            delete timer->_timerData;
     }
 
     timer->_timerData = data;
@@ -194,7 +194,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 
     LLBC_TimerData *data = timer->_timerData;
     ASSERT(data->timer == timer && 
-        "Timer manager internal error, LLBC_TimerData::timer != argument: timer!");
+        "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
 
     data->validate = false;
     data->cancelling = true;
@@ -208,9 +208,12 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     {
         int delElemRet = _heap.DeleteElem(data);
         ASSERT(delElemRet == LLBC_OK &&
-            "Timer manager internal error, Could not found timer data when Cancel long timeout timer!");
+            "Timer scheduler internal error, Could not found timer data when Cancel long timeout timer!");
         if (--data->refCount == 0)
-            LLBC_Delete(data);
+        {
+            delete data;
+            timer->_timerData = nullptr;
+        }
     }
 
     return LLBC_OK;

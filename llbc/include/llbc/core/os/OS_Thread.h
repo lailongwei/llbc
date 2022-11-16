@@ -206,6 +206,6 @@ LLBC_EXPORT int LLBC_TlsSetValue(LLBC_TlsHandle handle, void *value);
 
 __LLBC_NS_END
 
-#include "llbc/core/os/OS_ThreadImpl.h"
+#include "llbc/core/os/OS_ThreadInl.h"
 
 #endif // __LLBC_CORE_OS_OS_THREAD_H__

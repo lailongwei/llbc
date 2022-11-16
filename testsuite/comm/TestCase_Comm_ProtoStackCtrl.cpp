@@ -79,13 +79,13 @@ namespace
 }
 
 TestCase_Comm_ProtoStackCtrl::TestCase_Comm_ProtoStackCtrl()
-: _svc(LLBC_IService::Create("ProtoStackCtrl"))
+: _svc(LLBC_Service::Create("ProtoStackCtrl"))
 {
 }
 
 TestCase_Comm_ProtoStackCtrl::~TestCase_Comm_ProtoStackCtrl()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])

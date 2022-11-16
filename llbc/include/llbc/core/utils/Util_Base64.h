@@ -87,6 +87,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_Base64Impl.h"
+#include "llbc/core/utils/Util_Base64Inl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_BASE64_H__

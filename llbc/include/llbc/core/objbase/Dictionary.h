@@ -436,6 +436,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/DictionaryImpl.h"
+#include "llbc/core/objbase/DictionaryInl.h"
 
 #endif // !__LLBC_OBJBASE_DICTIONARY_H__

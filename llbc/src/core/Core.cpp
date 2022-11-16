@@ -49,7 +49,7 @@ int __LLBC_CoreStartup()
     LLBC_CPUTime::InitFrequency();
     // Set entry thread timer scheduler.
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    tls->coreTls.timerScheduler = LLBC_New(LLBC_TimerScheduler);
+    tls->coreTls.timerScheduler = new LLBC_TimerScheduler;
 
     // Set random seed.
     LLBC_SeedRand(static_cast<int>(time(nullptr)));
@@ -59,8 +59,8 @@ int __LLBC_CoreStartup()
         LLBC_StartupNetLibrary();
 
     // Create entry thread auto-release pool stack.
-    tls->objbaseTls.poolStack = LLBC_New(LLBC_AutoReleasePoolStack);
-    LLBC_New(LLBC_NS LLBC_AutoReleasePool);
+    tls->objbaseTls.poolStack = new LLBC_AutoReleasePoolStack;
+    new LLBC_NS LLBC_AutoReleasePool;
 
     // Set entry thread object pool.
     if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
@@ -93,7 +93,7 @@ void __LLBC_CoreCleanup()
     // Destroy entry thread auto-release pool stack.
     if (tls->objbaseTls.poolStack)
     {
-        LLBC_Delete(reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack));
+        delete reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
         tls->objbaseTls.poolStack = nullptr;
     }
 
@@ -104,7 +104,7 @@ void __LLBC_CoreCleanup()
     // Destroy entry thread timer scheduler.
     if (tls->coreTls.timerScheduler)
     {
-        LLBC_Delete(reinterpret_cast<LLBC_TimerScheduler *>(tls->coreTls.timerScheduler));
+        delete reinterpret_cast<LLBC_TimerScheduler *>(tls->coreTls.timerScheduler);
         tls->coreTls.timerScheduler = nullptr;
     }
 

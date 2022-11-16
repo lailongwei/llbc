@@ -46,7 +46,7 @@ void pyllbc_AddCommObjs()
     pyllbc_Module *topMod = pyllbc_s_TopModule;
 
     // Create llbc.codec module.
-    pyllbc_Module *codecMod = LLBC_New(pyllbc_Module, "codec", topMod);
+    pyllbc_Module *codecMod = new pyllbc_Module("codec", topMod);
     codecMod->AddMethod(methods.encode);
     codecMod->AddMethod(methods.decode);
 
@@ -122,7 +122,7 @@ void pyllbc_AddCommObjs()
     topMod->AddMethod(methods.o2j);
 
     // Create protocol sub module.
-    pyllbc_Module *protoMod = LLBC_New(pyllbc_Module, "Protocol", topMod);
+    pyllbc_Module *protoMod = new pyllbc_Module("Protocol", topMod);
     // Add layer enumerations to protocol module.
     protoMod->AddObject("PACK_LAYER", LLBC_ProtocolLayer::PackLayer);
     protoMod->AddObject("COMPRESS_LAYER", LLBC_ProtocolLayer::CompressLayer);

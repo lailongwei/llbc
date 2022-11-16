@@ -28,7 +28,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_New(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "Oi", &pyEv, &evId))
         return nullptr;
 
-    LLBC_Event *ev = LLBC_New(LLBC_Event, evId, true);
+    LLBC_Event *ev = new LLBC_Event(evId, true);
     ev->SetExtData(pyEv, nullptr);
 
     return PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(ev));
@@ -40,7 +40,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_Del(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &ev))
         return nullptr;
 
-    LLBC_Delete(ev);
+    delete ev;
 
     Py_RETURN_NONE;
 }

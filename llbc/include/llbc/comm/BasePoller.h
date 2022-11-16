@@ -35,7 +35,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Socket;
 class LLBC_Session;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_PollerMgr;
 class LLBC_SessionOpts;
 
@@ -86,7 +86,7 @@ public:
      * Set service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Set poller manager.
@@ -173,7 +173,7 @@ protected:
 
     int _id;
     int _brotherCount;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_PollerMgr *_pollerMgr;
     
     typedef std::map<LLBC_SocketHandle, LLBC_Session *> _Sockets;

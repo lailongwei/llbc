@@ -94,6 +94,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/event/EventFirerImpl.h"
+#include "llbc/core/event/EventFirerInl.h"
 
 #endif // !__LLBC_CORE_EVENT_EVENT_FIRER_H__

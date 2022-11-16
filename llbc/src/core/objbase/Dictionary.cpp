@@ -61,7 +61,7 @@ void LLBC_Dictionary::Clear()
         LLBC_DictionaryElem *temp = elem;
         elem = elem->GetElemNext();
 
-        LLBC_Delete(temp);
+        delete temp;
     }
 
     _size = 0;
@@ -131,7 +131,7 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
         SetHashBucketSize(_bucketSize * 2);
     }
 
-    LLBC_DictionaryElem *elem = LLBC_New(LLBC_DictionaryElem, key, o);
+    LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
 
     // Link to doubly-linked list.
     if (_tail)
@@ -173,7 +173,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         SetHashBucketSize(_bucketSize * 2);
     }
 
-    LLBC_DictionaryElem *elem = LLBC_New(LLBC_DictionaryElem, key, o);
+    LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
 
     // Hash to bucket.
     elem->Hash(_bucket, _bucketSize);
@@ -264,7 +264,7 @@ int LLBC_Dictionary::Erase(Iter it)
     // Remove from doubly-linked list.
     RemoveFromDoublyLinkedList(elem);
 
-    LLBC_Delete(elem);
+    delete elem;
 
     _size -= 1;
 
@@ -410,7 +410,7 @@ void LLBC_Dictionary::SetObjectFactory(LLBC_ObjectFactory *factory)
 
 LLBC_Object *LLBC_Dictionary::Clone() const
 {
-    LLBC_Dictionary *clone = LLBC_New(LLBC_Dictionary);
+    LLBC_Dictionary *clone = new LLBC_Dictionary;
 
     // Clone object factory.
     if (_objFactory)

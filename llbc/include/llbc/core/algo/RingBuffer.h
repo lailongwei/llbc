@@ -129,6 +129,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/algo/RingBufferImpl.h"
+#include "llbc/core/algo/RingBufferInl.h"
 
 #endif // !__LLBC_CORE_ALGO_RING_BUFFER_H__

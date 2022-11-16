@@ -49,17 +49,17 @@ LLBC_Property::LLBC_Property(const This &another)
     _parent = nullptr;
 
     if (another._value)
-        _value = LLBC_New(LLBC_Variant, *another._value);
+        _value = new LLBC_Variant(*another._value);
     else
         _value = nullptr;
 
     if (another._properties)
     {
-        _properties = LLBC_New(This::Properties);
+        _properties = new This::Properties;
         for (This::Properties::const_iterator it = another._properties->begin();
              it != another._properties->end();
              it++)
-            _properties->insert(std::make_pair(it->first, LLBC_New(This, *it->second)));
+            _properties->insert(std::make_pair(it->first, new This(*it->second)));
     }
     else
     {
@@ -142,7 +142,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     if (backProperties)
     {
         LLBC_STLHelper::DeleteContainer(*backProperties);
-        LLBC_Delete(backProperties);
+        delete backProperties;
     }
 
     return LLBC_OK;
@@ -355,7 +355,7 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
     This *prop = it->second;
     if (names.size() == 1 || removeAll)
     {
-        LLBC_Delete(prop);
+        delete prop;
         _properties->erase(it);
 
         if (_properties->size() == 0)
@@ -417,15 +417,15 @@ This &LLBC_Property::operator =(const This &another)
 
     Cleanup();
     if (another._value)
-        _value = LLBC_New(LLBC_Variant, *another._value);
+        _value = new LLBC_Variant(*another._value);
 
     if (another._properties)
     {
-        _properties = LLBC_New(This::Properties);
+        _properties = new This::Properties;
         for (This::Properties::const_iterator it = another._properties->begin();
              it != another._properties->end();
              it++)
-            _properties->insert(std::make_pair(it->first, LLBC_New(This, *it->second)));
+            _properties->insert(std::make_pair(it->first, new This(*it->second)));
     }
 
     _comments = another._comments;
@@ -457,7 +457,7 @@ void LLBC_Property::CleanupComments()
 void LLBC_Property::ExpandProperties(const LLBC_String &name)
 {
     if (!_properties)
-        _properties = LLBC_New(This::Properties);
+        _properties = new This::Properties;
 
     const LLBC_Strings names = name.split(This::NameSeparator, 1);
     const LLBC_String &topName = names[0]; 
@@ -465,7 +465,7 @@ void LLBC_Property::ExpandProperties(const LLBC_String &name)
     _It it = _properties->find(topName);
     if (it == _properties->end())
     {
-        LLBC_Property *prop = LLBC_New(LLBC_Property, this);
+        LLBC_Property *prop = new LLBC_Property(this);
         it = _properties->insert(std::make_pair(topName, prop)).first;
     }
     else

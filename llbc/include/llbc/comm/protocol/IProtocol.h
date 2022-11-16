@@ -35,7 +35,7 @@ class LLBC_Session;
 class LLBC_CoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -69,14 +69,6 @@ public:
     const Coders *GetCoders() const;
 
 public:
-    /**
-     * When one connection established, will call this method.
-     * @param[in] local - the local address.
-     * @param[in] peer  - the peer address.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer) = 0;
-
     /**
      * When data send, will call this method.
      * @param[in] in             - the in data.
@@ -127,9 +119,9 @@ protected:
 
     /**
      * Get service.
-     * @return LLBC_IService * - the service.
+     * @return LLBC_Service * - the service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
 private:
     /**
@@ -170,7 +162,7 @@ protected:
     int _acceptSessionId;
     LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
     LLBC_ObjectPoolInst<LLBC_Packet> *_pktPoolInst;

@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Component;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -304,15 +304,15 @@ public:
     /**
      * Get service by service Id.
      * @param[in] id - service Id.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService(int id) const;
+    LLBC_Service *GetService(int id) const;
     /**
      * Get service by service name.
      * @param[in] name - service name.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService(const LLBC_String &name) const;
+    LLBC_Service *GetService(const LLBC_String &name) const;
 
     /**
      * Stop service by service Id.
@@ -392,6 +392,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/application/ApplicationImpl.h"
+#include "llbc/application/ApplicationInl.h"
 
 #endif // !__LLBC_APP_IAPPLICATION_H__

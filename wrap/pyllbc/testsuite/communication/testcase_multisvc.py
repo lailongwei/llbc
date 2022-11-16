@@ -50,8 +50,8 @@ class ClientPacketUnifyPreHandler(object):
         payload = packet.data
         data = payload.unpackstr()
         payload.pos = 0
-        print 'Client unify prev-recv packet: {}(len:{}), stream.pos:{}, stream.size:{}'.format(
-            data, data.__len__(), payload.pos, payload.size)
+        print 'Client unify prev-recv packet: {}(len:{}), stream.pos:{}, stream.cap:{}'.format(
+            data, data.__len__(), payload.pos, payload.cap)
         return True
 
 

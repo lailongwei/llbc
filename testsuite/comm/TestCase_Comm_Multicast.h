@@ -37,8 +37,8 @@ public:
 private:
     void FetchArgs(int argc, char *argv[]);
 
-    int PrepareClientLogic(LLBC_IService *svc);
-    int PrepareServerLogic(LLBC_IService *svc);
+    int PrepareClientLogic(LLBC_Service *svc);
+    int PrepareServerLogic(LLBC_Service *svc);
 
 private:
     bool _asClient;

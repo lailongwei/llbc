@@ -73,6 +73,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LogJsonMsgImpl.h"
+#include "llbc/core/log/LogJsonMsgInl.h"
 
 #endif // !__LLBC_CORE_LOG_LOG_JSONMSG_H__

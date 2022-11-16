@@ -44,15 +44,15 @@ LLBC_ILogAppender *LLBC_LogAppenderBuilder::BuildAppender(int type) const
     switch (type)
     {
     case LLBC_LogAppenderType::Console:
-        appender = LLBC_New(LLBC_LogConsoleAppender);
+        appender = new LLBC_LogConsoleAppender;
         break;
 
     case LLBC_LogAppenderType::File:
-        appender = LLBC_New(LLBC_LogFileAppender);
+        appender = new LLBC_LogFileAppender;
         break;
 
     case LLBC_LogAppenderType::Network:
-        appender = LLBC_New(LLBC_LogNetworkAppender);
+        appender = new LLBC_LogNetworkAppender;
         break;
 
     default:
