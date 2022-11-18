@@ -207,7 +207,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
 
     int len;
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
-    if (!llbcStream.ReadSInt32(len))
+    if (!llbcStream.Read(len))
     {
         pyllbc_SetError("not enough bytes to unpack dict data(head area)");
         return nullptr;
@@ -276,7 +276,7 @@ int pyllbc_PackLemma_Dict::Write(pyllbc_Stream *stream, PyObject *values)
 #if LLBC_TARGET_PROCESSOR_X86_64
     llbcStream.WriteSInt32(static_cast<sint32>(len));
 #else
-    llbcStream.WriteSInt32(len);
+    llbcStream.Write(len);
 #endif
 
     Py_ssize_t pos = 0;

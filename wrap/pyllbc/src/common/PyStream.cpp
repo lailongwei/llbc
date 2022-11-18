@@ -552,7 +552,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
     else if (pyllbc_TypeDetector::IsBool(val))
     {
         const bool boolVal = !!PyObject_IsTrue(val);
-        _stream.WriteBool(boolVal);
+        _stream.Write(boolVal);
 
         return LLBC_OK;
     }

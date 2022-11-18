@@ -26,6 +26,7 @@
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/BasicDataType.h"
+#include "llbc/common/Endian.h"
 
 /** Some stream helper macros define **/
 /*  DeSerialize/Read about macros define  */
@@ -236,8 +237,9 @@ public:
     /**
      * Fill stream buffer, use '\0' to fill.
      * @param[in] size - the will fill buffer size, in bytes.
+     * @param[in] byte - the will fill byte, default is 0.
      */
-    void Fill(size_t size);
+    void Fill(size_t size, uint8 byte = 0);
 
     /**
      * Get current stream buffer capacity.
@@ -304,14 +306,57 @@ public:
 
 public:
     /**
-     * Read template function, will automatch function to read, if this class
-     * exist DeSerialize method, will call DeSerialize method to read, otherwise
-     * use Read(&obj, sizeof(obj)).
-     * @param[out] obj - will deserialize's object.
-     * @return bool - return true if successed, otherwise return false.
+     * Read arithmetic type object from stream.
+     * @param[out] obj - already read object.
+     * @return bool - return true if success, otherwise return false.
      */
     template <typename T>
-    bool Read(T &obj)
+    typename std::enable_if<std::is_arithmetic<T>::value, bool>::type
+    Read(T &obj)
+    {
+        const size_t readableSize = _cap - _pos;
+        if (UNLIKELY(readableSize < sizeof(T)))
+            return false;
+
+        obj = *(reinterpret_cast<T *>(reinterpret_cast<char *>(_buf) + _pos));
+        _pos += sizeof(T);
+
+        if (_endian != LLBC_MachineEndian)
+            LLBC_ReverseBytes(obj);
+
+        return true;
+    }
+
+    /**
+     * Read STL string type object from stream.
+     * @param[out] obj - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_base_of<T, std::string>::value, bool>::type
+    Read(T &obj)
+    {
+        uint32 len = 0;
+        if (!Read(len))
+            return false;
+
+        obj.clear();
+        if (len == 0)
+            return true;
+
+        obj.resize(len);
+        return Read(const_cast<char *>(obj.data()), obj.size());
+    }
+
+    /**
+     * Read object from stream.
+     * @param[out] obj - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_base_of<T, std::string>::value, bool>::type
+    Read(T &obj)
     {
         return ReadImpl<T>(obj, 0);
     }
@@ -463,13 +508,48 @@ private:
 
 public:
     /**
-     * Write template function, will automatch functio to write, if
-     * this class exist Serialize method, will call Serialize method
-     * to write, else use Write(&obj, sizeof(obj)).
-     * @param[in] obj - will serialize's object(can be set to any type's object).
+     * Write arithmetic type object to stream.
+     * @param[in] obj - the will write object.
      */
     template <typename T>
-    void Write(const T &obj)
+    typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+    Write(const T &obj)
+    {
+        AutoRecap(sizeof(T));
+        if (_endian != LLBC_MachineEndian)
+        {
+            T obj2(obj);
+            LLBC_ReverseBytes(obj2);
+            memcpy(reinterpret_cast<char *>(_buf) + _pos, &obj2, sizeof(T));
+        }
+        else
+        {
+            memcpy(reinterpret_cast<char *>(_buf) + _pos, &obj, sizeof(T));
+        }
+
+        _pos += sizeof(T);
+    }
+
+    /**
+     * Write std::string type object to stream.
+     * @param[in] obj - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_base_of<std::string, T>::value, void>::type
+    Write(const T &obj)
+    {
+        Write(static_cast<uint32>(obj.size()));
+        Write(obj.data(), obj.size());
+    }
+
+    /**
+     * Write object to stream.
+     * @param[in] obj - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_base_of<std::string, T>::value, void>::type
+    Write(const T &obj)
     {
         WriteImpl<T>(obj, 0);
     }
@@ -628,68 +708,11 @@ public:
     LLBC_IObjectPoolInst *GetPoolInst();
 
 public:
-    /**
-     * Raw data type read/write support.
-     * Note: All this raw data type read/write API support endian type flag.
-     */
-    bool ReadBool(bool &value);
-    bool ReadSInt8(sint8 &value);
-    bool ReadUInt8(uint8 &value);
-    bool ReadSInt16(sint16 &value);
-    bool ReadUInt16(uint16 &value);
-    bool ReadSInt32(sint32 &value);
-    bool ReadUInt32(uint32 &value);
-    bool ReadSInt64(sint64 &value);
-    bool ReadUInt64(uint64 &value);
-    bool ReadLong(long &value);
-    bool ReadULong(ulong &value);
-    bool ReadFloat(float &value);
-    bool ReadDouble(double &value);
-    bool ReadPtr(void *&value);
-
-    bool ReadBool_2(bool failRet = false);
-    sint8 ReadSInt8_2(sint8 failRet = 0);
-    uint8 ReadUInt8_2(uint8 failRet = 0);
-    sint16 ReadSInt16_2(sint16 failRet = 0);
-    uint16 ReadUInt16_2(uint16 failRet = 0);
-    sint32 ReadSInt32_2(sint32 failRet = 0);
-    uint32 ReadUInt32_2(uint32 failRet = 0);
-    sint64 ReadSInt64_2(sint64 failRet = 0);
-    uint64 ReadUInt64_2(uint64 failRet = 0);
-    long ReadLong_2(long failRet = 0);
-    ulong ReadULong_2(ulong failRet = 0);
-    float ReadFloat_2(float failRet = 0.0f);
-    double ReadDouble_2(double failRet = 0.0);
-    void *ReadPtr_2(void *failRet = nullptr);
-
-    void WriteBool(bool value);
-    void WriteSInt8(sint8 value);
-    void WriteUInt8(uint8 value);
-    void WriteSint16(sint16 value);
-    void WriteUInt16(uint16 value);
-    void WriteSInt32(sint32 value);
-    void WriteUInt32(uint32 value);
-    void WriteSInt64(sint64 value);
-    void WriteUInt64(uint64 value);
-    void WriteLong(long value);
-    void WriteULong(ulong value);
-    void WriteFloat(float value);
-    void WriteDouble(double value);
-    void WritePtr(const void *value);
-
-public:
     LLBC_Stream &operator =(const LLBC_Stream &rhs);
 
 private:
     void AutoRecap(size_t needCap);
-
-    template <typename T>
-    bool ReadRawType(T &value);
-    
-    template <typename T>
-    void WriteRawType(const T &value);
-
-    bool OverlappedCheck(const void *another, size_t len);
+        bool OverlappedCheck(const void *another, size_t len);
 
 private:
     void *_buf;
@@ -705,6 +728,5 @@ private:
 __LLBC_NS_END
 
 #include "llbc/common/StreamInl.h"
-#include "llbc/common/StreamSpecInl.h"
 
 #endif // !__LLBC_COM_STREAM_H__
