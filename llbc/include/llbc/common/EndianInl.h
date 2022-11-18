@@ -26,7 +26,7 @@
 __LLBC_NS_BEGIN
 
 template <typename T>
-inline void LLBC_ReverseBytes(T &val)
+void LLBC_ReverseBytes(T &val)
 {
     const T copyVal = val;
 
@@ -37,7 +37,7 @@ inline void LLBC_ReverseBytes(T &val)
 }
 
 template <typename T>
-inline T LLBC_ReverseBytes2(const T &val)
+T LLBC_ReverseBytes2(const T &val)
 {
     T reversedVal = val;
     LLBC_ReverseBytes(reversedVal);
@@ -74,7 +74,7 @@ inline void LLBC_Net2Host<uint64>(uint64 &val)
 }
 
 template <typename T>
-inline void LLBC_Net2Host(T &val)
+void LLBC_Net2Host(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
@@ -109,7 +109,7 @@ inline uint64 LLBC_Net2Host2<uint64>(const uint64 &val)
 }
 
 template <typename T>
-inline T LLBC_Net2Host2(const T &val)
+T LLBC_Net2Host2(const T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         return LLBC_ReverseBytes2(val);
@@ -146,7 +146,7 @@ inline void LLBC_Host2Net<uint64>(uint64 &val)
 }
 
 template <typename T>
-inline void LLBC_Host2Net(T &val)
+void LLBC_Host2Net(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
@@ -181,7 +181,7 @@ inline uint64 LLBC_Host2Net2<uint64>(const uint64 &val)
 }
 
 template <typename T>
-inline T LLBC_Host2Net2(const T &val)
+T LLBC_Host2Net2(const T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         return LLBC_ReverseBytes2(val);
