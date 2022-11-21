@@ -221,13 +221,12 @@ inline void LLBC_Stream::SetEndian(int endian)
 
 inline void LLBC_Stream::Swap(LLBC_Stream &another)
 {
-    LLBC_Swap(_buf, another._buf);
-    LLBC_Swap(_pos, another._pos);
-    LLBC_Swap(_cap, another._cap);
+    std::swap(_buf, another._buf);
+    std::swap(_pos, another._pos);
+    std::swap(_cap, another._cap);
 
-    LLBC_Swap(_endian,  another._endian);
-
-    LLBC_Swap(_attach, another._attach);
+    std::swap(_endian,  another._endian);
+    std::swap(_attach, another._attach);
 }
 
 inline size_t LLBC_Stream::GetPos() const
@@ -295,11 +294,7 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
 
     // Swap n0, n1, if n0 > n1.
     if (UNLIKELY(n0 > n1))
-    {
-        size_t temp = n0;
-        n0 = n1;
-        n1 = temp;
-    }
+        std::swap(n0, n1);
 
     ASSERT(n1 <= _pos && "LLBC_Stream::Replace() n1 > _pos!");
 
@@ -314,7 +309,9 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t l
     if (eraseLen == 0)
     {
         if (n1 == _pos)
+        {
             memcpy((uint8 *)_buf + n1, buf, len);
+        }
         else
         {
             tmpBuf = (uint8 *)malloc(_pos - n1);
