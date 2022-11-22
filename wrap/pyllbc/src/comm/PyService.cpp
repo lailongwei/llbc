@@ -889,7 +889,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
 
     stream.Attach(inlStream);
     (void)inlStream.Detach();
-    stream.SetAttachAttr(false);
+    stream.SetAttach(false);
 
     Py_DECREF(cobj);
     Py_DECREF(pyStreamObj);

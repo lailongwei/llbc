@@ -32,8 +32,9 @@ inline LLBC_Stream::LLBC_Stream()
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
-
 , _attach(false)
+
+, _poolInst(nullptr)
 {
 }
 
@@ -43,8 +44,9 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs)
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
-
 , _attach(false)
+
+, _poolInst(nullptr)
 {
     Assign(rhs);
 }
@@ -55,33 +57,23 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
-
 , _attach(false)
+
+, _poolInst(nullptr)
 {
-    if (attach)
-        Attach(rhs);
-    else
-        Assign(rhs);
+    attach ? Attach(rhs) : Assign(rhs);
 }
 
 inline LLBC_Stream::LLBC_Stream(size_t cap)
+: _buf(cap > 0 ? LLBC_Malloc(sint8, cap) : nullptr)
+, _pos(0)
+, _cap(0)
+
+, _endian(LLBC_DefaultEndian)
+, _attach(false)
+
+, _poolInst(nullptr)
 {
-    if (cap > 0)
-    {
-        _buf = calloc(cap, 1);
-        ASSERT(_buf && "LLBC_Stream object alloc memory from heap failed");
-    }
-    else
-    {
-        _buf = nullptr;
-    }
-
-    _pos = 0;
-    _cap = cap;
-
-    _endian = LLBC_DefaultEndian;
-
-    _attach = false;
 }
 
 inline LLBC_Stream::LLBC_Stream(void *buf, size_t len, bool attach)
@@ -106,83 +98,65 @@ inline LLBC_Stream::LLBC_Stream(void *buf, size_t len, bool attach)
 
 inline LLBC_Stream::~LLBC_Stream()
 {
-    if (!_attach)
-        LLBC_XFree(_buf);
+    if (!_attach && _buf)
+        free(_buf);
 }
 
 inline void LLBC_Stream::Attach(const LLBC_Stream &rhs)
 {
-    if (!_attach)
-        LLBC_XFree(_buf);
+    if (UNLIKELY(this == &rhs))
+        return;
+
+    if (!_attach && _buf)
+        free(_buf);
 
     _buf = rhs._buf;
-    _pos = rhs._pos;
     _cap = rhs._cap;
-
-    _endian = rhs._endian;
+    _pos = rhs._pos;
 
     _attach = true;
 }
 
 inline void LLBC_Stream::Attach(void *buf, size_t len)
 {
-    if ((buf && len == 0) || (!buf && len > 0))
-        return;
+    if (!_attach && _buf)
+        free(_buf);
 
-    if (!_attach)
-        LLBC_XFree(_buf);
-
-    _buf = buf;
+    if (UNLIKELY(!buf || len == 0))
+    {
+        _buf = nullptr;
+        _cap = 0;
+    }
+    else
+    {
+        _buf = reinterpret_cast<sint8 *>(buf);
+        _cap = len;
+    }
     _pos = 0;
-    _cap = len;
 
     _attach = true;
 }
 
 inline void LLBC_Stream::Assign(const LLBC_Stream &rhs)
 {
-    if (!_attach)
-        LLBC_XFree(_buf);
+    if (UNLIKELY(this == &rhs))
+        return;
 
-    if (rhs._buf)
-    {
-        _buf = malloc(rhs._cap);
-        memcpy(_buf, rhs._buf, rhs._cap);
-    }
-    else
-    {
-        _buf = nullptr;
-    }
-
-    _pos = rhs._pos;
-    _cap = rhs._cap;
-
-    _endian = rhs._endian;
-
-    _attach = false;
+    SetPos(rhs._pos);
+    if (_pos != 0)
+        Write(rhs._buf, rhs._pos);
 }
 
 inline void LLBC_Stream::Assign(void *buf, size_t len)
 {
-    if (!_attach)
-        LLBC_XFree(_buf);
-
-    if (buf && len > 0)
+    if (!buf || len == 0)
     {
-        _buf = malloc(len);
-        memcpy(_buf, buf, len);
-
-        _cap = len;
-    }
-    else
-    {
-        _buf = nullptr;
-        _cap = 0;
+        SetPos(0);
+        return;
     }
 
-    _pos = 0;
-
-    _attach = false;
+    SetPos(len);
+    Write(buf, len);
 }
 
 inline void *LLBC_Stream::Detach()
@@ -190,8 +164,7 @@ inline void *LLBC_Stream::Detach()
     void *tmp = _buf;
 
     _buf = nullptr;
-    _pos = 0;
-    _cap = 0;
+    _pos = _cap = 0;
 
     _attach = false;
 
@@ -203,7 +176,7 @@ inline bool LLBC_Stream::IsAttach() const
     return _attach;
 }
 
-inline void LLBC_Stream::SetAttachAttr(bool attach)
+inline void LLBC_Stream::SetAttach(bool attach)
 {
     _attach = attach;
 }
@@ -215,7 +188,7 @@ inline int LLBC_Stream::GetEndian() const
 
 inline void LLBC_Stream::SetEndian(int endian)
 {
-    if (LLBC_Endian::IsValid(endian))
+    if (LIKELY(LLBC_Endian::IsValid(endian)))
         _endian = endian;
 }
 
@@ -236,29 +209,12 @@ inline size_t LLBC_Stream::GetPos() const
 
 inline void LLBC_Stream::SetPos(size_t pos)
 {
-    ASSERT(pos <= _cap);
-    _pos = pos;
+    _pos = MIN(pos, _cap);
 }
 
-inline bool LLBC_Stream::Skip(long size)
+inline void LLBC_Stream::Skip(int size)
 {
-    const size_t skipped = static_cast<
-        size_t>(MAX(0, static_cast<long>(_pos) + size));
-
-    if (skipped > _cap)
-        return false;
-
-    SetPos(skipped);
-
-    return true;
-}
-
-inline void LLBC_Stream::Fill(size_t size, uint8 byte)
-{
-    AutoRecap(size);
-    memset((char *)_buf + _pos, byte, size);
-
-    _pos += size;
+    SetPos(MIN(static_cast<size_t>(MAX(0, static_cast<sint64>(_pos) + size)), _cap));
 }
 
 inline size_t LLBC_Stream::GetCap() const
@@ -288,79 +244,73 @@ inline void LLBC_Stream::Insert(size_t pos, const void *buf, size_t len)
     Replace(pos, pos, buf, len);
 }
 
+inline void LLBC_Stream::Erase(size_t n0, size_t n1)
+{
+    Replace(n0, n1, nullptr, 0);
+}
+
 inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t len)
 {
-    ASSERT(buf && len && "LLBC_Stream::Insert() buf or len invalid!");
-
-    // Swap n0, n1, if n0 > n1.
-    if (UNLIKELY(n0 > n1))
+    // Normalize n0, n1.
+    if (n1 == npos || n1 > _pos)
+    {
+        n1 = _pos;
+        if (n0 > n1)
+            n0 = n1;
+    }
+    else if (UNLIKELY(n0 > n1))
+    {
         std::swap(n0, n1);
-
-    ASSERT(n1 <= _pos && "LLBC_Stream::Replace() n1 > _pos!");
-
-    const size_t eraseLen = n1 - n0;
-    if (_pos + len - eraseLen > _cap)
-    {
-        ASSERT(!_attach && "LLBC_Stream::Insert() obj attach's buf limit");
-        Recap(_cap + MAX(len, _cap));
     }
 
-    uint8 *tmpBuf = nullptr;
-    if (eraseLen == 0)
+    // Normalize len.
+    if (UNLIKELY(!buf))
+        len = 0;
+
+    // Process perfect replace.
+    const auto eraseSize = n1 - n0;
+    if (len == eraseSize)
     {
-        if (n1 == _pos)
+        if (len > 0)
         {
-            memcpy((uint8 *)_buf + n1, buf, len);
-        }
-        else
-        {
-            tmpBuf = (uint8 *)malloc(_pos - n1);
+            const auto oldPos = _pos;
+            SetPos(n0);
+            Write(buf, len);
 
-            memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
-            memcpy((uint8 *)_buf + n1, buf, len);
-            memcpy((uint8 *)_buf + n1 + len, tmpBuf, _pos - n1);
-
-            free(tmpBuf);
+            SetPos(oldPos);
         }
 
-        _pos += len;
         return;
     }
 
-    if (eraseLen == len)
+    // Copy back buf.
+    sint8 *backBuf = nullptr;
+    const size_t backBufSize = _pos - n1;
+    if (backBufSize > 0)
     {
-        memcpy((uint8 *)_buf + n0, buf, len);
-        return;
+        backBuf = LLBC_Malloc(sint8, backBufSize);
+        memcpy(backBuf, _buf + n1, backBufSize);
     }
 
-    if (n1 != _pos)
+    // Copy 'will replace buf' + 'back buf' to stream.
+    SetPos(n0);
+    if (len > 0)
+        Write(buf, len);
+    if (backBuf)
     {
-        tmpBuf = (uint8 *)malloc(_pos - n1);
-        memcpy(tmpBuf, (uint8 *)_buf + n1, _pos - n1);
+        Write(backBuf, backBufSize);
+        free(backBuf);
     }
-
-    memcpy((uint8 *)_buf + n0, buf, len);
-
-    if (tmpBuf)
-    {
-        memcpy((uint8 *)_buf + n0 + len, tmpBuf, _pos - n1);
-        free(tmpBuf);
-    }
-
-    _pos = _pos + len - (n1 - n0);
 }
 
 inline bool LLBC_Stream::Read(void *buf, size_t len)
 {
-    if (len <= 0)
+    if (UNLIKELY(len <= 0))
         return true;
-    else if (UNLIKELY(!buf) || _pos + len > _cap)
+    else if (UNLIKELY(!buf || _pos + len > _cap))
         return false;
 
-    // check memory overlapped
-    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Read(void *, size_t) buffer overlapped!");
-
-    memcpy(buf, (const uint8 *)_buf + _pos, len);
+    memcpy(buf, _buf + _pos, len);
     _pos += len;
 
     return true;
@@ -368,28 +318,25 @@ inline bool LLBC_Stream::Read(void *buf, size_t len)
 
 inline void LLBC_Stream::Write(const void *buf, size_t len)
 {
-    if (UNLIKELY(!buf || len <= 0))
+    if (UNLIKELY((!buf || len <= 0) || !AutoRecap(len)))
         return;
 
-    ASSERT(OverlappedCheck(buf, len) && "LLBC_Stream::Write(const void *, size_t) buffer overlapped!");
-
-    AutoRecap(len);
-    memcpy((uint8 *)_buf + _pos, buf, len);
+    memcpy(_buf + _pos, buf, len);
     _pos += len;
 }
 
-inline void LLBC_Stream::Recap(size_t newCap)
+inline bool LLBC_Stream::Recap(size_t newCap)
 {
-    if (UNLIKELY(_attach))
-        return;
+    if (UNLIKELY(_attach || newCap < _cap))
+        return false;
 
     if (newCap > _cap)
     {
-        _buf = realloc(_buf, newCap);
-        ASSERT(_buf && "alloc memory from heap fail!");
-
+        _buf = LLBC_Realloc(sint8, _buf, newCap);
         _cap = newCap;
     }
+
+    return true;
 }
 
 inline void LLBC_Stream::Clear()
@@ -417,36 +364,29 @@ inline LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
     return _poolInst;
 }
 
-inline LLBC_Stream &LLBC_Stream::operator =(const LLBC_Stream &rhs)
+inline LLBC_Stream &LLBC_Stream::operator=(const LLBC_Stream &rhs)
 {
     Assign(rhs);
     return *this;
 }
 
-inline void LLBC_Stream::AutoRecap(size_t needCap)
+inline bool LLBC_Stream::AutoRecap(size_t needCap)
 {
     const size_t freeCap = GetFreeCap();
     if (freeCap >= needCap)
-        return;
+        return true;
 
-    if (_attach)
-    {
-        ASSERT(false && "stream obj attach's buf limit");
-        return;
-    }
-
-    const size_t newSize = 
+    const size_t newCap = 
         MAX(_pos + needCap, MIN((_cap << 1), _cap + LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT));
-    Recap((newSize + 0xf) & 0xfffffff0);
+    return Recap((newCap + 0xf) & 0xfffffff0);
 }
 
-inline bool LLBC_Stream::OverlappedCheck(const void *another, size_t len)
+inline bool LLBC_Stream::OverlappedCheck(const void *another, size_t len) const
 {
     if (!_buf)
         return true;
 
-    return (((uint8 *)another + len <= _buf) || 
-        (another >= (uint8 *)_buf + _cap));
+    return ((reinterpret_cast<const sint8 *>(another) + len <= _buf) || (another >= _buf + _cap));
 }
 
 __LLBC_NS_END

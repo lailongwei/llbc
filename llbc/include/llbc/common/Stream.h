@@ -82,10 +82,6 @@
 #define LLBC_STREAM_WRITE_BUF(buf, len)                         \
     __w_stream.Write(buf, len)                                  \
 
-// Fill macro define ,use to fill some null bytes to stream.
-#define LLBC_STREAM_FILL(size)                                  \
-    __w_stream.Fill(size)                                       \
-
 // End write macro define, use to stop stream write.
 #define LLBC_STREAM_END_WRITE()                                 \
     } while(0)                                                  \
@@ -114,7 +110,7 @@ __LLBC_NS_BEGIN
 class LLBC_Stream final
 {
 public:
-    static const size_t npos = -1;
+    static constexpr size_t npos = (std::numeric_limits<size_t>::max)();
 
 public:
     /**
@@ -162,7 +158,7 @@ public:
     /**
      * Attach external buffer.
      * @param[in] buf - external buffer pointer, not null.
-     * @param[in] len - indicate external buffer size, in bytes, must greater or equal than 0.
+     * @param[in] len - indicate external buffer size, in bytes, must greater than or equal to 0.
      */
     void Attach(void *buf, size_t len);
 
@@ -195,7 +191,7 @@ public:
      * Set stream's buffer attach attribute.
      * @param[in] attach - attach flag.
      */
-    void SetAttachAttr(bool attach);
+    void SetAttach(bool attach);
 
     /**
      * Get endian type.
@@ -230,16 +226,8 @@ public:
     /**
      * Skip the buffer R/W position.
      * @param[in] size - will skip's size, in bytes.
-     * @return bool    - return true if skip operation successed, otherwise return false.
      */
-    bool Skip(long size);
-
-    /**
-     * Fill stream buffer, use '\0' to fill.
-     * @param[in] size - the will fill buffer size, in bytes.
-     * @param[in] byte - the will fill byte, default is 0.
-     */
-    void Fill(size_t size, uint8 byte = 0);
+    void Skip(int size);
 
     /**
      * Get current stream buffer capacity.
@@ -279,11 +267,18 @@ public:
     void Insert(size_t pos, const void *buf, size_t len);
 
     /**
+     * Erase specific range stream buffer.
+     * @param[in] n0 - begin erase pos.
+     * @param[in] n1 - end erase pos, if is npos, will erase [n0, end).
+     */
+    void Erase(size_t n0, size_t n1);
+
+    /**
      * Replace stream's buffer.
      * Note: 1. Performance warning.
      *       2. Do not try to replace attach attribute's stream.
      * @param[in] n0  - stream begin position.
-     * @param[in] n1  - stream end position.
+     * @param[in] n1  - stream end position, if is npos, will replace [n0, end) range stream buffer.
      * @param[in] buf - buffer.
      * @param[in] len - buffer length.
      */
@@ -688,8 +683,9 @@ public:
     /**
      * Recapacity stream.
      * @param[in] newCap - new capacity, must greater than current capacity.
+     * @return bool - return 0 if success, otherwise return false.
      */
-    void Recap(size_t newCap);
+    bool Recap(size_t newCap);
 
     /**
      * Clear stream.
@@ -708,14 +704,14 @@ public:
     LLBC_IObjectPoolInst *GetPoolInst();
 
 public:
-    LLBC_Stream &operator =(const LLBC_Stream &rhs);
+    LLBC_Stream &operator=(const LLBC_Stream &rhs);
 
 private:
-    void AutoRecap(size_t needCap);
-        bool OverlappedCheck(const void *another, size_t len);
+    bool AutoRecap(size_t needCap);
+    bool OverlappedCheck(const void *another, size_t len) const;
 
 private:
-    void *_buf;
+    sint8 *_buf;
     size_t _pos;
     size_t _cap;
 
