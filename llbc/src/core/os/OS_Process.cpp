@@ -1,3 +1,9 @@
+/**
+ * @Author: Your name
+ * @Date:   2022-11-22 05:26:41
+ * @Last Modified by:   Your name
+ * @Last Modified time: 2022-11-29 11:23:48
+ */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
@@ -27,6 +33,11 @@
 #if LLBC_SUPPORT_HOOK_PROCESS_CRASH
 #include "llbc/core/file/Directory.h"
 #endif
+
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif // GCC compiler
 
 __LLBC_NS_BEGIN
 
@@ -430,3 +441,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
 
 __LLBC_NS_END
 #endif // Supp hook process crash
+
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#pragma GCC diagnostic pop
+#endif // GCC compiler
