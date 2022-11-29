@@ -297,6 +297,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/time/TimeImpl.h"
+#include "llbc/core/time/TimeInl.h"
 
 #endif // !__LLBC_CORE_TIME_TIME_H__

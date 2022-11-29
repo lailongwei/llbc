@@ -249,7 +249,8 @@ private:
     union _Func
     {
         CFunc cfunc;
-        char stlFunc[sizeof(std::function<Rtn(Args...)>)];
+        using STLFuncType = std::function<Rtn(Args...)>;
+        char stlFunc[sizeof(STLFuncType)];
         char methHolder[sizeof(void *) * 5 /* sizeof(vptr) + sizeof(bool)(aligement to 8) + sizeof(union meth) : default aligement */];
 
         _Func()
@@ -285,6 +286,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_DelegateImpl.h"
+#include "llbc/core/utils/Util_DelegateInl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DELEGATE_H__

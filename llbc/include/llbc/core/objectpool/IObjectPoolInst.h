@@ -143,6 +143,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/IObjectPoolInstImpl.h"
+#include "llbc/core/objectpool/IObjectPoolInstInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_INSTANCE_H__

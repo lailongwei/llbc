@@ -1,0 +1,23 @@
+<a a_attr1 = "3" a_attr2 = "4" />
+<b b_attr1 = "5" b_attr2 = "6" />
+
+<Service Name = "TestSvc1">
+    <Component Name = "TestCompA">
+        <X>333</X>
+        <Y>444</Y>
+    </Component>
+    <Component Name = "TestCompB">
+        <A>5555</A>
+        <B>6666</B>
+    </Component>
+</Service>
+<Service Name = "TestSvc2">
+    <Component Name = "TestCompA">
+        <X>hello</X>
+        <Y>hey</Y>
+    </Component>
+    <Component Name = "TestCompB">
+        <A>world</A>
+        <B>judy</B>
+    </Component>
+</Service>

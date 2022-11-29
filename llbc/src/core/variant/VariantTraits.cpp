@@ -36,7 +36,7 @@
             lObj->clear();                                               \
     } else {                                                             \
         if (lObj == nullptr)                                             \
-            lObj = LLBC_New(LLBC_Variant::ty, *rObj);                    \
+            lObj = new LLBC_Variant::ty(*rObj);                          \
         else                                                             \
             *lObj = *rObj;                                               \
     }                                                                    \
@@ -284,7 +284,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lDict)
                 lDict->insert(rDict->begin(), rDict->end());
             else
-                lDict = LLBC_New(LLBC_Variant::Dict, *rDict);
+                lDict = new LLBC_Variant::Dict(*rDict);
         }
 
         return;
@@ -304,7 +304,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
 
             if (!lSeq)
-                lSeq = LLBC_New(LLBC_Variant::Seq);
+                lSeq = new LLBC_Variant::Seq;
             if (lSeq->capacity() < lSeq->size() + rDict->size())
                 lSeq->reserve(lSeq->size() + rDict->size());
 
@@ -321,7 +321,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lSeq)
                 lSeq->insert(lSeq->end(), rSeq->begin(), rSeq->end());
             else
-                lSeq = LLBC_New(LLBC_Variant::Seq, *rSeq);
+                lSeq = new LLBC_Variant::Seq(*rSeq);
         }
         else
         {
@@ -351,14 +351,14 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lStr)
                 lStr->append(*rStr);
             else
-                lStr = LLBC_New(LLBC_Variant::Str, *rStr);
+                lStr = new LLBC_Variant::Str(*rStr);
         }
         else
         {
             if (lStr)
                 lStr->append(right.AsStr());
             else
-                lStr = LLBC_New(LLBC_Variant::Str, right.AsStr());
+                lStr = new LLBC_Variant::Str(right.AsStr());
         }
 
         return;

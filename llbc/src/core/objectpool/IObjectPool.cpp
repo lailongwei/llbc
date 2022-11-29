@@ -60,7 +60,7 @@ void LLBC_IObjectPool::DestroyAllPoolInstFactories()
     for (std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.begin();
          it != _poolInstFactories.end();
          ++it)
-        LLBC_Delete(it->second);
+        delete it->second;
 
     _poolInstFactories.clear();
 

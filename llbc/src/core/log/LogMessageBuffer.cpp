@@ -165,7 +165,7 @@ LLBC_LogMessageBuffer::operator std::basic_ostream<char> &()
 {
     if (!_stream)
     {
-        _stream = LLBC_New(std::basic_ostringstream<char>, std::ios_base::ate);
+        _stream = new std::basic_ostringstream<char>(std::ios_base::ate);
         if (!_buf.empty())
             *_stream <<_buf;
     }

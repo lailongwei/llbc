@@ -199,7 +199,7 @@ sint64 LLBC_IntervalSampler::GetSpeedInHours(int hours) const
 
 void LLBC_IntervalSampler::ShiftSpeedArray(sint64 *arr, int size, int diff)
 {
-    sint64 *tmpArr = LLBC_News(sint64, size - 1);
+    sint64 *tmpArr = new sint64[size - 1];
     if(diff > 0)
     {
         if(diff < size)
@@ -228,7 +228,7 @@ void LLBC_IntervalSampler::ShiftSpeedArray(sint64 *arr, int size, int diff)
         }
     }
 
-    LLBC_Deletes(tmpArr);
+    delete[] tmpArr;
 }
 
 __LLBC_NS_END

@@ -114,6 +114,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/TlsImpl.h"
+#include "llbc/core/thread/TlsInl.h"
 
 #endif // !__LLBC_CORE_THREAD_TLS_H__

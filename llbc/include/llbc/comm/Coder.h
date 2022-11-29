@@ -75,6 +75,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/comm/CoderImpl.h"
+#include "llbc/comm/CoderInl.h"
 
 #endif // !__LLBC_COMM_ICODER_H__

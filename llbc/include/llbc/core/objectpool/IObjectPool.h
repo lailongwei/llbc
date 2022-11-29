@@ -111,6 +111,6 @@ protected:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/IObjectPoolImpl.h"
+#include "llbc/core/objectpool/IObjectPoolInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__

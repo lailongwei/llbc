@@ -96,6 +96,6 @@ LLBC_EXPORT bool LLBC_BoolJudge();
 
 __LLBC_NS_END
 
-#include "llbc/core/random/RandomImpl.h"
+#include "llbc/core/random/RandomInl.h"
 
 #endif // !__LLBC_CORE_RANDOM_RANDOM_H__

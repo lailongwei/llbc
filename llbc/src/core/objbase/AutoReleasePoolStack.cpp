@@ -44,7 +44,7 @@ LLBC_AutoReleasePoolStack::~LLBC_AutoReleasePoolStack()
         pools.push_back(pool);
 
     for (size_t i = 0; i < pools.size(); ++i)
-        LLBC_Delete(pools[i]);
+        delete pools[i];
 }
 
 int LLBC_AutoReleasePoolStack::AddObject(LLBC_Object *o)

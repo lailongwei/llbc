@@ -56,6 +56,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/entity/HolderImpl.h"
+#include "llbc/core/entity/HolderInl.h"
 
 #endif // !__LLBC_CORE_ENTITY_HOLDER_H__

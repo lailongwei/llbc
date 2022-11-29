@@ -12,6 +12,7 @@
 .DS_Store
 
 .vscode/
+.idea/
 
 iOSBuild/*.xcodeproj/xcuserdata/
 iOSBuild/*.xcodeproj/project.xcworkspace/xcuserdata/

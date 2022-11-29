@@ -1,0 +1,38 @@
+name: Linux build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  linux-build:
+    name: Linux build job
+    runs-on: ubuntu-latest
+    container: docker.io/centos:7
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      
+      - name: intall deps
+        run: yum install -y wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
+        
+      - name: Compile core lib code
+        run: |
+          make core_lib config=debug64 -j4
+          make core_lib config=release64 -j4
+        
+      - name: Compile test code
+        run: |
+          # make test config=debug64 -j4
+          make test config=release64 -j4
+        
+      - run: echo "🍏 This job's status is ${{ job.status }}."

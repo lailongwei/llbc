@@ -87,7 +87,7 @@ class TestHandler(object):
         # print 'send response...'
         data.iVal = self._handleTimes
         svc.send(session_id, data)
-        raise Exception('Test exception, raise from TestData packet handler')
+        # raise Exception('Test exception, raise from TestData packet handler')
 
         self._handleTimes += 1
         if self._handleTimes % 1000 == 0:

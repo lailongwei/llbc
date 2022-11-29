@@ -63,13 +63,13 @@ LLBC_String LLBC_Directory::HomeDir()
     char *envVal = LLBC_Malloc(char, requiredSize);
     if (getenv_s(&requiredSize, envVal, requiredSize, "HOMEPATH") != 0)
     {
-        LLBC_Free(envVal);
+        free(envVal);
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_String();
     }
 
     LLBC_String path(envVal);
-    LLBC_Free(envVal);
+    free(envVal);
 #else // Non-Win32
     char *envVal = getenv("HOME");
     if (!envVal)

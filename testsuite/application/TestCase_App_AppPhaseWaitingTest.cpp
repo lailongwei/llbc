@@ -152,7 +152,7 @@ public:
         
         if (startFinished)
         {
-            auto testSvc = LLBC_IService::Create();
+            auto testSvc = LLBC_Service::Create();
             testSvc->AddComponent(new TestCompA);
             testSvc->AddComponent(new TestCompB);
 

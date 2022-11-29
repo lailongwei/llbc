@@ -45,11 +45,6 @@ int LLBC_CodecProtocol::GetLayer() const
     return LLBC_ProtocolLayer::CodecLayer;
 }
 
-int LLBC_CodecProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     // Set packet payload(from object-pool).

@@ -73,6 +73,7 @@ LLBC_Application::LLBC_Application()
 , _llbcLibStartupInApp(false)
 
 , _loadingCfg(false)
+, _preventCfgLoad(0)
 , _cfgType(LLBC_ApplicationConfigType::End)
 
 , _services(*LLBC_ServiceMgrSingleton)
@@ -147,6 +148,18 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     }
 
     return LLBC_OK;
+}
+
+void LLBC_Application::PreventConfigLoad()
+{
+    LLBC_LockGuard guard(_cfgLock);
+    ++_preventCfgLoad;
+}
+
+void LLBC_Application::CancelPreventConfigLoad()
+{
+    LLBC_LockGuard guard(_cfgLock);
+    _preventCfgLoad = MAX(0, _preventCfgLoad - 1);
 }
 
 int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
@@ -513,7 +526,11 @@ int LLBC_Application::LoadConfig(bool lock)
     if (lock)
         _cfgLock.Lock();
     LLBC_Defer(if (lock) _cfgLock.Unlock());
+
+    // Not allow reentry.
     LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
+    // If prevent config load, return faled.
+    LLBC_SetErrAndReturnIf(_preventCfgLoad != 0, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Check config file exist or not.
     LLBC_SetErrAndReturnIf(!LLBC_File::Exists(_cfgPath), LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
@@ -523,7 +540,10 @@ int LLBC_Application::LoadConfig(bool lock)
 
     LLBC_DoIf(_cfgType == LLBC_ApplicationConfigType::Ini, return LoadIniConfig());
     LLBC_DoIf(_cfgType == LLBC_ApplicationConfigType::Xml, return LoadXmlConfig());
-    LLBC_DoIf(true, return LoadPropertyConfig());
+    LLBC_DoIf(_cfgType == LLBC_ApplicationConfigType::Property, return LoadPropertyConfig());
+    
+    LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
+    return LLBC_FAILED;
 }
 
 int LLBC_Application::LoadIniConfig()

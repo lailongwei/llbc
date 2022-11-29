@@ -69,12 +69,12 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     std::cout <<"core/thread/lock test:" <<std::endl;
 
 
-    __LLBC_Thread_Test_Arg *threadArg = LLBC_New(__LLBC_Thread_Test_Arg);
+    __LLBC_Thread_Test_Arg *threadArg = new __LLBC_Thread_Test_Arg;
     LLBC_NativeThreadHandle handles[__g_threads_num] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
 
     // SimpleLock test.
     std::cout <<"Test SimpleLock ..." <<std::endl;
-    threadArg->lock = LLBC_New(LLBC_SimpleLock);
+    threadArg->lock = new LLBC_SimpleLock;
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -89,12 +89,12 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     {
         LLBC_JoinThread(handles[i]);
     }
-    LLBC_Delete(threadArg->lock);
+    delete threadArg->lock;
     std::cout <<"\t OK, value: " <<threadArg->val <<std::endl;
 
     // RecursiveLock test.
     std::cout <<"Test RecursiveLock ..." <<std::endl;
-    threadArg->lock = LLBC_New(LLBC_RecursiveLock);
+    threadArg->lock = new LLBC_RecursiveLock;
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -109,12 +109,12 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     {
         LLBC_JoinThread(handles[i]);
     }
-    LLBC_Delete(threadArg->lock);
+    delete threadArg->lock;
     std::cout <<"\t OK, value: " <<threadArg->val <<std::endl;
 
     // FastLock test.
     std::cout <<"Test FastLock ..." <<std::endl;
-    threadArg->lock = LLBC_New(LLBC_FastLock);
+    threadArg->lock = new LLBC_FastLock;
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -129,7 +129,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     {
         LLBC_JoinThread(handles[i]);
     }
-    LLBC_Delete(threadArg->lock);
+    delete threadArg->lock;
     std::cout <<"\t OK, value: " <<threadArg->val <<std::endl;
 
     // SpinLock test.
@@ -149,12 +149,12 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     {
         LLBC_JoinThread(handles[i]);
     }
-    LLBC_Delete(threadArg->lock);
+    delete threadArg->lock;
     std::cout <<"\t OK, value: " <<threadArg->val <<std::endl;
 
     // DummyLock test.
     std::cout <<"Test DummyLock ..." <<std::endl;
-    threadArg->lock = LLBC_New(LLBC_DummyLock);
+    threadArg->lock = new LLBC_DummyLock;
     threadArg->val = 0;
     for(int i = 0; i < __g_threads_num; ++i)
     {
@@ -169,10 +169,10 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
     {
         LLBC_JoinThread(handles[i]);
     }
-    LLBC_Delete(threadArg->lock);
+    delete threadArg->lock;
     std::cout <<"\t OK, value: " <<threadArg->val <<std::endl;
 
-    LLBC_Delete(threadArg);
+    delete threadArg;
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();

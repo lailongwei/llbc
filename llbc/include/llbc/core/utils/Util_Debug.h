@@ -121,7 +121,7 @@ __LLBC_NS_END
  */
 LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
 
-#include "llbc/core/utils/Util_DebugImpl.h"
+#include "llbc/core/utils/Util_DebugInl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
 

@@ -48,14 +48,6 @@ public:
 
 public:
     /**
-     * When one connection established, will call this method.
-     * @param[in] local - the local address.
-     * @param[in] peer  - the peer address.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer);
-
-    /**
      * When data send, will call this method.
      * @param[in] in             - the in data.
      * @param[in] out            - the out data.

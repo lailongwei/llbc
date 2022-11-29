@@ -119,7 +119,7 @@ LLBC_HIDDEN void __LLBC_DestroyErrors();
 
 __LLBC_NS_END
 
-#include <llbc/common/ErrorsImpl.h>
+#include <llbc/common/ErrorsInl.h>
 
 #endif // !__LLBC_COM_ERRORS_H__
 

@@ -150,6 +150,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/timer/BinaryHeapImpl.h"
+#include "llbc/core/timer/BinaryHeapInl.h"
 
 #endif // !__LLBC_CORE_TIMER_BINARY_HEAP_H__

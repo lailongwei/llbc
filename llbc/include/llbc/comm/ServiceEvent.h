@@ -201,6 +201,10 @@ struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
 {
+    int cfgType;
+    LLBC_Property propCfg;
+    LLBC_Variant nonPropCfg;
+
     LLBC_SvcEv_AppCfgReloadedEv();
 };
 
@@ -284,7 +288,9 @@ public:
     /**
      * Build application config reload event.
      */
-    static LLBC_MessageBlock *BuildAppCfgReloadEv();
+    static LLBC_MessageBlock *BuildAppCfgReloadEv(int cfgType,
+                                                  const LLBC_Property &propCfg,
+                                                  const LLBC_Variant &nonPropCfg);
 
 public:
     /**
@@ -295,6 +301,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/comm/ServiceEventImpl.h"
+#include "llbc/comm/ServiceEventInl.h"
 
 #endif // !__LLBC_COMM_SERVICE_EVENT_H__

@@ -24,17 +24,9 @@
 
 namespace
 {
-    struct UserDefineStruct
-    {
-        int val1;
-        LLBC_String val2;
-    };
+    struct UserDefineStruct {};
 
-    class UserDefineClass
-    {
-        int val1;
-        LLBC_String val2;
-    };
+    class UserDefineClass {};
 }
 
 TestCase_Com_RTTI::TestCase_Com_RTTI()

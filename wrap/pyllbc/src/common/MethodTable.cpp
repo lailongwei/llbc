@@ -40,7 +40,7 @@ pyllbc_MethodTable::pyllbc_MethodTable()
 
 pyllbc_MethodTable::~pyllbc_MethodTable()
 {
-    LLBC_Free(_methods);
+    free(_methods);
 }
 
 int pyllbc_MethodTable::AddMethod(const PyMethodDef &method)

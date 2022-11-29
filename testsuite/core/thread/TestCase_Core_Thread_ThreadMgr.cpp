@@ -29,6 +29,8 @@ static int ThreadProc(void *arg)
 
     LLBC_ThreadManager::Sleep(5000);
 
+    LLBC_PrintLine("Thread %d will exit", nativeHandle);
+
     return 0;
 }
 

@@ -34,7 +34,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free vector, size: %lu", vec.size());
 
     for(sint32 i = 0; i < 10; ++i)
-        vec.push_back(LLBC_New(sint8));
+        vec.push_back(new sint8);
     LLBC_STLHelper::DeleteContainer(vec, true, true);
     LLBC_PrintLine("after free vector, size: %lu", vec.size());
 
@@ -46,7 +46,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free list, size: %lu", list.size());
 
     for(sint32 i = 0; i < 10; ++i)
-        list.push_back(LLBC_New(sint32));
+        list.push_back(new sint32);
     LLBC_STLHelper::DeleteContainer(list, true, true);
     LLBC_PrintLine("after delete list, size: %lu", list.size());
 
@@ -58,7 +58,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free deque, size: %lu", list.size());
 
     for(sint32 i = 0; i < 10; ++i)
-        dq.push_back(LLBC_New(sint32));
+        dq.push_back(new sint32);
     LLBC_STLHelper::DeleteContainer(dq, true, true);
     LLBC_PrintLine("after delete deque, size: %lu", list.size());
 
@@ -70,7 +70,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free stack, size: %lu", stk.size());
 
     for (sint32 i = 0; i < 10; ++i)
-        stk.push(LLBC_New(sint32));
+        stk.push(new sint32);
     LLBC_STLHelper::DeleteContainer(stk);
     LLBC_PrintLine("after delete stack, size: %lu", stk.size());
 
@@ -82,7 +82,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free queue, size: %lu", q.size());
 
     for (sint32 i = 0; i < 10; ++i)
-        q.push(LLBC_New(sint32));
+        q.push(new sint32);
     LLBC_STLHelper::DeleteContainer(q);
     LLBC_PrintLine("after delete queue, size: %lu", q.size());
 
@@ -95,7 +95,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     std::map<sint32, std::string *> map2;
     for(sint32 i = 0; i < 10; ++i)
-        map2[i] = LLBC_New(std::string);
+        map2[i] = new std::string;
     LLBC_STLHelper::DeleteContainer(map2, true, true);
     LLBC_PrintLine("after delete map, size: %lu", map2.size());
 
@@ -107,7 +107,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     LLBC_PrintLine("after free set, size: %lu", s.size());
 
     for(sint32 i = 0;  i < 10; ++i)
-        s.insert(LLBC_New(sint32));
+        s.insert(new sint32);
     LLBC_STLHelper::DeleteContainer(s, true, true);
     LLBC_PrintLine("after delete set, size: %lu", s.size());
 

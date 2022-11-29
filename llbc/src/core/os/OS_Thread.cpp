@@ -49,7 +49,7 @@ static unsigned int WINAPI __ThreadEntry(void *arg)
     LLBC_NS LLBC_ThreadProc llbcThreadProc = entryArg->proc;
     void *llbcThreadArg = entryArg->arg;
 
-    LLBC_Delete(entryArg);
+    delete entryArg;
 
     int llbcThreadRtn = (*llbcThreadProc)(llbcThreadArg);
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -307,7 +307,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
     }
     stackSize = MAX(stackSize, LLBC_CFG_THREAD_MINIMUM_STACK_SIZE);
 
-    LLBC_INTERNAL_NS __ThreadEntryArg *threadArg = LLBC_New(LLBC_INTERNAL_NS __ThreadEntryArg);
+    LLBC_INTERNAL_NS __ThreadEntryArg *threadArg = new LLBC_INTERNAL_NS __ThreadEntryArg;
     threadArg->proc = proc;
     threadArg->arg = arg;
 
@@ -328,7 +328,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
                                &LLBC_INTERNAL_NS __ThreadEntry,
                                threadArg)) != 0)
     {
-        LLBC_Delete(threadArg);
+        delete threadArg;
 
         errno = ret;
         pthread_attr_destroy(&attr);
@@ -345,7 +345,7 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
                                      nullptr);
     if (!*handle)
     {
-        LLBC_Delete(threadArg);
+        delete threadArg;
 
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;

@@ -22,11 +22,13 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
+
+#include "llbc/application/Application.h"
 
 __LLBC_NS_BEGIN
 
@@ -340,25 +342,133 @@ LLBC_Component::LLBC_Component(uint64 caredEvents)
 , _started(false)
 , _caredEvents(caredEvents)
 
+, _svc(nullptr)
 , _meths(nullptr)
 
-, _svc(nullptr)
+, _cfgType(LLBC_ApplicationConfigType::End)
+, _propCfg(nullptr)
+, _nonPropCfg(nullptr)
 {
 }
 
 LLBC_Component::~LLBC_Component()
 {
-    LLBC_XDelete(_meths);
-}
+    LLBC_XDelete(_propCfg);
+    LLBC_XDelete(_nonPropCfg);
 
-void LLBC_Component::SetService(LLBC_IService *svc)
-{
-    _svc = svc;
+    LLBC_XDelete(_meths);
 }
 
 LLBC_Component *LLBC_Component::GetComponent(const char *compName)
 {
     return _svc->GetComponent(compName);
+}
+
+const LLBC_Variant &LLBC_Component::GetConfig() const
+{
+    return _nonPropCfg ? *_nonPropCfg : LLBC_Variant::nil;
+}
+
+const LLBC_Property &LLBC_Component::GetPropertyConfig() const
+{
+    static const LLBC_Property emptyPropCfg;
+    return _propCfg ? *_propCfg : emptyPropCfg;
+}
+
+void LLBC_Component::UpdateComponentCfg()
+{
+    if (UNLIKELY(!_svc))
+        return;
+
+    // Get config type.
+    _cfgType = _svc->GetConfigType();
+
+    // Reset component config.
+    LLBC_DoIf(_propCfg, _propCfg->RemoveAllProperties());
+    LLBC_DoIf(_nonPropCfg, _nonPropCfg->BecomeNil());
+
+    // Update component config.
+    auto compNamePtr = LLBC_GetTypeName(*this);
+    const auto colonPos = strrchr(compNamePtr, ':');
+    const LLBC_String compName = colonPos ? colonPos + 1 : compNamePtr;
+    const LLBC_String iCompName = 
+        (compName.size() > 1 && compName[0] != 'I') ? LLBC_String("I") + compName : compName;
+    if (_cfgType == LLBC_ApplicationConfigType::Property)
+    {
+        // Component config prop name:
+        // <comp_name>
+        // <comp_name>.xxx
+        // <comp_name>.xxx.xxx
+        // <comp_name>.xxx.xxx.xxx....
+        auto &svcPropCfg = _svc->GetPropertyConfig();
+        auto compCfg = svcPropCfg.GetProperty(compName);
+        if (!compCfg && iCompName.size() != compName.size())
+            compCfg = _propCfg->GetProperty(iCompName);
+        if (compCfg)
+        {
+            if (_propCfg)
+                *_propCfg = *compCfg;
+            else
+                _propCfg = new LLBC_Property(*compCfg);
+        }
+    }
+    else
+    {
+        const LLBC_Variant *matchedCompCfg = nullptr;
+        auto svcNonPropCfg = _svc->GetConfig();
+        if (_cfgType == LLBC_ApplicationConfigType::Ini)
+        {
+            // Component config section: [<svc_name>.<comp_name>]
+            auto compCfgKey =
+                LLBC_String().format("%s.%s", _svc->GetName().c_str(), compName.c_str());
+            auto it = svcNonPropCfg.DictFind(compCfgKey);
+            if (it == svcNonPropCfg.DictEnd() && iCompName.size() != compName.size())
+            {
+                compCfgKey =
+                    LLBC_String().format("%s.%s", _svc->GetName().c_str(), iCompName.c_str());
+                it = svcNonPropCfg.DictFind(compCfgKey);
+            }
+
+            if (it != svcNonPropCfg.DictEnd())
+                matchedCompCfg = &it->second;
+        }
+        else if (_cfgType == LLBC_ApplicationConfigType::Xml)
+        {
+            auto &compCfgs = svcNonPropCfg[LLBC_XMLKeys::Children];
+            for (auto &compCfg : compCfgs.AsSeq())
+            {
+                const auto compCfgName = compCfg[LLBC_XMLKeys::Name].AsStr();
+                if (compCfgName != "Component" &&
+                    compCfgName != "component" &&
+                    compCfgName != "Comp" &&
+                    compCfgName != "comp")
+                    continue;
+
+                const auto &compCfgAttrs = compCfg[LLBC_XMLKeys::Attrs];
+                if (compCfgAttrs["Name"] == compName ||
+                    compCfgAttrs["name"] == compName ||
+                    (iCompName.size() != compName.size() &&
+                     (compCfgAttrs["Name"] == iCompName ||
+                      compCfgAttrs["name"] == iCompName)))
+                {
+                    matchedCompCfg = &compCfg;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // Do nothing.
+        }
+
+        if (matchedCompCfg)
+        {
+            if (_nonPropCfg)
+                *_nonPropCfg = *matchedCompCfg;
+            else
+                _nonPropCfg = new LLBC_Variant(*matchedCompCfg);
+        }
+    }
 }
 
 __LLBC_NS_END

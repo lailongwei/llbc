@@ -27,7 +27,7 @@
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
 
@@ -42,11 +42,6 @@ LLBC_RawProtocol::~LLBC_RawProtocol()
 int LLBC_RawProtocol::GetLayer() const
 {
     return LLBC_ProtocolLayer::PackLayer;
-}
-
-int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
 }
 
 int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
@@ -76,7 +71,7 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     packet->SetPayload(block);
 
     // Create output.
-    out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+    out = new LLBC_MessageBlock(sizeof(LLBC_Packet *));
     (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&packet, sizeof(LLBC_Packet *));
 
     return LLBC_OK;

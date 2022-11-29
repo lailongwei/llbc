@@ -229,7 +229,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectPoolInstImpl.h"
+#include "llbc/core/objectpool/ObjectPoolInstInl.h"
 
 // Restore some warnings.
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -192,7 +192,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     lock.Unlock();
     #endif // !Non-Win32
 
-    LLBC_Free(buf);
+    free(buf);
 
     return LLBC_OK;
 }

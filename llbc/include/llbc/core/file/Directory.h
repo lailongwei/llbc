@@ -186,6 +186,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/file/DirectoryImpl.h"
+#include "llbc/core/file/DirectoryInl.h"
 
 #endif // !__LLBC_CORE_FILE_DIRECTORY_H__

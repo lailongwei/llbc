@@ -132,10 +132,10 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
         return LLBC_FAILED;
     }
 
-    Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
+    Base *lemma = new pyllbc_PackLemma_Raw;
     if (lemma->Process(ch) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         _state = Base::Error;
 
         return LLBC_FAILED;
@@ -143,7 +143,7 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
 
     if (Process(lemma) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         return LLBC_FAILED;
     }
 
@@ -207,7 +207,7 @@ PyObject *pyllbc_PackLemma_Dict::Read(pyllbc_Stream *stream)
 
     int len;
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
-    if (!llbcStream.ReadSInt32(len))
+    if (!llbcStream.Read(len))
     {
         pyllbc_SetError("not enough bytes to unpack dict data(head area)");
         return nullptr;
@@ -276,7 +276,7 @@ int pyllbc_PackLemma_Dict::Write(pyllbc_Stream *stream, PyObject *values)
 #if LLBC_TARGET_PROCESSOR_X86_64
     llbcStream.WriteSInt32(static_cast<sint32>(len));
 #else
-    llbcStream.WriteSInt32(len);
+    llbcStream.Write(len);
 #endif
 
     Py_ssize_t pos = 0;

@@ -244,6 +244,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LoggerConfigInfoImpl.h"
+#include "llbc/core/log/LoggerConfigInfoInl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__

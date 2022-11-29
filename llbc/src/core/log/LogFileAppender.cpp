@@ -100,7 +100,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     if (initInfo.lazyCreateLogFile)
         return LLBC_OK;
 
-    _file = LLBC_New(LLBC_File);
+    _file = new LLBC_File;
     _fileName = BuildLogFileName(now);
 
     LLBC_FileAttributes fileAttrs;
@@ -287,7 +287,7 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
     if (_file)
         _file->Close();
     else
-        _file = LLBC_New(LLBC_File);
+        _file = new LLBC_File;
 
     // Reset non-reflush log count variables.
     _nonFlushLogCount = 0;

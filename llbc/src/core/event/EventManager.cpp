@@ -74,7 +74,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
         return 0;
 
-    _ListenerInfo *li = LLBC_New(_ListenerInfo);
+    _ListenerInfo *li = new _ListenerInfo;
     li->evId = id;
     li->stub = stub;
     li->deleg = listener;
@@ -98,7 +98,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
         return 0;
 
-    _ListenerInfo *li = LLBC_New(_ListenerInfo);
+    _ListenerInfo *li = new _ListenerInfo;
     li->evId = id;
     li->stub = stub;
     li->listener = listener;

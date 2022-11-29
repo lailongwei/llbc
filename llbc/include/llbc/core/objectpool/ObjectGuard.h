@@ -140,6 +140,6 @@ __LLBC_NS_END
 template <typename ObjectType>
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard);
 
-#include "llbc/core/objectpool/ObjectGuardImpl.h"
+#include "llbc/core/objectpool/ObjectGuardInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_GUARD_H__

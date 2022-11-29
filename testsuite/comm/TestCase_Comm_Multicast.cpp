@@ -75,7 +75,7 @@ public:
         if (_asClient)
             return;
 
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         if (_useBst)
             svc->Broadcast(OPCODE, "Hello world!", 14, 0);
         else
@@ -134,10 +134,10 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
         protoFactory = new LLBC_NormalProtocolFactory;
     else
         protoFactory = new LLBC_RawProtocolFactory;
-    LLBC_IService *svc = LLBC_IService::Create("MulticastTest", protoFactory);
+    LLBC_Service *svc = LLBC_Service::Create("MulticastTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
-    TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
+    TestComp *comp = new TestComp(_asClient, _useBst);
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
@@ -152,7 +152,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }
@@ -169,7 +169,7 @@ void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
         _useBst = LLBC_ToLower(argv[5]) == "true" ? true : false;
 }
 
-int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_IService *svc)
+int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
 {
     for (int i = 0; i < _clientCnt; ++i)
     {
@@ -188,7 +188,7 @@ int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_IService *svc)
     return LLBC_OK;
 }
 
-int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_IService *svc)
+int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_Service *svc)
 {
     const int sessionId = svc->Listen(_runIp.c_str(), _runPort);
     if (sessionId == 0)

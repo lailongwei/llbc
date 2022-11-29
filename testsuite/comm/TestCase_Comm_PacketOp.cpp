@@ -26,7 +26,7 @@ namespace
 {
     void __DeletePreHandleResult(void *result)
     {
-        LLBC_Delete(reinterpret_cast<char *>(result));
+        delete reinterpret_cast<char *>(result);
         std::cout <<"Prehandle result data deleted!" <<std::endl;
     }
 }
@@ -132,8 +132,8 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     // PreHandleResult about test.
     std::cout <<"\nPreHandle result about test:" <<std::endl;
     std::cout <<"Create new packet to test prehandle result clear callback method" <<std::endl;
-    LLBC_Packet *preHandleTestPacket = LLBC_New(LLBC_Packet);
-    preHandleTestPacket->SetPreHandleResult(LLBC_New(char), __DeletePreHandleResult);
+    LLBC_Packet *preHandleTestPacket = new LLBC_Packet;
+    preHandleTestPacket->SetPreHandleResult(new char, __DeletePreHandleResult);
 
     std::cout <<"Delete prehandle test packet" <<std::endl;
     LLBC_XDelete(preHandleTestPacket);
@@ -146,7 +146,7 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     streamOutputTest.SetRecverServiceId(200);
     streamOutputTest.SetOpcode(300);
     streamOutputTest.SetStatus(400);
-    streamOutputTest.SetPayload(LLBC_New(LLBC_MessageBlock));
+    streamOutputTest.SetPayload(new LLBC_MessageBlock);
     streamOutputTest <<3;
     streamOutputTest <<"Hello world";
     std::cout <<"streamOutputTest::operator<<(std::ostream &): " <<streamOutputTest <<std::endl;

@@ -34,14 +34,14 @@
 __LLBC_NS_BEGIN
 
 LLBC_SamplerGroup::LLBC_SamplerGroup()
-: _samplers(LLBC_New(_SamplerMap))
+: _samplers(new _SamplerMap)
 {
 }
 
 LLBC_SamplerGroup::~LLBC_SamplerGroup()
 {
     LLBC_STLHelper::DeleteContainer(*_samplers, false);
-    LLBC_Delete(_samplers);
+    delete _samplers;
 }
 
 int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
@@ -62,15 +62,15 @@ int LLBC_SamplerGroup::AddSampler(int type, const LLBC_String &name)
     switch (type)
     {
     case LLBC_SamplerType::CountSampler:
-        sampler = LLBC_New(LLBC_CountSampler);
+        sampler = new LLBC_CountSampler;
         break;
 
     case LLBC_SamplerType::LimitSampler:
-        sampler = LLBC_New(LLBC_LimitSampler);
+        sampler = new LLBC_LimitSampler;
         break;
 
     case LLBC_SamplerType::IntervalSampler:
-        sampler = LLBC_New(LLBC_IntervalSampler);
+        sampler = new LLBC_IntervalSampler;
         break;
 
     default:

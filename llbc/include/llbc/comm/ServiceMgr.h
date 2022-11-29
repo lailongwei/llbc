@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -44,8 +44,8 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_ServiceMgr
 {
 public:
-    typedef std::map<int, LLBC_IService *> Id2Services;
-    typedef std::map<LLBC_String, LLBC_IService *> Name2Services;
+    typedef std::map<int, LLBC_Service *> Id2Services;
+    typedef std::map<LLBC_String, LLBC_Service *> Name2Services;
 
 public:
     /**
@@ -58,16 +58,16 @@ public:
     /**
      * Get service by service Id.
      * @param[in] id - the service Id.
-     * @return LLBC_IService * - the service, if not found, return nullptr.
+     * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_IService *GetService(int id);
+    LLBC_Service *GetService(int id);
 
     /**
      * Get service by service name.
      * @param[in] name - the service name.
-     * @return LLBC_IService * - the service, if not found, return nullptr.
+     * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_IService *GetService(const LLBC_String &name);
+    LLBC_Service *GetService(const LLBC_String &name);
 
 public:
     /**
@@ -117,34 +117,34 @@ public:
 
 private:
     /**
-     * Friend class: LLBC_Service.
+     * Friend class: LLBC_ServiceImpl.
      *  Access methods:
      *      OnServiceStart()
      *      OnServiceStop()
      */
-    friend class LLBC_Service;
+    friend class LLBC_ServiceImpl;
 
     /**
      * Add service to service manager.
      * @param[in] svc - the service.
      */
-    void OnServiceStart(LLBC_IService *svc);
+    void OnServiceStart(LLBC_Service *svc);
 
     /**
      * Remove service from service manager.
      * @param[in] id - the service Id.
      */
-    void OnServiceStop(LLBC_IService *svc);
+    void OnServiceStop(LLBC_Service *svc);
 
 private:
-    int Stop(LLBC_IService *svc, bool del);
+    int Stop(LLBC_Service *svc, bool del);
 
-    LLBC_IService *GetServiceNonLock(int id);
-    LLBC_IService *GetServiceNonLock(const LLBC_String &name);
+    LLBC_Service *GetServiceNonLock(int id);
+    LLBC_Service *GetServiceNonLock(const LLBC_String &name);
 
-    static bool InTls(const LLBC_IService *svc);
+    static bool InTls(const LLBC_Service *svc);
     static bool InTls(const Id2Services &svcs);
-    typedef std::map<LLBC_String, LLBC_IService *> _Services2;
+    typedef std::map<LLBC_String, LLBC_Service *> _Services2;
     static bool InTls(const _Services2 &svcs);
 
 private:
@@ -162,7 +162,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ServiceMgr>;
 
 __LLBC_NS_END
 
-#include "llbc/comm/ServiceMgrImpl.h"
+#include "llbc/comm/ServiceMgrInl.h"
 
 #endif // !__LLBC_COMM_SERVICE_MGR_H__
 

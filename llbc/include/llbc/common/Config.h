@@ -48,7 +48,7 @@
  * \brief Common about config options define.
  */
 // The stream object auto resize increment limit, in bytes.
-#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          256
+#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          512
 
 /**
  * \brief core/algo about config options define.
@@ -257,10 +257,6 @@
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
-// Service frame-timeout function switch, if enabled, the service will has frame-timeout limit function, default is 0.
-#define LLBC_CFG_COMM_ENABLE_SERVICE_FRAME_TIMEOUT          0
-
-
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).
 //   "SelectPoller" : Use select poller(All platform available).

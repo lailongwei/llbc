@@ -139,6 +139,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/GuardImpl.h"
+#include "llbc/core/thread/GuardInl.h"
 
 #endif // __LLBC_CORE_THREAD_GUARD_H__

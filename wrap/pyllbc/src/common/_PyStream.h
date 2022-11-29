@@ -25,16 +25,16 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_NewPyStream(PyObject *self, PyObject *args)
 {
-    int initSize = 0;
+    int initCap = 0;
     PyObject *pyStream;
     int endian = LLBC_MachineEndian;
-    if (!PyArg_ParseTuple(args, "O|ii", &pyStream, &initSize, &endian))
+    if (!PyArg_ParseTuple(args, "O|ii", &pyStream, &initCap, &endian))
         return nullptr;
 
-    pyllbc_Stream *stream = LLBC_New(pyllbc_Stream, pyStream, initSize);
+    pyllbc_Stream *stream = new pyllbc_Stream(pyStream, initCap);
     if (UNLIKELY(stream->SetEndian(endian) != LLBC_OK))
     {
-        LLBC_Delete(stream);
+        delete stream;
         return nullptr;
     }
 
@@ -47,7 +47,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelPyStream(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &stream))
         return nullptr;
 
-    LLBC_Delete(stream);
+    delete stream;
 
     Py_RETURN_NONE;
 }
@@ -96,23 +96,23 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamPos(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_GetPyStreamSize(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_GetPyStreamCap(PyObject *self, PyObject *args)
 {
     pyllbc_Stream *stream;
     if (!PyArg_ParseTuple(args, "l", &stream))
         return nullptr;
 
-    return Py_BuildValue("I", stream->GetSize());
+    return Py_BuildValue("I", stream->GetCap());
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamSize(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_SetPyStreamCap(PyObject *self, PyObject *args)
 {
-    uint32 newSize;
+    uint32 newCap;
     pyllbc_Stream *stream;
-    if (!PyArg_ParseTuple(args, "lI", &stream, &newSize))
+    if (!PyArg_ParseTuple(args, "lI", &stream, &newCap))
         return nullptr;
 
-    if (stream->SetSize(newSize) != LLBC_OK)
+    if (stream->Recap(newCap) != LLBC_OK)
         return nullptr;
 
     Py_RETURN_NONE;
@@ -286,12 +286,12 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamRead_Stream(PyObject *self, PyObject *ar
 
     LLBC_Stream &llbcWillRead = willReadStream->GetLLBCStream();
 
-    begin = MIN(MAX(0, begin), static_cast<int>(llbcWillRead.GetSize()));
+    begin = MIN(MAX(0, begin), static_cast<int>(llbcWillRead.GetCap()));
 
     if (end == -1)
-        end = static_cast<int>(llbcWillRead.GetSize());
+        end = static_cast<int>(llbcWillRead.GetCap());
     else
-        end = MIN(MAX(0, end), static_cast<int>(llbcWillRead.GetSize()));
+        end = MIN(MAX(0, end), static_cast<int>(llbcWillRead.GetCap()));
 
     // Get python layer stream class object.
     PyObject *streamCls = pyllbc_TopModule->GetObject("Stream"); // Borrow reference.
@@ -621,12 +621,12 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Stream(PyObject *self, PyObject *a
     if (!PyArg_ParseTuple(args, "ll|ii", &stream, &willWrite, &beginPos, &endPos))
         return nullptr;
 
-    beginPos = MIN(MAX(0, beginPos), static_cast<int>(willWrite->GetSize()));
+    beginPos = MIN(MAX(0, beginPos), static_cast<int>(willWrite->GetCap()));
 
     if (endPos == -1)
-        endPos = static_cast<int>(willWrite->GetSize());
+        endPos = static_cast<int>(willWrite->GetCap());
     else
-        endPos = MIN(MAX(0, endPos), static_cast<int>(willWrite->GetSize()));
+        endPos = MIN(MAX(0, endPos), static_cast<int>(willWrite->GetCap()));
 
     if (beginPos > endPos)
         LLBC_Swap(beginPos, endPos);

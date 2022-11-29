@@ -33,7 +33,7 @@ LLBC_IProtocol *LLBC_RawProtocolFactory::Create(int layer) const
     switch (layer)
     {
     case LLBC_ProtocolLayer::PackLayer:
-        return LLBC_New(LLBC_RawProtocol);
+        return new LLBC_RawProtocol;
 
     default:
         return nullptr;

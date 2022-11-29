@@ -27,7 +27,7 @@
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/SelectPoller.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -104,9 +104,9 @@ void LLBC_SelectPoller::Svc()
                 int sockErr;
                 LLBC_SessionCloseInfo *closeInfo;
                 if (sock->GetPendingError(sockErr) != LLBC_OK)
-                    closeInfo = LLBC_New(LLBC_SessionCloseInfo);
+                    closeInfo = new LLBC_SessionCloseInfo;
                 else
-                    closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, sockErr);
+                    closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, sockErr);
 
                 session->OnClose(nullptr, closeInfo);
             }
@@ -144,9 +144,9 @@ void LLBC_SelectPoller::Svc()
                     int sockErr;
                     LLBC_SessionCloseInfo *closeInfo;
                     if (UNLIKELY(sock->GetPendingError(sockErr) != LLBC_OK))
-                        closeInfo = LLBC_New(LLBC_SessionCloseInfo);
+                        closeInfo = new LLBC_SessionCloseInfo;
                     else
-                        closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+                        closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
 
                     session->OnClose(closeInfo);
                 }
@@ -191,7 +191,7 @@ void LLBC_SelectPoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
 
 void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 {
-    LLBC_Socket *socket = LLBC_New(LLBC_Socket);
+    LLBC_Socket *socket = new LLBC_Socket;
     socket->SetNonBlocking();
     socket->SetPollerType(LLBC_PollerType::SelectPoller);
 
@@ -224,7 +224,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     }
     else
     {
-        LLBC_Delete(socket);
+        delete socket;
         LLBC_XDelete(ev.sessionOpts);
 
         _svc->Push(LLBC_SvcEvUtil::
@@ -383,7 +383,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         }
         else
         {
-            LLBC_Delete(socket);
+            delete socket;
         }
 
         // Erase socket from connecting map.

@@ -612,6 +612,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/variant/VariantImpl.h"
+#include "llbc/core/variant/VariantInl.h"
 
 #endif // !__LLBC_CORE_VARIANT_VARIANT_H__

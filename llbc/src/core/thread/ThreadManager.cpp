@@ -80,16 +80,16 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     // Setup core tls some components.
-    tls->coreTls.safetyObjectPool = LLBC_New(LLBC_NS LLBC_SafetyObjectPool);
-    tls->coreTls.unsafetyObjectPool = LLBC_New(LLBC_NS LLBC_UnsafetyObjectPool);
-    tls->coreTls.timerScheduler = LLBC_New(LLBC_NS LLBC_TimerScheduler);
+    tls->coreTls.safetyObjectPool = new LLBC_NS LLBC_SafetyObjectPool;
+    tls->coreTls.unsafetyObjectPool = new LLBC_NS LLBC_UnsafetyObjectPool;
+    tls->coreTls.timerScheduler = new LLBC_NS LLBC_TimerScheduler;
 
     // Setup objbase tls some components.
-    tls->objbaseTls.poolStack = LLBC_New(LLBC_NS LLBC_AutoReleasePoolStack);
-    LLBC_New(LLBC_NS LLBC_AutoReleasePool);
+    tls->objbaseTls.poolStack = new LLBC_NS LLBC_AutoReleasePoolStack;
+    new LLBC_NS LLBC_AutoReleasePool;
 
     // Delete arg.
-    LLBC_Delete(threadArg);
+    delete threadArg;
 
     // Notify thread manager thread startup.
     threadMgr->OnThreadStartup(threadHandle);
@@ -101,12 +101,12 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     threadMgr->OnThreadTerminate(threadHandle);
 
     // Cleanup objbase tls components.
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)); tls->objbaseTls.poolStack = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack); tls->objbaseTls.poolStack = nullptr;
 
     // Cleanup core tls components.
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler)); tls->coreTls.timerScheduler = nullptr;
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool)); tls->coreTls.safetyObjectPool = nullptr;
-    LLBC_Delete(reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool)); tls->coreTls.unsafetyObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
@@ -121,8 +121,8 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_ThreadManager::LLBC_ThreadManager()
-: _maxThreadHandle(LLBC_INVALID_HANDLE)
-, _maxGroupHandle(LLBC_INVALID_HANDLE)
+: _maxThreadHandle(0)
+, _maxGroupHandle(0)
 {
     memset(_groups, 0, sizeof(_groups));
     memset(_threads, 0, sizeof(_threads));
@@ -452,7 +452,8 @@ int LLBC_ThreadManager::WaitGroup(LLBC_Handle handle)
 
     for (size_t i = 0; i < willWaitThreads.size(); ++i)
     {
-        if (Wait(willWaitThreads[i]) != LLBC_OK)
+        if (Wait(willWaitThreads[i]) != LLBC_OK &&
+            LLBC_GetLastError() != LLBC_ERROR_NOT_FOUND)
             return LLBC_FAILED;
     }
 
@@ -964,15 +965,16 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
     if (groupHandle == LLBC_INVALID_HANDLE)
         groupHandle = ++_maxGroupHandle;
 
+    ++_maxThreadHandle;
     if (handle)
-        *handle = ++_maxThreadHandle;
+        *handle = _maxThreadHandle;
 
     LLBC_NativeThreadHandle tmpNativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     if (!nativeHandle)
         nativeHandle = &tmpNativeThreadHandle;
 
     LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg *threadArg =
-        LLBC_New(LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg);
+        new LLBC_INTERNAL_NS __LLBC_ThreadMgr_Thread_Arg;
     threadArg->realArg = arg;
     threadArg->realProc = proc;
     threadArg->threadHandle = _maxThreadHandle;
@@ -985,11 +987,11 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
                           priority,
                           stackSize) != LLBC_OK)
     {
-        LLBC_Delete(threadArg);
+        delete threadArg;
         return LLBC_INVALID_HANDLE;
     }
 
-    LLBC_ThreadDescriptor *desc = LLBC_New(LLBC_ThreadDescriptor);
+    LLBC_ThreadDescriptor *desc = new LLBC_ThreadDescriptor;
     desc->SetHandle(_maxThreadHandle);
     desc->SetNativeHandle(*nativeHandle);
     desc->SetGroupHandle(groupHandle);
@@ -1018,7 +1020,7 @@ void LLBC_ThreadManager::AddThreadDescriptor(LLBC_ThreadDescriptor *threadDesc)
     LLBC_ThreadGroupDescriptor *groupDesc = FindThreadGroupDescriptor(threadDesc->GetGroupHandle());
     if (!groupDesc)
     {
-        groupDesc = LLBC_New(LLBC_ThreadGroupDescriptor);
+        groupDesc = new LLBC_ThreadGroupDescriptor;
         groupDesc->SetGroupHandle(threadDesc->GetGroupHandle());
         AddThreadGroupDescriptor(groupDesc);
     }
@@ -1076,7 +1078,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
         if (groupDesc->GetThreadCount() == 0)
             RemoveThreadGroupDescriptor(groupDesc->GetGroupHandle());
 
-        LLBC_Delete(desc);
+        delete desc;
 
         return;
     }
@@ -1094,7 +1096,7 @@ void LLBC_ThreadManager::RemoveThreadDescriptor(LLBC_Handle handle)
 
             desc->SetThreadNext(desc->GetThreadNext()->GetThreadNext());
 
-            LLBC_Delete(tmpDesc);
+            delete tmpDesc;
 
             return;
         }
@@ -1153,7 +1155,7 @@ void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
     {
         _groups[groupBucketIdx] = groupDesc->GetGroupNext();
 
-        LLBC_Delete(groupDesc);
+        delete groupDesc;
 
         return;
     }
@@ -1165,7 +1167,7 @@ void LLBC_ThreadManager::RemoveThreadGroupDescriptor(LLBC_Handle handle)
             LLBC_ThreadGroupDescriptor *tmpGroupDesc = groupDesc->GetGroupNext();
             groupDesc->SetGroupNext(groupDesc->GetGroupNext()->GetGroupNext());
 
-            LLBC_Delete(tmpGroupDesc);
+            delete tmpGroupDesc;
 
             return;
         }

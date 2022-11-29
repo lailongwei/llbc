@@ -103,6 +103,6 @@ LLBC_EXPORT int LLBC_HashString(const LLBC_String &str);
 
 __LLBC_NS_END
 
-#include "llbc/core/utils/Util_TextImpl.h"
+#include "llbc/core/utils/Util_TextInl.h"
 
 #endif // __LLBC_CORE_UTILS_UTIL_TEXT_H__
