@@ -198,16 +198,16 @@ public:
     bool HasConfig() const;
 
     /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    const LLBC_Variant &GetConfig() const;
+
+    /**
      * Get property type config.
      * @return const LLBC_Property & - the property config.
      */
     const LLBC_Property &GetPropertyConfig() const;
-
-    /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
-     */
-    const LLBC_Variant &GetNonPropertyConfig() const;
 
     /**
      * Get application config type.
@@ -234,6 +234,16 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int ReloadConfig(bool callEvMeth = true);
+
+    /**
+     * Prevent application config load.
+     */
+    void PreventConfigLoad();
+
+    /**
+     * Cancel prevent application config load.
+     */
+    void CancelPreventConfigLoad();
 
 public:
     /**
@@ -369,6 +379,7 @@ protected:
 
     LLBC_SpinLock _cfgLock;
     volatile bool _loadingCfg;
+    volatile int _preventCfgLoad;
     LLBC_Property _propCfg;
     LLBC_Variant _nonPropCfg;
     LLBC_String _cfgPath;

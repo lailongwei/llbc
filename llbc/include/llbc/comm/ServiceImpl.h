@@ -77,6 +77,24 @@ public:
     virtual const LLBC_String &GetName() const;
 
     /**
+     * Get config type.
+     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     */
+    virtual int GetConfigType() const;
+
+    /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    virtual const LLBC_Variant &GetConfig() const;
+
+    /**
+     * Get property type config.
+     * @return const LLBC_Property & - the property config.
+     */
+    virtual const LLBC_Property &GetPropertyConfig() const;
+
+    /**
      * Get full stack option.
      * @return bool - the full stack option.
      */
@@ -491,6 +509,11 @@ protected:
 
 private:
     /**
+     * Service config operation methods.
+     */
+    void UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev = nullptr);
+
+    /**
      * Service TLS operation methods.
      */
     void AddServiceToTls();
@@ -586,13 +609,17 @@ private:
                            bool validCheck = true);
 
 private:
-    int _id;
     static int _maxId;
 
+    int _id;
+    LLBC_String _name;
     LLBC_ThreadId _svcThreadId;
 
+    int _cfgType;
+    LLBC_Property _propCfg;
+    LLBC_Variant _nonPropCfg;
+
     bool _fullStack;
-    LLBC_String _name;
     LLBC_IProtocolFactory *_dftProtocolFactory;
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory;
     DriveMode _driveMode;

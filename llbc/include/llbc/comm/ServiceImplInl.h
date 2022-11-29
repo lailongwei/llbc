@@ -23,6 +23,31 @@
 
 __LLBC_NS_BEGIN
 
+inline int LLBC_ServiceImpl::GetId() const
+{
+    return _id;
+}
+
+inline const LLBC_String &LLBC_ServiceImpl::GetName() const
+{
+    return _name;
+}
+
+inline int LLBC_ServiceImpl::GetConfigType() const
+{
+    return _cfgType;
+}
+
+inline const LLBC_Variant &LLBC_ServiceImpl::GetConfig() const
+{
+    return _nonPropCfg;
+}
+
+inline const LLBC_Property &LLBC_ServiceImpl::GetPropertyConfig() const
+{
+    return _propCfg;
+}
+
 inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
     // Call internal MulticastSendCoder<> template method to complete.

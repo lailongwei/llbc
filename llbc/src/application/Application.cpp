@@ -73,6 +73,7 @@ LLBC_Application::LLBC_Application()
 , _llbcLibStartupInApp(false)
 
 , _loadingCfg(false)
+, _preventCfgLoad(false)
 , _cfgType(LLBC_ApplicationConfigType::End)
 
 , _services(*LLBC_ServiceMgrSingleton)
@@ -131,6 +132,8 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     // Lock and check again.
     LLBC_LockGuard guard(_cfgLock);
     LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    // If prevent config load, return faled.
+    LLBC_SetErrAndReturnIf(_preventCfgLoad != 0, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Config not found when application start.
     LLBC_SetErrAndReturnIf(_cfgType == LLBC_ApplicationConfigType::End, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
@@ -147,6 +150,18 @@ int LLBC_Application::ReloadConfig(bool callEvMeth)
     }
 
     return LLBC_OK;
+}
+
+void LLBC_Application::PreventConfigLoad()
+{
+    LLBC_LockGuard guard(_cfgLock);
+    ++_preventCfgLoad;
+}
+
+void LLBC_Application::CancelPreventConfigLoad()
+{
+    LLBC_LockGuard guard(_cfgLock);
+    _preventCfgLoad = MAX(0, _preventCfgLoad - 1);
 }
 
 int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)

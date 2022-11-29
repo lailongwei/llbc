@@ -70,11 +70,11 @@ inline bool LLBC_Application::HasConfig() const
 }
 
 inline const LLBC_Property &LLBC_Application::GetPropertyConfig() const
-{
+    {
     return _propCfg;
 }
 
-inline const LLBC_Variant &LLBC_Application::GetNonPropertyConfig() const
+inline const LLBC_Variant &LLBC_Application::GetConfig() const
 {
     return _nonPropCfg;
 }

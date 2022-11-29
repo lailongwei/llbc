@@ -96,6 +96,24 @@ public:
     virtual const LLBC_String &GetName() const = 0;
 
     /**
+     * Get config type.
+     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     */
+    virtual int GetConfigType() const = 0;
+
+    /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    virtual const LLBC_Variant &GetConfig() const = 0;
+
+    /**
+     * Get property type config.
+     * @return const LLBC_Property & - the property config.
+     */
+    virtual const LLBC_Property &GetPropertyConfig() const = 0;
+
+    /**
      * Get full stack option.
      * @return bool - the full stack option.
      */

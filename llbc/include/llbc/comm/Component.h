@@ -455,6 +455,27 @@ public:
 
 public:
     /**
+     * Get config type.
+     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     */
+    int GetConfigType() const;
+
+    /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    const LLBC_Variant &GetConfig() const;
+
+    /**
+     * Get property type config.
+     * @return const LLBC_Property & - the property config.
+     */
+    const LLBC_Property &GetPropertyConfig() const;
+
+
+
+public:
+    /**
      * Get all component methods.
      * @return const LLBC_ComponentMethods * - the component methods, maybe is null.
      */
@@ -572,7 +593,8 @@ private:
     /**
      * Friend class: LLBC_ServiceImpl.
      *  Access methods:
-     *      void SetService()
+     *      void SetService();
+     *      void UpdateComponentCfg();
      * Access data members:
      *      _inited;
      */
@@ -582,16 +604,24 @@ private:
      * Set service.
      * @param[in] service - service object.
      */
-    virtual void SetService(LLBC_Service *service);
+    void SetService(LLBC_Service *service);
+
+    /**
+     * Update component config.
+     */
+    void UpdateComponentCfg();
 
 private:
     bool _inited;
     bool _started;
     uint64 _caredEvents;
 
+    LLBC_Service *_svc;
     LLBC_ComponentMethods *_meths;
 
-    LLBC_Service *_svc;
+    int _cfgType;
+    LLBC_Property *_propCfg;
+    LLBC_Variant *_nonPropCfg;
 };
 
 /**

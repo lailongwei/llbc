@@ -38,6 +38,8 @@
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
+#include "llbc/application/Application.h"
+
 namespace
 {
     typedef LLBC_NS LLBC_ServiceImpl This;
@@ -74,11 +76,12 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
                            LLBC_IProtocolFactory *dftProtocolFactory,
                            bool fullStack)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
-
+, _name(name.c_str(), name.length())
 , _svcThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
+, _cfgType(LLBC_ApplicationConfigType::End)
+
 , _fullStack(fullStack)
-, _name(name.c_str(), name.length())
 , _dftProtocolFactory(dftProtocolFactory)
 , _sessionProtoFactory()
 , _driveMode(SelfDrive)
@@ -140,7 +143,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 {
     // Create service name, if is empty.
     if (_name.empty())
-        _name.format("S%d-%s", _id, LLBC_GUIDHelper::GenStr().c_str());
+        _name.format("Svc_%d_%s", _id, LLBC_GUIDHelper::GenStr().c_str());
 
     // Create protocol stack, if is null.
     if (!_dftProtocolFactory)
@@ -185,16 +188,6 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
 
     LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
     LLBC_XDelete(_dftProtocolFactory);
-}
-
-int LLBC_ServiceImpl::GetId() const
-{
-    return _id;
-}
-
-const LLBC_String &LLBC_ServiceImpl::GetName() const
-{
-    return _name;
 }
 
 bool LLBC_ServiceImpl::IsFullStack() const
@@ -258,23 +251,24 @@ int LLBC_ServiceImpl::SuppressCoderNotFoundWarning()
 
 int LLBC_ServiceImpl::Start(int pollerCount)
 {
-    if (pollerCount <= 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-    else if (_svcMgr.GetService(_id) ||
+    // Normalize pollerCount.
+    pollerCount = MAX(1, pollerCount);
+
+    // Service repeat start check.
+    if (_svcMgr.GetService(_id) ||
         _svcMgr.GetService(_name))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
+    // Reentry check.
     else if (_started)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
+    // Reentry check again.
     _lock.Lock();
     if (_started)
     {
@@ -284,12 +278,17 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
+    // Start pollermgr.
     if (_pollerMgr.Start(pollerCount) != LLBC_OK)
     {
         _lock.Unlock();
         return LLBC_FAILED;
     }
 
+    // Update service config.
+    UpdateServiceCfg();
+
+    // Add to service tls or activate.
     if (_driveMode == ExternalDrive)
     {
         if (!IsCanContinueDriveService())
@@ -315,8 +314,10 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         }
     }
 
+    // Mask started.
     _started = true;
 
+    // Init&Start comps.
     if (_driveMode == ExternalDrive)
     {
         // Waiting for all comp init & start finished.
@@ -1200,7 +1201,9 @@ void LLBC_ServiceImpl::ProcessAppConfigReload()
     if (!IsStarted())
         return;
 
-    Push(LLBC_SvcEvUtil::BuildAppCfgReloadEv());
+    auto app = LLBC_Application::ThisApp();
+    Push(LLBC_SvcEvUtil::BuildAppCfgReloadEv(
+        app->GetConfigType(), app->GetPropertyConfig(), app->GetConfig()));
 }
 
 void LLBC_ServiceImpl::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
@@ -1379,6 +1382,10 @@ void LLBC_ServiceImpl::Cleanup()
     // Reset some variables.
     _relaxTimes = 0;
 
+    _propCfg.RemoveAllProperties();
+    _nonPropCfg = LLBC_Variant::nil;
+    _cfgType = LLBC_ApplicationConfigType::End;
+
     _compsInitFinished = false;
     _compsInitRet = LLBC_ERROR_SUCCESS;
     _compsStartFinished = false;
@@ -1388,6 +1395,75 @@ void LLBC_ServiceImpl::Cleanup()
     _stopping = false;
 
     _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+}
+
+void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
+{
+    auto app = LLBC_Application::ThisApp();
+    if (UNLIKELY(!app))
+        return;
+
+    // If use app config, lock app config load.
+    if (!ev)
+        app->PreventConfigLoad();
+    LLBC_Defer(if (!ev) app->CancelPreventConfigLoad());
+
+    // Get config type.
+    _cfgType = ev ? ev->cfgType : app->GetConfigType();
+
+    // Reset service config.
+    _propCfg.RemoveAllProperties();
+    _nonPropCfg = LLBC_Variant::nil;
+
+    // Update service config.
+    if (_cfgType == LLBC_ApplicationConfigType::Property)
+    {
+        // Service config prop name:
+        // <svc_name>
+        // <svc_name>.xxx
+        // <svc_name>.xxx.xxx
+        // <svc_name>.xxx.xxx.xxx....
+        auto &appPropCfg = ev ? ev->propCfg : app->GetPropertyConfig();
+        auto svcCfg = appPropCfg.GetProperty(GetName());
+        LLBC_DoIf(svcCfg, _propCfg = *svcCfg);
+    }
+    else
+    {
+        auto &appNonPropCfg = ev ? ev->nonPropCfg : app->GetConfig();
+        if (_cfgType == LLBC_ApplicationConfigType::Ini)
+        {
+            // Service config section: [<svc_name>]
+            // Comp config section(s): [<svc_name>.<comp_name>]
+            for (auto it = appNonPropCfg.DictBegin(); it != appNonPropCfg.DictEnd(); ++it)
+            {
+                const auto iniSectionName = it->first.AsStr();
+                if (iniSectionName == GetName() ||
+                    (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
+                    _nonPropCfg[iniSectionName] = it->second;
+            }
+        }
+        else if (_cfgType == LLBC_ApplicationConfigType::Xml)
+        {
+            auto &svcCfgs = appNonPropCfg[LLBC_XMLKeys::Children];
+            for (auto &svcCfg : svcCfgs.AsSeq())
+            {
+                const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
+                if (svcCfgName != "Service" &&
+                    svcCfgName != "service" &&
+                    svcCfgName != "Svc" &&
+                    svcCfgName != "svc")
+                    continue;
+
+                const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
+                if (svcCfgAttrs["Name"] == GetName() ||
+                    svcCfgAttrs["name"] == GetName())
+                {
+                    _nonPropCfg = svcCfg;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void LLBC_ServiceImpl::AddServiceToTls()
@@ -1778,6 +1854,9 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
     }
     else if (ev.startFinish)
     {
+        if (_cfgType == LLBC_ApplicationConfigType::End)
+            UpdateServiceCfg();
+
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFinish])
             comp->OnApplicationStartFinish();
     }
@@ -1790,15 +1869,21 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
 
 void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 {
+    // Update service config.
+    UpdateServiceCfg(&static_cast<LLBC_SvcEv_AppCfgReloadedEv &>(_));
+    // Update all components config.
+    for (auto &compItem : _name2Comps)
+        compItem.second->UpdateComponentCfg();
+
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
     auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload];
-    if (!caredComps.empty())
-    {
-        // Dispatch application config reloaded event to all comps.
-        const size_t compsSize = caredComps.size();
-        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-            caredComps[compIdx]->OnApplicationConfigReload();
-    }
+    if (caredComps.empty())
+        return;
+
+    // Dispatch application config reloaded event to all comps.
+    const size_t compsSize = caredComps.size();
+    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+        caredComps[compIdx]->OnApplicationConfigReload();
 }
 
 int LLBC_ServiceImpl::InitComps()
@@ -1809,8 +1894,9 @@ int LLBC_ServiceImpl::InitComps()
     _compsInitRet = LLBC_ERROR_SUCCESS;
     for (auto &willRegComp : _willRegComps)
     {
-        // Set service to comp & add to service's comps dict.
+        // Set service to comp & update component config & add to service's comps dict.
         willRegComp->SetService(this);
+        willRegComp->UpdateComponentCfg();
         AddComp(willRegComp);
 
         // If inited, continue.

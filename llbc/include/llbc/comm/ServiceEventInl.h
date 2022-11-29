@@ -119,6 +119,7 @@ inline LLBC_SvcEv_AppPhaseEv::LLBC_SvcEv_AppPhaseEv()
 
 inline LLBC_SvcEv_AppCfgReloadedEv::LLBC_SvcEv_AppCfgReloadedEv()
 : LLBC_ServiceEvent(LLBC_ServiceEventType::AppCfgReloaded)
+, cfgType(-1)
 {
 }
 

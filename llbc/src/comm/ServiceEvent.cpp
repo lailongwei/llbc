@@ -25,6 +25,8 @@
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/ServiceEvent.h"
 
+#include "llbc/application/Application.h"
+
 namespace
 {
     typedef LLBC_NS LLBC_ServiceEvent Base;
@@ -179,10 +181,17 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppPhaseEv(bool earlyStart,
     return evBlock;
 }
 
-LLBC_MessageBlock * LLBC_SvcEvUtil::BuildAppCfgReloadEv()
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppCfgReloadEv(int cfgType,
+                                                       const LLBC_Property &propCfg,
+                                                       const LLBC_Variant &nonPropCfg)
 {
-    LLBC_SvcEv_AppCfgReloadedEv *ev;
-    auto evBlock = __CreateEvBlock(ev);
+    LLBC_SvcEv_AppCfgReloadedEv *wrapEv;
+    auto evBlock = __CreateEvBlock(wrapEv);
+    wrapEv->cfgType = cfgType;
+    if (cfgType == LLBC_ApplicationConfigType::Property)
+        wrapEv->propCfg = propCfg;
+    else
+        wrapEv->nonPropCfg = nonPropCfg;
 
     return evBlock;
 }

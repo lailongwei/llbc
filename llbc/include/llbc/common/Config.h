@@ -257,7 +257,6 @@
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
-
 // The poller model config(Platform specific).
 //  Alloc set one of the follow configs(string format, case insensitive).
 //   "SelectPoller" : Use select poller(All platform available).

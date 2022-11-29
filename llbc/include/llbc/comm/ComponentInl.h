@@ -127,6 +127,11 @@ inline bool LLBC_Component::IsCaredEventIndex(int compEvOffset) const
 #endif
 }
 
+inline int LLBC_Component::GetConfigType() const
+{
+    return _cfgType;
+}
+
 inline const LLBC_ComponentMethods *LLBC_Component::GetAllMethods() const
 {
     return _meths;
@@ -224,6 +229,11 @@ inline void LLBC_Component::OnProtoReport(const LLBC_ProtoReport &report)
 
 inline void LLBC_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 {
+}
+
+inline void LLBC_Component::SetService(LLBC_Service *svc)
+{
+    _svc = svc;
 }
 
 __LLBC_NS_END
