@@ -212,6 +212,9 @@ project "testsuite"
     files {
         TESTSUITE_PATH .. "/**.h",
         TESTSUITE_PATH .. "/**.cpp",
+        TESTSUITE_PATH .. "/**.xml",
+        TESTSUITE_PATH .. "/**.cfg",
+        TESTSUITE_PATH .. "/**.ini",
     }
 
     -- includedirswrap\csllbc\csharp\script_tools
@@ -272,6 +275,9 @@ project "testsuite"
             "-std=c++11",
         }
     filter {}
+
+    -- Specific debug directory.
+    debugdir(LLBC_OUTPUT_DIR)
 
 group "wrap"
 
