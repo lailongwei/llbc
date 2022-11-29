@@ -134,7 +134,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         auto loggerMgr = LLBC_LoggerManagerSingleton; \
         if (UNLIKELY(!loggerMgr->IsInited())) {       \
             LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls(); \
-            int len = snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls), fmt, ##__VA_ARGS__); \
+            int len = snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls->coreTls.loggerFmtBuf), fmt, ##__VA_ARGS__); \
             if (len >= 0)                             \
                 loggerMgr->UnInitOutput(              \
                     level, libTls->coreTls.loggerFmtBuf); \
