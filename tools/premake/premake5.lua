@@ -296,7 +296,7 @@ project "testsuite"
                                             string.gsub(LLBC_OUTPUT_DIR, "/", "\\")))
         end
     filter {}
-    filter { "system:non windows" }
+    filter { "system:not windows" }
         for _, test_cfg in pairs(test_cfgs) do
             postbuildcommands(string.format("cp -rf \"%s/%s\" \"%s\"", TESTSUITE_PATH, test_cfg, LLBC_OUTPUT_DIR))
         end
