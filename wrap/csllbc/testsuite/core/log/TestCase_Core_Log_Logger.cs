@@ -30,7 +30,7 @@ class TestCase_Core_Log_Logger : ITestCase
     {
         Console.WriteLine("Core/Log/Logger test:");
 
-        string logCfg = "Logger_Cfg.cfg";
+        string logCfg = "LoggerCfg.cfg";
         LoggerMgr.Init(logCfg);
 
         // Test Root logger.

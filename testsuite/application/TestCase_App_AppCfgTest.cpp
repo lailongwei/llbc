@@ -213,13 +213,13 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 
     // Set config path.
     // If not specific config path, application will auto reload config(order Ini->Cfg->Xml).
-    // app.SetConfigPath("./CfgTestApp.ini");
-    // app.SetConfigPath("./CfgTestApp.cfg");
-    // app.SetConfigPath("./CfgTestApp.xml");
+    // app.SetConfigPath("./AppCfgTest.ini");
+    // app.SetConfigPath("./AppCfgTest.cfg");
+    // app.SetConfigPath("./AppCfgTest.xml");
 
     // Startup app object.
     std::cout <<"Start app..." <<std::endl;
-    if (app.Start(argc, argv, "CfgTestApp") != LLBC_OK)
+    if (app.Start(argc, argv, "AppCfgTest") != LLBC_OK)
     {
         std::cerr <<"App start failed, err:" <<LLBC_FormatLastError() <<std::endl;
         return LLBC_FAILED;
