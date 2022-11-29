@@ -25,6 +25,77 @@ using namespace llbc;
 namespace
 {
 
+class TestCompA : public LLBC_Component
+{
+public:
+    virtual bool OnStart(bool &finished)
+    {
+        const LLBC_String compName = LLBC_GetTypeName(TestCompA);
+        std::cout << "Comp " << compName << " start..." << std::endl;
+        std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
+
+        LLBC_String propCfgCnt;
+        GetPropertyConfig().SaveToContent(propCfgCnt);
+        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
+
+        if (GetService()->GetName() == "TestSvc1")
+        {
+            cfgReloadTimer_.SetTimeoutHandler(this, &TestCompA::OnTimeout_ReloadCfg);
+            cfgReloadTimer_.Schedule(LLBC_TimeSpan::FromSeconds(10));
+        }
+
+        return true;
+    }
+
+    virtual void OnStop(bool &finished)
+    {
+        cfgReloadTimer_.Cancel();
+    }
+
+    virtual void OnApplicationConfigReload()
+    {
+        std::cout << "[" << GetService()->GetName()
+                  << "."
+                  << LLBC_GetTypeName(*this)
+                  << ", ptr:"
+                  << this
+                  << "] Application config reload"
+                  << std::endl;
+        std::cout << "- CfgType:" << GetConfigType() << std::endl;
+        std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
+    
+        LLBC_String propCfgCnt;
+        GetPropertyConfig().SaveToContent(propCfgCnt);
+        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
+    }
+
+private:
+    void OnTimeout_ReloadCfg(LLBC_Timer *timer)
+    {
+        LLBC_Application::ThisApp()->ReloadConfig();
+    }
+
+private:
+    LLBC_Timer cfgReloadTimer_;
+};
+
+class TestCompB : public LLBC_Component
+{
+public:
+    virtual bool OnStart(bool &finished)
+    {
+        const LLBC_String compName = LLBC_GetTypeName(TestCompB);
+        std::cout << "Comp " << compName << " start..." << std::endl;
+        std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
+
+        LLBC_String propCfgCnt;
+        GetPropertyConfig().SaveToContent(propCfgCnt);
+        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
+
+        return true;
+    }
+};
+
 class TestApp : public LLBC_Application
 {
 public:
@@ -54,7 +125,7 @@ public:
             }
             else
             {
-                std::cout << "- cfg cnt:" << GetNonPropertyConfig().ToString() << std::endl;
+                std::cout << "- cfg cnt:" << GetConfig().ToString() << std::endl;
             }
         }
 
@@ -74,11 +145,23 @@ public:
         {
             startFinished = false;
             std::cout <<"App " <<GetName() << " starting, cost:" <<cost <<std::endl;
+            return LLBC_OK;
         }
-        else
-        {
-            std::cout <<"App " <<GetName() <<"start finished" <<std::endl;
-        }
+
+        std::cout <<"App " <<GetName() <<"start finished" <<std::endl;
+
+        // Create services.
+        std::cout << "Create service <TestSvc1>..." << std::endl;
+        auto svc1 = LLBC_Service::Create("TestSvc1");
+        svc1->AddComponent(new TestCompA);
+        svc1->AddComponent(new TestCompB);
+        svc1->Start();
+
+        std::cout << "Create service <TestSvc2>..." << std::endl;
+        auto svc2 = LLBC_Service::Create("TestSvc2");
+        svc2->AddComponent(new TestCompA);
+        svc2->AddComponent(new TestCompB);
+        svc2->Start();
 
         return LLBC_OK;
     }
@@ -126,11 +209,13 @@ TestCase_App_AppCfgTest::~TestCase_App_AppCfgTest()
 int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 {
     // Define app object.
-    TestApp app(LLBC_TimeSpan::FromSeconds(5), LLBC_TimeSpan::FromSeconds(5));
+    TestApp app(LLBC_TimeSpan::FromSeconds(3), LLBC_TimeSpan::FromSeconds(3));
 
     // Set config path.
-    // If not specific config path, application will auto reload config.
+    // If not specific config path, application will auto reload config(order Ini->Cfg->Xml).
+    // app.SetConfigPath("./CfgTestApp.ini");
     // app.SetConfigPath("./CfgTestApp.cfg");
+    // app.SetConfigPath("./CfgTestApp.xml");
 
     // Startup app object.
     std::cout <<"Start app..." <<std::endl;
