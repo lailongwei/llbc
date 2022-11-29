@@ -912,6 +912,12 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsSeq())
     {
+        if (!_holder.data.obj.seq)
+        {
+            stream.Write(static_cast<uint32>(0));
+            return;
+        }
+
         stream.Write(static_cast<uint32>(_holder.data.obj.seq->size()));
         for (SeqConstIter it = _holder.data.obj.seq->begin();
              it != _holder.data.obj.seq->end();
@@ -922,6 +928,12 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsDict())
     {
+        if (!_holder.data.obj.dict)
+        {
+            stream.Write(static_cast<uint32>(0));
+            return;
+        }
+
         stream.Write(static_cast<uint32>(_holder.data.obj.dict->size()));
         for (DictConstIter it = _holder.data.obj.dict->begin();
              it != _holder.data.obj.dict->end();
