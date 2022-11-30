@@ -113,6 +113,11 @@ void __LLBC_CoreCleanup()
 
     // Destroy Variant number to number string repr fast access table.
     LLBC_Variant::DestroyNumber2StrFastAccessTable();
+
+    // Cleanup Symbol(if enabled).
+    #if LLBC_CFG_OS_IMPL_SYMBOL
+    (void)LLBC_CleanupSymbol();
+    #endif // LLBC_CFG_OS_IMPL_SYMBOL
 }
 
 __LLBC_NS_END
