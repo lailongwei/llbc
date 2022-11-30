@@ -212,9 +212,14 @@ inline void LLBC_Stream::SetPos(size_t pos)
     _pos = MIN(pos, _cap);
 }
 
-inline void LLBC_Stream::Skip(int size)
+inline bool LLBC_Stream::Skip(int size)
 {
-    SetPos(MIN(static_cast<size_t>(MAX(0, static_cast<sint64>(_pos) + size)), _cap));
+    const sint64 newPos = static_cast<sint64>(_pos) + size;
+    if (UNLIKELY(newPos < 0 || newPos > static_cast<sint64>(_cap)))
+        return false;
+
+    _pos = static_cast<size_t>(newPos);
+    return true;
 }
 
 inline size_t LLBC_Stream::GetCap() const
