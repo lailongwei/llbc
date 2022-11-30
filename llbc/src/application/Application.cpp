@@ -94,6 +94,7 @@ LLBC_Application::LLBC_Application()
 LLBC_Application::~LLBC_Application()
 {
     ASSERT(!IsStarted() && "Please stop application before destruct");
+    LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup());
     _thisApp = nullptr;
 }
 
@@ -179,8 +180,6 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
     if (LLBC_Startup() != LLBC_OK)
     {
         LLBC_ReturnIf(LLBC_GetLastError() != LLBC_ERROR_REENTRY, LLBC_FAILED);
-
-        _llbcLibStartupInApp = false;
         LLBC_SetLastError(LLBC_OK);
     }
 
@@ -203,10 +202,7 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
 
         _name.clear();
 
-        LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
-
         _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
-
         _startPhase = LLBC_ApplicationStartPhase::Stopped;
     });
 
