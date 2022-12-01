@@ -137,7 +137,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Test json styled log.
     DoJsonLogTest();
 
-    int jsonLogTestTimes = 10;
+    int jsonLogTestTimes = 30;
     for (int i = 0; i < jsonLogTestTimes; ++i)
         DoJsonLogTest();
 
