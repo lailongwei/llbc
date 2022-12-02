@@ -234,7 +234,7 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 #if LLBC_TARGET_PLATFORM_WIN32
         localtime_s(&timeStruct, &nowInSecs);
 #else
-        localtime_r(&nowInSecond, &timeStruct);
+        localtime_r(&nowInSecs, &timeStruct);
 #endif
 
         char timeFmtBuf[17];
