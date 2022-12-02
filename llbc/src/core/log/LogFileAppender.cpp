@@ -167,7 +167,9 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 
     CheckAndUpdateLogFile(data.logTime);
 
-    LLBC_String formattedData;
+    LLBC_String &formattedData =
+        *reinterpret_cast<LLBC_String *>(__LLBC_GetLibTls()->coreTls.logFmtStr);
+    formattedData.clear();
     chain->Format(data, formattedData);
 
     const long actuallyWrote = 

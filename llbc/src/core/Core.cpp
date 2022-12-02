@@ -34,6 +34,10 @@ int __LLBC_CoreStartup()
         return LLBC_FAILED;
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
+    // Init log fmt str.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    tls->coreTls.logFmtStr = new LLBC_String;
+
     // Initialize Variant Type->StrDesc dictionary.
     LLBC_VariantType::InitType2StrDict();
     // Initialize Variant number to number string repr fast access table.
@@ -48,7 +52,6 @@ int __LLBC_CoreStartup()
     // initialize performance frequency.
     LLBC_CPUTime::InitFrequency();
     // Set entry thread timer scheduler.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.timerScheduler = new LLBC_TimerScheduler;
 
     // Set random seed.
@@ -113,6 +116,10 @@ void __LLBC_CoreCleanup()
 
     // Destroy Variant number to number string repr fast access table.
     LLBC_Variant::DestroyNumber2StrFastAccessTable();
+
+    // Destroy log fmt str.
+    delete reinterpret_cast<LLBC_String *>(tls->coreTls.logFmtStr);
+    tls->coreTls.logFmtStr = nullptr;
 
     // Cleanup Symbol(if enabled).
     #if LLBC_CFG_OS_IMPL_SYMBOL

@@ -89,7 +89,9 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
 
     FILE * const out = logLevel >= _LogLevel::Warn ? stderr : stdout;
 
-    LLBC_String formattedData;
+    LLBC_String &formattedData =
+        *reinterpret_cast<LLBC_String *>(__LLBC_GetLibTls()->coreTls.logFmtStr);
+    formattedData.clear();
     chain->Format(data, formattedData);
 
 #if LLBC_TARGET_PLATFORM_WIN32
