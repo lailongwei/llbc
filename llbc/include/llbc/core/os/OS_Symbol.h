@@ -35,6 +35,12 @@ __LLBC_NS_BEGIN
 LLBC_EXPORT int LLBC_InitSymbol();
 
 /**
+ * Cleanup symbol.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_CleanupSymbol();
+
+/**
  * Capture stack back trace.
  * @param[in]  skipFrames    - skip frames count, default 0.
  * @param[out] captureFrames - the final back traces, default is infinite.

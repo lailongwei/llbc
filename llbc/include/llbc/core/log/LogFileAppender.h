@@ -84,26 +84,25 @@ protected:
 private:
     /**
      * Check and update log file.
-     * @param[in] now 
+     * @param[in] now - now time, in micro-seconds.
      */
     void CheckAndUpdateLogFile(sint64 now);
 
     /**
      * Build log file name.
-     * @now                - now time.
+     * @now                - now time, in micro-seconds.
      * @return LLBC_String - the log file name.
      */
     LLBC_String BuildLogFileName(sint64 now) const;
 
     /**
      * Check is need reopen file or not.
-     * @param[in] now     - now time.
      * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
      * @param[out] backup - the backup flag, if true, means must backup log files.
      *                      about backup, see BackupFiles() method.
      * @return bool - need reopen if true, otherwise return false.
      */
-    bool IsNeedReOpenFile(sint64 now, const LLBC_String &newFileName, bool &clear, bool &backup) const;
+    bool IsNeedReOpenFile(const LLBC_String &newFileName, bool &clear, bool &backup) const;
 
     /**
      * ReOpen the log file.

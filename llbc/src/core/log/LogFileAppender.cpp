@@ -37,7 +37,7 @@
 #include "llbc/core/log/LogFileAppender.h"
 
 __LLBC_INTERNAL_NS_BEGIN
-const static int __LogFileCheckInterval = 500;
+const static int __LogFileCheckInterval = 500000; // In micro-seconds.
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -95,7 +95,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxFileSize = initInfo.maxFileSize > 0 ? initInfo.maxFileSize : LONG_MAX;
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
-    sint64 now = LLBC_GetMilliSeconds();
+    const sint64 now = LLBC_GetMicroSeconds();
 
     if (initInfo.lazyCreateLogFile)
         return LLBC_OK;
@@ -214,7 +214,7 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 
     bool clear = false, backup = false;
     const LLBC_String newFileName = BuildLogFileName(now);
-    if (!IsNeedReOpenFile(now, newFileName, clear, backup))
+    if (!IsNeedReOpenFile(newFileName, clear, backup))
         return;
 
     if (backup)
@@ -230,18 +230,21 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
     if (_isDailyRolling)
     {
         struct tm timeStruct;
-        time_t nowInSecond = static_cast<time_t>(now / 1000);
+        time_t nowInSecs = static_cast<time_t>(now / 1000000);
 #if LLBC_TARGET_PLATFORM_WIN32
-        localtime_s(&timeStruct, &nowInSecond);
+        localtime_s(&timeStruct, &nowInSecs);
 #else
         localtime_r(&nowInSecond, &timeStruct);
 #endif
 
-        char timeFmtBuf[9];
+        char timeFmtBuf[17];
         timeFmtBuf[sizeof(timeFmtBuf) - 1] = '\0';
-        strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
-
-        logFile.append_format(".%s", timeFmtBuf);
+        const size_t len = strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
+        if (LIKELY(len > 0))
+        {
+            logFile.append(1, '.');
+            logFile.append(timeFmtBuf, len);
+        }
     }
 
     if (!_fileSuffix.empty())
@@ -250,8 +253,7 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
     return logFile;
 }
 
-bool LLBC_LogFileAppender::IsNeedReOpenFile(sint64 now,
-                                            const LLBC_String &newFileName,
+bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
                                             bool &clear,
                                             bool &backup) const
 {
