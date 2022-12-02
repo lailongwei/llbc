@@ -271,7 +271,9 @@ static void __NonWin32CrashHandler(int sig)
     __corePattern[readRet] = '\0';
 
     // Copy executable to core pattern directory(ignore error).
-    const char *corePatternDir = dirname(__corePattern);
+    const char *corePatternDir = nullptr;
+    if (readRet > 0 && __corePattern[0] != '|')
+        corePatternDir = dirname(__corePattern);
     if (!corePatternDir)
         corePatternDir = ".";
 
