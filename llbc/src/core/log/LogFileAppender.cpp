@@ -210,8 +210,9 @@ void LLBC_LogFileAppender::Flush()
 
 void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 {
+    const auto timeDiff = now - _logfileLastCheckTime;
     if (_fileSize < _maxFileSize && 
-        LLBC_Abs(_logfileLastCheckTime - now) < LLBC_INL_NS __LogFileCheckInterval)
+        (timeDiff > 0 && timeDiff < LLBC_INL_NS __LogFileCheckInterval))
         return;
 
     bool clear = false, backup = false;
