@@ -239,7 +239,7 @@ int LLBC_LogLineToken::GetType() const
 void LLBC_LogLineToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     const int index = static_cast<int>(formattedData.size());
-    const auto lineStrIdx = data.line * 5;
+    const size_t lineStrIdx = data.line * 5;
     if (lineStrIdx < sizeof(__lineStrs))
     {
         const auto lineStr = __lineStrs + lineStrIdx;
