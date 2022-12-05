@@ -97,12 +97,12 @@ private:
 
     /**
      * Check is need reopen file or not.
-     * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
      * @param[out] backup - the backup flag, if true, means must backup log files.
      *                      about backup, see BackupFiles() method.
+     * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
      * @return bool - need reopen if true, otherwise return false.
      */
-    bool IsNeedReOpenFile(const LLBC_String &newFileName, bool &clear, bool &backup) const;
+    bool IsNeedReOpenFile(const LLBC_String &newFileName, bool &backup, bool &clear) const;
 
     /**
      * ReOpen the log file.

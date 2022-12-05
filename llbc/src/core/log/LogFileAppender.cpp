@@ -74,13 +74,13 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     if (_Base::Initialize(initInfo) != LLBC_OK)
         return LLBC_FAILED;
 
-    if (initInfo.file.empty())
+    if (initInfo.filePath.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    _filePath = initInfo.file;
+    _filePath = initInfo.filePath;
     _fileSuffix = initInfo.fileSuffix;
     const LLBC_String fileDir = LLBC_Directory::DirName(_filePath);
     if (!LLBC_Directory::Exists(fileDir))
@@ -211,25 +211,27 @@ void LLBC_LogFileAppender::Flush()
 void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 {
     const auto timeDiff = now - _logfileLastCheckTime;
-    if (_fileSize < _maxFileSize && 
-        (timeDiff > 0 && timeDiff < LLBC_INL_NS __LogFileCheckInterval))
+    if (_fileSize < _maxFileSize && // File size not reach to limit.
+        (timeDiff > 0 && timeDiff < LLBC_INL_NS __LogFileCheckInterval) && // not reach check interval.
+        now % 1000000 == _logfileLastCheckTime % 1000000) // not cross seconds.
         return;
 
-    bool clear = false, backup = false;
+    _logfileLastCheckTime = now;
+
+    bool backup = false, clear = false;
     const LLBC_String newFileName = BuildLogFileName(now);
-    if (!IsNeedReOpenFile(newFileName, clear, backup))
+    if (!IsNeedReOpenFile(newFileName, backup, clear))
         return;
 
     if (backup)
         BackupFiles();
 
     ReOpenFile(newFileName, clear);
-    _logfileLastCheckTime = now;
 }
 
 LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
 {
-    LLBC_String logFile = _filePath;
+    LLBC_String logFileName = _filePath;
     if (_isDailyRolling)
     {
         struct tm timeStruct;
@@ -245,40 +247,40 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
         const size_t len = strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
         if (LIKELY(len > 0))
         {
-            logFile.append(1, '.');
-            logFile.append(timeFmtBuf, len);
+            logFileName.append(1, '.');
+            logFileName.append(timeFmtBuf, len);
         }
     }
 
     if (!_fileSuffix.empty())
-        logFile.append(_fileSuffix);
+        logFileName.append(_fileSuffix);
 
-    return logFile;
+    return logFileName;
 }
 
 bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
-                                            bool &clear,
-                                            bool &backup) const
+                                            bool &backup,
+                                            bool &clear) const
 {
     if (_fileSize >= _maxFileSize)
     {
-        clear = true;
         backup = true;
+        clear = true;
 
         return true;
     }
     else if (newFileName.size() != _fileName.size() ||
             memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
     {
-        clear = false;
         backup = false;
+        clear = false;
 
         return true;
     }
     else if (!LLBC_File::Exists(newFileName))
     {
-        clear = true;
         backup = false;
+        clear = true;
 
         return true;
     }
@@ -289,7 +291,7 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
 int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
 {
     // Close old file.
-    if (_file)
+    if (LIKELY(_file))
         _file->Close();
     else
         _file = new LLBC_File;

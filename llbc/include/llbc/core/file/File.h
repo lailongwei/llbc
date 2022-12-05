@@ -447,7 +447,6 @@ private:
 private:
     int _mode;
     LLBC_String _path;
-
     LLBC_FileHandle _handle;
 };
 
