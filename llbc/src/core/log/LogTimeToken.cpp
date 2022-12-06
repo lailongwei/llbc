@@ -55,8 +55,8 @@ int LLBC_LogTimeToken::GetType() const
 void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     // Format non millisecond part.
-    int index = static_cast<int>(formattedData.size());
-    time_t timeInSecond = static_cast<time_t>(data.logTime / 1000000);
+    const int index = static_cast<int>(formattedData.size());
+    const time_t timeInSecond = static_cast<time_t>(data.logTime / 1000000);
 
     if (timeInSecond != _lastFmtTime)
     {

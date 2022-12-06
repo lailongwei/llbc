@@ -50,11 +50,10 @@ int LLBC_LogMsgToken::GetType() const
 
 void LLBC_LogMsgToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
+    const int index = static_cast<int>(formattedData.size());
     formattedData.append(data.msg, data.msgLen);
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

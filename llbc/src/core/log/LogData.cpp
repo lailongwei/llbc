@@ -29,7 +29,6 @@
 __LLBC_NS_BEGIN
 LLBC_LogData::LLBC_LogData()
 : logger(nullptr)
-, loggerName(nullptr)
 
 , msg(nullptr)
 , msgLen(0)
@@ -59,7 +58,6 @@ LLBC_LogData::~LLBC_LogData()
 void LLBC_LogData::Clear()
 {
     logger = nullptr;
-    loggerName = nullptr;
 
     msgLen = 0;
 

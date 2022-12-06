@@ -507,9 +507,8 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                                              LLBC_LogData *logData,
                                                              __LLBC_LibTls *libTls)
 {
-    // fill: logger&logger name.
+    // fill: logger.
     logData->logger = this;
-    logData->loggerName = _name.c_str();
 
     // fill: log level.
     logData->level = level;

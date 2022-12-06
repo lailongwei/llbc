@@ -292,6 +292,7 @@ void TestCase_Core_Log::DoUninitLogTest()
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
-                   logData->loggerName, LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
+                   logData->logger->GetLoggerName().c_str(),
+                   LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
 }
 

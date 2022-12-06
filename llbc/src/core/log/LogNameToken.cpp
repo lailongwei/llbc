@@ -24,6 +24,8 @@
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogFormattingInfo.h"
+#include "llbc/core/log/Logger.h"
+
 #include "llbc/core/log/LogNameToken.h"
 
 __LLBC_NS_BEGIN
@@ -49,11 +51,10 @@ int LLBC_LogNameToken::GetType() const
 
 void LLBC_LogNameToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    formattedData.append(data.loggerName);
+    const int index = static_cast<int>(formattedData.size());
+    formattedData.append(data.logger->GetLoggerName());
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

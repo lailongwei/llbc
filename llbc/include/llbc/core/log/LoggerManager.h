@@ -317,4 +317,6 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 
 __LLBC_NS_END
 
+#include "llbc/core/log/LoggerManagerInl.h"
+
 #endif // !__LLBC_CORE_LOG_LOGGER_MANAGER_H__
