@@ -49,14 +49,14 @@ __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Warn)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Error)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Fatal)
 
-LLBC_FORCE_INLINE int LLBC_Logger::Output(int level,
-                                          const char *tag,
-                                          const char *file,
-                                          int line,
-                                          const char *func,
-                                          bool staticFileAndFunc,
-                                          const char *fmt,
-                                          ...) 
+inline int LLBC_Logger::Output(int level,
+                               const char *tag,
+                               const char *file,
+                               int line,
+                               const char *func,
+                               bool staticFileAndFunc,
+                               const char *fmt,
+                               ...) 
 {
     if (level < _logLevel)
         return LLBC_OK;
