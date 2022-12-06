@@ -115,11 +115,6 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     return LLBC_OK;
 }
 
-bool LLBC_LoggerManager::IsInited() const
-{
-    return _rootLogger != nullptr;
-}
-
 void LLBC_LoggerManager::Finalize()
 {
     LLBC_LockGuard guard(_lock);

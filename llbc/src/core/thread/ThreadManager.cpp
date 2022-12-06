@@ -64,6 +64,7 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     // Set TLS.
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
     tls->coreTls.llbcThread = true;
+    tls->coreTls.logFmtStr = new LLBC_NS LLBC_String;
     tls->coreTls.threadHandle = threadArg->threadHandle;
     tls->coreTls.threadId = LLBC_NS LLBC_GetCurrentThreadId();
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -107,6 +108,7 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
     delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
     delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_String *>(tls->coreTls.logFmtStr); tls->coreTls.logFmtStr = nullptr;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);

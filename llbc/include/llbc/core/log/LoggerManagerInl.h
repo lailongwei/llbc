@@ -19,43 +19,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-#include "llbc/common/Export.h"
-
-#include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
-#include "llbc/core/log/LogFileToken.h"
+#ifdef __LLBC_CORE_LOG_LOGGER_MANAGER_H__
 
 __LLBC_NS_BEGIN
 
-LLBC_LogFileToken::LLBC_LogFileToken()
+inline bool LLBC_LoggerManager::IsInited() const
 {
-}
-
-LLBC_LogFileToken::~LLBC_LogFileToken()
-{
-}
-
-int LLBC_LogFileToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
-{
-    SetFormatter(formatter);
-    return LLBC_OK;
-}
-
-int LLBC_LogFileToken::GetType() const
-{
-    return LLBC_LogTokenType::FileToken;
-}
-
-void LLBC_LogFileToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
-{
-    if (data.fileLen == 0)
-        return;
-
-    const int index = static_cast<int>(formattedData.size());
-    formattedData.append(data.file, data.fileLen);
-
-    GetFormatter()->Format(formattedData, index);
+    return _rootLogger != nullptr;
 }
 
 __LLBC_NS_END
+
+#endif // __LLBC_CORE_LOG_LOGGER_MANAGER_H__

@@ -29,7 +29,7 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
 }
 
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
-    inline int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) \
+    LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) \
     {                                             \
         if (_logLevel > LLBC_LogLevel::level)     \
             return LLBC_OK;                       \
@@ -49,7 +49,13 @@ __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Warn)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Error)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Fatal)
 
-inline int LLBC_Logger::Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) 
+inline int LLBC_Logger::Output(int level,
+                               const char *tag,
+                               const char *file,
+                               int line,
+                               const char *func,
+                               const char *fmt,
+                               ...) 
 {
     if (level < _logLevel)
         return LLBC_OK;

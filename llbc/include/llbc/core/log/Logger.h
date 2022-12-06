@@ -148,7 +148,13 @@ public:
      * @param[in] ...    - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Output(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(7, 8);
+    int Output(int level,
+               const char *tag,
+               const char *file,
+               int line,
+               const char *func,
+               const char *fmt,
+               ...) LLBC_STRING_FORMAT_CHECK(7, 8);
 
     /**
      * Output message by va_list.
@@ -161,7 +167,13 @@ public:
      * @param[in] va    - variadic parameter list.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va);
+    int VOutput(int level,
+                const char *tag,
+                const char *file,
+                int line,
+                const char *func,
+                const char *fmt,
+                va_list va);
 
     /**
      * Like Output() method, but message is non-format message, use to improve performance.
@@ -174,7 +186,13 @@ public:
      * @param[in] msgLen - message string length, if -1, will auto calculate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen);
+    int NonFormatOutput(int level,
+                        const char *tag,
+                        const char *file,
+                        int line,
+                        const char *func,
+                        const char *msg,
+                        size_t msgLen);
 
 private:
     /**
@@ -262,9 +280,8 @@ private:
 
     /**
      * Flush appenders.
-     * @param[in] force - force flush or not, default is false.
      */
-    void FlushAppenders(bool force);
+    void FlushAppenders();
 
     /**
      * Lockless uninstall error hook.

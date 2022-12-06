@@ -87,7 +87,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LSLOG_DEBUG(std::setprecision(9) <<f);
     LSLOG_DEBUG(std::setprecision(5) <<std::fixed <<f);
     LSLOG_DEBUG(std::setprecision(9) <<std::fixed <<f);
-#endif // LLBC_CFG_LOG_USING_WITH_STREAM`
+#endif // LLBC_CFG_LOG_USING_WITH_STREAM
 
     LLOG_INFO("This is a info log message.");
     LLOG_INFO2("test_tag", "This is a info log message.");
@@ -120,16 +120,24 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     }
 
     // Peform performance test.
-    LLBC_PrintLine("Perform preformance test:");
-    LLBC_CPUTime begin = LLBC_CPUTime::Current();
-    const int loopLmt = 2000000;
-    for (int i = 0; i < loopLmt; ++i)
-        LLOG_DEBUG3("perftest", "performance test msg");
+    const int perfTestTimes = 3;
+    for (int i = 0; i < perfTestTimes; ++i)
+    {
+        LLBC_PrintLine("Press any key to exec performance test(times:%d):", i);
+        getchar();
 
-    LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
-    LLBC_PrintLine("Performance test completed, "
-        "log times:%d, cost:%s ms, per-log cost:%.3f us", loopLmt,
-        elapsed.ToString().c_str(), elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+        LLBC_CPUTime begin = LLBC_CPUTime::Current();
+        const int loopLmt = 2000000;
+        for (int i = 0; i < loopLmt; ++i)
+            LLOG_DEBUG3("perftest", "performance test msg");
+
+        LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
+        LLBC_PrintLine("Performance test completed, "
+                       "log times:%d, cost:%s ms, per-log cost:%.3f us",
+                       loopLmt,
+                       elapsed.ToString().c_str(),
+                       elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+    }
 
     LLBC_PrintLine("Press any key to begin json log test");
     getchar();
@@ -137,7 +145,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Test json styled log.
     DoJsonLogTest();
 
-    int jsonLogTestTimes = 10;
+    int jsonLogTestTimes = 30;
     for (int i = 0; i < jsonLogTestTimes; ++i)
         DoJsonLogTest();
 
@@ -284,6 +292,7 @@ void TestCase_Core_Log::DoUninitLogTest()
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
-                   logData->loggerName, LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
+                   logData->logger->GetLoggerName().c_str(),
+                   LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
 }
 

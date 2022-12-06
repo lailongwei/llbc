@@ -42,7 +42,6 @@ __LLBC_NS_BEGIN
 struct LLBC_EXPORT LLBC_LogData
 {
     LLBC_Logger *logger;    // Log data owner logger.
-    const char *loggerName; // Logger name.
 
     char *msg;              // Log message.
     int msgLen;             // message length.
@@ -51,16 +50,14 @@ struct LLBC_EXPORT LLBC_LogData
     int level;              // Log level.
     sint64 logTime;         // Log time.
 
-    char *others;           // Other infos[file, tag, func].
-    uint32 othersCap;       // Others data size.
-    uint32 fileBeg;         // File begin.
-    uint32 fileLen;         // Log source file name length.
-    uint32 tagBeg;          // Tag begin.
-    uint32 tagLen;          // Tag length.
-    uint32 funcBeg;         // Function begin.
-    uint32 funcLen;         // Function length.
+    char file[128];         // File
+    int fileLen;            // File length
+    char func[48];          // Func
+    int funcLen;            // Func length
+    char tag[32];           // Tag
+    int tagLen;             // Tag length
 
-    long line;              // Log source file line number.
+    int line;               // Log source file line number.
 
     LLBC_ThreadId threadId; // Log native thread Id.
 

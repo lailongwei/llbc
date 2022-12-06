@@ -23,6 +23,16 @@
 
 namespace
 {
+    class TestComp : public LLBC_Component
+    {
+    public:
+        virtual bool OnStart(bool &startFinished)
+        {
+            LLBC_PrintLine("Simulate comp start failed case...");
+            return false;
+        }
+    };
+
     class TestApp : public LLBC_Application
     {
     public:
@@ -35,6 +45,16 @@ namespace
         virtual int OnStart(int argc, char *arg[], bool &startFinished)
         {
             LLBC_PrintLine("Application start, name:%s", GetName().c_str());
+
+            _testSvc = LLBC_Service::Create("TestSvc");
+            _testSvc->AddComponent(new TestComp);
+
+            if (_testSvc->Start() != LLBC_OK)
+            {
+                LLBC_PrintLine("Start %s failed, err:%s", _testSvc->GetName().c_str(), LLBC_FormatLastError());
+                return LLBC_FAILED;
+            }
+
             return LLBC_OK;
         }
 

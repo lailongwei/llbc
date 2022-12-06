@@ -167,6 +167,7 @@ project "llbc"
     -- links
     filter { "system:linux" }
         links {
+            "dl",
             "uuid",
             "pthread",
         }

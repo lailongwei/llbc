@@ -29,7 +29,6 @@
 __LLBC_NS_BEGIN
 LLBC_LogData::LLBC_LogData()
 : logger(nullptr)
-, loggerName(nullptr)
 
 , msg(nullptr)
 , msgLen(0)
@@ -38,14 +37,9 @@ LLBC_LogData::LLBC_LogData()
 , level(-1)
 , logTime(0)
 
-, others(nullptr)
-, othersCap(0)
-, fileBeg(0)
 , fileLen(0)
-, tagBeg(0)
-, tagLen(0)
-, funcBeg(0)
 , funcLen(0)
+, tagLen(0)
 
 , line(0)
 
@@ -59,29 +53,20 @@ LLBC_LogData::~LLBC_LogData()
 {
     if (msg)
         free(msg);
-    if (others)
-        free(others);
 }
 
 void LLBC_LogData::Clear()
 {
     logger = nullptr;
-    loggerName = nullptr;
 
     msgLen = 0;
 
     level = -1;
     logTime = 0;
 
-    tagBeg = 0;
-    tagLen = 0; 
-
-    fileBeg = 0;
     fileLen = 0;
-    tagBeg = 0;
-    tagLen = 0;
-    funcBeg = 0;
     funcLen = 0;
+    tagLen = 0;
 
     line = 0;
 

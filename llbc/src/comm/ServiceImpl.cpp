@@ -345,7 +345,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         // Waiting for all comps init finished.
         while (!_compsInitFinished)
             LLBC_Sleep(1);
-        if (_compsInitRet != LLBC_OK)
+        if (_compsInitRet != LLBC_ERROR_SUCCESS)
         {
             const int compsInitRet = _compsInitRet;
             Stop();
@@ -358,7 +358,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         // Waiting for all comps start finished.
         while (!_compsStartFinished)
             LLBC_Sleep(1);
-        if (_compsStartRet != LLBC_OK)
+        if (_compsStartRet != LLBC_ERROR_SUCCESS)
         {
             const int compsStartRet = _compsStartRet;
             Stop();

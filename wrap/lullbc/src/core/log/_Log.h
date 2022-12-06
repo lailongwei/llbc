@@ -161,7 +161,10 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
                                          func,
                                          fmtBufBeg,
                                          msgSize) != LLBC_OK))
-        lullbc_TransferLLBCError(l, __FILE__, __LINE__, "failed to log message, native Output() method call failed");
+        lullbc_TransferLLBCError(l,
+                                 __FILE__,
+                                 __LINE__,
+                                 "failed to log message, native Output() method call failed");
 
     return 0;
 }

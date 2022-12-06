@@ -51,7 +51,7 @@ int LLBC_LogThreadIdToken::GetType() const
 
 void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
+    const int index = static_cast<int>(formattedData.size());
 
     char buf[32];
     #if LLBC_TARGET_PLATFORM_WIN32
@@ -61,8 +61,7 @@ void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &format
     #endif
     formattedData.append(buf);
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

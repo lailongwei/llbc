@@ -49,12 +49,13 @@ int LLBC_LogFunctionToken::GetType() const
 
 void LLBC_LogFunctionToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    if (data.funcLen > 0)
-        formattedData.append(data.others + data.funcBeg, data.funcLen);
+    if (data.funcLen == 0)
+        return;
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    const int index = static_cast<int>(formattedData.size());
+    formattedData.append(data.func, data.funcLen);
+
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

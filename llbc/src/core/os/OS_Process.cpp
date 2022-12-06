@@ -1,9 +1,3 @@
-/**
- * @Author: Your name
- * @Date:   2022-11-22 05:26:41
- * @Last Modified by:   Your name
- * @Last Modified time: 2022-11-29 11:23:48
- */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
@@ -277,8 +271,11 @@ static void __NonWin32CrashHandler(int sig)
     __corePattern[readRet] = '\0';
 
     // Copy executable to core pattern directory(ignore error).
-    const char *corePatternDir = dirname(__corePattern);
-    LLBC_DoIf(!corePatternDir, exit(1));
+    const char *corePatternDir = nullptr;
+    if (readRet > 0 && __corePattern[0] != '|')
+        corePatternDir = dirname(__corePattern);
+    if (!corePatternDir)
+        corePatternDir = ".";
 
     const int pid = getpid();
     const LLBC_NS uint32 now = time(nullptr);
@@ -337,7 +334,7 @@ static void __NonWin32CrashHandler(int sig)
 
     // Reraise signal.
     signal(sig, SIG_DFL);
-    raise (sig);
+    raise(sig);
 }
 
 __LLBC_INTERNAL_NS_END

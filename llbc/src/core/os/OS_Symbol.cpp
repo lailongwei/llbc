@@ -48,6 +48,21 @@ int LLBC_InitSymbol()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
+int LLBC_CleanupSymbol()
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (::SymCleanup(GetCurrentProcess()) != TRUE)
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+#else // Non-Win32
+    return LLBC_OK;
+#endif // LLBC_TARGET_PLATFORM_WIN32
+}
+
 LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
 {
     LLBC_String backTrace;

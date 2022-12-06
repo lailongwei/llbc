@@ -36,11 +36,18 @@ template <typename _Elem>
 class LLBC_BasicCString
 {
 public:
+    // The npos define.
+    static constexpr size_t npos = static_cast<size_t>(-1);
+
+public:
     /**
-     * Constructor.
-     * @param[in] cstr: the const string.
+     * Constructors.
      */
-    LLBC_BasicCString(const _Elem *cstr):_cstr(cstr) {  }
+    template <size_t _ArrLen>
+    LLBC_BasicCString(const _Elem (&arr)[_ArrLen]): _cstr(arr), _size(_ArrLen - 1) {  }
+    LLBC_BasicCString(const _Elem *cstr, size_t size = npos):_cstr(cstr), _size(size == npos ? strlen(cstr) : size) {  }
+    LLBC_BasicCString(std::basic_string<_Elem> &stlStr): _cstr(stlStr.data()), _size(stlStr.size()) {  }
+    LLBC_BasicCString(const LLBC_BasicCString &other): _cstr(other._cstr), _size(other._size) {  }
 
 public:
     /**
@@ -52,96 +59,137 @@ public:
         return _cstr;
     }
 
+    /**
+     * Get string size.
+     * @return size_t - the string size.
+     */
+    size_t GetSize() const
+    {
+        return _size;
+    }
+
 public:
     // operator <
+    template <size_t _ArrLen>
+    bool operator <(const _Elem (&other)[_ArrLen]) const
+    {
+        return operator<(LLBC_BasicCString(other));
+    }
     bool operator <(const _Elem *other) const
     {
-        return operator<(LLBC_BasicCString<_Elem>(other));
-    }
-    bool operator <(const LLBC_BasicCString<_Elem> &other) const
-    {
-        if (_cstr == other._cstr)
-            return false;
-
-        return strcmp(_cstr, other._cstr) < 0;
+        return operator<(LLBC_BasicCString(other));
     }
     bool operator <(const std::basic_string<_Elem> &other) const
     {
-        return operator<(other.c_str());
+        return operator<(LLBC_BasicCString(other.data(), other.size()));
+    }
+    bool operator <(const LLBC_BasicCString &other) const
+    {
+        return _cstr != other._cstr && 
+                (_size < other._size ||
+                 (_size == other._size && memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) < 0));
     }
 
     // operator ==
+    template <size_t _ArrLen>
+    bool operator ==(const _Elem (&other)[_ArrLen]) const
+    {
+        return operator==(LLBC_BasicCString(other));
+    }
     bool operator ==(const _Elem *other) const
     {
-        return operator==(LLBC_BasicCString<_Elem>(other));
-    }
-    bool operator ==(const LLBC_BasicCString<_Elem> &other) const
-    {
-        return _cstr == other._cstr || strcmp(_cstr, other._cstr) == 0;
+        return operator==(LLBC_BasicCString(other));
     }
     bool operator ==(const std::basic_string<_Elem> &other) const
     {
-        return operator==(other.c_str());
+        return operator==(LLBC_BasicCString(other));
+    }
+    bool operator ==(const LLBC_BasicCString &other) const
+    {
+        return _cstr == other._cstr ||
+            (_size == other._size &&
+             memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) == 0);
     }
 
     // operator !=
+    template <int _ArrLen>
+    bool operator !=(const _Elem (&other)[_ArrLen]) const
+    {
+        return !operator==(LLBC_BasicCString(other));
+    }
     bool operator !=(const _Elem *other) const
     {
-        return operator!=(LLBC_BasicCString<_Elem>(other));
-    }
-    bool operator !=(const LLBC_BasicCString<_Elem> &other) const
-    {
-        return !(*this == other);
+        return !operator==(LLBC_BasicCString(other));
     }
     bool operator !=(const std::basic_string<_Elem> &other) const
     {
-        return operator!=(other.c_str());
+        return !operator==(LLBC_BasicCString(other));
+    }
+    bool operator !=(const LLBC_BasicCString &other) const
+    {
+        return !operator==(other);
     }
 
     // operator <=
+    template <int _ArrLen>
+    bool operator <=(const _Elem (&other)[_ArrLen]) const
+    {
+        return !(LLBC_BasicCString(other) < *this);
+    }
     bool operator <=(const _Elem *other) const
     {
-        return operator<=(LLBC_BasicCString<_Elem>(other));
-    }
-    bool operator <=(const LLBC_BasicCString<_Elem> &other) const
-    {
-        return !(other < *this);
+        return !(LLBC_BasicCString(other) < *this);
     }
     bool operator <=(const std::basic_string<_Elem> &other) const
     {
-        return operator<=(other.c_str());
+        return !(LLBC_BasicCString(other) < *this);
+    }
+    bool operator <=(const LLBC_BasicCString &other) const
+    {
+        return !(other < *this);
     }
 
     // operator >
+    template <int _ArrLen>
+    bool operator >(const _Elem (&other)[_ArrLen]) const
+    {
+        return LLBC_BasicCString(other) < *this;
+    }
     bool operator >(const _Elem *other) const
     {
-        return operator>(LLBC_BasicCString<_Elem>(other));
+        return LLBC_BasicCString(other) < *this;
+    }
+    bool operator >(const std::basic_string<_Elem> &other) const
+    {
+        return LLBC_BasicCString(other) < *this;
     }
     bool operator >(const LLBC_BasicCString<_Elem> &other) const
     {
         return other < *this;
     }
-    bool operator >(const std::basic_string<_Elem> &other) const
-    {
-        return operator>(other.c_str());
-    }
 
     // operator >=
+    template <int _ArrLen>
+    bool operator >=(const _Elem (&other)[_ArrLen]) const
+    {
+        return !(*this < LLBC_BasicCString(other));
+    }
     bool operator >=(const _Elem *other) const
     {
-        return operator>=(LLBC_BasicCString<_Elem>(other));
-    }
-    bool operator >=(const LLBC_BasicCString<_Elem> &other) const
-    {
-        return !(other < *this);
+        return !(*this < LLBC_BasicCString(other));
     }
     bool operator >=(const std::basic_string<_Elem> &other) const
     {
-        return operator>=(other.c_str());
+        return !(*this < LLBC_BasicCString(other));
+    }
+    bool operator >=(const LLBC_BasicCString<_Elem> &other) const
+    {
+        return !(*this < other);
     }
 
 private:
     const char *_cstr;
+    size_t _size;
 };
 
 /**

@@ -81,7 +81,6 @@ LLBC_String LLBC_FileMode::GetFileModeDesc(int fileMode)
 LLBC_File::LLBC_File()
 : _mode(LLBC_FileMode::Read)
 , _path()
-
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
 }
@@ -89,7 +88,6 @@ LLBC_File::LLBC_File()
 LLBC_File::LLBC_File(const LLBC_String &path, int mode)
 : _mode(LLBC_FileMode::Read)
 , _path()
-
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
     if (Open(path, mode) == LLBC_OK)
@@ -123,7 +121,7 @@ int LLBC_File::Open(const LLBC_String &path, int mode)
     }
 
     _mode = mode;
-    _path.append(path.c_str(), path.length());
+    _path.assign(path.c_str(), path.length());
 
     return LLBC_OK;
 }

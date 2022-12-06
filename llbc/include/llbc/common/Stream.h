@@ -226,8 +226,9 @@ public:
     /**
      * Skip the buffer R/W position.
      * @param[in] size - will skip's size, in bytes.
+     * @return bool - return true if success, otherwise return false.
      */
-    void Skip(int size);
+    bool Skip(int size);
 
     /**
      * Get current stream buffer capacity.
