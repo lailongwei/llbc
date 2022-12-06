@@ -87,7 +87,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LSLOG_DEBUG(std::setprecision(9) <<f);
     LSLOG_DEBUG(std::setprecision(5) <<std::fixed <<f);
     LSLOG_DEBUG(std::setprecision(9) <<std::fixed <<f);
-#endif // LLBC_CFG_LOG_USING_WITH_STREAM`
+#endif // LLBC_CFG_LOG_USING_WITH_STREAM
 
     LLOG_INFO("This is a info log message.");
     LLOG_INFO2("test_tag", "This is a info log message.");
@@ -128,8 +128,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
     LLBC_PrintLine("Performance test completed, "
-        "log times:%d, cost:%s ms, per-log cost:%.3f us", loopLmt,
-        elapsed.ToString().c_str(), elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+                   "log times:%d, cost:%s ms, per-log cost:%.3f us",
+                   loopLmt,
+                   elapsed.ToString().c_str(),
+                   elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
 
     LLBC_PrintLine("Press any key to begin json log test");
     getchar();

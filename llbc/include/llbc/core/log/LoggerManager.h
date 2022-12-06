@@ -129,39 +129,39 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  * @param[in] fmt        - the log message format string.
  * @param[in] ...        - the variadic log message parameters.
  */
-#define LLOG(loggerName, tag, level, fmt, ...)        \
-    do {                                              \
+#define LLOG(loggerName, tag, level, fmt, ...)            \
+    do {                                                  \
         auto __loggerMgr__ = LLBC_LoggerManagerSingleton; \
-        if (UNLIKELY(!__loggerMgr__->IsInited())) {   \
+        if (UNLIKELY(!__loggerMgr__->IsInited())) {       \
             LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls(); \
             int __len__ = snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls->coreTls.loggerFmtBuf), fmt, ##__VA_ARGS__); \
-            if (__len__ >= 0)                         \
-                __loggerMgr__->UnInitOutput(          \
+            if (__len__ >= 0)                             \
+                __loggerMgr__->UnInitOutput(              \
                     level, libTls->coreTls.loggerFmtBuf); \
-        }                                             \
-        else {                                        \
-            LLBC_NS LLBC_Logger *l;                   \
-            if (loggerName != nullptr) {              \
-                l = __loggerMgr__->GetLogger(loggerName); \
-                if (UNLIKELY(l == nullptr))           \
-                    break;                            \
-            }                                         \
-            else {                                    \
-                l = __loggerMgr__->GetRootLogger();   \
-            }                                         \
-                                                      \
-            if (level < l->GetLogLevel())             \
-                break;                                \
-                                                      \
-            l->Output(level,                          \
-                      tag,                            \
-                      __FILE__,                       \
-                      __LINE__,                       \
-                      __FUNCTION__,                   \
-                      fmt,                            \
-                      ##__VA_ARGS__);                 \
-        }                                             \
-    } while (false)                                   \
+        }                                                 \
+        else {                                            \
+            LLBC_NS LLBC_Logger *__l__;                   \
+            if (loggerName != nullptr) {                  \
+                __l__ = __loggerMgr__->GetLogger(loggerName); \
+                if (UNLIKELY(__l__ == nullptr))           \
+                    break;                                \
+            }                                             \
+            else {                                        \
+                __l__ = __loggerMgr__->GetRootLogger();   \
+            }                                             \
+                                                          \
+            if (level < __l__->GetLogLevel())             \
+                break;                                    \
+                                                          \
+            __l__->Output(level,                          \
+                          tag,                            \
+                          __FILE__,                       \
+                          __LINE__,                       \
+                          __FUNCTION__,                   \
+                          fmt,                            \
+                          ##__VA_ARGS__);                 \
+        }                                                 \
+    } while (false)                                       \
 
 #define LLOG_TRACE(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
 #define LLOG_TRACE2(tag, fmt, ...) LLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Trace, fmt, ##__VA_ARGS__)
@@ -248,39 +248,39 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  * @param[in] level      - log level.
  * @param[in] streamMsg  - stream message, like: '"the log message, intVal:" << 3 <<", strVal:" << "strMsg"'
  */
-#define LSLOG(loggerName, tag, level, streamMsg)           \
-    do {                                                   \
-        auto __loggerMgr__ = LLBC_LoggerManagerSingleton;  \
-        if (UNLIKELY(!__loggerMgr__->IsInited())) {        \
-            LLBC_NS LLBC_LogMessageBuffer lmb;             \
-            LLBC_LoggerManagerSingleton->UnInitOutput(     \
-                level, lmb.str(lmb << streamMsg).c_str()); \
-        }                                                  \
-        else {                                             \
-            LLBC_NS LLBC_Logger *l;                        \
-            if (loggerName != nullptr) {                   \
-                l = __loggerMgr__->GetLogger(loggerName);  \
-                if (UNLIKELY(l == nullptr))                \
-                    break;                                 \
-            }                                              \
-            else {                                         \
-                l = __loggerMgr__->GetRootLogger();        \
-            }                                              \
-                                                           \
-            if (level < l->GetLogLevel())                  \
-                break;                                     \
-                                                           \
-            LLBC_NS LLBC_LogMessageBuffer lmb;             \
-            const LLBC_String &formattedLogMsg = lmb.str(lmb << streamMsg); \
-            l->NonFormatOutput(level,                      \
-                               tag,                        \
-                               __FILE__,                   \
-                               __LINE__,                   \
-                               __FUNCTION__,               \
-                               formattedLogMsg.c_str(),    \
-                               formattedLogMsg.length());  \
-        }                                                  \
-    } while (false)                                        \
+#define LSLOG(loggerName, tag, level, streamMsg)               \
+    do {                                                       \
+        auto __loggerMgr__ = LLBC_LoggerManagerSingleton;      \
+        if (UNLIKELY(!__loggerMgr__->IsInited())) {            \
+            LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
+            LLBC_LoggerManagerSingleton->UnInitOutput(         \
+                level, __lmb__.str(__lmb__ << streamMsg).c_str()); \
+        }                                                      \
+        else {                                                 \
+            LLBC_NS LLBC_Logger *__l__;                        \
+            if (loggerName != nullptr) {                       \
+                __l__ = __loggerMgr__->GetLogger(loggerName);  \
+                if (UNLIKELY(__l__ == nullptr))                \
+                    break;                                     \
+            }                                                  \
+            else {                                             \
+                __l__ = __loggerMgr__->GetRootLogger();        \
+            }                                                  \
+                                                               \
+            if (level < __l__->GetLogLevel())                  \
+                break;                                         \
+                                                               \
+            LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
+            const LLBC_String &formattedLogMsg = __lmb__.str(__lmb__ << streamMsg); \
+            __l__->NonFormatOutput(level,                      \
+                               tag,                            \
+                               __FILE__,                       \
+                               __LINE__,                       \
+                               __FUNCTION__,                   \
+                               formattedLogMsg.c_str(),        \
+                               formattedLogMsg.length());      \
+        }                                                      \
+    } while (false)                                            \
 
 #define LSLOG_TRACE(streamMsg) LSLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
 #define LSLOG_TRACE2(tag, streamMsg) LSLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Trace, streamMsg)
