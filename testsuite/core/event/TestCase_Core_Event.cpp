@@ -56,7 +56,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     _ev1TooStub = evMgr.AddListener(EventIds::Event1, this, &TestCase_Core_Event::OnEvent1Too);
 
     // Build event.
-    LLBC_Event *ev = LLBC_New(LLBC_Event, EventIds::Event1);
+    LLBC_Event *ev = new LLBC_Event(EventIds::Event1);
     // Attach int key indexed params.
     ev->SetParam(0, 1);
     ev->SetParam(1, true);
@@ -72,10 +72,10 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     evMgr.Fire(ev);
 
     std::cout <<"Fire Event2" <<std::endl;
-    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event2));
+    evMgr.Fire(new LLBC_Event(EventIds::Event2));
 
     std::cout <<"Fire Event1" <<std::endl;
-    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event1));
+    evMgr.Fire(new LLBC_Event(EventIds::Event1));
 
     std::cout <<"Test chain call event fire" <<std::endl;
     evMgr.AddListener(EventIds::Event3, [this](LLBC_Event &ev){

@@ -42,15 +42,14 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Initialize logger manager.
 #if LLBC_TARGET_PLATFORM_IPHONE
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
-    if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "Logger_Cfg.cfg") != LLBC_OK)
+    if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    LLBC_String a = LLBC_Directory::AbsPath("Logger_Cfg.cfg");
-    if(LLBC_LoggerManagerSingleton->Initialize("Logger_Cfg.cfg") != LLBC_OK)
+    if(LLBC_LoggerManagerSingleton->Initialize("LogTestCfg.cfg") != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLine(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
-        LLBC_FilePrintLine(stderr, "Forgot copy Logger_Cfg.cfg test config file to CWD?");
+        LLBC_FilePrintLine(stderr, "Forgot copy LogTestCfg.cfg test config file to test dir?");
         return -1;
     }
 

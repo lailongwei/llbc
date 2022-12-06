@@ -27,13 +27,13 @@ namespace
     class LazyClass
     {
     public:
-        void BeforeRun(LLBC_IService *svc, const LLBC_Variant &data)
+        void BeforeRun(LLBC_Service *svc, const LLBC_Variant &data)
         {
             LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
             svc->Post(this, &LazyClass::AfterRun, data);
         }
 
-        void AfterRun(LLBC_IService *svc, const LLBC_Variant &data)
+        void AfterRun(LLBC_Service *svc, const LLBC_Variant &data)
         {
             LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
 
@@ -54,9 +54,9 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("service/lazy task test:");
 
-    LLBC_IService *svc = LLBC_IService::Create("LazyTaskTest");
+    LLBC_Service *svc = LLBC_Service::Create("LazyTaskTest");
 
-    LazyClass *taskObj = LLBC_New(LazyClass);
+    LazyClass *taskObj = new LazyClass;
     LLBC_Variant taskData;
     taskData["IntVal"] = 51215;
     taskData["StrVal"] = "Hello World";
@@ -69,8 +69,8 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to exit...");
     getchar();
 
-    LLBC_Delete(svc);
-    LLBC_Delete(taskObj);
+    delete svc;
+    delete taskObj;
 
     return LLBC_OK;
 }

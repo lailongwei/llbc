@@ -74,6 +74,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ReferencablePoolObjImpl.h"
+#include "llbc/core/objectpool/ReferencablePoolObjInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__

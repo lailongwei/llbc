@@ -23,13 +23,13 @@
 #include "comm/TestCase_Comm_DynLoadComp.h"
 
 TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
-: _svc(LLBC_IService::Create("DynLoadTestSvc"))
+: _svc(LLBC_Service::Create("DynLoadTestSvc"))
 {
 }
 
 TestCase_Comm_DynLoadComp::~TestCase_Comm_DynLoadComp()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])

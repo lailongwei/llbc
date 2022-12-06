@@ -758,10 +758,10 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     begTime = LLBC_Time::Now();
 
     const int threadNums = 4;
-    ObjectPoolTestTask *task = LLBC_New(ObjectPoolTestTask);
+    ObjectPoolTestTask *task = new ObjectPoolTestTask;
     task->Activate(threadNums);
     task->Wait();
-    LLBC_Delete(task);
+    delete task;
 
     usedTime = LLBC_Time::Now() - begTime;
     LLBC_PrintLine("MultiThread pool Get/Release test finished, used time: %lld, thread nums: %d", usedTime.GetTotalMicroSeconds(), threadNums);

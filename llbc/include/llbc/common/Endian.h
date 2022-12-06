@@ -131,6 +131,6 @@ T LLBC_Host2Net2(const T &val);
 
 __LLBC_NS_END
 
-#include "llbc/common/EndianImpl.h"
+#include "llbc/common/EndianInl.h"
 
 #endif // !__LLBC_COM_ENDIAN_H__

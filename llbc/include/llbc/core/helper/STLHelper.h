@@ -192,6 +192,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/helper/STLHelperImpl.h"
+#include "llbc/core/helper/STLHelperInl.h"
 
 #endif // __LLBC_CORE_HELPER_STL_HELPER_H__

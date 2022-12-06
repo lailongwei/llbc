@@ -58,39 +58,6 @@ namespace
         std::cout <<"\targ3: " <<arg3 <<std::endl;
         std::cout <<"\targ4: " <<arg4 <<std::endl;
     }
-
-    void Func_Foo_5(int arg1, int arg2, int arg3, int arg4, int arg5)
-    {
-        std::cout <<"Func_Foo_5() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-    }
-
-    void Func_Foo_6(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
-    {
-        std::cout <<"Func_Foo_6() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-        std::cout <<"\targ6: " <<arg6 <<std::endl;
-    }
-
-    void Func_Foo_7(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
-    {
-        std::cout <<"Func_Foo_7() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-        std::cout <<"\targ6: " <<arg6 <<std::endl;
-        std::cout <<"\targ7: " <<arg7 <<std::endl;
-    }
 }
 
 TestCase_Core_Utils_Delegate::TestCase_Core_Utils_Delegate()

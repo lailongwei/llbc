@@ -32,7 +32,7 @@
 #include "llbc/comm/Component.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/BasePoller.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"

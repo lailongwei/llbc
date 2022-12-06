@@ -134,6 +134,6 @@ __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
-#include "llbc/core/utils/Util_AlgorithmImpl.h"
+#include "llbc/core/utils/Util_AlgorithmInl.h"
 
 #endif // !__LLBC_CORE_UTILS_UTIL_ALGORITHM_H__

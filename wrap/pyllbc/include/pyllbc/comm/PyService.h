@@ -399,7 +399,7 @@ private:
     friend class pyllbc_Component;
 
 private:
-    LLBC_IService *_llbcSvc;
+    LLBC_Service *_llbcSvc;
     LLBC_String _llbcSvcName;
     bool _useNormalProtocolFactory;
 

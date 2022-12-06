@@ -79,8 +79,8 @@ int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("Service FPS test:");
 
-    LLBC_IService *fpsTestSvc = LLBC_IService::Create("FPSTestService");
-    fpsTestSvc->AddComponent(LLBC_New(TestComp));
+    LLBC_Service *fpsTestSvc = LLBC_Service::Create("FPSTestService");
+    fpsTestSvc->AddComponent(new TestComp);
     fpsTestSvc->SetFPS(LLBC_INFINITE);
 
     fpsTestSvc->Start();
@@ -88,7 +88,7 @@ int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
     LLBC_PrintLine("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(fpsTestSvc);
+    delete fpsTestSvc;
 
     return LLBC_OK;
 }

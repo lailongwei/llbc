@@ -37,7 +37,7 @@ void lullbc_TransferLLBCError(lua_State *l, const char *additionMsg, ...)
             LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
 
             errMsg.format("%s, addition error info: %s", LLBC_FormatLastError(), fmttedAdditionMsg);
-            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+            free(fmttedAdditionMsg); // !!!Free formatted addition message.
         }
 
         // Push to stack top.
@@ -64,7 +64,7 @@ void lullbc_TransferLLBCError(lua_State *l, const char *file, int lineNo, const 
             LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
 
             errMsg.append_format(", addition error info: %s", fmttedAdditionMsg);
-            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+            free(fmttedAdditionMsg); // !!!Free formatted addition message.
         }
         
         // Push to stack top.
@@ -103,7 +103,7 @@ void lullbc_SetError(lua_State *l, const char *additionMsg, ...)
             LLBC_FormatArg(additionMsg, fmttedAdditionMsg, fmttedAdditionMsgLen);
 
             errMsg.format("%s, addition error info: %s", LLBC_FormatLastError(), fmttedAdditionMsg);
-            LLBC_Free(fmttedAdditionMsg); // !!!Free formatted addition message.
+            free(fmttedAdditionMsg); // !!!Free formatted addition message.
         }
 
         // Push to stack top.
@@ -129,7 +129,7 @@ void lullbc_ArgCheck(lua_State *l, int cond, int arg, const char *extraMsg, ...)
         LLBC_String msg;
         msg.append(fmttedExtraMsg, fmttedExtraMsgLen);
 
-        LLBC_Free(fmttedExtraMsg);
+        free(fmttedExtraMsg);
 
         luaL_argcheck(l, cond, arg, msg.c_str());
     }

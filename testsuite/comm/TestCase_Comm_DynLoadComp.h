@@ -35,7 +35,7 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
 };
 
 #endif // !__LLBC_TEST_CASE_COMM_DYN_LOAD_COMP_H__

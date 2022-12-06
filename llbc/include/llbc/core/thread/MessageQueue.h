@@ -181,6 +181,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/MessageQueueImpl.h"
+#include "llbc/core/thread/MessageQueueInl.h"
 
 #endif // !__LLBC_CORE_THREAD_MESSAGE_QUEUE_H__

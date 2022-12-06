@@ -38,8 +38,8 @@ PyObject *pyllbc_Stream::_methDecode = nullptr;
 PyObject *pyllbc_Stream::_keyDict = nullptr;
 PyObject *pyllbc_Stream::_keySlots = nullptr;
 
-pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t size)
-: _stream(size)
+pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t cap)
+: _stream(cap)
 , _pyStream(pyStream)
 {
     if (UNLIKELY(!_methEncode))
@@ -54,82 +54,6 @@ pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t size)
 
 pyllbc_Stream::~pyllbc_Stream()
 {
-}
-
-int pyllbc_Stream::GetEndian() const
-{
-    return _stream.GetEndian();
-}
-
-int pyllbc_Stream::SetEndian(int endian)
-{
-    if (!LLBC_Endian::IsValid(endian))
-    {
-        pyllbc_SetError("Invalid endian value", LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    _stream.SetEndian(endian);
-
-    return LLBC_OK;
-}
-
-size_t pyllbc_Stream::GetPos() const
-{
-    return _stream.GetPos();
-}
-
-int pyllbc_Stream::SetPos(size_t pos)
-{
-    if (pos > _stream.GetSize())
-    {
-        pyllbc_SetError("pos out of range", LLBC_ERROR_LIMIT);
-        return LLBC_FAILED;
-    }
-
-    _stream.SetPos(pos);
-
-    return LLBC_OK;
-}
-
-size_t pyllbc_Stream::GetSize() const
-{
-    return _stream.GetSize();
-}
-
-int pyllbc_Stream::SetSize(size_t size)
-{
-    if (_stream.IsAttach())
-    {
-        pyllbc_SetError("could not set attach buffer stream size(attached buffer maybe from pyllbc native library or other native libraries)", LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-
-    if (size <= _stream.GetSize())
-    {
-         pyllbc_SetError("stream new size must greater than old size", LLBC_ERROR_LIMIT);
-         return LLBC_FAILED;
-    }
-
-    _stream.Resize(size);
-
-    return LLBC_OK;
-}
-
-LLBC_Stream &pyllbc_Stream::GetLLBCStream()
-{
-    return _stream;
-}
-
-const LLBC_Stream &pyllbc_Stream::GetLLBCStream() const
-{
-    return _stream;
-}
-
-PyObject *pyllbc_Stream::GetPyObj()
-{
-    Py_INCREF(_pyStream);
-    return _pyStream;
 }
 
 PyObject *pyllbc_Stream::GetRaw()
@@ -364,7 +288,7 @@ PyObject *pyllbc_Stream::ReadPyLong()
 PyObject *pyllbc_Stream::ReadStr()
 {
     auto pos = _stream.GetPos();
-    const auto size = _stream.GetSize();
+    const auto size = _stream.GetCap();
     if (UNLIKELY(pos == size))
         return PyString_FromStringAndSize("", 0);
 
@@ -396,7 +320,7 @@ PyObject *pyllbc_Stream::ReadStr2()
         return nullptr;
     }
 
-    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetCap() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
         return nullptr;
@@ -417,7 +341,7 @@ PyObject *pyllbc_Stream::ReadUnicode()
         return nullptr;
     }
 
-    if (static_cast<uint32>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetCap() - _stream.GetPos()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'unicode'", LLBC_ERROR_LIMIT);
         return nullptr;
@@ -444,14 +368,14 @@ PyObject *pyllbc_Stream::ReadByteArray()
     if (!_stream.Read(buf, len))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
-        LLBC_Free(buf);
+        free(buf);
 
         return nullptr;
     }
 
     PyObject *pyVal = 
         PyByteArray_FromStringAndSize(buf, len);
-    LLBC_Free(buf);
+    free(buf);
 
     return pyVal;
 }
@@ -628,7 +552,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
     else if (pyllbc_TypeDetector::IsBool(val))
     {
         const bool boolVal = !!PyObject_IsTrue(val);
-        _stream.WriteBool(boolVal);
+        _stream.Write(boolVal);
 
         return LLBC_OK;
     }

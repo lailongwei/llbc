@@ -212,6 +212,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectManipulatorImpl.h"
+#include "llbc/core/objectpool/ObjectManipulatorInl.h"
 
 #endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_MANIPULATOR_H__

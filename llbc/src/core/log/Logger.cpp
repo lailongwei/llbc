@@ -217,7 +217,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     // Set/Create log runnable.
     if (_config->IsAsyncMode())
     {
-        _logRunnable = _config->IsIndependentThread() ? LLBC_New(LLBC_LogRunnable) : sharedLogRunnable;
+        _logRunnable = _config->IsIndependentThread() ? new LLBC_LogRunnable : sharedLogRunnable;
         _logRunnable->AddLogger(this);
 
         if (_config->IsIndependentThread())
@@ -247,7 +247,7 @@ void LLBC_Logger::Finalize()
         if (_config->IsIndependentThread())
         {
             _logRunnable->Stop();
-            LLBC_Delete(_logRunnable);
+            delete _logRunnable;
         }
         else
         {
@@ -267,7 +267,7 @@ void LLBC_Logger::Finalize()
         LLBC_ILogAppender *appender = _appenders;
         _appenders = _appenders->GetAppenderNext();
 
-        LLBC_Delete(appender);
+        delete appender;
     }
 
     // Reset basic members.

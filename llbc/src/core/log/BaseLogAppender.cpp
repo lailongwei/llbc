@@ -50,7 +50,7 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
     _level = initInfo.level;
 
-    _chain = LLBC_New(LLBC_LogTokenChain);
+    _chain = new LLBC_LogTokenChain;
     if (_chain->Build(initInfo.pattern) != LLBC_OK)
     {
         LLBC_XDelete(_chain);

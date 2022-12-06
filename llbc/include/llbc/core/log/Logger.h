@@ -297,7 +297,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LoggerImpl.h"
+#include "llbc/core/log/LoggerInl.h"
 
 #endif // !__LLBC_CORE_LOG_LOGGER_H__
 

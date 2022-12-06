@@ -86,7 +86,7 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/variant/VariantArithmeticImpl.h"
+#include "llbc/core/variant/VariantArithmeticInl.h"
 
 #endif // !__LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
 

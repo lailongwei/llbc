@@ -49,12 +49,12 @@ LLBC_Timer::~LLBC_Timer()
     {
         Cancel();
         if (--_timerData->refCount == 0)
-            LLBC_Delete(_timerData);
+            delete _timerData;
 ;
     }
 
     if (_data)
-        LLBC_Delete(_data);
+        delete _data;
 }
 
 uint64 LLBC_Timer::GetDueTime() const
@@ -108,11 +108,12 @@ void LLBC_Timer::OnCancel()
 
 int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
 {
-    if (_timerData && _timerData->cancelling)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
-        return LLBC_FAILED;
-    }
+    // Note: Allow reschedule in <OnCancel> event meth.
+    // if (_timerData && _timerData->cancelling)
+    // {
+    //     LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
+    //     return LLBC_FAILED;
+    // }
 
     const int cancelRet = Cancel();
     if (UNLIKELY(cancelRet != LLBC_OK))

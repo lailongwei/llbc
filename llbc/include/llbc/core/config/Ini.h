@@ -342,6 +342,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/config/IniImpl.h"
+#include "llbc/core/config/IniInl.h"
 
 #endif // !__LLBC_CORE_CONFIG_INI_H__

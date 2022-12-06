@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
 namespace
@@ -45,13 +45,13 @@ LLBC_ServiceMgr::~LLBC_ServiceMgr()
     // Do nothing.
 }
 
-LLBC_IService *LLBC_ServiceMgr::GetService(int id)
+LLBC_Service *LLBC_ServiceMgr::GetService(int id)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(id);
 }
 
-LLBC_IService *LLBC_ServiceMgr::GetService(const LLBC_String &name)
+LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_String &name)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(name);
@@ -62,7 +62,7 @@ int LLBC_ServiceMgr::Stop(int id, bool del)
     // Lock.
     _lock.Lock();
     // Find service.
-    LLBC_IService *svc = GetServiceNonLock(id);
+    LLBC_Service *svc = GetServiceNonLock(id);
     if (!svc)
     {
         _lock.Unlock();
@@ -80,7 +80,7 @@ int LLBC_ServiceMgr::Stop(const LLBC_String &name, bool del)
     // Lock.
     _lock.Lock();
     // Find service.
-    LLBC_IService *svc = GetServiceNonLock(name);
+    LLBC_Service *svc = GetServiceNonLock(name);
     if (!svc)
     {
         _lock.Unlock();
@@ -117,7 +117,7 @@ int LLBC_ServiceMgr::StopAll(bool del)
     return LLBC_OK;
 }
 
-int LLBC_ServiceMgr::Stop(LLBC_IService *svc, bool del)
+int LLBC_ServiceMgr::Stop(LLBC_Service *svc, bool del)
 {
     // Not allow call in service self thread.
     if (InTls(svc))
@@ -139,14 +139,14 @@ int LLBC_ServiceMgr::Stop(LLBC_IService *svc, bool del)
     return LLBC_OK;
 }
 
-bool LLBC_ServiceMgr::InTls(const LLBC_IService *svc)
+bool LLBC_ServiceMgr::InTls(const LLBC_Service *svc)
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     void **svcs = tls->commTls.services;
     for (int i = 0;
          i <= LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
          ++i)
-        if (reinterpret_cast<LLBC_IService *>(svcs[i]) == svc)
+        if (reinterpret_cast<LLBC_Service *>(svcs[i]) == svc)
             return true;
 
     return false;
@@ -174,14 +174,14 @@ bool LLBC_ServiceMgr::InTls(const Name2Services &svcs)
     return false;
 }
 
-void LLBC_ServiceMgr::OnServiceStart(LLBC_IService *svc)
+void LLBC_ServiceMgr::OnServiceStart(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
     _id2Services.insert(std::make_pair(svc->GetId(), svc));
     _name2Services.insert(std::make_pair(svc->GetName(), svc));
 }
 
-void LLBC_ServiceMgr::OnServiceStop(LLBC_IService *svc)
+void LLBC_ServiceMgr::OnServiceStop(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
     _id2Services.erase(svc->GetId());

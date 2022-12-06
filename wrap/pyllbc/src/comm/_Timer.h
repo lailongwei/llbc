@@ -29,7 +29,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewPyTimer(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "OO|O", &pyObj, &timeoutCallable, &cancelCallable))
         return nullptr;
 
-    pyllbc_Timer *timer = LLBC_New(pyllbc_Timer, pyObj, timeoutCallable, cancelCallable);
+    pyllbc_Timer *timer = new pyllbc_Timer(pyObj, timeoutCallable, cancelCallable);
 
     return Py_BuildValue("l", timer);
 }
@@ -40,7 +40,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelPyTimer(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &timer))
         return nullptr;
 
-    LLBC_Delete(timer);
+    delete timer;
 
     Py_RETURN_NONE;
 }

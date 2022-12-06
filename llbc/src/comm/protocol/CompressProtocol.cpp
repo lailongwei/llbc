@@ -40,11 +40,6 @@ int LLBC_CompressProtocol::GetLayer() const
     return LLBC_ProtocolLayer::CompressLayer;
 }
 
-int LLBC_CompressProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_CompressProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     out = in;

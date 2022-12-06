@@ -607,6 +607,6 @@ __LLBC_NS_END
  */
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
 
-#include "llbc/comm/PacketImpl.h"
+#include "llbc/comm/PacketInl.h"
 
 #endif // !__LLBC_COMM_PACKET_H__

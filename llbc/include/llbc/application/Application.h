@@ -33,7 +33,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Component;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -198,16 +198,16 @@ public:
     bool HasConfig() const;
 
     /**
+     * Get non-property type config.
+     * @return const LLBC_Variant & - the non-property application config.
+     */
+    const LLBC_Variant &GetConfig() const;
+
+    /**
      * Get property type config.
      * @return const LLBC_Property & - the property config.
      */
     const LLBC_Property &GetPropertyConfig() const;
-
-    /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
-     */
-    const LLBC_Variant &GetNonPropertyConfig() const;
 
     /**
      * Get application config type.
@@ -235,6 +235,16 @@ public:
      */
     int ReloadConfig(bool callEvMeth = true);
 
+    /**
+     * Prevent application config load.
+     */
+    void PreventConfigLoad();
+
+    /**
+     * Cancel prevent application config load.
+     */
+    void CancelPreventConfigLoad();
+
 public:
     /**
      * Start application.
@@ -243,12 +253,12 @@ public:
      * @param[in] name - the application name, default is executable file name(extension splited, if has extension).
      * @return int - return 0 if start success, otherwise return -1.
      */
-    int Start(int argc, char *argv[], const LLBC_String &name = "");
+    virtual int Start(int argc, char *argv[], const LLBC_String &name = "");
 
     /**
      * Stop application.
      */
-    void Stop();
+    virtual void Stop();
 
     /**
      * Check application start phase.
@@ -304,15 +314,15 @@ public:
     /**
      * Get service by service Id.
      * @param[in] id - service Id.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService(int id) const;
+    LLBC_Service *GetService(int id) const;
     /**
      * Get service by service name.
      * @param[in] name - service name.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService(const LLBC_String &name) const;
+    LLBC_Service *GetService(const LLBC_String &name) const;
 
     /**
      * Stop service by service Id.
@@ -369,6 +379,7 @@ protected:
 
     LLBC_SpinLock _cfgLock;
     volatile bool _loadingCfg;
+    volatile int _preventCfgLoad;
     LLBC_Property _propCfg;
     LLBC_Variant _nonPropCfg;
     LLBC_String _cfgPath;
@@ -392,6 +403,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/application/ApplicationImpl.h"
+#include "llbc/application/ApplicationInl.h"
 
 #endif // !__LLBC_APP_IAPPLICATION_H__

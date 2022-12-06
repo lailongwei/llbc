@@ -50,7 +50,7 @@ public:
     {
         LLBC_PrintLine("MyComp initialize ...");
 
-        TestObj *obj = LLBC_New(TestObj);
+        TestObj *obj = new TestObj;
         obj->AutoRelease();
 
         obj->Retain();
@@ -70,12 +70,12 @@ public:
     virtual void OnUpdate()
     {
         // Create new release pool.
-        LLBC_AutoReleasePool *pool = LLBC_New(LLBC_AutoReleasePool);
+        LLBC_AutoReleasePool *pool = new LLBC_AutoReleasePool;
 
-        LLBC_Object *obj = LLBC_New(TestObj);
+        LLBC_Object *obj = new TestObj;
         obj->AutoRelease();
 
-        LLBC_Delete(pool);
+        delete pool;
     }
 };
 
@@ -94,14 +94,14 @@ int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
     LLBC_PrintLine("ReleasePool test:");
 
     // Create service.
-    LLBC_IService *svc = LLBC_IService::Create("ReleasePoolTest");
-    svc->AddComponent(LLBC_New(MyComp));
+    LLBC_Service *svc = LLBC_Service::Create("ReleasePoolTest");
+    svc->AddComponent(new MyComp);
     svc->Start();
 
     std::cout <<"press any key to continue ..." <<std::endl;
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

@@ -9,7 +9,7 @@
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
 
 -- solution/projects path
-SLN_PATH = "../../"
+SLN_PATH = "../.."
 CORELIB_PATH = SLN_PATH .. "/llbc"
 TESTSUITE_PATH = SLN_PATH .. "/testsuite"
 WRAPS_PATH = SLN_PATH .. "/wrap"
@@ -212,6 +212,9 @@ project "testsuite"
     files {
         TESTSUITE_PATH .. "/**.h",
         TESTSUITE_PATH .. "/**.cpp",
+        TESTSUITE_PATH .. "/**.xml",
+        TESTSUITE_PATH .. "/**.cfg",
+        TESTSUITE_PATH .. "/**.ini",
     }
 
     -- includedirswrap\csllbc\csharp\script_tools
@@ -271,6 +274,32 @@ project "testsuite"
         buildoptions {
             "-std=c++11",
         }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(LLBC_OUTPUT_DIR)
+
+    -- Copy all testcases config files to debug directory.
+    postbuildmessage("Copying all testcase config files to debug directory...");
+    local test_cfgs = {
+        "core/config/IniTestCfg.ini",
+        "core/log/LogTestCfg.cfg",
+        "application/AppCfgTest.cfg",
+        "application/AppCfgTest.ini",
+        "application/AppCfgTest.xml",
+    }
+    filter { "system:windows" }
+        for _, test_cfg in pairs(test_cfgs) do
+            postbuildcommands(string.format("COPY /Y \"%s\\%s\" \"%s\"",
+                                            string.gsub(TESTSUITE_PATH, "/", "\\"),
+                                            string.gsub(test_cfg, "/", "\\"),
+                                            string.gsub(LLBC_OUTPUT_DIR, "/", "\\")))
+        end
+    filter {}
+    filter { "system:not windows" }
+        for _, test_cfg in pairs(test_cfgs) do
+            postbuildcommands(string.format("cp -rf \"%s/%s\" \"%s\"", TESTSUITE_PATH, test_cfg, LLBC_OUTPUT_DIR))
+        end
     filter {}
 
 group "wrap"

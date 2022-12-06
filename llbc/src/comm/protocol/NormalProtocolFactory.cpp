@@ -35,13 +35,13 @@ LLBC_IProtocol *LLBC_NormalProtocolFactory::Create(int layer) const
     switch (layer)
     {
     case LLBC_ProtocolLayer::CodecLayer:
-        return LLBC_New(LLBC_CodecProtocol);
+        return new LLBC_CodecProtocol;
 
     case LLBC_ProtocolLayer::CompressLayer:
-        return LLBC_New(LLBC_CompressProtocol);
+        return new LLBC_CompressProtocol;
 
     case LLBC_ProtocolLayer::PackLayer:
-        return LLBC_New(LLBC_PacketProtocol);
+        return new LLBC_PacketProtocol;
 
     default:
         return nullptr;

@@ -324,7 +324,7 @@ LLBC_Socket *LLBC_Socket::Accept()
     if (newHandle == LLBC_INVALID_SOCKET_HANDLE)
         return nullptr;
 
-    LLBC_Socket *newSocket = LLBC_New(LLBC_Socket, newHandle);
+    LLBC_Socket *newSocket = new LLBC_Socket(newHandle);
     newSocket->_pollerType = _pollerType;
 
     return newSocket;
@@ -384,7 +384,7 @@ int LLBC_Socket::Send(const char *buf, int len)
 
 int LLBC_Socket::AsyncSend(const char *buf, int len)
 {
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, len);
+    LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
     block->Write(buf, len);
 
     return AsyncSend(block);
@@ -405,7 +405,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
 
     LLBC_MessageBlock *mergedBlock = _willSend.MergeBlocksAndDetach();
 
-    LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
+    LLBC_POverlapped ol = new LLBC_Overlapped;
     ol->sock = _handle;
     ol->data = mergedBlock;
     ol->opcode = _Opcode::Send;
@@ -575,7 +575,7 @@ void LLBC_Socket::OnSend()
     if (!block)
         return;
 
-    ol = LLBC_New(LLBC_Overlapped);
+    ol = new LLBC_Overlapped;
     ol->opcode = _Opcode::Send;
     ol->sock = _handle;
     ol->data = block;
@@ -610,9 +610,9 @@ void LLBC_Socket::OnSend()
     if (ret != LLBC_OK && LLBC_GetLastError() != LLBC_ERROR_PENDING)
     {
         trace("LLBC_Socket::OnSend() call LLBC_SendEx() failed, reason: %s\n", LLBC_FormatLastError());
-        LLBC_Delete(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
+        delete reinterpret_cast<LLBC_MessageBlock *>(ol->data);
 
-        LLBC_Delete(ol);
+        delete ol;
         _session->OnClose();
         return;
     }
@@ -640,7 +640,7 @@ void LLBC_Socket::OnRecv()
     #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
     LLBC_MessageBlock *block = _msgBlockPoolInst->GetObject();
     #else
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, _session->GetSessionOpts().GetSessionRecvBufSize());
+    LLBC_MessageBlock *block = new LLBC_MessageBlock(_session->GetSessionOpts().GetSessionRecvBufSize());
     #endif
     while ((len = LLBC_Recv(_handle,
                             block->GetDataStartWithWritePos(),
@@ -727,9 +727,9 @@ void LLBC_Socket::OnRecv()
            )
         {
             #if LLBC_TARGET_PLATFORM_NON_WIN32
-            _session->OnClose(LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+            _session->OnClose(new LLBC_SessionCloseInfo(errNo, subErrNo));
             #else
-            _session->OnClose(nullptr, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+            _session->OnClose(nullptr, new LLBC_SessionCloseInfo(errNo, subErrNo));
             #endif
             return;
         }
@@ -740,11 +740,11 @@ void LLBC_Socket::OnRecv()
     {
         #if LLBC_TARGET_PLATFORM_NON_WIN32
         LLBC_SessionCloseInfo *closeInfo = 
-            LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, ECONNRESET);
+            new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, ECONNRESET);
         _session->OnClose(closeInfo);
         #else
         LLBC_SessionCloseInfo *closeInfo =
-            LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, WSAECONNRESET);
+            new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, WSAECONNRESET);
         _session->OnClose(nullptr, closeInfo);
         #endif
         return;
@@ -814,7 +814,7 @@ size_t LLBC_Socket::GetIocpSendingDataSize() const
 #if LLBC_TARGET_PLATFORM_WIN32
 int LLBC_Socket::PostZeroWSARecv()
 {
-    LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
+    LLBC_POverlapped ol = new LLBC_Overlapped;
     ol->opcode = _Opcode::Receive;
     ol->sock = _handle;
 
@@ -834,7 +834,7 @@ int LLBC_Socket::PostZeroWSARecv()
         trace("LLBC_Socket::PostWSARecv() call LLBC_RecvEx() failed, "
             "reason: %s\n", LLBC_FormatLastError());
 
-        LLBC_Delete(ol);
+        delete ol;
         return LLBC_FAILED;
     }
 
@@ -844,14 +844,14 @@ int LLBC_Socket::PostZeroWSARecv()
 
 int LLBC_Socket::PostAsyncAccept()
 {
-    LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
+    LLBC_POverlapped ol = new LLBC_Overlapped;
     ol->opcode = LLBC_OverlappedOpcode::Accept;
     ol->sock = _handle;
     if (UNLIKELY((ol->acceptSock = 
             LLBC_CreateTcpSocketEx()) == 
                     LLBC_INVALID_SOCKET_HANDLE))
     {
-        LLBC_Delete(ol);
+        delete ol;
         return LLBC_FAILED;
     }
 
@@ -866,7 +866,7 @@ int LLBC_Socket::PostAsyncAccept()
         LLBC_GetLastError() != LLBC_ERROR_PENDING))
     {
         LLBC_CloseSocket(ol->acceptSock);
-        LLBC_Delete(ol);
+        delete ol;
 
         return LLBC_FAILED;
     }

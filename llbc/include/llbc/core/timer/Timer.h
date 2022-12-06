@@ -189,6 +189,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/timer/TimerImpl.h"
+#include "llbc/core/timer/TimerInl.h"
 
 #endif // !__LLBC_CORE_TIMER_TIMER_H__

@@ -35,7 +35,7 @@ pyllbc_FrameCallable::~pyllbc_FrameCallable()
     Py_DECREF(_callable);
 }
 
-void pyllbc_FrameCallable::Call(LLBC_IService *llbcSvc)
+void pyllbc_FrameCallable::Call(LLBC_Service *llbcSvc)
 {
     PyObject *ret = PyObject_CallFunctionObjArgs(_callable, _svc, nullptr);
     if (ret)

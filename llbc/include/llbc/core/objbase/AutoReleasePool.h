@@ -110,6 +110,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/AutoReleasePoolImpl.h"
+#include "llbc/core/objbase/AutoReleasePoolInl.h"
 
 #endif // !__LLBC_OBJBASE_AUTO_RELEASE_POOL_H__

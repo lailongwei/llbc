@@ -126,11 +126,11 @@ void LLBC_Variant::Holder::ClearData()
         return;
 
     if (type == LLBC_VariantType::VT_STR_DFT)
-        LLBC_Delete(data.obj.str);
+        delete data.obj.str;
     else if (type == LLBC_VariantType::VT_SEQ_DFT)
-        LLBC_Delete(data.obj.seq);
+        delete data.obj.seq;
     else if (type == LLBC_VariantType::VT_DICT_DFT)
-        LLBC_Delete(data.obj.dict);
+        delete data.obj.dict;
 
     data.raw.int64Val = 0;
 }
@@ -153,7 +153,7 @@ void LLBC_Variant::InitNumber2StrFastAccessTable()
         sprintf(buf, "%d", i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN);
         #endif
 
-        _num2StrFastAccessTbl[i] = LLBC_New(Str, buf);
+        _num2StrFastAccessTbl[i] = new Str(buf);
     }
 }
 
@@ -164,7 +164,7 @@ void LLBC_Variant::DestroyNumber2StrFastAccessTable()
 
     int cap = LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN + 1;
     for (int i = 0; i < cap; ++i)
-        LLBC_Delete(_num2StrFastAccessTbl[i]);
+        delete _num2StrFastAccessTbl[i];
 
     LLBC_XFree(_num2StrFastAccessTbl);
 }
@@ -176,7 +176,7 @@ LLBC_Variant::LLBC_Variant(const char *str)
     {
         const size_t strLen = strlen(str);
         if (strLen != 0)
-            _holder.data.obj.str = LLBC_New(Str, str, strLen);
+            _holder.data.obj.str = new Str(str, strLen);
     }
 }
 
@@ -641,7 +641,7 @@ LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key)
     if (_holder.type == LLBC_VariantType::VT_SEQ_DFT)
     {
         if (!_holder.data.obj.seq)
-            _holder.data.obj.seq = LLBC_New(Seq);
+            _holder.data.obj.seq = new Seq;
 
         return (*_holder.data.obj.seq)[key];
     }
@@ -781,7 +781,7 @@ LLBC_Variant & LLBC_Variant::operator =(const char * const &str)
         if (_holder.data.obj.str)
             _holder.data.obj.str->assign(str, len);
         else
-            _holder.data.obj.str = LLBC_New(LLBC_String, str, len);
+            _holder.data.obj.str = new LLBC_String(str, len);
     }
 
     return *this;
@@ -840,7 +840,7 @@ LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &str)
         if (_holder.data.obj.str)
             *_holder.data.obj.str = str;
         else
-            _holder.data.obj.str = LLBC_New(LLBC_String, str);
+            _holder.data.obj.str = new LLBC_String(str);
     }
 
     return *this;
@@ -859,7 +859,7 @@ LLBC_Variant &LLBC_Variant::operator =(const Seq &seq)
         if (_holder.data.obj.seq)
             *_holder.data.obj.seq = seq;
         else
-            _holder.data.obj.seq = LLBC_New(Seq, seq);
+            _holder.data.obj.seq = new Seq(seq);
     }
 
     return *this;
@@ -878,7 +878,7 @@ LLBC_Variant &LLBC_Variant::operator =(const Dict &dict)
         if (_holder.data.obj.dict)
             *_holder.data.obj.dict = dict;
         else
-            _holder.data.obj.dict = LLBC_New(Dict, dict);
+            _holder.data.obj.dict = new Dict(dict);
     }
 
     return *this;
@@ -912,6 +912,12 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsSeq())
     {
+        if (!_holder.data.obj.seq)
+        {
+            stream.Write(static_cast<uint32>(0));
+            return;
+        }
+
         stream.Write(static_cast<uint32>(_holder.data.obj.seq->size()));
         for (SeqConstIter it = _holder.data.obj.seq->begin();
              it != _holder.data.obj.seq->end();
@@ -922,6 +928,12 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
     else if (IsDict())
     {
+        if (!_holder.data.obj.dict)
+        {
+            stream.Write(static_cast<uint32>(0));
+            return;
+        }
+
         stream.Write(static_cast<uint32>(_holder.data.obj.dict->size()));
         for (DictConstIter it = _holder.data.obj.dict->begin();
              it != _holder.data.obj.dict->end();
@@ -961,7 +973,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
         if (_holder.data.obj.str)
             _holder.data.obj.str->clear();
         else
-            _holder.data.obj.str = LLBC_New(LLBC_String);
+            _holder.data.obj.str = new LLBC_String;
 
         if (!stream.Read(*_holder.data.obj.str))
         {
@@ -986,7 +998,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
         if (count == 0)
             return true;
        if (!_holder.data.obj.seq)
-            _holder.data.obj.seq = LLBC_New(Seq);
+            _holder.data.obj.seq = new Seq;
 
         for (uint32 i = 0; i < count; ++i)
         {
@@ -1017,7 +1029,7 @@ bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
         if (count == 0)
             return true;
         if (!_holder.data.obj.dict)
-            _holder.data.obj.dict = LLBC_New(Dict);
+            _holder.data.obj.dict = new Dict;
 
         for (uint32 i = 0; i < count; ++i)
         {

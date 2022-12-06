@@ -45,7 +45,7 @@ public:
      * Callable method, call by llbc library.
      * @param[in] llbcSvc - the service pointer.
      */
-    void Call(LLBC_IService *llbcSvc);
+    void Call(LLBC_Service *llbcSvc);
 
 private:
     PyObject *_svc;

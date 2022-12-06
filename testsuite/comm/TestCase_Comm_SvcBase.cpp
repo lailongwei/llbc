@@ -64,7 +64,7 @@ class TestDataFactory : public LLBC_CoderFactory
 public:
     virtual LLBC_Coder *Create() const
     {
-        return LLBC_New(TestData);
+        return new TestData;
     }
 };
 
@@ -142,7 +142,7 @@ public:
         LLBC_PrintLine("Receive data[%d], iVal: %d, strVal: %s", 
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 
-        TestData *resData = LLBC_New(TestData);
+        TestData *resData = new TestData;
         *resData = *data;
 
         LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
@@ -185,7 +185,7 @@ public:
 private:
     void DelPreHandleResult(void *result)
     {
-        LLBC_Free(result);
+        free(result);
     }
 };
 
@@ -194,21 +194,21 @@ class TestCompFactory : public LLBC_ComponentFactory
 public:
     LLBC_Component *Create() const
     {
-        return LLBC_New(TestComp);
+        return new TestComp;
     }
 };
 
 }
 
 TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
-: _svc(LLBC_IService::Create("SvcBaseTest"))
-// : _svc(LLBC_IService::Create("SvcBaseTest", nullptr, false))
+: _svc(LLBC_Service::Create("SvcBaseTest"))
+// : _svc(LLBC_Service::Create("SvcBaseTest", nullptr, false))
 {
 }
 
 TestCase_Comm_SvcBase::~TestCase_Comm_SvcBase()
 {
-    LLBC_Delete(_svc);
+    delete _svc;
 }
 
 int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
@@ -217,10 +217,10 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register comp.
-    TestComp *comp = LLBC_New(TestComp);
+    TestComp *comp = new TestComp;
     _svc->AddComponent(comp);
     // Register coder.
-    _svc->AddCoderFactory(1, LLBC_New(TestDataFactory));
+    _svc->AddCoderFactory(1, new TestDataFactory);
     // Register status desc(if enabled).
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _svc->AddStatusDesc(1, "The test status describe");
@@ -337,11 +337,11 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     }
 
     // Create packet to send to peer.
-    TestData *encoder = LLBC_New(TestData);
+    TestData *encoder = new TestData;
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library";
 
-    // LLBC_Packet *packet = LLBC_New(LLBC_Packet); // uncomment for test send non object-pool packet.
+    // LLBC_Packet *packet = new LLBC_Packet; // uncomment for test send non object-pool packet.
      LLBC_Packet *packet = _svc->GetPacketObjectPool().GetObject();  // uncomment for test send object-pool packet.
     packet->SetHeader(connSession, 1, 0);
     packet->SetEncoder(encoder);
@@ -354,7 +354,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
 
-    packet = LLBC_New(LLBC_Packet);
+    packet = new LLBC_Packet;
     packet->SetHeader(connSession, 1, 1);
     packet->SetEncoder(encoder);
 

@@ -27,14 +27,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_New(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &file))
         return nullptr;
 
-    LLBC_Property *prop = LLBC_New(LLBC_Property);
+    LLBC_Property *prop = new LLBC_Property;
     if (strlen(file) == 0)
         return Py_BuildValue("l", prop);
 
     if (prop->LoadFromFile(file) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, prop->GetLoadErrorDesc());
-        LLBC_Delete(prop);
+        delete prop;
 
         return nullptr;
     }
@@ -48,7 +48,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_Delete(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &prop))
         return nullptr;
 
-    LLBC_Delete(prop);
+    delete prop;
 
     Py_RETURN_NONE;
 }
@@ -156,17 +156,17 @@ LLBC_EXTERN_C PyObject *_pyllbc_Property_GetProperty(PyObject *self, PyObject *a
     }
 
     // Set new sub property.
-    LLBC_Property *copySubProp = LLBC_New(LLBC_Property, *subProp);
+    LLBC_Property *copySubProp = new LLBC_Property(*subProp);
     if (attrOptr.SetAttr("_c_obj", reinterpret_cast<sint64>(copySubProp)) != LLBC_OK)
     {
         Py_DECREF(pySubProp);
-        LLBC_Delete(copySubProp);
+        delete copySubProp;
 
         return nullptr;
     }
     
     // Succeed, delete old sub property.
-    LLBC_Delete(reinterpret_cast<LLBC_Property *>(oldSubProp));
+    delete reinterpret_cast<LLBC_Property *>(oldSubProp);
 
     return pySubProp;
 }

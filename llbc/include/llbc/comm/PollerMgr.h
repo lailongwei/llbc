@@ -32,7 +32,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Socket;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_BasePoller;
 class LLBC_IProtocolFactory;
 
@@ -60,7 +60,7 @@ public:
      * Set service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
 public:
     /**
@@ -175,7 +175,7 @@ private:
 
 private:
     int _type;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
 
     int _pollerCount;
     LLBC_BasePoller **_pollers;
