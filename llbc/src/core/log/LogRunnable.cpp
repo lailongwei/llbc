@@ -107,7 +107,6 @@ LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
 
     for (auto &logData : logDatas)
     {
-        logData->Prepare();
         logData->logger->OutputLogData(*logData);
         LLBC_Recycle(logData);
     }

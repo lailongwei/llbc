@@ -29,14 +29,14 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
 }
 
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
-    LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, bool staticFileAndFunc, const char *fmt, ...) \
+    LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) \
     {                                             \
         if (_logLevel > LLBC_LogLevel::level)     \
             return LLBC_OK;                       \
                                                   \
         va_list va;                               \
         va_start(va, fmt);                        \
-        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, staticFileAndFunc, fmt, va); \
+        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, fmt, va); \
         va_end(va);                               \
                                                   \
         return ret;                               \
@@ -54,7 +54,6 @@ inline int LLBC_Logger::Output(int level,
                                const char *file,
                                int line,
                                const char *func,
-                               bool staticFileAndFunc,
                                const char *fmt,
                                ...) 
 {
@@ -63,7 +62,7 @@ inline int LLBC_Logger::Output(int level,
 
     va_list va;
     va_start(va, fmt);
-    const int ret = VOutput(level, tag, file, line, func, staticFileAndFunc, fmt, va);
+    const int ret = VOutput(level, tag, file, line, func, fmt, va);
     va_end(va);
 
     return ret;

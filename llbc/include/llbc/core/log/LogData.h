@@ -51,18 +51,14 @@ struct LLBC_EXPORT LLBC_LogData
     int level;              // Log level.
     sint64 logTime;         // Log time.
 
-    const char *staticFile; // Static file.
-    const char *staticFunc; // Static func.
-    bool logCodeFilePath;   // Log code file path or not(only used in <staticFile> variable parse).
-
     char file[256];         // File
-    sint64 fileLen;         // File length
+    int fileLen;            // File length
     char func[64];          // Func
-    sint64 funcLen;         // Func length
+    int funcLen;            // Func length
     char tag[64];           // Tag
-    sint64 tagLen;          // Tag length
+    int tagLen;             // Tag length
 
-    long line;              // Log source file line number.
+    int line;               // Log source file line number.
 
     LLBC_ThreadId threadId; // Log native thread Id.
 
@@ -72,12 +68,6 @@ public:
      */
     LLBC_LogData();
     ~LLBC_LogData();
-
-public:
-    /**
-     * Prepare log data.
-     */
-    void Prepare();
 
 public:
     /**

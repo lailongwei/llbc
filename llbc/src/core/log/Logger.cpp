@@ -346,7 +346,6 @@ int LLBC_Logger::VOutput(int level,
                          const char *file,
                          int line,
                          const char *func,
-                         bool staticFileAndFunc,
                          const char *fmt,
                          va_list va) 
 {
@@ -358,7 +357,6 @@ int LLBC_Logger::VOutput(int level,
                                       file,
                                       line,
                                       func,
-                                      staticFileAndFunc,
                                       fmt,
                                       va);
     if (UNLIKELY(!data))
@@ -385,7 +383,6 @@ int LLBC_Logger::NonFormatOutput(int level,
                                  const char *file,
                                  int line,
                                  const char *func,
-                                 bool staticFileAndFunc,
                                  const char *msg,
                                  size_t msgLen)
 {
@@ -397,7 +394,6 @@ int LLBC_Logger::NonFormatOutput(int level,
                                       file,
                                       line,
                                       func,
-                                      staticFileAndFunc,
                                       msg,
                                       msgLen);
     if (_hookDelegs[level])
@@ -421,7 +417,6 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
-                                                          bool staticFileAndFunc,
                                                           const char *fmt,
                                                           va_list va)
 {
@@ -458,7 +453,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[len] = '\0';
 
     // Fill other LogData members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, staticFileAndFunc, data, libTls);
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls);
 
     return data;
 }
@@ -468,7 +463,6 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
-                                                          bool staticFileAndFunc,
                                                           const char *msg,
                                                           size_t msgLen)
 {
@@ -500,7 +494,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[msgLen] = '\0';
 
     // Fill LogData other members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, staticFileAndFunc, data, __LLBC_GetLibTls());
+    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls());
 
     return data;
 }
@@ -510,7 +504,6 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                                              const char *file,
                                                              int line,
                                                              const char *func,
-                                                             bool staticFileAndFunc,
                                                              LLBC_LogData *logData,
                                                              __LLBC_LibTls *libTls)
 {
@@ -525,61 +518,57 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->logTime = LLBC_GetMicroSeconds();
 
     // fill: file, func.
-    if (staticFileAndFunc)
+    if (file)
     {
-        logData->staticFile = file;
-        logData->staticFunc = func;
-        logData->logCodeFilePath = _config->IsLogCodeFilePath();
-    }
-    else
-    {
-        if (file)
+        logData->fileLen = static_cast<int>(strlen(file));
+        if (!_config->IsLogCodeFilePath())
         {
-            logData->fileLen = static_cast<sint64>(strlen(file));
-            if (!_config->IsLogCodeFilePath())
+            const char *ps = file + logData->fileLen - 1;
+            while (ps != file)
             {
                 #if LLBC_TARGET_PLATFORM_WIN32
-                const char *ps = strrchr(file, '\\');
-                if (ps == nullptr)
-                    ps = strrchr(file, '/');
+                if (*ps == '\\' ||
+                    *ps == '/')
                 #else // Non-Win32
-                const char *ps = strrchr(file, '/');
-                #endif // Win32
-                if (ps != nullptr)
+                if (*ps == '/')
+                #endif
                 {
-                    logData->fileLen -= (static_cast<uint32>(ps - file) + 1);
+                    logData->fileLen -= (ps + 1 - file);
                     file = ps + 1;
+                    break;
                 }
-            }
 
-            const sint64 exceedLen = logData->fileLen - (sizeof(logData->file) - 1);
-            if (UNLIKELY(exceedLen > 0))
-            {
-                file += exceedLen;
-                logData->fileLen = sizeof(logData->file) - 1;
+                --ps;
             }
-
-            memcpy(logData->file, file, logData->fileLen);
-            logData->file[logData->fileLen] = '\0';
         }
 
-        if (func)
+        const int exceedLen = logData->fileLen - static_cast<int>((sizeof(logData->file) - 1));
+        if (UNLIKELY(exceedLen > 0))
         {
-            logData->funcLen = static_cast<sint64>(strlen(func));
-            const sint64 exceedLen = logData->funcLen - (sizeof(logData->func) - 1);
-            if (UNLIKELY(exceedLen > 0))
-                logData->funcLen = sizeof(logData->func) - 1;
-
-            memcpy(logData->func, func, logData->funcLen);
-            logData->func[logData->funcLen] = '\0';
+            file += exceedLen;
+            logData->fileLen = sizeof(logData->file) - 1;
         }
+
+        memcpy(logData->file, file, logData->fileLen);
+        logData->file[logData->fileLen] = '\0';
+    }
+
+    if (func)
+    {
+        logData->funcLen = static_cast<int>(strlen(func));
+        const sint64 exceedLen = logData->funcLen - static_cast<int>((sizeof(logData->func) - 1));
+        if (UNLIKELY(exceedLen > 0))
+            logData->funcLen = sizeof(logData->func) - 1;
+
+        memcpy(logData->func, func, logData->funcLen);
+        logData->func[logData->funcLen] = '\0';
     }
 
     // fill: tag.
     if (tag)
     {
-        logData->tagLen = static_cast<sint64>(strlen(tag));
-        const sint64 exceedLen = logData->tagLen - (sizeof(logData->tag) - 1);
+        logData->tagLen = static_cast<int>(strlen(tag));
+        const sint64 exceedLen = logData->tagLen - static_cast<int>((sizeof(logData->tag) - 1));
         if (UNLIKELY(exceedLen > 0))
             logData->tagLen = sizeof(logData->tag) - 1;
 

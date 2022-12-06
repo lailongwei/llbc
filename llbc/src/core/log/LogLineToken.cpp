@@ -250,7 +250,7 @@ void LLBC_LogLineToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
         char lineStr[32];
         lineStr[0] = '\0';
         #if LLBC_TARGET_PLATFORM_WIN32
-        _itoa_s(static_cast<int>(data.line), lineStr, 10);
+        _itoa_s(data.line, lineStr, 10);
         formattedData.append(lineStr);
         #else // Non-Win32
         const int len = snprintf(lineStr, sizeof(lineStr), "%ld", data.line);

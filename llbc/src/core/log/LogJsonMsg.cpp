@@ -95,7 +95,6 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  _file,
                                  _line,
                                  _func,
-                                 true,
                                  buffer.GetString(),
                                  buffer.GetLength());
 

@@ -120,18 +120,24 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     }
 
     // Peform performance test.
-    LLBC_PrintLine("Perform preformance test:");
-    LLBC_CPUTime begin = LLBC_CPUTime::Current();
-    const int loopLmt = 2000000;
-    for (int i = 0; i < loopLmt; ++i)
-        LLOG_DEBUG3("perftest", "performance test msg");
+    const int perfTestTimes = 3;
+    for (int i = 0; i < perfTestTimes; ++i)
+    {
+        LLBC_PrintLine("Press any key to exec performance test(times:%d):", i);
+        getchar();
 
-    LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
-    LLBC_PrintLine("Performance test completed, "
-                   "log times:%d, cost:%s ms, per-log cost:%.3f us",
-                   loopLmt,
-                   elapsed.ToString().c_str(),
-                   elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+        LLBC_CPUTime begin = LLBC_CPUTime::Current();
+        const int loopLmt = 2000000;
+        for (int i = 0; i < loopLmt; ++i)
+            LLOG_DEBUG3("perftest", "performance test msg");
+
+        LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
+        LLBC_PrintLine("Performance test completed, "
+                       "log times:%d, cost:%s ms, per-log cost:%.3f us",
+                       loopLmt,
+                       elapsed.ToString().c_str(),
+                       elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+    }
 
     LLBC_PrintLine("Press any key to begin json log test");
     getchar();

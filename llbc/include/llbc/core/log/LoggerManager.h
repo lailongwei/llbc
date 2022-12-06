@@ -158,7 +158,6 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                           __FILE__,                       \
                           __LINE__,                       \
                           __FUNCTION__,                   \
-                          true,                           \
                           fmt,                            \
                           ##__VA_ARGS__);                 \
         }                                                 \
@@ -279,7 +278,6 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                                    __FILE__,                   \
                                    __LINE__,                   \
                                    __FUNCTION__,               \
-                                   true,                       \
                                    formattedLogMsg.c_str(),    \
                                    formattedLogMsg.length());  \
         }                                                      \
