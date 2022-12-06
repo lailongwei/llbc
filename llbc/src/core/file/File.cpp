@@ -121,7 +121,7 @@ int LLBC_File::Open(const LLBC_String &path, int mode)
     }
 
     _mode = mode;
-    _path.append(path.c_str(), path.length());
+    _path.assign(path.c_str(), path.length());
 
     return LLBC_OK;
 }

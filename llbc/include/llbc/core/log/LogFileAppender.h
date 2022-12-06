@@ -24,6 +24,7 @@
 
 #include "llbc/common/Common.h"
 
+#include "llbc/core/file/File.h"
 #include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN
@@ -89,20 +90,21 @@ private:
     void CheckAndUpdateLogFile(sint64 now);
 
     /**
-     * Build log file name.
+     * Build log file path.
      * @now                - now time, in micro-seconds.
-     * @return LLBC_String - the log file name.
+     * @return LLBC_String - the log file path.
      */
-    LLBC_String BuildLogFileName(sint64 now) const;
+    LLBC_String BuildLogFilePath(sint64 now) const;
 
     /**
      * Check is need reopen file or not.
-     * @param[out] backup - the backup flag, if true, means must backup log files.
-     *                      about backup, see BackupFiles() method.
-     * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
+     * @param[in] newFilePath - the new file path.
+     * @param[out] backup     - the backup flag, if true, means must backup log files.
+     *                          about backup, see BackupFiles() method.
+     * @param[out] clear      - the clear flag, if true, means when reopen file, must clear file content.
      * @return bool - need reopen if true, otherwise return false.
      */
-    bool IsNeedReOpenFile(const LLBC_String &newFileName, bool &backup, bool &clear) const;
+    bool IsNeedReOpenFile(const LLBC_String &newFilePath, bool &backup, bool &clear) const;
 
     /**
      * ReOpen the log file.
@@ -115,7 +117,7 @@ private:
     /**
      * Backup all log files.
      */
-    void BackupFiles() const;
+    void BackupFiles();
 
     /**
      * Update log file buffer info(included buffer mode and buffer size).
@@ -128,23 +130,21 @@ private:
     int GetBackupFilesCount(const LLBC_String &logFileName) const;
 
 private:
-    LLBC_String _filePath;
+    LLBC_String _fileBasePath;
     LLBC_String _fileSuffix;
 
     int _fileBufferSize;
     bool _isDailyRolling;
 
-    long _maxFileSize;
+    sint64 _maxFileSize;
     int _maxBackupIndex;
 
 private:
-    LLBC_String _fileName;
-
-    LLBC_File *_file;
-    long _fileSize;
+    LLBC_File _file;
+    sint64 _fileSize;
 
     sint64 _nonFlushLogCount;
-    sint64 _logfileLastCheckTime;
+    sint64 _logFileLastCheckTime;
 };
 
 __LLBC_NS_END

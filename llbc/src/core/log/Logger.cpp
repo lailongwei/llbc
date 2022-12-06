@@ -603,13 +603,13 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     }
 
     // Flush appenders.
-    FlushAppenders(force);
+    FlushAppenders();
 
     // Update last flush time(use flushed time to avoid logger performance problem).
     _lastFlushTime = now != 0 ? now : LLBC_GetMilliSeconds();
 }
 
-void LLBC_Logger::FlushAppenders(bool force)
+void LLBC_Logger::FlushAppenders()
 {  
     // Foreach appenders to flush.
     LLBC_ILogAppender *appender = _appenders;

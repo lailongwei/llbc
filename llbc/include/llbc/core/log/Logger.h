@@ -262,9 +262,8 @@ private:
 
     /**
      * Flush appenders.
-     * @param[in] force - force flush or not, default is false.
      */
-    void FlushAppenders(bool force);
+    void FlushAppenders();
 
     /**
      * Lockless uninstall error hook.

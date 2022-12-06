@@ -27,8 +27,6 @@
 
 #include "llbc/core/file/File.h"
 #include "llbc/core/file/Directory.h"
-#include "llbc/core/utils/Util_Text.h"
-#include "llbc/core/utils/Util_Math.h"
 #include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/log/LogData.h"
@@ -49,13 +47,11 @@ LLBC_LogFileAppender::LLBC_LogFileAppender()
 , _maxFileSize(LONG_MAX)
 , _maxBackupIndex(INT_MAX)
 
-, _fileName()
-
 , _file(nullptr)
 , _fileSize(0)
 
 , _nonFlushLogCount(0)
-, _logfileLastCheckTime(0)
+, _logFileLastCheckTime(0)
 {
 }
 
@@ -71,22 +67,28 @@ int LLBC_LogFileAppender::GetType() const
 
 int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 {
-    if (_Base::Initialize(initInfo) != LLBC_OK)
-        return LLBC_FAILED;
-
+    // Init info check.
     if (initInfo.filePath.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    _filePath = initInfo.filePath;
+    // Init base appender.
+    if (_Base::Initialize(initInfo) != LLBC_OK)
+        return LLBC_FAILED;
+
+    // Save file appender config to members.
+    _fileBasePath = initInfo.filePath;
     _fileSuffix = initInfo.fileSuffix;
-    const LLBC_String fileDir = LLBC_Directory::DirName(_filePath);
+    const LLBC_String fileDir = LLBC_Directory::DirName(_fileBasePath);
     if (!LLBC_Directory::Exists(fileDir))
     {
         if (LLBC_Directory::Create(fileDir) != LLBC_OK)
+        {
+            _Base::Finalize();
             return LLBC_FAILED;
+        }
     }
 
     _fileBufferSize = MAX(0, initInfo.fileBufferSize);
@@ -95,45 +97,19 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _maxFileSize = initInfo.maxFileSize > 0 ? initInfo.maxFileSize : LONG_MAX;
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
 
-    const sint64 now = LLBC_GetMicroSeconds();
-
+    // If lazy create log file, return it.
     if (initInfo.lazyCreateLogFile)
         return LLBC_OK;
 
-    _file = new LLBC_File;
-    _fileName = BuildLogFileName(now);
-
-    LLBC_FileAttributes fileAttrs;
-    fileAttrs.fileSize = 0;
-    bool fileExists = LLBC_File::Exists(_fileName);
-    if (fileExists)
-    {
-        if (LLBC_File::GetFileAttributes(_fileName, fileAttrs) != LLBC_OK)
-            return LLBC_FAILED;
-    }
-
-    bool reOpenClear = false;
-    int backupFilesCount = GetBackupFilesCount(_fileName);
-    if (fileExists &&
-        (fileAttrs.fileSize >= _maxFileSize ||
-            backupFilesCount < _maxBackupIndex))
-    {
-        BackupFiles();
-        reOpenClear = true;
-    }
-
-    if (ReOpenFile(_fileName, reOpenClear) != LLBC_OK)
-        return LLBC_FAILED;
-
-    _nonFlushLogCount = 0;
-    _logfileLastCheckTime = now;
+    // Force check and update file one time.
+    CheckAndUpdateLogFile(LLBC_GetMicroSeconds());
 
     return LLBC_OK;
 }
 
 void LLBC_LogFileAppender::Finalize()
 {
-    _filePath.clear();
+    _fileBasePath.clear();
     _fileSuffix.clear();
 
     _fileBufferSize = 0;
@@ -142,13 +118,11 @@ void LLBC_LogFileAppender::Finalize()
     _maxFileSize = LONG_MAX;
     _maxBackupIndex = INT_MAX;
 
-    _fileName.clear();
-
-    LLBC_XDelete(_file);
+    _file.Close();
     _fileSize = 0;
 
     _nonFlushLogCount = 0;
-    _logfileLastCheckTime = 0;
+    _logFileLastCheckTime = 0;
 
     _Base::Finalize();
 }
@@ -173,7 +147,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
     chain->Format(data, formattedData);
 
     const long actuallyWrote = 
-        _file->Write(formattedData.data(), formattedData.size());
+        _file.Write(formattedData.data(), formattedData.size());
     if (actuallyWrote != -1)
     {
         _fileSize += actuallyWrote;
@@ -184,7 +158,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
                 Flush();
         }
 
-        if (actuallyWrote != static_cast<long>(formattedData.size()))
+        if (UNLIKELY(actuallyWrote != static_cast<long>(formattedData.size())))
         {
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
             return LLBC_FAILED;
@@ -201,37 +175,43 @@ void LLBC_LogFileAppender::Flush()
     if (_nonFlushLogCount == 0)
         return;
 
-    if (LIKELY(_file))
-    {
-        _file->Flush();
-        _nonFlushLogCount = 0;
-    }
+    _file.Flush();
+    _nonFlushLogCount = 0;
 }
 
 void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 {
-    const auto timeDiff = now - _logfileLastCheckTime;
+    // Is need check?
+    const sint64 timeDiff = now - _logFileLastCheckTime;
     if (_fileSize < _maxFileSize && // File size not reach to limit.
-        (timeDiff > 0 && timeDiff < LLBC_INL_NS __LogFileCheckInterval) && // not reach check interval.
-        now % 1000000 == _logfileLastCheckTime % 1000000) // not cross seconds.
+        (timeDiff >= 0 && timeDiff < LLBC_INL_NS __LogFileCheckInterval) && // not reach check interval.
+        now / 1000000 == _logFileLastCheckTime / 1000000) // no cross seconds.
         return;
 
-    _logfileLastCheckTime = now;
+    // Update log file last check time.
+    _logFileLastCheckTime = now;
 
+    // If file not opened, open file first.
+    const LLBC_String filePath = BuildLogFilePath(now);
+    if (UNLIKELY(!_file.IsOpened()))
+    {
+        if (ReOpenFile(filePath, false) != LLBC_OK)
+            return;
+    }
+
+    // Execute log file(s) backup and reopen, if need.
     bool backup = false, clear = false;
-    const LLBC_String newFileName = BuildLogFileName(now);
-    if (!IsNeedReOpenFile(newFileName, backup, clear))
-        return;
-
-    if (backup)
-        BackupFiles();
-
-    ReOpenFile(newFileName, clear);
+    if (IsNeedReOpenFile(filePath, backup, clear))
+    {
+        if (backup)
+            BackupFiles();
+        ReOpenFile(filePath, clear);
+    }
 }
 
-LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
+LLBC_String LLBC_LogFileAppender::BuildLogFilePath(sint64 now) const
 {
-    LLBC_String logFileName = _filePath;
+    LLBC_String filePath = _fileBasePath;
     if (_isDailyRolling)
     {
         struct tm timeStruct;
@@ -247,18 +227,18 @@ LLBC_String LLBC_LogFileAppender::BuildLogFileName(sint64 now) const
         const size_t len = strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
         if (LIKELY(len > 0))
         {
-            logFileName.append(1, '.');
-            logFileName.append(timeFmtBuf, len);
+            filePath.append(1, '.');
+            filePath.append(timeFmtBuf, len);
         }
     }
 
     if (!_fileSuffix.empty())
-        logFileName.append(_fileSuffix);
+        filePath.append(_fileSuffix);
 
-    return logFileName;
+    return filePath;
 }
 
-bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
+bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFilePath,
                                             bool &backup,
                                             bool &clear) const
 {
@@ -269,15 +249,15 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
 
         return true;
     }
-    else if (newFileName.size() != _fileName.size() ||
-            memcmp(newFileName.data(), _fileName.data(), _fileName.size()) != 0)
+    else if (newFilePath.size() != _file.GetFilePath().size() ||
+             memcmp(newFilePath.data(), _file.GetFilePath().data(), _file.GetFilePath().size()) != 0)
     {
         backup = false;
         clear = false;
 
         return true;
     }
-    else if (!LLBC_File::Exists(newFileName))
+    else if (!LLBC_File::Exists(newFilePath))
     {
         backup = false;
         clear = true;
@@ -291,15 +271,16 @@ bool LLBC_LogFileAppender::IsNeedReOpenFile(const LLBC_String &newFileName,
 int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
 {
     // Close old file.
-    if (LIKELY(_file))
-        _file->Close();
-    else
-        _file = new LLBC_File;
+    if (LIKELY(_file.IsOpened()))
+    {
+        _file.Close();
+        _fileSize = 0;
+    }
 
     // Reset non-reflush log count variables.
     _nonFlushLogCount = 0;
     // Do reopen file.
-    if (UNLIKELY(_file->Open(newFileName, clear ? 
+    if (UNLIKELY(_file.Open(newFileName, clear ? 
         LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite) != LLBC_OK))
     {
 #ifdef LLBC_DEBUG
@@ -309,33 +290,31 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
         return LLBC_FAILED;
     }
 
-    // Update file name/size, buffer info.
-    _fileName = newFileName;
-    _fileSize = _file->GetFileSize();
+    // Update file size, buffer info.
+    _fileSize = _file.GetFileSize();
     UpdateFileBufferInfo();
 
     return LLBC_OK;
 }
 
-void LLBC_LogFileAppender::BackupFiles() const
+void LLBC_LogFileAppender::BackupFiles()
 {
     if (_maxBackupIndex == 0)
         return;
-    else if (!LLBC_File::Exists(_fileName))
-        return;
 
-    if (_file->IsOpened())
-        _file->Close();
+    const LLBC_String filePath = _file.GetFilePath();
+    _file.Close();
+    _fileSize = 0;
 
-    const LLBC_String fileNameNonSuffix = 
-        _fileName.substr(0, _fileName.size() - _fileSuffix.size());
+    const LLBC_String filePathNoSuffix = 
+        filePath.substr(0, filePath.size() - _fileSuffix.size());
 
     int availableIndex = 0;
     while (availableIndex < _maxBackupIndex)
     {
         availableIndex += 1;
         LLBC_String backupFileName;
-        backupFileName.format("%s.%d%s", fileNameNonSuffix.c_str(), availableIndex, _fileSuffix.c_str());
+        backupFileName.format("%s.%d%s", filePathNoSuffix.c_str(), availableIndex, _fileSuffix.c_str());
         if (!LLBC_File::Exists(backupFileName))
             break;
     }
@@ -344,12 +323,12 @@ void LLBC_LogFileAppender::BackupFiles() const
     {
         LLBC_String willMove;
         if (willMoveIndex > 0)
-            willMove.format("%s.%d%s", fileNameNonSuffix.c_str(), willMoveIndex, _fileSuffix.c_str());
+            willMove.format("%s.%d%s", filePathNoSuffix.c_str(), willMoveIndex, _fileSuffix.c_str());
         else
-            willMove = _fileName;
+            willMove = filePath;
 
         LLBC_String moveTo;
-        moveTo.format("%s.%d%s", fileNameNonSuffix.c_str(), willMoveIndex + 1, _fileSuffix.c_str());
+        moveTo.format("%s.%d%s", filePathNoSuffix.c_str(), willMoveIndex + 1, _fileSuffix.c_str());
 
 #ifdef LLBC_RELEASE
         LLBC_File::MoveFile(willMove, moveTo, true);
@@ -366,9 +345,9 @@ void LLBC_LogFileAppender::BackupFiles() const
 void LLBC_LogFileAppender::UpdateFileBufferInfo()
 {
     if (_fileBufferSize == 0)
-        _file->SetBufferMode(LLBC_FileBufferMode::NoBuf, 0);
+        _file.SetBufferMode(LLBC_FileBufferMode::NoBuf, 0);
     else
-        _file->SetBufferMode(LLBC_FileBufferMode::FullBuf, _fileBufferSize);
+        _file.SetBufferMode(LLBC_FileBufferMode::FullBuf, _fileBufferSize);
 }
 
 int LLBC_LogFileAppender::GetBackupFilesCount(const LLBC_String &logFileName) const
