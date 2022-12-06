@@ -254,7 +254,7 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
 
 #if LLBC_TARGET_PROCESSOR_X86_64
-    llbcStream.WriteSInt32(static_cast<sint32>(len));
+    llbcStream.Write(static_cast<sint32>(len));
 #else
     llbcStream.Write(len);
 #endif
