@@ -38,14 +38,13 @@ LLBC_LogData::LLBC_LogData()
 , level(-1)
 , logTime(0)
 
-, others(nullptr)
-, othersCap(0)
-, fileBeg(0)
+, staticFile(nullptr)
+, staticFunc(nullptr)
+, logCodeFilePath(false)
+
 , fileLen(0)
-, tagBeg(0)
-, tagLen(0)
-, funcBeg(0)
 , funcLen(0)
+, tagLen(0)
 
 , line(0)
 
@@ -59,8 +58,23 @@ LLBC_LogData::~LLBC_LogData()
 {
     if (msg)
         free(msg);
-    if (others)
-        free(others);
+}
+
+void LLBC_LogData::Prepare()
+{
+    if (staticFile && !logCodeFilePath)
+    {
+        #if LLBC_TARGET_PLATFORM_WIN32
+        const char *ps = strrchr(staticFile, '\\');
+        if (ps == nullptr)
+            ps = strrchr(staticFile, '/');
+        #else // Non-Win32
+        const char *ps = strrchr(file, '/');
+        #endif // Win32
+
+        if (ps != nullptr)
+            staticFile = ps + 1;
+    }
 }
 
 void LLBC_LogData::Clear()
@@ -73,15 +87,13 @@ void LLBC_LogData::Clear()
     level = -1;
     logTime = 0;
 
-    tagBeg = 0;
-    tagLen = 0; 
+    staticFile = nullptr;
+    staticFunc = nullptr;
+    logCodeFilePath = false;
 
-    fileBeg = 0;
     fileLen = 0;
-    tagBeg = 0;
-    tagLen = 0;
-    funcBeg = 0;
     funcLen = 0;
+    tagLen = 0;
 
     line = 0;
 

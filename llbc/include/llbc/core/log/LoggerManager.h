@@ -158,6 +158,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                           __FILE__,                       \
                           __LINE__,                       \
                           __FUNCTION__,                   \
+                          true,                           \
                           fmt,                            \
                           ##__VA_ARGS__);                 \
         }                                                 \
@@ -203,7 +204,8 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         (*(new LLBC_NS LLBC_LogJsonMsg(                  \
                    LIKELY(LLBC_LoggerManagerSingleton->IsInited()) ? \
                         (loggerName != nullptr ?         \
-                            LLBC_LoggerManagerSingleton->GetLogger(loggerName) : LLBC_LoggerManagerSingleton->GetRootLogger()) : nullptr, \
+                            LLBC_LoggerManagerSingleton->GetLogger(loggerName) : \
+                                LLBC_LoggerManagerSingleton->GetRootLogger()) : nullptr, \
                    tag,                                  \
                    level,                                \
                    __FILE__,                             \
@@ -273,12 +275,13 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
             LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
             const LLBC_String &formattedLogMsg = __lmb__.str(__lmb__ << streamMsg); \
             __l__->NonFormatOutput(level,                      \
-                               tag,                            \
-                               __FILE__,                       \
-                               __LINE__,                       \
-                               __FUNCTION__,                   \
-                               formattedLogMsg.c_str(),        \
-                               formattedLogMsg.length());      \
+                                   tag,                        \
+                                   __FILE__,                   \
+                                   __LINE__,                   \
+                                   __FUNCTION__,               \
+                                   true,                       \
+                                   formattedLogMsg.c_str(),    \
+                                   formattedLogMsg.length());  \
         }                                                      \
     } while (false)                                            \
 

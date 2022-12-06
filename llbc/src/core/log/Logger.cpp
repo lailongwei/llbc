@@ -341,13 +341,26 @@ void LLBC_Logger::UninstallHookLockless(int level)
         _hookDelegs[level] = nullptr;
 }
 
-int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va) 
+int LLBC_Logger::VOutput(int level,
+                         const char *tag,
+                         const char *file,
+                         int line,
+                         const char *func,
+                         bool staticFileAndFunc,
+                         const char *fmt,
+                         va_list va) 
 {
     if (_logLevel > level)
         return LLBC_OK;
 
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, fmt, va);
-    // __LLBC_InlMacro_BuildLogDataV(level, tag, file, line, func, fmt, va, data);
+    LLBC_LogData *data = BuildLogData(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      staticFileAndFunc,
+                                      fmt,
+                                      va);
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
@@ -367,14 +380,26 @@ int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line,
     return LLBC_OK;
 }
 
-int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen)
+int LLBC_Logger::NonFormatOutput(int level,
+                                 const char *tag,
+                                 const char *file,
+                                 int line,
+                                 const char *func,
+                                 bool staticFileAndFunc,
+                                 const char *msg,
+                                 size_t msgLen)
 {
     if (level < _logLevel)
         return LLBC_OK;
 
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, msg, msgLen);
-    // __LLBC_InlMacro_BuildLogData(level, tag, file, line, func, msg, msgLen, data);
-
+    LLBC_LogData *data = BuildLogData(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      staticFileAndFunc,
+                                      msg,
+                                      msgLen);
     if (_hookDelegs[level])
         _hookDelegs[level](data);
 
@@ -396,6 +421,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
+                                                          bool staticFileAndFunc,
                                                           const char *fmt,
                                                           va_list va)
 {
@@ -432,7 +458,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[len] = '\0';
 
     // Fill other LogData members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls);
+    FillLogDataNonMsgMembers(level, tag, file, line, func, staticFileAndFunc, data, libTls);
 
     return data;
 }
@@ -442,6 +468,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
+                                                          bool staticFileAndFunc,
                                                           const char *msg,
                                                           size_t msgLen)
 {
@@ -473,7 +500,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[msgLen] = '\0';
 
     // Fill LogData other members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls());
+    FillLogDataNonMsgMembers(level, tag, file, line, func, staticFileAndFunc, data, __LLBC_GetLibTls());
 
     return data;
 }
@@ -483,6 +510,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                                              const char *file,
                                                              int line,
                                                              const char *func,
+                                                             bool staticFileAndFunc,
                                                              LLBC_LogData *logData,
                                                              __LLBC_LibTls *libTls)
 {
@@ -496,62 +524,73 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     // fill: log time.
     logData->logTime = LLBC_GetMicroSeconds();
 
-    // fill: other infos(file, tag, func).
-    if (file)
+    // fill: file, func.
+    if (staticFileAndFunc)
     {
-        // data->fileBeg = 0; // fileBeg always is 0.
-        logData->fileLen = static_cast<uint32>(strlen(file));
-        if (!_config->IsLogCodeFilePath())
-        {
-            #if LLBC_TARGET_PLATFORM_WIN32
-            const char *ps = strrchr(file, '\\');
-            if (ps == nullptr)
-                ps = strrchr(file, '/');
-            #else // Non-Win32
-            const char *ps = strrchr(file, '/');
-            #endif // Win32
-            if (ps != nullptr)
-            {
-                logData->fileLen -= (static_cast<uint32>(ps - file) + 1);
-                file = ps + 1;
-            }
-        }
-
-        logData->tagBeg = logData->fileLen;
-    }
-
-    if (tag)
-    {
-        logData->tagLen = static_cast<uint32>(strlen(tag));
-        logData->funcBeg = logData->tagBeg + logData->tagLen;
+        logData->staticFile = file;
+        logData->staticFunc = func;
+        logData->logCodeFilePath = _config->IsLogCodeFilePath();
     }
     else
     {
-        logData->funcBeg = logData->fileLen;
-    }
-
-    if (func)
-        logData->funcLen = static_cast<uint32>(strlen(func));
-
-    const uint32 othersSize = logData->fileLen + logData->tagLen + logData->funcLen;
-    if (othersSize != 0)
-    {
-        if (logData->othersCap < othersSize)
+        if (file)
         {
-            logData->othersCap = othersSize;
-            logData->others = LLBC_Realloc(char, logData->others, othersSize);
+            logData->fileLen = static_cast<sint64>(strlen(file));
+            if (!_config->IsLogCodeFilePath())
+            {
+                #if LLBC_TARGET_PLATFORM_WIN32
+                const char *ps = strrchr(file, '\\');
+                if (ps == nullptr)
+                    ps = strrchr(file, '/');
+                #else // Non-Win32
+                const char *ps = strrchr(file, '/');
+                #endif // Win32
+                if (ps != nullptr)
+                {
+                    logData->fileLen -= (static_cast<uint32>(ps - file) + 1);
+                    file = ps + 1;
+                }
+            }
+
+            const sint64 exceedLen = logData->fileLen - (sizeof(logData->file) - 1);
+            if (UNLIKELY(exceedLen > 0))
+            {
+                file += exceedLen;
+                logData->fileLen = sizeof(logData->file) - 1;
+            }
+
+            memcpy(logData->file, file, logData->fileLen);
+            logData->file[logData->fileLen] = '\0';
         }
 
-        if (file)
-            memcpy(logData->others, file, logData->fileLen);
-        if (tag)
-            memcpy(logData->others + logData->tagBeg, tag, logData->tagLen);
         if (func)
-            memcpy(logData->others + logData->funcBeg, func, logData->funcLen);
+        {
+            logData->funcLen = static_cast<sint64>(strlen(func));
+            const sint64 exceedLen = logData->funcLen - (sizeof(logData->func) - 1);
+            if (UNLIKELY(exceedLen > 0))
+                logData->funcLen = sizeof(logData->func) - 1;
+
+            memcpy(logData->func, func, logData->funcLen);
+            logData->func[logData->funcLen] = '\0';
+        }
     }
 
+    // fill: tag.
+    if (tag)
+    {
+        logData->tagLen = static_cast<sint64>(strlen(tag));
+        const sint64 exceedLen = logData->tagLen - (sizeof(logData->tag) - 1);
+        if (UNLIKELY(exceedLen > 0))
+            logData->tagLen = sizeof(logData->tag) - 1;
+
+        memcpy(logData->tag, tag, logData->tagLen);
+        logData->tag[logData->tagLen] = '\0';
+    }
+
+    // fill: line.
     logData->line = line;
 
+    // fill: threadId.
     logData->threadId = libTls->coreTls.threadId;
 }
 

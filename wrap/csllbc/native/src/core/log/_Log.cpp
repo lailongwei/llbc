@@ -53,7 +53,14 @@ int csllbc_Log_LogMsg(LLBC_Logger *logger,
                       const char *msg,
                       const char *tag)
 {
-    return logger->NonFormatOutput(level, tag, fileName, lineNo, func, msg, strlen(msg)); 
+    return logger->NonFormatOutput(level,
+                                   tag,
+                                   fileName,
+                                   lineNo,
+                                   func,
+                                   false,
+                                   msg,
+                                   strlen(msg)); 
 }
 
 void csllbc_Log_Destroy()

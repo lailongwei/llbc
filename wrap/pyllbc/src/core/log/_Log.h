@@ -82,7 +82,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
             return nullptr;
     }
 
-    int rtn = logger->NonFormatOutput(level, tag, file, line, func, msg, -1);
+    int rtn = logger->NonFormatOutput(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      false,
+                                      msg,
+                                      -1);
     if (UNLIKELY(rtn != LLBC_OK))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);

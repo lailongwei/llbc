@@ -49,12 +49,23 @@ int LLBC_LogFileToken::GetType() const
 
 void LLBC_LogFileToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    if (data.fileLen > 0)
-        formattedData.append(data.others + data.fileBeg, data.fileLen);
+    int index;
+    if (data.staticFile)
+    {
+        index = static_cast<int>(formattedData.size());
+        formattedData.append(data.staticFile);
+    }
+    else if (data.fileLen > 0)
+    {
+        index = static_cast<int>(formattedData.size());
+        formattedData.append(data.file, data.fileLen);
+    }
+    else
+    {
+        return;
+    }
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END
