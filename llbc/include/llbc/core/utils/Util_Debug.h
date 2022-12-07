@@ -65,9 +65,6 @@ public:
 
 public:
     static uint64 GetCPUFreqPerSecond();
-    static uint64 GetCPUFreqPerMilliSecond();
-    static uint64 GetCPUFreqPerMicroSecond();
-    static uint64 GetCPUFreqPerNanoSecond();
 
 public:
     static LLBC_CPUTime Current();
@@ -106,11 +103,7 @@ public:
 
 private:
     uint64 _cpuCount;
-
     static uint64 _freqPerSecond;
-    static uint64 _freqPerMillisecond;
-    static uint64 _freqPerMicroSecond;
-    static uint64 _freqPerNanoSecond;
 };
 
 

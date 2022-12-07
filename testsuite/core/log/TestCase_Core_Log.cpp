@@ -59,9 +59,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Use root logger to test.
     LLOG_TRACE("This is a trace log message.");
-    LLOG_TRACE2("test_tag", "This is a trace log message.");
+    LLOG_TRACE3("test_tag", "This is a trace log message.");
     LLOG_DEBUG("This is a debug log message.");
-    LLOG_DEBUG2("test_tag", "This is a debug log message.");
+    LLOG_DEBUG3("test_tag", "This is a debug log message.");
 
     // Uninstall logger hook(from root logger).
     rootLogger->UninstallHook(LLBC_LogLevel::Debug);
@@ -90,33 +90,33 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 
     LLOG_INFO("This is a info log message.");
-    LLOG_INFO2("test_tag", "This is a info log message.");
+    LLOG_INFO3("test_tag", "This is a info log message.");
     LLOG_WARN("This is a warn log message.");
-    LLOG_WARN2("test_tag", "This is a warn log message.");
+    LLOG_WARN3("test_tag", "This is a warn log message.");
     LLOG_ERROR("This is a error log message.");
-    LLOG_ERROR2("test_tag", "This is a error log message.");
+    LLOG_ERROR3("test_tag", "This is a error log message.");
     LLOG_FATAL("This is a fatal log message.");
-    LLOG_FATAL2("test_tag", "This is a fatal log message.");
+    LLOG_FATAL3("test_tag", "This is a fatal log message.");
 
-    // Use test logger to test.
-    LLOG_TRACE3("test", "This is a trace log message.");
+    // Use 'test' logger to test.
+    LLOG_TRACE2("test", "This is a trace log message.");
     LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
-    LLOG_DEBUG3("test", "This is a debug log message.");
+    LLOG_DEBUG2("test", "This is a debug log message.");
     LLOG_DEBUG4("test", "test_tag", "This is a debug log message.");
-    LLOG_INFO3("test", "This is a info log message.");
+    LLOG_INFO2("test", "This is a info log message.");
     LLOG_INFO4("test", "test_tag", "This is a info log message.");
-    LLOG_WARN3("test", "This is a warn log message.");
+    LLOG_WARN2("test", "This is a warn log message.");
     LLOG_WARN4("test", "test_tag", "This is a warn log message.");
-    LLOG_ERROR3("test", "This is a error log message.");
+    LLOG_ERROR2("test", "This is a error log message.");
     LLOG_ERROR4("test", "test_tag", "This is a error log message.");
-    LLOG_FATAL3("test", "This is a fatal log message.");
+    LLOG_FATAL2("test", "This is a fatal log message.");
     LLOG_FATAL4("test", "test_tag", "This is a fatal log message.");
 
     // Log file delete test.
     for (int i = 0; i < 5; ++i)
     {
-        LLOG_DEBUG3("deltest", "This is a deltest logger message.");
-        LLBC_ThreadManager::Sleep(1000);
+        LLOG_DEBUG2("deltest", "This is a deltest logger message.");
+        LLBC_Sleep(800);
     }
 
     // Peform performance test.
@@ -129,7 +129,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         LLBC_CPUTime begin = LLBC_CPUTime::Current();
         const int loopLmt = 2000000;
         for (int i = 0; i < loopLmt; ++i)
-            LLOG_DEBUG3("perftest", "performance test msg, msg idx:%d", i);
+            LLOG_DEBUG2("perftest", "performance test msg, msg idx:%d", i);
 
         LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
         LLBC_PrintLine("Performance test completed, "
@@ -165,15 +165,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
     LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
-    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
-    LJLOG_TRACE2("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_TRACE2(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
+    LJLOG_TRACE2("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_TRACE3(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
-    LJLOG_TRACE3("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
-    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
-    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
-    LJLOG_TRACE3("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
     LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
@@ -186,15 +186,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().2").Finish("%s", "Finish Test");
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_DEBUG2("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().1").Finish("");
-    LJLOG_DEBUG2("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().2").Finish("%s", "Finish Test");
-    LJLOG_DEBUG2("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_DEBUG2(nullptr).Add("testKey", "testValue->LJLOG_DEBUG3().1").Finish("");
+    LJLOG_DEBUG2("").Add("testKey", "testValue->LJLOG_DEBUG3().2").Finish("");
+    LJLOG_DEBUG2("test").Add("testKey", "testValue->LJLOG_DEBUG3().3").Finish("");
+    LJLOG_DEBUG2("test").Add("testKey", "testValue->LJLOG_DEBUG4().4").Finish("%s", "Finish Test");
+    LJLOG_DEBUG2("test").Add("testKey", "testValue->LJLOG_DEBUG4().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_DEBUG3(nullptr).Add("testKey", "testValue->LJLOG_DEBUG3().1").Finish("");
-    LJLOG_DEBUG3("").Add("testKey", "testValue->LJLOG_DEBUG3().2").Finish("");
-    LJLOG_DEBUG3("test").Add("testKey", "testValue->LJLOG_DEBUG3().3").Finish("");
-    LJLOG_DEBUG3("test").Add("testKey", "testValue->LJLOG_DEBUG4().4").Finish("%s", "Finish Test");
-    LJLOG_DEBUG3("test").Add("testKey", "testValue->LJLOG_DEBUG4().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_DEBUG3("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().1").Finish("");
+    LJLOG_DEBUG3("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().2").Finish("%s", "Finish Test");
+    LJLOG_DEBUG3("testTag").Add("testKey", "testValue->LJLOG_DEBUG2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_DEBUG4(nullptr, "testDbgTag4_1").Add("testKey", "LJLOG_DEBUG4().1").Finish("");
     LJLOG_DEBUG4("", "testDbgTag4_2").Add("testKey", "testValue->LJLOG_DEBUG4().2").Finish("");
@@ -207,15 +207,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_INFO().Add("testKey", "testValue->LJLOG_INFO().2").Finish("%s", "Finish Test");
     LJLOG_INFO().Add("testKey", "testValue->LJLOG_INFO().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_INFO2("testTag").Add("testKey", "testValue->LJLOG_INFO2().1").Finish("");
-    LJLOG_INFO2("testTag").Add("testKey", "testValue->LJLOG_INFO2().2").Finish("%s", "Finish Test");
-    LJLOG_INFO2("testTag").Add("testKey", "testValue->LJLOG_INFO2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_INFO2(nullptr).Add("testKey", "testValue->LJLOG_INFO3().1").Finish("");
+    LJLOG_INFO2("").Add("testKey", "testValue->LJLOG_INFO3().2").Finish("");
+    LJLOG_INFO2("test").Add("testKey", "testValue->LJLOG_INFO3().3").Finish("");
+    LJLOG_INFO2("test").Add("testKey", "testValue->LJLOG_INFO3().4").Finish("%s", "Finish Test");
+    LJLOG_INFO2("test").Add("testKey", "testValue->LJLOG_INFO3().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_INFO3(nullptr).Add("testKey", "testValue->LJLOG_INFO3().1").Finish("");
-    LJLOG_INFO3("").Add("testKey", "testValue->LJLOG_INFO3().2").Finish("");
-    LJLOG_INFO3("test").Add("testKey", "testValue->LJLOG_INFO3().3").Finish("");
-    LJLOG_INFO3("test").Add("testKey", "testValue->LJLOG_INFO3().4").Finish("%s", "Finish Test");
-    LJLOG_INFO3("test").Add("testKey", "testValue->LJLOG_INFO3().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_INFO3("testTag").Add("testKey", "testValue->LJLOG_INFO2().1").Finish("");
+    LJLOG_INFO3("testTag").Add("testKey", "testValue->LJLOG_INFO2().2").Finish("%s", "Finish Test");
+    LJLOG_INFO3("testTag").Add("testKey", "testValue->LJLOG_INFO2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_INFO4(nullptr, "testInfoTag4_1").Add("testKey", "testValue->LJLOG_INFO4().1").Finish("");
     LJLOG_INFO4("", "testInfoTag4_2").Add("testKey", "testValue->LJLOG_INFO4().2").Finish("");
@@ -227,15 +227,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_WARN().Add("testKey", "testValue->LJLOG_WARN().2").Finish("%s", "Finish Test");
     LJLOG_WARN().Add("testKey", "testValue->LJLOG_WARN().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_WARN2("testTag").Add("testKey", "testValue->LJLOG_WARN2().1").Finish("");
-    LJLOG_WARN2("testTag").Add("testKey", "testValue->LJLOG_WARN2().2").Finish("%s", "Finish Test");
-    LJLOG_WARN2("testTag").Add("testKey", "testValue->LJLOG_WARN2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_WARN2(nullptr).Add("testKey", "testValue->LJLOG_WARN3().1").Finish("");
+    LJLOG_WARN2("").Add("testKey", "testValue->LJLOG_WARN3().2").Finish("");
+    LJLOG_WARN2("test").Add("testKey", "testValue->LJLOG_WARN3().3").Finish("");
+    LJLOG_WARN2("test").Add("testKey", "testValue->LJLOG_WARN3().4").Finish("%s", "Finish Test");
+    LJLOG_WARN2("test").Add("testKey", "testValue->LJLOG_WARN3().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_WARN3(nullptr).Add("testKey", "testValue->LJLOG_WARN3().1").Finish("");
-    LJLOG_WARN3("").Add("testKey", "testValue->LJLOG_WARN3().2").Finish("");
-    LJLOG_WARN3("test").Add("testKey", "testValue->LJLOG_WARN3().3").Finish("");
-    LJLOG_WARN3("test").Add("testKey", "testValue->LJLOG_WARN3().4").Finish("%s", "Finish Test");
-    LJLOG_WARN3("test").Add("testKey", "testValue->LJLOG_WARN3().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_WARN3("testTag").Add("testKey", "testValue->LJLOG_WARN2().1").Finish("");
+    LJLOG_WARN3("testTag").Add("testKey", "testValue->LJLOG_WARN2().2").Finish("%s", "Finish Test");
+    LJLOG_WARN3("testTag").Add("testKey", "testValue->LJLOG_WARN2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_WARN4(nullptr, "testWarnTag4_1").Add("testKey", "testValue->LJLOG_WARN4().1").Finish("");
     LJLOG_WARN4("", "testWranTag4_2").Add("testKey", "testValue->LJLOG_WARN4().2").Finish("");
@@ -247,15 +247,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_ERROR().Add("testKey", "testValue->LJLOG_ERROR().2").Finish("%s", "Finish Test");
     LJLOG_ERROR().Add("testKey", "testValue->LJLOG_ERROR().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_ERROR2("testTag").Add("testKey", "testValue->LJLOG_ERROR2().1").Finish("");
-    LJLOG_ERROR2("testTag").Add("testKey", "testValue->LJLOG_ERROR2().2").Finish("%s", "Finish Test");
-    LJLOG_ERROR2("testTag").Add("testKey", "testValue->LJLOG_ERROR2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_ERROR2(nullptr).Add("testKey", "testValue->LJLOG_ERROR3().1").Finish("");
+    LJLOG_ERROR2("").Add("testKey", "testValue->LJLOG_ERROR3().2").Finish("");
+    LJLOG_ERROR2("test").Add("testKey", "testValue->LJLOG_ERROR3().3").Finish("");
+    LJLOG_ERROR2("test").Add("testKey", "testValue->LJLOG_ERROR3().4").Finish("%s", "Finish Test");
+    LJLOG_ERROR2("test").Add("testKey", "testValue->LJLOG_ERROR3().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_ERROR3(nullptr).Add("testKey", "testValue->LJLOG_ERROR3().1").Finish("");
-    LJLOG_ERROR3("").Add("testKey", "testValue->LJLOG_ERROR3().2").Finish("");
-    LJLOG_ERROR3("test").Add("testKey", "testValue->LJLOG_ERROR3().3").Finish("");
-    LJLOG_ERROR3("test").Add("testKey", "testValue->LJLOG_ERROR3().4").Finish("%s", "Finish Test");
-    LJLOG_ERROR3("test").Add("testKey", "testValue->LJLOG_ERROR3().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_ERROR3("testTag").Add("testKey", "testValue->LJLOG_ERROR2().1").Finish("");
+    LJLOG_ERROR3("testTag").Add("testKey", "testValue->LJLOG_ERROR2().2").Finish("%s", "Finish Test");
+    LJLOG_ERROR3("testTag").Add("testKey", "testValue->LJLOG_ERROR2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_ERROR4(nullptr, "testTag").Add("testKey", "testValue->LJLOG_ERROR4().1").Finish("");
     LJLOG_ERROR4("", "testTag").Add("testKey", "testValue->LJLOG_ERROR4().2").Finish("");
@@ -267,15 +267,15 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_FATAL().Add("testKey", "testValue->LJLOG_FATAL().2").Finish("%s", "Finish Test");
     LJLOG_FATAL().Add("testKey", "testValue->LJLOG_FATAL().3").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_FATAL2("testTag").Add("testKey", "testValue->LJLOG_FATAL2().1").Finish("");
-    LJLOG_FATAL2("testTag").Add("testKey", "testValue->LJLOG_FATAL2().2").Finish("%s", "Finish Test");
-    LJLOG_FATAL2("testTag").Add("testKey", "testValue->LJLOG_FATAL2().3").Finish("%s%d", "Finish Test", 2);
+    LJLOG_FATAL2(nullptr).Add("testKey", "testValue->LJLOG_FATAL3().1").Finish("");
+    LJLOG_FATAL2("").Add("testKey", "testValue->LJLOG_FATAL3().2").Finish("");
+    LJLOG_FATAL2("test").Add("testKey", "testValue->LJLOG_FATAL3().3").Finish("");
+    LJLOG_FATAL2("test").Add("testKey", "testValue->LJLOG_FATAL().4").Finish("%s", "Finish Test");
+    LJLOG_FATAL2("test").Add("testKey", "testValue->LJLOG_FATAL().5").Finish("%s%d", "Finish Test", 2);
 
-    LJLOG_FATAL3(nullptr).Add("testKey", "testValue->LJLOG_FATAL3().1").Finish("");
-    LJLOG_FATAL3("").Add("testKey", "testValue->LJLOG_FATAL3().2").Finish("");
-    LJLOG_FATAL3("test").Add("testKey", "testValue->LJLOG_FATAL3().3").Finish("");
-    LJLOG_FATAL3("test").Add("testKey", "testValue->LJLOG_FATAL().4").Finish("%s", "Finish Test");
-    LJLOG_FATAL3("test").Add("testKey", "testValue->LJLOG_FATAL().5").Finish("%s%d", "Finish Test", 2);
+    LJLOG_FATAL3("testTag").Add("testKey", "testValue->LJLOG_FATAL2().1").Finish("");
+    LJLOG_FATAL3("testTag").Add("testKey", "testValue->LJLOG_FATAL2().2").Finish("%s", "Finish Test");
+    LJLOG_FATAL3("testTag").Add("testKey", "testValue->LJLOG_FATAL2().3").Finish("%s%d", "Finish Test", 2);
 
     LJLOG_FATAL4(nullptr, "testTag").Add("testKey", "testValue->LJLOG_FATAL4().1").Finish("");
     LJLOG_FATAL4("", "testTag").Add("testKey", "testValue->LJLOG_FATAL4().2").Finish("");

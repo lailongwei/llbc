@@ -37,21 +37,6 @@ inline uint64 LLBC_CPUTime::GetCPUFreqPerSecond()
     return _freqPerSecond;
 }
 
-inline uint64 LLBC_CPUTime::GetCPUFreqPerMilliSecond()
-{
-    return _freqPerMillisecond;
-}
-
-inline uint64 LLBC_CPUTime::GetCPUFreqPerMicroSecond()
-{
-    return _freqPerMicroSecond;
-}
-
-inline uint64 LLBC_CPUTime::GetCPUFreqPerNanoSecond()
-{
-    return _freqPerNanoSecond;
-}
-
 inline uint64 LLBC_CPUTime::GetCPUCount() const
 {
     return _cpuCount;
@@ -69,7 +54,7 @@ inline int LLBC_CPUTime::ToSeconds() const
 inline sint64 LLBC_CPUTime::ToMilliSeconds() const
 {
 #if LLBC_SUPPORT_RDTSC
-    return _cpuCount / _freqPerMillisecond;
+    return _cpuCount * 1000ll / _freqPerSecond;
 #else // Not supp rdtsc
     return _cpuCount / LLBC_TimeConstant::NumOfMilliSecondsPerSecond;
 #endif // Supp rdtsc
@@ -78,7 +63,7 @@ inline sint64 LLBC_CPUTime::ToMilliSeconds() const
 inline sint64 LLBC_CPUTime::ToMicroSeconds() const
 {
 #if LLBC_SUPPORT_RDTSC
-    return _cpuCount / _freqPerMicroSecond;
+    return _cpuCount * 1000000ll / _freqPerSecond;
 #else // Not supp rdtsc
     return _cpuCount;
 #endif // Supp rdtsc
@@ -87,7 +72,7 @@ inline sint64 LLBC_CPUTime::ToMicroSeconds() const
 inline sint64 LLBC_CPUTime::ToNanoSeconds() const
 {
 #if LLBC_SUPPORT_RDTSC
-    return _cpuCount / _freqPerNanoSecond;
+    return _cpuCount * 1000000000ll / _freqPerSecond;
 #else // Not supp rdtsc
     return _cpuCount * LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond;
 #endif // Supp rdtsc
