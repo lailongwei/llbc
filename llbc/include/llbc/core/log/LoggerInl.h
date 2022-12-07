@@ -23,6 +23,11 @@
 
 __LLBC_NS_BEGIN
 
+inline const LLBC_String &LLBC_Logger::GetLoggerName() const
+{
+    return _name;
+}
+
 LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
 {
     return _logLevel;

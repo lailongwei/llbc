@@ -94,10 +94,17 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root" && rootCfg;
 
     // Common log configs.
+    bool hasLogLevelCfg;
     if (cfg.HasProperty("level"))
+    {
+        hasLogLevelCfg = true;
         _logLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str());
+    }
     else
+    {
+        hasLogLevelCfg = false;
         _logLevel = _notConfigUseRoot ? rootCfg->_logLevel : LLBC_CFG_LOG_DEFAULT_LEVEL;
+    }
     _asyncMode = __LLBC_GetLogCfg("asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
         _independentThread = __LLBC_GetLogCfg("independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
@@ -109,6 +116,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     {
         if (cfg.HasProperty("consoleLogLevel"))
             _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsStr().c_str());
+        else if (hasLogLevelCfg)
+            _consoleLogLevel = _logLevel;
         else
             _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : _logLevel;
 
@@ -127,6 +136,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         // File log level option.
         if (cfg.HasProperty("fileLogLevel"))
             _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
+        else if (hasLogLevelCfg)
+            _fileLogLevel = _logLevel;
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : _logLevel;
 

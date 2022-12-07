@@ -42,66 +42,6 @@
 #pragma warning(disable:4996)
 #endif
 
-// Internal macro: build log data object.
-#define __LLBC_InlMacro_BuildLogData(level, tag, file, line, func, msg, msgLen, data) { \
-    if (msgLen == static_cast<size_t>(-1) && msg) \
-        msgLen = strlen(msg); \
-    \
-    if (!msg) \
-        msgLen = 0; \
-    \
-    if (msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE) \
-        msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1; \
-    \
-    data = _logDataPoolInst.GetObject(); \
-    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 256); \
-    if (data->msgCap < msgCap) { \
-        data->msgCap = msgCap; \
-        data->msg = LLBC_Realloc(char, data->msg, msgCap); \
-    } \
-    \
-    data->msgLen = static_cast<int>(msgLen); \
-    if (msgLen > 0) \
-        memcpy(data->msg, msg, msgLen); \
-    data->msg[msgLen] = '\0'; \
-    \
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls()); \
-} \
-
-// Internal macro: build log data object(by va list).
-#define __LLBC_InlMacro_BuildLogDataV(level, tag, file, line, func, fmt, va, data) \
-do { \
-    data = _logDataPoolInst.GetObject(); \
-    \
-    __LLBC_LibTls *libTls = __LLBC_GetLibTls(); \
-    int len = vsnprintf(libTls->coreTls.loggerFmtBuf, \
-                        sizeof(libTls->coreTls.loggerFmtBuf), \
-                        fmt, \
-                        va); \
-    if (UNLIKELY(len < 0)) { \
-        LLBC_SetLastError(LLBC_ERROR_CLIB); \
-        LLBC_Recycle(data); \
-        data = nullptr; \
-        \
-        break; \
-    } \
-    \
-    if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)) \
-        len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1); \
-    \
-    if (data->msgCap < len + 1) { \
-        data->msgCap = MAX(len + 1, 256); \
-        data->msg = LLBC_Realloc(char, data->msg, data->msgCap); \
-    } \
-    \
-    data->msgLen = len; \
-    if (len > 0) \
-        memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len); \
-    data->msg[len] = '\0'; \
-    \
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls); \
-} while (false) \
-
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
@@ -283,15 +223,6 @@ void LLBC_Logger::Finalize()
     
 }
 
-const LLBC_String &LLBC_Logger::GetLoggerName() const
-{
-    LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    return _name;
-}
-
 void LLBC_Logger::SetLogLevel(int level)
 {
     LLBC_LockGuard guard(_lock);
@@ -300,17 +231,13 @@ void LLBC_Logger::SetLogLevel(int level)
 
 bool LLBC_Logger::IsTakeOver() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsTakeOver();
 }
 
 bool LLBC_Logger::IsAsyncMode() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsAsyncMode();
 }
 
@@ -420,8 +347,6 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *fmt,
                                                           va_list va)
 {
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
-
     // Format message.
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
@@ -431,18 +356,17 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     if (UNLIKELY(len < 0))
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        LLBC_Recycle(data);
-
         return nullptr;
     }
 
     // Normalize length.
-    if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1))
+    if (UNLIKELY(len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)))
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
+    LLBC_LogData *data = _logDataPoolInst.GetObject();
     if (data->msgCap < len + 1)
     {
-        data->msgCap = MAX(len + 1, 256);
+        data->msgCap = MAX(len + 1, 192);
         data->msg = LLBC_Realloc(char, data->msg, data->msgCap);
     }
 
@@ -471,16 +395,16 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
         msgLen = strlen(msg);
 
     // Set message length to 0, if msg is null.
-    if (!msg)
+    if (UNLIKELY(!msg))
         msgLen = 0;
 
     // Normalize message length(<= LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1).
-    if (msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE)
+    if (UNLIKELY(msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE))
         msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1;
 
     // Alloc new LogData, and adjust message capacity.
     LLBC_LogData *data = _logDataPoolInst.GetObject();
-    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 256);
+    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 192);
     if (data->msgCap < msgCap)
     {
         data->msgCap = msgCap;
@@ -532,7 +456,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                 if (*ps == '/')
                 #endif
                 {
-                    logData->fileLen -= (ps + 1 - file);
+                    logData->fileLen -= static_cast<int>((ps + 1 - file));
                     file = ps + 1;
                     break;
                 }
@@ -555,7 +479,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     if (func)
     {
         logData->funcLen = static_cast<int>(strlen(func));
-        const sint64 exceedLen = logData->funcLen - static_cast<int>((sizeof(logData->func) - 1));
+        const int exceedLen = logData->funcLen - static_cast<int>((sizeof(logData->func) - 1));
         if (UNLIKELY(exceedLen > 0))
             logData->funcLen = sizeof(logData->func) - 1;
 
@@ -567,7 +491,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     if (tag)
     {
         logData->tagLen = static_cast<int>(strlen(tag));
-        const sint64 exceedLen = logData->tagLen - static_cast<int>((sizeof(logData->tag) - 1));
+        const int exceedLen = logData->tagLen - static_cast<int>((sizeof(logData->tag) - 1));
         if (UNLIKELY(exceedLen > 0))
             logData->tagLen = sizeof(logData->tag) - 1;
 
@@ -593,9 +517,7 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
 
     LLBC_ILogAppender *tmpAppender = _appenders;
     while (tmpAppender->GetAppenderNext())
-    {
         tmpAppender = tmpAppender->GetAppenderNext();
-    }
 
     tmpAppender->SetAppenderNext(appender);
 }
@@ -648,9 +570,6 @@ void LLBC_Logger::FlushAppenders()
 }
 
 __LLBC_NS_END
-
-#undef __LLBC_InlMacro_BuildLogData
-#undef __LLBC_InlMacro_BuildLogDataV
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)

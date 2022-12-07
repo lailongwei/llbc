@@ -129,7 +129,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         LLBC_CPUTime begin = LLBC_CPUTime::Current();
         const int loopLmt = 2000000;
         for (int i = 0; i < loopLmt; ++i)
-            LLOG_DEBUG3("perftest", "performance test msg");
+            LLOG_DEBUG3("perftest", "performance test msg, msg idx:%d", i);
 
         LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
         LLBC_PrintLine("Performance test completed, "
