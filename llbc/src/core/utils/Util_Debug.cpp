@@ -102,9 +102,6 @@ std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth)
 }
 
 uint64 LLBC_CPUTime::_freqPerSecond = 0;
-uint64 LLBC_CPUTime::_freqPerMillisecond = 0;
-uint64 LLBC_CPUTime::_freqPerMicroSecond = 0;
-uint64 LLBC_CPUTime::_freqPerNanoSecond = 0;
 
 LLBC_CPUTime LLBC_CPUTime::Current()
 {
@@ -114,7 +111,11 @@ LLBC_CPUTime LLBC_CPUTime::Current()
 LLBC_String LLBC_CPUTime::ToString() const
 {
     LLBC_String info;
-    info.append_format("%.06f", static_cast<double>(_cpuCount) / _freqPerMillisecond);
+    #if LLBC_SUPPORT_RDTSC
+    info.append_format("%.03f", _cpuCount * 1000000ull / _freqPerSecond / 1000.0);
+    #else // Not supp rdtsc
+    info.append_format("%.03f", _cpuCount / 1000.0);
+    #endif // Supp rdtsc
 
     return info;
 }
@@ -123,20 +124,8 @@ void LLBC_CPUTime::InitFrequency()
 {
 #if LLBC_SUPPORT_RDTSC
     _freqPerSecond = LLBC_GetCpuCounterFrequency();
-    _freqPerMillisecond = MAX(_freqPerSecond / LLBC_Time::NumOfMilliSecondsPerSecond, 1);
-    _freqPerMicroSecond = MAX(_freqPerSecond / LLBC_Time::NumOfMicroSecondsPerSecond, 1);
-    _freqPerNanoSecond = MAX(_freqPerSecond / LLBC_Time::NumOfNanoSecondsPerSecond, 1);
-    
-    if (_freqPerNanoSecond == 1)
-    {
-        _freqPerMicroSecond = _freqPerNanoSecond * 1000;
-        _freqPerMillisecond = _freqPerMicroSecond * 1000;
-    }
 #else // Not supp rdtsc
     _freqPerSecond = LLBC_INFINITE;
-    _freqPerMillisecond = LLBC_INFINITE;
-    _freqPerMicroSecond = LLBC_INFINITE;
-    _freqPerNanoSecond = LLBC_INFINITE;
 #endif // Supp rdtsc
 }
 

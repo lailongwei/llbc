@@ -40,9 +40,6 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     LLBC_PrintLine("Test CPUTime:");
     {
         LLBC_PrintLine("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
-        LLBC_PrintLine("- CpuFreq per milli-second:%llu", LLBC_CPUTime::GetCPUFreqPerMilliSecond());
-        LLBC_PrintLine("- CpuFreq per micro-second:%llu", LLBC_CPUTime::GetCPUFreqPerMicroSecond());
-        LLBC_PrintLine("- CpuFreq per nano-second:%llu", LLBC_CPUTime::GetCPUFreqPerNanoSecond());
         LLBC_PrintLine("");
     }
 
