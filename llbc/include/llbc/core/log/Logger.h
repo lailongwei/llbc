@@ -290,7 +290,7 @@ private:
 
 private:
     LLBC_String _name;
-    LLBC_SpinLock _lock;
+    mutable LLBC_SpinLock _lock;
 
     int _logLevel;
     const LLBC_LoggerConfigInfo *_config;

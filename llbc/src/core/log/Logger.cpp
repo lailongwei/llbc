@@ -283,15 +283,6 @@ void LLBC_Logger::Finalize()
     
 }
 
-const LLBC_String &LLBC_Logger::GetLoggerName() const
-{
-    LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    return _name;
-}
-
 void LLBC_Logger::SetLogLevel(int level)
 {
     LLBC_LockGuard guard(_lock);
@@ -300,17 +291,13 @@ void LLBC_Logger::SetLogLevel(int level)
 
 bool LLBC_Logger::IsTakeOver() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsTakeOver();
 }
 
 bool LLBC_Logger::IsAsyncMode() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsAsyncMode();
 }
 
