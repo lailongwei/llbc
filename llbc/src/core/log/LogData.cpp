@@ -27,23 +27,24 @@
 #include "llbc/core/log/LogData.h"
 
 __LLBC_NS_BEGIN
+// Note: Some data members don't need init.
 LLBC_LogData::LLBC_LogData()
-: logger(nullptr)
+// : logger(nullptr)
 
-, msg(nullptr)
+: msg(nullptr)
 , msgLen(0)
 , msgCap(0)
 
-, level(-1)
-, logTime(0)
+// , level(-1)
+// , logTime(0)
 
 , fileLen(0)
 , funcLen(0)
 , tagLen(0)
 
-, line(0)
+// , line(0)
 
-, threadId(LLBC_INVALID_NATIVE_THREAD_ID)
+// , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
 , _poolInst(nullptr)
 {
@@ -57,20 +58,22 @@ LLBC_LogData::~LLBC_LogData()
 
 void LLBC_LogData::Clear()
 {
-    logger = nullptr;
+    // Note: Some data members don't need reset.
+
+    // logger = nullptr;
 
     msgLen = 0;
 
-    level = -1;
-    logTime = 0;
+    // level = -1;
+    // logTime = 0;
 
     fileLen = 0;
     funcLen = 0;
     tagLen = 0;
 
-    line = 0;
+    // line = 0;
 
-    threadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    // threadId = LLBC_INVALID_NATIVE_THREAD_ID;
 }
 
 void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)

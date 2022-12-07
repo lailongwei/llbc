@@ -420,8 +420,6 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *fmt,
                                                           va_list va)
 {
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
-
     // Format message.
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
@@ -431,8 +429,6 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     if (UNLIKELY(len < 0))
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        LLBC_Recycle(data);
-
         return nullptr;
     }
 
@@ -440,6 +436,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1))
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
+    LLBC_LogData *data = _logDataPoolInst.GetObject();
     if (data->msgCap < len + 1)
     {
         data->msgCap = MAX(len + 1, 256);
