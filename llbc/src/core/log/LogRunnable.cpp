@@ -89,7 +89,7 @@ void LLBC_LogRunnable::Svc()
     while (LIKELY(!_stoped))
     {
         if (!TryPopAndProcLogDatas())
-            LLBC_Sleep(5);
+            LLBC_Sleep(1);
 
         FlushLoggers(false, LLBC_GetMilliSeconds());
     }
