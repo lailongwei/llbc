@@ -42,66 +42,6 @@
 #pragma warning(disable:4996)
 #endif
 
-// Internal macro: build log data object.
-#define __LLBC_InlMacro_BuildLogData(level, tag, file, line, func, msg, msgLen, data) { \
-    if (msgLen == static_cast<size_t>(-1) && msg) \
-        msgLen = strlen(msg); \
-    \
-    if (!msg) \
-        msgLen = 0; \
-    \
-    if (msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE) \
-        msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1; \
-    \
-    data = _logDataPoolInst.GetObject(); \
-    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 256); \
-    if (data->msgCap < msgCap) { \
-        data->msgCap = msgCap; \
-        data->msg = LLBC_Realloc(char, data->msg, msgCap); \
-    } \
-    \
-    data->msgLen = static_cast<int>(msgLen); \
-    if (msgLen > 0) \
-        memcpy(data->msg, msg, msgLen); \
-    data->msg[msgLen] = '\0'; \
-    \
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls()); \
-} \
-
-// Internal macro: build log data object(by va list).
-#define __LLBC_InlMacro_BuildLogDataV(level, tag, file, line, func, fmt, va, data) \
-do { \
-    data = _logDataPoolInst.GetObject(); \
-    \
-    __LLBC_LibTls *libTls = __LLBC_GetLibTls(); \
-    int len = vsnprintf(libTls->coreTls.loggerFmtBuf, \
-                        sizeof(libTls->coreTls.loggerFmtBuf), \
-                        fmt, \
-                        va); \
-    if (UNLIKELY(len < 0)) { \
-        LLBC_SetLastError(LLBC_ERROR_CLIB); \
-        LLBC_Recycle(data); \
-        data = nullptr; \
-        \
-        break; \
-    } \
-    \
-    if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)) \
-        len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1); \
-    \
-    if (data->msgCap < len + 1) { \
-        data->msgCap = MAX(len + 1, 256); \
-        data->msg = LLBC_Realloc(char, data->msg, data->msgCap); \
-    } \
-    \
-    data->msgLen = len; \
-    if (len > 0) \
-        memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len); \
-    data->msg[len] = '\0'; \
-    \
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls); \
-} while (false) \
-
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
@@ -632,9 +572,6 @@ void LLBC_Logger::FlushAppenders()
 }
 
 __LLBC_NS_END
-
-#undef __LLBC_InlMacro_BuildLogData
-#undef __LLBC_InlMacro_BuildLogDataV
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
