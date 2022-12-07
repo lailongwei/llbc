@@ -58,11 +58,19 @@ LLBC_LogData::~LLBC_LogData()
 
 void LLBC_LogData::Clear()
 {
-    // Note: Some data members don't need reset.
+    // Notes:
+    // - Some data members don't need reset.
+    // - Free msg buf, if cap too large.
 
     // logger = nullptr;
 
     msgLen = 0;
+    if (msgCap >= MAX(1024, (LLBC_CFG_LOG_FORMAT_BUF_SIZE * 7 / 8)))
+    {
+        free(msg);
+        msg = nullptr;
+        msgCap = 0;
+    }
 
     // level = -1;
     // logTime = 0;
