@@ -54,12 +54,6 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
-#if LLBC_SUPPORT_RDTSC
-, _nowTime(0)
-, _lastGetTimeCPUTime(0)
-, _oneMilliSecCPUTime(0)
-#endif // Supp rdtsc
-
 , _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
 , _hookDelegs()
 {
@@ -149,11 +143,6 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         this->AddAppender(appender);
     }
 
-    // Init time fetch optimize about members.
-    #if LLBC_SUPPORT_RDTSC
-    _oneMilliSecCPUTime = static_cast<uint64>(LLBC_CPUTime::GetCPUFreqPerMilliSecond() * 0.1);
-    #endif // Supp rdtsc
-
     // Set/Create log runnable.
     if (_config->IsAsyncMode())
     {
@@ -214,13 +203,6 @@ void LLBC_Logger::Finalize()
     _name.clear();
     _config = nullptr;
     _logLevel = LLBC_LogLevel::Begin;
-
-#if LLBC_SUPPORT_RDTSC
-    _nowTime = 0;
-    _lastGetTimeCPUTime = 0;
-    _oneMilliSecCPUTime = 0;
-#endif // Supp rdtsc
-    
 }
 
 void LLBC_Logger::SetLogLevel(int level)
