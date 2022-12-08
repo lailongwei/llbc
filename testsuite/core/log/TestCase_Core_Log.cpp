@@ -286,7 +286,9 @@ void TestCase_Core_Log::DoJsonLogTest()
 void TestCase_Core_Log::DoUninitLogTest()
 {
     LLOG_DEBUG("This is a uninited log message");
+    LLOG_DEBUG3("uninit_tag", "This is a uninited log message");
     LJLOG_DEBUG().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
+    LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)

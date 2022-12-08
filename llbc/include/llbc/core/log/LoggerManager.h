@@ -95,10 +95,12 @@ public:
 
     /**
      * Uninit output.
-     * @param logLv - the log level.
-     * @param msg   - the log message.
+     * @param[in] logLv - the log level.
+     * @param[in] tag   - the log tag.
+     * @param[in] fmt   -  format control string.
+     * @param[in] ...   - optional arguments.
      */
-    void UnInitOutput(int logLv, const char *msg);
+    void UnInitOutput(int logLv, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
 
 private:
     mutable LLBC_DummyLock _lock;
@@ -132,14 +134,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 #define LLOG(loggerName, tag, level, fmt, ...)            \
     do {                                                  \
         auto __loggerMgr__ = LLBC_LoggerManagerSingleton; \
-        if (UNLIKELY(!__loggerMgr__->IsInited())) {       \
-            LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls(); \
-            int __len__ = snprintf(libTls->coreTls.loggerFmtBuf, sizeof(libTls->coreTls.loggerFmtBuf), fmt, ##__VA_ARGS__); \
-            if (__len__ >= 0)                             \
-                __loggerMgr__->UnInitOutput(              \
-                    level, libTls->coreTls.loggerFmtBuf); \
-        }                                                 \
-        else {                                            \
+        if (LIKELY(__loggerMgr__->IsInited())) {          \
             LLBC_NS LLBC_Logger *__l__;                   \
             if (loggerName != nullptr) {                  \
                 __l__ = __loggerMgr__->GetLogger(loggerName); \
@@ -160,6 +155,9 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                           __FUNCTION__,                   \
                           fmt,                            \
                           ##__VA_ARGS__);                 \
+        }                                                 \
+        else {                                            \
+            __loggerMgr__->UnInitOutput(level, tag, fmt, ##__VA_ARGS__); \
         }                                                 \
     } while (false)                                       \
 
@@ -252,12 +250,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 #define LSLOG(loggerName, tag, level, streamMsg)               \
     do {                                                       \
         auto __loggerMgr__ = LLBC_LoggerManagerSingleton;      \
-        if (UNLIKELY(!__loggerMgr__->IsInited())) {            \
-            LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
-            LLBC_LoggerManagerSingleton->UnInitOutput(         \
-                level, __lmb__.str(__lmb__ << streamMsg).c_str()); \
-        }                                                      \
-        else {                                                 \
+        if (LIKELY(__loggerMgr__->IsInited())) {               \
             LLBC_NS LLBC_Logger *__l__;                        \
             if (loggerName != nullptr) {                       \
                 __l__ = __loggerMgr__->GetLogger(loggerName);  \
@@ -280,6 +273,11 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                                    __FUNCTION__,               \
                                    formattedLogMsg.c_str(),    \
                                    formattedLogMsg.length());  \
+        }                                                      \
+        else {                                                 \
+            LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
+            LLBC_LoggerManagerSingleton->UnInitOutput(         \
+                level, tag, "%s", __lmb__.str(__lmb__ << streamMsg).c_str()); \
         }                                                      \
     } while (false)                                            \
 

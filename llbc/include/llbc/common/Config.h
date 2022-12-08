@@ -144,7 +144,7 @@
 // Default max backup file index.
 #define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       1000
 // Default log file buffer size, in bytes.
-#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE           1024000
+#define LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE           40960
 // Default log appenders flush interval, in milli-seconds.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL             200
 // Default max log appenders flush interval, in milli-seconds.
