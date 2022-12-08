@@ -100,7 +100,7 @@ public:
      * @param[in] fmt   -  format control string.
      * @param[in] ...   - optional arguments.
      */
-    void UnInitOutput(int logLv, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(3, 4);
+    void UnInitOutput(int logLv, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
 
 private:
     mutable LLBC_DummyLock _lock;
