@@ -87,9 +87,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     _doc.Accept(writer);
 
     // Output json log.
-    if (UNLIKELY(!_logger))
-        LLBC_LoggerManagerSingleton->UnInitOutput(_lv, buffer.GetString());
-    else
+    if (LIKELY(_logger))
         _logger->NonFormatOutput(_lv,
                                  _tag,
                                  _file,
@@ -97,6 +95,8 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  _func,
                                  buffer.GetString(),
                                  buffer.GetLength());
+    else
+        LLBC_LoggerManagerSingleton->UnInitOutput(_lv, _tag, buffer.GetString());
 
     // Recycle self.
     LLBC_Recycle(this);

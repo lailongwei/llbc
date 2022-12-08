@@ -225,11 +225,38 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
     return iter->second;
 }
 
-void LLBC_LoggerManager::UnInitOutput(int logLv, const char *msg)
+void LLBC_LoggerManager::UnInitOutput(int logLv, const char *tag, const char *fmt, ...)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
     const LLBC_String &lvDesc = LLBC_LogLevel::GetLevelDesc(logLv);
-    LLBC_FilePrint(to, "[Log][%s] %s\n", lvDesc.c_str(), msg);
+
+    LLBC_FilePrint(to, "[Log][%s]<%s> ", lvDesc.c_str(), tag ? tag : "");
+
+    va_list ap;
+    va_start(ap, fmt);
+
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (LIKELY(libTls))
+    {
+        const int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
+                                  sizeof(libTls->coreTls.loggerFmtBuf),
+                                  fmt,
+                                  ap);
+        LLBC_FilePrint(to, "%s\n", len < 0 ? fmt : libTls->coreTls.loggerFmtBuf);
+    }
+    else
+    {
+        char fmtBuf[256];
+        const int len = vsnprintf(fmtBuf,
+                                  sizeof(fmtBuf),
+                                  fmt,
+                                  ap);
+        LLBC_FilePrint(to, "%s\n", len < 0 ? fmt : fmtBuf);
+    }
+
+    va_end(ap);
+
+    fflush(to);
 }
 
 __LLBC_NS_END
