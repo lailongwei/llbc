@@ -44,17 +44,40 @@ public:
      * Constructors.
      */
     template <size_t _ArrLen>
-    LLBC_BasicCString(const _Elem (&arr)[_ArrLen]): _cstr(arr), _size(_ArrLen - 1) {  }
-    LLBC_BasicCString(const _Elem *cstr, size_t size = npos):_cstr(cstr), _size(size == npos ? strlen(cstr) : size) {  }
-    LLBC_BasicCString(const std::basic_string<_Elem> &stlStr): _cstr(stlStr.data()), _size(stlStr.size()) {  }
-    LLBC_BasicCString(const LLBC_BasicCString &other): _cstr(other._cstr), _size(other._size) {  }
+    LLBC_BasicCString(const _Elem (&arr)[_ArrLen])
+    : _cstr(arr)
+    , _size(LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0)
+    {
+    }
+
+    LLBC_BasicCString(const _Elem *cstr = nullptr, size_t size = npos)
+    {
+        if (cstr == nullptr || size == 0)
+        {
+            _cstr = "";
+            _size = 0;
+            return;
+        }
+
+        _cstr = cstr;
+        _size = size == npos ? strlen(cstr) : size;
+    }
+
+    LLBC_BasicCString(const std::basic_string<_Elem> &stlStr)
+    : _cstr(stlStr.data()), _size(stlStr.size())
+    {
+    }
+
+    LLBC_BasicCString(const LLBC_BasicCString &other): _cstr(other._cstr), _size(other._size)
+    {
+    }
 
 public:
     /**
      * Get const string.
      * @return const _Elem * - the const string.
      */
-    const _Elem *GetCStr() const
+    const _Elem *GetStr() const
     {
         return _cstr;
     }
@@ -137,7 +160,7 @@ public:
     }
     bool operator ==(const LLBC_BasicCString &other) const
     {
-        return _cstr == other._cstr ||
+        return UNLIKELY(_cstr == other._cstr) ||
             (_size == other._size &&
              memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) == 0);
     }
@@ -219,7 +242,7 @@ public:
     }
 
 private:
-    const char *_cstr;
+    const _Elem *_cstr;
     size_t _size;
 };
 
@@ -229,12 +252,48 @@ private:
 template <typename _Elem>
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
-    if (cstr.GetCStr())
-        return o <<cstr.GetCStr();
-    else
-        return o <<"";
+    return o <<cstr.GetStr();
 }
 
 __LLBC_NS_END
+
+namespace std
+{
+
+/**
+ * \brief The std::hash<T> template class specilization: std::hash<LLBC_CString>.
+ */
+template <>
+struct hash<LLBC_NS LLBC_BasicCString<char> >
+{
+    size_t operator()(const LLBC_NS LLBC_BasicCString<char> &cstr) const noexcept
+    {
+        // Use DJB hash algo
+        size_t i, h;
+        const char *str = cstr.GetStr();
+        for (i = h = 0; i < cstr.GetSize(); ++i)
+            h = ((h << 5) + h) ^ str[i];
+        return h;
+    };
+};
+
+/**
+ * \brief The std::hash<T> template class specilization: std::hash<LLBC_CWString>.
+ */
+template <>
+struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
+{
+    size_t operator()(const LLBC_NS LLBC_BasicCString<wchar_t> &cstr) const noexcept
+    {
+        // Use DJB hash algo
+        size_t i, h;
+        const wchar_t *str = cstr.GetStr();
+        for (i = h = 0; i < cstr.GetSize(); ++i)
+            h = ((h << 10) + h) ^ str[i];
+        return h;
+    };
+};
+
+}
 
 #endif // !__LLBC_COM_BASIC_CSTRING_H__
