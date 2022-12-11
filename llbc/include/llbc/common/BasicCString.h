@@ -44,7 +44,11 @@ public:
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+    #if LLBC_TARGET_PLATFORM_WIN32
     constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    #else
+    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    #endif
     : _cstr("")
     , _size(0)
     {
@@ -56,7 +60,11 @@ public:
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
               typename = _CtorElem>
+    #if LLBC_TARGET_PLATFORM_WIN32
     constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    #else
+    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    #endif
     : _cstr(L"")
     , _size(0)
     {}
@@ -167,7 +175,11 @@ public:
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString &operator =(nullptr_t _)
+    #else
+    LLBC_BasicCString &operator =(std::nullptr_t _)
+    #endif
     {
         _cstr = "";
         _size = 0;
@@ -181,7 +193,11 @@ public:
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
               typename = _CtorElem>
+    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString &operator =(nullptr_t _)
+    #else
+    LLBC_BasicCString &operator =(std::nullptr_t _)
+    #endif
     {
         _cstr = L"";
         _size = 0;
