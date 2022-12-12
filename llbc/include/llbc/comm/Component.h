@@ -479,8 +479,6 @@ public:
      */
     const LLBC_Property &GetPropertyConfig() const;
 
-
-
 public:
     /**
      * Get all component methods.
