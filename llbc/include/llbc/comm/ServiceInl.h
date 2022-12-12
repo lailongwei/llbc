@@ -106,14 +106,18 @@ LLBC_Service::GetComponent()
     return static_cast<Comp *>(GetComponent(colonPos ? colonPos + 1 : compName));
 }
 
-inline LLBC_Component *LLBC_Service::GetComponent(const LLBC_String &compName)
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
+                        !std::is_same<LLBC_Component, Comp>::value,
+                        const Comp *>::type
+LLBC_Service::GetComponent() const
 {
-    return GetComponent(compName.c_str());
+    return const_cast<LLBC_Service *>(this)->GetComponent<Comp>();
 }
 
-inline LLBC_Component *LLBC_Service::GetComponent(const std::string &compName)
+inline const LLBC_Component *LLBC_Service::GetComponent(const LLBC_CString &compName) const
 {
-    return GetComponent(compName.c_str());
+    return const_cast<LLBC_Service *>(this)->GetComponent(compName);
 }
 
 template <typename CoderFactory>
