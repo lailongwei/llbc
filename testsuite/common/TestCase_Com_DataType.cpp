@@ -22,64 +22,9 @@
 
 #include "common/TestCase_Com_DataType.h"
 
-template <size_t Len>
-void MyTemp(const char (&arr)[Len])
-{
-    std::cout << arr << std::endl;
-}
-
-class MyStr
-{
-public:
-    template <size_t Len>
-    MyStr(const char (&arr)[Len])
-    {
-        std::cout << "Templ ctor called:" << arr << std::endl;
-    }
-
-    // template <>
-    // MyStr(const char (&arr)[6])
-    // {
-        // std::cout << "Templ(6) ctor called:" << arr << std::endl;
-    // }
-
-    MyStr(const std::string &stlStr)
-    {
-        std::cout << "Stl String ctor called:" << stlStr << std::endl;
-    }
-
-    template <typename Ptr,
-              typename = typename std::enable_if<std::is_pointer<Ptr>::value &&
-                                                 std::is_same<char, typename std::remove_reference<typename std::remove_const<typename std::remove_pointer<Ptr>::type>::type>::type>::value, Ptr>::type>
-    MyStr(Ptr str, size_t len = 0)
-    {
-        std::cout << "Non-Templ ctor called:" << str << std::endl;
-    }
-};
-
 int TestCase_Com_DataType::Run(int argc, char *argv[])
 {
     LLBC_PrintLine("llbc library test case(datatype test):");
-
-    const wchar *wstr = L"";
-    MyStr myStr("hello");
-    const char *rawStr = "Hey judy";
-    std::string stlStr = "Hey judy(stlstr)";
-    LLBC_String llbcStr = "Hey judy(llbcstr)";
-    MyStr myStr2(rawStr);
-
-    LLBC_CString emptyStr; // construct by nullptr.
-    LLBC_CString cstr("hello"); // construct by string literal.
-    LLBC_CString cstr2(rawStr); // construct by string pointer.
-
-    // operator < test
-    {
-        std::cout << (emptyStr < nullptr) << std::endl; // nullptr
-        std::cout << (emptyStr < "hey") << std::endl; // string literal
-        std::cout << (emptyStr < rawStr) << std::endl; // string pointer
-        std::cout << (emptyStr < stlStr) << std::endl; // stl str
-        std::cout << (emptyStr < llbcStr) << std::endl; // llbc str
-    }
 
     // raw types test.
     RawTest();
