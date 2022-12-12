@@ -12,7 +12,7 @@ function TestCase.run(...)
 
     -- Initialize Log component.
     print 'Initialize log component...'
-    Log.init('Logger_Cfg.cfg', false)
+    Log.init('LogTestCfg.cfg', false)
     print('Call Log.isinit():', Log.isinit())
 
     -- Base test.
