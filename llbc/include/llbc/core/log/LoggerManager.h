@@ -80,18 +80,11 @@ public:
     LLBC_Logger *GetRootLogger() const;
 
     /**
-     * Get logger.
-     * @param[in] name - logger name.
-     * @return LLBC_ILogger * - logger.
-     */
-    LLBC_Logger *GetLogger(const char *name) const;
-
-    /**
      * Get logger by name.
      * @param[in] name - logger name.
      * @return LLBC_Logger * - logger.
      */
-    LLBC_Logger *GetLogger(const LLBC_String &name) const;
+    LLBC_Logger *GetLogger(const LLBC_CString &name) const;
 
     /**
      * Uninit output.
@@ -111,6 +104,7 @@ private:
     LLBC_Logger * volatile _rootLogger;
     std::map<LLBC_String, LLBC_Logger *> _str2Loggers;
     std::map<LLBC_CString, LLBC_Logger *> _cstr2Loggers;
+    std::vector<std::pair<LLBC_CString, LLBC_Logger *> > _loggerList;
     std::map<LLBC_String, LLBC_Logger *>::const_iterator _str2LoggersEnd;
     std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 

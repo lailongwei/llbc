@@ -82,6 +82,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
+    _loggerList.emplace_back(_rootLoggerName, _rootLogger);
     _str2Loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
     _cstr2Loggers.insert(std::make_pair(_rootLoggerName.c_str(), _rootLogger));
 
@@ -101,6 +102,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
             return LLBC_FAILED;
         }
 
+        _loggerList.emplace_back(cfgIter->first, logger);
         _str2Loggers.insert(std::make_pair(cfgIter->first, logger));
         _cstr2Loggers.insert(std::make_pair(cfgIter->first.c_str(), logger));
     }
@@ -130,6 +132,7 @@ void LLBC_LoggerManager::Finalize()
     }
 
     // Delete all loggers and set _rootLogger logger to nullptr.
+    _loggerList.clear();
     _cstr2Loggers.clear();
     LLBC_STLHelper::DeleteContainer(_str2Loggers);
 
@@ -153,7 +156,7 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
     return _rootLogger;
 }
 
-LLBC_Logger *LLBC_LoggerManager::GetLogger(const char *name) const
+LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
 {
     _lock.Lock();
     if (UNLIKELY(_rootLogger == nullptr))
@@ -164,65 +167,46 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const char *name) const
         return nullptr;
     }
 
-    if (name == nullptr || name[0] == '\0')
+    if (name.IsEmpty())
     {
         _lock.Unlock();
         return _rootLogger;
     }
 
-    auto iter = _cstr2Loggers.find(name);
-    if (iter == _cstr2LoggersEnd)
+    // If logger cnt <= 25, use liner find, (note: 25 is a experience value).
+    if (_loggerList.size() <= 25)
     {
-        if (_rootLogger->IsTakeOver())
+        const size_t loggerCnt = _loggerList.size();
+        auto loggerList = &_loggerList[0];
+        for (size_t i = 0; i < loggerCnt; ++i)
+        {
+            if (loggerList[i].first == name)
+            {
+                _lock.Unlock();
+                return loggerList[i].second;
+            }
+        }
+    }
+    else // Otherwise search in map.
+    {
+        auto iter = _cstr2Loggers.find(name);
+        if (LIKELY(iter != _cstr2LoggersEnd))
         {
             _lock.Unlock();
-            return _rootLogger;
+            return iter->second;
         }
-
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-
-        return nullptr;
     }
 
-    _lock.Unlock();
-    return iter->second;
-}
-
-LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_String &name) const
-{
-    _lock.Lock();
-    if (UNLIKELY(_rootLogger == nullptr))
-    {
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-
-        return nullptr;
-    }
-
-    if (UNLIKELY(name.empty()))
+    if (_rootLogger->IsTakeOver())
     {
         _lock.Unlock();
         return _rootLogger;
     }
 
-    auto iter = _str2Loggers.find(name);
-    if (iter == _str2LoggersEnd)
-    {
-        if (_rootLogger->IsTakeOver())
-        {
-            _lock.Unlock();
-            return _rootLogger;
-        }
-
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-
-        return nullptr;
-    }
-
     _lock.Unlock();
-    return iter->second;
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
+    return nullptr;
 }
 
 void LLBC_LoggerManager::UnInitOutput(int logLv, const char *tag, const char *fmt, ...)

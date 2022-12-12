@@ -25,7 +25,6 @@
 #include "llbc/common/PFConfig.h"
 
 #include "llbc/common/OSHeader.h"
-#include "llbc/common/BasicString.h"
 
 __LLBC_NS_BEGIN
 
@@ -41,20 +40,113 @@ public:
 
 public:
     /**
-     * Constructors.
+     * Default constructor when _Elem == char.
+     */
+    template <typename _CtorElem = _Elem,
+              typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+    #if LLBC_TARGET_PLATFORM_WIN32
+    constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    #else
+    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    #endif
+    : _cstr("")
+    , _size(0)
+    {
+    }
+    
+    /**
+     * Default constructor when _Elem == wchar_t.
+     */
+    template <typename _CtorElem = _Elem,
+              typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
+              typename = _CtorElem>
+    #if LLBC_TARGET_PLATFORM_WIN32
+    constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    #else
+    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    #endif
+    : _cstr(L"")
+    , _size(0)
+    {}
+
+    /**
+     * Parameter constructor when parameter type is literal string.
      */
     template <size_t _ArrLen>
-    LLBC_BasicCString(const _Elem (&arr)[_ArrLen]): _cstr(arr), _size(_ArrLen - 1) {  }
-    LLBC_BasicCString(const _Elem *cstr, size_t size = npos):_cstr(cstr), _size(size == npos ? strlen(cstr) : size) {  }
-    LLBC_BasicCString(const std::basic_string<_Elem> &stlStr): _cstr(stlStr.data()), _size(stlStr.size()) {  }
-    LLBC_BasicCString(const LLBC_BasicCString &other): _cstr(other._cstr), _size(other._size) {  }
+    constexpr LLBC_BasicCString(const _Elem (&arr)[_ArrLen])
+    : _cstr(arr)
+    , _size(LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0)
+    {
+    }
+
+    /**
+     * Parameter constructor when parameter type is char pointer.
+     */
+    template <typename _Ptr,
+              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
+                                                 std::is_same<
+                                                     typename std::remove_const<
+                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
+    LLBC_BasicCString(_Ptr cstr, size_t size = npos)
+    {
+        if (cstr == nullptr || size == 0)
+        {
+            _cstr = "";
+            _size = 0;
+            return;
+        }
+
+        _cstr = cstr;
+        _size = size == npos ? strlen(cstr) : size;
+    }
+
+    /**
+     * Parameter constructor when parameter type is wchar_t pointer.
+     */
+    template <typename _Ptr,
+              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
+                                                 std::is_same<
+                                                     typename std::remove_const<
+                                                         typename std::remove_pointer<_Ptr>::type>::type, wchar_t>::value, _Ptr>::type,
+
+              typename = _Ptr>
+    LLBC_BasicCString(_Ptr cstr, size_t size = npos)
+    {
+        if (cstr == nullptr == size == 0)
+        {
+            _cstr = L"";
+            _size = 0;
+            return;
+        }
+
+        _cstr = cstr;
+        _size = size == npos ? wcslen(cstr) : size;
+    }
+
+    /**
+     * Parameter constructor when parameter type is std::basic_string<_Elem>.
+     */
+    LLBC_BasicCString(const std::basic_string<_Elem> &stlStr)
+    : _cstr(stlStr.data())
+    , _size(stlStr.size())
+    {
+    }
+
+    /**
+     * Copy constructor.
+     */
+    LLBC_BasicCString(const LLBC_BasicCString &other)
+    : _cstr(other._cstr)
+    , _size(other._size)
+    {
+    }
 
 public:
     /**
      * Get const string.
      * @return const _Elem * - the const string.
      */
-    const _Elem *GetCStr() const
+    const _Elem *GetStr() const
     {
         return _cstr;
     }
@@ -68,74 +160,162 @@ public:
         return _size;
     }
 
+    /**
+     * Check string is empty.
+     * @reutrn bool - empty flag.
+     */
+    bool IsEmpty() const
+    {
+        return _size == 0;
+    }
+
 public:
-    // operator=
+    /**
+     * nullptr_t assignment operator when _Elem == char.
+     */
+    template <typename _CtorElem = _Elem,
+              typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+    #if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_BasicCString &operator =(nullptr_t _)
+    #else
+    LLBC_BasicCString &operator =(std::nullptr_t _)
+    #endif
+    {
+        _cstr = "";
+        _size = 0;
+
+        return *this;
+    }
+
+    /**
+     * nullptr_t assignment operator when _Elem == wchar_t.
+     */
+    template <typename _CtorElem = _Elem,
+              typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
+              typename = _CtorElem>
+    #if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_BasicCString &operator =(nullptr_t _)
+    #else
+    LLBC_BasicCString &operator =(std::nullptr_t _)
+    #endif
+    {
+        _cstr = L"";
+        _size = 0;
+
+        return *this;
+    }
+
+    /**
+     * Literal string assignment operator.
+     */
     template <size_t _ArrLen>
-    LLBC_BasicCString &operator =(const _Elem (&arr)[_ArrLen])
+    constexpr LLBC_BasicCString &operator =(const _Elem (&arr)[_ArrLen])
     {
         _cstr = arr;
-        _size = _ArrLen - 1;
+        _size = LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0;
 
         return *this;
     }
-    LLBC_BasicCString &operator =(const _Elem *cstr)
+
+    /**
+     * String pointer assignment operator when _Elem == char.
+     */
+    template <typename _Ptr,
+              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
+                                                 std::is_same<
+                                                     typename std::remove_const<
+                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
+    LLBC_BasicCString &operator =(_Ptr cstr)
     {
-        _cstr = cstr;
-        _size = strlen(cstr);
+        if (LIKELY(cstr))
+        {
+            _cstr = cstr;
+            _size = strlen(cstr);
+        }
+        else
+        {
+            _cstr = "";
+            _size = 0;
+        }
 
         return *this;
     }
-    LLBC_BasicCString &operator=(const std::basic_string<_Elem> &stlStr)
+
+    /**
+     * String pointer assignment operator when _Elem == char.
+     */
+    template <typename _Ptr,
+              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
+                                                 std::is_same<
+                                                     typename std::remove_const<
+                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type,
+              typename = _Ptr>
+    LLBC_BasicCString &operator =(_Ptr cstr)
     {
-        _cstr = stlStr.data();
+        if (LIKELY(cstr))
+        {
+            _cstr = cstr;
+            _size = wcslen(cstr);
+        }
+        else
+        {
+            _cstr = L"";
+            _size = 0;
+        }
+
+        return *this;
+    }
+
+    /**
+     * std::basic_string<_Elem> assignment operator.
+     */
+    LLBC_BasicCString &operator =(const std::basic_string<_Elem> &stlStr)
+    {
+        _cstr = stlStr.str();
         _size = stlStr.size();
 
         return *this;
     }
-    LLBC_BasicCString &operator=(const LLBC_BasicCString &other)
-    {
-        _cstr = other._cstr;
-        _size = other._size;
 
+    /**
+     * Copy assignment operator
+     */
+    LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
+    {
+        memcpy(this, &other, sizeof(other));
         return *this;
     }
 
+public:
     // operator <
-    template <size_t _ArrLen>
-    bool operator <(const _Elem (&arr)[_ArrLen]) const
+    template <typename _Other>
+    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator <(const _Other &other)
     {
-        return operator<(LLBC_BasicCString(arr));
+        return *this < LLBC_BasicCString(other);
     }
-    bool operator <(const _Elem *cstr) const
-    {
-        return operator<(LLBC_BasicCString(cstr));
-    }
-    bool operator <(const std::basic_string<_Elem> &stlStr) const
-    {
-        return operator<(LLBC_BasicCString(stlStr.data(), stlStr.size()));
-    }
-    bool operator <(const LLBC_BasicCString &other) const
+
+    template <typename _Other>
+    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator <(const _Other &other) const
     {
         return _cstr != other._cstr && 
                 (_size < other._size ||
-                 (_size == other._size && memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) < 0));
+                 (_size == other._size &&
+                  memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) < 0));
     }
 
     // operator ==
-    template <size_t _ArrLen>
-    bool operator ==(const _Elem (&arr)[_ArrLen]) const
+    template <typename _Other>
+    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator ==(const _Other &other)
     {
-        return operator==(LLBC_BasicCString(arr));
+        return this->operator==(LLBC_BasicCString(other));
     }
-    bool operator ==(const _Elem *cstr) const
-    {
-        return operator==(LLBC_BasicCString(cstr));
-    }
-    bool operator ==(const std::basic_string<_Elem> &stlStr) const
-    {
-        return operator==(LLBC_BasicCString(stlStr));
-    }
-    bool operator ==(const LLBC_BasicCString &other) const
+
+    template <typename _Other>
+    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator ==(const _Other &other) const
     {
         return _cstr == other._cstr ||
             (_size == other._size &&
@@ -143,83 +323,59 @@ public:
     }
 
     // operator !=
-    template <int _ArrLen>
-    bool operator !=(const _Elem (&arr)[_ArrLen]) const
-    {
-        return !operator==(LLBC_BasicCString(arr));
-    }
-    bool operator !=(const _Elem *cstr) const
-    {
-        return !operator==(LLBC_BasicCString(cstr));
-    }
-    bool operator !=(const std::basic_string<_Elem> &stlStr) const
-    {
-        return !operator==(LLBC_BasicCString(stlStr));
-    }
-    bool operator !=(const LLBC_BasicCString &other) const
+    template <typename _Other>
+    bool operator !=(const _Other &other) const
     {
         return !operator==(other);
     }
 
     // operator <=
-    template <int _ArrLen>
-    bool operator <=(const _Elem (&arr)[_ArrLen]) const
+    template <typename _Other>
+    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator <=(const _Other &other) const
     {
-        return !(LLBC_BasicCString(arr) < *this);
+        return !(LLBC_BasicCString(other) < *this);
     }
-    bool operator <=(const _Elem *cstr) const
-    {
-        return !(LLBC_BasicCString(cstr) < *this);
-    }
-    bool operator <=(const std::basic_string<_Elem> &stlStr) const
-    {
-        return !(LLBC_BasicCString(stlStr) < *this);
-    }
-    bool operator <=(const LLBC_BasicCString &other) const
+
+    template <typename _Other>
+    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator <=(const _Other &other) const
     {
         return !(other < *this);
     }
 
     // operator >
-    template <int _ArrLen>
-    bool operator >(const _Elem (&other)[_ArrLen]) const
+    template <typename _Other>
+    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator >(const _Other &other) const
     {
         return LLBC_BasicCString(other) < *this;
     }
-    bool operator >(const _Elem *other) const
-    {
-        return LLBC_BasicCString(other) < *this;
-    }
-    bool operator >(const std::basic_string<_Elem> &other) const
-    {
-        return LLBC_BasicCString(other) < *this;
-    }
-    bool operator >(const LLBC_BasicCString<_Elem> &other) const
+
+    template <typename _Other>
+    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator >(const _Other &other) const
     {
         return other < *this;
     }
 
     // operator >=
-    template <int _ArrLen>
-    bool operator >=(const _Elem (&arr)[_ArrLen]) const
+    template <typename _Other>
+    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator >=(const _Other &other) const
     {
-        return !(*this < LLBC_BasicCString(arr));
+        return !(*this < LLBC_BasicCString(other));
     }
-    bool operator >=(const _Elem *cstr) const
-    {
-        return !(*this < LLBC_BasicCString(cstr));
-    }
-    bool operator >=(const std::basic_string<_Elem> &stlStr) const
-    {
-        return !(*this < LLBC_BasicCString(stlStr));
-    }
-    bool operator >=(const LLBC_BasicCString<_Elem> &other) const
+
+    template <typename _Other>
+    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    operator >=(const _Other &other) const
     {
         return !(*this < other);
     }
 
 private:
-    const char *_cstr;
+    const _Elem *_cstr;
     size_t _size;
 };
 
@@ -229,12 +385,48 @@ private:
 template <typename _Elem>
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
-    if (cstr.GetCStr())
-        return o <<cstr.GetCStr();
-    else
-        return o <<"";
+    return o <<cstr.GetStr();
 }
 
 __LLBC_NS_END
+
+namespace std
+{
+
+/**
+ * \brief The std::hash<T> template class specilization: std::hash<LLBC_CString>.
+ */
+template <>
+struct hash<LLBC_NS LLBC_BasicCString<char> >
+{
+    size_t operator()(const LLBC_NS LLBC_BasicCString<char> &cstr) const noexcept
+    {
+        // Use DJB hash algo
+        size_t h;
+        const char *str = cstr.GetStr();
+        for (size_t i = h = 0; i < cstr.GetSize(); ++i)
+            h = ((h << 5) + h) ^ str[i];
+        return h;
+    };
+};
+
+/**
+ * \brief The std::hash<T> template class specilization: std::hash<LLBC_CWString>.
+ */
+template <>
+struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
+{
+    size_t operator()(const LLBC_NS LLBC_BasicCString<wchar_t> &cstr) const noexcept
+    {
+        // Use DJB hash algo
+        size_t h;
+        const wchar_t *str = cstr.GetStr();
+        for (size_t i = h = 0; i < cstr.GetSize(); ++i)
+            h = ((h << 10) + h) ^ str[i];
+        return h;
+    };
+};
+
+}
 
 #endif // !__LLBC_COM_BASIC_CSTRING_H__
