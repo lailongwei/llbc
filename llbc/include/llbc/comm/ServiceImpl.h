@@ -314,7 +314,7 @@ public:
     /**
      * Get component.
      */
-    virtual LLBC_Component *GetComponent(const char *compName);
+    virtual LLBC_Component *GetComponent(const LLBC_CString &compName);
 
  
 public:

@@ -35,12 +35,19 @@ template <typename _Elem>
 class LLBC_BasicCString
 {
 public:
+    // STL-like typedefs.
+    typedef _Elem value_type;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef value_type * pointer;
+    typedef const value_type * const_pointer;
+
     // The npos define.
-    static constexpr size_t npos = static_cast<size_t>(-1);
+    static constexpr size_type npos = static_cast<size_type>(-1);
 
 public:
     /**
-     * Default constructor when _Elem == char.
+     * Default constructor when value_type == char.
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
@@ -55,7 +62,7 @@ public:
     }
     
     /**
-     * Default constructor when _Elem == wchar_t.
+     * Default constructor when value_type == wchar_t.
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
@@ -72,8 +79,8 @@ public:
     /**
      * Parameter constructor when parameter type is literal string.
      */
-    template <size_t _ArrLen>
-    constexpr LLBC_BasicCString(const _Elem (&arr)[_ArrLen])
+    template <size_type _ArrLen>
+    constexpr LLBC_BasicCString(const value_type (&arr)[_ArrLen])
     : _cstr(arr)
     , _size(LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0)
     {
@@ -87,7 +94,7 @@ public:
                                                  std::is_same<
                                                      typename std::remove_const<
                                                          typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
-    LLBC_BasicCString(_Ptr cstr, size_t size = npos)
+    LLBC_BasicCString(_Ptr cstr, size_type size = npos)
     {
         if (cstr == nullptr || size == 0)
         {
@@ -110,7 +117,7 @@ public:
                                                          typename std::remove_pointer<_Ptr>::type>::type, wchar_t>::value, _Ptr>::type,
 
               typename = _Ptr>
-    LLBC_BasicCString(_Ptr cstr, size_t size = npos)
+    LLBC_BasicCString(_Ptr cstr, size_type size = npos)
     {
         if (cstr == nullptr == size == 0)
         {
@@ -124,9 +131,9 @@ public:
     }
 
     /**
-     * Parameter constructor when parameter type is std::basic_string<_Elem>.
+     * Parameter constructor when parameter type is std::basic_string<value_type>.
      */
-    LLBC_BasicCString(const std::basic_string<_Elem> &stlStr)
+    LLBC_BasicCString(const std::basic_string<value_type> &stlStr)
     : _cstr(stlStr.data())
     , _size(stlStr.size())
     {
@@ -144,36 +151,36 @@ public:
 public:
     /**
      * Get const string.
-     * @return const _Elem * - the const string.
+     * @return const_pointer - the const string.
      */
-    const _Elem *str() const
+    const_pointer str() const
     {
         return _cstr;
     }
 
     /**
      * Get const string.
-     * @return const _Elem * - the const string.
+     * @return const_pointer - the const string.
      */
-    const _Elem *data() const
+    const_pointer data() const
     {
         return _cstr;
     }
 
     /**
      * Get string size.
-     * @return size_t - the string size.
+     * @return size_type - the string size.
      */
-    size_t size() const
+    size_type size() const
     {
         return _size;
     }
 
     /**
      * Get string size.
-     * @return size_t - the string size.
+     * @return size_type - the string size.
      */
-    size_t length() const
+    size_type length() const
     {
         return _size;
     }
@@ -189,7 +196,7 @@ public:
 
 public:
     /**
-     * nullptr_t assignment operator when _Elem == char.
+     * nullptr_t assignment operator when value_type == char.
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
@@ -206,7 +213,7 @@ public:
     }
 
     /**
-     * nullptr_t assignment operator when _Elem == wchar_t.
+     * nullptr_t assignment operator when value_type == wchar_t.
      */
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
@@ -226,8 +233,8 @@ public:
     /**
      * Literal string assignment operator.
      */
-    template <size_t _ArrLen>
-    constexpr LLBC_BasicCString &operator =(const _Elem (&arr)[_ArrLen])
+    template <size_type _ArrLen>
+    constexpr LLBC_BasicCString &operator =(const value_type (&arr)[_ArrLen])
     {
         _cstr = arr;
         _size = LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0;
@@ -236,7 +243,7 @@ public:
     }
 
     /**
-     * String pointer assignment operator when _Elem == char.
+     * String pointer assignment operator when value_type == char.
      */
     template <typename _Ptr,
               typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
@@ -260,7 +267,7 @@ public:
     }
 
     /**
-     * String pointer assignment operator when _Elem == char.
+     * String pointer assignment operator when value_type == char.
      */
     template <typename _Ptr,
               typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
@@ -285,9 +292,9 @@ public:
     }
 
     /**
-     * std::basic_string<_Elem> assignment operator.
+     * std::basic_string<value_type> assignment operator.
      */
-    LLBC_BasicCString &operator =(const std::basic_string<_Elem> &stlStr)
+    LLBC_BasicCString &operator =(const std::basic_string<value_type> &stlStr)
     {
         _cstr = stlStr.str();
         _size = stlStr.size();
@@ -298,10 +305,38 @@ public:
     /**
      * Copy assignment operator
      */
-    LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
+    constexpr LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
     {
         memcpy(this, &other, sizeof(other));
         return *this;
+    }
+
+public:
+    // operator []
+    constexpr const value_type &operator [](size_type index) const
+    {
+        #if LLBC_DEBUG
+        ASSERT(LIKELY(index < _size) && "index out of range");
+        #endif // LLBC_DEBUG
+
+        return _cstr[index];
+    }
+
+    // operator +
+    constexpr LLBC_BasicCString operator +(difference_type offset) const
+    {
+        #if LLBC_DEBUG
+        const auto beg = static_cast<difference_type>(_size) + offset;
+        ASSERT(LIKELY(beg >= 0 && beg < static_cast<difference_type>(_size)) && "index out of range");
+        #endif // LLBC_DEBUG
+
+        return LLBC_BasicCString(_cstr + offset, _size - offset);
+    }
+
+    // operator -
+    constexpr LLBC_BasicCString operator -(difference_type offset) const
+    {
+        return operator+(-offset);
     }
 
 public:
@@ -320,7 +355,7 @@ public:
         return _cstr != other._cstr && 
                 (_size < other._size ||
                  (_size == other._size &&
-                  memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) < 0));
+                  memcmp(_cstr, other._cstr, sizeof(value_type) * _size) < 0));
     }
 
     // operator ==
@@ -337,7 +372,7 @@ public:
     {
         return _cstr == other._cstr ||
             (_size == other._size &&
-             memcmp(_cstr, other._cstr, sizeof(_Elem) * _size) == 0);
+             memcmp(_cstr, other._cstr, sizeof(value_type) * _size) == 0);
     }
 
     // operator !=
@@ -393,8 +428,8 @@ public:
     }
 
 private:
-    const _Elem *_cstr;
-    size_t _size;
+    const_pointer _cstr;
+    size_type _size;
 };
 
 /**

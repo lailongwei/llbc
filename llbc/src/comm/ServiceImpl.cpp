@@ -772,10 +772,9 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath, const L
     return ret;
 }
 
-LLBC_Component *LLBC_ServiceImpl::GetComponent(const char *compName)
+LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
 {
-    const size_t compNameLen = LIKELY(compName) ? strlen(compName) : 0;
-    if (UNLIKELY(compNameLen == 0))
+    if (UNLIKELY(compName.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return nullptr;
@@ -787,7 +786,7 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const char *compName)
     if (it != compsEnd)
         return it->second;
 
-    if (compNameLen > 1 && compName[0] == 'I')
+    if (compName.size() > 1 && compName[0] == 'I')
     {
         if ((it = _name2Comps.find(compName + 1)) != compsEnd)
             return it->second;
