@@ -234,7 +234,7 @@ public:
      * Literal string assignment operator.
      */
     template <size_type _ArrLen>
-    constexpr LLBC_BasicCString &operator =(const value_type (&arr)[_ArrLen])
+    LLBC_BasicCString &operator =(const value_type (&arr)[_ArrLen])
     {
         _cstr = arr;
         _size = LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0;
@@ -305,7 +305,7 @@ public:
     /**
      * Copy assignment operator
      */
-    constexpr LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
+    LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
     {
         memcpy(this, &other, sizeof(other));
         return *this;
@@ -313,7 +313,7 @@ public:
 
 public:
     // operator []
-    constexpr const value_type &operator [](size_type index) const
+    const value_type &operator [](size_type index) const
     {
         #if LLBC_DEBUG
         ASSERT(LIKELY(index < _size) && "index out of range");
@@ -323,7 +323,7 @@ public:
     }
 
     // operator +
-    constexpr LLBC_BasicCString operator +(difference_type offset) const
+    LLBC_BasicCString operator +(difference_type offset) const
     {
         #if LLBC_DEBUG
         const auto beg = static_cast<difference_type>(_size) + offset;
@@ -334,7 +334,7 @@ public:
     }
 
     // operator -
-    constexpr LLBC_BasicCString operator -(difference_type offset) const
+    LLBC_BasicCString operator -(difference_type offset) const
     {
         return operator+(-offset);
     }
