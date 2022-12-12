@@ -146,7 +146,16 @@ public:
      * Get const string.
      * @return const _Elem * - the const string.
      */
-    const _Elem *GetStr() const
+    const _Elem *str() const
+    {
+        return _cstr;
+    }
+
+    /**
+     * Get const string.
+     * @return const _Elem * - the const string.
+     */
+    const _Elem *data() const
     {
         return _cstr;
     }
@@ -155,7 +164,16 @@ public:
      * Get string size.
      * @return size_t - the string size.
      */
-    size_t GetSize() const
+    size_t size() const
+    {
+        return _size;
+    }
+
+    /**
+     * Get string size.
+     * @return size_t - the string size.
+     */
+    size_t length() const
     {
         return _size;
     }
@@ -164,7 +182,7 @@ public:
      * Check string is empty.
      * @reutrn bool - empty flag.
      */
-    bool IsEmpty() const
+    bool empty() const
     {
         return _size == 0;
     }
@@ -385,7 +403,7 @@ private:
 template <typename _Elem>
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
-    return o <<cstr.GetStr();
+    return o <<cstr.str();
 }
 
 __LLBC_NS_END
@@ -403,8 +421,8 @@ struct hash<LLBC_NS LLBC_BasicCString<char> >
     {
         // Use DJB hash algo
         size_t h;
-        const char *str = cstr.GetStr();
-        for (size_t i = h = 0; i < cstr.GetSize(); ++i)
+        const char *str = cstr.str();
+        for (size_t i = h = 0; i < cstr.size(); ++i)
             h = ((h << 5) + h) ^ str[i];
         return h;
     };
@@ -420,8 +438,8 @@ struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
     {
         // Use DJB hash algo
         size_t h;
-        const wchar_t *str = cstr.GetStr();
-        for (size_t i = h = 0; i < cstr.GetSize(); ++i)
+        const wchar_t *str = cstr.str();
+        for (size_t i = h = 0; i < cstr.size(); ++i)
             h = ((h << 10) + h) ^ str[i];
         return h;
     };

@@ -167,7 +167,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
         return nullptr;
     }
 
-    if (name.IsEmpty())
+    if (name.empty())
     {
         _lock.Unlock();
         return _rootLogger;

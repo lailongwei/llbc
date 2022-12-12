@@ -2142,7 +2142,7 @@ void LLBC_ServiceImpl::DestroyComps()
         auto compName = it->first;
         _name2Comps.erase(it);
 
-        free(const_cast<char *>(compName.GetStr()));
+        free(const_cast<char *>(compName.str()));
     }
 
     for (auto &evComps: _caredEventComps)
