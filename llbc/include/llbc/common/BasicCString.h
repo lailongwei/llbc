@@ -303,7 +303,7 @@ public:
     }
 
     /**
-     * Copy assignment operator
+     * Copy assignment operator.
      */
     LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
     {
@@ -454,7 +454,7 @@ struct hash<LLBC_NS LLBC_BasicCString<char> >
 {
     size_t operator()(const LLBC_NS LLBC_BasicCString<char> &cstr) const noexcept
     {
-        // Use DJB hash algo
+        // Use DJB hash algo.
         size_t h;
         const char *str = cstr.str();
         for (size_t i = h = 0; i < cstr.size(); ++i)
@@ -471,7 +471,7 @@ struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
 {
     size_t operator()(const LLBC_NS LLBC_BasicCString<wchar_t> &cstr) const noexcept
     {
-        // Use DJB hash algo
+        // Use DJB hash algo.
         size_t h;
         const wchar_t *str = cstr.str();
         for (size_t i = h = 0; i < cstr.size(); ++i)
