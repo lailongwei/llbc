@@ -52,9 +52,9 @@ public:
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
     #if LLBC_TARGET_PLATFORM_WIN32
-    constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    LLBC_BasicCString(nullptr_t _ = nullptr)
     #else
-    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    LLBC_BasicCString(std::nullptr_t _ = nullptr)
     #endif
     : _cstr("")
     , _size(0)
@@ -68,9 +68,9 @@ public:
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
               typename = _CtorElem>
     #if LLBC_TARGET_PLATFORM_WIN32
-    constexpr LLBC_BasicCString(nullptr_t _ = nullptr)
+    LLBC_BasicCString(nullptr_t _ = nullptr)
     #else
-    constexpr LLBC_BasicCString(std::nullptr_t _ = nullptr)
+    LLBC_BasicCString(std::nullptr_t _ = nullptr)
     #endif
     : _cstr(L"")
     , _size(0)
@@ -80,7 +80,7 @@ public:
      * Parameter constructor when parameter type is literal string.
      */
     template <size_type _ArrLen>
-    constexpr LLBC_BasicCString(const value_type (&arr)[_ArrLen])
+    LLBC_BasicCString(const value_type (&arr)[_ArrLen])
     : _cstr(arr)
     , _size(LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0)
     {
