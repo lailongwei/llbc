@@ -290,7 +290,7 @@ public:
     // operator <
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator <(const _Other &other)
+    operator <(const _Other &other) const
     {
         return *this < LLBC_BasicCString(other);
     }
@@ -308,7 +308,7 @@ public:
     // operator ==
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator ==(const _Other &other)
+    operator ==(const _Other &other) const
     {
         return this->operator==(LLBC_BasicCString(other));
     }
