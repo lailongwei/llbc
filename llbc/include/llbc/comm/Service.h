@@ -628,6 +628,13 @@ protected:
 
 protected:
     /**
+     * Declare friend class: LLBC_Component.
+     * Access method list:
+     *     GetComponentList()
+     */
+    friend class LLBC_Component;
+
+    /**
      * Declare friend class: LLBC_Application.
      *  Access method list:
      *      ProcessAppConfigReload()
