@@ -428,9 +428,16 @@ public:
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
     GetComponent();
-    LLBC_Component *GetComponent(const LLBC_String &compName);
-    LLBC_Component *GetComponent(const std::string &compName);
-    LLBC_Component *GetComponent(const char *compName);
+    LLBC_Component *GetComponent(const LLBC_CString &compName);
+    template <typename Comp>
+    typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, const Comp *>::type
+    GetComponent() const;
+    const LLBC_Component *GetComponent(const LLBC_CString &compName) const;
+
+    /**
+     * Get component list.
+     */
+    const std::vector<LLBC_Component *> &GetComponentList() const;
 
 public:
     /**

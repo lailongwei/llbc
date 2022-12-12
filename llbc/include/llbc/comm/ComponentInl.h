@@ -95,17 +95,36 @@ template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
 LLBC_Component::GetComponent()
 {
-    return static_cast<Comp *>(GetComponent(LLBC_GetTypeName(Comp)));
+    const auto &compList = GetComponentList();
+    if (compList.size() <= 32)
+    {
+        Comp *castComp;
+        for (auto &comp : compList)
+        {
+            if ((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
+                return castComp;
+        }
+    }
+
+    #if LLBC_TARGET_PLATFORM_WIN32
+    auto compName = typeid(Comp).name();
+    #else
+    auto compName = LLBC_GetTypeName(Comp);
+    #endif
+    const auto colonPos = strrchr(compName, ':');
+    return static_cast<Comp *>(GetComponent(colonPos ? colonPos + 1 : compName));
 }
 
-inline LLBC_Component *LLBC_Component::GetComponent(const LLBC_String &compName)
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, const Comp *>::type
+LLBC_Component::GetComponent() const
 {
-    return GetComponent(compName.c_str());
+    return const_cast<LLBC_Component *>(this)->GetComponent<Comp>();
 }
 
-inline LLBC_Component *LLBC_Component::GetComponent(const std::string &compName)
+inline const LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &compName) const
 {
-    return GetComponent(compName.c_str());
+    return const_cast<LLBC_Component *>(this)->GetComponent(compName);
 }
 
 inline uint64 LLBC_Component::GetCaredEvents() const

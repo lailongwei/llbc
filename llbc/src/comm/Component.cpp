@@ -359,9 +359,14 @@ LLBC_Component::~LLBC_Component()
     LLBC_XDelete(_meths);
 }
 
-LLBC_Component *LLBC_Component::GetComponent(const char *compName)
+LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &compName)
 {
     return _svc->GetComponent(compName);
+}
+
+const std::vector<LLBC_Component *> &LLBC_Component::GetComponentList() const
+{
+    return _svc->GetComponentList();
 }
 
 const LLBC_Variant &LLBC_Component::GetConfig() const
