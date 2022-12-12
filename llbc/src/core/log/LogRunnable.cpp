@@ -36,7 +36,8 @@ __LLBC_NS_BEGIN
 LLBC_LogRunnable::LLBC_LogRunnable()
 : _stoped(false)
 {
-    memset(&_logDataQueues[0], 0, sizeof(_logDataQueues));
+    for (size_t i = 0; i < sizeof(_logDatas) / sizeof(_logDatas[0]); ++i)
+        _logDatas[i].reserve(4096);
 }
 
 LLBC_LogRunnable::~LLBC_LogRunnable()
@@ -71,17 +72,7 @@ void LLBC_LogRunnable::Stop()
 void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
 {
     _logDataLock.Lock();
-
-    auto &logDataQueue = _logDataQueues[0];
-    auto &sizePair = logDataQueue.sizeUn.sizePair;
-    if (UNLIKELY(sizePair.size == sizePair.cap))
-    {
-        sizePair.cap = MAX(sizePair.cap << 1, 8192);
-        logDataQueue.datas = reinterpret_cast<LLBC_LogData **>(
-            realloc(logDataQueue.datas, sizePair.cap * sizeof(LLBC_LogData *)));
-    }
-    logDataQueue.datas[sizePair.size++] = logData;
-
+    _logDatas[0].push_back(logData);
     _logDataLock.Unlock();
 }
 
@@ -91,17 +82,6 @@ void LLBC_LogRunnable::Cleanup()
 
     FlushLoggers(true, 0);
     _loggers.clear();
-
-    for (size_t i = 0; i < sizeof(_logDataQueues) / sizeof(_logDataQueues[0]); ++i)
-    {
-        auto &logDataQueue = _logDataQueues[i];
-        if (!logDataQueue.datas)
-            continue;
-
-        free(logDataQueue.datas);
-        logDataQueue.datas = nullptr;
-        logDataQueue.sizeUn._ = 0;
-    }
 }
 
 void LLBC_LogRunnable::Svc()
@@ -118,22 +98,17 @@ void LLBC_LogRunnable::Svc()
 LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
 {
     _logDataLock.Lock();
-    std::swap(_logDataQueues[0], _logDataQueues[1]);
+    std::swap(_logDatas[0], _logDatas[1]);
     _logDataLock.Unlock();
 
-    auto &logDataQueue = _logDataQueues[1];
-    auto &sizePair = logDataQueue.sizeUn.sizePair;
-    if (sizePair.size == 0)
-        return false;
-
-    for (uint32 i = 0; i < sizePair.size; ++i)
+    auto &logDatas = _logDatas[1];
+    for (auto &logData : logDatas)
     {
-        auto &logData = logDataQueue.datas[i];
         logData->logger->OutputLogData(*logData);
         LLBC_Recycle(logData);
     }
 
-    sizePair.size = 0;
+    logDatas.clear();
 
     return true;
 }
