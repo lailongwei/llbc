@@ -100,7 +100,19 @@ private:
     std::vector<LLBC_Logger *> _loggers;
 
     LLBC_SpinLock _logDataLock;
-    std::vector<LLBC_LogData *> _logDatas[2];
+    struct
+    {
+        LLBC_LogData **datas;
+        union
+        {
+            llbc::uint64 _;
+            struct
+            {
+                uint32 size;
+                uint32 cap;
+            } sizePair;
+        } sizeUn;
+    } _logDataQueues[2];
 };
 
 __LLBC_NS_END

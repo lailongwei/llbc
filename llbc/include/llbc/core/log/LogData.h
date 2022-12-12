@@ -84,6 +84,11 @@ public:
      */
     LLBC_IObjectPoolInst *GetPoolInst();
 
+    /**
+     * Object pool support method.
+     */
+    size_t GetPoolInstPerBlockUnitsNum();
+
     // Disable log data assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_LogData);
 
