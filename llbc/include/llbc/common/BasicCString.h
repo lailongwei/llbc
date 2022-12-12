@@ -38,7 +38,7 @@ public:
     // STL-like typedefs.
     typedef _Elem value_type;
     typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
+    typedef long difference_type;
     typedef value_type * pointer;
     typedef const value_type * const_pointer;
 
