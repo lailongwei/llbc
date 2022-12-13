@@ -105,6 +105,12 @@ public:
      */
     bool IsAsyncMode() const;
 
+    /**
+     * Get logger object pool.
+     * @return const LLBC_SafetyObjectPool & - logger object pool.
+     */
+    const LLBC_SafetyObjectPool &GetLoggerObjectPool() const;
+
 public:
     /**
      * Install logger hook.

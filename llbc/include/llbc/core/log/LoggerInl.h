@@ -33,6 +33,12 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
+inline const LLBC_SafetyObjectPool &LLBC_Logger::GetLoggerObjectPool() const
+{
+    LLBC_LockGuard guard(_lock);
+    return _objPool;
+}
+
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
     LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) \
     {                                             \
