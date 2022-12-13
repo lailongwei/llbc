@@ -44,11 +44,7 @@ void pyllbc_AddCoreMethods()
 
     // core/file
     pyllbc_Module *top = pyllbc_TopModule;
-    top->AddMethod(methods.GetModuleFileName);
-    top->AddMethod("get_module_filename",
-                   methods.GetModuleFileName.ml_meth,
-                   methods.GetModuleFileName.ml_flags,
-                   methods.GetModuleFileName.ml_doc);
+    top->AddMethod(methods.GetModuleFilePath);
 
     // core/bundle
     inl->AddMethod(methods.NewBundle);

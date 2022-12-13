@@ -116,7 +116,7 @@
 // Default log level is set to DEBUG(TRACE:0, DEBUG:1, INFO:2, WARN:3, ERROR:4, FATAL:5).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
-# define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               1
+# define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               0
 // Default log asynchronous mode is set to false.
 #define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     0
 // Default log independent logger thread is set to false.

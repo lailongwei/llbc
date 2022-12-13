@@ -24,6 +24,16 @@
 #include "lullbc/common/Macro.h"
 #include "lullbc/common/Errors.h"
 
+// Api: Dir_Exists
+LULLBC_LUA_METH int _lullbc_Dir_Exists(lua_State *l)
+{
+    luaL_checktype(l, 1, LUA_TSTRING);
+    const char *path = lua_tostring(l, 1);
+
+    lua_pushboolean(l, LLBC_File::Exists(path));
+    return 1;
+}
+
 // Api: Dir_IsDir
 LULLBC_LUA_METH int _lullbc_Dir_IsDir(lua_State *l)
 {
