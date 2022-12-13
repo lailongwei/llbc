@@ -12,7 +12,7 @@ class LogTest(TestCase):
         print 'Log test:'
 
         # Init log.
-        Log.init('Logger_Cfg.cfg')
+        Log.init('LogTestCfg.cfg')
 
         # Enable log fileinfo.
         Log.enablelogfileinfo()
