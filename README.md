@@ -26,12 +26,16 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 **iOS**: 提供稳定版本支持, 但特性无法保持最新, 可用于线上产品环境。  
 **Android**: 理论上可编译并使用, 不提供稳定版本支持, 也无法保持最新。  
 
-## 商业案例：
+## 使用此框架的游戏：
 |                            [onemt--苏丹的复仇](http://www.ltjianhe.com/koh.html)                             |      [onemt--苏丹传奇](https://play.google.com/store/apps/details?id=com.onemt.wolves.sos&hl=zh&gl=US)      |                            [onemt--帝国时代](http://www.ltjianhe.com/boe.html)                             |                            [onemt--永恒之战](http://www.ltjianhe.com/woe.html)                             |                            [onemt--诸王黎明](http://www.ltjianhe.com/rok.html)                             |
 |:-------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------:|
 | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__苏丹的复仇.png) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__苏丹传奇.jpg)  | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__帝国时代.png) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__永恒之战.png) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__诸王黎明.png) |
 |                             [onemt--阿拉伯传奇](http://www.ltjianhe.com/dk.html)                             |                         [Seasun--天域幻想](https://www.925g.com/game01/20197.html)                          |                            [37--天启之门](https://www.taptap.com/topic/505095)                             |         [游爱--剑仙传](https://baike.baidu.com/item/%E5%89%91%E4%BB%99%E4%BC%A0/3333767?fr=aladdin)         |                                              [游爱--掌上飞仙]()                                              |
 | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__阿拉伯传奇.png) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__seasun__天域幻想.jpg) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__37wan__天启之门.jpg) |  ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__游爱__剑仙传.jpeg)   |                                                                                                        |
+
+## 使用此框架的公司：
+|[37wan](https://www.37.com/)|[ONEMT](http://www.onemt.com/)|[西山居](https://www.xishanju.com/)|[祺曜互娱](http://www.7yao.top/)|[腾讯](www.tencent.com/)|
+|:--------------------------:|:----------------------------:|:--------------------------------:|:------------------------------:|:----------------------:|
 
 ## 支持：
 
