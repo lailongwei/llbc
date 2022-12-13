@@ -102,6 +102,9 @@ LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
     _logDataLock.Unlock();
 
     auto &logDatas = _logDatas[1];
+    if (logDatas.empty())
+        return false;
+
     for (auto &logData : logDatas)
     {
         logData->logger->OutputLogData(*logData);

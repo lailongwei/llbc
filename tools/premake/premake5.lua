@@ -280,8 +280,8 @@ project "testsuite"
     -- Specific debug directory.
     debugdir(LLBC_OUTPUT_DIR)
 
-    -- Copy all testcases config files to debug directory.
-    postbuildmessage("Copying all testcase config files to debug directory...");
+    -- Copy all testcases config files to output directory.
+    postbuildmessage("Copying all testcase config files to output directory...");
     local test_cfgs = {
         "core/config/IniTestCfg.ini",
         "core/log/LogTestCfg.cfg",
