@@ -1,5 +1,10 @@
 local Directory = llbc.newclass('llbc.Directory')
 
+-- Check given path exist or not.
+-- @param path - the given path.
+-- @return bool - return bool if given path exist, otherwise return false.
+Directory.exists = _llbc.Dir_Exists
+
 -- Check given path is directory or not.
 -- @param path - the given path.
 -- @return bool - return true if is given path is directory, otherwise return false.
