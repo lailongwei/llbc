@@ -67,7 +67,7 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
 inline LLBC_Stream::LLBC_Stream(size_t cap)
 : _buf(cap > 0 ? LLBC_Malloc(sint8, cap) : nullptr)
 , _pos(0)
-, _cap(0)
+, _cap(cap)
 
 , _endian(LLBC_DefaultEndian)
 , _attach(false)
