@@ -513,9 +513,22 @@ inline LLBC_Variant::operator ulong() const
 }
 
 template <typename _Ty>
-inline LLBC_Variant::operator _Ty *() const
+LLBC_Variant::operator _Ty *() const
 {
     return AsPtr<_Ty>();
+}
+
+template <>
+inline LLBC_Variant::operator char *() const
+{
+    static thread_local char emptyMutableEmptyStr[1] = {'\0'};
+    return IsStrX() ?  const_cast<char *>(_holder.data.obj.str->c_str()) : emptyMutableEmptyStr;
+}
+
+template <>
+inline LLBC_Variant::operator const char *() const
+{
+    return IsStrX() ? _holder.data.obj.str->c_str() : "";
 }
 
 inline LLBC_Variant::operator sint64() const

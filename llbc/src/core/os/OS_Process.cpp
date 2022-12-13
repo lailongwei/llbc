@@ -189,8 +189,7 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     errMsg.append_format("%s\n", __stackBacktrace);
 
     LLBC_NS LLBC_String mbTitle;
-    mbTitle.format("Unhandled Exception(%s)",
-        LLBC_NS LLBC_Directory::BaseName(LLBC_NS LLBC_Directory::ModuleFileName()).c_str());
+    mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::ModuleFileName().c_str());
     ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
     if (__crashCallback)
@@ -356,8 +355,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     if (nmlDumpFilePath.empty())
     {
         const auto now = LLBC_Time::Now();
-        const auto modName = LLBC_Directory::ModuleFileName();
-        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
         nmlDumpFilePath.append_format("_%d_%s.dmp", LLBC_GetCurrentProcessId(), now.Format("%Y%m%d_%H%M%S").c_str());
     }
 

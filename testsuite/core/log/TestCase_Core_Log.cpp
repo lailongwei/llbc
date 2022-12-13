@@ -126,6 +126,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         LLBC_PrintLine("Press any key to exec performance test(times:%d):", i);
         getchar();
 
+        LLBC_ObjectPoolStat opStat;
+        LLBC_LoggerManagerSingleton->GetLogger("perftest")->GetLoggerObjectPool().Stat(opStat);
+        LLBC_PrintLine("perftest logger object pool stat:\n%s", opStat.ToString().c_str());
+
         LLBC_CPUTime begin = LLBC_CPUTime::Current();
         const int loopLmt = 2000000;
         for (int i = 0; i < loopLmt; ++i)

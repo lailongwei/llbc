@@ -120,16 +120,22 @@ public:
 
 public:
     /**
+     * Get current executable module file directory.
+     * @return LLBC_String - the module file directory.
+     */
+    static LLBC_String ModuleFileDir();
+
+    /**
      * Get current executable module file name.
      * @return LLBC_String - the module file name.
      */
     static LLBC_String ModuleFileName();
 
     /**
-     * Get current executable module file directory.
-     * @return LLBC_String - the module file directory.
+     * Get current executable module file path(dir + name).
+     * @return LLBC_String - the module file path.
      */
-    static LLBC_String ModuleFileDir();
+    static LLBC_String ModuleFilePath();
 
     /**
      * Get given path directory name.

@@ -186,12 +186,7 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
     // Normalize application name.
     _name = name;
     if (_name.empty())
-    {
-        _name = LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName());
-        const auto dotPos = _name.find('.');
-        if (dotPos != LLBC_String::npos && dotPos > 0)
-            _name = _name.substr(0, dotPos);
-    }
+        _name = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
 
     // Define app start failed defer.
     LLBC_Defer(if (ret != LLBC_OK) { 
@@ -488,7 +483,7 @@ LLBC_String LLBC_Application::LocateConfigPath(const LLBC_String &appName, int &
     LLBC_Strings cfgFileNames{appName};
     if (appName.endswith("_d") || appName.endswith("_debug"))
               cfgFileNames.push_back(appName.substr(0, appName.rfind('_')));
-    const auto execName = LLBC_Directory::SplitExt(LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName()))[0];
+    const auto execName = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
     cfgFileNames.push_back(execName);
     if (execName.endswith("_d") || execName.endswith("_debug"))
         cfgFileNames.push_back(execName.substr(0, execName.rfind('_')));

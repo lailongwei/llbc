@@ -158,6 +158,8 @@
 #define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
 // Default log config item not config use default or root config(root/default).
 #define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
+// Log data object pool units size per block.
+#define LLBC_CFG_LOG_LOG_DATA_OBJPOOL_UNIT_SIZE_PER_BLOCK   512
 
 /**
  * \brief core/timer about configs.

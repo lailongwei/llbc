@@ -24,31 +24,31 @@
 
 int TestCase_Core_VariantTest::Run(int argc, char *argv[])
 {
-    std::cout <<"LLBC_Variant test:" <<std::endl;
+    std::cout << "LLBC_Variant test:" << std::endl;
 
     BasicTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     CompareTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     CompositeKeyTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     ArithmeticTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     SeqTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     DictTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     SerializeTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     HashTest();
-    std::cout <<std::endl;
+    std::cout << std::endl;
 
     ConvertToUnurderedStlContainerTest();
 
@@ -60,7 +60,7 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
 
 void TestCase_Core_VariantTest::BasicTest()
 {
-    std::cout <<"Basic test:" <<std::endl;
+    std::cout << "Basic test:" << std::endl;
 
     LLBC_Variant nilVal;
     LLBC_Variant boolVal(true);
@@ -88,99 +88,115 @@ void TestCase_Core_VariantTest::BasicTest()
     LLBC_Variant looseBoolVal6("   0.0 ");
     LLBC_Variant looseBoolVal7("   1.3 ");
 
-    std::cout <<"nil val, isNil: " 
-        <<(nilVal.IsNil() ? "true" : "false") <<", ToString: " <<nilVal <<std::endl;
-    std::cout <<"bool val, isBool: "
-        <<(boolVal.IsBool() ? "true" : "false") <<", ToString: " <<boolVal <<std::endl;
-    std::cout <<"int8Val, isInt8: " 
-        <<(int8Val.IsInt8() ? "true" : "false") <<", ToString: " <<int8Val <<std::endl;
-    std::cout <<"uint8Val, isUInt8: " 
-        <<(uint8Val.IsUInt8() ? "true" : "false") <<", ToString: " <<uint8Val <<std::endl;
-    std::cout <<"int16Val, isInt16: "
-        <<(int16Val.IsInt16() ? "true" : "false") <<", ToString: " <<int16Val <<std::endl;
-    std::cout <<"uint16Val, isUInt16: "
-        <<(uint16Val.IsUInt16() ? "true" : "false") <<", ToString: " <<uint16Val <<std::endl;
-    std::cout <<"int32Val, isInt32: "
-        <<(int32Val.IsInt32() ? "true" : "false") <<", ToString: " <<int32Val <<std::endl;
-    std::cout <<"uint32Val, isUInt32: "
-        <<(uint32Val.IsUInt32() ? "true" : "false") <<", ToString: " <<uint32Val <<std::endl;
-    std::cout <<"longVal, isLong: " 
-        <<(longVal.IsLong() ? "true" : "false") <<", ToString: " <<longVal <<std::endl;
-    std::cout <<"ulongVal, isULong: " 
-        <<(ulongVal.IsULong() ? "true" : "false") <<", ToString: " <<ulongVal <<std::endl;
-    std::cout <<"ptrVal, isPtr: " 
-        <<(ptrVal.IsPtr() ? "true" : "false") <<", ToString: " <<ptrVal <<std::endl;
-    std::cout <<"int64Val, isInt64: " 
-        <<(int64Val.IsInt64() ? "true" : "false") <<", ToString: " <<int64Val <<std::endl;
-    std::cout <<"uint64Val, isUInt64: " 
-        <<(uint64Val.IsUInt64() ? "true" : "false") <<", ToString: " <<uint64Val <<std::endl;
-    std::cout <<"floatVal, isFloat: " 
-        <<(floatVal.IsFloat() ? "true" : "false") <<", ToString: " <<floatVal <<std::endl;
-    std::cout <<"doubleVal, isDouble: " 
-        <<(doubleVal.IsDouble() ? "true" : "false") <<", ToString: " <<doubleVal <<std::endl;
-    std::cout <<"strVal, isStr: " 
-        <<(strVal.IsStr() ? "true" : "false") <<", ToString: " <<strVal <<std::endl;
+    std::cout << "nil val, isNil: "
+        << (nilVal.IsNil() ? "true" : "false") << ", ToString: " << nilVal << std::endl;
+    std::cout << "bool val, isBool: "
+        << (boolVal.IsBool() ? "true" : "false") << ", ToString: " << boolVal << std::endl;
+    std::cout << "int8Val, isInt8: "
+        << (int8Val.IsInt8() ? "true" : "false") << ", ToString: " << int8Val << std::endl;
+    std::cout << "uint8Val, isUInt8: "
+        << (uint8Val.IsUInt8() ? "true" : "false") << ", ToString: " << uint8Val << std::endl;
+    std::cout << "int16Val, isInt16: "
+        << (int16Val.IsInt16() ? "true" : "false") << ", ToString: " << int16Val << std::endl;
+    std::cout << "uint16Val, isUInt16: "
+        << (uint16Val.IsUInt16() ? "true" : "false") << ", ToString: " << uint16Val << std::endl;
+    std::cout << "int32Val, isInt32: "
+        << (int32Val.IsInt32() ? "true" : "false") << ", ToString: " << int32Val << std::endl;
+    std::cout << "uint32Val, isUInt32: "
+        << (uint32Val.IsUInt32() ? "true" : "false") << ", ToString: " << uint32Val << std::endl;
+    std::cout << "longVal, isLong: "
+        << (longVal.IsLong() ? "true" : "false") << ", ToString: " << longVal << std::endl;
+    std::cout << "ulongVal, isULong: "
+        << (ulongVal.IsULong() ? "true" : "false") << ", ToString: " << ulongVal << std::endl;
+    std::cout << "ptrVal, isPtr: "
+        << (ptrVal.IsPtr() ? "true" : "false") << ", ToString: " << ptrVal << std::endl;
+    std::cout << "int64Val, isInt64: "
+        << (int64Val.IsInt64() ? "true" : "false") << ", ToString: " << int64Val << std::endl;
+    std::cout << "uint64Val, isUInt64: "
+        << (uint64Val.IsUInt64() ? "true" : "false") << ", ToString: " << uint64Val << std::endl;
+    std::cout << "floatVal, isFloat: "
+        << (floatVal.IsFloat() ? "true" : "false") << ", ToString: " << floatVal << std::endl;
+    std::cout << "doubleVal, isDouble: "
+        << (doubleVal.IsDouble() ? "true" : "false") << ", ToString: " << doubleVal << std::endl;
+    std::cout << "strVal, isStr: "
+        << (strVal.IsStr() ? "true" : "false") << ", ToString: " << strVal << std::endl;
     std::cout << "looseBoolVal1: "
-        <<looseBoolVal1 <<", AsBool(): " <<looseBoolVal1.AsLooseBool() <<std::endl;
+        << looseBoolVal1 << ", AsBool(): " << looseBoolVal1.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal2: "
-        <<looseBoolVal2 <<", AsBool(): " <<looseBoolVal2.AsLooseBool() <<std::endl;
+        << looseBoolVal2 << ", AsBool(): " << looseBoolVal2.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal3: "
-        <<looseBoolVal3 <<", AsBool(): " <<looseBoolVal3.AsLooseBool() <<std::endl;
+        << looseBoolVal3 << ", AsBool(): " << looseBoolVal3.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal4: "
-        <<looseBoolVal4 <<", AsBool(): " <<looseBoolVal4.AsLooseBool() <<std::endl;
+        << looseBoolVal4 << ", AsBool(): " << looseBoolVal4.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal5: "
-        <<looseBoolVal5 <<", AsBool(): " <<looseBoolVal5.AsLooseBool() <<std::endl;
+        << looseBoolVal5 << ", AsBool(): " << looseBoolVal5.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal6: "
-        <<looseBoolVal6 <<", AsBool(): " <<looseBoolVal6.AsLooseBool() <<std::endl;
+        << looseBoolVal6 << ", AsBool(): " << looseBoolVal6.AsLooseBool() << std::endl;
     std::cout << "looseBoolVal7: "
-        <<looseBoolVal7 <<", AsBool(): " <<looseBoolVal7.AsLooseBool() <<std::endl;
-    std::cout <<std::endl;
+        << looseBoolVal7 << ", AsBool(): " << looseBoolVal7.AsLooseBool() << std::endl;
+    std::cout << std::endl;
 
     LLBC_Variant become(3);
-    std::cout <<"origin value: " <<become <<std::endl;
+    std::cout << "origin value: " << become << std::endl;
     become.BecomeStr();
-    std::cout <<"become to Sring: " <<become <<std::endl;
+    std::cout << "become to Sring: " << become << std::endl;
     become.BecomeBool();
-    std::cout <<"become bool: " <<become <<std::endl;
+    std::cout << "become bool: " << become << std::endl;
     become.BecomeInt8();
-    std::cout <<"become int8: " <<become <<std::endl;
+    std::cout << "become int8: " << become << std::endl;
     become.BecomeUInt8();
-    std::cout <<"become uint8: " <<become <<std::endl;
+    std::cout << "become uint8: " << become << std::endl;
     become.BecomeInt16();
-    std::cout <<"become int16: " <<become <<std::endl;
+    std::cout << "become int16: " << become << std::endl;
     become.BecomeUInt16();
-    std::cout <<"become uint16: " <<become <<std::endl;
+    std::cout << "become uint16: " << become << std::endl;
     become.BecomeInt32();
-    std::cout <<"become int32: " <<become <<std::endl;
+    std::cout << "become int32: " << become << std::endl;
     become.BecomeUInt32();
-    std::cout <<"become uint32: " <<become <<std::endl;
+    std::cout << "become uint32: " << become << std::endl;
     become.BecomeLong();
-    std::cout <<"become long: " <<become <<std::endl;
+    std::cout << "become long: " << become << std::endl;
     become.BecomeULong();
-    std::cout <<"become ulong: " <<become <<std::endl;
+    std::cout << "become ulong: " << become << std::endl;
     become.BecomePtr();
-    std::cout <<"become ptr: " <<become <<std::endl;
+    std::cout << "become ptr: " << become << std::endl;
     become.BecomeInt64();
-    std::cout <<"become int64: " <<become <<std::endl;
+    std::cout << "become int64: " << become << std::endl;
     become.BecomeUInt64();
-    std::cout <<"become uint64: " <<become <<std::endl;
+    std::cout << "become uint64: " << become << std::endl;
     become.BecomeFloat();
-    std::cout <<"become float: " <<become <<std::endl;
+    std::cout << "become float: " << become << std::endl;
     become.BecomeDouble();
-    std::cout <<"become double: " <<become <<std::endl;
+    std::cout << "become double: " << become << std::endl;
     become.BecomeNil();
-    std::cout <<"become Nil: " <<become <<std::endl;
+    std::cout << "become Nil: " << become << std::endl;
     become.BecomeBool();
-    std::cout <<"become bool: " <<become <<std::endl;
+    std::cout << "become bool: " << become << std::endl;
 
     int intData = 300;
     ptrVal = &intData;
-    std::cout <<"Pointer type(special) test:" <<std::endl;
-    std::cout <<"intData: " <<intData <<", save ptr(0x" <<&intData << ") to variant: " <<ptrVal <<std::endl;
+    std::cout << "Pointer type(special) test:" << std::endl;
+    std::cout << "intData: " << intData << ", save ptr(0x" << &intData << ") to variant: " << ptrVal << std::endl;
 
     ptrVal = ptrVal + LLBC_Variant(4);
     ptrVal = ptrVal - LLBC_Variant(4);
-    std::cout <<"After ptrVal += 4, ptrVal -= 4, value: " <<*ptrVal.AsPtr<int>() <<std::endl;
+    std::cout << "After ptrVal += 4, ptrVal -= 4, value: " << *ptrVal.AsPtr<int>() << std::endl;
+
+    std::cout << "Implicit [const ]char * cast test:" << std::endl;
+    strVal = "hello world";
+    std::cout << "- After strVal = \"hello world\":" << strVal << std::endl;
+    std::cout << "- strVal ? strVal : \"hello\": " << (strVal ? strVal : "hello") << std::endl;
+
+    char mutableHeyStr[4] = { 'H', 'e' , 'y', '\0' };
+    strVal = mutableHeyStr;
+    std::cout << " - After strVal = mutableHeyStr(Hey):" << strVal << std::endl;
+    std::cout << "- strVal ? strVal : mutableHeyStr(Hey): " << (strVal ? strVal : mutableHeyStr) << std::endl;
+
+    LLBC_Variant constructFromCStr("hello world");
+    LLBC_Variant constructFromMStr(mutableHeyStr);
+    std::cout << "Construct from mutable/immutable test:" << std::endl;
+    std::cout << "- construct from cstr:\"hello world\":" << constructFromCStr <<std::endl;
+    std::cout << "- construct from mstr:\"" << mutableHeyStr << "\":" << constructFromMStr <<std::endl;
 }
 
 void TestCase_Core_VariantTest::CompareTest()

@@ -596,7 +596,17 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
+LLBC_String LLBC_Directory::ModuleFileDir()
+{
+    return DirName(ModuleFilePath());
+}
+
 LLBC_String LLBC_Directory::ModuleFileName()
+{
+    return BaseName(ModuleFilePath());
+}
+
+LLBC_String LLBC_Directory::ModuleFilePath()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     ssize_t ret = -1;
@@ -633,11 +643,6 @@ LLBC_String LLBC_Directory::ModuleFileName()
 
     return modFileName;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
-}
-
-LLBC_String LLBC_Directory::ModuleFileDir()
-{
-    return DirName(ModuleFileName());
 }
 
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
