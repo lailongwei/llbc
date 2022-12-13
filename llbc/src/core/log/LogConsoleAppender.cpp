@@ -87,7 +87,18 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     if (logLevel < GetLogLevel())
         return LLBC_OK;
 
-    FILE * const out = logLevel >= _LogLevel::Warn ? stderr : stdout;
+    FILE *out = nullptr;
+    if (logLevel >= _LogLevel::Warn)
+    {
+        out = stderr;
+        #if !LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE
+        LLBC_FlushFile(stdout);
+        #endif
+    }
+    else
+    {
+        out = stdout;
+    }
 
     LLBC_String &formattedData =
         *reinterpret_cast<LLBC_String *>(__LLBC_GetLibTls()->coreTls.logFmtStr);
