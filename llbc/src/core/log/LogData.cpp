@@ -96,7 +96,7 @@ LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()
 
 size_t LLBC_LogData::GetPoolInstPerBlockUnitsNum()
 {
-    return 512;
+    return LLBC_CFG_LOG_LOG_DATA_OBJPOOL_UNIT_SIZE_PER_BLOCK;
 }
 
 __LLBC_NS_END
