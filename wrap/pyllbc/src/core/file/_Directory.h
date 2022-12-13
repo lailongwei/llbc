@@ -19,14 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-LLBC_EXTERN_C PyObject *_pyllbc_GetModuleFileName(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_GetModuleFilePath(PyObject *self, PyObject *args)
 {
-    const LLBC_String mfn = LLBC_Directory::ModuleFileName();
-    if (mfn.empty())
+    const LLBC_String mfp = LLBC_Directory::ModuleFilePath();
+    if (UNLIKELY(mfp.empty()))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When get the module file name");
         return NULL;
     }
 
-    return PyString_FromStringAndSize(mfn.data(), mfn.size());
+    return PyString_FromStringAndSize(mfp.data(), mfp.size());
 }
