@@ -102,7 +102,7 @@ LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
     LLBC_String libName(fileName);
     libName.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
     if (libName.empty())
-        libName = LLBC_Directory::ModuleFileName();
+        libName = LLBC_Directory::ModuleFilePath();
 
     if ((handle = ::LoadLibraryExA(libName.c_str(), nullptr, 0)) == LLBC_INVALID_LIBRARY_HANDLE)
         LLBC_SetLastError(LLBC_ERROR_OSAPI);

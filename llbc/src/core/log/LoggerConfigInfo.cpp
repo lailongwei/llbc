@@ -218,8 +218,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
         LLBC_Num2Str(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
-    const LLBC_String modFileName = 
-        LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName());
+    const LLBC_String modFileName = LLBC_Directory::ModuleFileName();
     _logFile.findreplace("%m", modFileName);
 
 #if LLBC_TARGET_PLATFORM_IPHONE

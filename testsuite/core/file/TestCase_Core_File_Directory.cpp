@@ -99,7 +99,7 @@ int TestCase_Core_File_Directory::ExistsTest()
     path = "~~~~~~~~";
     LLBC_PrintLine("%s exists? %d", path.c_str(), LLBC_Directory::Exists(path));
 
-    path = LLBC_Directory::ModuleFileName();
+    path = LLBC_Directory::ModuleFilePath();
     LLBC_PrintLine("%s exists? %d", path.c_str(), LLBC_Directory::Exists(path));
 
     LLBC_PrintLine("");
@@ -308,6 +308,7 @@ int TestCase_Core_File_Directory::ModuleFileTest()
     LLBC_PrintLine("ModuleFile test:");
     LLBC_PrintLine("Module file name: %s", LLBC_Directory::ModuleFileName().c_str());
     LLBC_PrintLine("Module file directory: %s", LLBC_Directory::ModuleFileDir().c_str());
+    LLBC_PrintLine("Module file path: %s", LLBC_Directory::ModuleFilePath().c_str());
 
     LLBC_PrintLine("");
 
