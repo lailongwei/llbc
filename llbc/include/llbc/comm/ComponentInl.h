@@ -36,38 +36,53 @@ inline const LLBC_ComponentMethods::Methods &LLBC_ComponentMethods::GetAllMethod
     return _meths;
 }
 
-inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const char *methName) const
+inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const LLBC_CString &methName) const
 {
     static const LLBC_ComponentMethod nullMeth;
-    Methods::const_iterator it = _meths.find(methName);
-    if (UNLIKELY(it == _meths.end()))
+
+    const size_t methSize = _methList.size();
+    if (methSize <= 30)
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return nullMeth;
+        for (size_t i = 0; i < methSize; ++i)
+        {
+            auto &methPair = _methList[i];
+            if (methPair.first == methName)
+                return methPair.second;
+        }
+    }
+    else
+    {
+        Methods::const_iterator it = _meths.find(methName);
+        if (LIKELY(it != _meths.end()))
+            return it->second;
     }
 
-    return it->second;
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+    return nullMeth;
 }
 
-template <typename ComponentCls>
-int LLBC_ComponentMethods::AddMethod(ComponentCls *component, const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+template <typename Component>
+int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, Component *comp, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
-    if (UNLIKELY(!methName || strlen(methName) == 0 || !meth))
+    if (UNLIKELY(methName.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    if (UNLIKELY(!_meths.emplace(methName, LLBC_ComponentMethod(component, meth)).second))
+    const LLBC_ComponentMethod compMeth(comp, meth);
+    if (UNLIKELY(!_meths.emplace(methName, compMeth).second))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
+    _methList.emplace_back(methName, compMeth);
+
     return LLBC_OK;
 }
 
-inline int LLBC_ComponentMethods::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_ComponentMethods::CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     const LLBC_ComponentMethod &meth = GetMethod(methName);
     if (UNLIKELY(!meth))
@@ -151,21 +166,22 @@ inline int LLBC_Component::GetConfigType() const
     return _cfgType;
 }
 
-inline const LLBC_ComponentMethods *LLBC_Component::GetAllMethods() const
+inline const LLBC_ComponentMethods &LLBC_Component::GetAllMethods() const
 {
-    return _meths;
+    static const LLBC_ComponentMethods emptyMethods;
+    return LIKELY(_meths) ? *_meths : emptyMethods;
 }
 
-template <typename ComponentCls>
-int LLBC_Component::AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+template <typename Component>
+int LLBC_Component::AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
-    if (!_meths)
+    if (UNLIKELY(!_meths))
         _meths = new LLBC_ComponentMethods;
 
-    return _meths->AddMethod<ComponentCls>(dynamic_cast<ComponentCls *>(this), methName, meth);
+    return _meths->AddMethod<Component>(methName, dynamic_cast<Component *>(this), meth);
 }
 
-inline int LLBC_Component::CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_Component::CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     if (UNLIKELY(!_meths))
     {
