@@ -22,7 +22,7 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
       - name: Install MSBuild
-        uses: microsoft/setup-msbuild@master
+        uses: microsoft/setup-msbuild@main
         
       - name: PreBuild
         run: echo vs2019 | ./WinPreBuild.bat 0
