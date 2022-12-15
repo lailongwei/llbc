@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Comp.h"
+#include "comm/TestCase_Comm_CompBase.h"
 
 namespace
 {
@@ -138,17 +138,17 @@ namespace
     };
 }
 
-TestCase_Comm_Comp::TestCase_Comm_Comp()
+TestCase_Comm_CompBase::TestCase_Comm_CompBase()
 {
 }
 
-TestCase_Comm_Comp::~TestCase_Comm_Comp()
+TestCase_Comm_CompBase::~TestCase_Comm_CompBase()
 {
 }
 
-int TestCase_Comm_Comp::Run(int argc, char *argv[])
+int TestCase_Comm_CompBase::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Comp test:");
+    LLBC_PrintLine("CompBase test:");
 
     // Parse arguments.
     if (argc < 4)
@@ -165,7 +165,7 @@ int TestCase_Comm_Comp::Run(int argc, char *argv[])
         return TestInExternalDriveService(argv[2], port);
 }
 
-int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int port)
+int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, int port)
 {
     LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
@@ -254,7 +254,7 @@ int TestCase_Comm_Comp::TestInInternalDriveService(const LLBC_String &host, int 
     return LLBC_OK;
 }
 
-int TestCase_Comm_Comp::TestInExternalDriveService(const LLBC_String &host, int port)
+int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, int port)
 {
     LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 

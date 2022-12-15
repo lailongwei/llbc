@@ -320,6 +320,9 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     // Init&Start comps.
     if (_driveMode == ExternalDrive)
     {
+        // Add service to service mgr.
+        _svcMgr.OnServiceStart(this);
+
         // Waiting for all comp init & start finished.
         if (InitComps() != LLBC_OK || 
             StartComps() != LLBC_OK)
@@ -334,7 +337,6 @@ int LLBC_ServiceImpl::Start(int pollerCount)
             return LLBC_FAILED;
         }
 
-        _svcMgr.OnServiceStart(this);
         _lock.Unlock();
     }
     else // Self-Drive
@@ -1319,6 +1321,8 @@ void LLBC_ServiceImpl::Svc()
     InitObjectPools();
     InitTimerScheduler();
     InitAutoReleasePool();
+
+    _svcMgr.OnServiceStart(this);
     if (UNLIKELY(InitComps() != LLBC_OK))
     {
         _lock.Unlock();
@@ -1330,8 +1334,6 @@ void LLBC_ServiceImpl::Svc()
         _lock.Unlock();
         return;
     }
-
-    _svcMgr.OnServiceStart(this);
 
     _lock.Unlock();
 

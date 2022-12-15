@@ -256,7 +256,7 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
 
     // Get native comp native methods.
     typedef LLBC_ComponentMethods::Methods::const_iterator _NativeMethodsIter;
-    const LLBC_ComponentMethods::Methods *nativeMeths = nativeComp->GetAllMethods() ? &nativeComp->GetAllMethods()->GetAllMethods() : nullptr;
+    const LLBC_ComponentMethods::Methods &nativeMeths = nativeComp->GetAllMethods().GetAllMethods();
 
     // If not specific python comp class, define python layer comp class and compile it.
     if (!compCls || pyllbc_TypeDetector::IsNone(compCls))
@@ -267,16 +267,13 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
         compClsDef.append_format("    \"\"\"Dynamic load comp %s(from native dynamic library:%s) define\"\"\"\n", compName.c_str(), libPath.c_str());
         compClsDef.append_format("    def __init__(self, cobj, name, meths):\n");
         compClsDef.append_format("        super(%s, self).__init__(cobj, name, meths)\n", compName.c_str());
-        if (nativeMeths)
+        for (_NativeMethodsIter nativeMethIt = nativeMeths.begin();
+             nativeMethIt != nativeMeths.end();
+             ++nativeMethIt)
         {
-            for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
-                 nativeMethIt != nativeMeths->end();
-                 ++nativeMethIt)
-            {
-                const char *nativeMeth = nativeMethIt->first.str();
-                compClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
-                compClsDef.append_format("        return llbc.inl.CallComponentMethod(self._c_obj, '%s', arg)\n", nativeMeth);
-            }
+            const char *nativeMeth = nativeMethIt->first.str();
+            compClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
+            compClsDef.append_format("        return llbc.inl.CallComponentMethod(self._c_obj, '%s', arg)\n", nativeMeth);
         }
 
         compClsDef.append_format("\n");
@@ -294,10 +291,10 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
             return LLBC_FAILED;
         }
     }
-    else if (nativeMeths)
+    else
     {
-        for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
-             nativeMethIt != nativeMeths->end();
+        for (_NativeMethodsIter nativeMethIt = nativeMeths.begin();
+             nativeMethIt != nativeMeths.end();
              ++nativeMethIt)
         {
             const char *nativeMeth = nativeMethIt->first.str();
@@ -331,13 +328,10 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
     PyObject *pyCObj = PyLong_FromLongLong(reinterpret_cast<long long>(nativeComp));
     PyObject *pyCompName = PyString_FromString(compName.c_str());
     PyObject *pyMeths = PySet_New(nullptr);
-    if (nativeMeths)
-    {
-        for (_NativeMethodsIter nativeMethIt = nativeMeths->begin();
-             nativeMethIt != nativeMeths->end();
-             ++nativeMethIt)
-            PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.str())); // Steal referencce for o.
-    }
+    for (_NativeMethodsIter nativeMethIt = nativeMeths.begin();
+         nativeMethIt != nativeMeths.end();
+         ++nativeMethIt)
+        PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.str())); // Steal referencce for o.
 
     comp = PyObject_CallFunctionObjArgs(compCls,
                                         pyCObj,

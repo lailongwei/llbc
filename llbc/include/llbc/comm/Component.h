@@ -343,6 +343,7 @@ class LLBC_ComponentMethods
 {
 public:
     typedef std::map<LLBC_CString, LLBC_ComponentMethod> Methods;
+    typedef std::vector < std::pair<LLBC_CString, LLBC_ComponentMethod> > MethodList;
 
 public:
     /**
@@ -363,18 +364,18 @@ public:
      * @param[in] methName - the method name.
      * @return const LLBC_ComponentMethod & - the component method, if not found return nullptr.
      */
-    const LLBC_ComponentMethod &GetMethod(const char *methName) const;
+    const LLBC_ComponentMethod &GetMethod(const LLBC_CString &methName) const;
 
 public:
     /**
      * Add component method.
-     * @param[in] component - the component object.
      * @param[in] methName  - the method name.
+     * @param[in] comp      - the component object.
      * @param[in] meth      - the method pointer.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename ComponentCls>
-    int AddMethod(ComponentCls *component, const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    template <typename Component>
+    int AddMethod(const LLBC_CString &methName, Component *comp, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
 public:
     /**
@@ -384,7 +385,7 @@ public:
      * @param[in] ret      - the method execute result.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret);
+    int CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret);
 
 private:
     // Disable assignment.
@@ -392,6 +393,7 @@ private:
 
 private:
     Methods _meths;
+    MethodList _methList;
 };
 
 /**
@@ -482,9 +484,9 @@ public:
 public:
     /**
      * Get all component methods.
-     * @return const LLBC_ComponentMethods * - the component methods, maybe is null.
+     * @return const LLBC_ComponentMethods & - the component methods.
      */
-    const LLBC_ComponentMethods *GetAllMethods() const;
+    const LLBC_ComponentMethods &GetAllMethods() const;
 
     /**
      * Add component method.
@@ -492,8 +494,8 @@ public:
      * @param[in] meth     - the method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename ComponentCls>
-    int AddMethod(const char *methName, int (ComponentCls::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    template <typename Component>
+    int AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
     /**
      * Call component method.
@@ -502,7 +504,7 @@ public:
      * @param[in] ret      - the method execute result.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CallMethod(const char *methName, const LLBC_Variant &arg, LLBC_Variant &ret);
+    virtual int CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret);
 
 public:
     /**

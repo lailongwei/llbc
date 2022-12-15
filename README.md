@@ -33,6 +33,10 @@ llbc为一个精简、功能完整、多语言支持的服务端开发框架，�
 |                             [onemt--阿拉伯传奇](http://www.ltjianhe.com/dk.html)                             |                         [Seasun--天域幻想](https://www.925g.com/game01/20197.html)                          |                            [37--天启之门](https://www.taptap.com/topic/505095)                             |         [游爱--剑仙传](https://baike.baidu.com/item/%E5%89%91%E4%BB%99%E4%BC%A0/3333767?fr=aladdin)         |                                              [游爱--掌上飞仙]()                                              |
 | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__onemt__阿拉伯传奇.png) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__seasun__天域幻想.jpg) | ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__37wan__天启之门.jpg) |  ![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase__游爱__剑仙传.jpeg)   |                                                                                                        |
 
+## 使用此框架的公司：
+|[37wan](https://www.37.com/)|[ONEMT](http://www.onemt.com/)|[西山居](https://www.xishanju.com/)|[祺曜互娱](http://www.7yao.top/)|[腾讯](www.tencent.com/)|
+|:--------------------------:|:----------------------------:|:--------------------------------:|:------------------------------:|:----------------------:|
+
 ## 支持：
 
 llbc欢迎大家使用、提出问题及贡献代码。  

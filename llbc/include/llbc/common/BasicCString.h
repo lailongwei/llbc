@@ -326,8 +326,8 @@ public:
     LLBC_BasicCString operator +(difference_type offset) const
     {
         #if LLBC_DEBUG
-        const auto beg = static_cast<difference_type>(_size) + offset;
-        ASSERT(LIKELY(beg >= 0 && beg < static_cast<difference_type>(_size)) && "index out of range");
+        ASSERT(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
+                (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) && "index out of range");
         #endif // LLBC_DEBUG
 
         return LLBC_BasicCString(_cstr + offset, _size - offset);
