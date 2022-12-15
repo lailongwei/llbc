@@ -327,7 +327,7 @@ public:
     {
         #if LLBC_DEBUG
         ASSERT(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
-                (offset < 0 && std::abs(offset) < reinterpret_cast<difference_type>(_cstr))) && "index out of range");
+                (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) && "index out of range");
         #endif // LLBC_DEBUG
 
         return LLBC_BasicCString(_cstr + offset, _size - offset);
