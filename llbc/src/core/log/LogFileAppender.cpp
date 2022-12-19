@@ -31,6 +31,7 @@
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogRollingMode.h"
 #include "llbc/core/log/LogTokenChain.h"
 #include "llbc/core/log/LogFileAppender.h"
 
@@ -42,7 +43,7 @@ __LLBC_NS_BEGIN
 
 LLBC_LogFileAppender::LLBC_LogFileAppender()
 : _fileBufferSize(0)
-, _isDailyRolling(true)
+, _fileRollingMode(LLBC_LogRollingMode::End)
 
 , _maxFileSize(LONG_MAX)
 , _maxBackupIndex(INT_MAX)
@@ -92,7 +93,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     }
 
     _fileBufferSize = MAX(0, initInfo.fileBufferSize);
-    _isDailyRolling = initInfo.dailyRolling;
+    _fileRollingMode = initInfo.fileRollingMode;
 
     _maxFileSize = initInfo.maxFileSize > 0 ? initInfo.maxFileSize : LONG_MAX;
     _maxBackupIndex = MAX(0, initInfo.maxBackupIndex);
@@ -113,7 +114,7 @@ void LLBC_LogFileAppender::Finalize()
     _fileSuffix.clear();
 
     _fileBufferSize = 0;
-    _isDailyRolling = false;
+    _fileRollingMode = LLBC_LogRollingMode::End;
 
     _maxFileSize = LONG_MAX;
     _maxBackupIndex = INT_MAX;
@@ -212,7 +213,7 @@ void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
 LLBC_String LLBC_LogFileAppender::BuildLogFilePath(sint64 now) const
 {
     LLBC_String filePath = _fileBasePath;
-    if (_isDailyRolling)
+    if (_fileRollingMode != LLBC_LogRollingMode::NoRolling)
     {
         struct tm timeStruct;
         time_t nowInSecs = static_cast<time_t>(now / 1000000);
@@ -222,14 +223,15 @@ LLBC_String LLBC_LogFileAppender::BuildLogFilePath(sint64 now) const
         localtime_r(&nowInSecs, &timeStruct);
 #endif
 
-        char timeFmtBuf[17];
-        timeFmtBuf[sizeof(timeFmtBuf) - 1] = '\0';
-        const size_t len = strftime(timeFmtBuf, 9, "%y-%m-%d", &timeStruct);
+        char timeFmtBuf[16];
+        timeFmtBuf[0] = '.';
+        const size_t len = strftime(timeFmtBuf + 1,
+                                    sizeof(timeFmtBuf) - 1,
+                                    _fileRollingMode == 
+                                        LLBC_LogRollingMode::HourlyRolling ? "%y%m%d%H" : "%y%m%d",
+                                    &timeStruct);
         if (LIKELY(len > 0))
-        {
-            filePath.append(1, '.');
-            filePath.append(timeFmtBuf, len);
-        }
+            filePath.append(timeFmtBuf, len + 1);
     }
 
     if (!_fileSuffix.empty())

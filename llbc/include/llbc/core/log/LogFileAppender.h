@@ -134,7 +134,7 @@ private:
     LLBC_String _fileSuffix;
 
     int _fileBufferSize;
-    bool _isDailyRolling;
+    int _fileRollingMode;
 
     sint64 _maxFileSize;
     int _maxBackupIndex;

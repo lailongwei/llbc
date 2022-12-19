@@ -28,6 +28,7 @@
 #include "llbc/core/config/Property.h"
 
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogRollingMode.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 
 /*
@@ -62,7 +63,7 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _logCodeFilePath(true)
 , _forceAppLogPath(false)
 , _filePattern()
-, _dailyMode(true)
+, _fileRollingMode(LLBC_LogRollingMode::End)
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)
 , _fileBufferSize(0)
@@ -133,7 +134,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     _logToFile = __LLBC_GetLogCfg("logToFile", LOG_TO_FILE, IsLogToFile, AsLooseBool);
     if (_logToFile)
     {
-        // File log level option.
+        // File log level.
         if (cfg.HasProperty("fileLogLevel"))
             _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
         else if (hasLogLevelCfg)
@@ -141,7 +142,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : _logLevel;
 
-        // Log dir option.
+        // Log dir.
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
@@ -154,7 +155,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         // Force application log path(log file place into application module file dir).
         _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsLooseBool);
 
-        // Log file path option.
+        // Log file path.
         if (cfg.HasProperty("logFile"))
             _logFile = cfg.GetValue("logFile").AsStr().strip();
         if (_logFile.empty())
@@ -169,19 +170,33 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
                 _logFile = LLBC_Directory::AbsPath(_logFile);
         }
 
-        // Other file log options.
+        // Log file suffix.
         _logFileSuffix = __LLBC_GetLogCfg("logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
+        // Log code file path.
         _logCodeFilePath = __LLBC_GetLogCfg("logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
+        // Log file pattern.
         if (cfg.HasProperty("filePattern"))
             _filePattern = cfg.GetValue("filePattern").AsStr().c_str();
         else
             _filePattern = _notConfigUseRoot ? 
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
-        _dailyMode = __LLBC_GetLogCfg("dailyRolling", DAILY_ROLLING, IsDailyRollingMode, AsLooseBool);
+
+        // File rolling mode.
+        if (cfg.HasProperty("fileRollingMode"))
+            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg.GetValue("fileRollingMode").AsStr());
+        else
+            _fileRollingMode = _notConfigUseRoot ? rootCfg->GetFileRollingMode() : LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
+        if (!LLBC_LogRollingMode::IsValid(_fileRollingMode))
+            _fileRollingMode = LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
+
+        // Max file size.
         _maxFileSize = __LLBC_GetLogCfg2("maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);
+        // Max backup index.
         _maxBackupIndex = __LLBC_GetLogCfg2("maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
+        // Lazy create log file.
         _lazyCreateLogFile = __LLBC_GetLogCfg2("lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);
 
+        // File buffer size.
         if (_asyncMode)
             _fileBufferSize = __LLBC_GetLogCfg("fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
     }

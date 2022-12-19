@@ -163,10 +163,10 @@ public:
     bool IsForceAppLogPath() const;
 
     /**
-     * Get daily rolling mode switch(available in file appender).
-     * @return bool - daily rolling mode switch.
+     * Get file rolling mode.
+     * @return bool - file rolling mode.
      */
-    bool IsDailyRollingMode() const;
+    int GetFileRollingMode() const;
 
     /**
      * Get max log file size.
@@ -233,7 +233,7 @@ private:
     bool _logCodeFilePath;
     bool _forceAppLogPath;
     LLBC_String _filePattern;
-    bool _dailyMode;
+    int _fileRollingMode;
     long _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
