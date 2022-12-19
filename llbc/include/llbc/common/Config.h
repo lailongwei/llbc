@@ -137,8 +137,8 @@
 #define LLBC_CFG_LOG_DEFAULT_LOG_CODE_FILE_PATH             false
 // Default file log pattern: time file:line@[Logger Name][Log Level] - Message\n.
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
-// Default is daily rolling mode.
-#define LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING                  1
+// Default file rolling mode: no rolling.
+#define LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE              0
 // Default max log file size.
 #define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
 // Default max backup file index.

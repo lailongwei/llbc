@@ -212,7 +212,7 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
 void LLBC_LoggerManager::UnInitOutput(int logLv, const char *tag, const char *fmt, ...)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
-    const LLBC_String &lvDesc = LLBC_LogLevel::GetLevelDesc(logLv);
+    const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
 
     LLBC_FilePrint(to, "[Log][%s]<%s> ", lvDesc.c_str(), tag ? tag : "");
 

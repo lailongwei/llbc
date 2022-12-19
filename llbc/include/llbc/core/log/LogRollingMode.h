@@ -19,60 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_LOG_LEVEL_H__
-#define __LLBC_LOG_LEVEL_H__
+#ifndef __LLBC_CORE_LOG_LOG_ROLLING_MODE_H__
+#define __LLBC_CORE_LOG_LOG_ROLLING_MODE_H__
 
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The log level class encapsulation.
+ * \brief The log rolling mode enumeration.
  */
-class LLBC_EXPORT LLBC_LogLevel
+struct LLBC_EXPORT LLBC_LogRollingMode
 {
 public:
-    /**
-     * Level value enumeration.
-     */
     enum
     {
         Begin,
 
-        Trace = Begin,
-        Debug,
-        Info,
-        Warn,
-        Error,
-        Fatal,
+        NoRolling = Begin,
+        HourlyRolling,
+        DailyRolling,
 
         End
     };
 
-public:
     /**
-     * Get specific log level string representation.
-     * @param[in] level - log level.
-     * @return const LLBC_String & - level representation.
+     * Get rolling mode string representation.
+     * @param[in] mode - the rolling mode.
+     * @return const LLBC_CString & - the rolling mode string representation.
      */
-    static const LLBC_CString &GetLevelStr(int level);
-
-public:
-    /**
-     * Get specific log level by level string representation.
-     * @param[in] levelStr - log level representation.
-     * @return int - log level.
-     */
-    static int Str2Level(const LLBC_CString &levelStr);
+    static const LLBC_CString &GetModeStr(int mode);
 
     /**
-     * Check giving log level is legal or not.
-     * @param[in] level - the given log level.
-     * @return bool - return if log level is legal, otherwise return false.
+     * Get rolling mode by rolling mode string.
+     * @param[in] modeStr - the rolling mode string.
+     * @return int - the rolling mode.
      */
-    static bool IsLegal(int level);
+    static int Str2Mode(const LLBC_CString &modeStr);
+
+    /**
+     * Check given rolling mode is validate or not.
+     * @param[in] mode - the rolling mode.
+     */
+    static bool IsValid(int mode);
 };
 
 __LLBC_NS_END
 
-#endif // !__LLBC_LOG_LEVEL_H__
+#endif // !__LLBC_CORE_LOG_LOG_ROLLING_MODE_H__

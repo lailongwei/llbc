@@ -171,12 +171,12 @@ namespace llbc
         }
 
         /// <summary>
-        /// Logger default daily-rolling mode option.
+        /// Logger default file rolling mode option.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool logDefaultEnabledDailyMode
+        public static int logDefaultEnabledDailyMode
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_IsDefaultEnabledDailyRolling() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Log_DefaultFileRollingMode(); }
         }
 
         /// <summary>

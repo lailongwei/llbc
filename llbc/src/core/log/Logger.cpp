@@ -122,7 +122,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         appenderInitInfo.pattern = _config->GetFilePattern();
         appenderInitInfo.filePath = _config->GetLogFile();
         appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
-        appenderInitInfo.dailyRolling = _config->IsDailyRollingMode();
+        appenderInitInfo.fileRollingMode = _config->GetFileRollingMode();
         appenderInitInfo.maxFileSize = _config->GetMaxFileSize();
         appenderInitInfo.maxBackupIndex = _config->GetMaxBackupIndex();
         appenderInitInfo.lazyCreateLogFile = _config->IsLazyCreateLogFile();

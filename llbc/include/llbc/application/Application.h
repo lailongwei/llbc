@@ -322,7 +322,7 @@ public:
      * @param[in] name - service name.
      * @return LLBC_Service * - service.
      */
-    LLBC_Service *GetService(const LLBC_String &name) const;
+    LLBC_Service *GetService(const LLBC_CString &name) const;
 
     /**
      * Stop service by service Id.
@@ -337,7 +337,7 @@ public:
      * @param[in] del  - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(const LLBC_String &name, bool del = true);
+    int StopService(const LLBC_CString &name, bool del = true);
 
 private:
     /**

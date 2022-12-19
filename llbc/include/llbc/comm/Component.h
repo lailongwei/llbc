@@ -370,12 +370,10 @@ public:
     /**
      * Add component method.
      * @param[in] methName  - the method name.
-     * @param[in] comp      - the component object.
-     * @param[in] meth      - the method pointer.
+     * @param[in] meth      - the component method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename Component>
-    int AddMethod(const LLBC_CString &methName, Component *comp, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    int AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth);
 
 public:
     /**
@@ -495,7 +493,15 @@ public:
     const LLBC_ComponentMethods &GetAllMethods() const;
 
     /**
-     * Add component method.
+     * Add component method(delegate method).
+     * @param[in] methName - the method name.
+     * @param[in] meth     - the method.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth);
+
+    /**
+     * Add component method(component's member).
      * @param[in] methName - the method name.
      * @param[in] meth     - the method.
      * @return int - return 0 if success, otherwise return -1.

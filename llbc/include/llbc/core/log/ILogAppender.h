@@ -69,7 +69,7 @@ struct LLBC_LogAppenderInitInfo
 
     LLBC_String filePath;           // log file path, used in File type appender.
     LLBC_String fileSuffix;         // log file suffix name, used in File type appender.
-    bool dailyRolling;              // daily rolling mode flag, used in File type appender.
+    int fileRollingMode;            // file rolling mode flag, used in File type appender.
     long maxFileSize;               // max log file size, int bytes, used in File type appender.
     int maxBackupIndex;             // max backup index, used in File type appender.
     int fileBufferSize;             // file buffer size, used in File type appender.

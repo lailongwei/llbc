@@ -39,8 +39,19 @@ inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(int id)
     return it != _id2Services.end() ? it->second : nullptr;
 }
 
-inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_String &name)
+inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_CString &name)
 {
+    if (_serviceList.size() < 30)
+    {
+        std::vector<LLBC_Service *>::iterator it = std::find_if(
+            _serviceList.begin(), _serviceList.end(), [name](LLBC_Service *const &svc)
+        {
+            return name == svc->GetName();
+        });
+
+        return it != _serviceList.end() ? *it : nullptr;
+    }
+
     Name2Services::iterator it = _name2Services.find(name);
     return it != _name2Services.end() ? it->second : nullptr;
 }

@@ -44,7 +44,7 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("  Log default log to file: {0}", LibConfig.logDefaultLogToFile);
         Console.WriteLine("  Log default file log pattern: {0}", LibConfig.logDefaultFileLogPattern);
         Console.WriteLine("  Log default lazy create log file: {0}", LibConfig.lazyCreateLogFile);
-        Console.WriteLine("  Log default enabled daily-rolling mode: {0}", LibConfig.logDefaultEnabledDailyMode);
+        Console.WriteLine("  Log default file rolling mode: {0}", LibConfig.logDefaultEnabledDailyMode);
         Console.WriteLine("  Log default max log file size(in bytes): {0}", LibConfig.logDefaultMaxFileSize);
         Console.WriteLine("  Log default max backup index: {0}", LibConfig.logDefaultMaxBackupIndex);
         Console.WriteLine("  Log default log file buffer size(in bytes): {0}", LibConfig.logDefaultLogFileBufferSize);

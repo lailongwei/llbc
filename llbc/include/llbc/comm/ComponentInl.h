@@ -61,8 +61,7 @@ inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const LLBC_C
     return nullMeth;
 }
 
-template <typename Component>
-int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, Component *comp, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+inline int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth)
 {
     if (UNLIKELY(methName.empty()))
     {
@@ -70,14 +69,13 @@ int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, Component *co
         return LLBC_FAILED;
     }
 
-    const LLBC_ComponentMethod compMeth(comp, meth);
-    if (UNLIKELY(!_meths.emplace(methName, compMeth).second))
+    if (UNLIKELY(!_meths.emplace(methName, meth).second))
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
-    _methList.emplace_back(methName, compMeth);
+    _methList.emplace_back(methName, meth);
 
     return LLBC_OK;
 }
@@ -172,13 +170,18 @@ inline const LLBC_ComponentMethods &LLBC_Component::GetAllMethods() const
     return LIKELY(_meths) ? *_meths : emptyMethods;
 }
 
-template <typename Component>
-int LLBC_Component::AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+inline int LLBC_Component::AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth)
 {
     if (UNLIKELY(!_meths))
         _meths = new LLBC_ComponentMethods;
 
-    return _meths->AddMethod<Component>(methName, dynamic_cast<Component *>(this), meth);
+    return _meths->AddMethod(methName, meth);
+}
+
+template <typename Component>
+int LLBC_Component::AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+{
+    return AddMethod(methName, LLBC_ComponentMethod(dynamic_cast<Component *>(this), meth));
 }
 
 inline int LLBC_Component::CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret)

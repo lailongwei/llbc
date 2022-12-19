@@ -57,7 +57,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultLogToFile();
 // LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen);
 // LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultEnabledDailyRolling();
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultFileRollingMode();
 // LLBC_CFG_LOG_MAX_FILE_SIZE
 LLBC_EXTERN_C CSLLBC_EXPORT sint64 csllbc_LibConfig_Log_MaxFileSize();
 // LLBC_CFG_LOG_MAX_BACKUP_INDEX
