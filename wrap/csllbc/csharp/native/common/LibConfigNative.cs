@@ -66,7 +66,7 @@ namespace llbc
         public extern static int csllbc_LibConfig_Log_DefaultFileLogPattern(long pattern, int patternLen);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Log_IsDefaultEnabledDailyRolling();
+        public extern static int csllbc_LibConfig_Log_DefaultFileRollingMode();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static long csllbc_LibConfig_Log_MaxFileSize();
