@@ -33,10 +33,6 @@ namespace
 __LLBC_NS_BEGIN
 
 LLBC_ServiceMgr::LLBC_ServiceMgr()
-: _lock()
-
-, _id2Services()
-, _name2Services()
 {
 }
 
@@ -51,7 +47,7 @@ LLBC_Service *LLBC_ServiceMgr::GetService(int id)
     return GetServiceNonLock(id);
 }
 
-LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_String &name)
+LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_CString &name)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(name);
@@ -75,7 +71,7 @@ int LLBC_ServiceMgr::Stop(int id, bool del)
     return Stop(svc, del);
 }
 
-int LLBC_ServiceMgr::Stop(const LLBC_String &name, bool del)
+int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
 {
     // Lock.
     _lock.Lock();
@@ -177,6 +173,8 @@ bool LLBC_ServiceMgr::InTls(const Name2Services &svcs)
 void LLBC_ServiceMgr::OnServiceStart(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
+
+    _serviceList.push_back(svc);
     _id2Services.insert(std::make_pair(svc->GetId(), svc));
     _name2Services.insert(std::make_pair(svc->GetName(), svc));
 }
@@ -184,6 +182,9 @@ void LLBC_ServiceMgr::OnServiceStart(LLBC_Service *svc)
 void LLBC_ServiceMgr::OnServiceStop(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
+
+    _serviceList.erase(
+        std::find(_serviceList.begin(), _serviceList.end(), svc));
     _id2Services.erase(svc->GetId());
     _name2Services.erase(svc->GetName());
 }

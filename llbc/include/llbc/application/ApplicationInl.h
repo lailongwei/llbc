@@ -134,7 +134,7 @@ inline LLBC_Service *LLBC_Application::GetService(int id) const
     return _services.GetService(id);
 }
 
-inline LLBC_Service *LLBC_Application::GetService(const LLBC_String &name) const
+inline LLBC_Service *LLBC_Application::GetService(const LLBC_CString &name) const
 {
     return _services.GetService(name);
 }
@@ -144,7 +144,7 @@ inline int LLBC_Application::StopService(int id, bool del)
     return _services.Stop(id, del);
 }
 
-inline int LLBC_Application::StopService(const LLBC_String &name, bool del)
+inline int LLBC_Application::StopService(const LLBC_CString &name, bool del)
 {
     return _services.Stop(name, del);
 }
