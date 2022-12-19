@@ -27,7 +27,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_String __level2StrDesc[LLBC_NS LLBC_LogLevel::End + 1] =
+static const LLBC_NS LLBC_CString __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1] =
 {
     "TRACE",
     "DEBUG",
@@ -43,31 +43,29 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-const LLBC_String &LLBC_LogLevel::GetLevelDesc(int level)
+const LLBC_CString &LLBC_LogLevel::GetLevelStr(int level)
 {
     return ((level >= LLBC_LogLevel::Begin && level < LLBC_LogLevel::End) ?
-        LLBC_INTERNAL_NS __level2StrDesc[level] : LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::End]);
+        LLBC_INTERNAL_NS __level2StrRepr[level] : LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::End]);
 }
 
-int LLBC_LogLevel::Str2Level(const char *level)
+int LLBC_LogLevel::Str2Level(const LLBC_CString &levelStr)
 {
-    if (UNLIKELY(!level))
-    {
+    if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;
-    }
 
-    const LLBC_String upperStr = LLBC_ToUpper(level);
-    if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Trace])
+    const LLBC_String upperStr = LLBC_ToUpper(levelStr.str());
+    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
         return LLBC_LogLevel::Trace;
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Debug])
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
         return LLBC_LogLevel::Debug;
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Info])
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Info] == upperStr)
         return LLBC_LogLevel::Info;
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Warn])
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Warn] == upperStr)
         return LLBC_LogLevel::Warn;
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Error])
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Error] == upperStr)
         return LLBC_LogLevel::Error;
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Fatal])
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Fatal] == upperStr)
         return LLBC_LogLevel::Fatal;
 
     return LLBC_LogLevel::End;

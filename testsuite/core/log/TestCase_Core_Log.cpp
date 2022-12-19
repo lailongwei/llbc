@@ -299,6 +299,6 @@ void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
                    logData->logger->GetLoggerName().c_str(),
-                   LLBC_LogLevel::GetLevelDesc(logData->level).c_str());
+                   LLBC_LogLevel::GetLevelStr(logData->level).c_str());
 }
 
