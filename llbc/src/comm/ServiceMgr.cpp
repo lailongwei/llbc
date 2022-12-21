@@ -55,9 +55,8 @@ LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_CString &name)
 
 int LLBC_ServiceMgr::Stop(int id, bool del)
 {
-    // Lock.
-    _lock.Lock();
     // Find service.
+    _lock.Lock();
     LLBC_Service *svc = GetServiceNonLock(id);
     if (!svc)
     {
@@ -66,6 +65,7 @@ int LLBC_ServiceMgr::Stop(int id, bool del)
 
         return LLBC_FAILED;
     }
+    _lock.Unlock();
 
     // Exec service stop.
     return Stop(svc, del);
@@ -73,9 +73,8 @@ int LLBC_ServiceMgr::Stop(int id, bool del)
 
 int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
 {
-    // Lock.
-    _lock.Lock();
     // Find service.
+    _lock.Lock();
     LLBC_Service *svc = GetServiceNonLock(name);
     if (!svc)
     {
@@ -84,6 +83,7 @@ int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
 
         return LLBC_FAILED;
     }
+    _lock.Unlock();
 
     // Exec service stop.
     return Stop(svc, del);
@@ -93,14 +93,6 @@ int LLBC_ServiceMgr::StopAll(bool del)
 {
     // Fetch all services.
     _lock.Lock();
-    if (InTls(_id2Services))
-    {
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_PERM);
-
-        return LLBC_FAILED;
-    }
-
     Id2Services svcs = _id2Services;
     _lock.Unlock();
 
@@ -115,19 +107,6 @@ int LLBC_ServiceMgr::StopAll(bool del)
 
 int LLBC_ServiceMgr::Stop(LLBC_Service *svc, bool del)
 {
-    // Not allow call in service self thread.
-    if (InTls(svc))
-    {
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_PERM);
-
-        return LLBC_FAILED;
-    }
-
-    // Unlock.
-    _lock.Unlock();
-
-    // Stop service.
     svc->Stop();
     if (del)
         delete svc;
