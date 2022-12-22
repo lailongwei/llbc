@@ -252,22 +252,28 @@ static int __catchSignals[] LLBC_CFG_OS_HOOK_CRASH_SINGLES;
 
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
+static void __ReRaiseSig(int sig)
+{
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+
 static void __NonWin32CrashHandler(int sig)
 {
     // Get executable file path.
     ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, PATH_MAX);
-    LLBC_DoIf(readLinkRet == -1, exit(1));
+    LLBC_DoIf(readLinkRet == -1, __ReRaiseSig(sig));
 
     __exeFilePath[readLinkRet] = '\0';
     const char *exeFileName = basename(__exeFilePath);
-    LLBC_DoIf(!exeFileName, exit(1));
+    LLBC_DoIf(!exeFileName, __ReRaiseSig(sig));
 
     // Get core pattern.
     auto corePatternFd = open(__corePatternPath, O_RDONLY);
-    LLBC_DoIf(corePatternFd == -1, exit(1));
+    LLBC_DoIf(corePatternFd == -1, __ReRaiseSig(sig));
 
     ssize_t readRet = read(corePatternFd, __corePattern, sizeof(__corePattern) - 1);
-    LLBC_DoIf(readRet == -1, close(corePatternFd); exit(1));
+    LLBC_DoIf(readRet == -1, close(corePatternFd); __ReRaiseSig(sig));
     
     close(corePatternFd);
     __corePattern[readRet] = '\0';
@@ -289,7 +295,7 @@ static void __NonWin32CrashHandler(int sig)
                           exeFileName,
                           pid,
                           now);
-    LLBC_DoIf(fmtRet < 0, exit(1));
+    LLBC_DoIf(fmtRet < 0, __ReRaiseSig(sig));
 
     system(__shellCmd);
 
@@ -301,10 +307,10 @@ static void __NonWin32CrashHandler(int sig)
                       exeFileName,
                       pid,
                       now);
-    LLBC_DoIf(fmtRet < 0, exit(1));
+    LLBC_DoIf(fmtRet < 0, __ReRaiseSig(sig));
 
     int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-    LLBC_DoIf(coreDescFileFd == -1, exit(1));
+    LLBC_DoIf(coreDescFileFd == -1, __ReRaiseSig(sig));
 
     char descFileHead[128];
     fmtRet = snprintf(descFileHead,
@@ -338,8 +344,7 @@ static void __NonWin32CrashHandler(int sig)
     LLBC_LoggerManagerSingleton->Finalize();
 
     // Reraise signal.
-    signal(sig, SIG_DFL);
-    raise(sig);
+    __ReRaiseSig(sig);
 }
 
 __LLBC_INTERNAL_NS_END
