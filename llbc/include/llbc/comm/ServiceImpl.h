@@ -576,7 +576,7 @@ private:
      * Timer-Scheduler operation methods.
      */
     void InitTimerScheduler();
-    void UpdateTimers();
+    void UpdateTimerScheduler();
     void ClearHoldedTimerScheduler();
 
     /**

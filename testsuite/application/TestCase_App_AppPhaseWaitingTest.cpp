@@ -135,6 +135,86 @@ class TestCompA : public TestCompBase
 class TestCompB : public TestCompBase
 {};
 
+class TestCompC : public TestCompBase
+{};
+
+class PreAddTestComp : public LLBC_Component
+{
+    class TestEvIds
+    {
+    public:
+        enum
+        {
+            Begin = 1,
+            Ev1 = Begin,
+            Ev2,
+
+            End,
+        };
+    };
+
+public:
+    virtual bool OnInitialize(bool &finished)
+    {
+        _timer.SetTimeoutHandler(this, &PreAddTestComp::OnTimeout);
+        return true;
+    }
+
+    virtual void OnDestroy(bool &finished)
+    {
+        _timer.SetTimeoutHandler(nullptr);
+    }
+
+    virtual bool OnStart(bool &finished)
+    {
+        LLBC_Service *svc = GetService();
+        svc->SubscribeEvent(TestEvIds::Ev1, [](LLBC_Event &ev)
+        {
+            LLBC_PrintLine("%s, Ev1 handler called, ev[\"val\"]:%s",
+                           LLBC_GetTypeName(PreAddTestComp),
+                           ev["val"].ToString().c_str());
+        });
+
+        svc->SubscribeEvent(TestEvIds::Ev2, [](LLBC_Event &ev)
+        {
+            LLBC_PrintLine("%s, Ev2 handler called, ev[\"val\"]:%s",
+                           LLBC_GetTypeName(PreAddTestComp),
+                           ev["val"].ToString().c_str());
+        });
+
+        _timer.Schedule(LLBC_TimeSpan::FromSeconds(5));
+
+        LLBC_PrintLine("%s: OnStart", LLBC_GetTypeName(PreAddTestComp));
+
+        return true;
+    }
+
+    virtual void OnStop(bool &finshed)
+    {
+        LLBC_PrintLine("%s: OnStop", LLBC_GetTypeName(PreAddTestComp));
+
+        _timer.Cancel();
+
+        LLBC_Service *svc = GetService();
+        svc->UnsubscribeEvent(TestEvIds::Ev1);
+        svc->UnsubscribeEvent(TestEvIds::Ev2);
+    }
+
+private:
+    void OnTimeout(LLBC_Timer *timer)
+    {
+        LLBC_PrintLine("%s: timeout, timer can working....", LLBC_GetTypeName(PreAddTestComp));
+
+        const int evId = LLBC_Rand(TestEvIds::Begin, TestEvIds::End);
+        LLBC_Event *ev = new LLBC_Event(evId);
+        (*ev)["val"] = LLBC_String().format("Event id is:%d", evId);
+        GetService()->FireEvent(ev);
+    }
+
+private:
+    LLBC_Timer _timer;
+};
+
 class TestApp : public LLBC_Application
 {
 public:
@@ -153,8 +233,10 @@ public:
         if (startFinished)
         {
             auto testSvc = LLBC_Service::Create();
+            testSvc->AddComponent(new PreAddTestComp);
             testSvc->AddComponent(new TestCompA);
             testSvc->AddComponent(new TestCompB);
+            testSvc->AddComponent(new TestCompC);
 
             testSvc->Start();
         }

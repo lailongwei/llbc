@@ -314,11 +314,6 @@ inline int LLBC_Service::SubscribeStatus(int opcode, int status, ObjType *obj, v
 }
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
-inline LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, void(*func)(LLBC_Event &))
-{
-    return SubscribeEvent(event, LLBC_Delegate<void(LLBC_Event &)>(func));
-}
-
 template <typename ObjType>
 inline LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &))
 {
