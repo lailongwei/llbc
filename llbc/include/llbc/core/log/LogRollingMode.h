@@ -19,25 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef __LLBC_CORE_LOG_LOG_ROLLING_MODE_H__
+#define __LLBC_CORE_LOG_LOG_ROLLING_MODE_H__
 
-#include "llbc/common/Export.h"
-
-#include "llbc/comm/Comm.h"
+#include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
 
-int __LLBC_CommStartup()
+/**
+ * \brief The log rolling mode enumeration.
+ */
+struct LLBC_EXPORT LLBC_LogRollingMode
 {
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Coder>());
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Packet>());
+public:
+    enum
+    {
+        Begin,
 
-    return LLBC_OK;
-}
+        NoRolling = Begin,
+        HourlyRolling,
+        DailyRolling,
 
-void __LLBC_CommCleanup()
-{
-    LLBC_ServiceMgrSingleton->StopAll();
-}
+        End
+    };
+
+    /**
+     * Get rolling mode string representation.
+     * @param[in] mode - the rolling mode.
+     * @return const LLBC_CString & - the rolling mode string representation.
+     */
+    static const LLBC_CString &GetModeStr(int mode);
+
+    /**
+     * Get rolling mode by rolling mode string.
+     * @param[in] modeStr - the rolling mode string.
+     * @return int - the rolling mode.
+     */
+    static int Str2Mode(const LLBC_CString &modeStr);
+
+    /**
+     * Check given rolling mode is validate or not.
+     * @param[in] mode - the rolling mode.
+     */
+    static bool IsValid(int mode);
+};
 
 __LLBC_NS_END
+
+#endif // !__LLBC_CORE_LOG_LOG_ROLLING_MODE_H__

@@ -94,7 +94,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default log to file: %s\n", (LLBC_CFG_LOG_DEFAULT_LOG_TO_FILE) ? "true" : "false");
     desc.append_format("    default log file name: <same with logger name>\n");
     desc.append_format("    default file log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
-    desc.append_format("    default daily mode enabled(available in file log): %s\n", (LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING) ? "true" : "false");
+    desc.append_format("    default file rolling mode: %d\n", LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE);
     desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);
     desc.append_format("    default max backup index: %d\n", LLBC_CFG_LOG_MAX_BACKUP_INDEX);
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);

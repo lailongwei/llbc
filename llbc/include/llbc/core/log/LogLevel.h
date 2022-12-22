@@ -51,19 +51,19 @@ public:
 
 public:
     /**
-     * Get specific log level string describe.
+     * Get specific log level string representation.
      * @param[in] level - log level.
-     * @return const LLBC_String & - level describe.
+     * @return const LLBC_String & - level representation.
      */
-    static const LLBC_String &GetLevelDesc(int level);
+    static const LLBC_CString &GetLevelStr(int level);
 
 public:
     /**
-     * Get specific log level by describe.
-     * @param[in] str - log level describe.
+     * Get specific log level by level string representation.
+     * @param[in] levelStr - log level representation.
      * @return int - log level.
      */
-    static int Str2Level(const char *str);
+    static int Str2Level(const LLBC_CString &levelStr);
 
     /**
      * Check giving log level is legal or not.

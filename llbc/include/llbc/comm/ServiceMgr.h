@@ -45,7 +45,7 @@ class LLBC_EXPORT LLBC_ServiceMgr
 {
 public:
     typedef std::map<int, LLBC_Service *> Id2Services;
-    typedef std::map<LLBC_String, LLBC_Service *> Name2Services;
+    typedef std::map<LLBC_CString, LLBC_Service *> Name2Services;
 
 public:
     /**
@@ -67,7 +67,7 @@ public:
      * @param[in] name - the service name.
      * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_Service *GetService(const LLBC_String &name);
+    LLBC_Service *GetService(const LLBC_CString &name);
 
 public:
     /**
@@ -90,7 +90,7 @@ public:
      * @param[in] del  - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop(const LLBC_String &name, bool del = true);
+    int Stop(const LLBC_CString &name, bool del = true);
 
     /**
      * Stop all services.
@@ -140,18 +140,18 @@ private:
     int Stop(LLBC_Service *svc, bool del);
 
     LLBC_Service *GetServiceNonLock(int id);
-    LLBC_Service *GetServiceNonLock(const LLBC_String &name);
+    LLBC_Service *GetServiceNonLock(const LLBC_CString &name);
 
     static bool InTls(const LLBC_Service *svc);
     static bool InTls(const Id2Services &svcs);
-    typedef std::map<LLBC_String, LLBC_Service *> _Services2;
-    static bool InTls(const _Services2 &svcs);
+    static bool InTls(const Name2Services &svcs);
 
 private:
     LLBC_SpinLock _lock;
 
+    std::vector<LLBC_Service *> _serviceList;
     Id2Services _id2Services;
-    _Services2 _name2Services;
+    Name2Services _name2Services;
 };
 
 /**

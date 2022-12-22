@@ -108,9 +108,9 @@ inline bool LLBC_LoggerConfigInfo::IsForceAppLogPath() const
     return _forceAppLogPath;
 }
 
-inline bool LLBC_LoggerConfigInfo::IsDailyRollingMode() const
+inline int LLBC_LoggerConfigInfo::GetFileRollingMode() const
 {
-    return _dailyMode;
+    return _fileRollingMode;
 }
 
 inline long LLBC_LoggerConfigInfo::GetMaxFileSize() const

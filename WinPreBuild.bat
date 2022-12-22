@@ -25,7 +25,7 @@ if errorlevel 1 (
 ) else (
     echo Succcess to generate Visual Studio solution and project files
     echo Solution file path: build/%choose%/llbc_%choose%.sln
-   if "%1"=="" (
+    if "%1"=="" (
         explorer ..\..\build\%choose%
     )
     if "%1"=="1" (

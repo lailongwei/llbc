@@ -1099,7 +1099,7 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
 
     // Update all components.
     UpdateComps();
-    UpdateTimers();
+    UpdateTimerScheduler();
     UpdateAutoReleasePool();
 
     // Handle frame-tasks.
@@ -1581,7 +1581,11 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         // Dispatch session-create event to all comps.
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-            caredComps[compIdx]->OnSessionCreate(info);
+        {
+            LLBC_Component *&comp = caredComps[compIdx];
+            if (LIKELY(comp->_started))
+                comp->OnSessionCreate(info);
+        }
     }
 }
 
@@ -1615,7 +1619,11 @@ void LLBC_ServiceImpl::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         // Dispatch session-destroy event to all comps.
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-             caredComps[compIdx]->OnSessionDestroy(destroyInfo);
+        {
+            LLBC_Component *&comp = caredComps[compIdx];
+            if (LIKELY(comp->_started))
+                comp->OnSessionDestroy(destroyInfo);
+        }
     }
 
     // Remove session protocol factory.
@@ -1641,7 +1649,11 @@ void LLBC_ServiceImpl::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
 
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-             caredComps[compIdx]->OnAsyncConnResult(result);
+        {
+            LLBC_Component *&comp = caredComps[compIdx];
+            if (LIKELY(comp->_started))
+                comp->OnAsyncConnResult(result);
+        }
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1768,7 +1780,11 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             const size_t compsSize = caredComps.size();
             for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-                 caredComps[compIdx]->OnUnHandledPacket(*packet);
+            {
+                LLBC_Component *&comp = caredComps[compIdx];
+                if (LIKELY(comp->_started))
+                    comp->OnUnHandledPacket(*packet);
+            }
         }
     }
 
@@ -1793,7 +1809,11 @@ void LLBC_ServiceImpl::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
 
         const size_t compsSize = caredComps.size();
         for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-             caredComps[compIdx]->OnProtoReport(report);
+        {
+            LLBC_Component *&comp = caredComps[compIdx];
+            if (LIKELY(comp->_started))
+                comp->OnProtoReport(report);
+        }
     }
 }
 
@@ -1846,12 +1866,18 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
     if (ev.earlyStart)
     {
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStart])
-            comp->OnApplicationEarlyStart();
+        {
+            if (LIKELY(comp->_started))
+                comp->OnApplicationEarlyStart();
+        }
     }
     else if (ev.startFail)
     {
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFail])
-            comp->OnApplicationStartFail();
+        {
+            if (LIKELY(comp->_started))
+                comp->OnApplicationStartFail();
+        }
     }
     else if (ev.startFinish)
     {
@@ -1859,12 +1885,18 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
             UpdateServiceCfg();
 
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFinish])
-            comp->OnApplicationStartFinish();
+        {
+            if (LIKELY(comp->_started))
+                comp->OnApplicationStartFinish();
+        }
     }
     else if (ev.earlyStop)
     {
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStop])
-            comp->OnApplicationEarlyStop();
+        {
+            if (LIKELY(comp->_started))
+                comp->OnApplicationEarlyStop();
+        }
     }
 }
 
@@ -1884,7 +1916,11 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
     // Dispatch application config reloaded event to all comps.
     const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        caredComps[compIdx]->OnApplicationConfigReload();
+    {
+        LLBC_Component *&comp = caredComps[compIdx];
+        if (LIKELY(comp->_started))
+            comp->OnApplicationConfigReload();
+    }
 }
 
 int LLBC_ServiceImpl::InitComps()
@@ -1951,17 +1987,6 @@ int LLBC_ServiceImpl::InitComps()
 
 int LLBC_ServiceImpl::StartComps()
 {
-    // Define started comps update lambda.
-    auto updateStartedComps = [this](size_t toCompIdx) {
-        for (size_t upCompIdx = 0; upCompIdx < toCompIdx; ++upCompIdx)
-        {
-            auto &upComp = _compList[upCompIdx];
-            if (upComp->_started &&
-                upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
-                upComp->OnUpdate();
-        }
-    };
-
     _compsStartRet = LLBC_ERROR_SUCCESS;
 
     // Call comps OnStart() event method.
@@ -1996,7 +2021,7 @@ int LLBC_ServiceImpl::StartComps()
                 break;
             }
 
-            updateStartedComps(compIdx);
+            OnSvc(false);
             LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         }
 
@@ -2006,6 +2031,7 @@ int LLBC_ServiceImpl::StartComps()
     }
 
     // If all comps start finished, call comps OnLateStart() event method.
+    // TODO: will remove async-waiting for Late-Start finish design in the future.
     if (compIdx == compsSize)
     {
         for (compIdx = 0; compIdx != compsSize; ++compIdx)
@@ -2020,7 +2046,7 @@ int LLBC_ServiceImpl::StartComps()
                     if (lateStartFinish)
                         break;
 
-                    updateStartedComps(compIdx);
+                    OnSvc(false);
                     LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
                 }
             }
@@ -2040,18 +2066,8 @@ int LLBC_ServiceImpl::StartComps()
 
 void LLBC_ServiceImpl::StopComps()
 {
-    // Define started comps update lambda.
-    auto updateStartedComps = [this](int toCompIdx) {
-        for (int upCompIdx = 0; upCompIdx < toCompIdx; ++upCompIdx)
-        {
-            auto &upComp = _compList[upCompIdx];
-            if (upComp->_started &&
-                upComp->IsCaredEvents(LLBC_ComponentEvents::OnUpdate))
-                upComp->OnUpdate();
-        }
-    };
-
     // Call comps OnEarlyStop() event method.
+    // TODO: will remove async-waiting for Early-Stop finish design in the future.
     for (int compIdx = static_cast<int>(_compList.size() - 1); compIdx >= 0; --compIdx)
     {
         auto &comp = _compList[compIdx];
@@ -2066,7 +2082,7 @@ void LLBC_ServiceImpl::StopComps()
             if (earlyStopFinish)
                 break;
 
-            updateStartedComps(compIdx);
+            OnSvc(false);
             LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
         }
     }
@@ -2087,7 +2103,7 @@ void LLBC_ServiceImpl::StopComps()
                 if (stopFinished)
                     break;
 
-                updateStartedComps(compIdx);
+                OnSvc(false);
                 LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
             }
         }
@@ -2104,7 +2120,11 @@ void LLBC_ServiceImpl::UpdateComps()
 
     const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        caredComps[compIdx]->OnUpdate();
+    {
+        LLBC_Component *&comp = caredComps[compIdx];
+        if (LIKELY(comp->_started))
+            comp->OnUpdate();
+    }
 }
 
 void LLBC_ServiceImpl::DestroyComps()
@@ -2275,7 +2295,7 @@ void LLBC_ServiceImpl::InitTimerScheduler()
     }
 }
 
-void LLBC_ServiceImpl::UpdateTimers()
+void LLBC_ServiceImpl::UpdateTimerScheduler()
 {
     _timerScheduler->Update();
 }
@@ -2291,10 +2311,10 @@ void LLBC_ServiceImpl::ClearHoldedTimerScheduler()
 
 void LLBC_ServiceImpl::ProcessIdle()
 {
-    auto &comps = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
-    LLBC_ReturnIf(comps.empty(), void());
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
+    LLBC_ReturnIf(caredComps.empty(), void());
 
-    const size_t compsSize = comps.size();
+    const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
         sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
@@ -2303,7 +2323,9 @@ void LLBC_ServiceImpl::ProcessIdle()
             if (elapsed >= _frameInterval)
                 break;
 
-            comps[compIdx]->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
+            LLBC_Component *&comp = caredComps[compIdx];
+            if (LIKELY(comp->_started))
+                comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
         }
     }
 }

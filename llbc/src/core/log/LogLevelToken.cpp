@@ -51,7 +51,9 @@ int LLBC_LogLevelToken::GetType() const
 void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     const int index = static_cast<int>(formattedData.size());
-    formattedData.append(LLBC_LogLevel::GetLevelDesc(data.level));
+
+    const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level);
+    formattedData.append(lvStr.c_str(), lvStr.size());
 
     GetFormatter()->Format(formattedData, index);
 }

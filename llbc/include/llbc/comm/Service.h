@@ -496,7 +496,6 @@ public:
     /**
      * Subscribe event to specified handler method.
      */
-    LLBC_ListenerStub SubscribeEvent(int event, void(*func)(LLBC_Event &));
     template <typename ObjType>
     LLBC_ListenerStub SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &));
 

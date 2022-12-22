@@ -162,6 +162,15 @@ public:
      * Get const string.
      * @return const_pointer - the const string.
      */
+    const_pointer c_str() const
+    {
+        return _cstr;
+    }
+
+    /**
+     * Get const string.
+     * @return const_pointer - the const string.
+     */
     const_pointer data() const
     {
         return _cstr;
