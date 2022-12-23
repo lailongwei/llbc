@@ -51,7 +51,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_IObjectPoolInst
 {
 public:
-    LLBC_IObjectPoolInst(LLBC_IObjectPool *objPool);
+    explicit LLBC_IObjectPoolInst(LLBC_IObjectPool *objPool);
     virtual ~LLBC_IObjectPoolInst() {  }
 
 public:

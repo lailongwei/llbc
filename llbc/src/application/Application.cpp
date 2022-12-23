@@ -106,7 +106,7 @@ int LLBC_Application::SetConfigPath(const LLBC_String &cfgPath)
     // Get config type.
     const auto ext = LLBC_Directory::SplitExt(cfgPath)[1];
     const auto cfgType = LLBC_ApplicationConfigType::GetConfigType(ext);
-    LLBC_SetErrAndReturnIf(cfgType < LLBC_ApplicationConfigType::Begin || 
+    LLBC_SetErrAndReturnIf(cfgType < LLBC_ApplicationConfigType::Begin ||
                                 cfgType >= LLBC_ApplicationConfigType::End,
                            LLBC_ERROR_NOT_SUPPORT,
                            LLBC_FAILED);
@@ -189,7 +189,7 @@ int LLBC_Application::Start(int argc, char *argv[], const LLBC_String &name)
         _name = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
 
     // Define app start failed defer.
-    LLBC_Defer(if (ret != LLBC_OK) { 
+    LLBC_Defer(if (ret != LLBC_OK) {
         _cfgPath.clear();
         _cfgType = LLBC_ApplicationConfigType::End;
         _propCfg.RemoveAllProperties();

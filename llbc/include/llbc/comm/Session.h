@@ -107,7 +107,7 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_Session(const LLBC_SessionOpts &sessionOpts);
+    explicit LLBC_Session(const LLBC_SessionOpts &sessionOpts);
     ~LLBC_Session();
 
 public:

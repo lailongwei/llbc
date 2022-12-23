@@ -127,7 +127,10 @@ protected:
     /**
      * Create new session from socket.
      */
-    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession);
+    LLBC_Session *CreateSession(LLBC_Socket *socket,
+                                int sessionId,
+                                const LLBC_SessionOpts &sessionOpts,
+                                LLBC_Session *acceptSession);
 
 protected:
     /**

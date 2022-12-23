@@ -34,7 +34,7 @@ int LLBC_Entity::AddBehavior(int id, BehaviorType *value, const LLBC_String &nam
         return LLBC_FAILED;
     }
 
-    if (this->IsExistBehavior(id) || 
+    if (this->IsExistBehavior(id) ||
         (!name.empty() && this->IsExistBehavior(name)))
     {
         LLBC_SetLastError(LLBC_ERROR_EXIST);

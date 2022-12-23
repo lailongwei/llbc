@@ -19,45 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_EVENT_EVENT_MANAGER_H__
+#ifndef __LLBC_TEST_CASE_COMM_COMP_REFLECTION_METHOD_H__
+#define __LLBC_TEST_CASE_COMM_COMP_REFLECTION_METHOD_H__
 
-#include "llbc/core/event/Event.h"
+#include "llbc.h"
+using namespace llbc;
 
-__LLBC_NS_BEGIN
-
-template <typename ObjectType>
-LLBC_ListenerStub LLBC_EventManager::AddListener(int id, 
-                                                 ObjectType *obj, 
-                                                 void (ObjectType::*listener)(LLBC_Event &),
-                                                 const LLBC_ListenerStub &boundStub)
+class TestCase_Comm_CompReflectionMethod : public LLBC_BaseTestCase
 {
-    if (!obj || !listener)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return 0;
-    }
+public:
+    TestCase_Comm_CompReflectionMethod() = default;
+    virtual ~TestCase_Comm_CompReflectionMethod() = default;
 
-    return this->AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(obj, listener), boundStub);
-}
+public:
+    virtual int Run(int argc, char *argv[]);
+};
 
-inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
-{
-    if (RemoveListener(stub) != LLBC_OK)
-    {
-        stub = 0;
-        return LLBC_FAILED;
-    }
-
-    stub = 0;
-
-    return LLBC_OK;
-}
-
-inline bool LLBC_EventManager::IsFiring() const
-{
-    return _firing > 0;
-}
-
-__LLBC_NS_END
-
-#endif // __LLBC_CORE_EVENT_EVENT_MANAGER_H__
+#endif // __LLBC_TEST_CASE_COMM_COMP_REFLECTION_METHOD_H__

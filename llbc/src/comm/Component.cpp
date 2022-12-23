@@ -403,7 +403,7 @@ void LLBC_Component::UpdateComponentCfg()
     auto compNamePtr = LLBC_GetTypeName(*this);
     const auto colonPos = strrchr(compNamePtr, ':');
     const LLBC_String compName = colonPos ? colonPos + 1 : compNamePtr;
-    const LLBC_String iCompName = 
+    const LLBC_String iCompName =
         (compName.size() > 1 && compName[0] != 'I') ? LLBC_String("I") + compName : compName;
     if (_cfgType == LLBC_ApplicationConfigType::Property)
     {

@@ -250,7 +250,7 @@ public:
     template <typename _T>
     explicit LLBC_Variant(const _T * const &ptr);
     explicit LLBC_Variant(const sint64 &i64);
-    explicit LLBC_Variant(const uint64 &ui64); 
+    explicit LLBC_Variant(const uint64 &ui64);
     explicit LLBC_Variant(const float &f);
     explicit LLBC_Variant(const double &d);
     explicit LLBC_Variant(const char *str);

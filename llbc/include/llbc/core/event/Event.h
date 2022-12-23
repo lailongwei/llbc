@@ -36,7 +36,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Event : public LLBC_PoolObject
 {
 public:
-    LLBC_Event(int id = 0, bool dontDelAfterFire = false);
+    explicit LLBC_Event(int id = 0, bool dontDelAfterFire = false);
     virtual ~LLBC_Event();
 
 public:

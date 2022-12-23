@@ -79,7 +79,7 @@ void LLBC_VariantUtil::Xml2Variant(const ::llbc::tinyxml2::XMLElement &elem, LLB
         var.BecomeDict();
 
     // Elemment name/value.
-    var[LLBC_XMLKeys::Name] =elem.Name();
+    var[LLBC_XMLKeys::Name] = elem.Name();
     var[LLBC_XMLKeys::Value] = elem.GetText();
 
     // Element attrs.

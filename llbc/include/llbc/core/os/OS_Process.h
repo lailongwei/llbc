@@ -49,7 +49,8 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
  * @return int - return 0 if success, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath = "",
-                                      const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &callback = nullptr);
+                                      const LLBC_Delegate<void(const char *stackBacktrace,
+                                                               int sig)> &callback = nullptr);
 
 __LLBC_NS_END
 

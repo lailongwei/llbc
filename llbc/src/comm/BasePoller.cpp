@@ -289,7 +289,10 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
     }
 }
 
-LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession)
+LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket,
+                                             int sessionId,
+                                             const LLBC_SessionOpts &sessionOpts,
+                                             LLBC_Session *acceptSession)
 {
     if (sessionId == 0)
         sessionId = _pollerMgr->AllocSessionId();

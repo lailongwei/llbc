@@ -44,7 +44,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_ReferencablePoolObj : public LLBC_Object
 {
 public:
-    explicit LLBC_ReferencablePoolObj();
+    LLBC_ReferencablePoolObj();
     virtual ~LLBC_ReferencablePoolObj();
 
 public:

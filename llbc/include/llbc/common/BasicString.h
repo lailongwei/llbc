@@ -34,7 +34,7 @@ __LLBC_NS_BEGIN
 template <typename _Elem,
           typename _Traits = std::char_traits<_Elem>,
           typename _Ax = std::allocator<_Elem> >
-class LLBC_BasicString : public 
+class LLBC_BasicString : public
     std::basic_string<_Elem, _Traits, _Ax>
 {
     static_assert(sizeof(_Elem) <= 2, "LLBC_BasicString not support sizeof(_Elem) > 2 element type!");
@@ -178,7 +178,7 @@ public:
     {
         if (this->empty() || right == 1)
             return *this;
-        
+
         if (right <= 0)
         {
             this->clear();
@@ -374,8 +374,7 @@ public:
         return *this;
     }
 
-    _This &insert(size_type p0, const _This &str, 
-        size_type pos, size_type n)
+    _This &insert(size_type p0, const _This &str, size_type pos, size_type n)
     {
         _Base::insert(p0, str, pos, n);
         return *this;
@@ -432,71 +431,61 @@ public:
     }
 
     // replace operations.
-    _This &replace(size_type p0, size_type n0,
-        const _This &str)
+    _This &replace(size_type p0, size_type n0, const _This &str)
     {
         _Base::replace(p0, n0, str);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _This &str, size_type pos, size_type n)
+    _This &replace(size_type p0, size_type n0, const _This &str, size_type pos, size_type n)
     {
         _Base::replace(p0, n0, str, pos, n);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _Elem *s)
+    _This &replace(size_type p0, size_type n0, const _Elem *s)
     {
         _Base::replace(p0, n0, s);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _Elem *s, size_type n)
+    _This &replace(size_type p0, size_type n0, const _Elem *s, size_type n)
     {
         _Base::replace(p0, n0, s, n);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        size_type n, _Elem c)
+    _This &replace(size_type p0, size_type n0, size_type n, _Elem c)
     {
         _Base::replace(p0, n0, n, c);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _This &str)
+    _This &replace(iterator first0, iterator last0, const _This &str)
     {
         _Base::replace(first0, last0, str);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _Elem *s)
+    _This &replace(iterator first0, iterator last0, const _Elem *s)
     {
         _Base::replace(first0, last0, s);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _Elem *s, size_type n)
+    _This &replace(iterator first0, iterator last0, const _Elem *s, size_type n)
     {
         _Base::replace(first0, last0, s, n);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        size_type n, _Elem c)
+    _This &replace(iterator first0, iterator last0, size_type n, _Elem c)
     {
         _Base::replace(first0, last0, n, c);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const_iterator first, const_iterator last)
+    _This &replace(iterator first0, iterator last0, const_iterator first, const_iterator last)
     {
         _Base::replace(first0, last0, first, last);
         return *this;
@@ -630,20 +619,17 @@ public:
     }
 
     // find operations.
-    size_type find(const _This &str, 
-        size_type pos = 0) const
+    size_type find(const _This &str, size_type pos = 0) const
     {
         return _Base::find(str, pos);
     }
 
-    size_type find(const _Elem *s, 
-        size_type pos, size_type n) const
+    size_type find(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find(s, pos, n);
     }
 
-    size_type find(const _Elem *s,
-        size_type pos = 0) const
+    size_type find(const _Elem *s, size_type pos = 0) const
     {
         return _Base::find(s, pos);
     }
@@ -654,14 +640,12 @@ public:
     }
 
     // Reverse find operations.
-    size_type rfind(const _This &str, 
-        size_type pos = _This::npos) const
+    size_type rfind(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::rfind(str, pos);
     }
 
-    size_type rfind(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type rfind(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::rfind(s, pos, n);
     }
@@ -677,14 +661,12 @@ public:
     }
 
     // find first of operations.
-    size_type find_first_of(const _This &str, 
-        size_type pos = 0) const
+    size_type find_first_of(const _This &str, size_type pos = 0) const
     {
         return _Base::find_first_of(str, pos);
     }
 
-    size_type find_first_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_first_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_first_of(s, pos, n);
     }
@@ -700,14 +682,12 @@ public:
     }
 
     // find last of operations.
-    size_type find_last_of(const _This &str,
-        size_type pos = _This::npos) const
+    size_type find_last_of(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::find_last_of(str, pos);
     }
 
-    size_type find_last_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_last_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_last_of(s, pos, n);
     }
@@ -722,14 +702,12 @@ public:
         return _Base::find_last_of(c, pos);
     }
 
-    size_type find_first_not_of(const _This &str,
-        size_type pos = 0) const
+    size_type find_first_not_of(const _This &str, size_type pos = 0) const
     {
         return _Base::find_first_not_of(str, pos);
     }
 
-    size_type find_first_not_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_first_not_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_first_not_of(s, pos, n);
     }
@@ -744,14 +722,12 @@ public:
         return _Base::find_first_not_of(c, pos);
     }
 
-    size_type find_last_not_of(const _This &str,
-        size_type pos = _This::npos) const
+    size_type find_last_not_of(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::find_last_not_of(str, pos);
     }
 
-    size_type find_last_not_of(const _Elem *s, size_type pos, 
-        size_type n) const
+    size_type find_last_not_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_last_not_of(s, pos, n);
     }
@@ -813,14 +789,12 @@ public:
         return _Base::compare(str);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _This &str)
+    int compare(size_type p0, size_type n0, const _This &str)
     {
         return _Base::compare(p0, n0, str);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _This &str, size_type pos, size_type n) const
+    int compare(size_type p0, size_type n0, const _This &str, size_type pos, size_type n) const
     {
         return _Base::compare(p0, n0, str, pos, n);
     }
@@ -830,14 +804,12 @@ public:
         return _Base::compare(s);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _Elem *s) const
+    int compare(size_type p0, size_type n0, const _Elem *s) const
     {
         return _Base::compare(p0, n0, s);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _Elem *s, size_type pos) const
+    int compare(size_type p0, size_type n0, const _Elem *s, size_type pos) const
     {
         return _Base::compare(p0, n0, s, pos);
     }
@@ -849,8 +821,8 @@ public:
             return -1;
 
         _Elem thisC = this->at(0);
-        return (thisC > c ? 1 : 
-                    (thisC < c ? -1 :  
+        return (thisC > c ? 1 :
+                    (thisC < c ? -1 :
                         (size == 1 ? 0 : 1)));
     }
 
@@ -1006,7 +978,7 @@ public:
         return isdigit(*this);
     }
 
-    // isspace: space[' '], carriage return['\r'], line feed['\n'], form feed['\f'], horizontal tab['\t'], vertical tab['\v']
+    // isspace: space[' '],carriage return['\r'],line feed['\n'],form feed['\f'],horizontal tab['\t'],vertical tab['\v']
     static bool isspace(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
@@ -1057,7 +1029,7 @@ public:
         if (s.empty())
             return true;
 
-        return (this->size() >= s.size() && 
+        return (this->size() >= s.size() &&
             memcmp(s.data(), this->data() + (this->size() - s.size()) * sizeof(_Elem), s.size() * sizeof(_Elem)) == 0);
     }
 
@@ -1161,7 +1133,7 @@ public:
     }
 
 public:
-    // strip operation: strip left. 
+    // strip operation: strip left.
     _This &lstrip(const _This &chars = _This())
     {
         _This willStripChars;
@@ -1395,7 +1367,7 @@ public:
             return;
         }
 
-        charIndex = (charIndex < 0) ? 
+        charIndex = (charIndex < 0) ?
             static_cast<long>(utf8Count) + charIndex : charIndex;
         if (charIndex <= 0 || charIndex >= static_cast<long>(utf8Count))
         {
@@ -1453,8 +1425,8 @@ public:
     {
         if (sizeof(_Elem) != sizeof(char) || _This::size() < 3)
             return false;
-        
-        return (memcmp(reinterpret_cast<const char *>(this->data()), 
+
+        return (memcmp(reinterpret_cast<const char *>(this->data()),
             reinterpret_cast<const char *>("\xef\xbb\xbf"), 3) == 0) ? true : false;
 
     }

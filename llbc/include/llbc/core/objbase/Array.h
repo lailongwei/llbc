@@ -74,10 +74,8 @@ public:
     reference operator *() const
     {   // return designated object.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             return *(_arr + _idx);
-        }
 
         return *(_arr + _idx - 1);
     }
@@ -93,14 +91,10 @@ public:
     iterator &operator ++()
     {   // preincrement.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             ++_idx;
-        }
         else
-        {
             --_idx;
-        }
 
         return *this;
     }
@@ -115,14 +109,10 @@ public:
     iterator &operator --()
     {   // predecrement.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             --_idx;
-        }
         else
-        {
             ++_idx;
-        }
 
         return *this;
     }
@@ -136,14 +126,10 @@ public:
 
     iterator &operator +=(difference_type off)
     {   // increment by integer.
-        if(_Forward)
-        {
+        if (_Forward)
             _idx += off;
-        }
         else
-        {
             _idx -= off;
-        }
 
         _Checkit();
         return *this;
@@ -157,14 +143,10 @@ public:
 
     iterator &operator -=(difference_type off)
     {   // decrement by integer.
-        if(_Forward)
-        {
+        if (_Forward)
             _idx -= off;
-        }
         else
-        {
             _idx += off;
-        }
 
         _Checkit();
         return *this;
@@ -178,10 +160,8 @@ public:
 
     difference_type operator -(const iterator &rhs) const
     {   // return difference of iterators.
-        if(_Forward)
-        {
+        if (_Forward)
             return _idx - rhs._idx;
-        }
 
         return rhs._idx - _idx;
     }
@@ -194,10 +174,8 @@ public:
     bool operator <(const iterator &rhs) const
     {   // test if this < rhs.
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(_arr != rhs._arr))
-        {
+        if (UNLIKELY(_arr != rhs._arr))
             _Xinvarg();
-        }
 #endif
         return _Forward ? _idx < rhs._idx : _idx > rhs._idx;
     }
@@ -205,10 +183,8 @@ public:
     bool operator ==(const iterator &rhs) const
     {   // test for iterator equality.
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(_arr != rhs._arr))
-        {
+        if (UNLIKELY(_arr != rhs._arr))
             _Xinvarg();
-        }
 #endif
         return _idx == rhs._idx;
     }
@@ -260,18 +236,12 @@ protected:
     void _Checkit() const
     {
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(!_arr))
-        {
+        if (UNLIKELY(!_arr))
             _Xnullptr();
-        }
-        if(UNLIKELY(_idx < 0))
-        {
+        if (UNLIKELY(_idx < 0))
             _Xunf();
-        }
-        if(UNLIKELY(_idx == LONG_MAX))
-        {
+        if (UNLIKELY(_idx == LONG_MAX))
             _Xlen();
-        }
 #endif
     }
 

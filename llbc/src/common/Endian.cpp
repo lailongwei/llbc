@@ -46,13 +46,13 @@ __LLBC_NS_BEGIN
 
 bool LLBC_Endian::IsValid(int type)
 {
-    return (type >= LLBC_Endian::BigEndian && 
+    return (type >= LLBC_Endian::BigEndian &&
         type < LLBC_Endian::UnknownEndian) ? true : false;
 }
 
 const char *LLBC_Endian::Type2Str(int type)
 {
-    return LLBC_Endian::IsValid(type) ? 
+    return LLBC_Endian::IsValid(type) ?
         LLBC_INTERNAL_NS __g_endian_type_desc[type] :
             LLBC_INTERNAL_NS __g_endian_type_desc[LLBC_Endian::UnknownEndian];
 }
@@ -70,7 +70,7 @@ int LLBC_Endian::Str2Type(const char *str)
     lowerCaseStr[len] = '\0';
 
     int type;
-    if (memcmp(LLBC_INTERNAL_NS 
+    if (memcmp(LLBC_INTERNAL_NS
         __g_endian_type_desc[LLBC_Endian::BigEndian], lowerCaseStr, len) == 0)
     {
         type = LLBC_Endian::BigEndian;
@@ -104,7 +104,7 @@ LLBC_EXPORT int LLBC_DefaultEndian = LLBC_Endian::LittleEndian;
 
 int LLBC_GetMachineEndianType()
 {
-    return static_cast<char>(LLBC_INTERNAL_NS __g_endianTest.intVal) == 'l' ? 
+    return static_cast<char>(LLBC_INTERNAL_NS __g_endianTest.intVal) == 'l' ?
         LLBC_Endian::LittleEndian : LLBC_Endian::BigEndian;
 }
 

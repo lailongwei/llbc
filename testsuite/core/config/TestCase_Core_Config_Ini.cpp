@@ -50,6 +50,10 @@ int TestCase_Core_Config_Ini::Run(int argc, char *argv[])
     }
     LLBC_PrintLine("Success to load ini file");
 
+    LLBC_Ini iniToo = ini;
+    LLBC_Ini iniTooToo;
+    iniTooToo = ini;
+
     // Test size_t/long/ulong
     LLBC_PrintLine("Test long/ulong/size_t value read:");
     long lVal = ini.GetValue<long>("Long_ULong_Size_t", "lVal", 3);

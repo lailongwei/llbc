@@ -135,7 +135,7 @@ private:
     size_t _sockSendBufSize; // socket send buffer size, in bytes, default is 0, it means use os default.
     size_t _sockRecvBufSize; // socket recv buffer size, in bytes, default is 0, it means use os default.
     size_t _sessionSendBufSize; // session send buffer size, in bytes, default is LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE
-    size_t _sessionRecvBufSize; // sessiontrecv buffer size(init size), in bytes, default is LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE.
+    size_t _sessionRecvBufSize; // session recv buffer size(init size), in bytes, default is LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE.
     size_t _maxPacketSize; // max packet seize in packet protocol
 };
 

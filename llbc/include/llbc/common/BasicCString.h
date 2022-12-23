@@ -336,7 +336,8 @@ public:
     {
         #if LLBC_DEBUG
         ASSERT(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
-                (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) && "index out of range");
+                (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) &&
+               "index out of range");
         #endif // LLBC_DEBUG
 
         return LLBC_BasicCString(_cstr + offset, _size - offset);
@@ -361,7 +362,7 @@ public:
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
     operator <(const _Other &other) const
     {
-        return _cstr != other._cstr && 
+        return _cstr != other._cstr &&
                 (_size < other._size ||
                  (_size == other._size &&
                   memcmp(_cstr, other._cstr, sizeof(value_type) * _size) < 0));

@@ -140,7 +140,11 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
         const auto usedCap = snprintf(stackBacktrace,
                                       backtraceSize,
                                       "#%d 0x%p in %s at %s:%d\n",
-                                      frameNo++, reinterpret_cast<void *>(symbol->Address), symbol->Name, fileName ? fileName : "", lineNo);
+                                      frameNo++,
+                                      reinterpret_cast<void *>(symbol->Address),
+                                      symbol->Name,
+                                      fileName ? fileName : "",
+                                      lineNo);
         if (usedCap <= 0 ||
             usedCap >= static_cast<int>(backtraceSize) - 1)
             return;
@@ -353,7 +357,8 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
-                          const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &callback)
+                          const LLBC_Delegate<void(const char *stackBacktrace,
+                                                   int sig)> &callback)
 {
 #if LLBC_TARGET_PLATFORM_WIN32    
     LLBC_String nmlDumpFilePath = dumpFilePath;
@@ -361,7 +366,9 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     {
         const auto now = LLBC_Time::Now();
         nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
-        nmlDumpFilePath.append_format("_%d_%s.dmp", LLBC_GetCurrentProcessId(), now.Format("%Y%m%d_%H%M%S").c_str());
+        nmlDumpFilePath.append_format("_%d_%s.dmp",
+                                      LLBC_GetCurrentProcessId(),
+                                      now.Format("%Y%m%d_%H%M%S").c_str());
     }
 
     if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))

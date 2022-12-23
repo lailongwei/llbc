@@ -123,7 +123,7 @@ inline void LLBC_Event::ClearExtData()
         _extData = nullptr;
     }
 
-    _extDataClearDeleg = nullptr;   
+    _extDataClearDeleg = nullptr;
 }
 
 __LLBC_NS_END

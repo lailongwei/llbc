@@ -35,29 +35,29 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Property
 {
 public:
-	static const char NameSeparator;
-	static const char NameValueSeparator;
-	static const char CommentBeg;
+    static const char NameSeparator;
+    static const char NameValueSeparator;
+    static const char CommentBeg;
 
-	static const char EscapeChar;
+    static const char EscapeChar;
     static const char * const EscapeChars;
 
-	typedef LLBC_Property This;
+    typedef LLBC_Property This;
 
 public:
-	/**
-	 * Properties type typedef.
-	 */
-	typedef std::map<LLBC_String, LLBC_Property *> Properties;
+    /**
+     * Properties type typedef.
+     */
+    typedef std::map<LLBC_String, LLBC_Property *> Properties;
 
 public:
-	/**
-	 * Constructor / Destructor.
-	 */
+    /**
+     * Constructor / Destructor.
+     */
     LLBC_Property(const This &another);
-	explicit LLBC_Property(LLBC_Property *parent = nullptr);
+    explicit LLBC_Property(LLBC_Property *parent = nullptr);
 
-	virtual ~LLBC_Property();
+    virtual ~LLBC_Property();
 
 public:
     /**
@@ -96,11 +96,11 @@ public:
     const LLBC_String &GetLoadErrorDesc() const;
 
 public:
-	/**
-	 * Get the property's parent property.
-	 * @return LLBC_Property * - the parent property.
-	 */
-	const LLBC_Property *GetParent() const;
+    /**
+     * Get the property's parent property.
+     * @return LLBC_Property * - the parent property.
+     */
+    const LLBC_Property *GetParent() const;
 
     /**
      * Get the property name.
@@ -114,34 +114,34 @@ public:
      */
     size_t GetPropertiesCount() const;
 
-	/**
-	 * Get the property names.
-	 * @param[in] nest - nest flag.
-	 * @return LLBC_Strings - the property names.
-	 */
-	LLBC_Strings GetPropertyNames(bool nest = false) const;
+    /**
+     * Get the property names.
+     * @param[in] nest - nest flag.
+     * @return LLBC_Strings - the property names.
+     */
+    LLBC_Strings GetPropertyNames(bool nest = false) const;
 
 public:
-	/**
-	 * Get property value.
+    /**
+     * Get property value.
      * @param[in] name - the property name, if empty, will return self value.
-	 * @param[in] dft  - the default value, if this property has not value.
-	 * @return LLBC_Variant - the property value, if has no value, return default value, 
+     * @param[in] dft  - the default value, if this property has not value.
+     * @return LLBC_Variant - the property value, if has no value, return default value, 
      *                        and set last error to LLBC_ERROR_NOT_FOUND, otherwise set 
      *                        last error to LLBC_ERROR_SUCCESS.
-	 */
-	LLBC_Variant GetValue(const LLBC_String &name = LLBC_String(),
+     */
+    LLBC_Variant GetValue(const LLBC_String &name = LLBC_String(),
                           const LLBC_Variant &dft = LLBC_Variant()) const;
 
-	/**
-	 * Set property value.
+    /**
+     * Set property value.
      * @param[in] name     - set property name, if empty, will set to self.
-	 * @param[in] value    - the property value.
-	 * @param[in] comments - the comments.
-	 * @return int - return 0 if success, otherwise return -1.
-	 */
-	template <typename _ValueType>
-	int SetValue(const LLBC_String &name, const _ValueType &value, const LLBC_String &comments = LLBC_String());
+     * @param[in] value    - the property value.
+     * @param[in] comments - the comments.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename _ValueType>
+        int SetValue(const LLBC_String &name, const _ValueType &value, const LLBC_String &comments = LLBC_String());
 
 public:
     /**
@@ -157,24 +157,24 @@ public:
      */
     const LLBC_Property *GetProperty(const LLBC_String &name) const;
 
-	/**
-	 * Get all property sub-properties.
-	 * @return const Properties - the all sub properties.
-	 */
-	const Properties &GetAllProperties() const;
+    /**
+     * Get all property sub-properties.
+     * @return const Properties - the all sub properties.
+     */
+    const Properties &GetAllProperties() const;
 
-	/**
-	 * Remove the sub property.
-	 * @param[in] name      - the property name.
+    /**
+     * Remove the sub property.
+     * @param[in] name      - the property name.
      * @param[in] removeAll - remove all properties or not.
-	 * @return int - return 0 if success, otherwise return -1.
-	 */
-	int RemoveProperty(const LLBC_String &name, bool removeAll = false);
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveProperty(const LLBC_String &name, bool removeAll = false);
 
-	/**
-	 * Return the property's all sub properties.
-	 */
-	void RemoveAllProperties();
+    /**
+     * Return the property's all sub properties.
+     */
+    void RemoveAllProperties();
 
 public:
     /**

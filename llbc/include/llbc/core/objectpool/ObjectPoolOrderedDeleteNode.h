@@ -38,8 +38,6 @@ typedef std::map<LLBC_CString, LLBC_ObjectPoolOrderedDeleteNode *> LLBC_ObjectPo
 class LLBC_EXPORT LLBC_ObjectPoolOrderedDeleteNode
 {
 public:
-
-public:
     explicit LLBC_ObjectPoolOrderedDeleteNode(const LLBC_CString &name);
     ~LLBC_ObjectPoolOrderedDeleteNode();
 

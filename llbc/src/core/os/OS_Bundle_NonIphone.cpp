@@ -92,17 +92,23 @@ LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)
     return path;
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name)
 {
     return LLBC_GetBundleResPath(bundle, name, "", "");
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name,
+                                  const LLBC_String &ext)
 {
-    return LLBC_GetBundleResPath(bundle, name, ext, ""); 
+    return LLBC_GetBundleResPath(bundle, name, ext, "");
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name,
+                                  const LLBC_String &ext,
+                                  const LLBC_String &inDir)
 {
     if (UNLIKELY(name.empty()))
     {

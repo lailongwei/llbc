@@ -300,7 +300,11 @@ LLBC_EXPORT int LLBC_ConnectToPeerEx(LLBC_SocketHandle handle,
  * @param[in/out] len - pointer the size of the optval buffer.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int optname, void *optval, LLBC_SocketLen *len);
+LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle,
+                                     int level,
+                                     int optname,
+                                     void *optval,
+                                     LLBC_SocketLen *len);
 
 /**
  * Set socket option.
@@ -311,7 +315,11 @@ LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int op
  * @param[in] len     - size of the optval buffer.
  * @return int - if no error occurs, return zero, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetSocketOption(LLBC_SocketHandle handle, int level, int optname, const void *optval, LLBC_SocketLen len);
+LLBC_EXPORT int LLBC_SetSocketOption(LLBC_SocketHandle handle,
+                                     int level,
+                                     int optname,
+                                     const void *optval,
+                                     LLBC_SocketLen len);
 
 __LLBC_NS_END
 

@@ -26,36 +26,32 @@ __LLBC_NS_BEGIN
 template <typename T>
 int LLBC_CheckFlowUseAdd(T value, T addent)
 {
-    if(UNLIKELY(addent == 0))
+    if (UNLIKELY(addent == 0))
     {
         return LLBC_FlowType::NoFlow;
     }
 
     T result = value + addent;
-    if(T(T(0) - 1) > 0)
+    if (T(T(0) - 1) > 0)
     {
-        return ((result < value) ? 
+        return ((result < value) ?
             LLBC_FlowType::OverFlow : LLBC_FlowType::NoFlow);
     }
     else
     {
-        if(addent > 0)
+        if (addent > 0)
         {
-            return ((result < value) ? 
+            return ((result < value) ?
                 LLBC_FlowType::OverFlow : LLBC_FlowType::NoFlow);
         }
         else
         {
-            //return ((value + addent > value) ? 
+            //return ((value + addent > value) ?
                 //LLBC_FlowType::UnderFlow : LLBC_FlowType::NoFlow);
-            if(result > value)
-            {
+            if (result > value)
                 return LLBC_FlowType::UnderFlow;
-            }
             else
-            {
                 return LLBC_FlowType::NoFlow;
-            }
         }
     }
 
@@ -65,27 +61,27 @@ int LLBC_CheckFlowUseAdd(T value, T addent)
 template <typename T>
 int LLBC_CheckFlowUseSub(T value, T subtrahend)
 {
-    if(UNLIKELY(subtrahend == 0))
+    if (UNLIKELY(subtrahend == 0))
     {
         return LLBC_FlowType::NoFlow;
     }
 
     T result = value - subtrahend;
-    if(T(T(0) - 1) > 0)
+    if (T(T(0) - 1) > 0)
     {
-        return ((result > value) ? 
+        return ((result > value) ?
             LLBC_FlowType::UnderFlow : LLBC_FlowType::NoFlow);
     }
     else
     {
-        if(subtrahend > 0)
+        if (subtrahend > 0)
         {
-            return ((result > value) ? 
+            return ((result > value) ?
                 LLBC_FlowType::UnderFlow : LLBC_FlowType::NoFlow);
         }
         else
         {
-            return ((result < value) ? 
+            return ((result < value) ?
                 LLBC_FlowType::OverFlow : LLBC_FlowType::NoFlow);
         }
     }
