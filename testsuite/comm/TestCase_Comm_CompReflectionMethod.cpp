@@ -142,8 +142,9 @@ int TestCase_Comm_CompReflectionMethod::Run(int argc, char *argv[])
 
     svc->Start();
 
+    LLBC_Defer(delete svc);
     LLBC_PrintLine("Press any key to continue...");
-    delete svc;
+    getchar();
 
     return LLBC_OK;
 }
