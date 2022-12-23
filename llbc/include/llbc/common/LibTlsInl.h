@@ -36,7 +36,7 @@ __LLBC_NS_BEGIN
 struct LLBC_EXPORT __LLBC_LibTls
 {
     /* Common-Module TLS value. */
-    struct  
+    struct
     {
         /* error, sub-error, and error describe character pointer. */
         int errNo;
@@ -97,14 +97,14 @@ struct LLBC_EXPORT __LLBC_LibTls
     } coreTls;
 
     /* ObjBase-Module TLS valus. */
-    struct 
+    struct
     {
         /* Auto-Release pool stack. */
         void *poolStack;
     } objbaseTls;
 
     /* Communication-Module TLS value. */
-    struct  
+    struct
     {
         /* Services pointer. */
         void *services[LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT + 1];

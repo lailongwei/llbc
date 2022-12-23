@@ -238,7 +238,7 @@ public:
 
     /**
      * @brief Get free capacity.
-     * 
+     *
      * @return size_t - free capacity, in bytes.
      */
     size_t GetFreeCap() const;
@@ -403,7 +403,7 @@ private:
     /**
      * Try adapt STL unsorted unary container(std::list/std::vector/std::deque/...).
      */
-    template <typename T, 
+    template <typename T,
               void (T::*)(const typename T::value_type &),
               void (T::*)(typename T::size_type)>
     struct stl_unsorted_unary_container;

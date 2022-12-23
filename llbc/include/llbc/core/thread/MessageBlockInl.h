@@ -163,12 +163,12 @@ inline void *LLBC_MessageBlock::GetData() const
 
 inline void *LLBC_MessageBlock::GetDataStartWithReadPos() const
 {
-    return (void *)(reinterpret_cast<const char *>(_buf) + _readPos);
+    return const_cast<char *>(reinterpret_cast<const char *>(_buf) + _readPos);
 }
 
 inline void *LLBC_MessageBlock::GetDataStartWithWritePos() const
 {
-    return (void *)(reinterpret_cast<const char *>(_buf) + _writePos);
+    return const_cast<char *>((reinterpret_cast<const char *>(_buf) + _writePos));
 }
 
 inline size_t LLBC_MessageBlock::GetSize() const

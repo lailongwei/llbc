@@ -396,8 +396,11 @@ public:
     /**
      * Add component by shared library.
      */
-    int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName);
-    virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp) = 0;
+    int AddComponent(const LLBC_String &compSharedLibPath,
+                     const LLBC_String &compName);
+    virtual int AddComponent(const LLBC_String &compSharedLibPath,
+                             const LLBC_String &compName,
+                             LLBC_Component *&comp) = 0;
 
     /**
      * Get component.

@@ -74,9 +74,13 @@ class LLBC_EXPORT LLBC_FileBufferMode
 public:
     enum
     {
-        NoBuf = _IONBF,   // No buffer is used, all file read/write operation will direct synchronous to store device.
-        LineBuf = _IOLBF, // For some systems, this provides line buffering. However, for Win32, the behavior is the same as NoBuf - Full Buffering.
-        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and size is used as the size of the buffer. If buffer is nullptr, an automatically allocated buffer size bytes long is used.
+        NoBuf = _IONBF,   // No buffer is used, all file read/write operation
+                          // will direct synchronous to store device.
+        LineBuf = _IOLBF, // For some systems, this provides line buffering. However,
+                          // for Win32, the behavior is the same as NoBuf - Full Buffering.
+        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and
+                          // size is used as the size of the buffer. If buffer is nullptr,
+                          // an automatically allocated buffer size bytes long is used.
     };
 };
 
@@ -391,8 +395,8 @@ public:
      * @param[in] lastModifyTime       - the last modify time, if nullptr, will update to now.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int TouchFile(const LLBC_String &filePath, 
-                         bool updateLastAccessTime = true, 
+    static int TouchFile(const LLBC_String &filePath,
+                         bool updateLastAccessTime = true,
                          const timespec *lastAccessTime = nullptr,
                          bool updateLastModifyTime = true,
                          const timespec *lastModifyTime = nullptr);
@@ -402,7 +406,8 @@ public:
      * Copy file.
      * @param[in] srcFilePath  - the source file path.
      * @param[in] destFilePath - the destination file path.
-     * @param[in] overlapped   - if the new file already exists, the function overrides the existing file and succeeds, otherwise failed.
+     * @param[in] overlapped   - if the new file already exists, the function overrides
+     *                           the existing file and succeeds, otherwise failed.
      *                           default is true.
      * @return int - return 0 if success, otherwise return -1.
      */

@@ -103,8 +103,8 @@ inline size_t LLBC_SessionOpts::GetMaxPacketSize() const
 }
 
 inline void LLBC_SessionOpts::SetMaxPacketSize(size_t size)
-{ 
-    _maxPacketSize = size; 
+{
+    _maxPacketSize = size;
 }
 
 __LLBC_NS_END

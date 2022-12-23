@@ -110,7 +110,9 @@ LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
                          0);
 }
 
-LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct, int milliSecond, int microSecond)
+LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct,
+                                    int milliSecond,
+                                    int microSecond)
 {
     time_t clanderTimeInSecs = mktime(const_cast<tm *>(&timeStruct));
     return LLBC_Time(clanderTimeInSecs * NumOfMicroSecondsPerSecond +
@@ -118,7 +120,14 @@ LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct, int milliSecond, int m
                      microSecond);
 }
 
-LLBC_Time LLBC_Time::FromTimeParts(int year, int month, int day, int hour, int minute, int second, int milliSecond, int microSecond)
+LLBC_Time LLBC_Time::FromTimeParts(int year,
+                                   int month,
+                                   int day,
+                                   int hour,
+                                   int minute,
+                                   int second,
+                                   int milliSecond, 
+                                   int microSecond)
 {
     tm timeStruct;
     timeStruct.tm_year = year - 1900;
@@ -328,7 +337,11 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
     return LLBC_TimeSpan(spanVal);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour, int minute, int second, int milliSecond, int microSecond) const
+LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour,
+                                       int minute,
+                                       int second,
+                                       int milliSecond,
+                                       int microSecond) const
 {
     return GetIntervalTo(LLBC_TimeSpan::FromHours(hour,
                          minute, 
@@ -342,7 +355,12 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpa
     return from.GetIntervalTo(span);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, int hour, int minute, int second, int milliSecond, int microSecond)
+LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from,
+                                       int hour,
+                                       int minute,
+                                       int second,
+                                       int milliSecond,
+                                       int microSecond)
 {
     return from.GetIntervalTo(hour, minute, second, milliSecond, microSecond);
 }

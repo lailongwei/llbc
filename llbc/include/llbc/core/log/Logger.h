@@ -136,12 +136,42 @@ public:
      * @param[in] ...  - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Trace(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
-    int Debug(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
-    int Info(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
-    int Warn(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
-    int Error(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
-    int Fatal(const char *tag, const char *file, int line, const char *func, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Trace(const char *tag,
+              const char *file,
+              int line,
+              const char *func,
+              const char *fmt,
+              ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Debug(const char *tag,
+              const char *file,
+              int line,
+              const char *func,
+              const char *fmt,
+              ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Info(const char *tag,
+             const char *file,
+             int line,
+             const char *func,
+             const char *fmt,
+             ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Warn(const char *tag,
+             const char *file,
+             int line,
+             const char *func,
+             const char *fmt,
+             ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Error(const char *tag,
+              const char *file,
+              int line,
+              const char *func,
+              const char *fmt,
+              ...) LLBC_STRING_FORMAT_CHECK(6, 7);
+    int Fatal(const char *tag,
+              const char *file,
+              int line,
+              const char *func,
+              const char *fmt,
+              ...) LLBC_STRING_FORMAT_CHECK(6, 7);
 
     /**
      * Output fmt using given level.

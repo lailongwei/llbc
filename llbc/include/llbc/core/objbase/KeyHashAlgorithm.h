@@ -36,7 +36,7 @@ class LLBC_EXPORT LLBC_HashAlgo
 public:
     enum
     {
-        Begin, 
+        Begin,
 
         BKDR = Begin,
         DJB,

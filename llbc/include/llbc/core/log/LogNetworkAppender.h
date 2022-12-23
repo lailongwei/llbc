@@ -40,7 +40,6 @@ public:
     virtual ~LLBC_LogNetworkAppender();
 
 public:
-public:
     /**
      * Get log appender type, see LLBC_LogAppenderType.
      * @return int - log appender type.

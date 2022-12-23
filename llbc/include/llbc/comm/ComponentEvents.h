@@ -98,7 +98,7 @@ public:
 
 public:
     static constexpr uint64 AllEvents = (1 << LLBC_ComponentEventIndex::End) - 1;
-    static constexpr uint64 DefaultEvents = LLBC_ComponentEvents::AllEvents & 
+    static constexpr uint64 DefaultEvents = LLBC_ComponentEvents::AllEvents &
                                             ~(LLBC_ComponentEvents::OnUpdate |
                                               LLBC_ComponentEvents::OnIdle);
 

@@ -67,11 +67,9 @@ void LLBC_Dictionary::Sort(_Fn2 &fn)
         LLBC_DictionaryElem *prevElem = curElem->GetElemPrev();
         for (; prevElem != nullptr; prevElem = prevElem->GetElemPrev())
         {
-            if (fn((const LLBC_DictionaryElem *)prevElem, 
-                    (const LLBC_DictionaryElem *)curElem))
-            {
+            if (fn(static_cast<const LLBC_DictionaryElem *>(prevElem),
+                   static_cast<const LLBC_DictionaryElem *>(curElem)))
                 break;
-            }
         }
 
         if (!prevElem)
@@ -86,13 +84,9 @@ void LLBC_Dictionary::Sort(_Fn2 &fn)
             curElem->SetElemPrev(prevElem);
             curElem->SetElemNext(prevElem->GetElemNext());
             if (prevElem->GetElemNext())
-            {
                 prevElem->GetElemNext()->SetElemPrev(curElem);
-            }
             else
-            {
                 _tail = curElem;
-            }
 
             prevElem->SetElemNext(curElem);
         }

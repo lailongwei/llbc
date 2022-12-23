@@ -105,14 +105,14 @@ LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name)
 {
     _SamplerMapIter iter = _samplers->find(name);
     return iter != _samplers->end() ? 
-        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)nullptr);
+        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), static_cast<LLBC_ISampler *>(nullptr));
 }
 
 const LLBC_ISampler *LLBC_SamplerGroup::GetSampler(const LLBC_String &name) const
 {
     _SamplerMapCIter iter = _samplers->find(name);
     return iter != _samplers->end() ?
-        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), (LLBC_ISampler *)nullptr);
+        iter->second : (LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), static_cast<LLBC_ISampler *>(nullptr));
 
 }
 

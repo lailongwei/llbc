@@ -361,12 +361,12 @@ int LLBC_Socket::Connect(const LLBC_SockAddr_IN &addr)
 #if LLBC_TARGET_PLATFORM_WIN32
 int LLBC_Socket::ConnectEx(const LLBC_SockAddr_IN &addr, LLBC_POverlapped ol)
 {
-    return LLBC_ConnectToPeerEx(_handle,    // in
-                                addr,       // in
-                                nullptr,       // in_opt
-                                0,          // in
-                                nullptr,       // out(if send buffer is null, ignored) 
-                                ol);        // out
+    return LLBC_ConnectToPeerEx(_handle, // in
+                                addr,    // in
+                                nullptr, // in_opt
+                                0,       // in
+                                nullptr, // out(if send buffer is null, ignored) 
+                                ol);     // out
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 

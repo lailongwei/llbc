@@ -35,12 +35,12 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
     if (name.empty())
     {
         this->Cleanup();
-		if (!value.IsStr())
-			_value = new LLBC_Variant(value.ValueToString());
-		else
-			_value = new LLBC_Variant(value);
+        if (!value.IsStr())
+            _value = new LLBC_Variant(value.ValueToString());
+        else
+            _value = new LLBC_Variant(value);
 
-		_comments = comments;
+        _comments = comments;
 
         return LLBC_OK;
     }
@@ -58,7 +58,7 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &
 template <typename _ValueType>
 inline int LLBC_Property::SetValue(const LLBC_String &name, const _ValueType &value, const LLBC_String &comments)
 {
-	return this->SetValue(name, LLBC_Variant(value), comments);
+    return this->SetValue(name, LLBC_Variant(value), comments);
 }
 
 __LLBC_NS_END

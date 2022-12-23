@@ -30,9 +30,9 @@ __LLBC_NS_BEGIN
 template <typename T>
 inline void LLBC_Swap(T &left, T &right)
 {
-    T temp = left;
-    left = right;
-    right = temp;
+    T temp = std::move(left);
+    left = std::move(right);
+    right = std::move(temp);
 };
 
 __LLBC_NS_END

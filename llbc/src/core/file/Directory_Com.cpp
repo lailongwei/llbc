@@ -373,7 +373,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     return GetFiles(path, files, __emptyFileExt, recursive);
 }
 
-int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &fileExt, bool recursive)
+int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct stat fileStat;
@@ -476,14 +476,14 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
 #endif // Non-Win32
 
     if (files.empty() || 
-            fileExt.empty())
+            ext.empty())
         return LLBC_OK;
 
     for (int i = static_cast<int>(files.size() - 1); i >= 0; --i)
     {
         const LLBC_String &file = files[i];
         const LLBC_Strings splited = SplitExt(file);
-        if (splited.size() == 1 || splited[1] != fileExt)
+        if (splited.size() == 1 || splited[1] != ext)
             files.erase(files.begin() + i);
     }
 

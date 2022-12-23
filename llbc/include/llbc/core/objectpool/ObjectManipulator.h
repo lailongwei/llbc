@@ -152,7 +152,9 @@ private:
     template <typename ObjectType, void (ObjectType::_Mybase::*)()>
     struct clearmethod_in_base_stl_container_type;
     template <typename ObjectType>
-    static bool ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *);
+    static bool ResetObj(void *obj,
+                         clearmethod_in_base_stl_container_type<ObjectType,
+                                                                &ObjectType::_Mybase::clear> *);
 
 private:
     /**
@@ -169,7 +171,8 @@ public:
     template <typename ObjectType, size_t (ObjectType::*GetPoolInstPerBlockUnitsNum)()>
     struct poolinst_unitsnum_detectable_type;
     template <typename ObjectType>
-    static size_t GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *);
+    static size_t GetPoolInstPerBlockUnitsNumInl(
+        poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *);
 
     /**
      * Get default object pool instance per-block units number(LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER).
@@ -185,7 +188,9 @@ private:
     template <typename ObjectType, void (ObjectType::*)(LLBC_IObjectPoolInst &)>
     struct poolinstcreate_callable_type;
     template <typename ObjectType>
-    static void OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *);
+    static void OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst,
+                                    poolinstcreate_callable_type<ObjectType,
+                                                                 &ObjectType::OnPoolInstCreate> *);
 
     /**
      * Default object pool instance create callback function caller.
@@ -200,7 +205,9 @@ private:
     template <typename ObjectType, void (ObjectType::*)(LLBC_IObjectPoolInst &)>
     struct poolinstdestroy_callable_type;
     template <typename ObjectType>
-    static void OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *);
+    static void OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst,
+                                     poolinstdestroy_callable_type<ObjectType,
+                                                                   &ObjectType::OnPoolInstDestroy> *);
 
     /**
      * Default object pool instance destroy callback function caller.
