@@ -299,15 +299,15 @@ inline sint64 LLBC_AtomicFetchAndXor(volatile sint64 *ptr, sint64 value)
 inline sint32 LLBC_AtomicCompareAndExchange(volatile sint32 *ptr, sint32 exchange, sint32 comparand)
 {
 #if LLBC_TARGET_PLATFORM_LINUX
-    return __sync_val_compare_and_swap(reinterpret_cast<sint32 *>(ptr), comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_WIN32
     return ::InterlockedCompareExchange(reinterpret_cast<volatile LONG *>(ptr), exchange, comparand);
 #elif LLBC_TARGET_PLATFORM_IPHONE
-    return __sync_val_compare_and_swap(reinterpret_cast<sint32 *>(ptr), comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_MAC
-    return __sync_val_compare_and_swap(reinterpret_cast<sint32 *>(ptr), comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_ANDROID
-    return __sync_val_compare_and_swap(reinterpret_cast<sint32 *>(ptr), comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #endif
 }
 
