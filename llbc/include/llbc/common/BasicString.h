@@ -69,7 +69,7 @@ public:
     LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
     LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
-    LLBC_BasicString(LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
+    LLBC_BasicString(const LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
