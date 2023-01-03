@@ -380,17 +380,6 @@ const LLBC_Property &LLBC_Component::GetPropertyConfig() const
     return _propCfg ? *_propCfg : emptyPropCfg;
 }
 
-void LLBC_Component::SetConfig(const LLBC_Variant &compCfg)
-{
-    LLBC_XDelete(_propCfg);
-
-    if (_nonPropCfg)
-        *_nonPropCfg = compCfg;
-    else
-        _nonPropCfg = new LLBC_Variant(compCfg);
-    _cfgType = LLBC_ApplicationConfigType::Xml;
-}
-
 void LLBC_Component::UpdateComponentCfg()
 {
     if (UNLIKELY(!_svc))
