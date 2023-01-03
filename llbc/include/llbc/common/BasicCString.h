@@ -153,15 +153,6 @@ public:
      * Get const string.
      * @return const_pointer - the const string.
      */
-    const_pointer str() const
-    {
-        return _cstr;
-    }
-
-    /**
-     * Get const string.
-     * @return const_pointer - the const string.
-     */
     const_pointer c_str() const
     {
         return _cstr;
@@ -305,7 +296,7 @@ public:
      */
     LLBC_BasicCString &operator =(const std::basic_string<value_type> &stlStr)
     {
-        _cstr = stlStr.str();
+        _cstr = stlStr.c_str();
         _size = stlStr.size();
 
         return *this;
@@ -448,7 +439,7 @@ private:
 template <typename _Elem>
 std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
-    return o <<cstr.str();
+    return o <<cstr.c_str();
 }
 
 __LLBC_NS_END
@@ -466,7 +457,7 @@ struct hash<LLBC_NS LLBC_BasicCString<char> >
     {
         // Use DJB hash algo.
         size_t h;
-        const char *str = cstr.str();
+        const char *str = cstr.c_str();
         for (size_t i = h = 0; i < cstr.size(); ++i)
             h = ((h << 5) + h) ^ str[i];
         return h;
@@ -483,7 +474,7 @@ struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
     {
         // Use DJB hash algo.
         size_t h;
-        const wchar_t *str = cstr.str();
+        const wchar_t *str = cstr.c_str();
         for (size_t i = h = 0; i < cstr.size(); ++i)
             h = ((h << 10) + h) ^ str[i];
         return h;

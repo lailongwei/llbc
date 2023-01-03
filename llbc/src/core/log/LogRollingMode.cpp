@@ -58,7 +58,7 @@ const LLBC_CString &LLBC_LogRollingMode::GetModeStr(int mode)
 
 int LLBC_LogRollingMode::Str2Mode(const LLBC_CString &modeStr)
 {
-    const LLBC_String upperModeStr = LLBC_ToUpper(modeStr.str());
+    const LLBC_String upperModeStr = LLBC_ToUpper(modeStr.c_str());
     if (LLBC_INTERNAL_NS __rollMode2StrRepr[HourlyRolling] == upperModeStr ||
         LLBC_INTERNAL_NS __rollMode2StrAliasRepr[HourlyRolling] == upperModeStr)
         return HourlyRolling;

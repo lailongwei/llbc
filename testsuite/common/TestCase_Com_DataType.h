@@ -33,6 +33,8 @@ public:
 private:
     void RawTest();
     void StringBaseTest();
+    void StringCompareTest();
+    void StringLogicOperationTest();
     void StringUTF8Test();
     void StringFindReplaceTest();
     void StringStripTest();
