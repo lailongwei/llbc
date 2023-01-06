@@ -48,7 +48,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The service interface class define.
  */
-class LLBC_EXPORT LLBC_Service : protected LLBC_BaseTask
+class LLBC_EXPORT LLBC_Service : protected LLBC_Task
 {
     typedef LLBC_Service This;
 
@@ -64,8 +64,8 @@ public:
 
 public:
     // Import Base::Push/Base::Wait method to service.
-    using LLBC_BaseTask::Push;
-    using LLBC_BaseTask::Wait;
+    using LLBC_Task::Push;
+    using LLBC_Task::Wait;
 
 public:
     virtual ~LLBC_Service() {  }

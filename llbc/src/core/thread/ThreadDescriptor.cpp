@@ -117,12 +117,12 @@ void LLBC_ThreadDescriptor::SetFlags(int flags)
     _flags = flags;
 }
 
-LLBC_BaseTask *LLBC_ThreadDescriptor::GetTask() const
+LLBC_Task *LLBC_ThreadDescriptor::GetTask() const
 {
     return _task;
 }
 
-void LLBC_ThreadDescriptor:: SetTask(LLBC_BaseTask *task)
+void LLBC_ThreadDescriptor:: SetTask(LLBC_Task *task)
 {
     _task = task;
 }

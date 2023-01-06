@@ -59,8 +59,6 @@ struct LLBC_EXPORT __LLBC_LibTls
 
         /* logger format buffer(used for vsnprintf()) */
         char loggerFmtBuf[LLBC_CFG_LOG_FORMAT_BUF_SIZE + 1];
-        /* logger format string(used for log appenders) */
-        void *logFmtStr;
 
         /* thread id/handle. */
         LLBC_Handle threadHandle;
