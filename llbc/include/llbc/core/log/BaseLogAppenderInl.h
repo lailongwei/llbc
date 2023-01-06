@@ -43,6 +43,11 @@ inline void LLBC_BaseLogAppender::SetAppenderNext(LLBC_ILogAppender *next)
     _next = next;
 }
 
+inline LLBC_String &LLBC_BaseLogAppender::GetLogFormatBuf()
+{
+    return _logFmtBuf;
+}
+
 inline void LLBC_BaseLogAppender::Flush()
 {
 }

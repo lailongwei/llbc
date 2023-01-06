@@ -23,19 +23,19 @@
 
 __LLBC_NS_BEGIN
 
-inline int LLBC_BaseTask::Push(LLBC_MessageBlock *block)
+inline int LLBC_Task::Push(LLBC_MessageBlock *block)
 {
     _msgQueue.PushBack(block);
     return LLBC_OK;
 }
 
-inline int LLBC_BaseTask::Pop(LLBC_MessageBlock *&block)
+inline int LLBC_Task::Pop(LLBC_MessageBlock *&block)
 {
     _msgQueue.PopFront(block);
     return LLBC_OK;
 }
 
-inline int LLBC_BaseTask::PopAll(LLBC_MessageBlock *&blocks)
+inline int LLBC_Task::PopAll(LLBC_MessageBlock *&blocks)
 {
     if (_msgQueue.PopAll(blocks))
         return LLBC_OK;
@@ -43,7 +43,7 @@ inline int LLBC_BaseTask::PopAll(LLBC_MessageBlock *&blocks)
     return LLBC_FAILED;
 }
 
-inline int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
+inline int LLBC_Task::TryPop(LLBC_MessageBlock *&block)
 {
     if (_msgQueue.TryPopFront(block))
         return LLBC_OK;
@@ -51,7 +51,7 @@ inline int LLBC_BaseTask::TryPop(LLBC_MessageBlock *&block)
     return LLBC_FAILED;
 }
 
-inline int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
+inline int LLBC_Task::TimedPop(LLBC_MessageBlock *&block, int interval)
 {
     if (_msgQueue.TimedPopFront(block, interval))
         return LLBC_OK;
@@ -59,7 +59,7 @@ inline int LLBC_BaseTask::TimedPop(LLBC_MessageBlock *&block, int interval)
     return LLBC_FAILED;
 }
 
-inline size_t LLBC_BaseTask::GetMessageSize() const
+inline size_t LLBC_Task::GetMessageSize() const
 {
     return _msgQueue.GetSize();
 }

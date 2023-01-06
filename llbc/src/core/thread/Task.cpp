@@ -31,9 +31,9 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-int static __LLBC_BaseTaskEntry(void *arg)
+int static __LLBC_TaskEntry(void *arg)
 {
-    LLBC_NS LLBC_BaseTask *task = reinterpret_cast<LLBC_NS LLBC_BaseTask *>(arg);
+    LLBC_NS LLBC_Task *task = reinterpret_cast<LLBC_NS LLBC_Task *>(arg);
 
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
 
@@ -52,7 +52,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_BaseTask::LLBC_BaseTask(LLBC_ThreadManager *threadMgr)
+LLBC_Task::LLBC_Task(LLBC_ThreadManager *threadMgr)
 : _threadNum(0)
 , _curThreadNum(0)
 , _startCompleted(false)
@@ -61,13 +61,13 @@ LLBC_BaseTask::LLBC_BaseTask(LLBC_ThreadManager *threadMgr)
 {
 }
 
-LLBC_BaseTask::~LLBC_BaseTask()
+LLBC_Task::~LLBC_Task()
 {
     Wait();
     LLBC_XFree(_taskThreads);
 }
 
-int LLBC_BaseTask::Activate(int threadNum,
+int LLBC_Task::Activate(int threadNum,
                             int flags,
                             int priority,
                             LLBC_Handle groupHandle,
@@ -78,7 +78,7 @@ int LLBC_BaseTask::Activate(int threadNum,
     LLBC_XFree(_taskThreads);
     _taskThreads = LLBC_Calloc(LLBC_Handle, threadNum * sizeof(LLBC_Handle));
     if (_threadManager->CreateThreads(threadNum,
-                                      &LLBC_INTERNAL_NS __LLBC_BaseTaskEntry,
+                                      &LLBC_INTERNAL_NS __LLBC_TaskEntry,
                                       this,
                                       flags,
                                       priority,
@@ -104,21 +104,21 @@ int LLBC_BaseTask::Activate(int threadNum,
     return LLBC_OK;
 }
 
-bool LLBC_BaseTask::IsActivated() const
+bool LLBC_Task::IsActivated() const
 {
-    LLBC_LockGuard guard(const_cast<LLBC_BaseTask *>(this)->_lock);
+    LLBC_LockGuard guard(const_cast<LLBC_Task *>(this)->_lock);
     return _threadNum != 0;
 }
 
-int LLBC_BaseTask::GetThreadCount() const
+int LLBC_Task::GetThreadCount() const
 {
-    LLBC_BaseTask *ncThis = const_cast<LLBC_BaseTask *>(this);
+    LLBC_Task *ncThis = const_cast<LLBC_Task *>(this);
     LLBC_LockGuard guard(ncThis->_lock);
 
     return _threadNum;
 }
 
-int LLBC_BaseTask::Wait()
+int LLBC_Task::Wait()
 {
     if (!IsActivated())
     {
@@ -129,7 +129,7 @@ int LLBC_BaseTask::Wait()
     return _threadManager->WaitTask(this);
 }
 
-int LLBC_BaseTask::Suspend()
+int LLBC_Task::Suspend()
 {
     if (!IsActivated())
     {
@@ -140,7 +140,7 @@ int LLBC_BaseTask::Suspend()
     return _threadManager->SuspendTask(this);
 }
 
-int LLBC_BaseTask::Resume()
+int LLBC_Task::Resume()
 {
     if (!IsActivated())
     {
@@ -151,7 +151,7 @@ int LLBC_BaseTask::Resume()
     return _threadManager->ResumeTask(this);
 }
 
-int LLBC_BaseTask::Cancel()
+int LLBC_Task::Cancel()
 {
     if (!IsActivated())
     {
@@ -162,7 +162,7 @@ int LLBC_BaseTask::Cancel()
     return _threadManager->CancelTask(this);
 }
 
-int LLBC_BaseTask::Kill(int signo)
+int LLBC_Task::Kill(int signo)
 {
     if (!IsActivated())
     {
@@ -173,14 +173,14 @@ int LLBC_BaseTask::Kill(int signo)
     return _threadManager->KillTask(this, signo);
 }
 
-void LLBC_BaseTask::OnTaskThreadStart()
+void LLBC_Task::OnTaskThreadStart()
 {
     LLBC_LockGuard guard(_lock);
     if (++_curThreadNum == _threadNum)
         _startCompleted = true;
 }
 
-void LLBC_BaseTask::OnTaskThreadStop()
+void LLBC_Task::OnTaskThreadStop()
 {
     while (!_startCompleted)
         LLBC_ThreadManager::Sleep(1);
@@ -199,7 +199,7 @@ void LLBC_BaseTask::OnTaskThreadStop()
     _lock.Unlock();
 }
 
-void LLBC_BaseTask::InternalCleanup()
+void LLBC_Task::InternalCleanup()
 {
     if (_threadNum == 0)
         return;
@@ -213,7 +213,7 @@ void LLBC_BaseTask::InternalCleanup()
     _msgQueue.Cleanup();
 }
 
-void LLBC_BaseTask::GetTaskThreads(std::vector<LLBC_Handle> &taskThreads)
+void LLBC_Task::GetTaskThreads(std::vector<LLBC_Handle> &taskThreads)
 {
     if (!IsActivated())
         return;

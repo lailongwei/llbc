@@ -142,13 +142,12 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 
     CheckAndUpdateLogFile(data.logTime);
 
-    LLBC_String &formattedData =
-        *reinterpret_cast<LLBC_String *>(__LLBC_GetLibTls()->coreTls.logFmtStr);
-    formattedData.clear();
-    chain->Format(data, formattedData);
+    auto &logFmtBuf = GetLogFormatBuf();
+    logFmtBuf.clear();
+    chain->Format(data, logFmtBuf);
 
     const long actuallyWrote = 
-        _file.Write(formattedData.data(), formattedData.size());
+        _file.Write(logFmtBuf.data(), logFmtBuf.size());
     if (actuallyWrote != -1)
     {
         _fileSize += actuallyWrote;
@@ -159,7 +158,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
                 Flush();
         }
 
-        if (UNLIKELY(actuallyWrote != static_cast<long>(formattedData.size())))
+        if (UNLIKELY(actuallyWrote != static_cast<long>(logFmtBuf.size())))
         {
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
             return LLBC_FAILED;

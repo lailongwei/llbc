@@ -41,11 +41,11 @@ __LLBC_NS_BEGIN
 /**
  * \brief Task class encapsulation.
  */
-class LLBC_EXPORT LLBC_BaseTask
+class LLBC_EXPORT LLBC_Task
 {
 public:
-    LLBC_BaseTask(LLBC_ThreadManager *threadMgr = nullptr);
-    virtual ~LLBC_BaseTask();
+    LLBC_Task(LLBC_ThreadManager *threadMgr = nullptr);
+    virtual ~LLBC_Task();
 
 public:
     /**
@@ -174,11 +174,11 @@ public:
     /**
      * Disable assignment.
      */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_BaseTask);
+    LLBC_DISABLE_ASSIGNMENT(LLBC_Task);
 
 private:
     /*
-     * Base task internal cleanup.
+     * Task internal cleanup.
      */
     void InternalCleanup();
 

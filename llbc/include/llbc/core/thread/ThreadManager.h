@@ -29,7 +29,7 @@
 #include "llbc/core/singleton/Singleton.h"
 
 __LLBC_NS_BEGIN
-class LLBC_BaseTask;
+class LLBC_Task;
 class LLBC_ThreadDescriptor;
 class LLBC_ThreadGroupDescriptor;
 __LLBC_NS_END
@@ -65,7 +65,7 @@ public:
                               int flags = LLBC_ThreadFlag::Joinable,
                               int priority = LLBC_ThreadPriority::Normal,
                               const int stackSize[] = nullptr,
-                              LLBC_BaseTask *task = nullptr,
+                              LLBC_Task *task = nullptr,
                               LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
                               LLBC_NativeThreadHandle nativeHandles[] = nullptr,
                               LLBC_Handle handles[] = nullptr);
@@ -87,7 +87,7 @@ public:
                              int flags = LLBC_ThreadFlag::Joinable,
                              int priority = LLBC_ThreadPriority::Normal,
                              int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE,
-                             LLBC_BaseTask *task = nullptr,
+                             LLBC_Task *task = nullptr,
                              LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
                              LLBC_NativeThreadHandle *nativeHandle = nullptr,
                              LLBC_Handle *handle = nullptr);
@@ -128,9 +128,9 @@ public:
     /**
      * Get thread task.
      * @param[in] handle - thread handle.
-     * @return LLBC_BaseTask * - thread task.
+     * @return LLBC_Task * - thread task.
      */
-    LLBC_BaseTask *GetTask(LLBC_Handle handle) const;
+    LLBC_Task *GetTask(LLBC_Handle handle) const;
 
     /**
      * Get thread stack size.
@@ -167,7 +167,7 @@ public:
      * @param[in] task - thread task.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int WaitTask(LLBC_BaseTask *task);
+    int WaitTask(LLBC_Task *task);
 
     /**
      * Wait specific thread group to terminate.
@@ -195,7 +195,7 @@ public:
      * @param[in] task - thread task.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int SuspendTask(LLBC_BaseTask *task);
+    int SuspendTask(LLBC_Task *task);
 
     /**
      * Suspend thread group.
@@ -223,7 +223,7 @@ public:
      * @param[in] task - thread task.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int ResumeTask(LLBC_BaseTask *task);
+    int ResumeTask(LLBC_Task *task);
 
     /**
      * Resume thread group.
@@ -251,7 +251,7 @@ public:
      * @param[in] task - thread task.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int CancelTask(LLBC_BaseTask *task);
+    int CancelTask(LLBC_Task *task);
 
     /**
      * Cancel thread group.
@@ -281,7 +281,7 @@ public:
      * @parampin[ signum - signal number.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int KillTask(LLBC_BaseTask *task, int signum);
+    int KillTask(LLBC_Task *task, int signum);
 
     /**
      * Send signal to specific thread group.
@@ -329,7 +329,7 @@ private:
                                      int flags = LLBC_ThreadFlag::Joinable,
                                      int priority = LLBC_ThreadPriority::Normal,
                                      int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE,
-                                     LLBC_BaseTask *task = nullptr,
+                                     LLBC_Task *task = nullptr,
                                      LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
                                      LLBC_NativeThreadHandle *nativeHandle = nullptr,
                                      LLBC_Handle *handle = nullptr);
