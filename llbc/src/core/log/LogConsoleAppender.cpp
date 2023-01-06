@@ -133,9 +133,9 @@ int LLBC_LogConsoleAppender::DetermineLogTextColor(int logLv)
     typedef LLBC_ConsoleColor _CC;
 
     if (logLv == _LogLevel::Warn)
-        return _CC::Bg_Black | _CC::Fg_Yellow | _CC::Highlight_Fg;
+        return _CC::Bg_Default | _CC::Fg_Yellow | _CC::Highlight_Fg;
     else if (logLv == _LogLevel::Error || logLv == _LogLevel::Fatal)
-        return _CC::Bg_Black | _CC::Fg_Red | _CC::Highlight_Fg;
+        return _CC::Bg_Default | _CC::Fg_Red | _CC::Highlight_Fg;
     else
         return _CC::Bg_Default | _CC::Fg_Default;
 }
