@@ -124,7 +124,7 @@ void LLBC_Array::Sort(LLBC_Array::Iter n0, LLBC_Array::Iter n1, _Fn2 &fn)
         while (j >= begin && !fn(_objs[j], obj))
         {
             _objs[j + 1] = _objs[j];
-            j --;
+            j--;
         }
 
         _objs[j + 1] = obj;

@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The poller monitor class encapsulation.
  */
-class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_BaseTask
+class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_Task
 {
     typedef LLBC_Delegate<void()> _Deleg;
 

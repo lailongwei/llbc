@@ -335,17 +335,13 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::vector<_Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         val.push_back(elem);
     }
@@ -356,19 +352,15 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::vector<_Ty> &val)
 template <typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Read(std::list<_Ty> &val)
 {
-    uint32 len = 0; 
+    uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         val.push_back(elem);
     }
@@ -381,17 +373,13 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::deque<_Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     for (uint32 i = 0; i < len; ++i)
     {
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         val.push_back(elem);
     }
@@ -404,17 +392,13 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::set<_Kty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     for (uint32 i = 0; i < len; ++i)
     {
         _Kty key;
         if (this->Read(key) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         val.insert(key);
     }
@@ -427,23 +411,17 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(std::map<_Kty, _Ty> &val)
 {
     uint32 len = 0;
     if (this->Read(len) != LLBC_OK)
-    {
         return LLBC_FAILED;
-    }
 
     for (uint32 i = 0; i < len; ++i)
     {
         _Kty key;
         if (this->Read(key) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         _Ty elem;
         if (this->Read(elem) != LLBC_OK)
-        {
             return LLBC_FAILED;
-        }
 
         val.insert(std::make_pair(key, elem));
     }
@@ -580,9 +558,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::list<_Ty> &val)
 
     _Iter it = val.begin(), endIt = val.end();
     for (; it != endIt; ++it)
-    {
         this->Write(*it);
-    }
 
     return LLBC_OK;
 }
@@ -594,9 +570,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::deque<_Ty> &val)
 
     const size_t size = val.size();
     for (size_t i = 0; i < size; ++i)
-    {
         this->Write(val[i]);
-    }
 
     return LLBC_OK;
 }
@@ -610,9 +584,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::set<_Kty> &val)
 
     _Iter it = val.begin(), endIt = val.end();
     for (; it != endIt; ++it)
-    {
         this->Write(*it);
-    }
 
     return LLBC_OK;
 }

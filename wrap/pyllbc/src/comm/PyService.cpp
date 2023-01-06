@@ -271,7 +271,7 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
              nativeMethIt != nativeMeths.end();
              ++nativeMethIt)
         {
-            const char *nativeMeth = nativeMethIt->first.str();
+            const char *nativeMeth = nativeMethIt->first.c_str();
             compClsDef.append_format("    def %s(self, arg):\n", nativeMeth);
             compClsDef.append_format("        return llbc.inl.CallComponentMethod(self._c_obj, '%s', arg)\n", nativeMeth);
         }
@@ -297,7 +297,7 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
              nativeMethIt != nativeMeths.end();
              ++nativeMethIt)
         {
-            const char *nativeMeth = nativeMethIt->first.str();
+            const char *nativeMeth = nativeMethIt->first.c_str();
 
             LLBC_String compMethDef;
             compMethDef.append_format("def %s(self, arg):\n", nativeMeth);
@@ -331,7 +331,7 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
     for (_NativeMethodsIter nativeMethIt = nativeMeths.begin();
          nativeMethIt != nativeMeths.end();
          ++nativeMethIt)
-        PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.str())); // Steal referencce for o.
+        PySet_Add(pyMeths, PyString_FromString(nativeMethIt->first.c_str())); // Steal referencce for o.
 
     comp = PyObject_CallFunctionObjArgs(compCls,
                                         pyCObj,

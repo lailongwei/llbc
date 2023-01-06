@@ -64,7 +64,6 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     // Set TLS.
     LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
     tls->coreTls.llbcThread = true;
-    tls->coreTls.logFmtStr = new LLBC_NS LLBC_String;
     tls->coreTls.threadHandle = threadArg->threadHandle;
     tls->coreTls.threadId = LLBC_NS LLBC_GetCurrentThreadId();
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -108,7 +107,6 @@ static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_ThreadEntry(LLBC_NS LLBC_ThreadAr
     delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
     delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
     delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
-    delete reinterpret_cast<LLBC_NS LLBC_String *>(tls->coreTls.logFmtStr); tls->coreTls.logFmtStr = nullptr;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
@@ -141,7 +139,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThreads(int threadNum,
                                               int flags,
                                               int priority,
                                               const int stackSize[],
-                                              LLBC_BaseTask *task,
+                                              LLBC_Task *task,
                                               LLBC_Handle groupHandle,
                                               LLBC_NativeThreadHandle nativeHandles[],
                                               LLBC_Handle handles[])
@@ -178,7 +176,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread(LLBC_ThreadProc proc,
                                              int flags,
                                              int priority,
                                              int stackSize,
-                                             LLBC_BaseTask *task,
+                                             LLBC_Task *task,
                                              LLBC_Handle groupHandle,
                                              LLBC_NativeThreadHandle *nativeHandle,
                                              LLBC_Handle *handle)
@@ -254,7 +252,7 @@ LLBC_Handle LLBC_ThreadManager::GetGroupHandle(LLBC_Handle handle) const
     return threadDesc->GetGroupHandle();
 }
 
-LLBC_BaseTask *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
+LLBC_Task *LLBC_ThreadManager::GetTask(LLBC_Handle handle) const
 {
     if (UNLIKELY(handle == LLBC_INVALID_HANDLE))
     {
@@ -396,7 +394,7 @@ int LLBC_ThreadManager::Wait(LLBC_Handle handle)
     return rtn;
 }
 
-int LLBC_ThreadManager::WaitTask(LLBC_BaseTask *task)
+int LLBC_ThreadManager::WaitTask(LLBC_Task *task)
 {
     if (UNLIKELY(!task))
     {
@@ -522,7 +520,7 @@ int LLBC_ThreadManager::Suspend(LLBC_Handle handle)
     return rtn;
 }
 
-int LLBC_ThreadManager::SuspendTask(LLBC_BaseTask *task)
+int LLBC_ThreadManager::SuspendTask(LLBC_Task *task)
 {
     if (UNLIKELY(!task))
     {
@@ -632,7 +630,7 @@ int LLBC_ThreadManager::Resume(LLBC_Handle handle)
     return rtn;
 }
 
-int LLBC_ThreadManager::ResumeTask(LLBC_BaseTask *task)
+int LLBC_ThreadManager::ResumeTask(LLBC_Task *task)
 {
     if (UNLIKELY(!task))
     {
@@ -745,7 +743,7 @@ int LLBC_ThreadManager::Cancel(LLBC_Handle handle)
     return rtn;
 }
 
-int LLBC_ThreadManager::CancelTask(LLBC_BaseTask *task)
+int LLBC_ThreadManager::CancelTask(LLBC_Task *task)
 {
     if (UNLIKELY(!task))
     {
@@ -847,7 +845,7 @@ int LLBC_ThreadManager::Kill(LLBC_Handle handle, int signum)
     return LLBC_KillThread(threadDesc->GetNativeHandle(), signum);
 }
 
-int LLBC_ThreadManager::KillTask(LLBC_BaseTask *task, int signum)
+int LLBC_ThreadManager::KillTask(LLBC_Task *task, int signum)
 {
     if (UNLIKELY(!task))
     {
@@ -951,7 +949,7 @@ LLBC_Handle LLBC_ThreadManager::CreateThread_NonLock(LLBC_ThreadProc proc,
                                                      int flags,
                                                      int priority,
                                                      int stackSize,
-                                                     LLBC_BaseTask *task,
+                                                     LLBC_Task *task,
                                                      LLBC_Handle groupHandle,
                                                      LLBC_NativeThreadHandle *nativeHandle,
                                                      LLBC_Handle *handle)

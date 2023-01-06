@@ -28,13 +28,14 @@
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"
 #include "llbc/common/Stream.h"
+#include "llbc/common/BasicCString.h"
 
 __LLBC_NS_BEGIN
 
 template <typename _Elem,
           typename _Traits = std::char_traits<_Elem>,
           typename _Ax = std::allocator<_Elem> >
-class LLBC_BasicString : public 
+class LLBC_BasicString : public
     std::basic_string<_Elem, _Traits, _Ax>
 {
     static_assert(sizeof(_Elem) <= 2, "LLBC_BasicString not support sizeof(_Elem) > 2 element type!");
@@ -68,6 +69,7 @@ public:
     LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
     LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
+    LLBC_BasicString(const LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
@@ -98,6 +100,12 @@ public:
         return *this;
     }
 
+    _This &operator =(const LLBC_BasicCString<_Elem> &cstr)
+    {
+        _Base::assign(cstr.c_str(), cstr.size());
+        return *this;
+    }
+
     _This &operator =(const _Elem *s)
     {
         if (LIKELY(s))
@@ -115,10 +123,10 @@ public:
     }
 
     // operator +
-    _This operator +(const _Elem *s) const
+    _This operator +(const _This &rhs) const
     {
         _This ret = *this;
-        ret.append(s);
+        ret.append(rhs);
         return ret;
     }
 
@@ -129,38 +137,54 @@ public:
         return ret;
     }
 
-    _This operator +(const _This &rhs) const
+    _This operator +(const LLBC_BasicCString<_Elem> &cstr) const
     {
         _This ret = *this;
-        ret.append(rhs);
+        ret.append(cstr);
+        return ret;
+    }
+
+    _This operator +(const _Elem *s) const
+    {
+        _This ret = *this;
+        ret.append(s);
+        return ret;
+    }
+
+    _This operator +(const _Elem &c) const
+    {
+        _This ret = *this;
+        ret.append(1, c);
         return ret;
     }
 
     // operator +=
-    _This &operator +=(const _Base &rhs)
-    {
-        _Base::operator +=(rhs);
-        return *this;
-    }
-
     _This &operator +=(const _This &rhs)
     {
-        _Base::operator +=(rhs);
-        return *this;
+        return append(rhs);
+    }
+
+    _This &operator +=(const _Base &rhs)
+    {
+        return append(rhs);
+    }
+
+    _This &operator +=(const LLBC_BasicCString<_Elem> &cstr)
+    {
+        return append(cstr.c_str(), cstr.size());
     }
 
     _This &operator +=(const _Elem *s)
     {
         if (LIKELY(s))
-            _Base::operator +=(s);
+            return append(s);
 
         return *this;
     }
 
     _This &operator +=(const _Elem &c)
     {
-        _Base::operator +=(c);
-        return *this;
+        return append(1, c);
     }
 
     // operator *
@@ -178,79 +202,178 @@ public:
     {
         if (this->empty() || right == 1)
             return *this;
-        
+
         if (right <= 0)
         {
             this->clear();
             return *this;
         }
 
-        _This unitStr(*this);
-        const _Elem *unitStrBuf = unitStr.data();
-        typename _This::size_type unitStrSize = unitStr.size();
+        const _Elem *unitStrBuf = this->data();
+        const size_type unitStrSize = this->size();
 
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
         for (int i = 1; i < right; ++i)
-            memcpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(_Elem));
+            memcpy(buf + i * unitStrSize, unitStrBuf, sizeof(_Elem) * unitStrSize);
 
         return *this;
     }
 
     // operator ==
-    bool operator ==(const _This &rhs) const
+    bool operator ==(const _This &str) const
     {
-        return _This::compare(rhs) == 0;
+        return this->compare(str) == 0;
+    }
+
+    bool operator ==(const _Base &str) const
+    {
+        return this->compare(str) == 0;
+    }
+
+    bool operator ==(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) == 0;
     }
 
     bool operator ==(const _Elem *s) const
     {
-        return _This::compare(s) == 0;
+        return this->compare(s) == 0;
     }
 
     bool operator ==(const _Elem &c) const
     {
-        return _This::compare(c) == 0;
+        return this->compare(c) == 0;
     }
 
     // operator !=
-    bool operator !=(const _This &rhs) const
+    bool operator !=(const _This &str) const
     {
-        return !this->operator ==(rhs);
+        return this->compare(str) != 0;
+    }
+
+    bool operator !=(const _Base &str) const
+    {
+        return this->compare(str) != 0;
+    }
+
+    bool operator !=(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) != 0;
     }
 
     bool operator !=(const _Elem *s) const
     {
-        return !this->operator ==(s);
+        return this->compare(s) != 0;
     }
 
     bool operator !=(const _Elem &c) const
     {
-        return !this->operator ==(c);
+        return this->compare(c) != 0;
     }
 
     // operator <
-    bool operator <(const _This &rhs) const
+    bool operator <(const _This &str) const
     {
-        return this->compare(rhs) < 0;
+        return this->compare(str) < 0;
+    }
+
+    bool operator <(const _Base &str) const
+    {
+        return this->compare(str) < 0;
+    }
+
+    bool operator <(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) < 0;
+    }
+
+    bool operator <(const _Elem *s) const
+    {
+        return this->compare(s) < 0;
+    }
+
+    bool operator <(const _Elem &c) const
+    {
+        return this->compare(c) < 0;
     }
 
     // operator <=
-    bool operator <=(const _This &rhs) const
+    bool operator <=(const _This &str) const
     {
-        return this->compare(rhs) <= 0;
+        return this->compare(str) <= 0;
+    }
+
+    bool operator <=(const _Base &str) const
+    {
+        return this->compare(str) <= 0;
+    }
+
+    bool operator <=(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) <= 0;
+    }
+
+    bool operator <=(const _Elem *s) const
+    {
+        return this->compare(s) <= 0;
+    }
+
+    bool operator <=(const _Elem &c) const
+    {
+        return this->compare(c) <= 0;
     }
 
     // operator >
-    bool operator >(const _This &rhs) const
+    bool operator >(const _This &str) const
     {
-        return this->compare(rhs) > 0;
+        return this->compare(str) > 0;
+    }
+
+    bool operator >(const _Base &str) const
+    {
+        return this->compare(str) > 0;
+    }
+
+    bool operator >(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) > 0;
+    }
+
+    bool operator >(const _Elem *s) const
+    {
+        return this->compare(s) > 0;
+    }
+
+    bool operator >(const _Elem &c) const
+    {
+        return this->compare(c) > 0;
     }
 
     // operator >=
-    bool operator >=(const _This &rhs) const
+    bool operator >=(const _This &str) const
     {
-        return this->compare(rhs) >= 0;
+        return this->compare(str) >= 0;
+    }
+
+    bool operator >=(const _Base &str) const
+    {
+        return this->compare(str) >= 0;
+    }
+
+    bool operator >=(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return this->compare(cstr) >= 0;
+    }
+
+    bool operator >=(const _Elem *s) const
+    {
+        return this->compare(s) >= 0;
+    }
+
+    bool operator >=(const _Elem &c) const
+    {
+        return this->compare(c) >= 0;
     }
 
     // operator []
@@ -291,6 +414,12 @@ public:
     _This &append(const _This &str)
     {
         _Base::append(str);
+        return *this;
+    }
+
+    _This &append(const LLBC_BasicCString<_Elem> &cstr)
+    {
+        _Base::append(cstr.c_str(), cstr.size());
         return *this;
     }
 
@@ -374,8 +503,7 @@ public:
         return *this;
     }
 
-    _This &insert(size_type p0, const _This &str, 
-        size_type pos, size_type n)
+    _This &insert(size_type p0, const _This &str, size_type pos, size_type n)
     {
         _Base::insert(p0, str, pos, n);
         return *this;
@@ -432,71 +560,61 @@ public:
     }
 
     // replace operations.
-    _This &replace(size_type p0, size_type n0,
-        const _This &str)
+    _This &replace(size_type p0, size_type n0, const _This &str)
     {
         _Base::replace(p0, n0, str);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _This &str, size_type pos, size_type n)
+    _This &replace(size_type p0, size_type n0, const _This &str, size_type pos, size_type n)
     {
         _Base::replace(p0, n0, str, pos, n);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _Elem *s)
+    _This &replace(size_type p0, size_type n0, const _Elem *s)
     {
         _Base::replace(p0, n0, s);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        const _Elem *s, size_type n)
+    _This &replace(size_type p0, size_type n0, const _Elem *s, size_type n)
     {
         _Base::replace(p0, n0, s, n);
         return *this;
     }
 
-    _This &replace(size_type p0, size_type n0,
-        size_type n, _Elem c)
+    _This &replace(size_type p0, size_type n0, size_type n, _Elem c)
     {
         _Base::replace(p0, n0, n, c);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _This &str)
+    _This &replace(iterator first0, iterator last0, const _This &str)
     {
         _Base::replace(first0, last0, str);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _Elem *s)
+    _This &replace(iterator first0, iterator last0, const _Elem *s)
     {
         _Base::replace(first0, last0, s);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const _Elem *s, size_type n)
+    _This &replace(iterator first0, iterator last0, const _Elem *s, size_type n)
     {
         _Base::replace(first0, last0, s, n);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        size_type n, _Elem c)
+    _This &replace(iterator first0, iterator last0, size_type n, _Elem c)
     {
         _Base::replace(first0, last0, n, c);
         return *this;
     }
 
-    _This &replace(iterator first0, iterator last0,
-        const_iterator first, const_iterator last)
+    _This &replace(iterator first0, iterator last0, const_iterator first, const_iterator last)
     {
         _Base::replace(first0, last0, first, last);
         return *this;
@@ -630,20 +748,17 @@ public:
     }
 
     // find operations.
-    size_type find(const _This &str, 
-        size_type pos = 0) const
+    size_type find(const _This &str, size_type pos = 0) const
     {
         return _Base::find(str, pos);
     }
 
-    size_type find(const _Elem *s, 
-        size_type pos, size_type n) const
+    size_type find(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find(s, pos, n);
     }
 
-    size_type find(const _Elem *s,
-        size_type pos = 0) const
+    size_type find(const _Elem *s, size_type pos = 0) const
     {
         return _Base::find(s, pos);
     }
@@ -654,14 +769,12 @@ public:
     }
 
     // Reverse find operations.
-    size_type rfind(const _This &str, 
-        size_type pos = _This::npos) const
+    size_type rfind(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::rfind(str, pos);
     }
 
-    size_type rfind(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type rfind(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::rfind(s, pos, n);
     }
@@ -677,14 +790,12 @@ public:
     }
 
     // find first of operations.
-    size_type find_first_of(const _This &str, 
-        size_type pos = 0) const
+    size_type find_first_of(const _This &str, size_type pos = 0) const
     {
         return _Base::find_first_of(str, pos);
     }
 
-    size_type find_first_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_first_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_first_of(s, pos, n);
     }
@@ -700,14 +811,12 @@ public:
     }
 
     // find last of operations.
-    size_type find_last_of(const _This &str,
-        size_type pos = _This::npos) const
+    size_type find_last_of(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::find_last_of(str, pos);
     }
 
-    size_type find_last_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_last_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_last_of(s, pos, n);
     }
@@ -722,14 +831,12 @@ public:
         return _Base::find_last_of(c, pos);
     }
 
-    size_type find_first_not_of(const _This &str,
-        size_type pos = 0) const
+    size_type find_first_not_of(const _This &str, size_type pos = 0) const
     {
         return _Base::find_first_not_of(str, pos);
     }
 
-    size_type find_first_not_of(const _Elem *s, size_type pos,
-        size_type n) const
+    size_type find_first_not_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_first_not_of(s, pos, n);
     }
@@ -744,14 +851,12 @@ public:
         return _Base::find_first_not_of(c, pos);
     }
 
-    size_type find_last_not_of(const _This &str,
-        size_type pos = _This::npos) const
+    size_type find_last_not_of(const _This &str, size_type pos = _This::npos) const
     {
         return _Base::find_last_not_of(str, pos);
     }
 
-    size_type find_last_not_of(const _Elem *s, size_type pos, 
-        size_type n) const
+    size_type find_last_not_of(const _Elem *s, size_type pos, size_type n) const
     {
         return _Base::find_last_not_of(s, pos, n);
     }
@@ -813,14 +918,17 @@ public:
         return _Base::compare(str);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _This &str)
+    int compare(const LLBC_BasicCString<_Elem> &cstr) const
+    {
+        return _Base::compare(0, cstr.size(), cstr.c_str());
+    }
+
+    int compare(size_type p0, size_type n0, const _This &str)
     {
         return _Base::compare(p0, n0, str);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _This &str, size_type pos, size_type n) const
+    int compare(size_type p0, size_type n0, const _This &str, size_type pos, size_type n) const
     {
         return _Base::compare(p0, n0, str, pos, n);
     }
@@ -830,14 +938,12 @@ public:
         return _Base::compare(s);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _Elem *s) const
+    int compare(size_type p0, size_type n0, const _Elem *s) const
     {
         return _Base::compare(p0, n0, s);
     }
 
-    int compare(size_type p0, size_type n0,
-        const _Elem *s, size_type pos) const
+    int compare(size_type p0, size_type n0, const _Elem *s, size_type pos) const
     {
         return _Base::compare(p0, n0, s, pos);
     }
@@ -849,8 +955,8 @@ public:
             return -1;
 
         _Elem thisC = this->at(0);
-        return (thisC > c ? 1 : 
-                    (thisC < c ? -1 :  
+        return (thisC > c ? 1 :
+                    (thisC < c ? -1 :
                         (size == 1 ? 0 : 1)));
     }
 
@@ -1006,7 +1112,7 @@ public:
         return isdigit(*this);
     }
 
-    // isspace: space[' '], carriage return['\r'], line feed['\n'], form feed['\f'], horizontal tab['\t'], vertical tab['\v']
+    // isspace: space[' '],carriage return['\r'],line feed['\n'],form feed['\f'],horizontal tab['\t'],vertical tab['\v']
     static bool isspace(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
@@ -1057,7 +1163,7 @@ public:
         if (s.empty())
             return true;
 
-        return (this->size() >= s.size() && 
+        return (this->size() >= s.size() &&
             memcmp(s.data(), this->data() + (this->size() - s.size()) * sizeof(_Elem), s.size() * sizeof(_Elem)) == 0);
     }
 
@@ -1161,7 +1267,7 @@ public:
     }
 
 public:
-    // strip operation: strip left. 
+    // strip operation: strip left.
     _This &lstrip(const _This &chars = _This())
     {
         _This willStripChars;
@@ -1395,7 +1501,7 @@ public:
             return;
         }
 
-        charIndex = (charIndex < 0) ? 
+        charIndex = (charIndex < 0) ?
             static_cast<long>(utf8Count) + charIndex : charIndex;
         if (charIndex <= 0 || charIndex >= static_cast<long>(utf8Count))
         {
@@ -1453,8 +1559,8 @@ public:
     {
         if (sizeof(_Elem) != sizeof(char) || _This::size() < 3)
             return false;
-        
-        return (memcmp(reinterpret_cast<const char *>(this->data()), 
+
+        return (memcmp(reinterpret_cast<const char *>(this->data()),
             reinterpret_cast<const char *>("\xef\xbb\xbf"), 3) == 0) ? true : false;
 
     }

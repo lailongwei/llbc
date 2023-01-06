@@ -36,7 +36,7 @@ inline sint32 LLBC_AtomicGet(volatile sint32 *ptr)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_add(ptr, 0);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return ::InterlockedExchangeAdd((volatile LONG *)ptr, 0);
+    return ::InterlockedExchangeAdd(reinterpret_cast<volatile LONG *>(ptr), 0);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_add(ptr, 0);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -72,7 +72,7 @@ inline sint32 LLBC_AtomicSet(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_lock_test_and_set(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return ::InterlockedExchange((volatile LONG *)ptr, value);
+    return ::InterlockedExchange(reinterpret_cast<volatile LONG *>(ptr), value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_lock_test_and_set(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -109,7 +109,7 @@ inline sint32 LLBC_AtomicFetchAndAdd(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_add(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return ::InterlockedExchangeAdd((volatile LONG *)ptr, value);
+    return ::InterlockedExchangeAdd(reinterpret_cast<volatile LONG *>(ptr), value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_add(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -145,7 +145,7 @@ inline sint32 LLBC_AtomicFetchAndSub(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_sub(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return ::InterlockedExchangeAdd((volatile LONG *)ptr, - value);
+    return ::InterlockedExchangeAdd(reinterpret_cast<volatile LONG *>(ptr), - value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_sub(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -184,7 +184,7 @@ inline sint32 LLBC_AtomicFetchAndAnd(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_and(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return _InterlockedAnd((volatile LONG *)ptr, value);
+    return _InterlockedAnd(reinterpret_cast<volatile LONG *>(ptr), value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_and(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -223,7 +223,7 @@ inline sint32 LLBC_AtomicFetchAndOr(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_or(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return _InterlockedOr((volatile LONG *)ptr, value);
+    return _InterlockedOr(reinterpret_cast<volatile LONG *>(ptr), value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_or(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -262,7 +262,7 @@ inline sint32 LLBC_AtomicFetchAndXor(volatile sint32 *ptr, sint32 value)
 #if LLBC_TARGET_PLATFORM_LINUX
     return __sync_fetch_and_xor(ptr, value);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return _InterlockedXor((volatile LONG *)ptr, value);
+    return _InterlockedXor(reinterpret_cast<volatile LONG *>(ptr), value);
 #elif LLBC_TARGET_PLATFORM_IPHONE
     return __sync_fetch_and_xor(ptr, value);
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -299,15 +299,15 @@ inline sint64 LLBC_AtomicFetchAndXor(volatile sint64 *ptr, sint64 value)
 inline sint32 LLBC_AtomicCompareAndExchange(volatile sint32 *ptr, sint32 exchange, sint32 comparand)
 {
 #if LLBC_TARGET_PLATFORM_LINUX
-    return __sync_val_compare_and_swap((sint32 *)ptr, comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_WIN32
-    return ::InterlockedCompareExchange((volatile LONG *)ptr, exchange, comparand);
+    return ::InterlockedCompareExchange(reinterpret_cast<volatile LONG *>(ptr), exchange, comparand);
 #elif LLBC_TARGET_PLATFORM_IPHONE
-    return __sync_val_compare_and_swap((sint32 *)ptr, comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_MAC
-    return __sync_val_compare_and_swap((sint32 *)ptr, comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #elif LLBC_TARGET_PLATFORM_ANDROID
-    return __sync_val_compare_and_swap((sint32 *)ptr, comparand, exchange);
+    return __sync_val_compare_and_swap(ptr, comparand, exchange);
 #endif
 }
 

@@ -918,7 +918,11 @@ int LLBC_ConnectToPeerEx(LLBC_SocketHandle handle,
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
-int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int optname, void *optval, LLBC_SocketLen *len)
+int LLBC_GetSocketOption(LLBC_SocketHandle handle,
+                         int level,
+                         int optname,
+                         void *optval,
+                         LLBC_SocketLen *len)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (getsockopt(handle, level, optname, 
@@ -941,7 +945,11 @@ int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int optname, void 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
-int LLBC_SetSocketOption(LLBC_SocketHandle handle, int level, int optname, const void *optval, LLBC_SocketLen len)
+int LLBC_SetSocketOption(LLBC_SocketHandle handle,
+                         int level,
+                         int optname,
+                         const void *optval,
+                         LLBC_SocketLen len)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if (setsockopt(handle, level, optname, 

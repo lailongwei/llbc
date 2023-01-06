@@ -170,7 +170,8 @@ inline const LLBC_ComponentMethods &LLBC_Component::GetAllMethods() const
     return LIKELY(_meths) ? *_meths : emptyMethods;
 }
 
-inline int LLBC_Component::AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth)
+inline int LLBC_Component::AddMethod(const LLBC_CString &methName,
+                                     const LLBC_ComponentMethod &meth)
 {
     if (UNLIKELY(!_meths))
         _meths = new LLBC_ComponentMethods;
@@ -179,12 +180,14 @@ inline int LLBC_Component::AddMethod(const LLBC_CString &methName, const LLBC_Co
 }
 
 template <typename Component>
-int LLBC_Component::AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
+int LLBC_Component::AddMethod(const LLBC_CString &methName,
+                              int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     return AddMethod(methName, LLBC_ComponentMethod(dynamic_cast<Component *>(this), meth));
 }
 
-inline int LLBC_Component::CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_Component::CallMethod(const LLBC_CString &methName,
+                                      const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     if (UNLIKELY(!_meths))
     {

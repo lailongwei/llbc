@@ -324,7 +324,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         _svcMgr.OnServiceStart(this);
 
         // Waiting for all comp init & start finished.
-        if (InitComps() != LLBC_OK || 
+        if (InitComps() != LLBC_OK ||
             StartComps() != LLBC_OK)
         {
             int errNo = LLBC_GetLastError();
@@ -630,7 +630,8 @@ int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
             _readySessionInfosLock.Unlock();
             if (removeSession)
                 RemoveSession(sessionId,
-                              "Protocol stack ctrl finished, business logic require remove this session(Half-Stack mode only)");
+                              "Protocol stack ctrl finished, "
+                              "business logic require remove this session(Half-Stack mode only)");
 
             return LLBC_OK;
         }
@@ -669,12 +670,14 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
 
     memcpy(compName, compRttiName, compNameLen + 1);
 
-    if (std::find_if(_willRegComps.begin(), _willRegComps.end(), [comp, compName, compNameLen](LLBC_Component *regComp) {
+    if (std::find_if(_willRegComps.begin(),
+                _willRegComps.end(),
+                [comp, compName, compNameLen](LLBC_Component *regComp) {
         if (comp == regComp)
         {
             return true;
         }
-        
+
         const char *regCompName = LLBC_GetTypeName(*regComp);
         return strlen(regCompName) == compNameLen && memcmp(compName, regCompName, compNameLen) == 0;
     }) != _willRegComps.end())
@@ -1131,7 +1134,7 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId, int acceptS
     }
 
     // Find protocol factory.
-    LLBC_IProtocolFactory *protoFactory = 
+    LLBC_IProtocolFactory *protoFactory =
         FindSessionProtocolFactory(acceptSessionId != 0 ? acceptSessionId : sessionId);
 
     // Create PackLayer protocol.
@@ -1161,14 +1164,14 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreateCodecStack(int sessionId, int accept
     }
 
     // Find protocol factory.
-    LLBC_IProtocolFactory *protoFactory = 
+    LLBC_IProtocolFactory *protoFactory =
         FindSessionProtocolFactory(acceptSessionId != 0 ? acceptSessionId : sessionId);
 
     // Create CodecLayer protocol.
     LLBC_IProtocol *codecLayer = protoFactory->Create(LLBC_ProtocolLayer::CodecLayer);
     if (codecLayer)
     {
-        ASSERT(codecLayer->GetLayer() == 
+        ASSERT(codecLayer->GetLayer() ==
             LLBC_ProtocolLayer::CodecLayer && "Invalid protocol layer!");
 
         stack->AddProtocol(codecLayer);
@@ -1346,7 +1349,7 @@ void LLBC_ServiceImpl::Cleanup()
     // Force handle queued events.
     if (_started &&
         _stopping &&
-        _compsStartFinished && 
+        _compsStartFinished &&
         _compsStartRet == LLBC_ERROR_SUCCESS)
         HandleQueuedEvents();
 
@@ -1767,7 +1770,8 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-    // Finally, search packet handler to handle, if not found any packet handler, dispatch unhandled-packet event to all comps.
+    // Finally, search packet handler to handle,
+    // if not found any packet handler, dispatch unhandled-packet event to all comps.
     auto it = _handlers.find(opcode);
     if (it != _handlers.end())
     {
@@ -2163,7 +2167,7 @@ void LLBC_ServiceImpl::DestroyComps()
         auto compName = it->first;
         _name2Comps.erase(it);
 
-        free(const_cast<char *>(compName.str()));
+        free(const_cast<char *>(compName.c_str()));
     }
 
     for (auto &evComps: _caredEventComps)
@@ -2483,7 +2487,8 @@ int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
     typename SessionIds::const_iterator sessionIt = sessionIds.begin();
 
     LLBC_Packet *firstPacket = _packetObjectPool.GetObject();
-    // firstPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
+    // firstPacket->SetSenderServiceId(_id);
+        // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
     firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
 
     bool hasCoder = true;
@@ -2531,7 +2536,8 @@ int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
                 continue;
 
             LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
+            // otherPacket->SetSenderServiceId(_id);
+                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
             otherPacket->Write(payload, payloadLen);
 
@@ -2561,7 +2567,8 @@ int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
                 continue;
 
             LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
+            // otherPacket->SetSenderServiceId(_id);
+                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
             otherPacket->SetHeader(svcId, sessionId, opcode, status);
 
             _multicastOtherPackets[i - 1] = otherPacket;
@@ -2588,7 +2595,10 @@ int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
     return LLBC_OK;
 }
 
-LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack)
+LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId,
+                                                       int acceptSessionId,
+                                                       bool isListenSession,
+                                                       LLBC_ProtocolStack *codecStack)
 {
     this->sessionId = sessionId;
     this->acceptSessionId = acceptSessionId;

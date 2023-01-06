@@ -34,7 +34,7 @@ class LLBC_EXPORT LLBC_ConsoleColor
 public:
     enum
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+        #if LLBC_TARGET_PLATFORM_NON_WIN32
         Fg_Black = 8,
         Fg_Red = 4,
         Fg_Green = 2,
@@ -58,7 +58,7 @@ public:
 
         Fg_Default = 0,
         Bg_Default = 0
-#else // LLBC_TARGET_PLATFORM_WIN32
+        #else // LLBC_TARGET_PLATFORM_WIN32
         Fg_Black  = 0,
         Fg_Red    = FOREGROUND_RED,
         Fg_Green  = FOREGROUND_GREEN,
@@ -82,7 +82,7 @@ public:
 
         Fg_Default = Fg_White,
         Bg_Default = Bg_Black
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+        #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     };
 };
 

@@ -150,7 +150,8 @@ private:
     /**
      * Statistic top N pool instance statistic infos.
      */
-    void StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat, std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const;
+    void StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat,
+                               std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const;
 
 private:
     // Disable assignment.

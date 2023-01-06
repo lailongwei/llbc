@@ -74,7 +74,8 @@ inline int LLBC_Service::AddComponent(LLBC_ComponentFactory *compFactory)
     return ret;
 }
 
-inline int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName)
+inline int LLBC_Service::AddComponent(const LLBC_String &compSharedLibPath,
+                                      const LLBC_String &compName)
 {
     LLBC_Component *_;
     return AddComponent(compSharedLibPath, compName, _);

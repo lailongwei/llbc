@@ -45,7 +45,7 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_PacketHeaderAssembler(size_t headerLen);
+    explicit LLBC_PacketHeaderAssembler(size_t headerLen);
     virtual ~LLBC_PacketHeaderAssembler();
 
 public:

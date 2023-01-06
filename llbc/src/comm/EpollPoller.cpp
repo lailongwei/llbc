@@ -225,7 +225,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             if (epev.events & EPOLLOUT)
             {
                 // Maybe in session removed while calling OnRecv() method.
-                if ((epev.events & EPOLLIN) && 
+                if ((epev.events & EPOLLIN) &&
                         UNLIKELY(_sessions.find(sessionId) == _sessions.end()))
                     continue;
 

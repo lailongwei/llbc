@@ -267,7 +267,7 @@ namespace
     /**
     * \brief Object pool test task encapsulation.
     */
-    class ObjectPoolTestTask : public LLBC_BaseTask
+    class ObjectPoolTestTask : public LLBC_Task
     {
     public:
         ObjectPoolTestTask()

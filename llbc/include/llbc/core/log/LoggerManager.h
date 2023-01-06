@@ -223,7 +223,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 #define LJLOG_WARN3(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Warn)
 #define LJLOG_WARN4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Warn)
 
-#define LJLOG_ERROR() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Error) 
+#define LJLOG_ERROR() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Error)
 #define LJLOG_ERROR2(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Error)
 #define LJLOG_ERROR3(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Error)
 #define LJLOG_ERROR4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Error)

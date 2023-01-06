@@ -76,7 +76,8 @@ namespace std
  * \brief The std::less<T> template class specialization: std::less<LLBC_TimerData *>.
  */
 template <>
-struct less<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
+struct less<LLBC_NS LLBC_TimerData *> :
+    public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
 {
     bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2)
     {
@@ -88,7 +89,8 @@ struct less<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_Time
  * \brief The std::greater<T> template class specialization: std::greater<LLBC_TimerData *>.
  */
 template <>
-struct greater<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
+struct greater<LLBC_NS LLBC_TimerData *> :
+    public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
 {
     bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2)
     {

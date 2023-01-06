@@ -309,7 +309,9 @@ public:
      * Register component.
      */
     virtual int AddComponent(LLBC_Component *comp);
-    virtual int AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp);
+    virtual int AddComponent(const LLBC_String &compSharedLibPath,
+                             const LLBC_String &compName,
+                             LLBC_Component *&comp);
 
     /**
      * Get component.
@@ -652,7 +654,10 @@ private:
         LLBC_ProtocolStack *codecStack;
 
     public:
-        _ReadySessionInfo(int sessionId, int acceptSessionId, bool isListenSession, LLBC_ProtocolStack *codecStack = nullptr);
+        _ReadySessionInfo(int sessionId,
+                          int acceptSessionId,
+                          bool isListenSession,
+                          LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
     std::map<int, _ReadySessionInfo *> _readySessionInfos;

@@ -49,19 +49,19 @@ public:
      */
     enum
     {
-        StrToken      = '\0',         // ..: string type token.
-        NameToken     = 'N',          // %L: logger name type token.
-        TagToken      = 'g',          // %g: tag type token.
-        FileToken     = 'f',          // %f: file name type token.
-        LineToken     = 'l',          // %l: file line type token.
-        FunctionToken = 'F',          // %F: function token.
-        ThreadIdToken = 't',          // %t: thread id type token.
-        ProcessIdToken= 'p',          // %p: process id type token.
-        LevelToken    = 'L',          // %L: level type token, like DEBUG, INFO, eg ...
-        NewLineToken  = 'n',          // %n: new line type.
-        MsgToken      = 'm',          // %m: message type token.
-        TimeToken     = 'T',          // %T: time token.
-        EscapeToken   = '%',          // %%: escape token.
+        StrToken       = '\0',// ..: string type token.
+        NameToken      = 'N', // %L: logger name type token.
+        TagToken       = 'g', // %g: tag type token.
+        FileToken      = 'f', // %f: file name type token.
+        LineToken      = 'l', // %l: file line type token.
+        FunctionToken  = 'F', // %F: function token.
+        ThreadIdToken  = 't', // %t: thread id type token.
+        ProcessIdToken = 'p', // %p: process id type token.
+        LevelToken     = 'L', // %L: level type token, like DEBUG, INFO, eg ...
+        NewLineToken   = 'n', // %n: new line type.
+        MsgToken       = 'm', // %m: message type token.
+        TimeToken      = 'T', // %T: time token.
+        EscapeToken    = '%', // %%: escape token.
 
         End
     };

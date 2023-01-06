@@ -400,7 +400,7 @@ private:
 class LLBC_EXPORT LLBC_Component
 {
 public:
-    LLBC_Component(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
+    explicit LLBC_Component(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
     virtual ~LLBC_Component();
 
 public:
@@ -492,7 +492,8 @@ public:
      * @param[in] meth     - the method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth);
+    int AddMethod(const LLBC_CString &methName,
+                  const LLBC_ComponentMethod &meth);
 
     /**
      * Add component method(component's member).
@@ -501,7 +502,8 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename Component>
-    int AddMethod(const LLBC_CString &methName, int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
+    int AddMethod(const LLBC_CString &methName,
+                  int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
     /**
      * Call component method.
@@ -510,7 +512,8 @@ public:
      * @param[in] ret      - the method execute result.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret);
+    virtual int CallMethod(const LLBC_CString &methName,
+                           const LLBC_Variant &arg, LLBC_Variant &ret);
 
 public:
     /**

@@ -297,7 +297,10 @@ private:                                            \
                                                                     \
         va_list ___llbc_macro_inl_argfmt_ap;                        \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        int ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        int ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf(nullptr,  \
+                                                          0,        \
+                                                          (fmt),    \
+                                                          ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
             buf = nullptr; len = 0;                                 \
@@ -307,7 +310,10 @@ private:                                            \
                                                                     \
         buf = LLBC_Malloc(char, ___llbc_macro_inl_argfmt_vsnp_len + 1); \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf((buf),        \
+                                                      ___llbc_macro_inl_argfmt_vsnp_len + 1, \
+                                                      (fmt),        \
+                                                      ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
             free(buf);                                              \

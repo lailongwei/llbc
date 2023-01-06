@@ -25,7 +25,7 @@
 /**
  * \brief Test task encapsulation.
  */
-class TestTask : public LLBC_BaseTask
+class TestTask : public LLBC_Task
 {
 public:
     explicit TestTask(size_t perThreadPopTimes);

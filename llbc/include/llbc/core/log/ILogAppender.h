@@ -121,15 +121,11 @@ protected:
      */
     virtual int GetLogLevel() const = 0;
 
-protected:
     /**
      * Get current appender's token chain.
      * @return LLBC_LogTokenChain * - the log token chain.
      */
     virtual LLBC_LogTokenChain *GetTokenChain() const = 0;
-
-protected:
-    friend class LLBC_Logger;
 
     /**
      * Get next appender.
@@ -143,11 +139,26 @@ protected:
      */
     virtual void SetAppenderNext(LLBC_ILogAppender *appender) = 0;
 
+    /**
+     * Get log formatter buffer.
+     * @return LLBC_String & - log format buffer.
+     */
+    virtual LLBC_String &GetLogFormatBuf() = 0;
+
 protected:
     /**
      * Flush method.
      */
     virtual void Flush() = 0;
+
+private:
+    /**
+     * Friend class: LLBC_Logger.
+     * Call method(s):
+     * - GetAppenderNext()
+     * - SetAppenderNext()
+     */
+    friend class LLBC_Logger;
 };
 
 __LLBC_NS_END

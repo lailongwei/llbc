@@ -46,13 +46,13 @@ __LLBC_NS_BEGIN
 /**
  * \brief The base poller class encapsulation.
  */
-class LLBC_HIDDEN LLBC_BasePoller : public LLBC_BaseTask
+class LLBC_HIDDEN LLBC_BasePoller : public LLBC_Task
 {
     typedef LLBC_BasePoller This;
 
 public:
     // Public Task::Push method, hide other Task methods.
-    using LLBC_BaseTask::Push;
+    using LLBC_Task::Push;
 
 public:
     /**
@@ -127,7 +127,10 @@ protected:
     /**
      * Create new session from socket.
      */
-    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession);
+    LLBC_Session *CreateSession(LLBC_Socket *socket,
+                                int sessionId,
+                                const LLBC_SessionOpts &sessionOpts,
+                                LLBC_Session *acceptSession);
 
 protected:
     /**

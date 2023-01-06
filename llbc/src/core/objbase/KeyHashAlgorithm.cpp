@@ -58,7 +58,7 @@ uint32 __LLBC_Hash::_BKDRHash::operator()(const void * buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = hash * seed + str[i];
     }
@@ -71,7 +71,7 @@ uint32 __LLBC_Hash::_DJBHash::operator()(const void *buf, size_t size) const
     uint32 hash = 5381;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         // Equivalent to: hash = hash[i - 1] * 33 + str[i]
         hash += (hash << 5) + str[i];
@@ -85,7 +85,7 @@ uint32 __LLBC_Hash::_SDBMHash::operator() (const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         // Equivalent to: hash = 65599 * hash + (*buf ++);
         hash = str[i] + (hash << 6) + (hash << 16) - hash;
@@ -101,7 +101,7 @@ uint32 __LLBC_Hash::_RSHash::operator()(const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = hash * a + (str[i]);
         a *= b;
@@ -115,7 +115,7 @@ uint32 __LLBC_Hash::_JSHash::operator()(const void *buf, size_t size) const
     uint32 hash = 1315423911;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash ^= ((hash << 5) + str[i] + (hash >> 2));
     }
@@ -134,7 +134,7 @@ uint32 __LLBC_Hash::_PJHash::operator()(const void *buf, size_t size) const
     uint32 test = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = (hash << oneEighth) + str[i];
         if((test = hash & highBits) != 0)
@@ -152,7 +152,7 @@ uint32 __LLBC_Hash::_ELFHash::operator()(const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = (hash << 4) + str[i];
         if((x = hash & 0xF0000000L) != 0)
@@ -170,7 +170,7 @@ uint32 __LLBC_Hash::_APHash::operator()(const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         if((i & 1) == 0)
         {

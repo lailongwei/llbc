@@ -132,7 +132,8 @@ private:
 class LLBC_ObjectPoolStat
 {
 public:
-    std::map<LLBC_CString, LLBC_ObjectPoolInstStat> poolInsts; // the pool instances array, all pool instances info are stored in here.
+    // the pool instances array, all pool instances info are stored in here.
+    std::map<LLBC_CString, LLBC_ObjectPoolInstStat> poolInsts;
 
     size_t freeMemory; // all pool instances free memory(in bytes, approx)
     size_t usedMemory; // all pool instances used memory(in bytes, approx)
@@ -182,13 +183,17 @@ private:
 class LLBC_ObjectPoolInstStatComper
 {
 public:
-    static bool CompBy_UsedMem(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+    static bool CompBy_UsedMem(const LLBC_ObjectPoolInstStat * const &left,
+                               const LLBC_ObjectPoolInstStat * const &right);
 
-    static bool CompBy_ElemMem(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+    static bool CompBy_ElemMem(const LLBC_ObjectPoolInstStat * const &left,
+                               const LLBC_ObjectPoolInstStat * const &right);
 
-    static bool CompBy_UsedElems(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+    static bool CompBy_UsedElems(const LLBC_ObjectPoolInstStat * const &left,
+                                 const LLBC_ObjectPoolInstStat * const &right);
 
-    static bool CompBy_AllocatedMem(const LLBC_ObjectPoolInstStat * const &left, const LLBC_ObjectPoolInstStat * const &right);
+    static bool CompBy_AllocatedMem(const LLBC_ObjectPoolInstStat * const &left,
+                                    const LLBC_ObjectPoolInstStat * const &right);
 };
 
 __LLBC_NS_END

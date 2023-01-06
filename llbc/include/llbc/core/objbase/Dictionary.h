@@ -117,13 +117,9 @@ public:
         if (_elem)
         {
             if (_Forward)
-            {
                 _elem = _elem->GetElemNext();
-            }
             else
-            {
                 _elem = _elem->GetElemPrev();
-            }
         }
 
         return *this;
@@ -132,7 +128,7 @@ public:
     iterator operator ++(int)
     {   // postincrement.
         iterator temp(*this);
-        ++ *this;
+        ++*this;
         return temp;
     }
 
@@ -141,13 +137,9 @@ public:
         if (_elem)
         {
             if (_Forward)
-            {
                 _elem = _elem->GetElemPrev();
-            }
             else
-            {
                 _elem = _elem->GetElemNext();
-            }
         }
 
         return *this;
@@ -156,7 +148,7 @@ public:
     iterator operator --(int)
     {   // postdecrement.
         iterator temp(*this);
-        -- *this;
+        --*this;
         return temp;
     }
 
@@ -181,9 +173,7 @@ protected:
     {
 #ifdef LLBC_DEBUG
         if (!_elem)
-        {
             _Xnullptr();
-        }
 #endif
     }
 
@@ -260,7 +250,7 @@ public:
     const iterator operator ++(int)
     {   // postincrement.
         iterator temp(*this);
-        ++ *this;
+        ++*this;
         return temp;
     }
 
@@ -273,7 +263,7 @@ public:
     const iterator operator --(int)
     {   // postdecrement.
         iterator temp(*this);
-        -- *this;
+        --*this;
         return temp;
     }
 

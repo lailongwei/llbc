@@ -36,7 +36,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] = 
+static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
 {
     // Successfully.
     "successfully",             // 0x0000
@@ -235,12 +235,12 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             return libTls->commonTls.customErrDesc;
 
         __LLBC_LockCustomErr();
-        
+
         typedef std::map<int, LLBC_String>::iterator _Iter;
         _Iter it = __g_customErrDesc.find(no);
         const bool found = it != __g_customErrDesc.end();
 
-        const char *errDesc = 
+        const char *errDesc =
             found ? it->second.c_str() : __g_unknownCustomErrDesc;
 
         __LLBC_UnlockCustomErr();
@@ -252,12 +252,12 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        sprintf(libTls->commonTls.errDesc, 
+        sprintf(libTls->commonTls.errDesc,
                 __g_errDesc[noPart], subErrno, strerror(subErrno));
 #else // LLBC_TARGET_PLATFORM_WIN32
         char libcErrDesc[__LLBC_ERROR_DESC_SIZE] = {0};
         strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
-        sprintf_s(libTls->commonTls.errDesc, 
+        sprintf_s(libTls->commonTls.errDesc,
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
@@ -269,7 +269,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         HLOCAL hLocal = nullptr;
         const DWORD sysLocale = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
         // const DWORD sysLocale = MAKELANGID(LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
-        ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | 
+        ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM |
                              FORMAT_MESSAGE_ALLOCATE_BUFFER |
                              FORMAT_MESSAGE_IGNORE_INSERTS,
                          nullptr,
@@ -283,7 +283,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             HMODULE netDll = LoadLibraryExA("netmsg.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
             if (netDll != nullptr)
             {
-                ::FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE | 
+                ::FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE |
                                     FORMAT_MESSAGE_ALLOCATE_BUFFER |
                                     FORMAT_MESSAGE_IGNORE_INSERTS,
                                  netDll,
@@ -292,7 +292,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
                                  (PSTR)&hLocal,
                                  0,
                                  nullptr);
-                                    
+
                 ::FreeLibrary(netDll);
             }
         }
@@ -304,7 +304,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             bool hasCRLF = false;
             const size_t sysErrLen = strlen(sysErr);
             if (sysErrLen >= 2)
-                if (sysErr[sysErrLen - 2] == LLBC_CR_A && 
+                if (sysErr[sysErrLen - 2] == LLBC_CR_A &&
                     sysErr[sysErrLen - 1] == LLBC_LF_A)
                         hasCRLF = true;
 
@@ -313,7 +313,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 
             ::LocalUnlock(hLocal);
 
-            sprintf_s(libTls->commonTls.errDesc, 
+            sprintf_s(libTls->commonTls.errDesc,
                   __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, sysErr);
 
             ::LocalFree(hLocal);
@@ -321,9 +321,9 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
         else
         {
             char unknownErrDesc[64] = {0};
-            sprintf_s(unknownErrDesc, 
+            sprintf_s(unknownErrDesc,
                 sizeof(unknownErrDesc), "Unknown error, error code: %d", subErrno);
-            sprintf_s(libTls->commonTls.errDesc, 
+            sprintf_s(libTls->commonTls.errDesc,
                 __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], unknownErrDesc);
         }
 
@@ -333,7 +333,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (LLBC_ERROR_TYPE_IS_GAI(no))
     {
-        sprintf(libTls->commonTls.errDesc, 
+        sprintf(libTls->commonTls.errDesc,
               __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
         return libTls->commonTls.errDesc;
     }

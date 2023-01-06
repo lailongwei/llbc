@@ -32,6 +32,12 @@ int TestCase_Com_DataType::Run(int argc, char *argv[])
     // string base test.
     StringBaseTest();
 
+    // string compare test.
+    StringCompareTest();
+
+    // string logic-operation test.
+    StringLogicOperationTest();
+
     // utf8 test.
     StringUTF8Test();
 
@@ -135,6 +141,148 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLine("%s starts with 'world!!'?: %s", str.c_str(), str.endswith("world!!") ? "true" : "false");
 
     LLBC_PrintLine("\n");
+}
+
+void TestCase_Com_DataType::StringCompareTest()
+{
+    LLBC_PrintLine("String compare test:");
+    {
+        LLBC_PrintLine("- LLBC_String compare LLBC_String:");
+        const LLBC_String str1("Hello world");
+        const LLBC_String str2("Hello world!");
+        const LLBC_String str3("Hello World!");
+        const LLBC_String str4("Hey!");
+
+        LLBC_PrintLine("  - %s == %s ? %d", str1.c_str(), str2.c_str(), str1 == str2);
+        LLBC_PrintLine("  - %s != %s ? %d", str1.c_str(), str2.c_str(), str1 != str2);
+        LLBC_PrintLine("  - %s < %s ? %d", str1.c_str(), str2.c_str(), str1 < str2);
+        LLBC_PrintLine("  - %s <= %s ? %d", str1.c_str(), str2.c_str(), str1 <= str2);
+        LLBC_PrintLine("  - %s > %s ? %d", str1.c_str(), str2.c_str(), str1 > str2);
+        LLBC_PrintLine("  - %s >= %s ? %d", str1.c_str(), str2.c_str(), str1 >= str2);
+
+        LLBC_PrintLine("  - %s == %s ? %d", str2.c_str(), str3.c_str(), str2 == str3);
+        LLBC_PrintLine("  - %s != %s ? %d", str2.c_str(), str3.c_str(), str2 != str3);
+        LLBC_PrintLine("  - %s < %s ? %d", str2.c_str(), str3.c_str(), str2 < str3);
+        LLBC_PrintLine("  - %s <= %s ? %d", str2.c_str(), str3.c_str(), str2 <= str3);
+        LLBC_PrintLine("  - %s > %s ? %d", str2.c_str(), str3.c_str(), str2 > str3);
+        LLBC_PrintLine("  - %s >= %s ? %d", str2.c_str(), str3.c_str(), str2 >= str3);
+
+        LLBC_PrintLine("  - %s == %s ? %d", str3.c_str(), str4.c_str(), str3 == str4);
+        LLBC_PrintLine("  - %s != %s ? %d", str3.c_str(), str4.c_str(), str3 != str4);
+        LLBC_PrintLine("  - %s < %s ? %d", str3.c_str(), str4.c_str(), str3 < str4);
+        LLBC_PrintLine("  - %s <= %s ? %d", str3.c_str(), str4.c_str(), str3 <= str4);
+        LLBC_PrintLine("  - %s > %s ? %d", str3.c_str(), str4.c_str(), str3 > str4);
+        LLBC_PrintLine("  - %s >= %s ? %d", str3.c_str(), str4.c_str(), str3 >= str4);
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_String compare LLBC_CString:");
+        LLBC_String str1("Hello world");
+        LLBC_String str2("Hey Judy");
+        LLBC_CString cstr1("Hello world");
+        LLBC_CString cstr2("Hey Judy");
+
+        LLBC_PrintLine("  - %s == %s ? %d", str1.c_str(), cstr1.c_str(), str1 == cstr1);
+        LLBC_PrintLine("  - %s != %s ? %d", str1.c_str(), cstr1.c_str(), str1 != cstr1);
+        LLBC_PrintLine("  - %s < %s ? %d", str1.c_str(), cstr1.c_str(), str1 < cstr1);
+        LLBC_PrintLine("  - %s <= %s ? %d", str1.c_str(), cstr1.c_str(), str1 <= cstr1);
+        LLBC_PrintLine("  - %s > %s ? %d", str1.c_str(), cstr1.c_str(), str1 > cstr1);
+        LLBC_PrintLine("  - %s >= %s ? %d", str1.c_str(), cstr1.c_str(), str1 >= cstr1);
+
+        LLBC_PrintLine("  - %s == %s ? %d", str2.c_str(), cstr2.c_str(), str2 == cstr2);
+        LLBC_PrintLine("  - %s != %s ? %d", str2.c_str(), cstr2.c_str(), str2 != cstr2);
+        LLBC_PrintLine("  - %s < %s ? %d", str2.c_str(), cstr2.c_str(), str2 < cstr2);
+        LLBC_PrintLine("  - %s <= %s ? %d", str2.c_str(), cstr2.c_str(), str2 <= cstr2);
+        LLBC_PrintLine("  - %s > %s ? %d", str2.c_str(), cstr2.c_str(), str2 > cstr2);
+        LLBC_PrintLine("  - %s >= %s ? %d", str2.c_str(), cstr2.c_str(), str2 >= cstr2);
+
+        LLBC_PrintLine("  - %s == %s ? %d", str2.c_str(), cstr1.c_str(), str2 == cstr1);
+        LLBC_PrintLine("  - %s != %s ? %d", str2.c_str(), cstr1.c_str(), str2 != cstr1);
+        LLBC_PrintLine("  - %s < %s ? %d", str2.c_str(), cstr1.c_str(), str2 < cstr1);
+        LLBC_PrintLine("  - %s <= %s ? %d", str2.c_str(), cstr1.c_str(), str2 <= cstr1);
+        LLBC_PrintLine("  - %s > %s ? %d", str2.c_str(), cstr1.c_str(), str2 > cstr1);
+        LLBC_PrintLine("  - %s >= %s ? %d", str2.c_str(), cstr1.c_str(), str2 >= cstr1);
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_CString compare LLBC_String:");
+        LLBC_String str1("Hello world");
+        LLBC_String str2("Hey Judy");
+        LLBC_CString cstr1("Hello world");
+        LLBC_CString cstr2("Hey Judy");
+
+        LLBC_PrintLine("  - %s == %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 == str1);
+        LLBC_PrintLine("  - %s != %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 != str1);
+        LLBC_PrintLine("  - %s < %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 < str1);
+        LLBC_PrintLine("  - %s <= %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 <= str1);
+        LLBC_PrintLine("  - %s > %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 > str1);
+        LLBC_PrintLine("  - %s >= %s ? %d", cstr1.c_str(), str1.c_str(), cstr1 >= str1);
+
+        LLBC_PrintLine("  - %s == %s ? %d", cstr2.c_str(), str2.c_str(), str2 == str2);
+        LLBC_PrintLine("  - %s != %s ? %d", cstr2.c_str(), str2.c_str(), str2 != str2);
+        LLBC_PrintLine("  - %s < %s ? %d", cstr2.c_str(), str2.c_str(), str2 < str2);
+        LLBC_PrintLine("  - %s <= %s ? %d", cstr2.c_str(), str2.c_str(), str2 <= str2);
+        LLBC_PrintLine("  - %s > %s ? %d", cstr2.c_str(), str2.c_str(), str2 > str2);
+        LLBC_PrintLine("  - %s >= %s ? %d", cstr2.c_str(), str2.c_str(), (str2 >= str2));
+
+        LLBC_PrintLine("  - %s == %s ? %d", cstr2.c_str(), str1.c_str(), str2 == str1);
+        LLBC_PrintLine("  - %s != %s ? %d", cstr2.c_str(), str1.c_str(), str2 != str1);
+        LLBC_PrintLine("  - %s < %s ? %d", cstr2.c_str(), str1.c_str(), str2 < str1);
+        LLBC_PrintLine("  - %s <= %s ? %d", cstr2.c_str(), str1.c_str(), str2 <= str1);
+        LLBC_PrintLine("  - %s > %s ? %d", cstr2.c_str(), str1.c_str(), str2 > str1);
+        LLBC_PrintLine("  - %s >= %s ? %d", cstr2.c_str(), str1.c_str(), str2 >= str1);
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_String compare const char *:");
+        LLBC_String str("Hello world");
+        auto cstr("Hello world");
+        LLBC_PrintLine(" - %s == %s ? %d", str.c_str(), cstr, str == cstr);
+    }
+}
+
+void TestCase_Com_DataType::StringLogicOperationTest()
+{
+    LLBC_PrintLine("String logic-operation test:");
+
+    {
+        LLBC_PrintLine("- LLBC_String += LLBC_String test:");
+        LLBC_String str1("Hello");
+        LLBC_String str2(" World");
+
+        const LLBC_String str3 = str1 + str2;
+        LLBC_PrintLine("%s + %s = %s", str1.c_str(), str2.c_str(), str3.c_str());
+        LLBC_PrintLine("%s += %s = %s", str1.c_str(), str2.c_str(), (str1 += str2).c_str());
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_String + literal string test:");
+        LLBC_String str("Hey");
+        auto cstr = " Judy";
+        
+        const LLBC_String str2 = str + cstr;
+        LLBC_PrintLine("%s + %s = %s", str.c_str(), cstr, str2.c_str());
+        LLBC_PrintLine("%s += %s = %s", str.c_str(), cstr, (str + cstr).c_str());
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_String + LLBC_CString test:");
+        LLBC_String str("Hey");
+        LLBC_CString cstr(" Judy");
+        
+        const LLBC_String str2 = str + cstr;
+        LLBC_PrintLine("%s + %s = %s", str.c_str(), cstr.c_str(), str2.c_str());
+        LLBC_PrintLine("%s += %s = %s", str.c_str(), cstr.c_str(), (str + cstr).c_str());
+    }
+
+    {
+        LLBC_PrintLine("- LLBC_String * int test:");
+        LLBC_String str1("Hello ");
+
+        LLBC_PrintLine("- %s * 0 = %s", str1.c_str(), (str1 * 0).c_str());
+        LLBC_PrintLine("- %s * 1 = %s", str1.c_str(), (str1 * 1).c_str());
+        LLBC_PrintLine("- %s * 3 = %s", str1.c_str(), (str1 * 3).c_str());
+    }
 }
 
 void TestCase_Com_DataType::StringUTF8Test()

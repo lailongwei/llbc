@@ -103,11 +103,11 @@ public:
      * Get specific path's files, not include directory type files.
      * @param[in]  path      - the path.
      * @param[out] files     - all given path's files.
-     * @param[in]  fileExt   - the file extension, included '.', if set to null. dont filter.
+     * @param[in]  ext       - the file extension, included '.', if set to null. dont filter.
      * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &fileExt, bool recursive = false);
+    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive = false);
 
     /**
      * Recursive specific path's directories.

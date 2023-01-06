@@ -58,7 +58,8 @@ LLBC_EXPORT LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle);
  * @param[in] name   - resource name.
  * @return LLBC_String - resource path.
  */
-LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                              const LLBC_String &name);
 
 /**
  * Get resource path by name and extension name.
@@ -67,7 +68,9 @@ LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LL
  * @param[in] ext   - resource extension.
  * @return LLBC_String - resource path.
  */
-LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                              const LLBC_String &name,
+                                              const LLBC_String &ext);
 
 /**
  * Get resource path by name and extension name and relative path.
@@ -77,7 +80,10 @@ LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LL
  * @param[in] inDir  - relative directory path.
  * @return LLBC_String - resource path.
  */
-LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir);
+LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                              const LLBC_String &name,
+                                              const LLBC_String &ext,
+                                              const LLBC_String &inDir);
 
 
 __LLBC_NS_END

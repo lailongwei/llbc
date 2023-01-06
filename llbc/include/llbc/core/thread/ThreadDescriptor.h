@@ -25,7 +25,7 @@
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
-class LLBC_BaseTask;
+class LLBC_Task;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -127,15 +127,15 @@ public:
 public:
     /**
      * Get task.
-     * @return LLBC_BaseTask * - task pointer.
+     * @return LLBC_Task * - task pointer.
      */
-    LLBC_BaseTask *GetTask() const;
+    LLBC_Task *GetTask() const;
 
     /**
      * Set task.
      * @param[in] task - task pointer.
      */
-    void SetTask(LLBC_BaseTask *task);
+    void SetTask(LLBC_Task *task);
 
 public:
     /**
@@ -178,7 +178,7 @@ private:
     int _state;
     int _flags;
 
-    LLBC_BaseTask *_task;
+    LLBC_Task *_task;
 
     LLBC_ThreadDescriptor *_nextThread;
     LLBC_ThreadDescriptor *_groupNextThread;

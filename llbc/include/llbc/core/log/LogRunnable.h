@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief Log Runnable class encapsulation.
  */
-class LLBC_LogRunnable : public LLBC_BaseTask
+class LLBC_LogRunnable : public LLBC_Task
 {
 public:
     /**

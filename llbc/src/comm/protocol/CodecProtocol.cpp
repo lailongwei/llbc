@@ -90,7 +90,9 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
         if (UNLIKELY(!coder->Decode(*packet)))
         {
             LLBC_String reportMsg = LLBC_String().format(
-                    "Decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+                "Decode packet failed, opcode: %d, payloadLen: %ld",
+                packet->GetOpcode(),
+                packet->GetPayloadLength());
 
             const LLBC_String &codecErr = packet->GetCodecError();
             if (!codecErr.empty())
@@ -116,7 +118,9 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
     else if (!_stack->GetIsSuppressedCoderNotFoundWarning())
     {
         const LLBC_String reportMsg = LLBC_String().format(
-            "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+            "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld",
+            packet->GetOpcode(),
+            packet->GetPayloadLength());
         _stack->Report(packet->GetSessionId(),
                        packet->GetOpcode(),
                        this,

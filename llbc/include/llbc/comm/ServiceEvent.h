@@ -240,8 +240,8 @@ public:
      * Build async-connect result event.
      */
     static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
-                                                     bool conneted, 
-                                                     const LLBC_String &reason, 
+                                                     bool conneted,
+                                                     const LLBC_String &reason,
                                                      const LLBC_SockAddr_IN &peer);
 
     /**

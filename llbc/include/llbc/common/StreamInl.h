@@ -381,7 +381,7 @@ inline bool LLBC_Stream::AutoRecap(size_t needCap)
     if (freeCap >= needCap)
         return true;
 
-    const size_t newCap = 
+    const size_t newCap =
         MAX(_pos + needCap, MIN((_cap << 1), _cap + LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT));
     return Recap((newCap + 0xf) & 0xfffffff0);
 }

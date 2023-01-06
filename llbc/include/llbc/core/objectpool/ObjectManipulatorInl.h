@@ -119,7 +119,9 @@ bool LLBC_ObjectManipulator::ResetObj(void *obj, Reusable_type<ObjectType, &Obje
 #endif // LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse
 
 template <typename ObjectType>
-bool LLBC_ObjectManipulator::ResetObj(void *obj, clearmethod_in_base_stl_container_type<ObjectType, &ObjectType::_Mybase::clear> *)
+bool LLBC_ObjectManipulator::ResetObj(void *obj,
+                                      clearmethod_in_base_stl_container_type<ObjectType,
+                                                                             &ObjectType::_Mybase::clear> *)
 {
     reinterpret_cast<ObjectType *>(obj)->clear();
     return false;
@@ -133,7 +135,8 @@ bool LLBC_ObjectManipulator::ResetObj(void *obj, ...)
 }
 
 template <typename ObjectType>
-size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
+size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(
+    poolinst_unitsnum_detectable_type<ObjectType, &ObjectType::GetPoolInstPerBlockUnitsNum> *)
 {
     return reinterpret_cast<ObjectType *>(NULL)->GetPoolInstPerBlockUnitsNum();
 }
@@ -145,7 +148,9 @@ size_t LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNumInl(...)
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst, poolinstcreate_callable_type<ObjectType, &ObjectType::OnPoolInstCreate> *)
+void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst,
+                                                 poolinstcreate_callable_type<ObjectType,
+                                                                              &ObjectType::OnPoolInstCreate> *)
 {
     reinterpret_cast<ObjectType *>(NULL)->OnPoolInstCreate(poolInst);
 }
@@ -157,7 +162,9 @@ void LLBC_ObjectManipulator::OnPoolInstCreateInl(LLBC_IObjectPoolInst &poolInst,
 }
 
 template <typename ObjectType>
-void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst, poolinstdestroy_callable_type<ObjectType, &ObjectType::OnPoolInstDestroy> *)
+void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst,
+                                                  poolinstdestroy_callable_type<ObjectType,
+                                                                                &ObjectType::OnPoolInstDestroy> *)
 {
     reinterpret_cast<ObjectType *>(NULL)->OnPoolInstDestroy(poolInst);
 }

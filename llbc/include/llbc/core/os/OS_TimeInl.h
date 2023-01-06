@@ -143,7 +143,7 @@ inline sint64 LLBC_WinFileTime2MicroSeconds(const FILETIME &fileTime)
 
 inline void LLBC_WinTimeSpec2FileTime(const timespec &ts, FILETIME &fileTime)
 {
-    sint64 ticks = ((sint64)ts.tv_sec * 10000000 + 
+    sint64 ticks = ((sint64)ts.tv_sec * 10000000 +
         ts.tv_nsec / 100) + LLBC_DELTA_EPOCH_IN_100NSEC;
     fileTime.dwHighDateTime = (DWORD)(ticks >> 32 & 0xffffffff);
     fileTime.dwLowDateTime = (DWORD)(ticks & 0xffffffff);

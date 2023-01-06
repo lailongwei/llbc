@@ -174,13 +174,15 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Release(const char *objectT
 
 template <typename PoolLockType, typename PoolInstLockType>
 template <typename ObjectType>
-LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetPoolInst()
+LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
+    GetPoolInst()
 {
     return GetPoolInstInl<ObjectType>();
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::GetIPoolInst(const char *objectType)
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
+    GetIPoolInst(const char *objectType)
 {
     _PoolInsts::iterator it;
     LLBC_IObjectPoolInst *poolInst;
@@ -216,7 +218,8 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolIns
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
+int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
+    AcquireOrderedDeletePoolInst(const char *frontObjectTypeName, const char *backObjectTypeName)
 {
     // Make node name reference(const) to shorten the param name.
     const LLBC_CString frontNodeName(frontObjectTypeName);
@@ -387,7 +390,8 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstLockType>::TryCreatePoolInstFromFactory(const char *objectType)
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
+    TryCreatePoolInstFromFactory(const char *objectType)
 {
     _poolInstFactoryLock.Lock();
     std::map<LLBC_CString, LLBC_IObjectPoolInstFactory *>::iterator it = _poolInstFactories.find(objectType);
@@ -404,7 +408,8 @@ LLBC_FORCE_INLINE LLBC_IObjectPoolInst * LLBC_ObjectPool<PoolLockType, PoolInstL
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
+    DeleteAcquireOrderedDeletePoolInst(LLBC_ObjectPoolOrderedDeleteNode *node)
 {
     // Delete node pool instance.
     _PoolInsts::iterator instIt = _poolInsts.find(node->GetNodeName());
@@ -437,7 +442,9 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType,
     _lock.Lock();
     if (UNLIKELY((it = _poolInsts.find(objectType)) == _poolInsts.end()))
     {
-        _poolInsts.insert(std::make_pair(objectType, poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
+        _poolInsts.insert(
+            std::make_pair(objectType,
+                           poolInst = new LLBC_ObjectPoolInst<ObjectType>(this, new PoolInstLockType())));
         _lock.Unlock();
 
         LLBC_ObjectManipulator::OnPoolInstCreate<ObjectType>(*poolInst);
@@ -452,8 +459,9 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType> *LLBC_ObjectPool<PoolLockType,
 }
 
 template <typename PoolLockType, typename PoolInstLockType>
-void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(LLBC_ObjectPoolStat &stat,
-                                                                            std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const
+void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(
+    LLBC_ObjectPoolStat &stat,
+    std::vector<const LLBC_ObjectPoolInstStat *> &instStats) const
 {
     // top N used memory array:
     std::sort(instStats.begin(), instStats.end(), LLBC_ObjectPoolInstStatComper::CompBy_UsedMem);
