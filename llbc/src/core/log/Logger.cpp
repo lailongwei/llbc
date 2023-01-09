@@ -92,7 +92,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _name.append(config->GetLoggerName());
     _config = config;
 
-    _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
+    _logLevel = _config->GetLogLevel();
     _flushInterval = _config->GetFlushInterval();
 
     // Create console appender, if acquire.
