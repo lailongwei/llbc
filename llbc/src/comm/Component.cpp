@@ -383,7 +383,7 @@ void LLBC_Component::SetConfig(const LLBC_Variant &compCfg)
     else
         _nonPropCfg = new LLBC_Variant(compCfg);
     _cfgType = LLBC_ApplicationConfigType::Xml;
-}   
+}
 
 const LLBC_Property &LLBC_Component::GetPropertyConfig() const
 {
