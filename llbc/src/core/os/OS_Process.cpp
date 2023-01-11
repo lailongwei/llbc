@@ -277,7 +277,18 @@ static void __NonWin32CrashHandler(int sig)
     LLBC_DoIf(readRet == -1, close(corePatternFd); raise(sig));
     
     close(corePatternFd);
+
+    // To avoid 'writing 1 byte into a region of size 0' error.
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC && LLBC_COMP_MAJOR_VER >= 8 && LLBC_COMP_MINOR_VER >= 2
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif // Gcc comp && ver >= 8.2
+
     __corePattern[readRet] = '\0';
+
+#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC && LLBC_COMP_MAJOR_VER >= 8 && LLBC_COMP_MINOR_VER >= 2
+ #pragma GCC diagnostic pop
+#endif // Gcc comp && ver >= 8.2
 
     // Copy executable to core pattern directory(ignore error).
     const char *corePatternDir = nullptr;
