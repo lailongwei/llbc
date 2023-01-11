@@ -474,6 +474,12 @@ public:
     const LLBC_Variant &GetConfig() const;
 
     /**
+     * Set non-property type config(tempory support for t/master branch).
+     * @param[in] compCfg - the component config.
+     */
+    void SetConfig(const LLBC_Variant &compCfg);
+
+    /**
      * Get property type config.
      * @return const LLBC_Property & - the property config.
      */
