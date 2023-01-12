@@ -1379,9 +1379,8 @@ void LLBC_ServiceImpl::Cleanup()
     while (TryPop(block) == LLBC_OK)
         LLBC_SvcEvUtil::DestroyEvBlock(block);
 
-    // If is self-drive servie, notify service manager self stopped.
-    if (_driveMode == SelfDrive)
-        _svcMgr.OnServiceStop(this);
+    // notify service manager self stopped.
+    _svcMgr.OnServiceStop(this);
 
     // Reset some variables.
     _relaxTimes = 0;
