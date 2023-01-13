@@ -38,7 +38,7 @@ llbc为一个精简、功能完整、跨平台、多语言支持的服务端开�
 ## 使用此框架的公司：
 |[37wan](https://www.37.com/)|[ONEMT](http://www.onemt.com/)|[西山居](https://www.xishanju.com/)|[祺曜互娱](http://www.7yao.top/)|[腾讯](https://www.tencent.com/zh-cn/)|
 |:--------------------------:|:----------------------------:|:--------------------------------:|:------------------------------:|:----------------------:|
-|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/37-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/onemt-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/seasun-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/qiyao-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/tencent-logo_new.png)|
+|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/37-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/onemt-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/seasun-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/qiyao-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/tencent-logo.jpg)|
 
 ## 支持：
 
