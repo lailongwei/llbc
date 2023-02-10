@@ -654,10 +654,11 @@ const LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key) const
 {
     if (_holder.type == LLBC_VariantType::VT_SEQ_DFT)
     {
-        if (!_holder.data.obj.seq)
+        const size_t intKey = key;
+        if (!_holder.data.obj.seq || intKey >= _holder.data.obj.seq->size())
             return LLBC_INL_NS __g_nilVariant;
 
-        return (*_holder.data.obj.seq)[key];
+        return (*_holder.data.obj.seq)[intKey];
     }
 
     if (_holder.type == LLBC_VariantType::VT_DICT_DFT)
