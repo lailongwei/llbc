@@ -251,16 +251,14 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
     uint32 noPart = LLBC_GetErrnoNoPart(no);
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-        sprintf(libTls->commonTls.errDesc,
-                __g_errDesc[noPart], subErrno, strerror(subErrno));
-#else // LLBC_TARGET_PLATFORM_WIN32
-        char libcErrDesc[__LLBC_ERROR_DESC_SIZE] = {0};
-        strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
-        sprintf_s(libTls->commonTls.errDesc,
-                __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
+        snprintf(libTls->commonTls.errDesc,
+                 __LLBC_ERROR_DESC_SIZE,
+                 __g_errDesc[noPart],
+                 subErrno,
+                 strerror_s(libTls->commonTls.clibErrFmtBuf,
+                            __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE,
+                            subErrno) == 0 ? 
+                                libTls->commonTls.clibErrFmtBuf : "Unknown <errno>");
         return libTls->commonTls.errDesc;
     }
 #if LLBC_TARGET_PLATFORM_WIN32

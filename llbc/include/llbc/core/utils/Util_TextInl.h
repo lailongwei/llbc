@@ -89,12 +89,8 @@ template <>
 inline LLBC_String LLBC_Num2Str(double val, int radix)
 {
     char buf[64] = {0};
+    snprintf(buf, sizeof(buf), "%f", val);
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    sprintf(buf, "%f", val);
-#else // LLBC_TARGET_PLATFORM_WIN32
-    sprintf_s(buf, sizeof(buf), "%f", val);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
     return buf;
 }
 

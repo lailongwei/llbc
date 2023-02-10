@@ -90,11 +90,13 @@ void LLBC_MD5::MD5GroupDigest::SetInfo(uint32 a, uint32 b, uint32 c, uint32 d)
 LLBC_String LLBC_MD5::MD5GroupDigest::ToString() const
 {
     char buf[64];
-    sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-        _val.byteVal[0], _val.byteVal[1], _val.byteVal[2], _val.byteVal[3],
-        _val.byteVal[4], _val.byteVal[5], _val.byteVal[6], _val.byteVal[7],
-        _val.byteVal[8], _val.byteVal[9], _val.byteVal[10], _val.byteVal[11],
-        _val.byteVal[12], _val.byteVal[13], _val.byteVal[14], _val.byteVal[15]);
+    snprintf(buf,
+             sizeof(buf),
+             "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+             _val.byteVal[0], _val.byteVal[1], _val.byteVal[2], _val.byteVal[3],
+             _val.byteVal[4], _val.byteVal[5], _val.byteVal[6], _val.byteVal[7],
+             _val.byteVal[8], _val.byteVal[9], _val.byteVal[10], _val.byteVal[11],
+             _val.byteVal[12], _val.byteVal[13], _val.byteVal[14], _val.byteVal[15]);
 
     return buf;
 }
