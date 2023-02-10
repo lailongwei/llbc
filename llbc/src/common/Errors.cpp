@@ -255,10 +255,14 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
                  __LLBC_ERROR_DESC_SIZE,
                  __g_errDesc[noPart],
                  subErrno,
+                 #if LLBC_TARGET_PLATFORM_WIN32
                  strerror_s(libTls->commonTls.clibErrFmtBuf,
                             __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE,
                             subErrno) == 0 ? 
                                 libTls->commonTls.clibErrFmtBuf : "Unknown <errno>");
+                 #else // Non-Win32
+                 strerror(subErrno));
+                 #endif // Win32
         return libTls->commonTls.errDesc;
     }
 #if LLBC_TARGET_PLATFORM_WIN32
