@@ -31,8 +31,6 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_Variant::Str __g_nullStr;
 static const LLBC_NS LLBC_Variant::Str __g_nilStr = "nil";
-static const LLBC_NS LLBC_Variant::Str __g_oneStr = "1";
-static const LLBC_NS LLBC_Variant::Str __g_zeroStr = "0";
 static const LLBC_NS LLBC_Variant::Str __g_trueStr = "true";
 static const LLBC_NS LLBC_Variant::Str __g_falseStr = "false";
 static const LLBC_NS LLBC_Variant::Str __g_yesStr = "yes";
@@ -40,7 +38,6 @@ static const LLBC_NS LLBC_Variant::Str __g_emptySeqStr = "[]";
 static const LLBC_NS LLBC_Variant::Str __g_emptyDictStr = "{}";
 static const LLBC_NS LLBC_Variant::Seq __g_emptySeq;
 static const LLBC_NS LLBC_Variant::Dict __g_emptyDict;
-static const LLBC_NS LLBC_Variant::Dict __g_emptyDeleg;
 
 static const LLBC_NS LLBC_Variant __g_nilVariant;
 
@@ -143,14 +140,15 @@ void LLBC_Variant::InitNumber2StrFastAccessTable()
         return;
 
     char buf[32];
-    int cap = LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN + 1;
+    constexpr int cap =
+        LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN + 1;
     _num2StrFastAccessTbl = LLBC_Malloc(Str *, sizeof(Str *) * cap);
     for (int i = 0; i < cap; ++i)
     {
         #if LLBC_TARGET_PLATFORM_WIN32
         _itoa_s(i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN, buf, 10);
         #else
-        sprintf(buf, "%d", i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN);
+        snprintf(buf, sizeof(buf), "%d", i + LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN);
         #endif
 
         _num2StrFastAccessTbl[i] = new Str(buf);
@@ -162,7 +160,8 @@ void LLBC_Variant::DestroyNumber2StrFastAccessTable()
     if (UNLIKELY(!_num2StrFastAccessTbl))
         return;
 
-    int cap = LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN + 1;
+    constexpr int cap =
+        LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN + 1;
     for (int i = 0; i < cap; ++i)
         delete _num2StrFastAccessTbl[i];
 
@@ -318,7 +317,8 @@ LLBC_String LLBC_Variant::AsStr() const
         {
             if (_holder.data.raw.int64Val >= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN &&
                 _holder.data.raw.int64Val <= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END)
-                return *_num2StrFastAccessTbl[static_cast<int>(_holder.data.raw.int64Val - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN)];
+                return *_num2StrFastAccessTbl[
+                    static_cast<int>(_holder.data.raw.int64Val - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN)];
 
             return LLBC_Num2Str(_holder.data.raw.int64Val);
         }
@@ -654,10 +654,11 @@ const LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key) const
 {
     if (_holder.type == LLBC_VariantType::VT_SEQ_DFT)
     {
-        if (!_holder.data.obj.seq)
+        const size_t intKey = key;
+        if (!_holder.data.obj.seq || intKey >= _holder.data.obj.seq->size())
             return LLBC_INL_NS __g_nilVariant;
 
-        return (*_holder.data.obj.seq)[key];
+        return (*_holder.data.obj.seq)[intKey];
     }
 
     if (_holder.type == LLBC_VariantType::VT_DICT_DFT)

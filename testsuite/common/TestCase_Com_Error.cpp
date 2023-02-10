@@ -39,9 +39,17 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_PrintLine("common/error test:\n");
 
     // Test CLib type error.
-    errno = EINTR;
-    LLBC_SetLastError(LLBC_ERROR_CLIB);
-    LLBC_PrintLine("CLib type error: %s", LLBC_FormatLastError());
+    auto fmtCLibErr = [](int errNo)
+    {
+        errno = errNo;
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        LLBC_PrintLine("CLib type error: %s", LLBC_FormatLastError());
+    };
+
+    fmtCLibErr(EINTR);
+    fmtCLibErr(EINVAL);
+    fmtCLibErr(EPIPE);
+    fmtCLibErr(33333);
 
     // Test OSApi type error(WIN32 specific).
 #if LLBC_TARGET_PLATFORM_WIN32

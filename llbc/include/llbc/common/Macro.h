@@ -48,7 +48,9 @@
     }                            \
 
 // llbc library error describe buffer size.
-#define __LLBC_ERROR_DESC_SIZE    2048
+#define __LLBC_ERROR_DESC_SIZE            2048
+// llbc clib error format buffer size.
+#define __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE 1024
 
 // Debug macro define.
 #ifdef DEBUG
