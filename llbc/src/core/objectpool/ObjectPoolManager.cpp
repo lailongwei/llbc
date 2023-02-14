@@ -98,12 +98,18 @@ LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolManager::GetEntryThreadUnsafetyObj
 LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (UNLIKELY(tls->coreTls.safetyObjectPool == nullptr))
+        tls->coreTls.safetyObjectPool = new LLBC_SafetyObjectPool;
+
     return reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
 }
 
 LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (UNLIKELY(tls->coreTls.unsafetyObjectPool == nullptr))
+        tls->coreTls.unsafetyObjectPool = new LLBC_UnsafetyObjectPool;
+
     return reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
 }
 
