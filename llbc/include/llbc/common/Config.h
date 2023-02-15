@@ -295,9 +295,9 @@
 #define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
- #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGFPE}
+ #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}
 #else // Non-Win32
- #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGQUIT, SIGFPE}
+ #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGQUIT}
 #endif // Win32
 // Application config reload signals.
 #if LLBC_TARGET_PLATFORM_WIN32
