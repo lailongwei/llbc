@@ -1039,6 +1039,14 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
+LLBC_Event& LLBC_ServiceImpl::BeginEvent(int eventId)
+{
+    LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
+    ev->SetId(eventId);
+
+    return *ev;
+}
+
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
 {
     if (UNLIKELY(!runnable))

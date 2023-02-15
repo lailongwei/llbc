@@ -534,6 +534,14 @@ public:
                            const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
                            const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr) = 0;
 
+
+    /**
+     * Begin fire event(asynchronous operation).
+     * @param[in] eventId - the event id.
+     * @return LLBC_Event & - the event firer object. 
+     */
+    virtual LLBC_Event &BeginEvent(int eventId) = 0;
+
     /**
      * Get event manager.
      * @return LLBC_EventManager & - the event manager.
