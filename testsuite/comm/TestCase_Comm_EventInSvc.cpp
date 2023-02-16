@@ -96,7 +96,9 @@ public:
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
         svc->FireEvent(ev);
 
-        svc->BeginFire(TestEvent::TEST_EV_ID3).SetParam("aa", 10086).Fire();
+        svc->BeginFire(TestEvent::TEST_EV_ID3)
+            .SetParam("aa", 10086)
+            .Fire();
     }
 
 public:

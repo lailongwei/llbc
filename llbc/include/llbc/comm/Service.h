@@ -39,7 +39,7 @@ class LLBC_PollerMgr;
 class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
-class LLBC_EventServiceFirer;
+class LLBC_ServiceEventFirer;
 
 __LLBC_NS_END
 
@@ -540,9 +540,9 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_EventServiceFirer &BeginFire(int eventId) = 0;
+    virtual LLBC_ServiceEventFirer &BeginFire(int eventId) = 0;
 
-    void SetEventInfo(LLBC_EventServiceFirer *eventServiceFirer, LLBC_Event *ev); 
+    void SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev); 
 
     /**
      * Get event manager.
@@ -608,6 +608,12 @@ public:
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
+
+    /**
+     * Get service event firer pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_ServiceEventFirer, LLBC_SpinLock> & - the service event firer pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool() = 0;
 
 public:
     /**

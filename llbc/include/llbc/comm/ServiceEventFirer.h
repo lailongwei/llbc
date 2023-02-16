@@ -36,14 +36,14 @@ __LLBC_NS_BEGIN
 /**
  * @brief The service event firer class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventServiceFirer : public LLBC_ReferencablePoolObj
+class LLBC_EXPORT LLBC_ServiceEventFirer : public LLBC_ReferencablePoolObj
 {
 public:
     /**
      * Ctor&Dtor.
      */
-    LLBC_EventServiceFirer();
-    ~LLBC_EventServiceFirer();
+    LLBC_ServiceEventFirer();
+    ~LLBC_ServiceEventFirer();
 
 public:
     /**
@@ -54,7 +54,7 @@ public:
      * @return LLBC_EventFirer &  - the event firer reference.
      */
     template <typename KeyType, typename ParamType>
-    LLBC_EventServiceFirer &SetParam(const KeyType &paramKey, const ParamType &param);
+    LLBC_ServiceEventFirer &SetParam(const KeyType &paramKey, const ParamType &param);
 
     /**
      * Fire firer holded event.
@@ -64,12 +64,12 @@ public:
 private:
     /**
      * @brief Set event info to firer.
-     * @param[in] ev    - the event object.
+     * @param[in] ev - the event object.
      * @param[in] service - the service.
      */
     void SetEventInfo(LLBC_Event *ev, LLBC_Service *service);
 
-    LLBC_DISABLE_ASSIGNMENT(LLBC_EventServiceFirer);
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ServiceEventFirer);
 
 private:
     friend class LLBC_Service;
@@ -81,4 +81,4 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/comm/EventServiceFirerInl.h"
+#include "llbc/comm/ServiceEventFirerInl.h"

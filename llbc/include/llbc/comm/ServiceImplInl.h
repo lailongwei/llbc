@@ -127,6 +127,11 @@ inline LLBC_ObjectPoolInst<LLBC_MessageBlock> &LLBC_ServiceImpl::GetMsgBlockObje
     return _msgBlockObjectPool;
 }
 
+inline LLBC_ObjectPoolInst<LLBC_ServiceEventFirer>& LLBC_ServiceImpl::GetServiceEventFirerObjectPool()
+{
+    return _eventFirerPool;
+}
+
 __LLBC_NS_END
 
 #endif // __LLBC_COMM_SERVICE_IMPL_H__

@@ -28,6 +28,7 @@
 #include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
+#include "llbc/comm/ServiceEventFirer.h"
 #include "llbc/comm/PollerMgr.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
@@ -404,7 +405,7 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_EventServiceFirer &BeginFire(int eventId);
+    virtual LLBC_ServiceEventFirer &BeginFire(int eventId);
 
 
     /**
@@ -454,6 +455,12 @@ public:
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
+
+    /**
+     * Get service event firer pool(thread safety).
+     * @return LLBC_ObjectPoolInst<LLBC_ServiceEventFirer, LLBC_SpinLock> & - the service event firer pool.
+     */
+    virtual LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool();
 
 public:
     /**
@@ -705,6 +712,7 @@ private:
     LLBC_UnsafetyObjectPool _unsafetyObjectPool;
     LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
+    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;

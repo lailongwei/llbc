@@ -85,7 +85,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
 {
     LLBC_PrintLine("Simple convert test");
 
-    // Test coding string(gbk coding): ???.
+    // Test coding string(gbk coding): ÄãºÃ.
     // GBK binary view:      c4 e3 ba c3
     const LLBC_String gbkBinaryData = "c4 e3 ba c3";
     // UTF8 binary view:     e4 bd a0 e5 a5 bd
@@ -99,7 +99,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
 
     // Test GBK->UTF8.
     LLBC_String utf8Str;
-    LLBC_String gbkStr = "???";
+    LLBC_String gbkStr = "ÄãºÃ";
     if(LLBC_Transcoder::MultiByteToMultiByte(
         "GBK", gbkStr, "UTF-8", utf8Str) != LLBC_OK)
     {

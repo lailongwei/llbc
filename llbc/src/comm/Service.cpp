@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "llbc/comm/EventServiceFirer.h"
 #include "llbc/common/Export.h"
 
 #include "llbc/comm/ServiceImpl.h"
@@ -40,7 +39,7 @@ This *LLBC_Service::Create(const LLBC_String &name,
 }
 
 
-void LLBC_Service::SetEventInfo(LLBC_EventServiceFirer *eventServiceFirer, LLBC_Event *ev)
+void LLBC_Service::SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev)
 {
     if(UNLIKELY(eventServiceFirer == nullptr))
         return ;

@@ -21,15 +21,17 @@
 
 #pragma once
 
+#include "llbc/comm/Service.h"
+
 #include "llbc/core/event/Event.h"
 #include "llbc/core/objectpool/PoolObjectReflection.h"
 
 __LLBC_NS_BEGIN
-inline LLBC_EventServiceFirer::LLBC_EventServiceFirer(): _ev(nullptr), _service(nullptr)
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(): _ev(nullptr), _service(nullptr)
 {
 }
 
-inline LLBC_EventServiceFirer::~LLBC_EventServiceFirer()
+inline LLBC_ServiceEventFirer::~LLBC_ServiceEventFirer()
 {
     if(LIKELY(_ev))
     {
@@ -40,7 +42,7 @@ inline LLBC_EventServiceFirer::~LLBC_EventServiceFirer()
 }
 
 template <typename KeyType, typename ParamType>
-LLBC_EventServiceFirer &LLBC_EventServiceFirer::SetParam(const KeyType &paramKey, const ParamType &param)
+LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::SetParam(const KeyType &paramKey, const ParamType &param)
 {
     if(LIKELY(_ev))
         _ev->SetParam(paramKey, param);
@@ -48,5 +50,20 @@ LLBC_EventServiceFirer &LLBC_EventServiceFirer::SetParam(const KeyType &paramKey
     return *this;
 }
 
+inline void LLBC_ServiceEventFirer::Fire()
+{
+    if(LIKELY(_ev))
+    {
+        _service->FireEvent(_ev);
+        _ev = nullptr;
+        _service = nullptr;
+    }
+}
+
+inline void LLBC_ServiceEventFirer::SetEventInfo(LLBC_Event *ev, LLBC_Service *service)
+{
+    _ev = ev;
+    _service = service;
+}
 
 __LLBC_NS_END

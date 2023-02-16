@@ -38,8 +38,9 @@
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
+#include "llbc/core/objectpool/ObjectPoolInst.h"
+
 #include "llbc/application/Application.h"
-#include "llbc/comm/EventServiceFirer.h"
 
 namespace
 {
@@ -134,6 +135,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 
 , _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
 , _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
+, _eventFirerPool(*_safetyObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
 
 , _timerScheduler(nullptr)
 
@@ -1040,12 +1042,12 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_EventServiceFirer &LLBC_ServiceImpl::BeginFire(int eventId)
+LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFire(int eventId)
 {
     LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
     ev->SetId(eventId);
 
-    LLBC_EventServiceFirer *eventServiceFirer = LLBC_GetObjectFromSafetyPool<LLBC_EventServiceFirer>();
+    auto *eventServiceFirer = static_cast<LLBC_ServiceEventFirer *>(GetServiceEventFirerObjectPool().GetReferencable());
     SetEventInfo(eventServiceFirer, ev);
 
     return *eventServiceFirer;
