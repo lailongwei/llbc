@@ -34,6 +34,7 @@
 #include "llbc/comm/BasePoller.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
+#include "llbc/comm/EventServiceFirer.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"

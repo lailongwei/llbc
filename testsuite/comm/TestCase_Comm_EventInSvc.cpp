@@ -34,6 +34,7 @@ public:
     {
         TEST_EV_ID1 = 1,
         TEST_EV_ID2 = 2,
+        TEST_EV_ID3 = 3,
     };
 
 public:
@@ -71,6 +72,7 @@ public:
         LLBC_Service *svc = GetService();
         _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestComp::HandleEvent);
         _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestComp::HandleEvent_Static);
+        _ev3HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID3, this, &EventTestComp::HandleEvent3);
 
         return true;
     }
@@ -87,12 +89,14 @@ public:
         TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
         ev->comp = this;
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
-
+        
         svc->FireEvent(ev);
-
+        
         ev = new TestEvent(TestEvent::TEST_EV_ID2);
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
         svc->FireEvent(ev);
+
+        svc->BeginFire(TestEvent::TEST_EV_ID3).SetParam("aa", 10086).Fire();
     }
 
 public:
@@ -123,12 +127,20 @@ public:
             svc->UnsubscribeEvent(comp->_ev1StaticHandlerStub);
     }
 
+    void HandleEvent3(LLBC_Event &_)
+    {
+        TestEvent &ev = static_cast<TestEvent &>(_);
+        std::cout << "handle event 3, data: " << ev.GetParam("aa") << std::endl;
+        GetService()->UnsubscribeEvent(_ev3HandlerStub); 
+    }
+
 private:
     int _handleTimes;
     int _staticHandleTimes;
 
     LLBC_ListenerStub _ev1HandlerStub;
     LLBC_ListenerStub _ev1StaticHandlerStub;
+    LLBC_ListenerStub _ev3HandlerStub;
 };
 
 }

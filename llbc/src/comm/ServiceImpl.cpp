@@ -39,6 +39,7 @@
 #include "llbc/comm/ServiceMgr.h"
 
 #include "llbc/application/Application.h"
+#include "llbc/comm/EventServiceFirer.h"
 
 namespace
 {
@@ -1039,12 +1040,15 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_Event& LLBC_ServiceImpl::BeginEvent(int eventId)
+LLBC_EventServiceFirer &LLBC_ServiceImpl::BeginFire(int eventId)
 {
     LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
     ev->SetId(eventId);
 
-    return *ev;
+    LLBC_EventServiceFirer *eventServiceFirer = LLBC_GetObjectFromSafetyPool<LLBC_EventServiceFirer>();
+    SetEventInfo(eventServiceFirer, ev);
+
+    return *eventServiceFirer;
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)

@@ -21,18 +21,32 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
-#include "llbc/core/objectpool/ReferencablePoolObj.h"
+#include "llbc/core/event/Event.h"
+#include "llbc/core/objectpool/PoolObjectReflection.h"
 
 __LLBC_NS_BEGIN
-class LLBC_Variant;
-class LLBC_Event;
-class LLBC_Service;
-__LLBC_NS_END
-
-class LLBC_EventServiceFirer
+inline LLBC_EventServiceFirer::LLBC_EventServiceFirer(): _ev(nullptr), _service(nullptr)
 {
-public:
-    
-};
+}
+
+inline LLBC_EventServiceFirer::~LLBC_EventServiceFirer()
+{
+    if(LIKELY(_ev))
+    {
+        LLBC_Recycle(_ev);
+        _ev = nullptr;
+        _service = nullptr;
+    }
+}
+
+template <typename KeyType, typename ParamType>
+LLBC_EventServiceFirer &LLBC_EventServiceFirer::SetParam(const KeyType &paramKey, const ParamType &param)
+{
+    if(LIKELY(_ev))
+        _ev->SetParam(paramKey, param);
+
+    return *this;
+}
+
+
+__LLBC_NS_END

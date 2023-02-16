@@ -30,8 +30,7 @@
 #include "llbc/comm/Component.h"
 
 __LLBC_NS_BEGIN
-
-/**
+ /**
  * Previous declare some classes.
  */
 class LLBC_Packet;
@@ -40,6 +39,7 @@ class LLBC_PollerMgr;
 class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
+class LLBC_EventServiceFirer;
 
 __LLBC_NS_END
 
@@ -540,7 +540,9 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_Event &BeginEvent(int eventId) = 0;
+    virtual LLBC_EventServiceFirer &BeginFire(int eventId) = 0;
+
+    void SetEventInfo(LLBC_EventServiceFirer *eventServiceFirer, LLBC_Event *ev); 
 
     /**
      * Get event manager.

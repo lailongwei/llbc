@@ -404,7 +404,7 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_Event &BeginEvent(int eventId);
+    virtual LLBC_EventServiceFirer &BeginFire(int eventId);
 
 
     /**
