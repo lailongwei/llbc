@@ -38,8 +38,6 @@
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
-#include "llbc/core/objectpool/ObjectPoolInst.h"
-
 #include "llbc/application/Application.h"
 
 namespace
