@@ -30,8 +30,7 @@
 #include "llbc/comm/Component.h"
 
 __LLBC_NS_BEGIN
-
-/**
+ /**
  * Previous declare some classes.
  */
 class LLBC_Packet;
@@ -40,6 +39,7 @@ class LLBC_PollerMgr;
 class LLBC_ComponentFactory;
 class LLBC_IProtocolFactory;
 class LLBC_ProtocolStack;
+class LLBC_ServiceEventFirer;
 
 __LLBC_NS_END
 
@@ -533,7 +533,17 @@ public:
     virtual void FireEvent(LLBC_Event *ev,
                            const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
                            const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr) = 0;
+ 
+    /**
+     * Begin fire event(asynchronous operation).
+     * @param[in] eventId - the event id.
+     * @return LLBC_Event & - the event firer object. 
+     */
+    virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId) = 0;
 
+protected:
+
+public:
     /**
      * Get event manager.
      * @return LLBC_EventManager & - the event manager.
@@ -662,6 +672,9 @@ protected:
     virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory) = 0;
     virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId) = 0;
     virtual void RemoveSessionProtocolFactory(int sessionId) = 0;
+
+protected:
+    void SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev); 
 };
 
 __LLBC_NS_END

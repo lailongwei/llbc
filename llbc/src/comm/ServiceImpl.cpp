@@ -133,6 +133,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 
 , _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
 , _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
+, _eventFirerPool(*_safetyObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
 
 , _timerScheduler(nullptr)
 
@@ -1037,6 +1038,18 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
     Push(LLBC_SvcEvUtil::BuildFireEventEv(ev, dequeueHandler));
     if (enqueueHandler)
         enqueueHandler(ev);
+}
+
+LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
+{
+    LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
+    ev->SetId(eventId);
+
+    auto *eventServiceFirer = _eventFirerPool.GetReferencableObject();
+    LLBC_AutoRelease(eventServiceFirer);
+    SetEventInfo(eventServiceFirer, ev);
+
+    return *eventServiceFirer;
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
