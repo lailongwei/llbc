@@ -405,8 +405,7 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_ServiceEventFirer &BeginFire(int eventId);
-
+    virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId);
 
     /**
      * Get event manager.
@@ -455,13 +454,6 @@ public:
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
-
-protected:
-    /**
-     * Get service event firer pool(thread safety).
-     * @return LLBC_ObjectPoolInst<LLBC_ServiceEventFirer, LLBC_SpinLock> & - the service event firer pool.
-     */
-    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool();
 
 public:
     /**

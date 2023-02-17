@@ -89,14 +89,13 @@ public:
         TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
         ev->comp = this;
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
-        
         svc->FireEvent(ev);
-        
+
         ev = new TestEvent(TestEvent::TEST_EV_ID2);
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
         svc->FireEvent(ev);
 
-        svc->BeginFire(TestEvent::TEST_EV_ID3)
+        svc->BeginFireEvent(TestEvent::TEST_EV_ID3)
             .SetParam("aa", 10086)
             .Fire();
     }

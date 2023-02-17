@@ -1042,12 +1042,12 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFire(int eventId)
+LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
 {
     LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
     ev->SetId(eventId);
 
-    auto *eventServiceFirer = GetServiceEventFirerObjectPool().GetReferencableObject();
+    auto *eventServiceFirer = _eventFirerPool.GetReferencableObject();
     LLBC_AutoRelease(eventServiceFirer);
     SetEventInfo(eventServiceFirer, ev);
 

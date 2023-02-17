@@ -43,7 +43,7 @@ public:
      * Ctor&Dtor.
      */
     LLBC_ServiceEventFirer();
-    ~LLBC_ServiceEventFirer();
+    ~LLBC_ServiceEventFirer() = default;
 
 public:
     /**
@@ -60,7 +60,7 @@ public:
      * Fire firer holded event.
      */
     void Fire();
-
+    
 public:
     /**
      * Object-Pool reflection support: clear firer object.
@@ -71,7 +71,6 @@ public:
      * Object-Pool reflection support: pool instance create event callback.
      */
     void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
-
 
 private:
     /**
