@@ -609,12 +609,6 @@ public:
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
 
-    /**
-     * Get service event firer pool(thread safety).
-     * @return LLBC_ObjectPoolInst<LLBC_ServiceEventFirer, LLBC_SpinLock> & - the service event firer pool.
-     */
-    virtual LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool() = 0;
-
 public:
     /**
      * One time service call routine, if service drive mode is ExternalDrive, you must manual call this method.

@@ -61,6 +61,18 @@ public:
      */
     void Fire();
 
+public:
+    /**
+     * Object-Pool reflection support: clear firer object.
+     */
+    void Clear();
+
+    /**
+     * Object-Pool reflection support: pool instance create event callback.
+     */
+    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
+
+
 private:
     /**
      * @brief Set event info to firer.

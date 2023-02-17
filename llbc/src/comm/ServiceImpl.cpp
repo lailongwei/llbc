@@ -1047,7 +1047,8 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFire(int eventId)
     LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
     ev->SetId(eventId);
 
-    auto *eventServiceFirer = static_cast<LLBC_ServiceEventFirer *>(GetServiceEventFirerObjectPool().GetReferencable());
+    auto *eventServiceFirer = GetServiceEventFirerObjectPool().GetReferencableObject();
+    LLBC_AutoRelease(eventServiceFirer);
     SetEventInfo(eventServiceFirer, ev);
 
     return *eventServiceFirer;

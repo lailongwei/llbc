@@ -456,11 +456,12 @@ public:
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
 
+protected:
     /**
      * Get service event firer pool(thread safety).
      * @return LLBC_ObjectPoolInst<LLBC_ServiceEventFirer, LLBC_SpinLock> & - the service event firer pool.
      */
-    virtual LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool();
+    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &GetServiceEventFirerObjectPool();
 
 public:
     /**

@@ -33,31 +33,34 @@ inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(): _ev(nullptr), _service(
 
 inline LLBC_ServiceEventFirer::~LLBC_ServiceEventFirer()
 {
-    if(LIKELY(_ev))
-    {
-        LLBC_Recycle(_ev);
-        _ev = nullptr;
-        _service = nullptr;
-    }
 }
 
 template <typename KeyType, typename ParamType>
 LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::SetParam(const KeyType &paramKey, const ParamType &param)
 {
-    if(LIKELY(_ev))
-        _ev->SetParam(paramKey, param);
+    _ev->SetParam(paramKey, param);
 
     return *this;
 }
 
 inline void LLBC_ServiceEventFirer::Fire()
 {
-    if(LIKELY(_ev))
-    {
-        _service->FireEvent(_ev);
-        _ev = nullptr;
-        _service = nullptr;
-    }
+    _service->FireEvent(_ev);
+    _ev = nullptr;
+    _service = nullptr;
+}
+
+inline void LLBC_ServiceEventFirer::Clear()
+{
+    LLBC_Recycle(_ev);
+    _ev = nullptr;
+    _service = nullptr;
+}
+
+inline void LLBC_ServiceEventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
+    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_ServiceEventFirer).name(), typeid(LLBC_ServiceEventFirer).name());
 }
 
 inline void LLBC_ServiceEventFirer::SetEventInfo(LLBC_Event *ev, LLBC_Service *service)
