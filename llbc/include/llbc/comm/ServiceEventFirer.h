@@ -60,7 +60,7 @@ public:
      * Fire firer holded event.
      */
     void Fire();
-    
+
 public:
     /**
      * Object-Pool reflection support: clear firer object.
