@@ -22,6 +22,7 @@
 #ifdef __LLBC_CORE_EVENT_EVENT_FIRER_H__
 
 #include "llbc/core/event/Event.h"
+#include "llbc/core/event/EventManager.h"
 
 __LLBC_NS_BEGIN
 
@@ -43,6 +44,38 @@ LLBC_EventFirer &LLBC_EventFirer::SetParam(const KeyType &paramKey, const ParamT
         _ev->SetParam(paramKey, param);
 
     return *this;
+}
+
+inline void LLBC_EventFirer::Fire()
+{
+    _evMgr->Fire(_ev);
+    _ev = nullptr;
+    _evMgr = nullptr;
+
+    LLBC_Recycle(this);
+}
+
+inline void LLBC_EventFirer::Clear()
+{
+    if (_ev)
+    {
+        LLBC_Recycle(_ev);
+        _ev = nullptr;
+        _evMgr = nullptr;
+    }
+}
+
+inline void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
+    objPool->AcquireOrderedDeletePoolInst(
+        typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
+}
+
+inline void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
+{
+    _ev = ev;
+    _evMgr = evMgr;
 }
 
 __LLBC_NS_END

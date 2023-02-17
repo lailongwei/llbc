@@ -23,11 +23,10 @@
 
 #include "llbc/comm/Service.h"
 
-#include "llbc/core/event/Event.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
-
 __LLBC_NS_BEGIN
-inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(): _ev(nullptr), _service(nullptr)
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer()
+: _ev(nullptr)
+, _service(nullptr)
 {
 }
 
@@ -47,15 +46,19 @@ inline void LLBC_ServiceEventFirer::Fire()
 
 inline void LLBC_ServiceEventFirer::Clear()
 {
-    LLBC_Recycle(_ev);
-    _ev = nullptr;
-    _service = nullptr;
+    if (_ev)
+    {
+        LLBC_Recycle(_ev);
+        _ev = nullptr;
+        _service = nullptr;
+    }
 }
 
 inline void LLBC_ServiceEventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
 {
     LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_ServiceEventFirer).name(), typeid(LLBC_Event).name());
+    objPool->AcquireOrderedDeletePoolInst(
+        typeid(LLBC_ServiceEventFirer).name(), typeid(LLBC_Event).name());
 }
 
 inline void LLBC_ServiceEventFirer::SetEventInfo(LLBC_Event *ev, LLBC_Service *service)
