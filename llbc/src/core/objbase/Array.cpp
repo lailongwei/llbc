@@ -121,7 +121,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 < End()))
+
+    if (n0 < Begin() || n0 >= End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
@@ -147,8 +148,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 <= End()) ||
-        !(n1 >= Begin() && n1 <= End()))
+    if (n0 < Begin() || n0 > End() ||
+        n1 < Begin() || n1 > End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
@@ -221,8 +222,9 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 < End()) ||
-        !(n1 >= Begin() && n1 <= End()))
+
+    if (n0 < Begin() || n0 >= End() ||
+        n1 < Begin() || n1 > End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
