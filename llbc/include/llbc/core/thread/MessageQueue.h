@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
-#define __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -183,4 +182,4 @@ __LLBC_NS_END
 
 #include "llbc/core/thread/MessageQueueInl.h"
 
-#endif // !__LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+

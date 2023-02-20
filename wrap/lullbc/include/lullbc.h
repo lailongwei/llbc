@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LULLBC_LULLBC_H__
-#define __LULLBC_LULLBC_H__
+#pragma once
 
 #include "lullbc/common/Common.h"
 #include "lullbc/core/Core.h"
@@ -30,4 +29,3 @@
  */
 LULLBC_EXTERN_C LULLBC_EXPORT int lullbc_entry(lua_State *l);
 
-#endif // !__LULLBC_LULLBC_H__

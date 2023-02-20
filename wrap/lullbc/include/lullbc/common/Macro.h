@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LULLBC_COM_MACRO_H__
-#define __LULLBC_COM_MACRO_H__
+#pragma once
 
 #include "lullbc/common/LibHeader.h"
 
@@ -54,4 +53,4 @@
 #define LULLBC_HOLD_KEY__TIMER_SCHEDULER        "timer_scheduler"
 #define LULLBC_HOLD_KEY__TIMER_ERROR_HANDLER    "timer_error_handler"
 
-#endif // !__LULLBC_COM_MACRO_H__
+

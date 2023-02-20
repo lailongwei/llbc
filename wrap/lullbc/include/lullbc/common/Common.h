@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LULLBC_COMMON_COMMON_H__
-#define __LULLBC_COMMON_COMMON_H__
+#pragma once
 
 #include "lullbc/common/LibHeader.h"
 #include "lullbc/common/Macro.h"
@@ -33,4 +32,4 @@
  */
 LULLBC_HIDDEN void lullbc_InitCommon();
 
-#endif // !__LULLC_COMMON_COMMON_H__
+

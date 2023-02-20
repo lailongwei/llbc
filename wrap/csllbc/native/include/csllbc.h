@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_H__
-#define __CSLLBC_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -38,4 +37,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Startup();
  */
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Cleanup();
 
-#endif // !__CSLLBC_H__
+

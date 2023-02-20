@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_SYMBOL_H__
-#define __LLBC_CORE_OS_OS_SYMBOL_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -53,4 +52,4 @@ LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t
 
 __LLBC_NS_END
 
-#endif // !__LLBC_CORE_OS_OS_SYMBOL_H__
+

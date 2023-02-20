@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_METHOD_TABLE_H__
-#define __PYLLBC_COM_METHOD_TABLE_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 
@@ -76,5 +75,5 @@ private:
     sint32 _capacity;
 };
 
-#endif // !__PYLLBC_COM_METHOD_TABLE_H__
+
 

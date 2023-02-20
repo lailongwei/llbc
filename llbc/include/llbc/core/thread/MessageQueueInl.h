@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifdef __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+#pragma once
 
 __LLBC_NS_BEGIN
 
@@ -71,4 +71,4 @@ inline size_t LLBC_MessageQueue::GetSize() const
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+

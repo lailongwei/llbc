@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_TIMER_TIMER_H__
+#pragma once
 
 __LLBC_NS_BEGIN
 
@@ -37,4 +37,4 @@ void LLBC_Timer::SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Tim
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_TIMER_TIMER_H__
+

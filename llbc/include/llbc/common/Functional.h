@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_FUNCTIONAL_H__
-#define __LLBC_COM_FUNCTIONAL_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -54,4 +53,4 @@ struct LLBC_BinaryFunction
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_FUNCTIONAL_H__
+

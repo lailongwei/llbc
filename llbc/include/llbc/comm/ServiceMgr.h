@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SERVICE_MGR_H__
-#define __LLBC_COMM_SERVICE_MGR_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -164,5 +163,5 @@ __LLBC_NS_END
 
 #include "llbc/comm/ServiceMgrInl.h"
 
-#endif // !__LLBC_COMM_SERVICE_MGR_H__
+
 
