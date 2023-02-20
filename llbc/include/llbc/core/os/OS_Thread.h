@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_THREAD_H__
-#define __LLBC_CORE_OS_OS_THREAD_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -208,4 +207,4 @@ __LLBC_NS_END
 
 #include "llbc/core/os/OS_ThreadInl.h"
 
-#endif // __LLBC_CORE_OS_OS_THREAD_H__
+

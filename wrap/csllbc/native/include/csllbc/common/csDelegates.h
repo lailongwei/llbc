@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COM_CSDELEGATES_H__
-#define __CSLLBC_COM_CSDELEGATES_H__
+#pragma once
 
 #include "csllbc/common/Macro.h"
 
@@ -128,4 +127,4 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////
 };
 
-#endif // __CSLLBC_COM_CSDELEGATES_H__
+

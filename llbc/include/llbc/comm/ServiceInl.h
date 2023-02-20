@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COMM_SERVICE_H__
+#pragma once
 
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
@@ -334,5 +334,5 @@ inline int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(This *, cons
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_SERVICE_H__
+
 

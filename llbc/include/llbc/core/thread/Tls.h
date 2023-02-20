@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_TLS_H__
-#define __LLBC_CORE_THREAD_TLS_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -116,4 +115,4 @@ __LLBC_NS_END
 
 #include "llbc/core/thread/TlsInl.h"
 
-#endif // !__LLBC_CORE_THREAD_TLS_H__
+

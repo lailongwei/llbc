@@ -19,11 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_EXPORT_H__
-#define __PYLLBC_COM_EXPORT_H__
+#pragma once
 
 /* !We just include llbc lib's export header file to redifine some llbc lib macros. */
 // #include "llbc/common/ExportHeader.h"
 
-#endif // !__PYLLBC_COM_EXPORT_H__
+
 

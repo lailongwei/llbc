@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COM_ENDIAN_H__
+#pragma once
 
 #include "llbc/common/BasicDataType.h"
 
@@ -191,4 +191,4 @@ T LLBC_Host2Net2(const T &val)
 
 __LLBC_NS_END
 
-#endif // __LLBC_COM_ENDIAN_H__
+

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_ICONV_ICONV_H__
-#define __LLBC_CORE_ICONV_ICONV_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -39,5 +38,3 @@ size_t iconv(iconv_t cd, char **inbuf, size_t *inbytesleft, char **outbuf, size_
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-#endif// !__LLBC_CORE_ICONV_ICONV_H__

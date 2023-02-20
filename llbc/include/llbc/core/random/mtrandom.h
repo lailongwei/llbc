@@ -52,8 +52,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef __LLBC_CORE_RANDOM_MTRANDOM_H__
-#define __LLBC_CORE_RANDOM_MTRANDOM_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -182,4 +181,4 @@ private:
 
 __LLBC_NS_END
 
-#endif //! __LLBC_CORE_RANDOM_MTRANDOM_H__
+

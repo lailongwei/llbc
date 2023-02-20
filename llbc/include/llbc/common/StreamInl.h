@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_COM_STREAM_H__
+#pragma once
 
 #include "llbc/common/Template.h"
 #include "llbc/common/Endian.h"
@@ -396,4 +396,4 @@ inline bool LLBC_Stream::OverlappedCheck(const void *another, size_t len) const
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_STREAM_H__
+

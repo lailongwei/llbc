@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
+#pragma once
 
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
@@ -46,4 +46,4 @@ inline LLBC_IObjectPoolInst *LLBC_PoolObject::GetPoolInst()
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_H__
+

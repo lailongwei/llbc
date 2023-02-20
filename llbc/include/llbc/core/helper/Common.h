@@ -19,10 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_HELPER_COMMON_H__
-#define __LLBC_CORE_HELPER_COMMON_H__
+#pragma once
 
 #include "llbc/core/helper/STLHelper.h"
 #include "llbc/core/helper/GUIDHelper.h"
 
-#endif // __LLBC_CORE_HELPER_COMMON_H__
+

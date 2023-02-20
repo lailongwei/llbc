@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __PYLLBC_COM_PY_STREAM_H__
+#pragma once
 
 #include "pyllbc/common/Errors.h"
 
@@ -95,4 +95,4 @@ inline PyObject *pyllbc_Stream::GetPyObj()
     return _pyStream;
 }
 
-#endif // __PYLLBC_COM_PY_STREAM_H__
+

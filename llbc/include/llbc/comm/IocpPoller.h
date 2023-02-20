@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_IOCP_POLLER_H__
-#define __LLBC_COMM_IOCP_POLLER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -122,5 +121,5 @@ __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-#endif // !__LLBC_COMM_IOCP_POLLER_H__
+
 

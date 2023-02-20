@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_ENTITY_ENTITY_H__
+#pragma once
 
 #include "llbc/core/entity/Holder.h"
 
@@ -119,4 +119,4 @@ const BehaviorType *LLBC_Entity::GetBehavior(const LLBC_String &name) const
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_ENTITY_ENTITY_H__
+

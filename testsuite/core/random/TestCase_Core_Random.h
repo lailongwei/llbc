@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_RANDOM_H__
-#define __LLBC_TEST_CASE_CORE_RANDOM_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -39,4 +38,4 @@ private:
     void Exec_RandInt_begin_end_Test(int begin, int end, int times);
 };
 
-#endif // !__LLBC_TEST_CASE_CORE_RANDOM_H__
+
