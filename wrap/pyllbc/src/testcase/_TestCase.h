@@ -64,7 +64,6 @@ public:
     }
 };
 
-
 LLBC_EXTERN_C PyObject *_pyllbc_NewTestCase(PyObject *self, PyObject *args)
 {
     char *tcName;

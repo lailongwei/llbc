@@ -54,5 +54,3 @@ private:
 private:
     void *FooEx(const LLBC_NS LLBC_String &arg);
 };
-
-

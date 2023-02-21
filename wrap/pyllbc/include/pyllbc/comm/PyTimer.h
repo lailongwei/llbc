@@ -98,5 +98,3 @@ private:
     LLBC_String _cancelCallableDesc;
     LLBC_String _boundedCancelObjDesc;
 };
-
-

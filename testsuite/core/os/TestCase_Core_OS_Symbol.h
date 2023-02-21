@@ -44,6 +44,3 @@ private:
 
     void PrintBackTrace();
 };
-
-
-

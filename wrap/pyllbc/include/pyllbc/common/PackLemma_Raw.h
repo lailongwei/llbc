@@ -81,5 +81,3 @@ private:
     Symbol _symbol;
     bool _str2Flag;
 };
-
-

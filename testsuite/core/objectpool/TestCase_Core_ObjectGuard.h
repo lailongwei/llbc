@@ -38,5 +38,3 @@ private:
     int WeakRefTest();
     int AccessorOperatorsTest();
 };
-
-

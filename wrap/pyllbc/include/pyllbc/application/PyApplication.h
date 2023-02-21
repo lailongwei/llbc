@@ -59,5 +59,3 @@ public:
 private:
     PyObject *_pyApp; // Borrowed reference.
 };
-
-

@@ -50,5 +50,3 @@ private:
 
     static const int _clientCnt;
 };
-
-

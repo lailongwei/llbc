@@ -36,6 +36,3 @@ public:
 private:
     void VerifyIPv4Addr(const LLBC_String &addr);
 };
-
-
-

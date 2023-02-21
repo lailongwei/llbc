@@ -74,6 +74,3 @@ private:
     sint32 _size;
     sint32 _capacity;
 };
-
-
-

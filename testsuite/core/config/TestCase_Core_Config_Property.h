@@ -36,5 +36,3 @@ public:
 private:
     LLBC_String _file;
 };
-
-

@@ -51,5 +51,3 @@ private:
     LLBC_String _script;
     bool _builded;
 };
-
-

@@ -42,6 +42,3 @@ private:
 private:
     LLBC_Service *_svc;
 };
-
-
-

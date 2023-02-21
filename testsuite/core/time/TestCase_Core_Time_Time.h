@@ -43,5 +43,3 @@ private:
     void PrintTimeStruct(const LLBC_TimeStruct &ts);
     void PrintCLibTimeStruct(const struct tm &ts);
 };
-
-

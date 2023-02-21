@@ -38,5 +38,3 @@ private:
     void TestGuardMeth();
     void TestGuardVariableArgument();
 };
-
-

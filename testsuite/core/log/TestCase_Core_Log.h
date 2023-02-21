@@ -39,5 +39,3 @@ private:
 
     void OnLogHook(const LLBC_LogData *logData);
 };
-
-

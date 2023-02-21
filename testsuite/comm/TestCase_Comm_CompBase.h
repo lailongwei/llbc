@@ -37,5 +37,3 @@ private:
     int TestInInternalDriveService(const LLBC_String &host, const int port);
     int TestInExternalDriveService(const LLBC_String &host, const int port);
 };
-
-

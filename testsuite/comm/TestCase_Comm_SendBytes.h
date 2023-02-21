@@ -43,5 +43,3 @@ private:
     LLBC_String _runIp;
     int _runPort;
 };
-
-

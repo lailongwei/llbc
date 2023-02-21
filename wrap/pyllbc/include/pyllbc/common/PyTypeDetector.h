@@ -74,5 +74,3 @@ public:
     static bool IsSequence(PyObject *obj);
     static bool IsDict(PyObject *obj);
 };
-
-

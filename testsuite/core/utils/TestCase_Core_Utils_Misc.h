@@ -32,5 +32,3 @@ public:
 private:
     int TestStartArgs(int argc, char *argv[]);
 };
-
-

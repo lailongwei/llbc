@@ -56,5 +56,3 @@ private:
 
     static PyObject *_pyEvCls;
 };
-
-

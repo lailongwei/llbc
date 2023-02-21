@@ -89,5 +89,3 @@ private:
     PyObject *_errCls;
     PyObject *_tbObj;
 };
-
-

@@ -92,5 +92,3 @@ private:
 
     static std::map<LLBC_String, PyObject *> _rawClasses;
 };
-
-
