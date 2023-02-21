@@ -321,5 +321,3 @@ LLBC_EXPORT int LLBC_SetSocketOption(LLBC_SocketHandle handle,
                                      LLBC_SocketLen len);
 
 __LLBC_NS_END
-
-

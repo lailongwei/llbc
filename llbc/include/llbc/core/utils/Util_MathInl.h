@@ -48,5 +48,3 @@ inline ldouble LLBC_Abs(const ldouble &val)
 }
 
 __LLBC_NS_END
-
-

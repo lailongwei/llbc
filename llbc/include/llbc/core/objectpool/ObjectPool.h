@@ -194,5 +194,3 @@ typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafetyObjectPool;
 typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafetyObjectPool;
 
 __LLBC_NS_END
-
-

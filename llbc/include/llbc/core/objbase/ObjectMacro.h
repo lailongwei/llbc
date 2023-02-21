@@ -52,5 +52,3 @@ __LLBC_NS_BEGIN
     } while (0)               \
 
 __LLBC_NS_END
-
-

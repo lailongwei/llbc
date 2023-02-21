@@ -258,5 +258,3 @@ void LLBC_BinaryHeap<T, Comp>::PercolateDown(int index)
 }
 
 __LLBC_NS_END
-
-

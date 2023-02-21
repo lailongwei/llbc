@@ -400,5 +400,3 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memU
 }
 
 __LLBC_NS_END
-
-

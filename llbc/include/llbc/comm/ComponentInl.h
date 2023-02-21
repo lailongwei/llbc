@@ -278,5 +278,3 @@ inline void LLBC_Component::SetService(LLBC_Service *svc)
 }
 
 __LLBC_NS_END
-
-

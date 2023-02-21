@@ -180,5 +180,3 @@ LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Clear()
 }
 
 __LLBC_NS_END
-
-

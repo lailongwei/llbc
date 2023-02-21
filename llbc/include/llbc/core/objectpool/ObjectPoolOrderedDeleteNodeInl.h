@@ -195,5 +195,3 @@ inline bool LLBC_ObjectPoolOrderedDeleteNode::operator ==(const LLBC_ObjectPoolO
 }
 
 __LLBC_NS_END
-
-

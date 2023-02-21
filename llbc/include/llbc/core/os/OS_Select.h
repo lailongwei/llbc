@@ -65,5 +65,3 @@ __LLBC_NS_BEGIN
 LLBC_EXPORT int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval);
 
 __LLBC_NS_END
-
-

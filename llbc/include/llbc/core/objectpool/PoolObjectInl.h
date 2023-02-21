@@ -45,5 +45,3 @@ inline LLBC_IObjectPoolInst *LLBC_PoolObject::GetPoolInst()
 }
 
 __LLBC_NS_END
-
-

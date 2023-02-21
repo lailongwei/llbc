@@ -30,5 +30,3 @@ inline LLBC_String LLBC_Directory::Join(const LLBC_String &path1, const LLBC_Str
 }
 
 __LLBC_NS_END
-
-

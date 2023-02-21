@@ -30,5 +30,3 @@ LLBC_FORCE_INLINE uint32 __LLBC_Hash::operator()(const void *bytes, size_t size)
 }
 
 __LLBC_NS_END
-
-

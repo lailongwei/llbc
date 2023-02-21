@@ -66,5 +66,3 @@ LLBC_HIDDEN int __LLBC_CommonStartup();
 LLBC_HIDDEN void __LLBC_CommonCleanup();
 
 __LLBC_NS_END
-
-

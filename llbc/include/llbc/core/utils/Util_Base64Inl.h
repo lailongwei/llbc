@@ -138,5 +138,3 @@ inline int LLBC_Base64::Decode(const char *input, size_t inputLen, LLBC_String &
 }
 
 __LLBC_NS_END
-
-

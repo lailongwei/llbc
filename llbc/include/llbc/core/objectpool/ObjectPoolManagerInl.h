@@ -75,5 +75,3 @@ ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease)
 }
 
 __LLBC_NS_END
-
-

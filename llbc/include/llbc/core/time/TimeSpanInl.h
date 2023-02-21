@@ -305,5 +305,3 @@ inline bool LLBC_TimeSpan::DeSerialize(LLBC_Stream &stream)
 }
 
 __LLBC_NS_END
-
-

@@ -34,5 +34,3 @@ __LLBC_NS_BEGIN
 typedef uint64 LLBC_ListenerStub;
 
 __LLBC_NS_END
-
-

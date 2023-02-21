@@ -231,5 +231,3 @@ void LLBC_Delegate<Rtn(Args...)>::Reset()
 }
 
 __LLBC_NS_END
-
-

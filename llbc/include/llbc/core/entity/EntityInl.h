@@ -118,5 +118,3 @@ const BehaviorType *LLBC_Entity::GetBehavior(const LLBC_String &name) const
 }
 
 __LLBC_NS_END
-
-

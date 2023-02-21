@@ -62,5 +62,3 @@ inline int LLBC_Property::SetValue(const LLBC_String &name, const _ValueType &va
 }
 
 __LLBC_NS_END
-
-

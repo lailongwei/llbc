@@ -217,5 +217,3 @@ void LLBC_PoolObjectReflection::RecycleInl(ObjectType *&obj,
 #undef __LLBC_CORE_OBJECT_POOL_POOL_OBJECT_REFLECTION_DETECT_TYPE_DEF
 
 __LLBC_NS_END
-
-

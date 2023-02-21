@@ -59,5 +59,3 @@ LLBC_FORCE_INLINE void LLBC_IObjectPoolInst::CheckRefCount(void *obj)
 }
 
 __LLBC_NS_END
-
-

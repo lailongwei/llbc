@@ -105,5 +105,3 @@ void LLBC_Tls<ValueType>::ClearValue(int valueClearMeth)
 }
 
 __LLBC_NS_END
-
-

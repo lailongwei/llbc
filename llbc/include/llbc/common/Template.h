@@ -35,5 +35,3 @@ inline void LLBC_Swap(T &left, T &right)
 };
 
 __LLBC_NS_END
-
-

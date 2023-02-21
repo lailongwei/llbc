@@ -34,5 +34,3 @@ LLBC_FORCE_INLINE void LLBC_AutoReleasePool::SetPoolNext(LLBC_AutoReleasePool *n
 }
 
 __LLBC_NS_END
-
-

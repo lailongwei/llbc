@@ -42,5 +42,3 @@ void *LLBC_Holder<ValueType>::GetValue() const
 }
 
 __LLBC_NS_END
-
-

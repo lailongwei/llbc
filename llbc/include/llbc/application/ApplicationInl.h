@@ -150,5 +150,3 @@ inline int LLBC_Application::StopService(const LLBC_CString &name, bool del)
 }
 
 __LLBC_NS_END
-
-

@@ -51,5 +51,3 @@ LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t
 #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
 __LLBC_NS_END
-
-

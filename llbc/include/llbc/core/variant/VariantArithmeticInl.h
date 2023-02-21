@@ -109,5 +109,3 @@ inline RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawT
 }
 
 __LLBC_NS_END
-
-

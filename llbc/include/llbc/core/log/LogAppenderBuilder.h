@@ -56,5 +56,3 @@ template class LLBC_HIDDEN LLBC_Singleton<LLBC_LogAppenderBuilder>;
 #define LLBC_LogAppenderBuilderSingleton LLBC_Singleton<LLBC_NS LLBC_LogAppenderBuilder>::Instance()
 
 __LLBC_NS_END
-
-

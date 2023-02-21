@@ -83,5 +83,3 @@ inline void LLBC_ReferencablePoolObj::SafeRelease()
 }
 
 __LLBC_NS_END
-
-

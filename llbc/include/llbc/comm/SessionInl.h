@@ -104,5 +104,3 @@ inline void LLBC_Session::SetPoller(LLBC_BasePoller *poller)
 }
 
 __LLBC_NS_END
-
-

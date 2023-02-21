@@ -127,5 +127,3 @@ inline void LLBC_Event::ClearExtData()
 }
 
 __LLBC_NS_END
-
-

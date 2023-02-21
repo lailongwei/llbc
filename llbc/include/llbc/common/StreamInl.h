@@ -395,5 +395,3 @@ inline bool LLBC_Stream::OverlappedCheck(const void *another, size_t len) const
 }
 
 __LLBC_NS_END
-
-

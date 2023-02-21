@@ -490,5 +490,3 @@ void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::StatTopNPoolInstStats(
 #undef __LLBC_SPE_OBJPOOL_METHS
 
 __LLBC_NS_END
-
-
