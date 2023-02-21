@@ -49,5 +49,3 @@ struct LLBC_HIDDEN LLBC_AsyncConnInfo
 };
 
 __LLBC_NS_END
-
-

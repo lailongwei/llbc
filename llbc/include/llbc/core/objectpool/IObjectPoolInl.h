@@ -34,5 +34,3 @@ int LLBC_IObjectPool::AcquireOrderedDeletePoolInst()
 }
 
 __LLBC_NS_END
-
-

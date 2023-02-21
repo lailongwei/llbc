@@ -48,5 +48,3 @@ typedef LLBC_BasicCString<wchar> LLBC_CWString;
 #endif // LLBC_UNICODE
 
 __LLBC_NS_END
-
-

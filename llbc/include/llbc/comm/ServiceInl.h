@@ -333,6 +333,3 @@ inline int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(This *, cons
 }
 
 __LLBC_NS_END
-
-
-

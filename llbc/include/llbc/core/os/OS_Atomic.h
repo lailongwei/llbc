@@ -326,5 +326,3 @@ inline sint64 LLBC_AtomicCompareAndExchange(volatile sint64 *ptr, sint64 exchang
 }
 
 __LLBC_NS_END
-
-

@@ -91,5 +91,3 @@ inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, con
 }
 
 __LLBC_NS_END
-
-

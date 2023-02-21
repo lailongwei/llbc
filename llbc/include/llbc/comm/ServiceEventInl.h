@@ -141,6 +141,3 @@ inline LLBC_SvcEv_FireEv::~LLBC_SvcEv_FireEv()
 }
 
 __LLBC_NS_END
-
-
-

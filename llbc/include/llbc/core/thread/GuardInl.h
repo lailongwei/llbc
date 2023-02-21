@@ -118,5 +118,3 @@ inline LLBC_InvokeGuard::~LLBC_InvokeGuard()
 }
 
 __LLBC_NS_END
-
-

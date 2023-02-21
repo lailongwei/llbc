@@ -52,5 +52,3 @@ LLBC_EXPORT int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath = "",
                                                                int sig)> &callback = nullptr);
 
 __LLBC_NS_END
-
-

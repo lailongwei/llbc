@@ -85,6 +85,3 @@ inline int LLBC_Logger::Output(int level,
 }
 
 __LLBC_NS_END
-
-
-

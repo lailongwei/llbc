@@ -128,5 +128,3 @@ inline LLBC_ObjectPoolInst<LLBC_MessageBlock> &LLBC_ServiceImpl::GetMsgBlockObje
 }
 
 __LLBC_NS_END
-
-

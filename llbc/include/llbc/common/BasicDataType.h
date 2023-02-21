@@ -276,5 +276,3 @@ typedef LLBC_SessionIdSet::const_iterator LLBC_SessionIdSetCIter;
 typedef void *(*LLBC_CompDynamicCreateFunc)();
 
 __LLBC_NS_END
-
-

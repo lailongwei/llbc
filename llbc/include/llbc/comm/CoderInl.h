@@ -32,5 +32,3 @@ inline LLBC_Coder::~LLBC_Coder()
 }
 
 __LLBC_NS_END
-
-

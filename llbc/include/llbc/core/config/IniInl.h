@@ -194,5 +194,3 @@ inline int LLBC_Ini::SetValue(const LLBC_String &sectionName,
 }
 
 __LLBC_NS_END
-
-

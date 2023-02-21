@@ -108,5 +108,3 @@ inline void LLBC_SessionOpts::SetMaxPacketSize(size_t size)
 }
 
 __LLBC_NS_END
-
-

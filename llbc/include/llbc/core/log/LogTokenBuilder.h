@@ -56,5 +56,3 @@ template class LLBC_HIDDEN LLBC_Singleton<LLBC_LogTokenBuilder>;
 #define LLBC_LogTokenBuilderSingleton LLBC_Singleton<LLBC_NS LLBC_LogTokenBuilder>::Instance()
 
 __LLBC_NS_END
-
-

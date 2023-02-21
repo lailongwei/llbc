@@ -616,5 +616,3 @@ __LLBC_NS_BEGIN
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))
 
 __LLBC_NS_END
-
-

@@ -60,5 +60,3 @@ inline void *LLBC_DummyLock::Handle()
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 __LLBC_NS_END
-
-

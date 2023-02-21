@@ -59,5 +59,3 @@ inline bool LLBC_EventManager::IsFiring() const
 }
 
 __LLBC_NS_END
-
-

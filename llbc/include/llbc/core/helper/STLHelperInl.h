@@ -472,5 +472,3 @@ inline void LLBC_STLHelper::OperateElem(_Ty * const &elem, int opcode)
 }
 
 __LLBC_NS_END
-
-

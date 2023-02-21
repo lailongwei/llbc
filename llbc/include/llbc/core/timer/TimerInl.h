@@ -36,5 +36,3 @@ void LLBC_Timer::SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Tim
 }
 
 __LLBC_NS_END
-
-

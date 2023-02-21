@@ -51,6 +51,3 @@ LLBC_EXTERN LLBC_EXPORT bool LLBC_isDebugVer;
 LLBC_EXPORT LLBC_String LLBC_GetVersionInfo(bool verbose = false);
 
 __LLBC_NS_END
-
-
-

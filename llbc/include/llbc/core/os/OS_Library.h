@@ -48,5 +48,3 @@ LLBC_EXPORT LLBC_LibraryFun LLBC_GetProcAddress(LLBC_LibraryHandle handle, const
 LLBC_EXPORT int LLBC_CloseLibrary(LLBC_LibraryHandle handle);
 
 __LLBC_NS_END
-
-

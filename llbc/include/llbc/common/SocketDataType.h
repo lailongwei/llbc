@@ -389,5 +389,3 @@ private:
 typedef LLBC_OverlappedGroup * LLBC_POverlappedGroup;
 
 __LLBC_NS_END
-
-

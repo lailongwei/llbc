@@ -29,5 +29,3 @@ inline bool LLBC_LoggerManager::IsInited() const
 }
 
 __LLBC_NS_END
-
-

@@ -51,6 +51,3 @@ LLBC_EXPORT int LLBC_Startup(bool initWinSock = true);
 LLBC_EXPORT int LLBC_Cleanup();
 
 __LLBC_NS_END
-
-
-

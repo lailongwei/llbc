@@ -134,6 +134,3 @@ LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
 void __LLBC_ResetLibTls();
 
 __LLBC_NS_END
-
-
-

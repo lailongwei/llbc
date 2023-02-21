@@ -92,5 +92,3 @@ void LLBC_Singleton<T, LockType, ThreadUnit>::Release()
 }
 
 __LLBC_NS_END
-
-

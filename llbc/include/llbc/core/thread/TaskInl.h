@@ -65,5 +65,3 @@ inline size_t LLBC_Task::GetMessageSize() const
 }
 
 __LLBC_NS_END
-
-

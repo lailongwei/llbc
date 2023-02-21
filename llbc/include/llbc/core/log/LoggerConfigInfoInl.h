@@ -144,5 +144,3 @@ inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
 }
 
 __LLBC_NS_END
-
-

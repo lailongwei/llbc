@@ -116,5 +116,3 @@ inline LLBC_String LLBC_Num2Str(T val, int radix)
 }
 
 __LLBC_NS_END
-
-

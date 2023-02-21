@@ -86,6 +86,3 @@ LLBC_EXPORT LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
 
 
 __LLBC_NS_END
-
-
-

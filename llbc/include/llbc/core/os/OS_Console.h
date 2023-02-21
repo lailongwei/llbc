@@ -127,5 +127,3 @@ LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 LLBC_EXPORT int LLBC_FlushFile(FILE *file);
 
 __LLBC_NS_END
-
-

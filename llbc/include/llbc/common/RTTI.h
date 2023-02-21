@@ -46,5 +46,3 @@ LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
 #endif // Non-Win32
 
 __LLBC_NS_END
-
-

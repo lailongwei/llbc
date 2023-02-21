@@ -57,5 +57,3 @@ inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_CString &name
 }
 
 __LLBC_NS_END
-
-

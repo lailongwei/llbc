@@ -150,5 +150,3 @@ __LLBC_NS_BEGIN
 LLBC_EXTERN LLBC_EXPORT const LLBC_SessionOpts LLBC_DftSessionOpts;
 
 __LLBC_NS_END
-
-

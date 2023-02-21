@@ -48,6 +48,3 @@ LLBC_EXPORT int LLBC_GetAddrInfo(const char *nodename,
 LLBC_EXPORT void LLBC_FreeAddrInfo(struct addrinfo *ai);
 
 __LLBC_NS_END
-
-
-

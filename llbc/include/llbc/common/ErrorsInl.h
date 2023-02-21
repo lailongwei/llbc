@@ -31,5 +31,3 @@ LLBC_SetLastError(EnumTy no, const char *customErrStr)
 }
 
 __LLBC_NS_END
-
-

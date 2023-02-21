@@ -33,6 +33,3 @@ __LLBC_NS_BEGIN
 LLBC_EXPORT bool LLBC_IsIPv4Addr(const LLBC_String &addr);
 
 __LLBC_NS_END
-
-
-

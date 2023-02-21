@@ -70,5 +70,3 @@ inline size_t LLBC_MessageQueue::GetSize() const
 }
 
 __LLBC_NS_END
-
-

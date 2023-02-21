@@ -38,7 +38,6 @@ class XMLDocument;
 }
 __LLBC_NS_END
 
-
 __LLBC_NS_BEGIN
 
 /**
