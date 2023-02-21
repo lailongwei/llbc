@@ -33,5 +33,3 @@ public:
     void DoBasicTest();
     void DoPerfTest();
 };
-
-

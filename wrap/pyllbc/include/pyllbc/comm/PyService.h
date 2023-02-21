@@ -440,5 +440,3 @@ private:
     static PyObject *_streamCls;
     static pyllbc_ErrorHooker *_errHooker;
 };
-
-

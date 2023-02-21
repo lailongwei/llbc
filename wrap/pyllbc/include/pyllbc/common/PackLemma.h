@@ -215,5 +215,3 @@ protected:
 
     PyObject *_compileEnv;
 };
-
-

@@ -91,5 +91,3 @@ public:
 private:
     std::vector<Base *> _lemmas;
 };
-
-

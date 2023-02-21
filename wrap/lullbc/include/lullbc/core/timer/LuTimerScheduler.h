@@ -31,5 +31,3 @@ public:
 private:
     LLBC_DISABLE_ASSIGNMENT(lullbc_TimerScheduler);
 };
-
-

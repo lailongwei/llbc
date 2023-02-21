@@ -48,5 +48,3 @@ private:
 private:
     LLBC_String _testFileName;
 };
-
-

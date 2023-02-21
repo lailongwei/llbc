@@ -29,5 +29,3 @@ class TestCase_Core_Utils_Debug : public LLBC_BaseTestCase
 public:
     virtual int Run(int argc, char *argv[]);
 };
-
-

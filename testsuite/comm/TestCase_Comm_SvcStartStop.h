@@ -33,6 +33,3 @@ public:
 public:
     virtual int Run(int argc, char *artv[]);
 };
-
-
-

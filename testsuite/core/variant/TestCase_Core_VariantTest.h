@@ -40,5 +40,3 @@ private:
     void HashTest();
     void ConvertToUnurderedStlContainerTest();
 };
-
-

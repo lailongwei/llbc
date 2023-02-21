@@ -40,5 +40,3 @@ private:
 
     void SortTest();
 };
-
-

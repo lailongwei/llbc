@@ -52,5 +52,3 @@ public:
      */
     static PyObject *Variant2Obj(const LLBC_Variant &var);
 };
-
-

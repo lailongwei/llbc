@@ -38,5 +38,3 @@ public:
      */
     static pyllbc_PackLemma *Build(pyllbc_PackLemma::Type type, PyObject *compileEnv = nullptr);
 };
-
-

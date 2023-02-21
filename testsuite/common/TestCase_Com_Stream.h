@@ -29,5 +29,3 @@ class TestCase_Com_Stream : public LLBC_BaseTestCase
 public:
     virtual int Run(int argc, char *argv[]);
 };
-
-

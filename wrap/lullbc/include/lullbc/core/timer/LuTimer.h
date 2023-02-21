@@ -65,5 +65,3 @@ private:
     lua_State *_luaState;
     int _callableInfo;
 };
-
-

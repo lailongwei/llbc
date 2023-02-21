@@ -147,5 +147,3 @@ private:
     static PyObject *_attrErrNo;
     static PyObject *_attrSubErrNo;
 };
-
-

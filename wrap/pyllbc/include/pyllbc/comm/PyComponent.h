@@ -205,5 +205,3 @@ private:
 
     PyObject *_compEvCallArgs;
 };
-
-

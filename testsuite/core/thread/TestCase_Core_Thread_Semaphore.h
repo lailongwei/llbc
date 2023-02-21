@@ -33,5 +33,3 @@ public:
 private:
     virtual int Run(int argc, char *argv[]);
 };
-
-

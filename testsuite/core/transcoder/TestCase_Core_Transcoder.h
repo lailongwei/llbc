@@ -45,5 +45,3 @@ private:
 private:
     virtual void DeleteOutputFiles(const std::vector<LLBC_String> &files);
 };
-
-

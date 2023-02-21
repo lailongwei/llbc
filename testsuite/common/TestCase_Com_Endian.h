@@ -29,5 +29,3 @@ class TestCase_Com_Endian : public LLBC_BaseTestCase
 public:
     virtual int Run(int argc, char *argv[]);
 };
-
-

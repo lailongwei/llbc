@@ -67,5 +67,3 @@ private:
     PyObject *_handler;
     PyObject *_callArgs;
 };
-
-

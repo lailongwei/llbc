@@ -50,5 +50,3 @@ private:
     PyObject *_svc;
     PyObject *_callable;
 };
-
-

@@ -371,7 +371,6 @@ struct _alias {
         identifier asname;
 };
 
-
 #define Module(a0, a1) _Py_Module(a0, a1)
 mod_ty _Py_Module(asdl_seq * body, PyArena *arena);
 #define Interactive(a0, a1) _Py_Interactive(a0, a1)

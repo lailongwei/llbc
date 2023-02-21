@@ -47,5 +47,3 @@ private:
     int GetFilesTest(const LLBC_String &path, bool recursive);
     int GetDirectoriesTest(const LLBC_String &path, bool recursive);
 };
-
-

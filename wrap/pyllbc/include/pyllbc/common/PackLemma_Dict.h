@@ -80,5 +80,3 @@ private:
     Base *_keyLemma;
     Base *_valueLemma;
 };
-
-

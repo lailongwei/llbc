@@ -29,5 +29,3 @@ class TestCase_Core_Helper_StlHelper : public LLBC_BaseTestCase
 public:
     virtual int Run(int argc, char *argv[]);
 };
-
-

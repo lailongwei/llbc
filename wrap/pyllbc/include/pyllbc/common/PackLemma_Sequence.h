@@ -81,5 +81,3 @@ private:
     Symbol _seqType;
     std::vector<Base *> _lemmas;
 };
-
-

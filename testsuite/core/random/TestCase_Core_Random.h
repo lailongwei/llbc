@@ -37,5 +37,3 @@ private:
     void Exec_RandInt_end_Test(int end, int times);
     void Exec_RandInt_begin_end_Test(int begin, int end, int times);
 };
-
-

@@ -67,5 +67,3 @@ private:
 private:
     LLBC_DISABLE_ASSIGNMENT(lullbc_LuaHolder);
 };
-
-

@@ -43,5 +43,3 @@ private:
     void DoPoolDebugAssetTest();
     void DoStringSpecificPoolInstTest();
 };
-
-

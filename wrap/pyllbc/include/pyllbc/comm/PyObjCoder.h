@@ -70,5 +70,3 @@ private:
     static int DecodeDict(PyObject *in, LLBC_JsonValue *&out);
     static int DecodeObj(const LLBC_JsonValue &in, PyObject *&out);
 };
-
-
