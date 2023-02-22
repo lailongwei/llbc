@@ -146,9 +146,9 @@ public:
     template <typename _Key, typename _Ty>
     static void RecycleContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
-    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse = false);
+    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
     template <typename _Ty, std::size_t _Nm>
-    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse = false);
+    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
 
 public:
     /**
