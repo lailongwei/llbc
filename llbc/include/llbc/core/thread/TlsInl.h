@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifdef __LLBC_CORE_THREAD_TLS_H__
+#pragma once
 
 #include "llbc/core/os/OS_Thread.h"
 
@@ -105,5 +105,3 @@ void LLBC_Tls<ValueType>::ClearValue(int valueClearMeth)
 }
 
 __LLBC_NS_END
-
-#endif // __LLBC_CORE_THREAD_TLS_H__

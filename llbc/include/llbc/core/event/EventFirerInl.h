@@ -19,9 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_EVENT_EVENT_FIRER_H__
+#pragma once
 
 #include "llbc/core/event/Event.h"
+#include "llbc/core/event/EventManager.h"
 
 __LLBC_NS_BEGIN
 
@@ -39,12 +40,40 @@ inline LLBC_EventFirer::~LLBC_EventFirer()
 template <typename KeyType, typename ParamType>
 LLBC_EventFirer &LLBC_EventFirer::SetParam(const KeyType &paramKey, const ParamType &param)
 {
-    if (LIKELY(_ev))
-        _ev->SetParam(paramKey, param);
-
+    _ev->SetParam(paramKey, param);
     return *this;
 }
 
-__LLBC_NS_END
+inline void LLBC_EventFirer::Fire()
+{
+    _evMgr->Fire(_ev);
+    _ev = nullptr;
+    _evMgr = nullptr;
 
-#endif // __LLBC_CORE_EVENT_EVENT_FIRER_H__
+    LLBC_Recycle(this);
+}
+
+inline void LLBC_EventFirer::Clear()
+{
+    if (_ev)
+    {
+        LLBC_Recycle(_ev);
+        _ev = nullptr;
+        _evMgr = nullptr;
+    }
+}
+
+inline void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+{
+    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
+    objPool->AcquireOrderedDeletePoolInst(
+        typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
+}
+
+inline void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
+{
+    _ev = ev;
+    _evMgr = evMgr;
+}
+
+__LLBC_NS_END

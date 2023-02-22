@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_COMMON_H__
-#define __LLBC_CORE_LOG_COMMON_H__
+#pragma once
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
@@ -30,4 +29,4 @@
 
 #include "llbc/core/log/LogJsonMsg.h"
 
-#endif // !__LLBC_CORE_LOG_COMMON_H__
+

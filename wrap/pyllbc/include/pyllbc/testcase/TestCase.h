@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_TESTCASE_TESTCASE_H__
-#define __PYLLBC_TESTCASE_TESTCASE_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 
@@ -44,4 +43,4 @@ LLBC_HIDDEN void pyllbc_AddTestCaseMethods();
  */
 LLBC_HIDDEN void pyllbc_AddTestCaseObjs();
 
-#endif // !__PYLLBC_TESTCASE_TESTCASE_H__
+

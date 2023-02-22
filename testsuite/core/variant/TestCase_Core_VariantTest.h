@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CORE_VARIANT_TEST_H__
-#define __LLBC_TEST_CORE_VARIANT_TEST_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -41,5 +40,3 @@ private:
     void HashTest();
     void ConvertToUnurderedStlContainerTest();
 };
-
-#endif // !__LLBC_TEST_CORE_VARIANT_TEST_H__

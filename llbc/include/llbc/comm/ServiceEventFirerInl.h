@@ -19,49 +19,52 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
-
-#include "llbc/core/objectpool/Common.h"
-
-#include "llbc/core/event/EventFirer.h"
-#include "llbc/core/event/EventManager.h"
+#include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
-
-void LLBC_EventFirer::Fire()
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer()
+: _ev(nullptr)
+, _service(nullptr)
 {
-    if (LIKELY(_ev))
-    {
-        _evMgr->Fire(_ev);
-        _ev = nullptr;
-        _evMgr = nullptr;
-    }
-
-    LLBC_Recycle(this);
 }
 
-void LLBC_EventFirer::Clear()
+template <typename KeyType, typename ParamType>
+LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::SetParam(const KeyType &paramKey, const ParamType &param)
 {
-    if (LIKELY(_ev))
+    _ev->SetParam(paramKey, param);
+    return *this;
+}
+
+inline void LLBC_ServiceEventFirer::Fire()
+{
+    _service->FireEvent(_ev);
+    _ev = nullptr;
+    _service = nullptr;
+}
+
+inline void LLBC_ServiceEventFirer::Clear()
+{
+    if (_ev)
     {
         LLBC_Recycle(_ev);
         _ev = nullptr;
-
-        _evMgr = nullptr;
+        _service = nullptr;
     }
 }
 
-void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+inline void LLBC_ServiceEventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
 {
     LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
+    objPool->AcquireOrderedDeletePoolInst(
+        typeid(LLBC_ServiceEventFirer).name(), typeid(LLBC_Event).name());
 }
 
-void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
+inline void LLBC_ServiceEventFirer::SetEventInfo(LLBC_Event *ev, LLBC_Service *service)
 {
     _ev = ev;
-    _evMgr = evMgr;
+    _service = service;
 }
 
 __LLBC_NS_END

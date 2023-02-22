@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_FILE_DIRECTORY_H__
-#define __LLBC_TEST_CASE_CORE_FILE_DIRECTORY_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -48,5 +47,3 @@ private:
     int GetFilesTest(const LLBC_String &path, bool recursive);
     int GetDirectoriesTest(const LLBC_String &path, bool recursive);
 };
-
-#endif // __LLBC_TEST_CASE_CORE_FILE_DIRECTORY_H__

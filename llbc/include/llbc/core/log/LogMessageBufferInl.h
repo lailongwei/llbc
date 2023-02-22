@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifdef __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+#pragma once
 
 template <typename T>
 std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val)
@@ -28,4 +28,4 @@ std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const 
     return static_cast<std::basic_ostream<char> &>(msg) << val;
 }
 
-#endif // __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+

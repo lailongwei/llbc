@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_STAT_H__
-#define __LLBC_CORE_OBJECT_POOL_OBJECT_POOL_STAT_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -207,4 +206,4 @@ LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Object
 
 #include "llbc/core/objectpool/ObjectPoolStatInl.h"
 
-#endif // !__LLBC_CORE_OBJECT_POOL_OBJECT_POOL_STAT_H__
+

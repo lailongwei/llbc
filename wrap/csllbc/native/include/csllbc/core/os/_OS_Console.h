@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_CORE_OS__OS_CONSOLE_H__
-#define __CSLLBC_CORE_OS__OS_CONSOLE_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 
@@ -38,4 +37,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Console_ResetColor();
 
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Console_SafeFlush(bool flushStdout);
 
-#endif // !__CSLLBC_CORE_OS__OS_CONSOLE_H__
+

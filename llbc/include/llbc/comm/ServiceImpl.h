@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SERVICE_IMPL_H__
-#define __LLBC_COMM_SERVICE_IMPL_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
@@ -28,6 +27,7 @@
 #include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
+#include "llbc/comm/ServiceEventFirer.h"
 #include "llbc/comm/PollerMgr.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
@@ -399,6 +399,12 @@ public:
                            const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
                            const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr);
 
+    /**
+     * Begin fire event(asynchronous operation).
+     * @param[in] eventId - the event id.
+     * @return LLBC_Event & - the event firer object. 
+     */
+    virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId);
 
     /**
      * Get event manager.
@@ -698,6 +704,7 @@ private:
     LLBC_UnsafetyObjectPool _unsafetyObjectPool;
     LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
+    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool;
 
 private:
     LLBC_TimerScheduler *_timerScheduler;
@@ -721,5 +728,5 @@ __LLBC_NS_END
 
 #include "llbc/comm/ServiceImplInl.h"
 
-#endif // !__LLBC_COMM_SERVICE_IMPL_H__
+
 

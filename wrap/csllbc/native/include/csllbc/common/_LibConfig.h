@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COM__LIB_CONFIG_H__
-#define __CSLLBC_COM__LIB_CONFIG_H__
+#pragma once
 
 #include "csllbc/common/LibHeader.h"
 #include "csllbc/common/Macro.h"
@@ -114,4 +113,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_PollerModel(sint64 model, 
 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#endif // !__CSLLBC_COM__LIB_CONFIG_H__
+

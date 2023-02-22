@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM_CSCOMPONENT_H__
-#define __CSLLBC_COMM_CSCOMPONENT_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -90,4 +89,4 @@ private:
     _D::Deleg_Comp_OnUnHandledPacket _unHandledPacketDeleg;
 };
 
-#endif // !__CSLLBC_COMM_CSCOMPONENT_H__
+

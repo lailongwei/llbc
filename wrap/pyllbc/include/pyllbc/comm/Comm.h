@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_COMM_H__
-#define __PYLLBC_COMM_COMM_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
@@ -45,4 +44,4 @@ LLBC_HIDDEN void pyllbc_AddCommMethods();
  */
 LLBC_HIDDEN void pyllbc_AddCommObjs();
 
-#endif // !__PYLLBC_COMM_COMM_H__
+

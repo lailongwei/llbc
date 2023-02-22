@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
-#define __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -113,4 +112,4 @@ std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const 
 
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 
-#endif // !__LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+

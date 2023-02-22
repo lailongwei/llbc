@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_LIB_HEADER_H__
-#define __PYLLBC_COM_LIB_HEADER_H__
+#pragma once
 
 /* Include python header file. */
 #include "Python.h"
@@ -30,5 +29,5 @@
 #include "llbc.h"
 using namespace llbc;
 
-#endif // !__PYLLBC_COM_LIB_HEADER_H__
+
 

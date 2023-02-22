@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_HELPER_STL_HELPER_H__
-#define __LLBC_CORE_HELPER_STL_HELPER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -147,9 +146,9 @@ public:
     template <typename _Key, typename _Ty>
     static void RecycleContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
     template <typename _Key, typename _Ty>
-    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear, bool reverse = false);
+    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
     template <typename _Ty, std::size_t _Nm>
-    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear, bool reverse = false);
+    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
 
 public:
     /**
@@ -194,4 +193,4 @@ __LLBC_NS_END
 
 #include "llbc/core/helper/STLHelperInl.h"
 
-#endif // __LLBC_CORE_HELPER_STL_HELPER_H__
+
