@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_UTILS_DELEGATE_H__
-#define __LLBC_TEST_CASE_CORE_UTILS_DELEGATE_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -55,5 +54,3 @@ private:
 private:
     void *FooEx(const LLBC_NS LLBC_String &arg);
 };
-
-#endif // !__LLBC_TEST_CASE_CORE_UTILS_DELEGATE_H__

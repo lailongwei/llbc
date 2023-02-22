@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_SUITE_H__
-#define __LLBC_TEST_SUITE_H__
+#pragma once
 
 #include "common/TestCase_Com_DataType.h"
 #include "common/TestCase_Com_Endian.h"
@@ -99,4 +98,4 @@
 
 extern int TestSuite_Main(int argc, char *argv[]);
 
-#endif // !__LLBC_TEST_SUITE_H__
+

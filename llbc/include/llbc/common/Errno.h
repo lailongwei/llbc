@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_ERRNO_H__
-#define __LLBC_COM_ERRNO_H__
+#pragma once
 
 #include "llbc/common/Macro.h"
 
@@ -617,5 +616,3 @@ __LLBC_NS_BEGIN
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_ERRNO_H__

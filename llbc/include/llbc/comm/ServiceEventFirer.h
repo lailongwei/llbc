@@ -23,73 +23,73 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/sampler/BaseSampler.h"
+#include "llbc/core/objectpool/ReferencablePoolObj.h"
+
+__LLBC_NS_BEGIN
+class LLBC_Variant;
+class LLBC_Event;
+class LLBC_Service;
+__LLBC_NS_END
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The limit type sampler class encapsulation.
+ * @brief The service event firer class encapsulation.
  */
-class LLBC_EXPORT LLBC_LimitSampler : public LLBC_BaseSampler
+class LLBC_EXPORT LLBC_ServiceEventFirer : public LLBC_ReferencablePoolObj
 {
-    typedef LLBC_BaseSampler _Base;
-
 public:
-    LLBC_LimitSampler();
-    virtual ~LLBC_LimitSampler();
-
-public:
-   /**
-    * Get sampler type.
-    * @return int - sampler type.
-    */
-    virtual int GetType() const;
-
     /**
-     * Reset sampler.
+     * Ctor&Dtor.
      */
-     virtual void Reset();
+    LLBC_ServiceEventFirer();
+    ~LLBC_ServiceEventFirer() = default;
 
 public:
     /**
-     * Sampling function.
-     * @param[in] value   - increment value.
-      *@param[in] appData - current time sampling value.
-     * @return int - return 0 if success, otherwise return -1.
+     * Set event param.
+     * 
+     * @param[in] paramKey - the event param key.
+     * @param[in] param    - the event param.
+     * @return LLBC_EventFirer &  - the event firer reference.
      */
-    virtual int Sampling(sint64 value, void *appData = nullptr);
+    template <typename KeyType, typename ParamType>
+    LLBC_ServiceEventFirer &SetParam(const KeyType &paramKey, const ParamType &param);
+
+    /**
+     * Fire firer holded event.
+     */
+    void Fire();
 
 public:
     /**
-     * Get minimize value sampling value.
-     * @return sint64 - sampling value.
+     * Object-Pool reflection support: clear firer object.
      */
-    sint64 GetMinValue() const;
+    void Clear();
 
     /**
-     * Get minimize value sampling time.
-     * @return time_t - sampling time.
+     * Object-Pool reflection support: pool instance create event callback.
      */
-    time_t GetMinValueSamplingTime() const;
-
-    /**
-     * Get maximize vaue sampling value.
-     * @return sint64 - sampling value.
-     */
-    sint64 GetMaxValue() const;
-
-    /**
-     * Get maximize value sampling time.
-     * @return time_t - sampling time.
-     */
-    time_t GetMaxValueSamplingTime() const;
+    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
 
 private:
-    sint64 _minVal;
-    time_t _minValSamplingTime;
+    /**
+     * @brief Set event info to firer.
+     * @param[in] ev - the event object.
+     * @param[in] service - the service.
+     */
+    void SetEventInfo(LLBC_Event *ev, LLBC_Service *service);
 
-    sint64 _maxVal;
-    time_t _maxValSamplingTime;
+    LLBC_DISABLE_ASSIGNMENT(LLBC_ServiceEventFirer);
+
+private:
+    friend class LLBC_Service;
+
+private:
+    LLBC_Event *_ev;
+    LLBC_Service *_service;
 };
 
 __LLBC_NS_END
+
+#include "llbc/comm/ServiceEventFirerInl.h"

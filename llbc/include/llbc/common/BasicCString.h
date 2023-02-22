@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_BASIC_CSTRING_H__
-#define __LLBC_COM_BASIC_CSTRING_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -483,4 +482,4 @@ struct hash<LLBC_NS LLBC_BasicCString<wchar_t> >
 
 }
 
-#endif // !__LLBC_COM_BASIC_CSTRING_H__
+

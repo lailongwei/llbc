@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_COMMON_H__
-#define __LLBC_CORE_OS_COMMON_H__
+#pragma once
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Atomic.h"
@@ -40,4 +39,4 @@
 #include "llbc/core/os/OS_Iocp.h"
 #endif
 
-#endif // __LLBC_CORE_OS_COMMON_H__
+

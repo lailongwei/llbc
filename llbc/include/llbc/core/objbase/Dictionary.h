@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_DICTIONARY_H__
-#define __LLBC_OBJBASE_DICTIONARY_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -428,4 +427,4 @@ __LLBC_NS_END
 
 #include "llbc/core/objbase/DictionaryInl.h"
 
-#endif // !__LLBC_OBJBASE_DICTIONARY_H__
+

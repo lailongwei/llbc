@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM_CSPACKET_HANDLER_H__
-#define __CSLLBC_COMM_CSPACKET_HANDLER_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -74,4 +73,4 @@ private:
     _NotFoundDecoderReport _notFoundDecoderReport;
 };
 
-#endif // !__CSLLBC_COMM_CSPACKET_HANDLER_H__
+

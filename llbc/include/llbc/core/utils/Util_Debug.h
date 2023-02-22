@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_UTIL_DEBUG_H__
-#define __LLBC_CORE_UTILS_UTIL_DEBUG_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -116,5 +115,5 @@ LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS
 
 #include "llbc/core/utils/Util_DebugInl.h"
 
-#endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
+
 

@@ -22,8 +22,7 @@
 #include "lullbc/common/Export.h"
 #include "lullbc/common/LibHeader.h"
 
-#ifndef __LULLBC_COM_LUA_HOLDER_H__
-#define __LULLBC_COM_LUA_HOLDER_H__
+#pragma once
 
 /**
  * \brief The lua holder class encapsulation.
@@ -68,5 +67,3 @@ private:
 private:
     LLBC_DISABLE_ASSIGNMENT(lullbc_LuaHolder);
 };
-
-#endif // !__LULLBC_COM_LUA_HOLDER_H__

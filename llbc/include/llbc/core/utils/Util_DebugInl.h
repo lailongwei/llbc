@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifdef __LLBC_CORE_UTILS_UTIL_DEBUG_H__
+#pragma once
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/time/Common.h"
@@ -164,4 +164,3 @@ inline LLBC_CPUTime::operator uint64() const
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_UTILS_UTIL_DEBUG_H__

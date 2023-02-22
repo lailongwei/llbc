@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_CONFIG_H__
-#define __PYLLBC_COM_CONFIG_H__
+#pragma once
 
 // Define task count limit, default is 16.
 #define PYLLBC_CFG_TASK_LMT         16
@@ -33,4 +32,4 @@
 // Packet reuse option.
 #define PYLLBC_CFG_PACKET_REUSE     1
 
-#endif // !__PYLLBC_COM_CONFIG_H__
+

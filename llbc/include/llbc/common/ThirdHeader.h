@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_THIRD_HEADER_H__
-#define __LLBC_COM_THIRD_HEADER_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 #include "llbc/common/Compiler.h"
@@ -28,4 +27,4 @@
 // Include zlib library header file.
 // #include "zlib.h"
 
-#endif // !__LLBC_COM_THIRD_HEADER_H__
+

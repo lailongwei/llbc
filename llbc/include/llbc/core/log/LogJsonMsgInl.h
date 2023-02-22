@@ -21,7 +21,7 @@
 
 #include "llbc/core/variant/Variant.h"
 
-#ifdef __LLBC_CORE_LOG_LOG_JSONMSG_H__
+#pragma once
 
 __LLBC_NS_BEGIN
 
@@ -72,4 +72,3 @@ LLBC_LogJsonMsg &LLBC_LogJsonMsg::Add(const char *key, const T &value)
 
 __LLBC_NS_END
 
-#endif // __LLBC_CORE_LOG_LOG_JSONMSG_H__

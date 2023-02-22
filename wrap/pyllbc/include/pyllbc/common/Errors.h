@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_ERROR_H__
-#define __PYLLBC_COM_ERROR_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 
@@ -97,4 +96,4 @@ LLBC_HIDDEN void pyllbc_SetErrSetHock(const LLBC_Delegate<void(const LLBC_String
  */
 LLBC_HIDDEN void pyllbc_SetErrClearHook(const LLBC_Delegate<void()> &hook);
 
-#endif // !__PYLLBC_COM_ERROR_H__
+

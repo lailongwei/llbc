@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM__TIMER_H__
-#define __CSLLBC_COMM__TIMER_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -64,4 +63,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT uint64 csllbc_Timer_GetPeriod(csllbc_Timer *timer);
  */
 LLBC_EXTERN_C CSLLBC_EXPORT uint64 csllbc_Timer_GetTimerId(csllbc_Timer *timer);
 
-#endif // !__CSLLBC_COMM__TIMER_H__
+
