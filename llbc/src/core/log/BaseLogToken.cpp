@@ -45,7 +45,8 @@ LLBC_LogFormattingInfo *LLBC_BaseLogToken::GetFormatter() const
 
 void LLBC_BaseLogToken::SetFormatter(LLBC_LogFormattingInfo *formatter)
 {
-    LLBC_XDelete(_formatter);
+    if (_formatter)
+        delete _formatter;
     _formatter = formatter;
 }
 

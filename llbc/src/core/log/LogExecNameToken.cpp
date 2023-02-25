@@ -22,41 +22,44 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/os/OS_Process.h"
-#include "llbc/core/utils/Util_Text.h"
+#include "llbc/core/file/Directory.h"
 
 #include "llbc/core/log/LogFormattingInfo.h"
-#include "llbc/core/log/LogProcessIdToken.h"
+#include "llbc/core/log/LogExecNameToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogProcessIdToken::LLBC_LogProcessIdToken()
-: _processId(LLBC_GetCurrentProcessId())
+LLBC_LogExecNameToken::LLBC_LogExecNameToken()
+: _execName{}
+, _execNameLen(0)
 {
 }
 
-LLBC_LogProcessIdToken::~LLBC_LogProcessIdToken()
+LLBC_LogExecNameToken::~LLBC_LogExecNameToken()
 {
 }
 
-int LLBC_LogProcessIdToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogExecNameToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
+
+    const LLBC_String execName =
+        LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+    _execNameLen = MIN(execName.size(), sizeof(_execName));
+    memcpy(_execName, execName.c_str(), _execNameLen);
+
     return LLBC_OK;
 }
 
-int LLBC_LogProcessIdToken::GetType() const
+int LLBC_LogExecNameToken::GetType() const
 {
-    return LLBC_LogTokenType::ProcessIdToken;
+    return LLBC_LogTokenType::ExecNameToken;
 }
 
-void LLBC_LogProcessIdToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
+void LLBC_LogExecNameToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%d", _processId);
-    formattedData.append(buf);
+    const int index = static_cast<int>(formattedData.size());
+    formattedData.append(_execName, _execNameLen);
 
     GetFormatter()->Format(formattedData, index);
 }

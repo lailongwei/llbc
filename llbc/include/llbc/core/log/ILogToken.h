@@ -49,7 +49,8 @@ public:
     enum
     {
         StrToken       = '\0',// ..: string type token.
-        NameToken      = 'N', // %L: logger name type token.
+        NameToken      = 'N', // %N: logger name type token.
+        ExecNameToken  = 'e', // %e: executable name type token.
         TagToken       = 'g', // %g: tag type token.
         FileToken      = 'f', // %f: file name type token.
         LineToken      = 'l', // %l: file line type token.

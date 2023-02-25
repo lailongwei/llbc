@@ -247,7 +247,8 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
     _logFile.findreplace("%p", curProcId); 
 
     const LLBC_String modFileName = LLBC_Directory::ModuleFileName();
-    _logFile.findreplace("%m", modFileName);
+    _logFile.findreplace("%m", modFileName); //! '%m' replace format has been deprecated.
+    _logFile.findreplace("%e", modFileName);
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
