@@ -22,9 +22,10 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/log/LogStrToken.h"
 #include "llbc/core/log/LogNullToken.h"
+#include "llbc/core/log/LogStrToken.h"
 #include "llbc/core/log/LogNameToken.h"
+#include "llbc/core/log/LogExecNameToken.h"
 #include "llbc/core/log/LogTagToken.h"
 #include "llbc/core/log/LogFileToken.h"
 #include "llbc/core/log/LogLineToken.h"
@@ -57,6 +58,9 @@ LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 
     case LLBC_LogTokenType::NameToken:
         return new LLBC_LogNameToken;
+
+    case LLBC_LogTokenType::ExecNameToken:
+        return new LLBC_LogExecNameToken;
 
     case LLBC_LogTokenType::TagToken:
         return new LLBC_LogTagToken;
