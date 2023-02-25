@@ -67,7 +67,9 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
         localtime_r(&timeInSecond, &timeStruct);
     #endif
         _lastFmtTime = timeInSecond;
-        _cacheLen = strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
+        _cacheLen = strftime(_fmtCache,
+                             sizeof(_fmtCache),
+                             "%y-%m-%d %H:%M:%S.", &timeStruct);
     }
 
     formattedData.append(_fmtCache, _cacheLen);
