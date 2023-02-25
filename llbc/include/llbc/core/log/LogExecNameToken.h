@@ -59,7 +59,11 @@ public:
     virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
 private:
+    #if LLBC_TARGET_PLATFORM_WIN32
     char _execName[MAX_PATH];
+    #else
+    char _execName[PATH_MAX];
+    #endif
     size_t _execNameLen;
 };
 
