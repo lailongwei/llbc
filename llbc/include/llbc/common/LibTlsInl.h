@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_LIB_TLS_INL_H__
-#define __LLBC_COM_LIB_TLS_INL_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -43,6 +42,7 @@ struct LLBC_EXPORT __LLBC_LibTls
         int subErrNo;
         char errDesc[__LLBC_ERROR_DESC_SIZE];
         char customErrDesc[__LLBC_ERROR_DESC_SIZE];
+        char clibErrFmtBuf[__LLBC_CLIB_ERROR_FORMAT_BUF_SIZE];
         char rtti[__LLBC_RTTI_BUF_SIZE];
     } commonTls;
 
@@ -134,6 +134,3 @@ LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
 void __LLBC_ResetLibTls();
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_LIB_TLS_INL_H__
-

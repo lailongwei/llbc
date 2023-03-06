@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __PYLLBC_COM_OBJ_ATTR_OPTR_H__
+#pragma once
 
 #include "pyllbc/common/Errors.h"
 #include "pyllbc/common/PyModule.h"
@@ -405,4 +405,4 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const _Val &val)
     return LLBC_FAILED;
 }
 
-#endif // __PYLLBC_COM_OBJ_ATTR_OPTR_H__
+

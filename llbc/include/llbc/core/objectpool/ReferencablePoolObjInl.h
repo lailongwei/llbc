@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__
+#pragma once
 
 #include "llbc/core/os/OS_Atomic.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
@@ -83,5 +83,3 @@ inline void LLBC_ReferencablePoolObj::SafeRelease()
 }
 
 __LLBC_NS_END
-
-#endif // __LLBC_CORE_OBJECT_POOL_REFERENCABLE_POOL_OBJ_H__

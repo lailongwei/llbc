@@ -261,8 +261,7 @@ void LLBC_LogLineToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
         #endif // Win32
     }
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

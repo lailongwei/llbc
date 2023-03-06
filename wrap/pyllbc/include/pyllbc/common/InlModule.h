@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_INL_MODULE_H__
-#define __PYLLBC_COM_INL_MODULE_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/PyModule.h"
@@ -38,4 +37,4 @@ public:
 /* The internal module singleton class encapsulation. */
 #define pyllbc_s_InlModule LLBC_Singleton<_pyllbc_InlModule, LLBC_DummyLock>::Instance()
 
-#endif // !__PYLLBC_COM_INL_MODULE_H__
+

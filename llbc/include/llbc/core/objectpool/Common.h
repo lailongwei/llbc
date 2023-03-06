@@ -19,10 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_COMMON_H__
-#define __LLBC_CORE_OBJECT_POOL_COMMON_H__
+#pragma once
 
 #include "llbc/core/objectpool/ReferencablePoolObj.h"
 #include "llbc/core/objectpool/ObjectPoolManager.h"
 
-#endif // !__LLBC_CORE_OBJECT_POOL_COMMON_H__
+

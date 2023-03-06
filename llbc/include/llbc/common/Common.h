@@ -20,8 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifndef __LLBC_COM_COMMON_H__
-#define __LLBC_COM_COMMON_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 #include "llbc/common/Compiler.h"
@@ -67,5 +66,3 @@ LLBC_HIDDEN int __LLBC_CommonStartup();
 LLBC_HIDDEN void __LLBC_CommonCleanup();
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_COMMON_H__

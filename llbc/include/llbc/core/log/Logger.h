@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOGGER_H__
-#define __LLBC_CORE_LOG_LOGGER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -320,9 +319,10 @@ private:
     void FlushAppenders();
 
     /**
-     * Lockless uninstall error hook.
+     * Clear logger non-runnable data members.
+     * @param[in] keepErrNo - keep errno(included sub errno) or not, default is true.
      */
-    void UninstallHookLockless(int level);
+    void ClearNonRunnableMembers(bool keepErrNo = true);
 
 private:
     LLBC_String _name;
@@ -346,5 +346,5 @@ __LLBC_NS_END
 
 #include "llbc/core/log/LoggerInl.h"
 
-#endif // !__LLBC_CORE_LOG_LOGGER_H__
+
 

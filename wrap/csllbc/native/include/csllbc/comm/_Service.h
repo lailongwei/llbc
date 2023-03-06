@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM__SERVICE_H__
-#define __CSLLBC_COMM__SERVICE_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -294,4 +293,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_UnifyPreSubscribe(csllbc_Service 
  */
 LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_OnSvc(csllbc_Service *svc, bool fullFrame);
 
-#endif // !__CSLLBC_COMM__SERVICE_H__
+

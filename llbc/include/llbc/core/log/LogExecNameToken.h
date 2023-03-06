@@ -19,49 +19,52 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
+#include "llbc/common/Common.h"
 
-#include "llbc/core/objectpool/Common.h"
-
-#include "llbc/core/event/EventFirer.h"
-#include "llbc/core/event/EventManager.h"
+#include "llbc/core/log/BaseLogToken.h"
 
 __LLBC_NS_BEGIN
 
-void LLBC_EventFirer::Fire()
+/**
+ * \brief Executable name type log token calss encapsulation.
+ */
+class LLBC_HIDDEN LLBC_LogExecNameToken : public LLBC_BaseLogToken
 {
-    if (LIKELY(_ev))
-    {
-        _evMgr->Fire(_ev);
-        _ev = nullptr;
-        _evMgr = nullptr;
-    }
+public:
+    LLBC_LogExecNameToken();
+    virtual ~LLBC_LogExecNameToken();
 
-    LLBC_Recycle(this);
-}
+public:
+    /**
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
 
-void LLBC_EventFirer::Clear()
-{
-    if (LIKELY(_ev))
-    {
-        LLBC_Recycle(_ev);
-        _ev = nullptr;
+    /**
+     * Get token type.
+     * @return int - token type.
+     */
+    virtual int GetType() const;
 
-        _evMgr = nullptr;
-    }
-}
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
-void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
-{
-    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
-}
-
-void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
-{
-    _ev = ev;
-    _evMgr = evMgr;
-}
+private:
+    #if LLBC_TARGET_PLATFORM_WIN32
+    char _execName[MAX_PATH];
+    #else
+    char _execName[PATH_MAX];
+    #endif
+    size_t _execNameLen;
+};
 
 __LLBC_NS_END

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_PF_CONFIG_H__
-#define __LLBC_COM_PF_CONFIG_H__
+#pragma once
 
 // ==================================================================================
 // Platform specific macros pre-define.
@@ -249,5 +248,5 @@
  #error "Cannot recognize the target processor; are you targeting an unsuported processor?"
 #endif // LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86
 
-#endif // !__LLBC_COM_PF_CONFIG_H__
+
 

@@ -55,16 +55,10 @@ void LLBC_LogProcessIdToken::Format(const LLBC_LogData &data, LLBC_String &forma
     int index = static_cast<int>(formattedData.size());
 
     char buf[32];
-    #if LLBC_TARGET_PLATFORM_WIN32
-    sprintf_s(buf, sizeof(buf), "%d", _processId);
-    #else
-    sprintf(buf, "%d", _processId);
-    #endif
-
+    snprintf(buf, sizeof(buf), "%d", _processId);
     formattedData.append(buf);
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter()->Format(formattedData, index);
 }
 
 __LLBC_NS_END

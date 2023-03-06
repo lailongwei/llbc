@@ -251,16 +251,18 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
     uint32 noPart = LLBC_GetErrnoNoPart(no);
     if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-        sprintf(libTls->commonTls.errDesc,
-                __g_errDesc[noPart], subErrno, strerror(subErrno));
-#else // LLBC_TARGET_PLATFORM_WIN32
-        char libcErrDesc[__LLBC_ERROR_DESC_SIZE] = {0};
-        strerror_s(libcErrDesc, __LLBC_ERROR_DESC_SIZE, subErrno);
-        sprintf_s(libTls->commonTls.errDesc,
-                __LLBC_ERROR_DESC_SIZE, __g_errDesc[noPart], subErrno, libcErrDesc);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
+        snprintf(libTls->commonTls.errDesc,
+                 __LLBC_ERROR_DESC_SIZE,
+                 __g_errDesc[noPart],
+                 subErrno,
+                 #if LLBC_TARGET_PLATFORM_WIN32
+                 strerror_s(libTls->commonTls.clibErrFmtBuf,
+                            __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE,
+                            subErrno) == 0 ? 
+                                libTls->commonTls.clibErrFmtBuf : "Unknown <errno>");
+                 #else // Non-Win32
+                 strerror(subErrno));
+                 #endif // Win32
         return libTls->commonTls.errDesc;
     }
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -280,7 +282,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
                          nullptr);
         if (!hLocal)
         {
-            HMODULE netDll = LoadLibraryExA("netmsg.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
+            HMODULE netDll =
+                LoadLibraryExA("netmsg.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
             if (netDll != nullptr)
             {
                 ::FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE |
@@ -333,8 +336,11 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (LLBC_ERROR_TYPE_IS_GAI(no))
     {
-        sprintf(libTls->commonTls.errDesc,
-              __g_errDesc[noPart], subErrno, gai_strerror(subErrno));
+        snprintf(libTls->commonTls.errDesc,
+                 __LLBC_ERROR_DESC_SIZE,
+                 __g_errDesc[noPart],
+                 subErrno,
+                 gai_strerror(subErrno));
         return libTls->commonTls.errDesc;
     }
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
@@ -344,7 +350,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         strcpy(libTls->commonTls.errDesc, "unknown error");
 #else // LLBC_TARGET_PLATFORM_WIN32
-        strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, "unknown error");
+        strcpy_s(libTls->commonTls.errDesc,
+                 __LLBC_ERROR_DESC_SIZE, "unknown error");
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
         return libTls->commonTls.errDesc;
@@ -355,9 +362,11 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             return libTls->commonTls.customErrDesc;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        strcpy(libTls->commonTls.errDesc, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
+        strcpy(libTls->commonTls.errDesc,
+               (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #else // LLBC_TARGET_PLATFORM_WIN32
-        strcpy_s(libTls->commonTls.errDesc, __LLBC_ERROR_DESC_SIZE, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
+        strcpy_s(libTls->commonTls.errDesc,
+                 __LLBC_ERROR_DESC_SIZE, (__g_errDesc[noPart] ? __g_errDesc[noPart] : ""));
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
         return libTls->commonTls.errDesc;

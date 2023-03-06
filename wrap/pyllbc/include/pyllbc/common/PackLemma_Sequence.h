@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_PACK_LEMMA_SEQUENCE_H__
-#define __PYLLBC_PACK_LEMMA_SEQUENCE_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/PackLemma.h"
@@ -82,5 +81,3 @@ private:
     Symbol _seqType;
     std::vector<Base *> _lemmas;
 };
-
-#endif // !__PYLLBC_PACK_LEMMA_SEQUENCE_H__

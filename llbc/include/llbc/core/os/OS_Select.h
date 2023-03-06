@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_SELECT_H__
-#define __LLBC_CORE_OS_OS_SELECT_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -66,5 +65,3 @@ __LLBC_NS_BEGIN
 LLBC_EXPORT int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet *exceptfds, int interval);
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_OS_OS_SELECT_H__

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_ILOG_TOKEN_H__
-#define __LLBC_CORE_LOG_ILOG_TOKEN_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -50,7 +49,8 @@ public:
     enum
     {
         StrToken       = '\0',// ..: string type token.
-        NameToken      = 'N', // %L: logger name type token.
+        NameToken      = 'N', // %N: logger name type token.
+        ExecNameToken  = 'e', // %e: executable name type token.
         TagToken       = 'g', // %g: tag type token.
         FileToken      = 'f', // %f: file name type token.
         LineToken      = 'l', // %l: file line type token.
@@ -127,5 +127,3 @@ protected:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_ILOG_TOKEN_H__

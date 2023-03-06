@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_UTILS_UTIL_TEXT_H__
+#pragma once
 
 #include "llbc/core/utils/Util_Algorithm.h"
 
@@ -89,12 +89,8 @@ template <>
 inline LLBC_String LLBC_Num2Str(double val, int radix)
 {
     char buf[64] = {0};
+    snprintf(buf, sizeof(buf), "%f", val);
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    sprintf(buf, "%f", val);
-#else // LLBC_TARGET_PLATFORM_WIN32
-    sprintf_s(buf, sizeof(buf), "%f", val);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
     return buf;
 }
 
@@ -120,5 +116,3 @@ inline LLBC_String LLBC_Num2Str(T val, int radix)
 }
 
 __LLBC_NS_END
-
-#endif // __LLBC_CORE_UTILS_UTIL_TEXT_H__

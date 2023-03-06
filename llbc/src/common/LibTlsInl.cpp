@@ -40,6 +40,7 @@ __LLBC_LibTls::__LLBC_LibTls()
     commonTls.subErrNo = LLBC_ERROR_SUCCESS;
     memset(&commonTls.errDesc, 0, sizeof(commonTls.errDesc));
     memset(&commonTls.customErrDesc, 0, sizeof(commonTls.customErrDesc));
+    memset(&commonTls.clibErrFmtBuf, 0, sizeof(commonTls.clibErrFmtBuf));
 
     coreTls.llbcThread = false;
     coreTls.entryThread = false;

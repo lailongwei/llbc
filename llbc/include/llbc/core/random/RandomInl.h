@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifdef __LLBC_CORE_RANDOM_RANDOM_H__
+#pragma once
 
 __LLBC_NS_BEGIN
 
@@ -91,5 +91,3 @@ inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, con
 }
 
 __LLBC_NS_END
-
-#endif // __LLBC_CORE_RANDOM_RANDOM_H__

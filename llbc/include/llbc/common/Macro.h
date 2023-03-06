@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_MACRO_H__
-#define __LLBC_COM_MACRO_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -48,7 +47,9 @@
     }                            \
 
 // llbc library error describe buffer size.
-#define __LLBC_ERROR_DESC_SIZE    2048
+#define __LLBC_ERROR_DESC_SIZE            2048
+// llbc clib error format buffer size.
+#define __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE 1024
 
 // Debug macro define.
 #ifdef DEBUG
@@ -409,4 +410,4 @@ private:                                            \
 #define LLBC_SetErrAndReturnIf(cond, err, ret)                \
     if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
 
-#endif // !__LLBC_COM_MACRO_H__
+

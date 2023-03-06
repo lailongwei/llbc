@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_OBJECT_MACRO_H__
-#define __LLBC_OBJBASE_OBJECT_MACRO_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -53,5 +52,3 @@ __LLBC_NS_BEGIN
     } while (0)               \
 
 __LLBC_NS_END
-
-#endif // !__LLBC_OBJBASE_OBJECT_MACRO_H__

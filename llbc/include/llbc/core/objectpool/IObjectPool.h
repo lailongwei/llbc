@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
-#define __LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 #include "llbc/core/thread/SpinLock.h"
@@ -113,4 +112,4 @@ __LLBC_NS_END
 
 #include "llbc/core/objectpool/IObjectPoolInl.h"
 
-#endif // !__LLBC_CORE_OBJECT_POOL_IOBJECT_POOL_H__
+
