@@ -108,6 +108,8 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
+            ClearNonRunnableMembers();
+
             return LLBC_FAILED;
         }
 
@@ -137,6 +139,8 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
+            ClearNonRunnableMembers();
+
             return LLBC_FAILED;
         }
 
@@ -186,23 +190,8 @@ void LLBC_Logger::Finalize()
         _logRunnable = nullptr;
     }
 
-    // Uninstall all hooks.
-    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
-        UninstallHookLockless(level);
-
-    // Delete all appenders.
-    while (_appenders)
-    {
-        LLBC_ILogAppender *appender = _appenders;
-        _appenders = _appenders->GetAppenderNext();
-
-        delete appender;
-    }
-
-    // Reset basic members.
-    _name.clear();
-    _config = nullptr;
-    _logLevel = LLBC_LogLevel::Begin;
+    // Clear non-runnable data members.
+    ClearNonRunnableMembers(false);
 }
 
 void LLBC_Logger::SetLogLevel(int level)
@@ -240,14 +229,11 @@ int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogD
 
 void LLBC_Logger::UninstallHook(int level)
 {
-    LLBC_LockGuard guard(_lock);
-    UninstallHookLockless(level);
-}
+    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level)))
+        return;
 
-void LLBC_Logger::UninstallHookLockless(int level)
-{
-    if (LIKELY(LLBC_LogLevel::IsLegal(level)))
-        _hookDelegs[level] = nullptr;
+    LLBC_LockGuard guard(_lock);
+    _hookDelegs[level] = nullptr;
 }
 
 int LLBC_Logger::VOutput(int level,
@@ -549,6 +535,43 @@ void LLBC_Logger::FlushAppenders()
         appender->Flush();
         appender = appender->GetAppenderNext();
     }
+}
+
+void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
+{
+    // If require keep errno(include sub errno), cache it and define recover defer operation.
+    int errNo, subErrNo;
+    if (keepErrNo)
+    {
+        errNo = LLBC_GetLastError();
+        subErrNo = LLBC_GetSubErrorNo();
+    }
+
+    LLBC_Defer(
+        LLBC_DoIf(keepErrNo,
+            LLBC_SetLastError(errNo); LLBC_SetSubErrorNo(subErrNo)));
+
+    // Uninstall all hooks.
+    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
+        _hookDelegs[level] = nullptr;
+
+    // Delete all appenders.
+    while (_appenders)
+    {
+        LLBC_ILogAppender *appender = _appenders;
+        _appenders = _appenders->GetAppenderNext();
+
+        delete appender;
+    }
+
+    // Reset basic members.
+    _flushInterval = 0;
+    _lastFlushTime = 0;
+
+    _config = nullptr;
+    _logLevel = LLBC_LogLevel::Begin;
+
+    _name.clear();
 }
 
 __LLBC_NS_END
