@@ -191,7 +191,7 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
                 ++erasedCount;
             }
 
-            memmove(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
+            memmove(_objs + i, _objs + i + 1, (_size - (i + 1)) * sizeof(Obj *));
             _objs[--_size] = nullptr;
         }
     }
