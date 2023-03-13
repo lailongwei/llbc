@@ -1945,8 +1945,13 @@ int LLBC_ServiceImpl::InitComps()
     LLBC_Defer(_initingComp = false);
 
     _compsInitRet = LLBC_ERROR_SUCCESS;
-    for (auto &willRegComp : _willRegComps)
+    while (!_willRegComps.empty())
     {
+        // Pop will-reg comp.
+        const std::list<LLBC_Component *>::iterator willRegCompIt = _willRegComps.begin();
+        LLBC_Component * const willRegComp = *willRegCompIt;
+        _willRegComps.erase(willRegCompIt);
+
         // Set service to comp & update component config & add to service's comps dict.
         willRegComp->SetService(this);
         willRegComp->UpdateComponentCfg();
@@ -1992,8 +1997,6 @@ int LLBC_ServiceImpl::InitComps()
             break;
         }
     }
-
-    _willRegComps.clear();
 
     LLBC_SetLastError(_compsInitRet);
     _compsInitFinished = true;
