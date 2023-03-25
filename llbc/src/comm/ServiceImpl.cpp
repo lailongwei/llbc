@@ -1881,18 +1881,18 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
     auto &ev = static_cast<_Ev &>(_);
     if (ev.earlyStart)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStart])
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppEarlyStart])
         {
             if (LIKELY(comp->_started))
-                comp->OnApplicationEarlyStart();
+                comp->OnAppEarlyStart();
         }
     }
     else if (ev.startFail)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFail])
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppStartFail])
         {
             if (LIKELY(comp->_started))
-                comp->OnApplicationStartFail();
+                comp->OnAppStartFail();
         }
     }
     else if (ev.startFinish)
@@ -1900,18 +1900,18 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         if (_cfgType == LLBC_AppConfigType::End)
             UpdateServiceCfg();
 
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFinish])
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppStartFinish])
         {
             if (LIKELY(comp->_started))
-                comp->OnApplicationStartFinish();
+                comp->OnAppStartFinish();
         }
     }
     else if (ev.earlyStop)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationWillStop])
+        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppWillStop])
         {
             if (LIKELY(comp->_started))
-                comp->OnApplicationEarlyStop();
+                comp->OnAppEarlyStop();
         }
     }
 }
@@ -1925,7 +1925,7 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
         compItem.second->UpdateComponentCfg();
 
     // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnApplicationConfigReload];
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnAppConfigReload];
     if (caredComps.empty())
         return;
 
@@ -1935,7 +1935,7 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
     {
         LLBC_Component *&comp = caredComps[compIdx];
         if (LIKELY(comp->_started))
-            comp->OnApplicationConfigReload();
+            comp->OnAppConfigReload();
     }
 }
 
