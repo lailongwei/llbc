@@ -34,14 +34,14 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event manager class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventManager
+class LLBC_EXPORT LLBC_EventMgr
 {
 public:
     /**
      * Ctor & Dtor.
      */
-    LLBC_EventManager();
-    virtual ~LLBC_EventManager();
+    LLBC_EventMgr();
+    virtual ~LLBC_EventMgr();
 
 public:
     /**
@@ -183,6 +183,6 @@ protected:
 
 __LLBC_NS_END
 
-#include "llbc/core/event/EventManagerInl.h"
+#include "llbc/core/event/EventMgrInl.h"
 
 

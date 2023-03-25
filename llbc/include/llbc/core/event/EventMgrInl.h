@@ -26,10 +26,10 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-LLBC_ListenerStub LLBC_EventManager::AddListener(int id, 
-                                                 ObjectType *obj, 
-                                                 void (ObjectType::*listener)(LLBC_Event &),
-                                                 const LLBC_ListenerStub &boundStub)
+LLBC_ListenerStub LLBC_EventMgr::AddListener(int id, 
+                                             ObjectType *obj, 
+                                             void (ObjectType::*listener)(LLBC_Event &),
+                                             const LLBC_ListenerStub &boundStub)
 {
     if (!obj || !listener)
     {
@@ -40,7 +40,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     return this->AddListener(id, LLBC_Delegate<void(LLBC_Event &)>(obj, listener), boundStub);
 }
 
-inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
+inline int LLBC_EventMgr::RemoveListenerX(LLBC_ListenerStub &stub)
 {
     if (RemoveListener(stub) != LLBC_OK)
     {
@@ -53,7 +53,7 @@ inline int LLBC_EventManager::RemoveListenerX(LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
-inline bool LLBC_EventManager::IsFiring() const
+inline bool LLBC_EventMgr::IsFiring() const
 {
     return _firing > 0;
 }

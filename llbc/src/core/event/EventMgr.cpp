@@ -27,24 +27,24 @@
 #include "llbc/core/objectpool/Common.h"
 
 #include "llbc/core/event/EventFirer.h"
-#include "llbc/core/event/EventManager.h"
+#include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_EventManager::_ListenerInfo::_ListenerInfo()
+LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)
 , stub(0)
 , listener(nullptr)
 {
 }
 
-LLBC_EventManager::_ListenerInfo::~_ListenerInfo()
+LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 {
     if (listener)
         LLBC_Recycle(listener);
 }
 
-LLBC_EventManager::LLBC_EventManager()
+LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
 , _maxListenerStub(0)
 
@@ -52,7 +52,7 @@ LLBC_EventManager::LLBC_EventManager()
 {
 }
 
-LLBC_EventManager::~LLBC_EventManager()
+LLBC_EventMgr::~LLBC_EventMgr()
 {
     for (_Id2ListenerInfos::iterator it = _id2ListenerInfos.begin();
          it != _id2ListenerInfos.end();
@@ -60,9 +60,9 @@ LLBC_EventManager::~LLBC_EventManager()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
-LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                 const LLBC_Delegate<void(LLBC_Event &)> &listener,
-                                                 const LLBC_ListenerStub &boundStub)
+LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
+                                             const LLBC_Delegate<void(LLBC_Event &)> &listener,
+                                             const LLBC_ListenerStub &boundStub)
 {
     if (id <= 0 || !listener)
     {
@@ -84,9 +84,9 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     return stub;
 }
 
-LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
-                                                 LLBC_EventListener *listener,
-                                                 const LLBC_ListenerStub &boundStub)
+LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
+                                             LLBC_EventListener *listener,
+                                             const LLBC_ListenerStub &boundStub)
 {
     if (id <= 0 || !listener)
     {
@@ -108,7 +108,7 @@ LLBC_ListenerStub LLBC_EventManager::AddListener(int id,
     return stub;
 }
 
-int LLBC_EventManager::RemoveListener(int id)
+int LLBC_EventMgr::RemoveListener(int id)
 {
     if (id <= 0)
     {
@@ -145,7 +145,7 @@ int LLBC_EventManager::RemoveListener(int id)
     return LLBC_OK;
 }
 
-int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
+int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
 {
     if (stub == 0)
     {
@@ -185,7 +185,7 @@ int LLBC_EventManager::RemoveListener(const LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
-void LLBC_EventManager::RemoveAllListeners()
+void LLBC_EventMgr::RemoveAllListeners()
 {
     if (IsFiring())
     {
@@ -200,7 +200,7 @@ void LLBC_EventManager::RemoveAllListeners()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
-void LLBC_EventManager::Fire(LLBC_Event *ev)
+void LLBC_EventMgr::Fire(LLBC_Event *ev)
 {
     BeforeFireEvent();
 
@@ -227,7 +227,7 @@ void LLBC_EventManager::Fire(LLBC_Event *ev)
     AfterFireEvent();
 }
 
-LLBC_EventFirer &LLBC_EventManager::BeginFire(int evId)
+LLBC_EventFirer &LLBC_EventMgr::BeginFire(int evId)
 {
     LLBC_Event *ev = LLBC_GetObjectFromUnsafetyPool<LLBC_Event>();
     ev->SetId(evId);
@@ -238,17 +238,17 @@ LLBC_EventFirer &LLBC_EventManager::BeginFire(int evId)
     return *evFirer;
 }
 
-bool LLBC_EventManager::HasStub(const LLBC_ListenerStub &stub) const
+bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const
 {
     return _stub2ListenerInfos.find(stub) != _stub2ListenerInfos.end();
 }
 
-void LLBC_EventManager::BeforeFireEvent()
+void LLBC_EventMgr::BeforeFireEvent()
 {
     ++_firing;
 }
 
-void LLBC_EventManager::AfterFireEvent()
+void LLBC_EventMgr::AfterFireEvent()
 {
     if (--_firing != 0)
         return;
@@ -285,7 +285,7 @@ void LLBC_EventManager::AfterFireEvent()
     }
 }
 
-int LLBC_EventManager::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub)
+int LLBC_EventMgr::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub)
 {
     if (boundStub != 0)
     {
@@ -305,7 +305,7 @@ int LLBC_EventManager::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC
     return LLBC_OK;
 }
 
-void LLBC_EventManager::AddListenerInfo(_ListenerInfo *li)
+void LLBC_EventMgr::AddListenerInfo(_ListenerInfo *li)
 {
     auto &lis = _id2ListenerInfos[li->evId];
     lis.push_back(li);

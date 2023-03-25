@@ -102,7 +102,7 @@ inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdList &sess
     return LLBC_OK;
 }
 
-inline LLBC_EventManager &LLBC_ServiceImpl::GetEventManager()
+inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
 {
     return _evManager;
 }

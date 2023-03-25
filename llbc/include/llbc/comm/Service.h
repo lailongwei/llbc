@@ -545,9 +545,9 @@ protected:
 public:
     /**
      * Get event manager.
-     * @return LLBC_EventManager & - the event manager.
+     * @return LLBC_EventMgr & - the event manager.
      */
-    virtual LLBC_EventManager &GetEventManager() = 0;
+    virtual LLBC_EventMgr &GetEventManager() = 0;
 
 public:
     /**

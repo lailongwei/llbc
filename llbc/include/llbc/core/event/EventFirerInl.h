@@ -22,7 +22,7 @@
 #pragma once
 
 #include "llbc/core/event/Event.h"
-#include "llbc/core/event/EventManager.h"
+#include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
 
@@ -70,7 +70,7 @@ inline void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
         typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
 }
 
-inline void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr)
+inline void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventMgr *evMgr)
 {
     _ev = ev;
     _evMgr = evMgr;

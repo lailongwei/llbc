@@ -34,7 +34,7 @@ namespace
         };
     };
 
-    static LLBC_EventManager evMgr;
+    static LLBC_EventMgr evMgr;
 }
 
 TestCase_Core_Event::TestCase_Core_Event()

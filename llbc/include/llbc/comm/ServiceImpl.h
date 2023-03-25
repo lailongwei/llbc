@@ -408,9 +408,9 @@ public:
 
     /**
      * Get event manager.
-     * @return LLBC_EventManager & - the event manager.
+     * @return LLBC_EventMgr & - the event manager.
      */
-    virtual LLBC_EventManager &GetEventManager();
+    virtual LLBC_EventMgr &GetEventManager();
 
 public:
     /**
@@ -710,7 +710,7 @@ private:
     LLBC_TimerScheduler *_timerScheduler;
 
 private:
-    LLBC_EventManager _evManager;
+    LLBC_EventMgr _evManager;
     LLBC_ListenerStub _evManagerMaxListenerStub;
 
 private:
