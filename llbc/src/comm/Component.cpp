@@ -28,7 +28,7 @@
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 
-#include "llbc/application/App.h"
+#include "llbc/app/App.h"
 
 __LLBC_NS_BEGIN
 

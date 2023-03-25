@@ -19,7 +19,7 @@ def main():
     PyNMC(op.join(code_path, 'testcase')).build()
     PyNMC(op.join(code_path, 'core')).build()
     PyNMC(op.join(code_path, 'comm')).build()
-    PyNMC(op.join(code_path, 'application')).build()
+    PyNMC(op.join(code_path, 'app')).build()
     print 'Done'
 
     print 'Build script integrator...',

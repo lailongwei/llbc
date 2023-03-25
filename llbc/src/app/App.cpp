@@ -26,7 +26,7 @@
 
 #include "llbc.h" //! Include llbc header to use Startup/Cleanup function.
 #include "llbc/comm/ServiceEvent.h"
-#include "llbc/application/App.h"
+#include "llbc/app/App.h"
 
 __LLBC_INTERNAL_NS_BEGIN
 

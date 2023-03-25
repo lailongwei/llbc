@@ -38,7 +38,7 @@
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
-#include "llbc/application/App.h"
+#include "llbc/app/App.h"
 
 namespace
 {
