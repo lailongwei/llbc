@@ -27,7 +27,7 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
-#include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 #include "llbc/core/log/LogJsonMsg.h"
 
@@ -96,7 +96,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  buffer.GetString(),
                                  buffer.GetLength());
     else
-        LLBC_LoggerManagerSingleton->UnInitOutput(
+        LLBC_LoggerMgrSingleton->UnInitOutput(
             _lv, _tag, nullptr, 0, nullptr, "%s", buffer.GetString());
 
     // Recycle self.

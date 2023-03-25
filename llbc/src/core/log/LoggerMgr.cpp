@@ -33,14 +33,14 @@
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerConfigurator.h"
-#include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/LoggerMgr.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_String LLBC_LoggerManager::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
+LLBC_String LLBC_LoggerMgr::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
 
-LLBC_LoggerManager::LLBC_LoggerManager()
+LLBC_LoggerMgr::LLBC_LoggerMgr()
 : _configurator(nullptr)
 , _sharedLogRunnable(nullptr)
 
@@ -48,12 +48,12 @@ LLBC_LoggerManager::LLBC_LoggerManager()
 {
 }
 
-LLBC_LoggerManager::~LLBC_LoggerManager()
+LLBC_LoggerMgr::~LLBC_LoggerMgr()
 {
     Finalize();
 }
 
-int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
+int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -119,7 +119,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
     return LLBC_OK;
 }
 
-void LLBC_LoggerManager::Finalize()
+void LLBC_LoggerMgr::Finalize()
 {
     LLBC_LockGuard guard(_lock);
     if (_rootLogger == nullptr)
@@ -147,7 +147,7 @@ void LLBC_LoggerManager::Finalize()
     LLBC_XDelete(_configurator);
 }
 
-LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
+LLBC_Logger *LLBC_LoggerMgr::GetRootLogger() const
 {
     if (UNLIKELY(_rootLogger == nullptr))
     {
@@ -158,7 +158,7 @@ LLBC_Logger *LLBC_LoggerManager::GetRootLogger() const
     return _rootLogger;
 }
 
-LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
+LLBC_Logger *LLBC_LoggerMgr::GetLogger(const LLBC_CString &name) const
 {
     _lock.Lock();
     if (UNLIKELY(_rootLogger == nullptr))
@@ -211,13 +211,13 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
     return nullptr;
 }
 
-void LLBC_LoggerManager::UnInitOutput(int logLv,
-                                      const char *tag,
-                                      const char *file,
-                                      int line,
-                                      const char *func,
-                                      const char *fmt,
-                                      ...)
+void LLBC_LoggerMgr::UnInitOutput(int logLv,
+                                  const char *tag,
+                                  const char *file,
+                                  int line,
+                                  const char *func,
+                                  const char *fmt,
+                                  ...)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
     const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);

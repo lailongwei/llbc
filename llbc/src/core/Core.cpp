@@ -63,7 +63,7 @@ int __LLBC_CoreStartup()
     new LLBC_NS LLBC_AutoReleasePool;
 
     // Set entry thread object pool.
-    if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
+    if (LLBC_ThreadObjectPoolMgr::CreateEntryThreadObjectPools() != LLBC_OK)
         return LLBC_FAILED;
 
     // Supported object-pool reflection types assert.
@@ -78,7 +78,7 @@ int __LLBC_CoreStartup()
 void __LLBC_CoreCleanup()
 {
     // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     // Purge auto-release pool stack.
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
@@ -86,7 +86,7 @@ void __LLBC_CoreCleanup()
         reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)->Purge();
 
     // Destroy entry thread object pool.
-    (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
+    (void)LLBC_ThreadObjectPoolMgr::DestroyEntryThreadObjectPools();
     // Destroy all object pool instance factories.
     LLBC_IObjectPool::DestroyAllPoolInstFactories();
 

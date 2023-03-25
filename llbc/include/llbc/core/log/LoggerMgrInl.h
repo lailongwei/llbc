@@ -23,7 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline bool LLBC_LoggerManager::IsInited() const
+inline bool LLBC_LoggerMgr::IsInited() const
 {
     return _rootLogger != nullptr;
 }

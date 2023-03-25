@@ -22,6 +22,6 @@
 #pragma once
 
 #include "llbc/core/objectpool/ReferencablePoolObj.h"
-#include "llbc/core/objectpool/ObjectPoolManager.h"
+#include "llbc/core/objectpool/ObjectPoolMgr.h"
 
 

@@ -42,10 +42,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Initialize logger manager.
 #if LLBC_TARGET_PLATFORM_IPHONE
     const LLBC_Bundle *mainBundle = LLBC_Bundle::GetMainBundle();
-    if(LLBC_LoggerManagerSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
+    if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    if(LLBC_LoggerManagerSingleton->Initialize("LogTestCfg.cfg") != LLBC_OK)
+    if(LLBC_LoggerMgrSingleton->Initialize("LogTestCfg.cfg") != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
@@ -54,8 +54,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     }
 
     // Install logger hook(to root logger).
-    LLBC_Logger *rootLogger = LLBC_LoggerManagerSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug, LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
+    LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
+    rootLogger->InstallHook(LLBC_LogLevel::Debug,
+                            LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
     LLOG_TRACE("This is a trace log message.");
@@ -127,7 +128,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         getchar();
 
         LLBC_ObjectPoolStat opStat;
-        LLBC_LoggerManagerSingleton->GetLogger("perftest")->GetLoggerObjectPool().Stat(opStat);
+        LLBC_LoggerMgrSingleton->GetLogger("perftest")->GetLoggerObjectPool().Stat(opStat);
         LLBC_PrintLn("perftest logger object pool stat:\n%s", opStat.ToString().c_str());
 
         LLBC_CPUTime begin = LLBC_CPUTime::Current();
@@ -154,7 +155,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         DoJsonLogTest();
 
     // Finalize logger.
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

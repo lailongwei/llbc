@@ -26,32 +26,32 @@ __LLBC_NS_BEGIN
 template <typename ObjectType>
 ObjectType *LLBC_GetObjectFromSafetyPool()
 {
-    return LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
+    return LLBC_ThreadObjectPoolMgr::GetCurThreadSafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
 void LLBC_ReleaseObjectToSafetyPool(ObjectType *obj)
 {
-    LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->Release(obj);
+    LLBC_ThreadObjectPoolMgr::GetCurThreadSafetyObjectPool()->Release(obj);
 }
 
 template <typename ObjectType>
 ObjectType *LLBC_GetObjectFromUnsafetyPool()
 {
-    return LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
+    return LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool()->Get<ObjectType>();
 }
 
 template <typename ObjectType>
 void LLBC_ReleaseObjectToUnsafetyPool(ObjectType *obj)
 {
-    LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->Release(obj);
+    LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool()->Release(obj);
 }
 
 template <typename ObjectType>
 LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromSafetyPool()
 {
     LLBC_ObjectPoolInst<ObjectType> *poolInst =
-        LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()->GetPoolInst<ObjectType>();
+        LLBC_ThreadObjectPoolMgr::GetCurThreadSafetyObjectPool()->GetPoolInst<ObjectType>();
     return LLBC_ObjectGuard<ObjectType>(poolInst->GetObject(), poolInst);
 }
 
@@ -59,14 +59,14 @@ template <typename ObjectType>
 LLBC_ObjectGuard<ObjectType> LLBC_GetGuardedObjectFromUnsafetyPool()
 {
     LLBC_ObjectPoolInst<ObjectType> *poolInst =
-        LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()->GetPoolInst<ObjectType>();
+        LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool()->GetPoolInst<ObjectType>();
     return LLBC_ObjectGuard<ObjectType>(poolInst->GetObject(), poolInst);
 }
 
 template <typename ReferencableObjectType>
 ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease)
 {
-    auto objPool = LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool();
+    auto objPool = LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool();
     ReferencableObjectType *refObj = objPool->GetReferencable<ReferencableObjectType>();
     if (autoRelease)
         refObj->AutoRelease();
