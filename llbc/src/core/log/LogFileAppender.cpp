@@ -289,8 +289,9 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
         LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite) != LLBC_OK))
     {
 #ifdef LLBC_DEBUG
-        traceline("LLBC_LogFileAppender::ReOpenFile(): Open file failed, name:%s, clear:%s, reason:%s",
-            __FILE__, __LINE__, newFileName.c_str(), clear, LLBC_FormatLastError());
+        traceline("LLBC_LogFileAppender::ReOpenFile(): "
+                  "Open file failed, name:%s, clear:%s, reason:%s",
+                  newFileName.c_str(), clear ? "true" : "false", LLBC_FormatLastError());
 #endif
         return LLBC_FAILED;
     }
