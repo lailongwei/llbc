@@ -53,14 +53,14 @@ public:
         OnProtoReport,
         OnUnHandledPacket,
 
-        OnApplicationWillStart,
-        OnApplicationStartFail,
-        OnApplicationStartFinish,
-        OnApplicationWillStop,
-        // OnApplicationStopFinish, // Note: 
-                                    //       When application stop finished, all service(s) and it's component(s) 
-                                    //       has been deleted, so this event index will not define.
-        OnApplicationConfigReload,
+        OnAppEarlyStart,
+        OnAppStartFail,
+        OnAppStartFinish,
+        OnAppWillStop,
+        // OnAppStopFinish, // Note: 
+                            //       When application stop finished, all service(s) and it's component(s) 
+                            //       has been deleted, so this event index will not define.
+        OnAppConfigReload,
 
         End,
     };
@@ -89,11 +89,11 @@ public:
     static constexpr uint64 OnProtoReport = 1 << LLBC_ComponentEventIndex::OnProtoReport;
     static constexpr uint64 OnUnHandledPacket = 1 << LLBC_ComponentEventIndex::OnUnHandledPacket;
 
-    static constexpr uint64 OnApplicationWillStart = 1 << LLBC_ComponentEventIndex::OnApplicationWillStart;
-    static constexpr uint64 OnApplicationStartFail = 1 << LLBC_ComponentEventIndex::OnApplicationStartFail;
-    static constexpr uint64 OnApplicationStartFinish = 1 << LLBC_ComponentEventIndex::OnApplicationStartFinish;
-    static constexpr uint64 OnApplicationWillStop = 1 << LLBC_ComponentEventIndex::OnApplicationWillStop;
-    static constexpr uint64 OnApplicationConfigReload = 1 << LLBC_ComponentEventIndex::OnApplicationConfigReload;
+    static constexpr uint64 OnAppWillStart = 1 << LLBC_ComponentEventIndex::OnAppEarlyStart;
+    static constexpr uint64 OnAppStartFail = 1 << LLBC_ComponentEventIndex::OnAppStartFail;
+    static constexpr uint64 OnAppStartFinish = 1 << LLBC_ComponentEventIndex::OnAppStartFinish;
+    static constexpr uint64 OnAppEarlyStop = 1 << LLBC_ComponentEventIndex::OnAppWillStop;
+    static constexpr uint64 OnAppConfigReload = 1 << LLBC_ComponentEventIndex::OnAppConfigReload;
 
 public:
     static constexpr uint64 AllEvents = (1 << LLBC_ComponentEventIndex::End) - 1;
