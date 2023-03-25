@@ -156,7 +156,7 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
             confictCount += 1;
         }
 
-        trace("Dictionary(addr:%x), key confict!, bucket:%u, count:%d\n", this, _hash, confictCount);
+        trace("Dictionary(addr:%p), key confict!, bucket:%u, count:%d\n", this, _hash, confictCount);
 #endif
     }
 }
