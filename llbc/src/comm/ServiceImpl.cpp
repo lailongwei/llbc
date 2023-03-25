@@ -1956,8 +1956,8 @@ int LLBC_ServiceImpl::InitComps()
         if (willRegComp->_inited)
             continue;
 
-        // If comp uncare <OnInitialize> event, set to inited, and than continue.
-        if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInitialize))
+        // If comp uncare <OnInit> event, set to inited, and than continue.
+        if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInit))
         {
             willRegComp->_inited = true;
             continue;
@@ -1968,7 +1968,7 @@ int LLBC_ServiceImpl::InitComps()
         {
             bool initFinished = true;
             LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-            if (!willRegComp->OnInitialize(initFinished))
+            if (!willRegComp->OnInit(initFinished))
             {
                 if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
                     LLBC_SetLastError(LLBC_ERROR_COMP_INIT);

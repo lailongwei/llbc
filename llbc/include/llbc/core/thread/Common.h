@@ -34,7 +34,7 @@
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageBuffer.h"
 #include "llbc/core/thread/MessageQueue.h"
-#include "llbc/core/thread/ThreadManager.h"
+#include "llbc/core/thread/ThreadMgr.h"
 #include "llbc/core/thread/Task.h"
 
 

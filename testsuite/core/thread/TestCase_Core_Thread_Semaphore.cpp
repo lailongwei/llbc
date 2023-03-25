@@ -33,7 +33,7 @@ static __LLBC_SemTestType *__g_testVal;
 
 static LLBC_SimpleLock __g_outLock;
 
-static int WaiterThreadProc(void *arg)
+static void WaiterThreadProc(void *arg)
 {
     int threadIndex = 0;
     memcpy(&threadIndex, &arg, sizeof(int));
@@ -65,11 +65,9 @@ static int WaiterThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"waiter " <<threadIndex <<" exit" <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
-static int SignalerThreadProc(void *arg)
+static void SignalerThreadProc(void *arg)
 {
     LLBC_Sleep(1000);
 
@@ -100,8 +98,6 @@ static int SignalerThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"signaler exit" <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
 TestCase_Core_Thread_Semaphore::TestCase_Core_Thread_Semaphore()
@@ -126,12 +122,12 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     {
         void *threadArg = nullptr;
         memcpy(&threadArg, &i, sizeof(long));
-        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
+        LLBC_CreateThread(&WaiterThreadProc, threadArg, &waiters[i]);
     }
 
     // Create signaler.
     LLBC_NativeThreadHandle signaler = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&signaler, &SignalerThreadProc, nullptr);
+    LLBC_CreateThread(&SignalerThreadProc, nullptr, &signaler);
 
     // Join signaler.
     LLBC_JoinThread(signaler);

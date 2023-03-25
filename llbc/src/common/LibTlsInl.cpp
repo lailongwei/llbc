@@ -29,7 +29,9 @@
 #include "llbc/common/LibTlsInl.h"
 
 __LLBC_INTERNAL_NS_BEGIN
+
 static LLBC_NS LLBC_TlsHandle __LLBC_libTlsHandle = LLBC_INVALID_TLS_HANDLE;
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -78,6 +80,8 @@ __LLBC_LibTls::~__LLBC_LibTls()
      #endif // LLBC_TARGET_PLATFORM_WIN32
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 }
+
+__LLBC_LibTls *__LLBC_EntryThreadLibTls = nullptr;
 
 void __LLBC_CreateLibTls()
 {
@@ -158,6 +162,11 @@ void __LLBC_ResetLibTls()
         ::TlsSetValue(tlsHandle, nullptr);
     }
 #endif
+}
+
+__LLBC_LibTls *__LLBC_GetEntryThreadLibTls()
+{
+    return __LLBC_EntryThreadLibTls;
 }
 
 __LLBC_NS_END

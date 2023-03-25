@@ -89,10 +89,19 @@ public:
      * Uninit output.
      * @param[in] logLv - the log level.
      * @param[in] tag   - the log tag.
+     * @param[in] file  - the log file.
+     * @param[in] line  - the log file line number.
+     * @param[in] func  - the log function.
      * @param[in] fmt   -  format control string.
      * @param[in] ...   - optional arguments.
      */
-    void UnInitOutput(int logLv, const char *tag, const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(4, 5);
+    void UnInitOutput(int logLv,
+                      const char *tag,
+                      const char *file,
+                      int line,
+                      const char *func,
+                      const char *fmt,
+                      ...) LLBC_STRING_FORMAT_CHECK(4, 5);
 
 private:
     mutable LLBC_DummyLock _lock;
@@ -150,7 +159,13 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
                           ##__VA_ARGS__);                 \
         }                                                 \
         else {                                            \
-            __loggerMgr__->UnInitOutput(level, tag, fmt, ##__VA_ARGS__); \
+            __loggerMgr__->UnInitOutput(level,            \
+                                        tag,              \
+                                        __FILE__,         \
+                                        __LINE__,         \
+                                        __FUNCTION__,     \
+                                        fmt,              \
+                                        ##__VA_ARGS__);   \
         }                                                 \
     } while (false)                                       \
 
@@ -270,7 +285,13 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         else {                                                 \
             LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
             LLBC_LoggerManagerSingleton->UnInitOutput(         \
-                level, tag, "%s", __lmb__.str(__lmb__ << streamMsg).c_str()); \
+                level,                                         \
+                tag,                                           \
+                __FILE__,                                      \
+                __LINE__,                                      \
+                __FUNCTION__,                                  \
+                "%s",                                          \
+                __lmb__.str(__lmb__ << streamMsg).c_str());    \
         }                                                      \
     } while (false)                                            \
 

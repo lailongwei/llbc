@@ -21,69 +21,66 @@
 
 #pragma once
 
-#include "llbc/core/os/OS_Atomic.h"
-
 __LLBC_NS_BEGIN
 
-inline const char *LLBC_TaskState::GetDesc(int taskState)
+inline int LLBC_ThreadMgr::Wait(LLBC_Handle handle)
 {
-    LLBC_ReturnIf(taskState == NotActivated, "NotActivated");
-    LLBC_ReturnIf(taskState == Activating, "Activating");
-    LLBC_ReturnIf(taskState == Activated, "Activated");
-    LLBC_ReturnIf(taskState == Deactivating, "Deactivating");
-
-    return "UnknownTaskState";
+    return WaitOrCancelThread(handle, true);
 }
 
-inline bool LLBC_Task::IsActivated() const
+inline int LLBC_ThreadMgr::WaitGroup(LLBC_Handle groupHandle)
 {
-    return _taskState == LLBC_TaskState::Activated;
+    return WaitOrCancelGroup(groupHandle, true);
 }
 
-inline int LLBC_Task::GetTaskState() const
+inline int LLBC_ThreadMgr::WaitAll()
 {
-    return _taskState;
+    return WaitOrCancelAll(true);
 }
 
-inline int LLBC_Task::Push(LLBC_MessageBlock *block)
+inline int LLBC_ThreadMgr::Cancel(LLBC_Handle handle)
 {
-    _msgQueue.PushBack(block);
-    return LLBC_OK;
+    return WaitOrCancelThread(handle, false);
 }
 
-inline int LLBC_Task::Pop(LLBC_MessageBlock *&block)
+inline int LLBC_ThreadMgr::CancelGroup(LLBC_Handle groupHandle)
 {
-    _msgQueue.PopFront(block);
-    return LLBC_OK;
+    return WaitOrCancelGroup(groupHandle, false);
 }
 
-inline int LLBC_Task::PopAll(LLBC_MessageBlock *&blocks)
+inline int LLBC_ThreadMgr::CancelAll()
 {
-    if (_msgQueue.PopAll(blocks))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    return WaitOrCancelAll(false);
 }
 
-inline int LLBC_Task::TryPop(LLBC_MessageBlock *&block)
+inline int LLBC_ThreadMgr::Suspend(LLBC_Handle handle)
 {
-    if (_msgQueue.TryPopFront(block))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    return SuspendOrResumeThread(handle, true);
 }
 
-inline int LLBC_Task::TimedPop(LLBC_MessageBlock *&block, int interval)
+inline int LLBC_ThreadMgr::SuspendGroup(LLBC_Handle groupHandle)
 {
-    if (_msgQueue.TimedPopFront(block, interval))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    return SuspendOrResumeGroup(groupHandle, true);
 }
 
-inline size_t LLBC_Task::GetMessageSize() const
+inline int LLBC_ThreadMgr::SuspendAll()
 {
-    return _msgQueue.GetSize();
+    return SuspendOrResumeAll(true);
+}
+
+inline int LLBC_ThreadMgr::Resume(LLBC_Handle handle)
+{
+    return SuspendOrResumeThread(handle, false);
+}
+
+inline int LLBC_ThreadMgr::ResumeGroup(LLBC_Handle groupHandle)
+{
+    return SuspendOrResumeGroup(groupHandle, false);
+}
+
+inline int LLBC_ThreadMgr::ResumeAll()
+{
+    return SuspendOrResumeAll(false);
 }
 
 __LLBC_NS_END

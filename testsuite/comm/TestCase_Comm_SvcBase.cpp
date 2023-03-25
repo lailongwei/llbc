@@ -76,62 +76,62 @@ public:
     {}
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service initialize");
+        LLBC_PrintLn("Service initialize");
         return true;
     }
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service Destroy");
+        LLBC_PrintLn("Service Destroy");
     }
 
     virtual bool OnStart(bool &startFinished)
     {
-        LLBC_PrintLine("Service start");
+        LLBC_PrintLn("Service start");
         return true;
     }
 
     virtual void OnStop(bool &stopFinished)
     {
-        LLBC_PrintLine("Service stop");
+        LLBC_PrintLn("Service stop");
     }
 
 public:
     virtual void OnUpdate()
     {
         int fps = LLBC_Rand(20, 61);
-        // LLBC_PrintLine("Service update, set fps to %d", fps);
+        // LLBC_PrintLn("Service update, set fps to %d", fps);
 
         GetService()->SetFPS(fps);
     }
 
     virtual void OnIdle(const LLBC_TimeSpan &idleTime)
     {
-        // LLBC_PrintLine("Service idle, idle time: %s", idleTime.ToString().c_str());
+        // LLBC_PrintLn("Service idle, idle time: %s", idleTime.ToString().c_str());
     }
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
-        LLBC_PrintLine("SessionCreate: %s", sessionInfo.ToString().c_str());
+        LLBC_PrintLn("SessionCreate: %s", sessionInfo.ToString().c_str());
         // std::cout <<"Session Create: " <<si <<std::endl;
     }
 
     virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session destroy, info: %s", destroyInfo.ToString().c_str());
+        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
     {
-        LLBC_PrintLine("Async-Conn result: %s", result.ToString().c_str());
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
         // std::cout <<"Async-Conn result: " <<result <<std::endl;
     }
 
     virtual void OnProtoReport(const LLBC_ProtoReport &report)
     {
-        LLBC_PrintLine("Protocol report: %s", report.ToString().c_str());
+        LLBC_PrintLn("Protocol report: %s", report.ToString().c_str());
         // std::cout <<"Protocol report: " <<report <<std::endl;
     }
 
@@ -139,7 +139,7 @@ public:
     void OnRecvData(LLBC_Packet &packet)
     {
         TestData *data = packet.GetDecoder<TestData>();
-        LLBC_PrintLine("Receive data[%d], iVal: %d, strVal: %s", 
+        LLBC_PrintLn("Receive data[%d], iVal: %d, strVal: %s", 
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 
         TestData *resData = new TestData;
@@ -155,7 +155,7 @@ public:
     bool OnPreRecvData(LLBC_Packet &packet)
     {
         TestData *data = (TestData *)packet.GetDecoder();
-        LLBC_PrintLine("Pre-Receive data[%d], iVal: %d, strVal: %s",
+        LLBC_PrintLn("Pre-Receive data[%d], iVal: %d, strVal: %s",
             packet.GetSessionId(), data->iVal, data->strVal.c_str());
 
         packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
@@ -165,7 +165,7 @@ public:
 
     bool OnUnifyPreRecvData(LLBC_Packet &packet)
     {
-        LLBC_PrintLine("Unify Pre-Receive data[%d]", packet.GetSessionId());
+        LLBC_PrintLn("Unify Pre-Receive data[%d]", packet.GetSessionId());
 
         packet.SetPreHandleResult(LLBC_Malloc(char, 4096), this, &TestComp::DelPreHandleResult);
 
@@ -175,10 +175,10 @@ public:
 public:
     void OnStatus_1(LLBC_Packet &packet)
     {
-        LLBC_PrintLine("Recv status != 0 packet, op: %d, status: %d",
+        LLBC_PrintLn("Recv status != 0 packet, op: %d, status: %d",
             packet.GetOpcode(), packet.GetStatus());
 #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-        LLBC_PrintLine("The status desc: %s", packet.GetStatusDesc().c_str());
+        LLBC_PrintLn("The status desc: %s", packet.GetStatusDesc().c_str());
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
     }
 
@@ -213,8 +213,8 @@ TestCase_Comm_SvcBase::~TestCase_Comm_SvcBase()
 
 int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Communication Service Basic test:");
-    LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
+    LLBC_PrintLn("Communication Service Basic test:");
+    LLBC_PrintLn("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register comp.
     TestComp *comp = new TestComp;
@@ -253,10 +253,10 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     SendRecvTest("127.0.0.1", 7789);
 
 #if LLBC_TARGET_PLATFORM_IPHONE
-    LLBC_PrintLine("Sleep 300 seconds to exit...");
-    LLBC_ThreadManager::Sleep(300 * 1000);
+    LLBC_PrintLn("Sleep 300 seconds to exit...");
+    LLBC_ThreadMgr::Sleep(300 * 1000);
 #else // Non-iPhone
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 #endif // iPhone
 
@@ -265,39 +265,39 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
 
 void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
 {
-    LLBC_PrintLine("Listen in %s:%d", ip, port);
+    LLBC_PrintLn("Listen in %s:%d", ip, port);
     int sid = _svc->Listen(ip, port);
     if (sid == 0)
     {
-        LLBC_PrintLine("listen in %s:%d failed, reason: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("listen in %s:%d failed, reason: %s", LLBC_FormatLastError());
         return;
     }
 
-    LLBC_PrintLine("Listening in %s:%d", ip, port);
+    LLBC_PrintLn("Listening in %s:%d", ip, port);
 
     // Try to connect.
     const int clientCount = 10;
-    LLBC_PrintLine("Create %d clients to connet to this listen session", clientCount);
+    LLBC_PrintLn("Create %d clients to connet to this listen session", clientCount);
     for (int i = 0; i < clientCount; ++i)
     {
         auto connSid = _svc->AsyncConn(ip, port);
         if (connSid == 0)
-            LLBC_PrintLine("connect to %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
+            LLBC_PrintLn("connect to %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
     }
 }
 
 void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
 {
-    LLBC_PrintLine("Connect to %s:%d", ip, port);
+    LLBC_PrintLn("Connect to %s:%d", ip, port);
     int sid = _svc->Connect(ip, port);
     if (sid != 0)
     {
-        LLBC_PrintLine("Connet to %s:%d success, sid: %d, disconnect it", ip, port, sid);
+        LLBC_PrintLn("Connet to %s:%d success, sid: %d, disconnect it", ip, port, sid);
         _svc->RemoveSession(sid, "For test!!!!!");
     }
     else
     {
-        LLBC_PrintLine("Fail to connect to %s:%d, reason: %s", ip, port, LLBC_FormatLastError());
+        LLBC_PrintLn("Fail to connect to %s:%d, reason: %s", ip, port, LLBC_FormatLastError());
     }
 }
 
@@ -309,20 +309,20 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
     else
         clientCount = 100;
 
-    LLBC_PrintLine("Async connect to %s:%d", ip, port);
+    LLBC_PrintLn("Async connect to %s:%d", ip, port);
     for (int i = 0; i < clientCount; ++i)
         _svc->AsyncConn(ip, port);
 }
 
 void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
 {
-    LLBC_PrintLine("Send/Recv test:");
+    LLBC_PrintLn("Send/Recv test:");
 
     // Create listen session.
     int listenSession = _svc->Listen(ip, port);
     if (listenSession == 0)
     {
-        LLBC_PrintLine("Create listen session failed in %s:%d", ip, port);
+        LLBC_PrintLn("Create listen session failed in %s:%d", ip, port);
         return;
     }
 
@@ -330,7 +330,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     int connSession = _svc->Connect(ip, port);
     if (connSession == 0)
     {
-        LLBC_PrintLine("Connect to %s:%d failed, "
+        LLBC_PrintLn("Connect to %s:%d failed, "
             "reason: %s", ip, port, LLBC_FormatLastError());
         _svc->RemoveSession(listenSession);
         return;

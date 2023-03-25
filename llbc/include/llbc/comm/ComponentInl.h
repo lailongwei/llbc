@@ -198,7 +198,7 @@ inline int LLBC_Component::CallMethod(const LLBC_CString &methName,
     return _meths->CallMethod(methName, arg, ret);
 }
 
-inline bool LLBC_Component::OnInitialize(bool &finished)
+inline bool LLBC_Component::OnInit(bool &finished)
 {
     return true;
 }

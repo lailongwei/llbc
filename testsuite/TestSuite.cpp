@@ -62,7 +62,7 @@ int TestSuite_Main(int argc, char* argv[])
             if (testcaseName == nullptr || testcaseFactory == nullptr)
                 continue;
 
-            LLBC_PrintLine("%d: %s", i + 1, testcaseName);
+            LLBC_PrintLn("%d: %s", i + 1, testcaseName);
         }
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 

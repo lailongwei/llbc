@@ -21,69 +21,66 @@
 
 #pragma once
 
-#include "llbc/core/os/OS_Atomic.h"
-
 __LLBC_NS_BEGIN
 
-inline const char *LLBC_TaskState::GetDesc(int taskState)
-{
-    LLBC_ReturnIf(taskState == NotActivated, "NotActivated");
-    LLBC_ReturnIf(taskState == Activating, "Activating");
-    LLBC_ReturnIf(taskState == Activated, "Activated");
-    LLBC_ReturnIf(taskState == Deactivating, "Deactivating");
+inline LLBC_ThreadDescriptor::LLBC_ThreadDescriptor()
+: _threadHandle(LLBC_INVALID_HANDLE)
+, _nativeHandle(LLBC_INVALID_NATIVE_THREAD_HANDLE)
+, _groupHandle(LLBC_INVALID_HANDLE)
 
-    return "UnknownTaskState";
+, _priority(LLBC_ThreadPriority::Normal)
+, _state(LLBC_ThreadState::Stoped)
+{
 }
 
-inline bool LLBC_Task::IsActivated() const
+inline LLBC_Handle LLBC_ThreadDescriptor::GetHandle() const
 {
-    return _taskState == LLBC_TaskState::Activated;
+    return _threadHandle;
 }
 
-inline int LLBC_Task::GetTaskState() const
+inline void LLBC_ThreadDescriptor::SetHandle(LLBC_Handle handle)
 {
-    return _taskState;
+    _threadHandle = handle;
 }
 
-inline int LLBC_Task::Push(LLBC_MessageBlock *block)
+inline LLBC_NativeThreadHandle LLBC_ThreadDescriptor::GetNativeHandle() const
 {
-    _msgQueue.PushBack(block);
-    return LLBC_OK;
+    return _nativeHandle;
 }
 
-inline int LLBC_Task::Pop(LLBC_MessageBlock *&block)
+inline void LLBC_ThreadDescriptor::SetNativeHandle(LLBC_NativeThreadHandle handle)
 {
-    _msgQueue.PopFront(block);
-    return LLBC_OK;
+    _nativeHandle = handle;
 }
 
-inline int LLBC_Task::PopAll(LLBC_MessageBlock *&blocks)
+inline LLBC_Handle LLBC_ThreadDescriptor::GetGroupHandle() const
 {
-    if (_msgQueue.PopAll(blocks))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    return _groupHandle;
 }
 
-inline int LLBC_Task::TryPop(LLBC_MessageBlock *&block)
+inline void LLBC_ThreadDescriptor::SetGroupHandle(LLBC_Handle handle)
 {
-    if (_msgQueue.TryPopFront(block))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    _groupHandle = handle;
 }
 
-inline int LLBC_Task::TimedPop(LLBC_MessageBlock *&block, int interval)
+inline int LLBC_ThreadDescriptor::GetPriority() const
 {
-    if (_msgQueue.TimedPopFront(block, interval))
-        return LLBC_OK;
-
-    return LLBC_FAILED;
+    return _priority;
 }
 
-inline size_t LLBC_Task::GetMessageSize() const
+inline void LLBC_ThreadDescriptor::SetPriority(int priority)
 {
-    return _msgQueue.GetSize();
+    _priority = priority;
+}
+
+inline int LLBC_ThreadDescriptor::GetState() const
+{
+    return _state;
+}
+
+inline void LLBC_ThreadDescriptor::SetState(int state)
+{
+    _state = state;
 }
 
 __LLBC_NS_END

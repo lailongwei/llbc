@@ -67,7 +67,7 @@ public:
     using LLBC_Task::Wait;
 
 public:
-    virtual ~LLBC_Service() {  }
+    virtual ~LLBC_Service() = default;
 
 public:
     /**
@@ -550,13 +550,6 @@ public:
     virtual LLBC_EventManager &GetEventManager() = 0;
 
 public:
-    /**
-     * Post runnable to service.
-     * @param[in] func - the runnable function.
-     * @param[in] data - the runnable data, can be null.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Post(void(*func)(This *, const LLBC_Variant &data), const LLBC_Variant &data = LLBC_Variant::nil);
     /**
      * Post runnable to service.
      * @param[in] obj    - the runnable object.

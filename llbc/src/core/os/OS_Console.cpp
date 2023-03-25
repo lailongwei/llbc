@@ -180,7 +180,6 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     {
         fprintf(file, (newline ? "%s\n" : "%s"), buf);
     }
-    fflush(file);
     funlockfile(file);
     #else // Win32
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
@@ -188,7 +187,6 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 
     lock.Lock();
     fprintf(file, newline ? "%s\n" : "%s", buf);
-    fflush(file);
     lock.Unlock();
     #endif // !Non-Win32
 

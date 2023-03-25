@@ -96,7 +96,8 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  buffer.GetString(),
                                  buffer.GetLength());
     else
-        LLBC_LoggerManagerSingleton->UnInitOutput(_lv, _tag, "%s", buffer.GetString());
+        LLBC_LoggerManagerSingleton->UnInitOutput(
+            _lv, _tag, nullptr, 0, nullptr, "%s", buffer.GetString());
 
     // Recycle self.
     LLBC_Recycle(this);

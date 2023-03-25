@@ -87,7 +87,11 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     {
         if (LLBC_Directory::Create(fileDir) != LLBC_OK)
         {
+            _fileSuffix.clear();
+            _fileBasePath.clear();
+
             _Base::Finalize();
+
             return LLBC_FAILED;
         }
     }

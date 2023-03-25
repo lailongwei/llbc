@@ -60,12 +60,14 @@ struct LLBC_EXPORT __LLBC_LibTls
         /* logger format buffer(used for vsnprintf()) */
         char loggerFmtBuf[LLBC_CFG_LOG_FORMAT_BUF_SIZE + 1];
 
-        /* thread id/handle. */
-        LLBC_Handle threadHandle;
         /* native thread id, can use to OS dependency APIs. */
         LLBC_ThreadId threadId;
+        /* thread id/handle. */
+        LLBC_Handle threadHandle;
         /* native thread handle, can use to OS dependency APIs. */
         LLBC_NativeThreadHandle nativeThreadHandle;
+        /* thread group handle. */
+        LLBC_Handle threadGroupHandle;
 
         /* Task pointer. */
         void *task;
@@ -113,6 +115,11 @@ struct LLBC_EXPORT __LLBC_LibTls
 };
 
 /**
+ * The entry-thread lib tls variable.
+ */
+extern LLBC_EXPORT __LLBC_LibTls *__LLBC_EntryThreadLibTls;
+
+/**
  * The Lib TLS handle create function.
  */
 LLBC_HIDDEN void __LLBC_CreateLibTls();
@@ -127,6 +134,12 @@ LLBC_HIDDEN void __LLBC_DestroyLibTls();
  * @return __LLBC_LibTls * - lib TLS value pointer.
  */
 LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
+
+/**
+ * Get entry-thread lib TLS value.
+ * @return __LLBC_LibTls * - entry-thread lib TLS value pointer.
+ */
+LLBC_EXPORT __LLBC_LibTls *__LLBC_GetEntryThreadLibTls();
 
 /**
  * Reset lib TLS value.

@@ -65,4 +65,10 @@ LLBC_HIDDEN int __LLBC_CommonStartup();
  */
 LLBC_HIDDEN void __LLBC_CommonCleanup();
 
+/**
+ * Get entry thread native thread handle.
+ * @return LLBC_NativeThreadHandle - the native thread handle.
+ */
+LLBC_EXPORT LLBC_NativeThreadHandle __LLBC_GetEntryThreadNativeThreadHandle();
+
 __LLBC_NS_END

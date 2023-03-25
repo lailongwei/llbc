@@ -78,7 +78,7 @@ void TestCase_Core_OS_Process::TestCrash_InvalidPtrWrite()
 
 void TestCase_Core_OS_Process::TestCrash_InvalidPtrRead()
 {
-    LLBC_PrintLine("Test invalid pointer read");
+    LLBC_PrintLn("Test invalid pointer read");
 
     int *invalidPtr4Write = nullptr;
     std::cout << *invalidPtr4Write << std::endl;

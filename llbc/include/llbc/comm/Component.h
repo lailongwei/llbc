@@ -518,7 +518,7 @@ public:
     /**
      * When service start and not not init component before, will call then event handler.
      */
-    virtual bool OnInitialize(bool &finished);
+    virtual bool OnInit(bool &finished);
 
     /**
      * When service destroy, will call this event handler.

@@ -24,31 +24,31 @@
 
 int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("llbc library core/utils/Util_Algorithm test");
+    LLBC_PrintLn("llbc library core/utils/Util_Algorithm test");
 
-    LLBC_PrintLine("flow check test:");
-    LLBC_PrintLine("3 + 4: %s", 
+    LLBC_PrintLn("flow check test:");
+    LLBC_PrintLn("3 + 4: %s", 
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd(3, 4)));
-    LLBC_PrintLine("(sint16)32767 + (sint16)2: %s",
+    LLBC_PrintLn("(sint16)32767 + (sint16)2: %s",
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd((sint16)32767, (sint16)2)));
-    LLBC_PrintLine("(sint16)-32768 + (sint16)-2: %s",
+    LLBC_PrintLn("(sint16)-32768 + (sint16)-2: %s",
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseAdd((sint16)-32768, (sint16)-2)));
 
-    LLBC_PrintLine("2 - 1: %s", 
+    LLBC_PrintLn("2 - 1: %s", 
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub(2, 1)));
-    LLBC_PrintLine("(sint16)-32768 - (sing16)1: %s",
+    LLBC_PrintLn("(sint16)-32768 - (sing16)1: %s",
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)-32768, (sint16)1)));
-    LLBC_PrintLine("(sint16)32767 - (sint16)-2: %s",
+    LLBC_PrintLn("(sint16)32767 - (sint16)-2: %s",
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)32767, (sint16)-2)));
-    LLBC_PrintLine("");
+    LLBC_PrintLn("");
 
-    LLBC_PrintLine("NOFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::NoFlow));
-    LLBC_PrintLine("UNDERFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::UnderFlow));
-    LLBC_PrintLine("OVERFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::OverFlow));
-    LLBC_PrintLine("UNKNOWN string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::Unknown));
-    LLBC_PrintLine("0xff3d string: %s", LLBC_FlowType::Type2Str(0xff3d));
+    LLBC_PrintLn("NOFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::NoFlow));
+    LLBC_PrintLn("UNDERFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::UnderFlow));
+    LLBC_PrintLn("OVERFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::OverFlow));
+    LLBC_PrintLn("UNKNOWN string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::Unknown));
+    LLBC_PrintLn("0xff3d string: %s", LLBC_FlowType::Type2Str(0xff3d));
 
-	LLBC_PrintLine("\nLLBC_StringEscape test:");
+	LLBC_PrintLn("\nLLBC_StringEscape test:");
 
     LLBC_String willEscape = ".#=";
     //Ä©Î²±àÂë²âÊÔ
@@ -57,7 +57,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     escapeTail1.escape(willEscape, '\\');
     LLBC_StringEscape(escapeTail2, willEscape, '\\');
     ASSERT(escapeTail1 == escapeTail2);
-    LLBC_PrintLine("Tail escape test: %s", (escapeTail1 == escapeTail2) ? "true" : "false");
+    LLBC_PrintLn("Tail escape test: %s", (escapeTail1 == escapeTail2) ? "true" : "false");
 
     //·ÇÄ©±àÂë²âÊÔ
     LLBC_String escapeNotTail1 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn";
@@ -65,7 +65,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     escapeNotTail1.escape(willEscape, '\\');
     LLBC_StringEscape(escapeNotTail2, willEscape, '\\');
     ASSERT(escapeNotTail1 == escapeNotTail2);
-    LLBC_PrintLine("Not Tail escape test: %s", (escapeNotTail1 == escapeNotTail2) ? "true" : "false");
+    LLBC_PrintLn("Not Tail escape test: %s", (escapeNotTail1 == escapeNotTail2) ? "true" : "false");
 
     //¶à×Ö·û²âÊÔ
     LLBC_String speEscape2 = "!.#=$:?<>_^[]@+-{}~/|&*`";
@@ -74,7 +74,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     speStr1.escape(speEscape2, '\\');
     LLBC_StringEscape(speStr2, speEscape2, '\\');
     ASSERT(speStr1 == speStr2);
-    LLBC_PrintLine("Special character escape test: %s", (speStr1 == speStr2) ? "true": "false");
+    LLBC_PrintLn("Special character escape test: %s", (speStr1 == speStr2) ? "true": "false");
 
     const static int nEscapeTestNum = 100000;
     std::vector<LLBC_String> t1;
@@ -91,7 +91,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     {
         t1[i].escape(willEscape, '\\');
     }
-    LLBC_PrintLine("LLBC_String escape test used time(ms): %lld",
+    LLBC_PrintLn("LLBC_String escape test used time(ms): %lld",
                    (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
     begTestTime = LLBC_Time::Now();
@@ -99,11 +99,11 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     {
         LLBC_StringEscape(t2[i], willEscape, '\\');
     }
-    LLBC_PrintLine("Algorithm LLBC_String escape test used time(ms): %lld",
+    LLBC_PrintLn("Algorithm LLBC_String escape test used time(ms): %lld",
                    (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
     ASSERT(t1[0] == t2[0]);
-    LLBC_PrintLine("test completed, press any key to exit");
+    LLBC_PrintLn("test completed, press any key to exit");
     getchar();
 
     return 0;

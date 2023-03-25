@@ -69,7 +69,7 @@ public:
     virtual ~TestCompBase() = default;
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
         TestWaiter()(false, LLBC_GetTypeName(*this), "init", _initTime, _initWaitTime, initFinished);
         return true;
@@ -154,7 +154,7 @@ class PreAddTestComp : public LLBC_Component
     };
 
 public:
-    virtual bool OnInitialize(bool &finished)
+    virtual bool OnInit(bool &finished)
     {
         _timer.SetTimeoutHandler(this, &PreAddTestComp::OnTimeout);
         return true;
@@ -170,28 +170,28 @@ public:
         LLBC_Service *svc = GetService();
         svc->SubscribeEvent(TestEvIds::Ev1, [](LLBC_Event &ev)
         {
-            LLBC_PrintLine("%s, Ev1 handler called, ev[\"val\"]:%s",
+            LLBC_PrintLn("%s, Ev1 handler called, ev[\"val\"]:%s",
                            LLBC_GetTypeName(PreAddTestComp),
                            ev["val"].ToString().c_str());
         });
 
         svc->SubscribeEvent(TestEvIds::Ev2, [](LLBC_Event &ev)
         {
-            LLBC_PrintLine("%s, Ev2 handler called, ev[\"val\"]:%s",
+            LLBC_PrintLn("%s, Ev2 handler called, ev[\"val\"]:%s",
                            LLBC_GetTypeName(PreAddTestComp),
                            ev["val"].ToString().c_str());
         });
 
         _timer.Schedule(LLBC_TimeSpan::FromSeconds(5));
 
-        LLBC_PrintLine("%s: OnStart", LLBC_GetTypeName(PreAddTestComp));
+        LLBC_PrintLn("%s: OnStart", LLBC_GetTypeName(PreAddTestComp));
 
         return true;
     }
 
     virtual void OnStop(bool &finshed)
     {
-        LLBC_PrintLine("%s: OnStop", LLBC_GetTypeName(PreAddTestComp));
+        LLBC_PrintLn("%s: OnStop", LLBC_GetTypeName(PreAddTestComp));
 
         _timer.Cancel();
 
@@ -203,7 +203,7 @@ public:
 private:
     void OnTimeout(LLBC_Timer *timer)
     {
-        LLBC_PrintLine("%s: timeout, timer can working....", LLBC_GetTypeName(PreAddTestComp));
+        LLBC_PrintLn("%s: timeout, timer can working....", LLBC_GetTypeName(PreAddTestComp));
 
         const int evId = LLBC_Rand(TestEvIds::Begin, TestEvIds::End);
         LLBC_Event *ev = new LLBC_Event(evId);

@@ -34,62 +34,62 @@ public:
     : LLBC_Component(LLBC_ComponentEvents::AllEvents)
     , _recvTimes(0)
     {
-        LLBC_PrintLine(">>> Comp ctor called!");
+        LLBC_PrintLn(">>> Comp ctor called!");
     }
 
     virtual ~TestComp()
     {
-        LLBC_PrintLine(">>> Comp dtor called!");
+        LLBC_PrintLn(">>> Comp dtor called!");
     }
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service initialize");
+        LLBC_PrintLn("Service initialize");
         return true;
     }
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy");
+        LLBC_PrintLn("Service destroy");
     }
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
-        LLBC_PrintLine("Session create: %s", sessionInfo.ToString().c_str());
+        LLBC_PrintLn("Session create: %s", sessionInfo.ToString().c_str());
     }
 
     virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session destroy, info: %s", destroyInfo.ToString().c_str());
+        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
     {
-        LLBC_PrintLine("Async-Conn result: %s", result.ToString().c_str());
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
     }
 
     virtual void OnUpdate()
     {
-        LLBC_PrintLine("Service update");
+        LLBC_PrintLn("Service update");
     }
 
     virtual void OnIdle(const LLBC_TimeSpan &idleTime)
     {
-        LLBC_PrintLine("Service idle, idleTime: %s", idleTime.ToString().c_str());
+        LLBC_PrintLn("Service idle, idleTime: %s", idleTime.ToString().c_str());
     }
 
 public:
     virtual void OnDataArrival(LLBC_Packet &packet)
     {
-        LLBC_PrintLine("Session[%d] receive data, len: %d\n", 
+        LLBC_PrintLn("Session[%d] receive data, len: %d\n", 
             packet.GetSessionId(), packet.GetLength());
 
         if (++_recvTimes == 100)
         {
-            LLBC_PrintLine("Comp received %d times, stop this service", _recvTimes);
+            LLBC_PrintLn("Comp received %d times, stop this service", _recvTimes);
 
-            LLBC_PrintLine("Print any key to stop...");
+            LLBC_PrintLn("Print any key to stop...");
             getchar();
 
             GetService()->Stop();
@@ -123,12 +123,12 @@ TestCase_Comm_ExternalDriveSvc::~TestCase_Comm_ExternalDriveSvc()
 
 int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("ExternalDrive type service test:");
+    LLBC_PrintLn("ExternalDrive type service test:");
 
     // Parse arguments.
     if (argc < 3)
     {
-        LLBC_PrintLine("Startup argument error, eg: ./a ip port");
+        LLBC_PrintLn("Startup argument error, eg: ./a ip port");
         return -1;
     }
 
@@ -144,7 +144,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     _svc->SetDriveMode(LLBC_Service::ExternalDrive);
     if (_svc->Start() != LLBC_OK)
     {
-        LLBC_PrintLine("Service startup failed, reason: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Service startup failed, reason: %s", LLBC_FormatLastError());
         return -1;
     }
 
@@ -152,7 +152,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     int listenSid;
     if ((listenSid = _svc->Listen(ip, port)) == 0)
     {
-        LLBC_PrintLine("Listen in %s:%d failed", ip, port);
+        LLBC_PrintLn("Listen in %s:%d failed", ip, port);
         return -1;
     }
 
@@ -160,7 +160,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     int connSid;
     if ((connSid = _svc->Connect(ip, port)) == 0)
     {
-        LLBC_PrintLine("Connect to %s:%d failed", ip, port);
+        LLBC_PrintLn("Connect to %s:%d failed", ip, port);
         return -1;
     }
 

@@ -91,19 +91,25 @@
 /**
  * \brief core/thread about config options define.
  */
-// Enable/Disable Suspend/Resume thread support macro(Non-WIN32 platform available only).
-// If enable it, LLBC library will use SIGUSR1, SIGUSR2 signal to implement.
-#define LLBC_CFG_THREAD_ENABLE_SUSPEND_RESUME_SUPPORT       1
 // Maximum thread number.
 #define LLBC_CFG_THREAD_MAX_THREAD_NUM                      128
 // Default stack size.
+#if LLBC_TARGET_PLATFORM_WIN32
+// Stack size 0 operating system uses the same value as the stack that's specified for the main thread
+#define LLBC_CFG_THREAD_DFT_STACK_SIZE                      0
+#else
 #define LLBC_CFG_THREAD_DFT_STACK_SIZE                      (10 * 1024 * 1024)
+#endif
 // Minimum stack size.
-#define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (1 * 1024 * 1024)
+#define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (2 * 1024 * 1024)
 // Message block default size.
 #define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (256)
 // If you want debug guardians, enable this config option.
 #define LLBC_CFG_THREAD_GUARD_DEBUG                         0
+// Entry thread handle.
+#define LLBC_CFG_THREAD_ENTRY_THREAD_HANDLE                 1
+// Entry thread group handle.
+#define LLBC_CFG_THREAD_ENTRY_THREAD_GROUP_HANDLE           1
 
 /**
  * \brief core/log about config options define.

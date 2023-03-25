@@ -32,11 +32,13 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 extern "C" {
+
 struct __ThreadEntryArg
 {
     LLBC_NS LLBC_ThreadProc proc;
     void *arg;
 };
+
 }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -51,11 +53,11 @@ static unsigned int WINAPI __ThreadEntry(void *arg)
 
     delete entryArg;
 
-    int llbcThreadRtn = (*llbcThreadProc)(llbcThreadArg);
+    (*llbcThreadProc)(llbcThreadArg);
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return reinterpret_cast<void *>(llbcThreadRtn);
+    return nullptr;
 #else
-    return llbcThreadRtn;
+    return 0;
 #endif
 }
 
@@ -283,29 +285,32 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
-                      LLBC_ThreadProc proc,
+bool LLBC_ThreadPriority::IsValid(int threadPriority)
+{
+    return threadPriority >= Begin && threadPriority < End;
+}
+
+int LLBC_CreateThread(LLBC_ThreadProc proc,
                       LLBC_ThreadArg arg,
-                      int flags,
+                      LLBC_NativeThreadHandle *nativeHandle,
                       int priority,
                       int stackSize)
 {
-    if (!handle || !proc)
+    // Arguments check.
+    if (!nativeHandle ||
+        !proc ||
+        stackSize < 0 ||
+        !LLBC_ThreadPriority::IsValid(priority))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    if ((flags & LLBC_ThreadFlag::Joinable) != LLBC_ThreadFlag::Joinable &&
-        (flags & LLBC_ThreadFlag::Detached) != LLBC_ThreadFlag::Detached)
-    {
-        flags |= LLBC_ThreadFlag::Joinable;
-    }
-    if (priority >= LLBC_ThreadPriority::End)
-    {
-        priority = LLBC_ThreadPriority::Normal;
-    }
-    stackSize = MAX(stackSize, LLBC_CFG_THREAD_MINIMUM_STACK_SIZE);
+    // Normalize stackSize.
+    if (stackSize == 0)
+        stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE;
+    else if (stackSize < LLBC_CFG_THREAD_MINIMUM_STACK_SIZE)
+        stackSize = LLBC_CFG_THREAD_MINIMUM_STACK_SIZE;
 
     LLBC_INTERNAL_NS __ThreadEntryArg *threadArg = new LLBC_INTERNAL_NS __ThreadEntryArg;
     threadArg->proc = proc;
@@ -315,55 +320,51 @@ int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
     pthread_attr_t attr;
     pthread_attr_init(&attr);
 
-    // Set thread flag.
-    pthread_attr_setdetachstate(&attr, (flags & LLBC_ThreadFlag::Detached) ? 
-        PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
-
     // Set stack size.
     pthread_attr_setstacksize(&attr, stackSize);
 
     int ret = 0;
     if ((ret = pthread_create(handle,
-                               &attr,
-                               &LLBC_INTERNAL_NS __ThreadEntry,
-                               threadArg)) != 0)
+                              &attr,
+                              &LLBC_INTERNAL_NS __ThreadEntry,
+                              threadArg)) != 0)
     {
         delete threadArg;
 
         errno = ret;
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+
         pthread_attr_destroy(&attr);
+
         return LLBC_FAILED;
     }
 
     pthread_attr_destroy(&attr);
-#else
-    *handle = (HANDLE)_beginthreadex(nullptr,
-                                     stackSize, 
-                                     &LLBC_INTERNAL_NS __ThreadEntry,
-                                     threadArg,
-                                     0,
-                                     nullptr);
-    if (!*handle)
+#else // Win32
+    *nativeHandle = (HANDLE)_beginthreadex(nullptr,
+                                           stackSize, 
+                                           &LLBC_INTERNAL_NS __ThreadEntry,
+                                           threadArg,
+                                           0,
+                                           nullptr);
+    if (!*nativeHandle)
     {
         delete threadArg;
-
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
+
         return LLBC_FAILED;
     }
 #endif
 
-    if (LLBC_SetThreadPriority(*handle, priority) != LLBC_OK)
+    if (priority != LLBC_ThreadPriority::Normal &&
+        LLBC_SetThreadPriority(*nativeHandle, priority) != LLBC_OK)
     {
+        #if LLBC_TARGET_PLATFORM_WIN32
+        ::CloseHandle(*nativeHandle);
+        #endif
+        *nativeHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
+
         return LLBC_FAILED;
-    }
-
-    if ((flags | LLBC_ThreadFlag::Detached) == LLBC_ThreadFlag::Detached)
-    {
-#if LLBC_TARGET_PLATFORM_WIN32
-        ::CloseHandle(*handle);
-#endif
-
-        *handle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     }
 
     return LLBC_OK;
@@ -393,7 +394,8 @@ LLBC_ThreadId LLBC_GetCurrentThreadId()
     return syscall(SYS_gettid);
     #endif
 #else // LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC (FreeBSD kernel)
-    // For get more information, see: https://www.freebsd.org/cgi/man.cgi?query=pthread_getthreadid_np&sektion=3&manpath=freebsd-release-ports
+    // For get more information, see:
+    // - https://www.freebsd.org/cgi/man.cgi?query=pthread_getthreadid_np&sektion=3&manpath=freebsd-release-ports
     return pthread_mach_thread_np(pthread_self());
 #endif
 }
@@ -513,7 +515,7 @@ int LLBC_SuspendThread(LLBC_NativeThreadHandle handle)
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else
-    if (::SuspendThread(handle) == -1)
+    if (::SuspendThread(handle) == static_cast<DWORD>(-1))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
@@ -535,7 +537,7 @@ int LLBC_ResumeThread(LLBC_NativeThreadHandle handle)
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #else
-    if (::ResumeThread(handle) == -1)
+    if (::ResumeThread(handle) == static_cast<DWORD>(-1))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return LLBC_FAILED;
@@ -603,7 +605,7 @@ int LLBC_CancelThread(LLBC_NativeThreadHandle handle)
 #endif
 }
 
-int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo)
+int LLBC_KillThread(LLBC_NativeThreadHandle handle, int sig)
 {
     if (handle == LLBC_INVALID_NATIVE_THREAD_HANDLE)
     {
@@ -613,7 +615,7 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo)
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     int status = 0;
-    if ((status = pthread_kill(handle, signo)) != 0)
+    if ((status = pthread_kill(handle, sig)) != 0)
     {
         errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -622,13 +624,41 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo)
     
     return LLBC_OK;
 #else
-    if (raise(signo) != 0)
+    switch (sig)
     {
+    #ifdef SIGINT
+    case SIGINT:
+    #endif
+    #ifdef SIGTERM
+    case SIGTERM:
+    #endif
+    #ifdef SIGFPE
+    case SIGFPE:
+    #endif
+    #ifdef SIGBREAK
+    case SIGBREAK:
+    #endif
+    #ifdef SIGABRT
+    case SIGABRT:
+    #endif
+    #ifdef SIGABRT_COMPAT
+    case SIGABRT_COMPAT:
+    #endif
+        if (TerminateThread(handle, sig) == 0)
+        {
+            LLBC_SetLastError(LLBC_ERROR_OSAPI);
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
+        break;
+
+    default:
+        errno = EINVAL;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
+        break;
     }
-
-    return LLBC_OK;
 #endif
 }
 

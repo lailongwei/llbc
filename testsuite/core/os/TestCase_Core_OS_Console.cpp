@@ -72,78 +72,78 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     std::cout <<std::endl;
 
 	// test foreground color.
-    LLBC_PrintLine("foreground color test: ");
+    LLBC_PrintLn("foreground color test: ");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Red | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Red | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Green | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Green | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Green | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Blue | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Blue | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Blue | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Yellow | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Yellow | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Yellow | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Purple | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Purple | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Purple | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Cyan | LLBC_ConsoleColor::Bg_Default);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Cyan | Bg_Default");
-    LLBC_PrintLine("");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Cyan | Bg_Default");
+    LLBC_PrintLn("");
 
     // test background color.
     LLBC_SetConsoleColor(stdout, defaultClr);
-    LLBC_PrintLine("background color test: ");
+    LLBC_PrintLn("background color test: ");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Red);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Red");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Red");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Green);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Green");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Green");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Blue);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Blue");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Blue");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Yellow);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Yellow");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Yellow");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Purple);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Purple");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Purple");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Cyan);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Cyan");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Cyan");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Black | LLBC_ConsoleColor::Bg_White);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Black | Bg_White");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Black | Bg_White");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Black | LLBC_ConsoleColor::Bg_Cyan);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Black | Bg_Cyan");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Black | Bg_Cyan");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_White | LLBC_ConsoleColor::Bg_Black);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_White | Bg_Black");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_White | Bg_Black");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Cyan | LLBC_ConsoleColor::Bg_Black);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Cyan | Bg_Black");
-    LLBC_PrintLine("");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Cyan | Bg_Black");
+    LLBC_PrintLn("");
 
 	// test highlight foreground color.
-    LLBC_PrintLine("highlight foreground color test: ");
+    LLBC_PrintLn("highlight foreground color test: ");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Red | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Red | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Green | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Green | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Green | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Blue | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Blue | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Blue | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Yellow | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Yellow | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Yellow | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Purple | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Purple | Bg_Default");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Purple | Bg_Default");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Cyan | LLBC_ConsoleColor::Bg_Default | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Cyan | Bg_Default");
-    LLBC_PrintLine("");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Cyan | Bg_Default");
+    LLBC_PrintLn("");
 
     // test highlight background color.
     LLBC_SetConsoleColor(stdout, defaultClr);
-    LLBC_PrintLine("highlight background color test: ");
+    LLBC_PrintLn("highlight background color test: ");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Red | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Red");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Red");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Green | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Green");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Green");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Blue | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Blue");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Blue");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Yellow");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Yellow");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Purple | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Purple");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Purple");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Default | LLBC_ConsoleColor::Bg_Cyan | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("LLBC_PrintLine, Fg_Default | Bg_Cyan");
-    LLBC_PrintLine("");
+    LLBC_PrintLn("LLBC_PrintLn, Fg_Default | Bg_Cyan");
+    LLBC_PrintLn("");
 
     // test highlight.
     LLBC_SetConsoleColor(stdout, defaultClr);
@@ -158,15 +158,15 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     std::cout << "Highlight foreground & background" << std::endl;
 
     LLBC_SetConsoleColor(stdout, defaultClr);
-    LLBC_PrintLine("highlight test: ");
+    LLBC_PrintLn("highlight test: ");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow);
-    LLBC_PrintLine("Normal");
+    LLBC_PrintLn("Normal");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg);
-    LLBC_PrintLine("Highlight foreground");
+    LLBC_PrintLn("Highlight foreground");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Bg);
-    LLBC_PrintLine("Highlight background");
+    LLBC_PrintLn("Highlight background");
     LLBC_SetConsoleColor(stdout, LLBC_ConsoleColor::Fg_Red | LLBC_ConsoleColor::Bg_Yellow | LLBC_ConsoleColor::Highlight_Fg | LLBC_ConsoleColor::Highlight_Bg);
-    LLBC_PrintLine("Highlight foreground & background");
+    LLBC_PrintLn("Highlight foreground & background");
 
     LLBC_SetConsoleColor(stderr, defaultClr);
 
@@ -179,14 +179,14 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     std::cout <<"LLBC_Print(\"" <<hrStr <<"\"):" <<std::endl;
     LLBC_Print(str.c_str());
 
-    std::cout <<"LLBC_PrintLine(\"" <<hrStr <<"\"):" <<std::endl;
-    LLBC_PrintLine(str.c_str());
+    std::cout <<"LLBC_PrintLn(\"" <<hrStr <<"\"):" <<std::endl;
+    LLBC_PrintLn(str.c_str());
 
     std::cout <<"LLBC_FilePrint(stdout, \"" <<hrStr <<"\"):" <<std::endl;
     LLBC_FilePrint(stdout, str.c_str());
 
-    std::cout <<"LLBC_FilePrintLine(stdout, \"" <<hrStr <<"\"):" <<std::endl;
-    LLBC_FilePrintLine(stdout, str.c_str());
+    std::cout <<"LLBC_FilePrintLn(stdout, \"" <<hrStr <<"\"):" <<std::endl;
+    LLBC_FilePrintLn(stdout, "%s", str.c_str());
     std::cout <<"====================================================" <<std::endl;
 
     fprintf(stdout, "Press any key to continue ... ...\n");

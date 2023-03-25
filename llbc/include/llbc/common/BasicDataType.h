@@ -153,7 +153,7 @@ __LLBC_NS_BEGIN
 
 // handle datatype define.
 typedef int LLBC_Handle;
-#define LLBC_INVALID_HANDLE                 ((LLBC_Handle)(-1))
+#define LLBC_INVALID_HANDLE                 ((LLBC_NS LLBC_Handle)(-1))
 
 // thread datatype define.
 #if LLBC_TARGET_PLATFORM_LINUX
@@ -203,7 +203,8 @@ typedef int LLBC_Handle;
  #define LLBC_INVALID_TLS_HANDLE             ((pthread_key_t)(-1))
 #endif // LLBC_TARGET_PLATFORM_LINUX
 
-typedef int LLBC_ThreadRtn;
+// Thread about data type define.
+typedef void LLBC_ThreadRtn;
 typedef void * LLBC_ThreadArg;
 typedef LLBC_ThreadRtn (*LLBC_ThreadProc)(LLBC_ThreadArg);
 

@@ -28,7 +28,7 @@ namespace
     public:
         virtual bool OnStart(bool &startFinished)
         {
-            LLBC_PrintLine("Simulate comp start failed case...");
+            LLBC_PrintLn("Simulate comp start failed case...");
             return false;
         }
     };
@@ -44,14 +44,14 @@ namespace
     public:
         virtual int OnStart(int argc, char *arg[], bool &startFinished)
         {
-            LLBC_PrintLine("Application start, name:%s", GetName().c_str());
+            LLBC_PrintLn("Application start, name:%s", GetName().c_str());
 
             _testSvc = LLBC_Service::Create("TestSvc");
             _testSvc->AddComponent(new TestComp);
 
             if (_testSvc->Start() != LLBC_OK)
             {
-                LLBC_PrintLine("Start %s failed, err:%s", _testSvc->GetName().c_str(), LLBC_FormatLastError());
+                LLBC_PrintLn("Start %s failed, err:%s", _testSvc->GetName().c_str(), LLBC_FormatLastError());
                 return LLBC_FAILED;
             }
 
@@ -60,7 +60,7 @@ namespace
 
         virtual void OnStop(bool &stopFinished)
         {
-            LLBC_PrintLine("Application stop");
+            LLBC_PrintLn("Application stop");
             LLBC_XDelete(_testSvc);
         }
 
@@ -79,7 +79,7 @@ TestCase_App_AppTest::~TestCase_App_AppTest()
 
 int TestCase_App_AppTest::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Application/AppTest(Press Ctrl+C to exit):");
+    LLBC_PrintLn("Application/AppTest(Press Ctrl+C to exit):");
 
     TestApp app;
     app.Start(argc, argv);

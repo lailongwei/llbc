@@ -36,7 +36,7 @@ public:
     {
         Begin = 0,
 
-        OnInitialize = Begin,
+        OnInit = Begin,
         OnDestroy,
 
         OnStart,
@@ -72,7 +72,7 @@ public:
 class LLBC_EXPORT LLBC_ComponentEvents
 {
 public:
-    static constexpr uint64 OnInitialize = 1 << LLBC_ComponentEventIndex::OnInitialize;
+    static constexpr uint64 OnInit = 1 << LLBC_ComponentEventIndex::OnInit;
     static constexpr uint64 OnDestroy = 1 << LLBC_ComponentEventIndex::OnDestroy;
     
     static constexpr uint64 OnStart = 1 << LLBC_ComponentEventIndex::OnStart;

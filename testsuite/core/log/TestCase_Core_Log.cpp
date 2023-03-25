@@ -33,8 +33,8 @@ TestCase_Core_Log::~TestCase_Core_Log()
 
 int TestCase_Core_Log::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/log test:");
-    LLBC_PrintLine("Current dir:%s", LLBC_Directory::CurDir().c_str());
+    LLBC_PrintLn("core/log test:");
+    LLBC_PrintLn("Current dir:%s", LLBC_Directory::CurDir().c_str());
 
     // Do uninited log message test
     DoUninitLogTest();
@@ -48,8 +48,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerManagerSingleton->Initialize("LogTestCfg.cfg") != LLBC_OK)
 #endif
     {
-        LLBC_FilePrintLine(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
-        LLBC_FilePrintLine(stderr, "Forgot copy LogTestCfg.cfg test config file to test dir?");
+        LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr, "Forgot copy LogTestCfg.cfg test config file to test dir?");
         return -1;
     }
 
@@ -123,12 +123,12 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     const int perfTestTimes = 3;
     for (int i = 0; i < perfTestTimes; ++i)
     {
-        LLBC_PrintLine("Press any key to exec performance test(times:%d):", i);
+        LLBC_PrintLn("Press any key to exec performance test(times:%d):", i);
         getchar();
 
         LLBC_ObjectPoolStat opStat;
         LLBC_LoggerManagerSingleton->GetLogger("perftest")->GetLoggerObjectPool().Stat(opStat);
-        LLBC_PrintLine("perftest logger object pool stat:\n%s", opStat.ToString().c_str());
+        LLBC_PrintLn("perftest logger object pool stat:\n%s", opStat.ToString().c_str());
 
         LLBC_CPUTime begin = LLBC_CPUTime::Current();
         const int loopLmt = 2000000;
@@ -136,14 +136,14 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
             LLOG_DEBUG2("perftest", "performance test msg, msg idx:%d", i);
 
         LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
-        LLBC_PrintLine("Performance test completed, "
+        LLBC_PrintLn("Performance test completed, "
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,
                        elapsed.ToString().c_str(),
                        elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
     }
 
-    LLBC_PrintLine("Press any key to begin json log test");
+    LLBC_PrintLn("Press any key to begin json log test");
     getchar();
 
     // Test json styled log.
@@ -156,7 +156,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Finalize logger.
     LLBC_LoggerManagerSingleton->Finalize();
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;
@@ -297,7 +297,7 @@ void TestCase_Core_Log::DoUninitLogTest()
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
-    LLBC_PrintLine("Log hook, loggerName: %s, level: %s",
+    LLBC_PrintLn("Log hook, loggerName: %s, level: %s",
                    logData->logger->GetLoggerName().c_str(),
                    LLBC_LogLevel::GetLevelStr(logData->level).c_str());
 }

@@ -36,14 +36,14 @@ TestCase_Com_Error::~TestCase_Com_Error()
 
 int TestCase_Com_Error::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("common/error test:\n");
+    LLBC_PrintLn("common/error test:\n");
 
     // Test CLib type error.
     auto fmtCLibErr = [](int errNo)
     {
         errno = errNo;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        LLBC_PrintLine("CLib type error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("CLib type error: %s", LLBC_FormatLastError());
     };
 
     fmtCLibErr(EINTR);
@@ -82,7 +82,7 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     ::SetLastError(ERROR_BAD_ENVIRONMENT);
     LLBC_SetLastError(LLBC_ERROR_OSAPI);
 
-    LLBC_PrintLine("OSAPIError: err desc:%s", LLBC_FormatLastError());
+    LLBC_PrintLn("OSAPIError: err desc:%s", LLBC_FormatLastError());
 #endif
 
     // Test Net API type error(WIN32 specific).
@@ -90,89 +90,89 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     ::WSASetLastError(WSAENAMETOOLONG);
     LLBC_SetLastError(LLBC_ERROR_NETAPI);
 
-    LLBC_PrintLine("NetAPI error: err desc: %s", LLBC_FormatLastError());
+    LLBC_PrintLn("NetAPI error: err desc: %s", LLBC_FormatLastError());
 #endif
 
     // Test GAI type error.
     LLBC_SetLastError(LLBC_ERROR_GAI);
     LLBC_SetSubErrorNo(EAI_NODATA);
-    LLBC_PrintLine("GAI error: err desc: %s", LLBC_FormatLastError());
+    LLBC_PrintLn("GAI error: err desc: %s", LLBC_FormatLastError());
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_SetSubErrorNo(EAI_ADDRFAMILY);
-    LLBC_PrintLine("GAI error: err desc: %s", LLBC_FormatLastError());
+    LLBC_PrintLn("GAI error: err desc: %s", LLBC_FormatLastError());
 #endif
 
     // LLBC library type error.
-    LLBC_PrintLine("LLBC library type error test:");
-    LLBC_PrintLine("\tLLBC_ERROR_UNKNOWN: %s", LLBC_StrError(LLBC_ERROR_UNKNOWN));
-    LLBC_PrintLine("\tLLBC_ERROR_RANGE: %s", LLBC_StrError(LLBC_ERROR_RANGE));
-    LLBC_PrintLine("\tLLBC_ERROR_EXIST: %s", LLBC_StrError(LLBC_ERROR_EXIST));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_FOUND: %s", LLBC_StrError(LLBC_ERROR_NOT_FOUND));
-    LLBC_PrintLine("\tLLBC_ERROR_END: %s", LLBC_StrError(LLBC_ERROR_END));
-    LLBC_PrintLine("\tLLBC_ERROR_LIMIT: %s", LLBC_StrError(LLBC_ERROR_LIMIT));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_INIT: %s", LLBC_StrError(LLBC_ERROR_NOT_INIT));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_OPEN: %s", LLBC_StrError(LLBC_ERROR_NOT_OPEN));
-    LLBC_PrintLine("\tLLBC_ERROR_INITED: %s", LLBC_StrError(LLBC_ERROR_INITED));
-    LLBC_PrintLine("\tLLBC_ERROR_OPENED: %s", LLBC_StrError(LLBC_ERROR_OPENED));
-    LLBC_PrintLine("\tLLBC_ERROR_PERM: %s", LLBC_StrError(LLBC_ERROR_PERM));
-    LLBC_PrintLine("\tLLBC_ERROR_TRUNCATED: %s", LLBC_StrError(LLBC_ERROR_TRUNCATED));
-    LLBC_PrintLine("\tLLBC_ERROR_INVALID: %s", LLBC_StrError(LLBC_ERROR_INVALID));
-    LLBC_PrintLine("\tLLBC_ERROR_FORMAT: %s", LLBC_StrError(LLBC_ERROR_FORMAT));
-    LLBC_PrintLine("\tLLBC_ERROR_TIMEOUTED: %s", LLBC_StrError(LLBC_ERROR_TIMEOUTED));
-    LLBC_PrintLine("\tLLBC_ERROR_BUSY: %s", LLBC_StrError(LLBC_ERROR_BUSY));
-    LLBC_PrintLine("\tLLBC_ERROR_REENTRY: %s", LLBC_StrError(LLBC_ERROR_REENTRY));
-    LLBC_PrintLine("\tLLBC_ERROR_NO_SUCH: %s", LLBC_StrError(LLBC_ERROR_NO_SUCH));
-    LLBC_PrintLine("\tLLBC_ERROR_WBLOCK: %s", LLBC_StrError(LLBC_ERROR_WBLOCK));
-    LLBC_PrintLine("\tLLBC_ERROR_AGAIN: %s", LLBC_StrError(LLBC_ERROR_AGAIN));
-    LLBC_PrintLine("\tLLBC_ERROR_PENDING: %s", LLBC_StrError(LLBC_ERROR_PENDING));
-    LLBC_PrintLine("\tLLBC_ERROR_ILLEGAL: %s", LLBC_StrError(LLBC_ERROR_ILLEGAL));
-    LLBC_PrintLine("\tLLBC_ERROR_ACCESS_DENY: %s", LLBC_StrError(LLBC_ERROR_ACCESS_DENY));
-    LLBC_PrintLine("\tLLBC_ERROR_REPEAT: %s", LLBC_StrError(LLBC_ERROR_REPEAT));
-    LLBC_PrintLine("\tLLBC_ERROR_ENCODE: %s", LLBC_StrError(LLBC_ERROR_ENCODE));
-    LLBC_PrintLine("\tLLBC_ERROR_DECODE: %s", LLBC_StrError(LLBC_ERROR_DECODE));
-    LLBC_PrintLine("\tLLBC_ERROR_COMPRESS: %s", LLBC_StrError(LLBC_ERROR_COMPRESS));
-    LLBC_PrintLine("\tLLBC_ERROR_DECOMPRESS: %s", LLBC_StrError(LLBC_ERROR_DECOMPRESS));
-    LLBC_PrintLine("\tLLBC_ERROR_PACK: %s", LLBC_StrError(LLBC_ERROR_PACK));
-    LLBC_PrintLine("\tLLBC_ERROR_UNPACK: %s", LLBC_StrError(LLBC_ERROR_UNPACK));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_ALLOW: %s", LLBC_StrError(LLBC_ERROR_NOT_ALLOW));
-    LLBC_PrintLine("\tLLBC_ERROR_COMP_INIT: %s", LLBC_StrError(LLBC_ERROR_COMP_INIT));
-    LLBC_PrintLine("\tLLBC_ERROR_COMP_START: %s", LLBC_StrError(LLBC_ERROR_COMP_START));
-    LLBC_PrintLine("\tLLBC_ERROR_WSA_SYSNOTREADY: %s", LLBC_StrError(LLBC_ERROR_WSA_SYSNOTREADY));
-    LLBC_PrintLine("\tLLBC_ERROR_WSA_VERNOTSUPPORTED: %s", LLBC_StrError(LLBC_ERROR_WSA_VERNOTSUPPORTED));
-    LLBC_PrintLine("\tLLBC_ERROR_WSA_EPROCLIM: %s", LLBC_StrError(LLBC_ERROR_WSA_EPROCLIM));
-    LLBC_PrintLine("\tLLBC_ERROR_IS_LISTEN_SOCKET: %s", LLBC_StrError(LLBC_ERROR_IS_LISTEN_SOCKET));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_POOL_OBJECT: %s", LLBC_StrError(LLBC_ERROR_NOT_POOL_OBJECT));
-    LLBC_PrintLine("\tLLBC_ERROR_SESSION_SND_BUF_LIMIT: %s", LLBC_StrError(LLBC_ERROR_SESSION_SND_BUF_LIMIT));
-    LLBC_PrintLine("\tLLBC_ERROR_NOT_SUPPORT: %s", LLBC_StrError(LLBC_ERROR_NOT_SUPPORT));
-    LLBC_PrintLine("\tLLBC_ERROR_CANCELLED: %s", LLBC_StrError(LLBC_ERROR_CANCELLED));
+    LLBC_PrintLn("LLBC library type error test:");
+    LLBC_PrintLn("\tLLBC_ERROR_UNKNOWN: %s", LLBC_StrError(LLBC_ERROR_UNKNOWN));
+    LLBC_PrintLn("\tLLBC_ERROR_RANGE: %s", LLBC_StrError(LLBC_ERROR_RANGE));
+    LLBC_PrintLn("\tLLBC_ERROR_EXIST: %s", LLBC_StrError(LLBC_ERROR_EXIST));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_FOUND: %s", LLBC_StrError(LLBC_ERROR_NOT_FOUND));
+    LLBC_PrintLn("\tLLBC_ERROR_END: %s", LLBC_StrError(LLBC_ERROR_END));
+    LLBC_PrintLn("\tLLBC_ERROR_LIMIT: %s", LLBC_StrError(LLBC_ERROR_LIMIT));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_INIT: %s", LLBC_StrError(LLBC_ERROR_NOT_INIT));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_OPEN: %s", LLBC_StrError(LLBC_ERROR_NOT_OPEN));
+    LLBC_PrintLn("\tLLBC_ERROR_INITED: %s", LLBC_StrError(LLBC_ERROR_INITED));
+    LLBC_PrintLn("\tLLBC_ERROR_OPENED: %s", LLBC_StrError(LLBC_ERROR_OPENED));
+    LLBC_PrintLn("\tLLBC_ERROR_PERM: %s", LLBC_StrError(LLBC_ERROR_PERM));
+    LLBC_PrintLn("\tLLBC_ERROR_TRUNCATED: %s", LLBC_StrError(LLBC_ERROR_TRUNCATED));
+    LLBC_PrintLn("\tLLBC_ERROR_INVALID: %s", LLBC_StrError(LLBC_ERROR_INVALID));
+    LLBC_PrintLn("\tLLBC_ERROR_FORMAT: %s", LLBC_StrError(LLBC_ERROR_FORMAT));
+    LLBC_PrintLn("\tLLBC_ERROR_TIMEOUTED: %s", LLBC_StrError(LLBC_ERROR_TIMEOUTED));
+    LLBC_PrintLn("\tLLBC_ERROR_BUSY: %s", LLBC_StrError(LLBC_ERROR_BUSY));
+    LLBC_PrintLn("\tLLBC_ERROR_REENTRY: %s", LLBC_StrError(LLBC_ERROR_REENTRY));
+    LLBC_PrintLn("\tLLBC_ERROR_NO_SUCH: %s", LLBC_StrError(LLBC_ERROR_NO_SUCH));
+    LLBC_PrintLn("\tLLBC_ERROR_WBLOCK: %s", LLBC_StrError(LLBC_ERROR_WBLOCK));
+    LLBC_PrintLn("\tLLBC_ERROR_AGAIN: %s", LLBC_StrError(LLBC_ERROR_AGAIN));
+    LLBC_PrintLn("\tLLBC_ERROR_PENDING: %s", LLBC_StrError(LLBC_ERROR_PENDING));
+    LLBC_PrintLn("\tLLBC_ERROR_ILLEGAL: %s", LLBC_StrError(LLBC_ERROR_ILLEGAL));
+    LLBC_PrintLn("\tLLBC_ERROR_ACCESS_DENY: %s", LLBC_StrError(LLBC_ERROR_ACCESS_DENY));
+    LLBC_PrintLn("\tLLBC_ERROR_REPEAT: %s", LLBC_StrError(LLBC_ERROR_REPEAT));
+    LLBC_PrintLn("\tLLBC_ERROR_ENCODE: %s", LLBC_StrError(LLBC_ERROR_ENCODE));
+    LLBC_PrintLn("\tLLBC_ERROR_DECODE: %s", LLBC_StrError(LLBC_ERROR_DECODE));
+    LLBC_PrintLn("\tLLBC_ERROR_COMPRESS: %s", LLBC_StrError(LLBC_ERROR_COMPRESS));
+    LLBC_PrintLn("\tLLBC_ERROR_DECOMPRESS: %s", LLBC_StrError(LLBC_ERROR_DECOMPRESS));
+    LLBC_PrintLn("\tLLBC_ERROR_PACK: %s", LLBC_StrError(LLBC_ERROR_PACK));
+    LLBC_PrintLn("\tLLBC_ERROR_UNPACK: %s", LLBC_StrError(LLBC_ERROR_UNPACK));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_ALLOW: %s", LLBC_StrError(LLBC_ERROR_NOT_ALLOW));
+    LLBC_PrintLn("\tLLBC_ERROR_COMP_INIT: %s", LLBC_StrError(LLBC_ERROR_COMP_INIT));
+    LLBC_PrintLn("\tLLBC_ERROR_COMP_START: %s", LLBC_StrError(LLBC_ERROR_COMP_START));
+    LLBC_PrintLn("\tLLBC_ERROR_WSA_SYSNOTREADY: %s", LLBC_StrError(LLBC_ERROR_WSA_SYSNOTREADY));
+    LLBC_PrintLn("\tLLBC_ERROR_WSA_VERNOTSUPPORTED: %s", LLBC_StrError(LLBC_ERROR_WSA_VERNOTSUPPORTED));
+    LLBC_PrintLn("\tLLBC_ERROR_WSA_EPROCLIM: %s", LLBC_StrError(LLBC_ERROR_WSA_EPROCLIM));
+    LLBC_PrintLn("\tLLBC_ERROR_IS_LISTEN_SOCKET: %s", LLBC_StrError(LLBC_ERROR_IS_LISTEN_SOCKET));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_POOL_OBJECT: %s", LLBC_StrError(LLBC_ERROR_NOT_POOL_OBJECT));
+    LLBC_PrintLn("\tLLBC_ERROR_SESSION_SND_BUF_LIMIT: %s", LLBC_StrError(LLBC_ERROR_SESSION_SND_BUF_LIMIT));
+    LLBC_PrintLn("\tLLBC_ERROR_NOT_SUPPORT: %s", LLBC_StrError(LLBC_ERROR_NOT_SUPPORT));
+    LLBC_PrintLn("\tLLBC_ERROR_CANCELLED: %s", LLBC_StrError(LLBC_ERROR_CANCELLED));
 
     // Custom erorr test.
-    LLBC_PrintLine("LLBC library custom error test:");
+    LLBC_PrintLn("LLBC library custom error test:");
 
     const int customErr1 = LLBC_BuildCustomErrno(1);
     const int customErr2 = LLBC_BuildCustomErrno(2);
     LLBC_AddCustomErrno(customErr1, "The custom error 1");
     LLBC_AddCustomErrno(customErr2, "The custom error 2");
 
-    LLBC_PrintLine("Custom error 0x%x desc: %s", customErr1, LLBC_StrError(customErr1));
-    LLBC_PrintLine("Custom error 0x%x desc: %s", customErr2, LLBC_StrError(customErr2));
+    LLBC_PrintLn("Custom error 0x%x desc: %s", customErr1, LLBC_StrError(customErr1));
+    LLBC_PrintLn("Custom error 0x%x desc: %s", customErr2, LLBC_StrError(customErr2));
 
-    LLBC_PrintLine("Remove custom error: 0x%x", customErr1);
+    LLBC_PrintLn("Remove custom error: 0x%x", customErr1);
     LLBC_RemoveCustomErrno(customErr1);
 
-    LLBC_PrintLine("Custom error 0x%x desc: %s", customErr1, LLBC_StrError(customErr1));
+    LLBC_PrintLn("Custom error 0x%x desc: %s", customErr1, LLBC_StrError(customErr1));
 
     // Custom error string test.
-    LLBC_PrintLine("Custom error string test:");
+    LLBC_PrintLn("Custom error string test:");
     LLBC_SetLastError(LLBC_ERROR_FORMAT, "The custom error string for LLBC_ERROR_FORMAT");
-    LLBC_PrintLine("\tSet LLBC_ERROR_FORMAT error string to: \"The custom error string for LLBC_ERROR_FORMAT\"");
-    LLBC_PrintLine("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
-    LLBC_PrintLine("\tReset last eror:LLBC_ERROR_FORMAT:");
+    LLBC_PrintLn("\tSet LLBC_ERROR_FORMAT error string to: \"The custom error string for LLBC_ERROR_FORMAT\"");
+    LLBC_PrintLn("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
+    LLBC_PrintLn("\tReset last eror:LLBC_ERROR_FORMAT:");
     LLBC_SetLastError(LLBC_ERROR_FORMAT);
-    LLBC_PrintLine("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
+    LLBC_PrintLn("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
 
-    LLBC_PrintLine("");
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

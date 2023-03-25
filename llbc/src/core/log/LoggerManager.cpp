@@ -22,6 +22,8 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/time/Time.h"
+
 #include "llbc/core/os/OS_Console.h"
 
 #include "llbc/core/helper/STLHelper.h"
@@ -112,7 +114,7 @@ int LLBC_LoggerManager::Initialize(const LLBC_String &cfgFile)
 
     // Startup shared log runnable.
     if (_sharedLogRunnable)
-        _sharedLogRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
+        _sharedLogRunnable->Activate(1, LLBC_ThreadPriority::BelowNormal);
 
     return LLBC_OK;
 }
@@ -209,12 +211,40 @@ LLBC_Logger *LLBC_LoggerManager::GetLogger(const LLBC_CString &name) const
     return nullptr;
 }
 
-void LLBC_LoggerManager::UnInitOutput(int logLv, const char *tag, const char *fmt, ...)
+void LLBC_LoggerManager::UnInitOutput(int logLv,
+                                      const char *tag,
+                                      const char *file,
+                                      int line,
+                                      const char *func,
+                                      const char *fmt,
+                                      ...)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
     const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
 
-    LLBC_FilePrint(to, "[Log][%s]<%s> ", lvDesc.c_str(), tag ? tag : "");
+    if (file)
+    {
+        #if LLBC_TARGET_PLATFORM_WIN32
+        const char *fileBaseName = strrchr(file, LLBC_BACKLASH_A);
+        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_SLASH_A));
+        LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+        #else
+        const char *fileBaseName = strrchr(file, LLBC_SLASH_A);
+        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_BACKLASH_A));
+        LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+        #endif
+    }
+
+    const auto now = LLBC_Time::Now();
+    LLBC_FilePrint(to,
+                   "[Log]%s [%-5s][%s:%d %s]<%s> - ",
+                   now.ToString().c_str(),
+                   lvDesc.c_str(),
+                   file ? file : "",
+                   line,
+                   func ? func : "",
+                   tag ? tag : "");
+
 
     va_list ap;
     va_start(ap, fmt);
@@ -230,7 +260,7 @@ void LLBC_LoggerManager::UnInitOutput(int logLv, const char *tag, const char *fm
     }
     else
     {
-        char fmtBuf[256];
+        char fmtBuf[512];
         const int len = vsnprintf(fmtBuf,
                                   sizeof(fmtBuf),
                                   fmt,

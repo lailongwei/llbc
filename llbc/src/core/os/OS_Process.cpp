@@ -310,10 +310,10 @@ static void __NonWin32CrashHandler(int sig)
                       now);
     LLBC_DoIf(fmtRet < 0, raise(sig));
 
-    int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+    int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
     LLBC_DoIf(coreDescFileFd == -1, raise(sig));
 
-    char descFileHead[128];
+    char descFileHead[64];
     fmtRet = snprintf(descFileHead,
                       sizeof(descFileHead),
                       "Stack BackTrace(signal:%d):\n",
@@ -326,19 +326,23 @@ static void __NonWin32CrashHandler(int sig)
 
     const auto framesCnt = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
     backtrace_symbols_fd(__frames, framesCnt, coreDescFileFd);
-    close(coreDescFileFd);
+    fsync(coreDescFileFd);
 
     // Call callback delegate.
-    if (__crashCallback &&
-        (coreDescFileFd = open(__coreDescFilePath, O_RDONLY)) != -1)
+    if (__crashCallback)
     {
-        auto readRet = read(coreDescFileFd, __stackBacktrace, sizeof(__stackBacktrace) - 1);
+        LLBC_DoIf(lseek(coreDescFd), 0, SEEK_SET) == -1, close(coreFileFd); raise(sig));
+        auto readRet = read(coreFileFd, __stackBacktrace, sizeof(__stackBacktrace) - 1);
         if (readRet >= 0)
             __stackBacktrace[readRet] = '\0';
 
         close(coreDescFileFd);
 
         __crashCallback(__stackBacktrace, sig);
+    }
+    else
+    {
+        close(coreDescFileFd);
     }
 
     // Finalize logger manager.

@@ -28,7 +28,7 @@ namespace
 class EchoServerComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
         // 消息注册, 因echo实现为流式协议实现, opcode为0
         LLBC_Service *svc = GetService();
@@ -94,7 +94,7 @@ private:
 class EchoClientComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
         // 同EchoServerComp, 订阅
         LLBC_Service *svc = GetService();

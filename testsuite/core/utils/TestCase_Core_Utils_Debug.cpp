@@ -24,7 +24,7 @@
 
 int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/utils/Util_Debug test:");
+    LLBC_PrintLn("core/utils/Util_Debug test:");
 
     // Byte2Hex test.
     char str[256];
@@ -33,71 +33,71 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         str[i] = static_cast<char>(i);
     }
 
-    LLBC_PrintLine("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, 32).c_str());
-    LLBC_PrintLine("");
+    LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, 32).c_str());
+    LLBC_PrintLn("");
 
     // CPUTime test.
-    LLBC_PrintLine("Test CPUTime:");
+    LLBC_PrintLn("Test CPUTime:");
     {
-        LLBC_PrintLine("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
-        LLBC_PrintLine("");
+        LLBC_PrintLn("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
+        LLBC_PrintLn("");
     }
 
     {
-        LLBC_PrintLine("- LLBC_CPUTime(1000) + LLBC_CPUTime(1000) = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) + LLBC_CPUTime(1000) = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) + LLBC_CPUTime(1000)));
-        LLBC_PrintLine("- LLBC_CPUTime(1000) - LLBC_CPUTime(500) = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) - LLBC_CPUTime(500) = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(500)));
-        LLBC_PrintLine("- LLBC_CPUTime(1000) - LLBC_CPUTime(2000) = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) - LLBC_CPUTime(2000) = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(2000)));
 
-        LLBC_PrintLine("- LLBC_CPUTime(1000) += 500 = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) += 500 = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) += 500));
-        LLBC_PrintLine("- LLBC_CPUTime(1000) -= 500 = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) -= 500 = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) -= 500));
-        LLBC_PrintLine("- LLBC_CPUTime(1000) -= 2000 = %llu", 
+        LLBC_PrintLn("- LLBC_CPUTime(1000) -= 2000 = %llu", 
                        static_cast<uint64>(LLBC_CPUTime(1000) -= 2000));
 
-        LLBC_PrintLine("- LLBC_CPUTime(1000) > LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) > LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) > LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLine("- LLBC_CPUTime(1000) >= LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) >= LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) >= LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLine("- LLBC_CPUTime(1000) < LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) < LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) < LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLine("- LLBC_CPUTime(1000) <= LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) <= LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) <= LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLine("- LLBC_CPUTime(1000) == LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) == LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) == LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLine("- LLBC_CPUTime(1000) != LLBC_CPUTime(500) = %s",
+        LLBC_PrintLn("- LLBC_CPUTime(1000) != LLBC_CPUTime(500) = %s",
                        LLBC_CPUTime(1000) != LLBC_CPUTime(500) ? "true" : "false");
     }
 
     {
         int loopTimes = 10000000;
-        LLBC_PrintLine("- Test foreach empty loop %d times time cost", loopTimes);
+        LLBC_PrintLn("- Test foreach empty loop %d times time cost", loopTimes);
         LLBC_CPUTime beg = LLBC_CPUTime::Current();
         for (int i = 0; i < loopTimes; ++i)
         {
         }
 
         LLBC_CPUTime cost = LLBC_CPUTime::Current() - beg;
-        LLBC_PrintLine("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
+        LLBC_PrintLn("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
                        cost.GetCPUCount(), cost.ToString().c_str());
-        LLBC_PrintLine("");
+        LLBC_PrintLn("");
     }
 
     {
-        LLBC_PrintLine("- Test static LLBC_CPUTime::ToXXX() method:");
-        LLBC_PrintLine("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
-        LLBC_PrintLine("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%d", LLBC_CPUTime::ToMilliSeconds(100000000llu));
-        LLBC_PrintLine("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%d", LLBC_CPUTime::ToMicroSeconds(10000000llu));
-        LLBC_PrintLine("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%d", LLBC_CPUTime::ToNanoSeconds(1000000llu));
-        LLBC_PrintLine("");
+        LLBC_PrintLn("- Test static LLBC_CPUTime::ToXXX() method:");
+        LLBC_PrintLn("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%d", LLBC_CPUTime::ToMilliSeconds(100000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%d", LLBC_CPUTime::ToMicroSeconds(10000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%d", LLBC_CPUTime::ToNanoSeconds(1000000llu));
+        LLBC_PrintLn("");
     }
 
-    LLBC_PrintLine("");
+    LLBC_PrintLn("");
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

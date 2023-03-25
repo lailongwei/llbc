@@ -36,14 +36,14 @@ namespace
         {
             _updateTimes = 0;
             _beginUpdateTime = 0;
-            LLBC_PrintLine("Service %s start", GetService()->GetName().c_str());
+            LLBC_PrintLn("Service %s start", GetService()->GetName().c_str());
 
             return true;
         }
 
         virtual void OnStop(bool &stopFinished)
         {
-            LLBC_PrintLine("Service %s stop", GetService()->GetName().c_str());
+            LLBC_PrintLn("Service %s stop", GetService()->GetName().c_str());
         }
 
         virtual void OnUpdate()
@@ -57,7 +57,7 @@ namespace
                 double elapsed = static_cast<double>(LLBC_GetMilliSeconds() - _beginUpdateTime);
                 double updateSpeed = _updateTimes / elapsed;
 
-                LLBC_PrintLine("Elapsed time: %f, updateSpeed(per ms): %.3f", elapsed, updateSpeed);
+                LLBC_PrintLn("Elapsed time: %f, updateSpeed(per ms): %.3f", elapsed, updateSpeed);
             }
         }
 
@@ -77,7 +77,7 @@ TestCase_Comm_SvcFps::~TestCase_Comm_SvcFps()
 
 int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Service FPS test:");
+    LLBC_PrintLn("Service FPS test:");
 
     LLBC_Service *fpsTestSvc = LLBC_Service::Create("FPSTestService");
     fpsTestSvc->AddComponent(new TestComp);
@@ -85,7 +85,7 @@ int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
 
     fpsTestSvc->Start();
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     delete fpsTestSvc;

@@ -32,7 +32,7 @@ TestCase_Core_Entity::~TestCase_Core_Entity()
 
 int TestCase_Core_Entity::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/entity test:");
+    LLBC_PrintLn("core/entity test:");
 
     LLBC_Entity entity;
     entity.AddProperty("sint8Prop", LLBC_Variant((sint8)-8));
@@ -64,7 +64,7 @@ int TestCase_Core_Entity::Run(int argc, char *argv[])
     std::cout <<"behavior2 " <<behavior2 <<std::endl;
     std::cout <<"behavior3 " <<entity.GetBehavior<LLBC_String>(3) <<std::endl;
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

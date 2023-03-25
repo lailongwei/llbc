@@ -79,12 +79,12 @@ namespace
     public:
         TestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         ~TestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -94,18 +94,18 @@ namespace
         ReflectionableTestObj()
         : _poolInst(nullptr)
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         ~ReflectionableTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
             _poolInst = &poolInst;
         }
 
@@ -143,18 +143,18 @@ namespace
     public:
         ClearableTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         ~ClearableTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void Clear()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -163,18 +163,18 @@ namespace
     public:
         ReferencableTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         virtual ~ReferencableTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void Clear()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -183,12 +183,12 @@ namespace
     public:
         ObjectReflectionBaseTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         virtual ~ObjectReflectionBaseTestObj()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
 
         void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
@@ -204,7 +204,7 @@ namespace
     public:
         void Clear()
         {
-            LLBC_PrintLine("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -347,7 +347,7 @@ TestCase_Core_ObjectPool::~TestCase_Core_ObjectPool()
 
 int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/objectpool test:");
+    LLBC_PrintLn("core/objectpool test:");
 
     DoBasicTest();
     DoStatTest();
@@ -358,7 +358,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     DoPoolDebugAssetTest();
     DoStringSpecificPoolInstTest();
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;
@@ -366,7 +366,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
 
 void TestCase_Core_ObjectPool::DoBasicTest()
 {
-    LLBC_PrintLine("Begin object pool basic test:");
+    LLBC_PrintLn("Begin object pool basic test:");
 
     // Test Get/Release
     {
@@ -379,30 +379,30 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         pool.Release(vec1);
 
         const int testTimes = 10;
-        LLBC_PrintLine("LLBC_ObjectPool<>:Get/Release test(test times:%d):", testTimes);
+        LLBC_PrintLn("LLBC_ObjectPool<>:Get/Release test(test times:%d):", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
-            LLBC_PrintLine("  -> Get TestObj...");
+            LLBC_PrintLn("  -> Get TestObj...");
             TestObj *obj = pool.Get<TestObj>();
 
-            LLBC_PrintLine("  -> Release TestObj...");
+            LLBC_PrintLn("  -> Release TestObj...");
             pool.Release(obj);
         }
 
-        LLBC_PrintLine("LLBC_ObjectPool<>:Get/Release test(clearable obj)(test times:%d):", testTimes);
+        LLBC_PrintLn("LLBC_ObjectPool<>:Get/Release test(clearable obj)(test times:%d):", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
-            LLBC_PrintLine("  -> Get ClearableTestObj...");
+            LLBC_PrintLn("  -> Get ClearableTestObj...");
             ClearableTestObj *obj = pool.Get<ClearableTestObj>();
 
-            LLBC_PrintLine("  -> Release ClearableTestObj...");
+            LLBC_PrintLn("  -> Release ClearableTestObj...");
             pool.Release(obj);
         }
 
-        LLBC_PrintLine("LLBC_ObjectPool<>:GetGuarded test(clearable obj)(test times:%d):", testTimes);
+        LLBC_PrintLn("LLBC_ObjectPool<>:GetGuarded test(clearable obj)(test times:%d):", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
-            LLBC_PrintLine("  -> Get(Guarded) ClearableTestObj...");
+            LLBC_PrintLn("  -> Get(Guarded) ClearableTestObj...");
             LLBC_ObjectGuard<ClearableTestObj> obj = pool.GetGuarded<ClearableTestObj>();
         }
     }
@@ -412,14 +412,14 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         LLBC_ObjectPool<> pool;
 
         const int testTimes = 10;
-        LLBC_PrintLine("ReflectionTestObj object test(times:%d)", testTimes);
-        LLBC_PrintLine("Is <ReflectionableTestObj> supported pool-object reflection:%s", 
+        LLBC_PrintLn("ReflectionTestObj object test(times:%d)", testTimes);
+        LLBC_PrintLn("Is <ReflectionableTestObj> supported pool-object reflection:%s", 
                        LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<ReflectionableTestObj>() ? "True" : "False");
 
         ReflectionableTestObj *ro = pool.Get<ReflectionableTestObj>();
-        LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
-        LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
-        LLBC_PrintLine("Reflection method support:Recycle():");
+        LLBC_PrintLn("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
+        LLBC_PrintLn("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
+        LLBC_PrintLn("Reflection method support:Recycle():");
         LLBC_PoolObjectReflection::Recycle(ro);
 
         LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
@@ -437,14 +437,14 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         LLBC_ObjectPool<> pool;
 
         const int testTimes = 10;
-        LLBC_PrintLine("ObjectReflectionBaseTestObj object test(times:%d)", testTimes);
-        LLBC_PrintLine("Is <ObjectReflectionBaseTestObj supported pool-object reflection:%s",
+        LLBC_PrintLn("ObjectReflectionBaseTestObj object test(times:%d)", testTimes);
+        LLBC_PrintLn("Is <ObjectReflectionBaseTestObj supported pool-object reflection:%s",
                        LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<ObjectReflectionBaseTestObj>() ? "True" : "False");
 
         ObjectReflectionBaseTestObj *ro = pool.Get<ObjectReflectionBaseTestObj>();
-        LLBC_PrintLine("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
-        LLBC_PrintLine("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
-        LLBC_PrintLine("Reflection method support:Recycle():");
+        LLBC_PrintLn("Reflection method support:IsPoolObject(): %s", LLBC_PoolObjectReflection::IsPoolObject(ro) ? "True" : "False");
+        LLBC_PrintLn("Reflection method support:GetPoolInst(): %p", LLBC_PoolObjectReflection::GetPoolInst(ro));
+        LLBC_PrintLn("Reflection method support:Recycle():");
         LLBC_PoolObjectReflection::Recycle(ro);
 
         LLBC_ObjectGuard<LLBC_Packet> pkt = pool.GetGuarded<LLBC_Packet>();
@@ -463,7 +463,7 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         LLBC_ObjectPool<> pool;
 
         const int testTimes = 10;
-        LLBC_PrintLine("Referencable object test(times: %d)", testTimes);
+        LLBC_PrintLn("Referencable object test(times: %d)", testTimes);
         for (int i = 0; i < testTimes; ++i)
         {
             ReferencableTestObj *obj = pool.GetReferencable<ReferencableTestObj>();
@@ -471,12 +471,12 @@ void TestCase_Core_ObjectPool::DoBasicTest()
         }
     }
 
-    LLBC_PrintLine("Object pool basic test finished");
+    LLBC_PrintLn("Object pool basic test finished");
 }
 
 void TestCase_Core_ObjectPool::DoStatTest()
 {
-    LLBC_PrintLine("Object pool stat test:");
+    LLBC_PrintLn("Object pool stat test:");
     LLBC_UnsafetyObjectPool ob;
     ob.GetGuarded<char>();
     ob.GetGuarded<sint16>();
@@ -488,20 +488,20 @@ void TestCase_Core_ObjectPool::DoStatTest()
     LLBC_ObjectPoolStat stat;
     ob.Stat(stat);
 
-    LLBC_PrintLine("After stat(use 2 shift spaces):\n%s", stat.ToString(2).c_str());
+    LLBC_PrintLn("After stat(use 2 shift spaces):\n%s", stat.ToString(2).c_str());
 }
 
 void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
 {
-    LLBC_PrintLine("Do ordered delete test(Please use debug tools too check test result):");
+    LLBC_PrintLn("Do ordered delete test(Please use debug tools too check test result):");
 
-    LLBC_PrintLine("Test case 1: <FrontNode == nullptr && BackNode == nullptr>:");
+    LLBC_PrintLn("Test case 1: <FrontNode == nullptr && BackNode == nullptr>:");
     {
         LLBC_UnsafetyObjectPool pool;
         pool.AcquireOrderedDeletePoolInst<OD_A, OD_B>();
     }
 
-    LLBC_PrintLine("Test case 2: <FrontNode != nullptr && BackNode == nullptr>:");
+    LLBC_PrintLn("Test case 2: <FrontNode != nullptr && BackNode == nullptr>:");
     {
         {
             // Before:
@@ -529,7 +529,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         }
     }
 
-    LLBC_PrintLine("Test case 3: <FrontNode == nullptr && BackNode != nullptr>:");
+    LLBC_PrintLn("Test case 3: <FrontNode == nullptr && BackNode != nullptr>:");
     {
         {
             // Before:
@@ -556,7 +556,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         }
     }
 
-    LLBC_PrintLine("Test 4: <FrontNode != nullptr && BackNode != nullptr>:");
+    LLBC_PrintLn("Test 4: <FrontNode != nullptr && BackNode != nullptr>:");
     {
         // Before:
         //    A --> X --> Y1 --> Z1
@@ -580,7 +580,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
     }
 
-    LLBC_PrintLine("Test 5: <FrontNode != nullptr && BackNode != nullptr>(has same parent node):");
+    LLBC_PrintLn("Test 5: <FrontNode != nullptr && BackNode != nullptr>(has same parent node):");
     {
         // Before:
         //    A --> X --> Y1 --> Z1
@@ -608,7 +608,7 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
         pool.AcquireOrderedDeletePoolInst<OD_X, OD_I>();
     }
 
-    LLBC_PrintLine("Test 6: Real ordered delete test:");
+    LLBC_PrintLn("Test 6: Real ordered delete test:");
     {
         // X --> A
 
@@ -621,26 +621,26 @@ void TestCase_Core_ObjectPool::DoOrderedDeleteTest()
 
 void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
 {
-    LLBC_PrintLine("Begin object pool converience methods test:");
+    LLBC_PrintLn("Begin object pool converience methods test:");
 
     typedef std::map<int, std::string> _TestType;
 
     _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
-    LLBC_PrintLine("Get object from safety object-pool: 0x%08x, do some operations...", obj1);
+    LLBC_PrintLn("Get object from safety object-pool: 0x%08x, do some operations...", obj1);
     obj1->insert(std::make_pair(1, "Hello world!"));
     obj1->insert(std::make_pair(2, "Hey, Judy!"));
     LLBC_ReleaseObjectToSafetyPool(obj1);
-    LLBC_PrintLine("Release object to safety object-pool");
+    LLBC_PrintLn("Release object to safety object-pool");
 
     _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
-    LLBC_PrintLine("Get object from unsafety object-pool 0x%08x, do some operations...", obj2);
+    LLBC_PrintLn("Get object from unsafety object-pool 0x%08x, do some operations...", obj2);
     obj2->insert(std::make_pair(3, "Hello world!"));
     obj2->insert(std::make_pair(4, "Hey, Judy!"));
     LLBC_ReleaseObjectToUnsafetyPool(obj2);
-    LLBC_PrintLine("Release object to unafety object-pool");
+    LLBC_PrintLn("Release object to unafety object-pool");
 
     ReferencableTestObj *refObj = LLBC_GetReferencableObjectFromPool<ReferencableTestObj>();
-    LLBC_PrintLine("Get referencable-object from object-pool(unsafety) 0x%08x, do some operations...", refObj);
+    LLBC_PrintLn("Get referencable-object from object-pool(unsafety) 0x%08x, do some operations...", refObj);
     refObj->Retain();
     refObj->Release();
     refObj->Release();
@@ -654,7 +654,7 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
     int perfTestTimes = 100000;
     int perTestPerTimeLoopTimes = 100;
     #endif
-    LLBC_PrintLine("Exec performance compare test(Converience methods performance <<>> local object pools), "
+    LLBC_PrintLn("Exec performance compare test(Converience methods performance <<>> local object pools), "
                    "test times:%d, per-time loop times:%d", perfTestTimes, perTestPerTimeLoopTimes);
     LLBC_Time begTestTime = LLBC_Time::Now();
     for (int i = 0; i < perfTestTimes; ++i)
@@ -670,7 +670,7 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
         LLBC_ReleaseObjectToSafetyPool(obj1);
         LLBC_ReleaseObjectToUnsafetyPool(obj2);
     }
-    LLBC_PrintLine("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+    LLBC_PrintLn("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
     begTestTime = LLBC_Time::Now();
     objPool1.Release(objPool1.Get<_TestType>());
@@ -688,14 +688,14 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
         objPool1.Release(obj1);
         objPool2.Release(obj2);
     }
-    LLBC_PrintLine("Local object pools test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+    LLBC_PrintLn("Local object pools test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
 
-    LLBC_PrintLine("Object pool converience methods test finished");
+    LLBC_PrintLn("Object pool converience methods test finished");
 }
 
 void TestCase_Core_ObjectPool::DoPerfTest()
 {
-    LLBC_PrintLine("Begin object pool performance test:");
+    LLBC_PrintLn("Begin object pool performance test:");
 
     LLBC_UnsafetyObjectPool pool;
     std::vector<double> *poolObjs[ListSize];
@@ -713,7 +713,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     }
 
     // New/Delete test.
-    LLBC_PrintLine("Test new/delete ...");
+    LLBC_PrintLn("Test new/delete ...");
     LLBC_Time begTime = LLBC_Time::Now();
     for (int i = 0; i < TestTimes; ++i)
     {
@@ -730,10 +730,10 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     }
 
     LLBC_TimeSpan usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLine("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
     // Thread pool test.
-    LLBC_PrintLine("Test pool Get/Release ...");
+    LLBC_PrintLn("Test pool Get/Release ...");
     begTime = LLBC_Time::Now();
     LLBC_ObjectPoolInst<std::vector<double> > *poolInst = pool.GetPoolInst<std::vector<double> >();
     for (int i = 0; i < TestTimes; ++i)
@@ -751,10 +751,10 @@ void TestCase_Core_ObjectPool::DoPerfTest()
             poolInst->ReleaseObject(poolObjs[j]);
     }
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLine("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
     // Multithread test.
-    LLBC_PrintLine("Test multiThread pool Get/Release ...");
+    LLBC_PrintLn("Test multiThread pool Get/Release ...");
     begTime = LLBC_Time::Now();
 
     const int threadNums = 4;
@@ -764,10 +764,10 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     delete task;
 
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLine("MultiThread pool Get/Release test finished, used time: %lld, thread nums: %d", usedTime.GetTotalMicroSeconds(), threadNums);
+    LLBC_PrintLn("MultiThread pool Get/Release test finished, used time: %lld, thread nums: %d", usedTime.GetTotalMicroSeconds(), threadNums);
 
     // Guarded object test.
-    LLBC_PrintLine("Guarded object test(please debug it)...");
+    LLBC_PrintLn("Guarded object test(please debug it)...");
     {
         LLBC_ObjectGuard<std::vector<int> > obj = pool.GetGuarded<std::vector<int> >();
 
@@ -782,14 +782,14 @@ void TestCase_Core_ObjectPool::DoPerfTest()
         obj2->push_back(40.0);
     }
 
-    LLBC_PrintLine("Guarded object test finished");
+    LLBC_PrintLn("Guarded object test finished");
 
-    LLBC_PrintLine("Object pool performance test finished");
+    LLBC_PrintLn("Object pool performance test finished");
 }
 
 void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
 {
-    LLBC_PrintLine("Begin complex object<ComplexObj> pool performance test:");
+    LLBC_PrintLn("Begin complex object<ComplexObj> pool performance test:");
 
     LLBC_UnsafetyObjectPool pool;
     ComplexObj *poolObjs[ListSize];
@@ -807,7 +807,7 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
     }
 
     // New/Delete test.
-    LLBC_PrintLine("Test new/delete ...");
+    LLBC_PrintLn("Test new/delete ...");
     LLBC_Time begTime = LLBC_Time::Now();
     for (int i = 0; i < ComplexTestTimes; ++i)
     {
@@ -835,10 +835,10 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
     }
 
     LLBC_TimeSpan usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLine("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
     // Thread pool test.
-    LLBC_PrintLine("Test pool Get/Release ...");
+    LLBC_PrintLn("Test pool Get/Release ...");
     begTime = LLBC_Time::Now();
     LLBC_ObjectPoolInst<ComplexObj> *poolInst = pool.GetPoolInst<ComplexObj>();
     for (int i = 0; i < ComplexTestTimes; ++i)
@@ -874,16 +874,16 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
             poolInst->Release(poolObjs[j]);
     }
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLine("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
 
-    LLBC_PrintLine("Object pool performance test finished");
+    LLBC_PrintLn("Object pool performance test finished");
 
 }
 
 void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
 {
 #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    LLBC_PrintLine("Not enabled pool debug option<LLBC_CFG_CORE_OBJECT_POOL_DEBUG>, please enable it!");
+    LLBC_PrintLn("Not enabled pool debug option<LLBC_CFG_CORE_OBJECT_POOL_DEBUG>, please enable it!");
     return;
 #endif
 
@@ -905,22 +905,22 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
 
 void TestCase_Core_ObjectPool::DoStringSpecificPoolInstTest()
 {
-    LLBC_PrintLine("\nDoStringSpecificPoolInstTest begin...");
+    LLBC_PrintLn("\nDoStringSpecificPoolInstTest begin...");
     LLBC_UnsafetyObjectPool pool;
 
     LLBC_ObjectPoolInst<std::string> *stdStringPoolInst = pool.GetPoolInst<std::string>();
-    //LLBC_PrintLine("std::string pool inst ptr %p  %p", stdStringPoolInst, pool.GetStdStringPoolInst());
+    //LLBC_PrintLn("std::string pool inst ptr %p  %p", stdStringPoolInst, pool.GetStdStringPoolInst());
     std::string *stdString = stdStringPoolInst->GetObject();
     stdString->assign("std::string specific test...");
-    LLBC_PrintLine("%s", stdString->c_str());
+    LLBC_PrintLn("%s", stdString->c_str());
     stdStringPoolInst->Release(stdString);
 
     LLBC_ObjectPoolInst<LLBC_String> *llbcStringPoolInst = pool.GetPoolInst<LLBC_String>();
-    //LLBC_PrintLine("std::string pool inst ptr %p  %p", llbcStringPoolInst, pool.GetLLBCStringPoolInst());
+    //LLBC_PrintLn("std::string pool inst ptr %p  %p", llbcStringPoolInst, pool.GetLLBCStringPoolInst());
     LLBC_String *llbcString = llbcStringPoolInst->GetObject();
     llbcString->assign("LLBC_String specific test...");
-    LLBC_PrintLine("%s", llbcString->c_str());
+    LLBC_PrintLn("%s", llbcString->c_str());
     llbcStringPoolInst->Release(llbcString);
 
-    LLBC_PrintLine("DoStringSpecificPoolInstTest end...\n");
+    LLBC_PrintLn("DoStringSpecificPoolInstTest end...\n");
 }

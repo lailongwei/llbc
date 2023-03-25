@@ -29,13 +29,13 @@ namespace
     public:
         void BeforeRun(LLBC_Service *svc, const LLBC_Variant &data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
             svc->Post(this, &LazyClass::AfterRun, data);
         }
 
         void AfterRun(LLBC_Service *svc, const LLBC_Variant &data)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
 
             svc->Post(this, &LazyClass::BeforeRun, data);
         }
@@ -52,7 +52,7 @@ TestCase_Comm_LazyTask::~TestCase_Comm_LazyTask()
 
 int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("service/lazy task test:");
+    LLBC_PrintLn("service/lazy task test:");
 
     LLBC_Service *svc = LLBC_Service::Create("LazyTaskTest");
 
@@ -66,7 +66,7 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 
     svc->Start();
 
-    LLBC_PrintLine("Press any key to exit...");
+    LLBC_PrintLn("Press any key to exit...");
     getchar();
 
     delete svc;
