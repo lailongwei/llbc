@@ -319,9 +319,10 @@ private:
     void FlushAppenders();
 
     /**
-     * Lockless uninstall error hook.
+     * Clear logger non-runnable data members.
+     * @param[in] keepErrNo - keep errno(included sub errno) or not, default is true.
      */
-    void UninstallHookLockless(int level);
+    void ClearNonRunnableMembers(bool keepErrNo = true);
 
 private:
     LLBC_String _name;

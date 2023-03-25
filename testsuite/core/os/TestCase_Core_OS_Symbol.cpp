@@ -68,7 +68,7 @@ void TestCase_Core_OS_Symbol::Goo2()
     int a = 3;
     int b = 4;
     a += b;
-    LLBC_Print("a:%d, b:%d", a, b);
+    LLBC_Print("a:%d, b:%d\n", a, b);
     Goo3();
 }
 

@@ -669,7 +669,7 @@ private:
     std::map<int, _ReadySessionInfo *> _readySessionInfos;
     LLBC_SpinLock _readySessionInfosLock;
 
-    std::vector<LLBC_Component *> _willRegComps;
+    std::list<LLBC_Component *> _willRegComps;
     volatile bool _compsInitFinished;
     volatile int _compsInitRet;
     volatile bool _compsStartFinished;
