@@ -78,7 +78,7 @@ public:
 
     /**
      * Get config type.
-     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     * @return int - the config type, see LLBC_AppConfigType enum.
      */
     virtual int GetConfigType() const;
 

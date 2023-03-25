@@ -72,7 +72,7 @@ public:
 private:
     void OnTimeout_ReloadCfg(LLBC_Timer *timer)
     {
-        LLBC_Application::ThisApp()->ReloadConfig();
+        LLBC_App::ThisApp()->ReloadConfig();
     }
 
 private:
@@ -96,7 +96,7 @@ public:
     }
 };
 
-class TestApp : public LLBC_Application
+class TestApp : public LLBC_App
 {
 public:
     TestApp(LLBC_TimeSpan startNeedTime, LLBC_TimeSpan stopNeedTime)
@@ -117,7 +117,7 @@ public:
         {
             std::cout << "App has config" << std::endl;
             std::cout << "- cfg path:" << GetConfigPath() << std::endl;
-            if (GetConfigType() == LLBC_ApplicationConfigType::Property)
+            if (GetConfigType() == LLBC_AppConfigType::Property)
             {
                 LLBC_String propCnt;
                 GetPropertyConfig().SaveToContent(propCnt);

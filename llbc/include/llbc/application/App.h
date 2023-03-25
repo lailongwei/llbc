@@ -41,7 +41,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The application config type enumeration.
  */
-class LLBC_EXPORT LLBC_ApplicationConfigType
+class LLBC_EXPORT LLBC_AppConfigType
 {
 public:
     enum ENUM
@@ -72,7 +72,7 @@ public:
 /**
  * \brief The application event type enumeration.
  */
-class LLBC_ApplicationEventType
+class LLBC_AppEventType
 {
 public:
     enum ENUM
@@ -103,7 +103,7 @@ struct LLBC_ApplicationEvent
 /**
  * \brief The application start phase encapsulation.
  */
-class LLBC_ApplicationStartPhase
+class LLBC_AppStartPhase
 {
 public:
     enum ENUM
@@ -122,11 +122,11 @@ public:
  * \brief The application interface class encapsulation.
  *        Note: Please call Start/Wait/Stop method at main thread.
  */
-class LLBC_EXPORT LLBC_Application
+class LLBC_EXPORT LLBC_App
 {
 public:
-    LLBC_Application();
-    virtual ~LLBC_Application();
+    LLBC_App();
+    virtual ~LLBC_App();
 
 public:
     /**
@@ -187,7 +187,7 @@ public:
      */
     template <typename App>
     static App *ThisApp();
-    static LLBC_Application *ThisApp();
+    static LLBC_App *ThisApp();
 
 public:
     /**
@@ -210,9 +210,9 @@ public:
 
     /**
      * Get application config type.
-     * @return LLBC_ApplicationConfigType::ENUM - application config type.
+     * @return LLBC_AppConfigType::ENUM - application config type.
      */
-    LLBC_ApplicationConfigType::ENUM GetConfigType() const;
+    LLBC_AppConfigType::ENUM GetConfigType() const;
 
     /**
      * Get application config path.
@@ -372,7 +372,7 @@ private:
 
 protected:
     LLBC_String _name;
-    volatile LLBC_ApplicationStartPhase::ENUM _startPhase;
+    volatile LLBC_AppStartPhase::ENUM _startPhase;
 
     bool _llbcLibStartupInApp;
 
@@ -382,7 +382,7 @@ protected:
     LLBC_Property _propCfg;
     LLBC_Variant _nonPropCfg;
     LLBC_String _cfgPath;
-    LLBC_ApplicationConfigType::ENUM _cfgType;
+    LLBC_AppConfigType::ENUM _cfgType;
 
     LLBC_ServiceMgr &_services;
 
@@ -397,11 +397,11 @@ private:
     std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _libEventHandlers;
     std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _logicEventHandlers;
 
-    static LLBC_Application *_thisApp;
+    static LLBC_App *_thisApp;
 };
 
 __LLBC_NS_END
 
-#include "llbc/application/ApplicationInl.h"
+#include "llbc/application/AppInl.h"
 
 

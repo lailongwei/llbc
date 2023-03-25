@@ -96,7 +96,7 @@ public:
 
     /**
      * Get config type.
-     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     * @return int - the config type, see LLBC_AppConfigType enum.
      */
     virtual int GetConfigType() const = 0;
 
@@ -639,11 +639,11 @@ protected:
     friend class LLBC_Component;
 
     /**
-     * Declare friend class: LLBC_Application.
+     * Declare friend class: LLBC_App.
      *  Access method list:
      *      ProcessAppConfigReload()
      */
-    friend class LLBC_Application;
+    friend class LLBC_App;
 
     /**
      * Process application config reload event.

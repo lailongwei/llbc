@@ -33,7 +33,7 @@ namespace
         }
     };
 
-    class TestApp : public LLBC_Application
+    class TestApp : public LLBC_App
     {
     public:
         TestApp()
