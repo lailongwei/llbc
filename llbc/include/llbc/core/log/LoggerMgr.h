@@ -101,7 +101,7 @@ public:
                       int line,
                       const char *func,
                       const char *fmt,
-                      ...) LLBC_STRING_FORMAT_CHECK(4, 5);
+                      ...) LLBC_STRING_FORMAT_CHECK(7, 8);
 
 private:
     mutable LLBC_DummyLock _lock;
