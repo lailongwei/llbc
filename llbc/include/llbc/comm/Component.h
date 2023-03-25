@@ -562,15 +562,15 @@ public:
     /**
      * Application phase change event handler, when application start phase changed, will call these event handlers.
      */
-    virtual void OnApplicationEarlyStart();
-    virtual void OnApplicationStartFail();
-    virtual void OnApplicationStartFinish();
-    virtual void OnApplicationEarlyStop();
+    virtual void OnAppEarlyStart();
+    virtual void OnAppStartFail();
+    virtual void OnAppStartFinish();
+    virtual void OnAppEarlyStop();
 
     /**
      * When application config reload, will call this event handler.
      */
-    virtual void OnApplicationConfigReload();
+    virtual void OnAppConfigReload();
 
 public:
     /**

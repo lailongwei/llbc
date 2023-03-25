@@ -52,7 +52,7 @@ public:
         cfgReloadTimer_.Cancel();
     }
 
-    virtual void OnApplicationConfigReload()
+    virtual void OnAppConfigReload()
     {
         std::cout << "[" << GetService()->GetName()
                   << "."
