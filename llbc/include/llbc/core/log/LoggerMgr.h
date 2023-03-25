@@ -47,11 +47,11 @@ __LLBC_NS_BEGIN
 /**
  * \brief The logger manager class encapsulation.
  */
-class LLBC_EXPORT LLBC_LoggerManager
+class LLBC_EXPORT LLBC_LoggerMgr
 {
 public:
-    LLBC_LoggerManager();
-    ~LLBC_LoggerManager();
+    LLBC_LoggerMgr();
+    ~LLBC_LoggerMgr();
 
 public:
     /**
@@ -122,8 +122,8 @@ private:
 /**
  * Singleton class macro define.
  */
-template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
-#define LLBC_LoggerManagerSingleton LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerManager>::Instance()
+template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerMgr>;
+#define LLBC_LoggerMgrSingleton LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>::Instance()
 
 /**
  * @brief The llbc library log macro define.
@@ -135,7 +135,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  */
 #define LLOG(loggerName, tag, level, fmt, ...)            \
     do {                                                  \
-        auto __loggerMgr__ = LLBC_LoggerManagerSingleton; \
+        auto __loggerMgr__ = LLBC_LoggerMgrSingleton;     \
         if (LIKELY(__loggerMgr__->IsInited())) {          \
             LLBC_NS LLBC_Logger *__l__;                   \
             if (loggerName != nullptr) {                  \
@@ -207,10 +207,10 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  */
 #define LJLOG(loggerName, tag, level)                    \
         (*(new LLBC_NS LLBC_LogJsonMsg(                  \
-                   LIKELY(LLBC_LoggerManagerSingleton->IsInited()) ? \
+                   LIKELY(LLBC_LoggerMgrSingleton->IsInited()) ? \
                         (loggerName != nullptr ?         \
-                            LLBC_LoggerManagerSingleton->GetLogger(loggerName) : \
-                                LLBC_LoggerManagerSingleton->GetRootLogger()) : nullptr, \
+                            LLBC_LoggerMgrSingleton->GetLogger(loggerName) : \
+                                LLBC_LoggerMgrSingleton->GetRootLogger()) : nullptr, \
                    tag,                                  \
                    level,                                \
                    __FILE__,                             \
@@ -257,7 +257,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
  */
 #define LSLOG(loggerName, tag, level, streamMsg)               \
     do {                                                       \
-        auto __loggerMgr__ = LLBC_LoggerManagerSingleton;      \
+        auto __loggerMgr__ = LLBC_LoggerMgrSingleton;          \
         if (LIKELY(__loggerMgr__->IsInited())) {               \
             LLBC_NS LLBC_Logger *__l__;                        \
             if (loggerName != nullptr) {                       \
@@ -284,7 +284,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
         }                                                      \
         else {                                                 \
             LLBC_NS LLBC_LogMessageBuffer __lmb__;             \
-            LLBC_LoggerManagerSingleton->UnInitOutput(         \
+            LLBC_LoggerMgrSingleton->UnInitOutput(             \
                 level,                                         \
                 tag,                                           \
                 __FILE__,                                      \
@@ -329,6 +329,6 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerManager>;
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LoggerManagerInl.h"
+#include "llbc/core/log/LoggerMgrInl.h"
 
 

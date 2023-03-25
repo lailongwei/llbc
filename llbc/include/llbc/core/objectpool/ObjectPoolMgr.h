@@ -36,7 +36,7 @@ LLBC_EXPORT LLBC_SafetyObjectPool &__LLBC_GlobalObjectPool();
 /**
  * \brief The thread object pool manager class encapsulation.
  */
-class LLBC_EXPORT LLBC_ThreadObjectPoolManager
+class LLBC_EXPORT LLBC_ThreadObjectPoolMgr
 {
 public:
     /**
@@ -138,6 +138,6 @@ ReferencableObjectType *LLBC_GetReferencableObjectFromPool(bool autoRelease = fa
 
 __LLBC_NS_END
 
-#include "llbc/core/objectpool/ObjectPoolManagerInl.h"
+#include "llbc/core/objectpool/ObjectPoolMgrInl.h"
 
 

@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objectpool/ObjectPoolManager.h"
+#include "llbc/core/objectpool/ObjectPoolMgr.h"
 
 __LLBC_INTERNAL_NS_BEGIN
 
@@ -34,7 +34,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools()
+int LLBC_ThreadObjectPoolMgr::CreateEntryThreadObjectPools()
 {
     LLBC_INL_NS __g_globalObjectPool = new LLBC_SafetyObjectPool;
 
@@ -59,7 +59,7 @@ int LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools()
     return LLBC_OK;
 }
 
-int LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools()
+int LLBC_ThreadObjectPoolMgr::DestroyEntryThreadObjectPools()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (!tls->coreTls.entryThread)
@@ -85,17 +85,17 @@ int LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools()
     return LLBC_OK;
 }
 
-LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolManager::GetEntryThreadSafetyObjectPool()
+LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadSafetyObjectPool()
 {
     return LLBC_INTERNAL_NS __g_entryThreadSafetyObjectPool;
 }
 
-LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolManager::GetEntryThreadUnsafetyObjectPool()
+LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadUnsafetyObjectPool()
 {
     return LLBC_INTERNAL_NS __g_entryThreadUnsafetyObjectPool;
 }
 
-LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPool()
+LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadSafetyObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (UNLIKELY(tls->coreTls.safetyObjectPool == nullptr))
@@ -104,7 +104,7 @@ LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolManager::GetCurThreadSafetyObjectPoo
     return reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
 }
 
-LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolManager::GetCurThreadUnsafetyObjectPool()
+LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (UNLIKELY(tls->coreTls.unsafetyObjectPool == nullptr))

@@ -27,7 +27,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &cfgFile))
         return nullptr;
 
-    LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
+    LLBC_LoggerMgr *loggerMgr = LLBC_LoggerMgrSingleton;
     if (loggerMgr->Initialize(cfgFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
@@ -39,7 +39,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
 
 LLBC_EXTERN_C PyObject *_pyllbc_UnInitLoggerMgr(PyObject *self, PyObject *args)
 {
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     Py_RETURN_NONE;
 }
@@ -59,7 +59,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iOiOs|ss", &level, &fileNameObj, &line, &funcNameObj, &msg, &loggerName, &tag))
         return nullptr;
 
-    LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
+    LLBC_LoggerMgr *loggerMgr = LLBC_LoggerMgrSingleton;
     LLBC_Logger *logger = (!loggerName || strcmp(loggerName, "root") == 0) ? 
             loggerMgr->GetRootLogger() : loggerMgr->GetLogger(loggerName);
     if (!logger)

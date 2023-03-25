@@ -25,7 +25,7 @@
 #include "llbc/core/log/LogLevel.h"
 
 #include "llbc/core/log/Logger.h"
-#include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 #include "llbc/core/log/LogJsonMsg.h"
 

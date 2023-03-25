@@ -27,7 +27,7 @@
 #if LLBC_SUPPORT_HOOK_PROCESS_CRASH
 #include "llbc/core/file/Directory.h"
 #endif
-#include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 #if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
 #pragma GCC diagnostic push
@@ -199,7 +199,7 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     if (__crashCallback)
         __crashCallback(__stackBacktrace, 0);
 
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -346,7 +346,7 @@ static void __NonWin32CrashHandler(int sig)
     }
 
     // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     // Reraise signal.
     raise(sig);
