@@ -25,7 +25,7 @@
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/ServiceEvent.h"
 
-#include "llbc/application/App.h"
+#include "llbc/app/App.h"
 
 namespace
 {

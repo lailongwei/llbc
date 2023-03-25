@@ -25,7 +25,7 @@
 #include "pyllbc/testcase/TestCase.h"
 #include "pyllbc/core/Core.h"
 #include "pyllbc/comm/Comm.h"
-#include "pyllbc/application/Application.h"
+#include "pyllbc/app/App.h"
 
 /**
  * pyllbc library initialize function, call by python interpreter.

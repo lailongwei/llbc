@@ -19,29 +19,43 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "pyllbc/common/Export.h"
+#pragma once
 
-#include "pyllbc/application/PyApplication.h"
+#include "pyllbc/common/Common.h"
+#include "pyllbc/core/Core.h"
+#include "pyllbc/comm/Comm.h"
 
-pyllbc_Application::pyllbc_Application(PyObject *pyApp)
-: _pyApp(pyApp)
+/**
+ * \brief The python layer native application encapsulation.
+ * TODO: for now simple encapsulation.
+ */
+class LLBC_HIDDEN pyllbc_App : public LLBC_App
 {
-}
+public:
+    /**
+     * Ctor & Dtor.
+     */
+    pyllbc_App(PyObject *pyApp);
+    virtual ~pyllbc_App();
 
-pyllbc_Application::~pyllbc_Application()
-{
-}
+public:
+    /**
+     * Get python layer application.
+     * @return PyObject * - the python layer application, borrow reference.
+     */
+    PyObject *GetPyApp() const;
 
-PyObject * pyllbc_Application::GetPyApp() const
-{
-    return _pyApp;
-}
+public:
+    /**
+     * Application event method: OnStart.
+     */
+    virtual int OnStart(int argc, char *argv[], bool &startFinished);
 
-int pyllbc_Application::OnStart(int argc, char *argv[], bool &startFinished)
-{
-    return LLBC_OK;
-}
+    /**
+     * Application event method: OnStop.
+     */
+    virtual void OnStop(bool &stopFinished);
 
-void pyllbc_Application::OnStop(bool &stopFinished)
-{
-}
+private:
+    PyObject *_pyApp; // Borrowed reference.
+};

@@ -21,14 +21,14 @@
 
 #include "pyllbc/common/Export.h"
 
-#include "pyllbc/application/PyApplication.h"
-#include "pyllbc/application/Application.h"
+#include "pyllbc/app/PyApp.h"
+#include "pyllbc/app/App.h"
 
-#include "src/application/_ApplicationMethods.h"
+#include "src/app/_AppMethods.h"
 
 void pyllbc_InitApplication()
 {
-    new pyllbc_Application(nullptr);
+    new pyllbc_App(nullptr);
 }
 
 void pyllbc_DestroyApplication()
@@ -44,6 +44,6 @@ void pyllbc_AddApplicationObjs()
     pyllbc_Module *inlMod = pyllbc_InlModule;
 
     // Add inl module methods.
-    pyllbc_ApplicationMethods &methods = *pyllbc_s_ApplicationMethods;
+    pyllbc_AppMethods &methods = *pyllbc_s_AppMethods;
     inlMod->AddMethod(methods.SetDumpFile);
 }
