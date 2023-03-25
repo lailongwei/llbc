@@ -331,7 +331,7 @@ static void __NonWin32CrashHandler(int sig)
     // Call callback delegate.
     if (__crashCallback)
     {
-        if (lseek(coreDescFd), 0, SEEK_SET) == -1)
+        if (lseek(coreDescFd, 0, SEEK_SET) == -1)
         {
             close(coreFileFd);
             raise(sig);
