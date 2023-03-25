@@ -331,7 +331,12 @@ static void __NonWin32CrashHandler(int sig)
     // Call callback delegate.
     if (__crashCallback)
     {
-        LLBC_DoIf(lseek(coreDescFd), 0, SEEK_SET) == -1, close(coreFileFd); raise(sig));
+        if (lseek(coreDescFd), 0, SEEK_SET) == -1)
+        {
+            close(coreFileFd);
+            raise(sig);
+        }
+
         auto readRet = read(coreFileFd, __stackBacktrace, sizeof(__stackBacktrace) - 1);
         if (readRet >= 0)
             __stackBacktrace[readRet] = '\0';
