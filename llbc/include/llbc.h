@@ -30,7 +30,7 @@
 /* llbc/testcase part */
 #include "llbc/testcase/BaseTestCase.h"
 /* llbc/application part */
-#include "llbc/application/Application.h"
+#include "llbc/application/App.h"
 
 __LLBC_NS_BEGIN
 

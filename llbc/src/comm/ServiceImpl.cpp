@@ -38,7 +38,7 @@
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
-#include "llbc/application/Application.h"
+#include "llbc/application/App.h"
 
 namespace
 {
@@ -79,7 +79,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _name(name.c_str(), name.length())
 , _svcThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
-, _cfgType(LLBC_ApplicationConfigType::End)
+, _cfgType(LLBC_AppConfigType::End)
 
 , _fullStack(fullStack)
 , _dftProtocolFactory(dftProtocolFactory)
@@ -1218,7 +1218,7 @@ void LLBC_ServiceImpl::ProcessAppConfigReload()
     if (!IsStarted())
         return;
 
-    auto app = LLBC_Application::ThisApp();
+    auto app = LLBC_App::ThisApp();
     Push(LLBC_SvcEvUtil::BuildAppCfgReloadEv(
         app->GetConfigType(), app->GetPropertyConfig(), app->GetConfig()));
 }
@@ -1400,7 +1400,7 @@ void LLBC_ServiceImpl::Cleanup()
 
     _propCfg.RemoveAllProperties();
     _nonPropCfg = LLBC_Variant::nil;
-    _cfgType = LLBC_ApplicationConfigType::End;
+    _cfgType = LLBC_AppConfigType::End;
 
     _compsInitFinished = false;
     _compsInitRet = LLBC_ERROR_SUCCESS;
@@ -1415,7 +1415,7 @@ void LLBC_ServiceImpl::Cleanup()
 
 void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
 {
-    auto app = LLBC_Application::ThisApp();
+    auto app = LLBC_App::ThisApp();
     if (UNLIKELY(!app))
         return;
 
@@ -1432,7 +1432,7 @@ void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
     _nonPropCfg = LLBC_Variant::nil;
 
     // Update service config.
-    if (_cfgType == LLBC_ApplicationConfigType::Property)
+    if (_cfgType == LLBC_AppConfigType::Property)
     {
         // Service config prop name:
         // <svc_name>
@@ -1446,7 +1446,7 @@ void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
     else
     {
         auto &appNonPropCfg = ev ? ev->nonPropCfg : app->GetConfig();
-        if (_cfgType == LLBC_ApplicationConfigType::Ini)
+        if (_cfgType == LLBC_AppConfigType::Ini)
         {
             // Service config section: [<svc_name>]
             // Comp config section(s): [<svc_name>.<comp_name>]
@@ -1458,7 +1458,7 @@ void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
                     _nonPropCfg[iniSectionName] = it->second;
             }
         }
-        else if (_cfgType == LLBC_ApplicationConfigType::Xml)
+        else if (_cfgType == LLBC_AppConfigType::Xml)
         {
             auto &svcCfgs = appNonPropCfg[LLBC_XMLKeys::Children];
             for (auto &svcCfg : svcCfgs.AsSeq())
@@ -1897,7 +1897,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
     }
     else if (ev.startFinish)
     {
-        if (_cfgType == LLBC_ApplicationConfigType::End)
+        if (_cfgType == LLBC_AppConfigType::End)
             UpdateServiceCfg();
 
         for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnApplicationStartFinish])

@@ -28,123 +28,123 @@ inline LLBC_ApplicationEvent::LLBC_ApplicationEvent(int evType)
 {
 }
 
-inline int LLBC_Application::OnEarlyStart(int argc, char *argv[])
+inline int LLBC_App::OnEarlyStart(int argc, char *argv[])
 {
     return LLBC_OK;
 }
 
-inline void LLBC_Application::OnLateStart(int argc, char *argv[])
+inline void LLBC_App::OnLateStart(int argc, char *argv[])
 {
 }
 
-inline void LLBC_Application::OnEarlyStop()
+inline void LLBC_App::OnEarlyStop()
 {
 }
 
-inline void LLBC_Application::OnLateStop()
+inline void LLBC_App::OnLateStop()
 {
 }
 
-inline void LLBC_Application::OnUpdate(bool &doNothing)
+inline void LLBC_App::OnUpdate(bool &doNothing)
 {
 }
 
-inline void LLBC_Application::OnConfigReload()
+inline void LLBC_App::OnConfigReload()
 {
 }
 
 template <typename App>
-inline App *LLBC_Application::ThisApp()
+inline App *LLBC_App::ThisApp()
 {
     return static_cast<App *>(_thisApp);
 }
 
-inline LLBC_Application *LLBC_Application::ThisApp()
+inline LLBC_App *LLBC_App::ThisApp()
 {
     return _thisApp;
 }
 
-inline bool LLBC_Application::HasConfig() const
+inline bool LLBC_App::HasConfig() const
 {
     return !_cfgPath.empty();
 }
 
-inline const LLBC_Property &LLBC_Application::GetPropertyConfig() const
+inline const LLBC_Property &LLBC_App::GetPropertyConfig() const
     {
     return _propCfg;
 }
 
-inline const LLBC_Variant &LLBC_Application::GetConfig() const
+inline const LLBC_Variant &LLBC_App::GetConfig() const
 {
     return _nonPropCfg;
 }
 
-inline LLBC_ApplicationConfigType::ENUM LLBC_Application::GetConfigType() const
+inline LLBC_AppConfigType::ENUM LLBC_App::GetConfigType() const
 {
     return _cfgType;
 }
 
-inline const LLBC_String &LLBC_Application::GetConfigPath() const
+inline const LLBC_String &LLBC_App::GetConfigPath() const
 {
     return _cfgPath;
 }
 
-inline bool LLBC_Application::IsStopped() const
+inline bool LLBC_App::IsStopped() const
 {
-    return _startPhase == LLBC_ApplicationStartPhase::Stopped;
+    return _startPhase == LLBC_AppStartPhase::Stopped;
 }
 
-inline bool LLBC_Application::IsStarting() const
+inline bool LLBC_App::IsStarting() const
 {
-    return _startPhase == LLBC_ApplicationStartPhase::Starting;
+    return _startPhase == LLBC_AppStartPhase::Starting;
 }
 
-inline bool LLBC_Application::IsStarted() const
+inline bool LLBC_App::IsStarted() const
 {
-    return _startPhase == LLBC_ApplicationStartPhase::Started;
+    return _startPhase == LLBC_AppStartPhase::Started;
 }
 
-inline bool LLBC_Application::IsStopping() const
+inline bool LLBC_App::IsStopping() const
 {
-    return _startPhase == LLBC_ApplicationStartPhase::Stopping;
+    return _startPhase == LLBC_AppStartPhase::Stopping;
 }
 
-inline int LLBC_Application::GetStartPhase() const
+inline int LLBC_App::GetStartPhase() const
 {
     return _startPhase;
 }
 
-inline int LLBC_Application::PushEvent(int evType)
+inline int LLBC_App::PushEvent(int evType)
 {
     return PushEvent(new LLBC_ApplicationEvent(evType));
 }
 
-inline const LLBC_String &LLBC_Application::GetName() const
+inline const LLBC_String &LLBC_App::GetName() const
 {
     return _name;
 }
 
-inline const LLBC_StartArgs &LLBC_Application::GetStartArgs() const
+inline const LLBC_StartArgs &LLBC_App::GetStartArgs() const
 {
     return _startArgs;
 }
 
-inline LLBC_Service *LLBC_Application::GetService(int id) const
+inline LLBC_Service *LLBC_App::GetService(int id) const
 {
     return _services.GetService(id);
 }
 
-inline LLBC_Service *LLBC_Application::GetService(const LLBC_CString &name) const
+inline LLBC_Service *LLBC_App::GetService(const LLBC_CString &name) const
 {
     return _services.GetService(name);
 }
 
-inline int LLBC_Application::StopService(int id, bool del)
+inline int LLBC_App::StopService(int id, bool del)
 {
     return _services.Stop(id, del);
 }
 
-inline int LLBC_Application::StopService(const LLBC_CString &name, bool del)
+inline int LLBC_App::StopService(const LLBC_CString &name, bool del)
 {
     return _services.Stop(name, del);
 }
