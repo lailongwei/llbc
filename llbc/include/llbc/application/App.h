@@ -92,12 +92,12 @@ public:
 /**
  * \brief The application event class encapsulation.
  */
-struct LLBC_ApplicationEvent
+struct LLBC_AppEvent
 {
     int evType;
     LLBC_Variant evData;
 
-    explicit LLBC_ApplicationEvent(int evType);
+    explicit LLBC_AppEvent(int evType);
 };
 
 /**
@@ -286,7 +286,7 @@ public:
      * @param[in] ev - the event object.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int PushEvent(LLBC_ApplicationEvent *ev);
+    int PushEvent(LLBC_AppEvent *ev);
 
     /**
      * Subscribe application event handler.
@@ -294,7 +294,7 @@ public:
      * @param[in] evHandler - event handler.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_ApplicationEvent &)> &evHandler);
+    int SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_AppEvent &)> &evHandler);
 
 public:
     /**
@@ -358,8 +358,8 @@ private:
 
 private:
     void HandleEvents(bool &doNothing);
-    void HandleEvent_Stop(const LLBC_ApplicationEvent &ev);
-    void HandleEvent_ReloadAppCfg(const LLBC_ApplicationEvent &ev);
+    void HandleEvent_Stop(const LLBC_AppEvent &ev);
+    void HandleEvent_ReloadAppCfg(const LLBC_AppEvent &ev);
 
     static void HandleSignal_Stop(int sig);
     static void HandleSignal_ReloadAppCfg(int sig);
@@ -393,9 +393,9 @@ private:
     bool _requireStop;
 
     LLBC_SpinLock _eventLock;
-    std::vector<LLBC_ApplicationEvent *> _events[2];
-    std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _libEventHandlers;
-    std::map<int, LLBC_Delegate<void(const LLBC_ApplicationEvent &)> > _logicEventHandlers;
+    std::vector<LLBC_AppEvent *> _events[2];
+    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _libEventHandlers;
+    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _logicEventHandlers;
 
     static LLBC_App *_thisApp;
 };

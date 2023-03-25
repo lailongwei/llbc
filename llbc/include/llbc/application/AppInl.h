@@ -23,7 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_ApplicationEvent::LLBC_ApplicationEvent(int evType)
+inline LLBC_AppEvent::LLBC_AppEvent(int evType)
 : evType(evType)
 {
 }
@@ -116,7 +116,7 @@ inline int LLBC_App::GetStartPhase() const
 
 inline int LLBC_App::PushEvent(int evType)
 {
-    return PushEvent(new LLBC_ApplicationEvent(evType));
+    return PushEvent(new LLBC_AppEvent(evType));
 }
 
 inline const LLBC_String &LLBC_App::GetName() const

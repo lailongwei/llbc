@@ -86,9 +86,9 @@ LLBC_App::LLBC_App()
 
     _thisApp = this;
     _libEventHandlers.emplace(LLBC_AppEventType::Stop,
-        LLBC_Delegate<void(const LLBC_ApplicationEvent &)>(this, &LLBC_App::HandleEvent_Stop));
+        LLBC_Delegate<void(const LLBC_AppEvent &)>(this, &LLBC_App::HandleEvent_Stop));
     _libEventHandlers.emplace(LLBC_AppEventType::ReloadApplicationConfig,
-        LLBC_Delegate<void(const LLBC_ApplicationEvent &)>(this, &LLBC_App::HandleEvent_ReloadAppCfg));
+        LLBC_Delegate<void(const LLBC_AppEvent &)>(this, &LLBC_App::HandleEvent_ReloadAppCfg));
 }
 
 LLBC_App::~LLBC_App()
@@ -389,7 +389,7 @@ void LLBC_App::Stop()
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup(); _llbcLibStartupInApp = false);
 }
 
-int LLBC_App::PushEvent(LLBC_ApplicationEvent *ev)
+int LLBC_App::PushEvent(LLBC_AppEvent *ev)
 {
     LLBC_LockGuard guard(_eventLock);
     if (!IsStarted() &&
@@ -404,7 +404,7 @@ int LLBC_App::PushEvent(LLBC_ApplicationEvent *ev)
     return LLBC_OK;
 }
 
-int LLBC_App::SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_ApplicationEvent &)> &evHandler)
+int LLBC_App::SubscribeEvent(int evType, const LLBC_Delegate<void(const LLBC_AppEvent &)> &evHandler)
 {
     // Check event type & event handler.
     if (evType < LLBC_AppEventType::LibBegin ||
@@ -600,12 +600,12 @@ void LLBC_App::HandleEvents(bool &doNothing)
     }
 }
 
-void LLBC_App::HandleEvent_ReloadAppCfg(const LLBC_ApplicationEvent &ev)
+void LLBC_App::HandleEvent_ReloadAppCfg(const LLBC_AppEvent &ev)
 {
     ReloadConfig();
 }
 
-void LLBC_App::HandleEvent_Stop(const LLBC_ApplicationEvent &ev)
+void LLBC_App::HandleEvent_Stop(const LLBC_AppEvent &ev)
 {
     _requireStop = true;
 }
