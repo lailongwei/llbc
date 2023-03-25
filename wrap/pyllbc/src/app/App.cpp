@@ -26,20 +26,20 @@
 
 #include "src/app/_AppMethods.h"
 
-void pyllbc_InitApplication()
+void pyllbc_InitApp()
 {
     new pyllbc_App(nullptr);
 }
 
-void pyllbc_DestroyApplication()
+void pyllbc_DestroyApp()
 {
 }
 
-void pyllbc_AddApplicationMethods()
+void pyllbc_AddAppMethods()
 {
 }
 
-void pyllbc_AddApplicationObjs()
+void pyllbc_AddAppObjs()
 {
     pyllbc_Module *inlMod = pyllbc_InlModule;
 

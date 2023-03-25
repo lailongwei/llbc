@@ -28,21 +28,21 @@
 /**
  * Initialize the pyllbc application module.
  */
-LLBC_HIDDEN void pyllbc_InitApplication();
+LLBC_HIDDEN void pyllbc_InitApp();
 
 /**
  * Destroy the pyllbc application module.
  */
-LLBC_HIDDEN void pyllbc_DestroyApplication();
+LLBC_HIDDEN void pyllbc_DestroyApp();
 
 /**
  * Add application module all methods to python.
  */
-LLBC_HIDDEN void pyllbc_AddApplicationMethods();
+LLBC_HIDDEN void pyllbc_AddAppMethods();
 
 /**
  * Add application module all objs to python.
  */
-LLBC_HIDDEN void pyllbc_AddApplicationObjs();
+LLBC_HIDDEN void pyllbc_AddAppObjs();
 
 
