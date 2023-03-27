@@ -68,13 +68,13 @@ void TestCase_Com_DataType::RawTest()
     LLBC_PrintLn("sizeof(sint16): %lu", sizeof(sint16));
     LLBC_PrintLn("sizeof(sint32): %lu", sizeof(sint32));
     LLBC_PrintLn("sizeof(sint64): %lu", sizeof(sint64));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     LLBC_PrintLn("sizeof(uint8): %lu", sizeof(uint8));
     LLBC_PrintLn("sizeof(uint16): %lu", sizeof(sint16));
     LLBC_PrintLn("sizeof(uint32): %lu", sizeof(sint32));
     LLBC_PrintLn("sizeof(uint64): %lu", sizeof(sint64));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     LLBC_PrintLn("sizeof(tchar): %lu", sizeof(tchar));
 

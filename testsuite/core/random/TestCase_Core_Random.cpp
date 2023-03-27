@@ -62,28 +62,28 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
     // Test RandReal()
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     LLBC_PrintLn("LLBC_Random::RandReal() test:");
     for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%.6f ", rand.RandReal());
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     LLBC_PrintLn("LLBC_RandReal() test:");
     for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%.6f ", LLBC_RandReal());
     }
 
     // Test Choice.
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     LLBC_PrintLn("LLBC_Random::Choice() test(vector range:[1, 100]):");
     std::vector<int> v;
     for (int i = 0; i < 100; ++i)
@@ -104,7 +104,7 @@ void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%3d ", LLBC_Rand(end));
     }
@@ -115,7 +115,7 @@ void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%3d ", rand.Rand(end));
     }
@@ -128,7 +128,7 @@ void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int t
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%4d ", LLBC_Rand(begin, end));
     }
@@ -139,7 +139,7 @@ void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int t
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLn("");
+            LLBC_Print("\n");
 
         LLBC_Print("%4d ", rand.Rand(begin, end));
     }

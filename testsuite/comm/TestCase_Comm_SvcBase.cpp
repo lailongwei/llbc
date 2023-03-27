@@ -269,7 +269,7 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     int sid = _svc->Listen(ip, port);
     if (sid == 0)
     {
-        LLBC_PrintLn("listen in %s:%d failed, reason: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("listen in %s:%d failed, reason: %s", ip, port, LLBC_FormatLastError());
         return;
     }
 

@@ -79,12 +79,12 @@ namespace
     public:
         TestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         ~TestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -94,18 +94,18 @@ namespace
         ReflectionableTestObj()
         : _poolInst(nullptr)
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         ~ReflectionableTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
             _poolInst = &poolInst;
         }
 
@@ -121,12 +121,12 @@ namespace
 
         void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+            LLBC_Print("  ->[ptr:0x%p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
         }
 
         void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+            LLBC_Print("  ->[ptr:0x%p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
         }
 
         void Clear()
@@ -143,18 +143,18 @@ namespace
     public:
         ClearableTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         ~ClearableTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void Clear()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -163,18 +163,18 @@ namespace
     public:
         ReferencableTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         virtual ~ReferencableTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
     public:
         void Clear()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -183,28 +183,28 @@ namespace
     public:
         ObjectReflectionBaseTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         virtual ~ObjectReflectionBaseTestObj()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
 
         void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+            LLBC_Print("  ->[ptr:0x%p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
         }
 
         void OnPoolInstDestroy(LLBC_IObjectPoolInst &poolInst)
         {
-            LLBC_Print("  ->[ptr:0x%08p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
+            LLBC_Print("  ->[ptr:0x%p]%s: Called, pool inst:%p!", this, __FUNCTION__, &poolInst);
         }
 
     public:
         void Clear()
         {
-            LLBC_PrintLn("  ->[ptr:0x%08p]%s: Called!", this, __FUNCTION__);
+            LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
     };
 
@@ -626,21 +626,21 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
     typedef std::map<int, std::string> _TestType;
 
     _TestType *obj1 = LLBC_GetObjectFromSafetyPool<_TestType>();
-    LLBC_PrintLn("Get object from safety object-pool: 0x%08x, do some operations...", obj1);
+    LLBC_PrintLn("Get object from safety object-pool: 0x%p, do some operations...", obj1);
     obj1->insert(std::make_pair(1, "Hello world!"));
     obj1->insert(std::make_pair(2, "Hey, Judy!"));
     LLBC_ReleaseObjectToSafetyPool(obj1);
     LLBC_PrintLn("Release object to safety object-pool");
 
     _TestType *obj2 = LLBC_GetObjectFromUnsafetyPool<_TestType>();
-    LLBC_PrintLn("Get object from unsafety object-pool 0x%08x, do some operations...", obj2);
+    LLBC_PrintLn("Get object from unsafety object-pool 0x%p, do some operations...", obj2);
     obj2->insert(std::make_pair(3, "Hello world!"));
     obj2->insert(std::make_pair(4, "Hey, Judy!"));
     LLBC_ReleaseObjectToUnsafetyPool(obj2);
     LLBC_PrintLn("Release object to unafety object-pool");
 
     ReferencableTestObj *refObj = LLBC_GetReferencableObjectFromPool<ReferencableTestObj>();
-    LLBC_PrintLn("Get referencable-object from object-pool(unsafety) 0x%08x, do some operations...", refObj);
+    LLBC_PrintLn("Get referencable-object from object-pool(unsafety) 0x%p, do some operations...", refObj);
     refObj->Retain();
     refObj->Release();
     refObj->Release();

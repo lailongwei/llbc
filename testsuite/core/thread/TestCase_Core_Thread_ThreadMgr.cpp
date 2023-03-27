@@ -65,7 +65,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_StaticMethods()
                      LLBC_ThreadMgr::InLLBCEntryThread() ? "entry" : "non-entry");
         LLBC_PrintLn("  - Cur thread id:%d", LLBC_ThreadMgr::CurThreadId());
         LLBC_PrintLn("  - Cur thread handle:%d", LLBC_ThreadMgr::CurThreadHandle());
-        LLBC_PrintLn("  - Cur native thread handle:%p", LLBC_ThreadMgr::CurNativeThreadHandle());
+        LLBC_PrintLn("  - Cur native thread handle:%llu", (uint64)LLBC_ThreadMgr::CurNativeThreadHandle());
         LLBC_PrintLn("  - Cur thread group handle:%d", LLBC_ThreadMgr::CurGroupHandle());
     };
 
@@ -194,7 +194,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_KillEntryThread()
 
     // Try kill entry thread group.
     const LLBC_Handle curGroupHandle = LLBC_ThreadMgr::CurGroupHandle();
-    killRet = threadMgr->KillGroup(curThreadHandle, 9);
+    killRet = threadMgr->KillGroup(curGroupHandle, 9);
     LLBC_PrintLn("- Kill entry thread group ret:%d, err:%s",
                  killRet, LLBC_FormatLastError());
     LLBC_LogAndReturnIf(killRet == LLBC_OK ||
@@ -223,7 +223,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_CreateThreads()
         LLBC_PrintLn("- is llbc entry thread?:%d", LLBC_ThreadMgr::InLLBCEntryThread());
         LLBC_PrintLn("- ThreadId:%d", static_cast<int>(LLBC_ThreadMgr::CurThreadId()));
         LLBC_PrintLn("- Thread Handle:%d", LLBC_ThreadMgr::CurThreadHandle());
-        LLBC_PrintLn("- Native Thread Handle:%p", LLBC_ThreadMgr::CurNativeThreadHandle());
+        LLBC_PrintLn("- Native Thread Handle:%llu", (uint64)LLBC_ThreadMgr::CurNativeThreadHandle());
         LLBC_PrintLn("- Thread Group Handle:%d", LLBC_ThreadMgr::CurGroupHandle());
 
         for (int i = 0; i < 10000000; ++i)
@@ -601,7 +601,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_SuspendAndResumeThreads()
     // Suspend/Resume all test.
     stopFlag = false;
     runningThreadsNum = 0;
-    LLBC_PrintLn("Create %d threads for test Suspend/Resume all ...");
+    LLBC_PrintLn("Create %d threads for test Suspend/Resume all ...", threadNum);
     group = threadMgr->CreateThreads(threadNum, threadEntry);
     while (runningThreadsNum != threadNum)
         LLBC_Sleep(1);

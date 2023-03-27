@@ -34,7 +34,7 @@
         LLBC_SetConsoleColor(stdout, color);                         \
         LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
-        LLBC_NS __LLBC_FilePrint(true, stdout, "");                  \
+        LLBC_NS __LLBC_FilePrint(false, stdout, "\n");               \
     } while (0);
 
 #define __ClearInputBuf()                           \
@@ -67,7 +67,7 @@ int TestSuite_Main(int argc, char* argv[])
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 
         int idx = -1;
-        LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
+        LLBC_Print("Please select testcase (0-exit): ");
 
         char inputBuf[8192];
         if (fgets(inputBuf, sizeof(inputBuf), stdin) == nullptr)

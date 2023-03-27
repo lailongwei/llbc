@@ -39,14 +39,14 @@ int TestCase_Com_Endian::Run(int argc, char *argv[])
         LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian));
     LLBC_PrintLn("LLBC_Endian::UnknownEndian + 300 describe: %s",
         LLBC_Endian::Type2Str(LLBC_Endian::UnknownEndian + 300));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // Endian describe -> Endian type test.
     LLBC_PrintLn("'big endian' type: %d", LLBC_Endian::Str2Type("big endian"));
     LLBC_PrintLn("'little endian' type: %d", LLBC_Endian::Str2Type("little endian"));
     LLBC_PrintLn("'unknown endian' type: %d", LLBC_Endian::Str2Type("unknown type"));
     LLBC_PrintLn("'hello' type: %d", LLBC_Endian::Str2Type("hello"));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // Test host <-> net.
     int data = 0x01020304;
@@ -55,7 +55,7 @@ int TestCase_Com_Endian::Run(int argc, char *argv[])
     LLBC_Host2Net(data);
     LLBC_PrintLn("net to host test, net: 0x%08x, host: 0x%08x",
         data, LLBC_Net2Host2(data));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     sint64 longData = 0x0506070801020304L;
     LLBC_PrintLn("host to net test(long data), host: 0x%16llx, net: 0x%16llx", longData, LLBC_Host2Net2(longData));
     LLBC_Host2Net(longData);

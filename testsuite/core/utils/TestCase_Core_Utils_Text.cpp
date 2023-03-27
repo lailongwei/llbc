@@ -36,18 +36,18 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     {
         LLBC_PrintLn("\t%s", strs[i].c_str());
     }
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // Filter-out test.
     LLBC_PrintLn("filter out string: %s", str.c_str());
     LLBC_PrintLn("result: %s", LLBC_FilterOutString(str, " ").c_str());
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     
     // Upper<->Lower test.
     str = "AaBbCcDd eEfFgG";
     LLBC_PrintLn("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper(str.c_str()).c_str());
     LLBC_PrintLn("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower(str.c_str()).c_str());
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // String -> Number test.
     str = "-30";
@@ -69,7 +69,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         str.c_str(), LLBC_Str2UInt64(str.c_str()));
     LLBC_PrintLn("string [%s] to number(Str2Double): %f", 
         str.c_str(), LLBC_Str2Double(str.c_str()));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // Number -> String test.
     {
@@ -126,7 +126,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
             voidPtr, LLBC_Num2Str(voidPtr, 16).c_str());
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

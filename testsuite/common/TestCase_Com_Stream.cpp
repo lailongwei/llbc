@@ -274,21 +274,21 @@ static void ReplaceTest()
 
     LLBC_Stream stream;
     stream.Write("Hello world\0", 12);
-    LLBC_PrintLn("  - Before replace, pos:%lu, buf:%s", stream.GetPos(), stream.GetBuf<const char *>());
+    LLBC_PrintLn("  - Before replace, pos:%lu, buf:%s", stream.GetPos(), stream.GetBuf<char>());
 
     LLBC_PrintLn("  - Insert 'Hey ' after space character...");
     stream.Replace(6, 6, "Hey ", 4);
-    LLBC_PrintLn("  - After insert, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After insert, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
     LLBC_PrintLn("  - Replace 'Hey' to 'ABC'...");
     stream.Replace(6, 9, "ABC", 3);
-    LLBC_PrintLn("  - After replace, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After replace, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
     LLBC_PrintLn("  - Erase 'ABC ' from stream...");
     stream.Replace(6, 10, nullptr, 0);
-    LLBC_PrintLn("  - After erase, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After erase, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
-    LLBC_PrintLn("  - Erase '\0' termermal character...");
+    LLBC_PrintLn("  - Erase '\\0' termermal character...");
     stream.Replace(stream.GetPos() - 1, stream.npos, nullptr, 0);
 
     char appendStr[] = ", Hello World Too";
@@ -297,7 +297,7 @@ static void ReplaceTest()
     LLBC_PrintLn("  - After append '%s', pos:%lu, buf:%s",
                    appendStr,
                    stream.GetPos(),
-                   (stream.GetBuf<const char *>()));
+                   (stream.GetBuf<char>()));
 }
 
 static LLBC_String ToStringVec(const std::vector<int> &vec)

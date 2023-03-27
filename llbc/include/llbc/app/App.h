@@ -372,7 +372,7 @@ private:
 
 protected:
     LLBC_String _name;
-    volatile LLBC_AppStartPhase::ENUM _startPhase;
+    volatile int _startPhase;
 
     bool _llbcLibStartupInApp;
 

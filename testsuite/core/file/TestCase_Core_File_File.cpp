@@ -95,7 +95,7 @@ bool TestCase_Core_File_File::FileModeDescTest()
     LLBC_PrintLn("LLBC_FileMode::BinaryAppendReadWrite(%08x): %s", LLBC_FileMode::BinaryAppendReadWrite, 
         LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::BinaryAppendReadWrite).c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -165,7 +165,7 @@ bool TestCase_Core_File_File::OpenCloseTest()
         return false;
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -191,7 +191,7 @@ bool TestCase_Core_File_File::GetXXXMethodsTest()
     // GetFileMode():
     LLBC_PrintLn("LLBC_File::GetFileMode(): %s", LLBC_FileMode::GetFileModeDesc(file.GetFileMode()).c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -271,7 +271,7 @@ bool TestCase_Core_File_File::ReadWriteTest()
     const LLBC_String notExistLine = file.ReadLine();
     LLBC_PrintLn("Not exist line: %s, error: %s", notExistLine.c_str(), LLBC_FormatLastError());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -336,7 +336,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
     PrintFileAttributes(fileAttrs);
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -390,7 +390,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     LLBC_PrintLn("Delete copy file");
     LLBC_File::DeleteFile(copyFileName);
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }
@@ -448,7 +448,7 @@ bool TestCase_Core_File_File::MoveFileTest()
     LLBC_File::DeleteFile(copyFileName);
     LLBC_File::DeleteFile(moveFileName);
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return true;
 }

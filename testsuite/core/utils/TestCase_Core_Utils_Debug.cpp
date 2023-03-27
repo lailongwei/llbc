@@ -34,13 +34,13 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     }
 
     LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, 32).c_str());
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     // CPUTime test.
     LLBC_PrintLn("Test CPUTime:");
     {
         LLBC_PrintLn("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
-        LLBC_PrintLn("");
+        LLBC_Print("\n");
     }
 
     {
@@ -83,19 +83,19 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         LLBC_CPUTime cost = LLBC_CPUTime::Current() - beg;
         LLBC_PrintLn("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
                        cost.GetCPUCount(), cost.ToString().c_str());
-        LLBC_PrintLn("");
+        LLBC_Print("\n");
     }
 
     {
         LLBC_PrintLn("- Test static LLBC_CPUTime::ToXXX() method:");
         LLBC_PrintLn("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%d", LLBC_CPUTime::ToMilliSeconds(100000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%d", LLBC_CPUTime::ToMicroSeconds(10000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%d", LLBC_CPUTime::ToNanoSeconds(1000000llu));
-        LLBC_PrintLn("");
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%lld", LLBC_CPUTime::ToMilliSeconds(100000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%lld", LLBC_CPUTime::ToMicroSeconds(10000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%lld", LLBC_CPUTime::ToNanoSeconds(1000000llu));
+        LLBC_Print("\n");
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

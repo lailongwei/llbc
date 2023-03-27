@@ -84,7 +84,7 @@ int TestCase_Core_File_Directory::CurDirTest()
     LLBC_PrintLn("After set, current directory: %s", LLBC_Directory::CurDir().c_str());
     LLBC_Directory::SetCurDir(curDir);
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -102,7 +102,7 @@ int TestCase_Core_File_Directory::ExistsTest()
     path = LLBC_Directory::ModuleFilePath();
     LLBC_PrintLn("%s exists? %d", path.c_str(), LLBC_Directory::Exists(path));
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -151,7 +151,7 @@ int TestCase_Core_File_Directory::CreateRemoveTest()
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -179,7 +179,7 @@ int TestCase_Core_File_Directory::AbsPathTest()
     LLBC_PrintLn("%s abspath: %s", path.c_str(), LLBC_Directory::AbsPath(path).c_str());
 #endif
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -227,7 +227,7 @@ int TestCase_Core_File_Directory::SplitExtTest()
     parts = LLBC_Directory::SplitExt(path);
     LLBC_PrintLn("Split %s: part1: [%s], part2: [%s]", path.c_str(), parts[0].c_str(), parts[1].c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -262,7 +262,7 @@ int TestCase_Core_File_Directory::GetFilesTest()
     }
 
     LLBC_Directory::Remove("a");
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -297,7 +297,7 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
     }
 
     LLBC_Directory::Remove("a");
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
     return LLBC_OK;
@@ -310,7 +310,7 @@ int TestCase_Core_File_Directory::ModuleFileTest()
     LLBC_PrintLn("Module file directory: %s", LLBC_Directory::ModuleFileDir().c_str());
     LLBC_PrintLn("Module file path: %s", LLBC_Directory::ModuleFilePath().c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -331,7 +331,7 @@ int TestCase_Core_File_Directory::DirNameBaseNameTest()
     LLBC_PrintLn("path %s dirName: %s, baseName: %s", 
         path.c_str(), LLBC_Directory::DirName(path).c_str(), LLBC_Directory::BaseName(path).c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -345,7 +345,7 @@ int TestCase_Core_File_Directory::MiscTest()
     LLBC_PrintLn("Temporary directory: %s", LLBC_Directory::TempDir().c_str());
     LLBC_PrintLn("Cache directory: %s", LLBC_Directory::CacheDir().c_str());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -386,7 +386,7 @@ int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool rec
             LLBC_Print(", ");
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }
@@ -410,7 +410,7 @@ int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bo
             LLBC_Print(", ");
     }
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     return LLBC_OK;
 }

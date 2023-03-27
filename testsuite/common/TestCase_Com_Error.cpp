@@ -171,7 +171,7 @@ int TestCase_Com_Error::Run(int argc, char *argv[])
     LLBC_SetLastError(LLBC_ERROR_FORMAT);
     LLBC_PrintLn("\tLLBC_FormatLastError(LLBC_ERROR_FORMAT):%s", LLBC_FormatLastError());
 
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
 

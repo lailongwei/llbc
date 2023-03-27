@@ -30,16 +30,16 @@ namespace
 
 static void ThreadProc(void *arg)
 {
-    long threadIndex;
-    memcpy(&threadIndex, &arg, sizeof(long));
-    LLBC_PrintLn("thread %d startup", threadIndex);
+    uint64 threadIndex = 0;
+    memcpy(&threadIndex, &arg, sizeof(uint64));
+    LLBC_PrintLn("thread %llu startup", threadIndex);
 
     __g_tls.SetValue(new long);
     (*__g_tls) = threadIndex;
     for(int i = 0; i < 5000000; ++i)
         (*__g_tls) += 1;
 
-    LLBC_PrintLn("thread [%ld] tls value: %ld", threadIndex, *__g_tls);
+    LLBC_PrintLn("thread [%llu] tls value: %ld", threadIndex, *__g_tls);
 }
 
 TestCase_Core_Thread_Tls::TestCase_Core_Thread_Tls()

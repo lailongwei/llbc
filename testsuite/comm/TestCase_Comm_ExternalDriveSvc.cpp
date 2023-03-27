@@ -82,7 +82,7 @@ public:
 public:
     virtual void OnDataArrival(LLBC_Packet &packet)
     {
-        LLBC_PrintLn("Session[%d] receive data, len: %d\n", 
+        LLBC_PrintLn("Session[%d] receive data, len: %lu\n", 
             packet.GetSessionId(), packet.GetLength());
 
         if (++_recvTimes == 100)

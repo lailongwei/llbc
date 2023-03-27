@@ -40,7 +40,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)-32768, (sint16)1)));
     LLBC_PrintLn("(sint16)32767 - (sint16)-2: %s",
         LLBC_FlowType::Type2Str(LLBC_CheckFlowUseSub((sint16)32767, (sint16)-2)));
-    LLBC_PrintLn("");
+    LLBC_Print("\n");
 
     LLBC_PrintLn("NOFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::NoFlow));
     LLBC_PrintLn("UNDERFLOW string: %s", LLBC_FlowType::Type2Str(LLBC_FlowType::UnderFlow));

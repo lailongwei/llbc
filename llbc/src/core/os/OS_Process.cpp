@@ -331,13 +331,13 @@ static void __NonWin32CrashHandler(int sig)
     // Call callback delegate.
     if (__crashCallback)
     {
-        if (lseek(coreDescFd, 0, SEEK_SET) == -1)
+        if (lseek(coreDescFileFd, 0, SEEK_SET) == -1)
         {
-            close(coreFileFd);
+            close(coreDescFileFd);
             raise(sig);
         }
 
-        auto readRet = read(coreFileFd, __stackBacktrace, sizeof(__stackBacktrace) - 1);
+        auto readRet = read(coreDescFileFd, __stackBacktrace, sizeof(__stackBacktrace) - 1);
         if (readRet >= 0)
             __stackBacktrace[readRet] = '\0';
 

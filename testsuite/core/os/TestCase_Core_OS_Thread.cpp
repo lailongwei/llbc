@@ -31,10 +31,12 @@ static void ThreadProc(void *arg)
     {
         LLBC_ThreadId id = LLBC_GetCurrentThreadId();
         LLBC_NativeThreadHandle handle = LLBC_GetCurrentThread();
-#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+#if LLBC_TARGET_PLATFORM_WIN32
         LLBC_PrintLn("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
-#else
+#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
         LLBC_PrintLn("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
+#else // Linux/Android
+        LLBC_PrintLn("Hello, I'm thread %s[handle:%ld, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
 #endif
 
         LLBC_Sleep(1000);

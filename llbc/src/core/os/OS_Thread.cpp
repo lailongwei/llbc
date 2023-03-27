@@ -324,7 +324,7 @@ int LLBC_CreateThread(LLBC_ThreadProc proc,
     pthread_attr_setstacksize(&attr, stackSize);
 
     int ret = 0;
-    if ((ret = pthread_create(handle,
+    if ((ret = pthread_create(nativeHandle,
                               &attr,
                               &LLBC_INTERNAL_NS __ThreadEntry,
                               threadArg)) != 0)
