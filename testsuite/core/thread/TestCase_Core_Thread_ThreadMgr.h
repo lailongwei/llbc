@@ -32,4 +32,19 @@ public:
 
 public:
     virtual int Run(int argc, char *argv[]);
+
+private:
+    int Test_StaticMethods();
+
+    int Test_KillEntryThread();
+    int Test_WaitAndCancelInEnryThread();
+    int Test_SuspendAndResumeEntryThread();
+
+    int Test_CreateThreads();
+    int Test_CreateAndOperateThreads();   
+
+    int Test_KillThreads();
+    int Test_WaitThreads();
+    int Test_CancelThreads();
+    int Test_SuspendAndResumeThreads();
 };

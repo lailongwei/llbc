@@ -12,7 +12,7 @@ class TestComp(object):
     def __init__(self):
         self._call_times = 0
 
-    def oninitialize(self, ev):
+    def oninit(self, ev):
         print 'service init: {}'.format(ev)
 
     def onstart(self, ev):

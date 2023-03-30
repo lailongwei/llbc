@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/Packet.h"

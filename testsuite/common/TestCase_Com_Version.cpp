@@ -32,16 +32,16 @@ TestCase_Com_Version::~TestCase_Com_Version()
 
 int TestCase_Com_Version::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("llbc library version test: ");
+    LLBC_PrintLn("llbc library version test: ");
 
-    LLBC_PrintLine("Major version: %d", LLBC_majorVersion);
-    LLBC_PrintLine("Minor version: %d", LLBC_minorVersion);
-    LLBC_PrintLine("Update No: %d", LLBC_updateNo);
-    LLBC_PrintLine("Is debug version: %s", LLBC_isDebugVer ? "true" : "false");
+    LLBC_PrintLn("Major version: %d", LLBC_majorVersion);
+    LLBC_PrintLn("Minor version: %d", LLBC_minorVersion);
+    LLBC_PrintLn("Update No: %d", LLBC_updateNo);
+    LLBC_PrintLn("Is debug version: %s", LLBC_isDebugVer ? "true" : "false");
 
-    LLBC_PrintLine("Version describe(verbose): \n%s", LLBC_GetVersionInfo(true).c_str());
+    LLBC_PrintLn("Version describe(verbose): \n%s", LLBC_GetVersionInfo(true).c_str());
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

@@ -47,7 +47,7 @@ public:
     /**
      * When service start and not not init comp before, will call then event handler function.
      */
-    virtual bool OnInitialize(bool &initFinished);
+    virtual bool OnInit(bool &initFinished);
 
     /**
      * When service destroy, will call this event handler function.
@@ -164,7 +164,7 @@ private:
     pyllbc_Service *_svc;
     PyObject *_pySvc;
 
-    PyObject *_methOnInitialize;
+    PyObject *_methOnInit;
     PyObject *_methOnDestroy;
     PyObject *_methOnStart;
     PyObject *_methOnStop;

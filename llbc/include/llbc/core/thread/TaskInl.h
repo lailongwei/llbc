@@ -21,7 +21,29 @@
 
 #pragma once
 
+#include "llbc/core/os/OS_Atomic.h"
+
 __LLBC_NS_BEGIN
+
+inline const char *LLBC_TaskState::GetDesc(int taskState)
+{
+    LLBC_ReturnIf(taskState == NotActivated, "NotActivated");
+    LLBC_ReturnIf(taskState == Activating, "Activating");
+    LLBC_ReturnIf(taskState == Activated, "Activated");
+    LLBC_ReturnIf(taskState == Deactivating, "Deactivating");
+
+    return "UnknownTaskState";
+}
+
+inline bool LLBC_Task::IsActivated() const
+{
+    return _taskState == LLBC_TaskState::Activated;
+}
+
+inline int LLBC_Task::GetTaskState() const
+{
+    return _taskState;
+}
 
 inline int LLBC_Task::Push(LLBC_MessageBlock *block)
 {

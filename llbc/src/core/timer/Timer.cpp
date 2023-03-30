@@ -22,8 +22,8 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/time/Common.h"
-#include "llbc/core/variant/Common.h"
+#include "llbc/core/time/Time.h"
+#include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"

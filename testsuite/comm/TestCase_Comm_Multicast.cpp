@@ -38,15 +38,15 @@ public:
     }
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service created!");
+        LLBC_PrintLn("Service created!");
         return true;
     }
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy!");
+        LLBC_PrintLn("Service destroy!");
     }
 
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
@@ -88,7 +88,7 @@ public:
         const int sessionId = packet.GetSessionId();
         const char *data = reinterpret_cast<const char *>(packet.GetPayload());
 
-        LLBC_PrintLine("Session[%4d] received data: %s", sessionId, data);
+        LLBC_PrintLn("Session[%4d] received data: %s", sessionId, data);
     }
 
 private:
@@ -119,10 +119,10 @@ TestCase_Comm_Multicast::~TestCase_Comm_Multicast()
 
 int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Service multicast test:");
+    LLBC_PrintLn("Service multicast test:");
     if (argc < 5)
     {
-        LLBC_FilePrintLine(stderr, "Argument error, eg: ./a [client/server], [normal/raw] ip port [useBst=False]");
+        LLBC_FilePrintLn(stderr, "Argument error, eg: ./a [client/server], [normal/raw] ip port [useBst=False]");
         return LLBC_FAILED;
     }
 
@@ -149,7 +149,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     svc->SetFPS(10);
     svc->Start();
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     delete svc;
@@ -176,12 +176,12 @@ int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
         const int sessionId = svc->Connect(_runIp.c_str(), _runPort);
         if (sessionId == 0)
         {
-            LLBC_PrintLine("Connect to %s:%d failed, err: %s",
+            LLBC_PrintLn("Connect to %s:%d failed, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("Connect to %s:%d succeed, sid: %d",
+        LLBC_PrintLn("Connect to %s:%d succeed, sid: %d",
             _runIp.c_str(), _runPort, sessionId);
     }
 
@@ -193,12 +193,13 @@ int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_Service *svc)
     const int sessionId = svc->Listen(_runIp.c_str(), _runPort);
     if (sessionId == 0)
     {
-        LLBC_FilePrintLine(stderr, "Listen on %s:%d failed, err: %s",
-            _runIp.c_str(), _runPort, LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr,
+                         "Listen on %s:%d failed, err: %s",
+                         _runIp.c_str(), _runPort, LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLine("Server listening on %s:%d...", _runIp.c_str(), _runPort);
+    LLBC_PrintLn("Server listening on %s:%d...", _runIp.c_str(), _runPort);
 
     return LLBC_OK;
 }

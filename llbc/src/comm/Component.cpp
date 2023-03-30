@@ -28,7 +28,7 @@
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
 
-#include "llbc/application/Application.h"
+#include "llbc/app/App.h"
 
 __LLBC_NS_BEGIN
 
@@ -345,7 +345,7 @@ LLBC_Component::LLBC_Component(uint64 caredEvents)
 , _svc(nullptr)
 , _meths(nullptr)
 
-, _cfgType(LLBC_ApplicationConfigType::End)
+, _cfgType(LLBC_AppConfigType::End)
 , _propCfg(nullptr)
 , _nonPropCfg(nullptr)
 {
@@ -405,7 +405,7 @@ void LLBC_Component::UpdateComponentCfg()
     const LLBC_String compName = colonPos ? colonPos + 1 : compNamePtr;
     const LLBC_String iCompName =
         (compName.size() > 1 && compName[0] != 'I') ? LLBC_String("I") + compName : compName;
-    if (_cfgType == LLBC_ApplicationConfigType::Property)
+    if (_cfgType == LLBC_AppConfigType::Property)
     {
         LLBC_DoIf(_nonPropCfg, _nonPropCfg->BecomeNil());
 
@@ -432,7 +432,7 @@ void LLBC_Component::UpdateComponentCfg()
 
         const LLBC_Variant *matchedCompCfg = nullptr;
         auto svcNonPropCfg = _svc->GetConfig();
-        if (_cfgType == LLBC_ApplicationConfigType::Ini)
+        if (_cfgType == LLBC_AppConfigType::Ini)
         {
             // Component config section: [<svc_name>.<comp_name>]
             auto compCfgKey =
@@ -448,7 +448,7 @@ void LLBC_Component::UpdateComponentCfg()
             if (it != svcNonPropCfg.DictEnd())
                 matchedCompCfg = &it->second;
         }
-        else if (_cfgType == LLBC_ApplicationConfigType::Xml)
+        else if (_cfgType == LLBC_AppConfigType::Xml)
         {
             auto &compCfgs = svcNonPropCfg[LLBC_XMLKeys::Children];
             for (auto &compCfg : compCfgs.AsSeq())

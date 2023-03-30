@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
@@ -78,7 +75,7 @@ public:
 
     /**
      * Get config type.
-     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     * @return int - the config type, see LLBC_AppConfigType enum.
      */
     virtual int GetConfigType() const;
 
@@ -408,9 +405,9 @@ public:
 
     /**
      * Get event manager.
-     * @return LLBC_EventManager & - the event manager.
+     * @return LLBC_EventMgr & - the event manager.
      */
-    virtual LLBC_EventManager &GetEventManager();
+    virtual LLBC_EventMgr &GetEventManager();
 
 public:
     /**
@@ -710,7 +707,7 @@ private:
     LLBC_TimerScheduler *_timerScheduler;
 
 private:
-    LLBC_EventManager _evManager;
+    LLBC_EventMgr _evManager;
     LLBC_ListenerStub _evManagerMaxListenerStub;
 
 private:
@@ -727,6 +724,3 @@ private:
 __LLBC_NS_END
 
 #include "llbc/comm/ServiceImplInl.h"
-
-
-

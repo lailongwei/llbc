@@ -208,13 +208,13 @@ public:
             return *this;
         }
 
-        const _Elem *unitStrBuf = this->data();
+        const _This unitStr(*this);
         const size_type unitStrSize = this->size();
 
         this->resize(unitStrSize * right);
         _Elem *buf = const_cast<_Elem *>(this->data());
         for (int i = 1; i < right; ++i)
-            memcpy(buf + i * unitStrSize, unitStrBuf, sizeof(_Elem) * unitStrSize);
+            memcpy(buf + i * unitStrSize, unitStr.data(), sizeof(_Elem) * unitStrSize);
 
         return *this;
     }

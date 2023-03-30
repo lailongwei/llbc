@@ -25,7 +25,7 @@
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/ServiceEvent.h"
 
-#include "llbc/application/Application.h"
+#include "llbc/app/App.h"
 
 namespace
 {
@@ -188,7 +188,7 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppCfgReloadEv(int cfgType,
     LLBC_SvcEv_AppCfgReloadedEv *wrapEv;
     auto evBlock = __CreateEvBlock(wrapEv);
     wrapEv->cfgType = cfgType;
-    if (cfgType == LLBC_ApplicationConfigType::Property)
+    if (cfgType == LLBC_AppConfigType::Property)
         wrapEv->propCfg = propCfg;
     else
         wrapEv->nonPropCfg = nonPropCfg;

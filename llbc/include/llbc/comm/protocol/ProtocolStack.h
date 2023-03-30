@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 

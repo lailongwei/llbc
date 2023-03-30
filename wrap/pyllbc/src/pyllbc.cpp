@@ -50,20 +50,20 @@ void initllbc_debug()
     pyllbc_InitTestCase();
     pyllbc_InitCore();
     pyllbc_InitComm();
-    pyllbc_InitApplication();
+    pyllbc_InitApp();
 
     /* Add all modules' objs/methods to python. */
     pyllbc_AddCommonObjs();
     pyllbc_AddTestCaseObjs();
     pyllbc_AddCoreObjs();
     pyllbc_AddCommObjs();
-    pyllbc_AddApplicationObjs();
+    pyllbc_AddAppObjs();
 
     pyllbc_AddCommonMethods();
     pyllbc_AddTestCaseMethods();
     pyllbc_AddCoreMethods();
     pyllbc_AddCommMethods();
-    pyllbc_AddApplicationMethods();
+    pyllbc_AddAppMethods();
 
     /* Buildup module. */
     pyllbc_TopModule->Build();

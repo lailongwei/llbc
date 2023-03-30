@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/os/OS_Thread.h"
 #include "llbc/core/thread/MessageQueue.h"
 
@@ -31,11 +29,36 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
-class LLBC_ThreadManager;
+class LLBC_ThreadMgr;
 
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
+
+/**
+ * \brief The task state enumeration.
+ */
+class LLBC_EXPORT LLBC_TaskState
+{
+public:
+    enum
+    {
+        Begin,
+        NotActivated = Begin,
+        Activating,
+        Activated,
+        Deactivating,
+
+        End
+    };
+
+    /**
+     * Get task state describe.
+     * @param[in] taskState - the task state.
+     * @return const char * - the task state describe.
+     */
+    static const char *GetDesc(int taskState);
+};
 
 /**
  * \brief Task class encapsulation.
@@ -43,24 +66,20 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Task
 {
 public:
-    LLBC_Task(LLBC_ThreadManager *threadMgr = nullptr);
+    LLBC_Task(LLBC_ThreadMgr *threadMgr = nullptr);
     virtual ~LLBC_Task();
 
 public:
     /**
      * Activate current task.
-     * @param[in] threadNum   - thread number.
-     * @param[in] flags       - thread flag.
-     * @param[in] priority    - thread priority.
-     * @param[in] groupHandle - thread group handle.
-     * @param[in] stack_size  - per thread stack size, in bytes.
+     * @param[in] threadNum         - thread number.
+     * @param[in] threadPriority    - thread priority.
+     * @param[in] stackSize         - per thread stack size, in bytes.
      * @return int - return 0 if success, otherwise return false.
      */
     virtual int Activate(int threadNum = 1,
-                         int flags = LLBC_ThreadFlag::Joinable,
-                         int priority = LLBC_ThreadPriority::Normal,
-                         LLBC_Handle groupHandle = LLBC_INVALID_HANDLE,
-                         const int stack_size[] = nullptr);
+                         int threadPriority = LLBC_ThreadPriority::Normal,
+                         int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE);
 
     /**
      * Check task is activated or not.
@@ -69,10 +88,10 @@ public:
     bool IsActivated() const;
 
     /**
-     * Get thread count.
-     * @return int - thread number.
+     * Get task state.
+     * @return int - the task state enumeration.
      */
-    int GetThreadCount() const;
+    int GetTaskState() const;
 
 public:
     /**
@@ -80,30 +99,6 @@ public:
      * @return int - return 0 if success, otherwise return false.
      */
     virtual int Wait();
-
-    /**
-     * Suspend current task.
-     * @return int - return 0 if success, otherwise return false.
-     */
-    virtual int Suspend();
-
-    /**
-     * Resume current task.
-     * @return int - return 0 if success, otherwise return false.
-     */
-    virtual int Resume();
-
-    /**
-     * Cancel current task.
-     * @return int - return 0 if success, otherwise return false.
-     */
-    virtual int Cancel();
-
-    /**
-     * Kill current task.
-     * @return int - return 0 if success, otherwise return false.
-     */
-    virtual int Kill(int signo);
 
 public:
     /**
@@ -159,50 +154,33 @@ public:
      */
     size_t GetMessageSize() const;
 
-public:
-    /**
-     * When task thread start, will call this event handler.
-     */
-    void OnTaskThreadStart();
-
-    /**
-     * When task thread stop, will call this event handler.
-     */
-    void OnTaskThreadStop();
-
+private:
     /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_Task);
 
-private:
     /*
      * Task internal cleanup.
      */
     void InternalCleanup();
 
-private:
     /**
-     * Declare friend class: LLBC_Session.
-     *  Access method list:
-     *      GetTaskThreads()
+     * Task entry method
      */
-    friend class LLBC_ThreadManager;
-
-    /**
-     * Get task threads, call by LLBC_TaskManager.
-     * @param[out] taskThreads - the task threads.
-     */
-    void GetTaskThreads(std::vector<LLBC_Handle> &taskThreads);
+    void TaskEntry(void *arg);
 
 private:
-    int _threadNum;
-    int _curThreadNum;
-    volatile bool _startCompleted;
-    LLBC_ThreadManager *_threadManager;
-    LLBC_Handle *_taskThreads;
-
     LLBC_SpinLock _lock;
+
+    volatile int _taskState;
+    volatile int _activateTimes;
+    volatile LLBC_Handle _threadGroupHandle;
+    volatile LLBC_ThreadId _activateThreadId;
+    LLBC_ThreadMgr *_threadMgr;
+
+    volatile int _threadNum;
+    volatile int _activatingThreadNum;
 
     LLBC_MessageQueue _msgQueue;
 };

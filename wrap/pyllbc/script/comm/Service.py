@@ -449,7 +449,7 @@ class pyllbcService(object):
         """
         Add component.
             component methods(all methods are optional):
-                oninitialize(self, ev): service initialize handler.
+                oninit(self, ev): service initialize handler.
                     ev.svc: service object.
                 ondestroy(self, ev): service destroy handler.
                     ev.svc: service object.

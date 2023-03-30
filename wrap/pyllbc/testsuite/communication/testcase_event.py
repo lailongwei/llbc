@@ -7,7 +7,7 @@ from llbc import TestCase, Service, Event, comp, bindto
 @comp
 @bindto('event_test_svc')
 class EventTestComp(object):
-    def oninitialize(self, ev):
+    def oninit(self, ev):
         svc = ev.svc
         print('Component initialize, svc:{}'.format(svc))
 

@@ -12,7 +12,7 @@ TEST_PORT = 17788
 
 
 class ClientComp(object):
-    def oninitialize(self, ev):
+    def oninit(self, ev):
         ev.svc.asyncconn(TEST_IP, TEST_PORT)
 
     def onsessioncreate(self, ev):

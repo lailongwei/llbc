@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/thread/SpinLock.h"
 
 __LLBC_NS_BEGIN
@@ -46,7 +44,7 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 #ifndef trace 
  #ifdef LLBC_DEBUG
   #define trace(format, ...) LLBC_FilePrint(stdout, format, ##__VA_ARGS__)
-  #define traceline(format, ...) LLBC_FilePrintLine(stdout, format, ##__VA_ARGS__)
+  #define traceline(format, ...) LLBC_FilePrintLn(stdout, format, ##__VA_ARGS__)
  #else
   #define trace(format, ...)
   #define traceline(format, ...)

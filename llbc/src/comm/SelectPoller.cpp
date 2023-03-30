@@ -78,7 +78,7 @@ void LLBC_SelectPoller::Svc()
         HandleQueuedEvents(0);
         if (_maxFd == 0)
         {
-            LLBC_ThreadManager::Sleep(interval);
+            LLBC_Sleep(interval);
             continue;
         }
 
@@ -169,7 +169,7 @@ void LLBC_SelectPoller::Svc()
         if (UNLIKELY(elapsed < 0))
             continue;
         else if (elapsed < interval)
-            LLBC_ThreadManager::Sleep(static_cast<int>(interval - elapsed));
+            LLBC_Sleep(static_cast<int>(interval - elapsed));
     }
 }
 

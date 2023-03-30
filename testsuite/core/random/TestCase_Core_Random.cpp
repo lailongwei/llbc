@@ -32,7 +32,7 @@ TestCase_Core_Random::~TestCase_Core_Random()
 
 int TestCase_Core_Random::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/random test:");
+    LLBC_PrintLn("core/random test:");
 
     // Test Rand(int end)
     LLBC_Random rand;
@@ -62,37 +62,37 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
     // Test RandReal()
-    LLBC_PrintLine("");
-    LLBC_PrintLine("LLBC_Random::RandReal() test:");
+    LLBC_Print("\n");
+    LLBC_PrintLn("LLBC_Random::RandReal() test:");
     for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%.6f ", rand.RandReal());
     }
 
-    LLBC_PrintLine("");
-    LLBC_PrintLine("LLBC_RandReal() test:");
+    LLBC_Print("\n");
+    LLBC_PrintLn("LLBC_RandReal() test:");
     for(int i = 0; i < 100; ++i)
     {
         if(i != 0 && i % 10 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%.6f ", LLBC_RandReal());
     }
 
     // Test Choice.
-    LLBC_PrintLine("");
-    LLBC_PrintLine("LLBC_Random::Choice() test(vector range:[1, 100]):");
+    LLBC_Print("\n");
+    LLBC_PrintLn("LLBC_Random::Choice() test(vector range:[1, 100]):");
     std::vector<int> v;
     for (int i = 0; i < 100; ++i)
         v.push_back(i + 1);
 
     for (int i = 0; i < 10; ++i)
-        LLBC_PrintLine("  Choice result: %d", *rand.Choice(v.begin(), v.end()));
+        LLBC_PrintLn("  Choice result: %d", *rand.Choice(v.begin(), v.end()));
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;
@@ -100,22 +100,22 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
 
 void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
 {
-    LLBC_PrintLine("LLBC_Rand(%d) test(times:%d):", end, times);
+    LLBC_PrintLn("LLBC_Rand(%d) test(times:%d):", end, times);
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%3d ", LLBC_Rand(end));
     }
     LLBC_Print("\n");
 
     LLBC_Random rand;
-    LLBC_PrintLine("LLBC_Random::Rand(%d) test(times:%d):", end, times);
+    LLBC_PrintLn("LLBC_Random::Rand(%d) test(times:%d):", end, times);
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%3d ", rand.Rand(end));
     }
@@ -124,22 +124,22 @@ void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
 
 void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int times)
 {
-    LLBC_PrintLine("LLBC_Rand(%d, %d) test(times:%d):", begin, end, times);
+    LLBC_PrintLn("LLBC_Rand(%d, %d) test(times:%d):", begin, end, times);
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%4d ", LLBC_Rand(begin, end));
     }
     LLBC_Print("\n");
 
     LLBC_Random rand;
-    LLBC_PrintLine("LLBC_Random::Rand(%d, %d) test(times:%d):", begin, end, times);
+    LLBC_PrintLn("LLBC_Random::Rand(%d, %d) test(times:%d):", begin, end, times);
     for(int i = 0; i < times; ++i)
     {
         if(i != 0 && i % 20 == 0)
-            LLBC_PrintLine("");
+            LLBC_Print("\n");
 
         LLBC_Print("%4d ", rand.Rand(begin, end));
     }

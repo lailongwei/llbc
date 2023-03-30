@@ -285,9 +285,9 @@ project "testsuite"
     local test_cfgs = {
         "core/config/IniTestCfg.ini",
         "core/log/LogTestCfg.cfg",
-        "application/AppCfgTest.cfg",
-        "application/AppCfgTest.ini",
-        "application/AppCfgTest.xml",
+        "app/AppCfgTest.cfg",
+        "app/AppCfgTest.ini",
+        "app/AppCfgTest.xml",
     }
     filter { "system:windows" }
         for _, test_cfg in pairs(test_cfgs) do

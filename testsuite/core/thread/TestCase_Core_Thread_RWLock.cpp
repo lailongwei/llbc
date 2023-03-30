@@ -32,7 +32,7 @@ static struct
     int value;
 } __g_rwValue;
 
-static int Reader_ThreadProc(void *arg)
+static void Reader_ThreadProc(void *arg)
 {
     long threadIndex;
     memcpy(&threadIndex, &arg, sizeof(long));
@@ -56,11 +56,9 @@ static int Reader_ThreadProc(void *arg)
 
         LLBC_Sleep(0);
     }
-
-    return 0;
 }
 
-static int Writer_ThreadProc(void *arg)
+static void Writer_ThreadProc(void *arg)
 {
     __g_outLock.Lock();
     std::cout <<"I'm writer" <<std::endl;
@@ -77,8 +75,6 @@ static int Writer_ThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"Writer thread update value completed, final value: " <<__g_rwValue.value <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
 TestCase_Core_Thread_RWLock::TestCase_Core_Thread_RWLock()
@@ -99,12 +95,12 @@ int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
     {
         void *threadArg = nullptr;
         memcpy(&threadArg, &i, sizeof(long));
-        LLBC_CreateThread(&readers[i], &Reader_ThreadProc, threadArg);
+        LLBC_CreateThread(&Reader_ThreadProc, threadArg, &readers[i]);
     }
 
     // Create writer.
     LLBC_NativeThreadHandle writer = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&writer, &Writer_ThreadProc, nullptr);
+    LLBC_CreateThread(&Writer_ThreadProc, nullptr, &writer);
 
     // Join writer.
     LLBC_JoinThread(writer);

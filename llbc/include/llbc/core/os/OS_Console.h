@@ -108,15 +108,18 @@ LLBC_EXPORT int LLBC_SetConsoleColor(FILE *file, int color);
  * @param[in] ...     - option arguments.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...);
+LLBC_EXPORT int __LLBC_FilePrint(bool newline,
+                                 FILE *file,
+                                 const char *fmt,
+                                 ...) LLBC_STRING_FORMAT_CHECK(3, 4);;
 
 #define LLBC_Print(fmt, ...) \
     LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__)
-#define LLBC_PrintLine(fmt, ...) \
+#define LLBC_PrintLn(fmt, ...) \
     LLBC_NS __LLBC_FilePrint(true, stdout, fmt, ##__VA_ARGS__)
 #define LLBC_FilePrint(file, fmt, ...) \
     LLBC_NS __LLBC_FilePrint(false, file, fmt, ##__VA_ARGS__)
-#define LLBC_FilePrintLine(file, fmt, ...) \
+#define LLBC_FilePrintLn(file, fmt, ...) \
     LLBC_NS __LLBC_FilePrint(true, file, fmt, ##__VA_ARGS__)
 
 /**

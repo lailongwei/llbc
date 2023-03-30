@@ -39,55 +39,55 @@ public:
     }
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service create!");
+        LLBC_PrintLn("Service create!");
         return true;
     }
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy!");
+        LLBC_PrintLn("Service destroy!");
     }
 
 public:
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
-        LLBC_PrintLine("Session Create: %s", sessionInfo.ToString().c_str());
+        LLBC_PrintLn("Session Create: %s", sessionInfo.ToString().c_str());
     }
 
     virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
-        LLBC_PrintLine("Session Destroy, info: %s", destroyInfo.ToString().c_str());
+        LLBC_PrintLn("Session Destroy, info: %s", destroyInfo.ToString().c_str());
     }
 
     virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
     {
-        LLBC_PrintLine("Async-Conn result: %s", result.ToString().c_str());
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
     }
 
     virtual void OnUnHandledPacket(const LLBC_Packet &packet)
     {
-        LLBC_PrintLine("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
+        LLBC_PrintLn("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
             packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
     }
 
     virtual void OnProtoReport(const LLBC_ProtoReport &report)
     {
-        LLBC_PrintLine("Proto report: %s", report.ToString().c_str());
+        LLBC_PrintLn("Proto report: %s", report.ToString().c_str());
     }
 
 public:
     void OnDataArrival(LLBC_Packet &packet)
     {
         if ((_packets += 1) % 1000 == 0)
-            LLBC_PrintLine("[%s]Received %ld packets!", LLBC_Time::Now().ToString().c_str(), _packets);
+            LLBC_PrintLn("[%s]Received %ld packets!", LLBC_Time::Now().ToString().c_str(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
         uint64 recv100MB = _recvBytes / (100 * 1024 * 1024);
         if (recv100MB > _prevRecv100MB)
         {
-            LLBC_PrintLine("[%s]Received %llu MB data!", LLBC_Time::Now().ToString().c_str(), _recvBytes / (1024 * 1024));
+            LLBC_PrintLn("[%s]Received %llu MB data!", LLBC_Time::Now().ToString().c_str(), _recvBytes / (1024 * 1024));
             _prevRecv100MB = recv100MB;
         }
 
@@ -118,10 +118,10 @@ TestCase_Comm_Svc::~TestCase_Comm_Svc()
 
 int TestCase_Comm_Svc::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Server/Client test:");
+    LLBC_PrintLn("Server/Client test:");
     if (argc < 5)
     {
-        LLBC_PrintLine("argument error, eg: ./a [client/server] [normal/raw] ip port");
+        LLBC_PrintLn("argument error, eg: ./a [client/server] [normal/raw] ip port");
         return -1;
     }
 
@@ -134,7 +134,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         protoFactory = new LLBC_NormalProtocolFactory;
     else
         protoFactory = new LLBC_RawProtocolFactory;
-    LLBC_PrintLine("Will start %s type service, service type: %s",
+    LLBC_PrintLn("Will start %s type service, service type: %s",
         asClient ? "CLIENT" : "SERVER",
         LLBC_String(argv[2]) == "normal" ? "Normal" : "Raw");
 
@@ -152,11 +152,11 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     // sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
     if (!asClient)
     {
-        LLBC_PrintLine("Will listening in %s:%d", ip, port);
+        LLBC_PrintLn("Will listening in %s:%d", ip, port);
         int sessionId = svc->Listen(ip, port, nullptr, sessionOpts);
         if (sessionId == 0)
         {
-            LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
+            LLBC_PrintLn("Create session failed, reason: %s", LLBC_FormatLastError());
             delete svc;
 
             return -1;
@@ -172,13 +172,13 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         else
             clientCount = 200;
 
-        LLBC_PrintLine("Create %d clients to test", clientCount);
+        LLBC_PrintLn("Create %d clients to test", clientCount);
         for (int i = 0; i < clientCount; ++i)
         {
             int sessionId = svc->Connect(ip, port, -1, nullptr, sessionOpts);
             if (sessionId == 0)
             {
-                LLBC_PrintLine("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());
+                LLBC_PrintLn("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());
                 continue;
             }
 
@@ -205,7 +205,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         }
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     delete svc;

@@ -55,10 +55,10 @@ inline TestTask::~TestTask()
 inline void TestTask::Svc()
 {
     _val = new int();
-    LLBC_PrintLine("Thread allocated thread-local variable[int *], ptr:%p", _val);
+    LLBC_PrintLn("Thread allocated thread-local variable[int *], ptr:%p", _val);
     for (int i = 0; i < 100000; ++i)
         *_val += 1;
-    LLBC_PrintLine("Exec `*val += 1` finished, val:%d", *_val);
+    LLBC_PrintLn("Exec `*val += 1` finished, val:%d", *_val);
     LLBC_XDelete(_val);
 
     LLBC_MessageBlock *block = nullptr;
@@ -69,7 +69,7 @@ inline void TestTask::Svc()
         LLBC_Stream stream(block->GetData(), block->GetReadableSize());
         stream.Read(content);
 
-        LLBC_PrintLine("[%d] fetch data: %s",  LLBC_GetCurrentThreadId(), content.c_str());
+        LLBC_PrintLn("[%d] fetch data: %s",  LLBC_GetCurrentThreadId(), content.c_str());
 
         delete block;
     }
@@ -79,7 +79,7 @@ inline void TestTask::Svc()
 
 inline void TestTask::Cleanup()
 {
-    LLBC_PrintLine("Task cleanup, queue size:%lu", GetMessageSize());
+    LLBC_PrintLn("Task cleanup, queue size:%lu", GetMessageSize());
 }
 
 TestCase_Core_Thread_Task::TestCase_Core_Thread_Task()
@@ -92,13 +92,16 @@ TestCase_Core_Thread_Task::~TestCase_Core_Thread_Task()
 
 int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/thread/task test:");
+    LLBC_PrintLn("core/thread/task test:");
 
     // Activate task.
     const int threadNum = 5;
     const size_t pushMsgSize = 10000 * threadNum;
     TestTask *task = new TestTask(pushMsgSize / threadNum);
     task->Activate(5);
+    const int taskState = task->GetTaskState();
+    LLBC_PrintLn("Task activated, task state:%s(%d)",
+                   LLBC_TaskState::GetDesc(taskState), taskState);
 
     // Send message to task.
     for(size_t i = 0; i < pushMsgSize; ++i)
@@ -111,14 +114,19 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
         task->Push(block);
     }
 
+    // Before wait task, print task state.
+    LLBC_PrintLn("Before wait task, task state:%s",
+                   LLBC_TaskState::GetDesc(task->GetTaskState()));
+
     // Wait task.
     task->Wait();
     // Dump message queue size.
-    LLBC_PrintLine("After task finished, queue size:%lu", task->GetMessageSize());
+    LLBC_PrintLn("After task finished, task state:%s, queue size:%lu",
+                   LLBC_TaskState::GetDesc(task->GetTaskState()), task->GetMessageSize());
     // Delete task.
     delete task;
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

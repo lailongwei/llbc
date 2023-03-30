@@ -30,12 +30,12 @@ class TestObj : public LLBC_Object
 public:
     TestObj()
     {
-        LLBC_PrintLine("TestObj construct: %p", this);
+        LLBC_PrintLn("TestObj construct: %p", this);
     }
 
     virtual ~TestObj()
     {
-        LLBC_PrintLine("TestObj destruct: %p", this);
+        LLBC_PrintLn("TestObj destruct: %p", this);
     }
 };
 
@@ -46,9 +46,9 @@ public:
     virtual ~MyComp() {  }
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("MyComp initialize ...");
+        LLBC_PrintLn("MyComp initialize ...");
 
         TestObj *obj = new TestObj;
         obj->AutoRelease();
@@ -64,7 +64,7 @@ public:
 
     virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("MyComp destroy...");
+        LLBC_PrintLn("MyComp destroy...");
     }
 
     virtual void OnUpdate()
@@ -91,7 +91,7 @@ TestCase_Comm_ReleasePool::~TestCase_Comm_ReleasePool()
 
 int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("ReleasePool test:");
+    LLBC_PrintLn("ReleasePool test:");
 
     // Create service.
     LLBC_Service *svc = LLBC_Service::Create("ReleasePoolTest");

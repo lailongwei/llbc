@@ -22,7 +22,7 @@
 
 #include "core/os/TestCase_Core_OS_Thread.h"
 
-static int ThreadProc(void *arg)
+static void ThreadProc(void *arg)
 {
     const char *threadDesc = reinterpret_cast<const char *>(arg);
 
@@ -31,18 +31,18 @@ static int ThreadProc(void *arg)
     {
         LLBC_ThreadId id = LLBC_GetCurrentThreadId();
         LLBC_NativeThreadHandle handle = LLBC_GetCurrentThread();
-#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-        LLBC_PrintLine("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
-#else
-        LLBC_PrintLine("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
+#if LLBC_TARGET_PLATFORM_WIN32
+        LLBC_PrintLn("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
+#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+        LLBC_PrintLn("Hello, I'm thread %s[handle:%p, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
+#else // Linux/Android
+        LLBC_PrintLn("Hello, I'm thread %s[handle:%ld, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
 #endif
 
         LLBC_Sleep(1000);
     }
 
     LLBC_Sleep(60 * 1000);
-
-    return 0;
 }
 
 TestCase_Core_OS_Thread::TestCase_Core_OS_Thread()
@@ -69,7 +69,7 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
     LLBC_NativeThreadHandle handle1 = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     LLBC_NativeThreadHandle handle2 = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     std::cout <<"Create thread1" <<std::endl;
-    if(LLBC_CreateThread(&handle1, ThreadProc, (void *)"thread 1") != LLBC_OK)
+    if(LLBC_CreateThread(ThreadProc, (void *)"thread 1", &handle1) != LLBC_OK)
     {
         std::cerr <<"Create thread1 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;
@@ -87,7 +87,7 @@ int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
     std::cout <<"thread1 new priority: " <<LLBC_GetThreadPriority(handle1) <<std::endl;
 
     std::cout <<"Create thread2" <<std::endl;
-    if(LLBC_CreateThread(&handle2, ThreadProc, (void *)"thread 2") != LLBC_OK)
+    if(LLBC_CreateThread(ThreadProc, (void *)"thread 2", &handle2) != LLBC_OK)
     {
         std::cerr <<"Create thread2 failed, err desc: " <<LLBC_FormatLastError() <<std::endl;
         return -1;

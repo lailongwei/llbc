@@ -44,24 +44,24 @@ namespace
     public:
         void OnPrint()
         {
-            LLBC_PrintLine("TestComp");
+            LLBC_PrintLn("TestComp");
         }
 
     public:
-        virtual bool OnInitialize(bool &initFinished)
+        virtual bool OnInit(bool &initFinished)
         {
-            LLBC_PrintLine("Service initialize");
+            LLBC_PrintLn("Service initialize");
             return true;
         }
 
         virtual void OnDestroy(bool &destroyFinished)
         {
-            LLBC_PrintLine("Service destroy");
+            LLBC_PrintLn("Service destroy");
         }
 
         virtual bool OnStart(bool &startFinished)
         {
-            LLBC_PrintLine("Service start");
+            LLBC_PrintLn("Service start");
             _timer = new LLBC_Timer(
                               std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
@@ -72,7 +72,7 @@ namespace
 
         virtual void OnStop(bool &stopFinished)
         {
-            LLBC_PrintLine("Service stop");
+            LLBC_PrintLn("Service stop");
             _timer->Cancel();
             LLBC_XDelete(_timer);
         }
@@ -80,23 +80,23 @@ namespace
     public:
         virtual void OnUpdate()
         {
-            LLBC_PrintLine("Update...");
+            LLBC_PrintLn("Update...");
         }
 
         virtual void OnIdle(const LLBC_TimeSpan &idleTime)
         {
-            LLBC_PrintLine("Idle, idle time: %s...", idleTime.ToString().c_str());
+            LLBC_PrintLn("Idle, idle time: %s...", idleTime.ToString().c_str());
         }
 
     public:
         virtual void OnTimerTimeout(LLBC_Timer *timer)
         {
-            LLBC_PrintLine("Timer timeout!");
+            LLBC_PrintLn("Timer timeout!");
         }
 
         virtual void OnTimerCancel(LLBC_Timer *timer)
         {
-            LLBC_PrintLine("Time cancelled!");
+            LLBC_PrintLn("Time cancelled!");
         }
 
     private:
@@ -124,7 +124,7 @@ namespace
     public:
         void OnPrint()
         {
-            LLBC_PrintLine("EchoComp");
+            LLBC_PrintLn("EchoComp");
         }
     };
 
@@ -148,12 +148,13 @@ TestCase_Comm_CompBase::~TestCase_Comm_CompBase()
 
 int TestCase_Comm_CompBase::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("CompBase test:");
+    LLBC_PrintLn("CompBase test:");
 
     // Parse arguments.
     if (argc < 4)
     {
-        LLBC_FilePrintLine(stderr, "argument error, eg: ./a {internal-drive | external-drive} <host> <port>");
+        LLBC_FilePrintLn(
+            stderr, "argument error, eg: ./a {internal-drive | external-drive} <host> <port>");
         return LLBC_FAILED;
     }
 
@@ -167,7 +168,7 @@ int TestCase_Comm_CompBase::Run(int argc, char *argv[])
 
 int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, int port)
 {
-    LLBC_PrintLine("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
+    LLBC_PrintLn("Comp test(In internal-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
     LLBC_Service *svc = LLBC_Service::Create("CompTest");
@@ -178,38 +179,38 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
     // Try init library comp(not exist)
     const LLBC_String notExistCompName = "Not exist comp name";
     const LLBC_String notExistCompLibPath = "!!!!!!!!Not exist library!!!!!!!!";
-    LLBC_PrintLine("Test try register not exist third-party comp, libPath:%s, compName:%s",
+    LLBC_PrintLn("Test try register not exist third-party comp, libPath:%s, compName:%s",
                    notExistCompLibPath.c_str(), notExistCompName.c_str());
     int ret = svc->AddComponent(notExistCompLibPath, notExistCompName);
     if (ret != LLBC_OK)
     {
-        LLBC_PrintLine("Register not exist third-party comp failed, error:%s", LLBC_FormatLastError());
+        LLBC_PrintLn("Register not exist third-party comp failed, error:%s", LLBC_FormatLastError());
     }
     else
     {
-        LLBC_PrintLine("Register not exist third-party comp success, internal error!!!");
+        LLBC_PrintLn("Register not exist third-party comp success, internal error!!!");
         getchar();
         delete svc;
 
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLine("Start service...");
+    LLBC_PrintLn("Start service...");
     if (svc->Start(10) != LLBC_OK)
     {
-        LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
         delete svc;
 
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Test componet load success.");
-    LLBC_PrintLine("Call Service::Start() finished!");
+    LLBC_PrintLn("Test componet load success.");
+    LLBC_PrintLn("Call Service::Start() finished!");
 
     auto* testComp = svc->GetComponent<ITestComp>();
     if(testComp == nullptr)
     {
-        LLBC_PrintLine("Test component get failed, error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Test component get failed, error: %s", LLBC_FormatLastError());
         getchar();
         delete svc;
 
@@ -220,7 +221,7 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
     auto* echoComp = svc->GetComponent<IEchoComp>();
     if(echoComp == nullptr)
     {
-        LLBC_PrintLine("Echo component get failed, error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Echo component get failed, error: %s", LLBC_FormatLastError());
         getchar();
         delete svc;
 
@@ -230,24 +231,24 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
 
     
 
-    LLBC_PrintLine("Press any key to restart service(stop->start)...");
+    LLBC_PrintLn("Press any key to restart service(stop->start)...");
     getchar();
     svc->Stop();
     if (svc->Start(5) != LLBC_OK)
     {
-        LLBC_PrintLine("Failed to restart service, error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Failed to restart service, error: %s", LLBC_FormatLastError());
         getchar();
         delete svc;
 
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Call Service::Start() finished!");
+    LLBC_PrintLn("Call Service::Start() finished!");
 
-    LLBC_PrintLine("Press any key to stop service...");
+    LLBC_PrintLn("Press any key to stop service...");
     getchar();
     svc->Stop();
 
-    LLBC_PrintLine("Press any key to destroy service...");
+    LLBC_PrintLn("Press any key to destroy service...");
     getchar();
     delete svc;
 
@@ -256,7 +257,7 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
 
 int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, int port)
 {
-    LLBC_PrintLine("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
+    LLBC_PrintLn("Comp test(In external-drive service), host: %s, port: %d", host.c_str(), port);
 
     // Create and init service.
     LLBC_Service *svc = LLBC_Service::Create("CompTest");
@@ -264,38 +265,38 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
     svc->AddComponent<TestCompFactory>();
     svc->SetDriveMode(LLBC_Service::ExternalDrive);
 
-    LLBC_PrintLine("Start service...");
+    LLBC_PrintLn("Start service...");
     if (svc->Start(2) != LLBC_OK)
     {
-        LLBC_PrintLine("Failed to start service, error: %s", LLBC_FormatLastError());
+        LLBC_PrintLn("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
         delete svc;
 
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Call Service::Start() finished!");
+    LLBC_PrintLn("Call Service::Start() finished!");
 
     int waitSecs = 10, nowWaited = 0;
-    LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
+    LLBC_PrintLn("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
     while (nowWaited != waitSecs)
     {
         svc->OnSvc();
         ++nowWaited;
     }
 
-    LLBC_PrintLine("Restart service...");
+    LLBC_PrintLn("Restart service...");
     svc->Stop();
     if (svc->Start(2) != LLBC_OK)
     {
-        LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
+        LLBC_PrintLn("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
         getchar();
         delete svc;
 
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Call Service::Start() finished!");
+    LLBC_PrintLn("Call Service::Start() finished!");
 
-    LLBC_PrintLine("Calling Service.OnSvc, %d seconds later will stop service...", waitSecs);
+    LLBC_PrintLn("Calling Service.OnSvc, %d seconds later will stop service...", waitSecs);
     nowWaited = 0;
     while (nowWaited != waitSecs)
     {
@@ -303,10 +304,10 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
         ++nowWaited;
     }
 
-    LLBC_PrintLine("Stop service...");
+    LLBC_PrintLn("Stop service...");
     svc->Stop();
 
-    LLBC_PrintLine("Press any key to destroy service...");
+    LLBC_PrintLn("Press any key to destroy service...");
     getchar();
     delete svc;
 

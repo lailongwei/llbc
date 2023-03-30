@@ -28,7 +28,7 @@ wrap/pyllbc/src/pyllbc_scripts.h
 wrap/pyllbc/src/common/_CommonMethods.h
 wrap/pyllbc/src/core/_CoreMethods.h
 wrap/pyllbc/src/comm/_CommMethods.h
-wrap/pyllbc/src/application/_ApplicationMethods.h
+wrap/pyllbc/src/app/_AppMethods.h
 wrap/pyllbc/src/testcase/_TestcaseMethods.h
 
 !.gitignore
