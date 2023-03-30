@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/singleton/Singleton.h"
 #include "llbc/core/thread/DummyLock.h"
 

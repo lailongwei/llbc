@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"

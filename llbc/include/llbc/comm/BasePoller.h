@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/AsyncConnInfo.h"
 

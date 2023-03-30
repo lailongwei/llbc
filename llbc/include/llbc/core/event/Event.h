@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/variant/Variant.h"
 #include "llbc/core/utils/Util_Delegate.h"
 #include "llbc/core/objectpool/PoolObject.h"

@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/objectpool/IObjectPoolInstFactory.h"
 
 __LLBC_NS_BEGIN

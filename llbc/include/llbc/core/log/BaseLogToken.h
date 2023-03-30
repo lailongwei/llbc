@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/log/ILogToken.h"
 
 __LLBC_NS_BEGIN

@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/thread/Task.h"
 #include "llbc/core/thread/SpinLock.h"
 

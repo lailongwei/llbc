@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/os/OS_Thread.h"
 #include "llbc/core/thread/MessageQueue.h"
 

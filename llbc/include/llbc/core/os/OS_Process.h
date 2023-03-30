@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/utils/Util_Delegate.h"
 
 // Hook process crash support macro define.

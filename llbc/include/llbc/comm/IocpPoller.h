@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/BasePoller.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
