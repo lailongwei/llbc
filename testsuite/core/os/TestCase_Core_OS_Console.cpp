@@ -1,3 +1,9 @@
+/**
+ * @Author: Your name
+ * @Date:   2023-03-30 19:18:42
+ * @Last Modified by:   Your name
+ * @Last Modified time: 2023-03-30 19:42:55
+ */
 // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
@@ -183,7 +189,7 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     LLBC_PrintLn("%s", str.c_str());
 
     std::cout <<"LLBC_FilePrint(stdout, \"" <<hrStr <<"\"):" <<std::endl;
-    LLBC_FilePrint(stdout, str.c_str());
+    LLBC_FilePrint(stdout, "%s", str.c_str());
 
     std::cout <<"LLBC_FilePrintLn(stdout, \"" <<hrStr <<"\"):" <<std::endl;
     LLBC_FilePrintLn(stdout, "%s", str.c_str());
