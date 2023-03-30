@@ -177,10 +177,10 @@ int TestCase_Core_OS_Console::Run(int argc, char *argv[])
     const LLBC_String str = "Hello World\n";
     const LLBC_String hrStr = "Hello World\\n";
     std::cout <<"LLBC_Print(\"" <<hrStr <<"\"):" <<std::endl;
-    LLBC_Print(str.c_str());
+    LLBC_Print("%s", str.c_str());
 
     std::cout <<"LLBC_PrintLn(\"" <<hrStr <<"\"):" <<std::endl;
-    LLBC_PrintLn(str.c_str());
+    LLBC_PrintLn("%s", str.c_str());
 
     std::cout <<"LLBC_FilePrint(stdout, \"" <<hrStr <<"\"):" <<std::endl;
     LLBC_FilePrint(stdout, str.c_str());

@@ -170,17 +170,7 @@ private:
     /**
      * Task entry method
      */
-    static void TaskEntry(void *arg);
-
-    /**
-     * When task thread start, will call this event handler.
-     */
-    void OnTaskThreadStart();
-
-    /**
-     * When task thread stop, will call this event handler.
-     */
-    void OnTaskThreadStop();
+    void TaskEntry(void *arg);
 
 private:
     LLBC_SpinLock _lock;

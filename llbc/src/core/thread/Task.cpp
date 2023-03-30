@@ -72,8 +72,8 @@ int LLBC_Task::Activate(int threadNum,
 
     // Create task threads.
     _threadGroupHandle = _threadMgr->CreateThreads(threadNum,
-                                                   &TaskEntry,
-                                                   this,
+                                                   LLBC_Delegate<void(void *)>(this, &LLBC_Task::TaskEntry),
+                                                   nullptr,
                                                    threadPriority,
                                                    stackSize);
     if (_threadGroupHandle == LLBC_INVALID_HANDLE)
@@ -156,30 +156,21 @@ void LLBC_Task::InternalCleanup()
 
 void LLBC_Task::TaskEntry(void *arg)
 {
-    LLBC_Task *task = reinterpret_cast<LLBC_NS LLBC_Task *>(arg);
+    // Set task object to TLS.
+    __LLBC_GetLibTls()->coreTls.task = this;
 
-    LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
+    // Incr activating thread num.
+    (void)LLBC_AtomicFetchAndAdd(&_activatingThreadNum, 1);
 
-    tls->coreTls.task = task;
-
-    task->OnTaskThreadStart();
-    while (task->GetTaskState() != LLBC_NS LLBC_TaskState::Activated)
+    // Waiting for Task::Activate() call finished.
+    while (GetTaskState() != LLBC_NS LLBC_TaskState::Activated)
         LLBC_NS LLBC_Sleep(0);
 
-    task->Svc();
+    // Call task svc meth().
+    // ==========================================
+    Svc();
+    // ==========================================
 
-    task->OnTaskThreadStop();
-
-    tls->coreTls.task = nullptr;
-}
-
-void LLBC_Task::OnTaskThreadStart()
-{
-    (void)LLBC_AtomicFetchAndAdd(&_activatingThreadNum, 1);
-}
-
-void LLBC_Task::OnTaskThreadStop()
-{
     // Set _taskState to Deactivating, if is first stop thread.
     const int preSubThreadNum = LLBC_AtomicFetchAndSub(&_activatingThreadNum, 1);
     if (preSubThreadNum == _threadNum)
@@ -192,13 +183,16 @@ void LLBC_Task::OnTaskThreadStop()
             LLBC_Sleep(0);
     }
 
-    // If is latest stop thread, cleanup task.
+    // If the latest thread is stopped, cleanup task.
     if (preSubThreadNum == 1)
     {
         LLBC_LockGuard guard(_lock);
         Cleanup();
         InternalCleanup();
     }
+
+    // Reset TLS's task member.
+    __LLBC_GetLibTls()->coreTls.task = nullptr;
 }
 
 __LLBC_NS_END
