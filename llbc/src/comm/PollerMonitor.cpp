@@ -60,7 +60,7 @@ void LLBC_PollerMonitor::Stop()
 
     _stopping = true;
     while (_started)
-        LLBC_ThreadManager::Sleep(20);
+        LLBC_Sleep(20);
 
     _stopping = false;
 }

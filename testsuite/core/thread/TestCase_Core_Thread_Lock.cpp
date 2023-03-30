@@ -31,7 +31,7 @@ struct __LLBC_Thread_Test_Arg
     uint64 val;
 };
 
-static int ThreadProc(void *arg)
+static void ThreadProc(void *arg)
 {
     int threadIndex = *(reinterpret_cast<int *>(arg));
     __LLBC_Thread_Test_Arg *threadArg;
@@ -52,8 +52,6 @@ static int ThreadProc(void *arg)
     __g_outLock.Unlock();
 
     free(arg);
-
-    return 0;
 }
 
 TestCase_Core_Thread_Lock::TestCase_Core_Thread_Lock()
@@ -82,7 +80,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
         *(reinterpret_cast<int *>(buf)) = i;
         memcpy(buf + sizeof(int), &threadArg, sizeof(__LLBC_Thread_Test_Arg *));
-        LLBC_CreateThread(&handles[i], &ThreadProc, buf);
+        LLBC_CreateThread(&ThreadProc, buf, &handles[i]);
     }
 
     for(int i = 0; i < __g_threads_num; ++i)
@@ -102,7 +100,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
         *(reinterpret_cast<int *>(buf)) = i;
         memcpy(buf + sizeof(int), &threadArg, sizeof(__LLBC_Thread_Test_Arg *));
-        LLBC_CreateThread(&handles[i], &ThreadProc, buf);
+        LLBC_CreateThread(&ThreadProc, buf, &handles[i]);
     }
 
     for(int i = 0; i < __g_threads_num; ++i)
@@ -122,7 +120,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
         *(reinterpret_cast<int *>(buf)) = i;
         memcpy(buf + sizeof(int), &threadArg, sizeof(__LLBC_Thread_Test_Arg *));
-        LLBC_CreateThread(&handles[i], &ThreadProc, buf);
+        LLBC_CreateThread(&ThreadProc, buf, &handles[i]);
     }
 
     for(int i = 0; i < __g_threads_num; ++i)
@@ -142,7 +140,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
         *(reinterpret_cast<int *>(buf)) = i;
         memcpy(buf + sizeof(int), &threadArg, sizeof(__LLBC_Thread_Test_Arg *));
-        LLBC_CreateThread(&handles[i], &ThreadProc, buf);
+        LLBC_CreateThread(&ThreadProc, buf, &handles[i]);
     }
 
     for(int i = 0; i < __g_threads_num; ++i)
@@ -162,7 +160,7 @@ int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
 
         *(reinterpret_cast<int *>(buf)) = i;
         memcpy(buf + sizeof(int), &threadArg, sizeof(__LLBC_Thread_Test_Arg *));
-        LLBC_CreateThread(&handles[i], &ThreadProc, buf);
+        LLBC_CreateThread(&ThreadProc, buf, &handles[i]);
     }
 
     for(int i = 0; i < __g_threads_num; ++i)

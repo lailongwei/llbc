@@ -34,8 +34,8 @@ TestCase_Comm_DynLoadComp::~TestCase_Comm_DynLoadComp()
 
 int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Communication Service Dynamic Load Comp Test:");
-    LLBC_PrintLine("Note: You must be build your comp library first!");
+    LLBC_PrintLn("Communication Service Dynamic Load Comp Test:");
+    LLBC_PrintLn("Note: You must be build your comp library first!");
 
     LLBC_String libPath, compName;
     LLBC_Print("Please input your comp library path:");
@@ -44,36 +44,36 @@ int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
     LLBC_Print("Please input your comp name:");
     std::cin >> compName;
 
-    LLBC_PrintLine("Will register comp in service");
+    LLBC_PrintLn("Will register comp in service");
     int ret = _svc->AddComponent(libPath, compName);
     if (ret != LLBC_OK)
     {
-        LLBC_FilePrintLine(stderr, "Failed to register dynamic comp, error:%s", LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr, "Failed to register dynamic comp, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
-    LLBC_PrintLine("Register dynamic comp success, try start service");
+    LLBC_PrintLn("Register dynamic comp success, try start service");
     if ((ret = _svc->Start()) != LLBC_OK)
     {
-        LLBC_FilePrintLine(stderr, "Start service failed, error:%s", LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr, "Start service failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLine("Try call comp method: Foo");
+    LLBC_PrintLn("Try call comp method: Foo");
     LLBC_Component *comp = _svc->GetComponent("TestComp");
     LLBC_Variant arg(3);
     LLBC_Variant callRet(4);
     ret = comp->CallMethod("Foo", arg, callRet);
     if (ret != LLBC_OK)
     {
-        LLBC_PrintLine("Call method Foo success, but return code not equal to 0, error(maybe incorrect):%s", LLBC_FormatLastError());
+        LLBC_PrintLn("Call method Foo success, but return code not equal to 0, error(maybe incorrect):%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
     else
     {
-        LLBC_PrintLine("Call method Foo success, callRet:%s", callRet.ToString().c_str());
+        LLBC_PrintLn("Call method Foo success, callRet:%s", callRet.ToString().c_str());
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return 0;

@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 #include "llbc/core/thread/SimpleLock.h"
 #include "llbc/core/thread/ConditionVariable.h"

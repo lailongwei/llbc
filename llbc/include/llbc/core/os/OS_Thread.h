@@ -26,19 +26,6 @@
 __LLBC_NS_BEGIN
 
 /**
- * Thread flag enumeration.
- */
-class LLBC_EXPORT LLBC_ThreadFlag
-{
-public:
-    enum
-    {
-        Joinable    = 0x00000001,
-        Detached    = 0x00000002
-    };
-};
-
-/**
  * Thread state enumeration.
  */
 class LLBC_EXPORT LLBC_ThreadState
@@ -76,27 +63,32 @@ public:
 
         End
     };
+
+    /**
+     * Check given thread priority enumeration valid or not.
+     * @param[in] threadPriority - the thread priority.
+     * @return bool - the valid flag.
+     */
+    static bool IsValid(int threadPriority);
 };
 
 /**
  * Create thread, in WIN32 platform, use ::CreateThread system API to implement,
  * In LINUX platform, use posix-thread API to implement.
- * @param[out] nativeThreadHandle - native thread handle, in WIN32, type is HANDLE,
- *                                  in LINUX platform, type is pthread_t, see
- *                                  llbc/common/BasicDataType.h header file.
- * @param[in] proc                - thread routine.
- * @param[in] arg                 - thread routine's argument.
- * @param[in] flags               - thread flags, see LLBC_ThreadFlag class.
- * @param[in] priority            - thread priority, see LLBC_ThreadPriority class.
- * @param[in] stackSize           - thread stack size, in bytes.
+ * @param[in] proc          - thread routine.
+ * @param[in] arg           - thread routine's argument.
+ * @param[out] nativeHandle - native thread handle, in WIN32, type is HANDLE,
+ *                            in LINUX platform, type is pthread_t, see
+ *                            llbc/common/BasicDataType.h header file.
+ * @param[in] priority      - thread priority, see LLBC_ThreadPriority class.
+ * @param[in] stackSize     - thread stack size, in bytes.
  * @return int - return 0 if create successed, otherwise return false.
  */
-LLBC_EXPORT int LLBC_CreateThread(LLBC_NativeThreadHandle *handle,
-                                  LLBC_ThreadProc proc,
+LLBC_EXPORT int LLBC_CreateThread(LLBC_ThreadProc proc,
                                   LLBC_ThreadArg arg,
-                                  int flags = LLBC_ThreadFlag::Joinable,
+                                  LLBC_NativeThreadHandle *nativeHandle = nullptr,
                                   int priority = LLBC_ThreadPriority::Normal,
-                                  int stackSize = LLBC_CFG_THREAD_DFT_STACK_SIZE);
+                                  int stackSize = 0);
 
 /**
  * Get current native thread handle.
@@ -157,10 +149,10 @@ LLBC_EXPORT int LLBC_CancelThread(LLBC_NativeThreadHandle handle);
 /**
  * Kill thread.
  * @param[in] handle - native thread handle.
- * @param[in] signo  - signal number.
+ * @param[in] sig    - signal number.
  * @return int - return 0 if successed, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_KillThread(LLBC_NativeThreadHandle handle, int signo);
+LLBC_EXPORT int LLBC_KillThread(LLBC_NativeThreadHandle handle, int sig);
 
 /**
  * Sleep function.

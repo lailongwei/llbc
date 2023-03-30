@@ -198,7 +198,7 @@ inline int LLBC_Component::CallMethod(const LLBC_CString &methName,
     return _meths->CallMethod(methName, arg, ret);
 }
 
-inline bool LLBC_Component::OnInitialize(bool &finished)
+inline bool LLBC_Component::OnInit(bool &finished)
 {
     return true;
 }
@@ -232,23 +232,23 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
-inline void LLBC_Component::OnApplicationEarlyStart()
+inline void LLBC_Component::OnAppEarlyStart()
 {
 }
 
-inline void LLBC_Component::OnApplicationStartFail()
+inline void LLBC_Component::OnAppStartFail()
 {
 }
 
-inline void LLBC_Component::OnApplicationStartFinish()
+inline void LLBC_Component::OnAppStartFinish()
 {
 }
 
-inline void LLBC_Component::OnApplicationEarlyStop()
+inline void LLBC_Component::OnAppEarlyStop()
 {
 }
 
-inline void LLBC_Component::OnApplicationConfigReload()
+inline void LLBC_Component::OnAppConfigReload()
 {
 }
 

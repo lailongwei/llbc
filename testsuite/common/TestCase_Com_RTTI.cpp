@@ -39,35 +39,35 @@ TestCase_Com_RTTI::~TestCase_Com_RTTI()
 
 int TestCase_Com_RTTI::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Common/RTTI test:");
+    LLBC_PrintLn("Common/RTTI test:");
 
-    LLBC_PrintLine("Raw type name test:");
-    LLBC_PrintLine("  LLBC_GetTypeName(bool): %s", LLBC_GetTypeName(bool));
-    LLBC_PrintLine("  LLBC_GetTypeName(sint8): %s", LLBC_GetTypeName(sint8));
-    LLBC_PrintLine("  LLBC_GetTypeName(uint8): %s", LLBC_GetTypeName(uint8));
-    LLBC_PrintLine("  LLBC_GetTypeName(sint16): %s", LLBC_GetTypeName(sint16));
-    LLBC_PrintLine("  LLBC_GetTypeName(uint16): %s", LLBC_GetTypeName(uint16));
-    LLBC_PrintLine("  LLBC_GetTypeName(sint32): %s", LLBC_GetTypeName(sint32));
-    LLBC_PrintLine("  LLBC_GetTypeName(uint32): %s", LLBC_GetTypeName(uint32));
-    LLBC_PrintLine("  LLBC_GetTypeName(sint64): %s", LLBC_GetTypeName(sint64));
-    LLBC_PrintLine("  LLBC_GetTypeName(uint64): %s", LLBC_GetTypeName(uint64));
-    LLBC_PrintLine("  LLBC_GetTypeName(float): %s", LLBC_GetTypeName(float));
-    LLBC_PrintLine("  LLBC_GetTypeName(double): %s", LLBC_GetTypeName(double));
-    LLBC_PrintLine("  LLBC_GetTypeName(std::string): %s", LLBC_GetTypeName(std::string));
-    LLBC_PrintLine("  LLBC_GetTypeName(LLBC_String): %s", LLBC_GetTypeName(LLBC_String));
+    LLBC_PrintLn("Raw type name test:");
+    LLBC_PrintLn("  LLBC_GetTypeName(bool): %s", LLBC_GetTypeName(bool));
+    LLBC_PrintLn("  LLBC_GetTypeName(sint8): %s", LLBC_GetTypeName(sint8));
+    LLBC_PrintLn("  LLBC_GetTypeName(uint8): %s", LLBC_GetTypeName(uint8));
+    LLBC_PrintLn("  LLBC_GetTypeName(sint16): %s", LLBC_GetTypeName(sint16));
+    LLBC_PrintLn("  LLBC_GetTypeName(uint16): %s", LLBC_GetTypeName(uint16));
+    LLBC_PrintLn("  LLBC_GetTypeName(sint32): %s", LLBC_GetTypeName(sint32));
+    LLBC_PrintLn("  LLBC_GetTypeName(uint32): %s", LLBC_GetTypeName(uint32));
+    LLBC_PrintLn("  LLBC_GetTypeName(sint64): %s", LLBC_GetTypeName(sint64));
+    LLBC_PrintLn("  LLBC_GetTypeName(uint64): %s", LLBC_GetTypeName(uint64));
+    LLBC_PrintLn("  LLBC_GetTypeName(float): %s", LLBC_GetTypeName(float));
+    LLBC_PrintLn("  LLBC_GetTypeName(double): %s", LLBC_GetTypeName(double));
+    LLBC_PrintLn("  LLBC_GetTypeName(std::string): %s", LLBC_GetTypeName(std::string));
+    LLBC_PrintLn("  LLBC_GetTypeName(LLBC_String): %s", LLBC_GetTypeName(LLBC_String));
 
-    LLBC_PrintLine("\nPoint type test:");
-    LLBC_PrintLine("  LLBC_GetTypeName((int *)): %s", LLBC_GetTypeName(int*));
-    LLBC_PrintLine("  LLBC_GetTypeName((int *)nullptr): %s", LLBC_GetTypeName((int*)nullptr));
-    LLBC_PrintLine("  LLBC_GetTypeName(int **): %s", LLBC_GetTypeName(int**));
-    LLBC_PrintLine("  LLBC_GetTypeName((int **)nullptr): %s", LLBC_GetTypeName((int**)nullptr));
-    LLBC_PrintLine("  LLBC_GetTypeName((int ***)nullptr): %s", LLBC_GetTypeName((int***)nullptr));
+    LLBC_PrintLn("\nPoint type test:");
+    LLBC_PrintLn("  LLBC_GetTypeName((int *)): %s", LLBC_GetTypeName(int*));
+    LLBC_PrintLn("  LLBC_GetTypeName((int *)nullptr): %s", LLBC_GetTypeName((int*)nullptr));
+    LLBC_PrintLn("  LLBC_GetTypeName(int **): %s", LLBC_GetTypeName(int**));
+    LLBC_PrintLn("  LLBC_GetTypeName((int **)nullptr): %s", LLBC_GetTypeName((int**)nullptr));
+    LLBC_PrintLn("  LLBC_GetTypeName((int ***)nullptr): %s", LLBC_GetTypeName((int***)nullptr));
 
-    LLBC_PrintLine("\nUser defined classes/structs test:");
-    LLBC_PrintLine("  LLBC_GetTypeName(UserDefineStruct): %s", LLBC_GetTypeName(UserDefineStruct));
-    LLBC_PrintLine("  LLBC_GetTypeName(UserDefineClass): %s", LLBC_GetTypeName(UserDefineClass));
+    LLBC_PrintLn("\nUser defined classes/structs test:");
+    LLBC_PrintLn("  LLBC_GetTypeName(UserDefineStruct): %s", LLBC_GetTypeName(UserDefineStruct));
+    LLBC_PrintLn("  LLBC_GetTypeName(UserDefineClass): %s", LLBC_GetTypeName(UserDefineClass));
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return LLBC_OK;

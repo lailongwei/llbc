@@ -22,7 +22,6 @@
 #pragma once
 
 #include "llbc/core/thread/Guard.h"
-#include "llbc/core/helper/Common.h"
 
 #include "llbc/core/objectpool/ObjectPoolStat.h"
 #include "llbc/core/objectpool/IObjectPoolInstFactory.h"

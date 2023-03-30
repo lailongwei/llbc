@@ -30,10 +30,10 @@ const int OPCODE = 0;
 class TestComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
         LLBC_Service *svc = GetService();
-        LLBC_PrintLine("Service create: %p", svc);
+        LLBC_PrintLn("Service create: %p", svc);
 
         return true;
     }
@@ -41,20 +41,20 @@ public:
     virtual void OnDestroy(bool &destroyFinished)
     {
         LLBC_Service *svc = GetService();
-        LLBC_PrintLine("Service destroy: %p", svc);
+        LLBC_PrintLn("Service destroy: %p", svc);
     }
 
     virtual void OnUpdate()
     {
         // LLBC_Service *svc = GetService();
-        // LLBC_PrintLine("Service update: %p", svc);
+        // LLBC_PrintLn("Service update: %p", svc);
     }
 
 public:
     void OnRecv(LLBC_Packet &packet)
     {
         const char *data = reinterpret_cast<const char *>(packet.GetPayload());
-        LLBC_PrintLine("Recved packet, data: %s", data);
+        LLBC_PrintLn("Recved packet, data: %s", data);
 
         LLBC_Service *svc = GetService();
         svc->Send(packet.GetSessionId(), packet.GetOpcode(), "Hello, World!", 14, 0);
@@ -78,10 +78,10 @@ TestCase_Comm_SendBytes::~TestCase_Comm_SendBytes()
 
 int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Servie send bytes test:");
+    LLBC_PrintLn("Servie send bytes test:");
     if (argc < 5)
     {
-        LLBC_PrintLine("argument error, eg: ./a [client/server] [normal/raw] ip port");
+        LLBC_PrintLn("argument error, eg: ./a [client/server] [normal/raw] ip port");
         return LLBC_FAILED;
     }
 
@@ -105,28 +105,30 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
         sid = svc->Connect(_runIp.c_str(), _runPort);
         if (sid == 0)
         {
-            LLBC_FilePrintLine(stderr, "connect to %s:%d failed, err: %s",
-                _runIp.c_str(), _runPort, LLBC_FormatLastError());
+            LLBC_FilePrintLn(stderr,
+                             "connect to %s:%d failed, err: %s",
+                             _runIp.c_str(),
+                             _runPort, LLBC_FormatLastError());
             delete svc;
 
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("server connect to %s:%d success", _runIp.c_str(), _runPort);
+        LLBC_PrintLn("server connect to %s:%d success", _runIp.c_str(), _runPort);
     }
     else
     {
         sid = svc->Listen(_runIp.c_str(), _runPort);
         if (sid == 0)
         {
-            LLBC_FilePrintLine(stderr, "failed to listen on %s:%d, err: %s",
+            LLBC_FilePrintLn(stderr, "failed to listen on %s:%d, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
             delete svc;
 
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("server listen on %s:%d", _runIp.c_str(), _runPort);
+        LLBC_PrintLn("server listen on %s:%d", _runIp.c_str(), _runPort);
     }
 
     svc->Start();
@@ -141,7 +143,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
         svc->Send(pkt);
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     delete svc;

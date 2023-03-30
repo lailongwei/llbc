@@ -21,15 +21,13 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/objectpool/PoolObject.h"
 
 __LLBC_NS_BEGIN
 class LLBC_Variant;
 
 class LLBC_Event;
-class LLBC_EventManager;
+class LLBC_EventMgr;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -79,16 +77,16 @@ private:
      * @param[in] ev    - the event object.
      * @param[in] evMgr - the event manager.
      */
-    void SetEventInfo(LLBC_Event *ev, LLBC_EventManager *evMgr);
+    void SetEventInfo(LLBC_Event *ev, LLBC_EventMgr *evMgr);
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_EventFirer);
 
 private:
-    friend class LLBC_EventManager;
+    friend class LLBC_EventMgr;
 
 private:
     LLBC_Event *_ev;
-    LLBC_EventManager *_evMgr;
+    LLBC_EventMgr *_evMgr;
 };
 
 __LLBC_NS_END

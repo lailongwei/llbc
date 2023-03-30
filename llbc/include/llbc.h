@@ -29,8 +29,8 @@
 #include "llbc/comm/Comm.h"
 /* llbc/testcase part */
 #include "llbc/testcase/BaseTestCase.h"
-/* llbc/application part */
-#include "llbc/application/Application.h"
+/* llbc/app part */
+#include "llbc/app/App.h"
 
 __LLBC_NS_BEGIN
 

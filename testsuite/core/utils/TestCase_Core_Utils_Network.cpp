@@ -32,7 +32,7 @@ TestCase_Core_Utils_Network::~TestCase_Core_Utils_Network()
 
 int TestCase_Core_Utils_Network::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("llbc library core/utils/Util_Network test:");
+    LLBC_PrintLn("llbc library core/utils/Util_Network test:");
 
     VerifyIPv4Addr("www.baidu.com");
     VerifyIPv4Addr("127.0.0.1");
@@ -49,7 +49,7 @@ int TestCase_Core_Utils_Network::Run(int argc, char *argv[])
 
 void TestCase_Core_Utils_Network::VerifyIPv4Addr(const LLBC_String &addr)
 {
-    LLBC_PrintLine("%s is IPv4 address format? %s", 
+    LLBC_PrintLn("%s is IPv4 address format? %s", 
             addr.c_str(), LLBC_IsIPv4Addr(addr) ? "true" : "false");
 }
 

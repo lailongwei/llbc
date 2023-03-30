@@ -41,7 +41,7 @@ TestCase_Comm_PacketOp::~TestCase_Comm_PacketOp()
 
 int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("llbc library communication/packet test:");
+    LLBC_PrintLn("llbc library communication/packet test:");
 
     // Raw data type read/write test.
     std::cout <<"Raw data type read/write test(net byte order flag: " 

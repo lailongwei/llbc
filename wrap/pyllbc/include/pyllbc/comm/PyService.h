@@ -116,7 +116,7 @@ public:
      * Register comp.
      * @param[in] comp - the comp instance(normal, not steal reference).
      *      comp methods(all methods are optional):
-     *          oninitialize(self, ev): service initialize handler.
+     *          oninit(self, ev): service initialize handler.
      *              ev.svc: service object.
      *          ondestroy(self, ev): service destroy handler.
      *              ev.svc: service object.

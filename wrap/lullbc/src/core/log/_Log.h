@@ -20,16 +20,16 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 static LLBC_Logger *__rootLogger = nullptr;
-static LLBC_LoggerManager *__loggerManager = nullptr;
+static LLBC_LoggerMgr *__loggerManager = nullptr;
 
 // API: InitLog
 LULLBC_LUA_METH int _lullbc_InitLog(lua_State *l)
 {
     const char *configFile = lua_tostring(l, 1);
-    if (LLBC_LoggerManagerSingleton->Initialize(configFile) != LLBC_OK)
+    if (LLBC_LoggerMgrSingleton->Initialize(configFile) != LLBC_OK)
         lullbc_TransferLLBCError(l, __FILE__, __LINE__, "When initialize logger manager");
 
-    __loggerManager = LLBC_LoggerManagerSingleton;
+    __loggerManager = LLBC_LoggerMgrSingleton;
     __rootLogger = __loggerManager->GetRootLogger();
     return 0;
 }
@@ -42,7 +42,7 @@ LULLBC_LUA_METH int _lullbc_UnInitLog(lua_State *l)
 
     __rootLogger = nullptr;
     __loggerManager = nullptr;
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 
     return 0;
 }
@@ -50,7 +50,7 @@ LULLBC_LUA_METH int _lullbc_UnInitLog(lua_State *l)
 // API: IsLogInit
 LULLBC_LUA_METH int _lullbc_IsLogInit(lua_State *l)
 {
-    lua_pushboolean(l, LLBC_LoggerManagerSingleton->IsInited() ? 1 : 0);
+    lua_pushboolean(l, LLBC_LoggerMgrSingleton->IsInited() ? 1 : 0);
     return 1;
 }
 

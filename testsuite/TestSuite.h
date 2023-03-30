@@ -92,9 +92,9 @@
 #include "comm/TestCase_Comm_DynLoadComp.h"
 #include "comm/TestCase_Comm_Echo.h"
 
-#include "application/TestCase_App_AppTest.h"
-#include "application/TestCase_App_AppCfgTest.h"
-#include "application/TestCase_App_AppPhaseWaitingTest.h"
+#include "app/TestCase_App_AppTest.h"
+#include "app/TestCase_App_AppCfgTest.h"
+#include "app/TestCase_App_AppPhaseWaitingTest.h"
 
 extern int TestSuite_Main(int argc, char *argv[]);
 

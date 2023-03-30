@@ -44,11 +44,11 @@ namespace
     public:
         void OnPrint()
         {
-            LLBC_PrintLine("TestComp");
+            LLBC_PrintLn("TestComp");
         }
 
     public:
-        virtual bool OnInitialize(bool &initFinished)
+        virtual bool OnInit(bool &initFinished)
         {
             AddMethod("Foo", [this](const LLBC_Variant &callArgs, LLBC_Variant &callRet) {
                 callRet = Foo(callArgs["x"], callArgs["y"].AsStr());
@@ -65,7 +65,7 @@ namespace
 
         virtual bool OnStart(bool &startFinished)
         {
-            LLBC_PrintLine("Service start");
+            LLBC_PrintLn("Service start");
             _timer = new LLBC_Timer(
                 std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
                 std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
@@ -76,7 +76,7 @@ namespace
 
         virtual void OnStop(bool &stopFinished)
         {
-            LLBC_PrintLine("Service stop");
+            LLBC_PrintLn("Service stop");
             _timer->Cancel();
             LLBC_XDelete(_timer);
         }
@@ -95,28 +95,28 @@ namespace
     private:
         virtual void OnTimerTimeout(LLBC_Timer *timer)
         {
-            LLBC_PrintLine("Call methods:");
-            LLBC_PrintLine("- Call Foo(3, \"hello world\") ret:%d", Foo(3, "hello world"));
-            LLBC_PrintLine("- Call Goo(6, \"hey judy\") ret:%s", Goo(6, "hey judy").c_str());
+            LLBC_PrintLn("Call methods:");
+            LLBC_PrintLn("- Call Foo(3, \"hello world\") ret:%d", Foo(3, "hello world"));
+            LLBC_PrintLn("- Call Goo(6, \"hey judy\") ret:%s", Goo(6, "hey judy").c_str());
 
-            LLBC_PrintLine("Call reflection methods:");
+            LLBC_PrintLn("Call reflection methods:");
             LLBC_Variant callArgs, callRet;
             callArgs["x"] = 3;
             callArgs["y"] = "hello world";
 
             int ret = CallMethod("Foo", callArgs, callRet);
-            LLBC_PrintLine("- Reflection call Foo(3, \"hello world\") ret:%d, retParams:%s", ret, callRet.ToString().c_str());
+            LLBC_PrintLn("- Reflection call Foo(3, \"hello world\") ret:%d, retParams:%s", ret, callRet.ToString().c_str());
 
             callArgs["x"] = 6;
             callArgs["y"] = "hey judy";
             callRet.Clear();
             ret = CallMethod("Goo", callArgs, callRet);
-            LLBC_PrintLine("- Reflection call Call Goo(6, \"hey judy\") ret:%d, retParams:%s", ret, callRet.ToString().c_str());
+            LLBC_PrintLn("- Reflection call Call Goo(6, \"hey judy\") ret:%d, retParams:%s", ret, callRet.ToString().c_str());
         }
 
         virtual void OnTimerCancel(LLBC_Timer *timer)
         {
-            LLBC_PrintLine("Time cancelled!");
+            LLBC_PrintLn("Time cancelled!");
         }
 
     private:
@@ -135,7 +135,7 @@ namespace
 
 int TestCase_Comm_CompReflectionMethod::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Comp reflection method test:");
+    LLBC_PrintLn("Comp reflection method test:");
 
     auto svc = LLBC_Service::Create("TestSvc");
     svc->AddComponent<TestCompFactory>();
@@ -143,7 +143,7 @@ int TestCase_Comm_CompReflectionMethod::Run(int argc, char *argv[])
     svc->Start();
 
     LLBC_Defer(delete svc);
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return LLBC_OK;

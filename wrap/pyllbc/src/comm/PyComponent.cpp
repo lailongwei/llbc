@@ -47,7 +47,7 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 , _svc(svc)
 , _pySvc(svc->GetPyService())
 
-, _methOnInitialize(Py_BuildValue("s", "oninitialize"))
+, _methOnInit(Py_BuildValue("s", "oninit"))
 , _methOnDestroy(Py_BuildValue("s", "ondestroy"))
 , _methOnStart(Py_BuildValue("s", "onstart"))
 , _methOnStop(Py_BuildValue("s", "onstop"))
@@ -94,7 +94,7 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 
 pyllbc_Component::~pyllbc_Component()
 {
-    Py_DECREF(_methOnInitialize);
+    Py_DECREF(_methOnInit);
     Py_DECREF(_methOnDestroy);
     Py_DECREF(_methOnStart);
     Py_DECREF(_methOnStop);
@@ -141,9 +141,9 @@ pyllbc_Component::~pyllbc_Component()
     Py_DECREF(_compEvCallArgs);
 }
 
-bool pyllbc_Component::OnInitialize(bool &initFinished)
+bool pyllbc_Component::OnInit(bool &initFinished)
 {
-    return CallComponentMeth(_methOnInitialize, _EvBuilder::BuildInitializeEv(_pySvc), true);
+    return CallComponentMeth(_methOnInit, _EvBuilder::BuildInitializeEv(_pySvc), true);
 }
 
 void pyllbc_Component::OnDestroy(bool &destroyFinished)

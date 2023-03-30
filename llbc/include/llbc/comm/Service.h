@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/SessionOpts.h"
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Component.h"
@@ -67,7 +64,7 @@ public:
     using LLBC_Task::Wait;
 
 public:
-    virtual ~LLBC_Service() {  }
+    virtual ~LLBC_Service() = default;
 
 public:
     /**
@@ -96,7 +93,7 @@ public:
 
     /**
      * Get config type.
-     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     * @return int - the config type, see LLBC_AppConfigType enum.
      */
     virtual int GetConfigType() const = 0;
 
@@ -545,18 +542,11 @@ protected:
 public:
     /**
      * Get event manager.
-     * @return LLBC_EventManager & - the event manager.
+     * @return LLBC_EventMgr & - the event manager.
      */
-    virtual LLBC_EventManager &GetEventManager() = 0;
+    virtual LLBC_EventMgr &GetEventManager() = 0;
 
 public:
-    /**
-     * Post runnable to service.
-     * @param[in] func - the runnable function.
-     * @param[in] data - the runnable data, can be null.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Post(void(*func)(This *, const LLBC_Variant &data), const LLBC_Variant &data = LLBC_Variant::nil);
     /**
      * Post runnable to service.
      * @param[in] obj    - the runnable object.
@@ -646,11 +636,11 @@ protected:
     friend class LLBC_Component;
 
     /**
-     * Declare friend class: LLBC_Application.
+     * Declare friend class: LLBC_App.
      *  Access method list:
      *      ProcessAppConfigReload()
      */
-    friend class LLBC_Application;
+    friend class LLBC_App;
 
     /**
      * Process application config reload event.

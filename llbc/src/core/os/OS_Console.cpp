@@ -153,13 +153,34 @@ int LLBC_SetConsoleColor(FILE *file, int color)
 int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 {
     const int fileNo = LLBC_File::GetFileNo(file);
-    if (UNLIKELY(fileNo == -1))
-    {
-        return LLBC_FAILED;
-    }
+    LLBC_ReturnIf(UNLIKELY(fileNo == -1), LLBC_FAILED);
 
-    char *buf; int len;
-    LLBC_FormatArg(fmt, buf, len);
+    char stackBuf[512 + 128 + 1];
+
+    va_list ap;
+    va_start(ap, fmt);
+    int len = vsnprintf(stackBuf, sizeof(stackBuf), fmt, ap);
+    va_end(ap);
+
+    LLBC_SetErrAndReturnIf(UNLIKELY(len < 0), LLBC_ERROR_CLIB, LLBC_FAILED);
+
+    char *buf = stackBuf;
+    if (len >= static_cast<int>(sizeof(stackBuf)))
+    {
+        buf = LLBC_Malloc(char, len + 1);
+
+        va_start(ap, fmt);
+        len = vsnprintf(buf, len + 1, fmt, ap);
+        va_end(ap);
+
+        if (UNLIKELY(len < 0))
+        {
+            delete buf;
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+
+            return LLBC_FAILED;
+        }
+    }
 
     #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
@@ -180,7 +201,6 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     {
         fprintf(file, (newline ? "%s\n" : "%s"), buf);
     }
-    fflush(file);
     funlockfile(file);
     #else // Win32
     const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
@@ -188,11 +208,10 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 
     lock.Lock();
     fprintf(file, newline ? "%s\n" : "%s", buf);
-    fflush(file);
     lock.Unlock();
     #endif // !Non-Win32
 
-    free(buf);
+    LLBC_DoIf(len >= static_cast<int>(sizeof(stackBuf)), free(buf));
 
     return LLBC_OK;
 }

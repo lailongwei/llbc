@@ -39,7 +39,7 @@ struct Serialize_Test2
 
     void Serialize(LLBC_Stream &stream) const
     {
-        LLBC_PrintLine("Serialize_Test2::Serialize() method call");
+        LLBC_PrintLn("Serialize_Test2::Serialize() method call");
         LLBC_STREAM_BEGIN_WRITE(stream);
 
         LLBC_STREAM_WRITE(sint64Val);
@@ -50,7 +50,7 @@ struct Serialize_Test2
 
     bool DeSerialize(LLBC_Stream &stream)
     {
-        LLBC_PrintLine("Serializ_Test2::DeSerialize() method call");
+        LLBC_PrintLn("Serializ_Test2::DeSerialize() method call");
         LLBC_STREAM_BEGIN_READ(stream, bool, false);
 
         LLBC_STREAM_READ(sint64Val);
@@ -67,14 +67,14 @@ struct Serialize_Test3
 
     void serialize(LLBC_Stream &stream) const
     {
-        LLBC_PrintLine("Serialize_Test3::serialize() method call");
+        LLBC_PrintLn("Serialize_Test3::serialize() method call");
         stream <<sint64Val
                <<strVal;
     }
 
     bool deserialize(LLBC_Stream &stream)
     {
-        LLBC_PrintLine("Serialize_Test3::deserialize() method call");
+        LLBC_PrintLn("Serialize_Test3::deserialize() method call");
         stream >>sint64Val
                >>strVal;
         return true;
@@ -102,7 +102,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     MethodSerializeTest();
     ReplaceTest();
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return LLBC_OK;
@@ -110,25 +110,25 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
 
 static void ClearTest()
 {
-    LLBC_PrintLine("Clear stream test:");
+    LLBC_PrintLn("Clear stream test:");
     LLBC_Stream s;
     s.Write(32);
     s.Write(true);
     s.Write(false);
-    LLBC_PrintLine("Before clear non-attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetCap(), s.GetBuf(), s.IsAttach());
+    LLBC_PrintLn("Before clear non-attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetCap(), s.GetBuf(), s.IsAttach());
 
     s.Clear();
-    LLBC_PrintLine("After clear non-attack stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetCap(), s.GetBuf(), s.IsAttach());
+    LLBC_PrintLn("After clear non-attack stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s.GetPos(), s.GetCap(), s.GetBuf(), s.IsAttach());
 
     LLBC_Stream s2;
     char *buf = LLBC_Malloc(char, 1024);
     s2.Attach(buf, 1024);
     s2.Write(10086);
     s2.Skip(1000);
-    LLBC_PrintLine("Before clear attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetCap(), s2.GetBuf(), s2.IsAttach());
+    LLBC_PrintLn("Before clear attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetCap(), s2.GetBuf(), s2.IsAttach());
 
     s2.Clear();
-    LLBC_PrintLine("After clear attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetCap(), s2.GetBuf(), s2.IsAttach());
+    LLBC_PrintLn("After clear attach stream, s.pos:%lu, s.cap:%lu, s.buf:%p, attached:%d", s2.GetPos(), s2.GetCap(), s2.GetBuf(), s2.IsAttach());
 
     free(buf);
 }
@@ -136,7 +136,7 @@ static void ClearTest()
 static void RawSerializeTest()
 {
     Serialize_Test test1 = {8, 16, 32, 64};
-    LLBC_PrintLine("before serialize, "
+    LLBC_PrintLn("before serialize, "
         "sint8Val: %d, sint16val: %d, sint32val: %d, sint64val: %llu",
         test1.sint8Val, test1.sint16Val, test1.sint32Val, test1.sint64Val);
 
@@ -146,7 +146,7 @@ static void RawSerializeTest()
     Serialize_Test test2;
     stream.SetPos(0);
     stream.Read(test2);
-    LLBC_PrintLine("after deserialize, "
+    LLBC_PrintLn("after deserialize, "
         "sint8Val: %d, sint16val: %d, sint32val: %d, sint64val: %llu",
         test2.sint8Val, test2.sint16Val, test2.sint32Val, test2.sint64Val);
 }
@@ -155,7 +155,7 @@ static void STLContainersSerializeTest()
 {
     // std::string test.
     std::string str = "STL std::string";
-    LLBC_PrintLine("before serialize std::string: %s", str.c_str());
+    LLBC_PrintLn("before serialize std::string: %s", str.c_str());
 
     LLBC_Stream stream;
     stream.Write(str);
@@ -163,14 +163,14 @@ static void STLContainersSerializeTest()
     std::string str2;
     stream.SetPos(0);
     stream.Read(str2);
-    LLBC_PrintLine("after deserialize std::string: %s", str2.c_str());
+    LLBC_PrintLn("after deserialize std::string: %s", str2.c_str());
 
     // std::vector<int> test.
     std::vector<int> vec;
     vec.push_back(1);
     vec.push_back(2);
     vec.push_back(3);
-    LLBC_PrintLine("before serialize std::vector<int>: %s", ToStringVec(vec).c_str());  
+    LLBC_PrintLn("before serialize std::vector<int>: %s", ToStringVec(vec).c_str());  
 
     stream.SetPos(0);
     stream.Write(vec);
@@ -178,7 +178,7 @@ static void STLContainersSerializeTest()
     std::vector<int> vec2;
     stream.SetPos(0);
     stream.Read(vec2);
-    LLBC_PrintLine("after deserialize std::vector<int>: %s", ToStringVec(vec2).c_str());
+    LLBC_PrintLn("after deserialize std::vector<int>: %s", ToStringVec(vec2).c_str());
 
     // std::vector<std::vector<int> > test.
     std::vector<std::vector<int> > nestingVec;
@@ -190,7 +190,7 @@ static void STLContainersSerializeTest()
         for (int j = 0; j < 3; ++j)
             nestingVec[i].push_back(j + 1);
     }
-    LLBC_PrintLine("before serialize std::vector<std::vector<int> >: %s", ToStringNestingVec(nestingVec).c_str());
+    LLBC_PrintLn("before serialize std::vector<std::vector<int> >: %s", ToStringNestingVec(nestingVec).c_str());
 
     stream.SetPos(0);
     stream.Write(nestingVec);
@@ -198,14 +198,14 @@ static void STLContainersSerializeTest()
     std::vector<std::vector<int> > nestingVec2;
     stream.SetPos(0);
     stream.Read(nestingVec2);
-    LLBC_PrintLine("after deserialize std::vector<std::vector<int> >: %s", ToStringNestingVec(nestingVec2).c_str());
+    LLBC_PrintLn("after deserialize std::vector<std::vector<int> >: %s", ToStringNestingVec(nestingVec2).c_str());
 
     // std::set<int> test.
     std::set<int> s;
     s.insert(1);
     s.insert(2);
     s.insert(3);
-    LLBC_PrintLine("before serialize std::set<int>: %s", ToStringSet(s).c_str());
+    LLBC_PrintLn("before serialize std::set<int>: %s", ToStringSet(s).c_str());
 
     stream.SetPos(0);
     stream.Write(s);
@@ -213,14 +213,14 @@ static void STLContainersSerializeTest()
     std::set<int> s2;
     stream.SetPos(0);
     stream.Read(s2);
-    LLBC_PrintLine("after deserialize std::set<int>: %s", ToStringSet(s2).c_str());
+    LLBC_PrintLn("after deserialize std::set<int>: %s", ToStringSet(s2).c_str());
 
     // std::map<int, int> test.
     std::map<int, int> m;
     m.insert(std::make_pair(1, 10));
     m.insert(std::make_pair(2, 20));
     m.insert(std::make_pair(3, 30));
-    LLBC_PrintLine("before serialize std::map<int, int>: %s", ToStringMap(m).c_str());
+    LLBC_PrintLn("before serialize std::map<int, int>: %s", ToStringMap(m).c_str());
 
     stream.SetPos(0);
     stream.Write(m);
@@ -228,25 +228,25 @@ static void STLContainersSerializeTest()
     std::map<int, int> m2;
     stream.SetPos(0);
     stream.Read(m2);
-    LLBC_PrintLine("after deserialize std::map<int, int>: %s", ToStringMap(m2).c_str());
+    LLBC_PrintLn("after deserialize std::map<int, int>: %s", ToStringMap(m2).c_str());
 }
 
 static void MethodSerializeTest()
 {
-    LLBC_PrintLine("Method serialize test...");
+    LLBC_PrintLn("Method serialize test...");
 
     // Serialize/DeSerialize
     LLBC_Stream stream;
     Serialize_Test2 test2_1 = {64, "hello"};
     stream <<test2_1;
-    LLBC_PrintLine("- test2_1 serialized(Serialize()), "
+    LLBC_PrintLn("- test2_1 serialized(Serialize()), "
         "val:[int64Val:%llu, strVal:%s], stream pos:%lu",
         test2_1.sint64Val, test2_1.strVal.c_str(), stream.GetPos());
 
     Serialize_Test2 test2_2;
     stream.SetPos(0);
     stream >> test2_2;
-    LLBC_PrintLine("- stream deserialized(Deserialize()), "
+    LLBC_PrintLn("- stream deserialized(Deserialize()), "
         "val:[int64Val:%llu, strVal:%s], stream pos:%lu",
         test2_2.sint64Val, test2_2.strVal.c_str(), stream.GetPos());
 
@@ -254,50 +254,50 @@ static void MethodSerializeTest()
     Serialize_Test3 test3_1 = {128, "world"};
     stream.SetPos(0);
     stream <<test3_1;
-    LLBC_PrintLine("- test3_1 serialized(serialize()), "
+    LLBC_PrintLn("- test3_1 serialized(serialize()), "
         "val:[int64Val:%llu, strVal:%s], stream pos:%lu",
         test3_1.sint64Val, test3_1.strVal.c_str(), stream.GetPos());
 
     Serialize_Test3 test3_2;
     stream.SetPos(0);
     stream >> test3_2;
-    LLBC_PrintLine("- stream deserialized(Deserialize()), "
+    LLBC_PrintLn("- stream deserialized(Deserialize()), "
         "val:[int64Val:%llu, strVal:%s], stream pos:%lu",
         test3_2.sint64Val, test3_2.strVal.c_str(), stream.GetPos());
 
-    LLBC_PrintLine("Method serialize test finished!");
+    LLBC_PrintLn("Method serialize test finished!");
 }
 
 static void ReplaceTest()
 {
-    LLBC_PrintLine("Replace test...");
+    LLBC_PrintLn("Replace test...");
 
     LLBC_Stream stream;
     stream.Write("Hello world\0", 12);
-    LLBC_PrintLine("  - Before replace, pos:%lu, buf:%s", stream.GetPos(), stream.GetBuf<const char *>());
+    LLBC_PrintLn("  - Before replace, pos:%lu, buf:%s", stream.GetPos(), stream.GetBuf<char>());
 
-    LLBC_PrintLine("  - Insert 'Hey ' after space character...");
+    LLBC_PrintLn("  - Insert 'Hey ' after space character...");
     stream.Replace(6, 6, "Hey ", 4);
-    LLBC_PrintLine("  - After insert, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After insert, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
-    LLBC_PrintLine("  - Replace 'Hey' to 'ABC'...");
+    LLBC_PrintLn("  - Replace 'Hey' to 'ABC'...");
     stream.Replace(6, 9, "ABC", 3);
-    LLBC_PrintLine("  - After replace, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After replace, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
-    LLBC_PrintLine("  - Erase 'ABC ' from stream...");
+    LLBC_PrintLn("  - Erase 'ABC ' from stream...");
     stream.Replace(6, 10, nullptr, 0);
-    LLBC_PrintLine("  - After erase, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<const char *>()));
+    LLBC_PrintLn("  - After erase, pos:%lu, buf:%s", stream.GetPos(), (stream.GetBuf<char>()));
 
-    LLBC_PrintLine("  - Erase '\0' termermal character...");
+    LLBC_PrintLn("  - Erase '\\0' termermal character...");
     stream.Replace(stream.GetPos() - 1, stream.npos, nullptr, 0);
 
     char appendStr[] = ", Hello World Too";
-    LLBC_PrintLine("  - Append '%s' to stream...", appendStr);
+    LLBC_PrintLn("  - Append '%s' to stream...", appendStr);
     stream.Replace(LLBC_Stream::npos, LLBC_Stream::npos, appendStr, sizeof(appendStr));
-    LLBC_PrintLine("  - After append '%s', pos:%lu, buf:%s",
+    LLBC_PrintLn("  - After append '%s', pos:%lu, buf:%s",
                    appendStr,
                    stream.GetPos(),
-                   (stream.GetBuf<const char *>()));
+                   (stream.GetBuf<char>()));
 }
 
 static LLBC_String ToStringVec(const std::vector<int> &vec)

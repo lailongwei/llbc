@@ -34,7 +34,7 @@ namespace
         };
     };
 
-    static LLBC_EventManager evMgr;
+    static LLBC_EventMgr evMgr;
 }
 
 TestCase_Core_Event::TestCase_Core_Event()
@@ -91,7 +91,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     evMgr.BeginFire(EventIds::Event3);
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

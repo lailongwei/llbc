@@ -65,9 +65,9 @@ public:
     }
 
 public:
-    virtual bool OnInitialize(bool &initFinished)
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_ThreadManager::Sleep(1000);
+        LLBC_Sleep(1000);
 
         LLBC_Service *svc = GetService();
         _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestComp::HandleEvent);

@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/FastLock.h"
 #endif // LLBC_TARGET_PLATFORM_WIN32

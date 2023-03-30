@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
 #include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN

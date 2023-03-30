@@ -32,31 +32,41 @@ TestCase_Comm_MessageBuffer::~TestCase_Comm_MessageBuffer()
 
 int TestCase_Comm_MessageBuffer::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("MessageBuffer testcase:");
+    LLBC_PrintLn("MessageBuffer testcase:");
 
-    LLBC_PrintLine("Message buffer read/write ptr test:");
+    LLBC_PrintLn("Message buffer read/write ptr test:");
     {
         LLBC_MessageBuffer msgBuffer;
-        LLBC_PrintLine("Write 'hello world':");
+        LLBC_PrintLn("Write 'hello world':");
         msgBuffer.Write("hello world", 12);
-        LLBC_PrintLine("After wrote, size: %lu, first block readable size: %lu, first block data(const char *):%s",
-                       msgBuffer.GetSize(), msgBuffer.FirstBlock()->GetReadableSize(), msgBuffer.FirstBlock()->GetDataStartWithReadPos());
+        LLBC_PrintLn("After wrote, size:%lu, first block readable size:%lu, first block data(const char *):%s",
+                     msgBuffer.GetSize(),
+                     msgBuffer.FirstBlock()->GetReadableSize(),
+                     reinterpret_cast<const char *>(msgBuffer.FirstBlock()->GetDataStartWithReadPos()));
 
         char strBuf[16];
         size_t readRet = msgBuffer.Read(strBuf, 3);
         strBuf[3] = '\0';
-        LLBC_PrintLine("After read 3 chars, size: %lu, first block readable size: %lu, first block data(const char *):%s, read data:%s, read ret:%lu",
-                       msgBuffer.GetSize(), msgBuffer.FirstBlock()->GetReadableSize(), msgBuffer.FirstBlock()->GetDataStartWithReadPos(), strBuf, readRet);
+        LLBC_PrintLn("After read 3 chars, size:%lu, first block readable size:%lu, "
+                     "first block data(const char *):%s, read data:%s, read ret:%lu",
+                     msgBuffer.GetSize(),
+                     msgBuffer.FirstBlock()->GetReadableSize(),
+                     reinterpret_cast<const char *>(msgBuffer.FirstBlock()->GetDataStartWithReadPos()),
+                     strBuf,
+                     readRet);
 
         readRet = msgBuffer.Read(strBuf, 13);
         strBuf[readRet] = '\0';
-        LLBC_PrintLine("After read 13 chars ,size:%lu, first block?:%p, read data:%s, read ret:%lu",
-                       msgBuffer.GetSize(), msgBuffer.FirstBlock(), strBuf, readRet);
+        LLBC_PrintLn("After read 13 chars ,size:%lu, first block?:%p, read data:%s, read ret:%lu",
+                     msgBuffer.GetSize(),
+                     msgBuffer.FirstBlock(),
+                     strBuf,
+                     readRet);
 
-        LLBC_PrintLine("");
+        LLBC_Print("\n");
     }
 
-    LLBC_PrintLine("Message buffer read/write message block test:");
+    LLBC_PrintLn("Message buffer read/write message block test:");
     {
         LLBC_MessageBuffer msgBuffer;
         LLBC_MessageBlock *block1 = new LLBC_MessageBlock(24);
@@ -66,42 +76,46 @@ int TestCase_Comm_MessageBuffer::Run(int argc, char *argv[])
         block2->Write("Hey Judy", 9);
         msgBuffer.Append(block1);
         msgBuffer.Append(block2);
-        LLBC_PrintLine("After append 2 buffers, size:%lu, first block size:%lu, first block data(const char *):%s",
-                       msgBuffer.GetSize(), msgBuffer.FirstBlock()->GetReadableSize(), msgBuffer.FirstBlock()->GetDataStartWithReadPos());
+        LLBC_PrintLn("After append 2 buffers, size:%lu, first block size:%lu, first block data(const char *):%s",
+                     msgBuffer.GetSize(),
+                     msgBuffer.FirstBlock()->GetReadableSize(),
+                     reinterpret_cast<const char *>(msgBuffer.FirstBlock()->GetDataStartWithReadPos()));
 
         LLBC_MessageBlock *block3 = new LLBC_MessageBlock();
         block3->Write("Who's your dady!", 17);
         msgBuffer.Append(block3);
-        LLBC_PrintLine("After append new buffer(17 bytes), size:%lu, first block size:%lu", msgBuffer.GetSize(), msgBuffer.FirstBlock()->GetReadableSize());
+        LLBC_PrintLn("After append new buffer(17 bytes), size:%lu, first block size:%lu",
+                     msgBuffer.GetSize(), msgBuffer.FirstBlock()->GetReadableSize());
 
         size_t removeRet = msgBuffer.Remove(20);
-        LLBC_PrintLine("After remove 20 bytes, size:%lu, first block?:%p, remove ret:%lu",
-                       msgBuffer.GetSize(), msgBuffer.FirstBlock(), removeRet);
+        LLBC_PrintLn("After remove 20 bytes, size:%lu, first block?:%p, remove ret:%lu",
+                     msgBuffer.GetSize(), msgBuffer.FirstBlock(), removeRet);
 
-        LLBC_PrintLine("");
+        LLBC_Print("\n");
     }
 
-    LLBC_PrintLine("Message buffer write large data test(ptr):");
+    LLBC_PrintLn("Message buffer write large data test(ptr):");
     {
         LLBC_MessageBuffer msgBuffer;
         for (int i = 0; i < 4000; ++i)
             msgBuffer.Write("hello world", 11);
 
-        LLBC_PrintLine("After write 4000 * 11 = %d bytes, size:%lu", 4000 * 11, msgBuffer.GetSize());
+        LLBC_PrintLn("After write 4000 * 11 = %d bytes, size:%lu", 4000 * 11, msgBuffer.GetSize());
         int blockIdx = 0;
         const LLBC_MessageBlock *block = msgBuffer.FirstBlock();
         while(block)
         {
-            LLBC_PrintLine("- block %02d[%p] size:%lu, cap:%lu", blockIdx, block, block->GetReadableSize(), block->GetSize());
+            LLBC_PrintLn("- block %02d[%p] size:%lu, cap:%lu",
+                         blockIdx, block, block->GetReadableSize(), block->GetSize());
             block = block->GetNext();
 
             blockIdx += 1;
         }
 
-        LLBC_PrintLine("");
+        LLBC_Print("\n");
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return 0;

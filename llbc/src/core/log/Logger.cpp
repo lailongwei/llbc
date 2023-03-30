@@ -154,7 +154,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         _logRunnable->AddLogger(this);
 
         if (_config->IsIndependentThread())
-            _logRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
+            _logRunnable->Activate(1, LLBC_ThreadPriority::BelowNormal);
     }
 
     return LLBC_OK;

@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
-
 #include "llbc/comm/ComponentEvents.h"
 
 __LLBC_NS_BEGIN
@@ -462,7 +459,7 @@ public:
 public:
     /**
      * Get config type.
-     * @return int - the config type, see LLBC_ApplicationConfigType enum.
+     * @return int - the config type, see LLBC_AppConfigType enum.
      */
     int GetConfigType() const;
 
@@ -518,7 +515,7 @@ public:
     /**
      * When service start and not not init component before, will call then event handler.
      */
-    virtual bool OnInitialize(bool &finished);
+    virtual bool OnInit(bool &finished);
 
     /**
      * When service destroy, will call this event handler.
@@ -562,15 +559,15 @@ public:
     /**
      * Application phase change event handler, when application start phase changed, will call these event handlers.
      */
-    virtual void OnApplicationEarlyStart();
-    virtual void OnApplicationStartFail();
-    virtual void OnApplicationStartFinish();
-    virtual void OnApplicationEarlyStop();
+    virtual void OnAppEarlyStart();
+    virtual void OnAppStartFail();
+    virtual void OnAppStartFinish();
+    virtual void OnAppEarlyStop();
 
     /**
      * When application config reload, will call this event handler.
      */
-    virtual void OnApplicationConfigReload();
+    virtual void OnAppConfigReload();
 
 public:
     /**

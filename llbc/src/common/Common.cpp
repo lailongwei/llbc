@@ -42,7 +42,8 @@ int __LLBC_CommonStartup()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.llbcThread = true;
     tls->coreTls.entryThread = true;
-    tls->coreTls.threadHandle = LLBC_INVALID_HANDLE;
+    tls->coreTls.threadHandle = LLBC_CFG_THREAD_ENTRY_THREAD_HANDLE;
+    tls->coreTls.threadGroupHandle = LLBC_CFG_THREAD_ENTRY_THREAD_GROUP_HANDLE;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     tls->coreTls.threadId = ::GetCurrentThreadId();
@@ -68,11 +69,17 @@ int __LLBC_CommonStartup()
     // Set endian type constant.
     LLBC_MachineEndian = LLBC_GetMachineEndianType();
 
+    // Set entry-thread lib tls variable.
+    __LLBC_EntryThreadLibTls = tls;
+
     return LLBC_OK;
 }
 
 void __LLBC_CommonCleanup()
 {
+    // Reset holded entry-thread lib tls variable.
+    __LLBC_EntryThreadLibTls = nullptr;
+
     // Reset entry thread tls info.
 #if LLBC_TARGET_PLATFORM_WIN32
     __LLBC_LibTls *tls = __LLBC_GetLibTls();

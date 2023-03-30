@@ -29,7 +29,7 @@ namespace
     public:
         virtual bool Ctrl(int ctrlCmd, const LLBC_Variant &ctrlData, bool &removeSession)
         {
-            LLBC_PrintLine(">>>Ctrl protocol, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
+            LLBC_PrintLn(">>>Ctrl protocol, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
             return false; // Return true if you want to pass control command to lower protocols.
                           // Return false if you dont want to pass control command to lower protocols.
 
@@ -68,12 +68,12 @@ namespace
     public:
         virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
         {
-            LLBC_PrintLine("Session Create, sessionInfo:%s", sessionInfo.ToString().c_str());
+            LLBC_PrintLn("Session Create, sessionInfo:%s", sessionInfo.ToString().c_str());
         }
 
         virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
         {
-            LLBC_PrintLine("Session Destroy, destroyInfo:%s", destroyInfo.ToString().c_str());
+            LLBC_PrintLn("Session Destroy, destroyInfo:%s", destroyInfo.ToString().c_str());
         }
     };
 }
@@ -90,27 +90,27 @@ TestCase_Comm_ProtoStackCtrl::~TestCase_Comm_ProtoStackCtrl()
 
 int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Communication Service protocol stack control test:");
-    LLBC_PrintLine("Note: Maybe you must use gdb or windbg to trace!");
+    LLBC_PrintLn("Communication Service protocol stack control test:");
+    LLBC_PrintLn("Note: Maybe you must use gdb or windbg to trace!");
 
     // Register comp.
     _svc->AddComponent(new TestComp());
 
     // Start service.
-    LLBC_PrintLine("Start service...");
+    LLBC_PrintLn("Start service...");
     int ret = _svc->Start();
     if (ret != LLBC_OK)
     {
-        LLBC_FilePrintLine(stderr, "Start service failed, error:%s", LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr, "Start service failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
     // Add listen session.
-    LLBC_PrintLine("Listen on 127.0.0.1:10086...");
+    LLBC_PrintLn("Listen on 127.0.0.1:10086...");
     int sessionId = _svc->Listen("127.0.0.1", 10086, new TestProtoFactory());
     if (sessionId == 0)
     {
-        LLBC_FilePrintLine(stderr, "Listen on 127.0.0.1:10086 failed, error:%s", LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr, "Listen on 127.0.0.1:10086 failed, error:%s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
@@ -133,10 +133,10 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     LLBC_FlushFile(stderr);
 
     #if LLBC_TARGET_PLATFORM_IPHONE
-    LLBC_PrintLine("Sleep 300 seconds to exit...");
-    LLBC_ThreadManager::Sleep(300 * 1000);
+    LLBC_PrintLn("Sleep 300 seconds to exit...");
+    LLBC_ThreadMgr::Sleep(300 * 1000);
     #else // Non-iPhone
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
     #endif // iPhone
 
@@ -145,6 +145,6 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
 
 void TestCase_Comm_ProtoStackCtrl::TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
 {
-    LLBC_PrintLine("Do control scene, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
+    LLBC_PrintLn("Do control scene, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
     _svc->CtrlProtocolStack(sessionId, ctrlCmd, ctrlData);
 }
