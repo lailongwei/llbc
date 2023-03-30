@@ -23,7 +23,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Console.h"
-#include "llbc/core/objectpool/Common.h"
+#include "llbc/core/objectpool/ObjectPoolMgr.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"

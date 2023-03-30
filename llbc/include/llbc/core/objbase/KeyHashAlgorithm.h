@@ -23,7 +23,7 @@
 
 #include "llbc/common/Common.h"
 
-#include "llbc/core/singleton/Common.h"
+#include "llbc/core/singleton/Singleton.h"
 
 __LLBC_NS_BEGIN
 

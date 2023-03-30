@@ -22,7 +22,8 @@
 #pragma once
 
 #include "llbc/common/Common.h"
-#include "llbc/core/algo/Algo.h"
+
+#include "llbc/core/algo/RingBuffer.h"
 #include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 

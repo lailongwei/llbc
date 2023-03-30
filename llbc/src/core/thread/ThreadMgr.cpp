@@ -27,8 +27,12 @@
 #include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
+
 #include "llbc/core/objectpool/ObjectPool.h"
-#include "llbc/core/objbase/ObjBase.h"
+
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/AutoReleasePool.h"
+#include "llbc/core/objbase/AutoReleasePoolStack.h"
 
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/ThreadDescriptor.h"

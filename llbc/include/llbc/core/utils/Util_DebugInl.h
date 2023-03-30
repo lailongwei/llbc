@@ -23,7 +23,7 @@
 #pragma once
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/time/Common.h"
+#include "llbc/core/time/Time.h"
 
 __LLBC_NS_BEGIN
 

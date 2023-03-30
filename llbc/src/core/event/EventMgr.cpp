@@ -24,7 +24,7 @@
 
 #include "llbc/core/helper/STLHelper.h"
 
-#include "llbc/core/objectpool/Common.h"
+#include "llbc/core/objectpool/ObjectPoolMgr.h"
 
 #include "llbc/core/event/EventFirer.h"
 #include "llbc/core/event/EventMgr.h"
