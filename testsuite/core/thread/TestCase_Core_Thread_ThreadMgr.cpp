@@ -124,7 +124,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_WaitAndCancelInEnryThread()
                         LLBC_FAILED);
     // Try cancel entry group.
     cancelRet = LLBC_ThreadMgrSingleton->CancelGroup(curGroupHandle);
-    LLBC_PrintLn("Cancel entry group handle ret:%d, err:%s",
+    LLBC_PrintLn("- Cancel entry group handle ret:%d, err:%s",
                  cancelRet, LLBC_FormatLastError());
     LLBC_LogAndReturnIf(cancelRet == LLBC_OK || LLBC_GetLastError() != LLBC_ERROR_NOT_ALLOW,
                         Error,
@@ -274,6 +274,11 @@ int TestCase_Core_Thread_ThreadMgr::Test_CreateThreads()
 
 int TestCase_Core_Thread_ThreadMgr::Test_KillThreads()
 {
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    LLBC_PrintLn("Kill threads test will raise process level "
+                 "crash on non-win32 platform, skip test...");
+    return LLBC_OK;
+#else // Win32
     static constexpr int threadNum = 10;
 
     LLBC_PrintLn("Kill threads test:");
@@ -373,6 +378,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_KillThreads()
     LLBC_PrintLn("Done!");
 
     return LLBC_OK;
+#endif // Non-Win32
 }
 
 int TestCase_Core_Thread_ThreadMgr::Test_WaitThreads()
