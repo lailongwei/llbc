@@ -46,6 +46,7 @@ __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
 : _logLevel(LLBC_LogLevel::Begin)
+, _addTimestampInJsonLog(false)
 , _config(nullptr)
 
 , _logRunnable(nullptr)
@@ -90,9 +91,11 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
     // Init basic data members.
     _name.append(config->GetLoggerName());
+
+    _logLevel = config->GetLogLevel();
+    _addTimestampInJsonLog = config->IsAddTimestampInJsonLog();
     _config = config;
 
-    _logLevel = _config->GetLogLevel();
     _flushInterval = _config->GetFlushInterval();
 
     // Create console appender, if acquire.
@@ -278,6 +281,7 @@ int LLBC_Logger::NonFormatOutput(int level,
                                  const char *file,
                                  int line,
                                  const char *func,
+                                 sint64 time,
                                  const char *msg,
                                  size_t msgLen)
 {
@@ -289,6 +293,7 @@ int LLBC_Logger::NonFormatOutput(int level,
                                       file,
                                       line,
                                       func,
+                                      time != 0 ? time : LLBC_GetMicroSeconds(),
                                       msg,
                                       msgLen);
     if (_hookDelegs[level])
@@ -345,7 +350,14 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[len] = '\0';
 
     // Fill other LogData members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls);
+    FillLogDataNonMsgMembers(level,
+                             tag,
+                             file,
+                             line,
+                             func,
+                             LLBC_GetMicroSeconds(),
+                             data,
+                             libTls);
 
     return data;
 }
@@ -355,6 +367,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
+                                                          sint64 time,
                                                           const char *msg,
                                                           size_t msgLen)
 {
@@ -386,7 +399,14 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     data->msg[msgLen] = '\0';
 
     // Fill LogData other members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls());
+    FillLogDataNonMsgMembers(level,
+                             tag,
+                             file,
+                             line,
+                             func,
+                             time,
+                             data,
+                             __LLBC_GetLibTls());
 
     return data;
 }
@@ -396,6 +416,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                                              const char *file,
                                                              int line,
                                                              const char *func,
+                                                             sint64 time,
                                                              LLBC_LogData *logData,
                                                              __LLBC_LibTls *libTls)
 {
@@ -406,7 +427,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->level = level;
 
     // fill: log time.
-    logData->logTime = LLBC_GetMicroSeconds();
+    logData->logTime = time;
 
     // fill: file, func.
     if (file)
@@ -569,6 +590,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _lastFlushTime = 0;
 
     _config = nullptr;
+    _addTimestampInJsonLog = false;
     _logLevel = LLBC_LogLevel::Begin;
 
     _name.clear();

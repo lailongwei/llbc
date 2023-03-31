@@ -95,6 +95,13 @@ public:
 
 public:
     /**
+     * Add timestamp in json log.
+     * @return bool - add timestamp in json log flag.
+     */
+    bool IsAddTimestampInJsonLog() const;
+
+public:
+    /**
      * Get log to console switch.
      * @return bool - log to console switch.
      */
@@ -224,6 +231,8 @@ private:
     bool _asyncMode;
     bool _independentThread;
     int _flushInterval;
+
+    bool _addTimestampInJsonLog;
 
     bool _logToConsole;
     int _consoleLogLevel;

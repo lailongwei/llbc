@@ -22,6 +22,7 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/objectpool/ObjectPoolMgr.h"
 
@@ -63,7 +64,8 @@ LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 {
     // Log level judge.
-    if (_logger && _lv < _logger->GetLogLevel())
+    if (LIKELY(_logger) &&
+        _lv < _logger->GetLogLevel())
         return;
 
     // Format.
@@ -77,6 +79,11 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     va_end(va);
     if (UNLIKELY(len < 0))
         return;
+
+    // Add time.
+    const sint64 now = LLBC_GetMicroSeconds();
+    if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
+        this->Add("timestamp", now);
 
     // Doc add string with not copy.
     _doc.AddMember("msg", LLBC_JsonValue(libTls->coreTls.loggerFmtBuf, len).Move(), _doc.GetAllocator());
@@ -93,6 +100,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  _file,
                                  _line,
                                  _func,
+                                 now,
                                  buffer.GetString(),
                                  buffer.GetLength());
     else
