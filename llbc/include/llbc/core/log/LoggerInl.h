@@ -33,6 +33,11 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
+LLBC_FORCE_INLINE bool LLBC_Logger::IsAddTimestampInJsonLog() const
+{
+    return _addTimestampInJsonLog;
+}
+
 inline const LLBC_SafetyObjectPool &LLBC_Logger::GetLoggerObjectPool() const
 {
     LLBC_LockGuard guard(_lock);

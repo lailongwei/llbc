@@ -87,6 +87,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
                                       file,
                                       line,
                                       func,
+                                      0,
                                       msg,
                                       -1);
     if (UNLIKELY(rtn != LLBC_OK))

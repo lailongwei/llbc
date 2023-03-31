@@ -53,6 +53,11 @@ inline int LLBC_LoggerConfigInfo::GetFlushInterval() const
     return _flushInterval;
 }
 
+inline bool LLBC_LoggerConfigInfo::IsAddTimestampInJsonLog() const
+{
+    return _addTimestampInJsonLog;
+}
+
 inline bool LLBC_LoggerConfigInfo::IsLogToConsole() const
 {
     return _logToConsole;

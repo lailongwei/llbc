@@ -58,6 +58,7 @@ int csllbc_Log_LogMsg(LLBC_Logger *logger,
                                    fileName,
                                    lineNo,
                                    func,
+                                   0,
                                    msg,
                                    strlen(msg)); 
 }
