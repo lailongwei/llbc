@@ -103,6 +103,12 @@ public:
     bool IsAsyncMode() const;
 
     /**
+     * Get add timestamp in json log flag.
+     * @return bool - add timestamp in json log flag.
+     */
+    bool IsAddTimestampInJsonLog() const;
+
+    /**
      * Get logger object pool.
      * @return const LLBC_SafetyObjectPool & - logger object pool.
      */
@@ -215,6 +221,7 @@ public:
      * @param[in] file   - log file name.
      * @param[in] line   - log file line.
      * @param[in] func   - log function.
+     * @param[in] time   - log time, in micro-seconds.
      * @param[in] msg    - message string.
      * @param[in] msgLen - message string length, if -1, will auto calculate.
      * @return int - return 0 if success, otherwise return -1.
@@ -224,6 +231,7 @@ public:
                         const char *file,
                         int line,
                         const char *func,
+                        sint64 time,
                         const char *msg,
                         size_t msgLen);
 
@@ -254,6 +262,7 @@ private:
      * @param[in] file   - log file name.
      * @param[in] line   - log file line.
      * @param[in] func   - log function.
+     * @param[in] time   - log time, in micro-seconds.
      * @param[in] msg    - log message.
      * @param[in] msgLen - log message length.
      */
@@ -262,6 +271,7 @@ private:
                                const char *file,
                                int line,
                                const char *func,
+                               sint64 time,
                                const char *msg,
                                size_t msgLen);
 
@@ -272,6 +282,7 @@ private:
      * @param[in] file    - log file name.
      * @param[in] line    - log file line.
      * @param[in] func    - log function.
+     * @param[in] time    - log time.
      * @param[in] logData - log data.
      * @param[in] libTls  - log tls.
      */
@@ -280,6 +291,7 @@ private:
                                   const char *file,
                                   int line,
                                   const char *func,
+                                  sint64 time,
                                   LLBC_LogData *logData,
                                   __LLBC_LibTls *libTls);
 
@@ -327,6 +339,7 @@ private:
     mutable LLBC_SpinLock _lock;
 
     int _logLevel;
+    bool _addTimestampInJsonLog;
     const LLBC_LoggerConfigInfo *_config;
 
     LLBC_LogRunnable *_logRunnable;

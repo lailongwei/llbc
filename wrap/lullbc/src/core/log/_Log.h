@@ -159,6 +159,7 @@ LULLBC_LUA_METH int _lullbc_LogMsg(lua_State *l)
                                          file,
                                          line,
                                          func,
+                                         0,
                                          fmtBufBeg,
                                          msgSize) != LLBC_OK))
         lullbc_TransferLLBCError(l,

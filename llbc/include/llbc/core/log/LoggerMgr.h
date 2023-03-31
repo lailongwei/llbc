@@ -277,6 +277,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerMgr>;
                                    __FILE__,                   \
                                    __LINE__,                   \
                                    __FUNCTION__,               \
+                                   0ll,                        \
                                    formattedLogMsg.c_str(),    \
                                    formattedLogMsg.length());  \
         }                                                      \

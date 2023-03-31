@@ -126,6 +126,8 @@
 #define LLBC_CFG_LOG_DEFAULT_ASYNC_MODE                     0
 // Default log independent logger thread is set to false.
 #define LLBC_CFG_LOG_DEFAULT_INDEPENDENT_THREAD             0
+// Default add timestamp in json log is set to false.
+#define LLBC_CFG_LOG_DEFAULT_ADD_TIMESTAMP_IN_JSON_LOG      0
 // Default is log to console.
 #define LLBC_CFG_LOG_DEFAULT_LOG_TO_CONSOLE                 1
 // Default console log pattern: time [Logger Name][Log Level] - Message\n.

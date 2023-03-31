@@ -51,6 +51,8 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _independentThread(false)
 , _flushInterval(0)
 
+, _addTimestampInJsonLog(0)
+
 , _logToConsole(true)
 , _consoleLogLevel(LLBC_LogLevel::End)
 , _consolePattern()
@@ -113,6 +115,10 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             "independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
      _flushInterval = __LLBC_GetLogCfg(
          "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
+
+    // Json styled log configs.
+    _addTimestampInJsonLog = __LLBC_GetLogCfg(
+        "addTimestampInJsonLog", ADD_TIMESTAMP_IN_JSON_LOG, IsAddTimestampInJsonLog, AsLooseBool);
 
     // Console log configs.
      _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
