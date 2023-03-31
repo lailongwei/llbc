@@ -175,7 +175,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 
         if (UNLIKELY(len < 0))
         {
-            delete buf;
+            free(buf);
             LLBC_SetLastError(LLBC_ERROR_CLIB);
 
             return LLBC_FAILED;
