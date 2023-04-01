@@ -101,17 +101,18 @@ int LLBC_PollerMgr::Start(int count)
     }
 
     _pollerCount = count;
-    _pollers = LLBC_Malloc(LLBC_BasePoller *, sizeof(LLBC_BasePoller *) * count);
-    memset(_pollers, 0, sizeof(LLBC_BasePoller *) * count);
+    _pollers = LLBC_Calloc(LLBC_BasePoller *, sizeof(LLBC_BasePoller *) * count);
 
     // Create pollers.
     for (int i = 0; i < count; ++i)
     {
-        _pollers[i] = LLBC_BasePoller::Create(_type);
-        _pollers[i]->SetPollerId(i);
-        _pollers[i]->SetService(_svc);
-        _pollers[i]->SetPollerMgr(this);
-        _pollers[i]->SetBrothersCount(count);
+        LLBC_BasePoller *poller = LLBC_BasePoller::Create(_type);
+        poller->SetPollerId(i);
+        poller->SetService(_svc);
+        poller->SetPollerMgr(this);
+        poller->SetBrothersCount(count);
+
+        _pollers[i] = poller;
     }
 
     // Startup all pollers.
@@ -156,6 +157,7 @@ void LLBC_PollerMgr::Stop()
     {
         for (int i = 0; i < _pollerCount; ++i)
             delete _pollers[i];
+
         LLBC_XFree(_pollers);
         _pollerCount = 0;
     }
