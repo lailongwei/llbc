@@ -230,9 +230,18 @@ int TestCase_Core_Thread_ThreadMgr::Test_CreateThreads()
             LLBC_AtomicFetchAndAdd(&value, 1);
     };
 
+    // Set thread hooks.
+    auto threadMgr = LLBC_ThreadMgrSingleton;
+    threadMgr->SetThreadStartHook([](LLBC_Handle handle) {
+        LLBC_PrintLn("[Hook] Thread Start: %d", handle);
+    });
+
+    threadMgr->SetThreadStopHook([](LLBC_Handle handle) {
+        LLBC_PrintLn("[Hook] Thread Stop: %d", handle);
+    });
+
     // Create threads
     syncLock.Lock();
-    auto threadMgr = LLBC_ThreadMgrSingleton;
     LLBC_PrintLn("Create %d threads for test ...", threadNum);
     LLBC_Handle group = threadMgr->CreateThreads(threadNum, threadEntry, this);
     if (group == LLBC_INVALID_HANDLE)
