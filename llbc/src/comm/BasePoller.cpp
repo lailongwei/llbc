@@ -139,8 +139,7 @@ void LLBC_BasePoller::Stop()
         return;
 
     _stopping = true;
-    const auto ret = Wait();
-    std::cerr << "Wait poller ret:" << ret <<", last err:" <<LLBC_FormatLastError() << std::endl;
+    Wait();
 }
 
 void LLBC_BasePoller::Cleanup()

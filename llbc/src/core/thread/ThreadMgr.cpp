@@ -24,13 +24,10 @@
 
 #include "llbc/core/os/OS_Thread.h"
 
-#include "llbc/core/utils/Util_Debug.h"
-
 #include "llbc/core/timer/TimerScheduler.h"
 
 #include "llbc/core/objectpool/ObjectPool.h"
 
-#include "llbc/core/objbase/Object.h"
 #include "llbc/core/objbase/AutoReleasePool.h"
 #include "llbc/core/objbase/AutoReleasePoolStack.h"
 
@@ -61,10 +58,6 @@ __LLBC_ThreadMgr_WrapThreadArg::__LLBC_ThreadMgr_WrapThreadArg()
 
 , threadHandle(LLBC_INVALID_HANDLE)
 , threadGroupHandle(LLBC_INVALID_HANDLE)
-{
-}
-
-static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_WrapThreadEntry(LLBC_NS LLBC_ThreadArg _)
 {
 }
 

@@ -56,8 +56,7 @@ void LLBC_PollerMonitor::Stop()
         return;
 
     _stopping = true;
-    const auto ret = Wait();
-    std::cerr << "Wait poller monitor ret:" << ret << ", last err:" << LLBC_FormatLastError() << std::endl;
+    Wait();
 }
 
 void LLBC_PollerMonitor::Svc()
