@@ -555,7 +555,9 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int Post(ObjType *obj, void (ObjType::*method)(This *, const LLBC_Variant &data), const LLBC_Variant &data = LLBC_Variant::nil);
+    int Post(ObjType *obj,
+             void (ObjType::*method)(This *, const LLBC_Variant &data),
+             const LLBC_Variant &data = LLBC_Variant::nil);
 
     /**
      * Post runnable to service.
@@ -563,7 +565,8 @@ public:
      * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil) = 0;
+    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable,
+                     const LLBC_Variant &data = LLBC_Variant::nil) = 0;
 
     /**
      * Get service codec protocol stack, only full-stack option disabled available.
@@ -617,9 +620,30 @@ protected:
     /**
      * Stack create helper methods(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr) = 0;
-    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr) = 0;
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId,
+                                                int acceptSessionId = 0,
+                                                LLBC_ProtocolStack *stack = nullptr) = 0;
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId,
+                                                 int acceptSessionId = 0,
+                                                 LLBC_ProtocolStack *stack = nullptr) = 0;
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) = 0;
+
+
+protected:
+    /**
+     * Declare friend class: LLBC_BasePoller.
+     *  Access method list:
+     *      AddReadySession()
+     */
+    friend class LLBC_BasePoller;
+
+    /**
+     * Ready session operation methods.
+     */
+    virtual void AddReadySession(int sessionId,
+                                 int acceptSessionId,
+                                 bool isListenSession,
+                                 bool repeatCheck = false) = 0;
 
 protected:
     /**

@@ -52,7 +52,7 @@ LLBC_EpollPoller::~LLBC_EpollPoller()
 
 int LLBC_EpollPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -79,19 +79,23 @@ int LLBC_EpollPoller::Start()
         return LLBC_FAILED;
     }
 
-    _started = true;
     return LLBC_OK;
+}
+
+void LLBC_EpollPoller::Stop()
+{
+    if (!IsActivated() || _stopping)
+        return;
+
+    StopMonitor();
+
+    LLBC_BasePoller::Stop();
 }
 
 void LLBC_EpollPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     while (!_stopping)
-    {
         HandleQueuedEvents(20);
-    }
 }
 
 void LLBC_EpollPoller::Cleanup()

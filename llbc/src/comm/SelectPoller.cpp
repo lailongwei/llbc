@@ -52,7 +52,7 @@ LLBC_SelectPoller::~LLBC_SelectPoller()
 
 int LLBC_SelectPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -61,15 +61,11 @@ int LLBC_SelectPoller::Start()
     if (Activate() != LLBC_OK)
         return LLBC_FAILED;
 
-    _started = true;
     return LLBC_OK;
 }
 
 void LLBC_SelectPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     static const int interval = 20;
     LLBC_FdSet reads, writes, excepts;
 

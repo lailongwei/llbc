@@ -24,13 +24,10 @@
 
 #include "llbc/core/os/OS_Thread.h"
 
-#include "llbc/core/utils/Util_Debug.h"
-
 #include "llbc/core/timer/TimerScheduler.h"
 
 #include "llbc/core/objectpool/ObjectPool.h"
 
-#include "llbc/core/objbase/Object.h"
 #include "llbc/core/objbase/AutoReleasePool.h"
 #include "llbc/core/objbase/AutoReleasePoolStack.h"
 
@@ -46,9 +43,10 @@ struct __LLBC_ThreadMgr_WrapThreadArg
     LLBC_NS LLBC_Delegate<void(void *)> entry;
     void *arg;
 
+    LLBC_NS LLBC_ThreadMgr *threadMgr;
+
     LLBC_NS LLBC_Handle threadHandle;
     LLBC_NS LLBC_Handle threadGroupHandle;
-    LLBC_NS LLBC_ThreadMgr *threadMgr;
 
     __LLBC_ThreadMgr_WrapThreadArg();
 };
@@ -56,76 +54,11 @@ struct __LLBC_ThreadMgr_WrapThreadArg
 __LLBC_ThreadMgr_WrapThreadArg::__LLBC_ThreadMgr_WrapThreadArg()
 : arg(nullptr)
 
+, threadMgr(nullptr)
+
 , threadHandle(LLBC_INVALID_HANDLE)
 , threadGroupHandle(LLBC_INVALID_HANDLE)
-, threadMgr(nullptr)
 {
-}
-
-static LLBC_NS LLBC_ThreadRtn __LLBC_ThreadMgr_WrapThreadEntry(LLBC_NS LLBC_ThreadArg _)
-{
-    // Get wrap thread argument.
-    __LLBC_ThreadMgr_WrapThreadArg *wrapArg = 
-        reinterpret_cast<__LLBC_ThreadMgr_WrapThreadArg *>(_);
-    ASSERT(wrapArg && "llbc library internal error, threadArg nullptr!");
-
-    // Set TLS.
-    LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
-    tls->coreTls.llbcThread = true;
-    tls->coreTls.threadId = LLBC_NS LLBC_GetCurrentThreadId();
-    tls->coreTls.threadHandle = wrapArg->threadHandle;
-    tls->coreTls.threadGroupHandle = wrapArg->threadGroupHandle;
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    tls->coreTls.nativeThreadHandle = LLBC_NS LLBC_GetCurrentThread();
-#else // LLBC_TARGET_PLATFORM_WIN32
-    HANDLE pseudoHandle = ::GetCurrentThread();
-    ::DuplicateHandle(::GetCurrentProcess(),
-                      pseudoHandle,
-                      ::GetCurrentProcess(),
-                      &tls->coreTls.nativeThreadHandle,
-                      0,
-                      FALSE,
-                      DUPLICATE_SAME_ACCESS);
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-    // Setup core tls some components.
-    tls->coreTls.safetyObjectPool = new LLBC_NS LLBC_SafetyObjectPool;
-    tls->coreTls.unsafetyObjectPool = new LLBC_NS LLBC_UnsafetyObjectPool;
-    tls->coreTls.timerScheduler = new LLBC_NS LLBC_TimerScheduler;
-
-    // Setup objbase tls some components.
-    tls->objbaseTls.poolStack = new LLBC_NS LLBC_AutoReleasePoolStack;
-    new LLBC_NS LLBC_AutoReleasePool;
-
-    // Notify thread manager thread startup.
-    LLBC_NS LLBC_ThreadMgr *threadMgr = wrapArg->threadMgr;
-    threadMgr->OnThreadStartup(wrapArg->threadHandle);
-
-    // Call thread proc.
-    wrapArg->entry(wrapArg->arg);
-
-    // Notify thread manager thread terminated.
-    threadMgr->OnThreadTerminate(wrapArg->threadHandle);
-
-    // Delete arg.
-    delete wrapArg;
-
-    // Cleanup objbase tls components.
-    delete reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(
-        tls->objbaseTls.poolStack); tls->objbaseTls.poolStack = nullptr;
-
-    // Cleanup core tls components.
-    delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(
-        tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
-    delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(
-        tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
-    delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(
-        tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
-
-#if LLBC_TARGET_PLATFORM_WIN32
-    ::CloseHandle(tls->coreTls.nativeThreadHandle);
-#endif // LLBC_TARGET_PLATFORM_WIN32
-    LLBC_NS __LLBC_ResetLibTls();
 }
 
 __LLBC_INTERNAL_NS_END
@@ -185,6 +118,18 @@ LLBC_Handle LLBC_ThreadMgr::CreateThreads(int threadNum,
     }
 
     return groupHandle;
+}
+
+void LLBC_ThreadMgr::SetThreadStartHook(const LLBC_Delegate<void(LLBC_Handle)> &startHook)
+{
+    LLBC_LockGuard guard(_lock);
+    _threadStartHook = startHook;
+}
+
+void LLBC_ThreadMgr::SetThreadStopHook(const LLBC_Delegate<void(LLBC_Handle)> &stopHook)
+{
+    LLBC_LockGuard guard(_lock);
+    _threadStopHook = stopHook;
 }
 
 bool LLBC_ThreadMgr::InLLBCThread()
@@ -392,49 +337,118 @@ int LLBC_ThreadMgr::KillAll(int sig)
     return LLBC_OK;
 }
 
-void LLBC_ThreadMgr::OnThreadStartup(LLBC_Handle handle)
+void LLBC_ThreadMgr::ThreadEntry(void *arg)
 {
-    LLBC_LockGuard guard(_lock);
+    // Get wrap thread argument.
+    LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg *wrapArg = 
+        reinterpret_cast<LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg *>(arg);
 
-    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
+    const LLBC_Handle handle = wrapArg->threadHandle;
+
+    // Initialize lib TLS.
+    LLBC_NS __LLBC_LibTls *tls = LLBC_NS __LLBC_GetLibTls();
+    tls->coreTls.llbcThread = true;
+    tls->coreTls.threadId = LLBC_NS LLBC_GetCurrentThreadId();
+    tls->coreTls.threadHandle = handle;
+    tls->coreTls.threadGroupHandle = wrapArg->threadGroupHandle;
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    tls->coreTls.nativeThreadHandle = LLBC_NS LLBC_GetCurrentThread();
+#else // LLBC_TARGET_PLATFORM_WIN32
+    HANDLE pseudoHandle = ::GetCurrentThread();
+    ::DuplicateHandle(::GetCurrentProcess(),
+                      pseudoHandle,
+                      ::GetCurrentProcess(),
+                      &tls->coreTls.nativeThreadHandle,
+                      0,
+                      FALSE,
+                      DUPLICATE_SAME_ACCESS);
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+    // Setup core tls some components.
+    tls->coreTls.safetyObjectPool = new LLBC_NS LLBC_SafetyObjectPool;
+    tls->coreTls.unsafetyObjectPool = new LLBC_NS LLBC_UnsafetyObjectPool;
+    tls->coreTls.timerScheduler = new LLBC_NS LLBC_TimerScheduler;
+    // Setup objbase tls some components.
+    tls->objbaseTls.poolStack = new LLBC_NS LLBC_AutoReleasePoolStack;
+    new LLBC_NS LLBC_AutoReleasePool;
+
+     // Set thread to <Running> state.
+    LLBC_ThreadMgr * const threadMgr = wrapArg->threadMgr;
+    threadMgr->_lock.Lock();
+    LLBC_ThreadDescriptor *threadDesc = threadMgr->FindThreadDescriptor(handle);
     threadDesc->SetState(LLBC_ThreadState::Running);
-}
 
-void LLBC_ThreadMgr::OnThreadTerminate(LLBC_Handle handle)
-{
-    LLBC_LockGuard guard(_lock);
+    const LLBC_Delegate<void(LLBC_Handle)> startHook = threadMgr->_threadStartHook;
+    threadMgr->_lock.Unlock();
 
-    LLBC_ThreadDescriptor *threadDesc = FindThreadDescriptor(handle);
-    if (threadDesc)
+    // Invoke thread start hook.
+    LLBC_DoIf(startHook, startHook(handle));
+
+
+    // Call thread proc.
+    // ==========================================
+    wrapArg->entry(wrapArg->arg);
+    // ==========================================
+
+    // Invoke thread stop hook.
+    threadMgr->_lock.Lock();
+    LLBC_Delegate<void(LLBC_Handle)> stopHook = threadMgr->_threadStopHook;
+    threadMgr->_lock.Unlock();
+
+    LLBC_DoIf(stopHook, stopHook(handle));
+
+    // Remove thread descriptor.
+    threadMgr->_lock.Lock();
+    threadDesc = threadMgr->FindThreadDescriptor(handle);
+    if (LIKELY(threadDesc))
     {
 #if LLBC_TARGET_PLATFORM_WIN32
         ::CloseHandle(threadDesc->GetNativeHandle());
 #endif
 
-        RemoveThreadDescriptor(threadDesc->GetHandle());
+        threadMgr->RemoveThreadDescriptor(threadDesc->GetHandle());
     }
+    threadMgr->_lock.Unlock();
+
+    // Delete arg.
+    delete wrapArg;
+
+    // Cleanup objbase tls components.
+    delete reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(
+        tls->objbaseTls.poolStack); tls->objbaseTls.poolStack = nullptr;
+    // Cleanup core tls components.
+    delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(
+        tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(
+        tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(
+        tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
+#if LLBC_TARGET_PLATFORM_WIN32
+    ::CloseHandle(tls->coreTls.nativeThreadHandle);
+#endif // LLBC_TARGET_PLATFORM_WIN32
+    LLBC_NS __LLBC_ResetLibTls();
 }
 
 LLBC_Handle LLBC_ThreadMgr::CreateThread_NonLock(const LLBC_Delegate<void(void *)> &entry,
-                                                     void *arg,
-                                                     int priority,
-                                                     int stackSize,
-                                                     LLBC_Handle groupHandle,
-                                                     LLBC_NativeThreadHandle &nativeHandle)
+                                                 void *arg,
+                                                 int priority,
+                                                 int stackSize,
+                                                 LLBC_Handle groupHandle,
+                                                 LLBC_NativeThreadHandle &nativeHandle)
 {
     // Gen thread handle.
     const LLBC_Handle handle = ++_maxThreadHandle;
 
     // Create wrap thread argument.
-    LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg *wrapArg = new LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg;
+    LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg *wrapArg =
+            new LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadArg;
     wrapArg->entry = entry;
     wrapArg->arg = arg;
+    wrapArg->threadMgr = this;
     wrapArg->threadHandle = handle;
     wrapArg->threadGroupHandle = groupHandle;
-    wrapArg->threadMgr = this;
 
     // Create thread.
-    if (LLBC_CreateThread(&LLBC_INL_NS __LLBC_ThreadMgr_WrapThreadEntry,
+    if (LLBC_CreateThread(&LLBC_ThreadMgr::ThreadEntry,
                           wrapArg,
                           &nativeHandle,
                           priority,

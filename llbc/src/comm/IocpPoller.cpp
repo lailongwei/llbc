@@ -52,7 +52,7 @@ LLBC_IocpPoller::~LLBC_IocpPoller()
 
 int LLBC_IocpPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -79,23 +79,27 @@ int LLBC_IocpPoller::Start()
         return LLBC_FAILED;
     }
 
-    _started = true;
     return LLBC_OK;
+}
+
+void LLBC_IocpPoller::Stop()
+{
+    if (!IsActivated() || _stopping)
+        return;
+
+    StopMonitor();
+
+    LLBC_BasePoller::Stop();
 }
 
 void LLBC_IocpPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     while (!_stopping)
         HandleQueuedEvents(20);
 }
 
 void LLBC_IocpPoller::Cleanup()
 {
-    StopMonitor();
-
     LLBC_CloseIocp(_iocp);
     _iocp = LLBC_INVALID_IOCP_HANDLE;
 

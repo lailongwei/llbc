@@ -279,14 +279,14 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    // Start pollermgr.
-    if (_pollerMgr.Start(pollerCount) != LLBC_OK)
+    // Init PollerMgr.
+    if (_pollerMgr.Init(pollerCount) != LLBC_OK)
     {
         _lock.Unlock();
         return LLBC_FAILED;
     }
 
-    // Update service config.
+    // Update service config(extract from the app config).
     UpdateServiceCfg();
 
     // Add to service tls or activate.
@@ -294,7 +294,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     {
         if (!IsCanContinueDriveService())
         {
-            _pollerMgr.Stop();
+            _pollerMgr.Finalize();
             LLBC_SetLastError(LLBC_ERROR_LIMIT);
 
             _lock.Unlock();
@@ -308,7 +308,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     {
         if (Activate(1) != LLBC_OK)
         {
-            _pollerMgr.Stop();
+            _pollerMgr.Finalize();
             _lock.Unlock();
 
             return LLBC_FAILED;
@@ -321,6 +321,9 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     // Init&Start comps.
     if (_driveMode == ExternalDrive)
     {
+        // Start pollermgr.
+        _pollerMgr.Start();
+
         // Add service to service mgr.
         _svcMgr.OnServiceStart(this);
 
@@ -401,8 +404,8 @@ void LLBC_ServiceImpl::Stop()
         if (LLBC_GetCurrentThreadId() == svcThreadId)
             return;
 
-        while (_started)
-            LLBC_Sleep(1);
+        // Waiting for svc-thread stopped.
+        Wait();
     }
     else // Stop external-drive service.
     {
@@ -459,9 +462,9 @@ int LLBC_ServiceImpl::GetFrameInterval() const
 }
 
 int LLBC_ServiceImpl::Listen(const char *ip,
-                         uint16 port,
-                         LLBC_IProtocolFactory *protoFactory,
-                         const LLBC_SessionOpts &sessionOpts)
+                             uint16 port,
+                             LLBC_IProtocolFactory *protoFactory,
+                             const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
@@ -474,10 +477,10 @@ int LLBC_ServiceImpl::Listen(const char *ip,
 }
 
 int LLBC_ServiceImpl::Connect(const char *ip,
-                          uint16 port,
-                          double timeout,
-                          LLBC_IProtocolFactory *protoFactory,
-                          const LLBC_SessionOpts &sessionOpts)
+                              uint16 port,
+                              double timeout,
+                              LLBC_IProtocolFactory *protoFactory,
+                              const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
     const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
@@ -490,10 +493,10 @@ int LLBC_ServiceImpl::Connect(const char *ip,
 }
 
 int LLBC_ServiceImpl::AsyncConn(const char *ip,
-                            uint16 port,
-                            double timeout,
-                            LLBC_IProtocolFactory *protoFactory,
-                            const LLBC_SessionOpts &sessionOpts)
+                                uint16 port,
+                                double timeout,
+                                LLBC_IProtocolFactory *protoFactory,
+                                const LLBC_SessionOpts &sessionOpts)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -602,8 +605,8 @@ int LLBC_ServiceImpl::RemoveSession(int sessionId, const char *reason)
 }
 
 int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
-                                    int ctrlCmd,
-                                    const LLBC_Variant &ctrlData)
+                                        int ctrlCmd,
+                                        const LLBC_Variant &ctrlData)
 {
     LLBC_LockGuard guard(_lock);
     if (!_started)
@@ -692,7 +695,9 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
     return LLBC_OK;
 }
 
-int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath, const LLBC_String &compName, LLBC_Component *&comp)
+int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
+                                   const LLBC_String &compName,
+                                   LLBC_Component *&comp)
 {
     // Force reset out parameter: comp.
     comp = nullptr;
@@ -1032,8 +1037,8 @@ void LLBC_ServiceImpl::UnsubscribeEvent(const LLBC_ListenerStub &stub)
 }
 
 void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
-                             const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler,
-                             const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
+                                 const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler,
+                                 const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler)
 {
     Push(LLBC_SvcEvUtil::BuildFireEventEv(ev, dequeueHandler));
     if (enqueueHandler)
@@ -1052,7 +1057,8 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return *eventServiceFirer;
 }
 
-int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data)
+int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable,
+                           const LLBC_Variant &data)
 {
     if (UNLIKELY(!runnable))
     {
@@ -1079,7 +1085,8 @@ const LLBC_ProtocolStack *LLBC_ServiceImpl::GetCodecProtocolStack(int sessionId)
     LLBC_ServiceImpl *ncThis = const_cast<LLBC_ServiceImpl *>(this);
     ncThis->_readySessionInfosLock.Lock();
     auto it = _readySessionInfos.find(sessionId);
-    const LLBC_ProtocolStack *codecStack = it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
+    const LLBC_ProtocolStack *codecStack =
+        it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
     ncThis->_readySessionInfosLock.Unlock();
 
     if (!codecStack)
@@ -1138,7 +1145,9 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
         Cleanup();
 }
 
-LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId, int acceptSessionId, LLBC_ProtocolStack *stack)
+LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId,
+                                                      int acceptSessionId,
+                                                      LLBC_ProtocolStack *stack)
 {
     if (!stack)
     {
@@ -1167,7 +1176,9 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId, int acceptS
     return stack;
 }
 
-LLBC_ProtocolStack *LLBC_ServiceImpl::CreateCodecStack(int sessionId, int acceptSessionId, LLBC_ProtocolStack *stack)
+LLBC_ProtocolStack *LLBC_ServiceImpl::CreateCodecStack(int sessionId,
+                                                       int acceptSessionId,
+                                                       LLBC_ProtocolStack *stack)
 {
     if (!stack)
     {
@@ -1263,7 +1274,10 @@ void LLBC_ServiceImpl::RemoveSessionProtocolFactory(int sessionId)
     }
 }
 
-void LLBC_ServiceImpl::AddReadySession(int sessionId, int acceptSessionId, bool isListenSession, bool repeatCheck)
+void LLBC_ServiceImpl::AddReadySession(int sessionId,
+                                       int acceptSessionId,
+                                       bool isListenSession,
+                                       bool repeatCheck)
 {
     if (repeatCheck)
     {
@@ -1333,6 +1347,8 @@ void LLBC_ServiceImpl::Svc()
 
     _lock.Lock();
 
+    _pollerMgr.Start();
+
     AddServiceToTls();
     InitObjectPools();
     InitTimerScheduler();
@@ -1366,8 +1382,9 @@ void LLBC_ServiceImpl::Cleanup()
         _compsStartRet == LLBC_ERROR_SUCCESS)
         HandleQueuedEvents();
 
-    // Stop poller manager.
+    // Stop && Finalize poller manager.
     _pollerMgr.Stop();
+    _pollerMgr.Finalize();
 
     // If drivemode is external-drive, cancel all timers first.
     if (_driveMode == ExternalDrive)
@@ -2350,8 +2367,8 @@ void LLBC_ServiceImpl::ProcessIdle()
 }
 
 int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
-                               bool lock,
-                               bool validCheck)
+                                   bool lock,
+                                   bool validCheck)
 {
     // Lock if need.
     if (lock)
@@ -2451,13 +2468,13 @@ int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
 }
 
 int LLBC_ServiceImpl::LockableSend(int svcId,
-                               int sessionId,
-                               int opcode,
-                               const void *bytes,
-                               size_t len,
-                               int status,
-                               bool lock,
-                               bool validCheck)
+                                   int sessionId,
+                                   int opcode,
+                                   const void *bytes,
+                                   size_t len,
+                                   int status,
+                                   bool lock,
+                                   bool validCheck)
 {
     // Create packet(from object pool) and send.
     LLBC_Packet *packet = _packetObjectPool.GetObject();
@@ -2475,11 +2492,11 @@ int LLBC_ServiceImpl::LockableSend(int svcId,
 
 template <typename SessionIds>
 int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
-                                     const SessionIds &sessionIds,
-                                     int opcode,
-                                     LLBC_Coder *coder,
-                                     int status,
-                                     bool validCheck)
+                                         const SessionIds &sessionIds,
+                                         int opcode,
+                                         LLBC_Coder *coder,
+                                         int status,
+                                         bool validCheck)
 {
     if (sessionIds.empty())
     {

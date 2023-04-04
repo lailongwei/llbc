@@ -69,8 +69,6 @@ public:
 
 private:
     _Deleg _deleg;
-
-    volatile bool _started;
     volatile bool _stopping;
 };
 

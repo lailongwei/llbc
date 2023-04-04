@@ -57,8 +57,7 @@ This::_Handler This::_handlers[LLBC_PollerEvent::End] =
 };
 
 LLBC_BasePoller::LLBC_BasePoller()
-: _started(false)
-, _stopping(false)
+: _stopping(false)
 
 , _id(-1)
 , _brotherCount(0)
@@ -136,14 +135,11 @@ int LLBC_BasePoller::Start()
 
 void LLBC_BasePoller::Stop()
 {
-    if (!_started || _stopping)
+    if (!IsActivated() || _stopping)
         return;
 
     _stopping = true;
-    while (_started)
-        LLBC_Sleep(20);
-
-    _stopping = false;
+    Wait();
 }
 
 void LLBC_BasePoller::Cleanup()
@@ -179,7 +175,8 @@ void LLBC_BasePoller::Cleanup()
         delete it->second.socket;
     _connecting.clear();
 
-    _started = false;
+    // Reset stopping flag.
+    _stopping = false;
 }
 
 void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
@@ -341,8 +338,15 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
     _sessions.insert(std::make_pair(session->GetId(), session));
     _sockets.insert(std::make_pair(session->GetSocketHandle(), session));
 
-    // Build event and push to service.
+    // Pre-Add Service-Level session info to makesure protocol stack's 
+    // Service::Send()/Multicast()/Broadcast() methods call successfully.
     LLBC_Socket *sock = session->GetSocket();
+    _svc->AddReadySession(session->GetId(),
+                          session->GetAcceptId(),
+                          sock->IsListen(),
+                          true);
+
+    // Build session-create event and push to service.
     LLBC_MessageBlock *block = LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
                                                                     sock->GetPeerAddress(),
                                                                     sock->IsListen(),

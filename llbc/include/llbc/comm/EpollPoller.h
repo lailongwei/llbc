@@ -53,6 +53,11 @@ public:
     virtual int Start();
 
     /**
+     * Stop poller.
+     */
+    virtual void Stop();
+
+    /**
      * Task startup method.
      */
     virtual void Svc();

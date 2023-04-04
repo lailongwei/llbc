@@ -416,7 +416,8 @@ public:
      * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable, const LLBC_Variant &data = LLBC_Variant::nil);
+    virtual int Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable,
+                     const LLBC_Variant &data = LLBC_Variant::nil);
 
     /**
      * Get service protocol stack, only full-stack option disabled available.
@@ -462,8 +463,12 @@ protected:
     /**
      * Stack create helper method(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
-    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId, int acceptSessionId = 0, LLBC_ProtocolStack *stack = nullptr);
+    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId,
+                                                int acceptSessionId = 0,
+                                                LLBC_ProtocolStack *stack = nullptr);
+    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId,
+                                                 int acceptSessionId = 0,
+                                                 LLBC_ProtocolStack *stack = nullptr);
     virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
 
 protected:
@@ -497,7 +502,10 @@ protected:
     /**
      * Ready session operation methods.
      */
-    void AddReadySession(int sessionId, int acceptSessionId, bool isListenSession, bool repeatCheck = false);
+    virtual void AddReadySession(int sessionId,
+                                 int acceptSessionId,
+                                 bool isListenSession,
+                                 bool repeatCheck = false);
     void RemoveReadySession(int sessionId);
     void RemoveAllReadySessions();
 
