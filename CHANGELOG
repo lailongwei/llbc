@@ -1,8 +1,11 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
+# Version: 1.1.1
+# 2022/4/4 -
+#
 # Version: 1.1.0
-# 2022/8~
+# 2022/8 - 23/4/4
 # ThreadMgr测试用例增加Thread Start/Stop Hook测试代码
 # 优化非LogRunnable start线程stop时的等待逻辑
 # LogRunnable兼容非Start()调用者线程进行Stop()的情况, 以确保在Crash-Hook中的LoggerMgr->Finalize()调用可正常结束
