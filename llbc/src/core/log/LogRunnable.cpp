@@ -34,7 +34,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_LogRunnable::LLBC_LogRunnable()
-: _stoped(false)
+: _stopping(false)
 {
     for (size_t i = 0; i < sizeof(_logDatas) / sizeof(_logDatas[0]); ++i)
         _logDatas[i].reserve(4096);
@@ -65,7 +65,7 @@ int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
 
 void LLBC_LogRunnable::Stop()
 {
-    _stoped = true;
+    _stopping = true;
     Wait();
 }
 
@@ -82,11 +82,13 @@ void LLBC_LogRunnable::Cleanup()
 
     FlushLoggers(true, 0);
     _loggers.clear();
+
+    _stopping = false;
 }
 
 void LLBC_LogRunnable::Svc()
 {
-    while (LIKELY(!_stoped))
+    while (LIKELY(!_stopping))
     {
         if (!TryPopAndProcLogDatas())
             LLBC_Sleep(1);

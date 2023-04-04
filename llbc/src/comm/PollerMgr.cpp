@@ -87,7 +87,7 @@ void LLBC_PollerMgr::SetService(LLBC_Service *svc)
     _svc = svc;
 }
 
-int LLBC_PollerMgr::Start(int count)
+int LLBC_PollerMgr::Init(int count)
 {
     if (count <= 0)
     {
@@ -115,8 +115,20 @@ int LLBC_PollerMgr::Start(int count)
         _pollers[i] = poller;
     }
 
+    return LLBC_OK;
+}
+
+int LLBC_PollerMgr::Start()
+{
+    // Uninit check.
+    if (!_pollers)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     // Startup all pollers.
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < _pollerCount; ++i)
         _pollers[i]->Start();
 
     // Process pending sockets.
@@ -135,12 +147,22 @@ int LLBC_PollerMgr::Start(int count)
         _pollers[it->first % _pollerCount]->Push(
             LLBC_PollerEvUtil::BuildAsyncConnEv(it->first, it->second.second, it->second.first));
     }
+
     _pendingAsyncConns.clear();
 
     return LLBC_OK;
 }
 
 void LLBC_PollerMgr::Stop()
+{
+    LLBC_ReturnIf(!_pollers, void());
+
+    // Stop all pollers.
+    for (int i = _pollerCount - 1; i >= 0; --i)
+        _pollers[i]->Stop();
+}
+
+void LLBC_PollerMgr::Finalize()
 {
     // Always cleanup pending add-sock container.
     for (_PendingAddSocks::iterator it = _pendingAddSocks.begin();
@@ -155,8 +177,8 @@ void LLBC_PollerMgr::Stop()
     // Delete all pollers.
     if (_pollers)
     {
-        for (int i = 0; i < _pollerCount; ++i)
-            delete _pollers[i];
+        for (int i = _pollerCount - 1; i >= 0; --i)
+            LLBC_XDelete(_pollers[i]);
 
         LLBC_XFree(_pollers);
         _pollerCount = 0;

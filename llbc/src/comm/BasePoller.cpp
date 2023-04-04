@@ -57,8 +57,7 @@ This::_Handler This::_handlers[LLBC_PollerEvent::End] =
 };
 
 LLBC_BasePoller::LLBC_BasePoller()
-: _started(false)
-, _stopping(false)
+: _stopping(false)
 
 , _id(-1)
 , _brotherCount(0)
@@ -136,14 +135,12 @@ int LLBC_BasePoller::Start()
 
 void LLBC_BasePoller::Stop()
 {
-    if (!_started || _stopping)
+    if (!IsActivated() || _stopping)
         return;
 
     _stopping = true;
-    while (_started)
-        LLBC_Sleep(20);
-
-    _stopping = false;
+    const auto ret = Wait();
+    std::cerr << "Wait poller ret:" << ret <<", last err:" <<LLBC_FormatLastError() << std::endl;
 }
 
 void LLBC_BasePoller::Cleanup()
@@ -179,7 +176,8 @@ void LLBC_BasePoller::Cleanup()
         delete it->second.socket;
     _connecting.clear();
 
-    _started = false;
+    // Reset stopping flag.
+    _stopping = false;
 }
 
 void LLBC_BasePoller::HandleQueuedEvents(int waitTime)

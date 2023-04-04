@@ -62,11 +62,23 @@ public:
 
 public:
     /**
+     * Initialize poller manager.
+     * @param[in] count - the poller count.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Init(int count);
+
+    /**
+     * Finalize poller manager.
+     */
+    void Finalize();
+
+    /**
      * Startup poller manager.
      * @param[in] count - the poller count.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Start(int count);
+    int Start();
 
     /**
      * Stop poller manager.
