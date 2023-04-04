@@ -65,8 +65,17 @@ int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
 
 void LLBC_LogRunnable::Stop()
 {
+    LLBC_ReturnIf(GetTaskState() == LLBC_TaskState::NotActivated, void());
+
+    // Mask stopping and waiting for thread stopped.
     _stopping = true;
-    Wait();
+    LLBC_ReturnIf(Wait() == LLBC_OK, void());
+
+    // If Wait() call failed, maybe call LogRunnable::Stop() in difference thread(eg: in crash hook),
+    // in this case, force waiting for LogRunnable thread stopped.
+    while (GetTaskState() != LLBC_TaskState::NotActivated)
+        LLBC_Sleep(1);
+    LLBC_Sleep(20);
 }
 
 void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
