@@ -93,6 +93,18 @@ public:
      */
     int GetTaskState() const;
 
+    /**
+     * Get thread manager.
+     * @return LLBC_ThreadMgr * - thread manager.
+     */
+    LLBC_ThreadMgr *GetThreadMgr() const;
+
+    /**
+     * Get task thread group handle.
+     * @return LLBC_Handle - task thread group handle.
+     */
+    LLBC_Handle GetThreadGroupHandle() const;
+
 public:
     /**
      * Wait current task.

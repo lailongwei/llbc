@@ -45,6 +45,16 @@ inline int LLBC_Task::GetTaskState() const
     return _taskState;
 }
 
+inline LLBC_ThreadMgr *LLBC_Task::GetThreadMgr() const
+{
+    return _threadMgr;
+}
+
+inline LLBC_Handle LLBC_Task::GetThreadGroupHandle() const
+{
+    return _threadGroupHandle;
+}
+
 inline int LLBC_Task::Push(LLBC_MessageBlock *block)
 {
     _msgQueue.PushBack(block);

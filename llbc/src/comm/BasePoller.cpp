@@ -341,8 +341,15 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
     _sessions.insert(std::make_pair(session->GetId(), session));
     _sockets.insert(std::make_pair(session->GetSocketHandle(), session));
 
-    // Build event and push to service.
+    // Pre-Add Service-Level session info to makesure protocol stack's 
+    // Service::Send()/Multicast()/Broadcast() methods call successfully.
     LLBC_Socket *sock = session->GetSocket();
+    _svc->AddReadySession(session->GetId(),
+                          session->GetAcceptId(),
+                          sock->IsListen(),
+                          true);
+
+    // Build session-create event and push to service.
     LLBC_MessageBlock *block = LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
                                                                     sock->GetPeerAddress(),
                                                                     sock->IsListen(),
