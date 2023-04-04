@@ -74,8 +74,7 @@ void LLBC_LogRunnable::Stop()
     // If Wait() call failed, maybe call LogRunnable::Stop() in difference thread(eg: in crash hook),
     // in this case, force waiting for LogRunnable thread stopped.
     while (GetTaskState() != LLBC_TaskState::NotActivated)
-        LLBC_Sleep(1);
-    LLBC_Sleep(20);
+        LLBC_Sleep(10);
 }
 
 void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
