@@ -167,7 +167,6 @@ private:
     friend class LLBC_Session;
 
 protected:
-    volatile bool _started;
     volatile bool _stopping;
 
     int _id;

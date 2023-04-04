@@ -279,14 +279,14 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    // Start pollermgr.
-    if (_pollerMgr.Start(pollerCount) != LLBC_OK)
+    // Init PollerMgr.
+    if (_pollerMgr.Init(pollerCount) != LLBC_OK)
     {
         _lock.Unlock();
         return LLBC_FAILED;
     }
 
-    // Update service config.
+    // Update service config(extract from the app config).
     UpdateServiceCfg();
 
     // Add to service tls or activate.
@@ -294,7 +294,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     {
         if (!IsCanContinueDriveService())
         {
-            _pollerMgr.Stop();
+            _pollerMgr.Finalize();
             LLBC_SetLastError(LLBC_ERROR_LIMIT);
 
             _lock.Unlock();
@@ -308,7 +308,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     {
         if (Activate(1) != LLBC_OK)
         {
-            _pollerMgr.Stop();
+            _pollerMgr.Finalize();
             _lock.Unlock();
 
             return LLBC_FAILED;
@@ -321,6 +321,9 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     // Init&Start comps.
     if (_driveMode == ExternalDrive)
     {
+        // Start pollermgr.
+        _pollerMgr.Start();
+
         // Add service to service mgr.
         _svcMgr.OnServiceStart(this);
 
@@ -401,8 +404,8 @@ void LLBC_ServiceImpl::Stop()
         if (LLBC_GetCurrentThreadId() == svcThreadId)
             return;
 
-        while (_started)
-            LLBC_Sleep(1);
+        // Waiting for svc-thread stopped.
+        Wait();
     }
     else // Stop external-drive service.
     {
@@ -1344,6 +1347,8 @@ void LLBC_ServiceImpl::Svc()
 
     _lock.Lock();
 
+    _pollerMgr.Start();
+
     AddServiceToTls();
     InitObjectPools();
     InitTimerScheduler();
@@ -1377,8 +1382,9 @@ void LLBC_ServiceImpl::Cleanup()
         _compsStartRet == LLBC_ERROR_SUCCESS)
         HandleQueuedEvents();
 
-    // Stop poller manager.
+    // Stop && Finalize poller manager.
     _pollerMgr.Stop();
+    _pollerMgr.Finalize();
 
     // If drivemode is external-drive, cancel all timers first.
     if (_driveMode == ExternalDrive)

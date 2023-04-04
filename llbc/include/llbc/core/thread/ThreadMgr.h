@@ -64,6 +64,18 @@ public:
                               std::vector<LLBC_Handle> *handles = nullptr,
                               std::vector<LLBC_NativeThreadHandle> *nativeHandles = nullptr);
 
+    /**
+     * Set thread start hook.
+     * @param[in] startHook - thread start hook.
+     */
+    void SetThreadStartHook(const LLBC_Delegate<void(LLBC_Handle)> &startHook);
+
+    /**
+     * Set thread stop hook.
+     * @param[in] stopHook - thread stop hook.
+     */
+    void SetThreadStopHook(const LLBC_Delegate<void(LLBC_Handle)> &stopHook);
+
 public:
     /**
      * Check in llbc thread or not.
@@ -248,18 +260,12 @@ public:
      */
     int KillAll(int sig);
 
-public:
+private:
     /**
-     * Thread startup event handle function, call by thread entry function.
-     * @param[in] handle - thread handle.
+     * llbc library thread entry.
+     * @param[in] arg - thread arg.
      */
-    void OnThreadStartup(LLBC_Handle handle);
-
-    /**
-     * Thread terminate event handle function, call by Thread entry function.
-     * @param[in] handle - thread handle.
-     */
-    void OnThreadTerminate(LLBC_Handle handle);
+    static void ThreadEntry(void *arg);
 
 private:
     /**
@@ -394,6 +400,9 @@ private:
 
     volatile LLBC_Handle _maxThreadHandle;
     volatile LLBC_Handle _maxThreadGroupHandle;
+
+    LLBC_Delegate<void(LLBC_Handle)> _threadStartHook;
+    LLBC_Delegate<void(LLBC_Handle)> _threadStopHook;
 
     std::unordered_map<LLBC_Handle, LLBC_ThreadDescriptor *> _hldr2Threads;
     std::unordered_map<LLBC_NativeThreadHandle, LLBC_ThreadDescriptor *> _nativeHldr2Threads;

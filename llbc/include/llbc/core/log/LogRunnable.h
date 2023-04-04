@@ -93,7 +93,7 @@ private:
     void FlushLoggers(bool force, sint64 now);
 
 private:
-    volatile bool _stoped;
+    volatile bool _stopping;
     std::vector<LLBC_Logger *> _loggers;
 
     LLBC_SpinLock _logDataLock;
