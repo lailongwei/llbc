@@ -61,7 +61,10 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
         LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC, LLBC_COMP_VER);
 #elif LLBC_CUR_COMP == LLBC_COMP_GCC
     desc.append_format(", arch:%s, compiled with:%s(ver:%d.%d.%d))", 
-        LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC, LLBC_COMP_MAJOR_VER, LLBC_COMP_MINOR_VER, LLBC_COMP_PATCH_LEVEL);
+                       LLBC_TARGET_PROCESSOR_DESC,
+                       LLBC_CUR_COMP_DESC,
+                       LLBC_COMP_MAJOR_VER,
+                       LLBC_COMP_MINOR_VER, LLBC_COMP_PATCH_LEVEL);
 #else
     desc.append_format(", arch:%s, compiled with:%s)", 
         LLBC_TARGET_PROCESSOR_DESC, LLBC_CUR_COMP_DESC);
