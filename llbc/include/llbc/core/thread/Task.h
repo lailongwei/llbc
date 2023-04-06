@@ -193,6 +193,7 @@ private:
 
     volatile int _threadNum;
     volatile int _activatingThreadNum;
+    volatile int _inSvcMethThreadNum;
 
     LLBC_MessageQueue _msgQueue;
 };
