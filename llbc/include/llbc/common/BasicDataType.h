@@ -272,7 +272,7 @@ typedef std::set<int> LLBC_SessionIdSet;
 typedef LLBC_SessionIdSet::iterator LLBC_SessionIdSetIter;
 typedef LLBC_SessionIdSet::const_iterator LLBC_SessionIdSetCIter;
 
-// Component dynamic create function define
+// Component dynamic create function define.
 // Note: the return pointer must be LLBC_Component(or its subclass) class instance.
 typedef void *(*LLBC_CompDynamicCreateFunc)();
 

@@ -434,7 +434,7 @@ public:
     const LLBC_OverlappedGroup &GetOverlappedGroup() const;
 
     /**
-     * About all overlapped operate methods.
+     * About all overlapped Operate methods.
      */
     void InsertOverlapped(LLBC_POverlapped ol);
     void RemoveOverlapped(LLBC_POverlapped ol);

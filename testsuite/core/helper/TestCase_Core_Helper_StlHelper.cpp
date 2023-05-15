@@ -35,7 +35,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     for(sint32 i = 0; i < 10; ++i)
         vec.push_back(new sint8);
-    LLBC_STLHelper::DeleteContainer(vec, true, true);
+    LLBC_STLHelper::DeleteContainer(vec, true);
     LLBC_PrintLn("after free vector, size: %lu", vec.size());
 
     // List test.
@@ -47,7 +47,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     for(sint32 i = 0; i < 10; ++i)
         list.push_back(new sint32);
-    LLBC_STLHelper::DeleteContainer(list, true, true);
+    LLBC_STLHelper::DeleteContainer(list, true);
     LLBC_PrintLn("after delete list, size: %lu", list.size());
 
     // Deque test.
@@ -59,7 +59,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     for(sint32 i = 0; i < 10; ++i)
         dq.push_back(new sint32);
-    LLBC_STLHelper::DeleteContainer(dq, true, true);
+    LLBC_STLHelper::DeleteContainer(dq, true);
     LLBC_PrintLn("after delete deque, size: %lu", list.size());
 
     // Stack test.
@@ -96,7 +96,7 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
     std::map<sint32, std::string *> map2;
     for(sint32 i = 0; i < 10; ++i)
         map2[i] = new std::string;
-    LLBC_STLHelper::DeleteContainer(map2, true, true);
+    LLBC_STLHelper::DeleteContainer(map2, true);
     LLBC_PrintLn("after delete map, size: %lu", map2.size());
 
     // Set test.
@@ -108,8 +108,44 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     for(sint32 i = 0;  i < 10; ++i)
         s.insert(new sint32);
-    LLBC_STLHelper::DeleteContainer(s, true, true);
+    LLBC_STLHelper::DeleteContainer(s, true);
     LLBC_PrintLn("after delete set, size: %lu", s.size());
+
+    // Unordered Set test.
+    std::unordered_set<sint32 *> us;
+    for (sint32 i = 0; i < 10; ++i)
+        us.insert(new int(i * 100));
+    LLBC_STLHelper::DeleteContainer(us);
+    LLBC_PrintLn("after delete unordered set, size: %lu", us.size());
+
+    for (sint32 i = 0; i < 10; ++i)
+        us.insert(new sint32[3]);
+    LLBC_STLHelper::DeletesContainer(us, true);
+    LLBC_PrintLn("after deletes unordered set, size: %lu", us.size());
+
+    // Unordered Map test.
+    std::unordered_map<sint32, sint32 *> um;
+    for (sint32 i = 0; i < 10; ++i)
+        um.emplace(i, new int(i * 100));
+    LLBC_STLHelper::DeleteContainer(um);
+    LLBC_PrintLn("after delete unordered map, size: %lu", um.size());
+
+    for (sint32 i = 0; i < 10; ++i)
+        um.emplace(i, LLBC_Malloc(sint32, sizeof(sint32)));
+    LLBC_STLHelper::FreeContainer(um, true);
+    LLBC_PrintLn("after free unordered map, size: %lu", um.size());
+
+    // array test.
+    std::array<int *, 10> arr{nullptr};
+    for (sint32 i = 0; i < arr.size(); ++i)
+        arr[i] = new int(i);
+    LLBC_STLHelper::DeleteContainer(arr);
+    LLBC_PrintLn("after delete array, size: %lu, max_size: %lu", arr.size(), arr.max_size());
+
+    for (sint32 i = 0; i < arr.size(); ++i)
+        arr[i] = LLBC_Malloc(int, sizeof(int));
+    LLBC_STLHelper::FreeContainer(arr, true);
+    LLBC_PrintLn("after free array, size: %lu, max_size: %lu", arr.size(), arr.max_size());
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

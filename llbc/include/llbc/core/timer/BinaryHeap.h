@@ -114,17 +114,17 @@ public:
 
 public:
     /**
-     * = operate function.
+     * = Operate function.
      */
     _This &operator =(const _This &right);
 
     /**
-     * bool operate function.
+     * bool Operate function.
      */
     operator bool() const;
 
     /**
-     * ! operate function.
+     * ! Operate function.
      */
     bool operator !() const;
 

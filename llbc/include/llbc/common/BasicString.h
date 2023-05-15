@@ -26,7 +26,6 @@
 #include "llbc/common/Macro.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"
-#include "llbc/common/Stream.h"
 #include "llbc/common/BasicCString.h"
 
 __LLBC_NS_BEGIN
@@ -1579,27 +1578,6 @@ public:
     }
 
 public:
-    void serialize(LLBC_Stream &stream) const
-    {
-        stream.Write(static_cast<uint32>(this->size()));
-        stream.Write(_Base::data(), _Base::size() * sizeof(_Elem));
-    }
-
-    bool deserialize(LLBC_Stream &stream)
-    {
-        uint32 len;
-        if (!stream.Read(len))
-            return false;
-
-        _Base::clear();
-        if (len == 0)
-            return true;
-
-        this->resize(len);
-        return stream.Read(const_cast<char *>(this->data()), sizeof(_Elem) * this->size());
-    }
-
-private:
     size_type next_utf8_char_pos(size_type &beginBytePos) const
     {
         if (sizeof(_Elem) != sizeof(char))

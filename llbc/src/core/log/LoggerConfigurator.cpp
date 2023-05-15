@@ -41,7 +41,7 @@ LLBC_LoggerConfigurator::LLBC_LoggerConfigurator()
 
 LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
 {
-    LLBC_STLHelper::DeleteContainer(_configs, true);
+    LLBC_STLHelper::DeleteContainer(_configs);
 }
 
 int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
@@ -83,7 +83,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
         if (info->Initialize(loggerName, *cfg.GetProperty(loggerName), _rootConfig) != LLBC_OK)
         {
             delete info;
-            LLBC_STLHelper::DeleteContainer(_configs, true);
+            LLBC_STLHelper::DeleteContainer(_configs);
             return LLBC_FAILED;
         }
 

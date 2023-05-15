@@ -22,16 +22,38 @@
 #pragma once
 
 #include "llbc/common/Macro.h"
+#include "llbc/common/OSHeader.h"
 
 __LLBC_NS_BEGIN
 
-// Swap template.
+/**
+ * \brief Template specification judge function.
+ */
+template <typename Class, template <typename...> class ClassTemplate>
+struct LLBC_IsTemplSpec : std::false_type {  };
+
+template <template <typename...> class ClassTemplate, typename... Args>
+struct LLBC_IsTemplSpec<ClassTemplate<Args...>, ClassTemplate> : public std::true_type {  };
+
+/**
+ * \brief Special Template specification judge function: std::array.
+ */
+template <typename ArrayClass, template <typename ValueType, size_t N> class ArrayClassTemplate>
+struct LLBC_IsSTLArraySpec : std::false_type {  };
+
+template <template <typename ValueType, size_t N> class ArrayClassTemplate, typename ValueType, size_t N>
+struct LLBC_IsSTLArraySpec<ArrayClassTemplate<ValueType, N>, ArrayClassTemplate> : public std::true_type {  };
+
+/**
+ * \brief Extract given T pure type.
+ */
 template <typename T>
-inline void LLBC_Swap(T &left, T &right)
+struct LLBC_ExtractPureType
 {
-    T temp = std::move(left);
-    left = std::move(right);
-    right = std::move(temp);
+    typedef typename std::remove_const<
+                typename std::remove_pointer<
+                    typename std::remove_reference<T>::type>::type>::type type;
 };
+
 
 __LLBC_NS_END
