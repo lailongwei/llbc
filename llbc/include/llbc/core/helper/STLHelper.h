@@ -82,7 +82,7 @@ private:
     {
         static void Operate(const pointer_type &pointer)
         {
-            static_assert(false && "Unsupported op");
+            ASSERT(false && "Unsupported op");
         }
     };
 

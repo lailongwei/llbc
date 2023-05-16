@@ -104,120 +104,6 @@ class LLBC_IObjectPoolInst;
 
 __LLBC_NS_END
 
-__LLBC_INTERNAL_NS_BEGIN
-
-/**
- * \brief std::array reader template define.
- */
-template <size_t N>
-struct __LLBC_ArrayReader
-{
-    template <typename Arr>
-    static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
-    {
-        if (UNLIKELY(!stream.Read(arr[N - 1])))
-            return false;
-
-        return __LLBC_ArrayReader<N - 1>::Read(arr, stream);
-    }
-};
-
-/**
- * \brief Stop std::array read.
- */
-template <>
-struct __LLBC_ArrayReader<0>
-{
-    template <typename Arr>
-    static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
-    {
-        return true;
-    }
-};
-
-/**
- * \brief std::array writer template define.
- */
-template <size_t N>
-struct __LLBC_ArrayWriter
-{
-    template <typename Arr>
-    static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
-    {
-        stream.Write(arr[N - 1]);
-        __LLBC_ArrayWriter<N - 1>::Write(arr, stream);
-    }
-};
-
-/**
- * \brief Stop std::array read.
- */
-template <>
-struct __LLBC_ArrayWriter<0>
-{
-    template <typename Arr>
-    static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
-    {
-    }
-};
-
-/**
- * \brief std::tuple reader template define.
- */
-template <size_t N>
-struct __LLBC_TupleReader
-{
-    template <typename Tup>
-    static bool Read(Tup &tup, LLBC_NS LLBC_Stream &stream)
-    {
-        if (UNLIKELY(!stream.Read(std::get<N - 1>(tup))))
-            return false;
-
-        return __LLBC_TupleReader<N - 1>::Read(tup, stream);
-    }
-};
-
-/**
- * \brief Stop std::tuple read.
- */
-template <>
-struct __LLBC_TupleReader<0>
-{
-    template <typename Tup>
-    static bool Read(Tup &tup, LLBC_NS LLBC_Stream &stream, size_t &readCount)
-    {
-        return true;
-    }
-};
-
-/**
- * \brief std::tuple writer template define.
- */
-template <size_t N>
-struct __LLBC_TupleWriter
-{
-    template <typename Tup>
-    static void Write(const Tup &tup, LLBC_NS LLBC_Stream &stream)
-    {
-        stream.Write(std::get<N - 1>(tup));
-        __LLBC_TupleWriter<N - 1>::Write(tup, stream);
-    }
-};
-
-/**
- * \brief Stop std::tuple write.
- */
-template <>
-struct __LLBC_TupleWriter<0>
-{
-    template <typename Tup>
-    static void Write(const Tup &tup, LLBC_NS LLBC_Stream &stream)
-    {
-    }
-};
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 /**
@@ -428,7 +314,7 @@ public:
     template <typename T>
     T Read()
     {
-        T obj;
+        T obj{};
         return LIKELY(Read<T>(obj)) ? obj : T();
     }
 
@@ -531,7 +417,7 @@ public:
                             std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value, bool>::type
     Read(T &obj)
     {
-        static_assert(false && "Unsupported stream read operation!");
+        ASSERT(false && "Unsupported stream read operation!");
         return false;
     }
 
@@ -737,6 +623,24 @@ public:
         return true;
     }
 
+private:
+    /**
+     * \brief std::array reader template define.
+     */
+    template <size_t N>
+    struct __LLBC_ArrayReader
+    {
+        template <typename Arr>
+        static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
+        {
+            if (UNLIKELY(!stream.Read(arr[N - 1])))
+                return false;
+    
+            return __LLBC_ArrayReader<N - 1>::Read(arr, stream);
+        }
+    };
+
+public:
     /**
      * Read std::array template spec type object from stream.
      * @param[out] arr - already read object.
@@ -746,9 +650,28 @@ public:
     typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, bool>::type
     Read(T &arr)
     {
-        return LLBC_INTERNAL_NS __LLBC_ArrayReader<std::tuple_size<T>::value>::Read(arr, *this);
+        return __LLBC_ArrayReader<std::tuple_size<T>::value>::Read(arr, *this);
     }
 
+
+private:
+    /**
+     * \brief std::tuple reader template define.
+     */
+    template <size_t N>
+    struct __LLBC_TupleReader
+    {
+        template <typename Tup>
+        static bool Read(Tup &tup, LLBC_NS LLBC_Stream &stream)
+        {
+            if (UNLIKELY(!stream.Read(std::get<N - 1>(tup))))
+                return false;
+
+            return __LLBC_TupleReader<N - 1>::Read(tup, stream);
+        }
+    };
+
+public:
     /**
      * Read std::tuple template spec type object from stream.
      * @param[out] tup - already read object.
@@ -758,7 +681,7 @@ public:
     typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, bool>::type
     Read(T &tup)
     {
-        return LLBC_INTERNAL_NS __LLBC_TupleReader<std::tuple_size<T>::value>::Read(tup, *this);
+        return __LLBC_TupleReader<std::tuple_size<T>::value>::Read(tup, *this);
     }
 
     /**
@@ -1039,7 +962,7 @@ public:
                             LLBC_IsTemplSpec<T, std::stack>::value, void>::type
     Write(const T &container)
     {
-        static_assert(false && "Write std::queue/std::stack is not supported for now");
+        ASSERT(false && "Write std::queue/std::stack is not supported for now");
     }
 
     /**
@@ -1065,6 +988,22 @@ public:
         }
     }
 
+private:
+    /**
+     * \brief std::array writer template define.
+     */
+    template <size_t N>
+    struct __LLBC_ArrayWriter
+    {
+        template <typename Arr>
+        static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
+        {
+            stream.Write(arr[N - 1]);
+            __LLBC_ArrayWriter<N - 1>::Write(arr, stream);
+        }
+    };
+
+public:
     /**
      * Write std::array template spec type object to stream.
      * @param[in] arr - the will write object.
@@ -1073,9 +1012,25 @@ public:
     typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, void>::type
     Write(const T &arr)
     {
-        LLBC_INTERNAL_NS __LLBC_ArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
+        __LLBC_ArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
     }
 
+private:
+    /**
+     * \brief std::tuple writer template define.
+     */
+    template <size_t N>
+    struct __LLBC_TupleWriter
+    {
+        template <typename Tup>
+        static void Write(const Tup &tup, LLBC_Stream &stream)
+        {
+            stream.Write(std::get<N - 1>(tup));
+            __LLBC_TupleWriter<N - 1>::Write(tup, stream);
+        }
+    };
+
+public:
     /**
      * Write std::tuple template spec type object to stream.
      * @param[in] tup - the will write object.
@@ -1084,7 +1039,7 @@ public:
     typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, void>::type
     Write(const T &tup)
     {
-        LLBC_INTERNAL_NS __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
+        __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
     }
 
     /**

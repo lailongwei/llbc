@@ -258,10 +258,10 @@ int TestCase_Com_Stream::BasicTest()
     stream2 << true << 128 << 1.32 << "Hello world";
     LLBC_PrintLn("- After write:%s", stream2.ToString().c_str());
 
-    bool bVal;
-    int intVal;
+    bool bVal = false;
+    int intVal = 0;
     double dblVal = 0.0;
-    char strVal[20];
+    char strVal[20] = {'\0'};
     stream2.SetPos(0);
     stream2 >> bVal >> intVal >> dblVal >> strVal;
     LLBC_PrintLn("- After read, bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream:%s",
@@ -276,9 +276,9 @@ int TestCase_Com_Stream::ConstructAndAssignmentTest()
 
     auto readStreamCnt = [](LLBC_Stream &stream, const char *streamName)
     {
-        bool bVal;
-        int intVal;
-        double dblVal;
+        bool bVal = false;
+        int intVal = 0;
+        double dblVal = 0.0;
         LLBC_String strVal;
         stream.SetPos(0);
         stream >> bVal >> intVal >> dblVal >> strVal;

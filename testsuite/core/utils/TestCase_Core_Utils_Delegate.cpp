@@ -100,6 +100,7 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     std::cout <<"strSizeMeth valid?:" <<!!strSizeMeth <<std::endl;
 
     LLBC_Delegate<void()> nullDeleg = nullptr;
+    nullDeleg = nullptr;
     std::cout <<"nullDeleg valid?:" <<!!nullDeleg <<std::endl;
     nullDeleg = &Func_Foo_0;
     if (nullDeleg)
@@ -132,6 +133,12 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
         std::cout << "lambda function void() called()!" << std::endl;
     };
     func0();
+
+    // Move to func0Too
+    auto func0Too = std::move(func0);
+    func0Too();
+    std::cout << "After func0 move to func0Too, func0 valid?:"
+        << !!func0 << ", func0Too valid?:" << !!func0Too << std::endl;
 
     nullDeleg = nullptr;
     std::cout <<"set nullDeleg to nullptr, valid?:" <<!!nullDeleg <<std::endl;

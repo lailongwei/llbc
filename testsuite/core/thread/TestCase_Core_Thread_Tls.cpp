@@ -39,7 +39,7 @@ static void ThreadProc(void *arg)
     for(int i = 0; i < 5000000; ++i)
         (*__g_tls) += 1;
 
-    LLBC_PrintLn("thread [%llu] tls value: %lu", threadIndex, *__g_tls);
+    LLBC_PrintLn("thread [%d] tls value: %lu", threadIndex, *__g_tls);
 }
 
 TestCase_Core_Thread_Tls::TestCase_Core_Thread_Tls()

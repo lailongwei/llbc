@@ -113,6 +113,7 @@
 
 // RTTI support header files.
 #include <typeinfo>
+#include <type_traits>
 
 // Enable posix support, if in WIN32 platform.
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -26,6 +26,56 @@
 
 __LLBC_NS_BEGIN
 
+/**
+ * \brief Stop std::array read.
+ */
+template <>
+struct LLBC_Stream::__LLBC_ArrayReader<0>
+{
+    template <typename Arr>
+    static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
+    {
+        return true;
+    }
+};
+
+/**
+ * \brief Stop std::array read.
+ */
+template <>
+struct LLBC_Stream::__LLBC_ArrayWriter<0>
+{
+    template <typename Arr>
+    static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
+    {
+    }
+};
+
+/**
+ * \brief Stop std::tuple read.
+ */
+template <>
+struct LLBC_Stream::__LLBC_TupleReader<0>
+{
+    template <typename Tup>
+    static bool Read(Tup &tup, LLBC_Stream &stream, size_t &readCount)
+    {
+        return true;
+    }
+};
+
+/**
+ * \brief Stop std::tuple write.
+ */
+template <>
+struct LLBC_Stream::__LLBC_TupleWriter<0>
+{
+    template <typename Tup>
+    static void Write(const Tup &tup, LLBC_Stream &stream)
+    {
+    }
+};
+
 inline LLBC_Stream::LLBC_Stream()
 : _buf(nullptr)
 , _pos(0)

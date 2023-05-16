@@ -30,19 +30,20 @@ __LLBC_NS_BEGIN
  * \brief Template specification judge function.
  */
 template <typename Class, template <typename...> class ClassTemplate>
-struct LLBC_IsTemplSpec : std::false_type {  };
+struct LLBC_IsTemplSpec :std::false_type {};
 
 template <template <typename...> class ClassTemplate, typename... Args>
-struct LLBC_IsTemplSpec<ClassTemplate<Args...>, ClassTemplate> : public std::true_type {  };
+struct LLBC_IsTemplSpec<ClassTemplate<Args...>, ClassTemplate> : public std::true_type {};
 
 /**
  * \brief Special Template specification judge function: std::array.
  */
 template <typename ArrayClass, template <typename ValueType, size_t N> class ArrayClassTemplate>
-struct LLBC_IsSTLArraySpec : std::false_type {  };
+struct LLBC_IsSTLArraySpec : std::false_type {};
 
 template <template <typename ValueType, size_t N> class ArrayClassTemplate, typename ValueType, size_t N>
-struct LLBC_IsSTLArraySpec<ArrayClassTemplate<ValueType, N>, ArrayClassTemplate> : public std::true_type {  };
+struct LLBC_IsSTLArraySpec<ArrayClassTemplate<ValueType, N>, ArrayClassTemplate>
+    : public std::true_type {};
 
 /**
  * \brief Extract given T pure type.
@@ -55,5 +56,75 @@ struct LLBC_ExtractPureType
                     typename std::remove_reference<T>::type>::type>::type type;
 };
 
+/**
+ * \brief Integer sequence.
+ * 
+ */
+template <int...> struct LLBC_IntSequence {};
+
+/**
+ * \brief Make integer sequence.
+ * 
+ */
+template <int N, int... Is> struct LLBC_MakeIntSequence :
+    LLBC_MakeIntSequence<N - 1, N - 1, Is...> {};
+template <int... Is> struct LLBC_MakeIntSequence<0, Is...> :
+    LLBC_IntSequence<Is...> {};
+
+/**
+ * \brief LLBC library specific placeholder template.
+ * 
+ */
+template <int>
+struct LLBC_PlaceHolderTemplate {};
+
+__LLBC_NS_END
+
+namespace std
+{
+
+/**
+ * \brief Specification std::is_placeholder<LLBC_PlaceHolderTemplate<N> >.
+ * 
+ */
+template <int N>
+struct is_placeholder<LLBC_NS LLBC_PlaceHolderTemplate<N> > :
+    integral_constant<int, N + 1> {};
+
+}
+
+__LLBC_INTERNAL_NS_BEGIN
+
+/**
+ * \brief Class method bind support(internal template function).
+ */
+template <typename Obj, typename Rtn, typename... Args, int... Is>
+std::function<Rtn(Args...)> __LLBC_BindClassMethod(Obj *obj, Rtn(Obj::*meth)(Args...), LLBC_NS LLBC_IntSequence<Is...>)
+{
+    return std::bind(meth, obj, LLBC_NS LLBC_PlaceHolderTemplate<Is>{}...);
+}
+template <typename Obj, typename Rtn, typename... Args, int... Is>
+std::function<Rtn(Args...)> __LLBC_BindClassMethod(Obj *obj, Rtn(Obj::*meth)(Args...) const, LLBC_NS LLBC_IntSequence<Is...>)
+{
+    return std::bind(meth, obj, LLBC_NS LLBC_PlaceHolderTemplate<Is>{}...);
+}
+
+__LLBC_INTERNAL_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
+ * \brief Class method bind support.
+ */
+template <typename Obj, typename Rtn, typename... Args>
+std::function<Rtn(Args...)> LLBC_BindClassMethod(Obj *obj, Rtn(Obj::*meth)(Args...))
+{
+    return LLBC_INTERNAL_NS __LLBC_BindClassMethod(obj, meth, LLBC_MakeIntSequence<sizeof...(Args)>{});
+}
+template <typename Obj, typename Rtn, typename... Args>
+std::function<Rtn(Args...)> LLBC_BindClassMethod(Obj *obj, Rtn(Obj::*meth)(Args...) const)
+{
+    return LLBC_INTERNAL_NS __LLBC_BindClassMethod(obj, meth, LLBC_MakeIntSequence<sizeof...(Args)>{});
+}
 
 __LLBC_NS_END

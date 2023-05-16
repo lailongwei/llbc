@@ -137,12 +137,12 @@ int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
 
     // array test.
     std::array<int *, 10> arr{nullptr};
-    for (sint32 i = 0; i < arr.size(); ++i)
+    for (size_t i = 0; i < arr.size(); ++i)
         arr[i] = new int(i);
     LLBC_STLHelper::DeleteContainer(arr);
     LLBC_PrintLn("after delete array, size: %lu, max_size: %lu", arr.size(), arr.max_size());
 
-    for (sint32 i = 0; i < arr.size(); ++i)
+    for (size_t i = 0; i < arr.size(); ++i)
         arr[i] = LLBC_Malloc(int, sizeof(int));
     LLBC_STLHelper::FreeContainer(arr, true);
     LLBC_PrintLn("after free array, size: %lu, max_size: %lu", arr.size(), arr.max_size());
