@@ -599,7 +599,7 @@ int TestCase_Com_Stream::SerializableClsSerTest()
 
     GenRandStr(serObj1.str, rander, { 50, 200 });
     for (int i = 0; i < rander.Rand(1, 10); ++i)
-        serObj1.strs.push_back(std::move(GenRandStr(rander, {50, 100})));
+        serObj1.strs.push_back(GenRandStr(rander, {50, 100}));
 
     for (int i = 0; i < rander.Rand(1, 10); ++i)
     {
