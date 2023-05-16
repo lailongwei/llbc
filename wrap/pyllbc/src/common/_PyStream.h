@@ -629,7 +629,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyStreamWrite_Stream(PyObject *self, PyObject *a
         endPos = MIN(MAX(0, endPos), static_cast<int>(willWrite->GetCap()));
 
     if (beginPos > endPos)
-        LLBC_Swap(beginPos, endPos);
+        std::swap(beginPos, endPos);
 
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
     LLBC_Stream &llbcWillWrite = willWrite->GetLLBCStream();

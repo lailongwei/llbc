@@ -21,28 +21,10 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
+#include "llbc/core/objectpool/ObjectPool.h"
+#include "llbc/core/objectpool/PoolObjectReflection.h"
 
 __LLBC_NS_BEGIN
-
-/**
- * \brief The STL container operation code enumeration.
- */
-class LLBC_STLContainerOpcode
-{
-public:
-    enum
-    {
-        Begin,
-
-        Delete = Begin,
-        Free,
-        Deletes,
-        Recycle,
-
-        End
-    };
-};
 
 /**
  * \brief The class simplifies the operations for STL.
@@ -52,145 +34,221 @@ class LLBC_EXPORT LLBC_STLHelper
 public:
     /**
      * Free STL container.
-     * @param[in/out] container - STL container object.
-     * @param[in]     clear     - clear container flag, default is true.
-     * @param[in]     reverse   - reverse free flag, default is false.
+     * @param[in] cont    - stl container.
+     * @param[in] reverse - reverse free flag.
      */
-    template <typename _Ty>
-    static void FreeContainer(std::vector<_Ty *> &vec, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void FreeContainer(std::list<_Ty *> &l, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void FreeContainer(std::deque<_Ty *> &dq, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void FreeContainer(std::stack<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void FreeContainer(std::queue<_Ty *> &q, bool clear = true, bool reverse = false);
-    template <typename _Key>
-    static void FreeContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void FreeContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void FreeContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Ty, std::size_t _Nm>
-    static void FreeContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
+    template <typename Cont>
+    static void FreeContainer(Cont &cont, bool reverse = false)
+    {
+        OpCont<Cont, 0>(cont, reverse);
+    }
 
     /**
      * Delete STL container.
-     * @param[in/out] container - STL container object.
-     * @param[in]     clear     - clear container flag, default is true.
-     * @param[in]     reverse   - reverse free flag, default is false.
+     * @param[in] cont    - stl container.
+     * @param[in] reverse - reverse delete flag.
      */
-    template <typename _Ty>
-    static void DeleteContainer(std::vector<_Ty *> &vec, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeleteContainer(std::list<_Ty *> &l, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeleteContainer(std::deque<_Ty *> &dq, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeleteContainer(std::stack<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeleteContainer(std::queue<_Ty *> &q, bool clear = true, bool reverse = false);
-    template <typename _Key>
-    static void DeleteContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void DeleteContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void DeleteContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Ty, std::size_t _Nm>
-    static void DeleteContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
+    template <typename Cont>
+    static void DeleteContainer(Cont &cont, bool reverse = false)
+    {
+        OpCont<Cont, 1>(cont, reverse);
+    }
 
     /**
      * Deletes STL container.
-     * @param[in/out] container - STL container object.
-     * @param[in]     clear     - clear container flag, default is true.
-     * @param[in]     reverse   - reverse free flag, default is falst.
+     * @param[in] cont    - stl container.
+     * @param[in] reverse - reverse deletes flag.
      */
-    template <typename _Ty>
-    static void DeletesContainer(std::vector<_Ty *> &vec, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeletesContainer(std::list<_Ty *> &l, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeletesContainer(std::deque<_Ty *> &dq, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeletesContainer(std::stack<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void DeletesContainer(std::queue<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Key>
-    static void DeletesContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void DeletesContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void DeletesContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Ty, std::size_t _Nm>
-    static void DeletesContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
+    template <typename Cont>
+    static void DeletesContainer(Cont &cont, bool reverse = false)
+    {
+        OpCont<Cont, 2>(cont, reverse);
+    }
 
     /**
      * Recycle STL container.
-     * @param[in/out] container - STL container object.
-     * @param[in]     clear     - clear container flag, default is true.
-     * @param[in]     reverse   - reverse free flag, default is falst.
+     * @param[in] cont    - stl container.
+     * @param[in] reverse - reverse recycle flag.
      */
-    template <typename _Ty>
-    static void RecycleContainer(std::vector<_Ty *> &vec, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void RecycleContainer(std::list<_Ty *> &l, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void RecycleContainer(std::deque<_Ty *> &dq, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void RecycleContainer(std::stack<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Ty>
-    static void RecycleContainer(std::queue<_Ty *> &stk, bool clear = true, bool reverse = false);
-    template <typename _Key>
-    static void RecycleContainer(std::set<_Key *> &s, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void RecycleContainer(std::map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Key, typename _Ty>
-    static void RecycleContainer(std::unordered_map<_Key, _Ty *> &m, bool clear = true, bool reverse = false);
-    template <typename _Ty, std::size_t _Nm>
-    static void RecycleContainer(std::array<_Ty *, _Nm> &arr, bool clear = true, bool reverse = false);
-
-public:
-    /**
-     * Operate STL container.
-     * @param[in/out] container - STL container object.
-     * @param[in]     opcode    - operation code, see LLBC_STLContainerOpCode enumeration class.
-     * @param[in]     clear     - clear container flag, default is true.
-     * @param[in]     reverse   - reverse free flag, default is false.
-     */
-    template <typename _Ty>
-    static void OperateContainer(std::vector<_Ty *> &vec, int opcode, bool clear, bool reverse);
-    template <typename _Ty>
-    static void OperateContainer(std::list<_Ty *> &l, int opcode, bool clear, bool reverse);
-    template <typename _Ty>
-    static void OperateContainer(std::deque<_Ty *> &dq, int opcode, bool clear, bool reverse);
-    template <typename _Ty>
-    static void OperateContainer(std::stack<_Ty *> &stk, int opcode, bool clear, bool reverse);
-    template <typename _Ty>
-    static void OperateContainer(std::queue<_Ty *> &q, int opcode, bool clear, bool reverse);
-    template <typename _Key>
-    static void OperateContainer(std::set<_Key *> &s, int opcode, bool clear, bool reverse);
-    template <typename _Key, typename _Ty>
-    static void OperateContainer(std::map<_Key, _Ty *> &m, int opcode, bool clear, bool reverse);
-    template <typename _Key, typename _Ty>
-    static void OperateContainer(std::unordered_map<_Key, _Ty *> &m, int opcode, bool clear, bool reverse);
-    template <typename _Ty, std::size_t _Nm>
-    static void OperateContainer(std::array<_Ty *, _Nm> &arr, int opcode, bool clear, bool reverse);
+    template <typename Cont>
+    static void RecycleContainer(Cont &cont, bool reverse = false)
+    {
+        OpCont<Cont, 3>(cont, reverse);
+    }
 
 private:
-    /**
-     * Operate STL element.
-     * @param[in/out] elem   - element object pointer.
-     * @param[in]     opcode - operation code, see LLBC_STLContainerOpcode enumeration class.
-     */
-    template <typename _Ty>
-    static void OperateElem(_Ty *&elem, int opcode);
-    template <typename _Ty>
-    static void OperateElem(_Ty * const &elem, int opcode);
+    template <typename pointer_type, int op>
+    struct PointerOperator
+    {
+        static void Operate(const pointer_type &pointer)
+        {
+            ASSERT(false && "Unsupported op");
+        }
+    };
+
+    template <typename pointer_type>
+    struct PointerOperator<pointer_type, 0>
+    {
+        static void Operate(const pointer_type &pointer) { free(pointer); }
+    };
+
+    template <typename pointer_type>
+    struct PointerOperator<pointer_type, 1>
+    {
+        static void Operate(const pointer_type &pointer) { delete pointer; }
+    };
+
+    template <typename pointer_type>
+    struct PointerOperator<pointer_type, 2>
+    {
+        static void Operate(const pointer_type &pointer) { delete[] pointer; }
+    };
+
+    template <typename pointer_type>
+    struct PointerOperator<pointer_type, 3>
+    {
+        static void Operate(const pointer_type &pointer) { LLBC_Recycle(pointer); }
+    };
+
+private:
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::vector>::value ||
+                            LLBC_IsTemplSpec<Cont, std::list>::value ||
+                            LLBC_IsTemplSpec<Cont, std::set>::value , void>::type
+    OpCont(Cont &cont, bool reverse)
+    {
+        if (!reverse)
+        {
+            const auto endIt = cont.end();
+            for (auto it = cont.begin(); it != endIt; ++it)
+                PointerOperator<typename Cont::value_type, Op>::Operate(*it);
+        }
+        else
+        {
+            const auto rendIt = cont.rend();
+            for (auto rit = cont.rbegin(); rit != rendIt; ++rit)
+                PointerOperator<typename Cont::value_type, Op>::Operate(*rit);
+        }
+
+        cont.clear();
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::unordered_set>::value, void>::type
+    OpCont(Cont &cont, bool)
+    {
+        const auto endIt = cont.end();
+        for (auto it = cont.begin(); it != endIt; ++it)
+            PointerOperator<typename Cont::value_type, Op>::Operate(*it);
+
+        cont.clear();
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::stack>::value, void>::type
+    OpCont(Cont &cont, bool)
+    {
+        while (!cont.empty())
+        {
+            PointerOperator<typename Cont::value_type, Op>::Operate(cont.top());
+            cont.pop();
+        }
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::queue>::value, void>::type
+    OpCont(Cont &cont, bool)
+    {
+        while (!cont.empty())
+        {
+            PointerOperator<typename Cont::value_type, Op>::Operate(cont.front());
+            cont.pop();
+        }
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::deque>::value, void>::type
+    OpCont(Cont &cont, bool reverse)
+    {
+        const int contSize = static_cast<int>(cont.size());
+        if (!reverse)
+        {
+            for (int i = 0; i < contSize; ++i)
+                PointerOperator<typename Cont::value_type, Op>::Operate(cont[i]);
+        }
+        else
+        {
+            for (int i = contSize - 1; i >= 0; --i)
+                PointerOperator<typename Cont::value_type, Op>::Operate(cont[i]);
+        }
+
+        cont.clear();
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::map>::value, void>::type
+    OpCont(Cont &cont, bool reverse)
+    {
+        if (!reverse)
+        {
+            const auto endIt = cont.end();
+            for (auto it = cont.begin(); it != endIt; ++it)
+                PointerOperator<typename Cont::mapped_type, Op>::Operate(it->second);
+        }
+        else
+        {
+            const auto rendIt = cont.rend();
+            for (auto rit = cont.rbegin(); rit != rendIt; ++rit)
+                PointerOperator<typename Cont::mapped_type, Op>::Operate(rit->second);
+        }
+
+        cont.clear();
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsTemplSpec<Cont, std::unordered_map>::value, void>::type
+    OpCont(Cont &cont, bool)
+    {
+        const auto endIt = cont.end();
+        for (auto it = cont.begin(); it != endIt; ++it)
+            PointerOperator<typename Cont::mapped_type, Op>::Operate(it->second);
+
+        cont.clear();
+    }
+
+    template <typename Cont, int Op>
+    static
+    typename std::enable_if<LLBC_IsSTLArraySpec<Cont, std::array>::value, void>::type
+    OpCont(Cont &cont, bool reverse)
+    {
+        if (!reverse)
+        {
+            for (size_t i = 0; i < cont.size(); ++i)
+            {
+                auto &elem = cont.at(i);
+                PointerOperator<typename Cont::value_type, Op>::Operate(elem);
+
+                elem = nullptr;
+            }
+        }
+        else
+        {
+            for (int i = static_cast<int>(cont.size()) - 1; i >= 0; --i)
+            {
+                auto &elem = cont.at(i);
+                PointerOperator<typename Cont::value_type, Op>::Operate(elem);
+
+                elem = nullptr;
+            }
+        }
+    }
 };
 
 __LLBC_NS_END
-
-#include "llbc/core/helper/STLHelperInl.h"
-
-

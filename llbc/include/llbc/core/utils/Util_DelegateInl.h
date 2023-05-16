@@ -25,126 +25,124 @@ __LLBC_NS_BEGIN
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(std::nullptr_t _)
-: _funcType(0)
-, _func()
+: _cfunc(nullptr)
+, _stlFunc()
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(CFunc cfunc)
-: _funcType(cfunc ? 1 : 0)
-, _func(cfunc)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const CFunc &cfunc)
+: _cfunc(cfunc)
+, _stlFunc()
+{
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(StlFunc &&stlFunc)
+: _cfunc(nullptr)
+, _stlFunc(std::move(stlFunc))
 {
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const StlFunc &stlFunc)
-: _funcType(stlFunc != nullptr ? 2 : 0)
-, _func()
+: _cfunc(nullptr)
+, _stlFunc(stlFunc)
 {
-    if (_funcType == 2)
-        new (_func.stlFunc) StlFunc(stlFunc);
 }
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...))
-: _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
-, _func()
+: _cfunc(nullptr)
+, _stlFunc(LLBC_BindClassMethod(obj, meth))
 {
-    if (_funcType == 3)
-        new (_func.methHolder) _ClsMethHolder<Obj>(obj, meth);
 }
 
 template <typename Rtn, typename ...Args>
 template <typename Obj>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Obj *obj, Rtn(Obj::*meth)(Args...) const)
-: _funcType(obj != nullptr && meth != nullptr ? 3 : 0)
-, _func()
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*constMeth)(Args...) const)
+: _cfunc(nullptr)
+, _stlFunc(LLBC_BindClassMethod(obj, constMeth))
 {
-    if (_funcType == 3)
-        new (_func.methHolder) _ClsMethHolder<Obj>(obj, meth);
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(LLBC_Delegate &&another)
+: _cfunc(another._cfunc)
+, _stlFunc(std::move(another._stlFunc))
+{
+    another._cfunc = nullptr;
+}
+
+template <typename Rtn, typename ...Args>
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
+: _cfunc(another._cfunc)
+, _stlFunc(another._stlFunc)
+{
 }
 
 template <typename Rtn, typename ...Args>
 template <typename Func>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Func &func)
-: LLBC_Delegate(StlFunc(func))
+: _cfunc(nullptr)
+, _stlFunc(func)
 {
-}
-
-template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
-: _funcType(another._funcType)
-, _func()
-{
-    if (_funcType == 1)
-        _func.cfunc = another._func.cfunc;
-    else if (_funcType == 2)
-        new (_func.stlFunc) StlFunc(*reinterpret_cast<const StlFunc *>(another._func.stlFunc));
-    else if (_funcType == 3)
-        memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
-}
-
-template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::~LLBC_Delegate()
-{
-    if (_funcType == 2)
-        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::operator bool() const
 {
-    return _funcType != 0;
+    return _cfunc != nullptr || _stlFunc != nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 bool LLBC_Delegate<Rtn(Args...)>::operator==(std::nullptr_t _) const
 {
-    return _funcType == 0;
+    return _cfunc == nullptr && _stlFunc == nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 bool LLBC_Delegate<Rtn(Args...)>::operator!=(std::nullptr_t _) const
 {
-    return _funcType != 0;
+    return _cfunc != nullptr || _stlFunc != nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 {
-    if (_funcType == 1)
-        return (*_func.cfunc)(std::forward<Args>(args)...);
-    else if (_funcType == 2)
-        return (*reinterpret_cast<const StlFunc *>(_func.stlFunc))(std::forward<Args>(args)...);
-    else if (_funcType == 3)
-        return reinterpret_cast<const _IClsMethHolder *>(_func.methHolder)->Invoke(std::forward<Args>(args)...);
+    if (_cfunc)
+        return (*_cfunc)(std::forward<Args>(args)...);
+    else if (_stlFunc)
+        return _stlFunc(std::forward<Args>(args)...);
     else
-        return Rtn();
+        throw std::bad_function_call();
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(std::nullptr_t _)
 {
-    Reset();
+    _cfunc = nullptr;
+    _stlFunc = nullptr;
+
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(CFunc cfunc)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const CFunc &cfunc)
 {
-    if (cfunc == nullptr)
-    {
-        Reset();
-        return *this;
-    }
+    _cfunc = cfunc;
+    _stlFunc = nullptr;
 
-    if (_funcType == 2)
-        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+    return *this;
+}
 
-    _funcType = 1;
-    _func.cfunc = cfunc;
+
+template <typename Rtn, typename ...Args>
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(StlFunc &&stlFunc)
+{
+    _cfunc = nullptr;
+    _stlFunc = std::move(stlFunc);
 
     return *this;
 }
@@ -152,82 +150,62 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(CFunc cfunc)
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const StlFunc &stlFunc)
 {
-    if (stlFunc == nullptr)
-    {
-        Reset();
-        return *this;
-    }
-
-    if (_funcType == 2)
-    {
-        *reinterpret_cast<StlFunc *>(_func.stlFunc) = stlFunc;
-    }
-    else
-    {
-        _funcType = 2;
-        new (_func.stlFunc) StlFunc(stlFunc);
-    }
+    _cfunc = nullptr;
+    _stlFunc = stlFunc;
 
     return *this;
 }
 
-template <typename Rtn, typename ... Args>
-template <typename Func>
-LLBC_Delegate<Rtn(Args ...)> &LLBC_Delegate<Rtn(Args ...)>::operator=(const Func &func)
+template <typename Rtn, typename ...Args>
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(LLBC_Delegate<Rtn(Args...)> &&another)
 {
-    return operator=(StlFunc(func));
+    if (UNLIKELY(&another == this))
+        return *this;
+
+    if (another._cfunc)
+    {
+        _cfunc = another._cfunc;
+        another._cfunc = nullptr;
+        _stlFunc = nullptr;
+    }
+    else
+    {
+        _stlFunc = std::move(another._stlFunc);
+        _cfunc = nullptr;
+    }
+
+    return *this;
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_Delegate<Rtn(Args...)> &another)
 {
-    if (this == &another)
+    if (UNLIKELY(&another == this))
         return *this;
 
-    if (another._funcType == 1)
+    if (another._cfunc)
     {
-        if (_funcType == 2)
-            reinterpret_cast<StlFunc *>(_func.methHolder)->~StlFunc();
-
-        _funcType = 1;
-        _func.cfunc = another._func.cfunc;
-    }
-    else if (another._funcType == 2)
-    {
-        if (_funcType == 2)
-        {
-            *reinterpret_cast<StlFunc *>(_func.stlFunc) =
-                *reinterpret_cast<const StlFunc *>(another._func.stlFunc);
-        }
-        else
-        {
-            _funcType = 2;
-            new (_func.stlFunc) StlFunc(*reinterpret_cast<const StlFunc *>(another._func.stlFunc));
-        }
-    }
-    else if (another._funcType == 3)
-    {
-        if (_funcType == 2)
-            reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
-
-        _funcType = 3;
-        memcpy(_func.methHolder, another._func.methHolder, sizeof(_func.methHolder));
+        _cfunc = another._cfunc;
+        _stlFunc = nullptr;
     }
     else
     {
-        Reset();
+        _cfunc = nullptr;
+        _stlFunc = another._stlFunc;
     }
 
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-void LLBC_Delegate<Rtn(Args...)>::Reset()
+template <typename Func>
+typename std::enable_if<!std::is_same<Func, LLBC_Delegate<Rtn(Args...)> >::value, LLBC_Delegate<Rtn(Args...)> &>::type
+LLBC_Delegate<Rtn(Args...)>::operator=(const Func &func)
 {
-    if (_funcType == 2)
-        reinterpret_cast<StlFunc *>(_func.stlFunc)->~StlFunc();
+    _cfunc = nullptr;
+    _stlFunc = func;
 
-    _funcType = 0;
+    return *this;
 }
 
 __LLBC_NS_END

@@ -61,7 +61,7 @@ pyllbc_Module::~pyllbc_Module()
     }
 
     /* Destroy all sub modules. */
-    LLBC_STLHelper::DeleteContainer(_subModules, false);
+    LLBC_STLHelper::DeleteContainer(_subModules);
 
     /* Dereference self python module object. */
     Py_XDECREF(_module);
