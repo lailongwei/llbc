@@ -265,7 +265,7 @@ long LLBC_File::GetFileSize() const
     {
         if (ret == LLBC_OK)
         {
-            ret = LLBC_FAILED;
+            fileSize = -1L;
             LLBC_SetLastError(LLBC_ERROR_CLIB);
         }
     }
