@@ -113,10 +113,8 @@ Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 {
     if (_cfunc)
         return (*_cfunc)(std::forward<Args>(args)...);
-    else if (_stlFunc)
-        return _stlFunc(std::forward<Args>(args)...);
     else
-        throw std::bad_function_call();
+        return _stlFunc(std::forward<Args>(args)...);
 }
 
 template <typename Rtn, typename ...Args>
