@@ -32,7 +32,6 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
-#include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/ServiceImpl.h"
@@ -42,7 +41,6 @@
 
 namespace
 {
-    typedef LLBC_NS LLBC_ServiceImpl This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
 }
 
@@ -91,9 +89,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _stopping(false)
 , _initingComp(false)
 
-, _lock()
-, _protoLock()
-
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _relaxTimes(0)
@@ -101,30 +96,12 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _sinkIntoLoop(false)
 , _afterStop(false)
 
-, _pollerMgr()
-, _readySessionInfos()
-, _readySessionInfosLock()
-
-, _willRegComps()
-
 , _compsInitFinished(false)
 , _compsInitRet(LLBC_ERROR_SUCCESS)
 , _compsStartFinished(false)
 , _compsStartRet(LLBC_ERROR_SUCCESS)
 
 , _caredEventComps{}
-, _coders()
-, _handlers()
-, _preHandlers()
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler()
-#endif
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-, _statusHandlers()
-#endif
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-, _statusDescs()
-#endif
 
 , _frameTaskIdx(0)
 , _frameTasks{}
@@ -137,7 +114,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 
 , _timerScheduler(nullptr)
 
-, _evManager()
 , _evManagerMaxListenerStub(0)
 
 , _svcMgr(*LLBC_ServiceMgrSingleton)
@@ -422,9 +398,7 @@ void LLBC_ServiceImpl::Stop()
 
 int LLBC_ServiceImpl::GetFPS() const
 {
-    This *ncThis = const_cast<This *>(this);
-
-    LLBC_LockGuard guard(ncThis->_lock);
+    LLBC_LockGuard guard(_lock);
     return _fps;
 }
 
@@ -455,9 +429,7 @@ int LLBC_ServiceImpl::SetFPS(int fps)
 
 int LLBC_ServiceImpl::GetFrameInterval() const
 {
-    This *ncThis = const_cast<This *>(this);
-
-    LLBC_LockGuard guard(ncThis->_lock);
+    LLBC_LockGuard guard(_lock);
     return _frameInterval;
 }
 
@@ -1082,12 +1054,11 @@ const LLBC_ProtocolStack *LLBC_ServiceImpl::GetCodecProtocolStack(int sessionId)
     }
 
     // Not enabled full-stack option, return session codec protocol-stack.
-    LLBC_ServiceImpl *ncThis = const_cast<LLBC_ServiceImpl *>(this);
-    ncThis->_readySessionInfosLock.Lock();
+    _readySessionInfosLock.Lock();
     auto it = _readySessionInfos.find(sessionId);
     const LLBC_ProtocolStack *codecStack =
         it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
-    ncThis->_readySessionInfosLock.Unlock();
+    _readySessionInfosLock.Unlock();
 
     if (!codecStack)
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
