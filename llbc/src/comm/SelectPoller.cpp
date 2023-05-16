@@ -338,7 +338,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         processed += 1;
 
         int sockErr;
-        const char *reason = nullptr;
+        const char *reason;
         bool connected = inWriteSet;
         if (UNLIKELY(socket->GetPendingError(sockErr) != LLBC_OK))
         {

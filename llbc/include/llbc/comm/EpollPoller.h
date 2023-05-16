@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The Epoll poller class encapsulation.
  */
-class LLBC_HIDDEN LLBC_EpollPoller : public LLBC_BasePoller
+class LLBC_HIDDEN LLBC_EpollPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_EpollPoller();
