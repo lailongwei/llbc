@@ -128,7 +128,7 @@ LLBC_Ini::LLBC_Ini(const This &another)
 
 LLBC_Ini::~LLBC_Ini()
 {
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
 }
 
 int LLBC_Ini::LoadFromFile(const LLBC_String &file)
@@ -142,7 +142,7 @@ int LLBC_Ini::LoadFromFile(const LLBC_String &file)
 
 int LLBC_Ini::LoadFromContent(const LLBC_String &content)
 {
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
     _sectionNames.clear();
 
     LLBC_String sectionName;
@@ -570,7 +570,7 @@ void LLBC_Ini::Copy(const This &another)
     _errMsg = another._errMsg;
     _sectionNames = another._sectionNames;
 
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
     for (LLBC_IniSections::const_iterator it = another._sections.begin();
          it != another._sections.end();
          ++it)

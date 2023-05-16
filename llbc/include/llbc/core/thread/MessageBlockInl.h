@@ -255,16 +255,16 @@ inline int LLBC_MessageBlock::ShiftWritePos(long off)
 
 inline void LLBC_MessageBlock::Swap(LLBC_MessageBlock *another)
 {
-    LLBC_Swap(_attach, another->_attach);
+    std::swap(_attach, another->_attach);
 
-    LLBC_Swap(_buf, another->_buf);
-    LLBC_Swap(_size, another->_size);
+    std::swap(_buf, another->_buf);
+    std::swap(_size, another->_size);
 
-    LLBC_Swap(_readPos, another->_readPos);
-    LLBC_Swap(_writePos, another->_writePos);
+    std::swap(_readPos, another->_readPos);
+    std::swap(_writePos, another->_writePos);
 
-    LLBC_Swap(_prev, another->_prev);
-    LLBC_Swap(_next, another->_next);
+    std::swap(_prev, another->_prev);
+    std::swap(_next, another->_next);
 }
 
 inline LLBC_MessageBlock *LLBC_MessageBlock::Clone() const

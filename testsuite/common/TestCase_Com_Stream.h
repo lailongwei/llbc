@@ -28,4 +28,25 @@ class TestCase_Com_Stream : public LLBC_BaseTestCase
 {
 public:
     virtual int Run(int argc, char *argv[]);
+
+private:
+    int BasicTest();
+    int ConstructAndAssignmentTest();
+    int AttachTest();
+    int DetachTest();
+    int RecapTest();
+    int SwapTest();
+    int EndianTest();
+    int PODTypeSerTest();
+    int TrivialClsSerTest();
+    int SerializableClsSerTest();
+    int MovableReadTest();
+
+private:
+    static void GenRandStr(LLBC_String &str,
+                           LLBC_Random &rander,
+                           const std::pair<int, int> &strLenRange);
+
+    static LLBC_String GenRandStr(LLBC_Random &rander,
+                                  const std::pair<int, int> &strLenRange);
 };

@@ -54,6 +54,8 @@ inline TestTask::~TestTask()
 
 inline void TestTask::Svc()
 {
+    ASSERT(GetTaskState() == LLBC_TaskState::Activated);
+
     _val = new int();
     LLBC_PrintLn("Thread allocated thread-local variable[int *], ptr:%p", _val);
     for (int i = 0; i < 100000; ++i)
@@ -74,7 +76,7 @@ inline void TestTask::Svc()
         delete block;
     }
 
-    return;
+    ASSERT(GetTaskState() == LLBC_TaskState::Activated);
 }
 
 inline void TestTask::Cleanup()

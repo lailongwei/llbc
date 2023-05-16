@@ -40,6 +40,7 @@ LLBC_Task::LLBC_Task(LLBC_ThreadMgr *threadMgr)
 
 , _threadNum(0)
 , _activatingThreadNum(0)
+, _inSvcMethThreadNum(0)
 {
 }
 
@@ -148,6 +149,7 @@ void LLBC_Task::InternalCleanup()
 
     _threadNum = 0;
     _activatingThreadNum = 0;
+    _inSvcMethThreadNum = 0;
 
     _threadGroupHandle = LLBC_INVALID_HANDLE;
     _activateThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
@@ -168,13 +170,19 @@ void LLBC_Task::TaskEntry(void *arg)
 
     // Call task Svc() meth.
     // ==========================================
+    (void)LLBC_AtomicFetchAndAdd(&_inSvcMethThreadNum, 1);
     Svc();
+    (void)LLBC_AtomicFetchAndSub(&_inSvcMethThreadNum, 1);
     // ==========================================
 
     // Set _taskState to Deactivating, if is first stop thread.
     const int preSubThreadNum = LLBC_AtomicFetchAndSub(&_activatingThreadNum, 1);
     if (preSubThreadNum == _threadNum)
     {
+        // Makesure all task threads leaved Svc() meth.
+        while (_inSvcMethThreadNum != 0)
+            LLBC_Sleep(0);
+
         LLBC_AtomicSet(&_taskState, LLBC_TaskState::Deactivating);
     }
     else // Otherwise waiting for _taskState leave Activated status.

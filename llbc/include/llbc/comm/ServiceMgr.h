@@ -43,7 +43,7 @@ class LLBC_EXPORT LLBC_ServiceMgr
 {
 public:
     typedef std::map<int, LLBC_Service *> Id2Services;
-    typedef std::map<LLBC_CString, LLBC_Service *> Name2Services;
+    typedef std::map<LLBC_String, LLBC_Service *> Name2Services;
 
 public:
     /**

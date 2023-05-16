@@ -1335,7 +1335,7 @@ void LLBC_ServiceImpl::RemoveReadySession(int sessionId)
 void LLBC_ServiceImpl::RemoveAllReadySessions()
 {
     _readySessionInfosLock.Lock();
-    LLBC_STLHelper::DeleteContainer(_readySessionInfos, true, false);
+    LLBC_STLHelper::DeleteContainer(_readySessionInfos);
     _readySessionInfosLock.Unlock();
 }
 
@@ -2192,7 +2192,7 @@ void LLBC_ServiceImpl::DestroyComps()
         }
     }
 
-    LLBC_STLHelper::DeleteContainer(_compList, true, true);
+    LLBC_STLHelper::DeleteContainer(_compList, true);
     while (!_name2Comps.empty())
     {
         auto it = _name2Comps.begin();
@@ -2208,7 +2208,7 @@ void LLBC_ServiceImpl::DestroyComps()
 
 void LLBC_ServiceImpl::DestroyWillRegComps()
 {
-    LLBC_STLHelper::RecycleContainer(_willRegComps, true, true);
+    LLBC_STLHelper::RecycleContainer(_willRegComps, true);
 }
 
 void LLBC_ServiceImpl::CloseAllCompLibraries()

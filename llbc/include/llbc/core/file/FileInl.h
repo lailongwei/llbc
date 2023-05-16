@@ -123,7 +123,7 @@ inline LLBC_String LLBC_File::ReadLine()
 }
 
 template <typename T>
-inline int LLBC_File::ReadRawObj(T &obj)
+int LLBC_File::ReadRawObj(T &obj)
 {
     long actuallyRead = Read((&obj), sizeof(T));
     if (actuallyRead == -1)
@@ -308,7 +308,7 @@ inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
         newLineFormat = LLBC_FileNewLineFormat::LineFeed;
 
 
-    long lineEndingRet = -1;
+    long lineEndingRet;
     if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch)
     {
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -339,7 +339,7 @@ inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
 }
 
 template <typename T>
-inline int LLBC_File::WriteRawObj(const T &obj)
+int LLBC_File::WriteRawObj(const T &obj)
 {
     long actuallyWrote = Write(&obj, sizeof(T));
     if (actuallyWrote == -1)

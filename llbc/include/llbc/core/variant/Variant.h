@@ -387,7 +387,7 @@ public:
     size_t Size() const;
     size_t Capacity() const;
 
-    // Dictionary type variant object specify operate methods.
+    // Dictionary type variant object specify Operate methods.
     SeqIter SeqBegin();
     SeqIter SeqEnd();
     SeqConstIter SeqBegin() const;
@@ -432,7 +432,7 @@ public:
     template <typename _Ty>
     void SeqErase(const _Ty &val);
 
-    // Dictionary type variant object specify operate methods.
+    // Dictionary type variant object specify Operate methods.
     DictIter DictBegin();
     DictIter DictEnd();
     DictConstIter DictBegin() const;
