@@ -131,6 +131,15 @@ inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
         _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
+template <typename _T1, typename _T2>
+LLBC_Variant::LLBC_Variant(const std::pair<_T1, _T2> &pa)
+{
+    _holder.type = LLBC_VariantType::VT_SEQ_DFT;
+    _holder.data.obj.seq = new Seq();
+    _holder.data.obj.seq->emplace_back(pa.first);
+    _holder.data.obj.seq->emplace_back(pa.second);
+}
+
 inline LLBC_Variant::LLBC_Variant(const Seq &seq)
 {
     _holder.type = LLBC_VariantType::VT_SEQ_DFT;
@@ -556,6 +565,16 @@ inline LLBC_Variant::operator LLBC_String () const
     return AsStr();
 }
 
+template <typename _T1, typename _T2>
+LLBC_Variant::operator std::pair<_T1, _T2>() const
+{
+    if (!IsSeq() || Size() < 2)
+        return std::make_pair(_T1(), _T2());
+
+    const Seq &seq = *_holder.data.obj.seq;
+    return std::make_pair<_T1, _T2>(seq[0], seq[1]);
+}
+
 inline LLBC_Variant::operator const LLBC_Variant::Seq &() const
 {
     return AsSeq();
@@ -566,7 +585,14 @@ LLBC_Variant::operator std::vector<_ElemTy>() const
 {
     std::vector<_ElemTy> v;
     if (IsSeqX() && !IsEmpty())
-        v.insert(_holder.data.obj.seq->begin(), _holder.data.obj.seq->end());
+    {
+        const Seq &seq = *_holder.data.obj.seq;
+
+        v.reserve(seq.size());
+        const SeqConstIter endIt = seq.end();
+        for (SeqConstIter it = seq.begin(); it != endIt; ++it)
+            v.emplace_back(*it);
+    }
 
     return v;
 }
@@ -673,7 +699,7 @@ LLBC_Variant::operator std::map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
     if (IsDictX())
-        CpToBinaryCont(m);
+        CpToBinaryCont<_Key, _Val, std::map<_Key, _Val> >(m);
 
     return m;
 }
@@ -683,7 +709,7 @@ LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
     if (IsDictX())
-        CpToBinaryCont(m);
+        CpToBinaryCont<_Key, _Val, std::map<_Key, _Val> >(m);
 
     return m;
 }
@@ -790,6 +816,18 @@ LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
     _holder.type = LLBC_VariantType::VT_RAW_PTR;
 
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
+
+    return *this;
+}
+
+template <typename _T1, typename _T2>
+LLBC_Variant &LLBC_Variant::operator =(const std::pair<_T1, _T2> &pa)
+{
+    BecomeSeqX();
+    _holder.data.obj.seq->clear();
+
+    _holder.data.obj.seq->emplace_back(pa.first);
+    _holder.data.obj.seq->emplace_back(pa.second);
 
     return *this;
 }
@@ -1090,7 +1128,7 @@ void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
 }
 
 template <typename _Key, typename _Val, typename _BinaryContainer>
-void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont)
+void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont) const
 {
     const DictConstIter endIt = _holder.data.obj.dict->end();
     for (DictConstIter it = _holder.data.obj.dict->begin(); it != endIt; ++it)

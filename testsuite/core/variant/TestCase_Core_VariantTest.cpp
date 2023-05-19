@@ -21,6 +21,7 @@
 
 
 #include "core/variant/TestCase_Core_VariantTest.h"
+#include "TestCase_Core_VariantTest.h"
 
 int TestCase_Core_VariantTest::Run(int argc, char *argv[])
 {
@@ -36,6 +37,9 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     std::cout << std::endl;
 
     ArithmeticTest();
+    std::cout << std::endl;
+
+    PairTest();
     std::cout << std::endl;
 
     SeqTest();
@@ -348,6 +352,30 @@ void TestCase_Core_VariantTest::ArithmeticTest()
     std::cout <<"[" <<right <<"] * [" <<left <<"] = " <<right * left <<std::endl;
     std::cout <<"[" <<right <<"] / [" <<left <<"] = " <<right / left <<std::endl;
     std::cout <<std::endl;
+}
+
+void TestCase_Core_VariantTest::PairTest()
+{
+    std::cout << "Pair test" << std::endl;
+
+    LLBC_Variant var1(std::make_pair(3, "Hello"));
+    std::cout << "Construct from pair:" << var1 << std::endl;
+
+    std::pair<std::vector<int>, std::map<int, int> > pa;
+    for (int i = 0; i < 10; ++i)
+    {
+        pa.first.push_back(i);
+        pa.second.emplace(i, i * 100);
+    }
+    LLBC_Variant var2;
+    var2 = pa;
+    std::cout << "Copy from pair:" << var2 << std::endl;
+
+    pa.first.clear();
+    pa.second.clear();
+    pa = var2;
+    std::cout << "Recover from Variant, pair.first:" << LLBC_Variant(pa.first)
+        << ", pair.second:" << LLBC_Variant(pa.second) << std::endl;
 }
 
 void TestCase_Core_VariantTest::SeqTest()

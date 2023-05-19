@@ -34,6 +34,7 @@ private:
     void CompareTest();
     void CompositeKeyTest();
     void ArithmeticTest();
+    void PairTest();
     void SeqTest();
     void DictTest();
     void SerializeTest();
