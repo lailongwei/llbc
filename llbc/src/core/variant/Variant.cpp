@@ -30,7 +30,7 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_Variant::Str __g_nullStr;
-static const LLBC_NS LLBC_Variant::Str __g_nilStr = "nil";
+static const LLBC_NS LLBC_Variant::Str __g_nilStr;
 static const LLBC_NS LLBC_Variant::Str __g_trueStr = "true";
 static const LLBC_NS LLBC_Variant::Str __g_falseStr = "false";
 static const LLBC_NS LLBC_Variant::Str __g_yesStr = "yes";
