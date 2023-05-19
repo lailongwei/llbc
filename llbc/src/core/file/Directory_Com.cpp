@@ -621,7 +621,7 @@ LLBC_String LLBC_Directory::ModuleFilePath()
 
     return buf;
 #else // LLBC_TARGET_PLATFORM_WIN32
-    DWORD ret = 0;
+    DWORD ret;
     int bufLen = MAX_PATH + 1;
     char *buf = LLBC_Malloc(char, bufLen);
     while ((ret = ::GetModuleFileNameA(nullptr, buf, bufLen)) == bufLen)
@@ -638,7 +638,7 @@ LLBC_String LLBC_Directory::ModuleFilePath()
 
     buf[ret] = '\0';
 
-    const LLBC_String modFileName(buf);
+    LLBC_String modFileName(buf);
     free(buf);
 
     return modFileName;
@@ -715,10 +715,8 @@ LLBC_String LLBC_Directory::CurDir()
  
     return cwd;
 #else
-    LPSTR cwd = nullptr;
-    DWORD cwdSize = 0;
-    cwdSize = ::GetCurrentDirectoryA(0, nullptr);
-    cwd = reinterpret_cast<LPSTR>(malloc(cwdSize * sizeof(CHAR)));
+    DWORD cwdSize = ::GetCurrentDirectoryA(0, nullptr);
+    LPSTR cwd = reinterpret_cast<LPSTR>(malloc(cwdSize * sizeof(CHAR)));
     if (::GetCurrentDirectoryA(cwdSize, cwd) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -726,7 +724,7 @@ LLBC_String LLBC_Directory::CurDir()
         return "";
     }
     
-    const LLBC_String path(cwd);
+    LLBC_String path(cwd);
     free(cwd);
 
     return path;

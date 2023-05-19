@@ -255,6 +255,8 @@ public:
     explicit LLBC_Variant(const char *str);
     explicit LLBC_Variant(const std::string &str);
     explicit LLBC_Variant(const LLBC_String &str);
+    template <typename _T1, typename _T2>
+    explicit LLBC_Variant(const std::pair<_T1, _T2> &pa);
     explicit LLBC_Variant(const Seq &seq);
     template <typename _T>
     explicit LLBC_Variant(const std::vector<_T> &vec);
@@ -364,6 +366,8 @@ public:
     operator float () const;
     operator double () const;
     operator LLBC_String () const;
+    template <typename _T1, typename _T2>
+    operator typename std::pair<_T1, _T2>() const;
     operator const Seq &() const;
     template <typename _Ty>
     operator std::vector<_Ty>() const;
@@ -492,6 +496,8 @@ public:
     LLBC_Variant &operator =(float f);
     LLBC_Variant &operator =(const double &d);
     LLBC_Variant &operator =(const LLBC_String &str);
+    template <typename _T1, typename _T2>
+    LLBC_Variant &operator =(const std::pair<_T1, _T2> &pa);
     LLBC_Variant &operator =(const Seq &seq);
     template <typename _T>
     LLBC_Variant &operator =(const std::vector<_T> &vec);
@@ -588,7 +594,7 @@ private:
     void CtFromBinaryCont(const _BinaryContainer &binaryCont);
 
     template <typename _Key, typename _Val, typename _BinaryContainer>
-    void CpToBinaryCont(_BinaryContainer &binaryCont);
+    void CpToBinaryCont(_BinaryContainer &binaryCont) const;
 
     bool IsStrX() const;
     bool IsSeqX() const;

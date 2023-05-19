@@ -642,7 +642,7 @@ private:
     volatile bool _stopping;
     volatile bool _initingComp;
 
-    LLBC_RecursiveLock _lock;
+    mutable LLBC_RecursiveLock _lock;
     LLBC_SpinLock _protoLock;
 
     int _fps;
@@ -672,7 +672,7 @@ private:
         ~_ReadySessionInfo();
     };
     std::map<int, _ReadySessionInfo *> _readySessionInfos;
-    LLBC_SpinLock _readySessionInfosLock;
+    mutable LLBC_SpinLock _readySessionInfosLock;
 
     std::list<LLBC_Component *> _willRegComps;
     volatile bool _compsInitFinished;
