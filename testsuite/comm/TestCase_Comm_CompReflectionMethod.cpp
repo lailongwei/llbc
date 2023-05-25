@@ -126,7 +126,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create() const
+        virtual ITestComp *Create(LLBC_Service *service) const
         {
             return new TestComp;
         }

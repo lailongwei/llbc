@@ -45,7 +45,7 @@ LLBC_Service::AddComponent()
     auto compFactory = new CompFactory;
     LLBC_Defer(delete compFactory);
 
-    auto comp = compFactory->Create();
+    auto comp = compFactory->Create(this);
     const int ret = AddComponent(comp);
     if (ret != LLBC_OK)
     {
@@ -64,7 +64,7 @@ inline int LLBC_Service::AddComponent(LLBC_ComponentFactory *compFactory)
         return LLBC_FAILED;
     }
 
-    auto comp = compFactory->Create();
+    auto comp = compFactory->Create(this);
     const int ret = AddComponent(comp);
     if (ret != LLBC_OK)
         LLBC_XDelete(comp);
