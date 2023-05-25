@@ -106,7 +106,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create() const
+        virtual ITestComp *Create(LLBC_Service *service) const
         {
             return new TestComp;
         }
@@ -131,7 +131,7 @@ namespace
     class EchoCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual IEchoComp *Create() const
+        virtual IEchoComp *Create(LLBC_Service *service) const
         {
             return new EchoComp;
         }

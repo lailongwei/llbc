@@ -651,7 +651,7 @@ public:
     virtual ~LLBC_ComponentFactory() {  }
 
 public:
-    virtual LLBC_Component *Create() const = 0;
+    virtual LLBC_Component *Create(LLBC_Service *service) const = 0;
 };
 
 __LLBC_NS_END

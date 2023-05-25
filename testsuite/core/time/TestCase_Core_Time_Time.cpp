@@ -256,7 +256,9 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
 
     LLBC_TimeSpan ts1 = LLBC_TimeSpan::FromMicros(10086);
     std::cout << "LLBC_TimeSpan(100s) * 100 = " << ts1 * 100 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) * 0.5 = " << ts1 * 0.5 << std::endl;
     std::cout << "LLBC_TimeSpan(100s) / 100 = " << ts1 / 100 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) / 0.5 = " << ts1 / 0.5 << std::endl;
     std::cout << "LLBC_TimeSpan(100s) % 100 = " << ts1 % 100 << std::endl;
 }
 
