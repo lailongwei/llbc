@@ -192,7 +192,7 @@ private:
 class TestCompFactory : public LLBC_ComponentFactory
 {
 public:
-    LLBC_Component *Create() const
+    LLBC_Component *Create(LLBC_Service *service) const
     {
         return new TestComp;
     }
