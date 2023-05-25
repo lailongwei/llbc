@@ -74,18 +74,6 @@ template <typename T>
 int LLBC_CheckFlowUseSub(T value, T subtrahend);
 
 /**
- * Convert an number to a string(Just use to adapt _itoa(), _i64toa(), _ui64toa() Platform relationship APIS).
- * @param[in] value - number to be convert.
- * @param[in] radix - base of value, must be in the range[2, 36].
- *
- * @return LLBC_String - string result.
- */
-LLBC_EXPORT LLBC_String LLBC_ItoA(sint32 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_UItoA(uint32 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_I64toA(sint64 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
-
-/**
  * Escape LLBC_String.
  * @param[in] escapeString    - string to escape.
  * @param[in] willEscapeChars - char set of need to escape.

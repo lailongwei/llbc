@@ -249,7 +249,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
     const LLBC_String curProcId = 
-        LLBC_Num2Str(LLBC_GetCurrentProcessId());
+        LLBC_NumToStr(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
     const LLBC_String modFileName = LLBC_Directory::ModuleFileName();

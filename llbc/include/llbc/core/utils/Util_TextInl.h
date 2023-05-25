@@ -26,93 +26,159 @@
 __LLBC_NS_BEGIN
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint64 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint64 val)
 {
-    return LLBC_I64toA(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint64 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint64 val)
 {
-    return LLBC_UI64toA(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint32 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint32 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint32 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint32 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint16 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint16 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint16 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint16 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint8 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint8 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint8 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint8 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(long val, int radix)
+inline LLBC_String LLBC_NumToStr(double val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return std::to_string(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(ulong val, int radix)
+inline LLBC_String LLBC_NumToStr(float val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
-}
-
-template <>
-inline LLBC_String LLBC_Num2Str(double val, int radix)
-{
-    char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%f", val);
-
-    return buf;
-}
-
-template <>
-inline LLBC_String LLBC_Num2Str(float val, int radix)
-{
-    return LLBC_Num2Str<double>(val, radix);
+    return std::to_string(val);
 }
 
 template <typename T>
-inline LLBC_String LLBC_Num2Str(T val, int radix)
+LLBC_String LLBC_NumToStr(T val)
 {
-    if (radix != 10 && radix != 16)
-        radix = 10;
-
-    LLBC_String str;
-    if (radix == 16)
-        str += "0x";
-
     uint64 ptrVal = 0;
     memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
-    return (str + LLBC_Num2Str<uint64>(ptrVal, radix));
+    return LLBC_NumToStr<uint64>(ptrVal);
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(sint64 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(uint64 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(sint32 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(uint32 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(sint16 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(uint16 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(sint8 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <>
+inline LLBC_String LLBC_NumToStrHex(uint8 val)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill ('0') << std::setw(sizeof(val) * 2)
+           << std::hex << val;
+    return stream.str();
+}
+
+template <typename T>
+LLBC_String LLBC_NumToStrHex(T val)
+{
+    uint64 ptrVal = 0;
+    memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
+    return LLBC_NumToStrHex<uint64>(ptrVal);
 }
 
 __LLBC_NS_END
