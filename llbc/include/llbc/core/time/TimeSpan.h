@@ -118,15 +118,15 @@ public:
 
     LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator *(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator /(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator %(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator *(double scale) const;
+    LLBC_TimeSpan operator /(double scale) const;
+    LLBC_TimeSpan operator %(sint64 span) const;
 
     LLBC_TimeSpan &operator +=(const LLBC_TimeSpan &span);
     LLBC_TimeSpan &operator -=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator *=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator /=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator %=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator *=(double scale);
+    LLBC_TimeSpan &operator /=(double scale);
+    LLBC_TimeSpan &operator %=(sint64 scale);
 
     bool operator ==(const LLBC_TimeSpan &span) const;
     bool operator !=(const LLBC_TimeSpan &span) const;

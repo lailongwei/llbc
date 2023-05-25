@@ -253,6 +253,13 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan::FromMinutes(-100, 100, 300): " << tsFromMMSS2 << std::endl;
     std::cout << "LLBC_TimeSpan::FromHours(5, -400, 500, -600, 700): " << tsFromHHMMSS << std::endl;
     std::cout << "LLBC_TimeSpan::FromDays(1, 2, 3, 4, 500, 600): " << tsFromDDHHMMSS << std::endl;
+
+    LLBC_TimeSpan ts1 = LLBC_TimeSpan::FromMicros(10086);
+    std::cout << "LLBC_TimeSpan(100s) * 100 = " << ts1 * 100 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) * 0.5 = " << ts1 * 0.5 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) / 100 = " << ts1 / 100 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) / 0.5 = " << ts1 / 0.5 << std::endl;
+    std::cout << "LLBC_TimeSpan(100s) % 100 = " << ts1 % 100 << std::endl;
 }
 
 void TestCase_Core_Time_Time::CpuTimeTest()

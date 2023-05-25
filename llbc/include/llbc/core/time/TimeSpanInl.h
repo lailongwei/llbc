@@ -196,19 +196,19 @@ inline LLBC_TimeSpan LLBC_TimeSpan::operator -(const LLBC_TimeSpan &span) const
     return LLBC_TimeSpan(_span - span._span);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator *(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator *(double scale) const
 {
-    return LLBC_TimeSpan(_span * span._span);
+    return LLBC_TimeSpan(static_cast<sint64>(_span * scale));
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator /(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator /(double scale) const
 {
-    return LLBC_TimeSpan(_span / span._span);
+    return LLBC_TimeSpan(static_cast<sint64>(_span / scale));
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator %(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator %(sint64 scale) const
 {
-    return LLBC_TimeSpan(_span % span._span);
+    return LLBC_TimeSpan(_span % scale);
 }
 
 inline LLBC_TimeSpan &LLBC_TimeSpan::operator +=(const LLBC_TimeSpan &span)
@@ -223,21 +223,21 @@ inline LLBC_TimeSpan &LLBC_TimeSpan::operator -=(const LLBC_TimeSpan &span)
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator *=(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator *=(double scale)
 {
-    _span *= span._span;
+    _span = static_cast<sint64>(_span * scale);
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator /=(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator /=(double scale)
 {
-    _span /= span._span;
+    _span = static_cast<sint64>(_span / scale);
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator %=(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator %=(sint64 scale)
 {
-    _span %= span._span;
+    _span %= scale;
     return *this;
 }
 
