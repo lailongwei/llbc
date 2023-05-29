@@ -91,7 +91,7 @@ LLBC_String LLBC_NumToStr(T val);
  * @return LLBC_String - the converted string.
  */
 template <typename T>
-LLBC_String LLBC_NumToStrHex(T val);
+LLBC_String LLBC_NumToStrInHex(T val);
 
 /**
  * Hash specific string.

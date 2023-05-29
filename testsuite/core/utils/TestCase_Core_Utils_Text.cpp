@@ -80,9 +80,13 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         LLBC_PrintLn("LLBC_Num2Str<uint8>()[%d] -> string(base:10): %s",
             uint8Val, LLBC_NumToStr(uint8Val).c_str());
 
-        sint16 sint16Val = -16;
+        sint16 sint16Val = 16;
         LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
-            sint16Val, LLBC_NumToStrHex(sint16Val).c_str());
+            sint16Val, LLBC_NumToStrInHex(sint16Val).c_str());
+        
+        sint16 sint16Val2 = -16;
+        LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
+            sint16Val2, LLBC_NumToStrInHex(sint16Val2).c_str());
 
         sint32 sint32Val = -32;
         LLBC_PrintLn("LLBC_Num2Str<sint32>()[%d] -> string(base:10): %s",
@@ -98,10 +102,10 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         LLBC_PrintLn("LLBC_Num2Str<ulong>()[%lu] -> string(base:10): %s",
             ulongVal, LLBC_NumToStr(ulongVal).c_str());
 
-        sint64 sint64Val = -64;
+        sint64 sint64Val = -9223372036854775808;
         LLBC_PrintLn("LLBC_Num2Str<sint64>()[%lld] -> string(base:10): %s",
             sint64Val, LLBC_NumToStr(sint64Val).c_str());
-        uint64 uint64Val = 64;
+        uint64 uint64Val = 18446744073709551615;
         LLBC_PrintLn("LLBC_Num2Str<uint64>()[%llu] -> string(base:10): %s",
             uint64Val, LLBC_NumToStr(uint64Val).c_str());
 
@@ -112,15 +116,15 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         LLBC_PrintLn("LLBC_Num2Str<double>()[%f] -> string: %s",
             doubleVal, LLBC_NumToStr(doubleVal).c_str());
 
-        sint64 intPtrAddr = 0xcdcdcdcd;
+        sint64 intPtrAddr = 0x1234cdef;
         int *intPtr; memcpy(&intPtr, &intPtrAddr, sizeof(int *));
         LLBC_PrintLn("LLBC_Num2Str<int *>()[%p] -> string: %s",
-            intPtr, LLBC_NumToStrHex(intPtr).c_str());
+            intPtr, LLBC_NumToStrInHex(intPtr).c_str());
 
         sint64 voidPtrAddr = 0xfffffffe;
         void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
         LLBC_PrintLn("LLBC_Num2Str<void *>()[%p] -> string: %s",
-            voidPtr, LLBC_NumToStrHex(voidPtr).c_str());
+            voidPtr, LLBC_NumToStrInHex(voidPtr).c_str());
     }
 
     LLBC_Print("\n");
