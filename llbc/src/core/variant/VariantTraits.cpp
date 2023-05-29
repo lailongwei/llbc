@@ -106,29 +106,45 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
 
     const LLBC_Variant::Holder &lHolder = left.GetHolder();
     const LLBC_Variant::Holder &rHolder = right.GetHolder();
-    if (left.IsStr())
+    if (left.IsStr()) // Str == Any
     {
-        __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Str, str);
+        // Str == Non-Raw
+        if (!right.IsRaw())
+        {
+            __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Str, str);
+        }
+        else // Str == Raw
+        {
+            if (right.IsDouble() || right.IsFloat())
+                return left.AsDouble() == right.AsDouble();
+            else if (right.IsUnsignedRaw())
+                return left.AsUInt64() == right.AsUInt64();
+            else
+                return left.AsInt64() == right.AsInt64();
+        }
     }
-    else if (left.IsSeq())
+    else if (left.IsSeq()) // Seq == Any
     {
         __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Seq, seq);
     }
-    else if (left.IsDict())
+    else if (left.IsDict()) // Dict == Any
     {
         __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Dict, dict);
     }
-    else if (left.IsRaw())
+    else if (left.IsRaw()) // Raw == Any
     {
-        if (!right.IsRaw())
+        if (!right.IsRaw() && !right.IsStr()) // Raw == Non-Raw&&Non-Str
             return false;
 
+        // Raw == Raw/Str
         if ((left.IsDouble() || left.IsFloat()) ||
             (right.IsDouble() || right.IsFloat()))
-            return left.AsDouble() == right.AsDouble();
-
-        return (left.GetHolder().data.raw.uint64Val == 
-            right.GetHolder().data.raw.uint64Val);
+            return std::fabs(left.AsDouble() - right.AsDouble()) <
+                std::numeric_limits<double>::epsilon();
+        else if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
+            return left.AsUInt64() == right.AsUInt64();
+        else
+            return left.AsInt64() == right.AsInt64();
     }
 
     return (left.IsNil() && right.IsNil());
@@ -166,27 +182,40 @@ bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
     {
         if (right.IsDict() ||
             right.IsSeq()) // Dict/Seq: true
+        {
             return true;
+        }
         else if (right.IsStr()) // Str: exec compare
+        {
             __LLBC_INL_OBJ_TYPE_VARS_LT_COMP(Str, str);
-        else // Raw/Nil: false
+        }
+        else if (right.IsRaw()) // Raw: exec compare(convert to raw)
+        {
+            if (right.IsDouble() || right.IsFloat())
+                return left.AsDouble() < right.AsDouble();
+            else if (right.IsUnsignedRaw())
+                return left.AsUInt64() < right.AsUInt64();
+            else
+                return left.AsInt64() < right.AsInt64();
+        }
+        else // Nil: false
+        {
             return false;
+        }
     }
     else if (left.IsRaw())
     {
         if (right.IsDict() ||
-            right.IsSeq() ||
-            right.IsStr()) // Dict/Seq/Str: true
+            right.IsSeq()) // Dict/Seq: true
         {
             return true;
         }
-        else if (right.IsRaw()) // Raw: exec compare
+        else if (right.IsStr() || right.IsRaw()) // Str/Raw: exec compare
         {
             if ((left.IsDouble() || left.IsFloat()) ||
                 (right.IsDouble() || right.IsFloat()))
                 return left.AsDouble() < right.AsDouble();
-
-            if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
+            else if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
                 return left.AsUInt64() < right.AsUInt64();
             else
                 return left.AsInt64() < right.AsInt64();
