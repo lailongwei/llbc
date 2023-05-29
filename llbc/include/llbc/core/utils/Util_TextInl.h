@@ -29,7 +29,7 @@ template<typename UIT>
 char *LLBC_UnsignedIntegralToBuff(char* buffer_end, UIT unsigned_integral_val)
 {
     // format unsigned_integral_val to buffer ending at buffer_end
-    static_assert(std::is_unsigned_v<UIT>, "UI must be unsigned");
+    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
 
 #ifdef _WIN64
     auto val_trunc = unsigned_integral_val;
@@ -66,7 +66,7 @@ template<typename UIT>
 char *LLBC_UnsignedIntegralToBuffInHex(char* buffer_end, UIT unsigned_integral_val)
 {
     // format unsigned_integral_val to buffer ending at buffer_end in hex
-    static_assert(std::is_unsigned_v<UIT>, "UI must be unsigned");
+    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
 
 #ifdef _WIN64
     auto val_trunc = unsigned_integral_val;
@@ -105,7 +105,7 @@ template<typename IT>
 LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integral_val)
 {
     // convert integral to llbc string in hex
-    static_assert(std::is_integral_v<IT>, "IT must be integral");
+    static_assert(std::is_integral<IT>(), "IT must be integral");
     char buffer[21]; // can hole -2^63 and 2^64 - 1
     char *const buffer_end = std::end(buffer);
     char *buffer_end_trunc = buffer_end;
@@ -130,7 +130,7 @@ template<typename IT>
 LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integral_val)
 {
     // convert integral to llbc string
-    static_assert(std::is_integral_v<IT>, "IT must be integral");
+    static_assert(std::is_integral<IT>(), "IT must be integral");
     char buffer[21]; // can hole -2^63 and 2^64 - 1
     char *const buffer_end = std::end(buffer);
     char *buffer_end_trunc = buffer_end;
@@ -211,10 +211,9 @@ inline LLBC_String LLBC_NumToStr(ulong val)
 template <>
 inline LLBC_String LLBC_NumToStr(double val)
 {
-    const auto len = static_cast<size_t>(_scprintf("%f", val));
-    LLBC_String res(len, '\0');
-    sprintf_s(const_cast<char*>(res.data()), len + 1, "%f", val);
-    return res;
+    char buf[64] = {0};
+    snprintf(buf, sizeof(buf), "%f", val);
+    return buf;
 }
 
 template <>
