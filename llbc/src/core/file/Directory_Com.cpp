@@ -26,6 +26,10 @@
  #include <dirent.h>
 #endif // Non-Win32
 
+#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+ #include <mach-o/dyld.h>
+#endif
+
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/file/File.h"
 
