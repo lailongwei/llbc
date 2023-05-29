@@ -35,18 +35,18 @@ char *LLBC_UnsignedIntegralToBuff(char* buffer_end, UIT unsigned_integral_val)
     auto val_trunc = unsigned_integral_val;
 #else
     constexpr bool BIG_TYPE = sizeof(unsigned_integral_val) > 4;
-    if constexpr (BIG_TYPE)
+    if (BIG_TYPE)
     {
         // for 64-bit numbers, work in chucks to avoid 64 bit-divisions
         while(unsigned_integral_val > 0xFFFFFFFFU)
         {
             auto val_trunc = static_cast<unsigned long>(unsigned_integral_val) % 1000000000;
-            unsigned_integral_val / 1000000000;
+            unsigned_integral_val /= 1000000000;
 
             for(int index = 0; index != 9; index++)
             {
                 *--buffer_end = static_cast<char>('0' + val_trunc % 10);
-                val_trunc / 10;
+                val_trunc /= 10;
             }
         }
     }
@@ -72,19 +72,19 @@ char *LLBC_UnsignedIntegralToBuffInHex(char* buffer_end, UIT unsigned_integral_v
     auto val_trunc = unsigned_integral_val;
 #else
     constexpr bool BIG_TYPE = sizeof(unsigned_integral_val) > 4;
-    if constexpr (BIG_TYPE)
+    if (BIG_TYPE)
     {
         // for 64-bit numbers, work in chucks to avoid 64 bit-divisions
         while(unsigned_integral_val > 0xFFFFFFFFU)
         {
             auto val_trunc = static_cast<unsigned long>(unsigned_integral_val) % 1000000000;
-            unsigned_integral_val / 268435456;
+            unsigned_integral_val /= 268435456;
 
             for(int index = 0; index != 7; index++)
             {
                 auto digit = val_trunc % 16;
                 *--buffer_end = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
-                val_trunc / 16;
+                val_trunc /= 16;
             }
         }
     }
@@ -111,14 +111,14 @@ LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integral_val)
     char *buffer_end_trunc = buffer_end;
     if(integral_val < 0)
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, std::make_unsigned_t<IT>(0 - integral_val));
+        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, typename std::make_unsigned<IT>::type(0 - integral_val));
         *--buffer_end_trunc = 'x';
         *--buffer_end_trunc = '0';
         *--buffer_end_trunc = '-';
     }
     else
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, std::make_unsigned_t<IT>(integral_val));
+        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, typename std::make_unsigned<IT>::type(integral_val));
         *--buffer_end_trunc = 'x';
         *--buffer_end_trunc = '0';
     }
@@ -136,12 +136,12 @@ LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integral_val)
     char *buffer_end_trunc = buffer_end;
     if(integral_val < 0)
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, std::make_unsigned_t<IT>(0 - integral_val));
+        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, typename std::make_unsigned<IT>::type(0 - integral_val));
         *--buffer_end_trunc = '-';
     }
     else
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, std::make_unsigned_t<IT>(integral_val));
+        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, typename std::make_unsigned<IT>::type(integral_val));
     }
     return {buffer_end_trunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(buffer_end - buffer_end_trunc)};
 }
