@@ -139,11 +139,12 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
         // Raw == Raw/Str
         if ((left.IsDouble() || left.IsFloat()) ||
             (right.IsDouble() || right.IsFloat()))
-            return left.AsDouble() == right.AsDouble();
+            return std::fabs(left.AsDouble() - right.AsDouble()) <
+                std::numeric_limits<double>::epsilon();
         else if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
-            return left.AsUInt64() < right.AsUInt64();
+            return left.AsUInt64() == right.AsUInt64();
         else
-            return left.AsInt64() < right.AsInt64();
+            return left.AsInt64() == right.AsInt64();
     }
 
     return (left.IsNil() && right.IsNil());
