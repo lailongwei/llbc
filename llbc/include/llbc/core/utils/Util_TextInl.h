@@ -26,124 +26,80 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 template<typename UIT>
-char *LLBC_UnsignedIntegralToBuff(char* buffer_end, UIT unsigned_integral_val)
+char *LLBC_UnsignedIntegralToBuff(char* bufferEnd, UIT unsignedIntegralVal)
 {
-    // format unsigned_integral_val to buffer ending at buffer_end
+    // format unsignedIntegralVal to buffer ending at bufferEnd
     static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
 
-#ifdef _WIN64
-    auto val_trunc = unsigned_integral_val;
-#else
-    constexpr bool BIG_TYPE = sizeof(unsigned_integral_val) > 4;
-    if (BIG_TYPE)
-    {
-        // for 64-bit numbers, work in chucks to avoid 64 bit-divisions
-        while(unsigned_integral_val > 0xFFFFFFFFU)
-        {
-            auto val_trunc = static_cast<unsigned long>(unsigned_integral_val) % 1000000000;
-            unsigned_integral_val /= 1000000000;
-
-            for(int index = 0; index != 9; index++)
-            {
-                *--buffer_end = static_cast<char>('0' + val_trunc % 10);
-                val_trunc /= 10;
-            }
-        }
-    }
-
-    auto val_trunc = static_cast<unsigned long>(unsigned_integral_val);
-#endif
+    auto valTrunc = unsignedIntegralVal;
     do
     {
-        *--buffer_end = static_cast<char>('0' + val_trunc % 10);
-        val_trunc /= 10;
-    }
-    while (val_trunc != 0);
-    return buffer_end;
+        *--bufferEnd = static_cast<char>('0' + valTrunc % 10);
+        valTrunc /= 10;
+    } while (valTrunc != 0);
+    return bufferEnd;
 }
 
 template<typename UIT>
-char *LLBC_UnsignedIntegralToBuffInHex(char* buffer_end, UIT unsigned_integral_val)
+char *LLBC_UnsignedIntegralToBuffInHex(char* bufferEnd, UIT unsignedIntegralVal)
 {
-    // format unsigned_integral_val to buffer ending at buffer_end in hex
+    // format unsignedIntegralVal to buffer ending at bufferEnd in hex
     static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
 
-#ifdef _WIN64
-    auto val_trunc = unsigned_integral_val;
-#else
-    constexpr bool BIG_TYPE = sizeof(unsigned_integral_val) > 4;
-    if (BIG_TYPE)
-    {
-        // for 64-bit numbers, work in chucks to avoid 64 bit-divisions
-        while(unsigned_integral_val > 0xFFFFFFFFU)
-        {
-            auto val_trunc = static_cast<unsigned long>(unsigned_integral_val) % 1000000000;
-            unsigned_integral_val /= 268435456;
-
-            for(int index = 0; index != 7; index++)
-            {
-                auto digit = val_trunc % 16;
-                *--buffer_end = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
-                val_trunc /= 16;
-            }
-        }
-    }
-
-    auto val_trunc = static_cast<unsigned long>(unsigned_integral_val);
-#endif
+    auto valTrunc = unsignedIntegralVal;
     do
     {
-        auto digit = val_trunc % 16;
-        *--buffer_end = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
-        val_trunc /= 16;
+        auto digit = valTrunc % 16;
+        *--bufferEnd = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
+        valTrunc /= 16;
     }
-    while (val_trunc != 0);
-    return buffer_end;
+    while (valTrunc != 0);
+    return bufferEnd;
 }
 
 template<typename IT>
-LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integral_val)
+LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integralVal)
 {
     // convert integral to llbc string in hex
     static_assert(std::is_integral<IT>(), "IT must be integral");
     char buffer[21]; // can hole -2^63 and 2^64 - 1
-    char *const buffer_end = std::end(buffer);
-    char *buffer_end_trunc = buffer_end;
-    if(integral_val < 0)
+    char *const bufferEnd = std::end(buffer);
+    char *bufferEndTrunc = bufferEnd;
+    if(integralVal < 0)
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, typename std::make_unsigned<IT>::type(0 - integral_val));
-        *--buffer_end_trunc = 'x';
-        *--buffer_end_trunc = '0';
-        *--buffer_end_trunc = '-';
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc, typename std::make_unsigned<IT>::type(0 - integralVal));
+        *--bufferEndTrunc = 'x';
+        *--bufferEndTrunc = '0';
+        *--bufferEndTrunc = '-';
     }
     else
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuffInHex(buffer_end_trunc, typename std::make_unsigned<IT>::type(integral_val));
-        *--buffer_end_trunc = 'x';
-        *--buffer_end_trunc = '0';
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc, typename std::make_unsigned<IT>::type(integralVal));
+        *--bufferEndTrunc = 'x';
+        *--bufferEndTrunc = '0';
     }
     
-    return {buffer_end_trunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(buffer_end - buffer_end_trunc)};
+    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
 }
 
 template<typename IT>
-LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integral_val)
+LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integralVal)
 {
     // convert integral to llbc string
     static_assert(std::is_integral<IT>(), "IT must be integral");
     char buffer[21]; // can hole -2^63 and 2^64 - 1
-    char *const buffer_end = std::end(buffer);
-    char *buffer_end_trunc = buffer_end;
-    if(integral_val < 0)
+    char *const bufferEnd = std::end(buffer);
+    char *bufferEndTrunc = bufferEnd;
+    if(integralVal < 0)
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, typename std::make_unsigned<IT>::type(0 - integral_val));
-        *--buffer_end_trunc = '-';
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc, typename std::make_unsigned<IT>::type(0 - integralVal));
+        *--bufferEndTrunc = '-';
     }
     else
     {
-        buffer_end_trunc = LLBC_UnsignedIntegralToBuff(buffer_end_trunc, typename std::make_unsigned<IT>::type(integral_val));
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc, typename std::make_unsigned<IT>::type(integralVal));
     }
-    return {buffer_end_trunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(buffer_end - buffer_end_trunc)};
+    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
 }
 __LLBC_INTERNAL_NS_END
 
