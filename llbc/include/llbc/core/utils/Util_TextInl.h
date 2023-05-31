@@ -171,7 +171,7 @@ template <>
 inline LLBC_String LLBC_NumToStr(long double val)
 {
     char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%f", val);
+    snprintf(buf, sizeof(buf), "%f", static_cast<double>(val));
     return buf;
 }
 
