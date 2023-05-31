@@ -75,55 +75,56 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     {
         sint8 sint8Val = 'a';
         LLBC_PrintLn("LLBC_Num2Str<sint8>()[%c] -> string(base:10): %s",
-            sint8Val, LLBC_Num2Str(sint8Val).c_str());
+            sint8Val, LLBC_NumToStr(sint8Val).c_str());
         uint8 uint8Val = 97;
         LLBC_PrintLn("LLBC_Num2Str<uint8>()[%d] -> string(base:10): %s",
-            uint8Val, LLBC_Num2Str(uint8Val).c_str());
+            uint8Val, LLBC_NumToStr(uint8Val).c_str());
 
-        sint16 sint16Val = -16;
+        sint16 sint16Val = 16;
         LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
-            sint16Val, LLBC_Num2Str(sint16Val, 16).c_str());
-        uint16 uint16Val = 16;
-        LLBC_PrintLn("LLBC_Num2Str<uint16>()[%u] -> string(base:8): %s",
-            uint16Val, LLBC_Num2Str(uint16Val, 8).c_str());
+            sint16Val, LLBC_NumToStrInHex(sint16Val).c_str());
+        
+        sint16 sint16Val2 = -16;
+        LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
+            sint16Val2, LLBC_NumToStrInHex(sint16Val2).c_str());
 
         sint32 sint32Val = -32;
         LLBC_PrintLn("LLBC_Num2Str<sint32>()[%d] -> string(base:10): %s",
-            sint32Val, LLBC_Num2Str(sint32Val).c_str());
+            sint32Val, LLBC_NumToStr(sint32Val).c_str());
         uint32 uint32Val = 32;
         LLBC_PrintLn("LLBC_Num2Str<uint32>()[%u] -> string(base:10): %s",
-            uint32Val, LLBC_Num2Str(uint32Val).c_str());
+            uint32Val, LLBC_NumToStr(uint32Val).c_str());
 
         long longVal = -1;
         LLBC_PrintLn("LLBC_Num2Str<long>()[%ld] -> string(base:10): %s",
-            longVal, LLBC_Num2Str(longVal).c_str());
+            longVal, LLBC_NumToStr(longVal).c_str());
         llbc::ulong ulongVal = -1;
         LLBC_PrintLn("LLBC_Num2Str<ulong>()[%lu] -> string(base:10): %s",
-            ulongVal, LLBC_Num2Str(ulongVal).c_str());
+            ulongVal, LLBC_NumToStr(ulongVal).c_str());
 
-        sint64 sint64Val = -64;
+        sint64 sint64Val = -9223372036854775808U;
         LLBC_PrintLn("LLBC_Num2Str<sint64>()[%lld] -> string(base:10): %s",
-            sint64Val, LLBC_Num2Str(sint64Val).c_str());
-        uint64 uint64Val = 64;
+            sint64Val, LLBC_NumToStr(sint64Val).c_str());
+        uint64 uint64Val = 18446744073709551615U;
         LLBC_PrintLn("LLBC_Num2Str<uint64>()[%llu] -> string(base:10): %s",
-            uint64Val, LLBC_Num2Str(uint64Val).c_str());
+            uint64Val, LLBC_NumToStr(uint64Val).c_str());
 
         float fVal = 1.0f;
         LLBC_PrintLn("LLBC_Num2Str<float>()[%f] -> string: %s",
-            fVal, LLBC_Num2Str(fVal).c_str());
+            fVal, LLBC_NumToStr(fVal).c_str());
         double doubleVal = -1.0f;
         LLBC_PrintLn("LLBC_Num2Str<double>()[%f] -> string: %s",
-            doubleVal, LLBC_Num2Str(doubleVal).c_str());
+            doubleVal, LLBC_NumToStr(doubleVal).c_str());
 
-        sint64 intPtrAddr = 0xcdcdcdcd;
+        sint64 intPtrAddr = 0x1234cdef;
         int *intPtr; memcpy(&intPtr, &intPtrAddr, sizeof(int *));
         LLBC_PrintLn("LLBC_Num2Str<int *>()[%p] -> string: %s",
-            intPtr, LLBC_Num2Str(intPtr, 16).c_str());
+            intPtr, LLBC_NumToStrInHex(static_cast<void*>(intPtr)).c_str());
 
         sint64 voidPtrAddr = 0xfffffffe;
         void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
         LLBC_PrintLn("LLBC_Num2Str<void *>()[%p] -> string: %s",
-            voidPtr, LLBC_Num2Str(voidPtr, 16).c_str());
+            voidPtr, LLBC_NumToStrInHex(voidPtr).c_str());
     }
 
     LLBC_Print("\n");

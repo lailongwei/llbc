@@ -361,10 +361,10 @@ int LLBC_PollerMgr::GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr)
     hints.ai_next = nullptr;
 
     struct addrinfo *ai;
-    if (LLBC_GetAddrInfo(ip,                         // servname
-                         LLBC_Num2Str(port).c_str(), // nodename
-                         &hints,                     // hints
-                         &ai) != LLBC_OK)            // result
+    if (LLBC_GetAddrInfo(ip,                          // servname
+                         LLBC_NumToStr(port).c_str(), // nodename
+                         &hints,                      // hints
+                         &ai) != LLBC_OK)             // result
         return LLBC_FAILED;
 
     addr.FromOSDataType(reinterpret_cast<

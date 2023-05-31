@@ -23,96 +23,234 @@
 
 #include "llbc/core/utils/Util_Algorithm.h"
 
+__LLBC_INTERNAL_NS_BEGIN
+
+template<typename UIT>
+char *LLBC_UnsignedIntegralToBuff(char* bufferEnd, UIT unsignedIntegralVal)
+{
+    // format unsignedIntegralVal to buffer ending at bufferEnd
+    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
+
+    auto valTrunc = unsignedIntegralVal;
+    do
+    {
+        *--bufferEnd = static_cast<char>('0' + valTrunc % 10);
+        valTrunc /= 10;
+    } while (valTrunc != 0);
+    return bufferEnd;
+}
+
+template<typename UIT>
+char *LLBC_UnsignedIntegralToBuffInHex(char* bufferEnd, UIT unsignedIntegralVal)
+{
+    // format unsignedIntegralVal to buffer ending at bufferEnd in hex
+    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
+
+    do
+    {
+        auto digit = unsignedIntegralVal % 16;
+        *--bufferEnd = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
+        unsignedIntegralVal /= 16;
+    }
+    while (unsignedIntegralVal != 0);
+    return bufferEnd;
+}
+
+template<typename IT>
+LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integralVal)
+{
+    // convert integral to llbc string in hex
+    static_assert(std::is_integral<IT>(), "IT must be integral");
+    char buffer[21]; // can hole -2^63 and 2^64 - 1
+    char *const bufferEnd = std::end(buffer);
+    char *bufferEndTrunc = bufferEnd;
+    if(integralVal < 0)
+    {
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(0 - integralVal));
+        *--bufferEndTrunc = 'x';
+        *--bufferEndTrunc = '0';
+        *--bufferEndTrunc = '-';
+    }
+    else
+    {
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(integralVal));
+        *--bufferEndTrunc = 'x';
+        *--bufferEndTrunc = '0';
+    }
+    
+    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
+}
+
+template<typename IT>
+LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integralVal)
+{
+    // convert integral to llbc string
+    static_assert(std::is_integral<IT>(), "IT must be integral");
+    char buffer[21]; // can hole -2^63 and 2^64 - 1
+    char *const bufferEnd = std::end(buffer);
+    char *bufferEndTrunc = bufferEnd;
+    if(integralVal < 0)
+    {
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(0 - integralVal));
+        *--bufferEndTrunc = '-';
+    }
+    else
+    {
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(integralVal));
+    }
+    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
+}
+__LLBC_INTERNAL_NS_END
+
 __LLBC_NS_BEGIN
-
 template <>
-inline LLBC_String LLBC_Num2Str(sint64 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint64 val)
 {
-    return LLBC_I64toA(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint64 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint64 val)
 {
-    return LLBC_UI64toA(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint32 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint32 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint32 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint32 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint16 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint16 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint16 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint16 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(sint8 val, int radix)
+inline LLBC_String LLBC_NumToStr(sint8 val)
 {
-    return LLBC_Num2Str<sint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(uint8 val, int radix)
+inline LLBC_String LLBC_NumToStr(uint8 val)
 {
-    return LLBC_Num2Str<uint64>(val, radix);
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStr(long val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStr(ulong val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(long val, int radix)
-{
-    return LLBC_Num2Str<sint64>(val, radix);
-}
-
-template <>
-inline LLBC_String LLBC_Num2Str(ulong val, int radix)
-{
-    return LLBC_Num2Str<uint64>(val, radix);
-}
-
-template <>
-inline LLBC_String LLBC_Num2Str(double val, int radix)
+inline LLBC_String LLBC_NumToStr(long double val)
 {
     char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%f", val);
-
+    snprintf(buf, sizeof(buf), "%f", static_cast<double>(val));
     return buf;
 }
 
 template <>
-inline LLBC_String LLBC_Num2Str(float val, int radix)
+inline LLBC_String LLBC_NumToStr(double val)
 {
-    return LLBC_Num2Str<double>(val, radix);
+    char buf[64] = {0};
+    snprintf(buf, sizeof(buf), "%f", val);
+    return buf;
+}
+
+template <>
+inline LLBC_String LLBC_NumToStr(float val)
+{
+    return LLBC_NumToStr<double>(val);
 }
 
 template <typename T>
-inline LLBC_String LLBC_Num2Str(T val, int radix)
+LLBC_String LLBC_NumToStr(T val)
 {
-    if (radix != 10 && radix != 16)
-        radix = 10;
-
-    LLBC_String str;
-    if (radix == 16)
-        str += "0x";
-
     uint64 ptrVal = 0;
     memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
-    return (str + LLBC_Num2Str<uint64>(ptrVal, radix));
+    return LLBC_NumToStr<uint64>(ptrVal);
 }
 
+inline LLBC_String LLBC_NumToStrInHex(sint64 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);   
+}
+
+inline LLBC_String LLBC_NumToStrInHex(uint64 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(sint32 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(uint32 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(sint16 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(uint16 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(sint8 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(uint8 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(long val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(ulong val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+inline LLBC_String LLBC_NumToStrInHex(void *val)
+{
+    uint64 ptrVal = 0;
+    memcpy(&ptrVal, &val, sizeof(uint64));
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex<uint64>(ptrVal);
+}
 __LLBC_NS_END

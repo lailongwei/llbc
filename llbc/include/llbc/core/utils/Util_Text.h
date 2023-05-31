@@ -83,7 +83,15 @@ LLBC_EXPORT double LLBC_Str2Double(const char *str);
  * @return LLBC_String - the converted string.
  */
 template <typename T>
-LLBC_String LLBC_Num2Str(T val, int radix = 10);
+LLBC_String LLBC_NumToStr(T val);
+
+/**
+ * Convert number(signed/unsigned) type to string with hexadecimal format.
+ * @param[in] val   - number value.
+ * @return LLBC_String - the converted string.
+ */
+template <typename T>
+LLBC_String LLBC_NumToStrInHex(T val);
 
 /**
  * Hash specific string.

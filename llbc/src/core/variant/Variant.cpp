@@ -311,7 +311,7 @@ LLBC_String LLBC_Variant::AsStr() const
         }
         else if (IsFloat() || IsDouble())
         {
-            return LLBC_Num2Str(_holder.data.raw.doubleVal);
+            return LLBC_NumToStr(_holder.data.raw.doubleVal);
         }
         else if (IsSignedRaw())
         {
@@ -320,14 +320,14 @@ LLBC_String LLBC_Variant::AsStr() const
                 return *_num2StrFastAccessTbl[
                     static_cast<int>(_holder.data.raw.int64Val - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN)];
 
-            return LLBC_Num2Str(_holder.data.raw.int64Val);
+            return LLBC_NumToStr(_holder.data.raw.int64Val);
         }
         else
         {
             if (IsPtr())
                 return LLBC_String().format("0x%p", _holder.data.raw.uint64Val);
             else
-                return LLBC_Num2Str(_holder.data.raw.uint64Val);
+                return LLBC_NumToStr(_holder.data.raw.uint64Val);
         }
     }
 
