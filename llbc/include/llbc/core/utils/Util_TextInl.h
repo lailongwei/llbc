@@ -46,14 +46,13 @@ char *LLBC_UnsignedIntegralToBuffInHex(char* bufferEnd, UIT unsignedIntegralVal)
     // format unsignedIntegralVal to buffer ending at bufferEnd in hex
     static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
 
-    auto valTrunc = unsignedIntegralVal;
     do
     {
-        auto digit = valTrunc % 16;
+        auto digit = unsignedIntegralVal % 16;
         *--bufferEnd = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
-        valTrunc /= 16;
+        unsignedIntegralVal /= 16;
     }
-    while (valTrunc != 0);
+    while (unsignedIntegralVal != 0);
     return bufferEnd;
 }
 
@@ -67,14 +66,16 @@ LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integralVal)
     char *bufferEndTrunc = bufferEnd;
     if(integralVal < 0)
     {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc, typename std::make_unsigned<IT>::type(0 - integralVal));
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(0 - integralVal));
         *--bufferEndTrunc = 'x';
         *--bufferEndTrunc = '0';
         *--bufferEndTrunc = '-';
     }
     else
     {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc, typename std::make_unsigned<IT>::type(integralVal));
+        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
+                            typename std::make_unsigned<IT>::type(integralVal));
         *--bufferEndTrunc = 'x';
         *--bufferEndTrunc = '0';
     }
