@@ -80,7 +80,7 @@ LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integralVal)
         *--bufferEndTrunc = '0';
     }
     
-    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
+    return {bufferEndTrunc, static_cast<size_t>(bufferEnd - bufferEndTrunc)};
 }
 
 template<typename IT>
@@ -88,6 +88,7 @@ LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integralVal)
 {
     // convert integral to llbc string
     static_assert(std::is_integral<IT>(), "IT must be integral");
+
     char buffer[21]; // can hole -2^63 and 2^64 - 1
     char *const bufferEnd = std::end(buffer);
     char *bufferEndTrunc = bufferEnd;
@@ -102,7 +103,8 @@ LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integralVal)
         bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc,
                             typename std::make_unsigned<IT>::type(integralVal));
     }
-    return {bufferEndTrunc, static_cast<LLBC_NS LLBC_BasicString<char>::size_type>(bufferEnd - bufferEndTrunc)};
+
+    return {bufferEndTrunc, static_cast<size_t>(bufferEnd - bufferEndTrunc)};
 }
 __LLBC_INTERNAL_NS_END
 
