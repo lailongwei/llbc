@@ -121,6 +121,18 @@ inline LLBC_String LLBC_NumToStr(uint64 val)
     return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
+template<>
+inline LLBC_String LLBC_NumToStr(long val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStr(ulong val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+}
+
 template <>
 inline LLBC_String LLBC_NumToStr(sint32 val)
 {
@@ -157,17 +169,6 @@ inline LLBC_String LLBC_NumToStr(uint8 val)
     return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
 }
 
-template<>
-inline LLBC_String LLBC_NumToStr(long val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStr(ulong val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
 
 template <>
 inline LLBC_String LLBC_NumToStr(long double val)
@@ -199,56 +200,68 @@ LLBC_String LLBC_NumToStr(T val)
     return LLBC_NumToStr<uint64>(ptrVal);
 }
 
+template<>
 inline LLBC_String LLBC_NumToStrInHex(sint64 val)
 {
     return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);   
 }
 
+template<>
 inline LLBC_String LLBC_NumToStrInHex(uint64 val)
 {
     return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
 }
 
-inline LLBC_String LLBC_NumToStrInHex(sint32 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-inline LLBC_String LLBC_NumToStrInHex(uint32 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-inline LLBC_String LLBC_NumToStrInHex(sint16 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-inline LLBC_String LLBC_NumToStrInHex(uint16 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-inline LLBC_String LLBC_NumToStrInHex(sint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-inline LLBC_String LLBC_NumToStrInHex(uint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
+template<>
 inline LLBC_String LLBC_NumToStrInHex(long val)
 {
     return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
 }
 
+template<>
 inline LLBC_String LLBC_NumToStrInHex(ulong val)
 {
     return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
 }
 
+template<>
+inline LLBC_String LLBC_NumToStrInHex(sint32 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(uint32 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(sint16 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(uint16 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(sint8 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(uint8 val)
+{
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
+}
+
+
+template<>
 inline LLBC_String LLBC_NumToStrInHex(void *val)
 {
     uint64 ptrVal = 0;
