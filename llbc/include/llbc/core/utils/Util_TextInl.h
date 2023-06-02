@@ -271,8 +271,6 @@ inline LLBC_String LLBC_NumToStrInHex(void *val)
 template<>
 inline LLBC_String LLBC_NumToStrInHex(const void *val)
 {
-    uint64 ptrVal = 0;
-    memcpy(&ptrVal, &val, sizeof(uint64));
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex<uint64>(ptrVal);
+    return LLBC_NumToStrInHex(const_cast<void *>(val));
 }
 __LLBC_NS_END
