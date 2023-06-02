@@ -260,9 +260,16 @@ inline LLBC_String LLBC_NumToStrInHex(uint8 val)
     return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
 }
 
-
 template<>
 inline LLBC_String LLBC_NumToStrInHex(void *val)
+{
+    uint64 ptrVal = 0;
+    memcpy(&ptrVal, &val, sizeof(uint64));
+    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex<uint64>(ptrVal);
+}
+
+template<>
+inline LLBC_String LLBC_NumToStrInHex(const void *val)
 {
     uint64 ptrVal = 0;
     memcpy(&ptrVal, &val, sizeof(uint64));
