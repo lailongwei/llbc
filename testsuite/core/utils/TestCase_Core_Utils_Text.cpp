@@ -122,8 +122,8 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
             intPtr, LLBC_NumToStrInHex(static_cast<void*>(intPtr)).c_str());
 
         sint64 voidPtrAddr = 0xfffffffe;
-        void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
-        LLBC_PrintLn("LLBC_Num2Str<void *>()[%p] -> string: %s",
+        const void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
+        LLBC_PrintLn("LLBC_Num2Str<const void *>()[%p] -> string: %s",
             voidPtr, LLBC_NumToStrInHex(voidPtr).c_str());
     }
 
