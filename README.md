@@ -3,7 +3,7 @@
 llbc开发过程中，使用了以下JetBrains产品：
 * <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.png" alt="ReSharper logo." style="width:18%;height:18%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharperCPP.png" alt="ReSharper C++ logo." style="width:20%;height:20%" /> <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.png" alt="PyCharm logo." style="width:15%;height:15%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/CLion.png" alt="CLion logo." style="width:15%;height:15%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/Space.png" alt="Space logo." style="width:15%;height:15%" />
 
-> 如果你也是一名开源软件的开发者，可尝试申请JetBrains的[开源软件开发许可](https://www.jetbrains.com/shop/eform/opensource)
+> 如果你也是一名开源软件的开发者，可尝试申请JetBrains的[开源软件开发许可](https://www.jetbrains.com/shop/eform/opensource)。
 
 ## 简述
 llbc为一个精简、功能完整、跨平台、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
