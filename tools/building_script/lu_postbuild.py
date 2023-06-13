@@ -20,10 +20,10 @@ def main():
     else:
         target = op.join(target_path, 'llbc_debug.lua')
 
-    print 'Copy [{0}] to [{1}]...'.format(src, target)
+    print('Copy [{0}] to [{1}]...'.format(src, target))
     shutil.move(src, target)
 
-    print 'Done!'
+    print('Done!')
 
 if __name__ == '__main__':
     main()

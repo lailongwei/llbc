@@ -60,7 +60,7 @@ class PyNativeMethodCollector(BaseNativeMethodCollector):
 
         first_data = True
         ctor = CppFun(cls_name, rtn='', visit=CppVisit(CppVisit.PUBLIC))
-        for meth_name, meth in methods.iteritems():
+        for meth_name, meth in methods.items():
             ctor.addstmt('{0}.ml_name = {1};'.format(meth_name, meth['name']))
             ctor.addstmt('{0}.ml_meth = {1};'.format(meth_name, meth['meth']))
             ctor.addstmt('{0}.ml_flags = {1};'.format(meth_name, meth['flags']))

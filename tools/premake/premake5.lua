@@ -37,11 +37,6 @@ else
     local output = os_capture("python --version")
     if output:find("command not found") then
         error("python command not found")
-    elseif output:find("Python 3") then
-        if os_capture("which python2"):len() == 0 then
-            error("Python3 is not yet supported, please install python2 and make sure python2 can be use")
-        end
-        PY = "python2"
     else
         PY = "python"
     end
@@ -819,6 +814,7 @@ project "lullbc"
         LLBC_OUTPUT_DIR,
         LUALIB_LIB_DIR,
     }
+
     filter { "configurations:debug*", "system:windows" }
         links {
             "libllbc_debug",
@@ -828,7 +824,6 @@ project "lullbc"
     filter { "configurations:debug*", "system:not windows" }
         links {
             "llbc_debug",
-            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua_debug",
         }
     filter {}
     filter { "configurations:release*", "system:windows" }
@@ -840,7 +835,6 @@ project "lullbc"
     filter { "configurations:release*", "system:not windows" }
         links {
             "llbc",
-            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua",
         }
     filter {}
 

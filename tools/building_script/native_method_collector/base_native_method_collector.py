@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-基础native方法收集器，完成c/c++native方法收集，并整合到对应的脚本语言中
+基础native方法收集器, 完成c/c++native方法收集, 并整合到对应的脚本语言中
 """
 
 import re
@@ -34,7 +34,7 @@ class BaseNativeMethodCollector(object):
 
     def _buildable(self):
         if not op.exists(self.search_path):
-            print 'Path [{0}] not found, skip build methods...'.format(self.search_path)
+            print('Path [{0}] not found, skip build methods...'.format(self.search_path))
             return False
 
         return True

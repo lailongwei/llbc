@@ -3,8 +3,7 @@
 CPP函数定义,用于生成函数.
 """
 
-
-from cppvisitattr import CppVisit
+from .cppvisitattr import CppVisit
 
 
 class CppFun(object):
@@ -42,7 +41,7 @@ class CppFun(object):
         function += '('
         if isinstance(self.__args, (list, tuple)):
             argslen = len(self.__args)
-            for argidx in xrange(0, argslen):
+            for argidx in range(0, argslen):
                 if argidx != 0:
                     function += ', '
                 function += self.__args[argidx]

@@ -3,8 +3,7 @@
 CPP数据结构定义
 """
 
-
-from cppvisitattr import CppVisit
+from .cppvisitattr import CppVisit
 
 
 class CppData(object):

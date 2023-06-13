@@ -2,10 +2,11 @@
 """
 lullbc专用native方法收集器, 完成c/c++native方法收集, 并整合到对应的脚本语言中
 """
+
+import re
 import os
 from os import path as op
 
-import re
 
 from c import Cfg
 from cpputils import *
@@ -62,7 +63,7 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
                 return '\n    {{"{0}", {1}}},'.format(meth['lua_name'], meth['name'])
 
         luareg = 'static luaL_Reg lullbc_NativeMethods[] = {'
-        for meth in methods.itervalues():
+        for meth in methods.values():
             luareg += _build_luareg(meth)
         luareg += _build_luareg(None)
         luareg += '\n}'
@@ -76,7 +77,7 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
         meths = {}
         with open(fpath, 'r') as f:
             lines = f.readlines()
-            for idx in xrange(len(lines)):
+            for idx in range(len(lines)):
                 line = lines[idx]
                 m = self._meth_re.match(line)
                 if not m:
