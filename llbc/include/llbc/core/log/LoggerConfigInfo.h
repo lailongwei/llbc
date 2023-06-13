@@ -227,7 +227,6 @@ private:
     LLBC_String _loggerName;
     bool _notConfigUseRoot;
 
-    int _logLevel;
     bool _asyncMode;
     bool _independentThread;
     int _flushInterval;

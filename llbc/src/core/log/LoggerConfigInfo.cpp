@@ -46,7 +46,6 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 : _loggerName()
 , _notConfigUseRoot(false)
 
-, _logLevel(LLBC_LogLevel::End)
 , _asyncMode(false)
 , _independentThread(false)
 , _flushInterval(0)
@@ -96,18 +95,6 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         notCfgUseOpt = LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE;
     _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root" && rootCfg;
 
-    // Common log configs.
-    bool hasLogLevelCfg;
-    if (cfg.HasProperty("level"))
-    {
-        hasLogLevelCfg = true;
-        _logLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str());
-    }
-    else
-    {
-        hasLogLevelCfg = false;
-        _logLevel = _notConfigUseRoot ? rootCfg->_logLevel : LLBC_CFG_LOG_DEFAULT_LEVEL;
-    }
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
@@ -126,10 +113,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     {
         if (cfg.HasProperty("consoleLogLevel"))
             _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsStr().c_str());
-        else if (hasLogLevelCfg)
-            _consoleLogLevel = _logLevel;
         else
-            _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : _logLevel;
+            _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
         if (cfg.HasProperty("consolePattern"))
             _consolePattern = cfg.GetValue("consolePattern").AsStr().c_str();
@@ -147,10 +132,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         // File log level.
         if (cfg.HasProperty("fileLogLevel"))
             _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
-        else if (hasLogLevelCfg)
-            _fileLogLevel = _logLevel;
         else
-            _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : _logLevel;
+            _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
         // Log dir.
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
@@ -225,13 +208,6 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             "takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsLooseBool);
 
     // Check configs.
-    if (!LLBC_LogLevel::IsLegal(_logLevel))
-        _logLevel = LLBC_CFG_LOG_DEFAULT_LEVEL;
-    if (!LLBC_LogLevel::IsLegal(_consoleLogLevel))
-        _consoleLogLevel = _logLevel;
-    if (!LLBC_LogLevel::IsLegal(_fileLogLevel))
-        _fileLogLevel = _logLevel;
-
     _maxFileSize = MAX(1024, _maxFileSize);
     _maxBackupIndex = MAX(0, _maxBackupIndex);
     _flushInterval = MIN(MAX(0, _flushInterval), LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);

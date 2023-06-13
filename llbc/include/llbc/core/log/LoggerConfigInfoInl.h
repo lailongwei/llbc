@@ -35,7 +35,7 @@ inline bool LLBC_LoggerConfigInfo::IsNotConfigUseRoot() const
 
 inline int LLBC_LoggerConfigInfo::GetLogLevel() const
 {
-    return _logLevel;
+    return MIN(_consoleLogLevel, _fileLogLevel);
 }
 
 inline bool LLBC_LoggerConfigInfo::IsAsyncMode() const
