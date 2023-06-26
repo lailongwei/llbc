@@ -40,8 +40,8 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  127
 // Determine max cpature frames count when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
-// Determine hook crash single set.
-#define LLBC_CFG_OS_HOOK_CRASH_SINGLES                      {SIGSEGV, SIGABRT, SIGFPE}
+// Determine crash signal set.
+#define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE}
 
 /**
  * \brief Common about config options define.
