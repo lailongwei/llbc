@@ -821,18 +821,31 @@ project "lullbc"
             (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua_debug",
         }
     filter {}
-    filter { "configurations:debug*", "system:not windows" }
+    filter { "configurations:debug*", "system:linux" }
+        links {
+            "llbc_debug",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua_debug",
+        }
+    filter {}
+    filter { "configurations:debug*", "system:macosx" }
         links {
             "llbc_debug",
         }
     filter {}
+
     filter { "configurations:release*", "system:windows" }
         links {
             "libllbc",
             (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "liblua",
         }
     filter {}
-    filter { "configurations:release*", "system:not windows" }
+    filter { "configurations:release*", "system:linux" }
+        links {
+            "llbc",
+            (LUALIB_SETTING.lua_path[3] ~= nil and LUALIB_SETTING.lua_path[3] ~= "") and LUALIB_SETTING.lua_path[3] or "lua",
+        }
+    filter {}
+    filter { "configurations:release*", "system:macosx" }
         links {
             "llbc",
         }
