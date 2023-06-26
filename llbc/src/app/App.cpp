@@ -218,8 +218,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     // Load config.
     LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
-    // Hook process crash.
-    if (LLBC_HookProcessCrash() != LLBC_OK)
+    // Handle progress crash.
+    if (LLBC_HandleCrash() != LLBC_OK)
         return LLBC_FAILED;
 
     // Install required signal handlers.

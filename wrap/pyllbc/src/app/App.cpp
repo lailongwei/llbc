@@ -45,5 +45,5 @@ void pyllbc_AddAppObjs()
 
     // Add inl module methods.
     pyllbc_AppMethods &methods = *pyllbc_s_AppMethods;
-    inlMod->AddMethod(methods.SetDumpFile);
+    inlMod->AddMethod(methods.HandleCrash);
 }

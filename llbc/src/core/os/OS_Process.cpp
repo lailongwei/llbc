@@ -24,7 +24,7 @@
 
 #include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
-#if LLBC_SUPPORT_HOOK_PROCESS_CRASH
+#if LLBC_SUPPORT_HANDLE_CRASH
 #include "llbc/core/file/Directory.h"
 #endif
 #include "llbc/core/log/LoggerMgr.h"
@@ -47,10 +47,10 @@ int LLBC_GetCurrentProcessId()
 
 __LLBC_NS_END
 
-#if LLBC_SUPPORT_HOOK_PROCESS_CRASH
+#if LLBC_SUPPORT_HANDLE_CRASH
 __LLBC_INTERNAL_NS_BEGIN
 
-static bool __hookedCrash = false;
+static bool __hookedCrashSignals = false;
 static char __stackBacktrace[128 * 1024 + 1] {'\0'};
 static LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)> __crashCallback = nullptr;
 
@@ -252,7 +252,7 @@ static char __corePattern[PATH_MAX + 1];
 static char __coreDescFilePath[PATH_MAX + 1];
 static char __shellCmd[PATH_MAX * 2 + 256 + 1];
 static void *__frames[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES] {nullptr};
-static int __catchSignals[] LLBC_CFG_OS_HOOK_CRASH_SINGLES;
+static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
@@ -275,7 +275,7 @@ static void __NonWin32CrashHandler(int sig)
 
     ssize_t readRet = read(corePatternFd, __corePattern, sizeof(__corePattern) - 1);
     LLBC_DoIf(readRet == -1, close(corePatternFd); raise(sig));
-    
+   
     close(corePatternFd);
     __corePattern[readRet >= 0 ? readRet : 0] = '\0';
 
@@ -362,11 +362,11 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
-                          const LLBC_Delegate<void(const char *stackBacktrace,
-                                                   int sig)> &callback)
+int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
+                     const LLBC_Delegate<void(const char *stackBacktrace,
+                                              int sig)> &crashCallback)
 {
-#if LLBC_TARGET_PLATFORM_WIN32    
+#if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String nmlDumpFilePath = dumpFilePath;
     if (nmlDumpFilePath.empty())
     {
@@ -386,18 +386,18 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
     LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
-    if (!LLBC_INL_NS __hookedCrash)
+    if (!LLBC_INL_NS __hookedCrashSignals)
     {
         ::SetUnhandledExceptionFilter(LLBC_INL_NS __Win32CrashHandler);
         #ifdef LLBC_RELEASE
         LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
         #endif
 
-        LLBC_INL_NS __hookedCrash = true;
+        LLBC_INL_NS __hookedCrashSignals = true;
     }
 
     // Set crash callback.
-    LLBC_INL_NS __crashCallback = callback;
+    LLBC_INL_NS __crashCallback = crashCallback;
 
     return LLBC_OK;
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
@@ -428,7 +428,7 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
     }
 
     // Set signals handler.
-    if (!LLBC_INL_NS __hookedCrash)
+    if (!LLBC_INL_NS __hookedCrashSignals)
     {
         // Set signals handler.
         sigset_t ss;
@@ -445,11 +445,11 @@ int LLBC_HookProcessCrash(const LLBC_String &dumpFilePath,
         // Make signals unblock.
         sigprocmask(SIG_UNBLOCK, &ss, nullptr);
 
-        LLBC_INL_NS __hookedCrash = true;
+        LLBC_INL_NS __hookedCrashSignals = true;
     }
 
     // Set crash callback.
-    LLBC_INL_NS __crashCallback = callback;
+    LLBC_INL_NS __crashCallback = crashCallback;
 
     return LLBC_OK;
 #else // Unsupported platforms

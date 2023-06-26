@@ -12,8 +12,7 @@ from communication import *
 def main():
     # set dump file first.
     import llbc
-    if sys.platform == 'win32':
-        llbc.inl.SetDumpFile('pyllbc_testsuite_dumpfile')
+    llbc.inl.HandleCrash('pyllbc_testsuite_dumpfile')
 
     # #### common part.
     LLBCInfoTest()()
