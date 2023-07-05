@@ -75,7 +75,7 @@ void LLBC_TimerScheduler::Update()
 
     LLBC_TimerData *data;
     sint64 now = LLBC_GetMilliSeconds();
-    while (_heap.FindTop(data) == LLBC_OK)
+    while (_heap.Top(data) == LLBC_OK)
     {
         if (now < data->handle)
             break;

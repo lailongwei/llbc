@@ -56,7 +56,14 @@ inline bool LLBC_BinaryHeap<T, Comp>::IsEmpty() const
 }
 
 template <typename T, typename Comp>
-int LLBC_BinaryHeap<T, Comp>::FindTop(T &elem) const
+const T &LLBC_BinaryHeap<T, Comp>::Top() const
+{
+    ASSERT(LIKELY(_size != 0) && "BinaryHeap is empty");
+    return _elems[1];
+}
+
+template <typename T, typename Comp>
+int LLBC_BinaryHeap<T, Comp>::Top(T &elem) const
 {
     if (this->IsEmpty())
     {
@@ -153,7 +160,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(const T &elem)
 {
     for (size_t i = 1; i <= _size; ++i)
     {
-        if (_elems[i] == elem)
+        if (!_comp(_elems[i], elem) && !_comp(elem, _elems[i]))
             return this->DeleteElem(i);
     }
 

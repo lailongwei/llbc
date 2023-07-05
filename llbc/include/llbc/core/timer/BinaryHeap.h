@@ -50,11 +50,17 @@ public:
     bool IsEmpty() const;
 
     /**
-     * Find top element.
-     * @param[out] elem - top element.
-     * @return int - return 0 if found, otherwise return -1.
+     * Get top element, if is empty, wlll raise abort signal.
+     * @return const T & - the top element reference.
      */
-    int FindTop(T &elem) const;
+    const T &Top() const;
+
+    /**
+     * Get top element.
+     * @param[out] elem - top element.
+     * @return int - return 0 not empty, otherwise return -1.
+     */
+    int Top(T &elem) const;
 
     /**
      * Insert element.
