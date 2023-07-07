@@ -276,39 +276,46 @@ public:
     template <int Fmt1Size>
     static void Output(const char *fileName, int lineNo, const char *funcName, int logLv,
                        const char (&fmt1)[Fmt1Size], const char *cond, const char *behav,
-                       const char *fmt2, ...) LLBC_STRING_FORMAT_CHECK(8, 9)
-    {
-        va_list ap;
-        va_start(ap, fmt2);
-        
-        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-        
-        // Format format 1 and format 2.
-        size_t fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
-                  sizeof libTls->coreTls.loggerFmtBuf,
-                  fmt1, cond, behav);
-        size_t fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                  sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
-                  fmt2, ap);
+                       const char *fmt2, ...) LLBC_STRING_FORMAT_CHECK(8, 9);
 
-        auto* loggerMgr = LLBC_LoggerMgrSingleton;
-        if (LIKELY(loggerMgr->IsInited()))
-        {
-            LLBC_Logger *logger = loggerMgr->GetRootLogger();
-            LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
-
-            logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
-                libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
-        }
-        else
-        {
-            loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
-                libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
-        }
-
-        va_end(ap);
-    }
 };
+
+template<int ARG_COUNT> template<int Fmt1Size>
+void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int lineNo, const char *funcName,
+                                                    int logLv, const char (&fmt1)[Fmt1Size], const char *cond,
+                                                    const char *behav, const char *fmt2, ...)
+{
+
+  va_list ap;
+  va_start(ap, fmt2);
+
+  __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+
+  // Format format 1 and format 2.
+  size_t fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
+                            sizeof libTls->coreTls.loggerFmtBuf,
+                            fmt1, cond, behav);
+  size_t fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                             sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
+                             fmt2, ap);
+
+  auto* loggerMgr = LLBC_LoggerMgrSingleton;
+  if (LIKELY(loggerMgr->IsInited()))
+  {
+    LLBC_Logger *logger = loggerMgr->GetRootLogger();
+    LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
+
+    logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
+                            libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+  }
+  else
+  {
+    loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
+                                     libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+  }
+
+  va_end(ap);
+}
 
 template<>
 class __LLBC_ConditionLogOperator<0>
@@ -330,7 +337,6 @@ public:
         }
     }
 };
-
 
 
 /**
