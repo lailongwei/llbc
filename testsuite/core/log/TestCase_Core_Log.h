@@ -36,6 +36,6 @@ public:
 private:
     void DoJsonLogTest();
     void DoUninitLogTest();
-
+    void DoConditionMacroLogTest();
     void OnLogHook(const LLBC_LogData *logData);
 };

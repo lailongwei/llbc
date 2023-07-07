@@ -67,6 +67,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Uninstall logger hook(from root logger).
     rootLogger->UninstallHook(LLBC_LogLevel::Debug);
 
+    // Test condition macro log
+    DoConditionMacroLogTest();
+    
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LSLOG_DEBUG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
         <<", sint16: " <<(sint16)-16 << ", uint16: " <<(uint16)16 <<", sint32: " <<-32
@@ -295,6 +298,32 @@ void TestCase_Core_Log::DoUninitLogTest()
     LJLOG_DEBUG().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
+
+void TestCase_Core_Log::DoConditionMacroLogTest()
+{
+    LLBC_LogAndDoIf(true, Error, {});
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purly text");
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+    for(int i = 0; i < 4; i++) {
+        LLBC_LogAndContinueIf(i == 0, Error);
+        LLBC_LogAndContinueIf(i == 1, Error, "DoConditionMacroLogTest DoContinueIf: Purly text");
+        LLBC_LogAndContinueIf(i == 2, Error, "DoConditionMacroLogTest DoContinueIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+    }
+    for(;;) {
+        LLBC_LogAndBreakIf(true, Error);
+    }
+    for(;;) {
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: Purly text");
+    }
+    for(;;) {
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+    }
+
+    [](){ LLBC_LogAndReturnIf(true, Error, void()); }();
+    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: Purly text"); }();
+    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: int:%d, float:%f, string:%s", 1, 3.14, "hello world"); }();
+}
+
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {

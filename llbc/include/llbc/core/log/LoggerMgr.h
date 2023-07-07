@@ -23,6 +23,7 @@
 
 #include "llbc/core/singleton/Singleton.h"
 #include "llbc/core/thread/DummyLock.h"
+#include "llbc/core/log/Logger.h"
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
 #include "llbc/core/log/LogMessageBuffer.h"
@@ -100,6 +101,25 @@ public:
                       const char *func,
                       const char *fmt,
                       ...) LLBC_STRING_FORMAT_CHECK(7, 8);
+
+    /**
+     * Uninit non format output.
+     * @param[in] logLv  - the log level.
+     * @param[in] tag    - the log tag.
+     * @param[in] file  - the log file.
+     * @param[in] line  - the log file line number.
+     * @param[in] func  - the log function.
+     * @param[in] msg    - the log message.
+     * @param[in] msgLen - the log message length.
+     */
+    void UnInitNonFormatOutput(int logLv,
+                               const char *tag,
+                               const char *file,
+                               int line,
+                               const char *func,
+                               const char *msg,
+                               size_t msgLen);    
+                               
 
 private:
     mutable LLBC_DummyLock _lock;
@@ -244,6 +264,119 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_LoggerMgr>;
 #define LJLOG_FATAL2(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Fatal)
 #define LJLOG_FATAL3(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Fatal)
 #define LJLOG_FATAL4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Fatal)
+
+
+/**
+ * Log operator for condition judge helper macros.
+ */
+template<int>
+class __LLBC_ConditionLogOperator
+{
+public:
+    template <int Fmt1Size>
+    static void Output(const char *fileName, int lineNo, const char *funcName, int logLv,
+                       const char (&fmt1)[Fmt1Size], const char *cond, const char *behav,
+                       const char *fmt2, ...) LLBC_STRING_FORMAT_CHECK(8, 9)
+    {
+        va_list ap;
+        va_start(ap, fmt2);
+        
+        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+        
+        // Format format 1 and format 2.
+        size_t fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
+                  sizeof libTls->coreTls.loggerFmtBuf,
+                  fmt1, cond, behav);
+        size_t fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                  sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
+                  fmt2, ap);
+
+        auto* loggerMgr = LLBC_LoggerMgrSingleton;
+        if (LIKELY(loggerMgr->IsInited()))
+        {
+            LLBC_Logger *logger = loggerMgr->GetRootLogger();
+            LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
+
+            logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
+                libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+        }
+        else
+        {
+            loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
+                libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+        }
+
+        va_end(ap);
+    }
+};
+
+template<>
+class __LLBC_ConditionLogOperator<0>
+{
+public:
+    static void Output(const char *fileName, int lineNo, const char *funcName, int logLv, const char *fmt,
+                       const char *cond, const char *behav)
+    {
+        auto *loggerMgr = LLBC_LoggerMgrSingleton;     
+        if (LIKELY(loggerMgr->IsInited()))
+        {
+            LLBC_Logger *logger = loggerMgr->GetRootLogger();   
+            if (logger->GetLogLevel() <= logLv)
+                logger->Output(logLv, nullptr, fileName, lineNo, funcName, fmt, cond, behav);
+        }
+        else
+        {
+            loggerMgr->UnInitOutput(logLv, nullptr, fileName, lineNo, funcName, fmt, cond, behav);
+        }
+    }
+};
+
+
+
+/**
+ * Some condition judge helper with log print macros.
+ */
+#define LLBC_LogAndDoIf(cond, logLv, behav, ...)                                                                \
+    do {                                                                                                        \
+        if (cond) {                                                                                             \
+            __LLBC_ConditionLogOperator<GET_ARG_COUNT(##__VA_ARGS__)>::Output(                                  \
+                __FILE__, __LINE__, __FUNCTION__,                                                               \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                            \
+                    #cond, #behav, ##__VA_ARGS__);                                                              \
+            behav;                                                                                              \
+        }                                                                                                       \
+    } while(false)
+
+#define LLBC_LogAndContinueIf(cond, logLv, ...)                                                                 \
+    do {                                                                                                        \
+        if (cond) {                                                                                             \
+            __LLBC_ConditionLogOperator<GET_ARG_COUNT(##__VA_ARGS__)>::Output(                                  \
+                __FILE__, __LINE__, __FUNCTION__,                                                               \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<\"%s\"> is true. %s",                           \
+                    #cond, "", ##__VA_ARGS__);                                                                  \
+            continue;                                                                                           \
+        }                                                                                                       \
+    } while(false)
+
+#define LLBC_LogAndReturnIf(cond, logLv, ret, ...)                                                              \
+    do {                                                                                                        \
+        if (cond) {                                                                                             \
+            __LLBC_ConditionLogOperator<GET_ARG_COUNT(##__VA_ARGS__)>::Output(                                  \
+                __FILE__, __LINE__, __FUNCTION__,                                                               \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                    \
+                    #cond, #ret, ##__VA_ARGS__);                                                                \
+            return ret;                                                                                         \
+        }                                                                                                       \
+    } while(false) 
+
+#define LLBC_LogAndBreakIf(cond, logLv, ...)                                                                    \
+    if (cond) {                                                                                             \
+        __LLBC_ConditionLogOperator<GET_ARG_COUNT(##__VA_ARGS__)>::Output(                                  \
+        __FILE__, __LINE__, __FUNCTION__,                                                                   \
+            LLBC_NS LLBC_LogLevel::logLv, "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                        \
+                #cond, "", ##__VA_ARGS__);                                                                  \
+        break;                                                                                              \
+    }                                                                                                       \
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
 /**
