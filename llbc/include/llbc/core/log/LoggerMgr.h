@@ -286,35 +286,36 @@ void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int li
                                                     const char *behav, const char *fmt2, ...)
 {
 
-  va_list ap;
-  va_start(ap, fmt2);
+    va_list ap;
+    va_start(ap, fmt2);
 
-  __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
 
-  // Format format 1 and format 2.
-  size_t fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
-                            sizeof libTls->coreTls.loggerFmtBuf,
-                            fmt1, cond, behav);
-  size_t fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                             sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
-                             fmt2, ap);
+    // Format format 1 and format 2.
+    int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
+                                sizeof libTls->coreTls.loggerFmtBuf,
+                                fmt1, cond, behav);
+    int fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                                sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
+                                fmt2, ap);
+    va_end(ap);
+    
+    LLBC_ReturnIf(fmt2Len <= 0, void());
+    
+    auto* loggerMgr = LLBC_LoggerMgrSingleton;
+    if (LIKELY(loggerMgr->IsInited()))
+    {
+        LLBC_Logger *logger = loggerMgr->GetRootLogger();
+        LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
 
-  auto* loggerMgr = LLBC_LoggerMgrSingleton;
-  if (LIKELY(loggerMgr->IsInited()))
-  {
-    LLBC_Logger *logger = loggerMgr->GetRootLogger();
-    LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
-
-    logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
-                            libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
-  }
-  else
-  {
-    loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
-                                     libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
-  }
-
-  va_end(ap);
+        logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
+                                libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+    }
+    else
+    {
+        loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
+                                        libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+    }
 }
 
 template<>
