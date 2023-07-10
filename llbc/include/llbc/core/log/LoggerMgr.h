@@ -273,16 +273,14 @@ template<int>
 class __LLBC_ConditionLogOperator
 {
 public:
-    template <int Fmt1Size>
     static void Output(const char *fileName, int lineNo, const char *funcName, int logLv,
-                       const char (&fmt1)[Fmt1Size], const char *cond, const char *behav,
+                       const char *fmt1, const char *cond, const char *behav,
                        const char *fmt2, ...) LLBC_STRING_FORMAT_CHECK(8, 9);
-
 };
 
-template<int ARG_COUNT> template<int Fmt1Size>
+template<int ARG_COUNT>
 void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int lineNo, const char *funcName,
-                                                    int logLv, const char (&fmt1)[Fmt1Size], const char *cond,
+                                                    int logLv, const char *fmt1, const char *cond,
                                                     const char *behav, const char *fmt2, ...)
 {
 
