@@ -273,4 +273,43 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
     fflush(to);
 }
 
+void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
+                                           const char* tag,
+                                           const char* file,
+                                           int line,
+                                           const char* func,
+                                           const char* msg,
+                                           size_t msgLen)
+{
+    FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
+    const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
+
+    if (file)
+    {
+#if LLBC_TARGET_PLATFORM_WIN32
+    const char *fileBaseName = strrchr(file, LLBC_BACKLASH_A);
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_SLASH_A));
+    LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+#else
+    const char *fileBaseName = strrchr(file, LLBC_SLASH_A);
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_BACKLASH_A));
+    LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+#endif
+    }
+
+    const auto now = LLBC_Time::Now();
+    LLBC_FilePrint(to,
+                   "[Log]%s [%-5s][%s:%d %s]<%s> - ",
+                   now.ToString().c_str(),
+                   lvDesc.c_str(),
+                   file ? file : "",
+                   line,
+                   func ? func : "",
+                   tag ? tag : "");
+
+    fwrite(msg, 1, msgLen, to);
+
+    fflush(to);
+}
+
 __LLBC_NS_END

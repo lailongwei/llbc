@@ -259,7 +259,7 @@ private:                                    \
             free(memblock);         \
             (memblock) = nullptr;   \
         }                           \
-    } while(0)                      \
+    } while(false)                  \
 
 #define LLBC_XDelete(objptr)        \
     do {                            \
@@ -275,7 +275,7 @@ private:                                    \
             delete[] (objsptr);     \
             objsptr = nullptr;      \
         }                           \
-    } while(0)                      \
+    } while(false)                  \
 
 #define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
 #define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
@@ -325,7 +325,7 @@ private:                                    \
                                                                     \
         len = static_cast<std::remove_reference<decltype(len)>::type>(___llbc_macro_inl_argfmt_vsnp_len); \
         buf[len] = '\0';                                            \
-    } while(0)                                                      \
+    } while(false)                                                  \
 
 /**
  * RTTI support.
@@ -366,46 +366,22 @@ private:                                    \
  * Some condition judge helper macros.
  */
 #define LLBC_Foreach(cont, behav)                             \
-    for (auto &item : cont) { behav; }                        \
+    do{ for (auto &item : cont) { behav; } } while(false)     \
 
 #define LLBC_DoIf(cond, behav)                                \
-    if (cond) { behav; }                                      \
-
-#define LLBC_LogAndDoIf(cond, logLv, behav)                   \
-    if (cond) {                                               \
-        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<" #cond "> is true, do:%s", #behav); \
-        behav;                                                \
-    }                                                         \
+    do{ if (cond) { behav; } } while(false)                   \
 
 #define LLBC_ContinueIf(cond)                                 \
     if (cond) continue                                        \
 
-#define LLBC_LogAndContinueIf(cond, logLv)                    \
-    if (cond) {                                               \
-        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<" #cond "> is true"); \
-        continue;                                             \
-    }                                                         \
-
 #define LLBC_BreakIf(cond)                                    \
     if (cond) break                                           \
-
-#define LLBC_LogAndBreakIf(cond, logLv)                       \
-    if (cond) {                                               \
-        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_BreakIf:<" #cond "> is true"); \
-        break;                                                \
-    }                                                         \
 
 #define LLBC_SetErrAndBreakIf(cond, err)                      \
     if (cond) { LLBC_NS LLBC_SetLastError(err); break; }      \
 
 #define LLBC_ReturnIf(cond, ret)                              \
-    if (cond) { return ret; }                                 \
-
-#define LLBC_LogAndReturnIf(cond, logLv, ret)                 \
-    if (cond) {                                               \
-        LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<" #cond "> is true"); \
-        return ret;                                           \
-    }                                                         \
+    do{ if (cond) { return ret; } } while(false)              \
 
 #define LLBC_SetErrAndReturnIf(cond, err, ret)                \
     if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
