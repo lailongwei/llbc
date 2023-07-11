@@ -291,11 +291,11 @@ void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int li
 
     // Format format 1 and format 2.
     int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
-                                sizeof libTls->coreTls.loggerFmtBuf,
-                                fmt1, cond, behav);
+                           sizeof libTls->coreTls.loggerFmtBuf,
+                           fmt1, cond, behav);
     int fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                                sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
-                                fmt2, ap);
+                            sizeof libTls->coreTls.loggerFmtBuf - fmt1Len,
+                            fmt2, ap);
     va_end(ap);
     
     LLBC_ReturnIf(fmt2Len <= 0, void());
@@ -312,7 +312,7 @@ void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int li
     else
     {
         loggerMgr->UnInitNonFormatOutput(logLv, nullptr, fileName, lineNo, funcName,
-                                        libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
+                                         libTls->coreTls.loggerFmtBuf, fmt1Len + fmt2Len);
     }
 }
 
@@ -347,7 +347,7 @@ public:
             __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(\
                 __FILE__, __LINE__, __FUNCTION__,                                                               \
                 LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                            \
-                    #cond, #behav, ##__VA_ARGS__);                                                              \
+                #cond, #behav, ##__VA_ARGS__);                                                              \
             behav;                                                                                              \
         }                                                                                                       \
     } while(false)
@@ -358,7 +358,7 @@ public:
             __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(\
                 __FILE__, __LINE__, __FUNCTION__,                                                               \
                 LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<\"%s\"> is true. %s",                           \
-                    #cond, "", ##__VA_ARGS__);                                                                  \
+                #cond, "", ##__VA_ARGS__);                                                                  \
             continue;                                                                                           \
         }                                                                                                       \
     } while(false)
@@ -369,7 +369,7 @@ public:
             __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(\
                 __FILE__, __LINE__, __FUNCTION__,                                                               \
                 LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                    \
-                    #cond, #ret, ##__VA_ARGS__);                                                                \
+                #cond, #ret, ##__VA_ARGS__);                                                                \
             return ret;                                                                                         \
         }                                                                                                       \
     } while(false) 
@@ -377,9 +377,9 @@ public:
 #define LLBC_LogAndBreakIf(cond, logLv, ...)                                                                    \
     if (cond) {                                                                                                 \
         __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(    \
-        __FILE__, __LINE__, __FUNCTION__,                                                                       \
+            __FILE__, __LINE__, __FUNCTION__,                                                                       \
             LLBC_NS LLBC_LogLevel::logLv, "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                            \
-                #cond, "", ##__VA_ARGS__);                                                                      \
+            #cond, "", ##__VA_ARGS__);                                                                      \
         break;                                                                                                  \
     }                                                                                                           \
 
