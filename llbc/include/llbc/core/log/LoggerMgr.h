@@ -292,9 +292,9 @@ void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int li
 
     va_list ap;
     va_start(ap, fmt2);
-    const int fmtLen = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                                 sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
-                                 fmt2, ap);
+    int fmtLen = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                           sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
+                           fmt2, ap);
     va_end(ap);
     LLBC_ReturnIf(UNLIKELY(fmtLen < 0), void());
 
