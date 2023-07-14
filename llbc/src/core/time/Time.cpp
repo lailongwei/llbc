@@ -194,6 +194,26 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
     return LLBC_TimeSpan(localTime % NumOfMicroSecondsPerDay);
 }
 
+LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
+{
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(),
+                                   GetHour(),
+                                   GetMinute(),
+                                   GetSecond(),
+                                   GetMilliSecond(),
+                                   GetMicroSecond());
+}
+
+LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
+{
+    return LLBC_TimeSpan::FromDays(GetDayOfMonth() - 1,
+                                   GetHour(),
+                                   GetMinute(),
+                                   GetSecond(),
+                                   GetMilliSecond(),
+                                   GetMicroSecond());
+}
+
 LLBC_String LLBC_Time::Format(const char *format) const
 {
     char buf[32];
@@ -337,32 +357,53 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
     return LLBC_TimeSpan(spanVal);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(int hour,
-                                       int minute,
-                                       int second,
-                                       int milliSecond,
-                                       int microSecond) const
-{
-    return GetIntervalTo(LLBC_TimeSpan::FromHours(hour,
-                         minute, 
-                         second, 
-                         milliSecond, 
-                         microSecond));
-}
-
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span)
 {
     return from.GetIntervalTo(span);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from,
-                                       int hour,
-                                       int minute,
-                                       int second,
-                                       int milliSecond,
-                                       int microSecond)
+bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
+                             const LLBC_Time &to,
+                             const LLBC_TimeSpan &timeOfDay)
 {
-    return from.GetIntervalTo(hour, minute, second, milliSecond, microSecond);
+    if (UNLIKELY(timeOfDay < LLBC_TimeSpan::zero ||
+        timeOfDay >= LLBC_TimeSpan::oneDay))
+        return false;
+
+    auto diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return false;
+
+    if (diff >= LLBC_TimeSpan::oneDay)
+        return true;
+
+    const LLBC_TimeSpan &fromTimeOfDay = from.GetTimeOfDay();
+    const LLBC_TimeSpan &toTimeOfDay = to.GetTimeOfDay();
+    return (toTimeOfDay >= timeOfDay) &&
+        ((fromTimeOfDay < timeOfDay) ||
+         (fromTimeOfDay > timeOfDay && toTimeOfDay < fromTimeOfDay));
+}
+
+bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
+                              const LLBC_Time &to,
+                              const LLBC_TimeSpan &timeOfWeek)
+{
+    if (UNLIKELY(timeOfWeek < LLBC_TimeSpan::zero ||
+        timeOfWeek >= LLBC_TimeSpan::oneWeek))
+        return false;
+
+    auto diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return false;
+
+    if (diff >= LLBC_TimeSpan::oneWeek)
+        return true;
+
+    const LLBC_TimeSpan &fromTimeOfWeek = from.GetTimeOfWeek();
+    const LLBC_TimeSpan &toTimeOfWeek = to.GetTimeOfWeek();
+    return (toTimeOfWeek >= timeOfWeek) &&
+        ((fromTimeOfWeek < timeOfWeek) ||
+         (fromTimeOfWeek > timeOfWeek && toTimeOfWeek < fromTimeOfWeek));
 }
 
 LLBC_TimeSpan LLBC_Time::operator -(const LLBC_Time &time) const

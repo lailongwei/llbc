@@ -162,6 +162,16 @@ public:
      * @return LLBC_TimeSpan - the current time of day.
      */
     LLBC_TimeSpan GetTimeOfDay() const;
+    /**
+     * Get current time of week.
+     * @return LLBC_TimeSpan - the current time of week.
+     */
+    LLBC_TimeSpan GetTimeOfWeek() const;
+    /**
+     * Get current time of month.
+     * @return LLBC_TimeSpan - the current time of month.
+     */
+    LLBC_TimeSpan GetTimeOfMonth() const;
 
 public:
     /**
@@ -246,26 +256,33 @@ public:
     /**
      * Get remaining seconds to nearest day special monent.
      * @param[in] span        - span value.
-     * @param[in] hour        - hour.
-     * @param[in] minute      - minute.
-     * @param[in] second      - second.
-     * @param[in] milliSecond - milli-second.
-     * @param[in] microSecond - micro-second.
-     * @param[in] from        - from time.
      * @return LLBC_TimeSpan - timespan value.
      */
     LLBC_TimeSpan GetIntervalTo(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan GetIntervalTo(int hour,
-                                int minute,
-                                int second,
-                                int milliSecond = 0,
-                                int microSecond = 0) const;
     static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span);
-    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &from,
-                                       int hour, int minute,
-                                       int second,
-                                       int milliSecond = 0,
-                                       int microSecond = 0);
+
+public:
+    /**
+     * Verify that the given time(to) has been crossed day or not.
+     * @param[in] from - from time.
+     * @param[in] to   - to time.
+     * @param[in] timeOfDay - cross time of day point.
+     * @return bool - return true if crossed day, otherwise return false.
+     */
+    static bool IsCrossedDay(const LLBC_Time &from,
+                             const LLBC_Time &to,
+                             const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
+
+    /**
+     * Verify that the given time(to) has been crossed week or not.
+     * @param[in] from - from time.
+     * @param[in] to   - to time.
+     * @param[in] timeOfDay - cross time of week point.
+     * @return bool - return true if crossed week, otherwise return false.
+     */
+    static bool IsCrossedWeek(const LLBC_Time &from,
+                              const LLBC_Time &to,
+                              const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
 public:
     /**
@@ -307,9 +324,29 @@ public:
     bool DeSerialize(LLBC_Stream &stream);
 
 private:
+    /**
+     * Internal constructor.
+     * @param clanderTimeInMicroSeconds 
+     */
     explicit LLBC_Time(const sint64 &clanderTimeInMicroSeconds);
 
+    /**
+     * Update time structs(local&gmt)
+     */
     void UpdateTimeStructs();
+
+    /**
+     * Verify that the given time(to) has been crossed specific period.
+     * @param[in] from         - from time.
+     * @param[in] to           - to time.
+     * @param[in] period       - the cross period.
+     * @param[in] timeOfPeriod - cross time of period point.
+     * @return bool - return true if crossed specific period, otherwise return false.
+     */
+    bool IsCrossedPeriod(const LLBC_Time &from,
+                         const LLBC_Time &to,
+                         const LLBC_TimeSpan &period,
+                         const LLBC_TimeSpan &timeOfPeriod);
 
 private:
     sint64 _time;

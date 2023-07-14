@@ -67,10 +67,12 @@ public:
     static const LLBC_TimeSpan oneMin;
     static const LLBC_TimeSpan oneHour;
     static const LLBC_TimeSpan oneDay;
+    static const LLBC_TimeSpan oneWeek;
     static const LLBC_TimeSpan negOneSec;
     static const LLBC_TimeSpan negOneMin;
     static const LLBC_TimeSpan negOneHour;
     static const LLBC_TimeSpan negOneDay;
+    static const LLBC_TimeSpan negOneWeek;
 
 public:
     /**

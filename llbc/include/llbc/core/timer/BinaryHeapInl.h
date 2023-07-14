@@ -195,7 +195,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(size_t index, T &elem)
 }
 
 template <typename T, typename Comp>
-void LLBC_BinaryHeap<T, Comp>::MakeEmpty()
+void LLBC_BinaryHeap<T, Comp>::Clear()
 {
     _size = 0;
     _elems.resize(1);
@@ -217,7 +217,7 @@ template <typename T, typename Comp>
 typename LLBC_BinaryHeap<T, Comp>::_This &LLBC_BinaryHeap<
     T, Comp>::operator =(const typename LLBC_BinaryHeap<T, Comp>::_This &right)
 {
-    this->MakeEmpty();
+    this->Clear();
 
     this->_size = right._size;
     this->_elems.assign(right.begin(), right.end());

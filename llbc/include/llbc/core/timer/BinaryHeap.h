@@ -102,9 +102,9 @@ public:
     int DeleteElem(size_t index, T &elem);
 
     /**
-     * Cleanup heap.
+     * Clear heap.
      */
-    void MakeEmpty();
+    void Clear();
 
     /**
      * Get heap size.
