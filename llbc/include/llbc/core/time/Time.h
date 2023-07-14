@@ -335,19 +335,6 @@ private:
      */
     void UpdateTimeStructs();
 
-    /**
-     * Verify that the given time(to) has been crossed specific period.
-     * @param[in] from         - from time.
-     * @param[in] to           - to time.
-     * @param[in] period       - the cross period.
-     * @param[in] timeOfPeriod - cross time of period point.
-     * @return bool - return true if crossed specific period, otherwise return false.
-     */
-    bool IsCrossedPeriod(const LLBC_Time &from,
-                         const LLBC_Time &to,
-                         const LLBC_TimeSpan &period,
-                         const LLBC_TimeSpan &timeOfPeriod);
-
 private:
     sint64 _time;
     tm _gmtTimeStruct;
