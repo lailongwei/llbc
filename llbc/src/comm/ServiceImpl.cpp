@@ -1093,6 +1093,7 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
 
     // Update all components.
     UpdateComps();
+    LateUpdateComps();
     UpdateTimerScheduler();
     UpdateAutoReleasePool();
 
@@ -2131,6 +2132,21 @@ void LLBC_ServiceImpl::UpdateComps()
         LLBC_Component *&comp = caredComps[compIdx];
         if (LIKELY(comp->_started))
             comp->OnUpdate();
+    }
+}
+
+void LLBC_ServiceImpl::LateUpdateComps()
+{
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnLateUpdate];
+    if (caredComps.empty())
+        return;
+
+    const size_t compsSize = caredComps.size();
+    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+    {
+        LLBC_Component *&comp = caredComps[compIdx];
+        if (LIKELY(comp->_started))
+            comp->OnLateUpdate();
     }
 }
 

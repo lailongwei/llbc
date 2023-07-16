@@ -561,6 +561,7 @@ private:
     int InitComps();
     int StartComps();
     void UpdateComps();
+    void LateUpdateComps();
     void StopComps();
     void DestroyComps();
     void DestroyWillRegComps();

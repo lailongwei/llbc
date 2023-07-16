@@ -83,6 +83,11 @@ namespace
             LLBC_PrintLn("Update...");
         }
 
+        virtual void OnLateUpdate()
+        {
+            LLBC_PrintLn("Late Update...");
+        }
+
         virtual void OnIdle(const LLBC_TimeSpan &idleTime)
         {
             LLBC_PrintLn("Idle, idle time: %s...", idleTime.ToString().c_str());

@@ -551,9 +551,14 @@ public:
 
 public:
     /**
-     * Heartbeat function.
+     * Component update function.
      */
     virtual void OnUpdate();
+
+    /**
+     * Component late update function.
+     */
+    virtual void OnLateUpdate();
 
     /**
      * Idle event handler.

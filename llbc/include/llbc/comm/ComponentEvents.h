@@ -44,6 +44,7 @@ public:
         OnStop,
 
         OnUpdate,
+        OnLateUpdate,
         OnIdle,
 
         OnSessionCreate,
@@ -80,6 +81,7 @@ public:
     static constexpr uint64 OnStop = 1 << LLBC_ComponentEventIndex::OnStop;
 
     static constexpr uint64 OnUpdate = 1 << LLBC_ComponentEventIndex::OnUpdate;
+    static constexpr uint64 OnLateUpdate = 1 << LLBC_ComponentEventIndex::OnLateUpdate;
     static constexpr uint64 OnIdle = 1 << LLBC_ComponentEventIndex::OnIdle;
 
     static constexpr uint64 OnSessionCreate = 1 << LLBC_ComponentEventIndex::OnSessionCreate;
@@ -98,6 +100,7 @@ public:
     static constexpr uint64 AllEvents = (1 << LLBC_ComponentEventIndex::End) - 1;
     static constexpr uint64 DefaultEvents = LLBC_ComponentEvents::AllEvents &
                                             ~(LLBC_ComponentEvents::OnUpdate |
+                                              LLBC_ComponentEvents::OnLateUpdate |
                                               LLBC_ComponentEvents::OnIdle);
 
 public:
