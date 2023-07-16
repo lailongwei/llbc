@@ -27,7 +27,7 @@ __LLBC_NS_BEGIN
 
 /**
  * \brief Variant type enumeration.
- *      format(32bit): first_type[high 8 bit] second_type[low 24 bit]
+ *      format(32bit): first_type[high 8 bit] second_type[low 8 bit]
  *          first_type:
  *              raw type:    The row data type, like int32, uint32 ...eg.
  *              string type: The string data type, use LLBC_String.
@@ -38,61 +38,61 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_VariantType
 {
 public:
-    enum ENUM : uint32
+    enum ENUM : uint16
     {
         // Nil type enumeration.
-        NIL                  = 0x00000000,
+        NIL                  = 0x0000,
 
         // First type enumeration.
-        RAW                  = 0x01000000,
-        STR                  = 0x02000000,
-        SEQ                  = 0x04000000,
-        DICT                 = 0x08000000,
+        RAW                  = 0x0100,
+        STR                  = 0x0200,
+        SEQ                  = 0x0400,
+        DICT                 = 0x0800,
 
         // Row type enumeration.
         // Bit view(first type always equal RAW):
         //          [first type] [raw type] [signed/unsigned]
-        //             8 bits     23 bits        1 bit     
-        RAW_BOOL             = 0x01000003,
-        RAW_SINT8            = 0x01000005,
-        RAW_UINT8            = 0x01000008,
-        RAW_SINT16           = 0x01000011,
-        RAW_UINT16           = 0x01000020,
-        RAW_SINT32           = 0x01000041,
-        RAW_UINT32           = 0x01000080,
-        RAW_LONG             = 0x01000101,
-        RAW_ULONG            = 0x01000200,
-        RAW_PTR              = 0x01000400,
-        RAW_SINT64           = 0x01000801,
-        RAW_UINT64           = 0x01001000,
-        RAW_FLOAT            = 0x01002001,
-        RAW_DOUBLE           = 0x01004001,
+        //             8 bits      7 bits        1 bit     
+        RAW_BOOL             = 0x0103, // 0000 0011
+        RAW_SINT8            = 0x0105, // 0000 0101
+        RAW_UINT8            = 0x0106, // 0000 0110
+        RAW_SINT16           = 0x0109, // 0000 1001
+        RAW_UINT16           = 0x010a, // 0000 1010
+        RAW_SINT32           = 0x010d, // 0000 1101
+        RAW_UINT32           = 0x010e, // 0000 1110
+        RAW_LONG             = 0x0111, // 0001 0001
+        RAW_ULONG            = 0x0112, // 0001 0010
+        RAW_PTR              = 0x0114, // 0001 0100
+        RAW_SINT64           = 0x0117, // 0001 0111
+        RAW_UINT64           = 0x0118, // 0001 1000
+        RAW_FLOAT            = 0x011b, // 0001 1011
+        RAW_DOUBLE           = 0x011d, // 0001 1101
 
         // Str type enumeartion.
         // ! Now, string type's second type only support LLBC_String type.
         // Bit view(first type always equal STR):
         //          [first type] [string type]
-        //             8 bits       24 bits
-        STR_DFT              = 0x02000001,
+        //             8 bits       8 bits
+        STR_DFT              = 0x0201,
 
         // Sequence enumeration.
         // Bit view(first type always equal SEQ):
         //          [first type] [dictionary type]
-        //              8 bits       24 bits
-        SEQ_DFT              = 0x04000001,
+        //              8 bits       8 bits
+        SEQ_DFT              = 0x0401,
 
         // Dictionary type enumeration.
         // Bit view(first type always equal DICT):
         //          [first type] [dictionary type]
-        //              8 bits       24 bits
-        DICT_DFT             = 0x08000001,
+        //              8 bits       8 bits
+        DICT_DFT             = 0x0801,
 
         /////////////////////////////////////////////////////////////////////
 
         //! The first type mask value.
-        MASK_FIRST_TYPE      = 0xff000000,
+        MASK_FIRST_TYPE      = 0xff00,
         //! The raw type variant's signed mask value.
-        MASK_RAW_SIGNED      = 0x00000001
+        MASK_RAW_SIGNED      = 0x0001
     };
 
     /**
