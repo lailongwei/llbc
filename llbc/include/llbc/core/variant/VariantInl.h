@@ -32,62 +32,62 @@ inline LLBC_Variant::LLBC_Variant()
 
 inline LLBC_Variant::LLBC_Variant(const bool &b)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_BOOL;
+    _holder.type = LLBC_VariantType::RAW_BOOL;
     _holder.data.raw.int64Val = b ? 1 : 0;
 }
 
 inline LLBC_Variant::LLBC_Variant(const sint8 &i8)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_SINT8;
+    _holder.type = LLBC_VariantType::RAW_SINT8;
     _holder.data.raw.int64Val = static_cast<sint64>(i8);
 }
 
 inline LLBC_Variant::LLBC_Variant(const uint8 &ui8)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_UINT8;
+    _holder.type = LLBC_VariantType::RAW_UINT8;
     _holder.data.raw.uint64Val = ui8;
 }
 
 inline LLBC_Variant::LLBC_Variant(const sint16 &i16)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_SINT16;
+    _holder.type = LLBC_VariantType::RAW_SINT16;
     _holder.data.raw.int64Val = i16;
 }
 
 inline LLBC_Variant::LLBC_Variant(const uint16 &ui16)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_UINT16;
+    _holder.type = LLBC_VariantType::RAW_UINT16;
     _holder.data.raw.uint64Val = ui16;
 }
 
 inline LLBC_Variant::LLBC_Variant(const sint32 &i32)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_SINT32;
+    _holder.type = LLBC_VariantType::RAW_SINT32;
     _holder.data.raw.int64Val = i32;
 }
 
 inline LLBC_Variant::LLBC_Variant(const uint32 &ui32)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_UINT32;
+    _holder.type = LLBC_VariantType::RAW_UINT32;
     _holder.data.raw.uint64Val = ui32;
 }
 
 inline LLBC_Variant::LLBC_Variant(const long &l)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_LONG;
+    _holder.type = LLBC_VariantType::RAW_LONG;
     _holder.data.raw.int64Val = l;
 }
 
 inline LLBC_Variant::LLBC_Variant(const ulong &ul)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_ULONG;
+    _holder.type = LLBC_VariantType::RAW_ULONG;
     _holder.data.raw.uint64Val = ul;
 }
 
 template <typename _T>
 inline LLBC_Variant::LLBC_Variant(const _T * const &ptr)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_PTR;
+    _holder.type = LLBC_VariantType::RAW_PTR;
 
     _holder.data.raw.uint64Val = 0;
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
@@ -95,38 +95,38 @@ inline LLBC_Variant::LLBC_Variant(const _T * const &ptr)
 
 inline LLBC_Variant::LLBC_Variant(const sint64 &i64)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_SINT64;
+    _holder.type = LLBC_VariantType::RAW_SINT64;
     _holder.data.raw.int64Val = i64;
 }
 
 inline LLBC_Variant::LLBC_Variant(const uint64 &ui64)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_UINT64;
+    _holder.type = LLBC_VariantType::RAW_UINT64;
     _holder.data.raw.uint64Val = ui64;
 }
 
 inline LLBC_Variant::LLBC_Variant(const float &f)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_FLOAT;
+    _holder.type = LLBC_VariantType::RAW_FLOAT;
     _holder.data.raw.doubleVal = f;
 }
 
 inline LLBC_Variant::LLBC_Variant(const double &d)
 {
-    _holder.type = LLBC_VariantType::VT_RAW_DOUBLE;
+    _holder.type = LLBC_VariantType::RAW_DOUBLE;
     _holder.data.raw.doubleVal = d;
 }
 
 inline LLBC_Variant::LLBC_Variant(const std::string &str)
 {
-    _holder.type = LLBC_VariantType::VT_STR_DFT;
+    _holder.type = LLBC_VariantType::STR_DFT;
     if (!str.empty())
         _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
 {
-    _holder.type = LLBC_VariantType::VT_STR_DFT;
+    _holder.type = LLBC_VariantType::STR_DFT;
     if (!str.empty())
         _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
@@ -134,7 +134,7 @@ inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
 template <typename _T1, typename _T2>
 LLBC_Variant::LLBC_Variant(const std::pair<_T1, _T2> &pa)
 {
-    _holder.type = LLBC_VariantType::VT_SEQ_DFT;
+    _holder.type = LLBC_VariantType::SEQ_DFT;
     _holder.data.obj.seq = new Seq();
     _holder.data.obj.seq->emplace_back(pa.first);
     _holder.data.obj.seq->emplace_back(pa.second);
@@ -142,7 +142,7 @@ LLBC_Variant::LLBC_Variant(const std::pair<_T1, _T2> &pa)
 
 inline LLBC_Variant::LLBC_Variant(const Seq &seq)
 {
-    _holder.type = LLBC_VariantType::VT_SEQ_DFT;
+    _holder.type = LLBC_VariantType::SEQ_DFT;
     if (!seq.empty())
         _holder.data.obj.seq = new Seq(seq.begin(), seq.end());
 }
@@ -183,7 +183,7 @@ LLBC_Variant::LLBC_Variant(const std::unordered_set<_T> &us)
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant::Dict &dict)
 {
-    _holder.type = LLBC_VariantType::VT_DICT_DFT;
+    _holder.type = LLBC_VariantType::DICT_DFT;
     _holder.data.obj.dict = new Dict(dict);
 }
 
@@ -221,197 +221,197 @@ inline const LLBC_Variant::Holder &LLBC_Variant::GetHolder() const
 
 inline bool LLBC_Variant::IsNil() const
 {
-    return (_holder.type  == LLBC_VariantType::VT_NIL);
+    return (_holder.type  == LLBC_VariantType::NIL);
 }
 
 inline bool LLBC_Variant::IsRaw() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW) == LLBC_VariantType::VT_RAW);
+    return ((_holder.type & LLBC_VariantType::RAW) == LLBC_VariantType::RAW);
 }
 
 inline bool LLBC_Variant::IsSignedRaw() const
 {
-    return (IsRaw() && ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) == LLBC_VariantType::VT_MASK_RAW_SIGNED));
+    return (IsRaw() && ((_holder.type & LLBC_VariantType::MASK_RAW_SIGNED) == LLBC_VariantType::MASK_RAW_SIGNED));
 }
 
 inline bool LLBC_Variant::IsUnsignedRaw() const
 {
-    return (IsRaw() && ((_holder.type & LLBC_VariantType::VT_MASK_RAW_SIGNED) != LLBC_VariantType::VT_MASK_RAW_SIGNED));
+    return (IsRaw() && ((_holder.type & LLBC_VariantType::MASK_RAW_SIGNED) != LLBC_VariantType::MASK_RAW_SIGNED));
 }
 
 inline bool LLBC_Variant::IsBool() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_BOOL) == LLBC_VariantType::VT_RAW_BOOL);
+    return _holder.type == LLBC_VariantType::RAW_BOOL;
 }
 
 inline bool LLBC_Variant::IsInt8() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT8) == LLBC_VariantType::VT_RAW_SINT8);
+    return _holder.type == LLBC_VariantType::RAW_SINT8;
 }
 
 inline bool LLBC_Variant::IsUInt8() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT8) == LLBC_VariantType::VT_RAW_UINT8);
+    return _holder.type == LLBC_VariantType::RAW_UINT8;
 }
 
 inline bool LLBC_Variant::IsInt16() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT16) == LLBC_VariantType::VT_RAW_SINT16);
+    return _holder.type == LLBC_VariantType::RAW_SINT16;
 }
 
 inline bool LLBC_Variant::IsUInt16() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT16) == LLBC_VariantType::VT_RAW_UINT16);
+    return _holder.type == LLBC_VariantType::RAW_UINT16;
 }
 
 inline bool LLBC_Variant::IsInt32() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT32) == LLBC_VariantType::VT_RAW_SINT32);
+    return _holder.type == LLBC_VariantType::RAW_SINT32;
 }
 
 inline bool LLBC_Variant::IsUInt32() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT32) == LLBC_VariantType::VT_RAW_UINT32);
+    return _holder.type == LLBC_VariantType::RAW_UINT32;
 }
 
 inline bool LLBC_Variant::IsLong() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_LONG) == LLBC_VariantType::VT_RAW_LONG);
+    return _holder.type == LLBC_VariantType::RAW_LONG;
 }
 
 inline bool LLBC_Variant::IsULong() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_ULONG) == LLBC_VariantType::VT_RAW_ULONG);
+    return _holder.type == LLBC_VariantType::RAW_ULONG;
 }
 
 inline bool LLBC_Variant::IsPtr() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_PTR) == LLBC_VariantType::VT_RAW_PTR);
+    return _holder.type == LLBC_VariantType::RAW_PTR;
 }
 
 inline bool LLBC_Variant::IsInt64() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_SINT64) == LLBC_VariantType::VT_RAW_SINT64);
+    return _holder.type == LLBC_VariantType::RAW_SINT64;
 }
 
 inline bool LLBC_Variant::IsUInt64() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_UINT64) == LLBC_VariantType::VT_RAW_UINT64);
+    return _holder.type == LLBC_VariantType::RAW_UINT64;
 }
 
 inline bool LLBC_Variant::IsFloat() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_FLOAT) == LLBC_VariantType::VT_RAW_FLOAT);
+    return _holder.type == LLBC_VariantType::RAW_FLOAT;
 }
 
 inline bool LLBC_Variant::IsDouble() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_RAW_DOUBLE) == LLBC_VariantType::VT_RAW_DOUBLE);
+    return _holder.type == LLBC_VariantType::RAW_DOUBLE;
 }
 
 inline bool LLBC_Variant::IsStr() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_STR_DFT) == LLBC_VariantType::VT_STR_DFT);
+    return _holder.type == LLBC_VariantType::STR_DFT;
 }
 
 inline bool LLBC_Variant::IsSeq() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_SEQ_DFT) == LLBC_VariantType::VT_SEQ_DFT);
+    return _holder.type == LLBC_VariantType::SEQ_DFT;
 }
 
 inline bool LLBC_Variant::IsDict() const
 {
-    return ((_holder.type & LLBC_VariantType::VT_DICT_DFT) == LLBC_VariantType::VT_DICT_DFT);
+    return _holder.type == LLBC_VariantType::DICT_DFT;
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeNil()
 {
-    return Become(LLBC_VariantType::VT_NIL);
+    return Become(LLBC_VariantType::NIL);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeBool()
 {
-    return Become(LLBC_VariantType::VT_RAW_BOOL);
+    return Become(LLBC_VariantType::RAW_BOOL);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeInt8()
 {
-    return Become(LLBC_VariantType::VT_RAW_SINT8);
+    return Become(LLBC_VariantType::RAW_SINT8);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeUInt8()
 {
-    return Become(LLBC_VariantType::VT_RAW_UINT8);
+    return Become(LLBC_VariantType::RAW_UINT8);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeInt16()
 {
-    return Become(LLBC_VariantType::VT_RAW_SINT16);
+    return Become(LLBC_VariantType::RAW_SINT16);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeUInt16()
 {
-    return Become(LLBC_VariantType::VT_RAW_UINT16);
+    return Become(LLBC_VariantType::RAW_UINT16);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeInt32()
 {
-    return Become(LLBC_VariantType::VT_RAW_SINT32);
+    return Become(LLBC_VariantType::RAW_SINT32);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeUInt32()
 {
-    return Become(LLBC_VariantType::VT_RAW_UINT32);
+    return Become(LLBC_VariantType::RAW_UINT32);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeLong()
 {
-    return Become(LLBC_VariantType::VT_RAW_LONG);
+    return Become(LLBC_VariantType::RAW_LONG);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeULong()
 {
-    return Become(LLBC_VariantType::VT_RAW_ULONG);
+    return Become(LLBC_VariantType::RAW_ULONG);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomePtr()
 {
-    return Become(LLBC_VariantType::VT_RAW_PTR);
+    return Become(LLBC_VariantType::RAW_PTR);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeInt64()
 {
-    return Become(LLBC_VariantType::VT_RAW_SINT64);
+    return Become(LLBC_VariantType::RAW_SINT64);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeUInt64()
 {
-    return Become(LLBC_VariantType::VT_RAW_UINT64);
+    return Become(LLBC_VariantType::RAW_UINT64);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeFloat()
 {
-    return Become(LLBC_VariantType::VT_RAW_FLOAT);
+    return Become(LLBC_VariantType::RAW_FLOAT);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeDouble()
 {
-    return Become(LLBC_VariantType::VT_RAW_DOUBLE);
+    return Become(LLBC_VariantType::RAW_DOUBLE);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeStr()
 {
-    return Become(LLBC_VariantType::VT_STR_DFT);
+    return Become(LLBC_VariantType::STR_DFT);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeSeq()
 {
-    return Become(LLBC_VariantType::VT_SEQ_DFT);
+    return Become(LLBC_VariantType::SEQ_DFT);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeDict()
 {
-    return Become(LLBC_VariantType::VT_DICT_DFT);
+    return Become(LLBC_VariantType::DICT_DFT);
 }
 
 inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
@@ -813,7 +813,7 @@ template <typename _T>
 LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
 {
     _holder.ClearData();
-    _holder.type = LLBC_VariantType::VT_RAW_PTR;
+    _holder.type = LLBC_VariantType::RAW_PTR;
 
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
 

@@ -41,58 +41,58 @@ public:
     enum ENUM : uint32
     {
         // Nil type enumeration.
-        VT_NIL                  = 0x00000000,
+        NIL                  = 0x00000000,
 
         // First type enumeration.
-        VT_RAW                  = 0x01000000,
-        VT_STR                  = 0x02000000,
-        VT_SEQ                  = 0x04000000,
-        VT_DICT                 = 0x08000000,
+        RAW                  = 0x01000000,
+        STR                  = 0x02000000,
+        SEQ                  = 0x04000000,
+        DICT                 = 0x08000000,
 
         // Row type enumeration.
-        // Bit view(first type always equal VT_RAW):
+        // Bit view(first type always equal RAW):
         //          [first type] [raw type] [signed/unsigned]
         //             8 bits     23 bits        1 bit     
-        VT_RAW_BOOL             = 0x01000003,
-        VT_RAW_SINT8            = 0x01000005,
-        VT_RAW_UINT8            = 0x01000008,
-        VT_RAW_SINT16           = 0x01000011,
-        VT_RAW_UINT16           = 0x01000020,
-        VT_RAW_SINT32           = 0x01000041,
-        VT_RAW_UINT32           = 0x01000080,
-        VT_RAW_LONG             = 0x01000101,
-        VT_RAW_ULONG            = 0x01000200,
-        VT_RAW_PTR              = 0x01000400,
-        VT_RAW_SINT64           = 0x01000801,
-        VT_RAW_UINT64           = 0x01001000,
-        VT_RAW_FLOAT            = 0x01002001,
-        VT_RAW_DOUBLE           = 0x01004001,
+        RAW_BOOL             = 0x01000003,
+        RAW_SINT8            = 0x01000005,
+        RAW_UINT8            = 0x01000008,
+        RAW_SINT16           = 0x01000011,
+        RAW_UINT16           = 0x01000020,
+        RAW_SINT32           = 0x01000041,
+        RAW_UINT32           = 0x01000080,
+        RAW_LONG             = 0x01000101,
+        RAW_ULONG            = 0x01000200,
+        RAW_PTR              = 0x01000400,
+        RAW_SINT64           = 0x01000801,
+        RAW_UINT64           = 0x01001000,
+        RAW_FLOAT            = 0x01002001,
+        RAW_DOUBLE           = 0x01004001,
 
         // Str type enumeartion.
         // ! Now, string type's second type only support LLBC_String type.
-        // Bit view(first type always equal VT_STR):
+        // Bit view(first type always equal STR):
         //          [first type] [string type]
         //             8 bits       24 bits
-        VT_STR_DFT              = 0x02000001,
+        STR_DFT              = 0x02000001,
 
         // Sequence enumeration.
-        // Bit view(first type always equal VT_SEQ):
+        // Bit view(first type always equal SEQ):
         //          [first type] [dictionary type]
         //              8 bits       24 bits
-        VT_SEQ_DFT              = 0x04000001,
+        SEQ_DFT              = 0x04000001,
 
         // Dictionary type enumeration.
-        // Bit view(first type always equal VT_DICT):
+        // Bit view(first type always equal DICT):
         //          [first type] [dictionary type]
         //              8 bits       24 bits
-        VT_DICT_DFT             = 0x08000001,
+        DICT_DFT             = 0x08000001,
 
         /////////////////////////////////////////////////////////////////////
 
         //! The first type mask value.
-        VT_MASK_FIRST_TYPE      = 0xff000000,
+        MASK_FIRST_TYPE      = 0xff000000,
         //! The raw type variant's signed mask value.
-        VT_MASK_RAW_SIGNED      = 0x00000001
+        MASK_RAW_SIGNED      = 0x00000001
     };
 
     /**
@@ -101,14 +101,6 @@ public:
      * @return const LLBC_String & - the type string representation.
      */
     static const LLBC_String &Type2Str(int type);
-
-    /**
-     * Init type to string representation dictionary, call by llbc library.
-     */
-    static void InitType2StrDict();
-
-private:
-    static std::map<LLBC_VariantType::ENUM, LLBC_String> _typeDescs;
 };
 
 __LLBC_NS_END
@@ -189,42 +181,6 @@ public:
     private:
         friend class LLBC_Variant;
         void ClearData();
-    };
-
-    /**
-     * The variant data type enumerations.
-     */
-    enum
-    {
-        NIL = LLBC_VariantType::VT_NIL,
-
-        BOOL = LLBC_VariantType::VT_RAW_BOOL,
-        SINT8 = LLBC_VariantType::VT_RAW_SINT8,
-        UINT8 = LLBC_VariantType::VT_RAW_UINT8,
-        SINT16 = LLBC_VariantType::VT_RAW_SINT16,
-        UINT16 = LLBC_VariantType::VT_RAW_UINT16,
-        SINT32 = LLBC_VariantType::VT_RAW_SINT32,
-        UINT32 = LLBC_VariantType::VT_RAW_UINT32,
-        LONG = LLBC_VariantType::VT_RAW_LONG,
-        ULONG = LLBC_VariantType::VT_RAW_ULONG,
-        PTR = LLBC_VariantType::VT_RAW_PTR,
-        SINT64 = LLBC_VariantType::VT_RAW_SINT64,
-        UINT64 = LLBC_VariantType::VT_RAW_UINT64,
-        FLOAT = LLBC_VariantType::VT_RAW_FLOAT,
-        DOUBLE = LLBC_VariantType::VT_RAW_DOUBLE,
-
-        STR = LLBC_VariantType::VT_STR_DFT,
-        SEQ = LLBC_VariantType::VT_SEQ_DFT,
-        DICT = LLBC_VariantType::VT_DICT_DFT
-    };
-
-    /**
-     * The variant mask enumerations.
-     */
-    enum
-    {
-        MASK_FIRST = LLBC_VariantType::VT_MASK_FIRST_TYPE,
-        MASK_SIGNED = LLBC_VariantType::VT_MASK_RAW_SIGNED,
     };
 
 public:
