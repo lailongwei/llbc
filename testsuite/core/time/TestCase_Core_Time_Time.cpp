@@ -46,6 +46,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     CpuTimeTest();
     std::cout << std::endl;
 
+    GetIntervalToTest();
+    std::cout << std::endl;
+
     CrossTimePeriodTest();
     std::cout << std::endl;
 
@@ -231,9 +234,6 @@ void TestCase_Core_Time_Time::TimeClassTest()
         <<", milliSecond=" <<milliPart <<", microSecond=" <<microPart <<"):"
         << fromParts <<std::endl;
     std::cout <<"    millisec: " <<fromParts.GetMilliSecond() <<", microsec: " <<fromParts.GetMicroSecond() <<std::endl;
-
-    // GetIntervalTo test:
-    std::cout <<"now: " <<now <<", GetInterval To 3600 seconds: " <<now.GetIntervalTo(LLBC_TimeSpan(3600)) <<std::endl;
 }
 
 void TestCase_Core_Time_Time::TimeSpanClassTest()
@@ -271,13 +271,54 @@ void TestCase_Core_Time_Time::CpuTimeTest()
     for(sint32 idx = 0; idx < 10; ++idx)
     {
         auto freq = LLBC_GetCpuCounterFrequency();
-        std::cout << "Current idx:" << std::to_string(idx) << ", tsc frequency:" << std::to_string(freq) << std::endl;
+        std::cout << "Current idx:" << std::to_string(idx)
+            << ", tsc frequency:" << std::to_string(freq) << std::endl;
     }
     std::cout << "Cpu time tsc end: \n" << std::endl;
 
     std::cout << "Cpu time stream out test: " << std::endl;
     std::cout << "Stream out current cpu time: " << LLBC_CPUTime::Current() << std::endl;
     std::cout << "Cpu time stream out end: " << std::endl;
+}
+
+void TestCase_Core_Time_Time::GetIntervalToTest()
+{
+    std::cout << "Get interval to xxx test:" << std::endl;
+
+    auto toTimeOfDayTestLbda = [](const LLBC_Time &fromTime,
+                                  const LLBC_TimeSpan &toTimeOfDay)
+    {
+        std::cout << "- GetIntervalToTimeOfDay test:" << std::endl;
+        std::cout << "  - fromTime: " << fromTime << std::endl;
+        std::cout << "  - toTimeOfDay: " << toTimeOfDay << std::endl;
+        std::cout << "  - intervalTo: "
+            << LLBC_Time::GetIntervalToTimeOfDay(fromTime, toTimeOfDay) << std::endl;
+    };
+
+    toTimeOfDayTestLbda(LLBC_Time::FromTimeStr("2022-07-14 07:00:00"),
+                                               LLBC_TimeSpan::oneHour * 8);
+    toTimeOfDayTestLbda(LLBC_Time::FromTimeStr("2022-07-14 08:00:00"),
+                                               LLBC_TimeSpan::oneHour * 8);
+    toTimeOfDayTestLbda(LLBC_Time::FromTimeStr("2022-07-14 09:00:00"),
+                                               LLBC_TimeSpan::oneHour * 8);
+
+    auto toTimeOfWeekTestLbda = [](const LLBC_Time &fromTime,
+                                   const LLBC_TimeSpan &toTimeOfWeek)
+    {
+        std::cout << "- GetIntervalToTimeOfWeek test:" << std::endl;
+        std::cout << "  - fromTime: " << fromTime << std::endl;
+        std::cout << "  - toTimeOfWeek: " << toTimeOfWeek << std::endl;
+        std::cout << "  - intervalTo: "
+            << LLBC_Time::GetIntervalToTimeOfWeek(fromTime, toTimeOfWeek) << std::endl;
+    };
+
+    // Note: 2022/07/14 is Friday
+    toTimeOfWeekTestLbda(LLBC_Time::FromTimeStr(
+        "2022-07-13 07:00:00"), LLBC_TimeSpan::FromDays(5, 8));
+    toTimeOfWeekTestLbda(LLBC_Time::FromTimeStr(
+        "2022-07-14 08:00:00"), LLBC_TimeSpan::FromDays(5, 8));
+    toTimeOfWeekTestLbda(LLBC_Time::FromTimeStr(
+        "2022-07-15 09:00:00"), LLBC_TimeSpan::FromDays(5, 8));
 }
 
 void TestCase_Core_Time_Time::CrossTimePeriodTest()

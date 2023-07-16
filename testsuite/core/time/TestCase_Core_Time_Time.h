@@ -39,6 +39,7 @@ private:
     void TimeClassTest();
     void TimeSpanClassTest();
     void CpuTimeTest();
+    void GetIntervalToTest();
     void CrossTimePeriodTest();
 
     void PrintTimeStruct(const LLBC_TimeStruct &ts);

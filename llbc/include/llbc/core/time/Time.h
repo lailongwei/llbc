@@ -254,12 +254,22 @@ public:
 
 public:
     /**
-     * Get remaining seconds to nearest day special monent.
-     * @param[in] span        - span value.
-     * @return LLBC_TimeSpan - timespan value.
+     * Get interval to time of day.
+     * @param[in] fromTime     - from time. 
+     * @param[in] toTimeOfDay  - to time of day.
+     * @return LLBC_TimeSpan - interval value.
      */
-    LLBC_TimeSpan GetIntervalTo(const LLBC_TimeSpan &span) const;
-    static LLBC_TimeSpan GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span);
+    static LLBC_TimeSpan GetIntervalToTimeOfDay(const LLBC_Time &fromTime,
+                                                const LLBC_TimeSpan &toTimeOfDay);
+
+    /**
+     * Get interval to time of week.
+     * @param[in] fromTime      - from time. 
+     * @param[in] toTimeOfWeek  - to time of week.
+     * @return LLBC_TimeSpan - interval value.
+     */
+    static LLBC_TimeSpan GetIntervalToTimeOfWeek(const LLBC_Time &fromTime,
+                                                 const LLBC_TimeSpan &toTimeOfWeek);
 
 public:
     /**

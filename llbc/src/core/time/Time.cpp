@@ -343,23 +343,20 @@ int LLBC_Time::GetMonthSpanDays(int year, int month)
     return LLBC_GetMonthSpanDays(year, month);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &span) const
+LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_Time &fromTime,
+                                                const LLBC_TimeSpan &toTimeOfDay)
 {
-    // Get past time(local time zone).
-    sint64 localTime = _time - LLBC_GetTimezone() * NumOfMicroSecondsPerSecond;
-    sint64 todayElapsed = localTime % NumOfMicroSecondsPerDay;
-
-    // Calculate span value.
-    sint64 spanVal = span.GetTotalMicroSeconds() - todayElapsed;
-    if (spanVal < 0)
-        spanVal = NumOfMicroSecondsPerDay + spanVal;
-
-    return LLBC_TimeSpan(spanVal);
+    const LLBC_TimeSpan fromTimeOfDay = fromTime.GetTimeOfDay();
+    const LLBC_TimeSpan diff = toTimeOfDay - fromTimeOfDay;
+    return diff < LLBC_TimeSpan::zero ? diff + LLBC_TimeSpan::oneDay : diff;
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_Time &from, const LLBC_TimeSpan &span)
+LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_Time &fromTime,
+                                                 const LLBC_TimeSpan &toTimeOfWeek)
 {
-    return from.GetIntervalTo(span);
+    const LLBC_TimeSpan fromTimeOfWeek = fromTime.GetTimeOfWeek();
+    const LLBC_TimeSpan diff = toTimeOfWeek - fromTimeOfWeek;
+    return diff < LLBC_TimeSpan::zero ? diff + LLBC_TimeSpan::oneWeek : diff;
 }
 
 bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
@@ -370,7 +367,7 @@ bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
         timeOfDay >= LLBC_TimeSpan::oneDay))
         return false;
 
-    auto diff = to - from;
+    const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return false;
 
@@ -392,7 +389,7 @@ bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
         timeOfWeek >= LLBC_TimeSpan::oneWeek))
         return false;
 
-    auto diff = to - from;
+    const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return false;
 
