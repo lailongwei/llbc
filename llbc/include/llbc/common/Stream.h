@@ -777,6 +777,26 @@ private:
     }
 
     /**
+     * Try adapt protobuf3 mesage object.
+     */
+    template <typename T, bool (T::*)() const, size_t (T::*)() const>
+    class protobuf3_type;
+    template <typename T>
+    bool ReadImpl(T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
+    {
+        uint32 pbDataSize;
+        if (UNLIKELY(Read(pbDataSize) == false))
+            return false;
+
+        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
+        if (!ret)
+            return false;
+
+        _pos += pbDataSize;
+        return true;
+    }
+
+    /**
      * Final Read implement: memcpy obj memory.
      */
     template <typename T>
@@ -1121,6 +1141,25 @@ private:
         obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
         _pos += needSize;
     }
+    /**
+     * Try adapt T::SerializeToArray(protobuf3 message object).
+     */
+    template <typename T>
+    void WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
+    {
+        // Check initialized first.
+        obj.CheckInitialized();
+
+        // Recap Stream.
+        size_t needSize = obj.ByteSizeLong();
+        if ((_cap - _pos) < needSize + sizeof(uint32))
+            Recap(_cap + (needSize + sizeof(uint32)));
+
+        Write(static_cast<uint32>(needSize));
+        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
+        _pos += needSize;
+    }
+
 
     /**
      * Final write implement: memcpy obj memory.
