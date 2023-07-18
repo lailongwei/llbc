@@ -779,7 +779,7 @@ private:
     /**
      * Try adapt protobuf3 mesage object.
      */
-    template <typename T, bool (T:: *)() const, size_t(T:: *)() const>
+    template <typename T, bool (T::*)() const, size_t (T::*)() const>
     class protobuf3_type;
     template <typename T>
     bool ReadImpl(T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
