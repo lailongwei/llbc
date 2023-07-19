@@ -1128,7 +1128,7 @@ private:
         obj.serialize(*this);
     }
     /**
-     * Try adapt protobuf message object.
+     * Try adapt protobuf2 message object.
      */
     template <typename T>
     void WriteImpl(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
@@ -1146,7 +1146,7 @@ private:
         _pos += needSize;
     }
     /**
-     * Try adapt T::SerializeToArray(protobuf3 message object).
+     * Try adapt protobuf3 message object.
      */
     template <typename T>
     void WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
@@ -1163,7 +1163,6 @@ private:
         obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
         _pos += needSize;
     }
-
 
     /**
      * Final write implement: memcpy obj memory.
