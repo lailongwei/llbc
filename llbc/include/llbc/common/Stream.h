@@ -757,7 +757,7 @@ private:
     }
 
     /**
-     * Try adapt protobuf mesage object.
+     * Try adapt protobuf2 mesage object.
      */
     template <typename T, bool (T::*)() const, int (T::*)() const>
     class protobuf_type;
@@ -768,9 +768,11 @@ private:
         if (UNLIKELY(Read(pbDataSize) == false))
             return false;
 
-        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
-        if (!ret)
+        if (!obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize)))
+        {
+            _pos -= sizeof(uint32);
             return false;
+        }
 
         _pos += pbDataSize;
         return true;
@@ -788,9 +790,11 @@ private:
         if (UNLIKELY(Read(pbDataSize) == false))
             return false;
 
-        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
-        if (!ret)
+        if (!obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize)))
+        {
+            _pos -= sizeof(uint32);
             return false;
+        }
 
         _pos += pbDataSize;
         return true;
