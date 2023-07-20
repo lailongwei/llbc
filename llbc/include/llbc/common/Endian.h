@@ -86,11 +86,14 @@ LLBC_EXPORT int LLBC_GetMachineEndianType();
  * @param [in/out] val - the will reverse value, the reverse result will store here.
  */
 template <typename T>
-typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, void>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 1,
+                        void>::type
 LLBC_ReverseBytes(T &val);
-
 template <typename T>
-typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), void>::type
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) > 1),
+                        void>::type
 LLBC_ReverseBytes(T &val);
 
 /**
@@ -99,11 +102,34 @@ LLBC_ReverseBytes(T &val);
  * @return T - the already reversed value.
  */
 template <typename T>
-typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, T>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 1,
+                        T>::type
 LLBC_ReverseBytes2(const T &val);
-
 template <typename T>
-typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), T>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            (sizeof(T) == 2 || sizeof(T) == 4),
+                        T>::type
+LLBC_ReverseBytes2(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 8,
+                        T>::type
+LLBC_ReverseBytes2(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 10,
+                        T>::type
+LLBC_ReverseBytes2(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 12,
+                        T>::type
+LLBC_ReverseBytes2(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 16,
+                        T>::type
 LLBC_ReverseBytes2(const T &val);
 
 /**

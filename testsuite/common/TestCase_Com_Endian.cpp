@@ -49,17 +49,35 @@ int TestCase_Com_Endian::Run(int argc, char *argv[])
     LLBC_Print("\n");
 
     // Test host <-> net.
-    int data = 0x01020304;
-    LLBC_PrintLn("host to net test, host: 0x%08x, net: 0x%08x",
-        data, LLBC_Host2Net2(data));
-    LLBC_Host2Net(data);
-    LLBC_PrintLn("net to host test, net: 0x%08x, host: 0x%08x",
-        data, LLBC_Net2Host2(data));
-    LLBC_Print("\n");
-    sint64 longData = 0x0506070801020304L;
-    LLBC_PrintLn("host to net test(long data), host: 0x%16llx, net: 0x%16llx", longData, LLBC_Host2Net2(longData));
-    LLBC_Host2Net(longData);
-    LLBC_PrintLn("net to host test, net: 0x%16llx, host: 0x%16llx", longData, LLBC_Net2Host2(longData));
+    sint16 i16 = 0x0102;
+    LLBC_PrintLn("sint16 host<->net byte order convert test:");
+    LLBC_PrintLn("- val:0x%04x", i16);
+    LLBC_PrintLn("- val -> net order:0x%04x", LLBC_Host2Net2(i16));
+    LLBC_PrintLn("- val -> net order -> host order:0x%04x\n", LLBC_Net2Host2(LLBC_Host2Net2(i16)));
+
+    sint32 i32 = 0x01020304;
+    LLBC_PrintLn("sint32 host<->net byte order convert test:");
+    LLBC_PrintLn("- val:0x%08x", i32);
+    LLBC_PrintLn("- val -> net order:0x%08x", LLBC_Host2Net2(i32));
+    LLBC_PrintLn("- val -> net order -> host order:0x%08x\n", LLBC_Net2Host2(LLBC_Host2Net2(i32)));
+
+    sint64 i64 = 0x0506070801020304L;
+    LLBC_PrintLn("sint64 host<->net byte order convert test:");
+    LLBC_PrintLn("- val:0x%016llx", i64);
+    LLBC_PrintLn("- val -> net order:0x%016llx", LLBC_Host2Net2(i64));
+    LLBC_PrintLn("- val -> net order -> host order:0x%016llx\n", LLBC_Net2Host2(LLBC_Host2Net2(i64)));
+
+    double dbl = 3.1415926;
+    LLBC_PrintLn("double host<->net byte order convert test:");
+    LLBC_PrintLn("- val:%f", dbl);
+    LLBC_PrintLn("- val -> net order:%f", LLBC_Host2Net2(dbl));
+    LLBC_PrintLn("- val -> net order -> host order:%f\n", LLBC_Net2Host2(LLBC_Host2Net2(dbl)));
+
+    long double ldbl = 9.87654321;
+    LLBC_PrintLn("long double host<->net byte order convert test:");
+    LLBC_PrintLn("- val:%Lf", ldbl);
+    LLBC_PrintLn("- val -> net order:%Lf", LLBC_Host2Net2(ldbl));
+    LLBC_PrintLn("- val -> net order -> host order:%Lf\n", LLBC_Net2Host2(LLBC_Host2Net2(ldbl)));
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

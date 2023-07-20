@@ -26,27 +26,35 @@
 __LLBC_NS_BEGIN
 
 template <typename T>
-typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, void>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 1,
+                        void>::type
 LLBC_ReverseBytes(T &val)
 {
 }
 
 template <typename T>
-typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), void>::type
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) > 1),
+                        void>::type
 LLBC_ReverseBytes(T &val)
 {
     val = LLBC_ReverseBytes2<T>(val);
 }
 
 template <typename T>
-typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, T>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 1,
+                        T>::type
 LLBC_ReverseBytes2(const T &val)
 {
     return val;
 }
 
 template <typename T>
-typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), T>::type
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            (sizeof(T) == 2 || sizeof(T) == 4),
+                        T>::type
 LLBC_ReverseBytes2(const T &val)
 {
     union
@@ -62,32 +70,71 @@ LLBC_ReverseBytes2(const T &val)
     return dest.val;
 }
 
-template <>
-inline void LLBC_Net2Host<sint64>(sint64 &val)
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 8,
+                        T>::type
+LLBC_ReverseBytes2(const T &val)
 {
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return;
+    const uint32 highPart = LLBC_ReverseBytes2<uint32>(static_cast<uint32>(
+        *reinterpret_cast<const uint64 *>(&val) >> 32));
+    const uint32 lowPart = LLBC_ReverseBytes2<uint32>(
+        static_cast<uint32>(*reinterpret_cast<const uint64 *>(&val) & 0xffffffffllu));
 
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    val = static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
+    const uint64 reversedVal = (static_cast<uint64>(lowPart) << 32) | highPart;
+    return *reinterpret_cast<const T *>(&reversedVal);
 }
 
-template <>
-inline void LLBC_Net2Host<uint64>(uint64 &val)
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 10,
+                        T>::type
+LLBC_ReverseBytes2(const T &val)
 {
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return;
+    #pragma pack(push, 2)
+    struct 
+    {
+        uint64 lowPart;
+        uint16 highPart;
+    } u80Val;
 
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
+    static_assert(sizeof(T) == sizeof(u80Val), "llbc framework internal error");
+    #pragma pack(pop)
 
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    val = (static_cast<uint64>(part2) << 32) | part1;
+    memcpy(&u80Val, &val, sizeof(u80Val));
+    LLBC_ReverseBytes<uint64>(u80Val.lowPart);
+    LLBC_ReverseBytes<uint16>(u80Val.highPart);
+
+    T reversedVal;
+    memcpy(&reversedVal, &u80Val, sizeof(T));
+
+    return reversedVal;
+}
+
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 16,
+                        T>::type
+LLBC_ReverseBytes2(const T &val)
+{
+    #pragma pack(push, 8)
+    struct
+    {
+        uint64 lowPart;
+        uint64 highPart;
+    } u128Val, reversedU128Val;
+
+    static_assert(sizeof(T) == sizeof(u128Val), "llbc framework internal error");
+    #pragma pack(pop)
+
+    memcpy(&u128Val, &val, sizeof(u128Val));
+    reversedU128Val.lowPart = LLBC_ReverseBytes2<uint64>(u128Val.highPart);
+    reversedU128Val.highPart = LLBC_ReverseBytes2<uint64>(u128Val.lowPart);
+
+    T reversedVal;
+    memcpy(&reversedVal, &reversedU128Val, sizeof(T));
+
+    return reversedVal;
 }
 
 template <typename T>
@@ -95,34 +142,6 @@ void LLBC_Net2Host(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
-}
-
-template <>
-inline sint64 LLBC_Net2Host2<sint64>(const sint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return val;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    return static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
-}
-
-template <>
-inline uint64 LLBC_Net2Host2<uint64>(const uint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return val;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    return (static_cast<uint64>(part2) << 32) | part1;
 }
 
 template <typename T>
@@ -134,67 +153,11 @@ T LLBC_Net2Host2(const T &val)
     return val;
 }
 
-template <>
-inline void LLBC_Host2Net<sint64>(sint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    val = static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
-}
-
-template <>
-inline void LLBC_Host2Net<uint64>(uint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    val = (static_cast<uint64>(part2) << 32) | part1;
-}
-
 template <typename T>
 void LLBC_Host2Net(T &val)
 {
     if (LLBC_MachineEndian != LLBC_Endian::NetEndian)
         LLBC_ReverseBytes(val);
-}
-
-template <>
-inline sint64 LLBC_Host2Net2<sint64>(const sint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return val;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    return static_cast<sint64>((static_cast<uint64>(part2) << 32) | part1);
-}
-
-template <>
-inline uint64 LLBC_Host2Net2<uint64>(const uint64 &val)
-{
-    if (LLBC_MachineEndian == LLBC_Endian::NetEndian)
-        return val;
-
-    uint32 part1 = static_cast<uint32>(val & 0x00000000ffffffffL);
-    uint32 part2 = static_cast<uint32>(val >> 32);
-
-    LLBC_Net2Host<uint32>(part1);
-    LLBC_Net2Host<uint32>(part2);
-    return (static_cast<uint64>(part2) << 32) | part1;
 }
 
 template <typename T>
