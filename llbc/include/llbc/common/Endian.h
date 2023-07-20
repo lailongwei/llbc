@@ -86,7 +86,12 @@ LLBC_EXPORT int LLBC_GetMachineEndianType();
  * @param [in/out] val - the will reverse value, the reverse result will store here.
  */
 template <typename T>
-void LLBC_ReverseBytes(T &val);
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, void>::type
+LLBC_ReverseBytes(T &val);
+
+template <typename T>
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), void>::type
+LLBC_ReverseBytes(T &val);
 
 /**
  * Reverse c/c++ basic data type byte order.
@@ -94,7 +99,12 @@ void LLBC_ReverseBytes(T &val);
  * @return T - the already reversed value.
  */
 template <typename T>
-T LLBC_ReverseBytes2(const T &val);
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, T>::type
+LLBC_ReverseBytes2(const T &val);
+
+template <typename T>
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), T>::type
+LLBC_ReverseBytes2(const T &val);
 
 /**
  * Convert network byte order data to host byte order.

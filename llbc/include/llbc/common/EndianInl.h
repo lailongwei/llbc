@@ -26,23 +26,40 @@
 __LLBC_NS_BEGIN
 
 template <typename T>
-void LLBC_ReverseBytes(T &val)
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, void>::type
+LLBC_ReverseBytes(T &val)
 {
-    const T copyVal = val;
-
-    uint8 *ptr = reinterpret_cast<uint8 *>(&val);
-    const uint8 *copyPtr = reinterpret_cast<const uint8 *>(&copyVal);
-    for (size_t i = 0; i < sizeof(T); ++i)
-        ptr[i] = copyPtr[sizeof(T) - i - 1];
 }
 
 template <typename T>
-T LLBC_ReverseBytes2(const T &val)
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), void>::type
+LLBC_ReverseBytes(T &val)
 {
-    T reversedVal = val;
-    LLBC_ReverseBytes(reversedVal);
+    val = LLBC_ReverseBytes2<T>(val);
+}
 
-    return reversedVal;
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, T>::type
+LLBC_ReverseBytes2(const T &val)
+{
+    return val;
+}
+
+template <typename T>
+typename std::enable_if<((std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) > 1), T>::type
+LLBC_ReverseBytes2(const T &val)
+{
+    union
+    {
+        T val;
+        uint8 bytes[sizeof(T)] ;
+    } source, dest;
+
+    source.val = val;
+    for (size_t i = 0; i < sizeof(T); ++i)
+        dest.bytes[i] = source.bytes[sizeof(T) - i - 1];
+
+    return dest.val;
 }
 
 template <>
