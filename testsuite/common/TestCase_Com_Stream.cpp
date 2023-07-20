@@ -221,6 +221,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_PrintLn("Stream test:");
 
     LLBC_ReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(EnumTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(ConstructAndAssignmentTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(AttachTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(DetachTest() != LLBC_OK, LLBC_FAILED);
@@ -266,6 +267,57 @@ int TestCase_Com_Stream::BasicTest()
     stream2 >> bVal >> intVal >> dblVal >> strVal;
     LLBC_PrintLn("- After read, bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream:%s",
                  bVal, intVal, dblVal, strVal, stream2.ToString().c_str());
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::EnumTest()
+{
+    LLBC_PrintLn("Enum test:");
+
+    // Define use for test Enumeration types.
+    enum class I64Enum : sint64
+    {
+        ENUM1 = -64,
+        ENUM2 = 64,
+    };
+    enum class U64Enum : uint64 
+    {
+        ENUM1 = 6400,
+        ENUM2 = 640000,
+    };
+
+    // Write enumeration values to stream.
+    LLBC_Stream stream;
+    stream.Write(I64Enum::ENUM1);
+    stream.Write(I64Enum::ENUM2);
+    stream.Write(U64Enum::ENUM1);
+    stream.Write(U64Enum::ENUM2);
+
+    // Dump stream.
+    LLBC_PrintLn("All enums has been written to stream:");
+    LLBC_PrintLn("- stream:%s", stream.ToString().c_str());
+    LLBC_PrintLn("- bytes hex dump:\n%s", LLBC_Byte2Hex(stream.GetBuf(), stream.GetPos()).c_str());
+
+    // Read from stream.
+    stream.SetPos(0);
+    LLBC_PrintLn("Read enums:");
+
+    I64Enum i64en = stream.Read<I64Enum>();
+    LLBC_PrintLn("Read I64Enum: %lld, equal I64Enum::ENUM1?:%d", static_cast<sint64>(i64en), i64en == I64Enum::ENUM1);
+    LLBC_SetErrAndReturnIf(i64en != I64Enum::ENUM1, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
+
+    i64en = stream.Read<I64Enum>();
+    LLBC_PrintLn("Read I64Enum: %lld, equal I64Enum::ENUM2?:%d", static_cast<sint64>(i64en), i64en == I64Enum::ENUM2);
+    LLBC_SetErrAndReturnIf(i64en != I64Enum::ENUM2, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
+
+    U64Enum u64en = stream.Read<U64Enum>();
+    LLBC_PrintLn("Read U64Enum: %llu, equal U64Enum::ENUM1?:%d", static_cast<uint64>(u64en), u64en == U64Enum::ENUM1);
+    LLBC_SetErrAndReturnIf(u64en != U64Enum::ENUM1, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
+
+    u64en = stream.Read<U64Enum>();
+    LLBC_PrintLn("Read U64Enum: %llu, equal U64Enum::ENUM2?:%d", static_cast<uint64>(u64en), u64en == U64Enum::ENUM2);
+    LLBC_SetErrAndReturnIf(u64en != U64Enum::ENUM2, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
 
     return LLBC_OK;
 }
