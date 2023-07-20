@@ -319,20 +319,17 @@ public:
     }
 
     /**
-     * Read arithmetic type object from stream.
+     * Read arithmetic/enumeration type object from stream.
      * @param[out] obj - already read object.
      * @return bool - return true if success, otherwise return false.
      */
     template <typename T>
-    typename std::enable_if<std::is_arithmetic<T>::value, bool>::type
+    typename std::enable_if<std::is_arithmetic<T>::value ||
+                            std::is_enum<T>::value, bool>::type
     Read(T &obj)
     {
-        const size_t readableSize = _cap - _pos;
-        if (UNLIKELY(readableSize < sizeof(T)))
+        if (UNLIKELY(!Read(&obj, sizeof(T))))
             return false;
-
-        obj = *(reinterpret_cast<T *>(_buf + _pos));
-        _pos += sizeof(T);
 
         if (_endian != LLBC_MachineEndian)
             LLBC_ReverseBytes(obj);
@@ -340,6 +337,70 @@ public:
         return true;
     }
 
+    /**
+     * Forbid string pointer read operation.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value, bool>::type
+    Read(T &obj)
+    {
+        ASSERT(false && "Unsupported stream read operation!");
+        return false;
+    }
+
+    /**
+     * Read void pointer from stream.
+     * @param[out] voidPtr - the void pointer.
+     * @return bool - return 0 if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value, bool>::type
+    Read(T &voidPtr)
+    {
+        uint64 ptrVal;
+        if (UNLIKELY(!Read(ptrVal)))
+            return false;
+
+        memcpy(&voidPtr, &ptrVal, MIN(sizeof(voidPtr), sizeof(ptrVal)));
+
+        return true;
+    }
+
+    /**
+     * Read non string pointer from stream.
+     * @param[out] ptr - the non string pointer.
+     * @return bool - return 0 if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value, bool>::type
+    Read(T &ptr)
+    {
+        bool innerCreate = false;
+        if (!ptr)
+        {
+            innerCreate = true;
+            ptr = new typename LLBC_ExtractPureType<T>::type;
+        }
+
+        if (UNLIKELY(!Read(*ptr)))
+        {
+            if (innerCreate)
+                delete ptr;
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Read char array from stream.
+     * @param[out] arr - char array.
+     * @return bool - return true if success, otherwise return false.
+     */
     template <typename T, size_t _ArrLen>
     typename std::enable_if<std::is_arithmetic<T>::value &&
                             std::is_same<T, char>::value, bool>::type
@@ -370,6 +431,11 @@ public:
         }
     }
 
+    /**
+     * Read arithmetic array from stream.
+     * @param[out] arr - arithmetic array.
+     * @return bool - return true if success, otherwise return false.
+     */
     template <typename T, size_t _ArrLen>
     typename std::enable_if<std::is_arithmetic<T>::value &&
                             !std::is_same<T, char>::value, bool>::type
@@ -387,6 +453,11 @@ public:
         return Read(&arr[0], sizeof(T) * size);
     }
 
+    /**
+     * Read non-arithmetic array from stream.
+     * @param[out] arr - non-arithmetic array.
+     * @return bool - return true if success, otherwise return false.
+     */
     template <typename T, size_t _ArrLen>
     typename std::enable_if<!std::is_arithmetic<T>::value, bool>::type
     Read(T (&arr)[_ArrLen])
@@ -404,65 +475,6 @@ public:
         {
             if (UNLIKELY(!Read(&arr[i])))
                 return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Forbid string pointer read operation.
-     */
-    template <typename T>
-    typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value, bool>::type
-    Read(T &obj)
-    {
-        ASSERT(false && "Unsupported stream read operation!");
-        return false;
-    }
-
-    /**
-     * Write void pointer from stream.
-     * @param[out] voidPtr - the void pointer.
-     * @return bool - return 0 if success, otherwise return false.
-     */
-    template <typename T>
-    typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value, bool>::type
-    Read(T &voidPtr)
-    {
-        uint64 ptrVal;
-        if (UNLIKELY(!Read(ptrVal)))
-            return false;
-
-        memcpy(&voidPtr, &ptrVal, MIN(sizeof(voidPtr), sizeof(ptrVal)));
-
-        return true;
-    }
-
-    /**
-     * Write non string pointer from stream.
-     * @param[out] ptr - the non string pointer.
-     * @return bool - return 0 if success, otherwise return false.
-     */
-    template <typename T>
-    typename std::enable_if<std::is_pointer<T>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value, bool>::type
-    Read(T &ptr)
-    {
-        bool innerCreate = false;
-        if (!ptr)
-        {
-            innerCreate = true;
-            ptr = new typename LLBC_ExtractPureType<T>::type;
-        }
-
-        if (UNLIKELY(!Read(*ptr)))
-        {
-            if (innerCreate)
-                delete ptr;
-            return false;
         }
 
         return true;
@@ -703,8 +715,9 @@ public:
      */
     template <typename T>
     typename std::enable_if<!std::is_arithmetic<T>::value &&
-                            !std::is_array<T>::value &&
+                            !std::is_enum<T>::value &&
                             !std::is_pointer<T>::value &&
+                            !std::is_array<T>::value &&
                             !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
                               LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
                             !LLBC_IsTemplSpec<T, std::vector>::value &&
@@ -818,74 +831,19 @@ public:
      * @param[in] obj - the will write object.
      */
     template <typename T>
-    typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+    typename std::enable_if<std::is_arithmetic<T>::value ||
+                            std::is_enum<T>::value, void>::type
     Write(const T &obj)
     {
-        ReserveFreeCap(sizeof(T));
         if (_endian != LLBC_MachineEndian)
         {
-            T obj2(obj);
-            LLBC_ReverseBytes(obj2);
-            memcpy(_buf + _pos, &obj2, sizeof(T));
+            const T obj2 = LLBC_ReverseBytes2(obj);
+            Write(&obj2, sizeof(T));
         }
         else
         {
-            memcpy(_buf + _pos, &obj, sizeof(T));
+            Write(&obj, sizeof(T));
         }
-
-        _pos += sizeof(T);
-    }
-
-    /**
-     * Write char arithmetic array to stream.
-     * @param[in] arr - the char arithmetic array.
-     */
-    template <typename T, size_t _ArrLen>
-    typename std::enable_if<std::is_arithmetic<T>::value &&
-                            std::is_same<T, char>::value, void>::type
-    Write(const T (&arr)[_ArrLen])
-    {
-        if (_ArrLen == 0)
-        {
-            Write(0u);
-        }
-        else if (arr[_ArrLen - 1] == '\0')
-        {
-
-            Write(static_cast<uint32>(_ArrLen) - 1);
-            Write(&arr[0], sizeof(T) * (_ArrLen - 1));
-        }
-        else
-        {
-            Write(static_cast<uint32>(_ArrLen));
-            Write(&arr[0], sizeof(T) * _ArrLen);
-        }
-    }
-
-    /**
-     * Write non-char arithmetic array to stream.
-     * @param[in] arr - the non-char arithmetic array.
-     */
-    template <typename T, size_t _ArrLen>
-    typename std::enable_if<std::is_arithmetic<T>::value &&
-                            !std::is_same<T, char>::value, void>::type
-    Write(const T (&arr)[_ArrLen])
-    {
-        Write(static_cast<uint32>(_ArrLen));
-        Write(&arr[0], sizeof(arr));
-    }
-
-    /**
-     * Write non-arithmetic raw-array to stream.
-     * @param[in] arr - the raw-array.
-     */
-    template <typename T, size_t _ArrLen>
-    typename std::enable_if<!std::is_arithmetic<T>::value, void>::type
-    Write(const T (&arr)[_ArrLen])
-    {
-        Write(static_cast<uint32>(_ArrLen));
-        for (size_t i = 0; i < _ArrLen; ++i)
-            Write(arr[i]);
     }
 
     /**
@@ -938,6 +896,58 @@ public:
             Write(*ptr) :
                 Write(typename LLBC_ExtractPureType<T>::type());
         
+    }
+
+    /**
+     * Write char arithmetic array to stream.
+     * @param[in] arr - the char arithmetic array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                            std::is_same<T, char>::value, void>::type
+    Write(const T (&arr)[_ArrLen])
+    {
+        if (_ArrLen == 0)
+        {
+            Write(0u);
+        }
+        else if (arr[_ArrLen - 1] == '\0')
+        {
+
+            Write(static_cast<uint32>(_ArrLen) - 1);
+            Write(&arr[0], sizeof(T) * (_ArrLen - 1));
+        }
+        else
+        {
+            Write(static_cast<uint32>(_ArrLen));
+            Write(&arr[0], sizeof(T) * _ArrLen);
+        }
+    }
+
+    /**
+     * Write non-char arithmetic array to stream.
+     * @param[in] arr - the non-char arithmetic array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                            !std::is_same<T, char>::value, void>::type
+    Write(const T (&arr)[_ArrLen])
+    {
+        Write(static_cast<uint32>(_ArrLen));
+        Write(&arr[0], sizeof(arr));
+    }
+
+    /**
+     * Write non-arithmetic raw-array to stream.
+     * @param[in] arr - the raw-array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<!std::is_arithmetic<T>::value, void>::type
+    Write(const T (&arr)[_ArrLen])
+    {
+        Write(static_cast<uint32>(_ArrLen));
+        for (size_t i = 0; i < _ArrLen; ++i)
+            Write(arr[i]);
     }
 
     /**
@@ -1084,8 +1094,9 @@ public:
      */
     template <typename T>
     typename std::enable_if<!std::is_arithmetic<T>::value &&
-                            !std::is_array<T>::value &&
+                            !std::is_enum<T>::value &&
                             !std::is_pointer<T>::value &&
+                            !std::is_array<T>::value &&
                             !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
                               LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
                             !LLBC_IsTemplSpec<T, std::vector>::value &&
