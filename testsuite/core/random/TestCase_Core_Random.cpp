@@ -62,9 +62,9 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
     // Test Rand(weights)
-    Exec_RandInt_index_Test(std::vector<int>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_index_Test(std::list<int>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_index_Test(std::array<int, 5>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::vector<int>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<int>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<int, 5>{ 1, 2, 3, 4, 5}, 100);
 
     // Test RandReal()
     LLBC_Print("\n");
