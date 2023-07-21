@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/random/mtrandom.h"
+#include "llbc/common/TemplateDeduction.h"
 
 __LLBC_NS_BEGIN
 
@@ -59,10 +60,15 @@ public:
     int Rand(int begin, int end);
 
     /**
-     * Generate a random index based on the weight values of the input vectors.
-     * @return int - the random index of the vector[0, vector.size()).
+     * Generate a random index based on the weight values of the input weights.
+     * @return int - the random index of the weights[0, weights.size()).
      */
-    int Rand(const std::vector<int> &weights);
+    template <typename _Weights>
+    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                            std::is_array<_Weights>::value, int>::type
+    Rand(const _Weights &weights);
 
     /**
      * Generate a floating point number N such that: 0 <= N < 1.

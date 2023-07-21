@@ -70,11 +70,16 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
-inline int LLBC_Random::Rand(const std::vector<int> &weights)
+template <typename _Weights>
+typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                        std::is_array<_Weights>::value, int>::type
+LLBC_Random::Rand(const _Weights &weights)
 {
     if (weights.size() <= 1)
         return 0;
-        
+
     int totalWeight = 0;
     for (int weight : weights)
         totalWeight += weight;
@@ -82,14 +87,16 @@ inline int LLBC_Random::Rand(const std::vector<int> &weights)
     auto randomWeight = Rand(0, totalWeight);
     int currentWeight = 0;
 
-    for (size_t i = 0; i < weights.size(); ++i) 
+    auto i = 0;
+    for (int weight : weights)
     {
-        currentWeight += weights[i];
+        currentWeight += weight;
         if (randomWeight < currentWeight)
             return i;
+        i++;
     }
 
-    return weights.size() - 1; // will not reach here
+    ASSERT(false && "llbc framework internal error");
 }
 
 inline double LLBC_Random::RandReal()
