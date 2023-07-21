@@ -169,7 +169,7 @@ TestCase_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times
     LLBC_PrintLn("LLBC_Rand(weights) test(times:%d):", times);
 
     LLBC_Print("weights: ");
-    for (const auto &weight: weights)
+    for (const auto &weight : weights)
         LLBC_Print("%s ", std::to_string(static_cast<int>(weight)).c_str());
     LLBC_Print("\n");
 
