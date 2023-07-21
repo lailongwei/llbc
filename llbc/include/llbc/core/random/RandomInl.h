@@ -87,7 +87,7 @@ LLBC_Random::Rand(const _Weights &weights)
     const int randomWeight = Rand(0, totalWeight);
     int currentWeight = 0;
 
-    auto i = 0;
+    int i = 0;
     for (const auto &weight : weights)
     {
         currentWeight += static_cast<int>(weight);;
@@ -97,6 +97,7 @@ LLBC_Random::Rand(const _Weights &weights)
     }
 
     ASSERT(false && "llbc framework internal error");
+    return 0;
 }
 
 inline double LLBC_Random::RandReal()

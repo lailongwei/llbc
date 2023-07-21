@@ -62,12 +62,12 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
     // Test Rand(weights)
-    Exec_RandInt_array_Test(std::vector<int>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_array_Test(std::list<int>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_array_Test(std::array<int, 5>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_array_Test(std::vector<sint64>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_array_Test(std::list<sint64>{ 1, 2, 3, 4, 5}, 100);
-    Exec_RandInt_array_Test(std::array<sint64, 5>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::vector<int>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<int>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<int, 5>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::vector<sint64>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<sint64>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<sint64, 5>{1, 2, 3, 4, 5}, 100);
 
     // Test RandReal()
     LLBC_Print("\n");
@@ -165,7 +165,7 @@ TestCase_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times
 
     LLBC_Print("weights: ");
     for (const auto &weight: weights)
-        LLBC_Print(std::to_string(static_cast<int>(weight)).append(" ").c_str());
+        LLBC_Print("%s ", std::to_string(static_cast<int>(weight)).c_str());
     LLBC_Print("\n");
 
     LLBC_Random random;
