@@ -59,6 +59,12 @@ public:
     int Rand(int begin, int end);
 
     /**
+     * Generate a random index based on the weight values of the input vectors.
+     * @return int - the random index of the vector[0, vector.size()).
+     */
+    int Rand(const std::vector<int>& weights);
+
+    /**
      * Generate a floating point number N such that: 0 <= N < 1.
      * @return int - the random floating point number N.
      */

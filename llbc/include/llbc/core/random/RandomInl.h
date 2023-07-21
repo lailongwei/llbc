@@ -70,6 +70,28 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
+inline int LLBC_Random::Rand(const std::vector<int>& weights)
+{
+    if (weights.size() <= 1)
+        return 0;
+        
+    int totalWeight = 0;
+    for (int weight : weights)
+        totalWeight += weight;
+
+    auto randomWeight = Rand(0, totalWeight);
+    int currentWeight = 0;
+
+    for (size_t i = 0; i < weights.size(); ++i) 
+    {
+        currentWeight += weights[i];
+        if (randomWeight < currentWeight)
+            return i;
+    }
+
+    return weights.size() - 1; // will not reach here
+}
+
 inline double LLBC_Random::RandReal()
 {
     return _mtRand.real();
