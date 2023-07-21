@@ -70,7 +70,7 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
-inline int LLBC_Random::Rand(const std::vector<int>& weights)
+inline int LLBC_Random::Rand(const std::vector<int> &weights)
 {
     if (weights.size() <= 1)
         return 0;
