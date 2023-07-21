@@ -71,7 +71,7 @@ void pyllbc_AddCommonObjs()
     endianMod->AddObject("BigEndian", LLBC_Endian::BigEndian);
     endianMod->AddObject("NetEndian", LLBC_Endian::NetEndian);
     endianMod->AddObject("LittleEndian", LLBC_Endian::LittleEndian);
-    endianMod->AddObject("MachineEndian", LLBC_GetMachineEndianType());
+    endianMod->AddObject("MachineEndian", LLBC_MachineEndian);
 
     /* Add PyStream methods. */
     pyllbc_Module *inlMod = pyllbc_s_InlModule;
