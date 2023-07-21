@@ -65,6 +65,9 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_array_Test(std::vector<int>{ 1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::list<int>{ 1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::array<int, 5>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::vector<sint64>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<sint64>{ 1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<sint64, 5>{ 1, 2, 3, 4, 5}, 100);
 
     // Test RandReal()
     LLBC_Print("\n");
@@ -153,16 +156,16 @@ void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int t
 
 template <typename _Weights>
 typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-    LLBC_IsTemplSpec<_Weights, std::list>::value ||
-    LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-    std::is_array<_Weights>::value, void>::type
-TestCase_Core_Random::Exec_RandInt_array_Test(_Weights weights, int times)
+                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                        std::is_array<_Weights>::value, void>::type
+TestCase_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times)
 {
     LLBC_PrintLn("LLBC_Rand(weights) test(times:%d):", times);
 
     LLBC_Print("weights: ");
-        for (int val : weights)
-            LLBC_Print(std::to_string(val).append(" ").c_str());
+    for (const auto &weight: weights)
+        LLBC_Print(std::to_string(static_cast<int>(weight)).append(" ").c_str());
     LLBC_Print("\n");
 
     LLBC_Random random;

@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include "llbc/common/Common.h"
 #include "llbc/core/random/mtrandom.h"
-#include "llbc/common/TemplateDeduction.h"
 
 __LLBC_NS_BEGIN
 

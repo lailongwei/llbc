@@ -81,16 +81,16 @@ LLBC_Random::Rand(const _Weights &weights)
         return 0;
 
     int totalWeight = 0;
-    for (int weight : weights)
-        totalWeight += weight;
+    for (const auto &weight : weights)
+        totalWeight += static_cast<int>(weight);
 
-    auto randomWeight = Rand(0, totalWeight);
+    const int randomWeight = Rand(0, totalWeight);
     int currentWeight = 0;
 
     auto i = 0;
-    for (int weight : weights)
+    for (const auto &weight : weights)
     {
-        currentWeight += weight;
+        currentWeight += static_cast<int>(weight);;
         if (randomWeight < currentWeight)
             return i;
         i++;
