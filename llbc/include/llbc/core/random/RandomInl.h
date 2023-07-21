@@ -77,9 +77,6 @@ typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
                         std::is_array<_Weights>::value, int>::type
 LLBC_Random::Rand(const _Weights &weights)
 {
-    if (weights.size() <= 1)
-        return 0;
-
     int totalWeight = 0;
     for (const auto &weight : weights)
         totalWeight += static_cast<int>(weight);

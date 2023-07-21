@@ -62,9 +62,14 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
     // Test Rand(weights)
+    int weightsArr[5] = {1, 2, 3, 4, 5};
+    Exec_RandInt_array_Test(weightsArr, 100);
     Exec_RandInt_array_Test(std::vector<int>{1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::list<int>{1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::array<int, 5>{1, 2, 3, 4, 5}, 100);
+
+    sint64 weightsArrInt64[5] = {1, 2, 3, 4, 5};
+    Exec_RandInt_array_Test(weightsArrInt64, 100);
     Exec_RandInt_array_Test(std::vector<sint64>{1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::list<sint64>{1, 2, 3, 4, 5}, 100);
     Exec_RandInt_array_Test(std::array<sint64, 5>{1, 2, 3, 4, 5}, 100);
