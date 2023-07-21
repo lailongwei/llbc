@@ -332,7 +332,7 @@ public:
             return false;
 
         if (_endian != LLBC_MachineEndian)
-            LLBC_ReverseBytes(obj);
+            obj = LLBC_ReverseBytes(obj);
 
         return true;
     }
@@ -837,7 +837,7 @@ public:
     {
         if (_endian != LLBC_MachineEndian)
         {
-            const T obj2 = LLBC_ReverseBytes2(obj);
+            const T obj2 = LLBC_ReverseBytes(obj);
             Write(&obj2, sizeof(T));
         }
         else

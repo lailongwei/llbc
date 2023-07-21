@@ -66,9 +66,6 @@ int __LLBC_CommonStartup()
                       DUPLICATE_SAME_ACCESS);
 #endif // LLBC_TARGET_PLATFRM_NON_WIN32
 
-    // Set endian type constant.
-    LLBC_MachineEndian = LLBC_GetMachineEndianType();
-
     // Set entry-thread lib tls variable.
     __LLBC_EntryThreadLibTls = tls;
 
