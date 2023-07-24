@@ -303,7 +303,7 @@ void TestCase_Core_Log::DoConditionMacroLogTest()
 {
     LLBC_LogAndDoIf(true, Error, {});
     LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purly text");
-    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s", 1, "ss", "hello world");
     for(int i = 0; i < 4; i++) 
     {
         LLBC_LogAndContinueIf(i == 0, Error);

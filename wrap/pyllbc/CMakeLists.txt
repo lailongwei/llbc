@@ -1,0 +1,1 @@
+project(llbc_wrap_pyllbc)
