@@ -10,20 +10,11 @@ include_directories(${LLBC_CORE_LIB_INCLUDE})
 
 # Link core lib dependency library.
 IF(WIN32)
-    SET(LLBC_CORE_LIB_DEPS
-            ws2_32.lib,
-            Mswsock.lib,
-            DbgHelp.lib)
-
+    set(LLBC_CORE_LIB_LINK_LIBRARIES -lws2_32 -lMswsock -lDbgHelp)
 ELSEIF(UNIX AND NOT APPLE)
-    SET(LLBC_CORE_LIB_DEPS,
-            dl,
-            uuid,
-            pthread)
-
+    set(LLBC_CORE_LIB_LINK_LIBRARIES -ldl -lpthread -luuid)
 ELSEIF(APPLE)
-    SET(LLBC_CORE_LIB_DEPS
-            libiconv.dylib)
+    set(LLBC_CORE_LIB_LINK_LIBRARIES -liconv)
 ENDIF()
 
 # Set core library output directory.
@@ -31,10 +22,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Build core library static library.
-ADD_LIBRARY(${PROJECT_NAME} STATIC ${LLBC_SRC_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LLBC_CORE_LIB_DEPS})
+add_library(${PROJECT_NAME} STATIC ${LLBC_SRC_FILES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME})
 
 # Build core library shared library.
 SET(LLBC_CORE_LIB_SHARED_NAME ${PROJECT_NAME}_shared)
-ADD_LIBRARY(${LLBC_CORE_LIB_SHARED_NAME} SHARED ${LLBC_SRC_FILES})
-TARGET_LINK_LIBRARIES(${LLBC_CORE_LIB_SHARED_NAME} ${LLBC_CORE_LIB_DEPS})
+add_library(${LLBC_CORE_LIB_SHARED_NAME} SHARED ${LLBC_SRC_FILES})
+target_link_libraries(${LLBC_CORE_LIB_SHARED_NAME} ${LLBC_CORE_LIB_LINK_LIBRARIES})

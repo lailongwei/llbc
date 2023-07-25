@@ -26,4 +26,3 @@ SET(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
 # Add sub directory.
 add_subdirectory(${LLBC_CORE_LIB_DIR})
 add_subdirectory(${LLBC_TESTSUITE_DIR})
-add_subdirectory(${LLBC_WRAP_DIR})
