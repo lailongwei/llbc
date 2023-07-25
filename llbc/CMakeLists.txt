@@ -15,22 +15,26 @@ IF(WIN32)
             Mswsock.lib,
             DbgHelp.lib)
 
-ELIF(UNIX AND NOT APPLE)
+ELSEIF(UNIX AND NOT APPLE)
     SET(LLBC_CORE_LIB_DEPS,
             dl,
             uuid,
             pthread)
 
-ELIF(APPLE)
+ELSEIF(APPLE)
     SET(LLBC_CORE_LIB_DEPS
-            iconv)
-
+            libiconv.dylib)
 ENDIF()
 
-# Set core library static library output directory.
-SET(LLBC_LIB_OUTPUT_DIR ${LLBC_OUTPUT_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLBC_LIB_OUTPUT_DIR})
+# Set core library output directory.
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Build core library static library.
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${LLBC_SRC_FILES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LLBC_CORE_LIB_DEPS})
+
+# Build core library shared library.
+SET(LLBC_CORE_LIB_SHARED_NAME ${PROJECT_NAME}_shared)
+ADD_LIBRARY(${LLBC_CORE_LIB_SHARED_NAME} SHARED ${LLBC_SRC_FILES})
+TARGET_LINK_LIBRARIES(${LLBC_CORE_LIB_SHARED_NAME} ${LLBC_CORE_LIB_DEPS})

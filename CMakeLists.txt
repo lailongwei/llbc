@@ -15,7 +15,7 @@ SET(CMAKE_COLOR_MAKEFILE on)
 SET(LLBC_CORE_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
 
 # Set llbc testsuite directory.
-SET(LLBC_TEST_DIR ${PROJECT_SOURCE_DIR}/testsuite)
+SET(LLBC_TESTSUITE_DIR ${PROJECT_SOURCE_DIR}/testsuite)
 
 # Set llbc wrap directory.
 SET(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
@@ -25,5 +25,5 @@ SET(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
 
 # Add sub directory.
 add_subdirectory(${LLBC_CORE_LIB_DIR})
-add_subdirectory(${LLBC_TEST_DIR})
-#add_subdirectory(${LLBC_WRAP_DIR})
+add_subdirectory(${LLBC_TESTSUITE_DIR})
+add_subdirectory(${LLBC_WRAP_DIR})

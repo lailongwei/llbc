@@ -6,10 +6,8 @@ file(GLOB_RECURSE LLBC_SRC_FILES *.cpp *.h)
 # Include core lib directory.
 SET(LLBC_CORE_LIB_INCLUDE ${LLBC_CORE_LIB_DIR}/include)
 include_directories(${LLBC_CORE_LIB_INCLUDE})
-include_directories(${LLBC_TEST_DIR})
-
-# Link core lib library.
-link_directories(${LLBC_LIB_OUTPUT_DIR})
+# Include testsuite directory.
+include_directories(${LLBC_TESTSUITE_DIR})
 
 # Set testsuite dependency libraries.
 IF(WIN32)
@@ -17,7 +15,7 @@ IF(WIN32)
             ws2_32.lib,
             Mswsock.lib,
             DbgHelp.lib)
-ELIF(UNIX AND NOT APPLE)
+ELSEIF(UNIX AND NOT APPLE)
     SET(LLBC_TESTSUITE_DEP_LIBS
             dl,
             uuid,
@@ -25,13 +23,18 @@ ELIF(UNIX AND NOT APPLE)
             llbc_core_lib)
 ELSEIF(APPLE)
     SET(LLBC_TESTSUITE_DEP_LIBS
-            llbc_core_lib
-            iconv)
+            llbc_core_lib)
 ENDIF()
 
+# Copy all testcase config file to output directory.
+configure_file(${LLBC_TESTSUITE_DIR}/core/config/IniTestCfg.ini ${LLBC_OUTPUT_DIR} COPYONLY)
+configure_file(${LLBC_TESTSUITE_DIR}/core/log/LogTestCfg.cfg ${LLBC_OUTPUT_DIR} COPYONLY)
+configure_file(${LLBC_TESTSUITE_DIR}/app/AppCfgTest.cfg ${LLBC_OUTPUT_DIR} COPYONLY)
+configure_file(${LLBC_TESTSUITE_DIR}/app/AppCfgTest.ini ${LLBC_OUTPUT_DIR} COPYONLY)
+configure_file(${LLBC_TESTSUITE_DIR}/app/AppCfgTest.xml ${LLBC_OUTPUT_DIR} COPYONLY)
+
 # Set testsuite output directory.
-SET(LLBC_TESTSUITE_OUTPUT_DIR ${LLBC_OUTPUT_DIR}/testsuite)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_TESTSUITE_OUTPUT_DIR})
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Build testsuite.
 add_executable(${PROJECT_NAME} ${LLBC_SRC_FILES})
