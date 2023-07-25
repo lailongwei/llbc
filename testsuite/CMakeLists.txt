@@ -11,9 +11,9 @@ include_directories(${LLBC_TESTSUITE_DIR})
 
 # Set testsuite dependency libraries.
 IF(WIN32)
-    set(LLBC_TESTSUITE_LINK_LIBRARIES -lws2_32 llbc_core_lib)
+    set(LLBC_TESTSUITE_LINK_LIBRARIES -lws2_32 -lMswsock -lDbgHelp llbc_core_lib)
 ELSEIF(UNIX AND NOT APPLE)
-    set(LLBC_TESTSUITE_LINK_LIBRARIES -ldl -lpthread llbc_core_lib)
+    set(LLBC_TESTSUITE_LINK_LIBRARIES -ldl -lpthread -luuid llbc_core_lib)
 ELSEIF(APPLE)
     set(LLBC_TESTSUITE_LINK_LIBRARIES -liconv llbc_core_lib)
 ENDIF()
@@ -30,5 +30,4 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Build testsuite.
 add_executable(${PROJECT_NAME} ${LLBC_SRC_FILES})
-target_link_libraries(${PROJECT_NAME} ${LLBC_TESTSUITE_LINK_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${LLBC_TESTSUITE_LINK_LIBRARIES})
