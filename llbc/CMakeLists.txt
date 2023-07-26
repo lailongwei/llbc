@@ -10,7 +10,7 @@ include_directories(${LLBC_CORE_LIB_INCLUDE})
 
 # Link core lib dependency library.
 IF(WIN32)
-    set(LLBC_CORE_LIB_LINK_LIBRARIES -lws2_32 -lMswsock -lDbgHelp)
+    set(LLBC_CORE_LIB_LINK_LIBRARIES ws2_32 Mswsock DbgHelp)
 ELSEIF(UNIX AND NOT APPLE)
     set(LLBC_CORE_LIB_LINK_LIBRARIES -ldl -lpthread -luuid)
 ELSEIF(APPLE)
