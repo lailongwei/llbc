@@ -102,7 +102,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         LLBC_PrintLn("LLBC_Num2Str<ulong>()[%lu] -> string(base:10): %s",
             ulongVal, LLBC_NumToStr(ulongVal).c_str());
 
-        sint64 sint64Val = -9223372036854775808U;
+        sint64 sint64Val = -9223372036854775807i64 - 1;
         LLBC_PrintLn("LLBC_Num2Str<sint64>()[%lld] -> string(base:10): %s",
             sint64Val, LLBC_NumToStr(sint64Val).c_str());
         uint64 uint64Val = 18446744073709551615U;

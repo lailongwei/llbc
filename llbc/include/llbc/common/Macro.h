@@ -163,8 +163,13 @@
  #endif
 #elif LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-  #define LLBC_EXPORTING 0
-  #define LLBC_EXPORT __declspec(dllimport)
+   #ifdef LLBC_LINK_STATIC_LIBRARY
+    #define LLBC_EXPORTING 0
+    #define LLBC_EXPORT
+   #else
+    #define LLBC_EXPORTING 1
+    #define LLBC_EXPORT  __declspec(dllimport)
+   #endif
  #endif
 #elif LLBC_TARGET_PLATFORM_IPHONE
  #ifndef LLBC_EXPORT
