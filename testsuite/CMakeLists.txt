@@ -17,10 +17,10 @@ IF(WIN32)
     set(LLBC_TESTSUITE_LINK_SHARED_LIBRARIES ws2_32 Mswsock DbgHelp llbc_core_lib_shared)
 ELSEIF(UNIX AND NOT APPLE)
     set(LLBC_TESTSUITE_LINK_STATIC_LIBRARIES -ldl -lpthread -luuid llbc_core_lib)
-    set(LLBC_TESTSUITE_LINK_SHARED_LIBRARIES ws2_32 Mswsock DbgHelp llbc_core_lib_shared)
+    set(LLBC_TESTSUITE_LINK_SHARED_LIBRARIES -ldl -lpthread -luuid llbc_core_lib_shared)
 ELSEIF(APPLE)
     set(LLBC_TESTSUITE_LINK_STATIC_LIBRARIES -liconv llbc_core_lib)
-    set(LLBC_TESTSUITE_LINK_SHARED_LIBRARIES ws2_32 Mswsock DbgHelp llbc_core_lib_shared)
+    set(LLBC_TESTSUITE_LINK_SHARED_LIBRARIES -liconv llbc_core_lib_shared)
 ENDIF()
 
 # Set testsuite output directory.
