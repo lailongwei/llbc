@@ -70,6 +70,32 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
+template <typename _Weights>
+typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                        std::is_array<_Weights>::value, int>::type
+LLBC_Random::Rand(const _Weights &weights)
+{
+    int totalWeight = 0;
+    for (const auto &weight : weights)
+        totalWeight += static_cast<int>(weight);
+
+    int i = 0;
+    int currentWeight = 0;
+    const int randomWeight = Rand(0, totalWeight);
+    for (const auto &weight : weights)
+    {
+        currentWeight += static_cast<int>(weight);
+        if (randomWeight < currentWeight)
+            return i;
+        i++;
+    }
+
+    ASSERT(false && "llbc framework internal error");
+    return 0;
+}
+
 inline double LLBC_Random::RandReal()
 {
     return _mtRand.real();
