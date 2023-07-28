@@ -370,25 +370,25 @@ private:                                    \
 /**
  * Some condition judge helper macros.
  */
-#define LLBC_Foreach(cont, behav)                             \
-    do{ for (auto &item : cont) { behav; } } while(false)     \
+#define LLBC_Foreach(cont, behav)                                 \
+    do { for (auto &item : cont) { behav; } } while(false)        \
 
-#define LLBC_DoIf(cond, behav)                                \
-    do{ if (cond) { behav; } } while(false)                   \
+#define LLBC_DoIf(cond, behav)                                    \
+    { if (cond) { behav; } }                                      \
 
-#define LLBC_ContinueIf(cond)                                 \
-    if (cond) continue                                        \
+#define LLBC_ContinueIf(cond)                                     \
+    { if (cond) continue; }                                       \
 
-#define LLBC_BreakIf(cond)                                    \
-    if (cond) break                                           \
+#define LLBC_BreakIf(cond)                                        \
+    { if (cond) break; }                                          \
 
-#define LLBC_SetErrAndBreakIf(cond, err)                      \
-    if (cond) { LLBC_NS LLBC_SetLastError(err); break; }      \
+#define LLBC_SetErrAndBreakIf(cond, err)                          \
+    { if (cond) { LLBC_NS LLBC_SetLastError(err); break; } }      \
 
-#define LLBC_ReturnIf(cond, ret)                              \
-    do{ if (cond) { return ret; } } while(false)              \
+#define LLBC_ReturnIf(cond, ret)                                  \
+    do { if (cond) { return ret; } } while(false)                 \
 
-#define LLBC_SetErrAndReturnIf(cond, err, ret)                \
-    if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
+#define LLBC_SetErrAndReturnIf(cond, err, ret)                    \
+    { if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
 
 

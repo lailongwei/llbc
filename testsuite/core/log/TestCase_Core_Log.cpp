@@ -302,30 +302,33 @@ void TestCase_Core_Log::DoUninitLogTest()
 void TestCase_Core_Log::DoConditionMacroLogTest()
 {
     LLBC_LogAndDoIf(true, Error, {});
-    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purly text");
-    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purely text");
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s",
+                    1, 3.14, "hello world");
+
     for(int i = 0; i < 4; i++) 
     {
         LLBC_LogAndContinueIf(i == 0, Error);
-        LLBC_LogAndContinueIf(i == 1, Error, "DoConditionMacroLogTest DoContinueIf: Purly text");
+        LLBC_LogAndContinueIf(i == 1, Error, "DoConditionMacroLogTest DoContinueIf: Purely text");
         LLBC_LogAndContinueIf(i == 2, Error, "DoConditionMacroLogTest DoContinueIf: int:%d, float:%f, string:%s",
-                                             1, 3.14, "hello world");
+                              1, 3.14, "hello world");
     }
-    for(;;) 
+    for(;;)
     {
         LLBC_LogAndBreakIf(true, Error);
     }
-    for(;;) 
+    for(;;)
     {
-        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: Purly text");
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: Purely text");
     }
     for(;;) 
     {
-        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: int:%d, float:%f, string:%s", 1, 3.14, "hello world");
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: int:%d, float:%f, string:%s",
+                           1, 3.14, "hello world");
     }
 
     [](){ LLBC_LogAndReturnIf(true, Error, void()); }();
-    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: Purly text"); }();
+    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: Purely text"); }();
     [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: int:%d, float:%f, string:%s", 
                                                    1, 3.14, "hello world"); }();
 }

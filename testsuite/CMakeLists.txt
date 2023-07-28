@@ -26,6 +26,13 @@ endif()
 # Set testsuite output directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
+# Copy all testcase config file to output directory.
+file(COPY ${LLBC_TESTSUITE_DIR}/core/config/IniTestCfg.ini DESTINATION ${LLBC_OUTPUT_DIR})
+file(COPY ${LLBC_TESTSUITE_DIR}/core/log/LogTestCfg.cfg DESTINATION ${LLBC_OUTPUT_DIR})
+file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.cfg DESTINATION ${LLBC_OUTPUT_DIR})
+file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.ini DESTINATION ${LLBC_OUTPUT_DIR})
+file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.xml DESTINATION ${LLBC_OUTPUT_DIR})
+
 # Build testsuite.
 set(LLBC_TESTSUITE_LINK_STATIC_LIB ${PROJECT_NAME})
 add_executable(${LLBC_TESTSUITE_LINK_STATIC_LIB} ${LLBC_TEST_SRC_FILES})
@@ -37,9 +44,3 @@ add_executable(${LLBC_TESTSUITE_LINK_SHARED_LIB} ${LLBC_TEST_SRC_FILES})
 target_link_libraries(${LLBC_TESTSUITE_LINK_SHARED_LIB} ${LLBC_TESTSUITE_SHARED_LIB})
 target_compile_definitions(${LLBC_TESTSUITE_LINK_SHARED_LIB} PRIVATE -DLLBC_LINK_SHARED_LIBRARY)
 
-# Copy all testcase config file to output directory.
-file(COPY ${LLBC_TESTSUITE_DIR}/core/config/IniTestCfg.ini DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_TESTSUITE_DIR}/core/log/LogTestCfg.cfg DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.cfg DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.ini DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_TESTSUITE_DIR}/app/AppCfgTest.xml DESTINATION ${LLBC_OUTPUT_DIR})
