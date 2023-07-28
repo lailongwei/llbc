@@ -26,7 +26,7 @@ jobs:
         run: yum install -y git wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
 
       - name : install cmake
-        run: git clone https://github.com/Kitware/CMake && cd CMake && ./bootstrap && make && make install
+        run: git clone https://github.com/Kitware/CMake && cd CMake && ./bootstrap && make && make install && make ..
         
       - name: Compile core lib code
         run: |
