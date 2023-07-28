@@ -30,5 +30,12 @@ jobs:
         run: |
           # make test config=debug64 -j4
           make test config=release64 -j4
+
+      - name: Build all target by cmake
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make -j
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
