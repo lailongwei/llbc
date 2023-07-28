@@ -43,6 +43,6 @@ jobs:
           mkdir cmake_build
           cd cmake_build
           cmake ..
-          make -j
+          make -j 4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
