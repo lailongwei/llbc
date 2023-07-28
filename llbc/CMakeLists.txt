@@ -5,17 +5,17 @@ project(llbc_lib)
 file(GLOB_RECURSE LLBC_LIB_SRC_FILES *.cpp)
 
 # Include llbc lib directory.
-SET(LLBC_LIB_INCLUDE ${LLBC_LIB_DIR}/include)
+set(LLBC_LIB_INCLUDE ${LLBC_LIB_DIR}/include)
 include_directories(${LLBC_LIB_INCLUDE})
 
 # Link llbc lib dependency library.
-IF(WIN32)
+if(WIN32)
     set(LLBC_LIB_LINK_LIB ws2_32 Mswsock DbgHelp)
-ELSEIF(UNIX AND NOT APPLE)
+elseif(UNIX AND NOT APPLE)
     set(LLBC_LIB_LINK_LIB -ldl -lpthread -luuid)
-ELSEIF(APPLE)
+elseif(APPLE)
     set(LLBC_LIB_LINK_LIB -liconv)
-ENDIF()
+endif()
 
 # Set llbc library output directory.
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})

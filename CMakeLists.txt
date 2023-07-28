@@ -8,20 +8,20 @@ project(llbc)
 set(CMAKE_CXX_STANDARD 14)
 
 # Set project cmake options.
-SET(CMAKE_VERBOSE_MAKEFILE on)
-SET(CMAKE_COLOR_MAKEFILE on)
+set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_COLOR_MAKEFILE on)
 
 # Set llbc core lib directory.
-SET(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
+set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
 
 # Set llbc testsuite directory.
-SET(LLBC_TESTSUITE_DIR ${PROJECT_SOURCE_DIR}/testsuite)
+set(LLBC_TESTSUITE_DIR ${PROJECT_SOURCE_DIR}/testsuite)
 
 # Set llbc wrap directory.
-SET(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
+set(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
 
 # Set llbc output directory.
-SET(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
+set(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
 
 # Add sub directory.
 add_subdirectory(${LLBC_LIB_DIR})
