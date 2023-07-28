@@ -23,7 +23,7 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
       - name: install deps
-        run: yum install -y git libssl-dev wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
+        run: yum install -y git openssl-dev wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
 
       - name : install cmake
         run: git clone https://github.com/Kitware/CMake && cd CMake && ./bootstrap && make && make install && make ..
