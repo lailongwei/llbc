@@ -29,7 +29,7 @@
 #endif
 #include "llbc/core/log/LoggerMgr.h"
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#if LLBC_CUR_COMPILER == LLBC_COMP_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
 #endif // GCC compiler
@@ -461,6 +461,6 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
 __LLBC_NS_END
 #endif // Supp hook process crash
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#if LLBC_CUR_COMPILER == LLBC_COMP_GCC
 #pragma GCC diagnostic pop
 #endif // GCC compiler
