@@ -43,8 +43,8 @@ jobs:
 
       - name: Build all target by cmake
         run: |
-          mkdir build
-          cd build
+          mkdir cmake_build
+          cd cmake_build
           cmake ..
           cmake --build . --config Release
         
