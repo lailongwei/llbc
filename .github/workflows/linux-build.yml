@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir cmake_build
           cd cmake_build
-          cmake ..
+          cmake3 ..
           make -j
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
