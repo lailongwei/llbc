@@ -46,7 +46,7 @@ jobs:
           mkdir cmake_build
           cd cmake_build
           cmake ..
-          cmake --build . --config Release
+          cmake --build . --config Release -j
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
     
