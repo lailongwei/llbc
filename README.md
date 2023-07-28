@@ -1,5 +1,5 @@
 ## 前置
-感谢<a href="https://www.jetbrains.com"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo." style="width:10%;height:10%" /></a>为llbc提供的开发工具支持，推荐大家使用JetBrains开发工具进行开发。
+感谢<a href="https://www.jetbrains.com"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo." style="width:4%;height:4%" /></a>为llbc提供的开发工具支持，推荐大家使用JetBrains开发工具进行开发。
 llbc开发过程中，使用了以下JetBrains产品：
 > <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.png" alt="ReSharper logo." style="width:18%;height:18%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharperCPP.png" alt="ReSharper C++ logo." style="width:20%;height:20%" /> <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.png" alt="PyCharm logo." style="width:15%;height:15%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/CLion.png" alt="CLion logo." style="width:15%;height:15%" /><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/Space.png" alt="Space logo." style="width:15%;height:15%" />
 
