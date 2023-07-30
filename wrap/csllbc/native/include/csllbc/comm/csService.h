@@ -39,7 +39,7 @@ class CSLLBC_HIDDEN csllbc_Service
     typedef csllbc_Delegates _D;
 
 public:
-    typedef LLBC_Service::DriveMode DriveMode;
+    typedef LLBC_ServiceDriveMode::ENUM DriveMode;
 
 public:
     /**
