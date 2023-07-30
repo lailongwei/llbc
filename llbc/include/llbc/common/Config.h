@@ -297,9 +297,9 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 // Application try start interval(Call OnStart() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_START_INTERVAL             100
+#define LLBC_CFG_APP_TRY_START_INTERVAL             5
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
+#define LLBC_CFG_APP_TRY_STOP_INTERVAL              5
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}
