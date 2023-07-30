@@ -48,7 +48,7 @@ public:
      */
 
      // UTC begin time.
-    static const LLBC_Time UTCBegin;
+    static const LLBC_Time utcBegin;
 
     // Number of xxxxx per-day.
     static constexpr int NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay;

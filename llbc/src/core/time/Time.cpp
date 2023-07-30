@@ -38,7 +38,7 @@ std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 
 __LLBC_NS_BEGIN
 
-const LLBC_Time LLBC_Time::UTCBegin;
+const LLBC_Time LLBC_Time::utcBegin;
 
 LLBC_Time LLBC_Time::Now()
 {
