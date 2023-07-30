@@ -253,21 +253,16 @@ long LLBC_File::GetFileSize() const
         return -1;
     }
 
-    int ret = LLBC_OK;
     long fileSize = ftell(handle);
     if (fileSize == -1L)
-    {
-        ret = LLBC_FAILED;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-    }
 
     if (fseek(handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
     {
-        if (ret == LLBC_OK)
-        {
+        if (fileSize >= 0)
             fileSize = -1L;
-            LLBC_SetLastError(LLBC_ERROR_CLIB);
-        }
+
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
     }
 
     return fileSize;
