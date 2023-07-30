@@ -255,9 +255,9 @@ private:                                    \
 
 /* Memory operations macros. */
 // allocate/reallocate/free/delete/recycle.
-#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
-#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
-#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
+#define LLBC_Malloc(type, sizeInBytes)            (reinterpret_cast<type *>(malloc(sizeInBytes)))
+#define LLBC_Calloc(type, sizeInBytes)            (reinterpret_cast<type *>(calloc(sizeInBytes, 1)))
+#define LLBC_Realloc(type, memblock, sizeInBytes) (reinterpret_cast<type *>(realloc((memblock), (sizeInBytes))))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
