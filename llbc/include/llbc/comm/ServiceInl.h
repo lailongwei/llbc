@@ -26,6 +26,28 @@
 
 __LLBC_NS_BEGIN
 
+constexpr bool LLBC_ServiceRunningPhase::IsFailedPhase(int runningPhase)
+{
+    return runningPhase == PreStartFailed ||
+        runningPhase == InitCompsFailed ||
+        runningPhase == StartCompsFailed;
+}
+
+constexpr bool LLBC_ServiceRunningPhase::IsStoppingPhase(int runningPhase)
+{
+    return runningPhase == Stopping;
+}
+
+constexpr bool LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(int runningPhase)
+{
+    return runningPhase == Stopping || IsFailedPhase(runningPhase);
+}
+
+constexpr bool LLBC_ServiceDriveMode::IsValid(int driveMode)
+{
+    return driveMode >= Begin && driveMode < End;
+}
+
 template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, int>::type
 LLBC_Service::AddComponent()
@@ -99,7 +121,7 @@ LLBC_Service::GetComponent()
     }
 
     #if LLBC_TARGET_PLATFORM_WIN32
-    auto compName = typeid(Comp).name();
+    auto compName = LLBC_GetTypeName(Comp);
     #else
     auto compName = LLBC_GetTypeName(Comp);
     #endif
@@ -322,11 +344,9 @@ inline LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, ObjType *obj, v
 }
 
 template <typename ObjType>
-inline int LLBC_Service::Post(ObjType *obj,
-                              void (ObjType::*method)(This *, const LLBC_Variant &),
-                              const LLBC_Variant &data)
+inline int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(LLBC_Service *))
 {
-    return Post(LLBC_Delegate<void(This *, const LLBC_Variant &)>(obj, method), data);
+    return Post(LLBC_Delegate<void(LLBC_Service *)>(obj, method));
 }
 
 __LLBC_NS_END

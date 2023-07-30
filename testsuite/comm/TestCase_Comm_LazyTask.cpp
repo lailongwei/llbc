@@ -27,17 +27,17 @@ namespace
     class LazyClass
     {
     public:
-        void BeforeRun(LLBC_Service *svc, const LLBC_Variant &data)
+        void BeforeRun(LLBC_Service *svc)
         {
-            LLBC_PrintLn("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
-            svc->Post(this, &LazyClass::AfterRun, data);
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s", "BeforeRun()");
+            svc->Post(this, &LazyClass::AfterRun);
         }
 
-        void AfterRun(LLBC_Service *svc, const LLBC_Variant &data)
+        void AfterRun(LLBC_Service *svc)
         {
-            LLBC_PrintLn("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s", "AfterRun()");
 
-            svc->Post(this, &LazyClass::BeforeRun, data);
+            svc->Post(this, &LazyClass::BeforeRun);
         }
     };
 }
@@ -62,7 +62,7 @@ int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
     taskData["StrVal"] = "Hello World";
     taskData["DictData"] = LLBC_Variant();
     taskData["DictData"]["EmbeddedVal"] = 3.1415926;
-    svc->Post(taskObj, &LazyClass::BeforeRun, taskData);
+    svc->Post(taskObj, &LazyClass::BeforeRun);
 
     svc->Start();
 

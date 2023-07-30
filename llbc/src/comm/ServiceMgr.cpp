@@ -162,8 +162,12 @@ void LLBC_ServiceMgr::OnServiceStop(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
 
-    _serviceList.erase(
-        std::find(_serviceList.begin(), _serviceList.end(), svc));
+    const auto svcListIt =
+        std::find(_serviceList.begin(), _serviceList.end(), svc);
+    if (svcListIt == _serviceList.end())
+        return;
+
+    _serviceList.erase(svcListIt);
     _id2Services.erase(svc->GetId());
     _name2Services.erase(svc->GetName());
 }

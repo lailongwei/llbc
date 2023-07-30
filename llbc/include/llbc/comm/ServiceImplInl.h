@@ -47,6 +47,20 @@ inline const LLBC_Property &LLBC_ServiceImpl::GetPropertyConfig() const
 {
     return _propCfg;
 }
+inline bool LLBC_ServiceImpl::IsFullStack() const
+{
+    return _fullStack;
+}
+
+inline LLBC_ServiceDriveMode::ENUM LLBC_ServiceImpl::GetDriveMode() const
+{
+    return _driveMode;
+}
+
+inline bool LLBC_ServiceImpl::IsStarted() const
+{
+    return _runningPhase == LLBC_ServiceRunningPhase::Started;
+}
 
 inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
@@ -65,9 +79,10 @@ inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdList &sess
 inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_started))
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
 
@@ -85,9 +100,10 @@ inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessi
 inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_started))
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
 

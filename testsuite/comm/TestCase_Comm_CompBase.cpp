@@ -268,7 +268,7 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
     LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
-    svc->SetDriveMode(LLBC_Service::ExternalDrive);
+    svc->SetDriveMode(LLBC_ServiceDriveMode::ExternalDrive);
 
     LLBC_PrintLn("Start service...");
     if (svc->Start(2) != LLBC_OK)

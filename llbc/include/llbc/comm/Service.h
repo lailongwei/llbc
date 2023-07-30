@@ -42,22 +42,104 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
+ * \brief The service running phase enumeration.
+ */
+class LLBC_ServiceRunningPhase
+{
+public:
+    enum ENUM
+    {
+        Begin = 0,
+
+        // Service has not been started.
+        NotStarted = Begin,
+
+        // Service pre-starting(Perform some preparatory work before initializing components).
+        PreStarting,
+        // Specific service pre-start failed.
+        PreStartFailed,
+        // Service has been pre-started.
+        PreStarted,
+
+        // Service is currently initializing components.
+        InitingComps,
+        // Specific service initialize components failed.
+        InitCompsFailed,
+        // Service has been initialized all components.
+        CompsInited,
+
+        // Service is currently starting components.
+        StartingComps,
+        // Specific service start components failed.
+        StartCompsFailed,
+        // Service has been started all components.
+        CompsStarted,
+
+        // Service has been started.
+        Started,
+
+        // Service is currently stopping components.
+        StoppingComps,
+
+        // Service is currently stopping.
+        Stopping,
+
+        End,
+    };
+
+    /**
+     * Check given running is failed phase or not.
+     * Failed phases: XXXFailed.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - failed phase flag.
+     */
+    static constexpr bool IsFailedPhase(int runningPhase);
+
+    /**
+     * Check given running phase is stopping phase or not.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - stopping phase flag.
+     */
+    static constexpr bool IsStoppingPhase(int runningPhase);
+
+    /**
+     * Check given running phase is failed/stopping phase or not.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - failed/stopping phase flag.
+     */
+    static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
+};
+
+/**
+ * \brief The service drive mode enumeration.
+ */
+class LLBC_ServiceDriveMode
+{
+public:
+    enum ENUM
+    {
+        Begin = 0,
+        // Self drive mode: Using service internal thread to drive OnSvc() method call.
+        SelfDrive = Begin,
+        // External drive mode: Using external internal thread to drive OnSvc() method call.
+        ExternalDrive,
+
+        End
+    };
+
+    /**
+     * Check given drive mode is validate or not.
+     * @param[in] driveMode - the service drive mode.
+     * @return bool - return true if validate, otherwise return false.
+     */
+    static constexpr bool IsValid(int driveMode);
+};
+
+/**
  * \brief The service interface class define.
  */
 class LLBC_EXPORT LLBC_Service : protected LLBC_Task
 {
-    typedef LLBC_Service This;
-
-public:
-    /**
-     * The service drive mode enumeration.
-     */
-    enum DriveMode
-    {
-        SelfDrive,
-        ExternalDrive,
-    };
-
 public:
     // Import Base::Push/Base::Wait method to service.
     using LLBC_Task::Push;
@@ -72,11 +154,11 @@ public:
      * @param[in] name               - the service name.
      * @param[in] dftProtocolFactory - the service default protocol factory, if null will use library normal protocol factory.
      * @param[in] fullStack          - the full stack option, default is true.
-     * @return This * - new service.
+     * @return LLBC_Service * - new service.
      */
-    static This *Create(const LLBC_String &name = "",
-                        LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                        bool fullStack = true);
+    static LLBC_Service *Create(const LLBC_String &name = "",
+                                LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                                bool fullStack = true);
 
 public:
     /**
@@ -117,16 +199,16 @@ public:
 
     /**
      * Get the service drive mode.
-     * @return DriveMode - the service drive mode.
+     * @return LLBC_ServiceDriveMode::ENUM - the service drive mode.
      */
-    virtual DriveMode GetDriveMode() const = 0;
+    virtual LLBC_ServiceDriveMode::ENUM GetDriveMode() const = 0;
 
     /**
      * Set the service drive mode.
-     * @param[in] mode - the service drive mode.
+     * @param[in] driveMode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SetDriveMode(DriveMode mode) = 0;
+    virtual int SetDriveMode(LLBC_ServiceDriveMode::ENUM driveMode) = 0;
 
 public:
     /**
@@ -151,8 +233,9 @@ public:
 
     /**
      * Stop the service.
+     * @return int - return 0 if success, otherwise return failed.
      */
-    virtual void Stop() = 0;
+    virtual int Stop() = 0;
 
 public:
     /**
@@ -551,22 +634,17 @@ public:
      * Post runnable to service.
      * @param[in] obj    - the runnable object.
      * @param[in] method - the runnable method.
-     * @param[in] data   - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int Post(ObjType *obj,
-             void (ObjType::*method)(This *, const LLBC_Variant &data),
-             const LLBC_Variant &data = LLBC_Variant::nil);
+    int Post(ObjType *obj, void (ObjType:: *method)(LLBC_Service *));
 
     /**
      * Post runnable to service.
      * @param[in] runnable - the runnable obj.
-     * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable,
-                     const LLBC_Variant &data = LLBC_Variant::nil) = 0;
+    virtual int Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable) = 0;
 
     /**
      * Get service codec protocol stack, only full-stack option disabled available.

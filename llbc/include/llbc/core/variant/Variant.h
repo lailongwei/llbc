@@ -347,7 +347,7 @@ public:
     size_t Size() const;
     size_t Capacity() const;
 
-    // Dictionary type variant object specify Operate methods.
+    // Sequence type variant object specify Operate methods.
     SeqIter SeqBegin();
     SeqIter SeqEnd();
     SeqConstIter SeqBegin() const;

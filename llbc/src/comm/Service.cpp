@@ -24,16 +24,11 @@
 
 #include "llbc/comm/ServiceImpl.h"
 
-namespace
-{
-    typedef LLBC_NS LLBC_Service This;
-}
-
 __LLBC_NS_BEGIN
 
-This *LLBC_Service::Create(const LLBC_String &name,
-                           LLBC_IProtocolFactory *dftProtocolFactory,
-                           bool fullStack)
+LLBC_Service *LLBC_Service::Create(const LLBC_String &name,
+                                   LLBC_IProtocolFactory *dftProtocolFactory,
+                                   bool fullStack)
 {
     return new LLBC_ServiceImpl(name, dftProtocolFactory, fullStack);
 }
