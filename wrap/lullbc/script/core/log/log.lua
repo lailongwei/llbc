@@ -5,15 +5,15 @@ local getinfo = debug.getinfo
 local LogMsg = _llbc.LogMsg
 
 -- Log levels enumeration.
-Log.TRACE = 0
-Log.DEBUG = 1
+Log.DEBUG = 0
+Log.TRACE = 1
 Log.INFO = 2
 Log.WARN = 3
 Log.ERROR = 4
 Log.FATAL = 5
 -- Local log levels(for optimize performance).
-local TRACE = Log.TRACE
 local DEBUG = Log.DEBUG
+local TRACE = Log.TRACE
 local INFO = Log.INFO
 local WARN = Log.WARN
 local ERROR = Log.ERROR
@@ -114,30 +114,6 @@ end
 
 local output = Log.output
 
--- Log TRACE level message to root logger.
--- @param ... - log message.
--- @returns - no return.
-function Log.t(...)
-    output(TRACE, nil, nil, ...)
-end
-
--- Log TRACE level message to specific logger.
--- @param[optional] logger - logger name, default is root logger.
--- @param ...              - log message.
--- @returns - no return.
-function Log.t2(logger, ...)
-    output(TRACE, logger, nil, ...)
-end
-
--- Log TRACE level message to specific logger, and append tag.
--- @param[optional] logger - logger name, default is root logger.
--- @param[optional] tag    - log tag, default is nil.
--- @param ...              - log message.
--- @returns - no return.
-function Log.t3(logger, tag, ...)
-    output(TRACE, logger, tag, ...)
-end
-
 -- Log DEBUG level message to root logger.
 -- @param ... - log message.
 -- @returns - no return.
@@ -160,6 +136,30 @@ end
 -- @returns - no return.
 function Log.d3(logger, tag, ...)
     output(DEBUG, logger, tag, ...)
+end
+
+-- Log TRACE level message to root logger.
+-- @param ... - log message.
+-- @returns - no return.
+function Log.t(...)
+    output(TRACE, nil, nil, ...)
+end
+
+-- Log TRACE level message to specific logger.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param ...              - log message.
+-- @returns - no return.
+function Log.t2(logger, ...)
+    output(TRACE, logger, nil, ...)
+end
+
+-- Log TRACE level message to specific logger, and append tag.
+-- @param[optional] logger - logger name, default is root logger.
+-- @param[optional] tag    - log tag, default is nil.
+-- @param ...              - log message.
+-- @returns - no return.
+function Log.t3(logger, tag, ...)
+    output(TRACE, logger, tag, ...)
 end
 
 -- Log INFO level message to root logger.

@@ -6,8 +6,8 @@ import inspect as pyllbcInspect
 import llbc
 
 class pyllbcLog(object):
-    TRACE = 0
-    DEBUG = 1
+    DEBUG = 0
+    TRACE = 1
     INFO = 2
     WARN = 3
     ERROR = 4
@@ -45,14 +45,14 @@ class pyllbcLog(object):
         cls.__log_fileinfo = False
 
     @classmethod
-    def t(cls, msg, logger='root', tag=''):
-        """Log trace level message"""
-        cls.__logmsg(cls.TRACE, msg, logger, tag)
-
-    @classmethod
     def d(cls, msg, logger='root', tag=''):
         """Log debug level message"""
         cls.__logmsg(cls.DEBUG, msg, logger, tag)
+
+    @classmethod
+    def t(cls, msg, logger='root', tag=''):
+        """Log trace level message"""
+        cls.__logmsg(cls.TRACE, msg, logger, tag)
 
     @classmethod
     def i(cls, msg, logger='root', tag=''):
