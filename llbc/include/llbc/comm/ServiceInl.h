@@ -21,6 +21,10 @@
 
 #pragma once
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <cxxabi.h>
+#endif
+
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 

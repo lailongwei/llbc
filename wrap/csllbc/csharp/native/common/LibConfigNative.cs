@@ -117,7 +117,7 @@ namespace llbc
         public extern static int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Comm_IsEnabledSamplerSupport();
+        public extern static int csllbc_LibConfig_Comm_MaxCompNameLen();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
