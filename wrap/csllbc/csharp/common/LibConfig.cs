@@ -315,12 +315,12 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service Sampler-Support enabled config.
+        /// Service max supported component name length.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool commIsEnabledSamplerSupport
+        public static int commMaxCompNameLen
         {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledSamplerSupport() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Comm_MaxCompNameLen(); }
         }
 
         /// <summary>

@@ -100,8 +100,8 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MinServiceFPS();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MaxServiceFPS();
 // LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount();
-// LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledSamplerSupport();
+// LLBC_CFG_COMM_MAX_COMP_NAME_LEN
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MaxCompNameLen();
 // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
 // LLBC_CFG_COMM_ENABLE_STATUS_DESC

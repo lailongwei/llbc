@@ -44,7 +44,7 @@ namespace
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
 }
 
-#define __LLBC_INL_CHECK_START_PHASE_EQ(requirePhase, failedSetErr, failedRet) \
+#define __LLBC_INL_CHECK_RUNNING_PHASE_EQ(requirePhase, failedSetErr, failedRet) \
     LLBC_LockGuard guard(_lock);                                               \
     if (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::requirePhase ||    \
         LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
@@ -52,7 +52,7 @@ namespace
         return failedRet;                                                      \
     }                                                                          \
 
-#define __LLBC_INL_CHECK_START_PHASE_LE(requirePhase, failedSetErr, failedRet) \
+#define __LLBC_INL_CHECK_RUNNING_PHASE_LE(requirePhase, failedSetErr, failedRet) \
     LLBC_LockGuard guard(_lock);                                               \
     if (UNLIKELY(_runningPhase > LLBC_ServiceRunningPhase::requirePhase ||     \
         LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
@@ -60,7 +60,7 @@ namespace
         return failedRet;                                                      \
     }                                                                          \
 
-#define __LLBC_INL_CHECK_START_PHASE_GE(requirePhase, failedSetErr, failedRet) \
+#define __LLBC_INL_CHECK_RUNNING_PHASE_GE(requirePhase, failedSetErr, failedRet) \
     LLBC_LockGuard guard(_lock);                                               \
     if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::requirePhase ||     \
         LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
@@ -177,7 +177,7 @@ int LLBC_ServiceImpl::SetDriveMode(LLBC_ServiceDriveMode::ENUM driveMode)
     }
 
      // If service not in <NotStarted> phase, could not change drive mode.
-    __LLBC_INL_CHECK_START_PHASE_EQ(
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Set driveMode to _driveMode.
@@ -198,7 +198,7 @@ int LLBC_ServiceImpl::SetDriveMode(LLBC_ServiceDriveMode::ENUM driveMode)
 
 int LLBC_ServiceImpl::SuppressCoderNotFoundWarning()
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         StartingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
     _suppressedCoderNotFoundWarning = true;
 
@@ -372,7 +372,7 @@ int LLBC_ServiceImpl::Listen(const char *ip,
                              LLBC_IProtocolFactory *protoFactory,
                              const LLBC_SessionOpts &sessionOpts)
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
 
     const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
@@ -390,7 +390,7 @@ int LLBC_ServiceImpl::Connect(const char *ip,
                               LLBC_IProtocolFactory *protoFactory,
                               const LLBC_SessionOpts &sessionOpts)
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
 
     const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
@@ -408,7 +408,7 @@ int LLBC_ServiceImpl::AsyncConn(const char *ip,
                                 LLBC_IProtocolFactory *protoFactory,
                                 const LLBC_SessionOpts &sessionOpts)
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
 
     int pendingSessionId;
@@ -492,7 +492,7 @@ int LLBC_ServiceImpl::Broadcast(int svcId, int opcode, const void *bytes, size_t
 
 int LLBC_ServiceImpl::RemoveSession(int sessionId, const char *reason)
 {
-    __LLBC_INL_CHECK_START_PHASE_GE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_GE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
@@ -515,7 +515,7 @@ int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
                                         int ctrlCmd,
                                         const LLBC_Variant &ctrlData)
 {
-    __LLBC_INL_CHECK_START_PHASE_GE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_GE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     _readySessionInfosLock.Lock();
@@ -553,51 +553,48 @@ int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
 
 int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
 {
+    // Argument check.
     if (UNLIKELY(!comp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_EQ(
+    // Check service running phase.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
-    char compName[512];
-    const char *compRttiName = LLBC_GetTypeName(*comp);
-    const char *compNSNameEnd = strrchr(compRttiName, ':');
-    if (compNSNameEnd != nullptr)
-        compRttiName = compNSNameEnd + 1;
+    // Get component name.
+    size_t compNameLen;
+    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
+    GetCompName(typeid(*comp).name(), compName, compNameLen);
 
-    const size_t compNameLen = strlen(compRttiName);
-    if (compNameLen >= sizeof(compName))
-    {
-        LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_FAILED;
-    }
+    // Define component find lambda.
+    const auto findLambda = [comp, compName, compNameLen](LLBC_Component *regComp) {
+        if (comp == regComp)
+            return true;
 
-    memcpy(compName, compRttiName, compNameLen + 1);
+        char regCompName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
+        size_t regCompNameLen;
+        GetCompName(typeid(*regComp).name(), regCompName, regCompNameLen);
 
+        return regCompNameLen == compNameLen &&
+            memcmp(compName, regCompName, compNameLen) == 0;
+    };
+
+    // Repeat add check.
     if (std::find_if(_willRegComps.begin(),
                 _willRegComps.end(),
-                [comp, compName, compNameLen](LLBC_Component *regComp) {
-        if (comp == regComp)
-        {
-            return true;
-        }
-
-        const char *regCompName = LLBC_GetTypeName(*regComp);
-        const char *regCompNSNameEnd = strrchr(regCompName, ':');
-        if (regCompNSNameEnd != nullptr)
-            regCompName = regCompNSNameEnd + 1;
-
-        return strlen(regCompName) == compNameLen &&
-            memcmp(compName, regCompName, compNameLen) == 0;
-    }) != _willRegComps.end())
+                     findLambda) != _willRegComps.end() ||
+        std::find_if(_compList.begin(),
+                     _compList.end(),
+                     findLambda) != _compList.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
+    // Add to _willRegComps.
     _willRegComps.push_back(comp);
 
     return LLBC_OK;
@@ -611,7 +608,7 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     comp = nullptr;
 
     // Check service phase.
-    __LLBC_INL_CHECK_START_PHASE_EQ(
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Argument check.
@@ -720,7 +717,7 @@ int LLBC_ServiceImpl::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactor
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (!_coderFactories.insert(std::make_pair(opcode, coderFactory)).second)
@@ -741,7 +738,7 @@ int LLBC_ServiceImpl::AddStatusDesc(int status, const LLBC_String &desc)
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (!_statusDescs.insert(std::make_pair(
@@ -763,7 +760,7 @@ int LLBC_ServiceImpl::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (!_handlers.insert(std::make_pair(opcode, deleg)).second)
@@ -783,7 +780,7 @@ int LLBC_ServiceImpl::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Pac
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (!_preHandlers.insert(std::make_pair(opcode, deleg)).second)
@@ -804,7 +801,7 @@ int LLBC_ServiceImpl::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)>
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (_unifyPreHandler)
@@ -828,7 +825,7 @@ int LLBC_ServiceImpl::SubscribeStatus(int opcode, int status, const LLBC_Delegat
         return LLBC_FAILED;
     }
 
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     auto &stHandlers = _statusHandlers[opcode];
@@ -844,7 +841,7 @@ int LLBC_ServiceImpl::SubscribeStatus(int opcode, int status, const LLBC_Delegat
 
 int LLBC_ServiceImpl::EnableTimerScheduler()
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (_driveMode != LLBC_ServiceDriveMode::ExternalDrive)
@@ -859,7 +856,7 @@ int LLBC_ServiceImpl::EnableTimerScheduler()
 
 int LLBC_ServiceImpl::DisableTimerScheduler()
 {
-    __LLBC_INL_CHECK_START_PHASE_LE(
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
         InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     if (_driveMode != LLBC_ServiceDriveMode::ExternalDrive)
@@ -2615,6 +2612,6 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
 
 __LLBC_NS_END
 
-#undef __LLBC_INL_CHECK_START_PHASE_GE
-#undef __LLBC_INL_CHECK_START_PHASE_LE
-#undef __LLBC_INL_CHECK_START_PHASE_EQ
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_GE
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_LE
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_EQ

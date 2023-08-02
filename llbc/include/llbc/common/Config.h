@@ -254,8 +254,6 @@
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
 #define LLBC_CFG_COMM_MAX_SERVICE_FPS                       1000
-// Sampler support option, default is true.
-#define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine enable the service has status handler support or not.
@@ -264,6 +262,8 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
+// Max component name length.
+#define LLBC_CFG_COMM_MAX_COMP_NAME_LEN                     255
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // The poller model config(Platform specific).

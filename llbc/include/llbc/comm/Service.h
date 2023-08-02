@@ -620,8 +620,6 @@ public:
      */
     virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId) = 0;
 
-protected:
-
 public:
     /**
      * Get event manager.
@@ -685,6 +683,17 @@ public:
      * @param[in] fullFrame - the full frame flag.
      */
     virtual void OnSvc(bool fullFrame = true) = 0;
+
+protected:
+    /**
+     * Get given component name.
+     * @param[in] qualifiedCompName - the qualified component name.
+     * @param[out] compName         - the component name.
+     * @param[out] compNameLen      - the component name length.
+     */
+    static void GetCompName(const char *qualifiedCompName,
+                            char (&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
+                            size_t &compNameLen);
 
 protected:
     /**
