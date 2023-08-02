@@ -27,8 +27,8 @@
 
 __LLBC_NS_BEGIN
  /**
- * Previous declare some classes.
- */
+  * Previous declare some classes.
+  */
 class LLBC_Packet;
 class LLBC_Session;
 class LLBC_PollerMgr;
