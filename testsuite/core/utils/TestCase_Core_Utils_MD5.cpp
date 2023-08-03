@@ -40,15 +40,15 @@ int TestCase_Core_Utils_MD5::Run(int argc, char *argv[])
 
     // d41d8cd98f00b204e9800998ecf8427e
     LLBC_PrintLn("Content: %s", str1.c_str());
-    LLBC_PrintLn("MD5: %s",  LLBC_MD5::MD5_String(str1.c_str()).c_str());
+    LLBC_PrintLn("MD5: %s",  LLBC_MD5::HexDigest(str1.data(), str1.size()).c_str());
 
     // b10a8db164e0754105b7a99be72e3fe5
     LLBC_PrintLn("Content: %s", str2.c_str());
-    LLBC_PrintLn("MD5: %s", LLBC_MD5::MD5_String(str2.c_str()).c_str());
+    LLBC_PrintLn("MD5: %s", LLBC_MD5::HexDigest(str2.data(), str2.size()).c_str());
 
     // f90ca33af8bc681c9affec37711e7593
     LLBC_PrintLn("Content: %s", str3.c_str());
-    LLBC_PrintLn("Content: %s", LLBC_MD5::MD5_String(str3.c_str()).c_str());
+    LLBC_PrintLn("Content: %s", LLBC_MD5::HexDigest(str3.data(), str3.size()).c_str());
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
