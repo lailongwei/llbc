@@ -33,80 +33,32 @@
 
 __LLBC_NS_BEGIN
 
-#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+#define __LLBC_INL_MD5_ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+
 LLBC_MD5::MD5GroupDigest::MD5GroupDigest(uint32 a, uint32 b, uint32 c, uint32 d)
+: _val{{a, b, c, d}}
 {
-    SetInfo(a, b, c, d);
 }
 
-uint32 LLBC_MD5::MD5GroupDigest::GetA() const
+void LLBC_MD5::MD5GroupDigest::Get(uint8 (&digest)[16]) const
 {
-    return _val.sVal.a;
+    memcpy(digest, _val.byteVal, sizeof(digest));
 }
 
-void LLBC_MD5::MD5GroupDigest::SetA(uint32 a)
+void LLBC_MD5::MD5GroupDigest::Get(uint32 &a, uint32 &b, uint32 &c, uint32 &d)
 {
-    _val.sVal.a = a;
+    a = _val.sVal.a;
+    b = _val.sVal.b;
+    c = _val.sVal.c;
+    d = _val.sVal.d;
 }
 
-uint32 LLBC_MD5::MD5GroupDigest::GetB() const
+LLBC_MD5::MD5GroupDigest &LLBC_MD5::MD5GroupDigest::operator+=(const MD5GroupDigest &right)
 {
-    return _val.sVal.b;
-}
-
-void LLBC_MD5::MD5GroupDigest::SetB(uint32 b)
-{
-    _val.sVal.b = b;
-}
-
-uint32 LLBC_MD5::MD5GroupDigest::GetC() const
-{
-    return _val.sVal.c;
-}
-
-void LLBC_MD5::MD5GroupDigest::SetC(uint32 c)
-{
-    _val.sVal.c = c;
-}
-
-uint32 LLBC_MD5::MD5GroupDigest::GetD() const
-{
-    return _val.sVal.d;
-}
-
-void LLBC_MD5::MD5GroupDigest::SetD(uint32 d)
-{
-    _val.sVal.d = d;
-}
-
-void LLBC_MD5::MD5GroupDigest::SetInfo(uint32 a, uint32 b, uint32 c, uint32 d)
-{
-    SetA(a);
-    SetB(b);
-    SetC(c);
-    SetD(d);
-}
-
-LLBC_String LLBC_MD5::MD5GroupDigest::ToString() const
-{
-    char buf[64];
-    snprintf(buf,
-             sizeof(buf),
-             "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-             _val.byteVal[0], _val.byteVal[1], _val.byteVal[2], _val.byteVal[3],
-             _val.byteVal[4], _val.byteVal[5], _val.byteVal[6], _val.byteVal[7],
-             _val.byteVal[8], _val.byteVal[9], _val.byteVal[10], _val.byteVal[11],
-             _val.byteVal[12], _val.byteVal[13], _val.byteVal[14], _val.byteVal[15]);
-
-    return buf;
-}
-
-LLBC_MD5::MD5GroupDigest &LLBC_MD5::MD5GroupDigest::operator +=(const LLBC_MD5::MD5GroupDigest &right)
-{
-    SetA(GetA() + right.GetA());
-    SetB(GetB() + right.GetB());
-    SetC(GetC() + right.GetC());
-    SetD(GetD() + right.GetD());
+    _val.sVal.a += right._val.sVal.a;
+    _val.sVal.b += right._val.sVal.b;
+    _val.sVal.c += right._val.sVal.c;
+    _val.sVal.d += right._val.sVal.d;
 
     return *this;
 }
@@ -158,12 +110,10 @@ LLBC_MD5::MD5Group::~MD5Group()
     LLBC_XFree(_buf);
 }
 
-void LLBC_MD5::MD5Group::GenerateDigest(LLBC_MD5::MD5GroupDigest &digest)
+void LLBC_MD5::MD5Group::GenerateDigest(MD5GroupDigest &digest)
 {
-    uint32 a = digest.GetA();
-    uint32 b = digest.GetB();
-    uint32 c = digest.GetC();
-    uint32 d = digest.GetD();
+    uint32 a, b, c, d;
+    digest.Get(a, b, c, d);
 
     // Loop 1:
     FF(a, b, c, d, GetSubGroupValue( 0), S11, Ti[1]);
@@ -237,7 +187,7 @@ void LLBC_MD5::MD5Group::GenerateDigest(LLBC_MD5::MD5GroupDigest &digest)
     II(c, d, a, b, GetSubGroupValue( 2), S43, Ti[63]);
     II(b, c, d, a, GetSubGroupValue( 9), S44, Ti[64]);
 
-    digest += LLBC_MD5::MD5GroupDigest(a, b, c, d);
+    digest += MD5GroupDigest(a, b, c, d);
 }
 
 uint32 LLBC_MD5::MD5Group::GetSubGroupValue(uint32 index)
@@ -268,28 +218,28 @@ uint32 LLBC_MD5::MD5Group::I(uint32 x, uint32 y, uint32 z)
 void LLBC_MD5::MD5Group::FF(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 Mj, uint32 s, uint32 ti)
 {
     a += (F(b, c, d) + Mj + ti);
-    a = ROTATE_LEFT(a, s);
+    a = __LLBC_INL_MD5_ROTATE_LEFT(a, s);
     a += b;
 }
 
 void LLBC_MD5::MD5Group::GG(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 Mj, uint32 s, uint32 ti)
 {
     a += (G(b, c, d) + Mj + ti);
-    a = ROTATE_LEFT(a, s);
+    a = __LLBC_INL_MD5_ROTATE_LEFT(a, s);
     a += b;
 }
 
 void LLBC_MD5::MD5Group::HH(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 Mj, uint32 s, uint32 ti)
 {
     a += (H(b, c, d) + Mj + ti);
-    a = ROTATE_LEFT(a, s);
+    a = __LLBC_INL_MD5_ROTATE_LEFT(a, s);
     a += b;
 }
 
 void LLBC_MD5::MD5Group::II(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 Mj, uint32 s, uint32 ti)
 {
     a += (I(b, c, d) + Mj + ti);
-    a = ROTATE_LEFT(a, s);
+    a = __LLBC_INL_MD5_ROTATE_LEFT(a, s);
     a += b;
 }
 
@@ -298,50 +248,14 @@ const uint32 LLBC_MD5::_chainingValB = 0xefcdab89;
 const uint32 LLBC_MD5::_chainingValC = 0x98badcfe;
 const uint32 LLBC_MD5::_chainingValD = 0x10325476;
 
-LLBC_String LLBC_MD5::MD5_File(const LLBC_String &file)
-{
-    long fileSize = 0;
-    char *fileContent = nullptr;
-
-    LLBC_File fileObj;
-    if (fileObj.Open(file, LLBC_FileMode::BinaryRead) != LLBC_OK)
-    {
-        return "";
-    }
-
-    fileSize = fileObj.GetFileSize();
-    if (fileSize > 0)
-    {
-        fileContent = LLBC_Malloc(char, fileSize);
-        if (fileObj.Read(fileContent, fileSize) != fileSize)
-        {
-            LLBC_XFree(fileContent);
-            return "";
-        }
-    }
-
-    fileObj.Close();
-    LLBC_String result = MD5_Buffer(fileContent, fileSize);
-
-    LLBC_XFree(fileContent);
-
-    return result;
-}
-
-LLBC_String LLBC_MD5::MD5_String(const char *str)
-{
-    return MD5_Buffer(str, strlen(str));
-}
-
-LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
+LLBC_String LLBC_MD5::Digest(const void *bytes, size_t len)
 {
     size_t realGroupCnt = len / MD5Group::GROUP_SIZE;
     uint32 modVal = len % MD5Group::GROUP_SIZE;
 
-    unsigned char *secondaryBuf = nullptr;
-    size_t secondaryBufSize = 0;
-
-    if (buf == nullptr || len == 0 || modVal == 0)
+    size_t secondaryBufSize;
+    unsigned char *secondaryBuf;
+    if (bytes == nullptr || len == 0 || modVal == 0)
     {
         secondaryBufSize = MD5Group::GROUP_SIZE;
         secondaryBuf = LLBC_Malloc(unsigned char, secondaryBufSize);
@@ -354,7 +268,7 @@ LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
         secondaryBuf = LLBC_Malloc(unsigned char, secondaryBufSize);
         memset(secondaryBuf, 0, secondaryBufSize);
         memcpy(secondaryBuf, 
-            reinterpret_cast<const char *>(buf) + realGroupCnt * MD5Group::GROUP_SIZE, modVal);
+            reinterpret_cast<const char *>(bytes) + realGroupCnt * MD5Group::GROUP_SIZE, modVal);
         secondaryBuf[modVal] = 0x80;
     }
     else
@@ -363,56 +277,75 @@ LLBC_String LLBC_MD5::MD5_Buffer(const void *buf, size_t len)
         secondaryBuf = LLBC_Malloc(unsigned char, secondaryBufSize);
         memset(secondaryBuf, 0, secondaryBufSize);
         memcpy(secondaryBuf, 
-            reinterpret_cast<const char *>(buf) + realGroupCnt * MD5Group::GROUP_SIZE, modVal);
+            reinterpret_cast<const char *>(bytes) + realGroupCnt * MD5Group::GROUP_SIZE, modVal);
         secondaryBuf[modVal] = 0x80;
     }
 
-    if (buf == nullptr || len == 0)
-    {
-        *reinterpret_cast<unsigned long long *>(secondaryBuf + secondaryBufSize - MD5Group::MESSAGE_LEN) = 0;
-    }
+    if (bytes == nullptr || len == 0)
+        *reinterpret_cast<unsigned long long *>(
+            secondaryBuf + secondaryBufSize - MD5Group::MESSAGE_LEN) = 0;
     else
-    {
-        *reinterpret_cast<unsigned long long *>(secondaryBuf + secondaryBufSize - MD5Group::MESSAGE_LEN) = (len << 3);
-    }
+        *reinterpret_cast<unsigned long long *>(
+            secondaryBuf + secondaryBufSize - MD5Group::MESSAGE_LEN) = (len << 3);
 
-    MD5GroupDigest digest(_chainingValA, _chainingValB, _chainingValC, _chainingValD);
+    MD5GroupDigest digestObj(_chainingValA, _chainingValB, _chainingValC, _chainingValD);
     for (size_t i = 0; i < realGroupCnt; ++i)
     {
-        MD5Group group(buf, i * MD5Group::GROUP_SIZE);
-        group.GenerateDigest(digest);
+        MD5Group group(bytes, i * MD5Group::GROUP_SIZE);
+        group.GenerateDigest(digestObj);
     }
 
     size_t secondaryGroupCnt = secondaryBufSize / MD5Group::GROUP_SIZE;
     for (size_t i = 0; i < secondaryGroupCnt; ++i)
     {
         MD5Group group(secondaryBuf, i * MD5Group::GROUP_SIZE);
-        group.GenerateDigest(digest);
+        group.GenerateDigest(digestObj);
     }
 
     LLBC_XFree(secondaryBuf);
 
-    return digest.ToString();
+    uint8 digest[16];
+    digestObj.Get(digest);
+
+    return LLBC_String().append(reinterpret_cast<const char *>(digest), sizeof(digest));
 }
 
-int LLBC_MD5::GenerateBufferDigest(const void *buf, size_t len, LLBC_MD5::MD5GroupDigest &digest)
+LLBC_String LLBC_MD5::HexDigest(const void *bytes, size_t len)
 {
-    if (len == 0 || len % MD5Group::GROUP_SIZE != 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
+    const auto digest = Digest(bytes, len);
+    if (digest.empty())
+        return "";
 
-    for (size_t i = 0; i < len; i += MD5Group::GROUP_SIZE)
-    {
-        MD5Group group(reinterpret_cast<const char *>(buf) + i, MD5Group::GROUP_SIZE);
-        group.GenerateDigest(digest);
-    }
+    char hexDigest[33];
+    const auto digestPtr = reinterpret_cast<const uint8 *>(digest.data());
+    snprintf(hexDigest,
+             sizeof(hexDigest),
+             "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+             digestPtr[0], digestPtr[1], digestPtr[2], digestPtr[3],
+             digestPtr[4], digestPtr[5], digestPtr[6], digestPtr[7],
+             digestPtr[8], digestPtr[9], digestPtr[10], digestPtr[11],
+             digestPtr[12], digestPtr[13], digestPtr[14], digestPtr[15]);
 
-    return LLBC_OK;
+    return hexDigest;
+}
+
+LLBC_String LLBC_MD5::FileDigest(const LLBC_String &file)
+{
+    auto fileCnt = LLBC_File::ReadToEnd(file);
+    return LLBC_GetLastError() == LLBC_ERROR_SUCCESS ?
+        Digest(fileCnt.data(), fileCnt.size()) : "";
+}
+
+LLBC_String LLBC_MD5::FileHexDigest(const LLBC_String &file)
+{
+    auto fileCnt = LLBC_File::ReadToEnd(file);
+    return LLBC_GetLastError() == LLBC_ERROR_SUCCESS ?
+        HexDigest(fileCnt.data(), fileCnt.size()) : "";
 }
 
 __LLBC_NS_END
+
+#undef __LLBC_INL_MD5_ROTATE_LEFT
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)

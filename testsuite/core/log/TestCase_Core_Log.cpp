@@ -59,10 +59,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
                             LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
-    LLOG_TRACE("This is a trace log message.");
-    LLOG_TRACE3("test_tag", "This is a trace log message.");
     LLOG_DEBUG("This is a debug log message.");
     LLOG_DEBUG3("test_tag", "This is a debug log message.");
+    LLOG_TRACE("This is a trace log message.");
+    LLOG_TRACE3("test_tag", "This is a trace log message.");
 
     // Uninstall logger hook(from root logger).
     rootLogger->UninstallHook(LLBC_LogLevel::Debug);
@@ -103,10 +103,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL3("test_tag", "This is a fatal log message.");
 
     // Use 'test' logger to test.
-    LLOG_TRACE2("test", "This is a trace log message.");
-    LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
     LLOG_DEBUG2("test", "This is a debug log message.");
     LLOG_DEBUG4("test", "test_tag", "This is a debug log message.");
+    LLOG_TRACE2("test", "This is a trace log message.");
+    LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
     LLOG_INFO2("test", "This is a info log message.");
     LLOG_INFO4("test", "test_tag", "This is a info log message.");
     LLOG_WARN2("test", "This is a warn log message.");
@@ -168,27 +168,6 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
 void TestCase_Core_Log::DoJsonLogTest()
 {
-    // Test LJLOG_TRACE macros.
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE2(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
-    LJLOG_TRACE2("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
-    LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
-    LJLOG_TRACE4("test", "testTraceTag4_3").Add("testKey", "testValue->LJLOG_TRACE4().3").Finish("");
-    LJLOG_TRACE4("test", "testTraceTag4_4").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
-    LJLOG_TRACE4("test", "testTraceTag4_5").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
-
     // Test LJLOG_DEBUG macros.
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().1").Finish("");
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().2").Finish("%s", "Finish Test");
@@ -209,6 +188,27 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_DEBUG4("test", "testDbgTag4_3").Add("testKey", "testValue->LJLOG_DEBUG4().3").Finish("");
     LJLOG_DEBUG4("test", "testDbgTag4_4").Add("testKey", "testValue->LJLOG_DEBUG4().4").Finish("%s", "Finish Test");
     LJLOG_DEBUG4("test", "testDbgTag4_5").Add("testKey", "testValue->LJLOG_DEBUG4().5").Finish("%s%d", "Finish Test", 2);
+
+    // Test LJLOG_TRACE macros.
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE2(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
+    LJLOG_TRACE2("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
+    LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_3").Add("testKey", "testValue->LJLOG_TRACE4().3").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_4").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE4("test", "testTraceTag4_5").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
 
     // Test LJLOG_INFO macros.
     LJLOG_INFO().Add("testKey", "testValue->LJLOG_INFO().1").Finish("");
@@ -293,8 +293,15 @@ void TestCase_Core_Log::DoJsonLogTest()
 
 void TestCase_Core_Log::DoUninitLogTest()
 {
-    LLOG_DEBUG("This is a uninited log message");
-    LLOG_DEBUG3("uninit_tag", "This is a uninited log message");
+    LLOG_DEBUG("This is a uninited debug log message");
+    LLOG_TRACE("This is a uninited trace log message");
+    LLOG_INFO("This is a uninited info log message");
+    LLOG_WARN("This is a uninited warn log message");
+    LLOG_ERROR("This is a uninited error log message");
+    LLOG_FATAL("This is a uninited fatal log message");
+
+    LLOG_DEBUG3("uninit_tag", "This is a uninited log message(has tag)");
+
     LJLOG_DEBUG().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }

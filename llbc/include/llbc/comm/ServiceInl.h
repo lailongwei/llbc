@@ -21,10 +21,36 @@
 
 #pragma once
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <cxxabi.h>
+#endif
+
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
 __LLBC_NS_BEGIN
+
+constexpr bool LLBC_ServiceRunningPhase::IsFailedPhase(int runningPhase)
+{
+    return runningPhase == PreStartFailed ||
+        runningPhase == InitCompsFailed ||
+        runningPhase == StartCompsFailed;
+}
+
+constexpr bool LLBC_ServiceRunningPhase::IsStoppingPhase(int runningPhase)
+{
+    return runningPhase == Stopping;
+}
+
+constexpr bool LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(int runningPhase)
+{
+    return runningPhase == Stopping || IsFailedPhase(runningPhase);
+}
+
+constexpr bool LLBC_ServiceDriveMode::IsValid(int driveMode)
+{
+    return driveMode >= Begin && driveMode < End;
+}
 
 template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, int>::type
@@ -98,13 +124,10 @@ LLBC_Service::GetComponent()
         }
     }
 
-    #if LLBC_TARGET_PLATFORM_WIN32
-    auto compName = typeid(Comp).name();
-    #else
-    auto compName = LLBC_GetTypeName(Comp);
-    #endif
-    const auto colonPos = strrchr(compName, ':');
-    return static_cast<Comp *>(GetComponent(colonPos ? colonPos + 1 : compName));
+    size_t compNameLen;
+    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
+    GetCompName(typeid(Comp).name(), compName, compNameLen);
+    return static_cast<Comp *>(GetComponent(LLBC_CString(compName, compNameLen)));
 }
 
 template <typename Comp>
@@ -197,49 +220,49 @@ inline int LLBC_Service::Send(int svcId, int sessionId, int opcode, const void *
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds)
+int LLBC_Service::Multicast(const SessionIds &sessionIds)
 {
     return Multicast(0, sessionIds, 0, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode)
 {
     return Multicast(0, sessionIds, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, LLBC_Coder *coder)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, LLBC_Coder *coder)
 {
     return Multicast(0, sessionIds, 0, coder, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder)
 {
     return Multicast(0, sessionIds, opcode, coder, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status)
 {
     return Multicast(0, sessionIds, opcode, coder, status);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, const void *bytes, size_t len)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, const void *bytes, size_t len)
 {
     return Multicast(0, sessionIds, 0, bytes, len, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len)
 {
     return Multicast(0, sessionIds, opcode, bytes, len, 0);
 }
 
 template <typename SessionIds>
-inline int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status)
+int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     return Multicast(0, sessionIds, opcode, bytes, len, status);
 }
@@ -270,7 +293,7 @@ inline int LLBC_Service::Broadcast(int opcode, const void *bytes, size_t len, in
 }
 
 template <typename ObjType>
-inline int LLBC_Service::Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
+int LLBC_Service::Subscribe(int opcode, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
     return Subscribe(opcode, LLBC_Delegate<void(LLBC_Packet &)>(obj, method));
 }
@@ -281,7 +304,7 @@ inline int LLBC_Service::PreSubscribe(int opcode, bool (*func)(LLBC_Packet &))
 }
 
 template <typename ObjType>
-inline int LLBC_Service::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
+int LLBC_Service::PreSubscribe(int opcode, ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
     return PreSubscribe(opcode, LLBC_Delegate<bool(LLBC_Packet &)>(obj, method));
 }
@@ -293,7 +316,7 @@ inline int LLBC_Service::UnifyPreSubscribe(bool(*func)(LLBC_Packet &))
 }
 
 template <typename ObjType>
-inline int LLBC_Service::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
+int LLBC_Service::UnifyPreSubscribe(ObjType *obj, bool (ObjType::*method)(LLBC_Packet &))
 {
     return UnifyPreSubscribe(LLBC_Delegate<bool(LLBC_Packet &)>(obj, method));
 }
@@ -306,7 +329,7 @@ inline int LLBC_Service::SubscribeStatus(int opcode, int status, void(*func)(LLB
 }
 
 template <typename ObjType>
-inline int LLBC_Service::SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
+int LLBC_Service::SubscribeStatus(int opcode, int status, ObjType *obj, void (ObjType::*method)(LLBC_Packet &))
 {
     if (SubscribeStatus(opcode, status, LLBC_Delegate<void(LLBC_Packet &)>(obj, method)) != LLBC_OK)
         return LLBC_FAILED;
@@ -316,17 +339,56 @@ inline int LLBC_Service::SubscribeStatus(int opcode, int status, ObjType *obj, v
 #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 template <typename ObjType>
-inline LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &))
+LLBC_ListenerStub LLBC_Service::SubscribeEvent(int event, ObjType *obj, void (ObjType::*method)(LLBC_Event &))
 {
     return SubscribeEvent(event, LLBC_Delegate<void(LLBC_Event &)>(obj, method));
 }
 
 template <typename ObjType>
-inline int LLBC_Service::Post(ObjType *obj,
-                              void (ObjType::*method)(This *, const LLBC_Variant &),
-                              const LLBC_Variant &data)
+int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(LLBC_Service *))
 {
-    return Post(LLBC_Delegate<void(This *, const LLBC_Variant &)>(obj, method), data);
+    return Post(LLBC_Delegate<void(LLBC_Service *)>(obj, method));
+}
+
+LLBC_FORCE_INLINE
+void LLBC_Service::GetCompName(const char *qualifiedCompName,
+                               char(&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
+                               size_t &compNameLen)
+{
+    #if LLBC_TARGET_PLATFORM_WIN32
+    compNameLen = strlen(qualifiedCompName);
+    #else // Non-Win32
+    int demangleStatus;
+    char demangledCompName[sizeof(compName)];
+    size_t demangledLen = sizeof(demangledCompName);
+    abi::__cxa_demangle(qualifiedCompName,
+                        demangledCompName,
+                        &demangledLen,
+                        &demangleStatus);
+    if (LIKELY(demangleStatus == 0))
+    {
+        qualifiedCompName = demangledCompName;
+        compNameLen = demangledLen;
+    }
+    else
+    {
+        compNameLen = strlen(qualifiedCompName);
+    }
+    #endif // Win32
+
+    const char *compNameBeg = qualifiedCompName + compNameLen - 1;
+    while (compNameBeg != qualifiedCompName)
+    {
+        --compNameBeg;
+        if (*compNameBeg == ':')
+        {
+            ++compNameBeg;
+            break;
+        }
+    }
+
+    compNameLen -= (compNameBeg - qualifiedCompName);
+    memcpy(compName, compNameBeg, compNameLen + 1);
 }
 
 __LLBC_NS_END

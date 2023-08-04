@@ -35,7 +35,7 @@ public:
                      bool &finFlag)
     {
         const char *operatorType = isApp ? "App" : "Service";
-        if (begTime == LLBC_Time::UTCBegin)
+        if (begTime == LLBC_Time::utcBegin)
             begTime = LLBC_Time::Now();
 
         const auto alreadyWait = LLBC_Time::Now() - begTime;

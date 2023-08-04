@@ -170,7 +170,7 @@ protected:
     typedef std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _Stub2ListenerInfos; // stub id 2 listeners
 
     int _firing;
-    LLBC_ListenerStub _maxListenerStub;
+    static sint64 _maxListenerStub;
 
     _Id2ListenerInfos _id2ListenerInfos;
     _Stub2ListenerInfos _stub2ListenerInfos;

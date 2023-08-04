@@ -134,7 +134,7 @@ public:
 
     virtual int OnStart(int argc, char *argv[], bool &startFinished)
     {
-        if (_startTime == LLBC_Time::UTCBegin)
+        if (_startTime == LLBC_Time::utcBegin)
         {
             _startTime = LLBC_Time::Now();
             startFinished = false;
@@ -168,7 +168,7 @@ public:
 
     virtual void OnStop(bool &stopFinished)
     {
-        if (_stopTime == LLBC_Time::UTCBegin)
+        if (_stopTime == LLBC_Time::utcBegin)
             _stopTime = LLBC_Time::Now();
 
         auto cost = LLBC_Time::Now() - _stopTime;

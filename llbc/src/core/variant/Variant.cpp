@@ -915,9 +915,9 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
         }
 
         stream.Write(static_cast<uint32>(_holder.data.obj.seq->size()));
-        for (SeqConstIter it = _holder.data.obj.seq->begin();
-             it != _holder.data.obj.seq->end();
-             ++it)
+
+        const Seq::const_iterator seqEnd = _holder.data.obj.seq->end();
+        for (SeqConstIter it = _holder.data.obj.seq->begin(); it != seqEnd; ++it)
         {
             stream.Write(*it);
         }
@@ -931,9 +931,9 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
         }
 
         stream.Write(static_cast<uint32>(_holder.data.obj.dict->size()));
-        for (DictConstIter it = _holder.data.obj.dict->begin();
-             it != _holder.data.obj.dict->end();
-             ++it)
+
+        const Dict::const_iterator dictEnd = _holder.data.obj.dict->end();
+        for (DictConstIter it = _holder.data.obj.dict->begin(); it != dictEnd; ++it)
         {
             stream.Write(it->first);
             stream.Write(it->second);

@@ -118,7 +118,7 @@
 #define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
 // Logger format buf size.
 #define LLBC_CFG_LOG_FORMAT_BUF_SIZE                        16 * 1024
-// Default log level is set to DEBUG(TRACE:0, DEBUG:1, INFO:2, WARN:3, ERROR:4, FATAL:5).
+// Default log level is set to DEBUG(DEBUG:0, TRACE:1, INFO:2, WARN:3, ERROR:4, FATAL:5).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               0
@@ -254,8 +254,6 @@
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
 #define LLBC_CFG_COMM_MAX_SERVICE_FPS                       1000
-// Sampler support option, default is true.
-#define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine enable the service has status handler support or not.
@@ -264,6 +262,8 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
+// Max component name length.
+#define LLBC_CFG_COMM_MAX_COMP_NAME_LEN                     255
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // The poller model config(Platform specific).
@@ -297,9 +297,9 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 // Application try start interval(Call OnStart() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_START_INTERVAL             100
+#define LLBC_CFG_APP_TRY_START_INTERVAL             5
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
+#define LLBC_CFG_APP_TRY_STOP_INTERVAL              5
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}

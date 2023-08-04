@@ -63,8 +63,8 @@ inline const LLBC_SafetyObjectPool &LLBC_Logger::GetLoggerObjectPool() const
         return ret;                               \
     }                                             \
 
-__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Trace)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Debug)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Trace)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Info)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Warn)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Error)
