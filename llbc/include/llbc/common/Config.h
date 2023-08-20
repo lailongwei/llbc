@@ -190,7 +190,7 @@
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     0
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     1
 // Object reset match methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1

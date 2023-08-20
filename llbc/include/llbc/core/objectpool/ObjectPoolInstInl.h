@@ -36,11 +36,16 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
 : LLBC_IObjectPoolInst(objPool)
 , _poolInstName(typeid(ObjectType).name())
 
-, _elemSize((sizeof(MemoryUnit) + 
-            (sizeof(ObjectType) % LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN ? 
-                (LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN * 
-                 (sizeof(ObjectType) / LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN + 1)) : 
-                 (sizeof(ObjectType)) + (LLBC_INL_NS CheckSymbolSize << 1))))
+// Header Size(MemoryUnit) + BeginFlags + Aligened ObjectType Size + EndFlags
+, _elemSize(sizeof(MemoryUnit) +
+#if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+            sizeof(LLBC_INL_NS __objBeginFlags) +
+#endif
+            ((sizeof(ObjectType) + LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN - 1) & ~(LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN - 1))
+#if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+            + sizeof(LLBC_INL_NS __objEndFlags)
+#endif
+    )
 , _elemCnt(static_cast<int>(LLBC_ObjectManipulator::GetPoolInstPerBlockUnitsNum<ObjectType>()))
 , _blockSize(_elemSize * _elemCnt)
 
@@ -63,17 +68,21 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
     // Destroy objects and recycle memory.
     if (_blockCnt != 0)
     {
-        for (int blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
+        for (size_t blockIdx = 0; blockIdx != _blockCnt; ++blockIdx)
         {
             MemoryBlock *&memBlock = _blocks[blockIdx];
-            for (int unitIdx = 0; unitIdx != _elemCnt; ++unitIdx)
+            for (size_t unitIdx = 0; unitIdx != _elemCnt; ++unitIdx)
             {
                 MemoryUnit *memUnit =
                     reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * unitIdx);
                 if (!memUnit->unFlags.flags.inited)
                     continue;
 
-                void *obj = reinterpret_cast<void *>(memUnit->buff + LLBC_INL_NS CheckSymbolSize);
+                #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+                void *obj = memUnit->buff;
+                #else
+                void *obj = memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags);
+                #endif
                 if (memUnit->unFlags.flags.referencableObj)
                 {
                     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
@@ -134,12 +143,29 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
     #endif
 
     // Get memory unit, and do assert, makesure will release object is not referencable object.
+    #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
-        reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
+        reinterpret_cast<uint8 *>(obj) - sizeof(MemoryUnit));
+    #else
+    MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
+        reinterpret_cast<uint8 *>(obj) - (sizeof(MemoryUnit) + sizeof(LLBC_INL_NS __objBeginFlags)));
+    #endif
+
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    // Memory corruption check.
+    ASSERT(memcmp(memUnit->buff,
+                  LLBC_INL_NS __objBeginFlags,
+                  sizeof(LLBC_INL_NS __objBeginFlags)) == 0 &&
+           "LLBC_ObjectPoolInst::Release(): Memory has been corrupted!");
+    ASSERT(memcmp(memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags) + sizeof(ObjectType),
+                  LLBC_INL_NS __objEndFlags,
+                  sizeof(LLBC_INL_NS __objEndFlags)) == 0 &&
+           "LLBC_ObjectPoolInst::Release(): Memory has been corrupted!");
+
+    // Referencable object check.
     ASSERT(!memUnit->unFlags.flags.referencableObj &&
-           "LLBC_ObjectPoolInst::Release() could not release referencable object, "
-           "please using LLBC_ReferencableObj::Release/AutoRelease methods to complete object release");
+           "LLBC_ObjectPoolInst::Release(): Release referencable object("
+           "using LLBC_ReferencableObj::Release/AutoRelease to release");
     #endif
 
     // Execute real release.
@@ -178,7 +204,7 @@ void LLBC_ObjectPoolInst<ObjectType>::Stat(LLBC_ObjectPoolInstStat& stat) const
     stat.blockMemorySize = _blockSize;
     stat.unitMemorySize = _elemSize;
     stat.blocks.resize(_blockCnt);
-    for (int i = 0; i < _blockCnt; ++i)
+    for (size_t i = 0; i < _blockCnt; ++i)
     {
         // Stat memory block.
         MemoryBlock *&block = _blocks[i];
@@ -232,15 +258,22 @@ template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::ReleaseReferencable(void *obj)
 {
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(obj != nullptr && "LLBC_ObjectPoolInst::ReleaseReferencable() could not release nullptr pointer object!");
+    ASSERT(obj != nullptr &&
+           "LLBC_ObjectPoolInst::ReleaseReferencable(): obj is nullptr!");
     #endif
 
+    #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
-        reinterpret_cast<uint8 *>(obj) - (LLBC_INL_NS CheckSymbolSize + sizeof(MemoryUnit)));
+        reinterpret_cast<uint8 *>(obj) - sizeof(MemoryUnit));
+    #else
+    MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
+        reinterpret_cast<uint8 *>(obj) - (sizeof(MemoryUnit) + sizeof(LLBC_INL_NS __objBeginFlags)));
+    #endif
+
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(memUnit->unFlags.flags.referencableObj &&
-           "LLBC_ObjectPoolInst::Release() could not release referencable object, "
-           "please using LLBC_ReferencableObj::Release/AutoRelease methods to complete object release");
+           "LLBC_ObjectPoolInst::Release(): Release non-referencable obj("
+           "using LLBC_ReferencableObj::Release/AutoRelease methods to release)");
     #endif
 
     Release(memUnit, obj);
@@ -269,7 +302,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
     #endif // 64bit-processor
     memBlock->freeUnits = freeUnits;
 
-    for (int idx = 0; idx < _elemCnt; ++idx)
+    for (size_t idx = 0; idx < _elemCnt; ++idx)
     {
         MemoryUnit *memUnit =
             reinterpret_cast<MemoryUnit *>(reinterpret_cast<uint8 *>(memBlock->buff) + _elemSize * idx);
@@ -280,9 +313,12 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
         memUnit->seq = idx;
 
         #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-        *(reinterpret_cast<sint64 *>(memUnit->buff)) = LLBC_INL_NS BeginingSymbol;
-        *(reinterpret_cast<sint64 *>(reinterpret_cast<
-          uint8 *>(memUnit) + _elemSize - LLBC_INL_NS CheckSymbolSize)) = LLBC_INL_NS EndingSymbol;
+        memcpy(memUnit->buff,
+               LLBC_INL_NS __objBeginFlags,
+               sizeof(LLBC_INL_NS __objBeginFlags));
+        memcpy(memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags) + sizeof(ObjectType),
+               LLBC_INL_NS __objEndFlags,
+               sizeof(LLBC_INL_NS __objEndFlags));
         #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
         freeUnits->Push(memUnit);
     }
@@ -320,21 +356,27 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
     _lock->Unlock();
 
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(*(reinterpret_cast<sint64 *>(memUnit->buff)) ==
-           LLBC_INL_NS BeginingSymbol && "LLBC_ObjectPoolInst::Get() memory unit is dirty");
-    ASSERT(*(reinterpret_cast<sint64 *>(
-        reinterpret_cast<uint8 *>(memUnit) + _elemSize - LLBC_INL_NS CheckSymbolSize)) == LLBC_INL_NS EndingSymbol &&
-        "LLBC_ObjectPoolInst::Get() memory unit is dirty");
+    // Memory corruption check.
+    ASSERT(memcmp(memUnit->buff,
+                  LLBC_INL_NS __objBeginFlags,
+                  sizeof(LLBC_INL_NS __objBeginFlags)) == 0 &&
+           "LLBC_ObjectPoolInst::Get(): Memory has been corrupted!");
+    ASSERT(memcmp(memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags) + sizeof(ObjectType),
+                  LLBC_INL_NS __objEndFlags,
+                  sizeof(LLBC_INL_NS __objEndFlags)) == 0 &&
+           "LLBC_ObjectPoolInst::Get(): Memory has been corrupted!");
+
+    // Referencable flag match check.
     if (memUnit->unFlags.flags.inited)
-        ASSERT(memUnit->unFlags.flags.referencableObj ==
-               referencableObj && "LLBC_ObjectPoolInst::Get() memory unit referencable flag conflict");
+        ASSERT(memUnit->unFlags.flags.referencableObj == referencableObj &&
+               "LLBC_ObjectPoolInst::Get(): referencable flag mismatched!");
     #endif
 
-    #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    void *obj = memUnit->buff + LLBC_INL_NS CheckSymbolSize;
-    #else // !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    void *obj = memUnit->buff; //! Implic CheckSymbolSize is zero.
-    #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    void *obj = memUnit->buff;
+    #else // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
+    void *obj = memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags);
+    #endif // !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     if (!memUnit->unFlags.flags.inited)
     {
         LLBC_ObjectManipulator::New<ObjectType>(obj);

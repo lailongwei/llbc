@@ -355,7 +355,7 @@ int TestCase_Core_ObjectPool::Run(int argc, char *argv[])
     DoConverienceMethodsTest();
     DoPerfTest();
     DoComplexObjPerfTest();
-    DoPoolDebugAssetTest();
+    DoPoolDebugAssertTest();
     DoStringSpecificPoolInstTest();
 
     LLBC_PrintLn("Press any key to continue ...");
@@ -880,8 +880,10 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
 
 }
 
-void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
+void TestCase_Core_ObjectPool::DoPoolDebugAssertTest()
 {
+    LLBC_PrintLn("Begin Object pool debug asset test:");
+
 #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     LLBC_PrintLn("Not enabled pool debug option<LLBC_CFG_CORE_OBJECT_POOL_DEBUG>, please enable it!");
     return;
@@ -901,6 +903,22 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssetTest()
         // pool.Release(pkt);
         // pool.Release(pkt);
     }
+
+    // Test pointer written out of bounds.
+    {
+        struct _OPTestStruct {
+            int a;
+            int b;
+            int c;
+        };
+
+        auto obj = pool.Get<_OPTestStruct>();
+        *(reinterpret_cast<uint8 *>(obj) - 15) = 3;
+        // *(reinterpret_cast<uint8 *>(obj + 1)) = 3;
+        pool.Release(obj);
+    }
+
+    LLBC_PrintLn("Object pool debug asset test finished");
 }
 
 void TestCase_Core_ObjectPool::DoStringSpecificPoolInstTest()

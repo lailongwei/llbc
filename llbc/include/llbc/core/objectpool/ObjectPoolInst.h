@@ -34,19 +34,15 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-// Define BeginingSymbol/EndSymbol, CheckSymbolSize.
+// Define beginFlags/endFlags.
 #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-const size_t CheckSymbolSize = 8;
-
  #if LLBC_TARGET_PLATFORM_WIN32
-    const LLBC_NS sint64 BeginingSymbol = 0xcdcdcdcdcdcdcdcdI64;
-    const LLBC_NS sint64 EndingSymbol = 0xcdcdcdcdcdcdcdcdI64;
+    static constexpr LLBC_NS uint64 __objBeginFlags[4] {0xcdcdcdcdcdcdcdcdUI64};
+    static constexpr LLBC_NS uint64 __objEndFlags[4] {0xcdcdcdcdcdcdcdcdUI64};
  #else // Non-Win32
-    const LLBC_NS sint64 BeginingSymbol = 0xcdcdcdcdcdcdcdcdLL;
-    const LLBC_NS sint64 EndingSymbol = 0xcdcdcdcdcdcdcdcdLL;
+    static constexpr LLBC_NS uint64 __objBeginFlags[4] = {0xcdcdcdcdcdcdcdcdull};
+    static constexpr LLBC_NS uint64 __objEndFlags[4] = {0xcdcdcdcdcdcdcdcdull};
  #endif // LLBC_TARGET_PLATFORM_WIN32
-#else // NDEBUG
-const size_t CheckSymbolSize = 0;
 #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 
 __LLBC_INTERNAL_NS_END
@@ -214,11 +210,11 @@ private:
 private:
     const char *_poolInstName;
 
-    const int _elemSize;
-    const int _elemCnt;
-    const int _blockSize;
+    const size_t _elemSize;
+    const size_t _elemCnt;
+    const size_t _blockSize;
 
-    int _blockCnt;
+    size_t _blockCnt;
     MemoryBlock **_blocks;
     LLBC_RingBuffer<MemoryBlock *> _freeBlocks;
 
