@@ -254,12 +254,24 @@ static char __shellCmd[PATH_MAX * 2 + 256 + 1];
 static void *__frames[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES] {nullptr};
 static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
+static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
 static void __NonWin32CrashHandler(int sig)
 {
     // Uninstall this signal's hook.
     signal(sig, SIG_DFL);
+
+    // If handling another crash signal, raise the signal again, otherwise mask hanlding signal.
+    if (__handlingCrashSignals)
+    {
+        raise(sig);
+        return;
+    }
+    else
+    {
+        __handlingCrashSignals = true;
+    }
 
     // Get executable file path.
     ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, PATH_MAX);
