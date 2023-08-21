@@ -50,6 +50,19 @@ LLBC_FORCE_INLINE LLBC_RingBuffer<ElemType>::~LLBC_RingBuffer()
 }
 
 template <typename ElemType>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Push(ElemType &&elem)
+{
+    if (UNLIKELY(_full))
+        ReCapacity(_capacity << 1);
+
+    new (&_elems[_tail]) ElemType(std::move(elem));
+    if (UNLIKELY(++_tail == _capacity))
+        _tail = 0;
+
+    _full = (_tail == _front);
+}
+
+template <typename ElemType>
 LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Push(const ElemType &elem)
 {
     if (UNLIKELY(_full))
@@ -75,8 +88,7 @@ LLBC_FORCE_INLINE ElemType LLBC_RingBuffer<ElemType>::Pop()
     if (UNLIKELY(++_front == _capacity))
         _front = 0;
 
-    if (UNLIKELY(_full))
-        _full = false;
+    _full = false;
 
     return elem;
 }
@@ -96,7 +108,7 @@ LLBC_FORCE_INLINE const ElemType &LLBC_RingBuffer<ElemType>::Front() const
 template <typename ElemType>
 LLBC_FORCE_INLINE ElemType &LLBC_RingBuffer<ElemType>::Tail()
 {
-    return _elems[_tail];
+    return _tail > 0 ? _elems[_tail - 1] : _elems[_capacity - 1];
 }
 
 template <typename ElemType>

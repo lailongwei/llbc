@@ -45,6 +45,13 @@ public:
      * Note: If ring buffer reach to limit, will auto recapacity.
      * @param[in] elem - the element.
      */
+    void Push(ElemType &&elem);
+
+    /**
+     * Push element to ring buffer.
+     * Note: If ring buffer reach to limit, will auto recapacity.
+     * @param[in] elem - the element.
+     */
     void Push(const ElemType &elem);
 
     /**
