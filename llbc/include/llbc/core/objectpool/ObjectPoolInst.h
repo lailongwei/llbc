@@ -36,13 +36,18 @@ __LLBC_INTERNAL_NS_BEGIN
 
 // Define beginFlags/endFlags.
 #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
- #if LLBC_TARGET_PLATFORM_WIN32
-    static constexpr LLBC_NS uint64 __objBeginFlags[4] {0xcdcdcdcdcdcdcdcdUI64};
-    static constexpr LLBC_NS uint64 __objEndFlags[4] {0xcdcdcdcdcdcdcdcdUI64};
- #else // Non-Win32
-    static constexpr LLBC_NS uint64 __objBeginFlags[4] = {0xcdcdcdcdcdcdcdcdull};
-    static constexpr LLBC_NS uint64 __objEndFlags[4] = {0xcdcdcdcdcdcdcdcdull};
- #endif // LLBC_TARGET_PLATFORM_WIN32
+static constexpr LLBC_NS uint64 __objBeginFlags[4] {
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+};
+static constexpr LLBC_NS uint64 __objEndFlags[4] {
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+};
 #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 
 __LLBC_INTERNAL_NS_END

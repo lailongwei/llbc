@@ -69,8 +69,7 @@ LLBC_FORCE_INLINE ElemType LLBC_RingBuffer<ElemType>::Pop()
     ASSERT(!IsEmpty() && "Try pop a empty LLBC_RingBuffer!");
 #endif
 
-    // TODO: Use cxx11 rvalue ref construct.
-    ElemType elem = _elems[_front];
+    ElemType elem(std::move(_elems[_front]));
     _elems[_front].~ElemType();
 
     if (UNLIKELY(++_front == _capacity))

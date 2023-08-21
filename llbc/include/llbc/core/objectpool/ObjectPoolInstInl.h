@@ -139,7 +139,8 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
 {
     // Do assert, makesure object is not null.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(obj != nullptr && "LLBC_ObjectPoolInst::Release() could not release nullptr pointer object!");
+    ASSERT(obj != nullptr &&
+           "LLBC_ObjectPoolInst::Release(): Release nullptr pointer!");
     #endif
 
     // Get memory unit, and do assert, makesure will release object is not referencable object.
@@ -336,7 +337,8 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
 {
     // Do assert(makesure given block has free units).
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(!memBlock->freeUnits->IsEmpty() && "Try pop empty memory block!");
+    ASSERT(!memBlock->freeUnits->IsEmpty() &&
+           "LLBC_ObjectPoolInst::FindFreeObj(): Pop from empty memory block!");
     #endif
 
     // Pop free unit, and then not exist any free units after pop, pop this block from _freeBlocks.
@@ -346,7 +348,8 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
     {
         #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
         MemoryBlock *popBlock = _freeBlocks.Pop();
-        ASSERT(popBlock == memBlock && "Object pool instance internal error, memory blocks dismatch!");
+        ASSERT(popBlock == memBlock &&
+               "LLBC_ObjectPoolInst::FindFreeObj(): Memory blocks mismatch!");
         #else
         _freeBlocks.Pop();
         #endif
@@ -360,16 +363,16 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock
     ASSERT(memcmp(memUnit->buff,
                   LLBC_INL_NS __objBeginFlags,
                   sizeof(LLBC_INL_NS __objBeginFlags)) == 0 &&
-           "LLBC_ObjectPoolInst::Get(): Memory has been corrupted!");
+           "LLBC_ObjectPoolInst::FindFreeObj(): Memory has been corrupted!");
     ASSERT(memcmp(memUnit->buff + sizeof(LLBC_INL_NS __objBeginFlags) + sizeof(ObjectType),
                   LLBC_INL_NS __objEndFlags,
                   sizeof(LLBC_INL_NS __objEndFlags)) == 0 &&
-           "LLBC_ObjectPoolInst::Get(): Memory has been corrupted!");
+           "LLBC_ObjectPoolInst::FindFreeObj(): Memory has been corrupted!");
 
     // Referencable flag match check.
     if (memUnit->unFlags.flags.inited)
         ASSERT(memUnit->unFlags.flags.referencableObj == referencableObj &&
-               "LLBC_ObjectPoolInst::Get(): referencable flag mismatched!");
+               "LLBC_ObjectPoolInst::FindFreeObj(): referencable flag mismatched!");
     #endif
 
     #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
@@ -412,10 +415,9 @@ LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::Get(const bool &referen
 template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memUnit, void *obj)
 {
-    // Repeated release check(only available when LLBC_DEBUG/LLBC_CFG_CORE_OBJECT_POOL_DEBUG enabled).
-    #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(memUnit->unFlags.flags.inUsing && "Repeated release object to object-pool!");
-    #endif
+    // Repeated release check.
+    ASSERT(memUnit->unFlags.flags.inUsing &&
+           "LLBC_ObjectPoolInst::Release(): Repeated release object to object-pool!");
 
     // Reset object data(call object pool clear method or delete object).
     if (LLBC_ObjectManipulator::Reset<ObjectType>(obj))
@@ -434,7 +436,8 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memU
 
     // Makesure ring-buffer is not full.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-    ASSERT(!freeUnits->IsFull() && "Try repeat release object!");
+    ASSERT(!freeUnits->IsFull() &&
+           "LLBC_ObjectPoolInst::Release(): Repeated release object!");
     #endif
 
     freeUnits->Push(memUnit);
