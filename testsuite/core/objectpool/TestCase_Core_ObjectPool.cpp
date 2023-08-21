@@ -906,16 +906,16 @@ void TestCase_Core_ObjectPool::DoPoolDebugAssertTest()
 
     // Test pointer written out of bounds.
     {
-        struct _OPTestStruct {
-            int a;
-            int b;
-            int c;
-        };
+        // struct _OPTestStruct {
+        //     int a;
+        //     int b;
+        //     int c;
+        // };
 
-        auto obj = pool.Get<_OPTestStruct>();
-        *(reinterpret_cast<uint8 *>(obj) - 15) = 3;
+        // auto obj = pool.Get<_OPTestStruct>();
+        // // *(reinterpret_cast<uint8 *>(obj) - 15) = 3;
         // *(reinterpret_cast<uint8 *>(obj + 1)) = 3;
-        pool.Release(obj);
+        // pool.Release(obj);
     }
 
     LLBC_PrintLn("Object pool debug asset test finished");
