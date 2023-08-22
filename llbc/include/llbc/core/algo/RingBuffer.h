@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The basic ring buffer data structure implement.
  */
-template <typename ElemType>
+template <typename T>
 class LLBC_RingBuffer
 {
 public:
@@ -45,43 +45,43 @@ public:
      * Note: If ring buffer reach to limit, will auto recapacity.
      * @param[in] elem - the element.
      */
-    void Push(ElemType &&elem);
+    void Push(T &&elem);
 
     /**
      * Push element to ring buffer.
      * Note: If ring buffer reach to limit, will auto recapacity.
      * @param[in] elem - the element.
      */
-    void Push(const ElemType &elem);
+    void Push(const T &elem);
 
     /**
      * Pop element from ring buffer.
      * Warning: Do not pop empty ring buffer, the behavior is not defined!
-     * @return ElemType - the element.
+     * @return T - the element.
      */
-    ElemType Pop();
+    T Pop();
 
     /**
      * Get front element.
-     * @return ElemType & - the front element reference.
+     * @return T & - the front element reference.
      */
-    ElemType &Front();
+    T &Front();
     /**
      * Get front element.
-     * @return const ElemType & - the front element const reference.
+     * @return const T & - the front element const reference.
      */
-    const ElemType &Front() const;
+    const T &Front() const;
 
     /**
      * Get front element.
-     * @return ElemType & - the front element reference.
+     * @return T & - the front element reference.
      */
-    ElemType &Tail();
+    T &Tail();
     /**
      * Get front element.
-     * @return const ElemType & - the front element const reference.
+     * @return const T & - the front element const reference.
      */
-    const ElemType &Tail() const;
+    const T &Tail() const;
 
     /**
      * Get ring buffer size(used capacity).
@@ -125,7 +125,7 @@ public:
     LLBC_DISABLE_ASSIGNMENT(LLBC_RingBuffer);
 
 private:
-    ElemType *_elems;
+    T *_elems;
     size_t _capacity;
 
     size_t _front;
