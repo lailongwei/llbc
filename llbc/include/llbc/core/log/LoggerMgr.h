@@ -385,7 +385,7 @@ void __LLBC_ConditionLogOperator<ARG_COUNT>::Output(const char *fileName, int li
         auto *logger = loggerMgr->GetRootLogger();
         LLBC_ReturnIf(logLv < logger->GetLogLevel(), void());
 
-        logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroSeconds(),
+        logger->NonFormatOutput(logLv, nullptr, fileName, lineNo, funcName, LLBC_GetMicroseconds(),
                                 libTls->coreTls.loggerFmtBuf, fmtLen);
     }
     else

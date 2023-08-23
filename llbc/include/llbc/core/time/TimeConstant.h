@@ -32,41 +32,41 @@ class LLBC_TimeConstant
 {
 public:
     static constexpr int NumOfSecondsPerDay = 86400; // Number of seconds per-day.
-    static constexpr int NumOfMilliSecondsPerDay = 86400000; // Number of milli-seconds per-day.
+    static constexpr int NumOfMillisecondsPerDay = 86400000; // Number of milli-seconds per-day.
     #if LLBC_TARGET_PLATFORM_WIN32
-    static constexpr sint64 NumOfMicroSecondsPerDay = 86400000000I64; // Number of micro-seconds per-day.
-    static constexpr sint64 NumOfNanoSecondsPerDay = 86400000000000I64; // Number of nano-seconds per-day.
+    static constexpr sint64 NumOfMicrosecondsPerDay = 86400000000I64; // Number of micro-seconds per-day.
+    static constexpr sint64 NumOfNanosecondsPerDay = 86400000000000I64; // Number of nano-seconds per-day.
     #else
-    static constexpr sint64 NumOfMicroSecondsPerDay = 86400000000LL; // Number of micro-seconds per-day.
-    static constexpr sint64 NumOfNanoSecondsPerDay = 86400000000000LL; // Number of nano-seconds per-day.
+    static constexpr sint64 NumOfMicrosecondsPerDay = 86400000000LL; // Number of micro-seconds per-day.
+    static constexpr sint64 NumOfNanosecondsPerDay = 86400000000000LL; // Number of nano-seconds per-day.
     #endif
 
     static constexpr int NumOfSecondsPerHour = 3600; // Number of seconds per-hour.
-    static constexpr int NumOfMilliSecondsPerHour = 3600000; // Number of milli-seconds per-hour.
-    static constexpr sint64 NumOfMicroSecondsPerHour = 3600000000; // Number of micro-seconds per-hour.
+    static constexpr int NumOfMillisecondsPerHour = 3600000; // Number of milli-seconds per-hour.
+    static constexpr sint64 NumOfMicrosecondsPerHour = 3600000000; // Number of micro-seconds per-hour.
     #if LLBC_TARGET_PLATFORM_WIN32
-    static constexpr sint64 NumOfNanoSecondsPerHour = 3600000000000I64; // Number of nano-seconds per-hour.
+    static constexpr sint64 NumOfNanosecondsPerHour = 3600000000000I64; // Number of nano-seconds per-hour.
     #else
-    static constexpr sint64 NumOfNanoSecondsPerHour = 3600000000000LL; // Number of nano-seconds per-hour.
+    static constexpr sint64 NumOfNanosecondsPerHour = 3600000000000LL; // Number of nano-seconds per-hour.
     #endif
 
     static constexpr int NumOfSecondsPerMinute = 60; // Number of seconds per-minute.
-    static constexpr int NumOfMilliSecondsPerMinute = 60000; // Number of milli-seconds per-minute.
-    static constexpr sint64 NumOfMicroSecondsPerMinute = 60000000; // Number of micro-seconds per-minute.
+    static constexpr int NumOfMillisecondsPerMinute = 60000; // Number of milli-seconds per-minute.
+    static constexpr sint64 NumOfMicrosecondsPerMinute = 60000000; // Number of micro-seconds per-minute.
     #if LLBC_TARGET_PLATFORM_WIN32
-    static constexpr sint64 NumOfNanoSecondsPerMinute = 60000000000I64; // Number of nano-seconds per-minute.
+    static constexpr sint64 NumOfNanosecondsPerMinute = 60000000000I64; // Number of nano-seconds per-minute.
     #else
-    static constexpr sint64 NumOfNanoSecondsPerMinute = 60000000000LL; // Number of nano-seconds per-minute.
+    static constexpr sint64 NumOfNanosecondsPerMinute = 60000000000LL; // Number of nano-seconds per-minute.
     #endif
 
-    static constexpr int NumOfMilliSecondsPerSecond = 1000; // Number of milli-seconds per-second.
-    static constexpr sint64 NumOfMicroSecondsPerSecond = 1000000; // Number of micro-seconds per-second.
-    static constexpr sint64 NumOfNanoSecondsPerSecond = 1000000000; // Number of nano-seconds per-second.
+    static constexpr int NumOfMillisecondsPerSecond = 1000; // Number of milli-seconds per-second.
+    static constexpr sint64 NumOfMicrosecondsPerSecond = 1000000; // Number of micro-seconds per-second.
+    static constexpr sint64 NumOfNanosecondsPerSecond = 1000000000; // Number of nano-seconds per-second.
 
-    static constexpr sint64 NumOfMicroSecondsPerMilliSecond = 1000; // Number of micro-seconds per-millisecond.
-    static constexpr sint64 NumOfNanoSecondsPerMilliSecond = 1000000; // Number of nano-seconds per-millisecond.
+    static constexpr sint64 NumOfMicrosecondsPerMillisecond = 1000; // Number of micro-seconds per-millisecond.
+    static constexpr sint64 NumOfNanosecondsPerMillisecond = 1000000; // Number of nano-seconds per-millisecond.
 
-    static constexpr sint64 NumOfNanoSecondsPerMicroSecond = 1000; // Number of nano-seconds per-microsecond.
+    static constexpr sint64 NumOfNanosecondsPerMicrosecond = 1000; // Number of nano-seconds per-microsecond.
 };
 
 __LLBC_NS_END

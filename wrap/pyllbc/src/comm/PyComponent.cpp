@@ -175,7 +175,7 @@ void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
         return;
 
     PyObject *pyIdleTime = PyFloat_FromDouble(
-        idleTime.GetTotalMicroSeconds() / static_cast<double>(LLBC_TimeConstant::NumOfMicroSecondsPerSecond));
+        idleTime.GetTotalMicroseconds() / static_cast<double>(LLBC_TimeConstant::NumOfMicrosecondsPerSecond));
     PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
     Py_DECREF(pyIdleTime);
 

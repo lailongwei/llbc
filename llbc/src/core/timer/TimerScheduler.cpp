@@ -74,7 +74,7 @@ void LLBC_TimerScheduler::Update()
         return;
 
     LLBC_TimerData *data;
-    sint64 now = LLBC_GetMilliSeconds();
+    sint64 now = LLBC_GetMilliseconds();
     while (_heap.Top(data) == LLBC_OK)
     {
         if (now < data->handle)
@@ -164,7 +164,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
 
     LLBC_TimerData *data = new LLBC_TimerData;
     memset(data, 0, sizeof(LLBC_TimerData));
-    data->handle = LLBC_GetMilliSeconds() + dueTime;
+    data->handle = LLBC_GetMilliseconds() + dueTime;
     data->timerId = ++ _maxTimerId;
     data->dueTime = dueTime;
     data->period = period;
@@ -204,7 +204,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     if (data->timeouting)
         return LLBC_OK;
 
-    if (data->handle - LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
+    if (data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
         int delElemRet = _heap.DeleteElem(data);
         ASSERT(delElemRet == LLBC_OK &&

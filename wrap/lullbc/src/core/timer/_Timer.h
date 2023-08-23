@@ -106,9 +106,9 @@ LULLBC_LUA_METH int _lullbc_Timer_Schedule(lua_State *l)
     if (UNLIKELY(!lua_isnumber(l, -1)))
         lullbc_SetError(l, "period except number type");
 
-    const LLBC_TimeSpan dueTime = LLBC_TimeSpan::FromMillis(
+    const LLBC_TimeSpan dueTime = LLBC_TimeSpan::FromMilliseconds(
         static_cast<sint64>(static_cast<double>(lua_tonumber(l, -2)) * 1000));
-    const LLBC_TimeSpan period = LLBC_TimeSpan::FromMillis(
+    const LLBC_TimeSpan period = LLBC_TimeSpan::FromMilliseconds(
         static_cast<sint64>(static_cast<double>(lua_tonumber(l, -1)) * 1000));
 
     // Schedule timer

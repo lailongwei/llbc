@@ -49,37 +49,38 @@ inline time_t LLBC_Time::NowTimestampInSecs()
 
 inline sint64 LLBC_Time::NowTimestampInMillis()
 {
-    return LLBC_GetMilliSeconds();
+    return LLBC_GetMilliseconds();
 }
 
 inline sint64 LLBC_Time::NowTimestampInMicros()
 {
-    return LLBC_GetMicroSeconds();
+    return LLBC_GetMicroseconds();
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
-    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
+    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConstant::NumOfMicrosecondsPerSecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMilliSeconds)
+inline LLBC_Time LLBC_Time::FromMilliseconds(sint64 clanderTimeInMilliseconds)
 {
-    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
+    return LLBC_Time(clanderTimeInMilliseconds * LLBC_TimeConstant::NumOfMicrosecondsPerMillisecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicroSeconds)
+inline LLBC_Time LLBC_Time::FromMicroseconds(sint64 clanderTimeInMicroseconds)
 {
-    return LLBC_Time(clanderTimeInMicroSeconds);
+    return LLBC_Time(clanderTimeInMicroseconds);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
 {
-    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
+    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConstant::NumOfMicrosecondsPerSecond + timeVal.tv_usec);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
 {
-    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
+    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConstant::NumOfMicrosecondsPerSecond +
+                     timeSpec.tv_nsec / LLBC_TimeConstant::NumOfNanosecondsPerMicrosecond);
 }
 
 inline int LLBC_Time::GetYear() const
@@ -129,12 +130,12 @@ inline int LLBC_Time::GetSecond() const
 
 inline time_t LLBC_Time::GetTimestampInSecs() const
 {
-    return static_cast<time_t>(_time / LLBC_TimeConstant::NumOfMicroSecondsPerSecond);
+    return static_cast<time_t>(_time / LLBC_TimeConstant::NumOfMicrosecondsPerSecond);
 }
 
 inline sint64 LLBC_Time::GetTimestampInMillis() const
 {
-    return _time / LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond;
+    return _time / LLBC_TimeConstant::NumOfMicrosecondsPerMillisecond;
 }
 
 inline sint64 LLBC_Time::GetTimestampInMicros() const
@@ -207,8 +208,8 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
     stream.Write(_time);
 }
 
-inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroSeconds)
-: _time(clanderTimeInMicroSeconds)
+inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroseconds)
+: _time(clanderTimeInMicroseconds)
 {
     UpdateTimeStructs();
 }

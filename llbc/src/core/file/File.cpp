@@ -555,7 +555,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     {
         if (lastAccessTime == nullptr)
         {
-            const sint64 nowTime = LLBC_GetMicroSeconds();
+            const sint64 nowTime = LLBC_GetMicroseconds();
             tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
             tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
 
@@ -575,7 +575,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         {
             if (!gotNowTime)
             {
-                const sint64 nowTime = LLBC_GetMicroSeconds();
+                const sint64 nowTime = LLBC_GetMicroseconds();
                 tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
                 tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
             }

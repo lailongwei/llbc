@@ -110,7 +110,7 @@ int LLBC_GetTimeOfDay(struct timeval *tv, void *tz)
         return LLBC_FAILED;
     }
 
-    sint64 timeVal = LLBC_GetMicroSeconds();
+    sint64 timeVal = LLBC_GetMicroseconds();
     tv->tv_sec = (long)(timeVal / 1000000L);
     tv->tv_usec = (long)(timeVal % 1000000L);
 

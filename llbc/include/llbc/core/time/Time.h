@@ -50,36 +50,6 @@ public:
      // UTC begin time.
     static const LLBC_Time utcBegin;
 
-    // Number of xxxxx per-day.
-    static constexpr int NumOfSecondsPerDay = LLBC_TimeConstant::NumOfSecondsPerDay;
-    static constexpr int NumOfMilliSecondsPerDay = LLBC_TimeConstant::NumOfMilliSecondsPerDay;
-    static constexpr sint64 NumOfMicroSecondsPerDay = LLBC_TimeConstant::NumOfMicroSecondsPerDay;
-    static constexpr sint64 NumOfNanoSecondsPerDay = LLBC_TimeConstant::NumOfNanoSecondsPerDay;
-
-    // Number of xxx per-hour.
-    static constexpr int NumOfSecondsPerHour = LLBC_TimeConstant::NumOfSecondsPerHour;
-    static constexpr int NumOfMilliSecondsPerHour = LLBC_TimeConstant::NumOfMilliSecondsPerHour;
-    static constexpr sint64 NumOfMicroSecondsPerHour = LLBC_TimeConstant::NumOfMicroSecondsPerHour;
-    static constexpr sint64 NumOfNanoSecondsPerHour = LLBC_TimeConstant::NumOfNanoSecondsPerHour;
-
-    // Number of xxx per-minute.
-    static constexpr int NumOfSecondsPerMinute = LLBC_TimeConstant::NumOfSecondsPerMinute;
-    static constexpr int NumOfMilliSecondsPerMinute = LLBC_TimeConstant::NumOfMilliSecondsPerMinute;
-    static constexpr sint64 NumOfMicroSecondsPerMinute = LLBC_TimeConstant::NumOfMicroSecondsPerMinute;
-    static constexpr sint64 NumOfNanoSecondsPerMinute = LLBC_TimeConstant::NumOfNanoSecondsPerMinute;
-
-    // Number of xxx per-second.
-    static constexpr int NumOfMilliSecondsPerSecond = LLBC_TimeConstant::NumOfMilliSecondsPerSecond;
-    static constexpr sint64 NumOfMicroSecondsPerSecond = LLBC_TimeConstant::NumOfMicroSecondsPerSecond;
-    static constexpr sint64 NumOfNanoSecondsPerSecond = LLBC_TimeConstant::NumOfNanoSecondsPerSecond;
-
-    // Number of xxx per-millisecond.
-    static constexpr sint64 NumOfMicroSecondsPerMilliSecond = LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond;
-    static constexpr sint64 NumOfNanoSecondsPerMilliSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMilliSecond;
-
-    // Number of xxx per-microsecond.
-    static constexpr sint64 NumOfNanoSecondsPerMicroSecond = LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond;
-
 public:
     /**
      * Constructors.
@@ -117,8 +87,8 @@ public:
      * @return LLBC_Time - Time object.
      */
     static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMillis(sint64 clanderTimeInMilliSeconds);
-    static LLBC_Time FromMicros(sint64 clanderTimeInMicroSeconds);
+    static LLBC_Time FromMilliseconds(sint64 clanderTimeInMilliseconds);
+    static LLBC_Time FromMicroseconds(sint64 clanderTimeInMicroseconds);
     static LLBC_Time FromTimeVal(const timeval &timeVal);
     static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
@@ -149,8 +119,8 @@ public:
     int GetHour() const;
     int GetMinute() const;
     int GetSecond() const;
-    int GetMilliSecond() const;
-    int GetMicroSecond() const;
+    int GetMillisecond() const;
+    int GetMicrosecond() const;
 
     /**
      * Get date part time.
@@ -225,8 +195,8 @@ public:
     LLBC_Time AddHours(int hours) const;
     LLBC_Time AddMinutes(int minutes) const;
     LLBC_Time AddSeconds(int seconds) const;
-    LLBC_Time AddMilliSeconds(int milliSeconds) const;
-    LLBC_Time AddMicroSeconds(int microSeconds) const;
+    LLBC_Time AddMilliseconds(int milliSeconds) const;
+    LLBC_Time AddMicroseconds(int microSeconds) const;
 
 public:
     /**
@@ -336,9 +306,9 @@ public:
 private:
     /**
      * Internal constructor.
-     * @param clanderTimeInMicroSeconds 
+     * @param clanderTimeInMicroseconds 
      */
-    explicit LLBC_Time(const sint64 &clanderTimeInMicroSeconds);
+    explicit LLBC_Time(const sint64 &clanderTimeInMicroseconds);
 
     /**
      * Update time structs(local&gmt)

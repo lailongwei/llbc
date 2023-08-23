@@ -78,7 +78,7 @@ inline int LLBC_GetMonthSpanDays(int year, int month)
     return spanDays;
 }
 
-inline sint64 LLBC_GetMilliSeconds()
+LLBC_FORCE_INLINE sint64 LLBC_GetMilliseconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct timeval timeVal;
@@ -91,11 +91,11 @@ inline sint64 LLBC_GetMilliSeconds()
     ::GetSystemTimeAsFileTime(&ft);
 
     // Convert to unix time.
-    return LLBC_WinFileTime2MilliSeconds(ft);
+    return LLBC_WinFileTime2Milliseconds(ft);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
-inline sint64 LLBC_GetMicroSeconds()
+LLBC_FORCE_INLINE sint64 LLBC_GetMicroseconds()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct timeval timeVal;
@@ -108,7 +108,7 @@ inline sint64 LLBC_GetMicroSeconds()
     ::GetSystemTimeAsFileTime(&ft);
 
     // Convert to unix time.
-    return LLBC_WinFileTime2MicroSeconds(ft);
+    return LLBC_WinFileTime2Microseconds(ft);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 }
 
@@ -123,7 +123,7 @@ inline void LLBC_WinFileTime2TimeSpec(const FILETIME &fileTime, timespec &ts)
     ts.tv_nsec = static_cast<long>((time % 10000000 * 100));
 }
 
-inline sint64 LLBC_WinFileTime2MilliSeconds(const FILETIME &fileTime)
+LLBC_FORCE_INLINE sint64 LLBC_WinFileTime2Milliseconds(const FILETIME &fileTime)
 {
     sint64 timeInMilliSec = ((sint64)fileTime.dwHighDateTime) << 32;
     timeInMilliSec |= fileTime.dwLowDateTime;
@@ -132,7 +132,7 @@ inline sint64 LLBC_WinFileTime2MilliSeconds(const FILETIME &fileTime)
     return timeInMilliSec - LLBC_DELTA_EPOCH_IN_MSEC;
 }
 
-inline sint64 LLBC_WinFileTime2MicroSeconds(const FILETIME &fileTime)
+LLBC_FORCE_INLINE sint64 LLBC_WinFileTime2Microseconds(const FILETIME &fileTime)
 {
     sint64 timeInMicroSec = ((sint64)fileTime.dwHighDateTime) << 32;
     timeInMicroSec |= fileTime.dwLowDateTime;
@@ -141,7 +141,7 @@ inline sint64 LLBC_WinFileTime2MicroSeconds(const FILETIME &fileTime)
     return timeInMicroSec - LLBC_DELTA_EPOCH_IN_USEC;
 }
 
-inline void LLBC_WinTimeSpec2FileTime(const timespec &ts, FILETIME &fileTime)
+LLBC_FORCE_INLINE void LLBC_WinTimeSpec2FileTime(const timespec &ts, FILETIME &fileTime)
 {
     sint64 ticks = ((sint64)ts.tv_sec * 10000000 +
         ts.tv_nsec / 100) + LLBC_DELTA_EPOCH_IN_100NSEC;
@@ -149,14 +149,14 @@ inline void LLBC_WinTimeSpec2FileTime(const timespec &ts, FILETIME &fileTime)
     fileTime.dwLowDateTime = (DWORD)(ticks & 0xffffffff);
 }
 
-inline void LLBC_WinMilliSeconds2FileTime(sint64 milliSeconds, FILETIME &fileTime)
+LLBC_FORCE_INLINE void LLBC_WinMilliseconds2FileTime(sint64 milliSeconds, FILETIME &fileTime)
 {
     sint64 ticks = milliSeconds * 10000 + LLBC_DELTA_EPOCH_IN_100NSEC;
     fileTime.dwHighDateTime = (DWORD)(ticks >> 32 & 0xffffffff);
     fileTime.dwLowDateTime = (DWORD)(ticks & 0xffffffff);
 }
 
-inline void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTime)
+LLBC_FORCE_INLINE void LLBC_WinMicroseconds2FileTime(sint64 microSeconds, FILETIME &fileTime)
 {
     sint64 ticks = microSeconds * 10 + LLBC_DELTA_EPOCH_IN_100NSEC;
     fileTime.dwHighDateTime = (DWORD)(ticks >> 32 & 0xffffffff);
@@ -181,7 +181,7 @@ inline uint64 LLBC_GetCpuCounterFrequency()
 #endif // Supp rdtsc
 }
 
-inline uint64 LLBC_RdTsc()
+LLBC_FORCE_INLINE uint64 LLBC_RdTsc()
 {
 #if LLBC_SUPPORT_RDTSC
     #if LLBC_TARGET_PLATFORM_WIN32
@@ -200,7 +200,7 @@ inline uint64 LLBC_RdTsc()
     return (static_cast<uint64>(hi) << 32) | lo;
     #endif // LLBC_TARGET_PLATFORM_WIN32
 #else
-    return LLBC_GetMicroSeconds();
+    return LLBC_GetMicroseconds();
 #endif
 }
 

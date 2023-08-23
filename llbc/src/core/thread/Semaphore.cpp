@@ -131,7 +131,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         return TryWait();
     }
 
-    sint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
+    sint64 expireTime = LLBC_GetMilliseconds() + milliSeconds;
     do
     {
         if(TryWait())
@@ -145,7 +145,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         {
             return true;
         }
-    } while(LLBC_GetMilliSeconds() < expireTime);
+    } while(LLBC_GetMilliseconds() < expireTime);
 
     LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     return false;

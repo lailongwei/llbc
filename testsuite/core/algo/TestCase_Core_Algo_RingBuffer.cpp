@@ -153,7 +153,7 @@ void TestCase_Core_Algo_RingBuffer::DoPerfTest()
 
     static constexpr size_t rbCap = 512;
     LLBC_RingBuffer<int> rb(rbCap);
-    sint64 begTestTime = LLBC_GetMicroSeconds();
+    sint64 begTestTime = LLBC_GetMicroseconds();
     for (size_t i = 0; i < testTimes; ++i)
     {
         for (size_t j = 0; j < rbCap; j += 4)
@@ -170,7 +170,7 @@ void TestCase_Core_Algo_RingBuffer::DoPerfTest()
         }
     }
 
-    sint64 usedTime = LLBC_GetMicroSeconds() - begTestTime;
+    sint64 usedTime = LLBC_GetMicroseconds() - begTestTime;
     std::cout << "- test finished, used time:" << usedTime
               << "us, per time cost:" << usedTime / static_cast<double>(testTimes * rb.GetCapacity() * 2) << "us"
               << std::endl;

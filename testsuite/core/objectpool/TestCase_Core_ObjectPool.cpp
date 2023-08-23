@@ -670,7 +670,7 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
         LLBC_ReleaseObjectToSafetyPool(obj1);
         LLBC_ReleaseObjectToUnsafetyPool(obj2);
     }
-    LLBC_PrintLn("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+    LLBC_PrintLn("Converience methods test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliseconds());
 
     begTestTime = LLBC_Time::Now();
     objPool1.Release(objPool1.Get<_TestType>());
@@ -688,7 +688,7 @@ void TestCase_Core_ObjectPool::DoConverienceMethodsTest()
         objPool1.Release(obj1);
         objPool2.Release(obj2);
     }
-    LLBC_PrintLn("Local object pools test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliSeconds());
+    LLBC_PrintLn("Local object pools test used time(ms): %lld", (LLBC_Time::Now() - begTestTime).GetTotalMilliseconds());
 
     LLBC_PrintLn("Object pool converience methods test finished");
 }
@@ -730,7 +730,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     }
 
     LLBC_TimeSpan usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroseconds());
 
     // Thread pool test.
     LLBC_PrintLn("Test pool Get/Release ...");
@@ -751,7 +751,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
             poolInst->ReleaseObject(poolObjs[j]);
     }
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroseconds());
 
     // Multithread test.
     LLBC_PrintLn("Test multiThread pool Get/Release ...");
@@ -764,7 +764,7 @@ void TestCase_Core_ObjectPool::DoPerfTest()
     delete task;
 
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLn("MultiThread pool Get/Release test finished, used time: %lld, thread nums: %d", usedTime.GetTotalMicroSeconds(), threadNums);
+    LLBC_PrintLn("MultiThread pool Get/Release test finished, used time: %lld, thread nums: %d", usedTime.GetTotalMicroseconds(), threadNums);
 
     // Guarded object test.
     LLBC_PrintLn("Guarded object test(please debug it)...");
@@ -835,7 +835,7 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
     }
 
     LLBC_TimeSpan usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("New/delete test finished, used time: %lld", usedTime.GetTotalMicroseconds());
 
     // Thread pool test.
     LLBC_PrintLn("Test pool Get/Release ...");
@@ -874,7 +874,7 @@ void TestCase_Core_ObjectPool::DoComplexObjPerfTest()
             poolInst->Release(poolObjs[j]);
     }
     usedTime = LLBC_Time::Now() - begTime;
-    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroSeconds());
+    LLBC_PrintLn("Pool Get/Release test finished, used time: %lld", usedTime.GetTotalMicroseconds());
 
     LLBC_PrintLn("Object pool performance test finished");
 

@@ -53,8 +53,8 @@ public:
     static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
     static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
     static LLBC_TimeSpan FromSeconds(int seconds, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMillis(sint64 millisecs, sint64 microsecs = 0);
-    static LLBC_TimeSpan FromMicros(sint64 microsecs);
+    static LLBC_TimeSpan FromMilliseconds(sint64 millisecs, sint64 microsecs = 0);
+    static LLBC_TimeSpan FromMicroseconds(sint64 microsecs);
 
     static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
@@ -101,22 +101,22 @@ public:
     int GetHours() const;
     int GetMinutes() const;
     int GetSeconds() const;
-    int GetMilliSeconds() const;
-    int GetMicroSeconds() const;
+    int GetMilliseconds() const;
+    int GetMicroseconds() const;
 
     int GetTotalDays() const;
     int GetTotalHours() const;
     int GetTotalMinutes() const;
     int GetTotalSeconds() const;
-    sint64 GetTotalMilliSeconds() const;
-    sint64 GetTotalMicroSeconds() const;
+    sint64 GetTotalMilliseconds() const;
+    sint64 GetTotalMicroseconds() const;
 
     LLBC_TimeSpan AddDays(int days);
     LLBC_TimeSpan AddHours(int hours);
     LLBC_TimeSpan AddMinutes(int minutes);
     LLBC_TimeSpan AddSeconds(int seconds);
-    LLBC_TimeSpan AddMilliSeconds(sint64 milliSeconds);
-    LLBC_TimeSpan AddMicroSeconds(sint64 microSeconds);
+    LLBC_TimeSpan AddMilliseconds(sint64 milliSeconds);
+    LLBC_TimeSpan AddMicroseconds(sint64 microSeconds);
 
     LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
