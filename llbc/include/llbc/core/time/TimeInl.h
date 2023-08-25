@@ -59,12 +59,12 @@ inline sint64 LLBC_Time::NowTimestampInMicros()
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
-    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConstant::NumOfMicrosecondsPerSecond);
+    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
 inline LLBC_Time LLBC_Time::FromMilliseconds(sint64 clanderTimeInMilliseconds)
 {
-    return LLBC_Time(clanderTimeInMilliseconds * LLBC_TimeConstant::NumOfMicrosecondsPerMillisecond);
+    return LLBC_Time(clanderTimeInMilliseconds * LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
 inline LLBC_Time LLBC_Time::FromMicroseconds(sint64 clanderTimeInMicroseconds)
@@ -74,13 +74,13 @@ inline LLBC_Time LLBC_Time::FromMicroseconds(sint64 clanderTimeInMicroseconds)
 
 inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
 {
-    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConstant::NumOfMicrosecondsPerSecond + timeVal.tv_usec);
+    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConst::NumOfMicrosPerSecond + timeVal.tv_usec);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
 {
-    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConstant::NumOfMicrosecondsPerSecond +
-                     timeSpec.tv_nsec / LLBC_TimeConstant::NumOfNanosecondsPerMicrosecond);
+    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConst::NumOfMicrosPerSecond +
+                     timeSpec.tv_nsec / LLBC_TimeConst::NumOfNanosPerMicrosecond);
 }
 
 inline int LLBC_Time::GetYear() const
@@ -130,12 +130,12 @@ inline int LLBC_Time::GetSecond() const
 
 inline time_t LLBC_Time::GetTimestampInSecs() const
 {
-    return static_cast<time_t>(_time / LLBC_TimeConstant::NumOfMicrosecondsPerSecond);
+    return static_cast<time_t>(_time / LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
 inline sint64 LLBC_Time::GetTimestampInMillis() const
 {
-    return _time / LLBC_TimeConstant::NumOfMicrosecondsPerMillisecond;
+    return _time / LLBC_TimeConst::NumOfMicrosPerMillisecond;
 }
 
 inline sint64 LLBC_Time::GetTimestampInMicros() const

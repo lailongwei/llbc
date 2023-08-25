@@ -22,7 +22,7 @@
 #pragma once
 
 #include "llbc/core/time/TimeSpan.h"
-#include "llbc/core/time/TimeConstant.h"
+#include "llbc/core/time/TimeConst.h"
 
 __LLBC_NS_BEGIN
 

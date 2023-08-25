@@ -47,7 +47,7 @@ inline int LLBC_CPUTime::ToSeconds() const
 #if LLBC_SUPPORT_RDTSC
     return static_cast<int>(_cpuCount / _freqPerSecond);
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMicrosecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::NumOfMicrosPerSecond;
 #endif // Supp rdtsc
 }
 
@@ -56,7 +56,7 @@ inline sint64 LLBC_CPUTime::ToMilliseconds() const
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMillisecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::NumOfMillisPerSecond;
 #endif // Supp rdtsc
 }
 
@@ -74,7 +74,7 @@ inline sint64 LLBC_CPUTime::ToNanoseconds() const
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount * LLBC_TimeConstant::NumOfNanosecondsPerMicrosecond;
+    return _cpuCount * LLBC_TimeConst::NumOfNanosPerMicrosecond;
 #endif // Supp rdtsc
 }
 
