@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include <random>
 #include "llbc/common/Common.h"
-#include "llbc/core/random/mtrandom.h"
 
 __LLBC_NS_BEGIN
 
@@ -90,7 +90,7 @@ public:
     _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
 
 private:
-    mtrandom _mtRand;
+    std::mt19937 _mtRand;
 };
 
 /**
