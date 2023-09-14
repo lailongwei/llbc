@@ -47,20 +47,20 @@ inline int LLBC_CPUTime::ToSeconds() const
 #if LLBC_SUPPORT_RDTSC
     return static_cast<int>(_cpuCount / _freqPerSecond);
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMicroSecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::NumOfMicrosPerSecond;
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMilliSeconds() const
+inline sint64 LLBC_CPUTime::ToMilliseconds() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMilliSecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::NumOfMillisPerSecond;
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMicroSeconds() const
+inline sint64 LLBC_CPUTime::ToMicroseconds() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000ll / _freqPerSecond;
@@ -69,12 +69,12 @@ inline sint64 LLBC_CPUTime::ToMicroSeconds() const
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToNanoSeconds() const
+inline sint64 LLBC_CPUTime::ToNanoseconds() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount * LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond;
+    return _cpuCount * LLBC_TimeConst::NumOfNanosPerMicrosecond;
 #endif // Supp rdtsc
 }
 
@@ -83,19 +83,19 @@ inline int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
     return LLBC_CPUTime(cpuCount).ToSeconds();
 }
 
-inline sint64 LLBC_CPUTime::ToMilliSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMilliseconds(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMilliSeconds();
+    return LLBC_CPUTime(cpuCount).ToMilliseconds();
 }
 
-inline sint64 LLBC_CPUTime::ToMicroSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMicroseconds(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMicroSeconds();
+    return LLBC_CPUTime(cpuCount).ToMicroseconds();
 }
 
-inline sint64 LLBC_CPUTime::ToNanoSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToNanoseconds(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToNanoSeconds();
+    return LLBC_CPUTime(cpuCount).ToNanoseconds();
 }
 
 inline LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const

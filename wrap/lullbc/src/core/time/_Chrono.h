@@ -27,16 +27,16 @@ LULLBC_LUA_METH int _lullbc_Chrono_UTC_Seconds(lua_State *l)
     return 1;
 }
 
-// Api: Chrono_UTC_MilliSeconds
-LULLBC_LUA_METH int _lullbc_Chrono_UTC_MilliSeconds(lua_State *l)
+// Api: Chrono_UTC_Milliseconds
+LULLBC_LUA_METH int _lullbc_Chrono_UTC_Milliseconds(lua_State *l)
 {
-    lua_pushinteger(l, LLBC_GetMilliSeconds());
+    lua_pushinteger(l, LLBC_GetMilliseconds());
     return 1;
 }
 
-// Api: Chrono_UTC_MicroSeconds
-LULLBC_LUA_METH int _lullbc_Chrono_UTC_MicroSeconds(lua_State *l)
+// Api: Chrono_UTC_Microseconds
+LULLBC_LUA_METH int _lullbc_Chrono_UTC_Microseconds(lua_State *l)
 {
-    lua_pushinteger(l, LLBC_GetMicroSeconds());
+    lua_pushinteger(l, LLBC_GetMicroseconds());
     return 1;
 }

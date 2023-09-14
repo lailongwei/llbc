@@ -101,7 +101,7 @@ void LLBC_LogRunnable::Svc()
         if (!TryPopAndProcLogDatas())
             LLBC_Sleep(1);
 
-        FlushLoggers(false, LLBC_GetMilliSeconds());
+        FlushLoggers(false, LLBC_GetMilliseconds());
     }
 }
 

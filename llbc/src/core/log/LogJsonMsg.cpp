@@ -81,7 +81,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         return;
 
     // Add time.
-    const sint64 now = LLBC_GetMicroSeconds();
+    const sint64 now = LLBC_GetMicroseconds();
     if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
         this->Add("timestamp", now);
 

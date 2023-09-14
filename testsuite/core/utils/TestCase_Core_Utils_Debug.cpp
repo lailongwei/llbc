@@ -89,9 +89,9 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     {
         LLBC_PrintLn("- Test static LLBC_CPUTime::ToXXX() method:");
         LLBC_PrintLn("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%lld", LLBC_CPUTime::ToMilliSeconds(100000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%lld", LLBC_CPUTime::ToMicroSeconds(10000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%lld", LLBC_CPUTime::ToNanoSeconds(1000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliseconds(100000000llu):%lld", LLBC_CPUTime::ToMilliseconds(100000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroseconds(10000000llu):%lld", LLBC_CPUTime::ToMicroseconds(10000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoseconds(1000000llu):%lld", LLBC_CPUTime::ToNanoseconds(1000000llu));
         LLBC_Print("\n");
     }
 

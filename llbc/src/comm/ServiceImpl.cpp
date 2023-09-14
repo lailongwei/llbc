@@ -1019,7 +1019,7 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
 
     // Record begin svc time, if fullFrame is true.
     if (fullFrame)
-        _begSvcTime = LLBC_GetMilliSeconds();
+        _begSvcTime = LLBC_GetMilliseconds();
 
     // Handle posts.
     HandlePosts();
@@ -1043,7 +1043,7 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
     {
-        const sint64 elapsed = LLBC_GetMilliSeconds() - _begSvcTime;
+        const sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
         if (elapsed >= 0 && elapsed < _frameInterval)
             LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
     }
@@ -2323,7 +2323,7 @@ void LLBC_ServiceImpl::ProcessIdle()
     const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
-        sint64 elapsed = LLBC_GetMilliSeconds() - _begSvcTime;
+        sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
         if (LIKELY(elapsed >= 0))
         {
             if (elapsed >= _frameInterval)
@@ -2331,7 +2331,7 @@ void LLBC_ServiceImpl::ProcessIdle()
 
             LLBC_Component *&comp = caredComps[compIdx];
             if (LIKELY(comp->_started))
-                comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
+                comp->OnIdle(LLBC_TimeSpan::FromMilliseconds(_frameInterval - elapsed));
         }
     }
 }

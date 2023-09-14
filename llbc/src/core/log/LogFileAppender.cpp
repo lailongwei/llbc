@@ -107,7 +107,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         return LLBC_OK;
 
     // Force check and update file one time.
-    CheckAndUpdateLogFile(LLBC_GetMicroSeconds());
+    CheckAndUpdateLogFile(LLBC_GetMicroseconds());
 
     return LLBC_OK;
 }

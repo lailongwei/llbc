@@ -144,7 +144,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,
                        elapsed.ToString().c_str(),
-                       elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+                       elapsed.ToNanoseconds() / static_cast<double>(loopLmt) / 1000.0);
     }
 
     LLBC_PrintLn("Press any key to begin json log test");

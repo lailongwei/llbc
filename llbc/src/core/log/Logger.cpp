@@ -293,7 +293,7 @@ int LLBC_Logger::NonFormatOutput(int level,
                                       file,
                                       line,
                                       func,
-                                      time != 0 ? time : LLBC_GetMicroSeconds(),
+                                      time != 0 ? time : LLBC_GetMicroseconds(),
                                       msg,
                                       msgLen);
     if (_hookDelegs[level])
@@ -355,7 +355,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                              file,
                              line,
                              func,
-                             LLBC_GetMicroSeconds(),
+                             LLBC_GetMicroseconds(),
                              data,
                              libTls);
 
@@ -534,7 +534,7 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     if (!force)
     {
         if (now == 0)
-            now = LLBC_GetMilliSeconds();
+            now = LLBC_GetMilliseconds();
         sint64 diff = now - _lastFlushTime;
         if (diff >= 0 && diff < _flushInterval)
             return;
@@ -544,7 +544,7 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     FlushAppenders();
 
     // Update last flush time(use flushed time to avoid logger performance problem).
-    _lastFlushTime = now != 0 ? now : LLBC_GetMilliSeconds();
+    _lastFlushTime = now != 0 ? now : LLBC_GetMilliseconds();
 }
 
 void LLBC_Logger::FlushAppenders()
