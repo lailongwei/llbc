@@ -80,7 +80,8 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
 bool csllbc_Coder::Decode(LLBC_Packet &packet)
 {
     int errMsgLen;
-    _decodeDelegs = csllbc_Service::GetPacketDecodeDelegates(packet.GetSenderServiceId());
+    // TODO: tempory impl
+    _decodeDelegs = csllbc_Service::GetPacketDecodeDelegates(0);
     void *decodeRet = (*_decodeDelegs->decodeDeleg)(packet.GetSessionId(),
                                                     packet.GetOpcode(),
                                                     packet.GetPayload(),

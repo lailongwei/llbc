@@ -331,80 +331,71 @@ public:
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId     - the service Id.
      * @param[in] sessionId - the session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
+     * @param[in] flags     - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId);
-    virtual int Send(int sessionId, int opcode);
-    virtual int Send(int sessionId, LLBC_Coder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status);
+    int Send(int sessionId,
+             int opcode,
+             LLBC_Coder *coder,
+             int status = 0,
+             uint32 flags = 0);
 
     /**
      * Send bytes(these methods will automatics create packet to send).
-     * @param[in] svcId     - the service Id.
      * @param[in] sessionId - the session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] bytes     - the bytes data.
      * @param[in] len       - data length.
      * @param[in] status    - the status, default is 0.
+     * @param[in] flags     - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId, const void *bytes, size_t len);
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len);
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status);
+    int Send(int sessionId,
+             int opcode,
+             const void *bytes,
+             size_t len,
+             int status = 0,
+             uint32 flags = 0);
 
-public:
     /** 
      * Multicast data(these methods will automatics create packet to send).
      * Note: 
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, LLBC_Coder *coder);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
-
-    /**
-     * Multicast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
      * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
-     * @param[in] bytes      - bytes to multi cast.
-     * @param[in] len   `    - will send bytes len, in bytes.
+     * @param[in] coder      - the coder.
      * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, const void *bytes, size_t len);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
+    int Multicast(const LLBC_SessionIds &sessionIds,
+                  int opcode,
+                  LLBC_Coder *coder,
+                  int status = 0,
+                  uint32 flags = 0);
+
+    /** 
+     * Multicast bytes.
+     * @param[in] sessionIds - the session Ids.
+     * @param[in] opcode     - the opcode.
+     * @param[in] bytes      - the bytes data.
+     * @param[in] len        - the bytes length.
+     * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Multicast(const LLBC_SessionIds &sessionIds,
+                          int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0) = 0;
 
     /** 
      * Broadcast data(these methods will automatics create packet to send).
@@ -412,29 +403,31 @@ public:
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
+     * @param[in] opcode - the opcode.
+     * @param[in] coder  - the coder.
+     * @param[in] status - the status, default is 0.
+     * @param[in] flags  - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast();
-    virtual int Broadcast(int opcode);
-    virtual int Broadcast(int opcode, LLBC_Coder *coder, int status);
-    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status) = 0;
+    int Broadcast(int opcode,
+                  LLBC_Coder *coder,
+                  int status = 0,
+                  uint32 flags = 0);
 
     /**
-     * Broadcast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
-     * @param[in] opcode     - the opcode.
-     * @param[in] bytes      - bytes to multi cast.
-     * @param[in] len   `    - will send bytes len, in bytes.
-     * @param[in] status     - the status, default is 0.
+     * Broadcast bytes.
+     * @param[in] opcode - the opcode.
+     * @param[in] bytes  - bytes to multi cast.
+     * @param[in] len    - will send bytes len, in bytes.
+     * @param[in] status - the status, default is 0.
+     * @param[in] flags  - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, const void *bytes, size_t len);
-    virtual int Broadcast(int opcode, const void *bytes, size_t len, int status);
-    virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status) = 0;
+    virtual int Broadcast(int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0) = 0;
 
     /**
      * Remove session, always success.
@@ -506,14 +499,6 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_CoderFactory, CoderFactory>::value, int>::type
     AddCoderFactory(int opcode);
     virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory) = 0;
-
-    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-public:
-    /**
-     * Add status code describe.
-     */
-    virtual int AddStatusDesc(int status, const LLBC_String &desc) = 0;
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 public:
     /**

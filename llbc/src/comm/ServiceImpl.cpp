@@ -442,50 +442,106 @@ int LLBC_ServiceImpl::Send(LLBC_Packet *packet)
 {
     // Call internal LockableSend() method to send packet.
     // lock = true
-    // validCheck = true
-    return LockableSend(packet, true, true);
+    // checkRunningPhase = true
+    // checkSessionValidity = true
+    return LockableSend(packet, true, true, true);
 }
 
-int LLBC_ServiceImpl::Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status)
+int LLBC_ServiceImpl::Multicast(const LLBC_SessionIds &sessionIds,
+                                int opcode,
+                                const void *bytes,
+                                size_t len,
+                                int status,
+                                uint32 flags)
 {
-    // Copy all connected session Ids.
-    _readySessionInfosLock.Lock();
-    LLBC_SessionIdList connSIds;
-    for (auto readySInfoIt = _readySessionInfos.begin();
-         readySInfoIt != _readySessionInfos.end();
-         ++readySInfoIt)
+    // Argument check.
+    if (UNLIKELY(sessionIds.empty()))
     {
-        const _ReadySessionInfo * const &sessionInfo = readySInfoIt->second;
-        if (sessionInfo->isListenSession)
-            continue;
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
 
-        connSIds.push_back(sessionInfo->sessionId);
+    // Lock & Check running phase.
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    // Foreach to call internal method LockableSend() to complete.
+    // lock = false
+    // checkRunningPhase = false
+    // checkSessionValidity = true
+    const auto sessionIdsEndIt = sessionIds.end();
+    for (auto sessionIt = sessionIds.begin();
+         sessionIt != sessionIdsEndIt;
+         ++sessionIt)
+        LockableSend(*sessionIt, // sessionId
+                     opcode, // opcode
+                     bytes, // bytes
+                     len, // len
+                     status, // status
+                     flags, // flags
+                     false, // lock
+                     false, // checkRunningPhase
+                     true); // checkSessionValidity
+
+    return LLBC_OK;
+}
+
+int LLBC_ServiceImpl::Broadcast(int opcode,
+                                const void *bytes,
+                                size_t len,
+                                int status,
+                                uint32 flags)
+{
+    // Lock & Check running phase.
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    // Get all non-listen sessionIds.
+    static thread_local LLBC_SessionIds sessionIds;
+
+    _readySessionInfosLock.Lock();
+    const auto readySessionInfosEndIt = _readySessionInfos.end();
+    for (auto it = _readySessionInfos.begin();
+         it != readySessionInfosEndIt;
+         ++it)
+    {
+        const _ReadySessionInfo &readySessionInfo = *it->second;
+        if (!readySessionInfo.isListenSession)
+            sessionIds.push_back(readySessionInfo.sessionId);
     }
     _readySessionInfosLock.Unlock();
 
-    // Call internal template method MulticastSendCoder<>() to complete.
-    // validCheck = false
-    return MulticastSendCoder<LLBC_SessionIdList>(svcId, connSIds, opcode, coder, status, false);
-}
+    // return LLBC_OK, if is empty.
+    if (sessionIds.empty())
+        return LLBC_OK;
 
-int LLBC_ServiceImpl::Broadcast(int svcId, int opcode, const void *bytes, size_t len , int status)
-{
-    LLBC_LockGuard guard(_lock);
-
-    // Foreach to call internal method LockableSend() method to complete.
+    // Foreach to call internal method LockableSend() to compolete.
     // lock = false
-    // validCheck = false
-    LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
-    for (auto readySInfoIt = _readySessionInfos.begin();
-         readySInfoIt != _readySessionInfos.end();
-         ++readySInfoIt)
-    {
-        const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-        if (readySInfo->isListenSession)
-            continue;
-
-        LockableSend(svcId, readySInfo->sessionId, opcode, bytes, len, status, false, false);
-    }
+    // checkRunningPhase = false
+    // checkSessionValidity = false
+    const auto sessionIdsEndIt = sessionIds.end();
+    for (auto sessionIt = sessionIds.begin();
+         sessionIt != sessionIdsEndIt;
+         ++sessionIt)
+        LockableSend(*sessionIt, // sessionId
+                     opcode, // opcode
+                     bytes, // bytes
+                     len, // len
+                     status, // status
+                     flags, // flags
+                     false, // lock
+                     false, // checkRunningPhase
+                     false); // checkSessionValidity
 
     return LLBC_OK;
 }
@@ -728,29 +784,6 @@ int LLBC_ServiceImpl::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactor
 
     return LLBC_OK;
 }
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-int LLBC_ServiceImpl::AddStatusDesc(int status, const LLBC_String &desc)
-{
-    if (status == 0 || desc.empty())
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
-        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
-
-    if (!_statusDescs.insert(std::make_pair(
-        status, LLBC_String(desc.data(), desc.size()))).second)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 int LLBC_ServiceImpl::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
@@ -1646,35 +1679,11 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
 
     _readySessionInfosLock.Unlock();
 
-    // Packet receiver service Id set or dispatch to another service.
-    const int recverSvcId = packet->GetRecverServiceId();
-    if (recverSvcId == 0) // Set receiver service Id, if the packet's receiver service Id is 0.
-    {
-        packet->SetRecverServiceId(_id);
-    }
-    else if (recverSvcId != _id)
-    {
-        LLBC_Service *recverSvc = _svcMgr.GetService(recverSvcId);
-        if (recverSvc == nullptr || !recverSvc->IsStarted())
-        {
-            LLBC_Recycle(packet);
-            return;
-        }
-
-        recverSvc->Push(LLBC_SvcEvUtil::BuildDataArrivalEv(packet));
-        return;
-    }
-
     const int opcode = packet->GetOpcode();
-    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     const int status = packet->GetStatus();
     if (status != 0)
     {
-        #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-        auto statusDescIt = _statusDescs.find(status);
-        if (statusDescIt != _statusDescs.end())
-            packet->SetStatusDesc(statusDescIt->second);
-        #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
         # if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
         auto stHandlersIt = _statusHandlers.find(opcode);
         if (stHandlersIt != _statusHandlers.end())
@@ -1690,7 +1699,7 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         }
         # endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     }
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     // Firstly, we recognize specified opcode's pre-handler, if registered, call it.
     bool preHandled = false;
@@ -2327,31 +2336,35 @@ void LLBC_ServiceImpl::ProcessIdle()
     }
 }
 
-int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
-                                   bool lock,
-                                   bool validCheck)
+LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
+                                                     bool lock,
+                                                     bool checkRunningPhase,
+                                                     bool checkSessionValidity)
 {
     // Lock if need.
     if (lock)
         _lock.Lock();
 
     // Running phase check.
-    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
-        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+    if (checkRunningPhase)
     {
-        if (lock)
-            _lock.Unlock();
+        if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+            LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+        {
+            if (lock)
+                _lock.Unlock();
 
-        LLBC_Recycle(packet);
+            LLBC_Recycle(packet);
 
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
+            LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+            return LLBC_FAILED;
+        }
     }
 
     // Validate check, if need.
     const _ReadySessionInfo *readySInfo = nullptr;
     const int sessionId = packet->GetSessionId();
-    if (!_fullStack || validCheck)
+    if (!_fullStack || checkSessionValidity)
     {
         decltype(_readySessionInfos)::const_iterator readySInfoIt;
 
@@ -2390,9 +2403,6 @@ int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
             _readySessionInfosLock.Unlock();
     }
 
-    // Set sender service Id.
-    packet->SetSenderServiceId(_id);
-
     // If enabled full-stack option, send packet and return.
     if (_fullStack)
     {
@@ -2429,19 +2439,19 @@ int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
     return ret;
 }
 
-int LLBC_ServiceImpl::LockableSend(int svcId,
-                                   int sessionId,
-                                   int opcode,
-                                   const void *bytes,
-                                   size_t len,
-                                   int status,
-                                   bool lock,
-                                   bool validCheck)
+LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
+                                                     int opcode,
+                                                     const void *bytes,
+                                                     size_t len,
+                                                     int status,
+                                                     uint32 flags,
+                                                     bool lock,
+                                                     bool checkRunningPhase,
+                                                     bool checkSessionValidity)
 {
     // Create packet(from object pool) and send.
     LLBC_Packet *packet = _packetObjectPool.GetObject();
-    // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
-    packet->SetHeader(svcId, sessionId, opcode, status);
+    packet->SetHeader(sessionId, opcode, status, flags);
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))
     {
@@ -2449,159 +2459,18 @@ int LLBC_ServiceImpl::LockableSend(int svcId,
         return ret;
     }
 
-    return LockableSend(packet, lock, validCheck);
-}
-
-template <typename SessionIds>
-int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
-                                         const SessionIds &sessionIds,
-                                         int opcode,
-                                         LLBC_Coder *coder,
-                                         int status,
-                                         bool validCheck)
-{
-    // Session Ids not empty check.
-    if (sessionIds.empty())
-    {
-        LLBC_XRecycle(coder);
-        return LLBC_OK;
-    }
-
-    // Lock.
-    LLBC_LockGuard guard(_lock);
-
-    // Running phase check.
-    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
-        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
-    {
-        if (LIKELY(coder))
-            LLBC_Recycle(coder);
-
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-
-    typename SessionIds::const_iterator sessionIt = sessionIds.begin();
-
-    LLBC_Packet *firstPacket = _packetObjectPool.GetObject();
-    // firstPacket->SetSenderServiceId(_id);
-        // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-    firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
-
-    bool hasCoder = true;
-    if (LIKELY(coder))
-    {
-        firstPacket->SetEncoder(coder);
-        if (!firstPacket->Encode())
-        {
-            LLBC_Recycle(firstPacket);
-            LLBC_SetLastError(LLBC_ERROR_ENCODE);
-
-            return LLBC_FAILED;
-        }
-    }
-    else
-    {
-        hasCoder = false;
-    }
-
-    typename SessionIds::size_type sessionCnt = sessionIds.size();
-    if (sessionCnt == 1)
-        return LockableSend(firstPacket, false, validCheck);
-
-    static thread_local std::vector<LLBC_Packet *> otherPackets;
-    otherPackets.resize(sessionCnt - 1);
-    if (LIKELY(hasCoder))
-    {
-        const void *payload = firstPacket->GetPayload();
-        const size_t payloadLen = firstPacket->GetPayloadLength();
-
-        if (validCheck)
-            _readySessionInfosLock.Lock();
-
-        decltype(_readySessionInfos)::const_iterator readySInfoIt;
-        for (typename SessionIds::size_type i = 1;
-             i < sessionCnt;
-             ++i)
-        {
-            const int sessionId = *sessionIt++;
-            if (validCheck &&
-                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
-                    continue;
-
-            const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-            if (readySInfo->isListenSession)
-                continue;
-
-            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id);
-                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-            otherPacket->SetHeader(svcId, sessionId, opcode, status);
-            otherPacket->Write(payload, payloadLen);
-
-            otherPackets[i - 1] = otherPacket;
-        }
-
-        if (validCheck)
-            _readySessionInfosLock.Unlock();
-    }
-    else
-    {
-        if (validCheck)
-            _readySessionInfosLock.Lock();
-
-        decltype(_readySessionInfos)::const_iterator readySInfoIt;
-        for (typename SessionIds::size_type i = 1;
-             i < sessionCnt;
-             ++i)
-        {
-            const int sessionId = *sessionIt++;
-            if (validCheck &&
-                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
-                continue;
-
-            const _ReadySessionInfo *const &readySInfo = readySInfoIt->second;
-            if (readySInfo->isListenSession)
-                continue;
-
-            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id);
-                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-            otherPacket->SetHeader(svcId, sessionId, opcode, status);
-
-            otherPackets[i - 1] = otherPacket;
-        }
-
-        if (validCheck)
-            _readySessionInfosLock.Unlock();
-    }
-
-    LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
-
-    const typename SessionIds::size_type otherPacketCnt = sessionCnt - 1;
-    for (typename SessionIds::size_type i = 0; i != otherPacketCnt; ++i)
-    {
-        LLBC_Packet *&otherPacket = otherPackets[i];
-        if (UNLIKELY(!otherPacket))
-            continue;
-
-        LockableSend(otherPacket, false, false); // Don't need vaildate check.
-    }
-
-    otherPackets.clear();
-
-    return LLBC_OK;
+    return LockableSend(packet, lock, checkRunningPhase, checkSessionValidity);
 }
 
 LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId,
                                                        int acceptSessionId,
                                                        bool isListenSession,
                                                        LLBC_ProtocolStack *codecStack)
+: sessionId(sessionId)
+, acceptSessionId(acceptSessionId)
+, isListenSession(isListenSession)
+, codecStack(codecStack)
 {
-    this->sessionId = sessionId;
-    this->acceptSessionId = acceptSessionId;
-    this->isListenSession = isListenSession;
-    this->codecStack = codecStack;
 }
 
 LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()

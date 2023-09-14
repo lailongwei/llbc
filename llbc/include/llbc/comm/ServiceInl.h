@@ -156,60 +156,29 @@ LLBC_Service::AddCoderFactory(int opcode)
     return ret;
 }
 
-inline int LLBC_Service::Send(int sessionId)
-{
-    return Send(0, sessionId, 0, static_cast<LLBC_Coder *>(nullptr), 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, int opcode)
-{
-    return Send(0, sessionId, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, LLBC_Coder *coder)
-{
-    return Send(0, sessionId, 0, coder, 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, int opcode, LLBC_Coder *coder)
-{
-    return Send(0, sessionId, opcode, coder, 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, int opcode, LLBC_Coder *coder, int status)
-{
-    return Send(0, sessionId, opcode, coder, status);
-}
-
-inline int LLBC_Service::Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status)
+LLBC_FORCE_INLINE int LLBC_Service::Send(int sessionId,
+                                         int opcode,
+                                         LLBC_Coder *coder,
+                                         int status,
+                                         uint32 flags)
 {
     LLBC_Packet *packet = GetPacketObjectPool().GetObject();
+    packet->SetHeader(sessionId, opcode, status, flags);
     packet->SetEncoder(coder);
-    packet->SetHeader(svcId, sessionId, opcode, status);
 
     return Send(packet);
 }
 
-inline int LLBC_Service::Send(int sessionId, const void *bytes, size_t len)
-{
-    return Send(0, sessionId, 0, bytes, len, 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, int opcode, const void *bytes, size_t len)
-{
-    return Send(0, sessionId, opcode, bytes, len, 0);
-}
-
-inline int LLBC_Service::Send(int sessionId, int opcode, const void *bytes, size_t len, int status)
-{
-    return Send(0, sessionId, opcode, bytes, len, status);
-}
-
-inline int LLBC_Service::Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status)
+LLBC_FORCE_INLINE int LLBC_Service::Send(int sessionId,
+                                         int opcode,
+                                         const void *bytes,
+                                         size_t len,
+                                         int status,
+                                         uint32 flags)
 {
     // Create packet(from object pool) and send.
     LLBC_Packet *packet = GetPacketObjectPool().GetObject();
-    packet->SetHeader(svcId, sessionId, opcode, status);
+    packet->SetHeader(sessionId, opcode, status, flags);
     if (UNLIKELY(packet->Write(bytes, len) != LLBC_OK))
     {
         LLBC_Recycle(packet);
@@ -219,77 +188,91 @@ inline int LLBC_Service::Send(int svcId, int sessionId, int opcode, const void *
     return Send(packet);
 }
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds)
+LLBC_FORCE_INLINE int LLBC_Service::Multicast(const LLBC_SessionIds &sessionIds,
+                                              int opcode,
+                                              LLBC_Coder *coder,
+                                              int status,
+                                              uint32 flags)
 {
-    return Multicast(0, sessionIds, 0, static_cast<LLBC_Coder *>(nullptr), 0);
+    // Argument check.
+    if (UNLIKELY(!coder))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    // Pre-Set last error to LLBC_ERROR_SUCCESS.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Encode coder.
+    // TODO: Temporary code, will be optimized in later.
+    static thread_local LLBC_Packet pkt;
+    if (UNLIKELY(!pkt.GetPayload()))
+        pkt.SetPayload(new LLBC_MessageBlock);
+
+    LLBC_MessageBlock *pktPayload = pkt.GetMutablePayload();
+
+    pktPayload->SetWritePos(0);
+    if (UNLIKELY(!coder->Encode(pkt)))
+    {
+        LLBC_Recycle(coder);
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+            LLBC_SetLastError(LLBC_ERROR_ENCODE);
+
+        return LLBC_FAILED;
+    }
+
+    // Recycle coder.
+    LLBC_Recycle(coder);
+
+    // Multicast bytes.
+    return Multicast(sessionIds,
+                     opcode,
+                     pktPayload->GetData(),
+                     pktPayload->GetWritePos(),
+                     status,
+                     flags);
 }
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode)
+LLBC_FORCE_INLINE int LLBC_Service::Broadcast(int opcode, LLBC_Coder *coder, int status, uint32 flags)
 {
-    return Multicast(0, sessionIds, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
-}
+    // Argument check.
+    if (UNLIKELY(!coder))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, LLBC_Coder *coder)
-{
-    return Multicast(0, sessionIds, 0, coder, 0);
-}
+    // Pre-Set last error to LLBC_ERROR_SUCCESS.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder)
-{
-    return Multicast(0, sessionIds, opcode, coder, 0);
-}
+    // Encode coder.
+    // TODO: Temporary code, will be optimized in later.
+    static thread_local LLBC_Packet pkt;
+    if (UNLIKELY(!pkt.GetPayload()))
+        pkt.SetPayload(new LLBC_MessageBlock);
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status)
-{
-    return Multicast(0, sessionIds, opcode, coder, status);
-}
+    LLBC_MessageBlock *pktPayload = pkt.GetMutablePayload();
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, const void *bytes, size_t len)
-{
-    return Multicast(0, sessionIds, 0, bytes, len, 0);
-}
+    pktPayload->SetWritePos(0);
+    if (UNLIKELY(!coder->Encode(pkt)))
+    {
+        LLBC_Recycle(coder);
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+            LLBC_SetLastError(LLBC_ERROR_ENCODE);
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len)
-{
-    return Multicast(0, sessionIds, opcode, bytes, len, 0);
-}
+        return LLBC_FAILED;
+    }
 
-template <typename SessionIds>
-int LLBC_Service::Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status)
-{
-    return Multicast(0, sessionIds, opcode, bytes, len, status);
-}
+    // Recycle coder.
+    LLBC_Recycle(coder);
 
-inline int LLBC_Service::Broadcast()
-{
-    return Broadcast(0, 0, static_cast<LLBC_Coder *>(nullptr), 0);
-}
-
-inline int LLBC_Service::Broadcast(int opcode)
-{
-    return Broadcast(0, opcode, static_cast<LLBC_Coder *>(nullptr), 0);
-}
-
-inline int LLBC_Service::Broadcast(int opcode, LLBC_Coder *coder, int status)
-{
-    return Broadcast(0, opcode, coder, status);
-}
-
-inline int LLBC_Service::Broadcast(int opcode, const void *bytes, size_t len)
-{
-    return Broadcast(0, opcode, bytes, len, 0);
-}
-
-inline int LLBC_Service::Broadcast(int opcode, const void *bytes, size_t len, int status)
-{
-    return Broadcast(0, opcode, bytes, len, status);
+    // Broadcast bytes.
+    return Broadcast(opcode,
+                     pktPayload->GetData(),
+                     pktPayload->GetWritePos(),
+                     status,
+					 flags);
 }
 
 template <typename ObjType>

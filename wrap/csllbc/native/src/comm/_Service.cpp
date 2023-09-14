@@ -182,7 +182,7 @@ int csllbc_Service_Multicast(csllbc_Service *svc,
                              int dataLen,
                              int status)
 {
-    LLBC_SessionIdList sessionIdList(sessionIdCount);
+    LLBC_SessionIds sessionIdList(sessionIdCount);
     for (int idx = 0; idx < sessionIdCount; ++idx)
         sessionIdList.push_back(sessionIds[idx]);
 

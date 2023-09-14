@@ -146,7 +146,7 @@ public:
         *resData = *data;
 
         LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
-        resPacket->SetHeader(packet, packet.GetOpcode(), 0);
+        resPacket->SetHeader(packet.GetSessionId(), packet.GetOpcode(), 0);
         resPacket->SetEncoder(resData);
 
         GetService()->Send(resPacket);

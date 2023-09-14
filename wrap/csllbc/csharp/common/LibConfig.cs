@@ -333,15 +333,6 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service Status-Desc enabled config.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static bool commIsEnabledStatusDesc
-        {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledStatusDesc() != 0; }
-        }
-
-        /// <summary>
         /// Service Unify-PreSubscribe enabled config.
         /// <para>config layer: llbc core library</para>
         /// </summary>

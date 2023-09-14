@@ -104,8 +104,6 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCo
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MaxCompNameLen();
 // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
-// LLBC_CFG_COMM_ENABLE_STATUS_DESC
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledStatusDesc();
 // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe();
 // LLBC_CFG_COMM_POLLER_MODEL

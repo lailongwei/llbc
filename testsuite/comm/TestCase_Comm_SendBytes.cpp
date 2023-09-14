@@ -99,7 +99,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
-    int sid = 0;
+    int sid;
     if (_asClient)
     {
         sid = svc->Connect(_runIp.c_str(), _runPort);
@@ -136,7 +136,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     if (_asClient)
     {
         LLBC_Packet *pkt = new LLBC_Packet;
-        pkt->SetHeader(sid, OPCODE, 0);
+        pkt->SetHeader(sid, OPCODE, 0, 0);
         pkt->Write("Hello, world");
         pkt->Write(0);
 

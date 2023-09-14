@@ -123,9 +123,6 @@ namespace llbc
         public extern static int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Comm_IsEnabledStatusDesc();
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]

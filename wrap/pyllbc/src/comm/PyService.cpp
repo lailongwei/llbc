@@ -443,7 +443,7 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
 
     // Build packet & send.
     LLBC_Packet *packet = new LLBC_Packet;
-    packet->Write(stream.GetBuf(), stream.GetPos());
+    packet->Write(stream.GetBuf(), stream.GetWritePos());
 
     packet->SetSessionId(sessionId);
     packet->SetOpcode(opcode);
@@ -461,7 +461,7 @@ int pyllbc_Service::Send(int sessionId, int opcode, PyObject *data, int status, 
     return LLBC_OK;
 }
 
-int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status)
+int pyllbc_Service::Multicast(const LLBC_SessionIds &sessionIds, int opcode, PyObject *data, int status)
 {
     // Started check.
     if (UNLIKELY(!IsStarted()))
@@ -481,7 +481,7 @@ int pyllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, 
 
     // Send it.
     const void *bytes = stream.GetBuf();
-    const size_t len = stream.GetPos();
+    const size_t len = stream.GetWritePos();
     return _llbcSvc->Multicast(sessionIds, opcode, bytes, len, status);
 }
 
@@ -501,7 +501,7 @@ int pyllbc_Service::Broadcast(int opcode, PyObject *data, int status)
 
     // Send it.
     const void *bytes = stream.GetBuf();
-    const size_t len = stream.GetPos();
+    const size_t len = stream.GetWritePos();
     return _llbcSvc->Broadcast(opcode, bytes, len, status);
 }
 

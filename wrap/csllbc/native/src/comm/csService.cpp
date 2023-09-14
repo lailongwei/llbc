@@ -173,7 +173,7 @@ int csllbc_Service::Send(int sessionId, int opcode, const void *bytes, size_t le
     return _llbcSvc->Send(sessionId, opcode, bytes, len, status);
 }
 
-int csllbc_Service::Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
+int csllbc_Service::Multicast(const LLBC_SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status)
 {
     return _llbcSvc->Multicast(sessionIds, opcode, bytes, len,status);
 }
@@ -235,6 +235,9 @@ void csllbc_Service::AddPacketDecodeDelegates(int svcId, PacketDecodeDelegates *
 csllbc_Service::PacketDecodeDelegates *csllbc_Service::GetPacketDecodeDelegates(int svcId)
 {
     _packetDelegatesLock.Lock();
+    if (svcId == 0)
+        return !_packetDecodeDelegs.empty() ? _packetDecodeDelegs.begin()->second : nullptr;
+
     _PacketDecodeDelegs::iterator it = _packetDecodeDelegs.find(svcId);
     PacketDecodeDelegates *delegs = (it != _packetDecodeDelegs.end() ? it->second : nullptr);
 

@@ -51,7 +51,6 @@ const SymbolGroup &This::GroupedSymbol::Raw()
         _raw.insert(This::Float);
         _raw.insert(This::Double);
         _raw.insert(This::String);
-        _raw.insert(This::StringLen);
         _raw.insert(This::Unicode);
         _raw.insert(This::ByteArray);
         _raw.insert(This::Buffer);

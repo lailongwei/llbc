@@ -419,52 +419,72 @@ public:
 /**
  * Some condition judge helper with log print macros.
  */
-#define LLBC_LogAndDoIf(cond, logLv, behav, ...)                                                                       \
-    {                                                                                                                  \
-        if (cond) {                                                                                                    \
-            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(       \
-                __FILE__, __LINE__, __FUNCTION__,                                                                      \
-                LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                                   \
-                #cond, #behav, ##__VA_ARGS__);                                                                         \
-            behav;                                                                                                     \
-        }                                                                                                              \
-    }                                                                                                                  \
+#define LLBC_LogAndDoIf(cond, logLv, behav, ...)                                                                 \
+    {                                                                                                            \
+        if ((cond)) {                                                                                            \
+            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
+                __FILE__, __LINE__, __FUNCTION__,                                                                \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                             \
+                #cond, #behav, ##__VA_ARGS__);                                                                   \
+            behav;                                                                                               \
+        }                                                                                                        \
+    }                                                                                                            \
 
-#define LLBC_LogAndContinueIf(cond, logLv, ...)                                                                        \
-    {                                                                                                                  \
-        if (cond)                                                                                                      \
-        {                                                                                                              \
-            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(       \
-                __FILE__, __LINE__, __FUNCTION__,                                                                      \
-                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<\"%s\"> is true. %s",                                  \
-                #cond, "", ##__VA_ARGS__);                                                                             \
-            continue;                                                                                                  \
-        }                                                                                                              \
-    }                                                                                                                  \
+#define LLBC_LogAndContinueIf(cond, logLv, ...)                                                                  \
+    {                                                                                                            \
+        if ((cond))                                                                                              \
+        {                                                                                                        \
+            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
+                __FILE__, __LINE__, __FUNCTION__,                                                                \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ContinueIf:<\"%s\"> is true. %s",                            \
+                #cond, "", ##__VA_ARGS__);                                                                       \
+            continue;                                                                                            \
+        }                                                                                                        \
+    }                                                                                                            \
 
-#define LLBC_LogAndReturnIf(cond, logLv, ret, ...)                                                                     \
-    do {                                                                                                               \
-        if (cond)                                                                                                      \
-        {                                                                                                              \
-            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(       \
-                __FILE__, __LINE__, __FUNCTION__,                                                                      \
-                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                           \
-                #cond, #ret, ##__VA_ARGS__);                                                                           \
-            return ret;                                                                                                \
-        }                                                                                                              \
-    } while(false)                                                                                                     \
+#define LLBC_LogAndBreakIf(cond, logLv, ...)                                                                     \
+    {                                                                                                            \
+        if ((cond))                                                                                              \
+        {                                                                                                        \
+            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
+                __FILE__, __LINE__, __FUNCTION__,                                                                \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                         \
+                #cond, "", ##__VA_ARGS__);                                                                       \
+            break;                                                                                               \
+        }                                                                                                        \
+    }                                                                                                            \
 
-#define LLBC_LogAndBreakIf(cond, logLv, ...)                                                                           \
-    {                                                                                                                  \
-        if (cond)                                                                                                      \
-        {                                                                                                              \
-            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output(       \
-                __FILE__, __LINE__, __FUNCTION__,                                                                      \
-                LLBC_NS LLBC_LogLevel::logLv, "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                               \
-                #cond, "", ##__VA_ARGS__);                                                                             \
-            break;                                                                                                     \
-        }                                                                                                              \
-    }                                                                                                                  \
+#define LLBC_LogAndReturnIf(cond, logLv, ret, ...)                                                               \
+    {                                                                                                            \
+        if ((cond)) {                                                                                            \
+            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
+                __FILE__, __LINE__, __FUNCTION__,                                                                \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                     \
+                #cond, #ret, ##__VA_ARGS__);                                                                     \
+            return ret;                                                                                          \
+        }                                                                                                        \
+    }                                                                                                            \
+
+#define LLBC_LogAndExitIf(cond, logLv, exitCode, ...)                                                            \
+    {                                                                                                            \
+        if ((cond)) {                                                                                            \
+            __LLBC_ConditionLogOperator<std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
+                __FILE__, __LINE__, __FUNCTION__,                                                                \
+                LLBC_NS LLBC_LogLevel::logLv, "LLBC_ExitIf:<\"%s\"> is true, exitCode:%d. ",                     \
+                #cond, static_cast<int>(exitCode), ##__VA_ARGS__);                                               \
+                                                                                                                 \
+            if (LLBC_LoggerMgrSingleton->IsInited())                                                             \
+                LLBC_LoggerMgrSingleton->Finalize();                                                             \
+                                                                                                                 \
+            ::exit(static_cast<int>(exitCode));                                                                  \
+        }                                                                                                        \
+    }                                                                                                            \
+
+#define LLBC_LogAndDoIfNot(cond, logLv, behav, ...) LLBC_LogAndDoIf(!(cond), logLv, behav, ##__VA_ARGS__)
+#define LLBC_LogAndContinueIfNot(cond, logLv, ...) LLBC_LogAndContinueIf(!(cond), logLv, ##__VA_ARGS__)
+#define LLBC_LogAndBreakIfNot(cond, logLv, ...) LLBC_LogAndBreakIf(!(cond), logLv, ##__VA_ARGS__)
+#define LLBC_LogAndReturnIfNot(cond, logLv, ret, ...) LLBC_LogAndReturnIf(!(cond), logLv, ret, ##__VA_ARGS__)
+#define LLBC_LogAndExitIfNot(cond, logLv, exitCode, ...) LLBC_LogAndExitIf(!(cond), logLv, exitCode, ##__VA_ARGS__)
 
 __LLBC_NS_END
 

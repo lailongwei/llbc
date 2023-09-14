@@ -70,4 +70,11 @@
 #define pyllbc_TopModule        pyllbc_s_TopModule
 #define pyllbc_InlModule        pyllbc_s_InlModule
 
+/* The Python -> C++ argument parse converience macro define. */
+#define PYLLBC_ParseCObjBeginArgs(cobj, addiFmt, ...) \
+    unsigned PY_LONG_LONG valOf##cobj;                \
+    if (!PyArg_ParseTuple(args, "K" addiFmt, &valOf##cobj, ##__VA_ARGS__)) \
+        return nullptr;                               \
+                                                      \
+    memcpy(&cobj, &valOf##cobj, sizeof(cobj))         \
 

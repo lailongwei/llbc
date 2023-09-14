@@ -254,7 +254,7 @@ public:
      * @param[in] status     - the status code, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status=0);
+    int Multicast(const LLBC_SessionIds &sessionIds, int opcode, PyObject *data, int status=0);
 
     /**
      * Broadcast data.

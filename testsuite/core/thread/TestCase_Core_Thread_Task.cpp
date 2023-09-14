@@ -111,7 +111,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
         LLBC_Stream stream;
         stream.Write(LLBC_String().format("Hello Message, seq:%d", i));
         LLBC_MessageBlock *block = new LLBC_MessageBlock;
-        block->Write(stream.GetBuf(), stream.GetPos());
+        block->Write(stream.GetBuf(), stream.GetWritePos());
 
         task->Push(block);
     }

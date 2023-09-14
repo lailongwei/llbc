@@ -55,28 +55,6 @@ public:
     void SetLength(size_t length);
 
     /**
-     * Get sender service Id.
-     * @return int - sender service Id.
-     */
-    int GetSenderServiceId() const;
-    /**
-     * Set sender service Id.
-     * @param[in] senderServiceId - sender service Id.
-     */
-    void SetSenderServiceId(int senderServiceId);
-
-    /**
-     * Get receiver service Id.
-     * @return int - receiver service Id.
-     */
-    int GetRecverServiceId() const;
-    /**
-     * Set receiver service Id.
-     * @param[in] recverServiceId - receiver service Id.
-     */
-    void SetRecverServiceId(int recverServiceId);
-
-    /**
      * Get session Id.
      * @return int - the session Id.
      */
@@ -144,50 +122,36 @@ public:
      */
     void SetStatus(int status);
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    /**
-     * Get the status describe.
-     * @return const LLBC_String & - the status describe.
-     */
-    const LLBC_String &GetStatusDesc() const;
-
-    /**
-     * Set the status describe.
-     * @param[in] desc - the status describe.
-     */
-    void SetStatusDesc(const LLBC_String &desc);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-
 public:
     /**
      * Get packet flags.
-     * @return int - the packet flags.
+     * @return uint32 - the packet flags.
      */
-    int GetFlags() const;
+    uint32 GetFlags() const;
     /**
      * Set packet flags.
      * @param[in] flags - the packet falgs.
      */
-    void SetFlags(int flags);
+    void SetFlags(uint32 flags);
 
     /**
      * Check this packet already set specified flags or not.
      * @param[in] flags - the packet flags.
      * @return bool - return true if has specified flags, otherwise return return false.
      */
-    bool HasFlags(int flags) const;
+    bool HasFlags(uint32 flags) const;
 
     /**
      * Add flags to packet.
      * @param[in] flags - the packet flags.
      */
-    void AddFlags(int flags);
+    void AddFlags(uint32 flags);
 
     /**
      * Remove flags from packet.
      * @param[in] flags - the packet flags.
      */
-    void RemoveFlags(int flags);
+    void RemoveFlags(uint32 flags);
 
 public:
     /**
@@ -228,17 +192,9 @@ public:
      * @param[in] sessionId - session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] status    - the status code.
+	 * @param[in] flags     - the flags.
      */
-    void SetHeader(int sessionId, int opcode, int status);
-    void SetHeader(int svcId, int sessionId, int opcode, int status);
-
-    /**
-     * Set packet header.
-     * @param[in] packet - packet.
-     * @param[in] opcode - the opcode.
-     * @param[in] status - the status code.
-     */
-    void SetHeader(const LLBC_Packet &packet, int opcode, int status);
+    void SetHeader(int sessionId, int opcode, int status = 0, uint32 flags = 0u);
 
 public:
     /**
@@ -569,17 +525,12 @@ private:
 
     int _sessionId;
     int _acceptSessionId;
-    int _senderSvcId;
-    int _recverSvcId;
     LLBC_SockAddr_IN _localAddr;
     LLBC_SockAddr_IN _peerAddr;
 
     int _opcode;
     int _status;
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    LLBC_String *_statusDesc;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    int _flags;
+    uint32 _flags;
     sint64 _extData1;
     sint64 _extData2;
     sint64 _extData3;

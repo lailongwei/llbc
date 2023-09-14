@@ -187,11 +187,6 @@ int csllbc_LibConfig_Comm_IsEnabledStatusHandler()
     return LLBC_CFG_COMM_ENABLE_STATUS_HANDLER;
 }
 
-int csllbc_LibConfig_Comm_IsEnabledStatusDesc()
-{
-    return LLBC_CFG_COMM_ENABLE_STATUS_DESC;
-}
-
 int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()
 {
     return LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE;

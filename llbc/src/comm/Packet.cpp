@@ -27,7 +27,6 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_String __g_dftStatusDesc;
 static const char *__g_msgBlockTypeName = typeid(LLBC_NS LLBC_MessageBlock).name();
 
 __LLBC_INTERNAL_NS_END
@@ -39,14 +38,9 @@ LLBC_Packet::LLBC_Packet()
 
 , _sessionId(0)
 , _acceptSessionId(0)
-, _senderSvcId(0)
-, _recverSvcId(0)
 
 , _opcode(0)
 , _status(0)
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-, _statusDesc(nullptr)
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 , _flags(0)
 , _extData1(0)
 , _extData2(0)
@@ -74,26 +68,7 @@ LLBC_Packet::~LLBC_Packet()
     LLBC_XRecycle(_encoder);
     LLBC_XRecycle(_decoder);
     LLBC_XDelete(_codecError);
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    LLBC_XDelete(_statusDesc);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 }
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-const LLBC_String &LLBC_Packet::GetStatusDesc() const
-{
-    return (_statusDesc) ? *_statusDesc : LLBC_INL_NS __g_dftStatusDesc;
-}
-
-void LLBC_Packet::SetStatusDesc(const LLBC_String &desc)
-{
-    if (_statusDesc)
-        _statusDesc->assign(desc.data(), desc.size());
-    else
-        _statusDesc = new LLBC_String(desc.data(), desc.size());
-}
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 void LLBC_Packet::SetPayloadDeleteDeleg(const LLBC_Delegate<void(LLBC_MessageBlock *)> &deleg)
 {
@@ -154,17 +129,11 @@ void LLBC_Packet::Clear()
     _length = 0;
     _sessionId = 0;
     _acceptSessionId = 0;
-    _senderSvcId = 0;
-    _recverSvcId = 0;
     _localAddr.SetIp(0); _localAddr.SetPort(0);
     _peerAddr.SetIp(0); _peerAddr.SetPort(0);
 
     _opcode = 0;
     _status = 0;
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    if (_statusDesc)
-        _statusDesc->clear();
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _flags = 0;
     _extData1 = 0;
     _extData2 = 0;
@@ -286,9 +255,9 @@ void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
 LLBC_String LLBC_Packet::ToString() const
 {
     return LLBC_String().format(
-        "Packet[sid:%d, acceptSid:%d, senderSvcId:%d, recverSvcId:%d, opcode:%d, st:%d, "
+        "Packet[sid:%d, acceptSid:%d, opcode:%d, st:%d, "
         "payload:(read_pos:%lu, write_pos:%lu)]",
-        _sessionId, _acceptSessionId, _senderSvcId, _recverSvcId, _opcode, _status,
+        _sessionId, _acceptSessionId, _opcode, _status,
         _payload ? _payload->GetReadPos() : 0lu, _payload ? _payload->GetWritePos() : 0lu);
 }
 

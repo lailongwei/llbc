@@ -245,14 +245,23 @@ int TestCase_Com_Stream::BasicTest()
 
     LLBC_Stream stream2(1024);
     LLBC_PrintLn("- Has 1024 cap stream:%s", stream2.ToString().c_str());
-    stream2.Recap(2048);
-    LLBC_PrintLn("- After recap to 2048:%s", stream2.ToString().c_str());
+    stream2.Recap(500);
+    LLBC_PrintLn("- After recap to 500:%s", stream2.ToString().c_str());
     stream2.Recap(1024);
     LLBC_PrintLn("- After recap to 1024:%s", stream2.ToString().c_str());
+    stream2.Recap(1025);
+    LLBC_PrintLn("- After recap to 1025:%s", stream2.ToString().c_str());
+    stream2.Recap(2048);
+    LLBC_PrintLn("- After recap to 2048:%s", stream2.ToString().c_str());
+    stream2.Recap(2050);
+    LLBC_PrintLn("- After recap to 2050:%s", stream2.ToString().c_str());
+
     stream2.SetAttach(true);
     LLBC_PrintLn("- After set attach flag to true:%s", stream2.ToString().c_str());
+
     stream2.Recap(4096);
-    LLBC_PrintLn("- After set stream to 4096:%s", stream2.ToString().c_str());
+    LLBC_PrintLn("- After set attach type stream cap to 4096:%s", stream2.ToString().c_str());
+
     stream2.SetAttach(false);
     LLBC_PrintLn("- After set attach flag to false:%s", stream2.ToString().c_str());
 
@@ -263,10 +272,11 @@ int TestCase_Com_Stream::BasicTest()
     int intVal = 0;
     double dblVal = 0.0;
     char strVal[20] = {'\0'};
-    stream2.SetPos(0);
     stream2 >> bVal >> intVal >> dblVal >> strVal;
     LLBC_PrintLn("- After read, bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream:%s",
                  bVal, intVal, dblVal, strVal, stream2.ToString().c_str());
+
+    ASSERT(stream2.GetReadPos() == stream2.GetWritePos());
 
     return LLBC_OK;
 }
@@ -297,12 +307,10 @@ int TestCase_Com_Stream::EnumTest()
     // Dump stream.
     LLBC_PrintLn("All enums has been written to stream:");
     LLBC_PrintLn("- stream:%s", stream.ToString().c_str());
-    LLBC_PrintLn("- bytes hex dump:\n%s", LLBC_Byte2Hex(stream.GetBuf(), stream.GetPos()).c_str());
+    LLBC_PrintLn("- bytes hex dump:\n%s", LLBC_Byte2Hex(stream.GetBuf(), stream.GetWritePos()).c_str());
 
     // Read from stream.
-    stream.SetPos(0);
     LLBC_PrintLn("Read enums:");
-
     I64Enum i64en = stream.Read<I64Enum>();
     LLBC_PrintLn("Read I64Enum: %lld, equal I64Enum::ENUM1?:%d", static_cast<sint64>(i64en), i64en == I64Enum::ENUM1);
     LLBC_SetErrAndReturnIf(i64en != I64Enum::ENUM1, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
@@ -319,6 +327,8 @@ int TestCase_Com_Stream::EnumTest()
     LLBC_PrintLn("Read U64Enum: %llu, equal U64Enum::ENUM2?:%d", static_cast<uint64>(u64en), u64en == U64Enum::ENUM2);
     LLBC_SetErrAndReturnIf(u64en != U64Enum::ENUM2, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
 
+    ASSERT(stream.GetReadPos() == stream.GetWritePos());
+
     return LLBC_OK;
 }
 
@@ -332,7 +342,6 @@ int TestCase_Com_Stream::ConstructAndAssignmentTest()
         int intVal = 0;
         double dblVal = 0.0;
         LLBC_String strVal;
-        stream.SetPos(0);
         stream >> bVal >> intVal >> dblVal >> strVal;
         LLBC_PrintLn("- %s content:bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream2:%s",
                      streamName, bVal, intVal, dblVal, strVal.c_str(), stream.ToString().c_str());
@@ -348,15 +357,17 @@ int TestCase_Com_Stream::ConstructAndAssignmentTest()
 
     LLBC_Stream stream3;
     stream3 = stream1;
-    LLBC_PrintLn("- After Copy assignment, stream3:%s", stream3.ToString().c_str());
+    LLBC_PrintLn("- After Copy assignment:\n- stream1:%s\n- stream3:%s",
+                 stream1.ToString().c_str(), stream3.ToString().c_str());
     readStreamCnt(stream3, "Stream3");
 
     LLBC_Stream stream4(stream3, true);
-    LLBC_PrintLn("After copy construct(attach), stream4:%s", stream4.ToString().c_str());
+    LLBC_PrintLn("After copy construct(attach):\n- stream1:%s\n- stream4:%s",
+                 stream1.ToString().c_str(), stream4.ToString().c_str());
     readStreamCnt(stream4, "Stream4");
 
     LLBC_Stream stream5(std::move(stream1));
-    LLBC_PrintLn("- After move construct(stream1 -> stream5): stream1:%s, stream5:%s",
+    LLBC_PrintLn("- After move construct(stream1 -> stream5):\n- stream1:%s\n- stream5:%s",
                  stream1.ToString().c_str(), stream5.ToString().c_str());
     readStreamCnt(stream5, "Stream5");
 
@@ -414,10 +425,11 @@ int TestCase_Com_Stream::DetachTest()
     LLBC_PrintLn("- Begin detach stream:%s", stream.ToString().c_str());
 
     const size_t cap = stream.GetCap();
-    const size_t pos = stream.GetPos();
+    const size_t rPos = stream.GetReadPos();
+    const size_t wPos = stream.GetWritePos();
     auto ptr = stream.Detach();
-    LLBC_PrintLn("- Detached, pos:%lu, cap:%lu, ptr:%p, stream:%s",
-                 pos, cap, ptr, stream.ToString().c_str());
+    LLBC_PrintLn("- Detached, rPos:%lu, wPos:%lu, cap:%lu, ptr:%p, stream:%s",
+                 rPos, wPos, cap, ptr, stream.ToString().c_str());
 
     free(ptr);
 
@@ -471,18 +483,21 @@ int TestCase_Com_Stream::EndianTest()
 
     auto testEndian = [](LLBC_Stream &stream, const char *prefix)
     {
-        stream << 1 << 3 << 5 << 7;
+        int intVals[4]{ 1, 3, 5, 7 };
+        stream << intVals;
         LLBC_PrintLn("- %s: stream:%s, bytes:%s",
                      prefix,
                      stream.ToString().c_str(),
-                     LLBC_Byte2Hex(stream.GetBuf(), stream.GetPos()).c_str());
+                     LLBC_Byte2Hex(stream.GetBuf(), stream.GetWritePos()).c_str());
 
-        int intVals[4];
-        stream.SetPos(0);
+        memset(intVals, 0, sizeof(intVals));
         stream >> intVals;
         LLBC_PrintLn("- %s: read int vals:%d %d %d %d",
                      prefix,
                      intVals[0], intVals[1], intVals[2], intVals[3]);
+
+        ASSERT(intVals[0] == 1 && intVals[1] == 3 &&
+               intVals[2] == 5 && intVals[3] == 7);
     };
 
     LLBC_Stream stream1;
@@ -521,7 +536,6 @@ int TestCase_Com_Stream::PODTypeSerTest()
         << (void *)0x1234567; // ptr
     LLBC_PrintLn("  - After ser, stream:%s", stream.ToString().c_str());
 
-    stream.SetPos(0);
     LLBC_PrintLn("  - Read arithmetic values from stream:");
     LLBC_PrintLn("    - bool: %d", stream.Read<bool>());
     LLBC_PrintLn("    - sint8: %d", stream.Read<sint8>());
@@ -566,7 +580,6 @@ int TestCase_Com_Stream::PODTypeSerTest()
         << dblArr; // double[]
     LLBC_PrintLn("  - After ser, stream:%s", stream.ToString().c_str());
 
-    stream.SetPos(0);
     LLBC_String sint8Arr;
     memset(uint8Arr, 0, sizeof(uint8Arr));
     memset(sint16Arr, 0, sizeof(sint16Arr));
@@ -631,7 +644,6 @@ int TestCase_Com_Stream::TrivialClsSerTest()
     stream << trivialObj;
     LLBC_PrintLn("- After serialize, stream:%s", stream.ToString().c_str());
 
-    stream.SetPos(0);
     memset(&trivialObj, 0, sizeof(trivialObj));
     stream >> trivialObj;
     LLBC_PrintLn("- After deserialize, trivial obj:%s", trivialObj.ToString().c_str());
@@ -691,7 +703,6 @@ int TestCase_Com_Stream::SerializableClsSerTest()
     s << serObj1;
     LLBC_PrintLn("- Serialized to stream:%s", s.ToString().c_str());
 
-    s.SetPos(0);
     SerializableCls serObj2;
     if (!s.Read(serObj2))
     {
@@ -721,7 +732,6 @@ int TestCase_Com_Stream::MovableReadTest()
     LLBC_PrintLn("  - stream:%s", stream.ToString().c_str());
     LLBC_PrintLn("  - movableObj1:%d %s", movableObj1.intVal, movableObj1.strVal.c_str());
 
-    stream.SetPos(0);
     auto movableObj2 = stream.Read<MovableCls>();
 
     LLBC_PrintLn("- After called Read<MovableCls>():");

@@ -519,36 +519,35 @@ void TestCase_Core_VariantTest::SerializeTest()
     // Serialize & Deserialize raw type.
     LLBC_Stream stream;
     LLBC_Variant raw(-64);
-    stream <<raw;
-    std::cout <<"Raw obj[" <<raw <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream << raw;
+    std::cout << "Raw obj[" << raw << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserRaw;
-    stream.SetPos(0);
-    stream>> deserRaw;
-    std::cout <<"Deserialized from stream: [" <<deserRaw <<"]" <<std::endl;
+    stream >> deserRaw;
+    std::cout << "Deserialized from stream: [" << deserRaw << "]" << std::endl;
 
     // Serialize & Deserialize string type.
     LLBC_Variant str("Hello World!");
-    stream.SetPos(0);
-    stream <<str;
-    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << str;
+    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetWritePos() <<std::endl;
 
     LLBC_Variant deserStr;
-    stream.SetPos(0);
-    stream>> deserStr;
-    std::cout <<"Deserialized from stream: [" <<deserStr <<"]" <<std::endl;
+    stream >> deserStr;
+    std::cout << "Deserialized from stream: [" << deserStr << "]" << std::endl;
 
     // Serialize & Deserialize seq type.
     LLBC_Variant seq;
     seq.SeqPushBack(1);
     seq.SeqPushBack(false);
     seq.SeqPushBack("Hello world");
-    stream.SetPos(0);
-    stream <<seq;
-    std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetPos() << std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << seq;
+    std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserSeq;
-    stream.SetPos(0);
     stream >> deserSeq;
     std::cout << "Deserialized from stream:[" << deserSeq << "]" << std::endl;
 
@@ -556,14 +555,14 @@ void TestCase_Core_VariantTest::SerializeTest()
     LLBC_Variant dict;
     dict[1] = "Hello World!";
     dict[2] = "Hey Judy!";
-    stream.SetPos(0);
-    stream <<dict;
-    std::cout <<"Dict obj[" <<dict <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << dict;
+    std::cout << "Dict obj[" << dict << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserDict;
-    stream.SetPos(0);
-    stream>> deserDict;
-    std::cout <<"Deserialized from stream: [" <<deserDict <<"]" <<std::endl;
+    stream >> deserDict;
+    std::cout << "Deserialized from stream: [" << deserDict << "]" << std::endl;
 }
 
 void TestCase_Core_VariantTest::HashTest()

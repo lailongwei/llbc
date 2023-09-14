@@ -258,8 +258,6 @@
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine enable the service has status handler support or not.
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
-// Determine enable the service has status desc support or not.
-#define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
 // Max component name length.

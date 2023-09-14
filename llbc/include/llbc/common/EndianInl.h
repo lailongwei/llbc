@@ -25,7 +25,7 @@
 
 __LLBC_NS_BEGIN
 
-inline constexpr bool LLBC_Endian::IsValid(int type)
+LLBC_FORCE_INLINE constexpr bool LLBC_Endian::IsValid(int type)
 {
     return (type >= LLBC_Endian::BigEndian &&
         type < LLBC_Endian::UnknownEndian) ? true : false;

@@ -263,14 +263,10 @@ typedef const LLBC_GUID & LLBC_GUIDCRef;
  #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #endif
 
-// Session Ids data type define.
-typedef std::vector<int> LLBC_SessionIdList;
-typedef LLBC_SessionIdList::iterator LLBC_SessionIdListIter;
-typedef LLBC_SessionIdList::const_iterator LLBC_SessionIdListCIter;
-
+// Session Ids data type define(vector).
+typedef std::vector<int> LLBC_SessionIds;
+// Set Ids set data type define.
 typedef std::set<int> LLBC_SessionIdSet;
-typedef LLBC_SessionIdSet::iterator LLBC_SessionIdSetIter;
-typedef LLBC_SessionIdSet::const_iterator LLBC_SessionIdSetCIter;
 
 // Component dynamic create function define.
 // Note: the return pointer must be LLBC_Component(or its subclass) class instance.

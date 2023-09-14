@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
  * \brief Stop std::array read.
  */
 template <>
-struct LLBC_Stream::__LLBC_ArrayReader<0>
+struct LLBC_Stream::__LLBC_STLArrayReader<0>
 {
     template <typename Arr>
     static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
@@ -43,7 +43,7 @@ struct LLBC_Stream::__LLBC_ArrayReader<0>
  * \brief Stop std::array read.
  */
 template <>
-struct LLBC_Stream::__LLBC_ArrayWriter<0>
+struct LLBC_Stream::__LLBC_STLArrayWriter<0>
 {
     template <typename Arr>
     static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
@@ -76,9 +76,10 @@ struct LLBC_Stream::__LLBC_TupleWriter<0>
     }
 };
 
-inline LLBC_Stream::LLBC_Stream()
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream()
 : _buf(nullptr)
-, _pos(0)
+, _readPos(0)
+, _writePos(0)
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
@@ -88,9 +89,10 @@ inline LLBC_Stream::LLBC_Stream()
 {
 }
 
-inline LLBC_Stream::LLBC_Stream(size_t cap)
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(size_t cap)
 : _buf(cap > 0 ? LLBC_Malloc(sint8, cap) : nullptr)
-, _pos(0)
+, _readPos(0)
+, _writePos(0)
 , _cap(cap)
 
 , _endian(LLBC_DefaultEndian)
@@ -100,9 +102,10 @@ inline LLBC_Stream::LLBC_Stream(size_t cap)
 {
 }
 
-inline LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
 : _buf(rhs._buf)
-, _pos(rhs._pos)
+, _readPos(rhs._readPos)
+, _writePos(rhs._writePos)
 , _cap(rhs._cap)
 
 , _endian(rhs._endian)
@@ -112,19 +115,21 @@ inline LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
 , _poolInst(nullptr)
 {
     rhs._buf = nullptr;
-    rhs._pos = 0;
+    rhs._readPos = 0;
+    rhs._writePos = 0;
     rhs._cap = 0;
 
-    rhs._endian = LLBC_DefaultEndian;
+    rhs._endian = rhs._endian;
     rhs._attach = false;
 
     // !!! rhs._poolInst not allow move.
     // rhs._poolInst = nullptr;
 }
 
-inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
 : _buf(nullptr)
-, _pos(0)
+, _readPos(0)
+, _writePos(0)
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
@@ -135,9 +140,10 @@ inline LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
     attach ? Attach(rhs) : Assign(rhs);
 }
 
-inline LLBC_Stream::LLBC_Stream(void *buf, size_t size, bool attach)
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(void *buf, size_t size, bool attach)
 : _buf(nullptr)
-, _pos(0)
+, _readPos(0)
+, _writePos(0)
 , _cap(0)
 
 , _endian(LLBC_DefaultEndian)
@@ -148,13 +154,13 @@ inline LLBC_Stream::LLBC_Stream(void *buf, size_t size, bool attach)
     attach ? Attach(buf, size) : Assign(buf, size);
 }
 
-inline LLBC_Stream::~LLBC_Stream()
+LLBC_FORCE_INLINE LLBC_Stream::~LLBC_Stream()
 {
     if (_buf && !_attach)
         free(_buf);
 }
 
-inline void LLBC_Stream::Attach(const LLBC_Stream &rhs)
+LLBC_FORCE_INLINE void LLBC_Stream::Attach(const LLBC_Stream &rhs)
 {
     if (UNLIKELY(this == &rhs))
         return;
@@ -164,159 +170,233 @@ inline void LLBC_Stream::Attach(const LLBC_Stream &rhs)
 
     _buf = rhs._buf;
     _cap = rhs._cap;
-    _pos = rhs._pos;
+    _readPos = 0;
+    _writePos = rhs._writePos;
+
+    _endian = rhs._endian;
     _attach = true;
 }
 
-inline void LLBC_Stream::Attach(void *buf, size_t size)
+LLBC_FORCE_INLINE void LLBC_Stream::Attach(void *buf, size_t size)
 {
-    if (!_attach && _buf)
+    if (buf && !_attach)
         free(_buf);
 
-    _pos = 0;
+    _readPos = 0;
     if (UNLIKELY(!buf || size == 0))
     {
         _buf = nullptr;
-        _cap = 0;
+        _writePos = _cap = 0;
     }
     else
     {
         _buf = reinterpret_cast<sint8 *>(buf);
-        _cap = size;
+        _writePos = _cap = size;
     }
 
     _attach = true;
 }
 
-inline void *LLBC_Stream::Detach()
+LLBC_FORCE_INLINE void *LLBC_Stream::Detach()
 {
-    void *tmp = _buf;
+    if (!_buf)
+        return nullptr;
+
+    void * const buf = _buf;
 
     _buf = nullptr;
-    _pos = _cap = 0;
-
+    _readPos = _writePos = _cap = 0;
     _attach = false;
 
-    return tmp;
+    return buf;
 }
 
-inline bool LLBC_Stream::IsAttach() const
+LLBC_FORCE_INLINE bool LLBC_Stream::IsAttach() const
 {
     return _attach;
 }
 
-inline void LLBC_Stream::SetAttach(bool attach)
+LLBC_FORCE_INLINE void LLBC_Stream::SetAttach(bool attach)
 {
     _attach = attach;
 }
 
-inline void LLBC_Stream::Assign(const LLBC_Stream &rhs)
+LLBC_FORCE_INLINE void LLBC_Stream::Assign(const LLBC_Stream &rhs)
 {
     if (UNLIKELY(this == &rhs))
         return;
 
-    _pos = 0;
-    if (rhs._pos != 0)
-        Write(rhs._buf, rhs._pos);
+    _readPos = _writePos = 0;
+    if (rhs._writePos != 0)
+    {
+        Write(rhs._buf, rhs._writePos);
+        _readPos = rhs._readPos;
+    }
+
+    _endian = rhs._endian;
 }
 
-inline void LLBC_Stream::Assign(void *buf, size_t size)
+LLBC_FORCE_INLINE void LLBC_Stream::Assign(void *buf, size_t size)
 {
     if (!buf || size == 0)
     {
-        SetPos(0);
+        _readPos = _writePos = 0;
         return;
     }
 
-    _pos = 0;
+    _readPos = _writePos = 0;
     Write(buf, size);
 }
 
-inline void LLBC_Stream::Swap(LLBC_Stream &another)
+LLBC_FORCE_INLINE void LLBC_Stream::Swap(LLBC_Stream &another)
 {
     std::swap(_buf, another._buf);
-    std::swap(_pos, another._pos);
+    std::swap(_readPos, another._readPos);
+    std::swap(_writePos, another._writePos);
     std::swap(_cap, another._cap);
 
     std::swap(_endian,  another._endian);
     std::swap(_attach, another._attach);
 }
 
-inline int LLBC_Stream::GetEndian() const
+LLBC_FORCE_INLINE int LLBC_Stream::GetEndian() const
 {
     return _endian;
 }
 
-inline void LLBC_Stream::SetEndian(int endian)
+LLBC_FORCE_INLINE void LLBC_Stream::SetEndian(int endian)
 {
     if (LIKELY(LLBC_Endian::IsValid(endian)))
         _endian = endian;
 }
 
-inline size_t LLBC_Stream::GetPos() const
+LLBC_FORCE_INLINE size_t LLBC_Stream::GetReadPos() const
 {
-    return _pos;
+    return _readPos;
 }
 
-inline void LLBC_Stream::SetPos(size_t pos)
+LLBC_FORCE_INLINE size_t LLBC_Stream::GetWritePos() const
 {
-    _pos = MIN(pos, _cap);
+    return _writePos;
 }
 
-inline bool LLBC_Stream::Skip(sint64 size)
+LLBC_FORCE_INLINE bool LLBC_Stream::SetReadPos(size_t readPos)
 {
-    const sint64 newPos = static_cast<sint64>(_pos) + size;
-    if (UNLIKELY(newPos < 0 || newPos > static_cast<sint64>(_cap)))
+    if (UNLIKELY(readPos > _writePos))
         return false;
 
-    _pos = static_cast<size_t>(newPos);
+    _readPos = readPos;
     return true;
 }
 
-inline size_t LLBC_Stream::GetCap() const
+LLBC_FORCE_INLINE bool LLBC_Stream::SetWritePos(size_t writePos)
+{
+    if (UNLIKELY(writePos > _cap))
+        return false;
+
+    _writePos = writePos;
+    if (_readPos > _writePos)
+        _readPos = _writePos;
+
+    return true;
+}
+
+LLBC_FORCE_INLINE bool LLBC_Stream::SkipRead(sint64 skipSize)
+{
+    const auto newReadPos = static_cast<sint64>(_readPos) + skipSize;
+    if (UNLIKELY(newReadPos < 0 ||
+        newReadPos > static_cast<sint64>(_writePos)))
+        return false;
+
+    return SetReadPos(static_cast<size_t>(newReadPos));
+}
+
+LLBC_FORCE_INLINE bool LLBC_Stream::SkipWrite(sint64 skipSize)
+{
+    const auto newWritePos = static_cast<sint64>(_writePos) + skipSize;
+    if (UNLIKELY(newWritePos < 0 ||
+        newWritePos > static_cast<sint64>(_cap)))
+        return false;
+
+    return SetWritePos(static_cast<size_t>(newWritePos));
+}
+
+LLBC_FORCE_INLINE size_t LLBC_Stream::GetCap() const
 {
     return _cap;
 }
 
-inline size_t LLBC_Stream::GetFreeCap() const
+LLBC_FORCE_INLINE size_t LLBC_Stream::GetReadableSize() const
 {
-    return _cap - _pos;
+    return _writePos - _readPos;
+}
+
+LLBC_FORCE_INLINE size_t LLBC_Stream::GetWritableSize() const
+{
+    return _cap - _writePos;
 }
 
 template <typename T>
-T *LLBC_Stream::GetBuf() const
+T *LLBC_Stream::GetBuf()
 {
     return reinterpret_cast<T *>(_buf);
 }
 
 template <typename T>
-T *LLBC_Stream::GetBufStartWithPos() const
+const T *LLBC_Stream::GetBuf() const
 {
-    return reinterpret_cast<T *>(GetBuf<char>() + _pos);
+    return reinterpret_cast<const T *>(_buf);
 }
 
-inline void LLBC_Stream::Insert(size_t pos, const void *buf, size_t size)
+template <typename T>
+T *LLBC_Stream::GetBufStartWithReadPos()
+{
+    return _buf ?
+        reinterpret_cast<T *>(
+            reinterpret_cast<char *>(_buf) + _readPos) :
+            nullptr;
+}
+template <typename T>
+const T *LLBC_Stream::GetBufStartWithReadPos() const
+{
+    return const_cast<LLBC_Stream *>(this)->GetBufStartWithReadPos<T>();
+}
+
+template <typename T>
+T *LLBC_Stream::GetBufStartWithWritePos()
+{
+    return _buf ?
+        reinterpret_cast<T *>(
+            reinterpret_cast<char *>(_buf) + _writePos) :
+            nullptr;
+}
+
+template <typename T>
+const T *LLBC_Stream::GetBufStartWithWritePos() const
+{
+    return const_cast<LLBC_Stream *>(this)->GetBufStartWithWritePos<T>();
+}
+
+LLBC_FORCE_INLINE void LLBC_Stream::Insert(size_t pos, const void *buf, size_t size)
 {
     Replace(pos, pos, buf, size);
 }
 
-inline void LLBC_Stream::Erase(size_t n0, size_t n1)
+LLBC_FORCE_INLINE void LLBC_Stream::Erase(size_t n0, size_t n1)
 {
     Replace(n0, n1, nullptr, 0);
 }
 
-inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t size)
+LLBC_FORCE_INLINE void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t size)
 {
     // Normalize n0, n1.
-    if (n1 == npos || n1 > _pos)
+    if (UNLIKELY(n0 > n1))
+        std::swap(n0, n1);
+    if (n1 == npos || n1 > _writePos)
     {
-        n1 = _pos;
+        n1 = _writePos;
         if (n0 > n1)
             n0 = n1;
-    }
-    else if (UNLIKELY(n0 > n1))
-    {
-        std::swap(n0, n1);
     }
 
     // Normalize size.
@@ -328,20 +408,14 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t s
     if (size == eraseSize)
     {
         if (size > 0)
-        {
-            const auto oldPos = _pos;
-            SetPos(n0);
-            Write(buf, size);
-
-            SetPos(oldPos);
-        }
+            memcpy(_buf + n0, buf, size);
 
         return;
     }
 
     // Copy back buf.
     sint8 *backBuf = nullptr;
-    const size_t backBufSize = _pos - n1;
+    const size_t backBufSize = _writePos - n1;
     if (backBufSize > 0)
     {
         backBuf = LLBC_Malloc(sint8, backBufSize);
@@ -349,40 +423,740 @@ inline void LLBC_Stream::Replace(size_t n0, size_t n1, const void *buf, size_t s
     }
 
     // Copy 'will replace buf' + 'back buf' to stream.
-    SetPos(n0);
+    const size_t oldReadPos = _readPos;
+    SetWritePos(n0);
     if (size > 0)
+    {
         Write(buf, size);
+    }
     if (backBuf)
     {
         Write(backBuf, backBufSize);
         free(backBuf);
     }
+
+    SetReadPos(oldReadPos);
 }
 
-inline bool LLBC_Stream::Read(void *buf, size_t size)
+LLBC_FORCE_INLINE bool LLBC_Stream::Read(void *buf, size_t size)
 {
-    if (UNLIKELY(size <= 0))
-        return true;
-    if (UNLIKELY(!buf || _pos + size > _cap))
+    if (UNLIKELY(!buf || size <= 0))
+        return false;
+    if (UNLIKELY( _readPos + size > _writePos))
         return false;
 
-    memcpy(buf, _buf + _pos, size);
-    _pos += size;
+    memcpy(buf, _buf + _readPos, size);
+    _readPos += size;
 
     return true;
 }
 
-inline void LLBC_Stream::Write(const void *buf, size_t size)
+LLBC_FORCE_INLINE void LLBC_Stream::Write(const void *buf, size_t size)
 {
-    if (UNLIKELY((!buf || size <= 0) ||
-                 !ReserveFreeCap(size)))
+    if (UNLIKELY((!buf || size <= 0) || !ReserveWritableSize(size)))
         return;
 
-    memcpy(_buf + _pos, buf, size);
-    _pos += size;
+    memcpy(_buf + _writePos, buf, size);
+    _writePos += size;
 }
 
-inline bool LLBC_Stream::Recap(size_t newCap)
+template <typename T>
+T LLBC_Stream::Read()
+{
+    T obj{};
+    return LIKELY(Read<T>(obj)) ? obj : T();
+}
+
+template <typename T>
+typename std::enable_if<std::is_arithmetic<T>::value ||
+                        std::is_enum<T>::value, bool>::type
+LLBC_Stream::Read(T &obj)
+{
+    if (UNLIKELY(!Read(&obj, sizeof(T))))
+        return false;
+
+    if (_endian != LLBC_MachineEndian)
+        obj = LLBC_ReverseBytes(obj);
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
+                        bool>::type
+LLBC_Stream::Read(T &obj)
+{
+    ASSERT(false && "Unsupported stream read operation(for char *)!");
+    return false;
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                        bool>::type
+LLBC_Stream::Read(T &voidPtr)
+{
+    uint64 ptrVal;
+    if (UNLIKELY(!Read(ptrVal)))
+        return false;
+
+    memcpy(&voidPtr, &ptrVal, MIN(sizeof(voidPtr), sizeof(ptrVal)));
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                        bool>::type
+LLBC_Stream::Read(T &ptr)
+{
+    bool innerCreate = false;
+    if (!ptr)
+    {
+        innerCreate = true;
+        ptr = new typename LLBC_ExtractPureType<T>::type;
+    }
+
+    if (UNLIKELY(!Read(*ptr)))
+    {
+        if (innerCreate)
+            delete ptr;
+        return false;
+    }
+
+    return true;
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<std::is_arithmetic<T>::value &&
+                            std::is_same<T, char>::value,
+                        bool>::type
+LLBC_Stream::Read(T (&arr)[_ArrLen])
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    if (size == 0)
+        return true;
+    if (size > _ArrLen)
+        return false;
+
+    if (!Read(&arr[0], size))
+    {
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    if (size < _ArrLen)
+        arr[size] = T();
+
+    return true;
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<std::is_arithmetic<T>::value &&
+                            (std::is_same<T, uint8>::value ||
+                             std::is_same<T, bool>::value),
+                        bool>::type
+LLBC_Stream::Read(T (&arr)[_ArrLen])
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    if (size == 0)
+        return true;
+    if (size > _ArrLen)
+        return false;
+
+    if (!Read(&arr[0], size))
+    {
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    return true;
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<(std::is_arithmetic<T>::value &&
+                         (!std::is_same<T, char>::value &&
+                          !std::is_same<T, uint8>::value &&
+                          !std::is_same<T, bool>::value)) ||
+                            !std::is_arithmetic<T>::value,
+                        bool>::type
+LLBC_Stream::Read(T (&arr)[_ArrLen])
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    if (size == 0)
+        return true;
+    else if (size > _ArrLen)
+        return false;
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (UNLIKELY(!Read(arr[i])))
+            return false;
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                            LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                        bool>::type
+LLBC_Stream::Read(T &str)
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    if (size == 0)
+    {
+        str.clear();
+        return true;
+    }
+
+    str.resize(size);
+    if (UNLIKELY(!Read(const_cast<char *>(str.data()), str.size())))
+    {
+        str.clear();
+        return false;
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
+                            LLBC_IsTemplSpec<T, std::list>::value ||
+                            LLBC_IsTemplSpec<T, std::deque>::value,
+                        bool>::type
+LLBC_Stream::Read(T &container)
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    if (size == 0)
+    {
+        container.clear();
+        return true;
+    }
+
+    size_t numOfReads = 0;
+    container.resize(size);
+    const typename T::iterator endIt = container.end();
+    for (typename T::iterator it = container.begin(); it != endIt; ++it)
+    {
+        typename T::value_type &value = *it;
+        if (UNLIKELY(!Read(value)))
+        {
+            container.resize(numOfReads);
+            return false;
+        }
+
+        ++numOfReads;
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
+                            LLBC_IsTemplSpec<T, std::stack>::value,
+                        bool>::type
+LLBC_Stream::Read(T &container)
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    container.clear();
+    if (size == 0)
+        return true;
+
+    typename T::value_type value;
+    for (uint32 i = 0; i < size; ++i)
+    {
+        if (UNLIKELY(!Read(value)))
+            return false;
+
+        container.push(std::move(value));
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::set>::value ||
+                            LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                        bool>::type
+LLBC_Stream::Read(T &container)
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    container.clear();
+    if (size == 0)
+        return true;
+
+    typename T::value_type value;
+    for (uint32 i = 0; i < size; ++i)
+    {
+        if (UNLIKELY(!Read(value)))
+            return false;
+
+        container.insert(std::move(value));
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
+                            LLBC_IsTemplSpec<T, std::unordered_map>::value,
+                        bool>::type
+LLBC_Stream::Read(T &container)
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
+        return false;
+
+    container.clear();
+    if (size == 0)
+        return true;
+
+    typename T::key_type key;
+    typename T::mapped_type mapped;
+    for (uint32 i = 0; i < size; ++i)
+    {
+        if (UNLIKELY(!Read(key) || !Read(mapped)))
+            return false;
+
+        container.emplace(std::move(key), std::move(mapped));
+    }
+
+    return true;
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, bool>::type
+LLBC_Stream::Read(T &arr)
+{
+    return __LLBC_STLArrayReader<std::tuple_size<T>::value>::Read(arr, *this);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, bool>::type
+LLBC_Stream::Read(T &tup)
+{
+    return __LLBC_TupleReader<std::tuple_size<T>::value>::Read(tup, *this);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, bool>::type
+LLBC_Stream::Read(T &p)
+{
+    return Read(p.first) && Read(p.second);
+}
+
+template <typename T>
+typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_enum<T>::value &&
+                            !std::is_pointer<T>::value &&
+                            !std::is_array<T>::value &&
+                            !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                              LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                            !LLBC_IsTemplSpec<T, std::vector>::value &&
+                            !LLBC_IsTemplSpec<T, std::list>::value &&
+                            !LLBC_IsTemplSpec<T, std::deque>::value &&
+                            !LLBC_IsTemplSpec<T, std::queue>::value &&
+                            !LLBC_IsTemplSpec<T, std::stack>::value &&
+                            !LLBC_IsTemplSpec<T, std::set>::value &&
+                            !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                            !LLBC_IsTemplSpec<T, std::map>::value &&
+                            !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                            !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                            !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                            !LLBC_IsTemplSpec<T, std::pair>::value,
+                        bool>::type
+LLBC_Stream::Read(T &obj)
+{
+    return ReadImpl<T>(obj, 0);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::DeSerialize> *)
+{
+    return obj.DeSerialize(*this);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::Deserialize> *)
+{
+    return obj.Deserialize(*this);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *)
+{
+    return obj.deserialize(*this);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *)
+{
+    uint32 pbDataSize;
+    if (UNLIKELY(!Read(pbDataSize)))
+        return false;
+
+    if (UNLIKELY(GetReadableSize() < pbDataSize))
+        return false;
+
+    if (!obj.ParseFromArray(GetBufStartWithReadPos(), static_cast<int>(pbDataSize)))
+    {
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    _readPos += pbDataSize;
+    return true;
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
+{
+    uint32 pbDataSize;
+    if (UNLIKELY(!Read(pbDataSize)))
+        return false;
+
+    if (UNLIKELY(GetReadableSize() < pbDataSize))
+        return false;
+
+    if (!obj.ParseFromArray(GetBufStartWithReadPos(), static_cast<int>(pbDataSize)))
+    {
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    _readPos += pbDataSize;
+    return true;
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, ...)
+{
+    return Read(&obj, sizeof(T));
+}
+
+template <typename T>
+typename std::enable_if<std::is_arithmetic<T>::value ||
+                            std::is_enum<T>::value,
+                        void>::type
+LLBC_Stream::Write(const T &obj)
+{
+    if (_endian != LLBC_MachineEndian)
+    {
+        const T obj2 = LLBC_ReverseBytes(obj);
+        Write(&obj2, sizeof(T));
+    }
+    else
+    {
+        Write(&obj, sizeof(T));
+    }
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
+                        void>::type
+LLBC_Stream::Write(const T &str)
+{
+    if (UNLIKELY(!str))
+    {
+        Write(0u);
+        return;
+    }
+
+    const uint32 strLen = strlen(str);
+    Write(strLen);
+    if (strLen > 0)
+        Write(str, strLen);
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                        void>::type
+LLBC_Stream::Write(const T &voidPtr)
+{
+    uint64 pointVal = 0;
+    memcpy(&pointVal, &voidPtr, sizeof(voidPtr));
+
+    Write(pointVal);
+}
+
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
+                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                        void>::type
+LLBC_Stream::Write(const T &ptr)
+{
+    LIKELY(ptr) ?
+        Write(*ptr) :
+            Write(typename LLBC_ExtractPureType<T>::type());
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<std::is_arithmetic<T>::value &&
+                            std::is_same<T, char>::value,
+                        void>::type
+LLBC_Stream::Write(const T (&arr)[_ArrLen])
+{
+    if (_ArrLen == 0)
+    {
+        Write(0u);
+    }
+    else if (arr[_ArrLen - 1] == '\0')
+    {
+
+        Write(static_cast<uint32>(_ArrLen) - 1);
+        Write(&arr[0], sizeof(T) * (_ArrLen - 1));
+    }
+    else
+    {
+        Write(static_cast<uint32>(_ArrLen));
+        Write(&arr[0], sizeof(T) * _ArrLen);
+    }
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<std::is_arithmetic<T>::value &&
+                            (std::is_same<T, uint8>::value ||
+                             std::is_same<T, bool>::value),
+                        void>::type
+LLBC_Stream::Write(const T (&arr)[_ArrLen])
+{
+    if (_ArrLen == 0)
+    {
+        Write(0u);
+    }
+    else
+    {
+        Write(static_cast<uint32>(_ArrLen));
+        Write(&arr[0], sizeof(T) * _ArrLen);
+    }
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<(std::is_arithmetic<T>::value &&
+                         (!std::is_same<T, char>::value &&
+                          !std::is_same<T, uint8>::value &&
+                          !std::is_same<T, bool>::value)) ||
+                            !std::is_arithmetic<T>::value,
+                        void>::type
+LLBC_Stream::Write(const T (&arr)[_ArrLen])
+{
+    Write(static_cast<uint32>(_ArrLen));
+    for (size_t i = 0; i < _ArrLen; ++i)
+        Write(arr[i]);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                            LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                        void>::type
+LLBC_Stream::Write(const T &str)
+{
+    Write(static_cast<uint32>(str.size()));
+    Write(str.data(), str.size());
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
+                            LLBC_IsTemplSpec<T, std::list>::value ||
+                            LLBC_IsTemplSpec<T, std::deque>::value ||
+                            LLBC_IsTemplSpec<T, std::set>::value ||
+                            LLBC_IsTemplSpec<T, std::unordered_set>::value ||
+                            LLBC_IsTemplSpec<T, std::stack>::value,
+                        void>::type
+LLBC_Stream::Write(const T &container)
+{
+    Write(static_cast<uint32>(container.size()));
+    if (container.empty())
+        return;
+
+    const typename T::const_iterator endIt = container.end();
+    for (typename T::const_iterator it = container.begin();
+         it != endIt;
+         ++it)
+        Write(*it);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
+                            LLBC_IsTemplSpec<T, std::stack>::value,
+                        void>::type
+LLBC_Stream::Write(const T &container)
+{
+    ASSERT(false && "Write std::queue/std::stack is not supported for now");
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
+                            LLBC_IsTemplSpec<T, std::unordered_map>::value,
+                        void>::type
+LLBC_Stream::Write(const T &container)
+{
+    Write(static_cast<uint32>(container.size()));
+    if (container.empty())
+        return;
+
+    const typename T::const_iterator endIt = container.end();
+    for (typename T::const_iterator it = container.begin();
+         it != endIt;
+         ++it)
+    {
+        Write(it->first);
+        Write(it->second);
+    }
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, void>::type
+LLBC_Stream::Write(const T &arr)
+{
+    __LLBC_STLArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, void>::type
+LLBC_Stream::Write(const T &tup)
+{
+    __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
+}
+
+template <typename T>
+typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, void>::type
+LLBC_Stream::Write(const T &p)
+{
+    Write(p.first);
+    Write(p.second);
+}
+
+template <typename T>
+typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_enum<T>::value &&
+                            !std::is_pointer<T>::value &&
+                            !std::is_array<T>::value &&
+                            !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                              LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                            !LLBC_IsTemplSpec<T, std::vector>::value &&
+                            !LLBC_IsTemplSpec<T, std::list>::value &&
+                            !LLBC_IsTemplSpec<T, std::deque>::value &&
+                            !LLBC_IsTemplSpec<T, std::queue>::value &&
+                            !LLBC_IsTemplSpec<T, std::stack>::value &&
+                            !LLBC_IsTemplSpec<T, std::set>::value &&
+                            !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                            !LLBC_IsTemplSpec<T, std::map>::value &&
+                            !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                            !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                            !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                            !LLBC_IsTemplSpec<T, std::pair>::value,
+                        void>::type
+LLBC_Stream::Write(const T &obj)
+{
+    WriteImpl<T>(obj, 0);
+}
+
+template <typename T, void (T::*)(LLBC_Stream &) const>
+struct upper_camel_case_serializable_type;
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
+{
+    obj.Serialize(*this);
+}
+
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
+{
+    obj.serialize(*this);
+}
+
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *)
+{
+    // Check initialized first.
+    obj.CheckInitialized();
+
+    // Recap Stream.
+    const size_t needSize = static_cast<size_t>(obj.ByteSize());
+    if (!ReserveWritableSize(needSize + sizeof(uint32)))
+        return;
+
+    Write(static_cast<uint32>(needSize));
+    obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _writePos, static_cast<int>(needSize));
+    _writePos += needSize;
+}
+
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
+{
+    // Check initialized first.
+    obj.CheckInitialized();
+
+    // Recap Stream.
+    size_t needSize = obj.ByteSizeLong();
+    if (!ReserveWritableSize(needSize + sizeof(uint32)))
+        return;
+
+    Write(static_cast<uint32>(needSize));
+    obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _writePos, static_cast<int>(needSize));
+    _writePos += needSize;
+}
+
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, ...)
+{
+    Write(&obj, sizeof(obj));
+}
+
+template <typename T>
+bool LLBC_Stream::Peek(T &obj)
+{
+    size_t oldReadPos = _readPos;
+    const bool ret = Read(obj);
+    _readPos = oldReadPos;
+
+    return ret;
+}
+
+template<typename T>
+LLBC_Stream &LLBC_Stream::operator >>(T &val)
+{
+    Read(val);
+    return *this;
+}
+
+template<typename T>
+LLBC_Stream &LLBC_Stream::operator <<(const T &val)
+{
+    Write(val);
+    return *this;
+}
+
+LLBC_FORCE_INLINE bool LLBC_Stream::Recap(size_t newCap)
 {
     if (UNLIKELY(_attach || newCap < _cap))
         return false;
@@ -396,42 +1170,42 @@ inline bool LLBC_Stream::Recap(size_t newCap)
     return true;
 }
 
-inline void LLBC_Stream::Clear()
+LLBC_FORCE_INLINE void LLBC_Stream::Clear()
 {
     if (_attach)
     {
         _buf = nullptr;
-        _pos = _cap = 0;
+        _readPos = _writePos = _cap = 0;
 
         _attach = false;
     }
     else
     {
-        _pos = 0;
+        _readPos = _writePos = 0;
     }
 }
 
-inline void LLBC_Stream::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+LLBC_FORCE_INLINE void LLBC_Stream::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
 {
     _poolInst = &poolInst;
 }
 
-inline LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
+LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
 {
     return _poolInst;
 }
 
-inline LLBC_String LLBC_Stream::ToString() const
+LLBC_FORCE_INLINE LLBC_String LLBC_Stream::ToString() const
 {
     LLBC_String repr;
-    repr.append_format("Stream[buf:%p, pos:%lu, cap:%lu", _buf, _pos, _cap);
-    repr.append_format(", attach:%s, endian:%s]",
-                       (_attach ? "true" : "false"), LLBC_Endian::Type2Str(_endian));
+    repr.append_format("Stream[%p, rpos:%lu, wpos:%lu, cap:%lu, attached:%s endian:%s]",
+                       _buf, _readPos, _writePos, _cap,
+                       _attach ? "true" : "false", LLBC_Endian::Type2Str(_endian));
 
     return repr;
 }
 
-inline LLBC_Stream &LLBC_Stream::operator=(const LLBC_Stream &rhs)
+LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(const LLBC_Stream &rhs)
 {
     if (UNLIKELY(this == &rhs))
         return *this;
@@ -440,13 +1214,14 @@ inline LLBC_Stream &LLBC_Stream::operator=(const LLBC_Stream &rhs)
     return *this;
 }
 
-inline LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs)
+LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs)
 {
     if (_buf && !_attach)
         free(_buf);
 
     _buf = rhs._buf;
-    _pos = rhs._pos;
+    _readPos = rhs._readPos;
+    _writePos = rhs._writePos;
     _cap = rhs._cap;
     _endian = rhs._endian;
     _attach = rhs._attach;
@@ -454,37 +1229,30 @@ inline LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs)
     // _poolInst = rhs._poolInst;
 
     rhs._buf = nullptr;
-    rhs._pos = 0;
+    rhs._readPos = 0;
+    rhs._writePos = 0;
     rhs._cap = 0;
-    rhs._endian = LLBC_DefaultEndian;
+    // !!! rhs._endian dont need reset.
+    // rhs._endian = LLBC_DefaultEndian;
     rhs._attach = false;
 
     return *this;
 }
 
-inline bool LLBC_Stream::ReserveFreeCap(size_t freeCap)
+LLBC_FORCE_INLINE bool LLBC_Stream::ReserveWritableSize(size_t writableSize)
 {
-    const size_t nowFreeCap = GetFreeCap();
-    if (nowFreeCap >= freeCap)
+    if (writableSize <= GetWritableSize())
         return true;
 
     const size_t newCap =
-        MAX(_pos + freeCap, MIN(
+        MAX(_writePos + writableSize, MIN(
             (_cap << 1), _cap + LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT));
     return Recap((newCap + 0xf) & 0xfffffff0);
 }
 
-inline bool LLBC_Stream::OverlappedCheck(const void *another, size_t size) const
-{
-    if (!_buf || !another)
-        return true;
-
-    return ((reinterpret_cast<const sint8 *>(another) + size <= _buf) || (another >= _buf + _cap));
-}
-
 __LLBC_NS_END
 
-inline std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Stream &stream)
+LLBC_FORCE_INLINE std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Stream &stream)
 {
     return o << stream.ToString();
 }

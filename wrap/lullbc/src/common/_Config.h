@@ -136,8 +136,6 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT");
     lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_STATUS_HANDLER);
     lua_setfield(l, 1, "CFG_COMM_ENABLE_STATUS_HANDLER");
-    lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_STATUS_DESC);
-    lua_setfield(l, 1, "CFG_COMM_ENABLE_STATUS_DESC");
     lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE);
     lua_setfield(l, 1, "CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE");
     lua_pushstring(l, LLBC_CFG_COMM_POLLER_MODEL);

@@ -370,25 +370,34 @@ private:                                    \
 /**
  * Some condition judge helper macros.
  */
-#define LLBC_Foreach(cont, behav)                                 \
-    do { for (auto &item : cont) { behav; } } while(false)        \
+#define LLBC_Foreach(cont, behav)                                   \
+    { for (auto &item : (cont)) { behav; } }                        \
 
-#define LLBC_DoIf(cond, behav)                                    \
-    { if (cond) { behav; } }                                      \
+#define LLBC_DoIf(cond, behav)                                      \
+    { if ((cond)) { behav; } }                                      \
 
-#define LLBC_ContinueIf(cond)                                     \
-    { if (cond) continue; }                                       \
+#define LLBC_ContinueIf(cond)                                       \
+    { if ((cond)) continue; }                                       \
 
-#define LLBC_BreakIf(cond)                                        \
-    { if (cond) break; }                                          \
+#define LLBC_BreakIf(cond)                                          \
+    { if ((cond)) break; }                                          \
 
-#define LLBC_SetErrAndBreakIf(cond, err)                          \
-    { if (cond) { LLBC_NS LLBC_SetLastError(err); break; } }      \
+#define LLBC_SetErrAndBreakIf(cond, err)                            \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); break; } }      \
 
-#define LLBC_ReturnIf(cond, ret)                                  \
-    do { if (cond) { return ret; } } while(false)                 \
+#define LLBC_ReturnIf(cond, ret)                                    \
+    { if ((cond)) { return (ret); } }                               \
 
-#define LLBC_SetErrAndReturnIf(cond, err, ret)                    \
-    { if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
+#define LLBC_SetErrAndReturnIf(cond, err, ret)                      \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
 
+#define LLBC_ExitIf(cond, exitCode)                                 \
+    { if ((cond)) exit(static_cast<int>(exitCode)); }               \
 
+#define LLBC_DoIfNot(cond, behav) LLBC_DoIf(!(cond), behav)
+#define LLBC_ContinueIfNot(cond, behav) LLBC_ContinueIf(!(cond), behav)
+#define LLBC_BreakIfNot(cond, behav) LLBC_BreakIf(!(cond), behav)
+#define LLBC_SetErrAndBreakIfNot(cond, err) LLBC_SetErrAndBreakIf(!(cond), err)
+#define LLBC_ReturnIfNot(cond, ret) LLBC_ReturnIf(!(cond), ret)
+#define LLBC_SetErrAndReturnIfNot(cond, err, ret) LLBC_SetErrAndReturnIf(!(cond), err, ret)
+#define LLBC_ExitIfNot(cond, exitCode) LLBC_ExitIf(!(cond), exitCode)
