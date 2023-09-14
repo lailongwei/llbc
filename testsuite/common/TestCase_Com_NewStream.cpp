@@ -301,4 +301,6 @@ int TestCase_Com_NewStream::AttachTest()
                                Error,
                                LLBC_FAILED);
     }
+
+    return LLBC_OK;
 }
