@@ -150,7 +150,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
     LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     return false;
 #else
-    DWORD waitRet = 0;
+    DWORD waitRet;
     if((waitRet = ::WaitForSingleObject(_sem, milliSeconds)) == WAIT_OBJECT_0)
     {
         return true;

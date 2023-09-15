@@ -67,14 +67,14 @@ inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
     return _evManager;
 }
 
-inline LLBC_SafetyObjectPool &LLBC_ServiceImpl::GetSafetyObjectPool()
+inline LLBC_SafeObjectPool &LLBC_ServiceImpl::GetSafeObjectPool()
 {
-    return _safetyObjectPool;
+    return _safeObjectPool;
 }
 
-inline LLBC_UnsafetyObjectPool &LLBC_ServiceImpl::GetUnsafetyObjectPool()
+inline LLBC_UnsafeObjectPool &LLBC_ServiceImpl::GetUnsafeObjectPool()
 {
-    return _unsafetyObjectPool;
+    return _unsafeObjectPool;
 }
 
 inline LLBC_ObjectPoolInst<LLBC_Packet> & LLBC_ServiceImpl::GetPacketObjectPool()

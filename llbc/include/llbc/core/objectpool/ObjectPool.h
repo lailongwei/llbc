@@ -186,9 +186,9 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
- * Typedef safety/unsafety object pool.
+ * Typedef safe/unsafe object pool.
  */
-typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafetyObjectPool;
-typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafetyObjectPool;
+typedef LLBC_ObjectPool<LLBC_SpinLock, LLBC_SpinLock> LLBC_SafeObjectPool;
+typedef LLBC_ObjectPool<LLBC_DummyLock, LLBC_DummyLock> LLBC_UnsafeObjectPool;
 
 __LLBC_NS_END

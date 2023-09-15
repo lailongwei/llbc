@@ -157,7 +157,7 @@ public:
      */
     LLBC_DictionaryElem *GetBucketElemPrev();
     /**
-     * Get previous buckt element.
+     * Get previous bucket element.
      * @return LLBC_DictionaryElem * - the previous bucket element.
      */
     const LLBC_DictionaryElem *GetBucketElemPrev() const;

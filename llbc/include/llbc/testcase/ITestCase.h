@@ -51,7 +51,7 @@ public:
 
     /**
      * Run function.
-     * @param[in] argc - argunemts count.
+     * @param[in] argc - arguments count.
      * @param[in] argv - arguments array.
      *
      * @return int - testcase return status code.

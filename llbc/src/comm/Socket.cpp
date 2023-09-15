@@ -63,15 +63,11 @@ LLBC_Socket::LLBC_Socket(LLBC_SocketHandle handle)
 , _pollerType(_PollerType::End)
 
 , _listenSocket(false)
-, _peerAddr()
-, _localAddr()
 
-, _willSend()
 , _maxPacketSize(LLBC_CFG_COMM_DFT_MAX_PACKET_SIZE)
 
 #if LLBC_TARGET_PLATFORM_WIN32
 , _nonBlocking(false)
-, _olGroup()
 
 , _iocpSendingDataSize(0)
 #endif // LLBC_TARGET_PLATFORM_WIN32
@@ -283,9 +279,6 @@ size_t LLBC_Socket::GetMaxPacketSize() const
 
 int LLBC_Socket::SetMaxPacketSize(size_t size)
 {
-    if (UNLIKELY(size < 0))
-        return -1;
-
     _maxPacketSize = (size != 0) ? size : LLBC_INFINITE;
     return 0;
 }
@@ -416,7 +409,7 @@ int LLBC_Socket::AsyncSend(LLBC_MessageBlock *block)
     buf.len = static_cast<ULONG>(sendingSize);
     buf.buf = reinterpret_cast<char *>(mergedBlock->GetDataStartWithReadPos());
 
-    int ret = 0;
+    int ret;
     ulong flags = 0;
     ulong bytesSent = 0;
     if ((ret = LLBC_SendEx(_handle, &buf, 1, &bytesSent, flags, ol)) != LLBC_OK)
@@ -635,7 +628,7 @@ void LLBC_Socket::OnRecv()
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-    int len = 0;
+    int len;
     bool recvFlag = false;
     #if LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL
     LLBC_MessageBlock *block = _msgBlockPoolInst->GetObject();
@@ -721,7 +714,7 @@ void LLBC_Socket::OnRecv()
     {
         if (errNo != LLBC_ERROR_WBLOCK
             #if LLBC_TARGET_PLATFORM_NON_WIN32
-            // In Non-WIN32 platform, recv() API return errnor maybe EAGAIN or EWOULDBLOCK.
+            // In Non-WIN32 platform, recv() API return errno maybe EAGAIN or EWOULDBLOCK.
             && errNo != LLBC_ERROR_AGAIN
             #endif
            )

@@ -130,9 +130,8 @@ uint32 __LLBC_Hash::_PJHash::operator()(const void *buf, size_t size) const
     static const uint32 oneEighth = bitsInUInt32 / 8;
     static const uint32 highBits = 0xffffffff << (bitsInUInt32 - oneEighth);
 
+    uint32 test;
     uint32 hash = 0;
-    uint32 test = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for (size_t i = 0; i < size; ++i)
     {
@@ -148,17 +147,16 @@ uint32 __LLBC_Hash::_PJHash::operator()(const void *buf, size_t size) const
 
 uint32 __LLBC_Hash::_ELFHash::operator()(const void *buf, size_t size) const
 {
-    uint32 x = 0;
+    uint32 test;
     uint32 hash = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for (size_t i = 0; i < size; ++i)
     {
         hash = (hash << 4) + str[i];
-        if((x = hash & 0xF0000000L) != 0)
+        if((test = hash & 0xF0000000L) != 0)
         {
-            hash ^= (x >> 24);
-            hash &= ~x;
+            hash ^= (test >> 24);
+            hash &= ~test;
         }
     }
 
@@ -168,7 +166,6 @@ uint32 __LLBC_Hash::_ELFHash::operator()(const void *buf, size_t size) const
 uint32 __LLBC_Hash::_APHash::operator()(const void *buf, size_t size) const
 {
     uint32 hash = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
     for (size_t i = 0; i < size; ++i)
     {

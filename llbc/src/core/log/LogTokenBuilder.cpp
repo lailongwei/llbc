@@ -76,7 +76,6 @@ LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 
     case LLBC_LogTokenType::ThreadIdToken:
         return new LLBC_LogThreadIdToken;
-        break;
 
     case LLBC_LogTokenType::ProcessIdToken:
         return new LLBC_LogProcessIdToken;

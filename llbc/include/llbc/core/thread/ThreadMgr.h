@@ -248,7 +248,7 @@ public:
     /**
      * Send signal to specific thread group.
      * @param[in] groupHandle - thread group handle.
-     * @param[in[ sig - signal number.
+     * @param[in] sig         - signal number.
      * @return int - return 0 if success, otherwise return -1.
      */
     int KillGroup(LLBC_Handle groupHandle, int sig);

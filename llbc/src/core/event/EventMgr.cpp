@@ -230,10 +230,10 @@ void LLBC_EventMgr::Fire(LLBC_Event *ev)
 
 LLBC_EventFirer &LLBC_EventMgr::BeginFire(int evId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromUnsafetyPool<LLBC_Event>();
+    LLBC_Event *ev = LLBC_GetObjectFromUnsafePool<LLBC_Event>();
     ev->SetId(evId);
 
-    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafetyPool<LLBC_EventFirer>();
+    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafePool<LLBC_EventFirer>();
     evFirer->SetEventInfo(ev, this);
 
     return *evFirer;

@@ -98,7 +98,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _name(name.c_str(), name.length())
 , _driveMode(LLBC_ServiceDriveMode::SelfDrive)
 , _svcThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
-, _cleanuping(false)
+, _inCleaning(false)
 , _sinkIntoOnSvcLoop(false)
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 , _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
@@ -122,9 +122,9 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 // Service extend functions about members.
 , _releasePoolStack(nullptr)
 
-, _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
-, _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
-, _eventFirerPool(*_safetyObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
+, _packetObjectPool(*_safeObjectPool.GetPoolInst<LLBC_Packet>())
+, _msgBlockObjectPool(*_safeObjectPool.GetPoolInst<LLBC_MessageBlock>())
+, _eventFirerPool(*_safeObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
 
 , _timerScheduler(nullptr)
 {
@@ -951,7 +951,7 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
 
 LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
+    LLBC_Event *ev = LLBC_GetObjectFromSafePool<LLBC_Event>();
     ev->SetId(eventId);
 
     auto *eventServiceFirer = _eventFirerPool.GetReferencableObject();
@@ -1279,11 +1279,11 @@ void LLBC_ServiceImpl::Svc()
 
 void LLBC_ServiceImpl::Cleanup()
 {
-    if (_cleanuping)
+    if (_inCleaning)
         return;
 
-    _cleanuping = true;
-    LLBC_Defer(_cleanuping = false);
+    _inCleaning = true;
+    LLBC_Defer(_inCleaning = false);
 
     // Force handle queued events.
     if (_runningPhase >= LLBC_ServiceRunningPhase::StoppingComps &&

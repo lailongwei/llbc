@@ -63,11 +63,6 @@ LLBC_BasePoller::LLBC_BasePoller()
 , _brotherCount(0)
 , _svc(nullptr)
 , _pollerMgr(nullptr)
-
-, _sockets()
-, _sessions()
-
-, _connecting()
 {
 }
 

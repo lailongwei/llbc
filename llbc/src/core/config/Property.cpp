@@ -78,10 +78,6 @@ LLBC_Property::LLBC_Property(LLBC_Property *parent)
 
 , _value(nullptr)
 , _properties(nullptr)
-
-, _comments()
-
-, _errMsg()
 {
 }
 

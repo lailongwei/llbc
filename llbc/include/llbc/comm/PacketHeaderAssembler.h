@@ -49,9 +49,9 @@ public:
 public:
     /**
      * Assemble packet header.
-     * @param[in] data - the stream data.
-     * @param[in] len  - the stream data length, in bytes.
-     * @param[out] len - the used stream data, in bytes..
+     * @param[in] data  - the stream data.
+     * @param[in] len   - the stream data length, in bytes.
+     * @param[out] used - the used stream data, in bytes..
      * @return int - return 0 if success, otherwise return -1.
      */
     bool Assemble(const void *data, size_t len, size_t &used);

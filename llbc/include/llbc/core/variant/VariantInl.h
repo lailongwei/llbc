@@ -1088,7 +1088,7 @@ void LLBC_Variant::CtFromUnaryCont(const _UnaryContainer &unaryCont)
     // create sequence object if it has not been created before.
     if (!seq)
         seq = new Seq;
-    // makesure the capacity greater than or equal to the giving unary container elements size.
+    // make sure the capacity greater than or equal to the giving unary container elements size.
     if (seq->capacity() < unaryCont.size())
         seq->reserve(unaryCont.size());
 

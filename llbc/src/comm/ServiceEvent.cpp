@@ -29,12 +29,8 @@
 
 namespace
 {
-    typedef LLBC_NS LLBC_ServiceEvent Base;
-    typedef LLBC_NS LLBC_MessageBlock _Block;
-    typedef LLBC_NS LLBC_ServiceEventType _EvType;
-
     template <typename Ev>
-    static inline _Block *__CreateEvBlock(Ev *&ev)
+    static inline LLBC_NS LLBC_MessageBlock *__CreateEvBlock(Ev *&ev)
     {
         ev = new Ev;
         auto block = new LLBC_NS LLBC_MessageBlock(ev, sizeof(Ev));

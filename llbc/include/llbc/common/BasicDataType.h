@@ -218,7 +218,7 @@ typedef FILE * LLBC_FileHandle;
  typedef int (*LLBC_LibraryFun)(void);
 #else
  typedef HMODULE LLBC_LibraryHandle;
- typedef int (__cdecl *LLBC_LibraryFun)(void);
+ typedef int (__cdecl *LLBC_LibraryFun)();
 #endif
 #define LLBC_INVALID_LIBRARY_HANDLE nullptr
 

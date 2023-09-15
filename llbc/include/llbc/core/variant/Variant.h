@@ -68,7 +68,7 @@ public:
         RAW_FLOAT            = 0x011b, // 0001 1011
         RAW_DOUBLE           = 0x011d, // 0001 1101
 
-        // Str type enumeartion.
+        // Str type enumeration.
         // ! Now, string type's second type only support LLBC_String type.
         // Bit view(first type always equal STR):
         //          [first type] [string type]
@@ -128,7 +128,7 @@ class LLBC_EXPORT LLBC_Variant
 {
 public:
 /**
- * \brief The unually used const variables define.
+ * \brief The commonly used const variables define.
  */
     static const LLBC_Variant nil;
 

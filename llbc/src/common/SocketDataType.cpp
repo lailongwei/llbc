@@ -292,7 +292,6 @@ LLBC_Overlapped::LLBC_Overlapped()
 
 LLBC_OverlappedGroup::LLBC_OverlappedGroup()
 : _sock(LLBC_INVALID_SOCKET_HANDLE)
-, _ols()
 
 , _delDataProc(nullptr)
 {

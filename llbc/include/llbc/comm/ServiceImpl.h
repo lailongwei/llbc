@@ -250,13 +250,14 @@ public:
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Broadcast(int opcode,
                           const void *bytes,
                           size_t len,
-                          int status,
-                          uint32 flags);
+                          int status = 0,
+                          uint32 flags = 0);
 
     /**
      * Remove session, always success.
@@ -395,25 +396,25 @@ public:
 
 public:
     /**
-     * Get service safety object pool.
-     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     * Get service safe object pool.
+     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
      */
-    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool();
+    virtual LLBC_SafeObjectPool &GetSafeObjectPool();
 
     /**
-     * Get service unsafety object pool.
-     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     * Get service unsafe object pool.
+     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
      */
-    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool();
+    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool();
 
     /**
-     * Get service packet object pool(thread safety).
+     * Get service packet object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
 
     /**
-     * Get message block object pool(thread safety).
+     * Get message block object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
@@ -583,7 +584,7 @@ private:
     LLBC_String _name; // Service Name.
     LLBC_ServiceDriveMode::ENUM _driveMode; // Drive mode(ExternalDrive or InternalDrive).
     LLBC_ThreadId _svcThreadId; // Service thread Id(which thread drive this service).
-    bool _cleanuping; // Cleanuping flag.
+    bool _inCleaning; // Cleaning flag.
     volatile bool _sinkIntoOnSvcLoop; // Sink into OnSvc() loop flag.
     LLBC_ServiceMgr &_svcMgr; // Owned service manager.
     mutable LLBC_RecursiveLock _lock; // Service lock.
@@ -606,7 +607,7 @@ private:
     LLBC_PollerMgr _pollerMgr; // Poller manager.
     LLBC_SpinLock _protoLock; // Protocol logic about lock.
     bool _suppressedCoderNotFoundWarning; // Suppress coder not found warning flag.
-    LLBC_IProtocolFactory *_dftProtocolFactory; // Default protocol factoy.
+    LLBC_IProtocolFactory *_dftProtocolFactory; // Default protocol factory.
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory; // Specific protocol factory.
     class _ReadySessionInfo // Ready session information.
     {
@@ -659,8 +660,8 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack; // Auto-Release pool stack.
 
     // - ObjPool support members.
-    LLBC_SafetyObjectPool _safetyObjectPool; // Safety object pool.
-    LLBC_UnsafetyObjectPool _unsafetyObjectPool; // Unsafety object pool.
+    LLBC_SafeObjectPool _safeObjectPool; // Safe object pool.
+    LLBC_UnsafeObjectPool _unsafeObjectPool; // Unsafe object pool.
     LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool; // Packet object pool.
     LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool; // MessageBlock object pool.
     LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool; // EventFirer object pool.

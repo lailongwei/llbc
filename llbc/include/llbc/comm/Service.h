@@ -639,25 +639,25 @@ public:
 
 public:
     /**
-     * Get service safety object pool.
-     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     * Get service safe object pool.
+     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
      */
-    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool() = 0;
+    virtual LLBC_SafeObjectPool &GetSafeObjectPool() = 0;
 
     /**
-     * Get service unsafety object pool.
-     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     * Get service unsafe object pool.
+     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
      */
-    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool() = 0;
+    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool() = 0;
 
     /**
-     * Get service packet object pool(thread safety).
+     * Get service packet object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool() = 0;
 
     /**
-     * Get message block object pool(thread safety).
+     * Get message block object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;

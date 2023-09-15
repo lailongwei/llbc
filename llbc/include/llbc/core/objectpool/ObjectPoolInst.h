@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include "llbc/core/thread/ILock.h"
 #include "llbc/core/algo/RingBuffer.h"
-#include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
 // Disable some warnings.
@@ -161,15 +161,15 @@ public:
     virtual const char *GetPoolInstName();
 
     /**
-     * Check this object pool instance is thread safety or not.
-     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     * Check this object pool instance is thread safe or not.
+     * @return bool - return true if is thread safe, otherwise thread unsafe.
      */
-    virtual bool IsThreadSafety() const;
+    virtual bool IsThreadSafe() const;
 
 public:
     /**
      * Perform object pool statistic.
-     * @param[out] stat - the statstic info.
+     * @param[out] stat - the statistic info.
      */
     virtual void Stat(LLBC_ObjectPoolInstStat &stat) const;
 

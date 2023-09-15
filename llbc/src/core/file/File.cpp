@@ -80,14 +80,12 @@ LLBC_String LLBC_FileMode::GetFileModeDesc(int fileMode)
 
 LLBC_File::LLBC_File()
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
 }
 
 LLBC_File::LLBC_File(const LLBC_String &path, int mode)
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
     if (Open(path, mode) == LLBC_OK)
@@ -541,7 +539,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     }
 
 #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
-    // In MAC or iPhone platform, always upate access & modify time.
+    // In MAC or iPhone platform, always update access & modify time.
     updateLastAccessTime = true;
     updateLastModifyTime = true;
 #endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
@@ -704,7 +702,7 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
         return LLBC_FAILED;
     }
 
-    // Open source file with BinayRead mode.
+    // Open source file with BinaryRead mode.
     LLBC_File srcFile(srcFilePath, LLBC_FileMode::BinaryRead);
     if (!srcFile.IsOpened())
         return LLBC_FAILED;

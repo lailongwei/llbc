@@ -79,7 +79,7 @@ public:
     /**
      * Set socket recv buffer size.
      * Note:
-     *  Some OS Platform supported send buffer dynamic adjust, like: windows 7 and laters, windows 2008 server and laters, linux kerner 2.4+.
+     *  Some OS Platform supported send buffer dynamic adjust, like: windows 7 and laters, windows 2008 server and laters, linux kernel 2.4+.
      * @param[in] sockRecvBufSize - the socket recv buffer size.
      */
     void SetSockRecvBufSize(size_t sockRecvBufSize);

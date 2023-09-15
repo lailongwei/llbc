@@ -119,7 +119,8 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
     rhs._writePos = 0;
     rhs._cap = 0;
 
-    rhs._endian = rhs._endian;
+    // ! rhs._endian dont need reset.
+    // rhs._endian = LLBC_DefaultEndian;
     rhs._attach = false;
 
     // !!! rhs._poolInst not allow move.

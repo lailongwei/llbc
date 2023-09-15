@@ -30,7 +30,7 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
- * \brief LLBC Variant arithmetic util class encpasulation.
+ * \brief LLBC Variant arithmetic util class encapsulation.
  *        just support bool/[su]int8/[su]int16/[su]int32/[su]int64/float/double type variant object.
  */
 class LLBC_EXPORT LLBC_VariantArithmetic

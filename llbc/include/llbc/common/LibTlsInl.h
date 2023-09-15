@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
 #include "llbc/common/Macro.h"
 #include "llbc/common/Config.h"
 #include "llbc/common/BasicDataType.h"
@@ -76,8 +74,8 @@ struct LLBC_EXPORT __LLBC_LibTls
         void *timerScheduler;
 
         /* ObjectPool pointers. */
-        void *safetyObjectPool;
-        void *unsafetyObjectPool;
+        void *safeObjectPool;
+        void *unsafeObjectPool;
 
         /* symbol about data. */
         #if LLBC_CFG_OS_IMPL_SYMBOL

@@ -43,8 +43,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
-: _loggerName()
-, _notConfigUseRoot(false)
+: _notConfigUseRoot(false)
 
 , _asyncMode(false)
 , _independentThread(false)
@@ -54,16 +53,12 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 
 , _logToConsole(true)
 , _consoleLogLevel(LLBC_LogLevel::End)
-, _consolePattern()
 , _colourfulOutput(true)
 
 , _logToFile(false)
 , _fileLogLevel(LLBC_LogLevel::End)
-, _logFile()
-, _logFileSuffix()
 , _logCodeFilePath(true)
 , _forceAppLogPath(false)
-, _filePattern()
 , _fileRollingMode(LLBC_LogRollingMode::End)
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)

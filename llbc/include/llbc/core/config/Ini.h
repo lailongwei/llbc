@@ -196,6 +196,7 @@ public:
     /**
      * Save ini config to file.
      * @param[in] file         - the file name.
+     * @param[in] headerLines  - the header lines, default is empty.
      * @param[in] sortSections - sections sort option, default is false.
      * @param[in] sortKeys     - keys sort option, default is false.
      * @return int - return 0 if success, otherwise return -1.
@@ -220,8 +221,8 @@ public:
 
     /**
      * Check has specific key in given section.
-     * @param[in] sectionNme - the section name.
-     * @param[in] key        - the key.
+     * @param[in] sectionName - the section name.
+     * @param[in] key         - the key.
      * @return bool - return true if exist key in given section, otherwise return false.
      */
     bool IsHasKey(const LLBC_String &sectionName, const LLBC_String &key) const;
@@ -252,9 +253,9 @@ public:
 public:
     /**
      * Get specific key value in given section(template method).
-     * @param[in] sectionName - the section name.
-     * @param[in] key         - the key.
-     * @param[in] default     - default value, if not exist specific key config, return this value.
+     * @param[in] sectionName  - the section name.
+     * @param[in] key          - the key.
+     * @param[in] defaultValue - default value, if not exist specific key config, return this value.
      * @return _ValueType - the config value.
      */
     template <typename _ValueType>

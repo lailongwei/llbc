@@ -41,8 +41,6 @@ void LLBC_VariantUtil::Ini2Variant(const LLBC_Ini &ini, LLBC_Variant &var)
     for (auto &section : sections)
     {
         auto &sectionVar = var[section.first];
-        sectionVar.AsDict();
-
         auto &sectionVals = section.second->GetAllValues();
         for (auto &sectionVal : sectionVals)
             sectionVar[sectionVal.first] = sectionVal.second;

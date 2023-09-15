@@ -220,7 +220,7 @@ typename LLBC_BinaryHeap<T, Comp>::_This &LLBC_BinaryHeap<
     this->Clear();
 
     this->_size = right._size;
-    this->_elems.assign(right.begin(), right.end());
+    this->_elems.assign(right._elems.begin(), right._elems.end());
 
     return *this;
 }

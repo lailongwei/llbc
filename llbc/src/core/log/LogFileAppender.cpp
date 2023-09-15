@@ -51,7 +51,7 @@ LLBC_LogFileAppender::LLBC_LogFileAppender()
 , _file(nullptr)
 , _fileSize(0)
 
-, _nonFlushLogCount(0)
+, _notFlushLogCount(0)
 , _logFileLastCheckTime(0)
 {
 }
@@ -126,7 +126,7 @@ void LLBC_LogFileAppender::Finalize()
     _file.Close();
     _fileSize = 0;
 
-    _nonFlushLogCount = 0;
+    _notFlushLogCount = 0;
     _logFileLastCheckTime = 0;
 
     _Base::Finalize();
@@ -157,7 +157,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
         _fileSize += actuallyWrote;
         if (_fileBufferSize > 0) // If file buffered, process flush logic
         {
-            _nonFlushLogCount += 1;
+            _notFlushLogCount += 1;
             if (data.level >= LLBC_LogLevel::Warn)
                 Flush();
         }
@@ -176,11 +176,11 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
 
 void LLBC_LogFileAppender::Flush()
 {
-    if (_nonFlushLogCount == 0)
+    if (_notFlushLogCount == 0)
         return;
 
     _file.Flush();
-    _nonFlushLogCount = 0;
+    _notFlushLogCount = 0;
 }
 
 void LLBC_LogFileAppender::CheckAndUpdateLogFile(sint64 now)
@@ -282,8 +282,8 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
         _fileSize = 0;
     }
 
-    // Reset non-reflush log count variables.
-    _nonFlushLogCount = 0;
+    // Reset not flush log count variables.
+    _notFlushLogCount = 0;
     // Do reopen file.
     if (UNLIKELY(_file.Open(newFileName, clear ? 
         LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite) != LLBC_OK))

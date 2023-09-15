@@ -92,7 +92,7 @@ void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
     LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
     objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_Packet).name(), LLBC_INL_NS __g_msgBlockTypeName);
 
-    // Force create dependented pool instances(MessageBlock/...)
+    // Force create dependent pool instances(MessageBlock/...)
     (void)objPool->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
 }
 

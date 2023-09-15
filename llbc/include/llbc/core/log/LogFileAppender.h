@@ -140,7 +140,7 @@ private:
     LLBC_File _file;
     sint64 _fileSize;
 
-    sint64 _nonFlushLogCount;
+    sint64 _notFlushLogCount;
     sint64 _logFileLastCheckTime;
 };
 

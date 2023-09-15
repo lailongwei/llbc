@@ -66,7 +66,7 @@ public:
     /**
      * Hash specific bytes.
      * @param bytes - the will hash bytes.
-     * @param len   - the will has bytes length.
+     * @param size  - the will has bytes length.
      * @return uint32 - the hash value.
      */
     template <int Algo = LLBC_HashAlgo::Default>
@@ -76,7 +76,7 @@ public:
      * Hash specific bytes.
      * @param[in] algo  - the key hash algorithm type.
      * @param[in] bytes - the will has bytes.
-     * @param[in] len   - the will hash bytes length.
+     * @param[in] size  - the will hash bytes length.
      * @return uint32 - the hash value.
      */
     uint32 operator()(int algo, const void *bytes, size_t size);

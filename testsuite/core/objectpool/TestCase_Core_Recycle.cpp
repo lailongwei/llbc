@@ -106,8 +106,8 @@ void TestCase_Core_Recycle::DoBasicTest()
 
     std::cout << "- Test PoolObj get/release/delete: " << std::endl;
     {
-        LLBC_SafetyObjectPool pool;
-        std::cout << ">> Sizeof(LLBC_SafetyObjectPool): " << sizeof(pool) << std::endl;
+        LLBC_SafeObjectPool pool;
+        std::cout << ">> Sizeof(LLBC_SafeObjectPool): " << sizeof(pool) << std::endl;
         std::cout << ">> Begin get pool object from pool:" << std::endl;
         PoolObj *po = pool.Get<PoolObj>();
 
@@ -156,7 +156,7 @@ void TestCase_Core_Recycle::DoPerfTest()
     // Object pool new/release test.
     std::cout << "Do LLBC_Packet object pool get/release test:" << std::endl;
     {
-        LLBC_UnsafetyObjectPool pool;
+        LLBC_UnsafeObjectPool pool;
         LLBC_ObjectPoolInst<LLBC_Packet> *poolInst = pool.GetPoolInst<LLBC_Packet>();
 
         beginTestTime = LLBC_GetMicroseconds();
@@ -175,7 +175,7 @@ void TestCase_Core_Recycle::DoPerfTest()
     // Object pool new/release test.
     std::cout << "Do LLBC_Packet object pool get/recycle test:" << std::endl;
     {
-        LLBC_UnsafetyObjectPool pool;
+        LLBC_UnsafeObjectPool pool;
         LLBC_ObjectPoolInst<LLBC_Packet> *poolInst = pool.GetPoolInst<LLBC_Packet>();
 
         beginTestTime = LLBC_GetMicroseconds();

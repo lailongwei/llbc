@@ -38,7 +38,7 @@
 #define LLBC_CFG_OS_IMPL_SYMBOL                             1
 // Determine max symbol name when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  127
-// Determine max cpature frames count when enabled OS/Symbol functions.
+// Determine max capture frames count when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 // Determine crash signal set.
 #define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE}

@@ -24,7 +24,6 @@
 #include "llbc/common/PFConfig.h"
 
 #include "llbc/common/Macro.h"
-#include "llbc/common/Endian.h"
 #include "llbc/common/BasicDataType.h"
 #include "llbc/common/StringDataType.h"
 #include "llbc/common/TemplateDeduction.h"

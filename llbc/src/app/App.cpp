@@ -67,8 +67,7 @@ auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
 LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
-: _name()
-, _startPhase(LLBC_AppStartPhase::Stopped)
+: _startPhase(LLBC_AppStartPhase::Stopped)
 
 , _llbcLibStartupInApp(false)
 

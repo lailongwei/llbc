@@ -36,7 +36,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::LLBC_ObjectPoolInst(LLBC_IObj
 : LLBC_IObjectPoolInst(objPool)
 , _poolInstName(typeid(ObjectType).name())
 
-// Header Size(MemoryUnit) + BeginFlags + Aligened ObjectType Size + EndFlags
+// Header Size(MemoryUnit) + BeginFlags + Aligned ObjectType Size + EndFlags
 , _elemSize(sizeof(MemoryUnit) +
 #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
             sizeof(LLBC_INL_NS __objBeginFlags) +
@@ -62,7 +62,7 @@ LLBC_FORCE_INLINE LLBC_ObjectPoolInst<ObjectType>::~LLBC_ObjectPoolInst()
     // Lock pool instance.
     _lock->Lock();
 
-    // Notify ObjectType, whis type object pool instance will destroy.
+    // Notify ObjectType, which type object pool instance will destroy.
     LLBC_ObjectManipulator::OnPoolInstDestroy<ObjectType>(*this);
 
     // Destroy objects and recycle memory.
@@ -137,13 +137,13 @@ LLBC_FORCE_INLINE LLBC_ObjectGuard<ObjectType> LLBC_ObjectPoolInst<ObjectType>::
 template <typename ObjectType>
 LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(void *obj)
 {
-    // Do assert, makesure object is not null.
+    // Do assert, make sure object is not null.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(obj != nullptr &&
            "LLBC_ObjectPoolInst::Release(): Release nullptr pointer!");
     #endif
 
-    // Get memory unit, and do assert, makesure will release object is not referencable object.
+    // Get memory unit, and do assert, make sure will release object is not referencable object.
     #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     MemoryUnit *memUnit = reinterpret_cast<MemoryUnit *>(
         reinterpret_cast<uint8 *>(obj) - sizeof(MemoryUnit));
@@ -186,7 +186,7 @@ const char * LLBC_ObjectPoolInst<ObjectType>::GetPoolInstName()
 }
 
 template <typename ObjectType>
-LLBC_FORCE_INLINE bool LLBC_ObjectPoolInst<ObjectType>::IsThreadSafety() const
+LLBC_FORCE_INLINE bool LLBC_ObjectPoolInst<ObjectType>::IsThreadSafe() const
 {
     return !_lock->IsDummyLock();
 }
@@ -335,7 +335,7 @@ template <typename ObjectType>
 LLBC_FORCE_INLINE void *LLBC_ObjectPoolInst<ObjectType>::FindFreeObj(MemoryBlock *&memBlock,
                                                                      const bool &referencableObj)
 {
-    // Do assert(makesure given block has free units).
+    // Do assert(make sure given block has free units).
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(!memBlock->freeUnits->IsEmpty() &&
            "LLBC_ObjectPoolInst::FindFreeObj(): Pop from empty memory block!");
@@ -434,7 +434,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::Release(MemoryUnit *memU
                                         // push this memory block to _freeBlocks.
         _freeBlocks.Push(memUnit->block);
 
-    // Makesure ring-buffer is not full.
+    // Make sure ring-buffer is not full.
     #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
     ASSERT(!freeUnits->IsFull() &&
            "LLBC_ObjectPoolInst::Release(): Repeated release object!");

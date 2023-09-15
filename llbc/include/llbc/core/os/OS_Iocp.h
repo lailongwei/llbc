@@ -29,7 +29,6 @@ __LLBC_NS_BEGIN
 
 /**
  * Create I/O completion port.
- * @param[in] numOfConcurrentThreads - the number of concurrent threads, default is 0.
  * @return LLBC_IocpHandle - IOCP handle.
  */
 LLBC_EXPORT LLBC_IocpHandle LLBC_CreateIocp();
@@ -42,8 +41,8 @@ LLBC_EXPORT LLBC_IocpHandle LLBC_CreateIocp();
  * @return int - return 0 if success, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_AddSocketToIocp(LLBC_IocpHandle handle, 
-                                                 LLBC_SocketHandle sock, 
-                                                 void *completionKey);
+                                     LLBC_SocketHandle sock, 
+                                     void *completionKey);
 
 /**
  * Close IOCP handle.

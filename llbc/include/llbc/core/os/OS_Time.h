@@ -47,7 +47,7 @@ LLBC_EXPORT void LLBC_TZSet();
 LLBC_EXPORT int LLBC_GetTimezone();
 
 /**
- * Makesure given year is leap year or not.
+ * Make sure given year is leap year or not.
  * @param[in] year - the given year.
  * @return bool - return true if is leap year, otherwise return false.
  */

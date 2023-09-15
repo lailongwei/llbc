@@ -287,10 +287,9 @@ void LLBC_MessageBuffer::Cleanup()
     if (!_head)
         return;
 
-    LLBC_MessageBlock *block = nullptr;
     while (_head)
     {
-        block = _head;
+        LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
         LLBC_Recycle(block);
     }

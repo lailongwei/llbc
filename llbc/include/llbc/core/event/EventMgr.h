@@ -69,8 +69,9 @@ public:
 
     /**
      * Add event listener.
-     * @param[in] id - event Id.
-     * @param[in] listener - event listener.
+     * @param[in] id         - event Id.
+     * @param[in] listener   - event listener.
+     * @param[in]] boundStub - bound listener stub, if specific, will use bound stub.
      * @return LLBC_ListenerStub - return LLBC_INAVLID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,

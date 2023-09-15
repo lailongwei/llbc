@@ -319,7 +319,7 @@ public:
     /**
      * Raw data type write methods.
      * @param[in] val - will write to packet's object.
-     * @return int - return 0 if success, otherwise retrun -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int Write(bool val);
     int Write(sint8 val);

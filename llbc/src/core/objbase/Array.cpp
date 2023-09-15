@@ -386,17 +386,17 @@ LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
 
 LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
 {
-    Obj *o = nullptr;
 
     int errNo = LLBC_GetLastError();
     int subErrNo = LLBC_GetSubErrorNo();
 
+    Obj *obj;
     LLBC_Array *arr = new LLBC_Array;
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); ++iter)
     {
-        if ((o = ObjectAtIndex(*iter)))
-            arr->PushBack(o);
+        if ((obj = ObjectAtIndex(*iter)))
+            arr->PushBack(obj);
     }
 
     LLBC_SetLastError(errNo);

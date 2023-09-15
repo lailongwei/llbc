@@ -114,8 +114,8 @@ LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct,
                                     int milliSecond,
                                     int microSecond)
 {
-    time_t clanderTimeInSecs = mktime(const_cast<tm *>(&timeStruct));
-    return LLBC_Time(clanderTimeInSecs * LLBC_TimeConst::NumOfMicrosPerSecond +
+    time_t calendarTimeInSecs = mktime(const_cast<tm *>(&timeStruct));
+    return LLBC_Time(calendarTimeInSecs * LLBC_TimeConst::NumOfMicrosPerSecond +
                      milliSecond * LLBC_TimeConst::NumOfMicrosPerMillisecond +
                      microSecond);
 }

@@ -46,7 +46,7 @@ bool LLBC_LogFormattingInfo::GetLeftAlign() const
     return _leftAlign;
 }
 
-void LLBC_LogFormattingInfo::SetLeftAligh(bool leftAlign)
+void LLBC_LogFormattingInfo::SetLeftAlign(bool leftAlign)
 {
     _leftAlign = leftAlign;
 }

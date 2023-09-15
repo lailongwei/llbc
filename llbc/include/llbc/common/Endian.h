@@ -120,7 +120,7 @@ T LLBC_Net2Host(const T &val);
 
 /**
  * Convert network byte order to host byte order.
- * @param[in] - will convert's value, host byte order.
+ * @param[in] val - will convert's value, host byte order.
  * @return T - convert result, network byte order.
  */
 template <typename T>

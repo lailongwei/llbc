@@ -37,6 +37,7 @@ inline LLBC_SvcEv_SessionCreate::LLBC_SvcEv_SessionCreate()
 , isListen(false)
 , sessionId(0)
 , acceptSessionId(0)
+, handle(LLBC_INVALID_SOCKET_HANDLE)
 {
 }
 

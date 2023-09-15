@@ -308,7 +308,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
          it != _connecting.end();
          )
     {
-        // Check event triggered in writeable-set or excepts-set
+        // Check event triggered in writable-set or excepts-set
         const LLBC_SocketHandle handle = it->first;
         bool inExceptSet = false;
         const bool inWriteSet = !!LLBC_FdIsSet(handle, &writes);

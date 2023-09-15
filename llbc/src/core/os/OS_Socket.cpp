@@ -288,9 +288,9 @@ int LLBC_ShutdownSocketInputOutput(LLBC_SocketHandle handle)
 int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags)
 {
 #if LLBC_TARGET_PLATFORM_NON_IPHONE
-    int ret = 0;
+    int ret;
 #else // iPhone
-    ssize_t ret = 0;
+    ssize_t ret;
 #endif
     while ((ret = send(handle,
                        reinterpret_cast<const char *>(buf), 
@@ -374,9 +374,9 @@ int LLBC_SendEx(LLBC_SocketHandle handle,
 int LLBC_Recv(LLBC_SocketHandle handle, void *buf, int len, int flags)
 {
 #if LLBC_TARGET_PLATFORM_NON_IPHONE
-    int ret = 0;
+    int ret;
 #else // iPHone
-    ssize_t ret = 0;
+    ssize_t ret;
 #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
     while ((ret = recv(handle,
                        reinterpret_cast<char *>(buf), 
@@ -755,7 +755,7 @@ LLBC_SocketHandle LLBC_AcceptClient(LLBC_SocketHandle handle, LLBC_SockAddr_IN *
     struct sockaddr_in inAddr;
     LLBC_SocketLen len = sizeof(struct sockaddr_in);
 
-    LLBC_SocketHandle clientHandle = LLBC_INVALID_SOCKET_HANDLE;
+    LLBC_SocketHandle clientHandle;
     if ((clientHandle = accept(
         handle, reinterpret_cast<struct sockaddr *>(&inAddr), &len)) == LLBC_INVALID_SOCKET_HANDLE)
     {

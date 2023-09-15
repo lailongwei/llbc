@@ -55,8 +55,8 @@ public:
 
 /**
  * Flow check when use add operations.
- * @param[in] val    - will check value.
- * @param[in] incVal - addent.
+ * @param[in] value  - will check value.
+ * @param[in] addent - addent.
  *
  * @return int - flow type.
  */
@@ -65,8 +65,8 @@ int LLBC_CheckFlowUseAdd(T value, T addent);
 
 /**
  * Flow check when using subtraction operation.
- * @param[in] val - will check value.
- * @param[in] sub - subtrahend.
+ * @param[in] value      - will check value.
+ * @param[in] subtrahend - subtrahend.
  *
  * @return int - flow type.
  */

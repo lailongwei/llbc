@@ -92,10 +92,10 @@ public:
     LLBC_ObjectPool<PoolLockType, PoolInstLockType> *GetObjectPool();
 
     /**
-     * Check this object pool instance is thread safety or not.
-     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     * Check this object pool instance is thread safe or not.
+     * @return bool - return true if is thread safe, otherwise thread unsafe.
      */
-    virtual bool IsThreadSafety() const = 0;
+    virtual bool IsThreadSafe() const = 0;
 
 public:
     /**

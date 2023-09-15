@@ -22,7 +22,6 @@
 #pragma once
 
 #include "llbc/core/time/TimeSpan.h"
-#include "llbc/core/time/TimeConst.h"
 
 __LLBC_NS_BEGIN
 
@@ -200,7 +199,7 @@ public:
 
 public:
     /**
-     * Makesure given year is leap year or not.
+     * Make sure given year is leap year or not.
      * @param[in] year - the given year.
       *@return bool - return true it means given year is leap year, otherwise not.
      */
@@ -255,9 +254,9 @@ public:
 
     /**
      * Verify that the given time(to) has been crossed week or not.
-     * @param[in] from - from time.
-     * @param[in] to   - to time.
-     * @param[in] timeOfDay - cross time of week point.
+     * @param[in] from       - from time.
+     * @param[in] to         - to time.
+     * @param[in] timeOfWeek - cross time of week point.
      * @return bool - return true if crossed week, otherwise return false.
      */
     static bool IsCrossedWeek(const LLBC_Time &from,
@@ -306,9 +305,9 @@ public:
 private:
     /**
      * Internal constructor.
-     * @param clanderTimeInMicroseconds 
+     * @param clendarTimeInMicroseconds - calendar time in microseconds.
      */
-    explicit LLBC_Time(const sint64 &clanderTimeInMicroseconds);
+    explicit LLBC_Time(const sint64 &clendarTimeInMicroseconds);
 
     /**
      * Update time structs(local&gmt)

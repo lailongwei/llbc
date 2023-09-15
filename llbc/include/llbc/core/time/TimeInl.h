@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/time/TimeConst.h"
 
 __LLBC_NS_BEGIN
 
@@ -208,8 +209,8 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
     stream.Write(_time);
 }
 
-inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroseconds)
-: _time(clanderTimeInMicroseconds)
+inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)
+: _time(clendarTimeInMicroseconds)
 {
     UpdateTimeStructs();
 }

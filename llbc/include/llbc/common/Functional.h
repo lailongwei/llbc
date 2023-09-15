@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
 #include "llbc/common/Macro.h"
 
 __LLBC_NS_BEGIN
