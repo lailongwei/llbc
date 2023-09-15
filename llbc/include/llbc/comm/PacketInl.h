@@ -618,7 +618,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::ReadRawType(_RawTy &val)
     }
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Net2Host(val);
+    val = LLBC_Net2Host(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
     return LLBC_OK;

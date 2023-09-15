@@ -81,11 +81,11 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
     sint64 extData1 = *reinterpret_cast<sint64 *>(_header + 12);
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Net2Host(len);
-    LLBC_Net2Host(opcode);
-    LLBC_Net2Host(status);
-    LLBC_Net2Host(flags);
-    LLBC_Net2Host(extData1);
+    len = LLBC_Net2Host(len);
+    opcode = LLBC_Net2Host(opcode);
+    status = LLBC_Net2Host(status);
+    flags = LLBC_Net2Host(flags);
+    extData1 = LLBC_Net2Host(extData1);
 #endif
 
     packet.SetLength(len);
