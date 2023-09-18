@@ -71,6 +71,13 @@ workspace ("llbc_" .. _ACTION)
         architecture "x86_64"
     filter {}
 
+    -- not use cxx11 abi
+    filter { "language:c++", "toolset:gcc or clang" }
+    defines {
+        "_GLIBCXX_USE_CXX11_ABI=0",
+    }
+    filter {}
+
     -- defines
     filter { "configurations:debug*" }
         defines {
