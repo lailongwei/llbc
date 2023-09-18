@@ -145,6 +145,14 @@ private:
 public:
     /**
      * Get bytes MD5 digest/hex digest.
+     * @param[in] bytes - bytes string.
+     * @return LLBC_String - MD5 digest/hex digest.
+     */
+    static LLBC_String Digest(const LLBC_String &bytes);
+    static LLBC_String HexDigest(const LLBC_String &bytes);
+
+    /**
+     * Get bytes MD5 digest/hex digest.
      * @param[in] bytes - bytes pointer.
      * @param[in] len   - bytes length.
      * @return LLBC_String - MD5 digest/hex digest.
@@ -168,3 +176,5 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/utils/Util_MD5Inl.h"
