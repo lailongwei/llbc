@@ -386,7 +386,7 @@ private:                                    \
     { if ((cond)) { LLBC_NS LLBC_SetLastError(err); break; } }      \
 
 #define LLBC_ReturnIf(cond, ret)                                    \
-    { if ((cond)) { return (ret); } }                               \
+    { if ((cond)) { return ret; } }                                 \
 
 #define LLBC_SetErrAndReturnIf(cond, err, ret)                      \
     { if ((cond)) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
