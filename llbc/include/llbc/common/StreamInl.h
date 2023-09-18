@@ -239,13 +239,10 @@ LLBC_FORCE_INLINE void LLBC_Stream::Assign(const LLBC_Stream &rhs)
 
 LLBC_FORCE_INLINE void LLBC_Stream::Assign(void *buf, size_t size)
 {
-    if (!buf || size == 0)
-    {
-        _readPos = _writePos = 0;
-        return;
-    }
-
     _readPos = _writePos = 0;
+    if (!buf || size == 0)
+        return;
+
     Write(buf, size);
 }
 
