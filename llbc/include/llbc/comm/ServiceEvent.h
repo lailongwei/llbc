@@ -38,7 +38,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The service event type enumeration.
  */
-class LLBC_EXPORT LLBC_ServiceEventType
+class LLBC_HIDDEN LLBC_ServiceEventType
 {
 public:
     enum
@@ -64,7 +64,7 @@ public:
 /**
  * \brief The service event base structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_ServiceEvent
 {
     int type;
 
@@ -75,7 +75,7 @@ struct LLBC_EXPORT LLBC_ServiceEvent
 /**
  * \brief The session create event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
 {
     bool isListen;
     int sessionId;
@@ -90,7 +90,7 @@ struct LLBC_EXPORT LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
 /**
  * \brief The session destroy event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
 {
     bool isListen;
     int sessionId;
@@ -108,7 +108,7 @@ struct LLBC_EXPORT LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
 /**
  * \brief The async-connect result event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
 {
     int sessionId;
     bool connected;
@@ -121,7 +121,7 @@ struct LLBC_EXPORT LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
 /**
  * \brief The data-arrival event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
 {
     LLBC_Packet *packet;
 
@@ -132,7 +132,7 @@ struct LLBC_EXPORT LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
 /**
  * \brief The proto-report event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
 {
     int sessionId;
     int opcode;
@@ -147,7 +147,7 @@ struct LLBC_EXPORT LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
 /**
  * \brief The subscribe-event event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 {
     int id;
     LLBC_ListenerStub stub;
@@ -161,7 +161,7 @@ struct LLBC_EXPORT LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
 /**
  * \brief The unsubscribe-event event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
 {
     int id;
     LLBC_ListenerStub stub;
@@ -172,7 +172,7 @@ struct LLBC_EXPORT LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
 /**
  * \brief The fire-event event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 {
     LLBC_Event *ev;
     LLBC_Delegate<void(LLBC_Event *)> dequeueHandler;
@@ -184,7 +184,7 @@ struct LLBC_EXPORT LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 /**
  * \brief The application phase event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
 {
     bool earlyStart;
     bool startFail;
@@ -197,7 +197,7 @@ struct LLBC_EXPORT LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
 /**
  * \brief The application config reloaded event structure encapsulation.
  */
-struct LLBC_EXPORT LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
 {
     int cfgType;
     LLBC_Property propCfg;
@@ -210,7 +210,7 @@ struct LLBC_EXPORT LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
  * \brief The service event util class encapsulation.
  *        Use for Build/Destroy service events.
  */
-class LLBC_EXPORT LLBC_SvcEvUtil
+class LLBC_HIDDEN LLBC_SvcEvUtil
 {
 public:
     /**
