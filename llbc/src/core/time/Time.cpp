@@ -111,13 +111,13 @@ LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
 }
 
 LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct,
-                                    int milliSecond,
-                                    int microSecond)
+                                    int milliSec,
+                                    int microSec)
 {
     time_t calendarTimeInSecs = mktime(const_cast<tm *>(&timeStruct));
     return LLBC_Time(calendarTimeInSecs * LLBC_TimeConst::NumOfMicrosPerSecond +
-                     milliSecond * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                     microSecond);
+                     milliSec * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                     microSec);
 }
 
 LLBC_Time LLBC_Time::FromTimeParts(int year,
@@ -126,8 +126,8 @@ LLBC_Time LLBC_Time::FromTimeParts(int year,
                                    int hour,
                                    int minute,
                                    int second,
-                                   int milliSecond, 
-                                   int microSecond)
+                                   int milliSec, 
+                                   int microSec)
 {
     tm timeStruct;
     timeStruct.tm_year = year - 1900;
@@ -153,7 +153,7 @@ LLBC_Time LLBC_Time::FromTimeParts(int year,
     timeStruct.tm_min = minute;
     timeStruct.tm_sec = second;
 
-    return FromTimeStruct(timeStruct, milliSecond, microSecond);
+    return FromTimeStruct(timeStruct, milliSec, microSec);
 }
 
 int LLBC_Time::GetMillisecond() const

@@ -92,16 +92,16 @@ public:
     static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
     static LLBC_Time FromTimeStruct(const tm &timeStruct,
-                                    int milliSecond = 0,
-                                    int microSecond = 0);
+                                    int milliSec = 0,
+                                    int microSec = 0);
     static LLBC_Time FromTimeParts(int year,
                                    int month,
                                    int day,
                                    int hour,
                                    int minute,
                                    int second,
-                                   int milliSecond = 0,
-                                   int microSecond = 0);
+                                   int milliSec = 0,
+                                   int microSec = 0);
 
 public:
     /**
