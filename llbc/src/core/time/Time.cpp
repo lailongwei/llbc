@@ -158,19 +158,19 @@ LLBC_Time LLBC_Time::FromTimeParts(int year,
 
 int LLBC_Time::GetMillisecond() const
 {
-    sint64 nowLocalMilliseconds = 
+    sint64 nowLocalMillis = 
         _time / LLBC_TimeConst::NumOfMicrosPerMillisecond - 
         LLBC_GetTimezone() * LLBC_TimeConst::NumOfMillisPerSecond;
     return static_cast<int>(
-        nowLocalMilliseconds % LLBC_TimeConst::NumOfMillisPerSecond);
+        nowLocalMillis % LLBC_TimeConst::NumOfMillisPerSecond);
 }
 
 int LLBC_Time::GetMicrosecond() const
 {
-    sint64 nowLocalMicroseconds =
+    sint64 nowLocalMicros =
         _time - LLBC_GetTimezone() * LLBC_TimeConst::NumOfMicrosPerSecond;
     return static_cast<int>(
-        nowLocalMicroseconds % LLBC_TimeConst::NumOfMicrosPerMillisecond);
+        nowLocalMicros % LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
 LLBC_Time LLBC_Time::GetDate() const
@@ -319,14 +319,14 @@ LLBC_Time LLBC_Time::AddSeconds(int seconds) const
     return *this + LLBC_TimeSpan(seconds * LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
-LLBC_Time LLBC_Time::AddMilliseconds(int milliSeconds) const
+LLBC_Time LLBC_Time::AddMillis(int millis) const
 {
-    return *this + LLBC_TimeSpan(milliSeconds * LLBC_TimeConst::NumOfMicrosPerMillisecond);
+    return *this + LLBC_TimeSpan(millis * LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
-LLBC_Time LLBC_Time::AddMicroseconds(int microSeconds) const
+LLBC_Time LLBC_Time::AddMicros(int micros) const
 {
-    return *this + LLBC_TimeSpan(static_cast<sint64>(microSeconds));
+    return *this + LLBC_TimeSpan(static_cast<sint64>(micros));
 }
 
 bool LLBC_Time::IsLeapYear(int year)
@@ -416,12 +416,12 @@ LLBC_TimeSpan LLBC_Time::operator +(const LLBC_Time &time) const
 
 LLBC_Time LLBC_Time::operator +(const LLBC_TimeSpan &span) const
 {
-    return LLBC_Time(_time + span.GetTotalMicroseconds());
+    return LLBC_Time(_time + span.GetTotalMicros());
 }
 
 LLBC_Time LLBC_Time::operator -(const LLBC_TimeSpan &span) const
 {
-    return LLBC_Time(_time - span.GetTotalMicroseconds());
+    return LLBC_Time(_time - span.GetTotalMicros());
 }
 
 LLBC_Time &LLBC_Time::operator =(const LLBC_Time &time)

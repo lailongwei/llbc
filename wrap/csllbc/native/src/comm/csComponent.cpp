@@ -80,7 +80,7 @@ void csllbc_Component::OnUpdate()
 
 void csllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
-    (*_idleDeleg)(static_cast<int>(idleTime.GetTotalMicroseconds()));
+    (*_idleDeleg)(static_cast<int>(idleTime.GetTotalMicros()));
 }
 
 void csllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)

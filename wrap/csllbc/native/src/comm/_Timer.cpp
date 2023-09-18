@@ -39,8 +39,8 @@ void csllbc_Timer_Destroy(csllbc_Timer *timer)
 
 int csllbc_Timer_Schedule(csllbc_Timer *timer, sint64 dueTime, sint64 period)
 {
-    return timer->Schedule(LLBC_TimeSpan::FromMilliseconds(dueTime),
-                           LLBC_TimeSpan::FromMilliseconds(period));
+    return timer->Schedule(LLBC_TimeSpan::FromMillis(dueTime),
+                           LLBC_TimeSpan::FromMillis(period));
 }
 
 int csllbc_Timer_IsScheduling(csllbc_Timer *timer)

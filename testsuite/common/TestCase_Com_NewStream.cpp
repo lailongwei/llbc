@@ -90,9 +90,8 @@ int TestCase_Com_NewStream::CtorTest()
     };
 
     // Test copy construct.
-    int ret;
-    LLBC_ReturnIf(ret = testCopyConstruct(true), ret);
-    LLBC_ReturnIf(ret = testCopyConstruct(false), ret);
+    LLBC_ReturnIfNot(testCopyConstruct(true) == LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testCopyConstruct(false) == LLBC_OK, LLBC_FAILED);
 
     // Test move construct.
     {
@@ -153,8 +152,8 @@ int TestCase_Com_NewStream::CtorTest()
     };
 
     // Test construct by buf and size.
-    LLBC_ReturnIf(ret = testConstructByBufAndSize(true), ret);
-    LLBC_ReturnIf(ret = testConstructByBufAndSize(false), ret);
+    LLBC_ReturnIfNot(testConstructByBufAndSize(true) == LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIfNot(testConstructByBufAndSize(false) == LLBC_OK, LLBC_FAILED);
 
     // Define construct by cap test lambda.
     auto testConstructByCap = [](size_t cap) {
@@ -301,6 +300,38 @@ int TestCase_Com_NewStream::AttachTest()
                                Error,
                                LLBC_FAILED);
     }
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::SwapTest()
+{
+    LLBC_PrintLn("Swap test:");
+
+    LLBC_Stream stream1;
+    stream1.SetEndian(LLBC_Endian::BigEndian);
+    stream1 << "Hello World" << false;
+
+    LLBC_Stream stream2;
+    stream2.SetEndian(LLBC_Endian::LittleEndian);
+    stream2 << 3 << 4.5 << true << "Hey, Judy";
+
+    const void *stream1Buf = stream1.GetBuf();
+    const void *stream2Buf = stream2.GetBuf();
+    const size_t stream1Cap = stream1.GetCap();
+    const size_t stream2Cap = stream2.GetCap();
+    const size_t stream1WritePos = stream1.GetWritePos();
+    const size_t stream2WritePos = stream2.GetWritePos();
+    const size_t stream1ReadPos = stream1WritePos / 2;
+    const size_t stream2ReadPos = stream2WritePos / 2;
+
+    stream1.SetReadPos(stream1ReadPos);
+    stream2.SetReadPos(stream2ReadPos);
+
+    LLBC_PrintLn("- stream1: %s", stream1.ToString().c_str());
+    LLBC_PrintLn("- stream2: %s", stream2.ToString().c_str());
+
+    // TODO:l
 
     return LLBC_OK;
 }

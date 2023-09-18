@@ -22,14 +22,14 @@
 // Api: Threading_Sleep
 LULLBC_LUA_METH int _lullbc_Threading_Sleep(lua_State *l)
 {
-    uint64 milliSecs = 0;
+    uint64 millis = 0;
     if (lua_gettop(l) > 0)
     {
         lullbc_ArgCheck(l, lua_isnumber(l, 1), 1, "sleep arguments must be a number");
-        milliSecs = lua_tointeger(l, 1);
+        millis = lua_tointeger(l, 1);
     }
 
-    LLBC_Sleep(static_cast<int>(milliSecs));
+    LLBC_Sleep(static_cast<int>(millis));
 
     return 0;
 }

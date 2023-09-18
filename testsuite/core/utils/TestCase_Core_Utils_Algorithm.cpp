@@ -92,7 +92,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
         t1[i].escape(willEscape, '\\');
     }
     LLBC_PrintLn("LLBC_String escape test used time(ms): %lld",
-                   (LLBC_Time::Now() - begTestTime).GetTotalMilliseconds());
+                   (LLBC_Time::Now() - begTestTime).GetTotalMillis());
 
     begTestTime = LLBC_Time::Now();
     for (int i = 0; i < nEscapeTestNum; ++i)
@@ -100,7 +100,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
         LLBC_StringEscape(t2[i], willEscape, '\\');
     }
     LLBC_PrintLn("Algorithm LLBC_String escape test used time(ms): %lld",
-                   (LLBC_Time::Now() - begTestTime).GetTotalMilliseconds());
+                   (LLBC_Time::Now() - begTestTime).GetTotalMillis());
 
     ASSERT(t1[0] == t2[0]);
     LLBC_PrintLn("test completed, press any key to exit");

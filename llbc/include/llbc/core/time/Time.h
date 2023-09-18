@@ -86,8 +86,8 @@ public:
      * @return LLBC_Time - Time object.
      */
     static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMilliseconds(sint64 clanderTimeInMilliseconds);
-    static LLBC_Time FromMicroseconds(sint64 clanderTimeInMicroseconds);
+    static LLBC_Time FromMillis(sint64 clanderTimeInMillis);
+    static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
     static LLBC_Time FromTimeVal(const timeval &timeVal);
     static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
@@ -194,8 +194,8 @@ public:
     LLBC_Time AddHours(int hours) const;
     LLBC_Time AddMinutes(int minutes) const;
     LLBC_Time AddSeconds(int seconds) const;
-    LLBC_Time AddMilliseconds(int milliSeconds) const;
-    LLBC_Time AddMicroseconds(int microSeconds) const;
+    LLBC_Time AddMillis(int millis) const;
+    LLBC_Time AddMicros(int micros) const;
 
 public:
     /**

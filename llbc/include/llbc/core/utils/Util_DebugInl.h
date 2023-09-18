@@ -51,7 +51,7 @@ inline int LLBC_CPUTime::ToSeconds() const
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMilliseconds() const
+inline sint64 LLBC_CPUTime::ToMillis() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000ll / _freqPerSecond;
@@ -60,7 +60,7 @@ inline sint64 LLBC_CPUTime::ToMilliseconds() const
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMicroseconds() const
+inline sint64 LLBC_CPUTime::ToMicros() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000ll / _freqPerSecond;
@@ -69,7 +69,7 @@ inline sint64 LLBC_CPUTime::ToMicroseconds() const
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToNanoseconds() const
+inline sint64 LLBC_CPUTime::ToNanos() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000000ll / _freqPerSecond;
@@ -83,19 +83,19 @@ inline int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
     return LLBC_CPUTime(cpuCount).ToSeconds();
 }
 
-inline sint64 LLBC_CPUTime::ToMilliseconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMillis(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMilliseconds();
+    return LLBC_CPUTime(cpuCount).ToMillis();
 }
 
-inline sint64 LLBC_CPUTime::ToMicroseconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMicros(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMicroseconds();
+    return LLBC_CPUTime(cpuCount).ToMicros();
 }
 
-inline sint64 LLBC_CPUTime::ToNanoseconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToNanos(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToNanoseconds();
+    return LLBC_CPUTime(cpuCount).ToNanos();
 }
 
 inline LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const

@@ -143,23 +143,23 @@ void TestCase_Core_Time_Time::TimeClassTest()
         std::cout <<i <<": " <<now.AddSeconds(i) <<", -" <<i <<": " <<now.AddSeconds(-i) <<"\n";
     std::cout <<std::endl;
 
-    int addMilliSecsStep = 500;
-    std::cout <<"AddMilliseconds() test(step:+/- " <<addMilliSecsStep <<" milli-seconds):" <<std::endl;
+    int addMillisStep = 500;
+    std::cout <<"AddMillis() test(step:+/- " <<addMillisStep <<" milli-seconds):" <<std::endl;
     for (int i = 1; i <= 3; ++i)
     {
-        int addMilliSecs = addMilliSecsStep * i;
-        std::cout << i <<"(" <<addMilliSecs <<"): " <<now.AddMilliseconds(addMilliSecs).GetTimestampInMicros() <<", -"
-            <<i <<"(" <<-addMilliSecs <<"): " <<now.AddMilliseconds(-addMilliSecs).GetTimestampInMicros() <<"\n";
+        int addMillis = addMillisStep * i;
+        std::cout << i <<"(" <<addMillis <<"): " <<now.AddMillis(addMillis).GetTimestampInMicros() <<", -"
+            <<i <<"(" <<-addMillis <<"): " <<now.AddMillis(-addMillis).GetTimestampInMicros() <<"\n";
     }
     std::cout <<std::endl;
 
-    int addMicroSecsStep = 500;
-    std::cout <<"AddMicroseconds() test(step:+/- " <<addMicroSecsStep <<" micro-seconds):" <<std::endl;
+    int addMicrosStep = 500;
+    std::cout <<"AddMicros() test(step:+/- " <<addMicrosStep <<" micro-seconds):" <<std::endl;
     for (int i = 1; i <= 3; ++i)
     {
-        int addMicroSecs = addMicroSecsStep * i;
-        std::cout <<i <<"(" <<addMicroSecs <<"): " <<now.AddMicroseconds(addMicroSecs).GetTimestampInMicros() <<", -"
-            <<i <<"(" <<-addMicroSecs <<"): " <<now.AddMicroseconds(-addMicroSecs).GetTimestampInMicros() <<"\n";
+        int addMicros = addMicrosStep * i;
+        std::cout <<i <<"(" <<addMicros <<"): " <<now.AddMicros(addMicros).GetTimestampInMicros() <<", -"
+            <<i <<"(" <<-addMicros <<"): " <<now.AddMicros(-addMicros).GetTimestampInMicros() <<"\n";
     }
     std::cout <<std::endl;
 
@@ -181,8 +181,8 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // FromXXX() test.
     std::cout <<"FromSeconds(1.0): " <<LLBC_Time::FromSeconds(1) <<std::endl;
-    std::cout <<"FromMinutes(10001): " <<LLBC_Time::FromMilliseconds(10001) <<std::endl;
-    std::cout <<"FromMicroseconds(10000000): " <<LLBC_Time::FromMicroseconds(10000000) <<std::endl;
+    std::cout <<"FromMinutes(10001): " <<LLBC_Time::FromMillis(10001) <<std::endl;
+    std::cout <<"FromMicros(10000000): " <<LLBC_Time::FromMicros(10000000) <<std::endl;
     timeval tv;
     tv.tv_sec = 10; tv.tv_usec = 10;
     std::cout <<"FromTimeVal(tv.sec=10, tv.usec=10): " <<LLBC_Time::FromTimeVal(tv) <<std::endl;
@@ -240,24 +240,24 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
 {
     std::cout << "LLBC_TimeSpan test:" << std::endl;
 
-    LLBC_TimeSpan tsFromMicros = LLBC_TimeSpan::FromMicroseconds(123);
-    LLBC_TimeSpan tsFromMillis = LLBC_TimeSpan::FromMilliseconds(456);
-    LLBC_TimeSpan tsFromMillisMicros = LLBC_TimeSpan::FromMilliseconds(-123, -456);
+    LLBC_TimeSpan tsFromMicros = LLBC_TimeSpan::FromMicros(123);
+    LLBC_TimeSpan tsFromMillis = LLBC_TimeSpan::FromMillis(456);
+    LLBC_TimeSpan tsFromMillisMicros = LLBC_TimeSpan::FromMillis(-123, -456);
     LLBC_TimeSpan tsFromSS = LLBC_TimeSpan::FromSeconds(10, 20, -30);
     LLBC_TimeSpan tsFromMMSS1 = LLBC_TimeSpan::FromMinutes(100, -100, 300);
     LLBC_TimeSpan tsFromMMSS2 = LLBC_TimeSpan::FromMinutes(-100, 100, 300);
     LLBC_TimeSpan tsFromHHMMSS = LLBC_TimeSpan::FromHours(5, -400, 500, -600, 700);
     LLBC_TimeSpan tsFromDDHHMMSS = LLBC_TimeSpan::FromDays(1, 2, 3, 4, 500, 600);
-    std::cout << "LLBC_TimeSpan::FromMicroseconds(123): " << tsFromMicros << std::endl;
-    std::cout << "LLBC_TimeSpan::FromMilliseconds(456): " << tsFromMillis << std::endl;
-    std::cout << "LLBC_TimeSpan::FromMilliseconds(-123, -456): " << tsFromMillisMicros << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMicros(123): " << tsFromMicros << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMillis(456): " << tsFromMillis << std::endl;
+    std::cout << "LLBC_TimeSpan::FromMillis(-123, -456): " << tsFromMillisMicros << std::endl;
     std::cout << "LLBC_TimeSpan::FromSeconds(10, 20, -30): " << tsFromSS << std::endl;
     std::cout << "LLBC_TimeSpan::FromMinutes(100, -100, 300): " << tsFromMMSS1 << std::endl;
     std::cout << "LLBC_TimeSpan::FromMinutes(-100, 100, 300): " << tsFromMMSS2 << std::endl;
     std::cout << "LLBC_TimeSpan::FromHours(5, -400, 500, -600, 700): " << tsFromHHMMSS << std::endl;
     std::cout << "LLBC_TimeSpan::FromDays(1, 2, 3, 4, 500, 600): " << tsFromDDHHMMSS << std::endl;
 
-    LLBC_TimeSpan ts = LLBC_TimeSpan::FromMicroseconds(1000);
+    LLBC_TimeSpan ts = LLBC_TimeSpan::FromMicros(1000);
     std::cout << "LLBC_TimeSpan(1000us) * 100 = " << ts * 100 << std::endl;
     std::cout << "LLBC_TimeSpan(1000us) * 0.5 = " << ts * 0.5 << std::endl;
     std::cout << "LLBC_TimeSpan(1000us) / 100 = " << ts / 100 << std::endl;

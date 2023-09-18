@@ -63,14 +63,14 @@ inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
     return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMilliseconds(sint64 clanderTimeInMilliseconds)
+inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMillis)
 {
-    return LLBC_Time(clanderTimeInMilliseconds * LLBC_TimeConst::NumOfMicrosPerMillisecond);
+    return LLBC_Time(clanderTimeInMillis * LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMicroseconds(sint64 clanderTimeInMicroseconds)
+inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicros)
 {
-    return LLBC_Time(clanderTimeInMicroseconds);
+    return LLBC_Time(clanderTimeInMicros);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)

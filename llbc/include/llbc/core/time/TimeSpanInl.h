@@ -30,49 +30,49 @@ inline std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSp
 
 __LLBC_NS_BEGIN
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromDays(int days, int hours, int minutes, int seconds, int millisecs, int microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromDays(int days, int hours, int minutes, int seconds, int millis, int micros)
 {
     return LLBC_TimeSpan(days * LLBC_TimeConst::NumOfMicrosPerDay +
                          hours * LLBC_TimeConst::NumOfMicrosPerHour +
                          minutes * LLBC_TimeConst::NumOfMicrosPerMinute +
                          seconds * LLBC_TimeConst::NumOfMicrosPerSecond +
-                         millisecs * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                         microsecs);
+                         millis * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                         micros);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromHours(int hours, int minutes, int seconds, int millisecs, int microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromHours(int hours, int minutes, int seconds, int millis, int micros)
 {
     return LLBC_TimeSpan(hours * LLBC_TimeConst::NumOfMicrosPerHour +
                          minutes * LLBC_TimeConst::NumOfMicrosPerMinute +
                          seconds * LLBC_TimeConst::NumOfMicrosPerSecond +
-                         millisecs * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                         microsecs);
+                         millis * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                         micros);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMinutes(int minutes, int seconds, int millisecs, int microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMinutes(int minutes, int seconds, int millis, int micros)
 {
     return LLBC_TimeSpan(minutes * LLBC_TimeConst::NumOfMicrosPerMinute +
                          seconds * LLBC_TimeConst::NumOfMicrosPerSecond +
-                         millisecs * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                         microsecs);
+                         millis * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                         micros);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromSeconds(int seconds, int millisecs, int microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromSeconds(int seconds, int millis, int micros)
 {
     return LLBC_TimeSpan(seconds * LLBC_TimeConst::NumOfMicrosPerSecond +
-                         millisecs * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                         microsecs);
+                         millis * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                         micros);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMilliseconds(sint64 millisecs, sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMillis(sint64 millis, sint64 micros)
 {
-    return LLBC_TimeSpan(millisecs * LLBC_TimeConst::NumOfMicrosPerMillisecond +
-                         microsecs);
+    return LLBC_TimeSpan(millis * LLBC_TimeConst::NumOfMicrosPerMillisecond +
+                         micros);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromMicroseconds(sint64 microsecs)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromMicros(sint64 micros)
 {
-    return LLBC_TimeSpan(microsecs);
+    return LLBC_TimeSpan(micros);
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const LLBC_String &spanStr)
@@ -112,13 +112,13 @@ inline int LLBC_TimeSpan::GetSeconds() const
          LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
-inline int LLBC_TimeSpan::GetMilliseconds() const
+inline int LLBC_TimeSpan::GetMillis() const
 {
     return static_cast<int>((_span % LLBC_TimeConst::NumOfMicrosPerSecond) /
         LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
-inline int LLBC_TimeSpan::GetMicroseconds() const
+inline int LLBC_TimeSpan::GetMicros() const
 {
     return static_cast<int>(_span % LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
@@ -143,45 +143,45 @@ inline int LLBC_TimeSpan::GetTotalSeconds() const
     return static_cast<int>(_span / LLBC_TimeConst::NumOfMicrosPerSecond);
 }
 
-inline sint64 LLBC_TimeSpan::GetTotalMilliseconds() const
+inline sint64 LLBC_TimeSpan::GetTotalMillis() const
 {
     return static_cast<sint64>(_span / LLBC_TimeConst::NumOfMicrosPerMillisecond);
 }
 
-inline sint64 LLBC_TimeSpan::GetTotalMicroseconds() const
+inline sint64 LLBC_TimeSpan::GetTotalMicros() const
 {
     return _span;
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::AddDays(int days)
 {
-    return AddMicroseconds(LLBC_TimeConst::NumOfMicrosPerDay * days);
+    return AddMicros(LLBC_TimeConst::NumOfMicrosPerDay * days);
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::AddHours(int hours)
 {
-    return AddMicroseconds(LLBC_TimeConst::NumOfMicrosPerHour * hours);
+    return AddMicros(LLBC_TimeConst::NumOfMicrosPerHour * hours);
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::AddMinutes(int minutes)
 {
-    return AddMicroseconds(LLBC_TimeConst::NumOfMicrosPerMinute * minutes);
+    return AddMicros(LLBC_TimeConst::NumOfMicrosPerMinute * minutes);
 }
 
 inline LLBC_TimeSpan LLBC_TimeSpan::AddSeconds(int seconds)
 {
-    return AddMicroseconds(LLBC_TimeConst::NumOfMicrosPerSecond * seconds);
+    return AddMicros(LLBC_TimeConst::NumOfMicrosPerSecond * seconds);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::AddMilliseconds(sint64 milliSeconds)
+inline LLBC_TimeSpan LLBC_TimeSpan::AddMillis(sint64 millis)
 {
-    return AddMicroseconds(LLBC_TimeConst::NumOfMicrosPerMillisecond * milliSeconds);
+    return AddMicros(LLBC_TimeConst::NumOfMicrosPerMillisecond * millis);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::AddMicroseconds(sint64 microSeconds)
+inline LLBC_TimeSpan LLBC_TimeSpan::AddMicros(sint64 micros)
 {
     LLBC_TimeSpan span;
-    span._span = _span + microSeconds;
+    span._span = _span + micros;
 
     return span;
 }
@@ -282,10 +282,10 @@ inline LLBC_String LLBC_TimeSpan::ToString() const
     int days = GetDays();
     if (days != 0)
         return LLBC_String().format("%d %02d:%02d:%02d.%06d", 
-            days, GetHours(), GetMinutes(), GetSeconds(), GetMilliseconds() * 1000 + GetMicroseconds());
+            days, GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
     else
         return LLBC_String().format("%02d:%02d:%02d.%06d",
-            GetHours(), GetMinutes(), GetSeconds(), GetMilliseconds() * 1000 + GetMicroseconds());
+            GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
 }
 
 inline void LLBC_TimeSpan::Serialize(LLBC_Stream &stream) const

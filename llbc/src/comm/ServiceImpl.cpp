@@ -2331,7 +2331,7 @@ void LLBC_ServiceImpl::ProcessIdle()
 
             LLBC_Component *&comp = caredComps[compIdx];
             if (LIKELY(comp->_started))
-                comp->OnIdle(LLBC_TimeSpan::FromMilliseconds(_frameInterval - elapsed));
+                comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
         }
     }
 }

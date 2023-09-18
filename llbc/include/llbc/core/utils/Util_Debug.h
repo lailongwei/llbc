@@ -69,14 +69,14 @@ public:
     uint64 GetCPUCount() const;
 
     int ToSeconds() const;
-    sint64 ToMilliseconds() const;
-    sint64 ToMicroseconds() const;
-    sint64 ToNanoseconds() const;
+    sint64 ToMillis() const;
+    sint64 ToMicros() const;
+    sint64 ToNanos() const;
 
     static int ToSeconds(uint64 cpuCount);
-    static sint64 ToMilliseconds(uint64 cpuCount);
-    static sint64 ToMicroseconds(uint64 cpuCount);
-    static sint64 ToNanoseconds(uint64 cpuCount);
+    static sint64 ToMillis(uint64 cpuCount);
+    static sint64 ToMicros(uint64 cpuCount);
+    static sint64 ToNanos(uint64 cpuCount);
 
     LLBC_String ToString() const;
 
