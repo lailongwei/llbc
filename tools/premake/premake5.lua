@@ -3,21 +3,8 @@
 --  @brief  The llbc library(included all wrap libraries) premake script define.
 
 -- #########################################################################
--- Global compile settings
 
--- flags.
-IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
-
--- solution/projects path
-SLN_PATH = "../.."
-CORELIB_PATH = SLN_PATH .. "/llbc"
-TESTSUITE_PATH = SLN_PATH .. "/testsuite"
-WRAPS_PATH = SLN_PATH .. "/wrap"
-PY_WRAP_PATH = WRAPS_PATH .. "/pyllbc"
-LU_WRAP_PATH = WRAPS_PATH .. "/lullbc"
-CS_WRAP_PATH = WRAPS_PATH .. "/csllbc"
-
--- Capture shell cmd's output
+-- Capture shell cmd's output function define.
 local function os_capture(cmd, raw)
     local f = assert(io.popen(cmd, 'r'))
     local s = assert(f:read('*a'))
@@ -28,6 +15,53 @@ local function os_capture(cmd, raw)
     s = string.gsub(s, '[\n\r]+', ' ')
     return s
 end
+
+-- custom c/cpp toolset setting function define.
+function set_custom_ccpp_toolset(toolset_bin_path)
+    -- copy toolset default variables/functions from gcc/clang toolset.
+    local custom_ccpp_toolset = {}
+    local orig_gcc_tool = premake.tools.gcc -- or premake.tools.clang
+    for k, v in pairs(orig_gcc_tool) do
+        custom_ccpp_toolset[k] = v
+    end
+
+    -- override gettoolname() function.
+    function custom_ccpp_toolset.gettoolname(cfg, tool)
+        if tool == 'cc' then
+            return toolset_bin_path .. '/gcc'
+        elseif tool == 'cxx' then
+            return toolset_bin_path .. '/g++'
+        elseif tool == 'ar' then
+            return toolset_bin_path .. '/ar'
+        else
+            return nil
+        end
+    end
+
+    -- install to premake.
+    premake.tools.custom_ccpp_toolset = custom_ccpp_toolset
+end
+
+-- #########################################################################
+-- Global compile settings.
+
+-- set compile toolset.
+local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolset or nil/''
+
+-- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custm_ccpp_toolset'.
+-- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
+
+-- flags.
+IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
+
+---- solution/projects path
+SLN_PATH = "../.."
+CORELIB_PATH = SLN_PATH .. "/llbc"
+TESTSUITE_PATH = SLN_PATH .. "/testsuite"
+WRAPS_PATH = SLN_PATH .. "/wrap"
+PY_WRAP_PATH = WRAPS_PATH .. "/pyllbc"
+LU_WRAP_PATH = WRAPS_PATH .. "/lullbc"
+CS_WRAP_PATH = WRAPS_PATH .. "/csllbc"
 
 -- PY target
 local PY
@@ -139,6 +173,11 @@ project "llbc"
     language "c++"
     kind "SharedLib"
 
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
     -- files
     files {
         SLN_PATH .. "/CHANGELOG",
@@ -205,6 +244,11 @@ project "testsuite"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
+
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
 
     -- dependents
     dependson {
@@ -326,6 +370,11 @@ project "pyllbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
 
     -- dependents
     dependson {
@@ -488,6 +537,11 @@ project "csllbc_native"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
 
     -- dependents
     dependson {
@@ -657,6 +711,11 @@ project "lullbc_lualib"
     language "c++"
     kind "SharedLib"
 
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
     -- files
     files {
         LUA_SRC_PATH .. "/*.h",
@@ -696,6 +755,11 @@ project "lullbc_luaexec"
     -- language, kind
     language "c++"
     kind "ConsoleApp"
+
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
 
     -- files
     files {
@@ -750,6 +814,11 @@ project "lullbc"
     -- language, kind
     language "c++"
     kind "SharedLib"
+
+    -- toolset
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
 
     -- dependents
     dependson {
