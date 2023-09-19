@@ -333,7 +333,11 @@ int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(LLBC_Service *))
     return Post(LLBC_Delegate<void(LLBC_Service *)>(obj, method));
 }
 
+#if LLBC_DEBUG
+inline
+#else
 LLBC_FORCE_INLINE
+#endif
 void LLBC_Service::GetCompName(const char *qualifiedCompName,
                                char(&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
                                size_t &compNameLen)
