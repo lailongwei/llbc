@@ -21,6 +21,7 @@ build/
 output/
 
 # wrap/lullbc
+wrap/lullbc/script/llbc.lua
 wrap/lullbc/src/_LullbcMethods.h
 
 # wrap/pyllbc
