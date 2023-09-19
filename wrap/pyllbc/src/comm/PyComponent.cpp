@@ -33,15 +33,6 @@ namespace
     typedef pyllbc_ComponentEvBuilder _EvBuilder;
 }
 
-namespace
-{
-    void DecRefPyObj(void *obj)
-    {
-        PyObject *pyObj = reinterpret_cast<PyObject *>(obj);
-        Py_DECREF(pyObj);
-    }
-}
-
 pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 : LLBC_Component(LLBC_ComponentEvents::AllEvents)
 , _svc(svc)
