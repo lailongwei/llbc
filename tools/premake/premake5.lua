@@ -106,7 +106,7 @@ workspace ("llbc_" .. _ACTION)
     filter {}
 
     -- not use cxx11 abi.
-    filter { "language:c++", "toolset:gcc or clang" }
+    filter { "language:c++", "system:not windows" }
     defines {
         "_GLIBCXX_USE_CXX11_ABI=0",
     }
