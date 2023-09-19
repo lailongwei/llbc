@@ -640,7 +640,7 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
 
     // Repeat add check.
     if (std::find_if(_willRegComps.begin(),
-                _willRegComps.end(),
+                     _willRegComps.end(),
                      findLambda) != _willRegComps.end() ||
         std::find_if(_compList.begin(),
                      _compList.end(),
