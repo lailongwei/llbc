@@ -46,7 +46,7 @@ end
 -- Global compile settings.
 
 -- set compile toolset.
-local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolset or nil/''
+local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolset.
 
 -- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custm_ccpp_toolset'.
 -- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
@@ -54,7 +54,7 @@ local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolse
 -- flags.
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
 
----- solution/projects path
+---- solution/projects path.
 SLN_PATH = "../.."
 CORELIB_PATH = SLN_PATH .. "/llbc"
 TESTSUITE_PATH = SLN_PATH .. "/testsuite"
@@ -63,7 +63,7 @@ PY_WRAP_PATH = WRAPS_PATH .. "/pyllbc"
 LU_WRAP_PATH = WRAPS_PATH .. "/lullbc"
 CS_WRAP_PATH = WRAPS_PATH .. "/csllbc"
 
--- PY target
+-- PY target.
 local PY
 if IS_WINDOWS then
     PY = "$(ProjectDir)../../tools/py.exe"
@@ -76,7 +76,7 @@ else
     end
 end
 
--- All libraries output directory
+-- All libraries output directory.
 LLBC_OUTPUT_BASE_DIR = SLN_PATH .. "/output/" .. _ACTION
 if IS_WINDOWS then
     LLBC_OUTPUT_DIR = LLBC_OUTPUT_BASE_DIR .. "/$(Configuration)"
@@ -87,17 +87,17 @@ end
 -- #########################################################################
 
 workspace ("llbc_" .. _ACTION)
-    -- location define
+    -- location define.
     location (SLN_PATH .. "/build/" .. _ACTION)
-    -- target directory define
+    -- target directory define.
     targetdir (LLBC_OUTPUT_DIR)
-    -- start project
+    -- start project.
     startproject("testsuite")
 
-    -- configurations
+    -- configurations.
     configurations { "release32", "debug32", "release64", "debug64" }
 
-    -- architecture
+    -- architecture.
     filter { "configurations:*32" }
         architecture "x86"
     filter {}
@@ -105,24 +105,24 @@ workspace ("llbc_" .. _ACTION)
         architecture "x86_64"
     filter {}
 
-    -- not use cxx11 abi
+    -- not use cxx11 abi.
     filter { "language:c++", "toolset:gcc or clang" }
     defines {
         "_GLIBCXX_USE_CXX11_ABI=0",
     }
     filter {}
 
-    -- defines
+    -- defines.
     filter { "configurations:debug*" }
         defines {
             "DEBUG"
         }
     filter {}
 
-    -- enable symbols
+    -- enable symbols.
     symbols "On"
 
-    -- set optimize options
+    -- set optimize options.
     filter { "configurations:debug*" }
         runtime "Debug"
         optimize "Debug"
@@ -131,7 +131,7 @@ workspace ("llbc_" .. _ACTION)
         optimize "On"
     filter {}
 
-    -- warnings setting
+    -- warnings setting.
     filter { "system:windows", "language:c++" }
         disablewarnings {
             "4091",
@@ -146,39 +146,39 @@ workspace ("llbc_" .. _ACTION)
         }
     filter {}
 
-    -- set debug target suffix
+    -- set debug target suffix.
     filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
 
-    -- enable multithread compile(only avabilable on windows)
+    -- enable multithread compile(only avabilable on windows).
     filter { "system:windows" }
         flags { "MultiProcessorCompile", "NoMinimalRebuild" }
     filter {}
 
-    -- characterset architecture
+    -- characterset architecture.
     filter { "language:c++" }
         characterset "MBCS"
     filter {}
 
-    -- enable obtaining backtraces from within a program
+    -- enable obtaining backtraces from within a program.
     filter { "system:not windows", "language:c++" }
         linkoptions { "-rdynamic" }
     filter {}
 
 -- ****************************************************************************
--- llbc core library compile setting
+-- llbc core library compile setting.
 project "llbc"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "SharedLib"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- files
+    -- files.
     files {
         SLN_PATH .. "/CHANGELOG",
         SLN_PATH .. "/README.md",
@@ -196,16 +196,16 @@ project "llbc"
         }
     filter {}
 
-    -- includedirs
+    -- includedirs.
     includedirs {
         SLN_PATH,
         CORELIB_PATH .. "/include",
     }
 
-    -- target prefix
+    -- target prefix.
     targetprefix "lib"
 
-    -- links
+    -- links.
     filter { "system:linux" }
         links {
             "dl",
@@ -239,23 +239,23 @@ project "llbc"
     filter {}
 
 -- ****************************************************************************
--- core library testsuite compile setting
+-- core library testsuite compile setting.
 project "testsuite"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "ConsoleApp"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
     }
 
-    -- files
+    -- files.
     files {
         TESTSUITE_PATH .. "/**.h",
         TESTSUITE_PATH .. "/**.cpp",
@@ -264,13 +264,13 @@ project "testsuite"
         TESTSUITE_PATH .. "/**.ini",
     }
 
-    -- includedirswrap\csllbc\csharp\script_tools
+    -- includedirswrap\csllbc\csharp\script_tools.
     includedirs {
         CORELIB_PATH .. "/include",
         TESTSUITE_PATH,
     }
 
-    -- links
+    -- links.
     libdirs { LLBC_OUTPUT_DIR }
     filter { "system:linux" }
         links {
@@ -309,7 +309,7 @@ project "testsuite"
         }
     filter {}
 
-    -- warnings
+    -- warnings.
     -- filter { "system:not windows" }
     --     disablewarnings {
     --         "invalid-source-encoding",
@@ -352,8 +352,8 @@ project "testsuite"
 group "wrap"
 
 -- ****************************************************************************
--- python wrap library(pyllbc) compile setting
--- import pylib_setting
+-- python wrap library(pyllbc) compile setting.
+-- import pylib_setting.
 package.path = package.path .. ";" .. "../../wrap/pyllbc/?.lua"
 local PYLIB_SETTING = require "pylib_setting"
 local PYLIB_PY_VER = PYLIB_SETTING.py_ver or 2
@@ -367,21 +367,21 @@ local PYLIB_INCL_PATH = (PYLIB_SETTING.py_path[1] ~= nil and PYLIB_SETTING.py_pa
 local PYLIB_LIB_DIR = (PYLIB_SETTING.py_path[2] ~= nil and PYLIB_SETTING.py_path[2] ~= "") and PYLIB_SETTING.py_path[2] or ""
 local PYLIB_LIB_NAME = (PYLIB_SETTING.py_path[3] ~= nil and PYLIB_SETTING.py_path[3] ~= "") and PYLIB_SETTING.py_path[3] or ""
 project "pyllbc"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "SharedLib"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
     }
 
-    -- files
+    -- files.
     files {
         PY_WRAP_PATH .. "/include/**.h",
         PY_WRAP_PATH .. "/src/**.h",
@@ -402,7 +402,7 @@ project "pyllbc"
         }
     end
 
-    -- includedirs
+    -- includedirs.
     includedirs {
         CORELIB_PATH .. "/include",
 
@@ -435,20 +435,20 @@ project "pyllbc"
         defines { "HAVE_ROUND" }
     filter {}
 
-    -- prebuild commands
+    -- prebuild commands.
     prebuildcommands {
         PY .. " ../../tools/building_script/py_prebuild.py pyllbc",
     }
 
-    -- target name, target prefix, extension
+    -- target name, target prefix, extension.
     targetname "llbc"
     targetprefix ""
     filter { "system:windows" }
         targetextension ".pyd"
     filter {}
 
-    -- links
-    -- link llbc library
+    -- links.
+    -- link llbc library.
     libdirs { LLBC_OUTPUT_DIR }
 
     filter { "system:windows", "configurations:debug*" }
@@ -465,7 +465,7 @@ project "pyllbc"
         links { "llbc" }
     filter {}
 
-    -- link python library
+    -- link python library.
     if string.len(PYLIB_LIB_DIR) > 0 then
         libdirs { PYLIB_LIB_DIR }
     else
@@ -488,7 +488,7 @@ project "pyllbc"
     if string.len(PYLIB_LIB_NAME) > 0 then
         links { PYLIB_LIB_NAME }
     else
-        -- in windows platform, python library use the python library file in the repo
+        -- in windows platform, python library use the python library file in the repo.
         filter { "system:windows", "configurations:debug*" }
             if PYLIB_PY_VER == 2 then
                 links { "python27_d" }
@@ -504,7 +504,7 @@ project "pyllbc"
             end
         filter {}
 
-        -- in non-windows platform, python library default named: python2.7
+        -- in non-windows platform, python library default named: python2.7.
         filter { "system:not windows" }
             if PYLIB_PY_VER == 2 then
                 links { "python2.7" }
@@ -532,38 +532,38 @@ project "pyllbc"
 group "wrap/csllbc"
 
 -- ****************************************************************************
--- csharp wrap library(csllbc) native library compile setting
+-- csharp wrap library(csllbc) native library compile setting.
 project "csllbc_native"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "SharedLib"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
     }
 
-    -- library suffix
+    -- library suffix.
     targetprefix "lib"
 
-    -- files
+    -- files.
     files {
         CS_WRAP_PATH .. "/native/**.h",
         CS_WRAP_PATH .. "/native/**.cpp",
     }
 
-    -- includedirs
+    -- includedirs.
     includedirs {
         CORELIB_PATH .. "/include",
         CS_WRAP_PATH .. "/native/include",
     }
 
-    -- links
+    -- links.
     libdirs {
         LLBC_OUTPUT_DIR,
     }
@@ -588,7 +588,7 @@ project "csllbc_native"
         }
     filter {}
 
-    -- disable warnings
+    -- disable warnings.
     filter { "system:not windows" }
         disablewarnings {
             "attributes"
@@ -611,27 +611,27 @@ project "csllbc_native"
 
 
 -- ****************************************************************************
--- csharp wrap library(csllbc) compile setting
+-- csharp wrap library(csllbc) compile setting.
 project "csllbc"
-    -- language, kind
+    -- language, kind.
     kind "SharedLib"
     language "c#"
 
-    -- files
+    -- files.
     files {
         CS_WRAP_PATH .. "/csharp/**.cs",
     }
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
         "csllbc_native",
     }
 
-    -- set unsafe flag
+    -- set unsafe flag.
     clr "Unsafe"
 
-    -- prebuild commands
+    -- prebuild commands.
     filter { "system:windows" }
         prebuildcommands {
             PY .. ' -c "import os;print(os.getcwd())"',
@@ -647,14 +647,14 @@ project "csllbc"
         }
     filter {}
 
-    -- postbuild commands
+    -- postbuild commands.
     filter { "system:not windows" }
         postbuildcommands {
             PY .. " ../../wrap/csllbc/csharp/script_tools/gen_dll_cfg.py ../../output/" .. _ACTION,
         }
     filter {}
 
-    -- defines
+    -- defines.
     filter { "system:linux" }
         defines {
             "CSLLBC_TARGET_PLATFORM_LINUX",
@@ -666,7 +666,7 @@ project "csllbc"
         }
     filter {}
 
-    -- links
+    -- links.
     filter {}
     links {
         "System",
@@ -675,25 +675,25 @@ project "csllbc"
     }
 
 -- ****************************************************************************
--- csharp wrap library(csllbc) testsuite compile setting
+-- csharp wrap library(csllbc) testsuite compile setting.
 project "csllbc_testsuite"
-    -- language, kind
+    -- language, kind.
     kind "ConsoleApp"
     language "c#"
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
         "csllbc_native",
         "csllbc",
     }
 
-    -- files
+    -- files.
     files {
         CS_WRAP_PATH .. "/testsuite/**.cs",
     }
 
-    -- links
+    -- links.
     links {
         "System",
         "System.Net",
@@ -704,19 +704,19 @@ project "csllbc_testsuite"
 group "wrap/lullbc"
 
 -- ****************************************************************************
--- luasrc library(liblua) compile setting
+-- luasrc library(liblua) compile setting.
 local LUA_SRC_PATH = "../../wrap/lullbc/lua"
 project "lullbc_lualib"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "SharedLib"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- files
+    -- files.
     files {
         LUA_SRC_PATH .. "/*.h",
         LUA_SRC_PATH .. "/*.c",
@@ -727,7 +727,7 @@ project "lullbc_lualib"
         LUA_SRC_PATH .. "/onelua.c",
     }
 
-    -- defines
+    -- defines.
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
@@ -740,46 +740,46 @@ project "lullbc_lualib"
         defines { "LUA_USE_DLOPEN" }
     filter {}
 
-    -- links
+    -- links.
     filter { "system:not windows" }
         links { "dl" }
     filter {}
 
-    -- target name, target prefix
+    -- target name, target prefix.
     targetname "lua"
     targetprefix "lib"
 
--- lua executable compile setting
+-- lua executable compile setting.
 local LUA_SRC_PATH = LU_WRAP_PATH .. "/lua"
 project "lullbc_luaexec"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "ConsoleApp"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- files
+    -- files.
     files {
         LUA_SRC_PATH .. "/*.h",
         LUA_SRC_PATH .. "/lua.c",
     }
 
-    -- defines
+    -- defines.
     defines {
         "LUA_COMPAT_5_1",
         "LUA_COMPAT_5_2",
         "LUA_COMPAT_5_3",
     }
 
-    -- dependents
+    -- dependents.
     dependson {
         "lullbc_lualib"
     }
 
-    -- links 
+    -- links.
     libdirs { 
         LLBC_OUTPUT_DIR,
     }
@@ -801,33 +801,33 @@ project "lullbc_luaexec"
         links { "lua" }
     filter {}
  
-    -- target name, target prefix
+    -- target name, target prefix.
     targetname "lua"
 
--- lua wrap library(lullbc) compile setting
--- import lualib_setting
+-- lua wrap library(lullbc) compile setting.
+-- import lualib_setting.
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
 local LUALIB_SETTING = require "lualib_setting"
 local LUALIB_INCL_PATH = (LUALIB_SETTING.lua_path[1] ~= nil and LUALIB_SETTING.lua_path[1] ~= "") and LUALIB_SETTING.lua_path[1] or LUA_SRC_PATH
 local LUALIB_LIB_DIR = (LUALIB_SETTING.lua_path[2] ~= nil and LUALIB_SETTING.lua_path[2] ~= "") and LUALIB_SETTING.lua_path[2] or LLBC_OUTPUT_DIR
 project "lullbc"
-    -- language, kind
+    -- language, kind.
     language "c++"
     kind "SharedLib"
 
-    -- toolset
+    -- toolset.
     if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
         toolset(llbc_ccpp_compile_toolset)
     end
 
-    -- dependents
+    -- dependents.
     dependson {
         "llbc",
         "lullbc_lualib",
         "lullbc_luaexec",
     }
 
-    -- files
+    -- files.
     files {
         LU_WRAP_PATH .. "/lua/*.h",
 
@@ -842,12 +842,12 @@ project "lullbc"
         LU_WRAP_PATH .. "/testsuite/**.cfg",
     }
 
-    -- define targetextension
+    -- define targetextension.
     filter { "system:macosx" }
         targetextension ".so"
     filter {}
 
-    -- includedirs
+    -- includedirs.
     includedirs {
         LUALIB_INCL_PATH,
         CORELIB_PATH .. "/include",
@@ -855,14 +855,14 @@ project "lullbc"
         LU_WRAP_PATH,
     }
 
-    -- defines
+    -- defines.
     filter { "system:windows", "action:vs2013 and vs2015 and vs2017" }
     defines {
         "HAVE_ROUND",
     }
     filter {}
 
-    -- prebuild commands
+    -- prebuild commands.
     filter { "configurations:debug*" }
         prebuildcommands {
             PY .. " ../../tools/building_script/lu_prebuild.py lullbc debug",
@@ -881,11 +881,11 @@ project "lullbc"
         }
     filter {}
 
-    -- target name, target prefix, extension
+    -- target name, target prefix, extension.
     targetname "_lullbc"
     targetprefix ""
 
-    -- links 
+    -- links.
     libdirs { 
         LLBC_OUTPUT_DIR,
         LUALIB_LIB_DIR,
@@ -941,7 +941,7 @@ project "lullbc"
         }
     filter {}
 
-    -- linkoptions
+    -- linkoptions.
     filter { "system:macosx" }
     	linkoptions {
             "-undefined dynamic_lookup",
