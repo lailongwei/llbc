@@ -336,7 +336,7 @@ private:                                    \
  * RTTI support.
  */
 // Define rtti buffer size.
- #define __LLBC_RTTI_BUF_SIZE    512
+ #define __LLBC_RTTI_BUF_SIZE    (32 * 1024)
 
 /**
  * Component generic call method convenience macros define.
