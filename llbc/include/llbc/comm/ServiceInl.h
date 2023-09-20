@@ -333,49 +333,4 @@ int LLBC_Service::Post(ObjType *obj, void (ObjType::*method)(LLBC_Service *))
     return Post(LLBC_Delegate<void(LLBC_Service *)>(obj, method));
 }
 
-#if LLBC_DEBUG
-inline
-#else
-LLBC_FORCE_INLINE
-#endif
-void LLBC_Service::GetCompName(const char *qualifiedCompName,
-                               char(&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
-                               size_t &compNameLen)
-{
-    #if LLBC_TARGET_PLATFORM_WIN32
-    compNameLen = strlen(qualifiedCompName);
-    #else // Non-Win32
-    int demangleStatus;
-    char demangledCompName[sizeof(compName)];
-    size_t demangledLen = sizeof(demangledCompName);
-    abi::__cxa_demangle(qualifiedCompName,
-                        demangledCompName,
-                        &demangledLen,
-                        &demangleStatus);
-    if (LIKELY(demangleStatus == 0))
-    {
-        qualifiedCompName = demangledCompName;
-        compNameLen = demangledLen;
-    }
-    else
-    {
-        compNameLen = strlen(qualifiedCompName);
-    }
-    #endif // Win32
-
-    const char *compNameBeg = qualifiedCompName + compNameLen - 1;
-    while (compNameBeg != qualifiedCompName)
-    {
-        --compNameBeg;
-        if (*compNameBeg == ':')
-        {
-            ++compNameBeg;
-            break;
-        }
-    }
-
-    compNameLen -= (compNameBeg - qualifiedCompName);
-    memcpy(compName, compNameBeg, compNameLen + 1);
-}
-
 __LLBC_NS_END
