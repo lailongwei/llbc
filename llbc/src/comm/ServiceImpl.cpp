@@ -1004,6 +1004,7 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
         fullFrame = false;
 
     while (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::Started &&
+                    _runningPhase != LLBC_ServiceRunningPhase::StartingComps &&
                     _runningPhase != LLBC_ServiceRunningPhase::StoppingComps))
     {
         LLBC_DoIf(fullFrame, LLBC_Sleep(_frameInterval));
@@ -2171,11 +2172,8 @@ void LLBC_ServiceImpl::StopComps()
     }
 
     // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
-    if (_runningPhase >= LLBC_ServiceRunningPhase::StoppingComps &&
-        _runningPhase <= LLBC_ServiceRunningPhase::Stopping)
+    if (_runningPhase == LLBC_ServiceRunningPhase::StoppingComps)
         _runningPhase = LLBC_ServiceRunningPhase::Stopping;
-
-    if (_runningPhase)
 
     // Stop poller mgr.
     _pollerMgr.Stop();
