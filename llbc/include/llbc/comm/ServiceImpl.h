@@ -584,10 +584,11 @@ private:
     LLBC_String _name; // Service Name.
     LLBC_ServiceDriveMode::ENUM _driveMode; // Drive mode(ExternalDrive or InternalDrive).
     LLBC_ThreadId _svcThreadId; // Service thread Id(which thread drive this service).
-    bool _inCleaning; // Cleaning flag.
+    volatile bool _inCleaning; // Cleaning flag.
     volatile bool _sinkIntoOnSvcLoop; // Sink into OnSvc() loop flag.
     LLBC_ServiceMgr &_svcMgr; // Owned service manager.
     mutable LLBC_RecursiveLock _lock; // Service lock.
+    volatile bool _serviceBeginLoop; // Service begin loop flag.
     volatile LLBC_ServiceRunningPhase::ENUM _runningPhase; // Service running phase.
     typedef void (LLBC_ServiceImpl::*_EvHandler)(LLBC_ServiceEvent &);
     static _EvHandler _evHandlers[LLBC_ServiceEventType::End]; // Service event handlers slot.

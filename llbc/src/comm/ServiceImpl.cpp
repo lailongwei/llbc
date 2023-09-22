@@ -101,6 +101,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _inCleaning(false)
 , _sinkIntoOnSvcLoop(false)
 , _svcMgr(*LLBC_ServiceMgrSingleton)
+, _serviceBeginLoop(false)
 , _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
 
 , _startErrNo(0)
@@ -282,6 +283,9 @@ int LLBC_ServiceImpl::Start(int pollerCount)
 
     // Update _runningPhase to Started phase.
     _runningPhase = LLBC_ServiceRunningPhase::Started;
+    // Waiting for _serviceBeginLoop flag set to true.
+    while (!_serviceBeginLoop)
+        LLBC_Sleep(1);
 
     return LLBC_OK;
 }
@@ -1274,6 +1278,7 @@ void LLBC_ServiceImpl::Svc()
         LLBC_Sleep(1);
 
     // Do Svc.
+    _serviceBeginLoop = true;
     while (LIKELY(_runningPhase == LLBC_ServiceRunningPhase::Started))
         OnSvc();
 }
@@ -1297,6 +1302,8 @@ void LLBC_ServiceImpl::Cleanup()
     // Post-Stop.
     PostStop();
 
+    // Reset _serviceBeginLoop flag.
+    _serviceBeginLoop = false;
     // Update _runningPhase to <NotStarted>.
     _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
 }
