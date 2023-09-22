@@ -284,8 +284,11 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     // Update _runningPhase to Started phase.
     _runningPhase = LLBC_ServiceRunningPhase::Started;
     // Waiting for _serviceBeginLoop flag set to true.
-    while (!_serviceBeginLoop)
-        LLBC_Sleep(1);
+    if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
+    {
+        while (!_serviceBeginLoop)
+            LLBC_Sleep(1);
+    }
 
     return LLBC_OK;
 }
