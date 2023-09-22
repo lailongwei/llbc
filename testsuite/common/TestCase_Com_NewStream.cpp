@@ -140,16 +140,18 @@ int TestCase_Com_NewStream::CtorTest()
         LLBC_PrintLn("Construct by buf and size(attach = %s):", attach ? "true" : "false");
         LLBC_PrintLn("- buf:%p, size:%lu", buf, size);
         LLBC_PrintLn("- stream:%s", stream.ToString().c_str());
-        LLBC_LogAndReturnIf(!(stream.IsAttach() == attach &&
-                              stream.GetEndian() == LLBC_DefaultEndian &&
-                              (attach ? stream.GetBuf() == buf : stream.GetBuf() != buf) &&
-                              stream.GetReadPos() == 0 &&
-                              stream.GetWritePos() == size &&
-                              stream.GetCap() == size), Error, LLBC_FAILED);
+        LLBC_LogAndReturnIfNot(stream.IsAttach() == attach &&
+                               stream.GetEndian() == LLBC_DefaultEndian &&
+                               (attach ? stream.GetBuf() == buf : stream.GetBuf() != buf) &&
+                               stream.GetReadPos() == 0 &&
+                               stream.GetWritePos() == size &&
+                               stream.GetCap() == size,
+                               Error,
+                               LLBC_FAILED);
 
-        LLBC_LogAndReturnIf(memcmp(stream.GetBuf(), "hello", sizeof("hello")) != 0,
-                            Error,
-                            LLBC_FAILED);
+        LLBC_LogAndReturnIfNot(memcmp(stream.GetBuf(), "hello", sizeof("hello")) == 0,
+                               Error,
+                               LLBC_FAILED);
 
         return LLBC_OK;
     };
