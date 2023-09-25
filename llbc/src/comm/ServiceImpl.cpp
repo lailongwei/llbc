@@ -156,7 +156,7 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
     // Forbid destroy service in service thread and not in <NotStarted> phase.
     if (_driveMode == LLBC_ServiceDriveMode::ExternalDrive)
         ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
-               LLBC_GetCurrentThreadId() != _svcThreadId);
+               LLBC_GetCurrentThreadId() == _svcThreadId);
 
     // Stop service and destroy comps).
     Stop();
