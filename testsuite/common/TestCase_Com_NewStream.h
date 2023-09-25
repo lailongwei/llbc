@@ -33,4 +33,6 @@ private:
     int CtorTest();
     int AttachTest();
     int SwapTest();
+    int EndianTest();
+    int RWPosTest();
 };

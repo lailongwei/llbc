@@ -28,6 +28,8 @@ int TestCase_Com_NewStream::Run(int argc, char *argv[])
     LLBC_LogAndReturnIfNot(CtorTest() == LLBC_OK, Error, LLBC_FAILED);
     LLBC_LogAndReturnIfNot(AttachTest() == LLBC_OK, Error, LLBC_FAILED);
     LLBC_LogAndReturnIfNot(SwapTest() == LLBC_OK, Error, LLBC_FAILED);
+    LLBC_LogAndReturnIfNot(EndianTest() == LLBC_OK, Error, LLBC_FAILED);
+    LLBC_LogAndReturnIfNot(RWPosTest() == LLBC_OK, Error, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -363,6 +365,111 @@ int TestCase_Com_NewStream::SwapTest()
                            LLBC_FAILED);
     LLBC_LogAndReturnIfNot(stream1.GetWritePos() == stream2WritePos &&
                            stream2.GetWritePos() == stream1WritePos,
+                           Error,
+                           LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::EndianTest()
+{
+    LLBC_PrintLn("Endian test:");
+
+    // Test default stream endian.
+    LLBC_Stream stream;
+    LLBC_PrintLn("- Default stream endian is:%s", LLBC_Endian::Type2Str(stream.GetEndian()));
+    LLBC_LogAndReturnIfNot(stream.GetEndian() == LLBC_DefaultEndian, Error, LLBC_FAILED);
+
+    // Test big endian.
+    LLBC_Stream beStream;
+    beStream.SetEndian(LLBC_Endian::BigEndian);
+    beStream << 1;
+    LLBC_PrintLn("- Big endian stream:%s", beStream.ToString().c_str());
+    LLBC_LogAndReturnIfNot(beStream.GetBuf<uint8>()[0] == 0 &&
+                           beStream.GetBuf<uint8>()[sizeof(int) - 1] == 1,
+                           Error,
+                           LLBC_FAILED);
+
+    // Test little endian.
+    LLBC_Stream leStream;
+    leStream.SetEndian(LLBC_Endian::LittleEndian);
+    leStream << 1;
+    LLBC_PrintLn("- Little endian stream:%s", leStream.ToString().c_str());
+    LLBC_LogAndReturnIfNot(leStream.GetBuf<uint8>()[0] == 1 &&
+                           leStream.GetBuf<uint8>()[sizeof(int) - 1] == 0,
+                           Error,
+                           LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::RWPosTest()
+{
+    LLBC_PrintLn("RWPos test:");
+
+    // Test default stream cap/rpos/wpos.
+    LLBC_Stream stream;
+    LLBC_PrintLn("- Default stream:%s", stream.ToString().c_str());
+    LLBC_LogAndReturnIfNot(stream.GetCap() == 0 &&
+                           stream.GetReadPos() == 0 &&
+                           stream.GetWritePos() == 0,
+                           Error,
+                           LLBC_FAILED);
+
+    // Test Recap().
+    LLBC_PrintLn("- Test recap");
+    for (int i = 0; i < 10; ++i)
+    {
+        const size_t oldCap = stream.GetCap();
+        const size_t recapSize = LLBC_Rand(2048);
+
+        const bool recapRet = stream.Recap(recapSize);
+        LLBC_PrintLn("  - Recap %lu -> %lu, ret:%s",
+                     oldCap, recapSize, recapRet ? "true" : "false");
+        LLBC_LogAndReturnIfNot(recapSize >= oldCap ? recapRet : !recapRet,
+                               Error,
+                               LLBC_FAILED);
+    }
+
+    // Test SetWritePos().
+    LLBC_PrintLn("- Test set wpos:");
+    for (int i = 0; i < 10; ++i)
+    {
+        const size_t oldWPos = stream.GetWritePos();
+        const size_t newWPos = LLBC_Rand(stream.GetCap() * 2);
+
+        const bool setWPosRet = stream.SetWritePos(newWPos);
+        LLBC_PrintLn("  - Set wpos %lu -> %lu, cap:%lu, ret:%s",
+                     oldWPos, newWPos, stream.GetCap(), setWPosRet ? "true" : "false");
+        LLBC_LogAndReturnIfNot(newWPos <= stream.GetCap() ? setWPosRet : !setWPosRet,
+                               Error,
+                               LLBC_FAILED);
+    }
+
+    // Test SetReadPos().
+    LLBC_PrintLn("- Test set rpos:");
+    stream.SetWritePos(stream.GetCap() / 2);
+    for (int i = 0; i < 10; ++i)
+    {
+        const size_t oldRPos = stream.GetReadPos();
+        const size_t newRPos = LLBC_Rand(stream.GetCap() + 1);
+
+        const bool setRPosRet = stream.SetReadPos(newRPos);
+        LLBC_PrintLn("  - Set rpos %lu -> %lu, rpos:%lu, ret:%s",
+                     oldRPos, newRPos, stream.GetWritePos(), setRPosRet ? "true" : "false");;
+        LLBC_LogAndReturnIfNot(newRPos <= stream.GetWritePos() ? setRPosRet : !setRPosRet,
+                               Error,
+                               LLBC_FAILED);
+    }
+
+    // Test auto normalize rpos.
+    LLBC_PrintLn("- Test auto normalize rpos:");
+    stream.Recap(4096);
+    stream.SetWritePos(stream.GetCap() / 2);
+    stream.SetReadPos(stream.GetWritePos() / 2);
+    stream.SetWritePos(stream.GetReadPos() - 1);
+    LLBC_PrintLn("  - Auto normalized rpos, stream:%s", stream.ToString().c_str());
+    LLBC_LogAndReturnIfNot(stream.GetReadPos() == stream.GetWritePos(),
                            Error,
                            LLBC_FAILED);
 
