@@ -98,10 +98,10 @@ int LLBC_GetConsoleColor(FILE *file)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    return LLBC_INTERNAL_NS __g_consoleColor[fileNo - 1];
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
     CONSOLE_SCREEN_BUFFER_INFO info;
@@ -131,11 +131,11 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)] = color;
+    LLBC_INTERNAL_NS __g_consoleColor[fileNo - 1] = color;
     return LLBC_OK;
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
     if (::SetConsoleTextAttribute(handle, color) == 0)
@@ -203,8 +203,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     }
     funlockfile(file);
     #else // Win32
-    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
 
     lock.Lock();
     fprintf(file, newline ? "%s\n" : "%s", buf);
@@ -237,7 +236,7 @@ int LLBC_FlushFile(FILE *file)
     return LLBC_OK;
 #else // Win32
     const int fileNo = LLBC_File::GetFileNo(file);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
     if (UNLIKELY(fflush(file) != 0))

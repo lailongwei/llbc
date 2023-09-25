@@ -23,6 +23,7 @@
 
 #include "llbc/core/singleton/Singleton.h"
 #include "llbc/core/thread/DummyLock.h"
+#include "llbc/core/thread/FastLock.h"
 #include "llbc/core/log/Logger.h"
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
@@ -135,6 +136,7 @@ private:
     std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 
     static LLBC_String _rootLoggerName;
+    static LLBC_FastLock _uninitColorfulOutputLock;
 };
 
 /**
