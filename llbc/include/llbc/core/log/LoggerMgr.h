@@ -509,7 +509,6 @@ public:
 #define LLBC_ErrorAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Error, ##__VA_ARGS__)
 #define LLBC_FatalAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Fatal, ##__VA_ARGS__)
 
-
 #define LLBC_WarnAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Warn, ret, ##__VA_ARGS__)
 #define LLBC_ErrorAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Error, ret, ##__VA_ARGS__)
 #define LLBC_FatalAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Fatal, ret, ##__VA_ARGS__)
