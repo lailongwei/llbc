@@ -488,6 +488,42 @@ public:
 #define LLBC_LogAndReturnIfNot(cond, logLv, ret, ...) LLBC_LogAndReturnIf(!(cond), logLv, ret, ##__VA_ARGS__)
 #define LLBC_LogAndExitIfNot(cond, logLv, exitCode, ...) LLBC_LogAndExitIf(!(cond), logLv, exitCode, ##__VA_ARGS__)
 
+#define LLBC_WarnAndDoIf(cond, behav, ...) LLBC_LogAndDoIf(cond, Warn, behav, ##__VA_ARGS__)
+#define LLBC_ErrorAndDoIf(cond, behav, ...) LLBC_LogAndDoIf(cond, Error, behav, ##__VA_ARGS__)
+#define LLBC_FatalAndDoIf(cond, behav, ...) LLBC_LogAndDoIf(cond, Fatal, behav, ##__VA_ARGS__)
+#define LLBC_WarnAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Warn, behav, ##__VA_ARGS__)
+#define LLBC_ErrorAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Error, behav, ##__VA_ARGS__)
+#define LLBC_FatalAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Fatal, behav, ##__VA_ARGS__)
+
+#define LLBC_WarnAndContinueIf(cond, ...) LLBC_LogAndContinueIf(cond, Warn, ##__VA_ARGS__)
+#define LLBC_ErrorAndContinueIf(cond, ...) LLBC_LogAndContinueIf(cond, Error, ##__VA_ARGS__)
+#define LLBC_FatalAndContinueIf(cond, ...) LLBC_LogAndContinueIf(cond, Fatal, ##__VA_ARGS__)
+#define LLBC_WarnAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Warn, ##__VA_ARGS__)
+#define LLBC_ErrorAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Error, ##__VA_ARGS__)
+#define LLBC_FatalAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Fatal, ##__VA_ARGS__)
+
+#define LLBC_WarnAndBreakIf(cond, ...) LLBC_LogAndBreakIf(cond, Warn, ##__VA_ARGS__)
+#define LLBC_ErrorAndBreakIf(cond, ...) LLBC_LogAndBreakIf(cond, Error, ##__VA_ARGS__)
+#define LLBC_FatalAndBreakIf(cond, ...) LLBC_LogAndBreakIf(cond, Fatal, ##__VA_ARGS__)
+#define LLBC_WarnAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Warn, ##__VA_ARGS__)
+#define LLBC_ErrorAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Error, ##__VA_ARGS__)
+#define LLBC_FatalAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Fatal, ##__VA_ARGS__)
+
+
+#define LLBC_WarnAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Warn, ret, ##__VA_ARGS__)
+#define LLBC_ErrorAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Error, ret, ##__VA_ARGS__)
+#define LLBC_FatalAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Fatal, ret, ##__VA_ARGS__)
+#define LLBC_WarnAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Warn, ret, ##__VA_ARGS__)
+#define LLBC_ErrorAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Error, ret, ##__VA_ARGS__)
+#define LLBC_FatalAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Fatal, ret, ##__VA_ARGS__)
+
+#define LLBC_WarnAndExitIf(cond, exitCode, ...) LLBC_LogAndExitIf(cond, Warn, exitCode, ##__VA_ARGS__)
+#define LLBC_ErrorAndExitIf(cond, exitCode, ...) LLBC_LogAndExitIf(cond, Error, exitCode, ##__VA_ARGS__)
+#define LLBC_FatalAndExitIf(cond, exitCode, ...) LLBC_LogAndExitIf(cond, Fatal, exitCode, ##__VA_ARGS__)
+#define LLBC_WarnAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Warn, exitCode, ##__VA_ARGS__)
+#define LLBC_ErrorAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Error, exitCode, ##__VA_ARGS__)
+#define LLBC_FatalAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Fatal, exitCode, ##__VA_ARGS__)
+
 __LLBC_NS_END
 
 #include "llbc/core/log/LoggerMgrInl.h"
