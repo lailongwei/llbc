@@ -504,7 +504,9 @@ int TestCase_Com_NewStream::SkipRWTest()
         LLBC_PrintLn("  - Skip write, skip:%d(to wpos:%lld), ret:%s, stream:%s",
                      skip, newWPos, skipWRet ? "true" : "false", stream.ToString().c_str());
 
-        LLBC_LogAndReturnIfNot(newWPos < 0 || newWPos > stream.GetCap() ? !skipWRet : skipWRet,
+        LLBC_LogAndReturnIfNot(newWPos < 0 ||
+                                   newWPos > static_cast<sint64>(stream.GetCap()) ?
+                                   !skipWRet : skipWRet,
                                Error,
                                LLBC_FAILED);
     }
@@ -523,7 +525,9 @@ int TestCase_Com_NewStream::SkipRWTest()
         LLBC_PrintLn("  - Skip read, skip:%d(to rpos:%lld), ret:%s, stream:%s",
                      skip, newRPos, skipRRet ? "true" : "false", stream.ToString().c_str());
 
-        LLBC_LogAndReturnIfNot(newRPos < 0 || newRPos > stream.GetWritePos() ? !skipRRet : skipRRet,
+        LLBC_LogAndReturnIfNot(newRPos < 0 ||
+                                   newRPos > static_cast<sint64>(stream.GetWritePos()) ?
+                                   !skipRRet : skipRRet,
                                Error,
                                LLBC_FAILED);
     }
