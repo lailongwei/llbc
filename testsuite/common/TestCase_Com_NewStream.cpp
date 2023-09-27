@@ -30,6 +30,9 @@ int TestCase_Com_NewStream::Run(int argc, char *argv[])
     LLBC_LogAndReturnIfNot(SwapTest() == LLBC_OK, Error, LLBC_FAILED);
     LLBC_LogAndReturnIfNot(EndianTest() == LLBC_OK, Error, LLBC_FAILED);
     LLBC_LogAndReturnIfNot(RWPosTest() == LLBC_OK, Error, LLBC_FAILED);
+    LLBC_LogAndReturnIfNot(SkipRWTest() == LLBC_OK, Error, LLBC_FAILED);
+    LLBC_LogAndReturnIfNot(ReadableSizeTest() == LLBC_OK, Error, LLBC_FAILED);
+    LLBC_LogAndReturnIfNot(WritableSizeTest() == LLBC_OK, Error, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -433,10 +436,10 @@ int TestCase_Com_NewStream::RWPosTest()
 
     // Test SetWritePos().
     LLBC_PrintLn("- Test set wpos:");
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 11; ++i)
     {
         const size_t oldWPos = stream.GetWritePos();
-        const size_t newWPos = LLBC_Rand(stream.GetCap() * 2);
+        const size_t newWPos = i < 10 ? LLBC_Rand(stream.GetCap() * 2) : stream.GetCap();
 
         const bool setWPosRet = stream.SetWritePos(newWPos);
         LLBC_PrintLn("  - Set wpos %lu -> %lu, cap:%lu, ret:%s",
@@ -449,10 +452,10 @@ int TestCase_Com_NewStream::RWPosTest()
     // Test SetReadPos().
     LLBC_PrintLn("- Test set rpos:");
     stream.SetWritePos(stream.GetCap() / 2);
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 11; ++i)
     {
         const size_t oldRPos = stream.GetReadPos();
-        const size_t newRPos = LLBC_Rand(stream.GetCap() + 1);
+        const size_t newRPos = i < 10 ? LLBC_Rand(stream.GetCap() + 1) : stream.GetWritePos();
 
         const bool setRPosRet = stream.SetReadPos(newRPos);
         LLBC_PrintLn("  - Set rpos %lu -> %lu, rpos:%lu, ret:%s",
@@ -472,6 +475,116 @@ int TestCase_Com_NewStream::RWPosTest()
     LLBC_LogAndReturnIfNot(stream.GetReadPos() == stream.GetWritePos(),
                            Error,
                            LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::SkipRWTest()
+{
+    LLBC_PrintLn("Skip rpos/wpos test:");
+
+    // Test skip default stream(cap:0, r/w pos:0).
+    LLBC_Stream stream;
+    auto skipReadRet = stream.SkipRead(20);
+    auto skipWriteRet = stream.SkipWrite(40);
+    LLBC_PrintLn("- Skip default stream read:%s", skipReadRet ? "true" : "false");
+    LLBC_PrintLn("- Skip default stream write:%s", skipWriteRet ? "true" : "false");
+
+    // Recap stream to 8192.
+    stream.Recap(8192);
+
+    // Test skip write..
+    for (int i = 0; i < 10; ++i)
+    {
+        int skip = LLBC_Rand(-static_cast<int>(stream.GetCap()),
+                         static_cast<int>(stream.GetCap() + 1));
+
+        const auto newWPos = static_cast<sint64>(stream.GetWritePos()) + skip;
+        const auto skipWRet = stream.SkipWrite(skip);
+        LLBC_PrintLn("  - Skip write, skip:%d(to wpos:%lld), ret:%s, stream:%s",
+                     skip, newWPos, skipWRet ? "true" : "false", stream.ToString().c_str());
+
+        LLBC_LogAndReturnIfNot(newWPos < 0 || newWPos > stream.GetCap() ? !skipWRet : skipWRet,
+                               Error,
+                               LLBC_FAILED);
+    }
+
+    // Set stream wpos to cap/2.
+    stream.SetWritePos(stream.GetCap() / 2);
+
+    // Test skip read.
+    for (int i = 0; i < 10; ++i)
+    {
+        int skip = LLBC_Rand(-static_cast<int>(stream.GetWritePos()),
+                         static_cast<int>(stream.GetWritePos() + 1));
+
+        const auto newRPos = static_cast<sint64>(stream.GetReadPos()) + skip;
+        const auto skipRRet = stream.SkipRead(skip);
+        LLBC_PrintLn("  - Skip read, skip:%d(to rpos:%lld), ret:%s, stream:%s",
+                     skip, newRPos, skipRRet ? "true" : "false", stream.ToString().c_str());
+
+        LLBC_LogAndReturnIfNot(newRPos < 0 || newRPos > stream.GetWritePos() ? !skipRRet : skipRRet,
+                               Error,
+                               LLBC_FAILED);
+    }
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::ReadableSizeTest()
+{
+    LLBC_PrintLn("Readable size test:");
+
+    // Test default stream readable size.
+    LLBC_Stream stream;
+    LLBC_PrintLn("- Default stream readable size:%lu", stream.GetReadableSize());
+    LLBC_ErrorAndReturnIfNot(stream.GetReadableSize() == 0, LLBC_FAILED);
+
+    // Set cap&write pos to 4096.
+    stream.Recap(4096);
+    stream.SetWritePos(stream.GetCap());
+    LLBC_PrintLn("  - Set stream cap&wpos to %lu for test", stream.GetWritePos());
+
+    // Test.
+    for (int i = 0; i < 10; ++i)
+    {
+        const size_t readPos = LLBC_Rand(0, static_cast<int>(stream.GetWritePos()) + 1);
+
+        stream.SetReadPos(readPos);
+        LLBC_PrintLn("  - Set read pos, readPos:%lu, readableSize:%lu",
+                     readPos, stream.GetReadableSize());
+
+        LLBC_ErrorAndReturnIfNot(stream.GetReadableSize() == stream.GetWritePos() - readPos,
+                                 LLBC_FAILED);
+    }
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_NewStream::WritableSizeTest()
+{
+    LLBC_PrintLn("Writable size test:");
+
+    // Test default stream writable size.
+    LLBC_Stream stream;
+    LLBC_PrintLn("- Default stream writable size:%lu", stream.GetWritableSize());
+
+    // Set cap pos to 4096.
+    stream.Recap(4096);
+    LLBC_PrintLn("  - Set stream cap to %lu for test", stream.GetCap());
+
+    // Test.
+    for (int i = 0; i < 10; ++i)
+    {
+        const size_t writePos = LLBC_Rand(0, static_cast<int>(stream.GetCap()) + 1);
+
+        stream.SetWritePos(writePos);
+        LLBC_PrintLn("  - Set write pos, writePos:%lu, writableSize:%lu",
+                     writePos, stream.GetWritableSize());
+
+        LLBC_ErrorAndReturnIfNot(stream.GetWritableSize() == stream.GetCap() - writePos,
+                                 LLBC_FAILED);
+    }
 
     return LLBC_OK;
 }

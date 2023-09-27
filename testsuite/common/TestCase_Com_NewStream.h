@@ -35,4 +35,7 @@ private:
     int SwapTest();
     int EndianTest();
     int RWPosTest();
+    int SkipRWTest();
+    int ReadableSizeTest();
+    int WritableSizeTest();
 };
