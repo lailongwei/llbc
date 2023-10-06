@@ -147,9 +147,9 @@
 // Default file rolling mode: no rolling.
 #define LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE              0
 // Default max log file size.
-#define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
+#define LLBC_CFG_LOG_MAX_FILE_SIZE                          (1024 * 1024 * 1024)
 // Default max backup file index.
-#define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       1000
+#define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       10
 // Default log file buffer size, in bytes.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE           40960
 // Default log appenders flush interval, in milli-seconds.
