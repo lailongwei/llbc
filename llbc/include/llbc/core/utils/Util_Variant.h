@@ -83,6 +83,14 @@ public:
      * @param[out] var - the variant object.
      */
     static void Xml2Variant(const ::llbc::tinyxml2::XMLElement &elem, LLBC_Variant &var);
+
+    /**
+     * Convert property to variant.
+     * 
+     * @param[in] prop - the property object.
+     * @param[out] var - the variant object.
+     */
+    static void Property2Variant(const LLBC_Property &prop, LLBC_Variant &var);
 };
 
 __LLBC_NS_END
