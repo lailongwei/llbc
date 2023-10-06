@@ -21,16 +21,7 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
-
-__LLBC_NS_BEGIN
-
-/**
- * Previous declare some classes.
- */
-class LLBC_Variant;
-
-__LLBC_NS_END
+#include "llbc/core/variant/Variant.h"
 
 __LLBC_NS_BEGIN
 
