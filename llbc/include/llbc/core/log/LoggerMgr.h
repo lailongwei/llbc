@@ -56,7 +56,7 @@ public:
 public:
     /**
      * Initialize logger manager using config file.
-     * @param[in] cfgFile - config file.
+     * @param[in] cfgFile - config file, for now, supported property/xml format.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Initialize(const LLBC_String &cfgFile);

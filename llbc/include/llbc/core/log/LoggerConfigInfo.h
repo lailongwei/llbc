@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_Property;
+class LLBC_Variant;
 
 __LLBC_NS_END
 
@@ -52,7 +52,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int Initialize(const LLBC_String &loggerName,
-                   const LLBC_Property &cfg,
+                   const LLBC_Variant &cfg,
                    const LLBC_LoggerConfigInfo *rootCfg);
 
 public:

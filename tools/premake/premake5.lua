@@ -342,6 +342,7 @@ project "testsuite"
     local test_cfgs = {
         "core/config/IniTestCfg.ini",
         "core/log/LogTestCfg.cfg",
+        "core/log/LogTestCfg.xml",
         "app/AppCfgTest.cfg",
         "app/AppCfgTest.ini",
         "app/AppCfgTest.xml",
