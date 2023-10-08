@@ -83,6 +83,11 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
                 loggerCfg[logCfgItem[LLBC_XMLKeys::Name]] = logCfgItem[LLBC_XMLKeys::Value];
         }
     }
+    else
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
+        return LLBC_FAILED;
+    }
 
     // Create root logger config info.
     const LLBC_Variant &rootCfg = cfg[LLBC_CFG_LOG_ROOT_LOGGER_NAME];
