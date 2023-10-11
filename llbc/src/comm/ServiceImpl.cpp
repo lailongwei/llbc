@@ -1384,47 +1384,58 @@ void LLBC_ServiceImpl::AddServiceToTls()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int idx = 0;
-    const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; ++idx)
+    for (int idx = 0; idx < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++idx)
     {
         if (!tls->commTls.services[idx])
-            break;
+        {
+            tls->commTls.services[idx] = this;
+            return;
+        }
     }
 
-    tls->commTls.services[idx] = this;
+    ASSERT(false && "llbc framework internal error");
 }
 
 void LLBC_ServiceImpl::RemoveServiceFromTls()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int idx = 0;
+    int svcCnt = 0;
+    int svcIdx = -1;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; ++idx)
+    for (; svcCnt < lmt; ++svcCnt)
     {
-        if (tls->commTls.services[idx] == this)
+        if (!tls->commTls.services[svcCnt])
             break;
+
+        if (tls->commTls.services[svcCnt] == this)
+            svcIdx = svcCnt;
     }
 
-    memmove(&tls->commTls.services[idx],
-            &tls->commTls.services[idx + 1],
-            sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
+    if (UNLIKELY(svcCnt == 0 || svcIdx == -1))
+        return;
+
+    if (svcIdx != svcCnt - 1)
+    {
+        memmove(&tls->commTls.services[svcIdx],
+                &tls->commTls.services[svcIdx + 1],
+                sizeof(tls->commTls.services[0]) * (svcCnt - svcIdx - 1));
+    }
+
+    tls->commTls.services[svcCnt - 1] = nullptr;
 }
 
 bool LLBC_ServiceImpl::IsCanContinueDriveService()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int checkIdx = 0;
-    const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; checkIdx <= lmt; ++checkIdx)
+    for (int idx = 0; idx < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++idx)
     {
-        if (tls->commTls.services[checkIdx] == nullptr)
-            break;
+        if (!tls->commTls.services[idx])
+            return true;
     }
 
-    return checkIdx < lmt ? true : false;
+    return false;
 }
 
 int LLBC_ServiceImpl::PreStart()

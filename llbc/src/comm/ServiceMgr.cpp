@@ -118,11 +118,14 @@ bool LLBC_ServiceMgr::InTls(const LLBC_Service *svc)
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     void **svcs = tls->commTls.services;
-    for (int i = 0;
-         i <= LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-         ++i)
-        if (reinterpret_cast<LLBC_Service *>(svcs[i]) == svc)
+    for (int i = 0; i < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++i)
+    {
+        if (svcs[i] == nullptr)
+            return false;
+
+        if (svcs[i] == svc)
             return true;
+    }
 
     return false;
 }
