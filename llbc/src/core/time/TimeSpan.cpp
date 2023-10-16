@@ -52,7 +52,7 @@ LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
     if (dayIdx != LLBC_String::npos)
     {
         _span = atoll(strippedSpan.substr(0, dayIdx).c_str()) *
-            LLBC_TimeConst::NumOfMicrosPerDay;
+            LLBC_TimeConst::numOfMicrosPerDay;
         strippedSpan = strippedSpan.substr(dayIdx + 1);
     }
     else
@@ -66,16 +66,16 @@ LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
     if (hmsParts.size() >= 2)
     {
         _span += atoll(hmsParts[hmsParts.size() - 2].c_str()) *
-            LLBC_TimeConst::NumOfMicrosPerMinute;
+            LLBC_TimeConst::numOfMicrosPerMinute;
         if (hmsParts.size() >= 3)
             _span += atoll(hmsParts[hmsParts.size() - 3].c_str()) *
-                LLBC_TimeConst::NumOfMicrosPerHour;
+                LLBC_TimeConst::numOfMicrosPerHour;
     }
 
     LLBC_Strings secParts = secSpan.strip().split('.', 1);
-    _span += atoll(secParts[0].c_str()) * LLBC_TimeConst::NumOfMicrosPerSecond;
+    _span += atoll(secParts[0].c_str()) * LLBC_TimeConst::numOfMicrosPerSecond;
     if (secParts.size() == 2)
-        _span += atoll(secParts[1].c_str()) * LLBC_TimeConst::NumOfMicrosPerMillisecond;
+        _span += atoll(secParts[1].c_str()) * LLBC_TimeConst::numOfMicrosPerMillisecond;
 }
 
 __LLBC_NS_END

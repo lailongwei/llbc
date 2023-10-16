@@ -31,7 +31,7 @@ LULLBC_LUA_METH int _lullbc_Util_CPUTimeToUTCTime(lua_State *l)
 {
     const uint64 cpuTsc = lua_tointeger(l, 1);
     lua_pushnumber(l, LLBC_CPUTime(cpuTsc).ToNanos() / 
-        static_cast<double>(LLBC_TimeConst::NumOfNanosPerMillisecond));
+        static_cast<double>(LLBC_TimeConst::numOfNanosPerMillisecond));
 
     return 1;
 }

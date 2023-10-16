@@ -60,12 +60,12 @@ inline sint64 LLBC_Time::NowTimestampInMicros()
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
-    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::NumOfMicrosPerSecond);
+    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::numOfMicrosPerSecond);
 }
 
 inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMillis)
 {
-    return LLBC_Time(clanderTimeInMillis * LLBC_TimeConst::NumOfMicrosPerMillisecond);
+    return LLBC_Time(clanderTimeInMillis * LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
 inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicros)
@@ -75,13 +75,13 @@ inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicros)
 
 inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
 {
-    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConst::NumOfMicrosPerSecond + timeVal.tv_usec);
+    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConst::numOfMicrosPerSecond + timeVal.tv_usec);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
 {
-    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConst::NumOfMicrosPerSecond +
-                     timeSpec.tv_nsec / LLBC_TimeConst::NumOfNanosPerMicrosecond);
+    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConst::numOfMicrosPerSecond +
+                     timeSpec.tv_nsec / LLBC_TimeConst::numOfNanosPerMicrosecond);
 }
 
 inline int LLBC_Time::GetYear() const
@@ -131,12 +131,12 @@ inline int LLBC_Time::GetSecond() const
 
 inline time_t LLBC_Time::GetTimestampInSecs() const
 {
-    return static_cast<time_t>(_time / LLBC_TimeConst::NumOfMicrosPerSecond);
+    return static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
 }
 
 inline sint64 LLBC_Time::GetTimestampInMillis() const
 {
-    return _time / LLBC_TimeConst::NumOfMicrosPerMillisecond;
+    return _time / LLBC_TimeConst::numOfMicrosPerMillisecond;
 }
 
 inline sint64 LLBC_Time::GetTimestampInMicros() const
