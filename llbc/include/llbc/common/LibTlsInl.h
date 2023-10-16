@@ -105,7 +105,7 @@ struct LLBC_EXPORT __LLBC_LibTls
     struct
     {
         /* Services pointer. */
-        void *services[LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT + 1];
+        void *services[LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT];
     } commTls;
 
     __LLBC_LibTls();
