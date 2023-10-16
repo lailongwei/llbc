@@ -326,7 +326,7 @@ void TestCase_Core_Time_Time::GetIntervalToTest()
         std::cout << "  - fromTime: " << fromTime
             << "(" << LLBC_TimeConst::dayOfWeekDesc[fromTime.GetDayOfWeek()] << ")" << std::endl;
         std::cout << "  - toTimeOfWeek: " << toTimeOfWeek
-            << "(" << LLBC_TimeConst::GetdayOfWeekDesc(toTimeOfWeek.GetTotalDays()) << ")" << std::endl;
+            << "(" << LLBC_TimeConst::GetDayOfWeekDesc(toTimeOfWeek.GetTotalDays()) << ")" << std::endl;
         std::cout << "  - intervalTo: "
             << fromTime.GetIntervalToTimeOfWeek(toTimeOfWeek) << std::endl;
     };
@@ -442,7 +442,7 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
         std::cout << "  - to:   " << to
             << "(" << LLBC_TimeConst::dayOfWeekDesc[to.GetDayOfWeek()] << ")" << std::endl;
         std::cout << "  - timeOfWeek: " << timeOfWeek
-            << "(" << LLBC_TimeConst::GetdayOfWeekDesc(timeOfWeek.GetTotalDays()) << ")" << std::endl;
+            << "(" << LLBC_TimeConst::GetDayOfWeekDesc(timeOfWeek.GetTotalDays()) << ")" << std::endl;
         const bool crossed = LLBC_Time::IsCrossedWeek(from, to, timeOfWeek);
         std::cout <<"   - crossed: " << crossed << std::endl;
         if (crossed != exceptCrossed)

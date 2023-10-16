@@ -46,7 +46,7 @@ const char *LLBC_TimeConst::dayOfWeekBriefDesc[7] {
     "Sat"
 };
 
-const char *LLBC_TimeConst::GetdayOfWeekDesc(int dayOfWeek, bool brief)
+const char *LLBC_TimeConst::GetDayOfWeekDesc(int dayOfWeek, bool brief)
 {
     return (brief ? dayOfWeekBriefDesc : dayOfWeekDesc)[
         dayOfWeek >= 0 ? dayOfWeek % 7 : (dayOfWeek % 7 + 7)];

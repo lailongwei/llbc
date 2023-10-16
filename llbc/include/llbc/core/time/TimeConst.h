@@ -84,7 +84,7 @@ public:
      * @param[in] dayOfWeek - day of week.
      * @return const char * - the day of week describe.
      */
-    static const char *GetdayOfWeekDesc(int dayOfWeek, bool brief = false);
+    static const char *GetDayOfWeekDesc(int dayOfWeek, bool brief = false);
 };
 
 __LLBC_NS_END
