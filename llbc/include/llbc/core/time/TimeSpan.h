@@ -122,26 +122,28 @@ public:
     LLBC_TimeSpan AddMillis(sint64 millis);
     LLBC_TimeSpan AddMicros(sint64 micros);
 
-    LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator *(double scale) const;
-    LLBC_TimeSpan operator /(double scale) const;
-    LLBC_TimeSpan operator %(sint64 span) const;
+    LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator*(double scale) const;
+    LLBC_TimeSpan operator/(double scale) const;
+    LLBC_TimeSpan operator%(sint64 span) const;
+    LLBC_TimeSpan operator%(const LLBC_TimeSpan &span) const;
 
-    LLBC_TimeSpan &operator +=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator -=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator *=(double scale);
-    LLBC_TimeSpan &operator /=(double scale);
-    LLBC_TimeSpan &operator %=(sint64 scale);
+    LLBC_TimeSpan &operator+=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator-=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator*=(double scale);
+    LLBC_TimeSpan &operator/=(double scale);
+    LLBC_TimeSpan &operator%=(sint64 span);
+    LLBC_TimeSpan &operator%=(const LLBC_TimeSpan &span);
 
-    bool operator ==(const LLBC_TimeSpan &span) const;
-    bool operator !=(const LLBC_TimeSpan &span) const;
-    bool operator <(const LLBC_TimeSpan &span)const;
-    bool operator >(const LLBC_TimeSpan &span) const;
-    bool operator <=(const LLBC_TimeSpan &span) const;
-    bool operator >=(const LLBC_TimeSpan &span) const;
+    bool operator==(const LLBC_TimeSpan &span) const;
+    bool operator!=(const LLBC_TimeSpan &span) const;
+    bool operator<(const LLBC_TimeSpan &span)const;
+    bool operator>(const LLBC_TimeSpan &span) const;
+    bool operator<=(const LLBC_TimeSpan &span) const;
+    bool operator>=(const LLBC_TimeSpan &span) const;
 
-    LLBC_TimeSpan &operator =(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator=(const LLBC_TimeSpan &span);
 
 public:
     /**
@@ -154,7 +156,7 @@ public:
     /**
      * Stream output operator support.
      */
-    friend std::ostream & ::operator <<(std::ostream &o, const LLBC_TimeSpan &s);
+    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_TimeSpan &s);
 
 public:
     /**

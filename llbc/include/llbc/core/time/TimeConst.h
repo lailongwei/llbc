@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The time constant variables define.
  */
-class LLBC_TimeConst
+class LLBC_EXPORT LLBC_TimeConst
 {
 public:
     static constexpr int NumOfSecondsPerDay = 86400; // Number of seconds per-day.
@@ -67,6 +67,24 @@ public:
     static constexpr sint64 NumOfNanosPerMillisecond = 1000000; // Number of nano-seconds per-millisecond.
 
     static constexpr sint64 NumOfNanosPerMicrosecond = 1000; // Number of nano-seconds per-microsecond.
+
+public:
+    /**
+     * Day of week describe, started by Sunday.
+     */
+    static const char *DayOfWeekDesc[7];
+
+    /**
+     * Day of week brief describe, started by Sunday.
+     */
+    static const char *DayOfWeekBriefDesc[7];
+
+    /**
+     * Get day of week describe, started by Sunday.
+     * @param[in] dayOfWeek - day of week.
+     * @return const char * - the day of week describe.
+     */
+    static const char *GetDayOfWeekDesc(int dayOfWeek, bool brief = false);
 };
 
 __LLBC_NS_END

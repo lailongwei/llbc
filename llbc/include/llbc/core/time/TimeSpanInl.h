@@ -23,7 +23,7 @@
 
 #include "llbc/core/time/TimeConst.h"
 
-inline std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span)
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span)
 {
     return stream <<span.ToString();
 }
@@ -186,92 +186,103 @@ inline LLBC_TimeSpan LLBC_TimeSpan::AddMicros(sint64 micros)
     return span;
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator +(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator+(const LLBC_TimeSpan &span) const
 {
     return LLBC_TimeSpan(_span + span._span);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator -(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator-(const LLBC_TimeSpan &span) const
 {
     return LLBC_TimeSpan(_span - span._span);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator *(double scale) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator*(double scale) const
 {
     return LLBC_TimeSpan(static_cast<sint64>(_span * scale));
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator /(double scale) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator/(double scale) const
 {
     return LLBC_TimeSpan(static_cast<sint64>(_span / scale));
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::operator %(sint64 scale) const
+inline LLBC_TimeSpan LLBC_TimeSpan::operator%(sint64 span) const
 {
-    return LLBC_TimeSpan(_span % scale);
+    return LLBC_TimeSpan(_span % span);
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator +=(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan LLBC_TimeSpan::operator%(const LLBC_TimeSpan &span) const
+{
+    return LLBC_TimeSpan(_span % span._span);
+}
+
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator+=(const LLBC_TimeSpan &span)
 {
     _span += span._span;
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator -=(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator-=(const LLBC_TimeSpan &span)
 {
     _span -= span._span;
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator *=(double scale)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator*=(double scale)
 {
     _span = static_cast<sint64>(_span * scale);
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator /=(double scale)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator/=(double scale)
 {
     _span = static_cast<sint64>(_span / scale);
     return *this;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator %=(sint64 scale)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator%=(sint64 span)
 {
-    _span %= scale;
+    _span %= span;
     return *this;
 }
 
-inline bool LLBC_TimeSpan::operator ==(const LLBC_TimeSpan &span) const
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator%=(const LLBC_TimeSpan &span)
+{
+    _span %= span._span;
+    return *this;
+}
+
+inline bool LLBC_TimeSpan::operator==(const LLBC_TimeSpan &span) const
 {
     return _span == span._span;
 }
 
-inline bool LLBC_TimeSpan::operator !=(const LLBC_TimeSpan &span) const
+inline bool LLBC_TimeSpan::operator!=(const LLBC_TimeSpan &span) const
 {
     return !(*this == span);
 }
 
-inline bool LLBC_TimeSpan::operator <(const LLBC_TimeSpan &span) const
+inline bool LLBC_TimeSpan::operator<(const LLBC_TimeSpan &span) const
 {
     return _span < span._span;
 }
 
-inline bool LLBC_TimeSpan::operator >(const LLBC_TimeSpan &span) const
+inline bool LLBC_TimeSpan::operator>(const LLBC_TimeSpan &span) const
 {
     return _span > span._span;
 }
 
-inline bool LLBC_TimeSpan::operator <=(const LLBC_TimeSpan &span) const
+inline bool LLBC_TimeSpan::operator<=(const LLBC_TimeSpan &span) const
 {
     return _span<= span._span;
 }
 
-inline bool LLBC_TimeSpan::operator >=(const LLBC_TimeSpan &span) const
+inline bool LLBC_TimeSpan::operator>=(const LLBC_TimeSpan &span) const
 {
     return _span >= span._span;
 }
 
-inline LLBC_TimeSpan &LLBC_TimeSpan::operator =(const LLBC_TimeSpan &span)
+inline LLBC_TimeSpan &LLBC_TimeSpan::operator=(const LLBC_TimeSpan &span)
 {
     _span = span._span;
     return *this;
