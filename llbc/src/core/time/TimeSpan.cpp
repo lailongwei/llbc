@@ -30,11 +30,15 @@ __LLBC_NS_BEGIN
 
 const LLBC_TimeSpan LLBC_TimeSpan::zero = LLBC_TimeSpan::FromSeconds(0);
 const LLBC_TimeSpan LLBC_TimeSpan::oneSec = LLBC_TimeSpan::FromSeconds(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMillisec = LLBC_TimeSpan::FromMillis(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMicrosec = LLBC_TimeSpan::FromMicros(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneMin = LLBC_TimeSpan::FromMinutes(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneHour = LLBC_TimeSpan::FromHours(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneDay = LLBC_TimeSpan::FromDays(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneWeek = LLBC_TimeSpan::FromDays(7);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneSec = LLBC_TimeSpan::FromSeconds(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneMillisec = LLBC_TimeSpan::FromMillis(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneMicrosec = LLBC_TimeSpan::FromMicros(-1);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneMin = LLBC_TimeSpan::FromMinutes(-1);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneHour = LLBC_TimeSpan::FromHours(-1);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneDay = LLBC_TimeSpan::FromDays(-1);
