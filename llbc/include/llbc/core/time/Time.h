@@ -127,6 +127,11 @@ public:
      */
     LLBC_Time GetDate() const;
     /**
+     * Get current time of hour.
+     * @return LLBC_TimeSpan - the current time of hour.
+     */
+    LLBC_TimeSpan GetTimeOfHour() const;
+    /**
      * Get current time of day.
      * @return LLBC_TimeSpan - the current time of day.
      */
@@ -223,28 +228,42 @@ public:
 
 public:
     /**
-     * Get interval to time of day.
-     * @param[in] fromTime     - from time. 
-     * @param[in] toTimeOfDay  - to time of day.
+     * Get interval to time of hour.
+     * @param[in] toTimeOfHour - to time of hour.
      * @return LLBC_TimeSpan - interval value.
      */
-    static LLBC_TimeSpan GetIntervalToTimeOfDay(const LLBC_Time &fromTime,
-                                                const LLBC_TimeSpan &toTimeOfDay);
+    LLBC_TimeSpan GetIntervalToTimeOfHour(const LLBC_TimeSpan &toTimeOfHour) const;
+
+    /**
+     * Get interval to time of day.
+     * @param[in] toTimeOfDay - to time of day.
+     * @return LLBC_TimeSpan - interval value.
+     */
+    LLBC_TimeSpan GetIntervalToTimeOfDay(const LLBC_TimeSpan &toTimeOfDay) const;
 
     /**
      * Get interval to time of week.
-     * @param[in] fromTime      - from time. 
-     * @param[in] toTimeOfWeek  - to time of week.
+     * @param[in] toTimeOfWeek - to time of week.
      * @return LLBC_TimeSpan - interval value.
      */
-    static LLBC_TimeSpan GetIntervalToTimeOfWeek(const LLBC_Time &fromTime,
-                                                 const LLBC_TimeSpan &toTimeOfWeek);
+    LLBC_TimeSpan GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek) const;
 
 public:
     /**
+     * Verify that the given time(to) has been crossed hour or not.
+     * @param[in] from       - from time.
+     * @param[in] to         - to time.
+     * @param[in] timeOfHour - cross time of hour point.
+     * @return bool - return true if crossed day, otherwise return false.
+     */
+    static bool IsCrossedHour(const LLBC_Time &from,
+                              const LLBC_Time &to,
+                              const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+
+    /**
      * Verify that the given time(to) has been crossed day or not.
-     * @param[in] from - from time.
-     * @param[in] to   - to time.
+     * @param[in] from      - from time.
+     * @param[in] to        - to time.
      * @param[in] timeOfDay - cross time of day point.
      * @return bool - return true if crossed day, otherwise return false.
      */
@@ -267,18 +286,18 @@ public:
     /**
      * Time span operations.
      */
-    LLBC_TimeSpan operator -(const LLBC_Time &time) const;
-    LLBC_TimeSpan operator +(const LLBC_Time &time) const;
+    LLBC_TimeSpan operator-(const LLBC_Time &time) const;
+    LLBC_TimeSpan operator+(const LLBC_Time &time) const;
 
-    LLBC_Time operator +(const LLBC_TimeSpan &span) const;
-    LLBC_Time operator -(const LLBC_TimeSpan &span) const;
+    LLBC_Time operator+(const LLBC_TimeSpan &span) const;
+    LLBC_Time operator-(const LLBC_TimeSpan &span) const;
 
-    bool operator ==(const LLBC_Time &time) const;
-    bool operator !=(const LLBC_Time &time) const;
-    bool operator <(const LLBC_Time &time) const;
-    bool operator >(const LLBC_Time &time) const;
-    bool operator <=(const LLBC_Time &time) const;
-    bool operator >=(const LLBC_Time &time) const;
+    bool operator==(const LLBC_Time &time) const;
+    bool operator!=(const LLBC_Time &time) const;
+    bool operator<(const LLBC_Time &time) const;
+    bool operator>(const LLBC_Time &time) const;
+    bool operator<=(const LLBC_Time &time) const;
+    bool operator>=(const LLBC_Time &time) const;
 
     LLBC_Time &operator =(const LLBC_Time &time);
 
@@ -291,9 +310,9 @@ public:
 
 public:
     /**
-     * Stream output operator support.
+     * Stream output operatorsupport.
      */
-    friend std::ostream & ::operator <<(std::ostream &stream, const LLBC_Time &t);
+    friend std::ostream & ::operator<<(std::ostream &stream, const LLBC_Time &t);
 
 public:
     /**
@@ -313,6 +332,20 @@ private:
      * Update time structs(local&gmt)
      */
     void UpdateTimeStructs();
+
+    /**
+     * Get interval to time internal implement.
+     */
+    LLBC_TimeSpan GetIntervalTo(const LLBC_TimeSpan &timeCycle,
+                                LLBC_TimeSpan toTimeOfTimeCycle) const;
+
+    /**
+     * Crossed time-cycle internal implement. 
+     */
+    static bool IsCrossed(const LLBC_Time &from,
+                          const LLBC_Time &to,
+                          const LLBC_TimeSpan &timeCycle,
+                          LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;

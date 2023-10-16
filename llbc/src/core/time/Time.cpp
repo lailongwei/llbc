@@ -31,10 +31,21 @@
 #pragma warning(disable:4996)
 #endif
 
-std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
+std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
 {
-    return stream<<t.ToString();
+    return stream << t.ToString();
 }
+
+__LLBC_INTERNAL_NS_BEGIN
+
+static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
+    &LLBC_NS LLBC_Time::GetTimeOfHour,
+    &LLBC_NS LLBC_Time::GetTimeOfDay,
+    &LLBC_NS LLBC_Time::GetTimeOfWeek,
+    &LLBC_NS LLBC_Time::GetTimeOfMonth,
+};
+
+__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -187,12 +198,18 @@ LLBC_Time LLBC_Time::GetDate() const
     return LLBC_Time(datePart);
 }
 
+LLBC_TimeSpan LLBC_Time::GetTimeOfHour() const
+{
+    return LLBC_TimeSpan(
+        (_time - (LLBC_GetTimezone() * LLBC_TimeConst::NumOfMicrosPerSecond)) %
+            LLBC_TimeConst::NumOfMicrosPerHour);
+}
+
 LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
 {
-    sint64 timeZone = LLBC_GetTimezone() * LLBC_TimeConst::NumOfMicrosPerSecond;
-
-    sint64 localTime = _time - timeZone;
-    return LLBC_TimeSpan(localTime % LLBC_TimeConst::NumOfMicrosPerDay);
+    return LLBC_TimeSpan(
+        (_time - (LLBC_GetTimezone() * LLBC_TimeConst::NumOfMicrosPerSecond)) %
+            LLBC_TimeConst::NumOfMicrosPerDay);
 }
 
 LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
@@ -344,87 +361,27 @@ int LLBC_Time::GetMonthSpanDays(int year, int month)
     return LLBC_GetMonthSpanDays(year, month);
 }
 
-LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_Time &fromTime,
-                                                const LLBC_TimeSpan &toTimeOfDay)
-{
-    const LLBC_TimeSpan fromTimeOfDay = fromTime.GetTimeOfDay();
-    const LLBC_TimeSpan diff = toTimeOfDay - fromTimeOfDay;
-    return diff < LLBC_TimeSpan::zero ? diff + LLBC_TimeSpan::oneDay : diff;
-}
-
-LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_Time &fromTime,
-                                                 const LLBC_TimeSpan &toTimeOfWeek)
-{
-    const LLBC_TimeSpan fromTimeOfWeek = fromTime.GetTimeOfWeek();
-    const LLBC_TimeSpan diff = toTimeOfWeek - fromTimeOfWeek;
-    return diff < LLBC_TimeSpan::zero ? diff + LLBC_TimeSpan::oneWeek : diff;
-}
-
-bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
-                             const LLBC_Time &to,
-                             const LLBC_TimeSpan &timeOfDay)
-{
-    if (UNLIKELY(timeOfDay < LLBC_TimeSpan::zero ||
-        timeOfDay >= LLBC_TimeSpan::oneDay))
-        return false;
-
-    const LLBC_TimeSpan diff = to - from;
-    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return false;
-
-    if (diff >= LLBC_TimeSpan::oneDay)
-        return true;
-
-    const LLBC_TimeSpan &fromTimeOfDay = from.GetTimeOfDay();
-    const LLBC_TimeSpan &toTimeOfDay = to.GetTimeOfDay();
-    return (toTimeOfDay >= timeOfDay) &&
-        ((fromTimeOfDay < timeOfDay) ||
-         (fromTimeOfDay > timeOfDay && toTimeOfDay < fromTimeOfDay));
-}
-
-bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
-                              const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfWeek)
-{
-    if (UNLIKELY(timeOfWeek < LLBC_TimeSpan::zero ||
-        timeOfWeek >= LLBC_TimeSpan::oneWeek))
-        return false;
-
-    const LLBC_TimeSpan diff = to - from;
-    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return false;
-
-    if (diff >= LLBC_TimeSpan::oneWeek)
-        return true;
-
-    const LLBC_TimeSpan &fromTimeOfWeek = from.GetTimeOfWeek();
-    const LLBC_TimeSpan &toTimeOfWeek = to.GetTimeOfWeek();
-    return (toTimeOfWeek >= timeOfWeek) &&
-        ((fromTimeOfWeek < timeOfWeek) ||
-         (fromTimeOfWeek > timeOfWeek && toTimeOfWeek < fromTimeOfWeek));
-}
-
-LLBC_TimeSpan LLBC_Time::operator -(const LLBC_Time &time) const
+LLBC_TimeSpan LLBC_Time::operator-(const LLBC_Time &time) const
 {
     return LLBC_TimeSpan(_time - time._time);
 }
 
-LLBC_TimeSpan LLBC_Time::operator +(const LLBC_Time &time) const
+LLBC_TimeSpan LLBC_Time::operator+(const LLBC_Time &time) const
 {
     return LLBC_TimeSpan(_time - time._time);
 }
 
-LLBC_Time LLBC_Time::operator +(const LLBC_TimeSpan &span) const
+LLBC_Time LLBC_Time::operator+(const LLBC_TimeSpan &span) const
 {
     return LLBC_Time(_time + span.GetTotalMicros());
 }
 
-LLBC_Time LLBC_Time::operator -(const LLBC_TimeSpan &span) const
+LLBC_Time LLBC_Time::operator-(const LLBC_TimeSpan &span) const
 {
     return LLBC_Time(_time - span.GetTotalMicros());
 }
 
-LLBC_Time &LLBC_Time::operator =(const LLBC_Time &time)
+LLBC_Time &LLBC_Time::operator=(const LLBC_Time &time)
 {
     if (this == &time ||
         *this == time)
@@ -468,6 +425,79 @@ void LLBC_Time::UpdateTimeStructs()
     localtime_r(&calendarTime, &_localTimeStruct);
     gmtime_r(&calendarTime, &_gmtTimeStruct);
     #endif
+}
+
+LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
+                                       LLBC_TimeSpan toTimeOfTimeCycle) const
+{
+    // !For now, GetIntervalToTimeOfMonth() is not supported.
+
+    // Calc fromTimeOfTimeCycle.
+    LLBC_TimeSpan fromTimeOfTimeCycle;
+    if (timeCycle == LLBC_TimeSpan::oneHour)
+        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[0])();
+    else if (timeCycle == LLBC_TimeSpan::oneDay)
+        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[1])();
+    else // oneWeek
+        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[2])();
+
+    // Normalize toTimeOfTimeCycle.
+    if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))
+        toTimeOfTimeCycle = toTimeOfTimeCycle % timeCycle + timeCycle;
+    else if (toTimeOfTimeCycle >= timeCycle)
+        toTimeOfTimeCycle %= timeCycle;
+
+    // Debug assertion.
+    #if LLBC_DEBUG
+    ASSERT((toTimeOfTimeCycle >= LLBC_TimeSpan::zero && toTimeOfTimeCycle < timeCycle) &&
+           "llbc framework internal error");
+    #endif
+
+    // Calc interval-to.
+    const LLBC_TimeSpan diff = toTimeOfTimeCycle - fromTimeOfTimeCycle;
+    return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
+}
+
+bool LLBC_Time::IsCrossed(const LLBC_Time &from,
+                          const LLBC_Time &to,
+                          const LLBC_TimeSpan &timeCycle,
+                          LLBC_TimeSpan timeOfTimeCycle)
+{
+    // If span < 0, return false.
+    const LLBC_TimeSpan diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return false;
+
+    // If span >= timeCycle, return true.
+    if (diff >= timeCycle)
+        return true;
+
+    // Normalize timeOfTimeCycle[0, timeCycle)
+    if (UNLIKELY(timeOfTimeCycle < LLBC_TimeSpan::zero))
+        timeOfTimeCycle = timeOfTimeCycle % timeCycle + timeCycle;
+    else if (UNLIKELY(timeOfTimeCycle >= timeCycle))
+        timeOfTimeCycle %= timeCycle;
+
+    // Crossed timeCycle judge: toTimeOfTimeCycle judge.
+    // => toTimeOfTimeCycle must be >= timeOfTimeCycle.
+    int methIdx;
+    LLBC_TimeSpan toTimeOfTimeCycle;
+    if (timeCycle == LLBC_TimeSpan::oneHour)
+        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 0])();
+    else if (timeCycle == LLBC_TimeSpan::oneDay)
+        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 1])();
+    else // oneWeek
+        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 2])();
+
+    if (toTimeOfTimeCycle < timeOfTimeCycle)
+        return false;
+
+    // Crossed timeCycle judge: fromTimeOfTimeCycle judge.
+    const LLBC_TimeSpan fromTimeOfTimeCycle =
+        (from.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx])();
+    return (fromTimeOfTimeCycle < timeOfTimeCycle) ||
+         (fromTimeOfTimeCycle > timeOfTimeCycle &&
+          toTimeOfTimeCycle < fromTimeOfTimeCycle);
 }
 
 __LLBC_NS_END

@@ -174,32 +174,68 @@ inline LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, co
     return FromSeconds(clanderTimeInSeconds).FormatAsGmt(format);
 }
 
-inline bool LLBC_Time::operator ==(const LLBC_Time &time) const
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfHour(const LLBC_TimeSpan &toTimeOfHour) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneHour, toTimeOfHour);
+}
+
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_TimeSpan &toTimeOfDay) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneDay, toTimeOfDay);
+}
+
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek);
+}
+
+inline bool LLBC_Time::IsCrossedHour(const LLBC_Time &from,
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfHour)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneHour, timeOfHour);
+}
+
+inline bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
+                                    const LLBC_Time &to,
+                                    const LLBC_TimeSpan &timeOfDay)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneDay, timeOfDay);
+}
+
+inline bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfWeek)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek);
+}
+
+inline bool LLBC_Time::operator==(const LLBC_Time &time) const
 {
     return _time == time._time;
 }
 
-inline bool LLBC_Time::operator !=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator!=(const LLBC_Time &time) const
 {
     return _time != time._time;
 }
 
-inline bool LLBC_Time::operator <(const LLBC_Time &time) const
+inline bool LLBC_Time::operator<(const LLBC_Time &time) const
 {
     return _time < time._time;
 }
 
-inline bool LLBC_Time::operator >(const LLBC_Time &time) const
+inline bool LLBC_Time::operator>(const LLBC_Time &time) const
 {
     return _time > time._time;
 }
 
-inline bool LLBC_Time::operator >=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator>=(const LLBC_Time &time) const
 {
     return _time >= time._time;
 }
 
-inline bool LLBC_Time::operator <=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator<=(const LLBC_Time &time) const
 {
     return _time <= time._time;
 }
