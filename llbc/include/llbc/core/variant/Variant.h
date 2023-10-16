@@ -208,6 +208,9 @@ public:
     explicit LLBC_Variant(const uint64 &ui64);
     explicit LLBC_Variant(const float &f);
     explicit LLBC_Variant(const double &d);
+    template <typename _T,
+              typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
+    explicit LLBC_Variant(const _T &en);
     explicit LLBC_Variant(const char *str);
     explicit LLBC_Variant(const std::string &str);
     explicit LLBC_Variant(const LLBC_String &str);
@@ -302,6 +305,9 @@ public:
     uint64 AsUInt64() const;
     float AsFloat() const;
     double AsDouble() const;
+    template <typename _T>
+    typename std::enable_if<std::is_enum<_T>::value, _T>::type
+    AsEnum() const;
     LLBC_String AsStr() const;
     const Seq &AsSeq() const;
     const Dict &AsDict() const;
@@ -321,6 +327,9 @@ public:
     operator uint64 () const;
     operator float () const;
     operator double () const;
+    template <typename _T,
+              typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
+    operator _T () const;
     operator LLBC_String () const;
     template <typename _T1, typename _T2>
     operator typename std::pair<_T1, _T2>() const;
@@ -451,6 +460,9 @@ public:
     LLBC_Variant &operator =(const uint64 &ui64);
     LLBC_Variant &operator =(float f);
     LLBC_Variant &operator =(const double &d);
+    template <typename _T,
+              typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
+    LLBC_Variant& operator =(const _T &en);
     LLBC_Variant &operator =(const LLBC_String &str);
     template <typename _T1, typename _T2>
     LLBC_Variant &operator =(const std::pair<_T1, _T2> &pa);

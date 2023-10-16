@@ -117,6 +117,14 @@ inline LLBC_Variant::LLBC_Variant(const double &d)
     _holder.data.raw.doubleVal = d;
 }
 
+template <typename _T,
+          typename std::enable_if<std::is_enum<_T>::value, int>::type>
+LLBC_Variant::LLBC_Variant(const _T &en)
+{
+    _holder.type = LLBC_VariantType::RAW_SINT64;
+    _holder.data.raw.int64Val = static_cast<sint64>(en);
+}
+
 inline LLBC_Variant::LLBC_Variant(const std::string &str)
 {
     _holder.type = LLBC_VariantType::STR_DFT;
@@ -476,6 +484,13 @@ inline float LLBC_Variant::AsFloat() const
     return static_cast<float>(AsDouble());
 }
 
+template <typename _T>
+typename std::enable_if<std::is_enum<_T>::value, _T>::type
+LLBC_Variant::AsEnum() const
+{
+    return static_cast<_T>(AsInt64());
+}
+
 inline LLBC_Variant::operator bool() const
 {
     return AsBool();
@@ -558,6 +573,13 @@ inline LLBC_Variant::operator float() const
 inline LLBC_Variant::operator double() const
 {
     return AsDouble();
+}
+
+template <typename _T,
+          typename std::enable_if<std::is_enum<_T>::value, int>::type>
+LLBC_Variant::operator _T () const
+{
+    return AsEnum<_T>();
 }
 
 inline LLBC_Variant::operator LLBC_String () const
@@ -807,6 +829,18 @@ template <typename _Key>
 const LLBC_Variant &LLBC_Variant::operator [](const _Key &key) const
 {
     return this->operator [](LLBC_Variant(key));
+}
+
+template <typename _T,
+          typename std::enable_if<std::is_enum<_T>::value, int>::type>
+LLBC_Variant &LLBC_Variant::operator =(const _T &en)
+{
+    _holder.ClearData();
+
+    _holder.type = LLBC_VariantType::RAW_SINT64;
+    _holder.data.raw.int64Val = static_cast<sint64>(en);
+
+    return *this;
 }
 
 template <typename _T>
