@@ -32,7 +32,7 @@ __LLBC_NS_END
 /**
  * Time class stream output operators previous declare.
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
 
 __LLBC_NS_BEGIN
 
@@ -299,7 +299,7 @@ public:
     bool operator<=(const LLBC_Time &time) const;
     bool operator>=(const LLBC_Time &time) const;
 
-    LLBC_Time &operator =(const LLBC_Time &time);
+    LLBC_Time &operator=(const LLBC_Time &time);
 
 public:
     /**

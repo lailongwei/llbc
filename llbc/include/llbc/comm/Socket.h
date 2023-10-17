@@ -116,12 +116,12 @@ public:
     /**
      * Implement bool operator.
      */
-    operator bool () const;
+    operator bool() const;
 
     /**
      * Implement ! operator.
      */
-    bool operator ! () const;
+    bool operator!() const;
 
 public:
     /**

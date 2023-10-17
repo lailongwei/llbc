@@ -60,25 +60,25 @@ public:
      * Get value associated with the tls.
      * @return ValueType * - value pointer.
      */
-    ValueType *operator ->();
+    ValueType *operator->();
 
     /**
      * Get value associated with the tls.
      * @return ValueType * - value pointer.
      */
-    const ValueType *operator ->() const;
+    const ValueType *operator->() const;
 
     /**
      * Get value associated with the tls.
      * @return ValueType & - value reference.
      */
-    ValueType &operator *();
+    ValueType &operator*();
 
     /**
      * Get value associated with the tls.
      * @return const ValueType & - const value reference.
      */
-    const ValueType &operator *() const;
+    const ValueType &operator*() const;
 
     /**
      * Get value associated with the tls.

@@ -124,9 +124,9 @@ public:
 
 public:
     /**
-     * operator ==
+     * operator==
      */
-    bool operator ==(const LLBC_SessionOpts &another) const;
+    bool operator==(const LLBC_SessionOpts &another) const;
 
 private:
     bool _noDelay; // No-delay option, default is true.

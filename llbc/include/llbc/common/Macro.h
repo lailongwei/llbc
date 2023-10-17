@@ -206,10 +206,10 @@
 #endif
 
 // Disable assignments of objects.
-#define LLBC_DISABLE_ASSIGNMENT(name)       \
-private:                                    \
-    name(const name &) = delete;            \
-    name &operator =(const name &) = delete \
+#define LLBC_DISABLE_ASSIGNMENT(name)      \
+private:                                   \
+    name(const name &) = delete;           \
+    name &operator=(const name &) = delete \
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX

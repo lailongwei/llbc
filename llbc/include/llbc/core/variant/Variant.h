@@ -117,7 +117,7 @@ __LLBC_NS_END
 /**
  * \brief LLBC_Variant stream output function.
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Variant &variant);
 
 __LLBC_NS_BEGIN
 
@@ -435,105 +435,105 @@ public:
     typename ::std::enable_if<!::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
     DictErase(_Key1 &&key1, _Keys &&... keys);
 
-    LLBC_Variant &operator [](const LLBC_Variant &key);
-    const LLBC_Variant &operator [](const LLBC_Variant &key) const;
+    LLBC_Variant &operator[](const LLBC_Variant &key);
+    const LLBC_Variant &operator[](const LLBC_Variant &key) const;
 
     template <typename _Key>
-    LLBC_Variant &operator [](const _Key &key);
+    LLBC_Variant &operator[](const _Key &key);
     template <typename _Key>
-    const LLBC_Variant &operator [](const _Key &key) const;
+    const LLBC_Variant &operator[](const _Key &key) const;
 
     // assignment operators.
-    LLBC_Variant &operator =(bool b);
-    LLBC_Variant &operator =(sint8 i8);
-    LLBC_Variant &operator =(uint8 ui8);
-    LLBC_Variant &operator =(sint16 i16);
-    LLBC_Variant &operator =(uint16 ui16);
-    LLBC_Variant &operator =(sint32 i32);
-    LLBC_Variant &operator =(uint32 ui32);
-    LLBC_Variant &operator =(long l);
-    LLBC_Variant &operator =(unsigned long ul);
-    LLBC_Variant &operator =(const char * const &str);
+    LLBC_Variant &operator=(bool b);
+    LLBC_Variant &operator=(sint8 i8);
+    LLBC_Variant &operator=(uint8 ui8);
+    LLBC_Variant &operator=(sint16 i16);
+    LLBC_Variant &operator=(uint16 ui16);
+    LLBC_Variant &operator=(sint32 i32);
+    LLBC_Variant &operator=(uint32 ui32);
+    LLBC_Variant &operator=(long l);
+    LLBC_Variant &operator=(unsigned long ul);
+    LLBC_Variant &operator=(const char * const &str);
     template <typename _T>
-    LLBC_Variant &operator =(const _T * const &ptr);
-    LLBC_Variant &operator =(const sint64 &i64);
-    LLBC_Variant &operator =(const uint64 &ui64);
-    LLBC_Variant &operator =(float f);
-    LLBC_Variant &operator =(const double &d);
+    LLBC_Variant &operator=(const _T * const &ptr);
+    LLBC_Variant &operator=(const sint64 &i64);
+    LLBC_Variant &operator=(const uint64 &ui64);
+    LLBC_Variant &operator=(float f);
+    LLBC_Variant &operator=(const double &d);
     template <typename _T,
               typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
-    LLBC_Variant& operator =(const _T &en);
-    LLBC_Variant &operator =(const LLBC_String &str);
+    LLBC_Variant& operator=(const _T &en);
+    LLBC_Variant &operator=(const LLBC_String &str);
     template <typename _T1, typename _T2>
-    LLBC_Variant &operator =(const std::pair<_T1, _T2> &pa);
-    LLBC_Variant &operator =(const Seq &seq);
+    LLBC_Variant &operator=(const std::pair<_T1, _T2> &pa);
+    LLBC_Variant &operator=(const Seq &seq);
     template <typename _T>
-    LLBC_Variant &operator =(const std::vector<_T> &vec);
+    LLBC_Variant &operator=(const std::vector<_T> &vec);
     template <typename _T>
-    LLBC_Variant &operator =(const std::list<_T> &lst);
+    LLBC_Variant &operator=(const std::list<_T> &lst);
     template <typename _T>
-    LLBC_Variant &operator =(const std::queue<_T> &que);
+    LLBC_Variant &operator=(const std::queue<_T> &que);
     template <typename _T>
-    LLBC_Variant &operator =(const std::set<_T> &s);
-    LLBC_Variant &operator =(const Dict &dict);
+    LLBC_Variant &operator=(const std::set<_T> &s);
+    LLBC_Variant &operator=(const Dict &dict);
     template <typename _Key, typename _Val>
-    LLBC_Variant &operator =(const std::map<_Key, _Val> &m);
-    LLBC_Variant &operator =(const LLBC_Variant &var);
-    LLBC_Variant &operator =(LLBC_Variant &&var);
+    LLBC_Variant &operator=(const std::map<_Key, _Val> &m);
+    LLBC_Variant &operator=(const LLBC_Variant &var);
+    LLBC_Variant &operator=(LLBC_Variant &&var);
 
     // Relational operators.
-    bool operator ==(const LLBC_Variant &another) const;
-    bool operator !=(const LLBC_Variant &another) const;
+    bool operator==(const LLBC_Variant &another) const;
+    bool operator!=(const LLBC_Variant &another) const;
 
-    bool operator <(const LLBC_Variant &another) const;
-    bool operator >(const LLBC_Variant &another) const;
-    bool operator <=(const LLBC_Variant &another) const;
-    bool operator >=(const LLBC_Variant &another) const;
+    bool operator<(const LLBC_Variant &another) const;
+    bool operator>(const LLBC_Variant &another) const;
+    bool operator<=(const LLBC_Variant &another) const;
+    bool operator>=(const LLBC_Variant &another) const;
 
     // Relational operators.
     template <typename _T>
-    bool operator ==(const _T &another) const;
+    bool operator==(const _T &another) const;
     template <typename _T>
-    bool operator !=(const _T &another) const;
+    bool operator!=(const _T &another) const;
 
     template <typename _T>
-    bool operator <(const _T &another) const;
+    bool operator<(const _T &another) const;
     template <typename _T>
-    bool operator >(const _T &another) const;
+    bool operator>(const _T &another) const;
     template <typename _T>
-    bool operator <=(const _T &another) const;
+    bool operator<=(const _T &another) const;
     template <typename _T>
-    bool operator >=(const _T &another) const;
+    bool operator>=(const _T &another) const;
 
     // Arithmetic operators.
-    LLBC_Variant operator +(const LLBC_Variant &another) const;
-    LLBC_Variant operator -(const LLBC_Variant &another) const;
-    LLBC_Variant operator *(const LLBC_Variant &another) const;
-    LLBC_Variant operator /(const LLBC_Variant &another) const;
+    LLBC_Variant operator+(const LLBC_Variant &another) const;
+    LLBC_Variant operator-(const LLBC_Variant &another) const;
+    LLBC_Variant operator*(const LLBC_Variant &another) const;
+    LLBC_Variant operator/(const LLBC_Variant &another) const;
 
-    LLBC_Variant &operator +=(const LLBC_Variant &another);
-    LLBC_Variant &operator -=(const LLBC_Variant &another);
-    LLBC_Variant &operator *=(const LLBC_Variant &another);
-    LLBC_Variant &operator /=(const LLBC_Variant &another);
+    LLBC_Variant &operator+=(const LLBC_Variant &another);
+    LLBC_Variant &operator-=(const LLBC_Variant &another);
+    LLBC_Variant &operator*=(const LLBC_Variant &another);
+    LLBC_Variant &operator/=(const LLBC_Variant &another);
 
     // Arithmetic operators(template base).
     template <typename _T>
-    LLBC_Variant operator +(const _T &another) const;
+    LLBC_Variant operator+(const _T &another) const;
     template <typename _T>
-    LLBC_Variant operator -(const _T &another) const;
+    LLBC_Variant operator-(const _T &another) const;
     template <typename _T>
-    LLBC_Variant operator *(const _T &another) const;
+    LLBC_Variant operator*(const _T &another) const;
     template <typename _T>
-    LLBC_Variant operator /(const _T &another) const;
+    LLBC_Variant operator/(const _T &another) const;
 
     template <typename _T>
-    LLBC_Variant &operator +=(const _T &another);
+    LLBC_Variant &operator+=(const _T &another);
     template <typename _T>
-    LLBC_Variant &operator -=(const _T &another);
+    LLBC_Variant &operator-=(const _T &another);
     template <typename _T>
-    LLBC_Variant &operator *=(const _T &another);
+    LLBC_Variant &operator*=(const _T &another);
     template <typename _T>
-    LLBC_Variant &operator /=(const _T &another);
+    LLBC_Variant &operator/=(const _T &another);
 
     // Type to string.
     const LLBC_String &TypeToString() const;
@@ -547,7 +547,7 @@ public:
     bool DeSerialize(LLBC_Stream &stream);
 
 public:
-    friend std::ostream &::operator <<(std::ostream &o, const LLBC_Variant &variant);
+    friend std::ostream &::operator<<(std::ostream &o, const LLBC_Variant &variant);
 
 private:
     friend class LLBC_VariantTraits;

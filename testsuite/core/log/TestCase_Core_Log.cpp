@@ -80,7 +80,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     std::string stdStr = "This is a std::string";
     LLBC_String llbcStr = "This is a LLBC_String";
-    LSLOG_DEBUG("std::string operator << test: " <<stdStr <<", LLBC_String operator << test: " <<llbcStr);
+    LSLOG_DEBUG("std::string operator<< test: " <<stdStr <<", LLBC_String operator<< test: " <<llbcStr);
 
     LLBC_Time now = LLBC_Time::Now();
     LLBC_TimeSpan span(-30);

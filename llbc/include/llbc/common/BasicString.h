@@ -72,106 +72,106 @@ public:
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
     LLBC_BasicString(size_type n, _Elem c, const _Ax &al = _Ax()):_Base(n, c, al) {  }
 
-    // operator =
-    _This &operator =(const _This &rhs)
+    // operator=
+    _This &operator=(const _This &rhs)
     {
-        _Base::operator =(rhs);
+        _Base::operator=(rhs);
         return *this;
     }
 
-    _This &operator =(_This &&rhs)
-    {
-        _Base::operator=(std::move(rhs));
-        return *this;
-    }
-
-    _This &operator =(const _Base &rhs)
-    {
-        _Base::operator =(rhs);
-        return *this;
-    }
-
-    _This &operator =(_Base &&rhs)
+    _This &operator=(_This &&rhs)
     {
         _Base::operator=(std::move(rhs));
         return *this;
     }
 
-    _This &operator =(const LLBC_BasicCString<_Elem> &cstr)
+    _This &operator=(const _Base &rhs)
+    {
+        _Base::operator=(rhs);
+        return *this;
+    }
+
+    _This &operator=(_Base &&rhs)
+    {
+        _Base::operator=(std::move(rhs));
+        return *this;
+    }
+
+    _This &operator=(const LLBC_BasicCString<_Elem> &cstr)
     {
         _Base::assign(cstr.c_str(), cstr.size());
         return *this;
     }
 
-    _This &operator =(const _Elem *s)
+    _This &operator=(const _Elem *s)
     {
         if (LIKELY(s))
-            _Base::operator =(s);
+            _Base::operator=(s);
         else
             this->clear();
 
         return *this;
     }
 
-    _This &operator =(const _Elem &c)
+    _This &operator=(const _Elem &c)
     {
-        _Base::operator =(c);
+        _Base::operator=(c);
         return *this;
     }
 
-    // operator +
-    _This operator +(const _This &rhs) const
+    // operator+
+    _This operator+(const _This &rhs) const
     {
         _This ret = *this;
         ret.append(rhs);
         return ret;
     }
 
-    _This operator +(const _Base &rhs) const
+    _This operator+(const _Base &rhs) const
     {
         _This ret = *this;
         ret.append(rhs);
         return ret;
     }
 
-    _This operator +(const LLBC_BasicCString<_Elem> &cstr) const
+    _This operator+(const LLBC_BasicCString<_Elem> &cstr) const
     {
         _This ret = *this;
         ret.append(cstr);
         return ret;
     }
 
-    _This operator +(const _Elem *s) const
+    _This operator+(const _Elem *s) const
     {
         _This ret = *this;
         ret.append(s);
         return ret;
     }
 
-    _This operator +(const _Elem &c) const
+    _This operator+(const _Elem &c) const
     {
         _This ret = *this;
         ret.append(1, c);
         return ret;
     }
 
-    // operator +=
-    _This &operator +=(const _This &rhs)
+    // operator+=
+    _This &operator+=(const _This &rhs)
     {
         return append(rhs);
     }
 
-    _This &operator +=(const _Base &rhs)
+    _This &operator+=(const _Base &rhs)
     {
         return append(rhs);
     }
 
-    _This &operator +=(const LLBC_BasicCString<_Elem> &cstr)
+    _This &operator+=(const LLBC_BasicCString<_Elem> &cstr)
     {
         return append(cstr.c_str(), cstr.size());
     }
 
-    _This &operator +=(const _Elem *s)
+    _This &operator+=(const _Elem *s)
     {
         if (LIKELY(s))
             return append(s);
@@ -179,13 +179,13 @@ public:
         return *this;
     }
 
-    _This &operator +=(const _Elem &c)
+    _This &operator+=(const _Elem &c)
     {
         return append(1, c);
     }
 
-    // operator *
-    _This operator *(int right) const
+    // operator*
+    _This operator*(int right) const
     {
         if (this->empty() || right == 1)
             return *this;
@@ -195,7 +195,7 @@ public:
         return copy;
     }
 
-    _This &operator *=(int right)
+    _This &operator*=(int right)
     {
         if (this->empty() || right == 1)
             return *this;
@@ -217,169 +217,169 @@ public:
         return *this;
     }
 
-    // operator ==
-    bool operator ==(const _This &str) const
+    // operator==
+    bool operator==(const _This &str) const
     {
         return this->compare(str) == 0;
     }
 
-    bool operator ==(const _Base &str) const
+    bool operator==(const _Base &str) const
     {
         return this->compare(str) == 0;
     }
 
-    bool operator ==(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator==(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) == 0;
     }
 
-    bool operator ==(const _Elem *s) const
+    bool operator==(const _Elem *s) const
     {
         return this->compare(s) == 0;
     }
 
-    bool operator ==(const _Elem &c) const
+    bool operator==(const _Elem &c) const
     {
         return this->compare(c) == 0;
     }
 
-    // operator !=
-    bool operator !=(const _This &str) const
+    // operator!=
+    bool operator!=(const _This &str) const
     {
         return this->compare(str) != 0;
     }
 
-    bool operator !=(const _Base &str) const
+    bool operator!=(const _Base &str) const
     {
         return this->compare(str) != 0;
     }
 
-    bool operator !=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator!=(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) != 0;
     }
 
-    bool operator !=(const _Elem *s) const
+    bool operator!=(const _Elem *s) const
     {
         return this->compare(s) != 0;
     }
 
-    bool operator !=(const _Elem &c) const
+    bool operator!=(const _Elem &c) const
     {
         return this->compare(c) != 0;
     }
 
-    // operator <
-    bool operator <(const _This &str) const
+    // operator<
+    bool operator<(const _This &str) const
     {
         return this->compare(str) < 0;
     }
 
-    bool operator <(const _Base &str) const
+    bool operator<(const _Base &str) const
     {
         return this->compare(str) < 0;
     }
 
-    bool operator <(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator<(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) < 0;
     }
 
-    bool operator <(const _Elem *s) const
+    bool operator<(const _Elem *s) const
     {
         return this->compare(s) < 0;
     }
 
-    bool operator <(const _Elem &c) const
+    bool operator<(const _Elem &c) const
     {
         return this->compare(c) < 0;
     }
 
-    // operator <=
-    bool operator <=(const _This &str) const
+    // operator<=
+    bool operator<=(const _This &str) const
     {
         return this->compare(str) <= 0;
     }
 
-    bool operator <=(const _Base &str) const
+    bool operator<=(const _Base &str) const
     {
         return this->compare(str) <= 0;
     }
 
-    bool operator <=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator<=(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) <= 0;
     }
 
-    bool operator <=(const _Elem *s) const
+    bool operator<=(const _Elem *s) const
     {
         return this->compare(s) <= 0;
     }
 
-    bool operator <=(const _Elem &c) const
+    bool operator<=(const _Elem &c) const
     {
         return this->compare(c) <= 0;
     }
 
-    // operator >
-    bool operator >(const _This &str) const
+    // operator>
+    bool operator>(const _This &str) const
     {
         return this->compare(str) > 0;
     }
 
-    bool operator >(const _Base &str) const
+    bool operator>(const _Base &str) const
     {
         return this->compare(str) > 0;
     }
 
-    bool operator >(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator>(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) > 0;
     }
 
-    bool operator >(const _Elem *s) const
+    bool operator>(const _Elem *s) const
     {
         return this->compare(s) > 0;
     }
 
-    bool operator >(const _Elem &c) const
+    bool operator>(const _Elem &c) const
     {
         return this->compare(c) > 0;
     }
 
-    // operator >=
-    bool operator >=(const _This &str) const
+    // operator>=
+    bool operator>=(const _This &str) const
     {
         return this->compare(str) >= 0;
     }
 
-    bool operator >=(const _Base &str) const
+    bool operator>=(const _Base &str) const
     {
         return this->compare(str) >= 0;
     }
 
-    bool operator >=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator>=(const LLBC_BasicCString<_Elem> &cstr) const
     {
         return this->compare(cstr) >= 0;
     }
 
-    bool operator >=(const _Elem *s) const
+    bool operator>=(const _Elem *s) const
     {
         return this->compare(s) >= 0;
     }
 
-    bool operator >=(const _Elem &c) const
+    bool operator>=(const _Elem &c) const
     {
         return this->compare(c) >= 0;
     }
 
-    // operator []
-    _Elem &operator [](size_type off)
+    // operator[]
+    _Elem &operator[](size_type off)
     {
         return (*((_Base *)this))[off];
     }
 
-    const _Elem &operator [](size_type off) const
+    const _Elem &operator[](size_type off) const
     {
         return (*((_Base *)this))[off];
     }
@@ -1165,7 +1165,7 @@ public:
     }
 
 public:
-    friend std::basic_ostream<_Elem> &operator <<(std::basic_ostream<_Elem> &o, const _This &str)
+    friend std::basic_ostream<_Elem> &operator<<(std::basic_ostream<_Elem> &o, const _This &str)
     {
         o.write(str.data(), str.size());
         return o;

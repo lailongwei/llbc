@@ -187,8 +187,8 @@ public:
     /**
      * Operator *.
      */
-    LLBC_Object *&operator *();
-    LLBC_Object * const &operator *() const;
+    LLBC_Object *&operator*();
+    LLBC_Object * const &operator*() const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DictionaryElem);
 

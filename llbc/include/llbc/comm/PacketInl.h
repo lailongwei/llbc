@@ -584,14 +584,14 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const _Ty &obj)
 }
 
 template <typename _Ty>
-LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator <<(const _Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator<<(const _Ty &val)
 {
     this->Write(val);
     return *this;
 }
 
 template <typename _Ty>
-LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator>>(_Ty &val)
 {
     this->Read(val);
     return *this;
@@ -661,7 +661,7 @@ LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetEncoder() const
 
 __LLBC_NS_END
 
-inline std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet)
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &packet)
 {
     return (o << packet.ToString());
 }

@@ -484,22 +484,22 @@ void LLBC_Component::UpdateComponentCfg()
 
 __LLBC_NS_END
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
 {
     return o <<si.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
 {
     return o <<destroy.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
 {
     return o <<result.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
 {
     return o <<report.ToString();
 }

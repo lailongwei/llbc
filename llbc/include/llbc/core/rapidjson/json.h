@@ -38,7 +38,7 @@ LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &out
 /**
  * LLBC_JsonValue output to stream operator function(in global ns).
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_JsonValue &value);
 
 __LLBC_NS_END
 

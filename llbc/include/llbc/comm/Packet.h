@@ -380,13 +380,13 @@ public:
      * stream output operations.
      */
     template <typename _Ty>
-    LLBC_Packet &operator <<(const _Ty &val);
+    LLBC_Packet &operator<<(const _Ty &val);
 
     /**
      * Stream input operations.
      */
     template <typename _Ty>
-    LLBC_Packet &operator >>(_Ty &val);
+    LLBC_Packet &operator>>(_Ty &val);
 
 public:
     /**
@@ -554,7 +554,7 @@ __LLBC_NS_END
 /**
  * Stream output operator support. 
  */
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
 
 #include "llbc/comm/PacketInl.h"
 

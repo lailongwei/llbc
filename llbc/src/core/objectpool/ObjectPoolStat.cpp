@@ -24,19 +24,19 @@
 
 #include "llbc/core/objectpool/ObjectPoolStat.h"
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st)
 {
     o << st.ToString();
     return o;
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st)
 {
     o << st.ToString();
     return o;
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st)
 {
     o << st.ToString();
     return o;

@@ -386,13 +386,13 @@ LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseEnd() const
     return ConstReverseIter(ConstIter::cpointer(nullptr));
 }
 
-LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](int key) const
+LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator[](int key) const
 {
     ConstIter it = Find(key);
     return it != End() ? it.Obj() : nullptr;
 }
 
-LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](const LLBC_String &key) const
+LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator[](const LLBC_String &key) const
 {
     ConstIter it = Find(key);
     return it != End() ? it.Obj() : nullptr;

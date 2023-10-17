@@ -250,12 +250,12 @@ void LLBC_DictionaryElem::SetBucketElemNext(LLBC_DictionaryElem *next)
     _bucketNext = next;
 }
 
-LLBC_Object *&LLBC_DictionaryElem::operator *()
+LLBC_Object *&LLBC_DictionaryElem::operator*()
 {
     return _obj;
 }
 
-LLBC_Object * const &LLBC_DictionaryElem::operator *() const
+LLBC_Object * const &LLBC_DictionaryElem::operator*() const
 {
     return _obj;
 }

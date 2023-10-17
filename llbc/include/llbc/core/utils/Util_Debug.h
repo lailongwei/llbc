@@ -81,17 +81,17 @@ public:
     LLBC_String ToString() const;
 
 public:
-    LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime &operator +=(const LLBC_CPUTime &right);
-    LLBC_CPUTime &operator -=(const LLBC_CPUTime &right);
+    LLBC_CPUTime operator+(const LLBC_CPUTime &right) const;
+    LLBC_CPUTime operator-(const LLBC_CPUTime &right) const;
+    LLBC_CPUTime &operator+=(const LLBC_CPUTime &right);
+    LLBC_CPUTime &operator-=(const LLBC_CPUTime &right);
 
-    bool operator <(const LLBC_CPUTime &right) const;
-    bool operator >(const LLBC_CPUTime &right) const;
-    bool operator <=(const LLBC_CPUTime &right) const;
-    bool operator >=(const LLBC_CPUTime &right) const;
-    bool operator ==(const LLBC_CPUTime &right) const;
-    bool operator !=(const LLBC_CPUTime &right) const;
+    bool operator<(const LLBC_CPUTime &right) const;
+    bool operator>(const LLBC_CPUTime &right) const;
+    bool operator<=(const LLBC_CPUTime &right) const;
+    bool operator>=(const LLBC_CPUTime &right) const;
+    bool operator==(const LLBC_CPUTime &right) const;
+    bool operator!=(const LLBC_CPUTime &right) const;
 
     operator uint64() const;
 
@@ -109,7 +109,7 @@ __LLBC_NS_END
 /**
  * stream output operator function for cpu time(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
 
 #include "llbc/core/utils/Util_DebugInl.h"
 

@@ -329,7 +329,7 @@ const LLBC_IniSections &LLBC_Ini::GetAllSections() const
     return _sections;
 }
 
-LLBC_Ini &LLBC_Ini::operator =(const This &another)
+LLBC_Ini &LLBC_Ini::operator=(const This &another)
 {
     if (this == &another)
         return *this;

@@ -1141,14 +1141,14 @@ bool LLBC_Stream::Peek(T &obj)
 }
 
 template<typename T>
-LLBC_Stream &LLBC_Stream::operator >>(T &val)
+LLBC_Stream &LLBC_Stream::operator>>(T &val)
 {
     Read(val);
     return *this;
 }
 
 template<typename T>
-LLBC_Stream &LLBC_Stream::operator <<(const T &val)
+LLBC_Stream &LLBC_Stream::operator<<(const T &val)
 {
     Write(val);
     return *this;
@@ -1250,7 +1250,7 @@ LLBC_FORCE_INLINE bool LLBC_Stream::ReserveWritableSize(size_t writableSize)
 
 __LLBC_NS_END
 
-LLBC_FORCE_INLINE std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Stream &stream)
+LLBC_FORCE_INLINE std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Stream &stream)
 {
     return o << stream.ToString();
 }

@@ -81,7 +81,7 @@ const LLBC_String &LLBC_VariantType::Type2Str(int type)
 
 __LLBC_NS_END
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NAMESPACE LLBC_Variant &variant)
+std::ostream &operator<<(std::ostream &o, const LLBC_NAMESPACE LLBC_Variant &variant)
 {
     LLBC_NAMESPACE LLBC_String str = variant.ToString();
     o.write(str.c_str(), str.length());
@@ -631,7 +631,7 @@ LLBC_Variant::DictIter LLBC_Variant::DictErase(DictIter first, DictIter last)
     return _holder.data.obj.dict->erase(first, last);
 }
 
-LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key)
+LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key)
 {
     if (_holder.type == LLBC_VariantType::SEQ_DFT)
     {
@@ -645,7 +645,7 @@ LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key)
     return (*_holder.data.obj.dict)[key];
 }
 
-const LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key) const
+const LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key) const
 {
     if (_holder.type == LLBC_VariantType::SEQ_DFT)
     {
@@ -668,7 +668,7 @@ const LLBC_Variant &LLBC_Variant::operator [](const LLBC_Variant &key) const
     return LLBC_INL_NS __g_nilVariant;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(bool b)
+LLBC_Variant &LLBC_Variant::operator=(bool b)
 {
     _holder.ClearData();
 
@@ -678,7 +678,7 @@ LLBC_Variant &LLBC_Variant::operator =(bool b)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(sint8 i8)
+LLBC_Variant &LLBC_Variant::operator=(sint8 i8)
 {
     _holder.ClearData();
 
@@ -688,7 +688,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint8 i8)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(uint8 ui8)
+LLBC_Variant &LLBC_Variant::operator=(uint8 ui8)
 {
     _holder.ClearData();
 
@@ -698,7 +698,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint8 ui8)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(sint16 i16)
+LLBC_Variant &LLBC_Variant::operator=(sint16 i16)
 {
     _holder.ClearData();
 
@@ -708,7 +708,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint16 i16)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(uint16 ui16)
+LLBC_Variant &LLBC_Variant::operator=(uint16 ui16)
 {
     _holder.ClearData();
 
@@ -718,7 +718,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint16 ui16)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(sint32 i32)
+LLBC_Variant &LLBC_Variant::operator=(sint32 i32)
 {
     _holder.ClearData();
 
@@ -728,7 +728,7 @@ LLBC_Variant &LLBC_Variant::operator =(sint32 i32)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(uint32 ui32)
+LLBC_Variant &LLBC_Variant::operator=(uint32 ui32)
 {
     _holder.ClearData();
 
@@ -738,7 +738,7 @@ LLBC_Variant &LLBC_Variant::operator =(uint32 ui32)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(long l)
+LLBC_Variant &LLBC_Variant::operator=(long l)
 {
     _holder.ClearData();
 
@@ -748,7 +748,7 @@ LLBC_Variant &LLBC_Variant::operator =(long l)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(ulong ul)
+LLBC_Variant &LLBC_Variant::operator=(ulong ul)
 {
     _holder.ClearData();
 
@@ -758,7 +758,7 @@ LLBC_Variant &LLBC_Variant::operator =(ulong ul)
     return *this;
 }
 
-LLBC_Variant & LLBC_Variant::operator =(const char * const &str)
+LLBC_Variant & LLBC_Variant::operator=(const char * const &str)
 {
     if (!IsStr())
     {
@@ -783,7 +783,7 @@ LLBC_Variant & LLBC_Variant::operator =(const char * const &str)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const sint64 &i64)
+LLBC_Variant &LLBC_Variant::operator=(const sint64 &i64)
 {
     _holder.ClearData();
 
@@ -793,7 +793,7 @@ LLBC_Variant &LLBC_Variant::operator =(const sint64 &i64)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const uint64 &ui64)
+LLBC_Variant &LLBC_Variant::operator=(const uint64 &ui64)
 {
     _holder.ClearData();
 
@@ -803,7 +803,7 @@ LLBC_Variant &LLBC_Variant::operator =(const uint64 &ui64)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(float f)
+LLBC_Variant &LLBC_Variant::operator=(float f)
 {
     _holder.ClearData();
 
@@ -813,7 +813,7 @@ LLBC_Variant &LLBC_Variant::operator =(float f)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const double &d)
+LLBC_Variant &LLBC_Variant::operator=(const double &d)
 {
     _holder.ClearData();
 
@@ -823,7 +823,7 @@ LLBC_Variant &LLBC_Variant::operator =(const double &d)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &str)
+LLBC_Variant &LLBC_Variant::operator=(const LLBC_String &str)
 {
     BecomeStr();
     if (str.empty())
@@ -842,7 +842,7 @@ LLBC_Variant &LLBC_Variant::operator =(const LLBC_String &str)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const Seq &seq)
+LLBC_Variant &LLBC_Variant::operator=(const Seq &seq)
 {
     BecomeSeq();
     if (seq.empty())
@@ -861,7 +861,7 @@ LLBC_Variant &LLBC_Variant::operator =(const Seq &seq)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator =(const Dict &dict)
+LLBC_Variant &LLBC_Variant::operator=(const Dict &dict)
 {
     BecomeSeq();
     if (dict.empty())

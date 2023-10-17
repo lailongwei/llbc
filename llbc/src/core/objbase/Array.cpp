@@ -405,18 +405,18 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
     return arr;
 }
 
-LLBC_Array::Obj *&LLBC_Array::operator [](LLBC_Array::difference_type off)
+LLBC_Array::Obj *&LLBC_Array::operator[](LLBC_Array::difference_type off)
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }
 
-LLBC_Array::ConstObj *LLBC_Array::operator [](LLBC_Array::difference_type off) const
+LLBC_Array::ConstObj *LLBC_Array::operator[](LLBC_Array::difference_type off) const
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }

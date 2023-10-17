@@ -137,7 +137,7 @@ __LLBC_NS_END
  * Stream output operator support. 
  */
 template <typename ObjectType>
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard);
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard);
 
 #include "llbc/core/objectpool/ObjectGuardInl.h"
 

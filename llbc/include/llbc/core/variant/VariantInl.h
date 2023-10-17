@@ -820,20 +820,20 @@ LLBC_Variant::DictErase(_Key1 &&key1, _Keys &&... keys)
 }
 
 template <typename _Key>
-LLBC_Variant &LLBC_Variant::operator [](const _Key &key)
+LLBC_Variant &LLBC_Variant::operator[](const _Key &key)
 {
-    return this->operator [](LLBC_Variant(key));
+    return this->operator[](LLBC_Variant(key));
 }
 
 template <typename _Key>
-const LLBC_Variant &LLBC_Variant::operator [](const _Key &key) const
+const LLBC_Variant &LLBC_Variant::operator[](const _Key &key) const
 {
-    return this->operator [](LLBC_Variant(key));
+    return this->operator[](LLBC_Variant(key));
 }
 
 template <typename _T,
           typename std::enable_if<std::is_enum<_T>::value, int>::type>
-LLBC_Variant &LLBC_Variant::operator =(const _T &en)
+LLBC_Variant &LLBC_Variant::operator=(const _T &en)
 {
     _holder.ClearData();
 
@@ -844,7 +844,7 @@ LLBC_Variant &LLBC_Variant::operator =(const _T &en)
 }
 
 template <typename _T>
-LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
+LLBC_Variant &LLBC_Variant::operator=(const _T * const &ptr)
 {
     _holder.ClearData();
     _holder.type = LLBC_VariantType::RAW_PTR;
@@ -855,7 +855,7 @@ LLBC_Variant &LLBC_Variant::operator =(const _T * const &ptr)
 }
 
 template <typename _T1, typename _T2>
-LLBC_Variant &LLBC_Variant::operator =(const std::pair<_T1, _T2> &pa)
+LLBC_Variant &LLBC_Variant::operator=(const std::pair<_T1, _T2> &pa)
 {
     BecomeSeqX();
     _holder.data.obj.seq->clear();
@@ -867,72 +867,72 @@ LLBC_Variant &LLBC_Variant::operator =(const std::pair<_T1, _T2> &pa)
 }
 
 template <typename _T>
-LLBC_Variant &LLBC_Variant::operator =(const std::vector<_T> &vec)
+LLBC_Variant &LLBC_Variant::operator=(const std::vector<_T> &vec)
 {
     CtFromUnaryCont<_T, std::vector<_T> >(vec);
     return *this;
 }
 
 template <typename _T>
-LLBC_Variant &LLBC_Variant::operator =(const std::list<_T> &lst)
+LLBC_Variant &LLBC_Variant::operator=(const std::list<_T> &lst)
 {
     CtFromUnaryCont<_T, std::list<_T> >(lst);
     return *this;
 }
 
 template <typename _T>
-LLBC_Variant &LLBC_Variant::operator =(const std::queue<_T> &que)
+LLBC_Variant &LLBC_Variant::operator=(const std::queue<_T> &que)
 {
     CtFromUnaryCont<_T, std::queue<_T> >(que);
     return *this;
 }
 
 template <typename _T>
-LLBC_Variant &LLBC_Variant::operator =(const std::set<_T> &s)
+LLBC_Variant &LLBC_Variant::operator=(const std::set<_T> &s)
 {
     CtFromUnaryCont<_T, std::set<_T> >(s);
     return *this;
 }
 
 template <typename _Key, typename _Val>
-LLBC_Variant &LLBC_Variant::operator =(const std::map<_Key, _Val> &m)
+LLBC_Variant &LLBC_Variant::operator=(const std::map<_Key, _Val> &m)
 {
     CtFromBinaryCont<_Key, _Val, std::map<_Key, _Val> >(m);
     return *this;
 }
 
-inline LLBC_Variant &LLBC_Variant::operator =(const LLBC_Variant &var)
+inline LLBC_Variant &LLBC_Variant::operator=(const LLBC_Variant &var)
 {
     LLBC_VariantTraits::assign(*this, var);
     return *this;
 }
 
-inline bool LLBC_Variant::operator ==(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator==(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::eq(*this, another);
 }
 
-inline bool LLBC_Variant::operator !=(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator!=(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::ne(*this, another);
 }
 
-inline bool LLBC_Variant::operator <(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator<(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::lt(*this, another);
 }
 
-inline bool LLBC_Variant::operator >(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator>(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::gt(*this, another);
 }
 
-inline bool LLBC_Variant::operator <=(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator<=(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::le(*this, another);
 }
 
-inline bool LLBC_Variant::operator >=(const LLBC_Variant &another) const
+inline bool LLBC_Variant::operator>=(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::ge(*this, another);
 }
@@ -973,45 +973,45 @@ bool LLBC_Variant::operator>=(const _T &another) const
     return operator>=(LLBC_Variant(another));
 }
 
-inline LLBC_Variant LLBC_Variant::operator +(const LLBC_Variant &another) const
+inline LLBC_Variant LLBC_Variant::operator+(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::add(*this, another);
 }
 
-inline LLBC_Variant LLBC_Variant::operator -(const LLBC_Variant &another) const
+inline LLBC_Variant LLBC_Variant::operator-(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::sub(*this, another);
 }
 
-inline LLBC_Variant LLBC_Variant::operator *(const LLBC_Variant &another) const
+inline LLBC_Variant LLBC_Variant::operator*(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::mul(*this, another);
 }
 
-inline LLBC_Variant LLBC_Variant::operator /(const LLBC_Variant &another) const
+inline LLBC_Variant LLBC_Variant::operator/(const LLBC_Variant &another) const
 {
     return LLBC_VariantTraits::div(*this, another);
 }
 
-inline LLBC_Variant &LLBC_Variant::operator +=(const LLBC_Variant &another)
+inline LLBC_Variant &LLBC_Variant::operator+=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::add_equal(*this, another);
     return *this;
 }
 
-inline LLBC_Variant &LLBC_Variant::operator -=(const LLBC_Variant &another)
+inline LLBC_Variant &LLBC_Variant::operator-=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::sub_equal(*this, another);
     return *this;
 }
 
-inline LLBC_Variant &LLBC_Variant::operator *=(const LLBC_Variant &another)
+inline LLBC_Variant &LLBC_Variant::operator*=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::mul_equal(*this, another);
     return *this;
 }
 
-inline LLBC_Variant &LLBC_Variant::operator /=(const LLBC_Variant &another)
+inline LLBC_Variant &LLBC_Variant::operator/=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::div_equal(*this, another);
     return *this;

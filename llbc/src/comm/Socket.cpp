@@ -156,7 +156,7 @@ LLBC_Socket::operator bool () const
     return !IsClosed();
 }
 
-bool LLBC_Socket::operator ! () const
+bool LLBC_Socket::operator!() const
 {
     return IsClosed();
 }

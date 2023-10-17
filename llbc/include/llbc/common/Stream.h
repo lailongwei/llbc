@@ -885,14 +885,14 @@ public:
      * @param[out] val - value reference.
      */
     template<typename T>
-    LLBC_Stream &operator >>(T &val);
+    LLBC_Stream &operator>>(T &val);
 
     /**
      * Stream output overlapped functions define.
      * @param[in] val - const value reference.
      */
     template<typename T>
-    LLBC_Stream &operator <<(const T &val);
+    LLBC_Stream &operator<<(const T &val);
 
 public:
     /**
@@ -955,7 +955,7 @@ __LLBC_NS_END
 /**
  * Stream output operator support. 
  */
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Stream &stream);
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Stream &stream);
 
 #include "llbc/common/StreamInl.h"
 

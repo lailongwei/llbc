@@ -215,7 +215,7 @@ const typename LLBC_BinaryHeap<T, Comp>::Container &LLBC_BinaryHeap<T, Comp>::Ge
 
 template <typename T, typename Comp>
 typename LLBC_BinaryHeap<T, Comp>::_This &LLBC_BinaryHeap<
-    T, Comp>::operator =(const typename LLBC_BinaryHeap<T, Comp>::_This &right)
+    T, Comp>::operator=(const typename LLBC_BinaryHeap<T, Comp>::_This &right)
 {
     this->Clear();
 
@@ -232,7 +232,7 @@ inline LLBC_BinaryHeap<T, Comp>::operator bool() const
 }
 
 template <typename T, typename Comp>
-inline bool LLBC_BinaryHeap<T, Comp>::operator !() const
+inline bool LLBC_BinaryHeap<T, Comp>::operator!() const
 {
     return this->IsEmpty();
 }

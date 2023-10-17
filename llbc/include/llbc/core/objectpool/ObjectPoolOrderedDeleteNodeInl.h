@@ -189,7 +189,7 @@ inline bool LLBC_ObjectPoolOrderedDeleteNode::IsBackNode(const LLBC_CString &nam
     return false;
 }
 
-inline bool LLBC_ObjectPoolOrderedDeleteNode::operator ==(const LLBC_ObjectPoolOrderedDeleteNode &other) const
+inline bool LLBC_ObjectPoolOrderedDeleteNode::operator==(const LLBC_ObjectPoolOrderedDeleteNode &other) const
 {
     return _name == other._name;
 }

@@ -27,12 +27,12 @@ namespace
 class TestWaiter
 {
 public:
-    void operator ()(bool isApp,
-                     const LLBC_String &name,
-                     const char *phaseStr,
-                     LLBC_Time &begTime,
-                     LLBC_TimeSpan &waitTime,
-                     bool &finFlag)
+    void operator()(bool isApp,
+                    const LLBC_String &name,
+                    const char *phaseStr,
+                    LLBC_Time &begTime,
+                    LLBC_TimeSpan &waitTime,
+                    bool &finFlag)
     {
         const char *operatorType = isApp ? "App" : "Service";
         if (begTime == LLBC_Time::utcBegin)

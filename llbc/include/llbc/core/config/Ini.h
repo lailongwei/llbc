@@ -287,7 +287,7 @@ public:
     /**
      * assignment operation.
      */
-    This &operator =(const This &another);
+    This &operator=(const This &another);
 
 private:
     int ParseLine(const LLBC_String &line, size_t lineNum, LLBC_String &sectionName);
