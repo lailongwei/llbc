@@ -369,7 +369,7 @@ public:
                        const char *cond,
                        const char *behav,
                        const char *fmt2,
-                       ...) LLBC_STRING_FORMAT_CHECK(8, 9)
+                       ...) LLBC_STRING_FORMAT_CHECK(10, 11)
     {
          // Formatting format 1 and format 2.
         LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();
