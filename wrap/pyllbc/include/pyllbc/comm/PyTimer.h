@@ -70,7 +70,7 @@ public:
      * Get timer string representation.
      * @return LLBC_String - the timer string representation.
      */
-    LLBC_String ToString() const;
+    virtual LLBC_String ToString() const;
 
 public:
     /**

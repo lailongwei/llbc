@@ -67,12 +67,12 @@ public:
     virtual void Release();
 
     /**
-     * Thread safety retain object.
+     * Thread safe retain object.
      */
     virtual void SafeRetain();
 
     /**
-     * Thread safety release object.
+     * Thread safe release object.
      */
     virtual void SafeRelease();
 

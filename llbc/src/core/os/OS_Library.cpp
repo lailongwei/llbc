@@ -89,12 +89,11 @@ __LLBC_NS_BEGIN
 
 LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
 {
-    LLBC_LibraryHandle handle = LLBC_INVALID_LIBRARY_HANDLE;
+    LLBC_LibraryHandle handle;
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if ((handle = dlopen(fileName, RTLD_LAZY)) == LLBC_INVALID_LIBRARY_HANDLE)
-    {
         LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
-    }
 
     return handle;
 #else // LLBC_TARGET_PLATFORM_WIN32

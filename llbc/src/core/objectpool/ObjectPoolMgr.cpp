@@ -26,9 +26,9 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS LLBC_SafetyObjectPool *__g_globalObjectPool = nullptr;
-static LLBC_NS LLBC_SafetyObjectPool *__g_entryThreadSafetyObjectPool = nullptr;
-static LLBC_NS LLBC_UnsafetyObjectPool *__g_entryThreadUnsafetyObjectPool = nullptr;
+static LLBC_NS LLBC_SafeObjectPool *__g_globalObjectPool = nullptr;
+static LLBC_NS LLBC_SafeObjectPool *__g_entryThreadSafeObjectPool = nullptr;
+static LLBC_NS LLBC_UnsafeObjectPool *__g_entryThreadUnsafeObjectPool = nullptr;
 
 __LLBC_INTERNAL_NS_END
 
@@ -36,7 +36,7 @@ __LLBC_NS_BEGIN
 
 int LLBC_ThreadObjectPoolMgr::CreateEntryThreadObjectPools()
 {
-    LLBC_INL_NS __g_globalObjectPool = new LLBC_SafetyObjectPool;
+    LLBC_INL_NS __g_globalObjectPool = new LLBC_SafeObjectPool;
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (!tls->coreTls.entryThread)
@@ -44,17 +44,17 @@ int LLBC_ThreadObjectPoolMgr::CreateEntryThreadObjectPools()
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
-    else if (tls->coreTls.safetyObjectPool ||
-             tls->coreTls.unsafetyObjectPool)
+    else if (tls->coreTls.safeObjectPool ||
+             tls->coreTls.unsafeObjectPool)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
-    tls->coreTls.safetyObjectPool = 
-        LLBC_INL_NS __g_entryThreadSafetyObjectPool = new LLBC_SafetyObjectPool;
-    tls->coreTls.unsafetyObjectPool =
-        LLBC_INL_NS __g_entryThreadUnsafetyObjectPool = new ::llbc::LLBC_UnsafetyObjectPool;
+    tls->coreTls.safeObjectPool = 
+        LLBC_INL_NS __g_entryThreadSafeObjectPool = new LLBC_SafeObjectPool;
+    tls->coreTls.unsafeObjectPool =
+        LLBC_INL_NS __g_entryThreadUnsafeObjectPool = new ::llbc::LLBC_UnsafeObjectPool;
 
     return LLBC_OK;
 }
@@ -67,50 +67,50 @@ int LLBC_ThreadObjectPoolMgr::DestroyEntryThreadObjectPools()
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
-    else if (!tls->coreTls.safetyObjectPool ||
-             !tls->coreTls.unsafetyObjectPool)
+    else if (!tls->coreTls.safeObjectPool ||
+             !tls->coreTls.unsafeObjectPool)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
 
-    tls->coreTls.safetyObjectPool = nullptr;
-    tls->coreTls.unsafetyObjectPool = nullptr;
+    tls->coreTls.safeObjectPool = nullptr;
+    tls->coreTls.unsafeObjectPool = nullptr;
 
-    LLBC_XDelete(LLBC_INL_NS __g_entryThreadSafetyObjectPool);
-    LLBC_XDelete(LLBC_INL_NS __g_entryThreadUnsafetyObjectPool);
+    LLBC_XDelete(LLBC_INL_NS __g_entryThreadSafeObjectPool);
+    LLBC_XDelete(LLBC_INL_NS __g_entryThreadUnsafeObjectPool);
 
     LLBC_XDelete(LLBC_INL_NS __g_globalObjectPool);
 
     return LLBC_OK;
 }
 
-LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadSafetyObjectPool()
+LLBC_SafeObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadSafeObjectPool()
 {
-    return LLBC_INTERNAL_NS __g_entryThreadSafetyObjectPool;
+    return LLBC_INTERNAL_NS __g_entryThreadSafeObjectPool;
 }
 
-LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadUnsafetyObjectPool()
+LLBC_UnsafeObjectPool *LLBC_ThreadObjectPoolMgr::GetEntryThreadUnsafeObjectPool()
 {
-    return LLBC_INTERNAL_NS __g_entryThreadUnsafetyObjectPool;
+    return LLBC_INTERNAL_NS __g_entryThreadUnsafeObjectPool;
 }
 
-LLBC_SafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadSafetyObjectPool()
+LLBC_SafeObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadSafeObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (UNLIKELY(tls->coreTls.safetyObjectPool == nullptr))
-        tls->coreTls.safetyObjectPool = new LLBC_SafetyObjectPool;
+    if (UNLIKELY(tls->coreTls.safeObjectPool == nullptr))
+        tls->coreTls.safeObjectPool = new LLBC_SafeObjectPool;
 
-    return reinterpret_cast<LLBC_SafetyObjectPool *>(tls->coreTls.safetyObjectPool);
+    return reinterpret_cast<LLBC_SafeObjectPool *>(tls->coreTls.safeObjectPool);
 }
 
-LLBC_UnsafetyObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafetyObjectPool()
+LLBC_UnsafeObjectPool *LLBC_ThreadObjectPoolMgr::GetCurThreadUnsafeObjectPool()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (UNLIKELY(tls->coreTls.unsafetyObjectPool == nullptr))
-        tls->coreTls.unsafetyObjectPool = new LLBC_UnsafetyObjectPool;
+    if (UNLIKELY(tls->coreTls.unsafeObjectPool == nullptr))
+        tls->coreTls.unsafeObjectPool = new LLBC_UnsafeObjectPool;
 
-    return reinterpret_cast<LLBC_UnsafetyObjectPool *>(tls->coreTls.unsafetyObjectPool);
+    return reinterpret_cast<LLBC_UnsafeObjectPool *>(tls->coreTls.unsafeObjectPool);
 }
 
 __LLBC_NS_END

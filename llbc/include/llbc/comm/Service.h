@@ -27,8 +27,8 @@
 
 __LLBC_NS_BEGIN
  /**
- * Previous declare some classes.
- */
+  * Previous declare some classes.
+  */
 class LLBC_Packet;
 class LLBC_Session;
 class LLBC_PollerMgr;
@@ -42,22 +42,104 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
+ * \brief The service running phase enumeration.
+ */
+class LLBC_ServiceRunningPhase
+{
+public:
+    enum ENUM
+    {
+        Begin = 0,
+
+        // Service has not been started.
+        NotStarted = Begin,
+
+        // Service pre-starting(Perform some preparatory work before initializing components).
+        PreStarting,
+        // Specific service pre-start failed.
+        PreStartFailed,
+        // Service has been pre-started.
+        PreStarted,
+
+        // Service is currently initializing components.
+        InitingComps,
+        // Specific service initialize components failed.
+        InitCompsFailed,
+        // Service has been initialized all components.
+        CompsInited,
+
+        // Service is currently starting components.
+        StartingComps,
+        // Specific service start components failed.
+        StartCompsFailed,
+        // Service has been started all components.
+        CompsStarted,
+
+        // Service has been started.
+        Started,
+
+        // Service is currently stopping components.
+        StoppingComps,
+
+        // Service is currently stopping.
+        Stopping,
+
+        End,
+    };
+
+    /**
+     * Check given running is failed phase or not.
+     * Failed phases: XXXFailed.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - failed phase flag.
+     */
+    static constexpr bool IsFailedPhase(int runningPhase);
+
+    /**
+     * Check given running phase is stopping phase or not.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - stopping phase flag.
+     */
+    static constexpr bool IsStoppingPhase(int runningPhase);
+
+    /**
+     * Check given running phase is failed/stopping phase or not.
+     * @param[in] runningPhase - the running phase.
+     * @return bool - failed/stopping phase flag.
+     */
+    static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
+};
+
+/**
+ * \brief The service drive mode enumeration.
+ */
+class LLBC_ServiceDriveMode
+{
+public:
+    enum ENUM
+    {
+        Begin = 0,
+        // Self drive mode: Using service internal thread to drive OnSvc() method call.
+        SelfDrive = Begin,
+        // External drive mode: Using external internal thread to drive OnSvc() method call.
+        ExternalDrive,
+
+        End
+    };
+
+    /**
+     * Check given drive mode is validate or not.
+     * @param[in] driveMode - the service drive mode.
+     * @return bool - return true if validate, otherwise return false.
+     */
+    static constexpr bool IsValid(int driveMode);
+};
+
+/**
  * \brief The service interface class define.
  */
 class LLBC_EXPORT LLBC_Service : protected LLBC_Task
 {
-    typedef LLBC_Service This;
-
-public:
-    /**
-     * The service drive mode enumeration.
-     */
-    enum DriveMode
-    {
-        SelfDrive,
-        ExternalDrive,
-    };
-
 public:
     // Import Base::Push/Base::Wait method to service.
     using LLBC_Task::Push;
@@ -72,11 +154,11 @@ public:
      * @param[in] name               - the service name.
      * @param[in] dftProtocolFactory - the service default protocol factory, if null will use library normal protocol factory.
      * @param[in] fullStack          - the full stack option, default is true.
-     * @return This * - new service.
+     * @return LLBC_Service * - new service.
      */
-    static This *Create(const LLBC_String &name = "",
-                        LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                        bool fullStack = true);
+    static LLBC_Service *Create(const LLBC_String &name = "",
+                                LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                                bool fullStack = true);
 
 public:
     /**
@@ -117,16 +199,16 @@ public:
 
     /**
      * Get the service drive mode.
-     * @return DriveMode - the service drive mode.
+     * @return LLBC_ServiceDriveMode::ENUM - the service drive mode.
      */
-    virtual DriveMode GetDriveMode() const = 0;
+    virtual LLBC_ServiceDriveMode::ENUM GetDriveMode() const = 0;
 
     /**
      * Set the service drive mode.
-     * @param[in] mode - the service drive mode.
+     * @param[in] driveMode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SetDriveMode(DriveMode mode) = 0;
+    virtual int SetDriveMode(LLBC_ServiceDriveMode::ENUM driveMode) = 0;
 
 public:
     /**
@@ -151,8 +233,9 @@ public:
 
     /**
      * Stop the service.
+     * @return int - return 0 if success, otherwise return failed.
      */
-    virtual void Stop() = 0;
+    virtual int Stop() = 0;
 
 public:
     /**
@@ -248,80 +331,71 @@ public:
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId     - the service Id.
      * @param[in] sessionId - the session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] coder     - the coder.
      * @param[in] status    - the status, default is 0.
+     * @param[in] flags     - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId);
-    virtual int Send(int sessionId, int opcode);
-    virtual int Send(int sessionId, LLBC_Coder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder);
-    virtual int Send(int sessionId, int opcode, LLBC_Coder *coder, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, LLBC_Coder *coder, int status);
+    int Send(int sessionId,
+             int opcode,
+             LLBC_Coder *coder,
+             int status = 0,
+             uint32 flags = 0);
 
     /**
      * Send bytes(these methods will automatics create packet to send).
-     * @param[in] svcId     - the service Id.
      * @param[in] sessionId - the session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] bytes     - the bytes data.
      * @param[in] len       - data length.
      * @param[in] status    - the status, default is 0.
+     * @param[in] flags     - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(int sessionId, const void *bytes, size_t len);
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len);
-    virtual int Send(int sessionId, int opcode, const void *bytes, size_t len, int status);
-    virtual int Send(int svcId, int sessionId, int opcode, const void *bytes, size_t len, int status);
+    int Send(int sessionId,
+             int opcode,
+             const void *bytes,
+             size_t len,
+             int status = 0,
+             uint32 flags = 0);
 
-public:
     /** 
      * Multicast data(these methods will automatics create packet to send).
      * Note: 
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, LLBC_Coder *coder);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, LLBC_Coder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status) = 0;
-
-    /**
-     * Multicast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
      * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
-     * @param[in] bytes      - bytes to multi cast.
-     * @param[in] len   `    - will send bytes len, in bytes.
+     * @param[in] coder      - the coder.
      * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, const void *bytes, size_t len);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len);
-    template <typename SessionIds>
-    int Multicast(const SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status) = 0;
+    int Multicast(const LLBC_SessionIds &sessionIds,
+                  int opcode,
+                  LLBC_Coder *coder,
+                  int status = 0,
+                  uint32 flags = 0);
+
+    /** 
+     * Multicast bytes.
+     * @param[in] sessionIds - the session Ids.
+     * @param[in] opcode     - the opcode.
+     * @param[in] bytes      - the bytes data.
+     * @param[in] len        - the bytes length.
+     * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Multicast(const LLBC_SessionIds &sessionIds,
+                          int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0) = 0;
 
     /** 
      * Broadcast data(these methods will automatics create packet to send).
@@ -329,29 +403,31 @@ public:
      *      no matter this method success or not, coder will be managed by this call,
      *      it means no matter this call success or not, delete coder operation will
      *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
+     * @param[in] opcode - the opcode.
+     * @param[in] coder  - the coder.
+     * @param[in] status - the status, default is 0.
+     * @param[in] flags  - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast();
-    virtual int Broadcast(int opcode);
-    virtual int Broadcast(int opcode, LLBC_Coder *coder, int status);
-    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status) = 0;
+    int Broadcast(int opcode,
+                  LLBC_Coder *coder,
+                  int status = 0,
+                  uint32 flags = 0);
 
     /**
-     * Broadcast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
-     * @param[in] opcode     - the opcode.
-     * @param[in] bytes      - bytes to multi cast.
-     * @param[in] len   `    - will send bytes len, in bytes.
-     * @param[in] status     - the status, default is 0.
+     * Broadcast bytes.
+     * @param[in] opcode - the opcode.
+     * @param[in] bytes  - bytes to multi cast.
+     * @param[in] len    - will send bytes len, in bytes.
+     * @param[in] status - the status, default is 0.
+     * @param[in] flags  - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode, const void *bytes, size_t len);
-    virtual int Broadcast(int opcode, const void *bytes, size_t len, int status);
-    virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status) = 0;
+    virtual int Broadcast(int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0) = 0;
 
     /**
      * Remove session, always success.
@@ -423,14 +499,6 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_CoderFactory, CoderFactory>::value, int>::type
     AddCoderFactory(int opcode);
     virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory) = 0;
-
-    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-public:
-    /**
-     * Add status code describe.
-     */
-    virtual int AddStatusDesc(int status, const LLBC_String &desc) = 0;
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 public:
     /**
@@ -537,8 +605,6 @@ public:
      */
     virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId) = 0;
 
-protected:
-
 public:
     /**
      * Get event manager.
@@ -551,22 +617,17 @@ public:
      * Post runnable to service.
      * @param[in] obj    - the runnable object.
      * @param[in] method - the runnable method.
-     * @param[in] data   - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename ObjType>
-    int Post(ObjType *obj,
-             void (ObjType::*method)(This *, const LLBC_Variant &data),
-             const LLBC_Variant &data = LLBC_Variant::nil);
+    int Post(ObjType *obj, void (ObjType:: *method)(LLBC_Service *));
 
     /**
      * Post runnable to service.
      * @param[in] runnable - the runnable obj.
-     * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(This *, const LLBC_Variant &)> &runnable,
-                     const LLBC_Variant &data = LLBC_Variant::nil) = 0;
+    virtual int Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable) = 0;
 
     /**
      * Get service codec protocol stack, only full-stack option disabled available.
@@ -578,25 +639,25 @@ public:
 
 public:
     /**
-     * Get service safety object pool.
-     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     * Get service safe object pool.
+     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
      */
-    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool() = 0;
+    virtual LLBC_SafeObjectPool &GetSafeObjectPool() = 0;
 
     /**
-     * Get service unsafety object pool.
-     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     * Get service unsafe object pool.
+     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
      */
-    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool() = 0;
+    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool() = 0;
 
     /**
-     * Get service packet object pool(thread safety).
+     * Get service packet object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool() = 0;
 
     /**
-     * Get message block object pool(thread safety).
+     * Get message block object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
@@ -607,6 +668,17 @@ public:
      * @param[in] fullFrame - the full frame flag.
      */
     virtual void OnSvc(bool fullFrame = true) = 0;
+
+protected:
+    /**
+     * Get given component name.
+     * @param[in] qualifiedCompName - the qualified component name.
+     * @param[out] compName         - the component name.
+     * @param[out] compNameLen      - the component name length.
+     */
+    static void GetCompName(const char *qualifiedCompName,
+                            char (&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
+                            size_t &compNameLen);
 
 protected:
     /**

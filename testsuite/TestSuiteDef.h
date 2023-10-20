@@ -1,12 +1,13 @@
-#ifndef _TEST_SUIT_DEF_H_
-#define _TEST_SUIT_DEF_H_
+#pragma once
 
 __DEF_TEST_CASE_BEGIN
 __DEFINE_TEST_CASE(TestCase_Com_Version)
 __DEFINE_TEST_CASE(TestCase_Com_DataType)
 __DEFINE_TEST_CASE(TestCase_Com_Endian)
 __DEFINE_TEST_CASE(TestCase_Com_Stream)
+__DEFINE_TEST_CASE(TestCase_Com_NewStream)
 __DEFINE_TEST_CASE(TestCase_Com_Error)
+__DEFINE_TEST_CASE(TestCase_Com_Macro)
 __DEFINE_TEST_CASE(TestCase_Com_Compiler)
 __DEFINE_TEST_CASE(TestCase_Com_RTTI)
 __DEFINE_TEST_CASE(TestCase_Com_ConcatMacro)
@@ -78,5 +79,3 @@ __DEF_TEST_CASE_END
 #undef __DEF_TEST_CASE_BEGIN
 #undef __DEFINE_TEST_CASE
 #undef __DEF_TEST_CASE_END
-
-#endif //_TEST_SUIT_DEF_H_

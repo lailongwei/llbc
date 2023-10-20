@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/time/TimeConst.h"
 
 __LLBC_NS_BEGIN
 
@@ -49,37 +50,38 @@ inline time_t LLBC_Time::NowTimestampInSecs()
 
 inline sint64 LLBC_Time::NowTimestampInMillis()
 {
-    return LLBC_GetMilliSeconds();
+    return LLBC_GetMilliseconds();
 }
 
 inline sint64 LLBC_Time::NowTimestampInMicros()
 {
-    return LLBC_GetMicroSeconds();
+    return LLBC_GetMicroseconds();
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
-    return LLBC_Time(clanderTimeInSeconds * NumOfMicroSecondsPerSecond);
+    return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::numOfMicrosPerSecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMilliSeconds)
+inline LLBC_Time LLBC_Time::FromMillis(sint64 clanderTimeInMillis)
 {
-    return LLBC_Time(clanderTimeInMilliSeconds * NumOfMicroSecondsPerMilliSecond);
+    return LLBC_Time(clanderTimeInMillis * LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
-inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicroSeconds)
+inline LLBC_Time LLBC_Time::FromMicros(sint64 clanderTimeInMicros)
 {
-    return LLBC_Time(clanderTimeInMicroSeconds);
+    return LLBC_Time(clanderTimeInMicros);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeVal(const timeval &timeVal)
 {
-    return LLBC_Time(timeVal.tv_sec * NumOfMicroSecondsPerSecond + timeVal.tv_usec);
+    return LLBC_Time(timeVal.tv_sec * LLBC_TimeConst::numOfMicrosPerSecond + timeVal.tv_usec);
 }
 
 inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
 {
-    return LLBC_Time(timeSpec.tv_sec * NumOfMicroSecondsPerSecond + timeSpec.tv_nsec / NumOfNanoSecondsPerMicroSecond);
+    return LLBC_Time(timeSpec.tv_sec * LLBC_TimeConst::numOfMicrosPerSecond +
+                     timeSpec.tv_nsec / LLBC_TimeConst::numOfNanosPerMicrosecond);
 }
 
 inline int LLBC_Time::GetYear() const
@@ -129,12 +131,12 @@ inline int LLBC_Time::GetSecond() const
 
 inline time_t LLBC_Time::GetTimestampInSecs() const
 {
-    return static_cast<time_t>(_time / LLBC_TimeConstant::NumOfMicroSecondsPerSecond);
+    return static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
 }
 
 inline sint64 LLBC_Time::GetTimestampInMillis() const
 {
-    return _time / LLBC_TimeConstant::NumOfMicroSecondsPerMilliSecond;
+    return _time / LLBC_TimeConst::numOfMicrosPerMillisecond;
 }
 
 inline sint64 LLBC_Time::GetTimestampInMicros() const
@@ -172,32 +174,68 @@ inline LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, co
     return FromSeconds(clanderTimeInSeconds).FormatAsGmt(format);
 }
 
-inline bool LLBC_Time::operator ==(const LLBC_Time &time) const
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfHour(const LLBC_TimeSpan &toTimeOfHour) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneHour, toTimeOfHour);
+}
+
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_TimeSpan &toTimeOfDay) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneDay, toTimeOfDay);
+}
+
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek) const
+{
+    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek);
+}
+
+inline bool LLBC_Time::IsCrossedHour(const LLBC_Time &from,
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfHour)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneHour, timeOfHour);
+}
+
+inline bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
+                                    const LLBC_Time &to,
+                                    const LLBC_TimeSpan &timeOfDay)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneDay, timeOfDay);
+}
+
+inline bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfWeek)
+{
+    return IsCrossed(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek);
+}
+
+inline bool LLBC_Time::operator==(const LLBC_Time &time) const
 {
     return _time == time._time;
 }
 
-inline bool LLBC_Time::operator !=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator!=(const LLBC_Time &time) const
 {
     return _time != time._time;
 }
 
-inline bool LLBC_Time::operator <(const LLBC_Time &time) const
+inline bool LLBC_Time::operator<(const LLBC_Time &time) const
 {
     return _time < time._time;
 }
 
-inline bool LLBC_Time::operator >(const LLBC_Time &time) const
+inline bool LLBC_Time::operator>(const LLBC_Time &time) const
 {
     return _time > time._time;
 }
 
-inline bool LLBC_Time::operator >=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator>=(const LLBC_Time &time) const
 {
     return _time >= time._time;
 }
 
-inline bool LLBC_Time::operator <=(const LLBC_Time &time) const
+inline bool LLBC_Time::operator<=(const LLBC_Time &time) const
 {
     return _time <= time._time;
 }
@@ -207,8 +245,8 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
     stream.Write(_time);
 }
 
-inline LLBC_Time::LLBC_Time(const sint64 &clanderTimeInMicroSeconds)
-: _time(clanderTimeInMicroSeconds)
+inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)
+: _time(clendarTimeInMicroseconds)
 {
     UpdateTimeStructs();
 }

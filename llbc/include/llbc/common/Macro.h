@@ -163,8 +163,13 @@
  #endif
 #elif LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-  #define LLBC_EXPORTING 0
-  #define LLBC_EXPORT __declspec(dllimport)
+   #ifdef LLBC_LINK_STATIC_LIBRARY
+    #define LLBC_EXPORTING 0
+    #define LLBC_EXPORT
+   #else
+    #define LLBC_EXPORTING 1
+    #define LLBC_EXPORT  __declspec(dllimport)
+   #endif
  #endif
 #elif LLBC_TARGET_PLATFORM_IPHONE
  #ifndef LLBC_EXPORT
@@ -201,10 +206,10 @@
 #endif
 
 // Disable assignments of objects.
-#define LLBC_DISABLE_ASSIGNMENT(name)       \
-private:                                    \
-    name(const name &) = delete;            \
-    name &operator =(const name &) = delete \
+#define LLBC_DISABLE_ASSIGNMENT(name)      \
+private:                                   \
+    name(const name &) = delete;           \
+    name &operator=(const name &) = delete \
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX
@@ -250,9 +255,9 @@ private:                                    \
 
 /* Memory operations macros. */
 // allocate/reallocate/free/delete/recycle.
-#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
-#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
-#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
+#define LLBC_Malloc(type, sizeInBytes)            (reinterpret_cast<type *>(malloc(sizeInBytes)))
+#define LLBC_Calloc(type, sizeInBytes)            (reinterpret_cast<type *>(calloc(sizeInBytes, 1)))
+#define LLBC_Realloc(type, memblock, sizeInBytes) (reinterpret_cast<type *>(realloc((memblock), (sizeInBytes))))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
@@ -331,7 +336,7 @@ private:                                    \
  * RTTI support.
  */
 // Define rtti buffer size.
- #define __LLBC_RTTI_BUF_SIZE    512
+ #define __LLBC_RTTI_BUF_SIZE    (32 * 1024)
 
 /**
  * Component generic call method convenience macros define.
@@ -365,25 +370,34 @@ private:                                    \
 /**
  * Some condition judge helper macros.
  */
-#define LLBC_Foreach(cont, behav)                             \
-    do{ for (auto &item : cont) { behav; } } while(false)     \
+#define LLBC_Foreach(cont, behav)                                   \
+    { for (auto &item : (cont)) { behav; } }                        \
 
-#define LLBC_DoIf(cond, behav)                                \
-    do{ if (cond) { behav; } } while(false)                   \
+#define LLBC_DoIf(cond, behav)                                      \
+    { if ((cond)) { behav; } }                                      \
 
-#define LLBC_ContinueIf(cond)                                 \
-    if (cond) continue                                        \
+#define LLBC_ContinueIf(cond)                                       \
+    { if ((cond)) continue; }                                       \
 
-#define LLBC_BreakIf(cond)                                    \
-    if (cond) break                                           \
+#define LLBC_BreakIf(cond)                                          \
+    { if ((cond)) break; }                                          \
 
-#define LLBC_SetErrAndBreakIf(cond, err)                      \
-    if (cond) { LLBC_NS LLBC_SetLastError(err); break; }      \
+#define LLBC_SetErrAndBreakIf(cond, err)                            \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); break; } }      \
 
-#define LLBC_ReturnIf(cond, ret)                              \
-    do{ if (cond) { return ret; } } while(false)              \
+#define LLBC_ReturnIf(cond, ret)                                    \
+    { if ((cond)) { return ret; } }                                 \
 
-#define LLBC_SetErrAndReturnIf(cond, err, ret)                \
-    if (cond) { LLBC_NS LLBC_SetLastError(err); return ret; } \
+#define LLBC_SetErrAndReturnIf(cond, err, ret)                      \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
 
+#define LLBC_ExitIf(cond, exitCode)                                 \
+    { if ((cond)) exit(static_cast<int>(exitCode)); }               \
 
+#define LLBC_DoIfNot(cond, behav) LLBC_DoIf(!(cond), behav)
+#define LLBC_ContinueIfNot(cond, behav) LLBC_ContinueIf(!(cond), behav)
+#define LLBC_BreakIfNot(cond, behav) LLBC_BreakIf(!(cond), behav)
+#define LLBC_SetErrAndBreakIfNot(cond, err) LLBC_SetErrAndBreakIf(!(cond), err)
+#define LLBC_ReturnIfNot(cond, ret) LLBC_ReturnIf(!(cond), ret)
+#define LLBC_SetErrAndReturnIfNot(cond, err, ret) LLBC_SetErrAndReturnIf(!(cond), err, ret)
+#define LLBC_ExitIfNot(cond, exitCode) LLBC_ExitIf(!(cond), exitCode)

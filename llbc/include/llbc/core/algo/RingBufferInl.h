@@ -23,91 +23,94 @@
 
 __LLBC_NS_BEGIN
 
-template <typename ElemType>
-LLBC_FORCE_INLINE LLBC_RingBuffer<ElemType>::LLBC_RingBuffer(size_t cap)
-: _elems(LLBC_Malloc(ElemType, sizeof(ElemType) * cap))
+template <typename T>
+LLBC_FORCE_INLINE LLBC_RingBuffer<T>::LLBC_RingBuffer(size_t cap)
+: _elems(LLBC_Malloc(T, sizeof(T) * cap))
 , _capacity(cap)
+
 , _front(0)
 , _tail(0)
 , _full(false)
 {
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE LLBC_RingBuffer<ElemType>::~LLBC_RingBuffer()
+template <typename T>
+LLBC_FORCE_INLINE LLBC_RingBuffer<T>::~LLBC_RingBuffer()
 {
-    while (!IsEmpty())
-    {
-        _elems[_front].~ElemType();
-        if (UNLIKELY(++_front == _capacity))
-            _front = 0;
-
-        if (UNLIKELY(_full))
-            _full = false;
-    }
-
+    Clear();
     free(_elems);
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Push(const ElemType &elem)
+template <typename T>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<T>::Push(T &&elem)
 {
     if (UNLIKELY(_full))
         ReCapacity(_capacity << 1);
 
-    new (&_elems[_tail]) ElemType(elem);
+    new (&_elems[_tail]) T(std::move(elem));
     if (UNLIKELY(++_tail == _capacity))
         _tail = 0;
 
     _full = (_tail == _front);
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE ElemType LLBC_RingBuffer<ElemType>::Pop()
+template <typename T>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<T>::Push(const T &elem)
+{
+    if (UNLIKELY(_full))
+        ReCapacity(_capacity << 1);
+
+    new (&_elems[_tail]) T(elem);
+    if (UNLIKELY(++_tail == _capacity))
+        _tail = 0;
+
+    _full = (_tail == _front);
+}
+
+template <typename T>
+LLBC_FORCE_INLINE T LLBC_RingBuffer<T>::Pop()
 {
 #if LLBC_DEBUG
     ASSERT(!IsEmpty() && "Try pop a empty LLBC_RingBuffer!");
 #endif
 
-    // TODO: Use cxx11 rvalue ref construct.
-    ElemType elem = _elems[_front];
-    _elems[_front].~ElemType();
+    T elem(std::move(_elems[_front]));
+    _elems[_front].~T();
 
     if (UNLIKELY(++_front == _capacity))
         _front = 0;
 
-    if (UNLIKELY(_full))
-        _full = false;
+    _full = false;
 
     return elem;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE ElemType &LLBC_RingBuffer<ElemType>::Front()
+template <typename T>
+LLBC_FORCE_INLINE T &LLBC_RingBuffer<T>::Front()
 {
     return _elems[_front];
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE const ElemType &LLBC_RingBuffer<ElemType>::Front() const
+template <typename T>
+LLBC_FORCE_INLINE const T &LLBC_RingBuffer<T>::Front() const
 {
-    return _elems[_front];
+    return const_cast<LLBC_RingBuffer *>(this)->Front();
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE ElemType &LLBC_RingBuffer<ElemType>::Tail()
+template <typename T>
+LLBC_FORCE_INLINE T &LLBC_RingBuffer<T>::Tail()
 {
-    return _elems[_tail];
+    return _tail > 0 ? _elems[_tail - 1] : _elems[_capacity - 1];
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE const ElemType &LLBC_RingBuffer<ElemType>::Tail() const
+template <typename T>
+LLBC_FORCE_INLINE const T &LLBC_RingBuffer<T>::Tail() const
 {
-    return _elems[_tail];
+    return const_cast<LLBC_RingBuffer *>(this)->Tail();
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE size_t LLBC_RingBuffer<ElemType>::GetSize() const
+template <typename T>
+LLBC_FORCE_INLINE size_t LLBC_RingBuffer<T>::GetSize() const
 {
     if (_tail > _front)
         return _tail - _front;
@@ -117,22 +120,22 @@ LLBC_FORCE_INLINE size_t LLBC_RingBuffer<ElemType>::GetSize() const
         return _capacity - _front + _tail;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE size_t LLBC_RingBuffer<ElemType>::GetCapacity() const
+template <typename T>
+LLBC_FORCE_INLINE size_t LLBC_RingBuffer<T>::GetCapacity() const
 {
     return _capacity;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::ReCapacity(size_t newCap)
+template <typename T>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<T>::ReCapacity(size_t newCap)
 {
     if (UNLIKELY(newCap <= _capacity))
         return;
 
     size_t tail = 0;
-    ElemType *newElems = LLBC_Malloc(ElemType, sizeof(ElemType) * newCap);
+    T *newElems = LLBC_Malloc(T, sizeof(T) * newCap);
     while (!IsEmpty())
-        new (&newElems[tail++]) ElemType(Pop());
+        new (&newElems[tail++]) T(Pop());
 
     free(_elems);
     _elems = newElems;
@@ -142,38 +145,35 @@ LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::ReCapacity(size_t newCap)
     _capacity = newCap;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE bool LLBC_RingBuffer<ElemType>::IsFull() const
+template <typename T>
+LLBC_FORCE_INLINE bool LLBC_RingBuffer<T>::IsFull() const
 {
     return _full;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE bool LLBC_RingBuffer<ElemType>::IsEmpty() const
+template <typename T>
+LLBC_FORCE_INLINE bool LLBC_RingBuffer<T>::IsEmpty() const
 {
-    return !_full && _tail == _front;
+    return _tail == _front && !_full;
 }
 
-template <typename ElemType>
-LLBC_FORCE_INLINE void LLBC_RingBuffer<ElemType>::Clear()
+template <typename T>
+LLBC_FORCE_INLINE void LLBC_RingBuffer<T>::Clear()
 {
     if (_front < _tail)
     {
 
         for (; _front != _tail; ++_front)
-            _elems[_front].~ElemType();
+            _elems[_front].~T();
     }
-    else
+    else if (_front != _tail || _full)
     {
-        if (IsEmpty())
-            return;
-
         for (; _front != _capacity; ++_front)
-            _elems[_front].~ElemType();
+            _elems[_front].~T();
 
         _front = 0;
         for (; _front != _tail; ++_front)
-            _elems[_front].~ElemType();
+            _elems[_front].~T();
 
         _full = false;
     }

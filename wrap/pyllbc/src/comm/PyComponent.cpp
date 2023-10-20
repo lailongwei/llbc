@@ -33,15 +33,6 @@ namespace
     typedef pyllbc_ComponentEvBuilder _EvBuilder;
 }
 
-namespace
-{
-    void DecRefPyObj(void *obj)
-    {
-        PyObject *pyObj = reinterpret_cast<PyObject *>(obj);
-        Py_DECREF(pyObj);
-    }
-}
-
 pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 : LLBC_Component(LLBC_ComponentEvents::AllEvents)
 , _svc(svc)
@@ -78,7 +69,7 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
 , _pyPacketReuseMeth(nullptr)
 #endif // PYLLBC_CFG_PACKET_REUSE
 , _pyNullCObj(PyInt_FromLong(0))
-, _pyPacketCreateArgs(PyTuple_New(7))
+, _pyPacketCreateArgs(PyTuple_New(6))
 
 , _pyStream(nullptr)
 , _nativeStream(nullptr)
@@ -175,7 +166,7 @@ void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
         return;
 
     PyObject *pyIdleTime = PyFloat_FromDouble(
-        idleTime.GetTotalMicroSeconds() / static_cast<double>(LLBC_TimeConstant::NumOfMicroSecondsPerSecond));
+        idleTime.GetTotalMicros() / static_cast<double>(LLBC_TimeConst::numOfMicrosPerSecond));
     PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
     Py_DECREF(pyIdleTime);
 
@@ -393,7 +384,6 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
         pyData = _pyStream;
     }
 
-    PyObject *pySenderSvcId = PyInt_FromLong(packet.GetSenderServiceId());
     PyObject *pySessionId = PyInt_FromLong(packet.GetSessionId());
 
     PyObject *pyOpcode = PyInt_FromLong(packet.GetOpcode());
@@ -401,17 +391,16 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
 
     PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
 
-    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySenderSvcId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 2, pySessionId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyOpcode);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyStatus);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyData);
-    PyTuple_SetItem(_pyPacketCreateArgs, 6, pyPacketCObj);
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
     #if PYLLBC_CFG_PACKET_REUSE
     PyObject *reuseRet = PyObject_CallObject(_pyPacketReuseMeth, _pyPacketCreateArgs);
 
     Py_IncRef(Py_None);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, Py_None); // Only clear pyData item(index 5).
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
 
     if (UNLIKELY(!reuseRet))
     {
@@ -427,7 +416,7 @@ PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
     PyObject *pyPacket = PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
 
     Py_IncRef(Py_None);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, Py_None); // Only clear pyData item(index 5).
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
 
     if (UNLIKELY(!pyPacket))
     {
@@ -499,18 +488,16 @@ PyObject* pyllbc_Component::CreateReusePyPacket()
     PyObject *pyData = Py_None;
     Py_IncRef(pyData);
 
-    PyObject *pySenderSvcId = PyInt_FromLong(0);
     PyObject *pySessionId = PyInt_FromLong(0);
     PyObject *pyOpcode = PyInt_FromLong(0);
     PyObject *pyStatus = PyInt_FromLong(0);
     PyObject *pyPacketCObj = PyInt_FromLong(0);
 
-    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySenderSvcId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 2, pySessionId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyOpcode);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyStatus);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyData);
-    PyTuple_SetItem(_pyPacketCreateArgs, 6, pyPacketCObj);
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
 
     return PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
 }

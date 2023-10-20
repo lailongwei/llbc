@@ -40,6 +40,6 @@ private:
     void DoConverienceMethodsTest();
     void DoPerfTest();
     void DoComplexObjPerfTest();
-    void DoPoolDebugAssetTest();
+    void DoPoolDebugAssertTest();
     void DoStringSpecificPoolInstTest();
 };

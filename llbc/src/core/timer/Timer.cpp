@@ -129,8 +129,8 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
         }
     }
 
-    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMilliSeconds());
-    sint64 periodMillis = MAX(0ll, period.GetTotalMilliSeconds());
+    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMillis());
+    sint64 periodMillis = MAX(0ll, period.GetTotalMillis());
     if (periodMillis == 0ll)
         periodMillis = dueTimeMillis;
 

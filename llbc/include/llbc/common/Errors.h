@@ -56,8 +56,8 @@ LLBC_EXPORT const char *LLBC_StrError(int no);
 
 /**
  * Format error message(extend version).
- * @param[in] no        - error number.
- * @param[in] subErrrno - the sub error number.
+ * @param[in] no       - error number.
+ * @param[in] subErrno - the sub error number.
  */
 LLBC_EXPORT const char *LLBC_StrErrorEx(int no, int subErrno);
 

@@ -122,7 +122,7 @@ public:
     /**
      * = Operate function.
      */
-    _This &operator =(const _This &right);
+    _This &operator=(const _This &right);
 
     /**
      * bool Operate function.
@@ -132,7 +132,7 @@ public:
     /**
      * ! Operate function.
      */
-    bool operator !() const;
+    bool operator!() const;
 
 private:
     /**

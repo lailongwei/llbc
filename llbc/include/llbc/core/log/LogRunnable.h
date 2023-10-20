@@ -88,7 +88,7 @@ private:
     /**
      * Flush all loggers.
      * @param[in] force - force or not.
-     * @param[in] now   - now time, in milli-seconds. if is set to 0, will call LLBC_GetMilliSeconds() to fetch now time.
+     * @param[in] now   - now time, in milli-seconds. if is set to 0, will call LLBC_GetMilliseconds() to fetch now time.
      */
     void FlushLoggers(bool force, sint64 now);
 

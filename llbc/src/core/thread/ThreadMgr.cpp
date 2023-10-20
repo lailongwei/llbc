@@ -364,8 +364,8 @@ void LLBC_ThreadMgr::ThreadEntry(void *arg)
                       DUPLICATE_SAME_ACCESS);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     // Setup core tls some components.
-    tls->coreTls.safetyObjectPool = new LLBC_NS LLBC_SafetyObjectPool;
-    tls->coreTls.unsafetyObjectPool = new LLBC_NS LLBC_UnsafetyObjectPool;
+    tls->coreTls.safeObjectPool = new LLBC_NS LLBC_SafeObjectPool;
+    tls->coreTls.unsafeObjectPool = new LLBC_NS LLBC_UnsafeObjectPool;
     tls->coreTls.timerScheduler = new LLBC_NS LLBC_TimerScheduler;
     // Setup objbase tls some components.
     tls->objbaseTls.poolStack = new LLBC_NS LLBC_AutoReleasePoolStack;
@@ -418,10 +418,10 @@ void LLBC_ThreadMgr::ThreadEntry(void *arg)
     // Cleanup core tls components.
     delete reinterpret_cast<LLBC_NS LLBC_TimerScheduler *>(
         tls->coreTls.timerScheduler); tls->coreTls.timerScheduler = nullptr;
-    delete reinterpret_cast<LLBC_NS LLBC_SafetyObjectPool *>(
-        tls->coreTls.safetyObjectPool); tls->coreTls.safetyObjectPool = nullptr;
-    delete reinterpret_cast<LLBC_NS LLBC_UnsafetyObjectPool *>(
-        tls->coreTls.unsafetyObjectPool); tls->coreTls.unsafetyObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_SafeObjectPool *>(
+        tls->coreTls.safeObjectPool); tls->coreTls.safeObjectPool = nullptr;
+    delete reinterpret_cast<LLBC_NS LLBC_UnsafeObjectPool *>(
+        tls->coreTls.unsafeObjectPool); tls->coreTls.unsafeObjectPool = nullptr;
 #if LLBC_TARGET_PLATFORM_WIN32
     ::CloseHandle(tls->coreTls.nativeThreadHandle);
 #endif // LLBC_TARGET_PLATFORM_WIN32

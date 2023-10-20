@@ -54,6 +54,42 @@ public:
         LLBC_PrintLn("Service destroy");
     }
 
+    virtual bool OnStart(bool &finished)
+    {
+        LLBC_PrintLn("Service start");
+        return true;
+    }
+
+    virtual void OnStop(bool &finished)
+    {
+        static const LLBC_TimeSpan stopDurTime = LLBC_TimeSpan::FromSeconds(15);
+        if (_begStopTime == LLBC_Time::utcBegin)
+        {
+            LLBC_PrintLn("Service stopping[0/%d]...", stopDurTime.GetTotalSeconds());
+
+            _begStopTime = LLBC_Time::Now();
+            LLBC_Sleep(1000);
+
+            finished = false;
+
+            return;
+        }
+
+        const LLBC_TimeSpan costTime = LLBC_Time::Now() - _begStopTime;
+        if (costTime < stopDurTime)
+        {
+            LLBC_PrintLn("Service stoipping[%d/%d]",
+                         costTime.GetTotalSeconds(), stopDurTime.GetTotalSeconds());
+
+            LLBC_Sleep(1000);
+            finished = false;
+
+            return;
+        }
+
+        LLBC_PrintLn("Service stop finished");
+    }
+
     virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
         LLBC_PrintLn("Session create: %s", sessionInfo.ToString().c_str());
@@ -98,7 +134,7 @@ public:
         }
 
         LLBC_Packet *resPacket = new LLBC_Packet;
-        resPacket->SetHeader(packet, OPCODE, 0);
+        resPacket->SetHeader(packet.GetSessionId(), OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
         GetService()->Send(resPacket);
@@ -106,6 +142,7 @@ public:
 
 private:
     int _recvTimes;
+    LLBC_Time _begStopTime;
 };
 
 }
@@ -141,7 +178,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     _svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
 
     // Set drive mode and start it.
-    _svc->SetDriveMode(LLBC_Service::ExternalDrive);
+    _svc->SetDriveMode(LLBC_ServiceDriveMode::ExternalDrive);
     if (_svc->Start() != LLBC_OK)
     {
         LLBC_PrintLn("Service startup failed, reason: %s", LLBC_FormatLastError());

@@ -31,6 +31,7 @@ public:
 
 private:
     void BasicTest();
+    void EnumTest();
     void CompareTest();
     void CompositeKeyTest();
     void ArithmeticTest();

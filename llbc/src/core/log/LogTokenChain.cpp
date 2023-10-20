@@ -65,33 +65,31 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
         return LLBC_FAILED;
     }
 
-    char ch = '\0';
-    const char *curPattern = nullptr;
-    LLBC_String::size_type patternLength = 0;
     int state = LLBC_INTERNAL_NS __g_literal_state;
 
-    LLBC_ILogToken *token = nullptr;
-    LLBC_LogFormattingInfo *formatter = nullptr;
-
-    LLBC_String buf;
+    const char *curPattern;
+    LLBC_String::size_type patternLen;
     if (pattern.empty())
     {
         curPattern = LLBC_INTERNAL_NS __g_default_pattern;
-        patternLength = sizeof(LLBC_INTERNAL_NS __g_default_pattern) - 1;
+        patternLen = sizeof(LLBC_INTERNAL_NS __g_default_pattern) - 1;
     }
     else
     {
         curPattern = pattern.data();
-        patternLength = pattern.size();
+        patternLen = pattern.size();
     }
 
-    for (size_t i = 0; i < patternLength;)
+    LLBC_String buf;
+    LLBC_ILogToken *token = nullptr;
+    LLBC_LogFormattingInfo *formatter = nullptr;
+    for (size_t i = 0; i < patternLen;)
     {
-        ch = curPattern[i++];
+        const char ch = curPattern[i++];
         switch(state)
         {
         case LLBC_INTERNAL_NS __g_literal_state:
-            if (i == patternLength)
+            if (i == patternLen)
             {
                 buf.append(1, ch);
                 break;
@@ -160,7 +158,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 }
                 else
                 {
-                    formatter->SetLeftAligh(minLength < 0 ? true : false);
+                    formatter->SetLeftAlign(minLength < 0 ? true : false);
                     formatter->SetMinLen(minLength);
                     formatter->SetMaxLen(INT_MAX);
                 }
@@ -180,8 +178,6 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
             LLBC_SetLastError(LLBC_ERROR_FORMAT);
             return LLBC_FAILED;
-
-            break;
         }
     }
 

@@ -315,12 +315,12 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service Sampler-Support enabled config.
+        /// Service max supported component name length.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool commIsEnabledSamplerSupport
+        public static int commMaxCompNameLen
         {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledSamplerSupport() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Comm_MaxCompNameLen(); }
         }
 
         /// <summary>
@@ -330,15 +330,6 @@ namespace llbc
         public static bool commIsEnabledStatusHandler
         {
             get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledStatusHandler() != 0; }
-        }
-
-        /// <summary>
-        /// Service Status-Desc enabled config.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static bool commIsEnabledStatusDesc
-        {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledStatusDesc() != 0; }
         }
 
         /// <summary>

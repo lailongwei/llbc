@@ -78,10 +78,6 @@ LLBC_Property::LLBC_Property(LLBC_Property *parent)
 
 , _value(nullptr)
 , _properties(nullptr)
-
-, _comments()
-
-, _errMsg()
 {
 }
 
@@ -416,7 +412,7 @@ int LLBC_Property::SetComments(const LLBC_String &name, const LLBC_String &comme
     return prop->SetComments("", comments);
 }
 
-LLBC_Property &LLBC_Property::operator =(const LLBC_Property &another)
+LLBC_Property &LLBC_Property::operator=(const LLBC_Property &another)
 {
     _parent = nullptr;
 

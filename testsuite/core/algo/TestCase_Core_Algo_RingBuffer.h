@@ -35,5 +35,6 @@ public:
 
 private:
     void DoBasicTest();
+    void DoFrontTailTest();
     void DoPerfTest();
 };

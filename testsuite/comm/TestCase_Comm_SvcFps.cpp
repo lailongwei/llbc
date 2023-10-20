@@ -49,12 +49,12 @@ namespace
         virtual void OnUpdate()
         {
             if (_updateTimes == 0)
-                _beginUpdateTime = LLBC_GetMilliSeconds();
+                _beginUpdateTime = LLBC_GetMilliseconds();
 
             ++_updateTimes;
             if (_updateTimes % 1000000 == 0)
             {
-                double elapsed = static_cast<double>(LLBC_GetMilliSeconds() - _beginUpdateTime);
+                double elapsed = static_cast<double>(LLBC_GetMilliseconds() - _beginUpdateTime);
                 double updateSpeed = _updateTimes / elapsed;
 
                 LLBC_PrintLn("Elapsed time: %f, updateSpeed(per ms): %.3f", elapsed, updateSpeed);

@@ -22,17 +22,27 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
-      - name: intall deps
-        run: yum install -y wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
-        
+      - name: install deps
+        run: yum install -y git openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
+
+      - name : install cmake
+        run: wget https://github.com/Kitware/CMake/releases/download/v3.27.0/cmake-3.27.0-linux-x86_64.tar.gz && tar -zxvf cmake-3.27.0-linux-x86_64.tar.gz && mv cmake-3.27.0-linux-x86_64 /usr/local/cmake && ln -s /usr/local/cmake/bin/* /usr/local/bin/
+
       - name: Compile core lib code
         run: |
           make core_lib config=debug64 -j4
           make core_lib config=release64 -j4
-        
+
       - name: Compile test code
         run: |
           # make test config=debug64 -j4
           make test config=release64 -j4
+
+      - name: Build all target by cmake
+        run: |
+          mkdir cmake_build
+          cd cmake_build
+          cmake ..
+          make -j 4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."

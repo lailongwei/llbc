@@ -105,9 +105,9 @@ public:
 
 public:
     /**
-     * Operator == implement.
+     * operator== implement.
      */
-    bool operator ==(const LLBC_ObjectPoolOrderedDeleteNode &other) const;
+    bool operator==(const LLBC_ObjectPoolOrderedDeleteNode &other) const;
 
 private:
     LLBC_CString _name;

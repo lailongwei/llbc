@@ -116,14 +116,10 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     LLBC_Packet packet2;
     packet2.SetOpcode(10086);
     packet2.SetStatus(-1);
-    packet2.SetSenderServiceId(110);
-    packet2.SetRecverServiceId(220);
     packet2.SetFlags(1111);
     std::cout <<"After set opcode/status/serviceId/flags, these values are:" <<std::endl;
     std::cout <<"  opcode: " <<packet2.GetOpcode() <<std::endl;
     std::cout <<"  status: " <<packet2.GetStatus() <<std::endl;
-    std::cout <<"  sender service Id: " <<packet2.GetSenderServiceId() <<std::endl;
-    std::cout <<"  receiver service Id: " <<packet2.GetRecverServiceId() <<std::endl;
 
     std::cout <<"  flags: " <<packet2.GetFlags() <<std::endl;
     std::cout <<"  packet length: " <<packet2.GetLength() <<std::endl;
@@ -142,8 +138,6 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     std::cout <<"\nPacket stream output test:" <<std::endl;
     LLBC_Packet streamOutputTest;
     streamOutputTest.SetSessionId(10086);
-    streamOutputTest.SetSenderServiceId(100);
-    streamOutputTest.SetRecverServiceId(200);
     streamOutputTest.SetOpcode(300);
     streamOutputTest.SetStatus(400);
     streamOutputTest.SetPayload(new LLBC_MessageBlock);

@@ -38,7 +38,7 @@ LLBC_FORCE_INLINE bool LLBC_Logger::IsAddTimestampInJsonLog() const
     return _addTimestampInJsonLog;
 }
 
-inline const LLBC_SafetyObjectPool &LLBC_Logger::GetLoggerObjectPool() const
+inline const LLBC_SafeObjectPool &LLBC_Logger::GetLoggerObjectPool() const
 {
     LLBC_LockGuard guard(_lock);
     return _objPool;
@@ -63,8 +63,8 @@ inline const LLBC_SafetyObjectPool &LLBC_Logger::GetLoggerObjectPool() const
         return ret;                               \
     }                                             \
 
-__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Trace)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Debug)
+__LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Trace)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Info)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Warn)
 __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(Error)

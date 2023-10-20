@@ -55,9 +55,9 @@ public:
     /**
      * When data received, will call this method.
      * @param[in] in             - the in data.
-     * @param[out out            - the out data.
+     * @param[out] out           - the out data.
      * @param[out] removeSession - when error occurred, this out param determine remove session or not.
-     * @param[in] int - return 0 if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Recv(void *in, void *&out, bool &removeSession);
 

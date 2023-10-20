@@ -37,7 +37,6 @@ public:
     {
         // Visible format 0x01020304 -> memory store format 0x04030201.
         BigEndian     = 0,
-
         // Network endian.
         NetEndian     = BigEndian,
 
@@ -51,42 +50,29 @@ public:
      * Check given endian type validate or not.
      * @return bool - return true if validate, otherwise return false.
      */
-    static bool IsValid(int type);
+    static constexpr bool IsValid(int endianType);
 
     /**
      * Endian type/type describe convert support.
      */
-    static const char *Type2Str(int type);
-    static int Str2Type(const char *str);
+    static const char *Type2Str(int endianType);
+    static int Str2Type(const char *endianTypeStr);
 };
 
 /**
- * The endian type constants.
- * Note: Now library support user through this constants to fetch machine
- *       endian type, and do not use LLBC_GetMachineEndianType() API, 
- *       because at sometimes in the future, LLBC_GetMachineEndianType()
- *       API implement code maybe become complex.
+ * The machine endian type define.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_MachineEndian;
+LLBC_EXTERN LLBC_EXPORT const int LLBC_MachineEndian;
 
 /**
  * The library default endian type constants:
  *  It representation the library default endian config.
  */
-LLBC_EXTERN LLBC_EXPORT int LLBC_DefaultEndian;
-
-/**
- * Get machine endian type, about the endian type, see LLBC_Endian class.
- * @return int - machine endian type.
- */
-LLBC_EXPORT int LLBC_GetMachineEndianType();
-
-/**
- * Reverse c/c++ basic data type byte order.
- * @param [in/out] val - the will reverse value, the reverse result will store here.
- */
-template <typename T>
-void LLBC_ReverseBytes(T &val);
+# if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
+static constexpr int LLBC_DefaultEndian = LLBC_Endian::NetEndian;
+# else
+static constexpr int LLBC_DefaultEndian = LLBC_Endian::LittleEndian;
+#endif
 
 /**
  * Reverse c/c++ basic data type byte order.
@@ -94,15 +80,35 @@ void LLBC_ReverseBytes(T &val);
  * @return T - the already reversed value.
  */
 template <typename T>
-T LLBC_ReverseBytes2(const T &val);
-
-/**
- * Convert network byte order data to host byte order.
- * @param[in/out] val - the will convert's value, network byte order, and the convert
- *                      result will store in t his variable.
- */
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 1,
+                        T>::type
+LLBC_ReverseBytes(const T &val);
 template <typename T>
-void LLBC_Net2Host(T &val);
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            (sizeof(T) == 2 || sizeof(T) == 4),
+                        T>::type
+LLBC_ReverseBytes(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 8,
+                        T>::type
+LLBC_ReverseBytes(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 10,
+                        T>::type
+LLBC_ReverseBytes(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 12,
+                        T>::type
+LLBC_ReverseBytes(const T &val);
+template <typename T>
+typename std::enable_if<(std::is_arithmetic<T>::value || std::is_enum<T>::value) &&
+                            sizeof(T) == 16,
+                        T>::type
+LLBC_ReverseBytes(const T &val);
 
 /**
  * Convert network byte order data to host byte order.
@@ -110,23 +116,15 @@ void LLBC_Net2Host(T &val);
  * @return T - the converted value, host byte order.
  */
 template <typename T>
-T LLBC_Net2Host2(const T &val);
-
-/**
- * Convert host byte order data to network byte order.
- * @param[in/out] val - the will convert's value, host byte order, and the convert
- *                      result will store in here.
- */
-template <typename T>
-void LLBC_Host2Net(T &val);
+T LLBC_Net2Host(const T &val);
 
 /**
  * Convert network byte order to host byte order.
- * @param[in] - will convert's value, host byte order.
+ * @param[in] val - will convert's value, host byte order.
  * @return T - convert result, network byte order.
  */
 template <typename T>
-T LLBC_Host2Net2(const T &val);
+T LLBC_Host2Net(const T &val);
 
 __LLBC_NS_END
 

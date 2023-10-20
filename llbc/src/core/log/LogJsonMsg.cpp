@@ -26,7 +26,6 @@
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/objectpool/ObjectPoolMgr.h"
 
-#include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerMgr.h"
 
@@ -51,14 +50,14 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger,
 , _line(line)
 , _func(func)
 
-, _doc(*LLBC_GetObjectFromUnsafetyPool<LLBC_Json::Document>())
+, _doc(*LLBC_GetObjectFromUnsafePool<LLBC_Json::Document>())
 {
     _doc.SetObject();
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 {
-    LLBC_ReleaseObjectToUnsafetyPool(&_doc);
+    LLBC_ReleaseObjectToUnsafePool(&_doc);
 }
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
@@ -81,7 +80,7 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         return;
 
     // Add time.
-    const sint64 now = LLBC_GetMicroSeconds();
+    const sint64 now = LLBC_GetMicroseconds();
     if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
         this->Add("timestamp", now);
 

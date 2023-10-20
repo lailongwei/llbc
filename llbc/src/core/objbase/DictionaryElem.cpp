@@ -149,14 +149,14 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
         hashed = this;
 
 #ifdef LLBC_DEBUG
-        int confictCount = 0;
+        int conflictCount = 0;
         LLBC_DictionaryElem *countElem = hashed;
         for(; countElem != nullptr; countElem = countElem->GetBucketElemNext())
         {
-            confictCount += 1;
+            conflictCount += 1;
         }
 
-        trace("Dictionary(addr:%p), key confict!, bucket:%u, count:%d\n", this, _hash, confictCount);
+        trace("Dictionary(addr:%p), key conflict!, bucket:%u, count:%d\n", this, _hash, conflictCount);
 #endif
     }
 }
@@ -250,12 +250,12 @@ void LLBC_DictionaryElem::SetBucketElemNext(LLBC_DictionaryElem *next)
     _bucketNext = next;
 }
 
-LLBC_Object *&LLBC_DictionaryElem::operator *()
+LLBC_Object *&LLBC_DictionaryElem::operator*()
 {
     return _obj;
 }
 
-LLBC_Object * const &LLBC_DictionaryElem::operator *() const
+LLBC_Object * const &LLBC_DictionaryElem::operator*() const
 {
     return _obj;
 }

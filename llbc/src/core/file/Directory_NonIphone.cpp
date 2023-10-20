@@ -117,9 +117,12 @@ LLBC_String LLBC_Directory::TempDir()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return "/tmp";
 #else // Win32
-    DWORD bufLen = 0;
-    bufLen = ::GetTempPathA(0, nullptr);
-    bufLen += 1;
+    const DWORD bufLen = ::GetTempPathA(0, nullptr) + 1;
+    if (UNLIKELY(bufLen == 1))
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return "";
+    }
 
     LPSTR buf = reinterpret_cast<LPSTR>(malloc(sizeof(CHAR) * bufLen));
     if (::GetTempPathA(bufLen, buf) == 0)

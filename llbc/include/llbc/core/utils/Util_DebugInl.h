@@ -47,20 +47,20 @@ inline int LLBC_CPUTime::ToSeconds() const
 #if LLBC_SUPPORT_RDTSC
     return static_cast<int>(_cpuCount / _freqPerSecond);
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMicroSecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::numOfMicrosPerSecond;
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMilliSeconds() const
+inline sint64 LLBC_CPUTime::ToMillis() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConstant::NumOfMilliSecondsPerSecond;
+    return _cpuCount / LLBC_TimeConst::numOfMillisPerSecond;
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToMicroSeconds() const
+inline sint64 LLBC_CPUTime::ToMicros() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000ll / _freqPerSecond;
@@ -69,12 +69,12 @@ inline sint64 LLBC_CPUTime::ToMicroSeconds() const
 #endif // Supp rdtsc
 }
 
-inline sint64 LLBC_CPUTime::ToNanoSeconds() const
+inline sint64 LLBC_CPUTime::ToNanos() const
 {
 #if LLBC_SUPPORT_RDTSC
     return _cpuCount * 1000000000ll / _freqPerSecond;
 #else // Not supp rdtsc
-    return _cpuCount * LLBC_TimeConstant::NumOfNanoSecondsPerMicroSecond;
+    return _cpuCount * LLBC_TimeConst::numOfNanosPerMicrosecond;
 #endif // Supp rdtsc
 }
 
@@ -83,27 +83,27 @@ inline int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
     return LLBC_CPUTime(cpuCount).ToSeconds();
 }
 
-inline sint64 LLBC_CPUTime::ToMilliSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMillis(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMilliSeconds();
+    return LLBC_CPUTime(cpuCount).ToMillis();
 }
 
-inline sint64 LLBC_CPUTime::ToMicroSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToMicros(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToMicroSeconds();
+    return LLBC_CPUTime(cpuCount).ToMicros();
 }
 
-inline sint64 LLBC_CPUTime::ToNanoSeconds(uint64 cpuCount)
+inline sint64 LLBC_CPUTime::ToNanos(uint64 cpuCount)
 {
-    return LLBC_CPUTime(cpuCount).ToNanoSeconds();
+    return LLBC_CPUTime(cpuCount).ToNanos();
 }
 
-inline LLBC_CPUTime LLBC_CPUTime::operator +(const LLBC_CPUTime &right) const
+inline LLBC_CPUTime LLBC_CPUTime::operator+(const LLBC_CPUTime &right) const
 {
     return LLBC_CPUTime(_cpuCount + right._cpuCount);
 }
 
-inline LLBC_CPUTime LLBC_CPUTime::operator -(const LLBC_CPUTime &right) const
+inline LLBC_CPUTime LLBC_CPUTime::operator-(const LLBC_CPUTime &right) const
 {
     if (_cpuCount < right._cpuCount)
         return LLBC_CPUTime(0);
@@ -111,13 +111,13 @@ inline LLBC_CPUTime LLBC_CPUTime::operator -(const LLBC_CPUTime &right) const
     return LLBC_CPUTime(_cpuCount - right._cpuCount);
 }
 
-inline LLBC_CPUTime &LLBC_CPUTime::operator +=(const LLBC_CPUTime &right)
+inline LLBC_CPUTime &LLBC_CPUTime::operator+=(const LLBC_CPUTime &right)
 {
     _cpuCount += right._cpuCount;
     return *this;
 }
 
-inline LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
+inline LLBC_CPUTime &LLBC_CPUTime::operator-=(const LLBC_CPUTime &right)
 {
     if (_cpuCount < right._cpuCount)
         _cpuCount = 0;
@@ -127,32 +127,32 @@ inline LLBC_CPUTime &LLBC_CPUTime::operator -=(const LLBC_CPUTime &right)
     return *this;
 }
 
-inline bool LLBC_CPUTime::operator <(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator<(const LLBC_CPUTime &right) const
 {
     return _cpuCount < right._cpuCount;
 }
 
-inline bool LLBC_CPUTime::operator >(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator>(const LLBC_CPUTime &right) const
 {
     return _cpuCount > right._cpuCount;
 }
 
-inline bool LLBC_CPUTime::operator <=(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator<=(const LLBC_CPUTime &right) const
 {
     return _cpuCount <= right._cpuCount;
 }
 
-inline bool LLBC_CPUTime::operator >=(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator>=(const LLBC_CPUTime &right) const
 {
     return _cpuCount >= right._cpuCount;
 }
 
-inline bool LLBC_CPUTime::operator ==(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator==(const LLBC_CPUTime &right) const
 {
     return _cpuCount == right._cpuCount;
 }
 
-inline bool LLBC_CPUTime::operator !=(const LLBC_CPUTime &right) const
+inline bool LLBC_CPUTime::operator!=(const LLBC_CPUTime &right) const
 {
     return _cpuCount != right._cpuCount;
 }

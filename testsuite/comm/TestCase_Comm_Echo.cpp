@@ -87,12 +87,18 @@ private:
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
         // »ØÏÔ
-        svc->Send(pkt.GetSessionId(), pkt.GetPayload(), pkt.GetPayloadLength());
+        svc->Send(pkt.GetSessionId(), 0, pkt.GetPayload(), pkt.GetPayloadLength());
     }
 };
 
 class EchoClientComp : public LLBC_Component
 {
+public:
+    EchoClientComp()
+    : _sId(0)
+    {}
+    virtual ~EchoClientComp() = default;
+
 public:
     virtual bool OnInit(bool &initFinished)
     {
@@ -157,7 +163,7 @@ private:
 
         // ·¢ËÍ
         LLBC_Service *svc = GetService();
-        svc->Send(_sId, input.data(), input.size() + 1);
+        svc->Send(_sId, 0, input.data(), input.size() + 1);
 
         return true;
     }

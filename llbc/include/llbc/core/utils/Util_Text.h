@@ -50,7 +50,7 @@ LLBC_EXPORT LLBC_String LLBC_FilterOutString(const LLBC_String &str, const LLBC_
 /**
  * Convert lower case character to upper case.
  * @param[in] str - will convert string.
- * @param[in] LLBC_String - the converted string.
+ * @return LLBC_String - the converted string.
  */
 LLBC_EXPORT LLBC_String LLBC_ToUpper(const char *str);
 
@@ -77,9 +77,7 @@ LLBC_EXPORT double LLBC_Str2Double(const char *str);
 
 /**
  * Convert number(signed/unsigned) type to string format.
- * @param[in] val   - number value.
- * @param[in] radix - base of value, must be in range[2, 36](specially, void * type 
- *                    instantiate function just support 10, 16 base value).
+ * @param[in] val - number value.
  * @return LLBC_String - the converted string.
  */
 template <typename T>
@@ -87,7 +85,7 @@ LLBC_String LLBC_NumToStr(T val);
 
 /**
  * Convert number(signed/unsigned) type to string with hexadecimal format.
- * @param[in] val   - number value.
+ * @param[in] val - number value.
  * @return LLBC_String - the converted string.
  */
 template <typename T>

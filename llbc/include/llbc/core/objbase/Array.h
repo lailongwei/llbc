@@ -68,7 +68,7 @@ public:
     {   // do nothing.
     }
 
-    reference operator *() const
+    reference operator*() const
     {   // return designated object.
         _Checkit();
         if (_Forward)
@@ -77,7 +77,7 @@ public:
         return *(_arr + _idx - 1);
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iter.
         _arr = rhs._arr;
         _idx = rhs._idx;
@@ -85,7 +85,7 @@ public:
         return *this;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         _Checkit();
         if (_Forward)
@@ -96,14 +96,14 @@ public:
         return *this;
     }
 
-    const iterator operator ++(int)
+    const iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         _Checkit();
         if (_Forward)
@@ -114,14 +114,14 @@ public:
         return *this;
     }
 
-    const iterator operator --(int)
+    const iterator operator--(int)
     {   // postdecrement.
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    iterator &operator +=(difference_type off)
+    iterator &operator+=(difference_type off)
     {   // increment by integer.
         if (_Forward)
             _idx += off;
@@ -132,13 +132,13 @@ public:
         return *this;
     }
 
-    const iterator operator +(difference_type off) const
+    const iterator operator+(difference_type off) const
     {   // return this + integer.
         iterator temp(*this);
         return temp += off;
     }
 
-    iterator &operator -=(difference_type off)
+    iterator &operator-=(difference_type off)
     {   // decrement by integer.
         if (_Forward)
             _idx -= off;
@@ -149,13 +149,13 @@ public:
         return *this;
     }
 
-    const iterator operator -(difference_type off) const
+    const iterator operator-(difference_type off) const
     {   // return this - integer.
         iterator temp(*this);
         return temp -= off;
     }
 
-    difference_type operator -(const iterator &rhs) const
+    difference_type operator-(const iterator &rhs) const
     {   // return difference of iterators.
         if (_Forward)
             return _idx - rhs._idx;
@@ -168,7 +168,7 @@ public:
         return *(*this + off);
     }
 
-    bool operator <(const iterator &rhs) const
+    bool operator<(const iterator &rhs) const
     {   // test if this < rhs.
 #ifdef LLBC_DEBUG
         if (UNLIKELY(_arr != rhs._arr))
@@ -177,7 +177,7 @@ public:
         return _Forward ? _idx < rhs._idx : _idx > rhs._idx;
     }
 
-    bool operator ==(const iterator &rhs) const
+    bool operator==(const iterator &rhs) const
     {   // test for iterator equality.
 #ifdef LLBC_DEBUG
         if (UNLIKELY(_arr != rhs._arr))
@@ -186,22 +186,22 @@ public:
         return _idx == rhs._idx;
     }
 
-    bool operator !=(const iterator &rhs) const
+    bool operator!=(const iterator &rhs) const
     {   // test for iterator inequality.
         return !(*this == rhs);
     }
 
-    bool operator <=(const iterator &rhs) const
+    bool operator<=(const iterator &rhs) const
     {   // test if this <= rhs.
         return !(rhs < *this);
     }
 
-    bool operator >(const iterator &rhs) const
+    bool operator>(const iterator &rhs) const
     {   // test if this > rhs.
         return rhs < *this;
     }
 
-    bool operator >=(const iterator &rhs) const
+    bool operator>=(const iterator &rhs) const
     {   // test if this >= rhs.
         return !(*this < rhs);
     }
@@ -280,67 +280,67 @@ public:
     {   // do nothing.
     }
 
-    reference operator *()
+    reference operator*()
     {   // return designated object.
         return (reference)**(_MyBase *)this;
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iter.
         (*(_MyBase *)this) = rhs;
         return *this;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         ++(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator ++(int)
+    const iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         --(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator --(int)
+    const iterator operator--(int)
     {
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    iterator &operator +=(difference_type off)
+    iterator &operator+=(difference_type off)
     {   // increment by integer.
         *(_MyBase *)this += off;
         return *this;
     }
 
-    const iterator operator +(difference_type off) const
+    const iterator operator+(difference_type off) const
     {   // return this + integer.
         iterator temp(*this);
         return temp += off;
     }
 
-    iterator &operator -=(difference_type off)
+    iterator &operator-=(difference_type off)
     {   // decrement by integer.
         return *this += -off;
     }
 
-    const iterator operator -(difference_type off) const
+    const iterator operator-(difference_type off) const
     {   // return this - integer.
         iterator temp(*this);
         return temp -= off;
     }
 
-    difference_type operator -(const _MyBase &rhs) const
+    difference_type operator-(const _MyBase &rhs) const
     {   // return difference of iterators.
         return *(_MyBase *)this - rhs;
     }
@@ -475,8 +475,8 @@ public:
     /**
      * Subscript operations.
      */
-    Obj *&operator [](difference_type off);
-    ConstObj *operator [](difference_type off) const;
+    Obj *&operator[](difference_type off);
+    ConstObj *operator[](difference_type off) const;
 
 public:
     /**

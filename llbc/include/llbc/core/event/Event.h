@@ -216,12 +216,12 @@ public:
     /**
      * Subscript supports.
      */
-    LLBC_Variant &operator [](int key);
-    LLBC_Variant &operator [](const char* key);
-    LLBC_Variant &operator [](const LLBC_String &key);
-    const LLBC_Variant &operator [](int key) const;
-    const LLBC_Variant &operator [](const char* key) const;
-    const LLBC_Variant &operator [](const LLBC_String &key) const;
+    LLBC_Variant &operator[](int key);
+    LLBC_Variant &operator[](const char* key);
+    LLBC_Variant &operator[](const LLBC_String &key);
+    const LLBC_Variant &operator[](int key) const;
+    const LLBC_Variant &operator[](const char* key) const;
+    const LLBC_Variant &operator[](const LLBC_String &key) const;
 
 public:
     /**

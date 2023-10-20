@@ -36,8 +36,6 @@ LLBC_SessionInfo::LLBC_SessionInfo()
 : _isListen(false)
 , _sessionId(0)
 , _acceptSessionId(0)
-, _localAddr()
-, _peerAddr()
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 {
 }
@@ -200,8 +198,6 @@ LLBC_String LLBC_SessionDestroyInfo::ToString() const
 LLBC_AsyncConnResult::LLBC_AsyncConnResult()
 : _sessionId(0)
 , _connected(false)
-, _reason()
-, _peerAddr()
 {
 }
 
@@ -266,7 +262,6 @@ LLBC_ProtoReport::LLBC_ProtoReport()
 
 , _layer(0)
 , _level(0)
-, _report()
 {
 }
 
@@ -489,22 +484,22 @@ void LLBC_Component::UpdateComponentCfg()
 
 __LLBC_NS_END
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
 {
     return o <<si.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
 {
     return o <<destroy.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
 {
     return o <<result.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
 {
     return o <<report.ToString();
 }

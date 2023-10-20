@@ -30,6 +30,9 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     BasicTest();
     std::cout << std::endl;
 
+    EnumTest();
+    std::cout << std::endl;
+
     CompareTest();
     std::cout << std::endl;
 
@@ -201,6 +204,65 @@ void TestCase_Core_VariantTest::BasicTest()
     std::cout << "Construct from mutable/immutable test:" << std::endl;
     std::cout << "- construct from cstr:\"hello world\":" << constructFromCStr <<std::endl;
     std::cout << "- construct from mstr:\"" << mutableHeyStr << "\":" << constructFromMStr <<std::endl;
+}
+
+void TestCase_Core_VariantTest::EnumTest()
+{
+    enum TraditionalStyleEnum
+    {
+        A = 3,
+        B = 4,
+        C = 5
+    };
+
+    enum class ClassStyleEnum
+    {
+        X = -3,
+        Y = -2,
+        Z = -1
+    };
+
+    std::cout << "Enum test: " << std::endl;
+    {
+        std::cout << "- Triditional style enum:" << std::endl;
+
+        LLBC_Variant tse1(TraditionalStyleEnum::A);
+        std::cout << "  - default construct: " << tse1 << std::endl;
+
+        LLBC_Variant tse2(3);
+        std::cout << "  - AsEnum<> return: " << tse2.AsEnum<TraditionalStyleEnum>() << std::endl;
+
+        TraditionalStyleEnum tse3 = tse1;
+        std::cout << "  - operator<Enum> return: " << tse3 << std::endl;
+
+        LLBC_Variant tse4;
+        tse4 = TraditionalStyleEnum::C;
+        std::cout << "  - operator=(Enum): " << tse4 << std::endl;
+
+        std::cout << "  - static_cast<Enum>(nil): " << static_cast<TraditionalStyleEnum>(LLBC_Variant()) << std::endl;
+    }
+
+    {
+        std::cout << "- Class style enum:" << std::endl;
+
+        LLBC_Variant cse1(ClassStyleEnum::X);
+        std::cout << "  - default construct: " << cse1<< std::endl;
+
+        LLBC_Variant cse2(-2);
+        std::cout << "  - AsEnum<> return: "
+                  << static_cast<int>(cse2.AsEnum<ClassStyleEnum>()) << std::endl;
+
+        ClassStyleEnum cse3 = cse1;
+        std::cout << "  - operator<Enum> return: "
+                  << static_cast<int>(cse3) << std::endl;
+
+        LLBC_Variant cse4;
+        cse4 = ClassStyleEnum::Z;
+        std::cout << "  - operator(Enum): " << cse4 << std::endl;
+
+        std::cout << "  - static_cast<Enum>(nil): "
+                  << static_cast<int>(static_cast<ClassStyleEnum>(LLBC_Variant())) << std::endl;
+    }
 }
 
 void TestCase_Core_VariantTest::CompareTest()
@@ -519,36 +581,35 @@ void TestCase_Core_VariantTest::SerializeTest()
     // Serialize & Deserialize raw type.
     LLBC_Stream stream;
     LLBC_Variant raw(-64);
-    stream <<raw;
-    std::cout <<"Raw obj[" <<raw <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream << raw;
+    std::cout << "Raw obj[" << raw << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserRaw;
-    stream.SetPos(0);
-    stream>> deserRaw;
-    std::cout <<"Deserialized from stream: [" <<deserRaw <<"]" <<std::endl;
+    stream >> deserRaw;
+    std::cout << "Deserialized from stream: [" << deserRaw << "]" << std::endl;
 
     // Serialize & Deserialize string type.
     LLBC_Variant str("Hello World!");
-    stream.SetPos(0);
-    stream <<str;
-    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << str;
+    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetWritePos() <<std::endl;
 
     LLBC_Variant deserStr;
-    stream.SetPos(0);
-    stream>> deserStr;
-    std::cout <<"Deserialized from stream: [" <<deserStr <<"]" <<std::endl;
+    stream >> deserStr;
+    std::cout << "Deserialized from stream: [" << deserStr << "]" << std::endl;
 
     // Serialize & Deserialize seq type.
     LLBC_Variant seq;
     seq.SeqPushBack(1);
     seq.SeqPushBack(false);
     seq.SeqPushBack("Hello world");
-    stream.SetPos(0);
-    stream <<seq;
-    std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetPos() << std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << seq;
+    std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserSeq;
-    stream.SetPos(0);
     stream >> deserSeq;
     std::cout << "Deserialized from stream:[" << deserSeq << "]" << std::endl;
 
@@ -556,14 +617,14 @@ void TestCase_Core_VariantTest::SerializeTest()
     LLBC_Variant dict;
     dict[1] = "Hello World!";
     dict[2] = "Hey Judy!";
-    stream.SetPos(0);
-    stream <<dict;
-    std::cout <<"Dict obj[" <<dict <<"] serialized size: " <<stream.GetPos() <<std::endl;
+    stream.SetReadPos(0);
+    stream.SetWritePos(0);
+    stream << dict;
+    std::cout << "Dict obj[" << dict << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserDict;
-    stream.SetPos(0);
-    stream>> deserDict;
-    std::cout <<"Deserialized from stream: [" <<deserDict <<"]" <<std::endl;
+    stream >> deserDict;
+    std::cout << "Deserialized from stream: [" << deserDict << "]" << std::endl;
 }
 
 void TestCase_Core_VariantTest::HashTest()

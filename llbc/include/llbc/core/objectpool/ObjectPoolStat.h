@@ -200,9 +200,9 @@ __LLBC_NS_END
 /**
  * Some stream output operator functions(in global ns).
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st);
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st);
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st);
 
 #include "llbc/core/objectpool/ObjectPoolStatInl.h"
 

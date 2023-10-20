@@ -84,7 +84,7 @@ void LLBC_SelectPoller::Svc()
         const int evCount = LLBC_Select(
             static_cast<int>(_maxFd + 1),&reads, &writes, &excepts, interval);
 
-        const sint64 begin = LLBC_GetMilliSeconds();
+        const sint64 begin = LLBC_GetMilliseconds();
         const int processed = HandleConnecting(writes, excepts);
 
         if (processed < evCount)
@@ -161,7 +161,7 @@ void LLBC_SelectPoller::Svc()
 #endif // LLBC_TARGET_PLATFORM_WIN32
         }
 
-        const sint64 elapsed = LLBC_GetMilliSeconds() - begin;
+        const sint64 elapsed = LLBC_GetMilliseconds() - begin;
         if (UNLIKELY(elapsed < 0))
             continue;
         else if (elapsed < interval)
@@ -308,7 +308,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
          it != _connecting.end();
          )
     {
-        // Check event triggered in writeable-set or excepts-set
+        // Check event triggered in writable-set or excepts-set
         const LLBC_SocketHandle handle = it->first;
         bool inExceptSet = false;
         const bool inWriteSet = !!LLBC_FdIsSet(handle, &writes);

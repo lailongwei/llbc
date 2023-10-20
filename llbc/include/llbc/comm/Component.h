@@ -470,7 +470,7 @@ public:
     const LLBC_Variant &GetConfig() const;
 
     /**
-     * Set non-property type config(tempory support for t/master branch).
+     * Set non-property type config(temporary support for t/master branch).
      * @param[in] compCfg - the component config.
      */
     void SetConfig(const LLBC_Variant &compCfg);
@@ -664,10 +664,10 @@ __LLBC_NS_END
 /**
  * Some stream output operator functions(in global ns).
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si);
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy);
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
 #include "llbc/comm/ComponentInl.h"
 

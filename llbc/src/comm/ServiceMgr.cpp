@@ -118,11 +118,14 @@ bool LLBC_ServiceMgr::InTls(const LLBC_Service *svc)
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     void **svcs = tls->commTls.services;
-    for (int i = 0;
-         i <= LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-         ++i)
-        if (reinterpret_cast<LLBC_Service *>(svcs[i]) == svc)
+    for (int i = 0; i < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++i)
+    {
+        if (svcs[i] == nullptr)
+            return false;
+
+        if (svcs[i] == svc)
             return true;
+    }
 
     return false;
 }
@@ -162,8 +165,12 @@ void LLBC_ServiceMgr::OnServiceStop(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
 
-    _serviceList.erase(
-        std::find(_serviceList.begin(), _serviceList.end(), svc));
+    const auto svcListIt =
+        std::find(_serviceList.begin(), _serviceList.end(), svc);
+    if (svcListIt == _serviceList.end())
+        return;
+
+    _serviceList.erase(svcListIt);
     _id2Services.erase(svc->GetId());
     _name2Services.erase(svc->GetName());
 }

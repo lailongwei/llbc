@@ -47,59 +47,19 @@ inline const LLBC_Property &LLBC_ServiceImpl::GetPropertyConfig() const
 {
     return _propCfg;
 }
-
-inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status)
+inline bool LLBC_ServiceImpl::IsFullStack() const
 {
-    // Call internal MulticastSendCoder<> template method to complete.
-    // validCheck = true
-    return MulticastSendCoder<LLBC_SessionIdSet>(svcId, sessionIds, opcode, coder, status);
+    return _fullStack;
 }
 
-inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status)
+inline LLBC_ServiceDriveMode::ENUM LLBC_ServiceImpl::GetDriveMode() const
 {
-    // Call internal MulticastSendCoder<> template method to complete.
-    // validCheck = true
-    return MulticastSendCoder<LLBC_SessionIdList>(svcId, sessionIds, opcode, coder, status);
+    return _driveMode;
 }
 
-inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status)
+inline bool LLBC_ServiceImpl::IsStarted() const
 {
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    // Foreach to call internal method LockableSend() method to complete.
-    // lock = false
-    // validCheck = true
-    for (LLBC_SessionIdSetCIter sessionIt = sessionIds.begin();
-         sessionIt != sessionIds.end();
-         ++sessionIt)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
-
-    return LLBC_OK;
-}
-
-inline int LLBC_ServiceImpl::Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status)
-{
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    // Foreach to call internal method LockableSend() method to complete.
-    // lock = false
-    // validCheck = true
-    for (LLBC_SessionIdListCIter sessionIt = sessionIds.begin();
-         sessionIt != sessionIds.end();
-         ++sessionIt)
-        LockableSend(svcId, *sessionIt, opcode, bytes, len, status, false);
-
-    return LLBC_OK;
+    return _runningPhase == LLBC_ServiceRunningPhase::Started;
 }
 
 inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
@@ -107,14 +67,14 @@ inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
     return _evManager;
 }
 
-inline LLBC_SafetyObjectPool &LLBC_ServiceImpl::GetSafetyObjectPool()
+inline LLBC_SafeObjectPool &LLBC_ServiceImpl::GetSafeObjectPool()
 {
-    return _safetyObjectPool;
+    return _safeObjectPool;
 }
 
-inline LLBC_UnsafetyObjectPool &LLBC_ServiceImpl::GetUnsafetyObjectPool()
+inline LLBC_UnsafeObjectPool &LLBC_ServiceImpl::GetUnsafeObjectPool()
 {
-    return _unsafetyObjectPool;
+    return _unsafeObjectPool;
 }
 
 inline LLBC_ObjectPoolInst<LLBC_Packet> & LLBC_ServiceImpl::GetPacketObjectPool()

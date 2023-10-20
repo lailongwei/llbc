@@ -23,14 +23,14 @@
 
 #include "pyllbc/common/Errors.h"
 
-inline int pyllbc_Stream::GetEndian() const
+LLBC_FORCE_INLINE int pyllbc_Stream::GetEndian() const
 {
     return _stream.GetEndian();
 }
 
-inline int pyllbc_Stream::SetEndian(int endian)
+LLBC_FORCE_INLINE int pyllbc_Stream::SetEndian(int endian)
 {
-    if (!LLBC_Endian::IsValid(endian))
+    if (UNLIKELY(!LLBC_Endian::IsValid(endian)))
     {
         pyllbc_SetError("Invalid endian value", LLBC_ERROR_INVALID);
         return LLBC_FAILED;
@@ -41,36 +41,53 @@ inline int pyllbc_Stream::SetEndian(int endian)
     return LLBC_OK;
 }
 
-inline size_t pyllbc_Stream::GetPos() const
+LLBC_FORCE_INLINE size_t pyllbc_Stream::GetReadPos() const
 {
-    return _stream.GetPos();
+    return _stream.GetReadPos();
 }
 
-inline int pyllbc_Stream::SetPos(size_t pos)
+LLBC_FORCE_INLINE int pyllbc_Stream::SetReadPos(size_t readPos)
 {
-    if (pos > _stream.GetCap())
+    if (!_stream.SetReadPos(readPos))
     {
-        pyllbc_SetError("pos out of range", LLBC_ERROR_LIMIT);
+        pyllbc_SetError("rpos out of range", LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
     }
-
-    _stream.SetPos(pos);
 
     return LLBC_OK;
 }
 
-inline size_t pyllbc_Stream::GetCap() const
+LLBC_FORCE_INLINE size_t pyllbc_Stream::GetWritePos() const
+{
+    return _stream.GetWritePos();
+}
+
+LLBC_FORCE_INLINE int pyllbc_Stream::SetWritePos(size_t writePos)
+{
+    if (!_stream.SetWritePos(writePos))
+    {
+        pyllbc_SetError("wpos out of range", LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
+LLBC_FORCE_INLINE size_t pyllbc_Stream::GetCap() const
 {
     return _stream.GetCap();
 }
 
-inline int pyllbc_Stream::Recap(size_t newCap)
+LLBC_FORCE_INLINE int pyllbc_Stream::Recap(size_t newCap)
 {
     if (_stream.IsAttach())
     {
-        pyllbc_SetError("could not set attach buffer stream newCap"
-                        "(attached buffer maybe from pyllbc native library or other native libraries)",
-                        LLBC_ERROR_NOT_ALLOW);
+        pyllbc_SetError("could not recap in attach buffer stream", LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+    else if (newCap < _stream.GetCap())
+    {
+        pyllbc_SetError("stream capacity cannot be reduced", LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
     }
 
@@ -79,17 +96,27 @@ inline int pyllbc_Stream::Recap(size_t newCap)
     return LLBC_OK;
 }
 
-inline LLBC_Stream &pyllbc_Stream::GetLLBCStream()
+LLBC_FORCE_INLINE size_t pyllbc_Stream::GetReadableSize() const
+{
+    return _stream.GetReadableSize();
+}
+
+LLBC_FORCE_INLINE size_t pyllbc_Stream::GetWritableSize() const
+{
+    return _stream.GetWritableSize();
+}
+
+LLBC_FORCE_INLINE LLBC_Stream &pyllbc_Stream::GetLLBCStream()
 {
     return _stream;
 }
 
-inline const LLBC_Stream &pyllbc_Stream::GetLLBCStream() const
+LLBC_FORCE_INLINE const LLBC_Stream &pyllbc_Stream::GetLLBCStream() const
 {
     return _stream;
 }
 
-inline PyObject *pyllbc_Stream::GetPyObj()
+LLBC_FORCE_INLINE PyObject *pyllbc_Stream::GetPyObj()
 {
     Py_INCREF(_pyStream);
     return _pyStream;

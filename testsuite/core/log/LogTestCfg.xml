@@ -1,0 +1,134 @@
+<!-- LogTestCfg.xml -->
+<!-- llbc log库示例配置文件 -->
+
+<!-- 日志配置统一在 <Log> 内 -->
+<Log>
+    <!-- 根日志记录器 -->
+    <root>
+        <!-- 日志异步属性,可以的取值:true/false, 默认为false. -->
+        <asynchronous>true</asynchronous>
+        <!-- 日志记录器异步时, 是否要求一个独立的异步日志线程来专门负责此日志记录器输出
+             注意: 默认框架在识别到有一个或多个日志记录器时, 将启动一个所有日志记录器共享的日志输出线程, 如果有
+                  个别日志记录器是高负载的日志记录器, 可以将此项配置成true, 以让日志记录器拥有独立的输出线程,
+                  此选项只有在asynchronous为true时有效. -->
+        <independentThread>false</independentThread>
+        <!-- 日志刷新间隔,在异步模式有效,毫秒为单位,默认为200. -->
+        <flushInterval>500</flushInterval>
+        <!-- 指示是否接管输出到未知logger的message,默认为true. -->
+        <takeOver>true</takeOver>
+        <!-- 日志记录器选项未配置时, 使用的默认配置来源, 有root或default两个选项, 选项配置具备继承性及覆盖性,非
+             根日志记录器(root)如果未配置过这个选项, 将使用根日志记录器, 如果有配置将使用自己的配置选项, 对于根
+             日志记录器, 此配置项只用来对非根产生继承影响.
+             选项含义:
+             - root: 如果指定此选项, 在未配置的非根日志记录器选项参数读取的时候, 将使用根日志记录器里面的配置作
+                     为指定日志记录器指定配置选项参数(注意: 像logFileName将不会无脑使用root配置, 这将造成日志错
+                     乱, 如未配置将使用记录器本身名字来命名)
+             - default: 如果指定此选项, 在未配置的日志记录器选项参数读取的时候, 将使用框架默认配置作为指定日志记
+                     录器指定配置选项参数 -->
+        <notConfigUse>root</notConfigUse>
+        <!-- 在以json格式输出Log时, 是否添加时间字戳到json log中, key:timestamp, 默认不添加 -->
+        <addTimestampInJsonLog>true</addTimestampInJsonLog>
+
+        <!-- 控制台输出器配置选项 -->
+        <!-- 确定日志是否输出到控制台,可以的取值:true/false. -->
+        <logToConsole>true</logToConsole>
+        <!-- 控制台日志输出级别,如果没有配置,使用Config.h中的默认log level值(LLBC_CFG_LOG_DEFAULT_LEVEL) -->
+        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <!-- 确定日志控制台输出格式,格式描述如下:
+               %N: 打印logger名字,对于当前配置,为root
+               %e: 打印进程可执行文件名(已去除扩展名)
+               %g: 打印消息tag, 用于给同类型消息打入相同的tag信息.
+               %F: 打印日志所在函数名.
+               %f: 打印日志所在的代码文件名.
+               %l: 打印日志的代码所在的行数.
+               %t: 线程Id.
+               %p: 进程Id.
+               %L: 日志模式(级别),如'DEBUG','TRACE','INFO' ...
+               %n: 换行符标记.
+               %m: 打印日志消息本身.
+               %T: 打印本地化时间格式的时间,如:'1970-01-01 00:00:00'.
+               %%: 打印一个字符'%'.
+               * : 其它字符将不被转议,照常打印.
+            默认的格式(即不配置这一项的情况下采用的格式)为:'%T [%L] - %m%n' -->
+        <consolePattern>%T [tag:%g][logger:%N][thread_Id:%t][process_Id:%7p][%-5L][%f:%l,%F] - %m%n</consolePattern>
+        <!-- 是否控制台输出时多彩输出. -->
+        <colourfulOutput>true</colourfulOutput>
+
+        <!-- 文件输出器配置选项 -->
+        <!-- 确定日志是否输出到文件. -->
+        <logToFile>true</logToFile>
+        <!-- 文件日志输出级别,如果没有配置,使用Config.h中的默认log level值(LLBC_CFG_LOG_DEFAULT_LEVEL). -->
+        <fileLogLevel>DEBUG</fileLogLevel>
+        <!-- 日志文件所在目录:
+              - 如果不配置, 将继承root(非root)或者使用"当前目录/应用程序执行文件所在目录"(这取决于forceAppLogPath配置).
+              - 如果配置了相对路径, 同不配置情况类似, 将join"当前目录/应用程序执行文件所在目录"(这取决于forceAppLogPath配置).
+              - 如果配置了绝对路径, 忽略forceAppLogPath, 直接使用此路径join logFile. -->
+        <logDir>.</logDir>
+        <!-- 日志文件名, %p: 当前进程Id, %m/%e: 当前主执行体映像名(Note: %m已废弃, 请使用%e来描述主执行体映像名). -->
+        <logFile>log/llbc_%p_%e</logFile>
+        <!-- 日志文件后缀. -->
+        <logFileSuffix>.txt</logFileSuffix>
+        <!-- 是否强制使用执行文件路径作为 logFile 相对输出路径. -->
+        <forceAppLogPath>false</forceAppLogPath>
+        <!-- 日志文件缓冲大小,在异步模式有效,默认40K. -->
+        <fileBufferSize>8192</fileBufferSize>
+        <!-- 文件输出时的日志格式. -->
+        <filePattern>%T [%-5L][%f:%l]&lt;exec:%-20e&gt;&lt;tag:%g&gt;&lt;logger:%N&gt; - %m%n</filePattern>
+        <!-- 文件滚动方式, 默认不滚动, 支持:
+             - 不滚动: NoRolling/No
+             - 按小时滚动: HourlyRolling/Hourly
+             - 按天滚动: DailyRolling/Daily -->
+        <fileRollingMode>Daily</fileRollingMode>
+        <!-- 日志文件单文件的最大大小,如果为0或者不配置,将不限制大小,以Byte为单位. -->
+        <maxFileSize>10240000</maxFileSize>
+        <!-- 日志文件最大备份索引,如果限定了最大日志文件大小.将会对日志进行按索引备份,如果为0或者不配置,将不会限制最大备份索引. -->
+        <maxBackupIndex>20</maxBackupIndex>
+        <!-- 是否延迟创建(备份日志文件), 进日志记录器初始化的时候, 默认将创建或更新日志记录文件, 在非常多日志记录器且大部分在进程生命周期期间都不可能产生任何日志的时候, 此选项将变得有用. -->
+        <lazyCreateLogFile>false</lazyCreateLogFile>
+    </root>
+
+    <!-- test logger配置 -->
+    <test>
+        <level>INFO</level>
+        <asynchronous>false</asynchronous>
+        <flushInterval>50</flushInterval>
+        <logToConsole>true</logToConsole>
+        <consolePattern>%T [%L]{logger:%N}{tag:%g} - %m%n</consolePattern>
+        <logToFile>true</logToFile>
+        <fileBufferSize>1024</fileBufferSize>
+        <logFile>log/llbc_logger_test</logFile>
+        <forceAppLogPath>false</forceAppLogPath>
+        <filePattern>%T [%-5L][%f:%l]{tag:%g} - %m%n</filePattern>
+        <fileRollingMode>Hourly</fileRollingMode>
+        <maxFileSize>100</maxFileSize>
+        <maxBackupIndex>10</maxBackupIndex>
+    </test>
+
+    <!-- deltest logger配置 -->
+    <deltest>
+        <level>DEBUG</level>
+        <asynchronous>true</asynchronous>
+        <logToConsole>true</logToConsole>
+        <logToFile>true</logToFile>
+        <fileRollingMode>NoRolling</fileRollingMode>
+        <maxFileSize>1024</maxFileSize>
+        <logFile>log/deltest</logFile>
+        <forceAppLogPath>false</forceAppLogPath>
+    </deltest>
+
+    <!-- preformance test logger配置 -->
+    <perftest>
+        <level>DEBUG</level>
+        <asynchronous>true</asynchronous>
+        <independentThread>true</independentThread>
+        <logToConsole>false</logToConsole>
+        <logToFile>true</logToFile>
+        <fileRollingMode>Hourly</fileRollingMode>
+        <maxFileSize>10240000</maxFileSize>
+        <maxBackupIndex>10</maxBackupIndex>
+        <logFile>log/perftest</logFile>
+        <forceAppLogPath>false</forceAppLogPath>
+    </perftest>
+
+    <!-- 其它 logger(s) 配置 -->
+</Log>

@@ -172,9 +172,9 @@ int csllbc_LibConfig_Comm_MaxServiceFPS()
     return LLBC_CFG_COMM_MAX_SERVICE_FPS;
 }
 
-int csllbc_LibConfig_Comm_IsEnabledSamplerSupport()
+int csllbc_LibConfig_Comm_MaxCompNameLen()
 {
-    return LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT;
+    return LLBC_CFG_COMM_MAX_COMP_NAME_LEN;
 }
 
 int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
@@ -185,11 +185,6 @@ int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
 int csllbc_LibConfig_Comm_IsEnabledStatusHandler()
 {
     return LLBC_CFG_COMM_ENABLE_STATUS_HANDLER;
-}
-
-int csllbc_LibConfig_Comm_IsEnabledStatusDesc()
-{
-    return LLBC_CFG_COMM_ENABLE_STATUS_DESC;
 }
 
 int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()

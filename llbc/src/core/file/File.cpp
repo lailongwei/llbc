@@ -80,14 +80,12 @@ LLBC_String LLBC_FileMode::GetFileModeDesc(int fileMode)
 
 LLBC_File::LLBC_File()
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
 }
 
 LLBC_File::LLBC_File(const LLBC_String &path, int mode)
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
     if (Open(path, mode) == LLBC_OK)
@@ -253,21 +251,16 @@ long LLBC_File::GetFileSize() const
         return -1;
     }
 
-    int ret = LLBC_OK;
     long fileSize = ftell(handle);
     if (fileSize == -1L)
-    {
-        ret = LLBC_FAILED;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-    }
 
     if (fseek(handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
     {
-        if (ret == LLBC_OK)
-        {
+        if (fileSize >= 0)
             fileSize = -1L;
-            LLBC_SetLastError(LLBC_ERROR_CLIB);
-        }
+
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
     }
 
     return fileSize;
@@ -546,7 +539,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     }
 
 #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
-    // In MAC or iPhone platform, always upate access & modify time.
+    // In MAC or iPhone platform, always update access & modify time.
     updateLastAccessTime = true;
     updateLastModifyTime = true;
 #endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
@@ -560,7 +553,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     {
         if (lastAccessTime == nullptr)
         {
-            const sint64 nowTime = LLBC_GetMicroSeconds();
+            const sint64 nowTime = LLBC_GetMicroseconds();
             tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
             tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
 
@@ -580,7 +573,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         {
             if (!gotNowTime)
             {
-                const sint64 nowTime = LLBC_GetMicroSeconds();
+                const sint64 nowTime = LLBC_GetMicroseconds();
                 tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
                 tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
             }
@@ -709,7 +702,7 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
         return LLBC_FAILED;
     }
 
-    // Open source file with BinayRead mode.
+    // Open source file with BinaryRead mode.
     LLBC_File srcFile(srcFilePath, LLBC_FileMode::BinaryRead);
     if (!srcFile.IsOpened())
         return LLBC_FAILED;

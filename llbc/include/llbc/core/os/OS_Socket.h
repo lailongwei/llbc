@@ -75,8 +75,8 @@ LLBC_EXPORT int LLBC_ShutdownSocketInputOutput(LLBC_SocketHandle handle);
  * @param[in] handle - socket handle.
  * @param[in] buf    - buffer containing the data to be transmitted.
  * @param[in] len    - length of data in buf.
- * @param[in] flag   - flags.
- * @return int       - if no error occurs, return the total number bytes sent, otherwise return -1.
+ * @param[in] flags  - flags.
+ * @return int - if no error occurs, return the total number bytes sent, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags);
 

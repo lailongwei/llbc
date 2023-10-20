@@ -25,7 +25,7 @@
 #include "llbc/core/os/OS_Process.h"
 #include "llbc/core/utils/Util_Text.h"
 #include  "llbc/core/file/Directory.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogRollingMode.h"
@@ -36,15 +36,14 @@
  */
 #define __LLBC_GetLogCfg(key, dft, rootMeth, asMeth)  __LLBC_GetLogCfg2(key, LLBC_CFG_LOG_DEFAULT_##dft, rootMeth, asMeth)
 
-#define __LLBC_GetLogCfg2(key, dft, rootMeth, asMeth) (cfg.HasProperty(key) ? \
-                                                       cfg.GetValue(key).asMeth() : \
-                                                       (_notConfigUseRoot ? rootCfg->rootMeth() : (dft))) \
+#define __LLBC_GetLogCfg2(key, dft, rootMeth, asMeth) (cfg[key] ? \
+                                                           cfg[key].asMeth() : \
+                                                               (_notConfigUseRoot ? rootCfg->rootMeth() : (dft))) \
 
 __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
-: _loggerName()
-, _notConfigUseRoot(false)
+: _notConfigUseRoot(false)
 
 , _asyncMode(false)
 , _independentThread(false)
@@ -54,16 +53,12 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 
 , _logToConsole(true)
 , _consoleLogLevel(LLBC_LogLevel::End)
-, _consolePattern()
 , _colourfulOutput(true)
 
 , _logToFile(false)
 , _fileLogLevel(LLBC_LogLevel::End)
-, _logFile()
-, _logFileSuffix()
 , _logCodeFilePath(true)
 , _forceAppLogPath(false)
-, _filePattern()
 , _fileRollingMode(LLBC_LogRollingMode::End)
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)
@@ -79,7 +74,7 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 }
 
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
-                                      const LLBC_Property &cfg,
+                                      const LLBC_Variant &cfg,
                                       const LLBC_LoggerConfigInfo *rootCfg)
 {
     // LoggerName.
@@ -87,8 +82,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
     // Not config use default/root option.
     LLBC_String notCfgUseOpt;
-    if (cfg.HasProperty("notConfigUse"))
-        notCfgUseOpt = cfg.GetValue("notConfigUse").AsStr();
+    if (cfg["notConfigUse"])
+        notCfgUseOpt = cfg["notConfigUse"].AsStr();
     else if (rootCfg)
         notCfgUseOpt = rootCfg->IsNotConfigUseRoot() ? "root" : "default";
     else
@@ -111,13 +106,13 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
      _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
     if (_logToConsole)
     {
-        if (cfg.HasProperty("consoleLogLevel"))
-            _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsStr().c_str());
+        if (cfg["consoleLogLevel"])
+            _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg["consoleLogLevel"].AsStr().c_str());
         else
             _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
-        if (cfg.HasProperty("consolePattern"))
-            _consolePattern = cfg.GetValue("consolePattern").AsStr().c_str();
+        if (cfg["consolePattern"])
+            _consolePattern = cfg["consolePattern"].AsStr();
         else
             _consolePattern = _notConfigUseRoot ? 
                 rootCfg->GetConsolePattern().c_str() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN;
@@ -130,12 +125,12 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     if (_logToFile)
     {
         // File log level.
-        if (cfg.HasProperty("fileLogLevel"))
-            _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
+        if (cfg["fileLogLevel"])
+            _fileLogLevel = LLBC_LogLevel::Str2Level(cfg["fileLogLevel"].AsStr().c_str());
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
-        // Log dir.
+        // Log file dir.
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
@@ -149,9 +144,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         _forceAppLogPath = __LLBC_GetLogCfg(
             "forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsLooseBool);
 
-        // Log file path.
-        if (cfg.HasProperty("logFile"))
-            _logFile = cfg.GetValue("logFile").AsStr().strip();
+        // Log file name.
+        if (cfg["logFile"])
+            _logFile = cfg["logFile"].AsStr().strip();
         if (_logFile.empty())
             _logFile = _loggerName;
         if (!_logDir.empty())
@@ -171,15 +166,15 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         _logCodeFilePath = __LLBC_GetLogCfg(
             "logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
         // Log file pattern.
-        if (cfg.HasProperty("filePattern"))
-            _filePattern = cfg.GetValue("filePattern").AsStr().c_str();
+        if (cfg["filePattern"])
+            _filePattern = cfg["filePattern"].AsStr();
         else
             _filePattern = _notConfigUseRoot ? 
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
 
         // File rolling mode.
-        if (cfg.HasProperty("fileRollingMode"))
-            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg.GetValue("fileRollingMode").AsStr());
+        if (cfg["fileRollingMode"])
+            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg["fileRollingMode"].AsStr());
         else
             _fileRollingMode = _notConfigUseRoot ?
                 rootCfg->GetFileRollingMode() : LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;

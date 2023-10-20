@@ -130,7 +130,7 @@ private:
 
     /**
      * Remove service from service manager.
-     * @param[in] id - the service Id.
+     * @param[in] svc - the service.
      */
     void OnServiceStop(LLBC_Service *svc);
 

@@ -29,7 +29,7 @@
 #endif
 #include "llbc/core/log/LoggerMgr.h"
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
 #endif // GCC compiler
@@ -254,12 +254,24 @@ static char __shellCmd[PATH_MAX * 2 + 256 + 1];
 static void *__frames[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES] {nullptr};
 static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
+static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
 static void __NonWin32CrashHandler(int sig)
 {
     // Uninstall this signal's hook.
     signal(sig, SIG_DFL);
+
+    // If handling another crash signal, raise the signal again, otherwise mask hanlding signal.
+    if (__handlingCrashSignals)
+    {
+        raise(sig);
+        return;
+    }
+    else
+    {
+        __handlingCrashSignals = true;
+    }
 
     // Get executable file path.
     ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, PATH_MAX);
@@ -461,6 +473,6 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
 __LLBC_NS_END
 #endif // Supp hook process crash
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic pop
 #endif // GCC compiler
