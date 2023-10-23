@@ -50,7 +50,7 @@ local llbc_disable_cxx11_abi = true -- true/false.
 -- set compile toolset.
 local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolset.
 
--- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custm_ccpp_toolset'.
+-- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custom_ccpp_toolset'.
 -- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
 
 -- windows platform flag.
