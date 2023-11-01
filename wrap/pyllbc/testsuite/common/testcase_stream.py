@@ -54,43 +54,39 @@ class StreamTest(TestCase):
 
         fmt = 'bbBssiiqqfdS'
         s.pack(fmt, *will_pack)
-        print 'after pack, pos: {}'.format(s.pos)
+        print 'after pack, wpos: {}'.format(s.wpos)
         print 'raw data: {}'.format(s)
 
-        s.pos = 0
         unpacked = s.unpack(fmt)
         print 'unpacked, data: {}'.format(unpacked)
         print
 
         print 'Pack/Unpack list:'
-        s.pos = 0
+        s.clear()
         will_pack = ['hello', 'world']
         print 'Before pack: {}'.format(will_pack)
         s.pack('[S]', will_pack)
 
-        s.pos = 0
         unpacked = s.unpack('[S]')
         print 'After unpack list: {}'.format(unpacked)
         print
 
         print 'Pack/Unpack tuple:'
-        s.pos = 0
+        s.clear()
         will_pack = ('hello', 'world')
         print 'Before pack: {}'.format(will_pack)
         s.pack('(S)', will_pack)
 
-        s.pos = 0
         unpacked = s.unpack('[S]')
         print 'After unpack tuple: {}'.format(unpacked)
         print
 
         print 'Pack/Unpack dict:'
-        s.pos = 0
+        s.clear()
         will_pack = {'name': 'Judy', 'age': '18', 'home': 'California'}
         print 'Before pack: {}'.format(will_pack)
         s.pack('{S:S}', will_pack)
 
-        s.pos = 0
         unpacked = s.unpack('{S:S}')
         print 'After unpack dict: {}'.format(unpacked)
         print
@@ -113,10 +109,9 @@ class StreamTest(TestCase):
         # Special, pack/unpack class test.
         will_pack = 3
         print 'Pack/Unpack class:'
-        s.pos = 0
+        s.clear()
         s.packobj(3)
 
-        s.pos = 0
         unpacked = s.unpackcls(int)
         print '{} <--> {}'.format(will_pack, unpacked)
         print
@@ -130,13 +125,12 @@ class StreamTest(TestCase):
         s = meths[0].__self__
         print 'Pack/Unpack {}:'.format(prompt_str)
 
-        s.pos = 0
+        s.clear()
         meths[0](val)
-        print ' packed, pos:{}'.format(s.pos)
+        print ' packed, wpos:{}'.format(s.wpos)
 
-        s.pos = 0
         unpacked = meths[1]()
-        print ' unpacked, pos:{}'.format(s.pos)
+        print ' unpacked, rpos:{}'.format(s.rpos)
         print '{} <--> {}'.format(val, unpacked)
 
     def _obj_pack_test(self):
@@ -147,9 +141,8 @@ class StreamTest(TestCase):
         print 'Before pack obj: {}'.format(obj)
         s.pack('C<PackableObjA>', obj)
 
-        print 'After pack object, size: {}'.format(s.pos)
+        print 'After pack object, size: {}'.format(s.wpos)
 
-        s.pos = 0
         unpacked = s.unpack('C<PackableObjA>')[0]
         print 'After unpack obj: {}'.format(unpacked)
         print
@@ -162,9 +155,8 @@ class StreamTest(TestCase):
         print 'Will pack data: {}'.format(will_pack)
 
         s.pack('{i:{S:[SBNC<int>]}}', will_pack)
-        print 'Pack done, size: {}'.format(s.pos)
+        print 'Pack done, size: {}'.format(s.wpos)
 
-        s.pos = 0
         unpacked = s.unpack('{i:{S:[SBNC<int>]}}')
         print 'After unpack data: {}'.format(unpacked)
         print
@@ -179,10 +171,8 @@ class StreamTest(TestCase):
         beg = time()
         print 'Pack/Unpack times: 1000000'
         for i in range(1000000):
-            s.pos = 0
+            s.clear()
             s.pack('{i:{S:[SBNC<int>]}}', will_pack)
-
-            s.pos = 0
             unpacked = s.unpack('{i:{S:[SBNC<int>]}}')
 
         elapsed = time() - beg
