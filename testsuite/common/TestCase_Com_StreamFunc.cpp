@@ -604,14 +604,14 @@ int TestCase_Com_StreamFunc::GetBufTest()
     LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithReadPos() == stream.GetBufStartWithWritePos(),
                              LLBC_FAILED);
     LLBC_PrintLn("- After read from stream, stream:%s, intVal:%d, strVal:%s",
-                 stream.ToString().c_str(), intVal, strVal);
+                 stream.ToString().c_str(), intVal, strVal.c_str());
 
     // Read/Write begin buf test:
     stream.SetWritePos(3);
     stream.SetReadPos(1);
     LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithWritePos<char>() - stream.GetBufStartWithReadPos<char>() == 2,
                              LLBC_FAILED);
-    LLBC_PrintLn("- After set wpos=3/rpos=1, buf diff:%d",
+    LLBC_PrintLn("- After set wpos=3/rpos=1, buf diff:%ld",
                  stream.GetBufStartWithWritePos<char>() - stream.GetBufStartWithReadPos<char>());
 
     return LLBC_OK;
@@ -677,23 +677,23 @@ int TestCase_Com_StreamFunc::NumericSerTest()
 {
     LLBC_PrintLn("Numeric type serialize test:");
 
-    bool bVal1 = LLBC_BoolJudge(), bVal2;
+    bool bVal1 = LLBC_BoolJudge(), bVal2 = false;
     sint8 s8Val1 = static_cast<sint8>(LLBC_Rand(std::numeric_limits<sint8>::min(), 
-                                            std::numeric_limits<sint8>::max() + 1)), s8Val2;
+                                            std::numeric_limits<sint8>::max() + 1)), s8Val2 = 0;
     uint8 u8Val1 = static_cast<uint8>(LLBC_Rand(0,
-                                            std::numeric_limits<uint8>::max() + 1)), u8Val2;
+                                            std::numeric_limits<uint8>::max() + 1)), u8Val2 = 0;
     sint16 s16Val1 = static_cast<sint16>(LLBC_Rand(std::numeric_limits<sint16>::min(), 
-                                               std::numeric_limits<sint16>::max() + 1)), s16Val2;
+                                               std::numeric_limits<sint16>::max() + 1)), s16Val2 = 0;
     uint16 u16Val1 = static_cast<uint16>(LLBC_Rand(0,
-                                               std::numeric_limits<uint16>::max() + 1)), u16Val2;
-    sint32 s32Val1 = LLBC_Rand(std::numeric_limits<sint32>::min(), std::numeric_limits<sint32>::max()), s32Val2;
-    uint32 u32Val1 = LLBC_Rand(0, std::numeric_limits<sint32>::max()), u32Val2;
-    long lVal1 = LLBC_Rand(), lVal2;
-    ulong ulVal1 = static_cast<ulong>(LLBC_Rand()), ulVal2;
-    sint64 s64Val1 = (static_cast<sint64>(LLBC_Rand()) << 32) | (static_cast<sint64>(LLBC_Rand())), s64Val2;
-    uint64 u64Val1 = (static_cast<uint64>(LLBC_Rand()) << 32) | (static_cast<uint64>(LLBC_Rand())), u64Val2;
-    float fVal1 = static_cast<float>(LLBC_RandReal()), fVal2;
-    double dVal1 = LLBC_RandReal(), dVal2;
+                                               std::numeric_limits<uint16>::max() + 1)), u16Val2 = 0;
+    sint32 s32Val1 = LLBC_Rand(std::numeric_limits<sint32>::min(), std::numeric_limits<sint32>::max()), s32Val2 = 0;
+    uint32 u32Val1 = LLBC_Rand(0, std::numeric_limits<sint32>::max()), u32Val2 = 0;
+    long lVal1 = LLBC_Rand(), lVal2 = 0;
+    ulong ulVal1 = static_cast<ulong>(LLBC_Rand()), ulVal2 = 0;
+    sint64 s64Val1 = (static_cast<sint64>(LLBC_Rand()) << 32) | (static_cast<sint64>(LLBC_Rand())), s64Val2 = 0;
+    uint64 u64Val1 = (static_cast<uint64>(LLBC_Rand()) << 32) | (static_cast<uint64>(LLBC_Rand())), u64Val2 = 0;
+    float fVal1 = static_cast<float>(LLBC_RandReal()), fVal2 = 0.0f;
+    double dVal1 = LLBC_RandReal(), dVal2 = 0.0;
 
     LLBC_Stream s;
     s << bVal1 >> bVal2
