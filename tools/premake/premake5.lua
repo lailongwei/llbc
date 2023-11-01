@@ -130,6 +130,13 @@ workspace ("llbc_" .. _ACTION)
         }
     filter {}
 
+    -- disable min/max macro define on windows platform.
+    filter { "language:c++", "system:windows" }
+        defines {
+            "NOMINMAX"
+        }
+    filter {}
+
     -- enable symbols.
     symbols "On"
 
