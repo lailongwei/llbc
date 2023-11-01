@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_NewStream : public LLBC_BaseTestCase
+class TestCase_Com_StreamFunc : public LLBC_BaseTestCase
 {
 public:
     virtual int Run(int argc, char *argv[]);
@@ -38,4 +38,10 @@ private:
     int SkipRWTest();
     int ReadableSizeTest();
     int WritableSizeTest();
+    int GetBufTest();
+    int BufOpTest();
+    int NumericSerTest();
+    int StrSerTest();
+    int StlContainerSerTest();
+    int SerializableObjSerTest();
 };

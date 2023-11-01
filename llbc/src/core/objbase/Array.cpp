@@ -464,7 +464,7 @@ void LLBC_Array::Serialize(LLBC_Stream &s) const
         s <<*it;
 }
 
-bool LLBC_Array::DeSerialize(LLBC_Stream &s)
+bool LLBC_Array::Deserialize(LLBC_Stream &s)
 {
     if (UNLIKELY(!_objFactory))
         return false;

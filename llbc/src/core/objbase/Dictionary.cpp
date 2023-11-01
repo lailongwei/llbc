@@ -464,7 +464,7 @@ void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
     }
 }
 
-bool LLBC_Dictionary::DeSerialize(LLBC_Stream &s)
+bool LLBC_Dictionary::Deserialize(LLBC_Stream &s)
 {
     if (!_objFactory)
         return false;

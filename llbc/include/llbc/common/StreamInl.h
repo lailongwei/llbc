@@ -58,7 +58,7 @@ template <>
 struct LLBC_Stream::__LLBC_TupleReader<0>
 {
     template <typename Tup>
-    static bool Read(Tup &tup, LLBC_Stream &stream, size_t &readCount)
+    static bool Read(Tup &tup, LLBC_Stream &stream)
     {
         return true;
     }
@@ -411,7 +411,7 @@ LLBC_FORCE_INLINE void LLBC_Stream::Replace(size_t n0, size_t n1, const void *bu
         return;
     }
 
-    // Copy back buf.
+    // Backup back buf.
     sint8 *backBuf = nullptr;
     const size_t backBufSize = _writePos - n1;
     if (backBufSize > 0)
@@ -420,8 +420,15 @@ LLBC_FORCE_INLINE void LLBC_Stream::Replace(size_t n0, size_t n1, const void *bu
         memcpy(backBuf, _buf + n1, backBufSize);
     }
 
+    // Calc new rpos.
+    // - rpos <= n0: rpos
+    // - rpos < n1: n0
+    // - rpos >= n1: rpos + (size - (n1 - n0))
+    const size_t newReadPos =
+        _readPos <= n0 ? _readPos :
+            (_readPos < n1 ? n0 : _readPos + size - eraseSize);
+
     // Copy 'will replace buf' + 'back buf' to stream.
-    const size_t oldReadPos = _readPos;
     SetWritePos(n0);
     if (size > 0)
     {
@@ -433,7 +440,9 @@ LLBC_FORCE_INLINE void LLBC_Stream::Replace(size_t n0, size_t n1, const void *bu
         free(backBuf);
     }
 
-    SetReadPos(oldReadPos);
+    // Update rpos/wpos.
+    SetWritePos(n0 + size + backBufSize);
+    SetReadPos(newReadPos);
 }
 
 LLBC_FORCE_INLINE bool LLBC_Stream::Read(void *buf, size_t size)
@@ -539,11 +548,14 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
         return false;
 
     if (size == 0)
+    {
+        if (_ArrLen > 0)
+            arr[0] = T();
         return true;
-    if (size > _ArrLen)
-        return false;
+    }
 
-    if (!Read(&arr[0], size))
+    if (size > _ArrLen ||
+        !Read(&arr[0], size))
     {
         _readPos -= sizeof(uint32);
         return false;
@@ -568,10 +580,9 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
 
     if (size == 0)
         return true;
-    if (size > _ArrLen)
-        return false;
 
-    if (!Read(&arr[0], size))
+    if (size > _ArrLen ||
+        !Read(&arr[0], size))
     {
         _readPos -= sizeof(uint32);
         return false;
@@ -585,7 +596,7 @@ typename std::enable_if<(std::is_arithmetic<T>::value &&
                          (!std::is_same<T, char>::value &&
                           !std::is_same<T, uint8>::value &&
                           !std::is_same<T, bool>::value)) ||
-                            !std::is_arithmetic<T>::value,
+                            std::is_enum<T>::value,
                         bool>::type
 LLBC_Stream::Read(T (&arr)[_ArrLen])
 {
@@ -595,12 +606,44 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
 
     if (size == 0)
         return true;
-    else if (size > _ArrLen)
+
+    if (size > _ArrLen ||
+        !Read(&arr[0], sizeof(T) * size))
+    {
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    if (_endian != LLBC_MachineEndian)
+    {
+        for (uint32 i = 0; i < size; ++i)
+            arr[i] = LLBC_ReverseBytes(arr[i]);
+    }
+
+    return true;
+}
+
+template <typename T, size_t _ArrLen>
+typename std::enable_if<!std::is_arithmetic<T>::value &&
+                        !std::is_enum<T>::value, bool>::type
+LLBC_Stream::Read(T(&arr)[_ArrLen])
+{
+    uint32 size;
+    if (UNLIKELY(!Read(size)))
         return false;
 
-    for (size_t i = 0; i < size; ++i)
+    if (size == 0)
+        return true;
+
+    if (size > _ArrLen)
     {
-        if (UNLIKELY(!Read(arr[i])))
+        _readPos -= sizeof(uint32);
+        return false;
+    }
+
+    for (uint32 i = 0; i < size; ++i)
+    {
+        if (!Read(arr[i]))
             return false;
     }
 
@@ -751,6 +794,11 @@ template <typename T>
 typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, bool>::type
 LLBC_Stream::Read(T &arr)
 {
+    uint32 arrSize;
+    if (!Read(arrSize) ||
+        arrSize != static_cast<uint32>(std::tuple_size<T>::value))
+        return false;
+
     return __LLBC_STLArrayReader<std::tuple_size<T>::value>::Read(arr, *this);
 }
 
@@ -758,6 +806,11 @@ template <typename T>
 typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, bool>::type
 LLBC_Stream::Read(T &tup)
 {
+    uint32 tupSize;
+    if (!Read(tupSize) ||
+        tupSize != static_cast<uint32>(std::tuple_size<T>::value))
+        return false;
+
     return __LLBC_TupleReader<std::tuple_size<T>::value>::Read(tup, *this);
 }
 
@@ -806,9 +859,27 @@ bool LLBC_Stream::ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::D
 }
 
 template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::DeSer> *)
+{
+    return obj.DeSer(*this);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::Deser> *)
+{
+    return obj.Deser(*this);
+}
+
+template <typename T>
 bool LLBC_Stream::ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *)
 {
     return obj.deserialize(*this);
+}
+
+template <typename T>
+bool LLBC_Stream::ReadImpl(T &obj, lower_camel_case_short_deserializable_type<T, &T::deser> *)
+{
+    return obj.deser(*this);
 }
 
 template <typename T>
@@ -928,9 +999,15 @@ LLBC_Stream::Write(const T (&arr)[_ArrLen])
     }
     else if (arr[_ArrLen - 1] == '\0')
     {
-
-        Write(static_cast<uint32>(_ArrLen) - 1);
-        Write(&arr[0], sizeof(T) * (_ArrLen - 1));
+        if (_ArrLen == 1)
+        {
+            Write(0u);
+        }
+        else
+        {
+            Write(static_cast<uint32>(_ArrLen - 1));
+            Write(&arr[0], sizeof(T) * (_ArrLen - 1));
+        }
     }
     else
     {
@@ -986,8 +1063,7 @@ typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
                             LLBC_IsTemplSpec<T, std::list>::value ||
                             LLBC_IsTemplSpec<T, std::deque>::value ||
                             LLBC_IsTemplSpec<T, std::set>::value ||
-                            LLBC_IsTemplSpec<T, std::unordered_set>::value ||
-                            LLBC_IsTemplSpec<T, std::stack>::value,
+                            LLBC_IsTemplSpec<T, std::unordered_set>::value,
                         void>::type
 LLBC_Stream::Write(const T &container)
 {
@@ -1035,6 +1111,7 @@ template <typename T>
 typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, void>::type
 LLBC_Stream::Write(const T &arr)
 {
+    Write(static_cast<uint32>(std::tuple_size<T>::value));
     __LLBC_STLArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
 }
 
@@ -1042,6 +1119,7 @@ template <typename T>
 typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, void>::type
 LLBC_Stream::Write(const T &tup)
 {
+    Write(static_cast<uint32>(std::tuple_size<T>::value));
     __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
 }
 
@@ -1078,8 +1156,6 @@ LLBC_Stream::Write(const T &obj)
     WriteImpl<T>(obj, 0);
 }
 
-template <typename T, void (T::*)(LLBC_Stream &) const>
-struct upper_camel_case_serializable_type;
 template <typename T>
 void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
 {
@@ -1087,9 +1163,21 @@ void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_serializable_type<T, 
 }
 
 template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *)
+{
+    obj.Ser(*this);
+}
+
+template <typename T>
 void LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
 {
     obj.serialize(*this);
+}
+
+template <typename T>
+void LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *)
+{
+    obj.ser(*this);
 }
 
 template <typename T>

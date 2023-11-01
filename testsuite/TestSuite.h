@@ -24,7 +24,7 @@
 #include "common/TestCase_Com_DataType.h"
 #include "common/TestCase_Com_Endian.h"
 #include "common/TestCase_Com_Stream.h"
-#include "common/TestCase_Com_NewStream.h"
+#include "common/TestCase_Com_StreamFunc.h"
 #include "common/TestCase_Com_Error.h"
 #include "common/TestCase_Com_Macro.h"
 #include "common/TestCase_Com_Version.h"

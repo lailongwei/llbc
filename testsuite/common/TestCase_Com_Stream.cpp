@@ -96,7 +96,7 @@ struct SerializableCls
             << complexVal;
     }
 
-    bool DeSerialize(LLBC_Stream &stream)
+    bool Deserialize(LLBC_Stream &stream)
     {
         LLBC_STREAM_BEGIN_READ(stream, bool, false);
 

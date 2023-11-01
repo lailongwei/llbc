@@ -304,7 +304,7 @@ inline void LLBC_TimeSpan::Serialize(LLBC_Stream &stream) const
     stream.Write(_span);
 }
 
-inline bool LLBC_TimeSpan::DeSerialize(LLBC_Stream &stream)
+inline bool LLBC_TimeSpan::Deserialize(LLBC_Stream &stream)
 {
     sint64 spanVal = 0;
     if (!stream.Read(spanVal))

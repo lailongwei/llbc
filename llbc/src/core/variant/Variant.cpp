@@ -941,7 +941,7 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     }
 }
 
-bool LLBC_Variant::DeSerialize(LLBC_Stream &stream)
+bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
 {
     LLBC_VariantType::ENUM streamType;
     if (!stream.Read(streamType))
