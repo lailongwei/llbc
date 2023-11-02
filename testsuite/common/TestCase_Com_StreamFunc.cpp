@@ -1033,18 +1033,23 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
     // Define base seriazable class.
     struct _BaseSerCls
     {
-        int intVal;
-        double dblVal;
-        LLBC_String strVal;
+        int intVal = 0;
+        double dblVal = 0;
+        LLBC_String strVal = 0;
+
+        mutable bool serCalled = false;
+        bool deserCalled = false;
 
     protected:
         void _Ser(LLBC_Stream &s) const
         {
+            serCalled = true;
             s << intVal << dblVal << strVal;
         }
 
         bool _Deser(LLBC_Stream &s)
         {
+            deserCalled = true;
             LLBC_ReturnIfNot(s.Read(intVal), false);
             LLBC_ReturnIfNot(s.Read(dblVal), false);
             LLBC_ReturnIfNot(s.Read(strVal), false);
@@ -1085,6 +1090,7 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
             clsName obj1(LLBC_Rand(10, 20), LLBC_RandReal(), "hello world"), obj2(0, 0.0, ""); \
             s << obj1 >> obj2; \
             LLBC_ReturnIfNot(obj1 == obj2, LLBC_FAILED); \
+            LLBC_ReturnIfNot(obj1.serCalled && obj2.deserCalled, LLBC_FAILED); \
             LLBC_ReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED); \
             LLBC_PrintLn("  - obj1: %d, %f, %s", obj1.intVal, obj1.dblVal, obj1.strVal.c_str()); \
             LLBC_PrintLn("  - obj2: %d, %f, %s", obj2.intVal, obj2.dblVal, obj2.strVal.c_str()); \
