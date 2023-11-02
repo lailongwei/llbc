@@ -424,18 +424,18 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
         if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
             return LLBC_FAILED;
 
-        // Write new core pattern.
+        // Write new core pattern(may not have permission to open core_pattern file, ignore error).
         LLBC_File corePatternFile;
-        if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) != LLBC_OK)
-            return LLBC_FAILED;
-
-        // If failed, try write old core pattern.
-        if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
+        if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
         {
-            corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
-            corePatternFile.Write(oldCorePattern);
+            // If failed, try write old core pattern.
+            if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
+            {
+                corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
+                corePatternFile.Write(oldCorePattern);
 
-            return LLBC_FAILED;
+                return LLBC_FAILED;
+            }
         }
     }
 
