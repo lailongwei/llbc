@@ -502,7 +502,14 @@ project "pyllbc"
                 string.gsub(llbc_output_dir, "/", "\\"),
                 pyllbc_testsuite_output_path_win))
     filter { "system:not windows" }
-        -- Do nothing.
+        postbuildcommands(
+            string.format(
+                "\\cp -rf \"%s\"/libllbc*.so \"%s\"/",
+                    llbc_output_dir, pyllbc_testsuite_output_path))
+        postbuildcommands(
+            string.format(
+                "\\cp -rf \"%s\"/llbc*.so \"%s\"/",
+                    llbc_output_dir, pyllbc_testsuite_output_path))
     filter {}
 
     -- postbuild: Copy misc files.
