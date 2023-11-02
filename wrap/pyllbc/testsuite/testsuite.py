@@ -7,6 +7,7 @@ import sys
 from common import *
 from core import *
 from communication import *
+from app import *
 
 
 def main():
