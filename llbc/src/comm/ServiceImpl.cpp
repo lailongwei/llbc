@@ -264,9 +264,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         _lock.Unlock();
 
         // Waiting for all service start finished or failed.
-        while (_runningPhase != LLBC_ServiceRunningPhase::PreStartFailed &&
-               _runningPhase != LLBC_ServiceRunningPhase::InitCompsFailed &&
-               _runningPhase != LLBC_ServiceRunningPhase::StartCompsFailed &&
+        while (!LLBC_ServiceRunningPhase::IsFailedPhase(_runningPhase) &&
                _runningPhase != LLBC_ServiceRunningPhase::CompsStarted)
             LLBC_Sleep(1);
 
@@ -1307,8 +1305,9 @@ void LLBC_ServiceImpl::Cleanup()
 
     // Reset _serviceBeginLoop flag.
     _serviceBeginLoop = false;
-    // Update _runningPhase to <NotStarted>.
-    _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
+    // Reset _runningPhase, if is not failed phase.
+    if (!LLBC_ServiceRunningPhase::IsFailedPhase(_runningPhase))
+        _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
 }
 
 void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
