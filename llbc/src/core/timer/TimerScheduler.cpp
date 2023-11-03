@@ -152,7 +152,7 @@ size_t LLBC_TimerScheduler::GetTimerCount() const
     return _heap.GetSize();
 }
 
-bool LLBC_TimerScheduler::IsDstroyed() const
+bool LLBC_TimerScheduler::IsDestroyed() const
 {
     return _destroyed;
 }

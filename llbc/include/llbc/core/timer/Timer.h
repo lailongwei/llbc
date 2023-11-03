@@ -63,21 +63,34 @@ public:
 public:
     /**
      * Get due time.
-     * @return uint64 - due time.
+     * @return LLBC_TimeSpan - due time.
      */
-    uint64 GetDueTime() const;
+    LLBC_TimeSpan GetDueTime() const;
 
     /**
      * Get timer period.
-     * @return uint64 - timer period.
+     * @return LLBC_TimeSpan - timer period.
      */
-    uint64 GetPeriod() const;
+    LLBC_TimeSpan GetPeriod() const;
 
     /**
      * Get timer Id.
      * @return LLBC_TimerId - timer Id.
      */
     LLBC_TimerId GetTimerId() const;
+
+    /**
+     * Get timeout times.
+     * @return sint64 - timeout times.
+     */
+    sint64 GetTimeoutTimes() const;
+
+public:
+    /**
+     * Get timeout handler.
+     * @return LLBC_Delegate<void(LLBC_Timer *)> & - timeout handler.
+     */
+    const LLBC_Delegate<void(LLBC_Timer *)> &GetTimeoutHandler() const;
 
     /**
      * Set timeout handler.
@@ -92,6 +105,12 @@ public:
      */
     template <typename ObjType>
     void SetTimeoutHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *));
+
+    /**
+     * Get cancel handler.
+     * @return LLBC_Delegate<void(LLBC_Timer *)> & - cancel handler.
+     */
+     const LLBC_Delegate<void(LLBC_Timer *)> &GetCancelHandler() const;
 
     /**
      * Set cancel handler.

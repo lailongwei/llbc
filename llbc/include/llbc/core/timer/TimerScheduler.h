@@ -92,7 +92,7 @@ private:
      * Get scheduler destroyed flag.
       *@return bool - destroyed flag.
      */
-    bool IsDstroyed() const;
+    bool IsDestroyed() const;
 
     /**
      * Schedule timer.
