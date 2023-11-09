@@ -50,21 +50,22 @@ LLBC_Timer::~LLBC_Timer()
         Cancel();
         if (--_timerData->refCount == 0)
             delete _timerData;
-;
     }
 
     if (_data)
         delete _data;
 }
 
-uint64 LLBC_Timer::GetDueTime() const
+LLBC_TimeSpan LLBC_Timer::GetDueTime() const
 {
-    return _timerData ? _timerData->dueTime : 0;
+    return _timerData ?
+        LLBC_TimeSpan::FromMillis(_timerData->dueTime) : LLBC_TimeSpan::zero;
 }
 
-uint64 LLBC_Timer::GetPeriod() const
+LLBC_TimeSpan LLBC_Timer::GetPeriod() const
 {
-    return _timerData ? _timerData->period : 0;
+    return _timerData ?
+        LLBC_TimeSpan::FromMillis(_timerData->period) : LLBC_TimeSpan::zero;
 }
 
 LLBC_TimerId LLBC_Timer::GetTimerId() const
@@ -72,38 +73,19 @@ LLBC_TimerId LLBC_Timer::GetTimerId() const
     return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
 }
 
-void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg)
+sint64 LLBC_Timer::GetTimeoutTimes() const
 {
-    _timeoutDeleg = timeoutDeleg;
-}
-
-void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
-{
-    _cancelDeleg = cancelDeleg;
+    return _timerData ? _timerData->repeatTimes : 0;
 }
 
 LLBC_Variant &LLBC_Timer::GetTimerData()
 {
-    if (!_data)
-        _data = new LLBC_Variant();
-    return *_data;
+    return *(_data ? _data : (_data = new LLBC_Variant));
 }
 
-const LLBC_Variant & LLBC_Timer::GetTimerData() const
+const LLBC_Variant &LLBC_Timer::GetTimerData() const
 {
-    return const_cast<LLBC_Timer *>(this)->GetTimerData();
-}
-
-void LLBC_Timer::OnTimeout()
-{
-    if (LIKELY(_timeoutDeleg))
-        _timeoutDeleg(this);
-}
-
-void LLBC_Timer::OnCancel()
-{
-    if (_cancelDeleg)
-        _cancelDeleg(this);
+    return _data ? *_data : LLBC_Variant::nil;
 }
 
 int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
@@ -169,8 +151,12 @@ bool LLBC_Timer::IsCancelling() const
 LLBC_String LLBC_Timer::ToString() const
 {
     return LLBC_String().format(
-        "timerId: %llu, dueTime: %llu, period: %llu, scheduling: %s",
-        GetTimerId(), GetDueTime(), GetPeriod(), IsScheduling()? "true" : "false");
+        "timerId:%llu, dueTime:%llums, period:%llums, timeoutTimes:%lld, scheduling:%s",
+        GetTimerId(),
+        GetDueTime().GetTotalMillis(),
+        GetPeriod().GetTotalMillis(),
+        GetTimeoutTimes(),
+        IsScheduling()? "true" : "false");
 }
 
 __LLBC_NS_END

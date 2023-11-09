@@ -399,7 +399,7 @@ public:
      * Serialize/Deserialize support.
      */
     virtual void Serialize(LLBC_Stream &s) const;
-    virtual bool DeSerialize(LLBC_Stream &s);
+    virtual bool Deserialize(LLBC_Stream &s);
 
     /**
      * Disable assignment.

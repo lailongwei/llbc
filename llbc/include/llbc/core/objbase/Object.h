@@ -102,11 +102,11 @@ public:
     virtual void Serialize(LLBC_Stream &s) const;
 
     /**
-     * DeSerialize method, use to deserialize the object from stream.
+     * Deserialize method, use to deserialize the object from stream.
      * @param[in] s - the stream object.
      * @return bool - return true if serialize success, otherwise return false.
      */
-    virtual bool DeSerialize(LLBC_Stream &s);
+    virtual bool Deserialize(LLBC_Stream &s);
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_Object);
 

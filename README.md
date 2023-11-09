@@ -5,8 +5,10 @@ llbc开发过程中，使用了以下JetBrains产品：
 
 > 如果你也是一名开源软件的开发者，可尝试申请JetBrains的[开源软件开发许可](https://www.jetbrains.com/shop/eform/opensource)。
 
+> 欢迎加入Discord交流: Discord: https://discord.gg/YmtjKkNgaN
+
 ## 简述
-llbc为一个精简、功能完整、跨平台、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
+一个简洁、高效、跨平台、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
 *Note：llbc框架不包含具体组件实现，所有较为通用的组件支持将由[llbc_comps](https://github.com/lailongwei/llbc_comps)仓库提供, llbc_comps仓库处于初建阶段，欢迎大家贡献组件。*
 
 ## 构建状态

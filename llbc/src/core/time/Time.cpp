@@ -403,7 +403,7 @@ LLBC_String LLBC_Time::ToString() const
                            LLBC_TimeConst::numOfMicrosPerMillisecond + GetMicrosecond());
 }
 
-bool LLBC_Time::DeSerialize(LLBC_Stream &stream)
+bool LLBC_Time::Deserialize(LLBC_Stream &stream)
 {
     sint64 timeVal = 0;
     if (!stream.Read(timeVal))

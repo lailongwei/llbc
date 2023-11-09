@@ -542,9 +542,9 @@ public:
     // To string.
     LLBC_String ToString() const;
 
-    // Serialize / DeSerialize support.
+    // Serialize / Deserialize support.
     void Serialize(LLBC_Stream &stream) const;
-    bool DeSerialize(LLBC_Stream &stream);
+    bool Deserialize(LLBC_Stream &stream);
 
 public:
     friend std::ostream &::operator<<(std::ostream &o, const LLBC_Variant &variant);

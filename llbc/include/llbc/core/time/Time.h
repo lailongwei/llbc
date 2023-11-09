@@ -316,10 +316,10 @@ public:
 
 public:
     /**
-     * Serialize / DeSerialize support.
+     * Serialize / Deserialize support.
      */
     void Serialize(LLBC_Stream &stream) const;
-    bool DeSerialize(LLBC_Stream &stream);
+    bool Deserialize(LLBC_Stream &stream);
 
 private:
     /**

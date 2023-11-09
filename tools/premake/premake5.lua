@@ -87,6 +87,9 @@ else
     llbc_output_dir = llbc_output_base_dir .. "/$(config)"
 end
 
+-- wrap libraries testsuite directory.
+local llbc_wrap_testsuite_output_dir = llbc_output_dir .. '/wrap_testsuites'
+
 -- #########################################################################
 
 workspace ("llbc_" .. _ACTION)
@@ -127,6 +130,13 @@ workspace ("llbc_" .. _ACTION)
     filter { "configurations:debug*" }
         defines {
             "DEBUG"
+        }
+    filter {}
+
+    -- disable min/max macro define on windows platform.
+    filter { "language:c++", "system:windows" }
+        defines {
+            "NOMINMAX"
         }
     filter {}
 
@@ -447,10 +457,76 @@ project "pyllbc"
         defines { "HAVE_ROUND" }
     filter {}
 
-    -- prebuild commands.
+    -- prebuild: Export native method export code & integrate python script code(to c++ dynamic lib).
     prebuildcommands {
         llbc_py_exec_path .. " ../../tools/building_script/py_prebuild.py pyllbc",
     }
+
+    -- postbuild: Create testsuite output directory.
+    local pyllbc_testsuite_path = llbc_py_wrap_path .. "/testsuite"
+    local pyllbc_testsuite_path_win = string.gsub(pyllbc_testsuite_path, "/", "\\")
+    local pyllbc_testsuite_output_path = llbc_wrap_testsuite_output_dir .. '/pyllbc'
+    local pyllbc_testsuite_output_path_win = string.gsub(pyllbc_testsuite_output_path, "/", "\\")
+    filter { "system:windows" }
+        postbuildcommands(
+            string.format(
+                "IF exist \"%s\" (echo \"%s exist\") ELSE (echo \"Create testsuite output dir: %s\" && MD \"%s\")",
+                pyllbc_testsuite_output_path_win, pyllbc_testsuite_output_path_win,
+                pyllbc_testsuite_output_path_win, pyllbc_testsuite_output_path_win))
+    filter { "system:not windows" }
+        postbuildcommands(string.format("mkdir -p \"%s\"", pyllbc_testsuite_output_path))
+    filter {}
+
+    -- postbuild: Copy testsuite scripts to output directory.
+    filter { "system:windows" }
+        postbuildcommands(
+            string.format("XCOPY /Y /E /F \"%s\\*\" \"%s\"",
+                pyllbc_testsuite_path_win,
+                pyllbc_testsuite_output_path_win))
+    filter { "system:not windows" }
+        postbuildcommands(string.format("\\cp -rf \"%s\"/* \"%s\"",
+            pyllbc_testsuite_path, pyllbc_testsuite_output_path))
+    filter {}
+
+    -- postbuild: Copy core lib & pyllbc lib file.
+    local llbc_output_dir_win = string.gsub(llbc_output_dir, "/", "\\")
+    filter { "system:windows" }
+        postbuildcommands(
+            string.format(
+                "for /f \"tokens=*\" %%%%f in ('DIR /b /a-d \"%s\\libllbc*.dll\"') do (COPY /Y %s\\%%%%f \"%s\")",
+                llbc_output_dir_win, llbc_output_dir_win, pyllbc_testsuite_output_path_win))
+        postbuildcommands(
+            string.format(
+                "for /f \"tokens=*\" %%%%f in ('DIR /b /a-d \"%s\\llbc*.pyd\"') do (COPY /Y %s\\%%%%f \"%s\")",
+                string.gsub(llbc_output_dir, "/", "\\"),
+                string.gsub(llbc_output_dir, "/", "\\"),
+                pyllbc_testsuite_output_path_win))
+    filter { "system:not windows" }
+        postbuildcommands(
+            string.format(
+                "\\cp -rf \"%s\"/libllbc*.so \"%s\"/",
+                    llbc_output_dir, pyllbc_testsuite_output_path))
+        postbuildcommands(
+            string.format(
+                "\\cp -rf \"%s\"/llbc*.so \"%s\"/",
+                    llbc_output_dir, pyllbc_testsuite_output_path))
+    filter {}
+
+    -- postbuild: Copy misc files.
+    local pyllbc_need_copy_to_testsuite_ouptut_misc_files = {
+        llbc_testsuite_path .. "/core/log/LogTestCfg.cfg"
+    }
+    filter { "system:windows" }
+        for _, file in pairs(pyllbc_need_copy_to_testsuite_ouptut_misc_files) do
+            postbuildcommands(string.format("COPY /Y \"%s\" \"%s\"",
+                                            string.gsub(file, "/", "\\"), pyllbc_testsuite_output_path_win))
+        end
+    filter {}
+    filter { "system:not windows" }
+        for _, file in pairs(pyllbc_need_copy_to_testsuite_ouptut_misc_files) do
+            postbuildcommands(string.format("\\cp -rf \"%s\" \"%s\"", file, pyllbc_testsuite_output_path))
+        end
+    filter {}
 
     -- target name, target prefix, extension.
     targetname "llbc"

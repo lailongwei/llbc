@@ -910,7 +910,7 @@ public:
     }
 
     // compare operations.
-    int compare(const _This &str) const
+    int compare(const _Base &str) const
     {
         return _Base::compare(str);
     }

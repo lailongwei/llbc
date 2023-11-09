@@ -29,14 +29,14 @@
 #include "llbc/common/TemplateDeduction.h"
 
 /** Some stream helper macros define **/
-/*  DeSerialize/Read about macros define  */
+/*  Deserialize/Read about macros define  */
 // Begin read macro define, use to simple begin read object.
 #define LLBC_STREAM_BEGIN_READ(stream, failRetType, failRetVal) \
     do {                                                        \
         failRetType __r_failRet = (failRetVal);                 \
         LLBC_NAMESPACE LLBC_Stream &__r_stream = (stream)       \
 
-// DeSerialize macro define.
+// Deserialize macro define.
 #define LLBC_STREAM_READ(field)                                 \
     if (!__r_stream.Read(field)) {                              \
         return __r_failRet;                                     \
@@ -408,7 +408,7 @@ public:
 
     /**
      * Read char array from stream.
-     * @param[out] arr - arithmetic array.
+     * @param[out] arr - char array.
      * @return bool - return true if success, otherwise return false.
      */
     template <typename T, size_t _ArrLen>
@@ -419,7 +419,7 @@ public:
 
     /**
      * Read uint8/bool array from stream.
-     * @param[out] arr - arithmetic array.
+     * @param[out] arr - uint8/bool array.
      * @return bool - return true if success, otherwise return false.
      */
     template <typename T, size_t _ArrLen>
@@ -430,8 +430,8 @@ public:
     Read(T(&arr)[_ArrLen]);
 
     /**
-     * Read non sint8/uint8/bool arithmetic array from stream.
-     * @param[out] arr - arithmetic array.
+     * Read non sint8/uint8/bool arithmetic array or enumeration array from stream.
+     * @param[out] arr - arithmetic/enumeration array.
      * @return bool - return true if success, otherwise return false.
      */
     template <typename T, size_t _ArrLen>
@@ -439,8 +439,18 @@ public:
                              (!std::is_same<T, char>::value &&
                               !std::is_same<T, uint8>::value &&
                               !std::is_same<T, bool>::value)) ||
-                                !std::is_arithmetic<T>::value,
+                                std::is_enum<T>::value,
                             bool>::type
+    Read(T(&arr)[_ArrLen]);
+
+    /**
+     * Read non arithmetic array and non enumeration array from stream.
+     * @param[out] arr - array.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_enum<T>::value, bool>::type
     Read(T(&arr)[_ArrLen]);
 
     /**
@@ -605,12 +615,34 @@ private:
     bool ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::Deserialize> *);
 
     /**
+     * Try adapt T::DeSer.
+     */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct upper_camel_case_short_deserializable_type;
+    template <typename T>
+    bool ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::DeSer> *);
+
+    /**
+     * Try adapt T::Deser.
+     */
+    template <typename T>
+    bool ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::Deser> *);
+
+    /**
      * Try adapt T::deserialize.
      */
     template <typename T, bool (T::*)(LLBC_Stream &)>
     struct lower_camel_case_deserializable_type;
     template <typename T>
     bool ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *);
+
+    /**
+     * Try adapt T::deser.
+     */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct lower_camel_case_short_deserializable_type;
+    template <typename T>
+    bool ReadImpl(T &obj, lower_camel_case_short_deserializable_type<T, &T::deser> *);
 
     /**
      * Try adapt protobuf2 mesage object.
@@ -677,7 +709,7 @@ public:
     Write(const T &ptr);
 
     /**
-     * Write char arithmetic array to stream.
+     * Write char array to stream.
      * @param[in] arr - the char arithmetic array.
      */
     template <typename T, size_t _ArrLen>
@@ -687,8 +719,8 @@ public:
     Write(const T(&arr)[_ArrLen]);
 
     /**
-     * Write uint8 array to stream.
-     * @param[in] arr - the char arithmetic array.
+     * Write uint8/bool array to stream.
+     * @param[in] arr - the uint8/bool arithmetic array.
      */
     template <typename T, size_t _ArrLen>
     typename std::enable_if<std::is_arithmetic<T>::value &&
@@ -729,8 +761,7 @@ public:
                                 LLBC_IsTemplSpec<T, std::list>::value ||
                                 LLBC_IsTemplSpec<T, std::deque>::value ||
                                 LLBC_IsTemplSpec<T, std::set>::value ||
-                                LLBC_IsTemplSpec<T, std::unordered_set>::value ||
-                                LLBC_IsTemplSpec<T, std::stack>::value,
+                                LLBC_IsTemplSpec<T, std::unordered_set>::value,
                             void>::type
     Write(const T &container);
 
@@ -846,12 +877,28 @@ private:
     void WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *);
 
     /**
+     * Try adapt T::Ser.
+     */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct upper_camel_case_short_serializable_type;
+    template <typename T>
+    void WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *);
+
+    /**
      * Try adapt T::serialize.
      */
     template <typename T, void (T::*)(LLBC_Stream &) const>
     struct lower_camel_case_serializable_type;
     template <typename T>
     void WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *);
+
+    /**
+     * Try adapt T::ser.
+     */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct lower_camel_case_short_serializable_type;
+    template <typename T>
+    void WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *);
 
     /**
      * Try adapt protobuf2 message object.

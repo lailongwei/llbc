@@ -1,3 +1,6 @@
 [submodule "wrap/lullbc/lua"]
 	path = wrap/lullbc/lua
 	url = https://github.com/lua/lua.git
+[submodule "wrap/pyllbc/cpython"]
+	path = wrap/pyllbc/cpython
+	url = https://github.com/python/cpython.git
