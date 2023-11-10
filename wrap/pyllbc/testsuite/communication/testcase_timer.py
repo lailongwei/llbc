@@ -27,8 +27,8 @@ class TimerTest(llbc.TestCase):
         # print 'timer[{}] cancelled!'.format(timer.timerid)
 
     def _createtimers(self):
-        timers_count=1000000
-        
+        timers_count = 1000000
+
         import time
         beg_add_time = time.time()
         print 'add {} timers:'.format(timers_count)

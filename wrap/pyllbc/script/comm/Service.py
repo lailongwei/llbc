@@ -163,7 +163,7 @@ class pyllbcService(object):
     __metaclass__ = pyllbcServiceMetaCls
 
     # service type define.
-    NORMAL = 1 # Normalize type service.
+    NORMAL = 1 # Normal type service.
     RAW = 2 # Raw type service.
 
     # FPS limit values define.
