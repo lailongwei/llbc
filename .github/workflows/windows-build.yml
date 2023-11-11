@@ -41,6 +41,20 @@ jobs:
           # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:testsuite
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
 
+      - name: Compile pyllbc lib code
+        run: |
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:pyllbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:pyllbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:pyllbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:pyllbc
+
+      - name: Compile lullbc lib code
+        run: |
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:lullbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:lullbc
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
+
       - name: Build all target by cmake
         run: |
           mkdir cmake_build
