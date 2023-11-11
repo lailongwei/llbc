@@ -7,15 +7,14 @@ import re
 import os
 from os import path as op
 
-
-from c import Cfg
-from cpputils import *
+from com.defs import ProjType
 from native_method_collector.base_native_method_collector import BaseNativeMethodCollector
 
 
 class LuNativeMethodCollector(BaseNativeMethodCollector):
     def __init__(self, search_path, classname_base=None, filename_base=None):
-        super(LuNativeMethodCollector, self).__init__(search_path, classname_base, filename_base)
+        super(LuNativeMethodCollector, self).__init__(
+            ProjType.lullbc, search_path, classname_base, filename_base)
         self._meth_re = re.compile(
             r'\s*LULLBC_LUA_METH\s+int\s+(_lullbc_([a-zA-Z0-9_]+))\s*\(\s*lua_State\s*\*\s*[a-zA-Z0-9_]*\s*\)\s*')
         self._anno_re = re.compile(r'\s*//.*')
@@ -28,12 +27,10 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
             return False
 
         # 创建cpp文件对象, 用于存放自动生成代码
-        proj_name = self.proj_name
         cpp_file = self._build_cpp_file()
 
         # 取得所有方法
         methods = {}
-        code_path = Cfg.getcodepath()
         r = self._build_filematch_re()
         for root, dirs, files in os.walk(self.search_path):
             for f in files:
@@ -50,7 +47,7 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
                 if not file_methods:
                     continue
 
-                incl = fpath[len(op.dirname(code_path)) + 1:]
+                incl = fpath[len(op.dirname(self.search_path)) + 1:]
                 cpp_file.addincl(incl)
 
                 methods.update(file_methods)
@@ -63,8 +60,8 @@ class LuNativeMethodCollector(BaseNativeMethodCollector):
                 return '\n    {{"{0}", {1}}},'.format(meth['lua_name'], meth['name'])
 
         luareg = 'static luaL_Reg lullbc_NativeMethods[] = {'
-        for meth in methods.values():
-            luareg += _build_luareg(meth)
+        for m in methods.values():
+            luareg += _build_luareg(m)
         luareg += _build_luareg(None)
         luareg += '\n}'
 

@@ -421,7 +421,7 @@ int TestCase_Com_StreamFunc::RWPosTest()
     for (int i = 0; i < 11; ++i)
     {
         const size_t oldWPos = stream.GetWritePos();
-        const size_t newWPos = i < 10 ? LLBC_Rand(stream.GetCap() * 2) : stream.GetCap();
+        const size_t newWPos = i < 10 ? LLBC_Rand(static_cast<int>(stream.GetCap()) * 2) : stream.GetCap();
 
         const bool setWPosRet = stream.SetWritePos(newWPos);
         LLBC_PrintLn("  - Set wpos %lu -> %lu, cap:%lu, ret:%s",
@@ -436,11 +436,11 @@ int TestCase_Com_StreamFunc::RWPosTest()
     for (int i = 0; i < 11; ++i)
     {
         const size_t oldRPos = stream.GetReadPos();
-        const size_t newRPos = i < 10 ? LLBC_Rand(stream.GetCap() + 1) : stream.GetWritePos();
+        const size_t newRPos = i < 10 ? LLBC_Rand(static_cast<int>(stream.GetCap()) + 1) : stream.GetWritePos();
 
         const bool setRPosRet = stream.SetReadPos(newRPos);
         LLBC_PrintLn("  - Set rpos %lu -> %lu, rpos:%lu, ret:%s",
-                     oldRPos, newRPos, stream.GetWritePos(), setRPosRet ? "true" : "false");;
+                     oldRPos, newRPos, stream.GetWritePos(), setRPosRet ? "true" : "false");
         LLBC_ErrorAndReturnIfNot(newRPos <= stream.GetWritePos() ? setRPosRet : !setRPosRet,
                                  LLBC_FAILED);
     }
