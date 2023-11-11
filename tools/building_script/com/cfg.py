@@ -4,6 +4,7 @@ llbc项目构建脚本脚本配置
 要求调用参数:
 - sys.argv[1] - 构建架构: 如x86/x64/...
 - sys.argv[2] - 构建配置: debug/release
+- sys.argv[3] - premake action参数: vs2022/gmake/...
 """
 
 import os
@@ -167,8 +168,7 @@ class _Cfg(object):
             return op.join(pcbuild_path, 'amd64') \
                 if ArchType.is_64bit_arch(cfg.arch) else pcbuild_path
         else:
-            Log.e('Not impl')
-            return None
+            return self.pyllbc_cpython_path
 
     @property
     def pyllbc_cpython_ver(self):
@@ -189,14 +189,13 @@ class _Cfg(object):
     def pyllbc_cpython_publish_path(self):
         """cpython submodule发布目录"""
         ver_parts = self.pyllbc_cpython_ver.split('.')
-        return op.join(self.output_path, 'Python' + ver_parts[0] + ver_parts[1])
+        return op.join(self.output_path, 'python' + ver_parts[0] + ver_parts[1])
 
     @property
     def pyllbc_dll_path(self):
         """pyllbc dll路径"""
-        pyllbc_dll_suffix = self.dll_suffix if self.platform != PlatformType.Windows else '.pyd'
         return op.join(self.output_path, 'llbc' +
-                       ('_debug' if self.is_debug else '') + pyllbc_dll_suffix)
+                       ('_debug' if self.is_debug else '') + cfg.dll_suffix)
     # endregion
 
     # region lua包装库(lullbc)相关

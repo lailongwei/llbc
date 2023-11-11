@@ -7,18 +7,27 @@ import os
 import shutil
 from os import path as op
 
+from com.sh import Sh
 from com.cfg import cfg
 from com.defs import PlatformType
 from com.log import Log
 
 
-def _publish_cpython_win32():
-    """发布cpython, win32平台"""
+def _publish_cpython():
+    """发布cpython"""
     # 创建发布目录
     pub_path = cfg.pyllbc_cpython_publish_path
     if not op.exists(pub_path):
         os.mkdir(pub_path)
 
+    # 根据平台进行具体的发布操作
+    if cfg.platform == PlatformType.Windows:
+        _publish_cpython_win32()
+    else:
+        _publish_cpython_non_win32()
+
+
+def _publish_cpython_win32():
     # 复制 python bin 及 dll
     Log.d('Copy python bin & dll files')
     cpython_output_path = cfg.pyllbc_cpython_output_path
@@ -31,7 +40,7 @@ def _publish_cpython_win32():
     for f in bin_and_dlls:
         shutil.copy(op.join(cpython_output_path, f), pub_path)
 
-    # 复制Doc/Include/Lib目录(删除再复制,忽略删除错误)
+    # 复制Doc/Include/Lib目录
     for d in ('Doc', 'Include', 'Lib'):
         Log.d('Copy {}/...'.format(d))
         from_dir = op.join(cfg.pyllbc_cpython_path, d)
@@ -65,17 +74,20 @@ def _publish_cpython_win32():
 
 
 def _publish_cpython_non_win32():
-    """发布cpython, win32平台"""
-    pass
+    site_packages_path = op.join(cfg.pyllbc_cpython_publish_path, 'lib/python2.7/site-packages')
+    Sh.execute('mkdir -p "{}"'.format(site_packages_path))
+
+    # 复制llbc dll 及 pyllbc dll到python site-packages/ 目录
+    Log.d('Copy llbc corelib dll to python site-packages...')
+    shutil.copy(cfg.llbc_dll_path, site_packages_path)
+    Log.d('Copy pyllc dll to python site-packages...')
+    shutil.copy(cfg.pyllbc_dll_path, site_packages_path)
 
 
 def main():
     # 发布cpython
     Log.fi('Publish cpython[to:{}]...', cfg.pyllbc_cpython_publish_path)
-    if cfg.platform == PlatformType.Windows:
-        _publish_cpython_win32()
-    else:
-        _publish_cpython_non_win32()
+    _publish_cpython()
     Log.i('Done!')
 
 

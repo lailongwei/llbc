@@ -17,11 +17,11 @@ from py_cpython_compiler import CPythonCompiler
 def main():
     # 编译cpython submodule
     Log.i("Compile cpython submodule...")
-    CPythonCompiler().compile(cfg.arch, cfg.is_debug, cfg.output_path)
+    CPythonCompiler().compile()
     Log.i('Done!')
 
     # 收集pyllbc native method
-    Log.i('Collect lua native methods...')
+    Log.i('Collect python native methods...')
     src_path = op.join(cfg.pyllbc_proj_path, 'src')
     PyNMC(op.join(src_path, 'common')).build()
     PyNMC(op.join(src_path, 'testcase')).build()

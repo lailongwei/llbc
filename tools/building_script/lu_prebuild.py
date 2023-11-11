@@ -18,7 +18,7 @@ def main():
     src_path = op.join(cfg.lullbc_proj_path, 'src')
     LuNMC(src_path,
           classname_base='',
-          filename_base=ProjType.lullbc).build()
+          filename_base=ProjType.lullbc.capitalize()).build()
     Log.i('Done!')
 
     # 整合所有lua脚本

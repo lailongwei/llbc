@@ -41,7 +41,9 @@ def _publish_lua():
 
     # 复制llbc & lullbc到发布目录
     Log.d('Copy llbc & pyllbc files to publish path...')
-    for f in _normalize_files(['libllbc.dll', '_lullbc.dll', 'llbc.lua']):
+    for f in _normalize_files(['libllbc' + cfg.dll_suffix,
+                               '_lullbc' + cfg.dll_suffix,
+                               'llbc.lua']):
         shutil.copy(op.join(cfg.output_path, f), pub_path)
 
 

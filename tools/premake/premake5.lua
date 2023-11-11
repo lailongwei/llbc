@@ -5,7 +5,7 @@
 -- #########################################################################
 -- Capture shell cmd's output function define.
 local function os_capture(cmd, raw)
-    local f = assert(io.popen(cmd, 'r'))
+    local f = assert(io.popen(cmd .. ' 2>&1', 'r'))
     local s = assert(f:read('*a'))
     f:close()
     if raw then return s end
@@ -432,8 +432,12 @@ project "pyllbc"
 
         -- cpython.
         cpython_path .. "/Include",
-        cpython_path .. "/PC",
     }
+    -- cpython - pyconfig.h
+    filter { "system:windows" }
+        includedirs { cpython_path .. "/PC" }
+    filter { "system:not windows" }
+        includedirs { cpython_path }
     filter {}
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
@@ -472,7 +476,6 @@ project "pyllbc"
     -- links.
     -- link llbc library.
     libdirs { llbc_output_dir }
-
     filter { "system:windows", "configurations:debug*" }
         links { "libllbc_debug" }
     filter { "system:windows", "configurations:release*" }
@@ -490,15 +493,21 @@ project "pyllbc"
         libdirs { cpython_path .. "/PCbuild" }
     filter { "system:windows", "architecture:x64" }
         libdirs { cpython_path .. "/PCbuild/amd64" }
+    filter { "system:not windows" }
+        libdirs { cpython_path }
     filter {}
 
     -- link cpython lib.
+    local py_ver_str = os_capture('python --version')
+    local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    local py_major_ver = string.gsub(py_ver_str, py_ver_match_str, '%2')
+    local py_minor_ver = string.gsub(py_ver_str, py_ver_match_str, '%3')
     filter { "system:windows", "configurations:debug*" }
-        links { "python27_d" }
+        links { string.format("python%s%s_d", py_major_ver, py_minor_ver) }
     filter { "system:windows", "configurations:release*" }
-        links { "python27" }
+        links { string.format("python%s%s", py_major_ver, py_minor_ver) }
     filter { "system:not windows" }
-        links { "python2.7" }
+        links { string.format("python%s.%s", py_major_ver, py_minor_ver) }
     filter {}
 
     -- Enable c++11 support.
