@@ -157,7 +157,7 @@ void TestCase_Core_Algo_RingBuffer::DoPerfTest()
     LLBC_RingBuffer<int> rb(rbCap);
     for (int i = 0; i < static_cast<int>(testTimes); ++i)
     {
-        for (int j = 0; j < rbCap; j += 4)
+        for (size_t j = 0; j < rbCap; j += 4)
         {
             rb.Push(i);
             rb.Push(i);
