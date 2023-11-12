@@ -17,10 +17,16 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       
       - name: install deps
-        run: yum install -y git openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
+        run: yum install -y openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
 
       - name : install cmake
         run: wget https://github.com/Kitware/CMake/releases/download/v3.27.0/cmake-3.27.0-linux-x86_64.tar.gz && tar -zxvf cmake-3.27.0-linux-x86_64.tar.gz && mv cmake-3.27.0-linux-x86_64 /usr/local/cmake && ln -s /usr/local/cmake/bin/* /usr/local/bin/
+
+      - name: install git
+        run: |
+          yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+          yum install -y git
+          echo "git version:`git --version`"
       
       - name: Check out repository code
         uses: actions/checkout@v3
