@@ -18,11 +18,12 @@ jobs:
       
       - name: Check out repository code
         uses: actions/checkout@v3
-        with:
-          submodules: "true"
         
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+
+      - name: Check out submodules
+        run: git submodule update --init --recursive
       
       - name: install deps
         run: yum install -y git openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
