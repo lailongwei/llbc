@@ -45,7 +45,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    const LLBC_String logCfgFile = "LogTestCfg.cfg"; // or "LogTestCfg.xml"
+    const LLBC_String logCfgFile = "LogTestCfg.cfg";
     if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
 #endif
     {
