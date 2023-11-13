@@ -45,7 +45,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    const LLBC_String logCfgFile = "LogTestCfg.xml"; // or "LogTestCfg.cfg"
+    const LLBC_String logCfgFile = "LogTestCfg.cfg"; // or "LogTestCfg.cfg"
     if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
 #endif
     {
@@ -344,8 +344,9 @@ void TestCase_Core_Log::DoConditionMacroLogTest()
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
-    LLBC_PrintLn("Log hook, loggerName: %s, level: %s",
+    LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
                    logData->logger->GetLoggerName().c_str(),
-                   LLBC_LogLevel::GetLevelStr(logData->level).c_str());
+                   LLBC_LogLevel::GetLevelStr(logData->level).c_str(),
+                   logData->msg);
 }
 
