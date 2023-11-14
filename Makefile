@@ -117,7 +117,7 @@ help:
 	@echo "  make tar      - tarball llbc framework(included core library, testsuite"
 	@echo "                  codes and all language specificed wrapped libraries)"
 
-all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET)
+all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET) $(ALL_WRAP_TARGETS)
 
 $(PREMAKE_TARGET):
 	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) gmake)
