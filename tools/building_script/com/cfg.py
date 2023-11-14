@@ -12,8 +12,8 @@ import re
 import sys
 from os import path as op
 
-from defs import LangType, ArchType, PlatformType
-from log import Log
+from com.defs import LangType, ArchType, PlatformType
+from com.log import Log
 
 # 库版本(majorVer.minorVer.updateNo)
 LIB_VER = '1.1.1'
