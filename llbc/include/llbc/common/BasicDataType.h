@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
  typedef unsigned long ulong;
  typedef unsigned long long uint64;
  typedef long double ldouble;
- typedef unsigned short wchar;
+ typedef char16_t wchar;
 #else // LLBC_TARGET_PLATFORM_WIN32
  typedef __int8 sint8;
  typedef __int16 sint16;

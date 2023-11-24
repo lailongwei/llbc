@@ -9,13 +9,15 @@ from os import path as op
 
 from cpputils import *
 
-from c import Cfg
+from com.cfg import cfg
+from com.defs import ProjType
 from native_method_collector.base_native_method_collector import BaseNativeMethodCollector
 
 
 class PyNativeMethodCollector(BaseNativeMethodCollector):
     def __init__(self, search_path, classname_base=None, filename_base=None):
-        super(PyNativeMethodCollector, self).__init__(search_path, classname_base, filename_base)
+        super(PyNativeMethodCollector, self).__init__(
+            ProjType.pyllbc, search_path, classname_base, filename_base)
         self.kwargsmatch_re = re.compile(r"^ *LLBC_EXTERN_C +PyObject *\* *"
                                          r"_pyllbc_([a-zA-Z0-9_]+)\( *(PyObject *\*[^,]*, *){2}PyObject *\*")
         self.argsmatch_re = re.compile(r"^ *LLBC_EXTERN_C +PyObject *\* *_pyllbc_([a-zA-Z0-9_]+)\( *PyObject *\*")
@@ -27,12 +29,11 @@ class PyNativeMethodCollector(BaseNativeMethodCollector):
             return False
 
         # 创建cpp文件对象, 用于存放自动生成代码
-        proj_name = self.proj_name
         cpp_file = self._build_cpp_file()
 
         # 取得所有方法
         methods = {}
-        code_path = Cfg.getcodepath()
+        code_path = op.join(cfg.pyllbc_proj_path, 'src')
         r = self._build_filematch_re()
         for root, dirs, files in os.walk(self.search_path):
             for f in files:

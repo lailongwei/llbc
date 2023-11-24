@@ -297,7 +297,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
     memset(memBlock->buff, 0, _blockSize);
     #endif
 
-    memBlock->seq = _blockCnt;
+    memBlock->seq = static_cast<int>(_blockCnt);
     #if LLBC_64BIT_PROCESSOR
     memBlock->unused = 0;
     #endif // 64bit-processor
@@ -311,7 +311,7 @@ LLBC_FORCE_INLINE void LLBC_ObjectPoolInst<ObjectType>::AllocateMemoryBlock()
         #if !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
         memUnit->unFlags.flagsVal = 0;
         #endif // !LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-        memUnit->seq = idx;
+        memUnit->seq = static_cast<int>(idx);
 
         #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
         memcpy(memUnit->buff,

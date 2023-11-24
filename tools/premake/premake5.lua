@@ -5,7 +5,7 @@
 -- #########################################################################
 -- Capture shell cmd's output function define.
 local function os_capture(cmd, raw)
-    local f = assert(io.popen(cmd, 'r'))
+    local f = assert(io.popen(cmd .. ' 2>&1', 'r'))
     local s = assert(f:read('*a'))
     f:close()
     if raw then return s end
@@ -89,6 +89,9 @@ end
 
 -- wrap libraries testsuite directory.
 local llbc_wrap_testsuite_output_dir = llbc_output_dir .. '/wrap_testsuites'
+
+-- building script directory.
+local llbc_building_script_dir = llbc_sln_path .. "/tools/building_script"
 
 -- #########################################################################
 
@@ -259,6 +262,20 @@ project "llbc"
         }
     filter {}
 
+    -- prebuild.
+    local prebuild_script = '../../tools/building_script/llbc_prebuild.py'
+    local prebuild_cmd = string.format('%s %s %%s %%s %s',
+                                       llbc_py_exec_path, prebuild_script, _ACTION)
+    filter { "configurations:debug32" }
+    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
+    filter { "configurations:release32" }
+    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
+    filter { "configurations:debug64" }
+    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
+    filter { "configurations:release64" }
+    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
+    filter {}
+
 -- ****************************************************************************
 -- core library testsuite compile setting.
 project "testsuite"
@@ -377,17 +394,6 @@ group "wrap"
 -- python wrap library(pyllbc) compile setting.
 -- import pylib_setting.
 package.path = package.path .. ";" .. "../../wrap/pyllbc/?.lua"
-local llbc_pylib_setting = require "pylib_setting"
-local pylib_py_ver = llbc_pylib_setting.py_ver or 2
-if pylib_py_ver == 2 then
-elseif pylib_py_ver == 3 then
-else
-    error('Please set the python version number correctly(in wrap/pyllbc/pylib_setting.lua)!')
-end
-
-local llbc_pylib_incl_path = (llbc_pylib_setting.py_path[1] ~= nil and llbc_pylib_setting.py_path[1] ~= "") and llbc_pylib_setting.py_path[1] or ""
-local llbc_pylib_lib_dir = (llbc_pylib_setting.py_path[2] ~= nil and llbc_pylib_setting.py_path[2] ~= "") and llbc_pylib_setting.py_path[2] or ""
-local pyllbc_pylib_lib_name = (llbc_pylib_setting.py_path[3] ~= nil and llbc_pylib_setting.py_path[3] ~= "") and llbc_pylib_setting.py_path[3] or ""
 project "pyllbc"
     -- language, kind.
     language "c++"
@@ -404,128 +410,60 @@ project "pyllbc"
     }
 
     -- files.
+    local cpython_path = llbc_py_wrap_path .. "/cpython"
     files {
         llbc_py_wrap_path .. "/include/**.h",
         llbc_py_wrap_path .. "/src/**.h",
         llbc_py_wrap_path .. "/src/**.cpp",
 
+        cpython_path .. "/Include/**.h",
         llbc_py_wrap_path .. "/script/**.py",
-
         llbc_py_wrap_path .. "/testsuite/**.py",
     }
 
-    if pylib_py_ver == 2 then
-        files {
-            llbc_py_wrap_path .. "/Python2.7.8/**.h" ,
-        }
-    elseif pylib_py_ver == 3 then
-        files {
-            llbc_py_wrap_path .. "/Python3.8.5/**.h",
-        }
-    end
-
     -- includedirs.
     includedirs {
+        -- llbc core lib.
         llbc_core_lib_path .. "/include",
 
+        -- pyllbc.
         llbc_py_wrap_path .. "/include",
         llbc_py_wrap_path,
+
+        -- cpython.
+        cpython_path .. "/Include",
     }
-
-    if string.len(llbc_pylib_incl_path) > 0 then
-        includedirs { llbc_pylib_incl_path }
-    else -- if not specific python include path, windows platform will use specific version python, other platforms will auto detect.
-        filter { "system:windows" }
-            if pylib_py_ver == 2 then
-                includedirs { llbc_py_wrap_path .. "/Python2.7.8/Include" }
-            elseif pylib_py_ver == 3 then
-                includedirs { llbc_py_wrap_path .. "/Python3.8.5/Include" }
-            end
-        filter {}
-
-        filter { "system:not windows" }
-            if pylib_py_ver == 2 then
-                includedirs { "/usr/include/python2.7" }
-            elseif pylib_py_ver == 3 then
-                includedirs { "/usr/include/python3.8" }
-            end
-        filter {}
-    end
+    -- cpython - pyconfig.h
+    filter { "system:windows" }
+        includedirs { cpython_path .. "/PC" }
+    filter { "system:not windows" }
+        includedirs { cpython_path }
+    filter {}
 
     -- define HAVE_ROUND(only on vs2013, vs2015, vs2017 and later version visual studio IDEs).
     filter { "action:vs20*" }
         defines { "HAVE_ROUND" }
     filter {}
 
-    -- prebuild: Export native method export code & integrate python script code(to c++ dynamic lib).
-    prebuildcommands {
-        llbc_py_exec_path .. " ../../tools/building_script/py_prebuild.py pyllbc",
-    }
-
-    -- postbuild: Create testsuite output directory.
-    local pyllbc_testsuite_path = llbc_py_wrap_path .. "/testsuite"
-    local pyllbc_testsuite_path_win = string.gsub(pyllbc_testsuite_path, "/", "\\")
-    local pyllbc_testsuite_output_path = llbc_wrap_testsuite_output_dir .. '/pyllbc'
-    local pyllbc_testsuite_output_path_win = string.gsub(pyllbc_testsuite_output_path, "/", "\\")
-    filter { "system:windows" }
-        postbuildcommands(
-            string.format(
-                "IF exist \"%s\" (echo \"%s exist\") ELSE (echo \"Create testsuite output dir: %s\" && MD \"%s\")",
-                pyllbc_testsuite_output_path_win, pyllbc_testsuite_output_path_win,
-                pyllbc_testsuite_output_path_win, pyllbc_testsuite_output_path_win))
-    filter { "system:not windows" }
-        postbuildcommands(string.format("mkdir -p \"%s\"", pyllbc_testsuite_output_path))
-    filter {}
-
-    -- postbuild: Copy testsuite scripts to output directory.
-    filter { "system:windows" }
-        postbuildcommands(
-            string.format("XCOPY /Y /E /F \"%s\\*\" \"%s\"",
-                pyllbc_testsuite_path_win,
-                pyllbc_testsuite_output_path_win))
-    filter { "system:not windows" }
-        postbuildcommands(string.format("\\cp -rf \"%s\"/* \"%s\"",
-            pyllbc_testsuite_path, pyllbc_testsuite_output_path))
-    filter {}
-
-    -- postbuild: Copy core lib & pyllbc lib file.
-    local llbc_output_dir_win = string.gsub(llbc_output_dir, "/", "\\")
-    filter { "system:windows" }
-        postbuildcommands(
-            string.format(
-                "for /f \"tokens=*\" %%%%f in ('DIR /b /a-d \"%s\\libllbc*.dll\"') do (COPY /Y %s\\%%%%f \"%s\")",
-                llbc_output_dir_win, llbc_output_dir_win, pyllbc_testsuite_output_path_win))
-        postbuildcommands(
-            string.format(
-                "for /f \"tokens=*\" %%%%f in ('DIR /b /a-d \"%s\\llbc*.pyd\"') do (COPY /Y %s\\%%%%f \"%s\")",
-                string.gsub(llbc_output_dir, "/", "\\"),
-                string.gsub(llbc_output_dir, "/", "\\"),
-                pyllbc_testsuite_output_path_win))
-    filter { "system:not windows" }
-        postbuildcommands(
-            string.format(
-                "\\cp -rf \"%s\"/libllbc*.so \"%s\"/",
-                    llbc_output_dir, pyllbc_testsuite_output_path))
-        postbuildcommands(
-            string.format(
-                "\\cp -rf \"%s\"/llbc*.so \"%s\"/",
-                    llbc_output_dir, pyllbc_testsuite_output_path))
-    filter {}
-
-    -- postbuild: Copy misc files.
-    local pyllbc_need_copy_to_testsuite_ouptut_misc_files = {
-        llbc_testsuite_path .. "/core/log/LogTestCfg.cfg"
-    }
-    filter { "system:windows" }
-        for _, file in pairs(pyllbc_need_copy_to_testsuite_ouptut_misc_files) do
-            postbuildcommands(string.format("COPY /Y \"%s\" \"%s\"",
-                                            string.gsub(file, "/", "\\"), pyllbc_testsuite_output_path_win))
-        end
-    filter {}
-    filter { "system:not windows" }
-        for _, file in pairs(pyllbc_need_copy_to_testsuite_ouptut_misc_files) do
-            postbuildcommands(string.format("\\cp -rf \"%s\" \"%s\"", file, pyllbc_testsuite_output_path))
-        end
+    -- prebuild & postbuild
+    local prebuild_script = '../../tools/building_script/py_prebuild.py'
+    local postbuild_script = '../../tools/building_script/py_postbuild.py'
+    local prebuild_cmd = string.format('%s %s %%s %%s %s',
+                                       llbc_py_exec_path, prebuild_script, _ACTION)
+    local postbuild_cmd = string.format('%s %s %%s %%s %s',
+                                        llbc_py_exec_path, postbuild_script, _ACTION)
+    filter { "configurations:debug32" }
+    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+    filter { "configurations:release32" }
+    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
+    postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+    filter { "configurations:debug64" }
+    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+    filter { "configurations:release64" }
+    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
+    postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -538,69 +476,39 @@ project "pyllbc"
     -- links.
     -- link llbc library.
     libdirs { llbc_output_dir }
-
     filter { "system:windows", "configurations:debug*" }
         links { "libllbc_debug" }
-    filter {}
     filter { "system:windows", "configurations:release*" }
         links { "libllbc" }
     filter {}
 
     filter { "system:not windows", "configurations:debug*" }
         links { "llbc_debug" }
-    filter {}
     filter { "system:not windows", "configurations:release*" }
         links { "llbc" }
     filter {}
 
-    -- link python library.
-    if string.len(llbc_pylib_lib_dir) > 0 then
-        libdirs { llbc_pylib_lib_dir }
-    else
-        filter { "system:windows", "architecture:x86" }
-            if pylib_py_ver == 2 then
-                libdirs { llbc_py_wrap_path .. "/Python2.7.8/Libs/Win/32" }
-            elseif pylib_py_ver == 3 then
-                libdirs { llbc_py_wrap_path .. "/Python3.8.5/Libs/Win/32" }
-            end
-        filter {}
-        filter { "system:windows", "architecture:x64" }
-            if pylib_py_ver == 2 then
-                libdirs { llbc_py_wrap_path .. "/Python2.7.8/Libs/Win/64" }
-            elseif pylib_py_ver == 3 then
-                libdirs { llbc_py_wrap_path .. "/Python3.8.5/Libs/Win/64" }
-            end
-        filter {}
-    end
+    -- set cpython libdir.
+    filter { "system:windows", "architecture:x86" }
+        libdirs { cpython_path .. "/PCbuild" }
+    filter { "system:windows", "architecture:x64" }
+        libdirs { cpython_path .. "/PCbuild/amd64" }
+    filter { "system:not windows" }
+        libdirs { cpython_path }
+    filter {}
 
-    if string.len(pyllbc_pylib_lib_name) > 0 then
-        links { pyllbc_pylib_lib_name }
-    else
-        -- in windows platform, python library use the python library file in the repo.
-        filter { "system:windows", "configurations:debug*" }
-            if pylib_py_ver == 2 then
-                links { "python27_d" }
-            elseif pylib_py_ver == 3 then
-                links { "python38_d" }
-            end
-        filter {}
-        filter { "system:windows", "configurations:release*" }
-            if pylib_py_ver == 2 then
-                links { "python27" }
-            elseif pylib_py_ver == 3 then
-                links { "python38" }
-            end
-        filter {}
-
-        -- in non-windows platform, python library default named: python2.7.
-        filter { "system:not windows" }
-            if pylib_py_ver == 2 then
-                links { "python2.7" }
-            elseif pylib_py_ver == 3 then
-                links { "python3.8" }
-            end
-        filter {}
-    end
+    -- link cpython lib.
+    local py_ver_str = os_capture('python --version')
+    local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    local py_major_ver = string.gsub(py_ver_str, py_ver_match_str, '%2')
+    local py_minor_ver = string.gsub(py_ver_str, py_ver_match_str, '%3')
+    filter { "system:windows", "configurations:debug*" }
+        links { string.format("python%s%s_d", py_major_ver, py_minor_ver) }
+    filter { "system:windows", "configurations:release*" }
+        links { string.format("python%s%s", py_major_ver, py_minor_ver) }
+    filter { "system:not windows" }
+        links { string.format("python%s.%s", py_major_ver, py_minor_ver) }
+    filter {}
 
     -- Enable c++11 support.
     filter { "system:not windows", "language:c++" }
@@ -658,17 +566,14 @@ project "csllbc_native"
         links {
             "libllbc_debug",
         }
-    filter {}
     filter { "system:windows", "configurations:release*" }
         links {
             "libllbc",
         }
-    filter {}
     filter { "system:not windows", "configurations:debug*" }
         links {
             "llbc_debug",
         }
-    filter {}
     filter { "system:not windows", "configurations:release*" }
         links {
             "llbc",
@@ -725,7 +630,6 @@ project "csllbc"
             llbc_py_exec_path .. " ../../../wrap/csllbc/csharp/script_tools/gen_native_code.py",
             llbc_py_exec_path .. " ../../../wrap/csllbc/csharp/script_tools/gen_errno_code.py",
         }
-    filter {}
     filter { "system:not windows" }
         prebuildcommands {
             llbc_py_exec_path .. ' -c "import os;print(os.getcwd())"',
@@ -894,9 +798,6 @@ project "lullbc_luaexec"
 -- lua wrap library(lullbc) compile setting.
 -- import lualib_setting.
 package.path = package.path .. ";" .. "../../wrap/lullbc/?.lua"
-local llbc_lualib_setting = require "lualib_setting"
-local llbc_lualib_incl_path = (llbc_lualib_setting.lua_path[1] ~= nil and llbc_lualib_setting.lua_path[1] ~= "") and llbc_lualib_setting.lua_path[1] or llbc_lua_src_path
-local llbc_lualib_lib_dir = (llbc_lualib_setting.lua_path[2] ~= nil and llbc_lualib_setting.lua_path[2] ~= "") and llbc_lualib_setting.lua_path[2] or llbc_output_dir
 project "lullbc"
     -- language, kind.
     language "c++"
@@ -936,7 +837,7 @@ project "lullbc"
 
     -- includedirs.
     includedirs {
-        llbc_lualib_incl_path,
+        llbc_lua_src_path,
         llbc_core_lib_path .. "/include",
         llbc_lu_wrap_path .. "/include",
         llbc_lu_wrap_path,
@@ -949,23 +850,23 @@ project "lullbc"
     }
     filter {}
 
-    -- prebuild commands.
-    filter { "configurations:debug*" }
-        prebuildcommands {
-            llbc_py_exec_path .. " ../../tools/building_script/lu_prebuild.py lullbc debug",
-        }
-        postbuildcommands {
-            llbc_py_exec_path .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "debug", llbc_output_dir),
-        }
-    filter {}
-
-    filter { "configurations:release*" }
-        prebuildcommands {
-            llbc_py_exec_path .. " ../../tools/building_script/lu_prebuild.py lullbc release",
-        }
-        postbuildcommands {
-            llbc_py_exec_path .. string.format(' ../../tools/building_script/lu_postbuild.py %s %s "%s"', "lullbc", "release", llbc_output_dir),
-        }
+    -- prebuild & postbuild.
+    local prebuild_script = llbc_building_script_dir .. '/lu_prebuild.py'
+    local postbuild_script = llbc_building_script_dir .. '/lu_postbuild.py'
+    local prebuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, prebuild_script, _ACTION)
+    local postbuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, postbuild_script, _ACTION)
+    filter { "configurations:debug32" }
+        prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+    filter { "configurations:release32" }
+        prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
+        postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+    filter { "configurations:debug64" }
+        prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+    filter { "configurations:release64" }
+        prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
+        postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -973,21 +874,18 @@ project "lullbc"
     targetprefix ""
 
     -- links.
-    libdirs { 
-        llbc_output_dir,
-        llbc_lualib_lib_dir,
-    }
+    libdirs { llbc_output_dir }
 
     filter { "configurations:debug*", "system:windows" }
         links {
             "libllbc_debug",
-            (llbc_lualib_setting.lua_path[3] ~= nil and llbc_lualib_setting.lua_path[3] ~= "") and llbc_lualib_setting.lua_path[3] or "liblua_debug",
+            "liblua_debug",
         }
     filter {}
     filter { "configurations:debug*", "system:linux" }
         links {
             "llbc_debug",
-            (llbc_lualib_setting.lua_path[3] ~= nil and llbc_lualib_setting.lua_path[3] ~= "") and llbc_lualib_setting.lua_path[3] or "lua_debug",
+            "lua_debug",
         }
     filter {}
     filter { "configurations:debug*", "system:macosx" }
@@ -999,13 +897,13 @@ project "lullbc"
     filter { "configurations:release*", "system:windows" }
         links {
             "libllbc",
-            (llbc_lualib_setting.lua_path[3] ~= nil and llbc_lualib_setting.lua_path[3] ~= "") and llbc_lualib_setting.lua_path[3] or "liblua",
+            "liblua",
         }
     filter {}
     filter { "configurations:release*", "system:linux" }
         links {
             "llbc",
-            (llbc_lualib_setting.lua_path[3] ~= nil and llbc_lualib_setting.lua_path[3] ~= "") and llbc_lualib_setting.lua_path[3] or "lua",
+            "lua",
         }
     filter {}
     filter { "configurations:release*", "system:macosx" }
