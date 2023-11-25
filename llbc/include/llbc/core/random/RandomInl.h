@@ -30,23 +30,22 @@ inline LLBC_Random::LLBC_Random(int seed)
 
 inline void LLBC_Random::Seed(int seed)
 {
-    _mtRand.reset(seed);
+    _mtRand.seed(seed);
 }
 
 inline int LLBC_Random::Rand()
 {
-    return static_cast<int>(_mtRand.rand());
+    return static_cast<int>(_mtRand());
 }
 
 inline int LLBC_Random::Rand(int end)
 {
     if (LIKELY(end != 0))
     {
-        const long long randVal = llabs(static_cast<int>(_mtRand.rand()));
         if (end > 0)
-            return static_cast<int>(randVal % end);
+            return _mtRand() % end;
         else
-            return static_cast<int>(randVal % end + end);
+            return _mtRand() % -end + end;
     }
     else
     {
@@ -58,11 +57,10 @@ inline int LLBC_Random::Rand(int begin, int end)
 {
     if (LIKELY(begin != end))
     {
-        const long long randVal = llabs(static_cast<int>(_mtRand.rand()));
         if (begin < end)
-            return randVal % (end - begin) + begin;
+            return _mtRand() % (end - begin) + begin;
         else
-            return randVal % (begin - end) + end;
+            return _mtRand() % (begin - end) + end;
     }
     else
     {
@@ -98,19 +96,19 @@ LLBC_Random::Rand(const _Weights &weights)
 
 inline double LLBC_Random::RandReal()
 {
-    return _mtRand.real();
+    return static_cast<double>(_mtRand()) / 4294967296;
 }
 
 inline bool LLBC_Random::BoolJudge()
 {
-    return _mtRand.rand() % 2 == 1;
+    return _mtRand() % 2 == 1;
 }
 
 template <typename _RandomAccessIter>
 inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
 {
-    long diff = static_cast<long>(end - begin);
-    if (UNLIKELY(diff <= 0))
+    sint64 diff = static_cast<sint64>(end - begin);
+    if (UNLIKELY(diff <= 0 || diff > INT_MAX))
         return end;
 
     return begin + Rand(diff);
