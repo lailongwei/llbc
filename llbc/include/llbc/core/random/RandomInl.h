@@ -96,7 +96,7 @@ LLBC_Random::Rand(const _Weights &weights)
 
 inline double LLBC_Random::RandReal()
 {
-    return static_cast<double>(_mtRand()) / 4294967296;
+    return static_cast<double>(_mtRand()) / 4294967296.;
 }
 
 inline bool LLBC_Random::BoolJudge()
@@ -108,10 +108,10 @@ template <typename _RandomAccessIter>
 inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
 {
     sint64 diff = static_cast<sint64>(end - begin);
-    if (UNLIKELY(diff <= 0 || diff > INT_MAX))
+    if (UNLIKELY(diff <= 0 || diff > UINT_MAX))
         return end;
 
-    return begin + Rand(diff);
+    return begin + _mtRand() % static_cast<uint32>(diff);
 }
 
 __LLBC_NS_END
