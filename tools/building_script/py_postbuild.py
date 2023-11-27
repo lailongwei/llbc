@@ -28,6 +28,7 @@ def _publish_cpython():
 
 
 def _publish_cpython_win32():
+    pub_path = cfg.pyllbc_cpython_publish_path
     # 复制 python bin 及 dll
     Log.d('Copy python bin & dll files')
     cpython_output_path = cfg.pyllbc_cpython_output_path

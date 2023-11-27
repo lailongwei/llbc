@@ -194,7 +194,7 @@ class _Cfg(object):
     @property
     def pyllbc_dll_path(self):
         """pyllbc dll路径"""
-        return op.join(self.output_path, 'llbc' +
+        return op.join(self.output_path, 'libllbc' +
                        ('_debug' if self.is_debug else '') + cfg.dll_suffix)
     # endregion
 
