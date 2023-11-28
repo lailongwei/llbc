@@ -918,9 +918,7 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
 
         const Seq::const_iterator seqEnd = _holder.data.obj.seq->end();
         for (SeqConstIter it = _holder.data.obj.seq->begin(); it != seqEnd; ++it)
-        {
             stream.Write(*it);
-        }
     }
     else if (IsDict())
     {

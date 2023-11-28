@@ -120,6 +120,14 @@ class _Cfg(object):
             return '.dylib'
         else:
             return '.so'
+
+    @property
+    def py_dll_suffix(self):
+        """py 动态链接库后缀"""
+        if self.platform == PlatformType.Windows:
+            return '.pyd'
+        else:
+            return self.dll_suffix()
     # endregion
 
     # region 核心库(llbc)相关
@@ -195,7 +203,7 @@ class _Cfg(object):
     def pyllbc_dll_path(self):
         """pyllbc dll路径"""
         return op.join(self.output_path, 'llbc' +
-                       ('_debug' if self.is_debug else '') + cfg.dll_suffix)
+                       ('_debug' if self.is_debug else '') + cfg.py_dll_suffix)
     # endregion
 
     # region lua包装库(lullbc)相关
