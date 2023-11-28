@@ -88,8 +88,6 @@ template <typename _T>
 inline LLBC_Variant::LLBC_Variant(const _T * const &ptr)
 {
     _holder.type = LLBC_VariantType::RAW_PTR;
-
-    _holder.data.raw.uint64Val = 0;
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
 }
 
@@ -1107,7 +1105,7 @@ inline void LLBC_Variant::CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty)
 template <typename _T, typename _UnaryContainer>
 void LLBC_Variant::CtFromUnaryCont(const _UnaryContainer &unaryCont)
 {
-    // become variant type to <Seq> type.
+    // variant become <Seq> type.
     BecomeSeq();
 
     // clear members.
@@ -1137,7 +1135,7 @@ void LLBC_Variant::CtFromUnaryCont(const _UnaryContainer &unaryCont)
 template <typename _Key, typename _Val, typename _BinaryContainer>
 void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
 {
-    // become variant type to <Dict> type.
+    // variant type become <Dict> type.
     BecomeDict();
 
     // clear members.

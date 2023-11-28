@@ -124,8 +124,7 @@ class _Cfg(object):
     @property
     def py_dll_suffix(self):
         """py 动态链接库后缀"""
-        pf = self.platform
-        if pf == PlatformType.Windows:
+        if self.platform == PlatformType.Windows:
             return '.pyd'
         else:
             return self.dll_suffix()
