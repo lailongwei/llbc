@@ -54,7 +54,6 @@ pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFa
 
 , _inMainloop()
 
-, _cppComp(nullptr)
 , _comps()
 
 , _handlers()
@@ -62,6 +61,17 @@ pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFa
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 , _unifyPreHandler(nullptr)
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+
+, _pyPacketCls(nullptr)
+#if PYLLBC_CFG_PACKET_REUSE
+, _pyReusePacket(nullptr)
+, _pyPacketReuseMeth(nullptr)
+#endif // PYLLBC_CFG_PACKET_REUSE
+, _pyNullCObj(PyInt_FromLong(0))
+, _pyPacketCreateArgs(PyTuple_New(6))
+
+, _pyStream(nullptr)
+, _nativeStream(nullptr)
 
 , _decoders()
 , _suppressedCoderNotFoundWarning(false)
@@ -76,11 +86,10 @@ pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFa
 , _started(false)
 , _stoping(false)
 {
+    Py_INCREF(_pySvc);
+
     // Create llbc library Service object and set some service attributes.
     CreateLLBCService(name, _useNormalProtocolFactory);
-
-    // Create cobj python attribute key.
-    _keyCObj = Py_BuildValue("s", "cobj");
 
     // Get event class.
     if (!This::_pyEvCls)
@@ -89,6 +98,9 @@ pyllbc_Service::pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFa
     // Get stream class.
     if (!This::_streamCls)
         This::_streamCls = pyllbc_s_TopModule->GetObject("Stream"); // Borrowed
+
+    Py_INCREF(_pySvc);
+    PyTuple_SetItem(_pyPacketCreateArgs, 0, _pySvc);
 }
 
 pyllbc_Service::~pyllbc_Service()
@@ -96,7 +108,23 @@ pyllbc_Service::~pyllbc_Service()
     Stop();
     AfterStop();
 
-    Py_DECREF(_keyCObj);
+    Py_DECREF(_pySvc);
+
+    Py_XDECREF(_pyPacketCls);
+#if PYLLBC_CFG_PACKET_REUSE
+    Py_XDECREF(_pyReusePacket);
+    Py_XDECREF(_pyPacketReuseMeth);
+#endif // PYLLBC_CFG_PACKET_REUSE
+    Py_XDECREF(_pyNullCObj);
+    Py_XDECREF(_pyPacketCreateArgs);
+
+    if (_pyStream)
+    {
+        Py_DECREF(_pyStream);
+
+        _pyStream = nullptr;
+        _nativeStream = nullptr;
+    }
 }
 
 int pyllbc_Service::GetId() const
@@ -210,7 +238,8 @@ int pyllbc_Service::AddComponent(PyObject *comp)
         return LLBC_FAILED;
     }
 
-    if (std::find(_comps.begin(), _comps.end(), comp) != _comps.end())
+    auto pred = [comp](pyllbc_Component *cppComp) { return cppComp->GetPyComp() == comp; };
+    if (std::find_if(_comps.begin(), _comps.end(), pred) != _comps.end())
     {
         LLBC_String errStr;
         const LLBC_String compStr = pyllbc_ObjUtil::GetObjStr(comp);
@@ -219,10 +248,9 @@ int pyllbc_Service::AddComponent(PyObject *comp)
         return LLBC_FAILED;
     }
 
-    Py_INCREF(comp);
-    _comps.push_back(comp);
-
-    return LLBC_OK;
+    auto cppComp = new pyllbc_Component(this, comp);
+    _comps.push_back(cppComp);
+    return _llbcSvc->AddComponent(cppComp);
 }
 
 int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp)
@@ -349,7 +377,7 @@ int pyllbc_Service::AddComponent(const LLBC_String &compName, const LLBC_String 
 
     // Hold python layer comp instances.
     Py_INCREF(comp);
-    _comps.push_back(comp);
+    _comps.push_back(new pyllbc_Component(this, comp));
 
     return LLBC_OK;
 }
@@ -528,7 +556,7 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         return LLBC_FAILED;
     }
 
-    if (_llbcSvc->Subscribe(opcode, _cppComp, &pyllbc_Component::OnDataReceived) != LLBC_OK)
+    if (_llbcSvc->Subscribe(opcode, this, &pyllbc_Service::OnDataReceived) != LLBC_OK)
     {
         delete wrapHandler;
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::Subscribe() failed");
@@ -577,7 +605,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
         return LLBC_FAILED;
     }
 
-    if (_llbcSvc->PreSubscribe(opcode, _cppComp, &pyllbc_Component::OnDataPreReceived) != LLBC_OK)
+    if (_llbcSvc->PreSubscribe(opcode, this, &pyllbc_Service::OnDataPreReceived) != LLBC_OK)
     {
         _preHandlers.erase(opcode);
         delete wrapHandler;
@@ -608,7 +636,7 @@ int pyllbc_Service::UnifyPreSubscribe(PyObject *preHandler, int flags)
     }
 
     _unifyPreHandler = wrapHandler;
-    if (_llbcSvc->UnifyPreSubscribe(_cppComp, &pyllbc_Component::OnDataUnifyPreReceived) != LLBC_OK)
+    if (_llbcSvc->UnifyPreSubscribe(this, &pyllbc_Service::OnDataUnifyPreReceived) != LLBC_OK)
     {
         LLBC_XDelete(_unifyPreHandler);
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "call native Service::UnifyPreSubscribe() failed");
@@ -648,7 +676,7 @@ int pyllbc_Service::FireEvent(PyObject *ev)
         return LLBC_FAILED;
     }
 
-    PyObject *nativeEvObj = PyObject_GetAttr(ev, _keyCObj); // New reference.
+    PyObject *nativeEvObj = PyObject_GetAttrString(ev, "cobj"); // New reference.
     if (!nativeEvObj)
     {
         pyllbc_TransferPyError("When get native event object");
@@ -758,6 +786,220 @@ pyllbc_ErrorHooker *pyllbc_Service::GetErrHooker()
     return This::_errHooker;
 }
 
+void pyllbc_Service::OnDataReceived(LLBC_Packet &packet)
+{
+    typedef pyllbc_Service::_PacketHandlers _Handlers;
+
+    // Stopping check.
+    if (UNLIKELY(_stoping))
+        return;
+
+    // Find handler.
+    _Handlers &handlers = _handlers;
+    _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
+    if (UNLIKELY(handlerIt == handlers.end()))
+        return;
+
+    // Build python layer packet.
+    pyllbc_PacketHandler *&handler = handlerIt->second;
+    PyObject *pyPacket = reinterpret_cast<PyObject *>(packet.GetPreHandleResult());
+    if (!pyPacket)
+    {
+        if (UNLIKELY(!(pyPacket = BuildPyPacket(packet))))
+            return;
+    }
+
+    // Handle packet.
+    PyObject *ret = handler->Handle(pyPacket);
+    if (LIKELY(ret))
+        Py_DECREF(ret);
+
+    // Force clear pylayer packet._cobj field.
+    PyObject_SetAttrString(pyPacket, "cobj", _pyNullCObj);
+
+    // Delete packet.
+    if (!packet.GetPreHandleResult())
+        Py_DECREF(pyPacket);
+}
+
+bool pyllbc_Service::OnDataPreReceived(LLBC_Packet &packet)
+{
+    typedef pyllbc_Service::_PacketHandlers _Handlers;
+
+    if (UNLIKELY(_stoping))
+        return true;
+
+    _Handlers &handlers = _preHandlers;
+    _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
+    if (UNLIKELY(handlerIt == handlers.end()))
+        return true;
+
+    pyllbc_PacketHandler *&handler = handlerIt->second;
+    PyObject *pyPacket = BuildPyPacket(packet);
+    if (UNLIKELY(!pyPacket))
+        return false;
+
+    packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
+    PyObject *ret = handler->Handle(pyPacket);
+    if (UNLIKELY(!ret))
+        return false;
+
+    const int detectResult = PyObject_IsTrue(ret);
+    if (UNLIKELY(detectResult == -1))
+    {
+        pyllbc_TransferPyError();
+
+        Py_DECREF(ret);
+        return false;
+    }
+
+    Py_DECREF(ret);
+    return detectResult != 0;
+}
+
+#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+bool pyllbc_Service::OnDataUnifyPreReceived(LLBC_Packet &packet)
+{
+    if (UNLIKELY(_stoping))
+        return true;
+
+    PyObject *pyPacket = BuildPyPacket(packet);
+    if (UNLIKELY(!pyPacket))
+        return false;
+
+    packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
+
+    PyObject *ret = _unifyPreHandler->Handle(pyPacket);
+    if (UNLIKELY(!ret))
+        return false;
+
+    const int detectResult = PyObject_IsTrue(ret);
+    if (UNLIKELY(detectResult == -1))
+    {
+        pyllbc_TransferPyError();
+
+        Py_DECREF(ret);
+        return false;
+    }
+
+    Py_DECREF(ret);
+    return detectResult != 0;
+}
+#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+
+PyObject *pyllbc_Service::BuildPyPacket(const LLBC_Packet &packet)
+{
+    // Get python layer class: llbc.Packet
+    if (UNLIKELY(!_pyPacketCls))
+    {
+        PyObject *modDict = pyllbc_TopModule->GetModuleDict();
+        _pyPacketCls = PyDict_GetItemString(modDict, "Packet");
+        Py_INCREF(_pyPacketCls);
+
+#if PYLLBC_CFG_PACKET_REUSE
+        _pyReusePacket = CreateReusePyPacket();
+        _pyPacketReuseMeth = PyObject_GetAttrString(_pyReusePacket, "_reuse");
+#endif // PYLLBC_CFG_PACKET_REUSE
+    }
+
+    // Create python layer instance: llbc.Stream
+    if (UNLIKELY(!_pyStream))
+    {
+        PyObject *tupleArg = PyTuple_New(1);
+#if (LLBC_CUR_COMP == LLBC_COMP_MSVC) && defined(_M_X64)
+        PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(static_cast<long>(packet.GetPayloadLength())));
+#else
+        PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(packet.GetPayloadLength()));
+#endif
+        _pyStream = PyObject_CallObject(_streamCls, tupleArg);
+        Py_DECREF(tupleArg);
+
+        // Get pyllbc_Stream object.
+        PyObject *cobj = PyObject_GetAttrString(_pyStream, "cobj");
+        if (UNLIKELY(!cobj))
+        {
+            Py_DECREF(_pyStream);
+            _pyStream = nullptr; // reset _pyStream
+            pyllbc_SetError("could not get llbc.Stream property 'cobj', recv data failed");
+
+            return nullptr;
+        }
+
+        PyArg_Parse(cobj, "l", &_nativeStream);
+        Py_DECREF(cobj);
+    }
+
+    _nativeStream->GetLLBCStream().Attach(
+        const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
+
+    PyObject *pyData = nullptr;
+    const auto &decoders = _decoders;
+    const auto decoderIt = decoders.find(packet.GetOpcode());
+    if (decoderIt != decoders.end())
+    {
+        PyObject *decoded = _nativeStream->Read(decoderIt->second);
+        if (!decoded)
+            return nullptr;
+
+        pyData = decoded;
+    }
+
+    if (!pyData)
+    {
+        Py_IncRef(_pyStream);
+        pyData = _pyStream;
+    }
+
+    PyObject *pySessionId = PyInt_FromLong(packet.GetSessionId());
+
+    PyObject *pyOpcode = PyInt_FromLong(packet.GetOpcode());
+    PyObject *pyStatus = PyInt_FromLong(packet.GetStatus());
+
+    PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
+
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
+#if PYLLBC_CFG_PACKET_REUSE
+    PyObject *reuseRet = PyObject_CallObject(_pyPacketReuseMeth, _pyPacketCreateArgs);
+
+    Py_IncRef(Py_None);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
+
+    if (UNLIKELY(!reuseRet))
+    {
+        pyllbc_TransferPyError();
+        return nullptr;
+    }
+
+    Py_DecRef(reuseRet);
+    Py_IncRef(_pyReusePacket);
+
+    return _pyReusePacket;
+#else
+    PyObject *pyPacket = PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
+
+    Py_IncRef(Py_None);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
+
+    if (UNLIKELY(!pyPacket))
+    {
+        pyllbc_TransferPyError();
+        return nullptr;
+    }
+
+    return pyPacket;
+#endif // PYLLBC_CFG_PACKET_REUSE
+}
+
+void pyllbc_Service::DeletePyPacket(void *_)
+{
+    PyObject *pyPacket = reinterpret_cast<PyObject *>(_);
+    Py_DECREF(pyPacket);
+}
+
 void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNormalProtocolFactory)
 {
     ASSERT(!_llbcSvc && "llbc service pointer not nullptr");
@@ -772,15 +1014,10 @@ void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNorma
     _llbcSvc->SetDriveMode(LLBC_ServiceDriveMode::ExternalDrive);
     _llbcSvc->DisableTimerScheduler();
     _llbcSvc->SuppressCoderNotFoundWarning();
-
-    _cppComp = new pyllbc_Component(this);
-    _llbcSvc->AddComponent(_cppComp);
 }
 
 void pyllbc_Service::AfterStop()
 {
-    _cppComp = nullptr;
-
     // Recreate service.
     LLBC_XDelete(_llbcSvc);
     CreateLLBCService(_llbcSvcName, _useNormalProtocolFactory);
@@ -789,7 +1026,7 @@ void pyllbc_Service::AfterStop()
     for (_Comps::reverse_iterator it = _comps.rbegin();
          it != _comps.rend();
          it++)
-        Py_DECREF(*it);
+        LLBC_XDelete(*it);
     _comps.clear();
 
     // Cleanup all python layer codecs.
@@ -863,7 +1100,7 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
     }
 
     // Get cobj property.
-    PyObject *cobj = PyObject_GetAttr(pyStreamObj, _keyCObj);
+    PyObject *cobj = PyObject_GetAttrString(pyStreamObj, "cobj");
     if (UNLIKELY(!cobj))
     {
         Py_DECREF(pyStreamObj);
@@ -891,6 +1128,27 @@ int pyllbc_Service::SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream)
 
     return LLBC_OK;
 }
+
+#if PYLLBC_CFG_PACKET_REUSE
+PyObject *pyllbc_Service::CreateReusePyPacket()
+{
+    PyObject *pyData = Py_None;
+    Py_IncRef(pyData);
+
+    PyObject *pySessionId = PyInt_FromLong(0);
+    PyObject *pyOpcode = PyInt_FromLong(0);
+    PyObject *pyStatus = PyInt_FromLong(0);
+    PyObject *pyPacketCObj = PyInt_FromLong(0);
+
+    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
+    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
+    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
+    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
+    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
+
+    return PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
+}
+#endif // PYLLBC_CFG_PACKET_REUSE
 
 void pyllbc_Service::EventEnqueueHandler(LLBC_Event *ev)
 {

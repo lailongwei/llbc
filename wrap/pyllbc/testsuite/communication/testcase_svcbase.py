@@ -11,23 +11,47 @@ from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_h
 class TestComp(object):
     def __init__(self):
         self._call_times = 0
+        self._init_times = 0
+        self._start_times = 0
+        self._stop_times = 0
+        self._destroy_times = 0
 
     def oninit(self, ev):
         print 'service init: {}'.format(ev)
+        if self._init_times == 10:
+            return True
+        else:
+            self._init_times += 1
+            return True, False
 
     def onstart(self, ev):
         print 'service start: {}'.format(ev)
+        if self._start_times == 10:
+            return
+        else:
+            self._start_times += 1
+            return True, False
 
     def onstop(self, ev):
         print 'service stop: {}'.format(ev)
+        if self._stop_times == 10:
+            return True
+        else:
+            self._stop_times += 1
+            return False
 
     def ondestroy(self, ev):
         print 'service destroy: {}'.format(ev)
+        if self._destroy_times == 10:
+            pass
+        else:
+            self._destroy_times += 1
+            return False
 
     def onupdate(self, ev):
-        # print 'service update: {}'.format(d)
+        # print 'service update: {}'.format(ev)
         self._call_times += 1
-        if self._call_times == 100000:
+        if self._call_times == 500:
             print 'Service update {} times, deschedule it'.format(self._call_times)
             Service.deschedule()
 

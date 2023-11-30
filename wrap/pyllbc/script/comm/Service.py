@@ -451,12 +451,16 @@ class pyllbcService(object):
             component methods(all methods are optional):
                 oninit(self, ev): service initialize handler.
                     ev.svc: service object.
+                    @ret: (isSuccess, hasFinished) or (isSuccess) or None, default is (True, True)
                 ondestroy(self, ev): service destroy handler.
                     ev.svc: service object.
+                    @ret: hasFinished or None, default is True
                 onstart(self, ev): service start handler.
                     ev.svc: service object.
+                    @ret: (isSuccess, hasFinished) or (isSuccess) or None, default is (True, True)
                 onstop(self, ev): service stop handler.
                     ev.svc: service object.
+                    @ret: hasFinished or None, default is True
                 onupdate(self, ev): service per-frame update handler.
                     ev.svc: service object.
                 onidle(self, ev): service per-frame idle handler.
