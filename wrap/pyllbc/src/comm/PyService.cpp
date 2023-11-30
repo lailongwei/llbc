@@ -1022,11 +1022,7 @@ void pyllbc_Service::AfterStop()
     LLBC_XDelete(_llbcSvc);
     CreateLLBCService(_llbcSvcName, _useNormalProtocolFactory);
 
-    // Cleanup all python layer components.
-    for (_Comps::reverse_iterator it = _comps.rbegin();
-         it != _comps.rend();
-         it++)
-        LLBC_XDelete(*it);
+    // Clear components.
     _comps.clear();
 
     // Cleanup all python layer codecs.
