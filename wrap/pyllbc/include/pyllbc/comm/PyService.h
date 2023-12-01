@@ -449,8 +449,7 @@ private:
 
     bool _inMainloop;
     
-    typedef std::vector<pyllbc_Component *> _Comps;
-    _Comps _comps;
+    std::vector<pyllbc_Component *> _comps;
 
     typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
     _PacketHandlers _handlers;

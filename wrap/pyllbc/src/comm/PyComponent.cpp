@@ -223,8 +223,6 @@ void pyllbc_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 
 PyObject *pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv, bool isRetRequired)
 {
-    typedef pyllbc_Service::_Comps _Comps;
-
     // Set event to call args.
     Py_INCREF(ev);
     PyTuple_SetItem(_compEvCallArgs, 0, ev); // Steals reference.
