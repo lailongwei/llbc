@@ -111,6 +111,7 @@ bool pyllbc_Component::OnInit(bool &initFinished)
     LLBC_ReturnIf(!_pyOnInitMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnInitMeth, _EvBuilder::BuildInitializeEv(_pySvc), true, true);
+    LLBC_ReturnIf(!pyRet, false);
 
     return ParsePythonRet(pyRet, initFinished);
 }
@@ -122,18 +123,7 @@ void pyllbc_Component::OnDestroy(bool &destroyFinished)
     PyObject *pyRet = CallComponentMeth(_pyOnDestroyMeth, _EvBuilder::BuildDestroyEv(_pySvc), true, true);
     LLBC_ReturnIf(!pyRet, void());
 
-    if (pyRet == Py_None)
-    {
-        Py_DecRef(pyRet);
-        return;
-    }
-
-    if (PyBool_Check(pyRet))
-        destroyFinished = PyObject_IsTrue(pyRet);
-    else
-        pyllbc_SetError(LLBC_String().format("Invalid ret type:%s", pyRet->ob_type->tp_name));
-
-    Py_DecRef(pyRet);
+    ParsePythonRet(pyRet, destroyFinished);
 }
 
 bool pyllbc_Component::OnStart(bool &startFinished)
@@ -141,6 +131,7 @@ bool pyllbc_Component::OnStart(bool &startFinished)
     LLBC_ReturnIf(!_pyOnStartMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnStartMeth, _EvBuilder::BuildStartEv(_pySvc), true, true);
+    LLBC_ReturnIf(!pyRet, false);
 
     return ParsePythonRet(pyRet, startFinished);
 }
@@ -152,18 +143,7 @@ void pyllbc_Component::OnStop(bool &stopFinished)
     PyObject *pyRet = CallComponentMeth(_pyOnStopMeth, _EvBuilder::BuildStopEv(_pySvc), true, true);
     LLBC_ReturnIf(!pyRet, void());
 
-    if (pyRet == Py_None)
-    {
-        Py_DecRef(pyRet);
-        return;
-    }
-
-    if (PyBool_Check(pyRet))
-        stopFinished = PyObject_IsTrue(pyRet);
-    else
-        pyllbc_SetError(LLBC_String().format("Invalid ret type:%s", pyRet->ob_type->tp_name));
-
-    Py_DecRef(pyRet);
+    ParsePythonRet(pyRet, stopFinished);
 }
 
 void pyllbc_Component::OnUpdate()
@@ -269,37 +249,22 @@ PyObject *pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool
 
 bool pyllbc_Component::ParsePythonRet(PyObject *pyRet, bool &finished)
 {
-    LLBC_ReturnIf(!pyRet, false);
-
-    LLBC_Defer(Py_DecRef(pyRet));
-
-    LLBC_ReturnIf(pyRet == Py_None, true);
+    if (pyRet == Py_None)
+    {
+        Py_DecRef(pyRet);
+        return true;
+    }
 
     if (PyBool_Check(pyRet))
     {
-        return PyObject_IsTrue(pyRet);
-    }
-    else if (PyTuple_Check(pyRet))
-    {
-        if (PyTuple_Size(pyRet) != 2)
-        {
-            pyllbc_SetError(LLBC_String().format("Invalid ret size:%s", PyTuple_Size(pyRet)));
-            return false;
-        }
-
-        int ret, tmpFinished;
-        if (!PyArg_ParseTuple(pyRet, "ii", &ret, &tmpFinished))
-        {
-            pyllbc_TransferPyError();
-            return false;
-        }
-
-        finished = tmpFinished;
-        return ret;
+        finished = PyObject_IsTrue(pyRet);
+        Py_DecRef(pyRet);
+        return true;
     }
     else
     {
         pyllbc_SetError(LLBC_String().format("Invalid ret type:%s", pyRet->ob_type->tp_name));
+        Py_DecRef(pyRet);
         return false;
     }
 }

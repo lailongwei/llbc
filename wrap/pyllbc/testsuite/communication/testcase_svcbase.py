@@ -22,7 +22,7 @@ class TestComp(object):
             return True
         else:
             self._init_times += 1
-            return True, False
+            return False
 
     def onstart(self, ev):
         print 'service start: {}'.format(ev)
@@ -30,7 +30,7 @@ class TestComp(object):
             return
         else:
             self._start_times += 1
-            return True, False
+            return False
 
     def onstop(self, ev):
         print 'service stop: {}'.format(ev)
