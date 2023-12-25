@@ -88,6 +88,15 @@ public:
     template <typename _RandomAccessIter>
     _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
 
+    /**
+     * Reorders the elements in the given range [begin, end) such that each possible permutation 
+     * of those elements has equal probability of appearance.
+     * @param[in] begin - begin iterator.
+     * @param[in] end   - end iterator.
+     */
+    template <typename _RandomAccessIter>
+    void Shuffle(const _RandomAccessIter &begin, const _RandomAccessIter &end);
+
 private:
     std::mt19937 _mtRand;
 };

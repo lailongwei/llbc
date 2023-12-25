@@ -114,4 +114,12 @@ inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, con
     return begin + _mtRand() % static_cast<uint32>(diff);
 }
 
+template <typename _RandomAccessIter>
+void LLBC_Random::Shuffle(const _RandomAccessIter &begin, const _RandomAccessIter &end)
+{
+    typedef typename std::iterator_traits<_RandomAccessIter>::difference_type _diff_t;
+    for (_diff_t i = end - begin - 1; i > 0; --i)
+        std::swap(begin[i], begin[Rand(i + 1)]);
+}
+
 __LLBC_NS_END
