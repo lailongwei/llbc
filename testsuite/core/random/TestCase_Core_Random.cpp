@@ -105,6 +105,14 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     for (int i = 0; i < 10; ++i)
         LLBC_PrintLn("  Choice result: %d", *rand.Choice(v.begin(), v.end()));
 
+    // Test shuffle.
+    LLBC_Print("\n");
+    LLBC_PrintLn("LLBC_Random::Shuffle() test:");
+    LLBC_PrintLn("- Before shuffle: %s", LLBC_Variant(v).ValueToString().c_str());
+
+    rand.Shuffle(v.begin(), v.end());
+    LLBC_PrintLn("- After shuffle: %s", LLBC_Variant(v).ValueToString().c_str());
+
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
