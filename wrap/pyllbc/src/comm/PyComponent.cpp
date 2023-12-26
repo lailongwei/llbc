@@ -55,7 +55,6 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp)
 
 , _compEvCallArgs(PyTuple_New(1))
 {
-    Py_INCREF(_pySvc);
     Py_INCREF(_pyComp);
     
     // Get method
@@ -85,7 +84,6 @@ pyllbc_Component::pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp)
 
 pyllbc_Component::~pyllbc_Component()
 {
-    Py_DECREF(_pySvc);
     Py_DECREF(_pyComp);
 
     Py_DECREF(_pyOnInitMeth);
@@ -111,7 +109,6 @@ bool pyllbc_Component::OnInit(bool &initFinished)
     LLBC_ReturnIf(!_pyOnInitMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnInitMeth, _EvBuilder::BuildInitializeEv(_pySvc), true, true);
-    LLBC_ReturnIf(!pyRet, false);
 
     return ParsePythonRet(pyRet, initFinished);
 }
@@ -121,7 +118,6 @@ void pyllbc_Component::OnDestroy(bool &destroyFinished)
     LLBC_ReturnIf(!_pyOnDestroyMeth, void());
 
     PyObject *pyRet = CallComponentMeth(_pyOnDestroyMeth, _EvBuilder::BuildDestroyEv(_pySvc), true, true);
-    LLBC_ReturnIf(!pyRet, void());
 
     ParsePythonRet(pyRet, destroyFinished);
 }
@@ -131,7 +127,6 @@ bool pyllbc_Component::OnStart(bool &startFinished)
     LLBC_ReturnIf(!_pyOnStartMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnStartMeth, _EvBuilder::BuildStartEv(_pySvc), true, true);
-    LLBC_ReturnIf(!pyRet, false);
 
     return ParsePythonRet(pyRet, startFinished);
 }
@@ -141,7 +136,6 @@ void pyllbc_Component::OnStop(bool &stopFinished)
     LLBC_ReturnIf(!_pyOnStopMeth, void());
 
     PyObject *pyRet = CallComponentMeth(_pyOnStopMeth, _EvBuilder::BuildStopEv(_pySvc), true, true);
-    LLBC_ReturnIf(!pyRet, void());
 
     ParsePythonRet(pyRet, stopFinished);
 }
@@ -247,12 +241,19 @@ PyObject *pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool
 
 bool pyllbc_Component::ParsePythonRet(PyObject *pyRet, bool &finished)
 {
+    LLBC_ReturnIf(UNLIKELY(!pyRet), false);
+
+    finished = false;
+
+    // default is successful and finished
     if (pyRet == Py_None)
     {
+        finished = true;
         Py_DecRef(pyRet);
         return true;
     }
 
+    // parse return
     if (PyBool_Check(pyRet))
     {
         finished = PyObject_IsTrue(pyRet);

@@ -35,6 +35,7 @@ public:
     /**
      * Constructor.
      * @param[in] svc - adapted to python c++ wrapped service.
+     * @param[in] pyComp - adapted to python component.
      */
     pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp);
 
@@ -46,6 +47,7 @@ public:
 public:
     /**
      * Get python comp.
+     * @return PyObject* - python component.
      */
     const PyObject *GetPyComp() const { return _pyComp; }
 public:

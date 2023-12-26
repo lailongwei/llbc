@@ -4,6 +4,7 @@ Service basic 测试
 """
 
 import traceback
+import sys
 from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_handler
 
 @comp
@@ -51,7 +52,7 @@ class TestComp(object):
     def onupdate(self, ev):
         # print 'service update: {}'.format(ev)
         self._call_times += 1
-        if self._call_times == 500:
+        if self._call_times == 300:
             print 'Service update {} times, deschedule it'.format(self._call_times)
             Service.deschedule()
 
@@ -164,7 +165,13 @@ class SvcBaseTest(TestCase):
         # Schedule.
         Service.schedule()
 
+        print('deschedule!!!!!!!!!!!!')
+        print(sys.getrefcount(svc))
+        print(sys.getrefcount(another))
         # If deschedule, will gone to here.
         # Delete my_svc service.
         del Service.svcbase_test_svc
         del Service.another
+        print('deschedule finish!!!!!!!!!!!!')
+        print(sys.getrefcount(svc))
+        print(sys.getrefcount(another))

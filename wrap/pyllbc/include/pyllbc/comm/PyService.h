@@ -348,7 +348,7 @@ public:
      */
     static pyllbc_ErrorHooker *GetErrHooker();
 
-public:
+private:
     /**
      * data receive handler.
      * @param[in] packet - packet.
@@ -448,12 +448,9 @@ private:
     PyObject *_pySvc;
 
     bool _inMainloop;
-    
-    std::vector<pyllbc_Component *> _comps;
 
-    typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
-    _PacketHandlers _handlers;
-    _PacketHandlers _preHandlers;
+    std::map<int, pyllbc_PacketHandler *>  _handlers;
+    std::map<int, pyllbc_PacketHandler *>  _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     pyllbc_PacketHandler *_unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE

@@ -521,7 +521,8 @@ class pyllbcService(object):
             llbc.inl.AddComponent(self._c_obj, comp)
 
         # add some common members
-        comp.svc = self
+        comp.__svc = weakref.ref(self)
+        comp.__class__.svc = property(lambda _self : _self.__svc())
 
         # update comp dict
         self._comps.update({comp.__class__: comp})

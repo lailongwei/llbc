@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import llbc
+import weakref
 
 class pyllbcPacket(object):
     def __init__(self, svc, session_id, opcode, status, data, cobj):
-        self.svc = svc
+        self._svc = weakref.ref(svc)
         self.session_id = session_id
 
         self._local_ip = None
@@ -25,6 +26,10 @@ class pyllbcPacket(object):
         self._cobj = cobj
 
         self._str = None
+
+    @property
+    def svc(self):
+        return self._svc()
 
     @property
     def recver_svc_id(self):
