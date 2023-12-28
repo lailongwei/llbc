@@ -3,8 +3,8 @@
 Service basic 测试
 """
 
-import traceback
 import sys
+import traceback
 from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_handler
 
 @comp
@@ -173,5 +173,5 @@ class SvcBaseTest(TestCase):
         del Service.svcbase_test_svc
         del Service.another
         print('deschedule finish!!!!!!!!!!!!')
-        print(sys.getrefcount(svc))
-        print(sys.getrefcount(another))
+        print('svcbase_test_svc ref count:{}'.format(sys.getrefcount(svc)))
+        print('another_svc ref count:{}'.format(sys.getrefcount(another)))

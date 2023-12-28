@@ -47,7 +47,7 @@ public:
 public:
     /**
      * Get python comp.
-     * @return PyObject* - python component.
+     * @return PyObject * - python component.
      */
     const PyObject *GetPyComp() const { return _pyComp; }
 public:
@@ -117,11 +117,12 @@ public:
 private:
     /**
      * Call python layer comp method.
-     * @param[in] meth     - method name, not steal reference, normal.
-     * @param[in] ev       - call event object, steal reference.
-     * @param[in] decRefEv - decref event.
+     * @param[in] meth          - method name, not steal reference, normal.
+     * @param[in] ev            - call event object, steal reference.
+     * @param[in] decRefEv      - decref event.
      * @param[in] isRetRequired - Whether a return value is required.
-     * @return PyObject *  - return python return value if isRetRequired is True and call success(no error occurred), otherwise return nullptr if error occurred(error info has been correctly processed).
+     * @return PyObject *       - return python return value if isRetRequired is True and call success(no error occurred),
+     *                            otherwise return nullptr if error occurred(error info has been correctly processed).
      */
     PyObject *CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv, bool isRetRequired);
     /**
@@ -130,7 +131,7 @@ private:
      * @param[out] finished - parsed param.
      * @return bool         - return value.
      */
-    bool ParsePythonRet(PyObject *pyRet, bool &finished);
+    static bool ParsePythonRet(PyObject *pyRet, bool &finished);
 
 private:
     pyllbc_Service *_svc;
