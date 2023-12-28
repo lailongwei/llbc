@@ -33,7 +33,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         str[i] = static_cast<char>(i);
     }
 
-    LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, 32).c_str());
+    LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, ' ', 16).c_str());
     LLBC_Print("\n");
 
     // CPUTime test.
