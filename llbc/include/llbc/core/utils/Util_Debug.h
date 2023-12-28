@@ -27,12 +27,13 @@ __LLBC_NS_BEGIN
 
 /**
  * Convert byte array to string format(hexadecimal format).
- * @param[in] buf - buffer pointer.
- * @param[in] len - buffer length.
- * @param[in] lineWidth - line width, default is 16.
- * @return std::string - the formatted string data.
+ * @param[in] bytes     - buffer pointer.
+ * @param[in] len       - buffer length.
+ * @param[in] byteSep   - byte separator.
+ * @param[in] lineWidth - line width, default is 0.
+ * @return LLBC_String - the formatted string data.
  */
-LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
+LLBC_EXPORT LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep = '\0', size_t lineWidth = 0);
 
 /**
  * Trace function define.
