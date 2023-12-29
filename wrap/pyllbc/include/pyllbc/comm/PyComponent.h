@@ -34,7 +34,7 @@ class LLBC_HIDDEN pyllbc_Component : public LLBC_Component
 public:
     /**
      * Constructor.
-     * @param[in] svc - adapted to python c++ wrapped service.
+     * @param[in] svc    - adapted to python c++ wrapped service.
      * @param[in] pyComp - adapted to python component.
      */
     pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp);
