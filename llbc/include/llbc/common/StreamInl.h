@@ -470,8 +470,8 @@ LLBC_FORCE_INLINE void LLBC_Stream::Write(const void *buf, size_t size)
 template <typename T>
 T LLBC_Stream::Read()
 {
-    T obj{};
-    return LIKELY(Read<T>(obj)) ? obj : T();
+    T obj;
+    return LIKELY(Read<T>(obj)) ? std::move(obj) : T();
 }
 
 template <typename T>
