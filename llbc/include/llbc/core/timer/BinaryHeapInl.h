@@ -160,7 +160,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(const T &elem)
 {
     for (size_t i = 1; i <= _size; ++i)
     {
-        if (!_comp(_elems[i], elem) && !_comp(elem, _elems[i]))
+        if (_elems[i] == elem)
             return this->DeleteElem(i);
     }
 
