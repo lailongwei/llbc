@@ -451,12 +451,16 @@ class pyllbcService(object):
             component methods(all methods are optional):
                 oninit(self, ev): service initialize handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 ondestroy(self, ev): service destroy handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onstart(self, ev): service start handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onstop(self, ev): service stop handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onupdate(self, ev): service per-frame update handler.
                     ev.svc: service object.
                 onidle(self, ev): service per-frame idle handler.
@@ -517,7 +521,8 @@ class pyllbcService(object):
             llbc.inl.AddComponent(self._c_obj, comp)
 
         # add some common members
-        comp.svc = self
+        comp.__svc = weakref.ref(self)
+        comp.__class__.svc = property(lambda _self : _self.__svc())
 
         # update comp dict
         self._comps.update({comp.__class__: comp})

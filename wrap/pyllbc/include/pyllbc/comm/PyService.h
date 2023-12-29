@@ -350,6 +350,41 @@ public:
 
 private:
     /**
+     * data receive handler.
+     * @param[in] packet - packet.
+     */
+    virtual void OnDataReceived(LLBC_Packet &packet);
+
+    /**
+     * The data pre-receive handler.
+     * @param[in] packet - packet.
+     * @return bool - the return value, if return false, will remove this session.
+     */
+    virtual bool OnDataPreReceived(LLBC_Packet &packet);
+
+#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    /**
+     * The data unify pre-receive handler.
+     * @param[in] packet - packet.
+     * @return bool - the return value, if return zero, will remove this session.
+     */
+    virtual bool OnDataUnifyPreReceived(LLBC_Packet &packet);
+#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+
+    /**
+     * Build python layer packet object according to LLBC_Packet object reference.
+     * @param[in] packet - the core library packet object reference.
+     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
+     */
+    PyObject *BuildPyPacket(const LLBC_Packet &packet);
+
+    /**
+     * Delete the python layer packet.
+     */
+    void DeletePyPacket(void *pyPacket);
+    
+private:
+    /**
      * Create llbc layer service object.
      * @param[in] svcName                  - the service name.
      * @param[in] useNormalProtocolFactory - use normal protocol facroty or raw protocol factory.
@@ -376,6 +411,14 @@ private:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream);
+
+#if PYLLBC_CFG_PACKET_REUSE
+    /**
+     * Create reuse python layer packet object.
+     * @return PyObject * - the python layer reuse packet(new reference).
+     */
+    PyObject *CreateReusePyPacket();
+#endif // PYLLBC_CFG_PACKET_REUSE
 
 private:
     /**
@@ -406,16 +449,22 @@ private:
 
     bool _inMainloop;
 
-    pyllbc_Component *_cppComp;
-    typedef std::vector<PyObject *> _Comps;
-    _Comps _comps;
-
-    typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
-    _PacketHandlers _handlers;
-    _PacketHandlers _preHandlers;
+    std::map<int, pyllbc_PacketHandler *>  _handlers;
+    std::map<int, pyllbc_PacketHandler *>  _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     pyllbc_PacketHandler *_unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+
+    PyObject *_pyPacketCls;
+#if PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyReusePacket;
+    PyObject *_pyPacketReuseMeth;
+#endif // PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyNullCObj;
+    PyObject *_pyPacketCreateArgs;
+
+    PyObject *_pyStream;
+    pyllbc_Stream *_nativeStream;
 
     std::map<int, PyObject *> _decoders;
     bool _suppressedCoderNotFoundWarning;
@@ -435,8 +484,6 @@ private:
     bool _stoping;
 
 private:
-    PyObject *_keyCObj;
-
     static PyObject *_streamCls;
     static pyllbc_ErrorHooker *_errHooker;
 };

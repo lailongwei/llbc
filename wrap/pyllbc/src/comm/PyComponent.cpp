@@ -33,98 +33,70 @@ namespace
     typedef pyllbc_ComponentEvBuilder _EvBuilder;
 }
 
-pyllbc_Component::pyllbc_Component(pyllbc_Service *svc)
+pyllbc_Component::pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp)
 : LLBC_Component(LLBC_ComponentEvents::AllEvents)
 , _svc(svc)
 , _pySvc(svc->GetPyService())
+, _pyComp(pyComp)
 
-, _methOnInit(Py_BuildValue("s", "oninit"))
-, _methOnDestroy(Py_BuildValue("s", "ondestroy"))
-, _methOnStart(Py_BuildValue("s", "onstart"))
-, _methOnStop(Py_BuildValue("s", "onstop"))
-, _methOnUpdate(Py_BuildValue("s", "onupdate"))
-, _methOnIdle(Py_BuildValue("s", "onidle"))
-, _methOnSessionCreate(Py_BuildValue("s", "onsessioncreate"))
-, _methOnSessionDestroy(Py_BuildValue("s", "onsessiondestroy"))
-, _methOnAsyncConnResult(Py_BuildValue("s", "onasyncconnresult"))
-, _methOnProtoReport(Py_BuildValue("s", "onprotoreport"))
-, _methOnUnHandledPacket(Py_BuildValue("s", "onunhandledpacket"))
-
-, _keySVC(Py_BuildValue("s", "svc"))
-, _keyIp(Py_BuildValue("s", "ip"))
-, _keyPort(Py_BuildValue("s", "port"))
-, _keySessionId(Py_BuildValue("s", "session_id"))
-, _keyOpcode(Py_BuildValue("s", "opcode"))
-, _keyData(Py_BuildValue("s", "data"))
-, _keyStatus(Py_BuildValue("s", "status"))
-, _keyReason(Py_BuildValue("s", "reason"))
-, _keyConnected(Py_BuildValue("s", "connected"))
-, _keyIdleTime(Py_BuildValue("s", "idletime"))
-, _keyInlIdleTime(Py_BuildValue("s", "_idletime"))
-, _keyCObj(Py_BuildValue("s", "_cobj"))
-
-, _pyPacketCls(nullptr)
-#if PYLLBC_CFG_PACKET_REUSE
-, _pyReusePacket(nullptr)
-, _pyPacketReuseMeth(nullptr)
-#endif // PYLLBC_CFG_PACKET_REUSE
-, _pyNullCObj(PyInt_FromLong(0))
-, _pyPacketCreateArgs(PyTuple_New(6))
-
-, _pyStream(nullptr)
-, _nativeStream(nullptr)
+, _pyOnInitMeth(nullptr)
+, _pyOnDestroyMeth(nullptr)
+, _pyOnStartMeth(nullptr)
+, _pyOnStopMeth(nullptr)
+, _pyOnUpdateMeth(nullptr)
+, _pyOnIdleMeth(nullptr)
+, _pyOnSessionCreateMeth(nullptr)
+, _pyOnSessionDestroyMeth(nullptr)
+, _pyOnProtoReportMeth(nullptr)
+, _pyOnUnHandledPacketMeth(nullptr)
 
 , _holdedOnIdleEv(_EvBuilder::BuildIdleEv(_pySvc, 0))
 , _holdedOnUpdateEv(_EvBuilder::BuildUpdateEv(_pySvc))
 
 , _compEvCallArgs(PyTuple_New(1))
 {
-    Py_INCREF(_pySvc);
-    PyTuple_SetItem(_pyPacketCreateArgs, 0, _pySvc);
+    Py_INCREF(_pyComp);
+    
+    // Get method
+    if (PyObject_HasAttrString(_pyComp, "oninit"))
+        _pyOnInitMeth = PyObject_GetAttrString(_pyComp, "oninit");
+    if (PyObject_HasAttrString(_pyComp, "ondestroy"))
+        _pyOnDestroyMeth = PyObject_GetAttrString(_pyComp, "ondestroy");
+    if (PyObject_HasAttrString(_pyComp, "onstart"))
+        _pyOnStartMeth = PyObject_GetAttrString(_pyComp, "onstart");
+    if (PyObject_HasAttrString(_pyComp, "onstop"))
+        _pyOnStopMeth = PyObject_GetAttrString(_pyComp, "onstop");
+    if (PyObject_HasAttrString(_pyComp, "onupdate"))
+        _pyOnUpdateMeth = PyObject_GetAttrString(_pyComp, "onupdate");
+    if (PyObject_HasAttrString(_pyComp, "onidle"))
+        _pyOnIdleMeth = PyObject_GetAttrString(_pyComp, "onidle");
+    if (PyObject_HasAttrString(_pyComp, "onsessioncreate"))
+        _pyOnSessionCreateMeth = PyObject_GetAttrString(_pyComp, "onsessioncreate");
+    if (PyObject_HasAttrString(_pyComp, "onsessiondestroy"))
+        _pyOnSessionDestroyMeth = PyObject_GetAttrString(_pyComp, "onsessiondestroy");
+    if (PyObject_HasAttrString(_pyComp, "onasyncconnresult"))
+        _pyOnAsyncConnResultMeth = PyObject_GetAttrString(_pyComp, "onasyncconnresult");
+    if (PyObject_HasAttrString(_pyComp, "onprotoreport"))
+        _pyOnProtoReportMeth = PyObject_GetAttrString(_pyComp, "onprotoreport");
+    if (PyObject_HasAttrString(_pyComp, "onunhandledpacket"))
+        _pyOnUnHandledPacketMeth = PyObject_GetAttrString(_pyComp, "onunhandledpacket");
 }
 
 pyllbc_Component::~pyllbc_Component()
 {
-    Py_DECREF(_methOnInit);
-    Py_DECREF(_methOnDestroy);
-    Py_DECREF(_methOnStart);
-    Py_DECREF(_methOnStop);
-    Py_DECREF(_methOnUpdate);
-    Py_DECREF(_methOnIdle);
-    Py_DECREF(_methOnSessionCreate);
-    Py_DECREF(_methOnSessionDestroy);
-    Py_DECREF(_methOnAsyncConnResult);
-    Py_DECREF(_methOnProtoReport);
-    Py_DECREF(_methOnUnHandledPacket);
+    Py_DECREF(_pyComp);
 
-    Py_DECREF(_keySVC);
-    Py_DECREF(_keyIp);
-    Py_DECREF(_keyPort);
-    Py_DECREF(_keySessionId);
-    Py_DECREF(_keyOpcode);
-    Py_DECREF(_keyData);
-    Py_DECREF(_keyStatus);
-    Py_DECREF(_keyReason);
-    Py_DECREF(_keyConnected);
-    Py_DECREF(_keyIdleTime);
-    Py_DECREF(_keyInlIdleTime);
-    Py_DECREF(_keyCObj);
-
-    Py_XDECREF(_pyPacketCls);
-    #if PYLLBC_CFG_PACKET_REUSE
-    Py_XDECREF(_pyReusePacket);
-    Py_XDECREF(_pyPacketReuseMeth);
-    #endif // PYLLBC_CFG_PACKET_REUSE
-    Py_XDECREF(_pyNullCObj);
-    Py_XDECREF(_pyPacketCreateArgs);
-
-    if (_pyStream)
-    {
-        Py_DECREF(_pyStream);
-
-        _pyStream = nullptr;
-        _nativeStream = nullptr;
-    }
+    Py_DECREF(_pyOnInitMeth);
+    Py_DECREF(_pyOnDestroyMeth);
+    Py_DECREF(_pyOnStartMeth);
+    Py_DECREF(_pyOnStopMeth);
+    Py_DECREF(_pyOnUpdateMeth);
+    Py_DECREF(_pyOnIdleMeth);
+    Py_DECREF(_pyOnSessionCreateMeth);
+    Py_DECREF(_pyOnSessionDestroyMeth);
+    Py_DECREF(_pyOnAsyncConnResultMeth);
+    Py_DECREF(_pyOnProtoReportMeth);
+    Py_DECREF(_pyOnUnHandledPacketMeth);
 
     Py_DECREF(_holdedOnIdleEv);
     Py_DECREF(_holdedOnUpdateEv);
@@ -134,371 +106,164 @@ pyllbc_Component::~pyllbc_Component()
 
 bool pyllbc_Component::OnInit(bool &initFinished)
 {
-    return CallComponentMeth(_methOnInit, _EvBuilder::BuildInitializeEv(_pySvc), true);
+    LLBC_ReturnIf(!_pyOnInitMeth, true);
+
+    PyObject *pyRet = CallComponentMeth(_pyOnInitMeth, _EvBuilder::BuildInitializeEv(_pySvc), true, true);
+
+    return ParsePythonRet(pyRet, initFinished);
 }
 
 void pyllbc_Component::OnDestroy(bool &destroyFinished)
 {
-    CallComponentMeth(_methOnDestroy, _EvBuilder::BuildDestroyEv(_pySvc), true);
+    LLBC_ReturnIf(!_pyOnDestroyMeth, void());
+
+    PyObject *pyRet = CallComponentMeth(_pyOnDestroyMeth, _EvBuilder::BuildDestroyEv(_pySvc), true, true);
+
+    ParsePythonRet(pyRet, destroyFinished);
 }
 
 bool pyllbc_Component::OnStart(bool &startFinished)
 {
-    return CallComponentMeth(_methOnStart, _EvBuilder::BuildStartEv(_pySvc), true);
+    LLBC_ReturnIf(!_pyOnStartMeth, true);
+
+    PyObject *pyRet = CallComponentMeth(_pyOnStartMeth, _EvBuilder::BuildStartEv(_pySvc), true, true);
+
+    return ParsePythonRet(pyRet, startFinished);
 }
 
 void pyllbc_Component::OnStop(bool &stopFinished)
 {
-    CallComponentMeth(_methOnStop, _EvBuilder::BuildStopEv(_pySvc), true);
+    LLBC_ReturnIf(!_pyOnStopMeth, void());
+
+    PyObject *pyRet = CallComponentMeth(_pyOnStopMeth, _EvBuilder::BuildStopEv(_pySvc), true, true);
+
+    ParsePythonRet(pyRet, stopFinished);
 }
 
 void pyllbc_Component::OnUpdate()
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnUpdateMeth, void());
 
-    CallComponentMeth(_methOnUpdate, _holdedOnUpdateEv, false);
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    CallComponentMeth(_pyOnUpdateMeth, _holdedOnUpdateEv, false, false);
 }
 
 void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnIdleMeth, void());
+
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
 
     PyObject *pyIdleTime = PyFloat_FromDouble(
         idleTime.GetTotalMicros() / static_cast<double>(LLBC_TimeConst::numOfMicrosPerSecond));
-    PyObject_SetAttr(_holdedOnIdleEv, _keyInlIdleTime, pyIdleTime);
+    PyObject_SetAttrString(_holdedOnIdleEv, "_idletime", pyIdleTime);
     Py_DECREF(pyIdleTime);
 
-    CallComponentMeth(_methOnIdle, _holdedOnIdleEv, false);
+    CallComponentMeth(_pyOnIdleMeth, _holdedOnIdleEv, false, false);
 }
 
 void pyllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnSessionCreateMeth, void());
 
-    CallComponentMeth(_methOnSessionCreate, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo), true);
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    CallComponentMeth(_pyOnSessionCreateMeth, _EvBuilder::BuildSessionCreateEv(_pySvc, sessionInfo), true, false);
 }
 
 void pyllbc_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnSessionDestroyMeth, void());
 
-    CallComponentMeth(_methOnSessionDestroy, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo), true);
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    CallComponentMeth(_pyOnSessionDestroyMeth, _EvBuilder::BuildSessionDestroyEv(_pySvc, destroyInfo), true, false);
 }
 
 void pyllbc_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnAsyncConnResultMeth, void());
 
-    CallComponentMeth(_methOnAsyncConnResult, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result), true);
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    CallComponentMeth(_pyOnAsyncConnResultMeth, _EvBuilder::BuildAsyncConnResultEv(_pySvc, result), true, false);
 }
 
 void pyllbc_Component::OnProtoReport(const LLBC_ProtoReport &report)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnProtoReportMeth, void());
 
-    CallComponentMeth(_methOnProtoReport, _EvBuilder::BuildProtoReportEv(_pySvc, report), true);
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    CallComponentMeth(_pyOnProtoReportMeth, _EvBuilder::BuildProtoReportEv(_pySvc, report), true, false);
 }
 
 void pyllbc_Component::OnUnHandledPacket(const LLBC_Packet &packet)
 {
-    if (UNLIKELY(_svc->_stoping))
-        return;
+    LLBC_ReturnIf(!_pyOnUnHandledPacketMeth, void());
 
-    PyObject *pyPacket = BuildPyPacket(packet);
-    if (UNLIKELY(pyPacket == nullptr))
-        return;
+    LLBC_ReturnIf(UNLIKELY(_svc->_stoping), void());
+
+    PyObject *pyPacket = _svc->BuildPyPacket(packet);
+    LLBC_ReturnIf(UNLIKELY(pyPacket == nullptr), void());
 
     PyObject *ev = 
         pyllbc_ComponentEvBuilder::BuildUnHandledPacketEv(_pySvc, packet, pyPacket);
     Py_DecRef(pyPacket); pyPacket = nullptr;
 
-    CallComponentMeth(_methOnUnHandledPacket, ev, true);
+    CallComponentMeth(_pyOnUnHandledPacketMeth, ev, true, false);
 }
 
-void pyllbc_Component::OnDataReceived(LLBC_Packet &packet)
+PyObject *pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv, bool isRetRequired)
 {
-    typedef pyllbc_Service::_PacketHandlers _Handlers;
-
-    // Stopping check.
-    if (UNLIKELY(_svc->_stoping))
-        return;
-
-    // Find handler.
-    _Handlers &handlers = _svc->_handlers;
-    _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
-    if (UNLIKELY(handlerIt == handlers.end()))
-        return;
-
-    // Build python layer packet.
-    pyllbc_PacketHandler *&handler = handlerIt->second;
-    PyObject *pyPacket = reinterpret_cast<PyObject *>(packet.GetPreHandleResult());
-    if (!pyPacket)
-    {
-        if (UNLIKELY(!(pyPacket = BuildPyPacket(packet))))
-            return;
-    }
-
-    // Handle packet.
-    PyObject *ret = handler->Handle(pyPacket);
-    if (LIKELY(ret))
-        Py_DECREF(ret);
-
-    // Force clear pylayer packet._cobj field.
-    PyObject_SetAttr(pyPacket, _keyCObj, _pyNullCObj);
-
-    // Delete packet.
-    if (!packet.GetPreHandleResult())
-        Py_DECREF(pyPacket);
-}
-
-bool pyllbc_Component::OnDataPreReceived(LLBC_Packet &packet)
-{
-    typedef pyllbc_Service::_PacketHandlers _Handlers;
-
-    if (UNLIKELY(_svc->_stoping))
-        return true;
-
-    _Handlers &handlers = _svc->_preHandlers;
-    _Handlers::iterator handlerIt = handlers.find(packet.GetOpcode());
-    if (UNLIKELY(handlerIt == handlers.end()))
-        return true;
-
-    pyllbc_PacketHandler *&handler = handlerIt->second;
-    PyObject *pyPacket = BuildPyPacket(packet);
-    if (UNLIKELY(!pyPacket))
-        return false;
-
-    packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
-    PyObject *ret = handler->Handle(pyPacket);
-    if (UNLIKELY(!ret))
-        return false;
-
-    const int detectResult = PyObject_IsTrue(ret);
-    if (UNLIKELY(detectResult == -1))
-    {
-        pyllbc_TransferPyError();
-
-        Py_DECREF(ret);
-        return false;
-    }
-
-    Py_DECREF(ret);
-    return detectResult != 0;
-}
-
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-bool pyllbc_Component::OnDataUnifyPreReceived(LLBC_Packet &packet)
-{
-    if (UNLIKELY(_svc->_stoping))
-        return true;
-
-    PyObject *pyPacket = BuildPyPacket(packet);
-    if (UNLIKELY(!pyPacket))
-        return false;
-
-    packet.SetPreHandleResult(pyPacket, this, &This::DeletePyPacket);
-
-    PyObject *ret = _svc->_unifyPreHandler->Handle(pyPacket);
-    if (UNLIKELY(!ret))
-        return false;
-
-    const int detectResult = PyObject_IsTrue(ret);
-    if (UNLIKELY(detectResult == -1))
-    {
-        pyllbc_TransferPyError();
-
-        Py_DECREF(ret);
-        return false;
-    }
-
-    Py_DECREF(ret);
-    return detectResult != 0;
-}
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-
-PyObject *pyllbc_Component::BuildPyPacket(const LLBC_Packet &packet)
-{
-    // Get python layer class: llbc.Packet
-    if (UNLIKELY(!_pyPacketCls))
-    {
-        PyObject *modDict = pyllbc_TopModule->GetModuleDict();
-        _pyPacketCls = PyDict_GetItemString(modDict, "Packet");
-        Py_INCREF(_pyPacketCls);
-
-        #if PYLLBC_CFG_PACKET_REUSE
-        _pyReusePacket = CreateReusePyPacket();
-        _pyPacketReuseMeth = PyObject_GetAttrString(_pyReusePacket, "_reuse");
-        #endif // PYLLBC_CFG_PACKET_REUSE
-    }
-
-    // Create python layer instance: llbc.Stream
-    if (UNLIKELY(!_pyStream))
-    {
-        PyObject *tupleArg = PyTuple_New(1);
-#if (LLBC_CUR_COMP == LLBC_COMP_MSVC) && defined(_M_X64)
-        PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(static_cast<long>(packet.GetPayloadLength())));
-#else
-        PyTuple_SetItem(tupleArg, 0, PyInt_FromLong(packet.GetPayloadLength()));
-#endif
-        _pyStream = PyObject_CallObject(_svc->_streamCls, tupleArg);
-        Py_DECREF(tupleArg);
-
-        // Get pyllbc_Stream object.
-        PyObject *cobj = PyObject_GetAttrString(_pyStream, "cobj");
-        if (UNLIKELY(!cobj))
-        {
-            Py_DECREF(_pyStream);
-            pyllbc_SetError("could not get llbc.Stream property 'cobj', recv data failed");
-
-            return nullptr;
-        }
-
-        PyArg_Parse(cobj, "l", &_nativeStream);
-        Py_DECREF(cobj);
-    }
-        
-    _nativeStream->GetLLBCStream().Attach(
-        const_cast<void *>(packet.GetPayload()), packet.GetPayloadLength());
-
-    PyObject *pyData = nullptr;
-    const auto &decoders = _svc->_decoders;
-    const auto decoderIt = decoders.find(packet.GetOpcode());
-    if (decoderIt != decoders.end())
-    {
-        PyObject *decoded = _nativeStream->Read(decoderIt->second);
-        if (!decoded)
-            return nullptr;
-
-        pyData = decoded;
-    }
-
-    if (!pyData)
-    {
-        Py_IncRef(_pyStream);
-        pyData = _pyStream;
-    }
-
-    PyObject *pySessionId = PyInt_FromLong(packet.GetSessionId());
-
-    PyObject *pyOpcode = PyInt_FromLong(packet.GetOpcode());
-    PyObject *pyStatus = PyInt_FromLong(packet.GetStatus());
-
-    PyObject *pyPacketCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(&packet));
-
-    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
-    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
-    #if PYLLBC_CFG_PACKET_REUSE
-    PyObject *reuseRet = PyObject_CallObject(_pyPacketReuseMeth, _pyPacketCreateArgs);
-
-    Py_IncRef(Py_None);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
-
-    if (UNLIKELY(!reuseRet))
-    {
-        pyllbc_TransferPyError();
-        return nullptr;
-    }
-
-    Py_DecRef(reuseRet);
-    Py_IncRef(_pyReusePacket);
-
-    return _pyReusePacket;
-    #else
-    PyObject *pyPacket = PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
-
-    Py_IncRef(Py_None);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, Py_None); // Only clear pyData item(index 4).
-
-    if (UNLIKELY(!pyPacket))
-    {
-        pyllbc_TransferPyError();
-        return nullptr;
-    }
-
-    return pyPacket;
-    #endif // PYLLBC_CFG_PACKET_REUSE
-}
-
-void pyllbc_Component::DeletePyPacket(void *_)
-{
-    PyObject *pyPacket = reinterpret_cast<PyObject *>(_);
-    Py_DECREF(pyPacket);
-}
-
-bool pyllbc_Component::CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv)
-{
-    typedef pyllbc_Service::_Comps _Comps;
-
     // Set event to call args.
     Py_INCREF(ev);
     PyTuple_SetItem(_compEvCallArgs, 0, ev); // Steals reference.
-
-    _Comps &comps = _svc->_comps;
-    for (_Comps::iterator it = comps.begin();
-         it != comps.end();
-         it++)
-    {
-        PyObject *&comp = *it;
-        if (!PyObject_HasAttr(comp, meth)) // TODO: Optimize
-            continue;
-
-        // Get method and call.
-        PyObject *pyMeth = PyObject_GetAttr(comp, meth); // New reference.
-        PyObject *pyRtn = PyObject_Call(pyMeth, _compEvCallArgs, nullptr);
-        if (!pyRtn)
-        {
-            pyllbc_TransferPyError();
-
-            Py_DECREF(pyMeth);
-            Py_INCREF(Py_None);
-            PyTuple_SetItem(_compEvCallArgs, 0, Py_None);
-            if (decRefEv)
-                Py_DECREF(ev);
-
-            return false;
-        }
-
-        Py_DECREF(pyMeth);
-        Py_DECREF(pyRtn);
-    }
+    PyObject *pyRet = PyObject_Call(meth, _compEvCallArgs, nullptr);
+    LLBC_DoIf(!pyRet, pyllbc_TransferPyError());
 
     // Clear call args.
     Py_INCREF(Py_None);
     PyTuple_SetItem(_compEvCallArgs, 0, Py_None);
 
     // Decref event, if acquire.
-    if (decRefEv)
-        Py_DECREF(ev);
+    LLBC_DoIf(decRefEv, Py_DECREF(ev));
 
-    return true;
+    if (!isRetRequired)
+    {
+        LLBC_DoIf(pyRet, Py_DECREF(pyRet));
+        return nullptr;
+    }
+
+    return pyRet;
 }
 
-#if PYLLBC_CFG_PACKET_REUSE
-PyObject* pyllbc_Component::CreateReusePyPacket()
+bool pyllbc_Component::ParsePythonRet(PyObject *pyRet, bool &finished)
 {
-    PyObject *pyData = Py_None;
-    Py_IncRef(pyData);
+    LLBC_ReturnIf(UNLIKELY(!pyRet), false);
 
-    PyObject *pySessionId = PyInt_FromLong(0);
-    PyObject *pyOpcode = PyInt_FromLong(0);
-    PyObject *pyStatus = PyInt_FromLong(0);
-    PyObject *pyPacketCObj = PyInt_FromLong(0);
+    finished = false;
 
-    PyTuple_SetItem(_pyPacketCreateArgs, 1, pySessionId);
-    PyTuple_SetItem(_pyPacketCreateArgs, 2, pyOpcode);
-    PyTuple_SetItem(_pyPacketCreateArgs, 3, pyStatus);
-    PyTuple_SetItem(_pyPacketCreateArgs, 4, pyData);
-    PyTuple_SetItem(_pyPacketCreateArgs, 5, pyPacketCObj);
+    // default is successful and finished
+    if (pyRet == Py_None)
+    {
+        finished = true;
+        Py_DecRef(pyRet);
+        return true;
+    }
 
-    return PyObject_CallObject(_pyPacketCls, _pyPacketCreateArgs);
+    // parse return
+    if (PyBool_Check(pyRet))
+    {
+        finished = PyObject_IsTrue(pyRet);
+        Py_DecRef(pyRet);
+        return true;
+    }
+    else
+    {
+        pyllbc_SetError(LLBC_String().format("Invalid ret type:%s", pyRet->ob_type->tp_name));
+        Py_DecRef(pyRet);
+        return false;
+    }
 }
-#endif // PYLLBC_CFG_PACKET_REUSE

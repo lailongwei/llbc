@@ -35,14 +35,21 @@ public:
     /**
      * Constructor.
      * @param[in] svc - adapted to python c++ wrapped service.
+     * @param[in] pyComp - adapted to python component.
      */
-    pyllbc_Component(pyllbc_Service *svc);
+    pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp);
 
     /**
      * Destructor.
      */
     virtual ~pyllbc_Component();
 
+public:
+    /**
+     * Get python comp.
+     * @return PyObject * - python component.
+     */
+    const PyObject *GetPyComp() const { return _pyComp; }
 public:
     /**
      * When service start and not not init comp before, will call then event handler function.
@@ -107,98 +114,41 @@ public:
      */
     virtual void OnUnHandledPacket(const LLBC_Packet &packet);
 
-public:
-    /**
-     * data receive handler.
-     * @param[in] packet - packet.
-     */
-    virtual void OnDataReceived(LLBC_Packet &packet);
-
-    /**
-     * The data pre-receive handler.
-     * @param[in] packet - packet.
-     * @return bool - the return value, if return false, will remove this session.
-     */
-    virtual bool OnDataPreReceived(LLBC_Packet &packet);
-
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    /**
-     * The data unify pre-receive handler.
-     * @param[in] packet - packet.
-     * @return bool - the return value, if return zero, will remove this session.
-     */
-    virtual bool OnDataUnifyPreReceived(LLBC_Packet &packet);
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-
-    /**
-     * Build python layer packet object according to LLBC_Packet object reference.
-     * @param[in] packet - the core library packet object reference.
-     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
-     */
-    PyObject *BuildPyPacket(const LLBC_Packet &packet);
-
-    /**
-     * Delete the python layer packet.
-     */
-    void DeletePyPacket(void *pyPacket);
-
 private:
     /**
      * Call python layer comp method.
-     * @param[in] meth     - method name, not steal reference, normal.
-     * @param[in] ev       - call event object, steal reference.
-     * @param[in] decRefEv - decref event.
-     * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
+     * @param[in] meth          - method name, not steal reference, normal.
+     * @param[in] ev            - call event object, steal reference.
+     * @param[in] decRefEv      - decref event.
+     * @param[in] isRetRequired - Whether a return value is required.
+     * @return PyObject *       - return python return value if isRetRequired is True and call success(no error occurred),
+     *                            otherwise return nullptr if error occurred(error info has been correctly processed).
      */
-    bool CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv);
-
-    #if PYLLBC_CFG_PACKET_REUSE
+    PyObject *CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv, bool isRetRequired);
     /**
-     * Create reuse python layer packet object.
-     * @return PyObject * - the python layer reuse packet(new reference).
+     * Parse finished param from pyRet.
+     * @param[in] pyRet     - python method return object, steal reference.
+     * @param[out] finished - parsed param.
+     * @return bool         - return value.
      */
-    PyObject *CreateReusePyPacket();
-    #endif // PYLLBC_CFG_PACKET_REUSE
+    static bool ParsePythonRet(PyObject *pyRet, bool &finished);
 
 private:
     pyllbc_Service *_svc;
     PyObject *_pySvc;
+    PyObject *_pyComp;
 
-    PyObject *_methOnInit;
-    PyObject *_methOnDestroy;
-    PyObject *_methOnStart;
-    PyObject *_methOnStop;
-    PyObject *_methOnUpdate;
-    PyObject *_methOnIdle;
-    PyObject *_methOnSessionCreate;
-    PyObject *_methOnSessionDestroy;
-    PyObject *_methOnAsyncConnResult;
-    PyObject *_methOnProtoReport;
-    PyObject *_methOnUnHandledPacket;
-
-    PyObject *_keySVC;
-    PyObject *_keyIp;
-    PyObject *_keyPort;
-    PyObject *_keySessionId;
-    PyObject *_keyOpcode;
-    PyObject *_keyData;
-    PyObject *_keyStatus;
-    PyObject *_keyReason;
-    PyObject *_keyConnected;
-    PyObject *_keyIdleTime;
-    PyObject *_keyInlIdleTime;
-    PyObject *_keyCObj;
-
-    PyObject *_pyPacketCls;
-    #if PYLLBC_CFG_PACKET_REUSE
-    PyObject *_pyReusePacket;
-    PyObject *_pyPacketReuseMeth;
-    #endif // PYLLBC_CFG_PACKET_REUSE
-    PyObject *_pyNullCObj;
-    PyObject *_pyPacketCreateArgs;
-
-    PyObject *_pyStream;
-    pyllbc_Stream *_nativeStream;
+    PyObject *_pyOnInitMeth;
+    PyObject *_pyOnDestroyMeth;
+    PyObject *_pyOnStartMeth;
+    PyObject *_pyOnStopMeth;
+    PyObject *_pyOnUpdateMeth;
+    PyObject *_pyOnIdleMeth;
+    PyObject *_pyOnSessionCreateMeth;
+    PyObject *_pyOnSessionDestroyMeth;
+    PyObject *_pyOnAsyncConnResultMeth;
+    PyObject *_pyOnProtoReportMeth;
+    PyObject *_pyOnUnHandledPacketMeth;
 
     PyObject *_holdedOnIdleEv;
     PyObject *_holdedOnUpdateEv;

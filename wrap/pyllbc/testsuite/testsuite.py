@@ -18,8 +18,6 @@ def main():
     # #### common part.
     LLBCInfoTest()()
     # StreamTest()()
-
-    import types
     # #### core part.
     # GUIDTest()()
     # BundleTest()()
