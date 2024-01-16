@@ -46,6 +46,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 #else
 
     const LLBC_String logCfgFile = "LogTestCfg.cfg";
+    // const LLBC_String logCfgFile = "LogTestCfg.xml";
     if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
 #endif
     {

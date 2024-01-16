@@ -64,8 +64,18 @@
               - 如果配置了相对路径, 同不配置情况类似, 将join"当前目录/应用程序执行文件所在目录"(这取决于forceAppLogPath配置).
               - 如果配置了绝对路径, 忽略forceAppLogPath, 直接使用此路径join logFile. -->
         <logDir>.</logDir>
-        <!-- 日志文件名, %p: 当前进程Id, %m/%e: 当前主执行体映像名(Note: %m已废弃, 请使用%e来描述主执行体映像名). -->
-        <logFile>log/llbc_%p_%e</logFile>
+        <!-- 日志文件名:
+             - %p: 当前进程Id
+             - %m/%e: 已去除后缀的当前主执行体映像名(Note: %m已废弃, 请使用%e来描述主执行体映像名)
+             - %l: 当前日志记录器名
+             - %L: 跟%l类似, 当前日志记录器名, 差别是这个替换符会"智能的"进行替换, 规则如下:
+               - root logger:
+                 xxx_%L => xxx, 即前缀_将会被自动消除, 同时root日志记录器名字不会体现到日志文件名中
+                 xxx__%L => xxx, 即任意多个_前缀都将会自动消除, 同时root日志记录器名字不会体现到日志文件名中
+                 xxx-%L => xxx, 同'_'
+                 xxx--%L => xxx, 同'__'
+               - non-root logger: 行为同%l一致 -->
+        <logFile>log/llbc_%p_%e_%L</logFile>
         <!-- 日志文件后缀. -->
         <logFileSuffix>.txt</logFileSuffix>
         <!-- 是否强制使用执行文件路径作为 logFile 相对输出路径. -->
@@ -96,7 +106,7 @@
         <consolePattern>%T [%L]{logger:%N}{tag:%g} - %m%n</consolePattern>
         <logToFile>true</logToFile>
         <fileBufferSize>1024</fileBufferSize>
-        <logFile>log/llbc_logger_test</logFile>
+        <logFile>log/llbc_logger_%L</logFile>
         <forceAppLogPath>false</forceAppLogPath>
         <filePattern>%T [%-5L][%f:%l]{tag:%g} - %m%n</filePattern>
         <fileRollingMode>Hourly</fileRollingMode>
@@ -112,7 +122,7 @@
         <logToFile>true</logToFile>
         <fileRollingMode>NoRolling</fileRollingMode>
         <maxFileSize>1024</maxFileSize>
-        <logFile>log/deltest</logFile>
+        <logFile>log/%L</logFile>
         <forceAppLogPath>false</forceAppLogPath>
     </deltest>
 
@@ -126,7 +136,7 @@
         <fileRollingMode>Hourly</fileRollingMode>
         <maxFileSize>10240000</maxFileSize>
         <maxBackupIndex>10</maxBackupIndex>
-        <logFile>log/perftest</logFile>
+        <logFile>log/%L</logFile>
         <forceAppLogPath>false</forceAppLogPath>
     </perftest>
 

@@ -225,12 +225,36 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
     _logFile.findreplace("%p", curProcId); 
 
     // Replace module file name: %m/%e.
-    const LLBC_String modFileName = LLBC_Directory::ModuleFileName();
-    _logFile.findreplace("%m", modFileName); //! '%m' replace format has been deprecated.
-    _logFile.findreplace("%e", modFileName);
+    const LLBC_String modFileName = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+    _logFile.findreplace("%m", modFileName) //! '%m' replace format has been deprecated.
+            .findreplace("%e", modFileName);
 
     // Replace logger name: %l.
     _logFile.findreplace("%l", _loggerName);
+
+    // Replace smart logger name: %L.
+    // for root logger:
+    //   => xxx_%L => xxx
+    //   => xxx__%L => xxx
+    //   => xxx-%L => xxx
+    //   => xxx--%L => xxx
+    // for non-root logger: same as %l.
+    if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME)
+    {
+        _logFile.findreplace("%L", _loggerName);
+    }
+    else
+    {
+        LLBC_String::size_type smartLoggerNamePos = 0;
+        while ((smartLoggerNamePos = _logFile.find("%L", smartLoggerNamePos)) != LLBC_String::npos)
+        {
+            while (smartLoggerNamePos > 0 &&
+                (_logFile[smartLoggerNamePos - 1] == '_' ||
+                    _logFile[smartLoggerNamePos - 1] == '-'))
+                _logFile.erase(--smartLoggerNamePos);
+            _logFile.erase(smartLoggerNamePos, 2);
+        }
+    }
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
