@@ -147,8 +147,18 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         // Log file name.
         if (cfg["logFile"])
             _logFile = cfg["logFile"].AsStr().strip();
+
         if (_logFile.empty())
-            _logFile = _loggerName;
+        {
+            if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME &&
+                _notConfigUseRoot)
+                _logFile = rootCfg->GetOriginalLogFile();
+            else
+                _logFile = _loggerName;
+        }
+
+        _originalLogFile = _logFile;
+
         if (!_logDir.empty())
             _logFile = LLBC_Directory::Join(_logDir, _logFile);
         if (!LLBC_Directory::IsAbsPath(_logFile))

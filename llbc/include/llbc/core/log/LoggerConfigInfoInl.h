@@ -103,6 +103,11 @@ inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogFile() const
     return _logFile;
 }
 
+inline const LLBC_String &LLBC_LoggerConfigInfo::GetOriginalLogFile() const
+{
+    return _originalLogFile;
+}
+
 inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogFileSuffix() const
 {
     return _logFileSuffix;

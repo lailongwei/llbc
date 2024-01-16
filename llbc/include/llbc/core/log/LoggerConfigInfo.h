@@ -157,6 +157,12 @@ public:
     const LLBC_String &GetLogFile() const;
 
     /**
+     * Get original log file name.
+     * @return const LLBC_String & - original log file name.
+     */
+    const LLBC_String &GetOriginalLogFile() const;
+
+    /**
      * Get log file suffix.
      * @return const LLBC_String & - log file suffix.
      */
@@ -242,6 +248,7 @@ private:
     int _fileLogLevel;
     LLBC_String _logDir;
     LLBC_String _logFile;
+    LLBC_String _originalLogFile;
     LLBC_String _logFileSuffix;
     bool _logCodeFilePath;
     bool _forceAppLogPath;
