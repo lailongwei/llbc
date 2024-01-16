@@ -219,13 +219,18 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
+    // Replace process id: %p.
     const LLBC_String curProcId = 
         LLBC_NumToStr(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
+    // Replace module file name: %m/%e.
     const LLBC_String modFileName = LLBC_Directory::ModuleFileName();
     _logFile.findreplace("%m", modFileName); //! '%m' replace format has been deprecated.
     _logFile.findreplace("%e", modFileName);
+
+    // Replace logger name: %l.
+    _logFile.findreplace("%l", _loggerName);
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
