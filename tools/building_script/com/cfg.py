@@ -4,7 +4,7 @@ llbc项目构建脚本脚本配置
 要求调用参数:
 - sys.argv[1] - 构建架构: 如x86/x64/...
 - sys.argv[2] - 构建配置: debug/release
-- sys.argv[3] - premake action参数: vs2022/gmake/...
+- sys.argv[3] - premake action参数: vs2022/gmake(deprecated)/gmake2/...
 """
 
 import os
@@ -127,7 +127,7 @@ class _Cfg(object):
         if self.platform == PlatformType.Windows:
             return '.pyd'
         else:
-            return self.dll_suffix()
+            return self.dll_suffix
     # endregion
 
     # region 核心库(llbc)相关

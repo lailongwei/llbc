@@ -47,8 +47,10 @@ LUWRAP_LUAEXE_TARGET:= lu_wrap_luaexe
 
 ALL_WRAP_TARGETS:= $(PYWRAP_TARGET) $(CSWRAP_TARGET) $(LUWRAP_TARGET)
 
+# Premake action
+PREMAKE_ACTION  := gmake2
 # All targets output directory
-ALL_TARGETS_OUTPUT := output/gmake/$(config)
+ALL_TARGETS_OUTPUT := output/$(PREMAKE_ACTION)/$(config)
 # Some prefixs/suffixes define
 ifeq ($(PLATFORMNAME),darwin)
   DYNLIB_SUFFIX := .dylib
@@ -120,27 +122,27 @@ help:
 all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET) $(ALL_WRAP_TARGETS)
 
 $(PREMAKE_TARGET):
-	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) gmake)
+	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) $(PREMAKE_ACTION))
 
 $(CORELIB_TARGET): $(PREMAKE_TARGET)
-	$(MAKE) -C build/gmake -f llbc.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f llbc.make
 
 $(TEST_TARGET): $(CORELIB_TARGET)
-	$(MAKE) -C build/gmake -f testsuite.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f testsuite.make
 
 $(WRAPS_TARGET): $(ALL_WRAP_TARGETS)
 $(PYWRAP_TARGET): $(CORELIB_TARGET)
-	$(MAKE) -C build/gmake -f pyllbc.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f pyllbc.make
 $(CSWRAP_TARGET): $(CORELIB_TARGET)
-	$(MAKE) -C build/gmake -f csllbc_native.make
-	$(MAKE) -C build/gmake -f csllbc.make
-	$(MAKE) -C build/gmake -f csllbc_testsuite.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_testsuite.make
 $(LUWRAP_LUALIB_TARGET):
-	$(MAKE) -C build/gmake -f lullbc_lualib.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_lualib.make
 $(LUWRAP_LUAEXE_TARGET): $(LUWRAP_LUALIB_TARGET)
-	$(MAKE) -C build/gmake -f lullbc_luaexec.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_luaexec.make
 $(LUWRAP_TARGET): $(CORELIB_TARGET) $(LUWRAP_LUALIB_TARGET) $(LUWRAP_LUAEXE_TARGET)
-	$(MAKE) -C build/gmake -f lullbc.make
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make
 
 clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(WRAPS_TARGET))
 	@$(shell find ./ -name "._*" -exec rm {} \;)
@@ -148,23 +150,23 @@ clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(WRAPS_TARGET))
 	@$(shell find ./ -type f -name "*.buildlog" -exec rm {} \;)
 
 clean_$(CORELIB_TARGET):
-	@(if [ -e build/gmake/llbc.make ]; then $(MAKE) -C build/gmake -f llbc.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/llbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f llbc.make clean; fi)
 
 clean_$(TEST_TARGET):
-	@(if [ -e build/gmake/testsuite.make ]; then $(MAKE) -C build/gmake -f testsuite.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/testsuite.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f testsuite.make clean; fi)
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):
-	@(if [ -e build/gmake/pyllbc.make ]; then $(MAKE) -C build/gmake -f pyllbc.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/pyllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f pyllbc.make clean; fi)
 	@$(shell find ./wrap/pyllbc -type f -name "*.pyc" -exec rm {} \;)
 clean_$(CSWRAP_TARGET):
-	@(if [ -e build/gmake/csllbc_native.make ]; then $(MAKE) -C build/gmake -f csllbc_native.make clean; fi)
-	@(if [ -e build/gmake/csllbc.make ]; then $(MAKE) -C build/gmake -f csllbc.make clean; fi)
-	@(if [ -e build/gmake/csllbc_testsuite.make ]; then $(MAKE) -C build/gmake -f csllbc_testsuite.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/csllbc_native.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/csllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/csllbc_testsuite.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_testsuite.make clean; fi)
 clean_$(LUWRAP_TARGET):
-	@(if [ -e build/gmake/lullbc.make ]; then $(MAKE) -C build/gmake -f lullbc.make clean; fi)
-	@(if [ -e build/gmake/lullbc_lualib.make ]; then $(MAKE) -C build/gmake -f lullbc_lualib.make clean; fi)
-	@(if [ -e build/gmake/lullbc_luaexec.make ]; then $(MAKE) -C build/gmake -f lullbc_luaexec.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/lullbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/lullbc_lualib.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_lualib.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/lullbc_luaexec.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_luaexec.make clean; fi)
 
 install: install_$(CORELIB_TARGET) install_$(WRAPS_TARGET)
 

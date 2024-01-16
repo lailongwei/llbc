@@ -347,13 +347,6 @@ project "testsuite"
         }
     filter {}
 
-    -- warnings.
-    -- filter { "system:not windows" }
-    --     disablewarnings {
-    --         "invalid-source-encoding",
-    --     }
-    -- filter {}
-
     -- Enable c++11 support.
     filter { "system:not windows" }
         buildoptions {

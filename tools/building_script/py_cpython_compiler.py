@@ -81,8 +81,8 @@ class CPythonCompiler(object):
 
         # 配置cpython
         Log.fi('Configure cpython, isdebug:{}...', cfg.is_debug)
-        ret = Sh.execute('cd "{}" && ./configure {}'.format(cfg.pyllbc_cpython_path,
-                                                            ' '.join(cpython_config_opts)))
+        ret = Sh.execute('cd "{}" && ./configure {} > /dev/null'.format(cfg.pyllbc_cpython_path,
+                                                                        ' '.join(cpython_config_opts)))
         if ret != 0:
             Log.fe('Configure cpython failed, ret code:{}', ret)
 
@@ -94,6 +94,6 @@ class CPythonCompiler(object):
             Log.fe('Compile cpython failed, ret code:{}', ret)
 
         # 发布cpython(到编译目录)
-        ret = Sh.execute('cd "{}" && make install'.format(cfg.pyllbc_cpython_path))
+        ret = Sh.execute('cd "{}" && make install > /dev/null'.format(cfg.pyllbc_cpython_path))
         if ret != 0:
             Log.fe('Install cpython failed, ret code:{}'.format(ret))
