@@ -80,14 +80,12 @@ LLBC_String LLBC_FileMode::GetFileModeDesc(int fileMode)
 
 LLBC_File::LLBC_File()
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
 }
 
 LLBC_File::LLBC_File(const LLBC_String &path, int mode)
 : _mode(LLBC_FileMode::Read)
-, _path()
 , _handle(LLBC_INVALID_FILE_HANDLE)
 {
     if (Open(path, mode) == LLBC_OK)
@@ -236,7 +234,7 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
     return LLBC_OK;
 }
 
-long LLBC_File::GetFileSize() const
+sint64 LLBC_File::GetFileSize() const
 {
     if (!IsOpened())
     {
@@ -244,36 +242,42 @@ long LLBC_File::GetFileSize() const
         return -1;
     }
 
-    LLBC_FileHandle handle = 
-        const_cast<LLBC_FileHandle>(_handle);
-    long oldPos = ftell(handle);
-    if (fseek(handle, 0, LLBC_FileSeekOrigin::End) != 0)
+#if LLBC_TARGET_PLATFORM_WIN32
+    const sint64 oldPos = _ftelli64(_handle);
+    if (_fseeki64(_handle, 0, LLBC_FileSeekOrigin::End) != 0)
+#else
+    const sint64 oldPos = ftell(_handle);
+    if (fseek(_handle, 0, LLBC_FileSeekOrigin::End) != 0)
+#endif
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return -1;
     }
 
-    int ret = LLBC_OK;
-    long fileSize = ftell(handle);
-    if (fileSize == -1L)
-    {
-        ret = LLBC_FAILED;
+#if LLBC_TARGET_PLATFORM_WIN32
+    sint64 fileSize = _ftelli64(_handle);
+#else
+    sint64 fileSize = ftell(_handle);
+#endif
+    if (fileSize == -1)
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-    }
 
-    if (fseek(handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (_fseeki64(_handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
+#else
+    if (fseek(_handle, oldPos, LLBC_FileSeekOrigin::Begin) != 0)
+#endif
     {
-        if (ret == LLBC_OK)
-        {
-            fileSize = -1L;
-            LLBC_SetLastError(LLBC_ERROR_CLIB);
-        }
+        if (fileSize >= 0)
+            fileSize = -1;
+
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
     }
 
     return fileSize;
 }
 
-int LLBC_File::Seek(int seekOrigin, long offset)
+int LLBC_File::Seek(int seekOrigin, sint64 offset)
 {
     if (!IsOpened())
     {
@@ -281,7 +285,11 @@ int LLBC_File::Seek(int seekOrigin, long offset)
         return LLBC_FAILED;
     }
 
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (_fseeki64(_handle, offset, seekOrigin) != 0)
+#else
     if (fseek(_handle, offset, seekOrigin) != 0)
+#endif
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
@@ -290,7 +298,7 @@ int LLBC_File::Seek(int seekOrigin, long offset)
     return LLBC_OK;
 }
 
-long LLBC_File::GetFilePosition() const
+sint64 LLBC_File::GetFilePosition() const
 {
     if (!IsOpened())
     {
@@ -298,15 +306,18 @@ long LLBC_File::GetFilePosition() const
         return -1;
     }
 
-    long pos = ftell(
-        const_cast<LLBC_FileHandle>(_handle));
+#if LLBC_TARGET_PLATFORM_WIN32
+    const sint64 pos = _ftelli64(_handle);
+#else
+    const sint64 pos = ftell(_handle);
+#endif
     if (pos == -1)
         LLBC_SetLastError(LLBC_ERROR_CLIB);
 
     return pos;
 }
 
-int LLBC_File::SetFilePosition(long position)
+int LLBC_File::SetFilePosition(sint64 position)
 {
     if (!IsOpened())
     {
@@ -314,7 +325,11 @@ int LLBC_File::SetFilePosition(long position)
         return -1;
     }
 
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (_fseeki64(_handle, position, LLBC_FileSeekOrigin::Begin) != 0)
+#else
     if (fseek(_handle, position, LLBC_FileSeekOrigin::Begin) != 0)
+#endif
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
@@ -323,23 +338,23 @@ int LLBC_File::SetFilePosition(long position)
     return LLBC_OK;
 }
 
-long LLBC_File::OffsetFilePosition(long offset)
+sint64 LLBC_File::OffsetFilePosition(sint64 offset)
 {
-    long curPos = GetFilePosition();
-    if (curPos == -1)
+    const sint64 curPos = GetFilePosition();
+    if (UNLIKELY(curPos == -1))
         return LLBC_FAILED;
 
     return SetFilePosition(curPos + offset);
 }
 
-long LLBC_File::GetReadableSize() const
+sint64 LLBC_File::GetReadableSize() const
 {
-    long size = GetFileSize();
-    if (size == -1)
+    const sint64 size = GetFileSize();
+    if (UNLIKELY(size == -1))
         return -1;
 
-    long pos = GetFilePosition();
-    if (pos == -1)
+    const sint64 pos = GetFilePosition();
+    if (UNLIKELY(pos == -1))
         return -1;
 
     return size - pos;
@@ -348,7 +363,7 @@ long LLBC_File::GetReadableSize() const
 LLBC_String LLBC_File::ReadToEnd()
 {
     LLBC_String str;
-    const long readableSize = GetReadableSize();
+    const sint64 readableSize = GetReadableSize();
     if (UNLIKELY(readableSize < 0))
     {
         return str;
@@ -360,17 +375,16 @@ LLBC_String LLBC_File::ReadToEnd()
     }
 
     str.resize(static_cast<size_t>(readableSize));
-    long actuallyRead = Read(
+    const sint64 actuallyRead = Read(
         const_cast<char *>(str.data()), static_cast<size_t>(readableSize));
     if (actuallyRead == -1)
     {
         str.resize(0);
         return str;
     }
-    else if (actuallyRead < readableSize)
-    {
+
+    if (actuallyRead < readableSize)
         str.resize(static_cast<size_t>(actuallyRead));
-    }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     return str;
@@ -385,7 +399,7 @@ LLBC_String LLBC_File::ReadToEnd()
      return file.ReadToEnd();
  }
 
-long LLBC_File::Read(void *buf, size_t size)
+sint64 LLBC_File::Read(void *buf, size_t size)
 {
     if (!IsOpened())
     {
@@ -393,17 +407,18 @@ long LLBC_File::Read(void *buf, size_t size)
         return -1;
     }
 
-    size_t actuallyRead = fread(buf, 1, size, _handle);
+    const size_t actuallyRead = fread(buf, 1, size, _handle);
     if (actuallyRead != size && ferror(_handle) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return -1;
     }
 
-    return static_cast<long>(actuallyRead);
+    LLBC_SetLastError(actuallyRead != size ? LLBC_ERROR_TRUNCATED : LLBC_ERROR_SUCCESS);
+    return static_cast<sint64>(actuallyRead);
 }
 
-long LLBC_File::Write(const void *buf, size_t size)
+sint64 LLBC_File::Write(const void *buf, size_t size)
 {
     if (!IsOpened())
     {
@@ -411,14 +426,15 @@ long LLBC_File::Write(const void *buf, size_t size)
         return -1;
     }
 
-    size_t actuallyWrote = fwrite(buf, 1, size, _handle);
+    const size_t actuallyWrote = fwrite(buf, 1, size, _handle);
     if (actuallyWrote != size && ferror(_handle) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return -1;
     }
 
-    return static_cast<long>(actuallyWrote);
+    LLBC_SetLastError(actuallyWrote != size ? LLBC_ERROR_TRUNCATED : LLBC_ERROR_SUCCESS);
+    return static_cast<sint64>(actuallyWrote);
 }
 
 int LLBC_File::Flush()
@@ -426,7 +442,7 @@ int LLBC_File::Flush()
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return -1;
+        return LLBC_FAILED;
     }
 
     if (fflush(_handle) != 0)
@@ -546,7 +562,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     }
 
 #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
-    // In MAC or iPhone platform, always upate access & modify time.
+    // In MAC or iPhone platform, always update access & modify time.
     updateLastAccessTime = true;
     updateLastModifyTime = true;
 #endif // LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
@@ -560,7 +576,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
     {
         if (lastAccessTime == nullptr)
         {
-            const sint64 nowTime = LLBC_GetMicroSeconds();
+            const sint64 nowTime = LLBC_GetMicroseconds();
             tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
             tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
 
@@ -580,7 +596,7 @@ int LLBC_File::TouchFile(const LLBC_String &filePath,
         {
             if (!gotNowTime)
             {
-                const sint64 nowTime = LLBC_GetMicroSeconds();
+                const sint64 nowTime = LLBC_GetMicroseconds();
                 tsNowTime.tv_sec = static_cast<time_t>(nowTime / 1000000);
                 tsNowTime.tv_nsec = static_cast<long>(nowTime % 1000000) * 1000;
             }
@@ -709,7 +725,7 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
         return LLBC_FAILED;
     }
 
-    // Open source file with BinayRead mode.
+    // Open source file with BinaryRead mode.
     LLBC_File srcFile(srcFilePath, LLBC_FileMode::BinaryRead);
     if (!srcFile.IsOpened())
         return LLBC_FAILED;
@@ -726,18 +742,18 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
     if (!destFile.IsOpened())
         return LLBC_FAILED;
 
-    long srcFileSize = srcFile.GetFileSize();
+    sint64 srcFileSize = srcFile.GetFileSize();
     if (srcFileSize == 0)
         return LLBC_OK;
 
-    long copyBufSize = MIN(LLBC_CFG_CORE_FILE_COPY_BUF_SIZE, srcFileSize);
+    sint64 copyBufSize = MIN(LLBC_CFG_CORE_FILE_COPY_BUF_SIZE, srcFileSize);
     sint8 *copyBuf = LLBC_Malloc(sint8, copyBufSize);
 
-    long copiedSize = 0;
+    sint64 copiedSize = 0;
     while (copiedSize != srcFileSize)
     {
-        long copiableSize = MIN(srcFileSize - copiedSize, copyBufSize);
-        long actuallyRead = srcFile.Read(copyBuf, copiableSize);
+        sint64 copiableSize = MIN(srcFileSize - copiedSize, copyBufSize);
+        sint64 actuallyRead = srcFile.Read(copyBuf, copiableSize);
         if (UNLIKELY(actuallyRead == -1)) // encountered error, return failed.
         {
             free(copyBuf);
@@ -746,7 +762,7 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
 
         if (LIKELY(actuallyRead != 0)) // actually read some data from source file, copy to dest file.
         {
-            long actuallyCopy = destFile.Write(copyBuf, actuallyRead);
+            sint64 actuallyCopy = destFile.Write(copyBuf, actuallyRead);
             if (UNLIKELY(actuallyCopy == -1)) // encountered error, return failed.
             {
                 free(copyBuf);

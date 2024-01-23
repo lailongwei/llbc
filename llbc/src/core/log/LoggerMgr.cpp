@@ -39,6 +39,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_String LLBC_LoggerMgr::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
+LLBC_FastLock LLBC_LoggerMgr::_uninitColorfulOutputLock;
 
 LLBC_LoggerMgr::LLBC_LoggerMgr()
 : _configurator(nullptr)
@@ -222,6 +223,7 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
     const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
 
+    // Parse to get file basename.
     if (file)
     {
         #if LLBC_TARGET_PLATFORM_WIN32
@@ -235,7 +237,28 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
         #endif
     }
 
+    // Get now time.
     const auto now = LLBC_Time::Now();
+
+    // Set console color.
+    int oldConsoleColor;
+    if (logLv >= LLBC_LogLevel::Warn)
+    {
+        _uninitColorfulOutputLock.Lock();
+        if (logLv == LLBC_LogLevel::Warn)
+            LLBC_SetConsoleColor(to,
+                                 LLBC_ConsoleColor::Bg_Default |
+                                 LLBC_ConsoleColor::Fg_Yellow |
+                                 LLBC_ConsoleColor::Highlight_Fg);
+        else
+            LLBC_SetConsoleColor(to,
+                                 LLBC_ConsoleColor::Bg_Default |
+                                 LLBC_ConsoleColor::Fg_Red |
+                                 LLBC_ConsoleColor::Highlight_Fg);
+        oldConsoleColor = LLBC_GetConsoleColor(to);
+    }
+
+    // Log
     LLBC_FilePrint(to,
                    "[Log]%s [%-5s][%s:%d %s]<%s> - ",
                    now.ToString().c_str(),
@@ -245,6 +268,12 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
                    func ? func : "",
                    tag ? tag : "");
 
+    // Reset console color, if required.
+    if (logLv >= LLBC_LogLevel::Warn)
+    {
+        LLBC_SetConsoleColor(to, oldConsoleColor);
+        _uninitColorfulOutputLock.Unlock();
+    }
 
     va_list ap;
     va_start(ap, fmt);
@@ -269,6 +298,45 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
     }
 
     va_end(ap);
+
+    fflush(to);
+}
+
+void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
+                                           const char* tag,
+                                           const char* file,
+                                           int line,
+                                           const char* func,
+                                           const char* msg,
+                                           size_t msgLen)
+{
+    FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
+    const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
+
+    if (file)
+    {
+#if LLBC_TARGET_PLATFORM_WIN32
+    const char *fileBaseName = strrchr(file, LLBC_BACKLASH_A);
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_SLASH_A));
+    LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+#else
+    const char *fileBaseName = strrchr(file, LLBC_SLASH_A);
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_BACKLASH_A));
+    LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
+#endif
+    }
+
+    const auto now = LLBC_Time::Now();
+    LLBC_FilePrint(to,
+                   "[Log]%s [%-5s][%s:%d %s]<%s> - ",
+                   now.ToString().c_str(),
+                   lvDesc.c_str(),
+                   file ? file : "",
+                   line,
+                   func ? func : "",
+                   tag ? tag : "");
+
+    fwrite(msg, 1, msgLen, to);
 
     fflush(to);
 }

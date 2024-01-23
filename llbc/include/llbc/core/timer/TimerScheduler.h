@@ -92,7 +92,7 @@ private:
      * Get scheduler destroyed flag.
       *@return bool - destroyed flag.
      */
-    bool IsDstroyed() const;
+    bool IsDestroyed() const;
 
     /**
      * Schedule timer.
@@ -105,7 +105,7 @@ private:
 
     /**
      * Cancel timer.
-     * @param[in] - timer object.
+     * @param[in] timer - timer object.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Cancel(LLBC_Timer *timer);

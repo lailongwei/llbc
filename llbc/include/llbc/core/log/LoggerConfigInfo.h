@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_Property;
+class LLBC_Variant;
 
 __LLBC_NS_END
 
@@ -52,7 +52,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int Initialize(const LLBC_String &loggerName,
-                   const LLBC_Property &cfg,
+                   const LLBC_Variant &cfg,
                    const LLBC_LoggerConfigInfo *rootCfg);
 
 public:
@@ -157,6 +157,12 @@ public:
     const LLBC_String &GetLogFile() const;
 
     /**
+     * Get original log file name.
+     * @return const LLBC_String & - original log file name.
+     */
+    const LLBC_String &GetOriginalLogFile() const;
+
+    /**
      * Get log file suffix.
      * @return const LLBC_String & - log file suffix.
      */
@@ -182,9 +188,9 @@ public:
 
     /**
      * Get max log file size.
-     * @return long - max log file size.
+     * @return sint64 - max log file size.
      */
-    long GetMaxFileSize() const;
+    sint64 GetMaxFileSize() const;
 
     /**
      * Get max backup log file index.
@@ -219,6 +225,13 @@ private:
     void NormalizeLogFileName();
 
     /**
+     * Normalize log file size.
+     * @param logFileSize - the un-normalized log file size.
+     * @return sint64 - the normalized log file size.
+     */
+    sint64 NormalizeLogFileSize(const LLBC_String &logFileSize);
+
+    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
@@ -227,7 +240,6 @@ private:
     LLBC_String _loggerName;
     bool _notConfigUseRoot;
 
-    int _logLevel;
     bool _asyncMode;
     bool _independentThread;
     int _flushInterval;
@@ -243,12 +255,13 @@ private:
     int _fileLogLevel;
     LLBC_String _logDir;
     LLBC_String _logFile;
+    LLBC_String _originalLogFile;
     LLBC_String _logFileSuffix;
     bool _logCodeFilePath;
     bool _forceAppLogPath;
     LLBC_String _filePattern;
     int _fileRollingMode;
-    long _maxFileSize;
+    sint64 _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;

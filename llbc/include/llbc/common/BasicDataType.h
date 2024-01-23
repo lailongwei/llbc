@@ -42,7 +42,7 @@ __LLBC_NS_BEGIN
  typedef unsigned long ulong;
  typedef unsigned long long uint64;
  typedef long double ldouble;
- typedef unsigned short wchar;
+ typedef char16_t wchar;
 #else // LLBC_TARGET_PLATFORM_WIN32
  typedef __int8 sint8;
  typedef __int16 sint16;
@@ -218,7 +218,7 @@ typedef FILE * LLBC_FileHandle;
  typedef int (*LLBC_LibraryFun)(void);
 #else
  typedef HMODULE LLBC_LibraryHandle;
- typedef int (__cdecl *LLBC_LibraryFun)(void);
+ typedef int (__cdecl *LLBC_LibraryFun)();
 #endif
 #define LLBC_INVALID_LIBRARY_HANDLE nullptr
 
@@ -263,14 +263,10 @@ typedef const LLBC_GUID & LLBC_GUIDCRef;
  #define LLBC_INVALID_BUNDLE_HANDLE nullptr
 #endif
 
-// Session Ids data type define.
-typedef std::vector<int> LLBC_SessionIdList;
-typedef LLBC_SessionIdList::iterator LLBC_SessionIdListIter;
-typedef LLBC_SessionIdList::const_iterator LLBC_SessionIdListCIter;
-
+// Session Ids data type define(vector).
+typedef std::vector<int> LLBC_SessionIds;
+// Set Ids set data type define.
 typedef std::set<int> LLBC_SessionIdSet;
-typedef LLBC_SessionIdSet::iterator LLBC_SessionIdSetIter;
-typedef LLBC_SessionIdSet::const_iterator LLBC_SessionIdSetCIter;
 
 // Component dynamic create function define.
 // Note: the return pointer must be LLBC_Component(or its subclass) class instance.

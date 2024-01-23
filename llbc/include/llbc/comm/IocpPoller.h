@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The Iocp poller class encapsulation.
  */
-class LLBC_HIDDEN LLBC_IocpPoller : public LLBC_BasePoller
+class LLBC_HIDDEN LLBC_IocpPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_IocpPoller();

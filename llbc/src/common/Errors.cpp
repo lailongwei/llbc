@@ -175,6 +175,16 @@ int LLBC_GetLastError()
 
 void LLBC_SetLastError(int no, const char *customErrStr)
 {
+    // For win32 platform, cache os/netapi errno first, because
+    // tls operation api will reset the errno.
+    #if LLBC_TARGET_PLATFORM_WIN32
+    int osApiOrNetApiErrNo;
+    if (LLBC_ERROR_TYPE_IS_OSAPI(no))
+        osApiOrNetApiErrNo = static_cast<int>(::GetLastError());
+    else if (LLBC_ERROR_TYPE_IS_NETAPI(no))
+        osApiOrNetApiErrNo = ::WSAGetLastError();
+    #endif
+
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
     if (UNLIKELY(!libTls))
         return;
@@ -188,13 +198,10 @@ void LLBC_SetLastError(int no, const char *customErrStr)
         libTls->commonTls.subErrNo = errno;
     }
 #if LLBC_TARGET_PLATFORM_WIN32
-    else if (LLBC_ERROR_TYPE_IS_OSAPI(no))
+    else if (LLBC_ERROR_TYPE_IS_OSAPI(no) ||
+             LLBC_ERROR_TYPE_IS_NETAPI(no))
     {
-        libTls->commonTls.subErrNo = ::GetLastError();
-    }
-    else if (LLBC_ERROR_TYPE_IS_NETAPI(no))
-    {
-        libTls->commonTls.subErrNo = ::WSAGetLastError();
+        libTls->commonTls.subErrNo = osApiOrNetApiErrNo;
     }
 #endif
     else // Library error or Custom error.

@@ -36,9 +36,6 @@ __LLBC_NS_BEGIN
 
 LLBC_Bundle::LLBC_Bundle()
 : _bundle(LLBC_INVALID_BUNDLE_HANDLE)
-
-, _bundleName()
-, _bundlePath()
 {
 }
 

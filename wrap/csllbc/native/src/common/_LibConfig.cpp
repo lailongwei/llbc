@@ -97,9 +97,14 @@ int csllbc_LibConfig_Log_DefaultFileRollingMode()
     return LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
 }
 
-sint64 csllbc_LibConfig_Log_MaxFileSize()
+sint64 csllbc_LibConfig_Log_MaxFileSizeLimit()
 {
-    return LLBC_CFG_LOG_MAX_FILE_SIZE;
+    return LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT;
+}
+
+sint64 csllbc_LibConfig_Log_DefaultMaxFileSize()
+{
+    return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
 }
 
 int csllbc_LibConfig_Log_MaxBackupIndex()
@@ -172,9 +177,9 @@ int csllbc_LibConfig_Comm_MaxServiceFPS()
     return LLBC_CFG_COMM_MAX_SERVICE_FPS;
 }
 
-int csllbc_LibConfig_Comm_IsEnabledSamplerSupport()
+int csllbc_LibConfig_Comm_MaxCompNameLen()
 {
-    return LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT;
+    return LLBC_CFG_COMM_MAX_COMP_NAME_LEN;
 }
 
 int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
@@ -185,11 +190,6 @@ int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
 int csllbc_LibConfig_Comm_IsEnabledStatusHandler()
 {
     return LLBC_CFG_COMM_ENABLE_STATUS_HANDLER;
-}
-
-int csllbc_LibConfig_Comm_IsEnabledStatusDesc()
-{
-    return LLBC_CFG_COMM_ENABLE_STATUS_DESC;
 }
 
 int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()

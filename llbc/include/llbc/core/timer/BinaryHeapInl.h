@@ -56,7 +56,14 @@ inline bool LLBC_BinaryHeap<T, Comp>::IsEmpty() const
 }
 
 template <typename T, typename Comp>
-int LLBC_BinaryHeap<T, Comp>::FindTop(T &elem) const
+const T &LLBC_BinaryHeap<T, Comp>::Top() const
+{
+    ASSERT(LIKELY(_size != 0) && "BinaryHeap is empty");
+    return _elems[1];
+}
+
+template <typename T, typename Comp>
+int LLBC_BinaryHeap<T, Comp>::Top(T &elem) const
 {
     if (this->IsEmpty())
     {
@@ -188,7 +195,7 @@ int LLBC_BinaryHeap<T, Comp>::DeleteElem(size_t index, T &elem)
 }
 
 template <typename T, typename Comp>
-void LLBC_BinaryHeap<T, Comp>::MakeEmpty()
+void LLBC_BinaryHeap<T, Comp>::Clear()
 {
     _size = 0;
     _elems.resize(1);
@@ -208,12 +215,12 @@ const typename LLBC_BinaryHeap<T, Comp>::Container &LLBC_BinaryHeap<T, Comp>::Ge
 
 template <typename T, typename Comp>
 typename LLBC_BinaryHeap<T, Comp>::_This &LLBC_BinaryHeap<
-    T, Comp>::operator =(const typename LLBC_BinaryHeap<T, Comp>::_This &right)
+    T, Comp>::operator=(const typename LLBC_BinaryHeap<T, Comp>::_This &right)
 {
-    this->MakeEmpty();
+    this->Clear();
 
     this->_size = right._size;
-    this->_elems.assign(right.begin(), right.end());
+    this->_elems.assign(right._elems.begin(), right._elems.end());
 
     return *this;
 }
@@ -225,7 +232,7 @@ inline LLBC_BinaryHeap<T, Comp>::operator bool() const
 }
 
 template <typename T, typename Comp>
-inline bool LLBC_BinaryHeap<T, Comp>::operator !() const
+inline bool LLBC_BinaryHeap<T, Comp>::operator!() const
 {
     return this->IsEmpty();
 }

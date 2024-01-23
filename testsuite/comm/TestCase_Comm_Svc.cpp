@@ -93,7 +93,7 @@ public:
 
         // LLBC_Packet *resPacket = new LLBC_Packet;
         LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
-        resPacket->SetHeader(packet, OPCODE, 0);
+        resPacket->SetHeader(packet.GetSessionId(), OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
         GetService()->Send(resPacket);

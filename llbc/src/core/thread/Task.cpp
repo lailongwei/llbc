@@ -24,7 +24,6 @@
 
 #include "llbc/core/os/OS_Atomic.h"
 
-#include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/ThreadMgr.h"
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/Task.h"
@@ -179,7 +178,7 @@ void LLBC_Task::TaskEntry(void *arg)
     const int preSubThreadNum = LLBC_AtomicFetchAndSub(&_activatingThreadNum, 1);
     if (preSubThreadNum == _threadNum)
     {
-        // Makesure all task threads leaved Svc() meth.
+        // Make sure all task threads leaved Svc() meth.
         while (_inSvcMethThreadNum != 0)
             LLBC_Sleep(0);
 

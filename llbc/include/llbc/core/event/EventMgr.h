@@ -69,8 +69,9 @@ public:
 
     /**
      * Add event listener.
-     * @param[in] id - event Id.
-     * @param[in] listener - event listener.
+     * @param[in] id         - event Id.
+     * @param[in] listener   - event listener.
+     * @param[in]] boundStub - bound listener stub, if specific, will use bound stub.
      * @return LLBC_ListenerStub - return LLBC_INAVLID_LISTENER_STUB if failed, otherwise return validate stub.
      */
     virtual LLBC_ListenerStub AddListener(int id,
@@ -170,7 +171,7 @@ protected:
     typedef std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _Stub2ListenerInfos; // stub id 2 listeners
 
     int _firing;
-    LLBC_ListenerStub _maxListenerStub;
+    static sint64 _maxListenerStub;
 
     _Id2ListenerInfos _id2ListenerInfos;
     _Stub2ListenerInfos _stub2ListenerInfos;

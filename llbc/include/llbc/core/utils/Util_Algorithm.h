@@ -55,8 +55,8 @@ public:
 
 /**
  * Flow check when use add operations.
- * @param[in] val    - will check value.
- * @param[in] incVal - addent.
+ * @param[in] value  - will check value.
+ * @param[in] addent - addent.
  *
  * @return int - flow type.
  */
@@ -65,25 +65,13 @@ int LLBC_CheckFlowUseAdd(T value, T addent);
 
 /**
  * Flow check when using subtraction operation.
- * @param[in] val - will check value.
- * @param[in] sub - subtrahend.
+ * @param[in] value      - will check value.
+ * @param[in] subtrahend - subtrahend.
  *
  * @return int - flow type.
  */
 template <typename T>
 int LLBC_CheckFlowUseSub(T value, T subtrahend);
-
-/**
- * Convert an number to a string(Just use to adapt _itoa(), _i64toa(), _ui64toa() Platform relationship APIS).
- * @param[in] value - number to be convert.
- * @param[in] radix - base of value, must be in the range[2, 36].
- *
- * @return LLBC_String - string result.
- */
-LLBC_EXPORT LLBC_String LLBC_ItoA(sint32 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_UItoA(uint32 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_I64toA(sint64 value, int radix);
-LLBC_EXPORT LLBC_String LLBC_UI64toA(uint64 value, int radix);
 
 /**
  * Escape LLBC_String.

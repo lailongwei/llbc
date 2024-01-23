@@ -83,6 +83,11 @@ namespace
             LLBC_PrintLn("Update...");
         }
 
+        virtual void OnLateUpdate()
+        {
+            LLBC_PrintLn("Late Update...");
+        }
+
         virtual void OnIdle(const LLBC_TimeSpan &idleTime)
         {
             LLBC_PrintLn("Idle, idle time: %s...", idleTime.ToString().c_str());
@@ -106,7 +111,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create() const
+        virtual ITestComp *Create(LLBC_Service *service) const
         {
             return new TestComp;
         }
@@ -131,7 +136,7 @@ namespace
     class EchoCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual IEchoComp *Create() const
+        virtual IEchoComp *Create(LLBC_Service *service) const
         {
             return new EchoComp;
         }
@@ -263,7 +268,7 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
     LLBC_Service *svc = LLBC_Service::Create("CompTest");
     svc->SetFPS(1);
     svc->AddComponent<TestCompFactory>();
-    svc->SetDriveMode(LLBC_Service::ExternalDrive);
+    svc->SetDriveMode(LLBC_ServiceDriveMode::ExternalDrive);
 
     LLBC_PrintLn("Start service...");
     if (svc->Start(2) != LLBC_OK)

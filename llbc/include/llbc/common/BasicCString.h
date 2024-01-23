@@ -200,9 +200,9 @@ public:
     template <typename _CtorElem = _Elem,
               typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
     #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_BasicCString &operator =(nullptr_t _)
+    LLBC_BasicCString &operator=(nullptr_t _)
     #else
-    LLBC_BasicCString &operator =(std::nullptr_t _)
+    LLBC_BasicCString &operator=(std::nullptr_t _)
     #endif
     {
         _cstr = "";
@@ -218,9 +218,9 @@ public:
               typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
               typename = _CtorElem>
     #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_BasicCString &operator =(nullptr_t _)
+    LLBC_BasicCString &operator=(nullptr_t _)
     #else
-    LLBC_BasicCString &operator =(std::nullptr_t _)
+    LLBC_BasicCString &operator=(std::nullptr_t _)
     #endif
     {
         _cstr = L"";
@@ -233,7 +233,7 @@ public:
      * Literal string assignment operator.
      */
     template <size_type _ArrLen>
-    LLBC_BasicCString &operator =(const value_type (&arr)[_ArrLen])
+    LLBC_BasicCString &operator=(const value_type (&arr)[_ArrLen])
     {
         _cstr = arr;
         _size = LIKELY(_ArrLen > 0) ? _ArrLen - 1 : 0;
@@ -249,7 +249,7 @@ public:
                                                  std::is_same<
                                                      typename std::remove_const<
                                                          typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
-    LLBC_BasicCString &operator =(_Ptr cstr)
+    LLBC_BasicCString &operator=(_Ptr cstr)
     {
         if (LIKELY(cstr))
         {
@@ -274,7 +274,7 @@ public:
                                                      typename std::remove_const<
                                                          typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type,
               typename = _Ptr>
-    LLBC_BasicCString &operator =(_Ptr cstr)
+    LLBC_BasicCString &operator=(_Ptr cstr)
     {
         if (LIKELY(cstr))
         {
@@ -293,7 +293,7 @@ public:
     /**
      * std::basic_string<value_type> assignment operator.
      */
-    LLBC_BasicCString &operator =(const std::basic_string<value_type> &stlStr)
+    LLBC_BasicCString &operator=(const std::basic_string<value_type> &stlStr)
     {
         _cstr = stlStr.c_str();
         _size = stlStr.size();
@@ -304,15 +304,15 @@ public:
     /**
      * Copy assignment operator.
      */
-    LLBC_BasicCString &operator =(const LLBC_BasicCString &other)
+    LLBC_BasicCString &operator=(const LLBC_BasicCString &other)
     {
         memcpy(this, &other, sizeof(other));
         return *this;
     }
 
 public:
-    // operator []
-    const value_type &operator [](size_type index) const
+    // operator[]
+    const value_type &operator[](size_type index) const
     {
         #if LLBC_DEBUG
         ASSERT(LIKELY(index < _size) && "index out of range");
@@ -321,8 +321,8 @@ public:
         return _cstr[index];
     }
 
-    // operator +
-    LLBC_BasicCString operator +(difference_type offset) const
+    // operator+
+    LLBC_BasicCString operator+(difference_type offset) const
     {
         #if LLBC_DEBUG
         ASSERT(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
@@ -333,24 +333,24 @@ public:
         return LLBC_BasicCString(_cstr + offset, _size - offset);
     }
 
-    // operator -
-    LLBC_BasicCString operator -(difference_type offset) const
+    // operator-
+    LLBC_BasicCString operator-(difference_type offset) const
     {
         return operator+(-offset);
     }
 
 public:
-    // operator <
+    // operator<
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator <(const _Other &other) const
+    operator<(const _Other &other) const
     {
         return *this < LLBC_BasicCString(other);
     }
 
     template <typename _Other>
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator <(const _Other &other) const
+    operator<(const _Other &other) const
     {
         return _cstr != other._cstr &&
                 (_size < other._size ||
@@ -358,71 +358,71 @@ public:
                   memcmp(_cstr, other._cstr, sizeof(value_type) * _size) < 0));
     }
 
-    // operator ==
+    // operator==
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator ==(const _Other &other) const
+    operator==(const _Other &other) const
     {
         return this->operator==(LLBC_BasicCString(other));
     }
 
     template <typename _Other>
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator ==(const _Other &other) const
+    operator==(const _Other &other) const
     {
         return _cstr == other._cstr ||
             (_size == other._size &&
              memcmp(_cstr, other._cstr, sizeof(value_type) * _size) == 0);
     }
 
-    // operator !=
+    // operator!=
     template <typename _Other>
-    bool operator !=(const _Other &other) const
+    bool operator!=(const _Other &other) const
     {
         return !operator==(other);
     }
 
-    // operator <=
+    // operator<=
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator <=(const _Other &other) const
+    operator<=(const _Other &other) const
     {
         return !(LLBC_BasicCString(other) < *this);
     }
 
     template <typename _Other>
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator <=(const _Other &other) const
+    operator<=(const _Other &other) const
     {
         return !(other < *this);
     }
 
-    // operator >
+    // operator>
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator >(const _Other &other) const
+    operator>(const _Other &other) const
     {
         return LLBC_BasicCString(other) < *this;
     }
 
     template <typename _Other>
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator >(const _Other &other) const
+    operator>(const _Other &other) const
     {
         return other < *this;
     }
 
-    // operator >=
+    // operator>=
     template <typename _Other>
     typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator >=(const _Other &other) const
+    operator>=(const _Other &other) const
     {
         return !(*this < LLBC_BasicCString(other));
     }
 
     template <typename _Other>
     typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
-    operator >=(const _Other &other) const
+    operator>=(const _Other &other) const
     {
         return !(*this < other);
     }
@@ -436,7 +436,7 @@ private:
  * \brief The const string stream output function.
  */
 template <typename _Elem>
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
     return o <<cstr.c_str();
 }

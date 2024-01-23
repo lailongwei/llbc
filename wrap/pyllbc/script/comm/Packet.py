@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import llbc
+import weakref
 
 class pyllbcPacket(object):
-    def __init__(self, svc, sender_svc_id, session_id, opcode, status, data, cobj):
-        self.svc = svc
-        self.sender_svc_id = sender_svc_id
+    def __init__(self, svc, session_id, opcode, status, data, cobj):
+        self._svc = weakref.ref(svc)
         self.session_id = session_id
 
         self._local_ip = None
@@ -26,6 +26,10 @@ class pyllbcPacket(object):
         self._cobj = cobj
 
         self._str = None
+
+    @property
+    def svc(self):
+        return self._svc()
 
     @property
     def recver_svc_id(self):
@@ -104,9 +108,8 @@ class pyllbcPacket(object):
         self._extdata3 = self._cobj != 0 and llbc.inl.Packet_GetExtData3(self._cobj) or 0
         return self._extdata3
 
-    def _reuse(self, _, sender_svc_id, session_id, opcode, status, data, cobj):
+    def _reuse(self, _, session_id, opcode, status, data, cobj):
         """Reuse packet(internal call)"""
-        self.sender_svc_id = sender_svc_id
         self.session_id = session_id
 
         self._local_ip = None
@@ -131,7 +134,6 @@ class pyllbcPacket(object):
     def __str__(self):
         if self._str is None:
             d = {
-                'sender_svc_id': self.sender_svc_id,
                 'recver_svc_id': self.recver_svc_id,
                 'session_id': self.session_id,
                 'local_addr': '{}:{}'.format(self.local_ip, self.local_port),

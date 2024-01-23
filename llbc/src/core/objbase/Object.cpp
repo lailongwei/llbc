@@ -109,7 +109,7 @@ void LLBC_Object::Serialize(LLBC_Stream &s) const
     // ... ...
 }
 
-bool LLBC_Object::DeSerialize(LLBC_Stream &s)
+bool LLBC_Object::Deserialize(LLBC_Stream &s)
 {
     // Do nothing.
     // ... ...

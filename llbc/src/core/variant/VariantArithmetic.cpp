@@ -31,59 +31,59 @@ void LLBC_VariantArithmetic::Performs(LLBC_Variant &left, const LLBC_Variant &ri
 {
     switch (left.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
+    case LLBC_VariantType::RAW_BOOL:
         LLBC_VariantArithmetic::Performs_bool_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT8:
+    case LLBC_VariantType::RAW_SINT8:
         LLBC_VariantArithmetic::Performs_int8_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT8:
+    case LLBC_VariantType::RAW_UINT8:
         LLBC_VariantArithmetic::Performs_uint8_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT16:
+    case LLBC_VariantType::RAW_SINT16:
         LLBC_VariantArithmetic::Performs_int16_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_UINT16:
         LLBC_VariantArithmetic::Performs_uint16_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         LLBC_VariantArithmetic::Performs_int32_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         LLBC_VariantArithmetic::Performs_uint32_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         LLBC_VariantArithmetic::Performs_long_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         LLBC_VariantArithmetic::Performs_ulong_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         LLBC_VariantArithmetic::Performs_ptr_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         LLBC_VariantArithmetic::Performs_int64_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         LLBC_VariantArithmetic::Performs_uint64_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
+    case LLBC_VariantType::RAW_FLOAT:
         LLBC_VariantArithmetic::Performs_float_any(left, right, type);
         break;
 
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_DOUBLE:
         LLBC_VariantArithmetic::Performs_double_any(left, right, type);
         break;
 
@@ -97,56 +97,56 @@ void LLBC_VariantArithmetic::Performs_bool_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
+    case LLBC_VariantType::RAW_BOOL:
         left = Performs_raw_operation(left.AsBool(), right.AsBool(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT8:
+    case LLBC_VariantType::RAW_SINT8:
         left = Performs_raw_operation(left.AsInt8(), right.AsInt8(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT8:
+    case LLBC_VariantType::RAW_UINT8:
         left = Performs_raw_operation(left.AsUInt8(), right.AsUInt8(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT16:
+    case LLBC_VariantType::RAW_SINT16:
         left = Performs_raw_operation(left.AsInt16(), right.AsInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_UINT16:
         left = Performs_raw_operation(left.AsUInt16(), right.AsUInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -160,53 +160,53 @@ void LLBC_VariantArithmetic::Performs_int8_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
         left = Performs_raw_operation(left.AsInt8(), right.AsInt8(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT8:
+    case LLBC_VariantType::RAW_UINT8:
         left = Performs_raw_operation(left.AsUInt8(), right.AsUInt8(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT16:
+    case LLBC_VariantType::RAW_SINT16:
         left = Performs_raw_operation(left.AsInt16(), right.AsInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_UINT16:
         left = Performs_raw_operation(left.AsUInt16(), right.AsUInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -220,50 +220,50 @@ void LLBC_VariantArithmetic::Performs_uint8_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
         left = Performs_raw_operation(left.AsUInt8(), right.AsUInt8(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT16:
+    case LLBC_VariantType::RAW_SINT16:
         left = Performs_raw_operation(left.AsInt16(), right.AsInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_UINT16:
         left = Performs_raw_operation(left.AsUInt16(), right.AsUInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -277,47 +277,47 @@ void LLBC_VariantArithmetic::Performs_int16_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
         left = Performs_raw_operation(left.AsInt16(), right.AsInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_UINT16:
         left = Performs_raw_operation(left.AsUInt16(), right.AsUInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -331,44 +331,44 @@ void LLBC_VariantArithmetic::Performs_uint16_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
         left = Performs_raw_operation(left.AsUInt16(), right.AsUInt16(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -382,41 +382,41 @@ void LLBC_VariantArithmetic::Performs_int32_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
         left = Performs_raw_operation(left.AsInt32(), right.AsInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -430,38 +430,38 @@ void LLBC_VariantArithmetic::Performs_uint32_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
         left = Performs_raw_operation(left.AsUInt32(), right.AsUInt32(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -475,35 +475,35 @@ void LLBC_VariantArithmetic::Performs_long_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
-    case LLBC_VariantType::VT_RAW_LONG:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
+    case LLBC_VariantType::RAW_LONG:
         left = Performs_raw_operation(left.AsLong(), right.AsLong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -517,32 +517,32 @@ void LLBC_VariantArithmetic::Performs_ulong_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
-    case LLBC_VariantType::VT_RAW_LONG:
-    case LLBC_VariantType::VT_RAW_ULONG:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
+    case LLBC_VariantType::RAW_LONG:
+    case LLBC_VariantType::RAW_ULONG:
         left = Performs_raw_operation(left.AsULong(), right.AsULong(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -556,29 +556,29 @@ void LLBC_VariantArithmetic::Performs_ptr_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
-    case LLBC_VariantType::VT_RAW_LONG:
-    case LLBC_VariantType::VT_RAW_ULONG:
-    case LLBC_VariantType::VT_RAW_PTR:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
+    case LLBC_VariantType::RAW_LONG:
+    case LLBC_VariantType::RAW_ULONG:
+    case LLBC_VariantType::RAW_PTR:
         left = Performs_raw_operation(left.AsPtr<void>(), right.AsPtr<void>(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -592,26 +592,26 @@ void LLBC_VariantArithmetic::Performs_int64_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
-    case LLBC_VariantType::VT_RAW_LONG:
-    case LLBC_VariantType::VT_RAW_ULONG:
-    case LLBC_VariantType::VT_RAW_PTR:
-    case LLBC_VariantType::VT_RAW_SINT64:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
+    case LLBC_VariantType::RAW_LONG:
+    case LLBC_VariantType::RAW_ULONG:
+    case LLBC_VariantType::RAW_PTR:
+    case LLBC_VariantType::RAW_SINT64:
         left = Performs_raw_operation(left.AsInt64(), right.AsInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 
@@ -625,23 +625,23 @@ void LLBC_VariantArithmetic::Performs_uint64_any(
 {
     switch (right.GetType())
     {
-    case LLBC_VariantType::VT_RAW_BOOL:
-    case LLBC_VariantType::VT_RAW_SINT8:
-    case LLBC_VariantType::VT_RAW_UINT8:
-    case LLBC_VariantType::VT_RAW_SINT16:
-    case LLBC_VariantType::VT_RAW_UINT16:
-    case LLBC_VariantType::VT_RAW_SINT32:
-    case LLBC_VariantType::VT_RAW_UINT32:
-    case LLBC_VariantType::VT_RAW_LONG:
-    case LLBC_VariantType::VT_RAW_ULONG:
-    case LLBC_VariantType::VT_RAW_PTR:
-    case LLBC_VariantType::VT_RAW_SINT64:
-    case LLBC_VariantType::VT_RAW_UINT64:
+    case LLBC_VariantType::RAW_BOOL:
+    case LLBC_VariantType::RAW_SINT8:
+    case LLBC_VariantType::RAW_UINT8:
+    case LLBC_VariantType::RAW_SINT16:
+    case LLBC_VariantType::RAW_UINT16:
+    case LLBC_VariantType::RAW_SINT32:
+    case LLBC_VariantType::RAW_UINT32:
+    case LLBC_VariantType::RAW_LONG:
+    case LLBC_VariantType::RAW_ULONG:
+    case LLBC_VariantType::RAW_PTR:
+    case LLBC_VariantType::RAW_SINT64:
+    case LLBC_VariantType::RAW_UINT64:
         left = Performs_raw_operation(left.AsUInt64(), right.AsUInt64(), type);
         break;
 
-    case LLBC_VariantType::VT_RAW_FLOAT:
-    case LLBC_VariantType::VT_RAW_DOUBLE:
+    case LLBC_VariantType::RAW_FLOAT:
+    case LLBC_VariantType::RAW_DOUBLE:
         left = Performs_raw_operation(left.AsDouble(), right.AsDouble(), type);
         break;
 

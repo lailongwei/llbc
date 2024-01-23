@@ -106,8 +106,8 @@ void TestCase_Core_Recycle::DoBasicTest()
 
     std::cout << "- Test PoolObj get/release/delete: " << std::endl;
     {
-        LLBC_SafetyObjectPool pool;
-        std::cout << ">> Sizeof(LLBC_SafetyObjectPool): " << sizeof(pool) << std::endl;
+        LLBC_SafeObjectPool pool;
+        std::cout << ">> Sizeof(LLBC_SafeObjectPool): " << sizeof(pool) << std::endl;
         std::cout << ">> Begin get pool object from pool:" << std::endl;
         PoolObj *po = pool.Get<PoolObj>();
 
@@ -127,7 +127,7 @@ void TestCase_Core_Recycle::DoPerfTest()
     // Normal new/delete test.
     LLBC_Packet **pkts = LLBC_Malloc(LLBC_Packet *, sizeof(LLBC_Packet *) * BATCH_TEST_TIMES);
     std::cout << "Do LLBC_Packet new/delete test:" << std::endl;
-    sint64 beginTestTime = LLBC_GetMicroSeconds();
+    sint64 beginTestTime = LLBC_GetMicroseconds();
     for (int i = 0; i != TEST_TIMES; ++i)
     {
         for (int j = 0; j != BATCH_TEST_TIMES; ++j)
@@ -136,12 +136,12 @@ void TestCase_Core_Recycle::DoPerfTest()
         for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
             delete pkts[j];
     }
-    sint64 usedTime = LLBC_GetMicroSeconds() - beginTestTime;
+    sint64 usedTime = LLBC_GetMicroseconds() - beginTestTime;
     std::cout << "Normal LLBC_Packet new/delete test used time:" << usedTime << std::endl;
 
     // Normal new/recycle test.
     std::cout << "Do LLBC_Packet new/recycle test:" << std::endl;
-    beginTestTime = LLBC_GetMicroSeconds();
+    beginTestTime = LLBC_GetMicroseconds();
     for (int i = 0; i != TEST_TIMES; ++i)
     {
         for (int j = 0; j != BATCH_TEST_TIMES; ++j)
@@ -150,16 +150,16 @@ void TestCase_Core_Recycle::DoPerfTest()
         for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
             LLBC_Recycle(pkts[j]);
     }
-    usedTime = LLBC_GetMicroSeconds() - beginTestTime;
+    usedTime = LLBC_GetMicroseconds() - beginTestTime;
     std::cout << "Normal LLBC_Packet new/recycle test used time:" << usedTime << std::endl;
 
     // Object pool new/release test.
     std::cout << "Do LLBC_Packet object pool get/release test:" << std::endl;
     {
-        LLBC_UnsafetyObjectPool pool;
+        LLBC_UnsafeObjectPool pool;
         LLBC_ObjectPoolInst<LLBC_Packet> *poolInst = pool.GetPoolInst<LLBC_Packet>();
 
-        beginTestTime = LLBC_GetMicroSeconds();
+        beginTestTime = LLBC_GetMicroseconds();
         for (int i = 0; i != TEST_TIMES; ++i)
         {
             for (int j = 0; j != BATCH_TEST_TIMES; ++j)
@@ -168,17 +168,17 @@ void TestCase_Core_Recycle::DoPerfTest()
             for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
                 poolInst->Release(pkts[j]);
         }
-        usedTime = LLBC_GetMicroSeconds() - beginTestTime;
+        usedTime = LLBC_GetMicroseconds() - beginTestTime;
         std::cout << "LLBC_Packet object pool new/release test used time:" << usedTime << std::endl;
     }
 
     // Object pool new/release test.
     std::cout << "Do LLBC_Packet object pool get/recycle test:" << std::endl;
     {
-        LLBC_UnsafetyObjectPool pool;
+        LLBC_UnsafeObjectPool pool;
         LLBC_ObjectPoolInst<LLBC_Packet> *poolInst = pool.GetPoolInst<LLBC_Packet>();
 
-        beginTestTime = LLBC_GetMicroSeconds();
+        beginTestTime = LLBC_GetMicroseconds();
         for (int i = 0; i != TEST_TIMES; ++i)
         {
             for (int j = 0; j != BATCH_TEST_TIMES; ++j)
@@ -187,7 +187,7 @@ void TestCase_Core_Recycle::DoPerfTest()
             for (int j = BATCH_TEST_TIMES - 1; j != -1; --j)
                 LLBC_Recycle(pkts[j]);
         }
-        usedTime = LLBC_GetMicroSeconds() - beginTestTime;
+        usedTime = LLBC_GetMicroseconds() - beginTestTime;
         std::cout << "LLBC_Packet object pool new/recycle test used time:" << usedTime << std::endl;
     }
 

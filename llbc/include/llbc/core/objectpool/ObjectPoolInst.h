@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include "llbc/core/thread/ILock.h"
 #include "llbc/core/algo/RingBuffer.h"
-#include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/objectpool/IObjectPoolInst.h"
 
 // Disable some warnings.
@@ -34,19 +34,20 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-// Define BeginingSymbol/EndSymbol, CheckSymbolSize.
+// Define beginFlags/endFlags.
 #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-const size_t CheckSymbolSize = 8;
-
- #if LLBC_TARGET_PLATFORM_WIN32
-    const LLBC_NS sint64 BeginingSymbol = 0xcdcdcdcdcdcdcdcdI64;
-    const LLBC_NS sint64 EndingSymbol = 0xcdcdcdcdcdcdcdcdI64;
- #else // Non-Win32
-    const LLBC_NS sint64 BeginingSymbol = 0xcdcdcdcdcdcdcdcdLL;
-    const LLBC_NS sint64 EndingSymbol = 0xcdcdcdcdcdcdcdcdLL;
- #endif // LLBC_TARGET_PLATFORM_WIN32
-#else // NDEBUG
-const size_t CheckSymbolSize = 0;
+static constexpr LLBC_NS uint64 __objBeginFlags[4] {
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+};
+static constexpr LLBC_NS uint64 __objEndFlags[4] {
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+    0xcdcdcdcdcdcdcdcdull,
+};
 #endif // LLBC_CFG_CORE_OBJECT_POOL_DEBUG
 
 __LLBC_INTERNAL_NS_END
@@ -160,15 +161,15 @@ public:
     virtual const char *GetPoolInstName();
 
     /**
-     * Check this object pool instance is thread safety or not.
-     * @return bool - return true if is thread safety, otherwise thread unsafety.
+     * Check this object pool instance is thread safe or not.
+     * @return bool - return true if is thread safe, otherwise thread unsafe.
      */
-    virtual bool IsThreadSafety() const;
+    virtual bool IsThreadSafe() const;
 
 public:
     /**
      * Perform object pool statistic.
-     * @param[out] stat - the statstic info.
+     * @param[out] stat - the statistic info.
      */
     virtual void Stat(LLBC_ObjectPoolInstStat &stat) const;
 
@@ -214,11 +215,11 @@ private:
 private:
     const char *_poolInstName;
 
-    const int _elemSize;
-    const int _elemCnt;
-    const int _blockSize;
+    const size_t _elemSize;
+    const size_t _elemCnt;
+    const size_t _blockSize;
 
-    int _blockCnt;
+    size_t _blockCnt;
     MemoryBlock **_blocks;
     LLBC_RingBuffer<MemoryBlock *> _freeBlocks;
 

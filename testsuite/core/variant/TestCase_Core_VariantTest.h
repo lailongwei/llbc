@@ -31,9 +31,11 @@ public:
 
 private:
     void BasicTest();
+    void EnumTest();
     void CompareTest();
     void CompositeKeyTest();
     void ArithmeticTest();
+    void PairTest();
     void SeqTest();
     void DictTest();
     void SerializeTest();

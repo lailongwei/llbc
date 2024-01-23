@@ -25,7 +25,7 @@
 
 __LLBC_NS_BEGIN
 
-class LLBC_HIDDEN LLBC_SelectPoller : public LLBC_BasePoller
+class LLBC_HIDDEN LLBC_SelectPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_SelectPoller();

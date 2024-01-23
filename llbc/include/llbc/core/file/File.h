@@ -232,9 +232,9 @@ public:
 public:
     /**
      * Get file size.
-     * @return long - the file size, if failed, return -1.
+     * @return sint64 - the file size, if failed, return -1.
      */
-    long GetFileSize() const;
+    sint64 GetFileSize() const;
 
     /**
      * Move the file pointer to a specified location.
@@ -242,33 +242,33 @@ public:
      * @param[in] offset     - number of bytes from origin.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Seek(int seekOrigin, long offset);
+    int Seek(int seekOrigin, sint64 offset);
 
     /**
      * Get file position.
-     * @return long - the file position, if failed, return -1.
+     * @return sint64 - the file position, if failed, return -1.
      */
-    long GetFilePosition() const;
+    sint64 GetFilePosition() const;
 
     /**
      * Set file position.
      * @param[in] position - the new file position.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetFilePosition(long position);
+    int SetFilePosition(sint64 position);
 
     /**
      * Offset file position.
      * @param[in] offset - the file offset.
-     * @return long - the new file position.
+     * @return sint64 - the new file position.
      */
-    long OffsetFilePosition(long offset);
+    sint64 OffsetFilePosition(sint64 offset);
 
     /**
      * Get file readable size.
-     * @return long - the file readable size.
+     * @return sint64 - the file readable size.
      */
-    long GetReadableSize() const;
+    sint64 GetReadableSize() const;
 
 public:
     /**
@@ -308,11 +308,11 @@ public:
      * File bytes read method.
      * @param[in] buf  - storage location for data.
      * @param[in] size - buffer size in bytes.
-     * @return long - actually read size, if -1, read failed, else if 0 < actuallyRead < size, 
-     *                it means truncated(LLBC_GetLastError() will return LLBC_ERROR_TRUNCATED),
-     *                otherwise success.
+     * @return sint64 - actually read size, if -1, read failed, else if 0 < actuallyRead < size, 
+     *                  it means truncated(LLBC_GetLastError() will return LLBC_ERROR_TRUNCATED),
+     *                  otherwise success.
      */
-    long Read(void *buf, size_t size);
+    sint64 Read(void *buf, size_t size);
 
 public:
     /**
@@ -336,28 +336,29 @@ public:
     int Write(const double &doubleVal);
     int Write(const ldouble &ldoubleVal);
     int Write(const char *cstr);
-    int Write(const LLBC_String &str);
-    int Write(const LLBC_WString &wstr);
-    int Write(const std::string &str);
-    int Write(const std::wstring &wstr);
+    template <typename StrType>
+    typename std::enable_if<LLBC_IsTemplSpec<StrType, std::basic_string>::value ||
+                            LLBC_IsTemplSpec<StrType, LLBC_BasicString>::value ||
+                            LLBC_IsTemplSpec<StrType, LLBC_BasicCString>::value, int>::type
+    Write(const StrType &str);
 
     /**
      * Write line data.
      * @param[in] line          - the line content.
      * @param[in] newLineFormat - the new line format, default is AutoMatch. 
-     * @return int - actually written size, in bytes, if write failed, return -1,
-     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     * @return sint64 - actually written size, in bytes, if write failed, return -1,
+     *                  else if 0 < actuallyWrote < size, it means truncated, otherwise success.
      */
-    long WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+    sint64 WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
 
     /**
      * File bytes write method.
      * @param[in] buf  - pointer to data to be written.
      * @param[in] size - buffer size in bytes.
-     * @return int - actually written size, in bytes, if write failed, return -1,
-     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     * @return sint64 - actually written size, in bytes, if write failed, return -1,
+     *                  else if 0 < actuallyWrote < size, it means truncated, otherwise success.
      */
-    long Write(const void *buf, size_t size);
+    sint64 Write(const void *buf, size_t size);
 
     /**
      * Flush file.

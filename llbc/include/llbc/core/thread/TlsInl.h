@@ -39,25 +39,25 @@ LLBC_Tls<ValueType>::~LLBC_Tls()
 }
 
 template <typename ValueType>
-ValueType *LLBC_Tls<ValueType>::operator ->()
+ValueType *LLBC_Tls<ValueType>::operator->()
 {
     return this->GetValue();
 }
 
 template <typename ValueType>
-const ValueType *LLBC_Tls<ValueType>::operator ->() const
+const ValueType *LLBC_Tls<ValueType>::operator->() const
 {
     return this->GetValue();
 }
 
 template <typename ValueType>
-ValueType &LLBC_Tls<ValueType>::operator *()
+ValueType &LLBC_Tls<ValueType>::operator*()
 {
     return *(this->GetValue());
 }
 
 template <typename ValueType>
-const ValueType &LLBC_Tls<ValueType>::operator *() const
+const ValueType &LLBC_Tls<ValueType>::operator*() const
 {
     return *(this->GetValue());
 }

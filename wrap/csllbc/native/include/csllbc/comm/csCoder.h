@@ -83,9 +83,6 @@ public:
      * Create csharp layer coder.
      */
     virtual LLBC_Coder *Create() const;
-
-private:
-    sint64 _packetId;
 };
 
 

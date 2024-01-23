@@ -31,6 +31,7 @@ public:
 
 private:
     int BasicTest();
+    int EnumTest();
     int ConstructAndAssignmentTest();
     int AttachTest();
     int DetachTest();

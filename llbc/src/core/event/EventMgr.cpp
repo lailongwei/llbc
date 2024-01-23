@@ -31,6 +31,8 @@
 
 __LLBC_NS_BEGIN
 
+sint64 LLBC_EventMgr::_maxListenerStub = 1;
+
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)
 , stub(0)
@@ -46,7 +48,6 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
-, _maxListenerStub(0)
 
 , _pendingRemoveAllListeners(false)
 {
@@ -229,10 +230,10 @@ void LLBC_EventMgr::Fire(LLBC_Event *ev)
 
 LLBC_EventFirer &LLBC_EventMgr::BeginFire(int evId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromUnsafetyPool<LLBC_Event>();
+    LLBC_Event *ev = LLBC_GetObjectFromUnsafePool<LLBC_Event>();
     ev->SetId(evId);
 
-    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafetyPool<LLBC_EventFirer>();
+    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafePool<LLBC_EventFirer>();
     evFirer->SetEventInfo(ev, this);
 
     return *evFirer;
@@ -299,7 +300,9 @@ int LLBC_EventMgr::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_Lis
     }
     else
     {
-        stub = ++_maxListenerStub;
+        stub = static_cast<LLBC_ListenerStub>(
+            LLBC_AtomicFetchAndAdd(&_maxListenerStub, 1));
+        ASSERT(stub != 0 && "Event stubs are exhausted");
     }
 
     return LLBC_OK;

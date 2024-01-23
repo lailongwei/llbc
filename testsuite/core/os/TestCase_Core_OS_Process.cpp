@@ -40,12 +40,12 @@ int TestCase_Core_OS_Process::TestCrash()
 {
     std::cout << "Crash hook test:" << std::endl;
 
-#if LLBC_SUPPORT_HOOK_PROCESS_CRASH
+#if LLBC_SUPPORT_HANDLE_CRASH
     // Set crash hook.
-    std::cout << "Hook process crash..." << std::endl;
-    if (LLBC_HookProcessCrash() != LLBC_OK)
+    std::cout << "Handle crash..." << std::endl;
+    if (LLBC_HandleCrash() != LLBC_OK)
     {
-        std::cerr << "Hook process crash failed, err:" << LLBC_FormatLastError() << std::endl;
+        std::cerr << "Handle crash failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
 
@@ -55,7 +55,7 @@ int TestCase_Core_OS_Process::TestCrash()
 
     return LLBC_OK;
 #else
-    // Unsupported hook process crash.
+    // Unsupported handle crash.
     return LLBC_OK;
 #endif
 }

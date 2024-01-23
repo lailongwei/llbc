@@ -38,10 +38,10 @@
 #define LLBC_CFG_OS_IMPL_SYMBOL                             1
 // Determine max symbol name when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME                  127
-// Determine max cpature frames count when enabled OS/Symbol functions.
+// Determine max capture frames count when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
-// Determine hook crash single set.
-#define LLBC_CFG_OS_HOOK_CRASH_SINGLES                      {SIGSEGV, SIGABRT, SIGFPE}
+// Determine crash signal set.
+#define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE}
 
 /**
  * \brief Common about config options define.
@@ -118,7 +118,7 @@
 #define LLBC_CFG_LOG_ROOT_LOGGER_NAME                       "root"
 // Logger format buf size.
 #define LLBC_CFG_LOG_FORMAT_BUF_SIZE                        16 * 1024
-// Default log level is set to DEBUG(TRACE:0, DEBUG:1, INFO:2, WARN:3, ERROR:4, FATAL:5).
+// Default log level is set to DEBUG(DEBUG:0, TRACE:1, INFO:2, WARN:3, ERROR:4, FATAL:5).
 #define LLBC_CFG_LOG_DEFAULT_LEVEL                          0
 // Default DEBUG/INFO level log to console flush attr.
 # define LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE               0
@@ -146,10 +146,12 @@
 #define LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN               "%T %f:%l@[%N][%L] - %m%n"
 // Default file rolling mode: no rolling.
 #define LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE              0
+// Max log file size limit.
+#define LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT                    (10ll * 1024 * 1024 * 1024)
 // Default max log file size.
-#define LLBC_CFG_LOG_MAX_FILE_SIZE                          LONG_MAX
+#define LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE                  (1ll * 1024 * 1024 * 1024)
 // Default max backup file index.
-#define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       1000
+#define LLBC_CFG_LOG_MAX_BACKUP_INDEX                       10
 // Default log file buffer size, in bytes.
 #define LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE           40960
 // Default log appenders flush interval, in milli-seconds.
@@ -190,7 +192,7 @@
  #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
 #endif
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     0
+#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     1
 // Object reset match methods control.
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
 #define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
@@ -254,16 +256,14 @@
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
 #define LLBC_CFG_COMM_MAX_SERVICE_FPS                       1000
-// Sampler support option, default is true.
-#define LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT                1
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine enable the service has status handler support or not.
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
-// Determine enable the service has status desc support or not.
-#define LLBC_CFG_COMM_ENABLE_STATUS_DESC                    1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
+// Max component name length.
+#define LLBC_CFG_COMM_MAX_COMP_NAME_LEN                     255
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // The poller model config(Platform specific).
@@ -297,9 +297,9 @@
                                                      MiniDumpWithThreadInfo)
 #endif
 // Application try start interval(Call OnStart() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_START_INTERVAL             100
+#define LLBC_CFG_APP_TRY_START_INTERVAL             5
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
-#define LLBC_CFG_APP_TRY_STOP_INTERVAL              100
+#define LLBC_CFG_APP_TRY_STOP_INTERVAL              5
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}

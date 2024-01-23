@@ -89,7 +89,7 @@ namespace
 
         LLBC_String Goo(int x, LLBC_CString y)
         {
-            return LLBC_Num2Str(x) + y.c_str();
+            return LLBC_NumToStr(x) + y.c_str();
         }
 
     private:
@@ -126,7 +126,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create() const
+        virtual ITestComp *Create(LLBC_Service *service) const
         {
             return new TestComp;
         }

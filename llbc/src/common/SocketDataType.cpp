@@ -36,7 +36,7 @@
  #pragma warning(disable: 4996)
 #endif // Win32
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a)
 {
     LLBC_NS LLBC_String str;
     str.format("%s:%d", a.GetIpAsString().c_str(), a.GetPort());
@@ -262,13 +262,13 @@ LLBC_String LLBC_SockAddr_IN::ToString() const
     return desc;
 }
 
-LLBC_SockAddr_IN &LLBC_SockAddr_IN::operator =(const LLBC_SockAddr_IN &right)
+LLBC_SockAddr_IN &LLBC_SockAddr_IN::operator=(const LLBC_SockAddr_IN &right)
 {
     memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
     return *this;
 }
 
-bool LLBC_SockAddr_IN::operator ==(const LLBC_SockAddr_IN &right) const
+bool LLBC_SockAddr_IN::operator==(const LLBC_SockAddr_IN &right) const
 {
     if (this == &right)
         return true;
@@ -292,7 +292,6 @@ LLBC_Overlapped::LLBC_Overlapped()
 
 LLBC_OverlappedGroup::LLBC_OverlappedGroup()
 : _sock(LLBC_INVALID_SOCKET_HANDLE)
-, _ols()
 
 , _delDataProc(nullptr)
 {

@@ -140,6 +140,5 @@ void pyllbc_ErrorHooker::Hook_ErrSet(const LLBC_String &errDesc, int llbcErr, Py
         Py_INCREF(_tbObj);
 
     _llbcErrNo = llbcErr;
-    _errDesc.clear();
-    _errDesc.append(errDesc);
+    _errDesc.assign(errDesc.c_str(), errDesc.size());
 }

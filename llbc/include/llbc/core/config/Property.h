@@ -191,7 +191,7 @@ public:
     int SetComments(const LLBC_String &name, const LLBC_String &comments);
 
 public:
-    This &operator =(const This &another);
+    This &operator=(const This &another);
 
 private:
     void Cleanup();

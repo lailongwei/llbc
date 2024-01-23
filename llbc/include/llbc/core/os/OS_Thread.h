@@ -82,7 +82,7 @@ public:
  *                            llbc/common/BasicDataType.h header file.
  * @param[in] priority      - thread priority, see LLBC_ThreadPriority class.
  * @param[in] stackSize     - thread stack size, in bytes.
- * @return int - return 0 if create successed, otherwise return false.
+ * @return int - return 0 if created successfully, otherwise return false.
  */
 LLBC_EXPORT int LLBC_CreateThread(LLBC_ThreadProc proc,
                                   LLBC_ThreadArg arg,

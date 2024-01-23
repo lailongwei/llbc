@@ -386,17 +386,17 @@ LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
 
 LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
 {
-    Obj *o = nullptr;
 
     int errNo = LLBC_GetLastError();
     int subErrNo = LLBC_GetSubErrorNo();
 
+    Obj *obj;
     LLBC_Array *arr = new LLBC_Array;
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); ++iter)
     {
-        if ((o = ObjectAtIndex(*iter)))
-            arr->PushBack(o);
+        if ((obj = ObjectAtIndex(*iter)))
+            arr->PushBack(obj);
     }
 
     LLBC_SetLastError(errNo);
@@ -405,18 +405,18 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
     return arr;
 }
 
-LLBC_Array::Obj *&LLBC_Array::operator [](LLBC_Array::difference_type off)
+LLBC_Array::Obj *&LLBC_Array::operator[](LLBC_Array::difference_type off)
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }
 
-LLBC_Array::ConstObj *LLBC_Array::operator [](LLBC_Array::difference_type off) const
+LLBC_Array::ConstObj *LLBC_Array::operator[](LLBC_Array::difference_type off) const
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }
@@ -464,7 +464,7 @@ void LLBC_Array::Serialize(LLBC_Stream &s) const
         s <<*it;
 }
 
-bool LLBC_Array::DeSerialize(LLBC_Stream &s)
+bool LLBC_Array::Deserialize(LLBC_Stream &s)
 {
     if (UNLIKELY(!_objFactory))
         return false;

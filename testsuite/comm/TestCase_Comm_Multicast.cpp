@@ -60,7 +60,7 @@ public:
     virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
         int sessionId = destroyInfo.GetSessionId();
-        for (LLBC_SessionIdListIter it = _sessionIds.begin();
+        for (auto it = _sessionIds.begin();
              it != _sessionIds.end();
              it++)
             if (*it == sessionId)
@@ -95,7 +95,7 @@ private:
     bool _asClient;
     bool _useBst;
 
-    LLBC_SessionIdList _sessionIds;
+    LLBC_SessionIds _sessionIds;
 };
 
 }

@@ -157,7 +157,7 @@ public:
      */
     LLBC_DictionaryElem *GetBucketElemPrev();
     /**
-     * Get previous buckt element.
+     * Get previous bucket element.
      * @return LLBC_DictionaryElem * - the previous bucket element.
      */
     const LLBC_DictionaryElem *GetBucketElemPrev() const;
@@ -187,8 +187,8 @@ public:
     /**
      * Operator *.
      */
-    LLBC_Object *&operator *();
-    LLBC_Object * const &operator *() const;
+    LLBC_Object *&operator*();
+    LLBC_Object * const &operator*() const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DictionaryElem);
 

@@ -33,7 +33,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         str[i] = static_cast<char>(i);
     }
 
-    LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, 32).c_str());
+    LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, ' ', 16).c_str());
     LLBC_Print("\n");
 
     // CPUTime test.
@@ -89,9 +89,9 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     {
         LLBC_PrintLn("- Test static LLBC_CPUTime::ToXXX() method:");
         LLBC_PrintLn("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMilliSeconds(100000000llu):%lld", LLBC_CPUTime::ToMilliSeconds(100000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMicroSeconds(10000000llu):%lld", LLBC_CPUTime::ToMicroSeconds(10000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToNanoSeconds(1000000llu):%lld", LLBC_CPUTime::ToNanoSeconds(1000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMillis(100000000llu):%lld", LLBC_CPUTime::ToMillis(100000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToMicros(10000000llu):%lld", LLBC_CPUTime::ToMicros(10000000llu));
+        LLBC_PrintLn("  - LLBC_CPUTime::ToNanos(1000000llu):%lld", LLBC_CPUTime::ToNanos(1000000llu));
         LLBC_Print("\n");
     }
 

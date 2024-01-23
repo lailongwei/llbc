@@ -38,7 +38,7 @@ LLBC_LogMessageBuffer::~LLBC_LogMessageBuffer()
     LLBC_XDelete(_stream);
 }
 
-LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const LLBC_String &msg)
+LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator<<(const LLBC_String &msg)
 {
     _buf.append(msg);
     if (_stream)
@@ -47,7 +47,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const LLBC_String &msg
     return *this;
 }
 
-LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const std::basic_string<char> &msg)
+LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator<<(const std::basic_string<char> &msg)
 {
     _buf.append(msg.c_str(), msg.length());
     if (_stream)
@@ -56,12 +56,12 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const std::basic_strin
     return *this;
 }
 
-LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(char *msg)
+LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator<<(char *msg)
 {
-    return operator <<((const char *)msg);
+    return operator<<((const char *)msg);
 }
 
-LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const char *msg)
+LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator<<(const char *msg)
 {
     const char *actualMsg = msg;
     if (UNLIKELY(!actualMsg))
@@ -74,7 +74,7 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(const char *msg)
     return *this;
 }
 
-LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(char msg)
+LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator<<(char msg)
 {
     _buf.append(1, msg);
     if (_stream)
@@ -83,77 +83,77 @@ LLBC_LogMessageBuffer &LLBC_LogMessageBuffer::operator <<(char msg)
     return *this;
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(bool val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(bool val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(uint8 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(uint8 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(sint16 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(sint16 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(uint16 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(uint16 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(sint32 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(sint32 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(uint32 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(uint32 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(sint64 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(sint64 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(uint64 val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(uint64 val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(long val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(long val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(ulong val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(ulong val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(float val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(float val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(double val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(double val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(ldouble val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(ldouble val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(void *val)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(void *val)
 {
-    return static_cast<std::basic_ostream<char> &>(*this).operator <<(val);
+    return static_cast<std::basic_ostream<char> &>(*this).operator<<(val);
 }
 
-std::basic_ostream<char> &LLBC_LogMessageBuffer::operator <<(ios_base_manip manip)
+std::basic_ostream<char> &LLBC_LogMessageBuffer::operator<<(ios_base_manip manip)
 {
     std::basic_ostream<char> &s = *this;
     (*manip)(s);

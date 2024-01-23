@@ -31,7 +31,7 @@ class ClientPacketHandler(object):
     def __call__(self, packet):
         payload = packet.data
         data = payload.unpackstr()
-        payload.pos = 0
+        payload.rpos = 0
         print 'Client recv packet: {}'.format(data)
         packet.svc.send(session_id=packet.session_id, data=data, opcode=TEST_REQ)
 
@@ -40,7 +40,7 @@ class ClientPacketPreHandler(object):
     def __call__(self, packet):
         payload = packet.data
         data = packet.unpackstr()
-        payload.pos = 0
+        payload.rpos = 0
         print 'Client prev-recv packet: {}'.format(data)
         return True
 
@@ -49,9 +49,9 @@ class ClientPacketUnifyPreHandler(object):
     def __call__(self, packet):
         payload = packet.data
         data = payload.unpackstr()
-        payload.pos = 0
-        print 'Client unify prev-recv packet: {}(len:{}), stream.pos:{}, stream.cap:{}'.format(
-            data, data.__len__(), payload.pos, payload.cap)
+        payload.rpos = 0
+        print 'Client unify prev-recv packet: {}(len:{}), stream.rpos:{}, stream.wpos:{}, stream.cap:{}'.format(
+            data, data.__len__(), payload.rpos, payload.wpos, payload.cap)
         return True
 
 
@@ -95,7 +95,10 @@ class ServerPacketUnifyPreHandler(object):
         self._times = 0
 
     def __call__(self, packet):
-        print 'Server unify pre-recv packet: {}'.format(packet.data)
+        payload = packet.data
+        data = payload.unpackstr()
+        payload.rpos = 0
+        print 'Server unify prev-recv packet: {}'.format(data)
         self._times += 1
         if self._times == self._RECV_TIMES_LIMIT:
             print 'Server recv times >= {}, will remove this session'.format(self._RECV_TIMES_LIMIT)

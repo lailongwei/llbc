@@ -23,12 +23,10 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/objectpool/PoolObjectReflection.h"
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/Logger.h"
-#include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
@@ -101,7 +99,7 @@ void LLBC_LogRunnable::Svc()
         if (!TryPopAndProcLogDatas())
             LLBC_Sleep(1);
 
-        FlushLoggers(false, LLBC_GetMilliSeconds());
+        FlushLoggers(false, LLBC_GetMilliseconds());
     }
 }
 

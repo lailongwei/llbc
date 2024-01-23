@@ -103,13 +103,13 @@ public:
         return _elem->GetObject();
     }
 
-    const cobject_type &operator *() const
+    const cobject_type &operator*() const
     {   // return designed object.
         _Checkit();
         return **_elem;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         if (_elem)
         {
@@ -122,14 +122,14 @@ public:
         return *this;
     }
 
-    iterator operator ++(int)
+    iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         if (_elem)
         {
@@ -142,24 +142,24 @@ public:
         return *this;
     }
 
-    iterator operator --(int)
+    iterator operator--(int)
     {   // postdecrement.
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    bool operator ==(const iterator &rhs) const
+    bool operator==(const iterator &rhs) const
     {   // test for iterator equality.
         return _elem == rhs._elem;
     }
 
-    bool operator !=(const iterator &rhs) const
+    bool operator!=(const iterator &rhs) const
     {   // test for iterator inequality.
         return !(*this == rhs);
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iterator.
         _elem = rhs._elem;
         return *this;
@@ -233,38 +233,38 @@ public:
         return _elem;
     }
 
-    object_type &operator *()
+    object_type &operator*()
     {   // return designated object.
         return **_elem;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         ++(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator ++(int)
+    const iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         --(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator --(int)
+    const iterator operator--(int)
     {   // postdecrement.
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iter.
         (*(_MyBase *)this) = rhs;
         return *this;
@@ -399,7 +399,7 @@ public:
      * Serialize/Deserialize support.
      */
     virtual void Serialize(LLBC_Stream &s) const;
-    virtual bool DeSerialize(LLBC_Stream &s);
+    virtual bool Deserialize(LLBC_Stream &s);
 
     /**
      * Disable assignment.

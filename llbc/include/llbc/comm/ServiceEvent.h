@@ -119,7 +119,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
 };
 
 /**
- * \brief The data-arrival event structure enapsulation.
+ * \brief The data-arrival event structure encapsulation.
  */
 struct LLBC_HIDDEN LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
 {
@@ -238,7 +238,7 @@ public:
      * Build async-connect result event.
      */
     static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
-                                                     bool conneted,
+                                                     bool connected,
                                                      const LLBC_String &reason,
                                                      const LLBC_SockAddr_IN &peer);
 

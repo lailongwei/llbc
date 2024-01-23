@@ -66,7 +66,7 @@ public:
     /**
      * Hash specific bytes.
      * @param bytes - the will hash bytes.
-     * @param len   - the will has bytes length.
+     * @param size  - the will has bytes length.
      * @return uint32 - the hash value.
      */
     template <int Algo = LLBC_HashAlgo::Default>
@@ -76,21 +76,16 @@ public:
      * Hash specific bytes.
      * @param[in] algo  - the key hash algorithm type.
      * @param[in] bytes - the will has bytes.
-     * @param[in] len   - the will hash bytes length.
+     * @param[in] size  - the will hash bytes length.
      * @return uint32 - the hash value.
      */
     uint32 operator()(int algo, const void *bytes, size_t size);
 
 private:
     /**
-     * Define Hash base class. 
-     */
-    typedef std::binary_function<const void *, size_t, uint32> _HashBase;
-
-    /**
      * BKDR hash algorithm.
      */
-    struct _BKDRHash : public _HashBase
+    struct _BKDRHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -98,7 +93,7 @@ private:
     /**
      * DJB hash algorithm.
      */
-    struct _DJBHash : public _HashBase
+    struct _DJBHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -106,7 +101,7 @@ private:
     /**
      * SDBM hash algorithm.
      */
-    struct _SDBMHash : public _HashBase
+    struct _SDBMHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -114,7 +109,7 @@ private:
     /**
      * RS hash algorithm.
      */
-    struct _RSHash : public _HashBase
+    struct _RSHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -122,7 +117,7 @@ private:
     /**
      * JS hash algorithm.
      */
-    struct _JSHash : public _HashBase
+    struct _JSHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -130,7 +125,7 @@ private:
     /**
      * P. J. Weinberger hash algorithm.
      */
-    struct _PJHash : public _HashBase
+    struct _PJHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -138,7 +133,7 @@ private:
     /**
      * ELF hash algorithm.
      */
-    struct _ELFHash : public _HashBase
+    struct _ELFHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -146,7 +141,7 @@ private:
     /**
      * AP hash algorithm.
      */
-    struct _APHash : public _HashBase
+    struct _APHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };

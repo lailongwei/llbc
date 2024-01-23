@@ -11,7 +11,7 @@ import os
 from os import path as op
 import shutil
 import re
-import md5
+import hashlib 
 
 # This script file path
 SCRIPT_PATH = op.abspath(op.dirname(__file__))
@@ -104,7 +104,7 @@ class NativeFunctionInfo(object):
             arg_begin_pos = len(method_begin)
 
         cs_args = self.cs_args
-        for i in xrange(len(cs_args)):
+        for i in range(len(cs_args)):
             if i != 0:
                 if self.args_multiline:
                     stmt += ',\n' + ' ' * arg_begin_pos
@@ -171,7 +171,7 @@ class NativeCodeFile(object):
     def parse(self, native_header_file):
         """Parse C++ native code file"""
         self._native_header_file = native_header_file
-        with open(native_header_file, 'rb') as f:
+        with open(native_header_file, 'r') as f:
             for line in f.readlines():
                 self._parse_line(line)
 
@@ -195,18 +195,20 @@ class NativeCodeFile(object):
 
         # write c# code to tempory file.
         temp_code_path = op.join(code_dir, '_____' + code_file + '.temp')
-        with open(temp_code_path, 'wb') as f:
+        with open(temp_code_path, 'w') as f:
             f.write(self._csharp_code)
 
         if not op.exists(self.csharp_code_path):
-            print 'Generated native method import c# code file: {}'.format(self.csharp_code_path)
+            print('Generated native method import c# code file: {}'.format(self.csharp_code_path))
             shutil.move(temp_code_path, self.csharp_code_path)
         else:
             with open(self.csharp_code_path, 'rb') as f:
-                old_digest = md5.new(f.read()).digest()
-            new_digest = md5.new(self._csharp_code).digest()
-            if new_digest != old_digest:
-                print 'Update native method import c# code file: {}'.format(self.csharp_code_path)
+                old_digest = hashlib.md5()
+                old_digest.update(f.read())
+            new_digest = hashlib.md5()
+            new_digest.update(self._csharp_code.encode('utf-8'))
+            if new_digest.digest() != old_digest.digest():
+                print('Update native method import c# code file: {}'.format(self.csharp_code_path))
                 shutil.move(temp_code_path, self.csharp_code_path)
             else:
                 os.remove(temp_code_path)
@@ -290,7 +292,7 @@ class NativeCodeFile(object):
         a('    {')
 
     def _append_methods(self):
-        for i in xrange(len(self._function_infos)):
+        for i in range(len(self._function_infos)):
             function_info = self._function_infos[i]
             self._append_line(function_info.to_csharp_import_stmt())
             if i != len(self._function_infos) - 1:
@@ -329,7 +331,7 @@ def main():
                 fileCount += 1
                 native_file.gen_csharp_code_file()
 
-    print 'All C# wrap code generated, file count: {}'.format(fileCount)
+    print('All C# wrap code generated, file count: {}'.format(fileCount))
 
 
 if __name__ == '__main__':

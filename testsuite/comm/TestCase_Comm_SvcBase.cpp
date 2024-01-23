@@ -146,7 +146,7 @@ public:
         *resData = *data;
 
         LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
-        resPacket->SetHeader(packet, packet.GetOpcode(), 0);
+        resPacket->SetHeader(packet.GetSessionId(), packet.GetOpcode(), 0);
         resPacket->SetEncoder(resData);
 
         GetService()->Send(resPacket);
@@ -192,7 +192,7 @@ private:
 class TestCompFactory : public LLBC_ComponentFactory
 {
 public:
-    LLBC_Component *Create() const
+    LLBC_Component *Create(LLBC_Service *service) const
     {
         return new TestComp;
     }
@@ -350,7 +350,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
 
     // Create status == 1 packet to send to peer(if enabled).
     #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    encoder = _svc->GetSafetyObjectPool().Get<TestData>();
+    encoder = _svc->GetSafeObjectPool().Get<TestData>();
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
 

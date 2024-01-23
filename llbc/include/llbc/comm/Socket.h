@@ -116,12 +116,12 @@ public:
     /**
      * Implement bool operator.
      */
-    operator bool () const;
+    operator bool() const;
 
     /**
      * Implement ! operator.
      */
-    bool operator ! () const;
+    bool operator!() const;
 
 public:
     /**
@@ -185,7 +185,7 @@ public:
     /**
      * Set recv buffer size.
      * @param[in] size - buffer size, in bytes.
-     * @return int - return 0 if succerss, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int SetRecvBufSize(size_t size);
 
@@ -218,7 +218,7 @@ public:
     /**
      * Set max packet size.
      * @param[in] size - packet size, in bytes.
-     * @return int - return 0 if succerss, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int SetMaxPacketSize(size_t size);
 

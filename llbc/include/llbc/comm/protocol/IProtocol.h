@@ -151,7 +151,7 @@ private:
     /**
      * Set coder factories, only available in Codec-Layer.
      * @param[in] coders - the coder factories pointer.
-     * @return int - reutrn 0 if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetCoders(const Coders *coders);
 

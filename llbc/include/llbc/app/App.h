@@ -247,7 +247,7 @@ public:
      * Start application.
      * @param[in] argc - the application startup argument number.
      * @param[in] argv - the application startup arguments.
-     * @param[in] name - the application name, default is executable file name(extension splited, if has extension).
+     * @param[in] name - the application name, default is executable file name(has been trim extension name).
      * @return int - return 0 if start success, otherwise return -1.
      */
     virtual int Start(int argc, char *argv[], const LLBC_String &name = "");
@@ -275,7 +275,7 @@ public:
     /**
      * Push application event by event type.
      * @param[in] evType - the event type.
-     * @return int - reutrn 0 if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int PushEvent(int evType);
 
@@ -341,7 +341,7 @@ private:
      * Locate application config path.
      * @param[in] appName  - the application name.
      * @param[out] cfgType - the application config type.
-     * @return LLBC_String - the application config path, return enpty string if failed.
+     * @return LLBC_String - the application config path, return empty string if failed.
      */
     static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
 

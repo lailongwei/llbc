@@ -39,7 +39,7 @@ class CSLLBC_HIDDEN csllbc_Service
     typedef csllbc_Delegates _D;
 
 public:
-    typedef LLBC_Service::DriveMode DriveMode;
+    typedef LLBC_ServiceDriveMode::ENUM DriveMode;
 
 public:
     /**
@@ -143,7 +143,7 @@ public:
     /**
      * Multicast data.
      */
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status = 0);
+    int Multicast(const LLBC_SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status = 0);
     /**
      * Broadcast data.
      */

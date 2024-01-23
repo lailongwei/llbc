@@ -27,12 +27,13 @@ __LLBC_NS_BEGIN
 
 /**
  * Convert byte array to string format(hexadecimal format).
- * @param[in] buf - buffer pointer.
- * @param[in] len - buffer length.
- * @param[in] lineWidth - line width, default is 16.
- * @return std::string - the formatted string data.
+ * @param[in] bytes     - buffer pointer.
+ * @param[in] len       - buffer length.
+ * @param[in] byteSep   - byte separator.
+ * @param[in] lineWidth - line width, default is 0.
+ * @return LLBC_String - the formatted string data.
  */
-LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
+LLBC_EXPORT LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep = '\0', size_t lineWidth = 0);
 
 /**
  * Trace function define.
@@ -69,29 +70,29 @@ public:
     uint64 GetCPUCount() const;
 
     int ToSeconds() const;
-    sint64 ToMilliSeconds() const;
-    sint64 ToMicroSeconds() const;
-    sint64 ToNanoSeconds() const;
+    sint64 ToMillis() const;
+    sint64 ToMicros() const;
+    sint64 ToNanos() const;
 
     static int ToSeconds(uint64 cpuCount);
-    static sint64 ToMilliSeconds(uint64 cpuCount);
-    static sint64 ToMicroSeconds(uint64 cpuCount);
-    static sint64 ToNanoSeconds(uint64 cpuCount);
+    static sint64 ToMillis(uint64 cpuCount);
+    static sint64 ToMicros(uint64 cpuCount);
+    static sint64 ToNanos(uint64 cpuCount);
 
     LLBC_String ToString() const;
 
 public:
-    LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime &operator +=(const LLBC_CPUTime &right);
-    LLBC_CPUTime &operator -=(const LLBC_CPUTime &right);
+    LLBC_CPUTime operator+(const LLBC_CPUTime &right) const;
+    LLBC_CPUTime operator-(const LLBC_CPUTime &right) const;
+    LLBC_CPUTime &operator+=(const LLBC_CPUTime &right);
+    LLBC_CPUTime &operator-=(const LLBC_CPUTime &right);
 
-    bool operator <(const LLBC_CPUTime &right) const;
-    bool operator >(const LLBC_CPUTime &right) const;
-    bool operator <=(const LLBC_CPUTime &right) const;
-    bool operator >=(const LLBC_CPUTime &right) const;
-    bool operator ==(const LLBC_CPUTime &right) const;
-    bool operator !=(const LLBC_CPUTime &right) const;
+    bool operator<(const LLBC_CPUTime &right) const;
+    bool operator>(const LLBC_CPUTime &right) const;
+    bool operator<=(const LLBC_CPUTime &right) const;
+    bool operator>=(const LLBC_CPUTime &right) const;
+    bool operator==(const LLBC_CPUTime &right) const;
+    bool operator!=(const LLBC_CPUTime &right) const;
 
     operator uint64() const;
 
@@ -109,7 +110,7 @@ __LLBC_NS_END
 /**
  * stream output operator function for cpu time(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
 
 #include "llbc/core/utils/Util_DebugInl.h"
 

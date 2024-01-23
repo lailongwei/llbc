@@ -76,7 +76,7 @@ int TestCase_Core_ObjectGuard::BaseTest()
     std::cout << "Base test..." << std::endl;
 
     // Test basic apis.
-    LLBC_UnsafetyObjectPool objPool;
+    LLBC_UnsafeObjectPool objPool;
     auto guard1 = objPool.GetGuarded<TestObj>();
     const auto &constGuard1 = guard1;
     std::cout << "- Create obj guard:" << guard1 << std::endl;
@@ -107,7 +107,7 @@ int TestCase_Core_ObjectGuard::WeakRefTest()
 {
     std::cout << "Weakref test..." << std::endl;
 
-    LLBC_UnsafetyObjectPool objPool;
+    LLBC_UnsafeObjectPool objPool;
     auto guard1 = objPool.GetGuarded<TestObj>();
     std::cout << "- New guard obj:" << guard1 << std::endl;
 
@@ -156,7 +156,7 @@ int TestCase_Core_ObjectGuard::AccessorOperatorsTest()
 {
     std::cout << "Accessor operators test..." << std::endl;
 
-    LLBC_UnsafetyObjectPool objPool;
+    LLBC_UnsafeObjectPool objPool;
     auto guard = objPool.GetGuarded<TestObj>();
     const auto &constGuard = guard;
 

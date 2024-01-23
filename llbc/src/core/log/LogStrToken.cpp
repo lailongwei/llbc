@@ -28,7 +28,6 @@
 __LLBC_NS_BEGIN
 
 LLBC_LogStrToken::LLBC_LogStrToken()
-: _str()
 {
 }
 

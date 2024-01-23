@@ -43,7 +43,7 @@ LLBC_EXPORT int LLBC_GetAddrInfo(const char *nodename,
 /**
  * This function frees address information the the LLBC_GetAddrInfo function dynamically allocates its addrinfo structures.
  * Note: For more about this function information, see MSDN or linux manual.
- * @param[ai] - the addrinfo pointer.
+ * @param[ai] ai - the addrinfo pointer.
  */
 LLBC_EXPORT void LLBC_FreeAddrInfo(struct addrinfo *ai);
 

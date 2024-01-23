@@ -56,7 +56,7 @@ public:
      * Set left align flag.
      * @param[in] leftAlign - left align flag.
      */
-    void SetLeftAligh(bool leftAligh);
+    void SetLeftAlign(bool leftAlign);
 
     /**
      * Get minimum log message length.
@@ -90,7 +90,7 @@ public:
 
     /**
      * Set fill character.
-     * @param[in] char - fill character.
+     * @param[in] fillCharacter - fill character.
      */
     void SetFillCharacter(char fillCharacter);
 

@@ -27,7 +27,7 @@ __LLBC_NS_BEGIN
 
 /**
  * Absolute value of given number.
- * @param[in] value - number value.
+ * @param[in] val - number value.
  * @return T - absolute value.
  */
 template <typename T>

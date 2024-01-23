@@ -22,7 +22,6 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/file/File.h"
-#include "llbc/core/variant/Variant.h"
 #include "llbc/core/helper/STLHelper.h"
 #include "llbc/core/config/Ini.h"
 
@@ -330,7 +329,7 @@ const LLBC_IniSections &LLBC_Ini::GetAllSections() const
     return _sections;
 }
 
-LLBC_Ini &LLBC_Ini::operator =(const This &another)
+LLBC_Ini &LLBC_Ini::operator=(const This &another)
 {
     if (this == &another)
         return *this;

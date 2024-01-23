@@ -25,8 +25,8 @@
 
 // Compiler types macro define.
 #define LLBC_COMP_MSVC  0  // Microsoft visual c++ compiler(cl)
-#define LLBC_COMP_GCC   1  // GNU c compiler(gcc/g++)
-#define LLBC_COMP_CLANG 2  // CLang compiler(clang)(for now, could not determine)
+#define LLBC_COMP_GCC   1  // GNU compiler(gcc/g++)
+#define LLBC_COMP_CLANG 2  // CLang compiler(clang)
 #define LLBC_COMP_OTHER 3  // Other compiles
 
 // Determine current compiler.

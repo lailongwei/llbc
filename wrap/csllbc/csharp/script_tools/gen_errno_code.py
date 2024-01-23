@@ -11,7 +11,7 @@ import os
 from os import path as op
 import shutil
 import re
-import md5
+import hashlib 
 
 # This script file path
 SCRIPT_PATH = op.abspath(op.dirname(__file__))
@@ -29,7 +29,7 @@ CS_ERRNO_FILE = op.join(LLBC_ROOT_PATH, u'wrap', u'csllbc', u'csharp', u'native'
 def analyse_file(name):
     f = open(name)
     if not f:
-      print 'file not found: ' + name
+      print('file not found: ' + name)
       exit()
       
     ls = []
@@ -65,19 +65,19 @@ def analyse_file(name):
     return ls
 
 # get file md5 set
-def get_file_md5_set(name):
+def get_file_md5_digest(name):
     if not os.path.exists(name):
       return 0
 
-    f = open(name, 'rb')
-    md5set = md5.new(f.read()).digest()
-    f.close()
-
-    return md5set
+    with open(name, 'rb') as f:
+        md5 = hashlib.md5()
+        md5.update(f.read())
+        digest = md5.digest()
+    return digest 
 
 # generate c++ head file    
 def generate_file(name, ls):
-    oldset = get_file_md5_set(name)
+    olddigest = get_file_md5_digest(name)
 
     text = 'using System;\n'
     text = text + '\n'
@@ -90,7 +90,9 @@ def generate_file(name, ls):
     text = text + '    }\n'
     text = text + '}\n'
     
-    if md5.new(text).digest() == oldset:
+    md5 = hashlib.md5()
+    md5.update(text.encode('utf-8'))
+    if md5.digest() == olddigest:
       return 'Errno: file check finished!'
     
     f = open(name, 'wb')
@@ -102,13 +104,10 @@ def generate_file(name, ls):
     return 'Errno: grenerate finished!\n  at: ' + name
 
 def main():
-    
     ls = analyse_file(CPP_ERRNO_FILE)
-      
     str = generate_file(CS_ERRNO_FILE, ls)
-    
     if str != '':
-      print str
+      print(str)
 
 if __name__ == '__main__':
     main()

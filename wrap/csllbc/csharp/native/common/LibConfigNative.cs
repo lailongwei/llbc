@@ -69,7 +69,10 @@ namespace llbc
         public extern static int csllbc_LibConfig_Log_DefaultFileRollingMode();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static long csllbc_LibConfig_Log_MaxFileSize();
+        public extern static long csllbc_LibConfig_Log_MaxFileSizeLimit();
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public extern static long csllbc_LibConfig_Log_DefaultMaxFileSize();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Log_MaxBackupIndex();
@@ -117,13 +120,10 @@ namespace llbc
         public extern static int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Comm_IsEnabledSamplerSupport();
+        public extern static int csllbc_LibConfig_Comm_MaxCompNameLen();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_LibConfig_Comm_IsEnabledStatusDesc();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         public extern static int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe();

@@ -34,8 +34,6 @@ int __LLBC_CoreStartup()
         return LLBC_FAILED;
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    // Initialize Variant Type->StrDesc dictionary.
-    LLBC_VariantType::InitType2StrDict();
     // Initialize Variant number to number string repr fast access table.
     LLBC_Variant::InitNumber2StrFastAccessTable();
 

@@ -160,7 +160,7 @@ LLBC_Event * LLBC_Event::Clone() const
     return clone;
 } 
 
-LLBC_Variant &LLBC_Event::operator [](int key)
+LLBC_Variant &LLBC_Event::operator[](int key)
 {
     if (!_intKeyParams)
         _intKeyParams = new _IntKeyParams;
@@ -172,7 +172,7 @@ LLBC_Variant &LLBC_Event::operator [](int key)
         return it->second;
 }
 
-LLBC_Variant &LLBC_Event::operator [](const char *key)
+LLBC_Variant &LLBC_Event::operator[](const char *key)
 {
     if (!_constantStrKeyParams)
         _constantStrKeyParams = new _ConstantStrKeyParams;
@@ -185,7 +185,7 @@ LLBC_Variant &LLBC_Event::operator [](const char *key)
         return it->second;
 }
 
-LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key)
+LLBC_Variant &LLBC_Event::operator[](const LLBC_String &key)
 {
     if (!_strKeyParams)
         _strKeyParams = new _StrKeyParams;
@@ -197,7 +197,7 @@ LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key)
         return it->second;
 }
 
-const LLBC_Variant &LLBC_Event::operator [](int key) const
+const LLBC_Variant &LLBC_Event::operator[](int key) const
 {
     if (!_intKeyParams)
         return LLBC_INL_NS __nilVariant;
@@ -206,7 +206,7 @@ const LLBC_Variant &LLBC_Event::operator [](int key) const
     return it != _intKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-const LLBC_Variant &LLBC_Event::operator [](const char* key) const
+const LLBC_Variant &LLBC_Event::operator[](const char* key) const
 {
     if (!_constantStrKeyParams)
         return LLBC_INL_NS __nilVariant;
@@ -215,7 +215,7 @@ const LLBC_Variant &LLBC_Event::operator [](const char* key) const
     return it != _constantStrKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-const LLBC_Variant &LLBC_Event::operator [](const LLBC_String &key) const
+const LLBC_Variant &LLBC_Event::operator[](const LLBC_String &key) const
 {
     if (!_strKeyParams)
         return LLBC_INL_NS __nilVariant;

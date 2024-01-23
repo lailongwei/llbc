@@ -34,7 +34,7 @@ __LLBC_NS_END
 /**
  * socket addr stream output operator previous declare.
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a);
 
 __LLBC_NS_BEGIN
 
@@ -248,19 +248,19 @@ public:
 
 public:
     /**
-     * Operator = overlapped function.
+     * Operator= overlapped function.
      */
-    LLBC_SockAddr_IN &operator =(const LLBC_SockAddr_IN &right);
+    LLBC_SockAddr_IN &operator=(const LLBC_SockAddr_IN &right);
 
     /**
      * Stream output operator.
      */
-    friend std::ostream & ::operator <<(std::ostream &o, const LLBC_SockAddr_IN &a);
+    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_SockAddr_IN &a);
 
     /**
-     * Operator == overlapped function.
+     * Operator== overlapped function.
      */
-    bool operator ==(const LLBC_SockAddr_IN &right) const;
+    bool operator==(const LLBC_SockAddr_IN &right) const;
 
 private:
     // Address family, like struct sockaddr_in.sim_family.

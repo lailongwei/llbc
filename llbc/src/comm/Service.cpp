@@ -24,20 +24,62 @@
 
 #include "llbc/comm/ServiceImpl.h"
 
-namespace
-{
-    typedef LLBC_NS LLBC_Service This;
-}
-
 __LLBC_NS_BEGIN
 
-This *LLBC_Service::Create(const LLBC_String &name,
-                           LLBC_IProtocolFactory *dftProtocolFactory,
-                           bool fullStack)
+LLBC_Service *LLBC_Service::Create(const LLBC_String &name,
+                                   LLBC_IProtocolFactory *dftProtocolFactory,
+                                   bool fullStack)
 {
     return new LLBC_ServiceImpl(name, dftProtocolFactory, fullStack);
 }
 
+void LLBC_Service::GetCompName(const char *qualifiedCompName,
+                               char(&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
+                               size_t &compNameLen)
+{
+    // Demangle.
+    #if LLBC_TARGET_PLATFORM_WIN32
+    compNameLen = strlen(qualifiedCompName);
+    const char *demangledCompName = qualifiedCompName;
+    #else // Non-Win32
+    int demangleStatus;
+    size_t bufLen = __LLBC_RTTI_BUF_SIZE;
+    char *demangledCompName = __LLBC_GetLibTls()->commonTls.rtti;
+    abi::__cxa_demangle(qualifiedCompName,
+                        demangledCompName,
+                        &bufLen,
+                        &demangleStatus);
+    if (UNLIKELY(demangleStatus != 0))
+        demangledCompName = const_cast<char *>(qualifiedCompName);
+    compNameLen = strlen(demangledCompName);
+    #endif // Win32
+
+    // Trim namespace(s) prefix.
+    const char *compNameBeg = demangledCompName + compNameLen - 1;
+    while (compNameBeg != demangledCompName)
+    {
+        if (*--compNameBeg == ':')
+        {
+            ++compNameBeg;
+            break;
+        }
+    }
+
+    // Normalize comp name length.
+    compNameLen -= (compNameBeg - demangledCompName);
+
+    // Copy to output param: compName.
+    if (UNLIKELY(compNameLen > LLBC_CFG_COMM_MAX_COMP_NAME_LEN))
+    {
+        compNameLen = LLBC_CFG_COMM_MAX_COMP_NAME_LEN;
+        memcpy(compName, compNameBeg, LLBC_CFG_COMM_MAX_COMP_NAME_LEN);
+        compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN] = '\0';
+    }
+    else
+    {
+        memcpy(compName, compNameBeg, compNameLen + 1);
+    }
+}
 
 void LLBC_Service::SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev)
 {
@@ -46,4 +88,5 @@ void LLBC_Service::SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_
 
     eventServiceFirer->SetEventInfo(ev, this);
 }
+
 __LLBC_NS_END

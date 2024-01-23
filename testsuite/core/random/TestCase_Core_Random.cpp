@@ -61,6 +61,19 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     Exec_RandInt_begin_end_Test(0, 100, 100);
     Exec_RandInt_begin_end_Test(-100, 100, 1000);
 
+    // Test Rand(weights)
+    int weightsArr[5] = {1, 2, 3, 4, 5};
+    Exec_RandInt_array_Test(weightsArr, 100);
+    Exec_RandInt_array_Test(std::vector<int>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<int>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<int, 5>{1, 2, 3, 4, 5}, 100);
+
+    sint64 weightsArrInt64[5] = {1, 2, 3, 4, 5};
+    Exec_RandInt_array_Test(weightsArrInt64, 100);
+    Exec_RandInt_array_Test(std::vector<sint64>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::list<sint64>{1, 2, 3, 4, 5}, 100);
+    Exec_RandInt_array_Test(std::array<sint64, 5>{1, 2, 3, 4, 5}, 100);
+
     // Test RandReal()
     LLBC_Print("\n");
     LLBC_PrintLn("LLBC_Random::RandReal() test:");
@@ -91,6 +104,14 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
 
     for (int i = 0; i < 10; ++i)
         LLBC_PrintLn("  Choice result: %d", *rand.Choice(v.begin(), v.end()));
+
+    // Test shuffle.
+    LLBC_Print("\n");
+    LLBC_PrintLn("LLBC_Random::Shuffle() test:");
+    LLBC_PrintLn("- Before shuffle: %s", LLBC_Variant(v).ValueToString().c_str());
+
+    rand.Shuffle(v.begin(), v.end());
+    LLBC_PrintLn("- After shuffle: %s", LLBC_Variant(v).ValueToString().c_str());
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -143,5 +164,31 @@ void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int t
 
         LLBC_Print("%4d ", rand.Rand(begin, end));
     }
+    LLBC_Print("\n\n");
+}
+
+template <typename _Weights>
+typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                        std::is_array<_Weights>::value, void>::type
+TestCase_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times)
+{
+    LLBC_PrintLn("LLBC_Rand(weights) test(times:%d):", times);
+
+    LLBC_Print("weights: ");
+    for (const auto &weight : weights)
+        LLBC_Print("%s ", std::to_string(static_cast<int>(weight)).c_str());
+    LLBC_Print("\n");
+
+    LLBC_Random random;
+    for (int i = 0; i < times; ++i)
+    {
+        if (i != 0 && i % 20 == 0)
+            LLBC_Print("\n");
+
+        LLBC_Print("%d ", random.Rand(weights));
+    }
+
     LLBC_Print("\n\n");
 }

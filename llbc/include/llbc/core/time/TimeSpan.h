@@ -36,7 +36,7 @@ __LLBC_NS_END
 /**
  * TimeSpan class stream output operators previous declare.
  */
-std::ostream & operator <<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
+std::ostream & operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 __LLBC_NS_BEGIN
 
@@ -49,12 +49,12 @@ public:
     /**
      * Convenience span construct methods.
      */
-    static LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromSeconds(int seconds, int millisecs = 0, int microsecs = 0);
-    static LLBC_TimeSpan FromMillis(sint64 millisecs, sint64 microsecs = 0);
-    static LLBC_TimeSpan FromMicros(sint64 microsecs);
+    static LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
+    static LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
+    static LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
+    static LLBC_TimeSpan FromMicros(sint64 micros);
 
     static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
@@ -63,14 +63,20 @@ public:
      * Converience constant variables.
      */
     static const LLBC_TimeSpan zero;
+    static const LLBC_TimeSpan oneMicrosec;
+    static const LLBC_TimeSpan oneMillisec;
     static const LLBC_TimeSpan oneSec;
     static const LLBC_TimeSpan oneMin;
     static const LLBC_TimeSpan oneHour;
     static const LLBC_TimeSpan oneDay;
+    static const LLBC_TimeSpan oneWeek;
     static const LLBC_TimeSpan negOneSec;
+    static const LLBC_TimeSpan negOneMillisec;
+    static const LLBC_TimeSpan negOneMicrosec;
     static const LLBC_TimeSpan negOneMin;
     static const LLBC_TimeSpan negOneHour;
     static const LLBC_TimeSpan negOneDay;
+    static const LLBC_TimeSpan negOneWeek;
 
 public:
     /**
@@ -99,43 +105,45 @@ public:
     int GetHours() const;
     int GetMinutes() const;
     int GetSeconds() const;
-    int GetMilliSeconds() const;
-    int GetMicroSeconds() const;
+    int GetMillis() const;
+    int GetMicros() const;
 
     int GetTotalDays() const;
     int GetTotalHours() const;
     int GetTotalMinutes() const;
     int GetTotalSeconds() const;
-    sint64 GetTotalMilliSeconds() const;
-    sint64 GetTotalMicroSeconds() const;
+    sint64 GetTotalMillis() const;
+    sint64 GetTotalMicros() const;
 
     LLBC_TimeSpan AddDays(int days);
     LLBC_TimeSpan AddHours(int hours);
     LLBC_TimeSpan AddMinutes(int minutes);
     LLBC_TimeSpan AddSeconds(int seconds);
-    LLBC_TimeSpan AddMilliSeconds(sint64 milliSeconds);
-    LLBC_TimeSpan AddMicroSeconds(sint64 microSeconds);
+    LLBC_TimeSpan AddMillis(sint64 millis);
+    LLBC_TimeSpan AddMicros(sint64 micros);
 
-    LLBC_TimeSpan operator +(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator -(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator *(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator /(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator %(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
+    LLBC_TimeSpan operator*(double scale) const;
+    LLBC_TimeSpan operator/(double scale) const;
+    LLBC_TimeSpan operator%(sint64 span) const;
+    LLBC_TimeSpan operator%(const LLBC_TimeSpan &span) const;
 
-    LLBC_TimeSpan &operator +=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator -=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator *=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator /=(const LLBC_TimeSpan &span);
-    LLBC_TimeSpan &operator %=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator+=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator-=(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator*=(double scale);
+    LLBC_TimeSpan &operator/=(double scale);
+    LLBC_TimeSpan &operator%=(sint64 span);
+    LLBC_TimeSpan &operator%=(const LLBC_TimeSpan &span);
 
-    bool operator ==(const LLBC_TimeSpan &span) const;
-    bool operator !=(const LLBC_TimeSpan &span) const;
-    bool operator <(const LLBC_TimeSpan &span)const;
-    bool operator >(const LLBC_TimeSpan &span) const;
-    bool operator <=(const LLBC_TimeSpan &span) const;
-    bool operator >=(const LLBC_TimeSpan &span) const;
+    bool operator==(const LLBC_TimeSpan &span) const;
+    bool operator!=(const LLBC_TimeSpan &span) const;
+    bool operator<(const LLBC_TimeSpan &span)const;
+    bool operator>(const LLBC_TimeSpan &span) const;
+    bool operator<=(const LLBC_TimeSpan &span) const;
+    bool operator>=(const LLBC_TimeSpan &span) const;
 
-    LLBC_TimeSpan &operator =(const LLBC_TimeSpan &span);
+    LLBC_TimeSpan &operator=(const LLBC_TimeSpan &span);
 
 public:
     /**
@@ -148,14 +156,14 @@ public:
     /**
      * Stream output operator support.
      */
-    friend std::ostream & ::operator <<(std::ostream &o, const LLBC_TimeSpan &s);
+    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_TimeSpan &s);
 
 public:
     /**
-     * Serialize&DeSerialize support.
+     * Serialize&Deserialize support.
      */
     void Serialize(LLBC_Stream &stream) const;
-    bool DeSerialize(LLBC_Stream &stream);
+    bool Deserialize(LLBC_Stream &stream);
 
 private:
     // Declare friend class:LLBC_Time.

@@ -36,8 +36,6 @@ LLBC_SessionInfo::LLBC_SessionInfo()
 : _isListen(false)
 , _sessionId(0)
 , _acceptSessionId(0)
-, _localAddr()
-, _peerAddr()
 , _sockHandle(LLBC_INVALID_SOCKET_HANDLE)
 {
 }
@@ -200,8 +198,6 @@ LLBC_String LLBC_SessionDestroyInfo::ToString() const
 LLBC_AsyncConnResult::LLBC_AsyncConnResult()
 : _sessionId(0)
 , _connected(false)
-, _reason()
-, _peerAddr()
 {
 }
 
@@ -266,7 +262,6 @@ LLBC_ProtoReport::LLBC_ProtoReport()
 
 , _layer(0)
 , _level(0)
-, _report()
 {
 }
 
@@ -374,6 +369,17 @@ const LLBC_Variant &LLBC_Component::GetConfig() const
     return _nonPropCfg ? *_nonPropCfg : LLBC_Variant::nil;
 }
 
+void LLBC_Component::SetConfig(const LLBC_Variant &compCfg)
+{
+    LLBC_XDelete(_propCfg);
+
+    if (_nonPropCfg)
+        *_nonPropCfg = compCfg;
+    else
+        _nonPropCfg = new LLBC_Variant(compCfg);
+    _cfgType = LLBC_AppConfigType::Xml;
+}
+
 const LLBC_Property &LLBC_Component::GetPropertyConfig() const
 {
     static const LLBC_Property emptyPropCfg;
@@ -478,22 +484,22 @@ void LLBC_Component::UpdateComponentCfg()
 
 __LLBC_NS_END
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionInfo &si)
 {
     return o <<si.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SessionDestroyInfo &destroy)
 {
     return o <<destroy.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncConnResult &result)
 {
     return o <<result.ToString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report)
 {
     return o <<report.ToString();
 }

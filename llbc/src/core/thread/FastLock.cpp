@@ -55,7 +55,7 @@ LLBC_FastLock::~LLBC_FastLock()
 void LLBC_FastLock::Lock()
 {
 #ifdef LLBC_FAST_LOCK_ASM
-    bool gotLock = false;
+    bool gotLock;
     do
     {
         gotLock = TryLock();

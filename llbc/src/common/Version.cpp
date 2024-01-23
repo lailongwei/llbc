@@ -28,6 +28,8 @@
 
 __LLBC_NS_BEGIN
 
+// The version number is automatically updated by the building_script
+// and configured in cfg.py, please do not update it manually.
 int LLBC_majorVersion       = 1;
 int LLBC_minorVersion       = 1;
 int LLBC_updateNo           = 1;
@@ -98,7 +100,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default log file name: <same with logger name>\n");
     desc.append_format("    default file log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     desc.append_format("    default file rolling mode: %d\n", LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE);
-    desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);
+    desc.append_format("    max log file size limit: %lld\n", LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
+    desc.append_format("    default max log file size: %lld\n", LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE);
     desc.append_format("    default max backup index: %d\n", LLBC_CFG_LOG_MAX_BACKUP_INDEX);
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
@@ -115,9 +118,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("  default service FPS: %d\n", LLBC_CFG_COMM_DFT_SERVICE_FPS);
     desc.append_format("  per thread max drive services count: %d\n", LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT);
     desc.append_format("  enabled register status code handler support: %s\n", LLBC_CFG_COMM_ENABLE_STATUS_HANDLER ? "true" : "false");
-    desc.append_format("  enabled register status code describe string support: %s\n", LLBC_CFG_COMM_ENABLE_STATUS_DESC ? "true" : "false");
     desc.append_format("  enabled unify pre-subscribe support: %s\n", LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE ? "true" : "false");
-    desc.append_format("  sampler support: %s\n", LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT ? "true" : "false");
+    desc.append_format("  max supported component name length: %d\n", LLBC_CFG_COMM_MAX_COMP_NAME_LEN);
 
     // Append third-party info.
     // desc.append_format("3rd party info: \n");

@@ -41,9 +41,6 @@ __LLBC_NS_BEGIN
 
 class LLBC_HIDDEN LLBC_ServiceImpl final : public LLBC_Service
 {
-    typedef LLBC_Service Base;
-    typedef LLBC_ServiceImpl This;
-
 public:
     /**
      * Create specified type service.
@@ -101,14 +98,14 @@ public:
      * Get the service drive mode.
      * @return DriveMode - the service drive mode.
      */
-    virtual DriveMode GetDriveMode() const;
+    virtual LLBC_ServiceDriveMode::ENUM GetDriveMode() const;
 
     /**
      * Set the service drive mode.
      * @param[in] mode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SetDriveMode(DriveMode mode);
+    virtual int SetDriveMode(LLBC_ServiceDriveMode::ENUM mode);
 
 public:
     /**
@@ -133,8 +130,9 @@ public:
 
     /**
      * Stop the service.
+     * @return int - return 0 if success, otherwise return failed.
      */
-    virtual void Stop();
+    virtual int Stop();
 
 public:
     /**
@@ -203,7 +201,6 @@ public:
      * @param[in] protoFactory - the protocol factory, default use service protocol factory.
      *                           if use custom protocol factory, when AsyncConn failed, the factory will delete by framework.
      * @param[in] sessionOpts  - the session options.
-     * @return int - return 0 if success, otherwise return -1.
      * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
     virtual int AsyncConn(const char *ip,
@@ -231,56 +228,36 @@ public:
     virtual int Send(LLBC_Packet *packet);
 
     /** 
-     * Multicast data(these methods will automatics create packet to send).
-     * Note: 
-     *      no matter this method success or not, coder will be managed by this call,
-     *      it means no matter this call success or not, delete coder operation will
-     *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] sessionIds - the session Ids.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, LLBC_Coder *coder, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, LLBC_Coder *coder, int status);
-    /**
-     * Multicast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
+     * Multicast bytes.
      * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
-     * @param[in] bytes      - bytes to multi cast.
-     * @param[in] len   `    - will send bytes len, in bytes.
+     * @param[in] bytes      - the bytes data.
+     * @param[in] len        - the bytes length.
      * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(int svcId, const LLBC_SessionIdSet &sessionIds, int opcode, const void *bytes, size_t len, int status);
-    virtual int Multicast(int svcId, const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status);
+    virtual int Multicast(const LLBC_SessionIds &sessionIds,
+                          int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0);
 
-    /** 
-     * Broadcast data(these methods will automatics create packet to send).
-     * Note: 
-     *      no matter this method success or not, coder will be managed by this call,
-     *      it means no matter this call success or not, delete coder operation will
-     *      execute by llbc framework.
-     * @param[in] svcId      - the service Id.
-     * @param[in] opcode    - the opcode.
-     * @param[in] coder     - the coder.
-     * @param[in] status    - the status, default is 0.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status);
-    /**
-     * Broadcast bytes(these methods will automatics create packet to send).
-     * @param[in] svcId      - the service Id.
+   /**
+     * Broadcast bytes.
      * @param[in] opcode     - the opcode.
      * @param[in] bytes      - bytes to multi cast.
      * @param[in] len   `    - will send bytes len, in bytes.
      * @param[in] status     - the status, default is 0.
+     * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int svcId, int opcode, const void *bytes, size_t len, int status);
+    virtual int Broadcast(int opcode,
+                          const void *bytes,
+                          size_t len,
+                          int status = 0,
+                          uint32 flags = 0);
 
     /**
      * Remove session, always success.
@@ -321,14 +298,6 @@ public:
      * Add coder factory.
      */
     virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory);
-
-public:
-    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    /**
-     * Add status code describe.
-     */
-    virtual int AddStatusDesc(int status, const LLBC_String &desc);
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC 
 
 public:
     /**
@@ -413,11 +382,9 @@ public:
     /**
      * Post lazy task to service.
      * @param[in] runnable - the runnable obj.
-     * @param[in] data     - the runnable data, can be null.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable,
-                     const LLBC_Variant &data = LLBC_Variant::nil);
+    virtual int Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable);
 
     /**
      * Get service protocol stack, only full-stack option disabled available.
@@ -429,25 +396,25 @@ public:
 
 public:
     /**
-     * Get service safety object pool.
-     * @return LLBC_SafetyObjectPool & - the thread safety object pool reference.
+     * Get service safe object pool.
+     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
      */
-    virtual LLBC_SafetyObjectPool &GetSafetyObjectPool();
+    virtual LLBC_SafeObjectPool &GetSafeObjectPool();
 
     /**
-     * Get service unsafety object pool.
-     * @return LLBC_UnsafetyObjectPool & - the thread unsafety object pool reference.
+     * Get service unsafe object pool.
+     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
      */
-    virtual LLBC_UnsafetyObjectPool &GetUnsafetyObjectPool();
+    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool();
 
     /**
-     * Get service packet object pool(thread safety).
+     * Get service packet object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
 
     /**
-     * Get message block object pool(thread safety).
+     * Get message block object pool(thread safe).
      * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
      */
     virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
@@ -534,11 +501,15 @@ private:
     bool IsCanContinueDriveService();
 
     /**
-     * Frame tasks operation methods.
+     * Service phase support methods.
      */
-    typedef std::vector<std::pair<LLBC_Delegate<void(Base *, const LLBC_Variant &)>, LLBC_Variant> > _FrameTasks;
-    void HandleFrameTasks();
-    void DestroyFrameTasks();
+    int PreStart();
+    void PostStop();
+
+    /**
+     * Post operation methods.
+     */
+    void HandlePosts();
 
     /**
      * Queued event operation methods.
@@ -559,17 +530,15 @@ private:
      * Component operation methods.
      */
     int InitComps();
+    void DestroyComps(bool onlyCallEvMeth = true);
     int StartComps();
-    void UpdateComps();
     void StopComps();
-    void DestroyComps();
-    void DestroyWillRegComps();
-    void CloseAllCompLibraries();
+    void UpdateComps();
+    void LateUpdateComps();
     void AddComp(LLBC_Component *comp);
     void AddCompToCaredEventsArray(LLBC_Component *comp);
     LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
     void CloseCompLibrary(const LLBC_String &libPath);
-    void ClearCompsWhenInitCompFailed();
 
     /**
      * Auto-Release pool operation methods.
@@ -579,18 +548,11 @@ private:
     void ClearAutoReleasePool();
 
     /**
-    * Object pool operation methods.
-    */
-    void InitObjectPools();
-    void UpdateObjectPools();
-    void ClearHoldedObjectPools();
-
-    /**
      * Timer-Scheduler operation methods.
      */
     void InitTimerScheduler();
     void UpdateTimerScheduler();
-    void ClearHoldedTimerScheduler();
+    void ClearTimerScheduler();
 
     /**
      * Idle process method.
@@ -603,60 +565,52 @@ private:
      */
     int LockableSend(LLBC_Packet *packet,
                      bool lock = true,
-                     bool validCheck = true);
-    int LockableSend(int svcId,
-                     int sessionId,
+                     bool checkRunningPhase = true,
+                     bool checkSessionValidity = true);
+    int LockableSend(int sessionId,
                      int opcode,
                      const void *bytes,
                      size_t len,
                      int status,
+                     uint32 flags,
                      bool lock = true,
-                     bool validCheck = true);
-
-    template <typename SessionIds>
-    int MulticastSendCoder(int svcId,
-                           const SessionIds &sessionIds,
-                           int opcode,
-                           LLBC_Coder *coder,
-                           int status,
-                           bool validCheck = true);
+                     bool checkRunningPhase = true,
+                     bool checkSessionValidity = true);
 
 private:
-    static int _maxId;
+    static int _maxId; // Max service Id.
 
-    int _id;
-    LLBC_String _name;
-    LLBC_ThreadId _svcThreadId;
+    int _id; // Service Id.
+    LLBC_String _name; // Service Name.
+    LLBC_ServiceDriveMode::ENUM _driveMode; // Drive mode(ExternalDrive or InternalDrive).
+    LLBC_ThreadId _svcThreadId; // Service thread Id(which thread drive this service).
+    volatile bool _inCleaning; // Cleaning flag.
+    volatile bool _sinkIntoOnSvcLoop; // Sink into OnSvc() loop flag.
+    LLBC_ServiceMgr &_svcMgr; // Owned service manager.
+    mutable LLBC_RecursiveLock _lock; // Service lock.
+    volatile bool _serviceBeginLoop; // Service begin loop flag.
+    volatile LLBC_ServiceRunningPhase::ENUM _runningPhase; // Service running phase.
+    typedef void (LLBC_ServiceImpl::*_EvHandler)(LLBC_ServiceEvent &);
+    static _EvHandler _evHandlers[LLBC_ServiceEventType::End]; // Service event handlers slot.
 
-    int _cfgType;
-    LLBC_Property _propCfg;
-    LLBC_Variant _nonPropCfg;
+    // Service startup assistant members.
+    volatile int _startErrNo;
+    volatile int _startSubErrNo;
 
-    bool _fullStack;
-    LLBC_IProtocolFactory *_dftProtocolFactory;
-    std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory;
-    DriveMode _driveMode;
-    bool _suppressedCoderNotFoundWarning;
+    // Config about members.
+    int _cfgType; // Config type, see LLBC_AppConfigType enum.
+    LLBC_Property _propCfg; // Prop type config content.
+    LLBC_Variant _nonPropCfg; // Non-Prop type config content(xml/ini/...).
 
-    volatile bool _started;
-    volatile bool _stopping;
-    volatile bool _initingComp;
-
-    LLBC_RecursiveLock _lock;
-    LLBC_SpinLock _protoLock;
-
-    int _fps;
-    int _frameInterval;
-    uint64 _relaxTimes;
-    sint64 _begHeartbeatTime;
-
-    volatile bool _sinkIntoLoop;
-    volatile bool _afterStop;
-
-private:
-    LLBC_PollerMgr _pollerMgr;
-
-    class _ReadySessionInfo
+    // Protocol/poller/session about members.
+    bool _fullStack; // ProtocolStack running mode(full/half).
+    int _pollerCount; // Poller count.
+    LLBC_PollerMgr _pollerMgr; // Poller manager.
+    LLBC_SpinLock _protoLock; // Protocol logic about lock.
+    bool _suppressedCoderNotFoundWarning; // Suppress coder not found warning flag.
+    LLBC_IProtocolFactory *_dftProtocolFactory; // Default protocol factory.
+    std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory; // Specific protocol factory.
+    class _ReadySessionInfo // Ready session information.
     {
     public:
         int sessionId;
@@ -671,62 +625,54 @@ private:
                           LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
-    std::map<int, _ReadySessionInfo *> _readySessionInfos;
-    LLBC_SpinLock _readySessionInfosLock;
+    std::map<int, _ReadySessionInfo *> _readySessionInfos; // Ready sessions set.
+    mutable LLBC_SpinLock _readySessionInfosLock; // Ready session set lock.
 
-    std::list<LLBC_Component *> _willRegComps;
-    volatile bool _compsInitFinished;
-    volatile int _compsInitRet;
-    volatile bool _compsStartFinished;
-    volatile int _compsStartRet;
+    // FPS about members.
+    int _fps; // Service FPS.
+    int _frameInterval; // Frame interval, 1000/_fps.
+    sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
-    std::vector<LLBC_Component *> _compList;
-    std::map<LLBC_CString, LLBC_Component *> _name2Comps;
-    std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End];
-    std::map<LLBC_String, LLBC_Library *> _compLibraries;
-    std::map<int, LLBC_CoderFactory *> _coders;
-    std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _handlers;
-    std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _preHandlers;
+public:
+    // Components about members.
+    std::list<LLBC_Component *> _willRegComps; // Will register component list.
+    std::vector<LLBC_Component *> _compList; // Component list.
+    std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
+    std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End]; // Stored by event type component list.
+    std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
+
+    // Coder & Handler about members.
+    std::map<int, LLBC_CoderFactory *> _coderFactories; // Coder Factories.
+    std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > _handlers; // Packet handlers.
+    std::map<int, LLBC_Delegate<bool(LLBC_Packet &)> > _preHandlers; // Packet pre-handlers.
     #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler;
+    LLBC_Delegate<bool(LLBC_Packet &)> _unifyPreHandler; // Unify packet pre-handler.
     #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    std::map<int, std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > > _statusHandlers;
+    std::map<int, std::map<int, LLBC_Delegate<void(LLBC_Packet &)> > > _statusHandlers; // Status handlers.
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    std::map<int, LLBC_String> _statusDescs;
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 private:
-    uint32 _frameTaskIdx;
-    _FrameTasks _frameTasks[2];
+    // Service extend functions about members.
+    // - Post support members.
+    std::vector<LLBC_Delegate<void(LLBC_Service *)> > _posts; // Post list.
 
-private:
-    LLBC_AutoReleasePoolStack *_releasePoolStack;
+    // - Obj-Base support members.
+    LLBC_AutoReleasePoolStack *_releasePoolStack; // Auto-Release pool stack.
 
-private:
-    LLBC_SafetyObjectPool _safetyObjectPool;
-    LLBC_UnsafetyObjectPool _unsafetyObjectPool;
-    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool;
-    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool;
-    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool;
+    // - ObjPool support members.
+    LLBC_SafeObjectPool _safeObjectPool; // Safe object pool.
+    LLBC_UnsafeObjectPool _unsafeObjectPool; // Unsafe object pool.
+    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool; // Packet object pool.
+    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool; // MessageBlock object pool.
+    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool; // EventFirer object pool.
 
-private:
-    LLBC_TimerScheduler *_timerScheduler;
+    // - Timer scheduler.
+    LLBC_TimerScheduler *_timerScheduler; // Timer scheduler.
 
-private:
-    LLBC_EventMgr _evManager;
-    LLBC_ListenerStub _evManagerMaxListenerStub;
-
-private:
-    LLBC_ServiceMgr &_svcMgr;
-
-private:
-    std::vector<LLBC_Packet *> _multicastOtherPackets;
-
-private:
-    typedef void (LLBC_ServiceImpl::*_EvHandler)(LLBC_ServiceEvent &);
-    static _EvHandler _evHandlers[LLBC_ServiceEventType::End];
+    // - Event support members.
+    LLBC_EventMgr _evManager; // EventManager.
+    static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
 };
 
 __LLBC_NS_END

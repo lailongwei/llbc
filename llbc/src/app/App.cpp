@@ -67,8 +67,7 @@ auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
 LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
-: _name()
-, _startPhase(LLBC_AppStartPhase::Stopped)
+: _startPhase(LLBC_AppStartPhase::Stopped)
 
 , _llbcLibStartupInApp(false)
 
@@ -175,7 +174,6 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
 
     // Startup llbc library.
-    int ret = LLBC_FAILED;
     _llbcLibStartupInApp = true;
     if (LLBC_Startup() != LLBC_OK)
     {
@@ -189,6 +187,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         _name = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
 
     // Define app start failed defer.
+    int ret = LLBC_FAILED;
     LLBC_Defer(if (ret != LLBC_OK) {
         _cfgPath.clear();
         _cfgType = LLBC_AppConfigType::End;
@@ -218,8 +217,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     // Load config.
     LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
 
-    // Hook process crash.
-    if (LLBC_HookProcessCrash() != LLBC_OK)
+    // Handle progress crash.
+    if (LLBC_HandleCrash() != LLBC_OK)
         return LLBC_FAILED;
 
     // Install required signal handlers.
@@ -301,16 +300,13 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         if (_requireStop)
         {
             Stop();
-            return LLBC_OK;
+            return ret = LLBC_OK;
         }
 
         // Execute sleep, if not do anything.
         if (runDoNothing && handleEvsDoNothing)
             LLBC_Sleep(1);
     }
-
-    // Return ok.
-    return ret = LLBC_OK;
 }
 
 void LLBC_App::Stop()
@@ -497,7 +493,7 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
                  cfgType != LLBC_AppConfigType::End;
                  ++cfgType)
             {
-                const auto cfgPath = LLBC_Directory::Join(
+                auto cfgPath = LLBC_Directory::Join(
                     cfgFileDir, cfgFileName + LLBC_AppConfigType::GetConfigSuffix(cfgType));
                 LLBC_ReturnIf(LLBC_File::Exists(cfgPath), cfgPath);
             }

@@ -125,18 +125,7 @@ inline LLBC_String LLBC_File::ReadLine()
 template <typename T>
 int LLBC_File::ReadRawObj(T &obj)
 {
-    long actuallyRead = Read((&obj), sizeof(T));
-    if (actuallyRead == -1)
-    {
-        return LLBC_FAILED;
-    }
-    else if (actuallyRead != sizeof(T))
-    {
-        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
+    return Read((&obj), sizeof(T)) != sizeof(T) ? LLBC_FAILED : LLBC_OK;
 }
 
 inline int LLBC_File::Write(const bool &boolVal)
@@ -215,12 +204,12 @@ inline int LLBC_File::Write(const char *cstr)
     if (strSize == 0)
         return LLBC_OK;
 
-    const long actuallyWrote = Write(cstr, strSize);
+    const sint64 actuallyWrote = Write(cstr, strSize);
     if (actuallyWrote == -1)
     {
         return LLBC_FAILED;
     }
-    else if (actuallyWrote != static_cast<long>(strSize))
+    else if (actuallyWrote != static_cast<sint64>(strSize))
     {
         LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
         return LLBC_FAILED;
@@ -229,78 +218,21 @@ inline int LLBC_File::Write(const char *cstr)
     return LLBC_OK;
 }
 
-inline int LLBC_File::Write(const LLBC_String &str)
+template <typename StrType>
+typename std::enable_if<LLBC_IsTemplSpec<StrType, std::basic_string>::value ||
+                        LLBC_IsTemplSpec<StrType, LLBC_BasicString>::value ||
+                        LLBC_IsTemplSpec<StrType, LLBC_BasicCString>::value, int>::type
+LLBC_File::Write(const StrType &str)
 {
-    const long actuallyWrote = Write(str.data(), str.size());
-    if (actuallyWrote == -1)
-    {
-        return LLBC_FAILED;
-    }
-    else if (actuallyWrote != static_cast<long>(str.size()))
-    {
-        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
+    const sint64 strByteSize =
+        static_cast<sint64>(str.size() * sizeof(typename StrType::value_type));
+    return Write(str.data(), strByteSize) != strByteSize ? LLBC_FAILED : LLBC_OK;
 }
 
-inline int LLBC_File::Write(const LLBC_WString &wstr)
+inline sint64 LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
 {
-    const long actuallyWrote = Write(
-        wstr.data(), wstr.size() * sizeof(LLBC_WString::value_type));
-    if (actuallyWrote == -1)
-    {
-        return LLBC_FAILED;
-    }
-    else if (actuallyWrote != static_cast<long>(
-            wstr.size() * sizeof(LLBC_WString::value_type)))
-    {
-        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-
-inline int LLBC_File::Write(const std::string &str)
-{
-    const long actuallyWrote = Write(str.data(), str.size());
-    if (actuallyWrote == -1)
-    {
-        return LLBC_FAILED;
-    }
-    else if (actuallyWrote != static_cast<long>(str.size()))
-    {
-        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-
-inline int LLBC_File::Write(const std::wstring &wstr)
-{
-    const long actuallyWrote = Write(
-        wstr.data(), wstr.size() * sizeof(std::string::value_type));
-    if (actuallyWrote == -1)
-    {
-        return LLBC_FAILED;
-    }
-    else if (actuallyWrote != static_cast<long>(
-            wstr.size() * sizeof(std::string::value_type)))
-    {
-        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-
-inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
-{
-    const long contentRet = Write(line.data(), line.size());
-    if (contentRet != static_cast<long>(line.size()))
+    const sint64 contentRet = Write(line.data(), line.size());
+    if (contentRet != static_cast<sint64>(line.size()))
         return contentRet;
 
     if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch &&
@@ -308,7 +240,7 @@ inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
         newLineFormat = LLBC_FileNewLineFormat::LineFeed;
 
 
-    long lineEndingRet;
+    sint64 lineEndingRet;
     if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch)
     {
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -341,7 +273,7 @@ inline long LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
 template <typename T>
 int LLBC_File::WriteRawObj(const T &obj)
 {
-    long actuallyWrote = Write(&obj, sizeof(T));
+    sint64 actuallyWrote = Write(&obj, sizeof(T));
     if (actuallyWrote == -1)
     {
         return LLBC_FAILED;

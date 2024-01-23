@@ -35,7 +35,7 @@ inline bool LLBC_LoggerConfigInfo::IsNotConfigUseRoot() const
 
 inline int LLBC_LoggerConfigInfo::GetLogLevel() const
 {
-    return _logLevel;
+    return MIN(_consoleLogLevel, _fileLogLevel);
 }
 
 inline bool LLBC_LoggerConfigInfo::IsAsyncMode() const
@@ -103,6 +103,11 @@ inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogFile() const
     return _logFile;
 }
 
+inline const LLBC_String &LLBC_LoggerConfigInfo::GetOriginalLogFile() const
+{
+    return _originalLogFile;
+}
+
 inline const LLBC_String &LLBC_LoggerConfigInfo::GetLogFileSuffix() const
 {
     return _logFileSuffix;
@@ -123,7 +128,7 @@ inline int LLBC_LoggerConfigInfo::GetFileRollingMode() const
     return _fileRollingMode;
 }
 
-inline long LLBC_LoggerConfigInfo::GetMaxFileSize() const
+inline sint64 LLBC_LoggerConfigInfo::GetMaxFileSize() const
 {
     return _maxFileSize;
 }

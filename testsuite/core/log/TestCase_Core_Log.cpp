@@ -45,7 +45,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    if(LLBC_LoggerMgrSingleton->Initialize("LogTestCfg.cfg") != LLBC_OK)
+    // const LLBC_String logCfgFile = "LogTestCfg.cfg";
+    const LLBC_String logCfgFile = "LogTestCfg.xml";
+    if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
@@ -59,14 +61,17 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
                             LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
-    LLOG_TRACE("This is a trace log message.");
-    LLOG_TRACE3("test_tag", "This is a trace log message.");
     LLOG_DEBUG("This is a debug log message.");
     LLOG_DEBUG3("test_tag", "This is a debug log message.");
+    LLOG_TRACE("This is a trace log message.");
+    LLOG_TRACE3("test_tag", "This is a trace log message.");
 
     // Uninstall logger hook(from root logger).
     rootLogger->UninstallHook(LLBC_LogLevel::Debug);
 
+    // Test condition macro log
+    DoConditionMacroLogTest();
+    
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LSLOG_DEBUG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
         <<", sint16: " <<(sint16)-16 << ", uint16: " <<(uint16)16 <<", sint32: " <<-32
@@ -76,7 +81,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     std::string stdStr = "This is a std::string";
     LLBC_String llbcStr = "This is a LLBC_String";
-    LSLOG_DEBUG("std::string operator << test: " <<stdStr <<", LLBC_String operator << test: " <<llbcStr);
+    LSLOG_DEBUG("std::string operator<< test: " <<stdStr <<", LLBC_String operator<< test: " <<llbcStr);
 
     LLBC_Time now = LLBC_Time::Now();
     LLBC_TimeSpan span(-30);
@@ -100,10 +105,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL3("test_tag", "This is a fatal log message.");
 
     // Use 'test' logger to test.
-    LLOG_TRACE2("test", "This is a trace log message.");
-    LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
     LLOG_DEBUG2("test", "This is a debug log message.");
     LLOG_DEBUG4("test", "test_tag", "This is a debug log message.");
+    LLOG_TRACE2("test", "This is a trace log message.");
+    LLOG_TRACE4("test", "test_tag", "This is a trace log message.");
     LLOG_INFO2("test", "This is a info log message.");
     LLOG_INFO4("test", "test_tag", "This is a info log message.");
     LLOG_WARN2("test", "This is a warn log message.");
@@ -141,7 +146,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,
                        elapsed.ToString().c_str(),
-                       elapsed.ToNanoSeconds() / static_cast<double>(loopLmt) / 1000.0);
+                       elapsed.ToNanos() / static_cast<double>(loopLmt) / 1000.0);
     }
 
     LLBC_PrintLn("Press any key to begin json log test");
@@ -165,27 +170,6 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
 void TestCase_Core_Log::DoJsonLogTest()
 {
-    // Test LJLOG_TRACE macros.
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
-    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE2(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
-    LJLOG_TRACE2("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
-    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
-    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
-
-    LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
-    LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
-    LJLOG_TRACE4("test", "testTraceTag4_3").Add("testKey", "testValue->LJLOG_TRACE4().3").Finish("");
-    LJLOG_TRACE4("test", "testTraceTag4_4").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
-    LJLOG_TRACE4("test", "testTraceTag4_5").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
-
     // Test LJLOG_DEBUG macros.
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().1").Finish("");
     LJLOG_DEBUG().Add("testKey", "testValue->LJLOG_DEBUG().2").Finish("%s", "Finish Test");
@@ -206,6 +190,27 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_DEBUG4("test", "testDbgTag4_3").Add("testKey", "testValue->LJLOG_DEBUG4().3").Finish("");
     LJLOG_DEBUG4("test", "testDbgTag4_4").Add("testKey", "testValue->LJLOG_DEBUG4().4").Finish("%s", "Finish Test");
     LJLOG_DEBUG4("test", "testDbgTag4_5").Add("testKey", "testValue->LJLOG_DEBUG4().5").Finish("%s%d", "Finish Test", 2);
+
+    // Test LJLOG_TRACE macros.
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE2(nullptr).Add("testKey", "testValue->LJLOG_TRACE3().1").Finish("");
+    LJLOG_TRACE2("").Add("testKey", "testValue->LJLOG_TRACE3().2").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE3().3").Finish("");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE2("test").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().1").Finish("");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().2").Finish("%s", "Finish Test");
+    LJLOG_TRACE3("testTag").Add("testKey", "testValue->LJLOG_TRACE2().3").Finish("%s%d", "Finish Test", 2);
+
+    LJLOG_TRACE4(nullptr, "testTraceTag4_1").Add("testKey", "LJLOG_TRACE4().1").Finish("");
+    LJLOG_TRACE4("", "testTraceTag4_2").Add("testKey", "testValue->LJLOG_TRACE4().2").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_3").Add("testKey", "testValue->LJLOG_TRACE4().3").Finish("");
+    LJLOG_TRACE4("test", "testTraceTag4_4").Add("testKey", "testValue->LJLOG_TRACE4().4").Finish("%s", "Finish Test");
+    LJLOG_TRACE4("test", "testTraceTag4_5").Add("testKey", "testValue->LJLOG_TRACE4().5").Finish("%s%d", "Finish Test", 2);
 
     // Test LJLOG_INFO macros.
     LJLOG_INFO().Add("testKey", "testValue->LJLOG_INFO().1").Finish("");
@@ -290,16 +295,59 @@ void TestCase_Core_Log::DoJsonLogTest()
 
 void TestCase_Core_Log::DoUninitLogTest()
 {
-    LLOG_DEBUG("This is a uninited log message");
-    LLOG_DEBUG3("uninit_tag", "This is a uninited log message");
+    LLOG_DEBUG("This is a uninited debug log message");
+    LLOG_TRACE("This is a uninited trace log message");
+    LLOG_INFO("This is a uninited info log message");
+    LLOG_WARN("This is a uninited warn log message");
+    LLOG_ERROR("This is a uninited error log message");
+    LLOG_FATAL("This is a uninited fatal log message");
+
+    LLOG_DEBUG3("uninit_tag", "This is a uninited log message(has tag)");
+
     LJLOG_DEBUG().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
+void TestCase_Core_Log::DoConditionMacroLogTest()
+{
+    LLBC_LogAndDoIf(true, Error, {});
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purely text");
+    LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: int:%d, float:%f, string:%s",
+                    1, 3.14, "hello world");
+
+    for(int i = 0; i < 4; i++) 
+    {
+        LLBC_LogAndContinueIf(i == 0, Error);
+        LLBC_LogAndContinueIf(i == 1, Error, "DoConditionMacroLogTest DoContinueIf: Purely text");
+        LLBC_LogAndContinueIf(i == 2, Error, "DoConditionMacroLogTest DoContinueIf: int:%d, float:%f, string:%s",
+                              1, 3.14, "hello world");
+    }
+    for(;;)
+    {
+        LLBC_LogAndBreakIf(true, Error);
+    }
+    for(;;)
+    {
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: Purely text");
+    }
+    for(;;) 
+    {
+        LLBC_LogAndBreakIf(true, Error, "DoConditionMacroLogTest DoBreakIf: int:%d, float:%f, string:%s",
+                           1, 3.14, "hello world");
+    }
+
+    [](){ LLBC_LogAndReturnIf(true, Error, void()); }();
+    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: Purely text"); }();
+    [](){ LLBC_LogAndReturnIf(true, Error, void(), "DoConditionMacroLogTest DoReturn If: int:%d, float:%f, string:%s", 
+                                                   1, 3.14, "hello world"); }();
+}
+
+
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
-    LLBC_PrintLn("Log hook, loggerName: %s, level: %s",
+    LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
                    logData->logger->GetLoggerName().c_str(),
-                   LLBC_LogLevel::GetLevelStr(logData->level).c_str());
+                   LLBC_LogLevel::GetLevelStr(logData->level).c_str(),
+                   logData->msg);
 }
 

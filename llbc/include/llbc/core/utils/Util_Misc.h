@@ -81,8 +81,8 @@ public:
     /**
      * Subscript operations support.
      */
-    const LLBC_Variant &operator [](size_t index) const;
-    const LLBC_Variant &operator [](const LLBC_String &key) const;
+    const LLBC_Variant &operator[](size_t index) const;
+    const LLBC_Variant &operator[](const LLBC_String &key) const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_StartArgs);
 

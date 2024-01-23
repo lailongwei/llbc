@@ -73,7 +73,7 @@ int csllbc_Service_GetDriveMode(csllbc_Service *svc)
 
 int csllbc_Service_SetDriveMode(csllbc_Service *svc, int driveMode)
 {
-    return svc->SetDriveMode(static_cast<LLBC_Service::DriveMode>(driveMode));
+    return svc->SetDriveMode(static_cast<LLBC_ServiceDriveMode::ENUM>(driveMode));
 }
 
 int csllbc_Service_Start(csllbc_Service *svc, int pollerCount)
@@ -182,7 +182,7 @@ int csllbc_Service_Multicast(csllbc_Service *svc,
                              int dataLen,
                              int status)
 {
-    LLBC_SessionIdList sessionIdList(sessionIdCount);
+    LLBC_SessionIds sessionIdList(sessionIdCount);
     for (int idx = 0; idx < sessionIdCount; ++idx)
         sessionIdList.push_back(sessionIds[idx]);
 

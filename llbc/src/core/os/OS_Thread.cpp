@@ -129,9 +129,10 @@ static int __WinPriority2LLBCPriority(int priority)
 
     case THREAD_PRIORITY_TIME_CRITICAL:
         return LLBC_NS LLBC_ThreadPriority::Critical;
-    }
 
-    return LLBC_NS LLBC_ThreadPriority::Normal;
+    default:
+        return LLBC_NS LLBC_ThreadPriority::Normal;
+    }
 }
 
 static int __LLBCPriority2WinPriority(int priority)
@@ -158,9 +159,10 @@ static int __LLBCPriority2WinPriority(int priority)
 
     case LLBC_NS LLBC_ThreadPriority::Critical:
         return THREAD_PRIORITY_TIME_CRITICAL;
-    }
 
-    return THREAD_PRIORITY_NORMAL;
+    default:
+        return THREAD_PRIORITY_NORMAL;
+    }
 }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
@@ -651,13 +653,11 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int sig)
         }
 
         return LLBC_OK;
-        break;
 
     default:
         errno = EINVAL;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
-        break;
     }
 #endif
 }

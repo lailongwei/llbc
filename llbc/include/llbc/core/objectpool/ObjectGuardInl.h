@@ -220,7 +220,7 @@ LLBC_String LLBC_ObjectGuard<ObjectType>::ToString() const
 __LLBC_NS_END
 
 template <typename ObjectType>
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectGuard<ObjectType> &objGuard)
 {
     return (o << objGuard.ToString());
 }

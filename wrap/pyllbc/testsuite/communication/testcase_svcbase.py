@@ -3,6 +3,7 @@
 Service basic 测试
 """
 
+import sys
 import traceback
 from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_handler
 
@@ -11,23 +12,47 @@ from llbc import TestCase, comp, packet, bindto, Service, Stream, handler, exc_h
 class TestComp(object):
     def __init__(self):
         self._call_times = 0
+        self._init_times = 0
+        self._start_times = 0
+        self._stop_times = 0
+        self._destroy_times = 0
 
     def oninit(self, ev):
         print 'service init: {}'.format(ev)
+        if self._init_times == 10:
+            return True
+        else:
+            self._init_times += 1
+            return False
 
     def onstart(self, ev):
         print 'service start: {}'.format(ev)
+        if self._start_times == 10:
+            return
+        else:
+            self._start_times += 1
+            return False
 
     def onstop(self, ev):
         print 'service stop: {}'.format(ev)
+        if self._stop_times == 10:
+            return True
+        else:
+            self._stop_times += 1
+            return False
 
     def ondestroy(self, ev):
         print 'service destroy: {}'.format(ev)
+        if self._destroy_times == 10:
+            pass
+        else:
+            self._destroy_times += 1
+            return False
 
     def onupdate(self, ev):
-        # print 'service update: {}'.format(d)
+        # print 'service update: {}'.format(ev)
         self._call_times += 1
-        if self._call_times == 100000:
+        if self._call_times == 300:
             print 'Service update {} times, deschedule it'.format(self._call_times)
             Service.deschedule()
 
@@ -90,8 +115,8 @@ class TestHandler(object):
         # raise Exception('Test exception, raise from TestData packet handler')
 
         self._handleTimes += 1
-        if self._handleTimes % 1000 == 0:
-            print('Handle {} times'.format(self._handleTimes))
+        if self._handleTimes % 5000 == 0:
+            print('Handled {} times, test data:{}'.format(self._handleTimes, data))
 
 @exc_handler(TestData)
 @bindto('svcbase_test_svc')
@@ -128,7 +153,7 @@ class SvcBaseTest(TestCase):
         svc.fps = 200
 
         # Send data.
-        for i in range(50):  # Note: You can modify range limit to execute performance test.
+        for i in range(200):  # Note: You can modify range limit to execute performance test.
             svc.send(conn_sid, TestData())
         # Test unhandled packet.
         svc.send(conn_sid, data=3, opcode=10086, status=0)
@@ -140,7 +165,13 @@ class SvcBaseTest(TestCase):
         # Schedule.
         Service.schedule()
 
+        print('deschedule!!!!!!!!!!!!')
+        print(sys.getrefcount(svc))
+        print(sys.getrefcount(another))
         # If deschedule, will gone to here.
         # Delete my_svc service.
         del Service.svcbase_test_svc
         del Service.another
+        print('deschedule finish!!!!!!!!!!!!')
+        print('svcbase_test_svc ref count:{}'.format(sys.getrefcount(svc)))
+        print('another_svc ref count:{}'.format(sys.getrefcount(another)))

@@ -32,7 +32,6 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
-#include "llbc/comm/protocol/RawProtocolFactory.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
 #include "llbc/comm/Component.h"
 #include "llbc/comm/ServiceImpl.h"
@@ -42,15 +41,38 @@
 
 namespace
 {
-    typedef LLBC_NS LLBC_ServiceImpl This;
     typedef LLBC_NS LLBC_ProtocolStack _Stack;
 }
+
+#define __LLBC_INL_CHECK_RUNNING_PHASE_EQ(requirePhase, failedSetErr, failedRet) \
+    LLBC_LockGuard guard(_lock);                                               \
+    if (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::requirePhase ||    \
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
+        LLBC_SetLastError(failedSetErr);                                       \
+        return failedRet;                                                      \
+    }                                                                          \
+
+#define __LLBC_INL_CHECK_RUNNING_PHASE_LE(requirePhase, failedSetErr, failedRet) \
+    LLBC_LockGuard guard(_lock);                                               \
+    if (UNLIKELY(_runningPhase > LLBC_ServiceRunningPhase::requirePhase ||     \
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
+        LLBC_SetLastError(failedSetErr);                                       \
+        return failedRet;                                                      \
+    }                                                                          \
+
+#define __LLBC_INL_CHECK_RUNNING_PHASE_GE(requirePhase, failedSetErr, failedRet) \
+    LLBC_LockGuard guard(_lock);                                               \
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::requirePhase ||     \
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase))) {   \
+        LLBC_SetLastError(failedSetErr);                                       \
+        return failedRet;                                                      \
+    }                                                                          \
 
 __LLBC_NS_BEGIN
 
 int LLBC_ServiceImpl::_maxId = 1;
 
-LLBC_ServiceImpl::_EvHandler LLBC_ServiceImpl::_evHandlers[LLBC_ServiceEventType::End] = 
+LLBC_ServiceImpl::_EvHandler LLBC_ServiceImpl::_evHandlers[LLBC_ServiceEventType::End] =
 {
     &LLBC_ServiceImpl::HandleEv_SessionCreate,
     &LLBC_ServiceImpl::HandleEv_SessionDestroy,
@@ -66,81 +88,46 @@ LLBC_ServiceImpl::_EvHandler LLBC_ServiceImpl::_evHandlers[LLBC_ServiceEventType
     &LLBC_ServiceImpl::HandleEv_AppCfgReload,
 };
 
-// VS2005 and later version compiler support initialize array in construct list.
-// In here, we disable C4351 warning to initialize it.
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC && LLBC_COMP_VER >= 1400
-# pragma warning(disable:4351)
-#endif
+LLBC_ListenerStub LLBC_ServiceImpl::_evManagerMaxListenerStub = 0;
 
 LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
-                           LLBC_IProtocolFactory *dftProtocolFactory,
-                           bool fullStack)
+                                   LLBC_IProtocolFactory *dftProtocolFactory,
+                                   bool fullStack)
 : _id(LLBC_AtomicFetchAndAdd(&_maxId, 1))
+
 , _name(name.c_str(), name.length())
+, _driveMode(LLBC_ServiceDriveMode::SelfDrive)
 , _svcThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
+, _inCleaning(false)
+, _sinkIntoOnSvcLoop(false)
+, _svcMgr(*LLBC_ServiceMgrSingleton)
+, _serviceBeginLoop(false)
+, _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
+
+, _startErrNo(0)
+, _startSubErrNo(0)
 
 , _cfgType(LLBC_AppConfigType::End)
 
 , _fullStack(fullStack)
-, _dftProtocolFactory(dftProtocolFactory)
-, _sessionProtoFactory()
-, _driveMode(SelfDrive)
+, _pollerCount(0)
 , _suppressedCoderNotFoundWarning(false)
-
-, _started(false)
-, _stopping(false)
-, _initingComp(false)
-
-, _lock()
-, _protoLock()
+, _dftProtocolFactory(dftProtocolFactory)
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
-, _relaxTimes(0)
-, _begHeartbeatTime(0)
-, _sinkIntoLoop(false)
-, _afterStop(false)
-
-, _pollerMgr()
-, _readySessionInfos()
-, _readySessionInfosLock()
-
-, _willRegComps()
-
-, _compsInitFinished(false)
-, _compsInitRet(LLBC_ERROR_SUCCESS)
-, _compsStartFinished(false)
-, _compsStartRet(LLBC_ERROR_SUCCESS)
+, _begSvcTime(0)
 
 , _caredEventComps{}
-, _coders()
-, _handlers()
-, _preHandlers()
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-, _unifyPreHandler()
-#endif
-#if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-, _statusHandlers()
-#endif
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-, _statusDescs()
-#endif
 
-, _frameTaskIdx(0)
-, _frameTasks{}
-
+// Service extend functions about members.
 , _releasePoolStack(nullptr)
 
-, _packetObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_Packet>())
-, _msgBlockObjectPool(*_safetyObjectPool.GetPoolInst<LLBC_MessageBlock>())
-, _eventFirerPool(*_safetyObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
+, _packetObjectPool(*_safeObjectPool.GetPoolInst<LLBC_Packet>())
+, _msgBlockObjectPool(*_safeObjectPool.GetPoolInst<LLBC_MessageBlock>())
+, _eventFirerPool(*_safeObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
 
 , _timerScheduler(nullptr)
-
-, _evManager()
-, _evManagerMaxListenerStub(0)
-
-, _svcMgr(*LLBC_ServiceMgrSingleton)
 {
     // Create service name, if is empty.
     if (_name.empty())
@@ -153,83 +140,57 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);
-    ASSERT(LLBC_PollerType::IsValid(pollerType) && "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
+    ASSERT(LLBC_PollerType::IsValid(pollerType) &&
+           "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
 
     _pollerMgr.SetService(this);
     _pollerMgr.SetPollerType(pollerType);
 }
 
-// If using MSVC compiler and version >= 1400(VS2005), Reset C4351 warning to default.
-#if LLBC_CUR_COMP == LLBC_COMP_MSVC && LLBC_COMP_VER >= 1400
-# pragma warning(default:4351)
-#endif
-
 LLBC_ServiceImpl::~LLBC_ServiceImpl()
 {
+    // Forbid destroy service in service thread(Self Drive mode).
+    if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
+        ASSERT(LLBC_GetCurrentThreadId() != _svcThreadId);
+
+    // Forbid destroy service in service thread and not in <NotStarted> phase.
+    if (_driveMode == LLBC_ServiceDriveMode::ExternalDrive)
+        ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
+               LLBC_GetCurrentThreadId() == _svcThreadId);
+
+    // Stop service and destroy comps).
     Stop();
+    DestroyComps(false);
 
-    DestroyComps();
-    DestroyWillRegComps();
-    CloseAllCompLibraries();
-
-    LLBC_STLHelper::DeleteContainer(_coders);
-    _handlers.clear();
-    _preHandlers.clear();
-    #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    _unifyPreHandler = nullptr;
-    #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-
-    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    _statusHandlers.clear();
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-
-    RemoveAllReadySessions();
-
-    DestroyFrameTasks();
-
+    // Clear members.
+    LLBC_STLHelper::DeleteContainer(_coderFactories);
     LLBC_STLHelper::DeleteContainer(_sessionProtoFactory);
     LLBC_XDelete(_dftProtocolFactory);
 }
 
-bool LLBC_ServiceImpl::IsFullStack() const
+int LLBC_ServiceImpl::SetDriveMode(LLBC_ServiceDriveMode::ENUM driveMode)
 {
-    return _fullStack;
-}
-
-auto LLBC_ServiceImpl::GetDriveMode() const -> DriveMode
-{
-    return _driveMode;
-}
-
-int LLBC_ServiceImpl::SetDriveMode(DriveMode mode)
-{
-    // Drive mode vlidate check.
-    if (mode != SelfDrive && mode != ExternalDrive)
+    // Drive mode validate check.
+    if (UNLIKELY(!LLBC_ServiceDriveMode::IsValid(driveMode)))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
-    else if (_started) // If service started, could not change drive mode.
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
 
-    // Service started recheck(after locked).
-    LLBC_LockGuard guard(_lock);
-    if (_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
+     // If service not in <NotStarted> phase, could not change drive mode.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
+        NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Set driveMode to _driveMode.
+    _driveMode = driveMode;
 
     // If drive mode is external drive, Reinit object-pools, timer-scheduler, ...
-    if ((_driveMode = mode) == ExternalDrive)
+    if (_driveMode == LLBC_ServiceDriveMode::ExternalDrive)
     {
-        ClearHoldedObjectPools();
-        ClearHoldedTimerScheduler();
+        ClearTimerScheduler();
+        ClearAutoReleasePool();
 
-        InitObjectPools();
+        InitAutoReleasePool();
         InitTimerScheduler();
     }
 
@@ -238,13 +199,8 @@ int LLBC_ServiceImpl::SetDriveMode(DriveMode mode)
 
 int LLBC_ServiceImpl::SuppressCoderNotFoundWarning()
 {
-    LLBC_LockGuard guard(_lock);
-    if (_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        StartingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
     _suppressedCoderNotFoundWarning = true;
 
     return LLBC_OK;
@@ -253,178 +209,136 @@ int LLBC_ServiceImpl::SuppressCoderNotFoundWarning()
 int LLBC_ServiceImpl::Start(int pollerCount)
 {
     // Normalize pollerCount.
-    pollerCount = MAX(1, pollerCount);
+    _pollerCount = MAX(1, pollerCount);
+
+    // Reentry check.
+    _lock.Lock();
+    if (_runningPhase != LLBC_ServiceRunningPhase::NotStarted)
+    {
+        _lock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+
+        return LLBC_FAILED;
+    }
 
     // Service repeat start check.
     if (_svcMgr.GetService(_id) ||
         _svcMgr.GetService(_name))
     {
+        _lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
-    // Reentry check.
-    else if (_started)
+
+    // Defer reset _startErrNo/_startSubErrNo.
+    LLBC_Defer(
+        _startErrNo = 0;
+        _startSubErrNo = 0;
+    );
+
+    // PreStart -> InitComps -> StartComps.
+    if (_driveMode == LLBC_ServiceDriveMode::ExternalDrive)
     {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    // Reentry check again.
-    _lock.Lock();
-    if (_started)
-    {
-        _lock.Unlock();
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-
-        return LLBC_FAILED;
-    }
-
-    // Init PollerMgr.
-    if (_pollerMgr.Init(pollerCount) != LLBC_OK)
-    {
-        _lock.Unlock();
-        return LLBC_FAILED;
-    }
-
-    // Update service config(extract from the app config).
-    UpdateServiceCfg();
-
-    // Add to service tls or activate.
-    if (_driveMode == ExternalDrive)
-    {
-        if (!IsCanContinueDriveService())
+        // PreStart:
+        if (PreStart() != LLBC_OK ||
+            InitComps() != LLBC_OK ||
+            StartComps() != LLBC_OK)
         {
-            _pollerMgr.Finalize();
-            LLBC_SetLastError(LLBC_ERROR_LIMIT);
-
+            _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
             _lock.Unlock();
 
             return LLBC_FAILED;
         }
-
-        AddServiceToTls();
     }
     else
     {
+        // Activate service task(thread).
         if (Activate(1) != LLBC_OK)
         {
-            _pollerMgr.Finalize();
             _lock.Unlock();
+            return LLBC_FAILED;
+        }
+
+        // Set _runningPhase to <PreStarting>, and then unlock service lock.
+        _runningPhase = LLBC_ServiceRunningPhase::PreStarting;
+        _lock.Unlock();
+
+        // Waiting for all service start finished or failed.
+        while (!LLBC_ServiceRunningPhase::IsFailedPhase(_runningPhase) &&
+               _runningPhase != LLBC_ServiceRunningPhase::CompsStarted)
+            LLBC_Sleep(1);
+
+        // Process startup failed.
+        if (_runningPhase != LLBC_ServiceRunningPhase::CompsStarted)
+        {
+            LLBC_SetLastError(_startErrNo);
+            LLBC_SetSubErrorNo(_startSubErrNo);
+            _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
 
             return LLBC_FAILED;
         }
     }
 
-    // Mask started.
-    _started = true;
-
-    // Init&Start comps.
-    if (_driveMode == ExternalDrive)
+    // Update _runningPhase to Started phase.
+    _runningPhase = LLBC_ServiceRunningPhase::Started;
+    // Waiting for _serviceBeginLoop flag set to true.
+    if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
     {
-        // Start pollermgr.
-        _pollerMgr.Start();
-
-        // Add service to service mgr.
-        _svcMgr.OnServiceStart(this);
-
-        // Waiting for all comp init & start finished.
-        if (InitComps() != LLBC_OK ||
-            StartComps() != LLBC_OK)
-        {
-            int errNo = LLBC_GetLastError();
-
-            Stop();
-            LLBC_SetLastError(errNo);
-
-            _lock.Unlock();
-
-            return LLBC_FAILED;
-        }
-
-        _lock.Unlock();
-    }
-    else // Self-Drive
-    {
-        // Unlock first.
-        _lock.Unlock();
-
-        // Waiting for all comps init finished.
-        while (!_compsInitFinished)
+        while (!_serviceBeginLoop)
             LLBC_Sleep(1);
-        if (_compsInitRet != LLBC_ERROR_SUCCESS)
-        {
-            const int compsInitRet = _compsInitRet;
-            Stop();
-
-            LLBC_SetLastError(compsInitRet);
-
-            return LLBC_FAILED;
-        }
-
-        // Waiting for all comps start finished.
-        while (!_compsStartFinished)
-            LLBC_Sleep(1);
-        if (_compsStartRet != LLBC_ERROR_SUCCESS)
-        {
-            const int compsStartRet = _compsStartRet;
-            Stop();
-
-            LLBC_SetLastError(compsStartRet);
-
-            return LLBC_FAILED;
-        }
     }
 
     return LLBC_OK;
 }
 
-bool LLBC_ServiceImpl::IsStarted() const
+int LLBC_ServiceImpl::Stop()
 {
-    return _started;
-}
-
-void LLBC_ServiceImpl::Stop()
-{
+    // If service not in <Started> phase, return failed.
     _lock.Lock();
-    if (!_started || _stopping)
+    if (_runningPhase != LLBC_ServiceRunningPhase::Started)
     {
         _lock.Unlock();
-        return;
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+
+        return LLBC_FAILED;
     }
 
-    LLBC_ThreadId svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
-    if (_driveMode == SelfDrive)
-        svcThreadId = _svcThreadId;
-    _stopping = true;
+    // Get service driveMode/threadId.
+    const int driveMode = _driveMode;
+    const LLBC_ThreadId svcThreadId = _svcThreadId;
+
+    // Update service phase to <Stopping>.
+    _runningPhase = LLBC_ServiceRunningPhase::StoppingComps;
     _lock.Unlock();
 
-    if (_driveMode == SelfDrive) // Stop self-drive service.
+    // Exec stop logic.
+    const auto curThreadId = LLBC_GetCurrentThreadId();
+    if (driveMode == LLBC_ServiceDriveMode::ExternalDrive)
     {
-        // Call Stop() in self thread, do nothing.
-        if (LLBC_GetCurrentThreadId() == svcThreadId)
-            return;
-
-        // Waiting for svc-thread stopped.
-        Wait();
-    }
-    else // Stop external-drive service.
-    {
-        if (_sinkIntoLoop) // Service sink into loop, set afterStop flag to true, and return.
+        if (curThreadId == svcThreadId && _sinkIntoOnSvcLoop)
         {
-            _afterStop = true; //! After stop data member only use external-drive service.
-            return;
+            LLBC_SetLastError(LLBC_ERROR_PENDING);
+            return LLBC_FAILED;
         }
 
-        // Service not sink into loop, direct cleanup.
         Cleanup();
+        return LLBC_OK;
+    }
+    else // SelfDrive
+    {
+        if (curThreadId == svcThreadId)
+        {
+            LLBC_SetLastError(LLBC_ERROR_PENDING);
+            return LLBC_FAILED;
+        }
+
+        return Wait();
     }
 }
 
 int LLBC_ServiceImpl::GetFPS() const
 {
-    This *ncThis = const_cast<This *>(this);
-
-    LLBC_LockGuard guard(ncThis->_lock);
+    LLBC_LockGuard guard(_lock);
     return _fps;
 }
 
@@ -446,7 +360,6 @@ int LLBC_ServiceImpl::SetFPS(int fps)
     }
     else
     {
-        _relaxTimes = 0;
         _frameInterval = 0;
     }
 
@@ -455,9 +368,7 @@ int LLBC_ServiceImpl::SetFPS(int fps)
 
 int LLBC_ServiceImpl::GetFrameInterval() const
 {
-    This *ncThis = const_cast<This *>(this);
-
-    LLBC_LockGuard guard(ncThis->_lock);
+    LLBC_LockGuard guard(_lock);
     return _frameInterval;
 }
 
@@ -466,7 +377,9 @@ int LLBC_ServiceImpl::Listen(const char *ip,
                              LLBC_IProtocolFactory *protoFactory,
                              const LLBC_SessionOpts &sessionOpts)
 {
-    LLBC_LockGuard guard(_lock);
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
+
     const int sessionId = _pollerMgr.Listen(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, true);
@@ -482,7 +395,9 @@ int LLBC_ServiceImpl::Connect(const char *ip,
                               LLBC_IProtocolFactory *protoFactory,
                               const LLBC_SessionOpts &sessionOpts)
 {
-    LLBC_LockGuard guard(_lock);
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
+
     const int sessionId = _pollerMgr.Connect(ip, port, protoFactory, sessionOpts);
     if (sessionId != 0)
         AddReadySession(sessionId, 0, false);
@@ -498,7 +413,8 @@ int LLBC_ServiceImpl::AsyncConn(const char *ip,
                                 LLBC_IProtocolFactory *protoFactory,
                                 const LLBC_SessionOpts &sessionOpts)
 {
-    LLBC_LockGuard guard(_lock);
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        LLBC_ServiceRunningPhase::StoppingComps, LLBC_ERROR_NOT_ALLOW, 0);
 
     int pendingSessionId;
     const int asyncConnRet = _pollerMgr.AsyncConn(ip,
@@ -531,62 +447,114 @@ int LLBC_ServiceImpl::Send(LLBC_Packet *packet)
 {
     // Call internal LockableSend() method to send packet.
     // lock = true
-    // validCheck = true
-    return LockableSend(packet);
+    // checkRunningPhase = true
+    // checkSessionValidity = true
+    return LockableSend(packet, true, true, true);
 }
 
-int LLBC_ServiceImpl::Broadcast(int svcId, int opcode, LLBC_Coder *coder, int status)
+int LLBC_ServiceImpl::Multicast(const LLBC_SessionIds &sessionIds,
+                                int opcode,
+                                const void *bytes,
+                                size_t len,
+                                int status,
+                                uint32 flags)
 {
-    // Copy all connected session Ids.
-    _readySessionInfosLock.Lock();
-    LLBC_SessionIdList connSIds;
-    for (auto readySInfoIt = _readySessionInfos.begin();
-         readySInfoIt != _readySessionInfos.end();
-         ++readySInfoIt)
+    // Argument check.
+    if (UNLIKELY(sessionIds.empty()))
     {
-        const _ReadySessionInfo * const &sessionInfo = readySInfoIt->second;
-        if (sessionInfo->isListenSession)
-            continue;
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
 
-        connSIds.push_back(sessionInfo->sessionId);
+    // Lock & Check running phase.
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    // Foreach to call internal method LockableSend() to complete.
+    // lock = false
+    // checkRunningPhase = false
+    // checkSessionValidity = true
+    const auto sessionIdsEndIt = sessionIds.end();
+    for (auto sessionIt = sessionIds.begin();
+         sessionIt != sessionIdsEndIt;
+         ++sessionIt)
+        LockableSend(*sessionIt, // sessionId
+                     opcode, // opcode
+                     bytes, // bytes
+                     len, // len
+                     status, // status
+                     flags, // flags
+                     false, // lock
+                     false, // checkRunningPhase
+                     true); // checkSessionValidity
+
+    return LLBC_OK;
+}
+
+int LLBC_ServiceImpl::Broadcast(int opcode,
+                                const void *bytes,
+                                size_t len,
+                                int status,
+                                uint32 flags)
+{
+    // Lock & Check running phase.
+    LLBC_LockGuard guard(_lock);
+    if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+        LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    // Get all non-listen sessionIds.
+    static thread_local LLBC_SessionIds sessionIds;
+
+    _readySessionInfosLock.Lock();
+    const auto readySessionInfosEndIt = _readySessionInfos.end();
+    for (auto it = _readySessionInfos.begin();
+         it != readySessionInfosEndIt;
+         ++it)
+    {
+        const _ReadySessionInfo &readySessionInfo = *it->second;
+        if (!readySessionInfo.isListenSession)
+            sessionIds.push_back(readySessionInfo.sessionId);
     }
     _readySessionInfosLock.Unlock();
 
-    // Call internal template method MulticastSendCoder<>() to complete.
-    // validCheck = false
-    return MulticastSendCoder<LLBC_SessionIdList>(svcId, connSIds, opcode, coder, status, false);
-}
+    // return LLBC_OK, if is empty.
+    if (sessionIds.empty())
+        return LLBC_OK;
 
-int LLBC_ServiceImpl::Broadcast(int svcId, int opcode, const void *bytes, size_t len , int status)
-{
-    LLBC_LockGuard guard(_lock);
-
-    // Foreach to call internal method LockableSend() method to complete.
+    // Foreach to call internal method LockableSend() to compolete.
     // lock = false
-    // validCheck = false
-    LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
-    for (auto readySInfoIt = _readySessionInfos.begin();
-         readySInfoIt != _readySessionInfos.end();
-         ++readySInfoIt)
-    {
-        const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-        if (readySInfo->isListenSession)
-            continue;
-
-        LockableSend(svcId, readySInfo->sessionId, opcode, bytes, len, status, false, false);
-    }
+    // checkRunningPhase = false
+    // checkSessionValidity = false
+    const auto sessionIdsEndIt = sessionIds.end();
+    for (auto sessionIt = sessionIds.begin();
+         sessionIt != sessionIdsEndIt;
+         ++sessionIt)
+        LockableSend(*sessionIt, // sessionId
+                     opcode, // opcode
+                     bytes, // bytes
+                     len, // len
+                     status, // status
+                     flags, // flags
+                     false, // lock
+                     false, // checkRunningPhase
+                     false); // checkSessionValidity
 
     return LLBC_OK;
 }
 
 int LLBC_ServiceImpl::RemoveSession(int sessionId, const char *reason)
 {
-    LLBC_LockGuard guard(_lock);
-    if (!_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
+    __LLBC_INL_CHECK_RUNNING_PHASE_GE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     LLBC_LockGuard readySInfosGuard(_readySessionInfosLock);
     auto readySInfoIt = _readySessionInfos.find(sessionId);
@@ -608,12 +576,8 @@ int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
                                         int ctrlCmd,
                                         const LLBC_Variant &ctrlData)
 {
-    LLBC_LockGuard guard(_lock);
-    if (!_started)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
+    __LLBC_INL_CHECK_RUNNING_PHASE_GE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     _readySessionInfosLock.Lock();
     auto readySInfoIt = _readySessionInfos.find(sessionId);
@@ -650,46 +614,48 @@ int LLBC_ServiceImpl::CtrlProtocolStack(int sessionId,
 
 int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
 {
+    // Argument check.
     if (UNLIKELY(!comp))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
+    // Check service running phase.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
+        NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
-    char compName[512];
-    const char *compRttiName = LLBC_GetTypeName(*comp);
-    const size_t compNameLen = strlen(compRttiName);
-    if (compNameLen >= sizeof(compName))
-    {
-        LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_FAILED;
-    }
+    // Get component name.
+    size_t compNameLen;
+    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
+    GetCompName(typeid(*comp).name(), compName, compNameLen);
 
-    memcpy(compName, compRttiName, compNameLen + 1);
-
-    if (std::find_if(_willRegComps.begin(),
-                _willRegComps.end(),
-                [comp, compName, compNameLen](LLBC_Component *regComp) {
+    // Define component find lambda.
+    const auto findLambda = [comp, compName, compNameLen](LLBC_Component *regComp) {
         if (comp == regComp)
-        {
             return true;
-        }
 
-        const char *regCompName = LLBC_GetTypeName(*regComp);
-        return strlen(regCompName) == compNameLen && memcmp(compName, regCompName, compNameLen) == 0;
-    }) != _willRegComps.end())
+        char regCompName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
+        size_t regCompNameLen;
+        GetCompName(typeid(*regComp).name(), regCompName, regCompNameLen);
+
+        return regCompNameLen == compNameLen &&
+            memcmp(compName, regCompName, compNameLen) == 0;
+    };
+
+    // Repeat add check.
+    if (std::find_if(_willRegComps.begin(),
+                     _willRegComps.end(),
+                     findLambda) != _willRegComps.end() ||
+        std::find_if(_compList.begin(),
+                     _compList.end(),
+                     findLambda) != _compList.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
+    // Add to _willRegComps.
     _willRegComps.push_back(comp);
 
     return LLBC_OK;
@@ -702,13 +668,9 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     // Force reset out parameter: comp.
     comp = nullptr;
 
-    // Service started or not check.
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
+    // Check service phase.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
+        NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Argument check.
     if (compName.empty())
@@ -757,9 +719,9 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
 
     // Validate comp class name and giving compName is same or not.
     auto realCompName = LLBC_GetTypeName(*comp);
-    const auto colonPos = strrchr(realCompName, ':');
-    if (colonPos != nullptr)
-        realCompName = colonPos + 1;
+    const auto realCompNSNameEnd = strrchr(realCompName, ':');
+    if (realCompNSNameEnd != nullptr)
+        realCompName = realCompNSNameEnd + 1;
     if (UNLIKELY(realCompName != compName))
     {
         LLBC_XDelete(comp);
@@ -792,6 +754,7 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
     }
 
     const auto compsEnd = _name2Comps.end();
+
     LLBC_LockGuard guard(_lock);
     auto it = _name2Comps.find(compName);
     if (it != compsEnd)
@@ -815,13 +778,10 @@ int LLBC_ServiceImpl::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactor
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (!_coders.insert(std::make_pair(opcode, coderFactory)).second)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (!_coderFactories.insert(std::make_pair(opcode, coderFactory)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -829,33 +789,6 @@ int LLBC_ServiceImpl::AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactor
 
     return LLBC_OK;
 }
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-int LLBC_ServiceImpl::AddStatusDesc(int status, const LLBC_String &desc)
-{
-    if (status == 0 || desc.empty())
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-
-    if (!_statusDescs.insert(std::make_pair(
-        status, LLBC_String(desc.data(), desc.size()))).second)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    return LLBC_OK;
-}
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 int LLBC_ServiceImpl::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
@@ -865,13 +798,10 @@ int LLBC_ServiceImpl::Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (!_handlers.insert(std::make_pair(opcode, deleg)).second)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (!_handlers.insert(std::make_pair(opcode, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -888,13 +818,10 @@ int LLBC_ServiceImpl::PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Pac
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (!_preHandlers.insert(std::make_pair(opcode, deleg)).second)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (!_preHandlers.insert(std::make_pair(opcode, deleg)).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -912,13 +839,10 @@ int LLBC_ServiceImpl::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)>
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_unifyPreHandler)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (_unifyPreHandler)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -933,23 +857,14 @@ int LLBC_ServiceImpl::UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)>
 #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 int LLBC_ServiceImpl::SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg)
 {
-    if (UNLIKELY(!deleg))
+    if (UNLIKELY(!deleg || status == 0))
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (status == 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     auto &stHandlers = _statusHandlers[opcode];
     if (!stHandlers.insert(std::make_pair(status, deleg)).second)
@@ -964,13 +879,10 @@ int LLBC_ServiceImpl::SubscribeStatus(int opcode, int status, const LLBC_Delegat
 
 int LLBC_ServiceImpl::EnableTimerScheduler()
 {
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INITED);
-        return LLBC_FAILED;
-    }
-    else if (_driveMode != ExternalDrive)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (_driveMode != LLBC_ServiceDriveMode::ExternalDrive)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
@@ -982,13 +894,10 @@ int LLBC_ServiceImpl::EnableTimerScheduler()
 
 int LLBC_ServiceImpl::DisableTimerScheduler()
 {
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(_started && !_initingComp))
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-    else if (_driveMode != ExternalDrive)
+    __LLBC_INL_CHECK_RUNNING_PHASE_LE(
+        InitingComps, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    if (_driveMode != LLBC_ServiceDriveMode::ExternalDrive)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return LLBC_FAILED;
@@ -1047,7 +956,7 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
 
 LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromSafetyPool<LLBC_Event>();
+    LLBC_Event *ev = LLBC_GetObjectFromSafePool<LLBC_Event>();
     ev->SetId(eventId);
 
     auto *eventServiceFirer = _eventFirerPool.GetReferencableObject();
@@ -1057,8 +966,7 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return *eventServiceFirer;
 }
 
-int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &)> &runnable,
-                           const LLBC_Variant &data)
+int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
 {
     if (UNLIKELY(!runnable))
     {
@@ -1066,8 +974,9 @@ int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(Base *, const LLBC_Variant &
         return LLBC_FAILED;
     }
 
-    LLBC_LockGuard guard(_lock);
-    _frameTasks[_frameTaskIdx].emplace_back(runnable, data);
+    _lock.Lock();
+    _posts.push_back(runnable);
+    _lock.Unlock();
 
     return LLBC_OK;
 }
@@ -1082,12 +991,11 @@ const LLBC_ProtocolStack *LLBC_ServiceImpl::GetCodecProtocolStack(int sessionId)
     }
 
     // Not enabled full-stack option, return session codec protocol-stack.
-    LLBC_ServiceImpl *ncThis = const_cast<LLBC_ServiceImpl *>(this);
-    ncThis->_readySessionInfosLock.Lock();
+    _readySessionInfosLock.Lock();
     auto it = _readySessionInfos.find(sessionId);
     const LLBC_ProtocolStack *codecStack =
         it != _readySessionInfos.end() ? it->second->codecStack : nullptr;
-    ncThis->_readySessionInfosLock.Unlock();
+    _readySessionInfosLock.Unlock();
 
     if (!codecStack)
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -1100,33 +1008,39 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     if (fullFrame && _frameInterval == 0)
         fullFrame = false;
 
-    if (UNLIKELY(!_started))
+    while (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::Started &&
+                    _runningPhase != LLBC_ServiceRunningPhase::StartingComps &&
+                    _runningPhase != LLBC_ServiceRunningPhase::StoppingComps))
     {
-        if (fullFrame)
-            LLBC_Sleep(_frameInterval);
-
+        LLBC_DoIf(fullFrame, LLBC_Sleep(_frameInterval));
         return;
     }
 
-    _sinkIntoLoop = true;
+    bool needResetSinkIntoFlag = false;
+    if (!_sinkIntoOnSvcLoop)
+    {
+        _sinkIntoOnSvcLoop = true;
+        needResetSinkIntoFlag = true;
+    }
 
-    // Record begin heartbeat time.
+    // Record begin svc time, if fullFrame is true.
     if (fullFrame)
-        _begHeartbeatTime = LLBC_GetMilliSeconds();
+        _begSvcTime = LLBC_GetMilliseconds();
 
-    // Handle frame-tasks.
-    HandleFrameTasks();
+    // Handle posts.
+    HandlePosts();
 
     // Process queued events.
     HandleQueuedEvents();
 
     // Update all components.
     UpdateComps();
+    LateUpdateComps();
     UpdateTimerScheduler();
     UpdateAutoReleasePool();
 
     // Handle frame-tasks.
-    HandleFrameTasks();
+    HandlePosts();
 
     // Process Idle.
     if (fullFrame)
@@ -1135,14 +1049,20 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
     {
-        const sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
+        const sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
         if (elapsed >= 0 && elapsed < _frameInterval)
             LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
     }
 
-    _sinkIntoLoop = false;
-    if (UNLIKELY(_afterStop))
+    // If in stopping phases(StoppingComp/Stopping) and is ExternalDrive mode, Exec cleanup.
+    if (UNLIKELY(_runningPhase >= LLBC_ServiceRunningPhase::StoppingComps &&
+        _driveMode == LLBC_ServiceDriveMode::ExternalDrive))
         Cleanup();
+
+    // Reset sink into OnSvc() loop flag.
+    if (needResetSinkIntoFlag)
+        _sinkIntoOnSvcLoop = false;
+
 }
 
 LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId,
@@ -1199,7 +1119,7 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreateCodecStack(int sessionId,
             LLBC_ProtocolLayer::CodecLayer && "Invalid protocol layer!");
 
         stack->AddProtocol(codecLayer);
-        stack->SetCoders(&_coders);
+        stack->SetCoders(&_coderFactories);
     }
 
     return stack;
@@ -1341,93 +1261,53 @@ void LLBC_ServiceImpl::RemoveAllReadySessions()
 
 void LLBC_ServiceImpl::Svc()
 {
-    _svcThreadId = LLBC_GetCurrentThreadId();
-    while (!_started)
-        LLBC_Sleep(5);
-
+    // Startup(lock service).
     _lock.Lock();
-
-    _pollerMgr.Start();
-
-    AddServiceToTls();
-    InitObjectPools();
-    InitTimerScheduler();
-    InitAutoReleasePool();
-
-    _svcMgr.OnServiceStart(this);
-    if (UNLIKELY(InitComps() != LLBC_OK))
+    if (PreStart() != LLBC_OK ||
+        InitComps() != LLBC_OK ||
+        StartComps() != LLBC_OK)
     {
         _lock.Unlock();
         return;
     }
 
-    if (UNLIKELY(StartComps() != LLBC_OK))
-    {
-        _lock.Unlock();
-        return;
-    }
-
+    // Unlock.
     _lock.Unlock();
 
-    while (!_stopping)
+    // Waiting for _runningPhase updated to Started phase.
+    while (_runningPhase != LLBC_ServiceRunningPhase::Started)
+        LLBC_Sleep(1);
+
+    // Do Svc.
+    _serviceBeginLoop = true;
+    while (LIKELY(_runningPhase == LLBC_ServiceRunningPhase::Started))
         OnSvc();
 }
 
 void LLBC_ServiceImpl::Cleanup()
 {
+    if (_inCleaning)
+        return;
+
+    _inCleaning = true;
+    LLBC_Defer(_inCleaning = false);
+
     // Force handle queued events.
-    if (_started &&
-        _stopping &&
-        _compsStartFinished &&
-        _compsStartRet == LLBC_ERROR_SUCCESS)
+    if (_runningPhase >= LLBC_ServiceRunningPhase::StoppingComps &&
+        _runningPhase <= LLBC_ServiceRunningPhase::Stopping)
         HandleQueuedEvents();
 
-    // Stop && Finalize poller manager.
-    _pollerMgr.Stop();
-    _pollerMgr.Finalize();
-
-    // If drivemode is external-drive, cancel all timers first.
-    if (_driveMode == ExternalDrive)
-        _timerScheduler->CancelAll();
-
-    // Cleanup ready-sessionInfos map.
-    RemoveAllReadySessions();
-
-    // Stop components, destroy release-pool.
+    // Stop comps.
     StopComps();
-    ClearAutoReleasePool();
 
-    // Clear holded timer-scheduler & object-pools.
-    ClearHoldedObjectPools();
-    ClearHoldedTimerScheduler();
+    // Post-Stop.
+    PostStop();
 
-    // Remove service from TLS.
-    RemoveServiceFromTls();
-
-    // Popup & Destroy all not-process events.
-    LLBC_MessageBlock *block;
-    while (TryPop(block) == LLBC_OK)
-        LLBC_SvcEvUtil::DestroyEvBlock(block);
-
-    // notify service manager self stopped.
-    _svcMgr.OnServiceStop(this);
-
-    // Reset some variables.
-    _relaxTimes = 0;
-
-    _propCfg.RemoveAllProperties();
-    _nonPropCfg = LLBC_Variant::nil;
-    _cfgType = LLBC_AppConfigType::End;
-
-    _compsInitFinished = false;
-    _compsInitRet = LLBC_ERROR_SUCCESS;
-    _compsStartFinished = false;
-    _compsStartRet = LLBC_ERROR_SUCCESS;
-
-    _started = false;
-    _stopping = false;
-
-    _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    // Reset _serviceBeginLoop flag.
+    _serviceBeginLoop = false;
+    // Reset _runningPhase, if is not failed phase.
+    if (!LLBC_ServiceRunningPhase::IsFailedPhase(_runningPhase))
+        _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
 }
 
 void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
@@ -1503,68 +1383,160 @@ void LLBC_ServiceImpl::AddServiceToTls()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int idx = 0;
-    const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; ++idx)
+    for (int idx = 0; idx < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++idx)
     {
         if (!tls->commTls.services[idx])
-            break;
+        {
+            tls->commTls.services[idx] = this;
+            return;
+        }
     }
 
-    tls->commTls.services[idx] = this;
+    ASSERT(false && "llbc framework internal error");
 }
 
 void LLBC_ServiceImpl::RemoveServiceFromTls()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int idx = 0;
+    int svcCnt = 0;
+    int svcIdx = -1;
     const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; idx <= lmt; ++idx)
+    for (; svcCnt < lmt; ++svcCnt)
     {
-        if (tls->commTls.services[idx] == this)
+        if (!tls->commTls.services[svcCnt])
             break;
+
+        if (tls->commTls.services[svcCnt] == this)
+            svcIdx = svcCnt;
     }
 
-    memmove(&tls->commTls.services[idx],
-            &tls->commTls.services[idx + 1],
-            sizeof(tls->commTls.services[0]) * (lmt + 1 - (idx + 1)));
+    if (UNLIKELY(svcCnt == 0 || svcIdx == -1))
+        return;
+
+    if (svcIdx != svcCnt - 1)
+    {
+        memmove(&tls->commTls.services[svcIdx],
+                &tls->commTls.services[svcIdx + 1],
+                sizeof(tls->commTls.services[0]) * (svcCnt - svcIdx - 1));
+    }
+
+    tls->commTls.services[svcCnt - 1] = nullptr;
 }
 
 bool LLBC_ServiceImpl::IsCanContinueDriveService()
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
 
-    int checkIdx = 0;
-    const int lmt = LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-    for (; checkIdx <= lmt; ++checkIdx)
+    for (int idx = 0; idx < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++idx)
     {
-        if (tls->commTls.services[checkIdx] == nullptr)
-            break;
+        if (!tls->commTls.services[idx])
+            return true;
     }
 
-    return checkIdx < lmt ? true : false;
+    return false;
 }
 
-void LLBC_ServiceImpl::HandleFrameTasks()
+int LLBC_ServiceImpl::PreStart()
 {
-    auto &tasks = _frameTasks[_frameTaskIdx];
-    if (tasks.empty())
-        return;
+    // Set _runningPhase to PreStarting.
+    _runningPhase = LLBC_ServiceRunningPhase::PreStarting;
 
-    _frameTaskIdx ^= 1;
-    const auto endIt = tasks.end();
-    for (auto it = tasks.begin(); it != endIt; ++it)
-        (it->first)(this, it->second);
+    // Defer execute fail process lambda.
+    int ret = LLBC_FAILED;
+    LLBC_Defer(if (ret != LLBC_OK) {
+        // Fetch errNo/subErrNo first.
+        _startErrNo = LLBC_GetLastError();
+        _startSubErrNo = LLBC_GetSubErrorNo();
 
-    tasks.clear();
+        // Rollback PreStart state.
+        PostStop();
+
+        // Set _runningPhase to PreStartFailed.
+        _runningPhase = LLBC_ServiceRunningPhase::PreStartFailed;
+    });
+
+    // Get service thread Id.
+    _svcThreadId = LLBC_GetCurrentThreadId();
+
+    // Check current thread is can continue drive service ot not.
+    if (!IsCanContinueDriveService())
+    {
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
+    // Update service config.
+    UpdateServiceCfg();
+
+    // Initialize PollerMgr.
+    if (_pollerMgr.Init(_pollerCount) != LLBC_OK)
+        return LLBC_FAILED;
+
+    // Add service to TLS.
+    AddServiceToTls();
+
+    // Init timer-scheduler.
+    InitTimerScheduler();
+    // Init auto-release-pool.
+    InitAutoReleasePool();
+    // ... ...
+
+    // Add service to ServiceMgr.
+    _svcMgr.OnServiceStart(this);
+
+    // Set _runningPhase to PreStarted.
+    _runningPhase = LLBC_ServiceRunningPhase::PreStarted;
+
+    return ret = LLBC_OK;
 }
 
-void LLBC_ServiceImpl::DestroyFrameTasks()
+void LLBC_ServiceImpl::PostStop()
 {
-    for (size_t i = 0; i < sizeof(_frameTasks) / sizeof(_frameTasks[0]); ++i)
-        _frameTasks[i].clear();
-    _frameTaskIdx = 0;
+    // Remove service from ServiceMgr.
+    _svcMgr.OnServiceStop(this);
+
+    // ... ...
+    // Clear auto-release-pool.
+    ClearAutoReleasePool();
+    // Clear timer-scheduler.
+    ClearTimerScheduler();
+
+    // Remove service from TLS.
+    RemoveServiceFromTls();
+
+    // Finalize PollerMgr.
+    _pollerMgr.Finalize();
+
+    // Popup & Destroy all not-process events.
+    LLBC_MessageBlock *block;
+    while (TryPop(block) == LLBC_OK)
+        LLBC_SvcEvUtil::DestroyEvBlock(block);
+
+    // Remove all ready sessions.
+    RemoveAllReadySessions();
+
+    // Cleanup service config.
+    _cfgType = LLBC_AppConfigType::End;
+    _propCfg.RemoveAllProperties();
+    _nonPropCfg.BecomeNil();
+
+    // Reset _svcThreadId.
+    _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    // Reset _pollerCount.
+    _pollerCount = 0;
+}
+
+void LLBC_ServiceImpl::HandlePosts()
+{
+    LLBC_ReturnIf(_posts.empty(), void());
+
+    std::vector<LLBC_Delegate<void(LLBC_Service *)> > posts;
+    std::swap(posts, _posts);
+
+    const auto endIt = posts.end();
+    for (auto it = posts.begin(); it != endIt; ++it)
+        (*it)(this);
 }
 
 void LLBC_ServiceImpl::HandleQueuedEvents()
@@ -1728,35 +1700,11 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
 
     _readySessionInfosLock.Unlock();
 
-    // Packet receiver service Id set or dispatch to another service.
-    const int recverSvcId = packet->GetRecverServiceId();
-    if (recverSvcId == 0) // Set receiver service Id, if the packet's receiver service Id is 0.
-    {
-        packet->SetRecverServiceId(_id);
-    }
-    else if (recverSvcId != _id)
-    {
-        LLBC_Service *recverSvc = _svcMgr.GetService(recverSvcId);
-        if (recverSvc == nullptr || !recverSvc->IsStarted())
-        {
-            LLBC_Recycle(packet);
-            return;
-        }
-
-        recverSvc->Push(LLBC_SvcEvUtil::BuildDataArrivalEv(packet));
-        return;
-    }
-
     const int opcode = packet->GetOpcode();
-    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     const int status = packet->GetStatus();
     if (status != 0)
     {
-        #if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-        auto statusDescIt = _statusDescs.find(status);
-        if (statusDescIt != _statusDescs.end())
-            packet->SetStatusDesc(statusDescIt->second);
-        #endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
         # if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
         auto stHandlersIt = _statusHandlers.find(opcode);
         if (stHandlersIt != _statusHandlers.end())
@@ -1772,7 +1720,7 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         }
         # endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     }
-    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER || LLBC_CFG_COMM_ENABLE_STATUS_DESC
+    #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
     // Firstly, we recognize specified opcode's pre-handler, if registered, call it.
     bool preHandled = false;
@@ -1958,10 +1906,11 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
 
 int LLBC_ServiceImpl::InitComps()
 {
-    _initingComp = true;
-    LLBC_Defer(_initingComp = false);
+    // Set _runningPhase to InitingComps
+    _runningPhase = LLBC_ServiceRunningPhase::InitingComps;
 
-    _compsInitRet = LLBC_ERROR_SUCCESS;
+    // Use while() for support repeatly add components operation.
+    bool compsInitSucc = true;
     while (!_willRegComps.empty())
     {
         // Pop will-reg comp.
@@ -1978,7 +1927,7 @@ int LLBC_ServiceImpl::InitComps()
         if (willRegComp->_inited)
             continue;
 
-        // If comp uncare <OnInit> event, set to inited, and than continue.
+        // If comp don't care <OnInit> event, set to inited, and than continue.
         if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInit))
         {
             willRegComp->_inited = true;
@@ -1994,7 +1943,9 @@ int LLBC_ServiceImpl::InitComps()
             {
                 if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
                     LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
-                _compsInitRet = LLBC_GetLastError();
+
+                _startErrNo = LLBC_GetLastError();
+                _startSubErrNo = LLBC_GetSubErrorNo();
 
                 break;
             }
@@ -2010,20 +1961,104 @@ int LLBC_ServiceImpl::InitComps()
 
         if (!willRegComp->_inited)
         {
-            ClearCompsWhenInitCompFailed();
+            compsInitSucc = false;
             break;
         }
     }
 
-    LLBC_SetLastError(_compsInitRet);
-    _compsInitFinished = true;
+    if (!compsInitSucc)
+    {
+        DestroyComps(true);
+        PostStop();
 
-    return _compsInitRet == LLBC_ERROR_SUCCESS ? LLBC_OK : LLBC_FAILED;
+        LLBC_SetLastError(_startErrNo);
+        LLBC_SetSubErrorNo(_startSubErrNo);
+
+        _runningPhase = LLBC_ServiceRunningPhase::InitCompsFailed;
+
+        return LLBC_FAILED;
+    }
+
+    _runningPhase = LLBC_ServiceRunningPhase::CompsInited;
+
+    return LLBC_OK;
+}
+
+void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
+{
+    // Call components OnDestroy() event method.
+    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
+    {
+        LLBC_Component *comp = *it;
+        if (!comp->_inited)
+            continue;
+
+        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnDestroy))
+        {
+            comp->_inited = false;
+            continue;
+        }
+
+        while (true)
+        {
+            bool destroyFinished = true;
+            comp->OnDestroy(destroyFinished);
+
+            if (destroyFinished)
+            {
+                comp->_inited = false;
+                break;
+            }
+
+            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+        }
+    }
+
+    if (onlyCallEvMeth)
+        return;
+
+    // Delete all components.
+    LLBC_STLHelper::DeleteContainer(_compList, true);
+    while (!_name2Comps.empty())
+    {
+        auto it = _name2Comps.begin();
+        auto compName = it->first;
+        _name2Comps.erase(it);
+
+        free(const_cast<char *>(compName.c_str()));
+    }
+
+    for (auto &evComps: _caredEventComps)
+        evComps.clear();
+
+    // Delete all will-register components.
+    LLBC_STLHelper::RecycleContainer(_willRegComps, true);
+
+    // Close all component libraries.
+    LLBC_STLHelper::DeleteContainer(_compLibraries);
 }
 
 int LLBC_ServiceImpl::StartComps()
 {
-    _compsStartRet = LLBC_ERROR_SUCCESS;
+    // Set _runningPhase to StartingComps.
+    _runningPhase = LLBC_ServiceRunningPhase::StartingComps;
+
+    // Before start comps, startup poller mgr.
+    if (_pollerMgr.Start() != LLBC_OK)
+    {
+        _startErrNo = LLBC_GetLastError();
+        _startSubErrNo = LLBC_GetSubErrorNo();
+
+        DestroyComps(true);
+        PostStop();
+
+        LLBC_SetLastError(_startErrNo);
+        LLBC_SetSubErrorNo(_startSubErrNo);
+
+        _runningPhase = LLBC_ServiceRunningPhase::StartCompsFailed;
+
+        return LLBC_FAILED;
+    }
 
     // Call comps OnStart() event method.
     size_t compIdx = 0;
@@ -2048,10 +2083,13 @@ int LLBC_ServiceImpl::StartComps()
             {
                 if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
                     LLBC_SetLastError(LLBC_ERROR_COMP_START);
-                _compsStartRet = LLBC_GetLastError();
+
+                _startErrNo = LLBC_GetLastError();
+                _startSubErrNo = LLBC_GetSubErrorNo();
                 break;
             }
-            else if (startFinished)
+
+            if (startFinished)
             {
                 comp->_started = true;
                 break;
@@ -2087,17 +2125,23 @@ int LLBC_ServiceImpl::StartComps()
                 }
             }
         }
+
+        _runningPhase = LLBC_ServiceRunningPhase::CompsStarted;
+        return LLBC_OK;
     }
     else // Otherwise stop all comps.
     {
         StopComps();
+        DestroyComps(true);
+        PostStop();
+
+        LLBC_SetLastError(_startErrNo);
+        LLBC_SetSubErrorNo(_startSubErrNo);
+
+        _runningPhase = LLBC_ServiceRunningPhase::StartCompsFailed;
+
+        return LLBC_OK;
     }
-
-    // Set comps start errno, mask start finished.
-    LLBC_SetLastError(_compsStartRet);
-    _compsStartFinished = true;
-
-    return _compsStartRet == LLBC_ERROR_SUCCESS ? LLBC_OK : LLBC_FAILED;
 }
 
 void LLBC_ServiceImpl::StopComps()
@@ -2146,6 +2190,13 @@ void LLBC_ServiceImpl::StopComps()
 
         comp->_started = false;
     }
+
+    // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
+    if (_runningPhase == LLBC_ServiceRunningPhase::StoppingComps)
+        _runningPhase = LLBC_ServiceRunningPhase::Stopping;
+
+    // Stop poller mgr.
+    _pollerMgr.Stop();
 }
 
 void LLBC_ServiceImpl::UpdateComps()
@@ -2163,68 +2214,26 @@ void LLBC_ServiceImpl::UpdateComps()
     }
 }
 
-void LLBC_ServiceImpl::DestroyComps()
+void LLBC_ServiceImpl::LateUpdateComps()
 {
-    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
+    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnLateUpdate];
+    if (caredComps.empty())
+        return;
+
+    const size_t compsSize = caredComps.size();
+    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
-        LLBC_Component *comp = *it;
-        if (!comp->_inited)
-            continue;
-
-        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnDestroy))
-        {
-            comp->_inited = false;
-            continue;
-        }
-
-        while (true)
-        {
-            bool destroyFinished = true;
-            comp->OnDestroy(destroyFinished);
-
-            if (destroyFinished)
-            {
-                comp->_inited = false;
-                break;
-            }
-
-            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
-        }
+        LLBC_Component *&comp = caredComps[compIdx];
+        if (LIKELY(comp->_started))
+            comp->OnLateUpdate();
     }
-
-    LLBC_STLHelper::DeleteContainer(_compList, true);
-    while (!_name2Comps.empty())
-    {
-        auto it = _name2Comps.begin();
-        auto compName = it->first;
-        _name2Comps.erase(it);
-
-        free(const_cast<char *>(compName.c_str()));
-    }
-
-    for (auto &evComps: _caredEventComps)
-        evComps.clear();
-}
-
-void LLBC_ServiceImpl::DestroyWillRegComps()
-{
-    LLBC_STLHelper::RecycleContainer(_willRegComps, true);
-}
-
-void LLBC_ServiceImpl::CloseAllCompLibraries()
-{
-    LLBC_STLHelper::DeleteContainer(_compLibraries);
 }
 
 void LLBC_ServiceImpl::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
 
-    #if LLBC_TARGET_PLATFORM_WIN32
-    auto compName = typeid(*comp).name();
-    #else
     auto compName = LLBC_GetTypeName(*comp);
-    #endif
     const auto colonPos = strrchr(compName, ':');
     if (colonPos)
         compName = colonPos + 1;
@@ -2281,15 +2290,6 @@ void LLBC_ServiceImpl::CloseCompLibrary(const LLBC_String &libPath)
     _compLibraries.erase(libIt);
 }
 
-void LLBC_ServiceImpl::ClearCompsWhenInitCompFailed()
-{
-    StopComps();
-    DestroyComps();
-    DestroyWillRegComps();
-
-    CloseAllCompLibraries();
-}
-
  void LLBC_ServiceImpl::InitAutoReleasePool()
 {
     _releasePoolStack = LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack();
@@ -2297,7 +2297,7 @@ void LLBC_ServiceImpl::ClearCompsWhenInitCompFailed()
 
 void LLBC_ServiceImpl::UpdateAutoReleasePool()
 {
-    if (_driveMode == SelfDrive)
+    if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
         _releasePoolStack->Purge();
 }
 
@@ -2308,18 +2308,6 @@ void LLBC_ServiceImpl::ClearAutoReleasePool()
         _releasePoolStack->Purge();
         _releasePoolStack = nullptr;
     }
-}
-
-void LLBC_ServiceImpl::InitObjectPools()
-{
-}
-
-void LLBC_ServiceImpl::UpdateObjectPools()
-{
-}
-
-void LLBC_ServiceImpl::ClearHoldedObjectPools()
-{
 }
 
 void LLBC_ServiceImpl::InitTimerScheduler()
@@ -2336,7 +2324,7 @@ void LLBC_ServiceImpl::UpdateTimerScheduler()
     _timerScheduler->Update();
 }
 
-void LLBC_ServiceImpl::ClearHoldedTimerScheduler()
+void LLBC_ServiceImpl::ClearTimerScheduler()
 {
     if (_timerScheduler)
     {
@@ -2353,7 +2341,7 @@ void LLBC_ServiceImpl::ProcessIdle()
     const size_t compsSize = caredComps.size();
     for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
     {
-        sint64 elapsed = LLBC_GetMilliSeconds() - _begHeartbeatTime;
+        sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
         if (LIKELY(elapsed >= 0))
         {
             if (elapsed >= _frameInterval)
@@ -2366,30 +2354,35 @@ void LLBC_ServiceImpl::ProcessIdle()
     }
 }
 
-int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
-                                   bool lock,
-                                   bool validCheck)
+LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
+                                                     bool lock,
+                                                     bool checkRunningPhase,
+                                                     bool checkSessionValidity)
 {
     // Lock if need.
     if (lock)
         _lock.Lock();
 
-    // Started or not check.
-    if (UNLIKELY(!_started))
+    // Running phase check.
+    if (checkRunningPhase)
     {
-        if (lock)
-            _lock.Unlock();
+        if (UNLIKELY(_runningPhase < LLBC_ServiceRunningPhase::StartingComps ||
+            LLBC_ServiceRunningPhase::IsFailedOrStoppingPhase(_runningPhase)))
+        {
+            if (lock)
+                _lock.Unlock();
 
-        LLBC_Recycle(packet);
+            LLBC_Recycle(packet);
 
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
+            LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+            return LLBC_FAILED;
+        }
     }
 
     // Validate check, if need.
     const _ReadySessionInfo *readySInfo = nullptr;
     const int sessionId = packet->GetSessionId();
-    if (!_fullStack || validCheck)
+    if (!_fullStack || checkSessionValidity)
     {
         decltype(_readySessionInfos)::const_iterator readySInfoIt;
 
@@ -2428,9 +2421,6 @@ int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
             _readySessionInfosLock.Unlock();
     }
 
-    // Set sender service Id.
-    packet->SetSenderServiceId(_id);
-
     // If enabled full-stack option, send packet and return.
     if (_fullStack)
     {
@@ -2467,19 +2457,19 @@ int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,
     return ret;
 }
 
-int LLBC_ServiceImpl::LockableSend(int svcId,
-                                   int sessionId,
-                                   int opcode,
-                                   const void *bytes,
-                                   size_t len,
-                                   int status,
-                                   bool lock,
-                                   bool validCheck)
+LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
+                                                     int opcode,
+                                                     const void *bytes,
+                                                     size_t len,
+                                                     int status,
+                                                     uint32 flags,
+                                                     bool lock,
+                                                     bool checkRunningPhase,
+                                                     bool checkSessionValidity)
 {
     // Create packet(from object pool) and send.
     LLBC_Packet *packet = _packetObjectPool.GetObject();
-    // packet->SetSenderServiceId(_id); // LockableSend(LLBC_Packet *, bool bool) function will set sender service Id.
-    packet->SetHeader(svcId, sessionId, opcode, status);
+    packet->SetHeader(sessionId, opcode, status, flags);
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))
     {
@@ -2487,155 +2477,18 @@ int LLBC_ServiceImpl::LockableSend(int svcId,
         return ret;
     }
 
-    return LockableSend(packet, lock, validCheck);
-}
-
-template <typename SessionIds>
-int LLBC_ServiceImpl::MulticastSendCoder(int svcId,
-                                         const SessionIds &sessionIds,
-                                         int opcode,
-                                         LLBC_Coder *coder,
-                                         int status,
-                                         bool validCheck)
-{
-    if (sessionIds.empty())
-    {
-        if(LIKELY(coder))
-            LLBC_Recycle(coder);
-
-        return LLBC_OK;
-    }
-
-    LLBC_LockGuard guard(_lock);
-    if (UNLIKELY(!_started))
-    {
-        if (LIKELY(coder))
-            LLBC_Recycle(coder);
-
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    typename SessionIds::const_iterator sessionIt = sessionIds.begin();
-
-    LLBC_Packet *firstPacket = _packetObjectPool.GetObject();
-    // firstPacket->SetSenderServiceId(_id);
-        // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-    firstPacket->SetHeader(svcId, *sessionIt++, opcode, status);
-
-    bool hasCoder = true;
-    if (LIKELY(coder))
-    {
-        firstPacket->SetEncoder(coder);
-        if (!firstPacket->Encode())
-        {
-            LLBC_Recycle(firstPacket);
-            LLBC_SetLastError(LLBC_ERROR_ENCODE);
-
-            return LLBC_FAILED;
-        }
-    }
-    else
-    {
-        hasCoder = false;
-    }
-
-    typename SessionIds::size_type sessionCnt = sessionIds.size();
-    if (sessionCnt == 1)
-        return LockableSend(firstPacket, false, validCheck);
-
-    _multicastOtherPackets.resize(sessionCnt - 1);
-    if (LIKELY(hasCoder))
-    {
-        const void *payload = firstPacket->GetPayload();
-        const size_t payloadLen = firstPacket->GetPayloadLength();
-
-        if (validCheck)
-            _readySessionInfosLock.Lock();
-
-        decltype(_readySessionInfos)::const_iterator readySInfoIt;
-        for (typename SessionIds::size_type i = 1;
-             i < sessionCnt;
-             ++i)
-        {
-            const int sessionId = *sessionIt++;
-            if (validCheck &&
-                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
-                    continue;
-
-            const _ReadySessionInfo * const &readySInfo = readySInfoIt->second;
-            if (readySInfo->isListenSession)
-                continue;
-
-            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id);
-                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-            otherPacket->SetHeader(svcId, sessionId, opcode, status);
-            otherPacket->Write(payload, payloadLen);
-
-            _multicastOtherPackets[i - 1] = otherPacket;
-        }
-
-        if (validCheck)
-            _readySessionInfosLock.Unlock();
-    }
-    else
-    {
-        if (validCheck)
-            _readySessionInfosLock.Lock();
-
-        decltype(_readySessionInfos)::const_iterator readySInfoIt;
-        for (typename SessionIds::size_type i = 1;
-             i < sessionCnt;
-             ++i)
-        {
-            const int sessionId = *sessionIt++;
-            if (validCheck &&
-                (readySInfoIt = _readySessionInfos.find(sessionId)) == _readySessionInfos.end())
-                continue;
-
-            const _ReadySessionInfo *const &readySInfo = readySInfoIt->second;
-            if (readySInfo->isListenSession)
-                continue;
-
-            LLBC_Packet *otherPacket = _packetObjectPool.GetObject();
-            // otherPacket->SetSenderServiceId(_id);
-                // LockableSend(LLBC_Packet *, bool, bool) function will set sender service Id.
-            otherPacket->SetHeader(svcId, sessionId, opcode, status);
-
-            _multicastOtherPackets[i - 1] = otherPacket;
-        }
-
-        if (validCheck)
-            _readySessionInfosLock.Unlock();
-    }
-
-    LockableSend(firstPacket, false, validCheck); // Use pass "validCheck" argument to call LockableSend().
-
-    const typename SessionIds::size_type otherPacketCnt = sessionCnt - 1;
-    for (typename SessionIds::size_type i = 0; i != otherPacketCnt; ++i)
-    {
-        LLBC_Packet *&otherPacket = _multicastOtherPackets[i];
-        if (UNLIKELY(!otherPacket))
-            continue;
-
-        LockableSend(otherPacket, false, false); // Don't need vaildate check.
-    }
-
-    _multicastOtherPackets.clear();
-
-    return LLBC_OK;
+    return LockableSend(packet, lock, checkRunningPhase, checkSessionValidity);
 }
 
 LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId,
                                                        int acceptSessionId,
                                                        bool isListenSession,
                                                        LLBC_ProtocolStack *codecStack)
+: sessionId(sessionId)
+, acceptSessionId(acceptSessionId)
+, isListenSession(isListenSession)
+, codecStack(codecStack)
 {
-    this->sessionId = sessionId;
-    this->acceptSessionId = acceptSessionId;
-    this->isListenSession = isListenSession;
-    this->codecStack = codecStack;
 }
 
 LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
@@ -2645,3 +2498,7 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
 }
 
 __LLBC_NS_END
+
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_GE
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_LE
+#undef __LLBC_INL_CHECK_RUNNING_PHASE_EQ

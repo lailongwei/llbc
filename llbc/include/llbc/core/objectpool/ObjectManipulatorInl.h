@@ -21,7 +21,9 @@
 
 #pragma once
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#include "llbc/common/Compiler.h"
+
+#if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnonnull"
 #endif // GCC compiler
@@ -177,7 +179,7 @@ void LLBC_ObjectManipulator::OnPoolInstDestroyInl(LLBC_IObjectPoolInst &poolInst
 
 __LLBC_NS_END
 
-#if LLBC_CUR_COMPILER == LLBC_COMPILER_GCC
+#if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic pop
 #endif // GCC compiler
 

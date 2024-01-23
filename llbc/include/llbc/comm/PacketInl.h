@@ -33,26 +33,6 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetLength(size_t length)
     _length = length;
 }
 
-LLBC_FORCE_INLINE int LLBC_Packet::GetSenderServiceId() const
-{
-    return _senderSvcId;
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::SetSenderServiceId(int senderServiceId)
-{
-    _senderSvcId = senderServiceId;
-}
-
-LLBC_FORCE_INLINE int LLBC_Packet::GetRecverServiceId() const
-{
-    return _recverSvcId;
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::SetRecverServiceId(int recverServiceId)
-{
-    _recverSvcId = recverServiceId;
-}
-
 LLBC_FORCE_INLINE int LLBC_Packet::GetSessionId() const
 {
     return _sessionId;
@@ -113,27 +93,27 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetStatus(int status)
     _status = status;
 }
 
-LLBC_FORCE_INLINE int LLBC_Packet::GetFlags() const
+LLBC_FORCE_INLINE uint32 LLBC_Packet::GetFlags() const
 {
     return _flags;
 }
 
-LLBC_FORCE_INLINE void LLBC_Packet::SetFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::SetFlags(uint32 flags)
 {
     _flags = flags;
 }
 
-LLBC_FORCE_INLINE bool LLBC_Packet::HasFlags(int flags) const
+LLBC_FORCE_INLINE bool LLBC_Packet::HasFlags(uint32 flags) const
 {
     return (_flags & flags) == flags;
 }
 
-LLBC_FORCE_INLINE void LLBC_Packet::AddFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::AddFlags(uint32 flags)
 {
     SetFlags(_flags | flags);
 }
 
-LLBC_FORCE_INLINE void LLBC_Packet::RemoveFlags(int flags)
+LLBC_FORCE_INLINE void LLBC_Packet::RemoveFlags(uint32 flags)
 {
     SetFlags(_flags & (~flags));
 }
@@ -168,28 +148,12 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetExtData3(const sint64 &extData3)
     _extData3 = extData3;
 }
 
-LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(int sessionId, int opcode, int status)
+LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(int sessionId, int opcode, int status, uint32 flags)
 {
     SetSessionId(sessionId);
     SetOpcode(opcode);
     SetStatus(status);
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(int svcId, int sessionId, int opcode, int status)
-{
-    SetRecverServiceId(svcId);
-
-    SetSessionId(sessionId);
-    SetOpcode(opcode);
-    SetStatus(status);
-}
-
-LLBC_FORCE_INLINE void LLBC_Packet::SetHeader(const LLBC_Packet &packet, int opcode, int status)
-{
-    SetSessionId(packet._sessionId);
-
-    SetOpcode(opcode);
-    SetStatus(status);
+	SetFlags(flags);
 }
 
 LLBC_FORCE_INLINE const void *LLBC_Packet::GetPayload() const
@@ -220,6 +184,8 @@ LLBC_FORCE_INLINE LLBC_MessageBlock * LLBC_Packet::DetachPayload()
 {
     LLBC_MessageBlock *payload = _payload;
     _payload = nullptr;
+    if (_payloadDeleteDeleg)
+        _payloadDeleteDeleg = nullptr;
 
     return payload;
 }
@@ -441,13 +407,14 @@ LLBC_FORCE_INLINE int LLBC_Packet::Read(_Ty &val)
     LLBC_Stream s;
     s.Attach(_payload->
         GetDataStartWithReadPos(), _payload->GetReadableSize());
+    s.SetWritePos(_payload->GetReadableSize());
     if (!s.Read(val))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
     }
 
-    _payload->ShiftReadPos(static_cast<long>(s.GetPos()));
+    _payload->ShiftReadPos(static_cast<long>(s.GetReadPos()));
 
     return LLBC_OK;
 }
@@ -532,7 +499,8 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const void *buf, size_t len)
 
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const LLBC_Stream &stream)
 {
-    return CheckAndCreatePayload(stream.GetPos())->Write(stream.GetBuf(), stream.GetPos());
+    return CheckAndCreatePayload(stream.GetWritePos())->
+        Write(stream.GetBuf(), stream.GetWritePos());
 }
 
 template <typename _Ty>
@@ -612,18 +580,18 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const _Ty &obj)
     LLBC_Stream s;
     s.Write(obj);
 
-    return this->Write(s.GetBuf(), s.GetPos());
+    return this->Write(s.GetBuf(), s.GetWritePos());
 }
 
 template <typename _Ty>
-LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator <<(const _Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator<<(const _Ty &val)
 {
     this->Write(val);
     return *this;
 }
 
 template <typename _Ty>
-LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator >>(_Ty &val)
+LLBC_FORCE_INLINE LLBC_Packet &LLBC_Packet::operator>>(_Ty &val)
 {
     this->Read(val);
     return *this;
@@ -650,7 +618,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::ReadRawType(_RawTy &val)
     }
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Net2Host(val);
+    val = LLBC_Net2Host(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
     return LLBC_OK;
@@ -693,7 +661,7 @@ LLBC_FORCE_INLINE CoderType *LLBC_Packet::GetEncoder() const
 
 __LLBC_NS_END
 
-inline std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_Packet &packet)
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &packet)
 {
     return (o << packet.ToString());
 }

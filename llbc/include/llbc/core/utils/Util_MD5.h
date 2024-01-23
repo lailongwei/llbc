@@ -30,11 +30,11 @@ __LLBC_NS_BEGIN
  */
 class LLBC_EXPORT LLBC_MD5
 {
-public:
+private:
     /**
      * \brief Embedded class, use to encapsulation MD5GroupDigest class.
      */
-    class LLBC_EXPORT MD5GroupDigest
+    class LLBC_HIDDEN MD5GroupDigest
     {
     public:
         /**
@@ -43,43 +43,15 @@ public:
         MD5GroupDigest(uint32 a, uint32 b, uint32 c, uint32 d);
 
         /**
-         * Get / Set a value.
+         * Get group values.
          */
-        uint32 GetA() const;
-        void SetA(uint32 a);
-
-        /**
-         * Get / Set b value.
-         */
-        uint32 GetB() const;
-        void SetB(uint32 b);
-
-        /**
-         * Get / Set c value.
-         */
-        uint32 GetC() const;
-        void SetC(uint32 c);
-
-        /**
-         * Get / Set d value.
-         */
-        uint32 GetD() const;
-        void SetD(uint32 d);
-
-        /**
-         * Set group all values info.
-         */
-        void SetInfo(uint32 a, uint32 b, uint32 c, uint32 d);
-
-        /**
-         * Convert group digest to string format.
-         */
-        LLBC_String ToString() const;
+        void Get(uint8 (&digest)[16]) const;
+        void Get(uint32 &a, uint32 &b, uint32 &c, uint32 &d);
 
         /**
          * += operation overlapped function.
          */
-        MD5GroupDigest &operator +=(const MD5GroupDigest &right);
+        MD5GroupDigest &operator+=(const MD5GroupDigest &right);
 
     private:
         union
@@ -92,14 +64,14 @@ public:
                 uint32 d;
             } sVal;
 
-            unsigned char byteVal[16];
+            uint8 byteVal[16];
         } _val;
     };
 
     /**
      * \brief Embedded class, Use to encapsulation MD5Group class.
      */
-    class LLBC_EXPORT MD5Group
+    class LLBC_HIDDEN MD5Group
     {
     public:
         MD5Group(const void *buf, size_t pos);
@@ -172,34 +144,29 @@ public:
 
 public:
     /**
-     * Generate the specified file MD5 string.
+     * Get bytes MD5 digest/hex digest.
+     * @param[in] bytes - bytes string.
+     * @return LLBC_String - MD5 digest/hex digest.
+     */
+    static LLBC_String Digest(const LLBC_String &bytes);
+    static LLBC_String HexDigest(const LLBC_String &bytes);
+
+    /**
+     * Get bytes MD5 digest/hex digest.
+     * @param[in] bytes - bytes pointer.
+     * @param[in] len   - bytes length.
+     * @return LLBC_String - MD5 digest/hex digest.
+     */
+    static LLBC_String Digest(const void *bytes, size_t len);
+    static LLBC_String HexDigest(const void *bytes, size_t len);
+
+    /**
+     * Get file MD5 digest/hex digest.
      * @param[in] file - file name.
-     * @return LLBC_String - md5 value.
+     * @return LLBC_String - MD5 digest/hex digest.
      */
-    static LLBC_String MD5_File(const LLBC_String &file);
-
-    /**
-     * Generate the specified string MD5 string.
-     * @param[in] str - string value.
-     * @return LLBC_String - md5 value.
-     */
-    static LLBC_String MD5_String(const char *str);
-    /**
-     * Generate the specified buffer MD5 string.
-     * @param[in] buf - buffer pointer.
-     * @param[in] len - buffer length, in bytes.
-     * @return LLBC_String - md5 value.
-     */
-    static LLBC_String MD5_Buffer(const void *buf, size_t len);
-
-    /**
-     * Generate the specified buffer MD5 digest value.
-     * @param[in] buf - buffer pointer.
-     * @param[in] len - buffer lenght, in bytes.
-     * @param[out] digest - the md5 digest value.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int GenerateBufferDigest(const void *buf, size_t len, MD5GroupDigest &digest);
+    static LLBC_String FileDigest(const LLBC_String &file);
+    static LLBC_String FileHexDigest(const LLBC_String &file);
 
 private:
     static const uint32 _chainingValA;
@@ -209,3 +176,5 @@ private:
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/utils/Util_MD5Inl.h"

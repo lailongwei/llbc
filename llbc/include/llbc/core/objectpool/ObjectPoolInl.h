@@ -75,8 +75,7 @@ __LLBC_SPE_OBJPOOL_METHS(_vectorUint64PoolInst)
 
 template <typename PoolLockType, typename PoolInstLockType>
 LLBC_FORCE_INLINE LLBC_ObjectPool<PoolLockType, PoolInstLockType>::LLBC_ObjectPool()
-: LLBC_IObjectPool()
-, _orderedDeleteNodes(nullptr)
+: _orderedDeleteNodes(nullptr)
 , _topOrderedDeleteNodes(nullptr)
 , _stdStringPoolInst(nullptr)
 , _llbcStringPoolInst(nullptr)
@@ -355,7 +354,7 @@ int LLBC_ObjectPool<PoolLockType, PoolInstLockType>::
 template <typename PoolLockType, typename PoolInstLockType>
 void LLBC_ObjectPool<PoolLockType, PoolInstLockType>::Stat(LLBC_ObjectPoolStat &stat) const
 {
-    typedef typename std::map<LLBC_CString, LLBC_ObjectPoolInstStat>::iterator _InstStatIt;
+    typedef std::map<LLBC_CString, LLBC_ObjectPoolInstStat>::iterator _InstStatIt;
 
     stat.Reset();
 

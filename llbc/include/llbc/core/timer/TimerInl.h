@@ -23,16 +23,48 @@
 
 __LLBC_NS_BEGIN
 
+inline const LLBC_Delegate<void(LLBC_Timer *)> &LLBC_Timer::GetTimeoutHandler() const
+{
+    return _timeoutDeleg;
+}
+
 template <typename ObjType>
 void LLBC_Timer::SetTimeoutHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *))
 {
     _timeoutDeleg = LLBC_Delegate<void(LLBC_Timer *)>(obj, method);
 }
 
+inline void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg)
+{
+    _timeoutDeleg = timeoutDeleg;
+}
+
+inline const LLBC_Delegate<void(LLBC_Timer *)> &LLBC_Timer::GetCancelHandler() const
+{
+    return _cancelDeleg;
+}
+
 template <typename ObjType>
 void LLBC_Timer::SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *))
 {
     _cancelDeleg = LLBC_Delegate<void(LLBC_Timer *)>(obj, method);
+}
+
+inline void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
+{
+    _cancelDeleg = cancelDeleg;
+}
+
+inline void LLBC_Timer::OnTimeout()
+{
+    if (LIKELY(_timeoutDeleg))
+        _timeoutDeleg(this);
+}
+
+inline void LLBC_Timer::OnCancel()
+{
+    if (_cancelDeleg)
+        _cancelDeleg(this);
 }
 
 __LLBC_NS_END

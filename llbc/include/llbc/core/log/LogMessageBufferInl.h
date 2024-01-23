@@ -23,7 +23,7 @@
 #pragma once
 
 template <typename T>
-std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val)
+std::basic_ostream<char> &operator<<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val)
 {
     return static_cast<std::basic_ostream<char> &>(msg) << val;
 }
