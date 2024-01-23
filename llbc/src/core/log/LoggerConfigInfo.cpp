@@ -282,7 +282,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSize)
 {
     // strip.
-    auto nmlLogFileSizeStr = logFileSize.strip();
+    const LLBC_String nmlLogFileSizeStr = logFileSize.strip();
 
     // If is empty, use default.
     if (nmlLogFileSizeStr.empty())
@@ -297,7 +297,7 @@ sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSiz
     }
 
     // normalize storage unit.
-    const auto unit = nmlLogFileSizeStr.substr(unitPos).strip().tolower();
+    const LLBC_String unit = nmlLogFileSizeStr.substr(unitPos).strip().tolower();
     double nmlLogFileSize = LLBC_Variant(nmlLogFileSizeStr.substr(0, unitPos));
     // - k/kb, kib
     if (unit == "k" || unit == "kb")
