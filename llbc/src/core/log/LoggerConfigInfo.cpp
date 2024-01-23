@@ -312,7 +312,7 @@ sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSiz
     // - g/gb, gib
     else if (unit == "g" || unit == "gb")
         nmlLogFileSize *= (1000.0 * 1000.0 * 1000.0);
-    else if (unit == "mib")
+    else if (unit == "gib")
         nmlLogFileSize *= (1024.0 * 1024.0 * 1024.0);
     // - unknown/unsupported storage unit, ignore.
     // else
