@@ -154,7 +154,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
                 _notConfigUseRoot)
                 _logFile = rootCfg->GetOriginalLogFile();
             else
-                _logFile = _loggerName;
+                _logFile = "%L";
         }
 
         _originalLogFile = _logFile;
@@ -247,12 +247,14 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 
     // Replace smart logger name: %L.
     // for root logger:
+    //   => %L => root
     //   => xxx_%L => xxx
     //   => xxx__%L => xxx
     //   => xxx-%L => xxx
     //   => xxx--%L => xxx
     // for non-root logger: same as %l.
-    if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME)
+    if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME ||
+        LLBC_Directory::BaseName(_logFile) == "%L")
     {
         _logFile.findreplace("%L", _loggerName);
     }
@@ -310,7 +312,7 @@ sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSiz
     // - g/gb, gib
     else if (unit == "g" || unit == "gb")
         nmlLogFileSize *= (1000.0 * 1000.0 * 1000.0);
-    else if (unit == "mib")
+    else if (unit == "gib")
         nmlLogFileSize *= (1024.0 * 1024.0 * 1024.0);
     // - unknown/unsupported storage unit, ignore.
     // else
