@@ -251,9 +251,9 @@ bool TestCase_Core_File_File::ReadWriteTest()
     doubleVal = 0.0; file.Read(doubleVal);
     LLBC_PrintLn("The doubleVal: %f", doubleVal);
 
-    LLBC_PrintLn("Now file size: %ld, file pos: %ld", file.GetFileSize(), file.GetFilePosition());
+    LLBC_PrintLn("Now file size: %lld, file pos: %lld", file.GetFileSize(), file.GetFilePosition());
     file.Seek(LLBC_FileSeekOrigin::Current, -16);
-    LLBC_PrintLn("After Seek(Current, -16), file size: %ld, file pos: %ld", file.GetFileSize(), file.GetFilePosition());
+    LLBC_PrintLn("After Seek(Current, -16), file size: %lld, file pos: %lld", file.GetFileSize(), file.GetFilePosition());
 
     // Test ReadLine/WriteLine/ReadToEnd methods:
     LLBC_PrintLn("ReOpen file for test ReadLine/WriteLine/ReadToEnd methods:");

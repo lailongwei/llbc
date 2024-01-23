@@ -246,7 +246,7 @@ sint64 LLBC_File::GetFileSize() const
     const sint64 oldPos = _ftelli64(_handle);
     if (_fseeki64(_handle, 0, LLBC_FileSeekOrigin::End) != 0)
 #else
-    const sint64 oldPos = ftell(handle);
+    const sint64 oldPos = ftell(_handle);
     if (fseek(_handle, 0, LLBC_FileSeekOrigin::End) != 0)
 #endif
     {
