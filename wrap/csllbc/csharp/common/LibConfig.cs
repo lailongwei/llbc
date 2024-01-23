@@ -180,12 +180,21 @@ namespace llbc
         }
 
         /// <summary>
-        /// Logger default max log file size, in bytes.
+        /// Logger max log file size limit, in bytes.
         /// <para>config layer: llbc core library</para>
+        /// </summary>
+        public static long logMaxFileSizeLimit
+        {
+            get { return LLBCNative.csllbc_LibConfig_Log_MaxFileSizeLimit(); }
+        }
+
+        /// <summary>
+        /// Logger default log file size, in bytes.
+        /// <param>config layer: llbc core library</param>
         /// </summary>
         public static long logDefaultMaxFileSize
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_MaxFileSize(); }
+            get { return LLBCNative.csllbc_LibConfig_Log_DefaultMaxFileSize(); }
         }
 
         /// <summary>

@@ -128,7 +128,7 @@ inline int LLBC_LoggerConfigInfo::GetFileRollingMode() const
     return _fileRollingMode;
 }
 
-inline long LLBC_LoggerConfigInfo::GetMaxFileSize() const
+inline sint64 LLBC_LoggerConfigInfo::GetMaxFileSize() const
 {
     return _maxFileSize;
 }

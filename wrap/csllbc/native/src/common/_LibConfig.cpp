@@ -97,9 +97,14 @@ int csllbc_LibConfig_Log_DefaultFileRollingMode()
     return LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
 }
 
-sint64 csllbc_LibConfig_Log_MaxFileSize()
+sint64 csllbc_LibConfig_Log_MaxFileSizeLimit()
 {
-    return LLBC_CFG_LOG_MAX_FILE_SIZE;
+    return LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT;
+}
+
+sint64 csllbc_LibConfig_Log_DefaultMaxFileSize()
+{
+    return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
 }
 
 int csllbc_LibConfig_Log_MaxBackupIndex()

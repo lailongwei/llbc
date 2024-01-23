@@ -100,7 +100,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default log file name: <same with logger name>\n");
     desc.append_format("    default file log pattern: %s\n", LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN);
     desc.append_format("    default file rolling mode: %d\n", LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE);
-    desc.append_format("    default max log file size: %d\n", LLBC_CFG_LOG_MAX_FILE_SIZE);
+    desc.append_format("    max log file size limit: %lld\n", LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
+    desc.append_format("    default max log file size: %lld\n", LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE);
     desc.append_format("    default max backup index: %d\n", LLBC_CFG_LOG_MAX_BACKUP_INDEX);
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");

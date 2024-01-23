@@ -188,9 +188,9 @@ public:
 
     /**
      * Get max log file size.
-     * @return long - max log file size.
+     * @return sint64 - max log file size.
      */
-    long GetMaxFileSize() const;
+    sint64 GetMaxFileSize() const;
 
     /**
      * Get max backup log file index.
@@ -225,6 +225,13 @@ private:
     void NormalizeLogFileName();
 
     /**
+     * Normalize log file size.
+     * @param logFileSize - the un-normalized log file size.
+     * @return sint64 - the normalized log file size.
+     */
+    sint64 NormalizeLogFileSize(const LLBC_String &logFileSize);
+
+    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
@@ -254,7 +261,7 @@ private:
     bool _forceAppLogPath;
     LLBC_String _filePattern;
     int _fileRollingMode;
-    long _maxFileSize;
+    sint64 _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;

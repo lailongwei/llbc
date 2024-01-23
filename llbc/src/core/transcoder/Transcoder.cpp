@@ -297,7 +297,7 @@ int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString 
     if (!file.IsOpened())
         return LLBC_FAILED;
 
-    const long contentSize = file.GetFileSize();
+    const sint64 contentSize = file.GetFileSize();
     if (UNLIKELY(contentSize < 0))
         return LLBC_FAILED;
 
@@ -308,7 +308,7 @@ int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString 
     }
 
     content.resize(contentSize / 2);
-    const long actuallyRead = file.Read(const_cast<wchar *>(content.c_str()), contentSize);
+    const sint64 actuallyRead = file.Read(const_cast<wchar *>(content.c_str()), contentSize);
     if (actuallyRead == -1)
     {
         content.resize(0);

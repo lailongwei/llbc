@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
  * \brief Template specification judge function.
  */
 template <typename Class, template <typename...> class ClassTemplate>
-struct LLBC_IsTemplSpec :std::false_type {};
+struct LLBC_IsTemplSpec : public std::false_type {};
 
 template <template <typename...> class ClassTemplate, typename... Args>
 struct LLBC_IsTemplSpec<ClassTemplate<Args...>, ClassTemplate> : public std::true_type {};

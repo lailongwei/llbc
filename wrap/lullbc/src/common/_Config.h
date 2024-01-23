@@ -78,8 +78,10 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_FORCE_APP_LOG_PATH");
     lua_pushinteger(l, LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE);
     lua_setfield(l, 1, "CFG_LOG_DEFAULT_FILE_ROLLING_MODE");
-    lua_pushinteger(l, LLBC_CFG_LOG_MAX_FILE_SIZE);
-    lua_setfield(l, 1, "CFG_LOG_MAX_FILE_SIZE");
+    lua_pushinteger(l, LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
+    lua_setfield(l, 1, "CFG_LOG_MAX_FILE_SIZE_LIMIT");
+    lua_pushinteger(l, LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE);
+    lua_setfield(l, 1, "CFG_LOG_DEFAULT_MAX_FILE_SIZE");
     lua_pushinteger(l, LLBC_CFG_LOG_MAX_BACKUP_INDEX);
     lua_setfield(l, 1, "CFG_LOG_MAX_BACKUP_INDEX");
     lua_pushinteger(l, LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);

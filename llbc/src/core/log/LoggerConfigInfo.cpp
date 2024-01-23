@@ -192,8 +192,12 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             _fileRollingMode = LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
 
         // Max file size.
-        _maxFileSize = __LLBC_GetLogCfg2(
-            "maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);
+        if (cfg["maxFileSize"])
+            _maxFileSize = NormalizeLogFileSize(cfg["maxFileSize"]);
+        else if (_notConfigUseRoot)
+            _maxFileSize = rootCfg->GetMaxFileSize();
+        else
+            _maxFileSize = LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
         // Max backup index.
         _maxBackupIndex = __LLBC_GetLogCfg2(
             "maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
@@ -213,7 +217,6 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             "takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsLooseBool);
 
     // Check configs.
-    _maxFileSize = MAX(1024, _maxFileSize);
     _maxBackupIndex = MAX(0, _maxBackupIndex);
     _flushInterval = MIN(MAX(0, _flushInterval), LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
 
@@ -272,6 +275,50 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
         _logFile[0] != LLBC_SLASH_A)
         _logFile = LLBC_Directory::Join(LLBC_Directory::TempDir(), _logFile);
 #endif // LLBC_TARGET_PLATFORM_IPHONE
+}
+
+sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSize)
+{
+    // strip.
+    auto nmlLogFileSizeStr = logFileSize.strip();
+
+    // If is empty, use default.
+    if (nmlLogFileSizeStr.empty())
+        return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
+
+    // Find storage unit.
+    LLBC_String::size_type unitPos = 0;
+    for (; unitPos < nmlLogFileSizeStr.size(); ++unitPos)
+    {
+        if (!isdigit(nmlLogFileSizeStr[unitPos]) && nmlLogFileSizeStr[unitPos] != '.')
+            break;
+    }
+
+    // normalize storage unit.
+    const auto unit = nmlLogFileSizeStr.substr(unitPos).strip().tolower();
+    double nmlLogFileSize = LLBC_Variant(nmlLogFileSizeStr.substr(0, unitPos));
+    // - k/kb, kib
+    if (unit == "k" || unit == "kb")
+        nmlLogFileSize *= 1000.0;
+    else if (unit == "kib")
+        nmlLogFileSize *= 1024.0;
+    // - m/mb, mib
+    else if (unit == "m" || unit == "mb")
+        nmlLogFileSize *= (1000.0 * 1000.0);
+    else if (unit == "mib")
+        nmlLogFileSize *= (1024.0 * 1024.0);
+    // - g/gb, gib
+    else if (unit == "g" || unit == "gb")
+        nmlLogFileSize *= (1000.0 * 1000.0 * 1000.0);
+    else if (unit == "mib")
+        nmlLogFileSize *= (1024.0 * 1024.0 * 1024.0);
+    // - unknown/unsupported storage unit, ignore.
+    // else
+    //     // ... ...
+
+    // Clamp.
+    return MIN(MAX(1024ll, static_cast<sint64>(nmlLogFileSize)),
+               LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
 }
 
 __LLBC_NS_END

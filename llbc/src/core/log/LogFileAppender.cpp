@@ -150,7 +150,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
     logFmtBuf.clear();
     chain->Format(data, logFmtBuf);
 
-    const long actuallyWrote = 
+    const sint64 actuallyWrote = 
         _file.Write(logFmtBuf.data(), logFmtBuf.size());
     if (actuallyWrote != -1)
     {
@@ -162,7 +162,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
                 Flush();
         }
 
-        if (UNLIKELY(actuallyWrote != static_cast<long>(logFmtBuf.size())))
+        if (UNLIKELY(actuallyWrote != static_cast<sint64>(logFmtBuf.size())))
         {
             LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
             return LLBC_FAILED;
