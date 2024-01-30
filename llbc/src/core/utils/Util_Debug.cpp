@@ -97,7 +97,7 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
     ASSERT(hexStrIdx == hexStr.size() && "llbc framework internal error");
     #endif
 
-    return std::move(hexStr);
+    return hexStr;
 }
 
 uint64 LLBC_CPUTime::_freqPerSecond = 0;
