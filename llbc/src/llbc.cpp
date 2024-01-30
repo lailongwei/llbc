@@ -52,7 +52,7 @@ int LLBC_Startup(bool initWinSock)
     if (__LLBC_CoreStartup() != LLBC_OK)
         return LLBC_FAILED;
 
-    // Init communication module
+    // Init communication module.
     if (__LLBC_CommStartup() != LLBC_OK)
         return LLBC_FAILED;
 
