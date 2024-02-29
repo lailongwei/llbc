@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 class LLBC_ComponentEventIndex
 {
 public:
-    enum
+    enum ENUM
     {
         Begin = 0,
 

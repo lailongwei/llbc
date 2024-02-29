@@ -966,6 +966,11 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return *eventServiceFirer;
 }
 
+void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEventIndex::ENUM eventEnum, const LLBC_Variant &eventParams)
+{
+    _componentEvents.emplace(eventEnum, eventParams);
+}
+
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
 {
     if (UNLIKELY(!runnable))
@@ -1556,6 +1561,20 @@ void LLBC_ServiceImpl::HandleQueuedEvents()
             delete ev;
             delete block;
         }
+    }
+
+    while(!_componentEvents.empty())
+    {
+        auto &event = _componentEvents.front();
+        auto &eventEnum = event.first;
+        auto &eventParams = event.second;
+
+        for(auto *comp : _compList)
+        {
+            comp->OnEvent(eventEnum, eventParams);
+        }
+
+        _componentEvents.pop();
     }
 }
 

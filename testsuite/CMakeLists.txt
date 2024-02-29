@@ -25,6 +25,7 @@ endif()
 
 # Set testsuite output directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
+file(MAKE_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Copy all testcase config file to output directory.
 file(COPY ${LLBC_TESTSUITE_DIR}/core/config/IniTestCfg.ini DESTINATION ${LLBC_OUTPUT_DIR})

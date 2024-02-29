@@ -566,6 +566,13 @@ public:
      */
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
+    /**
+     * Process other components' events.
+     * @param[in] evIndex
+     * @param[in] evArgs
+     */
+    virtual void OnEvent(LLBC_ComponentEventIndex::ENUM evIndex, const LLBC_Variant &evArgs);
+
 public:
     /**
      * Application phase change event handler, when application start phase changed, will call these event handlers.

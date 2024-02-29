@@ -373,6 +373,13 @@ public:
     virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId);
 
     /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventEnum
+     * @param[in] eventParams
+     */
+    virtual void AddComponentEvent(LLBC_ComponentEventIndex::ENUM eventEnum, const LLBC_Variant &eventParams);
+
+    /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
@@ -673,6 +680,7 @@ private:
     // - Event support members.
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
+    std::queue<std::pair<LLBC_ComponentEventIndex::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
 };
 
 __LLBC_NS_END

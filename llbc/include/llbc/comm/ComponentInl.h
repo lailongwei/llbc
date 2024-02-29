@@ -236,6 +236,23 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
+inline void LLBC_Component::OnEvent(LLBC_ComponentEventIndex::ENUM evIndex, const llbc::LLBC_Variant &evArgs)
+{
+    switch (evIndex)
+    {
+        case LLBC_ComponentEventIndex::OnInit:
+        case LLBC_ComponentEventIndex::OnDestroy:
+        case LLBC_ComponentEventIndex::OnStart:
+        case LLBC_ComponentEventIndex::OnStop:
+        case LLBC_ComponentEventIndex::OnUpdate:
+        case LLBC_ComponentEventIndex::OnIdle:
+            break;
+
+        default:
+            break;
+    }
+}
+
 inline void LLBC_Component::OnAppEarlyStart()
 {
 }
