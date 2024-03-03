@@ -140,25 +140,6 @@ inline const LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &co
     return const_cast<LLBC_Component *>(this)->GetComponent(compName);
 }
 
-inline uint64 LLBC_Component::GetCaredEvents() const
-{
-    return _caredEvents;
-}
-
-inline bool LLBC_Component::IsCaredEvents(uint64 compEvs) const
-{
-    return (_caredEvents & compEvs) == compEvs;
-}
-
-inline bool LLBC_Component::IsCaredEventIndex(int compEvOffset) const
-{
- #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
-    return IsCaredEvents(1Ui64 << compEvOffset);
-#else
-    return IsCaredEvents(1ULL << compEvOffset);
-#endif
-}
-
 inline int LLBC_Component::GetConfigType() const
 {
     return _cfgType;
@@ -236,23 +217,6 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
-inline void LLBC_Component::OnEvent(LLBC_ComponentEventIndex::ENUM evIndex, const llbc::LLBC_Variant &evArgs)
-{
-    switch (evIndex)
-    {
-        case LLBC_ComponentEventIndex::OnInit:
-        case LLBC_ComponentEventIndex::OnDestroy:
-        case LLBC_ComponentEventIndex::OnStart:
-        case LLBC_ComponentEventIndex::OnStop:
-        case LLBC_ComponentEventIndex::OnUpdate:
-        case LLBC_ComponentEventIndex::OnIdle:
-            break;
-
-        default:
-            break;
-    }
-}
-
 inline void LLBC_Component::OnAppEarlyStart()
 {
 }
@@ -270,10 +234,6 @@ inline void LLBC_Component::OnAppEarlyStop()
 }
 
 inline void LLBC_Component::OnAppConfigReload()
-{
-}
-
-inline void LLBC_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
 }
 

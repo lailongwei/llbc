@@ -30,7 +30,7 @@ class EchoServerComp : public LLBC_Component
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // ÏûÏ¢×¢²á, ÒòechoÊµÏÖÎªÁ÷Ê½Ð­ÒéÊµÏÖ, opcodeÎª0
+        // ï¿½ï¿½Ï¢×¢ï¿½ï¿½, ï¿½ï¿½echoÊµï¿½ï¿½Îªï¿½ï¿½Ê½Ð­ï¿½ï¿½Êµï¿½ï¿½, opcodeÎª0
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
@@ -39,7 +39,7 @@ public:
 
     virtual bool OnStart(bool &startFinished)
     {
-        // Ö´ÐÐ¶Ë¿Ú¼àÌý
+        // Ö´ï¿½Ð¶Ë¿Ú¼ï¿½ï¿½ï¿½
         LLBC_Service *svc = GetService();
         int sId = svc->Listen("0.0.0.0", 9527);
         if (sId == 0)
@@ -48,7 +48,7 @@ public:
             return false;
         }
 
-        // ´òÓ¡Æô¶¯ÏûÏ¢
+        // ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
         std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
         return true;
@@ -56,7 +56,7 @@ public:
 
     virtual void OnStop(bool &stopFinished)
     {
-        // ´òÓ¡½«¹Ø±ÕÏûÏ¢
+        // ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½Ø±ï¿½ï¿½ï¿½Ï¢
         std::cout << "Echo server component will stop" << std::endl;
     }
 
@@ -86,7 +86,7 @@ private:
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
-        // »ØÏÔ
+        // ï¿½ï¿½ï¿½ï¿½
         svc->Send(pkt.GetSessionId(), 0, pkt.GetPayload(), pkt.GetPayloadLength());
     }
 };
@@ -102,7 +102,7 @@ public:
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // Í¬EchoServerComp, ¶©ÔÄ
+        // Í¬EchoServerComp, ï¿½ï¿½ï¿½ï¿½
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
@@ -136,17 +136,17 @@ public:
 private:
     void _OnPkt(LLBC_Packet &pkt)
     {
-        // ´òÓ¡»ØÏÔ
+        // ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "[Echo]" << msg << std::endl;
 
-        // ½ÓÊÜÐÂÊäÈë
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         _AcceptInput();
     }
 
     bool _AcceptInput(bool inStart = false)
     {
-        // ÊäÈë
+        // ï¿½ï¿½ï¿½ï¿½
         std::string input;
         while (input.empty())
         {
@@ -161,7 +161,7 @@ private:
             }
         }
 
-        // ·¢ËÍ
+        // ï¿½ï¿½ï¿½ï¿½
         LLBC_Service *svc = GetService();
         svc->Send(_sId, 0, input.data(), input.size() + 1);
 
@@ -186,7 +186,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
 {
     std::cout <<"Echo test:" <<std::endl;
 
-    // Ñ¡ÔñÆô¶¯·½Ê½
+    // Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
     std::cout << "Start echo as server(Y/[N])?";
 
     bool asServer;
@@ -195,7 +195,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     choice = choice.strip().toupper();
     asServer = choice == "Y" || choice == "YES";
 
-    // ´´½¨&Æô¶¯service
+    // ï¿½ï¿½ï¿½ï¿½&ï¿½ï¿½ï¿½ï¿½service
     LLBC_Service *svc = LLBC_Service::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
         svc->AddComponent(new EchoServerComp);
@@ -221,7 +221,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
         svc->Wait();
     }
 
-    // É¾³ýservice
+    // É¾ï¿½ï¿½service
     delete svc;
 
     return LLBC_OK;

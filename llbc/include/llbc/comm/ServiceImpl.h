@@ -543,7 +543,6 @@ private:
     void UpdateComps();
     void LateUpdateComps();
     void AddComp(LLBC_Component *comp);
-    void AddCompToCaredEventsArray(LLBC_Component *comp);
     LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
     void CloseCompLibrary(const LLBC_String &libPath);
 
@@ -645,7 +644,6 @@ public:
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
-    std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End]; // Stored by event type component list.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
 
     // Coder & Handler about members.

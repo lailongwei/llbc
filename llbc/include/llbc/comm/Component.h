@@ -396,7 +396,7 @@ private:
 class LLBC_EXPORT LLBC_Component
 {
 public:
-    explicit LLBC_Component(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
+    explicit LLBC_Component();
     virtual ~LLBC_Component();
 
 public:
@@ -434,27 +434,6 @@ public:
      * Get component list.
      */
     const std::vector<LLBC_Component *> &GetComponentList() const;
-
-public:
-    /**
-     * Get cared events.
-     * @return uint64 - the cared events.
-     */
-    uint64 GetCaredEvents() const;
-
-    /**
-     * Get cared specified components events or not.
-     * @param[in] compEvs - the comp events(bit collection).
-     * @return bool - return true it means cared specified events, otherwise return false.
-     */
-    bool IsCaredEvents(uint64 compEvs) const;
-
-    /**
-     * Get cared specified component events offset or not.
-     * @param[in] compEvOffset - the comp event offset.
-     * @return bool - return true it means cared specified event offset, otherwise return false.
-     */
-    bool IsCaredEventIndex(int compEvOffset) const;
 
 public:
     /**
@@ -571,7 +550,7 @@ public:
      * @param[in] evIndex
      * @param[in] evArgs
      */
-    virtual void OnEvent(LLBC_ComponentEventIndex::ENUM evIndex, const LLBC_Variant &evArgs);
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs) = 0;
 
 public:
     /**
@@ -588,12 +567,6 @@ public:
     virtual void OnAppConfigReload();
 
 public:
-    /**
-     * When new session create, will call this event handler.
-     * @param[in] sessionInfo - the session info.
-     */
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
-
     /**
      * When session destroy, will call this event handler.
      * @param[in] destroyInfo - the session destroy info.
@@ -644,7 +617,6 @@ private:
 private:
     bool _inited;
     bool _started;
-    uint64 _caredEvents;
 
     LLBC_Service *_svc;
     LLBC_ComponentMethods *_meths;
@@ -660,7 +632,7 @@ private:
 class LLBC_EXPORT LLBC_ComponentFactory
 {
 public:
-    virtual ~LLBC_ComponentFactory() {  }
+    virtual ~LLBC_ComponentFactory() = default;
 
 public:
     virtual LLBC_Component *Create(LLBC_Service *service) const = 0;

@@ -118,8 +118,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _begSvcTime(0)
 
-, _caredEventComps{}
-
 // Service extend functions about members.
 , _releasePoolStack(nullptr)
 
@@ -1588,9 +1586,7 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         AddReadySession(ev.sessionId, ev.acceptSessionId, ev.isListen, true);
     }
 
-    // Check has care session-create ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnSessionCreate];
-    if (!caredComps.empty())
+    for(auto *comp : _compList)
     {
         // Build session info.
         LLBC_SessionInfo info;
@@ -1601,14 +1597,8 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         info.SetPeerAddr(ev.peer);
         info.SetSocket(ev.handle);
 
-        // Dispatch session-create event to all comps.
-        const size_t compsSize = caredComps.size();
-        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        {
-            LLBC_Component *&comp = caredComps[compIdx];
-            if (LIKELY(comp->_started))
-                comp->OnSessionCreate(info);
-        }
+        LLBC_Variant eventParams = LLBC_Variant(&info);
+        comp->OnEvent(LLBC_ComponentEvents::OnSessionCreate, eventParams);
     }
 }
 
@@ -1946,13 +1936,6 @@ int LLBC_ServiceImpl::InitComps()
         if (willRegComp->_inited)
             continue;
 
-        // If comp don't care <OnInit> event, set to inited, and than continue.
-        if (!willRegComp->IsCaredEvents(LLBC_ComponentEvents::OnInit))
-        {
-            willRegComp->_inited = true;
-            continue;
-        }
-
         // Init comp.
         while (true)
         {
@@ -2011,12 +1994,6 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
         LLBC_Component *comp = *it;
         if (!comp->_inited)
             continue;
-
-        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnDestroy))
-        {
-            comp->_inited = false;
-            continue;
-        }
 
         while (true)
         {
@@ -2088,12 +2065,6 @@ int LLBC_ServiceImpl::StartComps()
         if (comp->_started)
             continue;
 
-        if (!comp->IsCaredEvents(LLBC_ComponentEvents::OnStart))
-        {
-            comp->_started = true;
-            continue;
-        }
-
         while (true)
         {
             bool startFinished = true;
@@ -2130,18 +2101,15 @@ int LLBC_ServiceImpl::StartComps()
         for (compIdx = 0; compIdx != compsSize; ++compIdx)
         {
             auto &comp = _compList[compIdx];
-            if (comp->IsCaredEvents(LLBC_ComponentEvents::OnLateStart))
+            while (true)
             {
-                while (true)
-                {
-                    bool lateStartFinish = true;
-                    comp->OnLateStart(lateStartFinish);
-                    if (lateStartFinish)
-                        break;
+                bool lateStartFinish = true;
+                comp->OnLateStart(lateStartFinish);
+                if (lateStartFinish)
+                    break;
 
-                    OnSvc(false);
-                    LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
-                }
+                OnSvc(false);
+                LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
             }
         }
 
@@ -2170,8 +2138,7 @@ void LLBC_ServiceImpl::StopComps()
     for (int compIdx = static_cast<int>(_compList.size() - 1); compIdx >= 0; --compIdx)
     {
         auto &comp = _compList[compIdx];
-        if (!comp->_started ||
-            !comp->IsCaredEvents(LLBC_ComponentEventIndex::OnEarlyStop))
+        if (!comp->_started)
             continue;
 
         while (true)
@@ -2193,18 +2160,15 @@ void LLBC_ServiceImpl::StopComps()
         if (!comp->_started)
             continue;
 
-        if (comp->IsCaredEvents(LLBC_ComponentEvents::OnStop))
+        while (true)
         {
-            while (true)
-            {
-                bool stopFinished = true;
-                comp->OnStop(stopFinished);
-                if (stopFinished)
-                    break;
+            bool stopFinished = true;
+            comp->OnStop(stopFinished);
+            if (stopFinished)
+                break;
 
-                OnSvc(false);
-                LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
-            }
+            OnSvc(false);
+            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
         }
 
         comp->_started = false;
@@ -2261,19 +2225,6 @@ void LLBC_ServiceImpl::AddComp(LLBC_Component *comp)
     auto allocCompName = LLBC_Malloc(char, compNameLen + 1);
     memcpy(allocCompName, compName, compNameLen + 1);
     _name2Comps.emplace(allocCompName, comp);
-
-    AddCompToCaredEventsArray(comp);
-}
-
-void LLBC_ServiceImpl::AddCompToCaredEventsArray(LLBC_Component *comp)
-{
-    for (int evOffset = LLBC_ComponentEventIndex::Begin;
-         evOffset != LLBC_ComponentEventIndex::End;
-         ++evOffset)
-    {
-        if (comp->IsCaredEventIndex(evOffset))
-            _caredEventComps[evOffset].push_back(comp);
-    }
 }
 
 LLBC_Library *LLBC_ServiceImpl::OpenCompLibrary(const LLBC_String &libPath, bool &existingLib)
