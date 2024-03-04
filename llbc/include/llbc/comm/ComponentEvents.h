@@ -44,8 +44,8 @@ public:
         OnAppEarlyStart,
         OnAppStartFail,
         OnAppStartFinish,
-        OnAppWillStop,
-        OnAppConfigReload,
+        OnAppEarlyStop,
+        OnAppCfgReload,
 
         End,
     };

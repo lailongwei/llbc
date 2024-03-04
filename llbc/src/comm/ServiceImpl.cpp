@@ -964,7 +964,7 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return *eventServiceFirer;
 }
 
-void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEventIndex::ENUM eventEnum, const LLBC_Variant &eventParams)
+void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEvents::ENUM eventEnum, const LLBC_Variant &eventParams)
 {
     _componentEvents.emplace(eventEnum, eventParams);
 }
@@ -1586,18 +1586,21 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
         AddReadySession(ev.sessionId, ev.acceptSessionId, ev.isListen, true);
     }
 
+    // Build session info.
+    LLBC_SessionInfo info;
+    info.SetIsListenSession(ev.isListen);
+    info.SetSessionId(ev.sessionId);
+    info.SetAcceptSessionId(ev.acceptSessionId);
+    info.SetLocalAddr(ev.local);
+    info.SetPeerAddr(ev.peer);
+    info.SetSocket(ev.handle);
+    LLBC_Variant eventParams(&info);
+
+    // Dispatch session-create event to all comps.
     for(auto *comp : _compList)
     {
-        // Build session info.
-        LLBC_SessionInfo info;
-        info.SetIsListenSession(ev.isListen);
-        info.SetSessionId(ev.sessionId);
-        info.SetAcceptSessionId(ev.acceptSessionId);
-        info.SetLocalAddr(ev.local);
-        info.SetPeerAddr(ev.peer);
-        info.SetSocket(ev.handle);
+        LLBC_ContinueIf(comp->_started == false);
 
-        LLBC_Variant eventParams = LLBC_Variant(&info);
         comp->OnEvent(LLBC_ComponentEvents::OnSessionCreate, eventParams);
     }
 }
@@ -1612,31 +1615,26 @@ void LLBC_ServiceImpl::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
         RemoveReadySession(ev.sessionId);
     }
 
-    // Check has care session-destroy ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnSessionDestroy];
-    if (!caredComps.empty())
+    // Build session info.
+    LLBC_SessionInfo *sessionInfo = new LLBC_SessionInfo;
+    sessionInfo->SetIsListenSession(ev.isListen);
+    sessionInfo->SetSessionId(ev.sessionId);
+    sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
+    sessionInfo->SetLocalAddr(ev.local);
+    sessionInfo->SetPeerAddr(ev.peer);
+    sessionInfo->SetSocket(ev.handle);
+
+    // Build session destroy info.
+    LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
+    ev.closeInfo = nullptr;
+    LLBC_Variant eventParams(&destroyInfo);
+
+    // Dispatch session-destroy event to all comps.
+    for(auto *comp : _compList)
     {
-        // Build session info.
-        LLBC_SessionInfo *sessionInfo = new LLBC_SessionInfo;
-        sessionInfo->SetIsListenSession(ev.isListen);
-        sessionInfo->SetSessionId(ev.sessionId);
-        sessionInfo->SetAcceptSessionId(ev.acceptSessionId);
-        sessionInfo->SetLocalAddr(ev.local);
-        sessionInfo->SetPeerAddr(ev.peer);
-        sessionInfo->SetSocket(ev.handle);
+        LLBC_ContinueIf(comp->_started == false);
 
-        // Build session destroy info.
-        LLBC_SessionDestroyInfo destroyInfo(sessionInfo, ev.closeInfo);
-        ev.closeInfo = nullptr;
-
-        // Dispatch session-destroy event to all comps.
-        const size_t compsSize = caredComps.size();
-        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        {
-            LLBC_Component *&comp = caredComps[compIdx];
-            if (LIKELY(comp->_started))
-                comp->OnSessionDestroy(destroyInfo);
-        }
+        comp->OnEvent(LLBC_ComponentEvents::OnSessionDestroy, eventParams);
     }
 
     // Remove session protocol factory.
@@ -1649,24 +1647,20 @@ void LLBC_ServiceImpl::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_AsyncConn _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
+    // Build async-conn-result info.
+    LLBC_AsyncConnResult result;
+    result.SetIsConnected(ev.connected);
+    result.SetSessionId(ev.sessionId);
+    result.SetReason(ev.reason);
+    result.SetPeerAddr(ev.peer);
+    LLBC_Variant eventParams(&result);
 
-    // Check has care asyncconn-result ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnAsyncConnResult];
-    if (!caredComps.empty())
+    // Dispatch async-conn-result event to all comps.
+    for(auto *comp : _compList)
     {
-        LLBC_AsyncConnResult result;
-        result.SetIsConnected(ev.connected);
-        result.SetSessionId(ev.sessionId);
-        result.SetReason(ev.reason);
-        result.SetPeerAddr(ev.peer);
+        LLBC_ContinueIf(comp->_started == false);
 
-        const size_t compsSize = caredComps.size();
-        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        {
-            LLBC_Component *&comp = caredComps[compIdx];
-            if (LIKELY(comp->_started))
-                comp->OnAsyncConnResult(result);
-        }
+        comp->OnEvent(LLBC_ComponentEvents::OnAsyncConnResult, eventParams);
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1765,16 +1759,13 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     }
     else
     {
-        auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnUnHandledPacket];
-        if (!caredComps.empty())
+        // Dispatch unhandled-packet event to all comps.
+        LLBC_Variant eventParams(packet);
+        for(auto *comp : _compList)
         {
-            const size_t compsSize = caredComps.size();
-            for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-            {
-                LLBC_Component *&comp = caredComps[compIdx];
-                if (LIKELY(comp->_started))
-                    comp->OnUnHandledPacket(*packet);
-            }
+            LLBC_ContinueIf(comp->_started == false);
+
+            comp->OnEvent(LLBC_ComponentEvents::OnUnHandledPacket, eventParams);
         }
     }
 
@@ -1786,24 +1777,21 @@ void LLBC_ServiceImpl::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     typedef LLBC_SvcEv_ProtoReport _Ev;
     _Ev &ev = static_cast<_Ev &>(_);
 
-    // Check has care proto-report ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnProtoReport];
-    if (!caredComps.empty())
-    {
-        LLBC_ProtoReport report;
-        report.SetSessionId(ev.sessionId);
-        report.SetOpcode(ev.opcode);
-        report.SetLayer(ev.layer);
-        report.SetLevel(ev.level);
-        report.SetReport(ev.report);
+    // Build proto-report.
+    LLBC_ProtoReport report;
+    report.SetSessionId(ev.sessionId);
+    report.SetOpcode(ev.opcode);
+    report.SetLayer(ev.layer);
+    report.SetLevel(ev.level);
+    report.SetReport(ev.report);
+    LLBC_Variant eventParams(&report);
 
-        const size_t compsSize = caredComps.size();
-        for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-        {
-            LLBC_Component *&comp = caredComps[compIdx];
-            if (LIKELY(comp->_started))
-                comp->OnProtoReport(report);
-        }
+    // Dispatch proto-report event to all comps.
+    for(auto *comp : _compList)
+    {
+        LLBC_ContinueIf(comp->_started == false);
+
+        comp->OnEvent(LLBC_ComponentEvents::OnProtoReport, eventParams);
     }
 }
 
@@ -1853,20 +1841,23 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
 {
     typedef LLBC_SvcEv_AppPhaseEv _Ev;
     auto &ev = static_cast<_Ev &>(_);
+    LLBC_Variant eventParams{};
     if (ev.earlyStart)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppEarlyStart])
+        for(auto *comp : _compList)
         {
-            if (LIKELY(comp->_started))
-                comp->OnAppEarlyStart();
+            LLBC_ContinueIf(comp->_started == false);
+
+            comp->OnEvent(LLBC_ComponentEvents::OnAppEarlyStart, eventParams);
         }
     }
     else if (ev.startFail)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppStartFail])
+        for(auto *comp : _compList)
         {
-            if (LIKELY(comp->_started))
-                comp->OnAppStartFail();
+            LLBC_ContinueIf(comp->_started == false);
+
+            comp->OnEvent(LLBC_ComponentEvents::OnAppStartFail, eventParams);
         }
     }
     else if (ev.startFinish)
@@ -1874,18 +1865,20 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         if (_cfgType == LLBC_AppConfigType::End)
             UpdateServiceCfg();
 
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppStartFinish])
+        for(auto *comp : _compList)
         {
-            if (LIKELY(comp->_started))
-                comp->OnAppStartFinish();
+            LLBC_ContinueIf(comp->_started == false);
+
+            comp->OnEvent(LLBC_ComponentEvents::OnAppStartFinish, eventParams);
         }
     }
     else if (ev.earlyStop)
     {
-        for (auto &comp : _caredEventComps[LLBC_ComponentEventIndex::OnAppWillStop])
+        for(auto *comp : _compList)
         {
-            if (LIKELY(comp->_started))
-                comp->OnAppEarlyStop();
+            LLBC_ContinueIf(comp->_started == false);
+
+            comp->OnEvent(LLBC_ComponentEvents::OnAppEarlyStop, eventParams);
         }
     }
 }
@@ -1898,18 +1891,13 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
     for (auto &compItem : _name2Comps)
         compItem.second->UpdateComponentCfg();
 
-    // Check has care application config reloaded ev comps or not, if has cared event comps, dispatch event.
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnAppConfigReload];
-    if (caredComps.empty())
-        return;
-
-    // Dispatch application config reloaded event to all comps.
-    const size_t compsSize = caredComps.size();
-    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+    // Dispatch app-cfg-reload event to all comps.
+    LLBC_Variant eventParams{};
+    for(auto *comp : _compList)
     {
-        LLBC_Component *&comp = caredComps[compIdx];
-        if (LIKELY(comp->_started))
-            comp->OnAppConfigReload();
+        LLBC_ContinueIf(comp->_started == false);
+
+        comp->OnEvent(LLBC_ComponentEvents::OnAppCfgReload, eventParams);
     }
 }
 
@@ -2023,9 +2011,6 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 
         free(const_cast<char *>(compName.c_str()));
     }
-
-    for (auto &evComps: _caredEventComps)
-        evComps.clear();
 
     // Delete all will-register components.
     LLBC_STLHelper::RecycleContainer(_willRegComps, true);
@@ -2195,6 +2180,13 @@ void LLBC_ServiceImpl::UpdateComps()
         if (LIKELY(comp->_started))
             comp->OnUpdate();
     }
+
+    for(auto *comp : _compList)
+    {
+        LLBC_ContinueIf(comp->_started == false);
+
+        comp->OnUpdate();
+    }
 }
 
 void LLBC_ServiceImpl::LateUpdateComps()
@@ -2305,11 +2297,7 @@ void LLBC_ServiceImpl::ClearTimerScheduler()
 
 void LLBC_ServiceImpl::ProcessIdle()
 {
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnIdle];
-    LLBC_ReturnIf(caredComps.empty(), void());
-
-    const size_t compsSize = caredComps.size();
-    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+    for(auto *comp : _compList)
     {
         sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
         if (LIKELY(elapsed >= 0))
@@ -2317,9 +2305,8 @@ void LLBC_ServiceImpl::ProcessIdle()
             if (elapsed >= _frameInterval)
                 break;
 
-            LLBC_Component *&comp = caredComps[compIdx];
-            if (LIKELY(comp->_started))
-                comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
+            LLBC_ContinueIf(comp->_started == false);
+            comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
         }
     }
 }

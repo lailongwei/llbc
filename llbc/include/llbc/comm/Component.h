@@ -546,51 +546,11 @@ public:
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
     /**
-     * Process other components' events.
+     * Process components' events.
      * @param[in] evIndex
      * @param[in] evArgs
      */
     virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs) = 0;
-
-public:
-    /**
-     * Application phase change event handler, when application start phase changed, will call these event handlers.
-     */
-    virtual void OnAppEarlyStart();
-    virtual void OnAppStartFail();
-    virtual void OnAppStartFinish();
-    virtual void OnAppEarlyStop();
-
-    /**
-     * When application config reload, will call this event handler.
-     */
-    virtual void OnAppConfigReload();
-
-public:
-    /**
-     * When session destroy, will call this event handler.
-     * @param[in] destroyInfo - the session destroy info.
-     */
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
-
-    /**
-     * When asynchronous connect result, will call this event handler.
-     * @param[in] result - asynchronous connect result data.
-     */
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
-
-public:
-    /**
-     * When protocol layer report something, will call this event handler.
-     * @param[in] report - the report information.
-     */
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
-
-    /**
-     * When service receive a unhandled packet, will call this event handler.
-     * @param[in] packet - the unhandled packet.
-     */
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     /**
