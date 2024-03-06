@@ -83,36 +83,43 @@ public:
      */
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-public:
+    /**
+     * Process components' events.
+     * @param[in] evIndex
+     * @param[in] evArgs
+     */
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs);
+
+private:
     /**
      * When new session create, will call this event handler.
      * @param[in] sessionInfo - the session info.
      */
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
 
     /**
      * When session destroy, will call this event handler.
      * @param[in] destroyInfo - the session destroy information.
      */
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
 
     /**
      * When asynchronous connect result, will call this event handler.
      * @param[in] result - the async-conn result info.
      */
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
 
     /**
      * When protocol stack reported, will call this event handler.
      * @param[in] report - the protocol report info.
      */
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
+    void OnProtoReport(const LLBC_ProtoReport &report);
 
     /**
      * When service receive a unhandled packet, will call this event handler.
      * @param[in] opcode - the opcode.
      */
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
+    void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     /**

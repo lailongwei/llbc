@@ -83,6 +83,39 @@ void csllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
     (*_idleDeleg)(static_cast<int>(idleTime.GetTotalMicros()));
 }
 
+void csllbc_Component::OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+{
+    switch(event)
+    {
+        case LLBC_ComponentEvents::SessionCreate:
+        {
+            OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+            break;
+        }
+        case LLBC_ComponentEvents::SessionDestroy:
+        {
+            OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+            break;
+        }
+        case LLBC_ComponentEvents::AsyncConnResult:
+        {
+            OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+            break;
+        }
+        case LLBC_ComponentEvents::ProtoReport:
+        {
+            OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+            break;
+        }
+        case LLBC_ComponentEvents::UnHandledPacket:
+        {
+            OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+            break;
+        }
+        default: break;
+    }
+}
+
 void csllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
 {
     const LLBC_SockAddr_IN &localAddr = sessionInfo.GetLocalAddr();

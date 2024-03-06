@@ -217,6 +217,11 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
+inline void LLBC_Component::OnEvent(LLBC_ComponentEvents::ENUM event, const llbc::LLBC_Variant& evArgs)
+{
+
+}
+
 inline void LLBC_Component::SetService(LLBC_Service *svc)
 {
     _svc = svc;

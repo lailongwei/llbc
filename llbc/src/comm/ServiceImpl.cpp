@@ -1601,7 +1601,7 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::OnSessionCreate, eventParams);
+        comp->OnEvent(LLBC_ComponentEvents::SessionCreate, eventParams);
     }
 }
 
@@ -1634,7 +1634,7 @@ void LLBC_ServiceImpl::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::OnSessionDestroy, eventParams);
+        comp->OnEvent(LLBC_ComponentEvents::SessionDestroy, eventParams);
     }
 
     // Remove session protocol factory.
@@ -1660,7 +1660,7 @@ void LLBC_ServiceImpl::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::OnAsyncConnResult, eventParams);
+        comp->OnEvent(LLBC_ComponentEvents::AsyncConnResult, eventParams);
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1765,7 +1765,7 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::OnUnHandledPacket, eventParams);
+            comp->OnEvent(LLBC_ComponentEvents::UnHandledPacket, eventParams);
         }
     }
 
@@ -1791,7 +1791,7 @@ void LLBC_ServiceImpl::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::OnProtoReport, eventParams);
+        comp->OnEvent(LLBC_ComponentEvents::ProtoReport, eventParams);
     }
 }
 
@@ -1848,7 +1848,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::OnAppEarlyStart, eventParams);
+            comp->OnEvent(LLBC_ComponentEvents::AppEarlyStart, eventParams);
         }
     }
     else if (ev.startFail)
@@ -1857,7 +1857,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::OnAppStartFail, eventParams);
+            comp->OnEvent(LLBC_ComponentEvents::AppStartFail, eventParams);
         }
     }
     else if (ev.startFinish)
@@ -1869,7 +1869,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::OnAppStartFinish, eventParams);
+            comp->OnEvent(LLBC_ComponentEvents::AppStartFinish, eventParams);
         }
     }
     else if (ev.earlyStop)
@@ -1878,7 +1878,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::OnAppEarlyStop, eventParams);
+            comp->OnEvent(LLBC_ComponentEvents::AppEarlyStop, eventParams);
         }
     }
 }
@@ -1897,7 +1897,7 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::OnAppCfgReload, eventParams);
+        comp->OnEvent(LLBC_ComponentEvents::AppCfgReload, eventParams);
     }
 }
 
@@ -2169,18 +2169,6 @@ void LLBC_ServiceImpl::StopComps()
 
 void LLBC_ServiceImpl::UpdateComps()
 {
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnUpdate];
-    if (caredComps.empty())
-        return;
-
-    const size_t compsSize = caredComps.size();
-    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
-    {
-        LLBC_Component *&comp = caredComps[compIdx];
-        if (LIKELY(comp->_started))
-            comp->OnUpdate();
-    }
-
     for(auto *comp : _compList)
     {
         LLBC_ContinueIf(comp->_started == false);
@@ -2191,16 +2179,11 @@ void LLBC_ServiceImpl::UpdateComps()
 
 void LLBC_ServiceImpl::LateUpdateComps()
 {
-    auto &caredComps = _caredEventComps[LLBC_ComponentEventIndex::OnLateUpdate];
-    if (caredComps.empty())
-        return;
-
-    const size_t compsSize = caredComps.size();
-    for (size_t compIdx = 0; compIdx != compsSize; ++compIdx)
+    for(auto *comp : _compList)
     {
-        LLBC_Component *&comp = caredComps[compIdx];
-        if (LIKELY(comp->_started))
-            comp->OnLateUpdate();
+        LLBC_ContinueIf(comp->_started == false);
+
+        comp->OnLateUpdate();
     }
 }
 

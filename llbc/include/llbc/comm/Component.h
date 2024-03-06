@@ -550,7 +550,7 @@ public:
      * @param[in] evIndex
      * @param[in] evArgs
      */
-    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs) = 0;
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs);
 
 private:
     /**

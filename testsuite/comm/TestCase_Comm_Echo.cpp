@@ -60,25 +60,43 @@ public:
         std::cout << "Echo server component will stop" << std::endl;
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch(event)
+        {
+            case LLBC_ComponentEvents::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            default: break;
+        }
+    }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
         if (!sessionInfo.IsListenSession())
             std::cout << "Session[sId:" << sessionInfo.GetSessionId()
                       << ", addr:" << sessionInfo.GetPeerAddr() << "]: <create>" << std::endl;
     }
 
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
         if (!destroyInfo.GetSessionInfo().IsListenSession())
         {
             auto &sessionInfo = destroyInfo.GetSessionInfo();
             std::cout << "Session[sId:" << sessionInfo.GetSessionId()
-                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:" 
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:"
                       << destroyInfo.GetReason() << ">" << std::endl;
         }
     }
 
-private:
     void _OnPkt(LLBC_Packet &pkt)
     {
         // Log

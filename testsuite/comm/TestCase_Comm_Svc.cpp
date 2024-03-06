@@ -50,31 +50,37 @@ public:
         LLBC_PrintLn("Service destroy!");
     }
 
-public:
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
     {
-        LLBC_PrintLn("Session Create: %s", sessionInfo.ToString().c_str());
-    }
-
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-    {
-        LLBC_PrintLn("Session Destroy, info: %s", destroyInfo.ToString().c_str());
-    }
-
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-    {
-        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
-    }
-
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet)
-    {
-        LLBC_PrintLn("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
-            packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
-    }
-
-    virtual void OnProtoReport(const LLBC_ProtoReport &report)
-    {
-        LLBC_PrintLn("Proto report: %s", report.ToString().c_str());
+        switch(event)
+        {
+            case LLBC_ComponentEvents::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::AsyncConnResult:
+            {
+                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                break;
+            }
+            case LLBC_ComponentEvents::UnHandledPacket:
+            {
+                OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+                break;
+            }
+            case LLBC_ComponentEvents::ProtoReport:
+            {
+                OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+                break;
+            }
+            default: break;
+        }
     }
 
 public:
@@ -98,6 +104,34 @@ public:
 
         GetService()->Send(resPacket);
     }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        LLBC_PrintLn("Session Create: %s", sessionInfo.ToString().c_str());
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        LLBC_PrintLn("Session Destroy, info: %s", destroyInfo.ToString().c_str());
+    }
+
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+    {
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
+    }
+
+    void OnUnHandledPacket(const LLBC_Packet &packet)
+    {
+        LLBC_PrintLn("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
+            packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
+    }
+
+    void OnProtoReport(const LLBC_ProtoReport &report)
+    {
+        LLBC_PrintLn("Proto report: %s", report.ToString().c_str());
+    }
+
 
 private:
     uint64 _recvBytes;

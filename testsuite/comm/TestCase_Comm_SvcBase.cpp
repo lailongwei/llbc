@@ -72,7 +72,7 @@ class TestComp : public LLBC_Component
 {
 public:
     TestComp()
-    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents)
+    : LLBC_Component()
     {}
 
 public:
@@ -112,27 +112,32 @@ public:
         // LLBC_PrintLn("Service idle, idle time: %s", idleTime.ToString().c_str());
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
     {
-        LLBC_PrintLn("SessionCreate: %s", sessionInfo.ToString().c_str());
-        // std::cout <<"Session Create: " <<si <<std::endl;
-    }
-
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-    {
-        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
-    }
-
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-    {
-        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
-        // std::cout <<"Async-Conn result: " <<result <<std::endl;
-    }
-
-    virtual void OnProtoReport(const LLBC_ProtoReport &report)
-    {
-        LLBC_PrintLn("Protocol report: %s", report.ToString().c_str());
-        // std::cout <<"Protocol report: " <<report <<std::endl;
+        switch(event)
+        {
+            case LLBC_ComponentEvents::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::AsyncConnResult:
+            {
+                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                break;
+            }
+            case LLBC_ComponentEvents::ProtoReport:
+            {
+                OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+                break;
+            }
+            default: break;
+        }
     }
 
 public:
@@ -183,6 +188,29 @@ public:
     }
 
 private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        LLBC_PrintLn("SessionCreate: %s", sessionInfo.ToString().c_str());
+        // std::cout <<"Session Create: " <<si <<std::endl;
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
+    }
+
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+    {
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
+        // std::cout <<"Async-Conn result: " <<result <<std::endl;
+    }
+
+    void OnProtoReport(const LLBC_ProtoReport &report)
+    {
+        LLBC_PrintLn("Protocol report: %s", report.ToString().c_str());
+        // std::cout <<"Protocol report: " <<report <<std::endl;
+    }
+
     void DelPreHandleResult(void *result)
     {
         free(result);

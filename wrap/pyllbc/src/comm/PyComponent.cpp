@@ -34,7 +34,7 @@ namespace
 }
 
 pyllbc_Component::pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp)
-: LLBC_Component(LLBC_ComponentEvents::AllEvents)
+: LLBC_Component()
 , _svc(svc)
 , _pySvc(svc->GetPyService())
 , _pyComp(pyComp)
@@ -161,6 +161,39 @@ void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
     Py_DECREF(pyIdleTime);
 
     CallComponentMeth(_pyOnIdleMeth, _holdedOnIdleEv, false, false);
+}
+
+void pyllbc_Component::OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+{
+    switch(event)
+    {
+        case LLBC_ComponentEvents::SessionCreate:
+        {
+            OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+            break;
+        }
+        case LLBC_ComponentEvents::SessionDestroy:
+        {
+            OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+            break;
+        }
+        case LLBC_ComponentEvents::AsyncConnResult:
+        {
+            OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+            break;
+        }
+        case LLBC_ComponentEvents::ProtoReport:
+        {
+            OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+            break;
+        }
+        case LLBC_ComponentEvents::UnHandledPacket:
+        {
+            OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+            break;
+        }
+        default: break;
+    }
 }
 
 void pyllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)

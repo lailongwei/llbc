@@ -35,17 +35,17 @@ public:
     {
         Begin = 0,
 
-        OnSessionCreate,
-        OnSessionDestroy,
-        OnAsyncConnResult,
-        OnProtoReport,
-        OnUnHandledPacket,
+        SessionCreate,
+        SessionDestroy,
+        AsyncConnResult,
+        ProtoReport,
+        UnHandledPacket,
 
-        OnAppEarlyStart,
-        OnAppStartFail,
-        OnAppStartFinish,
-        OnAppEarlyStop,
-        OnAppCfgReload,
+        AppEarlyStart,
+        AppStartFail,
+        AppStartFinish,
+        AppEarlyStop,
+        AppCfgReload,
 
         End,
     };

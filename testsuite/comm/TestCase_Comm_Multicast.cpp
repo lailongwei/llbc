@@ -31,7 +31,7 @@ class TestComp : public LLBC_Component
 {
 public:
     TestComp(bool asClient, bool useBst)
-    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+    : LLBC_Component()
     , _asClient(asClient)
     , _useBst(useBst)
     {
@@ -49,27 +49,6 @@ public:
         LLBC_PrintLn("Service destroy!");
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
-    {
-        if (sessionInfo.IsListenSession())
-            return;
-
-        _sessionIds.push_back(sessionInfo.GetSessionId());
-    }
-
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-    {
-        int sessionId = destroyInfo.GetSessionId();
-        for (auto it = _sessionIds.begin();
-             it != _sessionIds.end();
-             it++)
-            if (*it == sessionId)
-            {
-                _sessionIds.erase(it);
-                break;
-            }
-    }
-
     virtual void OnUpdate()
     {
         if (_asClient)
@@ -82,6 +61,24 @@ public:
             svc->Multicast(_sessionIds, OPCODE, "Hello, world!", 14, 0);
     }
 
+    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch (event)
+        {
+            case LLBC_ComponentEvents::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEvents::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            default: break;
+        }
+    }
+
 public:
     virtual void OnRecv(LLBC_Packet &packet)
     {
@@ -89,6 +86,28 @@ public:
         const char *data = reinterpret_cast<const char *>(packet.GetPayload());
 
         LLBC_PrintLn("Session[%4d] received data: %s", sessionId, data);
+    }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        if (sessionInfo.IsListenSession())
+            return;
+
+        _sessionIds.push_back(sessionInfo.GetSessionId());
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        int sessionId = destroyInfo.GetSessionId();
+        for (auto it = _sessionIds.begin();
+             it != _sessionIds.end();
+             it++)
+            if (*it == sessionId)
+            {
+                _sessionIds.erase(it);
+                break;
+            }
     }
 
 private:
