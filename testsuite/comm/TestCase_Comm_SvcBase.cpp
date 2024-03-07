@@ -112,26 +112,26 @@ public:
         // LLBC_PrintLn("Service idle, idle time: %s", idleTime.ToString().c_str());
     }
 
-    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
     {
         switch(event)
         {
-            case LLBC_ComponentEvents::SessionCreate:
+            case LLBC_ComponentEventType::SessionCreate:
             {
                 OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
                 break;
             }
-            case LLBC_ComponentEvents::SessionDestroy:
+            case LLBC_ComponentEventType::SessionDestroy:
             {
                 OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
-            case LLBC_ComponentEvents::AsyncConnResult:
+            case LLBC_ComponentEventType::AsyncConnResult:
             {
                 OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
                 break;
             }
-            case LLBC_ComponentEvents::ProtoReport:
+            case LLBC_ComponentEventType::ProtoReport:
             {
                 OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
                 break;

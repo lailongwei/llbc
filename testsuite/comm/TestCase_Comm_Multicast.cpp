@@ -61,16 +61,16 @@ public:
             svc->Multicast(_sessionIds, OPCODE, "Hello, world!", 14, 0);
     }
 
-    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs)
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
     {
         switch (event)
         {
-            case LLBC_ComponentEvents::SessionCreate:
+            case LLBC_ComponentEventType::SessionCreate:
             {
                 OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
                 break;
             }
-            case LLBC_ComponentEvents::SessionDestroy:
+            case LLBC_ComponentEventType::SessionDestroy:
             {
                 OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
                 break;

@@ -610,7 +610,7 @@ public:
      * @param[in] eventEnum
      * @param[in] eventParams
      */
-    virtual void AddComponentEvent(LLBC_ComponentEvents::ENUM eventEnum, const LLBC_Variant &eventParams) = 0;
+    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams) = 0;
 
 public:
     /**

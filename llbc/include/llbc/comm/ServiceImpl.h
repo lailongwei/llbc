@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/ServiceEventFirer.h"
@@ -377,7 +376,7 @@ public:
      * @param[in] eventEnum
      * @param[in] eventParams
      */
-    virtual void AddComponentEvent(LLBC_ComponentEvents::ENUM eventEnum, const LLBC_Variant &eventParams);
+    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams);
 
     /**
      * Get event manager.
@@ -678,7 +677,7 @@ private:
     // - Event support members.
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
-    std::queue<std::pair<LLBC_ComponentEvents::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
+    std::queue<std::pair<LLBC_ComponentEventType::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
 };
 
 __LLBC_NS_END

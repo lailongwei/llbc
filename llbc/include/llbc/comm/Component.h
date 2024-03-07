@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/comm/ComponentEvents.h"
-
 __LLBC_NS_BEGIN
 
 /**
@@ -391,6 +389,34 @@ private:
 };
 
 /**
+ * \brief The component events offset enumeration.
+ */
+class LLBC_ComponentEventType
+{
+public:
+    enum ENUM
+    {
+        // llbc component event enumeration range[0, 100).
+        LibBegin = 0,
+        SessionCreate = LibBegin,
+        SessionDestroy,
+        AsyncConnResult,
+        ProtoReport,
+        UnHandledPacket,
+        AppEarlyStart,
+        AppStartFail,
+        AppStartFinish,
+        AppEarlyStop,
+        AppCfgReload,
+        LibEnd = 100,
+
+        // Logic component event enumeration range[100, 100000).
+        LogicBegin = LibEnd,
+        LogicEnd = 100000
+    };
+};
+
+/**
  * \brief The component interface class encapsulation.
  */
 class LLBC_EXPORT LLBC_Component
@@ -550,7 +576,7 @@ public:
      * @param[in] evIndex
      * @param[in] evArgs
      */
-    virtual void OnEvent(LLBC_ComponentEvents::ENUM event, const LLBC_Variant &evArgs);
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
 
 private:
     /**
@@ -609,5 +635,3 @@ LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncCo
 LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
 #include "llbc/comm/ComponentInl.h"
-
-

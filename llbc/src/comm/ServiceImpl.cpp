@@ -964,7 +964,7 @@ LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return *eventServiceFirer;
 }
 
-void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEvents::ENUM eventEnum, const LLBC_Variant &eventParams)
+void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams)
 {
     _componentEvents.emplace(eventEnum, eventParams);
 }
@@ -1601,7 +1601,7 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::SessionCreate, eventParams);
+        comp->OnEvent(LLBC_ComponentEventType::SessionCreate, eventParams);
     }
 }
 
@@ -1634,7 +1634,7 @@ void LLBC_ServiceImpl::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::SessionDestroy, eventParams);
+        comp->OnEvent(LLBC_ComponentEventType::SessionDestroy, eventParams);
     }
 
     // Remove session protocol factory.
@@ -1660,7 +1660,7 @@ void LLBC_ServiceImpl::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::AsyncConnResult, eventParams);
+        comp->OnEvent(LLBC_ComponentEventType::AsyncConnResult, eventParams);
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1765,7 +1765,7 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::UnHandledPacket, eventParams);
+            comp->OnEvent(LLBC_ComponentEventType::UnHandledPacket, eventParams);
         }
     }
 
@@ -1791,7 +1791,7 @@ void LLBC_ServiceImpl::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::ProtoReport, eventParams);
+        comp->OnEvent(LLBC_ComponentEventType::ProtoReport, eventParams);
     }
 }
 
@@ -1848,7 +1848,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::AppEarlyStart, eventParams);
+            comp->OnEvent(LLBC_ComponentEventType::AppEarlyStart, eventParams);
         }
     }
     else if (ev.startFail)
@@ -1857,7 +1857,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::AppStartFail, eventParams);
+            comp->OnEvent(LLBC_ComponentEventType::AppStartFail, eventParams);
         }
     }
     else if (ev.startFinish)
@@ -1869,7 +1869,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::AppStartFinish, eventParams);
+            comp->OnEvent(LLBC_ComponentEventType::AppStartFinish, eventParams);
         }
     }
     else if (ev.earlyStop)
@@ -1878,7 +1878,7 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
         {
             LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEvents::AppEarlyStop, eventParams);
+            comp->OnEvent(LLBC_ComponentEventType::AppEarlyStop, eventParams);
         }
     }
 }
@@ -1897,7 +1897,7 @@ void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
     {
         LLBC_ContinueIf(comp->_started == false);
 
-        comp->OnEvent(LLBC_ComponentEvents::AppCfgReload, eventParams);
+        comp->OnEvent(LLBC_ComponentEventType::AppCfgReload, eventParams);
     }
 }
 
