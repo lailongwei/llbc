@@ -20,7 +20,7 @@ elseif(UNIX AND NOT APPLE)
     set(LLBC_TESTSUITE_SHARED_LIB -ldl -lpthread -luuid llbc_lib_shared)
 elseif(APPLE)
     set(LLBC_TESTSUITE_STATIC_LIB -liconv llbc_lib)
-    set(LLBC_TESTSUITE_SHARED_LIB -liconv llbc_lib_shared)
+    set(LLBC_TESTSUITE_SHARED_LIB llbc_lib_shared)
 endif()
 
 # Set testsuite output directory.
