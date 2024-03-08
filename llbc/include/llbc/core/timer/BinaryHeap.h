@@ -47,76 +47,70 @@ public:
      * Check heap empty or not.
      * @return bool - return true is empty, otherwise return false.
      */
-    bool IsEmpty() const;
+    bool empty() const;
 
     /**
      * Get top element, if is empty, wlll raise abort signal.
      * @return const T & - the top element reference.
      */
-    const T &Top() const;
+    const T &top() const;
 
     /**
      * Get top element.
      * @param[out] elem - top element.
      * @return int - return 0 not empty, otherwise return -1.
      */
-    int Top(T &elem) const;
+    int top(T &elem) const;
 
     /**
      * Insert element.
      */
-    void Insert(const T &elem);
+    void insert(const T &elem);
 
     /**
      * Delete top element.
-     * @return int - return 0 if delete success, otherwise return -1.
+     * @return void
      */
-    int DeleteTop();
+    void pop();
 
     /**
      * Delete top element, and return deleted element copy.
      * @param[out] elem - deleted element.
-     * @return int - return 0 if delete success, otherwise return -1.
+     * @return void
      */
-    int DeleteTop(T &elem);
+    void pop(T &elem);
 
     /**
      * Delete specific index's heap element.
      * @param[in] index - heap index.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int DeleteElem(size_t index);
+    int erase(size_t index);
 
     /**
-     * Delete specific elem's heap element.
+     * Delete specific element in heap.
      * @param[in] elem - element.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int DeleteElem(const T &elem);
+    int erase(const T &elem);
 
     /**
      * Delete specific index's heap element, and return deleted element copy.
      * @param[in] index - heap index.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int DeleteElem(size_t index, T &elem);
+    int erase(size_t index, T &elem);
 
     /**
      * Clear heap.
      */
-    void Clear();
+    void clear();
 
     /**
      * Get heap size.
      * @return size_t - heap size.
      */
-    size_t GetSize() const;
-
-    /**
-     * Get heap data.
-     * @return const Container & - heap data.
-     */
-    const Container &GetData() const;
+    size_t size() const;
 
 public:
     /**
