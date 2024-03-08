@@ -30,7 +30,7 @@ class EchoServerComp : public LLBC_Component
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // ��Ϣע��, ��echoʵ��Ϊ��ʽЭ��ʵ��, opcodeΪ0
+        // 消息注册, 因echo实现为流式协议实现, opcode为0
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
@@ -39,7 +39,7 @@ public:
 
     virtual bool OnStart(bool &startFinished)
     {
-        // ִ�ж˿ڼ���
+        // 执行端口监听
         LLBC_Service *svc = GetService();
         int sId = svc->Listen("0.0.0.0", 9527);
         if (sId == 0)
@@ -48,7 +48,7 @@ public:
             return false;
         }
 
-        // ��ӡ������Ϣ
+        // 打印启动消息
         std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
         return true;
@@ -56,7 +56,7 @@ public:
 
     virtual void OnStop(bool &stopFinished)
     {
-        // ��ӡ���ر���Ϣ
+        // 打印将关闭消息
         std::cout << "Echo server component will stop" << std::endl;
     }
 
@@ -104,7 +104,7 @@ private:
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
-        // ����
+        // 回显
         svc->Send(pkt.GetSessionId(), 0, pkt.GetPayload(), pkt.GetPayloadLength());
     }
 };
@@ -120,7 +120,7 @@ public:
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // ͬEchoServerComp, ����
+        // 同EchoServerComp, 订阅
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
@@ -154,17 +154,17 @@ public:
 private:
     void _OnPkt(LLBC_Packet &pkt)
     {
-        // ��ӡ����
+        // 打印回显
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "[Echo]" << msg << std::endl;
 
-        // ����������
+        // 接受新输入
         _AcceptInput();
     }
 
     bool _AcceptInput(bool inStart = false)
     {
-        // ����
+        // 输入
         std::string input;
         while (input.empty())
         {
@@ -179,7 +179,7 @@ private:
             }
         }
 
-        // ����
+        // 发送
         LLBC_Service *svc = GetService();
         svc->Send(_sId, 0, input.data(), input.size() + 1);
 
@@ -204,7 +204,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
 {
     std::cout <<"Echo test:" <<std::endl;
 
-    // ѡ��������ʽ
+    // 选择启动方式
     std::cout << "Start echo as server(Y/[N])?";
 
     bool asServer;
@@ -213,7 +213,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     choice = choice.strip().toupper();
     asServer = choice == "Y" || choice == "YES";
 
-    // ����&����service
+    // 创建&启动service
     LLBC_Service *svc = LLBC_Service::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
         svc->AddComponent(new EchoServerComp);
@@ -239,7 +239,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
         svc->Wait();
     }
 
-    // ɾ��service
+    // 删除service
     delete svc;
 
     return LLBC_OK;
