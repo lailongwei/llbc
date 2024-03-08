@@ -224,7 +224,7 @@ const LLBC_Variant &LLBC_Event::operator[](const LLBC_String &key) const
     return it != _strKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-void LLBC_Event::Clear()
+void LLBC_Event::Reuse()
 {
     _id = 0;
     _dontDelAfterFire = false;

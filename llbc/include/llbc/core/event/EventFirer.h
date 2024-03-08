@@ -64,7 +64,7 @@ public:
     /**
      * Object-Pool reflection support: clear firer object.
      */
-    void Clear();
+    virtual void Reuse() override;
 
     /**
      * Object-Pool reflection support: pool instance create event callback.
