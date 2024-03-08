@@ -34,7 +34,7 @@ inline LLBC_EventFirer::LLBC_EventFirer()
 
 inline LLBC_EventFirer::~LLBC_EventFirer()
 {
-    Clear();
+    Reuse();
 }
 
 template <typename KeyType, typename ParamType>
@@ -53,7 +53,7 @@ inline void LLBC_EventFirer::Fire()
     LLBC_Recycle(this);
 }
 
-inline void LLBC_EventFirer::Clear()
+inline void LLBC_EventFirer::Reuse()
 {
     if (_ev)
     {

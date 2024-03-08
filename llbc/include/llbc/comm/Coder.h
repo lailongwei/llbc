@@ -40,8 +40,8 @@ __LLBC_NS_BEGIN
 class LLBC_Coder : public LLBC_PoolObject
 {
 public:
-    LLBC_Coder();
-    virtual ~LLBC_Coder();
+    LLBC_Coder() = default;
+    ~LLBC_Coder() override = default;
 
 public:
     /**
@@ -61,7 +61,7 @@ public:
 class LLBC_CoderFactory
 {
 public:
-    virtual ~LLBC_CoderFactory() {  }
+    virtual ~LLBC_CoderFactory() = default;
 
 public:
     /**
@@ -72,7 +72,5 @@ public:
 };
 
 __LLBC_NS_END
-
-#include "llbc/comm/CoderInl.h"
 
 
