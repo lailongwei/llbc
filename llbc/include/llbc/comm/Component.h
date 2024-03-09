@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "llbc/comm/ComponentEvents.h"
-
 __LLBC_NS_BEGIN
 
 /**
@@ -391,12 +389,40 @@ private:
 };
 
 /**
+ * \brief The component events offset enumeration.
+ */
+class LLBC_ComponentEventType
+{
+public:
+    enum ENUM
+    {
+        // llbc component event enumeration range[0, 100).
+        LibBegin = 0,
+        SessionCreate = LibBegin,
+        SessionDestroy,
+        AsyncConnResult,
+        ProtoReport,
+        UnHandledPacket,
+        AppEarlyStart,
+        AppStartFail,
+        AppStartFinish,
+        AppEarlyStop,
+        AppCfgReload,
+        LibEnd = 100,
+
+        // Logic component event enumeration range[100, 100000).
+        LogicBegin = LibEnd,
+        LogicEnd = 100000
+    };
+};
+
+/**
  * \brief The component interface class encapsulation.
  */
 class LLBC_EXPORT LLBC_Component
 {
 public:
-    explicit LLBC_Component(uint64 caredEvents = LLBC_ComponentEvents::DefaultEvents);
+    explicit LLBC_Component();
     virtual ~LLBC_Component();
 
 public:
@@ -434,27 +460,6 @@ public:
      * Get component list.
      */
     const std::vector<LLBC_Component *> &GetComponentList() const;
-
-public:
-    /**
-     * Get cared events.
-     * @return uint64 - the cared events.
-     */
-    uint64 GetCaredEvents() const;
-
-    /**
-     * Get cared specified components events or not.
-     * @param[in] compEvs - the comp events(bit collection).
-     * @return bool - return true it means cared specified events, otherwise return false.
-     */
-    bool IsCaredEvents(uint64 compEvs) const;
-
-    /**
-     * Get cared specified component events offset or not.
-     * @param[in] compEvOffset - the comp event offset.
-     * @return bool - return true it means cared specified event offset, otherwise return false.
-     */
-    bool IsCaredEventIndex(int compEvOffset) const;
 
 public:
     /**
@@ -566,51 +571,12 @@ public:
      */
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-public:
     /**
-     * Application phase change event handler, when application start phase changed, will call these event handlers.
+     * Process components' events.
+     * @param[in] evIndex
+     * @param[in] evArgs
      */
-    virtual void OnAppEarlyStart();
-    virtual void OnAppStartFail();
-    virtual void OnAppStartFinish();
-    virtual void OnAppEarlyStop();
-
-    /**
-     * When application config reload, will call this event handler.
-     */
-    virtual void OnAppConfigReload();
-
-public:
-    /**
-     * When new session create, will call this event handler.
-     * @param[in] sessionInfo - the session info.
-     */
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
-
-    /**
-     * When session destroy, will call this event handler.
-     * @param[in] destroyInfo - the session destroy info.
-     */
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
-
-    /**
-     * When asynchronous connect result, will call this event handler.
-     * @param[in] result - asynchronous connect result data.
-     */
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
-
-public:
-    /**
-     * When protocol layer report something, will call this event handler.
-     * @param[in] report - the report information.
-     */
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
-
-    /**
-     * When service receive a unhandled packet, will call this event handler.
-     * @param[in] packet - the unhandled packet.
-     */
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
 
 private:
     /**
@@ -637,7 +603,6 @@ private:
 private:
     bool _inited;
     bool _started;
-    uint64 _caredEvents;
 
     LLBC_Service *_svc;
     LLBC_ComponentMethods *_meths;
@@ -653,7 +618,7 @@ private:
 class LLBC_EXPORT LLBC_ComponentFactory
 {
 public:
-    virtual ~LLBC_ComponentFactory() {  }
+    virtual ~LLBC_ComponentFactory() = default;
 
 public:
     virtual LLBC_Component *Create(LLBC_Service *service) const = 0;
@@ -670,5 +635,3 @@ LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_AsyncCo
 LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ProtoReport &report);
 
 #include "llbc/comm/ComponentInl.h"
-
-

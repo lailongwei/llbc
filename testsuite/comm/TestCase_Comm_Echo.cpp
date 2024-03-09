@@ -30,7 +30,7 @@ class EchoServerComp : public LLBC_Component
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // ÏûÏ¢×¢²á, ÒòechoÊµÏÖÎªÁ÷Ê½Ğ­ÒéÊµÏÖ, opcodeÎª0
+        // æ¶ˆæ¯æ³¨å†Œ, å› echoå®ç°ä¸ºæµå¼åè®®å®ç°, opcodeä¸º0
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
@@ -39,7 +39,7 @@ public:
 
     virtual bool OnStart(bool &startFinished)
     {
-        // Ö´ĞĞ¶Ë¿Ú¼àÌı
+        // æ‰§è¡Œç«¯å£ç›‘å¬
         LLBC_Service *svc = GetService();
         int sId = svc->Listen("0.0.0.0", 9527);
         if (sId == 0)
@@ -48,7 +48,7 @@ public:
             return false;
         }
 
-        // ´òÓ¡Æô¶¯ÏûÏ¢
+        // æ‰“å°å¯åŠ¨æ¶ˆæ¯
         std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
         return true;
@@ -56,29 +56,47 @@ public:
 
     virtual void OnStop(bool &stopFinished)
     {
-        // ´òÓ¡½«¹Ø±ÕÏûÏ¢
+        // æ‰“å°å°†å…³é—­æ¶ˆæ¯
         std::cout << "Echo server component will stop" << std::endl;
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch(event)
+        {
+            case LLBC_ComponentEventType::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            default: break;
+        }
+    }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
         if (!sessionInfo.IsListenSession())
             std::cout << "Session[sId:" << sessionInfo.GetSessionId()
                       << ", addr:" << sessionInfo.GetPeerAddr() << "]: <create>" << std::endl;
     }
 
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
         if (!destroyInfo.GetSessionInfo().IsListenSession())
         {
             auto &sessionInfo = destroyInfo.GetSessionInfo();
             std::cout << "Session[sId:" << sessionInfo.GetSessionId()
-                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:" 
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:"
                       << destroyInfo.GetReason() << ">" << std::endl;
         }
     }
 
-private:
     void _OnPkt(LLBC_Packet &pkt)
     {
         // Log
@@ -86,7 +104,7 @@ private:
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
-        // »ØÏÔ
+        // å›æ˜¾
         svc->Send(pkt.GetSessionId(), 0, pkt.GetPayload(), pkt.GetPayloadLength());
     }
 };
@@ -102,7 +120,7 @@ public:
 public:
     virtual bool OnInit(bool &initFinished)
     {
-        // Í¬EchoServerComp, ¶©ÔÄ
+        // åŒEchoServerComp, è®¢é˜…
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
@@ -136,17 +154,17 @@ public:
 private:
     void _OnPkt(LLBC_Packet &pkt)
     {
-        // ´òÓ¡»ØÏÔ
+        // æ‰“å°å›æ˜¾
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "[Echo]" << msg << std::endl;
 
-        // ½ÓÊÜĞÂÊäÈë
+        // æ¥å—æ–°è¾“å…¥
         _AcceptInput();
     }
 
     bool _AcceptInput(bool inStart = false)
     {
-        // ÊäÈë
+        // è¾“å…¥
         std::string input;
         while (input.empty())
         {
@@ -161,7 +179,7 @@ private:
             }
         }
 
-        // ·¢ËÍ
+        // å‘é€
         LLBC_Service *svc = GetService();
         svc->Send(_sId, 0, input.data(), input.size() + 1);
 
@@ -186,7 +204,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
 {
     std::cout <<"Echo test:" <<std::endl;
 
-    // Ñ¡ÔñÆô¶¯·½Ê½
+    // é€‰æ‹©å¯åŠ¨æ–¹å¼
     std::cout << "Start echo as server(Y/[N])?";
 
     bool asServer;
@@ -195,7 +213,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     choice = choice.strip().toupper();
     asServer = choice == "Y" || choice == "YES";
 
-    // ´´½¨&Æô¶¯service
+    // åˆ›å»º&å¯åŠ¨service
     LLBC_Service *svc = LLBC_Service::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
         svc->AddComponent(new EchoServerComp);
@@ -221,7 +239,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
         svc->Wait();
     }
 
-    // É¾³ıservice
+    // åˆ é™¤service
     delete svc;
 
     return LLBC_OK;

@@ -27,7 +27,7 @@ namespace
     class ITestComp : public LLBC_Component
     {
     public:
-        ITestComp() : LLBC_Component(LLBC_ComponentEvents::AllEvents) {}
+        ITestComp() : LLBC_Component() {}
         virtual ~ITestComp() = default;
     };
 

@@ -66,12 +66,31 @@ namespace
     class TestComp : public LLBC_Component
     {
     public:
-        virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+        virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+        {
+            switch (event)
+            {
+                case LLBC_ComponentEventType::SessionCreate:
+                {
+                    OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                    break;
+                }
+                case LLBC_ComponentEventType::SessionDestroy:
+                {
+                    OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                    break;
+                }
+                default: break;
+            }
+        }
+
+    private:
+        void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
         {
             LLBC_PrintLn("Session Create, sessionInfo:%s", sessionInfo.ToString().c_str());
         }
 
-        virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+        void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
         {
             LLBC_PrintLn("Session Destroy, destroyInfo:%s", destroyInfo.ToString().c_str());
         }

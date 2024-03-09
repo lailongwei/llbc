@@ -202,7 +202,7 @@ namespace
         }
 
     public:
-        void Clear()
+        virtual void Reuse()
         {
             LLBC_PrintLn("  ->[ptr:0x%p]%s: Called!", this, __FUNCTION__);
         }
