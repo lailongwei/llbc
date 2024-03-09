@@ -52,7 +52,7 @@ struct TestData : public LLBC_Coder
         return true;
     }
 
-    virtual void Clear()
+    virtual void Reuse()
     {
         iVal = 0;
         strVal.clear();

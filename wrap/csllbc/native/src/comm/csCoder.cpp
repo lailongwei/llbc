@@ -97,6 +97,13 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
     return false;
 }
 
+void csllbc_Coder::Reuse()
+{
+    _packetId = 0;
+    _encodeDeleg = nullptr;
+    _decodeDelegs = nullptr;
+}
+
 LLBC_Coder *csllbc_CoderFactory::Create() const
 {
     return new csllbc_Coder;
