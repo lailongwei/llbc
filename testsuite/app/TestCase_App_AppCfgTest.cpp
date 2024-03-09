@@ -66,7 +66,7 @@ public:
     }
 
 private:
-    virtual void OnAppCfgReload()
+    void OnAppCfgReload()
     {
         std::cout << "[" << GetService()->GetName()
                   << "."
