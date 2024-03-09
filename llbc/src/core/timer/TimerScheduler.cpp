@@ -42,11 +42,10 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 {
     _destroyed = true;
 
-    const size_t size = _heap.GetSize();
-    const _Heap::Container &elems = _heap.GetData();
-    for (size_t i = 1; i <= size; ++i)
+    _Heap::Container elems(_heap);
+    for(auto &elem : elems)
     {
-        LLBC_TimerData *data = const_cast<LLBC_TimerData *>(elems[i]);
+        LLBC_TimerData *data = elem;
         if (data->validate)
         {
             data->validate = false;
@@ -70,17 +69,17 @@ void LLBC_TimerScheduler::Update()
 {
     if (UNLIKELY(!_enabled))
         return;
-    else if (_heap.IsEmpty())
+    else if (_heap.empty())
         return;
 
     LLBC_TimerData *data;
     sint64 now = LLBC_GetMilliseconds();
-    while (_heap.Top(data) == LLBC_OK)
+    while (_heap.top(data) == LLBC_OK)
     {
         if (now < data->handle)
             break;
 
-        _heap.DeleteTop();
+        _heap.pop();
         if (!data->validate)
         {
             if (--data->refCount == 0)
@@ -127,7 +126,7 @@ void LLBC_TimerScheduler::Update()
             sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
-            _heap.Insert(data);
+            _heap.insert(data);
         }
         else
         {
@@ -149,7 +148,7 @@ void LLBC_TimerScheduler::SetEnabled(bool enabled)
 
 size_t LLBC_TimerScheduler::GetTimerCount() const
 {
-    return _heap.GetSize();
+    return _heap.size();
 }
 
 bool LLBC_TimerScheduler::IsDestroyed() const
@@ -182,7 +181,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     }
 
     timer->_timerData = data;
-    _heap.Insert(data);
+    _heap.insert(data);
 
     return LLBC_OK;
 }
@@ -206,7 +205,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 
     if (data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
-        int delElemRet = _heap.DeleteElem(data);
+        int delElemRet = _heap.erase(data);
         ASSERT(delElemRet == LLBC_OK &&
             "Timer scheduler internal error, Could not found timer data when Cancel long timeout timer!");
         if (--data->refCount == 0)
@@ -224,11 +223,10 @@ void LLBC_TimerScheduler::CancelAll()
     if (UNLIKELY(_destroyed))
         return;
 
-    const size_t size = _heap.GetSize();
-    _Heap::Container copyElems(_heap.GetData());
-    for (size_t i = 1; i <= size; ++i)
+    _Heap::Container copyElems(_heap);
+    for(auto &elem : copyElems)
     {
-        LLBC_TimerData *data = copyElems[i];
+        LLBC_TimerData *data = elem;
         if (UNLIKELY(!data->validate))
             return;
 
