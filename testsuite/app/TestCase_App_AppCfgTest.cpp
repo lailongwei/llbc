@@ -52,7 +52,21 @@ public:
         cfgReloadTimer_.Cancel();
     }
 
-    virtual void OnAppConfigReload()
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch(event)
+        {
+            case LLBC_ComponentEventType::AppCfgReload:
+            {
+                OnAppCfgReload();
+                break;
+            }
+            default: break;
+        }
+    }
+
+private:
+    virtual void OnAppCfgReload()
     {
         std::cout << "[" << GetService()->GetName()
                   << "."
@@ -63,13 +77,12 @@ public:
                   << std::endl;
         std::cout << "- CfgType:" << GetConfigType() << std::endl;
         std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
-    
+
         LLBC_String propCfgCnt;
         GetPropertyConfig().SaveToContent(propCfgCnt);
         std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
     }
 
-private:
     void OnTimeout_ReloadCfg(LLBC_Timer *timer)
     {
         LLBC_App::ThisApp()->ReloadConfig();

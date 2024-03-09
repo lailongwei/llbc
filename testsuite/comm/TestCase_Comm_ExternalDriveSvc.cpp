@@ -31,7 +31,7 @@ class TestComp : public LLBC_Component
 {
 public:
     TestComp()
-    : LLBC_Component(LLBC_ComponentEvents::AllEvents)
+    : LLBC_Component()
     , _recvTimes(0)
     {
         LLBC_PrintLn(">>> Comp ctor called!");
@@ -90,21 +90,6 @@ public:
         LLBC_PrintLn("Service stop finished");
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
-    {
-        LLBC_PrintLn("Session create: %s", sessionInfo.ToString().c_str());
-    }
-
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-    {
-        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
-    }
-
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-    {
-        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
-    }
-
     virtual void OnUpdate()
     {
         LLBC_PrintLn("Service update");
@@ -113,6 +98,29 @@ public:
     virtual void OnIdle(const LLBC_TimeSpan &idleTime)
     {
         LLBC_PrintLn("Service idle, idleTime: %s", idleTime.ToString().c_str());
+    }
+
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch (event)
+        {
+            case LLBC_ComponentEventType::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::AsyncConnResult:
+            {
+                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                break;
+            }
+            default: break;
+        }
     }
 
 public:
@@ -138,6 +146,22 @@ public:
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
         GetService()->Send(resPacket);
+    }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        LLBC_PrintLn("Session create: %s", sessionInfo.ToString().c_str());
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        LLBC_PrintLn("Session destroy, info: %s", destroyInfo.ToString().c_str());
+    }
+
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+    {
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
     }
 
 private:

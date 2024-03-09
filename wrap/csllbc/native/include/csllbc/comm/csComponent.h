@@ -60,14 +60,15 @@ public:
     virtual void OnUpdate();
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-public:
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
 
-public:
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+
+    void OnProtoReport(const LLBC_ProtoReport &report);
+    void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     LLBC_DISABLE_ASSIGNMENT(csllbc_Component);
