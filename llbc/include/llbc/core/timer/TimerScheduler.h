@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/timer/BinaryHeap.h"
+#include "llbc/core/timer/Heap.h"
 
 __LLBC_NS_BEGIN
 
@@ -39,7 +39,7 @@ class LLBC_EXPORT LLBC_TimerScheduler
 {
     typedef LLBC_TimerScheduler _This;
 
-    typedef LLBC_BinaryHeap<LLBC_TimerData *> _Heap;
+    typedef LLBC_Heap<LLBC_TimerData *> _Heap;
 
 public:
     LLBC_TimerScheduler();
