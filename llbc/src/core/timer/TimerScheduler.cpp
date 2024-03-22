@@ -42,8 +42,7 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 {
     _destroyed = true;
 
-    _Heap::Container elems(_heap);
-    for(auto &elem : elems)
+    for(auto &elem : _heap)
     {
         LLBC_TimerData *data = elem;
         if (data->validate)
@@ -67,15 +66,18 @@ LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
 
 void LLBC_TimerScheduler::Update()
 {
-    if (UNLIKELY(!_enabled))
-        return;
-    else if (_heap.empty())
-        return;
+    LLBC_ReturnIf(_enabled == false || _heap.empty(), void());
 
-    LLBC_TimerData *data;
     sint64 now = LLBC_GetMilliseconds();
-    while (_heap.top(data) == LLBC_OK)
+    while (_heap.empty() == false)
     {
+        LLBC_TimerData *data = _heap.top();
+        if(data == nullptr)
+        {
+            _heap.pop();
+            continue;
+        }
+
         if (now < data->handle)
             break;
 
@@ -126,7 +128,7 @@ void LLBC_TimerScheduler::Update()
             sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
-            _heap.insert(data);
+            _heap.push(data);
         }
         else
         {
@@ -161,17 +163,14 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = new LLBC_TimerData;
+    auto *data = new LLBC_TimerData;
     memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliseconds() + dueTime;
     data->timerId = ++ _maxTimerId;
     data->dueTime = dueTime;
     data->period = period;
-    // data->repeatTimes = 0;
     data->timer = timer;
     data->validate = true;
-    // data->timeouting = false;
-    // data->cancelling = false;
     data->refCount = 2;
 
     if (timer->_timerData)
@@ -181,7 +180,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     }
 
     timer->_timerData = data;
-    _heap.insert(data);
+    _heap.push(data);
 
     return LLBC_OK;
 }
@@ -205,9 +204,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 
     if (data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
-        int delElemRet = _heap.erase(data);
-        ASSERT(delElemRet == LLBC_OK &&
-            "Timer scheduler internal error, Could not found timer data when Cancel long timeout timer!");
+        _heap.erase(data);
         if (--data->refCount == 0)
         {
             delete data;
@@ -223,8 +220,7 @@ void LLBC_TimerScheduler::CancelAll()
     if (UNLIKELY(_destroyed))
         return;
 
-    _Heap::Container copyElems(_heap);
-    for(auto &elem : copyElems)
+    for(auto &elem : _heap)
     {
         LLBC_TimerData *data = elem;
         if (UNLIKELY(!data->validate))
