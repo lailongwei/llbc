@@ -80,7 +80,7 @@ void TestCase_Core_Timer_Heap::MinHeapTest()
     std::vector<int> data = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 
     // Min heap
-    LLBC_Heap<int, std::vector<int>, std::greater<>> heap;
+    LLBC_Heap<int, std::vector<int>, std::greater<int>> heap;
     for(auto d : data)
     {
         heap.push(d);
