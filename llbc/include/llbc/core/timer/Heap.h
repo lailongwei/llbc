@@ -35,8 +35,8 @@ public:
     /**
      * \brief Get the begin and end iterator of the heap.
      */
-    auto begin() const { return this->c.begin(); }
-    auto end() const { return this->c.end(); }
+    auto begin() const -> decltype(this->c.begin()) { return this->c.begin(); }
+    auto end() const -> decltype(this->c.end()) { return this->c.end(); }
 
     /**
      * \brief Remove the specified value from the heap.
