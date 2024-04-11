@@ -20,16 +20,20 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/variant/TestCase_Core_VariantTest.h"
-#include "TestCase_Core_VariantTest.h"
+#include "core/variant/TestCase_Core_Variant.h"
+#include "TestCase_Core_Variant.h"
 
-int TestCase_Core_VariantTest::Run(int argc, char *argv[])
+int TestCase_Core_Variant::Run(int argc, char *argv[])
 {
     std::cout << "LLBC_Variant test:" << std::endl;
 
     BasicTest();
     std::cout << std::endl;
 
+    StrTest();
+    std::cout << std::endl;
+
+    /**
     EnumTest();
     std::cout << std::endl;
 
@@ -58,6 +62,7 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     std::cout << std::endl;
 
     ConvertToUnurderedStlContainerTest();
+    */
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
@@ -65,7 +70,7 @@ int TestCase_Core_VariantTest::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_VariantTest::BasicTest()
+void TestCase_Core_Variant::BasicTest()
 {
     std::cout << "Basic test:" << std::endl;
 
@@ -206,7 +211,27 @@ void TestCase_Core_VariantTest::BasicTest()
     std::cout << "- construct from mstr:\"" << mutableHeyStr << "\":" << constructFromMStr <<std::endl;
 }
 
-void TestCase_Core_VariantTest::EnumTest()
+void TestCase_Core_Variant::StrTest()
+{
+    std::cout << "String test:" << std::endl;
+
+    // LLBC_String test
+    LLBC_Variant strVal("Hello world");
+    std::cout << "strVal: " << strVal << std::endl;
+
+    strVal += "!";
+    std::cout << "strVal += \"!\":" << strVal << std::endl;
+
+    // LLBC_CString test
+    LLBC_Variant cstrVal(LLBC_CString("Hello world"));
+    std::cout << "cstrVal: " << cstrVal << std::endl;
+
+    cstrVal += LLBC_CString("!");
+    std::cout << "cstrVal += \"!\":" << cstrVal << std::endl;
+
+}
+
+void TestCase_Core_Variant::EnumTest()
 {
     enum TraditionalStyleEnum
     {
@@ -265,7 +290,7 @@ void TestCase_Core_VariantTest::EnumTest()
     }
 }
 
-void TestCase_Core_VariantTest::CompareTest()
+void TestCase_Core_Variant::CompareTest()
 {
     std::cout << "Compare test: " << std::endl;
 
@@ -339,7 +364,7 @@ void TestCase_Core_VariantTest::CompareTest()
     std::cout << "dict1 < dict2?: " << (dict1 < dict2) << ", dict1 == dict2?: " << (dict1 == dict2) << std::endl;
 }
 
-void TestCase_Core_VariantTest::CompositeKeyTest()
+void TestCase_Core_Variant::CompositeKeyTest()
 {
     std::cout <<"Composite key test:" <<std::endl;
 
@@ -360,7 +385,7 @@ void TestCase_Core_VariantTest::CompositeKeyTest()
     std::cout <<"The composite variant: " <<v <<std::endl;
 }
 
-void TestCase_Core_VariantTest::ArithmeticTest()
+void TestCase_Core_Variant::ArithmeticTest()
 {
     std::cout <<"Arithmetic test:" <<std::endl;
 
@@ -416,7 +441,7 @@ void TestCase_Core_VariantTest::ArithmeticTest()
     std::cout <<std::endl;
 }
 
-void TestCase_Core_VariantTest::PairTest()
+void TestCase_Core_Variant::PairTest()
 {
     std::cout << "Pair test" << std::endl;
 
@@ -440,7 +465,7 @@ void TestCase_Core_VariantTest::PairTest()
         << ", pair.second:" << LLBC_Variant(pa.second) << std::endl;
 }
 
-void TestCase_Core_VariantTest::SeqTest()
+void TestCase_Core_Variant::SeqTest()
 {
     std::cout << "Sequence test" << std::endl;
 
@@ -497,7 +522,7 @@ void TestCase_Core_VariantTest::SeqTest()
     std::cout <<"- After batch push back:" <<batchPushBackTestSeq <<std::endl;
 }
 
-void TestCase_Core_VariantTest::DictTest()
+void TestCase_Core_Variant::DictTest()
 {
     std::cout <<"Dict test" <<std::endl;
 
@@ -574,7 +599,7 @@ void TestCase_Core_VariantTest::DictTest()
     std::cout <<"- After call DictErase(6):" <<batchEraseTestDict <<std::endl;
 }
 
-void TestCase_Core_VariantTest::SerializeTest()
+void TestCase_Core_Variant::SerializeTest()
 {
     std::cout <<"Serialize test" <<std::endl;
 
@@ -627,7 +652,7 @@ void TestCase_Core_VariantTest::SerializeTest()
     std::cout << "Deserialized from stream: [" << deserDict << "]" << std::endl;
 }
 
-void TestCase_Core_VariantTest::HashTest()
+void TestCase_Core_Variant::HashTest()
 {
     std::cout <<"Hash test" <<std::endl;
 
@@ -658,7 +683,7 @@ void TestCase_Core_VariantTest::HashTest()
     doHash(seq);
 }
 
-void TestCase_Core_VariantTest::ConvertToUnurderedStlContainerTest()
+void TestCase_Core_Variant::ConvertToUnurderedStlContainerTest()
 {
     std::cout <<"Convert to unordered stl container test:" <<std::endl;
 

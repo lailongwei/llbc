@@ -69,11 +69,12 @@ public:
         RAW_DOUBLE           = 0x011d, // 0001 1101
 
         // Str type enumeration.
-        // ! Now, string type's second type only support LLBC_String type.
         // Bit view(first type always equal STR):
         //          [first type] [string type]
         //             8 bits       8 bits
-        STR_DFT              = 0x0201,
+        STR_DFT                    = 0x0201, // LLBC_String
+        STR_CONST_DFT              = 0x0202, // LLBC_CString
+
 
         // Sequence enumeration.
         // Bit view(first type always equal SEQ):
@@ -137,6 +138,7 @@ public:
      * Variant embedded data types typedef.
      */
     typedef LLBC_String Str;
+    typedef LLBC_CString CStr;
 
     typedef std::vector<LLBC_Variant> Seq;
     typedef Seq::iterator SeqIter;
@@ -166,6 +168,7 @@ public:
             union ObjType
             {
                 Str *str;
+                CStr *cstr;
                 Dict *dict;
                 Seq *seq;
             } obj;
@@ -214,6 +217,8 @@ public:
     explicit LLBC_Variant(const char *str);
     explicit LLBC_Variant(const std::string &str);
     explicit LLBC_Variant(const LLBC_String &str);
+    explicit LLBC_Variant(const std::string_view &cstr);
+    explicit LLBC_Variant(const LLBC_CString &cstr);
     template <typename _T1, typename _T2>
     explicit LLBC_Variant(const std::pair<_T1, _T2> &pa);
     explicit LLBC_Variant(const Seq &seq);
@@ -264,6 +269,7 @@ public:
     bool IsFloat() const;
     bool IsDouble() const;
     bool IsStr() const;
+    bool IsCStr() const;
     bool IsSeq() const;
     bool IsDict() const;
 
@@ -284,6 +290,7 @@ public:
     LLBC_Variant &BecomeFloat();
     LLBC_Variant &BecomeDouble();
     LLBC_Variant &BecomeStr();
+    LLBC_Variant &BecomeCStr();
     LLBC_Variant &BecomeSeq();
     LLBC_Variant &BecomeDict();
     LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
@@ -565,10 +572,12 @@ private:
     void CpToBinaryCont(_BinaryContainer &binaryCont) const;
 
     bool IsStrX() const;
+    bool IsCStrX() const;
     bool IsSeqX() const;
     bool IsDictX() const;
 
     LLBC_Variant &BecomeStrX();
+    LLBC_Variant &BecomeCStrX();
     LLBC_Variant &BecomeSeqX();
     LLBC_Variant &BecomeDictX();
 
