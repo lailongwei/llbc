@@ -2111,8 +2111,7 @@ int LLBC_ServiceImpl::StartComps()
         LLBC_SetSubErrorNo(_startSubErrNo);
 
         _runningPhase = LLBC_ServiceRunningPhase::StartCompsFailed;
-
-        return LLBC_OK;
+        return LLBC_FAILED;
     }
 }
 
