@@ -70,7 +70,7 @@
 		D87A14F61DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14AD1DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp */; };
 		D87A14F71DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14AF1DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp */; };
 		D87A14F81DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B11DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp */; };
-		D87A14F91DA3559100DB1F62 /* TestCase_Core_Variant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B41DA3559100DB1F62 /* TestCase_Core_Variant.cpp */; };
+		D87A14F91DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */; };
 		D87A14FA1DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B71DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp */; };
 		D87A14FB1DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14B91DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp */; };
 		D87A14FC1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14BB1DA3559100DB1F62 /* TestCase_ObjBase_Object.cpp */; };
@@ -199,8 +199,8 @@
 		D87A14B01DA3559100DB1F62 /* TestCase_Core_Utils_Network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Network.h; sourceTree = "<group>"; };
 		D87A14B11DA3559100DB1F62 /* TestCase_Core_Utils_Text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Utils_Text.cpp; sourceTree = "<group>"; };
 		D87A14B21DA3559100DB1F62 /* TestCase_Core_Utils_Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Utils_Text.h; sourceTree = "<group>"; };
-		D87A14B41DA3559100DB1F62 /* TestCase_Core_Variant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Variant.cpp; sourceTree = "<group>"; };
-		D87A14B51DA3559100DB1F62 /* TestCase_Core_Variant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Variant.h; sourceTree = "<group>"; };
+		D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_VariantTest.cpp; sourceTree = "<group>"; };
+		D87A14B51DA3559100DB1F62 /* TestCase_Core_VariantTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_VariantTest.h; sourceTree = "<group>"; };
 		D87A14B71DA3559100DB1F62 /* TestCase_ObjBase_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_ObjBase_Array.cpp; sourceTree = "<group>"; };
 		D87A14B81DA3559100DB1F62 /* TestCase_ObjBase_Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_ObjBase_Array.h; sourceTree = "<group>"; };
 		D87A14B91DA3559100DB1F62 /* TestCase_ObjBase_Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_ObjBase_Dictionary.cpp; sourceTree = "<group>"; };
@@ -509,8 +509,8 @@
 		D87A14B31DA3559100DB1F62 /* variant */ = {
 			isa = PBXGroup;
 			children = (
-				D87A14B41DA3559100DB1F62 /* TestCase_Core_Variant.cpp */,
-				D87A14B51DA3559100DB1F62 /* TestCase_Core_Variant.h */,
+				D87A14B41DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp */,
+				D87A14B51DA3559100DB1F62 /* TestCase_Core_VariantTest.h */,
 			);
 			path = variant;
 			sourceTree = "<group>";
@@ -662,7 +662,7 @@
 				D87A14DD1DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp in Sources */,
 				D87A14D91DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp in Sources */,
 				D87A14261DA3541D00DB1F62 /* AppDelegate.mm in Sources */,
-				D87A14F91DA3559100DB1F62 /* TestCase_Core_Variant.cpp in Sources */,
+				D87A14F91DA3559100DB1F62 /* TestCase_Core_VariantTest.cpp in Sources */,
 				D87A14C21DA3559100DB1F62 /* TestCase_Comm_Facade.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

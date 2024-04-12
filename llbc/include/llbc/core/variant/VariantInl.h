@@ -137,20 +137,6 @@ inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
         _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
-inline LLBC_Variant::LLBC_Variant(const std::string_view &cstr)
-{
-    _holder.type = LLBC_VariantType::STR_CONST_DFT;
-    if (!cstr.empty())
-        _holder.data.obj.cstr = new LLBC_CString(cstr.data(), cstr.size());
-}
-
-inline LLBC_Variant::LLBC_Variant(const LLBC_CString &cstr)
-{
-    _holder.type = LLBC_VariantType::STR_CONST_DFT;
-    if (!cstr.empty())
-        _holder.data.obj.cstr = new LLBC_CString(cstr.data(), cstr.size());
-}
-
 template <typename _T1, typename _T2>
 LLBC_Variant::LLBC_Variant(const std::pair<_T1, _T2> &pa)
 {
@@ -334,11 +320,6 @@ inline bool LLBC_Variant::IsStr() const
     return _holder.type == LLBC_VariantType::STR_DFT;
 }
 
-inline bool LLBC_Variant::IsCStr() const
-{
-    return _holder.type == LLBC_VariantType::STR_CONST_DFT;
-}
-
 inline bool LLBC_Variant::IsSeq() const
 {
     return _holder.type == LLBC_VariantType::SEQ_DFT;
@@ -427,11 +408,6 @@ inline LLBC_Variant &LLBC_Variant::BecomeDouble()
 inline LLBC_Variant &LLBC_Variant::BecomeStr()
 {
     return Become(LLBC_VariantType::STR_DFT);
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeCStr()
-{
-    return Become(LLBC_VariantType::STR_CONST_DFT);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeSeq()
@@ -1196,11 +1172,6 @@ inline bool LLBC_Variant::IsStrX() const
     return IsStr() && _holder.data.obj.str != nullptr;
 }
 
-inline bool LLBC_Variant::IsCStrX() const
-{
-    return IsCStr() && _holder.data.obj.cstr != nullptr;
-}
-
 inline bool LLBC_Variant::IsSeqX() const
 {
     return IsSeq() && _holder.data.obj.seq != nullptr;
@@ -1216,15 +1187,6 @@ inline LLBC_Variant &LLBC_Variant::BecomeStrX()
     BecomeStr();
     if (!_holder.data.obj.str)
         _holder.data.obj.str = new Str;
-
-    return *this;
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeCStrX()
-{
-    BecomeCStr();
-    if (!_holder.data.obj.cstr)
-        _holder.data.obj.cstr = new CStr;
 
     return *this;
 }
@@ -1294,11 +1256,6 @@ struct hash<LLBC_NS LLBC_Variant>
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
             return str && !str->empty() ? LLBC_Hash(str->data(), str->size()) : LLBC_Hash(nullptr, 0);
-        }
-        else if (var.IsCStr())
-        {
-            const auto &cstr = var.GetHolder().data.obj.cstr;
-            return cstr && !cstr->empty() ? LLBC_Hash(cstr->data(), cstr->size()) : LLBC_Hash(nullptr, 0);
         }
         else if (var.IsSeq())
         {

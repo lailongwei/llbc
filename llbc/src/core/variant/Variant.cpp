@@ -60,7 +60,6 @@ static std::map<LLBC_NS LLBC_VariantType::ENUM, LLBC_NS LLBC_String> __g_typeDes
     {LLBC_NS LLBC_VariantType::RAW_DOUBLE, "double"},
 
     {LLBC_NS LLBC_VariantType::STR_DFT, "string"},
-    {LLBC_NS LLBC_VariantType::STR_CONST_DFT, "cstring"},
 
     {LLBC_NS LLBC_VariantType::SEQ_DFT, "sequence"},
 
@@ -199,11 +198,7 @@ bool LLBC_Variant::AsBool() const
     }
     if (firstType == LLBC_VariantType::STR)
     {
-        auto type = GetType();
-
-        LLBC_ReturnIf(type == LLBC_VariantType::STR_DFT, _holder.data.obj.str && !_holder.data.obj.str->empty());
-
-        LLBC_ReturnIf(type == LLBC_VariantType::STR_CONST_DFT, _holder.data.obj.cstr && !_holder.data.obj.cstr->empty());
+        return _holder.data.obj.str && !_holder.data.obj.str->empty();
     }
     if (firstType == LLBC_VariantType::SEQ)
     {
@@ -221,36 +216,17 @@ bool LLBC_Variant::AsLooseBool() const
 {
     if (GetFirstType() == LLBC_VariantType::STR)
     {
-        auto type = GetType();
-        if (type == LLBC_VariantType::STR_DFT)
-        {
-            const Str * const &str = _holder.data.obj.str;
-            if (!str || str->empty())
-                return false;
+        const Str * const &str = _holder.data.obj.str;
+        if (!str || str->empty())
+            return false;
 
-            const Str nmlStr = str->strip().tolower();
-            if (nmlStr == LLBC_INL_NS __g_trueStr || nmlStr == LLBC_INL_NS __g_yesStr)
-                return true;
-            else if (nmlStr.find('.') != Str::npos)
-                return std::fabs(LLBC_Str2Double(nmlStr.c_str())) > DBL_EPSILON;
-            else
-                return AsInt64() != 0;
-        }
-        else if (type == LLBC_VariantType::STR_CONST_DFT)
-        {
-            const CStr * const &cstr = _holder.data.obj.cstr;
-            if (!cstr || cstr->empty())
-                return false;
-
-            const Str nmlStr = Str(*cstr).strip().tolower();
-            if (nmlStr == LLBC_INL_NS __g_trueStr || nmlStr == LLBC_INL_NS __g_yesStr)
-                return true;
-            else if (nmlStr.find('.') != Str::npos)
-                return std::fabs(LLBC_Str2Double(nmlStr.c_str())) > DBL_EPSILON;
-            else
-                return LLBC_Str2Int64(nmlStr.c_str()) != 0;
-        }
-
+        const Str nmlStr = str->strip().tolower();
+        if (nmlStr == LLBC_INL_NS __g_trueStr || nmlStr == LLBC_INL_NS __g_yesStr)
+            return true;
+        else if (nmlStr.find('.') != Str::npos)
+            return std::fabs(LLBC_Str2Double(nmlStr.c_str())) > DBL_EPSILON;
+        else
+            return AsInt64() != 0;
     }
 
     return AsBool();
@@ -353,11 +329,6 @@ LLBC_String LLBC_Variant::AsStr() const
     if (IsStr())
     {
         return _holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr;
-    }
-
-    if (IsCStr())
-    {
-        return _holder.data.obj.cstr ? LLBC_String(*_holder.data.obj.cstr) : LLBC_INL_NS __g_nullStr;
     }
 
     if (IsSeq())
@@ -935,10 +906,6 @@ void LLBC_Variant::Serialize(LLBC_Stream &stream) const
     {
         stream.Write(_holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr);
     }
-    else if (IsCStr())
-    {
-        stream.Write(_holder.data.obj.cstr ? LLBC_String(*_holder.data.obj.cstr) : LLBC_INL_NS __g_nullStr);
-    }
     else if (IsSeq())
     {
         if (!_holder.data.obj.seq)
@@ -1003,19 +970,6 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
             _holder.data.obj.str = new LLBC_String;
 
         if (!stream.Read(*_holder.data.obj.str))
-        {
-            BecomeNil();
-            return false;
-        }
-
-        return true;
-    }
-    else if (IsCStr())
-    {
-        delete _holder.data.obj.cstr;
-
-        _holder.data.obj.cstr = new LLBC_CString;
-        if (!stream.Read(*_holder.data.obj.cstr))
         {
             BecomeNil();
             return false;
