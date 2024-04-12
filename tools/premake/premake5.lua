@@ -248,10 +248,10 @@ project "llbc"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -347,10 +347,10 @@ project "testsuite"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -503,10 +503,10 @@ project "pyllbc"
         links { string.format("python%s.%s", py_major_ver, py_minor_ver) }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows", "language:c++" }
         buildoptions {
-            "-std=c++11"
+            "-std=c++17"
         }
     filter {}
 
@@ -580,10 +580,10 @@ project "csllbc_native"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -905,10 +905,10 @@ project "lullbc"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
