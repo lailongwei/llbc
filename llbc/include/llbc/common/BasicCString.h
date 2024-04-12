@@ -86,16 +86,6 @@ public:
     }
 
     /**
-     * Parameter constructor when parameter type is stl string_view.
-     */
-
-    LLBC_BasicCString(const std::string_view &str)
-    : _cstr(str.data())
-    , _size(str.size())
-    {
-    }
-
-    /**
      * Parameter constructor when parameter type is char pointer.
      */
     template <typename _Ptr,

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.2)
 project(llbc)
 
 # Set project c++ standard.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 # Set project cmake options.
 set(CMAKE_VERBOSE_MAKEFILE on)

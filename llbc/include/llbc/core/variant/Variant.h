@@ -215,7 +215,6 @@ public:
     explicit LLBC_Variant(const std::string &str);
     explicit LLBC_Variant(const LLBC_String &str);
     explicit LLBC_Variant(const LLBC_CString &str);
-    explicit LLBC_Variant(const std::string_view &str);
     template <typename _T1, typename _T2>
     explicit LLBC_Variant(const std::pair<_T1, _T2> &pa);
     explicit LLBC_Variant(const Seq &seq);
@@ -467,7 +466,6 @@ public:
     LLBC_Variant& operator=(const _T &en);
     LLBC_Variant &operator=(const std::string &str);
     LLBC_Variant &operator=(const LLBC_String &str);
-    LLBC_Variant &operator=(const std::string_view &str);
     LLBC_Variant &operator=(const LLBC_CString &str);
     template <typename _T1, typename _T2>
     LLBC_Variant &operator=(const std::pair<_T1, _T2> &pa);

@@ -221,31 +221,24 @@ void TestCase_Core_Variant::StringTest()
     LLBC_Variant v3(LLBC_String("Hello world"));
     std::cout << "  - construct(LLBC_String): " << v3 << std::endl;
 
-    LLBC_Variant v4(std::string_view("Hello world"));
-    std::cout << "  - construct(std::string_view): " << v4 << std::endl;
+    LLBC_Variant v4(LLBC_CString("Hello world"));
+    std::cout << "  - construct(LLBC_CString): " << v4 << std::endl;
 
-    LLBC_Variant v5(LLBC_CString("Hello world"));
-    std::cout << "  - construct(LLBC_CString): " << v5 << std::endl;
+    LLBC_Variant v5;
+    v5 = "Hello world";
+    std::cout << "  - operator=(const char *): " << v5 << std::endl;
 
     LLBC_Variant v6;
-    v6 = "Hello world";
-    std::cout << "  - operator=(const char *): " << v6 << std::endl;
+    v6 = std::string("Hello world");
+    std::cout << "  - operator=(std::string): " << v6 << std::endl;
 
     LLBC_Variant v7;
-    v7 = std::string("Hello world");
-    std::cout << "  - operator=(std::string): " << v7 << std::endl;
+    v7 = LLBC_String("Hello world");
+    std::cout << "  - operator=(LLBC_String): " << v7 << std::endl;
 
     LLBC_Variant v8;
-    v8 = LLBC_String("Hello world");
-    std::cout << "  - operator=(LLBC_String): " << v8 << std::endl;
-
-    LLBC_Variant v9;
-    v9 = std::string_view("Hello world");
-    std::cout << "  - operator=(std::string_view): " << v9 << std::endl;
-
-    LLBC_Variant v10;
-    v10 = LLBC_CString("Hello world");
-    std::cout << "  - operator=(LLBC_CString): " << v10 << std::endl;
+    v8 = LLBC_CString("Hello world");
+    std::cout << "  - operator=(LLBC_CString): " << v8 << std::endl;
 }
 
 void TestCase_Core_Variant::EnumTest()

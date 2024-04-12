@@ -861,25 +861,6 @@ LLBC_Variant &LLBC_Variant::operator=(const LLBC_String &str)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator=(const std::string_view &str)
-{
-    BecomeStr();
-    if (str.empty())
-    {
-        if (_holder.data.obj.str)
-            _holder.data.obj.str->clear();
-    }
-    else
-    {
-        if (_holder.data.obj.str)
-            *_holder.data.obj.str = str;
-        else
-            _holder.data.obj.str = new LLBC_String(str);
-    }
-
-    return *this;
-}
-
 LLBC_Variant &LLBC_Variant::operator=(const LLBC_CString &str)
 {
     BecomeStr();

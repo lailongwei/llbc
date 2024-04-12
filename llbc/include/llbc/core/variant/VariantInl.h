@@ -130,13 +130,6 @@ inline LLBC_Variant::LLBC_Variant(const std::string &str)
         _holder.data.obj.str = new LLBC_String(str.data(), str.size());
 }
 
-inline LLBC_Variant::LLBC_Variant(const std::string_view &str)
-{
-    _holder.type = LLBC_VariantType::STR_DFT;
-    if (!str.empty())
-        _holder.data.obj.str = new LLBC_String(str.data(), str.size());
-}
-
 inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
 {
     _holder.type = LLBC_VariantType::STR_DFT;
