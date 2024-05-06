@@ -107,8 +107,7 @@
 #include <set>
 #include <unordered_set>
 #include <algorithm>
-#include <limits.h>
-#include <limits>
+#include <climits>
 #include <functional>
 #include <utility>
 

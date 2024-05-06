@@ -332,10 +332,9 @@ LLBC_String LLBC_ProtoReport::ToString() const
     return repr;
 }
 
-LLBC_Component::LLBC_Component(uint64 caredEvents)
+LLBC_Component::LLBC_Component()
 : _inited(false)
 , _started(false)
-, _caredEvents(caredEvents)
 
 , _svc(nullptr)
 , _meths(nullptr)

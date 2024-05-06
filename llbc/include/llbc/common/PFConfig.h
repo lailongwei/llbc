@@ -77,7 +77,7 @@
 #endif
 
 // Mac platform recognize.
-#if !LLBC_TARGET_PLATFORM && TARGET_OS_MAC
+#if !LLBC_TARGET_PLATFORM && defined(__APPLE__)
 #undef LLBC_TARGET_PLATFORM
 #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_MAC
 #endif

@@ -28,7 +28,7 @@ namespace
     {
     public:
         TestComp()
-        : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+        : LLBC_Component()
         {
         }
 

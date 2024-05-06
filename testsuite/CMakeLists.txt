@@ -20,11 +20,12 @@ elseif(UNIX AND NOT APPLE)
     set(LLBC_TESTSUITE_SHARED_LIB -ldl -lpthread -luuid llbc_lib_shared)
 elseif(APPLE)
     set(LLBC_TESTSUITE_STATIC_LIB -liconv llbc_lib)
-    set(LLBC_TESTSUITE_SHARED_LIB -liconv llbc_lib_shared)
+    set(LLBC_TESTSUITE_SHARED_LIB llbc_lib_shared)
 endif()
 
 # Set testsuite output directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
+file(MAKE_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Copy all testcase config file to output directory.
 file(COPY ${LLBC_TESTSUITE_DIR}/core/config/IniTestCfg.ini DESTINATION ${LLBC_OUTPUT_DIR})

@@ -82,7 +82,6 @@ int TestCase_Core_ObjectGuard::BaseTest()
     std::cout << "- Create obj guard:" << guard1 << std::endl;
     std::cout << "  - GetObj() return:" << guard1.GetObj() << std::endl;
     std::cout << "  - GetObj() const return:" << constGuard1.GetObj() << std::endl;
-    std::cout << "  - IsWeakRef() return:" << guard1.IsWeakRef() << std::endl;
     std::cout << "  - ToString() return:" << guard1.ToString() << std::endl;
     std::cout << "  - Guard obj available?:" << (guard1 ? "true" : "false") << std::endl;
 
@@ -115,8 +114,7 @@ int TestCase_Core_ObjectGuard::WeakRefTest()
     std::cout << "- After copy construct(guard2 = guard1):" << std::endl;
     std::cout << "  - guard1:" <<guard1 <<std::endl;
     std::cout << "  - guard2:" <<guard2 <<std::endl;
-    if (!guard1.IsWeakRef() ||
-        guard2.IsWeakRef())
+    if (guard1.GetObj() || !guard2.GetObj())
     {
         std::cerr << "Copy construct has some bugs, please check ObjectGuard code!" << std::endl;
         return LLBC_FAILED;
@@ -128,8 +126,7 @@ int TestCase_Core_ObjectGuard::WeakRefTest()
     std::cout << "- After assignment(guard3 = guard2):" << std::endl;
     std::cout << "  - guard2:" << guard2 << std::endl;
     std::cout << "  - guard3:" << guard3 << std::endl;
-    if (!guard2.IsWeakRef() ||
-        guard3.IsWeakRef())
+    if (guard2.GetObj() || !guard3.GetObj())
     {
         std::cerr << "Assignment operator has some bugs, please check ObjectGuard code!" << std::endl;
         return LLBC_FAILED;

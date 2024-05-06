@@ -605,6 +605,13 @@ public:
      */
     virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId) = 0;
 
+    /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventEnum
+     * @param[in] eventParams
+     */
+    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams) = 0;
+
 public:
     /**
      * Get event manager.
@@ -765,6 +772,3 @@ protected:
 __LLBC_NS_END
 
 #include "llbc/comm/ServiceInl.h"
-
-
-

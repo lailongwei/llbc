@@ -19,30 +19,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
-
-#include "llbc/comm/ComponentEvents.h"
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static LLBC_FORCE_INLINE int __FastLog2(LLBC_NS uint64 v)
-{
-    LLBC_NS uint32 r = (v > 0xffffffff) << 5; v >>= r;
-    LLBC_NS uint32 shift = (v > 0xffff) << 4; v >>= shift; r |= shift;
-    shift = (v > 0xff) << 3; v >>= shift; r |= shift;
-    shift = (v > 0xf) << 2; v >>= shift; r |= shift;
-    shift = (v > 0x3) << 1; v >>= shift; r |= shift;
-    return r | static_cast<LLBC_NS uint32>((v >> 1));
-}
-
-__LLBC_INTERNAL_NS_END
+#include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
 
-int LLBC_ComponentEvents::IndexOf(uint64 ev)
+/**
+ * \brief The heap template class encapsulation.
+ */
+template <typename T, class Container = std::vector<T>, class Compare = std::less<typename Container::value_type>>
+class LLBC_Heap : public std::priority_queue<T, Container, Compare>
 {
-    return LLBC_INL_NS __FastLog2(ev);
-}
+public:
+    /**
+     * \brief Get the begin and end iterator of the heap.
+     */
+    auto begin() const -> decltype(this->c.begin()) { return this->c.begin(); }
+    auto end() const -> decltype(this->c.end()) { return this->c.end(); }
+
+    /**
+     * \brief Remove the specified value from the heap.
+     *
+     * \param value - the value to remove.
+     */
+    void erase(const T &value)
+    {
+        auto it = std::find(this->c.begin(), this->c.end(), value);
+        LLBC_ReturnIf(it == this->c.end(), void());
+
+        if(it == this->c.begin())
+        {
+            this->pop();
+            return;
+        }
+
+        this->c.erase(it);
+        std::make_heap(this->c.begin(), this->c.end(), this->comp);
+    }
+};
 
 __LLBC_NS_END
+

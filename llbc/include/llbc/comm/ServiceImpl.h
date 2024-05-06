@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "llbc/comm/ComponentEvents.h"
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/ServiceEventFirer.h"
@@ -373,6 +372,13 @@ public:
     virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId);
 
     /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventEnum
+     * @param[in] eventParams
+     */
+    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams);
+
+    /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
@@ -536,7 +542,6 @@ private:
     void UpdateComps();
     void LateUpdateComps();
     void AddComp(LLBC_Component *comp);
-    void AddCompToCaredEventsArray(LLBC_Component *comp);
     LLBC_Library *OpenCompLibrary(const LLBC_String &libPath, bool &existingLib);
     void CloseCompLibrary(const LLBC_String &libPath);
 
@@ -638,7 +643,6 @@ public:
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
-    std::vector<LLBC_Component *> _caredEventComps[LLBC_ComponentEventIndex::End]; // Stored by event type component list.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
 
     // Coder & Handler about members.
@@ -673,6 +677,7 @@ private:
     // - Event support members.
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
+    std::queue<std::pair<LLBC_ComponentEventType::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
 };
 
 __LLBC_NS_END

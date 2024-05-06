@@ -101,22 +101,51 @@ public:
         TestWaiter()(false, LLBC_GetTypeName(*this), "stop", _stopTime, _stopWaitTime, stopFinished);
     }
 
-    virtual void OnAppEarlyStart()
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch(event)
+        {
+            case LLBC_ComponentEventType::AppEarlyStart:
+            {
+                OnAppEarlyStart();
+                break;
+            }
+            case LLBC_ComponentEventType::AppStartFail:
+            {
+                OnAppStartFail();
+                break;
+            }
+            case LLBC_ComponentEventType::AppStartFinish:
+            {
+                OnAppStartFinish();
+                break;
+            }
+            case LLBC_ComponentEventType::AppEarlyStop:
+            {
+                OnAppEarlyStop();
+                break;
+            }
+            default: break;
+        }
+    }
+
+private:
+    void OnAppEarlyStart()
     {
         std::cout << LLBC_GetTypeName(*this) << ": OnAppEarlyStart()..." << std::endl;
     }
 
-    virtual void OnAppStartFail()
+    void OnAppStartFail()
     {
         std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFail()..." << std::endl;
     }
 
-    virtual void OnAppStartFinish()
+    void OnAppStartFinish()
     {
         std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFinish()..." << std::endl;
     }
 
-    virtual void OnAppEarlyStop()
+    void OnAppEarlyStop()
     {
         std::cout << LLBC_GetTypeName(*this) << ": OnAppEarlyStop()..." << std::endl;
     }

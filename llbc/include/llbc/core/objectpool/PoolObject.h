@@ -54,6 +54,11 @@ public:
      */
     virtual LLBC_IObjectPoolInst *GetPoolInst();
 
+    /**
+     * Object-Pool reflection support: Reuse object.
+     */
+    virtual void Reuse() = 0;
+
 protected:
     LLBC_IObjectPoolInst *_poolInst;
 };

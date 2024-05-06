@@ -100,12 +100,6 @@ public:
     const ObjectType *GetObj() const;
 
     /**
-     * Check guarded object is weak ref object or not.
-     * @return bool - weak reference flag.
-     */
-    bool IsWeakRef() const;
-
-    /**
      * Delete guarded object.
      * @return ObjectType * - the detached guarded object.
      */
@@ -125,10 +119,8 @@ public:
     LLBC_String ToString() const;
 
 private:
-    ObjectType *_obj;
+    mutable ObjectType *_obj;
     LLBC_IObjectPoolInst *_poolInst;
-
-    mutable bool _weakRef;
 };
 
 __LLBC_NS_END

@@ -140,25 +140,6 @@ inline const LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &co
     return const_cast<LLBC_Component *>(this)->GetComponent(compName);
 }
 
-inline uint64 LLBC_Component::GetCaredEvents() const
-{
-    return _caredEvents;
-}
-
-inline bool LLBC_Component::IsCaredEvents(uint64 compEvs) const
-{
-    return (_caredEvents & compEvs) == compEvs;
-}
-
-inline bool LLBC_Component::IsCaredEventIndex(int compEvOffset) const
-{
- #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
-    return IsCaredEvents(1Ui64 << compEvOffset);
-#else
-    return IsCaredEvents(1ULL << compEvOffset);
-#endif
-}
-
 inline int LLBC_Component::GetConfigType() const
 {
     return _cfgType;
@@ -236,44 +217,9 @@ inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
 }
 
-inline void LLBC_Component::OnAppEarlyStart()
+inline void LLBC_Component::OnEvent(LLBC_ComponentEventType::ENUM event, const llbc::LLBC_Variant& evArgs)
 {
-}
 
-inline void LLBC_Component::OnAppStartFail()
-{
-}
-
-inline void LLBC_Component::OnAppStartFinish()
-{
-}
-
-inline void LLBC_Component::OnAppEarlyStop()
-{
-}
-
-inline void LLBC_Component::OnAppConfigReload()
-{
-}
-
-inline void LLBC_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
-{
-}
-
-inline void LLBC_Component::OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-{
-}
-
-inline void LLBC_Component::OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-{
-}
-
-inline void LLBC_Component::OnProtoReport(const LLBC_ProtoReport &report)
-{
-}
-
-inline void LLBC_Component::OnUnHandledPacket(const LLBC_Packet &packet)
-{
 }
 
 inline void LLBC_Component::SetService(LLBC_Service *svc)
