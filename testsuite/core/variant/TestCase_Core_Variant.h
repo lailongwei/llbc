@@ -24,13 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_VariantTest : public LLBC_BaseTestCase
+class TestCase_Core_Variant : public LLBC_BaseTestCase
 {
 public:
     virtual int Run(int argc, char *argv[]);
 
 private:
     void BasicTest();
+    void StringTest();
     void EnumTest();
     void CompareTest();
     void CompositeKeyTest();

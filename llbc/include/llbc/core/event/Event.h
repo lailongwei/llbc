@@ -227,7 +227,7 @@ public:
     /**
      * Object-Pool reflection support: clear firer object.
      */
-    void Clear();
+    virtual void Reuse() override;
 
     /**
      * Disable assignment.

@@ -758,7 +758,7 @@ LLBC_Variant &LLBC_Variant::operator=(ulong ul)
     return *this;
 }
 
-LLBC_Variant & LLBC_Variant::operator=(const char * const &str)
+LLBC_Variant &LLBC_Variant::operator=(const char * const &str)
 {
     if (!IsStr())
     {
@@ -823,7 +823,45 @@ LLBC_Variant &LLBC_Variant::operator=(const double &d)
     return *this;
 }
 
+LLBC_Variant &LLBC_Variant::operator=(const std::string &str)
+{
+    BecomeStr();
+    if (str.empty())
+    {
+        if (_holder.data.obj.str)
+            _holder.data.obj.str->clear();
+    }
+    else
+    {
+        if (_holder.data.obj.str)
+            *_holder.data.obj.str = str;
+        else
+            _holder.data.obj.str = new LLBC_String(str);
+    }
+
+    return *this;
+}
+
 LLBC_Variant &LLBC_Variant::operator=(const LLBC_String &str)
+{
+    BecomeStr();
+    if (str.empty())
+    {
+        if (_holder.data.obj.str)
+            _holder.data.obj.str->clear();
+    }
+    else
+    {
+        if (_holder.data.obj.str)
+            *_holder.data.obj.str = str;
+        else
+            _holder.data.obj.str = new LLBC_String(str);
+    }
+
+    return *this;
+}
+
+LLBC_Variant &LLBC_Variant::operator=(const LLBC_CString &str)
 {
     BecomeStr();
     if (str.empty())

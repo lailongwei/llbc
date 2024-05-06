@@ -56,7 +56,7 @@ class EventTestComp : public LLBC_Component
 {
 public:
     EventTestComp()
-    : LLBC_Component(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+    : LLBC_Component()
     , _handleTimes(0)
     , _staticHandleTimes(0)
     , _ev1HandlerStub()

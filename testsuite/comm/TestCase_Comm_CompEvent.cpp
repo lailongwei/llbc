@@ -25,13 +25,6 @@ int TestCase_Comm_CompEvent::Run(int argc, char *argv[])
 {
     std::cout << "ComponentEvent test:" << std::endl;
 
-    std::cout << "Component events list:" << std::endl;
-    for (int i = LLBC_ComponentEventIndex::Begin; i < LLBC_ComponentEventIndex::End; ++i)
-        fprintf(stdout, "- Comp event:%08llu index:%d\n", 1llu << i, LLBC_ComponentEvents::IndexOf(1llu << i));
-
-    fprintf(stdout, "All events:%08llu, Default events:%08llu\n",
-            LLBC_ComponentEvents::AllEvents, LLBC_ComponentEvents::DefaultEvents);
-
     std::cout << "Press any key to continue..." << std::endl;
     getchar();
 
