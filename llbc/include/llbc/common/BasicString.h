@@ -1468,11 +1468,9 @@ public:
 
         size_type prev_bytePos = 0;
         size_type bytePos = 0;
-        while (utf8Count--)
+        while ((bytePos = _This::next_utf8_char_pos(bytePos)) != _This::npos)
         {
-            bytePos = _This::next_utf8_char_pos(bytePos);
             strs.push_back(_This::substr(prev_bytePos, bytePos - prev_bytePos));
-            std::cout << prev_bytePos << " " << bytePos << std::endl;
             prev_bytePos = bytePos;
         }
     }
