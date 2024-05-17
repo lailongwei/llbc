@@ -129,13 +129,10 @@ private:
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;
-    std::map<LLBC_String, LLBC_Logger *> _str2Loggers;
     std::map<LLBC_CString, LLBC_Logger *> _cstr2Loggers;
     std::vector<std::pair<LLBC_CString, LLBC_Logger *> > _loggerList;
-    std::map<LLBC_String, LLBC_Logger *>::const_iterator _str2LoggersEnd;
     std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 
-    static LLBC_String _rootLoggerName;
     static LLBC_FastLock _uninitColorfulOutputLock;
 };
 
@@ -852,5 +849,3 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Fatal, exitCode, ##__VA_ARGS__)
 
 #include "llbc/core/log/LoggerMgrInl.h"
-
-

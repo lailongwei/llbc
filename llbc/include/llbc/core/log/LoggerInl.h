@@ -23,7 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline const LLBC_String &LLBC_Logger::GetLoggerName() const
+LLBC_FORCE_INLINE const LLBC_String &LLBC_Logger::GetLoggerName() const
 {
     return _name;
 }

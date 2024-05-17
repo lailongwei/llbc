@@ -84,12 +84,6 @@ public:
     int GetLogLevel() const;
 
     /**
-     * Set log level.
-     * @param[in] level - new log level.
-     */
-    void SetLogLevel(int level);
-
-    /**
      * Get logger take over option, only available on root logger.
      * @return bool - take over option.
      */

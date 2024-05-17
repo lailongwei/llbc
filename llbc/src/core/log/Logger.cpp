@@ -44,7 +44,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
-: _logLevel(LLBC_LogLevel::Begin)
+: _logLevel(LLBC_LogLevel::End)
 , _addTimestampInJsonLog(false)
 , _config(nullptr)
 
@@ -196,12 +196,6 @@ void LLBC_Logger::Finalize()
     ClearNonRunnableMembers(false);
 }
 
-void LLBC_Logger::SetLogLevel(int level)
-{
-    LLBC_LockGuard guard(_lock);
-    _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
-}
-
 bool LLBC_Logger::IsTakeOver() const
 {
     LLBC_LockGuard guard(_lock);
@@ -336,7 +330,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
     LLBC_LogData *data = _logDataPoolInst.GetObject();
-    if (data->msgCap < len + 1)
+    if (UNLIKELY(data->msgCap < len + 1))
     {
         data->msgCap = MAX(len + 1, 192);
         data->msg = LLBC_Realloc(char, data->msg, data->msgCap);
@@ -344,7 +338,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     // Copy formatted message to LogData.
     data->msgLen = len;
-    if (len > 0)
+    if (LIKELY(len > 0))
         memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len);
     data->msg[len] = '\0';
 
@@ -393,7 +387,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     // Copy message to LogData.
     data->msgLen = static_cast<int>(msgLen);
-    if (msgLen > 0)
+    if (LIKELY(msgLen > 0))
         memcpy(data->msg, msg, msgLen);
     data->msg[msgLen] = '\0';
 
@@ -590,7 +584,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
 
     _config = nullptr;
     _addTimestampInJsonLog = false;
-    _logLevel = LLBC_LogLevel::Begin;
+    _logLevel = LLBC_LogLevel::End;
 
     _name.clear();
 }

@@ -38,12 +38,10 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_String LLBC_LoggerMgr::_rootLoggerName = LLBC_CFG_LOG_ROOT_LOGGER_NAME;
 LLBC_FastLock LLBC_LoggerMgr::_uninitColorfulOutputLock;
 
 LLBC_LoggerMgr::LLBC_LoggerMgr()
-: _configurator(nullptr)
-, _sharedLogRunnable(nullptr)
+: _sharedLogRunnable(nullptr)
 
 , _rootLogger(nullptr)
 {
@@ -77,7 +75,8 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
 
     // Config root logger.
     _rootLogger = new LLBC_Logger;
-    if (_configurator->Config(_rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
+    const LLBC_CString rootLoggerName(LLBC_CFG_LOG_ROOT_LOGGER_NAME);
+    if (_configurator->Config(rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
     {
         LLBC_XDelete(_rootLogger);
         LLBC_XDelete(_configurator);
@@ -85,16 +84,15 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
         return LLBC_FAILED;
     }
 
-    _loggerList.emplace_back(_rootLoggerName, _rootLogger);
-    _str2Loggers.insert(std::make_pair(_rootLoggerName, _rootLogger));
-    _cstr2Loggers.insert(std::make_pair(_rootLoggerName.c_str(), _rootLogger));
+    _loggerList.emplace_back(rootLoggerName, _rootLogger);
+    _cstr2Loggers.insert(std::make_pair(rootLoggerName, _rootLogger));
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
     std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator cfgIter = configs.begin();
     for (; cfgIter != configs.end(); ++cfgIter)
     {
-        if (cfgIter->first == _rootLoggerName)
+        if (cfgIter->first == rootLoggerName)
             continue;
 
         LLBC_Logger *logger = new LLBC_Logger;
@@ -106,11 +104,9 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
         }
 
         _loggerList.emplace_back(cfgIter->first, logger);
-        _str2Loggers.insert(std::make_pair(cfgIter->first, logger));
         _cstr2Loggers.insert(std::make_pair(cfgIter->first.c_str(), logger));
     }
 
-    _str2LoggersEnd = _str2Loggers.end();
     _cstr2LoggersEnd = _cstr2Loggers.end();
 
     // Startup shared log runnable.
@@ -135,11 +131,10 @@ void LLBC_LoggerMgr::Finalize()
     }
 
     // Delete all loggers and set _rootLogger logger to nullptr.
+    for (auto rit = _loggerList.rbegin(); rit != _loggerList.rend(); ++rit)
+        delete rit->second;
     _loggerList.clear();
     _cstr2Loggers.clear();
-    LLBC_STLHelper::DeleteContainer(_str2Loggers);
-
-    _str2LoggersEnd = _str2Loggers.end();
     _cstr2LoggersEnd = _cstr2Loggers.end();
 
     _rootLogger = nullptr;
