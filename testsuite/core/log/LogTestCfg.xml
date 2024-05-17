@@ -112,12 +112,13 @@
 
     <!-- test logger配置 -->
     <test>
-        <level>INFO</level>
         <asynchronous>false</asynchronous>
         <flushInterval>50</flushInterval>
         <logToConsole>true</logToConsole>
+        <consoleLogLevel>INFO</consoleLogLevel>
         <consolePattern>%T [%L]{logger:%N}{tag:%g} - %m%n</consolePattern>
         <logToFile>true</logToFile>
+        <fileLogLevel>INFO</fileLogLevel>
         <fileBufferSize>1024</fileBufferSize>
         <logFile>log/llbc_logger_%L</logFile>
         <forceAppLogPath>false</forceAppLogPath>
@@ -129,10 +130,11 @@
 
     <!-- deltest logger配置 -->
     <deltest>
-        <level>DEBUG</level>
         <asynchronous>true</asynchronous>
         <logToConsole>true</logToConsole>
+        <consoleLogLevel>DEBUG</consoleLogLevel>
         <logToFile>true</logToFile>
+        <fileLogLevel>DEBUG</fileLogLevel>
         <fileRollingMode>NoRolling</fileRollingMode>
         <maxFileSize>1KiB</maxFileSize>
         <logFile>log/%L</logFile>
@@ -141,11 +143,12 @@
 
     <!-- preformance test logger配置 -->
     <perftest>
-        <level>DEBUG</level>
         <asynchronous>true</asynchronous>
         <independentThread>true</independentThread>
         <logToConsole>false</logToConsole>
+        <consoleLogLevel>DEBUG</consoleLogLevel>
         <logToFile>true</logToFile>
+        <fileLogLevel>DEBUG</fileLogLevel>
         <fileRollingMode>Hourly</fileRollingMode>
         <maxFileSize>2.5MB</maxFileSize>
         <maxBackupIndex>10</maxBackupIndex>
