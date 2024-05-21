@@ -438,6 +438,33 @@ inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
     return *this;
 }
 
+inline LLBC_Variant &LLBC_Variant::BecomeStrX()
+{
+    BecomeStr();
+    if (!_holder.data.obj.str)
+        _holder.data.obj.str = new Str;
+
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
+{
+    BecomeSeq();
+    if (!_holder.data.obj.seq)
+        _holder.data.obj.seq = new Seq;
+
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::BecomeDictX()
+{
+    BecomeDict();
+    if (!_holder.data.obj.dict)
+        _holder.data.obj.dict = new Dict;
+
+    return *this;
+}
+
 inline sint8 LLBC_Variant::AsInt8() const
 {
     return static_cast<sint8>(AsInt64());
@@ -1187,33 +1214,6 @@ inline bool LLBC_Variant::IsSeqX() const
 inline bool LLBC_Variant::IsDictX() const
 {
     return IsDict() && _holder.data.obj.dict != nullptr;
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeStrX()
-{
-    BecomeStr();
-    if (!_holder.data.obj.str)
-        _holder.data.obj.str = new Str;
-
-    return *this;
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
-{
-    BecomeSeq();
-    if (!_holder.data.obj.seq)
-        _holder.data.obj.seq = new Seq;
-
-    return *this;
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeDictX()
-{
-    BecomeDict();
-    if (!_holder.data.obj.dict)
-        _holder.data.obj.dict = new Dict;
-
-    return *this;
 }
 
 inline void LLBC_Variant::SeqPushBack()
