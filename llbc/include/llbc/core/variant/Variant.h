@@ -285,12 +285,12 @@ public:
     LLBC_Variant &BecomeFloat();
     LLBC_Variant &BecomeDouble();
     LLBC_Variant &BecomeStr();
-    LLBC_Variant &BecomeSeq();
-    LLBC_Variant &BecomeDict();
-    LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
     LLBC_Variant &BecomeStrX();
+    LLBC_Variant &BecomeSeq();
     LLBC_Variant &BecomeSeqX();
+    LLBC_Variant &BecomeDict();
     LLBC_Variant &BecomeDictX();
+    LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
 
     // Real data fetch.
     bool AsBool() const;
