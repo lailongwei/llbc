@@ -417,27 +417,6 @@ inline LLBC_Variant &LLBC_Variant::BecomeStr()
     return Become(LLBC_VariantType::STR_DFT);
 }
 
-inline LLBC_Variant &LLBC_Variant::BecomeSeq()
-{
-    return Become(LLBC_VariantType::SEQ_DFT);
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeDict()
-{
-    return Become(LLBC_VariantType::DICT_DFT);
-}
-
-inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
-{
-    if (_holder.type != ty)
-    {
-        _holder.ClearData();
-        _holder.type = ty;
-    }
-
-    return *this;
-}
-
 inline LLBC_Variant &LLBC_Variant::BecomeStrX()
 {
     BecomeStr();
@@ -445,6 +424,11 @@ inline LLBC_Variant &LLBC_Variant::BecomeStrX()
         _holder.data.obj.str = new Str;
 
     return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::BecomeSeq()
+{
+    return Become(LLBC_VariantType::SEQ_DFT);
 }
 
 inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
@@ -456,11 +440,27 @@ inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
     return *this;
 }
 
+inline LLBC_Variant &LLBC_Variant::BecomeDict()
+{
+    return Become(LLBC_VariantType::DICT_DFT);
+}
+
 inline LLBC_Variant &LLBC_Variant::BecomeDictX()
 {
     BecomeDict();
     if (!_holder.data.obj.dict)
         _holder.data.obj.dict = new Dict;
+
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
+{
+    if (_holder.type != ty)
+    {
+        _holder.ClearData();
+        _holder.type = ty;
+    }
 
     return *this;
 }
