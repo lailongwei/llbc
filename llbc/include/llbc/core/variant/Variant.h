@@ -288,6 +288,9 @@ public:
     LLBC_Variant &BecomeSeq();
     LLBC_Variant &BecomeDict();
     LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
+    LLBC_Variant &BecomeStrX();
+    LLBC_Variant &BecomeSeqX();
+    LLBC_Variant &BecomeDictX();
 
     // Real data fetch.
     bool AsBool() const;
@@ -570,10 +573,6 @@ private:
     bool IsStrX() const;
     bool IsSeqX() const;
     bool IsDictX() const;
-
-    LLBC_Variant &BecomeStrX();
-    LLBC_Variant &BecomeSeqX();
-    LLBC_Variant &BecomeDictX();
 
     void SeqPushBack();
     void SeqPushBackElem(const Seq::value_type &val);
