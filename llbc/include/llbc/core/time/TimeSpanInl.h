@@ -93,6 +93,11 @@ LLBC_TimeSpan::FromSpanStr(const _StrType &spanStr)
     return LLBC_TimeSpan(spanStr.c_str(), spanStr.size());
 }
 
+inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const LLBC_String &spanStr)
+{
+    return LLBC_TimeSpan(spanStr.c_str(), spanStr.size());
+}
+
 inline LLBC_TimeSpan::LLBC_TimeSpan(const sint64 &spanInMicros)
 : _span(spanInMicros)
 {
@@ -111,6 +116,11 @@ inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr)
 
 template <typename _StrType, typename>
 inline LLBC_TimeSpan::LLBC_TimeSpan(const _StrType &spanStr)
+: LLBC_TimeSpan(spanStr.c_str(), spanStr.size())
+{
+}
+
+inline LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &spanStr)
 : LLBC_TimeSpan(spanStr.c_str(), spanStr.size())
 {
 }

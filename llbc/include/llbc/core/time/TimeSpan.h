@@ -61,6 +61,7 @@ public:
     template <typename _StrType>
     static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
     FromSpanStr(const _StrType &spanStr);
+    static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
 public:
     /**
@@ -99,6 +100,7 @@ public:
     template <typename _StrType,
               typename = typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, _StrType>::type>
     explicit LLBC_TimeSpan(const _StrType &spanStr);
+    explicit LLBC_TimeSpan(const LLBC_String &spanStr);
 
 public:
     /**
