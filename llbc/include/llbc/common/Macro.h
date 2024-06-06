@@ -286,6 +286,11 @@ private:                                   \
 #define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
 
 /**
+ * Whitespace check.
+ */
+#define LLBC_IsSpace(ch) (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '\v' || ch == '\f')
+
+/**
  * Format argument.
  * @param[in] fmt  - the format string.
  * @param[out] buf - the formatted string, must call free() to free memory.

@@ -263,6 +263,17 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan(1000us) / 100 = " << ts / 100 << std::endl;
     std::cout << "LLBC_TimeSpan(1000us) / 0.5 = " << ts / 0.5 << std::endl;
     std::cout << "LLBC_TimeSpan(1000us) % 100 = " << ts % 100 << std::endl;
+
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"\"): " << LLBC_TimeSpan::FromSpanStr("") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"1\"): " << LLBC_TimeSpan::FromSpanStr("1") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"01\"): " << LLBC_TimeSpan::FromSpanStr("01") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"01:02\"): " << LLBC_TimeSpan::FromSpanStr("01:02") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"01:02:03\"): " << LLBC_TimeSpan::FromSpanStr("01:02:03") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("01:02:03.04") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"     05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("    05 01:02:03.04") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04     \"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04     ") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"     05 01:02:03.04     \"): " << LLBC_TimeSpan::FromSpanStr("     05 01:02:03.04     ") << std::endl;
 }
 
 void TestCase_Core_Time_Time::CpuTimeTest()
