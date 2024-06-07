@@ -273,11 +273,40 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"     05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("    05 01:02:03.04") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04     \"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04     ") << std::endl;
-    std::cout << "LLBC_TimeSpan::FromSpanStr(\"     05 01:02:03.04     \"): " << LLBC_TimeSpan::FromSpanStr("     05 01:02:03.04     ") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"   \t  05 01:02:03.04  \t   \"): " << LLBC_TimeSpan::FromSpanStr("  \t   05 01:02:03.04  \t   ") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"9999999999999999\"): " << LLBC_TimeSpan::FromSpanStr("9999999999999999") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"01:02:03:04:05\"): " << LLBC_TimeSpan::FromSpanStr("01:02:03:04:05") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"-8 01:02:03:04:05\"): " << LLBC_TimeSpan::FromSpanStr("-8 01:02:03:04:05") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(std::string(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr(std::string("05 01:02:03.04")) << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(LLBC_String(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr(LLBC_String("05 01:02:03.04")) << std::endl;
+
+    std::cout << "LLBC_TimeSpan::FromSpanStr() performance test:" << std::endl;
+    #if LLBC_DEBUG
+    static constexpr int testTimes = 100000;
+    #else
+    static constexpr int testTimes = 1000000;
+    #endif
+
+    const std::vector<LLBC_String> testSpanStrs {
+        " 7:45:16.323423",
+        " \t\v 8 12:30:40.123456\v\t  ",
+        " 9 23:03:55.001002\v\t  ",
+        "12:13.3",
+        "17:45:16.998923",
+    };
+
+    LLBC_TimeSpan finalSpan;
+    const auto begTime = LLBC_CPUTime::Current();
+    for (int i = 0; i < testTimes; ++i)
+    {
+        for (auto &spanStr : testSpanStrs)
+            finalSpan += LLBC_TimeSpan::FromSpanStr(spanStr);
+    }
+
+    const auto costTime = LLBC_CPUTime::Current() - begTime;
+    std::cout << "- Finish, test times:" << testTimes
+              << ", cost time:" << costTime.ToMicros() << " micro sec"
+              << std::endl;
 }
 
 void TestCase_Core_Time_Time::CpuTimeTest()
