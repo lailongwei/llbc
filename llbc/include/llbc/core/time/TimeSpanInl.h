@@ -364,6 +364,16 @@ inline bool LLBC_TimeSpan::Deserialize(LLBC_Stream &stream)
 inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
 : _span(0)
 {
+    // Time span string format:
+    // - [DD ][[HH:]MM:]SS[.micro_sec]
+    //
+    // eg:
+    //                   DD       HH       MM   SS   micro_sec
+    // 03 =>                                     3 +     0      seconds
+    // 02:03 =>                           2*60 + 3 +     0      seconds
+    // 01:02:03 =>               1*3600 + 2*60 + 3 +     0      seconds
+    // 8 01:02:03 =>   8*86400 + 1*3600 + 2*60 + 3 +     0      seconds
+    // 8 01:02:03.4 => 8*86400 + 1*3600 + 2*60 + 3 + 4*0.000001 seconds
     // Argument check.
     if (UNLIKELY(!spanStr || spanStrLen == 0))
         return;
@@ -385,21 +395,10 @@ inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
     while (spanStrEnd != spanStr && LLBC_IsSpace(*spanStrEnd))
         --spanStrEnd;
 
-    // spanStrEnd == spanStr is always false.
-    // if (spanStrEnd == spanStr)
-    //     return;
     ++spanStrEnd;
     spanStrLen = static_cast<size_t>(spanStrEnd - spanStr);
 
     // Parse time span string, format:
-    // [DD][ [[[HH:]MM:]SS[.micro_sec]]
-    // eg:               DD       HH       MM   SS   micro_sec
-    // 03 =>                                     3 +     0      seconds
-    // 02:03 =>                           2*60 + 3 +     0      seconds
-    // 01:02:03 =>               1*3600 + 2*60 + 3 +     0      seconds
-    // 8 01:02:03 =>   8*86400 + 1*3600 + 2*60 + 3 +     0      seconds
-    // 8 01:02:03.4 => 8*86400 + 1*3600 + 2*60 + 3 + 4*0.000001 seconds
-
     // - Parse <DD> part.
     char numFmtBuf[12];
     const char *dayPartEnd = spanStr;
