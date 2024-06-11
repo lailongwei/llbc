@@ -84,6 +84,13 @@ public:
     int GetLogLevel() const;
 
     /**
+     * @brief Set log level.
+     * @param[in] logLevel - the log level(End will disabled logger).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetLogLevel(int logLevel);
+
+    /**
      * Get logger take over option, only available on root logger.
      * @return bool - take over option.
      */
@@ -331,7 +338,7 @@ private:
     LLBC_String _name;
     mutable LLBC_SpinLock _lock;
 
-    int _logLevel;
+    volatile int _logLevel;
     bool _addTimestampInJsonLog;
     const LLBC_LoggerConfigInfo *_config;
 

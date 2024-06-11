@@ -210,7 +210,7 @@ bool LLBC_Logger::IsAsyncMode() const
 
 int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(level) ||
         !hookDeleg))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
@@ -225,7 +225,7 @@ int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogD
 
 void LLBC_Logger::UninstallHook(int level)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level)))
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(level)))
         return;
 
     LLBC_LockGuard guard(_lock);

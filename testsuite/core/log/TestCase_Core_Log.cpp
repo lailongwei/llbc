@@ -125,6 +125,11 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         LLBC_Sleep(800);
     }
 
+    // Perform log level set test.
+    LLBC_PrintLn("Press any kty to begin log level test");
+    getchar();
+    DoLogLevelSetTest();
+
     // Peform performance test.
     const int perfTestTimes = 3;
     for (int i = 0; i < perfTestTimes; ++i)
@@ -149,9 +154,6 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
                        elapsed.ToNanos() / static_cast<double>(loopLmt) / 1000.0);
     }
 
-    LLBC_PrintLn("Press any key to begin json log test");
-    getchar();
-
     // Test json styled log.
     DoJsonLogTest();
 
@@ -166,6 +168,36 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     getchar();
 
     return 0;
+}
+
+void TestCase_Core_Log::DoLogLevelSetTest()
+{
+    auto testLogger = LLBC_LoggerMgrSingleton->GetLogger("log_level_set_test");
+    LLBC_PrintLn("Log level set test, test logger name:%s, default level:%s",
+                 testLogger->GetLoggerName().c_str(),
+                 LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str());
+
+    auto testOutput = [testLogger](int logLevel) {
+        testLogger->SetLogLevel(logLevel);
+        LLBC_PrintLn(">>>>>>>> logger: %s, level: %s <<<<<<<<<",
+                     testLogger->GetLoggerName().c_str(),
+                     LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str());
+        LLOG_DEBUG2("log_level_set_test", "This is a DEBUG log");
+        LLOG_TRACE2("log_level_set_test", "This is a TRACE log");
+        LLOG_INFO2("log_level_set_test", "This is a INFO log");
+        LLOG_WARN2("log_level_set_test", "This is a WARN log");
+        LLOG_ERROR2("log_level_set_test", "This is a ERROR log");
+        LLOG_FATAL2("log_level_set_test", "This is a FATAL log");
+        LLBC_PrintLn(">>>>>>>> ****************** <<<<<<<<<");
+    };
+
+    testOutput(LLBC_LogLevel::Debug);
+    testOutput(LLBC_LogLevel::Trace);
+    testOutput(LLBC_LogLevel::Info);
+    testOutput(LLBC_LogLevel::Warn);
+    testOutput(LLBC_LogLevel::Error);
+    testOutput(LLBC_LogLevel::Fatal);
+    testOutput(LLBC_LogLevel::End);
 }
 
 void TestCase_Core_Log::DoJsonLogTest()

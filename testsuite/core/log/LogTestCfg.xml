@@ -141,6 +141,18 @@
         <forceAppLogPath>false</forceAppLogPath>
     </deltest>
 
+    <!-- log level设置测试logger配置 -->
+    <log_level_set_test>
+        <asynchronous>false</asynchronous>
+        <independentThread>true</independentThread>
+        <logToConsole>true</logToConsole>
+        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <logToFile>true</logToFile>
+        <fileLogLevel>DEBUG</fileLogLevel>
+        <fileRollingMode>NoRolling</fileRollingMode>
+        <maxFileSize>1024MB</maxFileSize>
+    </log_level_set_test>
+
     <!-- preformance test logger配置 -->
     <perftest>
         <asynchronous>true</asynchronous>

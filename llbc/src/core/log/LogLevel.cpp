@@ -49,7 +49,7 @@ const LLBC_CString &LLBC_LogLevel::GetLevelStr(int level)
         LLBC_INTERNAL_NS __level2StrRepr[level] : LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::End]);
 }
 
-int LLBC_LogLevel::Str2Level(const LLBC_CString &levelStr)
+int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
 {
     if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;
@@ -71,7 +71,7 @@ int LLBC_LogLevel::Str2Level(const LLBC_CString &levelStr)
     return LLBC_LogLevel::End;
 }
 
-bool LLBC_LogLevel::IsLegal(int level)
+bool LLBC_LogLevel::IsValid(int level)
 {
     return (LLBC_LogLevel::Begin <= level && level < LLBC_LogLevel::End);
 }
