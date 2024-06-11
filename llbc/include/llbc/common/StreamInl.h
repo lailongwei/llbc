@@ -1203,7 +1203,7 @@ void LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &
     obj.CheckInitialized();
 
     // Recap Stream.
-    size_t needSize = obj.ByteSizeLong();
+    const size_t needSize = obj.ByteSizeLong();
     if (!ReserveWritableSize(needSize + sizeof(uint32)))
         return;
 
