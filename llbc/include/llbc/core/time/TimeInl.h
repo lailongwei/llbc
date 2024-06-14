@@ -43,21 +43,6 @@ inline LLBC_Time::~LLBC_Time()
 {
 }
 
-inline time_t LLBC_Time::NowTimestampInSecs()
-{
-    return time(nullptr);
-}
-
-inline sint64 LLBC_Time::NowTimestampInMillis()
-{
-    return LLBC_GetMilliseconds();
-}
-
-inline sint64 LLBC_Time::NowTimestampInMicros()
-{
-    return LLBC_GetMicroseconds();
-}
-
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
     return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::numOfMicrosPerSecond);

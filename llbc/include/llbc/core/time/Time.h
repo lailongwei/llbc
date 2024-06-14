@@ -67,14 +67,6 @@ public:
      */
     static LLBC_Time Now();
 
-    /**
-     * Get now timestamp, in specific precision.
-     * @return time_t/sint64 - now timestamp.
-     */
-    static time_t NowTimestampInSecs();
-    static sint64 NowTimestampInMillis();
-    static sint64 NowTimestampInMicros();
-
 public:
     /**
      * Create time object from some ways.
