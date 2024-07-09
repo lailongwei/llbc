@@ -10,6 +10,7 @@
 #include "llbc/core/rapidjson/stream.h"
 #include "llbc/core/rapidjson/document.h"
 #include "llbc/core/rapidjson/stringbuffer.h"
+#include "llbc/core/rapidjson/istreamwrapper.h"
 #include "llbc/core/rapidjson/error/en.h"
 
 __LLBC_NS_BEGIN
