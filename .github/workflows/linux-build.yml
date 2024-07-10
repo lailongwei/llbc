@@ -18,7 +18,7 @@ jobs:
 
       - name: update yum repo baseurl
         run: |
-          cat /etc/yum.repos.d/CentOS-Base.repo.backup
+          cat /etc/yum.repos.d/CentOS-Base.repo
           sudo cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
           sudo sed -i '3s|.*|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos/$releasever/os/$basearch/|' /etc/yum.repos.d/CentOS-Base.repo
       
