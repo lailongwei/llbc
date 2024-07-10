@@ -20,7 +20,8 @@ jobs:
         run: |
           cat /etc/yum.repos.d/CentOS-Base.repo
           mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-          wget -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+          curl -O http://mirrors.aliyun.com/repo/Centos-7.repo
+          mv Centos-7.repo /etc/yum.repos.d/CentOS-Base.repo
           cat /etc/yum.repos.d/CentOS-Base.repo
           yum clean all
           yum makecache
