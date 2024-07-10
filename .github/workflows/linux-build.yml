@@ -18,13 +18,11 @@ jobs:
 
       - name: update yum repo baseurl
         run: |
-          cat /etc/yum.repos.d/CentOS-Base.repo
-          mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-          curl -O http://mirrors.aliyun.com/repo/Centos-7.repo
-          mv Centos-7.repo /etc/yum.repos.d/CentOS-Base.repo
-          cat /etc/yum.repos.d/CentOS-Base.repo
-          yum clean all
-          yum makecache
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+          # yum clean all
+          # yum makecache
 
       - name: install deps
         run: yum install -y openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
