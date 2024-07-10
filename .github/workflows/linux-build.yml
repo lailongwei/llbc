@@ -20,7 +20,7 @@ jobs:
         run: |
           cat /etc/yum.repos.d/CentOS-Base.repo
           sudo cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-          sudo sed -i '3s|.*|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos/$releasever/os/$basearch/|' /etc/yum.repos.d/CentOS-Base.repo
+          sudo sed -i 's|^mirrorlist=\(.*\)|#mirrorlist=\1\nbaseurl=http://mirrors.tuna.tsinghua.edu.cn/centos/$releasever/os/$basearch/|' /etc/yum.repos.d/CentOS-Base.repo
       
       - name: install deps
         run: yum install -y openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
