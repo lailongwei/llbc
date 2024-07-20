@@ -101,13 +101,13 @@ class LLBC_ObjReflector
 public:
     // New.
     template <typename Obj>
-    static constexpr
+    static 
     void New(void *mem) { (void)(new (mem) Obj()); }
 
 public:
     // Delete.
     template <typename Obj>
-    static constexpr
+    static
     void Delete(void *mem) { reinterpret_cast<Obj *>(mem)->~Obj(); }
 
 public:
@@ -282,7 +282,7 @@ private:
 
     // Unusable object reuse support: Do nothing.
     template <typename Obj>
-    static constexpr void ReuseInl(void *mem, ...) {  }
+    static void ReuseInl(void *mem, ...) {  }
 
 public:
     // Object pool reflection support.
@@ -384,9 +384,9 @@ private:
     }
 
     template <typename Obj>
-    static constexpr void SetTypedObjPoolInl(void *mem,
-                                        LLBC_TypedObjPool<Obj> *objPool,
-                                        ...) {  }
+    static void SetTypedObjPoolInl(void *mem,
+                                   LLBC_TypedObjPool<Obj> *objPool,
+                                   ...) {  }
 
 public:
     // GetStripeCapacity.
@@ -432,7 +432,7 @@ private:
     }
 
     template <typename Obj>
-    static constexpr void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool, ...)
+    static void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool, ...)
     {
         // Do nothing.
     }
