@@ -993,7 +993,7 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
 {
     const auto it = std::find_if(_typedObjPools.begin(),
                                  _typedObjPools.end(),
-                                 [orderedDelNode](const auto &item) {
+                                 [orderedDelNode](const std::pair<const char *, _WrappedTypedObjPool *> &item) {
         return orderedDelNode->GetName() == item.first;
     });
 

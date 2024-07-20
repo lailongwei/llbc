@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objPool/ObjPool.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
 
