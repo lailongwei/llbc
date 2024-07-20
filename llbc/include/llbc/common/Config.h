@@ -102,7 +102,7 @@
 #endif
 // Minimum stack size.
 #define LLBC_CFG_THREAD_MINIMUM_STACK_SIZE                  (2 * 1024 * 1024)
-// Message block default size.
+// Message stripe default size.
 #define LLBC_CFG_THREAD_MSG_BLOCK_DFT_SIZE                  (256)
 // If you want debug guardians, enable this config option.
 #define LLBC_CFG_THREAD_GUARD_DEBUG                         0
@@ -167,7 +167,7 @@
 #define LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE                   0
 // Default log config item not config use default or root config(root/default).
 #define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
-// Log data object pool units size per block.
+// Log data object pool units size per stripe.
 #define LLBC_CFG_LOG_LOG_DATA_OBJPOOL_UNIT_SIZE_PER_BLOCK   512
 
 /**
@@ -181,28 +181,19 @@
 /**
 * \brief core/objectpool about configs.
 */
-// Object pool per-block units number define.
-#define LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER        64
-// Object pool statistic top N limit define.
-#define LLBC_CFG_CORE_OBJECT_POOL_STAT_TOP_N                15
-// Object pool memory allign config.
-#if LLBC_64BIT_PROCESSOR
- #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             8
-#else
- #define LLBC_CFG_CORE_OBJECT_POOL_MEMORY_ALIGN             4
-#endif
+// Object pool object magic number.
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER              0xabcd
+// Object pool stripe capacity.
+#define LLBC_CFG_CORE_OBJPOOL_STRIPE_CAPACITY               1024
 // Object pool debug option.
-#define LLBC_CFG_CORE_OBJECT_POOL_DEBUG                     1
+#define LLBC_CFG_CORE_OBJPOOL_DEBUG                         1
 // Object reset match methods control.
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_clear      1
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Clear      1
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reset      1
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reset      1
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_reuse      1
-#define LLBC_CFG_CORE_OBJECT_POOL_RESETOBJ_MATCH_Reuse      1
-// Some llbc framework types object pool units number define.
-#define LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER        256 // LLBC_Packet
-#define LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER 256 // LLBC_MessageBlock
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_clear    1
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Clear    1
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reset    1
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reset    1
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reuse    1
+#define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reuse    1
 
 /**
  * \brief ObjBase about configs.
@@ -248,7 +239,7 @@
 //   but once you turn on this option, your server memory will be streteched very large.
 // - if enabled, LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE will no effect.
 #define LLBC_CFG_COMM_SESSION_RECV_BUF_USE_OBJ_POOL         0
-// Message buffer element(block) allow resize limit.
+// Message buffer element(stripe) allow resize limit.
 #define LLBC_CFG_COMM_MSG_BUFFER_ELEM_RESIZE_LIMIT          (8 * 1024)
 // Default service FPS value.
 #define LLBC_CFG_COMM_DFT_SERVICE_FPS                       200

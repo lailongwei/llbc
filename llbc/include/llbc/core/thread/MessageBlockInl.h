@@ -27,11 +27,14 @@ inline LLBC_MessageBlock::LLBC_MessageBlock(size_t size)
 : _attach(false)
 , _buf(nullptr)
 , _size(size)
+
 , _readPos(0)
 , _writePos(0)
+
 , _prev(nullptr)
 , _next(nullptr)
-, _poolInst(nullptr)
+
+, _typedObjPool(nullptr)
 {
     if (LIKELY(size > 0))
         _buf = LLBC_Malloc(char, size);
@@ -41,12 +44,14 @@ inline LLBC_MessageBlock::LLBC_MessageBlock(void *buf, size_t size, bool attach)
 : _attach(attach)
 , _buf(reinterpret_cast<char *>(buf))
 , _size(size)
+
 , _readPos(0)
 , _writePos(0)
+
 , _prev(nullptr)
 , _next(nullptr)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -123,21 +128,6 @@ inline void LLBC_MessageBlock::Release()
     _readPos = _writePos = 0;
 }
 
-inline void LLBC_MessageBlock::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-{
-    _poolInst = &poolInst;
-}
-
-inline LLBC_IObjectPoolInst * LLBC_MessageBlock::GetPoolInst()
-{
-    return _poolInst;
-}
-
-inline size_t LLBC_MessageBlock::GetPoolInstPerBlockUnitsNum()
-{
-    return LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER;
-}
-
 inline void LLBC_MessageBlock::Clear()
 {
     _readPos = _writePos = 0;
@@ -149,6 +139,16 @@ inline void LLBC_MessageBlock::Clear()
     }
 
     _prev = _next = nullptr;
+}
+
+inline LLBC_TypedObjPool<LLBC_MessageBlock> *LLBC_MessageBlock::GetTypedObjPool() const
+{
+    return _typedObjPool;
+}
+
+inline void LLBC_MessageBlock::SetTypedObjPool(LLBC_TypedObjPool<LLBC_MessageBlock> *typedObjPool)
+{
+    _typedObjPool = typedObjPool;
 }
 
 inline bool LLBC_MessageBlock::IsAttach() const

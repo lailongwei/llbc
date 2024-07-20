@@ -60,15 +60,9 @@ int __LLBC_CoreStartup()
     tls->objbaseTls.poolStack = new LLBC_AutoReleasePoolStack;
     new LLBC_NS LLBC_AutoReleasePool;
 
-    // Set entry thread object pool.
-    if (LLBC_ThreadObjectPoolMgr::CreateEntryThreadObjectPools() != LLBC_OK)
+    // Initialize thread-spec object pool.
+    if (LLBC_ThreadSpecObjPool::Initialize() != LLBC_OK)
         return LLBC_FAILED;
-
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_LogData>());
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_MessageBlock>());
-    // Add all framework internal implemented object pool factories.
-    LLBC_IObjectPool::RegisterPoolInstFactory(new LLBC_MessageBlockObjectPoolInstFactory());
 
     return LLBC_OK;
 }
@@ -83,10 +77,8 @@ void __LLBC_CoreCleanup()
     if (tls->objbaseTls.poolStack)
         reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)->Purge();
 
-    // Destroy entry thread object pool.
-    (void)LLBC_ThreadObjectPoolMgr::DestroyEntryThreadObjectPools();
-    // Destroy all object pool instance factories.
-    LLBC_IObjectPool::DestroyAllPoolInstFactories();
+    // Finalize thread-spec object pool.
+    LLBC_ThreadSpecObjPool::Finalize();
 
     // Destroy entry thread auto-release pool stack.
     if (tls->objbaseTls.poolStack)

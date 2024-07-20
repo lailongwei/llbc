@@ -85,7 +85,7 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream()
 , _endian(LLBC_DefaultEndian)
 , _attach(false)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -98,7 +98,7 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(size_t cap)
 , _endian(LLBC_DefaultEndian)
 , _attach(false)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -111,8 +111,8 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
 , _endian(rhs._endian)
 , _attach(rhs._attach)
 
-// !!! rhs._poolInst not allow move.
-, _poolInst(nullptr)
+// !!! rhs._typedObjPool not allow move.
+, _typedObjPool(nullptr)
 {
     rhs._buf = nullptr;
     rhs._readPos = 0;
@@ -123,8 +123,8 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
     // rhs._endian = LLBC_DefaultEndian;
     rhs._attach = false;
 
-    // !!! rhs._poolInst not allow move.
-    // rhs._poolInst = nullptr;
+    // !!! rhs._typedObjPool not allow move.
+    // rhs._typedObjPool = nullptr;
 }
 
 LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
@@ -136,7 +136,7 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(const LLBC_Stream &rhs, bool attach)
 , _endian(LLBC_DefaultEndian)
 , _attach(false)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
     attach ? Attach(rhs) : Assign(rhs);
 }
@@ -150,7 +150,7 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(void *buf, size_t size, bool attach)
 , _endian(LLBC_DefaultEndian)
 , _attach(false)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
     attach ? Attach(buf, size) : Assign(buf, size);
 }
@@ -1271,14 +1271,14 @@ LLBC_FORCE_INLINE void LLBC_Stream::Clear()
     }
 }
 
-LLBC_FORCE_INLINE void LLBC_Stream::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+LLBC_FORCE_INLINE LLBC_TypedObjPool<LLBC_Stream> *LLBC_Stream::GetTypedObjPool() const
 {
-    _poolInst = &poolInst;
+    return _typedObjPool;
 }
 
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Stream::GetPoolInst()
+LLBC_FORCE_INLINE void LLBC_Stream::SetTypedObjPool(LLBC_TypedObjPool<LLBC_Stream> *typedObjPool)
 {
-    return _poolInst;
+    _typedObjPool = typedObjPool;
 }
 
 LLBC_FORCE_INLINE LLBC_String LLBC_Stream::ToString() const
@@ -1311,8 +1311,8 @@ LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs)
     _cap = rhs._cap;
     _endian = rhs._endian;
     _attach = rhs._attach;
-    // !!! rhs._poolInst not allow move.
-    // _poolInst = rhs._poolInst;
+    // !!! rhs._typedObjPool not allow move.
+    // _typedObjPool = rhs._typedObjPool;
 
     rhs._buf = nullptr;
     rhs._readPos = 0;

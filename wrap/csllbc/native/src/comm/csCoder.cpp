@@ -46,6 +46,13 @@ csllbc_Coder::PacketDecodeDelegates *csllbc_Coder::GetDecodeDelegates()
     return _decodeDelegs;
 }
 
+void csllbc_Coder::Reuse()
+{
+    _packetId = 0;
+    _encodeDeleg = nullptr;
+    _decodeDelegs = nullptr;
+}
+
 bool csllbc_Coder::Encode(LLBC_Packet &packet)
 {
     // Call csharp managed encode delegate to encode data.
@@ -95,13 +102,6 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
     free(decodeRet);
 
     return false;
-}
-
-void csllbc_Coder::Reuse()
-{
-    _packetId = 0;
-    _encodeDeleg = nullptr;
-    _decodeDelegs = nullptr;
 }
 
 LLBC_Coder *csllbc_CoderFactory::Create() const

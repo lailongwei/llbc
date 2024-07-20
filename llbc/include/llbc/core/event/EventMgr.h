@@ -122,7 +122,7 @@ public:
      * @param[in] evId - the event id.
      * @return LLBC_EventFirer & - the event firer object.
      */
-    LLBC_EventFirer &BeginFire(int evId);
+    LLBC_EventFirer BeginFire(int evId);
 
     /**
      * Check event manager is firing or not.

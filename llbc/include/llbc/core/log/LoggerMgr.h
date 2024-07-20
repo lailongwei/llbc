@@ -225,7 +225,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
  * @param[in] level      - log level.
  */
 #define LJLOG(loggerName, tag, level)                    \
-        (*(new LLBC_NS LLBC_LogJsonMsg(                  \
+    (LLBC_NS LLBC_LogJsonMsg(                            \
                    LIKELY(LLBC_LoggerMgrSingleton->IsInited()) ? \
                         (loggerName != nullptr ?         \
                             LLBC_LoggerMgrSingleton->GetLogger(loggerName) : \
@@ -234,7 +234,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
                    level,                                \
                    __FILE__,                             \
                    __LINE__,                             \
-                   __FUNCTION__)))                       \
+                   __FUNCTION__))                        \
 
 #define LJLOG_DEBUG() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug)
 #define LJLOG_DEBUG2(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug)

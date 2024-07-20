@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/objectpool/PoolObject.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 __LLBC_NS_BEGIN
 class LLBC_Variant;
@@ -35,13 +35,16 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event firer class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventFirer : public LLBC_PoolObject
+class LLBC_EXPORT LLBC_EventFirer final
 {
-public:
     /**
-     * Ctor&Dtor.
+     * Ctor & Dtor.
      */
-    LLBC_EventFirer();
+private:
+    LLBC_EventFirer(LLBC_EventMgr *evMgr, LLBC_Event *ev);
+public:
+    LLBC_EventFirer(const LLBC_EventFirer &other);
+    LLBC_EventFirer(LLBC_EventFirer &&other);
     ~LLBC_EventFirer();
 
 public:
@@ -61,32 +64,16 @@ public:
     void Fire();
 
 public:
-    /**
-     * Object-Pool reflection support: clear firer object.
-     */
-    virtual void Reuse() override;
-
-    /**
-     * Object-Pool reflection support: pool instance create event callback.
-     */
-    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
-
-private:
-    /**
-     * @brief Set event info to firer.
-     * @param[in] ev    - the event object.
-     * @param[in] evMgr - the event manager.
-     */
-    void SetEventInfo(LLBC_Event *ev, LLBC_EventMgr *evMgr);
-
-    LLBC_DISABLE_ASSIGNMENT(LLBC_EventFirer);
+    // Copy assignment & Move assignment.
+    LLBC_EventFirer &operator=(const LLBC_EventFirer &other);
+    LLBC_EventFirer &operator=(LLBC_EventFirer &&other);
 
 private:
     friend class LLBC_EventMgr;
 
 private:
-    LLBC_Event *_ev;
     LLBC_EventMgr *_evMgr;
+    mutable LLBC_Event *_ev;
 };
 
 __LLBC_NS_END

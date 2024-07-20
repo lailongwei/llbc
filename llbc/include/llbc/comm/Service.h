@@ -601,9 +601,9 @@ public:
     /**
      * Begin fire event(asynchronous operation).
      * @param[in] eventId - the event id.
-     * @return LLBC_Event & - the event firer object. 
+     * @return LLBC_ServiceEventFirer - the event firer object. 
      */
-    virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId) = 0;
+    virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId) = 0;
 
     /**
      * Add component event into service. Operated in the next service drive loop.
@@ -646,28 +646,16 @@ public:
 
 public:
     /**
-     * Get service safe object pool.
-     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
+     * Get service thread-safe object pool.
+     * @return LLBC_ObjPool & - the service thread-safe object pool.
      */
-    virtual LLBC_SafeObjectPool &GetSafeObjectPool() = 0;
+    virtual LLBC_ObjPool &GetThreadSafeObjPool() = 0;
 
     /**
-     * Get service unsafe object pool.
-     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
+     * Get service thread-unsafe object pool.
+     * @return LLBC_ObjPool & - the service thread-unsafe object pool.
      */
-    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool() = 0;
-
-    /**
-     * Get service packet object pool(thread safe).
-     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
-     */
-    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool() = 0;
-
-    /**
-     * Get message block object pool(thread safe).
-     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
-     */
-    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool() = 0;
+    virtual LLBC_ObjPool &GetThreadUnsafeObjPool() = 0;
 
 public:
     /**
@@ -764,9 +752,6 @@ protected:
     virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory) = 0;
     virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId) = 0;
     virtual void RemoveSessionProtocolFactory(int sessionId) = 0;
-
-protected:
-    void SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev); 
 };
 
 __LLBC_NS_END

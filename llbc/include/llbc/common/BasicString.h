@@ -395,6 +395,12 @@ public:
         return _Base::at(off);
     }
 
+    // clear
+    void clear()
+    {
+        _Base::clear();
+    }
+
     // resize
     void resize(size_type count)
     {

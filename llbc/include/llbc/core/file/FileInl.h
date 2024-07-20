@@ -224,9 +224,8 @@ typename std::enable_if<LLBC_IsTemplSpec<StrType, std::basic_string>::value ||
                         LLBC_IsTemplSpec<StrType, LLBC_BasicCString>::value, int>::type
 LLBC_File::Write(const StrType &str)
 {
-    const sint64 strByteSize =
-        static_cast<sint64>(str.size() * sizeof(typename StrType::value_type));
-    return Write(str.data(), strByteSize) != strByteSize ? LLBC_FAILED : LLBC_OK;
+    const size_t strByteSize = str.size() * sizeof(typename StrType::value_type);
+    return Write(str.data(), strByteSize) != static_cast<sint64>(strByteSize) ? LLBC_FAILED : LLBC_OK;
 }
 
 inline sint64 LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)

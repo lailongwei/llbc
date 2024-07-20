@@ -19,25 +19,35 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
+#include "llbc.h"
+using namespace llbc;
 
-#include "llbc/core/objectpool/ObjectPoolStat.h"
-
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st)
+class TestCase_Core_ObjPool : public LLBC_BaseTestCase
 {
-    o << st.ToString();
-    return o;
-}
+public:
+    TestCase_Core_ObjPool() = default;
+    ~TestCase_Core_ObjPool() override = default;
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st)
-{
-    o << st.ToString();
-    return o;
-}
+public:
+    int Run(int argc, char *argv[]);
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st)
-{
-    o << st.ToString();
-    return o;
-}
+    int BaseTest();
+    int AcquireTest();
+    int ComplexAcquireTest();
+    int StatTest();
+    int ReflectTest();
+    int MemoryLeakTest();
+    int MultiThreadThread();
+    int PerfTest();
+    int OrderedDeleteTest();
+    int GuardedPoolObjTest();
+    int LibSupportedObjPoolClassesTest();
+    int CommonClassTest_Stream();
+
+    template <typename Obj>
+    static void RandAllocAndRelease(LLBC_ObjPool &objPool,
+                                    const std::pair<int, int> allocRange,
+                                    const std::pair<int, int> &releaseRange);
+};

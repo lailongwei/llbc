@@ -107,10 +107,8 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
     desc.append_format("  timer info: \n");
     desc.append_format("    strict timer schedule: %s\n", LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE ? "true" : "false");
-    desc.append_format("  objectpool info: \n");
-    desc.append_format("    object pool per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_BLOCK_UNITS_NUMBER);
-    desc.append_format("    framework type[LLBC_Packet] per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER);
-    desc.append_format("    framework type[LLBC_MessageBlock] per-block units number: %d\n", LLBC_CFG_CORE_OBJECT_POOL_MESSAGE_BLOCK_UNITS_NUMBER);
+    desc.append_format("  object pool info: \n");
+    desc.append_format("    object pool stripe capacity: %d\n", LLBC_CFG_CORE_OBJPOOL_STRIPE_CAPACITY);
 
     // Append communication info.
     desc.append_format("communication info: \n");

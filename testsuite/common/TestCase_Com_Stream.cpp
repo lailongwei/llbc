@@ -240,6 +240,10 @@ int TestCase_Com_Stream::BasicTest()
 {
     LLBC_PrintLn("BasicTest:");
 
+    ASSERT(LLBC_ObjReflector::IsSupportedObjPoolReflection<LLBC_Stream>());
+    LLBC_PrintLn("- LLBC_Stream supported objpool reflection?:%d",
+                 LLBC_ObjReflector::IsSupportedObjPoolReflection<LLBC_Stream>());
+
     LLBC_Stream stream1;
     LLBC_PrintLn("- Default stream:%s", stream1.ToString().c_str());
 

@@ -99,7 +99,8 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Stream;
-class LLBC_IObjectPoolInst;
+template <typename Obj>
+class LLBC_TypedObjPool;
 
 __LLBC_NS_END
 
@@ -956,14 +957,10 @@ public:
 
 public:
     /**
-     * Object-Pool reflection support: Mark pool object.
+     * Object-Pool reflection support.
      */
-    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Get pool instance.
-     */
-    LLBC_IObjectPoolInst *GetPoolInst();
+    LLBC_TypedObjPool<LLBC_Stream> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_Stream> *typedObjPool);
 
     /**
      * Get stream string representation.
@@ -994,7 +991,7 @@ private:
     int _endian;
     bool _attach;
 
-    LLBC_IObjectPoolInst *_poolInst;
+    LLBC_TypedObjPool<LLBC_Stream> *_typedObjPool;
 };
 
 __LLBC_NS_END

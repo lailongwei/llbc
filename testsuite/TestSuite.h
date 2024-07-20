@@ -71,10 +71,7 @@
 #include "core/objbase/TestCase_ObjBase_Object.h"
 #include "core/objbase/TestCase_ObjBase_Array.h"
 #include "core/objbase/TestCase_ObjBase_Dictionary.h"
-#include "core/objectpool/TestCase_Core_ObjectPool.h"
-#include "core/objectpool/TestCase_Core_Recycle.h"
-#include "core/objectpool/TestCase_Core_ObjectGuard.h"
-
+#include "core/objpool/TestCase_Core_ObjPool.h"
 #include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"
 #include "comm/TestCase_Comm_PacketOp.h"

@@ -491,10 +491,15 @@ project "pyllbc"
     filter {}
 
     -- link cpython lib.
-    local py_ver_str = os_capture('python --version')
-    local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    -- local py_ver_str = os_capture('python --version')
+    -- local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    local cpython_readme_file = io.open(llbc_py_wrap_path .. '/cpython/README', 'r')
+    local py_ver_str = cpython_readme_file:read()
+    cpython_readme_file:close()
+    local py_ver_match_str = '(.*)(%d+).(%d+).(%d+).*'
     local py_major_ver = string.gsub(py_ver_str, py_ver_match_str, '%2')
     local py_minor_ver = string.gsub(py_ver_str, py_ver_match_str, '%3')
+
     filter { "system:windows", "configurations:debug*" }
         links { string.format("python%s%s_d", py_major_ver, py_minor_ver) }
     filter { "system:windows", "configurations:release*" }

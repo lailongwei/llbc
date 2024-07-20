@@ -22,8 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objectpool/ObjectPool.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageBuffer.h"

@@ -29,7 +29,8 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
-class LLBC_IObjectPoolInst;
+template <typename Obj>
+class LLBC_TypedObjPool;
 
 __LLBC_NS_END
 
@@ -69,30 +70,17 @@ public:
 
 public:
     /**
-     * Object pool support method.
+     * Object pool support methods.
      */
-    void Clear();
-
-    /**
-     * Object pool support method.
-     */
-    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object pool support method.
-     */
-    LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object pool support method.
-     */
-    size_t GetPoolInstPerBlockUnitsNum();
+    void Reuse();
+    LLBC_TypedObjPool<LLBC_LogData> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool);
 
     // Disable log data assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_LogData);
 
 private:
-    LLBC_IObjectPoolInst *_poolInst;
+    LLBC_TypedObjPool<LLBC_LogData> *_typedObjPool;
 };
 
 __LLBC_NS_END

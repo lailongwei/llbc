@@ -26,15 +26,62 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_EventFirer::LLBC_EventFirer()
-: _ev(nullptr)
-, _evMgr(nullptr)
+inline LLBC_EventFirer::LLBC_EventFirer(LLBC_EventMgr *evMgr, LLBC_Event *ev)
+: _evMgr(evMgr)
+, _ev(ev)
 {
+}
+
+inline LLBC_EventFirer::LLBC_EventFirer(const LLBC_EventFirer &other)
+: _evMgr(other._evMgr)
+, _ev(other._ev)
+{
+    other._ev = nullptr;
+}
+
+inline LLBC_EventFirer::LLBC_EventFirer(LLBC_EventFirer &&other)
+: _evMgr(other._evMgr)
+, _ev(other._ev)
+{
+    other._ev = nullptr;
+}
+
+inline LLBC_EventFirer & LLBC_EventFirer::operator=(const LLBC_EventFirer &other)
+{
+    if (UNLIKELY(&other == this))
+        return *this;
+
+    if (UNLIKELY(_ev))
+        LLBC_Recycle(_ev);
+
+    _evMgr = other._evMgr;
+    _ev = other._ev;
+
+    other._ev = nullptr;
+
+    return *this;
+}
+
+inline LLBC_EventFirer & LLBC_EventFirer::operator=(LLBC_EventFirer &&other)
+{
+    if (UNLIKELY(&other == this))
+        return *this;
+
+    if (UNLIKELY(_ev))
+        LLBC_Recycle(_ev);
+
+    _evMgr = other._evMgr;
+    _ev = other._ev;
+
+    other._ev = nullptr;
+
+    return *this;
 }
 
 inline LLBC_EventFirer::~LLBC_EventFirer()
 {
-    Reuse();
+    if (_ev)
+        LLBC_Recycle(_ev);
 }
 
 template <typename KeyType, typename ParamType>
@@ -46,34 +93,11 @@ LLBC_EventFirer &LLBC_EventFirer::SetParam(const KeyType &paramKey, const ParamT
 
 inline void LLBC_EventFirer::Fire()
 {
-    _evMgr->Fire(_ev);
-    _ev = nullptr;
-    _evMgr = nullptr;
-
-    LLBC_Recycle(this);
-}
-
-inline void LLBC_EventFirer::Reuse()
-{
-    if (_ev)
+    if (LIKELY(_ev))
     {
-        LLBC_Recycle(_ev);
+        _evMgr->Fire(_ev);
         _ev = nullptr;
-        _evMgr = nullptr;
     }
-}
-
-inline void LLBC_EventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
-{
-    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(
-        typeid(LLBC_EventFirer).name(), typeid(LLBC_Event).name());
-}
-
-inline void LLBC_EventFirer::SetEventInfo(LLBC_Event *ev, LLBC_EventMgr *evMgr)
-{
-    _ev = ev;
-    _evMgr = evMgr;
 }
 
 __LLBC_NS_END

@@ -25,12 +25,6 @@
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static const char *__g_msgBlockTypeName = typeid(LLBC_NS LLBC_MessageBlock).name();
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 LLBC_Packet::LLBC_Packet()
@@ -54,8 +48,7 @@ LLBC_Packet::LLBC_Packet()
 
 , _payload(nullptr)
 
-, _selfPoolInst(nullptr)
-, _msgBlockPoolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -75,27 +68,6 @@ void LLBC_Packet::SetPayloadDeleteDeleg(const LLBC_Delegate<void(LLBC_MessageBlo
     _payloadDeleteDeleg = deleg;
 }
 
-void LLBC_Packet::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-{
-    _selfPoolInst = &poolInst;
-    _msgBlockPoolInst = poolInst.GetIObjectPool()->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
-}
-
-size_t LLBC_Packet::GetPoolInstPerBlockUnitsNum()
-{
-    return LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER;
-}
-
-void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
-{
-    // Set delete order.
-    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_Packet).name(), LLBC_INL_NS __g_msgBlockTypeName);
-
-    // Force create dependent pool instances(MessageBlock/...)
-    (void)objPool->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
-}
-
 void LLBC_Packet::Clear()
 {
     // Clear payload.
@@ -108,10 +80,10 @@ void LLBC_Packet::Clear()
         }
         else
         {
-            LLBC_IObjectPoolInst *payloadPoolInst = _payload->GetPoolInst();
-            if (payloadPoolInst)
+            LLBC_TypedObjPool<LLBC_MessageBlock> *payloadObjPool = _payload->GetTypedObjPool();
+            if (payloadObjPool)
             {
-                payloadPoolInst->Release(_payload);
+                payloadObjPool->Release(_payload);
                 _payload = nullptr;
             }
             else
@@ -144,6 +116,22 @@ void LLBC_Packet::Clear()
 
     // Clear pre-handle result.
     CleanupPreHandleResult();
+}
+
+LLBC_TypedObjPool<LLBC_Packet> *LLBC_Packet::GetTypedObjPool() const
+{
+    return _typedObjPool;
+}
+
+void LLBC_Packet::SetTypedObjPool(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool)
+{
+    _typedObjPool = typedObjPool;
+}
+
+void LLBC_Packet::OnTypedObjPoolCreated(LLBC_ObjPool *objPool)
+{
+    // Set delete order: LLBC_Packet <- LLBC_MessageBlock.
+    objPool->EnsureDeletionBefore<LLBC_Packet, LLBC_MessageBlock>();
 }
 
 LLBC_Coder *LLBC_Packet::GetEncoder() const
@@ -194,8 +182,8 @@ bool LLBC_Packet::Encode()
 {
     if (_encoder)
     {
-        if (!_payload && _msgBlockPoolInst)
-            _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+        if (!_payload && _typedObjPool)
+            _payload = _typedObjPool->GetObjPool()->Acquire<LLBC_MessageBlock>();
 
         if (!_encoder->Encode(*this))
             return false;

@@ -28,7 +28,9 @@ __LLBC_NS_BEGIN
 /**
  * \brief The heap template class encapsulation.
  */
-template <typename T, class Container = std::vector<T>, class Compare = std::less<typename Container::value_type>>
+template <typename T,
+          typename Container = std::vector<T>,
+          typename Compare = std::less<typename Container::value_type>>
 class LLBC_Heap : public std::priority_queue<T, Container, Compare>
 {
 public:

@@ -177,10 +177,10 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
 
 LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
 {
-    size_type erasedCount = 0;
     if (UNLIKELY(o == nullptr))
-        return erasedCount;
+        return 0;
 
+    size_type erasedCount = 0;
     for (difference_type i = _size - 1; i >= 0; --i)
     {
         if (_objs[i] == o)

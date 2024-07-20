@@ -55,12 +55,12 @@ void csllbc_Timer_Cancel(csllbc_Timer *timer)
 
 uint64 csllbc_Timer_GetDueTime(csllbc_Timer *timer)
 {
-    return timer->GetDueTime();
+    return timer->GetDueTime().GetTotalMillis();
 }
 
 uint64 csllbc_Timer_GetPeriod(csllbc_Timer *timer)
 {
-    return timer->GetPeriod();
+    return timer->GetPeriod().GetTotalMillis();
 }
 
 uint64 csllbc_Timer_GetTimerId(csllbc_Timer *timer)

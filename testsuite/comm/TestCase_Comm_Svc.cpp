@@ -98,7 +98,7 @@ public:
         }
 
         // LLBC_Packet *resPacket = new LLBC_Packet;
-        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
+        LLBC_Packet *resPacket = GetService()->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
         resPacket->SetHeader(packet.GetSessionId(), OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
@@ -221,7 +221,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
             memset(data, 1, dataSize);
 
             // LLBC_Packet *packet = new LLBC_Packet;
-            LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();
+            LLBC_Packet *packet = svc->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
             packet->SetHeader(sessionId, OPCODE, 0);
             packet->Write(data, dataSize);
 
@@ -231,7 +231,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
             // Test unhandled packet(unsubscribe opcode).
             // LLBC_Packet *unhandledPacket = new LLBC_Packet;
-            LLBC_Packet *unhandledPacket = svc->GetPacketObjectPool().GetObject();
+            LLBC_Packet *unhandledPacket = svc->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
             unhandledPacket->SetHeader(sessionId, OPCODE + 10000, 0);
             unhandledPacket->Write("Hello World", 12);
 

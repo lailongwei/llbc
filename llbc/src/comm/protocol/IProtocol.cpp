@@ -37,7 +37,7 @@ LLBC_IProtocol::LLBC_IProtocol()
 , _svc(nullptr)
 , _filter(nullptr)
 , _coders(nullptr)
-, _pktPoolInst(nullptr)
+, _pktObjPool(nullptr)
 {
 }
 
@@ -87,7 +87,7 @@ void LLBC_IProtocol::SetStack(LLBC_ProtocolStack *stack)
 {
     _stack = stack;
     _svc = _stack->GetService();
-    _pktPoolInst = &_svc->GetPacketObjectPool();
+    _pktObjPool = _svc->GetThreadSafeObjPool().GetTypedObjPool<LLBC_Packet>();
 }
 
 void LLBC_IProtocol::SetFilter(LLBC_IProtocolFilter *filter)

@@ -19,11 +19,51 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objectpool/ObjectPool.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 __LLBC_NS_BEGIN
+int LLBC_ThreadSpecObjPool::Initialize()
+{
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (!libTls->coreTls.entryThread)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
 
+    if (libTls->coreTls.safeObjPool ||
+        libTls->coreTls.unsafeObjPool)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    libTls->coreTls.safeObjPool = new LLBC_ObjPool(true);
+    libTls->coreTls.unsafeObjPool = new LLBC_ObjPool(false);
+
+    return LLBC_OK;
+}
+
+void LLBC_ThreadSpecObjPool::Finalize()
+{
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (!libTls->coreTls.entryThread)
+        return;
+
+    if (libTls->coreTls.safeObjPool)
+    {
+        delete reinterpret_cast<LLBC_ObjPool *>(libTls->coreTls.safeObjPool);
+        libTls->coreTls.safeObjPool = nullptr;
+    }
+
+    if (libTls->coreTls.unsafeObjPool)
+    {
+        delete reinterpret_cast<LLBC_ObjPool *>(libTls->coreTls.unsafeObjPool);
+        libTls->coreTls.unsafeObjPool = nullptr;
+    }
+}
 __LLBC_NS_END

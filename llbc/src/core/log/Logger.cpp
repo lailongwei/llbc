@@ -54,7 +54,7 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
-, _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
+, _logDataTypedObjPool(*_objPool.GetTypedObjPool<LLBC_LogData>())
 , _hookDelegs()
 {
 }
@@ -329,7 +329,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     if (UNLIKELY(len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)))
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
     if (UNLIKELY(data->msgCap < len + 1))
     {
         data->msgCap = MAX(len + 1, 192);
@@ -377,7 +377,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
         msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1;
 
     // Alloc new LogData, and adjust message capacity.
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
     const int msgCap = MAX(static_cast<int>(msgLen) + 1, 192);
     if (data->msgCap < msgCap)
     {
