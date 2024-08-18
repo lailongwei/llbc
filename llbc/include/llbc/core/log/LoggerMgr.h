@@ -166,7 +166,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
                 __l__ = __loggerMgr__->GetRootLogger();   \
             }                                             \
                                                           \
-            if (level < __l__->GetLogLevel())             \
+            if ((level) < __l__->GetLogLevel())           \
                 break;                                    \
                                                           \
             __l__->Output(level,                          \
