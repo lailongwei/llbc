@@ -441,14 +441,7 @@ public:
     // Recycle object.
     template <typename Obj>
     static
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
-    Recycle(Obj *obj);
-
-    template <typename Obj>
-    static
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                                LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(),
-                            void>::type
+    typename std::enable_if<LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(), void>::type
     Recycle(Obj *obj);
 
     template <typename Obj>

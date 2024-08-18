@@ -56,24 +56,11 @@
 __LLBC_NS_BEGIN
 
 template <typename Obj>
-typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+typename std::enable_if<LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(), void>::type
 LLBC_ObjReflector::Recycle(Obj *obj)
 {
     LLBC_TypedObjPool<Obj> *typedObjPool =
         reinterpret_cast<LLBC_TypedObjPool<Obj> *>(obj->GetTypedObjPool());
-    if (typedObjPool)
-        typedObjPool->Release(obj);
-    else
-        delete obj;
-}
-
-template <typename Obj>
-typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                            LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(),
-                        void>::type
-LLBC_ObjReflector::Recycle(Obj *obj)
-{
-    LLBC_TypedObjPool<Obj> *typedObjPool = obj->GetTypedObjPool();
     if (typedObjPool)
         typedObjPool->Release(obj);
     else
