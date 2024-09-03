@@ -54,6 +54,7 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
+, _objPool(true)
 , _logDataTypedObjPool(*_objPool.GetTypedObjPool<LLBC_LogData>())
 , _hookDelegs()
 {
@@ -101,7 +102,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetConsoleLogLevel();
+        appenderInitInfo.logLevel = _config->GetConsoleLogLevel();
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
 
@@ -122,7 +123,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     if (_config->IsLogToFile())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetFileLogLevel();
+        appenderInitInfo.logLevel = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
         appenderInitInfo.filePath = _config->GetLogFile();
         appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
@@ -194,6 +195,54 @@ void LLBC_Logger::Finalize()
 
     // Clear non-runnable data members.
     ClearNonRunnableMembers(false);
+}
+
+int LLBC_Logger::SetAppenderLogLevel(int appenderType, int logLevel)
+{
+    // Argument check.
+    if (!LLBC_LogAppenderType::IsValid(appenderType))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+    if (!LLBC_LogLevel::IsValid(logLevel) && logLevel != LLBC_LogLevel::End)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    // Logger inited check.
+    LLBC_LockGuard guard(_lock);
+    if (!IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Find appender.
+    LLBC_ILogAppender *appender = _appenders;
+    while (appender && appender->GetType() != appenderType)
+        appender = appender->GetAppenderNext();
+
+    if (!appender)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // Set appender log level.
+    appender->SetLogLevel(logLevel);
+
+    // Update logger log level.
+    _logLevel = LLBC_LogLevel::End;
+    appender = _appenders;
+    while (appender)
+    {
+        _logLevel = MIN(appender->GetLogLevel(), _logLevel);
+        appender = appender->GetAppenderNext();
+    }
+
+    return LLBC_OK;
 }
 
 bool LLBC_Logger::IsTakeOver() const

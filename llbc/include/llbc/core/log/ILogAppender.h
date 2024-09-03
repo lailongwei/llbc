@@ -55,6 +55,12 @@ public:
 
         End
     };
+
+    /**
+     * Check givin appender type is valid or not.
+     * @return bool - reutrn true if valid, otherwise return false.
+     */
+    static constexpr bool IsValid(int appenderType) { return appenderType >= Begin && appenderType < End; }
 };
 
 /**
@@ -62,7 +68,7 @@ public:
  */
 struct LLBC_LogAppenderInitInfo
 {
-    int level;                      // log level.
+    int logLevel;                   // log level.
     LLBC_String pattern;            // output pattern.
     bool colourfulOutput;           // colourful output flag.
 
@@ -119,6 +125,13 @@ protected:
      * @return int - the log level.
      */
     virtual int GetLogLevel() const = 0;
+
+    /**
+     * Set log level.
+     * @param[in] logLevel - the log level, End means disable appender output.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int SetLogLevel(int logLevel) = 0;
 
     /**
      * Get current appender's token chain.

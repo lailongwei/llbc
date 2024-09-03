@@ -85,10 +85,11 @@ public:
 
     /**
      * @brief Set log level.
-     * @param[in] logLevel - the log level(End will disabled logger).
+     * @param[in] appenderType - the log appender type.
+     * @param[in] logLevel     - the log level(End will disabled logger).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetLogLevel(int logLevel);
+    int SetAppenderLogLevel(int appenderType, int logLevel);
 
     /**
      * Get logger take over option, only available on root logger.

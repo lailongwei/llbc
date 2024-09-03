@@ -21,11 +21,26 @@
 
 #pragma once
 
+#include "llbc/core/log/LogLevel.h"
+
 __LLBC_NS_BEGIN
 
 inline int LLBC_BaseLogAppender::GetLogLevel() const
 {
-    return _level;
+    return _logLevel;
+}
+
+inline int LLBC_BaseLogAppender::SetLogLevel(int logLevel)
+{
+    if (!LLBC_LogLevel::IsValid(logLevel) && logLevel != LLBC_LogLevel::End)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    _logLevel = logLevel;
+
+    return LLBC_OK;
 }
 
 inline LLBC_LogTokenChain *LLBC_BaseLogAppender::GetTokenChain() const

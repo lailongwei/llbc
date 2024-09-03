@@ -23,6 +23,8 @@
 #include "core/log/TestCase_Core_Log.h"
 #include <iomanip>
 
+#include "llbc/core/log/ILogAppender.h"
+
 TestCase_Core_Log::TestCase_Core_Log()
 {
 }
@@ -177,11 +179,14 @@ void TestCase_Core_Log::DoLogLevelSetTest()
                  testLogger->GetLoggerName().c_str(),
                  LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str());
 
-    auto testOutput = [testLogger](int logLevel) {
-        testLogger->SetLogLevel(logLevel);
-        LLBC_PrintLn(">>>>>>>> logger: %s, level: %s <<<<<<<<<",
+    auto testOutput = [testLogger](int appenderType, int logLevel) {
+        const auto ret = testLogger->SetAppenderLogLevel(appenderType, logLevel);
+        LLBC_PrintLn(">>>>>>>> logger: %s, appender:%d, level: %s, ret:%d, error:%s <<<<<<<<<",
                      testLogger->GetLoggerName().c_str(),
-                     LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str());
+                     appenderType,
+                     LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str(),
+                     ret,
+                     ret == LLBC_OK ? "Success" : LLBC_FormatLastError());
         LLOG_DEBUG2("log_level_set_test", "This is a DEBUG log");
         LLOG_TRACE2("log_level_set_test", "This is a TRACE log");
         LLOG_INFO2("log_level_set_test", "This is a INFO log");
@@ -191,13 +196,27 @@ void TestCase_Core_Log::DoLogLevelSetTest()
         LLBC_PrintLn(">>>>>>>> ****************** <<<<<<<<<");
     };
 
-    testOutput(LLBC_LogLevel::Debug);
-    testOutput(LLBC_LogLevel::Trace);
-    testOutput(LLBC_LogLevel::Info);
-    testOutput(LLBC_LogLevel::Warn);
-    testOutput(LLBC_LogLevel::Error);
-    testOutput(LLBC_LogLevel::Fatal);
-    testOutput(LLBC_LogLevel::End);
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Debug);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Debug);
+    testOutput(LLBC_LogAppenderType::Network, LLBC_LogLevel::Debug);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Trace);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Trace);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Info);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Info);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Warn);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Warn);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Error);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Error);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::Fatal);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::Fatal);
+
+    testOutput(LLBC_LogAppenderType::Console, LLBC_LogLevel::End);
+    testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::End);
 }
 
 void TestCase_Core_Log::DoJsonLogTest()

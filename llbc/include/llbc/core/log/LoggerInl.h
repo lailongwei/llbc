@@ -33,19 +33,6 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
-LLBC_FORCE_INLINE int LLBC_Logger::SetLogLevel(int logLevel)
-{
-    if (!LLBC_LogLevel::IsValid(logLevel) && logLevel != LLBC_LogLevel::End)
-    {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    _logLevel = logLevel;
-
-    return LLBC_OK;
-}
-
 LLBC_FORCE_INLINE bool LLBC_Logger::IsAddTimestampInJsonLog() const
 {
     return _addTimestampInJsonLog;
