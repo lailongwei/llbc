@@ -33,7 +33,7 @@
         <!-- 确定日志是否输出到控制台,可以的取值:true/false. -->
         <logToConsole>true</logToConsole>
         <!-- 控制台日志输出级别,如果没有配置,使用Config.h中的默认log level值(LLBC_CFG_LOG_DEFAULT_LEVEL) -->
-        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <consoleLogLevel>TRACE</consoleLogLevel>
         <!-- 确定日志控制台输出格式,格式描述如下:
                %N: 打印logger名字,对于当前配置,为root
                %e: 打印进程可执行文件名(已去除扩展名)
@@ -43,7 +43,7 @@
                %l: 打印日志的代码所在的行数.
                %t: 线程Id.
                %p: 进程Id.
-               %L: 日志模式(级别),如'DEBUG','TRACE','INFO' ...
+               %L: 日志模式(级别),如'TRACE','TRACE','INFO' ...
                %n: 换行符标记.
                %m: 打印日志消息本身.
                %T: 打印本地化时间格式的时间,如:'1970-01-01 00:00:00'.
@@ -58,7 +58,7 @@
         <!-- 确定日志是否输出到文件. -->
         <logToFile>true</logToFile>
         <!-- 文件日志输出级别,如果没有配置,使用Config.h中的默认log level值(LLBC_CFG_LOG_DEFAULT_LEVEL). -->
-        <fileLogLevel>DEBUG</fileLogLevel>
+        <fileLogLevel>TRACE</fileLogLevel>
         <!-- 日志文件所在目录:
               - 如果不配置, 将继承root(非root)或者使用"当前目录/应用程序执行文件所在目录"(这取决于forceAppLogPath配置).
               - 如果配置了相对路径, 同不配置情况类似, 将join"当前目录/应用程序执行文件所在目录"(这取决于forceAppLogPath配置).
@@ -132,9 +132,9 @@
     <deltest>
         <asynchronous>true</asynchronous>
         <logToConsole>true</logToConsole>
-        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <consoleLogLevel>TRACE</consoleLogLevel>
         <logToFile>true</logToFile>
-        <fileLogLevel>DEBUG</fileLogLevel>
+        <fileLogLevel>TRACE</fileLogLevel>
         <fileRollingMode>NoRolling</fileRollingMode>
         <maxFileSize>1KiB</maxFileSize>
         <logFile>log/%L</logFile>
@@ -146,9 +146,9 @@
         <asynchronous>false</asynchronous>
         <independentThread>true</independentThread>
         <logToConsole>true</logToConsole>
-        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <consoleLogLevel>TRACE</consoleLogLevel>
         <logToFile>true</logToFile>
-        <fileLogLevel>DEBUG</fileLogLevel>
+        <fileLogLevel>TRACE</fileLogLevel>
         <fileRollingMode>NoRolling</fileRollingMode>
         <maxFileSize>1024MB</maxFileSize>
     </log_level_set_test>
@@ -158,9 +158,9 @@
         <asynchronous>true</asynchronous>
         <independentThread>true</independentThread>
         <logToConsole>false</logToConsole>
-        <consoleLogLevel>DEBUG</consoleLogLevel>
+        <consoleLogLevel>TRACE</consoleLogLevel>
         <logToFile>true</logToFile>
-        <fileLogLevel>DEBUG</fileLogLevel>
+        <fileLogLevel>TRACE</fileLogLevel>
         <fileRollingMode>Hourly</fileRollingMode>
         <maxFileSize>2.5MB</maxFileSize>
         <maxBackupIndex>10</maxBackupIndex>

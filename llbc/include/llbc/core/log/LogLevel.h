@@ -38,8 +38,8 @@ public:
     {
         Begin,
 
-        Debug = Begin,
-        Trace,
+        Trace = Begin,
+        Debug,
         Info,
         Warn,
         Error,

@@ -24,7 +24,7 @@ namespace csllbc_testsuite
 
             ITestCase testCase = null;
             // Common testcases:
-            testCase = new TestCase_Com_LibConfig();
+            // testCase = new TestCase_Com_LibConfig();
             // testCase = new TestCase_Com_SafeConsole();
 
             // Core testcases.

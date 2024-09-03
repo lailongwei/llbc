@@ -29,8 +29,8 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_CString __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1] =
 {
-    "DEBUG",
     "TRACE",
+    "DEBUG",
     "INFO",
     "WARN",
     "ERROR",
@@ -55,10 +55,10 @@ int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
         return LLBC_LogLevel::End;
 
     const LLBC_String upperStr = LLBC_ToUpper(levelStr.c_str());
-    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
-        return LLBC_LogLevel::Debug;
-    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
+    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
         return LLBC_LogLevel::Trace;
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
+        return LLBC_LogLevel::Debug;
     else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Info] == upperStr)
         return LLBC_LogLevel::Info;
     else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Warn] == upperStr)
