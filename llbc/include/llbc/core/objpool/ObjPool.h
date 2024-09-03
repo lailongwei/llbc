@@ -441,16 +441,44 @@ public:
     // Recycle object.
     template <typename Obj>
     static
-    typename std::enable_if<LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(), void>::type
-    Recycle(Obj *obj);
+    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    Recycle(Obj *obj)
+    {
+        LLBC_TypedObjPool<Obj> *typedObjPool =
+            reinterpret_cast<LLBC_TypedObjPool<Obj> *>(obj->GetTypedObjPool());
+        if (typedObjPool)
+            typedObjPool->Release(obj);
+        else
+            delete obj;
+    }
 
     template <typename Obj>
     static
-    typename std::enable_if<!LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(), void>::type
-    Recycle(Obj *obj) { delete obj; }
+    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    Recycle(Obj *obj)
+    {
+        RecycleInl<Obj>(obj, 0);
+    }
 
     template <typename Obj>
     static void RecycleX(Obj *&obj) { if (obj) { Recycle(obj); obj = nullptr; } }
+
+private:
+    template <typename Obj>
+    static void RecycleInl(Obj *obj,
+                           object_pool_detectable_type<Obj,
+                                                       &Obj::GetTypedObjPool,
+                                                       &Obj::SetTypedObjPool> *)
+    {
+        LLBC_TypedObjPool<Obj> *typedObjPool = obj->GetTypedObjPool();
+        if (typedObjPool)
+            typedObjPool->Release(obj);
+        else
+            delete obj;
+    }
+
+    template <typename Obj>
+    static void RecycleInl(Obj *obj, ...) { delete obj; }
 };
 
 /**

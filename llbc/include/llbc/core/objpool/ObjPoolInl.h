@@ -56,18 +56,6 @@
 __LLBC_NS_BEGIN
 
 template <typename Obj>
-typename std::enable_if<LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>(), void>::type
-LLBC_ObjReflector::Recycle(Obj *obj)
-{
-    LLBC_TypedObjPool<Obj> *typedObjPool =
-        reinterpret_cast<LLBC_TypedObjPool<Obj> *>(obj->GetTypedObjPool());
-    if (typedObjPool)
-        typedObjPool->Release(obj);
-    else
-        delete obj;
-}
-
-template <typename Obj>
 LLBC_FORCE_INLINE LLBC_GuardedPoolObj<Obj>::LLBC_GuardedPoolObj(Obj *obj, LLBC_TypedObjPool<Obj> *typedObjPool)
 : _obj(obj)
 , _typedObjPool(typedObjPool)
