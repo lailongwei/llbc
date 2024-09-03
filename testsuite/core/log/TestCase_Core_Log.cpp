@@ -121,14 +121,14 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL4("test", "test_tag", "This is a fatal log message.");
 
     // Log file delete test.
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 15; ++i)
     {
         LLOG_TRACE2("deltest", "This is a deltest logger message.");
         LLBC_Sleep(800);
     }
 
     // Perform log level set test.
-    LLBC_PrintLn("Press any kty to begin log level test");
+    LLBC_PrintLn("Press any key to begin log level test");
     getchar();
     DoLogLevelSetTest();
 

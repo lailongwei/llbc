@@ -82,10 +82,10 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     // Save file appender config to members.
     _fileBasePath = initInfo.filePath;
     _fileSuffix = initInfo.fileSuffix;
-    const LLBC_String fileDir = LLBC_Directory::DirName(_fileBasePath);
-    if (!LLBC_Directory::Exists(fileDir))
+    _fileDir = LLBC_Directory::DirName(_fileBasePath);
+    if (!LLBC_Directory::Exists(_fileDir))
     {
-        if (LLBC_Directory::Create(fileDir) != LLBC_OK)
+        if (LLBC_Directory::Create(_fileDir) != LLBC_OK)
         {
             _fileSuffix.clear();
             _fileBasePath.clear();
@@ -114,6 +114,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 
 void LLBC_LogFileAppender::Finalize()
 {
+    _fileDir.clear();
     _fileBasePath.clear();
     _fileSuffix.clear();
 
@@ -284,16 +285,39 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
 
     // Reset not flush log count variables.
     _notFlushLogCount = 0;
+
     // Do reopen file.
-    if (UNLIKELY(_file.Open(newFileName, clear ? 
-        LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite) != LLBC_OK))
+    const int openMode = clear ?
+        LLBC_FileMode::BinaryWrite : LLBC_FileMode::BinaryAppendWrite;
+    int openRet = _file.Open(newFileName, openMode);
+    if (UNLIKELY(openRet != LLBC_OK))
     {
-#ifdef LLBC_DEBUG
-        traceline("LLBC_LogFileAppender::ReOpenFile(): "
-                  "Open file failed, name:%s, clear:%s, reason:%s",
-                  newFileName.c_str(), clear ? "true" : "false", LLBC_FormatLastError());
-#endif
-        return LLBC_FAILED;
+        // Maybe log directory has been deleted, try create it.
+        if (UNLIKELY(!LLBC_Directory::Exists(_fileDir)))
+        {
+            if (UNLIKELY(LLBC_Directory::Create(_fileDir) != LLBC_OK))
+            {
+                #ifdef LLBC_DEBUG
+                traceline("LLBC_LogFileAppender::ReOpenFile(): "
+                          "Recreate log directory failed, name:%s, clear:%s, reason:%s",
+                          newFileName.c_str(), clear ? "true" : "false", LLBC_FormatLastError());
+                #endif
+                return LLBC_FAILED;
+            }
+
+            // Open again.
+            openRet = _file.Open(newFileName, openMode);
+        }
+
+        if (openRet != LLBC_OK)
+        {
+            #ifdef LLBC_DEBUG
+            traceline("LLBC_LogFileAppender::ReOpenFile(): "
+                      "Open file failed, name:%s, clear:%s, reason:%s",
+                      newFileName.c_str(), clear ? "true" : "false", LLBC_FormatLastError());
+            #endif
+            return LLBC_FAILED;
+        }
     }
 
     // Update file size, buffer info.

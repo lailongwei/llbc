@@ -127,6 +127,7 @@ private:
     int GetBackupFilesCount(const LLBC_String &logFileName) const;
 
 private:
+    LLBC_String _fileDir;
     LLBC_String _fileBasePath;
     LLBC_String _fileSuffix;
 
