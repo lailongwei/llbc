@@ -43,15 +43,20 @@ int LLBC_LogEnvToken::Initialize(const LLBC_LogFormattingInfo &formatter, const 
             free(envVal);
         }
         #else // Non-Win32
-        size_t requireSize;
-        if (getenv_s(&requireSize, nullptr, 0, envName) == 0 && requireSize > 0)
-        {
-            char *envVal = LLBC_Malloc(char, requireSize);
-            LLBC_Defer(free(envVal));
+        // getenv_s() require C11 support.
+        // size_t requireSize;
+        // if (getenv_s(&requireSize, nullptr, 0, envName) == 0 && requireSize > 0)
+        // {
+        //     char *envVal = LLBC_Malloc(char, requireSize);
+        //     LLBC_Defer(free(envVal));
 
-            if (getenv_s(&requireSize, envVal, requireSize, envName) == 0 && requireSize > 0)
-                _envValue.append(envVal);
-        }
+        //     if (getenv_s(&requireSize, envVal, requireSize, envName) == 0 && requireSize > 0)
+        //         _envValue.append(envVal);
+        // }
+
+        char *envVal = getenv(envName);
+        if (envVal)
+            _envValue.append(envVal);
         #endif // Win32
     }
 
