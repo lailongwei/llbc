@@ -2,7 +2,7 @@
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
 # Version: 1.1.1
-# 2022/4/4 -
+# 2023/4/4 - 
 # 1. 重构 LLBC_Stream, 重构后: 实现读写分离 + 更强大&适配性更好的类型检测支持
 # 2. 标准化 LLBC_Service phase, 完整简化代码
 # 3. 简化 LLBC_Service Send()/Multicast()/Broadcast() 接口及实现
@@ -18,6 +18,16 @@
 # 13. 随机支持更新: mtrand实现替换为stl自带实现, 支持权值随机
 # 14. LLBC_Variant更新: 适配性加强/性能提升/序列化空间占用优化
 # 15. 其他 代码优化/性能提升/测试代码完善
+# 16. Logger完善:
+#     - 废除logLevel配置项, 只保留明确的consoleLogLevel/fileLogLevel配置来明确配置appender log level
+#     - 支持条件判断宏日志打印支持(极其方便), 如: LLBC_WarnAndReturnIf/LLBC_ErrorAndBreakIf/...
+#     - 支持环境变量pattern打印: %E{EnvName}
+#     - Debug/Trace日志级别对调, 调整后, Trace级别将是最低级别
+# 17. 完整优化LLBC_Time/LLBC_TimeSpan, 性能及接口全面优化、简化
+# 18. LLBC_Component方法收敛(感谢reckful)
+# 19. LLBC_BinaryHeap调整为使用stl::priority_queue实现(感谢reckful)
+# 20. 废除框架中旧式对象池实现, 提供全新设计及实现的对象池, 代码得到极大的简化, 同时性能得到足够的提升
+# 21. 其它杂项优化
 #
 # Version: 1.1.0
 # 2022/8 - 23/4/4
