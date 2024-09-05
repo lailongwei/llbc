@@ -291,7 +291,8 @@ public:
     
     /**
      * Read oneline data to LLBC_String object.
-     * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non-zero.
+     * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
+     *                       otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
      */
     LLBC_String ReadLine();
 

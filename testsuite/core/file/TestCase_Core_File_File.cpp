@@ -263,11 +263,17 @@ bool TestCase_Core_File_File::ReadWriteTest()
     file.WriteLine("Hello World!");
     LLBC_PrintLn("WriteLine(\"Hey, Judy!\"):");
     file.WriteLine("Hey, Judy!");
+    LLBC_PrintLn("WriteLine(\"\"):");
+    file.WriteLine("");
+    LLBC_PrintLn("Write(\"Hey, Judy too!\"):");
+    file.Write("Hey, Judy too");
 
     file.SetFilePosition(0);
     LLBC_PrintLn("Read lines:");
-    LLBC_PrintLn("First line: %s", file.ReadLine().c_str());
-    LLBC_PrintLn("Second line: %s", file.ReadLine().c_str());
+    LLBC_PrintLn("First line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Second line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Third line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Fourth line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
     const LLBC_String notExistLine = file.ReadLine();
     LLBC_PrintLn("Not exist line: %s, error: %s", notExistLine.c_str(), LLBC_FormatLastError());
 

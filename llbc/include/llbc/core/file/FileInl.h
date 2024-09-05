@@ -95,11 +95,14 @@ inline int LLBC_File::Read(ldouble &ldoubleVal)
 
 inline LLBC_String LLBC_File::ReadLine()
 {
-    LLBC_String line;
-
+    // Read line bytes.
     char ch;
+    LLBC_String line;
+    bool hasBeenRead = false;
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     while (Read(ch) != LLBC_FAILED)
     {
+        hasBeenRead = true;
         if (ch != LLBC_CR && ch != LLBC_LF)
         {
             line.append(1, ch);
@@ -119,6 +122,15 @@ inline LLBC_String LLBC_File::ReadLine()
         break;
     }
 
+    // Read first byte failed, return empty line(LLBC_GetLastError() return non LLBC_ERROR_SUCCESS).
+    if (!hasBeenRead)
+        return line;
+
+    // If read to end, set last error to SUCCESS.
+    if (LLBC_GetLastError() == LLBC_ERROR_TRUNCATED)
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Return line.
     return line;
 }
 
