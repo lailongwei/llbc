@@ -97,13 +97,15 @@ int LLBC_Directory::Create(const LLBC_String &path)
             continue;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (!::CreateDirectoryA(toPath.c_str(), nullptr))
+        if (!::CreateDirectoryA(toPath.c_str(), nullptr) &&
+            ::GetLastError() != ERROR_ALREADY_EXISTS)
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
             return LLBC_FAILED;
         }
 #else
-        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) // permission: rwxr-xr-x
+        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0 &&
+            errno != EEXIST) // permission: rwxrwxr-x
         {
             LLBC_SetLastError(LLBC_ERROR_CLIB);
             return LLBC_FAILED;
