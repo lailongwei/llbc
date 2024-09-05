@@ -32,7 +32,7 @@ class LLBC_HIDDEN LLBC_LogTimeToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogTimeToken();
-    virtual ~LLBC_LogTimeToken();
+    virtual ~LLBC_LogTimeToken() = default;
 
 public:
     /**
@@ -41,7 +41,7 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
 
     /**
      * Get token type.

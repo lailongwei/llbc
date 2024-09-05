@@ -25,20 +25,11 @@
 #include "llbc/core/utils/Util_Text.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogThreadIdToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogThreadIdToken::LLBC_LogThreadIdToken()
-{
-}
-
-LLBC_LogThreadIdToken::~LLBC_LogThreadIdToken()
-{
-}
-
-int LLBC_LogThreadIdToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogThreadIdToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -54,10 +45,10 @@ void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &format
     const int index = static_cast<int>(formattedData.size());
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "%d", data.threadId);
-    formattedData.append(buf);
+    const int len = snprintf(buf, sizeof(buf), "%d", data.threadId);
+    formattedData.append(buf, len);
 
-    GetFormatter()->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END

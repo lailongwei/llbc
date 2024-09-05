@@ -22,33 +22,18 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogNullToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogNullToken::LLBC_LogNullToken()
+int LLBC_LogNullToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
-}
-
-LLBC_LogNullToken::~LLBC_LogNullToken()
-{
-}
-
-int LLBC_LogNullToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
-{
-    LLBC_XDelete(formatter);
-
     return LLBC_OK;
 }
 
 int LLBC_LogNullToken::GetType() const
 {
-    return LLBC_LogTokenType::End;
-}
-
-void LLBC_LogNullToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
-{
+    return LLBC_LogTokenType::NullToken;
 }
 
 __LLBC_NS_END

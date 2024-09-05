@@ -25,7 +25,6 @@
 #include "llbc/core/time/Time.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogTimeToken.h"
 
 __LLBC_NS_BEGIN
@@ -37,11 +36,7 @@ LLBC_LogTimeToken::LLBC_LogTimeToken()
 {
 }
 
-LLBC_LogTimeToken::~LLBC_LogTimeToken()
-{
-}
-
-int LLBC_LogTimeToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogTimeToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -77,7 +72,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     // Format millisecond part.
     formattedData.append_format("%06llu", data.logTime % 1000000);
 
-    GetFormatter()->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END

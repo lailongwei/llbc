@@ -32,7 +32,7 @@ class LLBC_HIDDEN LLBC_LogProcessIdToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogProcessIdToken();
-    virtual ~LLBC_LogProcessIdToken();
+    virtual ~LLBC_LogProcessIdToken() = default;
 
 public:
     /**
@@ -41,7 +41,7 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
 
     /**
      * Get token type.
@@ -57,7 +57,8 @@ public:
     virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
 private:
-    int _processId;
+    char _processId[32];
+    size_t _processIdSize;
 };
 
 __LLBC_NS_END

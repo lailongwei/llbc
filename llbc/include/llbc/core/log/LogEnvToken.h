@@ -19,46 +19,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
-
-#include "llbc/core/log/LogFormattingInfo.h"
+#include "llbc/core/log/BaseLogToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogFormattingInfo::LLBC_LogFormattingInfo()
-: leftAlign(true)
-, minLen(0)
-, maxLen(INT_MAX)
-, fillCharacter(' ')
+/**
+ * \brief Environment type log token calss encapsulation.
+ */
+class LLBC_HIDDEN LLBC_LogEnvToken : public LLBC_BaseLogToken
 {
-}
+public:
+    LLBC_LogEnvToken() = default;
+    virtual ~LLBC_LogEnvToken() = default;
 
-void LLBC_LogFormattingInfo::Reset()
-{
-    leftAlign = true;
-    minLen = 0;
-    maxLen = INT_MAX;
-    fillCharacter = ' ';
-    addiParam.clear();
-}
+public:
+    /**
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
 
-void LLBC_LogFormattingInfo::Format(LLBC_String &data, int fieldStart) const
-{
-    fieldStart = MAX(0, fieldStart);
-    fieldStart = MIN(fieldStart, static_cast<int>(data.length()));
+    /**
+     * Get token type.
+     * @return int - token type.
+     */
+    virtual int GetType() const;
 
-    int rawLen = static_cast<int>(data.length()) - fieldStart;
-    if (rawLen > maxLen)
-        data.erase(fieldStart + maxLen, rawLen - maxLen);
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
 
-    if (rawLen < minLen)
-    {
-        if (leftAlign)
-            data.append(minLen - rawLen, fillCharacter);
-        else
-            data.insert(fieldStart, minLen - rawLen, fillCharacter);
-    }
-}
+private:
+    LLBC_String _envValue;
+};
 
 __LLBC_NS_END

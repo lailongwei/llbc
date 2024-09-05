@@ -32,69 +32,16 @@ class LLBC_EXPORT LLBC_LogFormattingInfo
 {
 public:
     /**
-     * Parameter constructor, use to construct formatting info object.
-     * @param[in] leftAlign     - specific message is left alignment or right alignment.
-     * @param[in] minLen        - minimum log message length.
-     * @param[in] maxLen        - maximum log message length.
-     * @param[in] fillCharacter - fill character.
+     * Constructor & Destructor.
      */
-    LLBC_LogFormattingInfo(bool leftAlign = false,
-                           int minLen = 0,
-                           int maxLen = INT_MAX,
-                           int fillCharacter = ' ');
-
-    ~LLBC_LogFormattingInfo();
+    LLBC_LogFormattingInfo();
 
 public:
     /**
-     * Get left align flag.
-     * @return bool - left align flag.
+     * Reset formatting info.
      */
-    bool GetLeftAlign() const;
+    void Reset();
 
-    /**
-     * Set left align flag.
-     * @param[in] leftAlign - left align flag.
-     */
-    void SetLeftAlign(bool leftAlign);
-
-    /**
-     * Get minimum log message length.
-     * @return int - minimum message length.
-     */
-    int GetMinLen() const;
-
-    /**
-     * Set minimum log message length.
-     * @param[in] minLen - minimum message length.
-     */
-    void SetMinLen(int minLen);
-
-    /**
-     * Get maximum log message length.
-     * @return int - maximum message length.
-     */
-    int GetMaxLen() const;
-
-    /**
-     * Set maximum log message length.
-     * @param[in] maxLen - maximum message length.
-     */
-    void SetMaxLen(int maxLen);
-
-    /**
-     * Get fill character.
-     * @return char - fill character.
-     */
-    char GetFillCharacter() const;
-
-    /**
-     * Set fill character.
-     * @param[in] fillCharacter - fill character.
-     */
-    void SetFillCharacter(char fillCharacter);
-
-public:
     /**
      * Format the given data, start by field start index.
      * @param[in/out] data   - log data.
@@ -102,13 +49,14 @@ public:
      */
     void Format(LLBC_String &data, int fieldStart) const;
 
-private:
-    bool _leftAlign;
+public:
+    bool leftAlign;
 
-    int _minLen;
-    int _maxLen;
+    int minLen;
+    int maxLen;
+    char fillCharacter;
 
-    char _fillCharacter;
+    LLBC_String addiParam;
 };
 
 __LLBC_NS_END

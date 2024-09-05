@@ -32,7 +32,7 @@ class LLBC_HIDDEN LLBC_LogExecNameToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogExecNameToken();
-    virtual ~LLBC_LogExecNameToken();
+    virtual ~LLBC_LogExecNameToken() = default;
 
 public:
     /**
@@ -41,7 +41,7 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
 
     /**
      * Get token type.
@@ -58,9 +58,9 @@ public:
 
 private:
     #if LLBC_TARGET_PLATFORM_WIN32
-    char _execName[MAX_PATH];
+    char _execName[MAX_PATH + 1];
     #else
-    char _execName[PATH_MAX];
+    char _execName[PATH_MAX + 1];
     #endif
     size_t _execNameLen;
 };

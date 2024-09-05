@@ -24,7 +24,6 @@
 
 #include "llbc/core/file/Directory.h"
 
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogExecNameToken.h"
 
 __LLBC_NS_BEGIN
@@ -35,17 +34,13 @@ LLBC_LogExecNameToken::LLBC_LogExecNameToken()
 {
 }
 
-LLBC_LogExecNameToken::~LLBC_LogExecNameToken()
-{
-}
-
-int LLBC_LogExecNameToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogExecNameToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
 
     const LLBC_String execName =
         LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
-    _execNameLen = MIN(execName.size(), sizeof(_execName));
+    _execNameLen = MIN(execName.size(), sizeof(_execName) - 1);
     memcpy(_execName, execName.c_str(), _execNameLen);
 
     return LLBC_OK;
@@ -61,7 +56,7 @@ void LLBC_LogExecNameToken::Format(const LLBC_LogData &data, LLBC_String &format
     const int index = static_cast<int>(formattedData.size());
     formattedData.append(_execName, _execNameLen);
 
-    GetFormatter()->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
