@@ -93,47 +93,6 @@ inline int LLBC_File::Read(ldouble &ldoubleVal)
     return ReadRawObj<ldouble>(ldoubleVal);
 }
 
-inline LLBC_String LLBC_File::ReadLine()
-{
-    // Read line bytes.
-    char ch;
-    LLBC_String line;
-    bool hasBeenRead = false;
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    while (Read(ch) != LLBC_FAILED)
-    {
-        hasBeenRead = true;
-        if (ch != LLBC_CR && ch != LLBC_LF)
-        {
-            line.append(1, ch);
-            continue;
-        }
-
-        if (ch == LLBC_CR)
-        {
-            // Read linefeed.
-            if (ReadRawObj<char>(ch) == LLBC_OK)
-            {
-                if (ch != LLBC_LF)
-                    OffsetFilePosition(-1);
-            }
-        }
-
-        break;
-    }
-
-    // Read first byte failed, return empty line(LLBC_GetLastError() return non LLBC_ERROR_SUCCESS).
-    if (!hasBeenRead)
-        return line;
-
-    // If read to end, set last error to SUCCESS.
-    if (LLBC_GetLastError() == LLBC_ERROR_TRUNCATED)
-        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-
-    // Return line.
-    return line;
-}
-
 template <typename T>
 int LLBC_File::ReadRawObj(T &obj)
 {
@@ -238,47 +197,6 @@ LLBC_File::Write(const StrType &str)
 {
     const size_t strByteSize = str.size() * sizeof(typename StrType::value_type);
     return Write(str.data(), strByteSize) != static_cast<sint64>(strByteSize) ? LLBC_FAILED : LLBC_OK;
-}
-
-inline sint64 LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
-{
-    const sint64 contentRet = Write(line.data(), line.size());
-    if (contentRet != static_cast<sint64>(line.size()))
-        return contentRet;
-
-    if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch &&
-        (_mode & LLBC_FileMode::Text))
-        newLineFormat = LLBC_FileNewLineFormat::LineFeed;
-
-
-    sint64 lineEndingRet;
-    if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch)
-    {
-#if LLBC_TARGET_PLATFORM_WIN32
-        lineEndingRet = Write(LLBC_CRLF, 2);
-#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-        lineEndingRet = Write(LLBC_CR);
-#else // Linux, Android, and others
-        lineEndingRet = Write(LLBC_LF);
-#endif
-    }
-    else if (newLineFormat == LLBC_FileNewLineFormat::UnixStyle)
-    {
-        lineEndingRet = Write(LLBC_LF);
-    }
-    else if (newLineFormat == LLBC_FileNewLineFormat::WindowsStyle)
-    {
-        lineEndingRet = Write(LLBC_CRLF, 2);
-    }
-    else
-    {
-        lineEndingRet = Write(LLBC_CR);
-    }
-
-    if (lineEndingRet == -1)
-        return lineEndingRet;
-    else
-        return contentRet + lineEndingRet;
 }
 
 template <typename T>

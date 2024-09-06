@@ -105,12 +105,11 @@ class LLBC_FileNewLineFormat
 public:
     enum
     {
-        LineFeed,                 // LF, character is: \n, Linux/Unix OS used.
-        CarriageReturn,           // CR, character is: \r, Mac OS used.
-        CarriageReturn_LineFeed,  // CRLF, characters are: \r\n, Windows OS used.
+        LineFeed,                // LF, character is: \n, Linux/Unix OS used.
+        CarriageReturn_LineFeed, // CRLF, characters are: \r\n, Windows OS used.
 
-        UnixStyle = LineFeed,     // Alias for LineFeed enumeration.
-        MacStyle = CarriageReturn,// Alias for CarriageReturn.
+        UnixStyle = LineFeed,    // Alias for LineFeed enumeration.
+        MacStyle = LineFeed,     // Alias for CarriageReturn.
         WindowsStyle = CarriageReturn_LineFeed, // Alias for CarriageReturn-LineFeed.
 
         AutoMatch, // Auto match, it means if you use llbc library in Windows, will use CRLF, and so on...
@@ -297,6 +296,13 @@ public:
     LLBC_String ReadLine();
 
     /**
+     * Read lines from the file.
+     * @return LLBC_Strings - line list, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
+     *                        otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
+     */
+    LLBC_Strings ReadLines();
+
+    /**
      * Read data to end.
      * @param[in] filePath - the file path.
      * @return LLBC_String - the all non-read data, if success, LLBC_GetLastError() return LLBC_ERROR_SUCCESS, 
@@ -347,10 +353,17 @@ public:
      * Write line data.
      * @param[in] line          - the line content.
      * @param[in] newLineFormat - the new line format, default is AutoMatch. 
-     * @return sint64 - actually written size, in bytes, if write failed, return -1,
-     *                  else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    sint64 WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+    int WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+
+    /**
+     * Write lines to file.
+     * @param[in] lines         - the lines.
+     * @param[in] newLineFormat - the new line format, default is auto match.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int WriteLines(const LLBC_Strings &lines, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
 
     /**
      * File bytes write method.

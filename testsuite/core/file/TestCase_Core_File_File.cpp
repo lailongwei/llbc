@@ -255,7 +255,7 @@ bool TestCase_Core_File_File::ReadWriteTest()
     file.Seek(LLBC_FileSeekOrigin::Current, -16);
     LLBC_PrintLn("After Seek(Current, -16), file size: %lld, file pos: %lld", file.GetFileSize(), file.GetFilePosition());
 
-    // Test ReadLine/WriteLine/ReadToEnd methods:
+    // Test ReadLine/ReadLines, WriteLine/WriteLines, ReadToEnd methods:
     LLBC_PrintLn("ReOpen file for test ReadLine/WriteLine/ReadToEnd methods:");
     file.ReOpen(LLBC_FileMode::BinaryReadWrite);
 
@@ -266,16 +266,34 @@ bool TestCase_Core_File_File::ReadWriteTest()
     LLBC_PrintLn("WriteLine(\"\"):");
     file.WriteLine("");
     LLBC_PrintLn("Write(\"Hey, Judy too!\"):");
-    file.Write("Hey, Judy too");
+    file.Write("Hey, Judy too\n");
+
+    LLBC_PrintLn("WriteLines: 5 lines:");
+    LLBC_Strings willWriteLines;
+    for (int i = 0; i < 5; ++i)
+        willWriteLines.push_back(LLBC_String().format("WriteLines() content: %d", i));
+    file.WriteLines(willWriteLines);
+
+    LLBC_PrintLn("Write no line ending line");
+    file.Write("No line ending line");
 
     file.SetFilePosition(0);
-    LLBC_PrintLn("Read lines:");
+    LLBC_PrintLn("Read line:");
     LLBC_PrintLn("First line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
     LLBC_PrintLn("Second line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
     LLBC_PrintLn("Third line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
     LLBC_PrintLn("Fourth line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("5-10 lines:");
+    for (int i = 5; i <= 10; ++i)
+        LLBC_PrintLn("%d line: %s, last error:%d", i, file.ReadLine().c_str(), LLBC_GetLastError());
     const LLBC_String notExistLine = file.ReadLine();
     LLBC_PrintLn("Not exist line: %s, error: %s", notExistLine.c_str(), LLBC_FormatLastError());
+
+    LLBC_PrintLn("Read lines:");
+    file.SetFilePosition(0);
+    const LLBC_Strings lines = file.ReadLines();
+    for (size_t i = 0; i < lines.size(); ++i)
+        LLBC_PrintLn("%02d: %s", i, lines[i].c_str());
 
     LLBC_Print("\n");
 
