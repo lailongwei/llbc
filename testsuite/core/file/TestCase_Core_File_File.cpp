@@ -293,7 +293,7 @@ bool TestCase_Core_File_File::ReadWriteTest()
     file.SetFilePosition(0);
     const LLBC_Strings lines = file.ReadLines();
     for (size_t i = 0; i < lines.size(); ++i)
-        LLBC_PrintLn("%02d: %s", i, lines[i].c_str());
+        LLBC_PrintLn("%02lu: %s", i, lines[i].c_str());
 
     LLBC_Print("\n");
 

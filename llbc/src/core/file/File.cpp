@@ -530,12 +530,12 @@ int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
     else if (newLineFormat == LLBC_FileNewLineFormat::MacStyle)
     {
         requireRet = 1;
-        lineEndingRet = Write(LLBC_LF);
+        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
     }
     else
     {
         requireRet = 1;
-        lineEndingRet = Write(LLBC_LF);
+        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
     }
 
     return lineEndingRet != requireRet ? LLBC_FAILED : LLBC_OK;
