@@ -660,7 +660,7 @@ template <typename Obj>
 LLBC_FORCE_INLINE LLBC_TypedObjPool<Obj> *LLBC_ObjPool::GetTypedObjPool()
 {
     typedef LLBC_TypedObjPool<Obj> _TypedObjPool;
-    static const char *rttiName = typeid(Obj).name();
+    static const LLBC_CString rttiName(typeid(Obj).name());
 
     // Lock.
     __LLBC_INL_LockObjPool();
@@ -966,12 +966,7 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
                                                       bool isCollect,
                                                       bool deepCollect)
 {
-    const auto it = std::find_if(_typedObjPools.begin(),
-                                 _typedObjPools.end(),
-                                 [orderedDelNode](const std::pair<const char *, _WrappedTypedObjPool *> &item) {
-        return orderedDelNode->GetName() == item.first;
-    });
-
+    const auto it = _typedObjPools.find(orderedDelNode->GetName());
     if (it != _typedObjPools.end())
     {
         auto wrappedTypedObjPool = it->second;

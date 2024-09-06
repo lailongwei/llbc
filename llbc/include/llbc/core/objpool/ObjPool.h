@@ -780,7 +780,7 @@ private:
     // The wrapped TypedObjPool structure encapsulation.
     struct _WrappedTypedObjPool
     {
-        const char *rttiName;
+        LLBC_CString rttiName;
         void (*ReleaseObj)(void *, void *);
         void (*Destruct)(void *);
         void (*Collect)(void *, bool);
@@ -846,7 +846,7 @@ private:
     mutable LLBC_SpinLockHandle _lock;
 
     // Typed object pools.
-    std::map<const char *, _WrappedTypedObjPool *> _typedObjPools;
+    std::map<LLBC_CString, _WrappedTypedObjPool *> _typedObjPools;
 
     // Ordered delete nodes & node tree.
     std::map<LLBC_CString, _OrderedDeleteNode *> *_orderedDeleteNodes;
