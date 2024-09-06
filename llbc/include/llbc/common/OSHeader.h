@@ -25,16 +25,7 @@
 
 // OS header files.
 #if LLBC_TARGET_PLATFORM_WIN32
- #ifndef WIN32_LEAN_AND_MEAN
-  #define WIN32_LEAN_AND_MEAN
- #endif
-
- #ifndef WINVER
-  #define WINVER 0x600
- #endif
-
- #include <Windows.h>
- #include <Winsock2.h>
+ #include <Winsock2.h> // Has been included Windows.h.
  #include <Mswsock.h>
  #include <Ws2tcpip.h>
  #include <process.h>
@@ -117,9 +108,5 @@
 
 // Enable posix support, if in WIN32 platform.
 #if LLBC_TARGET_PLATFORM_WIN32
- #ifndef _POSIX_
-  #define _POSIX_
- #endif // !_POSIX_
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
 
