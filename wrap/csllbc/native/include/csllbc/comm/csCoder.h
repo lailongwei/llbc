@@ -61,16 +61,15 @@ public:
 
 public:
     /**
+     * Coder reuse support.
+     */
+    virtual void Reuse();
+
+    /**
      * Packet encode/decode methods.
      */
     virtual bool Encode(LLBC_Packet &packet);
     virtual bool Decode(LLBC_Packet &packet);
-
-public:
-    /**
-     * Object-Pool reflection support: Reuse object.
-     */
-    virtual void Reuse();
 
 private:
     sint64 _packetId;

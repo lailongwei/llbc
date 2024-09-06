@@ -135,7 +135,7 @@ int LLBC_Timer::Cancel()
 
 bool LLBC_Timer::IsScheduling() const
 {
-    return (_timerData != nullptr && _timerData->validate);
+    return (_timerData && _timerData->validate);
 }
 
 bool LLBC_Timer::IsTimeouting() const

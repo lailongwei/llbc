@@ -360,6 +360,83 @@ sint64 LLBC_File::GetReadableSize() const
     return size - pos;
 }
 
+LLBC_String LLBC_File::ReadLine()
+{
+    // Read line bytes.
+    char ch;
+    LLBC_String line;
+    bool hasBeenRead = false;
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    while (Read(ch) != LLBC_FAILED)
+    {
+        hasBeenRead = true;
+        if (ch != LLBC_CR && ch != LLBC_LF)
+        {
+            line.append(1, ch);
+            continue;
+        }
+
+        if (ch == LLBC_CR)
+        {
+            // Read linefeed.
+            if (ReadRawObj<char>(ch) == LLBC_OK)
+            {
+                if (ch != LLBC_LF)
+                    OffsetFilePosition(-1);
+            }
+        }
+
+        break;
+    }
+
+    // Read first byte failed, return empty line(LLBC_GetLastError() return non LLBC_ERROR_SUCCESS).
+    if (!hasBeenRead)
+        return line;
+
+    // If read to end, set last error to SUCCESS.
+    if (LLBC_GetLastError() == LLBC_ERROR_TRUNCATED)
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Return line.
+    return line;
+}
+
+LLBC_Strings LLBC_File::ReadLines()
+{
+    // File opened check.
+    if (UNLIKELY(!IsOpened()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_Strings();
+    }
+
+    // File position check.
+    if (UNLIKELY(GetFilePosition() == GetFileSize()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_TRUNCATED);
+        return LLBC_Strings();
+    }
+
+    // Read file content.
+    const LLBC_String fileCnt = ReadToEnd();
+    if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+        return LLBC_Strings();
+
+    // Set error to SUCCESS.
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Split(don't strip empty line).
+    LLBC_Strings lines = fileCnt.split(LLBC_LF, -1, false);
+    // Strip CR character(\r).
+    for (auto &line : lines)
+    {
+        if (!line.empty() && line[line.size() - 1] == LLBC_CR)
+            line.erase(line.size() - 1);
+    }
+
+    return lines;
+}
+
 LLBC_String LLBC_File::ReadToEnd()
 {
     LLBC_String str;
@@ -416,6 +493,63 @@ sint64 LLBC_File::Read(void *buf, size_t size)
 
     LLBC_SetLastError(actuallyRead != size ? LLBC_ERROR_TRUNCATED : LLBC_ERROR_SUCCESS);
     return static_cast<sint64>(actuallyRead);
+}
+
+int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
+{
+    // Write line content.
+    const sint64 contentRet = Write(line.data(), line.size());
+    if (contentRet != static_cast<sint64>(line.size()))
+        return LLBC_FAILED;
+
+    // If use auto-match new line format and file opened as Text mode, newLineFormat force changed to LF.
+    if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch &&
+        (_mode & LLBC_FileMode::Text))
+        newLineFormat = LLBC_FileNewLineFormat::LineFeed;
+
+    // Determine new line format, if is AutoMatch.
+    if (newLineFormat == LLBC_FileNewLineFormat::AutoMatch)
+    {
+#if LLBC_TARGET_PLATFORM_WIN32
+        newLineFormat = LLBC_FileNewLineFormat::WindowsStyle;
+#elif LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+        newLineFormat = LLBC_FileNewLineFormat::MacStyle;
+#else // Linux, Android and others.
+        newLineFormat = LLBC_FileNewLineFormat::UnixStyle;
+#endif // Win32
+    }
+
+    // Write line end.
+    sint64 requireRet;
+    sint64 lineEndingRet;
+    if (newLineFormat == LLBC_FileNewLineFormat::WindowsStyle)
+    {
+        requireRet = 2;
+        lineEndingRet = Write(LLBC_CRLF, 2);
+    }
+    else if (newLineFormat == LLBC_FileNewLineFormat::MacStyle)
+    {
+        requireRet = 1;
+        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
+    }
+    else
+    {
+        requireRet = 1;
+        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
+    }
+
+    return lineEndingRet != requireRet ? LLBC_FAILED : LLBC_OK;
+}
+
+int LLBC_File::WriteLines(const LLBC_Strings &lines, int newLineFormat)
+{
+    for (auto &line : lines)
+    {
+        if (WriteLine(line, newLineFormat) != LLBC_OK)
+            return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
 }
 
 sint64 LLBC_File::Write(const void *buf, size_t size)

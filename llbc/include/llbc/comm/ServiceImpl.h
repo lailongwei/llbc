@@ -369,7 +369,12 @@ public:
      * @param[in] eventId - the event id.
      * @return LLBC_Event & - the event firer object. 
      */
-    virtual LLBC_ServiceEventFirer &BeginFireEvent(int eventId);
+    /**
+     * Begin fire event(asynchronous operation).
+     * @param[in] eventId - the event id.
+     * @return LLBC_ServiceEventFirer - the event firer object. 
+     */
+    virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId);
 
     /**
      * Add component event into service. Operated in the next service drive loop.
@@ -402,28 +407,16 @@ public:
 
 public:
     /**
-     * Get service safe object pool.
-     * @return LLBC_SafeObjectPool & - the thread safe object pool reference.
+     * Get service thread-safe object pool.
+     * @return LLBC_ObjPool & - the service thread-safe object pool.
      */
-    virtual LLBC_SafeObjectPool &GetSafeObjectPool();
+    virtual LLBC_ObjPool &GetThreadSafeObjPool();
 
     /**
-     * Get service unsafe object pool.
-     * @return LLBC_UnsafeObjectPool & - the thread unsafe object pool reference.
+     * Get service thread-unsafe object pool.
+     * @return LLBC_ObjPool * - the service thread-unsafe object pool.
      */
-    virtual LLBC_UnsafeObjectPool &GetUnsafeObjectPool();
-
-    /**
-     * Get service packet object pool(thread safe).
-     * @return LLBC_ObjectPoolInst<LLBC_Packet, LLBC_SpinLock> & - the packet object pool.
-     */
-    virtual LLBC_ObjectPoolInst<LLBC_Packet> &GetPacketObjectPool();
-
-    /**
-     * Get message block object pool(thread safe).
-     * @return LLBC_ObjectPoolInst<LLBC_MessageBlock, LLBC_SpinLock> & - the message block object pool.
-     */
-    virtual LLBC_ObjectPoolInst<LLBC_MessageBlock> &GetMsgBlockObjectPool();
+    virtual LLBC_ObjPool &GetThreadUnsafeObjPool();
 
 public:
     /**
@@ -665,11 +658,8 @@ private:
     LLBC_AutoReleasePoolStack *_releasePoolStack; // Auto-Release pool stack.
 
     // - ObjPool support members.
-    LLBC_SafeObjectPool _safeObjectPool; // Safe object pool.
-    LLBC_UnsafeObjectPool _unsafeObjectPool; // Unsafe object pool.
-    LLBC_ObjectPoolInst<LLBC_Packet> &_packetObjectPool; // Packet object pool.
-    LLBC_ObjectPoolInst<LLBC_MessageBlock> &_msgBlockObjectPool; // MessageBlock object pool.
-    LLBC_ObjectPoolInst<LLBC_ServiceEventFirer> &_eventFirerPool; // EventFirer object pool.
+    LLBC_ObjPool _threadSafeObjPool; // Thread-safe object pool.
+    LLBC_ObjPool _threadUnsafeObjPool; // Thread-unsafe object pool.
 
     // - Timer scheduler.
     LLBC_TimerScheduler *_timerScheduler; // Timer scheduler.

@@ -63,7 +63,7 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
 
     // Create packet and write data.
-    LLBC_Packet *packet = _pktPoolInst->GetObject();
+    LLBC_Packet *packet = _pktObjPool->Acquire();
     const size_t readableSize = block->GetReadableSize();
 
     packet->SetLength(readableSize);

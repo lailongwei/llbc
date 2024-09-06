@@ -24,22 +24,30 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_ObjectPool : public LLBC_BaseTestCase
+class TestCase_Core_ObjPool : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_ObjectPool();
-    virtual ~TestCase_Core_ObjectPool();
+    TestCase_Core_ObjPool() = default;
+    ~TestCase_Core_ObjPool() override = default;
 
 public:
     int Run(int argc, char *argv[]);
 
-private:
-    void DoBasicTest();
-    void DoStatTest();
-    void DoOrderedDeleteTest();
-    void DoConverienceMethodsTest();
-    void DoPerfTest();
-    void DoComplexObjPerfTest();
-    void DoPoolDebugAssertTest();
-    void DoStringSpecificPoolInstTest();
+    int BaseTest();
+    int AcquireTest();
+    int ComplexAcquireTest();
+    int StatTest();
+    int ReflectTest();
+    int MemoryLeakTest();
+    int MultiThreadThread();
+    int PerfTest();
+    int OrderedDeleteTest();
+    int GuardedPoolObjTest();
+    int LibSupportedObjPoolClassesTest();
+    int CommonClassTest_Stream();
+
+    template <typename Obj>
+    static void RandAllocAndRelease(LLBC_ObjPool &objPool,
+                                    const std::pair<int, int> allocRange,
+                                    const std::pair<int, int> &releaseRange);
 };

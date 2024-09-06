@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/objectpool/ObjectPool.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 __LLBC_NS_BEGIN
 

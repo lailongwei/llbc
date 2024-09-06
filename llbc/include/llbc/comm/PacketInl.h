@@ -172,10 +172,15 @@ LLBC_FORCE_INLINE size_t LLBC_Packet::GetPayloadLength() const
     return _payload->GetReadableSize();
 }
 
-LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload()
+LLBC_FORCE_INLINE LLBC_MessageBlock *LLBC_Packet::GetMutablePayload(size_t ensureCap)
 {
-    if (!_payload && _msgBlockPoolInst)
-        _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+    if (!_payload)
+    {
+        if (_typedObjPool)
+            _payload = _typedObjPool->GetObjPool()->Acquire<LLBC_MessageBlock>();
+        else
+            _payload = new LLBC_MessageBlock(ensureCap);
+    }
 
     return _payload;
 }
@@ -196,7 +201,6 @@ LLBC_FORCE_INLINE void LLBC_Packet::SetPayload(LLBC_MessageBlock *payload)
         return;
 
     CleanupPayload();
-
     _payload = payload;
 }
 
@@ -207,11 +211,6 @@ LLBC_FORCE_INLINE void LLBC_Packet::ResetPayload()
         _payload->SetReadPos(0);
         _payload->SetWritePos(0);
     }
-}
-
-LLBC_FORCE_INLINE LLBC_IObjectPoolInst *LLBC_Packet::GetPoolInst()
-{
-    return _selfPoolInst;
 }
 
 template<typename RetType>
@@ -494,13 +493,12 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const char *val)
 
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const void *buf, size_t len)
 {
-    return CheckAndCreatePayload(len)->Write(buf, len);
+    return GetMutablePayload(len)->Write(buf, len);
 }
 
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const LLBC_Stream &stream)
 {
-    return CheckAndCreatePayload(stream.GetWritePos())->
-        Write(stream.GetBuf(), stream.GetWritePos());
+    return GetMutablePayload(stream.GetWritePos())->Write(stream.GetBuf(), stream.GetWritePos());
 }
 
 template <typename _Ty>
@@ -631,20 +629,7 @@ LLBC_FORCE_INLINE int LLBC_Packet::WriteRawType(_RawTy val)
     LLBC_Host2Net(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
-    return CheckAndCreatePayload(sizeof(val))->Write(&val, sizeof(val));
-}
-
-LLBC_FORCE_INLINE LLBC_MessageBlock *&LLBC_Packet::CheckAndCreatePayload(size_t initSize)
-{
-    if (!_payload)
-    {
-        if (_msgBlockPoolInst)
-            _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
-        else
-            _payload = new LLBC_MessageBlock(initSize);
-    }
-
-    return _payload;
+    return GetMutablePayload(sizeof(val))->Write(&val, sizeof(val));
 }
 
 template <typename CoderType>

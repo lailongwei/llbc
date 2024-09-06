@@ -55,6 +55,13 @@ protected:
     virtual int GetLogLevel() const;
 
     /**
+     * Set log level.
+     * @param[in] logLevel - the log level, End means disable appender output.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int SetLogLevel(int logLevel);
+
+    /**
      * Get current appender's token chain.
      * @return LLBC_LogTokenChain * - the log token chain.
      */
@@ -85,7 +92,7 @@ protected:
     virtual void Flush();
 
 private:
-    int _level;
+    volatile int _logLevel;
     LLBC_LogTokenChain *_chain;
     LLBC_ILogAppender *_next;
 

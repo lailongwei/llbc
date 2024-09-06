@@ -38,8 +38,8 @@ public:
     {
         Begin,
 
-        Debug = Begin,
-        Trace,
+        Trace = Begin,
+        Debug,
         Info,
         Warn,
         Error,
@@ -58,18 +58,18 @@ public:
 
 public:
     /**
-     * Get specific log level by level string representation.
+     * Get specific log level enum by level string representation.
      * @param[in] levelStr - log level representation.
-     * @return int - log level.
+     * @return int - log level enum.
      */
-    static int Str2Level(const LLBC_CString &levelStr);
+    static int GetLevelEnum(const LLBC_CString &levelStr);
 
     /**
-     * Check giving log level is legal or not.
+     * Check giving log level is validate or not.
      * @param[in] level - the given log level.
-     * @return bool - return if log level is legal, otherwise return false.
+     * @return bool - return if log level is validate, otherwise return false.
      */
-    static bool IsLegal(int level);
+    static bool IsValid(int level);
 };
 
 __LLBC_NS_END

@@ -29,8 +29,8 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_CString __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1] =
 {
-    "DEBUG",
     "TRACE",
+    "DEBUG",
     "INFO",
     "WARN",
     "ERROR",
@@ -49,16 +49,16 @@ const LLBC_CString &LLBC_LogLevel::GetLevelStr(int level)
         LLBC_INTERNAL_NS __level2StrRepr[level] : LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::End]);
 }
 
-int LLBC_LogLevel::Str2Level(const LLBC_CString &levelStr)
+int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
 {
     if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;
 
     const LLBC_String upperStr = LLBC_ToUpper(levelStr.c_str());
-    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
-        return LLBC_LogLevel::Debug;
-    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
+    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
         return LLBC_LogLevel::Trace;
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
+        return LLBC_LogLevel::Debug;
     else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Info] == upperStr)
         return LLBC_LogLevel::Info;
     else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Warn] == upperStr)
@@ -71,7 +71,7 @@ int LLBC_LogLevel::Str2Level(const LLBC_CString &levelStr)
     return LLBC_LogLevel::End;
 }
 
-bool LLBC_LogLevel::IsLegal(int level)
+bool LLBC_LogLevel::IsValid(int level)
 {
     return (LLBC_LogLevel::Begin <= level && level < LLBC_LogLevel::End);
 }

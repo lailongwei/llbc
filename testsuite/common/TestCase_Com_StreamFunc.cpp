@@ -954,7 +954,7 @@ _StlContainerSerTest()
     LLBC_PrintLn("- %s ser/deser test:", LLBC_GetTypeName(Container));
 
     Container c1, c2;
-    for (int i = 0; i < std::tuple_size<Container>::value; ++i)
+    for (size_t i = 0; i < std::tuple_size<Container>::value; ++i)
         c1.at(i) = LLBC_Rand(10000);
 
     LLBC_Stream s;

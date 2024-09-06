@@ -162,7 +162,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Send(int sessionId,
                                          int status,
                                          uint32 flags)
 {
-    LLBC_Packet *packet = GetPacketObjectPool().GetObject();
+    LLBC_Packet *packet = GetThreadSafeObjPool().Acquire<LLBC_Packet>();
     packet->SetHeader(sessionId, opcode, status, flags);
     packet->SetEncoder(coder);
 
@@ -177,7 +177,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Send(int sessionId,
                                          uint32 flags)
 {
     // Create packet(from object pool) and send.
-    LLBC_Packet *packet = GetPacketObjectPool().GetObject();
+    LLBC_Packet *packet = GetThreadSafeObjPool().Acquire<LLBC_Packet>();
     packet->SetHeader(sessionId, opcode, status, flags);
     if (UNLIKELY(packet->Write(bytes, len) != LLBC_OK))
     {

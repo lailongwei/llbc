@@ -67,24 +67,14 @@ inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
     return _evManager;
 }
 
-inline LLBC_SafeObjectPool &LLBC_ServiceImpl::GetSafeObjectPool()
+inline LLBC_ObjPool &LLBC_ServiceImpl::GetThreadSafeObjPool()
 {
-    return _safeObjectPool;
+    return _threadSafeObjPool;
 }
 
-inline LLBC_UnsafeObjectPool &LLBC_ServiceImpl::GetUnsafeObjectPool()
+inline LLBC_ObjPool &LLBC_ServiceImpl::GetThreadUnsafeObjPool()
 {
-    return _unsafeObjectPool;
-}
-
-inline LLBC_ObjectPoolInst<LLBC_Packet> & LLBC_ServiceImpl::GetPacketObjectPool()
-{
-    return _packetObjectPool;
-}
-
-inline LLBC_ObjectPoolInst<LLBC_MessageBlock> &LLBC_ServiceImpl::GetMsgBlockObjectPool()
-{
-    return _msgBlockObjectPool;
+    return _threadUnsafeObjPool;
 }
 
 __LLBC_NS_END

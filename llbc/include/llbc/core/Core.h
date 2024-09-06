@@ -140,8 +140,8 @@
 #include "llbc/core/objbase/AutoReleasePoolStack.h"
 
 // core/objpool
-#include "llbc/core/objectpool/ReferencablePoolObj.h"
-#include "llbc/core/objectpool/ObjectPoolMgr.h"
+#include "llbc/core/objpool/ObjPool.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 __LLBC_NS_BEGIN
 

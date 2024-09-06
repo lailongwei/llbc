@@ -34,6 +34,7 @@ public:
     int Run(int argc, char *argv[]);
 
 private:
+    void DoLogLevelSetTest();
     void DoJsonLogTest();
     void DoUninitLogTest();
     void DoConditionMacroLogTest();

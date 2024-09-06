@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objectpool/IObjectPoolInst.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
 
@@ -46,7 +46,7 @@ LLBC_LogData::LLBC_LogData()
 
 // , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -56,7 +56,7 @@ LLBC_LogData::~LLBC_LogData()
         free(msg);
 }
 
-void LLBC_LogData::Clear()
+void LLBC_LogData::Reuse()
 {
     // Notes:
     // - Some data members don't need reset.
@@ -84,19 +84,14 @@ void LLBC_LogData::Clear()
     // threadId = LLBC_INVALID_NATIVE_THREAD_ID;
 }
 
-void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+LLBC_TypedObjPool<LLBC_LogData> *LLBC_LogData::GetTypedObjPool() const
 {
-    _poolInst = &poolInst;
+    return _typedObjPool;
 }
 
-LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()
+void LLBC_LogData::SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool)
 {
-    return _poolInst;
-}
-
-size_t LLBC_LogData::GetPoolInstPerBlockUnitsNum()
-{
-    return LLBC_CFG_LOG_LOG_DATA_OBJPOOL_UNIT_SIZE_PER_BLOCK;
+    _typedObjPool = typedObjPool;
 }
 
 __LLBC_NS_END

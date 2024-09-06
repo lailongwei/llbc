@@ -41,7 +41,7 @@ LLBC_Object::LLBC_Object()
 
 LLBC_Object::~LLBC_Object()
 {
-    if (_autoRef && _poolStack)
+    if (_autoRef > 0 && _poolStack)
     {
         _poolStack->RemoveObject(this);
     }

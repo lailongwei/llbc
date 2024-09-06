@@ -36,6 +36,7 @@
 #include "llbc/core/log/LogNewLineToken.h"
 #include "llbc/core/log/LogMsgToken.h"
 #include "llbc/core/log/LogTimeToken.h"
+#include "llbc/core/log/LogEnvToken.h"
 #include "llbc/core/log/LogEscapeToken.h"
 #include "llbc/core/log/LogTokenBuilder.h"
 
@@ -91,6 +92,9 @@ LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 
     case LLBC_LogTokenType::TimeToken:
         return new LLBC_LogTimeToken;
+
+    case LLBC_LogTokenType::EnvToken:
+        return new LLBC_LogEnvToken;
 
     case LLBC_LogTokenType::EscapeToken:
         return new LLBC_LogEscapeToken;

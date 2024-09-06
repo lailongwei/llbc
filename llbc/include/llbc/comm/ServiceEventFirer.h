@@ -21,12 +21,15 @@
 
 #pragma once
 
-#include "llbc/core/objectpool/ReferencablePoolObj.h"
+#include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
-class LLBC_Variant;
-class LLBC_Event;
+
+/**
+* Pre-Declare: LLBC_Service.
+*/
 class LLBC_Service;
+
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -34,14 +37,17 @@ __LLBC_NS_BEGIN
 /**
  * @brief The service event firer class encapsulation.
  */
-class LLBC_EXPORT LLBC_ServiceEventFirer : public LLBC_ReferencablePoolObj
+class LLBC_EXPORT LLBC_ServiceEventFirer final
 {
-public:
     /**
-     * Ctor&Dtor.
+     * Ctor & Dtor.
      */
-    LLBC_ServiceEventFirer();
-    ~LLBC_ServiceEventFirer() = default;
+private:
+    LLBC_ServiceEventFirer(LLBC_Service *svc, LLBC_Event *ev);
+public:
+    LLBC_ServiceEventFirer(const LLBC_ServiceEventFirer &other);
+    LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other);
+    ~LLBC_ServiceEventFirer();
 
 public:
     /**
@@ -60,32 +66,15 @@ public:
     void Fire();
 
 public:
-    /**
-     * Object-Pool reflection support: clear firer object.
-     */
-    void Clear();
-
-    /**
-     * Object-Pool reflection support: pool instance create event callback.
-     */
-    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
+    // Copy assignment & Move assignment.
+    LLBC_ServiceEventFirer &operator=(const LLBC_ServiceEventFirer &other);
+    LLBC_ServiceEventFirer &operator=(LLBC_ServiceEventFirer &&other);
 
 private:
-    /**
-     * @brief Set event info to firer.
-     * @param[in] ev - the event object.
-     * @param[in] service - the service.
-     */
-    void SetEventInfo(LLBC_Event *ev, LLBC_Service *service);
+    friend class LLBC_ServiceImpl;
 
-    LLBC_DISABLE_ASSIGNMENT(LLBC_ServiceEventFirer);
-
-private:
-    friend class LLBC_Service;
-
-private:
-    LLBC_Event *_ev;
-    LLBC_Service *_service;
+    LLBC_Service *_svc;
+    mutable LLBC_Event *_ev;
 };
 
 __LLBC_NS_END

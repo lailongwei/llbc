@@ -55,7 +55,12 @@ public:
     static LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
     static LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
     static LLBC_TimeSpan FromMicros(sint64 micros);
-
+    template <size_t _StrArrLen>
+    static LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
+    static LLBC_TimeSpan FromSpanStr(const char *spanStr);
+    template <typename _StrType>
+    static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
+    FromSpanStr(const _StrType &spanStr);
     static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
 public:
@@ -81,20 +86,21 @@ public:
 public:
     /**
      * Construct by time tick, in micro-seconds.
-     * @param[in] span - the span tick.
+     * @param[in] spanInMicros - the span value, in micro-seconds.
      */
-    explicit LLBC_TimeSpan(const sint64 &span = 0);
+    explicit LLBC_TimeSpan(const sint64 &spanInMicros = 0);
 
     /**
      * Construct by span string representation, fmt: [DD ][HH:]MM:SS[.Micros].
-     * @param[in] span - the span value string representation.
+     * @param[in] spanStr - the span value string representation.
      */
-    LLBC_TimeSpan(const LLBC_String &span);
-
-    /**
-     * Destructor.
-     */
-    ~LLBC_TimeSpan();
+    template <size_t _StrArrLen>
+    explicit LLBC_TimeSpan(const char (&spanStr)[_StrArrLen]);
+    explicit LLBC_TimeSpan(const char *spanStr);
+    template <typename _StrType,
+              typename = typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, _StrType>::type>
+    explicit LLBC_TimeSpan(const _StrType &spanStr);
+    explicit LLBC_TimeSpan(const LLBC_String &spanStr);
 
 public:
     /**
@@ -164,6 +170,15 @@ public:
      */
     void Serialize(LLBC_Stream &stream) const;
     bool Deserialize(LLBC_Stream &stream);
+
+private:
+    /**
+     * Internal constructor.
+     * 
+     * @param spanStr    - the span string.
+     * @param spanStrLen - the span string length.
+     */
+    explicit LLBC_TimeSpan(const char *spanStr, size_t spanStrLen);
 
 private:
     // Declare friend class:LLBC_Time.

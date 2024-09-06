@@ -211,9 +211,10 @@ public:
 
     /**
      * Get mutable payload(message block object pointer).
+     * @param[in] ensureCap - ensure payload capacity.
      * @return LLBC_MessageBlock * - the mutable payload.
      */
-    LLBC_MessageBlock *GetMutablePayload();
+    LLBC_MessageBlock *GetMutablePayload(size_t ensureCap = 0);
 
     /**
      * Detach payload.
@@ -240,29 +241,20 @@ public:
 
 public:
     /**
-     * Object-Pool reflection support: Mark pool object.
-     */
-    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Get pool instance.
-     */
-    LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object-Pool reflection support, get user-defined per-block units number.
-     */
-    size_t GetPoolInstPerBlockUnitsNum();
-
-    /**
-     * Object-Pool reflection support: pool instance create event callback.
-     */
-    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Clear message block, this operation will clear read&write position information.
+     * Object-Pool reuse support.
      */
     void Clear();
+
+    /**
+     * Object-Pool reflection support.
+     */
+    LLBC_TypedObjPool<LLBC_Packet> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool);
+
+    /**
+     * Object-Pool event handler: typed object pool created.
+     */
+    void OnTypedObjPoolCreated(LLBC_ObjPool *objPool);
 
 public:
     /**
@@ -503,14 +495,6 @@ private:
 
 private:
     /**
-     * Check and create payload(if payload not exist).
-     * @param[in] initSize - the messageBlock init size(if need create, will use this parameter).
-     * @return LLBC_MessageBlock *& - the payload pointer reference.
-     */
-    LLBC_MessageBlock *&CheckAndCreatePayload(size_t initSize);
-
-private:
-    /**
      * Cleanup the pre-handle result data.
      */
     void CleanupPreHandleResult();
@@ -545,8 +529,7 @@ private:
     LLBC_MessageBlock *_payload;
     LLBC_Delegate<void(LLBC_MessageBlock *)> _payloadDeleteDeleg;
 
-    LLBC_IObjectPoolInst *_selfPoolInst;
-    LLBC_IObjectPoolInst *_msgBlockPoolInst;
+    LLBC_TypedObjPool<LLBC_Packet> *_typedObjPool;
 };
 
 __LLBC_NS_END

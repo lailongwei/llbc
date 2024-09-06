@@ -33,8 +33,11 @@ class LLBC_Logger;
 /**
  * \brief The json log msg class encapsulation.
  */
-class LLBC_EXPORT LLBC_LogJsonMsg
+class LLBC_EXPORT LLBC_LogJsonMsg final
 {
+    LLBC_DISABLE_ASSIGNMENT(LLBC_LogJsonMsg);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_LogJsonMsg);
+
 public:
     explicit LLBC_LogJsonMsg(LLBC_Logger *logger,
                              const char* tag,

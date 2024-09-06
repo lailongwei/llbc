@@ -23,7 +23,7 @@
 
 #include "llbc/core/thread/SpinLock.h"
 #include "llbc/core/utils/Util_Delegate.h"
-#include "llbc/core/objectpool/ObjectPool.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogLevel.h"
 
@@ -84,10 +84,12 @@ public:
     int GetLogLevel() const;
 
     /**
-     * Set log level.
-     * @param[in] level - new log level.
+     * @brief Set log level.
+     * @param[in] appenderType - the log appender type.
+     * @param[in] logLevel     - the log level(End will disabled logger).
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void SetLogLevel(int level);
+    int SetAppenderLogLevel(int appenderType, int logLevel);
 
     /**
      * Get logger take over option, only available on root logger.
@@ -109,9 +111,9 @@ public:
 
     /**
      * Get logger object pool.
-     * @return const LLBC_SafeObjectPool & - logger object pool.
+     * @return const LLBC_ObjPool & - logger object pool.
      */
-    const LLBC_SafeObjectPool &GetLoggerObjectPool() const;
+    const LLBC_ObjPool &GetLoggerObjPool() const;
 
 public:
     /**
@@ -337,7 +339,7 @@ private:
     LLBC_String _name;
     mutable LLBC_SpinLock _lock;
 
-    int _logLevel;
+    volatile int _logLevel;
     bool _addTimestampInJsonLog;
     const LLBC_LoggerConfigInfo *_config;
 
@@ -347,8 +349,8 @@ private:
     sint64 _flushInterval;
     LLBC_ILogAppender *_appenders;
 
-    LLBC_SafeObjectPool _objPool;
-    LLBC_ObjectPoolInst<LLBC_LogData> &_logDataPoolInst;
+    LLBC_ObjPool _objPool;
+    LLBC_TypedObjPool<LLBC_LogData> &_logDataTypedObjPool;
     LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
 };
 

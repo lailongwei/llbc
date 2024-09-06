@@ -304,10 +304,11 @@ void TestCase_Com_DataType::StringUTF8Test()
 
     // split_utf8_string().
     std::vector<LLBC_String> utf8Vec;
-    utf8Str.split_utf8_string(1, utf8Vec);
-    LLBC_PrintLn("Split utf8 string done, first str size: %ld, second str size: %ld", utf8Vec[0].length(), utf8Vec[1].length());
-    utf8Str.split_utf8_string(-1, utf8Vec);
-    LLBC_PrintLn("Reverse split utf8 string done, first str size: %ld, second str size: %ld", utf8Vec[0].length(), utf8Vec[1].length());
+    utf8Str.split_utf8_string(utf8Vec);
+    LLBC_Print("After split utf8 string, vector size: %ld", utf8Vec.size());
+    for(const auto& utf8Char : utf8Vec)
+        LLBC_Print("    \"%s\"", utf8Char.c_str());
+    LLBC_Print("\n");
 
     // trim/add bomb.
     utf8Str.trim_utf8_bomb();

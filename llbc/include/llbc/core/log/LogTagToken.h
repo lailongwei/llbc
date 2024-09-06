@@ -31,8 +31,8 @@ __LLBC_NS_BEGIN
 class LLBC_HIDDEN LLBC_LogTagToken : public LLBC_BaseLogToken
 {
 public:
-    LLBC_LogTagToken();
-    virtual ~LLBC_LogTagToken();
+    LLBC_LogTagToken() = default;
+    virtual ~LLBC_LogTagToken() = default;
 
 public:
     /**
@@ -41,7 +41,7 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str);
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
 
     /**
      * Get token type.

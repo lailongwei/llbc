@@ -44,7 +44,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
-: _logLevel(LLBC_LogLevel::Begin)
+: _logLevel(LLBC_LogLevel::End)
 , _addTimestampInJsonLog(false)
 , _config(nullptr)
 
@@ -54,7 +54,8 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
-, _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
+, _objPool(true)
+, _logDataTypedObjPool(*_objPool.GetTypedObjPool<LLBC_LogData>())
 , _hookDelegs()
 {
 }
@@ -101,7 +102,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetConsoleLogLevel();
+        appenderInitInfo.logLevel = _config->GetConsoleLogLevel();
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
 
@@ -122,7 +123,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     if (_config->IsLogToFile())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetFileLogLevel();
+        appenderInitInfo.logLevel = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
         appenderInitInfo.filePath = _config->GetLogFile();
         appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
@@ -196,10 +197,52 @@ void LLBC_Logger::Finalize()
     ClearNonRunnableMembers(false);
 }
 
-void LLBC_Logger::SetLogLevel(int level)
+int LLBC_Logger::SetAppenderLogLevel(int appenderType, int logLevel)
 {
+    // Argument check.
+    if (!LLBC_LogAppenderType::IsValid(appenderType))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+    if (!LLBC_LogLevel::IsValid(logLevel) && logLevel != LLBC_LogLevel::End)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    // Logger inited check.
     LLBC_LockGuard guard(_lock);
-    _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
+    if (!IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Find appender.
+    LLBC_ILogAppender *appender = _appenders;
+    while (appender && appender->GetType() != appenderType)
+        appender = appender->GetAppenderNext();
+
+    if (!appender)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // Set appender log level.
+    appender->SetLogLevel(logLevel);
+
+    // Update logger log level.
+    _logLevel = LLBC_LogLevel::End;
+    appender = _appenders;
+    while (appender)
+    {
+        _logLevel = MIN(appender->GetLogLevel(), _logLevel);
+        appender = appender->GetAppenderNext();
+    }
+
+    return LLBC_OK;
 }
 
 bool LLBC_Logger::IsTakeOver() const
@@ -216,7 +259,7 @@ bool LLBC_Logger::IsAsyncMode() const
 
 int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(level) ||
         !hookDeleg))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
@@ -231,7 +274,7 @@ int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogD
 
 void LLBC_Logger::UninstallHook(int level)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level)))
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(level)))
         return;
 
     LLBC_LockGuard guard(_lock);
@@ -335,8 +378,8 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
     if (UNLIKELY(len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)))
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
-    if (data->msgCap < len + 1)
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
+    if (UNLIKELY(data->msgCap < len + 1))
     {
         data->msgCap = MAX(len + 1, 192);
         data->msg = LLBC_Realloc(char, data->msg, data->msgCap);
@@ -344,7 +387,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     // Copy formatted message to LogData.
     data->msgLen = len;
-    if (len > 0)
+    if (LIKELY(len > 0))
         memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len);
     data->msg[len] = '\0';
 
@@ -383,7 +426,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
         msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1;
 
     // Alloc new LogData, and adjust message capacity.
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
     const int msgCap = MAX(static_cast<int>(msgLen) + 1, 192);
     if (data->msgCap < msgCap)
     {
@@ -393,7 +436,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     // Copy message to LogData.
     data->msgLen = static_cast<int>(msgLen);
-    if (msgLen > 0)
+    if (LIKELY(msgLen > 0))
         memcpy(data->msg, msg, msgLen);
     data->msg[msgLen] = '\0';
 
@@ -590,7 +633,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
 
     _config = nullptr;
     _addTimestampInJsonLog = false;
-    _logLevel = LLBC_LogLevel::Begin;
+    _logLevel = LLBC_LogLevel::End;
 
     _name.clear();
 }

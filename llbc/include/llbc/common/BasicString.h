@@ -395,6 +395,12 @@ public:
         return _Base::at(off);
     }
 
+    // clear
+    void clear()
+    {
+        _Base::clear();
+    }
+
     // resize
     void resize(size_type count)
     {
@@ -1449,43 +1455,11 @@ public:
         return count;
     }
 
-    // utf8 support: substring with utf8.
-    _This substr_with_utf8(size_type pos = 0, size_type n = _This::npos) const
-    {
-        if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
-            return _This();
-
-        size_type utf8Len = this->length_with_utf8();
-        if (pos >= utf8Len || n == 0)
-            return _This();
-
-        _These substrs;
-        this->split_utf8_string(static_cast<long>(pos), substrs);
-        if (substrs.empty())
-            return _This();
-
-        _This str1 = *substrs.rbegin();
-        utf8Len = str1.length_with_utf8();
-        pos = (n == _This::npos || n > utf8Len) ? utf8Len : n;
-
-        substrs.clear();
-        str1.split_utf8_string(static_cast<long>(pos), substrs);
-        if (substrs.empty())
-            return _This();
-
-        return substrs[0];
-    }
-
     // utf8 support: split utf8 string.
-    void split_utf8_string(long charIndex, _These &strs) const
+    void split_utf8_string(_These &strs) const
     {
         strs.clear();
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
-        {
-            strs.push_back(*this);
-            return;
-        }
-        else if (charIndex == 0)
         {
             strs.push_back(*this);
             return;
@@ -1498,24 +1472,13 @@ public:
             return;
         }
 
-        charIndex = (charIndex < 0) ?
-            static_cast<long>(utf8Count) + charIndex : charIndex;
-        if (charIndex <= 0 || charIndex >= static_cast<long>(utf8Count))
-        {
-            strs.push_back(*this);
-            return;
-        }
-
+        size_type prev_bytePos = 0;
         size_type bytePos = 0;
-        size_type charPos = 0;
-        while (static_cast<long>(charPos) != charIndex)
+        while ((bytePos = _This::next_utf8_char_pos(bytePos)) != _This::npos)
         {
-            bytePos = _This::next_utf8_char_pos(bytePos);
-            charPos++;
+            strs.push_back(_This::substr(prev_bytePos, bytePos - prev_bytePos));
+            prev_bytePos = bytePos;
         }
-
-        strs.push_back(_This::substr(0, bytePos));
-        strs.push_back(_This::substr(bytePos));
     }
 
     // utf8 support: scatter utf8 string.
@@ -1577,7 +1540,7 @@ public:
     }
 
 public:
-    size_type next_utf8_char_pos(size_type &beginBytePos) const
+    size_type next_utf8_char_pos(size_type beginBytePos) const
     {
         if (sizeof(_Elem) != sizeof(char))
             return _This::npos;

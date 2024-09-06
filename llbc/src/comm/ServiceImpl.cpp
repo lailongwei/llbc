@@ -121,9 +121,8 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 // Service extend functions about members.
 , _releasePoolStack(nullptr)
 
-, _packetObjectPool(*_safeObjectPool.GetPoolInst<LLBC_Packet>())
-, _msgBlockObjectPool(*_safeObjectPool.GetPoolInst<LLBC_MessageBlock>())
-, _eventFirerPool(*_safeObjectPool.GetPoolInst<LLBC_ServiceEventFirer>())
+, _threadSafeObjPool(true)
+, _threadUnsafeObjPool(false)
 
 , _timerScheduler(nullptr)
 {
@@ -952,16 +951,12 @@ void LLBC_ServiceImpl::FireEvent(LLBC_Event *ev,
         enqueueHandler(ev);
 }
 
-LLBC_ServiceEventFirer &LLBC_ServiceImpl::BeginFireEvent(int eventId)
+LLBC_ServiceEventFirer LLBC_ServiceImpl::BeginFireEvent(int eventId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromSafePool<LLBC_Event>();
+    LLBC_Event *ev = _threadSafeObjPool.Acquire<LLBC_Event>();
     ev->SetId(eventId);
 
-    auto *eventServiceFirer = _eventFirerPool.GetReferencableObject();
-    LLBC_AutoRelease(eventServiceFirer);
-    SetEventInfo(eventServiceFirer, ev);
-
-    return *eventServiceFirer;
+    return LLBC_ServiceEventFirer(this, ev);
 }
 
 void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams)
@@ -2407,7 +2402,7 @@ LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
                                                      bool checkSessionValidity)
 {
     // Create packet(from object pool) and send.
-    LLBC_Packet *packet = _packetObjectPool.GetObject();
+    LLBC_Packet *packet = _threadSafeObjPool.Acquire<LLBC_Packet>();
     packet->SetHeader(sessionId, opcode, status, flags);
     int ret = packet->Write(bytes, len);
     if (UNLIKELY(ret != LLBC_OK))

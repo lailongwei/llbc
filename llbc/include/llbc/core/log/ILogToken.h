@@ -61,9 +61,10 @@ public:
         NewLineToken   = 'n', // %n: new line type.
         MsgToken       = 'm', // %m: message type token.
         TimeToken      = 'T', // %T: time token.
+        EnvToken       = 'E', // %E: environment token.
         EscapeToken    = '%', // %%: escape token.
 
-        End
+        NullToken      = '?', // null token.
     };
 };
 
@@ -82,7 +83,7 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str) = 0;
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) = 0;
 
     /**
      * Get token type.
@@ -102,13 +103,13 @@ protected:
      * Get token log formatter.
      * @return LLBC_LogFormattingInfo * - log formatter.
      */
-    virtual LLBC_LogFormattingInfo *GetFormatter() const = 0;
+    virtual const LLBC_LogFormattingInfo &GetFormatter() const = 0;
 
     /**
      * Set token log formatter.
      * @param[in] formatter - log formatter.
      */
-    virtual void SetFormatter(LLBC_LogFormattingInfo *formatter) = 0;
+    virtual void SetFormatter(const LLBC_LogFormattingInfo &formatter) = 0;
 
 protected:
     friend class LLBC_LogTokenChain;

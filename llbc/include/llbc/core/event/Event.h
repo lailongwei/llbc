@@ -23,14 +23,14 @@
 
 #include "llbc/core/variant/Variant.h"
 #include "llbc/core/utils/Util_Delegate.h"
-#include "llbc/core/objectpool/PoolObject.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 __LLBC_NS_BEGIN
 
 /**
  * \brief The event class encapsulation.
  */
-class LLBC_EXPORT LLBC_Event : public LLBC_PoolObject
+class LLBC_EXPORT LLBC_Event : public LLBC_PoolObj
 {
 public:
     explicit LLBC_Event(int id = 0, bool dontDelAfterFire = false);
@@ -225,9 +225,9 @@ public:
 
 public:
     /**
-     * Object-Pool reflection support: clear firer object.
+     * Object-Pool reflection support: Reuse Event object.
      */
-    virtual void Reuse() override;
+    virtual void Reuse();
 
     /**
      * Disable assignment.

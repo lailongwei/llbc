@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "llbc/comm/Packet.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"

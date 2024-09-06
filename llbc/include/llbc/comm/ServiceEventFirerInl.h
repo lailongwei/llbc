@@ -24,10 +24,30 @@
 #include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
-inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer()
-: _ev(nullptr)
-, _service(nullptr)
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(LLBC_Service *svc, LLBC_Event *ev)
+: _svc(svc)
+, _ev(ev)
 {
+}
+
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(const LLBC_ServiceEventFirer &other)
+: _svc(other._svc)
+, _ev(other._ev)
+{
+    other._ev = nullptr;
+}
+
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other)
+: _svc(other._svc)
+, _ev(other._ev)
+{
+    other._ev = nullptr;
+}
+
+inline LLBC_ServiceEventFirer::~LLBC_ServiceEventFirer()
+{
+    if (_ev)
+        LLBC_Recycle(_ev);
 }
 
 template <typename KeyType, typename ParamType>
@@ -39,32 +59,45 @@ LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::SetParam(const KeyType &paramKey
 
 inline void LLBC_ServiceEventFirer::Fire()
 {
-    _service->FireEvent(_ev);
-    _ev = nullptr;
-    _service = nullptr;
-}
-
-inline void LLBC_ServiceEventFirer::Clear()
-{
-    if (_ev)
+    if (LIKELY(_ev))
     {
-        LLBC_Recycle(_ev);
+        _svc->FireEvent(_ev);
         _ev = nullptr;
-        _service = nullptr;
     }
 }
 
-inline void LLBC_ServiceEventFirer::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
+inline LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::operator=(const LLBC_ServiceEventFirer &other)
 {
-    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(
-        typeid(LLBC_ServiceEventFirer).name(), typeid(LLBC_Event).name());
+    if (UNLIKELY(&other == this))
+        return *this;
+
+    if (UNLIKELY(_ev))
+        LLBC_Recycle(_ev);
+
+    // Note: Crossed service event-firer assignment case will not occurred.
+    // _svc = other._svc;
+    _ev = other._ev;
+
+    other._ev = nullptr;
+
+    return *this;
 }
 
-inline void LLBC_ServiceEventFirer::SetEventInfo(LLBC_Event *ev, LLBC_Service *service)
+inline LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::operator=(LLBC_ServiceEventFirer &&other)
 {
-    _ev = ev;
-    _service = service;
+    if (UNLIKELY(&other == this))
+        return *this;
+
+    if (UNLIKELY(_ev))
+        LLBC_Recycle(_ev);
+
+    // Note: Crossed service event-firer assignment case will not occurred.
+    // _svc = other._svc;
+    _ev = other._ev;
+
+    other._ev = nullptr;
+
+    return *this;
 }
 
 __LLBC_NS_END

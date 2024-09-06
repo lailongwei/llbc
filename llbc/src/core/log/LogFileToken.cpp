@@ -23,20 +23,11 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogFileToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogFileToken::LLBC_LogFileToken()
-{
-}
-
-LLBC_LogFileToken::~LLBC_LogFileToken()
-{
-}
-
-int LLBC_LogFileToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogFileToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -55,7 +46,7 @@ void LLBC_LogFileToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     const int index = static_cast<int>(formattedData.size());
     formattedData.append(data.file, data.fileLen);
 
-    GetFormatter()->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END

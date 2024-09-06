@@ -22,16 +22,17 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/os/OS_Atomic.h"
+
 #include "llbc/core/helper/STLHelper.h"
 
-#include "llbc/core/objectpool/ObjectPoolMgr.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 #include "llbc/core/event/EventFirer.h"
 #include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
-
-sint64 LLBC_EventMgr::_maxListenerStub = 1;
+    sint64 LLBC_EventMgr::_maxListenerStub = 1;
 
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)
@@ -228,15 +229,12 @@ void LLBC_EventMgr::Fire(LLBC_Event *ev)
     AfterFireEvent();
 }
 
-LLBC_EventFirer &LLBC_EventMgr::BeginFire(int evId)
+LLBC_EventFirer LLBC_EventMgr::BeginFire(int evId)
 {
-    LLBC_Event *ev = LLBC_GetObjectFromUnsafePool<LLBC_Event>();
+    LLBC_Event *ev = LLBC_ThreadSpecObjPool::UnsafeAcquire<LLBC_Event>();
     ev->SetId(evId);
 
-    LLBC_EventFirer *evFirer = LLBC_GetObjectFromUnsafePool<LLBC_EventFirer>();
-    evFirer->SetEventInfo(ev, this);
-
-    return *evFirer;
+    return {this, ev};
 }
 
 bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const

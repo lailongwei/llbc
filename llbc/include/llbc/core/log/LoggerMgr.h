@@ -129,13 +129,10 @@ private:
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;
-    std::map<LLBC_String, LLBC_Logger *> _str2Loggers;
     std::map<LLBC_CString, LLBC_Logger *> _cstr2Loggers;
     std::vector<std::pair<LLBC_CString, LLBC_Logger *> > _loggerList;
-    std::map<LLBC_String, LLBC_Logger *>::const_iterator _str2LoggersEnd;
     std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 
-    static LLBC_String _rootLoggerName;
     static LLBC_FastLock _uninitColorfulOutputLock;
 };
 
@@ -169,7 +166,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
                 __l__ = __loggerMgr__->GetRootLogger();   \
             }                                             \
                                                           \
-            if (level < __l__->GetLogLevel())             \
+            if ((level) < __l__->GetLogLevel())           \
                 break;                                    \
                                                           \
             __l__->Output(level,                          \
@@ -228,7 +225,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
  * @param[in] level      - log level.
  */
 #define LJLOG(loggerName, tag, level)                    \
-        (*(new LLBC_NS LLBC_LogJsonMsg(                  \
+    (LLBC_NS LLBC_LogJsonMsg(                            \
                    LIKELY(LLBC_LoggerMgrSingleton->IsInited()) ? \
                         (loggerName != nullptr ?         \
                             LLBC_LoggerMgrSingleton->GetLogger(loggerName) : \
@@ -237,7 +234,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
                    level,                                \
                    __FILE__,                             \
                    __LINE__,                             \
-                   __FUNCTION__)))                       \
+                   __FUNCTION__))                        \
 
 #define LJLOG_DEBUG() LJLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug)
 #define LJLOG_DEBUG2(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug)
@@ -852,5 +849,3 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Fatal, exitCode, ##__VA_ARGS__)
 
 #include "llbc/core/log/LoggerMgrInl.h"
-
-

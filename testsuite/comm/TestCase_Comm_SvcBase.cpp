@@ -52,7 +52,7 @@ struct TestData : public LLBC_Coder
         return true;
     }
 
-    void Reuse()
+    virtual void Reuse()
     {
         iVal = 0;
         strVal.clear();
@@ -150,7 +150,7 @@ public:
         TestData *resData = new TestData;
         *resData = *data;
 
-        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
+        LLBC_Packet *resPacket = GetService()->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
         resPacket->SetHeader(packet.GetSessionId(), packet.GetOpcode(), 0);
         resPacket->SetEncoder(resData);
 
@@ -370,7 +370,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
     encoder->strVal = "Hello, llbc library";
 
     // LLBC_Packet *packet = new LLBC_Packet; // uncomment for test send non object-pool packet.
-     LLBC_Packet *packet = _svc->GetPacketObjectPool().GetObject();  // uncomment for test send object-pool packet.
+     LLBC_Packet *packet = _svc->GetThreadSafeObjPool().Acquire<LLBC_Packet>();  // uncomment for test send object-pool packet.
     packet->SetHeader(connSession, 1, 0);
     packet->SetEncoder(encoder);
 
@@ -378,7 +378,7 @@ void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
 
     // Create status == 1 packet to send to peer(if enabled).
     #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
-    encoder = _svc->GetSafeObjectPool().Get<TestData>();
+    encoder = _svc->GetThreadSafeObjPool().Acquire<TestData>();
     encoder->iVal = _svc->GetId();
     encoder->strVal = "Hello, llbc library too";
 

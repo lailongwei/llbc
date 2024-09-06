@@ -107,7 +107,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     if (_logToConsole)
     {
         if (cfg["consoleLogLevel"])
-            _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg["consoleLogLevel"].AsStr().c_str());
+            _consoleLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["consoleLogLevel"].AsStr().c_str());
         else
             _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
@@ -126,7 +126,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     {
         // File log level.
         if (cfg["fileLogLevel"])
-            _fileLogLevel = LLBC_LogLevel::Str2Level(cfg["fileLogLevel"].AsStr().c_str());
+            _fileLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["fileLogLevel"].AsStr().c_str());
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 

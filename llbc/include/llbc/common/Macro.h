@@ -205,11 +205,15 @@
 #define register
 #endif
 
-// Disable assignments of objects.
+// Disable assignments of object.
 #define LLBC_DISABLE_ASSIGNMENT(name)      \
-private:                                   \
     name(const name &) = delete;           \
     name &operator=(const name &) = delete \
+
+// Disable move assignments of object.
+#define LLBC_DISABLE_MOVE_ASSIGNMENT(name) \
+    name(name &&) = delete;                \
+    name &operator=(name &&) = delete      \
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX
@@ -282,8 +286,13 @@ private:                                   \
         }                           \
     } while(false)                  \
 
-#define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
-#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
+#define LLBC_Recycle(objptr)                LLBC_NS LLBC_ObjReflector::Recycle(objptr)
+#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_ObjReflector::RecycleX(objptr)
+
+/**
+ * Whitespace check.
+ */
+#define LLBC_IsSpace(ch) (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '\v' || ch == '\f')
 
 /**
  * Format argument.

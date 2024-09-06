@@ -23,7 +23,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/Logger.h"

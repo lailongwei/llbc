@@ -375,7 +375,7 @@ __LLBC_NS_BEGIN
 //
 // MessageText:
 //
-// would block.
+// would stripe.
 //
 #define __LLBC_ERROR_WBLOCK              ((int)(0x00000018))
 #define LLBC_ERROR_WBLOCK                ((int)(0xc0000018))

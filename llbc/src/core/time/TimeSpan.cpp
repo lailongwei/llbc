@@ -44,38 +44,4 @@ const LLBC_TimeSpan LLBC_TimeSpan::negOneHour = LLBC_TimeSpan::FromHours(-1);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneDay = LLBC_TimeSpan::FromDays(-1);
 const LLBC_TimeSpan LLBC_TimeSpan::negOneWeek = LLBC_TimeSpan::FromDays(-7);
 
-LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
-{
-   // Add day part span.
-    LLBC_String strippedSpan = span.strip();
-    size_t dayIdx = strippedSpan.find(' ');
-    if (dayIdx != LLBC_String::npos)
-    {
-        _span = atoll(strippedSpan.substr(0, dayIdx).c_str()) *
-            LLBC_TimeConst::numOfMicrosPerDay;
-        strippedSpan = strippedSpan.substr(dayIdx + 1);
-    }
-    else
-    {
-        _span = 0;
-    }
-
-    // Split by ':', fetch hour/minute/second/micro-second parts.
-    LLBC_Strings hmsParts = strippedSpan.strip().split(':');
-    const LLBC_String &secSpan = hmsParts[hmsParts.size() - 1];
-    if (hmsParts.size() >= 2)
-    {
-        _span += atoll(hmsParts[hmsParts.size() - 2].c_str()) *
-            LLBC_TimeConst::numOfMicrosPerMinute;
-        if (hmsParts.size() >= 3)
-            _span += atoll(hmsParts[hmsParts.size() - 3].c_str()) *
-                LLBC_TimeConst::numOfMicrosPerHour;
-    }
-
-    LLBC_Strings secParts = secSpan.strip().split('.', 1);
-    _span += atoll(secParts[0].c_str()) * LLBC_TimeConst::numOfMicrosPerSecond;
-    if (secParts.size() == 2)
-        _span += atoll(secParts[1].c_str()) * LLBC_TimeConst::numOfMicrosPerMillisecond;
-}
-
 __LLBC_NS_END

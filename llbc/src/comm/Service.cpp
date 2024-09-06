@@ -81,12 +81,4 @@ void LLBC_Service::GetCompName(const char *qualifiedCompName,
     }
 }
 
-void LLBC_Service::SetEventInfo(LLBC_ServiceEventFirer *eventServiceFirer, LLBC_Event *ev)
-{
-    if(UNLIKELY(eventServiceFirer == nullptr))
-        return ;
-
-    eventServiceFirer->SetEventInfo(ev, this);
-}
-
 __LLBC_NS_END

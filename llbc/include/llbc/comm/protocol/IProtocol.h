@@ -163,7 +163,7 @@ protected:
     LLBC_Service *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
-    LLBC_ObjectPoolInst<LLBC_Packet> *_pktPoolInst;
+    LLBC_TypedObjPool<LLBC_Packet> *_pktObjPool;
 };
 
 __LLBC_NS_END

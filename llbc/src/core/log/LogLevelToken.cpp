@@ -24,20 +24,11 @@
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogLevelToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogLevelToken::LLBC_LogLevelToken()
-{
-}
-
-LLBC_LogLevelToken::~LLBC_LogLevelToken()
-{
-}
-
-int LLBC_LogLevelToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogLevelToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -55,7 +46,7 @@ void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formatted
     const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level);
     formattedData.append(lvStr.c_str(), lvStr.size());
 
-    GetFormatter()->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END

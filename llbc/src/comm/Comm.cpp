@@ -28,10 +28,6 @@ __LLBC_NS_BEGIN
 
 int __LLBC_CommStartup()
 {
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Coder>());
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Packet>());
-
     return LLBC_OK;
 }
 

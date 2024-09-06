@@ -24,7 +24,7 @@
 
 #include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Console.h"
-#include "llbc/core/objectpool/ObjectPoolMgr.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerMgr.h"
@@ -50,14 +50,14 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger,
 , _line(line)
 , _func(func)
 
-, _doc(*LLBC_GetObjectFromUnsafePool<LLBC_Json::Document>())
+, _doc(*LLBC_ThreadSpecObjPool::UnsafeAcquire<LLBC_Json::Document>())
 {
     _doc.SetObject();
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 {
-    LLBC_ReleaseObjectToUnsafePool(&_doc);
+    LLBC_ThreadSpecObjPool::UnsafeRelease(&_doc);
 }
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
@@ -105,9 +105,6 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     else
         LLBC_LoggerMgrSingleton->UnInitOutput(
             _lv, _tag, nullptr, 0, nullptr, "%s", buffer.GetString());
-
-    // Recycle self.
-    LLBC_Recycle(this);
 }
 
 __LLBC_NS_END

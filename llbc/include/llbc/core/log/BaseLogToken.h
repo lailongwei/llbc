@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/log/ILogToken.h"
+#include "llbc/core/log/LogFormattingInfo.h"
 
 __LLBC_NS_BEGIN
 
@@ -31,21 +32,21 @@ __LLBC_NS_BEGIN
 class LLBC_HIDDEN LLBC_BaseLogToken : public LLBC_ILogToken
 {
 public:
-    LLBC_BaseLogToken();
-    virtual ~LLBC_BaseLogToken();
+    LLBC_BaseLogToken(): _nextToken(nullptr) {  }
+    virtual ~LLBC_BaseLogToken() = default;
 
 protected:
     /**
      * Get token log formatter.
      * @return LLBC_LogFormattingInfo * - log formatter.
      */
-    virtual LLBC_LogFormattingInfo *GetFormatter() const;
+    virtual const LLBC_LogFormattingInfo &GetFormatter() const { return _formatter; }
 
     /**
      * Set token log formatter.
      * @param[in] formatter - log formatter.
      */
-    virtual void SetFormatter(LLBC_LogFormattingInfo *formatter);
+    virtual void SetFormatter(const LLBC_LogFormattingInfo &formatter) { _formatter = formatter; }
 
 protected:
     friend class LLBC_LogTokenChain;
@@ -54,16 +55,16 @@ protected:
      * Get next token.
      * @return LLBC_ILogToken * - next log token.
      */
-    virtual LLBC_ILogToken *GetTokenNext() const;
+    virtual LLBC_ILogToken *GetTokenNext() const { return _nextToken; }
 
     /**
      * Set next token.
      * @param[in] next - next log token.
      */
-    virtual void SetTokenNext(LLBC_ILogToken *next);
+    virtual void SetTokenNext(LLBC_ILogToken *next) { _nextToken = next; }
 
 private:
-    LLBC_LogFormattingInfo *_formatter;
+    LLBC_LogFormattingInfo _formatter;
     LLBC_ILogToken *_nextToken;
 };
 

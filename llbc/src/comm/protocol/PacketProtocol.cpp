@@ -141,7 +141,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
                 return LLBC_OK;
 
             // Create new packet.
-            _packet = _pktPoolInst->GetObject();
+            _packet = _pktObjPool->Acquire();
             _headerAssembler.SetToPacket(*_packet);
             _packet->SetSessionId(_sessionId);
             _packet->SetAcceptSessionId(_acceptSessionId);

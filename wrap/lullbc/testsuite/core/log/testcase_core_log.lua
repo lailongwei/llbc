@@ -26,6 +26,7 @@ function TestCase.base_test()
 
     -- Test base log methods(all messages log to root logger).
     print 'Test base log methods, all messages log to root logger...'
+    Log.t('Hello, this is a TRACE level message...')  -- TRACE level message, log to root logger.
     Log.d('Hello, this is a DEBUG level message...')  -- DEBUG level message, log to root logger.
     Log.i('Hello, this is a INFO level message...')  -- INFO level message, log to root logger.
     Log.w('Hello, this is a WARN level message...')  -- WARN level message, log to root logger.
@@ -34,6 +35,7 @@ function TestCase.base_test()
 
     -- Test log to specific logger methods, all methods named Log.x2(logger, ...).
     print 'Test log to specific logger log methods, all messages log to specific logger...'
+    Log.t2('test', 'Hello, I will write to test logger...') -- Write TRACE level message  to 'test' logger.
     Log.d2('test', 'Hello, I will write to test logger...') -- Write DEBUG level message  to 'test' logger.
     Log.i2('test', 'Hello, I will write to test logger...') -- Write INFO level message  to 'test' logger.
     Log.w2('test', 'Hello, I will write to test logger...') -- Write WARN level message  to 'test' logger.
@@ -43,6 +45,7 @@ function TestCase.base_test()
     -- Test log to specific logger methods(appended tag), all methods named Log.x3(logger, tag, ...).
     -- logger name can be nil, if logger name is nil, message will log to root logger.
     print 'Test log to specific logger log methods(appended tag), all messages log to specific logger...'
+    Log.t3('test', 'TestTag', 'Hello, I will write to test logger...') -- Write TRACE level message  to 'test' logger.
     Log.d3('test', 'TestTag', 'Hello, I will write to test logger...') -- Write DEBUG level message  to 'test' logger.
     Log.i3('test', 'TestTag', 'Hello, I will write to test logger...') -- Write INFO level message  to 'test' logger.
     Log.w3('test', 'TestTag', 'Hello, I will write to test logger...') -- Write WARN level message  to 'test' logger.
@@ -51,11 +54,12 @@ function TestCase.base_test()
 
     -- Test log messages unknown logger.
     print 'Test log message to unknown logger, root logger will take over these messages...'
+    Log.t2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger TRACE message...')
     Log.d2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger DEBUG message...')
-    Log.i2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger DEBUG message...')
-    Log.w2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger DEBUG message...')
-    Log.d2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger DEBUG message...')
-    Log.w2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger DEBUG message...')
+    Log.i2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger INFO message...')
+    Log.w2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger WARN message...')
+    Log.d2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger ERROR message...')
+    Log.w2('unknown_logger', 'Hello, I am a log to "unknown_logger" logger FATAL message...')
 
     Log.i('Base test finish!\n')
 end

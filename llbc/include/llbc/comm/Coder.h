@@ -37,7 +37,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The packet coder interface class encapsulation.
  */
-class LLBC_Coder : public LLBC_PoolObject
+class LLBC_Coder : public LLBC_PoolObj
 {
 public:
     LLBC_Coder() = default;

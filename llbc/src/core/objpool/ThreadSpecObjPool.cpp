@@ -22,22 +22,47 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objectpool/ObjectPoolStat.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolBlockStat &st)
+__LLBC_NS_BEGIN
+int LLBC_ThreadSpecObjPool::Initialize()
 {
-    o << st.ToString();
-    return o;
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (!libTls->coreTls.entryThread)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    if (libTls->coreTls.safeObjPool ||
+        libTls->coreTls.unsafeObjPool)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REENTRY);
+        return LLBC_FAILED;
+    }
+
+    libTls->coreTls.safeObjPool = new LLBC_ObjPool(true);
+    libTls->coreTls.unsafeObjPool = new LLBC_ObjPool(false);
+
+    return LLBC_OK;
 }
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolInstStat &st)
+void LLBC_ThreadSpecObjPool::Finalize()
 {
-    o << st.ToString();
-    return o;
-}
+    __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    if (!libTls->coreTls.entryThread)
+        return;
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ObjectPoolStat &st)
-{
-    o << st.ToString();
-    return o;
+    if (libTls->coreTls.safeObjPool)
+    {
+        delete reinterpret_cast<LLBC_ObjPool *>(libTls->coreTls.safeObjPool);
+        libTls->coreTls.safeObjPool = nullptr;
+    }
+
+    if (libTls->coreTls.unsafeObjPool)
+    {
+        delete reinterpret_cast<LLBC_ObjPool *>(libTls->coreTls.unsafeObjPool);
+        libTls->coreTls.unsafeObjPool = nullptr;
+    }
 }
+__LLBC_NS_END

@@ -23,7 +23,7 @@
 
 __LLBC_NS_BEGIN
 
-inline const LLBC_String &LLBC_Logger::GetLoggerName() const
+LLBC_FORCE_INLINE const LLBC_String &LLBC_Logger::GetLoggerName() const
 {
     return _name;
 }
@@ -38,7 +38,7 @@ LLBC_FORCE_INLINE bool LLBC_Logger::IsAddTimestampInJsonLog() const
     return _addTimestampInJsonLog;
 }
 
-inline const LLBC_SafeObjectPool &LLBC_Logger::GetLoggerObjectPool() const
+inline const LLBC_ObjPool &LLBC_Logger::GetLoggerObjPool() const
 {
     LLBC_LockGuard guard(_lock);
     return _objPool;
