@@ -623,21 +623,12 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Get component name.
-    size_t compNameLen;
-    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-    GetCompName(typeid(*comp).name(), compName, compNameLen);
+    const LLBC_CString compName = LLBC_GetCompName(*comp);
 
     // Define component find lambda.
-    const auto findLambda = [comp, compName, compNameLen](LLBC_Component *regComp) {
-        if (comp == regComp)
-            return true;
-
-        char regCompName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-        size_t regCompNameLen;
-        GetCompName(typeid(*regComp).name(), regCompName, regCompNameLen);
-
-        return regCompNameLen == compNameLen &&
-            memcmp(compName, regCompName, compNameLen) == 0;
+    const auto findLambda = [comp, compName](LLBC_Component *regComp) {
+        return comp == regComp ||
+            compName == LLBC_GetCompName(*regComp);
     };
 
     // Repeat add check.
@@ -715,10 +706,7 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     }
 
     // Validate comp class name and giving compName is same or not.
-    auto realCompName = LLBC_GetTypeName(*comp);
-    const auto realCompNSNameEnd = strrchr(realCompName, ':');
-    if (realCompNSNameEnd != nullptr)
-        realCompName = realCompNSNameEnd + 1;
+    const LLBC_CString realCompName = LLBC_GetCompName(*comp);
     if (UNLIKELY(realCompName != compName))
     {
         LLBC_XDelete(comp);
@@ -750,16 +738,28 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
         return nullptr;
     }
 
+    // Strict match.
     const auto compsEnd = _name2Comps.end();
-
     LLBC_LockGuard guard(_lock);
     auto it = _name2Comps.find(compName);
     if (it != compsEnd)
         return it->second;
 
+    // Match IXxxYyy.
     if (compName.size() > 1 && compName[0] == 'I')
     {
         if ((it = _name2Comps.find(compName + 1)) != compsEnd)
+            return it->second;
+    }
+
+    // Match BaseXxxYyy.
+    if (compName.size() > 4 &&
+        compName[0] == 'B' &&
+        compName[1] == 'a' &&
+        compName[2] == 's' &&
+        compName[3] == 'e')
+    {
+        if ((it = _name2Comps.find(compName + 4)) != compsEnd)
             return it->second;
     }
 
@@ -2185,15 +2185,11 @@ void LLBC_ServiceImpl::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
 
-    auto compName = LLBC_GetTypeName(*comp);
-    const auto colonPos = strrchr(compName, ':');
-    if (colonPos)
-        compName = colonPos + 1;
-    const auto compNameLen = strlen(compName);
+    const LLBC_CString compName = LLBC_GetCompName(*comp);
 
-    auto allocCompName = LLBC_Malloc(char, compNameLen + 1);
-    memcpy(allocCompName, compName, compNameLen + 1);
-    _name2Comps.emplace(allocCompName, comp);
+    auto allocCompName = LLBC_Malloc(char, compName.size() + 1);
+    memcpy(allocCompName, compName.c_str(), compName.size() + 1);
+    _name2Comps.emplace(LLBC_CString(allocCompName, compName.size()), comp);
 }
 
 LLBC_Library *LLBC_ServiceImpl::OpenCompLibrary(const LLBC_String &libPath, bool &existingLib)

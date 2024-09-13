@@ -34,6 +34,7 @@ public:
     virtual int Run(int argc, char *argv[]);
 
 private:
+    int TestCompNameOperation();
     int TestInInternalDriveService(const LLBC_String &host, const int port);
     int TestInExternalDriveService(const LLBC_String &host, const int port);
 };

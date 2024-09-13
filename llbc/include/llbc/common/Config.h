@@ -253,8 +253,6 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
-// Max component name length.
-#define LLBC_CFG_COMM_MAX_COMP_NAME_LEN                     255
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // The poller model config(Platform specific).

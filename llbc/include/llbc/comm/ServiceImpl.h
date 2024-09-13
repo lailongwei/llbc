@@ -427,6 +427,17 @@ public:
 
 protected:
     /**
+     * Lock service.
+     */
+    virtual void LockService();
+
+    /**
+     * Unlock service.
+     */
+    virtual void UnlockService();
+
+protected:
+    /**
      * Stack create helper method(call by service and session class).
      */
     virtual LLBC_ProtocolStack *CreatePackStack(int sessionId,

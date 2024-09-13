@@ -113,21 +113,26 @@ typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
                         Comp *>::type
 LLBC_Service::GetComponent()
 {
-    const auto &compList = GetComponentList();
-    if (compList.size() <= 32)
+    // Normal search.
+    auto comp = static_cast<Comp *>(GetComponent(LLBC_GetCompName(Comp)));
+    if (comp)
+        return comp;
+
+    // Using dynamic_cast to search(lookup all components, lock service again).
+    LockService();
+    for (auto &svcComp : GetComponentList())
     {
-        Comp *castComp;
-        for (auto *comp : compList)
+        if ((comp = dynamic_cast<Comp *>(svcComp)))
         {
-            if ((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
-                return castComp;
+            UnlockService();
+            return comp;
         }
     }
 
-    size_t compNameLen;
-    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-    GetCompName(typeid(Comp).name(), compName, compNameLen);
-    return static_cast<Comp *>(GetComponent(LLBC_CString(compName, compNameLen)));
+    UnlockService();
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
+    return nullptr;
 }
 
 template <typename Comp>

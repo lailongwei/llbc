@@ -108,24 +108,7 @@ template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
 LLBC_Component::GetComponent()
 {
-    const auto &compList = GetComponentList();
-    if (compList.size() <= 32)
-    {
-        Comp *castComp;
-        for (auto &comp : compList)
-        {
-            if ((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
-                return castComp;
-        }
-    }
-
-    #if LLBC_TARGET_PLATFORM_WIN32
-    auto compName = typeid(Comp).name();
-    #else
-    auto compName = LLBC_GetTypeName(Comp);
-    #endif
-    const auto colonPos = strrchr(compName, ':');
-    return static_cast<Comp *>(GetComponent(colonPos ? colonPos + 1 : compName));
+    return GetService()->GetComponent<Comp>();
 }
 
 template <typename Comp>

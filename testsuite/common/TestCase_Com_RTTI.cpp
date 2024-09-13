@@ -63,6 +63,55 @@ int TestCase_Com_RTTI::Run(int argc, char *argv[])
     LLBC_PrintLn("  LLBC_GetTypeName((int **)nullptr): %s", LLBC_GetTypeName((int**)nullptr));
     LLBC_PrintLn("  LLBC_GetTypeName((int ***)nullptr): %s", LLBC_GetTypeName((int***)nullptr));
 
+    class BaseCls1 {};
+    class DerivedCls1 : public BaseCls1 {};
+
+    class BaseCls2 { public: virtual ~BaseCls2() {} };
+    class DerivedCls2 : public BaseCls2 {};
+
+    LLBC_PrintLn("\n complex type constraint test:");
+    LLBC_PrintLn("  LLBC_GetTypename(double): %s", LLBC_GetTypeName(double));
+    LLBC_PrintLn("  LLBC_GetTypename(const double): %s", LLBC_GetTypeName(const double));
+    LLBC_PrintLn("  LLBC_GetTypename(double const): %s", LLBC_GetTypeName(double const));
+    LLBC_PrintLn("  LLBC_GetTypename(const double &): %s", LLBC_GetTypeName(const double &));
+    LLBC_PrintLn("  LLBC_GetTypename(const double *): %s", LLBC_GetTypeName(const double *));
+    LLBC_PrintLn("  LLBC_GetTypename(double const *): %s", LLBC_GetTypeName(double const *));
+    LLBC_PrintLn("  LLBC_GetTypename(double * const): %s", LLBC_GetTypeName(double * const));
+    LLBC_PrintLn("  LLBC_GetTypename(const double * const): %s", LLBC_GetTypeName(const double * const));
+    LLBC_PrintLn("  LLBC_GetTypename(double const * const): %s", LLBC_GetTypeName(double const * const));
+    LLBC_PrintLn("  LLBC_GetTypename(volatile double): %s", LLBC_GetTypeName(volatile double));
+
+    BaseCls1 *baseCls1 = new BaseCls1;
+    BaseCls1 *derivedCls1 = new DerivedCls1;
+    BaseCls2 *baseCls2 = new BaseCls2;
+    BaseCls2 *derivedCls2 = new DerivedCls2;
+    LLBC_PrintLn("  LLBC_GetTypeName(BaseCls1): %s", LLBC_GetTypeName(BaseCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(DerivedCls1): %s", LLBC_GetTypeName(DerivedCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(BaseCls2): %s", LLBC_GetTypeName(BaseCls2));
+    LLBC_PrintLn("  LLBC_GetTypeName(DerivedCls2): %s", LLBC_GetTypeName(DerivedCls2));
+    LLBC_PrintLn("  LLBC_GetTypeName(baseCls1): %s", LLBC_GetTypeName(baseCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(derivedCls1): %s", LLBC_GetTypeName(derivedCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(baseCls2): %s", LLBC_GetTypeName(baseCls2));
+    LLBC_PrintLn("  LLBC_GetTypeName(derivedCls2): %s", LLBC_GetTypeName(derivedCls2));
+    LLBC_PrintLn("  LLBC_GetTypeName(*baseCls1): %s", LLBC_GetTypeName(*baseCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(*derivedCls1): %s", LLBC_GetTypeName(*derivedCls1));
+    LLBC_PrintLn("  LLBC_GetTypeName(*baseCls2): %s", LLBC_GetTypeName(*baseCls2));
+    LLBC_PrintLn("  LLBC_GetTypeName(*derivedCls2): %s", LLBC_GetTypeName(*derivedCls2));
+
+    LLBC_PrintLn("  LLBC_GetCompName(BaseCls1): %s", LLBC_GetCompName(BaseCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(DerivedCls1): %s", LLBC_GetCompName(DerivedCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(BaseCls2): %s", LLBC_GetCompName(BaseCls2));
+    LLBC_PrintLn("  LLBC_GetCompName(DerivedCls2): %s", LLBC_GetCompName(DerivedCls2));
+    LLBC_PrintLn("  LLBC_GetCompName(baseCls1): %s", LLBC_GetCompName(baseCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(derivedCls1): %s", LLBC_GetCompName(derivedCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(baseCls2): %s", LLBC_GetCompName(baseCls2));
+    LLBC_PrintLn("  LLBC_GetCompName(derivedCls2): %s", LLBC_GetCompName(derivedCls2));
+    LLBC_PrintLn("  LLBC_GetCompName(*baseCls1): %s", LLBC_GetCompName(*baseCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(*derivedCls1): %s", LLBC_GetCompName(*derivedCls1));
+    LLBC_PrintLn("  LLBC_GetCompName(*baseCls2): %s", LLBC_GetCompName(*baseCls2));
+    LLBC_PrintLn("  LLBC_GetCompName(*derivedCls2): %s", LLBC_GetCompName(*derivedCls2));
+
+
     LLBC_PrintLn("\nUser defined classes/structs test:");
     LLBC_PrintLn("  LLBC_GetTypeName(UserDefineStruct): %s", LLBC_GetTypeName(UserDefineStruct));
     LLBC_PrintLn("  LLBC_GetTypeName(UserDefineClass): %s", LLBC_GetTypeName(UserDefineClass));

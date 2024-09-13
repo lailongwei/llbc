@@ -22,27 +22,31 @@
 #pragma once
 
 #include "llbc/common/Macro.h"
-#include "llbc/common/StringDataType.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * Get type name(demangled).
+ * Get type name macro.
  */
-#define LLBC_GetTypeName(ty)  LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
+#define LLBC_GetTypeName(ty) LLBC_NS __LLBC_GetTypeName(typeid(ty).name())
 
 /**
- * Get type name(demangled).
+ * Get type name.
+ * @param[in] mangledTypeName - the mangled type name.
+ * @return const char * - the demangled type name.
  */
-LLBC_EXPORT const char *__LLBC_GetTypeName(const char *rawTyName);
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+LLBC_EXPORT const char *__LLBC_GetTypeName(const char *mangledTypeName);
 
 /**
- * Demangle cxx type name(only available in non-windows platform).
+ * Get template name macro.
  */
-LLBC_EXPORT const char *__LLBC_CxxDemangle(const char *name);
+#define LLBC_GetCompName(compTy) LLBC_NS __LLBC_GetCompName(typeid(compTy).name())
 
-#endif // Non-Win32
+/**
+ * Get component name.
+ * @param[in] mangledCompName - the mangled component name.
+ * @return const char * - the demangled component name.
+ */
+LLBC_EXPORT const char *__LLBC_GetCompName(const char *mangledCompName);
 
 __LLBC_NS_END

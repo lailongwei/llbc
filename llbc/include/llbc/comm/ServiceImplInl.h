@@ -77,4 +77,14 @@ inline LLBC_ObjPool &LLBC_ServiceImpl::GetThreadUnsafeObjPool()
     return _threadUnsafeObjPool;
 }
 
+inline void LLBC_ServiceImpl::LockService()
+{
+    _lock.Lock();
+}
+
+inline void LLBC_ServiceImpl::UnlockService()
+{
+    _lock.Unlock();
+}
+
 __LLBC_NS_END

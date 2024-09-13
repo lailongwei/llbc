@@ -394,11 +394,9 @@ void LLBC_Component::UpdateComponentCfg()
     _cfgType = _svc->GetConfigType();
 
     // Update component config.
-    auto compNamePtr = LLBC_GetTypeName(*this);
-    const auto colonPos = strrchr(compNamePtr, ':');
-    const LLBC_String compName = colonPos ? colonPos + 1 : compNamePtr;
-    const LLBC_String iCompName =
-        (compName.size() > 1 && compName[0] != 'I') ? LLBC_String("I") + compName : compName;
+    const LLBC_CString compName = LLBC_GetCompName(*this);
+    const LLBC_CString iCompName =
+            compName[0] == 'I' ? LLBC_CString(compName.c_str() + 1, compName.size() - 1) : compName;
     if (_cfgType == LLBC_AppConfigType::Property)
     {
         LLBC_DoIf(_nonPropCfg, _nonPropCfg->BecomeNil());
@@ -425,7 +423,7 @@ void LLBC_Component::UpdateComponentCfg()
         LLBC_DoIf(_propCfg, _propCfg->RemoveAllProperties());
 
         const LLBC_Variant *matchedCompCfg = nullptr;
-        auto svcNonPropCfg = _svc->GetConfig();
+        auto &svcNonPropCfg = _svc->GetConfig();
         if (_cfgType == LLBC_AppConfigType::Ini)
         {
             // Component config section: [<svc_name>.<comp_name>]
