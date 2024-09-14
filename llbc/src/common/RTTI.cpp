@@ -42,8 +42,8 @@ const char *__LLBC_GetTypeName(const char *mangledTypeName)
 
     int status;
     size_t len = sizeof(libTls->commonTls.rtti);
-    ::abi::__cxa_demangle(mangledCompName, libTls->commonTls.rtti, &len, &status);
-    return UNLIKELY(status != 0) ? mangledCompName : libTls->commonTls.rtti;
+    ::abi::__cxa_demangle(mangledTypeName, libTls->commonTls.rtti, &len, &status);
+    return UNLIKELY(status != 0) ? mangledTypeName : libTls->commonTls.rtti;
     #endif // Win32
 }
 
@@ -65,7 +65,14 @@ const char *__LLBC_GetCompName(const char *mangledCompName)
     int status;
     size_t len = sizeof(libTls->commonTls.rtti);
     abi::__cxa_demangle(mangledCompName, libTls->commonTls.rtti, &len, &status);
-    return UNLIKELY(status != 0) ? mangledCompName : libTls->commonTls.rtti;
+    if (UNLIKELY(status != 0))
+        return mangledCompName;
+
+    const char *colonPos = strrchr(libTls->commonTls.rtti, ':');
+    if (colonPos)
+        memmove(libTls->commonTls.rtti, colonPos + 1, strlen(colonPos + 1) + 1);
+
+    return libTls->commonTls.rtti;
     #endif // Win32
 }
 

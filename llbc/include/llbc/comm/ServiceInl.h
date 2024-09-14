@@ -30,6 +30,13 @@
 
 __LLBC_NS_BEGIN
 
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+LLBC_Component::GetComponent()
+{
+    return GetService()->GetComponent<Comp>();
+}
+
 constexpr bool LLBC_ServiceRunningPhase::IsFailedPhase(int runningPhase)
 {
     return runningPhase == PreStartFailed ||
@@ -113,13 +120,19 @@ typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
                         Comp *>::type
 LLBC_Service::GetComponent()
 {
+    // Get component name.
+    const LLBC_CString compName = LLBC_GetCompName(Comp);
+
     // Normal search.
-    auto comp = static_cast<Comp *>(GetComponent(LLBC_GetCompName(Comp)));
+    LockService();
+    auto comp = static_cast<Comp *>(GetComponent(compName));
     if (comp)
+    {
+        UnlockService();
         return comp;
+    }
 
     // Using dynamic_cast to search(lookup all components, lock service again).
-    LockService();
     for (auto &svcComp : GetComponentList())
     {
         if ((comp = dynamic_cast<Comp *>(svcComp)))

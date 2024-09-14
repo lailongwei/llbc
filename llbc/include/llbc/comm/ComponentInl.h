@@ -105,13 +105,6 @@ inline LLBC_Service *LLBC_Component::GetService() const
 }
 
 template <typename Comp>
-typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
-LLBC_Component::GetComponent()
-{
-    return GetService()->GetComponent<Comp>();
-}
-
-template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, const Comp *>::type
 LLBC_Component::GetComponent() const
 {

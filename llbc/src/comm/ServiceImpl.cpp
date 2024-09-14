@@ -623,7 +623,7 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Get component name.
-    const LLBC_CString compName = LLBC_GetCompName(*comp);
+    const LLBC_String compName = LLBC_GetCompName(*comp);
 
     // Define component find lambda.
     const auto findLambda = [comp, compName](LLBC_Component *regComp) {

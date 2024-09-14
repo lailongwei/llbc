@@ -101,7 +101,7 @@ namespace
 
         virtual void OnTimerCancel(LLBC_Timer *timer)
         {
-            LLBC_PrintLn("Time cancelled!");
+            LLBC_PrintLn("Timer cancelled!");
         }
 
     private:
