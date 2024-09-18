@@ -194,35 +194,54 @@ void TestCase_Core_Time_Time::TimeClassTest()
     ts.tv_sec = 10000000; ts.tv_nsec = 123456;
     std::cout <<"FromTimeSpec(ts.sec=10000000, ts.tv_nsec=123456): " <<LLBC_Time::FromTimeSpec(ts) <<std::endl;
 
-    std::string timeStr = "2000-12-13 19:21:35.345678";
-    LLBC_Time fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    auto fromTimeStrTest = [](const char *timeStr) {
+        LLBC_Time fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+        std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
+        std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    };
 
-    timeStr = "12-13 21:35";
-    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    std::cout <<LLBC_Time::FromTimeStr("2018-9-1 10:00:00.333333") <<std::endl;
 
-    timeStr = "12-13";
-    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    fromTimeStrTest("35");
+    fromTimeStrTest("35.345678");
+    fromTimeStrTest("19:35.345678");
+    fromTimeStrTest("13 19:35.345678");
+    fromTimeStrTest("13 21:19:35.345678");
+    fromTimeStrTest("13 39");
+    fromTimeStrTest("13 .345678");
+    fromTimeStrTest("12-13 19:35.345678");
+    fromTimeStrTest("12-13 21:19:35.345678");
+    fromTimeStrTest("2000-12-13 19:35");
+    fromTimeStrTest("2000-12-13 19:35.345678");
+    fromTimeStrTest("   \t2000-12-13 \t19:35.345678\t    ");
+    fromTimeStrTest("- 19:35.345678");
+    fromTimeStrTest("-- 19:35.345678");
+    fromTimeStrTest("- :.345678");
+    fromTimeStrTest("-- :.345678");
+    fromTimeStrTest("-- ::.345678");
 
-    timeStr = "1970-1-1 0:0:0";
-    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    size_t fromTimeStrPerfTestTimes = 100000;
+    std::vector<LLBC_String> testTimeStrs {
+        "2024-09-01 21:55:55.332345",
+        "2024-08-30 13:05:37.324868",
+        "1970-05-04 03:36:29.892342",
+        "1998-02-13 16:05:37.829346",
+        "2019-12-13 13:07:19.719054",
+    };
 
-    timeStr = "07:21:35";
-    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
-
-    timeStr = "13 35";
-    fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
-    std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
-    std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
+    const auto begTime = LLBC_GetMicroseconds();
+    for (size_t i = 0; i < fromTimeStrPerfTestTimes; ++i)
+    {
+        for (size_t j = 0; j < testTimeStrs.size(); ++j)
+            auto time = LLBC_Time::FromTimeStr(testTimeStrs[j]);
+    }
+    const auto costTime = LLBC_GetMicroseconds() - begTime;
+    std::cout << "LLBC_Time::FromTimeStr() perf test finished, "
+              << " test times: " << fromTimeStrPerfTestTimes * testTimeStrs.size()
+              << ", cost time: " << costTime << " micro sec, "
+              << ", per time cost: " << static_cast<double>(costTime) /
+                (fromTimeStrPerfTestTimes * testTimeStrs.size()) << " micro sec"
+              << std::endl;
 
     int yearPart = 1971, monthPart = 12, dayPart = 21;
     int hourPart = 13, minutePart = 23, secondPart = 32;
@@ -304,8 +323,10 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     }
 
     const auto costTime = LLBC_CPUTime::Current() - begTime;
-    std::cout << "- Finish, test times:" << testTimes
+    std::cout << "- Finish, test times:" << testTimes * testSpanStrs.size()
               << ", cost time:" << costTime.ToMicros() << " micro sec"
+              << ", per time cost: " << costTime.ToMicros() /
+                 static_cast<double>(testTimes * testSpanStrs.size()) << " micro sec"
               << std::endl;
 }
 

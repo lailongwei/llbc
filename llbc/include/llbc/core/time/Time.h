@@ -82,6 +82,12 @@ public:
     static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
     static LLBC_Time FromTimeVal(const timeval &timeVal);
     static LLBC_Time FromTimeSpec(const timespec &timeSpec);
+    template <size_t _StrArrLen>
+    static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
+    static LLBC_Time FromTimeStr(const char *timeStr);
+    template <typename _StrType>
+    static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+    FromTimeStr(const _StrType &timeStr);
     static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
     static LLBC_Time FromTimeStruct(const tm &timeStruct,
                                     int milliSec = 0,
@@ -314,6 +320,15 @@ public:
     bool Deserialize(LLBC_Stream &stream);
 
 private:
+    /**
+     * Construct Time object from time string representation.
+     * 
+     * @param[in] timeStr    - the time string representatin, eg: 2024-09-10 18:19:30.123456
+     * @param[in] timeStrLen - the time string length, not included '\0'.
+     * @return LLBC_Time - time obuect.
+     */
+    static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
+
     /**
      * Internal constructor.
      * @param clendarTimeInMicroseconds - calendar time in microseconds.

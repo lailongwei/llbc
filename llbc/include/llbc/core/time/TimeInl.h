@@ -69,6 +69,29 @@ inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
                      timeSpec.tv_nsec / LLBC_TimeConst::numOfNanosPerMicrosecond);
 }
 
+template <size_t _StrArrLen>
+LLBC_Time LLBC_Time::FromTimeStr(const char (&timeStr)[_StrArrLen])
+{
+    return FromTimeStr(timeStr, _StrArrLen - 1);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr)
+{
+    return FromTimeStr(timeStr, strlen(timeStr));
+}
+
+template <typename _StrType>
+typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+LLBC_Time::FromTimeStr(const _StrType &timeStr)
+{
+    return FromTimeStr(timeStr.c_str(), timeStr.size());
+}
+
+inline LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
+{
+    return FromTimeStr(timeStr.c_str(), timeStr.size());
+}
+
 inline int LLBC_Time::GetYear() const
 {
     return _localTimeStruct.tm_year + 1900; // scene 1900

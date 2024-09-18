@@ -56,71 +56,6 @@ LLBC_Time LLBC_Time::Now()
     return LLBC_Time(LLBC_GetMicroseconds());
 }
 
-LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
-{
-    if (UNLIKELY(timeStr.empty()))
-        return LLBC_Time();
-
-    // Split date, time
-    LLBC_Strings dateTimes = timeStr.split(' ', 1, true);
-    if (dateTimes.size() == 1) // Only has date part or time part(try guess).
-    {
-        if (dateTimes[0].find('-') != LLBC_String::npos) // Is date part, append default time part.
-            dateTimes.push_back("0:0:0.000");
-        else // Is time part, insert default date part.
-            dateTimes.insert(dateTimes.begin(), "1970-1-1");
-    }
-
-    const LLBC_String &datePart = dateTimes[0];
-    const LLBC_String &timePart = dateTimes[1];
-
-    // Split year,month,day
-    LLBC_Strings dateParts = datePart.split('-', 2, true);
-    if (dateParts.size() == 1) // Only has day part.
-    {
-        dateParts.insert(dateParts.begin(), "1");
-        dateParts.insert(dateParts.begin(), "1970");
-    }
-    else if (dateParts.size() == 2) // Only has day and month parts.
-    {
-        dateParts.insert(dateParts.begin(), "1970");
-    }
-
-    // Split hour,minute,second
-    LLBC_Strings timeParts = timePart.split(':', 2, true);
-    if (timeParts.size() == 1) // Only has hour part.
-    {
-        timeParts.push_back("0");
-        timeParts.push_back("0");
-    }
-    else if (timeParts.size() == 2) // Only has hour and minute parts.
-    {
-        timeParts.push_back("0");
-    }
-
-    // Split second,millisecond
-    LLBC_Strings secondParts = timeParts[2].split('.', 1);
-    if (secondParts.size() == 1) // Only has second part.
-        secondParts.push_back("0");
-
-    // Convert it
-    int year = LLBC_Str2Int32(dateParts[0].c_str());
-    int month = LLBC_Str2Int32(dateParts[1].c_str());
-    int day = LLBC_Str2Int32(dateParts[2].c_str());
-    int hour = LLBC_Str2Int32(timeParts[0].c_str());
-    int minute = LLBC_Str2Int32(timeParts[1].c_str());
-    int second = LLBC_Str2Int32(secondParts[0].c_str());
-    int microSeconds = LLBC_Str2Int32(secondParts[1].c_str());
-    return FromTimeParts(year,
-                         month,
-                         day,
-                         hour,
-                         minute,
-                         second,
-                         microSeconds / LLBC_TimeConst::numOfMicrosPerMillisecond,
-                         microSeconds % LLBC_TimeConst::numOfMicrosPerMillisecond);
-}
-
 LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct,
                                     int milliSec,
                                     int microSec)
@@ -414,6 +349,165 @@ bool LLBC_Time::Deserialize(LLBC_Stream &stream)
 
     return true;
 }
+
+#define __LLBC_INL_TIME_STR_PART_TO_VAL(partStr, partLen, timePartVar) \
+    if (UNLIKELY(partLen >= sizeof(numFmtBuf)))                        \
+        return utcBegin;                                               \
+                                                                       \
+    if (LIKELY(partLen > 0))                                           \
+    {                                                                  \
+        memcpy(numFmtBuf, partStr, partLen);                           \
+        numFmtBuf[partLen] = '\0';                                     \
+        timePartVar = atoi(numFmtBuf);                                 \
+    }                                                                  \
+
+#define __LLBC_INL_TIME_PARSE_SEPARATORS(beg, end, sep) \
+    strIt = beg;                                        \
+    sepSize = 0;                                        \
+    while (strIt != end)                                \
+    {                                                   \
+        if (*strIt == sep)                              \
+        {                                               \
+            sepPoses[sepSize++] = strIt;                \
+            if (sepSize == 2)                           \
+                break;                                  \
+        }                                               \
+                                                        \
+        ++strIt;                                        \
+    }                                                   \
+
+LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
+{
+    // Time string format:
+    // - yy-mm-dd HH:MM:SS[.micro_sec]
+    // 
+    // eg:
+    //                                 yyyy mm dd  HH MM SS micro_sec
+    // 03 =>                                             03  000000
+    // 02:03 =>                                       02 03  000000
+    // 01:02:03 =>                                 01 02 03  000000
+    // 08 01:02:03 =>                          08  01 02 03  000000
+    // 07-08 01:02:03 =>                    07 08  01 02 03  000000
+    // 06-07-08 01:02:03 =>              06 07 08  01 02 03  000000
+    // 2006-07-08 01:02:03 =>          2006 07 08  01 02 03  000000
+    // 2006-07-08 01:02:03.123456 =>   2006 07 08  01 02 03  123456
+
+    // Argument check.
+    if (UNLIKELY(!timeStr || timeStrLen == 0))
+        return utcBegin;
+
+    // Remove leading whitespace characters.
+    const char *originTimeStr = timeStr;
+    while (*timeStr != '\0')
+    {
+        if (LIKELY(!LLBC_IsSpace(*timeStr)))
+            break;
+        ++timeStr;
+    }
+
+    if (*timeStr == '\0')
+        return utcBegin;
+    timeStrLen -= static_cast<size_t>(timeStr - originTimeStr);
+
+    // Remove trailing whitespace characters.
+    const char *timeStrEnd = timeStr + timeStrLen - 1;
+    while (timeStrEnd != timeStr && LLBC_IsSpace(*timeStrEnd))
+        --timeStrEnd;
+    ++timeStrEnd;
+
+    // Define time string parse helper variables.
+    size_t sepSize;
+    const char *strIt;
+    const char *sepPoses[2]{nullptr, nullptr};
+
+    // Parse <Date> part.
+    char numFmtBuf[12];
+    int year = 1970, month = 1, day = 1;
+    const char *datePartEnd = timeStr;
+    while (++datePartEnd != timeStrEnd)
+        LLBC_BreakIf(LLBC_IsSpace(*datePartEnd));
+    if (datePartEnd != timeStrEnd)
+    {
+        __LLBC_INL_TIME_PARSE_SEPARATORS(timeStr, datePartEnd, '-')
+        if (sepSize == 2)
+        {
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                timeStr, static_cast<size_t>(sepPoses[0] - timeStr), year);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                sepPoses[0] + 1, static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1), month);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                sepPoses[1] + 1, static_cast<size_t>(datePartEnd - sepPoses[1] - 1), day);
+        }
+        else if (sepSize == 1)
+        {
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                timeStr, static_cast<size_t>(sepPoses[0] - timeStr), month);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                sepPoses[0] + 1, static_cast<size_t>(datePartEnd - sepPoses[0] - 1), day);
+        }
+        else
+        {
+            __LLBC_INL_TIME_STR_PART_TO_VAL(
+                timeStr, static_cast<size_t>(datePartEnd - timeStr), day);
+        }
+    }
+
+    // Parse <TimeOfDay> part.
+    int hour = 0, minute = 0, second = 0, microSec = 0;
+    if (datePartEnd != timeStrEnd)
+    {
+        timeStr = datePartEnd + 1;
+        while (*timeStr != '\0')
+        {
+            if (LIKELY(!LLBC_IsSpace(*timeStr)))
+                break;
+            ++timeStr;
+        }
+    }
+
+    __LLBC_INL_TIME_PARSE_SEPARATORS(timeStr, timeStrEnd, ':')
+
+    const char *secPart;
+    if (sepSize == 2)
+    {
+        __LLBC_INL_TIME_STR_PART_TO_VAL(
+            timeStr, static_cast<size_t>(sepPoses[0] - timeStr), hour);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(
+            sepPoses[0] + 1, static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1), minute);
+        secPart = sepPoses[1] + 1;
+    }
+    else if (sepSize == 1)
+    {
+        __LLBC_INL_TIME_STR_PART_TO_VAL(
+            timeStr, static_cast<size_t>(sepPoses[0] - timeStr), minute);
+        secPart = sepPoses[0] + 1;
+    }
+    else
+    {
+        secPart = timeStr;
+    }
+
+    const char *dotPos = secPart;
+    while (dotPos != timeStrEnd)
+    {
+        if (*dotPos == '.')
+            break;
+
+        ++dotPos;
+    }
+
+    const char *secPartEnd = dotPos != timeStrEnd ? dotPos : timeStrEnd;
+    __LLBC_INL_TIME_STR_PART_TO_VAL(secPart, static_cast<size_t>(secPartEnd - secPart), second);
+    if (dotPos != timeStrEnd)
+    {
+        __LLBC_INL_TIME_STR_PART_TO_VAL(dotPos + 1, static_cast<size_t>(timeStrEnd - dotPos - 1), microSec);
+    }
+
+    return FromTimeParts(year, month, day, hour, minute, second, microSec / 1000, microSec % 1000);
+}
+
+#undef __LLBC_INL_TIME_STR_PART_TO_VAL
+#undef __LLBC_INL_TIME_PARSE_SEPARATORS
 
 void LLBC_Time::UpdateTimeStructs()
 {
