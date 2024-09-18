@@ -64,7 +64,7 @@ const char *__LLBC_GetCompName(const char *mangledCompName)
 
     int status;
     size_t len = sizeof(libTls->commonTls.rtti);
-    abi::__cxa_demangle(mangledCompName, libTls->commonTls.rtti, &len, &status);
+    ::abi::__cxa_demangle(mangledCompName, libTls->commonTls.rtti, &len, &status);
     if (UNLIKELY(status != 0))
         return mangledCompName;
 
