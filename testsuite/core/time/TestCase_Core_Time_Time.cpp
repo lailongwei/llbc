@@ -343,7 +343,11 @@ void TestCase_Core_Time_Time::CpuTimeTest()
 
     std::cout << "Cpu time stream out test: " << std::endl;
     std::cout << "Stream out current cpu time: " << LLBC_CPUTime::Current() << std::endl;
-    std::cout << "Cpu time stream out end: " << std::endl;
+
+    auto begCPUTime = LLBC_CPUTime::Current();
+    LLBC_Sleep(1000);
+    auto costTime = LLBC_CPUTime::Current() - begCPUTime;
+    std::cout << "Sleep 1000 ms, cpu time cost: " << costTime << std::endl;
 }
 
 void TestCase_Core_Time_Time::GetIntervalToTest()
