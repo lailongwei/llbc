@@ -509,7 +509,7 @@ int TestCase_Core_ObjPool::PerfTest()
 
     // Exec default new/malloc test.
     LLBC_PrintLn("New/Delete perf test:");
-    auto begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw;
     for (int i = 0; i < testTimes; ++i)
     {
         for (int j = 0; j < perTimeAcquireTimes; ++j)
@@ -525,8 +525,8 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    auto newDelCostTime = LLBC_CPUTime::Current() - begTime;
-    LLBC_PrintLn("New/Delete test fin, cost: %lld us", newDelCostTime.ToMicros());
+    sw.Stop();
+    LLBC_PrintLn("New/Delete test fin, cost: %lld us", sw.Elapsed().GetTotalMicros());
 
     // Execute object pool acquire/release test.
     LLBC_PrintLn("ObjPool New/Delete perf test:");
@@ -535,7 +535,7 @@ int TestCase_Core_ObjPool::PerfTest()
     objPool.Release(objPool.Acquire<std::vector<int>>());
 
     // auto testObjPool = objPool.GetTypedObjPool<TestObj>();
-    begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw2;
     for (int i = 0; i < testTimes; ++i)
     {
         for (int j = 0; j < perTimeAcquireTimes; ++j)
@@ -553,11 +553,10 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    auto objPoolNewDelCostTime = LLBC_CPUTime::Current() - begTime;
+    sw2.Stop();
     LLBC_PrintLn("ObjPool New/Delete test fin, cost: %lld us, perf improvement: %.3f",
-                 objPoolNewDelCostTime.ToMicros(),
-                 ((newDelCostTime.GetCPUCount() - objPoolNewDelCostTime.GetCPUCount()) /
-                    static_cast<double>(objPoolNewDelCostTime.GetCPUCount())));
+                 sw2.Elapsed().GetTotalMicros(),
+                 (sw.ElapsedTicks() - sw2.ElapsedTicks()) / static_cast<double>(sw2.ElapsedTicks()));
 
     getchar();
 

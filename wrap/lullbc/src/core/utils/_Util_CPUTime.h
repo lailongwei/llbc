@@ -30,8 +30,11 @@ LULLBC_LUA_METH int _lullbc_Util_GetCPUTime(lua_State *l)
 LULLBC_LUA_METH int _lullbc_Util_CPUTimeToUTCTime(lua_State *l)
 {
     const uint64 cpuTsc = lua_tointeger(l, 1);
-    lua_pushnumber(l, LLBC_CPUTime(cpuTsc).ToNanos() / 
-        static_cast<double>(LLBC_TimeConst::numOfNanosPerMillisecond));
+    #if LLBC_SUPPORT_RDTSC
+    lua_pushnumber(l, cpuTsc * 1000.0 / LLBC_Stopwatch::GetFrequency());
+    #else
+    lua_pushnumber(l, cpuTsc / 1000.0);
+    #endif
 
     return 1;
 }

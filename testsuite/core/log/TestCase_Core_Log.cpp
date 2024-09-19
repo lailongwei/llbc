@@ -143,17 +143,17 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
             LLBC_LoggerMgrSingleton->GetLogger("perftest")->GetLoggerObjPool().GetStatistics();
         LLBC_PrintLn("perftest logger object pool stat:\n%s", objPoolStat.c_str());
 
-        LLBC_CPUTime begin = LLBC_CPUTime::Current();
+        LLBC_Stopwatch sw;
         const int loopLmt = 2000000;
         for (int i = 0; i < loopLmt; ++i)
             LLOG_TRACE2("perftest", "performance test msg, msg idx:%d", i);
 
-        LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
+        sw.Stop();
         LLBC_PrintLn("Performance test completed, "
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,
-                       elapsed.ToString().c_str(),
-                       elapsed.ToNanos() / static_cast<double>(loopLmt) / 1000.0);
+                       sw.ToString().c_str(),
+                       sw.ElapsedNanos() / static_cast<double>(loopLmt) / 1000.0);
     }
 
     // Test json styled log.

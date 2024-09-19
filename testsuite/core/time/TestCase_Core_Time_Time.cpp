@@ -318,17 +318,17 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     };
 
     LLBC_TimeSpan finalSpan;
-    const auto begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw;
     for (int i = 0; i < testTimes; ++i)
     {
         for (auto &spanStr : testSpanStrs)
             finalSpan += LLBC_TimeSpan::FromSpanStr(spanStr);
     }
 
-    const auto costTime = LLBC_CPUTime::Current() - begTime;
+    sw.Stop();
     std::cout << "- Finish, test times:" << testTimes * testSpanStrs.size()
-              << ", cost time:" << costTime.ToMicros() << " micro sec"
-              << ", per time cost: " << costTime.ToMicros() /
+              << ", cost time:" << sw.Elapsed().GetTotalMicros() << " micro sec"
+              << ", per time cost: " << sw.Elapsed().GetTotalMicros() /
                  static_cast<double>(testTimes * testSpanStrs.size()) << " micro sec"
               << std::endl;
 }
@@ -340,13 +340,10 @@ void TestCase_Core_Time_Time::CpuTimeTest()
     {
         auto freq = LLBC_GetCpuCounterFrequency();
         std::cout << "Current idx:" << std::to_string(idx)
-            << ", tsc frequency:" << std::to_string(freq) << std::endl;
+            << ", tsc frequency:" << std::to_string(freq)
+            << ", rdtsc:" << LLBC_RdTsc() << std::endl;
     }
-    std::cout << "Cpu time tsc end: \n" << std::endl;
-
-    std::cout << "Cpu time stream out test: " << std::endl;
-    std::cout << "Stream out current cpu time: " << LLBC_CPUTime::Current() << std::endl;
-    std::cout << "Cpu time stream out end: " << std::endl;
+    std::cout << "Cpu time tsc end\n" << std::endl;
 }
 
 void TestCase_Core_Time_Time::GetIntervalToTest()

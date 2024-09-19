@@ -36,63 +36,40 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     LLBC_PrintLn("Byte2Hex test:\n%s", LLBC_Byte2Hex(str, 256, ' ', 16).c_str());
     LLBC_Print("\n");
 
-    // CPUTime test.
-    LLBC_PrintLn("Test CPUTime:");
+    // Stopwatch test.
+    LLBC_PrintLn("Test Stopwatch:");
+
+    // - Output basic information.
     {
-        LLBC_PrintLn("- CpuFreq per second:%llu", LLBC_CPUTime::GetCPUFreqPerSecond());
+        LLBC_PrintLn("- IsHighResolution: %d", LLBC_Stopwatch::IsHighResolution());
+        LLBC_PrintLn("- Frequency: %llu", LLBC_Stopwatch::GetFrequency());
         LLBC_Print("\n");
     }
 
+    // - Stopwatch core function test.
     {
-        LLBC_PrintLn("- LLBC_CPUTime(1000) + LLBC_CPUTime(1000) = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) + LLBC_CPUTime(1000)));
-        LLBC_PrintLn("- LLBC_CPUTime(1000) - LLBC_CPUTime(500) = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(500)));
-        LLBC_PrintLn("- LLBC_CPUTime(1000) - LLBC_CPUTime(2000) = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) - LLBC_CPUTime(2000)));
+        LLBC_Stopwatch sw;
+        LLBC_Sleep(1000);
+        LLBC_PrintLn("- After sleep 1000ms: watcher: %s", sw.ToString().c_str());
+        LLBC_Sleep(500);
+        LLBC_PrintLn("- After sleep 500ms: watcher: %s", sw.ToString().c_str());
+        LLBC_PrintLn("  - Watch detail info, ElapsedNanos:%llu, ElapsedTicks:%llu",
+                     sw.ElapsedNanos(), sw.ElapsedTicks());
 
-        LLBC_PrintLn("- LLBC_CPUTime(1000) += 500 = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) += 500));
-        LLBC_PrintLn("- LLBC_CPUTime(1000) -= 500 = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) -= 500));
-        LLBC_PrintLn("- LLBC_CPUTime(1000) -= 2000 = %llu", 
-                       static_cast<uint64>(LLBC_CPUTime(1000) -= 2000));
+        sw.Stop();
+        LLBC_PrintLn("- Stop watcher and sleep 1000ms...");
+        LLBC_Sleep(1000);
+        LLBC_PrintLn("- Done, watcher: %s", sw.ToString().c_str());
 
-        LLBC_PrintLn("- LLBC_CPUTime(1000) > LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) > LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLn("- LLBC_CPUTime(1000) >= LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) >= LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLn("- LLBC_CPUTime(1000) < LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) < LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLn("- LLBC_CPUTime(1000) <= LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) <= LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLn("- LLBC_CPUTime(1000) == LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) == LLBC_CPUTime(500) ? "true" : "false");
-        LLBC_PrintLn("- LLBC_CPUTime(1000) != LLBC_CPUTime(500) = %s",
-                       LLBC_CPUTime(1000) != LLBC_CPUTime(500) ? "true" : "false");
-    }
+        sw.Reset();
+        LLBC_PrintLn("- After reset watcher: %s", sw.ToString().c_str());
 
-    {
-        int loopTimes = 10000000;
-        LLBC_PrintLn("- Test foreach empty loop %d times time cost", loopTimes);
-        LLBC_CPUTime beg = LLBC_CPUTime::Current();
-        for (int i = 0; i < loopTimes; ++i)
-        {
-        }
+        LLBC_Sleep(618);
+        LLBC_PrintLn("- After sleep 618ms, watcher: %s", sw.ToString().c_str());
 
-        LLBC_CPUTime cost = LLBC_CPUTime::Current() - beg;
-        LLBC_PrintLn("- loop end, costTime(cpuCount:%llu): %s milli-seconds",
-                       cost.GetCPUCount(), cost.ToString().c_str());
-        LLBC_Print("\n");
-    }
-
-    {
-        LLBC_PrintLn("- Test static LLBC_CPUTime::ToXXX() method:");
-        LLBC_PrintLn("  - LLBC_CPUTime::ToSeconds(11111111111llu):%d", LLBC_CPUTime::ToSeconds(11111111111llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMillis(100000000llu):%lld", LLBC_CPUTime::ToMillis(100000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToMicros(10000000llu):%lld", LLBC_CPUTime::ToMicros(10000000llu));
-        LLBC_PrintLn("  - LLBC_CPUTime::ToNanos(1000000llu):%lld", LLBC_CPUTime::ToNanos(1000000llu));
-        LLBC_Print("\n");
+        sw.Start();
+        LLBC_Sleep(618);
+        LLBC_PrintLn("- After Start & sleep 618ms, watcher: %s", sw.ToString().c_str());
     }
 
     LLBC_Print("\n");

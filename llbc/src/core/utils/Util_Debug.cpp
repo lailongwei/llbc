@@ -23,7 +23,6 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/time/Time.h"
 #include "llbc/core/utils/Util_Debug.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -100,33 +99,7 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
     return hexStr;
 }
 
-uint64 LLBC_CPUTime::_freqPerSecond = 0;
-
-LLBC_CPUTime LLBC_CPUTime::Current()
-{
-    return LLBC_CPUTime(LLBC_RdTsc());
-}
-
-LLBC_String LLBC_CPUTime::ToString() const
-{
-    LLBC_String info;
-    #if LLBC_SUPPORT_RDTSC
-    info.append_format("%.03f", _cpuCount * 1000000ull / _freqPerSecond / 1000.0);
-    #else // Not supp rdtsc
-    info.append_format("%.03f", _cpuCount / 1000.0);
-    #endif // Supp rdtsc
-
-    return info;
-}
-
-void LLBC_CPUTime::InitFrequency()
-{
-#if LLBC_SUPPORT_RDTSC
-    _freqPerSecond = LLBC_GetCpuCounterFrequency();
-#else // Not supp rdtsc
-    _freqPerSecond = LLBC_INFINITE;
-#endif // Supp rdtsc
-}
+uint64 LLBC_Stopwatch::_frequency = 0;
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
@@ -134,8 +107,3 @@ void LLBC_CPUTime::InitFrequency()
 
 __LLBC_NS_END
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime)
-{
-    o << cpuTime.ToString();
-    return o;
-}
