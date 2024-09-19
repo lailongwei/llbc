@@ -27,20 +27,14 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_Time::LLBC_Time()
-: _time(0)
+: LLBC_Time(0)
 {
-    UpdateTimeStructs();
 }
 
 inline LLBC_Time::LLBC_Time(const LLBC_Time &time)
 : _time(time._time)
 {
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(tm));
-    memcpy(&_gmtTimeStruct, &time._gmtTimeStruct, sizeof(tm));
-}
-
-inline LLBC_Time::~LLBC_Time()
-{
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
@@ -152,14 +146,22 @@ inline sint64 LLBC_Time::GetTimestampInMicros() const
     return _time;
 }
 
-inline const tm &LLBC_Time::GetGmtTime() const
+inline tm LLBC_Time::GetGmtTime() const
 {
-    return _gmtTimeStruct;
+    struct tm timeStruct;
+    GetGmtTime(timeStruct);
+
+    return timeStruct;
 }
 
 inline void LLBC_Time::GetGmtTime(tm &timeStruct) const
 {
-    memcpy(&timeStruct, &_gmtTimeStruct, sizeof(tm));
+    const time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
+    #if LLBC_TARGET_PLATFORM_WIN32
+    gmtime_s(&timeStruct, &calendarTime);
+    #else
+    gmtime_r(&calendarTime, &timeStruct);
+    #endif
 }
 
 inline const tm &LLBC_Time::GetLocalTime() const
@@ -257,6 +259,16 @@ inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)
 : _time(clendarTimeInMicroseconds)
 {
     UpdateTimeStructs();
+}
+
+inline void LLBC_Time::UpdateTimeStructs()
+{
+    time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
+    #if LLBC_TARGET_PLATFORM_WIN32
+    localtime_s(&_localTimeStruct, &calendarTime);
+    #else
+    localtime_r(&calendarTime, &_localTimeStruct);
+    #endif
 }
 
 __LLBC_NS_END

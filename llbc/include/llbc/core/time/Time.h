@@ -59,7 +59,7 @@ public:
     /**
      * Destructor.
      */
-    ~LLBC_Time();
+    ~LLBC_Time() = default;
 
 public:
     /**
@@ -158,9 +158,9 @@ public:
     /**
      * Get GMT time struct.
      * @param[out] timeStruct - time struct object reference.
-     * @return const tm & - time struct object.
+     * @return tm & - time struct object.
      */
-    const tm &GetGmtTime() const;
+    tm GetGmtTime() const;
     void GetGmtTime(tm &timeStruct) const;
 
     /**
@@ -356,7 +356,6 @@ private:
 
 private:
     sint64 _time;
-    tm _gmtTimeStruct;
     tm _localTimeStruct;
 };
 

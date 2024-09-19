@@ -181,10 +181,12 @@ LLBC_String LLBC_Time::Format(const char *format) const
 LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
 {
     char buf[32];
+    struct tm gmtTimeStruct;
+    GetGmtTime(gmtTimeStruct);
     if (format)
-        strftime(buf, sizeof(buf), format, &_gmtTimeStruct);
+        strftime(buf, sizeof(buf), format, &gmtTimeStruct);
     else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_gmtTimeStruct);
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &gmtTimeStruct);
 
     return buf;
 }
@@ -324,7 +326,6 @@ LLBC_Time &LLBC_Time::operator=(const LLBC_Time &time)
 
     _time = time._time;
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(tm));
-    memcpy(&_gmtTimeStruct, &time._gmtTimeStruct, sizeof(tm));
 
     return *this;
 }
@@ -513,18 +514,6 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 
 #undef __LLBC_INL_TIME_STR_PART_TO_VAL
 #undef __LLBC_INL_TIME_PARSE_SEPARATORS
-
-void LLBC_Time::UpdateTimeStructs()
-{
-    time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
-    #if LLBC_TARGET_PLATFORM_WIN32
-    localtime_s(&_localTimeStruct, &calendarTime);
-    gmtime_s(&_gmtTimeStruct, &calendarTime);
-    #else
-    localtime_r(&calendarTime, &_localTimeStruct);
-    gmtime_r(&calendarTime, &_gmtTimeStruct);
-    #endif
-}
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
                                        LLBC_TimeSpan toTimeOfTimeCycle) const
