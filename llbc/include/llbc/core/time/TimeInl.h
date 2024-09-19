@@ -258,10 +258,10 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
 inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)
 : _time(clendarTimeInMicroseconds)
 {
-    UpdateTimeStructs();
+    FillTimeStruct();
 }
 
-inline void LLBC_Time::UpdateTimeStructs()
+inline void LLBC_Time::FillTimeStruct()
 {
     time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
     #if LLBC_TARGET_PLATFORM_WIN32

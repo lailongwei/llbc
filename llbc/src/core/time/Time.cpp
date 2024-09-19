@@ -170,10 +170,7 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
 LLBC_String LLBC_Time::Format(const char *format) const
 {
     char buf[32];
-    if (format)
-        strftime(buf, sizeof(buf), format, &_localTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
+    strftime(buf, sizeof(buf), format ? format : "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
 
     return buf;
 }
@@ -181,12 +178,9 @@ LLBC_String LLBC_Time::Format(const char *format) const
 LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
 {
     char buf[32];
-    struct tm gmtTimeStruct;
+    tm gmtTimeStruct;
     GetGmtTime(gmtTimeStruct);
-    if (format)
-        strftime(buf, sizeof(buf), format, &gmtTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &gmtTimeStruct);
+    strftime(buf, sizeof(buf), format ? format : "%Y-%m-%d %H:%M:%S", &gmtTimeStruct);
 
     return buf;
 }
@@ -346,7 +340,7 @@ bool LLBC_Time::Deserialize(LLBC_Stream &stream)
         return false;
 
     _time = timeVal;
-    UpdateTimeStructs();
+    FillTimeStruct();
 
     return true;
 }

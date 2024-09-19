@@ -338,7 +338,7 @@ private:
     /**
      * Update time structs(local&gmt)
      */
-    void UpdateTimeStructs();
+    void FillTimeStruct();
 
     /**
      * Get interval to time internal implement.

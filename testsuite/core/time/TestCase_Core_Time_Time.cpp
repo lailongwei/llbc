@@ -81,6 +81,9 @@ void TestCase_Core_Time_Time::TimeClassTest()
 {
     std::cout <<"LLBC_Time test: " <<std::endl;
 
+    // Dump LLBC_Time size.
+    std::cout <<"sizeof(LLBC_Time): " <<sizeof(LLBC_Time) <<std::endl;
+
     // Default time test.
     LLBC_Time defaultTime;
     std::cout <<"Default time: " <<defaultTime <<std::endl;
@@ -236,9 +239,9 @@ void TestCase_Core_Time_Time::TimeClassTest()
             LLBC_Time::FromTimeStr(testTimeStrs[j]);
     }
     const auto costTime = LLBC_GetMicroseconds() - begTime;
-    std::cout << "LLBC_Time::FromTimeStr() perf test finished, "
-              << " test times: " << fromTimeStrPerfTestTimes * testTimeStrs.size()
-              << ", cost time: " << costTime << " micro sec, "
+    std::cout << "LLBC_Time::FromTimeStr() perf test finished"
+              << ", test times: " << fromTimeStrPerfTestTimes * testTimeStrs.size()
+              << ", cost time: " << costTime << " micro sec"
               << ", per time cost: " << static_cast<double>(costTime) /
                 (fromTimeStrPerfTestTimes * testTimeStrs.size()) << " micro sec"
               << std::endl;
