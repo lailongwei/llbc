@@ -106,6 +106,12 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
         __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, dayPartLen, LLBC_TimeConst::numOfMicrosPerDay);
 
         spanStr = dayPartEnd + 1;
+        while (*spanStr != '\0')
+        {
+            if (LIKELY(!LLBC_IsSpace(*spanStr)))
+                break;
+            ++spanStr;
+        }
     }
 
     // - Search all colons pos.
@@ -154,7 +160,6 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
     {
         if (*dotPos == '.')
             break;
-
         ++dotPos;
     }
 
@@ -163,7 +168,7 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
     __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(secPart, secPartLen, LLBC_TimeConst::numOfMicrosPerSecond);
     if (dotPos != spanStrEnd)
     {
-        size_t microPartLen = spanStrEnd - dotPos - 1;
+        const size_t microPartLen = spanStrEnd - dotPos - 1;
         __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(dotPos + 1, microPartLen, 1);
     }
 }

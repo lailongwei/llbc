@@ -431,24 +431,27 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
         __LLBC_INL_TIME_PARSE_SEPARATORS(timeStr, datePartEnd, '-')
         if (sepSize == 2)
         {
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                timeStr, static_cast<size_t>(sepPoses[0] - timeStr), year);
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                sepPoses[0] + 1, static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1), month);
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                sepPoses[1] + 1, static_cast<size_t>(datePartEnd - sepPoses[1] - 1), day);
+            const size_t yearPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, yearPartLen, year);
+
+            const size_t monthPartLen = static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[0] + 1, monthPartLen, month);
+
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - sepPoses[1] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[1] + 1, dayPartLen, day);
         }
         else if (sepSize == 1)
         {
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                timeStr, static_cast<size_t>(sepPoses[0] - timeStr), month);
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                sepPoses[0] + 1, static_cast<size_t>(datePartEnd - sepPoses[0] - 1), day);
+            const size_t monthPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, monthPartLen, month);
+
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - sepPoses[0] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[0] + 1, dayPartLen, day);
         }
         else
         {
-            __LLBC_INL_TIME_STR_PART_TO_VAL(
-                timeStr, static_cast<size_t>(datePartEnd - timeStr), day);
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, dayPartLen, day);
         }
     }
 
@@ -470,16 +473,17 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
     const char *secPart;
     if (sepSize == 2)
     {
-        __LLBC_INL_TIME_STR_PART_TO_VAL(
-            timeStr, static_cast<size_t>(sepPoses[0] - timeStr), hour);
-        __LLBC_INL_TIME_STR_PART_TO_VAL(
-            sepPoses[0] + 1, static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1), minute);
+        const size_t hourPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, hourPartLen, hour);
+
+        const size_t minutePartLen = static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1);
+        __LLBC_INL_TIME_STR_PART_TO_VAL( sepPoses[0] + 1, minutePartLen, minute);
         secPart = sepPoses[1] + 1;
     }
     else if (sepSize == 1)
     {
-        __LLBC_INL_TIME_STR_PART_TO_VAL(
-            timeStr, static_cast<size_t>(sepPoses[0] - timeStr), minute);
+        const size_t minutePartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, minutePartLen, minute);
         secPart = sepPoses[0] + 1;
     }
     else
@@ -492,15 +496,16 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
     {
         if (*dotPos == '.')
             break;
-
         ++dotPos;
     }
 
     const char *secPartEnd = dotPos != timeStrEnd ? dotPos : timeStrEnd;
-    __LLBC_INL_TIME_STR_PART_TO_VAL(secPart, static_cast<size_t>(secPartEnd - secPart), second);
+    const size_t secPartLen = static_cast<size_t>(secPartEnd - secPart);
+    __LLBC_INL_TIME_STR_PART_TO_VAL(secPart, secPartLen, second);
     if (dotPos != timeStrEnd)
     {
-        __LLBC_INL_TIME_STR_PART_TO_VAL(dotPos + 1, static_cast<size_t>(timeStrEnd - dotPos - 1), microSec);
+        const size_t microPartLen = static_cast<size_t>(timeStrEnd - dotPos - 1);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(dotPos + 1, microPartLen, microSec);
     }
 
     return FromTimeParts(year, month, day, hour, minute, second, microSec / 1000, microSec % 1000);

@@ -292,7 +292,7 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"     05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr("    05 01:02:03.04") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"05 01:02:03.04     \"): " << LLBC_TimeSpan::FromSpanStr("05 01:02:03.04     ") << std::endl;
-    std::cout << "LLBC_TimeSpan::FromSpanStr(\"   \t  05 01:02:03.04  \t   \"): " << LLBC_TimeSpan::FromSpanStr("  \t   05 01:02:03.04  \t   ") << std::endl;
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"   \t  05    01:02:03.04  \t   \"): " << LLBC_TimeSpan::FromSpanStr("  \t   05 01:02:03.04  \t   ") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"9999999999999999\"): " << LLBC_TimeSpan::FromSpanStr("9999999999999999") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"01:02:03:04:05\"): " << LLBC_TimeSpan::FromSpanStr("01:02:03:04:05") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"-8 01:02:03:04:05\"): " << LLBC_TimeSpan::FromSpanStr("-8 01:02:03:04:05") << std::endl;
