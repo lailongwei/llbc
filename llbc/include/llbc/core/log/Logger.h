@@ -118,16 +118,18 @@ public:
 public:
     /**
      * Install logger hook.
-     * @param[in] level     - the log level.
-     * @param[in] hookDeleg - the hook delegate.
+     * @param[in] level   - the log level.
+     * @param[in] logHook - the hook delegate.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg);
+    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
+    int InstallHook(std::initializer_list<int> levels, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
 
     /**
      * Uninstall error hook.
      */
     void UninstallHook(int level);
+    void UninstallHook(std::initializer_list<int> levels);
 
 public:
     /**
@@ -336,22 +338,35 @@ private:
     void ClearNonRunnableMembers(bool keepErrNo = true);
 
 private:
+    // Logger name.
     LLBC_String _name;
+    // Logger lock.
     mutable LLBC_SpinLock _lock;
 
+    // Log level.
     volatile int _logLevel;
+    // json styled log flag, auto add timestamp in json log or not.
     bool _addTimestampInJsonLog;
+    // Logger config.
     const LLBC_LoggerConfigInfo *_config;
 
+    // Log runnable object.
     LLBC_LogRunnable *_logRunnable;
 
+    // Last flush time, in milliseconds.
     sint64 _lastFlushTime;
+    // Flush interval, in milliseconds.
     sint64 _flushInterval;
+    // Log appenders.
     LLBC_ILogAppender *_appenders;
 
+    // Logger object pool.
     LLBC_ObjPool _objPool;
+    // LLBC_LogData typed object pool.
     LLBC_TypedObjPool<LLBC_LogData> &_logDataTypedObjPool;
-    LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
+
+    // Log hooks.
+    LLBC_Delegate<void(const LLBC_LogData *)> _logHooks[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END

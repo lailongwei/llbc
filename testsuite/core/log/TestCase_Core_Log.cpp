@@ -59,7 +59,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Install logger hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug,
+    rootLogger->InstallHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace },
                             LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
@@ -69,7 +69,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_DEBUG3("test_tag", "This is a debug log message.");
 
     // Uninstall logger hook(from root logger).
-    rootLogger->UninstallHook(LLBC_LogLevel::Debug);
+    rootLogger->UninstallHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace });
 
     // Test condition macro log
     DoConditionMacroLogTest();

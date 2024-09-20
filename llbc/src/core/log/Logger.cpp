@@ -56,7 +56,7 @@ LLBC_Logger::LLBC_Logger()
 
 , _objPool(true)
 , _logDataTypedObjPool(*_objPool.GetTypedObjPool<LLBC_LogData>())
-, _hookDelegs()
+, _logHooks()
 {
 }
 
@@ -257,17 +257,28 @@ bool LLBC_Logger::IsAsyncMode() const
     return _config->IsAsyncMode();
 }
 
-int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg)
+int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsValid(level) ||
-        !hookDeleg))
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(level) || !logHook))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    _hookDelegs[level] = hookDeleg;
+    _logHooks[level] = logHook;
+
+    return LLBC_OK;
+}
+
+int LLBC_Logger::InstallHook(std::initializer_list<int> levels,
+                             const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
+{
+    for (auto &level : levels)
+    {
+        if (InstallHook(level, logHook) != LLBC_OK)
+            return LLBC_FAILED;
+    }
 
     return LLBC_OK;
 }
@@ -278,7 +289,13 @@ void LLBC_Logger::UninstallHook(int level)
         return;
 
     LLBC_LockGuard guard(_lock);
-    _hookDelegs[level] = nullptr;
+    _logHooks[level] = nullptr;
+}
+
+void LLBC_Logger::UninstallHook(std::initializer_list<int> levels)
+{
+    for (auto &level : levels)
+        UninstallHook(level);
 }
 
 int LLBC_Logger::VOutput(int level,
@@ -302,8 +319,8 @@ int LLBC_Logger::VOutput(int level,
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
-    if (_hookDelegs[level])
-        _hookDelegs[level](data);
+    if (_logHooks[level])
+        _logHooks[level](data);
 
     if (!_config->IsAsyncMode())
     {
@@ -338,8 +355,8 @@ int LLBC_Logger::NonFormatOutput(int level,
                                       time != 0 ? time : LLBC_GetMicroseconds(),
                                       msg,
                                       msgLen);
-    if (_hookDelegs[level])
-        _hookDelegs[level](data);
+    if (_logHooks[level])
+        _logHooks[level](data);
 
     if (!_config->IsAsyncMode())
     {
@@ -616,7 +633,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
 
     // Uninstall all hooks.
     for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
-        _hookDelegs[level] = nullptr;
+        _logHooks[level] = nullptr;
 
     // Delete all appenders.
     while (_appenders)
