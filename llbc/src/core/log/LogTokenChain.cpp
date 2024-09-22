@@ -24,7 +24,7 @@
 
 #include "llbc/core/utils/Util_Text.h"
 
-#include "llbc/core/log/ILogToken.h"
+#include "llbc/core/log/BaseLogToken.h"
 #include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogTokenBuilder.h"
 #include "llbc/core/log/LogTokenChain.h"
@@ -83,7 +83,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
     // Parse pattern.
     LLBC_String buf;
-    LLBC_ILogToken *token = nullptr;
+    LLBC_BaseLogToken *token = nullptr;
     LLBC_LogFormattingInfo formatter;
     auto state = TokenParseState::NormalState;
     auto tokenBuilder = LLBC_LogTokenBuilderSingleton;
@@ -163,7 +163,6 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 const int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
                 formatter.leftAlign = minLength < 0 ? true : false;
                 formatter.minLen = std::abs(minLength);
-                formatter.maxLen = INT_MAX;
 
                 i--;
                 state = TokenParseState::ParsingToken;
@@ -213,7 +212,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
 void LLBC_LogTokenChain::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    LLBC_ILogToken *token = _head;
+    LLBC_BaseLogToken *token = _head;
     while (token)
     {
         token->Format(data, formattedData);
@@ -225,14 +224,14 @@ void LLBC_LogTokenChain::Cleanup()
 {
     while (_head)
     {
-        LLBC_ILogToken *next = _head->GetTokenNext();
+        LLBC_BaseLogToken *next = _head->GetTokenNext();
 
         delete _head;
         _head = next;
     }
 }
 
-void LLBC_LogTokenChain::AppendToken(LLBC_ILogToken *token)
+void LLBC_LogTokenChain::AppendToken(LLBC_BaseLogToken *token)
 {
     token->SetTokenNext(nullptr);
 
@@ -242,11 +241,9 @@ void LLBC_LogTokenChain::AppendToken(LLBC_ILogToken *token)
         return;
     }
 
-    LLBC_ILogToken *tmp = _head;
+    LLBC_BaseLogToken *tmp = _head;
     while (tmp->GetTokenNext())
-    {
         tmp = tmp->GetTokenNext();
-    }
 
     tmp->SetTokenNext(token);
 }

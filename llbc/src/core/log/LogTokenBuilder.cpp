@@ -50,7 +50,7 @@ LLBC_LogTokenBuilder::~LLBC_LogTokenBuilder()
 {
 }
 
-LLBC_ILogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
+LLBC_BaseLogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 {
     switch(type)
     {

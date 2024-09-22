@@ -53,7 +53,6 @@ public:
     bool leftAlign;
 
     int minLen;
-    int maxLen;
     char fillCharacter;
 
     LLBC_String addiParam;

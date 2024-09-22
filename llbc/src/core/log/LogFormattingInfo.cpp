@@ -29,7 +29,6 @@ __LLBC_NS_BEGIN
 LLBC_LogFormattingInfo::LLBC_LogFormattingInfo()
 : leftAlign(true)
 , minLen(0)
-, maxLen(INT_MAX)
 , fillCharacter(' ')
 {
 }
@@ -38,7 +37,6 @@ void LLBC_LogFormattingInfo::Reset()
 {
     leftAlign = true;
     minLen = 0;
-    maxLen = INT_MAX;
     fillCharacter = ' ';
     addiParam.clear();
 }
@@ -49,9 +47,6 @@ void LLBC_LogFormattingInfo::Format(LLBC_String &data, int fieldStart) const
     fieldStart = MIN(fieldStart, static_cast<int>(data.length()));
 
     int rawLen = static_cast<int>(data.length()) - fieldStart;
-    if (rawLen > maxLen)
-        data.erase(fieldStart + maxLen, rawLen - maxLen);
-
     if (rawLen < minLen)
     {
         if (leftAlign)

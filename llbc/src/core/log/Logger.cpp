@@ -257,45 +257,30 @@ bool LLBC_Logger::IsAsyncMode() const
     return _config->IsAsyncMode();
 }
 
-int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
+int LLBC_Logger::SetLogHook(int logLevel, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsValid(level) || !logHook))
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(logLevel)))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    _logHooks[level] = logHook;
+    _logHooks[logLevel] = logHook;
 
     return LLBC_OK;
 }
 
-int LLBC_Logger::InstallHook(std::initializer_list<int> levels,
-                             const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
+int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
+                            const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
 {
-    for (auto &level : levels)
+    for (auto &logLevel : logLevels)
     {
-        if (InstallHook(level, logHook) != LLBC_OK)
+        if (SetLogHook(logLevel, logHook) != LLBC_OK)
             return LLBC_FAILED;
     }
 
     return LLBC_OK;
-}
-
-void LLBC_Logger::UninstallHook(int level)
-{
-    if (UNLIKELY(!LLBC_LogLevel::IsValid(level)))
-        return;
-
-    LLBC_LockGuard guard(_lock);
-    _logHooks[level] = nullptr;
-}
-
-void LLBC_Logger::UninstallHook(std::initializer_list<int> levels)
-{
-    for (auto &level : levels)
-        UninstallHook(level);
 }
 
 int LLBC_Logger::VOutput(int level,

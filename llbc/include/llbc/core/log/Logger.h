@@ -117,19 +117,20 @@ public:
 
 public:
     /**
-     * Install logger hook.
-     * @param[in] level   - the log level.
-     * @param[in] logHook - the hook delegate.
+     * Set log hook.
+     * @param[in] logLevel - the log level.
+     * @param[in] logHook  - the log hook delegate, is is nullptr, will clear log hook.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
-    int InstallHook(std::initializer_list<int> levels, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
+    int SetLogHook(int logLevel, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
 
     /**
-     * Uninstall error hook.
+     * Set log hook.
+     * @param[in] logLevels - the log levels.
+     * @param[in] logHook   - the log hook delegate, is is nullptr, will clear log hook.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void UninstallHook(int level);
-    void UninstallHook(std::initializer_list<int> levels);
+    int SetLogHook(std::initializer_list<int> logLevels, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
 
 public:
     /**
