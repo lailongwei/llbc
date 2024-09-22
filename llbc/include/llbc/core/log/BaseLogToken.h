@@ -121,9 +121,6 @@ protected:
     void SetTokenNext(LLBC_BaseLogToken *next) { _nextToken = next; }
 
 private:
-    friend class LLBC_LogTokenChain;
-
-private:
     LLBC_LogFormattingInfo _formatter;
     LLBC_BaseLogToken *_nextToken;
 };
