@@ -406,6 +406,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     right = right.AsDouble();
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
 
     left = -15;
@@ -415,6 +416,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     right = right.AsDouble();
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right.BecomeDouble() <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right.BecomeDouble() <<std::endl;
     std::cout <<std::endl;
 
     left = 3;
@@ -427,6 +429,8 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<(left *= right) <<std::endl;
     std::cout <<"[" <<left <<"] /= [" <<right <<"] = ";
     std::cout <<(left /= right) <<std::endl;
+    std::cout <<"[" <<left <<"] %= [" <<right <<"] = ";
+    std::cout <<(left %= right) <<std::endl;
     std::cout <<std::endl;
 
     left = "hello ";
@@ -435,6 +439,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
 
     left = "he333llo";
@@ -443,11 +448,13 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
     std::cout <<"[" <<right <<"] + [" <<left <<"] = " <<right + left <<std::endl;
     std::cout <<"[" <<right <<"] - [" <<left <<"] = " <<right - left <<std::endl;
     std::cout <<"[" <<right <<"] * [" <<left <<"] = " <<right * left <<std::endl;
     std::cout <<"[" <<right <<"] / [" <<left <<"] = " <<right / left <<std::endl;
+    std::cout <<"[" <<right <<"] % [" <<left <<"] = " <<right % left <<std::endl;
     std::cout <<std::endl;
 }
 
@@ -512,6 +519,7 @@ void TestCase_Core_Variant::SeqTest()
     std::cout << "left - right: " << left - right << std::endl;
     std::cout << "left * right: " << left * right << std::endl;
     std::cout << "left / right: " << left / right << std::endl;
+    std::cout << "left % right: " << left % right << std::endl;
 
     // Sequence + - * / non sequence test.
     LLBC_Variant seq10;

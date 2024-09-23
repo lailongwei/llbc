@@ -278,6 +278,14 @@ LLBC_Variant LLBC_VariantTraits::div(const LLBC_Variant &left, const LLBC_Varian
     return ret;
 }
 
+LLBC_Variant LLBC_VariantTraits::mod(const LLBC_Variant &left, const LLBC_Variant &right)
+{
+    LLBC_Variant ret;
+    assign(ret, left);
+    mod_equal(ret, right);
+    return ret;
+}
+
 void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right)
 {
     // &Left == &Right rules:
@@ -748,6 +756,37 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
 
     // Left[Raw] / Right[Raw] = VariantArithmetic(l, r, op)
     LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_DIV);
+}
+
+void LLBC_VariantTraits::mod_equal(LLBC_Variant &left, const LLBC_Variant &right)
+{
+    // &Left == &Right rules:
+    if (&left == &right)
+    {
+        LLBC_Variant clone;
+        assign(clone, left);
+        mod_equal(left, clone);
+
+        return;
+    }
+
+    // Left[Nil] or Right[Nil] = Nil
+    if (left.IsNil() || right.IsNil())
+    {
+        left.BecomeNil();
+        return;
+    }
+
+    // Left[Dict/Seq/Str] / Right[Non Nil] = Left # undefined
+    if (!left.IsRaw())
+        return;
+
+    // Left[Raw] / Right[Dict/Seq/Str] = Left[Raw]
+    if (!right.IsRaw())
+        return;
+
+    // Left[Raw] / Right[Raw] = VariantArithmetic(l, r, op)
+    LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_MOD);
 }
 
 __LLBC_NS_END

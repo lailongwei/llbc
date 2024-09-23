@@ -516,11 +516,13 @@ public:
     LLBC_Variant operator-(const LLBC_Variant &another) const;
     LLBC_Variant operator*(const LLBC_Variant &another) const;
     LLBC_Variant operator/(const LLBC_Variant &another) const;
+    LLBC_Variant operator%(const LLBC_Variant &another) const;
 
     LLBC_Variant &operator+=(const LLBC_Variant &another);
     LLBC_Variant &operator-=(const LLBC_Variant &another);
     LLBC_Variant &operator*=(const LLBC_Variant &another);
     LLBC_Variant &operator/=(const LLBC_Variant &another);
+    LLBC_Variant &operator%=(const LLBC_Variant &another);
 
     // Arithmetic operators(template base).
     template <typename _T>
@@ -531,6 +533,8 @@ public:
     LLBC_Variant operator*(const _T &another) const;
     template <typename _T>
     LLBC_Variant operator/(const _T &another) const;
+    template <typename _T>
+    LLBC_Variant operator%(const _T &another) const;
 
     template <typename _T>
     LLBC_Variant &operator+=(const _T &another);
@@ -540,6 +544,8 @@ public:
     LLBC_Variant &operator*=(const _T &another);
     template <typename _T>
     LLBC_Variant &operator/=(const _T &another);
+    template <typename _T>
+    LLBC_Variant &operator%=(const _T &another);
 
     // Type to string.
     const LLBC_String &TypeToString() const;

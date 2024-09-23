@@ -1025,6 +1025,11 @@ inline LLBC_Variant LLBC_Variant::operator/(const LLBC_Variant &another) const
     return LLBC_VariantTraits::div(*this, another);
 }
 
+inline LLBC_Variant LLBC_Variant::operator%(const LLBC_Variant &another) const
+{
+    return LLBC_VariantTraits::mod(*this, another);
+}
+
 inline LLBC_Variant &LLBC_Variant::operator+=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::add_equal(*this, another);
@@ -1046,6 +1051,12 @@ inline LLBC_Variant &LLBC_Variant::operator*=(const LLBC_Variant &another)
 inline LLBC_Variant &LLBC_Variant::operator/=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::div_equal(*this, another);
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::operator%=(const LLBC_Variant &another)
+{
+    LLBC_VariantTraits::mod_equal(*this, another);
     return *this;
 }
 
@@ -1074,6 +1085,12 @@ LLBC_Variant LLBC_Variant::operator/(const _T &another) const
 }
 
 template <typename _T>
+LLBC_Variant LLBC_Variant::operator%(const _T &another) const
+{
+    return operator%(LLBC_Variant(another));
+}
+
+template <typename _T>
 LLBC_Variant &LLBC_Variant::operator+=(const _T &another)
 {
     return operator+=(LLBC_Variant(another));
@@ -1095,6 +1112,12 @@ template <typename _T>
 LLBC_Variant &LLBC_Variant::operator/=(const _T &another)
 {
     return operator/=(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant &LLBC_Variant::operator%=(const _T &another)
+{
+    return operator%=(LLBC_Variant(another));
 }
 
 inline void LLBC_Variant::SetType(int type)

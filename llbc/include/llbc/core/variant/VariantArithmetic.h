@@ -45,6 +45,7 @@ public:
         VT_ARITHMETIC_SUB = 1,
         VT_ARITHMETIC_MUL = 2,
         VT_ARITHMETIC_DIV = 3,
+        VT_ARITHMETIC_MOD = 4,
 
         VT_ARITHMETIC_END
     };

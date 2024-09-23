@@ -41,6 +41,9 @@ inline bool LLBC_VariantArithmetic::Performs_raw_operation(bool left, bool right
     case VT_ARITHMETIC_DIV:
         return left && right; // left == true and right == true return true, otherwise return false.
 
+    case VT_ARITHMETIC_MOD:
+        return (left ? 1 : 0) % (right ? 1 : 0);
+
     default:
         break;
     }
@@ -73,6 +76,10 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
         leftVal /= rightVal;
         break;
 
+    case VT_ARITHMETIC_MOD:
+        leftVal %= rightVal;
+        break;
+
     default:
         leftVal = 0;
         break;
@@ -84,8 +91,8 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
     return finalPtr;
 }
 
-template <typename RawType>
-inline RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
+template <>
+inline float LLBC_VariantArithmetic::Performs_raw_operation(float left, float right, int type)
 {
     switch (type)
     {
@@ -100,6 +107,90 @@ inline RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawT
 
     case VT_ARITHMETIC_DIV:
         return left / right;
+
+    case VT_ARITHMETIC_MOD:
+        return static_cast<float>(static_cast<sint64>(left) % static_cast<sint64>(right));
+
+    default:
+        break;
+    }
+
+    return float();
+}
+
+template <>
+inline double LLBC_VariantArithmetic::Performs_raw_operation(double left, double right, int type)
+{
+    switch (type)
+    {
+    case VT_ARITHMETIC_ADD:
+        return left + right;
+
+    case VT_ARITHMETIC_SUB:
+        return left - right;
+
+    case VT_ARITHMETIC_MUL:
+        return left * right;
+
+    case VT_ARITHMETIC_DIV:
+        return left / right;
+
+    case VT_ARITHMETIC_MOD:
+        return static_cast<double>(static_cast<sint64>(left) % static_cast<sint64>(right));
+
+    default:
+        break;
+    }
+
+    return double();
+}
+
+template <>
+inline ldouble LLBC_VariantArithmetic::Performs_raw_operation(ldouble left, ldouble right, int type)
+{
+    switch (type)
+    {
+    case VT_ARITHMETIC_ADD:
+        return left + right;
+
+    case VT_ARITHMETIC_SUB:
+        return left - right;
+
+    case VT_ARITHMETIC_MUL:
+        return left * right;
+
+    case VT_ARITHMETIC_DIV:
+        return left / right;
+
+    case VT_ARITHMETIC_MOD:
+        return static_cast<ldouble>(static_cast<sint64>(left) % static_cast<sint64>(right));
+
+    default:
+        break;
+    }
+
+    return ldouble();
+}
+
+template <typename RawType>
+RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
+{
+    switch (type)
+    {
+    case VT_ARITHMETIC_ADD:
+        return left + right;
+
+    case VT_ARITHMETIC_SUB:
+        return left - right;
+
+    case VT_ARITHMETIC_MUL:
+        return left * right;
+
+    case VT_ARITHMETIC_DIV:
+        return left / right;
+
+    case VT_ARITHMETIC_MOD:
+        return left % right;
 
     default:
         break;
