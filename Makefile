@@ -5,9 +5,10 @@
 #****************************************************************************
 # Determine platform name
 #****************************************************************************
-SUPPORTED_PLATFORMS := linux,darwin
-PLATFORMNAME		?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
-$(if $(findstring $(PLATFORMNAME),$(SUPPORTED_PLATFORMS)),,$(error "Unsupported os, must be one of '$(SUPPORTED_PLATFORMS)'"))
+SUPPORTED_SYSTEMS := linux,darwin
+SYSTEM_NAME		  ?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
+ARCHITECTURE_NAME ?= $(shell echo $(shell uname -m) | tr "[:upper:]" "[:lower:]")
+$(if $(findstring $(SYSTEM_NAME),$(SUPPORTED_SYSTEMS)),,$(error "Unsupported system, must be one of '$(SUPPORTED_SYSTEMS)'"))
 
 #****************************************************************************
 # Default config define
@@ -52,7 +53,7 @@ PREMAKE_ACTION  := gmake2
 # All targets output directory
 ALL_TARGETS_OUTPUT := output/$(PREMAKE_ACTION)/$(config)
 # Some prefixs/suffixes define
-ifeq ($(PLATFORMNAME),darwin)
+ifeq ($(SYSTEM_NAME),darwin)
   DYNLIB_SUFFIX := .dylib
 else
   DYNLIB_SUFFIX := .so
@@ -80,7 +81,7 @@ LUWRAP_TARGET_PATH     := $(ALL_TARGETS_OUTPUT)/$(LUWRAP_TARGET_NAME)
 
 # Some variables define
 PREMAKE_PATH	:= "tools/premake"
-PREMAKE_NAME	:= "premake5_$(PLATFORMNAME)"
+PREMAKE_NAME	:= "premake5_$(SYSTEM_NAME)_$(ARCHITECTURE_NAME)"
 
 #****************************************************************************
 # all real make commands

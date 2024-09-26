@@ -603,9 +603,9 @@ class LLBC_TypedObjPool final
         uint16 magicNum; // Pool object magic number.
 
         #if LLBC_64BIT_PROCESSOR
-        uint8 __unused[5];
+        uint8 __unused__[5];
         #else
-        uint8 __unused[1];
+        uint8 __unused__[1];
         #endif
 
         void *typedObjPool; // Typed object pool.
@@ -630,7 +630,7 @@ class LLBC_TypedObjPool final
         uint16 cap; // Stripe capacity, in object.
         uint16 used; // Used stripe memory, in object.
         #if LLBC_64BIT_PROCESSOR
-        uint8 __unused[4]; // Uunused.
+        uint8 __unused__[4]; // Uunused.
         #endif
 
         _WrappedObj *freeObjs; // Free objects.

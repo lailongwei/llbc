@@ -28,10 +28,10 @@ class TestCase_Core_ObjPool : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_ObjPool() = default;
-    ~TestCase_Core_ObjPool() override = default;
+    virtual ~TestCase_Core_ObjPool() = default;
 
 public:
-    int Run(int argc, char *argv[]);
+    virtual int Run(int argc, char *argv[]);
 
     int BaseTest();
     int AcquireTest();

@@ -53,7 +53,7 @@ class CPythonCompiler(object):
 
         if cfg.arch == ArchType.x86:
             platform = 'Win32'
-        elif cfg.arch == ArchType.x64:
+        elif cfg.arch == ArchType.x86_64:
             platform = 'x64'
         else:
             Log.e('Unsupported arch:{}'.format(cfg.arch))
@@ -70,6 +70,11 @@ class CPythonCompiler(object):
             Log.e('Compile cpython failed, ret code:{}'.format(ret))
 
     def _compile_cpython_in_non_win32(self):
+        # 当前llbc使用的python不支持非x86架构
+        if cfg.arch not in (ArchType.x86, ArchType.x86_64):
+            raise Exception('For now, the architecture in llbc framework embedded python '
+                            'is unsupported, arch:{}'.format(ArchType.type2desc(cfg.arch)))
+
         # 定义cpython配置选项
         cpython_config_opts = [
             '--enable-shared',

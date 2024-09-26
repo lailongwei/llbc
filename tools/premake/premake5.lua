@@ -53,8 +53,58 @@ local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolse
 -- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custom_ccpp_toolset'.
 -- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
 
--- windows platform flag.
-local llbc_is_windows_platform = string.match(_ACTION, 'vs') ~= nil
+-- determine system type.
+local llbc_system_types = {
+    ['windows'] = 'windows',
+    ['linux'] = 'linux',
+    ['darwin'] = 'darwin',
+    ['unknown'] = 'unknown',
+}
+
+local llbc_system_type = llbc_system_types.unknown
+if _ACTION:match('vs') then
+    llbc_system_type = llbc_system_types.windows
+else
+    local sys_name = string.lower(os_capture('uname'))
+    if sys_name:match('^linux') ~= nil then
+        llbc_system_type = llbc_system_tyeps.linux
+    elseif sys_name:match('^darwin') ~= nil then
+        llbc_system_type = llbc_system_types.darwin
+    else
+        llbc_system_type = llbc_system_types.unknown
+    end
+end
+
+if llbc_system_type == llbc_system_types.unknown then
+    error('Unsupported system, for now, llbc framework supported systems: windows/linux(and linux like)/darwin')
+end
+
+-- determine architecture type.
+local llbc_arch_types = {
+    ['x86'] = 'x86',
+    ['arm'] = 'ARM',
+    ['unknown'] = 'unknown',
+}
+
+local llbc_arch_type = llbc_arch_types.x86
+if not llbc_system_type ~= llbc_system_types.windows then
+    local machine_arch = os_capture('uname -m'):lower()
+    if machine_arch:sub(1, #'x86') == 'x86' then
+        llbc_arch_type = llbc_arch_types.x86
+    elseif machine_arch:sub(1, #'arm') == 'arm' then
+        llbc_arch_type = llbc_arch_types.arm
+    else
+        llbc_arch_type = llbc_arch_types.unknown
+    end
+end
+if llbc_arch_type == llbc_arch_types.unknown then
+    error('Unsupported architecture, for now, llbc framework supported systems: x86/ARM')
+end
+
+local llbc_arch_connect_char = '_'
+if llbc_arch_type == llbc_arch_types.arm then
+    llbc_arch_connect_char = ''
+end
 
 ---- solution/projects path.
 llbc_sln_path = "../.."
@@ -67,12 +117,17 @@ llbc_cs_wrap_path = llbc_wraps_path .. "/csllbc"
 
 -- python exec path.
 local llbc_py_exec_path
-if llbc_is_windows_platform then
+if llbc_system_type == llbc_system_types.windows then
     llbc_py_exec_path = "$(ProjectDir)../../tools/py.exe"
 else
     local output = os_capture("python --version")
     if output:find("command not found") then
-        error("python command not found")
+        output = os_capture("python3 --version")
+        if output:find("command not found") then
+            error("python command not found")
+        else
+            llbc_py_exec_path="python3"
+        end
     else
         llbc_py_exec_path = "python"
     end
@@ -81,7 +136,7 @@ end
 -- All libraries output directory.
 local llbc_output_dir
 local llbc_output_base_dir = llbc_sln_path .. "/output/" .. _ACTION
-if llbc_is_windows_platform then
+if llbc_system_type == llbc_system_types.windows then
     llbc_output_dir = llbc_output_base_dir .. "/$(Configuration)"
 else
     llbc_output_dir = llbc_output_base_dir .. "/$(config)"
@@ -92,6 +147,10 @@ local llbc_wrap_testsuite_output_dir = llbc_output_dir .. '/wrap_testsuites'
 
 -- building script directory.
 local llbc_building_script_dir = llbc_sln_path .. "/tools/building_script"
+
+-- Before gen Makefiles, dump system & architecture info.
+print(string.format(
+    '-------- system type: %s, arch type: %s --------', llbc_system_type, llbc_arch_type))
 
 -- #########################################################################
 
@@ -108,10 +167,9 @@ workspace ("llbc_" .. _ACTION)
 
     -- architecture.
     filter { "configurations:*32" }
-        architecture "x86"
-    filter {}
+        architecture(llbc_arch_type)
     filter { "configurations:*64" }
-        architecture "x86_64"
+        architecture(llbc_arch_type .. llbc_arch_connect_char .. '64')
     filter {}
 
     -- not use cxx11 abi.
@@ -267,13 +325,13 @@ project "llbc"
     local prebuild_cmd = string.format('%s %s %%s %%s %s',
                                        llbc_py_exec_path, prebuild_script, _ACTION)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
 -- ****************************************************************************
@@ -446,17 +504,17 @@ project "pyllbc"
     local postbuild_cmd = string.format('%s %s %%s %%s %s',
                                         llbc_py_exec_path, postbuild_script, _ACTION)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
-    postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
-    postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -775,23 +833,23 @@ project "lullbc_luaexec"
 
     filter { "system:not windows" }
         links { "dl" }
-    filter {}
-
     filter { "configurations:debug*", "system:windows" }
         links { "liblua_debug" }
-    filter {}
     filter { "configurations:release*", "system:windows" }
         links { "liblua" }
-    filter {}
     filter { "configurations:debug*", "system:not windows" }
         links { "lua_debug" }
-    filter {}
     filter { "configurations:release*", "system:not windows" }
         links { "lua" }
     filter {}
  
     -- target name, target prefix.
     targetname "lua"
+
+    -- for macosx, fix premake5 not auto add @rpath bug.
+    filter { "system:macosx" }
+        linkoptions { "-Wl,-rpath,@loader_path/." }
+    filter {}
 
 -- lua wrap library(lullbc) compile setting.
 -- import lualib_setting.
@@ -854,17 +912,17 @@ project "lullbc"
     local prebuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, prebuild_script, _ACTION)
     local postbuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, postbuild_script, _ACTION)
     filter { "configurations:debug32" }
-        prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-        prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
-        postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-        prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-        prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
-        postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
