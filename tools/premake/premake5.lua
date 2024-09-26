@@ -67,7 +67,7 @@ if _ACTION:match('vs') then
 else
     local sys_name = string.lower(os_capture('uname'))
     if sys_name:match('^linux') ~= nil then
-        llbc_system_type = llbc_system_tyeps.linux
+        llbc_system_type = llbc_system_types.linux
     elseif sys_name:match('^darwin') ~= nil then
         llbc_system_type = llbc_system_types.darwin
     else

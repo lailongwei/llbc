@@ -431,18 +431,18 @@ LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics(LLBC_Json::MemoryPoolAllo
 
     // Object info:
     // - obj_size: object size, in bytes.
-    stat.AddMember("obj_size", static_cast<uint64>(sizeof(Obj)), jsonAlloc);
+    stat.AddMember("obj_size", static_cast<uint32>(sizeof(Obj)), jsonAlloc);
     // - wrapped_obj_size: wrapped object size, in bytes.
-    stat.AddMember("wrapped_obj_size", static_cast<uint64>(sizeof(_WrappedObj)), jsonAlloc);
+    stat.AddMember("wrapped_obj_size", static_cast<uint32>(sizeof(_WrappedObj)), jsonAlloc);
     // - obj_count.
     const auto objCountPerStripe = LLBC_ObjReflector::GetStripeCapacity<Obj>();
     const auto objCount = objCountPerStripe * _stripes.size();
-    stat.AddMember("obj_count", static_cast<uint64>(objCount), jsonAlloc);
+    stat.AddMember("obj_count", static_cast<uint32>(objCount), jsonAlloc);
     // - using_obj_count.
-    stat.AddMember("using_obj_count", static_cast<uint64>(_usingObjCount), jsonAlloc);
+    stat.AddMember("using_obj_count", static_cast<uint32>(_usingObjCount), jsonAlloc);
     // - using_obj_rate.
     stat.AddMember("using_obj_rate",
-                   objCount != 0 ? static_cast<double>(_usingObjCount) / objCount : 0.0,
+                   objCount != 0 ? static_cast<uint32>(_usingObjCount) / objCount : 0.0,
                    jsonAlloc);
     // - reusable_obj_count.
     stat.AddMember("reusable_obj_count", _reusableObjCount, jsonAlloc);
@@ -452,7 +452,7 @@ LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics(LLBC_Json::MemoryPoolAllo
                    jsonAlloc);
     // - free_obj_count.
     const auto freeObjCount = objCount - _usingObjCount - _reusableObjCount;
-    stat.AddMember("free_obj_count", static_cast<uint64>(freeObjCount), jsonAlloc);
+    stat.AddMember("free_obj_count", static_cast<uint32>(freeObjCount), jsonAlloc);
     // - free_obj_rate.
     stat.AddMember("free_obj_rate",
                    objCount != 0 ? static_cast<double>(freeObjCount) / objCount : 0.0,
@@ -461,27 +461,27 @@ LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics(LLBC_Json::MemoryPoolAllo
     // Stripe info:
     // - stripe_size: stripe size, in bytes.
     const auto stripeSize = sizeof(_ObjStripe) + sizeof(_WrappedObj) * objCountPerStripe;
-    stat.AddMember("stripe_size", static_cast<uint64>(stripeSize), jsonAlloc);
+    stat.AddMember("stripe_size", static_cast<uint32>(stripeSize), jsonAlloc);
     // - obj_count_per_stripe.
-    stat.AddMember("obj_count_per_stripe", static_cast<uint64>(objCountPerStripe), jsonAlloc);
+    stat.AddMember("obj_count_per_stripe", static_cast<uint32>(objCountPerStripe), jsonAlloc);
     // - stripe_count.
-    stat.AddMember("stripe_count", static_cast<uint64>(_stripes.size()), jsonAlloc);
+    stat.AddMember("stripe_count", static_cast<uint32>(_stripes.size()), jsonAlloc);
 
     // Memory info:
     // - using_mem: using memory, in bytes
     const auto usingMem = sizeof(Obj) * _usingObjCount;
-    stat.AddMember("using_mem", static_cast<uint64>(usingMem), jsonAlloc);
+    stat.AddMember("using_mem", static_cast<uint32>(usingMem), jsonAlloc);
     // - reusable_mem: reusable memory, in bytes.
     const auto reusableMem = sizeof(Obj) * _reusableObjCount;
-    stat.AddMember("reusable_mem", static_cast<uint64>(reusableMem), jsonAlloc);
+    stat.AddMember("reusable_mem", static_cast<uint32>(reusableMem), jsonAlloc);
     // - free_mem: free memory, in bytes.
     const auto totalMem = sizeof(Obj) * objCount;
-    stat.AddMember("free_mem", static_cast<uint64>(totalMem - usingMem - reusableMem), jsonAlloc);
+    stat.AddMember("free_mem", static_cast<uint32>(totalMem - usingMem - reusableMem), jsonAlloc);
     // - total_mem: total memory, in bytes.
-    stat.AddMember("total_mem", static_cast<uint64>(totalMem), jsonAlloc);
+    stat.AddMember("total_mem", static_cast<uint32>(totalMem), jsonAlloc);
     // - total_mem2: total memory, included objpool manage cost.
     stat.AddMember("total_mem2",
-                   static_cast<uint64>(sizeof(LLBC_ObjPool) + // LLBC_ObjPool memory
+                   static_cast<uint32>(sizeof(LLBC_ObjPool) + // LLBC_ObjPool memory
                                            sizeof(_ObjStripe) * _stripes.size() + // stripes memory
                                            sizeof(_WrappedObj) * objCount), // wrapped object memory
                    jsonAlloc);
