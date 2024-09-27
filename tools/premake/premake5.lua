@@ -927,7 +927,7 @@ project "lullbc"
 
     -- target name, target prefix, extension.
     targetname "_lullbc"
-    targetprefix ".so"
+    targetprefix ""
 
     -- links.
     libdirs { llbc_output_dir }
