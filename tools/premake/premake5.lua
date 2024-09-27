@@ -848,7 +848,7 @@ project "lullbc_luaexec"
 
     -- for macosx, fix premake5 not auto add @rpath bug.
     filter { "system:macosx" }
-        linkoptions { "-Wl,-rpath,@loader_path/." }
+        runpathdirs { "@loader_path/." }
     filter {}
 
 -- lua wrap library(lullbc) compile setting.
@@ -927,7 +927,7 @@ project "lullbc"
 
     -- target name, target prefix, extension.
     targetname "_lullbc"
-    targetprefix ""
+    targetprefix ".so"
 
     -- links.
     libdirs { llbc_output_dir }
