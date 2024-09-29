@@ -678,11 +678,11 @@ public:
             size_type findIdx = _This::npos;
             if (with_elem)
             {
+                size_type elemFindIdx = _This::npos;
                 for (size_t i = 0; i < sep.size(); ++i)
                 {
-                    findIdx = this->find(sep[i], idx);
-                    if (findIdx != _This::npos)
-                        break;
+                    if ((elemFindIdx = this->find(sep[i], idx)) != _This::npos)
+                        findIdx = (findIdx == _This::npos ? elemFindIdx : MIN(findIdx, elemFindIdx));
                 }
             }
             else
