@@ -37,6 +37,7 @@ private:
     void DoLogLevelSetTest();
     void DoJsonLogTest();
     void DoUninitLogTest();
+    void SyncLoggerMultiThreadTest();
     void DoConditionMacroLogTest();
     void OnLogHook(const LLBC_LogData *logData);
 };

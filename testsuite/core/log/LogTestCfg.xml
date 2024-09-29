@@ -175,5 +175,12 @@
         <forceAppLogPath>false</forceAppLogPath>
     </perftest>
 
+    <!-- sync logger配置 -->
+    <sync>
+        <asynchronous>false</asynchronous>
+        <consoleLogLevel>WARN</consoleLogLevel>
+        <maxFileSize>1GiB</maxFileSize>
+    </sync>
+
     <!-- 其它 logger(s) 配置 -->
 </Log>

@@ -47,8 +47,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    // const LLBC_String logCfgFile = "LogTestCfg.cfg";
-    const LLBC_String logCfgFile = "LogTestCfg.xml";
+    const LLBC_String logCfgFile = "LogTestCfg.cfg";
+    // const LLBC_String logCfgFile = "LogTestCfg.xml";
     if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
 #endif
     {
@@ -70,6 +70,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 
     // Clear log hook(from root logger).
     rootLogger->SetLogHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace }, nullptr);
+
+    // Sync logger multi-thread test.
+    SyncLoggerMultiThreadTest();
 
     // Test condition macro log
     DoConditionMacroLogTest();
@@ -358,6 +361,46 @@ void TestCase_Core_Log::DoUninitLogTest()
 
     LJLOG_DEBUG().Add("Key1", "Key1 value").Finish("This is a uninited json log message");
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
+}
+
+void TestCase_Core_Log::SyncLoggerMultiThreadTest()
+{
+    LLBC_PrintLn("Sync logger multi-thread test:");
+
+    class _TestTask : public LLBC_Task
+    {
+    public:
+        explicit _TestTask(uint32 testTimes):_testTimes(testTimes), _nowTimes(0) {  }
+
+    public:
+        void Svc() override
+        {
+            sint32 nowTimes;
+            sint32 logTimes = 0;
+            while ((nowTimes = LLBC_AtomicFetchAndAdd(&_nowTimes, 1)) < _testTimes)
+            {
+                ++logTimes;
+                LLOG_INFO2("sync", "[%08u] I am thread %d...", nowTimes, LLBC_GetCurrentThreadId());
+            }
+
+            LLBC_PrintLn("Test thread %d exit, nowTimes:%d, logTimes:%d", LLBC_GetCurrentProcessId(), nowTimes, logTimes);
+        }
+
+        void Cleanup()
+        {
+            LLOG_INFO2("sync", "Sync logger multi-thread test finished, total test times: %d", _nowTimes);
+        }
+
+    public:
+        sint32 _testTimes;
+        sint32 _nowTimes;
+    };
+
+    _TestTask task(500000);
+    task.Activate(20);
+    task.Wait();
+
+    LLBC_PrintLn("Sync logger multi-thread test finished");
 }
 
 void TestCase_Core_Log::DoConditionMacroLogTest()

@@ -116,7 +116,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
             return LLBC_FAILED;
         }
 
-        this->AddAppender(appender);
+        AddAppender(appender);
     }
 
     // Create file appender, if acquire.
@@ -147,7 +147,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
             return LLBC_FAILED;
         }
 
-        this->AddAppender(appender);
+        AddAppender(appender);
     }
 
     // Set/Create log runnable.
@@ -309,7 +309,10 @@ int LLBC_Logger::VOutput(int level,
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->OutputLogData(*data);
+        _lock.Lock();
+        const int ret = OutputLogData(*data);
+        _lock.Unlock();
+
         LLBC_Recycle(data);
 
         return ret;
@@ -345,7 +348,10 @@ int LLBC_Logger::NonFormatOutput(int level,
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->OutputLogData(*data);
+        _lock.Lock();
+        const int ret = OutputLogData(*data);
+        _lock.Unlock();
+
         LLBC_Recycle(data);
 
         return ret;
