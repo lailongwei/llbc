@@ -386,7 +386,7 @@ void TestCase_Core_Log::SyncLoggerMultiThreadTest()
             LLBC_PrintLn("Test thread %d exit, nowTimes:%d, logTimes:%d", LLBC_GetCurrentProcessId(), nowTimes, logTimes);
         }
 
-        void Cleanup()
+        void Cleanup() override
         {
             LLOG_INFO2("sync", "Sync logger multi-thread test finished, total test times: %d", _nowTimes);
         }
