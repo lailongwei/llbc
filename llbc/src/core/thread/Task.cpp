@@ -160,6 +160,9 @@ void LLBC_Task::TaskEntry(void *arg)
     // Set task object to TLS.
     __LLBC_GetLibTls()->coreTls.task = this;
 
+    // Incr in Svc() method thread num.
+    (void)LLBC_AtomicFetchAndAdd(&_inSvcMethThreadNum, 1);
+
     // Incr activating thread num.
     (void)LLBC_AtomicFetchAndAdd(&_activatingThreadNum, 1);
 
@@ -169,7 +172,6 @@ void LLBC_Task::TaskEntry(void *arg)
 
     // Call task Svc() meth.
     // ==========================================
-    (void)LLBC_AtomicFetchAndAdd(&_inSvcMethThreadNum, 1);
     Svc();
     (void)LLBC_AtomicFetchAndSub(&_inSvcMethThreadNum, 1);
     // ==========================================

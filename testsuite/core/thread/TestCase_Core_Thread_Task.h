@@ -32,4 +32,8 @@ public:
 
 public:
     virtual int Run(int argc, char *argv[]);
+
+private:
+    int BasicTaskTest();
+    int EmptyTaskTest();
 };
