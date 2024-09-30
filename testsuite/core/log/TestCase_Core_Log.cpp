@@ -23,8 +23,6 @@
 #include "core/log/TestCase_Core_Log.h"
 #include <iomanip>
 
-#include "llbc/core/log/ILogAppender.h"
-
 TestCase_Core_Log::TestCase_Core_Log()
 {
 }
@@ -383,7 +381,7 @@ void TestCase_Core_Log::SyncLoggerMultiThreadTest()
                 LLOG_INFO2("sync", "[%08u] I am thread %d...", nowTimes, LLBC_GetCurrentThreadId());
             }
 
-            LLBC_PrintLn("Test thread %d exit, nowTimes:%d, logTimes:%d", LLBC_GetCurrentProcessId(), nowTimes, logTimes);
+            LLBC_PrintLn("Test thread %d exit, nowTimes:%d, logTimes:%d", LLBC_GetCurrentThreadId(), nowTimes, logTimes);
         }
 
         void Cleanup()

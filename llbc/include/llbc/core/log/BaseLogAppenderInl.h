@@ -48,12 +48,12 @@ inline LLBC_LogTokenChain *LLBC_BaseLogAppender::GetTokenChain() const
     return _chain;
 }
 
-inline LLBC_ILogAppender *LLBC_BaseLogAppender::GetAppenderNext() const
+inline LLBC_BaseLogAppender *LLBC_BaseLogAppender::GetAppenderNext() const
 {
     return _next;
 }
 
-inline void LLBC_BaseLogAppender::SetAppenderNext(LLBC_ILogAppender *next)
+inline void LLBC_BaseLogAppender::SetAppenderNext(LLBC_BaseLogAppender *next)
 {
     _next = next;
 }

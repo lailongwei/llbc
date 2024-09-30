@@ -31,7 +31,7 @@
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
-#include "llbc/core/log/ILogAppender.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
 #include "llbc/core/log/LogRunnable.h"
 
@@ -106,7 +106,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
 
-        LLBC_ILogAppender *appender = 
+        LLBC_BaseLogAppender *appender = 
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::Console);
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
@@ -137,7 +137,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         else
             appenderInitInfo.fileBufferSize = _config->GetFileBufferSize();
 
-        LLBC_ILogAppender *appender =
+        LLBC_BaseLogAppender *appender =
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::File);
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
@@ -220,7 +220,7 @@ int LLBC_Logger::SetAppenderLogLevel(int appenderType, int logLevel)
     }
 
     // Find appender.
-    LLBC_ILogAppender *appender = _appenders;
+    LLBC_BaseLogAppender *appender = _appenders;
     while (appender && appender->GetType() != appenderType)
         appender = appender->GetAppenderNext();
 
@@ -545,7 +545,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->threadId = libTls->coreTls.threadId;
 }
 
-void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
+void LLBC_Logger::AddAppender(LLBC_BaseLogAppender *appender)
 {
     appender->SetAppenderNext(nullptr);
     if (!_appenders)
@@ -554,7 +554,7 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
         return;
     }
 
-    LLBC_ILogAppender *tmpAppender = _appenders;
+    LLBC_BaseLogAppender *tmpAppender = _appenders;
     while (tmpAppender->GetAppenderNext())
         tmpAppender = tmpAppender->GetAppenderNext();
 
@@ -563,7 +563,7 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
 
 int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
 {
-    LLBC_ILogAppender *appender = _appenders;
+    LLBC_BaseLogAppender *appender = _appenders;
     if (!appender)
         return LLBC_OK;
 
@@ -600,7 +600,7 @@ void LLBC_Logger::Flush(bool force, sint64 now)
 void LLBC_Logger::FlushAppenders()
 {  
     // Foreach appenders to flush.
-    LLBC_ILogAppender *appender = _appenders;
+    LLBC_BaseLogAppender *appender = _appenders;
     while (appender)
     {
         appender->Flush();
@@ -629,7 +629,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     // Delete all appenders.
     while (_appenders)
     {
-        LLBC_ILogAppender *appender = _appenders;
+        LLBC_BaseLogAppender *appender = _appenders;
         _appenders = _appenders->GetAppenderNext();
 
         delete appender;

@@ -34,7 +34,7 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_LogData;
 class LLBC_LoggerConfigInfo;
-class LLBC_ILogAppender;
+class LLBC_BaseLogAppender;
 class LLBC_LogRunnable;
 
 __LLBC_NS_END
@@ -312,7 +312,7 @@ private:
      * Add log appender.
      * @param[in] appender - log appender.
      */
-    void AddAppender(LLBC_ILogAppender *appender);
+    void AddAppender(LLBC_BaseLogAppender *appender);
 
     /**
      * Output log data.
@@ -359,7 +359,7 @@ private:
     // Flush interval, in milliseconds.
     sint64 _flushInterval;
     // Log appenders.
-    LLBC_ILogAppender *_appenders;
+    LLBC_BaseLogAppender *_appenders;
 
     // Logger object pool.
     LLBC_ObjPool _objPool;

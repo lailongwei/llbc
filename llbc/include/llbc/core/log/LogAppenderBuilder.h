@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
-class LLBC_ILogAppender;
+class LLBC_BaseLogAppender;
 
 __LLBC_NS_END
 
@@ -44,7 +44,7 @@ public:
     ~LLBC_LogAppenderBuilder();
 
 public:
-    LLBC_ILogAppender *BuildAppender(int type) const;
+    LLBC_BaseLogAppender *BuildAppender(int type) const;
 };
 
 /**
