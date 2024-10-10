@@ -58,7 +58,7 @@ const LLBC_Variant &LLBC_Event::GetParam(const LLBC_Variant &key) const
 
 LLBC_Event &LLBC_Event::SetParam(const LLBC_Variant &key, const LLBC_Variant &param)
 {
-    LLBC_DoIf(_variantKeyParams == nullptr, _variantKeyParams = new typeof(*_variantKeyParams));
+    LLBC_DoIf(_variantKeyParams == nullptr, _variantKeyParams = new std::map(*_variantKeyParams));
 
     const auto &it = _variantKeyParams->find(key);
     if (it == _variantKeyParams->end()) _variantKeyParams->insert(std::make_pair(key, param));
@@ -74,7 +74,7 @@ const std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetVariantKeyParams() co
 
 std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetMutableVariantKeyParams()
 {
-    if (_variantKeyParams == nullptr) _variantKeyParams = new typeof(*_variantKeyParams);
+    if (_variantKeyParams == nullptr) _variantKeyParams = new std::map(*_variantKeyParams);
     return *_variantKeyParams;
 }
 
@@ -83,7 +83,7 @@ LLBC_Event * LLBC_Event::Clone() const
     auto *clone = new LLBC_Event(_id, false);
     if(_variantKeyParams)
     {
-        clone->_variantKeyParams = new std::map<LLBC_Variant, LLBC_Variant>(*_variantKeyParams);
+        clone->_variantKeyParams = new std::map(*_variantKeyParams);
     }
 
     return clone;
@@ -91,7 +91,7 @@ LLBC_Event * LLBC_Event::Clone() const
 
 LLBC_Variant &LLBC_Event::operator[](const LLBC_Variant &key)
 {
-    if(_variantKeyParams == nullptr) _variantKeyParams = new typeof(*_variantKeyParams);
+    if(_variantKeyParams == nullptr) _variantKeyParams = new std::map(*_variantKeyParams);
 
     const auto& it = _variantKeyParams->find(key);
     return it == _variantKeyParams->end() ? _variantKeyParams->insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
