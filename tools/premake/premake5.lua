@@ -228,7 +228,6 @@ workspace ("llbc_" .. _ACTION)
         buildoptions { 
             "-Wall -Werror",
             "-Wno-strict-aliasing",
-            "-Wno-error=register",
         }
     filter {}
 
@@ -581,6 +580,7 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-Wno-error=register",
         }
     filter {}
 
