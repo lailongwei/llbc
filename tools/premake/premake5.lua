@@ -187,6 +187,9 @@ workspace ("llbc_" .. _ACTION)
         filter {}
     end
 
+    -- set C++ standard as C++17
+    cppdialect "C++17"
+
     -- defines.
     filter { "configurations:debug*" }
         defines {
