@@ -53,7 +53,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
         return nullptr;
 
     // Try find event param from constant string_key params.
-    auto cit = ev->GetVariantKeyParams().find(LLBC_Variant[evParamKey]);
+    auto cit = ev->GetVariantKeyParams().find(LLBC_Variant(evParamKey));
     if (cit != ev->GetVariantKeyParams().end())
         return pyllbc_ObjUtil::Variant2Obj(cit->second);
 
