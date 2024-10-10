@@ -43,63 +43,21 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
     _dontDelAfterFire = dontDelAfterFire;
 }
 
-template <typename ParamType>
-inline LLBC_Event &LLBC_Event::SetParam(int key, const ParamType &param)
+template<typename KeyType>
+const LLBC_Variant& LLBC_Event::GetParam(const KeyType& key) const
 {
-    const LLBC_Variant varParam(param);
-    return SetParam(key, varParam);
+    return GetParam(LLBC_Variant(key));
 }
 
-template <typename ParamType>
-inline LLBC_Event &LLBC_Event::SetParam(const char *key, const ParamType &param)
+template <typename KeyType, typename ParamType>
+LLBC_Event& LLBC_Event::SetParam(const KeyType& key, const ParamType& param)
 {
-    const LLBC_Variant varParam(param);
-    return SetParam(key, varParam);
+    return SetParam(LLBC_Variant(key), LLBC_Variant(param));
 }
 
-template <typename ParamType>
-inline LLBC_Event &LLBC_Event::SetParam(const LLBC_String &key, const ParamType &param)
+inline size_t LLBC_Event::GetVariantKeyParamsCount() const
 {
-    const LLBC_Variant varParam(param);
-    return SetParam(key, varParam);
-}
-
-inline std::map<int, LLBC_Variant> &LLBC_Event::GetMutableIntKeyParams()
-{
-    if (!_intKeyParams)
-        _intKeyParams = new std::map<int, LLBC_Variant>();
-    return *_intKeyParams;
-}
-
-inline size_t LLBC_Event::GetIntKeyParamsCount() const
-{
-    return _intKeyParams != nullptr ? _intKeyParams->size() : 0;
-}
-
-inline size_t LLBC_Event::GetConstantStrKeyParamsCount() const
-{
-    return _constantStrKeyParams != nullptr ? _constantStrKeyParams->size() : 0;
-}
-
-inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableConstantStrKeyParams()
-{
-    if (!_constantStrKeyParams)
-        _constantStrKeyParams = new std::map<LLBC_CString, LLBC_Variant>();
-
-    return *_constantStrKeyParams;
-}
-
-inline size_t LLBC_Event::GetStrKeyParamsCount() const
-{
-    return _strKeyParams != nullptr ? _strKeyParams->size() : 0;
-}
-
-inline std::map<LLBC_String, LLBC_Variant> &LLBC_Event::GetMutableStrKeyParams()
-{
-    if (!_strKeyParams)
-        _strKeyParams = new std::map<LLBC_String, LLBC_Variant>();
-
-    return *_strKeyParams;
+    return _variantKeyParams != nullptr ? _variantKeyParams->size() : 0;
 }
 
 inline void * LLBC_Event::GetExtData() const
@@ -124,6 +82,18 @@ inline void LLBC_Event::ClearExtData()
     }
 
     _extDataClearDeleg = nullptr;
+}
+
+template<typename KeyType>
+LLBC_Variant& LLBC_Event::operator[](const KeyType &key)
+{
+    return operator[](LLBC_Variant(key));
+}
+
+template<typename KeyType>
+const LLBC_Variant& LLBC_Event::operator[](const KeyType &key) const
+{
+    return operator[](LLBC_Variant(key));
 }
 
 __LLBC_NS_END

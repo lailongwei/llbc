@@ -13,7 +13,7 @@ jobs:
   linux-build:
     name: Linux build job
     runs-on: ubuntu-latest
-    container: docker.io/centos:7
+    container: docker.io/centos:latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -28,17 +28,10 @@ jobs:
           # yum makecache
 
       - name: install deps
-        run: yum install -y openssl-devel wget tar gcc gcc-c++ libuuid libuuid-devel automake autoconf libtool make
-
-      - name : install cmake
-        run: wget https://github.com/Kitware/CMake/releases/download/v3.27.0/cmake-3.27.0-linux-x86_64.tar.gz && tar -zxvf cmake-3.27.0-linux-x86_64.tar.gz && mv cmake-3.27.0-linux-x86_64 /usr/local/cmake && ln -s /usr/local/cmake/bin/* /usr/local/bin/
-
-      - name: install git
         run: |
-          yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
-          yum install -y git
-          echo "git version:`git --version`"
-      
+          yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
+          ln -s /usr/bin/python2 /usr/bin/python
+
       - name: Check out repository code
         uses: actions/checkout@v3
         with:

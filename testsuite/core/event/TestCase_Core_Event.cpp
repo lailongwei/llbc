@@ -37,14 +37,6 @@ namespace
     static LLBC_EventMgr evMgr;
 }
 
-TestCase_Core_Event::TestCase_Core_Event()
-{
-}
-
-TestCase_Core_Event::~TestCase_Core_Event()
-{
-}
-
 int TestCase_Core_Event::Run(int argc, char *argv[])
 {
     std::cout <<"core/event test:" <<std::endl;
@@ -56,7 +48,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     _ev1TooStub = evMgr.AddListener(EventIds::Event1, this, &TestCase_Core_Event::OnEvent1Too);
 
     // Build event.
-    LLBC_Event *ev = new LLBC_Event(EventIds::Event1);
+    auto ev = new LLBC_Event(EventIds::Event1);
     // Attach int key indexed params.
     ev->SetParam(0, 1);
     ev->SetParam(1, true);
@@ -123,24 +115,10 @@ void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    std::cout <<"- Event " <<ev.GetId() <<" const char * indexed params:" <<std::endl;
-    const std::map<LLBC_CString, LLBC_Variant> &cstrKeyParams = ev.GetConstantStrKeyParams();
-    for (std::map<LLBC_CString, LLBC_Variant>::const_iterator cstrKeyIt = cstrKeyParams.begin();
-         cstrKeyIt != cstrKeyParams.end();
-         ++cstrKeyIt)
-        std::cout <<"  - " <<cstrKeyIt->first <<": " <<cstrKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" int indexed params:" <<std::endl;
-    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
-    for (std::map<int, LLBC_Variant>::const_iterator intKeyIt = intKeyParams.begin();
-         intKeyIt != intKeyParams.end();
-         ++intKeyIt)
-        std::cout <<"  - " <<intKeyIt->first <<": " <<intKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" LLBC_String indexed params:" <<std::endl;
-    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator strKeyIt = strKeyParams.begin();
-         strKeyIt != strKeyParams.end();
-         ++strKeyIt)
-        std::cout <<"  - " <<strKeyIt->first <<": " <<strKeyIt->second <<std::endl;
+    std::cout <<"- Event " <<ev.GetId() <<" indexed params:" <<std::endl;
+    const auto &params = ev.GetVariantKeyParams();
+    for(const auto &[key, value] : params)
+    {
+        std::cout <<"  - " <<key <<": " <<value <<std::endl;
+    }
 }
