@@ -53,14 +53,9 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
         return nullptr;
 
     // Try find event param from constant string_key params.
-    std::map<LLBC_CString, LLBC_Variant>::const_iterator cit = ev->GetConstantStrKeyParams().find(evParamKey);
-    if (cit != ev->GetConstantStrKeyParams().end())
+    std::map<LLBC_CString, LLBC_Variant>::const_iterator cit = ev->GetVariantKeyParams().find(evParamKey);
+    if (cit != ev->GetVariantKeyParams().end())
         return pyllbc_ObjUtil::Variant2Obj(cit->second);
-
-    // Try find event param from string params.
-    std::map<LLBC_String, LLBC_Variant>::const_iterator it = ev->GetStrKeyParams().find(LLBC_String(evParamKey));
-    if (it != ev->GetStrKeyParams().end())
-        return pyllbc_ObjUtil::Variant2Obj(it->second);
 
     // Not found, set index error.
     pyllbc_SetError(LLBC_String().format("not found event param, key:%s", evParamKey), LLBC_ERROR_NOT_FOUND, PyExc_IndexError);
