@@ -28,8 +28,10 @@ jobs:
           # yum makecache
 
       - name: install deps
-        run: yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
-      
+        run: |
+          yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
+          ln -s /usr/bin/python2 /usr/bin/python
+
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
