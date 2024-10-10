@@ -225,6 +225,7 @@ workspace ("llbc_" .. _ACTION)
         buildoptions { 
             "-Wall -Werror",
             "-Wno-strict-aliasing",
+            "-Wno-error=register",
         }
     filter {}
 
