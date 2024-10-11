@@ -44,20 +44,15 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
 }
 
 template<typename KeyType>
-const LLBC_Variant& LLBC_Event::GetParam(const KeyType& key) const
+const LLBC_Variant &LLBC_Event::GetParam(const KeyType &key) const
 {
     return GetParam(LLBC_Variant(key));
 }
 
 template <typename KeyType, typename ParamType>
-LLBC_Event& LLBC_Event::SetParam(const KeyType& key, const ParamType& param)
+LLBC_Event &LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
 {
     return SetParam(LLBC_Variant(key), LLBC_Variant(param));
-}
-
-inline size_t LLBC_Event::GetVariantKeyParamsCount() const
-{
-    return _variantKeyParams != nullptr ? _variantKeyParams->size() : 0;
 }
 
 inline void * LLBC_Event::GetExtData() const
@@ -85,13 +80,13 @@ inline void LLBC_Event::ClearExtData()
 }
 
 template<typename KeyType>
-LLBC_Variant& LLBC_Event::operator[](const KeyType &key)
+LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 {
     return operator[](LLBC_Variant(key));
 }
 
 template<typename KeyType>
-const LLBC_Variant& LLBC_Event::operator[](const KeyType &key) const
+const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 {
     return operator[](LLBC_Variant(key));
 }

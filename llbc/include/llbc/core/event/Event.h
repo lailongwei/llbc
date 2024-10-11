@@ -92,26 +92,20 @@ public:
      * @return LLBC_Event & - this reference.
      */
     template <typename KeyType, typename ParamType>
-    LLBC_Event& SetParam(const KeyType& key, const ParamType& param);
+    LLBC_Event &SetParam(const KeyType &key, const ParamType &param);
 
 public:
     /**
      * Get all variant key indexed params.
      * @return const std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params const reference.
      */
-    const std::map<LLBC_Variant, LLBC_Variant> &GetVariantKeyParams() const;
+    const std::map<LLBC_Variant, LLBC_Variant> &GetParams() const;
 
     /**
      * Get all variant key indexed params(mutable).
      * @return std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params mutable reference.
      */
-    std::map<LLBC_Variant, LLBC_Variant> &GetMutableVariantKeyParams();
-
-    /**
-     * Get all variant key indexed params count.
-     * @return size_t - the variant key indexed params count.
-     */
-    size_t GetVariantKeyParamsCount() const;
+    std::map<LLBC_Variant, LLBC_Variant> &GetMutableParams();
 
     /**
      * Clone event.
@@ -167,7 +161,7 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    std::map<LLBC_Variant, LLBC_Variant> *_variantKeyParams;
+    std::map<LLBC_Variant, LLBC_Variant> _params;
 
     void *_extData;
     LLBC_Delegate<void(void *)> _extDataClearDeleg;

@@ -116,7 +116,7 @@ void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
     std::cout <<"- Event " <<ev.GetId() <<" indexed params:" <<std::endl;
-    const auto &params = ev.GetVariantKeyParams();
+    const auto &params = ev.GetParams();
     for(const auto &[key, value] : params)
     {
         std::cout <<"  - " <<key <<": " <<value <<std::endl;

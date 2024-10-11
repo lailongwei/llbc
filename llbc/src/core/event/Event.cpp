@@ -37,82 +37,67 @@ __LLBC_NS_BEGIN
 LLBC_Event::LLBC_Event(const int id, const bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
-, _variantKeyParams(nullptr)
+, _params({})
 , _extData(nullptr)
 , _extDataClearDeleg(nullptr) {}
 
 LLBC_Event::~LLBC_Event()
 {
     ClearExtData();
-
-    LLBC_XDelete(_variantKeyParams);
 }
 
 const LLBC_Variant &LLBC_Event::GetParam(const LLBC_Variant &key) const
 {
-    LLBC_ReturnIf(_variantKeyParams == nullptr, LLBC_INL_NS __nilVariant);
-
-    const auto &it = _variantKeyParams->find(key);
-    return it != _variantKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
+    const auto &it = _params.find(key);
+    return it != _params.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
 LLBC_Event &LLBC_Event::SetParam(const LLBC_Variant &key, const LLBC_Variant &param)
 {
-    if(_variantKeyParams == nullptr) _variantKeyParams = new std::map<LLBC_Variant, LLBC_Variant>();
-
-    const auto &it = _variantKeyParams->find(key);
-    if (it == _variantKeyParams->end()) _variantKeyParams->insert(std::make_pair(key, param));
-    else it->second = param;
+    if (const auto &it = _params.find(key); it == _params.end())
+        _params.insert(std::make_pair(key, param));
+    else
+        it->second = param;
 
     return *this;
 }
 
-const std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetVariantKeyParams() const
+const std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetParams() const
 {
-    return _variantKeyParams != nullptr ? *_variantKeyParams : LLBC_INL_NS __emptyVariantKeyParams;
+    return _params;
 }
 
-std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetMutableVariantKeyParams()
+std::map<LLBC_Variant, LLBC_Variant> &LLBC_Event::GetMutableParams()
 {
-    if (_variantKeyParams == nullptr) _variantKeyParams = new std::map<LLBC_Variant, LLBC_Variant>();
-    return *_variantKeyParams;
+    return _params;
 }
 
 LLBC_Event * LLBC_Event::Clone() const
 {
     auto *clone = new LLBC_Event(_id, false);
-    if(_variantKeyParams)
-    {
-        clone->_variantKeyParams = new std::map<LLBC_Variant, LLBC_Variant>(*_variantKeyParams);
-    }
+    clone->_params = _params;
 
     return clone;
 } 
 
 LLBC_Variant &LLBC_Event::operator[](const LLBC_Variant &key)
 {
-    if(_variantKeyParams == nullptr) _variantKeyParams = new std::map<LLBC_Variant, LLBC_Variant>();
-
-    const auto& it = _variantKeyParams->find(key);
-    return it == _variantKeyParams->end() ? _variantKeyParams->insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
+    const auto &it = _params.find(key);
+    return it == _params.end() ? _params.insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
 }
 
 const LLBC_Variant &LLBC_Event::operator[](const LLBC_Variant &key) const
 {
-    if(_variantKeyParams == nullptr) return LLBC_INL_NS __nilVariant;
-
-    const auto& it = _variantKeyParams->find(key);
-    return it != _variantKeyParams->end() ? it->second : LLBC_INL_NS __nilVariant;
+    const auto &it = _params.find(key);
+    return it != _params.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
 void LLBC_Event::Reuse()
 {
     _id = 0;
     _dontDelAfterFire = false;
-
+    _params.clear();
     ClearExtData();
-
-    LLBC_DoIf(_variantKeyParams, _variantKeyParams->clear());
 }
 
 __LLBC_NS_END
