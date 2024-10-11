@@ -28,13 +28,12 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 static const LLBC_NS LLBC_Variant __nilVariant;
-static const std::map<LLBC_NS LLBC_Variant, LLBC_NS LLBC_Variant> __emptyVariantKeyParams;
 
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-LLBC_Event::LLBC_Event(const int id, const bool dontDelAfterFire)
+LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
 , _params({})
@@ -48,13 +47,13 @@ LLBC_Event::~LLBC_Event()
 
 const LLBC_Variant &LLBC_Event::GetParam(const LLBC_Variant &key) const
 {
-    const auto &it = _params.find(key);
+    const auto it = _params.find(key);
     return it != _params.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
 LLBC_Event &LLBC_Event::SetParam(const LLBC_Variant &key, const LLBC_Variant &param)
 {
-    if (const auto &it = _params.find(key); it == _params.end())
+    if (const auto it = _params.find(key); it == _params.end())
         _params.insert(std::make_pair(key, param));
     else
         it->second = param;
@@ -82,13 +81,13 @@ LLBC_Event * LLBC_Event::Clone() const
 
 LLBC_Variant &LLBC_Event::operator[](const LLBC_Variant &key)
 {
-    const auto &it = _params.find(key);
+    const auto it = _params.find(key);
     return it == _params.end() ? _params.insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
 }
 
 const LLBC_Variant &LLBC_Event::operator[](const LLBC_Variant &key) const
 {
-    const auto &it = _params.find(key);
+    const auto it = _params.find(key);
     return it != _params.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
